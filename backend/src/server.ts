@@ -1,0 +1,122 @@
+import express from 'express'
+import cors from 'cors'
+import { createServer } from 'http'
+import { env } from './shared/config/env.js'
+import { logger } from './shared/utils/logger.js'
+import { errorHandler } from './shared/middleware/error-handler.js'
+
+// Import features
+import { authRoutes } from './features/auth/index.js'
+
+// Initialize Express app
+const app = express()
+
+// Create HTTP server
+const httpServer = createServer(app)
+
+// =====================================================
+// Middleware
+// =====================================================
+
+// CORS configuration
+const allowedOrigins = env.ALLOWED_ORIGINS.split(',').map((origin) => origin.trim())
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, Postman, etc.)
+      if (!origin) return callback(null, true)
+
+      if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+        callback(null, true)
+      } else {
+        callback(new Error('Not allowed by CORS'))
+      }
+    },
+    credentials: true,
+  })
+)
+
+// Body parsers
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
+// Request logging
+app.use((req, res, next) => {
+  logger.debug(`${req.method} ${req.path}`, {
+    ip: req.ip,
+    userAgent: req.get('user-agent'),
+  })
+  next()
+})
+
+// =====================================================
+// Health Check
+// =====================================================
+
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: env.NODE_ENV,
+  })
+})
+
+// =====================================================
+// API Routes
+// =====================================================
+
+app.use('/api/auth', authRoutes)
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    error: {
+      message: 'Route not found',
+      code: 'NOT_FOUND',
+    },
+    meta: {
+      timestamp: new Date().toISOString(),
+    },
+  })
+})
+
+// =====================================================
+// Error Handler
+// =====================================================
+
+app.use(errorHandler)
+
+// =====================================================
+// Start Server
+// =====================================================
+
+const PORT = env.PORT
+
+httpServer.listen(PORT, () => {
+  logger.info(`🚀 Music Room backend is running!`)
+  logger.info(`📍 Server: http://localhost:${PORT}`)
+  logger.info(`🏥 Health: http://localhost:${PORT}/health`)
+  logger.info(`🔐 Auth API: http://localhost:${PORT}/api/auth`)
+  logger.info(`🌍 Environment: ${env.NODE_ENV}`)
+})
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  logger.info('SIGTERM received, shutting down gracefully...')
+  httpServer.close(() => {
+    logger.info('Server closed')
+    process.exit(0)
+  })
+})
+
+process.on('SIGINT', () => {
+  logger.info('SIGINT received, shutting down gracefully...')
+  httpServer.close(() => {
+    logger.info('Server closed')
+    process.exit(0)
+  })
+})
+
+export { app, httpServer }
