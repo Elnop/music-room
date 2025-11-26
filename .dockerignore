@@ -1,0 +1,66 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+docs/
+PLAN.md
+Git_Workflow.md
+DOCKER.md
+
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Node modules (will be installed in containers)
+**/node_modules
+**/npm-debug.log
+**/yarn-error.log
+
+# Environment files
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Build outputs
+**/dist
+**/build
+**/.expo
+**/.expo-shared
+**/web-build
+
+# Native builds
+**/android
+**/ios
+
+# Logs
+**/logs
+**/*.log
+
+# Test coverage
+**/coverage
+**/.nyc_output
+
+# Temporary files
+**/tmp
+**/temp
+**/.cache
+
+# Docker files
+**/Dockerfile
+**/.dockerignore
+docker-compose*.yml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Security scan results
+.trivyignore
+scan-results/

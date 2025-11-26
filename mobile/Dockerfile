@@ -1,0 +1,43 @@
+# Dockerfile for Music Room Mobile (Expo/React Native)
+# Using Chainguard Node.js image - ZERO CVE vulnerabilities
+FROM cgr.dev/chainguard/node:latest-dev
+
+# Switch to root for global installations and setup
+USER root
+
+# Install Expo CLI globally
+RUN npm install -g expo-cli @expo/ngrok
+
+WORKDIR /app
+
+# Fix permissions for the node user
+RUN chown -R node:node /app
+
+# Switch back to node user
+USER node
+
+# Install dependencies first (better caching)
+COPY --chown=node:node package*.json ./
+RUN npm install
+
+# Copy source code
+COPY --chown=node:node . .
+
+# Expose Expo ports
+# 8081: Metro bundler
+# 19000: Expo DevTools
+# 19001: Expo DevTools (secure)
+# 19002: Expo DevTools (legacy)
+EXPOSE 8081 19000 19001 19002
+
+# Set environment variables for Expo
+# EXPO_DEVTOOLS_LISTEN_ADDRESS allows DevTools to be accessible from outside the container
+ENV EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
+# REACT_NATIVE_PACKAGER_HOSTNAME sets the IP address that devices will connect to
+ENV REACT_NATIVE_PACKAGER_HOSTNAME=0.0.0.0
+
+# Reset entrypoint to use shell instead of node
+ENTRYPOINT []
+
+# Start Expo development server using the startup script
+CMD ["sh", "start-expo.sh"]

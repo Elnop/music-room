@@ -1,0 +1,71 @@
+# Dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+yarn.lock
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Expo
+.expo
+.expo-shared
+dist/
+web-build/
+
+# Native build outputs
+android/
+ios/
+*.apk
+*.ipa
+*.keystore
+
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+*.md
+
+# Tests
+coverage
+__tests__/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
+# Logs
+logs
+*.log
+
+# Temporary files
+tmp
+temp
+.cache
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# ESLint and Prettier
+.eslintcache
+.prettierignore
+
+# TypeScript
+*.tsbuildinfo
+
+# Metro bundler cache
+.metro-health-check*

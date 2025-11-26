@@ -1,0 +1,64 @@
+services:
+  # Backend API Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: music-room-backend
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount source code for hot reload
+      - ./backend:/app
+      # Prevent node_modules from being overwritten
+      - /app/node_modules
+    env_file:
+      - ./backend/.env
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+    networks:
+      - music-room-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Mobile Expo Service
+  mobile:
+    build:
+      context: ./mobile
+      dockerfile: Dockerfile
+    container_name: music-room-mobile
+    ports:
+      - "8081:8081"   # Metro bundler
+      - "19000:19000" # Expo DevTools
+      - "19001:19001" # Expo DevTools (secure)
+      - "19002:19002" # Expo DevTools (legacy)
+    volumes:
+      # Mount source code for hot reload
+      - ./mobile:/app
+      # Prevent node_modules from being overwritten
+      - /app/node_modules
+      - /app/.expo
+    environment:
+      - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
+      - REACT_NATIVE_PACKAGER_HOSTNAME=${HOST_IP:-0.0.0.0}
+      # Backend API URL (accessible from mobile container)
+      - API_URL=http://backend:3000
+    networks:
+      - music-room-network
+    depends_on:
+      - backend
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+
+networks:
+  music-room-network:
+    driver: bridge
+    name: music-room-network
