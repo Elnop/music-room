@@ -23,3 +23,20 @@ export const registerSchema = z.object({
 
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
+
+// Playlist Validators
+export const playlistSchema = z.object({
+  name: z
+    .string()
+    .min(1, 'Playlist name is required')
+    .max(100, 'Playlist name must be less than 100 characters'),
+  description: z
+    .string()
+    .max(500, 'Description must be less than 500 characters')
+    .optional(),
+  visibility: z.enum(['public', 'private'], {
+    errorMap: () => ({ message: 'Visibility must be public or private' }),
+  }),
+});
+
+export type PlaylistInput = z.infer<typeof playlistSchema>;

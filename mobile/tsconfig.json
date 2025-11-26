@@ -28,8 +28,8 @@
       "@services/*": [
         "src/services/*"
       ],
-      "@store/*": [
-        "src/store/*"
+      "@store": [
+        "src/store"
       ],
       "@hooks/*": [
         "src/hooks/*"
@@ -37,11 +37,14 @@
       "@utils/*": [
         "src/utils/*"
       ],
-      "@types/*": [
-        "src/types/*"
+      "@types": [
+        "src/types"
       ],
-      "@constants/*": [
-        "src/constants/*"
+      "@constants": [
+        "src/constants"
+      ],
+      "@mocks": [
+        "src/mocks"
       ]
     }
   },

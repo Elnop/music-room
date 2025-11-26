@@ -71,17 +71,56 @@ npm run android
 npm run ios
 ```
 
-## Scripts
+## Scripts Disponibles
 
-- `npm start` - Démarrer le serveur Expo
-- `npm run android` - Lancer sur Android
-- `npm run ios` - Lancer sur iOS
-- `npm run web` - Lancer sur navigateur
+### Démarrage Expo
+
+- `npm start` - Mode normal (défaut)
+- `npm run start:lan` - Mode LAN (recommandé avec Expo Go sur même WiFi)
+- `npm run start:tunnel` - Mode tunnel (fonctionne avec WiFi différents)
+- `npm run start:clear` - Démarrer avec cache effacé
+- `npm run start:lan-clear` - Mode LAN + cache effacé
+- `npm run android` - Lancer sur émulateur/appareil Android
+- `npm run ios` - Lancer sur simulateur iOS (macOS uniquement)
+- `npm run web` - Lancer dans le navigateur
+
+### Qualité de Code
+
+- `npm run check` - Vérifier types TypeScript + ESLint (rapide)
+- `npm run fix` - Formater et corriger automatiquement tout
+- `npm run check-all` - Vérification complète (types + lint + format)
 - `npm run lint` - Linter le code
-- `npm run lint:fix` - Corriger automatiquement
+- `npm run lint:fix` - Corriger les erreurs ESLint
 - `npm run format` - Formater avec Prettier
-- `npm run type-check` - Vérifier les types TypeScript
-- `npm run clean` - Nettoyer et réinstaller
+- `npm run type-check` - Vérifier les types TypeScript uniquement
+
+### Maintenance & Diagnostic
+
+- `npm run clean:cache` - Nettoyer le cache Expo (rapide, ~5 secondes)
+- `npm run clean:full` - Nettoyage complet + réinstallation
+- `npm run clean` - Nettoyer et réinstaller (alias de clean:full)
+- `npm run reset` - Nettoyer le cache et redémarrer Expo
+- `npm run doctor` - Diagnostiquer les problèmes de configuration Expo
+- `npm run update` - Vérifier si les dépendances sont à jour
+
+### Build & Production
+
+- `npm run prebuild` - Générer les dossiers natifs Android/iOS
+- `npm run build:local` - Build Android local (nécessite Android Studio)
+
+### Backend
+
+- `npm run dev:backend` - Lancer le backend depuis le dossier mobile
+
+## Commandes les Plus Utiles
+
+Pour débuter, voici les 5 commandes que vous utiliserez le plus :
+
+1. **`npm run start:lan`** - Tester avec Expo Go (recommandé)
+2. **`npm run fix`** - Corriger automatiquement le code
+3. **`npm run check`** - Vérifier avant un commit
+4. **`npm run reset`** - Résoudre les bugs étranges
+5. **`npm run doctor`** - Diagnostiquer les problèmes
 
 ## Architecture
 

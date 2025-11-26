@@ -3,18 +3,15 @@ export interface User {
   id: string;
   email: string;
   username: string;
-  avatar_url?: string;
-  created_at: string;
+  avatarUrl?: string;
+  createdAt: string;
 }
 
 export interface UserProfile extends User {
+  displayName?: string;
   bio?: string;
-  favorite_genres?: string[];
-  privacy: {
-    public: Record<string, unknown>;
-    friends: Record<string, unknown>;
-    private: Record<string, unknown>;
-  };
+  spotifyConnected: boolean;
+  updatedAt: string;
 }
 
 // Auth Types (Supabase Auth v2.50.0+)
@@ -35,26 +32,36 @@ export interface RegisterCredentials {
   username: string;
 }
 
-// Playlist Types
+// Track Types (Mock-friendly structure)
+export interface Track {
+  id: string;
+  title: string;
+  artist: string;
+  album: string;
+  albumArt: string;
+  duration: number; // milliseconds
+  spotifyUri: string;
+  previewUrl?: string;
+}
+
+// Playlist Types (Mock-friendly structure)
 export interface Playlist {
   id: string;
   name: string;
   description?: string;
-  owner_id: string;
+  coverUrl?: string;
+  ownerId: string;
+  collaboratorIds: string[];
+  trackIds: string[];
   visibility: 'public' | 'private';
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface Track {
-  id: string;
-  spotify_id: string;
-  name: string;
-  artist: string;
-  album: string;
-  duration_ms: number;
-  album_art_url?: string;
-  spotify_uri: string;
+// Playlist with full track data and owner info
+export interface PlaylistWithTracks extends Playlist {
+  tracks: Track[];
+  owner: UserProfile;
 }
 
 // Device Types

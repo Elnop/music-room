@@ -29,6 +29,7 @@ export const COLORS = {
   secondary: '#191414', // Near Black
   background: '#121212', // Pure Black
   surface: '#282828', // Dark Gray
+  border: '#404040', // Gray Border
   text: '#FFFFFF', // White
   textSecondary: '#B3B3B3', // Light Gray
   error: '#E63946', // Red
