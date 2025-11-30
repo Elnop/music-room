@@ -5,6 +5,9 @@ FROM cgr.dev/chainguard/node:latest-dev
 # Switch to root for global installations and setup
 USER root
 
+# Install system packages (expect for automated EAS login)
+RUN apk add --no-cache expect
+
 # Install Expo CLI globally
 RUN npm install -g expo-cli @expo/ngrok
 

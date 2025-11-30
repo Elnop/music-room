@@ -10,6 +10,7 @@ const envSchema = z.object({
   PORT: z.string().default('3000').transform(Number),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   ALLOWED_ORIGINS: z.string().default('http://localhost:8081'),
+  TUNNEL_URL: z.string().optional(), // Optional ngrok tunnel URL for cross-network development
 })
 
 export type Env = z.infer<typeof envSchema>

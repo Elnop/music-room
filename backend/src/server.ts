@@ -20,15 +20,38 @@ const httpServer = createServer(app)
 
 // CORS configuration
 const allowedOrigins = env.ALLOWED_ORIGINS.split(',').map((origin) => origin.trim())
+
+// Add tunnel URL to allowed origins if present (tunnel mode)
+if (env.TUNNEL_URL) {
+  allowedOrigins.push(env.TUNNEL_URL)
+  // Also allow exp:// protocol version for Expo
+  const expUrl = env.TUNNEL_URL.replace('https://', 'exp://')
+  allowedOrigins.push(expUrl)
+  logger.info(`🌐 Tunnel CORS enabled: ${env.TUNNEL_URL}`)
+}
+
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (mobile apps, Postman, etc.)
       if (!origin) return callback(null, true)
 
+      // In development, auto-allow ngrok domains for tunnel mode
+      if (env.NODE_ENV === 'development' && origin.includes('ngrok')) {
+        logger.debug(`✓ CORS allowed (ngrok tunnel): ${origin}`)
+        return callback(null, true)
+      }
+
+      // In development, auto-allow exp:// URLs for Expo
+      if (env.NODE_ENV === 'development' && origin.startsWith('exp://')) {
+        logger.debug(`✓ CORS allowed (Expo): ${origin}`)
+        return callback(null, true)
+      }
+
       if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
         callback(null, true)
       } else {
+        logger.warn(`❌ CORS blocked origin: ${origin}`)
         callback(new Error('Not allowed by CORS'))
       }
     },

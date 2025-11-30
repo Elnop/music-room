@@ -156,10 +156,61 @@ For detailed Docker documentation, see [DOCKER.md](./DOCKER.md).
 
 ## Development Workflow
 
+### Development Modes
+
+Music Room supports two development modes for mobile testing:
+
+#### LAN Mode (Default - Same WiFi Network)
+
+Use when your phone and computer are on the same WiFi network.
+
+```bash
+make dev               # Start services in LAN mode
+make qr                # Show QR code for local network
+```
+
+**Advantages:**
+- Fast performance (5-20ms latency)
+- Quick hot reload
+- No internet dependency
+- No additional configuration
+
+**Requirements:**
+- Phone and PC on same WiFi network
+
+#### Tunnel Mode (Different WiFi Networks)
+
+Use when your phone and computer are on **different networks** (e.g., phone on cellular data, PC on home WiFi).
+
+```bash
+# First time only (automatic setup)
+make tunnel-setup
+
+# Start tunnel mode
+make dev-tunnel
+
+# Multi-device support: Just share the QR code!
+```
+
+**Advantages:**
+- Works across any network (cellular, different WiFi, etc.)
+- No network configuration needed
+- Access from anywhere with internet
+- **Unlimited devices simultaneously** (share QR code with team)
+
+**Trade-offs:**
+- Slower performance (+50-200ms latency)
+- Requires EAS account (free, auto-configured)
+- Internet connection required
+
+**ngrok Web Interface:** http://localhost:4040 (monitor tunnel traffic)
+
+📖 **Full tunnel mode documentation:** See [TUNNEL_MODE.md](./TUNNEL_MODE.md)
+
 ### Daily Development
 
 ```bash
-# Start services
+# Start services (LAN mode)
 make dev
 
 # View logs (in another terminal)
@@ -174,6 +225,8 @@ make stop
 
 ### Testing Mobile App on Device
 
+#### LAN Mode (Same WiFi Network)
+
 1. Ensure your device and computer are on the same WiFi network
 
 2. Start services:
@@ -184,6 +237,24 @@ make stop
 3. Install **Expo Go** on your device (Play Store / App Store)
 
 4. Scan QR code from http://localhost:19000 or the terminal
+
+#### Tunnel Mode (Different Networks)
+
+1. One-time automatic setup:
+   ```bash
+   make tunnel-setup
+   ```
+
+2. Start tunnel mode:
+   ```bash
+   make dev-tunnel
+   ```
+
+3. Install **Expo Go** on your device
+
+4. Scan QR code from terminal (works from any network)
+
+**Multi-device:** Share the same QR code with unlimited devices!
 
 ### Rebuilding After Changes
 

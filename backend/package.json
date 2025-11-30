@@ -6,6 +6,7 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
+    "dev:tunnel": "sh start-with-tunnel.sh",
     "build": "tsc",
     "start": "node dist/server.js",
     "type-check": "tsc --noEmit"

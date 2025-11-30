@@ -18,11 +18,18 @@ USER node
 COPY --chown=node:node package*.json ./
 RUN npm install
 
+# Install ngrok globally for tunnel mode
+RUN npm install -g @expo/ngrok
+
 # Copy source code
 COPY --chown=node:node . .
 
-# Expose backend port
+# Copy tunnel startup script
+COPY --chown=node:node start-with-tunnel.sh ./
+
+# Expose backend port and ngrok web interface port
 EXPOSE 3000
+EXPOSE 4040
 
 # Reset entrypoint to use shell instead of node
 ENTRYPOINT []

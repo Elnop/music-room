@@ -1,4 +1,4 @@
-.PHONY: help install dev start stop restart logs logs-backend logs-mobile qr ps build build-backend build-mobile test test-backend lint format clean clean-docker clean-deps clean-all shell-backend shell-mobile deploy health
+.PHONY: help install dev start stop restart logs logs-backend logs-mobile qr ps build build-backend build-mobile test test-backend lint format clean clean-docker clean-deps clean-all shell-backend shell-mobile deploy health dev-tunnel qr-tunnel tunnel-info
 
 # Colors for output
 BLUE := \033[0;34m
@@ -356,3 +356,138 @@ info: ## Show system information
 	@echo ""
 	@echo "$(YELLOW)Container Status:$(NC)"
 	@$(DOCKER_COMPOSE) ps
+
+# =====================================================
+# Tunnel Mode Commands (Cross-Network Development)
+# =====================================================
+
+dev-tunnel: ## Start all services in tunnel mode (different WiFi networks)
+	@echo "$(BLUE)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(BLUE)║         Starting Music Room in TUNNEL MODE                   ║$(NC)"
+	@echo "$(BLUE)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Checking EAS configuration...$(NC)"
+	@if ! $(DOCKER_COMPOSE) run --rm mobile npx eas whoami >/dev/null 2>&1; then \
+		echo ""; \
+		echo "$(RED)❌ EAS not configured!$(NC)"; \
+		echo ""; \
+		echo "$(YELLOW)Run this first:$(NC) $(GREEN)make tunnel-setup$(NC)"; \
+		echo ""; \
+		exit 1; \
+	fi
+	@echo "$(GREEN)✓ EAS configured$(NC)"
+	@echo ""
+	@echo "$(YELLOW)⚠️  Note: Tunnel mode is slower than LAN mode$(NC)"
+	@echo "$(YELLOW)   Use this only when phone and PC are on different networks$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Building and starting containers with tunnel support...$(NC)"
+	@$(DOCKER_COMPOSE) -f docker-compose.yml -f docker-compose.tunnel.yml up -d --build
+	@echo ""
+	@echo "$(GREEN)✓ Services started in tunnel mode!$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Waiting for tunnels to initialize (20 seconds)...$(NC)"
+	@sleep 20
+	@clear
+	@echo ""
+	@echo "$(GREEN)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(GREEN)║              🌐 Music Room - TUNNEL MODE ACTIVE              ║$(NC)"
+	@echo "$(GREEN)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@echo "$(BLUE)📡 Tunnel URLs:$(NC)"
+	@echo "$(YELLOW)→ Backend tunnel URL:$(NC)"
+	@$(DOCKER_COMPOSE) exec -T backend cat /tmp/backend-tunnel-url.txt 2>/dev/null || echo "   $(YELLOW)Initializing...$(NC)"
+	@echo ""
+	@echo "$(BLUE)🔍 ngrok Web Interface:$(NC)"
+	@echo "   $(GREEN)✓$(NC) Backend ngrok:   http://localhost:4040"
+	@echo ""
+	@echo "$(BLUE)═══════════════════════════════════════════════════════════════$(NC)"
+	@echo "$(YELLOW)📱 EXPO QR CODE - Scan with Expo Go app$(NC)"
+	@echo "$(YELLOW)   (Works across different WiFi networks)$(NC)"
+	@echo "$(BLUE)═══════════════════════════════════════════════════════════════$(NC)"
+	@echo ""
+	@$(DOCKER_COMPOSE) logs mobile 2>/dev/null | grep -B 5 -A 50 "▄▄▄▄▄▄▄" | head -70 || $(DOCKER_COMPOSE) logs mobile | tail -60
+	@echo ""
+	@echo "$(BLUE)═══════════════════════════════════════════════════════════════$(NC)"
+	@echo ""
+	@echo "$(YELLOW)💡 Quick Commands:$(NC)"
+	@echo "   $(GREEN)make qr-tunnel$(NC)   - Show tunnel URLs and QR code again"
+	@echo "   $(GREEN)make tunnel-info$(NC) - Display detailed tunnel information"
+	@echo "   $(GREEN)make logs$(NC)        - View all logs"
+	@echo "   $(GREEN)make stop$(NC)        - Stop tunnel mode"
+	@echo "   $(GREEN)make dev$(NC)         - Switch back to LAN mode"
+	@echo ""
+	@echo "$(GREEN)✨ Tunnel mode active! Scan QR code from any network$(NC)"
+	@echo ""
+
+qr-tunnel: ## Show tunnel QR code and URLs
+	@clear
+	@echo ""
+	@echo "$(GREEN)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(GREEN)║              📱 Tunnel Mode - Connection Info                ║$(NC)"
+	@echo "$(GREEN)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@echo "$(BLUE)🌐 Backend Tunnel URL:$(NC)"
+	@$(DOCKER_COMPOSE) exec -T backend cat /tmp/backend-tunnel-url.txt 2>/dev/null || echo "   $(RED)✗ Backend tunnel not available$(NC)"
+	@echo ""
+	@echo "$(BLUE)🔍 ngrok Web Interface:$(NC)"
+	@echo "   http://localhost:4040 (view tunnel traffic, connections)"
+	@echo ""
+	@echo "$(BLUE)═══════════════════════════════════════════════════════════════$(NC)"
+	@echo "$(YELLOW)📱 EXPO QR CODE$(NC)"
+	@echo "$(BLUE)═══════════════════════════════════════════════════════════════$(NC)"
+	@echo ""
+	@$(DOCKER_COMPOSE) logs mobile 2>/dev/null | grep -B 5 -A 50 "▄▄▄▄▄▄▄" | head -70 || $(DOCKER_COMPOSE) logs mobile | tail -60
+	@echo ""
+	@echo "$(GREEN)✓ Works across different WiFi networks$(NC)"
+	@echo ""
+	@echo "$(YELLOW)💡 Quick commands:$(NC) $(GREEN)make tunnel-info$(NC) | $(GREEN)make logs$(NC) | $(GREEN)make stop$(NC)"
+	@echo ""
+
+tunnel-info: ## Display detailed tunnel connection info
+	@echo "$(BLUE)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(BLUE)║                  Tunnel Mode Information                     ║$(NC)"
+	@echo "$(BLUE)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@echo "$(YELLOW)Backend Tunnel:$(NC)"
+	@$(DOCKER_COMPOSE) exec -T backend cat /tmp/backend-tunnel-url.txt 2>/dev/null || echo "   $(RED)Not running$(NC)"
+	@echo ""
+	@echo "$(YELLOW)ngrok Web UI:$(NC)"
+	@echo "   http://localhost:4040"
+	@echo "   $(BLUE)Use this to inspect HTTP traffic, connections, and tunnel status$(NC)"
+	@echo ""
+	@echo "$(YELLOW)Container Status:$(NC)"
+	@$(DOCKER_COMPOSE) ps
+	@echo ""
+	@echo "$(YELLOW)Performance Note:$(NC)"
+	@echo "   Tunnel mode adds ~50-200ms latency vs LAN mode"
+	@echo "   Hot reload may be slower due to internet round-trip"
+	@echo ""
+	@echo "$(YELLOW)Quick Commands:$(NC)"
+	@echo "   $(GREEN)make qr-tunnel$(NC)  - Show QR code again"
+	@echo "   $(GREEN)make logs$(NC)       - View all logs"
+	@echo "   $(GREEN)make stop$(NC)       - Stop tunnel mode"
+	@echo "   $(GREEN)make dev$(NC)        - Switch to LAN mode"
+	@echo ""
+
+tunnel-setup: ## One-time setup for tunnel mode (auto EAS login)
+	@echo "$(BLUE)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(BLUE)║           Tunnel Mode - Automatic Setup                     ║$(NC)"
+	@echo "$(BLUE)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Starting mobile container for setup...$(NC)"
+	@$(DOCKER_COMPOSE) up mobile -d --build
+	@sleep 5
+	@echo ""
+	@echo "$(YELLOW)→ Configuring EAS (automatic login)...$(NC)"
+	@$(DOCKER_COMPOSE) exec mobile sh setup-eas-auto.sh
+	@echo ""
+	@echo "$(YELLOW)→ Stopping setup container...$(NC)"
+	@$(DOCKER_COMPOSE) stop mobile
+	@echo ""
+	@echo "$(GREEN)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(GREEN)║              ✓ Tunnel Setup Complete!                       ║$(NC)"
+	@echo "$(GREEN)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@echo "$(BLUE)Next step:$(NC)"
+	@echo "  Run: $(GREEN)make dev-tunnel$(NC) to start tunnel mode"
+	@echo ""
