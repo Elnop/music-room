@@ -1,11 +1,11 @@
 #!/bin/sh
-# Automatic EAS login and initialization using credentials from .env
-# This script automates the EAS setup process for tunnel mode
+# Automatic EAS initialization using EXPO_TOKEN from .env
+# No interactive login needed!
 
 set -e
 
 echo "=========================================="
-echo "EAS Auto-Setup"
+echo "EAS Auto-Setup (Token-Based)"
 echo "=========================================="
 
 # Check if .env exists
@@ -14,46 +14,39 @@ if [ ! -f .env ]; then
   exit 1
 fi
 
-# Extract EAS credentials from .env
-EAS_EMAIL=$(grep "# eas email" .env | sed 's/.*: //')
-EAS_PASSWORD=$(grep "# eas mdp" .env | sed 's/.*: //')
+# Load EXPO_TOKEN from .env
+if [ -f .env ]; then
+  export $(grep -v '^#' .env | grep '^EXPO_TOKEN=' | xargs)
+fi
 
-if [ -z "$EAS_EMAIL" ] || [ -z "$EAS_PASSWORD" ]; then
-  echo "❌ Error: EAS credentials not found in .env"
-  echo "   Add: # eas email : your@email.com"
-  echo "   Add: # eas mdp : YourPassword"
+# Check if EXPO_TOKEN is set
+if [ -z "$EXPO_TOKEN" ]; then
+  echo "❌ Error: EXPO_TOKEN not found in .env"
+  echo ""
+  echo "To fix:"
+  echo "  1. Go to https://expo.dev/settings/access-tokens"
+  echo "  2. Create a new Personal Access Token"
+  echo "  3. Add to mobile/.env:"
+  echo "     EXPO_TOKEN=expo_your_token_here"
+  echo ""
   exit 1
 fi
 
-# Check if already logged in
-if npx eas whoami 2>/dev/null | grep -q "$EAS_EMAIL"; then
-  echo "✓ Already logged in as: $EAS_EMAIL"
+# Verify token works
+echo "→ Verifying EXPO_TOKEN..."
+if npx eas whoami 2>/dev/null | grep -q "@"; then
+  EXPO_USER=$(npx eas whoami)
+  echo "✓ Authenticated as: $EXPO_USER"
 else
-  echo "→ Logging in to EAS as: $EAS_EMAIL"
-
-  # Auto-login using expect (handles interactive prompts)
-  npx expect << EOF
-set timeout 30
-spawn npx eas login
-expect "Email or username"
-send "$EAS_EMAIL\r"
-expect "Password"
-send "$EAS_PASSWORD\r"
-expect eof
-EOF
-
-  if [ $? -eq 0 ]; then
-    echo "✓ EAS login successful"
-  else
-    echo "❌ EAS login failed"
-    exit 1
-  fi
+  echo "❌ EXPO_TOKEN is invalid or expired"
+  echo "   Create a new token at: https://expo.dev/settings/access-tokens"
+  exit 1
 fi
 
 # Check if project is initialized
 if [ ! -f app.json ] || ! grep -q "projectId" app.json 2>/dev/null; then
   echo "→ Initializing EAS project..."
-  npx eas init --id auto || echo "⚠️  Init may have failed, continuing..."
+  npx eas init --non-interactive || echo "⚠️  Init may have failed, continuing..."
 else
   echo "✓ EAS project already initialized"
 fi

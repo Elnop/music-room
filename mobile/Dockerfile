@@ -5,9 +5,6 @@ FROM cgr.dev/chainguard/node:latest-dev
 # Switch to root for global installations and setup
 USER root
 
-# Install system packages (expect for automated EAS login)
-RUN apk add --no-cache expect
-
 # Install Expo CLI globally
 RUN npm install -g expo-cli @expo/ngrok
 
@@ -25,6 +22,9 @@ RUN npm install
 
 # Copy source code
 COPY --chown=node:node . .
+
+# Make scripts executable
+RUN chmod +x setup-eas-auto.sh start-expo.sh start-expo-tunnel.sh 2>/dev/null || true
 
 # Expose Expo ports
 # 8081: Metro bundler

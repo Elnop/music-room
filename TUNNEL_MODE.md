@@ -142,22 +142,30 @@ make dev
 
 ### Step-by-Step First Use
 
-1. **Login to EAS** (one-time setup):
+1. **Create EXPO_TOKEN** (one-time setup):
+   - Go to https://expo.dev/settings/access-tokens
+   - Log in with your Expo account
+   - Click "Create Token"
+   - Give it a name (e.g., "music-room-dev")
+   - Copy the token (starts with `expo_`)
+   - **Important**: Save it securely, it won't be shown again!
+
+2. **Add Token to mobile/.env**:
    ```bash
-   # Start mobile container
-   docker-compose up mobile -d
-
-   # Login to EAS
-   docker-compose exec mobile npx eas login
-
-   # Initialize project (updates app.json with project ID)
-   docker-compose exec mobile npx eas init
-
-   # Stop container
-   make stop
+   # Edit mobile/.env and add:
+   EXPO_TOKEN=expo_your_copied_token_here
    ```
 
-2. **Start Tunnel Mode**:
+3. **Run Setup**:
+   ```bash
+   make tunnel-setup
+   ```
+   This will:
+   - Verify your EXPO_TOKEN
+   - Initialize the EAS project
+   - No interactive prompts needed!
+
+4. **Start Tunnel Mode**:
    ```bash
    make dev-tunnel
    ```

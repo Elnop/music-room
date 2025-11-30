@@ -6,6 +6,9 @@ FROM cgr.dev/chainguard/node:latest-dev AS development
 # Switch to root to set up directories with correct permissions
 USER root
 
+# Install ngrok globally for tunnel mode (requires root)
+RUN npm install -g @expo/ngrok
+
 WORKDIR /app
 
 # Fix permissions for the node user (uid 65532 in Chainguard images)
@@ -17,9 +20,6 @@ USER node
 # Install dependencies first (better caching)
 COPY --chown=node:node package*.json ./
 RUN npm install
-
-# Install ngrok globally for tunnel mode
-RUN npm install -g @expo/ngrok
 
 # Copy source code
 COPY --chown=node:node . .
