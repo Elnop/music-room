@@ -23,6 +23,13 @@ RUN npm install
 # Copy source code
 COPY --chown=node:node . .
 
+# Switch to root to ensure .expo directory has correct permissions
+USER root
+RUN mkdir -p /app/.expo && chown -R node:node /app/.expo && chmod -R 755 /app/.expo
+
+# Switch back to node user
+USER node
+
 # Make scripts executable
 RUN chmod +x setup-eas-auto.sh start-expo.sh start-expo-tunnel.sh 2>/dev/null || true
 

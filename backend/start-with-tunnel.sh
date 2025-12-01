@@ -5,9 +5,22 @@ echo "=========================================="
 echo "Starting Backend with ngrok Tunnel"
 echo "=========================================="
 
+# Check if NGROK_AUTHTOKEN is set
+if [ -z "$NGROK_AUTHTOKEN" ]; then
+  echo "❌ Error: NGROK_AUTHTOKEN not set"
+  echo ""
+  echo "To fix:"
+  echo "  1. Sign up for ngrok: https://dashboard.ngrok.com/signup"
+  echo "  2. Get your authtoken: https://dashboard.ngrok.com/get-started/your-authtoken"
+  echo "  3. Add to backend/.env:"
+  echo "     NGROK_AUTHTOKEN=your_authtoken_here"
+  echo ""
+  exit 1
+fi
+
 # Start ngrok tunnel in background
 echo "→ Starting ngrok tunnel on port 3000..."
-npx ngrok http 3000 --log stdout --log-level info > /tmp/ngrok.log 2>&1 &
+npx ngrok http 3000 --authtoken "$NGROK_AUTHTOKEN" --log stdout --log-level info > /tmp/ngrok.log 2>&1 &
 NGROK_PID=$!
 
 echo "→ Waiting for ngrok tunnel to initialize..."

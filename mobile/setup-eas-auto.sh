@@ -34,12 +34,14 @@ fi
 
 # Verify token works
 echo "→ Verifying EXPO_TOKEN..."
-if npx eas whoami 2>/dev/null | grep -q "@"; then
-  EXPO_USER=$(npx eas whoami)
+WHOAMI_OUTPUT=$(npx eas whoami 2>&1)
+if echo "$WHOAMI_OUTPUT" | grep -q "authenticated using EXPO_TOKEN"; then
+  EXPO_USER=$(echo "$WHOAMI_OUTPUT" | head -n 1)
   echo "✓ Authenticated as: $EXPO_USER"
 else
   echo "❌ EXPO_TOKEN is invalid or expired"
   echo "   Create a new token at: https://expo.dev/settings/access-tokens"
+  echo "   Output was: $WHOAMI_OUTPUT"
   exit 1
 fi
 

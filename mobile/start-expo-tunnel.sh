@@ -36,7 +36,9 @@ echo "   If prompted, please login with your EAS account"
 echo ""
 
 # Start Expo with tunnel mode (cannot use --offline with --tunnel)
-npx expo start --tunnel --port 8081
+# @expo/ngrok is now installed locally, so no interactive prompt
+# Force --host tunnel explicitly
+npx expo start --host tunnel --port 8081
 
 echo ""
 echo "Expo tunnel stopped"

@@ -522,6 +522,116 @@ Before asking for help, verify:
 - [ ] Backend logs show ngrok tunnel started (`make logs-backend`)
 - [ ] Expo Go app is updated to latest version
 
+## Advanced Troubleshooting
+
+### Issue: `EXPO_TOKEN is invalid or expired`
+
+**Problem**: EAS authentication failing during setup.
+
+**Solution**: The script verification was looking for "@" in the output, but Expo returns a different format.
+
+```bash
+# Fixed in mobile/setup-eas-auto.sh:
+# Changed from: grep -q "@"
+# Changed to: grep -q "authenticated using EXPO_TOKEN"
+```
+
+**Resolution**:
+1. Get a new token: https://expo.dev/settings/access-tokens
+2. Update `mobile/.env`: `EXPO_TOKEN=your_token_here`
+3. Run: `make tunnel-setup`
+
+### Issue: `@expo/ngrok` installation prompt in non-interactive mode
+
+**Problem**: Expo asks to install `@expo/ngrok` but Docker container is non-interactive, causing it to hang or crash.
+
+**Solution**: Install `@expo/ngrok` as a local dependency instead of relying on global installation.
+
+```bash
+# Already fixed in mobile/package.json:
+"devDependencies": {
+  "@expo/ngrok": "^4.1.3",
+  ...
+}
+```
+
+**If you see this error**: Rebuild the mobile container:
+```bash
+docker compose -f docker-compose.yml -f docker-compose.tunnel.yml build mobile --no-cache
+```
+
+### Issue: `EACCES: permission denied, open '/app/.expo/README.md'`
+
+**Problem**: The `.expo` directory has incorrect permissions (owned by root instead of node user, UID 65532).
+
+**Solution**: Create `.expo` directory with correct permissions in Dockerfile.
+
+```bash
+# Already fixed in mobile/Dockerfile:
+USER root
+RUN mkdir -p /app/.expo && chown -R node:node /app/.expo && chmod -R 755 /app/.expo
+USER node
+```
+
+**If you still see this error**:
+```bash
+# Manually fix permissions:
+docker run --rm -v "$(pwd)/mobile/.expo:/data" alpine chown -R 65532:65532 /data
+
+# Then restart:
+docker restart music-room-mobile
+```
+
+### Issue: `NGROK_AUTHTOKEN not set`
+
+**Problem**: Backend tunnel fails because ngrok requires authentication.
+
+**Solution**:
+1. Sign up for ngrok: https://dashboard.ngrok.com/signup
+2. Get authtoken: https://dashboard.ngrok.com/get-started/your-authtoken
+3. Add to `backend/.env`:
+   ```bash
+   NGROK_AUTHTOKEN=your_authtoken_here
+   ```
+4. Restart: `make restart`
+
+### Issue: Expo starts in LAN mode instead of tunnel mode
+
+**Problem**: `EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0` forces LAN mode even with `--tunnel` flag.
+
+**Solution**: Remove `EXPO_DEVTOOLS_LISTEN_ADDRESS` in tunnel mode.
+
+```bash
+# Already fixed in docker-compose.tunnel.yml:
+# Removed: EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
+# This allows Expo to use tunnel mode properly
+```
+
+### Issue: Docker volumes override package installations
+
+**Problem**: The anonymous volume `/app/node_modules` was created before adding `@expo/ngrok`, so the package isn't available.
+
+**Solution**: Remove all volumes and rebuild:
+```bash
+docker compose down -v
+docker volume prune -f
+make dev-tunnel
+```
+
+### Issue: Mobile `.env` not loaded in container
+
+**Problem**: `EXPO_TOKEN` not available even though it's in `mobile/.env`.
+
+**Solution**: Add `env_file` to mobile service in `docker-compose.yml`:
+
+```yaml
+# Already fixed in docker-compose.yml:
+services:
+  mobile:
+    env_file:
+      - ./mobile/.env
+```
+
 ## Getting Help
 
 If tunnel mode isn't working:
@@ -529,8 +639,10 @@ If tunnel mode isn't working:
 1. Check logs: `make logs`
 2. Check tunnel info: `make tunnel-info`
 3. Visit ngrok interface: http://localhost:4040
-4. Review this guide's Troubleshooting section
-5. Open issue on GitHub with logs
+4. Review this guide's Troubleshooting section above
+5. Check Docker volumes: `docker volume ls`
+6. Rebuild containers: `docker compose down -v && make dev-tunnel`
+7. Open issue on GitHub with logs
 
 ---
 

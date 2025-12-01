@@ -26,9 +26,8 @@ services:
   mobile:
     command: sh start-expo-tunnel.sh
     environment:
-      - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
-      # In tunnel mode, don't need REACT_NATIVE_PACKAGER_HOSTNAME
-      # Expo tunnel handles this automatically
+      # In tunnel mode, don't set EXPO_DEVTOOLS_LISTEN_ADDRESS
+      # Let Expo handle the tunnel configuration automatically
       - TUNNEL_MODE=true
     ports:
       - "8081:8081"
@@ -41,6 +40,7 @@ services:
       # Keep existing volumes
       - ./mobile:/app
       - /app/node_modules
+      # Keep .expo in container (volume) to avoid permission issues
       - /app/.expo
     depends_on:
       - backend
