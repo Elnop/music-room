@@ -7,7 +7,9 @@ import { LoadingSpinner } from '@components/common';
 import { supabase } from '@/lib/supabase';
 
 export function RootNavigator() {
-  const { isAuthenticated, loadFromStorage, logout } = useAuthStore();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const loadFromStorage = useAuthStore((state) => state.loadFromStorage);
+  const logout = useAuthStore((state) => state.logout);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
@@ -29,8 +31,17 @@ export function RootNavigator() {
       console.log('Supabase auth event:', event);
 
       if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
-        // User signed out or deleted
-        await logout();
+        // User signed out or deleted - clear local state only
+        // Don't call logout() to avoid infinite loop
+        useAuthStore.setState({
+          user: null,
+          accessToken: null,
+          refreshToken: null,
+          isAuthenticated: false,
+          isLoading: false,
+          error: null,
+        });
+        await useAuthStore.getState().clearStorage();
       } else if (event === 'TOKEN_REFRESHED') {
         // Token was refreshed, update the access token
         if (session?.access_token) {
@@ -49,7 +60,7 @@ export function RootNavigator() {
     return () => {
       subscription.unsubscribe();
     };
-  }, [logout]);
+  }, []);
 
   // Show loading screen while checking auth state
   if (!isReady) {

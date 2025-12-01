@@ -67,7 +67,36 @@ async function apiRequest<T>(
       },
     });
 
-    const data: ApiResponse<T> = await response.json();
+    // Check if response is OK (status 200-299)
+    if (!response.ok) {
+      // Try to parse error response as JSON
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error?.message || errorData.message || errorMessage;
+      } catch {
+        // If response is not JSON, try to get text
+        try {
+          const errorText = await response.text();
+          errorMessage = errorText || errorMessage;
+        } catch {
+          // Keep default error message
+        }
+      }
+      throw new ApiError(errorMessage, `HTTP_${response.status}`);
+    }
+
+    // Parse successful response
+    let data: ApiResponse<T>;
+    try {
+      data = await response.json();
+    } catch (parseError) {
+      throw new ApiError(
+        'Invalid JSON response from server',
+        'PARSE_ERROR',
+        parseError
+      );
+    }
 
     if (!data.success || data.error) {
       throw new ApiError(
