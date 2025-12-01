@@ -12,31 +12,37 @@ import { COLORS, SPACING, FONT_SIZES } from '@constants';
 type ButtonVariant = 'primary' | 'secondary' | 'outline';
 
 interface ButtonProps {
-  title: string;
+  title?: string;
+  children?: React.ReactNode;
   onPress: () => void;
   variant?: ButtonVariant;
   disabled?: boolean;
   loading?: boolean;
   fullWidth?: boolean;
   icon?: React.ReactNode;
+  style?: ViewStyle;
 }
 
 export function Button({
   title,
+  children,
   onPress,
   variant = 'primary',
   disabled = false,
   loading = false,
   fullWidth = false,
   icon,
+  style,
 }: ButtonProps) {
   const isDisabled = disabled || loading;
+  const buttonText = title || children;
 
   const containerStyle = [
     styles.container,
     styles[variant],
     fullWidth && styles.fullWidth,
     isDisabled && styles.disabled,
+    style,
   ].filter(Boolean);
 
   const textStyle = [styles.text, styles[`${variant}Text` as keyof typeof styles]].filter(Boolean);
@@ -56,7 +62,7 @@ export function Button({
       ) : (
         <>
           {icon && <>{icon}</>}
-          <Text style={textStyle}>{title}</Text>
+          <Text style={textStyle}>{buttonText}</Text>
         </>
       )}
     </TouchableOpacity>

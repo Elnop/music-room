@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useAuthStore } from '@/store/authStore';
@@ -45,14 +46,15 @@ export function ProfileScreen() {
 
   if (!user) {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <Text style={styles.errorText}>No user data available</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
       {/* Header Section */}
       <View style={styles.header}>
         <Avatar
@@ -129,6 +131,7 @@ export function ProfileScreen() {
         Music Room v1.0.0
       </Text>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -136,6 +139,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+  },
+  scrollView: {
+    flex: 1,
   },
   contentContainer: {
     paddingVertical: SPACING.lg,
