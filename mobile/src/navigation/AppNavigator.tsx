@@ -9,6 +9,7 @@ import {
   CreatePlaylistScreen,
   SearchTracksScreen,
 } from '../screens/playlists';
+import { ProfileScreen, EditProfileScreen } from '../screens/profile';
 
 export type AppTabsParamList = {
   HomeTab: undefined;
@@ -24,8 +25,14 @@ export type PlaylistStackParamList = {
   SearchTracks: { playlistId: string };
 };
 
+export type ProfileStackParamList = {
+  Profile: undefined;
+  EditProfile: undefined;
+};
+
 const Tab = createBottomTabNavigator<AppTabsParamList>();
 const PlaylistStack = createNativeStackNavigator<PlaylistStackParamList>();
+const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 
 // Placeholder screens for other tabs
 function PlaceholderScreen({ title }: { title: string }) {
@@ -70,6 +77,32 @@ function PlaylistsNavigator() {
         options={{ title: 'Add Tracks' }}
       />
     </PlaylistStack.Navigator>
+  );
+}
+
+// Profile Stack Navigator
+function ProfileNavigator() {
+  return (
+    <ProfileStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: COLORS.background,
+        },
+        headerTintColor: COLORS.text,
+        headerShadowVisible: false,
+      }}
+    >
+      <ProfileStack.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{ headerShown: false }}
+      />
+      <ProfileStack.Screen
+        name="EditProfile"
+        component={EditProfileScreen}
+        options={{ title: 'Edit Profile' }}
+      />
+    </ProfileStack.Navigator>
   );
 }
 
@@ -123,13 +156,13 @@ export function AppNavigator() {
 
       <Tab.Screen
         name="ProfileTab"
+        component={ProfileNavigator}
         options={{
           title: 'Profile',
           tabBarIcon: () => <Text style={styles.icon}>👤</Text>,
+          headerShown: false,
         }}
-      >
-        {() => <PlaceholderScreen title="Profile" />}
-      </Tab.Screen>
+      />
     </Tab.Navigator>
   );
 }

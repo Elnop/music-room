@@ -7,6 +7,7 @@ import { errorHandler } from './shared/middleware/error-handler.js'
 
 // Import features
 import { authRoutes } from './features/auth/index.js'
+import { profileRoutes } from './features/profile/index.js'
 
 // Initialize Express app
 const app = express()
@@ -90,6 +91,7 @@ app.get('/health', (req, res) => {
 // =====================================================
 
 app.use('/api/auth', authRoutes)
+app.use('/api/profile', profileRoutes)
 
 // 404 handler
 app.use((req, res) => {
@@ -122,6 +124,7 @@ httpServer.listen(PORT, () => {
   logger.info(`📍 Server: http://localhost:${PORT}`)
   logger.info(`🏥 Health: http://localhost:${PORT}/health`)
   logger.info(`🔐 Auth API: http://localhost:${PORT}/api/auth`)
+  logger.info(`👤 Profile API: http://localhost:${PORT}/api/profile`)
   logger.info(`🌍 Environment: ${env.NODE_ENV}`)
 })
 
