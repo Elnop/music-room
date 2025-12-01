@@ -21,6 +21,14 @@ export interface AuthSession {
   user: User;
 }
 
+// Backend Auth Session Response
+export interface BackendAuthSession {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+  expiresAt: number;
+}
+
 export interface LoginCredentials {
   email: string;
   password: string;

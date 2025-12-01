@@ -2,18 +2,14 @@ import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { UserProfile } from '@types';
 import type { LoginInput, RegisterInput } from '@utils/validators';
-import {
-  MOCK_CREDENTIALS,
-  MOCK_USERS,
-  findUserByEmail,
-  isEmailTaken,
-  isUsernameTaken,
-} from '@mocks';
-import { delay, generateId } from '@utils/mockHelpers';
+import { authApi, ApiError } from '@services/api';
+import { supabase } from '@/lib/supabase';
 
 // AsyncStorage keys
 const STORAGE_KEYS = {
   AUTH_USER: '@musicroom/auth_user',
+  ACCESS_TOKEN: '@musicroom/access_token',
+  REFRESH_TOKEN: '@musicroom/refresh_token',
   IS_AUTHENTICATED: '@musicroom/is_authenticated',
 } as const;
 
@@ -22,6 +18,8 @@ const STORAGE_KEYS = {
  */
 interface AuthState {
   user: UserProfile | null;
+  accessToken: string | null;
+  refreshToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -43,11 +41,13 @@ interface AuthState {
 
 /**
  * Auth Store
- * Manages authentication state with mock data and AsyncStorage persistence
+ * Manages authentication state with Supabase and backend API
  */
 export const useAuthStore = create<AuthState>((set, get) => ({
   // Initial state
   user: null,
+  accessToken: null,
+  refreshToken: null,
   isAuthenticated: false,
   isLoading: false,
   error: null,
@@ -59,26 +59,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // Simulate network delay
-      await delay(800);
+      // Call backend API
+      const response = await authApi.login({ email, password });
 
-      // Validate credentials
-      if (
-        email.toLowerCase() !== MOCK_CREDENTIALS.email.toLowerCase() ||
-        password !== MOCK_CREDENTIALS.password
-      ) {
-        throw new Error('Invalid email or password');
-      }
-
-      // Find user
-      const user = findUserByEmail(email);
-      if (!user) {
-        throw new Error('User not found');
-      }
+      // Also sign in to Supabase (for auth state sync)
+      await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
       // Set authenticated state
       set({
-        user,
+        user: response.user,
+        accessToken: response.session.accessToken,
+        refreshToken: response.session.refreshToken,
         isAuthenticated: true,
         isLoading: false,
       });
@@ -86,12 +80,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // Persist to storage
       await get().saveToStorage();
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Login failed';
+      const errorMessage =
+        error instanceof ApiError ? error.message : 'Login failed';
       set({
         error: errorMessage,
         isLoading: false,
         isAuthenticated: false,
         user: null,
+        accessToken: null,
+        refreshToken: null,
       });
       throw error;
     }
@@ -104,38 +101,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // Simulate network delay
-      await delay(1000);
-
-      // Check if email already exists
-      if (isEmailTaken(data.email)) {
-        throw new Error('Email already in use');
-      }
-
-      // Check if username already exists
-      if (isUsernameTaken(data.username)) {
-        throw new Error('Username already taken');
-      }
-
-      // Create new user
-      const newUser: UserProfile = {
-        id: generateId('user'),
-        email: data.email,
-        username: data.username,
-        displayName: data.username, // Default to username
-        avatarUrl: undefined,
-        bio: undefined,
-        spotifyConnected: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-
-      // Add to mock users (in-memory)
-      MOCK_USERS.push(newUser);
+      // Call backend API
+      const response = await authApi.register(data);
 
       // Set authenticated state
       set({
-        user: newUser,
+        user: response.user,
+        accessToken: response.session.accessToken,
+        refreshToken: response.session.refreshToken,
         isAuthenticated: true,
         isLoading: false,
       });
@@ -143,12 +116,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // Persist to storage
       await get().saveToStorage();
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Registration failed';
+      const errorMessage =
+        error instanceof ApiError ? error.message : 'Registration failed';
       set({
         error: errorMessage,
         isLoading: false,
         isAuthenticated: false,
         user: null,
+        accessToken: null,
+        refreshToken: null,
       });
       throw error;
     }
@@ -161,12 +137,26 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // Simulate network delay
-      await delay(300);
+      const { accessToken } = get();
+
+      // Call backend API to logout (if token exists)
+      if (accessToken) {
+        try {
+          await authApi.logout(accessToken);
+        } catch (error) {
+          // Continue with logout even if API call fails
+          console.warn('Backend logout failed, continuing with local logout', error);
+        }
+      }
+
+      // Sign out from Supabase
+      await supabase.auth.signOut();
 
       // Clear state
       set({
         user: null,
+        accessToken: null,
+        refreshToken: null,
         isAuthenticated: false,
         isLoading: false,
         error: null,
@@ -184,6 +174,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   /**
    * Update user profile
+   * Note: This is a placeholder for future implementation
    */
   updateProfile: async (data: Partial<UserProfile>) => {
     const { user } = get();
@@ -194,10 +185,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // Simulate network delay
-      await delay(600);
-
-      // Update user object
+      // TODO: Implement backend API call for profile update
+      // For now, just update locally
       const updatedUser: UserProfile = {
         ...user,
         ...data,
@@ -227,15 +216,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
    */
   loadFromStorage: async () => {
     try {
-      const [userJson, isAuthJson] = await Promise.all([
+      const [userJson, accessToken, refreshToken, isAuthJson] = await Promise.all([
         AsyncStorage.getItem(STORAGE_KEYS.AUTH_USER),
+        AsyncStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN),
+        AsyncStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN),
         AsyncStorage.getItem(STORAGE_KEYS.IS_AUTHENTICATED),
       ]);
 
-      if (userJson && isAuthJson === 'true') {
+      if (userJson && accessToken && isAuthJson === 'true') {
         const user: UserProfile = JSON.parse(userJson);
         set({
           user,
+          accessToken,
+          refreshToken,
           isAuthenticated: true,
         });
       }
@@ -250,12 +243,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
    * Save auth state to AsyncStorage
    */
   saveToStorage: async () => {
-    const { user, isAuthenticated } = get();
+    const { user, accessToken, refreshToken, isAuthenticated } = get();
 
     try {
-      if (user && isAuthenticated) {
+      if (user && accessToken && isAuthenticated) {
         await Promise.all([
           AsyncStorage.setItem(STORAGE_KEYS.AUTH_USER, JSON.stringify(user)),
+          AsyncStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, accessToken),
+          AsyncStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken || ''),
           AsyncStorage.setItem(STORAGE_KEYS.IS_AUTHENTICATED, 'true'),
         ]);
       }
@@ -271,6 +266,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       await Promise.all([
         AsyncStorage.removeItem(STORAGE_KEYS.AUTH_USER),
+        AsyncStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN),
+        AsyncStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN),
         AsyncStorage.removeItem(STORAGE_KEYS.IS_AUTHENTICATED),
       ]);
     } catch (error) {

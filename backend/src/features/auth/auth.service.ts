@@ -22,10 +22,12 @@ export class AuthService {
         throw new AppError(409, 'Username already taken', 'USERNAME_TAKEN')
       }
 
-      // 2. Create user in Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      // 2. Create user in Supabase Auth using Admin API
+      // Using admin.createUser to bypass email confirmation in development
+      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email: data.email,
         password: data.password,
+        email_confirm: true, // Auto-confirm email for development
       })
 
       if (authError) {
@@ -33,8 +35,24 @@ export class AuthService {
         throw new AppError(400, authError.message, 'AUTH_ERROR')
       }
 
-      if (!authData.user || !authData.session) {
-        throw new AppError(400, 'Failed to create user', 'AUTH_ERROR')
+      logger.debug('Supabase admin createUser response', {
+        hasUser: !!authData.user,
+        userId: authData.user?.id,
+      })
+
+      if (!authData.user) {
+        throw new AppError(400, 'Failed to create user - no user returned', 'AUTH_ERROR')
+      }
+
+      // Generate a session manually using signInWithPassword
+      const { data: sessionData, error: sessionError } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      })
+
+      if (sessionError || !sessionData.session) {
+        logger.error('Failed to create session after user creation', { error: sessionError })
+        throw new AppError(500, 'User created but failed to generate session', 'SESSION_ERROR')
       }
 
       // 3. Create user profile
@@ -53,7 +71,7 @@ export class AuthService {
 
       logger.info('User registered successfully', { userId: authData.user.id })
 
-      return this.formatAuthResponse(authData.user, authData.session, data.username, data.displayName)
+      return this.formatAuthResponse(authData.user, sessionData.session, data.username, data.displayName)
     } catch (error) {
       if (error instanceof AppError) throw error
       logger.error('Unexpected error during registration', { error })
