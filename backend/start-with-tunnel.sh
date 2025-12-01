@@ -29,7 +29,7 @@ sleep 5
 # Extract tunnel URL from ngrok API
 TUNNEL_URL=""
 for i in 1 2 3 4 5; do
-  TUNNEL_URL=$(curl -s http://localhost:4040/api/tunnels 2>/dev/null | grep -o '"public_url":"https://[^"]*"' | grep -o 'https://[^"]*' | head -1)
+  TUNNEL_URL=$(wget -qO- http://localhost:4040/api/tunnels 2>/dev/null | grep -o '"public_url":"https://[^"]*"' | grep -o 'https://[^"]*' | head -1)
   if [ -n "$TUNNEL_URL" ]; then
     break
   fi
