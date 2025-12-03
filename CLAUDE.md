@@ -268,6 +268,50 @@ Both services use **Chainguard Images** (0 CVE, Wolfi OS, updated daily):
 
 See `DOCKER.md` for detailed Docker documentation and troubleshooting.
 
+## File Permissions
+
+### Why This Matters
+
+Music Room uses Chainguard container images that run as non-root user (UID 65532, user `node`). This is a security best practice that prevents potential privilege escalation attacks.
+
+Source code files must be readable by this user for:
+- Metro bundler to scan and watch files during development
+- Hot reload to work properly
+- Docker bind mounts (`./mobile:/app`) to function correctly
+
+**The Issue**: When source files have owner-only permissions (0700 for directories, 0600 for files), the Docker container's `node` user cannot read them, causing errors like:
+```
+Error: EACCES: permission denied, scandir '/app/src/mocks'
+```
+
+### Expected Permissions
+
+Source code should have standard readable permissions:
+- **Directories**: 0755 (drwxr-xr-x) - owner write, everyone read+execute
+- **Files**: 0644 (-rw-r--r--) - owner write, everyone read
+
+These are standard for shared development environments and are tracked by git.
+
+### Fixing Permission Issues
+
+If you see `EACCES: permission denied` errors:
+
+```bash
+# Fix all directories in mobile/src
+find mobile/src -type d -exec chmod 0755 {} \;
+
+# Fix all files in mobile/src
+find mobile/src -type f -exec chmod 0644 {} \;
+
+# Verify fix
+ls -la mobile/src/mocks/  # Should show drwxr-xr-x and -rw-r--r--
+
+# Restart Docker
+make restart
+```
+
+**Why this works**: The chmod commands make files readable by all users (including Docker's non-root `node` user), while keeping write permissions restricted to the owner. Git tracks these permissions, so the fix persists across commits.
+
 ## Git Workflow
 
 Branch: `main` (NOT `master`)
