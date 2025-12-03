@@ -294,23 +294,28 @@ These are standard for shared development environments and are tracked by git.
 
 ### Fixing Permission Issues
 
-If you see `EACCES: permission denied` errors:
+If you see `EACCES: permission denied` errors (e.g., `scandir '/app/src/mocks'` or `open '/app/babel.config.js'`):
 
 ```bash
-# Fix all directories in mobile/src
-find mobile/src -type d -exec chmod 0755 {} \;
+# Fix Mobile directory (excluding node_modules and .expo)
+find mobile -type d \( -name node_modules -o -name .expo \) -prune -o -type d -exec chmod 0755 {} \;
+find mobile -type d \( -name node_modules -o -name .expo \) -prune -o -type f -exec chmod 0644 {} \;
+chmod +x mobile/*.sh  # Make shell scripts executable
 
-# Fix all files in mobile/src
-find mobile/src -type f -exec chmod 0644 {} \;
+# Fix Backend directory (excluding node_modules and dist)
+find backend -type d \( -name node_modules -o -name dist \) -prune -o -type d -exec chmod 0755 {} \;
+find backend -type d \( -name node_modules -o -name dist \) -prune -o -type f -exec chmod 0644 {} \;
+chmod +x backend/*.sh  # Make shell scripts executable
 
 # Verify fix
-ls -la mobile/src/mocks/  # Should show drwxr-xr-x and -rw-r--r--
+ls -la mobile/babel.config.js mobile/src/mocks/  # Should show -rw-r--r-- and drwxr-xr-x
+ls -la backend/src/  # Should show drwxr-xr-x
 
 # Restart Docker
 make restart
 ```
 
-**Why this works**: The chmod commands make files readable by all users (including Docker's non-root `node` user), while keeping write permissions restricted to the owner. Git tracks these permissions, so the fix persists across commits.
+**Why this works**: The chmod commands make files readable by all users (including Docker's non-root `node` user), while keeping write permissions restricted to the owner. Shell scripts need execute permissions (+x) to run. Git tracks execute permissions, so the fix persists across commits.
 
 ## Git Workflow
 
