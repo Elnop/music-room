@@ -310,17 +310,64 @@ clean-deps: ## Remove only node_modules and build artifacts (no confirmation)
 	@rm -rf backend/dist mobile/.expo
 	@echo "$(GREEN)✓ Dependencies cleanup complete$(NC)"
 
-clean-all: ## Force remove everything without confirmation (dangerous!)
-	@echo "$(RED)Force cleaning everything...$(NC)"
+clean-all: ## Clean entire Docker system on machine (containers, images, volumes, networks, cache)
+	@echo "$(RED)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(RED)║           FULL DOCKER SYSTEM CLEANUP WARNING                ║$(NC)"
+	@echo "$(RED)╚══════════════════════════════════════════════════════════════╝$(NC)"
 	@echo ""
-	$(DOCKER_COMPOSE) down -v --rmi local || true
+	@echo "$(RED)⚠️  This will remove ALL Docker resources on your machine:$(NC)"
+	@echo "  • ALL containers (not just Music Room)"
+	@echo "  • ALL images (not just Music Room)"
+	@echo "  • ALL volumes (not just Music Room)"
+	@echo "  • ALL custom networks"
+	@echo "  • ALL builder cache"
+	@echo "  • backend/node_modules + mobile/node_modules"
+	@echo "  • backend/dist + mobile/.expo"
 	@echo ""
-	@echo "$(YELLOW)Removing dependencies...$(NC)"
-	rm -rf backend/node_modules mobile/node_modules
-	@echo "$(YELLOW)Removing build artifacts...$(NC)"
-	rm -rf backend/dist mobile/.expo
+	@echo "$(YELLOW)→ Stopping all Docker containers...$(NC)"
+	@docker stop $$(docker ps -aq) 2>/dev/null || true
+	@echo "$(GREEN)✓ All containers stopped$(NC)"
 	@echo ""
-	@echo "$(GREEN)✓ Force cleanup complete$(NC)"
+	@echo "$(YELLOW)→ Removing all Docker containers...$(NC)"
+	@docker rm $$(docker ps -aq) 2>/dev/null || true
+	@echo "$(GREEN)✓ All containers removed$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Removing all Docker images...$(NC)"
+	@docker rmi -f $$(docker images -aq) 2>/dev/null || true
+	@echo "$(GREEN)✓ All images removed$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Removing all Docker volumes...$(NC)"
+	@docker volume rm $$(docker volume ls -q) 2>/dev/null || true
+	@echo "$(GREEN)✓ All volumes removed$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Removing all custom Docker networks...$(NC)"
+	@docker network prune -f 2>/dev/null || true
+	@echo "$(GREEN)✓ All custom networks removed$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Cleaning Docker builder cache...$(NC)"
+	@docker builder prune -af 2>/dev/null || true
+	@echo "$(GREEN)✓ Builder cache cleaned$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Running full Docker system prune...$(NC)"
+	@docker system prune -af --volumes 2>/dev/null || true
+	@echo "$(GREEN)✓ System prune complete$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Removing local dependencies...$(NC)"
+	@rm -rf backend/node_modules mobile/node_modules
+	@echo "$(GREEN)✓ Dependencies removed$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Removing build artifacts...$(NC)"
+	@rm -rf backend/dist mobile/.expo
+	@echo "$(GREEN)✓ Build artifacts removed$(NC)"
+	@echo ""
+	@echo "$(GREEN)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(GREEN)║          Full Docker System Cleanup Complete!                ║$(NC)"
+	@echo "$(GREEN)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@echo "$(BLUE)To restart Music Room:$(NC)"
+	@echo "  1. $(GREEN)make install$(NC)  # Reinstall dependencies"
+	@echo "  2. $(GREEN)make dev$(NC)      # Build and start services"
+	@echo ""
 
 deploy-build: ## Build production images (for deployment)
 	@echo "$(BLUE)Building production images...$(NC)"
