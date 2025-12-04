@@ -35,11 +35,6 @@ export class AuthService {
         throw new AppError(400, authError.message, 'AUTH_ERROR')
       }
 
-      logger.debug('Supabase admin createUser response', {
-        hasUser: !!authData.user,
-        userId: authData.user?.id,
-      })
-
       if (!authData.user) {
         throw new AppError(400, 'Failed to create user - no user returned', 'AUTH_ERROR')
       }
