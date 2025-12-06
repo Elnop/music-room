@@ -1,6 +1,6 @@
 import crypto from 'crypto'
 import { supabase } from '@/shared/config/supabase.js'
-import { env } from '@/shared/config/env.js'
+import { env, getSpotifyRedirectUri } from '@/shared/config/env.js'
 import { AppError } from '@/shared/middleware/error-handler.js'
 import { logger } from '@/shared/utils/logger.js'
 import type {
@@ -48,7 +48,8 @@ export class SpotifyService {
     }
     this.clientId = env.SPOTIFY_CLIENT_ID || ''
     this.clientSecret = env.SPOTIFY_CLIENT_SECRET || ''
-    this.redirectUri = env.SPOTIFY_REDIRECT_URI || 'http://localhost:3000/api/spotify/auth/callback'
+    this.redirectUri = getSpotifyRedirectUri()
+    logger.info(`🎵 Spotify redirect URI: ${this.redirectUri}`)
   }
 
   /**

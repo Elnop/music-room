@@ -468,8 +468,18 @@ GET  /api/spotify/search            # Search Spotify catalog (requires auth)
 ```bash
 SPOTIFY_CLIENT_ID=your_spotify_client_id
 SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
-SPOTIFY_REDIRECT_URI=https://your-tunnel.ngrok-free.app/api/spotify/auth/callback
+
+# Redirect URI (auto-configured - optional override)
+# Tunnel mode: https://<tunnel>/api/spotify/auth/callback (automatic)
+# LAN mode:    http://localhost:3000/api/spotify/auth/callback (automatic)
+# SPOTIFY_REDIRECT_URI=  # Only set for custom URI
 ```
+
+**Redirect URI Auto-Configuration**:
+- **Tunnel mode**: Automatically uses tunnel URL from `TUNNEL_URL` environment variable
+- **LAN mode**: Automatically uses `http://localhost:3000/api/spotify/auth/callback`
+- **Manual override**: Set `SPOTIFY_REDIRECT_URI` explicitly to override automatic detection
+- Check `make dev-tunnel` output for the exact URI to add to Spotify Dashboard
 
 **Mobile `.env`**:
 ```bash
@@ -477,8 +487,9 @@ EXPO_PUBLIC_SPOTIFY_REDIRECT_URI=musicroom://auth/spotify/callback
 ```
 
 **Spotify Dashboard**:
-- Add redirect URI: `https://your-tunnel.ngrok-free.app/api/spotify/auth/callback`
-- Note: Tunnel URL changes on each `make dev-tunnel` restart
+- Add redirect URI displayed by `make dev-tunnel` (e.g., `https://abc123.ngrok-free.app/api/spotify/auth/callback`)
+- URI is automatically constructed from tunnel URL - no manual `.env` editing needed
+- Note: Tunnel URL changes on each `make dev-tunnel` restart, but backend logs display the current URI
 
 **app.json**:
 - Deep linking configured with scheme `musicroom://`

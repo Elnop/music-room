@@ -13,7 +13,7 @@ const envSchema = z.object({
   TUNNEL_URL: z.string().optional(), // Optional ngrok tunnel URL for cross-network development
   SPOTIFY_CLIENT_ID: z.string().optional(), // Optional for development without Spotify
   SPOTIFY_CLIENT_SECRET: z.string().optional(),
-  SPOTIFY_REDIRECT_URI: z.string().url().optional().default('http://localhost:3000/api/spotify/auth/callback'),
+  SPOTIFY_REDIRECT_URI: z.string().url().optional(), // Manual override only - auto-configured by default
 })
 
 export type Env = z.infer<typeof envSchema>
@@ -31,3 +31,25 @@ const parseEnv = (): Env => {
 }
 
 export const env = parseEnv()
+
+/**
+ * Smart Spotify redirect URI builder
+ * Automatically constructs the correct redirect URI based on current mode:
+ * - Manual override: Uses SPOTIFY_REDIRECT_URI if set
+ * - Tunnel mode: Uses TUNNEL_URL when available
+ * - LAN mode: Uses localhost with configured PORT
+ */
+export const getSpotifyRedirectUri = (): string => {
+  // 1. Manual override takes precedence
+  if (env.SPOTIFY_REDIRECT_URI) {
+    return env.SPOTIFY_REDIRECT_URI
+  }
+
+  // 2. Tunnel mode - use tunnel URL
+  if (env.TUNNEL_URL) {
+    return `${env.TUNNEL_URL}/api/spotify/auth/callback`
+  }
+
+  // 3. Default - localhost for LAN mode
+  return `http://localhost:${env.PORT}/api/spotify/auth/callback`
+}
