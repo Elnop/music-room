@@ -10,6 +10,7 @@ import {
   SearchTracksScreen,
 } from '../screens/playlists';
 import { ProfileScreen, EditProfileScreen } from '../screens/profile';
+import { SpotifyConnectScreen, SpotifySettingsScreen } from '../screens/spotify';
 
 export type AppTabsParamList = {
   HomeTab: undefined;
@@ -28,6 +29,8 @@ export type PlaylistStackParamList = {
 export type ProfileStackParamList = {
   Profile: undefined;
   EditProfile: undefined;
+  SpotifyConnect: undefined;
+  SpotifySettings: undefined;
 };
 
 const Tab = createBottomTabNavigator<AppTabsParamList>();
@@ -101,6 +104,16 @@ function ProfileNavigator() {
         name="EditProfile"
         component={EditProfileScreen}
         options={{ title: 'Edit Profile' }}
+      />
+      <ProfileStack.Screen
+        name="SpotifyConnect"
+        component={SpotifyConnectScreen}
+        options={{ title: 'Connect Spotify' }}
+      />
+      <ProfileStack.Screen
+        name="SpotifySettings"
+        component={SpotifySettingsScreen}
+        options={{ title: 'Spotify Settings' }}
       />
     </ProfileStack.Navigator>
   );

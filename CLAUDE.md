@@ -77,6 +77,38 @@ make qr-tunnel             # Show tunnel QR code and URLs
 **Performance:** ~50-200ms latency vs <10ms LAN mode.
 
 See [TUNNEL_MODE.md](./TUNNEL_MODE.md) for complete documentation.
+
+**Automatic Tunnel URL Sharing:**
+
+The tunnel system is now **100% automatic**:
+
+1. Backend starts ngrok tunnel → writes URL to `/tmp/shared/backend-tunnel-url.txt`
+2. Mobile container waits for file → reads URL automatically
+3. Expo starts with correct backend tunnel URL
+4. **No manual configuration needed!**
+
+**Technical Details:**
+- Backend and mobile containers share a Docker volume at `/tmp/shared`
+- Dockerfiles create directory with correct permissions (node:node, UID 65532)
+- `start-with-tunnel.sh` writes tunnel URL after ngrok initializes
+- `start-expo-tunnel.sh` reads URL and exports as `EXPO_PUBLIC_API_URL`
+- No hardcoded URLs in `.env` files - always uses fresh tunnel URL
+
+**Troubleshooting:**
+
+If mobile can't find backend tunnel URL:
+```bash
+# 1. Check backend tunnel initialized
+docker logs music-room-backend | grep "Tunnel URL"
+
+# 2. Verify file exists and is readable
+docker exec music-room-backend cat /tmp/shared/backend-tunnel-url.txt
+
+# 3. Check mobile can access shared volume
+docker exec music-room-mobile ls -la /tmp/shared
+
+# 4. Rebuild with fresh volumes
+make stop && docker compose down -v && make dev-tunnel
 ```
 
 ### Backend (Non-Docker Development)
@@ -380,6 +412,108 @@ The collection auto-saves JWT tokens after login/register.
 - **CORS**: Configured for development origins only
 - **Secrets**: Never commit `.env` files (in `.gitignore`)
 
+## Spotify Integration
+
+Music Room integrates with Spotify via OAuth 2.0 for music search and playlist management.
+
+### Backend Feature Structure
+
+```
+backend/src/features/spotify/
+├── spotify.types.ts          # TypeScript types (DTOs, Spotify API types)
+├── spotify.validators.ts     # Zod validation schemas
+├── spotify.service.ts        # OAuth logic, token management, Spotify API
+├── spotify.controller.ts     # Express request handlers
+├── spotify.routes.ts         # API routes
+└── index.ts                  # Public exports
+```
+
+### API Endpoints
+
+```bash
+GET  /api/spotify/auth/initiate     # Start OAuth flow (requires auth)
+GET  /api/spotify/auth/callback     # OAuth callback (redirects to deep link)
+POST /api/spotify/auth/exchange     # Exchange code for tokens
+GET  /api/spotify/auth/status       # Get connection status (requires auth)
+POST /api/spotify/auth/disconnect   # Disconnect Spotify (requires auth)
+GET  /api/spotify/search            # Search Spotify catalog (requires auth)
+```
+
+### Mobile Implementation
+
+**Screens**:
+- `SpotifyConnectScreen` - Optional connection flow with skip button
+- `SpotifySettingsScreen` - Connection status and disconnect
+
+**Store**: `spotifyStore.ts` (Zustand)
+- OAuth flow with `expo-web-browser`
+- Deep linking callback: `musicroom://auth/spotify/callback`
+- Automatic token refresh before expiry
+- Syncs connection status with `authStore`
+
+**Navigation**:
+- Accessible from Profile screen (tap Spotify row)
+- Routes to SpotifyConnect if not connected, SpotifySettings if connected
+
+### OAuth Flow
+
+1. User taps "Connect Spotify" → opens browser with Spotify auth URL
+2. User authorizes → Spotify redirects to backend `/api/spotify/auth/callback`
+3. Backend exchanges code for tokens → saves to database → redirects to `musicroom://auth/spotify/callback?success=true`
+4. Mobile app catches deep link → exchanges code with backend → updates UI
+
+### Configuration
+
+**Backend `.env`**:
+```bash
+SPOTIFY_CLIENT_ID=your_spotify_client_id
+SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
+SPOTIFY_REDIRECT_URI=https://your-tunnel.ngrok-free.app/api/spotify/auth/callback
+```
+
+**Mobile `.env`**:
+```bash
+EXPO_PUBLIC_SPOTIFY_REDIRECT_URI=musicroom://auth/spotify/callback
+```
+
+**Spotify Dashboard**:
+- Add redirect URI: `https://your-tunnel.ngrok-free.app/api/spotify/auth/callback`
+- Note: Tunnel URL changes on each `make dev-tunnel` restart
+
+**app.json**:
+- Deep linking configured with scheme `musicroom://`
+- Intent filters for Android, associated domains for iOS
+
+### Database
+
+Migration `002_spotify_oauth.sql` adds to `user_profiles`:
+- `spotify_access_token` - OAuth access token
+- `spotify_refresh_token` - Refresh token (for auto-renewal)
+- `spotify_token_expires_at` - Expiration timestamp
+- `spotify_scopes` - Array of granted permissions
+
+Function `clear_spotify_connection(user_id)` for atomic disconnect.
+
+### Testing Spotify Integration
+
+```bash
+# Start in tunnel mode (required for Spotify OAuth)
+make dev-tunnel
+
+# Copy the Spotify callback URL displayed
+# Add it to Spotify Dashboard → Redirect URIs
+
+# Test flow:
+1. Login to mobile app
+2. Navigate to Profile
+3. Tap "Spotify" row
+4. Tap "Connect Spotify"
+5. Authorize on Spotify
+6. Verify return to app with "Connected" status
+```
+
+See `doc/SPOTIFY_OAUTH.md` for detailed OAuth flow documentation.
+
 ## Current Implementation Status
 
 **Phase 1 - Complete**:
@@ -390,12 +524,22 @@ The collection auto-saves JWT tokens after login/register.
 - State management with Zustand (auth, playlists)
 - Docker development environment
 
+**Phase 2 - Complete (Spotify OAuth)**:
+- Spotify OAuth integration (deep linking with `musicroom://`)
+- Backend feature: `/api/spotify/*` (OAuth, search, status, disconnect)
+- Database migration: Spotify token storage in `user_profiles`
+- Mobile screens: SpotifyConnectScreen, SpotifySettingsScreen
+- Spotify store: Zustand state management with OAuth flow
+- Automatic token refresh (5 minutes before expiry)
+- CSRF protection with state parameter
+- Optional connection flow (skip allowed)
+
 **Planned Features** (see `PLAN.md`):
 - Friends system (add, manage, search friends)
 - Music rooms (collaborative listening spaces)
-- Spotify integration (OAuth, playback control)
+- Spotify playback control (SDK integration)
 - Real-time sync with Socket.io
-- Playlist collaboration
+- Playlist collaboration with Spotify tracks
 
 ## Common Issues & Solutions
 

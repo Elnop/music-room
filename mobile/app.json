@@ -2,6 +2,7 @@
   "expo": {
     "name": "Music Room",
     "slug": "music-room",
+    "scheme": "musicroom",
     "owner": "@anonymous",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -16,7 +17,8 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.musicroom.app"
+      "bundleIdentifier": "com.musicroom.app",
+      "associatedDomains": ["applinks:musicroom.app"]
     },
     "android": {
       "adaptiveIcon": {
@@ -31,7 +33,20 @@
         "android.permission.ACCESS_NETWORK_STATE"
       ],
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "musicroom",
+              "host": "auth"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"

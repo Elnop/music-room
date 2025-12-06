@@ -8,6 +8,7 @@ import { errorHandler } from './shared/middleware/error-handler.js'
 // Import features
 import { authRoutes } from './features/auth/index.js'
 import { profileRoutes } from './features/profile/index.js'
+import { spotifyRoutes } from './features/spotify/index.js'
 
 // Initialize Express app
 const app = express()
@@ -66,10 +67,20 @@ app.use(express.urlencoded({ extended: true }))
 
 // Request logging
 app.use((req, res, next) => {
-  logger.debug(`${req.method} ${req.path}`, {
+  const logData: any = {
     ip: req.ip,
     userAgent: req.get('user-agent'),
-  })
+    origin: req.get('origin'),
+  }
+
+  // Log body for POST/PUT/PATCH requests (hide passwords)
+  if (['POST', 'PUT', 'PATCH'].includes(req.method) && req.body) {
+    const body = { ...req.body }
+    if (body.password) body.password = '***'
+    logData.body = body
+  }
+
+  logger.info(`📨 ${req.method} ${req.path}`, logData)
   next()
 })
 
@@ -92,6 +103,7 @@ app.get('/health', (req, res) => {
 
 app.use('/api/auth', authRoutes)
 app.use('/api/profile', profileRoutes)
+app.use('/api/spotify', spotifyRoutes)
 
 // 404 handler
 app.use((req, res) => {
@@ -125,6 +137,7 @@ httpServer.listen(PORT, () => {
   logger.info(`🏥 Health: http://localhost:${PORT}/health`)
   logger.info(`🔐 Auth API: http://localhost:${PORT}/api/auth`)
   logger.info(`👤 Profile API: http://localhost:${PORT}/api/profile`)
+  logger.info(`🎵 Spotify API: http://localhost:${PORT}/api/spotify`)
   logger.info(`🌍 Environment: ${env.NODE_ENV}`)
 })
 

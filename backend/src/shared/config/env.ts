@@ -11,6 +11,9 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   ALLOWED_ORIGINS: z.string().default('http://localhost:8081'),
   TUNNEL_URL: z.string().optional(), // Optional ngrok tunnel URL for cross-network development
+  SPOTIFY_CLIENT_ID: z.string().optional(), // Optional for development without Spotify
+  SPOTIFY_CLIENT_SECRET: z.string().optional(),
+  SPOTIFY_REDIRECT_URI: z.string().url().optional().default('http://localhost:3000/api/spotify/auth/callback'),
 })
 
 export type Env = z.infer<typeof envSchema>

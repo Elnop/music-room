@@ -1,15 +1,18 @@
-# Spotify OAuth Integration - Flow Explanation
+# Spotify OAuth Integration - Implementation Guide
 
 ## Overview
 
-Music Room uses **backend-handled OAuth** for Spotify integration. This means the backend manages the OAuth flow and stores access/refresh tokens, while the mobile app simply triggers the authentication and receives the final result.
+Music Room uses **backend-handled OAuth with deep linking** for Spotify integration. The backend manages the OAuth flow and stores tokens, while the mobile app uses `expo-web-browser` and deep linking for a seamless user experience.
 
 ## Why Backend-Handled OAuth?
 
 ✅ **Security**: `SPOTIFY_CLIENT_SECRET` stays on the server, never exposed to mobile app
-✅ **Token Storage**: Tokens stored securely in Supabase database
-✅ **Token Refresh**: Backend automatically refreshes expired tokens
+✅ **Token Storage**: Tokens stored securely in Supabase database (`user_profiles` table)
+✅ **Token Refresh**: Backend automatically refreshes expired tokens (5 min before expiry)
 ✅ **Multi-Device**: User authenticated across all devices once tokens are stored
+✅ **Deep Linking**: Seamless return to app after authorization
+
+---
 
 ## OAuth Flow Diagram
 
@@ -19,348 +22,518 @@ Music Room uses **backend-handled OAuth** for Spotify integration. This means th
 │     App     │         │   Server    │         │     API     │
 └──────┬──────┘         └──────┬──────┘         └──────┬──────┘
        │                       │                       │
-       │ 1. User taps          │                       │
-       │   "Connect Spotify"   │                       │
-       │──────────────────────>│                       │
+       │ 1. Tap "Connect       │                       │
+       │    Spotify"           │                       │
        │                       │                       │
        │ 2. GET /api/spotify/  │                       │
-       │    auth/login         │                       │
+       │    auth/initiate      │                       │
+       │──────────────────────>│                       │
        │                       │                       │
-       │ 3. Returns OAuth URL  │                       │
+       │                       │ 3. Generate state     │
+       │                       │    (CSRF protection)  │
+       │                       │                       │
+       │ 4. Returns authUrl    │                       │
+       │    + state            │                       │
        │<──────────────────────│                       │
-       │   with state token    │                       │
        │                       │                       │
-       │ 4. Opens OAuth URL    │                       │
-       │   in browser          │                       │
+       │ 5. Open authUrl in    │                       │
+       │    expo-web-browser   │                       │
        │───────────────────────┼──────────────────────>│
        │                       │                       │
-       │                       │  5. User logs in      │
-       │                       │     and authorizes    │
+       │                       │ 6. User authorizes    │
        │                       │                       │
-       │                       │ 6. Redirects to       │
+       │                       │ 7. Redirect to        │
        │                       │    callback URL       │
        │                       │<──────────────────────│
-       │                       │ /api/spotify/callback │
-       │                       │ ?code=xxx&state=yyy   │
+       │                       │ GET /api/spotify/     │
+       │                       │ auth/callback?        │
+       │                       │ code=xxx&state=yyy    │
        │                       │                       │
-       │                       │ 7. Exchange code      │
+       │                       │ 8. Verify state       │
+       │                       │                       │
+       │                       │ 9. Exchange code      │
        │                       │    for tokens         │
        │                       │──────────────────────>│
        │                       │                       │
-       │                       │ 8. Returns tokens     │
+       │                       │ 10. Returns tokens    │
        │                       │<──────────────────────│
-       │                       │ {access_token,        │
-       │                       │  refresh_token}       │
        │                       │                       │
-       │                       │ 9. Store tokens in    │
-       │                       │    Supabase DB        │
+       │                       │ 11. Get Spotify       │
+       │                       │     user profile      │
+       │                       │──────────────────────>│
        │                       │                       │
-       │ 10. Mobile polls      │                       │
-       │     /api/spotify/     │                       │
-       │     status            │                       │
-       │──────────────────────>│                       │
+       │                       │ 12. Returns profile   │
+       │                       │<──────────────────────│
        │                       │                       │
-       │ 11. Returns success   │                       │
+       │                       │ 13. Save tokens +     │
+       │                       │     profile to DB     │
+       │                       │                       │
+       │ 14. Redirect to       │                       │
+       │     deep link         │                       │
        │<──────────────────────│                       │
-       │   {connected: true}   │                       │
+       │ musicroom://auth/     │                       │
+       │ spotify/callback?     │                       │
+       │ success=true&         │                       │
+       │ spotifyUserId=xxx     │                       │
        │                       │                       │
-       │ 12. Navigate to       │                       │
-       │     main app          │                       │
+       │ 15. Parse deep link   │                       │
+       │     Close browser     │                       │
+       │     Update UI         │                       │
+       │     Navigate back     │                       │
        │                       │                       │
 ```
+
+---
 
 ## Implementation Details
 
-### Step 1-3: Initiate OAuth
+### Backend Structure
 
-**Mobile** (`src/screens/spotify/SpotifyAuthScreen.tsx`):
+```
+backend/src/features/spotify/
+├── spotify.types.ts          # TypeScript types (DTOs, Spotify API responses)
+├── spotify.validators.ts     # Zod validation schemas
+├── spotify.service.ts        # OAuth logic, token management, Spotify API wrapper
+├── spotify.controller.ts     # Express request handlers
+├── spotify.routes.ts         # API routes
+└── index.ts                  # Public exports
+```
+
+### API Endpoints
+
+| Method | Endpoint | Auth Required | Description |
+|--------|----------|---------------|-------------|
+| GET | `/api/spotify/auth/initiate` | Yes | Start OAuth flow, returns authUrl + state |
+| GET | `/api/spotify/auth/callback` | No | OAuth callback from Spotify, redirects to deep link |
+| POST | `/api/spotify/auth/exchange` | No | Alternative endpoint for mobile code exchange |
+| GET | `/api/spotify/auth/status` | Yes | Get current connection status |
+| POST | `/api/spotify/auth/disconnect` | Yes | Disconnect Spotify account |
+| GET | `/api/spotify/search` | Yes | Search Spotify catalog |
+
+---
+
+## Step-by-Step Implementation
+
+### Step 1: User Initiates Connection
+
+**Mobile** (`spotifyStore.ts` - `initiateConnection()`):
+
 ```typescript
-const handleConnectSpotify = async () => {
+async initiateConnection() {
+  set({ isConnecting: true, error: null });
+
+  const { accessToken } = useAuthStore.getState();
+
   // Call backend to get OAuth URL
-  const response = await fetch(`${API_URL}/api/spotify/auth/login`, {
-    headers: {
-      'Authorization': `Bearer ${userToken}` // User must be logged in
+  const { authUrl, state } = await spotifyApi.initiateAuth(accessToken);
+
+  // Open Spotify auth in browser
+  const result = await WebBrowser.openAuthSessionAsync(
+    authUrl,
+    Linking.createURL('auth/spotify/callback')
+  );
+
+  if (result.type === 'success') {
+    // Browser closed, deep link caught
+    // Parse callback URL
+    const url = Linking.parse(result.url);
+    const success = url.queryParams?.success === 'true';
+
+    if (success) {
+      // Update UI
+      const currentUser = useAuthStore.getState().user;
+      useAuthStore.setState({
+        user: { ...currentUser, spotifyConnected: true }
+      });
+
+      // Fetch fresh status from backend
+      await checkStatus();
     }
-  });
-
-  const { authUrl, state } = await response.json();
-  // authUrl = "https://accounts.spotify.com/authorize?client_id=...&redirect_uri=..."
-
-  // Open OAuth URL in browser
-  await WebBrowser.openAuthSessionAsync(authUrl);
-
-  // Start polling for completion
-  pollAuthStatus(state);
-};
-```
-
-**Backend** (`backend/src/features/spotify/spotify.controller.ts`):
-```typescript
-export const initiateSpotifyAuth = async (req: Request, res: Response) => {
-  const userId = req.user.id; // From JWT middleware
-
-  // Generate random state token for CSRF protection
-  const state = crypto.randomBytes(32).toString('hex');
-
-  // Store state in database with user ID and expiration (5 minutes)
-  await storeAuthState(userId, state);
-
-  // Build Spotify OAuth URL
-  const authUrl = new URL('https://accounts.spotify.com/authorize');
-  authUrl.searchParams.append('client_id', process.env.SPOTIFY_CLIENT_ID);
-  authUrl.searchParams.append('response_type', 'code');
-  authUrl.searchParams.append('redirect_uri', `${BACKEND_URL}/api/spotify/callback`);
-  authUrl.searchParams.append('state', state);
-  authUrl.searchParams.append('scope', 'user-read-playback-state user-modify-playback-state');
-
-  res.json({ authUrl: authUrl.toString(), state });
-};
-```
-
-### Step 4-6: User Authorizes & Spotify Redirects
-
-1. Mobile opens `authUrl` in browser (using `expo-web-browser`)
-2. User logs into Spotify and grants permissions
-3. Spotify redirects to: `https://your-tunnel.ngrok.io/api/spotify/callback?code=xxx&state=yyy`
-4. This callback URL hits your **backend**, not the mobile app
-
-### Step 7-9: Exchange Code for Tokens
-
-**Backend** (`backend/src/features/spotify/spotify.controller.ts`):
-```typescript
-export const handleSpotifyCallback = async (req: Request, res: Response) => {
-  const { code, state } = req.query;
-
-  // Verify state token (CSRF protection)
-  const authState = await getAuthState(state);
-  if (!authState || authState.expiresAt < Date.now()) {
-    return res.status(400).send('Invalid or expired state');
   }
 
-  const userId = authState.userId;
+  set({ isConnecting: false });
+}
+```
 
-  // Exchange authorization code for access token
-  const tokenResponse = await fetch('https://accounts.spotify.com/api/token', {
+**Backend** (`spotify.service.ts` - `initiateAuth()`):
+
+```typescript
+async initiateAuth(userId: string): Promise<SpotifyAuthResponse> {
+  // Generate random state for CSRF protection
+  const state = crypto.randomBytes(16).toString('hex');
+
+  // Store state in memory (10 min expiration)
+  oauthStates.set(state, { userId, createdAt: Date.now() });
+
+  // Build Spotify OAuth URL
+  const params = new URLSearchParams({
+    client_id: this.clientId,
+    response_type: 'code',
+    redirect_uri: this.redirectUri, // Backend callback URL
+    state,
+    scope: this.scopes.join(' '), // user-read-email, playlist-*, etc.
+    show_dialog: 'false',
+  });
+
+  const authUrl = `https://accounts.spotify.com/authorize?${params}`;
+
+  return { authUrl, state };
+}
+```
+
+### Step 2: User Authorizes on Spotify
+
+User sees Spotify login/authorization page in `expo-web-browser`.
+User grants permissions → Spotify redirects to backend callback URL.
+
+### Step 3: Backend Receives Callback
+
+**Backend** (`spotify.controller.ts` - `handleCallback()`):
+
+```typescript
+async handleCallback(req: Request, res: Response) {
+  try {
+    const { code, state } = req.query;
+
+    // Validate and process OAuth
+    const result = await spotifyService.handleCallback({ code, state });
+
+    // Redirect to mobile deep link with success
+    const deepLink = `musicroom://auth/spotify/callback?success=true&spotifyUserId=${result.spotifyUserId}`;
+    res.redirect(deepLink);
+  } catch (error) {
+    // Redirect to deep link with error
+    const deepLink = `musicroom://auth/spotify/callback?success=false&error=${encodeURIComponent(error.message)}`;
+    res.redirect(deepLink);
+  }
+}
+```
+
+**Backend** (`spotify.service.ts` - `handleCallback()`):
+
+```typescript
+async handleCallback(data: SpotifyAuthCallbackDTO): Promise<SpotifyConnectionStatus> {
+  // 1. Verify state (CSRF protection)
+  const stateData = oauthStates.get(data.state);
+  if (!stateData) {
+    throw new AppError(400, 'Invalid or expired state');
+  }
+
+  const userId = stateData.userId;
+  oauthStates.delete(data.state); // Consume state
+
+  // 2. Exchange code for tokens
+  const tokenResponse = await this.exchangeCodeForTokens(data.code);
+  // tokenResponse = { access_token, refresh_token, expires_in, scope }
+
+  // 3. Get Spotify user profile
+  const spotifyUser = await this.getSpotifyUserProfile(tokenResponse.access_token);
+
+  // 4. Calculate expiration
+  const expiresAt = new Date(Date.now() + tokenResponse.expires_in * 1000);
+
+  // 5. Save to database
+  await supabase
+    .from('user_profiles')
+    .update({
+      spotify_connected: true,
+      spotify_user_id: spotifyUser.id,
+      spotify_access_token: tokenResponse.access_token,
+      spotify_refresh_token: tokenResponse.refresh_token,
+      spotify_token_expires_at: expiresAt.toISOString(),
+      spotify_scopes: tokenResponse.scope.split(' '),
+    })
+    .eq('id', userId);
+
+  return {
+    connected: true,
+    spotifyUserId: spotifyUser.id,
+    scopes: tokenResponse.scope.split(' '),
+    expiresAt: expiresAt.toISOString(),
+  };
+}
+```
+
+### Step 4: Mobile Catches Deep Link
+
+**Mobile** - `expo-web-browser` automatically handles the deep link:
+- Browser closes
+- `WebBrowser.openAuthSessionAsync()` returns with `result.type === 'success'`
+- `result.url` contains the deep link with parameters
+- Mobile parses success status and updates UI
+
+---
+
+## Database Schema
+
+Migration `002_spotify_oauth.sql` adds to `user_profiles`:
+
+```sql
+ALTER TABLE public.user_profiles
+  ADD COLUMN IF NOT EXISTS spotify_access_token TEXT,
+  ADD COLUMN IF NOT EXISTS spotify_refresh_token TEXT,
+  ADD COLUMN IF NOT EXISTS spotify_token_expires_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS spotify_scopes TEXT[];
+
+-- Function to clear all Spotify data atomically
+CREATE OR REPLACE FUNCTION public.clear_spotify_connection(user_id UUID)
+RETURNS VOID AS $$
+BEGIN
+  UPDATE public.user_profiles
+  SET
+    spotify_connected = FALSE,
+    spotify_user_id = NULL,
+    spotify_access_token = NULL,
+    spotify_refresh_token = NULL,
+    spotify_token_expires_at = NULL,
+    spotify_scopes = NULL,
+    updated_at = NOW()
+  WHERE id = user_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+```
+
+---
+
+## Token Refresh
+
+**Automatic Refresh** (in `spotify.service.ts`):
+
+```typescript
+private async getValidAccessToken(userId: string): Promise<string> {
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('spotify_access_token, spotify_refresh_token, spotify_token_expires_at, spotify_connected')
+    .eq('id', userId)
+    .single();
+
+  if (!profile.spotify_connected || !profile.spotify_access_token) {
+    throw new AppError(401, 'Spotify not connected');
+  }
+
+  const expiresAt = new Date(profile.spotify_token_expires_at);
+  const now = new Date();
+
+  // Refresh if expired or expires in next 5 minutes
+  if (expiresAt.getTime() - now.getTime() < 5 * 60 * 1000) {
+    return await this.refreshAccessToken(userId, profile.spotify_refresh_token);
+  }
+
+  return profile.spotify_access_token;
+}
+
+private async refreshAccessToken(userId: string, refreshToken: string): Promise<string> {
+  const response = await fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-      'Authorization': `Basic ${Buffer.from(
-        `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
-      ).toString('base64')}`
+      Authorization: `Basic ${Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64')}`,
     },
     body: new URLSearchParams({
-      grant_type: 'authorization_code',
-      code,
-      redirect_uri: `${BACKEND_URL}/api/spotify/callback`
-    })
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+    }),
   });
 
-  const tokens = await tokenResponse.json();
-  // tokens = { access_token, refresh_token, expires_in, ... }
+  const tokenData = await response.json();
+  const expiresAt = new Date(Date.now() + tokenData.expires_in * 1000);
 
-  // Store tokens in Supabase database
+  // Update database with new token
   await supabase
-    .from('spotify_tokens')
-    .upsert({
-      user_id: userId,
-      access_token: tokens.access_token,
-      refresh_token: tokens.refresh_token,
-      expires_at: Date.now() + tokens.expires_in * 1000
-    });
+    .from('user_profiles')
+    .update({
+      spotify_access_token: tokenData.access_token,
+      spotify_token_expires_at: expiresAt.toISOString(),
+    })
+    .eq('id', userId);
 
-  // Mark auth state as completed
-  await markAuthStateCompleted(state);
-
-  // Return success page (HTML)
-  res.send(`
-    <html>
-      <body>
-        <h1>✅ Spotify Connected!</h1>
-        <p>You can close this window and return to Music Room.</p>
-        <script>window.close();</script>
-      </body>
-    </html>
-  `);
-};
+  return tokenData.access_token;
+}
 ```
 
-### Step 10-12: Mobile Detects Success
+---
 
-**Mobile** (polling approach):
-```typescript
-const pollAuthStatus = async (state: string) => {
-  const maxAttempts = 60; // 60 seconds
-  let attempts = 0;
+## Mobile UI Components
 
-  const interval = setInterval(async () => {
-    attempts++;
+### SpotifyConnectScreen
 
-    // Check if auth completed
-    const response = await fetch(
-      `${API_URL}/api/spotify/auth/status?state=${state}`,
-      {
-        headers: { 'Authorization': `Bearer ${userToken}` }
-      }
-    );
+Located at `mobile/src/screens/spotify/SpotifyConnectScreen.tsx`
 
-    const { completed, error } = await response.json();
+**Features**:
+- Spotify icon (🎵)
+- Title "Connect to Spotify"
+- Feature list with checkmarks (search, add tracks, sync library, etc.)
+- "Connect Spotify" button (primary)
+- "Skip for now" button (ghost, shown after 2 seconds)
+- Error handling with retry
 
-    if (completed) {
-      clearInterval(interval);
-      // Navigate to main app
-      navigation.navigate('App');
-    } else if (error || attempts >= maxAttempts) {
-      clearInterval(interval);
-      Alert.alert('Error', 'Spotify connection timed out');
+**Navigation**:
+- Accessed from Profile screen by tapping Spotify row
+- Returns to Profile on success or skip
+
+### SpotifySettingsScreen
+
+Located at `mobile/src/screens/spotify/SpotifySettingsScreen.tsx`
+
+**Features**:
+- Connection status badge (Connected/Not Connected)
+- Spotify User ID (if connected)
+- Scopes count
+- Info section explaining benefits
+- "Disconnect Spotify" button with confirmation alert
+
+---
+
+## Configuration
+
+### Backend `.env`
+
+```bash
+# Spotify API credentials from https://developer.spotify.com/dashboard
+SPOTIFY_CLIENT_ID=your_spotify_client_id
+SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
+
+# Callback URL (changes with tunnel URL)
+SPOTIFY_REDIRECT_URI=https://abc123.ngrok-free.app/api/spotify/auth/callback
+```
+
+### Mobile `.env`
+
+```bash
+# Deep link callback (fixed)
+EXPO_PUBLIC_SPOTIFY_REDIRECT_URI=musicroom://auth/spotify/callback
+```
+
+### Spotify Dashboard
+
+1. Go to https://developer.spotify.com/dashboard
+2. Create or select your app
+3. Add Redirect URI: `https://your-tunnel-url.ngrok-free.app/api/spotify/auth/callback`
+4. Copy Client ID and Client Secret to backend `.env`
+
+**Note**: Tunnel URL changes on each `make dev-tunnel` restart. Update Spotify Dashboard each time.
+
+### app.json (Deep Linking)
+
+```json
+{
+  "expo": {
+    "scheme": "musicroom",
+    "ios": {
+      "associatedDomains": ["applinks:musicroom.app"]
+    },
+    "android": {
+      "intentFilters": [{
+        "action": "VIEW",
+        "autoVerify": true,
+        "data": [{ "scheme": "musicroom", "host": "auth" }],
+        "category": ["BROWSABLE", "DEFAULT"]
+      }]
     }
-  }, 1000); // Poll every second
-};
-```
-
-**Backend** (status endpoint):
-```typescript
-export const getAuthStatus = async (req: Request, res: Response) => {
-  const { state } = req.query;
-  const userId = req.user.id;
-
-  const authState = await getAuthState(state);
-
-  if (!authState) {
-    return res.json({ completed: false, error: 'Invalid state' });
   }
-
-  if (authState.userId !== userId) {
-    return res.json({ completed: false, error: 'Unauthorized' });
-  }
-
-  res.json({
-    completed: authState.completed,
-    error: authState.error
-  });
-};
+}
 ```
 
-## Redirect URI Configuration
+---
 
-### Tunnel Mode (Development - Different WiFi)
+## Testing the Integration
 
-When running `make dev-tunnel`, add this to Spotify Dashboard:
+### Step 1: Start Tunnel Mode
 
-```
-https://abc123.ngrok-free.app/api/spotify/callback
-```
-
-**⚠️ Important**: This URL changes each time you restart tunnel mode. Update it in:
-1. Spotify Dashboard → Redirect URIs
-2. Will be displayed automatically when running `make dev-tunnel`
-
-### LAN Mode (Development - Same WiFi)
-
-```
-http://localhost:3000/api/spotify/callback
-http://192.168.1.100:3000/api/spotify/callback  # Your local IP
+```bash
+make dev-tunnel
 ```
 
-### Production
+Copy the displayed Spotify callback URL (e.g., `https://abc123.ngrok-free.app/api/spotify/auth/callback`)
 
-```
-https://api.musicroom.com/api/spotify/callback
-```
+### Step 2: Update Spotify Dashboard
 
-## Security Considerations
+Add the callback URL to Spotify Dashboard → App Settings → Redirect URIs
 
-### CSRF Protection with State Token
+### Step 3: Execute Database Migration
 
-The `state` parameter prevents CSRF attacks:
-
-1. Backend generates random state token
-2. Stores it in database with user ID and expiration
-3. Includes it in OAuth URL
-4. Spotify returns it unchanged in callback
-5. Backend verifies it matches stored value
-
-Without this, an attacker could trick a user into authorizing their Spotify account.
-
-### Token Storage
-
-- **Access Token**: Valid for 1 hour, stored in database
-- **Refresh Token**: Valid indefinitely (until revoked), used to get new access tokens
-- Backend automatically refreshes expired access tokens before API calls
-
-### Client Secret Protection
-
-`SPOTIFY_CLIENT_SECRET` is **never** sent to mobile app or exposed in frontend code. It stays on the backend server only.
-
-## Using Spotify API After Authentication
-
-Once authenticated, the mobile app can call backend endpoints that use Spotify API:
-
-```typescript
-// Mobile: Request current playback
-const response = await fetch(`${API_URL}/api/spotify/playback`, {
-  headers: { 'Authorization': `Bearer ${userToken}` }
-});
-
-// Backend: Use stored Spotify tokens
-export const getCurrentPlayback = async (req: Request, res: Response) => {
-  const userId = req.user.id;
-
-  // Get user's Spotify tokens from database
-  const { access_token } = await getSpotifyTokens(userId);
-
-  // Call Spotify API
-  const playback = await fetch('https://api.spotify.com/v1/me/player', {
-    headers: { 'Authorization': `Bearer ${access_token}` }
-  });
-
-  res.json(await playback.json());
-};
+In Supabase Dashboard → SQL Editor, execute:
+```sql
+-- Content from backend/migrations/002_spotify_oauth.sql
 ```
 
-## Testing the Flow
+### Step 4: Test Flow
 
-1. Start tunnel mode:
-   ```bash
-   make dev-tunnel
-   ```
+1. Open mobile app (Expo Go)
+2. Login with test account
+3. Navigate to Profile
+4. Tap "Spotify" row → opens SpotifyConnectScreen
+5. Tap "Connect Spotify" → opens browser
+6. Authorize on Spotify
+7. Browser closes automatically
+8. Verify "Connected" status in Profile
+9. Tap "Spotify" row again → opens SpotifySettingsScreen
+10. Test disconnect
 
-2. Copy the displayed callback URL and add it to Spotify Dashboard
+---
 
-3. In mobile app, tap "Connect Spotify"
+## Security Features
 
-4. You'll see:
-   - Browser opens with Spotify login
-   - User authorizes
-   - Browser shows success page
-   - Mobile app polls and detects success
-   - Navigates to main app
+✅ **CSRF Protection**: State parameter with 10-minute expiration
+✅ **Client Secret**: Never exposed to mobile, stays on backend
+✅ **Token Storage**: Stored in Supabase with Row Level Security
+✅ **Token Refresh**: Automatic refresh before expiration (no user interruption)
+✅ **Scope Limiting**: Only requests necessary permissions
+✅ **Deep Link Validation**: Mobile validates callback origin
 
-5. Check ngrok web UI (http://localhost:4040) to see the callback request
+---
 
-## Common Issues
+## Troubleshooting
 
-### "Invalid redirect URI" error
+### "Invalid redirect URI" Error
 
-- The callback URL in Spotify Dashboard must **exactly match** the backend tunnel URL
-- Check for trailing slashes, http vs https, etc.
+- Ensure callback URL in Spotify Dashboard exactly matches `SPOTIFY_REDIRECT_URI` in backend `.env`
+- No trailing slashes, correct protocol (https for tunnel)
 
-### Mobile app doesn't detect success
+### Mobile Doesn't Return After Authorization
 
-- Check backend logs for callback errors
-- Verify state token is being stored/retrieved correctly
-- Ensure polling endpoint is working
+- Check deep linking configuration in `app.json`
+- Verify scheme is `musicroom://`
+- Test deep link manually: `npx uri-scheme open musicroom://auth/spotify/callback?success=true --ios`
 
-### Tokens not working
+### Tokens Not Working
 
 - Check token expiration (1 hour for access token)
-- Verify refresh token logic is implemented
-- Check Spotify API scopes match what you're requesting
+- Verify refresh token logic in backend
+- Check Spotify scopes match requested permissions
+
+### Callback URL Changes Every Restart
+
+- Use ngrok paid plan for fixed domain
+- Or manually update Spotify Dashboard after each `make dev-tunnel`
+- Consider using `make dev` (LAN mode) for development, tunnel only for testing
+
+---
 
 ## Next Steps
 
-After OAuth is working:
+Now that OAuth is working:
 
-1. **Implement Token Refresh**: Automatic refresh of expired access tokens
-2. **Add Spotify Endpoints**: `/api/spotify/search`, `/api/spotify/play`, etc.
-3. **Real-time Sync**: Use Socket.io to sync playback across users in a room
-4. **Error Handling**: Handle revoked tokens, API rate limits, etc.
+1. **Implement Playlist Integration** - Add Spotify tracks to Music Room playlists
+2. **Search UI** - Create search screen with Spotify API
+3. **Playback Control** - Integrate Spotify SDK for playback
+4. **Real-time Sync** - Use Socket.io to sync playback across users
+
+---
+
+## Files Modified
+
+### Backend
+- `backend/migrations/002_spotify_oauth.sql` (new)
+- `backend/src/shared/config/env.ts` (updated)
+- `backend/src/features/spotify/` (new directory, 6 files)
+- `backend/src/server.ts` (updated)
+
+### Mobile
+- `mobile/src/types/index.ts` (updated)
+- `mobile/src/services/api.ts` (updated)
+- `mobile/src/store/spotifyStore.ts` (new)
+- `mobile/src/screens/spotify/` (new directory, 3 files)
+- `mobile/src/navigation/AppNavigator.tsx` (updated)
+- `mobile/src/screens/profile/ProfileScreen.tsx` (updated)
+- `mobile/app.json` (updated)

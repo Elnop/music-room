@@ -93,3 +93,42 @@ export interface ApiError {
   code?: string;
   details?: unknown;
 }
+
+// Spotify Types (aligned with backend)
+export interface SpotifyConnectionStatus {
+  connected: boolean;
+  spotifyUserId?: string;
+  scopes?: string[];
+  expiresAt?: string;
+}
+
+export interface SpotifyAuthResponse {
+  authUrl: string;
+  state: string;
+}
+
+export interface SpotifyTrack {
+  id: string;
+  name: string;
+  artists: Array<{ name: string; id: string }>;
+  album: {
+    name: string;
+    id: string;
+    images: Array<{ url: string; height: number; width: number }>;
+  };
+  duration_ms: number;
+  uri: string;
+  preview_url: string | null;
+  external_urls: {
+    spotify: string;
+  };
+}
+
+export interface SpotifySearchResult {
+  tracks?: {
+    items: SpotifyTrack[];
+    total: number;
+    limit: number;
+    offset: number;
+  };
+}

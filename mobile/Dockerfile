@@ -8,6 +8,12 @@ USER root
 # Install Expo CLI globally
 RUN npm install -g expo-cli @expo/ngrok
 
+# Create shared directory for tunnel URL communication
+# Mobile container needs read access to files written by backend
+RUN mkdir -p /tmp/shared && \
+    chown -R node:node /tmp/shared && \
+    chmod 755 /tmp/shared
+
 WORKDIR /app
 
 # Fix permissions for the node user

@@ -14,8 +14,19 @@ export class AuthController {
    */
   async register(req: Request, res: Response, next: NextFunction) {
     try {
+      logger.debug('🔵 Register request received', {
+        body: req.body,
+        headers: {
+          'content-type': req.headers['content-type'],
+          'user-agent': req.headers['user-agent']
+        }
+      })
+
       const validated = registerSchema.parse(req.body)
+      logger.debug('🔵 Validation passed', { email: validated.email, username: validated.username })
+
       const result = await authService.register(validated)
+      logger.debug('🔵 Registration successful', { userId: result.user.id })
 
       const response: ApiResponse = {
         success: true,
@@ -27,6 +38,7 @@ export class AuthController {
 
       res.status(201).json(response)
     } catch (error) {
+      logger.error('🔴 Register error', { error })
       next(error)
     }
   }

@@ -9,6 +9,12 @@ USER root
 # Install ngrok globally for tunnel mode (requires root)
 RUN npm install -g @expo/ngrok
 
+# Create shared directory for tunnel URL communication with correct permissions
+# Must be done as root, but owned by node user (UID 65532)
+RUN mkdir -p /tmp/shared && \
+    chown -R node:node /tmp/shared && \
+    chmod 755 /tmp/shared
+
 WORKDIR /app
 
 # Fix permissions for the node user (uid 65532 in Chainguard images)

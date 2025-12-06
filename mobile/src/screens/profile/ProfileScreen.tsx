@@ -10,6 +10,8 @@ import { COLORS, SPACING } from '@constants';
 type ProfileStackParamList = {
   Profile: undefined;
   EditProfile: undefined;
+  SpotifyConnect: undefined;
+  SpotifySettings: undefined;
 };
 
 type NavigationProp = NativeStackNavigationProp<ProfileStackParamList>;
@@ -87,14 +89,20 @@ export function ProfileScreen() {
 
         <View style={styles.divider} />
 
-        <View style={styles.infoRow}>
+        <TouchableOpacity
+          style={styles.infoRow}
+          onPress={() => navigation.navigate(user.spotifyConnected ? 'SpotifySettings' : 'SpotifyConnect')}
+        >
           <Text style={styles.label}>Spotify</Text>
-          <View style={styles.spotifyBadge}>
-            <Text style={styles.spotifyText}>
-              {user.spotifyConnected ? 'Connected' : 'Not Connected'}
-            </Text>
+          <View style={styles.spotifyRow}>
+            <View style={[styles.spotifyBadge, user.spotifyConnected && styles.spotifyBadgeConnected]}>
+              <Text style={[styles.spotifyText, user.spotifyConnected && styles.spotifyTextConnected]}>
+                {user.spotifyConnected ? 'Connected' : 'Not Connected'}
+              </Text>
+            </View>
+            <Text style={styles.chevron}>›</Text>
           </View>
-        </View>
+        </TouchableOpacity>
 
         <View style={styles.divider} />
 
@@ -202,6 +210,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.primary,
     fontWeight: '600',
+  },
+  spotifyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.xs,
+  },
+  spotifyBadgeConnected: {
+    backgroundColor: COLORS.primary + '20',
+  },
+  spotifyTextConnected: {
+    color: COLORS.primary,
+  },
+  chevron: {
+    fontSize: 20,
+    color: COLORS.textSecondary,
   },
   actions: {
     paddingHorizontal: SPACING.lg,

@@ -1,5 +1,5 @@
 import type { LoginInput, RegisterInput } from '@utils/validators';
-import type { UserProfile } from '@types';
+import type { UserProfile, SpotifyAuthResponse, SpotifyConnectionStatus, SpotifySearchResult } from '@types';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
 
@@ -187,6 +187,80 @@ export const authApi = {
   async logout(accessToken: string): Promise<void> {
     await apiRequest<void>('/api/auth/logout', {
       method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+};
+
+/**
+ * Spotify API
+ */
+export const spotifyApi = {
+  /**
+   * Initiate Spotify OAuth flow
+   */
+  async initiateAuth(accessToken: string): Promise<SpotifyAuthResponse> {
+    return apiRequest<SpotifyAuthResponse>('/api/spotify/auth/initiate', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+
+  /**
+   * Exchange authorization code for tokens
+   */
+  async exchangeCode(code: string, state: string): Promise<SpotifyConnectionStatus> {
+    return apiRequest<SpotifyConnectionStatus>('/api/spotify/auth/exchange', {
+      method: 'POST',
+      body: JSON.stringify({ code, state }),
+    });
+  },
+
+  /**
+   * Get Spotify connection status
+   */
+  async getStatus(accessToken: string): Promise<SpotifyConnectionStatus> {
+    return apiRequest<SpotifyConnectionStatus>('/api/spotify/auth/status', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+
+  /**
+   * Disconnect Spotify account
+   */
+  async disconnect(accessToken: string): Promise<void> {
+    return apiRequest<void>('/api/spotify/auth/disconnect', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+
+  /**
+   * Search Spotify catalog
+   */
+  async search(
+    accessToken: string,
+    query: string,
+    type: 'track' | 'album' | 'artist' | 'playlist' = 'track',
+    limit: number = 20
+  ): Promise<SpotifySearchResult> {
+    const params = new URLSearchParams({
+      q: query,
+      type,
+      limit: limit.toString(),
+    });
+
+    return apiRequest<SpotifySearchResult>(`/api/spotify/search?${params.toString()}`, {
+      method: 'GET',
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

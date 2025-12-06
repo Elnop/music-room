@@ -13,6 +13,8 @@ services:
       - ./backend:/app
       # Prevent node_modules from being overwritten
       - /app/node_modules
+      # Shared volume for tunnel URL communication
+      - tunnel-info:/tmp/shared
     env_file:
       - ./backend/.env
     environment:
@@ -45,6 +47,8 @@ services:
       # Prevent node_modules from being overwritten
       - /app/node_modules
       - /app/.expo
+      # Shared volume for tunnel URL communication
+      - tunnel-info:/tmp/shared
     env_file:
       - ./mobile/.env
     environment:
@@ -64,3 +68,7 @@ networks:
   music-room-network:
     driver: bridge
     name: music-room-network
+
+volumes:
+  tunnel-info:
+    driver: local

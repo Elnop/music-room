@@ -15,8 +15,8 @@ ATTEMPT=0
 
 echo "→ Waiting for backend tunnel to initialize..."
 while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
-  if [ -f /tmp/backend-tunnel-url.txt ]; then
-    BACKEND_TUNNEL_URL=$(cat /tmp/backend-tunnel-url.txt)
+  if [ -f /tmp/shared/backend-tunnel-url.txt ]; then
+    BACKEND_TUNNEL_URL=$(cat /tmp/shared/backend-tunnel-url.txt)
 
     # Verify the URL is not empty
     if [ -n "$BACKEND_TUNNEL_URL" ]; then
@@ -45,15 +45,21 @@ if [ -z "$BACKEND_TUNNEL_URL" ]; then
   echo ""
   echo "❌ ERROR: Backend tunnel URL not found after 30 seconds"
   echo ""
+  echo "Debugging information:"
+  echo "  Shared volume mount: $(ls -la /tmp/shared 2>/dev/null || echo 'NOT FOUND')"
+  echo "  Backend tunnel file: $(ls -l /tmp/shared/backend-tunnel-url.txt 2>/dev/null || echo 'NOT FOUND')"
+  echo ""
   echo "Possible causes:"
   echo "  1. Backend container not started or not in tunnel mode"
-  echo "  2. ngrok failed to initialize"
-  echo "  3. Shared volume /tmp not working"
+  echo "  2. ngrok failed to initialize (check: docker logs music-room-backend)"
+  echo "  3. Shared volume not mounted correctly"
+  echo "  4. Permission issues (files not readable by mobile container)"
   echo ""
   echo "To fix:"
-  echo "  1. Check backend logs: docker logs music-room-backend"
-  echo "  2. Verify backend is running: docker ps"
-  echo "  3. Restart services: make stop && make dev-tunnel"
+  echo "  1. Check backend logs: make logs-backend"
+  echo "  2. Verify backend container: docker ps"
+  echo "  3. Check tunnel file: docker exec music-room-backend cat /tmp/shared/backend-tunnel-url.txt"
+  echo "  4. Rebuild and restart: make stop && docker compose down -v && make dev-tunnel"
   echo ""
   exit 1
 fi

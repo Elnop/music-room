@@ -52,8 +52,11 @@ echo "📍 Local URL:  http://localhost:3000"
 echo "🔍 ngrok Web Interface: http://localhost:4040"
 echo "=========================================="
 
-# Save tunnel URL to file for mobile to read
-echo "$TUNNEL_URL" > /tmp/backend-tunnel-url.txt
+# Save tunnel URL to shared volume for mobile to read
+# Directory is created by Dockerfile with correct permissions
+echo "$TUNNEL_URL" > /tmp/shared/backend-tunnel-url.txt
+chmod 644 /tmp/shared/backend-tunnel-url.txt
+echo "✓ Tunnel URL saved: /tmp/shared/backend-tunnel-url.txt"
 
 # Export for CORS configuration
 export TUNNEL_URL
