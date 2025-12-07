@@ -1,19 +1,7 @@
 import { create } from 'zustand';
-import type { Playlist, PlaylistWithTracks, UserProfile, Track } from '@types';
+import type { Playlist, PlaylistWithTracks, Track } from '@types';
 import type { PlaylistInput } from '@utils/validators';
-import {
-  getUserPlaylists,
-  findPlaylistById,
-  getPlaylistTracks,
-  createMockPlaylist,
-  updateMockPlaylist,
-  deleteMockPlaylist,
-  addTrackToPlaylist,
-  removeTrackFromPlaylist,
-  reorderPlaylistTracks,
-} from '@mocks';
-import { delay, generateId } from '@utils/mockHelpers';
-import { findUserById } from '@mocks';
+import { playlistApi } from '@api/playlistApi';
 
 /**
  * Playlist State Interface
@@ -41,7 +29,7 @@ interface PlaylistState {
 
 /**
  * Playlist Store
- * Manages playlist state with mock data
+ * Manages playlist state with real API calls
  */
 export const usePlaylistStore = create<PlaylistState>((set, get) => ({
   // Initial state
@@ -57,11 +45,7 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // Simulate network delay
-      await delay(800);
-
-      // Get user's playlists (owned + collaborating)
-      const playlists = getUserPlaylists(userId);
+      const playlists = await playlistApi.fetchPlaylists();
 
       set({
         playlists,
@@ -85,33 +69,10 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // Simulate network delay
-      await delay(600);
-
-      // Find playlist
-      const playlist = findPlaylistById(id);
-      if (!playlist) {
-        throw new Error('Playlist not found');
-      }
-
-      // Get tracks
-      const tracks = getPlaylistTracks(id);
-
-      // Get owner info
-      const owner = findUserById(playlist.ownerId);
-      if (!owner) {
-        throw new Error('Playlist owner not found');
-      }
-
-      // Build PlaylistWithTracks
-      const playlistWithTracks: PlaylistWithTracks = {
-        ...playlist,
-        tracks,
-        owner,
-      };
+      const playlist = await playlistApi.fetchPlaylistById(id);
 
       set({
-        currentPlaylist: playlistWithTracks,
+        currentPlaylist: playlist,
         isLoading: false,
       });
     } catch (error) {
@@ -133,30 +94,12 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // Simulate network delay
-      await delay(1000);
-
-      // Create new playlist
-      const newPlaylist: Playlist = {
-        id: generateId('playlist'),
-        name: data.name,
-        description: data.description,
-        coverUrl: undefined,
-        ownerId: userId,
-        collaboratorIds: [],
-        trackIds: [],
-        visibility: data.visibility,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-
-      // Add to mock data
-      createMockPlaylist(newPlaylist);
+      const newPlaylist = await playlistApi.createPlaylist(data);
 
       // Update state
       const { playlists } = get();
       set({
-        playlists: [...playlists, newPlaylist],
+        playlists: [newPlaylist, ...playlists],
         isLoading: false,
       });
     } catch (error) {
@@ -177,22 +120,14 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // Simulate network delay
-      await delay(600);
-
-      // Update in mock data
-      const updatedPlaylist = updateMockPlaylist(id, data);
-      if (!updatedPlaylist) {
-        throw new Error('Playlist not found');
-      }
+      const updatedPlaylist = await playlistApi.updatePlaylist(id, data);
 
       // Update state
       const { playlists, currentPlaylist } = get();
       set({
         playlists: playlists.map(p => (p.id === id ? updatedPlaylist : p)),
-        currentPlaylist: currentPlaylist?.id === id
-          ? { ...currentPlaylist, ...updatedPlaylist }
-          : currentPlaylist,
+        currentPlaylist:
+          currentPlaylist?.id === id ? { ...currentPlaylist, ...updatedPlaylist } : currentPlaylist,
         isLoading: false,
       });
     } catch (error) {
@@ -213,14 +148,7 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // Simulate network delay
-      await delay(500);
-
-      // Delete from mock data
-      const success = deleteMockPlaylist(id);
-      if (!success) {
-        throw new Error('Playlist not found');
-      }
+      await playlistApi.deletePlaylist(id);
 
       // Update state
       const { playlists, currentPlaylist } = get();
@@ -247,20 +175,10 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // Simulate network delay
-      await delay(400);
+      await playlistApi.addTrack(playlistId, track);
 
-      // Add track in mock data (passing full track object)
-      const success = addTrackToPlaylist(playlistId, track);
-      if (!success) {
-        throw new Error('Failed to add track (playlist not found or track already in playlist)');
-      }
-
-      // Refresh current playlist if it's the one being modified
-      const { currentPlaylist } = get();
-      if (currentPlaylist?.id === playlistId) {
-        await get().fetchPlaylistById(playlistId);
-      }
+      // Note: Removed fetchPlaylistById call to avoid race condition
+      // PlaylistDetailScreen will refresh automatically via useFocusEffect
 
       set({ isLoading: false });
     } catch (error) {
@@ -281,14 +199,7 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // Simulate network delay
-      await delay(400);
-
-      // Remove track from mock data
-      const success = removeTrackFromPlaylist(playlistId, trackId);
-      if (!success) {
-        throw new Error('Failed to remove track (playlist or track not found)');
-      }
+      await playlistApi.removeTrack(playlistId, trackId);
 
       // Refresh current playlist if it's the one being modified
       const { currentPlaylist } = get();
@@ -315,14 +226,7 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // Simulate network delay
-      await delay(400);
-
-      // Reorder tracks in mock data
-      const success = reorderPlaylistTracks(playlistId, trackIds);
-      if (!success) {
-        throw new Error('Failed to reorder tracks (playlist not found)');
-      }
+      await playlistApi.reorderTracks(playlistId, trackIds);
 
       // Refresh current playlist if it's the one being modified
       const { currentPlaylist } = get();

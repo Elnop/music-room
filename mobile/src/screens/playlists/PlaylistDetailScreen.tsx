@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   View,
   FlatList,
@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RouteProp } from '@react-navigation/native';
+import { RouteProp, useFocusEffect } from '@react-navigation/native';
 import { usePlaylistStore } from '../../store/playlistStore';
 import { useAuthStore } from '../../store/authStore';
 import { PlaylistHeader, TrackItem, AddTrackButton } from '@components/playlist';
@@ -39,9 +39,13 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
   const { user } = useAuthStore();
   const { currentPlaylist, isLoading, fetchPlaylistById, removeTrack } = usePlaylistStore();
 
-  useEffect(() => {
-    fetchPlaylistById(id);
-  }, [id]);
+  // Refresh playlist when screen receives focus (e.g., returning from SpotifySearchScreen)
+  // Note: useFocusEffect also triggers on mount, so no separate useEffect needed
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchPlaylistById(id);
+    }, [id])
+  );
 
   const canEdit = user ? canEditPlaylist(id, user.id) : false;
 

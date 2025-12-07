@@ -60,15 +60,22 @@ export interface Playlist {
   coverUrl?: string;
   ownerId: string;
   collaboratorIds: string[];
-  trackIds: string[];
+  trackCount: number;
   visibility: 'public' | 'private';
   createdAt: string;
   updatedAt: string;
 }
 
+// Track with position metadata (from playlist_tracks table)
+export interface TrackWithPosition extends Track {
+  position: number;
+  addedBy: string | null;
+  addedAt: string;
+}
+
 // Playlist with full track data and owner info
-export interface PlaylistWithTracks extends Playlist {
-  tracks: Track[];
+export interface PlaylistWithTracks extends Omit<Playlist, 'trackCount'> {
+  tracks: TrackWithPosition[];
   owner: UserProfile;
 }
 

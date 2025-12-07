@@ -1,0 +1,58 @@
+import { z } from 'zod';
+
+/**
+ * Playlist validation schemas using Zod
+ */
+
+export const createPlaylistSchema = z.object({
+  name: z
+    .string()
+    .min(1, 'Playlist name is required')
+    .max(100, 'Playlist name must be at most 100 characters'),
+  description: z
+    .string()
+    .max(500, 'Description must be at most 500 characters')
+    .optional(),
+  visibility: z.enum(['public', 'private'], {
+    errorMap: () => ({ message: 'Visibility must be either public or private' }),
+  }),
+});
+
+export const updatePlaylistSchema = z.object({
+  name: z
+    .string()
+    .min(1, 'Playlist name cannot be empty')
+    .max(100, 'Playlist name must be at most 100 characters')
+    .optional(),
+  description: z
+    .string()
+    .max(500, 'Description must be at most 500 characters')
+    .optional(),
+  visibility: z.enum(['public', 'private']).optional(),
+});
+
+export const addTrackSchema = z.object({
+  spotifyUri: z
+    .string()
+    .regex(/^spotify:track:[a-zA-Z0-9]+$/, 'Invalid Spotify track URI'),
+  title: z.string().min(1).max(200),
+  artist: z.string().min(1).max(200),
+  album: z.string().min(1).max(200),
+  albumArt: z.string().url().optional(),
+  durationMs: z.number().int().positive(),
+  previewUrl: z.string().url().optional(),
+});
+
+export const reorderTracksSchema = z.object({
+  trackIds: z.array(z.string().uuid()).min(1, 'Track IDs array cannot be empty'),
+});
+
+export const addCollaboratorSchema = z.object({
+  userId: z.string().uuid('Invalid user ID format'),
+});
+
+export type CreatePlaylistInput = z.infer<typeof createPlaylistSchema>;
+export type UpdatePlaylistInput = z.infer<typeof updatePlaylistSchema>;
+export type AddTrackInput = z.infer<typeof addTrackSchema>;
+export type ReorderTracksInput = z.infer<typeof reorderTracksSchema>;
+export type AddCollaboratorInput = z.infer<typeof addCollaboratorSchema>;
