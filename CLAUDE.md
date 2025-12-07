@@ -187,7 +187,28 @@ backend/src/
 │   │   ├── auth.middleware.ts   # JWT verification middleware
 │   │   ├── auth.routes.ts       # Express routes
 │   │   └── index.ts             # Public exports
-│   └── [future features: friends, rooms, playlists, spotify]
+│   ├── spotify/          # Spotify OAuth & search (complete)
+│   │   ├── spotify.types.ts
+│   │   ├── spotify.validators.ts
+│   │   ├── spotify.service.ts
+│   │   ├── spotify.controller.ts
+│   │   ├── spotify.routes.ts
+│   │   └── index.ts
+│   ├── playlists/        # Playlist management (complete)
+│   │   ├── playlist.types.ts
+│   │   ├── playlist.validators.ts
+│   │   ├── playlist.service.ts
+│   │   ├── playlist.controller.ts
+│   │   ├── playlist.routes.ts
+│   │   └── index.ts
+│   ├── profile/          # User profile management (complete)
+│   │   ├── profile.types.ts
+│   │   ├── profile.validators.ts
+│   │   ├── profile.service.ts
+│   │   ├── profile.controller.ts
+│   │   ├── profile.routes.ts
+│   │   └── index.ts
+│   └── [future features: friends, rooms]
 ├── shared/                # Shared code across features
 │   ├── config/           # Environment vars (env.ts), Supabase clients
 │   ├── middleware/       # Global middleware (error-handler.ts)
@@ -206,6 +227,9 @@ backend/src/
 **Backend API Routes**:
 - `/health` - Health check endpoint
 - `/api/auth/*` - Authentication endpoints (register, login, me, refresh, logout)
+- `/api/profile/*` - Profile management endpoints (get, update profile)
+- `/api/spotify/*` - Spotify OAuth and search endpoints (auth flow, search, status, disconnect)
+- `/api/playlists/*` - Playlist CRUD and track management endpoints (create, read, update, delete playlists, add/remove/reorder tracks, manage collaborators)
 
 ### Mobile: Component + Feature Architecture
 
@@ -213,30 +237,44 @@ backend/src/
 mobile/src/
 ├── screens/              # Screens by feature
 │   ├── auth/            # WelcomeScreen, LoginScreen, RegisterScreen
-│   └── playlists/       # PlaylistsScreen, CreatePlaylistScreen, PlaylistDetailScreen
+│   ├── playlists/       # PlaylistsScreen, CreatePlaylistScreen, PlaylistDetailScreen, SearchTracksScreen
+│   ├── profile/         # ProfileScreen, EditProfileScreen
+│   ├── spotify/         # SpotifyConnectScreen, SpotifySettingsScreen
+│   └── search/          # SpotifySearchScreen
 ├── components/
-│   ├── common/          # Reusable UI (Button, Card, Input, LoadingSpinner, etc.)
-│   └── playlist/        # Feature-specific (TrackItem, PlaylistCard, etc.)
+│   ├── common/          # Reusable UI (Button, Card, Input, LoadingSpinner, Avatar, etc.)
+│   ├── playlist/        # Feature-specific (TrackItem, PlaylistCard, PlaylistHeader, AddTrackButton)
+│   └── search/          # Search-specific (SpotifyTrackItem, PlaylistSelectorModal)
 ├── navigation/
 │   ├── RootNavigator.tsx    # Main navigator (switches Auth/App based on auth state)
 │   ├── AuthNavigator.tsx    # Stack for unauthenticated users
 │   └── AppNavigator.tsx     # Bottom tabs for authenticated users
 ├── store/               # Zustand state management
 │   ├── authStore.ts    # Authentication state (user, tokens, login/logout)
-│   └── playlistStore.ts # Playlist state (currently mock data)
+│   ├── playlistStore.ts # Playlist state with API integration
+│   └── spotifyStore.ts  # Spotify OAuth and search state
+├── api/                 # API client layer
+│   └── playlistApi.ts  # Playlist API calls
+├── services/            # Service layer
+│   ├── api.ts          # Base API configuration
+│   └── profileApi.ts   # Profile API calls
+├── lib/                 # Third-party library configuration
+│   └── supabase.ts     # Supabase client setup
 ├── types/              # TypeScript types aligned with backend
-├── utils/              # Validators (Zod), formatters, mock helpers
+├── utils/              # Validators (Zod), formatters, helpers, spotifyHelpers
 ├── constants/          # Theme colors, API URLs, spacing
 └── mocks/              # Mock data for development (users, playlists, tracks)
 ```
 
 **Key Mobile Patterns**:
-- Path aliases: `@components`, `@screens`, `@store`, `@utils`, `@types`, `@constants`
+- Path aliases: `@/*` (root), `@components`, `@screens`, `@store`, `@utils`, `@types`, `@constants`, `@mocks`, `@api`, `@services`
 - Zustand stores for state management (NOT Redux or Context)
 - React Hook Form + Zod for form validation
 - React Navigation 7 with stack and bottom tab navigators
 - Spotify-inspired dark theme (Green #1DB954, Black #121212)
 - Authentication state persisted to AsyncStorage, loaded on app start in RootNavigator
+- API layer (`@api`) for backend communication
+- Service layer (`@services`) for business logic
 
 ## Environment Configuration
 
@@ -278,8 +316,17 @@ Migrations are SQL files in `backend/migrations/` executed manually in Supabase 
 4. Execute
 
 **Current schema**:
-- `user_profiles` table (id, username, display_name, avatar_url, created_at, updated_at)
-- Linked to Supabase auth.users via foreign key
+- `user_profiles` table - User profile data (id, username, display_name, avatar_url, spotify_*, created_at, updated_at)
+  - Linked to Supabase auth.users via foreign key
+  - Includes Spotify OAuth tokens (access_token, refresh_token, token_expires_at, scopes)
+- `playlists` table - Playlist metadata (id, name, description, cover_url, owner_id, collaborator_ids, visibility, timestamps)
+- `tracks` table - Track data from Spotify (id, spotify_uri, title, artist, album, album_art, duration_ms, preview_url, timestamps)
+- `playlist_tracks` junction table - Many-to-many relationship (playlist_id, track_id, position, added_by, timestamps)
+
+**Migrations**:
+- `001_initial_schema.sql` - User profiles table with basic fields
+- `002_spotify_oauth.sql` - Spotify OAuth token storage in user_profiles
+- `003_playlist_persistence.sql` - Playlists, tracks, and playlist_tracks tables
 
 **Create new migration**:
 ```bash
@@ -545,12 +592,36 @@ See `doc/SPOTIFY_OAUTH.md` for detailed OAuth flow documentation.
 - CSRF protection with state parameter
 - Optional connection flow (skip allowed)
 
+**Phase 3 - Complete (Playlist Persistence)**:
+- Database migration: `003_playlist_persistence.sql` (playlists, tracks, playlist_tracks tables)
+- Backend feature: `/api/playlists/*` (full CRUD, track management, collaborators)
+  - 10 API endpoints for playlist operations
+  - Track add/remove/reorder functionality
+  - Collaborator management system
+- Mobile screens: PlaylistsScreen, PlaylistDetailScreen, CreatePlaylistScreen, SearchTracksScreen
+- Playlist store: Zustand state with full API integration
+- Playlist API client: `playlistApi.ts` for backend communication
+- Real playlist persistence (no more mock data)
+
+**Phase 4 - Complete (Profile System)**:
+- Backend feature: `/api/profile/*` (profile management, updates)
+- Mobile screens: ProfileScreen, EditProfileScreen
+- Profile API client: `profileApi.ts`
+- Profile tab in bottom navigation
+- Avatar upload and display support
+
+**Phase 5 - In Progress (Spotify Search)**:
+- Spotify search screen with track browsing
+- Add tracks from Spotify directly to playlists
+- Search tab in bottom navigation
+- Components: SpotifyTrackItem, PlaylistSelectorModal
+- Integration with Spotify API via backend
+
 **Planned Features** (see `PLAN.md`):
 - Friends system (add, manage, search friends)
 - Music rooms (collaborative listening spaces)
 - Spotify playback control (SDK integration)
 - Real-time sync with Socket.io
-- Playlist collaboration with Spotify tracks
 
 ## Common Issues & Solutions
 
