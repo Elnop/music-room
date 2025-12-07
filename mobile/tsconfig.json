@@ -14,37 +14,36 @@
     "types": [
       "react-native"
     ],
-    "baseUrl": ".",
     "paths": {
       "@/*": [
-        "src/*"
+        "./src/*"
       ],
       "@components/*": [
-        "src/components/*"
+        "./src/components/*"
       ],
       "@screens/*": [
-        "src/screens/*"
+        "./src/screens/*"
       ],
       "@services/*": [
-        "src/services/*"
+        "./src/services/*"
       ],
       "@store": [
-        "src/store"
+        "./src/store"
       ],
       "@hooks/*": [
-        "src/hooks/*"
+        "./src/hooks/*"
       ],
       "@utils/*": [
-        "src/utils/*"
+        "./src/utils/*"
       ],
       "@types": [
-        "src/types"
+        "./src/types"
       ],
       "@constants": [
-        "src/constants"
+        "./src/constants"
       ],
       "@mocks": [
-        "src/mocks"
+        "./src/mocks"
       ]
     }
   },
