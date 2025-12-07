@@ -11,10 +11,12 @@ import {
 } from '../screens/playlists';
 import { ProfileScreen, EditProfileScreen } from '../screens/profile';
 import { SpotifyConnectScreen, SpotifySettingsScreen } from '../screens/spotify';
+import { SpotifySearchScreen } from '../screens/search';
 
 export type AppTabsParamList = {
   HomeTab: undefined;
   PlaylistsTab: undefined;
+  SearchTab: undefined;
   FriendsTab: undefined;
   ProfileTab: undefined;
 };
@@ -33,9 +35,14 @@ export type ProfileStackParamList = {
   SpotifySettings: undefined;
 };
 
+export type SearchStackParamList = {
+  SpotifySearch: undefined;
+};
+
 const Tab = createBottomTabNavigator<AppTabsParamList>();
 const PlaylistStack = createNativeStackNavigator<PlaylistStackParamList>();
 const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
+const SearchStack = createNativeStackNavigator<SearchStackParamList>();
 
 // Placeholder screens for other tabs
 function PlaceholderScreen({ title }: { title: string }) {
@@ -119,6 +126,27 @@ function ProfileNavigator() {
   );
 }
 
+// Search Stack Navigator
+function SearchNavigator() {
+  return (
+    <SearchStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: COLORS.background,
+        },
+        headerTintColor: COLORS.text,
+        headerShadowVisible: false,
+      }}
+    >
+      <SearchStack.Screen
+        name="SpotifySearch"
+        component={SpotifySearchScreen}
+        options={{ headerShown: false }}
+      />
+    </SearchStack.Navigator>
+  );
+}
+
 export function AppNavigator() {
   return (
     <Tab.Navigator
@@ -153,6 +181,16 @@ export function AppNavigator() {
         options={{
           title: 'Playlists',
           tabBarIcon: () => <Text style={styles.icon}>🎵</Text>,
+          headerShown: false,
+        }}
+      />
+
+      <Tab.Screen
+        name="SearchTab"
+        component={SearchNavigator}
+        options={{
+          title: 'Search',
+          tabBarIcon: () => <Text style={styles.icon}>🔍</Text>,
           headerShown: false,
         }}
       />

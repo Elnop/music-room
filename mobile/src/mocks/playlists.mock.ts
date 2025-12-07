@@ -1,5 +1,5 @@
-import type { Playlist } from '@types';
-import { getTracksByIds } from './tracks.mock';
+import type { Playlist, Track } from '@types';
+import { getTracksByIds, MOCK_TRACKS } from './tracks.mock';
 
 /**
  * Mock Playlists
@@ -181,19 +181,26 @@ export const deleteMockPlaylist = (id: string): boolean => {
 
 /**
  * Helper: Add track to playlist
+ * Accepts a full Track object and adds it to the mock tracks collection if needed
  */
-export const addTrackToPlaylist = (playlistId: string, trackId: string): boolean => {
+export const addTrackToPlaylist = (playlistId: string, track: Track): boolean => {
   const playlist = findPlaylistById(playlistId);
   if (!playlist) {
     return false;
   }
 
   // Don't add if already exists
-  if (playlist.trackIds.includes(trackId)) {
+  if (playlist.trackIds.includes(track.id)) {
     return false;
   }
 
-  playlist.trackIds.push(trackId);
+  // Add track to mock tracks collection if it doesn't exist yet (e.g., from Spotify)
+  const trackExists = MOCK_TRACKS.find(t => t.id === track.id);
+  if (!trackExists) {
+    MOCK_TRACKS.push(track);
+  }
+
+  playlist.trackIds.push(track.id);
   playlist.updatedAt = new Date().toISOString();
   return true;
 };

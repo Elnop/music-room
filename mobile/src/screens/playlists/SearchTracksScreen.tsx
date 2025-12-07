@@ -59,7 +59,7 @@ export function SearchTracksScreen({ navigation, route }: SearchTracksScreenProp
 
   const handleAddTrack = async (track: Track) => {
     try {
-      await addTrack(playlistId, track.id);
+      await addTrack(playlistId, track);
       Alert.alert('Success', `"${track.title}" added to playlist`, [
         { text: 'Add More', style: 'cancel' },
         { text: 'Done', onPress: () => navigation.goBack() },

@@ -1,4 +1,4 @@
-.PHONY: help install dev start stop restart logs logs-backend logs-mobile qr ps build build-backend build-mobile test test-backend lint format clean clean-docker clean-deps clean-all shell-backend shell-mobile deploy health dev-tunnel qr-tunnel tunnel-info
+.PHONY: help install dev start stop restart logs logs-backend logs-mobile qr ps build build-backend build-mobile test test-backend lint format fix-permissions clean clean-docker clean-deps clean-all shell-backend shell-mobile deploy health dev-tunnel qr-tunnel tunnel-info
 
 # Colors for output
 BLUE := \033[0;34m
@@ -241,6 +241,35 @@ format: ## Format all code with prettier
 	@echo "$(YELLOW)→ Formatting mobile...$(NC)"
 	@cd mobile && npm run format || echo "$(YELLOW)⚠️  Mobile formatting not configured$(NC)"
 	@echo "$(GREEN)✓ Formatting complete$(NC)"
+
+fix-permissions: ## Fix file permissions for Docker non-root user compatibility
+	@echo "$(BLUE)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(BLUE)║              Fixing File Permissions                         ║$(NC)"
+	@echo "$(BLUE)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Fixing mobile directory permissions...$(NC)"
+	@find mobile -type d \( -name node_modules -o -name .expo \) -prune -o -type d -exec chmod 0755 {} \; 2>/dev/null
+	@find mobile -type d \( -name node_modules -o -name .expo \) -prune -o -type f -exec chmod 0644 {} \; 2>/dev/null
+	@chmod +x mobile/*.sh 2>/dev/null || true
+	@echo "$(GREEN)✓ Mobile permissions fixed$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Fixing backend directory permissions...$(NC)"
+	@find backend -type d \( -name node_modules -o -name dist \) -prune -o -type d -exec chmod 0755 {} \; 2>/dev/null
+	@find backend -type d \( -name node_modules -o -name dist \) -prune -o -type f -exec chmod 0644 {} \; 2>/dev/null
+	@chmod +x backend/*.sh 2>/dev/null || true
+	@echo "$(GREEN)✓ Backend permissions fixed$(NC)"
+	@echo ""
+	@echo "$(GREEN)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(GREEN)║            Permissions Fixed Successfully!                   ║$(NC)"
+	@echo "$(GREEN)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@echo "$(BLUE)Permissions set to:$(NC)"
+	@echo "  • Directories: 0755 (drwxr-xr-x) - readable by Docker container"
+	@echo "  • Files:       0644 (-rw-r--r--) - readable by Docker container"
+	@echo "  • Scripts:     executable (+x)"
+	@echo ""
+	@echo "$(YELLOW)💡 Run 'make restart' to apply changes in Docker$(NC)"
+	@echo ""
 
 shell-backend: ## Open shell in backend container
 	@echo "$(BLUE)Opening shell in backend container...$(NC)"

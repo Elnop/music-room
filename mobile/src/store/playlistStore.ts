@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Playlist, PlaylistWithTracks, UserProfile } from '@types';
+import type { Playlist, PlaylistWithTracks, UserProfile, Track } from '@types';
 import type { PlaylistInput } from '@utils/validators';
 import {
   getUserPlaylists,
@@ -30,7 +30,7 @@ interface PlaylistState {
   createPlaylist: (userId: string, data: PlaylistInput) => Promise<void>;
   updatePlaylist: (id: string, data: Partial<PlaylistInput>) => Promise<void>;
   deletePlaylist: (id: string) => Promise<void>;
-  addTrack: (playlistId: string, trackId: string) => Promise<void>;
+  addTrack: (playlistId: string, track: Track) => Promise<void>;
   removeTrack: (playlistId: string, trackId: string) => Promise<void>;
   reorderTracks: (playlistId: string, trackIds: string[]) => Promise<void>;
 
@@ -243,15 +243,15 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
   /**
    * Add track to playlist
    */
-  addTrack: async (playlistId: string, trackId: string) => {
+  addTrack: async (playlistId: string, track: Track) => {
     set({ isLoading: true, error: null });
 
     try {
       // Simulate network delay
       await delay(400);
 
-      // Add track in mock data
-      const success = addTrackToPlaylist(playlistId, trackId);
+      // Add track in mock data (passing full track object)
+      const success = addTrackToPlaylist(playlistId, track);
       if (!success) {
         throw new Error('Failed to add track (playlist not found or track already in playlist)');
       }
