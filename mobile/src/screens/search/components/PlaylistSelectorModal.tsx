@@ -84,7 +84,7 @@ export function PlaylistSelectorModal({
                 <View style={styles.playlistInfo}>
                   <Text style={styles.playlistName}>{item.name}</Text>
                   <Text style={styles.playlistTracks}>
-                    {item.trackIds.length} {item.trackIds.length === 1 ? 'track' : 'tracks'}
+                    {item.trackCount} {item.trackCount === 1 ? 'track' : 'tracks'}
                   </Text>
                 </View>
                 <Text style={styles.chevron}>›</Text>

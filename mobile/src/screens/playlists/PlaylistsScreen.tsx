@@ -14,7 +14,6 @@ import { usePlaylistStore } from '../../store/playlistStore';
 import { PlaylistCard } from '@components/playlist';
 import { EmptyState, LoadingSpinner } from '@components/common';
 import { COLORS, SPACING, FONT_SIZES } from '@constants';
-import { findUserById, getPlaylistTrackCount } from '@mocks';
 
 type PlaylistStackParamList = {
   Playlists: undefined;
@@ -73,13 +72,18 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
         data={playlists}
         keyExtractor={item => item.id}
         renderItem={({ item }) => {
-          const owner = findUserById(item.ownerId);
-          const trackCount = getPlaylistTrackCount(item.id);
+          // Use data from the playlist object itself
+          // For owner name, use current user if they own it, otherwise show 'Unknown'
+          const isOwner = user && item.ownerId === user.id;
+          const ownerName = isOwner
+            ? user.profile?.displayName || user.profile?.username || 'You'
+            : 'Unknown';
+
           return (
             <PlaylistCard
               playlist={item}
-              trackCount={trackCount}
-              ownerName={owner?.displayName || owner?.username || 'Unknown'}
+              trackCount={item.trackCount}
+              ownerName={ownerName}
               onPress={() => handlePlaylistPress(item.id)}
             />
           );

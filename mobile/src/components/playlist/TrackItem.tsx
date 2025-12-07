@@ -28,7 +28,7 @@ export function TrackItem({ track, onPress, onDelete, showDelete = false }: Trac
           {track.artist}
         </Text>
       </View>
-      <Text style={styles.duration}>{formatDuration(track.duration)}</Text>
+      <Text style={styles.duration}>{formatDuration(track.durationMs)}</Text>
       {showDelete && onDelete && (
         <TouchableOpacity style={styles.deleteButton} onPress={onDelete} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
           <Text style={styles.deleteIcon}>✕</Text>

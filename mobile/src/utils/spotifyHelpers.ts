@@ -13,7 +13,7 @@ export function convertSpotifyTrackToTrack(spotifyTrack: SpotifyTrack): Track {
     artist: spotifyTrack.artists.map(a => a.name).join(', '),
     album: spotifyTrack.album.name,
     albumArt: spotifyTrack.album.images[0]?.url || '',
-    duration: spotifyTrack.duration_ms,
+    durationMs: spotifyTrack.duration_ms,
     spotifyUri: spotifyTrack.uri,
     previewUrl: spotifyTrack.preview_url || undefined,
   };

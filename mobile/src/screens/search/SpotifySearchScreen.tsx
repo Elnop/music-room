@@ -81,6 +81,11 @@ export function SpotifySearchScreen() {
       const convertedTrack = convertSpotifyTrackToTrack(selectedTrack);
       await addTrack(playlistId, convertedTrack);
 
+      // Refresh playlists to update trackCount
+      if (user) {
+        await fetchPlaylists(user.id);
+      }
+
       setShowPlaylistModal(false);
       setSelectedTrack(null);
 

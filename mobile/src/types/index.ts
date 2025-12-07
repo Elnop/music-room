@@ -47,7 +47,7 @@ export interface Track {
   artist: string;
   album: string;
   albumArt: string;
-  duration: number; // milliseconds
+  durationMs: number; // milliseconds
   spotifyUri: string;
   previewUrl?: string;
 }

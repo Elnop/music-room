@@ -139,7 +139,7 @@ export const playlistApi = {
         artist: track.artist,
         album: track.album,
         albumArt: track.albumArt,
-        durationMs: track.duration,
+        durationMs: track.durationMs,
         previewUrl: track.previewUrl,
       }),
     });
