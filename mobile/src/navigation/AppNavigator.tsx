@@ -2,6 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, Text, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@contexts';
 import type { Theme } from '@themes/types';
 import {
@@ -180,6 +181,7 @@ function SearchNavigator() {
 
 export function AppNavigator() {
   const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
 
   return (
     <Tab.Navigator
@@ -190,8 +192,8 @@ export function AppNavigator() {
           backgroundColor: theme.colors.surface,
           borderTopWidth: theme.borders.thick, // 3px bordure top
           borderTopColor: theme.colors.border, // Noir
-          height: 60,
-          paddingBottom: 8,
+          height: 60 + insets.bottom,
+          paddingBottom: insets.bottom + 8,
           paddingTop: 8,
         },
         tabBarLabelStyle: {
