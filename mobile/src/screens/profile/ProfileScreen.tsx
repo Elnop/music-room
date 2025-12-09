@@ -13,6 +13,7 @@ type ProfileStackParamList = {
   EditProfile: undefined;
   SpotifyConnect: undefined;
   SpotifySettings: undefined;
+  Settings: undefined;
 };
 
 type NavigationProp = NativeStackNavigationProp<ProfileStackParamList>;
@@ -105,6 +106,16 @@ export function ProfileScreen() {
             </View>
             <Text style={styles.chevron}>›</Text>
           </View>
+        </TouchableOpacity>
+
+        <View style={styles.divider} />
+
+        <TouchableOpacity
+          style={styles.infoRow}
+          onPress={() => navigation.navigate('Settings')}
+        >
+          <Text style={styles.label}>Paramètres</Text>
+          <Text style={styles.chevron}>›</Text>
         </TouchableOpacity>
 
         <View style={styles.divider} />

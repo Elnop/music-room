@@ -16,7 +16,6 @@ import { SpotifySearchScreen } from '../screens/search';
 import { SettingsScreen } from '../screens/settings';
 
 export type AppTabsParamList = {
-  SettingsTab: undefined;
   PlaylistsTab: undefined;
   SearchTab: undefined;
   FriendsTab: undefined;
@@ -35,21 +34,17 @@ export type ProfileStackParamList = {
   EditProfile: undefined;
   SpotifyConnect: undefined;
   SpotifySettings: undefined;
+  Settings: undefined;
 };
 
 export type SearchStackParamList = {
   SpotifySearch: undefined;
 };
 
-export type SettingsStackParamList = {
-  Settings: undefined;
-};
-
 const Tab = createBottomTabNavigator<AppTabsParamList>();
 const PlaylistStack = createNativeStackNavigator<PlaylistStackParamList>();
 const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 const SearchStack = createNativeStackNavigator<SearchStackParamList>();
-const SettingsStack = createNativeStackNavigator<SettingsStackParamList>();
 
 // Placeholder screens for other tabs
 function PlaceholderScreen({ title }: { title: string }) {
@@ -61,34 +56,6 @@ function PlaceholderScreen({ title }: { title: string }) {
       <Text style={styles.placeholderText}>{title}</Text>
       <Text style={styles.placeholderSubtext}>Coming in next phases</Text>
     </View>
-  );
-}
-
-// Settings Stack Navigator
-function SettingsNavigator() {
-  const { theme } = useTheme();
-
-  return (
-    <SettingsStack.Navigator
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: theme.colors.background,
-          borderBottomWidth: theme.borders.medium,
-          borderBottomColor: theme.colors.border,
-        },
-        headerTintColor: theme.colors.text,
-        headerShadowVisible: false,
-        headerTitleStyle: {
-          fontWeight: theme.typography.weights.bold,
-        },
-      }}
-    >
-      <SettingsStack.Screen
-        name="Settings"
-        component={SettingsScreen}
-        options={{ title: 'Paramètres' }}
-      />
-    </SettingsStack.Navigator>
   );
 }
 
@@ -174,6 +141,11 @@ function ProfileNavigator() {
         component={SpotifySettingsScreen}
         options={{ title: 'Spotify Settings' }}
       />
+      <ProfileStack.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{ title: 'Paramètres' }}
+      />
     </ProfileStack.Navigator>
   );
 }
@@ -238,16 +210,6 @@ export function AppNavigator() {
         },
       }}
     >
-      <Tab.Screen
-        name="SettingsTab"
-        component={SettingsNavigator}
-        options={{
-          title: 'Settings',
-          tabBarIcon: () => <Text style={{ fontSize: 24 }}>⚙️</Text>,
-          headerShown: false,
-        }}
-      />
-
       <Tab.Screen
         name="PlaylistsTab"
         component={PlaylistsNavigator}
