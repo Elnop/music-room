@@ -2,11 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { useTheme } from '@contexts';
+import type { Theme } from '@themes/types';
 import { useSpotifyStore } from '@/store/spotifyStore';
 import { Button } from '@/components/common';
-import { COLORS, SPACING } from '@/constants';
 
 export function SpotifyConnectScreen() {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const navigation = useNavigation();
   const { initiateConnection, isConnecting, error, clearError } = useSpotifyStore();
   const [canSkip, setCanSkip] = useState(false);
@@ -98,71 +101,72 @@ function FeatureItem({ text }: { text: string }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: SPACING.xl,
-    paddingVertical: SPACING.xxl,
-    justifyContent: 'center',
-  },
-  iconContainer: {
-    alignItems: 'center',
-    marginBottom: SPACING.xl,
-  },
-  icon: {
-    fontSize: 80,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: COLORS.text,
-    textAlign: 'center',
-    marginBottom: SPACING.md,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: SPACING.xl,
-  },
-  features: {
-    marginBottom: SPACING.xl,
-  },
-  featureItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: SPACING.md,
-  },
-  featureIcon: {
-    fontSize: 20,
-    color: COLORS.primary,
-    marginRight: SPACING.md,
-  },
-  featureText: {
-    fontSize: 16,
-    color: COLORS.text,
-    flex: 1,
-  },
-  errorContainer: {
-    backgroundColor: COLORS.error + '20',
-    borderRadius: 8,
-    padding: SPACING.md,
-    marginBottom: SPACING.lg,
-  },
-  errorText: {
-    fontSize: 14,
-    color: COLORS.error,
-    textAlign: 'center',
-  },
-  actions: {
-    gap: SPACING.md,
-  },
-  button: {
-    width: '100%',
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    content: {
+      flex: 1,
+      paddingHorizontal: theme.spacing.xl,
+      paddingVertical: theme.spacing.xxl,
+      justifyContent: 'center',
+    },
+    iconContainer: {
+      alignItems: 'center',
+      marginBottom: theme.spacing.xl,
+    },
+    icon: {
+      fontSize: 80,
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: theme.typography.weights.bold,
+      color: theme.colors.text,
+      textAlign: 'center',
+      marginBottom: theme.spacing.md,
+    },
+    subtitle: {
+      fontSize: 16,
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 24,
+      marginBottom: theme.spacing.xl,
+    },
+    features: {
+      marginBottom: theme.spacing.xl,
+    },
+    featureItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: theme.spacing.md,
+    },
+    featureIcon: {
+      fontSize: 20,
+      color: theme.colors.primary,
+      marginRight: theme.spacing.md,
+    },
+    featureText: {
+      fontSize: 16,
+      color: theme.colors.text,
+      flex: 1,
+    },
+    errorContainer: {
+      backgroundColor: theme.colors.error + '20',
+      borderRadius: 8,
+      padding: theme.spacing.md,
+      marginBottom: theme.spacing.lg,
+    },
+    errorText: {
+      fontSize: 14,
+      color: theme.colors.error,
+      textAlign: 'center',
+    },
+    actions: {
+      gap: theme.spacing.md,
+    },
+    button: {
+      width: '100%',
+    },
+  });

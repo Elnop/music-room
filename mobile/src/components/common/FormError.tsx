@@ -1,12 +1,16 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { COLORS, SPACING, FONT_SIZES } from '@constants';
+import { useTheme } from '@contexts';
+import type { Theme } from '@themes/types';
 
 interface FormErrorProps {
   message: string;
 }
 
 export function FormError({ message }: FormErrorProps) {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
+
   if (!message) return null;
 
   return (
@@ -16,18 +20,19 @@ export function FormError({ message }: FormErrorProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: COLORS.error + '20', // 20% opacity
-    borderLeftWidth: 3,
-    borderLeftColor: COLORS.error,
-    padding: SPACING.sm,
-    borderRadius: 4,
-    marginBottom: SPACING.md,
-  },
-  text: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.error,
-    fontWeight: '500',
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      backgroundColor: theme.colors.error + '20', // 20% opacity rouge
+      borderLeftWidth: theme.borders.thick, // 3px bordure gauche
+      borderLeftColor: theme.colors.error, // Rouge
+      padding: theme.spacing.sm,
+      borderRadius: theme.borders.small, // 4px
+      marginBottom: theme.spacing.md,
+    },
+    text: {
+      fontSize: theme.typography.sizes.sm,
+      color: theme.colors.error,
+      fontWeight: theme.typography.weights.semibold, // 600 - bold
+    },
+  });

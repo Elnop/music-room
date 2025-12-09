@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { Avatar } from '@components/common';
-import { COLORS, SPACING, FONT_SIZES } from '@constants';
+import { useTheme } from '@contexts';
+import type { Theme } from '@themes/types';
 import type { PlaylistWithTracks } from '@types';
 
 interface PlaylistHeaderProps {
@@ -9,6 +10,9 @@ interface PlaylistHeaderProps {
 }
 
 export function PlaylistHeader({ playlist }: PlaylistHeaderProps) {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
+
   const defaultCover = 'https://via.placeholder.com/300/1DB954/FFFFFF?text=Playlist';
   const trackCount = playlist.tracks.length;
 
@@ -33,7 +37,8 @@ export function PlaylistHeader({ playlist }: PlaylistHeaderProps) {
       {playlist.collaboratorIds.length > 0 && (
         <View style={styles.collaborators}>
           <Text style={styles.collaboratorsText}>
-            {playlist.collaboratorIds.length} {playlist.collaboratorIds.length === 1 ? 'collaborator' : 'collaborators'}
+            {playlist.collaboratorIds.length}{' '}
+            {playlist.collaboratorIds.length === 1 ? 'collaborator' : 'collaborators'}
           </Text>
         </View>
       )}
@@ -41,57 +46,66 @@ export function PlaylistHeader({ playlist }: PlaylistHeaderProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    padding: SPACING.lg,
-    backgroundColor: COLORS.background,
-  },
-  cover: {
-    width: 200,
-    height: 200,
-    borderRadius: 8,
-    backgroundColor: COLORS.border,
-    marginBottom: SPACING.lg,
-  },
-  name: {
-    fontSize: FONT_SIZES.xxl,
-    fontWeight: 'bold',
-    color: COLORS.text,
-    textAlign: 'center',
-    marginBottom: SPACING.sm,
-  },
-  description: {
-    fontSize: FONT_SIZES.md,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginBottom: SPACING.md,
-    paddingHorizontal: SPACING.md,
-  },
-  meta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: SPACING.sm,
-  },
-  owner: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.text,
-    marginLeft: SPACING.sm,
-  },
-  separator: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
-    marginHorizontal: SPACING.sm,
-  },
-  trackCount: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
-  },
-  collaborators: {
-    marginTop: SPACING.sm,
-  },
-  collaboratorsText: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.primary,
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      alignItems: 'center',
+      padding: theme.spacing.lg,
+      backgroundColor: theme.colors.surface, // Blanc
+      borderBottomWidth: theme.borders.thick, // 3px bordure bottom
+      borderBottomColor: theme.colors.border, // Noir
+      ...theme.shadows.medium, // Ombre
+    },
+    cover: {
+      width: 200,
+      height: 200,
+      borderRadius: theme.borders.medium, // 8px
+      backgroundColor: theme.colors.surfaceAlt,
+      borderWidth: theme.borders.thick, // 3px bordure
+      borderColor: theme.colors.border,
+      marginBottom: theme.spacing.lg,
+    },
+    name: {
+      fontSize: theme.typography.sizes.xxl,
+      fontWeight: theme.typography.weights.bold, // 700 - bold
+      color: theme.colors.text,
+      textAlign: 'center',
+      marginBottom: theme.spacing.sm,
+    },
+    description: {
+      fontSize: theme.typography.sizes.md,
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+      marginBottom: theme.spacing.md,
+      paddingHorizontal: theme.spacing.md,
+      fontWeight: theme.typography.weights.regular,
+    },
+    meta: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: theme.spacing.sm,
+    },
+    owner: {
+      fontSize: theme.typography.sizes.sm,
+      color: theme.colors.text,
+      fontWeight: theme.typography.weights.medium,
+      marginLeft: theme.spacing.sm,
+    },
+    separator: {
+      fontSize: theme.typography.sizes.sm,
+      color: theme.colors.textSecondary,
+      marginHorizontal: theme.spacing.sm,
+    },
+    trackCount: {
+      fontSize: theme.typography.sizes.sm,
+      color: theme.colors.textSecondary,
+    },
+    collaborators: {
+      marginTop: theme.spacing.sm,
+    },
+    collaboratorsText: {
+      fontSize: theme.typography.sizes.sm,
+      color: theme.colors.primary,
+      fontWeight: theme.typography.weights.semibold,
+    },
+  });

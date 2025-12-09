@@ -8,11 +8,12 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useFocusEffect } from '@react-navigation/native';
+import { useTheme } from '@contexts';
+import type { Theme } from '@themes/types';
 import { usePlaylistStore } from '../../store/playlistStore';
 import { useAuthStore } from '../../store/authStore';
 import { PlaylistHeader, TrackItem, AddTrackButton } from '@components/playlist';
 import { EmptyState, LoadingSpinner } from '@components/common';
-import { COLORS, SPACING } from '@constants';
 import { canEditPlaylist } from '@mocks';
 
 type PlaylistStackParamList = {
@@ -35,6 +36,8 @@ interface PlaylistDetailScreenProps {
 }
 
 export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreenProps) {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const { id } = route.params;
   const { user } = useAuthStore();
   const { currentPlaylist, isLoading, fetchPlaylistById, removeTrack } = usePlaylistStore();
@@ -109,13 +112,14 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  list: {
-    flexGrow: 1,
-    paddingBottom: SPACING.xxl,
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    list: {
+      flexGrow: 1,
+      paddingBottom: theme.spacing.xxl,
+    },
+  });

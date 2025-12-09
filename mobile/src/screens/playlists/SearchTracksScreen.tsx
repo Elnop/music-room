@@ -10,10 +10,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
+import { useTheme } from '@contexts';
+import type { Theme } from '@themes/types';
 import { usePlaylistStore } from '../../store/playlistStore';
 import { SearchBar, EmptyState } from '@components/common';
 import { TrackItem } from '@components/playlist';
-import { COLORS, SPACING, FONT_SIZES } from '@constants';
 import { searchTracks } from '@mocks';
 import type { Track } from '@types';
 
@@ -37,6 +38,8 @@ interface SearchTracksScreenProps {
 }
 
 export function SearchTracksScreen({ navigation, route }: SearchTracksScreenProps) {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const { playlistId } = route.params;
   const { addTrack, isLoading } = usePlaylistStore();
   const [query, setQuery] = useState('');
@@ -114,37 +117,38 @@ export function SearchTracksScreen({ navigation, route }: SearchTracksScreenProp
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  header: {
-    padding: SPACING.md,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
-  list: {
-    flexGrow: 1,
-  },
-  resultItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
-  addButton: {
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    borderRadius: 16,
-    marginRight: SPACING.md,
-    minWidth: 60,
-    alignItems: 'center',
-  },
-  addButtonText: {
-    fontSize: FONT_SIZES.sm,
-    fontWeight: '600',
-    color: COLORS.background,
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    header: {
+      padding: theme.spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    list: {
+      flexGrow: 1,
+    },
+    resultItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    addButton: {
+      backgroundColor: theme.colors.primary,
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
+      borderRadius: 16,
+      marginRight: theme.spacing.md,
+      minWidth: 60,
+      alignItems: 'center',
+    },
+    addButtonText: {
+      fontSize: theme.typography.sizes.sm,
+      fontWeight: theme.typography.weights.semibold,
+      color: theme.colors.background,
+    },
+  });

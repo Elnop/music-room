@@ -7,7 +7,8 @@ import {
   TextInputProps,
   ViewStyle,
 } from 'react-native';
-import { COLORS, SPACING, FONT_SIZES } from '@constants';
+import { useTheme } from '@contexts';
+import type { Theme } from '@themes/types';
 
 interface InputProps extends TextInputProps {
   label: string;
@@ -29,6 +30,9 @@ export function Input({
   containerStyle,
   ...rest
 }: InputProps) {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
+
   return (
     <View style={[styles.container, containerStyle]}>
       <Text style={styles.label}>{label}</Text>
@@ -39,7 +43,7 @@ export function Input({
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor={COLORS.textSecondary}
+          placeholderTextColor={theme.colors.textSecondary}
           secureTextEntry={secureTextEntry}
           autoCapitalize={autoCapitalize}
           keyboardType={keyboardType}
@@ -51,44 +55,49 @@ export function Input({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: SPACING.md,
-  },
-  label: {
-    fontSize: FONT_SIZES.sm,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: SPACING.xs,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.surface,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: COLORS.surface,
-  },
-  inputContainerError: {
-    borderColor: COLORS.error,
-  },
-  leftIcon: {
-    paddingLeft: SPACING.sm + 2,
-  },
-  input: {
-    flex: 1,
-    paddingVertical: SPACING.sm + 2,
-    paddingHorizontal: SPACING.sm + 4,
-    fontSize: FONT_SIZES.md,
-    color: COLORS.text,
-  },
-  inputWithIcon: {
-    paddingLeft: SPACING.xs,
-  },
-  error: {
-    fontSize: FONT_SIZES.xs,
-    color: COLORS.error,
-    marginTop: SPACING.xs,
-    marginLeft: SPACING.xs,
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      marginBottom: theme.spacing.md,
+    },
+    label: {
+      fontSize: theme.typography.sizes.sm,
+      fontWeight: theme.typography.weights.semibold, // 600 - bold
+      color: theme.colors.text,
+      marginBottom: theme.spacing.xs,
+    },
+    inputContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.colors.surface, // Blanc
+      borderRadius: theme.borders.medium, // 8px
+      borderWidth: theme.borders.medium, // 2px bordure par défaut
+      borderColor: theme.colors.border, // Noir
+    },
+    inputContainerError: {
+      borderWidth: theme.borders.thick, // 3px en erreur
+      borderColor: theme.colors.error, // Rouge
+      backgroundColor: theme.colors.surface,
+    },
+    leftIcon: {
+      paddingLeft: theme.spacing.sm + 2,
+    },
+    input: {
+      flex: 1,
+      paddingVertical: theme.spacing.sm + 2,
+      paddingHorizontal: theme.spacing.sm + 4,
+      fontSize: theme.typography.sizes.md,
+      color: theme.colors.text,
+      fontWeight: theme.typography.weights.regular,
+    },
+    inputWithIcon: {
+      paddingLeft: theme.spacing.xs,
+    },
+    error: {
+      fontSize: theme.typography.sizes.xs,
+      color: theme.colors.error,
+      fontWeight: theme.typography.weights.semibold,
+      marginTop: theme.spacing.xs,
+      marginLeft: theme.spacing.xs,
+    },
+  });

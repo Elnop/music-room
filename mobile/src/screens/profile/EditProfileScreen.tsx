@@ -13,10 +13,11 @@ import { useNavigation } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useTheme } from '@contexts';
+import type { Theme } from '@themes/types';
 import { useAuthStore } from '@/store/authStore';
 import { profileApi, ApiError } from '@/services/profileApi';
 import { Button, Input, FormError } from '@components/common';
-import { COLORS, SPACING } from '@constants';
 
 // Validation schema (aligned with backend)
 const updateProfileSchema = z.object({
@@ -36,6 +37,8 @@ const updateProfileSchema = z.object({
 type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 
 export function EditProfileScreen() {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const navigation = useNavigation();
   const { user, accessToken } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
@@ -181,47 +184,48 @@ export function EditProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  contentContainer: {
-    padding: SPACING.lg,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: COLORS.text,
-    marginBottom: SPACING.xs,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    marginBottom: SPACING.xl,
-  },
-  bioInput: {
-    minHeight: 100,
-    textAlignVertical: 'top',
-  },
-  infoText: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    fontStyle: 'italic',
-    marginTop: SPACING.md,
-    marginBottom: SPACING.lg,
-  },
-  actions: {
-    marginTop: SPACING.md,
-    gap: SPACING.md,
-  },
-  actionButton: {
-    marginBottom: SPACING.sm,
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    keyboardView: {
+      flex: 1,
+    },
+    scrollView: {
+      flex: 1,
+    },
+    contentContainer: {
+      padding: theme.spacing.lg,
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: theme.typography.weights.bold,
+      color: theme.colors.text,
+      marginBottom: theme.spacing.xs,
+    },
+    subtitle: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      marginBottom: theme.spacing.xl,
+    },
+    bioInput: {
+      minHeight: 100,
+      textAlignVertical: 'top',
+    },
+    infoText: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+      fontStyle: 'italic',
+      marginTop: theme.spacing.md,
+      marginBottom: theme.spacing.lg,
+    },
+    actions: {
+      marginTop: theme.spacing.md,
+      gap: theme.spacing.md,
+    },
+    actionButton: {
+      marginBottom: theme.spacing.sm,
+    },
+  });

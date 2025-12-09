@@ -12,11 +12,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useTheme } from '@contexts';
+import type { Theme } from '@themes/types';
 import { useAuthStore } from '../../store/authStore';
 import { usePlaylistStore } from '../../store/playlistStore';
 import { Button, Input } from '@components/common';
 import { playlistSchema, PlaylistInput } from '@utils/validators';
-import { COLORS, SPACING, FONT_SIZES } from '@constants';
 
 type PlaylistStackParamList = {
   Playlists: undefined;
@@ -35,6 +36,8 @@ interface CreatePlaylistScreenProps {
 }
 
 export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const { user } = useAuthStore();
   const { createPlaylist, isLoading } = usePlaylistStore();
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
@@ -150,44 +153,45 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  keyboardAvoid: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  content: {
-    flex: 1,
-    padding: SPACING.lg,
-  },
-  title: {
-    fontSize: FONT_SIZES.xxl,
-    fontWeight: 'bold',
-    color: COLORS.text,
-    marginBottom: SPACING.xl,
-  },
-  form: {
-    gap: SPACING.md,
-  },
-  visibilitySection: {
-    marginVertical: SPACING.sm,
-  },
-  label: {
-    fontSize: FONT_SIZES.md,
-    fontWeight: '500',
-    color: COLORS.text,
-    marginBottom: SPACING.sm,
-  },
-  visibilityButtons: {
-    flexDirection: 'row',
-    gap: SPACING.sm,
-  },
-  visibilityButton: {
-    flex: 1,
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    keyboardAvoid: {
+      flex: 1,
+    },
+    scrollContent: {
+      flexGrow: 1,
+    },
+    content: {
+      flex: 1,
+      padding: theme.spacing.lg,
+    },
+    title: {
+      fontSize: theme.typography.sizes.xxl,
+      fontWeight: theme.typography.weights.bold,
+      color: theme.colors.text,
+      marginBottom: theme.spacing.xl,
+    },
+    form: {
+      gap: theme.spacing.md,
+    },
+    visibilitySection: {
+      marginVertical: theme.spacing.sm,
+    },
+    label: {
+      fontSize: theme.typography.sizes.md,
+      fontWeight: theme.typography.weights.medium,
+      color: theme.colors.text,
+      marginBottom: theme.spacing.sm,
+    },
+    visibilityButtons: {
+      flexDirection: 'row',
+      gap: theme.spacing.sm,
+    },
+    visibilityButton: {
+      flex: 1,
+    },
+  });

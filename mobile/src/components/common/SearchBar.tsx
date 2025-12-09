@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, TextInput, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
-import { COLORS, SPACING, FONT_SIZES } from '@constants';
+import { useTheme } from '@contexts';
+import type { Theme } from '@themes/types';
 
 interface SearchBarProps {
   value: string;
@@ -17,6 +18,9 @@ export function SearchBar({
   style,
   autoFocus = false,
 }: SearchBarProps) {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
+
   return (
     <View style={[styles.container, style]}>
       <TextInput
@@ -24,7 +28,7 @@ export function SearchBar({
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        placeholderTextColor={COLORS.textSecondary}
+        placeholderTextColor={theme.colors.textSecondary}
         autoFocus={autoFocus}
         autoCapitalize="none"
         autoCorrect={false}
@@ -34,19 +38,21 @@ export function SearchBar({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: COLORS.surface,
-    borderRadius: 24,
-    paddingHorizontal: SPACING.md,
-    height: 48,
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  input: {
-    fontSize: FONT_SIZES.md,
-    color: COLORS.text,
-    padding: 0,
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      backgroundColor: theme.colors.surface, // Blanc
+      borderRadius: 24, // Conserve le style pill
+      paddingHorizontal: theme.spacing.md,
+      height: 48,
+      justifyContent: 'center',
+      borderWidth: theme.borders.medium, // 2px bordure
+      borderColor: theme.colors.border, // Noir
+    },
+    input: {
+      fontSize: theme.typography.sizes.md,
+      color: theme.colors.text,
+      padding: 0,
+      fontWeight: theme.typography.weights.regular,
+    },
+  });

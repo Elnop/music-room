@@ -2,7 +2,8 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, Text, StyleSheet } from 'react-native';
-import { COLORS, FONT_SIZES } from '@constants';
+import { useTheme } from '@contexts';
+import type { Theme } from '@themes/types';
 import {
   PlaylistsScreen,
   PlaylistDetailScreen,
@@ -12,9 +13,10 @@ import {
 import { ProfileScreen, EditProfileScreen } from '../screens/profile';
 import { SpotifyConnectScreen, SpotifySettingsScreen } from '../screens/spotify';
 import { SpotifySearchScreen } from '../screens/search';
+import { SettingsScreen } from '../screens/settings';
 
 export type AppTabsParamList = {
-  HomeTab: undefined;
+  SettingsTab: undefined;
   PlaylistsTab: undefined;
   SearchTab: undefined;
   FriendsTab: undefined;
@@ -39,13 +41,21 @@ export type SearchStackParamList = {
   SpotifySearch: undefined;
 };
 
+export type SettingsStackParamList = {
+  Settings: undefined;
+};
+
 const Tab = createBottomTabNavigator<AppTabsParamList>();
 const PlaylistStack = createNativeStackNavigator<PlaylistStackParamList>();
 const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 const SearchStack = createNativeStackNavigator<SearchStackParamList>();
+const SettingsStack = createNativeStackNavigator<SettingsStackParamList>();
 
 // Placeholder screens for other tabs
 function PlaceholderScreen({ title }: { title: string }) {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
+
   return (
     <View style={styles.placeholder}>
       <Text style={styles.placeholderText}>{title}</Text>
@@ -54,16 +64,51 @@ function PlaceholderScreen({ title }: { title: string }) {
   );
 }
 
+// Settings Stack Navigator
+function SettingsNavigator() {
+  const { theme } = useTheme();
+
+  return (
+    <SettingsStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: theme.colors.background,
+          borderBottomWidth: theme.borders.medium,
+          borderBottomColor: theme.colors.border,
+        },
+        headerTintColor: theme.colors.text,
+        headerShadowVisible: false,
+        headerTitleStyle: {
+          fontWeight: theme.typography.weights.bold,
+        },
+      }}
+    >
+      <SettingsStack.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{ title: 'Paramètres' }}
+      />
+    </SettingsStack.Navigator>
+  );
+}
+
 // Playlist Stack Navigator
 function PlaylistsNavigator() {
+  const { theme } = useTheme();
+
   return (
     <PlaylistStack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: COLORS.background,
+          backgroundColor: theme.colors.background,
+          borderBottomWidth: theme.borders.medium,
+          borderBottomColor: theme.colors.border,
         },
-        headerTintColor: COLORS.text,
+        headerTintColor: theme.colors.text,
         headerShadowVisible: false,
+        headerTitleStyle: {
+          fontWeight: theme.typography.weights.bold,
+        },
       }}
     >
       <PlaylistStack.Screen
@@ -92,14 +137,21 @@ function PlaylistsNavigator() {
 
 // Profile Stack Navigator
 function ProfileNavigator() {
+  const { theme } = useTheme();
+
   return (
     <ProfileStack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: COLORS.background,
+          backgroundColor: theme.colors.background,
+          borderBottomWidth: theme.borders.medium,
+          borderBottomColor: theme.colors.border,
         },
-        headerTintColor: COLORS.text,
+        headerTintColor: theme.colors.text,
         headerShadowVisible: false,
+        headerTitleStyle: {
+          fontWeight: theme.typography.weights.bold,
+        },
       }}
     >
       <ProfileStack.Screen
@@ -128,14 +180,21 @@ function ProfileNavigator() {
 
 // Search Stack Navigator
 function SearchNavigator() {
+  const { theme } = useTheme();
+
   return (
     <SearchStack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: COLORS.background,
+          backgroundColor: theme.colors.background,
+          borderBottomWidth: theme.borders.medium,
+          borderBottomColor: theme.colors.border,
         },
-        headerTintColor: COLORS.text,
+        headerTintColor: theme.colors.text,
         headerShadowVisible: false,
+        headerTitleStyle: {
+          fontWeight: theme.typography.weights.bold,
+        },
       }}
     >
       <SearchStack.Screen
@@ -148,39 +207,53 @@ function SearchNavigator() {
 }
 
 export function AppNavigator() {
+  const { theme } = useTheme();
+
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: COLORS.primary,
-        tabBarInactiveTintColor: COLORS.textSecondary,
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.colors.textSecondary,
         tabBarStyle: {
-          backgroundColor: COLORS.surface,
-          borderTopColor: COLORS.background,
-          borderTopWidth: 1,
+          backgroundColor: theme.colors.surface,
+          borderTopWidth: theme.borders.thick, // 3px bordure top
+          borderTopColor: theme.colors.border, // Noir
+          height: 60,
+          paddingBottom: 8,
+          paddingTop: 8,
+        },
+        tabBarLabelStyle: {
+          fontWeight: theme.typography.weights.semibold,
+          fontSize: theme.typography.sizes.xs,
         },
         headerStyle: {
-          backgroundColor: COLORS.background,
+          backgroundColor: theme.colors.background,
+          borderBottomWidth: theme.borders.medium,
+          borderBottomColor: theme.colors.border,
         },
-        headerTintColor: COLORS.text,
+        headerTintColor: theme.colors.text,
         headerShadowVisible: false,
+        headerTitleStyle: {
+          fontWeight: theme.typography.weights.bold,
+        },
       }}
     >
       <Tab.Screen
-        name="HomeTab"
+        name="SettingsTab"
+        component={SettingsNavigator}
         options={{
-          title: 'Home',
-          tabBarIcon: () => <Text style={styles.icon}>🏠</Text>,
+          title: 'Settings',
+          tabBarIcon: () => <Text style={{ fontSize: 24 }}>⚙️</Text>,
+          headerShown: false,
         }}
-      >
-        {() => <PlaceholderScreen title="Home" />}
-      </Tab.Screen>
+      />
 
       <Tab.Screen
         name="PlaylistsTab"
         component={PlaylistsNavigator}
         options={{
           title: 'Playlists',
-          tabBarIcon: () => <Text style={styles.icon}>🎵</Text>,
+          tabBarIcon: () => <Text style={{ fontSize: 24 }}>🎵</Text>,
           headerShown: false,
         }}
       />
@@ -190,7 +263,7 @@ export function AppNavigator() {
         component={SearchNavigator}
         options={{
           title: 'Search',
-          tabBarIcon: () => <Text style={styles.icon}>🔍</Text>,
+          tabBarIcon: () => <Text style={{ fontSize: 24 }}>🔍</Text>,
           headerShown: false,
         }}
       />
@@ -199,7 +272,7 @@ export function AppNavigator() {
         name="FriendsTab"
         options={{
           title: 'Friends',
-          tabBarIcon: () => <Text style={styles.icon}>👥</Text>,
+          tabBarIcon: () => <Text style={{ fontSize: 24 }}>👥</Text>,
         }}
       >
         {() => <PlaceholderScreen title="Friends" />}
@@ -210,7 +283,7 @@ export function AppNavigator() {
         component={ProfileNavigator}
         options={{
           title: 'Profile',
-          tabBarIcon: () => <Text style={styles.icon}>👤</Text>,
+          tabBarIcon: () => <Text style={{ fontSize: 24 }}>👤</Text>,
           headerShown: false,
         }}
       />
@@ -218,24 +291,22 @@ export function AppNavigator() {
   );
 }
 
-const styles = StyleSheet.create({
-  icon: {
-    fontSize: 24,
-  },
-  placeholder: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLORS.background,
-  },
-  placeholderText: {
-    fontSize: FONT_SIZES.xl,
-    fontWeight: 'bold',
-    color: COLORS.text,
-    marginBottom: 8,
-  },
-  placeholderSubtext: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    placeholder: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: theme.colors.background,
+    },
+    placeholderText: {
+      fontSize: theme.typography.sizes.xl,
+      fontWeight: theme.typography.weights.bold,
+      color: theme.colors.text,
+      marginBottom: 8,
+    },
+    placeholderSubtext: {
+      fontSize: theme.typography.sizes.sm,
+      color: theme.colors.textSecondary,
+    },
+  });

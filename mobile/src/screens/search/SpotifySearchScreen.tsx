@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { useTheme } from '@contexts';
+import type { Theme } from '@themes/types';
 import { useSpotifyStore } from '../../store/spotifyStore';
 import { usePlaylistStore } from '../../store/playlistStore';
 import { useAuthStore } from '../../store/authStore';
@@ -16,10 +18,11 @@ import { SearchBar, EmptyState, LoadingSpinner, Button } from '@components/commo
 import { SpotifyTrackItem } from './components/SpotifyTrackItem';
 import { PlaylistSelectorModal } from './components/PlaylistSelectorModal';
 import { convertSpotifyTrackToTrack } from '@utils/spotifyHelpers';
-import { COLORS, SPACING } from '@constants';
 import type { SpotifyTrack } from '@types';
 
 export function SpotifySearchScreen() {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const navigation = useNavigation();
 
   // Zustand stores
@@ -185,30 +188,31 @@ export function SpotifySearchScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  flex: {
-    flex: 1,
-  },
-  header: {
-    padding: SPACING.md,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
-  listContent: {
-    flexGrow: 1,
-  },
-  notConnectedContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: SPACING.xl,
-  },
-  connectButton: {
-    marginTop: SPACING.lg,
-    minWidth: 200,
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    flex: {
+      flex: 1,
+    },
+    header: {
+      padding: theme.spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    listContent: {
+      flexGrow: 1,
+    },
+    notConnectedContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: theme.spacing.xl,
+    },
+    connectButton: {
+      marginTop: theme.spacing.lg,
+      minWidth: 200,
+    },
+  });

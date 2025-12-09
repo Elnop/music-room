@@ -9,11 +9,12 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useTheme } from '@contexts';
+import type { Theme } from '@themes/types';
 import { useAuthStore } from '../../store/authStore';
 import { usePlaylistStore } from '../../store/playlistStore';
 import { PlaylistCard } from '@components/playlist';
 import { EmptyState, LoadingSpinner } from '@components/common';
-import { COLORS, SPACING, FONT_SIZES } from '@constants';
 
 type PlaylistStackParamList = {
   Playlists: undefined;
@@ -32,6 +33,8 @@ interface PlaylistsScreenProps {
 }
 
 export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const { user } = useAuthStore();
   const { playlists, isLoading, fetchPlaylists } = usePlaylistStore();
 
@@ -93,7 +96,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
           <RefreshControl
             refreshing={isLoading}
             onRefresh={handleRefresh}
-            tintColor={COLORS.primary}
+            tintColor={theme.colors.primary}
           />
         }
         ListEmptyComponent={
@@ -107,38 +110,39 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.md,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
-  title: {
-    fontSize: FONT_SIZES.xxl,
-    fontWeight: 'bold',
-    color: COLORS.text,
-  },
-  createButton: {
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    borderRadius: 20,
-  },
-  createButtonText: {
-    fontSize: FONT_SIZES.md,
-    fontWeight: '600',
-    color: COLORS.background,
-  },
-  list: {
-    padding: SPACING.md,
-    flexGrow: 1,
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    title: {
+      fontSize: theme.typography.sizes.xxl,
+      fontWeight: theme.typography.weights.bold,
+      color: theme.colors.text,
+    },
+    createButton: {
+      backgroundColor: theme.colors.primary,
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
+      borderRadius: 20,
+    },
+    createButtonText: {
+      fontSize: theme.typography.sizes.md,
+      fontWeight: theme.typography.weights.semibold,
+      color: theme.colors.background,
+    },
+    list: {
+      padding: theme.spacing.md,
+      flexGrow: 1,
+    },
+  });

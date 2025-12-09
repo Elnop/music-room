@@ -44,6 +44,18 @@
       ],
       "@mocks": [
         "./src/mocks"
+      ],
+      "@contexts": [
+        "./src/contexts"
+      ],
+      "@contexts/*": [
+        "./src/contexts/*"
+      ],
+      "@themes": [
+        "./src/themes"
+      ],
+      "@themes/*": [
+        "./src/themes/*"
       ]
     }
   },

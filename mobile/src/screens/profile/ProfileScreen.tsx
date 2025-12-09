@@ -3,9 +3,10 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'rea
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useTheme } from '@contexts';
+import type { Theme } from '@themes/types';
 import { useAuthStore } from '@/store/authStore';
 import { Avatar, Button, Card } from '@components/common';
-import { COLORS, SPACING } from '@constants';
 
 type ProfileStackParamList = {
   Profile: undefined;
@@ -17,6 +18,8 @@ type ProfileStackParamList = {
 type NavigationProp = NativeStackNavigationProp<ProfileStackParamList>;
 
 export function ProfileScreen() {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const navigation = useNavigation<NavigationProp>();
   const { user, logout, isLoading } = useAuthStore();
 
@@ -143,107 +146,108 @@ export function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  contentContainer: {
-    paddingVertical: SPACING.lg,
-  },
-  header: {
-    alignItems: 'center',
-    paddingHorizontal: SPACING.lg,
-    paddingBottom: SPACING.xl,
-  },
-  username: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: COLORS.text,
-    marginTop: SPACING.md,
-  },
-  displayName: {
-    fontSize: 18,
-    color: COLORS.textSecondary,
-    marginTop: SPACING.xs,
-  },
-  bio: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    marginTop: SPACING.md,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  card: {
-    marginHorizontal: SPACING.lg,
-    marginBottom: SPACING.lg,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: SPACING.md,
-  },
-  label: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    fontWeight: '500',
-  },
-  value: {
-    fontSize: 14,
-    color: COLORS.text,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: COLORS.border,
-  },
-  spotifyBadge: {
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: SPACING.xs,
-    borderRadius: 12,
-    backgroundColor: COLORS.surface,
-  },
-  spotifyText: {
-    fontSize: 12,
-    color: COLORS.primary,
-    fontWeight: '600',
-  },
-  spotifyRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: SPACING.xs,
-  },
-  spotifyBadgeConnected: {
-    backgroundColor: COLORS.primary + '20',
-  },
-  spotifyTextConnected: {
-    color: COLORS.primary,
-  },
-  chevron: {
-    fontSize: 20,
-    color: COLORS.textSecondary,
-  },
-  actions: {
-    paddingHorizontal: SPACING.lg,
-    gap: SPACING.md,
-  },
-  actionButton: {
-    marginBottom: SPACING.sm,
-  },
-  footer: {
-    textAlign: 'center',
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    marginTop: SPACING.xl,
-    marginBottom: SPACING.lg,
-  },
-  errorText: {
-    fontSize: 16,
-    color: COLORS.error,
-    textAlign: 'center',
-    marginTop: SPACING.xl,
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    scrollView: {
+      flex: 1,
+    },
+    contentContainer: {
+      paddingVertical: theme.spacing.lg,
+    },
+    header: {
+      alignItems: 'center',
+      paddingHorizontal: theme.spacing.lg,
+      paddingBottom: theme.spacing.xl,
+    },
+    username: {
+      fontSize: 24,
+      fontWeight: theme.typography.weights.bold,
+      color: theme.colors.text,
+      marginTop: theme.spacing.md,
+    },
+    displayName: {
+      fontSize: 18,
+      color: theme.colors.textSecondary,
+      marginTop: theme.spacing.xs,
+    },
+    bio: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      marginTop: theme.spacing.md,
+      textAlign: 'center',
+      lineHeight: 20,
+    },
+    card: {
+      marginHorizontal: theme.spacing.lg,
+      marginBottom: theme.spacing.lg,
+    },
+    infoRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: theme.spacing.md,
+    },
+    label: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      fontWeight: theme.typography.weights.medium,
+    },
+    value: {
+      fontSize: 14,
+      color: theme.colors.text,
+    },
+    divider: {
+      height: 1,
+      backgroundColor: theme.colors.border,
+    },
+    spotifyBadge: {
+      paddingHorizontal: theme.spacing.sm,
+      paddingVertical: theme.spacing.xs,
+      borderRadius: 12,
+      backgroundColor: theme.colors.surface,
+    },
+    spotifyText: {
+      fontSize: 12,
+      color: theme.colors.primary,
+      fontWeight: theme.typography.weights.semibold,
+    },
+    spotifyRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing.xs,
+    },
+    spotifyBadgeConnected: {
+      backgroundColor: theme.colors.primary + '20',
+    },
+    spotifyTextConnected: {
+      color: theme.colors.primary,
+    },
+    chevron: {
+      fontSize: 20,
+      color: theme.colors.textSecondary,
+    },
+    actions: {
+      paddingHorizontal: theme.spacing.lg,
+      gap: theme.spacing.md,
+    },
+    actionButton: {
+      marginBottom: theme.spacing.sm,
+    },
+    footer: {
+      textAlign: 'center',
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+      marginTop: theme.spacing.xl,
+      marginBottom: theme.spacing.lg,
+    },
+    errorText: {
+      fontSize: 16,
+      color: theme.colors.error,
+      textAlign: 'center',
+      marginTop: theme.spacing.xl,
+    },
+  });

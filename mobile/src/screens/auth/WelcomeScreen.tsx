@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { COLORS, SPACING, FONT_SIZES } from '@constants';
+import { useTheme } from '@contexts';
+import type { Theme } from '@themes/types';
 import { Button } from '@components/common';
 
 type AuthStackParamList = {
@@ -21,6 +22,9 @@ interface WelcomeScreenProps {
 }
 
 export function WelcomeScreen({ navigation }: WelcomeScreenProps) {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
@@ -59,48 +63,49 @@ export function WelcomeScreen({ navigation }: WelcomeScreenProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'space-between',
-    padding: SPACING.lg,
-  },
-  header: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logo: {
-    fontSize: 72,
-    marginBottom: SPACING.md,
-  },
-  title: {
-    fontSize: FONT_SIZES.xxxl,
-    fontWeight: 'bold',
-    color: COLORS.text,
-    marginBottom: SPACING.sm,
-  },
-  subtitle: {
-    fontSize: FONT_SIZES.md,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-  },
-  buttonContainer: {
-    gap: SPACING.md,
-    marginBottom: SPACING.xl,
-  },
-  footer: {
-    paddingVertical: SPACING.md,
-    alignItems: 'center',
-  },
-  footerText: {
-    fontSize: FONT_SIZES.xs,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    content: {
+      flex: 1,
+      justifyContent: 'space-between',
+      padding: theme.spacing.lg,
+    },
+    header: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    logo: {
+      fontSize: 72,
+      marginBottom: theme.spacing.md,
+    },
+    title: {
+      fontSize: theme.typography.sizes.xxxl,
+      fontWeight: theme.typography.weights.bold,
+      color: theme.colors.text,
+      marginBottom: theme.spacing.sm,
+    },
+    subtitle: {
+      fontSize: theme.typography.sizes.md,
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+    },
+    buttonContainer: {
+      gap: theme.spacing.md,
+      marginBottom: theme.spacing.xl,
+    },
+    footer: {
+      paddingVertical: theme.spacing.md,
+      alignItems: 'center',
+    },
+    footerText: {
+      fontSize: theme.typography.sizes.xs,
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 18,
+    },
+  });

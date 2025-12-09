@@ -7,7 +7,8 @@ import {
   ViewStyle,
   TextStyle,
 } from 'react-native';
-import { COLORS, SPACING, FONT_SIZES } from '@constants';
+import { useTheme } from '@contexts';
+import type { Theme } from '@themes/types';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline';
 
@@ -34,6 +35,9 @@ export function Button({
   icon,
   style,
 }: ButtonProps) {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
+
   const isDisabled = disabled || loading;
   const buttonText = title || children;
 
@@ -47,6 +51,10 @@ export function Button({
 
   const textStyle = [styles.text, styles[`${variant}Text` as keyof typeof styles]].filter(Boolean);
 
+  // Spinner color based on variant
+  const spinnerColor =
+    variant === 'outline' ? theme.colors.primary : theme.colors.textInverse;
+
   return (
     <TouchableOpacity
       style={containerStyle}
@@ -55,10 +63,7 @@ export function Button({
       activeOpacity={0.7}
     >
       {loading ? (
-        <ActivityIndicator
-          color={variant === 'outline' ? COLORS.primary : COLORS.text}
-          size="small"
-        />
+        <ActivityIndicator color={spinnerColor} size="small" />
       ) : (
         <>
           {icon && <>{icon}</>}
@@ -69,48 +74,54 @@ export function Button({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    paddingVertical: SPACING.sm + 4,
-    paddingHorizontal: SPACING.lg,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    gap: SPACING.xs,
-  },
-  fullWidth: {
-    width: '100%',
-  },
-  disabled: {
-    opacity: 0.5,
-  },
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      paddingVertical: theme.spacing.sm + 4,
+      paddingHorizontal: theme.spacing.lg,
+      borderRadius: theme.borders.medium, // 8px arrondi léger
+      borderWidth: theme.borders.thick, // 3px bordure noire épaisse
+      borderColor: theme.colors.border, // Noir
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: 'row',
+      gap: theme.spacing.xs,
+      ...theme.shadows.medium, // Ombre offset 4px
+    },
+    fullWidth: {
+      width: '100%',
+    },
+    disabled: {
+      backgroundColor: theme.colors.surfaceAlt,
+      borderColor: theme.colors.borderLight,
+      // Pas d'opacity - utilisation de couleurs désactivées
+    },
 
-  // Variants
-  primary: {
-    backgroundColor: COLORS.primary,
-  },
-  secondary: {
-    backgroundColor: COLORS.surface,
-  },
-  outline: {
-    backgroundColor: 'transparent',
-    borderWidth: 1.5,
-    borderColor: COLORS.primary,
-  },
+    // Variants
+    primary: {
+      backgroundColor: theme.colors.primary,
+    },
+    secondary: {
+      backgroundColor: theme.colors.surface,
+    },
+    outline: {
+      backgroundColor: 'transparent',
+      borderWidth: theme.borders.medium, // 2px pour outline
+    },
 
-  // Text styles
-  text: {
-    fontSize: FONT_SIZES.md,
-    fontWeight: '600',
-  },
-  primaryText: {
-    color: COLORS.text,
-  },
-  secondaryText: {
-    color: COLORS.text,
-  },
-  outlineText: {
-    color: COLORS.primary,
-  },
-});
+    // Text styles
+    text: {
+      fontSize: theme.typography.sizes.md,
+      fontWeight: theme.typography.weights.bold, // 700 - bold par défaut
+    },
+    primaryText: {
+      color: theme.colors.textInverse,
+    },
+    secondaryText: {
+      color: theme.colors.text,
+    },
+    outlineText: {
+      color: theme.colors.primary,
+      fontWeight: theme.typography.weights.bold,
+    },
+  });

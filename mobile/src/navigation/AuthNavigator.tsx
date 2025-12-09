@@ -1,7 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { WelcomeScreen, LoginScreen, RegisterScreen } from '@screens/auth';
-import { COLORS } from '@constants';
+import { useTheme } from '@contexts';
 
 export type AuthStackParamList = {
   Welcome: undefined;
@@ -12,14 +12,21 @@ export type AuthStackParamList = {
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 
 export function AuthNavigator() {
+  const { theme } = useTheme();
+
   return (
     <Stack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: COLORS.background,
+          backgroundColor: theme.colors.background,
+          borderBottomWidth: theme.borders.medium, // 2px bordure
+          borderBottomColor: theme.colors.border, // Noir
         },
-        headerTintColor: COLORS.text,
+        headerTintColor: theme.colors.text,
         headerShadowVisible: false,
+        headerTitleStyle: {
+          fontWeight: theme.typography.weights.bold, // 700
+        },
       }}
     >
       <Stack.Screen

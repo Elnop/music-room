@@ -6,7 +6,8 @@ import {
   type ViewStyle,
   type StyleProp,
 } from 'react-native';
-import { COLORS, SPACING } from '@constants';
+import { useTheme } from '@contexts';
+import type { Theme } from '@themes/types';
 
 interface CardProps {
   children: React.ReactNode;
@@ -16,6 +17,9 @@ interface CardProps {
 }
 
 export function Card({ children, onPress, style, elevation = true }: CardProps) {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
+
   const Container = onPress ? TouchableOpacity : View;
 
   return (
@@ -29,20 +33,16 @@ export function Card({ children, onPress, style, elevation = true }: CardProps) 
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: COLORS.surface,
-    borderRadius: 8,
-    padding: SPACING.md,
-  },
-  elevation: {
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    card: {
+      backgroundColor: theme.colors.surface, // Blanc
+      borderRadius: theme.borders.medium, // 8px
+      borderWidth: theme.borders.thick, // 3px bordure noire
+      borderColor: theme.colors.border, // Noir
+      padding: theme.spacing.md,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-});
+    elevation: {
+      ...theme.shadows.large, // Ombre offset 6px (grande ombre pour les cartes)
+    },
+  });

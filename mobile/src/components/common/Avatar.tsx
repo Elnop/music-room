@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Image, Text, StyleSheet, type ViewStyle, type StyleProp } from 'react-native';
-import { COLORS, FONT_SIZES } from '@constants';
+import { useTheme } from '@contexts';
+import type { Theme } from '@themes/types';
 
 interface AvatarProps {
   uri?: string;
@@ -15,15 +16,17 @@ const SIZE_MAP = {
   lg: 80,
 };
 
-const FONT_SIZE_MAP = {
-  sm: FONT_SIZES.xs,
-  md: FONT_SIZES.md,
-  lg: FONT_SIZES.xl,
-};
-
 export function Avatar({ uri, size = 'md', name, style }: AvatarProps) {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
+
   const dimension = SIZE_MAP[size];
-  const fontSize = FONT_SIZE_MAP[size];
+  const fontSize =
+    size === 'sm'
+      ? theme.typography.sizes.xs
+      : size === 'md'
+        ? theme.typography.sizes.md
+        : theme.typography.sizes.xl;
 
   // Get initials from name
   const getInitials = (name?: string): string => {
@@ -66,18 +69,21 @@ export function Avatar({ uri, size = 'md', name, style }: AvatarProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: COLORS.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
-  },
-  image: {
-    resizeMode: 'cover',
-  },
-  initials: {
-    color: COLORS.background,
-    fontWeight: 'bold',
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      backgroundColor: theme.colors.surfaceAlt, // Surface alternative
+      justifyContent: 'center',
+      alignItems: 'center',
+      overflow: 'hidden',
+      borderWidth: theme.borders.medium, // 2px bordure
+      borderColor: theme.colors.border, // Noir
+    },
+    image: {
+      resizeMode: 'cover',
+    },
+    initials: {
+      color: theme.colors.text,
+      fontWeight: theme.typography.weights.bold, // 700
+    },
+  });

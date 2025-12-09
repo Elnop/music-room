@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { Card } from '@components/common';
-import { COLORS, SPACING, FONT_SIZES } from '@constants';
+import { useTheme } from '@contexts';
+import type { Theme } from '@themes/types';
 import type { Playlist } from '@types';
 
 interface PlaylistCardProps {
@@ -17,6 +18,9 @@ export function PlaylistCard({
   ownerName,
   onPress,
 }: PlaylistCardProps) {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
+
   const defaultCover = 'https://via.placeholder.com/150/1DB954/FFFFFF?text=Playlist';
 
   return (
@@ -54,51 +58,54 @@ export function PlaylistCard({
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    marginBottom: SPACING.md,
-  },
-  content: {
-    flexDirection: 'row',
-  },
-  cover: {
-    width: 80,
-    height: 80,
-    borderRadius: 4,
-    backgroundColor: COLORS.border,
-  },
-  info: {
-    flex: 1,
-    marginLeft: SPACING.md,
-    justifyContent: 'center',
-  },
-  name: {
-    fontSize: FONT_SIZES.lg,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: SPACING.xs,
-  },
-  description: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
-    marginBottom: SPACING.xs,
-  },
-  meta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  metaText: {
-    fontSize: FONT_SIZES.xs,
-    color: COLORS.textSecondary,
-  },
-  separator: {
-    fontSize: FONT_SIZES.xs,
-    color: COLORS.textSecondary,
-    marginHorizontal: SPACING.xs,
-  },
-  private: {
-    fontSize: FONT_SIZES.xs,
-    color: COLORS.primary,
-    fontWeight: '500',
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    card: {
+      marginBottom: theme.spacing.md,
+    },
+    content: {
+      flexDirection: 'row',
+    },
+    cover: {
+      width: 80,
+      height: 80,
+      borderRadius: theme.borders.small, // 4px
+      backgroundColor: theme.colors.surfaceAlt,
+      borderWidth: theme.borders.thin,
+      borderColor: theme.colors.border,
+    },
+    info: {
+      flex: 1,
+      marginLeft: theme.spacing.md,
+      justifyContent: 'center',
+    },
+    name: {
+      fontSize: theme.typography.sizes.lg,
+      fontWeight: theme.typography.weights.semibold, // 600 - bold
+      color: theme.colors.text,
+      marginBottom: theme.spacing.xs,
+    },
+    description: {
+      fontSize: theme.typography.sizes.sm,
+      color: theme.colors.textSecondary,
+      marginBottom: theme.spacing.xs,
+    },
+    meta: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    metaText: {
+      fontSize: theme.typography.sizes.xs,
+      color: theme.colors.textSecondary,
+    },
+    separator: {
+      fontSize: theme.typography.sizes.xs,
+      color: theme.colors.textSecondary,
+      marginHorizontal: theme.spacing.xs,
+    },
+    private: {
+      fontSize: theme.typography.sizes.xs,
+      color: theme.colors.primary,
+      fontWeight: theme.typography.weights.semibold, // 600
+    },
+  });

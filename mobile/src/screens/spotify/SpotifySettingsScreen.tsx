@@ -1,11 +1,14 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '@contexts';
+import type { Theme } from '@themes/types';
 import { useSpotifyStore } from '@/store/spotifyStore';
 import { Button, Card, LoadingSpinner } from '@/components/common';
-import { COLORS, SPACING } from '@/constants';
 
 export function SpotifySettingsScreen() {
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const { connectionStatus, isLoading, checkStatus, disconnect } = useSpotifyStore();
 
   useEffect(() => {
@@ -105,103 +108,104 @@ export function SpotifySettingsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  content: {
-    paddingVertical: SPACING.lg,
-  },
-  card: {
-    marginHorizontal: SPACING.lg,
-    marginBottom: SPACING.lg,
-  },
-  statusRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: SPACING.md,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: SPACING.md,
-  },
-  label: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    fontWeight: '500',
-  },
-  value: {
-    fontSize: 14,
-    color: COLORS.text,
-  },
-  badge: {
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: SPACING.xs,
-    borderRadius: 12,
-  },
-  connectedBadge: {
-    backgroundColor: COLORS.primary + '20',
-  },
-  disconnectedBadge: {
-    backgroundColor: COLORS.textSecondary + '20',
-  },
-  badgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  connectedText: {
-    color: COLORS.primary,
-  },
-  disconnectedText: {
-    color: COLORS.textSecondary,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: COLORS.border,
-  },
-  scopesContainer: {
-    paddingVertical: SPACING.md,
-  },
-  scopesText: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    marginTop: SPACING.xs,
-  },
-  infoSection: {
-    marginHorizontal: SPACING.lg,
-    marginBottom: SPACING.lg,
-    padding: SPACING.md,
-    backgroundColor: COLORS.surface,
-    borderRadius: 8,
-  },
-  infoTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: SPACING.sm,
-  },
-  infoText: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    lineHeight: 20,
-    marginBottom: SPACING.sm,
-  },
-  bulletPoint: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    lineHeight: 24,
-  },
-  actions: {
-    paddingHorizontal: SPACING.lg,
-  },
-  button: {
-    marginBottom: SPACING.sm,
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    scrollView: {
+      flex: 1,
+    },
+    content: {
+      paddingVertical: theme.spacing.lg,
+    },
+    card: {
+      marginHorizontal: theme.spacing.lg,
+      marginBottom: theme.spacing.lg,
+    },
+    statusRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: theme.spacing.md,
+    },
+    infoRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: theme.spacing.md,
+    },
+    label: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      fontWeight: theme.typography.weights.medium,
+    },
+    value: {
+      fontSize: 14,
+      color: theme.colors.text,
+    },
+    badge: {
+      paddingHorizontal: theme.spacing.sm,
+      paddingVertical: theme.spacing.xs,
+      borderRadius: 12,
+    },
+    connectedBadge: {
+      backgroundColor: theme.colors.primary + '20',
+    },
+    disconnectedBadge: {
+      backgroundColor: theme.colors.textSecondary + '20',
+    },
+    badgeText: {
+      fontSize: 12,
+      fontWeight: theme.typography.weights.semibold,
+    },
+    connectedText: {
+      color: theme.colors.primary,
+    },
+    disconnectedText: {
+      color: theme.colors.textSecondary,
+    },
+    divider: {
+      height: 1,
+      backgroundColor: theme.colors.border,
+    },
+    scopesContainer: {
+      paddingVertical: theme.spacing.md,
+    },
+    scopesText: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+      marginTop: theme.spacing.xs,
+    },
+    infoSection: {
+      marginHorizontal: theme.spacing.lg,
+      marginBottom: theme.spacing.lg,
+      padding: theme.spacing.md,
+      backgroundColor: theme.colors.surface,
+      borderRadius: 8,
+    },
+    infoTitle: {
+      fontSize: 16,
+      fontWeight: theme.typography.weights.semibold,
+      color: theme.colors.text,
+      marginBottom: theme.spacing.sm,
+    },
+    infoText: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      lineHeight: 20,
+      marginBottom: theme.spacing.sm,
+    },
+    bulletPoint: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      lineHeight: 24,
+    },
+    actions: {
+      paddingHorizontal: theme.spacing.lg,
+    },
+    button: {
+      marginBottom: theme.spacing.sm,
+    },
+  });
