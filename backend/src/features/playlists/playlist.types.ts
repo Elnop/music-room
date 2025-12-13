@@ -17,7 +17,7 @@ export interface PlaylistRow {
 
 export interface TrackRow {
   id: string;
-  spotify_uri: string;
+  track_uri: string; // Universal track identifier from any music service
   title: string;
   artist: string;
   album: string;
@@ -51,7 +51,7 @@ export interface UpdatePlaylistDTO {
 }
 
 export interface AddTrackDTO {
-  spotifyUri: string;
+  trackUri: string; // Universal track identifier from any music service
   title: string;
   artist: string;
   album: string;
@@ -71,7 +71,7 @@ export interface AddCollaboratorDTO {
 // Response types (camelCase for client)
 export interface TrackResponse {
   id: string;
-  spotifyUri: string;
+  trackUri: string; // Universal track identifier from any music service
   title: string;
   artist: string;
   album: string;

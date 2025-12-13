@@ -98,7 +98,7 @@ export class AuthService {
       // Fetch user profile
       const { data: profile, error: profileError } = await supabase
         .from('user_profiles')
-        .select('username, display_name, avatar_url, bio, spotify_connected, created_at, updated_at')
+        .select('username, display_name, avatar_url, bio, created_at, updated_at')
         .eq('id', authData.user.id)
         .single()
 
@@ -116,7 +116,6 @@ export class AuthService {
         profile.display_name,
         profile.avatar_url,
         profile.bio,
-        profile.spotify_connected,
         profile.created_at,
         profile.updated_at
       )
@@ -180,7 +179,6 @@ export class AuthService {
         displayName: profile.display_name,
         avatarUrl: profile.avatar_url,
         bio: profile.bio,
-        spotifyConnected: profile.spotify_connected,
         createdAt: profile.created_at,
         updatedAt: profile.updated_at,
       }
@@ -200,7 +198,6 @@ export class AuthService {
     displayName?: string,
     avatarUrl?: string,
     bio?: string,
-    spotifyConnected: boolean = false,
     createdAt?: string,
     updatedAt?: string
   ): AuthResponse {
@@ -212,7 +209,6 @@ export class AuthService {
         displayName,
         avatarUrl,
         bio,
-        spotifyConnected,
         createdAt: createdAt || new Date().toISOString(),
         updatedAt: updatedAt || new Date().toISOString(),
       },

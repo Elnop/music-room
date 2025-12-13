@@ -132,7 +132,6 @@ Créer un nouveau compte utilisateur.
       "displayName": "John Doe",
       "avatarUrl": null,
       "bio": null,
-      "spotifyConnected": false,
       "createdAt": "2025-01-15T10:30:00.000Z",
       "updatedAt": "2025-01-15T10:30:00.000Z"
     },
@@ -229,7 +228,6 @@ Authentifier un utilisateur existant.
       "displayName": "John Doe",
       "avatarUrl": null,
       "bio": null,
-      "spotifyConnected": false,
       "createdAt": "2025-01-15T10:30:00.000Z",
       "updatedAt": "2025-01-15T10:30:00.000Z"
     },
@@ -301,7 +299,6 @@ Authorization: Bearer <access_token>
       "displayName": "John Doe",
       "avatarUrl": null,
       "bio": null,
-      "spotifyConnected": false,
       "createdAt": "2025-01-15T10:30:00.000Z",
       "updatedAt": "2025-01-15T10:30:00.000Z"
     }

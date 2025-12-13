@@ -1,6 +1,6 @@
 # Music Room
 
-A collaborative music listening platform built with React Native, Node.js, and Spotify integration.
+A collaborative music listening platform built with React Native, Node.js, and music streaming integration.
 
 ## Quick Links
 
@@ -28,7 +28,7 @@ make stop
 ## Features
 
 - 🎵 Collaborative music playlists
-- 🎧 Spotify integration (OAuth + search)
+- 🎧 Music search and streaming (SoundCloud planned)
 - 👤 User profiles and authentication
 - 📱 Cross-platform mobile app (iOS + Android)
 - 🔄 Real-time synchronization
@@ -47,7 +47,7 @@ make stop
 - [doc/GETTING_STARTED.md](./doc/GETTING_STARTED.md) - Setup instructions
 - [doc/PLAN.md](./doc/PLAN.md) - Implementation roadmap
 - [doc/DOCKER.md](./doc/DOCKER.md) - Docker architecture
-- [doc/SPOTIFY_OAUTH.md](./doc/SPOTIFY_OAUTH.md) - Spotify integration details
+- [doc/SOUNDCLOUD_MIGRATION_PLAN.md](./doc/SOUNDCLOUD_MIGRATION_PLAN.md) - SoundCloud integration plan
 - [doc/TUNNEL_MODE.md](./doc/TUNNEL_MODE.md) - Cross-network development
 
 ## Contributing

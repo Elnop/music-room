@@ -1,7 +1,7 @@
 import type { Track } from '@types';
 
 /**
- * Mock Tracks - Spotify-like data
+ * Mock Tracks - Music track data
  * Using real popular artists for realistic mockup
  */
 export const MOCK_TRACKS: Track[] = [
@@ -12,7 +12,7 @@ export const MOCK_TRACKS: Track[] = [
     album: 'After Hours',
     albumArt: 'https://i.scdn.co/image/ab67616d0000b2738863bc11d2aa12b54f5aeb36',
     durationMs: 200040, // 3:20
-    spotifyUri: 'spotify:track:0VjIjW4GlUZAMYd2vXMi3b',
+    trackUri: 'mock:track:0VjIjW4GlUZAMYd2vXMi3b',
     previewUrl: 'https://p.scdn.co/mp3-preview/...',
   },
   {
@@ -22,7 +22,7 @@ export const MOCK_TRACKS: Track[] = [
     album: 'Future Nostalgia',
     albumArt: 'https://i.scdn.co/image/ab67616d0000b273d6d0b6d0b6d0b6d0b6d0b6d0',
     durationMs: 203064, // 3:23
-    spotifyUri: 'spotify:track:39LLxExYz6ewLAcYrzQQyP',
+    trackUri: 'mock:track:39LLxExYz6ewLAcYrzQQyP',
     previewUrl: 'https://p.scdn.co/mp3-preview/...',
   },
   {
@@ -32,7 +32,7 @@ export const MOCK_TRACKS: Track[] = [
     album: 'Views',
     albumArt: 'https://i.scdn.co/image/ab67616d0000b273f46b9d202509a8f7384b90de',
     durationMs: 173987, // 2:54
-    spotifyUri: 'spotify:track:12KCBHUrXY1yRrCqZZmqXh',
+    trackUri: 'mock:track:12KCBHUrXY1yRrCqZZmqXh',
     previewUrl: 'https://p.scdn.co/mp3-preview/...',
   },
   {
@@ -42,7 +42,7 @@ export const MOCK_TRACKS: Track[] = [
     album: 'Midnights',
     albumArt: 'https://i.scdn.co/image/ab67616d0000b273e0b60c608586d55d55f5e0de',
     durationMs: 200690, // 3:21
-    spotifyUri: 'spotify:track:0V3wPSX9ygBnCm8psDIegu',
+    trackUri: 'mock:track:0V3wPSX9ygBnCm8psDIegu',
     previewUrl: 'https://p.scdn.co/mp3-preview/...',
   },
   {
@@ -52,7 +52,7 @@ export const MOCK_TRACKS: Track[] = [
     album: "Harry's House",
     albumArt: 'https://i.scdn.co/image/ab67616d0000b2732e8ed79e177ff6011076f5f0',
     durationMs: 167303, // 2:47
-    spotifyUri: 'spotify:track:4Dvkj6JhhA12EX05fT7y2e',
+    trackUri: 'mock:track:4Dvkj6JhhA12EX05fT7y2e',
     previewUrl: 'https://p.scdn.co/mp3-preview/...',
   },
   {
@@ -62,7 +62,7 @@ export const MOCK_TRACKS: Track[] = [
     album: 'Dreamland',
     albumArt: 'https://i.scdn.co/image/ab67616d0000b2732bb0e1c1d0d22e7f8d7e3c3c',
     durationMs: 238805, // 3:59
-    spotifyUri: 'spotify:track:02MWAaffLxlfxAUY7c5dvx',
+    trackUri: 'mock:track:02MWAaffLxlfxAUY7c5dvx',
     previewUrl: 'https://p.scdn.co/mp3-preview/...',
   },
   {
@@ -72,7 +72,7 @@ export const MOCK_TRACKS: Track[] = [
     album: '=',
     albumArt: 'https://i.scdn.co/image/ab67616d0000b273e6f45e1a1e1e1a1e1e1e1a1e',
     durationMs: 207160, // 3:27
-    spotifyUri: 'spotify:track:50nfwKoDiSYg8zOCREWAm5',
+    trackUri: 'mock:track:50nfwKoDiSYg8zOCREWAm5',
     previewUrl: 'https://p.scdn.co/mp3-preview/...',
   },
   {
@@ -82,7 +82,7 @@ export const MOCK_TRACKS: Track[] = [
     album: 'After Hours',
     albumArt: 'https://i.scdn.co/image/ab67616d0000b2738863bc11d2aa12b54f5aeb36',
     durationMs: 215626, // 3:36
-    spotifyUri: 'spotify:track:5QO79kh1waicV47BqGRL3g',
+    trackUri: 'mock:track:5QO79kh1waicV47BqGRL3g',
     previewUrl: 'https://p.scdn.co/mp3-preview/...',
   },
   {
@@ -92,7 +92,7 @@ export const MOCK_TRACKS: Track[] = [
     album: 'SOUR',
     albumArt: 'https://i.scdn.co/image/ab67616d0000b273a91c4f8e6e6e6e6e6e6e6e6e',
     durationMs: 178147, // 2:58
-    spotifyUri: 'spotify:track:4ZtFanR9U6ndgddUvNcjcG',
+    trackUri: 'mock:track:4ZtFanR9U6ndgddUvNcjcG',
     previewUrl: 'https://p.scdn.co/mp3-preview/...',
   },
   {
@@ -102,7 +102,7 @@ export const MOCK_TRACKS: Track[] = [
     album: 'Justice',
     albumArt: 'https://i.scdn.co/image/ab67616d0000b273c3b3b3b3b3b3b3b3b3b3b3b3',
     durationMs: 198082, // 3:18
-    spotifyUri: 'spotify:track:4iJyoBOLtHqaGxP12qzhQI',
+    trackUri: 'mock:track:4iJyoBOLtHqaGxP12qzhQI',
     previewUrl: 'https://p.scdn.co/mp3-preview/...',
   },
   {
@@ -112,7 +112,7 @@ export const MOCK_TRACKS: Track[] = [
     album: 'Starboy',
     albumArt: 'https://i.scdn.co/image/ab67616d0000b2734718e2b124f79258be7bc452',
     durationMs: 230453, // 3:50
-    spotifyUri: 'spotify:track:7MXVkk9YMctZqd1Srtv4MB',
+    trackUri: 'mock:track:7MXVkk9YMctZqd1Srtv4MB',
     previewUrl: 'https://p.scdn.co/mp3-preview/...',
   },
   {
@@ -122,7 +122,7 @@ export const MOCK_TRACKS: Track[] = [
     album: "Hollywood's Bleeding",
     albumArt: 'https://i.scdn.co/image/ab67616d0000b273d5d5d5d5d5d5d5d5d5d5d5d5',
     durationMs: 215280, // 3:35
-    spotifyUri: 'spotify:track:21jGcNKet2qwijlDFuPiPb',
+    trackUri: 'mock:track:21jGcNKet2qwijlDFuPiPb',
     previewUrl: 'https://p.scdn.co/mp3-preview/...',
   },
   {
@@ -132,7 +132,7 @@ export const MOCK_TRACKS: Track[] = [
     album: 'F*ck Love 3: Over You',
     albumArt: 'https://i.scdn.co/image/ab67616d0000b273e4e4e4e4e4e4e4e4e4e4e4e4',
     durationMs: 141806, // 2:22
-    spotifyUri: 'spotify:track:5PjdY0CKGZdEuoNab3yDmX',
+    trackUri: 'mock:track:5PjdY0CKGZdEuoNab3yDmX',
     previewUrl: 'https://p.scdn.co/mp3-preview/...',
   },
   {
@@ -142,7 +142,7 @@ export const MOCK_TRACKS: Track[] = [
     album: 'MONTERO',
     albumArt: 'https://i.scdn.co/image/ab67616d0000b273f1f1f1f1f1f1f1f1f1f1f1f1',
     durationMs: 212521, // 3:33
-    spotifyUri: 'spotify:track:27NovPIUIRrOZoCHxABJwK',
+    trackUri: 'mock:track:27NovPIUIRrOZoCHxABJwK',
     previewUrl: 'https://p.scdn.co/mp3-preview/...',
   },
   {
@@ -152,7 +152,7 @@ export const MOCK_TRACKS: Track[] = [
     album: 'Happier Than Ever',
     albumArt: 'https://i.scdn.co/image/ab67616d0000b273a2a2a2a2a2a2a2a2a2a2a2a2',
     durationMs: 298613, // 4:59
-    spotifyUri: 'spotify:track:4RVnAU35WRWra6OZ3FqyRM',
+    trackUri: 'mock:track:4RVnAU35WRWra6OZ3FqyRM',
     previewUrl: 'https://p.scdn.co/mp3-preview/...',
   },
   {
@@ -162,7 +162,7 @@ export const MOCK_TRACKS: Track[] = [
     album: '30',
     albumArt: 'https://i.scdn.co/image/ab67616d0000b273b4b4b4b4b4b4b4b4b4b4b4b4',
     durationMs: 224400, // 3:44
-    spotifyUri: 'spotify:track:46IZ0fSY2mpAiktS3KOqds',
+    trackUri: 'mock:track:46IZ0fSY2mpAiktS3KOqds',
     previewUrl: 'https://p.scdn.co/mp3-preview/...',
   },
   {
@@ -172,7 +172,7 @@ export const MOCK_TRACKS: Track[] = [
     album: '=',
     albumArt: 'https://i.scdn.co/image/ab67616d0000b273e6f45e1a1e1e1a1e1e1e1a1e',
     durationMs: 230746, // 3:51
-    spotifyUri: 'spotify:track:6PQ88X9TkUIAUIZJHW2upE',
+    trackUri: 'mock:track:6PQ88X9TkUIAUIZJHW2upE',
     previewUrl: 'https://p.scdn.co/mp3-preview/...',
   },
   {
@@ -182,7 +182,7 @@ export const MOCK_TRACKS: Track[] = [
     album: 'MONTERO',
     albumArt: 'https://i.scdn.co/image/ab67616d0000b273f1f1f1f1f1f1f1f1f1f1f1f1',
     durationMs: 137458, // 2:17
-    spotifyUri: 'spotify:track:67BtfxlNbhBmCDR2L2l8qd',
+    trackUri: 'mock:track:67BtfxlNbhBmCDR2L2l8qd',
     previewUrl: 'https://p.scdn.co/mp3-preview/...',
   },
   {
@@ -192,7 +192,7 @@ export const MOCK_TRACKS: Track[] = [
     album: 'SOUR',
     albumArt: 'https://i.scdn.co/image/ab67616d0000b273a91c4f8e6e6e6e6e6e6e6e6e',
     durationMs: 215897, // 3:36
-    spotifyUri: 'spotify:track:6HU7h9RYOaPRFeh0R3UeAr',
+    trackUri: 'mock:track:6HU7h9RYOaPRFeh0R3UeAr',
     previewUrl: 'https://p.scdn.co/mp3-preview/...',
   },
   {
@@ -202,7 +202,7 @@ export const MOCK_TRACKS: Track[] = [
     album: 'Fine Line',
     albumArt: 'https://i.scdn.co/image/ab67616d0000b273c6c6c6c6c6c6c6c6c6c6c6c6',
     durationMs: 174000, // 2:54
-    spotifyUri: 'spotify:track:6UelLqGlWMcVH1E5c4H7lY',
+    trackUri: 'mock:track:6UelLqGlWMcVH1E5c4H7lY',
     previewUrl: 'https://p.scdn.co/mp3-preview/...',
   },
 ];

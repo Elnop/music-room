@@ -11,8 +11,6 @@ import { Avatar, Button, Card } from '@components/common';
 type ProfileStackParamList = {
   Profile: undefined;
   EditProfile: undefined;
-  SpotifyConnect: undefined;
-  SpotifySettings: undefined;
   Settings: undefined;
 };
 
@@ -90,23 +88,6 @@ export function ProfileScreen() {
           <Text style={styles.label}>Username</Text>
           <Text style={styles.value}>{user.username}</Text>
         </View>
-
-        <View style={styles.divider} />
-
-        <TouchableOpacity
-          style={styles.infoRow}
-          onPress={() => navigation.navigate(user.spotifyConnected ? 'SpotifySettings' : 'SpotifyConnect')}
-        >
-          <Text style={styles.label}>Spotify</Text>
-          <View style={styles.spotifyRow}>
-            <View style={[styles.spotifyBadge, user.spotifyConnected && styles.spotifyBadgeConnected]}>
-              <Text style={[styles.spotifyText, user.spotifyConnected && styles.spotifyTextConnected]}>
-                {user.spotifyConnected ? 'Connected' : 'Not Connected'}
-              </Text>
-            </View>
-            <Text style={styles.chevron}>›</Text>
-          </View>
-        </TouchableOpacity>
 
         <View style={styles.divider} />
 
@@ -214,28 +195,6 @@ const createStyles = (theme: Theme) =>
     divider: {
       height: 1,
       backgroundColor: theme.colors.border,
-    },
-    spotifyBadge: {
-      paddingHorizontal: theme.spacing.sm,
-      paddingVertical: theme.spacing.xs,
-      borderRadius: 12,
-      backgroundColor: theme.colors.surface,
-    },
-    spotifyText: {
-      fontSize: 12,
-      color: theme.colors.primary,
-      fontWeight: theme.typography.weights.semibold,
-    },
-    spotifyRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: theme.spacing.xs,
-    },
-    spotifyBadgeConnected: {
-      backgroundColor: theme.colors.primary + '20',
-    },
-    spotifyTextConnected: {
-      color: theme.colors.primary,
     },
     chevron: {
       fontSize: 20,

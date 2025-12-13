@@ -231,7 +231,7 @@ web-build/
 
 ```bash
 mkdir -p src/{screens,components,navigation,services,store,hooks,types,constants,utils}
-mkdir -p src/screens/{auth,friends,playlists,devices,spotify}
+mkdir -p src/screens/{auth,friends,playlists,devices,search}
 mkdir -p src/components/{common,playlist,player,friends}
 mkdir -p assets/{images,fonts,icons}
 ```
@@ -246,7 +246,7 @@ mobile/
 │   │   ├── friends/
 │   │   ├── playlists/
 │   │   ├── devices/
-│   │   └── spotify/
+│   │   └── search/
 │   ├── components/       # Composants réutilisables
 │   │   ├── common/
 │   │   ├── playlist/
@@ -286,9 +286,9 @@ export const SUPABASE_CONFIG = {
   ANON_KEY: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '',
 } as const;
 
-// Spotify Configuration
-export const SPOTIFY_CONFIG = {
-  CLIENT_ID: process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID || '',
+// SoundCloud Configuration
+export const SOUNDCLOUD_CONFIG = {
+  CLIENT_ID: process.env.EXPO_PUBLIC_SOUNDCLOUD_CLIENT_ID || '',
 } as const;
 
 // App Configuration
@@ -298,9 +298,9 @@ export const APP_CONFIG = {
   BUILD_NUMBER: 1,
 } as const;
 
-// Theme Colors (Spotify-inspired dark theme)
+// Theme Colors (Music-inspired dark theme)
 export const COLORS = {
-  primary: '#1DB954',      // Spotify Green
+  primary: '#1DB954',      // Music Green
   secondary: '#191414',    // Near Black
   background: '#121212',   // Pure Black
   surface: '#282828',      // Dark Gray
@@ -386,13 +386,13 @@ export interface Playlist {
 
 export interface Track {
   id: string;
-  spotify_id: string;
-  name: string;
+  title: string;
   artist: string;
   album: string;
-  duration_ms: number;
-  album_art_url?: string;
-  spotify_uri: string;
+  durationMs: number;
+  albumArt?: string;
+  trackUri: string; // Universal track identifier (SoundCloud permalink, etc.)
+  previewUrl?: string;
 }
 
 // Device Types
@@ -512,8 +512,8 @@ EXPO_PUBLIC_WS_URL=ws://localhost:3000
 EXPO_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
 
-# Spotify Configuration (Backend: Phase 6)
-EXPO_PUBLIC_SPOTIFY_CLIENT_ID=your-spotify-client-id-here
+# SoundCloud Configuration (Planned)
+EXPO_PUBLIC_SOUNDCLOUD_CLIENT_ID=your-soundcloud-client-id-here
 ```
 
 ### 7.2 .env (local development)
@@ -524,7 +524,7 @@ EXPO_PUBLIC_API_URL=http://localhost:3000
 EXPO_PUBLIC_WS_URL=ws://localhost:3000
 EXPO_PUBLIC_SUPABASE_URL=
 EXPO_PUBLIC_SUPABASE_ANON_KEY=
-EXPO_PUBLIC_SPOTIFY_CLIENT_ID=
+EXPO_PUBLIC_SOUNDCLOUD_CLIENT_ID=
 ```
 
 ### 7.3 .gitignore (ajouter)

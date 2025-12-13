@@ -30,7 +30,6 @@ export interface UserProfile {
   displayName?: string
   avatarUrl?: string
   bio?: string
-  spotifyConnected: boolean
   createdAt: string
   updatedAt: string
 }

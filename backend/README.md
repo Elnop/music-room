@@ -1,6 +1,6 @@
 # Music Room Backend
 
-Backend pour l'application Music Room - Collaborative music room with Spotify integration.
+Backend pour l'application Music Room - Collaborative music room with music streaming integration.
 
 ## 🏗️ Architecture
 
@@ -149,8 +149,8 @@ features/auth/
 - [ ] Feature Friends (système d'amis)
 - [ ] Feature Rooms (salles de musique)
 - [ ] Socket.io integration
-- [ ] Feature Spotify (OAuth + API integration)
-- [ ] Feature Playlists (collaborative playlists)
+- [ ] Feature Music Search (SoundCloud integration)
+- [x] Feature Playlists (collaborative playlists) - Complete
 
 ## 📖 Documentation
 

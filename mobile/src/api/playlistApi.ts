@@ -134,7 +134,7 @@ export const playlistApi = {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        spotifyUri: track.spotifyUri,
+        trackUri: track.trackUri,
         title: track.title,
         artist: track.artist,
         album: track.album,

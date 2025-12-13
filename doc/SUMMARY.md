@@ -106,8 +106,6 @@ Music_Room/
 - `display_name` (TEXT) - Optionnel, max 50 caractères
 - `avatar_url` (TEXT) - URL avatar
 - `bio` (TEXT) - Biographie, max 500 caractères
-- `spotify_connected` (BOOLEAN) - État connexion Spotify
-- `spotify_user_id` (TEXT) - ID Spotify user
 - `created_at` (TIMESTAMPTZ) - Date création
 - `updated_at` (TIMESTAMPTZ) - Date mise à jour
 
@@ -119,7 +117,6 @@ Music_Room/
 
 ### Index
 - `username` (pour recherche rapide)
-- `spotify_user_id` (pour lookup Spotify)
 
 ---
 
@@ -232,10 +229,10 @@ Ou utilisez **Postman** avec la collection fournie !
 - [ ] Namespaces & Rooms (join, leave, presence)
 - [ ] Integration mobile
 
-### Phase 6 : Spotify Integration (1 semaine)
-- [ ] OAuth flow Spotify
-- [ ] Feature spotify/ (service, client API)
-- [ ] Sync user playlists
+### Phase 6 : Music Search (SoundCloud Integration) (1 semaine)
+- [ ] SoundCloud API integration
+- [ ] Feature search/ (service, client API)
+- [ ] Browse and search tracks
 - [ ] Tests
 
 ### Phase 7 : Collaborative Playlists (2 semaines)

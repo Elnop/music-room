@@ -2,7 +2,7 @@
 
 > **Projet**: Application mobile collaborative de musique
 > **Version**: 3.0 (Architecture Supabase Auth + Backend Node.js)
-> **Stack**: Node.js + Supabase (Auth + DB) + Socket.io + React Native + Spotify API
+> **Stack**: Node.js + Supabase (Auth + DB) + Socket.io + React Native + Music Streaming API
 
 ---
 
@@ -38,7 +38,7 @@
 - **Risque "SDK does work" accepté** - Focus sur business logic
 
 **✅ Backend Node.js/Express** pour TOUTE la business logic
-- Services métier (playlists, devices, friends, Spotify)
+- Services métier (playlists, devices, friends, music search)
 - Validations (Zod), conflict resolution
 - **C'est là qu'on fait NOTRE travail**
 
@@ -70,7 +70,7 @@ Music Room est une application mobile collaborative centrée sur la musique.
 **2. Music Playlist Editor** (Service #1 - Mandatory)
 - Création de playlists collaboratives
 - Édition multi-utilisateurs en temps réel
-- Ajout de morceaux depuis Spotify
+- Ajout de morceaux depuis services de streaming
 - Réordonnancement drag-and-drop
 - Gestion des collaborateurs et permissions
 - Résolution automatique des conflits
@@ -83,10 +83,9 @@ Music Room est une application mobile collaborative centrée sur la musique.
 - Synchronisation de l'état de lecture
 - Gestion multi-devices
 
-**4. Intégration Spotify**
-- Recherche dans le catalogue Spotify
-- Lecture audio via Spotify SDK
-- Connexion compte Spotify
+**4. Intégration Musicale**
+- Recherche dans le catalogue musical (SoundCloud planned)
+- Lecture audio via streaming services
 - Preview et métadonnées
 
 ### Fonctionnalités Bonus
@@ -113,7 +112,7 @@ Le PDF avertit: **"Warning the SDK you choose must not do your work."**
 **Justifications**:
 
 1. **Auth n'est PAS le coeur du projet**
-   - Le travail métier = Playlist Editor, Control Delegation, Spotify integration
+   - Le travail métier = Playlist Editor, Control Delegation, music integration
    - Auth = prérequis technique, pas la valeur ajoutée
    - Comme utiliser Express pour HTTP au lieu de réimplémenter TCP
 
@@ -121,7 +120,7 @@ Le PDF avertit: **"Warning the SDK you choose must not do your work."**
    - Socket.io custom pour realtime collaboratif
    - Algorithmes de conflict resolution (CRDT)
    - Business logic complète (playlists, devices, friends)
-   - Intégration Spotify (search, playback, sync)
+   - Intégration musicale (search, playback, sync)
    - Tous les services métier
 
 3. **Gains de productivité réinvestis**
@@ -140,7 +139,7 @@ Le PDF avertit: **"Warning the SDK you choose must not do your work."**
 | **Playlist Collaborative Editor** | Socket.io + CRDT + UI temps réel | 🔥🔥🔥 Élevée |
 | **Control Delegation** | Multi-device sync + permissions | 🔥🔥 Moyenne |
 | **Friends System** | Requests + privacy levels | 🔥🔥 Moyenne |
-| **Spotify Integration** | Search + playback + sync | 🔥🔥 Moyenne |
+| **Music Integration** | Search + playback + sync (SoundCloud) | 🔥🔥 Moyenne |
 | **Conflict Resolution** | Algorithme custom CRDT | 🔥🔥🔥 Élevée |
 | **Business Logic** | Validations + services + controllers | 🔥🔥🔥 Élevée |
 | **Realtime WebSocket** | Socket.io rooms/namespaces/broadcast | 🔥🔥 Moyenne |
@@ -164,9 +163,9 @@ Le PDF avertit: **"Warning the SDK you choose must not do your work."**
 |-------------|-------------------|------------------------|
 | **Node.js + Express** | JSON natif, async/await, ecosystem npm, WebSocket performant | Python (FastAPI), Go (Gin) |
 | **PostgreSQL** | Relations complexes, ACID, transactions, JSON support | MongoDB, MySQL |
-| **React Native (Expo)** | Code partagé iOS/Android, Spotify SDK, large communauté | Kotlin natif, Flutter |
+| **React Native (Expo)** | Code partagé iOS/Android, streaming SDK support, large communauté | Kotlin natif, Flutter |
 | **Socket.io** | Contrôle total, rooms/namespaces, on écrit TOUTE la logique | Supabase Realtime, WebSocket natif |
-| **Spotify API** | Catalogue 70M+ tracks, SDK mobile officiel, documentation excellente | Deezer, YouTube Music |
+| **Music Streaming API** | Catalogue musical, SDK mobile, documentation | SoundCloud, Deezer, YouTube Music |
 
 ---
 
@@ -182,7 +181,7 @@ Le PDF avertit: **"Warning the SDK you choose must not do your work."**
 │  │   Mobile    │    │     Web     │    │ IoT (Bonus) │       │
 │  │   React     │    │   Next.js   │    │   iBeacon   │       │
 │  │   Native    │    │   14        │    │  Proximity  │       │
-│  │ Spotify SDK │    │ Spotify Web │    │             │       │
+│  │ Streaming   │    │ Streaming   │    │             │       │
 │  └──────┬──────┘    └──────┬──────┘    └──────┬──────┘       │
 │         │                   │                   │               │
 └─────────┼───────────────────┼───────────────────┼───────────────┘
@@ -201,7 +200,7 @@ Le PDF avertit: **"Warning the SDK you choose must not do your work."**
 │  │  │  ├─ /api/playlists/*   (collaborative editing)        │  │
 │  │  │  ├─ /api/devices/*     (device management)            │  │
 │  │  │  ├─ /api/delegations/* (control delegation)           │  │
-│  │  │  └─ /api/spotify/*     (search, tracks)               │  │
+│  │  │  └─ /api/search/*      (music search)                 │  │
 │  │  │                                                        │  │
 │  │  └─ Socket.io Server (WebSocket)                         │  │
 │  │     ├─ Namespace: /playlists (realtime collab)           │  │
@@ -210,9 +209,9 @@ Le PDF avertit: **"Warning the SDK you choose must not do your work."**
 │  └──────────────────────────────────────────────────────────┘  │
 │                                                                 │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐        │
-│  │   Business   │  │   Supabase   │  │   Spotify    │        │
-│  │    Logic     │  │     Auth     │  │     API      │        │
-│  │              │  │  Integration │  │   Integration │        │
+│  │   Business   │  │   Supabase   │  │   Music      │        │
+│  │    Logic     │  │     Auth     │  │   Streaming  │        │
+│  │              │  │  Integration │  │   API        │        │
 │  │  Services    │  │   Middleware │  │   Search     │        │
 │  │  Controllers │  │    Verify    │  │   Metadata   │        │
 │  │  Validations │  │    Tokens    │  │   Playback   │        │
@@ -249,9 +248,9 @@ Le PDF avertit: **"Warning the SDK you choose must not do your work."**
 │                   EXTERNAL SERVICES                             │
 │                                                                 │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐        │
-│  │   Spotify    │  │   Supabase   │  │    Google    │        │
-│  │   Web API    │  │     Auth     │  │    OAuth     │        │
-│  │              │  │   Facebook   │  │   Facebook   │        │
+│  │  SoundCloud  │  │   Supabase   │  │    Google    │        │
+│  │     API      │  │     Auth     │  │    OAuth     │        │
+│  │   (Planned)  │  │   Facebook   │  │   Facebook   │        │
 │  └──────────────┘  └──────────────┘  └──────────────┘        │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -315,14 +314,14 @@ User A                Backend (Socket.io)           User B
 - Structure complète du projet
 - Configuration environnements
 - Setup bases de données
-- Configuration Spotify Developer
+- Configuration Music API Developer
 
 **Tasks**
 - Initialiser projets backend (Node.js + TypeScript) et mobile (React Native + Expo)
 - Structure MVC backend (controllers, models, routes, services, middleware)
 - Configuration PostgreSQL (Supabase)
 - Créer migrations SQL (users, profiles, friendships, playlists, devices)
-- Configuration Spotify Developer (obtenir Client ID/Secret)
+- Configuration SoundCloud Developer (optionnel, obtenir Client ID)
 - Configuration OAuth (Google, Facebook)
 - Fichiers .env.example
 - Makefile pour installation
@@ -337,7 +336,7 @@ User A                Backend (Socket.io)           User B
 - [ ] Fichiers .env.example créés
 - [ ] Makefile fonctionnel
 - [ ] Git init avec .gitignore complet
-- [ ] Spotify Developer app créée
+- [ ] SoundCloud Developer app créée (optional)
 - [ ] OAuth Google/Facebook apps créées
 
 ---
@@ -423,56 +422,45 @@ User A                Backend (Socket.io)           User B
 
 ---
 
-### Phase 4: Intégration Spotify
+### Phase 4: Music Search Integration (SoundCloud Planned)
 
 **Objectifs**
-- Backend: Spotify Web API integration
+- Backend: Music streaming API integration
 - Backend: Search tracks, albums, artists
-- Backend: User Spotify account linking
-- Mobile: Spotify SDK Android
-- Mobile: Audio playback
+- Backend: Public API access (no OAuth required)
+- Mobile: Audio preview playback
 - Mobile: Search UI
 
 **Tasks Backend**
-- Configuration Spotify Web API
-- Client Credentials Flow (pour recherches publiques)
-- Authorization Code Flow (pour comptes utilisateurs)
-- Service Spotify:
+- Configuration SoundCloud API v2
+- Public API access for search
+- Service MusicSearch:
   - searchTracks
   - getTrack
-  - getAuthorizationUrl
-  - handleSpotifyCallback
-  - getUserSpotifyToken (avec refresh automatique)
-- Routes Spotify
-- Table user_spotify_accounts
+  - getTrackMetadata
+- Routes /api/search/*
+- Track metadata storage
 
 **Tasks Mobile**
-- Installation Spotify SDK (react-native-spotify-remote)
-- SpotifyService:
-  - initialize SDK
+- MusicSearchService:
+  - initialize API client
   - searchTracks (via notre API)
-  - linkAccount (OAuth)
-  - playTrack, pause, resume, skipToNext, skipToPrevious
-  - getPlaybackState
-  - subscribeToPlayerState
-- SpotifyPlayer component
+  - playPreview (audio preview)
+  - getTrackDetails
+- MusicPlayer component
 - TrackSearchScreen
 - TrackCard component
 
 **Checklist**
-- [ ] Backend: Spotify Web API configured
-- [ ] Backend: Client Credentials flow
-- [ ] Backend: Authorization Code flow
+- [ ] Backend: SoundCloud API v2 configured
+- [ ] Backend: Public API access setup
 - [ ] Backend: Search tracks endpoint
-- [ ] Backend: Link/unlink Spotify account
-- [ ] Backend: Token refresh logic
-- [ ] Mobile: Spotify SDK installed
-- [ ] Mobile: SpotifyService avec playback
+- [ ] Backend: Track metadata endpoint
+- [ ] Mobile: Music search service
 - [ ] Mobile: TrackSearchScreen
-- [ ] Mobile: SpotifyPlayer component
-- [ ] Mobile: Link account flow
-- [ ] Mobile: Playback controls
-- [ ] Tests integration Spotify
+- [ ] Mobile: MusicPlayer component (preview)
+- [ ] Mobile: Track preview playback
+- [ ] Tests integration music API
 
 ---
 
@@ -635,7 +623,7 @@ User A                Backend (Socket.io)           User B
 - Pages: login, register, playlists, friends, devices
 - Components UI réutilisables
 - Socket.io client web
-- Spotify Web Playback SDK
+- Music streaming web player
 - Responsive design (mobile, tablet, desktop)
 
 **Checklist**
@@ -643,7 +631,7 @@ User A                Backend (Socket.io)           User B
 - [ ] Pages principales créées
 - [ ] Components UI
 - [ ] Socket.io web client
-- [ ] Spotify Web Playback SDK
+- [ ] Music streaming web player
 - [ ] Responsive design
 
 ---
@@ -764,7 +752,7 @@ User A                Backend (Socket.io)           User B
 - **Testing**: Jest + Supertest
 - **Load Testing**: k6
 - **API Docs**: Swagger (swagger-jsdoc + swagger-ui-express)
-- **Music**: Spotify Web API (spotify-web-api-node)
+- **Music**: SoundCloud API v2 (public API)
 
 ### Mobile
 - **Framework**: React Native 0.73+ avec Expo
@@ -775,7 +763,7 @@ User A                Backend (Socket.io)           User B
 - **HTTP Client**: Axios
 - **Realtime**: Socket.io-client
 - **Storage**: Expo SecureStore + AsyncStorage
-- **Spotify**: react-native-spotify-remote
+- **Music Streaming**: Audio preview playback
 - **Location**: expo-location (IoT bonus)
 - **Testing**: Jest + Detox
 
@@ -785,7 +773,7 @@ User A                Backend (Socket.io)           User B
 - **Styling**: Tailwind CSS
 - **State Management**: Zustand + TanStack Query
 - **Realtime**: Socket.io-client
-- **Spotify**: Spotify Web Playback SDK
+- **Music Streaming**: Web audio player
 - **Testing**: Playwright
 
 ### DevOps & Infrastructure
@@ -805,9 +793,9 @@ User A                Backend (Socket.io)           User B
 Music_Room/
 ├── backend/
 │   ├── src/
-│   │   ├── config/            # Database, Spotify, Supabase
-│   │   ├── controllers/       # Auth, Users, Friends, Playlists, Devices, Spotify
-│   │   ├── models/            # User, Playlist, Device, Spotify
+│   │   ├── config/            # Database, Music API, Supabase
+│   │   ├── controllers/       # Auth, Users, Friends, Playlists, Devices, Search
+│   │   ├── models/            # User, Playlist, Device, Track
 │   │   ├── routes/            # API routes
 │   │   ├── middleware/        # Auth, Validation, RateLimit, Error
 │   │   ├── services/          # Business logic
@@ -823,10 +811,10 @@ Music_Room/
 │   └── tsconfig.json
 ├── mobile/
 │   ├── src/
-│   │   ├── screens/           # Auth, Friends, Playlists, Devices, Spotify
+│   │   ├── screens/           # Auth, Friends, Playlists, Devices, Search
 │   │   ├── components/        # Common, Playlist, Player, Friends
 │   │   ├── navigation/        # App, Auth, Tab navigators
-│   │   ├── services/          # API, Auth, Socket, Spotify, Storage
+│   │   ├── services/          # API, Auth, Socket, Music, Storage
 │   │   ├── store/             # Zustand stores
 │   │   ├── hooks/             # Custom hooks
 │   │   ├── types/             # TypeScript types
@@ -840,7 +828,7 @@ Music_Room/
 │   ├── src/
 │   │   ├── app/               # App Router pages
 │   │   ├── components/        # UI components
-│   │   ├── lib/               # API, Socket, Spotify clients
+│   │   ├── lib/               # API, Socket, Music clients
 │   │   └── hooks/             # Custom hooks
 │   ├── public/
 │   └── package.json
@@ -865,7 +853,7 @@ Music_Room/
 - **Android Studio** (pour émulateur)
 - **Expo CLI**: `npm install -g expo-cli`
 - **Comptes développeur**:
-  - Spotify Developer Account
+  - SoundCloud Developer Account (optional, for music search)
   - Supabase Account
   - Google Cloud Console (OAuth)
   - Facebook Developers (OAuth)
@@ -910,14 +898,12 @@ cd backend
 npm run migrate
 ```
 
-#### 3. Spotify Developer
+#### 3. SoundCloud Developer (Optional)
 
-1. https://developer.spotify.com/dashboard
-2. Create an App
-3. Copier Client ID et Client Secret
-4. Ajouter Redirect URIs:
-   - `http://localhost:3000/auth/spotify/callback` (backend)
-   - `exp://localhost:19000/--/spotify` (mobile)
+1. https://soundcloud.com/you/apps
+2. Register new app
+3. Copier Client ID
+4. Note: Public API access for search (no OAuth required for basic search)
 
 #### 4. Google OAuth
 
@@ -948,10 +934,8 @@ SUPABASE_SERVICE_KEY=xxx
 # Database
 DATABASE_URL=postgresql://user:pass@host:5432/musicroom
 
-# Spotify
-SPOTIFY_CLIENT_ID=xxx
-SPOTIFY_CLIENT_SECRET=xxx
-SPOTIFY_REDIRECT_URI=http://localhost:3000/auth/spotify/callback
+# SoundCloud (optional)
+SOUNDCLOUD_CLIENT_ID=xxx
 
 # Google OAuth
 GOOGLE_CLIENT_ID=xxx.apps.googleusercontent.com
@@ -980,7 +964,7 @@ EXPO_PUBLIC_API_URL=http://localhost:3000
 EXPO_PUBLIC_WS_URL=ws://localhost:3000
 EXPO_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=xxx
-EXPO_PUBLIC_SPOTIFY_CLIENT_ID=xxx
+EXPO_PUBLIC_SOUNDCLOUD_CLIENT_ID=xxx
 ```
 
 ---
@@ -1069,7 +1053,7 @@ EXPO_PUBLIC_SPOTIFY_CLIENT_ID=xxx
 | **Auth Supabase** | Supabase Auth (email + OAuth) | Validations + business logic + profils + logging | ✅ |
 | **Realtime** | Socket.io (protocol) | Rooms + broadcast + conflict resolution | ✅ |
 | **Database** | pg + Supabase (client) | Requêtes + models + logic | ✅ |
-| **Spotify** | spotify-web-api-node (API client) | Business logic playlists + sync | ✅ |
+| **Music API** | SoundCloud API client | Business logic search + playlists | ✅ |
 | **Validation** | Zod (schema lib) | Toutes les règles métier | ✅ |
 | **Email** | Nodemailer (SMTP client) | Validation system + templates | ✅ |
 
@@ -1084,7 +1068,7 @@ main (production)
   └── develop (integration)
       ├── feature/auth-system
       ├── feature/playlist-editor
-      ├── feature/spotify-integration
+      ├── feature/music-search
       └── bugfix/token-refresh
 ```
 

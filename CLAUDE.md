@@ -9,7 +9,7 @@ Music Room is a collaborative music listening platform built with:
 - **Mobile**: React Native 0.81 + Expo SDK 54 + TypeScript + Zustand
 - **Infrastructure**: Docker Compose for orchestrated development
 
-The app allows users to create collaborative music playlists with friends, featuring real-time synchronization and Spotify integration.
+The app allows users to create collaborative music playlists with friends, featuring real-time synchronization and music streaming integration.
 
 ## Development Commands
 
@@ -187,13 +187,6 @@ backend/src/
 │   │   ├── auth.middleware.ts   # JWT verification middleware
 │   │   ├── auth.routes.ts       # Express routes
 │   │   └── index.ts             # Public exports
-│   ├── spotify/          # Spotify OAuth & search (complete)
-│   │   ├── spotify.types.ts
-│   │   ├── spotify.validators.ts
-│   │   ├── spotify.service.ts
-│   │   ├── spotify.controller.ts
-│   │   ├── spotify.routes.ts
-│   │   └── index.ts
 │   ├── playlists/        # Playlist management (complete)
 │   │   ├── playlist.types.ts
 │   │   ├── playlist.validators.ts
@@ -228,7 +221,6 @@ backend/src/
 - `/health` - Health check endpoint
 - `/api/auth/*` - Authentication endpoints (register, login, me, refresh, logout)
 - `/api/profile/*` - Profile management endpoints (get, update profile)
-- `/api/spotify/*` - Spotify OAuth and search endpoints (auth flow, search, status, disconnect)
 - `/api/playlists/*` - Playlist CRUD and track management endpoints (create, read, update, delete playlists, add/remove/reorder tracks, manage collaborators)
 
 ### Mobile: Component + Feature Architecture
@@ -239,20 +231,18 @@ mobile/src/
 │   ├── auth/            # WelcomeScreen, LoginScreen, RegisterScreen
 │   ├── playlists/       # PlaylistsScreen, CreatePlaylistScreen, PlaylistDetailScreen, SearchTracksScreen
 │   ├── profile/         # ProfileScreen, EditProfileScreen
-│   ├── spotify/         # SpotifyConnectScreen, SpotifySettingsScreen
-│   └── search/          # SpotifySearchScreen
+│   ├── settings/        # SettingsScreen
+│   └── search/          # Future: Music search screens
 ├── components/
 │   ├── common/          # Reusable UI (Button, Card, Input, LoadingSpinner, Avatar, etc.)
-│   ├── playlist/        # Feature-specific (TrackItem, PlaylistCard, PlaylistHeader, AddTrackButton)
-│   └── search/          # Search-specific (SpotifyTrackItem, PlaylistSelectorModal)
+│   └── playlist/        # Feature-specific (TrackItem, PlaylistCard, PlaylistHeader, AddTrackButton)
 ├── navigation/
 │   ├── RootNavigator.tsx    # Main navigator (switches Auth/App based on auth state)
 │   ├── AuthNavigator.tsx    # Stack for unauthenticated users
 │   └── AppNavigator.tsx     # Bottom tabs for authenticated users
 ├── store/               # Zustand state management
 │   ├── authStore.ts    # Authentication state (user, tokens, login/logout)
-│   ├── playlistStore.ts # Playlist state with API integration
-│   └── spotifyStore.ts  # Spotify OAuth and search state
+│   └── playlistStore.ts # Playlist state with API integration
 ├── api/                 # API client layer
 │   └── playlistApi.ts  # Playlist API calls
 ├── services/            # Service layer
@@ -261,7 +251,7 @@ mobile/src/
 ├── lib/                 # Third-party library configuration
 │   └── supabase.ts     # Supabase client setup
 ├── types/              # TypeScript types aligned with backend
-├── utils/              # Validators (Zod), formatters, helpers, spotifyHelpers
+├── utils/              # Validators (Zod), formatters, helpers
 ├── constants/          # Theme colors, API URLs, spacing
 └── mocks/              # Mock data for development (users, playlists, tracks)
 ```
@@ -271,7 +261,7 @@ mobile/src/
 - Zustand stores for state management (NOT Redux or Context)
 - React Hook Form + Zod for form validation
 - React Navigation 7 with stack and bottom tab navigators
-- Spotify-inspired dark theme (Green #1DB954, Black #121212)
+- Music-inspired dark theme (Green #1DB954, Black #121212)
 - Authentication state persisted to AsyncStorage, loaded on app start in RootNavigator
 - API layer (`@api`) for backend communication
 - Service layer (`@services`) for business logic
@@ -316,17 +306,19 @@ Migrations are SQL files in `backend/migrations/` executed manually in Supabase 
 4. Execute
 
 **Current schema**:
-- `user_profiles` table - User profile data (id, username, display_name, avatar_url, spotify_*, created_at, updated_at)
+- `user_profiles` table - User profile data (id, username, display_name, avatar_url, bio, created_at, updated_at)
   - Linked to Supabase auth.users via foreign key
-  - Includes Spotify OAuth tokens (access_token, refresh_token, token_expires_at, scopes)
 - `playlists` table - Playlist metadata (id, name, description, cover_url, owner_id, collaborator_ids, visibility, timestamps)
-- `tracks` table - Track data from Spotify (id, spotify_uri, title, artist, album, album_art, duration_ms, preview_url, timestamps)
+- `tracks` table - Universal track data (id, track_uri, title, artist, album, album_art, duration_ms, preview_url, timestamps)
+  - `track_uri` stores universal track identifiers from any music service
 - `playlist_tracks` junction table - Many-to-many relationship (playlist_id, track_id, position, added_by, timestamps)
 
 **Migrations**:
 - `001_initial_schema.sql` - User profiles table with basic fields
-- `002_spotify_oauth.sql` - Spotify OAuth token storage in user_profiles
+- `002_spotify_oauth.sql` - (Deprecated) Previous Spotify OAuth integration
 - `003_playlist_persistence.sql` - Playlists, tracks, and playlist_tracks tables
+- `004_remove_spotify.sql` - Remove all Spotify columns from user_profiles
+- `005_rename_spotify_uri_to_track_uri.sql` - Rename spotify_uri to track_uri for universal support
 
 **Create new migration**:
 ```bash
@@ -459,118 +451,26 @@ The collection auto-saves JWT tokens after login/register.
 - **CORS**: Configured for development origins only
 - **Secrets**: Never commit `.env` files (in `.gitignore`)
 
-## Spotify Integration
+## Music Integration
 
-Music Room integrates with Spotify via OAuth 2.0 for music search and playlist management.
+Music Room uses a universal `trackUri` field to support multiple music services.
 
-### Backend Feature Structure
+### Planned: SoundCloud Integration
 
-```
-backend/src/features/spotify/
-├── spotify.types.ts          # TypeScript types (DTOs, Spotify API types)
-├── spotify.validators.ts     # Zod validation schemas
-├── spotify.service.ts        # OAuth logic, token management, Spotify API
-├── spotify.controller.ts     # Express request handlers
-├── spotify.routes.ts         # API routes
-└── index.ts                  # Public exports
-```
+SoundCloud integration is planned to replace the previous Spotify integration. Implementation details are available in `doc/SOUNDCLOUD_MIGRATION_PLAN.md`.
 
-### API Endpoints
+**Key Features (Planned)**:
+- Public API search (no OAuth required)
+- Direct track streaming
+- Simple architecture with single search endpoint
+- Support for AAC HLS audio format
 
-```bash
-GET  /api/spotify/auth/initiate     # Start OAuth flow (requires auth)
-GET  /api/spotify/auth/callback     # OAuth callback (redirects to deep link)
-POST /api/spotify/auth/exchange     # Exchange code for tokens
-GET  /api/spotify/auth/status       # Get connection status (requires auth)
-POST /api/spotify/auth/disconnect   # Disconnect Spotify (requires auth)
-GET  /api/spotify/search            # Search Spotify catalog (requires auth)
-```
+**Database Schema**:
+- `tracks` table stores universal track URIs in `track_uri` column
+- Supports any music service (SoundCloud, YouTube Music, etc.)
+- Migrations `004_remove_spotify.sql` and `005_rename_spotify_uri_to_track_uri.sql` prepared the database
 
-### Mobile Implementation
-
-**Screens**:
-- `SpotifyConnectScreen` - Optional connection flow with skip button
-- `SpotifySettingsScreen` - Connection status and disconnect
-
-**Store**: `spotifyStore.ts` (Zustand)
-- OAuth flow with `expo-web-browser`
-- Deep linking callback: `musicroom://auth/spotify/callback`
-- Automatic token refresh before expiry
-- Syncs connection status with `authStore`
-
-**Navigation**:
-- Accessible from Profile screen (tap Spotify row)
-- Routes to SpotifyConnect if not connected, SpotifySettings if connected
-
-### OAuth Flow
-
-1. User taps "Connect Spotify" → opens browser with Spotify auth URL
-2. User authorizes → Spotify redirects to backend `/api/spotify/auth/callback`
-3. Backend exchanges code for tokens → saves to database → redirects to `musicroom://auth/spotify/callback?success=true`
-4. Mobile app catches deep link → exchanges code with backend → updates UI
-
-### Configuration
-
-**Backend `.env`**:
-```bash
-SPOTIFY_CLIENT_ID=your_spotify_client_id
-SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
-
-# Redirect URI (auto-configured - optional override)
-# Tunnel mode: https://<tunnel>/api/spotify/auth/callback (automatic)
-# LAN mode:    http://localhost:3000/api/spotify/auth/callback (automatic)
-# SPOTIFY_REDIRECT_URI=  # Only set for custom URI
-```
-
-**Redirect URI Auto-Configuration**:
-- **Tunnel mode**: Automatically uses tunnel URL from `TUNNEL_URL` environment variable
-- **LAN mode**: Automatically uses `http://localhost:3000/api/spotify/auth/callback`
-- **Manual override**: Set `SPOTIFY_REDIRECT_URI` explicitly to override automatic detection
-- Check `make dev-tunnel` output for the exact URI to add to Spotify Dashboard
-
-**Mobile `.env`**:
-```bash
-EXPO_PUBLIC_SPOTIFY_REDIRECT_URI=musicroom://auth/spotify/callback
-```
-
-**Spotify Dashboard**:
-- Add redirect URI displayed by `make dev-tunnel` (e.g., `https://abc123.ngrok-free.app/api/spotify/auth/callback`)
-- URI is automatically constructed from tunnel URL - no manual `.env` editing needed
-- Note: Tunnel URL changes on each `make dev-tunnel` restart, but backend logs display the current URI
-
-**app.json**:
-- Deep linking configured with scheme `musicroom://`
-- Intent filters for Android, associated domains for iOS
-
-### Database
-
-Migration `002_spotify_oauth.sql` adds to `user_profiles`:
-- `spotify_access_token` - OAuth access token
-- `spotify_refresh_token` - Refresh token (for auto-renewal)
-- `spotify_token_expires_at` - Expiration timestamp
-- `spotify_scopes` - Array of granted permissions
-
-Function `clear_spotify_connection(user_id)` for atomic disconnect.
-
-### Testing Spotify Integration
-
-```bash
-# Start in tunnel mode (required for Spotify OAuth)
-make dev-tunnel
-
-# Copy the Spotify callback URL displayed
-# Add it to Spotify Dashboard → Redirect URIs
-
-# Test flow:
-1. Login to mobile app
-2. Navigate to Profile
-3. Tap "Spotify" row
-4. Tap "Connect Spotify"
-5. Authorize on Spotify
-6. Verify return to app with "Connected" status
-```
-
-See `doc/SPOTIFY_OAUTH.md` for detailed OAuth flow documentation.
+For implementation details, see `doc/SOUNDCLOUD_MIGRATION_PLAN.md`.
 
 ## Current Implementation Status
 
@@ -582,15 +482,11 @@ See `doc/SPOTIFY_OAUTH.md` for detailed OAuth flow documentation.
 - State management with Zustand (auth, playlists)
 - Docker development environment
 
-**Phase 2 - Complete (Spotify OAuth)**:
-- Spotify OAuth integration (deep linking with `musicroom://`)
-- Backend feature: `/api/spotify/*` (OAuth, search, status, disconnect)
-- Database migration: Spotify token storage in `user_profiles`
-- Mobile screens: SpotifyConnectScreen, SpotifySettingsScreen
-- Spotify store: Zustand state management with OAuth flow
-- Automatic token refresh (5 minutes before expiry)
-- CSRF protection with state parameter
-- Optional connection flow (skip allowed)
+**Phase 2 - Removed (Spotify Replaced)**:
+- Previous Spotify OAuth integration removed
+- Database cleaned: Removed all `spotify_*` columns from `user_profiles`
+- Renamed `spotify_uri` to `track_uri` for universal music service support
+- Migration to SoundCloud planned (see `doc/SOUNDCLOUD_MIGRATION_PLAN.md`)
 
 **Phase 3 - Complete (Playlist Persistence)**:
 - Database migration: `003_playlist_persistence.sql` (playlists, tracks, playlist_tracks tables)
@@ -610,17 +506,17 @@ See `doc/SPOTIFY_OAUTH.md` for detailed OAuth flow documentation.
 - Profile tab in bottom navigation
 - Avatar upload and display support
 
-**Phase 5 - In Progress (Spotify Search)**:
-- Spotify search screen with track browsing
-- Add tracks from Spotify directly to playlists
+**Phase 5 - Planned (Music Search)**:
+- SoundCloud integration for track search and streaming
+- Public API access (no OAuth required)
 - Search tab in bottom navigation
-- Components: SpotifyTrackItem, PlaylistSelectorModal
-- Integration with Spotify API via backend
+- Direct track playback
+- See `doc/SOUNDCLOUD_MIGRATION_PLAN.md` for implementation plan
 
 **Planned Features** (see `PLAN.md`):
 - Friends system (add, manage, search friends)
 - Music rooms (collaborative listening spaces)
-- Spotify playback control (SDK integration)
+- Music playback control
 - Real-time sync with Socket.io
 
 ## Common Issues & Solutions

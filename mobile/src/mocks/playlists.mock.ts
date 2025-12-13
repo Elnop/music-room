@@ -194,7 +194,7 @@ export const addTrackToPlaylist = (playlistId: string, track: Track): boolean =>
     return false;
   }
 
-  // Add track to mock tracks collection if it doesn't exist yet (e.g., from Spotify)
+  // Add track to mock tracks collection if it doesn't exist yet
   const trackExists = MOCK_TRACKS.find(t => t.id === track.id);
   if (!trackExists) {
     MOCK_TRACKS.push(track);

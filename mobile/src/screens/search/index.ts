@@ -1,1 +1,1 @@
-export { SpotifySearchScreen } from './SpotifySearchScreen';
+// Search screens will be added here (e.g., SoundCloudSearchScreen)

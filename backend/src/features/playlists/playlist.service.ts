@@ -214,12 +214,12 @@ export class PlaylistService {
       // Check permission
       await this.checkEditPermission(playlistId, userId);
 
-      // Upsert track (insert if not exists, return existing if duplicate spotify_uri)
+      // Upsert track (insert if not exists, return existing if duplicate track_uri)
       const { data: trackData, error: trackError } = await supabaseAdmin
         .from('tracks')
         .upsert(
           {
-            spotify_uri: track.spotifyUri,
+            track_uri: track.trackUri,
             title: track.title,
             artist: track.artist,
             album: track.album,
@@ -227,7 +227,7 @@ export class PlaylistService {
             duration_ms: track.durationMs,
             preview_url: track.previewUrl,
           },
-          { onConflict: 'spotify_uri' }
+          { onConflict: 'track_uri' }
         )
         .select()
         .single();
@@ -503,7 +503,7 @@ export class PlaylistService {
   private formatTrackResponse(row: TrackRow): TrackResponse {
     return {
       id: row.id,
-      spotifyUri: row.spotify_uri,
+      trackUri: row.track_uri,
       title: row.title,
       artist: row.artist,
       album: row.album,

@@ -42,7 +42,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
   const { user } = useAuthStore();
   const { currentPlaylist, isLoading, fetchPlaylistById, removeTrack } = usePlaylistStore();
 
-  // Refresh playlist when screen receives focus (e.g., returning from SpotifySearchScreen)
+  // Refresh playlist when screen receives focus
   // Note: useFocusEffect also triggers on mount, so no separate useEffect needed
   useFocusEffect(
     React.useCallback(() => {

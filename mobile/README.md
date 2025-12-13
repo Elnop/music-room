@@ -44,8 +44,8 @@ EXPO_PUBLIC_WS_URL=ws://localhost:3000
 EXPO_PUBLIC_SUPABASE_URL=
 EXPO_PUBLIC_SUPABASE_ANON_KEY=
 
-# Spotify (Phase ultérieure)
-EXPO_PUBLIC_SPOTIFY_CLIENT_ID=
+# SoundCloud (Phase ultérieure)
+EXPO_PUBLIC_SOUNDCLOUD_CLIENT_ID=
 ```
 
 ## Démarrage
@@ -132,7 +132,7 @@ mobile/
 │   │   ├── friends/      # Liste amis, invitations
 │   │   ├── playlists/    # Playlists collaboratives
 │   │   ├── devices/      # Gestion devices
-│   │   └── spotify/      # Connexion Spotify
+│   │   └── search/       # Music search
 │   ├── components/       # Composants réutilisables
 │   │   ├── common/       # Button, Card, Input...
 │   │   ├── playlist/     # TrackItem, PlaylistCard...
@@ -173,9 +173,9 @@ Alias disponibles : `@components`, `@screens`, `@services`, `@store`, `@hooks`, 
 
 ### Thème
 
-Le projet utilise un thème dark inspiré de Spotify :
+Le projet utilise un thème dark inspiré des applications musicales :
 
-- **Primary**: #1DB954 (Spotify Green)
+- **Primary**: #1DB954 (Music Green)
 - **Background**: #121212 (Pure Black)
 - **Surface**: #282828 (Dark Gray)
 - **Text**: #FFFFFF (White)

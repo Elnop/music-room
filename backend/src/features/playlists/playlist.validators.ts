@@ -32,9 +32,7 @@ export const updatePlaylistSchema = z.object({
 });
 
 export const addTrackSchema = z.object({
-  spotifyUri: z
-    .string()
-    .regex(/^spotify:track:[a-zA-Z0-9]+$/, 'Invalid Spotify track URI'),
+  trackUri: z.string().min(1).max(500), // Universal track URI (SoundCloud permalink, etc.)
   title: z.string().min(1).max(200),
   artist: z.string().min(1).max(200),
   album: z.string().min(1).max(200),

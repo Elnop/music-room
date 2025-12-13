@@ -8,7 +8,6 @@ import { errorHandler } from './shared/middleware/error-handler.js'
 // Import features
 import { authRoutes } from './features/auth/index.js'
 import { profileRoutes } from './features/profile/index.js'
-import { spotifyRoutes } from './features/spotify/index.js'
 import { playlistRoutes } from './features/playlists/index.js'
 
 // Initialize Express app
@@ -104,7 +103,6 @@ app.get('/health', (req, res) => {
 
 app.use('/api/auth', authRoutes)
 app.use('/api/profile', profileRoutes)
-app.use('/api/spotify', spotifyRoutes)
 app.use('/api/playlists', playlistRoutes)
 
 // 404 handler
@@ -139,7 +137,6 @@ httpServer.listen(PORT, () => {
   logger.info(`🏥 Health: http://localhost:${PORT}/health`)
   logger.info(`🔐 Auth API: http://localhost:${PORT}/api/auth`)
   logger.info(`👤 Profile API: http://localhost:${PORT}/api/profile`)
-  logger.info(`🎵 Spotify API: http://localhost:${PORT}/api/spotify`)
   logger.info(`📝 Playlist API: http://localhost:${PORT}/api/playlists`)
   logger.info(`🌍 Environment: ${env.NODE_ENV}`)
 })

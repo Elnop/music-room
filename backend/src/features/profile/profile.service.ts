@@ -52,7 +52,6 @@ export class ProfileService {
         displayName: profileData.display_name,
         avatarUrl: profileData.avatar_url,
         bio: profileData.bio,
-        spotifyConnected: profileData.spotify_connected,
         createdAt: profileData.created_at,
         updatedAt: profileData.updated_at,
       }
@@ -97,7 +96,6 @@ export class ProfileService {
         displayName: profileData.display_name,
         avatarUrl: profileData.avatar_url,
         bio: profileData.bio,
-        spotifyConnected: profileData.spotify_connected,
         createdAt: profileData.created_at,
         updatedAt: profileData.updated_at,
       }

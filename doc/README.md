@@ -4,7 +4,7 @@ A collaborative music listening platform where friends can share and control mus
 
 ## Overview
 
-Music Room is a mobile-first application that allows users to create collaborative music playlists with their friends. The platform integrates with Spotify to provide music streaming capabilities and features real-time synchronization using Socket.io for a seamless shared listening experience.
+Music Room is a mobile-first application that allows users to create collaborative music playlists with their friends. The platform integrates with music streaming services to provide music playback capabilities and features real-time synchronization using Socket.io for a seamless shared listening experience.
 
 ## Project Structure
 
@@ -277,7 +277,7 @@ make dev
 ### Planned Features
 - **Friends System**: Add, manage, and interact with friends
 - **Playlist Collaboration**: Create and share collaborative playlists
-- **Spotify Integration**: Stream music and sync playback
+- **Music Search**: Browse and search music catalog (SoundCloud planned)
 - **Real-time Sync**: Synchronized listening across devices
 - **Device Control**: Delegate playback control to friends
 - **Music Discovery**: Recommendations and shared listening stats

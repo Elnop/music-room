@@ -12,8 +12,6 @@ import {
   SearchTracksScreen,
 } from '../screens/playlists';
 import { ProfileScreen, EditProfileScreen } from '../screens/profile';
-import { SpotifyConnectScreen, SpotifySettingsScreen } from '../screens/spotify';
-import { SpotifySearchScreen } from '../screens/search';
 import { SettingsScreen } from '../screens/settings';
 
 export type AppTabsParamList = {
@@ -33,13 +31,11 @@ export type PlaylistStackParamList = {
 export type ProfileStackParamList = {
   Profile: undefined;
   EditProfile: undefined;
-  SpotifyConnect: undefined;
-  SpotifySettings: undefined;
   Settings: undefined;
 };
 
 export type SearchStackParamList = {
-  SpotifySearch: undefined;
+  Search: undefined;
 };
 
 const Tab = createBottomTabNavigator<AppTabsParamList>();
@@ -133,16 +129,6 @@ function ProfileNavigator() {
         options={{ title: 'Edit Profile' }}
       />
       <ProfileStack.Screen
-        name="SpotifyConnect"
-        component={SpotifyConnectScreen}
-        options={{ title: 'Connect Spotify' }}
-      />
-      <ProfileStack.Screen
-        name="SpotifySettings"
-        component={SpotifySettingsScreen}
-        options={{ title: 'Spotify Settings' }}
-      />
-      <ProfileStack.Screen
         name="Settings"
         component={SettingsScreen}
         options={{ title: 'Paramètres' }}
@@ -153,30 +139,7 @@ function ProfileNavigator() {
 
 // Search Stack Navigator
 function SearchNavigator() {
-  const { theme } = useTheme();
-
-  return (
-    <SearchStack.Navigator
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: theme.colors.background,
-          borderBottomWidth: theme.borders.medium,
-          borderBottomColor: theme.colors.border,
-        },
-        headerTintColor: theme.colors.text,
-        headerShadowVisible: false,
-        headerTitleStyle: {
-          fontWeight: theme.typography.weights.bold,
-        },
-      }}
-    >
-      <SearchStack.Screen
-        name="SpotifySearch"
-        component={SpotifySearchScreen}
-        options={{ headerShown: false }}
-      />
-    </SearchStack.Navigator>
-  );
+  return <PlaceholderScreen title="Search" />;
 }
 
 export function AppNavigator() {

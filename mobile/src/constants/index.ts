@@ -11,11 +11,6 @@ export const SUPABASE_CONFIG = {
   ANON_KEY: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '',
 } as const;
 
-// Spotify Configuration
-export const SPOTIFY_CONFIG = {
-  CLIENT_ID: process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID || '',
-} as const;
-
 // App Configuration
 export const APP_CONFIG = {
   NAME: 'Music Room',
@@ -23,9 +18,9 @@ export const APP_CONFIG = {
   BUILD_NUMBER: 1,
 } as const;
 
-// Theme Colors (Spotify-inspired dark theme)
+// Theme Colors (Music-inspired dark theme)
 export const COLORS = {
-  primary: '#1DB954', // Spotify Green
+  primary: '#1DB954', // Music Green
   secondary: '#191414', // Near Black
   background: '#121212', // Pure Black
   surface: '#282828', // Dark Gray

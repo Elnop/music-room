@@ -473,13 +473,6 @@ dev-tunnel: ## Start all services in tunnel mode (different WiFi networks)
 	@echo "$(YELLOW)→ Backend tunnel URL:$(NC)"
 	@$(DOCKER_COMPOSE) exec -T backend cat /tmp/backend-tunnel-url.txt 2>/dev/null || echo "   $(YELLOW)Initializing...$(NC)"
 	@echo ""
-	@echo "$(BLUE)🎵 Spotify OAuth Callback URL (add to Spotify Dashboard):$(NC)"
-	@BACKEND_URL=$$($(DOCKER_COMPOSE) exec -T backend cat /tmp/backend-tunnel-url.txt 2>/dev/null | tr -d '\n\r'); \
-	if [ -n "$$BACKEND_URL" ]; then \
-		echo "   $(GREEN)$$BACKEND_URL/api/spotify/auth/callback$(NC)"; \
-	else \
-		echo "   $(YELLOW)Waiting for tunnel to initialize...$(NC)"; \
-	fi
 	@echo ""
 	@echo "$(BLUE)🔍 ngrok Web Interface:$(NC)"
 	@echo "   $(GREEN)✓$(NC) Backend ngrok:   http://localhost:4040"
@@ -513,13 +506,6 @@ qr-tunnel: ## Show tunnel QR code and URLs
 	@echo "$(BLUE)🌐 Backend Tunnel URL:$(NC)"
 	@$(DOCKER_COMPOSE) exec -T backend cat /tmp/backend-tunnel-url.txt 2>/dev/null || echo "   $(RED)✗ Backend tunnel not available$(NC)"
 	@echo ""
-	@echo "$(BLUE)🎵 Spotify OAuth Callback URL (add to Spotify Dashboard):$(NC)"
-	@BACKEND_URL=$$($(DOCKER_COMPOSE) exec -T backend cat /tmp/backend-tunnel-url.txt 2>/dev/null | tr -d '\n\r'); \
-	if [ -n "$$BACKEND_URL" ]; then \
-		echo "   $(GREEN)$$BACKEND_URL/api/spotify/auth/callback$(NC)"; \
-	else \
-		echo "   $(RED)✗ Backend tunnel not available$(NC)"; \
-	fi
 	@echo ""
 	@echo "$(BLUE)🔍 ngrok Web Interface:$(NC)"
 	@echo "   http://localhost:4040 (view tunnel traffic, connections)"
