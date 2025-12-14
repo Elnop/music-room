@@ -222,6 +222,7 @@ backend/src/
 - `/api/auth/*` - Authentication endpoints (register, login, me, refresh, logout)
 - `/api/profile/*` - Profile management endpoints (get, update profile)
 - `/api/playlists/*` - Playlist CRUD and track management endpoints (create, read, update, delete playlists, add/remove/reorder tracks, manage collaborators)
+- `/api/soundcloud/*` - SoundCloud music search and streaming endpoints (search, track details, stream URLs)
 
 ### Mobile: Component + Feature Architecture
 
@@ -232,17 +233,20 @@ mobile/src/
 │   ├── playlists/       # PlaylistsScreen, CreatePlaylistScreen, PlaylistDetailScreen, SearchTracksScreen
 │   ├── profile/         # ProfileScreen, EditProfileScreen
 │   ├── settings/        # SettingsScreen
-│   └── search/          # Future: Music search screens
+│   └── search/          # SoundCloudSearchScreen, SoundCloudTrackItem, PlaylistSelectorModal
 ├── components/
 │   ├── common/          # Reusable UI (Button, Card, Input, LoadingSpinner, Avatar, etc.)
-│   └── playlist/        # Feature-specific (TrackItem, PlaylistCard, PlaylistHeader, AddTrackButton)
+│   ├── playlist/        # Feature-specific (TrackItem, PlaylistCard, PlaylistHeader, AddTrackButton)
+│   └── player/          # MiniPlayer, PlayerModal
 ├── navigation/
 │   ├── RootNavigator.tsx    # Main navigator (switches Auth/App based on auth state)
 │   ├── AuthNavigator.tsx    # Stack for unauthenticated users
 │   └── AppNavigator.tsx     # Bottom tabs for authenticated users
 ├── store/               # Zustand state management
 │   ├── authStore.ts    # Authentication state (user, tokens, login/logout)
-│   └── playlistStore.ts # Playlist state with API integration
+│   ├── playlistStore.ts # Playlist state with API integration
+│   ├── soundcloudStore.ts # SoundCloud search state
+│   └── playerStore.ts  # Audio player state
 ├── api/                 # API client layer
 │   └── playlistApi.ts  # Playlist API calls
 ├── services/            # Service layer
@@ -387,6 +391,76 @@ make restart
 ```
 
 **Why this works**: The chmod commands make files readable by all users (including Docker's non-root `node` user), while keeping write permissions restricted to the owner. Shell scripts need execute permissions (+x) to run. Git tracks execute permissions, so the fix persists across commits.
+
+## Music Integration - SoundCloud
+
+Music Room uses **SoundCloud** for music search and streaming via the `soundcloud.ts` npm package.
+
+### Key Features
+
+**Backend** (`/api/soundcloud/*`):
+- **Search Tracks**: `GET /api/soundcloud/search?q=query&limit=20`
+- **Get Track Details**: `GET /api/soundcloud/track/:urlOrId`
+- **Get Stream URL**: `GET /api/soundcloud/stream/:trackUrl` (returns AAC HLS stream URL)
+
+**Mobile**:
+- **Search Screen**: SoundCloudSearchScreen with debounced search (500ms)
+- **Track Items**: Display artwork, title, artist, duration
+- **Add to Playlist**: Modal to select playlist and add SoundCloud track
+- **Mini Player**: Persistent player at bottom of screen (above tab bar)
+- **Full Player Modal**: Complete player with controls, progress slider, artwork
+
+### Implementation Details
+
+**soundcloud.ts package**:
+- Automatically extracts `client_id` from SoundCloud website (no manual API registration needed)
+- Provides TypeScript wrapper for SoundCloud API
+- Handles track search, metadata, and stream URL retrieval
+
+**Backend Service** (`soundcloud.service.ts`):
+- In-memory cache (Map) for search results (1h TTL) and stream URLs (30min TTL)
+- Filters for playable/streamable tracks only
+- Converts SoundCloud tracks to internal Track format (`trackUri` = `permalink_url`)
+
+**Mobile Audio** (`expo-audio`):
+- Hook: `useSoundCloudPlayer(track)` fetches stream URL and manages playback
+- Supports play/pause, seek, skip ±10s
+- Progress tracking with slider
+- Auto-plays when stream loads
+
+**State Management**:
+- `soundcloudStore`: Search results, loading, errors
+- `playerStore`: Current track, play state, modal state
+
+### Usage Flow
+
+1. User searches for music in Search tab → `soundcloudStore.search(query)`
+2. Backend queries SoundCloud API via `soundcloud.ts`
+3. Results displayed in `SoundCloudSearchScreen`
+4. User taps play → `playerStore.playTrack(track)` → mini-player appears
+5. Hook `useSoundCloudPlayer` fetches stream URL from backend
+6. expo-audio plays HLS AAC stream
+7. User can expand to full player modal or add track to playlist
+
+### API Routes (Public - No Auth Required)
+
+```bash
+# Search
+curl "http://localhost:3000/api/soundcloud/search?q=lofi&limit=10"
+
+# Get Track
+curl "http://localhost:3000/api/soundcloud/track/user/song-name"
+
+# Get Stream URL (URL-encoded)
+curl "http://localhost:3000/api/soundcloud/stream/https%3A%2F%2Fsoundcloud.com%2Fuser%2Fsong"
+```
+
+### Track Storage
+
+When adding SoundCloud track to playlist:
+- `track_uri` = `permalink_url` (e.g., `https://soundcloud.com/artist/track`)
+- `title`, `artist`, `album_art`, `duration_ms` stored in `tracks` table
+- Stream URL fetched on-demand (not stored, as it expires)
 
 ## Git Workflow
 

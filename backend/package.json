@@ -11,16 +11,23 @@
     "start": "node dist/server.js",
     "type-check": "tsc --noEmit"
   },
-  "keywords": ["music", "room", "supabase", "socket.io", "express"],
+  "keywords": [
+    "music",
+    "room",
+    "supabase",
+    "socket.io",
+    "express"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
     "@supabase/supabase-js": "^2.50.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "socket.io": "^4.8.1",
-    "zod": "^3.24.1",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.7"
+    "soundcloud.ts": "^0.7.1",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

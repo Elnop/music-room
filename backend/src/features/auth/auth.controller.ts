@@ -49,8 +49,22 @@ export class AuthController {
    */
   async login(req: Request, res: Response, next: NextFunction) {
     try {
+      logger.info('🔵 Login request received', {
+        email: req.body?.email,
+        hasPassword: !!req.body?.password,
+        contentType: req.headers['content-type'],
+        origin: req.headers['origin']
+      })
+
       const validated = loginSchema.parse(req.body)
+      logger.info('🔵 Login validation passed', { email: validated.email })
+
       const result = await authService.login(validated)
+      logger.info('🔵 Login successful', {
+        userId: result.user.id,
+        email: result.user.email,
+        hasAccessToken: !!result.session.accessToken
+      })
 
       const response: ApiResponse = {
         success: true,
@@ -62,6 +76,11 @@ export class AuthController {
 
       res.json(response)
     } catch (error) {
+      logger.error('🔴 Login error', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        email: req.body?.email
+      })
       next(error)
     }
   }

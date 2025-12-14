@@ -1,1 +1,3 @@
-// Search screens will be added here (e.g., SoundCloudSearchScreen)
+export { SoundCloudSearchScreen } from './SoundCloudSearchScreen';
+export { SoundCloudTrackItem } from './components/SoundCloudTrackItem';
+export { PlaylistSelectorModal } from './components/PlaylistSelectorModal';

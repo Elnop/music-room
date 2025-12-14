@@ -79,23 +79,39 @@ export class AuthService {
    */
   async login(data: LoginDTO): Promise<AuthResponse> {
     try {
-      logger.info('User login attempt', { email: data.email })
+      logger.info('🟢 User login attempt', { email: data.email })
 
+      logger.debug('🟢 Calling Supabase signInWithPassword', { email: data.email })
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
       })
 
       if (authError) {
-        logger.warn('Login failed', { email: data.email, error: authError.message })
+        logger.warn('🟡 Login failed - Supabase auth error', {
+          email: data.email,
+          error: authError.message,
+          errorCode: authError.status
+        })
         throw new AppError(401, 'Invalid email or password', 'INVALID_CREDENTIALS')
       }
 
       if (!authData.user || !authData.session) {
+        logger.error('🔴 Login failed - No user or session returned', {
+          hasUser: !!authData.user,
+          hasSession: !!authData.session
+        })
         throw new AppError(401, 'Invalid email or password', 'INVALID_CREDENTIALS')
       }
 
+      logger.debug('🟢 Supabase auth successful', {
+        userId: authData.user.id,
+        email: authData.user.email,
+        hasSession: !!authData.session
+      })
+
       // Fetch user profile
+      logger.debug('🟢 Fetching user profile from database', { userId: authData.user.id })
       const { data: profile, error: profileError } = await supabase
         .from('user_profiles')
         .select('username, display_name, avatar_url, bio, created_at, updated_at')
@@ -103,11 +119,24 @@ export class AuthService {
         .single()
 
       if (profileError || !profile) {
-        logger.error('Failed to fetch user profile', { userId: authData.user.id, error: profileError })
+        logger.error('🔴 Failed to fetch user profile', {
+          userId: authData.user.id,
+          error: profileError,
+          profileExists: !!profile
+        })
         throw new AppError(500, 'Failed to fetch user profile', 'PROFILE_ERROR')
       }
 
-      logger.info('User logged in successfully', { userId: authData.user.id })
+      logger.debug('🟢 User profile fetched', {
+        userId: authData.user.id,
+        username: profile.username
+      })
+
+      logger.info('🟢 User logged in successfully', {
+        userId: authData.user.id,
+        email: authData.user.email,
+        username: profile.username
+      })
 
       return this.formatAuthResponse(
         authData.user,
@@ -121,7 +150,10 @@ export class AuthService {
       )
     } catch (error) {
       if (error instanceof AppError) throw error
-      logger.error('Unexpected error during login', { error })
+      logger.error('🔴 Unexpected error during login', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined
+      })
       throw new AppError(500, 'Login failed', 'LOGIN_ERROR')
     }
   }

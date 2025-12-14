@@ -13,6 +13,8 @@ import {
 } from '../screens/playlists';
 import { ProfileScreen, EditProfileScreen } from '../screens/profile';
 import { SettingsScreen } from '../screens/settings';
+import { SoundCloudSearchScreen } from '../screens/search/SoundCloudSearchScreen';
+import { MiniPlayer, PlayerModal } from '../components/player';
 
 export type AppTabsParamList = {
   PlaylistsTab: undefined;
@@ -139,30 +141,11 @@ function ProfileNavigator() {
 
 // Search Stack Navigator
 function SearchNavigator() {
-  return <PlaceholderScreen title="Search" />;
-}
-
-export function AppNavigator() {
   const { theme } = useTheme();
-  const insets = useSafeAreaInsets();
 
   return (
-    <Tab.Navigator
+    <SearchStack.Navigator
       screenOptions={{
-        tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: theme.colors.textSecondary,
-        tabBarStyle: {
-          backgroundColor: theme.colors.surface,
-          borderTopWidth: theme.borders.thick, // 3px bordure top
-          borderTopColor: theme.colors.border, // Noir
-          height: 60 + insets.bottom,
-          paddingBottom: insets.bottom + 8,
-          paddingTop: 8,
-        },
-        tabBarLabelStyle: {
-          fontWeight: theme.typography.weights.semibold,
-          fontSize: theme.typography.sizes.xs,
-        },
         headerStyle: {
           backgroundColor: theme.colors.background,
           borderBottomWidth: theme.borders.medium,
@@ -175,6 +158,49 @@ export function AppNavigator() {
         },
       }}
     >
+      <SearchStack.Screen
+        name="Search"
+        component={SoundCloudSearchScreen}
+        options={{ headerShown: false }}
+      />
+    </SearchStack.Navigator>
+  );
+}
+
+export function AppNavigator() {
+  const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
+
+  return (
+    <View style={{ flex: 1 }}>
+      <Tab.Navigator
+        screenOptions={{
+          tabBarActiveTintColor: theme.colors.primary,
+          tabBarInactiveTintColor: theme.colors.textSecondary,
+          tabBarStyle: {
+            backgroundColor: theme.colors.surface,
+            borderTopWidth: theme.borders.thick, // 3px bordure top
+            borderTopColor: theme.colors.border, // Noir
+            height: 60 + insets.bottom,
+            paddingBottom: insets.bottom + 8,
+            paddingTop: 8,
+          },
+          tabBarLabelStyle: {
+            fontWeight: theme.typography.weights.semibold,
+            fontSize: theme.typography.sizes.xs,
+          },
+          headerStyle: {
+            backgroundColor: theme.colors.background,
+            borderBottomWidth: theme.borders.medium,
+            borderBottomColor: theme.colors.border,
+          },
+          headerTintColor: theme.colors.text,
+          headerShadowVisible: false,
+          headerTitleStyle: {
+            fontWeight: theme.typography.weights.bold,
+          },
+        }}
+      >
       <Tab.Screen
         name="PlaylistsTab"
         component={PlaylistsNavigator}
@@ -215,6 +241,13 @@ export function AppNavigator() {
         }}
       />
     </Tab.Navigator>
+
+    {/* Mini Player - appears above tab bar */}
+    <MiniPlayer />
+
+    {/* Full Player Modal */}
+    <PlayerModal />
+  </View>
   );
 }
 
