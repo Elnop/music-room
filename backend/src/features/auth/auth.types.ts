@@ -3,20 +3,20 @@
  */
 
 export interface RegisterDTO {
-  email: string
-  password: string
-  username: string
-  displayName?: string
+  email: string;
+  password: string;
+  username: string;
+  displayName?: string;
 }
 
 export interface LoginDTO {
-  email: string
-  password: string
+  email: string;
+  password: string;
 }
 
 export interface OAuthCallbackDTO {
-  code: string
-  state?: string
+  code: string;
+  state?: string;
 }
 
 /**
@@ -24,35 +24,35 @@ export interface OAuthCallbackDTO {
  */
 
 export interface UserProfile {
-  id: string
-  email: string
-  username: string
-  displayName?: string
-  avatarUrl?: string
-  bio?: string
-  createdAt: string
-  updatedAt: string
+  id: string;
+  email: string;
+  username: string;
+  displayName?: string;
+  avatarUrl?: string;
+  bio?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface AuthResponse {
-  user: UserProfile
+  user: UserProfile;
   session: {
-    accessToken: string
-    refreshToken: string
-    expiresIn: number
-    expiresAt: number
-  }
+    accessToken: string;
+    refreshToken: string;
+    expiresIn: number;
+    expiresAt: number;
+  };
 }
 
 export interface RefreshTokenDTO {
-  refreshToken: string
+  refreshToken: string;
 }
 
 /**
  * Supabase Auth User (minimal type for type safety)
  */
 export interface SupabaseUser {
-  id: string
-  email: string
-  role?: string
+  id: string;
+  email: string;
+  role?: string;
 }

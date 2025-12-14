@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Playlist validation schemas using Zod
@@ -7,28 +7,30 @@ import { z } from 'zod';
 export const createPlaylistSchema = z.object({
   name: z
     .string()
-    .min(1, 'Playlist name is required')
-    .max(100, 'Playlist name must be at most 100 characters'),
+    .min(1, "Playlist name is required")
+    .max(100, "Playlist name must be at most 100 characters"),
   description: z
     .string()
-    .max(500, 'Description must be at most 500 characters')
+    .max(500, "Description must be at most 500 characters")
     .optional(),
-  visibility: z.enum(['public', 'private'], {
-    errorMap: () => ({ message: 'Visibility must be either public or private' }),
+  visibility: z.enum(["public", "private"], {
+    errorMap: () => ({
+      message: "Visibility must be either public or private",
+    }),
   }),
 });
 
 export const updatePlaylistSchema = z.object({
   name: z
     .string()
-    .min(1, 'Playlist name cannot be empty')
-    .max(100, 'Playlist name must be at most 100 characters')
+    .min(1, "Playlist name cannot be empty")
+    .max(100, "Playlist name must be at most 100 characters")
     .optional(),
   description: z
     .string()
-    .max(500, 'Description must be at most 500 characters')
+    .max(500, "Description must be at most 500 characters")
     .optional(),
-  visibility: z.enum(['public', 'private']).optional(),
+  visibility: z.enum(["public", "private"]).optional(),
 });
 
 export const addTrackSchema = z.object({
@@ -40,28 +42,30 @@ export const addTrackSchema = z.object({
     .string()
     .max(200)
     .optional()
-    .transform((val) => (val === '' ? undefined : val)),
+    .transform((val) => (val === "" ? undefined : val)),
   // Accept empty string or valid URL, transform empty string to undefined
   albumArt: z
     .string()
     .optional()
-    .transform((val) => (val === '' ? undefined : val))
+    .transform((val) => (val === "" ? undefined : val))
     .pipe(z.string().url().optional()),
   durationMs: z.number().int().positive(),
   // Accept empty string or valid URL, transform empty string to undefined
   previewUrl: z
     .string()
     .optional()
-    .transform((val) => (val === '' ? undefined : val))
+    .transform((val) => (val === "" ? undefined : val))
     .pipe(z.string().url().optional()),
 });
 
 export const reorderTracksSchema = z.object({
-  trackIds: z.array(z.string().uuid()).min(1, 'Track IDs array cannot be empty'),
+  trackIds: z
+    .array(z.string().uuid())
+    .min(1, "Track IDs array cannot be empty"),
 });
 
 export const addCollaboratorSchema = z.object({
-  userId: z.string().uuid('Invalid user ID format'),
+  userId: z.string().uuid("Invalid user ID format"),
 });
 
 export type CreatePlaylistInput = z.infer<typeof createPlaylistSchema>;

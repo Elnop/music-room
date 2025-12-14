@@ -1,4 +1,4 @@
-.PHONY: help install dev start stop restart logs logs-backend logs-mobile qr ps build build-backend build-mobile test test-backend lint format fix-permissions clean clean-docker clean-deps clean-all shell-backend shell-mobile deploy health dev-tunnel qr-tunnel tunnel-info
+.PHONY: help install dev start stop restart logs logs-backend logs-mobile qr ps build build-backend build-mobile test test-backend lint lint-fix format fix-permissions clean clean-docker clean-deps clean-all shell-backend shell-mobile deploy health dev-tunnel qr-tunnel tunnel-info
 
 # Colors for output
 BLUE := \033[0;34m
@@ -241,6 +241,18 @@ format: ## Format all code with prettier
 	@echo "$(YELLOW)→ Formatting mobile...$(NC)"
 	@cd mobile && npm run format || echo "$(YELLOW)⚠️  Mobile formatting not configured$(NC)"
 	@echo "$(GREEN)✓ Formatting complete$(NC)"
+
+lint-fix: ## Auto-fix linting issues in all code
+	@echo "$(BLUE)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(BLUE)║                Auto-fixing Lint Issues                       ║$(NC)"
+	@echo "$(BLUE)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Auto-fixing backend linting issues...$(NC)"
+	@cd backend && npm run lint:fix || echo "$(YELLOW)⚠️  Backend lint:fix failed$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Auto-fixing mobile linting issues...$(NC)"
+	@cd mobile && npm run lint:fix || echo "$(YELLOW)⚠️  Mobile lint:fix failed$(NC)"
+	@echo "$(GREEN)✓ Lint auto-fix complete$(NC)"
 
 fix-permissions: ## Fix file permissions for Docker non-root user compatibility
 	@echo "$(BLUE)╔══════════════════════════════════════════════════════════════╗$(NC)"

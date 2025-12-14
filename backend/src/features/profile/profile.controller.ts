@@ -1,10 +1,10 @@
-import type { Request, Response, NextFunction } from 'express'
-import { ProfileService } from './profile.service.js'
-import { updateProfileSchema } from './profile.validators.js'
-import type { AuthenticatedRequest } from '@/shared/types/global.types.js'
-import type { ApiResponse } from '@/shared/types/global.types.js'
+import type { Request, Response, NextFunction } from "express";
+import { ProfileService } from "./profile.service.js";
+import { updateProfileSchema } from "./profile.validators.js";
+import type { AuthenticatedRequest } from "@/shared/types/global.types.js";
+import type { ApiResponse } from "@/shared/types/global.types.js";
 
-const profileService = new ProfileService()
+const profileService = new ProfileService();
 
 export class ProfileController {
   /**
@@ -13,10 +13,13 @@ export class ProfileController {
    */
   async updateProfile(req: Request, res: Response, next: NextFunction) {
     try {
-      const authReq = req as AuthenticatedRequest
-      const validated = updateProfileSchema.parse(req.body)
+      const authReq = req as AuthenticatedRequest;
+      const validated = updateProfileSchema.parse(req.body);
 
-      const profile = await profileService.updateProfile(authReq.user.id, validated)
+      const profile = await profileService.updateProfile(
+        authReq.user.id,
+        validated,
+      );
 
       const response: ApiResponse = {
         success: true,
@@ -24,11 +27,11 @@ export class ProfileController {
         meta: {
           timestamp: new Date().toISOString(),
         },
-      }
+      };
 
-      res.status(200).json(response)
+      res.status(200).json(response);
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
@@ -38,9 +41,9 @@ export class ProfileController {
    */
   async getProfile(req: Request, res: Response, next: NextFunction) {
     try {
-      const { userId } = req.params
+      const { userId } = req.params;
 
-      const profile = await profileService.getProfile(userId)
+      const profile = await profileService.getProfile(userId);
 
       const response: ApiResponse = {
         success: true,
@@ -48,11 +51,11 @@ export class ProfileController {
         meta: {
           timestamp: new Date().toISOString(),
         },
-      }
+      };
 
-      res.status(200).json(response)
+      res.status(200).json(response);
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
@@ -62,9 +65,9 @@ export class ProfileController {
    */
   async getOwnProfile(req: Request, res: Response, next: NextFunction) {
     try {
-      const authReq = req as AuthenticatedRequest
+      const authReq = req as AuthenticatedRequest;
 
-      const profile = await profileService.getProfile(authReq.user.id)
+      const profile = await profileService.getProfile(authReq.user.id);
 
       const response: ApiResponse = {
         success: true,
@@ -72,11 +75,11 @@ export class ProfileController {
         meta: {
           timestamp: new Date().toISOString(),
         },
-      }
+      };
 
-      res.status(200).json(response)
+      res.status(200).json(response);
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 }

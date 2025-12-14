@@ -10,7 +10,7 @@ export interface PlaylistRow {
   cover_url?: string;
   owner_id: string;
   collaborator_ids: string[];
-  visibility: 'public' | 'private';
+  visibility: "public" | "private";
   created_at: string;
   updated_at: string;
 }
@@ -41,13 +41,13 @@ export interface PlaylistTrackRow {
 export interface CreatePlaylistDTO {
   name: string;
   description?: string;
-  visibility: 'public' | 'private';
+  visibility: "public" | "private";
 }
 
 export interface UpdatePlaylistDTO {
   name?: string;
   description?: string;
-  visibility?: 'public' | 'private';
+  visibility?: "public" | "private";
 }
 
 export interface AddTrackDTO {
@@ -89,7 +89,7 @@ export interface PlaylistResponse {
   coverUrl?: string;
   ownerId: string;
   collaboratorIds: string[];
-  visibility: 'public' | 'private';
+  visibility: "public" | "private";
   trackCount: number;
   createdAt: string;
   updatedAt: string;

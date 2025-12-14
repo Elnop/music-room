@@ -1,14 +1,17 @@
-import type { Request, Response, NextFunction } from 'express';
-import { PlaylistService } from './playlist.service.js';
+import type { Request, Response, NextFunction } from "express";
+import { PlaylistService } from "./playlist.service.js";
 import {
   createPlaylistSchema,
   updatePlaylistSchema,
   addTrackSchema,
   reorderTracksSchema,
   addCollaboratorSchema,
-} from './playlist.validators.js';
-import type { ApiResponse, AuthenticatedRequest } from '@/shared/types/global.types.js';
-import { logger } from '@/shared/utils/logger.js';
+} from "./playlist.validators.js";
+import type {
+  ApiResponse,
+  AuthenticatedRequest,
+} from "@/shared/types/global.types.js";
+import { logger } from "@/shared/utils/logger.js";
 
 const playlistService = new PlaylistService();
 
@@ -42,7 +45,10 @@ export class PlaylistController {
     try {
       const authReq = req as AuthenticatedRequest;
       const validated = createPlaylistSchema.parse(req.body);
-      const playlist = await playlistService.createPlaylist(authReq.user.id, validated);
+      const playlist = await playlistService.createPlaylist(
+        authReq.user.id,
+        validated,
+      );
 
       const response: ApiResponse = {
         success: true,
@@ -64,7 +70,10 @@ export class PlaylistController {
     try {
       const authReq = req as AuthenticatedRequest;
       const { id } = req.params;
-      const playlist = await playlistService.getPlaylistById(id, authReq.user.id);
+      const playlist = await playlistService.getPlaylistById(
+        id,
+        authReq.user.id,
+      );
 
       const response: ApiResponse = {
         success: true,
@@ -87,7 +96,11 @@ export class PlaylistController {
       const authReq = req as AuthenticatedRequest;
       const { id } = req.params;
       const validated = updatePlaylistSchema.parse(req.body);
-      const playlist = await playlistService.updatePlaylist(id, authReq.user.id, validated);
+      const playlist = await playlistService.updatePlaylist(
+        id,
+        authReq.user.id,
+        validated,
+      );
 
       const response: ApiResponse = {
         success: true,
@@ -113,7 +126,7 @@ export class PlaylistController {
 
       const response: ApiResponse = {
         success: true,
-        data: { message: 'Playlist deleted successfully' },
+        data: { message: "Playlist deleted successfully" },
         meta: { timestamp: new Date().toISOString() },
       };
 
@@ -132,43 +145,43 @@ export class PlaylistController {
       const authReq = req as AuthenticatedRequest;
       const { id } = req.params;
 
-      logger.debug('🎵 [Playlist Controller] Add track request', {
+      logger.debug("🎵 [Playlist Controller] Add track request", {
         playlistId: id,
         userId: authReq.user.id,
         body: {
           ...req.body,
-          albumArt: req.body.albumArt ? 'present' : 'empty/undefined',
-          previewUrl: req.body.previewUrl ? 'present' : 'empty/undefined',
+          albumArt: req.body.albumArt ? "present" : "empty/undefined",
+          previewUrl: req.body.previewUrl ? "present" : "empty/undefined",
         },
       });
 
       const validated = addTrackSchema.parse(req.body);
 
-      logger.debug('🎵 [Playlist Controller] Validation passed', {
+      logger.debug("🎵 [Playlist Controller] Validation passed", {
         validated: {
           ...validated,
-          albumArt: validated.albumArt ? 'present' : 'undefined',
-          previewUrl: validated.previewUrl ? 'present' : 'undefined',
+          albumArt: validated.albumArt ? "present" : "undefined",
+          previewUrl: validated.previewUrl ? "present" : "undefined",
         },
       });
 
       await playlistService.addTrack(id, authReq.user.id, validated);
 
-      logger.info('🟢 [Playlist Controller] Track added successfully', {
+      logger.info("🟢 [Playlist Controller] Track added successfully", {
         playlistId: id,
         trackUri: validated.trackUri,
       });
 
       const response: ApiResponse = {
         success: true,
-        data: { message: 'Track added successfully' },
+        data: { message: "Track added successfully" },
         meta: { timestamp: new Date().toISOString() },
       };
 
       res.status(201).json(response);
     } catch (error) {
-      logger.error('🔴 [Playlist Controller] Error adding track', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+      logger.error("🔴 [Playlist Controller] Error adding track", {
+        error: error instanceof Error ? error.message : "Unknown error",
         playlistId: req.params.id,
         body: req.body,
       });
@@ -188,7 +201,7 @@ export class PlaylistController {
 
       const response: ApiResponse = {
         success: true,
-        data: { message: 'Track removed successfully' },
+        data: { message: "Track removed successfully" },
         meta: { timestamp: new Date().toISOString() },
       };
 
@@ -207,11 +220,15 @@ export class PlaylistController {
       const authReq = req as AuthenticatedRequest;
       const { id } = req.params;
       const validated = reorderTracksSchema.parse(req.body);
-      await playlistService.reorderTracks(id, authReq.user.id, validated.trackIds);
+      await playlistService.reorderTracks(
+        id,
+        authReq.user.id,
+        validated.trackIds,
+      );
 
       const response: ApiResponse = {
         success: true,
-        data: { message: 'Tracks reordered successfully' },
+        data: { message: "Tracks reordered successfully" },
         meta: { timestamp: new Date().toISOString() },
       };
 
@@ -230,11 +247,15 @@ export class PlaylistController {
       const authReq = req as AuthenticatedRequest;
       const { id } = req.params;
       const validated = addCollaboratorSchema.parse(req.body);
-      await playlistService.addCollaborator(id, authReq.user.id, validated.userId);
+      await playlistService.addCollaborator(
+        id,
+        authReq.user.id,
+        validated.userId,
+      );
 
       const response: ApiResponse = {
         success: true,
-        data: { message: 'Collaborator added successfully' },
+        data: { message: "Collaborator added successfully" },
         meta: { timestamp: new Date().toISOString() },
       };
 
@@ -256,7 +277,7 @@ export class PlaylistController {
 
       const response: ApiResponse = {
         success: true,
-        data: { message: 'Collaborator removed successfully' },
+        data: { message: "Collaborator removed successfully" },
         meta: { timestamp: new Date().toISOString() },
       };
 

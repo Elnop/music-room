@@ -5,13 +5,13 @@
  * Other features should import from this file, not from internal modules
  */
 
-export { default as authRoutes } from './auth.routes.js'
-export { authMiddleware, optionalAuthMiddleware } from './auth.middleware.js'
-export { AuthService } from './auth.service.js'
+export { default as authRoutes } from "./auth.routes.js";
+export { authMiddleware, optionalAuthMiddleware } from "./auth.middleware.js";
+export { AuthService } from "./auth.service.js";
 export type {
   RegisterDTO,
   LoginDTO,
   AuthResponse,
   UserProfile,
-  SupabaseUser
-} from './auth.types.js'
+  SupabaseUser,
+} from "./auth.types.js";
