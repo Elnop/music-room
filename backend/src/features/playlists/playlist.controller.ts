@@ -8,6 +8,7 @@ import {
   addCollaboratorSchema,
 } from './playlist.validators.js';
 import type { ApiResponse, AuthenticatedRequest } from '@/shared/types/global.types.js';
+import { logger } from '@/shared/utils/logger.js';
 
 const playlistService = new PlaylistService();
 
@@ -130,8 +131,33 @@ export class PlaylistController {
     try {
       const authReq = req as AuthenticatedRequest;
       const { id } = req.params;
+
+      logger.debug('🎵 [Playlist Controller] Add track request', {
+        playlistId: id,
+        userId: authReq.user.id,
+        body: {
+          ...req.body,
+          albumArt: req.body.albumArt ? 'present' : 'empty/undefined',
+          previewUrl: req.body.previewUrl ? 'present' : 'empty/undefined',
+        },
+      });
+
       const validated = addTrackSchema.parse(req.body);
+
+      logger.debug('🎵 [Playlist Controller] Validation passed', {
+        validated: {
+          ...validated,
+          albumArt: validated.albumArt ? 'present' : 'undefined',
+          previewUrl: validated.previewUrl ? 'present' : 'undefined',
+        },
+      });
+
       await playlistService.addTrack(id, authReq.user.id, validated);
+
+      logger.info('🟢 [Playlist Controller] Track added successfully', {
+        playlistId: id,
+        trackUri: validated.trackUri,
+      });
 
       const response: ApiResponse = {
         success: true,
@@ -141,6 +167,11 @@ export class PlaylistController {
 
       res.status(201).json(response);
     } catch (error) {
+      logger.error('🔴 [Playlist Controller] Error adding track', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        playlistId: req.params.id,
+        body: req.body,
+      });
       next(error);
     }
   }

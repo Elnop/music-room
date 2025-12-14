@@ -36,9 +36,19 @@ export const addTrackSchema = z.object({
   title: z.string().min(1).max(200),
   artist: z.string().min(1).max(200),
   album: z.string().min(1).max(200),
-  albumArt: z.string().url().optional(),
+  // Accept empty string or valid URL, transform empty string to undefined
+  albumArt: z
+    .string()
+    .optional()
+    .transform((val) => (val === '' ? undefined : val))
+    .pipe(z.string().url().optional()),
   durationMs: z.number().int().positive(),
-  previewUrl: z.string().url().optional(),
+  // Accept empty string or valid URL, transform empty string to undefined
+  previewUrl: z
+    .string()
+    .optional()
+    .transform((val) => (val === '' ? undefined : val))
+    .pipe(z.string().url().optional()),
 });
 
 export const reorderTracksSchema = z.object({

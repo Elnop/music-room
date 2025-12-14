@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { useTheme } from '@/contexts';
 import { usePlaylistStore } from '@/store/playlistStore';
@@ -18,27 +19,82 @@ interface Props {
   onClose: () => void;
 }
 
+// Helper to parse structured API errors
+interface ApiError {
+  success: false;
+  error: {
+    message: string;
+    code: string;
+    statusCode: number;
+  };
+}
+
+function parseApiError(error: unknown): string {
+  // Check if it's a structured API error
+  if (error && typeof error === 'object' && 'error' in error) {
+    const apiError = error as ApiError;
+    if (apiError.error?.message) {
+      // Handle specific error codes
+      if (apiError.error.code === 'TRACK_DUPLICATE') {
+        return 'This track is already in the playlist';
+      }
+      if (apiError.error.code === 'FORBIDDEN') {
+        return 'You don\'t have permission to add tracks to this playlist';
+      }
+      return apiError.error.message;
+    }
+  }
+
+  // Fallback to standard Error message
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return 'Failed to add track to playlist';
+}
+
 export function PlaylistSelectorModal({ visible, track, onClose }: Props) {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
   const { playlists, addTrack } = usePlaylistStore();
+  const [isAdding, setIsAdding] = useState(false);
 
   const handleSelectPlaylist = async (playlistId: string) => {
-    if (!track) return;
+    if (!track || isAdding) return;
+
+    console.log('🎵 [PlaylistSelector] Adding track to playlist', {
+      trackId: track.id,
+      trackTitle: track.title,
+      playlistId,
+      hasArtwork: !!track.artwork_url,
+      hasUserAvatar: !!track.user.avatar_url,
+    });
+
+    setIsAdding(true);
 
     try {
       // Convert SoundCloud track to internal format
       const internalTrack = {
+        id: '', // Temporary ID, backend will generate UUID
         title: track.title,
         artist: track.user.username,
         album: track.genre || 'SoundCloud',
-        albumArt: track.artwork_url || track.user.avatar_url || '',
+        // Send undefined instead of empty string for better validation
+        albumArt: track.artwork_url || track.user.avatar_url || undefined,
         durationMs: track.duration,
         trackUri: track.permalink_url,
-        previewUrl: '', // Stream URL fetched separately
+        // Send undefined instead of empty string
+        previewUrl: undefined,
       };
 
-      await addTrack(playlistId, internalTrack);
+      console.log('🎵 [PlaylistSelector] Converted track:', {
+        ...internalTrack,
+        albumArt: internalTrack.albumArt ? 'present' : 'undefined',
+      });
+
+      await addTrack(playlistId, internalTrack as any); // Type assertion needed due to id field
+
+      console.log('🟢 [PlaylistSelector] Track added successfully');
 
       Alert.alert(
         'Success',
@@ -48,11 +104,17 @@ export function PlaylistSelectorModal({ visible, track, onClose }: Props) {
 
       onClose();
     } catch (error) {
+      console.error('🔴 [PlaylistSelector] Error adding track:', error);
+
+      const errorMessage = parseApiError(error);
+
       Alert.alert(
         'Error',
-        error instanceof Error ? error.message : 'Failed to add track to playlist',
+        errorMessage,
         [{ text: 'OK' }]
       );
+    } finally {
+      setIsAdding(false);
     }
   };
 
@@ -88,8 +150,12 @@ export function PlaylistSelectorModal({ visible, track, onClose }: Props) {
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <TouchableOpacity
-                style={styles.playlistItem}
+                style={[
+                  styles.playlistItem,
+                  isAdding && styles.playlistItemDisabled,
+                ]}
                 onPress={() => handleSelectPlaylist(item.id)}
+                disabled={isAdding}
               >
                 <View style={styles.playlistInfo}>
                   <Text style={styles.playlistName}>{item.name}</Text>
@@ -109,7 +175,18 @@ export function PlaylistSelectorModal({ visible, track, onClose }: Props) {
             style={styles.list}
           />
 
-          <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
+          {isAdding && (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="small" color={theme.colors.primary} />
+              <Text style={styles.loadingText}>Adding track...</Text>
+            </View>
+          )}
+
+          <TouchableOpacity
+            style={[styles.cancelButton, isAdding && styles.cancelButtonDisabled]}
+            onPress={onClose}
+            disabled={isAdding}
+          >
             <Text style={styles.cancelButtonText}>Cancel</Text>
           </TouchableOpacity>
         </View>
@@ -177,6 +254,9 @@ const createStyles = (theme: any) =>
       borderBottomWidth: 1,
       borderBottomColor: theme.colors.border,
     },
+    playlistItemDisabled: {
+      opacity: 0.5,
+    },
     playlistInfo: {
       flex: 1,
     },
@@ -207,12 +287,27 @@ const createStyles = (theme: any) =>
       fontSize: 14,
       color: theme.colors.textSecondary,
     },
+    loadingContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: theme.spacing.md,
+      gap: theme.spacing.sm,
+    },
+    loadingText: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      marginLeft: theme.spacing.sm,
+    },
     cancelButton: {
       margin: theme.spacing.lg,
       padding: theme.spacing.md,
       backgroundColor: theme.colors.surface,
       borderRadius: theme.borders.medium,
       alignItems: 'center',
+    },
+    cancelButtonDisabled: {
+      opacity: 0.5,
     },
     cancelButtonText: {
       fontSize: 16,

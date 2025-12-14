@@ -127,6 +127,15 @@ export const playlistApi = {
    */
   async addTrack(playlistId: string, track: Track): Promise<void> {
     const token = await getAuthToken();
+
+    console.log('🎵 [PlaylistApi] Sending add track request', {
+      playlistId,
+      trackUri: track.trackUri,
+      title: track.title,
+      albumArt: track.albumArt ? 'present' : 'undefined',
+      previewUrl: track.previewUrl ? 'present' : 'undefined',
+    });
+
     const response = await fetch(`${API_CONFIG.BASE_URL}/api/playlists/${playlistId}/tracks`, {
       method: 'POST',
       headers: {
@@ -145,9 +154,35 @@ export const playlistApi = {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error?.message || 'Failed to add track');
+      console.error('🔴 [PlaylistApi] Response not OK', {
+        status: response.status,
+        statusText: response.statusText,
+        contentType: response.headers.get('content-type'),
+      });
+
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        try {
+          const error = await response.json();
+          console.error('🔴 [PlaylistApi] JSON error response', error);
+          // Return the structured error for parsing in PlaylistSelectorModal
+          throw error;
+        } catch (parseError) {
+          console.error('🔴 [PlaylistApi] Failed to parse JSON error', parseError);
+          throw new Error('Failed to add track (invalid JSON response)');
+        }
+      } else {
+        // Response is not JSON (likely HTML error page)
+        const text = await response.text();
+        console.error('🔴 [PlaylistApi] Non-JSON response', {
+          responsePreview: text.substring(0, 200),
+        });
+        throw new Error(`Failed to add track (HTTP ${response.status}): ${response.statusText}`);
+      }
     }
+
+    console.log('🟢 [PlaylistApi] Track added successfully');
   },
 
   /**
