@@ -252,7 +252,7 @@ export class SoundCloudService {
     return {
       title: track.title,
       artist: track.user.username,
-      album: track.genre || 'SoundCloud',
+      album: undefined, // SoundCloud tracks don't have albums
       albumArt: track.artwork_url || track.user.avatar_url || '',
       durationMs: track.duration,
       trackUri: track.permalink_url,

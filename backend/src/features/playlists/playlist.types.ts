@@ -20,7 +20,7 @@ export interface TrackRow {
   track_uri: string; // Universal track identifier from any music service
   title: string;
   artist: string;
-  album: string;
+  album?: string; // Optional - not all services have album info
   album_art?: string;
   duration_ms: number;
   preview_url?: string;
@@ -54,7 +54,7 @@ export interface AddTrackDTO {
   trackUri: string; // Universal track identifier from any music service
   title: string;
   artist: string;
-  album: string;
+  album?: string; // Optional - not all services have album info
   albumArt?: string;
   durationMs: number;
   previewUrl?: string;
@@ -74,7 +74,7 @@ export interface TrackResponse {
   trackUri: string; // Universal track identifier from any music service
   title: string;
   artist: string;
-  album: string;
+  album?: string; // Optional - not all services have album info
   albumArt?: string;
   durationMs: number;
   previewUrl?: string;

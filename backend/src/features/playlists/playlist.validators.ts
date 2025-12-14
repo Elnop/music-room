@@ -35,7 +35,12 @@ export const addTrackSchema = z.object({
   trackUri: z.string().min(1).max(500), // Universal track URI (SoundCloud permalink, etc.)
   title: z.string().min(1).max(200),
   artist: z.string().min(1).max(200),
-  album: z.string().min(1).max(200),
+  // Album is optional - SoundCloud and other services may not have album info
+  album: z
+    .string()
+    .max(200)
+    .optional()
+    .transform((val) => (val === '' ? undefined : val)),
   // Accept empty string or valid URL, transform empty string to undefined
   albumArt: z
     .string()

@@ -163,15 +163,18 @@ export const playlistApi = {
       // Check if response is JSON
       const contentType = response.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
+        // Parse JSON error response
+        let errorData;
         try {
-          const error = await response.json();
-          console.error('🔴 [PlaylistApi] JSON error response', error);
-          // Return the structured error for parsing in PlaylistSelectorModal
-          throw error;
+          errorData = await response.json();
+          console.error('🔴 [PlaylistApi] JSON error response', errorData);
         } catch (parseError) {
           console.error('🔴 [PlaylistApi] Failed to parse JSON error', parseError);
           throw new Error('Failed to add track (invalid JSON response)');
         }
+
+        // Throw the structured error for parsing in PlaylistSelectorModal
+        throw errorData;
       } else {
         // Response is not JSON (likely HTML error page)
         const text = await response.text();

@@ -78,7 +78,7 @@ export function PlaylistSelectorModal({ visible, track, onClose }: Props) {
         id: '', // Temporary ID, backend will generate UUID
         title: track.title,
         artist: track.user.username,
-        album: track.genre || 'SoundCloud',
+        album: undefined, // SoundCloud tracks don't have albums
         // Send undefined instead of empty string for better validation
         albumArt: track.artwork_url || track.user.avatar_url || undefined,
         durationMs: track.duration,

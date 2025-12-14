@@ -229,7 +229,7 @@ export const searchTracks = (query: string): Track[] => {
     track =>
       track.title.toLowerCase().includes(lowerQuery) ||
       track.artist.toLowerCase().includes(lowerQuery) ||
-      track.album.toLowerCase().includes(lowerQuery)
+      (track.album && track.album.toLowerCase().includes(lowerQuery))
   );
 };
 

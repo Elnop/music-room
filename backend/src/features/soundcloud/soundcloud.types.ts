@@ -59,7 +59,7 @@ export interface SoundCloudSearchQuery {
 export interface TrackDTO {
   title: string;
   artist: string;
-  album: string;
+  album?: string; // Optional - SoundCloud doesn't have albums
   albumArt: string;
   durationMs: number;
   trackUri: string; // SoundCloud permalink_url
