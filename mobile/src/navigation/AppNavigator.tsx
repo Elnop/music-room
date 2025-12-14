@@ -15,6 +15,7 @@ import { ProfileScreen, EditProfileScreen } from '../screens/profile';
 import { SettingsScreen } from '../screens/settings';
 import { SoundCloudSearchScreen } from '../screens/search/SoundCloudSearchScreen';
 import { MiniPlayer, PlayerModal } from '../components/player';
+import { PlayerProvider } from '../contexts/PlayerContext';
 
 export type AppTabsParamList = {
   PlaylistsTab: undefined;
@@ -172,8 +173,9 @@ export function AppNavigator() {
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={{ flex: 1 }}>
-      <Tab.Navigator
+    <PlayerProvider>
+      <View style={{ flex: 1 }}>
+        <Tab.Navigator
         screenOptions={{
           tabBarActiveTintColor: theme.colors.primary,
           tabBarInactiveTintColor: theme.colors.textSecondary,
@@ -242,12 +244,13 @@ export function AppNavigator() {
       />
     </Tab.Navigator>
 
-    {/* Mini Player - appears above tab bar */}
-    <MiniPlayer />
+        {/* Mini Player - appears above tab bar */}
+        <MiniPlayer />
 
-    {/* Full Player Modal */}
-    <PlayerModal />
-  </View>
+        {/* Full Player Modal */}
+        <PlayerModal />
+      </View>
+    </PlayerProvider>
   );
 }
 

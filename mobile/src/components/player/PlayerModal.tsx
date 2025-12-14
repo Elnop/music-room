@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -11,8 +11,10 @@ import {
 } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { useTheme } from '@/contexts';
+import { usePlayer } from '@/contexts/PlayerContext';
 import { usePlayerStore } from '@/store/playerStore';
-import { useSoundCloudPlayer } from '@/hooks/useSoundCloudPlayer';
+import { usePlayerSync } from '@/hooks/usePlayerSync';
+import { usePlayerProgress } from '@/hooks/usePlayerProgress';
 
 const { width } = Dimensions.get('window');
 
@@ -20,15 +22,15 @@ export function PlayerModal() {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
 
-  const { currentTrack, isPlaying, isModalOpen, setModalOpen, pause, resume } = usePlayerStore();
-  const { player, loading, error } = useSoundCloudPlayer(currentTrack);
+  const { player, loading, error } = usePlayer();
+  const { currentTrack, isPlaying, isModalOpen, setModalOpen, pause, resume } =
+    usePlayerStore();
 
-  // Auto-play when track is loaded
-  useEffect(() => {
-    if (!loading && isPlaying && player.duration > 0) {
-      player.play();
-    }
-  }, [loading, player.duration]);
+  // Track player progress in real-time
+  const { currentTime, duration } = usePlayerProgress();
+
+  // Synchronize player with store state
+  usePlayerSync();
 
   if (!currentTrack) {
     return null;
@@ -42,23 +44,23 @@ export function PlayerModal() {
   };
 
   const handlePlayPause = () => {
-    if (loading) return;
+    if (loading || !player) return;
 
     if (isPlaying) {
-      player.pause();
       pause();
     } else {
-      player.play();
       resume();
     }
   };
 
   const handleSeek = (value: number) => {
+    if (!player) return;
     player.seekTo(value);
   };
 
   const handleSkip = (seconds: number) => {
-    const newPosition = Math.max(0, Math.min(player.duration, player.currentTime + seconds));
+    if (!player) return;
+    const newPosition = Math.max(0, Math.min(duration, currentTime + seconds));
     player.seekTo(newPosition);
   };
 
@@ -112,17 +114,17 @@ export function PlayerModal() {
           <Slider
             style={styles.slider}
             minimumValue={0}
-            maximumValue={player.duration || 1}
-            value={player.currentTime}
+            maximumValue={duration || 1}
+            value={currentTime}
             onSlidingComplete={handleSeek}
             minimumTrackTintColor={theme.colors.primary}
             maximumTrackTintColor={theme.colors.border}
             thumbTintColor={theme.colors.primary}
-            disabled={loading}
+            disabled={loading || !player}
           />
           <View style={styles.timeContainer}>
-            <Text style={styles.timeText}>{formatTime(player.currentTime)}</Text>
-            <Text style={styles.timeText}>{formatTime(player.duration)}</Text>
+            <Text style={styles.timeText}>{formatTime(currentTime)}</Text>
+            <Text style={styles.timeText}>{formatTime(duration)}</Text>
           </View>
         </View>
 

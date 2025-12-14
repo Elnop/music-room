@@ -2,16 +2,22 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/contexts';
+import { usePlayer } from '@/contexts/PlayerContext';
 import { usePlayerStore } from '@/store/playerStore';
-import { useSoundCloudPlayer } from '@/hooks/useSoundCloudPlayer';
+import { usePlayerSync } from '@/hooks/usePlayerSync';
+import { usePlayerProgress } from '@/hooks/usePlayerProgress';
 
 export function MiniPlayer() {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
   const styles = React.useMemo(() => createStyles(theme, insets), [theme, insets]);
 
+  const { player, loading } = usePlayer();
   const { currentTrack, isPlaying, pause, resume, toggleModal } = usePlayerStore();
-  const { player, loading } = useSoundCloudPlayer(currentTrack);
+  const { progress } = usePlayerProgress();
+
+  // Synchronize player with store state
+  usePlayerSync();
 
   // Don't render if no track
   if (!currentTrack) {
@@ -21,13 +27,11 @@ export function MiniPlayer() {
   const artworkUrl = currentTrack.artwork_url || currentTrack.user.avatar_url || 'https://via.placeholder.com/40';
 
   const handlePlayPause = () => {
-    if (loading) return;
+    if (loading || !player) return;
 
     if (isPlaying) {
-      player.pause();
       pause();
     } else {
-      player.play();
       resume();
     }
   };
@@ -73,9 +77,7 @@ export function MiniPlayer() {
           style={[
             styles.progressBar,
             {
-              width: player.duration > 0
-                ? `${(player.currentTime / player.duration) * 100}%`
-                : '0%',
+              width: `${progress}%`,
             },
           ]}
         />
