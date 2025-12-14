@@ -64,9 +64,20 @@ export class SoundCloudController {
    */
   async getStreamUrl(req: Request, res: Response, next: NextFunction) {
     try {
+      logger.info('🎵 [SoundCloud] Stream URL request received', {
+        rawParam: req.params.trackUrl,
+        headers: {
+          'user-agent': req.headers['user-agent'],
+          'origin': req.headers['origin'],
+        },
+      });
+
       const trackUrl = decodeURIComponent(req.params.trackUrl);
 
+      logger.info('🎵 [SoundCloud] Decoded track URL', { trackUrl });
+
       if (!trackUrl) {
+        logger.warn('🔴 [SoundCloud] Missing track URL in request');
         return res.status(400).json({
           success: false,
           error: {
@@ -77,9 +88,15 @@ export class SoundCloudController {
         });
       }
 
-      logger.info('Stream URL requested', { trackUrl });
+      logger.info('🎵 [SoundCloud] Fetching stream URL from service', { trackUrl });
 
       const streamUrl = await soundcloudService.getStreamUrl(trackUrl);
+
+      logger.info('🟢 [SoundCloud] Stream URL obtained successfully', {
+        trackUrl,
+        streamUrlLength: streamUrl.length,
+        streamUrlPreview: streamUrl.substring(0, 100) + '...',
+      });
 
       return res.json({
         success: true,
@@ -87,6 +104,11 @@ export class SoundCloudController {
         meta: { timestamp: new Date().toISOString() },
       });
     } catch (error) {
+      logger.error('🔴 [SoundCloud] Error getting stream URL', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        trackUrl: req.params.trackUrl,
+      });
       next(error);
     }
   }

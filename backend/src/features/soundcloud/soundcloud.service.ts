@@ -20,6 +20,7 @@ interface CacheEntry<T> {
 export class SoundCloudService {
   private soundcloud: any;
   private cache: Map<string, CacheEntry<any>> = new Map();
+  private clientId: string | null = null;
 
   constructor() {
     // soundcloud.ts automatically extracts client_id from SoundCloud website
@@ -31,7 +32,57 @@ export class SoundCloudService {
 
     const SoundcloudClass = (Soundcloud as any).default || (Soundcloud as any).Soundcloud || Soundcloud;
     this.soundcloud = new SoundcloudClass();
+
+    // Try to extract client_id after initialization
+    this.extractClientId();
+
     logger.info('SoundCloud service initialized (auto client_id extraction)');
+  }
+
+  private extractClientId() {
+    // Log soundcloud instance structure for debugging
+    logger.debug('🎵 [SoundCloud Service] Inspecting soundcloud instance', {
+      keys: Object.keys(this.soundcloud),
+      hasClientId: 'clientId' in this.soundcloud,
+      hasClient_id: 'client_id' in this.soundcloud,
+      hasOptions: 'options' in this.soundcloud,
+      hasApi: 'api' in this.soundcloud,
+      apiKeys: this.soundcloud.api ? Object.keys(this.soundcloud.api) : [],
+      utilKeys: this.soundcloud.util ? Object.keys(this.soundcloud.util) : [],
+    });
+
+    // Try to get client_id from api.clientId property
+    if (this.soundcloud.api?.clientId && typeof this.soundcloud.api.clientId === 'string') {
+      this.clientId = this.soundcloud.api.clientId;
+      logger.info('🟢 [SoundCloud Service] Client ID extracted from api.clientId', {
+        clientIdPreview: this.clientId.substring(0, 10) + '...',
+      });
+      return;
+    }
+
+    // Try to call getClientId() method
+    if (typeof this.soundcloud.api?.getClientId === 'function') {
+      try {
+        const id = this.soundcloud.api.getClientId();
+        if (id && typeof id === 'string') {
+          this.clientId = id;
+          logger.info('🟢 [SoundCloud Service] Client ID extracted from api.getClientId()', {
+            clientIdPreview: this.clientId.substring(0, 10) + '...',
+          });
+          return;
+        }
+      } catch (err) {
+        logger.debug('Failed to call api.getClientId()', { error: err });
+      }
+    }
+
+    logger.warn('🔴 [SoundCloud Service] Could not extract client_id from soundcloud instance');
+    logger.debug('🎵 [SoundCloud Service] Soundcloud instance details', {
+      type: typeof this.soundcloud,
+      constructor: this.soundcloud?.constructor?.name,
+      apiClientIdType: typeof this.soundcloud.api?.clientId,
+      apiClientIdValue: this.soundcloud.api?.clientId,
+    });
   }
 
   /**
@@ -113,49 +164,83 @@ export class SoundCloudService {
 
   /**
    * Get stream URL for a track
-   * Returns HLS AAC stream URL
+   * Uses soundcloud.ts util.streamLink() which handles everything internally
    */
   async getStreamUrl(trackUrl: string): Promise<string> {
     const cacheKey = `stream:${trackUrl}`;
     const cached = this.getCache<string>(cacheKey);
     if (cached) {
-      logger.debug('Returning cached stream URL', { trackUrl });
+      logger.debug('🎵 [SoundCloud Service] Returning cached stream URL', {
+        trackUrl,
+        cachedUrlPreview: cached.substring(0, 100) + '...'
+      });
       return cached;
     }
 
     try {
-      logger.info('Getting stream URL', { trackUrl });
+      logger.info('🎵 [SoundCloud Service] Getting stream URL', { trackUrl });
 
-      // Get track details first
-      const track = await this.soundcloud.tracks.get(trackUrl);
-
-      // Check if track is streamable
-      if (!track.streamable && !track.media?.transcodings?.length) {
-        logger.warn('Track is not streamable', { trackUrl, trackId: track.id });
-        throw new AppError(403, 'Track is not streamable', 'NOT_STREAMABLE');
+      // Check if util.streamLink() method is available
+      if (typeof this.soundcloud.util?.streamLink !== 'function') {
+        logger.error('🔴 [SoundCloud Service] util.streamLink() method not available');
+        throw new AppError(500, 'SoundCloud API client not properly initialized', 'API_ERROR');
       }
 
-      // Extract AAC HLS URL from media transcodings
-      const aacTranscoding = track.media?.transcodings?.find(
-        (t: any) =>
-          t.format?.protocol === 'hls' && t.format?.mime_type?.includes('aac')
-      );
+      // Use soundcloud.ts util.streamLink() method
+      // This method internally:
+      // 1. Resolves the track (gets track details)
+      // 2. Sorts transcodings by quality (AAC > MP3 > Opus)
+      // 3. Resolves the transcoding URL to actual stream URL
+      // We prefer HLS protocol for better streaming support
+      logger.debug('🎵 [SoundCloud Service] Calling util.streamLink() with HLS protocol');
 
-      if (!aacTranscoding) {
-        logger.warn('AAC HLS stream not found', { trackUrl, trackId: track.id });
-        throw new AppError(404, 'Stream URL not available', 'STREAM_NOT_FOUND');
+      const streamUrl = await this.soundcloud.util.streamLink(trackUrl, 'hls');
+
+      // Validate the returned stream URL
+      if (!streamUrl || typeof streamUrl !== 'string' || streamUrl.length === 0) {
+        logger.warn('🔴 [SoundCloud Service] HLS stream not available, trying progressive');
+
+        // Try progressive fallback
+        const progressiveUrl = await this.soundcloud.util.streamLink(trackUrl, 'progressive');
+
+        if (!progressiveUrl || typeof progressiveUrl !== 'string' || progressiveUrl.length === 0) {
+          logger.error('🔴 [SoundCloud Service] No valid stream URL returned', {
+            hlsResult: streamUrl,
+            progressiveResult: progressiveUrl,
+          });
+          throw new AppError(404, 'Track stream not available', 'STREAM_NOT_FOUND');
+        }
+
+        logger.info('🟢 [SoundCloud Service] Stream URL obtained (progressive fallback)', {
+          trackUrl,
+          streamUrlLength: progressiveUrl.length,
+          streamUrlPreview: progressiveUrl.substring(0, 100) + '...',
+        });
+
+        // Cache for 30 minutes (stream URLs can expire)
+        this.setCache(cacheKey, progressiveUrl, 1800);
+        return progressiveUrl;
       }
 
-      const streamUrl = aacTranscoding.url;
+      logger.info('🟢 [SoundCloud Service] Stream URL obtained successfully (HLS)', {
+        trackUrl,
+        streamUrlLength: streamUrl.length,
+        streamUrlPreview: streamUrl.substring(0, 100) + '...',
+      });
 
       // Cache for 30 minutes (stream URLs can expire)
       this.setCache(cacheKey, streamUrl, 1800);
 
-      logger.info('Stream URL obtained', { trackUrl, trackId: track.id });
       return streamUrl;
     } catch (error) {
       if (error instanceof AppError) throw error;
-      logger.error('Failed to get stream URL', { error, trackUrl });
+
+      logger.error('🔴 [SoundCloud Service] Failed to get stream URL', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        trackUrl,
+      });
+
       throw new AppError(500, 'Failed to get stream URL', 'STREAM_ERROR');
     }
   }

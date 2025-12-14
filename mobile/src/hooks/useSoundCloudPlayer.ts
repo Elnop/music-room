@@ -11,37 +11,86 @@ export function useSoundCloudPlayer(track: SoundCloudTrack | null) {
 
   const player = useAudioPlayer(streamUrl || '');
 
+  // Log player state changes
+  useEffect(() => {
+    if (!player) return;
+
+    console.log('🎵 [useSoundCloudPlayer] Player state:', {
+      isLoaded: player.isLoaded,
+      playing: player.playing,
+      duration: player.duration,
+      currentTime: player.currentTime,
+      hasStreamUrl: !!streamUrl,
+    });
+  }, [player?.isLoaded, player?.playing, player?.duration, streamUrl]);
+
   // Fetch stream URL when track changes
   useEffect(() => {
     if (!track) {
+      console.log('🎵 [useSoundCloudPlayer] No track, clearing stream');
       setStreamUrl(null);
       setError(null);
       return;
     }
 
     async function loadStream() {
+      console.log('🎵 [useSoundCloudPlayer] Loading stream for track:', {
+        id: track.id,
+        title: track.title,
+        permalink_url: track.permalink_url,
+      });
+
       setLoading(true);
       setError(null);
 
       try {
         const encodedUrl = encodeURIComponent(track.permalink_url);
-        const response = await fetch(
-          `${API_URL}/api/soundcloud/stream/${encodedUrl}`
-        );
+        const streamEndpoint = `${API_URL}/api/soundcloud/stream/${encodedUrl}`;
+
+        console.log('🎵 [useSoundCloudPlayer] Fetching stream from:', streamEndpoint);
+
+        const response = await fetch(streamEndpoint);
+
+        console.log('🎵 [useSoundCloudPlayer] Stream response:', {
+          status: response.status,
+          statusText: response.statusText,
+          ok: response.ok,
+          headers: {
+            'content-type': response.headers.get('content-type'),
+          },
+        });
 
         if (!response.ok) {
-          throw new Error('Failed to load stream');
+          const errorText = await response.text();
+          console.error('🔴 [useSoundCloudPlayer] Stream request failed:', {
+            status: response.status,
+            statusText: response.statusText,
+            body: errorText,
+          });
+          throw new Error(`Failed to load stream: ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();
+        console.log('🎵 [useSoundCloudPlayer] Stream response data:', {
+          success: data.success,
+          hasStreamUrl: !!data.data?.streamUrl,
+          streamUrl: data.data?.streamUrl?.substring(0, 100) + '...',
+        });
 
         if (data.success && data.data.streamUrl) {
+          console.log('🟢 [useSoundCloudPlayer] Stream URL obtained successfully');
           setStreamUrl(data.data.streamUrl);
         } else {
+          console.error('🔴 [useSoundCloudPlayer] Stream URL not in response:', data);
           throw new Error('Stream URL not available');
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load stream');
+        const errorMsg = err instanceof Error ? err.message : 'Failed to load stream';
+        console.error('🔴 [useSoundCloudPlayer] Error loading stream:', {
+          error: errorMsg,
+          stack: err instanceof Error ? err.stack : undefined,
+        });
+        setError(errorMsg);
       } finally {
         setLoading(false);
       }
