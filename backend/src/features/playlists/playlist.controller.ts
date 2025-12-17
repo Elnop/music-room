@@ -1,5 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { PlaylistService } from "./playlist.service.js";
+import { PlaylistTrackService } from "./services/playlist-track.service.js";
+import { CollaboratorService } from "./services/collaborator.service.js";
 import {
   createPlaylistSchema,
   updatePlaylistSchema,
@@ -14,6 +16,8 @@ import type {
 import { logger } from "@/shared/utils/logger.js";
 
 const playlistService = new PlaylistService();
+const trackService = new PlaylistTrackService();
+const collaboratorService = new CollaboratorService();
 
 export class PlaylistController {
   /**
@@ -165,7 +169,7 @@ export class PlaylistController {
         },
       });
 
-      await playlistService.addTrack(id, authReq.user.id, validated);
+      await trackService.addTrack(id, authReq.user.id, validated);
 
       logger.info("🟢 [Playlist Controller] Track added successfully", {
         playlistId: id,
@@ -197,7 +201,7 @@ export class PlaylistController {
     try {
       const authReq = req as AuthenticatedRequest;
       const { id, trackId } = req.params;
-      await playlistService.removeTrack(id, authReq.user.id, trackId);
+      await trackService.removeTrack(id, authReq.user.id, trackId);
 
       const response: ApiResponse = {
         success: true,
@@ -220,7 +224,7 @@ export class PlaylistController {
       const authReq = req as AuthenticatedRequest;
       const { id } = req.params;
       const validated = reorderTracksSchema.parse(req.body);
-      await playlistService.reorderTracks(
+      await trackService.reorderTracks(
         id,
         authReq.user.id,
         validated.trackIds,
@@ -247,7 +251,7 @@ export class PlaylistController {
       const authReq = req as AuthenticatedRequest;
       const { id } = req.params;
       const validated = addCollaboratorSchema.parse(req.body);
-      await playlistService.addCollaborator(
+      await collaboratorService.addCollaborator(
         id,
         authReq.user.id,
         validated.userId,
@@ -273,7 +277,7 @@ export class PlaylistController {
     try {
       const authReq = req as AuthenticatedRequest;
       const { id, userId } = req.params;
-      await playlistService.removeCollaborator(id, authReq.user.id, userId);
+      await collaboratorService.removeCollaborator(id, authReq.user.id, userId);
 
       const response: ApiResponse = {
         success: true,

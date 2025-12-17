@@ -111,9 +111,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     // Wait for player to be loaded
     if (player.isLoaded && player.duration > 0) {
       console.log('🎵 [PlayerProvider] Player loaded, auto-playing');
-      play();
+      player.play();
     }
-  }, [player?.isLoaded, player?.duration, streamUrl, play]);
+  }, [player, player?.isLoaded, player?.duration, streamUrl]);
 
   const value: PlayerContextValue = {
     player,

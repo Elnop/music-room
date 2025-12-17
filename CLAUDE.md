@@ -174,46 +174,109 @@ Metro Bundler: `http://localhost:8081`
 
 ## Architecture
 
-### Backend: Feature-First Architecture
+### Backend: Feature-First Architecture (Refactored for Team Collaboration)
 
 ```
 backend/src/
 ├── features/              # Features organized by domain
-│   ├── auth/             # Authentication feature (complete)
-│   │   ├── auth.types.ts        # TypeScript types
-│   │   ├── auth.validators.ts   # Zod validation schemas
-│   │   ├── auth.service.ts      # Business logic (Supabase integration)
-│   │   ├── auth.controller.ts   # Express request handlers
-│   │   ├── auth.middleware.ts   # JWT verification middleware
-│   │   ├── auth.routes.ts       # Express routes
-│   │   └── index.ts             # Public exports
-│   ├── playlists/        # Playlist management (complete)
+│   ├── auth/             # Authentication feature (194 lines, refactored)
+│   │   ├── services/           # Business logic services
+│   │   │   └── session.service.ts    # Session and token management
+│   │   ├── utils/              # Auth helpers
+│   │   │   └── auth.helpers.ts       # Format response, fetch profile
+│   │   ├── auth.types.ts       # TypeScript types
+│   │   ├── auth.validators.ts  # Zod validation schemas
+│   │   ├── auth.service.ts     # Main auth service (register, login)
+│   │   ├── auth.controller.ts  # Express request handlers
+│   │   ├── auth.middleware.ts  # JWT verification middleware
+│   │   └── auth.routes.ts      # Express routes
+│   ├── playlists/        # Playlist management (254 lines main service, refactored)
+│   │   ├── services/           # Business logic services
+│   │   │   ├── playlist-track.service.ts  # Track management (add/remove/reorder)
+│   │   │   └── collaborator.service.ts    # Collaborator management
+│   │   ├── permissions/        # Authorization checks
+│   │   │   └── playlist.permissions.ts    # Ownership and edit permissions
+│   │   ├── utils/              # Helpers
+│   │   │   └── playlist.helpers.ts        # Format responses, reindex positions
 │   │   ├── playlist.types.ts
 │   │   ├── playlist.validators.ts
-│   │   ├── playlist.service.ts
-│   │   ├── playlist.controller.ts
-│   │   ├── playlist.routes.ts
-│   │   └── index.ts
-│   ├── profile/          # User profile management (complete)
+│   │   ├── playlist.service.ts          # Main playlist CRUD service
+│   │   ├── playlist.controller.ts       # Express request handlers
+│   │   └── playlist.routes.ts
+│   ├── soundcloud/       # SoundCloud integration (75 lines main service, refactored)
+│   │   ├── services/           # Business logic services
+│   │   │   ├── soundcloud-search.service.ts  # Search and track retrieval
+│   │   │   └── soundcloud-stream.service.ts  # Stream URL management
+│   │   ├── utils/              # Helpers
+│   │   │   ├── soundcloud-cache.ts           # Cache management with TTL
+│   │   │   └── client-extractor.ts           # Client ID extraction
+│   │   ├── soundcloud.types.ts
+│   │   ├── soundcloud.validators.ts
+│   │   ├── soundcloud.service.ts      # Main orchestrator service
+│   │   ├── soundcloud.controller.ts
+│   │   └── soundcloud.routes.ts
+│   ├── profile/          # User profile management (124 lines, refactored for consistency)
+│   │   ├── services/           # Business logic services
+│   │   │   └── profile.service.ts    # Profile CRUD operations
 │   │   ├── profile.types.ts
 │   │   ├── profile.validators.ts
-│   │   ├── profile.service.ts
+│   │   ├── profile.service.ts         # Re-export for backward compatibility
 │   │   ├── profile.controller.ts
-│   │   ├── profile.routes.ts
-│   │   └── index.ts
+│   │   └── profile.routes.ts
 │   └── [future features: friends, rooms]
 ├── shared/                # Shared code across features
 │   ├── config/           # Environment vars (env.ts), Supabase clients
 │   ├── middleware/       # Global middleware (error-handler.ts)
 │   ├── types/            # Global TypeScript types
 │   └── utils/            # Logger, helpers
+│       ├── logger.ts
+│       └── database.helpers.ts  # Shared DB utilities (fetchSingle, fetchMany, etc.)
 └── server.ts             # Entry point (Express + Socket.io setup)
 ```
 
-**Key Backend Patterns**:
-- Each feature is self-contained with types, validators, service, controller, routes
+**Key Backend Patterns** (Updated for Team Collaboration):
+- **Feature-first structure**: Each feature is self-contained with clear boundaries
+- **Services layer**: Business logic split into focused services (< 150 lines each)
+- **Permissions layer**: Authorization checks separated for testability (playlists)
+- **Utils layer**: Reusable helpers and formatters to reduce duplication
+- **Consistent structure**: All features follow the same organizational pattern
+- **Improved maintainability**: Smaller files, clearer responsibilities, easier code reviews
+- **Testability**: Isolated services and helpers are easier to unit test
+- **Reduced debug noise**: Excessive logging removed, cleaner codebase
+
+**Refactoring Results**:
+- **Playlists**: 657 lines → 254 lines main service (60% reduction)
+- **SoundCloud**: 342 lines → 75 lines main service (78% reduction)
+- **Auth**: 307 lines → 194 lines main service (37% reduction)
+- **Profile**: 124 lines → organized in services/ for consistency
+
+**Standard Feature Structure**:
+```
+feature/
+  ├── services/          # Business logic divided by responsibility
+  │   ├── feature.service.ts        # Main CRUD operations
+  │   └── feature-secondary.service.ts  # Secondary operations
+  ├── utils/            # Helpers and utilities
+  │   └── feature.helpers.ts
+  ├── permissions/      # Authorization checks (if needed)
+  │   └── feature.permissions.ts
+  ├── feature.types.ts
+  ├── feature.validators.ts
+  ├── feature.controller.ts
+  ├── feature.routes.ts
+  └── feature.middleware.ts (if applicable)
+```
+
+**Import Convention**:
+- **No index.ts files anywhere** - All imports are direct from source files
+- Example: `import { PlaylistService } from "./services/playlist.service.js"`
+- Example: `import { formatResponse } from "./utils/playlist.helpers.js"`
+- Example: `import authRoutes from "./features/auth/auth.routes.js"` (from server.ts)
+
+**Database Integration**:
 - Supabase for PostgreSQL database + authentication
 - Zod for runtime validation aligned with TypeScript types
+- Shared database helpers in `shared/utils/database.helpers.ts`
 - Error responses follow standardized format from `error-handler.ts`
 - JWT tokens verified via `auth.middleware.ts` for protected routes
 

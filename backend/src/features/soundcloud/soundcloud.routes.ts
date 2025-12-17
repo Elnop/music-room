@@ -26,4 +26,4 @@ router.get("/track/:urlOrId", controller.getTrack.bind(controller));
  */
 router.get("/stream/:trackUrl", controller.getStreamUrl.bind(controller));
 
-export { router as soundcloudRoutes };
+export default router;

@@ -6,10 +6,10 @@ import { logger } from "./shared/utils/logger.js";
 import { errorHandler } from "./shared/middleware/error-handler.js";
 
 // Import features
-import { authRoutes } from "./features/auth/index.js";
-import { profileRoutes } from "./features/profile/index.js";
-import { playlistRoutes } from "./features/playlists/index.js";
-import { soundcloudRoutes } from "./features/soundcloud/index.js";
+import authRoutes from "./features/auth/auth.routes.js";
+import profileRoutes from "./features/profile/profile.routes.js";
+import playlistRoutes from "./features/playlists/playlist.routes.js";
+import soundcloudRoutes from "./features/soundcloud/soundcloud.routes.js";
 
 // Initialize Express app
 const app = express();

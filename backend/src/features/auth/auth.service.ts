@@ -1,6 +1,12 @@
 import { supabase } from "@/shared/config/supabase.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
 import { logger } from "@/shared/utils/logger.js";
+import {
+  formatAuthResponse,
+  fetchUserProfile,
+  getUserProfile,
+} from "./utils/auth.helpers.js";
+import { SessionService } from "./services/session.service.js";
 import type {
   RegisterDTO,
   LoginDTO,
@@ -10,6 +16,11 @@ import type {
 } from "./auth.types.js";
 
 export class AuthService {
+  private sessionService: SessionService;
+
+  constructor() {
+    this.sessionService = new SessionService();
+  }
   /**
    * Register a new user
    */
@@ -93,7 +104,7 @@ export class AuthService {
 
       logger.info("User registered successfully", { userId: authData.user.id });
 
-      return this.formatAuthResponse(
+      return formatAuthResponse(
         authData.user,
         sessionData.session,
         data.username,
@@ -111,11 +122,8 @@ export class AuthService {
    */
   async login(data: LoginDTO): Promise<AuthResponse> {
     try {
-      logger.info("🟢 User login attempt", { email: data.email });
+      logger.info("User login attempt", { email: data.email });
 
-      logger.debug("🟢 Calling Supabase signInWithPassword", {
-        email: data.email,
-      });
       const { data: authData, error: authError } =
         await supabase.auth.signInWithPassword({
           email: data.email,
@@ -123,10 +131,9 @@ export class AuthService {
         });
 
       if (authError) {
-        logger.warn("🟡 Login failed - Supabase auth error", {
+        logger.warn("Login failed - auth error", {
           email: data.email,
           error: authError.message,
-          errorCode: authError.status,
         });
         throw new AppError(
           401,
@@ -136,10 +143,7 @@ export class AuthService {
       }
 
       if (!authData.user || !authData.session) {
-        logger.error("🔴 Login failed - No user or session returned", {
-          hasUser: !!authData.user,
-          hasSession: !!authData.session,
-        });
+        logger.error("Login failed - no user or session returned");
         throw new AppError(
           401,
           "Invalid email or password",
@@ -147,49 +151,15 @@ export class AuthService {
         );
       }
 
-      logger.debug("🟢 Supabase auth successful", {
-        userId: authData.user.id,
-        email: authData.user.email,
-        hasSession: !!authData.session,
-      });
-
       // Fetch user profile
-      logger.debug("🟢 Fetching user profile from database", {
-        userId: authData.user.id,
-      });
-      const { data: profile, error: profileError } = await supabase
-        .from("user_profiles")
-        .select(
-          "username, display_name, avatar_url, bio, created_at, updated_at",
-        )
-        .eq("id", authData.user.id)
-        .single();
+      const profile = await fetchUserProfile(authData.user.id);
 
-      if (profileError || !profile) {
-        logger.error("🔴 Failed to fetch user profile", {
-          userId: authData.user.id,
-          error: profileError,
-          profileExists: !!profile,
-        });
-        throw new AppError(
-          500,
-          "Failed to fetch user profile",
-          "PROFILE_ERROR",
-        );
-      }
-
-      logger.debug("🟢 User profile fetched", {
+      logger.info("User logged in successfully", {
         userId: authData.user.id,
         username: profile.username,
       });
 
-      logger.info("🟢 User logged in successfully", {
-        userId: authData.user.id,
-        email: authData.user.email,
-        username: profile.username,
-      });
-
-      return this.formatAuthResponse(
+      return formatAuthResponse(
         authData.user,
         authData.session,
         profile.username,
@@ -201,9 +171,8 @@ export class AuthService {
       );
     } catch (error) {
       if (error instanceof AppError) throw error;
-      logger.error("🔴 Unexpected error during login", {
+      logger.error("Unexpected error during login", {
         error: error instanceof Error ? error.message : "Unknown error",
-        stack: error instanceof Error ? error.stack : undefined,
       });
       throw new AppError(500, "Login failed", "LOGIN_ERROR");
     }
@@ -213,95 +182,13 @@ export class AuthService {
    * Verify JWT token and return user
    */
   async verifyToken(token: string): Promise<SupabaseUser> {
-    try {
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser(token);
-
-      if (error || !user) {
-        throw new AppError(401, "Invalid or expired token", "INVALID_TOKEN");
-      }
-
-      return {
-        id: user.id,
-        email: user.email!,
-        role: user.role,
-      };
-    } catch (error) {
-      if (error instanceof AppError) throw error;
-      throw new AppError(401, "Invalid token", "INVALID_TOKEN");
-    }
+    return this.sessionService.verifyToken(token);
   }
 
   /**
    * Get user profile by ID
    */
   async getUserProfile(userId: string): Promise<UserProfile> {
-    try {
-      const { data: user, error: userError } =
-        await supabase.auth.admin.getUserById(userId);
-
-      if (userError || !user.user) {
-        throw new AppError(404, "User not found", "USER_NOT_FOUND");
-      }
-
-      const { data: profile, error: profileError } = await supabase
-        .from("user_profiles")
-        .select("*")
-        .eq("id", userId)
-        .single();
-
-      if (profileError || !profile) {
-        throw new AppError(404, "User profile not found", "PROFILE_NOT_FOUND");
-      }
-
-      return {
-        id: user.user.id,
-        email: user.user.email!,
-        username: profile.username,
-        displayName: profile.display_name,
-        avatarUrl: profile.avatar_url,
-        bio: profile.bio,
-        createdAt: profile.created_at,
-        updatedAt: profile.updated_at,
-      };
-    } catch (error) {
-      if (error instanceof AppError) throw error;
-      throw new AppError(500, "Failed to get user profile", "PROFILE_ERROR");
-    }
-  }
-
-  /**
-   * Format auth response helper
-   */
-  private formatAuthResponse(
-    user: any,
-    session: any,
-    username: string,
-    displayName?: string,
-    avatarUrl?: string,
-    bio?: string,
-    createdAt?: string,
-    updatedAt?: string,
-  ): AuthResponse {
-    return {
-      user: {
-        id: user.id,
-        email: user.email,
-        username,
-        displayName,
-        avatarUrl,
-        bio,
-        createdAt: createdAt || new Date().toISOString(),
-        updatedAt: updatedAt || new Date().toISOString(),
-      },
-      session: {
-        accessToken: session.access_token,
-        refreshToken: session.refresh_token,
-        expiresIn: session.expires_in,
-        expiresAt: session.expires_at,
-      },
-    };
+    return getUserProfile(userId);
   }
 }

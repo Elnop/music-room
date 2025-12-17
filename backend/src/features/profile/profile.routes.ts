@@ -33,4 +33,4 @@ router.get("/:userId", (req, res, next) =>
   controller.getProfile(req, res, next),
 );
 
-export { router as profileRoutes };
+export default router;
