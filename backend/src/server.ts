@@ -4,12 +4,7 @@ import { createServer } from "http";
 import { env } from "./shared/config/env.js";
 import { logger } from "./shared/utils/logger.js";
 import { errorHandler } from "./shared/middleware/error-handler.js";
-
-// Import features
-import authRoutes from "./features/auth/auth.routes.js";
-import profileRoutes from "./features/profile/profile.routes.js";
-import playlistRoutes from "./features/playlists/playlist.routes.js";
-import soundcloudRoutes from "./features/soundcloud/soundcloud.routes.js";
+import { routes } from "./shared/config/routes.js";
 
 // Initialize Express app
 const app = express();
@@ -101,13 +96,13 @@ app.get("/health", (req, res) => {
 });
 
 // =====================================================
-// API Routes
+// API Routes (registered from central registry)
 // =====================================================
 
-app.use("/api/auth", authRoutes);
-app.use("/api/profile", profileRoutes);
-app.use("/api/playlists", playlistRoutes);
-app.use("/api/soundcloud", soundcloudRoutes);
+routes.forEach(({ path, router, description }) => {
+  app.use(path, router);
+  logger.debug(`✓ Registered route: ${path}${description ? ` - ${description}` : ""}`);
+});
 
 // 404 handler
 app.use((req, res) => {

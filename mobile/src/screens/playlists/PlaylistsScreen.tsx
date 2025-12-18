@@ -13,8 +13,9 @@ import { useTheme } from '@contexts';
 import type { Theme } from '@themes/types';
 import { useAuthStore } from '../../store/authStore';
 import { usePlaylistStore } from '../../store/playlistStore';
-import { PlaylistCard } from '@components/playlist';
-import { EmptyState, LoadingSpinner } from '@components/common';
+import { PlaylistCard } from '@components/playlist/PlaylistCard';
+import { EmptyState } from '@components/common/EmptyState';
+import { LoadingSpinner } from '@components/common/LoadingSpinner';
 
 type PlaylistStackParamList = {
   Playlists: undefined;

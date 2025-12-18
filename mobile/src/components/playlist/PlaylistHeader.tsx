@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
-import { Avatar } from '@components/common';
+import { Avatar } from '@components/common/Avatar';
 import { useTheme } from '@contexts';
 import type { Theme } from '@themes/types';
 import type { PlaylistWithTracks } from '@types';

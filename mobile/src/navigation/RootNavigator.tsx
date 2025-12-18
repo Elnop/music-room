@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { AuthNavigator } from './AuthNavigator';
 import { AppNavigator } from './AppNavigator';
 import { useAuthStore } from '../store/authStore';
-import { LoadingSpinner } from '@components/common';
+import { LoadingSpinner } from '@components/common/LoadingSpinner';
 import { supabase } from '@/lib/supabase';
 
 export function RootNavigator() {

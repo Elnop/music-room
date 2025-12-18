@@ -17,7 +17,9 @@ import { useTheme } from '@contexts';
 import type { Theme } from '@themes/types';
 import { useAuthStore } from '@/store/authStore';
 import { profileApi, ApiError } from '@/services/profileApi';
-import { Button, Input, FormError } from '@components/common';
+import { Button } from '@components/common/Button';
+import { Input } from '@components/common/Input';
+import { FormError } from '@components/common/FormError';
 
 // Validation schema (aligned with backend)
 const updateProfileSchema = z.object({

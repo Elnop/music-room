@@ -13,8 +13,9 @@ import { RouteProp } from '@react-navigation/native';
 import { useTheme } from '@contexts';
 import type { Theme } from '@themes/types';
 import { usePlaylistStore } from '../../store/playlistStore';
-import { SearchBar, EmptyState } from '@components/common';
-import { TrackItem } from '@components/playlist';
+import { SearchBar } from '@components/common/SearchBar';
+import { EmptyState } from '@components/common/EmptyState';
+import { TrackItem } from '@components/playlist/TrackItem';
 import { searchTracks } from '@mocks';
 import type { Track } from '@types';
 

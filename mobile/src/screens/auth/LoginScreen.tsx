@@ -14,7 +14,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTheme } from '@contexts';
 import type { Theme } from '@themes/types';
-import { Button, Input, FormError } from '@components/common';
+import { Button } from '@components/common/Button';
+import { Input } from '@components/common/Input';
+import { FormError } from '@components/common/FormError';
 import { loginSchema, LoginInput } from '@utils/validators';
 import { useAuthStore } from '../../store/authStore';
 

@@ -12,8 +12,11 @@ import { useTheme } from '@contexts';
 import type { Theme } from '@themes/types';
 import { usePlaylistStore } from '../../store/playlistStore';
 import { useAuthStore } from '../../store/authStore';
-import { PlaylistHeader, TrackItem, AddTrackButton } from '@components/playlist';
-import { EmptyState, LoadingSpinner } from '@components/common';
+import { PlaylistHeader } from '@components/playlist/PlaylistHeader';
+import { TrackItem } from '@components/playlist/TrackItem';
+import { AddTrackButton } from '@components/playlist/AddTrackButton';
+import { EmptyState } from '@components/common/EmptyState';
+import { LoadingSpinner } from '@components/common/LoadingSpinner';
 import { canEditPlaylist } from '@mocks';
 
 type PlaylistStackParamList = {

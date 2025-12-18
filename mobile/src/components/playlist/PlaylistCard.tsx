@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
-import { Card } from '@components/common';
+import { Card } from '@components/common/Card';
 import { useTheme } from '@contexts';
 import type { Theme } from '@themes/types';
 import type { Playlist } from '@types';

@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTheme } from '@contexts';
 import type { Theme } from '@themes/types';
-import { Button } from '@components/common';
+import { Button } from '@components/common/Button';
 
 type AuthStackParamList = {
   Welcome: undefined;

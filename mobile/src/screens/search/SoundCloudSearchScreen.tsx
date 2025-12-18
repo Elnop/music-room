@@ -13,7 +13,7 @@ import { useSoundCloudStore } from '@/store/soundcloudStore';
 import { usePlayerStore } from '@/store/playerStore';
 import { SoundCloudTrackItem } from './components/SoundCloudTrackItem';
 import { PlaylistSelectorModal } from './components/PlaylistSelectorModal';
-import { LoadingSpinner } from '@/components/common';
+import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import debounce from 'lodash/debounce';
 import type { SoundCloudTrack } from '@/types';
 

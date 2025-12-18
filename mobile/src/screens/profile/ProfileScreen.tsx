@@ -6,7 +6,9 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTheme } from '@contexts';
 import type { Theme } from '@themes/types';
 import { useAuthStore } from '@/store/authStore';
-import { Avatar, Button, Card } from '@components/common';
+import { Avatar } from '@components/common/Avatar';
+import { Button } from '@components/common/Button';
+import { Card } from '@components/common/Card';
 
 type ProfileStackParamList = {
   Profile: undefined;

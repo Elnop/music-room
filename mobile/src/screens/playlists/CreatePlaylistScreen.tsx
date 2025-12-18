@@ -16,7 +16,8 @@ import { useTheme } from '@contexts';
 import type { Theme } from '@themes/types';
 import { useAuthStore } from '../../store/authStore';
 import { usePlaylistStore } from '../../store/playlistStore';
-import { Button, Input } from '@components/common';
+import { Button } from '@components/common/Button';
+import { Input } from '@components/common/Input';
 import { playlistSchema, PlaylistInput } from '@utils/validators';
 
 type PlaylistStackParamList = {
