@@ -224,11 +224,7 @@ export class PlaylistController {
       const authReq = req as AuthenticatedRequest;
       const { id } = req.params;
       const validated = reorderTracksSchema.parse(req.body);
-      await trackService.reorderTracks(
-        id,
-        authReq.user.id,
-        validated.trackIds,
-      );
+      await trackService.reorderTracks(id, authReq.user.id, validated.trackIds);
 
       const response: ApiResponse = {
         success: true,

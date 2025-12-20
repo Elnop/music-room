@@ -1,9 +1,6 @@
 import { logger } from "@/shared/utils/logger.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
-import {
-  SoundCloudCache,
-  CACHE_TTL,
-} from "../utils/soundcloud-cache.js";
+import { SoundCloudCache, CACHE_TTL } from "../utils/soundcloud-cache.js";
 
 /**
  * Service for SoundCloud streaming operations
@@ -53,7 +50,10 @@ export class SoundCloudStreamService {
       }
 
       // Fallback to progressive
-      const progressiveUrl = await this.tryGetStreamUrl(trackUrl, "progressive");
+      const progressiveUrl = await this.tryGetStreamUrl(
+        trackUrl,
+        "progressive",
+      );
 
       if (progressiveUrl) {
         logger.info("Stream URL obtained (progressive fallback)", { trackUrl });
@@ -91,7 +91,11 @@ export class SoundCloudStreamService {
       );
 
       // Validate stream URL
-      if (!streamUrl || typeof streamUrl !== "string" || streamUrl.length === 0) {
+      if (
+        !streamUrl ||
+        typeof streamUrl !== "string" ||
+        streamUrl.length === 0
+      ) {
         logger.debug(`${protocol} stream not available`, { trackUrl });
         return null;
       }

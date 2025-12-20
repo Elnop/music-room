@@ -101,7 +101,9 @@ app.get("/health", (req, res) => {
 
 routes.forEach(({ path, router, description }) => {
   app.use(path, router);
-  logger.debug(`✓ Registered route: ${path}${description ? ` - ${description}` : ""}`);
+  logger.debug(
+    `✓ Registered route: ${path}${description ? ` - ${description}` : ""}`,
+  );
 });
 
 // 404 handler

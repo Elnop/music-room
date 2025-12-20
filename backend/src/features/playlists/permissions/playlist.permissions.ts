@@ -39,10 +39,7 @@ export class PlaylistPermissions {
   /**
    * Check if user can edit playlist (owner or collaborator)
    */
-  async checkEditPermission(
-    playlistId: string,
-    userId: string,
-  ): Promise<void> {
+  async checkEditPermission(playlistId: string, userId: string): Promise<void> {
     const { data: playlist, error } = await supabaseAdmin
       .from("playlists")
       .select("owner_id, collaborator_ids")
