@@ -50,6 +50,14 @@ make stop
 - [doc/SOUNDCLOUD_MIGRATION_PLAN.md](./doc/SOUNDCLOUD_MIGRATION_PLAN.md) - SoundCloud integration plan
 - [doc/TUNNEL_MODE.md](./doc/TUNNEL_MODE.md) - Cross-network development
 
+## Links
+
+- [GitHub](https://github.com/Elnop/music-room/issues)
+- [Supabase](https://supabase.com/dashboard/project/vkhspkuureoostyupsrx)
+- [Expo](https://expo.dev/)
+- [Ngrok](https://dashboard.ngrok.com/get-started/your-authtoken)
+- [SoundCloud API](https://developers.soundcloud.com/docs/api/explorer/open-api)
+
 ## Contributing
 
 See [doc/GIT_WORKFLOW.md](./doc/GIT_WORKFLOW.md) for Git workflow and contribution guidelines.
