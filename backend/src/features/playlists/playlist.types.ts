@@ -2,6 +2,8 @@
  * Playlist DTOs and Types
  */
 
+export type EditMode = "open" | "restricted";
+
 // Database types (snake_case from DB)
 export interface PlaylistRow {
   id: string;
@@ -12,6 +14,7 @@ export interface PlaylistRow {
   collaborator_ids: string[];
   viewer_ids: string[];
   visibility: "public" | "private";
+  edit_mode: EditMode;
   created_at: string;
   updated_at: string;
 }
@@ -42,13 +45,15 @@ export interface PlaylistTrackRow {
 export interface CreatePlaylistDTO {
   name: string;
   description?: string;
-  visibility: "public" | "private";
+  visibility?: "public" | "private";
+  editMode?: EditMode;
 }
 
 export interface UpdatePlaylistDTO {
   name?: string;
   description?: string;
   visibility?: "public" | "private";
+  editMode?: EditMode;
 }
 
 export interface AddTrackDTO {
@@ -105,6 +110,7 @@ export interface PlaylistResponse {
   collaboratorIds: string[];
   viewerIds: string[];
   visibility: "public" | "private";
+  editMode: EditMode;
   trackCount: number;
   createdAt: string;
   updatedAt: string;

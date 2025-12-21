@@ -311,6 +311,7 @@ export class PlaylistService {
 
   /**
    * Create new playlist
+   * Default: visibility = 'public', editMode = 'open' (everyone can edit)
    */
   async createPlaylist(
     userId: string,
@@ -323,14 +324,20 @@ export class PlaylistService {
           name: data.name,
           description: data.description,
           owner_id: userId,
-          visibility: data.visibility,
+          visibility: data.visibility ?? "public",
+          edit_mode: data.editMode ?? "open",
         })
         .select()
         .single();
 
       if (error) throw error;
 
-      logger.info("Playlist created", { playlistId: playlist.id, userId });
+      logger.info("Playlist created", {
+        playlistId: playlist.id,
+        userId,
+        visibility: playlist.visibility,
+        editMode: playlist.edit_mode,
+      });
       return formatPlaylistResponse(playlist, 0);
     } catch (error) {
       logger.error("Failed to create playlist", { error, userId });
@@ -354,13 +361,17 @@ export class PlaylistService {
       // Only owner can update playlist metadata
       await this.permissions.checkOwnership(playlistId, userId);
 
+      const updateData: Record<string, unknown> = {};
+      if (data.name !== undefined) updateData.name = data.name;
+      if (data.description !== undefined)
+        updateData.description = data.description;
+      if (data.visibility !== undefined)
+        updateData.visibility = data.visibility;
+      if (data.editMode !== undefined) updateData.edit_mode = data.editMode;
+
       const { data: playlist, error } = await supabaseAdmin
         .from("playlists")
-        .update({
-          name: data.name,
-          description: data.description,
-          visibility: data.visibility,
-        })
+        .update(updateData)
         .eq("id", playlistId)
         .select()
         .single();
@@ -373,7 +384,7 @@ export class PlaylistService {
         .select("*", { count: "exact", head: true })
         .eq("playlist_id", playlistId);
 
-      logger.info("Playlist updated", { playlistId, userId });
+      logger.info("Playlist updated", { playlistId, userId, updateData });
       return formatPlaylistResponse(playlist, count || 0);
     } catch (error) {
       if (error instanceof AppError) throw error;

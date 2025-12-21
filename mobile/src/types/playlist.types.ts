@@ -1,6 +1,8 @@
 import type { TrackWithPosition } from './track.types';
 import type { UserProfile } from './user.types';
 
+export type EditMode = 'open' | 'restricted';
+
 export interface PlaylistOwner {
   id: string;
   username: string;
@@ -21,6 +23,7 @@ export interface Playlist {
   viewerIds: string[];
   trackCount: number;
   visibility: 'public' | 'private';
+  editMode: EditMode;
   createdAt: string;
   updatedAt: string;
 }

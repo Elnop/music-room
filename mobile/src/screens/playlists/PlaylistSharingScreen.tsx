@@ -51,6 +51,16 @@ const toMember = (user: UserProfile | ViewerProfile, canEdit: boolean): Member =
   canEdit,
 });
 
+/**
+ * Permission modes based on visibility + editMode:
+ *
+ * | visibility | editMode   | What this screen manages                    |
+ * |------------|------------|---------------------------------------------|
+ * | public     | open       | Info only - everyone can edit               |
+ * | public     | restricted | Manage editors (collaborators)              |
+ * | private    | open       | Manage access (viewers = can also edit)     |
+ * | private    | restricted | Manage access (viewers) + editors (collabs) |
+ */
 export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
@@ -58,18 +68,20 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
   const { accessToken } = useAuthStore();
   const { currentPlaylist, fetchPlaylistById } = usePlaylistStore();
 
-  // SINGLE source of truth for all members
   const [members, setMembers] = useState<Member[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-
   const [processingUserId, setProcessingUserId] = useState<string | null>(null);
 
   const loadingRef = useRef(false);
 
   const isPrivate = currentPlaylist?.visibility === 'private';
+  const isEditRestricted = currentPlaylist?.editMode === 'restricted';
+
+  const showEditToggle = isPrivate && isEditRestricted;
+  const isInfoOnly = !isPrivate && !isEditRestricted;
 
   const loadAllData = useCallback(async () => {
     if (!accessToken || loadingRef.current) return;
@@ -89,7 +101,6 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 
     try {
       const viewersData = await playlistApi.getViewers(playlistId);
-
       const { currentPlaylist: updatedPlaylist } = usePlaylistStore.getState();
 
       if (!updatedPlaylist) {
@@ -198,7 +209,9 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
   const handleAddUser = async (user: UserProfile) => {
     if (processingUserId) return;
 
-    const newMember = toMember(user, !isPrivate);
+    const canEdit = !isEditRestricted;
+
+    const newMember = toMember(user, canEdit);
 
     setMembers(prev => [...prev, newMember]);
     setSearchQuery('');
@@ -248,7 +261,8 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
               }
               try {
                 await playlistApi.removeViewer(playlistId, userId);
-              } catch {}
+              } catch {
+              }
             } else {
               await playlistApi.removeCollaborator(playlistId, userId);
             }
@@ -277,40 +291,13 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 
     try {
       if (currentCanEdit) {
-        let collaboratorRemoved = false;
+        await playlistApi.removeCollaborator(playlistId, userId);
         try {
-          await playlistApi.removeCollaborator(playlistId, userId);
-          collaboratorRemoved = true;
           await playlistApi.addViewer(playlistId, userId);
-        } catch (error) {
-          if (collaboratorRemoved) {
-            try {
-              await playlistApi.addCollaborator(playlistId, userId);
-            } catch (rollbackError) {
-              console.error(
-                '[PlaylistSharing] Rollback failed (restore collaborator):',
-                rollbackError
-              );
-            }
-          }
-          throw error;
+        } catch {
         }
       } else {
-        let viewerRemoved = false;
-        try {
-          await playlistApi.removeViewer(playlistId, userId);
-          viewerRemoved = true;
-          await playlistApi.addCollaborator(playlistId, userId);
-        } catch (error) {
-          if (viewerRemoved) {
-            try {
-              await playlistApi.addViewer(playlistId, userId);
-            } catch (rollbackError) {
-              console.error('[PlaylistSharing] Rollback failed (restore viewer):', rollbackError);
-            }
-          }
-          throw error;
-        }
+        await playlistApi.addCollaborator(playlistId, userId);
       }
     } catch (error) {
       console.error('[PlaylistSharing] Toggle failed:', error);
@@ -342,25 +329,6 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
   const renderMemberItem = ({ item }: { item: Member }) => {
     const isProcessing = processingUserId === item.id;
 
-    if (!isPrivate) {
-      return (
-        <View style={[styles.memberItem, isProcessing && styles.memberItemProcessing]}>
-          <Avatar size="md" name={item.displayName || item.username} uri={item.avatarUrl} />
-          <View style={styles.userInfo}>
-            <Text style={styles.username}>{item.username}</Text>
-            {item.displayName && <Text style={styles.displayName}>{item.displayName}</Text>}
-          </View>
-          <TouchableOpacity
-            style={styles.removeButton}
-            onPress={() => handleRemoveUser(item.id)}
-            disabled={!!processingUserId}
-          >
-            <Text style={styles.removeButtonText}>×</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    }
-
     return (
       <View style={[styles.memberItem, isProcessing && styles.memberItemProcessing]}>
         <Avatar size="md" name={item.displayName || item.username} uri={item.avatarUrl} />
@@ -368,22 +336,26 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
           <Text style={styles.username}>{item.username}</Text>
           {item.displayName && <Text style={styles.displayName}>{item.displayName}</Text>}
         </View>
-        <View style={styles.editToggleContainer}>
-          <Text style={styles.editLabel}>Édition</Text>
-          {isProcessing ? (
-            <View style={styles.switchPlaceholder}>
-              <LoadingSpinner size="small" />
-            </View>
-          ) : (
-            <Switch
-              value={item.canEdit}
-              onValueChange={() => handleToggleEdit(item.id, item.canEdit)}
-              disabled={!!processingUserId}
-              trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
-              thumbColor={theme.colors.surface}
-            />
-          )}
-        </View>
+
+        {showEditToggle && (
+          <View style={styles.editToggleContainer}>
+            <Text style={styles.editLabel}>Édition</Text>
+            {isProcessing ? (
+              <View style={styles.switchPlaceholder}>
+                <LoadingSpinner size="small" />
+              </View>
+            ) : (
+              <Switch
+                value={item.canEdit}
+                onValueChange={() => handleToggleEdit(item.id, item.canEdit)}
+                disabled={!!processingUserId}
+                trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+                thumbColor={theme.colors.surface}
+              />
+            )}
+          </View>
+        )}
+
         <TouchableOpacity
           style={styles.removeButton}
           onPress={() => handleRemoveUser(item.id)}
@@ -395,30 +367,88 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
     );
   };
 
+  const renderInfoCard = () => (
+    <View style={styles.infoCard}>
+      <Text style={styles.infoIcon}>🌍</Text>
+      <View style={styles.infoContent}>
+        <Text style={styles.infoTitle}>Playlist ouverte</Text>
+        <Text style={styles.infoText}>
+          Cette playlist est publique et tout le monde peut y ajouter ou supprimer des morceaux.
+        </Text>
+      </View>
+    </View>
+  );
+
+  const getHeaderContent = () => {
+    if (isPrivate && isEditRestricted) {
+      return {
+        title: 'Accès et édition',
+        subtitle: 'Gérez qui peut voir cette playlist et qui peut la modifier.',
+      };
+    }
+    if (isPrivate && !isEditRestricted) {
+      return {
+        title: 'Accès',
+        subtitle:
+          'Gérez qui peut voir et modifier cette playlist privée. Tous les invités peuvent éditer.',
+      };
+    }
+    if (!isPrivate && isEditRestricted) {
+      return {
+        title: 'Éditeurs',
+        subtitle: 'Gérez qui peut modifier cette playlist publique.',
+      };
+    }
+    // public + open
+    return {
+      title: 'Partage',
+      subtitle: 'Cette playlist est ouverte à tous.',
+    };
+  };
+
+  const getSectionTitle = () => {
+    if (isPrivate && isEditRestricted) {
+      return `Personnes avec accès (${members.length})`;
+    }
+    if (isPrivate && !isEditRestricted) {
+      return `Invités (${members.length})`;
+    }
+    return `Éditeurs (${members.length})`;
+  };
+
+  const getEmptyMessage = () => {
+    if (isPrivate) {
+      return "Aucune personne n'a accès à cette playlist";
+    }
+    return 'Aucun éditeur ajouté';
+  };
+
   if (isLoading) {
     return <LoadingSpinner fullScreen message="Chargement..." />;
   }
 
+  const headerContent = getHeaderContent();
+
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <View style={styles.header}>
-        <Text style={styles.title}>{isPrivate ? 'Accès' : 'Éditeurs'}</Text>
-        <Text style={styles.subtitle}>
-          {isPrivate
-            ? 'Gérez qui peut voir et modifier cette playlist privée.'
-            : 'Gérez qui peut modifier cette playlist.'}
-        </Text>
+        <Text style={styles.title}>{headerContent.title}</Text>
+        <Text style={styles.subtitle}>{headerContent.subtitle}</Text>
       </View>
 
       <View style={styles.content}>
-        <SearchBar
-          value={searchQuery}
-          onChangeText={handleSearchChange}
-          placeholder="Rechercher un utilisateur..."
-          style={styles.searchBar}
-        />
+        {isInfoOnly && renderInfoCard()}
 
-        {searchQuery.trim() && (
+        {!isInfoOnly && (
+          <SearchBar
+            value={searchQuery}
+            onChangeText={handleSearchChange}
+            placeholder="Rechercher un utilisateur..."
+            style={styles.searchBar}
+          />
+        )}
+
+        {searchQuery.trim() && !isInfoOnly && (
           <View style={styles.searchResults}>
             <Text style={styles.sectionTitle}>Résultats</Text>
             {isSearching ? (
@@ -437,27 +467,23 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
           </View>
         )}
 
-        <View style={styles.membersSection}>
-          <Text style={styles.sectionTitle}>
-            {isPrivate
-              ? `Personnes avec accès (${members.length})`
-              : `Éditeurs (${members.length})`}
-          </Text>
+        {(!isInfoOnly || members.length > 0) && (
+          <View style={styles.membersSection}>
+            <Text style={styles.sectionTitle}>{getSectionTitle()}</Text>
 
-          {members.length > 0 ? (
-            <FlatList
-              data={members}
-              keyExtractor={item => item.id}
-              renderItem={renderMemberItem}
-              style={styles.membersList}
-              extraData={processingUserId}
-            />
-          ) : (
-            <Text style={styles.noMembers}>
-              {isPrivate ? "Aucune personne n'a accès à cette playlist" : 'Aucun éditeur ajouté'}
-            </Text>
-          )}
-        </View>
+            {members.length > 0 ? (
+              <FlatList
+                data={members}
+                keyExtractor={item => item.id}
+                renderItem={renderMemberItem}
+                style={styles.membersList}
+                extraData={processingUserId}
+              />
+            ) : (
+              !isInfoOnly && <Text style={styles.noMembers}>{getEmptyMessage()}</Text>
+            )}
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -488,6 +514,33 @@ const createStyles = (theme: Theme) =>
     content: {
       flex: 1,
       padding: theme.spacing.lg,
+    },
+    infoCard: {
+      flexDirection: 'row',
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.spacing.sm,
+      padding: theme.spacing.lg,
+      borderWidth: theme.borders.medium,
+      borderColor: theme.colors.border,
+      marginBottom: theme.spacing.lg,
+    },
+    infoIcon: {
+      fontSize: 32,
+      marginRight: theme.spacing.md,
+    },
+    infoContent: {
+      flex: 1,
+    },
+    infoTitle: {
+      fontSize: theme.typography.sizes.md,
+      fontWeight: theme.typography.weights.semibold,
+      color: theme.colors.text,
+      marginBottom: theme.spacing.xs,
+    },
+    infoText: {
+      fontSize: theme.typography.sizes.sm,
+      color: theme.colors.textSecondary,
+      lineHeight: 20,
     },
     searchBar: {
       marginBottom: theme.spacing.md,

@@ -13,11 +13,22 @@ export const createPlaylistSchema = z.object({
     .string()
     .max(500, "Description must be at most 500 characters")
     .optional(),
-  visibility: z.enum(["public", "private"], {
-    errorMap: () => ({
-      message: "Visibility must be either public or private",
-    }),
-  }),
+  visibility: z
+    .enum(["public", "private"], {
+      errorMap: () => ({
+        message: "Visibility must be either public or private",
+      }),
+    })
+    .optional()
+    .default("public"),
+  editMode: z
+    .enum(["open", "restricted"], {
+      errorMap: () => ({
+        message: "Edit mode must be either open or restricted",
+      }),
+    })
+    .optional()
+    .default("open"),
 });
 
 export const updatePlaylistSchema = z.object({
@@ -31,6 +42,7 @@ export const updatePlaylistSchema = z.object({
     .max(500, "Description must be at most 500 characters")
     .optional(),
   visibility: z.enum(["public", "private"]).optional(),
+  editMode: z.enum(["open", "restricted"]).optional(),
 });
 
 export const addTrackSchema = z.object({

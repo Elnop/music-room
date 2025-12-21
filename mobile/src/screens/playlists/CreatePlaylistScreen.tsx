@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
@@ -18,7 +19,8 @@ import { useAuthStore } from '../../store/authStore';
 import { usePlaylistStore } from '../../store/playlistStore';
 import { Button } from '@components/common/Button';
 import { Input } from '@components/common/Input';
-import { playlistSchema, PlaylistInput } from '@utils/validators';
+import { playlistFormSchema, type PlaylistFormInput, type PlaylistInput } from '@utils/validators';
+import type { EditMode } from '@types';
 
 type PlaylistStackParamList = {
   Playlists: undefined;
@@ -41,34 +43,42 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
   const styles = React.useMemo(() => createStyles(theme), [theme]);
   const { user } = useAuthStore();
   const { createPlaylist, isLoading } = usePlaylistStore();
-  const [visibility, setVisibility] = useState<'public' | 'private'>('public');
+
+  const [isPrivate, setIsPrivate] = useState(false);
+  const [isEditRestricted, setIsEditRestricted] = useState(false);
 
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<PlaylistInput>({
-    resolver: zodResolver(playlistSchema),
+  } = useForm<PlaylistFormInput>({
+    resolver: zodResolver(playlistFormSchema),
     defaultValues: {
       name: '',
       description: '',
-      visibility: 'public',
     },
   });
 
-  const onSubmit = async (data: PlaylistInput) => {
+  const onSubmit = async (data: PlaylistFormInput) => {
     if (!user) {
-      Alert.alert('Error', 'You must be logged in to create a playlist');
+      Alert.alert('Erreur', 'Vous devez être connecté pour créer une playlist');
       return;
     }
 
+    const visibility = isPrivate ? 'private' : 'public';
+    const editMode: EditMode = isEditRestricted ? 'restricted' : 'open';
+
     try {
-      await createPlaylist(user.id, { ...data, visibility });
-      Alert.alert('Success', 'Playlist created successfully', [
+      await createPlaylist(user.id, {
+        ...data,
+        visibility,
+        editMode,
+      });
+      Alert.alert('Succès', 'Playlist créée avec succès', [
         { text: 'OK', onPress: () => navigation.goBack() },
       ]);
     } catch (error) {
-      Alert.alert('Error', 'Failed to create playlist');
+      Alert.alert('Erreur', 'Impossible de créer la playlist');
     }
   };
 
@@ -83,7 +93,7 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.content}>
-            <Text style={styles.title}>Create Playlist</Text>
+            <Text style={styles.title}>Créer une playlist</Text>
 
             <View style={styles.form}>
               <Controller
@@ -91,10 +101,10 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
                 name="name"
                 render={({ field: { onChange, value } }) => (
                   <Input
-                    label="Playlist Name"
+                    label="Nom de la playlist"
                     value={value}
                     onChangeText={onChange}
-                    placeholder="My Awesome Playlist"
+                    placeholder="Ma super playlist"
                     error={errors.name?.message}
                     autoFocus
                   />
@@ -106,10 +116,10 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
                 name="description"
                 render={({ field: { onChange, value } }) => (
                   <Input
-                    label="Description (Optional)"
+                    label="Description (Optionnel)"
                     value={value || ''}
                     onChangeText={onChange}
-                    placeholder="Describe your playlist..."
+                    placeholder="Décrivez votre playlist..."
                     error={errors.description?.message}
                     multiline
                     numberOfLines={3}
@@ -117,30 +127,60 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
                 )}
               />
 
-              <View style={styles.visibilitySection}>
-                <Text style={styles.label}>Visibility</Text>
-                <View style={styles.visibilityButtons}>
-                  <View style={styles.visibilityButton}>
-                    <Button
-                      title="Public"
-                      onPress={() => setVisibility('public')}
-                      variant={visibility === 'public' ? 'primary' : 'outline'}
-                      fullWidth
-                    />
+              <View style={styles.toggleSection}>
+                <View style={styles.toggleRow}>
+                  <View style={styles.toggleInfo}>
+                    <Text style={styles.toggleLabel}>Playlist privée</Text>
+                    <Text style={styles.toggleDescription}>
+                      {isPrivate
+                        ? 'Visible uniquement par les personnes invitées'
+                        : 'Visible par tous les utilisateurs'}
+                    </Text>
                   </View>
-                  <View style={styles.visibilityButton}>
-                    <Button
-                      title="Private"
-                      onPress={() => setVisibility('private')}
-                      variant={visibility === 'private' ? 'primary' : 'outline'}
-                      fullWidth
-                    />
+                  <Switch
+                    value={isPrivate}
+                    onValueChange={setIsPrivate}
+                    trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+                    thumbColor={theme.colors.surface}
+                  />
+                </View>
+              </View>
+
+              <View style={styles.toggleSection}>
+                <View style={styles.toggleRow}>
+                  <View style={styles.toggleInfo}>
+                    <Text style={styles.toggleLabel}>Édition restreinte</Text>
+                    <Text style={styles.toggleDescription}>
+                      {isEditRestricted
+                        ? 'Seules les personnes autorisées peuvent modifier'
+                        : 'Tout le monde peut ajouter/supprimer des morceaux'}
+                    </Text>
                   </View>
+                  <Switch
+                    value={isEditRestricted}
+                    onValueChange={setIsEditRestricted}
+                    trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+                    thumbColor={theme.colors.surface}
+                  />
+                </View>
+              </View>
+
+              <View style={styles.summarySection}>
+                <Text style={styles.summaryTitle}>Récapitulatif</Text>
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryIcon}>{isPrivate ? '🔒' : '🌍'}</Text>
+                  <Text style={styles.summaryText}>{isPrivate ? 'Privée' : 'Publique'}</Text>
+                </View>
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryIcon}>{isEditRestricted ? '✏️' : '👥'}</Text>
+                  <Text style={styles.summaryText}>
+                    {isEditRestricted ? 'Édition par les collaborateurs' : 'Édition par tous'}
+                  </Text>
                 </View>
               </View>
 
               <Button
-                title="Create Playlist"
+                title="Créer la playlist"
                 onPress={handleSubmit(onSubmit)}
                 loading={isLoading}
                 fullWidth
@@ -179,20 +219,59 @@ const createStyles = (theme: Theme) =>
     form: {
       gap: theme.spacing.md,
     },
-    visibilitySection: {
-      marginVertical: theme.spacing.sm,
+    toggleSection: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.spacing.sm,
+      padding: theme.spacing.md,
+      borderWidth: theme.borders.medium,
+      borderColor: theme.colors.border,
     },
-    label: {
+    toggleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    toggleInfo: {
+      flex: 1,
+      marginRight: theme.spacing.md,
+    },
+    toggleLabel: {
       fontSize: theme.typography.sizes.md,
-      fontWeight: theme.typography.weights.medium,
+      fontWeight: theme.typography.weights.semibold,
       color: theme.colors.text,
+      marginBottom: theme.spacing.xs,
+    },
+    toggleDescription: {
+      fontSize: theme.typography.sizes.sm,
+      color: theme.colors.textSecondary,
+    },
+    summarySection: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.spacing.sm,
+      padding: theme.spacing.md,
+      borderWidth: theme.borders.medium,
+      borderColor: theme.colors.border,
+      marginTop: theme.spacing.sm,
+    },
+    summaryTitle: {
+      fontSize: theme.typography.sizes.sm,
+      fontWeight: theme.typography.weights.semibold,
+      color: theme.colors.textSecondary,
+      textTransform: 'uppercase',
+      letterSpacing: 1,
       marginBottom: theme.spacing.sm,
     },
-    visibilityButtons: {
+    summaryRow: {
       flexDirection: 'row',
-      gap: theme.spacing.sm,
+      alignItems: 'center',
+      marginBottom: theme.spacing.xs,
     },
-    visibilityButton: {
-      flex: 1,
+    summaryIcon: {
+      fontSize: 16,
+      marginRight: theme.spacing.sm,
+    },
+    summaryText: {
+      fontSize: theme.typography.sizes.sm,
+      color: theme.colors.text,
     },
   });
