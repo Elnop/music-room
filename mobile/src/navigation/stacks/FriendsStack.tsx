@@ -11,11 +11,13 @@ import { useTheme } from '@contexts';
 import { FriendsScreen } from '../../screens/friends/FriendsScreen';
 import { UserProfileScreen } from '../../screens/friends/UserProfileScreen';
 import { PlaylistDetailScreen } from '../../screens/playlists/PlaylistDetailScreen';
+import { SearchTracksScreen } from '../../screens/playlists/SearchTracksScreen';
 
 export type FriendsStackParamList = {
   Friends: undefined;
   UserProfile: { userId: string };
   PlaylistDetail: { id: string };
+  SearchTracks: { playlistId: string };
 };
 
 const FriendsStack = createNativeStackNavigator<FriendsStackParamList>();
@@ -50,6 +52,11 @@ export function FriendsNavigator() {
         name="PlaylistDetail"
         component={PlaylistDetailScreen}
         options={{ title: 'Playlist' }}
+      />
+      <FriendsStack.Screen
+        name="SearchTracks"
+        component={SearchTracksScreen}
+        options={{ title: 'Ajouter des musiques' }}
       />
     </FriendsStack.Navigator>
   );

@@ -12,12 +12,14 @@ import { PlaylistsScreen } from '../../screens/playlists/PlaylistsScreen';
 import { PlaylistDetailScreen } from '../../screens/playlists/PlaylistDetailScreen';
 import { CreatePlaylistScreen } from '../../screens/playlists/CreatePlaylistScreen';
 import { SearchTracksScreen } from '../../screens/playlists/SearchTracksScreen';
+import { PlaylistSharingScreen } from '../../screens/playlists/PlaylistSharingScreen';
 
 export type PlaylistStackParamList = {
   Playlists: undefined;
   PlaylistDetail: { id: string };
   CreatePlaylist: undefined;
   SearchTracks: { playlistId: string };
+  PlaylistSharing: { playlistId: string };
 };
 
 const PlaylistStack = createNativeStackNavigator<PlaylistStackParamList>();
@@ -30,11 +32,9 @@ export function PlaylistsNavigator() {
       screenOptions={{
         headerStyle: {
           backgroundColor: theme.colors.background,
-          borderBottomWidth: theme.borders.medium,
-          borderBottomColor: theme.colors.border,
         },
         headerTintColor: theme.colors.text,
-        headerShadowVisible: false,
+        headerShadowVisible: true,
         headerTitleStyle: {
           fontWeight: theme.typography.weights.bold,
         },
@@ -59,6 +59,11 @@ export function PlaylistsNavigator() {
         name="SearchTracks"
         component={SearchTracksScreen}
         options={{ title: 'Add Tracks' }}
+      />
+      <PlaylistStack.Screen
+        name="PlaylistSharing"
+        component={PlaylistSharingScreen}
+        options={{ title: 'Partage' }}
       />
     </PlaylistStack.Navigator>
   );

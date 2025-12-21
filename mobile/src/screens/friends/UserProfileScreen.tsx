@@ -69,6 +69,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
         setFollowStatus(result.status);
       }
     } catch (err) {
+      console.error('[UserProfile] Follow toggle failed:', err);
     } finally {
       setIsFollowLoading(false);
     }
@@ -171,9 +172,9 @@ export function UserProfileScreen({ route, navigation }: Props) {
         </View>
 
         <View style={styles.playlistsSection}>
-          <Text style={styles.sectionTitle}>Playlists publiques</Text>
+          <Text style={styles.sectionTitle}>Playlists</Text>
           {playlists.length === 0 ? (
-            <Text style={styles.emptyPlaylists}>Aucune playlist publique</Text>
+            <Text style={styles.emptyPlaylists}>Aucune playlist</Text>
           ) : (
             playlists.map(playlist => (
               <PlaylistCard

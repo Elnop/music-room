@@ -4,6 +4,8 @@ import {
   FlatList,
   StyleSheet,
   Alert,
+  TouchableOpacity,
+  Text,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -17,13 +19,13 @@ import { TrackItem } from '@components/playlist/TrackItem';
 import { AddTrackButton } from '@components/playlist/AddTrackButton';
 import { EmptyState } from '@components/common/EmptyState';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
-import { canEditPlaylist } from '@mocks';
 
 type PlaylistStackParamList = {
   Playlists: undefined;
   PlaylistDetail: { id: string };
   CreatePlaylist: undefined;
   SearchTracks: { playlistId: string };
+  PlaylistSharing: { playlistId: string };
 };
 
 type PlaylistDetailScreenNavigationProp = NativeStackNavigationProp<
@@ -45,6 +47,13 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
   const { user } = useAuthStore();
   const { currentPlaylist, isLoading, fetchPlaylistById, removeTrack } = usePlaylistStore();
 
+  const isOwner = user && currentPlaylist?.ownerId === user.id;
+  
+  const canEdit = user && currentPlaylist ? (
+    currentPlaylist.ownerId === user.id ||
+    currentPlaylist.collaboratorIds.includes(user.id)
+  ) : false;
+
   // Refresh playlist when screen receives focus
   // Note: useFocusEffect also triggers on mount, so no separate useEffect needed
   useFocusEffect(
@@ -53,7 +62,20 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
     }, [id])
   );
 
-  const canEdit = user ? canEditPlaylist(id, user.id) : false;
+  React.useLayoutEffect(() => {
+    if (isOwner) {
+      navigation.setOptions({
+        headerRight: () => (
+          <TouchableOpacity
+            onPress={() => navigation.navigate('PlaylistSharing', { playlistId: id })}
+            style={{ paddingHorizontal: 8 }}
+          >
+            <Text style={{ fontSize: 20 }}>👥</Text>
+          </TouchableOpacity>
+        ),
+      });
+    }
+  }, [navigation, isOwner, id]);
 
   const handleAddTrack = () => {
     navigation.navigate('SearchTracks', { playlistId: id });

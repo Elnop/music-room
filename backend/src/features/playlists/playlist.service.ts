@@ -25,23 +25,26 @@ export class PlaylistService {
   }
 
   /**
-   * Get all playlists for a user (owned + collaborating)
+   * Get all playlists for a user (owned + collaborating + viewing)
    */
   async getUserPlaylists(userId: string): Promise<PlaylistResponse[]> {
     try {
       const { data: playlists, error } = await supabaseAdmin
         .from("playlists")
         .select("*")
-        .or(`owner_id.eq.${userId},collaborator_ids.cs.{${userId}}`)
+        .or(
+          `owner_id.eq.${userId},collaborator_ids.cs.{${userId}},viewer_ids.cs.{${userId}}`
+        )
         .order("created_at", { ascending: false });
 
       if (error) throw error;
 
-      // Get track counts for each playlist
-      const playlistIds = playlists.map((p) => p.id);
-      if (playlistIds.length === 0) {
+      if (playlists.length === 0) {
         return [];
       }
+
+      // Get track counts for each playlist
+      const playlistIds = playlists.map((p) => p.id);
 
       const { data: trackCounts, error: countError } = await supabaseAdmin
         .from("playlist_tracks")
@@ -55,33 +58,79 @@ export class PlaylistService {
           acc[row.playlist_id] = (acc[row.playlist_id] || 0) + 1;
           return acc;
         },
-        {} as Record<string, number>,
+        {} as Record<string, number>
+      );
+
+      // Get owner info for all playlists
+      const ownerIds = [...new Set(playlists.map((p) => p.owner_id))];
+      const { data: owners, error: ownersError } = await supabaseAdmin
+        .from("user_profiles")
+        .select("id, username, display_name, avatar_url")
+        .in("id", ownerIds);
+
+      if (ownersError) throw ownersError;
+
+      const ownerMap = (owners || []).reduce(
+        (acc, owner) => {
+          acc[owner.id] = {
+            id: owner.id,
+            username: owner.username,
+            displayName: owner.display_name,
+            avatarUrl: owner.avatar_url,
+          };
+          return acc;
+        },
+        {} as Record<
+          string,
+          {
+            id: string;
+            username: string;
+            displayName?: string;
+            avatarUrl?: string;
+          }
+        >
       );
 
       return playlists.map((p) =>
-        formatPlaylistResponse(p, countMap[p.id] || 0),
+        formatPlaylistResponse(p, countMap[p.id] || 0, ownerMap[p.owner_id])
       );
     } catch (error) {
       logger.error("Failed to get user playlists", { error, userId });
       throw new AppError(
         500,
         "Failed to fetch playlists",
-        "PLAYLIST_FETCH_ERROR",
+        "PLAYLIST_FETCH_ERROR"
       );
     }
   }
 
   /**
-   * Get public playlists for a specific user (for viewing their profile)
+   * Get playlists for a specific user's profile
+   * Returns public playlists + private playlists where current user is invited
    */
-  async getPublicPlaylistsByUser(targetUserId: string): Promise<PlaylistResponse[]> {
+  async getPlaylistsByUser(
+    targetUserId: string,
+    currentUserId?: string
+  ): Promise<PlaylistResponse[]> {
     try {
-      const { data: playlists, error } = await supabaseAdmin
+      // Build query: public playlists OR private where current user is viewer/collaborator
+      let query = supabaseAdmin
         .from("playlists")
         .select("*")
-        .eq("owner_id", targetUserId)
-        .eq("visibility", "public")
-        .order("created_at", { ascending: false });
+        .eq("owner_id", targetUserId);
+
+      if (currentUserId) {
+        // Get public OR (private AND user is viewer/collaborator)
+        query = query.or(
+          `visibility.eq.public,and(visibility.eq.private,or(viewer_ids.cs.{${currentUserId}},collaborator_ids.cs.{${currentUserId}}))`
+        );
+      } else {
+        query = query.eq("visibility", "public");
+      }
+
+      const { data: playlists, error } = await query.order("created_at", {
+        ascending: false,
+      });
 
       if (error) throw error;
 
@@ -102,18 +151,35 @@ export class PlaylistService {
           acc[row.playlist_id] = (acc[row.playlist_id] || 0) + 1;
           return acc;
         },
-        {} as Record<string, number>,
+        {} as Record<string, number>
       );
 
+      const { data: owner, error: ownerError } = await supabaseAdmin
+        .from("user_profiles")
+        .select("id, username, display_name, avatar_url")
+        .eq("id", targetUserId)
+        .single();
+
+      if (ownerError) throw ownerError;
+
+      const ownerInfo = owner
+        ? {
+            id: owner.id,
+            username: owner.username,
+            displayName: owner.display_name,
+            avatarUrl: owner.avatar_url,
+          }
+        : undefined;
+
       return playlists.map((p) =>
-        formatPlaylistResponse(p, countMap[p.id] || 0),
+        formatPlaylistResponse(p, countMap[p.id] || 0, ownerInfo)
       );
     } catch (error) {
-      logger.error("Failed to get public playlists", { error, targetUserId });
+      logger.error("Failed to get user playlists", { error, targetUserId });
       throw new AppError(
         500,
         "Failed to fetch playlists",
-        "PLAYLIST_FETCH_ERROR",
+        "PLAYLIST_FETCH_ERROR"
       );
     }
   }
@@ -123,7 +189,7 @@ export class PlaylistService {
    */
   async getPlaylistById(
     playlistId: string,
-    userId?: string,
+    userId?: string
   ): Promise<PlaylistWithTracksResponse> {
     try {
       // Get playlist
@@ -151,7 +217,7 @@ export class PlaylistService {
           added_by,
           added_at,
           tracks:track_id (*)
-        `,
+        `
         )
         .eq("playlist_id", playlistId)
         .order("position", { ascending: true });
@@ -193,7 +259,7 @@ export class PlaylistService {
       throw new AppError(
         500,
         "Failed to fetch playlist",
-        "PLAYLIST_FETCH_ERROR",
+        "PLAYLIST_FETCH_ERROR"
       );
     }
   }
@@ -203,7 +269,7 @@ export class PlaylistService {
    */
   async createPlaylist(
     userId: string,
-    data: CreatePlaylistDTO,
+    data: CreatePlaylistDTO
   ): Promise<PlaylistResponse> {
     try {
       const { data: playlist, error } = await supabaseAdmin
@@ -226,7 +292,7 @@ export class PlaylistService {
       throw new AppError(
         500,
         "Failed to create playlist",
-        "PLAYLIST_CREATE_ERROR",
+        "PLAYLIST_CREATE_ERROR"
       );
     }
   }
@@ -237,7 +303,7 @@ export class PlaylistService {
   async updatePlaylist(
     playlistId: string,
     userId: string,
-    data: UpdatePlaylistDTO,
+    data: UpdatePlaylistDTO
   ): Promise<PlaylistResponse> {
     try {
       // Only owner can update playlist metadata
@@ -270,7 +336,7 @@ export class PlaylistService {
       throw new AppError(
         500,
         "Failed to update playlist",
-        "PLAYLIST_UPDATE_ERROR",
+        "PLAYLIST_UPDATE_ERROR"
       );
     }
   }
@@ -297,7 +363,7 @@ export class PlaylistService {
       throw new AppError(
         500,
         "Failed to delete playlist",
-        "PLAYLIST_DELETE_ERROR",
+        "PLAYLIST_DELETE_ERROR"
       );
     }
   }

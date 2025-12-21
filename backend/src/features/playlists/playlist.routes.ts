@@ -28,11 +28,11 @@ router.post("/", (req, res, next) =>
 
 /**
  * @route   GET /api/playlists/user/:userId
- * @desc    Get public playlists of a specific user
+ * @desc    Get playlists of a specific user (public + private where invited)
  * @access  Private
  */
 router.get("/user/:userId", (req, res, next) =>
-  playlistController.getPublicPlaylistsByUser(req, res, next),
+  playlistController.getPlaylistsByUser(req, res, next),
 );
 
 /**
@@ -105,6 +105,33 @@ router.post("/:id/collaborators", (req, res, next) =>
  */
 router.delete("/:id/collaborators/:userId", (req, res, next) =>
   playlistController.removeCollaborator(req, res, next),
+);
+
+/**
+ * @route   GET /api/playlists/:id/viewers
+ * @desc    Get all viewers for a playlist
+ * @access  Private (owner only)
+ */
+router.get("/:id/viewers", (req, res, next) =>
+  playlistController.getViewers(req, res, next),
+);
+
+/**
+ * @route   POST /api/playlists/:id/viewers
+ * @desc    Add viewer to playlist (allows viewing private playlist)
+ * @access  Private (owner only)
+ */
+router.post("/:id/viewers", (req, res, next) =>
+  playlistController.addViewer(req, res, next),
+);
+
+/**
+ * @route   DELETE /api/playlists/:id/viewers/:userId
+ * @desc    Remove viewer from playlist
+ * @access  Private (owner only)
+ */
+router.delete("/:id/viewers/:userId", (req, res, next) =>
+  playlistController.removeViewer(req, res, next),
 );
 
 export default router;

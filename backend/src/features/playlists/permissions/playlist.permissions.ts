@@ -13,7 +13,8 @@ export class PlaylistPermissions {
     return (
       playlist.visibility === "public" ||
       playlist.owner_id === userId ||
-      playlist.collaborator_ids.includes(userId)
+      playlist.collaborator_ids.includes(userId) ||
+      playlist.viewer_ids.includes(userId)
     );
   }
 
@@ -62,7 +63,7 @@ export class PlaylistPermissions {
    * Fetch playlist with owner check
    */
   async getPlaylistWithOwnerCheck(
-    playlistId: string,
+    playlistId: string
   ): Promise<{ owner_id: string; collaborator_ids: string[] }> {
     const { data: playlist, error } = await supabaseAdmin
       .from("playlists")

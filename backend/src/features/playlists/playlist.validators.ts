@@ -68,8 +68,13 @@ export const addCollaboratorSchema = z.object({
   userId: z.string().uuid("Invalid user ID format"),
 });
 
+export const addViewerSchema = z.object({
+  userId: z.string().uuid("Invalid user ID format"),
+});
+
 export type CreatePlaylistInput = z.infer<typeof createPlaylistSchema>;
 export type UpdatePlaylistInput = z.infer<typeof updatePlaylistSchema>;
 export type AddTrackInput = z.infer<typeof addTrackSchema>;
 export type ReorderTracksInput = z.infer<typeof reorderTracksSchema>;
 export type AddCollaboratorInput = z.infer<typeof addCollaboratorSchema>;
+export type AddViewerInput = z.infer<typeof addViewerSchema>;

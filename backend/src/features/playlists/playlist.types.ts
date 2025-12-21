@@ -10,6 +10,7 @@ export interface PlaylistRow {
   cover_url?: string;
   owner_id: string;
   collaborator_ids: string[];
+  viewer_ids: string[];
   visibility: "public" | "private";
   created_at: string;
   updated_at: string;
@@ -68,6 +69,10 @@ export interface AddCollaboratorDTO {
   userId: string;
 }
 
+export interface AddViewerDTO {
+  userId: string;
+}
+
 // Response types (camelCase for client)
 export interface TrackResponse {
   id: string;
@@ -82,13 +87,22 @@ export interface TrackResponse {
   updatedAt: string;
 }
 
+export interface PlaylistOwner {
+  id: string;
+  username: string;
+  displayName?: string;
+  avatarUrl?: string;
+}
+
 export interface PlaylistResponse {
   id: string;
   name: string;
   description?: string;
   coverUrl?: string;
   ownerId: string;
+  owner?: PlaylistOwner;
   collaboratorIds: string[];
+  viewerIds: string[];
   visibility: "public" | "private";
   trackCount: number;
   createdAt: string;
@@ -97,12 +111,7 @@ export interface PlaylistResponse {
 
 export interface PlaylistWithTracksResponse extends PlaylistResponse {
   tracks: TrackWithPositionResponse[];
-  owner: {
-    id: string;
-    username: string;
-    displayName?: string;
-    avatarUrl?: string;
-  };
+  owner: PlaylistOwner;
 }
 
 export interface TrackWithPositionResponse extends TrackResponse {

@@ -3,6 +3,7 @@ import type {
   PlaylistRow,
   TrackRow,
   PlaylistResponse,
+  PlaylistOwner,
   TrackResponse,
 } from "../playlist.types.js";
 
@@ -12,6 +13,7 @@ import type {
 export function formatPlaylistResponse(
   row: PlaylistRow,
   trackCount: number,
+  owner?: PlaylistOwner
 ): PlaylistResponse {
   return {
     id: row.id,
@@ -19,7 +21,9 @@ export function formatPlaylistResponse(
     description: row.description,
     coverUrl: row.cover_url,
     ownerId: row.owner_id,
+    owner,
     collaboratorIds: row.collaborator_ids,
+    viewerIds: row.viewer_ids,
     visibility: row.visibility,
     trackCount,
     createdAt: row.created_at,
