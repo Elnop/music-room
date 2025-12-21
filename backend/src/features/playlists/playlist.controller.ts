@@ -42,6 +42,27 @@ export class PlaylistController {
   }
 
   /**
+   * GET /api/playlists/user/:userId
+   * Get public playlists of a specific user
+   */
+  async getPublicPlaylistsByUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { userId } = req.params;
+      const playlists = await playlistService.getPublicPlaylistsByUser(userId);
+
+      const response: ApiResponse = {
+        success: true,
+        data: { playlists },
+        meta: { timestamp: new Date().toISOString() },
+      };
+
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
    * POST /api/playlists
    * Create new playlist
    */

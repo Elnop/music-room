@@ -72,6 +72,53 @@ export class PlaylistService {
   }
 
   /**
+   * Get public playlists for a specific user (for viewing their profile)
+   */
+  async getPublicPlaylistsByUser(targetUserId: string): Promise<PlaylistResponse[]> {
+    try {
+      const { data: playlists, error } = await supabaseAdmin
+        .from("playlists")
+        .select("*")
+        .eq("owner_id", targetUserId)
+        .eq("visibility", "public")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      if (!playlists || playlists.length === 0) {
+        return [];
+      }
+
+      const playlistIds = playlists.map((p) => p.id);
+      const { data: trackCounts, error: countError } = await supabaseAdmin
+        .from("playlist_tracks")
+        .select("playlist_id")
+        .in("playlist_id", playlistIds);
+
+      if (countError) throw countError;
+
+      const countMap = (trackCounts || []).reduce(
+        (acc, row) => {
+          acc[row.playlist_id] = (acc[row.playlist_id] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>,
+      );
+
+      return playlists.map((p) =>
+        formatPlaylistResponse(p, countMap[p.id] || 0),
+      );
+    } catch (error) {
+      logger.error("Failed to get public playlists", { error, targetUserId });
+      throw new AppError(
+        500,
+        "Failed to fetch playlists",
+        "PLAYLIST_FETCH_ERROR",
+      );
+    }
+  }
+
+  /**
    * Get playlist by ID with full track data
    */
   async getPlaylistById(

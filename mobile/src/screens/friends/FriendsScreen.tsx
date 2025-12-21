@@ -78,7 +78,7 @@ export function FriendsScreen() {
       onPress={() => handleUserPress(item)}
       activeOpacity={0.7}
     >
-      <Avatar size="md" name={item.displayName || item.username} imageUrl={item.avatarUrl} />
+      <Avatar size="md" name={item.displayName || item.username} uri={item.avatarUrl} />
       <View style={styles.userInfo}>
         <Text style={styles.username}>{item.username}</Text>
         {item.displayName && <Text style={styles.displayName}>{item.displayName}</Text>}

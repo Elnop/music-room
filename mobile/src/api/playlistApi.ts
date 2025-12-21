@@ -38,6 +38,27 @@ export const playlistApi = {
   },
 
   /**
+   * Fetch public playlists of a specific user
+   */
+  async fetchUserPublicPlaylists(userId: string): Promise<Playlist[]> {
+    const token = await getAuthToken();
+    const response = await fetch(`${API_CONFIG.BASE_URL}/api/playlists/user/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error?.message || 'Failed to fetch playlists');
+    }
+
+    const data: ApiResponse<{ playlists: Playlist[] }> = await response.json();
+    return data.data!.playlists;
+  },
+
+  /**
    * Fetch playlist by ID with tracks
    */
   async fetchPlaylistById(id: string): Promise<PlaylistWithTracks> {
