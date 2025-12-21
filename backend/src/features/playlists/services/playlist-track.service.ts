@@ -18,6 +18,7 @@ export class PlaylistTrackService {
 
   /**
    * Add track to playlist
+   * Note: In 'open' edit mode, we don't track who added the track (added_by = null)
    */
   async addTrack(
     playlistId: string,
@@ -25,8 +26,12 @@ export class PlaylistTrackService {
     track: AddTrackDTO
   ): Promise<void> {
     try {
-      // Check permission (owner or collaborator)
-      await this.permissions.checkEditPermission(playlistId, userId);
+      const playlist =
+        await this.permissions.getPlaylistForPermissionCheck(playlistId);
+
+      if (!this.permissions.canEditPlaylist(playlist, userId)) {
+        throw new AppError(403, "Access denied", "PLAYLIST_ACCESS_DENIED");
+      }
 
       // Upsert track (insert if not exists, return existing if duplicate track_uri)
       const { data: trackData, error: trackError } = await supabaseAdmin
@@ -58,6 +63,8 @@ export class PlaylistTrackService {
 
       const nextPosition = maxPos ?? 0;
 
+      const addedBy = playlist.edit_mode === "restricted" ? userId : null;
+
       // Add to playlist_tracks
       const { error: addError } = await supabaseAdmin
         .from("playlist_tracks")
@@ -65,7 +72,7 @@ export class PlaylistTrackService {
           playlist_id: playlistId,
           track_id: trackData.id,
           position: nextPosition,
-          added_by: userId,
+          added_by: addedBy,
         });
 
       if (addError) {
@@ -84,8 +91,10 @@ export class PlaylistTrackService {
         playlistId,
         trackId: trackData.id,
         userId,
+        editMode: playlist.edit_mode,
       });
 
+      const now = new Date().toISOString();
       realtime.notifyPlaylistUpdate(playlistId, "track_added", {
         track: {
           id: trackData.id,
@@ -96,9 +105,11 @@ export class PlaylistTrackService {
           albumArt: trackData.album_art,
           durationMs: trackData.duration_ms,
           previewUrl: trackData.preview_url,
+          createdAt: trackData.created_at,
+          updatedAt: trackData.updated_at,
           position: nextPosition,
-          addedBy: userId,
-          addedAt: new Date().toISOString(),
+          addedBy,
+          addedAt: now,
         },
       });
     } catch (error) {

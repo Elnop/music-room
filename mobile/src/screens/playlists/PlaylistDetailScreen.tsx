@@ -85,10 +85,21 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 
   const isOwner = user && currentPlaylist?.ownerId === user.id;
 
-  const canEdit =
-    user && currentPlaylist
-      ? currentPlaylist.ownerId === user.id || currentPlaylist.collaboratorIds.includes(user.id)
-      : false;
+  const canEdit = React.useMemo(() => {
+    if (!user || !currentPlaylist) return false;
+
+    if (currentPlaylist.ownerId === user.id) return true;
+
+    if (currentPlaylist.collaboratorIds.includes(user.id)) return true;
+
+    if (currentPlaylist.editMode === 'open') {
+      if (currentPlaylist.visibility === 'public') return true;
+
+      if (currentPlaylist.viewerIds?.includes(user.id)) return true;
+    }
+
+    return false;
+  }, [user, currentPlaylist]);
 
   const handleReorderUpdate = React.useCallback(() => {
     fetchPlaylistById(id);

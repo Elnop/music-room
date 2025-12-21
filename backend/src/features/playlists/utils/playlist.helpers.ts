@@ -27,6 +27,7 @@ export function formatPlaylistResponse(
     collaboratorIds: row.collaborator_ids,
     viewerIds: row.viewer_ids,
     visibility: row.visibility,
+    editMode: row.edit_mode,
     trackCount,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
