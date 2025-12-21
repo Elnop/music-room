@@ -13,15 +13,19 @@ export function PlaylistHeader({ playlist }: PlaylistHeaderProps) {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
 
-  const defaultCover = 'https://via.placeholder.com/300/1DB954/FFFFFF?text=Playlist';
+  const firstTrackCover = playlist.tracks[0]?.albumArt;
+  const coverUrl = playlist.coverUrl || firstTrackCover;
   const trackCount = playlist.tracks.length;
 
   return (
     <View style={styles.container}>
-      <Image
-        source={{ uri: playlist.coverUrl || defaultCover }}
-        style={styles.cover}
-      />
+      {coverUrl ? (
+        <Image source={{ uri: coverUrl }} style={styles.cover} />
+      ) : (
+        <View style={[styles.cover, styles.emptyCover]}>
+          <Text style={styles.emptyIcon}>🎵</Text>
+        </View>
+      )}
       <Text style={styles.name}>{playlist.name}</Text>
       {playlist.description && (
         <Text style={styles.description}>{playlist.description}</Text>
@@ -59,11 +63,18 @@ const createStyles = (theme: Theme) =>
     cover: {
       width: 200,
       height: 200,
-      borderRadius: theme.borders.medium, // 8px
+      borderRadius: theme.borders.medium,
       backgroundColor: theme.colors.surfaceAlt,
-      borderWidth: theme.borders.thick, // 3px bordure
+      borderWidth: theme.borders.thick,
       borderColor: theme.colors.border,
       marginBottom: theme.spacing.lg,
+    },
+    emptyCover: {
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    emptyIcon: {
+      fontSize: 64,
     },
     name: {
       fontSize: theme.typography.sizes.xxl,

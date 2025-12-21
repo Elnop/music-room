@@ -14,6 +14,7 @@ export interface Playlist {
   name: string;
   description?: string;
   coverUrl?: string;
+  firstTrackCover?: string;
   ownerId: string;
   owner?: PlaylistOwner;
   collaboratorIds: string[];

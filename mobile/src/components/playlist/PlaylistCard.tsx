@@ -21,15 +21,18 @@ export function PlaylistCard({
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
 
-  const defaultCover = 'https://via.placeholder.com/150/1DB954/FFFFFF?text=Playlist';
+  const coverUrl = playlist.coverUrl || playlist.firstTrackCover;
 
   return (
     <Card onPress={onPress} style={styles.card}>
       <View style={styles.content}>
-        <Image
-          source={{ uri: playlist.coverUrl || defaultCover }}
-          style={styles.cover}
-        />
+        {coverUrl ? (
+          <Image source={{ uri: coverUrl }} style={styles.cover} />
+        ) : (
+          <View style={[styles.cover, styles.emptyCover]}>
+            <Text style={styles.emptyIcon}>🎵</Text>
+          </View>
+        )}
         <View style={styles.info}>
           <Text style={styles.name} numberOfLines={1}>
             {playlist.name}
@@ -69,10 +72,17 @@ const createStyles = (theme: Theme) =>
     cover: {
       width: 80,
       height: 80,
-      borderRadius: theme.borders.small, // 4px
+      borderRadius: theme.borders.small,
       backgroundColor: theme.colors.surfaceAlt,
       borderWidth: theme.borders.thin,
       borderColor: theme.colors.border,
+    },
+    emptyCover: {
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    emptyIcon: {
+      fontSize: 32,
     },
     info: {
       flex: 1,

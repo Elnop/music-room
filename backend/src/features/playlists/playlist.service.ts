@@ -43,7 +43,6 @@ export class PlaylistService {
         return [];
       }
 
-      // Get track counts for each playlist
       const playlistIds = playlists.map((p) => p.id);
 
       const { data: trackCounts, error: countError } = await supabaseAdmin
@@ -59,6 +58,25 @@ export class PlaylistService {
           return acc;
         },
         {} as Record<string, number>
+      );
+
+      const { data: firstTracks, error: firstTracksError } = await supabaseAdmin
+        .from("playlist_tracks")
+        .select("playlist_id, tracks:track_id(album_art)")
+        .in("playlist_id", playlistIds)
+        .eq("position", 0);
+
+      if (firstTracksError) throw firstTracksError;
+
+      const firstTrackCoverMap = (firstTracks || []).reduce(
+        (acc, row) => {
+          const track = row.tracks as { album_art?: string } | null;
+          if (track?.album_art) {
+            acc[row.playlist_id] = track.album_art;
+          }
+          return acc;
+        },
+        {} as Record<string, string>
       );
 
       // Get owner info for all playlists
@@ -92,7 +110,12 @@ export class PlaylistService {
       );
 
       return playlists.map((p) =>
-        formatPlaylistResponse(p, countMap[p.id] || 0, ownerMap[p.owner_id])
+        formatPlaylistResponse(
+          p,
+          countMap[p.id] || 0,
+          ownerMap[p.owner_id],
+          firstTrackCoverMap[p.id]
+        )
       );
     } catch (error) {
       logger.error("Failed to get user playlists", { error, userId });
@@ -113,14 +136,12 @@ export class PlaylistService {
     currentUserId?: string
   ): Promise<PlaylistResponse[]> {
     try {
-      // Build query: public playlists OR private where current user is viewer/collaborator
       let query = supabaseAdmin
         .from("playlists")
         .select("*")
         .eq("owner_id", targetUserId);
 
       if (currentUserId) {
-        // Get public OR (private AND user is viewer/collaborator)
         query = query.or(
           `visibility.eq.public,and(visibility.eq.private,or(viewer_ids.cs.{${currentUserId}},collaborator_ids.cs.{${currentUserId}}))`
         );
@@ -154,6 +175,25 @@ export class PlaylistService {
         {} as Record<string, number>
       );
 
+      const { data: firstTracks, error: firstTracksError } = await supabaseAdmin
+        .from("playlist_tracks")
+        .select("playlist_id, tracks:track_id(album_art)")
+        .in("playlist_id", playlistIds)
+        .eq("position", 0);
+
+      if (firstTracksError) throw firstTracksError;
+
+      const firstTrackCoverMap = (firstTracks || []).reduce(
+        (acc, row) => {
+          const track = row.tracks as { album_art?: string } | null;
+          if (track?.album_art) {
+            acc[row.playlist_id] = track.album_art;
+          }
+          return acc;
+        },
+        {} as Record<string, string>
+      );
+
       const { data: owner, error: ownerError } = await supabaseAdmin
         .from("user_profiles")
         .select("id, username, display_name, avatar_url")
@@ -172,7 +212,12 @@ export class PlaylistService {
         : undefined;
 
       return playlists.map((p) =>
-        formatPlaylistResponse(p, countMap[p.id] || 0, ownerInfo)
+        formatPlaylistResponse(
+          p,
+          countMap[p.id] || 0,
+          ownerInfo,
+          firstTrackCoverMap[p.id]
+        )
       );
     } catch (error) {
       logger.error("Failed to get user playlists", { error, targetUserId });
