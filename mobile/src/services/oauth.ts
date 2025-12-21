@@ -4,18 +4,18 @@ import {
 } from "@react-native-google-signin/google-signin";
 
 // Client IDs from Google Cloud Console
-const ANDROID_CLIENT_ID =
-  "187081511514-8dc2itp857pu6qtk3bkg7l389n5bhs98.apps.googleusercontent.com";
 const WEB_CLIENT_ID =
   "187081511514-6u51m2uorjrb72na2u8monu0jsdfhc13.apps.googleusercontent.com";
 
 /**
  * Configure Google Sign-In SDK
  * Must be called before using any Google Sign-In features
+ *
+ * Note: webClientId is used for both Android and iOS to get ID tokens
+ * The androidClientId parameter has been deprecated
  */
 export const configureGoogleSignIn = (): void => {
   GoogleSignin.configure({
-    androidClientId: ANDROID_CLIENT_ID,
     webClientId: WEB_CLIENT_ID, // Required to get ID tokens
     offlineAccess: false, // Don't request refresh token from Google
   });
@@ -51,6 +51,13 @@ export const signInWithGoogle = async (): Promise<string> => {
     } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
       throw new Error("Google Play Services not available");
     } else {
+      // Log detailed error for debugging
+      console.error('[OAuth] Google Sign-In failed:', {
+        errorCode: error.code,
+        errorMessage: error.message,
+        errorType: error.constructor?.name,
+        fullError: error,
+      });
       throw error;
     }
   }

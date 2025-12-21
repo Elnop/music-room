@@ -205,17 +205,44 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         refresh_token: response.session.refreshToken,
       });
     } catch (error) {
+      // Log error details for debugging
+      console.error('[AuthStore] loginWithGoogle failed:', {
+        errorType: error?.constructor?.name,
+        isApiError: error instanceof ApiError,
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+        errorCode: error instanceof ApiError ? error.code : undefined,
+        errorDetails: error instanceof ApiError ? error.details : undefined,
+        fullError: error,
+      });
+
       // Handle specific error codes
       if (error instanceof Error && error.message === 'SIGN_IN_CANCELLED') {
         // User cancelled = no error visible
         set({ isLoading: false, error: null });
       } else {
+        // Determine user-friendly error message
+        let errorMessage = 'Google login failed. Please try again.';
+
+        if (error instanceof ApiError) {
+          // Use backend error message (already user-friendly)
+          errorMessage = error.message;
+        } else if (error instanceof Error) {
+          // Use error message from oauth.ts or network layer
+          if (error.message === 'Google Play Services not available') {
+            errorMessage = 'Google Play Services not available. Please update Google Play Services and try again.';
+          } else if (error.message === 'Sign-in already in progress') {
+            errorMessage = 'A sign-in is already in progress. Please wait.';
+          } else if (error.message.includes('network') || error.message.includes('timeout')) {
+            errorMessage = 'Network error. Please check your connection and try again.';
+          } else {
+            // Fallback: show actual error message (but sanitized)
+            errorMessage = `Login failed: ${error.message}`;
+          }
+        }
+
         set({
           isLoading: false,
-          error:
-            error instanceof ApiError
-              ? error.message
-              : 'Google login failed. Please try again.',
+          error: errorMessage,
         });
       }
       throw error;
