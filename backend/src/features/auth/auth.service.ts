@@ -7,12 +7,17 @@ import {
   getUserProfile,
 } from "./utils/auth.helpers.js";
 import { SessionService } from "./services/session.service.js";
+import { OAuthService } from "./services/oauth.service.js";
+import { UserService } from "./services/user.service.js";
+import { ProviderService } from "./services/provider.service.js";
 import type {
   RegisterDTO,
   LoginDTO,
   AuthResponse,
   UserProfile,
   SupabaseUser,
+  LinkedProvidersResponse,
+  OAuthProvider,
 } from "./auth.types.js";
 
 export class AuthService {
@@ -190,5 +195,79 @@ export class AuthService {
    */
   async getUserProfile(userId: string): Promise<UserProfile> {
     return getUserProfile(userId);
+  }
+
+  /**
+   * Login with Google OAuth
+   * @param idToken - Google ID token from mobile app
+   * @returns AuthResponse with user and session
+   */
+  async loginWithGoogle(idToken: string): Promise<AuthResponse> {
+    try {
+      logger.info("Google OAuth login attempt");
+
+      // 1. Verify Google ID token
+      const googlePayload = await OAuthService.verifyGoogleToken(idToken);
+
+      // 2. Create or retrieve OAuth user (includes session generation)
+      const { userProfile, session } = await UserService.createOAuthUser(
+        "google",
+        googlePayload.sub,
+        googlePayload.email,
+        {
+          name: googlePayload.name || googlePayload.email.split("@")[0],
+          picture: googlePayload.picture,
+        },
+      );
+
+      logger.info("Google OAuth login successful", {
+        userId: userProfile.id,
+        username: userProfile.username,
+      });
+
+      // 3. Return formatted auth response
+      return {
+        user: {
+          id: userProfile.id,
+          email: googlePayload.email,
+          username: userProfile.username,
+          displayName: (userProfile as any).display_name,
+          avatarUrl: (userProfile as any).avatar_url,
+          bio: userProfile.bio,
+          createdAt: (userProfile as any).created_at,
+          updatedAt: (userProfile as any).updated_at,
+        },
+        session: {
+          accessToken: session.access_token,
+          refreshToken: session.refresh_token,
+          expiresIn: session.expires_in || 3600,
+          expiresAt: session.expires_at || 0,
+        },
+      };
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error;
+      }
+      logger.error("Unexpected error during Google OAuth login", { error });
+      throw new AppError(500, "Google login failed", "GOOGLE_LOGIN_ERROR");
+    }
+  }
+
+  /**
+   * Get linked authentication providers for a user
+   * @param userId - User ID
+   * @returns List of linked providers
+   */
+  async getLinkedProviders(userId: string): Promise<LinkedProvidersResponse> {
+    return ProviderService.getLinkedProviders(userId);
+  }
+
+  /**
+   * Unlink an OAuth provider from a user's account
+   * @param userId - User ID
+   * @param provider - Provider to unlink ('google' or 'facebook')
+   */
+  async unlinkProvider(userId: string, provider: OAuthProvider): Promise<void> {
+    return ProviderService.unlinkProvider(userId, provider);
   }
 }

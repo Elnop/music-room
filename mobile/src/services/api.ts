@@ -192,4 +192,49 @@ export const authApi = {
       },
     });
   },
+
+  /**
+   * Login with Google OAuth
+   */
+  async loginWithGoogle(idToken: string): Promise<AuthResponse> {
+    return apiRequest<AuthResponse>('/api/auth/google', {
+      method: 'POST',
+      body: JSON.stringify({
+        idToken,
+      }),
+    });
+  },
+
+  /**
+   * Get linked authentication providers
+   */
+  async getLinkedProviders(accessToken: string): Promise<{
+    providers: {
+      type: 'password' | 'google' | 'facebook';
+      connectedAt: string;
+      isPrimary: boolean;
+    }[];
+  }> {
+    return apiRequest('/api/auth/providers', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+
+  /**
+   * Unlink an OAuth provider
+   */
+  async unlinkProvider(
+    accessToken: string,
+    provider: 'google' | 'facebook'
+  ): Promise<{ message: string }> {
+    return apiRequest(`/api/auth/providers/${provider}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
 };

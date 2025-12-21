@@ -21,7 +21,7 @@ export class ProfileController {
 
       const profile = await profileService.updateProfile(
         authReq.user.id,
-        validated
+        validated,
       );
 
       const response: ApiResponse = {
@@ -98,7 +98,7 @@ export class ProfileController {
       const users = await profileService.searchUsers(
         validated.q,
         validated.limit,
-        authReq.user.id // Exclude current user from results
+        authReq.user.id, // Exclude current user from results
       );
 
       const response: ApiResponse = {

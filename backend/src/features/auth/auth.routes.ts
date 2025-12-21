@@ -39,4 +39,31 @@ router.post("/logout", authMiddleware, (req, res, next) =>
   authController.logout(req, res, next),
 );
 
+/**
+ * @route   POST /api/auth/google
+ * @desc    Login with Google OAuth
+ * @access  Public
+ */
+router.post("/google", (req, res, next) =>
+  authController.googleLogin(req, res, next),
+);
+
+/**
+ * @route   GET /api/auth/providers
+ * @desc    Get list of linked authentication providers
+ * @access  Private (requires authentication)
+ */
+router.get("/providers", authMiddleware, (req, res, next) =>
+  authController.getLinkedProviders(req, res, next),
+);
+
+/**
+ * @route   DELETE /api/auth/providers/:provider
+ * @desc    Unlink an OAuth provider from the account
+ * @access  Private (requires authentication)
+ */
+router.delete("/providers/:provider", authMiddleware, (req, res, next) =>
+  authController.unlinkProvider(req, res, next),
+);
+
 export default router;

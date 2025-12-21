@@ -1,4 +1,4 @@
-.PHONY: help install dev start stop restart logs logs-backend logs-mobile qr ps build build-backend build-mobile test test-backend lint lint-fix format fix-permissions clean clean-docker clean-deps clean-all shell-backend shell-mobile deploy health dev-tunnel qr-tunnel tunnel-info dev-local dev-android backend-local mobile-local expo-android expo-clear
+.PHONY: help install dev start stop restart logs logs-backend logs-mobile qr ps build build-backend build-mobile test test-backend lint lint-fix format fix-permissions clean clean-docker clean-deps clean-all shell-backend shell-mobile deploy health dev-tunnel qr-tunnel tunnel-info dev-local dev-android backend-local mobile-local expo-android expo-clear check-devices
 # Colors for output
 BLUE := \033[0;34m
 GREEN := \033[0;32m
@@ -669,3 +669,236 @@ expo-android: ## Quick start: Open app directly in Android emulator
 expo-clear: ## Start Expo with cleared cache (local)
 	@echo "$(BLUE)🧹 Starting Expo with cleared cache...$(NC)"
 	@cd mobile && npx expo start --localhost --clear
+
+
+clean-native: ## Clean native build folders (android, ios, .expo)
+	@echo "$(BLUE)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(BLUE)║              Cleaning Native Build Folders                   ║$(NC)"
+	@echo "$(BLUE)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Removing android/ folder...$(NC)"
+	@rm -rf mobile/android
+	@echo "$(GREEN)✓ Android build removed$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Removing ios/ folder...$(NC)"
+	@rm -rf mobile/ios
+	@echo "$(GREEN)✓ iOS build removed$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Removing .expo/ cache...$(NC)"
+	@rm -rf mobile/.expo
+	@echo "$(GREEN)✓ Expo cache removed$(NC)"
+	@echo ""
+	@echo "$(GREEN)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(GREEN)║              Native Build Cleaned Successfully!              ║$(NC)"
+	@echo "$(GREEN)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@echo "$(BLUE)Next step:$(NC) Run $(GREEN)make dev-build-local$(NC) to rebuild"
+	@echo ""
+
+
+check-devices: ## Check if Android device is connected
+	@echo "$(BLUE)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(BLUE)║              Checking Connected Devices                     ║$(NC)"
+	@echo "$(BLUE)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@echo "$(YELLOW)📱 Android Devices:$(NC)"
+	@if docker ps --format '{{.Names}}' | grep -q music-room-mobile; then \
+		echo "$(GREEN)   Using Docker container$(NC)"; \
+		docker exec music-room-mobile adb devices 2>/dev/null || echo "$(RED)   ✗ No devices found$(NC)"; \
+	else \
+		if command -v adb >/dev/null 2>&1; then \
+			echo "$(GREEN)   Using local adb$(NC)"; \
+			adb devices; \
+		else \
+			echo "$(RED)   ✗ adb not found$(NC)"; \
+			echo "$(YELLOW)   → Start Docker: make dev$(NC)"; \
+			echo "$(YELLOW)   → Or install Android SDK for local adb$(NC)"; \
+		fi \
+	fi
+	@echo ""
+	@echo "$(YELLOW)💡 Tips:$(NC)"
+	@echo "   • Make sure USB debugging is enabled on your device"
+	@echo "   • Accept USB debugging authorization popup on device"
+	@echo "   • Use $(GREEN)make dev-android$(NC) to launch app on connected device"
+	@echo ""
+
+
+# =====================================================
+# Custom Development Build (For Google Sign-In)
+# =====================================================
+
+dev-build-setup: ## One-time setup for custom development builds (EAS)
+	@echo "$(BLUE)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(BLUE)║     Custom Development Build - One-Time Setup (EAS)         ║$(NC)"
+	@echo "$(BLUE)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@echo "$(YELLOW)📖 WHY DO WE NEED THIS?$(NC)"
+	@echo "   Google Sign-In requires native code not available in Expo Go."
+	@echo "   A custom development build includes Google Sign-In while keeping:"
+	@echo "   $(GREEN)✓$(NC) Hot reload"
+	@echo "   $(GREEN)✓$(NC) Fast refresh"
+	@echo "   $(GREEN)✓$(NC) Tunnel mode (works across WiFi networks)"
+	@echo ""
+	@echo "$(YELLOW)📋 WHAT THIS DOES:$(NC)"
+	@echo "   1. Install EAS CLI globally (build tool)"
+	@echo "   2. Login to Expo account (reads credentials from mobile/.env)"
+	@echo "   3. Configure EAS project"
+	@echo ""
+	@echo "$(YELLOW)⚠️  PREREQUISITES:$(NC)"
+	@echo "   • mobile/.env must have: EXPO_TOKEN=your-token"
+	@echo "   • Get token from: https://expo.dev/accounts/[username]/settings/access-tokens"
+	@echo ""
+	@echo "$(YELLOW)→ Step 1/3: Installing EAS CLI globally...$(NC)"
+	@if ! command -v eas >/dev/null 2>&1; then \
+		npm install -g eas-cli; \
+		echo "$(GREEN)✓ EAS CLI installed$(NC)"; \
+	else \
+		echo "$(GREEN)✓ EAS CLI already installed$(NC)"; \
+	fi
+	@echo ""
+	@echo "$(YELLOW)→ Step 2/3: Logging into EAS account...$(NC)"
+	@if [ -f mobile/.env ] && grep -q "EXPO_TOKEN" mobile/.env; then \
+		echo "$(GREEN)✓ EXPO_TOKEN found in mobile/.env$(NC)"; \
+		cd mobile && eas whoami || (echo "$(RED)⚠️  Login failed - please check EXPO_TOKEN in mobile/.env$(NC)" && exit 1); \
+	else \
+		echo "$(RED)✗ EXPO_TOKEN not found in mobile/.env$(NC)"; \
+		echo ""; \
+		echo "$(YELLOW)Please add to mobile/.env:$(NC)"; \
+		echo "  EXPO_TOKEN=your-token-here"; \
+		echo ""; \
+		echo "$(BLUE)Get your token:$(NC)"; \
+		echo "  1. Go to: https://expo.dev/accounts/[username]/settings/access-tokens"; \
+		echo "  2. Create token with 'Read and write' access"; \
+		echo "  3. Copy token to mobile/.env"; \
+		echo ""; \
+		exit 1; \
+	fi
+	@echo "$(GREEN)✓ Logged in as: $$(cd mobile && eas whoami)$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Step 3/3: Configuring EAS project...$(NC)"
+	@cd mobile && eas build:configure || echo "$(YELLOW)⊙ EAS already configured$(NC)"
+	@echo ""
+	@echo "$(GREEN)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(GREEN)║              ✓ Development Build Setup Complete!            ║$(NC)"
+	@echo "$(GREEN)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@echo "$(BLUE)Next steps:$(NC)"
+	@echo "  1. Run: $(GREEN)make dev-build$(NC) to build Android development APK"
+	@echo "  2. Wait ~15-20 minutes for cloud build to complete"
+	@echo "  3. Download APK link will be provided"
+	@echo "  4. Install APK on your Android device (once)"
+	@echo "  5. Use $(GREEN)make dev-tunnel$(NC) as usual - hot reload works!"
+	@echo ""
+
+
+dev-build: ## Build custom development client for Android (Google Sign-In support)
+	@echo "$(BLUE)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(BLUE)║       Building Custom Development Client for Android        ║$(NC)"
+	@echo "$(BLUE)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@echo "$(YELLOW)📖 WHAT IS THIS?$(NC)"
+	@echo "   This builds an Android APK with Google Sign-In integrated."
+	@echo "   $(GREEN)You only need to do this once$(NC) (or when native deps change)."
+	@echo ""
+	@echo "$(YELLOW)⏱️  BUILD TIME:$(NC) ~15-20 minutes (cloud build on EAS servers)"
+	@echo ""
+	@echo "$(YELLOW)📋 WHAT HAPPENS:$(NC)"
+	@echo "   1. Code is uploaded to EAS servers"
+	@echo "   2. Android APK is built in the cloud with:"
+	@echo "      • Google Sign-In native code"
+	@echo "      • Development mode (hot reload enabled)"
+	@echo "      • Debug signing (for testing)"
+	@echo "   3. Download link is provided"
+	@echo ""
+	@echo "$(YELLOW)→ Checking EAS setup...$(NC)"
+	@if ! command -v eas >/dev/null 2>&1; then \
+		echo "$(RED)✗ EAS CLI not installed$(NC)"; \
+		echo ""; \
+		echo "$(YELLOW)Run this first:$(NC) $(GREEN)make dev-build-setup$(NC)"; \
+		echo ""; \
+		exit 1; \
+	fi
+	@if ! cd mobile && eas whoami >/dev/null 2>&1; then \
+		echo "$(RED)✗ Not logged into EAS$(NC)"; \
+		echo ""; \
+		echo "$(YELLOW)Run this first:$(NC) $(GREEN)make dev-build-setup$(NC)"; \
+		echo ""; \
+		exit 1; \
+	fi
+	@echo "$(GREEN)✓ EAS ready$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Starting cloud build...$(NC)"
+	@echo ""
+	@echo "$(BLUE)════════════════════════════════════════════════════════════$(NC)"
+	@echo "$(YELLOW)⏳ This will take ~15-20 minutes$(NC)"
+	@echo "$(YELLOW)   You can close this terminal - build continues in the cloud$(NC)"
+	@echo "$(YELLOW)   Check status: https://expo.dev/accounts/[username]/projects/music-room/builds$(NC)"
+	@echo "$(BLUE)════════════════════════════════════════════════════════════$(NC)"
+	@echo ""
+	@cd mobile && eas build --profile development --platform android
+	@echo ""
+	@echo "$(GREEN)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(GREEN)║                  ✓ Build Complete!                          ║$(NC)"
+	@echo "$(GREEN)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@echo "$(BLUE)📱 Next steps:$(NC)"
+	@echo "  1. Download the APK using the link above"
+	@echo "  2. Transfer APK to your Android device"
+	@echo "  3. Install APK (enable 'Install from unknown sources' if needed)"
+	@echo "  4. Run: $(GREEN)make dev-tunnel$(NC)"
+	@echo "  5. Open the dev build app on your phone"
+	@echo "  6. Scan QR code - hot reload works! ✨"
+	@echo ""
+	@echo "$(YELLOW)💡 You only need to rebuild when:$(NC)"
+	@echo "   • Native dependencies change (e.g., new plugins)"
+	@echo "   • app.json configuration changes"
+	@echo "   • NOT for regular code changes (hot reload handles that)"
+	@echo ""
+
+
+dev-build-local: ## Build development client locally with Android SDK (faster, requires setup)
+	@echo "$(BLUE)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(BLUE)║          Building Development Client Locally                 ║$(NC)"
+	@echo "$(BLUE)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@echo "$(YELLOW)📖 WHAT IS THIS?$(NC)"
+	@echo "   Builds the development APK locally (faster than cloud build)"
+	@echo ""
+	@echo "$(YELLOW)⚠️  PREREQUISITES:$(NC)"
+	@echo "   • Android Studio installed"
+	@echo "   • Android SDK configured"
+	@echo "   • ANDROID_HOME environment variable set"
+	@echo "   • adb command available"
+	@echo ""
+	@echo "$(YELLOW)→ Checking Android SDK...$(NC)"
+	@if ! command -v adb >/dev/null 2>&1; then \
+		echo "$(RED)✗ Android SDK not found$(NC)"; \
+		echo ""; \
+		echo "$(YELLOW)Please install Android Studio and configure:$(NC)"; \
+		echo "  export ANDROID_HOME=$$HOME/Android/Sdk"; \
+		echo "  export PATH=$$PATH:$$ANDROID_HOME/platform-tools"; \
+		echo ""; \
+		echo "$(BLUE)Or use cloud build:$(NC) $(GREEN)make dev-build$(NC)"; \
+		echo ""; \
+		exit 1; \
+	fi
+	@echo "$(GREEN)✓ Android SDK found: $${ANDROID_HOME}$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Running expo prebuild (generates native code)...$(NC)"
+	@cd mobile && npx expo prebuild --clean
+	@echo ""
+	@echo "$(YELLOW)→ Building and installing on connected device...$(NC)"
+	@echo "$(BLUE)Make sure your Android device is connected via USB with USB debugging enabled$(NC)"
+	@echo ""
+	@cd mobile && npx expo run:android --device
+	@echo ""
+	@echo "$(GREEN)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(GREEN)║          ✓ Development Build Installed on Device!           ║$(NC)"
+	@echo "$(GREEN)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@echo "$(BLUE)Next steps:$(NC)"
+	@echo "  1. Disconnect USB cable"
+	@echo "  2. Run: $(GREEN)make dev-tunnel$(NC)"
+	@echo "  3. Open dev build app on phone"
+	@echo "  4. Scan QR code - hot reload works! ✨"
+	@echo ""

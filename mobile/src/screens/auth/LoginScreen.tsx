@@ -7,6 +7,7 @@ import {
   Platform,
   ScrollView,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
@@ -35,7 +36,7 @@ interface LoginScreenProps {
 export function LoginScreen({ navigation }: LoginScreenProps) {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
-  const { login, isLoading, error, clearError } = useAuthStore();
+  const { login, loginWithGoogle, isLoading, error, clearError } = useAuthStore();
 
   const {
     control,
@@ -62,6 +63,15 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
       // Navigation handled by RootNavigator based on auth state
     } catch (err) {
       // Error shown via alert
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      await loginWithGoogle();
+      // Navigation handled by RootNavigator based on auth state
+    } catch (err) {
+      // Error shown via alert (from auth store)
     }
   };
 
@@ -123,6 +133,23 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
                 fullWidth
                 variant="primary"
               />
+
+              {/* Divider */}
+              <View style={styles.divider}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerText}>OR</Text>
+                <View style={styles.dividerLine} />
+              </View>
+
+              {/* Google Sign-In Button */}
+              <TouchableOpacity
+                style={styles.googleButton}
+                onPress={handleGoogleLogin}
+                disabled={isLoading}
+              >
+                <Text style={styles.googleIcon}>G</Text>
+                <Text style={styles.googleButtonText}>Continue with Google</Text>
+              </TouchableOpacity>
             </View>
 
             <View style={styles.footer}>
@@ -187,5 +214,41 @@ const createStyles = (theme: Theme) =>
       fontSize: theme.typography.sizes.sm,
       color: theme.colors.primary,
       fontWeight: theme.typography.weights.semibold,
+    },
+    divider: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginVertical: theme.spacing.lg,
+    },
+    dividerLine: {
+      flex: 1,
+      height: 1,
+      backgroundColor: '#3E3E3E',
+    },
+    dividerText: {
+      marginHorizontal: theme.spacing.md,
+      fontSize: theme.typography.sizes.sm,
+      color: theme.colors.textSecondary,
+    },
+    googleButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: '#FFFFFF',
+      borderRadius: 8,
+      paddingVertical: 12,
+      borderWidth: 1,
+      borderColor: '#DADCE0',
+    },
+    googleIcon: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: '#4285F4',
+      marginRight: 12,
+    },
+    googleButtonText: {
+      fontSize: 16,
+      fontWeight: '500',
+      color: '#3C4043',
     },
   });

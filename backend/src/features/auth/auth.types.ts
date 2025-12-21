@@ -20,6 +20,40 @@ export interface OAuthCallbackDTO {
 }
 
 /**
+ * OAuth Provider Types
+ */
+
+export type OAuthProvider = "google" | "facebook";
+
+export interface GoogleTokenPayload {
+  sub: string; // Google user ID
+  email: string;
+  email_verified: boolean;
+  name?: string;
+  picture?: string;
+  given_name?: string;
+  family_name?: string;
+}
+
+export interface GoogleLoginDTO {
+  idToken: string; // JWT ID token from Google Sign-In
+}
+
+export interface GoogleProfile {
+  name: string;
+  picture?: string;
+}
+
+export interface FacebookProfile {
+  name: string;
+  picture?: {
+    data: {
+      url: string;
+    };
+  };
+}
+
+/**
  * Response types
  */
 
@@ -32,6 +66,11 @@ export interface UserProfile {
   bio?: string;
   createdAt: string;
   updatedAt: string;
+  connectedProviders?: {
+    hasPassword: boolean;
+    hasGoogle: boolean;
+    hasFacebook: boolean;
+  };
 }
 
 export interface AuthResponse {
@@ -46,6 +85,17 @@ export interface AuthResponse {
 
 export interface RefreshTokenDTO {
   refreshToken: string;
+}
+
+/**
+ * Linked Providers Response
+ */
+export interface LinkedProvidersResponse {
+  providers: {
+    type: "password" | OAuthProvider;
+    connectedAt: string;
+    isPrimary: boolean;
+  }[];
 }
 
 /**

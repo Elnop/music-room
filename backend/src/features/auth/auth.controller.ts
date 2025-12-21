@@ -1,6 +1,10 @@
 import type { Request, Response, NextFunction } from "express";
 import { AuthService } from "./auth.service.js";
-import { registerSchema, loginSchema } from "./auth.validators.js";
+import {
+  registerSchema,
+  loginSchema,
+  googleLoginSchema,
+} from "./auth.validators.js";
 import type { ApiResponse } from "@/shared/types/global.types.js";
 import type { AuthenticatedRequest } from "@/shared/types/global.types.js";
 import { logger } from "@/shared/utils/logger.js";
@@ -131,6 +135,104 @@ export class AuthController {
 
       res.json(response);
     } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * POST /api/auth/google
+   * Login with Google OAuth
+   */
+  async googleLogin(req: Request, res: Response, next: NextFunction) {
+    try {
+      logger.info("Google OAuth login request received");
+
+      const validated = googleLoginSchema.parse(req.body);
+      const result = await authService.loginWithGoogle(validated.idToken);
+
+      const response: ApiResponse = {
+        success: true,
+        data: result,
+        meta: {
+          timestamp: new Date().toISOString(),
+        },
+      };
+
+      res.status(200).json(response);
+    } catch (error) {
+      logger.error("Google login error", { error });
+      next(error);
+    }
+  }
+
+  /**
+   * GET /api/auth/providers
+   * Get list of linked authentication providers for current user
+   */
+  async getLinkedProviders(req: Request, res: Response, next: NextFunction) {
+    try {
+      const authReq = req as AuthenticatedRequest;
+      logger.info("Get linked providers request", { userId: authReq.user.id });
+
+      const providers = await authService.getLinkedProviders(authReq.user.id);
+
+      const response: ApiResponse = {
+        success: true,
+        data: providers,
+        meta: {
+          timestamp: new Date().toISOString(),
+        },
+      };
+
+      res.json(response);
+    } catch (error) {
+      logger.error("Get linked providers error", { error });
+      next(error);
+    }
+  }
+
+  /**
+   * DELETE /api/auth/providers/:provider
+   * Unlink an OAuth provider from the current user's account
+   */
+  async unlinkProvider(req: Request, res: Response, next: NextFunction) {
+    try {
+      const authReq = req as AuthenticatedRequest;
+      const provider = req.params.provider as "google" | "facebook";
+
+      logger.info("Unlink provider request", {
+        userId: authReq.user.id,
+        provider,
+      });
+
+      // Validate provider
+      if (!["google", "facebook"].includes(provider)) {
+        const response: ApiResponse = {
+          success: false,
+          error: {
+            code: "INVALID_PROVIDER",
+            message: "Invalid provider. Must be 'google' or 'facebook'",
+          },
+          meta: {
+            timestamp: new Date().toISOString(),
+          },
+        };
+        return res.status(400).json(response);
+      }
+
+      await authService.unlinkProvider(authReq.user.id, provider);
+
+      const response: ApiResponse = {
+        success: true,
+        data: { message: `${provider} unlinked successfully` },
+        meta: {
+          timestamp: new Date().toISOString(),
+        },
+      };
+
+      res.json(response);
+    } catch (error) {
+      logger.error("Unlink provider error", { error });
       next(error);
     }
   }
