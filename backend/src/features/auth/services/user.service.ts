@@ -1,4 +1,3 @@
-import crypto from "crypto";
 import { supabase } from "../../../shared/config/supabase.js";
 import { AppError } from "../../../shared/middleware/error-handler.js";
 import { logger } from "../../../shared/utils/logger.js";
@@ -52,69 +51,90 @@ export class UserService {
   }
 
   /**
-   * Create session for OAuth user using admin magic link method
+   * Create session for OAuth user using Admin Magic Link API
+   * This method does NOT modify user passwords - safe for all user types
    * @param email - User email
    * @returns Supabase session with access and refresh tokens
    */
   private static async createSessionForOAuthUser(
     email: string,
   ): Promise<Session> {
-    // For OAuth users, we create a session by setting a temporary password
-    // and then signing in with it (this generates proper access/refresh tokens)
+    try {
+      // Step 1: Generate magic link using admin API
+      // This creates a temporary token WITHOUT modifying user password
+      const { data: linkData, error: linkError } =
+        await supabase.auth.admin.generateLink({
+          type: "magiclink",
+          email,
+        });
 
-    // Generate a secure random password (user will never see/use this)
-    const tempPassword = crypto.randomBytes(32).toString("hex");
+      if (linkError || !linkData) {
+        logger.error("Failed to generate magic link for OAuth user", {
+          email,
+          error: linkError,
+        });
+        throw new AppError(
+          500,
+          "Failed to generate session link",
+          "SESSION_LINK_GENERATION_FAILED",
+        );
+      }
 
-    // Get the user ID from Supabase auth
-    const { data: authUsers } = await supabase.auth.admin.listUsers();
-    const authUser = authUsers?.users.find((u) => u.email === email);
+      // Step 2: Extract hashed token from response
+      const { hashed_token } = linkData.properties;
 
-    if (!authUser) {
-      logger.error("OAuth user not found in Supabase auth", { email });
-      throw new AppError(500, "Failed to find user", "USER_NOT_FOUND");
-    }
+      if (!hashed_token) {
+        logger.error("Magic link response missing hashed_token", {
+          email,
+          properties: linkData.properties,
+        });
+        throw new AppError(
+          500,
+          "Invalid magic link response",
+          "INVALID_MAGIC_LINK_RESPONSE",
+        );
+      }
 
-    // Update user with temporary password
-    const { error: updateError } = await supabase.auth.admin.updateUserById(
-      authUser.id,
-      { password: tempPassword },
-    );
+      // Step 3: Verify the token hash to obtain session
+      // This exchanges the hashed_token for a full session with tokens
+      const { data: verifyData, error: verifyError } =
+        await supabase.auth.verifyOtp({
+          token_hash: hashed_token,
+          type: "email",
+        });
 
-    if (updateError) {
-      logger.error("Failed to set temporary password for OAuth user", {
-        error: updateError,
-      });
-      throw new AppError(
-        500,
-        "Failed to generate session",
-        "SESSION_GENERATION_FAILED",
-      );
-    }
+      if (verifyError || !verifyData.session) {
+        logger.error("Failed to verify OTP and create session", {
+          email,
+          error: verifyError,
+        });
+        throw new AppError(
+          500,
+          "Failed to create session from magic link",
+          "SESSION_VERIFICATION_FAILED",
+        );
+      }
 
-    // Sign in with the temporary password to get session tokens
-    const { data: sessionData, error: sessionError } =
-      await supabase.auth.signInWithPassword({
+      logger.info("Session created successfully for OAuth user via magic link", {
+        userId: verifyData.user?.id,
         email,
-        password: tempPassword,
       });
 
-    if (sessionError || !sessionData.session) {
-      logger.error("Failed to create session for OAuth user", {
-        error: sessionError,
+      return verifyData.session;
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error;
+      }
+      logger.error("Unexpected error creating OAuth session", {
+        email,
+        error,
       });
       throw new AppError(
         500,
-        "Failed to create session",
-        "SESSION_CREATION_FAILED",
+        "Failed to create OAuth session",
+        "OAUTH_SESSION_ERROR",
       );
     }
-
-    logger.info("Session created successfully for OAuth user", {
-      userId: authUser.id,
-      email,
-    });
-
-    return sessionData.session;
   }
 
   /**
