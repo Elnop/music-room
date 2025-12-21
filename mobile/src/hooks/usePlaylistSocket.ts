@@ -58,9 +58,13 @@ export function usePlaylistSocket(playlistId: string, onReorder?: () => void) {
     socket.on('playlist:updated', handlePlaylistUpdate);
 
     return () => {
-      socket.off('playlist:updated', handlePlaylistUpdate);
-      socket.emit('playlist:leave', playlistId);
-      console.log(`[Socket] Left playlist room: ${playlistId}`);
+      if (socket) {
+        socket.off('playlist:updated', handlePlaylistUpdate);
+        if (socket.connected) {
+          socket.emit('playlist:leave', playlistId);
+        }
+        console.log(`[Socket] Left playlist room: ${playlistId}`);
+      }
     };
   }, [socket, isConnected, playlistId, addTrackLocally, removeTrackLocally, onReorder]);
 }

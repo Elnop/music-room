@@ -1,6 +1,21 @@
 import { Server as SocketIOServer, Socket } from "socket.io";
 import type { Server as HTTPServer } from "http";
 import { logger } from "@/shared/utils/logger.js";
+import type { TrackWithPositionResponse } from "@/features/playlists/playlist.types.js";
+
+// Typed payloads for playlist events
+export interface TrackAddedPayload {
+  track: TrackWithPositionResponse;
+}
+
+export interface TrackRemovedPayload {
+  trackId: string;
+}
+
+export type PlaylistEventPayload =
+  | TrackAddedPayload
+  | TrackRemovedPayload
+  | undefined;
 
 /**
  * Realtime Service
@@ -18,9 +33,11 @@ class RealtimeService {
    * Initialize Socket.io server
    */
   initialize(httpServer: HTTPServer) {
+    const corsOrigin = process.env.SOCKET_IO_CORS_ORIGIN || "*";
+
     this.io = new SocketIOServer(httpServer, {
       cors: {
-        origin: "*",
+        origin: corsOrigin,
         methods: ["GET", "POST"],
       },
     });
@@ -28,7 +45,6 @@ class RealtimeService {
     this.io.on("connection", (socket) => {
       logger.info(`[Socket] Connected: ${socket.id}`);
 
-      // Register all feature handlers
       this.registerPlaylistHandlers(socket);
 
       socket.on("disconnect", () => {
@@ -59,8 +75,19 @@ class RealtimeService {
    */
   notifyPlaylistUpdate(
     playlistId: string,
+    event: "track_added",
+    data: TrackAddedPayload
+  ): void;
+  notifyPlaylistUpdate(
+    playlistId: string,
+    event: "track_removed",
+    data: TrackRemovedPayload
+  ): void;
+  notifyPlaylistUpdate(playlistId: string, event: "reordered"): void;
+  notifyPlaylistUpdate(
+    playlistId: string,
     event: "track_added" | "track_removed" | "reordered",
-    data?: Record<string, unknown>
+    data?: PlaylistEventPayload
   ) {
     if (!this.io) {
       logger.warn("[Socket] Cannot emit - Socket.io not initialized");

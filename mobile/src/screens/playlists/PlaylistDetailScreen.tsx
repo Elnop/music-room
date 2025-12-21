@@ -36,23 +36,37 @@ interface PlaylistDetailScreenProps {
   route: PlaylistDetailScreenRouteProp;
 }
 
-// Convert internal Track to SoundCloudTrack format for the player
-const trackToSoundCloud = (track: Track): SoundCloudTrack => ({
-  id: parseInt(track.id, 10) || Date.now(),
-  title: track.title,
-  description: null,
-  duration: track.durationMs,
-  genre: null,
-  artwork_url: track.albumArt,
-  permalink_url: track.trackUri,
-  user: {
-    id: 0,
-    username: track.artist,
-    avatar_url: track.albumArt,
-    permalink_url: '',
-  },
-  playable: true,
-});
+const hashStringToNumber = (str: string): number => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const chr = str.charCodeAt(i);
+    hash = (hash << 5) - hash + chr;
+    hash |= 0; // Convert to 32-bit integer
+  }
+  return Math.abs(hash);
+};
+
+const trackToSoundCloud = (track: Track): SoundCloudTrack => {
+  const parsed = parseInt(track.id, 10);
+  const trackId = !Number.isNaN(parsed) ? parsed : hashStringToNumber(track.trackUri || track.id);
+
+  return {
+    id: trackId,
+    title: track.title,
+    description: null,
+    duration: track.durationMs,
+    genre: null,
+    artwork_url: track.albumArt || null,
+    permalink_url: track.trackUri,
+    user: {
+      id: trackId,
+      username: track.artist,
+      avatar_url: track.albumArt || null,
+      permalink_url: track.trackUri,
+    },
+    playable: true,
+  };
+};
 
 export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreenProps) {
   const { theme } = useTheme();

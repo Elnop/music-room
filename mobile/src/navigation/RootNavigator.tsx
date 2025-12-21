@@ -10,7 +10,6 @@ import { supabase } from '@/lib/supabase';
 export function RootNavigator() {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const loadFromStorage = useAuthStore(state => state.loadFromStorage);
-  const logout = useAuthStore(state => state.logout);
   const [isReady, setIsReady] = useState(false);
 
   const connectSocket = useSocketStore(state => state.connect);

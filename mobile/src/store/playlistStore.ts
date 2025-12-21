@@ -124,12 +124,25 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 
       // Update state
       const { playlists, currentPlaylist } = get();
-      // Exclude owner from updatedPlaylist to preserve UserProfile type
-      const { owner: _, ...playlistUpdates } = updatedPlaylist;
+
+      const updatedCurrentPlaylist =
+        currentPlaylist?.id === id
+          ? {
+              ...currentPlaylist,
+              name: updatedPlaylist.name,
+              description: updatedPlaylist.description,
+              coverUrl: updatedPlaylist.coverUrl,
+              visibility: updatedPlaylist.visibility,
+              collaboratorIds: updatedPlaylist.collaboratorIds,
+              viewerIds: updatedPlaylist.viewerIds,
+              trackCount: updatedPlaylist.trackCount,
+              updatedAt: updatedPlaylist.updatedAt,
+            }
+          : currentPlaylist;
+
       set({
         playlists: playlists.map(p => (p.id === id ? updatedPlaylist : p)),
-        currentPlaylist:
-          currentPlaylist?.id === id ? { ...currentPlaylist, ...playlistUpdates } : currentPlaylist,
+        currentPlaylist: updatedCurrentPlaylist,
         isLoading: false,
       });
     } catch (error) {
