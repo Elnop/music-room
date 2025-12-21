@@ -1,0 +1,93 @@
+# ==============================================================================
+# Local Development Commands (No Docker)
+# ==============================================================================
+# Commands for local development, useful with Android Studio emulator
+
+.PHONY: dev-local dev-android backend-local mobile-local expo-android expo-clear clean-native check-devices
+
+dev-local: .ensure-backend-deps .ensure-mobile-deps ## Start development locally (no Docker) - for Android Studio emulator
+	$(call print_header,Starting Local Development Mode)
+	$(call print_success,Dependencies OK)
+	$(call blank_line)
+	$(call print_arrow,Starting backend server...)
+	$(call npm_backend,run dev) &
+	@sleep $(SHORT_WAIT_TIME)
+	$(call print_success,Backend started: $(BACKEND_URL))
+	$(call blank_line)
+	$(call print_arrow,Starting Expo for Android...)
+	$(call blank_line)
+	$(call expo_mobile,start --localhost --android)
+
+dev-android: ## Start Expo for Android emulator (backend must be running)
+	$(call print_header,Starting Expo for Android Emulator)
+	$(call check_backend_health)
+	$(call blank_line)
+	$(call print_arrow,Starting Expo with Android...)
+	$(call print_info,📱 Opening in Android Studio emulator)
+	$(call blank_line)
+	$(call expo_mobile,start --localhost --android)
+
+backend-local: .ensure-backend-deps ## Start backend only (local, no Docker)
+	$(call print_header,Starting Backend (Local))
+	$(call print_arrow,Starting backend server...)
+	$(call npm_backend,run dev)
+
+mobile-local: .ensure-mobile-deps ## Start Expo only (local, no Docker)
+	$(call print_header,Starting Expo (Local))
+	$(call print_arrow,Starting Expo development server...)
+	$(call blank_line)
+	$(call print_info,Options:)
+	@echo "  $(GREEN)a$(NC) - Android emulator"
+	@echo "  $(GREEN)i$(NC) - iOS simulator"
+	@echo "  $(GREEN)w$(NC) - Web browser"
+	$(call blank_line)
+	$(call expo_mobile,start --localhost)
+
+expo-android: ## Quick start: Open app directly in Android emulator
+	$(call print_info,📱 Opening in Android emulator...)
+	$(call expo_mobile,start --localhost --android)
+
+expo-clear: ## Start Expo with cleared cache (local)
+	$(call print_info,🧹 Starting Expo (cleared cache)...)
+	$(call expo_mobile,start --localhost --clear)
+
+clean-native: ## Clean native build folders (android, ios, .expo)
+	$(call print_header,Cleaning Native Build Folders)
+	$(call print_arrow,Removing android/ folder...)
+	@rm -rf $(MOBILE_DIR)/android
+	$(call print_success,Android build removed)
+	$(call blank_line)
+	$(call print_arrow,Removing ios/ folder...)
+	@rm -rf $(MOBILE_DIR)/ios
+	$(call print_success,iOS build removed)
+	$(call blank_line)
+	$(call print_arrow,Removing .expo/ cache...)
+	$(call remove_build_artifacts)
+	$(call print_success,Expo cache removed)
+	$(call blank_line)
+	$(call print_success,Native builds cleaned)
+	@echo "$(BLUE)Next:$(NC) Run $(GREEN)make dev-build-local$(NC) to rebuild"
+	$(call blank_line)
+
+check-devices: ## Check if Android device is connected
+	$(call print_header,Checking Connected Devices)
+	$(call print_subsection,📱 Android Devices)
+	@if docker ps --format '{{.Names}}' | grep -q music-room-$(MOBILE_SERVICE); then \
+		echo "$(BLUE)$(ICON_INFO) Using Docker container$(NC)"; \
+		$(call docker_exec,music-room-$(MOBILE_SERVICE),adb devices) 2>/dev/null || echo "$(RED)$(ICON_ERROR) No devices$(NC)"; \
+	else \
+		if command -v adb >/dev/null 2>&1; then \
+			echo "$(BLUE)$(ICON_INFO) Using local adb$(NC)"; \
+			adb devices; \
+		else \
+			echo "$(RED)$(ICON_ERROR) adb not found$(NC)"; \
+			echo "$(YELLOW)$(ICON_WARNING) Start Docker: make dev$(NC)"; \
+			echo "$(YELLOW)$(ICON_WARNING) Or install Android SDK$(NC)"; \
+		fi \
+	fi
+	$(call blank_line)
+	$(call print_subsection,💡 Tips)
+	@echo "   • Enable USB debugging on device"
+	@echo "   • Accept USB authorization popup"
+	@echo "   • Use $(GREEN)make dev-android$(NC) to launch"
+	$(call blank_line)
