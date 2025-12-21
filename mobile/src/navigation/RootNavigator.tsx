@@ -6,6 +6,7 @@ import { useAuthStore } from '../store/authStore';
 import { useSocketStore } from '../store/socketStore';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
 import { supabase } from '@/lib/supabase';
+import { useMusicControlEmitter } from '@hooks/useMusicControl';
 
 export function RootNavigator() {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
@@ -14,6 +15,9 @@ export function RootNavigator() {
 
   const connectSocket = useSocketStore(state => state.connect);
   const disconnectSocket = useSocketStore(state => state.disconnect);
+
+  // Emit listening status and handle remote control commands
+  useMusicControlEmitter();
 
   useEffect(() => {
     // Load auth state from AsyncStorage on app start
