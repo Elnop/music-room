@@ -167,8 +167,35 @@ export class UserService {
       }
 
       // 2. Check if email exists (link provider to existing account)
-      const { data: authUser } = await supabase.auth.admin.listUsers();
-      const existingUser = authUser?.users.find((u) => u.email === email);
+      // Use paginated search instead of loading all users for better performance
+      let existingUser = null;
+      let page = 1;
+      const perPage = 100;
+
+      while (!existingUser) {
+        const { data: pageData, error: listError } =
+          await supabase.auth.admin.listUsers({ page, perPage });
+
+        if (listError) {
+          logger.error("Failed to list users from Supabase auth", {
+            error: listError,
+          });
+          break;
+        }
+
+        const users = pageData?.users ?? [];
+        if (users.length === 0) {
+          // No more users, email doesn't exist
+          break;
+        }
+
+        existingUser = users.find((u) => u.email === email) ?? null;
+        if (existingUser) {
+          break;
+        }
+
+        page += 1;
+      }
 
       if (existingUser) {
         const { data: existingProfile } = await supabase

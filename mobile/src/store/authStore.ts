@@ -220,15 +220,25 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         refresh_token: response.session.refreshToken,
       });
     } catch (error) {
-      // Log error details for debugging
-      console.error('[AuthStore] loginWithGoogle failed:', {
-        errorType: error?.constructor?.name,
-        isApiError: error instanceof ApiError,
-        errorMessage: error instanceof Error ? error.message : 'Unknown error',
-        errorCode: error instanceof ApiError ? error.code : undefined,
-        errorDetails: error instanceof ApiError ? error.details : undefined,
-        fullError: error,
-      });
+      // Log error details for debugging (detailed logs only in development)
+      if (__DEV__) {
+        console.error('[AuthStore] loginWithGoogle failed:', {
+          errorType: error?.constructor?.name,
+          isApiError: error instanceof ApiError,
+          errorMessage: error instanceof Error ? error.message : 'Unknown error',
+          errorCode: error instanceof ApiError ? error.code : undefined,
+          errorDetails: error instanceof ApiError ? error.details : undefined,
+          fullError: error,
+        });
+      } else {
+        // Production: Only log safe, sanitized error info
+        console.error('[AuthStore] loginWithGoogle failed:', {
+          errorType: error?.constructor?.name,
+          isApiError: error instanceof ApiError,
+          errorMessage: error instanceof Error ? error.message : 'Unknown error',
+          errorCode: error instanceof ApiError ? error.code : undefined,
+        });
+      }
 
       // Handle specific error codes
       if (error instanceof Error && error.message === 'SIGN_IN_CANCELLED') {
@@ -260,7 +270,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           error: errorMessage,
         });
       }
-      throw error;
+      // Note: Error is not re-thrown as it's already handled by setting error state
+      // Caller can check the error state instead of catching exceptions
     }
   },
 

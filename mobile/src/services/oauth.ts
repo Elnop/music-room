@@ -1,11 +1,44 @@
 import {
   GoogleSignin,
   statusCodes,
+  type User as GoogleUser,
 } from "@react-native-google-signin/google-signin";
+import Constants from "expo-constants";
 
-// Client IDs from Google Cloud Console
+// Type guard to safely extract ID token from Google Sign-In response
+interface GoogleSignInResponse {
+  type?: "success" | "cancelled";
+  data?: {
+    idToken?: string | null;
+    user?: GoogleUser;
+  };
+  idToken?: string | null;
+  user?: GoogleUser;
+}
+
+function extractIdToken(response: GoogleSignInResponse): string {
+  // Try new structure (data.idToken)
+  const idToken = response.data?.idToken || response.idToken;
+
+  if (!idToken) {
+    throw new Error(
+      "No ID token received from Google Sign-In. Please try again.",
+    );
+  }
+
+  return idToken;
+}
+
+// Get Google OAuth Web Client ID from environment variables
 const WEB_CLIENT_ID =
-  "187081511514-6u51m2uorjrb72na2u8monu0jsdfhc13.apps.googleusercontent.com";
+  Constants.expoConfig?.extra?.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ||
+  process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
+
+if (!WEB_CLIENT_ID) {
+  throw new Error(
+    "EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID is not defined. Please set it in your .env file.",
+  );
+}
 
 /**
  * Configure Google Sign-In SDK
@@ -34,42 +67,47 @@ export const signInWithGoogle = async (): Promise<string> => {
     // Open Google consent screen
     const userInfo = await GoogleSignin.signIn();
 
-    // Extract ID token from response
-    // Note: SDK can return either userInfo.idToken or userInfo.data.idToken
-    const idToken = (userInfo as any).data?.idToken || userInfo.idToken;
+    // Extract ID token from response using type-safe helper
+    const idToken = extractIdToken(userInfo as GoogleSignInResponse);
 
-    // Log what Google returned for debugging
-    console.log('[OAuth] Google Sign-In response:', {
-      hasIdToken: !!idToken,
-      hasUser: !!userInfo.user || !!(userInfo as any).data?.user,
-      scopes: userInfo.scopes || (userInfo as any).data?.scopes,
-      user: userInfo.user || (userInfo as any).data?.user,
-    });
-
-    if (!idToken) {
-      console.error('[OAuth] No ID token in response. Full userInfo:', userInfo);
-      throw new Error("No ID token received from Google");
+    // Log what Google returned for debugging (only in development)
+    if (__DEV__) {
+      const response = userInfo as GoogleSignInResponse;
+      console.log('[OAuth] Google Sign-In response:', {
+        hasIdToken: !!idToken,
+        hasUser: !!response.user || !!response.data?.user,
+        user: response.user || response.data?.user,
+      });
     }
 
     console.log('[OAuth] ID token received successfully');
 
     return idToken;
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Handle specific error codes
-    if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+    const googleError = error as { code?: string; message?: string };
+
+    if (googleError.code === statusCodes.SIGN_IN_CANCELLED) {
       throw new Error("SIGN_IN_CANCELLED");
-    } else if (error.code === statusCodes.IN_PROGRESS) {
+    } else if (googleError.code === statusCodes.IN_PROGRESS) {
       throw new Error("Sign-in already in progress");
-    } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+    } else if (googleError.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
       throw new Error("Google Play Services not available");
     } else {
-      // Log detailed error for debugging
-      console.error('[OAuth] Google Sign-In failed:', {
-        errorCode: error.code,
-        errorMessage: error.message,
-        errorType: error.constructor?.name,
-        fullError: error,
-      });
+      // Log detailed error for debugging (only in development)
+      if (__DEV__) {
+        console.error('[OAuth] Google Sign-In failed:', {
+          errorCode: googleError.code,
+          errorMessage: googleError.message,
+          errorType: error?.constructor?.name,
+          fullError: error,
+        });
+      } else {
+        console.error('[OAuth] Google Sign-In failed:', {
+          errorCode: googleError.code,
+          errorMessage: googleError.message,
+        });
+      }
       throw error;
     }
   }

@@ -66,14 +66,16 @@
       [
         "@react-native-google-signin/google-signin",
         {
-          "iosUrlScheme": "com.googleusercontent.apps.187081511514-8dc2itp857pu6qtk3bkg7l389n5bhs98"
+          "iosUrlScheme": process.env.EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME || "com.googleusercontent.apps.187081511514-8dc2itp857pu6qtk3bkg7l389n5bhs98"
         }
       ]
     ],
     "extra": {
       "eas": {
         "projectId": "your-project-id-here"
-      }
+      },
+      "EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID": process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+      "EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME": process.env.EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME
     }
   }
 }
