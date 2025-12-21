@@ -13,7 +13,7 @@ export class ProfileService {
    */
   async updateProfile(
     userId: string,
-    data: UpdateProfileDTO
+    data: UpdateProfileDTO,
   ): Promise<ProfileUpdateResponse> {
     try {
       logger.info("Updating user profile", { userId, data });
@@ -42,7 +42,7 @@ export class ProfileService {
         throw new AppError(
           500,
           "Failed to update profile",
-          "PROFILE_UPDATE_ERROR"
+          "PROFILE_UPDATE_ERROR",
         );
       }
 
@@ -129,7 +129,7 @@ export class ProfileService {
   async searchUsers(
     query: string,
     limit = 20,
-    excludeUserId?: string
+    excludeUserId?: string,
   ): Promise<PublicProfile[]> {
     try {
       logger.info("Searching users", { query, limit, excludeUserId });

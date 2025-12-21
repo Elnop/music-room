@@ -110,7 +110,7 @@ export class CollaboratorService {
         .from("playlists")
         .update({
           collaborator_ids: playlist.collaborator_ids.filter(
-            (id) => id !== collaboratorId,
+            (id: string) => id !== collaboratorId,
           ),
         })
         .eq("id", playlistId);

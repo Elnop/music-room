@@ -18,9 +18,7 @@ export class OAuthService {
    * @returns Verified token payload with user information
    * @throws AppError if token is invalid or email is not verified
    */
-  static async verifyGoogleToken(
-    idToken: string
-  ): Promise<GoogleTokenPayload> {
+  static async verifyGoogleToken(idToken: string): Promise<GoogleTokenPayload> {
     try {
       const ticket = await this.client.verifyIdToken({
         idToken,
@@ -41,7 +39,7 @@ export class OAuthService {
         throw new AppError(
           400,
           "Email not verified with Google",
-          "EMAIL_NOT_VERIFIED"
+          "EMAIL_NOT_VERIFIED",
         );
       }
 
@@ -71,7 +69,7 @@ export class OAuthService {
       throw new AppError(
         401,
         "Invalid or expired Google token",
-        "INVALID_TOKEN"
+        "INVALID_TOKEN",
       );
     }
   }

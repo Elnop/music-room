@@ -15,6 +15,15 @@ const STORAGE_KEYS = {
 } as const;
 
 /**
+ * Linked provider info
+ */
+interface LinkedProvider {
+  type: 'password' | 'google' | 'facebook';
+  connectedAt: string;
+  isPrimary: boolean;
+}
+
+/**
  * Auth State Interface
  */
 interface AuthState {
@@ -24,6 +33,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  linkedProviders: LinkedProvider[] | null;
 
   // Actions
   login: (email: string, password: string) => Promise<void>;
@@ -31,6 +41,10 @@ interface AuthState {
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (data: Partial<UserProfile>) => Promise<void>;
+
+  // Provider management
+  fetchLinkedProviders: () => Promise<void>;
+  unlinkProvider: (provider: 'google' | 'facebook') => Promise<void>;
 
   // Storage helpers
   loadFromStorage: () => Promise<void>;
@@ -53,6 +67,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isAuthenticated: false,
   isLoading: false,
   error: null,
+  linkedProviders: null,
 
   /**
    * Login with email and password
@@ -349,6 +364,53 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       ]);
     } catch (error) {
       console.error('Failed to clear auth storage:', error);
+    }
+  },
+
+  /**
+   * Fetch linked authentication providers
+   */
+  fetchLinkedProviders: async () => {
+    const { accessToken } = get();
+    if (!accessToken) {
+      throw new Error('No access token available');
+    }
+
+    try {
+      const response = await authApi.getLinkedProviders(accessToken);
+      set({ linkedProviders: response.providers });
+    } catch (error) {
+      console.error('Failed to fetch linked providers:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Unlink an OAuth provider
+   */
+  unlinkProvider: async (provider: 'google' | 'facebook') => {
+    const { accessToken } = get();
+    if (!accessToken) {
+      throw new Error('No access token available');
+    }
+
+    set({ isLoading: true, error: null });
+
+    try {
+      await authApi.unlinkProvider(accessToken, provider);
+
+      // Refresh linked providers list
+      await get().fetchLinkedProviders();
+
+      set({ isLoading: false });
+    } catch (error) {
+      const errorMessage =
+        error instanceof ApiError ? error.message : 'Failed to unlink provider';
+      set({
+        error: errorMessage,
+        isLoading: false,
+      });
+      throw error;
     }
   },
 

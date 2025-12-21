@@ -164,4 +164,76 @@ export class AuthController {
       next(error);
     }
   }
+
+  /**
+   * GET /api/auth/providers
+   * Get list of linked authentication providers for current user
+   */
+  async getLinkedProviders(req: Request, res: Response, next: NextFunction) {
+    try {
+      const authReq = req as AuthenticatedRequest;
+      logger.info("Get linked providers request", { userId: authReq.user.id });
+
+      const providers = await authService.getLinkedProviders(authReq.user.id);
+
+      const response: ApiResponse = {
+        success: true,
+        data: providers,
+        meta: {
+          timestamp: new Date().toISOString(),
+        },
+      };
+
+      res.json(response);
+    } catch (error) {
+      logger.error("Get linked providers error", { error });
+      next(error);
+    }
+  }
+
+  /**
+   * DELETE /api/auth/providers/:provider
+   * Unlink an OAuth provider from the current user's account
+   */
+  async unlinkProvider(req: Request, res: Response, next: NextFunction) {
+    try {
+      const authReq = req as AuthenticatedRequest;
+      const provider = req.params.provider as "google" | "facebook";
+
+      logger.info("Unlink provider request", {
+        userId: authReq.user.id,
+        provider,
+      });
+
+      // Validate provider
+      if (!["google", "facebook"].includes(provider)) {
+        const response: ApiResponse = {
+          success: false,
+          error: {
+            code: "INVALID_PROVIDER",
+            message: "Invalid provider. Must be 'google' or 'facebook'",
+          },
+          meta: {
+            timestamp: new Date().toISOString(),
+          },
+        };
+        return res.status(400).json(response);
+      }
+
+      await authService.unlinkProvider(authReq.user.id, provider);
+
+      const response: ApiResponse = {
+        success: true,
+        data: { message: `${provider} unlinked successfully` },
+        meta: {
+          timestamp: new Date().toISOString(),
+        },
+      };
+
+      res.json(response);
+    } catch (error) {
+      logger.error("Unlink provider error", { error });
+      next(error);
+    }
+  }
 }

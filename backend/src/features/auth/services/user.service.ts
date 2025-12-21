@@ -12,7 +12,7 @@ export class UserService {
    * @returns Unique username (e.g., "johndoe" or "johndoe1")
    */
   private static async generateUniqueUsername(
-    baseName: string
+    baseName: string,
   ): Promise<string> {
     // Sanitize: "John Doe" → "johndoe"
     let username = baseName.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -57,7 +57,7 @@ export class UserService {
    * @returns Supabase session with access and refresh tokens
    */
   private static async createSessionForOAuthUser(
-    email: string
+    email: string,
   ): Promise<Session> {
     // For OAuth users, we create a session by setting a temporary password
     // and then signing in with it (this generates proper access/refresh tokens)
@@ -71,17 +71,13 @@ export class UserService {
 
     if (!authUser) {
       logger.error("OAuth user not found in Supabase auth", { email });
-      throw new AppError(
-        500,
-        "Failed to find user",
-        "USER_NOT_FOUND"
-      );
+      throw new AppError(500, "Failed to find user", "USER_NOT_FOUND");
     }
 
     // Update user with temporary password
     const { error: updateError } = await supabase.auth.admin.updateUserById(
       authUser.id,
-      { password: tempPassword }
+      { password: tempPassword },
     );
 
     if (updateError) {
@@ -91,7 +87,7 @@ export class UserService {
       throw new AppError(
         500,
         "Failed to generate session",
-        "SESSION_GENERATION_FAILED"
+        "SESSION_GENERATION_FAILED",
       );
     }
 
@@ -109,7 +105,7 @@ export class UserService {
       throw new AppError(
         500,
         "Failed to create session",
-        "SESSION_CREATION_FAILED"
+        "SESSION_CREATION_FAILED",
       );
     }
 
@@ -123,25 +119,26 @@ export class UserService {
 
   /**
    * Create or retrieve OAuth user
-   * @param provider - OAuth provider ('google')
-   * @param providerId - Provider-specific user ID (Google sub claim)
+   * @param provider - OAuth provider ('google' | 'facebook')
+   * @param providerId - Provider-specific user ID (Google sub claim, Facebook user ID)
    * @param email - User email
    * @param profile - OAuth profile data
    * @returns User profile and session
    */
   static async createOAuthUser(
-    provider: "google",
+    provider: "google" | "facebook",
     providerId: string,
     email: string,
-    profile: GoogleProfile
+    profile: any, // GoogleProfile | FacebookProfile
   ): Promise<{ userProfile: UserProfile; session: Session }> {
     try {
+      const providerColumn = `${provider}_id`; // 'google_id' or 'facebook_id'
+
       // 1. Check if OAuth provider ID already exists
       const { data: existingOAuth } = await supabase
         .from("user_profiles")
         .select("*")
-        .eq("oauth_provider_id", providerId)
-        .eq("oauth_provider", provider)
+        .eq(providerColumn, providerId)
         .single();
 
       if (existingOAuth) {
@@ -159,7 +156,7 @@ export class UserService {
         };
       }
 
-      // 2. Check if email exists with different provider (conflict)
+      // 2. Check if email exists (link provider to existing account)
       const { data: authUser } = await supabase.auth.admin.listUsers();
       const existingUser = authUser?.users.find((u) => u.email === email);
 
@@ -171,40 +168,34 @@ export class UserService {
           .single();
 
         if (existingProfile) {
-          // Email exists with a DIFFERENT OAuth provider (Google vs Facebook) → error
-          if (
-            existingProfile.oauth_provider &&
-            existingProfile.oauth_provider !== "email" &&
-            existingProfile.oauth_provider !== provider
-          ) {
-            logger.warn("Email already in use with different OAuth provider", {
+          // Check if this provider is already linked to the account
+          if (existingProfile[providerColumn]) {
+            logger.warn("Provider already linked to this account", {
               email,
-              existingProvider: existingProfile.oauth_provider,
-              attemptedProvider: provider,
+              provider,
+              userId: existingProfile.id,
             });
-            throw new AppError(
-              409,
-              `This email is already linked to ${existingProfile.oauth_provider}. Please sign in with ${existingProfile.oauth_provider}.`,
-              "EMAIL_IN_USE"
-            );
+            // Provider already linked, just create session
+            const session = await this.createSessionForOAuthUser(email);
+            return {
+              userProfile: existingProfile as UserProfile,
+              session,
+            };
           }
 
-          // Email exists (either email/password account, or same OAuth provider)
-          // → Link OAuth provider and return session
+          // Link OAuth provider to existing account (additive)
           logger.info("Linking OAuth provider to existing user account", {
             userId: existingProfile.id,
             email,
             provider,
             providerId,
-            previousProvider: existingProfile.oauth_provider || "email/password",
           });
 
-          // Update profile with OAuth provider ID
+          // Update profile with OAuth provider ID (additive - doesn't overwrite other providers)
           const { error: updateError } = await supabase
             .from("user_profiles")
             .update({
-              oauth_provider: provider,
-              oauth_provider_id: providerId,
+              [providerColumn]: providerId,
               avatar_url: profile.picture || existingProfile.avatar_url,
               updated_at: new Date().toISOString(),
             })
@@ -228,7 +219,7 @@ export class UserService {
 
       // 3. Create new OAuth user
       const username = await this.generateUniqueUsername(
-        profile.name || email.split("@")[0]
+        profile.name || email.split("@")[0],
       );
 
       logger.info("Creating new OAuth user", {
@@ -257,7 +248,7 @@ export class UserService {
         throw new AppError(
           500,
           "Failed to create user",
-          "USER_CREATION_FAILED"
+          "USER_CREATION_FAILED",
         );
       }
 
@@ -270,8 +261,7 @@ export class UserService {
             username,
             display_name: profile.name || username,
             avatar_url: profile.picture || null,
-            oauth_provider: provider,
-            oauth_provider_id: providerId,
+            [providerColumn]: providerId,
             email_verified: true, // OAuth email verified by provider
           })
           .select()
@@ -280,9 +270,12 @@ export class UserService {
         if (profileError) {
           // Check if it's a unique constraint violation (username collision)
           if (profileError.code === "23505") {
-            logger.warn("Username collision detected, retrying with new username", {
-              username,
-            });
+            logger.warn(
+              "Username collision detected, retrying with new username",
+              {
+                username,
+              },
+            );
             // Rollback auth user
             await supabase.auth.admin.deleteUser(authData.user.id);
             // Retry with new username
@@ -297,7 +290,7 @@ export class UserService {
           throw new AppError(
             500,
             "Failed to create profile",
-            "PROFILE_CREATION_FAILED"
+            "PROFILE_CREATION_FAILED",
           );
         }
 
@@ -305,7 +298,7 @@ export class UserService {
           throw new AppError(
             500,
             "Profile creation returned no data",
-            "PROFILE_CREATION_FAILED"
+            "PROFILE_CREATION_FAILED",
           );
         }
 
@@ -335,7 +328,7 @@ export class UserService {
       throw new AppError(
         500,
         "Failed to create OAuth user",
-        "OAUTH_USER_CREATION_ERROR"
+        "OAUTH_USER_CREATION_ERROR",
       );
     }
   }

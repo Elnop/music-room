@@ -20,8 +20,10 @@ export interface OAuthCallbackDTO {
 }
 
 /**
- * Google OAuth types
+ * OAuth Provider Types
  */
+
+export type OAuthProvider = "google" | "facebook";
 
 export interface GoogleTokenPayload {
   sub: string; // Google user ID
@@ -42,6 +44,15 @@ export interface GoogleProfile {
   picture?: string;
 }
 
+export interface FacebookProfile {
+  name: string;
+  picture?: {
+    data: {
+      url: string;
+    };
+  };
+}
+
 /**
  * Response types
  */
@@ -55,6 +66,11 @@ export interface UserProfile {
   bio?: string;
   createdAt: string;
   updatedAt: string;
+  connectedProviders?: {
+    hasPassword: boolean;
+    hasGoogle: boolean;
+    hasFacebook: boolean;
+  };
 }
 
 export interface AuthResponse {
@@ -69,6 +85,17 @@ export interface AuthResponse {
 
 export interface RefreshTokenDTO {
   refreshToken: string;
+}
+
+/**
+ * Linked Providers Response
+ */
+export interface LinkedProvidersResponse {
+  providers: {
+    type: "password" | OAuthProvider;
+    connectedAt: string;
+    isPrimary: boolean;
+  }[];
 }
 
 /**
