@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Switch, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -9,6 +9,7 @@ import type { Theme } from '@themes/types';
 import { useAuthStore } from '@/store/authStore';
 import { profileApi } from '@/services/profileApi';
 import { friendsApi, FriendProfile } from '@/services/friendsApi';
+import { musicControlApi } from '@/services/musicControlApi';
 import { SearchBar } from '@/components/common/SearchBar';
 import { Avatar } from '@/components/common/Avatar';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
@@ -34,6 +35,10 @@ export function FriendsScreen() {
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Music control permissions: Set of friend IDs that can control my music
+  const [controlPermissions, setControlPermissions] = useState<Set<string>>(new Set());
+  const [togglingUserId, setTogglingUserId] = useState<string | null>(null);
+
   const loadFriends = useCallback(async () => {
     if (!accessToken) return;
 
@@ -51,10 +56,42 @@ export function FriendsScreen() {
     }
   }, [accessToken, activeTab]);
 
+  const loadPermissions = useCallback(async () => {
+    try {
+      const allowedUserIds = await musicControlApi.getMyPermissions();
+      setControlPermissions(new Set(allowedUserIds));
+    } catch (err) {
+      console.error('[FriendsScreen] Failed to load permissions:', err);
+    }
+  }, []);
+
+  const handleToggleControl = useCallback(async (friendId: string, currentValue: boolean) => {
+    setTogglingUserId(friendId);
+    try {
+      if (currentValue) {
+        await musicControlApi.revokeControl(friendId);
+        setControlPermissions(prev => {
+          const next = new Set(prev);
+          next.delete(friendId);
+          return next;
+        });
+      } else {
+        await musicControlApi.grantControl(friendId);
+        setControlPermissions(prev => new Set(prev).add(friendId));
+      }
+    } catch (err) {
+      console.error('[FriendsScreen] Failed to toggle control:', err);
+      Alert.alert('Erreur', 'Impossible de modifier les permissions');
+    } finally {
+      setTogglingUserId(null);
+    }
+  }, []);
+
   useFocusEffect(
     useCallback(() => {
       loadFriends();
-    }, [loadFriends])
+      loadPermissions();
+    }, [loadFriends, loadPermissions])
   );
 
   const performSearch = useCallback(
@@ -104,23 +141,46 @@ export function FriendsScreen() {
     navigation.navigate('UserProfile', { userId });
   };
 
-  const renderFriendItem = ({ item }: { item: FriendProfile }) => (
-    <TouchableOpacity
-      style={styles.userItem}
-      onPress={() => handleUserPress(item.id)}
-      activeOpacity={0.7}
-    >
-      <Avatar size="md" name={item.displayName || item.username} uri={item.avatarUrl} />
-      <View style={styles.userInfo}>
-        <Text style={styles.username}>{item.username}</Text>
-        {item.displayName && <Text style={styles.displayName}>{item.displayName}</Text>}
-      </View>
-      <View style={styles.friendBadge}>
-        <Text style={styles.friendBadgeText}>Ami</Text>
-      </View>
-      <Text style={styles.chevron}>›</Text>
-    </TouchableOpacity>
-  );
+  const renderFriendItem = ({ item }: { item: FriendProfile }) => {
+    const canControl = controlPermissions.has(item.id);
+    const isToggling = togglingUserId === item.id;
+
+    return (
+      <TouchableOpacity
+        style={[styles.userItem, isToggling && styles.userItemProcessing]}
+        onPress={() => handleUserPress(item.id)}
+        activeOpacity={0.7}
+      >
+        <Avatar size="md" name={item.displayName || item.username} uri={item.avatarUrl} />
+        <View style={styles.userInfo}>
+          <Text style={styles.username}>{item.username}</Text>
+          {item.displayName && <Text style={styles.displayName}>{item.displayName}</Text>}
+          <View style={styles.controlRow}>
+            <Text style={styles.controlLabel}>🎵</Text>
+            <Text style={[styles.controlText, canControl && styles.controlTextActive]}>
+              {canControl ? 'Peut contrôler ma musique' : 'Contrôle de ma musique'}
+            </Text>
+          </View>
+        </View>
+        <View style={styles.controlToggle}>
+          {isToggling ? (
+            <View style={styles.switchPlaceholder}>
+              <LoadingSpinner size="small" />
+            </View>
+          ) : (
+            <Switch
+              value={canControl}
+              onValueChange={() => handleToggleControl(item.id, canControl)}
+              disabled={!!togglingUserId}
+              trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+              thumbColor={theme.colors.surface}
+            />
+          )}
+        </View>
+        <Text style={styles.chevron}>›</Text>
+      </TouchableOpacity>
+    );
+  };
 
   const renderSearchResultItem = ({ item }: { item: UserProfile }) => (
     <TouchableOpacity
@@ -292,6 +352,9 @@ const createStyles = (theme: Theme) =>
       borderWidth: theme.borders.medium,
       borderColor: theme.colors.border,
     },
+    userItemProcessing: {
+      opacity: 0.7,
+    },
     userInfo: {
       flex: 1,
       marginLeft: theme.spacing.md,
@@ -306,6 +369,23 @@ const createStyles = (theme: Theme) =>
       color: theme.colors.textSecondary,
       marginTop: 2,
     },
+    controlRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: 4,
+    },
+    controlLabel: {
+      fontSize: 12,
+      marginRight: 4,
+    },
+    controlText: {
+      fontSize: theme.typography.sizes.xs,
+      color: theme.colors.textSecondary,
+    },
+    controlTextActive: {
+      color: theme.colors.primary,
+      fontWeight: theme.typography.weights.medium,
+    },
     friendBadge: {
       backgroundColor: theme.colors.success + '20',
       paddingHorizontal: theme.spacing.sm,
@@ -317,6 +397,17 @@ const createStyles = (theme: Theme) =>
       fontSize: theme.typography.sizes.xs,
       fontWeight: theme.typography.weights.semibold,
       color: theme.colors.success,
+    },
+    controlToggle: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: theme.spacing.sm,
+    },
+    switchPlaceholder: {
+      width: 51,
+      height: 31,
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     chevron: {
       fontSize: 24,

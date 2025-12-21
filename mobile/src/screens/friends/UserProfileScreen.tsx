@@ -8,10 +8,13 @@ import { useAuthStore } from '@/store/authStore';
 import { profileApi } from '@/services/profileApi';
 import { friendsApi, type FollowStatus } from '@/services/friendsApi';
 import { playlistApi } from '@/api/playlistApi';
+import { musicControlApi } from '@/services/musicControlApi';
+import { useFriendListening } from '@/hooks/useMusicControl';
 import { Avatar } from '@/components/common/Avatar';
 import { Button } from '@/components/common/Button';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { PlaylistCard } from '@/components/playlist/PlaylistCard';
+import { DeviceListeningCard } from '@/components/music-control/DeviceListeningCard';
 import type { UserProfile, Playlist } from '@/types';
 import type { FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
 
@@ -29,6 +32,15 @@ export function UserProfileScreen({ route, navigation }: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const [isFollowLoading, setIsFollowLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [initialCanControl, setInitialCanControl] = useState(false);
+
+  const {
+    devices,
+    canControl: canControlMusic,
+    remotePlay,
+    remotePause,
+    isLoading: isListeningLoading,
+  } = useFriendListening(userId, initialCanControl);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,14 +50,16 @@ export function UserProfileScreen({ route, navigation }: Props) {
       setError(null);
 
       try {
-        const [profileData, statusData, playlistsData] = await Promise.all([
+        const [profileData, statusData, playlistsData, canControl] = await Promise.all([
           profileApi.getUserProfile(accessToken, userId),
           friendsApi.getFollowStatus(accessToken, userId),
           playlistApi.fetchUserPublicPlaylists(userId),
+          musicControlApi.canControl(userId),
         ]);
         setProfile(profileData);
         setFollowStatus(statusData);
         setPlaylists(playlistsData);
+        setInitialCanControl(canControl);
       } catch (err) {
         setError('Failed to load profile');
       } finally {
@@ -170,6 +184,30 @@ export function UserProfileScreen({ route, navigation }: Props) {
                 >
                   Suivre
                 </Button>
+              )}
+            </View>
+          )}
+
+          {canControlMusic && followStatus?.isFriend && (
+            <View style={styles.listeningSection}>
+              <Text style={styles.listeningSectionTitle}>🎵 Écoute en direct</Text>
+              {isListeningLoading ? (
+                <View style={styles.listeningLoading}>
+                  <LoadingSpinner size="small" />
+                </View>
+              ) : devices.length > 0 ? (
+                devices.map(deviceStatus => (
+                  <DeviceListeningCard
+                    key={deviceStatus.device.deviceId}
+                    status={deviceStatus}
+                    onPlay={() => remotePlay(deviceStatus.device.deviceId)}
+                    onPause={() => remotePause(deviceStatus.device.deviceId)}
+                  />
+                ))
+              ) : (
+                <View style={styles.listeningEmpty}>
+                  <Text style={styles.listeningEmptyText}>Aucun appareil connecté</Text>
+                </View>
               )}
             </View>
           )}
@@ -307,6 +345,32 @@ const createStyles = (theme: Theme) =>
       color: theme.colors.surface,
       fontWeight: theme.typography.weights.semibold,
       fontSize: 14,
+    },
+    listeningSection: {
+      marginTop: theme.spacing.lg,
+    },
+    listeningSectionTitle: {
+      fontSize: 16,
+      fontWeight: theme.typography.weights.bold,
+      color: theme.colors.text,
+      marginBottom: theme.spacing.md,
+    },
+    listeningLoading: {
+      paddingVertical: theme.spacing.lg,
+      alignItems: 'center',
+    },
+    listeningEmpty: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borders.medium,
+      borderWidth: theme.borders.thin,
+      borderColor: theme.colors.border,
+      paddingVertical: theme.spacing.lg,
+      alignItems: 'center',
+    },
+    listeningEmptyText: {
+      fontSize: 13,
+      color: theme.colors.textSecondary,
+      fontStyle: 'italic',
     },
     playlistsSection: {
       paddingHorizontal: theme.spacing.lg,
