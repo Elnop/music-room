@@ -73,10 +73,10 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 
     socket.on('connect_error', error => {
       console.error('[Socket] ❌ Connection error:', error.message);
-      // Try to provide more context
+      const transport = socket.io?.engine?.transport?.name ?? 'unknown';
       console.error('[Socket] Error details:', {
         url: socketUrl,
-        transport: socket.io?.engine?.transport?.name,
+        transport,
       });
     });
 

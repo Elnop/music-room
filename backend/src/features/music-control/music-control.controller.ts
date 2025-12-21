@@ -1,6 +1,18 @@
 import type { Request, Response, NextFunction } from "express";
-import type { AuthenticatedRequest, ApiResponse } from "@/shared/types/global.types.js";
+import type {
+  AuthenticatedRequest,
+  ApiResponse,
+} from "@/shared/types/global.types.js";
 import { musicControlService } from "./music-control.service.js";
+import { AppError } from "@/shared/middleware/error-handler.js";
+
+// UUID v4 validation regex
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function isValidUuid(id: string): boolean {
+  return UUID_REGEX.test(id);
+}
 
 /**
  * Music Control Controller
@@ -41,6 +53,10 @@ export class MusicControlController {
       const ownerId = authReq.user.id;
       const allowedUserId = req.params.userId;
 
+      if (!isValidUuid(allowedUserId)) {
+        throw new AppError(400, "Invalid user ID format", "INVALID_USER_ID");
+      }
+
       await musicControlService.grantControl(ownerId, allowedUserId);
 
       const response: ApiResponse = {
@@ -66,6 +82,10 @@ export class MusicControlController {
       const authReq = req as AuthenticatedRequest;
       const ownerId = authReq.user.id;
       const allowedUserId = req.params.userId;
+
+      if (!isValidUuid(allowedUserId)) {
+        throw new AppError(400, "Invalid user ID format", "INVALID_USER_ID");
+      }
 
       await musicControlService.revokeControl(ownerId, allowedUserId);
 
@@ -93,9 +113,13 @@ export class MusicControlController {
       const myUserId = authReq.user.id;
       const targetUserId = req.params.userId;
 
+      if (!isValidUuid(targetUserId)) {
+        throw new AppError(400, "Invalid user ID format", "INVALID_USER_ID");
+      }
+
       const canControl = await musicControlService.canControl(
         myUserId,
-        targetUserId
+        targetUserId,
       );
 
       const response: ApiResponse = {

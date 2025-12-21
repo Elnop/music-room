@@ -47,6 +47,35 @@ interface ListeningUpdatePayload {
 }
 
 /**
+ * Validate listening update payload structure
+ */
+function isValidListeningUpdatePayload(
+  data: unknown
+): data is ListeningUpdatePayload {
+  if (!data || typeof data !== "object") return false;
+  const payload = data as Record<string, unknown>;
+
+  // Validate device
+  if (!payload.device || typeof payload.device !== "object") return false;
+  const device = payload.device as Record<string, unknown>;
+  if (typeof device.deviceId !== "string" || !device.deviceId) return false;
+  if (typeof device.deviceName !== "string") return false;
+
+  // Validate isPlaying
+  if (typeof payload.isPlaying !== "boolean") return false;
+
+  // Validate track (can be null)
+  if (payload.track !== null) {
+    if (typeof payload.track !== "object") return false;
+    const track = payload.track as Record<string, unknown>;
+    if (typeof track.title !== "string") return false;
+    if (typeof track.artist !== "string") return false;
+  }
+
+  return true;
+}
+
+/**
  * Realtime Service
  * Manages Socket.io connections and event broadcasting
  *
@@ -162,7 +191,13 @@ class RealtimeService {
    * Music control handlers - multi-device support
    */
   private registerMusicControlHandlers(socket: Socket) {
-    socket.on("listening:update", async (data: ListeningUpdatePayload) => {
+    socket.on("listening:update", async (data: unknown) => {
+      // Validate payload structure
+      if (!isValidListeningUpdatePayload(data)) {
+        logger.warn("[Socket] listening:update received invalid payload");
+        return;
+      }
+
       const socketInfo = this.socketToDevice.get(socket.id);
       if (!socketInfo) {
         logger.warn("[Socket] listening:update from unauthenticated socket");
@@ -202,7 +237,14 @@ class RealtimeService {
         }
       );
 
-      await this.broadcastUserListeningStatus(userId);
+      try {
+        await this.broadcastUserListeningStatus(userId);
+      } catch (error) {
+        logger.error(
+          `[Socket] Failed to broadcast listening status for user ${userId}`,
+          { error }
+        );
+      }
     });
 
     // User subscribes to another user's listening status (all devices)
@@ -344,7 +386,12 @@ class RealtimeService {
 
       this.lastListeningUpdate.delete(deviceKey);
 
-      this.broadcastUserListeningStatus(userId);
+      this.broadcastUserListeningStatus(userId).catch((error) => {
+        logger.error(
+          `[Socket] Failed to broadcast listening status for user ${userId} on disconnect`,
+          { error }
+        );
+      });
 
       // Cleanup maps
       this.socketToDevice.delete(socket.id);
