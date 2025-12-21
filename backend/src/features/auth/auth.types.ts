@@ -20,6 +20,29 @@ export interface OAuthCallbackDTO {
 }
 
 /**
+ * Google OAuth types
+ */
+
+export interface GoogleTokenPayload {
+  sub: string; // Google user ID
+  email: string;
+  email_verified: boolean;
+  name?: string;
+  picture?: string;
+  given_name?: string;
+  family_name?: string;
+}
+
+export interface GoogleLoginDTO {
+  idToken: string; // JWT ID token from Google Sign-In
+}
+
+export interface GoogleProfile {
+  name: string;
+  picture?: string;
+}
+
+/**
  * Response types
  */
 

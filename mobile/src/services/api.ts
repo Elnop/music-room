@@ -192,4 +192,16 @@ export const authApi = {
       },
     });
   },
+
+  /**
+   * Login with Google OAuth
+   */
+  async loginWithGoogle(idToken: string): Promise<AuthResponse> {
+    return apiRequest<AuthResponse>('/api/auth/google', {
+      method: 'POST',
+      body: JSON.stringify({
+        idToken,
+      }),
+    });
+  },
 };

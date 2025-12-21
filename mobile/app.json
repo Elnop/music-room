@@ -62,6 +62,13 @@
             "buildToolsVersion": "34.0.0"
           }
         }
+      ],
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "androidClientId": "187081511514-8dc2itp857pu6qtk3bkg7l389n5bhs98.apps.googleusercontent.com",
+          "iosUrlScheme": "com.googleusercontent.apps.187081511514-8dc2itp857pu6qtk3bkg7l389n5bhs98"
+        }
       ]
     ],
     "extra": {

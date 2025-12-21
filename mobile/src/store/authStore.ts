@@ -4,6 +4,7 @@ import type { UserProfile } from '@types';
 import type { LoginInput, RegisterInput } from '@utils/validators';
 import { authApi, ApiError } from '@services/api';
 import { supabase } from '@/lib/supabase';
+import { signInWithGoogle } from '@services/oauth';
 
 // AsyncStorage keys
 const STORAGE_KEYS = {
@@ -27,6 +28,7 @@ interface AuthState {
   // Actions
   login: (email: string, password: string) => Promise<void>;
   register: (data: RegisterInput) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (data: Partial<UserProfile>) => Promise<void>;
 
@@ -169,6 +171,54 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         error: 'Logout failed',
         isLoading: false,
       });
+    }
+  },
+
+  /**
+   * Login with Google OAuth
+   */
+  loginWithGoogle: async () => {
+    set({ isLoading: true, error: null });
+
+    try {
+      // 1. Get ID token from Google Sign-In
+      const idToken = await signInWithGoogle();
+
+      // 2. Send to backend
+      const response = await authApi.loginWithGoogle(idToken);
+
+      // 3. Set authenticated state
+      set({
+        user: response.user,
+        accessToken: response.session.accessToken,
+        refreshToken: response.session.refreshToken,
+        isAuthenticated: true,
+        isLoading: false,
+      });
+
+      // 4. Persist to storage
+      await get().saveToStorage();
+
+      // 5. Set session in Supabase for consistency
+      await supabase.auth.setSession({
+        access_token: response.session.accessToken,
+        refresh_token: response.session.refreshToken,
+      });
+    } catch (error) {
+      // Handle specific error codes
+      if (error instanceof Error && error.message === 'SIGN_IN_CANCELLED') {
+        // User cancelled = no error visible
+        set({ isLoading: false, error: null });
+      } else {
+        set({
+          isLoading: false,
+          error:
+            error instanceof ApiError
+              ? error.message
+              : 'Google login failed. Please try again.',
+        });
+      }
+      throw error;
     }
   },
 

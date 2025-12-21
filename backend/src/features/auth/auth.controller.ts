@@ -1,6 +1,10 @@
 import type { Request, Response, NextFunction } from "express";
 import { AuthService } from "./auth.service.js";
-import { registerSchema, loginSchema } from "./auth.validators.js";
+import {
+  registerSchema,
+  loginSchema,
+  googleLoginSchema,
+} from "./auth.validators.js";
 import type { ApiResponse } from "@/shared/types/global.types.js";
 import type { AuthenticatedRequest } from "@/shared/types/global.types.js";
 import { logger } from "@/shared/utils/logger.js";
@@ -131,6 +135,32 @@ export class AuthController {
 
       res.json(response);
     } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * POST /api/auth/google
+   * Login with Google OAuth
+   */
+  async googleLogin(req: Request, res: Response, next: NextFunction) {
+    try {
+      logger.info("Google OAuth login request received");
+
+      const validated = googleLoginSchema.parse(req.body);
+      const result = await authService.loginWithGoogle(validated.idToken);
+
+      const response: ApiResponse = {
+        success: true,
+        data: result,
+        meta: {
+          timestamp: new Date().toISOString(),
+        },
+      };
+
+      res.status(200).json(response);
+    } catch (error) {
+      logger.error("Google login error", { error });
       next(error);
     }
   }

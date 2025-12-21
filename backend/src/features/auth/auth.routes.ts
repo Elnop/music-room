@@ -39,4 +39,13 @@ router.post("/logout", authMiddleware, (req, res, next) =>
   authController.logout(req, res, next),
 );
 
+/**
+ * @route   POST /api/auth/google
+ * @desc    Login with Google OAuth
+ * @access  Public
+ */
+router.post("/google", (req, res, next) =>
+  authController.googleLogin(req, res, next),
+);
+
 export default router;
