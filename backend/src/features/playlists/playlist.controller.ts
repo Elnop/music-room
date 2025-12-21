@@ -2,12 +2,14 @@ import type { Request, Response, NextFunction } from "express";
 import { PlaylistService } from "./playlist.service.js";
 import { PlaylistTrackService } from "./services/playlist-track.service.js";
 import { CollaboratorService } from "./services/collaborator.service.js";
+import { ViewerService } from "./services/viewer.service.js";
 import {
   createPlaylistSchema,
   updatePlaylistSchema,
   addTrackSchema,
   reorderTracksSchema,
   addCollaboratorSchema,
+  addViewerSchema,
 } from "./playlist.validators.js";
 import type {
   ApiResponse,
@@ -18,6 +20,7 @@ import { logger } from "@/shared/utils/logger.js";
 const playlistService = new PlaylistService();
 const trackService = new PlaylistTrackService();
 const collaboratorService = new CollaboratorService();
+const viewerService = new ViewerService();
 
 export class PlaylistController {
   /**
@@ -43,12 +46,16 @@ export class PlaylistController {
 
   /**
    * GET /api/playlists/user/:userId
-   * Get public playlists of a specific user
+   * Get playlists of a specific user (public + private where current user is invited)
    */
-  async getPublicPlaylistsByUser(req: Request, res: Response, next: NextFunction) {
+  async getPlaylistsByUser(req: Request, res: Response, next: NextFunction) {
     try {
+      const authReq = req as AuthenticatedRequest;
       const { userId } = req.params;
-      const playlists = await playlistService.getPublicPlaylistsByUser(userId);
+      const playlists = await playlistService.getPlaylistsByUser(
+        userId,
+        authReq.user.id
+      );
 
       const response: ApiResponse = {
         success: true,
@@ -299,6 +306,73 @@ export class PlaylistController {
       const response: ApiResponse = {
         success: true,
         data: { message: "Collaborator removed successfully" },
+        meta: { timestamp: new Date().toISOString() },
+      };
+
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * GET /api/playlists/:id/viewers
+   * Get all viewers for a playlist
+   */
+  async getViewers(req: Request, res: Response, next: NextFunction) {
+    try {
+      const authReq = req as AuthenticatedRequest;
+      const { id } = req.params;
+      const viewers = await viewerService.getViewers(id, authReq.user.id);
+
+      const response: ApiResponse = {
+        success: true,
+        data: { viewers },
+        meta: { timestamp: new Date().toISOString() },
+      };
+
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * POST /api/playlists/:id/viewers
+   * Add viewer to playlist
+   */
+  async addViewer(req: Request, res: Response, next: NextFunction) {
+    try {
+      const authReq = req as AuthenticatedRequest;
+      const { id } = req.params;
+      const validated = addViewerSchema.parse(req.body);
+      await viewerService.addViewer(id, authReq.user.id, validated.userId);
+
+      const response: ApiResponse = {
+        success: true,
+        data: { message: "Viewer added successfully" },
+        meta: { timestamp: new Date().toISOString() },
+      };
+
+      res.status(201).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * DELETE /api/playlists/:id/viewers/:userId
+   * Remove viewer from playlist
+   */
+  async removeViewer(req: Request, res: Response, next: NextFunction) {
+    try {
+      const authReq = req as AuthenticatedRequest;
+      const { id, userId } = req.params;
+      await viewerService.removeViewer(id, authReq.user.id, userId);
+
+      const response: ApiResponse = {
+        success: true,
+        data: { message: "Viewer removed successfully" },
         meta: { timestamp: new Date().toISOString() },
       };
 

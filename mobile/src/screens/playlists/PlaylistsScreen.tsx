@@ -1,14 +1,8 @@
-import React, { useEffect } from 'react';
-import {
-  View,
-  FlatList,
-  StyleSheet,
-  RefreshControl,
-  TouchableOpacity,
-  Text,
-} from 'react-native';
+import React, { useCallback } from 'react';
+import { View, FlatList, StyleSheet, RefreshControl, TouchableOpacity, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '@contexts';
 import type { Theme } from '@themes/types';
 import { useAuthStore } from '../../store/authStore';
@@ -24,10 +18,7 @@ type PlaylistStackParamList = {
   SearchTracks: { playlistId: string };
 };
 
-type PlaylistsScreenNavigationProp = NativeStackNavigationProp<
-  PlaylistStackParamList,
-  'Playlists'
->;
+type PlaylistsScreenNavigationProp = NativeStackNavigationProp<PlaylistStackParamList, 'Playlists'>;
 
 interface PlaylistsScreenProps {
   navigation: PlaylistsScreenNavigationProp;
@@ -39,11 +30,13 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
   const { user } = useAuthStore();
   const { playlists, isLoading, fetchPlaylists } = usePlaylistStore();
 
-  useEffect(() => {
-    if (user) {
-      fetchPlaylists(user.id);
-    }
-  }, [user]);
+  useFocusEffect(
+    useCallback(() => {
+      if (user) {
+        fetchPlaylists(user.id);
+      }
+    }, [user])
+  );
 
   const handleRefresh = async () => {
     if (user) {
@@ -76,12 +69,11 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
         data={playlists}
         keyExtractor={item => item.id}
         renderItem={({ item }) => {
-          // Use data from the playlist object itself
-          // For owner name, use current user if they own it, otherwise show 'Unknown'
           const isOwner = user && item.ownerId === user.id;
-          const ownerName = isOwner
-            ? user.profile?.displayName || user.profile?.username || 'You'
-            : 'Unknown';
+          const ownerName =
+            item.owner?.displayName ||
+            item.owner?.username ||
+            (isOwner ? user.displayName || user.username || 'You' : 'Unknown');
 
           return (
             <PlaylistCard

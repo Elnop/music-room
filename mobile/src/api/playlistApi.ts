@@ -1,6 +1,14 @@
 import { API_CONFIG } from '@constants';
-import type { Playlist, PlaylistWithTracks, Track, ApiResponse } from '@types';
+import type { Playlist, PlaylistWithTracks, Track, ApiResponse, UserProfile } from '@types';
 import type { PlaylistInput } from '@utils/validators';
+
+// Viewer profile type for API responses
+export interface ViewerProfile {
+  id: string;
+  username: string;
+  displayName?: string;
+  avatarUrl?: string;
+}
 
 /**
  * Playlist API Service
@@ -9,7 +17,7 @@ import type { PlaylistInput } from '@utils/validators';
 
 const getAuthToken = async (): Promise<string> => {
   // Import authStore dynamically to avoid circular dependencies
-  const { useAuthStore } = await import('@store/authStore');
+  const { useAuthStore } = await import('../store/authStore');
   const token = useAuthStore.getState().accessToken;
   if (!token) throw new Error('No authentication token available');
   return token;
@@ -214,12 +222,15 @@ export const playlistApi = {
    */
   async removeTrack(playlistId: string, trackId: string): Promise<void> {
     const token = await getAuthToken();
-    const response = await fetch(`${API_CONFIG.BASE_URL}/api/playlists/${playlistId}/tracks/${trackId}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await fetch(
+      `${API_CONFIG.BASE_URL}/api/playlists/${playlistId}/tracks/${trackId}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     if (!response.ok) {
       const error = await response.json();
@@ -232,14 +243,17 @@ export const playlistApi = {
    */
   async reorderTracks(playlistId: string, trackIds: string[]): Promise<void> {
     const token = await getAuthToken();
-    const response = await fetch(`${API_CONFIG.BASE_URL}/api/playlists/${playlistId}/tracks/reorder`, {
-      method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ trackIds }),
-    });
+    const response = await fetch(
+      `${API_CONFIG.BASE_URL}/api/playlists/${playlistId}/tracks/reorder`,
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ trackIds }),
+      }
+    );
 
     if (!response.ok) {
       const error = await response.json();
@@ -252,14 +266,17 @@ export const playlistApi = {
    */
   async addCollaborator(playlistId: string, userId: string): Promise<void> {
     const token = await getAuthToken();
-    const response = await fetch(`${API_CONFIG.BASE_URL}/api/playlists/${playlistId}/collaborators`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ userId }),
-    });
+    const response = await fetch(
+      `${API_CONFIG.BASE_URL}/api/playlists/${playlistId}/collaborators`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId }),
+      }
+    );
 
     if (!response.ok) {
       const error = await response.json();
@@ -272,16 +289,81 @@ export const playlistApi = {
    */
   async removeCollaborator(playlistId: string, userId: string): Promise<void> {
     const token = await getAuthToken();
-    const response = await fetch(`${API_CONFIG.BASE_URL}/api/playlists/${playlistId}/collaborators/${userId}`, {
-      method: 'DELETE',
+    const response = await fetch(
+      `${API_CONFIG.BASE_URL}/api/playlists/${playlistId}/collaborators/${userId}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error?.message || 'Failed to remove collaborator');
+    }
+  },
+
+  /**
+   * Get viewers for a playlist
+   */
+  async getViewers(playlistId: string): Promise<ViewerProfile[]> {
+    const token = await getAuthToken();
+    const response = await fetch(`${API_CONFIG.BASE_URL}/api/playlists/${playlistId}/viewers`, {
       headers: {
         Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error?.message || 'Failed to remove collaborator');
+      throw new Error(error.error?.message || 'Failed to fetch viewers');
+    }
+
+    const data: ApiResponse<{ viewers: ViewerProfile[] }> = await response.json();
+    return data.data!.viewers;
+  },
+
+  /**
+   * Add viewer to playlist (allows viewing private playlist)
+   */
+  async addViewer(playlistId: string, userId: string): Promise<void> {
+    const token = await getAuthToken();
+    const response = await fetch(`${API_CONFIG.BASE_URL}/api/playlists/${playlistId}/viewers`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userId }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error?.message || 'Failed to add viewer');
+    }
+  },
+
+  /**
+   * Remove viewer from playlist
+   */
+  async removeViewer(playlistId: string, userId: string): Promise<void> {
+    const token = await getAuthToken();
+    const response = await fetch(
+      `${API_CONFIG.BASE_URL}/api/playlists/${playlistId}/viewers/${userId}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error?.message || 'Failed to remove viewer');
     }
   },
 };

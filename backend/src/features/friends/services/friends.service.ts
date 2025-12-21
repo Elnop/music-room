@@ -41,13 +41,25 @@ export class FriendsService {
       ]);
 
       if (followingResult.error) {
-        logger.error("Failed to check following status", { error: followingResult.error });
-        throw new AppError(500, "Failed to get follow status", "FOLLOW_STATUS_ERROR");
+        logger.error("Failed to check following status", {
+          error: followingResult.error,
+        });
+        throw new AppError(
+          500,
+          "Failed to get follow status",
+          "FOLLOW_STATUS_ERROR"
+        );
       }
 
       if (followedByResult.error) {
-        logger.error("Failed to check followed by status", { error: followedByResult.error });
-        throw new AppError(500, "Failed to get follow status", "FOLLOW_STATUS_ERROR");
+        logger.error("Failed to check followed by status", {
+          error: followedByResult.error,
+        });
+        throw new AppError(
+          500,
+          "Failed to get follow status",
+          "FOLLOW_STATUS_ERROR"
+        );
       }
 
       const isFollowing = !!followingResult.data;
@@ -63,7 +75,11 @@ export class FriendsService {
     } catch (error) {
       if (error instanceof AppError) throw error;
       logger.error("Unexpected error getting follow status", { error });
-      throw new AppError(500, "Failed to get follow status", "FOLLOW_STATUS_ERROR");
+      throw new AppError(
+        500,
+        "Failed to get follow status",
+        "FOLLOW_STATUS_ERROR"
+      );
     }
   }
 
@@ -97,7 +113,10 @@ export class FriendsService {
 
       if (insertError) {
         if (insertError.code === "23505") {
-          logger.info("Already following user", { currentUserId, targetUserId });
+          logger.info("Already following user", {
+            currentUserId,
+            targetUserId,
+          });
         } else {
           logger.error("Failed to follow user", { error: insertError });
           throw new AppError(500, "Failed to follow user", "FOLLOW_ERROR");
@@ -142,5 +161,73 @@ export class FriendsService {
       throw new AppError(500, "Failed to unfollow user", "UNFOLLOW_ERROR");
     }
   }
-}
 
+  /**
+   * Get mutual friends (users who follow each other)
+   */
+  async getMutualFriends(userId: string): Promise<
+    Array<{
+      id: string;
+      username: string;
+      displayName?: string;
+      avatarUrl?: string;
+    }>
+  > {
+    try {
+      // Get users I follow
+      const { data: following, error: followingError } = await supabase
+        .from("follows")
+        .select("following_id")
+        .eq("follower_id", userId);
+
+      if (followingError) {
+        logger.error("Failed to get following list", { error: followingError });
+        throw new AppError(500, "Failed to get friends", "FRIENDS_ERROR");
+      }
+
+      if (!following || following.length === 0) {
+        return [];
+      }
+
+      const followingIds = following.map((f) => f.following_id);
+
+      const { data: mutualFollows, error: mutualError } = await supabase
+        .from("follows")
+        .select("follower_id")
+        .eq("following_id", userId)
+        .in("follower_id", followingIds);
+
+      if (mutualError) {
+        logger.error("Failed to get mutual follows", { error: mutualError });
+        throw new AppError(500, "Failed to get friends", "FRIENDS_ERROR");
+      }
+
+      if (!mutualFollows || mutualFollows.length === 0) {
+        return [];
+      }
+
+      const mutualIds = mutualFollows.map((f) => f.follower_id);
+
+      const { data: profiles, error: profilesError } = await supabase
+        .from("user_profiles")
+        .select("id, username, display_name, avatar_url")
+        .in("id", mutualIds);
+
+      if (profilesError) {
+        logger.error("Failed to get friend profiles", { error: profilesError });
+        throw new AppError(500, "Failed to get friends", "FRIENDS_ERROR");
+      }
+
+      return (profiles || []).map((p) => ({
+        id: p.id,
+        username: p.username,
+        displayName: p.display_name,
+        avatarUrl: p.avatar_url,
+      }));
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      logger.error("Unexpected error getting mutual friends", { error });
+      throw new AppError(500, "Failed to get friends", "FRIENDS_ERROR");
+    }
+  }
+}
