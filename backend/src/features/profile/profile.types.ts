@@ -24,3 +24,15 @@ export interface ProfileUpdateResponse {
   createdAt: string;
   updatedAt: string;
 }
+
+/**
+ * Public profile (for search results, no email)
+ */
+export interface PublicProfile {
+  id: string;
+  username: string;
+  displayName?: string;
+  avatarUrl?: string;
+  bio?: string;
+  createdAt: string;
+}

@@ -21,6 +21,7 @@ import type { Theme } from '@themes/types';
 import { PlaylistsNavigator } from './stacks/PlaylistsStack';
 import { ProfileNavigator } from './stacks/ProfileStack';
 import { SearchNavigator } from './stacks/SearchStack';
+import { FriendsNavigator } from './stacks/FriendsStack';
 
 // Player components
 import { MiniPlayer } from '../components/player/MiniPlayer';
@@ -39,6 +40,7 @@ export type AppTabsParamList = {
 export type { PlaylistStackParamList } from './stacks/PlaylistsStack';
 export type { ProfileStackParamList } from './stacks/ProfileStack';
 export type { SearchStackParamList } from './stacks/SearchStack';
+export type { FriendsStackParamList } from './stacks/FriendsStack';
 
 const Tab = createBottomTabNavigator<AppTabsParamList>();
 
@@ -120,16 +122,16 @@ export function AppNavigator() {
             }}
           />
 
-          {/* Friends Tab (Placeholder) */}
+          {/* Friends Tab */}
           <Tab.Screen
             name="FriendsTab"
+            component={FriendsNavigator}
             options={{
               title: 'Friends',
               tabBarIcon: () => <Text style={{ fontSize: 24 }}>👥</Text>,
+              headerShown: false,
             }}
-          >
-            {() => <PlaceholderScreen title="Friends" />}
-          </Tab.Screen>
+          />
 
           {/* Profile Tab */}
           <Tab.Screen

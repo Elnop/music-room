@@ -1,6 +1,9 @@
 import type { Request, Response, NextFunction } from "express";
 import { ProfileService } from "./profile.service.js";
-import { updateProfileSchema } from "./profile.validators.js";
+import {
+  updateProfileSchema,
+  searchUsersSchema,
+} from "./profile.validators.js";
 import type { AuthenticatedRequest } from "@/shared/types/global.types.js";
 import type { ApiResponse } from "@/shared/types/global.types.js";
 
@@ -18,7 +21,7 @@ export class ProfileController {
 
       const profile = await profileService.updateProfile(
         authReq.user.id,
-        validated,
+        validated
       );
 
       const response: ApiResponse = {
@@ -72,6 +75,35 @@ export class ProfileController {
       const response: ApiResponse = {
         success: true,
         data: profile,
+        meta: {
+          timestamp: new Date().toISOString(),
+        },
+      };
+
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Search users by username or display name
+   * GET /api/profile/search?q=query&limit=20
+   */
+  async searchUsers(req: Request, res: Response, next: NextFunction) {
+    try {
+      const authReq = req as AuthenticatedRequest;
+      const validated = searchUsersSchema.parse(req.query);
+
+      const users = await profileService.searchUsers(
+        validated.q,
+        validated.limit,
+        authReq.user.id // Exclude current user from results
+      );
+
+      const response: ApiResponse = {
+        success: true,
+        data: users,
         meta: {
           timestamp: new Date().toISOString(),
         },

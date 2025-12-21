@@ -130,4 +130,20 @@ export const profileApi = {
       method: 'GET',
     });
   },
+
+  /**
+   * Search users by username or display name
+   */
+  async searchUsers(
+    accessToken: string,
+    query: string,
+    limit = 20
+  ): Promise<UserProfile[]> {
+    const params = new URLSearchParams({ q: query, limit: limit.toString() });
+    return apiRequest<UserProfile[]>(
+      `/api/profile/search?${params.toString()}`,
+      accessToken,
+      { method: 'GET' }
+    );
+  },
 };

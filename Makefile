@@ -1,5 +1,4 @@
-.PHONY: help install dev start stop restart logs logs-backend logs-mobile qr ps build build-backend build-mobile test test-backend lint lint-fix format fix-permissions clean clean-docker clean-deps clean-all shell-backend shell-mobile deploy health dev-tunnel qr-tunnel tunnel-info
-
+.PHONY: help install dev start stop restart logs logs-backend logs-mobile qr ps build build-backend build-mobile test test-backend lint lint-fix format fix-permissions clean clean-docker clean-deps clean-all shell-backend shell-mobile deploy health dev-tunnel qr-tunnel tunnel-info dev-local dev-android backend-local mobile-local expo-android expo-clear
 # Colors for output
 BLUE := \033[0;34m
 GREEN := \033[0;32m
@@ -581,3 +580,92 @@ tunnel-setup: ## One-time setup for tunnel mode (auto EAS login)
 	@echo "$(BLUE)Next step:$(NC)"
 	@echo "  Run: $(GREEN)make dev-tunnel$(NC) to start tunnel mode"
 	@echo ""
+
+
+# =====================================================
+# Local Development Commands (No Docker, Android Studio)
+# =====================================================
+
+
+dev-local: ## Start development locally (no Docker) - for Android Studio emulator
+	@echo "$(BLUE)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(BLUE)║       Starting Music Room - LOCAL Development Mode          ║$(NC)"
+	@echo "$(BLUE)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Checking dependencies...$(NC)"
+	@if [ ! -d "backend/node_modules" ]; then \
+		echo "$(RED)⚠️  Backend dependencies not installed$(NC)"; \
+		echo "$(YELLOW)→ Installing backend dependencies...$(NC)"; \
+		cd backend && npm install; \
+	fi
+	@if [ ! -d "mobile/node_modules" ]; then \
+		echo "$(RED)⚠️  Mobile dependencies not installed$(NC)"; \
+		echo "$(YELLOW)→ Installing mobile dependencies...$(NC)"; \
+		cd mobile && npm install; \
+	fi
+	@echo "$(GREEN)✓ Dependencies OK$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Starting backend server...$(NC)"
+	@cd backend && npm run dev &
+	@sleep 3
+	@echo "$(GREEN)✓ Backend started on http://localhost:3000$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Starting Expo for Android...$(NC)"
+	@echo ""
+	@cd mobile && npx expo start --localhost --android
+
+
+dev-android: ## Start Expo for Android emulator (backend must be running)
+	@echo "$(BLUE)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(BLUE)║         Starting Expo for Android Studio Emulator           ║$(NC)"
+	@echo "$(BLUE)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Checking if backend is running...$(NC)"
+	@curl -s http://localhost:3000/health > /dev/null && echo "$(GREEN)✓ Backend: Running$(NC)" || (echo "$(RED)✗ Backend not running!$(NC)" && echo "$(YELLOW)Run 'make backend-local' first or 'make dev-local' for full setup$(NC)" && exit 1)
+	@echo ""
+	@echo "$(YELLOW)→ Starting Expo with Android...$(NC)"
+	@echo "$(BLUE)📱 This will automatically open the app in Android Studio emulator$(NC)"
+	@echo ""
+	@cd mobile && npx expo start --localhost --android
+
+
+backend-local: ## Start backend only (local, no Docker)
+	@echo "$(BLUE)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(BLUE)║              Starting Backend - Local Mode                  ║$(NC)"
+	@echo "$(BLUE)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@if [ ! -d "backend/node_modules" ]; then \
+		echo "$(YELLOW)→ Installing backend dependencies...$(NC)"; \
+		cd backend && npm install; \
+	fi
+	@echo "$(YELLOW)→ Starting backend server...$(NC)"
+	@cd backend && npm run dev
+
+
+mobile-local: ## Start Expo only (local, no Docker)
+	@echo "$(BLUE)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(BLUE)║               Starting Expo - Local Mode                    ║$(NC)"
+	@echo "$(BLUE)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@if [ ! -d "mobile/node_modules" ]; then \
+		echo "$(YELLOW)→ Installing mobile dependencies...$(NC)"; \
+		cd mobile && npm install; \
+	fi
+	@echo "$(YELLOW)→ Starting Expo development server...$(NC)"
+	@echo ""
+	@echo "$(BLUE)Options disponibles:$(NC)"
+	@echo "  $(GREEN)a$(NC) - Ouvrir sur Android emulator"
+	@echo "  $(GREEN)i$(NC) - Ouvrir sur iOS simulator"
+	@echo "  $(GREEN)w$(NC) - Ouvrir dans le navigateur web"
+	@echo ""
+	@cd mobile && npx expo start --localhost
+
+
+expo-android: ## Quick start: Open app directly in Android emulator
+	@echo "$(BLUE)📱 Opening app in Android Studio emulator...$(NC)"
+	@cd mobile && npx expo start --localhost --android
+
+
+expo-clear: ## Start Expo with cleared cache (local)
+	@echo "$(BLUE)🧹 Starting Expo with cleared cache...$(NC)"
+	@cd mobile && npx expo start --localhost --clear

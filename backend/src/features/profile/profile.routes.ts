@@ -25,6 +25,17 @@ router.patch("/", (req, res, next) => controller.updateProfile(req, res, next));
 router.get("/", (req, res, next) => controller.getOwnProfile(req, res, next));
 
 /**
+ * @route   GET /api/profile/search
+ * @desc    Search users by username or display name
+ * @access  Private
+ * @query   q - Search query (required)
+ * @query   limit - Max results (default: 20, max: 50)
+ */
+router.get("/search", (req, res, next) =>
+  controller.searchUsers(req, res, next),
+);
+
+/**
  * @route   GET /api/profile/:userId
  * @desc    Get user profile by ID
  * @access  Private

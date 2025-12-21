@@ -4,6 +4,7 @@ import { logger } from "@/shared/utils/logger.js";
 import type {
   UpdateProfileDTO,
   ProfileUpdateResponse,
+  PublicProfile,
 } from "../profile.types.js";
 
 export class ProfileService {
@@ -12,7 +13,7 @@ export class ProfileService {
    */
   async updateProfile(
     userId: string,
-    data: UpdateProfileDTO,
+    data: UpdateProfileDTO
   ): Promise<ProfileUpdateResponse> {
     try {
       logger.info("Updating user profile", { userId, data });
@@ -41,7 +42,7 @@ export class ProfileService {
         throw new AppError(
           500,
           "Failed to update profile",
-          "PROFILE_UPDATE_ERROR",
+          "PROFILE_UPDATE_ERROR"
         );
       }
 
@@ -119,6 +120,51 @@ export class ProfileService {
       if (error instanceof AppError) throw error;
       logger.error("Unexpected error fetching profile", { error });
       throw new AppError(500, "Failed to fetch profile", "PROFILE_FETCH_ERROR");
+    }
+  }
+
+  /**
+   * Search users by username or display name
+   */
+  async searchUsers(
+    query: string,
+    limit = 20,
+    excludeUserId?: string
+  ): Promise<PublicProfile[]> {
+    try {
+      logger.info("Searching users", { query, limit, excludeUserId });
+
+      // Search by username or display_name using ilike (case-insensitive)
+      let queryBuilder = supabase
+        .from("user_profiles")
+        .select("id, username, display_name, avatar_url, bio, created_at")
+        .or(`username.ilike.%${query}%,display_name.ilike.%${query}%`)
+        .limit(limit);
+
+      // Exclude current user from results
+      if (excludeUserId) {
+        queryBuilder = queryBuilder.neq("id", excludeUserId);
+      }
+
+      const { data, error } = await queryBuilder;
+
+      if (error) {
+        logger.error("Failed to search users", { error });
+        throw new AppError(500, "Failed to search users", "SEARCH_ERROR");
+      }
+
+      return (data || []).map((profile) => ({
+        id: profile.id,
+        username: profile.username,
+        displayName: profile.display_name,
+        avatarUrl: profile.avatar_url,
+        bio: profile.bio,
+        createdAt: profile.created_at,
+      }));
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      logger.error("Unexpected error searching users", { error });
+      throw new AppError(500, "Failed to search users", "SEARCH_ERROR");
     }
   }
 }
