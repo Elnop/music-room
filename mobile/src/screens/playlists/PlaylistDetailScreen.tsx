@@ -92,7 +92,11 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 
     if (currentPlaylist.collaboratorIds.includes(user.id)) return true;
 
-    if (currentPlaylist.editMode === 'open') return true;
+    if (currentPlaylist.editMode === 'open') {
+      if (currentPlaylist.visibility === 'public') return true;
+
+      if (currentPlaylist.viewerIds?.includes(user.id)) return true;
+    }
 
     return false;
   }, [user, currentPlaylist]);
