@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Playlist, PlaylistWithTracks, Track } from '@types';
+import type { Playlist, PlaylistWithTracks, Track, TrackWithPosition } from '@types';
 import type { PlaylistInput } from '@utils/validators';
 import { playlistApi } from '@api/playlistApi';
 
@@ -21,6 +21,9 @@ interface PlaylistState {
   addTrack: (playlistId: string, track: Track) => Promise<void>;
   removeTrack: (playlistId: string, trackId: string) => Promise<void>;
   reorderTracks: (playlistId: string, trackIds: string[]) => Promise<void>;
+
+  addTrackLocally: (playlistId: string, track: TrackWithPosition) => void;
+  removeTrackLocally: (playlistId: string, trackId: string) => void;
 
   // Error handling
   clearError: () => void;
@@ -52,8 +55,7 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
         isLoading: false,
       });
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to fetch playlists';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch playlists';
       set({
         error: errorMessage,
         isLoading: false,
@@ -76,8 +78,7 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
         isLoading: false,
       });
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to fetch playlist';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch playlist';
       set({
         error: errorMessage,
         isLoading: false,
@@ -103,8 +104,7 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
         isLoading: false,
       });
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to create playlist';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create playlist';
       set({
         error: errorMessage,
         isLoading: false,
@@ -124,15 +124,29 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 
       // Update state
       const { playlists, currentPlaylist } = get();
+
+      const updatedCurrentPlaylist =
+        currentPlaylist?.id === id
+          ? {
+              ...currentPlaylist,
+              name: updatedPlaylist.name,
+              description: updatedPlaylist.description,
+              coverUrl: updatedPlaylist.coverUrl,
+              visibility: updatedPlaylist.visibility,
+              collaboratorIds: updatedPlaylist.collaboratorIds,
+              viewerIds: updatedPlaylist.viewerIds,
+              trackCount: updatedPlaylist.trackCount,
+              updatedAt: updatedPlaylist.updatedAt,
+            }
+          : currentPlaylist;
+
       set({
         playlists: playlists.map(p => (p.id === id ? updatedPlaylist : p)),
-        currentPlaylist:
-          currentPlaylist?.id === id ? { ...currentPlaylist, ...updatedPlaylist } : currentPlaylist,
+        currentPlaylist: updatedCurrentPlaylist,
         isLoading: false,
       });
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to update playlist';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update playlist';
       set({
         error: errorMessage,
         isLoading: false,
@@ -158,8 +172,7 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
         isLoading: false,
       });
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to delete playlist';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to delete playlist';
       set({
         error: errorMessage,
         isLoading: false,
@@ -182,8 +195,7 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 
       set({ isLoading: false });
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to add track';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to add track';
       set({
         error: errorMessage,
         isLoading: false,
@@ -209,8 +221,7 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 
       set({ isLoading: false });
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to remove track';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to remove track';
       set({
         error: errorMessage,
         isLoading: false,
@@ -236,13 +247,45 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 
       set({ isLoading: false });
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to reorder tracks';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to reorder tracks';
       set({
         error: errorMessage,
         isLoading: false,
       });
       throw error;
+    }
+  },
+
+  /**
+   * Add track locally (for realtime updates without API call)
+   */
+  addTrackLocally: (playlistId: string, track: TrackWithPosition) => {
+    const { currentPlaylist } = get();
+    if (currentPlaylist?.id === playlistId) {
+      const trackExists = currentPlaylist.tracks.some(t => t.id === track.id);
+      if (!trackExists) {
+        set({
+          currentPlaylist: {
+            ...currentPlaylist,
+            tracks: [...currentPlaylist.tracks, track],
+          },
+        });
+      }
+    }
+  },
+
+  /**
+   * Remove track locally (for realtime updates without API call)
+   */
+  removeTrackLocally: (playlistId: string, trackId: string) => {
+    const { currentPlaylist } = get();
+    if (currentPlaylist?.id === playlistId) {
+      set({
+        currentPlaylist: {
+          ...currentPlaylist,
+          tracks: currentPlaylist.tracks.filter(t => t.id !== trackId),
+        },
+      });
     }
   },
 

@@ -13,13 +13,15 @@ import type {
 export function formatPlaylistResponse(
   row: PlaylistRow,
   trackCount: number,
-  owner?: PlaylistOwner
+  owner?: PlaylistOwner,
+  firstTrackCover?: string
 ): PlaylistResponse {
   return {
     id: row.id,
     name: row.name,
     description: row.description,
     coverUrl: row.cover_url,
+    firstTrackCover,
     ownerId: row.owner_id,
     owner,
     collaboratorIds: row.collaborator_ids,

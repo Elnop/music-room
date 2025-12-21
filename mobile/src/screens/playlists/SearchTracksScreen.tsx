@@ -46,10 +46,18 @@ export function SearchTracksScreen({ navigation, route }: SearchTracksScreenProp
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
   const { playlistId } = route.params;
-  const { addTrack } = usePlaylistStore();
+  const { addTrack, currentPlaylist } = usePlaylistStore();
   const { searchResults, isSearching, search, clearSearch } = useSoundCloudStore();
   const [query, setQuery] = useState('');
   const [addingTrackId, setAddingTrackId] = useState<number | null>(null);
+  const [addedTrackUris, setAddedTrackUris] = useState<Set<string>>(new Set());
+
+  React.useEffect(() => {
+    if (currentPlaylist?.tracks) {
+      const existingUris = new Set(currentPlaylist.tracks.map(t => t.trackUri));
+      setAddedTrackUris(existingUris);
+    }
+  }, [currentPlaylist?.tracks]);
 
   const debouncedSearch = React.useMemo(
     () =>
@@ -74,7 +82,35 @@ export function SearchTracksScreen({ navigation, route }: SearchTracksScreenProp
     debouncedSearch(text);
   };
 
+  const getErrorMessage = (error: unknown): string => {
+    if (error && typeof error === 'object' && 'error' in error) {
+      const apiError = error as { error?: { code?: string; message?: string } };
+      const code = apiError.error?.code;
+
+      switch (code) {
+        case 'PLAYLIST_ACCESS_DENIED':
+          return "Vous n'avez plus accès à cette playlist";
+        case 'PLAYLIST_NOT_FOUND':
+          return 'Cette playlist a été supprimée';
+        case 'TRACK_DUPLICATE':
+          return 'Cette musique est déjà dans la playlist';
+        default:
+          return apiError.error?.message || "Échec de l'ajout";
+      }
+    }
+
+    if (error instanceof Error) {
+      return error.message;
+    }
+
+    return "Échec de l'ajout";
+  };
+
   const handleAddTrack = async (track: SoundCloudTrack) => {
+    if (addedTrackUris.has(track.permalink_url)) {
+      return;
+    }
+
     setAddingTrackId(track.id);
     try {
       const internalTrack: NewTrackInput = {
@@ -89,13 +125,9 @@ export function SearchTracksScreen({ navigation, route }: SearchTracksScreenProp
 
       await addTrack(playlistId, internalTrack as Track);
 
-      Alert.alert('Succès', `"${track.title}" ajouté à la playlist`, [
-        { text: 'Ajouter plus', style: 'cancel' },
-        { text: 'Terminé', onPress: () => navigation.goBack() },
-      ]);
+      setAddedTrackUris(prev => new Set(prev).add(track.permalink_url));
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Échec de l'ajout";
-      Alert.alert('Erreur', message);
+      Alert.alert('Erreur', getErrorMessage(error));
     } finally {
       setAddingTrackId(null);
     }
@@ -110,12 +142,13 @@ export function SearchTracksScreen({ navigation, route }: SearchTracksScreenProp
   const renderTrackItem = ({ item }: { item: SoundCloudTrack }) => {
     const artworkUrl = item.artwork_url || item.user.avatar_url || 'https://via.placeholder.com/50';
     const isAdding = addingTrackId === item.id;
+    const isAdded = addedTrackUris.has(item.permalink_url);
 
     return (
       <TouchableOpacity
         style={styles.trackItem}
-        onPress={() => handleAddTrack(item)}
-        disabled={isAdding}
+        onPress={() => !isAdded && handleAddTrack(item)}
+        disabled={isAdding || isAdded}
         activeOpacity={0.7}
       >
         <Image source={{ uri: artworkUrl }} style={styles.artwork} />
@@ -128,13 +161,21 @@ export function SearchTracksScreen({ navigation, route }: SearchTracksScreenProp
           </Text>
           <Text style={styles.trackDuration}>{formatDuration(item.duration)}</Text>
         </View>
-        <TouchableOpacity
-          style={[styles.addButton, isAdding && styles.addButtonDisabled]}
-          onPress={() => handleAddTrack(item)}
-          disabled={isAdding}
+        <View
+          style={[
+            styles.addButton,
+            isAdding && styles.addButtonDisabled,
+            isAdded && styles.addedButton,
+          ]}
         >
-          {isAdding ? <LoadingSpinner size="small" /> : <Text style={styles.addButtonText}>+</Text>}
-        </TouchableOpacity>
+          {isAdding ? (
+            <LoadingSpinner size="small" />
+          ) : (
+            <Text style={[styles.addButtonText, isAdded && styles.addedButtonText]}>
+              {isAdded ? '✓' : '+'}
+            </Text>
+          )}
+        </View>
       </TouchableOpacity>
     );
   };
@@ -245,10 +286,17 @@ const createStyles = (theme: Theme) =>
     addButtonDisabled: {
       opacity: 0.6,
     },
+    addedButton: {
+      backgroundColor: theme.colors.success,
+    },
     addButtonText: {
       fontSize: 28,
       fontWeight: theme.typography.weights.bold,
       color: theme.colors.background,
       lineHeight: 30,
+    },
+    addedButtonText: {
+      fontSize: 20,
+      color: theme.colors.background,
     },
   });

@@ -3,6 +3,7 @@ import { AppError } from "@/shared/middleware/error-handler.js";
 import { logger } from "@/shared/utils/logger.js";
 import { PlaylistPermissions } from "../permissions/playlist.permissions.js";
 import { reindexPositions } from "../utils/playlist.helpers.js";
+import { realtime } from "@/realtime/index.js";
 import type { AddTrackDTO } from "../playlist.types.js";
 
 /**
@@ -21,7 +22,7 @@ export class PlaylistTrackService {
   async addTrack(
     playlistId: string,
     userId: string,
-    track: AddTrackDTO,
+    track: AddTrackDTO
   ): Promise<void> {
     try {
       // Check permission (owner or collaborator)
@@ -40,7 +41,7 @@ export class PlaylistTrackService {
             duration_ms: track.durationMs,
             preview_url: track.previewUrl,
           },
-          { onConflict: "track_uri" },
+          { onConflict: "track_uri" }
         )
         .select()
         .single();
@@ -52,7 +53,7 @@ export class PlaylistTrackService {
         "get_next_playlist_position",
         {
           p_playlist_id: playlistId,
-        },
+        }
       );
 
       const nextPosition = maxPos ?? 0;
@@ -73,7 +74,7 @@ export class PlaylistTrackService {
           throw new AppError(
             409,
             "Track already in playlist",
-            "TRACK_DUPLICATE",
+            "TRACK_DUPLICATE"
           );
         }
         throw addError;
@@ -83,6 +84,22 @@ export class PlaylistTrackService {
         playlistId,
         trackId: trackData.id,
         userId,
+      });
+
+      realtime.notifyPlaylistUpdate(playlistId, "track_added", {
+        track: {
+          id: trackData.id,
+          trackUri: trackData.track_uri,
+          title: trackData.title,
+          artist: trackData.artist,
+          album: trackData.album,
+          albumArt: trackData.album_art,
+          durationMs: trackData.duration_ms,
+          previewUrl: trackData.preview_url,
+          position: nextPosition,
+          addedBy: userId,
+          addedAt: new Date().toISOString(),
+        },
       });
     } catch (error) {
       if (error instanceof AppError) throw error;
@@ -97,7 +114,7 @@ export class PlaylistTrackService {
   async removeTrack(
     playlistId: string,
     userId: string,
-    trackId: string,
+    trackId: string
   ): Promise<void> {
     try {
       // Check permission (owner or collaborator)
@@ -119,6 +136,8 @@ export class PlaylistTrackService {
         trackId,
         userId,
       });
+
+      realtime.notifyPlaylistUpdate(playlistId, "track_removed", { trackId });
     } catch (error) {
       if (error instanceof AppError) throw error;
       logger.error("Failed to remove track", { error, playlistId, trackId });
@@ -132,7 +151,7 @@ export class PlaylistTrackService {
   async reorderTracks(
     playlistId: string,
     userId: string,
-    trackIds: string[],
+    trackIds: string[]
   ): Promise<void> {
     try {
       // Check permission (owner or collaborator)
@@ -153,7 +172,7 @@ export class PlaylistTrackService {
         throw new AppError(
           400,
           "Invalid track IDs for reordering",
-          "INVALID_TRACK_IDS",
+          "INVALID_TRACK_IDS"
         );
       }
 
@@ -179,13 +198,15 @@ export class PlaylistTrackService {
       if (insertError) throw insertError;
 
       logger.info("Playlist tracks reordered", { playlistId, userId });
+
+      realtime.notifyPlaylistUpdate(playlistId, "reordered");
     } catch (error) {
       if (error instanceof AppError) throw error;
       logger.error("Failed to reorder tracks", { error, playlistId });
       throw new AppError(
         500,
         "Failed to reorder tracks",
-        "TRACK_REORDER_ERROR",
+        "TRACK_REORDER_ERROR"
       );
     }
   }

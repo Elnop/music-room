@@ -5,8 +5,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '@contexts';
 import type { Theme } from '@themes/types';
+import type { Track, SoundCloudTrack } from '@types';
 import { usePlaylistStore } from '../../store/playlistStore';
 import { useAuthStore } from '../../store/authStore';
+import { usePlayerStore } from '../../store/playerStore';
+import { usePlaylistSocket } from '@hooks/usePlaylistSocket';
 import { PlaylistHeader } from '@components/playlist/PlaylistHeader';
 import { TrackItem } from '@components/playlist/TrackItem';
 import { AddTrackButton } from '@components/playlist/AddTrackButton';
@@ -33,12 +36,52 @@ interface PlaylistDetailScreenProps {
   route: PlaylistDetailScreenRouteProp;
 }
 
+const hashStringToNumber = (str: string): number => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const chr = str.charCodeAt(i);
+    hash = (hash << 5) - hash + chr;
+    hash |= 0; // Convert to 32-bit integer
+  }
+  return Math.abs(hash);
+};
+
+const trackToSoundCloud = (track: Track): SoundCloudTrack => {
+  const parsed = parseInt(track.id, 10);
+  const trackId = !Number.isNaN(parsed) ? parsed : hashStringToNumber(track.trackUri || track.id);
+
+  return {
+    id: trackId,
+    title: track.title,
+    description: null,
+    duration: track.durationMs,
+    genre: null,
+    artwork_url: track.albumArt || null,
+    permalink_url: track.trackUri,
+    user: {
+      id: trackId,
+      username: track.artist,
+      avatar_url: track.albumArt || null,
+      permalink_url: track.trackUri,
+    },
+    playable: true,
+  };
+};
+
 export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreenProps) {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
   const { id } = route.params;
   const { user } = useAuthStore();
   const { currentPlaylist, isLoading, fetchPlaylistById, removeTrack } = usePlaylistStore();
+  const {
+    currentTrack,
+    isPlaying,
+    loading: playerLoading,
+    playTrack,
+    pause,
+    resume,
+  } = usePlayerStore();
 
   const isOwner = user && currentPlaylist?.ownerId === user.id;
 
@@ -46,6 +89,12 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
     user && currentPlaylist
       ? currentPlaylist.ownerId === user.id || currentPlaylist.collaboratorIds.includes(user.id)
       : false;
+
+  const handleReorderUpdate = React.useCallback(() => {
+    fetchPlaylistById(id);
+  }, [id, fetchPlaylistById]);
+
+  usePlaylistSocket(id, handleReorderUpdate);
 
   // Refresh playlist when screen receives focus
   // Note: useFocusEffect also triggers on mount, so no separate useEffect needed
@@ -76,6 +125,20 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 
   const handleAddTrack = () => {
     navigation.navigate('SearchTracks', { playlistId: id });
+  };
+
+  const handlePlayTrack = (track: Track) => {
+    const isCurrentTrack = currentTrack?.permalink_url === track.trackUri;
+
+    if (isCurrentTrack) {
+      if (isPlaying) {
+        pause();
+      } else {
+        resume();
+      }
+    } else {
+      playTrack(trackToSoundCloud(track));
+    }
   };
 
   const handleDeleteTrack = async (trackId: string) => {
@@ -109,13 +172,19 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
       <FlatList
         data={currentPlaylist.tracks}
         keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <TrackItem
-            track={item}
-            showDelete={canEdit}
-            onDelete={() => handleDeleteTrack(item.id)}
-          />
-        )}
+        renderItem={({ item }) => {
+          const isCurrentlyPlaying = currentTrack?.permalink_url === item.trackUri;
+          return (
+            <TrackItem
+              track={item}
+              showDelete={canEdit}
+              onDelete={() => handleDeleteTrack(item.id)}
+              onPlay={() => handlePlayTrack(item)}
+              isPlaying={isCurrentlyPlaying && isPlaying}
+              isLoading={isCurrentlyPlaying && playerLoading}
+            />
+          );
+        }}
         ListHeaderComponent={<PlaylistHeader playlist={currentPlaylist} />}
         contentContainerStyle={styles.list}
         ListEmptyComponent={

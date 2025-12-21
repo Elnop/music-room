@@ -3,14 +3,17 @@ import { NavigationContainer } from '@react-navigation/native';
 import { AuthNavigator } from './AuthNavigator';
 import { AppNavigator } from './AppNavigator';
 import { useAuthStore } from '../store/authStore';
+import { useSocketStore } from '../store/socketStore';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
 import { supabase } from '@/lib/supabase';
 
 export function RootNavigator() {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const loadFromStorage = useAuthStore((state) => state.loadFromStorage);
-  const logout = useAuthStore((state) => state.logout);
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const loadFromStorage = useAuthStore(state => state.loadFromStorage);
   const [isReady, setIsReady] = useState(false);
+
+  const connectSocket = useSocketStore(state => state.connect);
+  const disconnectSocket = useSocketStore(state => state.disconnect);
 
   useEffect(() => {
     // Load auth state from AsyncStorage on app start
@@ -24,15 +27,21 @@ export function RootNavigator() {
   }, [loadFromStorage]);
 
   useEffect(() => {
+    if (isAuthenticated) {
+      connectSocket();
+    } else {
+      disconnectSocket();
+    }
+  }, [isAuthenticated, connectSocket, disconnectSocket]);
+
+  useEffect(() => {
     // Listen for auth state changes from Supabase
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Supabase auth event:', event);
 
-      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
-        // User signed out or deleted - clear local state only
-        // Don't call logout() to avoid infinite loop
+      if (event === 'SIGNED_OUT') {
         useAuthStore.setState({
           user: null,
           accessToken: null,
