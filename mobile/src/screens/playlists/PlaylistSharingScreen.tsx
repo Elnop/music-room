@@ -139,11 +139,11 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 
   useEffect(() => {
     loadAllData();
-  }, [playlistId]);
+  }, [playlistId, loadAllData]);
 
   useFocusEffect(
     useCallback(() => {
-      if (!loadingRef.current && members.length >= 0) {
+      if (!loadingRef.current) {
         loadAllData();
       }
     }, [loadAllData])
@@ -243,12 +243,12 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 
           try {
             if (isPrivate) {
-              const promises: Promise<void>[] = [];
               if (member.canEdit) {
-                promises.push(playlistApi.removeCollaborator(playlistId, userId));
+                await playlistApi.removeCollaborator(playlistId, userId);
               }
-              promises.push(playlistApi.removeViewer(playlistId, userId).catch(() => {}));
-              await Promise.all(promises);
+              try {
+                await playlistApi.removeViewer(playlistId, userId);
+              } catch {}
             } else {
               await playlistApi.removeCollaborator(playlistId, userId);
             }
@@ -277,11 +277,40 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 
     try {
       if (currentCanEdit) {
-        await playlistApi.removeCollaborator(playlistId, userId);
-        await playlistApi.addViewer(playlistId, userId);
+        let collaboratorRemoved = false;
+        try {
+          await playlistApi.removeCollaborator(playlistId, userId);
+          collaboratorRemoved = true;
+          await playlistApi.addViewer(playlistId, userId);
+        } catch (error) {
+          if (collaboratorRemoved) {
+            try {
+              await playlistApi.addCollaborator(playlistId, userId);
+            } catch (rollbackError) {
+              console.error(
+                '[PlaylistSharing] Rollback failed (restore collaborator):',
+                rollbackError
+              );
+            }
+          }
+          throw error;
+        }
       } else {
-        await playlistApi.removeViewer(playlistId, userId);
-        await playlistApi.addCollaborator(playlistId, userId);
+        let viewerRemoved = false;
+        try {
+          await playlistApi.removeViewer(playlistId, userId);
+          viewerRemoved = true;
+          await playlistApi.addCollaborator(playlistId, userId);
+        } catch (error) {
+          if (viewerRemoved) {
+            try {
+              await playlistApi.addViewer(playlistId, userId);
+            } catch (rollbackError) {
+              console.error('[PlaylistSharing] Rollback failed (restore viewer):', rollbackError);
+            }
+          }
+          throw error;
+        }
       }
     } catch (error) {
       console.error('[PlaylistSharing] Toggle failed:', error);

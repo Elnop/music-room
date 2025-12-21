@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  View,
-  FlatList,
-  StyleSheet,
-  Alert,
-  TouchableOpacity,
-  Text,
-} from 'react-native';
+import { View, FlatList, StyleSheet, Alert, TouchableOpacity, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useFocusEffect } from '@react-navigation/native';
@@ -48,11 +41,11 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
   const { currentPlaylist, isLoading, fetchPlaylistById, removeTrack } = usePlaylistStore();
 
   const isOwner = user && currentPlaylist?.ownerId === user.id;
-  
-  const canEdit = user && currentPlaylist ? (
-    currentPlaylist.ownerId === user.id ||
-    currentPlaylist.collaboratorIds.includes(user.id)
-  ) : false;
+
+  const canEdit =
+    user && currentPlaylist
+      ? currentPlaylist.ownerId === user.id || currentPlaylist.collaboratorIds.includes(user.id)
+      : false;
 
   // Refresh playlist when screen receives focus
   // Note: useFocusEffect also triggers on mount, so no separate useEffect needed
@@ -74,6 +67,10 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
           </TouchableOpacity>
         ),
       });
+    } else {
+      navigation.setOptions({
+        headerRight: undefined,
+      });
     }
   }, [navigation, isOwner, id]);
 
@@ -87,24 +84,20 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
       return;
     }
 
-    Alert.alert(
-      'Remove Track',
-      'Are you sure you want to remove this track from the playlist?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Remove',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await removeTrack(id, trackId);
-            } catch (error) {
-              Alert.alert('Error', 'Failed to remove track');
-            }
-          },
+    Alert.alert('Remove Track', 'Are you sure you want to remove this track from the playlist?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Remove',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await removeTrack(id, trackId);
+          } catch (error) {
+            Alert.alert('Error', 'Failed to remove track');
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   if (isLoading || !currentPlaylist) {

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   FlatList,
@@ -19,7 +19,9 @@ import { useSoundCloudStore } from '../../store/soundcloudStore';
 import { EmptyState } from '@components/common/EmptyState';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
 import debounce from 'lodash/debounce';
-import type { SoundCloudTrack } from '@types';
+import type { SoundCloudTrack, Track } from '@types';
+
+type NewTrackInput = Omit<Track, 'id'> & { id?: string };
 
 type PlaylistStackParamList = {
   Playlists: undefined;
@@ -75,18 +77,17 @@ export function SearchTracksScreen({ navigation, route }: SearchTracksScreenProp
   const handleAddTrack = async (track: SoundCloudTrack) => {
     setAddingTrackId(track.id);
     try {
-      const internalTrack = {
-        id: '',
+      const internalTrack: NewTrackInput = {
         title: track.title,
         artist: track.user.username,
         album: undefined,
-        albumArt: track.artwork_url || track.user.avatar_url || undefined,
+        albumArt: track.artwork_url || track.user.avatar_url || '',
         durationMs: track.duration,
         trackUri: track.permalink_url,
         previewUrl: undefined,
       };
 
-      await addTrack(playlistId, internalTrack as any);
+      await addTrack(playlistId, internalTrack as Track);
 
       Alert.alert('Succès', `"${track.title}" ajouté à la playlist`, [
         { text: 'Ajouter plus', style: 'cancel' },

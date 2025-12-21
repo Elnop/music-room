@@ -69,7 +69,11 @@ export function UserProfileScreen({ route, navigation }: Props) {
         setFollowStatus(result.status);
       }
     } catch (err) {
-      console.error('[UserProfile] Follow toggle failed:', err);
+      console.error('[UserProfile] Follow toggle failed', {
+        error: err,
+        userId,
+        isFollowing: followStatus?.isFollowing,
+      });
     } finally {
       setIsFollowLoading(false);
     }
