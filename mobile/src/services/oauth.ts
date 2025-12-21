@@ -34,12 +34,24 @@ export const signInWithGoogle = async (): Promise<string> => {
     // Open Google consent screen
     const userInfo = await GoogleSignin.signIn();
 
-    // Get ID token
-    const idToken = userInfo.idToken;
+    // Extract ID token from response
+    // Note: SDK can return either userInfo.idToken or userInfo.data.idToken
+    const idToken = (userInfo as any).data?.idToken || userInfo.idToken;
+
+    // Log what Google returned for debugging
+    console.log('[OAuth] Google Sign-In response:', {
+      hasIdToken: !!idToken,
+      hasUser: !!userInfo.user || !!(userInfo as any).data?.user,
+      scopes: userInfo.scopes || (userInfo as any).data?.scopes,
+      user: userInfo.user || (userInfo as any).data?.user,
+    });
 
     if (!idToken) {
+      console.error('[OAuth] No ID token in response. Full userInfo:', userInfo);
       throw new Error("No ID token received from Google");
     }
+
+    console.log('[OAuth] ID token received successfully');
 
     return idToken;
   } catch (error: any) {

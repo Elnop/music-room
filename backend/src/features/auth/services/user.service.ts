@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { supabase } from "../../../shared/config/supabase.js";
 import { AppError } from "../../../shared/middleware/error-handler.js";
 import { logger } from "../../../shared/utils/logger.js";
@@ -58,16 +59,34 @@ export class UserService {
   private static async createSessionForOAuthUser(
     email: string
   ): Promise<Session> {
-    // Use admin API to generate magic link token
-    const { data: linkData, error: linkError } =
-      await supabase.auth.admin.generateLink({
-        type: "magiclink",
-        email,
-      });
+    // For OAuth users, we create a session by setting a temporary password
+    // and then signing in with it (this generates proper access/refresh tokens)
 
-    if (linkError || !linkData) {
-      logger.error("Failed to generate session for OAuth user", {
-        error: linkError,
+    // Generate a secure random password (user will never see/use this)
+    const tempPassword = crypto.randomBytes(32).toString("hex");
+
+    // Get the user ID from Supabase auth
+    const { data: authUsers } = await supabase.auth.admin.listUsers();
+    const authUser = authUsers?.users.find((u) => u.email === email);
+
+    if (!authUser) {
+      logger.error("OAuth user not found in Supabase auth", { email });
+      throw new AppError(
+        500,
+        "Failed to find user",
+        "USER_NOT_FOUND"
+      );
+    }
+
+    // Update user with temporary password
+    const { error: updateError } = await supabase.auth.admin.updateUserById(
+      authUser.id,
+      { password: tempPassword }
+    );
+
+    if (updateError) {
+      logger.error("Failed to set temporary password for OAuth user", {
+        error: updateError,
       });
       throw new AppError(
         500,
@@ -76,24 +95,28 @@ export class UserService {
       );
     }
 
-    // Verify the hashed token to get session
+    // Sign in with the temporary password to get session tokens
     const { data: sessionData, error: sessionError } =
-      await supabase.auth.verifyOtp({
+      await supabase.auth.signInWithPassword({
         email,
-        token: linkData.properties.hashed_token,
-        type: "magiclink",
+        password: tempPassword,
       });
 
     if (sessionError || !sessionData.session) {
-      logger.error("Failed to verify session token for OAuth user", {
+      logger.error("Failed to create session for OAuth user", {
         error: sessionError,
       });
       throw new AppError(
         500,
-        "Failed to verify session token",
-        "SESSION_VERIFICATION_FAILED"
+        "Failed to create session",
+        "SESSION_CREATION_FAILED"
       );
     }
+
+    logger.info("Session created successfully for OAuth user", {
+      userId: authUser.id,
+      email,
+    });
 
     return sessionData.session;
   }
@@ -143,17 +166,63 @@ export class UserService {
       if (existingUser) {
         const { data: existingProfile } = await supabase
           .from("user_profiles")
-          .select("oauth_provider")
+          .select("*")
           .eq("id", existingUser.id)
           .single();
 
-        if (existingProfile && existingProfile.oauth_provider !== provider) {
-          logger.warn("Email already in use with different provider", {
+        if (existingProfile) {
+          // Email exists with a DIFFERENT OAuth provider (Google vs Facebook) → error
+          if (
+            existingProfile.oauth_provider &&
+            existingProfile.oauth_provider !== "email" &&
+            existingProfile.oauth_provider !== provider
+          ) {
+            logger.warn("Email already in use with different OAuth provider", {
+              email,
+              existingProvider: existingProfile.oauth_provider,
+              attemptedProvider: provider,
+            });
+            throw new AppError(
+              409,
+              `This email is already linked to ${existingProfile.oauth_provider}. Please sign in with ${existingProfile.oauth_provider}.`,
+              "EMAIL_IN_USE"
+            );
+          }
+
+          // Email exists (either email/password account, or same OAuth provider)
+          // → Link OAuth provider and return session
+          logger.info("Linking OAuth provider to existing user account", {
+            userId: existingProfile.id,
             email,
-            existingProvider: existingProfile.oauth_provider,
-            attemptedProvider: provider,
+            provider,
+            providerId,
+            previousProvider: existingProfile.oauth_provider || "email/password",
           });
-          throw new AppError(409, "Email already in use", "EMAIL_IN_USE");
+
+          // Update profile with OAuth provider ID
+          const { error: updateError } = await supabase
+            .from("user_profiles")
+            .update({
+              oauth_provider: provider,
+              oauth_provider_id: providerId,
+              avatar_url: profile.picture || existingProfile.avatar_url,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", existingProfile.id);
+
+          if (updateError) {
+            logger.error("Failed to update profile with OAuth provider", {
+              error: updateError,
+            });
+          }
+
+          // Create session for existing user
+          const session = await this.createSessionForOAuthUser(email);
+
+          return {
+            userProfile: existingProfile as UserProfile,
+            session,
+          };
         }
       }
 

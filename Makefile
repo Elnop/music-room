@@ -671,6 +671,31 @@ expo-clear: ## Start Expo with cleared cache (local)
 	@cd mobile && npx expo start --localhost --clear
 
 
+clean-native: ## Clean native build folders (android, ios, .expo)
+	@echo "$(BLUE)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(BLUE)║              Cleaning Native Build Folders                   ║$(NC)"
+	@echo "$(BLUE)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Removing android/ folder...$(NC)"
+	@rm -rf mobile/android
+	@echo "$(GREEN)✓ Android build removed$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Removing ios/ folder...$(NC)"
+	@rm -rf mobile/ios
+	@echo "$(GREEN)✓ iOS build removed$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Removing .expo/ cache...$(NC)"
+	@rm -rf mobile/.expo
+	@echo "$(GREEN)✓ Expo cache removed$(NC)"
+	@echo ""
+	@echo "$(GREEN)╔══════════════════════════════════════════════════════════════╗$(NC)"
+	@echo "$(GREEN)║              Native Build Cleaned Successfully!              ║$(NC)"
+	@echo "$(GREEN)╚══════════════════════════════════════════════════════════════╝$(NC)"
+	@echo ""
+	@echo "$(BLUE)Next step:$(NC) Run $(GREEN)make dev-build-local$(NC) to rebuild"
+	@echo ""
+
+
 check-devices: ## Check if Android device is connected
 	@echo "$(BLUE)╔══════════════════════════════════════════════════════════════╗$(NC)"
 	@echo "$(BLUE)║              Checking Connected Devices                     ║$(NC)"
