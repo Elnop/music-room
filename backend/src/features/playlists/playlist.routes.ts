@@ -27,6 +27,15 @@ router.post("/", (req, res, next) =>
 );
 
 /**
+ * @route   GET /api/playlists/user/:userId
+ * @desc    Get public playlists of a specific user
+ * @access  Private
+ */
+router.get("/user/:userId", (req, res, next) =>
+  playlistController.getPublicPlaylistsByUser(req, res, next),
+);
+
+/**
  * @route   GET /api/playlists/:id
  * @desc    Get playlist by ID with tracks
  * @access  Private

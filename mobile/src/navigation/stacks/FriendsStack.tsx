@@ -10,10 +10,12 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '@contexts';
 import { FriendsScreen } from '../../screens/friends/FriendsScreen';
 import { UserProfileScreen } from '../../screens/friends/UserProfileScreen';
+import { PlaylistDetailScreen } from '../../screens/playlists/PlaylistDetailScreen';
 
 export type FriendsStackParamList = {
   Friends: undefined;
   UserProfile: { userId: string };
+  PlaylistDetail: { id: string };
 };
 
 const FriendsStack = createNativeStackNavigator<FriendsStackParamList>();
@@ -44,7 +46,11 @@ export function FriendsNavigator() {
         component={UserProfileScreen}
         options={{ title: 'Profile' }}
       />
+      <FriendsStack.Screen
+        name="PlaylistDetail"
+        component={PlaylistDetailScreen}
+        options={{ title: 'Playlist' }}
+      />
     </FriendsStack.Navigator>
   );
 }
-
