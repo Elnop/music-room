@@ -5,12 +5,15 @@ import { env } from "./shared/config/env.js";
 import { logger } from "./shared/utils/logger.js";
 import { errorHandler } from "./shared/middleware/error-handler.js";
 import { routes } from "./shared/config/routes.js";
+import { realtime } from "./realtime/index.js";
 
 // Initialize Express app
 const app = express();
 
 // Create HTTP server
 const httpServer = createServer(app);
+
+realtime.initialize(httpServer);
 
 // =====================================================
 // Middleware

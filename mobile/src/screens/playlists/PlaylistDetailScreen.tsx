@@ -7,6 +7,7 @@ import { useTheme } from '@contexts';
 import type { Theme } from '@themes/types';
 import { usePlaylistStore } from '../../store/playlistStore';
 import { useAuthStore } from '../../store/authStore';
+import { usePlaylistSocket } from '@hooks/usePlaylistSocket';
 import { PlaylistHeader } from '@components/playlist/PlaylistHeader';
 import { TrackItem } from '@components/playlist/TrackItem';
 import { AddTrackButton } from '@components/playlist/AddTrackButton';
@@ -46,6 +47,12 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
     user && currentPlaylist
       ? currentPlaylist.ownerId === user.id || currentPlaylist.collaboratorIds.includes(user.id)
       : false;
+
+  const handleReorderUpdate = React.useCallback(() => {
+    fetchPlaylistById(id);
+  }, [id, fetchPlaylistById]);
+
+  usePlaylistSocket(id, handleReorderUpdate);
 
   // Refresh playlist when screen receives focus
   // Note: useFocusEffect also triggers on mount, so no separate useEffect needed
