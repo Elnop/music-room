@@ -8,6 +8,13 @@ export interface FollowStatus {
   followingCount: number;
 }
 
+export interface FriendProfile {
+  id: string;
+  username: string;
+  displayName?: string;
+  avatarUrl?: string;
+}
+
 interface ApiResponse<T> {
   success: boolean;
   data?: T;
@@ -79,6 +86,12 @@ async function apiRequest<T>(
 }
 
 export const friendsApi = {
+  async getFriends(accessToken: string): Promise<FriendProfile[]> {
+    return apiRequest<FriendProfile[]>('/api/friends', accessToken, {
+      method: 'GET',
+    });
+  },
+
   async getFollowStatus(accessToken: string, userId: string): Promise<FollowStatus> {
     return apiRequest<FollowStatus>(`/api/friends/status/${userId}`, accessToken, {
       method: 'GET',

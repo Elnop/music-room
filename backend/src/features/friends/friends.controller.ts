@@ -71,5 +71,24 @@ export class FriendsController {
       next(error);
     }
   }
-}
 
+  async getMutualFriends(req: Request, res: Response, next: NextFunction) {
+    try {
+      const authReq = req as AuthenticatedRequest;
+
+      const friends = await friendsService.getMutualFriends(authReq.user.id);
+
+      const response: ApiResponse = {
+        success: true,
+        data: friends,
+        meta: {
+          timestamp: new Date().toISOString(),
+        },
+      };
+
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+}
