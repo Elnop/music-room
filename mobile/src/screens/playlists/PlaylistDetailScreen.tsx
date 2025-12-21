@@ -5,8 +5,10 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '@contexts';
 import type { Theme } from '@themes/types';
+import type { Track, SoundCloudTrack } from '@types';
 import { usePlaylistStore } from '../../store/playlistStore';
 import { useAuthStore } from '../../store/authStore';
+import { usePlayerStore } from '../../store/playerStore';
 import { usePlaylistSocket } from '@hooks/usePlaylistSocket';
 import { PlaylistHeader } from '@components/playlist/PlaylistHeader';
 import { TrackItem } from '@components/playlist/TrackItem';
@@ -34,12 +36,38 @@ interface PlaylistDetailScreenProps {
   route: PlaylistDetailScreenRouteProp;
 }
 
+// Convert internal Track to SoundCloudTrack format for the player
+const trackToSoundCloud = (track: Track): SoundCloudTrack => ({
+  id: parseInt(track.id, 10) || Date.now(),
+  title: track.title,
+  description: null,
+  duration: track.durationMs,
+  genre: null,
+  artwork_url: track.albumArt,
+  permalink_url: track.trackUri,
+  user: {
+    id: 0,
+    username: track.artist,
+    avatar_url: track.albumArt,
+    permalink_url: '',
+  },
+  playable: true,
+});
+
 export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreenProps) {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
   const { id } = route.params;
   const { user } = useAuthStore();
   const { currentPlaylist, isLoading, fetchPlaylistById, removeTrack } = usePlaylistStore();
+  const {
+    currentTrack,
+    isPlaying,
+    loading: playerLoading,
+    playTrack,
+    pause,
+    resume,
+  } = usePlayerStore();
 
   const isOwner = user && currentPlaylist?.ownerId === user.id;
 
@@ -85,6 +113,20 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
     navigation.navigate('SearchTracks', { playlistId: id });
   };
 
+  const handlePlayTrack = (track: Track) => {
+    const isCurrentTrack = currentTrack?.permalink_url === track.trackUri;
+
+    if (isCurrentTrack) {
+      if (isPlaying) {
+        pause();
+      } else {
+        resume();
+      }
+    } else {
+      playTrack(trackToSoundCloud(track));
+    }
+  };
+
   const handleDeleteTrack = async (trackId: string) => {
     if (!canEdit) {
       Alert.alert('Permission Denied', 'You cannot edit this playlist');
@@ -116,13 +158,19 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
       <FlatList
         data={currentPlaylist.tracks}
         keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <TrackItem
-            track={item}
-            showDelete={canEdit}
-            onDelete={() => handleDeleteTrack(item.id)}
-          />
-        )}
+        renderItem={({ item }) => {
+          const isCurrentlyPlaying = currentTrack?.permalink_url === item.trackUri;
+          return (
+            <TrackItem
+              track={item}
+              showDelete={canEdit}
+              onDelete={() => handleDeleteTrack(item.id)}
+              onPlay={() => handlePlayTrack(item)}
+              isPlaying={isCurrentlyPlaying && isPlaying}
+              isLoading={isCurrentlyPlaying && playerLoading}
+            />
+          );
+        }}
         ListHeaderComponent={<PlaylistHeader playlist={currentPlaylist} />}
         contentContainerStyle={styles.list}
         ListEmptyComponent={
