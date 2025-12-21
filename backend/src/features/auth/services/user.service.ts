@@ -115,11 +115,6 @@ export class UserService {
         );
       }
 
-      logger.info("Session created successfully for OAuth user via magic link", {
-        userId: verifyData.user?.id,
-        email,
-      });
-
       return verifyData.session;
     } catch (error) {
       if (error instanceof AppError) {
@@ -162,11 +157,6 @@ export class UserService {
         .single();
 
       if (existingOAuth) {
-        logger.info("Existing OAuth user logging in", {
-          userId: existingOAuth.id,
-          provider,
-        });
-
         // User exists, create session
         const session = await this.createSessionForOAuthUser(email);
 
@@ -190,11 +180,6 @@ export class UserService {
         if (existingProfile) {
           // Check if this provider is already linked to the account
           if (existingProfile[providerColumn]) {
-            logger.warn("Provider already linked to this account", {
-              email,
-              provider,
-              userId: existingProfile.id,
-            });
             // Provider already linked, just create session
             const session = await this.createSessionForOAuthUser(email);
             return {
@@ -202,14 +187,6 @@ export class UserService {
               session,
             };
           }
-
-          // Link OAuth provider to existing account (additive)
-          logger.info("Linking OAuth provider to existing user account", {
-            userId: existingProfile.id,
-            email,
-            provider,
-            providerId,
-          });
 
           // Update profile with OAuth provider ID (additive - doesn't overwrite other providers)
           const { error: updateError } = await supabase
@@ -241,12 +218,6 @@ export class UserService {
       const username = await this.generateUniqueUsername(
         profile.name || email.split("@")[0],
       );
-
-      logger.info("Creating new OAuth user", {
-        email,
-        provider,
-        username,
-      });
 
       // Create Supabase Auth user (no password)
       const { data: authData, error: authError } =
@@ -290,12 +261,6 @@ export class UserService {
         if (profileError) {
           // Check if it's a unique constraint violation (username collision)
           if (profileError.code === "23505") {
-            logger.warn(
-              "Username collision detected, retrying with new username",
-              {
-                username,
-              },
-            );
             // Rollback auth user
             await supabase.auth.admin.deleteUser(authData.user.id);
             // Retry with new username
@@ -324,12 +289,6 @@ export class UserService {
 
         // Generate session
         const session = await this.createSessionForOAuthUser(email);
-
-        logger.info("OAuth user created successfully", {
-          userId: userProfile.id,
-          provider,
-          username: userProfile.username,
-        });
 
         return {
           userProfile,
