@@ -1,11 +1,12 @@
 .DEFAULT_GOAL := help
 
 include make/config.mk
-include make/echo.mk
-include make/docker-helpers.mk
-include make/npm-helpers.mk
-include make/cleanup-helpers.mk
-include make/check.mk
+include make/helpers/echo.mk
+include make/helpers/docker.mk
+include make/helpers/npm.mk
+include make/helpers/cleanup.mk
+include make/helpers/check.mk
+include make/helpers/utils.mk
 include make/deps.mk
 include make/install.mk
 include make/docker.mk
@@ -15,4 +16,3 @@ include make/native.mk
 include make/sync.mk
 include make/quality.mk
 include make/cleanup.mk
-include make/utils.mk
