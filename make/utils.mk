@@ -3,7 +3,7 @@
 # ==============================================================================
 # Helper commands: help, info, health checks, shell access, permissions
 
-.PHONY: help info health shell-backend shell-mobile fix-permissions
+.PHONY: help info health shell-backend shell-mobile fix-permissions fix-node-modules
 
 help: ## Show this help message
 	@clear 2>/dev/null || true
@@ -77,6 +77,7 @@ help: ## Show this help message
 	@echo "  $(GREEN)info$(NC)                Show system information"
 	@echo "  $(GREEN)health$(NC)              Check services health status"
 	@echo "  $(GREEN)fix-permissions$(NC)     Fix file permissions for Docker"
+	@echo "  $(GREEN)fix-node-modules$(NC)    Fix node_modules ownership $(YELLOW)[for local builds]$(NC)"
 	@echo ""
 	$(call print_separator)
 	@echo "$(YELLOW)Quick Start:$(NC)"
@@ -144,4 +145,37 @@ fix-permissions: ## Fix file permissions for Docker non-root user compatibility
 	$(call display_permissions_info)
 	$(call blank_line)
 	$(call print_warning,Run 'make restart' to apply in Docker)
+	$(call blank_line)
+
+fix-node-modules: ## Fix node_modules ownership (for local builds outside Docker)
+	$(call print_header,Fixing node_modules Ownership)
+	$(call print_subsection,📋 Checking ownership...)
+	@echo ""
+	@HAS_ROOT_DIRS=0; \
+	if [ -d "$(BACKEND_DIR)/node_modules" ] && [ ! -w "$(BACKEND_DIR)/node_modules" ]; then \
+		echo "$(RED)  ✗ Backend node_modules owned by root$(NC)"; \
+		HAS_ROOT_DIRS=1; \
+	fi; \
+	if [ -d "$(MOBILE_DIR)/node_modules" ] && [ ! -w "$(MOBILE_DIR)/node_modules" ]; then \
+		echo "$(RED)  ✗ Mobile node_modules owned by root$(NC)"; \
+		HAS_ROOT_DIRS=1; \
+	fi; \
+	if [ -d "$(MOBILE_DIR)/.expo" ] && [ ! -w "$(MOBILE_DIR)/.expo" ]; then \
+		echo "$(RED)  ✗ .expo cache owned by root$(NC)"; \
+		HAS_ROOT_DIRS=1; \
+	fi; \
+	if [ $$HAS_ROOT_DIRS -eq 1 ]; then \
+		echo ""; \
+		echo "$(YELLOW)⚠️  Root-owned directories detected$(NC)"; \
+		echo ""; \
+		echo "$(BLUE)Please run these commands in your terminal:$(NC)"; \
+		echo ""; \
+		echo "  $(GREEN)sudo rm -rf mobile/node_modules mobile/.expo backend/node_modules$(NC)"; \
+		echo "  $(GREEN)cd mobile && npm install$(NC)"; \
+		echo "  $(GREEN)cd ../backend && npm install$(NC)"; \
+		echo ""; \
+		exit 1; \
+	else \
+		echo "$(GREEN)  ✓ All directories have correct ownership$(NC)"; \
+	fi
 	$(call blank_line)

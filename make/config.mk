@@ -3,8 +3,9 @@
 # ==============================================================================
 # Shared configuration used across all Makefile modules
 
-# Force bash shell for consistent behavior across Linux and macOS
-SHELL := /bin/bash
+# Force zsh shell (team uses zsh for environment variables and consistent behavior)
+SHELL := /bin/zsh
+.SHELLFLAGS := -c
 
 # Detect operating system
 UNAME_S := $(shell uname -s)
@@ -97,3 +98,11 @@ export HOST_IP
 
 # Expo URL
 EXPO_URL := exp://$(HOST_IP):$(METRO_PORT)
+
+# Android SDK (for local builds)
+export ANDROID_HOME := $(HOME)/Android/Sdk
+export PATH := $(PATH):$(ANDROID_HOME)/emulator:$(ANDROID_HOME)/platform-tools:$(ANDROID_HOME)/tools:$(ANDROID_HOME)/tools/bin
+
+# Java JDK (bundled with Android Studio)
+export JAVA_HOME := $(HOME)/android-studio/jbr
+export PATH := $(JAVA_HOME)/bin:$(PATH)
