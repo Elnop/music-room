@@ -3,7 +3,7 @@
 # ==============================================================================
 # Commands for local development, useful with Android Studio emulator
 
-.PHONY: dev-local dev-android backend-local mobile-local expo-android expo-clear clean-native check-devices
+.PHONY: dev-local dev-android backend-local mobile-local expo-android expo-clear clean-native check-devices start-emulator kill-emulator
 
 dev-local: .ensure-backend-deps .ensure-mobile-deps ## Start development locally (no Docker) - for Android Studio emulator
 	$(call print_header,Starting Local Development Mode)
@@ -90,4 +90,58 @@ check-devices: ## Check if Android device is connected
 	@echo "   • Enable USB debugging on device"
 	@echo "   • Accept USB authorization popup"
 	@echo "   • Use $(GREEN)make dev-android$(NC) to launch"
+	$(call blank_line)
+
+start-emulator: ## Start Android emulator with software rendering (fixes black screen)
+	$(call print_header,Starting Android Emulator)
+	$(call print_subsection,🔧 Configuration)
+	@echo "   • GPU: Software rendering (swiftshader_indirect)"
+	@echo "   • Fixes black screen issues on Linux"
+	@echo ""
+	$(call print_arrow,Checking for running emulators...)
+	@RUNNING=$$($(ANDROID_HOME)/platform-tools/adb devices | grep emulator | wc -l); \
+	if [ $$RUNNING -gt 0 ]; then \
+		echo "$(YELLOW)$(ICON_WARNING) Emulator already running$(NC)"; \
+		echo "$(BLUE)$(ICON_INFO) Use $(GREEN)make kill-emulator$(NC) to stop it first$(NC)"; \
+		exit 1; \
+	fi
+	$(call blank_line)
+	$(call print_arrow,Listing available AVDs...)
+	@$(ANDROID_HOME)/emulator/emulator -list-avds | while read avd; do \
+		echo "  $(GREEN)$$avd$(NC)"; \
+	done
+	$(call blank_line)
+	$(call print_arrow,Starting emulator with software rendering...)
+	@AVD=$$($(ANDROID_HOME)/emulator/emulator -list-avds | head -1); \
+	if [ -z "$$AVD" ]; then \
+		echo "$(RED)$(ICON_ERROR) No AVD found$(NC)"; \
+		echo "$(YELLOW)$(ICON_WARNING) Create one in Android Studio: Tools > Device Manager$(NC)"; \
+		exit 1; \
+	fi; \
+	echo "$(BLUE)$(ICON_INFO) Launching: $$AVD$(NC)"; \
+	$(ANDROID_HOME)/emulator/emulator -avd $$AVD -gpu swiftshader_indirect > /dev/null 2>&1 &
+	$(call blank_line)
+	$(call print_info,⏳ Waiting for emulator to boot (30 seconds)...)
+	@sleep 30
+	$(call blank_line)
+	$(call print_success,Emulator started!)
+	$(call print_info,Run $(GREEN)make dev-build-local$(NC) to install the app)
+	$(call blank_line)
+
+kill-emulator: ## Stop all running Android emulators
+	$(call print_header,Stopping Android Emulators)
+	$(call print_arrow,Checking for running emulators...)
+	@RUNNING=$$($(ANDROID_HOME)/platform-tools/adb devices | grep emulator | wc -l); \
+	if [ $$RUNNING -eq 0 ]; then \
+		echo "$(YELLOW)$(ICON_WARNING) No emulators running$(NC)"; \
+		exit 0; \
+	fi
+	$(call blank_line)
+	$(call print_arrow,Killing emulators...)
+	@$(ANDROID_HOME)/platform-tools/adb devices | grep emulator | cut -f1 | while read device; do \
+		echo "  $(YELLOW)Stopping $$device$(NC)"; \
+		$(ANDROID_HOME)/platform-tools/adb -s $$device emu kill 2>/dev/null || true; \
+	done
+	@sleep 2
+	$(call print_success,All emulators stopped)
 	$(call blank_line)

@@ -42,6 +42,7 @@
     "expo": "~54.0.25",
     "expo-audio": "^1.1.0",
     "expo-build-properties": "~1.0.9",
+    "expo-device": "~8.0.10",
     "expo-haptics": "~14.0.0",
     "expo-linear-gradient": "~15.0.7",
     "expo-linking": "~7.0.4",

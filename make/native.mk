@@ -69,7 +69,7 @@ dev-build: ## Build custom development client for Android (Google Sign-In suppor
 	@echo "   • NOT for code changes (hot reload!)"
 	@echo ""
 
-dev-build-local: ## Build development client locally with Android SDK (faster)
+dev-build-local: .ensure-mobile-deps .ensure-backend-deps ## Build development client locally with Android SDK (faster)
 	$(call print_header,Building Locally (Android SDK))
 	$(call print_subsection,⚠️  REQUIRES)
 	@echo "   • Android Studio installed"
