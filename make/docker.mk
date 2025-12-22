@@ -3,9 +3,9 @@
 # ==============================================================================
 # Commands for Docker-based development environment
 
-.PHONY: dev start stop restart down logs logs-backend logs-mobile qr ps build build-backend build-mobile
+.PHONY: dev-docker start stop restart down logs logs-backend logs-mobile qr ps build build-backend build-mobile
 
-dev: ## Start all services in development mode (backend + mobile)
+dev-docker: ## Start all services in Docker containers (backend + mobile)
 	$(call print_header,Starting Music Room Development Environment)
 	$(call print_arrow,Building and starting containers...)
 	$(call docker_up_build)

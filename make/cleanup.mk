@@ -66,7 +66,7 @@ clean-all: ## Clean entire Docker system on machine (containers, images, volumes
 	$(call docker_full_cleanup)
 	$(call print_header,Full Cleanup Complete)
 	$(call print_subsection,To restart Music Room)
-	$(call display_next_steps,$(GREEN)make install$(NC)  # Reinstall dependencies,$(GREEN)make dev$(NC)      # Build and start)
+	$(call display_next_steps,$(GREEN)make install$(NC)     # Reinstall dependencies,$(GREEN)make dev-docker$(NC)  # Build and start Docker mode)
 	$(call blank_line)
 
 prune: ## Clean up unused Docker resources

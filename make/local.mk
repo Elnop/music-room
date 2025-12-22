@@ -81,7 +81,7 @@ check-devices: ## Check if Android device is connected
 			adb devices; \
 		else \
 			echo "$(RED)$(ICON_ERROR) adb not found$(NC)"; \
-			echo "$(YELLOW)$(ICON_WARNING) Start Docker: make dev$(NC)"; \
+			echo "$(YELLOW)$(ICON_WARNING) Start Docker: make dev-docker$(NC)"; \
 			echo "$(YELLOW)$(ICON_WARNING) Or install Android SDK$(NC)"; \
 		fi \
 	fi

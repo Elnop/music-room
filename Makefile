@@ -9,6 +9,7 @@ include make/helpers/check.mk
 include make/helpers/utils.mk
 include make/deps.mk
 include make/install.mk
+include make/dev-menu.mk
 include make/docker.mk
 include make/local.mk
 include make/tunnel.mk
