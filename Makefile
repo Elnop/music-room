@@ -14,5 +14,6 @@ include make/local.mk
 include make/tunnel.mk
 include make/native.mk
 include make/sync.mk
+include make/onboarding.mk
 include make/quality.mk
 include make/cleanup.mk
