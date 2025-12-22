@@ -30,26 +30,42 @@ endef
 
 # Docker: Stop all containers on machine
 # Usage: $(call docker_stop_all_containers)
+# Improved: handles empty container list on both Linux and macOS
 define docker_stop_all_containers
-	@docker stop $$(docker ps -aq) 2>/dev/null || true
+	@containers=$$(docker ps -aq 2>/dev/null); \
+	if [ -n "$$containers" ]; then \
+		docker stop $$containers 2>/dev/null || true; \
+	fi
 endef
 
 # Docker: Remove all containers on machine
 # Usage: $(call docker_rm_all_containers)
+# Improved: handles empty container list on both Linux and macOS
 define docker_rm_all_containers
-	@docker rm $$(docker ps -aq) 2>/dev/null || true
+	@containers=$$(docker ps -aq 2>/dev/null); \
+	if [ -n "$$containers" ]; then \
+		docker rm $$containers 2>/dev/null || true; \
+	fi
 endef
 
 # Docker: Remove all images on machine
 # Usage: $(call docker_rmi_all_images)
+# Improved: handles empty image list on both Linux and macOS
 define docker_rmi_all_images
-	@docker rmi -f $$(docker images -aq) 2>/dev/null || true
+	@images=$$(docker images -aq 2>/dev/null); \
+	if [ -n "$$images" ]; then \
+		docker rmi -f $$images 2>/dev/null || true; \
+	fi
 endef
 
 # Docker: Remove all volumes on machine
 # Usage: $(call docker_volume_rm_all)
+# Improved: handles empty volume list on both Linux and macOS
 define docker_volume_rm_all
-	@docker volume rm $$(docker volume ls -q) 2>/dev/null || true
+	@volumes=$$(docker volume ls -q 2>/dev/null); \
+	if [ -n "$$volumes" ]; then \
+		docker volume rm $$volumes 2>/dev/null || true; \
+	fi
 endef
 
 # Docker: Prune networks

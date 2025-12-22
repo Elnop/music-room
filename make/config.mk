@@ -3,6 +3,20 @@
 # ==============================================================================
 # Shared configuration used across all Makefile modules
 
+# Force bash shell for consistent behavior across Linux and macOS
+SHELL := /bin/bash
+
+# Detect operating system
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+	OS_TYPE := macos
+else ifeq ($(UNAME_S),Linux)
+	OS_TYPE := linux
+else
+	OS_TYPE := unknown
+endif
+export OS_TYPE
+
 # Colors for output
 BLUE := \033[0;34m
 GREEN := \033[0;32m
@@ -68,10 +82,15 @@ SHORT_WAIT_TIME := 3
 
 # Detect local IP address
 # Try multiple methods to get local IP (works on Linux, macOS, WSL)
+# Improved macOS support: tries all network interfaces (en0, en1, en2)
+# Uses ifconfig as fallback to get any non-loopback interface
 HOST_IP := $(shell \
 	ip route get 1 2>/dev/null | awk '{print $$7; exit}' || \
 	hostname -I 2>/dev/null | awk '{print $$1}' || \
+	ifconfig 2>/dev/null | grep "inet " | grep -v 127.0.0.1 | head -1 | awk '{print $$2}' || \
 	ipconfig getifaddr en0 2>/dev/null || \
+	ipconfig getifaddr en1 2>/dev/null || \
+	ipconfig getifaddr en2 2>/dev/null || \
 	echo "0.0.0.0" \
 )
 export HOST_IP

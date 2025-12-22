@@ -78,7 +78,7 @@ endef
 # Clear screen and print header
 # Usage: $(call clear_and_header,Title)
 define clear_and_header
-	@clear
+	@clear 2>/dev/null || true
 	$(call print_header,$(1))
 endef
 
@@ -97,13 +97,17 @@ endef
 
 # Display Expo QR code (unified for LAN and tunnel modes)
 # Usage: $(call display_qr,lan) or $(call display_qr,tunnel)
+# Improved: explicit locale for Unicode QR code chars (BSD/GNU grep compatibility)
 define display_qr
 	$(call print_separator)
 	@echo "$(YELLOW)📱 EXPO QR CODE - Scan with Expo Go app$(NC)"
 	$(if $(filter tunnel,$(1)),@echo "$(YELLOW)   (Works across different WiFi networks)$(NC)")
 	$(call print_separator)
 	$(call blank_line)
-	@$(DOCKER_COMPOSE) logs $(MOBILE_SERVICE) 2>/dev/null | grep -B 5 -A 50 "▄▄▄▄▄▄▄" | head -70 || $(DOCKER_COMPOSE) logs $(MOBILE_SERVICE) | tail -60
+	@LC_ALL=C.UTF-8 $(DOCKER_COMPOSE) logs $(MOBILE_SERVICE) 2>/dev/null | grep -B 5 -A 50 "▄▄▄▄▄▄▄" | head -70 || \
+	LC_ALL=en_US.UTF-8 $(DOCKER_COMPOSE) logs $(MOBILE_SERVICE) 2>/dev/null | grep -B 5 -A 50 "▄▄▄▄▄▄▄" | head -70 || \
+	$(DOCKER_COMPOSE) logs $(MOBILE_SERVICE) 2>/dev/null | grep -B 5 -A 50 "▄▄▄▄▄▄▄" | head -70 || \
+	$(DOCKER_COMPOSE) logs $(MOBILE_SERVICE) | tail -60
 	$(call blank_line)
 	$(if $(filter lan,$(1)),\
 		@echo "$(GREEN)🌐 Local IP: $(HOST_IP)$(NC)"; \

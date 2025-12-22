@@ -6,7 +6,7 @@
 .PHONY: help info health shell-backend shell-mobile fix-permissions
 
 help: ## Show this help message
-	@clear
+	@clear 2>/dev/null || true
 	@echo ""
 	$(call print_separator)
 	@echo "$(BLUE)              Music Room - Development Commands               $(NC)"
@@ -129,14 +129,14 @@ shell-mobile: ## Open shell in mobile container
 fix-permissions: ## Fix file permissions for Docker non-root user compatibility
 	$(call print_header,Fixing File Permissions)
 	$(call print_arrow,Fixing mobile directory permissions...)
-	@find $(MOBILE_DIR) -type d \( -name node_modules -o -name .expo \) -prune -o -type d -exec chmod 0755 {} \; 2>/dev/null
-	@find $(MOBILE_DIR) -type d \( -name node_modules -o -name .expo \) -prune -o -type f -exec chmod 0644 {} \; 2>/dev/null
+	@find $(MOBILE_DIR) \( -name node_modules -o -name .expo \) -prune -o -type d -print0 2>/dev/null | xargs -0 chmod 0755 2>/dev/null || true
+	@find $(MOBILE_DIR) \( -name node_modules -o -name .expo \) -prune -o -type f -print0 2>/dev/null | xargs -0 chmod 0644 2>/dev/null || true
 	@chmod +x $(MOBILE_DIR)/*.sh 2>/dev/null || true
 	$(call print_success,Mobile permissions fixed)
 	@echo ""
 	$(call print_arrow,Fixing backend directory permissions...)
-	@find $(BACKEND_DIR) -type d \( -name node_modules -o -name dist \) -prune -o -type d -exec chmod 0755 {} \; 2>/dev/null
-	@find $(BACKEND_DIR) -type d \( -name node_modules -o -name dist \) -prune -o -type f -exec chmod 0644 {} \; 2>/dev/null
+	@find $(BACKEND_DIR) \( -name node_modules -o -name dist \) -prune -o -type d -print0 2>/dev/null | xargs -0 chmod 0755 2>/dev/null || true
+	@find $(BACKEND_DIR) \( -name node_modules -o -name dist \) -prune -o -type f -print0 2>/dev/null | xargs -0 chmod 0644 2>/dev/null || true
 	@chmod +x $(BACKEND_DIR)/*.sh 2>/dev/null || true
 	$(call print_success,Backend permissions fixed)
 	$(call blank_line)
