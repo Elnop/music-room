@@ -17,12 +17,12 @@ else
 endif
 export OS_TYPE
 
-# Colors for output
-BLUE := \033[0;34m
-GREEN := \033[0;32m
-YELLOW := \033[0;33m
-RED := \033[0;31m
-NC := \033[0m # No Color
+# Colors for output (bash-compatible ANSI codes)
+BLUE := $(shell printf '\033[0;34m')
+GREEN := $(shell printf '\033[0;32m')
+YELLOW := $(shell printf '\033[0;33m')
+RED := $(shell printf '\033[0;31m')
+NC := $(shell printf '\033[0m') # No Color
 
 # Status indicators
 ICON_SUCCESS := ✓
