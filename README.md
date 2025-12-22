@@ -15,8 +15,11 @@ A collaborative music listening platform built with React Native, Node.js, and m
 # First-time setup
 make install
 
-# Start development environment (Docker)
+# Choose development mode
 make dev
+
+# OR start Docker directly
+make dev-docker
 
 # View logs
 make logs

@@ -153,7 +153,8 @@ The project consists of two main services:
 |---------|-------------|
 | `make help` | Show all available commands with descriptions |
 | `make install` | First-time setup: install dependencies and create .env files |
-| `make dev` | Start all services in development mode |
+| `make dev` | Show development mode menu (choose your workflow) |
+| `make dev-docker` | Start all services in Docker development mode |
 | `make stop` | Stop all running containers |
 | `make logs` | View logs from all services |
 | `make ps` | Show status of all containers |
@@ -480,6 +481,6 @@ If you encounter issues:
 1. Check the [Troubleshooting](#troubleshooting) section
 2. Review logs: `make logs`
 3. Check service health: `make health`
-4. Try rebuilding: `make clean && make install && make dev`
+4. Try rebuilding: `make clean && make install && make dev-docker`
 
 For project-specific help, refer to the main [README.md](./README.md).

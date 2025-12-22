@@ -118,7 +118,8 @@ The project includes a comprehensive Makefile for easy Docker management:
 ```bash
 make help          # Show all available commands
 make install       # First-time setup
-make dev           # Start development environment
+make dev           # Show development mode menu
+make dev-docker    # Start Docker development environment
 make stop          # Stop all services
 make logs          # View all logs
 make ps            # Show container status
@@ -165,7 +166,7 @@ Music Room supports two development modes for mobile testing:
 Use when your phone and computer are on the same WiFi network.
 
 ```bash
-make dev               # Start services in LAN mode
+make dev-docker        # Start services in LAN mode
 make qr                # Show QR code for local network
 ```
 

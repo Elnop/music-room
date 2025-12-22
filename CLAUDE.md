@@ -22,7 +22,8 @@ All primary development happens through the root Makefile which orchestrates Doc
 make install          # Install deps, create .env files
 
 # Daily development
-make dev              # Start all services (backend + mobile) in Docker
+make dev              # Show development mode menu (choose your workflow)
+make dev-docker       # Start all services in Docker (backend + mobile)
 make stop             # Stop all services
 make restart          # Restart all services
 make logs             # View all logs (backend + mobile)
@@ -168,7 +169,7 @@ Metro Bundler: `http://localhost:8081`
 ### Testing Mobile App on Physical Device
 
 1. Ensure device and computer on same WiFi
-2. Run `make dev` (or `make qr` if already running)
+2. Run `make dev-docker` (or `make qr` if already running)
 3. Install Expo Go app on device (Play Store / App Store)
 4. Scan QR code from terminal or http://localhost:19000
 
@@ -666,9 +667,9 @@ For implementation details, see `doc/SOUNDCLOUD_MIGRATION_PLAN.md`.
 
 **Docker build failures**:
 ```bash
-make clean    # Remove all containers and deps
-make install  # Reinstall
-make dev      # Rebuild and start
+make clean       # Remove all containers and deps
+make install     # Reinstall
+make dev-docker  # Rebuild and start
 ```
 
 **Expo cache issues**:
