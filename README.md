@@ -30,18 +30,42 @@ make stop
 
 ## Features
 
-- 🎵 Collaborative music playlists
-- 🎧 Music search and streaming (SoundCloud planned)
-- 👤 User profiles and authentication
-- 📱 Cross-platform mobile app (iOS + Android)
-- 🔄 Real-time synchronization
-- 🐳 Docker-based development
+- 🎵 **Collaborative Playlists** - Create, share, and manage music playlists with friends
+- 🎧 **SoundCloud Integration** - Search, stream, and play music with full audio controls
+- 👥 **Friends System** - Follow users, build your network, view mutual friends
+- 🎮 **Music Control Delegation** - Grant friends permission to control your playback
+- 👤 **User Profiles** - Customizable profiles with avatars and bios
+- 🔐 **Authentication** - Secure JWT-based auth with Supabase
+- 📱 **Cross-platform Mobile App** - iOS + Android support via React Native & Expo
+- ⚡ **Real-time Sync** - Socket.io for live playlist updates and music control
+- 🎚️ **Advanced Playlist Features** - Edit modes (open/restricted), viewers, collaborators
+- 🐳 **Docker Development** - Containerized environment with 0 CVE Chainguard images
 
 ## Tech Stack
 
-- **Backend**: Node.js + Express + Socket.io + TypeScript + Supabase
-- **Mobile**: React Native 0.81 + Expo SDK 54 + TypeScript + Zustand
-- **Infrastructure**: Docker Compose + Chainguard Images (0 CVE)
+### Backend
+- **Runtime**: Node.js 22 + TypeScript
+- **Framework**: Express.js
+- **Real-time**: Socket.io for WebSocket communication
+- **Database**: PostgreSQL via Supabase
+- **Auth**: Supabase Auth with JWT tokens
+- **Validation**: Zod schemas
+- **Music**: SoundCloud API via `soundcloud.ts` package
+
+### Mobile
+- **Framework**: React Native 0.81 + Expo SDK 54
+- **Language**: TypeScript
+- **State Management**: Zustand stores + React Context
+- **Navigation**: React Navigation 7 (stack-based)
+- **Audio**: expo-audio for HLS AAC streaming
+- **Real-time**: Socket.io client
+- **Forms**: React Hook Form + Zod validation
+
+### Infrastructure
+- **Containers**: Docker Compose orchestration
+- **Images**: Chainguard Images (0 CVE, distroless)
+- **Development**: Hot reload for backend + Expo Metro bundler
+- **Tunnel Mode**: Ngrok integration for cross-network development
 
 ## Documentation
 

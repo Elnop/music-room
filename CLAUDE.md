@@ -224,7 +224,19 @@ backend/src/
 │   │   ├── profile.service.ts         # Re-export for backward compatibility
 │   │   ├── profile.controller.ts
 │   │   └── profile.routes.ts
-│   └── [future features: friends, rooms]
+│   ├── friends/          # Friends system (follow/unfollow, mutual friends)
+│   │   ├── friends.types.ts
+│   │   ├── friends.validators.ts
+│   │   ├── friends.service.ts         # Follow/unfollow logic, get friends
+│   │   ├── friends.controller.ts
+│   │   └── friends.routes.ts
+│   ├── music-control/    # Music control delegation system
+│   │   ├── music-control.types.ts
+│   │   ├── music-control.validators.ts
+│   │   ├── music-control.service.ts   # Grant/revoke control permissions
+│   │   ├── music-control.controller.ts
+│   │   └── music-control.routes.ts
+│   └── [future features: rooms, social features]
 ├── shared/                # Shared code across features
 │   ├── config/           # Environment vars (env.ts), Supabase clients
 │   ├── middleware/       # Global middleware (error-handler.ts)
@@ -232,6 +244,8 @@ backend/src/
 │   └── utils/            # Logger, helpers
 │       ├── logger.ts
 │       └── database.helpers.ts  # Shared DB utilities (fetchSingle, fetchMany, etc.)
+├── realtime/             # Socket.io real-time service (478 lines)
+│   └── index.ts          # WebSocket event handlers (playlist sync, music control, device management)
 └── server.ts             # Entry point (Express + Socket.io setup)
 ```
 
@@ -281,12 +295,18 @@ feature/
 - Error responses follow standardized format from `error-handler.ts`
 - JWT tokens verified via `auth.middleware.ts` for protected routes
 
-**Backend API Routes**:
+**Backend API Routes** (33 total endpoints):
 - `/health` - Health check endpoint
-- `/api/auth/*` - Authentication endpoints (register, login, me, refresh, logout)
-- `/api/profile/*` - Profile management endpoints (get, update profile)
-- `/api/playlists/*` - Playlist CRUD and track management endpoints (create, read, update, delete playlists, add/remove/reorder tracks, manage collaborators)
-- `/api/soundcloud/*` - SoundCloud music search and streaming endpoints (search, track details, stream URLs)
+- `/api/auth/*` - Authentication endpoints (5 routes: register, login, me, refresh, logout)
+- `/api/profile/*` - Profile management endpoints (3 routes: get own profile, update profile, get user profile)
+- `/api/playlists/*` - Playlist CRUD and track management (14 routes)
+  - CRUD operations (create, get all, get by ID, update, delete)
+  - Track management (add, remove, reorder tracks)
+  - Collaborator management (add, remove, list collaborators)
+  - Viewer management (add, remove, list viewers - allows viewing private playlists)
+- `/api/soundcloud/*` - SoundCloud music search and streaming (3 routes: search, track details, stream URLs)
+- `/api/friends/*` - Friends system (4 routes: get friends, follow, unfollow, check follow status)
+- `/api/music-control/*` - Music control delegation (4 routes: grant control, revoke control, get permissions, check if user can control)
 
 ### Mobile: Component + Feature Architecture
 
@@ -294,28 +314,50 @@ feature/
 mobile/src/
 ├── screens/              # Screens by feature
 │   ├── auth/            # WelcomeScreen, LoginScreen, RegisterScreen
-│   ├── playlists/       # PlaylistsScreen, CreatePlaylistScreen, PlaylistDetailScreen, SearchTracksScreen
+│   ├── playlists/       # PlaylistsScreen, CreatePlaylistScreen, PlaylistDetailScreen, PlaylistEditorScreen
 │   ├── profile/         # ProfileScreen, EditProfileScreen
+│   ├── friends/         # FriendsScreen (455 lines - tabs for friends list + search), UserProfileScreen
 │   ├── settings/        # SettingsScreen
 │   └── search/          # SoundCloudSearchScreen, SoundCloudTrackItem, PlaylistSelectorModal
 ├── components/
 │   ├── common/          # Reusable UI (Button, Card, Input, LoadingSpinner, Avatar, etc.)
 │   ├── playlist/        # Feature-specific (TrackItem, PlaylistCard, PlaylistHeader, AddTrackButton)
-│   └── player/          # MiniPlayer, PlayerModal
+│   ├── player/          # MiniPlayer, PlayerModal (full player with controls, progress, artwork)
+│   └── music-control/   # DeviceListeningCard (displays friends listening with control delegation)
 ├── navigation/
 │   ├── RootNavigator.tsx    # Main navigator (switches Auth/App based on auth state)
 │   ├── AuthNavigator.tsx    # Stack for unauthenticated users
-│   └── AppNavigator.tsx     # Bottom tabs for authenticated users
+│   ├── AppNavigator.tsx     # Bottom tabs for authenticated users
+│   └── stacks/              # Feature-specific navigation stacks
+│       ├── PlaylistsStack.tsx
+│       ├── FriendsStack.tsx
+│       ├── ProfileStack.tsx
+│       └── SearchStack.tsx
+├── contexts/             # React Context providers
+│   ├── ThemeContext.tsx     # Theme state and colors (2705 lines)
+│   └── PlayerContext.tsx    # Audio player lifecycle management (4058 lines)
 ├── store/               # Zustand state management
-│   ├── authStore.ts    # Authentication state (user, tokens, login/logout)
-│   ├── playlistStore.ts # Playlist state with API integration
-│   ├── soundcloudStore.ts # SoundCloud search state
-│   └── playerStore.ts  # Audio player state
+│   ├── authStore.ts         # Authentication state (user, tokens, login/logout)
+│   ├── playlistStore.ts     # Playlist state with API integration
+│   ├── soundcloudStore.ts   # SoundCloud search state
+│   ├── playerStore.ts       # Audio player state (current track, play state, modal state)
+│   └── socketStore.ts       # Socket.io connection management
+├── hooks/               # Custom React hooks
+│   ├── useSoundCloudPlayer.ts   # Audio playback hook (fetch stream, manage player)
+│   ├── usePlayerController.ts   # Player controls (play, pause, seek, skip)
+│   ├── usePlayerProgress.ts     # Progress tracking and slider
+│   ├── usePlayerSync.ts         # Sync player state across components
+│   ├── useMusicControl.ts       # Music control delegation (7849 lines!)
+│   └── usePlaylistSocket.ts     # Real-time playlist updates
 ├── api/                 # API client layer
 │   └── playlistApi.ts  # Playlist API calls
 ├── services/            # Service layer
 │   ├── api.ts          # Base API configuration
-│   └── profileApi.ts   # Profile API calls
+│   ├── profileApi.ts   # Profile API calls
+│   ├── friendsApi.ts   # Friends API calls (follow, unfollow, get friends)
+│   ├── musicControlApi.ts  # Music control delegation API
+│   ├── oauth.ts        # OAuth integration (Google, etc.)
+│   └── deviceService.ts    # Device registration and management
 ├── lib/                 # Third-party library configuration
 │   └── supabase.ts     # Supabase client setup
 ├── types/              # TypeScript types aligned with backend
@@ -325,14 +367,17 @@ mobile/src/
 ```
 
 **Key Mobile Patterns**:
-- Path aliases: `@/*` (root), `@components`, `@screens`, `@store`, `@utils`, `@types`, `@constants`, `@mocks`, `@api`, `@services`
-- Zustand stores for state management (NOT Redux or Context)
+- Path aliases: `@/*` (root), `@components`, `@screens`, `@store`, `@utils`, `@types`, `@constants`, `@mocks`, `@api`, `@services`, `@hooks`, `@contexts`
+- Zustand stores for state management (auth, playlists, soundcloud, player, socket)
+- React Context for cross-cutting concerns (ThemeContext, PlayerContext)
 - React Hook Form + Zod for form validation
-- React Navigation 7 with stack and bottom tab navigators
+- React Navigation 7 with stack-based organization and bottom tab navigators
+- Custom hooks for complex logic (7 hooks for audio, music control, real-time)
 - Music-inspired dark theme (Green #1DB954, Black #121212)
 - Authentication state persisted to AsyncStorage, loaded on app start in RootNavigator
-- API layer (`@api`) for backend communication
-- Service layer (`@services`) for business logic
+- API layer (`@api`, `@services`) for backend communication
+- Socket.io for real-time updates (playlist changes, music control delegation)
+- expo-audio for SoundCloud streaming playback
 
 ## Environment Configuration
 
@@ -349,6 +394,10 @@ NODE_ENV=development
 
 # CORS
 ALLOWED_ORIGINS=http://localhost:8081,exp://localhost:8081
+
+# Tunnel Mode (for cross-network development)
+NGROK_AUTHTOKEN=your_ngrok_token  # Get from https://dashboard.ngrok.com/get-started/your-authtoken
+TUNNEL_URL=  # Auto-configured by tunnel script, leave empty
 ```
 
 ### Mobile `.env`
@@ -359,9 +408,19 @@ EXPO_PUBLIC_API_URL=http://localhost:3000
 # For physical device testing:
 # EXPO_PUBLIC_API_URL=http://YOUR_LOCAL_IP:3000
 
+# WebSocket URL (for real-time features)
+EXPO_PUBLIC_WS_URL=ws://localhost:3000
+
 # Supabase (optional, primarily using backend API)
 EXPO_PUBLIC_SUPABASE_URL=
 EXPO_PUBLIC_SUPABASE_ANON_KEY=
+
+# EAS / Tunnel Mode
+EXPO_TOKEN=your_expo_token  # For tunnel mode, get from expo.dev
+
+# OAuth (Google Sign-In)
+EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=your_google_client_id
+EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME=your_ios_scheme
 ```
 
 ## Database Migrations
@@ -376,10 +435,14 @@ Migrations are SQL files in `backend/migrations/` executed manually in Supabase 
 **Current schema**:
 - `user_profiles` table - User profile data (id, username, display_name, avatar_url, bio, created_at, updated_at)
   - Linked to Supabase auth.users via foreign key
-- `playlists` table - Playlist metadata (id, name, description, cover_url, owner_id, collaborator_ids, visibility, timestamps)
+- `playlists` table - Playlist metadata (id, name, description, cover_url, owner_id, collaborator_ids, viewer_ids, visibility, edit_mode, timestamps)
+  - `edit_mode` - 'open' (anyone can edit) or 'restricted' (only collaborators)
 - `tracks` table - Universal track data (id, track_uri, title, artist, album, album_art, duration_ms, preview_url, timestamps)
   - `track_uri` stores universal track identifiers from any music service
+  - `album` field is nullable (some tracks may not have album info)
 - `playlist_tracks` junction table - Many-to-many relationship (playlist_id, track_id, position, added_by, timestamps)
+- `follows` table - Follow relationships (follower_id, following_id, can_control_music, timestamps)
+  - `can_control_music` - Boolean flag for music control delegation permission
 
 **Migrations**:
 - `001_initial_schema.sql` - User profiles table with basic fields
@@ -387,6 +450,11 @@ Migrations are SQL files in `backend/migrations/` executed manually in Supabase 
 - `003_playlist_persistence.sql` - Playlists, tracks, and playlist_tracks tables
 - `004_remove_spotify.sql` - Remove all Spotify columns from user_profiles
 - `005_rename_spotify_uri_to_track_uri.sql` - Rename spotify_uri to track_uri for universal support
+- `006_make_album_nullable.sql` - Make album field nullable in tracks table
+- `006_oauth_providers.sql` / `007_multi_provider_oauth.sql` / `007_multi_provider_oauth_safe.sql` - OAuth provider support
+- `007_follows.sql` - Friends system with follows table
+- `009_music_control.sql` - Add can_control_music column to follows table
+- `010_edit_mode.sql` - Add edit_mode column to playlists table and update RLS policies
 
 **Create new migration**:
 ```bash
@@ -455,6 +523,71 @@ make restart
 ```
 
 **Why this works**: The chmod commands make files readable by all users (including Docker's non-root `node` user), while keeping write permissions restricted to the owner. Shell scripts need execute permissions (+x) to run. Git tracks execute permissions, so the fix persists across commits.
+
+## Real-time Features (Socket.io)
+
+Music Room implements real-time synchronization using **Socket.io** for live updates across devices.
+
+### Backend Real-time Service
+
+**Location**: `backend/src/realtime/index.ts` (478 lines)
+
+**Key Features**:
+- **Playlist Sync**: Real-time updates when tracks are added/removed from playlists
+- **Music Control Delegation**: Live updates when friends grant/revoke playback control
+- **Device Management**: Register devices and track listening status
+- **Room-based Events**: Events scoped to specific playlists or user groups
+
+**Event Types**:
+```typescript
+// Playlist events
+'playlist:track:added' - Track added to playlist
+'playlist:track:removed' - Track removed from playlist
+'playlist:updated' - Playlist metadata updated
+
+// Music control events
+'music-control:granted' - User granted control permission
+'music-control:revoked' - User revoked control permission
+
+// Device events
+'device:register' - Device registered for listening
+'device:status' - Listening status updated
+```
+
+### Mobile Integration
+
+**Socket Store** (`mobile/src/store/socketStore.ts`):
+- Connection state management
+- Auto-reconnection logic
+- Event subscription handling
+
+**Custom Hooks**:
+- `usePlaylistSocket` - Subscribe to playlist updates in real-time
+- `useMusicControl` - Handle music control delegation events (7849 lines!)
+
+**Usage Example**:
+```typescript
+// In PlaylistDetailScreen
+const { socket, isConnected } = socketStore();
+
+usePlaylistSocket(playlistId, {
+  onTrackAdded: (track) => {
+    // Refresh playlist when track added by another user
+    playlistStore.fetchPlaylist(playlistId);
+  },
+  onTrackRemoved: (trackId) => {
+    // Remove track from local state
+    playlistStore.removeTrackLocally(playlistId, trackId);
+  }
+});
+```
+
+**Connection Flow**:
+1. User logs in → `socketStore` connects to backend WebSocket
+2. User opens playlist → Subscribe to `playlist:${id}` room
+3. Another user adds track → Backend emits `playlist:track:added` event
+4. All connected clients in room receive event and update UI
+5. User leaves playlist → Unsubscribe from room
 
 ## Music Integration - SoundCloud
 
@@ -591,71 +724,108 @@ The collection auto-saves JWT tokens after login/register.
 
 ## Music Integration
 
-Music Room uses a universal `trackUri` field to support multiple music services.
-
-### Planned: SoundCloud Integration
-
-SoundCloud integration is planned to replace the previous Spotify integration. Implementation details are available in `doc/SOUNDCLOUD_MIGRATION_PLAN.md`.
-
-**Key Features (Planned)**:
-- Public API search (no OAuth required)
-- Direct track streaming
-- Simple architecture with single search endpoint
-- Support for AAC HLS audio format
-
-**Database Schema**:
-- `tracks` table stores universal track URIs in `track_uri` column
-- Supports any music service (SoundCloud, YouTube Music, etc.)
-- Migrations `004_remove_spotify.sql` and `005_rename_spotify_uri_to_track_uri.sql` prepared the database
-
-For implementation details, see `doc/SOUNDCLOUD_MIGRATION_PLAN.md`.
+Music Room uses a universal `trackUri` field to support multiple music services. SoundCloud integration is **fully implemented** and functional.
 
 ## Current Implementation Status
 
-**Phase 1 - Complete**:
+**Project Completion: ~70%**
+
+Music Room has evolved significantly beyond initial planning, with several major features fully implemented.
+
+**Phase 1 - ✅ Complete (Foundation)**:
 - Backend foundation with Express + Socket.io setup
 - Authentication feature (register, login, logout, refresh, user profile)
-- Mobile app with navigation (Auth stack, App stack)
+- Mobile app with navigation (Auth stack, App stack, feature-based stacks)
 - Basic UI screens (Welcome, Login, Register, Playlist views)
-- State management with Zustand (auth, playlists)
-- Docker development environment
+- State management with Zustand (auth, playlists, socket, player, soundcloud)
+- Docker development environment with Chainguard images
 
-**Phase 2 - Removed (Spotify Replaced)**:
+**Phase 2 - ✅ Complete (Infrastructure Removed - Spotify)**:
 - Previous Spotify OAuth integration removed
 - Database cleaned: Removed all `spotify_*` columns from `user_profiles`
 - Renamed `spotify_uri` to `track_uri` for universal music service support
-- Migration to SoundCloud planned (see `doc/SOUNDCLOUD_MIGRATION_PLAN.md`)
+- Migrated to SoundCloud (Phase 5 completed)
 
-**Phase 3 - Complete (Playlist Persistence)**:
+**Phase 3 - ✅ Complete (Playlist System)**:
 - Database migration: `003_playlist_persistence.sql` (playlists, tracks, playlist_tracks tables)
-- Backend feature: `/api/playlists/*` (full CRUD, track management, collaborators)
-  - 10 API endpoints for playlist operations
-  - Track add/remove/reorder functionality
-  - Collaborator management system
-- Mobile screens: PlaylistsScreen, PlaylistDetailScreen, CreatePlaylistScreen, SearchTracksScreen
+- Backend feature: `/api/playlists/*` (14 API endpoints)
+  - Full CRUD operations (create, read, update, delete)
+  - Track management (add, remove, reorder)
+  - Collaborator management (add, remove, list)
+  - Viewer management (add, remove, list - for private playlist viewing)
+  - Edit modes ('open' or 'restricted')
+- Mobile screens: PlaylistsScreen, PlaylistDetailScreen, CreatePlaylistScreen, PlaylistEditorScreen
 - Playlist store: Zustand state with full API integration
 - Playlist API client: `playlistApi.ts` for backend communication
-- Real playlist persistence (no more mock data)
+- Real-time playlist sync via Socket.io
 
-**Phase 4 - Complete (Profile System)**:
-- Backend feature: `/api/profile/*` (profile management, updates)
+**Phase 4 - ✅ Complete (Profile System)**:
+- Backend feature: `/api/profile/*` (3 API endpoints)
 - Mobile screens: ProfileScreen, EditProfileScreen
 - Profile API client: `profileApi.ts`
 - Profile tab in bottom navigation
 - Avatar upload and display support
 
-**Phase 5 - Planned (Music Search)**:
-- SoundCloud integration for track search and streaming
-- Public API access (no OAuth required)
-- Search tab in bottom navigation
-- Direct track playback
-- See `doc/SOUNDCLOUD_MIGRATION_PLAN.md` for implementation plan
+**Phase 5 - ✅ Complete (Music Search & Playback)**:
+- **SoundCloud integration** (3 API endpoints: search, track details, stream URLs)
+- Backend service with caching (1h for search, 30min for streams)
+- Public API access via `soundcloud.ts` npm package (no OAuth required)
+- **Mobile audio playback system**:
+  - PlayerContext (4058 lines) for lifecycle management
+  - MiniPlayer component (persistent above tab bar)
+  - Full PlayerModal with controls, progress slider, skip ±10s
+  - 4 custom hooks (useSoundCloudPlayer, usePlayerController, usePlayerProgress, usePlayerSync)
+  - expo-audio for HLS AAC streaming
+- Search tab in bottom navigation with debounced search
+- SoundCloudSearchScreen with track results
+- PlaylistSelectorModal to add tracks to playlists
+
+**Phase 6 - ✅ Complete (Friends System)**:
+- Database migration: `007_follows.sql` (follows table)
+- Backend feature: `/api/friends/*` (4 API endpoints)
+  - Follow/unfollow users
+  - Get mutual friends list
+  - Check follow status
+- Mobile screens: FriendsScreen (455 lines with tabs), UserProfileScreen
+- FriendsNavigator stack for friend-related navigation
+- Friends API client: `friendsApi.ts`
+- Friends tab in bottom navigation
+
+**Phase 7 - ✅ Complete (Music Control Delegation)**:
+- Database migration: `009_music_control.sql` (can_control_music column in follows)
+- Backend feature: `/api/music-control/*` (4 API endpoints)
+  - Grant/revoke playback control to friends
+  - Check who has control permissions
+  - Check if friend granted you control
+- Mobile integration:
+  - musicControlApi service
+  - useMusicControl hook (7849 lines!) for complex delegation logic
+  - DeviceListeningCard component
+  - Toggle switches in FriendsScreen for control permissions
+- Real-time updates via Socket.io when permissions change
+
+**Phase 8 - ✅ Complete (Real-time Synchronization)**:
+- Backend: Real-time service `realtime/index.ts` (478 lines)
+- Socket.io event system for:
+  - Playlist updates (track added/removed)
+  - Music control delegation events
+  - Device registration and listening status
+- Mobile: socketStore for connection management
+- Mobile: usePlaylistSocket hook for real-time playlist updates
+- Auto-reconnection logic
+
+**In Progress**:
+- OAuth providers (Google Sign-In) - partially implemented
+- Multi-device music control coordination
+- Playlist edit mode RLS policies
 
 **Planned Features** (see `PLAN.md`):
-- Friends system (add, manage, search friends)
-- Music rooms (collaborative listening spaces)
-- Music playback control
-- Real-time sync with Socket.io
+- Music rooms (group listening spaces)
+- Web responsive version
+- Offline mode / caching
+- Subscription system
+- IoT / iBeacon integration
+- Advanced social features (activity feed, recommendations)
 
 ## Common Issues & Solutions
 
