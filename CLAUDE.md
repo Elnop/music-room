@@ -13,103 +13,165 @@ The app allows users to create collaborative music playlists with friends, featu
 
 ## Development Commands
 
-### Root Level (Orchestration via Makefile)
+Music Room provides **three development modes** orchestrated by a modular Makefile system. Use `make help` to see all available commands.
 
-All primary development happens through the root Makefile which orchestrates Docker containers:
+### Quick Start
 
 ```bash
-# First-time setup
-make install          # Install deps, create .env files
+# 1. First-time setup (required once)
+make install          # Install all dependencies, create .env files
 
-# Daily development
-make dev              # Show development mode menu (choose your workflow)
-make dev-docker       # Start all services in Docker (backend + mobile)
-make stop             # Stop all services
+# 2. Choose your development mode
+make dev              # Interactive menu to select mode
+
+# OR directly start your preferred mode:
+make dev-docker       # Docker mode (containerized, recommended for most)
+make dev-local        # Local mode (native, for Android Studio users)
+make dev-tunnel       # Tunnel mode (cross-network, different WiFi)
+```
+
+### Development Modes
+
+#### 🐳 Docker Mode (Recommended)
+Containerized development using Docker Compose. Best for most developers.
+
+```bash
+# Start services
+make dev-docker       # Start backend + mobile in containers
+make stop             # Stop all containers
 make restart          # Restart all services
+make start            # Start existing containers (no rebuild)
+make down             # Stop and remove containers + networks
+
+# View logs
 make logs             # View all logs (backend + mobile)
 make logs-backend     # Backend logs only
 make logs-mobile      # Mobile logs only
 
-# Quality checks
-make lint             # Run linters (backend + mobile)
-make format           # Format code with Prettier
-make test             # Run all tests
-
-# Utilities
-make qr               # Show Expo QR code for mobile testing
-make health           # Health check all services
+# Testing
+make qr               # Show Expo QR code (device must be on same WiFi)
 make ps               # Show container status
+make health           # Check services health status
+
+# Container access
 make shell-backend    # Open shell in backend container
 make shell-mobile     # Open shell in mobile container
-
-# Tunnel Mode (Cross-Network Development)
-make tunnel-setup     # One-time automatic setup (auto EAS login)
-make dev-tunnel       # Start all services in tunnel mode (different WiFi networks)
-make qr-tunnel        # Show tunnel QR code and URLs
-make tunnel-info      # Display detailed tunnel information
-
-# Cleanup
-make clean            # Remove containers, images, dependencies (with confirmation)
-make prune            # Clean up unused Docker resources
+make build            # Rebuild Docker images
 ```
 
-### Tunnel Mode (Cross-Network Development)
+**When to use:** Default choice for development. Works out of the box.
 
-Use tunnel mode when your phone and PC are on **different WiFi networks**:
+#### 💻 Local Mode (Native Development)
+Run services directly on your machine without Docker. Required for Android Studio emulator integration.
 
 ```bash
-# First-time setup (one command, automatic)
-make tunnel-setup          # Auto-configures EAS using credentials from mobile/.env
+# Start services
+make dev-local        # Start backend + mobile locally
+make backend-local    # Start backend only
+make mobile-local     # Start Expo only
+
+# Android development
+make dev-android      # Start Expo for Android emulator
+make expo-android     # Quick launch in Android emulator
+make expo-clear       # Start Expo with cleared cache
+make check-devices    # Check connected Android devices
+```
+
+**When to use:**
+- Using Android Studio emulator
+- Need native debugging
+- Docker not available
+- Prefer native development
+
+**Requirements:** Node.js 20+, npm installed locally
+
+#### 🌐 Tunnel Mode (Cross-Network Development)
+Uses ngrok tunneling for development across different networks. Adds ~50-200ms latency.
+
+```bash
+# One-time setup (required once)
+make tunnel-setup     # Auto-configures EAS, requires EXPO_TOKEN in mobile/.env
 
 # Daily usage
-make dev-tunnel            # Start all services in tunnel mode
-make qr-tunnel             # Show tunnel QR code and URLs
-
-# Multi-device testing
-# Just share the QR code - supports unlimited devices!
+make dev-tunnel       # Start all services with tunnel
+make qr-tunnel        # Show tunnel QR code and URLs
+make tunnel-info      # Display detailed tunnel information
 ```
 
 **When to use:**
 - Phone on cellular data while PC on WiFi
 - Different WiFi networks
-- Multiple devices simultaneously (unlimited connections)
+- Testing from multiple devices simultaneously
 - Remote development/testing
 
 **Performance:** ~50-200ms latency vs <10ms LAN mode.
 
 See [TUNNEL_MODE.md](./TUNNEL_MODE.md) for complete documentation.
 
-**Automatic Tunnel URL Sharing:**
+### 📱 Native Builds (Custom Development Builds)
+Required for OAuth (Google/Facebook Sign-In) and native modules. Keeps hot reload functionality.
 
-The tunnel system is now **100% automatic**:
-
-1. Backend starts ngrok tunnel → writes URL to `/tmp/shared/backend-tunnel-url.txt`
-2. Mobile container waits for file → reads URL automatically
-3. Expo starts with correct backend tunnel URL
-4. **No manual configuration needed!**
-
-**Technical Details:**
-- Backend and mobile containers share a Docker volume at `/tmp/shared`
-- Dockerfiles create directory with correct permissions (node:node, UID 65532)
-- `start-with-tunnel.sh` writes tunnel URL after ngrok initializes
-- `start-expo-tunnel.sh` reads URL and exports as `EXPO_PUBLIC_API_URL`
-- No hardcoded URLs in `.env` files - always uses fresh tunnel URL
-
-**Troubleshooting:**
-
-If mobile can't find backend tunnel URL:
 ```bash
-# 1. Check backend tunnel initialized
-docker logs music-room-backend | grep "Tunnel URL"
+# One-time setup
+make dev-build-setup  # Configure EAS for development builds
 
-# 2. Verify file exists and is readable
-docker exec music-room-backend cat /tmp/shared/backend-tunnel-url.txt
+# Build custom development APK
+make dev-build        # Cloud build (~15-20 minutes)
+make dev-build-local  # Local build (requires Android SDK)
 
-# 3. Check mobile can access shared volume
-docker exec music-room-mobile ls -la /tmp/shared
+# Cleanup
+make clean-native     # Clean android/ios/expo folders
+```
 
-# 4. Rebuild with fresh volumes
-make stop && docker compose down -v && make dev-tunnel
+**When to use:**
+- Need Google/Facebook OAuth
+- Testing native modules
+- Expo Go limitations
+
+### Code Quality
+
+```bash
+make test             # Run all tests
+make lint             # Run linters on all code
+make lint-fix         # Auto-fix linting issues
+make format           # Format all code with Prettier
+```
+
+### Cleanup
+
+```bash
+make clean            # Remove containers + deps (with confirmation)
+make clean-docker     # Remove Docker resources only
+make clean-deps       # Remove node_modules + build artifacts
+make clean-native     # Clean native build folders
+make prune            # Clean unused Docker resources
+make clean-all        # ⚠️ Remove ALL Docker resources on machine
+```
+
+### Utilities
+
+```bash
+make info             # Show system information
+make fix-permissions  # Fix file permissions for Docker
+make fix-node-modules # Fix node_modules ownership (for local builds)
+```
+
+### Common Workflows
+
+```bash
+# Different WiFi networks?
+make tunnel-setup && make dev-tunnel
+
+# Android Studio emulator?
+make dev-local
+
+# Need Google Sign-In?
+make dev-build-setup && make dev-build
+
+# Fresh start after git pull?
+make restart          # Docker mode
+# OR
+make backend-local    # Local mode (restart manually)
 ```
 
 ### Backend (Non-Docker Development)
@@ -295,18 +357,18 @@ feature/
 - Error responses follow standardized format from `error-handler.ts`
 - JWT tokens verified via `auth.middleware.ts` for protected routes
 
-**Backend API Routes** (36 total endpoints):
+**Backend API Routes** (37 total endpoints):
 - `/health` - Health check endpoint
 - `/api/auth/*` - Authentication endpoints (8 routes):
-  - Email/password: register, login, me, refresh, logout
+  - Email/password: register, login, me, logout
   - OAuth: google, facebook
   - Provider management: get providers, unlink provider
-- `/api/profile/*` - Profile management endpoints (3 routes: get own profile, update profile, get user profile)
-- `/api/playlists/*` - Playlist CRUD and track management (14 routes)
+- `/api/profile/*` - Profile management endpoints (4 routes: get own profile, update profile, search users, get user profile)
+- `/api/playlists/*` - Playlist CRUD and track management (13 routes)
   - CRUD operations (create, get all, get by ID, update, delete)
   - Track management (add, remove, reorder tracks)
-  - Collaborator management (add, remove, list collaborators)
-  - Viewer management (add, remove, list viewers - allows viewing private playlists)
+  - Collaborator management (add, remove - list returned in playlist details)
+  - Viewer management (add, remove - list returned in playlist details)
 - `/api/soundcloud/*` - SoundCloud music search and streaming (3 routes: search, track details, stream URLs)
 - `/api/friends/*` - Friends system (4 routes: get friends, follow, unfollow, check follow status)
 - `/api/music-control/*` - Music control delegation (4 routes: grant control, revoke control, get permissions, check if user can control)
@@ -401,6 +463,13 @@ ALLOWED_ORIGINS=http://localhost:8081,exp://localhost:8081
 # Tunnel Mode (for cross-network development)
 NGROK_AUTHTOKEN=your_ngrok_token  # Get from https://dashboard.ngrok.com/get-started/your-authtoken
 TUNNEL_URL=  # Auto-configured by tunnel script, leave empty
+
+# OAuth (Google)
+GOOGLE_CLIENT_ID=your_google_client_id  # Get from Google Cloud Console
+
+# OAuth (Facebook)
+FACEBOOK_APP_ID=your_facebook_app_id  # Get from Facebook Developers
+FACEBOOK_APP_SECRET=your_facebook_app_secret  # Keep secret!
 ```
 
 ### Mobile `.env`
@@ -424,6 +493,10 @@ EXPO_TOKEN=your_expo_token  # For tunnel mode, get from expo.dev
 # OAuth (Google Sign-In)
 EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=your_google_client_id
 EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME=your_ios_scheme
+
+# OAuth (Facebook)
+EXPO_PUBLIC_FACEBOOK_APP_ID=your_facebook_app_id  # Get from Facebook Developers
+EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN=your_facebook_client_token  # Get from Facebook Developers
 ```
 
 ## Database Migrations
@@ -447,17 +520,21 @@ Migrations are SQL files in `backend/migrations/` executed manually in Supabase 
 - `follows` table - Follow relationships (follower_id, following_id, can_control_music, timestamps)
   - `can_control_music` - Boolean flag for music control delegation permission
 
-**Migrations**:
-- `001_initial_schema.sql` - User profiles table with basic fields
-- `002_spotify_oauth.sql` - (Deprecated) Previous Spotify OAuth integration
-- `003_playlist_persistence.sql` - Playlists, tracks, and playlist_tracks tables
-- `004_remove_spotify.sql` - Remove all Spotify columns from user_profiles
-- `005_rename_spotify_uri_to_track_uri.sql` - Rename spotify_uri to track_uri for universal support
-- `006_make_album_nullable.sql` - Make album field nullable in tracks table
-- `006_oauth_providers.sql` / `007_multi_provider_oauth.sql` / `007_multi_provider_oauth_safe.sql` - OAuth provider support
-- `007_follows.sql` - Friends system with follows table
-- `009_music_control.sql` - Add can_control_music column to follows table
-- `010_edit_mode.sql` - Add edit_mode column to playlists table and update RLS policies
+**Migrations** (in execution order):
+1. `001_initial_schema.sql` - User profiles table with basic fields
+2. `002_spotify_oauth.sql` - ⚠️ **Deprecated** - Previous Spotify OAuth integration
+3. `003_playlist_persistence.sql` - Playlists, tracks, and playlist_tracks tables
+4. `004_remove_spotify.sql` - Remove all Spotify columns from user_profiles
+5. `005_rename_spotify_uri_to_track_uri.sql` - Rename spotify_uri to track_uri for universal support
+6. `006_make_album_nullable.sql` - Make album field nullable in tracks table
+7. `006_oauth_providers.sql` - ⚠️ **Deprecated** - Initial OAuth provider support attempt
+8. `007_follows.sql` - Friends system with follows table
+9. `007_multi_provider_oauth.sql` - ⚠️ **Deprecated** - Multi-provider OAuth attempt
+10. `007_multi_provider_oauth_safe.sql` - ✅ **Active** - Safe multi-provider OAuth implementation
+11. `009_music_control.sql` - Add can_control_music column to follows table (skips 008)
+12. `010_edit_mode.sql` - Add edit_mode column to playlists table and update RLS policies
+
+**Note**: Multiple files share the same numbers (006, 007) due to iterative development. Files marked "Deprecated" were superseded by later versions. The "safe" variants include proper error handling and rollback capabilities.
 
 **Create new migration**:
 ```bash
@@ -751,11 +828,11 @@ Music Room has evolved significantly beyond initial planning, with several major
 
 **Phase 3 - ✅ Complete (Playlist System)**:
 - Database migration: `003_playlist_persistence.sql` (playlists, tracks, playlist_tracks tables)
-- Backend feature: `/api/playlists/*` (14 API endpoints)
+- Backend feature: `/api/playlists/*` (13 API endpoints)
   - Full CRUD operations (create, read, update, delete)
   - Track management (add, remove, reorder)
-  - Collaborator management (add, remove, list)
-  - Viewer management (add, remove, list - for private playlist viewing)
+  - Collaborator management (add, remove - list in playlist details)
+  - Viewer management (add, remove - list in playlist details)
   - Edit modes ('open' or 'restricted')
 - Mobile screens: PlaylistsScreen, PlaylistDetailScreen, CreatePlaylistScreen, PlaylistEditorScreen
 - Playlist store: Zustand state with full API integration
@@ -763,7 +840,7 @@ Music Room has evolved significantly beyond initial planning, with several major
 - Real-time playlist sync via Socket.io
 
 **Phase 4 - ✅ Complete (Profile System)**:
-- Backend feature: `/api/profile/*` (3 API endpoints)
+- Backend feature: `/api/profile/*` (4 API endpoints: get own, update, search users, get by ID)
 - Mobile screens: ProfileScreen, EditProfileScreen
 - Profile API client: `profileApi.ts`
 - Profile tab in bottom navigation
