@@ -14,7 +14,7 @@ export function formatPlaylistResponse(
   row: PlaylistRow,
   trackCount: number,
   owner?: PlaylistOwner,
-  firstTrackCover?: string
+  firstTrackCover?: string,
 ): PlaylistResponse {
   return {
     id: row.id,

@@ -19,7 +19,7 @@ export class ViewerService {
   async addViewer(
     playlistId: string,
     userId: string,
-    viewerId: string
+    viewerId: string,
   ): Promise<void> {
     try {
       await this.permissions.checkOwnership(playlistId, userId);
@@ -48,7 +48,7 @@ export class ViewerService {
         throw new AppError(
           400,
           "Owner cannot be added as viewer",
-          "OWNER_CANNOT_BE_VIEWER"
+          "OWNER_CANNOT_BE_VIEWER",
         );
       }
 
@@ -57,7 +57,7 @@ export class ViewerService {
         throw new AppError(
           409,
           "User is already a collaborator with edit access",
-          "ALREADY_COLLABORATOR"
+          "ALREADY_COLLABORATOR",
         );
       }
 
@@ -92,7 +92,7 @@ export class ViewerService {
   async removeViewer(
     playlistId: string,
     userId: string,
-    viewerId: string
+    viewerId: string,
   ): Promise<void> {
     try {
       // Only owner can remove viewers
@@ -114,7 +114,7 @@ export class ViewerService {
         .from("playlists")
         .update({
           viewer_ids: playlist.viewer_ids.filter(
-            (id: string) => id !== viewerId
+            (id: string) => id !== viewerId,
           ),
         })
         .eq("id", playlistId);
@@ -138,7 +138,7 @@ export class ViewerService {
    */
   async getViewers(
     playlistId: string,
-    userId: string
+    userId: string,
   ): Promise<
     Array<{
       id: string;

@@ -20,14 +20,14 @@ export class MusicControlService {
       // Verify they are mutual friends
       const followStatus = await friendsService.getFollowStatus(
         ownerId,
-        allowedUserId
+        allowedUserId,
       );
 
       if (!followStatus.isFriend) {
         throw new AppError(
           400,
           "You can only grant control to mutual friends",
-          "NOT_FRIENDS"
+          "NOT_FRIENDS",
         );
       }
 
@@ -48,7 +48,7 @@ export class MusicControlService {
         throw new AppError(
           500,
           "Failed to grant control",
-          "GRANT_CONTROL_ERROR"
+          "GRANT_CONTROL_ERROR",
         );
       }
 
@@ -83,7 +83,7 @@ export class MusicControlService {
         throw new AppError(
           500,
           "Failed to revoke control",
-          "REVOKE_CONTROL_ERROR"
+          "REVOKE_CONTROL_ERROR",
         );
       }
 
@@ -97,7 +97,7 @@ export class MusicControlService {
       throw new AppError(
         500,
         "Failed to revoke control",
-        "REVOKE_CONTROL_ERROR"
+        "REVOKE_CONTROL_ERROR",
       );
     }
   }
@@ -118,7 +118,7 @@ export class MusicControlService {
         throw new AppError(
           500,
           "Failed to get permissions",
-          "GET_PERMISSIONS_ERROR"
+          "GET_PERMISSIONS_ERROR",
         );
       }
 
@@ -129,7 +129,7 @@ export class MusicControlService {
       throw new AppError(
         500,
         "Failed to get permissions",
-        "GET_PERMISSIONS_ERROR"
+        "GET_PERMISSIONS_ERROR",
       );
     }
   }
@@ -172,7 +172,7 @@ export class MusicControlService {
    */
   async hasGrantedControlToMe(
     targetUserId: string,
-    myUserId: string
+    myUserId: string,
   ): Promise<boolean> {
     return this.canControl(myUserId, targetUserId);
   }

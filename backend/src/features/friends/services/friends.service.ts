@@ -9,7 +9,7 @@ export class FriendsService {
    */
   async getFollowStatus(
     currentUserId: string,
-    targetUserId: string
+    targetUserId: string,
   ): Promise<FollowStatus> {
     try {
       const [
@@ -47,7 +47,7 @@ export class FriendsService {
         throw new AppError(
           500,
           "Failed to get follow status",
-          "FOLLOW_STATUS_ERROR"
+          "FOLLOW_STATUS_ERROR",
         );
       }
 
@@ -58,7 +58,7 @@ export class FriendsService {
         throw new AppError(
           500,
           "Failed to get follow status",
-          "FOLLOW_STATUS_ERROR"
+          "FOLLOW_STATUS_ERROR",
         );
       }
 
@@ -78,7 +78,7 @@ export class FriendsService {
       throw new AppError(
         500,
         "Failed to get follow status",
-        "FOLLOW_STATUS_ERROR"
+        "FOLLOW_STATUS_ERROR",
       );
     }
   }
@@ -88,7 +88,7 @@ export class FriendsService {
    */
   async followUser(
     currentUserId: string,
-    targetUserId: string
+    targetUserId: string,
   ): Promise<FollowActionResponse> {
     try {
       // Prevent self-follow
@@ -138,7 +138,7 @@ export class FriendsService {
    */
   async unfollowUser(
     currentUserId: string,
-    targetUserId: string
+    targetUserId: string,
   ): Promise<FollowActionResponse> {
     try {
       const { error: deleteError } = await supabase

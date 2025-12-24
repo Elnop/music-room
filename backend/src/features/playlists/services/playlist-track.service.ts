@@ -23,7 +23,7 @@ export class PlaylistTrackService {
   async addTrack(
     playlistId: string,
     userId: string,
-    track: AddTrackDTO
+    track: AddTrackDTO,
   ): Promise<void> {
     try {
       const playlist =
@@ -46,7 +46,7 @@ export class PlaylistTrackService {
             duration_ms: track.durationMs,
             preview_url: track.previewUrl,
           },
-          { onConflict: "track_uri" }
+          { onConflict: "track_uri" },
         )
         .select()
         .single();
@@ -58,7 +58,7 @@ export class PlaylistTrackService {
         "get_next_playlist_position",
         {
           p_playlist_id: playlistId,
-        }
+        },
       );
 
       const nextPosition = maxPos ?? 0;
@@ -81,7 +81,7 @@ export class PlaylistTrackService {
           throw new AppError(
             409,
             "Track already in playlist",
-            "TRACK_DUPLICATE"
+            "TRACK_DUPLICATE",
           );
         }
         throw addError;
@@ -125,7 +125,7 @@ export class PlaylistTrackService {
   async removeTrack(
     playlistId: string,
     userId: string,
-    trackId: string
+    trackId: string,
   ): Promise<void> {
     try {
       // Check permission (owner or collaborator)
@@ -162,7 +162,7 @@ export class PlaylistTrackService {
   async reorderTracks(
     playlistId: string,
     userId: string,
-    trackIds: string[]
+    trackIds: string[],
   ): Promise<void> {
     try {
       // Check permission (owner or collaborator)
@@ -183,7 +183,7 @@ export class PlaylistTrackService {
         throw new AppError(
           400,
           "Invalid track IDs for reordering",
-          "INVALID_TRACK_IDS"
+          "INVALID_TRACK_IDS",
         );
       }
 
@@ -217,7 +217,7 @@ export class PlaylistTrackService {
       throw new AppError(
         500,
         "Failed to reorder tracks",
-        "TRACK_REORDER_ERROR"
+        "TRACK_REORDER_ERROR",
       );
     }
   }

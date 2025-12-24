@@ -4,11 +4,11 @@ import type { PlaylistRow } from "../playlist.types.js";
 
 /**
  * Playlist permissions and authorization checks
- * 
+ *
  * Permission matrix based on subject requirements:
  * - Visibility (public/private): controls who can VIEW the playlist
  * - Edit mode (open/restricted): controls who can EDIT the playlist
- * 
+ *
  * | visibility | edit_mode   | Can VIEW                           | Can EDIT                    |
  * |------------|-------------|------------------------------------|-----------------------------|
  * | public     | open        | Everyone                           | Everyone                    |
@@ -31,7 +31,7 @@ export class PlaylistPermissions {
 
   /**
    * Check if user can edit playlist based on edit_mode
-   * 
+   *
    * - Owner can always edit
    * - In 'open' mode: anyone who can view can also edit
    * - In 'restricted' mode: only owner + collaborators can edit
@@ -95,7 +95,7 @@ export class PlaylistPermissions {
    * Fetch playlist with owner check
    */
   async getPlaylistWithOwnerCheck(
-    playlistId: string
+    playlistId: string,
   ): Promise<{ owner_id: string; collaborator_ids: string[] }> {
     const { data: playlist, error } = await supabaseAdmin
       .from("playlists")
@@ -114,7 +114,7 @@ export class PlaylistPermissions {
    * Fetch full playlist for permission checks
    */
   async getPlaylistForPermissionCheck(
-    playlistId: string
+    playlistId: string,
   ): Promise<PlaylistRow> {
     const { data: playlist, error } = await supabaseAdmin
       .from("playlists")

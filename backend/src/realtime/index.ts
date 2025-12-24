@@ -50,7 +50,7 @@ interface ListeningUpdatePayload {
  * Validate listening update payload structure
  */
 function isValidListeningUpdatePayload(
-  data: unknown
+  data: unknown,
 ): data is ListeningUpdatePayload {
   if (!data || typeof data !== "object") return false;
   const payload = data as Record<string, unknown>;
@@ -122,13 +122,13 @@ class RealtimeService {
     this.io.on("connection", (socket) => {
       const transport = socket.conn.transport.name;
       logger.info(
-        `[Socket] ✅ Client connected: ${socket.id} via ${transport}`
+        `[Socket] ✅ Client connected: ${socket.id} via ${transport}`,
       );
 
       // Log transport upgrades
       socket.conn.on("upgrade", (newTransport: { name: string }) => {
         logger.debug(
-          `[Socket] Transport upgraded: ${socket.id} from ${transport} to ${newTransport.name}`
+          `[Socket] Transport upgraded: ${socket.id} from ${transport} to ${newTransport.name}`,
         );
       });
 
@@ -139,7 +139,7 @@ class RealtimeService {
       socket.on("disconnect", (reason) => {
         this.handleDisconnect(socket);
         logger.info(
-          `[Socket] ❌ Client disconnected: ${socket.id} - ${reason}`
+          `[Socket] ❌ Client disconnected: ${socket.id} - ${reason}`,
         );
       });
 
@@ -167,7 +167,7 @@ class RealtimeService {
       socket.join(`user:${userId}`);
 
       logger.debug(
-        `[Socket] User ${userId} registered device "${device.deviceName}" (${device.deviceId}) with socket ${socket.id}`
+        `[Socket] User ${userId} registered device "${device.deviceName}" (${device.deviceId}) with socket ${socket.id}`,
       );
     });
   }
@@ -234,7 +234,7 @@ class RealtimeService {
         {
           track: status.track?.title,
           isPlaying: status.isPlaying,
-        }
+        },
       );
 
       try {
@@ -242,7 +242,7 @@ class RealtimeService {
       } catch (error) {
         logger.error(
           `[Socket] Failed to broadcast listening status for user ${userId}`,
-          { error }
+          { error },
         );
       }
     });
@@ -259,7 +259,7 @@ class RealtimeService {
 
       const canControl = await musicControlService.canControl(
         myUserId,
-        targetUserId
+        targetUserId,
       );
       if (!canControl) {
         socket.emit("listening:error", {
@@ -281,14 +281,14 @@ class RealtimeService {
       socket.emit("listening:status", userStatus);
 
       logger.debug(
-        `[Socket] User ${myUserId} subscribed to ${targetUserId} (${devices.length} devices online)`
+        `[Socket] User ${myUserId} subscribed to ${targetUserId} (${devices.length} devices online)`,
       );
     });
 
     socket.on("listening:unsubscribe", (targetUserId: string) => {
       socket.leave(`listening:${targetUserId}`);
       logger.debug(
-        `[Socket] ${socket.id} unsubscribed from listening:${targetUserId}`
+        `[Socket] ${socket.id} unsubscribed from listening:${targetUserId}`,
       );
     });
 
@@ -303,7 +303,7 @@ class RealtimeService {
 
       const canControl = await musicControlService.canControl(
         controllerId,
-        data.targetUserId
+        data.targetUserId,
       );
       if (!canControl) {
         socket.emit("control:error", {
@@ -324,7 +324,7 @@ class RealtimeService {
         });
 
         logger.info(
-          `[Socket] Control action ${data.action} sent from ${controllerId} to device ${data.targetDeviceId} of user ${data.targetUserId}`
+          `[Socket] Control action ${data.action} sent from ${controllerId} to device ${data.targetDeviceId} of user ${data.targetUserId}`,
         );
 
         socket.emit("control:success", {
@@ -360,7 +360,7 @@ class RealtimeService {
     };
 
     logger.debug(
-      `[Socket] Broadcasting ${devices.length} devices for user ${userId} to ${subscriberCount} subscribers`
+      `[Socket] Broadcasting ${devices.length} devices for user ${userId} to ${subscriberCount} subscribers`,
     );
 
     // Emit to the listening room for this user
@@ -389,7 +389,7 @@ class RealtimeService {
       this.broadcastUserListeningStatus(userId).catch((error) => {
         logger.error(
           `[Socket] Failed to broadcast listening status for user ${userId} on disconnect`,
-          { error }
+          { error },
         );
       });
 
@@ -398,7 +398,7 @@ class RealtimeService {
       this.deviceToSocket.delete(deviceKey);
 
       logger.debug(
-        `[Socket] Cleaned up device ${deviceId} for user ${userId} on disconnect`
+        `[Socket] Cleaned up device ${deviceId} for user ${userId} on disconnect`,
       );
     }
   }
@@ -409,18 +409,18 @@ class RealtimeService {
   notifyPlaylistUpdate(
     playlistId: string,
     event: "track_added",
-    data: TrackAddedPayload
+    data: TrackAddedPayload,
   ): void;
   notifyPlaylistUpdate(
     playlistId: string,
     event: "track_removed",
-    data: TrackRemovedPayload
+    data: TrackRemovedPayload,
   ): void;
   notifyPlaylistUpdate(playlistId: string, event: "reordered"): void;
   notifyPlaylistUpdate(
     playlistId: string,
     event: "track_added" | "track_removed" | "reordered",
-    data?: PlaylistEventPayload
+    data?: PlaylistEventPayload,
   ) {
     if (!this.io) {
       logger.warn("[Socket] Cannot emit - Socket.io not initialized");
@@ -432,7 +432,7 @@ class RealtimeService {
       .emit("playlist:updated", { playlistId, event, ...data });
 
     logger.debug(
-      `[Socket] Emitted playlist:updated (${event}) to playlist:${playlistId}`
+      `[Socket] Emitted playlist:updated (${event}) to playlist:${playlistId}`,
     );
   }
 
@@ -450,7 +450,7 @@ class RealtimeService {
   notifyPermissionChange(
     targetUserId: string,
     ownerId: string,
-    granted: boolean
+    granted: boolean,
   ) {
     if (!this.io) return;
 
@@ -461,7 +461,7 @@ class RealtimeService {
     });
 
     logger.debug(
-      `[Socket] Permission ${granted ? "granted" : "revoked"}: ${ownerId} -> ${targetUserId}`
+      `[Socket] Permission ${granted ? "granted" : "revoked"}: ${ownerId} -> ${targetUserId}`,
     );
   }
 

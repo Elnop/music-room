@@ -54,7 +54,7 @@ export class PlaylistController {
       const { userId } = req.params;
       const playlists = await playlistService.getPlaylistsByUser(
         userId,
-        authReq.user.id
+        authReq.user.id,
       );
 
       const response: ApiResponse = {

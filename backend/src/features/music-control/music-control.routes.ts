@@ -12,7 +12,7 @@ router.use(authMiddleware);
  * Get list of users that I have granted control to
  */
 router.get("/permissions", (req, res, next) =>
-  musicControlController.getMyPermissions(req, res, next)
+  musicControlController.getMyPermissions(req, res, next),
 );
 
 /**
@@ -20,7 +20,7 @@ router.get("/permissions", (req, res, next) =>
  * Grant control permission to a friend
  */
 router.post("/permissions/:userId", (req, res, next) =>
-  musicControlController.grantControl(req, res, next)
+  musicControlController.grantControl(req, res, next),
 );
 
 /**
@@ -28,7 +28,7 @@ router.post("/permissions/:userId", (req, res, next) =>
  * Revoke control permission from a user
  */
 router.delete("/permissions/:userId", (req, res, next) =>
-  musicControlController.revokeControl(req, res, next)
+  musicControlController.revokeControl(req, res, next),
 );
 
 /**
@@ -36,7 +36,7 @@ router.delete("/permissions/:userId", (req, res, next) =>
  * Check if the target user has granted me control
  */
 router.get("/can-control/:userId", (req, res, next) =>
-  musicControlController.checkCanControl(req, res, next)
+  musicControlController.checkCanControl(req, res, next),
 );
 
 export default router;
