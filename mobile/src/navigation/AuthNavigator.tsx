@@ -31,16 +31,8 @@ export function AuthNavigator() {
         },
       }}
     >
-      <Stack.Screen
-        name="Welcome"
-        component={WelcomeScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Login"
-        component={LoginScreen}
-        options={{ title: 'Sign In' }}
-      />
+      <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Sign In' }} />
       <Stack.Screen
         name="Register"
         component={RegisterScreen}

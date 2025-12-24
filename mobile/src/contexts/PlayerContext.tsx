@@ -13,14 +13,7 @@ interface PlayerContextValue {
 const PlayerContext = createContext<PlayerContextValue | null>(null);
 
 export function PlayerProvider({ children }: { children: React.ReactNode }) {
-  const {
-    currentTrack,
-    streamUrl,
-    setStreamUrl,
-    setLoading,
-    setError,
-    play,
-  } = usePlayerStore();
+  const { currentTrack, streamUrl, setStreamUrl, setLoading, setError, play } = usePlayerStore();
 
   // Create the single audio player instance
   const player = useAudioPlayer(streamUrl || '');
@@ -117,8 +110,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
   const value: PlayerContextValue = {
     player,
-    loading: usePlayerStore((state) => state.loading),
-    error: usePlayerStore((state) => state.error),
+    loading: usePlayerStore(state => state.loading),
+    error: usePlayerStore(state => state.error),
   };
 
   return <PlayerContext.Provider value={value}>{children}</PlayerContext.Provider>;

@@ -52,8 +52,7 @@ export function Button({
   const textStyle = [styles.text, styles[`${variant}Text` as keyof typeof styles]].filter(Boolean);
 
   // Spinner color based on variant
-  const spinnerColor =
-    variant === 'outline' ? theme.colors.primary : theme.colors.textInverse;
+  const spinnerColor = variant === 'outline' ? theme.colors.primary : theme.colors.textInverse;
 
   return (
     <TouchableOpacity

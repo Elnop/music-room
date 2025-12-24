@@ -98,8 +98,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // Persist to storage
       await get().saveToStorage();
     } catch (error) {
-      const errorMessage =
-        error instanceof ApiError ? error.message : 'Login failed';
+      const errorMessage = error instanceof ApiError ? error.message : 'Login failed';
       set({
         error: errorMessage,
         isLoading: false,
@@ -134,8 +133,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // Persist to storage
       await get().saveToStorage();
     } catch (error) {
-      const errorMessage =
-        error instanceof ApiError ? error.message : 'Registration failed';
+      const errorMessage = error instanceof ApiError ? error.message : 'Registration failed';
       set({
         error: errorMessage,
         isLoading: false,
@@ -255,7 +253,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         } else if (error instanceof Error) {
           // Use error message from oauth.ts or network layer
           if (error.message === 'Google Play Services not available') {
-            errorMessage = 'Google Play Services not available. Please update Google Play Services and try again.';
+            errorMessage =
+              'Google Play Services not available. Please update Google Play Services and try again.';
           } else if (error.message === 'Sign-in already in progress') {
             errorMessage = 'A sign-in is already in progress. Please wait.';
           } else if (error.message.includes('network') || error.message.includes('timeout')) {
@@ -389,8 +388,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // Persist to storage
       await get().saveToStorage();
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Profile update failed';
+      const errorMessage = error instanceof Error ? error.message : 'Profile update failed';
       set({
         error: errorMessage,
         isLoading: false,
@@ -500,8 +498,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       set({ isLoading: false });
     } catch (error) {
-      const errorMessage =
-        error instanceof ApiError ? error.message : 'Failed to unlink provider';
+      const errorMessage = error instanceof ApiError ? error.message : 'Failed to unlink provider';
       set({
         error: errorMessage,
         isLoading: false,

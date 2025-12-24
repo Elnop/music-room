@@ -261,8 +261,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
               }
               try {
                 await playlistApi.removeViewer(playlistId, userId);
-              } catch {
-              }
+              } catch {}
             } else {
               await playlistApi.removeCollaborator(playlistId, userId);
             }
@@ -294,8 +293,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
         await playlistApi.removeCollaborator(playlistId, userId);
         try {
           await playlistApi.addViewer(playlistId, userId);
-        } catch {
-        }
+        } catch {}
       } else {
         await playlistApi.addCollaborator(playlistId, userId);
       }

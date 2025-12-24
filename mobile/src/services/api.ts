@@ -52,10 +52,7 @@ export class ApiError extends Error {
 /**
  * Make API request with error handling
  */
-async function apiRequest<T>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<T> {
+async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_URL}${endpoint}`;
 
   try {
@@ -91,11 +88,7 @@ async function apiRequest<T>(
     try {
       data = await response.json();
     } catch (parseError) {
-      throw new ApiError(
-        'Invalid JSON response from server',
-        'PARSE_ERROR',
-        parseError
-      );
+      throw new ApiError('Invalid JSON response from server', 'PARSE_ERROR', parseError);
     }
 
     if (!data.success || data.error) {

@@ -36,7 +36,8 @@ interface LoginScreenProps {
 export function LoginScreen({ navigation }: LoginScreenProps) {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
-  const { login, loginWithGoogle, loginWithFacebook, isLoading, error, clearError } = useAuthStore();
+  const { login, loginWithGoogle, loginWithFacebook, isLoading, error, clearError } =
+    useAuthStore();
 
   const {
     control,
@@ -173,10 +174,7 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
 
             <View style={styles.footer}>
               <Text style={styles.footerText}>Don't have an account? </Text>
-              <Text
-                style={styles.footerLink}
-                onPress={() => navigation.navigate('Register')}
-              >
+              <Text style={styles.footerLink} onPress={() => navigation.navigate('Register')}>
                 Sign up
               </Text>
             </View>

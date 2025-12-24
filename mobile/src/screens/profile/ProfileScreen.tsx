@@ -61,81 +61,62 @@ export function ProfileScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
-      {/* Header Section */}
-      <View style={styles.header}>
-        <Avatar
-          size="lg"
-          name={user.displayName || user.username}
-          imageUrl={user.avatarUrl}
-        />
-        <Text style={styles.username}>{user.username}</Text>
-        {user.displayName && (
-          <Text style={styles.displayName}>{user.displayName}</Text>
-        )}
-        {user.bio && (
-          <Text style={styles.bio}>{user.bio}</Text>
-        )}
-      </View>
-
-      {/* Profile Info Card */}
-      <Card style={styles.card}>
-        <View style={styles.infoRow}>
-          <Text style={styles.label}>Email</Text>
-          <Text style={styles.value}>{user.email}</Text>
+        {/* Header Section */}
+        <View style={styles.header}>
+          <Avatar size="lg" name={user.displayName || user.username} imageUrl={user.avatarUrl} />
+          <Text style={styles.username}>{user.username}</Text>
+          {user.displayName && <Text style={styles.displayName}>{user.displayName}</Text>}
+          {user.bio && <Text style={styles.bio}>{user.bio}</Text>}
         </View>
 
-        <View style={styles.divider} />
+        {/* Profile Info Card */}
+        <Card style={styles.card}>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Email</Text>
+            <Text style={styles.value}>{user.email}</Text>
+          </View>
 
-        <View style={styles.infoRow}>
-          <Text style={styles.label}>Username</Text>
-          <Text style={styles.value}>{user.username}</Text>
+          <View style={styles.divider} />
+
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Username</Text>
+            <Text style={styles.value}>{user.username}</Text>
+          </View>
+
+          <View style={styles.divider} />
+
+          <TouchableOpacity style={styles.infoRow} onPress={() => navigation.navigate('Settings')}>
+            <Text style={styles.label}>Paramètres</Text>
+            <Text style={styles.chevron}>›</Text>
+          </TouchableOpacity>
+
+          <View style={styles.divider} />
+
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Member Since</Text>
+            <Text style={styles.value}>{new Date(user.createdAt).toLocaleDateString()}</Text>
+          </View>
+        </Card>
+
+        {/* Actions */}
+        <View style={styles.actions}>
+          <Button variant="primary" onPress={handleEditProfile} style={styles.actionButton}>
+            Edit Profile
+          </Button>
+
+          <Button
+            variant="outline"
+            onPress={handleLogout}
+            loading={isLoading}
+            style={styles.actionButton}
+          >
+            Logout
+          </Button>
         </View>
 
-        <View style={styles.divider} />
-
-        <TouchableOpacity
-          style={styles.infoRow}
-          onPress={() => navigation.navigate('Settings')}
-        >
-          <Text style={styles.label}>Paramètres</Text>
-          <Text style={styles.chevron}>›</Text>
-        </TouchableOpacity>
-
-        <View style={styles.divider} />
-
-        <View style={styles.infoRow}>
-          <Text style={styles.label}>Member Since</Text>
-          <Text style={styles.value}>
-            {new Date(user.createdAt).toLocaleDateString()}
-          </Text>
-        </View>
-      </Card>
-
-      {/* Actions */}
-      <View style={styles.actions}>
-        <Button
-          variant="primary"
-          onPress={handleEditProfile}
-          style={styles.actionButton}
-        >
-          Edit Profile
-        </Button>
-
-        <Button
-          variant="outline"
-          onPress={handleLogout}
-          loading={isLoading}
-          style={styles.actionButton}
-        >
-          Logout
-        </Button>
-      </View>
-
-      {/* Footer */}
-      <Text style={styles.footer}>
-        Music Room v1.0.0
-      </Text>
-    </ScrollView>
+        {/* Footer */}
+        <Text style={styles.footer}>Music Room v1.0.0</Text>
+      </ScrollView>
     </SafeAreaView>
   );
 }

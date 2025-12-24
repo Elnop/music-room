@@ -44,7 +44,7 @@ export const MOCK_PLAYLISTS: Playlist[] = [
   },
   {
     id: 'playlist-4',
-    name: "Late Night Jams",
+    name: 'Late Night Jams',
     description: 'Perfect tunes for midnight drives',
     coverUrl: 'https://i.scdn.co/image/ab67616d0000b2734718e2b124f79258be7bc452',
     ownerId: 'user-1', // demo user
@@ -80,8 +80,7 @@ export const findPlaylistById = (id: string): Playlist | undefined => {
  */
 export const getUserPlaylists = (userId: string): Playlist[] => {
   return MOCK_PLAYLISTS.filter(
-    playlist =>
-      playlist.ownerId === userId || playlist.collaboratorIds.includes(userId)
+    playlist => playlist.ownerId === userId || playlist.collaboratorIds.includes(userId)
   );
 };
 
@@ -116,10 +115,7 @@ export const isPlaylistOwner = (playlistId: string, userId: string): boolean => 
 /**
  * Helper: Check if user is collaborator
  */
-export const isPlaylistCollaborator = (
-  playlistId: string,
-  userId: string
-): boolean => {
+export const isPlaylistCollaborator = (playlistId: string, userId: string): boolean => {
   const playlist = findPlaylistById(playlistId);
   return playlist?.collaboratorIds.includes(userId) || false;
 };
@@ -208,10 +204,7 @@ export const addTrackToPlaylist = (playlistId: string, track: Track): boolean =>
 /**
  * Helper: Remove track from playlist
  */
-export const removeTrackFromPlaylist = (
-  playlistId: string,
-  trackId: string
-): boolean => {
+export const removeTrackFromPlaylist = (playlistId: string, trackId: string): boolean => {
   const playlist = findPlaylistById(playlistId);
   if (!playlist) {
     return false;
@@ -230,10 +223,7 @@ export const removeTrackFromPlaylist = (
 /**
  * Helper: Reorder tracks in playlist
  */
-export const reorderPlaylistTracks = (
-  playlistId: string,
-  trackIds: string[]
-): boolean => {
+export const reorderPlaylistTracks = (playlistId: string, trackIds: string[]): boolean => {
   const playlist = findPlaylistById(playlistId);
   if (!playlist) {
     return false;

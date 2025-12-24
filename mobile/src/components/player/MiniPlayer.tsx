@@ -24,7 +24,8 @@ export function MiniPlayer() {
     return null;
   }
 
-  const artworkUrl = currentTrack.artwork_url || currentTrack.user.avatar_url || 'https://via.placeholder.com/40';
+  const artworkUrl =
+    currentTrack.artwork_url || currentTrack.user.avatar_url || 'https://via.placeholder.com/40';
 
   const handlePlayPause = () => {
     if (loading || !player) return;
@@ -37,16 +38,9 @@ export function MiniPlayer() {
   };
 
   return (
-    <TouchableOpacity
-      style={styles.container}
-      onPress={toggleModal}
-      activeOpacity={0.9}
-    >
+    <TouchableOpacity style={styles.container} onPress={toggleModal} activeOpacity={0.9}>
       <View style={styles.content}>
-        <Image
-          source={{ uri: artworkUrl }}
-          style={styles.artwork}
-        />
+        <Image source={{ uri: artworkUrl }} style={styles.artwork} />
         <View style={styles.info}>
           <Text style={styles.title} numberOfLines={1}>
             {currentTrack.title}
@@ -64,9 +58,7 @@ export function MiniPlayer() {
           {loading ? (
             <ActivityIndicator size="small" color={theme.colors.background} />
           ) : (
-            <Text style={styles.playButtonText}>
-              {isPlaying ? '⏸' : '▶'}
-            </Text>
+            <Text style={styles.playButtonText}>{isPlaying ? '⏸' : '▶'}</Text>
           )}
         </TouchableOpacity>
       </View>

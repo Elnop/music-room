@@ -10,15 +10,8 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
  * to create and manage the single shared player instance
  */
 export function usePlayerController() {
-  const {
-    currentTrack,
-    streamUrl,
-    setPlayer,
-    setStreamUrl,
-    setLoading,
-    setError,
-    play,
-  } = usePlayerStore();
+  const { currentTrack, streamUrl, setPlayer, setStreamUrl, setLoading, setError, play } =
+    usePlayerStore();
 
   // Create the audio player instance - useAudioPlayer must be called at component level
   const player = useAudioPlayer(streamUrl || '');
@@ -130,7 +123,7 @@ export function usePlayerController() {
 
   return {
     player,
-    loading: usePlayerStore((state) => state.loading),
-    error: usePlayerStore((state) => state.error),
+    loading: usePlayerStore(state => state.loading),
+    error: usePlayerStore(state => state.error),
   };
 }

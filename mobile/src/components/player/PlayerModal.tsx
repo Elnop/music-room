@@ -23,8 +23,7 @@ export function PlayerModal() {
   const styles = React.useMemo(() => createStyles(theme), [theme]);
 
   const { player, loading, error } = usePlayer();
-  const { currentTrack, isPlaying, isModalOpen, setModalOpen, pause, resume } =
-    usePlayerStore();
+  const { currentTrack, isPlaying, isModalOpen, setModalOpen, pause, resume } = usePlayerStore();
 
   // Track player progress in real-time
   const { currentTime, duration } = usePlayerProgress();
@@ -138,11 +137,7 @@ export function PlayerModal() {
             <Text style={styles.controlText}>-10s</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.playButton}
-            onPress={handlePlayPause}
-            disabled={loading}
-          >
+          <TouchableOpacity style={styles.playButton} onPress={handlePlayPause} disabled={loading}>
             {loading ? (
               <ActivityIndicator size="large" color={theme.colors.background} />
             ) : (

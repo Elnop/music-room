@@ -29,11 +29,7 @@ const updateProfileSchema = z.object({
     .max(50, 'Display name must be less than 50 characters')
     .optional()
     .or(z.literal('')),
-  bio: z
-    .string()
-    .max(500, 'Bio must be less than 500 characters')
-    .optional()
-    .or(z.literal('')),
+  bio: z.string().max(500, 'Bio must be less than 500 characters').optional().or(z.literal('')),
 });
 
 type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
@@ -89,8 +85,7 @@ export function EditProfileScreen() {
         },
       ]);
     } catch (err) {
-      const errorMessage =
-        err instanceof ApiError ? err.message : 'Failed to update profile';
+      const errorMessage = err instanceof ApiError ? err.message : 'Failed to update profile';
       setError(errorMessage);
       Alert.alert('Error', errorMessage);
     } finally {
@@ -105,82 +100,82 @@ export function EditProfileScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
       >
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.contentContainer}
-        keyboardShouldPersistTaps="handled"
-      >
-        <Text style={styles.title}>Edit Profile</Text>
-        <Text style={styles.subtitle}>Update your profile information</Text>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.contentContainer}
+          keyboardShouldPersistTaps="handled"
+        >
+          <Text style={styles.title}>Edit Profile</Text>
+          <Text style={styles.subtitle}>Update your profile information</Text>
 
-        {error && <FormError message={error} />}
+          {error && <FormError message={error} />}
 
-        {/* Display Name Input */}
-        <Controller
-          control={control}
-          name="displayName"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              label="Display Name"
-              placeholder="Enter your display name"
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              error={errors.displayName?.message}
-              autoCapitalize="words"
-              returnKeyType="next"
-            />
-          )}
-        />
+          {/* Display Name Input */}
+          <Controller
+            control={control}
+            name="displayName"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                label="Display Name"
+                placeholder="Enter your display name"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                error={errors.displayName?.message}
+                autoCapitalize="words"
+                returnKeyType="next"
+              />
+            )}
+          />
 
-        {/* Bio Input */}
-        <Controller
-          control={control}
-          name="bio"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              label="Bio"
-              placeholder="Tell us about yourself..."
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              error={errors.bio?.message}
-              multiline
-              numberOfLines={4}
-              style={styles.bioInput}
-              returnKeyType="done"
-            />
-          )}
-        />
+          {/* Bio Input */}
+          <Controller
+            control={control}
+            name="bio"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                label="Bio"
+                placeholder="Tell us about yourself..."
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                error={errors.bio?.message}
+                multiline
+                numberOfLines={4}
+                style={styles.bioInput}
+                returnKeyType="done"
+              />
+            )}
+          />
 
-        {/* Info Text */}
-        <Text style={styles.infoText}>
-          Note: You cannot change your username or email. Contact support if you need to
-          update these fields.
-        </Text>
+          {/* Info Text */}
+          <Text style={styles.infoText}>
+            Note: You cannot change your username or email. Contact support if you need to update
+            these fields.
+          </Text>
 
-        {/* Action Buttons */}
-        <View style={styles.actions}>
-          <Button
-            variant="primary"
-            onPress={handleSubmit(onSubmit)}
-            loading={isLoading}
-            disabled={!isDirty || isLoading}
-            style={styles.actionButton}
-          >
-            Save Changes
-          </Button>
+          {/* Action Buttons */}
+          <View style={styles.actions}>
+            <Button
+              variant="primary"
+              onPress={handleSubmit(onSubmit)}
+              loading={isLoading}
+              disabled={!isDirty || isLoading}
+              style={styles.actionButton}
+            >
+              Save Changes
+            </Button>
 
-          <Button
-            variant="outline"
-            onPress={() => navigation.goBack()}
-            disabled={isLoading}
-            style={styles.actionButton}
-          >
-            Cancel
-          </Button>
-        </View>
-      </ScrollView>
+            <Button
+              variant="outline"
+              onPress={() => navigation.goBack()}
+              disabled={isLoading}
+              style={styles.actionButton}
+            >
+              Cancel
+            </Button>
+          </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

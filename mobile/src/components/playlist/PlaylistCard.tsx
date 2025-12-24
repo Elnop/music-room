@@ -12,12 +12,7 @@ interface PlaylistCardProps {
   onPress: () => void;
 }
 
-export function PlaylistCard({
-  playlist,
-  trackCount,
-  ownerName,
-  onPress,
-}: PlaylistCardProps) {
+export function PlaylistCard({ playlist, trackCount, ownerName, onPress }: PlaylistCardProps) {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
 

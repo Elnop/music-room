@@ -24,10 +24,7 @@ export function SoundCloudTrackItem({ track, onPlay, onAddToPlaylist }: Props) {
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => onPlay(track)} style={styles.mainContent}>
-        <Image
-          source={{ uri: artworkUrl }}
-          style={styles.artwork}
-        />
+        <Image source={{ uri: artworkUrl }} style={styles.artwork} />
         <View style={styles.info}>
           <Text style={styles.title} numberOfLines={1}>
             {track.title}

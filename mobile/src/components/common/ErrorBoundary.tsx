@@ -56,9 +56,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
       return (
         <View style={styles.container}>
           <Text style={styles.title}>Something went wrong</Text>
-          <Text style={styles.error}>
-            {this.state.error?.message || 'Unknown error'}
-          </Text>
+          <Text style={styles.error}>{this.state.error?.message || 'Unknown error'}</Text>
           {__DEV__ && this.state.error?.stack && (
             <View style={styles.stackContainer}>
               <Text style={styles.stackTitle}>Stack Trace:</Text>

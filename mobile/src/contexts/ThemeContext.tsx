@@ -44,7 +44,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   const loadTheme = async () => {
     try {
       const savedTheme = await AsyncStorage.getItem(THEME_STORAGE_KEY);
-      if (savedTheme && (savedTheme in THEMES)) {
+      if (savedTheme && savedTheme in THEMES) {
         setThemeName(savedTheme as ThemeName);
       }
     } catch (error) {
@@ -80,11 +80,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     setTheme,
   };
 
-  return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
 export function useTheme() {

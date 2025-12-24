@@ -100,10 +100,7 @@ export const profileApi = {
   /**
    * Update current user's profile
    */
-  async updateProfile(
-    accessToken: string,
-    data: UpdateProfileData
-  ): Promise<UserProfile> {
+  async updateProfile(accessToken: string, data: UpdateProfileData): Promise<UserProfile> {
     return apiRequest<UserProfile>('/api/profile', accessToken, {
       method: 'PATCH',
       body: JSON.stringify(data),
@@ -122,10 +119,7 @@ export const profileApi = {
   /**
    * Get user profile by ID
    */
-  async getUserProfile(
-    accessToken: string,
-    userId: string
-  ): Promise<UserProfile> {
+  async getUserProfile(accessToken: string, userId: string): Promise<UserProfile> {
     return apiRequest<UserProfile>(`/api/profile/${userId}`, accessToken, {
       method: 'GET',
     });
@@ -134,16 +128,10 @@ export const profileApi = {
   /**
    * Search users by username or display name
    */
-  async searchUsers(
-    accessToken: string,
-    query: string,
-    limit = 20
-  ): Promise<UserProfile[]> {
+  async searchUsers(accessToken: string, query: string, limit = 20): Promise<UserProfile[]> {
     const params = new URLSearchParams({ q: query, limit: limit.toString() });
-    return apiRequest<UserProfile[]>(
-      `/api/profile/search?${params.toString()}`,
-      accessToken,
-      { method: 'GET' }
-    );
+    return apiRequest<UserProfile[]>(`/api/profile/search?${params.toString()}`, accessToken, {
+      method: 'GET',
+    });
   },
 };

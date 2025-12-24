@@ -2,19 +2,14 @@ import {
   GoogleSignin,
   statusCodes,
   type User as GoogleUser,
-} from "@react-native-google-signin/google-signin";
-import {
-  LoginManager,
-  AccessToken,
-  AuthenticationToken,
-  Settings,
-} from "react-native-fbsdk-next";
-import { Platform } from "react-native";
-import Constants from "expo-constants";
+} from '@react-native-google-signin/google-signin';
+import { LoginManager, AccessToken, AuthenticationToken, Settings } from 'react-native-fbsdk-next';
+import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 
 // Type guard to safely extract ID token from Google Sign-In response
 interface GoogleSignInResponse {
-  type?: "success" | "cancelled";
+  type?: 'success' | 'cancelled';
   data?: {
     idToken?: string | null;
     user?: GoogleUser;
@@ -28,9 +23,7 @@ function extractIdToken(response: GoogleSignInResponse): string {
   const idToken = response.data?.idToken || response.idToken;
 
   if (!idToken) {
-    throw new Error(
-      "No ID token received from Google Sign-In. Please try again.",
-    );
+    throw new Error('No ID token received from Google Sign-In. Please try again.');
   }
 
   return idToken;
@@ -42,9 +35,7 @@ const WEB_CLIENT_ID =
   process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 
 if (!WEB_CLIENT_ID) {
-  console.warn(
-    "EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID is not defined. Google login will not work.",
-  );
+  console.warn('EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID is not defined. Google login will not work.');
 }
 
 // Get Facebook OAuth configuration from environment variables
@@ -53,9 +44,7 @@ const FACEBOOK_APP_ID =
   process.env.EXPO_PUBLIC_FACEBOOK_APP_ID;
 
 if (!FACEBOOK_APP_ID) {
-  console.warn(
-    "EXPO_PUBLIC_FACEBOOK_APP_ID is not defined. Facebook login will not work.",
-  );
+  console.warn('EXPO_PUBLIC_FACEBOOK_APP_ID is not defined. Facebook login will not work.');
 }
 
 /**
@@ -80,7 +69,7 @@ export const configureGoogleSignIn = (): void => {
 export const signInWithGoogle = async (): Promise<string> => {
   if (!WEB_CLIENT_ID) {
     throw new Error(
-      "Google Sign-In is not configured. Please set EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID in your .env file.",
+      'Google Sign-In is not configured. Please set EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID in your .env file.'
     );
   }
 
@@ -112,11 +101,11 @@ export const signInWithGoogle = async (): Promise<string> => {
     const googleError = error as { code?: string; message?: string };
 
     if (googleError.code === statusCodes.SIGN_IN_CANCELLED) {
-      throw new Error("SIGN_IN_CANCELLED");
+      throw new Error('SIGN_IN_CANCELLED');
     } else if (googleError.code === statusCodes.IN_PROGRESS) {
-      throw new Error("Sign-in already in progress");
+      throw new Error('Sign-in already in progress');
     } else if (googleError.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-      throw new Error("Google Play Services not available");
+      throw new Error('Google Play Services not available');
     } else {
       // Log detailed error for debugging (only in development)
       if (__DEV__) {
@@ -144,7 +133,7 @@ export const signOutGoogle = async (): Promise<void> => {
   try {
     await GoogleSignin.signOut();
   } catch (error) {
-    console.error("Error signing out from Google:", error);
+    console.error('Error signing out from Google:', error);
   }
 };
 
@@ -175,24 +164,21 @@ export const signInWithFacebook = async (): Promise<string> => {
   try {
     if (!FACEBOOK_APP_ID) {
       throw new Error(
-        "Facebook App ID not configured. Please set EXPO_PUBLIC_FACEBOOK_APP_ID in your .env file.",
+        'Facebook App ID not configured. Please set EXPO_PUBLIC_FACEBOOK_APP_ID in your .env file.'
       );
     }
 
     // Request Facebook login with public_profile and email permissions
-    const result = await LoginManager.logInWithPermissions([
-      "public_profile",
-      "email",
-    ]);
+    const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
 
     if (result.isCancelled) {
-      throw new Error("SIGN_IN_CANCELLED");
+      throw new Error('SIGN_IN_CANCELLED');
     }
 
     // Get access token based on platform
     let accessToken: string | null = null;
 
-    if (Platform.OS === "ios") {
+    if (Platform.OS === 'ios') {
       // iOS: Try to get AuthenticationToken (Limited Login)
       // Note: Limited Login tokens cannot be used with Graph API
       // So we also try to get the regular AccessToken
@@ -203,7 +189,7 @@ export const signInWithFacebook = async (): Promise<string> => {
       accessToken = accessTokenData?.accessToken || null;
 
       if (__DEV__) {
-        console.log("[OAuth] Facebook iOS tokens:", {
+        console.log('[OAuth] Facebook iOS tokens:', {
           hasAuthToken: !!authToken,
           hasAccessToken: !!accessToken,
         });
@@ -215,31 +201,29 @@ export const signInWithFacebook = async (): Promise<string> => {
     }
 
     if (!accessToken) {
-      throw new Error(
-        "No access token received from Facebook Login. Please try again.",
-      );
+      throw new Error('No access token received from Facebook Login. Please try again.');
     }
 
-    console.log("[OAuth] Facebook access token received successfully");
+    console.log('[OAuth] Facebook access token received successfully');
 
     return accessToken;
   } catch (error: unknown) {
     const fbError = error as { message?: string };
 
     // Handle cancellation
-    if (fbError.message === "SIGN_IN_CANCELLED") {
-      throw new Error("SIGN_IN_CANCELLED");
+    if (fbError.message === 'SIGN_IN_CANCELLED') {
+      throw new Error('SIGN_IN_CANCELLED');
     }
 
     // Log detailed error for debugging
     if (__DEV__) {
-      console.error("[OAuth] Facebook Sign-In failed:", {
+      console.error('[OAuth] Facebook Sign-In failed:', {
         errorMessage: fbError.message,
         errorType: error?.constructor?.name,
         fullError: error,
       });
     } else {
-      console.error("[OAuth] Facebook Sign-In failed:", {
+      console.error('[OAuth] Facebook Sign-In failed:', {
         errorMessage: fbError.message,
       });
     }
@@ -254,9 +238,9 @@ export const signInWithFacebook = async (): Promise<string> => {
 export const signOutFacebook = async (): Promise<void> => {
   try {
     await LoginManager.logOut();
-    console.log("[OAuth] Facebook sign-out successful");
+    console.log('[OAuth] Facebook sign-out successful');
   } catch (error) {
-    console.error("Error signing out from Facebook:", error);
+    console.error('Error signing out from Facebook:', error);
   }
 };
 

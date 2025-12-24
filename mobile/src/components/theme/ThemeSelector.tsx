@@ -44,46 +44,28 @@ export function ThemeSelector() {
 
   return (
     <View style={styles.container}>
-      {THEME_OPTIONS.map((option) => {
+      {THEME_OPTIONS.map(option => {
         const isSelected = option.name === themeName;
         return (
           <TouchableOpacity
             key={option.name}
-            style={[
-              styles.themeCard,
-              isSelected && styles.themeCardSelected,
-            ]}
+            style={[styles.themeCard, isSelected && styles.themeCardSelected]}
             onPress={() => handleThemeChange(option.name)}
             activeOpacity={0.7}
           >
             {/* Preview des couleurs */}
             <View style={styles.colorPreview}>
+              <View style={[styles.colorDot, { backgroundColor: option.preview.colors.primary }]} />
               <View
-                style={[
-                  styles.colorDot,
-                  { backgroundColor: option.preview.colors.primary },
-                ]}
+                style={[styles.colorDot, { backgroundColor: option.preview.colors.secondary }]}
               />
-              <View
-                style={[
-                  styles.colorDot,
-                  { backgroundColor: option.preview.colors.secondary },
-                ]}
-              />
-              <View
-                style={[
-                  styles.colorDot,
-                  { backgroundColor: option.preview.colors.accent },
-                ]}
-              />
+              <View style={[styles.colorDot, { backgroundColor: option.preview.colors.accent }]} />
             </View>
 
             {/* Infos */}
             <View style={styles.info}>
               <Text style={styles.themeLabel}>{option.label}</Text>
-              <Text style={styles.themeDescription}>
-                {option.description}
-              </Text>
+              <Text style={styles.themeDescription}>{option.description}</Text>
             </View>
 
             {/* Checkmark si sélectionné */}

@@ -15,7 +15,7 @@ interface SoundCloudState {
   clearError: () => void;
 }
 
-export const useSoundCloudStore = create<SoundCloudState>((set) => ({
+export const useSoundCloudStore = create<SoundCloudState>(set => ({
   searchResults: [],
   isSearching: false,
   error: null,
@@ -35,9 +35,7 @@ export const useSoundCloudStore = create<SoundCloudState>((set) => ({
         limit: limit.toString(),
       });
 
-      const response = await fetch(
-        `${API_URL}/api/soundcloud/search?${params.toString()}`
-      );
+      const response = await fetch(`${API_URL}/api/soundcloud/search?${params.toString()}`);
 
       if (!response.ok) {
         throw new Error(`Search failed: ${response.statusText}`);

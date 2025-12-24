@@ -39,7 +39,7 @@ function parseApiError(error: unknown): string {
         return 'This track is already in the playlist';
       }
       if (apiError.error.code === 'FORBIDDEN') {
-        return 'You don\'t have permission to add tracks to this playlist';
+        return "You don't have permission to add tracks to this playlist";
       }
       return apiError.error.message;
     }
@@ -96,11 +96,7 @@ export function PlaylistSelectorModal({ visible, track, onClose }: Props) {
 
       console.log('🟢 [PlaylistSelector] Track added successfully');
 
-      Alert.alert(
-        'Success',
-        `Added "${track.title}" to playlist`,
-        [{ text: 'OK' }]
-      );
+      Alert.alert('Success', `Added "${track.title}" to playlist`, [{ text: 'OK' }]);
 
       onClose();
     } catch (error) {
@@ -108,28 +104,22 @@ export function PlaylistSelectorModal({ visible, track, onClose }: Props) {
 
       const errorMessage = parseApiError(error);
 
-      Alert.alert(
-        'Error',
-        errorMessage,
-        [{ text: 'OK' }]
-      );
+      Alert.alert('Error', errorMessage, [{ text: 'OK' }]);
     } finally {
       setIsAdding(false);
     }
   };
 
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      transparent
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <View style={styles.overlay}>
         <View style={styles.modal}>
           <View style={styles.header}>
             <Text style={styles.title}>Add to Playlist</Text>
-            <TouchableOpacity onPress={onClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+            <TouchableOpacity
+              onPress={onClose}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
               <Text style={styles.closeIcon}>✕</Text>
             </TouchableOpacity>
           </View>
@@ -147,13 +137,10 @@ export function PlaylistSelectorModal({ visible, track, onClose }: Props) {
 
           <FlatList
             data={playlists}
-            keyExtractor={(item) => item.id}
+            keyExtractor={item => item.id}
             renderItem={({ item }) => (
               <TouchableOpacity
-                style={[
-                  styles.playlistItem,
-                  isAdding && styles.playlistItemDisabled,
-                ]}
+                style={[styles.playlistItem, isAdding && styles.playlistItemDisabled]}
                 onPress={() => handleSelectPlaylist(item.id)}
                 disabled={isAdding}
               >

@@ -27,9 +27,7 @@ export function PlaylistHeader({ playlist }: PlaylistHeaderProps) {
         </View>
       )}
       <Text style={styles.name}>{playlist.name}</Text>
-      {playlist.description && (
-        <Text style={styles.description}>{playlist.description}</Text>
-      )}
+      {playlist.description && <Text style={styles.description}>{playlist.description}</Text>}
       <View style={styles.meta}>
         <Avatar uri={playlist.owner.avatarUrl} name={playlist.owner.displayName} size="sm" />
         <Text style={styles.owner}>{playlist.owner.displayName || playlist.owner.username}</Text>

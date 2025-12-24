@@ -27,10 +27,7 @@ type AuthStackParamList = {
   Register: undefined;
 };
 
-type RegisterScreenNavigationProp = NativeStackNavigationProp<
-  AuthStackParamList,
-  'Register'
->;
+type RegisterScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Register'>;
 
 interface RegisterScreenProps {
   navigation: RegisterScreenNavigationProp;
@@ -39,7 +36,8 @@ interface RegisterScreenProps {
 export function RegisterScreen({ navigation }: RegisterScreenProps) {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
-  const { register, loginWithGoogle, loginWithFacebook, isLoading, error, clearError } = useAuthStore();
+  const { register, loginWithGoogle, loginWithFacebook, isLoading, error, clearError } =
+    useAuthStore();
 
   const {
     control,
@@ -156,11 +154,8 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
 
               <View style={styles.passwordHint}>
                 <Text style={styles.passwordHintText}>
-                  Password must contain:{'\n'}
-                  • At least 8 characters{'\n'}
-                  • One uppercase letter{'\n'}
-                  • One number{'\n'}
-                  • One special character
+                  Password must contain:{'\n'}• At least 8 characters{'\n'}• One uppercase letter
+                  {'\n'}• One number{'\n'}• One special character
                 </Text>
               </View>
 
@@ -202,10 +197,7 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
 
             <View style={styles.footer}>
               <Text style={styles.footerText}>Already have an account? </Text>
-              <Text
-                style={styles.footerLink}
-                onPress={() => navigation.navigate('Login')}
-              >
+              <Text style={styles.footerLink} onPress={() => navigation.navigate('Login')}>
                 Sign in
               </Text>
             </View>

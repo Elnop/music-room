@@ -50,7 +50,7 @@ EXPO_PUBLIC_SOUNDCLOUD_CLIENT_ID=
 
 ## Démarrage
 
-### Développement avec Expo Go 
+### Développement avec Expo Go
 
 1. Installer Expo Go sur votre téléphone Android/iOS
 2. Lancer le serveur :

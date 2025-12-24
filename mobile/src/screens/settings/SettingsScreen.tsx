@@ -18,17 +18,13 @@ export function SettingsScreen() {
       {/* Section future : Compte */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Compte</Text>
-        <Text style={styles.placeholder}>
-          Paramètres du compte à venir...
-        </Text>
+        <Text style={styles.placeholder}>Paramètres du compte à venir...</Text>
       </View>
 
       {/* Section future : Notifications */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Notifications</Text>
-        <Text style={styles.placeholder}>
-          Paramètres des notifications à venir...
-        </Text>
+        <Text style={styles.placeholder}>Paramètres des notifications à venir...</Text>
       </View>
     </ScrollView>
   );

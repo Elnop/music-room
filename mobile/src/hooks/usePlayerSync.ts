@@ -8,7 +8,7 @@ import { usePlayerStore } from '@/store/playerStore';
  */
 export function usePlayerSync() {
   const { player } = usePlayer();
-  const isPlaying = usePlayerStore((state) => state.isPlaying);
+  const isPlaying = usePlayerStore(state => state.isPlaying);
   const lastIsPlayingRef = useRef(isPlaying);
 
   // Sync player playback with isPlaying state

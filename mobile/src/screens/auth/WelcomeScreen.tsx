@@ -12,10 +12,7 @@ type AuthStackParamList = {
   Register: undefined;
 };
 
-type WelcomeScreenNavigationProp = NativeStackNavigationProp<
-  AuthStackParamList,
-  'Welcome'
->;
+type WelcomeScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Welcome'>;
 
 interface WelcomeScreenProps {
   navigation: WelcomeScreenNavigationProp;
@@ -31,9 +28,7 @@ export function WelcomeScreen({ navigation }: WelcomeScreenProps) {
         <View style={styles.header}>
           <Text style={styles.logo}>🎵</Text>
           <Text style={styles.title}>Music Room</Text>
-          <Text style={styles.subtitle}>
-            Create collaborative playlists with friends
-          </Text>
+          <Text style={styles.subtitle}>Create collaborative playlists with friends</Text>
         </View>
 
         <View style={styles.buttonContainer}>

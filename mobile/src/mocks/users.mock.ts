@@ -78,9 +78,7 @@ export const findUserByEmail = (email: string): UserProfile | undefined => {
  * Helper: Find user by username
  */
 export const findUserByUsername = (username: string): UserProfile | undefined => {
-  return MOCK_USERS.find(
-    user => user.username.toLowerCase() === username.toLowerCase()
-  );
+  return MOCK_USERS.find(user => user.username.toLowerCase() === username.toLowerCase());
 };
 
 /**
@@ -101,7 +99,5 @@ export const isEmailTaken = (email: string): boolean => {
  * Helper: Check if username exists
  */
 export const isUsernameTaken = (username: string): boolean => {
-  return MOCK_USERS.some(
-    user => user.username.toLowerCase() === username.toLowerCase()
-  );
+  return MOCK_USERS.some(user => user.username.toLowerCase() === username.toLowerCase());
 };

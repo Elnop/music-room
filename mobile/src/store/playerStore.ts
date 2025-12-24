@@ -27,7 +27,7 @@ interface PlayerState {
   setModalOpen: (isOpen: boolean) => void;
 }
 
-export const usePlayerStore = create<PlayerState>((set) => ({
+export const usePlayerStore = create<PlayerState>(set => ({
   // Initial state
   currentTrack: null,
   streamUrl: null,
@@ -37,22 +37,22 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   isModalOpen: false,
 
   // Set the stream URL
-  setStreamUrl: (url) => {
+  setStreamUrl: url => {
     set({ streamUrl: url });
   },
 
   // Set loading state
-  setLoading: (loading) => {
+  setLoading: loading => {
     set({ loading });
   },
 
   // Set error state
-  setError: (error) => {
+  setError: error => {
     set({ error });
   },
 
   // Play a track (sets track and prepares for playback)
-  playTrack: (track) => {
+  playTrack: track => {
     set({
       currentTrack: track,
       isPlaying: true,
@@ -88,11 +88,11 @@ export const usePlayerStore = create<PlayerState>((set) => ({
 
   // Toggle modal visibility
   toggleModal: () => {
-    set((state) => ({ isModalOpen: !state.isModalOpen }));
+    set(state => ({ isModalOpen: !state.isModalOpen }));
   },
 
   // Set modal visibility
-  setModalOpen: (isOpen) => {
+  setModalOpen: isOpen => {
     set({ isModalOpen: isOpen });
   },
 }));

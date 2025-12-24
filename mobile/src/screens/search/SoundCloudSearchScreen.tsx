@@ -1,12 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  FlatList,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/contexts';
 import { useSoundCloudStore } from '@/store/soundcloudStore';
@@ -84,7 +77,7 @@ export function SoundCloudSearchScreen() {
       ) : (
         <FlatList
           data={searchResults}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={item => item.id.toString()}
           renderItem={({ item }) => (
             <SoundCloudTrackItem
               track={item}
@@ -99,9 +92,7 @@ export function SoundCloudSearchScreen() {
               <View style={styles.emptyState}>
                 <Text style={styles.emptyIcon}>🎵</Text>
                 <Text style={styles.emptyText}>Search for music on SoundCloud</Text>
-                <Text style={styles.emptySubtext}>
-                  Find tracks to add to your playlists
-                </Text>
+                <Text style={styles.emptySubtext}>Find tracks to add to your playlists</Text>
               </View>
             )
           }
