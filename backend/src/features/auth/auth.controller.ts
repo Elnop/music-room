@@ -4,6 +4,7 @@ import {
   registerSchema,
   loginSchema,
   googleLoginSchema,
+  facebookLoginSchema,
 } from "./auth.validators.js";
 import type { ApiResponse } from "@/shared/types/global.types.js";
 import type { AuthenticatedRequest } from "@/shared/types/global.types.js";
@@ -161,6 +162,32 @@ export class AuthController {
       res.status(200).json(response);
     } catch (error) {
       logger.error("Google login error", { error });
+      next(error);
+    }
+  }
+
+  /**
+   * POST /api/auth/facebook
+   * Login with Facebook OAuth
+   */
+  async facebookLogin(req: Request, res: Response, next: NextFunction) {
+    try {
+      logger.info("Facebook OAuth login request received");
+
+      const validated = facebookLoginSchema.parse(req.body);
+      const result = await authService.loginWithFacebook(validated.accessToken);
+
+      const response: ApiResponse = {
+        success: true,
+        data: result,
+        meta: {
+          timestamp: new Date().toISOString(),
+        },
+      };
+
+      res.status(200).json(response);
+    } catch (error) {
+      logger.error("Facebook login error", { error });
       next(error);
     }
   }

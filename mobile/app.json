@@ -68,6 +68,19 @@
         {
           "iosUrlScheme": "com.googleusercontent.apps.187081511514-8dc2itp857pu6qtk3bkg7l389n5bhs98"
         }
+      ],
+      [
+        "react-native-fbsdk-next",
+        {
+          "appID": "335709326982644",
+          "clientToken": "e7df3370baef0cac5ac750531fc3bcca",
+          "displayName": "Music Room",
+          "scheme": "fb335709326982644",
+          "advertiserIDCollectionEnabled": false,
+          "autoLogAppEventsEnabled": false,
+          "isAutoInitEnabled": true,
+          "iosUserTrackingPermission": "This identifier will be used to deliver personalized music recommendations."
+        }
       ]
     ],
     "extra": {

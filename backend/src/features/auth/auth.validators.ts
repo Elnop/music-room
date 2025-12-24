@@ -37,7 +37,12 @@ export const googleLoginSchema = z.object({
   idToken: z.string().min(1, "ID token is required"),
 });
 
+export const facebookLoginSchema = z.object({
+  accessToken: z.string().min(1, "Access token is required"),
+});
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>;
 export type GoogleLoginInput = z.infer<typeof googleLoginSchema>;
+export type FacebookLoginInput = z.infer<typeof facebookLoginSchema>;

@@ -136,18 +136,32 @@ export class UserService {
    * Create or retrieve OAuth user
    * @param provider - OAuth provider ('google' | 'facebook')
    * @param providerId - Provider-specific user ID (Google sub claim, Facebook user ID)
-   * @param email - User email
+   * @param email - User email (optional - will generate synthetic email if missing)
    * @param profile - OAuth profile data
    * @returns User profile and session
    */
   static async createOAuthUser(
     provider: "google" | "facebook",
     providerId: string,
-    email: string,
+    email: string | undefined,
     profile: any, // GoogleProfile | FacebookProfile
   ): Promise<{ userProfile: UserProfile; session: Session }> {
     try {
       const providerColumn = `${provider}_id`; // 'google_id' or 'facebook_id'
+
+      // Generate synthetic email if not provided (e.g., user denied email permission)
+      // Format: facebook_123456789@music-room.local or google_123456789@music-room.local
+      const effectiveEmail =
+        email || `${provider}_${providerId}@music-room.local`;
+
+      // Log if using synthetic email
+      if (!email) {
+        logger.info("Using synthetic email for OAuth user", {
+          provider,
+          providerId,
+          syntheticEmail: effectiveEmail,
+        });
+      }
 
       // 1. Check if OAuth provider ID already exists
       const { data: existingOAuth } = await supabase
@@ -158,7 +172,7 @@ export class UserService {
 
       if (existingOAuth) {
         // User exists, create session
-        const session = await this.createSessionForOAuthUser(email);
+        const session = await this.createSessionForOAuthUser(effectiveEmail);
 
         return {
           userProfile: existingOAuth,
@@ -167,34 +181,39 @@ export class UserService {
       }
 
       // 2. Check if email exists (link provider to existing account)
-      // Use paginated search instead of loading all users for better performance
+      // Skip email-based lookup if using synthetic email
       let existingUser = null;
-      let page = 1;
-      const perPage = 100;
 
-      while (!existingUser) {
-        const { data: pageData, error: listError } =
-          await supabase.auth.admin.listUsers({ page, perPage });
+      if (email) {
+        // Only search by email if real email was provided
+        // Use paginated search instead of loading all users for better performance
+        let page = 1;
+        const perPage = 100;
 
-        if (listError) {
-          logger.error("Failed to list users from Supabase auth", {
-            error: listError,
-          });
-          break;
+        while (!existingUser) {
+          const { data: pageData, error: listError } =
+            await supabase.auth.admin.listUsers({ page, perPage });
+
+          if (listError) {
+            logger.error("Failed to list users from Supabase auth", {
+              error: listError,
+            });
+            break;
+          }
+
+          const users = pageData?.users ?? [];
+          if (users.length === 0) {
+            // No more users, email doesn't exist
+            break;
+          }
+
+          existingUser = users.find((u) => u.email === email) ?? null;
+          if (existingUser) {
+            break;
+          }
+
+          page += 1;
         }
-
-        const users = pageData?.users ?? [];
-        if (users.length === 0) {
-          // No more users, email doesn't exist
-          break;
-        }
-
-        existingUser = users.find((u) => u.email === email) ?? null;
-        if (existingUser) {
-          break;
-        }
-
-        page += 1;
       }
 
       if (existingUser) {
@@ -208,7 +227,8 @@ export class UserService {
           // Check if this provider is already linked to the account
           if (existingProfile[providerColumn]) {
             // Provider already linked, just create session
-            const session = await this.createSessionForOAuthUser(email);
+            const session =
+              await this.createSessionForOAuthUser(effectiveEmail);
             return {
               userProfile: existingProfile as UserProfile,
               session,
@@ -232,7 +252,7 @@ export class UserService {
           }
 
           // Create session for existing user
-          const session = await this.createSessionForOAuthUser(email);
+          const session = await this.createSessionForOAuthUser(effectiveEmail);
 
           return {
             userProfile: existingProfile as UserProfile,
@@ -243,19 +263,20 @@ export class UserService {
 
       // 3. Create new OAuth user
       const username = await this.generateUniqueUsername(
-        profile.name || email.split("@")[0],
+        profile.name || effectiveEmail.split("@")[0],
       );
 
       // Create Supabase Auth user (no password)
       const { data: authData, error: authError } =
         await supabase.auth.admin.createUser({
-          email,
-          email_confirm: true, // Auto-confirm (OAuth verified)
+          email: effectiveEmail,
+          email_confirm: true, // Auto-confirm (OAuth verified or synthetic email)
           user_metadata: {
             oauth_provider: provider,
             oauth_provider_id: providerId,
             display_name: profile.name,
             avatar_url: profile.picture || null,
+            is_synthetic_email: !email, // Flag for synthetic emails
           },
         });
 
@@ -290,7 +311,7 @@ export class UserService {
           if (profileError.code === "23505") {
             // Rollback auth user
             await supabase.auth.admin.deleteUser(authData.user.id);
-            // Retry with new username
+            // Retry with new username (pass original email, not effectiveEmail)
             return this.createOAuthUser(provider, providerId, email, profile);
           }
 
@@ -315,7 +336,7 @@ export class UserService {
         }
 
         // Generate session
-        const session = await this.createSessionForOAuthUser(email);
+        const session = await this.createSessionForOAuthUser(effectiveEmail);
 
         return {
           userProfile,
