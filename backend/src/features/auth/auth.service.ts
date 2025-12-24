@@ -263,6 +263,68 @@ export class AuthService {
   }
 
   /**
+   * Login with Facebook OAuth
+   * @param accessToken - Facebook access token from mobile app
+   * @returns AuthResponse with user and session
+   */
+  async loginWithFacebook(accessToken: string): Promise<AuthResponse> {
+    try {
+      logger.info("Facebook OAuth login attempt");
+
+      // 1. Verify Facebook access token
+      const facebookPayload =
+        await OAuthService.verifyFacebookToken(accessToken);
+
+      // 2. Create or retrieve OAuth user (includes session generation)
+      // Email may be undefined if user denied email permission
+      const { userProfile, session } = await UserService.createOAuthUser(
+        "facebook",
+        facebookPayload.id,
+        facebookPayload.email, // May be undefined - synthetic email will be generated
+        {
+          name: facebookPayload.name,
+          picture: facebookPayload.picture,
+        },
+      );
+
+      logger.info("Facebook OAuth login successful", {
+        userId: userProfile.id,
+        username: userProfile.username,
+        hasSyntheticEmail: !facebookPayload.email,
+      });
+
+      // 3. Return formatted auth response
+      // Use real email if provided, otherwise use email from session (which might be synthetic)
+      const responseEmail = facebookPayload.email || session.user.email || "";
+
+      return {
+        user: {
+          id: userProfile.id,
+          email: responseEmail,
+          username: userProfile.username,
+          displayName: (userProfile as any).display_name,
+          avatarUrl: (userProfile as any).avatar_url,
+          bio: userProfile.bio,
+          createdAt: (userProfile as any).created_at,
+          updatedAt: (userProfile as any).updated_at,
+        },
+        session: {
+          accessToken: session.access_token,
+          refreshToken: session.refresh_token,
+          expiresIn: session.expires_in || 3600,
+          expiresAt: session.expires_at || 0,
+        },
+      };
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error;
+      }
+      logger.error("Unexpected error during Facebook OAuth login", { error });
+      throw new AppError(500, "Facebook login failed", "FACEBOOK_LOGIN_ERROR");
+    }
+  }
+
+  /**
    * Unlink an OAuth provider from a user's account
    * @param userId - User ID
    * @param provider - Provider to unlink ('google' or 'facebook')

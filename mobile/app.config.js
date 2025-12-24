@@ -71,6 +71,23 @@ module.exports = {
             "com.googleusercontent.apps.187081511514-8dc2itp857pu6qtk3bkg7l389n5bhs98",
         },
       ],
+      [
+        "react-native-fbsdk-next",
+        {
+          appID:
+            process.env.EXPO_PUBLIC_FACEBOOK_APP_ID || "335709326982644",
+          clientToken:
+            process.env.EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN ||
+            "e7df3370baef0cac5ac750531fc3bcca",
+          displayName: "Music Room",
+          scheme: `fb${process.env.EXPO_PUBLIC_FACEBOOK_APP_ID || "335709326982644"}`,
+          advertiserIDCollectionEnabled: false,
+          autoLogAppEventsEnabled: false,
+          isAutoInitEnabled: true,
+          iosUserTrackingPermission:
+            "This identifier will be used to deliver personalized music recommendations.",
+        },
+      ],
     ],
     extra: {
       eas: {
@@ -80,6 +97,9 @@ module.exports = {
         process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
       EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME:
         process.env.EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME,
+      EXPO_PUBLIC_FACEBOOK_APP_ID: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID,
+      EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN:
+        process.env.EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN,
     },
   },
 };

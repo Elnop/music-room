@@ -295,9 +295,12 @@ feature/
 - Error responses follow standardized format from `error-handler.ts`
 - JWT tokens verified via `auth.middleware.ts` for protected routes
 
-**Backend API Routes** (33 total endpoints):
+**Backend API Routes** (36 total endpoints):
 - `/health` - Health check endpoint
-- `/api/auth/*` - Authentication endpoints (5 routes: register, login, me, refresh, logout)
+- `/api/auth/*` - Authentication endpoints (8 routes):
+  - Email/password: register, login, me, refresh, logout
+  - OAuth: google, facebook
+  - Provider management: get providers, unlink provider
 - `/api/profile/*` - Profile management endpoints (3 routes: get own profile, update profile, get user profile)
 - `/api/playlists/*` - Playlist CRUD and track management (14 routes)
   - CRUD operations (create, get all, get by ID, update, delete)
@@ -814,8 +817,38 @@ Music Room has evolved significantly beyond initial planning, with several major
 - Mobile: usePlaylistSocket hook for real-time playlist updates
 - Auto-reconnection logic
 
+**Phase 9 - ✅ Complete (OAuth Integration - Google & Facebook)**:
+- **Google OAuth** (fully implemented):
+  - Backend: `/api/auth/google` endpoint with ID token verification
+  - Mobile: `@react-native-google-signin/google-signin` integration
+  - Token verification via `google-auth-library`
+  - **Email required** (Google always provides verified email)
+- **Facebook OAuth** (fully implemented):
+  - Backend: `/api/auth/facebook` endpoint with access token verification
+  - Mobile: `react-native-fbsdk-next` integration with platform-specific handling
+  - Token verification via Facebook Graph API (`/debug_token` + `/me` endpoints)
+  - Database: `facebook_id` column in `user_profiles` table
+  - **Email optional** - Works with only `public_profile` permission
+  - Synthetic email generation: `facebook_{id}@music-room.local` when email not provided
+- **Multi-provider support**:
+  - Users can link multiple OAuth providers to single account
+  - Provider management endpoints (`GET /api/auth/providers`, `DELETE /api/auth/providers/:provider`)
+  - Safety: Cannot unlink last authentication method
+- **Mobile OAuth service** (`oauth.ts`):
+  - `configureGoogleSignIn()`, `signInWithGoogle()` for Google
+  - `initializeFacebookSDK()`, `signInWithFacebook()` for Facebook
+  - Platform-specific token handling (iOS Limited Login vs Android standard flow)
+- **Auth store integration**:
+  - `loginWithGoogle()` and `loginWithFacebook()` actions
+  - Error handling with user-friendly messages
+  - Session persistence to AsyncStorage
+- **Synthetic email system**:
+  - Format: `{provider}_{providerId}@music-room.local`
+  - Supabase-compatible (auth.users requires email)
+  - Allows Facebook login without email permission
+  - User can add real email later via profile settings
+
 **In Progress**:
-- OAuth providers (Google Sign-In) - partially implemented
 - Multi-device music control coordination
 - Playlist edit mode RLS policies
 

@@ -206,6 +206,18 @@ export const authApi = {
   },
 
   /**
+   * Login with Facebook OAuth
+   */
+  async loginWithFacebook(accessToken: string): Promise<AuthResponse> {
+    return apiRequest<AuthResponse>('/api/auth/facebook', {
+      method: 'POST',
+      body: JSON.stringify({
+        accessToken,
+      }),
+    });
+  },
+
+  /**
    * Get linked authentication providers
    */
   async getLinkedProviders(accessToken: string): Promise<{

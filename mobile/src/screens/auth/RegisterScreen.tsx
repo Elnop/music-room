@@ -39,7 +39,7 @@ interface RegisterScreenProps {
 export function RegisterScreen({ navigation }: RegisterScreenProps) {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
-  const { register, loginWithGoogle, isLoading, error, clearError } = useAuthStore();
+  const { register, loginWithGoogle, loginWithFacebook, isLoading, error, clearError } = useAuthStore();
 
   const {
     control,
@@ -73,6 +73,15 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
   const handleGoogleLogin = async () => {
     try {
       await loginWithGoogle();
+      // Navigation handled by RootNavigator based on auth state
+    } catch (err) {
+      // Error shown via alert (from auth store)
+    }
+  };
+
+  const handleFacebookLogin = async () => {
+    try {
+      await loginWithFacebook();
       // Navigation handled by RootNavigator based on auth state
     } catch (err) {
       // Error shown via alert (from auth store)
@@ -178,6 +187,16 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
               >
                 <Text style={styles.googleIcon}>G</Text>
                 <Text style={styles.googleButtonText}>Continue with Google</Text>
+              </TouchableOpacity>
+
+              {/* Facebook Sign-In Button */}
+              <TouchableOpacity
+                style={styles.facebookButton}
+                onPress={handleFacebookLogin}
+                disabled={isLoading}
+              >
+                <Text style={styles.facebookIcon}>f</Text>
+                <Text style={styles.facebookButtonText}>Continue with Facebook</Text>
               </TouchableOpacity>
             </View>
 
@@ -290,5 +309,26 @@ const createStyles = (theme: Theme) =>
       fontSize: 16,
       fontWeight: '500',
       color: '#3C4043',
+    },
+    facebookButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: '#1877F2',
+      borderRadius: 8,
+      paddingVertical: 12,
+      borderWidth: 1,
+      borderColor: '#1877F2',
+    },
+    facebookIcon: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: '#FFFFFF',
+      marginRight: 12,
+    },
+    facebookButtonText: {
+      fontSize: 16,
+      fontWeight: '500',
+      color: '#FFFFFF',
     },
   });

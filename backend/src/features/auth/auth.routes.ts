@@ -49,6 +49,15 @@ router.post("/google", (req, res, next) =>
 );
 
 /**
+ * @route   POST /api/auth/facebook
+ * @desc    Login with Facebook OAuth
+ * @access  Public
+ */
+router.post("/facebook", (req, res, next) =>
+  authController.facebookLogin(req, res, next),
+);
+
+/**
  * @route   GET /api/auth/providers
  * @desc    Get list of linked authentication providers
  * @access  Private (requires authentication)

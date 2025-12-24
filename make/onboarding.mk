@@ -143,6 +143,71 @@ check-setup: ## Verify development environment is correctly configured
 	fi; \
 	echo ""; \
 	\
+	echo "$(YELLOW)$(ICON_ARROW) Facebook OAuth Configuration...$(NC)"; \
+	if [ -f "$(BACKEND_ENV)" ] && [ -f "$(MOBILE_ENV)" ]; then \
+		BACKEND_FB_ID=$$(grep '^FACEBOOK_APP_ID=' $(BACKEND_ENV) | cut -d'=' -f2); \
+		BACKEND_FB_SECRET=$$(grep '^FACEBOOK_APP_SECRET=' $(BACKEND_ENV) | cut -d'=' -f2); \
+		MOBILE_FB_ID=$$(grep '^EXPO_PUBLIC_FACEBOOK_APP_ID=' $(MOBILE_ENV) | cut -d'=' -f2); \
+		MOBILE_FB_TOKEN=$$(grep '^EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN=' $(MOBILE_ENV) | cut -d'=' -f2); \
+		\
+		echo "  $(BLUE)Backend:$(NC)"; \
+		if [ -z "$$BACKEND_FB_ID" ] || [ "$$BACKEND_FB_ID" = "your-facebook-app-id" ]; then \
+			echo "    $(YELLOW)$(ICON_WARNING) Facebook App ID not configured$(NC)"; \
+			echo "    $(YELLOW)→ Set FACEBOOK_APP_ID in backend/.env$(NC)"; \
+		elif ! echo "$$BACKEND_FB_ID" | grep -qE '^[0-9]{10,}$$'; then \
+			echo "    $(RED)$(ICON_ERROR) Invalid App ID format: $$BACKEND_FB_ID$(NC)"; \
+			echo "    $(YELLOW)→ App ID must be numeric with 10+ digits$(NC)"; \
+			ERRORS=$$((ERRORS + 1)); \
+		else \
+			echo "    $(GREEN)$(ICON_SUCCESS) App ID configured: $$BACKEND_FB_ID$(NC)"; \
+		fi; \
+		\
+		if [ -z "$$BACKEND_FB_SECRET" ] || [ "$$BACKEND_FB_SECRET" = "your-facebook-app-secret" ]; then \
+			echo "    $(YELLOW)$(ICON_WARNING) Facebook App Secret not configured$(NC)"; \
+			echo "    $(YELLOW)→ Set FACEBOOK_APP_SECRET in backend/.env$(NC)"; \
+		else \
+			echo "    $(GREEN)$(ICON_SUCCESS) App Secret configured (length: $${#BACKEND_FB_SECRET})$(NC)"; \
+		fi; \
+		\
+		echo "  $(BLUE)Mobile:$(NC)"; \
+		if [ -z "$$MOBILE_FB_ID" ] || [ "$$MOBILE_FB_ID" = "your-facebook-app-id" ]; then \
+			echo "    $(YELLOW)$(ICON_WARNING) Facebook App ID not configured$(NC)"; \
+			echo "    $(YELLOW)→ Set EXPO_PUBLIC_FACEBOOK_APP_ID in mobile/.env$(NC)"; \
+		elif ! echo "$$MOBILE_FB_ID" | grep -qE '^[0-9]{10,}$$'; then \
+			echo "    $(RED)$(ICON_ERROR) Invalid App ID format: $$MOBILE_FB_ID$(NC)"; \
+			echo "    $(YELLOW)→ App ID must be numeric with 10+ digits$(NC)"; \
+			ERRORS=$$((ERRORS + 1)); \
+		else \
+			echo "    $(GREEN)$(ICON_SUCCESS) App ID configured: $$MOBILE_FB_ID$(NC)"; \
+		fi; \
+		\
+		if [ -z "$$MOBILE_FB_TOKEN" ] || [ "$$MOBILE_FB_TOKEN" = "your-facebook-client-token" ]; then \
+			echo "    $(YELLOW)$(ICON_WARNING) Facebook Client Token not configured$(NC)"; \
+			echo "    $(YELLOW)→ Set EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN in mobile/.env$(NC)"; \
+		else \
+			echo "    $(GREEN)$(ICON_SUCCESS) Client Token configured (length: $${#MOBILE_FB_TOKEN})$(NC)"; \
+		fi; \
+		\
+		echo "  $(BLUE)Consistency:$(NC)"; \
+		if [ -n "$$BACKEND_FB_ID" ] && [ -n "$$MOBILE_FB_ID" ] && [ "$$BACKEND_FB_ID" != "your-facebook-app-id" ] && [ "$$MOBILE_FB_ID" != "your-facebook-app-id" ]; then \
+			if [ "$$BACKEND_FB_ID" != "$$MOBILE_FB_ID" ]; then \
+				echo "    $(RED)$(ICON_ERROR) App ID mismatch:$(NC)"; \
+				echo "      Backend: $$BACKEND_FB_ID"; \
+				echo "      Mobile:  $$MOBILE_FB_ID"; \
+				echo "    $(YELLOW)→ Ensure both .env files use the same Facebook App ID$(NC)"; \
+				ERRORS=$$((ERRORS + 1)); \
+			else \
+				echo "    $(GREEN)$(ICON_SUCCESS) App IDs match across backend and mobile$(NC)"; \
+			fi; \
+		fi; \
+		\
+		if [ -z "$$BACKEND_FB_ID" ] && [ -z "$$MOBILE_FB_ID" ]; then \
+			echo "    $(BLUE)$(ICON_INFO) Facebook OAuth not configured (optional)$(NC)"; \
+			echo "    $(YELLOW)→ See: https://developers.facebook.com/apps/$(NC)"; \
+		fi; \
+	fi; \
+	echo ""; \
+	\
 	echo "────────────────────────────────────────────────────────────────"; \
 	if [ $$ERRORS -eq 0 ]; then \
 		echo "$(GREEN)$(ICON_SUCCESS) Environment is ready!$(NC)"; \

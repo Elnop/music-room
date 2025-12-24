@@ -44,6 +44,17 @@ export interface GoogleProfile {
   picture?: string;
 }
 
+export interface FacebookTokenPayload {
+  id: string; // Facebook user ID
+  email?: string; // Optional - may not be provided if user denies email permission
+  name: string;
+  picture?: string;
+}
+
+export interface FacebookLoginDTO {
+  accessToken: string; // Access token from Facebook Login
+}
+
 export interface FacebookProfile {
   name: string;
   picture?: {
