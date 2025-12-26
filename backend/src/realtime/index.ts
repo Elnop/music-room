@@ -191,7 +191,7 @@ class RealtimeService {
    * Music control handlers - multi-device support
    */
   private registerMusicControlHandlers(socket: Socket) {
-    socket.on("listening:update", async (data: unknown) => {
+    socket.on("listening:update", (data: unknown) => {
       // Validate payload structure
       if (!isValidListeningUpdatePayload(data)) {
         logger.warn("[Socket] listening:update received invalid payload");
@@ -379,12 +379,8 @@ class RealtimeService {
 
       this.lastListeningUpdate.delete(deviceKey);
 
-      this.broadcastUserListeningStatus(userId).catch((error) => {
-        logger.error(
-          `[Socket] Failed to broadcast listening status for user ${userId} on disconnect`,
-          { error },
-        );
-      });
+      // Broadcast updated status (user has disconnected a device)
+      this.broadcastUserListeningStatus(userId);
 
       // Cleanup maps
       this.socketToDevice.delete(socket.id);

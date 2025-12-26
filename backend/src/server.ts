@@ -72,6 +72,7 @@ app.use((req, res, next) => {
     ip: string | undefined;
     userAgent: string | undefined;
     origin: string | undefined;
+    body?: Record<string, unknown>;
   } = {
     ip: req.ip,
     userAgent: req.get("user-agent"),
@@ -80,7 +81,7 @@ app.use((req, res, next) => {
 
   // Log body for POST/PUT/PATCH requests (hide passwords)
   if (["POST", "PUT", "PATCH"].includes(req.method) && req.body) {
-    const body = { ...req.body };
+    const body = { ...req.body } as Record<string, unknown>;
     if (body.password) body.password = "***";
     logData.body = body;
   }

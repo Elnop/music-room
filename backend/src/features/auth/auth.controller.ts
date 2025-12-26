@@ -57,9 +57,10 @@ export class AuthController {
    */
   async login(req: Request, res: Response, next: NextFunction) {
     try {
+      const body = req.body as { email?: string; password?: string };
       logger.info("🔵 Login request received", {
-        email: req.body?.email,
-        hasPassword: !!req.body?.password,
+        email: body?.email,
+        hasPassword: !!body?.password,
         contentType: req.headers["content-type"],
         origin: req.headers["origin"],
       });
@@ -84,10 +85,11 @@ export class AuthController {
 
       res.json(response);
     } catch (error) {
+      const body = req.body as { email?: string };
       logger.error("🔴 Login error", {
         error: error instanceof Error ? error.message : "Unknown error",
         stack: error instanceof Error ? error.stack : undefined,
-        email: req.body?.email,
+        email: body?.email,
       });
       next(error);
     }
@@ -120,7 +122,7 @@ export class AuthController {
    * POST /api/auth/logout
    * Logout current user (client-side token removal)
    */
-  async logout(req: Request, res: Response, next: NextFunction) {
+  logout(req: Request, res: Response, next: NextFunction) {
     try {
       logger.info("User logout", {
         userId: (req as AuthenticatedRequest).user.id,

@@ -177,13 +177,14 @@ export class PlaylistController {
       const authReq = req as AuthenticatedRequest;
       const { id } = req.params;
 
+      const body = req.body as { albumArt?: string; previewUrl?: string };
       logger.debug("🎵 [Playlist Controller] Add track request", {
         playlistId: id,
         userId: authReq.user.id,
         body: {
           ...req.body,
-          albumArt: req.body.albumArt ? "present" : "empty/undefined",
-          previewUrl: req.body.previewUrl ? "present" : "empty/undefined",
+          albumArt: body.albumArt ? "present" : "empty/undefined",
+          previewUrl: body.previewUrl ? "present" : "empty/undefined",
         },
       });
 
