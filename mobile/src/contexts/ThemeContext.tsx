@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { royalBlueTheme, christmasTheme, pastelLimeTheme } from '@themes';
 import type { Theme, ThemeName, ThemeContextValue } from '@themes/types';
@@ -35,22 +35,28 @@ interface ThemeProviderProps {
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const [themeName, setThemeName] = useState<ThemeName>('royalBlue');
+  const [isLoaded, setIsLoaded] = useState(false);
 
   // Load theme from storage on mount
   useEffect(() => {
-    loadTheme();
-  }, []);
+    if (isLoaded) return;
 
-  const loadTheme = async () => {
-    try {
-      const savedTheme = await AsyncStorage.getItem(THEME_STORAGE_KEY);
-      if (savedTheme && savedTheme in THEMES) {
-        setThemeName(savedTheme as ThemeName);
+    const loadTheme = async () => {
+      try {
+        const savedTheme = await AsyncStorage.getItem(THEME_STORAGE_KEY);
+        if (savedTheme && savedTheme in THEMES) {
+          setThemeName(savedTheme as ThemeName);
+        }
+      } catch (error) {
+        console.error('Failed to load theme:', error);
+      } finally {
+        setIsLoaded(true);
       }
-    } catch (error) {
-      console.error('Failed to load theme:', error);
-    }
-  };
+    };
+
+    loadTheme();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const setTheme = async (name: ThemeName) => {
     try {

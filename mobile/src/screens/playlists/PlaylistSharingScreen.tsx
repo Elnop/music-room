@@ -261,7 +261,9 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
               }
               try {
                 await playlistApi.removeViewer(playlistId, userId);
-              } catch {}
+              } catch (error) {
+                // Viewer may not exist, which is acceptable - ignore error
+              }
             } else {
               await playlistApi.removeCollaborator(playlistId, userId);
             }
@@ -293,7 +295,9 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
         await playlistApi.removeCollaborator(playlistId, userId);
         try {
           await playlistApi.addViewer(playlistId, userId);
-        } catch {}
+        } catch (error) {
+          // User may already be a viewer - ignore error
+        }
       } else {
         await playlistApi.addCollaborator(playlistId, userId);
       }

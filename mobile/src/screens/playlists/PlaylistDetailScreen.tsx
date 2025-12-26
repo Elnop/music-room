@@ -112,7 +112,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
   useFocusEffect(
     React.useCallback(() => {
       fetchPlaylistById(id);
-    }, [id])
+    }, [id, fetchPlaylistById])
   );
 
   React.useLayoutEffect(() => {

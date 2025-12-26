@@ -35,7 +35,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
       if (user) {
         fetchPlaylists(user.id);
       }
-    }, [user])
+    }, [user, fetchPlaylists])
   );
 
   const handleRefresh = async () => {

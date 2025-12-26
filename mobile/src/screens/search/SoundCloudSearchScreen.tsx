@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/contexts';
@@ -23,11 +23,11 @@ export function SoundCloudSearchScreen() {
   const { playTrack } = usePlayerStore();
 
   // Debounced search
-  const debouncedSearch = useCallback(
-    debounce((query: string) => {
+  const debouncedSearch = useMemo(
+    () => debounce((query: string) => {
       search(query);
     }, 500),
-    []
+    [search]
   );
 
   const handleSearchChange = (text: string) => {
