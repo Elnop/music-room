@@ -113,7 +113,7 @@ export async function optionalAuthMiddleware(
     logger.debug("User optionally authenticated", { userId: user.id });
 
     next();
-  } catch (error) {
+  } catch {
     // Don't fail, just continue without user
     logger.debug("Optional auth failed, continuing without user");
     next();
