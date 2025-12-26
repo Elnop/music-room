@@ -66,7 +66,7 @@ export const paginate = <T>(items: T[], page: number = 1, limit: number = 10) =>
  * @param query Search query
  * @param fields Fields to search in
  */
-export const searchItems = <T extends Record<string, any>>(
+export const searchItems = <T extends Record<string, unknown>>(
   items: T[],
   query: string,
   fields: (keyof T)[]

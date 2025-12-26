@@ -65,7 +65,7 @@ export function EditProfileScreen() {
 
     try {
       // Only send fields that have values
-      const updateData: any = {};
+      const updateData: Partial<UpdateProfileData> = {};
       if (data.displayName && data.displayName.trim()) {
         updateData.displayName = data.displayName.trim();
       }

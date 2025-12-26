@@ -109,7 +109,7 @@ export function SoundCloudSearchScreen() {
   );
 }
 
-const createStyles = (theme: any) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,

@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets, type EdgeInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/contexts';
+import type { Theme } from '@themes/types';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { usePlayerStore } from '@/store/playerStore';
 import { usePlayerSync } from '@/hooks/usePlayerSync';
@@ -78,7 +79,7 @@ export function MiniPlayer() {
   );
 }
 
-const createStyles = (theme: any, insets: any) =>
+const createStyles = (theme: Theme, insets: EdgeInsets) =>
   StyleSheet.create({
     container: {
       position: 'absolute',

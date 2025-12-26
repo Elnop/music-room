@@ -56,7 +56,7 @@ export function SoundCloudTrackItem({ track, onPlay, onAddToPlaylist }: Props) {
   );
 }
 
-const createStyles = (theme: any) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flexDirection: 'row',

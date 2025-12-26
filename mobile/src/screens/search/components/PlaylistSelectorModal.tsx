@@ -94,7 +94,7 @@ export function PlaylistSelectorModal({ visible, track, onClose }: Props) {
           albumArt: internalTrack.albumArt ? 'present' : 'undefined',
         });
 
-      await addTrack(playlistId, internalTrack as any); // Type assertion needed due to id field
+      await addTrack(playlistId, internalTrack as Track); // Type assertion needed due to id field
 
       if (__DEV__) console.log('🟢 [PlaylistSelector] Track added successfully');
 
@@ -184,7 +184,7 @@ export function PlaylistSelectorModal({ visible, track, onClose }: Props) {
   );
 }
 
-const createStyles = (theme: any) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     overlay: {
       flex: 1,
