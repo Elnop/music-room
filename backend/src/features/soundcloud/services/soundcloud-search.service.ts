@@ -43,17 +43,21 @@ export class SoundCloudSearchService {
       });
 
       // soundcloud.ts search method
-      const results = await this.soundcloud.tracks.search({
+      const results = (await this.soundcloud.tracks.search({
         q: query.q,
         limit: query.limit,
         offset: query.offset,
-      });
+      })) as {
+        collection?: SoundCloudTrack[];
+        total_results?: number;
+        next_href?: string;
+      };
 
       // Filter only playable/streamable tracks
-      const resultsData = results as { collection?: SoundCloudTrack[] };
-      const playableTracks = (resultsData.collection || []).filter((track) => {
+      const playableTracks = (results.collection || []).filter((track) => {
         const hasStreamUrl =
-          track.streamable || track.media?.transcodings?.length > 0;
+          track.streamable ||
+          (track.media?.transcodings && track.media.transcodings.length > 0);
         return hasStreamUrl;
       });
 
@@ -97,7 +101,9 @@ export class SoundCloudSearchService {
     try {
       logger.info("Fetching track", { urlOrId });
 
-      const track = await this.soundcloud.tracks.get(urlOrId);
+      const track = (await this.soundcloud.tracks.get(
+        urlOrId,
+      )) as SoundCloudTrack;
 
       // Cache track details
       this.cache.set(cacheKey, track, CACHE_TTL.TRACK);

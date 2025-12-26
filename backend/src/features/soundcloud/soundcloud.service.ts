@@ -1,6 +1,9 @@
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
-const SoundcloudModule = require("soundcloud.ts");
+const SoundcloudModule = require("soundcloud.ts") as {
+  default?: new () => unknown;
+  new (): unknown;
+};
 const Soundcloud = SoundcloudModule.default || SoundcloudModule;
 
 import { logger } from "@/shared/utils/logger.js";

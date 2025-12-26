@@ -96,7 +96,15 @@ export class OAuthService {
       const debugUrl = `https://graph.facebook.com/v21.0/debug_token?input_token=${accessToken}&access_token=${FACEBOOK_APP_ID}|${FACEBOOK_APP_SECRET}`;
 
       const debugResponse = await fetch(debugUrl);
-      const debugData = await debugResponse.json();
+      const debugData = (await debugResponse.json()) as {
+        data?: {
+          is_valid?: boolean;
+          app_id?: string;
+          user_id?: string;
+          error?: string;
+        };
+        error?: string;
+      };
 
       if (!debugResponse.ok || debugData.data?.error) {
         logger.warn("Facebook token verification failed", {
@@ -133,12 +141,33 @@ export class OAuthService {
       }
 
       const userId = debugData.data.user_id;
+      if (!userId) {
+        throw new AppError(
+          401,
+          "Facebook token missing user_id",
+          "INVALID_TOKEN",
+        );
+      }
 
       // 2. Fetch user profile from Facebook Graph API
       const profileUrl = `https://graph.facebook.com/v21.0/${userId}?fields=id,name,email,picture.type(large)&access_token=${accessToken}`;
 
       const profileResponse = await fetch(profileUrl);
-      const profileData = await profileResponse.json();
+      const profileData = (await profileResponse.json()) as {
+        id: string;
+        name: string;
+        email?: string;
+        picture?: {
+          data?: {
+            url?: string;
+          };
+        };
+        error?: {
+          message: string;
+          type: string;
+          code: number;
+        };
+      };
 
       if (!profileResponse.ok || profileData.error) {
         logger.error("Facebook profile fetch failed", {
