@@ -46,7 +46,7 @@ clean-deps: ## Remove all dependencies and build artifacts (node_modules, dist, 
 	@$(call remove_all_project_artifacts)
 	@echo "$(GREEN)✓ Dependencies and artifacts removed$(RESET)"
 
-clean-all: ## Complete cleanup - Docker system + project artifacts + global caches (with confirmation)
+clean-all: ## Complete cleanup - Docker system + project artifacts + global caches
 	@echo "$(BOLD)$(RED)⚠️  COMPLETE CLEANUP - THIS WILL REMOVE EVERYTHING!$(RESET)"
 	@echo "$(YELLOW)This will remove:$(RESET)"
 	@echo "  - ALL Docker resources on this machine (containers, images, volumes, networks, cache)"
@@ -54,46 +54,41 @@ clean-all: ## Complete cleanup - Docker system + project artifacts + global cach
 	@echo "  - ALL project caches (coverage, logs, .expo, native builds, etc.)"
 	@echo "  - ALL global caches (Expo, Metro, Watchman, Gradle)"
 	@echo ""
-	@printf "Type 'yes' to confirm complete cleanup: "; \
-	read confirm; \
-	if [ "$$confirm" = "yes" ]; then \
-		echo "$(RED)Starting complete cleanup...$(RESET)"; \
-		echo "$(CYAN)Step 1/5: Stopping all Docker containers...$(RESET)"; \
-		containers=$$(docker ps -aq 2>/dev/null); \
-		if [ -n "$$containers" ]; then docker stop $$containers 2>/dev/null || true; fi; \
-		echo "$(CYAN)Step 2/5: Removing all Docker resources...$(RESET)"; \
-		if [ -n "$$containers" ]; then docker rm $$containers 2>/dev/null || true; fi; \
-		images=$$(docker images -aq 2>/dev/null); \
-		if [ -n "$$images" ]; then docker rmi -f $$images 2>/dev/null || true; fi; \
-		volumes=$$(docker volume ls -q 2>/dev/null); \
-		if [ -n "$$volumes" ]; then docker volume rm $$volumes 2>/dev/null || true; fi; \
-		docker network prune -f 2>/dev/null || true; \
-		docker builder prune -af 2>/dev/null || true; \
-		docker system prune -af --volumes 2>/dev/null || true; \
-		echo "$(CYAN)Step 3/5: Cleaning project artifacts...$(RESET)"; \
-		rm -rf backend/node_modules mobile/node_modules 2>/dev/null || true; \
-		rm -rf backend/dist mobile/.expo 2>/dev/null || true; \
-		rm -rf mobile/android mobile/ios 2>/dev/null || true; \
-		rm -rf backend/coverage mobile/coverage 2>/dev/null || true; \
-		rm -f /tmp/ngrok.log /tmp/backend-tunnel-url.txt 2>/dev/null || true; \
-		rm -rf /tmp/shared 2>/dev/null || true; \
-		find . -name "*.tsbuildinfo" -type f -delete 2>/dev/null || true; \
-		find mobile -name ".eas-build-*.json" -type f -delete 2>/dev/null || true; \
-		echo "$(CYAN)Step 4/5: Cleaning global caches...$(RESET)"; \
-		rm -rf ~/.expo ~/.cache/expo 2>/dev/null || true; \
-		rm -rf ~/.cache/metro-bundler 2>/dev/null || true; \
-		rm -rf ~/.watchman 2>/dev/null || true; \
-		echo "$(CYAN)Step 5/5: Cleaning Gradle caches...$(RESET)"; \
-		rm -rf ~/.gradle ~/.android/build-cache 2>/dev/null || true; \
-		echo ""; \
-		echo "$(BOLD)$(GREEN)✓✓✓ COMPLETE CLEANUP FINISHED ✓✓✓$(RESET)"; \
-		echo ""; \
-		echo "$(YELLOW)To restart Music Room:$(RESET)"; \
-		echo "  1. $(GREEN)make install$(RESET)      - Reinstall dependencies"; \
-		echo "  2. $(GREEN)make dev-docker$(RESET)   - Start Docker development"; \
-	else \
-		echo "$(YELLOW)Cancelled.$(RESET)"; \
-	fi
+	@echo "$(RED)Starting complete cleanup...$(RESET)"
+	@echo "$(CYAN)Step 1/5: Stopping all Docker containers...$(RESET)"
+	@containers=$$(docker ps -aq 2>/dev/null); \
+	if [ -n "$$containers" ]; then docker stop $$containers 2>/dev/null || true; fi
+	@echo "$(CYAN)Step 2/5: Removing all Docker resources...$(RESET)"
+	@containers=$$(docker ps -aq 2>/dev/null); \
+	if [ -n "$$containers" ]; then docker rm $$containers 2>/dev/null || true; fi; \
+	images=$$(docker images -aq 2>/dev/null); \
+	if [ -n "$$images" ]; then docker rmi -f $$images 2>/dev/null || true; fi; \
+	volumes=$$(docker volume ls -q 2>/dev/null); \
+	if [ -n "$$volumes" ]; then docker volume rm $$volumes 2>/dev/null || true; fi; \
+	docker network prune -f 2>/dev/null || true; \
+	docker builder prune -af 2>/dev/null || true; \
+	docker system prune -af --volumes 2>/dev/null || true
+	@echo "$(CYAN)Step 3/5: Cleaning project artifacts...$(RESET)"
+	@rm -rf backend/node_modules mobile/node_modules 2>/dev/null || true
+	@rm -rf backend/dist mobile/.expo 2>/dev/null || true
+	@rm -rf mobile/android mobile/ios 2>/dev/null || true
+	@rm -rf backend/coverage mobile/coverage 2>/dev/null || true
+	@rm -f /tmp/ngrok.log /tmp/backend-tunnel-url.txt 2>/dev/null || true
+	@rm -rf /tmp/shared 2>/dev/null || true
+	@find . -name "*.tsbuildinfo" -type f -delete 2>/dev/null || true
+	@find mobile -name ".eas-build-*.json" -type f -delete 2>/dev/null || true
+	@echo "$(CYAN)Step 4/5: Cleaning global caches...$(RESET)"
+	@rm -rf ~/.expo ~/.cache/expo 2>/dev/null || true
+	@rm -rf ~/.cache/metro-bundler 2>/dev/null || true
+	@rm -rf ~/.watchman 2>/dev/null || true
+	@echo "$(CYAN)Step 5/5: Cleaning Gradle caches...$(RESET)"
+	@rm -rf ~/.gradle ~/.android/build-cache 2>/dev/null || true
+	@echo ""
+	@echo "$(BOLD)$(GREEN)✓✓✓ COMPLETE CLEANUP FINISHED ✓✓✓$(RESET)"
+	@echo ""
+	@echo "$(YELLOW)To restart Music Room:$(RESET)"
+	@echo "  1. $(GREEN)make install$(RESET)      - Reinstall dependencies"
+	@echo "  2. $(GREEN)make dev-docker$(RESET)   - Start Docker development"
 
 prune: ## Clean up unused Docker resources
 	$(call print_arrow,Pruning unused Docker resources...)
@@ -125,23 +120,17 @@ clean-global-cache: ## Remove global caches (Expo, Metro, Watchman) - affects al
 	@echo "  - ~/.cache/metro-bundler/"
 	@echo "  - ~/.watchman/"
 	@echo ""
-	@printf "Are you sure? Type 'yes' to continue: "; \
-	read confirm; \
-	if [ "$$confirm" = "yes" ]; then \
-		echo "$(YELLOW)⚠️  Removing Expo home cache (global, affects all projects)...$(RESET)"; \
-		rm -rf ~/.expo 2>/dev/null || true; \
-		rm -rf ~/.cache/expo 2>/dev/null || true; \
-		echo "$(GREEN)✓ Expo home cache removed$(RESET)"; \
-		echo "$(YELLOW)⚠️  Removing Metro bundler cache (global)...$(RESET)"; \
-		rm -rf ~/.cache/metro-bundler 2>/dev/null || true; \
-		echo "$(GREEN)✓ Metro cache removed$(RESET)"; \
-		echo "$(YELLOW)⚠️  Removing Watchman cache (global)...$(RESET)"; \
-		rm -rf ~/.watchman 2>/dev/null || true; \
-		echo "$(GREEN)✓ Watchman cache removed$(RESET)"; \
-		echo "$(BOLD)$(GREEN)✓ Global caches cleaned$(RESET)"; \
-	else \
-		echo "$(YELLOW)Cancelled.$(RESET)"; \
-	fi
+	@echo "$(YELLOW)⚠️  Removing Expo home cache (global, affects all projects)...$(RESET)"
+	@rm -rf ~/.expo 2>/dev/null || true
+	@rm -rf ~/.cache/expo 2>/dev/null || true
+	@echo "$(GREEN)✓ Expo home cache removed$(RESET)"
+	@echo "$(YELLOW)⚠️  Removing Metro bundler cache (global)...$(RESET)"
+	@rm -rf ~/.cache/metro-bundler 2>/dev/null || true
+	@echo "$(GREEN)✓ Metro cache removed$(RESET)"
+	@echo "$(YELLOW)⚠️  Removing Watchman cache (global)...$(RESET)"
+	@rm -rf ~/.watchman 2>/dev/null || true
+	@echo "$(GREEN)✓ Watchman cache removed$(RESET)"
+	@echo "$(BOLD)$(GREEN)✓ Global caches cleaned$(RESET)"
 
 clean-gradle: ## Remove Gradle caches (Android builds) - affects all Android projects
 	@echo "$(BOLD)$(RED)⚠️  WARNING: This will remove Gradle caches affecting ALL Android projects!$(RESET)"
@@ -149,17 +138,11 @@ clean-gradle: ## Remove Gradle caches (Android builds) - affects all Android pro
 	@echo "  - ~/.gradle/"
 	@echo "  - ~/.android/build-cache/"
 	@echo ""
-	@printf "Are you sure? Type 'yes' to continue: "; \
-	read confirm; \
-	if [ "$$confirm" = "yes" ]; then \
-		echo "$(YELLOW)⚠️  Removing Gradle cache (global, affects all Android projects)...$(RESET)"; \
-		rm -rf ~/.gradle 2>/dev/null || true; \
-		rm -rf ~/.android/build-cache 2>/dev/null || true; \
-		echo "$(GREEN)✓ Gradle cache removed$(RESET)"; \
-		echo "$(BOLD)$(GREEN)✓ Gradle caches cleaned$(RESET)"; \
-	else \
-		echo "$(YELLOW)Cancelled.$(RESET)"; \
-	fi
+	@echo "$(YELLOW)⚠️  Removing Gradle cache (global, affects all Android projects)...$(RESET)"
+	@rm -rf ~/.gradle 2>/dev/null || true
+	@rm -rf ~/.android/build-cache 2>/dev/null || true
+	@echo "$(GREEN)✓ Gradle cache removed$(RESET)"
+	@echo "$(BOLD)$(GREEN)✓ Gradle caches cleaned$(RESET)"
 
 clean-project: ## Remove all project artifacts (deps, builds, caches) - no Docker, no global
 	@echo "$(BOLD)$(CYAN)Cleaning all project artifacts...$(RESET)"
