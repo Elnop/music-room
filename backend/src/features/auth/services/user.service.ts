@@ -1,7 +1,7 @@
 import { supabase } from "../../../shared/config/supabase.js";
 import { AppError } from "../../../shared/middleware/error-handler.js";
 import { logger } from "../../../shared/utils/logger.js";
-import type { UserProfile, DbUserProfile } from "../auth.types.js";
+import type { UserProfile, UserProfileRow } from "../auth.types.js";
 import type { Session } from "@supabase/supabase-js";
 
 export class UserService {
@@ -145,7 +145,7 @@ export class UserService {
     providerId: string,
     email: string | undefined,
     profile: { name: string; picture?: string | { data: { url: string } } },
-  ): Promise<{ userProfile: DbUserProfile; session: Session }> {
+  ): Promise<{ userProfile: UserProfileRow; session: Session }> {
     try {
       const providerColumn = `${provider}_id`; // 'google_id' or 'facebook_id'
 
