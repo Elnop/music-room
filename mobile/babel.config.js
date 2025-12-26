@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = function (api) {
   api.cache(true);
   return {
@@ -6,21 +8,21 @@ module.exports = function (api) {
       [
         'module-resolver',
         {
-          root: ['.'],
+          root: ['./'],
           extensions: ['.ios.js', '.android.js', '.js', '.ts', '.tsx', '.json'],
           alias: {
-            '@': './src',
-            '@api': './src/api',
-            '@components': './src/components',
-            '@contexts': './src/contexts',
-            '@screens': './src/screens',
-            '@services': './src/services',
-            '@store': './src/store',
-            '@hooks': './src/hooks',
-            '@utils': './src/utils',
-            '@types': './src/types',
-            '@themes': './src/themes',
-            '@constants': './src/constants',
+            '@': path.resolve(__dirname, 'src'),
+            '@api': path.resolve(__dirname, 'src/api'),
+            '@components': path.resolve(__dirname, 'src/components'),
+            '@contexts': path.resolve(__dirname, 'src/contexts'),
+            '@screens': path.resolve(__dirname, 'src/screens'),
+            '@services': path.resolve(__dirname, 'src/services'),
+            '@store': path.resolve(__dirname, 'src/store'),
+            '@hooks': path.resolve(__dirname, 'src/hooks'),
+            '@utils': path.resolve(__dirname, 'src/utils'),
+            '@types': path.resolve(__dirname, 'src/types'),
+            '@themes': path.resolve(__dirname, 'src/themes'),
+            '@constants': path.resolve(__dirname, 'src/constants'),
           },
         },
       ],
