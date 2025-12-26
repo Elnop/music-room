@@ -29,7 +29,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       currentTime: player.currentTime,
       hasStreamUrl: !!streamUrl,
     });
-  }, [player?.isLoaded, player?.playing, player?.duration, streamUrl]);
+  }, [player, player?.isLoaded, player?.playing, player?.duration, streamUrl]);
 
   // Fetch stream URL when track changes
   useEffect(() => {
@@ -95,7 +95,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     }
 
     loadStream();
-  }, [currentTrack?.id, setStreamUrl, setLoading, setError]);
+  }, [currentTrack, currentTrack?.id, setStreamUrl, setLoading, setError]);
 
   // Auto-play when stream is loaded and player is ready
   useEffect(() => {

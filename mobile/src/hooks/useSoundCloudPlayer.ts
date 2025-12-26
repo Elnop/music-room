@@ -22,7 +22,7 @@ export function useSoundCloudPlayer(track: SoundCloudTrack | null) {
       currentTime: player.currentTime,
       hasStreamUrl: !!streamUrl,
     });
-  }, [player?.isLoaded, player?.playing, player?.duration, streamUrl]);
+  }, [player, player?.isLoaded, player?.playing, player?.duration, streamUrl]);
 
   // Fetch stream URL when track changes
   useEffect(() => {
@@ -97,7 +97,7 @@ export function useSoundCloudPlayer(track: SoundCloudTrack | null) {
     }
 
     loadStream();
-  }, [track?.id]);
+  }, [track, track?.id]);
 
   return { player, loading, error, streamUrl };
 }

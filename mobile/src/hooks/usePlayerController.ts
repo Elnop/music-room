@@ -33,7 +33,7 @@ export function usePlayerController() {
       currentTime: player.currentTime,
       hasStreamUrl: !!streamUrl,
     });
-  }, [player?.isLoaded, player?.playing, player?.duration, streamUrl]);
+  }, [player, player?.isLoaded, player?.playing, player?.duration, streamUrl]);
 
   // Fetch stream URL when track changes
   useEffect(() => {
@@ -108,7 +108,7 @@ export function usePlayerController() {
     }
 
     loadStream();
-  }, [currentTrack?.id, setStreamUrl, setLoading, setError]);
+  }, [currentTrack, currentTrack?.id, setStreamUrl, setLoading, setError]);
 
   // Auto-play when stream is loaded and player is ready
   useEffect(() => {
@@ -119,7 +119,7 @@ export function usePlayerController() {
       console.log('🎵 [usePlayerController] Player loaded, auto-playing');
       play();
     }
-  }, [player?.isLoaded, player?.duration, streamUrl, play]);
+  }, [player, player?.isLoaded, player?.duration, streamUrl, play]);
 
   return {
     player,
