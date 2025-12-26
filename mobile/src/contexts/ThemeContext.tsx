@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { royalBlueTheme, christmasTheme, pastelLimeTheme } from '@themes';
 import type { Theme, ThemeName, ThemeContextValue } from '@themes/types';

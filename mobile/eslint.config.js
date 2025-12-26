@@ -69,8 +69,8 @@ export default [
       'react/prop-types': 'off', // Using TypeScript for prop validation
       ...reactHooksPlugin.configs.recommended.rules,
 
-      // Console rules
-      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      // Console rules - allow console.log in development (__DEV__ wrapped)
+      'no-console': ['warn', { allow: ['log', 'warn', 'error'] }],
     },
   },
 

@@ -12,10 +12,9 @@
 
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@contexts';
-import type { Theme } from '@themes/types';
 
 // Import feature stacks (each feature owns its navigation)
 import { PlaylistsNavigator } from './stacks/PlaylistsStack';
@@ -139,24 +138,3 @@ export function AppNavigator() {
     </PlayerProvider>
   );
 }
-
-const createStyles = (theme: Theme) =>
-  StyleSheet.create({
-    placeholder: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: theme.colors.background,
-      padding: theme.spacing.xl,
-    },
-    placeholderText: {
-      fontSize: theme.typography.sizes['2xl'],
-      fontWeight: theme.typography.weights.bold,
-      color: theme.colors.text,
-      marginBottom: theme.spacing.md,
-    },
-    placeholderSubtext: {
-      fontSize: theme.typography.sizes.base,
-      color: theme.colors.textSecondary,
-    },
-  });

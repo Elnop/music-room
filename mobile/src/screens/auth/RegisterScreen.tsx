@@ -72,8 +72,8 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
   const handleGoogleLogin = async () => {
     try {
       await loginWithGoogle();
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       // Navigation handled by RootNavigator based on auth state
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       // Error shown via alert (from auth store)
     }
@@ -82,8 +82,8 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
   const handleFacebookLogin = async () => {
     try {
       await loginWithFacebook();
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       // Navigation handled by RootNavigator based on auth state
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       // Error shown via alert (from auth store)
     }
