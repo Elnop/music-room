@@ -33,14 +33,14 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
   useFocusEffect(
     useCallback(() => {
       if (user) {
-        fetchPlaylists(user.id);
+        fetchPlaylists();
       }
     }, [user, fetchPlaylists])
   );
 
   const handleRefresh = async () => {
     if (user) {
-      await fetchPlaylists(user.id);
+      await fetchPlaylists();
     }
   };
 

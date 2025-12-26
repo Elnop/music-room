@@ -180,8 +180,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       // Clear storage
       await get().clearStorage();
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
+      console.error('[AuthStore] Logout failed:', error);
       set({
         error: 'Logout failed',
         isLoading: false,
