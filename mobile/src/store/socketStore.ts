@@ -35,18 +35,18 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 
     // If already connected, skip
     if (existingSocket?.connected) {
-      console.log('[Socket] Already connected:', existingSocket.id);
+      if (__DEV__) console.log('[Socket] Already connected:', existingSocket.id);
       return;
     }
 
     // If socket exists but not connected, disconnect and reconnect
     if (existingSocket) {
-      console.log('[Socket] Socket exists but not connected, reconnecting...');
+      if (__DEV__) console.log('[Socket] Socket exists but not connected, reconnecting...');
       existingSocket.disconnect();
     }
 
     const socketUrl = API_CONFIG.BASE_URL;
-    console.log('[Socket] Connecting to:', socketUrl);
+    if (__DEV__) console.log('[Socket] Connecting to:', socketUrl);
 
     const socket = io(socketUrl, {
       // Try WebSocket first, fallback to polling if needed
@@ -62,12 +62,12 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     });
 
     socket.on('connect', () => {
-      console.log('[Socket] ✅ Connected successfully:', socket.id);
+      if (__DEV__) console.log('[Socket] ✅ Connected successfully:', socket.id);
       set({ isConnected: true });
     });
 
     socket.on('disconnect', reason => {
-      console.log('[Socket] ❌ Disconnected:', reason);
+      if (__DEV__) console.log('[Socket] ❌ Disconnected:', reason);
       set({ isConnected: false });
     });
 
@@ -81,11 +81,11 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     });
 
     socket.on('reconnect', attemptNumber => {
-      console.log('[Socket] 🔄 Reconnected after', attemptNumber, 'attempts');
+      if (__DEV__) console.log('[Socket] 🔄 Reconnected after', attemptNumber, 'attempts');
     });
 
     socket.on('reconnect_attempt', attemptNumber => {
-      console.log('[Socket] 🔄 Reconnect attempt', attemptNumber);
+      if (__DEV__) console.log('[Socket] 🔄 Reconnect attempt', attemptNumber);
     });
 
     socket.on('reconnect_error', error => {
@@ -106,7 +106,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     const { socket } = get();
 
     if (socket) {
-      console.log('[Socket] Disconnecting...');
+      if (__DEV__) console.log('[Socket] Disconnecting...');
       socket.disconnect();
       set({ socket: null, isConnected: false });
     }

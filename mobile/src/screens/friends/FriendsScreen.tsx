@@ -107,7 +107,7 @@ export function FriendsScreen() {
       try {
         const results = await profileApi.searchUsers(accessToken, query);
         setSearchResults(results);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
         setError('Erreur lors de la recherche');
         setSearchResults([]);

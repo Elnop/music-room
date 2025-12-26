@@ -31,12 +31,12 @@ export function usePlaylistSocket(playlistId: string, onReorder?: () => void) {
     }
 
     socket.emit('playlist:join', playlistId);
-    console.log(`[Socket] Joined playlist room: ${playlistId}`);
+    if (__DEV__) console.log(`[Socket] Joined playlist room: ${playlistId}`);
 
     const handlePlaylistUpdate = (data: PlaylistUpdateData) => {
       if (data.playlistId !== playlistId) return;
 
-      console.log(`[Socket] Playlist updated: ${data.event}`, data);
+      if (__DEV__) console.log(`[Socket] Playlist updated: ${data.event}`, data);
 
       switch (data.event) {
         case 'track_added':
@@ -63,7 +63,7 @@ export function usePlaylistSocket(playlistId: string, onReorder?: () => void) {
         if (socket.connected) {
           socket.emit('playlist:leave', playlistId);
         }
-        console.log(`[Socket] Left playlist room: ${playlistId}`);
+        if (__DEV__) console.log(`[Socket] Left playlist room: ${playlistId}`);
       }
     };
   }, [socket, isConnected, playlistId, addTrackLocally, removeTrackLocally, onReorder]);

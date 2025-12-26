@@ -43,7 +43,7 @@ export function RootNavigator() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Supabase auth event:', event);
+      if (__DEV__) console.log('Supabase auth event:', event);
 
       if (event === 'SIGNED_OUT') {
         useAuthStore.setState({

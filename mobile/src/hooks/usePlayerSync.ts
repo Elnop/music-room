@@ -21,13 +21,13 @@ export function usePlayerSync() {
 
     // If store says playing but player is paused, start playback
     if (isPlaying && !player.playing) {
-      console.log('🎵 [usePlayerSync] Starting playback');
+      if (__DEV__) console.log('🎵 [usePlayerSync] Starting playback');
       player.play();
     }
 
     // If store says paused but player is playing, pause playback
     if (!isPlaying && player.playing) {
-      console.log('🎵 [usePlayerSync] Pausing playback');
+      if (__DEV__) console.log('🎵 [usePlayerSync] Pausing playback');
       player.pause();
     }
   }, [player, isPlaying]);

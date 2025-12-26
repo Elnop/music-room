@@ -157,13 +157,14 @@ export const playlistApi = {
   async addTrack(playlistId: string, track: Track): Promise<void> {
     const token = await getAuthToken();
 
-    console.log('🎵 [PlaylistApi] Sending add track request', {
-      playlistId,
-      trackUri: track.trackUri,
-      title: track.title,
-      albumArt: track.albumArt ? 'present' : 'undefined',
-      previewUrl: track.previewUrl ? 'present' : 'undefined',
-    });
+    if (__DEV__)
+      console.log('🎵 [PlaylistApi] Sending add track request', {
+        playlistId,
+        trackUri: track.trackUri,
+        title: track.title,
+        albumArt: track.albumArt ? 'present' : 'undefined',
+        previewUrl: track.previewUrl ? 'present' : 'undefined',
+      });
 
     const response = await fetch(`${API_CONFIG.BASE_URL}/api/playlists/${playlistId}/tracks`, {
       method: 'POST',
@@ -214,7 +215,7 @@ export const playlistApi = {
       }
     }
 
-    console.log('🟢 [PlaylistApi] Track added successfully');
+    if (__DEV__) console.log('🟢 [PlaylistApi] Track added successfully');
   },
 
   /**

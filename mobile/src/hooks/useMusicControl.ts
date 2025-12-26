@@ -62,7 +62,8 @@ export function useMusicControlEmitter() {
   useEffect(() => {
     deviceService.getDeviceInfo().then(info => {
       setDeviceInfo(info);
-      console.log('[MusicControl] Device info loaded:', info.deviceName, info.deviceId);
+      if (__DEV__)
+        console.log('[MusicControl] Device info loaded:', info.deviceName, info.deviceId);
     });
   }, []);
 
@@ -73,7 +74,8 @@ export function useMusicControlEmitter() {
     }
 
     socket.emit('auth:register', { userId: user.id, device: deviceInfo });
-    console.log('[MusicControl] Registered user with device:', user.id, deviceInfo.deviceName);
+    if (__DEV__)
+      console.log('[MusicControl] Registered user with device:', user.id, deviceInfo.deviceName);
 
     // Mark as registered after a small delay to ensure server processed it
     const timer = setTimeout(() => {
@@ -112,13 +114,14 @@ export function useMusicControlEmitter() {
       };
 
       socket.emit('listening:update', status);
-      console.log(
-        '[MusicControl] Emitted listening status:',
-        status.track?.title,
-        status.isPlaying,
-        'from',
-        deviceInfo.deviceName
-      );
+      if (__DEV__)
+        console.log(
+          '[MusicControl] Emitted listening status:',
+          status.track?.title,
+          status.isPlaying,
+          'from',
+          deviceInfo.deviceName
+        );
     };
 
     const timer = setTimeout(emitStatus, 200);
@@ -130,7 +133,7 @@ export function useMusicControlEmitter() {
     if (!socket || !isConnected) return;
 
     const handleControlCommand = (data: ControlCommand) => {
-      console.log('[MusicControl] Received control command:', data);
+      if (__DEV__) console.log('[MusicControl] Received control command:', data);
 
       if (data.action === 'play') {
         resume();
@@ -173,7 +176,7 @@ export function useFriendListening(
     if (!socket || !isConnected || !targetUserId) return;
 
     const handlePermissionChanged = (data: PermissionChangedEvent) => {
-      console.log('[MusicControl] Permission changed:', data);
+      if (__DEV__) console.log('[MusicControl] Permission changed:', data);
       if (data.ownerId === targetUserId) {
         setCanControl(data.canControl);
         if (!data.canControl) {
@@ -203,11 +206,12 @@ export function useFriendListening(
 
     const subscribeTimer = setTimeout(() => {
       socket.emit('listening:subscribe', targetUserId);
-      console.log('[MusicControl] Subscribed to listening status of:', targetUserId);
+      if (__DEV__) console.log('[MusicControl] Subscribed to listening status of:', targetUserId);
     }, 200);
 
     const handleStatus = (status: UserListeningStatus) => {
-      console.log('[MusicControl] Received listening status:', status.devices.length, 'devices');
+      if (__DEV__)
+        console.log('[MusicControl] Received listening status:', status.devices.length, 'devices');
       if (status.ownerId === targetUserId) {
         setDevices(status.devices);
         setIsLoading(false);
@@ -215,7 +219,7 @@ export function useFriendListening(
     };
 
     const handleError = (err: { message: string; code: string }) => {
-      console.log('[MusicControl] Error:', err);
+      console.error('[MusicControl] Error:', err);
       setError(err.message);
       setIsLoading(false);
     };
@@ -229,7 +233,7 @@ export function useFriendListening(
       socket.off('listening:error', handleError);
       if (socket.connected) {
         socket.emit('listening:unsubscribe', targetUserId);
-        console.log('[MusicControl] Unsubscribed from:', targetUserId);
+        if (__DEV__) console.log('[MusicControl] Unsubscribed from:', targetUserId);
       }
     };
   }, [socket, isConnected, targetUserId, canControl]);
@@ -239,7 +243,7 @@ export function useFriendListening(
       if (!socket || !isConnected || !targetUserId) return;
 
       socket.emit('control:action', { targetUserId, targetDeviceId, action: 'play' });
-      console.log('[MusicControl] Sent play command to device:', targetDeviceId);
+      if (__DEV__) console.log('[MusicControl] Sent play command to device:', targetDeviceId);
     },
     [socket, isConnected, targetUserId]
   );
@@ -249,7 +253,7 @@ export function useFriendListening(
       if (!socket || !isConnected || !targetUserId) return;
 
       socket.emit('control:action', { targetUserId, targetDeviceId, action: 'pause' });
-      console.log('[MusicControl] Sent pause command to device:', targetDeviceId);
+      if (__DEV__) console.log('[MusicControl] Sent pause command to device:', targetDeviceId);
     },
     [socket, isConnected, targetUserId]
   );

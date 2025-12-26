@@ -22,30 +22,32 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!player) return;
 
-    console.log('🎵 [PlayerProvider] Player state:', {
-      isLoaded: player.isLoaded,
-      playing: player.playing,
-      duration: player.duration,
-      currentTime: player.currentTime,
-      hasStreamUrl: !!streamUrl,
-    });
+    if (__DEV__)
+      console.log('🎵 [PlayerProvider] Player state:', {
+        isLoaded: player.isLoaded,
+        playing: player.playing,
+        duration: player.duration,
+        currentTime: player.currentTime,
+        hasStreamUrl: !!streamUrl,
+      });
   }, [player, player?.isLoaded, player?.playing, player?.duration, streamUrl]);
 
   // Fetch stream URL when track changes
   useEffect(() => {
     if (!currentTrack) {
-      console.log('🎵 [PlayerProvider] No track, clearing stream');
+      if (__DEV__) console.log('🎵 [PlayerProvider] No track, clearing stream');
       setStreamUrl(null);
       setError(null);
       return;
     }
 
     async function loadStream() {
-      console.log('🎵 [PlayerProvider] Loading stream for track:', {
-        id: currentTrack.id,
-        title: currentTrack.title,
-        permalink_url: currentTrack.permalink_url,
-      });
+      if (__DEV__)
+        console.log('🎵 [PlayerProvider] Loading stream for track:', {
+          id: currentTrack.id,
+          title: currentTrack.title,
+          permalink_url: currentTrack.permalink_url,
+        });
 
       setLoading(true);
       setError(null);
@@ -54,15 +56,16 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         const encodedUrl = encodeURIComponent(currentTrack.permalink_url);
         const streamEndpoint = `${API_URL}/api/soundcloud/stream/${encodedUrl}`;
 
-        console.log('🎵 [PlayerProvider] Fetching stream from:', streamEndpoint);
+        if (__DEV__) console.log('🎵 [PlayerProvider] Fetching stream from:', streamEndpoint);
 
         const response = await fetch(streamEndpoint);
 
-        console.log('🎵 [PlayerProvider] Stream response:', {
-          status: response.status,
-          statusText: response.statusText,
-          ok: response.ok,
-        });
+        if (__DEV__)
+          console.log('🎵 [PlayerProvider] Stream response:', {
+            status: response.status,
+            statusText: response.statusText,
+            ok: response.ok,
+          });
 
         if (!response.ok) {
           const errorText = await response.text();
@@ -74,13 +77,14 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         }
 
         const data = await response.json();
-        console.log('🎵 [PlayerProvider] Stream response data:', {
-          success: data.success,
-          hasStreamUrl: !!data.data?.streamUrl,
-        });
+        if (__DEV__)
+          console.log('🎵 [PlayerProvider] Stream response data:', {
+            success: data.success,
+            hasStreamUrl: !!data.data?.streamUrl,
+          });
 
         if (data.success && data.data.streamUrl) {
-          console.log('🟢 [PlayerProvider] Stream URL obtained successfully');
+          if (__DEV__) console.log('🟢 [PlayerProvider] Stream URL obtained successfully');
           setStreamUrl(data.data.streamUrl);
         } else {
           throw new Error('Stream URL not available');
@@ -103,7 +107,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
     // Wait for player to be loaded
     if (player.isLoaded && player.duration > 0) {
-      console.log('🎵 [PlayerProvider] Player loaded, auto-playing');
+      if (__DEV__) console.log('🎵 [PlayerProvider] Player loaded, auto-playing');
       player.play();
     }
   }, [player, player?.isLoaded, player?.duration, streamUrl]);

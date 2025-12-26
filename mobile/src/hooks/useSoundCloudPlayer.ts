@@ -15,30 +15,32 @@ export function useSoundCloudPlayer(track: SoundCloudTrack | null) {
   useEffect(() => {
     if (!player) return;
 
-    console.log('🎵 [useSoundCloudPlayer] Player state:', {
-      isLoaded: player.isLoaded,
-      playing: player.playing,
-      duration: player.duration,
-      currentTime: player.currentTime,
-      hasStreamUrl: !!streamUrl,
-    });
+    if (__DEV__)
+      console.log('🎵 [useSoundCloudPlayer] Player state:', {
+        isLoaded: player.isLoaded,
+        playing: player.playing,
+        duration: player.duration,
+        currentTime: player.currentTime,
+        hasStreamUrl: !!streamUrl,
+      });
   }, [player, player?.isLoaded, player?.playing, player?.duration, streamUrl]);
 
   // Fetch stream URL when track changes
   useEffect(() => {
     if (!track) {
-      console.log('🎵 [useSoundCloudPlayer] No track, clearing stream');
+      if (__DEV__) console.log('🎵 [useSoundCloudPlayer] No track, clearing stream');
       setStreamUrl(null);
       setError(null);
       return;
     }
 
     async function loadStream() {
-      console.log('🎵 [useSoundCloudPlayer] Loading stream for track:', {
-        id: track.id,
-        title: track.title,
-        permalink_url: track.permalink_url,
-      });
+      if (__DEV__)
+        console.log('🎵 [useSoundCloudPlayer] Loading stream for track:', {
+          id: track.id,
+          title: track.title,
+          permalink_url: track.permalink_url,
+        });
 
       setLoading(true);
       setError(null);
@@ -47,18 +49,19 @@ export function useSoundCloudPlayer(track: SoundCloudTrack | null) {
         const encodedUrl = encodeURIComponent(track.permalink_url);
         const streamEndpoint = `${API_URL}/api/soundcloud/stream/${encodedUrl}`;
 
-        console.log('🎵 [useSoundCloudPlayer] Fetching stream from:', streamEndpoint);
+        if (__DEV__) console.log('🎵 [useSoundCloudPlayer] Fetching stream from:', streamEndpoint);
 
         const response = await fetch(streamEndpoint);
 
-        console.log('🎵 [useSoundCloudPlayer] Stream response:', {
-          status: response.status,
-          statusText: response.statusText,
-          ok: response.ok,
-          headers: {
-            'content-type': response.headers.get('content-type'),
-          },
-        });
+        if (__DEV__)
+          console.log('🎵 [useSoundCloudPlayer] Stream response:', {
+            status: response.status,
+            statusText: response.statusText,
+            ok: response.ok,
+            headers: {
+              'content-type': response.headers.get('content-type'),
+            },
+          });
 
         if (!response.ok) {
           const errorText = await response.text();
@@ -71,14 +74,15 @@ export function useSoundCloudPlayer(track: SoundCloudTrack | null) {
         }
 
         const data = await response.json();
-        console.log('🎵 [useSoundCloudPlayer] Stream response data:', {
-          success: data.success,
-          hasStreamUrl: !!data.data?.streamUrl,
-          streamUrl: data.data?.streamUrl?.substring(0, 100) + '...',
-        });
+        if (__DEV__)
+          console.log('🎵 [useSoundCloudPlayer] Stream response data:', {
+            success: data.success,
+            hasStreamUrl: !!data.data?.streamUrl,
+            streamUrl: data.data?.streamUrl?.substring(0, 100) + '...',
+          });
 
         if (data.success && data.data.streamUrl) {
-          console.log('🟢 [useSoundCloudPlayer] Stream URL obtained successfully');
+          if (__DEV__) console.log('🟢 [useSoundCloudPlayer] Stream URL obtained successfully');
           setStreamUrl(data.data.streamUrl);
         } else {
           console.error('🔴 [useSoundCloudPlayer] Stream URL not in response:', data);

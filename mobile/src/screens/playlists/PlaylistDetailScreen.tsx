@@ -166,7 +166,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
         onPress: async () => {
           try {
             await removeTrack(id, trackId);
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
           } catch (error) {
             Alert.alert('Error', 'Failed to remove track');
           }

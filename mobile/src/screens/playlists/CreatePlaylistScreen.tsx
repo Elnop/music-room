@@ -77,7 +77,7 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
       Alert.alert('Succès', 'Playlist créée avec succès', [
         { text: 'OK', onPress: () => navigation.goBack() },
       ]);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       Alert.alert('Erreur', 'Impossible de créer la playlist');
     }

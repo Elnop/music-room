@@ -2,7 +2,7 @@ import type { UserProfile } from '@types';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
 
-console.log('[ProfileAPI] Using API URL:', API_URL);
+if (__DEV__) console.log('[ProfileAPI] Using API URL:', API_URL);
 
 /**
  * Profile update data

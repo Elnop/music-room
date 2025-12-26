@@ -93,7 +93,7 @@ export const signInWithGoogle = async (): Promise<string> => {
       });
     }
 
-    console.log('[OAuth] ID token received successfully');
+    if (__DEV__) console.log('[OAuth] ID token received successfully');
 
     return idToken;
   } catch (error: unknown) {
@@ -204,7 +204,7 @@ export const signInWithFacebook = async (): Promise<string> => {
       throw new Error('No access token received from Facebook Login. Please try again.');
     }
 
-    console.log('[OAuth] Facebook access token received successfully');
+    if (__DEV__) console.log('[OAuth] Facebook access token received successfully');
 
     return accessToken;
   } catch (error: unknown) {
@@ -238,7 +238,7 @@ export const signInWithFacebook = async (): Promise<string> => {
 export const signOutFacebook = async (): Promise<void> => {
   try {
     await LoginManager.logOut();
-    console.log('[OAuth] Facebook sign-out successful');
+    if (__DEV__) console.log('[OAuth] Facebook sign-out successful');
   } catch (error) {
     console.error('Error signing out from Facebook:', error);
   }

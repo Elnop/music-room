@@ -18,7 +18,7 @@ export function usePlayerController() {
 
   // Update the player reference in the store whenever it changes
   useEffect(() => {
-    console.log('🎵 [usePlayerController] Updating player instance in store');
+    if (__DEV__) console.log('🎵 [usePlayerController] Updating player instance in store');
     setPlayer(player);
   }, [player, setPlayer]);
 
@@ -26,30 +26,32 @@ export function usePlayerController() {
   useEffect(() => {
     if (!player) return;
 
-    console.log('🎵 [usePlayerController] Player state:', {
-      isLoaded: player.isLoaded,
-      playing: player.playing,
-      duration: player.duration,
-      currentTime: player.currentTime,
-      hasStreamUrl: !!streamUrl,
-    });
+    if (__DEV__)
+      console.log('🎵 [usePlayerController] Player state:', {
+        isLoaded: player.isLoaded,
+        playing: player.playing,
+        duration: player.duration,
+        currentTime: player.currentTime,
+        hasStreamUrl: !!streamUrl,
+      });
   }, [player, player?.isLoaded, player?.playing, player?.duration, streamUrl]);
 
   // Fetch stream URL when track changes
   useEffect(() => {
     if (!currentTrack) {
-      console.log('🎵 [usePlayerController] No track, clearing stream');
+      if (__DEV__) console.log('🎵 [usePlayerController] No track, clearing stream');
       setStreamUrl(null);
       setError(null);
       return;
     }
 
     async function loadStream() {
-      console.log('🎵 [usePlayerController] Loading stream for track:', {
-        id: currentTrack.id,
-        title: currentTrack.title,
-        permalink_url: currentTrack.permalink_url,
-      });
+      if (__DEV__)
+        console.log('🎵 [usePlayerController] Loading stream for track:', {
+          id: currentTrack.id,
+          title: currentTrack.title,
+          permalink_url: currentTrack.permalink_url,
+        });
 
       setLoading(true);
       setError(null);
@@ -58,18 +60,19 @@ export function usePlayerController() {
         const encodedUrl = encodeURIComponent(currentTrack.permalink_url);
         const streamEndpoint = `${API_URL}/api/soundcloud/stream/${encodedUrl}`;
 
-        console.log('🎵 [usePlayerController] Fetching stream from:', streamEndpoint);
+        if (__DEV__) console.log('🎵 [usePlayerController] Fetching stream from:', streamEndpoint);
 
         const response = await fetch(streamEndpoint);
 
-        console.log('🎵 [usePlayerController] Stream response:', {
-          status: response.status,
-          statusText: response.statusText,
-          ok: response.ok,
-          headers: {
-            'content-type': response.headers.get('content-type'),
-          },
-        });
+        if (__DEV__)
+          console.log('🎵 [usePlayerController] Stream response:', {
+            status: response.status,
+            statusText: response.statusText,
+            ok: response.ok,
+            headers: {
+              'content-type': response.headers.get('content-type'),
+            },
+          });
 
         if (!response.ok) {
           const errorText = await response.text();
@@ -82,14 +85,15 @@ export function usePlayerController() {
         }
 
         const data = await response.json();
-        console.log('🎵 [usePlayerController] Stream response data:', {
-          success: data.success,
-          hasStreamUrl: !!data.data?.streamUrl,
-          streamUrl: data.data?.streamUrl?.substring(0, 100) + '...',
-        });
+        if (__DEV__)
+          console.log('🎵 [usePlayerController] Stream response data:', {
+            success: data.success,
+            hasStreamUrl: !!data.data?.streamUrl,
+            streamUrl: data.data?.streamUrl?.substring(0, 100) + '...',
+          });
 
         if (data.success && data.data.streamUrl) {
-          console.log('🟢 [usePlayerController] Stream URL obtained successfully');
+          if (__DEV__) console.log('🟢 [usePlayerController] Stream URL obtained successfully');
           setStreamUrl(data.data.streamUrl);
         } else {
           console.error('🔴 [usePlayerController] Stream URL not in response:', data);
@@ -116,7 +120,7 @@ export function usePlayerController() {
 
     // Wait for player to be loaded
     if (player.isLoaded && player.duration > 0) {
-      console.log('🎵 [usePlayerController] Player loaded, auto-playing');
+      if (__DEV__) console.log('🎵 [usePlayerController] Player loaded, auto-playing');
       play();
     }
   }, [player, player?.isLoaded, player?.duration, streamUrl, play]);

@@ -12,20 +12,21 @@ const THEMES: Record<ThemeName, Theme> = {
 };
 
 // Debug log to verify themes are properly constructed
-console.log('🔵 [ThemeContext] Themes initialized:', {
-  royalBlue: {
-    hasSpacing: !!royalBlueTheme.spacing,
-    spacingKeys: royalBlueTheme.spacing ? Object.keys(royalBlueTheme.spacing) : [],
-  },
-  christmas: {
-    hasSpacing: !!christmasTheme.spacing,
-    spacingKeys: christmasTheme.spacing ? Object.keys(christmasTheme.spacing) : [],
-  },
-  pastelLime: {
-    hasSpacing: !!pastelLimeTheme.spacing,
-    spacingKeys: pastelLimeTheme.spacing ? Object.keys(pastelLimeTheme.spacing) : [],
-  },
-});
+if (__DEV__)
+  console.log('🔵 [ThemeContext] Themes initialized:', {
+    royalBlue: {
+      hasSpacing: !!royalBlueTheme.spacing,
+      spacingKeys: royalBlueTheme.spacing ? Object.keys(royalBlueTheme.spacing) : [],
+    },
+    christmas: {
+      hasSpacing: !!christmasTheme.spacing,
+      spacingKeys: christmasTheme.spacing ? Object.keys(christmasTheme.spacing) : [],
+    },
+    pastelLime: {
+      hasSpacing: !!pastelLimeTheme.spacing,
+      spacingKeys: pastelLimeTheme.spacing ? Object.keys(pastelLimeTheme.spacing) : [],
+    },
+  });
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
@@ -71,13 +72,14 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
   // Debug log the currently active theme
   React.useEffect(() => {
-    console.log('🔵 [ThemeContext] Active theme:', {
-      themeName,
-      hasTheme: !!theme,
-      hasSpacing: !!theme?.spacing,
-      spacingKeys: theme?.spacing ? Object.keys(theme.spacing) : [],
-      spacingSm: theme?.spacing?.sm,
-    });
+    if (__DEV__)
+      console.log('🔵 [ThemeContext] Active theme:', {
+        themeName,
+        hasTheme: !!theme,
+        hasSpacing: !!theme?.spacing,
+        spacingKeys: theme?.spacing ? Object.keys(theme.spacing) : [],
+        spacingSm: theme?.spacing?.sm,
+      });
   }, [themeName, theme]);
 
   const value: ThemeContextValue = {

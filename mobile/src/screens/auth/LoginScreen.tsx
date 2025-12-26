@@ -62,7 +62,7 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
     try {
       await login(data.email, data.password);
       // Navigation handled by RootNavigator based on auth state
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       // Error shown via alert
     }
@@ -72,7 +72,7 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
     try {
       await loginWithGoogle();
       // Navigation handled by RootNavigator based on auth state
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       // Error shown via alert (from auth store)
     }
@@ -82,7 +82,7 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
     try {
       await loginWithFacebook();
       // Navigation handled by RootNavigator based on auth state
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       // Error shown via alert (from auth store)
     }

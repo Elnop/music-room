@@ -62,13 +62,14 @@ export function PlaylistSelectorModal({ visible, track, onClose }: Props) {
   const handleSelectPlaylist = async (playlistId: string) => {
     if (!track || isAdding) return;
 
-    console.log('🎵 [PlaylistSelector] Adding track to playlist', {
-      trackId: track.id,
-      trackTitle: track.title,
-      playlistId,
-      hasArtwork: !!track.artwork_url,
-      hasUserAvatar: !!track.user.avatar_url,
-    });
+    if (__DEV__)
+      console.log('🎵 [PlaylistSelector] Adding track to playlist', {
+        trackId: track.id,
+        trackTitle: track.title,
+        playlistId,
+        hasArtwork: !!track.artwork_url,
+        hasUserAvatar: !!track.user.avatar_url,
+      });
 
     setIsAdding(true);
 
@@ -87,14 +88,15 @@ export function PlaylistSelectorModal({ visible, track, onClose }: Props) {
         previewUrl: undefined,
       };
 
-      console.log('🎵 [PlaylistSelector] Converted track:', {
-        ...internalTrack,
-        albumArt: internalTrack.albumArt ? 'present' : 'undefined',
-      });
+      if (__DEV__)
+        console.log('🎵 [PlaylistSelector] Converted track:', {
+          ...internalTrack,
+          albumArt: internalTrack.albumArt ? 'present' : 'undefined',
+        });
 
       await addTrack(playlistId, internalTrack as any); // Type assertion needed due to id field
 
-      console.log('🟢 [PlaylistSelector] Track added successfully');
+      if (__DEV__) console.log('🟢 [PlaylistSelector] Track added successfully');
 
       Alert.alert('Success', `Added "${track.title}" to playlist`, [{ text: 'OK' }]);
 

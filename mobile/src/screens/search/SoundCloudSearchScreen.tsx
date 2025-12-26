@@ -24,9 +24,10 @@ export function SoundCloudSearchScreen() {
 
   // Debounced search
   const debouncedSearch = useMemo(
-    () => debounce((query: string) => {
-      search(query);
-    }, 500),
+    () =>
+      debounce((query: string) => {
+        search(query);
+      }, 500),
     [search]
   );
 
