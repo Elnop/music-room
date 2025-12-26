@@ -63,9 +63,9 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
     try {
       await register(data);
       // Navigation handled by RootNavigator based on auth state
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
-      // Error shown via alert
+    } catch (error) {
+      console.error('[RegisterScreen] Register error:', error);
+      // Error shown via alert (from auth store)
     }
   };
 
@@ -73,8 +73,8 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
     try {
       await loginWithGoogle();
       // Navigation handled by RootNavigator based on auth state
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
+    } catch (error) {
+      console.error('[RegisterScreen] Google login error:', error);
       // Error shown via alert (from auth store)
     }
   };
@@ -83,8 +83,8 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
     try {
       await loginWithFacebook();
       // Navigation handled by RootNavigator based on auth state
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
+    } catch (error) {
+      console.error('[RegisterScreen] Facebook login error:', error);
       // Error shown via alert (from auth store)
     }
   };
