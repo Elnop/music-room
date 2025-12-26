@@ -55,9 +55,10 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       }
     };
 
-    loadTheme();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    void loadTheme();
+    // setThemeName and setIsLoaded are stable (React setState functions)
+    // isLoaded is checked at the start to prevent re-runs
+  }, [isLoaded, setThemeName, setIsLoaded]);
 
   const setTheme = async (name: ThemeName) => {
     try {
