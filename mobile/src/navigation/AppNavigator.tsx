@@ -74,8 +74,6 @@ export function AppNavigator() {
             },
             headerStyle: {
               backgroundColor: theme.colors.background,
-              borderBottomWidth: theme.borders.medium,
-              borderBottomColor: theme.colors.border,
             },
             headerTintColor: theme.colors.text,
             headerShadowVisible: false,

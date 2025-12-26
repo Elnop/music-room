@@ -10,17 +10,10 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
  * to create and manage the single shared player instance
  */
 export function usePlayerController() {
-  const { currentTrack, streamUrl, setPlayer, setStreamUrl, setLoading, setError, play } =
-    usePlayerStore();
+  const { currentTrack, streamUrl, setStreamUrl, setLoading, setError, play } = usePlayerStore();
 
   // Create the audio player instance - useAudioPlayer must be called at component level
   const player = useAudioPlayer(streamUrl || '');
-
-  // Update the player reference in the store whenever it changes
-  useEffect(() => {
-    if (__DEV__) console.log('🎵 [usePlayerController] Updating player instance in store');
-    setPlayer(player);
-  }, [player, setPlayer]);
 
   // Log player state changes
   useEffect(() => {
@@ -46,6 +39,8 @@ export function usePlayerController() {
     }
 
     async function loadStream() {
+      if (!currentTrack) return;
+
       if (__DEV__)
         console.log('🎵 [usePlayerController] Loading stream for track:', {
           id: currentTrack.id,

@@ -13,12 +13,22 @@ clean: ## Remove containers, volumes, images, and project dependencies (with con
 	@echo "  - Coverage reports"
 	@echo "  - Build logs"
 	@echo ""
-	@read -p "Continue? (y/n): " confirm; \
+	@printf "Continue? (y/n): "; \
+	read confirm; \
 	if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ]; then \
-		$(call docker_down_volumes); \
+		echo "$(CYAN)Stopping and removing containers + volumes...$(RESET)"; \
+		docker-compose down -v 2>/dev/null || true; \
+		echo "$(GREEN)✓ Containers and volumes removed$(RESET)"; \
 		docker rmi music_room-backend music_room-mobile 2>/dev/null || true; \
 		docker network rm music-room-network 2>/dev/null || true; \
-		$(call remove_all_project_artifacts); \
+		rm -rf backend/node_modules mobile/node_modules 2>/dev/null || true; \
+		rm -rf backend/dist mobile/.expo 2>/dev/null || true; \
+		rm -rf mobile/android mobile/ios 2>/dev/null || true; \
+		rm -rf backend/coverage mobile/coverage 2>/dev/null || true; \
+		rm -f /tmp/ngrok.log /tmp/backend-tunnel-url.txt 2>/dev/null || true; \
+		rm -rf /tmp/shared 2>/dev/null || true; \
+		find . -name "*.tsbuildinfo" -type f -delete 2>/dev/null || true; \
+		find mobile -name ".eas-build-*.json" -type f -delete 2>/dev/null || true; \
 		echo "$(BOLD)$(GREEN)✓ Cleanup complete$(RESET)"; \
 	else \
 		echo "$(YELLOW)Cancelled.$(RESET)"; \
@@ -44,7 +54,8 @@ clean-all: ## Complete cleanup - Docker system + project artifacts + global cach
 	@echo "  - ALL project caches (coverage, logs, .expo, native builds, etc.)"
 	@echo "  - ALL global caches (Expo, Metro, Watchman, Gradle)"
 	@echo ""
-	@read -p "Type 'yes' to confirm complete cleanup: " confirm; \
+	@printf "Type 'yes' to confirm complete cleanup: "; \
+	read confirm; \
 	if [ "$$confirm" = "yes" ]; then \
 		echo "$(RED)Starting complete cleanup...$(RESET)"; \
 		echo "$(CYAN)Step 1/5: Stopping all Docker containers...$(RESET)"; \
@@ -114,7 +125,8 @@ clean-global-cache: ## Remove global caches (Expo, Metro, Watchman) - affects al
 	@echo "  - ~/.cache/metro-bundler/"
 	@echo "  - ~/.watchman/"
 	@echo ""
-	@read -p "Are you sure? Type 'yes' to continue: " confirm; \
+	@printf "Are you sure? Type 'yes' to continue: "; \
+	read confirm; \
 	if [ "$$confirm" = "yes" ]; then \
 		echo "$(YELLOW)⚠️  Removing Expo home cache (global, affects all projects)...$(RESET)"; \
 		rm -rf ~/.expo 2>/dev/null || true; \
@@ -137,7 +149,8 @@ clean-gradle: ## Remove Gradle caches (Android builds) - affects all Android pro
 	@echo "  - ~/.gradle/"
 	@echo "  - ~/.android/build-cache/"
 	@echo ""
-	@read -p "Are you sure? Type 'yes' to continue: " confirm; \
+	@printf "Are you sure? Type 'yes' to continue: "; \
+	read confirm; \
 	if [ "$$confirm" = "yes" ]; then \
 		echo "$(YELLOW)⚠️  Removing Gradle cache (global, affects all Android projects)...$(RESET)"; \
 		rm -rf ~/.gradle 2>/dev/null || true; \

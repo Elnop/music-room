@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/contexts';
+import type { Theme } from '@/themes/types';
 import { useSoundCloudStore } from '@/store/soundcloudStore';
 import { usePlayerStore } from '@/store/playerStore';
 import { SoundCloudTrackItem } from './components/SoundCloudTrackItem';

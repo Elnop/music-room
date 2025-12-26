@@ -88,5 +88,13 @@
     "typescript": "~5.9.2",
     "typescript-eslint": "^8.50.1"
   },
+  "overrides": {
+    "@expo/ngrok": {
+      "uuid": "^10.0.0"
+    },
+    "glob": "^10.3.10",
+    "rimraf": "^5.0.5",
+    "inflight": "npm:@zkochan/inflight@^2.0.0"
+  },
   "private": true
 }

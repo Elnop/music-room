@@ -1026,6 +1026,12 @@ cd mobile && npm install && npm run type-check
 - `DOCKER.md` - Docker architecture and troubleshooting
 - `GIT_WORKFLOW.md` - Git workflow and best practices
 - `SECURITY.md` - Security details (Chainguard Images, 0 CVE)
+- `docs/README.md` - Documentation index
+- `docs/backend/` - Backend technical documentation
+  - `SUPABASE_TYPES_MIGRATION.md` - Guide migration types Supabase
+  - `EXAMPLE_TYPED_SERVICE.md` - Exemple de service typé
+  - `TYPESCRIPT_LINT_SOLUTIONS.md` - Solutions TypeScript/ESLint
 - `backend/README.md` - Backend-specific documentation
 - `backend/API_DOCUMENTATION.md` - Complete API reference
+- `backend/DOCS.md` - Pointer to backend docs
 - `mobile/README.md` - Mobile-specific documentation

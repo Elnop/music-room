@@ -110,7 +110,7 @@ export class ProviderService {
     }
 
     // 3. Check provider is actually linked
-    const providerColumn = `${provider}_id` as "google_id" | "facebook_id";
+    const providerColumn = `${provider}_id`;
     const dbProfile = profile as Record<string, unknown>;
     if (!dbProfile[providerColumn]) {
       logger.warn("Attempt to unlink provider that is not linked", {

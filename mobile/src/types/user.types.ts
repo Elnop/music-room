@@ -12,3 +12,8 @@ export interface UserProfile extends User {
   bio?: string;
   updatedAt: string;
 }
+
+export interface UpdateProfileData {
+  displayName?: string;
+  bio?: string;
+}

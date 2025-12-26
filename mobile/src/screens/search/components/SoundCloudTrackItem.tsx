@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useTheme } from '@/contexts';
+import type { Theme } from '@/themes/types';
 import type { SoundCloudTrack } from '@/types';
 
 interface Props {

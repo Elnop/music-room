@@ -1,32 +1,53 @@
-import {
-  GoogleSignin,
-  statusCodes,
-  type User as GoogleUser,
-} from '@react-native-google-signin/google-signin';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { LoginManager, AccessToken, AuthenticationToken, Settings } from 'react-native-fbsdk-next';
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 
-// Type guard to safely extract ID token from Google Sign-In response
-interface GoogleSignInResponse {
-  type?: 'success' | 'cancelled';
-  data?: {
-    idToken?: string | null;
-    user?: GoogleUser;
-  };
-  idToken?: string | null;
-  user?: GoogleUser;
+// Type guard to check if an unknown response has idToken
+function hasIdToken(
+  response: unknown
+): response is { idToken: string } | { data: { idToken: string } } {
+  if (typeof response !== 'object' || response === null) {
+    return false;
+  }
+
+  const obj = response as Record<string, unknown>;
+
+  // Check direct idToken
+  if (typeof obj.idToken === 'string' && obj.idToken.length > 0) {
+    return true;
+  }
+
+  // Check nested data.idToken
+  if (typeof obj.data === 'object' && obj.data !== null) {
+    const data = obj.data as Record<string, unknown>;
+    if (typeof data.idToken === 'string' && data.idToken.length > 0) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
-function extractIdToken(response: GoogleSignInResponse): string {
-  // Try new structure (data.idToken)
-  const idToken = response.data?.idToken || response.idToken;
-
-  if (!idToken) {
+function extractIdToken(response: unknown): string {
+  if (!hasIdToken(response)) {
     throw new Error('No ID token received from Google Sign-In. Please try again.');
   }
 
-  return idToken;
+  const obj = response as Record<string, unknown>;
+
+  // Try direct idToken first
+  if (typeof obj.idToken === 'string') {
+    return obj.idToken;
+  }
+
+  // Try nested data.idToken
+  const data = obj.data as Record<string, unknown>;
+  if (typeof data.idToken === 'string') {
+    return data.idToken;
+  }
+
+  throw new Error('No ID token received from Google Sign-In. Please try again.');
 }
 
 // Get Google OAuth Web Client ID from environment variables
@@ -81,16 +102,11 @@ export const signInWithGoogle = async (): Promise<string> => {
     const userInfo = await GoogleSignin.signIn();
 
     // Extract ID token from response using type-safe helper
-    const idToken = extractIdToken(userInfo as GoogleSignInResponse);
+    const idToken = extractIdToken(userInfo);
 
     // Log what Google returned for debugging (only in development)
     if (__DEV__) {
-      const response = userInfo as GoogleSignInResponse;
-      console.log('[OAuth] Google Sign-In response:', {
-        hasIdToken: !!idToken,
-        hasUser: !!response.user || !!response.data?.user,
-        user: response.user || response.data?.user,
-      });
+      console.log('[OAuth] Google Sign-In successful');
     }
 
     if (__DEV__) console.log('[OAuth] ID token received successfully');
@@ -141,7 +157,12 @@ export const signOutGoogle = async (): Promise<void> => {
  * Check if user is already signed in to Google
  */
 export const isSignedIn = async (): Promise<boolean> => {
-  return await GoogleSignin.isSignedIn();
+  try {
+    const currentUser = await GoogleSignin.getCurrentUser();
+    return currentUser !== null;
+  } catch {
+    return false;
+  }
 };
 
 /**

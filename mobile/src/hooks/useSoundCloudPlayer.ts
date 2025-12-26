@@ -35,6 +35,8 @@ export function useSoundCloudPlayer(track: SoundCloudTrack | null) {
     }
 
     async function loadStream() {
+      if (!track) return;
+
       if (__DEV__)
         console.log('🎵 [useSoundCloudPlayer] Loading stream for track:', {
           id: track.id,

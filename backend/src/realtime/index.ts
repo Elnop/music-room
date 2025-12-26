@@ -164,7 +164,7 @@ class RealtimeService {
       this.deviceToSocket.set(deviceKey, socket.id);
 
       // Join personal room for targeted messages
-      socket.join(`user:${userId}`);
+      void socket.join(`user:${userId}`);
 
       logger.debug(
         `[Socket] User ${userId} registered device "${device.deviceName}" (${device.deviceId}) with socket ${socket.id}`,
@@ -177,12 +177,12 @@ class RealtimeService {
    */
   private registerPlaylistHandlers(socket: Socket) {
     socket.on("playlist:join", (playlistId: string) => {
-      socket.join(`playlist:${playlistId}`);
+      void socket.join(`playlist:${playlistId}`);
       logger.debug(`[Socket] ${socket.id} joined playlist:${playlistId}`);
     });
 
     socket.on("playlist:leave", (playlistId: string) => {
-      socket.leave(`playlist:${playlistId}`);
+      void socket.leave(`playlist:${playlistId}`);
       logger.debug(`[Socket] ${socket.id} left playlist:${playlistId}`);
     });
   }
@@ -237,14 +237,7 @@ class RealtimeService {
         },
       );
 
-      try {
-        await this.broadcastUserListeningStatus(userId);
-      } catch (error) {
-        logger.error(
-          `[Socket] Failed to broadcast listening status for user ${userId}`,
-          { error },
-        );
-      }
+      this.broadcastUserListeningStatus(userId);
     });
 
     // User subscribes to another user's listening status (all devices)
@@ -269,7 +262,7 @@ class RealtimeService {
         return;
       }
 
-      socket.join(`listening:${targetUserId}`);
+      void socket.join(`listening:${targetUserId}`);
 
       const userDevices = this.listeningStatuses.get(targetUserId);
       const devices = userDevices ? Array.from(userDevices.values()) : [];
@@ -286,7 +279,7 @@ class RealtimeService {
     });
 
     socket.on("listening:unsubscribe", (targetUserId: string) => {
-      socket.leave(`listening:${targetUserId}`);
+      void socket.leave(`listening:${targetUserId}`);
       logger.debug(
         `[Socket] ${socket.id} unsubscribed from listening:${targetUserId}`,
       );
@@ -344,7 +337,7 @@ class RealtimeService {
   /**
    * Broadcast all devices' listening status for a user
    */
-  private async broadcastUserListeningStatus(userId: string) {
+  private broadcastUserListeningStatus(userId: string) {
     if (!this.io) return;
 
     const room = `listening:${userId}`;

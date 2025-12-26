@@ -64,7 +64,7 @@ export function ProfileScreen() {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
         {/* Header Section */}
         <View style={styles.header}>
-          <Avatar size="lg" name={user.displayName || user.username} imageUrl={user.avatarUrl} />
+          <Avatar size="lg" name={user.displayName || user.username} uri={user.avatarUrl} />
           <Text style={styles.username}>{user.username}</Text>
           {user.displayName && <Text style={styles.displayName}>{user.displayName}</Text>}
           {user.bio && <Text style={styles.bio}>{user.bio}</Text>}

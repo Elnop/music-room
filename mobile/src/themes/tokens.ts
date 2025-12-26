@@ -10,7 +10,6 @@ export const NEOBRUTALISM_BORDERS = {
   // Border radius - légèrement arrondi pour modernité
   none: 0,
   small: 4,
-  medium: 8,
   round: 9999, // Cercles parfaits
 } as const;
 

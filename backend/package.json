@@ -42,8 +42,12 @@
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.2.0",
+    "supabase": "^1.200.3",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.50.1"
+  },
+  "overrides": {
+    "node-domexception": "npm:domexception@^4.0.0"
   }
 }

@@ -19,6 +19,11 @@ export const registerSchema = z.object({
     .min(3, 'Username must be at least 3 characters')
     .max(20, 'Username must be less than 20 characters')
     .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
+  displayName: z
+    .string()
+    .min(1, 'Display name cannot be empty')
+    .max(50, 'Display name must be less than 50 characters')
+    .optional(),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;

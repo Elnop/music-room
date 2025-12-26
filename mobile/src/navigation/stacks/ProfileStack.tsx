@@ -28,8 +28,10 @@ export function ProfileNavigator() {
       screenOptions={{
         headerStyle: {
           backgroundColor: theme.colors.background,
-          borderBottomWidth: theme.borders.medium,
-          borderBottomColor: theme.colors.border,
+        },
+        contentStyle: {
+          borderTopWidth: theme.borders.medium,
+          borderTopColor: theme.colors.border,
         },
         headerTintColor: theme.colors.text,
         headerShadowVisible: false,

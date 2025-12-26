@@ -15,6 +15,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTheme } from '@contexts';
 import type { Theme } from '@themes/types';
+import type { UpdateProfileData } from '@/types/user.types';
 import { useAuthStore } from '@/store/authStore';
 import { profileApi, ApiError } from '@/services/profileApi';
 import { Button } from '@components/common/Button';

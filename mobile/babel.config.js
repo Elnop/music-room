@@ -21,7 +21,6 @@ module.exports = function (api) {
             '@types': './src/types',
             '@themes': './src/themes',
             '@constants': './src/constants',
-            '@mocks': './src/mocks',
           },
         },
       ],

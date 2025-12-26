@@ -42,6 +42,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     }
 
     async function loadStream() {
+      if (!currentTrack) return;
+
       if (__DEV__)
         console.log('🎵 [PlayerProvider] Loading stream for track:', {
           id: currentTrack.id,

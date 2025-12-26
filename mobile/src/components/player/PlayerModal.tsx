@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { useTheme } from '@/contexts';
+import type { Theme } from '@/themes/types';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { usePlayerStore } from '@/store/playerStore';
 import { usePlayerSync } from '@/hooks/usePlayerSync';

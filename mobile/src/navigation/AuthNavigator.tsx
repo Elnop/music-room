@@ -21,8 +21,10 @@ export function AuthNavigator() {
       screenOptions={{
         headerStyle: {
           backgroundColor: theme.colors.background,
-          borderBottomWidth: theme.borders.medium, // 2px bordure
-          borderBottomColor: theme.colors.border, // Noir
+        },
+        contentStyle: {
+          borderTopWidth: theme.borders.medium, // 2px bordure
+          borderTopColor: theme.colors.border, // Noir
         },
         headerTintColor: theme.colors.text,
         headerShadowVisible: false,
