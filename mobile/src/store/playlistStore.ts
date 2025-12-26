@@ -44,6 +44,7 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
   /**
    * Fetch playlists for a user
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fetchPlaylists: async (userId: string) => {
     set({ isLoading: true, error: null });
 

@@ -68,13 +68,14 @@ export async function authMiddleware(
     logger.debug("User authenticated", { userId: user.id });
 
     next();
-  } catch (error: any) {
-    logger.warn("Authentication failed", { error: error.message });
+  } catch (error: unknown) {
+    const err = error as Error & { code?: string };
+    logger.warn("Authentication failed", { error: err.message });
     return res.status(401).json({
       success: false,
       error: {
-        message: error.message || "Authentication failed",
-        code: error.code || "AUTH_FAILED",
+        message: err.message || "Authentication failed",
+        code: err.code || "AUTH_FAILED",
       },
       meta: {
         timestamp: new Date().toISOString(),

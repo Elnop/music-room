@@ -2,6 +2,7 @@ import { logger } from "@/shared/utils/logger.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
 import { SoundCloudCache, CACHE_TTL } from "../utils/soundcloud-cache.js";
 import type {
+  SoundCloudClient,
   SoundCloudSearchQuery,
   SoundCloudSearchResult,
   SoundCloudTrack,
@@ -12,10 +13,10 @@ import type {
  * Service for SoundCloud search and track retrieval
  */
 export class SoundCloudSearchService {
-  private soundcloud: any;
+  private soundcloud: SoundCloudClient;
   private cache: SoundCloudCache;
 
-  constructor(soundcloudInstance: any) {
+  constructor(soundcloudInstance: SoundCloudClient) {
     this.soundcloud = soundcloudInstance;
     this.cache = new SoundCloudCache();
   }
@@ -49,7 +50,8 @@ export class SoundCloudSearchService {
       });
 
       // Filter only playable/streamable tracks
-      const playableTracks = (results.collection || []).filter((track: any) => {
+      const resultsData = results as { collection?: SoundCloudTrack[] };
+      const playableTracks = (resultsData.collection || []).filter((track) => {
         const hasStreamUrl =
           track.streamable || track.media?.transcodings?.length > 0;
         return hasStreamUrl;

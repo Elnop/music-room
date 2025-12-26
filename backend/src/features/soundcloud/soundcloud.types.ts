@@ -4,6 +4,21 @@
  */
 
 /**
+ * SoundCloud Client Interface (from soundcloud.ts package)
+ */
+export interface SoundCloudClient {
+  tracks: {
+    search: (query: {
+      q: string;
+      limit?: number;
+      offset?: number;
+    }) => Promise<unknown>;
+    get: (urlOrId: string) => Promise<unknown>;
+    getStreamUrl: (track: unknown) => Promise<string>;
+  };
+}
+
+/**
  * SoundCloud Track from API
  */
 export interface SoundCloudTrack {

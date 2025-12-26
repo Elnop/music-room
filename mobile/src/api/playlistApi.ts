@@ -1,5 +1,5 @@
 import { API_CONFIG } from '@constants';
-import type { Playlist, PlaylistWithTracks, Track, ApiResponse, UserProfile } from '@types';
+import type { Playlist, PlaylistWithTracks, Track, ApiResponse } from '@types';
 import type { PlaylistInput } from '@utils/validators';
 
 // Viewer profile type for API responses

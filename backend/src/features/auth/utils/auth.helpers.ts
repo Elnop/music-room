@@ -2,13 +2,14 @@ import { supabase } from "@/shared/config/supabase.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
 import { logger } from "@/shared/utils/logger.js";
 import type { AuthResponse, UserProfile } from "../auth.types.js";
+import type { User, Session } from "@supabase/supabase-js";
 
 /**
  * Format auth response with user and session data
  */
 export function formatAuthResponse(
-  user: any,
-  session: any,
+  user: User,
+  session: Session,
   username: string,
   displayName?: string,
   avatarUrl?: string,
@@ -88,7 +89,7 @@ export async function getUserProfile(userId: string): Promise<UserProfile> {
 
     return {
       id: user.user.id,
-      email: user.user.email!,
+      email: user.user.email ?? "",
       username: profile.username,
       displayName: profile.display_name,
       avatarUrl: profile.avatar_url,

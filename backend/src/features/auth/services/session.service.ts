@@ -22,7 +22,7 @@ export class SessionService {
 
       return {
         id: user.id,
-        email: user.email!,
+        email: user.email ?? "",
         role: user.role,
       };
     } catch (error) {

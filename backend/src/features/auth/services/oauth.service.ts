@@ -58,9 +58,9 @@ export class OAuthService {
       });
 
       return {
-        sub: payload.sub!,
-        email: payload.email!,
-        email_verified: payload.email_verified!,
+        sub: payload.sub ?? "",
+        email: payload.email ?? "",
+        email_verified: payload.email_verified ?? false,
         name: payload.name,
         picture: payload.picture,
         given_name: payload.given_name,

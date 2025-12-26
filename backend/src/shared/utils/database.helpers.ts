@@ -7,13 +7,23 @@ import { logger } from "@/shared/utils/logger.js";
  */
 
 /**
+ * Database filter value types
+ */
+type DbFilterValue = string | number | boolean | null;
+
+/**
+ * Database record type for inserts/updates
+ */
+type DbRecord = Record<string, DbFilterValue | DbFilterValue[] | undefined>;
+
+/**
  * Fetch a single record from database
  * Throws AppError if not found or on error
  */
 export async function fetchSingle<T>(
   client: SupabaseClient,
   table: string,
-  filter: Record<string, any>,
+  filter: Record<string, DbFilterValue>,
   select = "*",
   errorMessage = "Record not found",
   errorCode = "NOT_FOUND",
@@ -45,7 +55,7 @@ export async function fetchSingle<T>(
 export async function fetchMany<T>(
   client: SupabaseClient,
   table: string,
-  filter?: Record<string, any>,
+  filter?: Record<string, DbFilterValue>,
   select = "*",
   orderBy?: { column: string; ascending?: boolean },
 ): Promise<T[]> {
@@ -81,7 +91,7 @@ export async function fetchMany<T>(
 export async function insertOne<T>(
   client: SupabaseClient,
   table: string,
-  data: Record<string, any>,
+  data: DbRecord,
   select = "*",
   errorMessage = "Failed to insert record",
   errorCode = "INSERT_ERROR",
@@ -106,8 +116,8 @@ export async function insertOne<T>(
 export async function updateOne<T>(
   client: SupabaseClient,
   table: string,
-  filter: Record<string, any>,
-  data: Record<string, any>,
+  filter: Record<string, DbFilterValue>,
+  data: DbRecord,
   select = "*",
   errorMessage = "Failed to update record",
   errorCode = "UPDATE_ERROR",
@@ -135,7 +145,7 @@ export async function updateOne<T>(
 export async function deleteRecords(
   client: SupabaseClient,
   table: string,
-  filter: Record<string, any>,
+  filter: Record<string, DbFilterValue>,
   errorMessage = "Failed to delete record",
   errorCode = "DELETE_ERROR",
 ): Promise<void> {
@@ -160,7 +170,7 @@ export async function deleteRecords(
 export async function recordExists(
   client: SupabaseClient,
   table: string,
-  filter: Record<string, any>,
+  filter: Record<string, DbFilterValue>,
 ): Promise<boolean> {
   let query = client.from(table).select("id", { count: "exact", head: true });
 

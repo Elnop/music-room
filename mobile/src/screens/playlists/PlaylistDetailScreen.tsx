@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, FlatList, StyleSheet, Alert, TouchableOpacity, Text } from 'react-native';
+import { FlatList, StyleSheet, Alert, TouchableOpacity, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useFocusEffect } from '@react-navigation/native';
@@ -166,6 +166,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
         onPress: async () => {
           try {
             await removeTrack(id, trackId);
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           } catch (error) {
             Alert.alert('Error', 'Failed to remove track');
           }

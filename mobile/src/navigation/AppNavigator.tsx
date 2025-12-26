@@ -45,21 +45,6 @@ export type { FriendsStackParamList } from './stacks/FriendsStack';
 const Tab = createBottomTabNavigator<AppTabsParamList>();
 
 /**
- * Placeholder screen for features not yet implemented
- */
-function PlaceholderScreen({ title }: { title: string }) {
-  const { theme } = useTheme();
-  const styles = React.useMemo(() => createStyles(theme), [theme]);
-
-  return (
-    <View style={styles.placeholder}>
-      <Text style={styles.placeholderText}>{title}</Text>
-      <Text style={styles.placeholderSubtext}>Coming in next phases</Text>
-    </View>
-  );
-}
-
-/**
  * Main App Navigator - Bottom Tabs
  *
  * Features are organized as separate stack navigators in navigation/stacks/

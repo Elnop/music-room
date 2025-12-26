@@ -68,7 +68,11 @@ app.use(express.urlencoded({ extended: true }));
 
 // Request logging
 app.use((req, res, next) => {
-  const logData: any = {
+  const logData: {
+    ip: string | undefined;
+    userAgent: string | undefined;
+    origin: string | undefined;
+  } = {
     ip: req.ip,
     userAgent: req.get("user-agent"),
     origin: req.get("origin"),

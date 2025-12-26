@@ -11,7 +11,7 @@ export class AppError extends Error {
     public statusCode: number,
     message: string,
     public code?: string,
-    public details?: any,
+    public details?: unknown,
   ) {
     super(message);
     this.name = "AppError";
@@ -26,6 +26,7 @@ export function errorHandler(
   err: Error,
   req: Request,
   res: Response,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   next: NextFunction,
 ) {
   logger.error("Error occurred", {
@@ -72,11 +73,12 @@ export function errorHandler(
 
   // Supabase errors
   if ("code" in err && "message" in err) {
+    const supabaseError = err as Error & { code: string };
     const response: ApiResponse = {
       success: false,
       error: {
         message: err.message,
-        code: (err as any).code,
+        code: supabaseError.code,
       },
       meta: {
         timestamp: new Date().toISOString(),

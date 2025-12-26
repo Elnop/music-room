@@ -117,3 +117,18 @@ export interface SupabaseUser {
   email: string;
   role?: string;
 }
+
+/**
+ * Database UserProfile (snake_case from database)
+ */
+export interface DbUserProfile {
+  id: string;
+  username: string;
+  display_name?: string;
+  avatar_url?: string;
+  bio?: string;
+  created_at: string;
+  updated_at: string;
+  google_id?: string;
+  facebook_id?: string;
+}

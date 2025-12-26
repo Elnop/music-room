@@ -60,6 +60,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
         setFollowStatus(statusData);
         setPlaylists(playlistsData);
         setInitialCanControl(canControl);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
         setError('Failed to load profile');
       } finally {

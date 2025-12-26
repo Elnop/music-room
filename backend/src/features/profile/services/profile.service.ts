@@ -19,7 +19,7 @@ export class ProfileService {
       logger.info("Updating user profile", { userId, data });
 
       // Build update object with only provided fields
-      const updateData: Record<string, any> = {};
+      const updateData: Record<string, string | undefined> = {};
       if (data.displayName !== undefined)
         updateData.display_name = data.displayName;
       if (data.bio !== undefined) updateData.bio = data.bio;
@@ -63,7 +63,7 @@ export class ProfileService {
 
       return {
         id: profileData.id,
-        email: userData.user.email!,
+        email: userData.user.email ?? "",
         username: profileData.username,
         displayName: profileData.display_name,
         avatarUrl: profileData.avatar_url,
@@ -108,7 +108,7 @@ export class ProfileService {
 
       return {
         id: profileData.id,
-        email: userData.user.email!,
+        email: userData.user.email ?? "",
         username: profileData.username,
         displayName: profileData.display_name,
         avatarUrl: profileData.avatar_url,

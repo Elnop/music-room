@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ActivityIndicator,
   ViewStyle,
-  TextStyle,
 } from 'react-native';
 import { useTheme } from '@contexts';
 import type { Theme } from '@themes/types';

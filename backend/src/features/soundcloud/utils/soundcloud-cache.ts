@@ -18,7 +18,7 @@ export interface CacheEntry<T> {
  * Simple in-memory cache with TTL support
  */
 export class SoundCloudCache {
-  private cache: Map<string, CacheEntry<any>> = new Map();
+  private cache: Map<string, CacheEntry<unknown>> = new Map();
 
   /**
    * Get cached value if not expired

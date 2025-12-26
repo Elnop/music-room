@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { UserProfile } from '@types';
-import type { LoginInput, RegisterInput } from '@utils/validators';
+import type { RegisterInput } from '@utils/validators';
 import { authApi, ApiError } from '@services/api';
 import { supabase } from '@/lib/supabase';
 import { signInWithGoogle, signInWithFacebook } from '@services/oauth';
@@ -180,6 +180,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       // Clear storage
       await get().clearStorage();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       set({
         error: 'Logout failed',

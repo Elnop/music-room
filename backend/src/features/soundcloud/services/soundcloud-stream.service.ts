@@ -1,15 +1,28 @@
 import { logger } from "@/shared/utils/logger.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
 import { SoundCloudCache, CACHE_TTL } from "../utils/soundcloud-cache.js";
+import type { SoundCloudClient } from "../soundcloud.types.js";
+
+/**
+ * Extended SoundCloud client with util methods
+ */
+type SoundCloudClientWithUtil = SoundCloudClient & {
+  util?: {
+    streamLink: (
+      trackUrl: string,
+      protocol: "hls" | "progressive",
+    ) => Promise<string>;
+  };
+};
 
 /**
  * Service for SoundCloud streaming operations
  */
 export class SoundCloudStreamService {
-  private soundcloud: any;
+  private soundcloud: SoundCloudClientWithUtil;
   private cache: SoundCloudCache;
 
-  constructor(soundcloudInstance: any) {
+  constructor(soundcloudInstance: SoundCloudClientWithUtil) {
     this.soundcloud = soundcloudInstance;
     this.cache = new SoundCloudCache();
   }

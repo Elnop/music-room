@@ -19,7 +19,7 @@ import { useAuthStore } from '../../store/authStore';
 import { usePlaylistStore } from '../../store/playlistStore';
 import { Button } from '@components/common/Button';
 import { Input } from '@components/common/Input';
-import { playlistFormSchema, type PlaylistFormInput, type PlaylistInput } from '@utils/validators';
+import { playlistFormSchema, type PlaylistFormInput } from '@utils/validators';
 import type { EditMode } from '@types';
 
 type PlaylistStackParamList = {
@@ -77,6 +77,7 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
       Alert.alert('Succès', 'Playlist créée avec succès', [
         { text: 'OK', onPress: () => navigation.goBack() },
       ]);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       Alert.alert('Erreur', 'Impossible de créer la playlist');
     }

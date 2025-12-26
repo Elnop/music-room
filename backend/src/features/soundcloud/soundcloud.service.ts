@@ -11,6 +11,7 @@ import {
 import { SoundCloudSearchService } from "./services/soundcloud-search.service.js";
 import { SoundCloudStreamService } from "./services/soundcloud-stream.service.js";
 import type {
+  SoundCloudClient,
   SoundCloudSearchQuery,
   SoundCloudSearchResult,
   SoundCloudTrack,
@@ -21,7 +22,7 @@ import type {
  * Main SoundCloud service - orchestrates search and streaming operations
  */
 export class SoundCloudService {
-  private soundcloud: any;
+  private soundcloud: SoundCloudClient;
   private clientId: string | null = null;
   private searchService: SoundCloudSearchService;
   private streamService: SoundCloudStreamService;
