@@ -2,21 +2,32 @@
  * Data Transfer Objects (DTOs) for authentication
  */
 
+import type {
+	Tables,
+	TablesInsert,
+	TablesUpdate,
+} from "@/shared/types/supabase.helpers.js";
+
+// Database types (now using Supabase generated types)
+export type UserProfileRow = Tables<"user_profiles">;
+export type UserProfileInsert = TablesInsert<"user_profiles">;
+export type UserProfileUpdate = TablesUpdate<"user_profiles">;
+
 export interface RegisterDTO {
-  email: string;
-  password: string;
-  username: string;
-  displayName?: string;
+	email: string;
+	password: string;
+	username: string;
+	displayName?: string;
 }
 
 export interface LoginDTO {
-  email: string;
-  password: string;
+	email: string;
+	password: string;
 }
 
 export interface OAuthCallbackDTO {
-  code: string;
-  state?: string;
+	code: string;
+	state?: string;
 }
 
 /**
@@ -26,42 +37,42 @@ export interface OAuthCallbackDTO {
 export type OAuthProvider = "google" | "facebook";
 
 export interface GoogleTokenPayload {
-  sub: string; // Google user ID
-  email: string;
-  email_verified: boolean;
-  name?: string;
-  picture?: string;
-  given_name?: string;
-  family_name?: string;
+	sub: string; // Google user ID
+	email: string;
+	email_verified: boolean;
+	name?: string;
+	picture?: string;
+	given_name?: string;
+	family_name?: string;
 }
 
 export interface GoogleLoginDTO {
-  idToken: string; // JWT ID token from Google Sign-In
+	idToken: string; // JWT ID token from Google Sign-In
 }
 
 export interface GoogleProfile {
-  name: string;
-  picture?: string;
+	name: string;
+	picture?: string;
 }
 
 export interface FacebookTokenPayload {
-  id: string; // Facebook user ID
-  email?: string; // Optional - may not be provided if user denies email permission
-  name: string;
-  picture?: string;
+	id: string; // Facebook user ID
+	email?: string; // Optional - may not be provided if user denies email permission
+	name: string;
+	picture?: string;
 }
 
 export interface FacebookLoginDTO {
-  accessToken: string; // Access token from Facebook Login
+	accessToken: string; // Access token from Facebook Login
 }
 
 export interface FacebookProfile {
-  name: string;
-  picture?: {
-    data: {
-      url: string;
-    };
-  };
+	name: string;
+	picture?: {
+		data: {
+			url: string;
+		};
+	};
 }
 
 /**
@@ -69,66 +80,54 @@ export interface FacebookProfile {
  */
 
 export interface UserProfile {
-  id: string;
-  email: string;
-  username: string;
-  displayName?: string;
-  avatarUrl?: string;
-  bio?: string;
-  createdAt: string;
-  updatedAt: string;
-  connectedProviders?: {
-    hasPassword: boolean;
-    hasGoogle: boolean;
-    hasFacebook: boolean;
-  };
+	id: string;
+	email: string;
+	username: string;
+	displayName?: string;
+	avatarUrl?: string;
+	bio?: string;
+	createdAt: string;
+	updatedAt: string;
+	connectedProviders?: {
+		hasPassword: boolean;
+		hasGoogle: boolean;
+		hasFacebook: boolean;
+	};
 }
 
 export interface AuthResponse {
-  user: UserProfile;
-  session: {
-    accessToken: string;
-    refreshToken: string;
-    expiresIn: number;
-    expiresAt: number;
-  };
+	user: UserProfile;
+	session: {
+		accessToken: string;
+		refreshToken: string;
+		expiresIn: number;
+		expiresAt: number;
+	};
 }
 
 export interface RefreshTokenDTO {
-  refreshToken: string;
+	refreshToken: string;
 }
 
 /**
  * Linked Providers Response
  */
 export interface LinkedProvidersResponse {
-  providers: {
-    type: "password" | OAuthProvider;
-    connectedAt: string;
-    isPrimary: boolean;
-  }[];
+	providers: {
+		type: "password" | OAuthProvider;
+		connectedAt: string;
+		isPrimary: boolean;
+	}[];
 }
 
 /**
  * Supabase Auth User (minimal type for type safety)
  */
 export interface SupabaseUser {
-  id: string;
-  email: string;
-  role?: string;
+	id: string;
+	email: string;
+	role?: string;
 }
 
-/**
- * Database UserProfile (snake_case from database)
- */
-export interface DbUserProfile {
-  id: string;
-  username: string;
-  display_name?: string;
-  avatar_url?: string;
-  bio?: string;
-  created_at: string;
-  updated_at: string;
-  google_id?: string;
-  facebook_id?: string;
-}
+// DbUserProfile has been replaced by UserProfileRow (from generated types)
+// Use UserProfileRow for database operations instead

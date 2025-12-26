@@ -2,44 +2,28 @@
  * Playlist DTOs and Types
  */
 
+import type {
+  Tables,
+  TablesInsert,
+  TablesUpdate,
+} from "@/shared/types/supabase.helpers.js";
+
 export type EditMode = "open" | "restricted";
 
-// Database types (snake_case from DB)
-export interface PlaylistRow {
-  id: string;
-  name: string;
-  description?: string;
-  cover_url?: string;
-  owner_id: string;
-  collaborator_ids: string[];
-  viewer_ids: string[];
-  visibility: "public" | "private";
-  edit_mode: EditMode;
-  created_at: string;
-  updated_at: string;
-}
+// Database types (now using Supabase generated types)
+export type PlaylistRow = Tables<"playlists">;
+export type TrackRow = Tables<"tracks">;
+export type PlaylistTrackRow = Tables<"playlist_tracks">;
 
-export interface TrackRow {
-  id: string;
-  track_uri: string; // Universal track identifier from any music service
-  title: string;
-  artist: string;
-  album?: string; // Optional - not all services have album info
-  album_art?: string;
-  duration_ms: number;
-  preview_url?: string;
-  created_at: string;
-  updated_at: string;
-}
+// Insert types for creating new records
+export type PlaylistInsert = TablesInsert<"playlists">;
+export type TrackInsert = TablesInsert<"tracks">;
+export type PlaylistTrackInsert = TablesInsert<"playlist_tracks">;
 
-export interface PlaylistTrackRow {
-  id: string;
-  playlist_id: string;
-  track_id: string;
-  position: number;
-  added_by: string | null;
-  added_at: string;
-}
+// Update types for updating records
+export type PlaylistUpdate = TablesUpdate<"playlists">;
+export type TrackUpdate = TablesUpdate<"tracks">;
+export type PlaylistTrackUpdate = TablesUpdate<"playlist_tracks">;
 
 // DTOs for API requests
 export interface CreatePlaylistDTO {
