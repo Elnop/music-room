@@ -40,8 +40,8 @@ export function ProfileScreen() {
           onPress: async () => {
             try {
               await logout();
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch (error) {
+              console.error('[ProfileScreen] Logout failed:', error);
               Alert.alert('Error', 'Failed to logout. Please try again.');
             }
           },
