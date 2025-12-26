@@ -23,7 +23,10 @@ BLUE := $(shell printf '\033[0;34m')
 GREEN := $(shell printf '\033[0;32m')
 YELLOW := $(shell printf '\033[0;33m')
 RED := $(shell printf '\033[0;31m')
+CYAN := $(shell printf '\033[0;36m')
 NC := $(shell printf '\033[0m') # No Color
+RESET := $(NC)
+BOLD := $(shell printf '\033[1m')
 
 # Status indicators
 ICON_SUCCESS := ✓

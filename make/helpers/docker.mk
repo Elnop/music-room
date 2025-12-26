@@ -93,6 +93,14 @@ define docker_down
 	@$(DOCKER_COMPOSE) down
 endef
 
+# Stop and remove containers/networks with volumes
+# Usage: $(call docker_down_volumes)
+define docker_down_volumes
+	@echo "$(CYAN)Stopping and removing containers + volumes...$(RESET)"
+	@$(DOCKER_COMPOSE) down -v 2>/dev/null || true
+	@echo "$(GREEN)✓ Containers and volumes removed$(RESET)"
+endef
+
 # Stop and remove with volumes and images
 # Usage: $(call docker_down_full)
 define docker_down_full

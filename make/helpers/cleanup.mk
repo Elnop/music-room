@@ -103,3 +103,93 @@ define docker_full_cleanup
 	$(call docker_builder_prune)
 	$(call docker_system_prune_full)
 endef
+
+# Remove test coverage reports
+# Usage: $(call remove_coverage)
+define remove_coverage
+	@echo "$(CYAN)Removing test coverage reports...$(RESET)"
+	@rm -rf backend/coverage mobile/coverage 2>/dev/null || true
+	@echo "$(GREEN)✓ Coverage reports removed$(RESET)"
+endef
+
+# Remove build logs
+# Usage: $(call remove_build_logs)
+define remove_build_logs
+	@echo "$(CYAN)Removing build logs...$(RESET)"
+	@rm -f /tmp/ngrok.log 2>/dev/null || true
+	@rm -f /tmp/backend-tunnel-url.txt 2>/dev/null || true
+	@rm -rf /tmp/shared 2>/dev/null || true
+	@echo "$(GREEN)✓ Build logs removed$(RESET)"
+endef
+
+# Remove TypeScript build info
+# Usage: $(call remove_ts_buildinfo)
+define remove_ts_buildinfo
+	@echo "$(CYAN)Removing TypeScript build info...$(RESET)"
+	@find . -name "*.tsbuildinfo" -type f -delete 2>/dev/null || true
+	@echo "$(GREEN)✓ TypeScript build info removed$(RESET)"
+endef
+
+# Remove EAS build artifacts
+# Usage: $(call remove_eas_artifacts)
+define remove_eas_artifacts
+	@echo "$(CYAN)Removing EAS build artifacts...$(RESET)"
+	@find mobile -name ".eas-build-*.json" -type f -delete 2>/dev/null || true
+	@rm -rf mobile/eas-build-*.log 2>/dev/null || true
+	@echo "$(GREEN)✓ EAS artifacts removed$(RESET)"
+endef
+
+# Remove Expo home cache (global)
+# Usage: $(call remove_expo_home_cache)
+define remove_expo_home_cache
+	@echo "$(YELLOW)⚠️  Removing Expo home cache (global, affects all projects)...$(RESET)"
+	@rm -rf ~/.expo 2>/dev/null || true
+	@rm -rf ~/.cache/expo 2>/dev/null || true
+	@echo "$(GREEN)✓ Expo home cache removed$(RESET)"
+endef
+
+# Remove Metro bundler cache (global)
+# Usage: $(call remove_metro_cache)
+define remove_metro_cache
+	@echo "$(YELLOW)⚠️  Removing Metro bundler cache (global)...$(RESET)"
+	@rm -rf ~/.cache/metro-bundler 2>/dev/null || true
+	@echo "$(GREEN)✓ Metro cache removed$(RESET)"
+endef
+
+# Remove Watchman cache (global)
+# Usage: $(call remove_watchman_cache)
+define remove_watchman_cache
+	@echo "$(YELLOW)⚠️  Removing Watchman cache (global)...$(RESET)"
+	@rm -rf ~/.watchman 2>/dev/null || true
+	@echo "$(GREEN)✓ Watchman cache removed$(RESET)"
+endef
+
+# Remove Gradle cache (global)
+# Usage: $(call remove_gradle_cache)
+define remove_gradle_cache
+	@echo "$(YELLOW)⚠️  Removing Gradle cache (global, affects all Android projects)...$(RESET)"
+	@rm -rf ~/.gradle 2>/dev/null || true
+	@rm -rf ~/.android/build-cache 2>/dev/null || true
+	@echo "$(GREEN)✓ Gradle cache removed$(RESET)"
+endef
+
+# Master project-only cleanup
+# Usage: $(call remove_all_project_artifacts)
+define remove_all_project_artifacts
+	$(call remove_node_modules)
+	$(call remove_build_artifacts)
+	$(call remove_native_builds)
+	$(call remove_coverage)
+	$(call remove_build_logs)
+	$(call remove_ts_buildinfo)
+	$(call remove_eas_artifacts)
+endef
+
+# Master full cleanup (project + global caches)
+# Usage: $(call remove_all_artifacts_with_caches)
+define remove_all_artifacts_with_caches
+	$(call remove_all_project_artifacts)
+	$(call remove_expo_home_cache)
+	$(call remove_metro_cache)
+	$(call remove_watchman_cache)
+endef

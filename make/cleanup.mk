@@ -3,71 +3,86 @@
 # ==============================================================================
 # Commands for cleaning Docker resources, dependencies, and build artifacts
 
-.PHONY: clean clean-docker clean-deps clean-all prune deploy-build
+.PHONY: clean clean-docker clean-deps clean-all prune deploy-build clean-cache clean-global-cache clean-gradle clean-project clean-native
 
-clean: ## Remove all containers, images, volumes, and dependencies (with confirmation)
-	@echo "$(RED)=== CLEANUP WARNING ===$(NC)"
+clean: ## Remove containers, volumes, images, and project dependencies (with confirmation)
+	@echo "$(BOLD)$(YELLOW)This will remove:$(RESET)"
+	@echo "  - Music Room Docker containers, images, and volumes"
+	@echo "  - node_modules (backend + mobile)"
+	@echo "  - Build artifacts (dist, .expo)"
+	@echo "  - Coverage reports"
+	@echo "  - Build logs"
 	@echo ""
-	$(call print_subsection,This will remove)
-	@echo "  • Docker containers (music-room-backend, music-room-mobile)"
-	@echo "  • Docker images (music_room-backend, music_room-mobile)"
-	@echo "  • Docker volumes"
-	@echo "  • Docker network (music-room-network)"
-	@echo "  • $(BACKEND_NODE_MODULES)"
-	@echo "  • $(MOBILE_NODE_MODULES)"
-	@echo "  • $(BACKEND_DIST)"
-	@echo "  • $(MOBILE_EXPO)"
-	@echo ""
-	@printf "$(RED)Are you sure? [y/N]$(NC) "; \
-	read REPLY; \
-	if [ "$$REPLY" = "y" ] || [ "$$REPLY" = "Y" ]; then \
-		echo ""; \
-		echo "$(YELLOW)$(ICON_ARROW) Removing Docker resources...$(NC)"; \
+	@read -p "Continue? (y/n): " confirm; \
+	if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ]; then \
 		$(call docker_down_volumes); \
-		echo "$(GREEN)$(ICON_SUCCESS) Docker resources removed$(NC)"; \
-		echo "$(YELLOW)$(ICON_ARROW) Removing node_modules...$(NC)"; \
-		$(call remove_node_modules); \
-		echo "$(GREEN)$(ICON_SUCCESS) Dependencies removed$(NC)"; \
-		echo "$(YELLOW)$(ICON_ARROW) Removing build artifacts...$(NC)"; \
-		$(call remove_build_artifacts); \
-		echo "$(GREEN)$(ICON_SUCCESS) Build artifacts removed$(NC)"; \
-		echo ""; \
-		echo ""; \
-		echo "$(BLUE)=== Cleanup Complete ===$(NC)"; \
-		echo ""; \
-		echo "$(BLUE)$(ICON_INFO) Run 'make install' to reinstall$(NC)"; \
+		docker rmi music_room-backend music_room-mobile 2>/dev/null || true; \
+		docker network rm music-room-network 2>/dev/null || true; \
+		$(call remove_all_project_artifacts); \
+		echo "$(BOLD)$(GREEN)✓ Cleanup complete$(RESET)"; \
 	else \
-		echo ""; \
-		echo "$(BLUE)$(ICON_INFO) Cleanup cancelled$(NC)"; \
+		echo "$(YELLOW)Cancelled.$(RESET)"; \
 	fi
 
-clean-docker: ## Remove only Docker containers, images, and volumes (no confirmation)
-	$(call print_arrow,Removing Docker resources...)
-	$(call docker_down_volumes)
-	$(call print_success,Docker cleanup complete)
+clean-docker: ## Remove Music Room Docker resources only (containers, images, volumes, network)
+	@echo "$(CYAN)Removing Music Room Docker resources...$(RESET)"
+	@$(call docker_down_volumes)
+	@docker rmi music_room-backend music_room-mobile 2>/dev/null || true
+	@docker network rm music-room-network 2>/dev/null || true
+	@echo "$(GREEN)✓ Docker resources removed$(RESET)"
 
-clean-deps: ## Remove only node_modules and build artifacts (no confirmation)
-	$(call print_arrow,Removing dependencies and build artifacts...)
-	$(call remove_all_deps)
-	$(call print_success,Dependencies cleanup complete)
+clean-deps: ## Remove all dependencies and build artifacts (node_modules, dist, .expo, coverage, logs)
+	@echo "$(CYAN)Removing all dependencies and build artifacts...$(RESET)"
+	@$(call remove_all_project_artifacts)
+	@echo "$(GREEN)✓ Dependencies and artifacts removed$(RESET)"
 
-clean-all: ## Clean entire Docker system on machine (containers, images, volumes, networks, cache)
-	@echo "$(RED)=== FULL DOCKER SYSTEM CLEANUP WARNING ===$(NC)"
-	$(call blank_line)
-	$(call print_warning,This removes ALL Docker resources on your machine:)
-	@echo "  • ALL containers (not just Music Room)"
-	@echo "  • ALL images (not just Music Room)"
-	@echo "  • ALL volumes (not just Music Room)"
-	@echo "  • ALL custom networks"
-	@echo "  • ALL builder cache"
-	@echo "  • $(BACKEND_NODE_MODULES) + $(MOBILE_NODE_MODULES)"
-	@echo "  • $(BACKEND_DIST) + $(MOBILE_EXPO)"
-	$(call blank_line)
-	$(call docker_full_cleanup)
-	$(call print_header,Full Cleanup Complete)
-	$(call print_subsection,To restart Music Room)
-	$(call display_next_steps,$(GREEN)make install$(NC)     # Reinstall dependencies,$(GREEN)make dev-docker$(NC)  # Build and start Docker mode)
-	$(call blank_line)
+clean-all: ## Complete cleanup - Docker system + project artifacts + global caches (with confirmation)
+	@echo "$(BOLD)$(RED)⚠️  COMPLETE CLEANUP - THIS WILL REMOVE EVERYTHING!$(RESET)"
+	@echo "$(YELLOW)This will remove:$(RESET)"
+	@echo "  - ALL Docker resources on this machine (containers, images, volumes, networks, cache)"
+	@echo "  - ALL node_modules and build artifacts (backend + mobile)"
+	@echo "  - ALL project caches (coverage, logs, .expo, native builds, etc.)"
+	@echo "  - ALL global caches (Expo, Metro, Watchman, Gradle)"
+	@echo ""
+	@read -p "Type 'yes' to confirm complete cleanup: " confirm; \
+	if [ "$$confirm" = "yes" ]; then \
+		echo "$(RED)Starting complete cleanup...$(RESET)"; \
+		echo "$(CYAN)Step 1/5: Stopping all Docker containers...$(RESET)"; \
+		containers=$$(docker ps -aq 2>/dev/null); \
+		if [ -n "$$containers" ]; then docker stop $$containers 2>/dev/null || true; fi; \
+		echo "$(CYAN)Step 2/5: Removing all Docker resources...$(RESET)"; \
+		if [ -n "$$containers" ]; then docker rm $$containers 2>/dev/null || true; fi; \
+		images=$$(docker images -aq 2>/dev/null); \
+		if [ -n "$$images" ]; then docker rmi -f $$images 2>/dev/null || true; fi; \
+		volumes=$$(docker volume ls -q 2>/dev/null); \
+		if [ -n "$$volumes" ]; then docker volume rm $$volumes 2>/dev/null || true; fi; \
+		docker network prune -f 2>/dev/null || true; \
+		docker builder prune -af 2>/dev/null || true; \
+		docker system prune -af --volumes 2>/dev/null || true; \
+		echo "$(CYAN)Step 3/5: Cleaning project artifacts...$(RESET)"; \
+		rm -rf backend/node_modules mobile/node_modules 2>/dev/null || true; \
+		rm -rf backend/dist mobile/.expo 2>/dev/null || true; \
+		rm -rf mobile/android mobile/ios 2>/dev/null || true; \
+		rm -rf backend/coverage mobile/coverage 2>/dev/null || true; \
+		rm -f /tmp/ngrok.log /tmp/backend-tunnel-url.txt 2>/dev/null || true; \
+		rm -rf /tmp/shared 2>/dev/null || true; \
+		find . -name "*.tsbuildinfo" -type f -delete 2>/dev/null || true; \
+		find mobile -name ".eas-build-*.json" -type f -delete 2>/dev/null || true; \
+		echo "$(CYAN)Step 4/5: Cleaning global caches...$(RESET)"; \
+		rm -rf ~/.expo ~/.cache/expo 2>/dev/null || true; \
+		rm -rf ~/.cache/metro-bundler 2>/dev/null || true; \
+		rm -rf ~/.watchman 2>/dev/null || true; \
+		echo "$(CYAN)Step 5/5: Cleaning Gradle caches...$(RESET)"; \
+		rm -rf ~/.gradle ~/.android/build-cache 2>/dev/null || true; \
+		echo ""; \
+		echo "$(BOLD)$(GREEN)✓✓✓ COMPLETE CLEANUP FINISHED ✓✓✓$(RESET)"; \
+		echo ""; \
+		echo "$(YELLOW)To restart Music Room:$(RESET)"; \
+		echo "  1. $(GREEN)make install$(RESET)      - Reinstall dependencies"; \
+		echo "  2. $(GREEN)make dev-docker$(RESET)   - Start Docker development"; \
+	else \
+		echo "$(YELLOW)Cancelled.$(RESET)"; \
+	fi
 
 prune: ## Clean up unused Docker resources
 	$(call print_arrow,Pruning unused Docker resources...)
@@ -81,3 +96,59 @@ deploy-build: ## Build production images (for deployment)
 	@echo ""
 	$(call print_subsection,Images ready)
 	@echo "  - music-room-backend:latest"
+
+clean-cache: ## Remove project-level caches (.expo, coverage, logs)
+	@echo "$(BOLD)$(CYAN)Cleaning project caches...$(RESET)"
+	@$(call remove_build_artifacts)
+	@$(call remove_coverage)
+	@$(call remove_build_logs)
+	@$(call remove_ts_buildinfo)
+	@$(call remove_eas_artifacts)
+	@echo "$(BOLD)$(GREEN)✓ Project caches cleaned$(RESET)"
+
+clean-global-cache: ## Remove global caches (Expo, Metro, Watchman) - affects all projects
+	@echo "$(BOLD)$(RED)⚠️  WARNING: This will remove GLOBAL caches affecting ALL projects!$(RESET)"
+	@echo "$(YELLOW)Caches to be removed:$(RESET)"
+	@echo "  - ~/.expo/"
+	@echo "  - ~/.cache/expo/"
+	@echo "  - ~/.cache/metro-bundler/"
+	@echo "  - ~/.watchman/"
+	@echo ""
+	@read -p "Are you sure? Type 'yes' to continue: " confirm; \
+	if [ "$$confirm" = "yes" ]; then \
+		echo "$(YELLOW)⚠️  Removing Expo home cache (global, affects all projects)...$(RESET)"; \
+		rm -rf ~/.expo 2>/dev/null || true; \
+		rm -rf ~/.cache/expo 2>/dev/null || true; \
+		echo "$(GREEN)✓ Expo home cache removed$(RESET)"; \
+		echo "$(YELLOW)⚠️  Removing Metro bundler cache (global)...$(RESET)"; \
+		rm -rf ~/.cache/metro-bundler 2>/dev/null || true; \
+		echo "$(GREEN)✓ Metro cache removed$(RESET)"; \
+		echo "$(YELLOW)⚠️  Removing Watchman cache (global)...$(RESET)"; \
+		rm -rf ~/.watchman 2>/dev/null || true; \
+		echo "$(GREEN)✓ Watchman cache removed$(RESET)"; \
+		echo "$(BOLD)$(GREEN)✓ Global caches cleaned$(RESET)"; \
+	else \
+		echo "$(YELLOW)Cancelled.$(RESET)"; \
+	fi
+
+clean-gradle: ## Remove Gradle caches (Android builds) - affects all Android projects
+	@echo "$(BOLD)$(RED)⚠️  WARNING: This will remove Gradle caches affecting ALL Android projects!$(RESET)"
+	@echo "$(YELLOW)Caches to be removed:$(RESET)"
+	@echo "  - ~/.gradle/"
+	@echo "  - ~/.android/build-cache/"
+	@echo ""
+	@read -p "Are you sure? Type 'yes' to continue: " confirm; \
+	if [ "$$confirm" = "yes" ]; then \
+		echo "$(YELLOW)⚠️  Removing Gradle cache (global, affects all Android projects)...$(RESET)"; \
+		rm -rf ~/.gradle 2>/dev/null || true; \
+		rm -rf ~/.android/build-cache 2>/dev/null || true; \
+		echo "$(GREEN)✓ Gradle cache removed$(RESET)"; \
+		echo "$(BOLD)$(GREEN)✓ Gradle caches cleaned$(RESET)"; \
+	else \
+		echo "$(YELLOW)Cancelled.$(RESET)"; \
+	fi
+
+clean-project: ## Remove all project artifacts (deps, builds, caches) - no Docker, no global
+	@echo "$(BOLD)$(CYAN)Cleaning all project artifacts...$(RESET)"
+	@$(call remove_all_project_artifacts)
+	@echo "$(BOLD)$(GREEN)✓ Project fully cleaned$(RESET)"

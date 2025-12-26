@@ -21,7 +21,15 @@ endef
 # Usage: $(call expo_mobile,start --localhost)
 # Usage: $(call expo_mobile,prebuild --clean)
 define expo_mobile
-	@cd $(MOBILE_DIR) && npx expo $(1)
+	@cd $(MOBILE_DIR) && \
+	if [ -z "$$JAVA_HOME" ] || [ ! -d "$$JAVA_HOME" ]; then \
+		if [ -d "/usr/lib/jvm/java-17-openjdk-amd64" ]; then \
+			export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64; \
+		elif command -v java >/dev/null 2>&1; then \
+			export JAVA_HOME=$$(dirname $$(dirname $$(readlink -f $$(command -v java)))); \
+		fi; \
+	fi && \
+	npx expo $(1)
 endef
 
 # Run EAS command in mobile

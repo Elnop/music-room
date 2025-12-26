@@ -140,13 +140,64 @@ make format           # Format all code with Prettier
 ### Cleanup
 
 ```bash
-make clean            # Remove containers + deps (with confirmation)
-make clean-docker     # Remove Docker resources only
-make clean-deps       # Remove node_modules + build artifacts
-make clean-native     # Clean native build folders
-make prune            # Clean unused Docker resources
-make clean-all        # ⚠️ Remove ALL Docker resources on machine
+# Project-level cleanup (recommended for most cases)
+make clean            # Containers + volumes + project artifacts (with confirmation)
+make clean-deps       # Dependencies + build artifacts only (no Docker)
+make clean-cache      # Project caches only (.expo, coverage, logs)
+make clean-native     # Native build folders (android/, ios/)
+make clean-project    # All project artifacts (comprehensive, no Docker/global)
+
+# Docker-specific cleanup
+make clean-docker     # Music Room Docker resources only
+make prune            # Unused Docker resources across all projects
+
+# Global/system-wide cleanup (affects ALL projects - use with caution)
+make clean-global-cache   # Expo, Metro, Watchman caches (needs 'yes' confirmation)
+make clean-gradle         # Gradle/Android caches (needs 'yes' confirmation)
+
+# Nuclear option (use with extreme caution)
+make clean-all            # EVERYTHING: Docker + project + global caches (needs 'yes' confirmation)
 ```
+
+### Cleanup Matrix
+
+| Command | Files/Deps | Docker (Music Room) | Docker (System) | Global Caches | Confirmation |
+|---------|-----------|---------------------|-----------------|---------------|--------------|
+| `make clean` | ✓ | ✓ | ✗ | ✗ | Yes (y/n) |
+| `make clean-deps` | ✓ | ✗ | ✗ | ✗ | No |
+| `make clean-cache` | Cache only | ✗ | ✗ | ✗ | No |
+| `make clean-docker` | ✗ | ✓ | ✗ | ✗ | No |
+| `make clean-native` | Native only | ✗ | ✗ | ✗ | No |
+| `make clean-project` | ✓ (all) | ✗ | ✗ | ✗ | No |
+| `make prune` | ✗ | Unused | Unused | ✗ | No |
+| `make clean-global-cache` | ✗ | ✗ | ✗ | ✓ (Expo, Metro) | Yes (type 'yes') |
+| `make clean-gradle` | ✗ | ✗ | ✗ | ✓ (Android) | Yes (type 'yes') |
+| `make clean-all` | ✓ | ✓ | ✓ | ✓ | Yes (type 'yes') |
+
+### What Gets Cleaned
+
+**Project Artifacts:**
+- `backend/node_modules`, `mobile/node_modules` - Dependencies
+- `backend/dist` - TypeScript build output
+- `mobile/.expo` - Expo development cache
+- `mobile/android`, `mobile/ios` - Native builds (clean-native only)
+- `backend/coverage`, `mobile/coverage` - Test coverage reports
+- `*.tsbuildinfo` - TypeScript incremental build info
+- `.eas-build-*.json` - EAS build artifacts
+- `/tmp/ngrok.log`, `/tmp/backend-tunnel-url.txt` - Build logs
+
+**Docker Resources:**
+- Containers: `music-room-backend`, `music-room-mobile`
+- Images: `music_room-backend`, `music_room-mobile`
+- Volumes: Associated with Music Room services
+- Network: `music-room-network`
+- System: ALL Docker resources when using `clean-all`
+
+**Global Caches (only with explicit commands):**
+- `~/.expo/`, `~/.cache/expo/` - Expo global cache
+- `~/.cache/metro-bundler/` - Metro bundler cache
+- `~/.watchman` - Watchman file watcher cache
+- `~/.gradle/`, `~/.android/` - Gradle/Android SDK caches
 
 ### Utilities
 
