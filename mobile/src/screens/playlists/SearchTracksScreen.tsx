@@ -42,8 +42,7 @@ interface SearchTracksScreenProps {
   route: SearchTracksScreenRouteProp;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function SearchTracksScreen({ navigation, route }: SearchTracksScreenProps) {
+export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
   const { playlistId } = route.params;

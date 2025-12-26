@@ -261,8 +261,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
               }
               try {
                 await playlistApi.removeViewer(playlistId, userId);
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-              } catch (error) {
+              } catch (_error) {
                 // Viewer may not exist, which is acceptable - ignore error
               }
             } else {
@@ -296,8 +295,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
         await playlistApi.removeCollaborator(playlistId, userId);
         try {
           await playlistApi.addViewer(playlistId, userId);
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (error) {
+        } catch (_error) {
           // User may already be a viewer - ignore error
         }
       } else {
