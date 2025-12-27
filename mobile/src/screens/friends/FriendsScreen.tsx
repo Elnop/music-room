@@ -4,7 +4,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import debounce from 'lodash/debounce';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
+import { usePlayerHeight } from '@/contexts/PlayerContext';
 import type { Theme } from '@themes/types';
 import { useAuthStore } from '@/store/authStore';
 import { profileApi } from '@/services/profileApi';
@@ -22,6 +24,7 @@ type Tab = 'friends' | 'search';
 
 export function FriendsScreen() {
   const { theme } = useTheme();
+  const playerHeight = usePlayerHeight();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
   const navigation = useNavigation<NavigationProp>();
   const { accessToken } = useAuthStore();
@@ -157,7 +160,12 @@ export function FriendsScreen() {
           <Text style={styles.username}>{item.username}</Text>
           {item.displayName && <Text style={styles.displayName}>{item.displayName}</Text>}
           <View style={styles.controlRow}>
-            <Text style={styles.controlLabel}>🎵</Text>
+            <Ionicons
+              name="musical-notes"
+              size={12}
+              color={canControl ? theme.colors.primary : theme.colors.textSecondary}
+              style={styles.controlIcon}
+            />
             <Text style={[styles.controlText, canControl && styles.controlTextActive]}>
               {canControl ? 'Peut contrôler ma musique' : 'Contrôle de ma musique'}
             </Text>
@@ -178,7 +186,7 @@ export function FriendsScreen() {
             />
           )}
         </View>
-        <Text style={styles.chevron}>›</Text>
+        <Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
       </TouchableOpacity>
     );
   };
@@ -194,7 +202,7 @@ export function FriendsScreen() {
         <Text style={styles.username}>{item.username}</Text>
         {item.displayName && <Text style={styles.displayName}>{item.displayName}</Text>}
       </View>
-      <Text style={styles.chevron}>›</Text>
+      <Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
     </TouchableOpacity>
   );
 
@@ -252,10 +260,18 @@ export function FriendsScreen() {
             data={friends}
             keyExtractor={item => item.id}
             renderItem={renderFriendItem}
-            contentContainerStyle={styles.listContent}
+            contentContainerStyle={[
+              styles.listContent,
+              { paddingBottom: playerHeight + theme.spacing.xl },
+            ]}
             ListEmptyComponent={
               <View style={styles.emptyState}>
-                <Text style={styles.emptyIcon}>👥</Text>
+                <Ionicons
+                  name="people-outline"
+                  size={64}
+                  color={theme.colors.textSecondary}
+                  style={styles.emptyIcon}
+                />
                 <Text style={styles.emptyTitle}>Pas encore d'amis</Text>
                 <Text style={styles.emptySubtext}>
                   Suivez des utilisateurs qui vous suivent en retour pour devenir amis !
@@ -273,13 +289,21 @@ export function FriendsScreen() {
             data={searchResults}
             keyExtractor={item => item.id}
             renderItem={renderSearchResultItem}
-            contentContainerStyle={styles.listContent}
+            contentContainerStyle={[
+              styles.listContent,
+              { paddingBottom: playerHeight + theme.spacing.xl },
+            ]}
             ListEmptyComponent={
               searchQuery ? (
                 <Text style={styles.emptyText}>Aucun utilisateur trouvé</Text>
               ) : (
                 <View style={styles.emptyState}>
-                  <Text style={styles.emptyIcon}>🔍</Text>
+                  <Ionicons
+                    name="search-outline"
+                    size={64}
+                    color={theme.colors.textSecondary}
+                    style={styles.emptyIcon}
+                  />
                   <Text style={styles.emptyTitle}>Chercher un profil</Text>
                   <Text style={styles.emptySubtext}>
                     Commencez à taper pour trouver des utilisateurs !
@@ -312,11 +336,10 @@ const createStyles = (theme: Theme) =>
     tabsContainer: {
       flexDirection: 'row',
       backgroundColor: theme.colors.surface,
-      borderRadius: theme.spacing.sm,
+      borderRadius: 12,
       padding: 4,
       marginBottom: theme.spacing.md,
-      borderWidth: theme.borders.medium,
-      borderColor: theme.colors.border,
+      ...theme.shadows.small,
     },
     tab: {
       flex: 1,
@@ -340,18 +363,13 @@ const createStyles = (theme: Theme) =>
       marginBottom: theme.spacing.sm,
     },
     listContent: {
-      paddingHorizontal: theme.spacing.lg,
       paddingBottom: theme.spacing.xl,
     },
     userItem: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: theme.colors.surface,
-      padding: theme.spacing.md,
-      borderRadius: theme.spacing.sm,
-      marginBottom: theme.spacing.sm,
-      borderWidth: theme.borders.medium,
-      borderColor: theme.colors.border,
+      paddingVertical: 8,
+      paddingHorizontal: theme.spacing.md,
     },
     userItemProcessing: {
       opacity: 0.7,
@@ -375,8 +393,7 @@ const createStyles = (theme: Theme) =>
       alignItems: 'center',
       marginTop: 4,
     },
-    controlLabel: {
-      fontSize: 12,
+    controlIcon: {
       marginRight: 4,
     },
     controlText: {
@@ -410,10 +427,6 @@ const createStyles = (theme: Theme) =>
       justifyContent: 'center',
       alignItems: 'center',
     },
-    chevron: {
-      fontSize: 24,
-      color: theme.colors.textSecondary,
-    },
     errorContainer: {
       backgroundColor: theme.colors.error + '20',
       padding: theme.spacing.md,
@@ -432,8 +445,8 @@ const createStyles = (theme: Theme) =>
       paddingHorizontal: theme.spacing.xl,
     },
     emptyIcon: {
-      fontSize: 64,
       marginBottom: theme.spacing.lg,
+      opacity: 0.6,
     },
     emptyTitle: {
       fontSize: theme.typography.sizes.xl,

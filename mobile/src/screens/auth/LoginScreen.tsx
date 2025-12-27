@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useIsFocused } from '@react-navigation/native';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import { Button } from '@components/common/Button';
@@ -51,12 +52,28 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
     },
   });
 
-  // Show error alert
+  const isFocused = useIsFocused();
+  const isMounted = useRef(true);
+
   useEffect(() => {
-    if (error) {
-      Alert.alert('Login Failed', error, [{ text: 'OK', onPress: clearError }]);
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
+  // Show error alert only when screen is focused and mounted
+  useEffect(() => {
+    if (error && isFocused && isMounted.current) {
+      // Small delay to ensure Activity is attached
+      const timer = setTimeout(() => {
+        if (isMounted.current && isFocused) {
+          Alert.alert('Login Failed', error, [{ text: 'OK', onPress: clearError }]);
+        }
+      }, 100);
+      return () => clearTimeout(timer);
     }
-  }, [error, clearError]);
+  }, [error, clearError, isFocused]);
 
   const onSubmit = async (data: LoginInput) => {
     try {

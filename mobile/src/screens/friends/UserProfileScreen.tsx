@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import { useAuthStore } from '@/store/authStore';
@@ -142,7 +143,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
             <View style={styles.topRow}>
               {isAvatarHidden ? (
                 <View style={styles.hiddenAvatar}>
-                  <Text style={styles.hiddenAvatarIcon}>🔒</Text>
+                  <Ionicons name="lock-closed" size={32} color={theme.colors.textSecondary} />
                 </View>
               ) : (
                 <Avatar
@@ -181,7 +182,12 @@ export function UserProfileScreen({ route, navigation }: Props) {
             {/* Bio - with privacy check */}
             {isBioHidden ? (
               <View style={styles.hiddenField}>
-                <Text style={styles.hiddenIcon}>🔒</Text>
+                <Ionicons
+                  name="lock-closed"
+                  size={16}
+                  color={theme.colors.textSecondary}
+                  style={styles.hiddenIcon}
+                />
                 <Text style={styles.hiddenText}>
                   {isFriend ? 'Bio privée' : 'Visible uniquement pour les amis'}
                 </Text>
@@ -230,7 +236,10 @@ export function UserProfileScreen({ route, navigation }: Props) {
 
             {canControlMusic && followStatus?.isFriend && (
               <View style={styles.listeningSection}>
-                <Text style={styles.listeningSectionTitle}>🎵 Écoute en direct</Text>
+                <View style={styles.listeningSectionHeader}>
+                  <Ionicons name="musical-notes" size={16} color={theme.colors.primary} />
+                  <Text style={styles.listeningSectionTitle}>Écoute en direct</Text>
+                </View>
                 {isListeningLoading ? (
                   <View style={styles.listeningLoading}>
                     <LoadingSpinner size="small" />
@@ -258,7 +267,12 @@ export function UserProfileScreen({ route, navigation }: Props) {
         <ProfileSection title="Préférences musicales">
           {isMusicPrefsHidden ? (
             <View style={styles.hiddenFieldInline}>
-              <Text style={styles.hiddenIcon}>🔒</Text>
+              <Ionicons
+                name="lock-closed"
+                size={16}
+                color={theme.colors.textSecondary}
+                style={styles.hiddenIcon}
+              />
               <Text style={styles.hiddenText}>
                 {isFriend ? 'Préférences privées' : 'Visible uniquement pour les amis'}
               </Text>
@@ -401,7 +415,7 @@ const createStyles = (theme: Theme) =>
       gap: 8,
     },
     hiddenIcon: {
-      fontSize: 14,
+      marginRight: 4,
     },
     hiddenText: {
       fontSize: 14,
@@ -417,9 +431,6 @@ const createStyles = (theme: Theme) =>
       alignItems: 'center',
       borderWidth: 1,
       borderColor: theme.colors.border,
-    },
-    hiddenAvatarIcon: {
-      fontSize: 32,
     },
     genresContainer: {
       flexDirection: 'row',
@@ -461,6 +472,12 @@ const createStyles = (theme: Theme) =>
     listeningSection: {
       marginTop: theme.spacing.lg,
     },
+    listeningSectionHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      marginBottom: theme.spacing.sm,
+    },
     listeningSectionTitle: {
       fontSize: 16,
       fontWeight: theme.typography.weights.bold,
@@ -485,7 +502,6 @@ const createStyles = (theme: Theme) =>
       fontStyle: 'italic',
     },
     playlistsSection: {
-      paddingHorizontal: theme.spacing.lg,
       paddingTop: theme.spacing.xl,
       borderTopWidth: 1,
       borderTopColor: theme.colors.border,
@@ -496,12 +512,14 @@ const createStyles = (theme: Theme) =>
       fontWeight: theme.typography.weights.bold,
       color: theme.colors.text,
       marginBottom: theme.spacing.md,
+      paddingHorizontal: theme.spacing.md,
     },
     emptyPlaylists: {
       fontSize: 14,
       color: theme.colors.textSecondary,
       textAlign: 'center',
       paddingVertical: theme.spacing.lg,
+      paddingHorizontal: theme.spacing.md,
     },
     infoSection: {
       paddingHorizontal: theme.spacing.lg,

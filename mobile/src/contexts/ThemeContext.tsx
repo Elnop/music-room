@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { royalBlueTheme } from '@themes/royalBlue.theme';
 import { christmasTheme } from '@themes/christmas.theme';
 import { pastelLimeTheme } from '@themes/pastelLime.theme';
+import { originalTheme } from '@themes/original.theme';
 import type { ThemeName, ThemeContextValue } from '@/themes/types';
 import type { Theme } from '@/themes/types';
 
@@ -12,6 +13,7 @@ const THEMES: Record<ThemeName, Theme> = {
   royalBlue: royalBlueTheme,
   christmas: christmasTheme,
   pastelLime: pastelLimeTheme,
+  original: originalTheme,
 };
 
 if (__DEV__)

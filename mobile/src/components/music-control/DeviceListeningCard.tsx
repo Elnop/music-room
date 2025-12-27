@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import type { ListeningStatus } from '@/hooks/useMusicControl';
@@ -18,21 +19,23 @@ export function DeviceListeningCard({ status, onPlay, onPause }: DeviceListening
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
 
-  const getDeviceIcon = () => {
+  const getDeviceIcon = (): keyof typeof Ionicons.glyphMap => {
     switch (status.device.platform) {
       case 'ios':
-        return '📱';
+        return 'phone-portrait';
       case 'android':
-        return '📲';
+        return 'phone-portrait-outline';
       default:
-        return '💻';
+        return 'desktop-outline';
     }
   };
 
   return (
     <View style={styles.card}>
       <View style={styles.deviceHeader}>
-        <Text style={styles.deviceIcon}>{getDeviceIcon()}</Text>
+        <View style={styles.deviceIconContainer}>
+          <Ionicons name={getDeviceIcon()} size={20} color={theme.colors.primary} />
+        </View>
         <View style={styles.deviceInfo}>
           <Text style={styles.deviceName} numberOfLines={1}>
             {status.device.deviceName}
@@ -63,7 +66,12 @@ export function DeviceListeningCard({ status, onPlay, onPause }: DeviceListening
             onPress={status.isPlaying ? onPause : onPlay}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <Text style={styles.controlIcon}>{status.isPlaying ? '⏸' : '▶'}</Text>
+            <Ionicons
+              name={status.isPlaying ? 'pause' : 'play'}
+              size={20}
+              color="#FFFFFF"
+              style={status.isPlaying ? undefined : { marginLeft: 2 }}
+            />
           </TouchableOpacity>
         </View>
       ) : (
@@ -79,9 +87,7 @@ const createStyles = (theme: Theme) =>
   StyleSheet.create({
     card: {
       backgroundColor: theme.colors.surface,
-      borderRadius: theme.borders.medium,
-      borderWidth: theme.borders.thin,
-      borderColor: theme.colors.border,
+      borderRadius: 12,
       padding: theme.spacing.md,
       marginBottom: theme.spacing.md,
       ...theme.shadows.small,
@@ -94,8 +100,13 @@ const createStyles = (theme: Theme) =>
       borderBottomColor: theme.colors.border,
       paddingBottom: theme.spacing.sm,
     },
-    deviceIcon: {
-      fontSize: 24,
+    deviceIconContainer: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: theme.colors.primary + '15',
+      alignItems: 'center',
+      justifyContent: 'center',
       marginRight: theme.spacing.sm,
     },
     deviceInfo: {
@@ -127,7 +138,7 @@ const createStyles = (theme: Theme) =>
     trackArtwork: {
       width: 50,
       height: 50,
-      borderRadius: theme.borders.small,
+      borderRadius: 8,
       backgroundColor: theme.colors.surfaceAlt,
       marginRight: theme.spacing.md,
     },
@@ -155,10 +166,6 @@ const createStyles = (theme: Theme) =>
     },
     controlButtonActive: {
       backgroundColor: theme.colors.secondary || theme.colors.primary,
-    },
-    controlIcon: {
-      fontSize: 18,
-      color: theme.colors.background,
     },
     emptyContainer: {
       paddingVertical: theme.spacing.md,

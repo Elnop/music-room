@@ -10,6 +10,7 @@ import {
   Dimensions,
 } from 'react-native';
 import Slider from '@react-native-community/slider';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@/themes/types';
 import { usePlayer } from '@/contexts/PlayerContext';
@@ -78,10 +79,10 @@ export function PlayerModal() {
             onPress={() => setModalOpen(false)}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Text style={styles.closeIcon}>∨</Text>
+            <Ionicons name="chevron-down" size={28} color={theme.colors.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Now Playing</Text>
-          <View style={{ width: 24 }} />
+          <View style={{ width: 28 }} />
         </View>
 
         <View style={styles.artworkContainer}>
@@ -127,14 +128,20 @@ export function PlayerModal() {
             onPress={() => handleSkip(-10)}
             disabled={loading}
           >
-            <Text style={styles.controlText}>-10s</Text>
+            <Ionicons name="play-back" size={24} color={theme.colors.text} />
+            <Text style={styles.controlText}>10s</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.playButton} onPress={handlePlayPause} disabled={loading}>
             {loading ? (
-              <ActivityIndicator size="large" color={theme.colors.background} />
+              <ActivityIndicator size="large" color="#FFFFFF" />
             ) : (
-              <Text style={styles.playButtonText}>{isPlaying ? '⏸' : '▶'}</Text>
+              <Ionicons
+                name={isPlaying ? 'pause' : 'play'}
+                size={36}
+                color="#FFFFFF"
+                style={isPlaying ? undefined : { marginLeft: 4 }}
+              />
             )}
           </TouchableOpacity>
 
@@ -143,7 +150,8 @@ export function PlayerModal() {
             onPress={() => handleSkip(10)}
             disabled={loading}
           >
-            <Text style={styles.controlText}>+10s</Text>
+            <Ionicons name="play-forward" size={24} color={theme.colors.text} />
+            <Text style={styles.controlText}>10s</Text>
           </TouchableOpacity>
         </View>
 
@@ -171,10 +179,6 @@ const createStyles = (theme: Theme) =>
       paddingHorizontal: theme.spacing.lg,
       paddingVertical: theme.spacing.md,
     },
-    closeIcon: {
-      fontSize: 24,
-      color: theme.colors.text,
-    },
     headerTitle: {
       fontSize: 16,
       fontWeight: theme.typography.weights.semibold,
@@ -188,7 +192,7 @@ const createStyles = (theme: Theme) =>
     artwork: {
       width: width - theme.spacing.xxl * 2,
       height: width - theme.spacing.xxl * 2,
-      borderRadius: theme.borders.medium,
+      borderRadius: 16,
       backgroundColor: theme.colors.surface,
     },
     trackInfo: {
@@ -211,7 +215,7 @@ const createStyles = (theme: Theme) =>
       backgroundColor: theme.colors.error + '20',
       padding: theme.spacing.md,
       marginHorizontal: theme.spacing.xl,
-      borderRadius: theme.borders.small,
+      borderRadius: 12,
       marginBottom: theme.spacing.md,
     },
     errorText: {
@@ -245,14 +249,14 @@ const createStyles = (theme: Theme) =>
     controlButton: {
       padding: theme.spacing.md,
       backgroundColor: theme.colors.surface,
-      borderRadius: theme.borders.medium,
-      minWidth: 60,
+      borderRadius: 16,
+      minWidth: 70,
       alignItems: 'center',
     },
     controlText: {
-      fontSize: 14,
-      color: theme.colors.text,
-      fontWeight: theme.typography.weights.semibold,
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+      marginTop: 2,
     },
     playButton: {
       width: 80,
@@ -261,10 +265,6 @@ const createStyles = (theme: Theme) =>
       backgroundColor: theme.colors.primary,
       alignItems: 'center',
       justifyContent: 'center',
-    },
-    playButtonText: {
-      fontSize: 32,
-      color: theme.colors.background,
     },
     loadingContainer: {
       marginTop: theme.spacing.lg,

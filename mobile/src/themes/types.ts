@@ -5,7 +5,7 @@ import {
   NEOBRUTALISM_TYPOGRAPHY,
 } from '@/themes/tokens';
 
-export type ThemeName = 'royalBlue' | 'christmas' | 'pastelLime';
+export type ThemeName = 'royalBlue' | 'christmas' | 'pastelLime' | 'original';
 
 export interface ThemeColors {
   // Primary colors

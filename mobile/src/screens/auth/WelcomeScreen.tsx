@@ -1,10 +1,14 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useMemo } from 'react';
+import { View, StyleSheet, Image, Animated, Easing, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import { Button } from '@components/common/Button';
+import logo from '@/assets/logo/logo.png';
+import appIcon from '@/assets/logo/app-icon.png';
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 type AuthStackParamList = {
   Welcome: undefined;
@@ -18,40 +22,167 @@ interface WelcomeScreenProps {
   navigation: WelcomeScreenNavigationProp;
 }
 
+interface FloatingIconProps {
+  size: number;
+  top: number;
+  left: number;
+  delay: number;
+  duration: number;
+  rotateDirection: 1 | -1;
+  floatRange?: number;
+}
+
+function FloatingIcon({
+  size,
+  top,
+  left,
+  delay,
+  duration,
+  rotateDirection,
+  floatRange = 25,
+}: FloatingIconProps) {
+  const floatAnim = useMemo(() => new Animated.Value(0), []);
+  const rotateAnim = useMemo(() => new Animated.Value(0), []);
+  const scaleAnim = useMemo(() => new Animated.Value(1), []);
+
+  useEffect(() => {
+    // Float animation (up and down) - plus prononcé
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(floatAnim, {
+          toValue: 1,
+          duration: duration,
+          delay: delay,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+        Animated.timing(floatAnim, {
+          toValue: 0,
+          duration: duration,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+
+    // Rotate animation - plus rapide
+    Animated.loop(
+      Animated.timing(rotateAnim, {
+        toValue: 1,
+        duration: duration * 2.5,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    ).start();
+
+    // Scale pulsation
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(scaleAnim, {
+          toValue: 1.15,
+          duration: duration * 1.5,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: duration * 1.5,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, [floatAnim, rotateAnim, scaleAnim, delay, duration]);
+
+  const translateY = floatAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -floatRange],
+  });
+
+  const rotate = rotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', `${rotateDirection * 360}deg`],
+  });
+
+  return (
+    <Animated.Image
+      source={appIcon}
+      style={{
+        position: 'absolute',
+        width: size,
+        height: size,
+        top,
+        left,
+        opacity: 0.4,
+        transform: [{ translateY }, { rotate }, { scale: scaleAnim }],
+      }}
+      resizeMode="contain"
+    />
+  );
+}
+
 export function WelcomeScreen({ navigation }: WelcomeScreenProps) {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Floating background icons - plus visibles et dynamiques */}
+      <FloatingIcon
+        size={80}
+        top={60}
+        left={20}
+        delay={0}
+        duration={1200}
+        rotateDirection={1}
+        floatRange={35}
+      />
+      <FloatingIcon
+        size={65}
+        top={120}
+        left={SCREEN_WIDTH - 100}
+        delay={400}
+        duration={1400}
+        rotateDirection={-1}
+        floatRange={30}
+      />
+      <FloatingIcon
+        size={70}
+        top={SCREEN_HEIGHT * 0.45}
+        left={15}
+        delay={200}
+        duration={1100}
+        rotateDirection={1}
+        floatRange={40}
+      />
+      <FloatingIcon
+        size={75}
+        top={SCREEN_HEIGHT * 0.55}
+        left={SCREEN_WIDTH - 95}
+        delay={600}
+        duration={1300}
+        rotateDirection={-1}
+        floatRange={32}
+      />
+
       <View style={styles.content}>
         <View style={styles.header}>
-          <Text style={styles.logo}>🎵</Text>
-          <Text style={styles.title}>Music Room</Text>
-          <Text style={styles.subtitle}>Create collaborative playlists with friends</Text>
+          <Image source={logo} style={styles.logo} resizeMode="contain" />
         </View>
 
         <View style={styles.buttonContainer}>
           <Button
             title="Get Started"
-            onPress={() => navigation.navigate('Login')}
+            onPress={() => navigation.navigate('Register')}
             variant="primary"
             fullWidth
           />
           <Button
-            title="Create Account"
-            onPress={() => navigation.navigate('Register')}
+            title="Login"
+            onPress={() => navigation.navigate('Login')}
             variant="outline"
             fullWidth
           />
-        </View>
-
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            Demo credentials:{'\n'}
-            email: demo@musicroom.com{'\n'}
-            password: Demo123!@#
-          </Text>
         </View>
       </View>
     </SafeAreaView>
@@ -75,32 +206,11 @@ const createStyles = (theme: Theme) =>
       alignItems: 'center',
     },
     logo: {
-      fontSize: 72,
-      marginBottom: theme.spacing.md,
-    },
-    title: {
-      fontSize: theme.typography.sizes.xxxl,
-      fontWeight: theme.typography.weights.bold,
-      color: theme.colors.text,
-      marginBottom: theme.spacing.sm,
-    },
-    subtitle: {
-      fontSize: theme.typography.sizes.md,
-      color: theme.colors.textSecondary,
-      textAlign: 'center',
+      width: 300,
+      height: 300,
     },
     buttonContainer: {
       gap: theme.spacing.md,
       marginBottom: theme.spacing.xl,
-    },
-    footer: {
-      paddingVertical: theme.spacing.md,
-      alignItems: 'center',
-    },
-    footerText: {
-      fontSize: theme.typography.sizes.xs,
-      color: theme.colors.textSecondary,
-      textAlign: 'center',
-      lineHeight: 18,
     },
   });

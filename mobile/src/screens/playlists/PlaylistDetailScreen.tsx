@@ -1,9 +1,11 @@
 import React from 'react';
-import { FlatList, StyleSheet, Alert, TouchableOpacity, Text } from 'react-native';
+import { FlatList, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useFocusEffect } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
+import { usePlayerHeight } from '@/contexts/PlayerContext';
 import type { Theme } from '@themes/types';
 import type { Track } from '@/types/track.types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
@@ -13,7 +15,6 @@ import { usePlayerStore } from '@store/playerStore';
 import { usePlaylistSocket } from '@hooks/usePlaylistSocket';
 import { PlaylistHeader } from '@components/playlist/PlaylistHeader';
 import { TrackItem } from '@components/playlist/TrackItem';
-import { AddTrackButton } from '@components/playlist/AddTrackButton';
 import { EmptyState } from '@components/common/EmptyState';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
 
@@ -71,6 +72,7 @@ const trackToSoundCloud = (track: Track): SoundCloudTrack => {
 
 export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreenProps) {
   const { theme } = useTheme();
+  const playerHeight = usePlayerHeight();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
   const { id } = route.params;
   const { user } = useAuthStore();
@@ -124,7 +126,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
             onPress={() => navigation.navigate('PlaylistSharing', { playlistId: id })}
             style={{ paddingHorizontal: 8 }}
           >
-            <Text style={{ fontSize: 20 }}>👥</Text>
+            <Ionicons name="settings-outline" size={24} color={theme.colors.text} />
           </TouchableOpacity>
         ),
       });
@@ -133,7 +135,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
         headerRight: undefined,
       });
     }
-  }, [navigation, isOwner, id]);
+  }, [navigation, isOwner, id, theme.colors.text]);
 
   const handleAddTrack = () => {
     navigation.navigate('SearchTracks', { playlistId: id });
@@ -198,16 +200,21 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
             />
           );
         }}
-        ListHeaderComponent={<PlaylistHeader playlist={currentPlaylist} />}
-        contentContainerStyle={styles.list}
+        ListHeaderComponent={
+          <PlaylistHeader
+            playlist={currentPlaylist}
+            canEdit={canEdit}
+            onAddTrack={handleAddTrack}
+          />
+        }
+        contentContainerStyle={[styles.list, { paddingBottom: playerHeight + theme.spacing.xxl }]}
         ListEmptyComponent={
           <EmptyState
-            icon="🎵"
+            icon="musical-notes-outline"
             message="No tracks in this playlist yet. Add some tracks to get started!"
           />
         }
       />
-      {canEdit && <AddTrackButton onPress={handleAddTrack} />}
     </SafeAreaView>
   );
 }

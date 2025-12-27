@@ -1,25 +1,18 @@
 import React, { useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-  RefreshControl,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '@/contexts/ThemeContext';
+import { usePlayerHeight } from '@/contexts/PlayerContext';
 import type { Theme } from '@themes/types';
 import type { MusicGenre, MusicPreferences } from '@/types/user.types';
 import { useAuthStore } from '@/store/authStore';
 import { privacyApi } from '@/services/privacyApi';
 import { friendsApi, type MyStats } from '@/services/friendsApi';
+import { Ionicons } from '@expo/vector-icons';
 import { Avatar } from '@components/common/Avatar';
-import { Button } from '@components/common/Button';
 import { ProfileSection } from '@components/profile/ProfileSection';
 import { GenreChip } from '@components/profile/GenreChip';
 import { ThemeSelector } from '@components/theme/ThemeSelector';
@@ -36,10 +29,10 @@ type NavigationProp = NativeStackNavigationProp<ProfileStackParamList>;
 
 export function ProfileScreen() {
   const { theme } = useTheme();
+  const playerHeight = usePlayerHeight();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
   const navigation = useNavigation<NavigationProp>();
-  const { user, logout, isLoading } = useAuthStore();
-  const { accessToken } = useAuthStore();
+  const { user, logout, isLoading, accessToken, isAuthenticated } = useAuthStore();
 
   const [musicPreferences, setMusicPreferences] = useState<MusicPreferences | null>(null);
   const [stats, setStats] = useState<MyStats | null>(null);
@@ -47,22 +40,23 @@ export function ProfileScreen() {
 
   // Load profile data (music preferences + stats)
   const loadProfileData = useCallback(async () => {
-    if (!accessToken) return;
+    // Don't load if not authenticated or during logout
+    if (!accessToken || !isAuthenticated) return;
 
     try {
       const [prefsData, statsData] = await Promise.all([
         privacyApi.getMusicPreferences(accessToken),
         friendsApi.getMyStats(accessToken),
       ]);
-      setMusicPreferences(prefsData);
-      setStats(statsData);
-    } catch (error) {
-      // Silently fail - data is optional
-      if (__DEV__) {
-        console.log('[ProfileScreen] Could not load profile data:', error);
+      // Double-check we're still authenticated before setting state
+      if (useAuthStore.getState().isAuthenticated) {
+        setMusicPreferences(prefsData);
+        setStats(statsData);
       }
+    } catch {
+      // Silently fail - data is optional and errors during logout are expected
     }
-  }, [accessToken]);
+  }, [accessToken, isAuthenticated]);
 
   // Reload on focus
   useFocusEffect(
@@ -89,27 +83,12 @@ export function ProfileScreen() {
     navigation.navigate('MusicPreferences');
   };
 
-  const handleLogout = () => {
-    Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Logout',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await logout();
-            } catch (error) {
-              console.error('[ProfileScreen] Logout failed:', error);
-              Alert.alert('Error', 'Failed to logout. Please try again.');
-            }
-          },
-        },
-      ],
-      { cancelable: true }
-    );
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('[ProfileScreen] Logout failed:', error);
+    }
   };
 
   if (!user) {
@@ -126,7 +105,10 @@ export function ProfileScreen() {
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.contentContainer}
+        contentContainerStyle={[
+          styles.contentContainer,
+          { paddingBottom: playerHeight + theme.spacing.xl },
+        ]}
         refreshControl={
           <RefreshControl
             refreshing={isRefreshing}
@@ -140,6 +122,12 @@ export function ProfileScreen() {
           colors={[theme.colors.primary + '40', theme.colors.background]}
           style={styles.heroGradient}
         >
+          {/* Edit Profile Button - Top Right */}
+          <TouchableOpacity style={styles.editProfileButton} onPress={handleEditProfile}>
+            <Ionicons name="pencil" size={14} color={theme.colors.primary} />
+            <Text style={styles.editProfileText}>Edit</Text>
+          </TouchableOpacity>
+
           <View style={styles.heroContent}>
             <Avatar size="lg" name={user.displayName || user.username} uri={user.avatarUrl} />
 
@@ -180,7 +168,12 @@ export function ProfileScreen() {
             </View>
           ) : (
             <TouchableOpacity style={styles.emptyState} onPress={handleMusicPreferences}>
-              <Text style={styles.emptyStateIcon}>🎵</Text>
+              <Ionicons
+                name="musical-notes-outline"
+                size={32}
+                color={theme.colors.textSecondary}
+                style={styles.emptyStateIcon}
+              />
               <Text style={styles.emptyStateText}>Add your favorite genres</Text>
               <Text style={styles.emptyStateHint}>Tap to select up to 5 genres</Text>
             </TouchableOpacity>
@@ -214,36 +207,26 @@ export function ProfileScreen() {
           <ThemeSelector />
         </ProfileSection>
 
-        {/* Quick Actions Section */}
-        <ProfileSection title="Settings">
-          <TouchableOpacity style={styles.menuItem} onPress={handleEditProfile}>
-            <Text style={styles.menuIcon}>✏️</Text>
-            <Text style={styles.menuLabel}>Edit Profile</Text>
-            <Text style={styles.menuChevron}>›</Text>
+        {/* Privacy Settings Button */}
+        <View style={styles.privacyButtonContainer}>
+          <TouchableOpacity style={styles.privacyButton} onPress={handlePrivacySettings}>
+            <View style={styles.privacyIconContainer}>
+              <Ionicons name="lock-closed" size={20} color={theme.colors.primary} />
+            </View>
+            <View style={styles.privacyTextContainer}>
+              <Text style={styles.privacyTitle}>Privacy Settings</Text>
+              <Text style={styles.privacySubtitle}>Control who sees your info</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
           </TouchableOpacity>
-
-          <View style={styles.divider} />
-
-          <TouchableOpacity style={styles.menuItem} onPress={handlePrivacySettings}>
-            <Text style={styles.menuIcon}>🔒</Text>
-            <Text style={styles.menuLabel}>Privacy Settings</Text>
-            <Text style={styles.menuChevron}>›</Text>
-          </TouchableOpacity>
-
-          <View style={styles.divider} />
-
-          <TouchableOpacity style={styles.menuItem} onPress={handleMusicPreferences}>
-            <Text style={styles.menuIcon}>🎵</Text>
-            <Text style={styles.menuLabel}>Music Preferences</Text>
-            <Text style={styles.menuChevron}>›</Text>
-          </TouchableOpacity>
-        </ProfileSection>
+        </View>
 
         {/* Logout Button */}
         <View style={styles.logoutSection}>
-          <Button variant="outline" onPress={handleLogout} loading={isLoading}>
-            Logout
-          </Button>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout} disabled={isLoading}>
+            <Ionicons name="log-out-outline" size={20} color="#DC2626" />
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Footer */}
@@ -272,6 +255,26 @@ const createStyles = (theme: Theme) =>
     heroContent: {
       alignItems: 'center',
       paddingHorizontal: theme.spacing.lg,
+    },
+    editProfileButton: {
+      position: 'absolute',
+      top: theme.spacing.md,
+      right: theme.spacing.lg,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      backgroundColor: theme.colors.surface,
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
+      borderRadius: 20,
+      borderWidth: 2,
+      borderColor: theme.colors.border,
+      zIndex: 10,
+    },
+    editProfileText: {
+      fontSize: 13,
+      color: theme.colors.text,
+      fontWeight: theme.typography.weights.bold,
     },
     username: {
       fontSize: 14,
@@ -330,8 +333,8 @@ const createStyles = (theme: Theme) =>
       paddingVertical: theme.spacing.lg,
     },
     emptyStateIcon: {
-      fontSize: 32,
       marginBottom: theme.spacing.sm,
+      opacity: 0.6,
     },
     emptyStateText: {
       fontSize: 16,
@@ -362,27 +365,58 @@ const createStyles = (theme: Theme) =>
       height: 1,
       backgroundColor: theme.colors.border,
     },
-    menuItem: {
+    privacyButtonContainer: {
+      paddingHorizontal: theme.spacing.lg,
+      marginTop: theme.spacing.md,
+    },
+    privacyButton: {
       flexDirection: 'row',
       alignItems: 'center',
-      paddingVertical: theme.spacing.sm,
+      backgroundColor: theme.colors.surface,
+      padding: theme.spacing.lg,
+      borderRadius: 16,
     },
-    menuIcon: {
-      fontSize: 20,
-      marginRight: theme.spacing.sm,
+    privacyIconContainer: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: theme.colors.primary + '15',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: theme.spacing.md,
     },
-    menuLabel: {
+    privacyTextContainer: {
       flex: 1,
+    },
+    privacyTitle: {
       fontSize: 16,
+      fontWeight: theme.typography.weights.bold,
       color: theme.colors.text,
     },
-    menuChevron: {
-      fontSize: 22,
+    privacySubtitle: {
+      fontSize: 13,
       color: theme.colors.textSecondary,
+      marginTop: 2,
     },
     logoutSection: {
       paddingHorizontal: theme.spacing.lg,
-      marginTop: theme.spacing.md,
+      marginTop: theme.spacing.lg,
+    },
+    logoutButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: theme.spacing.sm,
+      paddingVertical: theme.spacing.md,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: '#DC2626',
+      backgroundColor: 'transparent',
+    },
+    logoutText: {
+      fontSize: 16,
+      fontWeight: theme.typography.weights.semibold,
+      color: '#DC2626',
     },
     footer: {
       textAlign: 'center',

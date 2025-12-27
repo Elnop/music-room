@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Avatar } from '@components/common/Avatar';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
@@ -7,9 +8,11 @@ import type { PlaylistWithTracks } from '@/types/playlist.types';
 
 interface PlaylistHeaderProps {
   playlist: PlaylistWithTracks;
+  onAddTrack?: () => void;
+  canEdit?: boolean;
 }
 
-export function PlaylistHeader({ playlist }: PlaylistHeaderProps) {
+export function PlaylistHeader({ playlist, onAddTrack, canEdit = false }: PlaylistHeaderProps) {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
 
@@ -23,7 +26,7 @@ export function PlaylistHeader({ playlist }: PlaylistHeaderProps) {
         <Image source={{ uri: coverUrl }} style={styles.cover} />
       ) : (
         <View style={[styles.cover, styles.emptyCover]}>
-          <Text style={styles.emptyIcon}>🎵</Text>
+          <Ionicons name="musical-notes" size={64} color={theme.colors.textSecondary} />
         </View>
       )}
       <Text style={styles.name}>{playlist.name}</Text>
@@ -38,11 +41,22 @@ export function PlaylistHeader({ playlist }: PlaylistHeaderProps) {
       </View>
       {playlist.collaboratorIds.length > 0 && (
         <View style={styles.collaborators}>
+          <Ionicons name="people-outline" size={14} color={theme.colors.primary} />
           <Text style={styles.collaboratorsText}>
             {playlist.collaboratorIds.length}{' '}
             {playlist.collaboratorIds.length === 1 ? 'collaborator' : 'collaborators'}
           </Text>
         </View>
+      )}
+
+      {/* Add track button integrated in header */}
+      {canEdit && onAddTrack && (
+        <TouchableOpacity style={styles.addTrackRow} onPress={onAddTrack} activeOpacity={0.6}>
+          <View style={styles.addTrackIcon}>
+            <Ionicons name="add" size={24} color={theme.colors.textSecondary} />
+          </View>
+          <Text style={styles.addTrackText}>Ajouter un titre</Text>
+        </TouchableOpacity>
       )}
     </View>
   );
@@ -53,26 +67,18 @@ const createStyles = (theme: Theme) =>
     container: {
       alignItems: 'center',
       padding: theme.spacing.lg,
-      backgroundColor: theme.colors.surface,
-      borderBottomWidth: theme.borders.thick,
-      borderBottomColor: theme.colors.border,
-      ...theme.shadows.medium,
+      paddingBottom: 0,
     },
     cover: {
       width: 200,
       height: 200,
-      borderRadius: theme.borders.medium,
+      borderRadius: 8,
       backgroundColor: theme.colors.surfaceAlt,
-      borderWidth: theme.borders.thick,
-      borderColor: theme.colors.border,
       marginBottom: theme.spacing.lg,
     },
     emptyCover: {
       justifyContent: 'center',
       alignItems: 'center',
-    },
-    emptyIcon: {
-      fontSize: 64,
     },
     name: {
       fontSize: theme.typography.sizes.xxl,
@@ -110,11 +116,37 @@ const createStyles = (theme: Theme) =>
       color: theme.colors.textSecondary,
     },
     collaborators: {
+      flexDirection: 'row',
+      alignItems: 'center',
       marginTop: theme.spacing.sm,
+      gap: theme.spacing.xs,
     },
     collaboratorsText: {
       fontSize: theme.typography.sizes.sm,
       color: theme.colors.primary,
       fontWeight: theme.typography.weights.semibold,
+    },
+    addTrackRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      alignSelf: 'stretch',
+      marginTop: 0,
+      paddingVertical: 8,
+      paddingHorizontal: theme.spacing.md,
+      marginHorizontal: -theme.spacing.lg,
+    },
+    addTrackIcon: {
+      width: 48,
+      height: 48,
+      borderRadius: 4,
+      backgroundColor: theme.colors.surfaceAlt,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    addTrackText: {
+      fontSize: theme.typography.sizes.md,
+      fontWeight: theme.typography.weights.medium,
+      color: theme.colors.textSecondary,
+      marginLeft: theme.spacing.md,
     },
   });

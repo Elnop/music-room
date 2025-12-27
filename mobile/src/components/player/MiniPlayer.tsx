@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets, type EdgeInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import { usePlayer } from '@/contexts/PlayerContext';
@@ -55,14 +56,20 @@ export function MiniPlayer() {
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
           {loading ? (
-            <ActivityIndicator size="small" color={theme.colors.background} />
+            <ActivityIndicator size="small" color="#FFFFFF" />
           ) : (
-            <Text style={styles.playButtonText}>{isPlaying ? '⏸' : '▶'}</Text>
+            <Ionicons
+              name={isPlaying ? 'pause' : 'play'}
+              size={20}
+              color="#FFFFFF"
+              style={isPlaying ? undefined : { marginLeft: 2 }}
+            />
           )}
         </TouchableOpacity>
       </View>
 
-      <View style={styles.progressBarContainer}>
+      {/* Progress bar at the bottom of the mini player */}
+      {progress > 0 && (
         <View
           style={[
             styles.progressBar,
@@ -71,7 +78,7 @@ export function MiniPlayer() {
             },
           ]}
         />
-      </View>
+      )}
     </TouchableOpacity>
   );
 }
@@ -80,30 +87,22 @@ const createStyles = (theme: Theme, insets: EdgeInsets) =>
   StyleSheet.create({
     container: {
       position: 'absolute',
-      bottom: 60 + insets.bottom,
+      bottom: 70 + insets.bottom, // Tab bar height (70) + safe area
       left: 0,
       right: 0,
-      backgroundColor: theme.colors.surface,
-      borderTopWidth: 1,
-      borderTopColor: theme.colors.border,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: -2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 8,
+      backgroundColor: theme.colors.background,
     },
     content: {
       flexDirection: 'row',
       alignItems: 'center',
       padding: theme.spacing.sm,
-      paddingBottom: theme.spacing.md,
     },
     artwork: {
       width: 40,
       height: 40,
-      borderRadius: theme.borders.small,
+      borderRadius: 8,
       marginRight: theme.spacing.sm,
-      backgroundColor: theme.colors.background,
+      backgroundColor: theme.colors.surfaceAlt,
     },
     info: {
       flex: 1,
@@ -126,14 +125,6 @@ const createStyles = (theme: Theme, insets: EdgeInsets) =>
       backgroundColor: theme.colors.primary,
       alignItems: 'center',
       justifyContent: 'center',
-    },
-    playButtonText: {
-      fontSize: 16,
-      color: theme.colors.background,
-    },
-    progressBarContainer: {
-      height: 2,
-      backgroundColor: theme.colors.border,
     },
     progressBar: {
       height: 2,

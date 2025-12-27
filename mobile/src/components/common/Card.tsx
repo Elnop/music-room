@@ -31,12 +31,11 @@ const createStyles = (theme: Theme) =>
   StyleSheet.create({
     card: {
       backgroundColor: theme.colors.surface,
-      borderRadius: theme.borders.medium,
-      borderWidth: theme.borders.thick,
-      borderColor: theme.colors.border,
+      borderRadius: 16,
+      borderWidth: 0,
       padding: theme.spacing.md,
     },
     elevation: {
-      ...theme.shadows.large,
+      ...theme.shadows.medium,
     },
   });

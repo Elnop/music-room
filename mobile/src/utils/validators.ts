@@ -33,8 +33,8 @@ export const playlistFormSchema = z.object({
   name: z
     .string()
     .min(1, 'Playlist name is required')
-    .max(100, 'Playlist name must be less than 100 characters'),
-  description: z.string().max(500, 'Description must be less than 500 characters').optional(),
+    .max(20, 'Le nom doit faire 20 caractères max'),
+  description: z.string().max(70, 'La description doit faire 70 caractères max').optional(),
 });
 
 export type PlaylistFormInput = z.infer<typeof playlistFormSchema>;

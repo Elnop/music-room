@@ -4,6 +4,9 @@ import { usePlayerStore } from '@/store/playerStore';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
 
+// MiniPlayer height for padding calculations (content + progress bar + margins)
+export const MINI_PLAYER_HEIGHT = 75;
+
 interface PlayerContextValue {
   player: ReturnType<typeof useAudioPlayer>;
   loading: boolean;
@@ -124,4 +127,13 @@ export function usePlayer() {
     throw new Error('usePlayer must be used within PlayerProvider');
   }
   return context;
+}
+
+/**
+ * Hook to get the height of the MiniPlayer for padding calculations.
+ * Returns MINI_PLAYER_HEIGHT when a track is playing, 0 otherwise.
+ */
+export function usePlayerHeight(): number {
+  const currentTrack = usePlayerStore(state => state.currentTrack);
+  return currentTrack ? MINI_PLAYER_HEIGHT : 0;
 }

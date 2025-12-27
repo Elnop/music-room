@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import { useAuthStore } from '@store/authStore';
@@ -21,6 +22,12 @@ import { Button } from '@components/common/Button';
 import { Input } from '@components/common/Input';
 import { playlistFormSchema, type PlaylistFormInput } from '@utils/validators';
 import type { EditMode } from '@/types/playlist.types';
+
+// Playlist field limits
+const PLAYLIST_LIMITS = {
+  NAME_MAX: 20,
+  DESCRIPTION_MAX: 70,
+};
 
 type PlaylistStackParamList = {
   Playlists: undefined;
@@ -101,14 +108,20 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
                 control={control}
                 name="name"
                 render={({ field: { onChange, value } }) => (
-                  <Input
-                    label="Nom de la playlist"
-                    value={value}
-                    onChangeText={onChange}
-                    placeholder="Ma super playlist"
-                    error={errors.name?.message}
-                    autoFocus
-                  />
+                  <View>
+                    <Input
+                      label="Nom de la playlist"
+                      value={value}
+                      onChangeText={text => onChange(text.slice(0, PLAYLIST_LIMITS.NAME_MAX))}
+                      placeholder="Ma super playlist"
+                      error={errors.name?.message}
+                      autoFocus
+                      maxLength={PLAYLIST_LIMITS.NAME_MAX}
+                    />
+                    <Text style={styles.charCount}>
+                      {value?.length || 0}/{PLAYLIST_LIMITS.NAME_MAX}
+                    </Text>
+                  </View>
                 )}
               />
 
@@ -116,15 +129,23 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
                 control={control}
                 name="description"
                 render={({ field: { onChange, value } }) => (
-                  <Input
-                    label="Description (Optionnel)"
-                    value={value || ''}
-                    onChangeText={onChange}
-                    placeholder="Décrivez votre playlist..."
-                    error={errors.description?.message}
-                    multiline
-                    numberOfLines={3}
-                  />
+                  <View>
+                    <Input
+                      label="Description (Optionnel)"
+                      value={value || ''}
+                      onChangeText={text =>
+                        onChange(text.slice(0, PLAYLIST_LIMITS.DESCRIPTION_MAX))
+                      }
+                      placeholder="Décrivez votre playlist..."
+                      error={errors.description?.message}
+                      multiline
+                      numberOfLines={3}
+                      maxLength={PLAYLIST_LIMITS.DESCRIPTION_MAX}
+                    />
+                    <Text style={styles.charCount}>
+                      {value?.length || 0}/{PLAYLIST_LIMITS.DESCRIPTION_MAX}
+                    </Text>
+                  </View>
                 )}
               />
 
@@ -163,20 +184,6 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
                     trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
                     thumbColor={theme.colors.surface}
                   />
-                </View>
-              </View>
-
-              <View style={styles.summarySection}>
-                <Text style={styles.summaryTitle}>Récapitulatif</Text>
-                <View style={styles.summaryRow}>
-                  <Text style={styles.summaryIcon}>{isPrivate ? '🔒' : '🌍'}</Text>
-                  <Text style={styles.summaryText}>{isPrivate ? 'Privée' : 'Publique'}</Text>
-                </View>
-                <View style={styles.summaryRow}>
-                  <Text style={styles.summaryIcon}>{isEditRestricted ? '✏️' : '👥'}</Text>
-                  <Text style={styles.summaryText}>
-                    {isEditRestricted ? 'Édition par les collaborateurs' : 'Édition par tous'}
-                  </Text>
                 </View>
               </View>
 
@@ -266,13 +273,17 @@ const createStyles = (theme: Theme) =>
       flexDirection: 'row',
       alignItems: 'center',
       marginBottom: theme.spacing.xs,
-    },
-    summaryIcon: {
-      fontSize: 16,
-      marginRight: theme.spacing.sm,
+      gap: theme.spacing.sm,
     },
     summaryText: {
       fontSize: theme.typography.sizes.sm,
       color: theme.colors.text,
+    },
+    charCount: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+      textAlign: 'right',
+      marginTop: -theme.spacing.sm,
+      marginBottom: theme.spacing.sm,
     },
   });

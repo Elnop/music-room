@@ -1,4 +1,5 @@
 // User Types (aligned with backend)
+import type { Ionicons } from '@expo/vector-icons';
 
 // =====================================================
 // Visibility Types
@@ -8,6 +9,11 @@
  * Visibility level for profile fields
  */
 export type VisibilityLevel = 'public' | 'friends_only' | 'private';
+
+/**
+ * Ionicons glyph name type
+ */
+export type IoniconsName = keyof typeof Ionicons.glyphMap;
 
 /**
  * Music genre options (10 total, user can select max 5)
@@ -41,7 +47,7 @@ export const MUSIC_GENRES: MusicGenre[] = [
 ];
 
 /**
- * Genre display information with icons and colors
+ * Genre display information with emojis and colors
  */
 export const GENRE_INFO: Record<MusicGenre, { label: string; icon: string; color: string }> = {
   pop: { label: 'Pop', icon: '🎵', color: '#FF6B9D' },
@@ -162,10 +168,10 @@ export const VISIBILITY_LABELS: Record<VisibilityLevel, string> = {
 };
 
 /**
- * Visibility icons for UI
+ * Visibility icons for UI (Ionicons names)
  */
-export const VISIBILITY_ICONS: Record<VisibilityLevel, string> = {
-  public: '🌍',
-  friends_only: '👥',
-  private: '🔒',
+export const VISIBILITY_ICONS: Record<VisibilityLevel, IoniconsName> = {
+  public: 'globe-outline',
+  friends_only: 'people-outline',
+  private: 'lock-closed-outline',
 };

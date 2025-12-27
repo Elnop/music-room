@@ -1,44 +1,40 @@
-// Neobrutalism Design Tokens
+// Minimalist Design Tokens
 
 export const NEOBRUTALISM_BORDERS = {
-  // Border widths
-  thin: 1,
-  medium: 2,
-  thick: 3,
-  extraThick: 4,
+  // Border widths - minimalist style (no visible borders)
+  thin: 0,
+  medium: 0,
+  thick: 1,
+  extraThick: 1,
 
-  // Border radius - légèrement arrondi pour modernité
+  // Border radius
   none: 0,
-  small: 4,
-  round: 9999, // Cercles parfaits
+  small: 8,
+  round: 9999,
 } as const;
 
 export const NEOBRUTALISM_SHADOWS = {
-  // Small offset shadow (2px)
+  // Subtle shadows with blur
   small: {
     shadowColor: '#000000',
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 1, // Opacité totale (pas de transparence)
-    shadowRadius: 0, // Pas de blur
-    elevation: 3, // Android
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
   },
-
-  // Medium offset shadow (4px)
   medium: {
     shadowColor: '#000000',
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 1,
-    shadowRadius: 0,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
-
-  // Large offset shadow (6px)
   large: {
     shadowColor: '#000000',
-    shadowOffset: { width: 6, height: 6 },
-    shadowOpacity: 1,
-    shadowRadius: 0,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 6,
   },
 } as const;
 
@@ -47,7 +43,7 @@ export const NEOBRUTALISM_TYPOGRAPHY = {
     regular: '400' as const,
     medium: '500' as const,
     semibold: '600' as const,
-    bold: '700' as const, // Par défaut pour la plupart du texte
+    bold: '700' as const,
     extrabold: '800' as const,
     black: '900' as const,
   },

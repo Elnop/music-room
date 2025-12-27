@@ -108,37 +108,17 @@ export function MusicPreferencesScreen() {
             maxGenres={MAX_GENRES}
           />
         </View>
-
-        {selectedGenres.length > 0 && (
-          <View style={styles.previewSection}>
-            <Text style={styles.previewTitle}>Your Selection</Text>
-            <Text style={styles.previewText}>
-              {selectedGenres.length === 1
-                ? "You've selected 1 genre"
-                : `You've selected ${selectedGenres.length} genres`}
-            </Text>
-          </View>
-        )}
-
-        <View style={styles.tipBox}>
-          <Text style={styles.tipIcon}>💡</Text>
-          <Text style={styles.tipText}>
-            Your music preferences will be visible based on your privacy settings. You can change
-            who sees them in Privacy Settings.
-          </Text>
-        </View>
-      </ScrollView>
-
-      <View style={styles.footer}>
         <Button
           variant="primary"
           onPress={handleSave}
           loading={isSaving}
           disabled={!hasChanges || isSaving}
+          fullWidth={false}
+          style={styles.saveButton}
         >
           Save Preferences
         </Button>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -214,5 +194,8 @@ const createStyles = (theme: Theme) =>
       padding: theme.spacing.lg,
       borderTopWidth: 1,
       borderTopColor: theme.colors.border,
+    },
+    saveButton: {
+      marginHorizontal: theme.spacing.lg,
     },
   });

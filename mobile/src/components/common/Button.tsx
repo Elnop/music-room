@@ -42,22 +42,26 @@ export function Button({
     style,
   ].filter(Boolean);
 
-  const textStyle = [styles.text, styles[`${variant}Text` as keyof typeof styles]].filter(Boolean);
+  const textStyle = [
+    styles.text,
+    styles[`${variant}Text` as keyof typeof styles],
+    isDisabled && styles.disabledText,
+  ].filter(Boolean);
 
-  const spinnerColor = variant === 'outline' ? theme.colors.primary : theme.colors.textInverse;
+  const spinnerColor = variant === 'primary' ? '#FFFFFF' : theme.colors.primary;
 
   return (
     <TouchableOpacity
       style={containerStyle}
       onPress={onPress}
       disabled={isDisabled}
-      activeOpacity={0.7}
+      activeOpacity={0.8}
     >
       {loading ? (
         <ActivityIndicator color={spinnerColor} size="small" />
       ) : (
         <>
-          {icon && <>{icon}</>}
+          {icon}
           <Text style={textStyle}>{buttonText}</Text>
         </>
       )}
@@ -68,23 +72,19 @@ export function Button({
 const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
-      paddingVertical: theme.spacing.sm + 4,
-      paddingHorizontal: theme.spacing.lg,
-      borderRadius: theme.borders.medium,
-      borderWidth: theme.borders.thick,
-      borderColor: theme.colors.border,
+      height: 52,
+      paddingHorizontal: 24,
+      borderRadius: 12,
       alignItems: 'center',
       justifyContent: 'center',
       flexDirection: 'row',
-      gap: theme.spacing.xs,
-      ...theme.shadows.medium,
+      gap: 8,
     },
     fullWidth: {
       width: '100%',
     },
     disabled: {
-      backgroundColor: theme.colors.surfaceAlt,
-      borderColor: theme.colors.borderLight,
+      opacity: 0.5,
     },
 
     primary: {
@@ -92,24 +92,29 @@ const createStyles = (theme: Theme) =>
     },
     secondary: {
       backgroundColor: theme.colors.surface,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
     },
     outline: {
       backgroundColor: 'transparent',
-      borderWidth: theme.borders.medium,
+      borderWidth: 1,
+      borderColor: '#FFFFFF',
     },
 
     text: {
-      fontSize: theme.typography.sizes.md,
-      fontWeight: theme.typography.weights.bold,
+      fontSize: 16,
+      fontWeight: '600',
     },
     primaryText: {
-      color: theme.colors.textInverse,
+      color: '#FFFFFF',
     },
     secondaryText: {
       color: theme.colors.text,
     },
     outlineText: {
-      color: theme.colors.primary,
-      fontWeight: theme.typography.weights.bold,
+      color: theme.colors.text,
+    },
+    disabledText: {
+      opacity: 0.7,
     },
   });

@@ -1,7 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
+import { usePlayerHeight } from '@/contexts/PlayerContext';
 import type { Theme } from '@/themes/types';
 import { useSoundCloudStore } from '@store/soundcloudStore';
 import { usePlayerStore } from '@store/playerStore';
@@ -13,6 +15,7 @@ import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
 export function SoundCloudSearchScreen() {
   const { theme } = useTheme();
+  const playerHeight = usePlayerHeight();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -87,12 +90,21 @@ export function SoundCloudSearchScreen() {
               onAddToPlaylist={handleAddToPlaylist}
             />
           )}
+          contentContainerStyle={{
+            paddingBottom: playerHeight + theme.spacing.xxl,
+            flexGrow: 1,
+          }}
           ListEmptyComponent={
             searchQuery ? (
               <Text style={styles.emptyText}>No tracks found</Text>
             ) : (
               <View style={styles.emptyState}>
-                <Text style={styles.emptyIcon}>🎵</Text>
+                <Ionicons
+                  name="musical-notes-outline"
+                  size={64}
+                  color={theme.colors.textSecondary}
+                  style={styles.emptyIcon}
+                />
                 <Text style={styles.emptyText}>Search for music on SoundCloud</Text>
                 <Text style={styles.emptySubtext}>Find tracks to add to your playlists</Text>
               </View>
@@ -126,13 +138,12 @@ const createStyles = (theme: Theme) =>
       marginBottom: theme.spacing.md,
     },
     searchInput: {
-      backgroundColor: theme.colors.surface,
-      borderRadius: theme.borders.medium,
-      padding: theme.spacing.md,
+      backgroundColor: theme.colors.surfaceAlt,
+      borderRadius: 8,
+      paddingVertical: 12,
+      paddingHorizontal: theme.spacing.md,
       fontSize: 16,
       color: theme.colors.text,
-      borderWidth: 2,
-      borderColor: theme.colors.border,
     },
     errorContainer: {
       backgroundColor: theme.colors.error + '20',
@@ -161,8 +172,8 @@ const createStyles = (theme: Theme) =>
       paddingHorizontal: theme.spacing.xl,
     },
     emptyIcon: {
-      fontSize: 64,
       marginBottom: theme.spacing.lg,
+      opacity: 0.6,
     },
     emptyText: {
       textAlign: 'center',

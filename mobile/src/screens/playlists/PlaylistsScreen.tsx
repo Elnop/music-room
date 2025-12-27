@@ -3,7 +3,9 @@ import { View, FlatList, StyleSheet, RefreshControl, TouchableOpacity, Text } fr
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
+import { usePlayerHeight } from '@/contexts/PlayerContext';
 import type { Theme } from '@themes/types';
 import { useAuthStore } from '@store/authStore';
 import { usePlaylistStore } from '@store/playlistStore';
@@ -26,6 +28,7 @@ interface PlaylistsScreenProps {
 
 export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
   const { theme } = useTheme();
+  const playerHeight = usePlayerHeight();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
   const { user } = useAuthStore();
   const { playlists, isLoading, fetchPlaylists } = usePlaylistStore();
@@ -61,7 +64,8 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
       <View style={styles.header}>
         <Text style={styles.title}>My Playlists</Text>
         <TouchableOpacity style={styles.createButton} onPress={handleCreatePress}>
-          <Text style={styles.createButtonText}>+ New</Text>
+          <Ionicons name="add" size={20} color="#FFFFFF" />
+          <Text style={styles.createButtonText}>New</Text>
         </TouchableOpacity>
       </View>
 
@@ -84,7 +88,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
             />
           );
         }}
-        contentContainerStyle={styles.list}
+        contentContainerStyle={[styles.list, { paddingBottom: playerHeight + theme.spacing.xl }]}
         refreshControl={
           <RefreshControl
             refreshing={isLoading}
@@ -94,7 +98,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
         }
         ListEmptyComponent={
           <EmptyState
-            icon="🎵"
+            icon="musical-notes-outline"
             message="No playlists yet. Create your first playlist to get started!"
           />
         }
@@ -113,29 +117,29 @@ const createStyles = (theme: Theme) =>
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      paddingHorizontal: theme.spacing.md,
-      paddingVertical: theme.spacing.md,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
+      paddingHorizontal: theme.spacing.lg,
+      paddingVertical: theme.spacing.lg,
     },
     title: {
-      fontSize: theme.typography.sizes.xxl,
+      fontSize: 28,
       fontWeight: theme.typography.weights.bold,
       color: theme.colors.text,
     },
     createButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
       backgroundColor: theme.colors.primary,
       paddingHorizontal: theme.spacing.md,
       paddingVertical: theme.spacing.sm,
       borderRadius: 20,
+      gap: 4,
     },
     createButtonText: {
       fontSize: theme.typography.sizes.md,
       fontWeight: theme.typography.weights.semibold,
-      color: theme.colors.background,
+      color: '#FFFFFF',
     },
     list: {
-      padding: theme.spacing.md,
       flexGrow: 1,
     },
   });

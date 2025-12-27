@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
-import { Card } from '@components/common/Card';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import type { Playlist } from '@/types/playlist.types';
@@ -19,98 +19,57 @@ export function PlaylistCard({ playlist, trackCount, ownerName, onPress }: Playl
   const coverUrl = playlist.coverUrl || playlist.firstTrackCover;
 
   return (
-    <Card onPress={onPress} style={styles.card}>
-      <View style={styles.content}>
-        {coverUrl ? (
-          <Image source={{ uri: coverUrl }} style={styles.cover} />
-        ) : (
-          <View style={[styles.cover, styles.emptyCover]}>
-            <Text style={styles.emptyIcon}>🎵</Text>
-          </View>
-        )}
-        <View style={styles.info}>
-          <Text style={styles.name} numberOfLines={1}>
-            {playlist.name}
-          </Text>
-          {playlist.description && (
-            <Text style={styles.description} numberOfLines={2}>
-              {playlist.description}
-            </Text>
-          )}
-          <View style={styles.meta}>
-            <Text style={styles.metaText}>
-              {trackCount} {trackCount === 1 ? 'track' : 'tracks'}
-            </Text>
-            <Text style={styles.separator}>•</Text>
-            <Text style={styles.metaText}>by {ownerName}</Text>
-            {playlist.visibility === 'private' && (
-              <>
-                <Text style={styles.separator}>•</Text>
-                <Text style={styles.private}>Private</Text>
-              </>
-            )}
-          </View>
+    <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.6}>
+      {coverUrl ? (
+        <Image source={{ uri: coverUrl }} style={styles.cover} />
+      ) : (
+        <View style={[styles.cover, styles.emptyCover]}>
+          <Ionicons name="musical-notes" size={24} color={theme.colors.textSecondary} />
         </View>
+      )}
+      <View style={styles.info}>
+        <Text style={styles.name} numberOfLines={1}>
+          {playlist.name}
+        </Text>
+        <Text style={styles.metaText} numberOfLines={1}>
+          {trackCount} {trackCount === 1 ? 'track' : 'tracks'} • {ownerName}
+          {playlist.visibility === 'private' && ' • 🔒'}
+        </Text>
       </View>
-    </Card>
+    </TouchableOpacity>
   );
 }
 
 const createStyles = (theme: Theme) =>
   StyleSheet.create({
-    card: {
-      marginBottom: theme.spacing.md,
-    },
-    content: {
+    container: {
       flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 8,
+      paddingHorizontal: theme.spacing.md,
     },
     cover: {
-      width: 80,
-      height: 80,
-      borderRadius: theme.borders.small,
+      width: 48,
+      height: 48,
+      borderRadius: 4,
       backgroundColor: theme.colors.surfaceAlt,
-      borderWidth: theme.borders.thin,
-      borderColor: theme.colors.border,
     },
     emptyCover: {
       justifyContent: 'center',
       alignItems: 'center',
     },
-    emptyIcon: {
-      fontSize: 32,
-    },
     info: {
       flex: 1,
       marginLeft: theme.spacing.md,
-      justifyContent: 'center',
     },
     name: {
-      fontSize: theme.typography.sizes.lg,
-      fontWeight: theme.typography.weights.semibold,
+      fontSize: theme.typography.sizes.md,
+      fontWeight: theme.typography.weights.medium,
       color: theme.colors.text,
-      marginBottom: theme.spacing.xs,
-    },
-    description: {
-      fontSize: theme.typography.sizes.sm,
-      color: theme.colors.textSecondary,
-      marginBottom: theme.spacing.xs,
-    },
-    meta: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      marginBottom: 2,
     },
     metaText: {
-      fontSize: theme.typography.sizes.xs,
+      fontSize: theme.typography.sizes.sm,
       color: theme.colors.textSecondary,
-    },
-    separator: {
-      fontSize: theme.typography.sizes.xs,
-      color: theme.colors.textSecondary,
-      marginHorizontal: theme.spacing.xs,
-    },
-    private: {
-      fontSize: theme.typography.sizes.xs,
-      color: theme.colors.primary,
-      fontWeight: theme.typography.weights.semibold,
     },
   });

@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useFocusEffect } from '@react-navigation/native';
 import debounce from 'lodash/debounce';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import { useAuthStore } from '@store/authStore';
@@ -410,7 +411,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
         {item.displayName && <Text style={styles.displayName}>{item.displayName}</Text>}
       </View>
       <View style={styles.addButton}>
-        <Text style={styles.addButtonText}>+</Text>
+        <Ionicons name="add" size={24} color="#FFFFFF" />
       </View>
     </TouchableOpacity>
   );
@@ -450,7 +451,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
           onPress={() => handleRemoveUser(item.id)}
           disabled={!!processingUserId}
         >
-          <Text style={styles.removeButtonText}>×</Text>
+          <Ionicons name="close" size={20} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
     );
@@ -463,7 +464,13 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
       {/* Visibility Toggle */}
       <View style={styles.settingItem}>
         <View style={styles.settingInfo}>
-          <Text style={styles.settingIcon}>{isPrivate ? '🔒' : '🌍'}</Text>
+          <View style={styles.settingIconContainer}>
+            <Ionicons
+              name={isPrivate ? 'lock-closed' : 'globe'}
+              size={20}
+              color={theme.colors.primary}
+            />
+          </View>
           <View style={styles.settingTextContainer}>
             <Text style={styles.settingLabel}>Visibilité</Text>
             <Text style={styles.settingDescription}>
@@ -488,7 +495,13 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
       {/* Edit Mode Toggle */}
       <View style={styles.settingItem}>
         <View style={styles.settingInfo}>
-          <Text style={styles.settingIcon}>{isEditRestricted ? '✏️' : '📝'}</Text>
+          <View style={styles.settingIconContainer}>
+            <Ionicons
+              name={isEditRestricted ? 'pencil' : 'create'}
+              size={20}
+              color={theme.colors.primary}
+            />
+          </View>
           <View style={styles.settingTextContainer}>
             <Text style={styles.settingLabel}>Mode d'édition</Text>
             <Text style={styles.settingDescription}>
@@ -514,7 +527,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 
   const renderInfoCard = () => (
     <View style={styles.infoCard}>
-      <Text style={styles.infoIcon}>ℹ️</Text>
+      <Ionicons name="information-circle" size={28} color={theme.colors.primary} />
       <View style={styles.infoContent}>
         <Text style={styles.infoTitle}>Playlist ouverte</Text>
         <Text style={styles.infoText}>
@@ -700,8 +713,13 @@ const createStyles = (theme: Theme) =>
       flex: 1,
       marginRight: theme.spacing.md,
     },
-    settingIcon: {
-      fontSize: 24,
+    settingIconContainer: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: theme.colors.primary + '15',
+      alignItems: 'center',
+      justifyContent: 'center',
       marginRight: theme.spacing.md,
     },
     settingTextContainer: {
@@ -727,7 +745,6 @@ const createStyles = (theme: Theme) =>
       marginBottom: theme.spacing.lg,
     },
     infoIcon: {
-      fontSize: 32,
       marginRight: theme.spacing.md,
     },
     infoContent: {

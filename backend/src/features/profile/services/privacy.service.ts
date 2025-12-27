@@ -20,10 +20,15 @@ type ProfilePrivacyRow = Tables<"profile_privacy">;
 export class PrivacyService {
   /**
    * Get privacy settings for a user
+   * @param userId - The user whose privacy settings to fetch
+   * @param requesterId - The user making the request (optional, used to determine if we can create defaults)
    */
-  async getPrivacySettings(userId: string): Promise<ProfilePrivacy> {
+  async getPrivacySettings(
+    userId: string,
+    requesterId?: string
+  ): Promise<ProfilePrivacy> {
     try {
-      logger.info("Fetching privacy settings", { userId });
+      logger.info("Fetching privacy settings", { userId, requesterId });
 
       const { data, error } = await supabase
         .from("profile_privacy")
@@ -32,9 +37,14 @@ export class PrivacyService {
         .single();
 
       if (error) {
-        // If no record exists, create default settings
+        // If no record exists
         if (error.code === "PGRST116") {
-          return await this.createDefaultSettings(userId);
+          // Only create default settings if the requester is the user themselves
+          if (requesterId && requesterId === userId) {
+            return await this.createDefaultSettings(userId);
+          }
+          // For other users, return default settings without creating them
+          return this.getDefaultPrivacySettings(userId);
         }
         logger.error("Failed to fetch privacy settings", { error });
         throw new AppError(
@@ -54,6 +64,21 @@ export class PrivacyService {
         "PRIVACY_FETCH_ERROR"
       );
     }
+  }
+
+  /**
+   * Get default privacy settings without creating them in database
+   */
+  private getDefaultPrivacySettings(userId: string): ProfilePrivacy {
+    return {
+      userId,
+      emailVisibility: "private",
+      bioVisibility: "public",
+      avatarVisibility: "public",
+      musicPreferencesVisibility: "public",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
   }
 
   /**
@@ -204,8 +229,11 @@ export class PrivacyService {
         throw new AppError(404, "Profile not found", "PROFILE_NOT_FOUND");
       }
 
-      // Get privacy settings
-      const privacy = await this.getPrivacySettings(targetUserId);
+      // Get privacy settings (pass viewerId to determine if we can create defaults)
+      const privacy = await this.getPrivacySettings(
+        targetUserId,
+        viewerId ?? undefined
+      );
 
       // Check friendship status if viewer is logged in
       let isFriend = false;

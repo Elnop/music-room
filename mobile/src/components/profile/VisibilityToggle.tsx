@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import type { VisibilityLevel } from '@/types/user.types';
@@ -35,7 +36,11 @@ export function VisibilityToggle({ label, description, value, onChange }: Visibi
               onPress={() => onChange(option)}
               activeOpacity={0.7}
             >
-              <Text style={styles.optionIcon}>{VISIBILITY_ICONS[option]}</Text>
+              <Ionicons
+                name={VISIBILITY_ICONS[option]}
+                size={14}
+                color={isSelected ? '#FFFFFF' : theme.colors.textSecondary}
+              />
               <Text style={[styles.optionLabel, isSelected && styles.optionLabelSelected]}>
                 {VISIBILITY_LABELS[option]}
               </Text>
@@ -84,9 +89,6 @@ const createStyles = (theme: Theme) =>
     },
     optionSelected: {
       backgroundColor: theme.colors.primary,
-    },
-    optionIcon: {
-      fontSize: 14,
     },
     optionLabel: {
       fontSize: 12,

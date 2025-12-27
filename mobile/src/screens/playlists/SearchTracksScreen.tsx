@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import { usePlaylistStore } from '@store/playlistStore';
@@ -172,9 +173,7 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
           {isAdding ? (
             <LoadingSpinner size="small" />
           ) : (
-            <Text style={[styles.addButtonText, isAdded && styles.addedButtonText]}>
-              {isAdded ? '✓' : '+'}
-            </Text>
+            <Ionicons name={isAdded ? 'checkmark' : 'add'} size={20} color="#FFFFFF" />
           )}
         </View>
       </TouchableOpacity>
@@ -206,7 +205,7 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
           contentContainerStyle={styles.list}
           ListEmptyComponent={
             <EmptyState
-              icon="🎵"
+              icon="musical-notes-outline"
               message={
                 query.trim()
                   ? 'Aucune musique trouvée'

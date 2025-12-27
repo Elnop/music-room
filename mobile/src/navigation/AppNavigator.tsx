@@ -3,20 +3,17 @@
  *
  * This file orchestrates the bottom tab navigation for authenticated users.
  * Individual feature stacks are defined in navigation/stacks/ to avoid merge conflicts.
- *
- * To add a new tab:
- * 1. Create your stack in navigation/stacks/YourFeatureStack.tsx
- * 2. Import it here
- * 3. Add a Tab.Screen below
  */
 
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, Text } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
+import type { Theme } from '@/themes/types';
 
-// Import feature stacks (each feature owns its navigation)
+// Import feature stacks
 import { PlaylistsNavigator } from '@/navigation/stacks/PlaylistsStack';
 import { ProfileNavigator } from '@/navigation/stacks/ProfileStack';
 import { SearchNavigator } from '@/navigation/stacks/SearchStack';
@@ -43,35 +40,31 @@ export type { FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
 
 const Tab = createBottomTabNavigator<AppTabsParamList>();
 
-/**
- * Main App Navigator - Bottom Tabs
- *
- * Features are organized as separate stack navigators in navigation/stacks/
- * This structure prevents merge conflicts when multiple developers add features.
- */
+// Icon mapping for tabs
+const TAB_ICONS: Record<
+  string,
+  { active: keyof typeof Ionicons.glyphMap; inactive: keyof typeof Ionicons.glyphMap }
+> = {
+  PlaylistsTab: { active: 'musical-notes', inactive: 'musical-notes-outline' },
+  SearchTab: { active: 'search', inactive: 'search-outline' },
+  FriendsTab: { active: 'people', inactive: 'people-outline' },
+  ProfileTab: { active: 'person', inactive: 'person-outline' },
+};
+
 export function AppNavigator() {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
+  const styles = React.useMemo(() => createStyles(theme, insets.bottom), [theme, insets.bottom]);
 
   return (
     <PlayerProvider>
-      <View style={{ flex: 1 }}>
+      <View style={styles.container}>
         <Tab.Navigator
-          screenOptions={{
+          screenOptions={({ route }) => ({
             tabBarActiveTintColor: theme.colors.primary,
             tabBarInactiveTintColor: theme.colors.textSecondary,
-            tabBarStyle: {
-              backgroundColor: theme.colors.surface,
-              borderTopWidth: theme.borders.thick,
-              borderTopColor: theme.colors.border,
-              height: 60 + insets.bottom,
-              paddingBottom: insets.bottom + 8,
-              paddingTop: 8,
-            },
-            tabBarLabelStyle: {
-              fontWeight: theme.typography.weights.semibold,
-              fontSize: theme.typography.sizes.xs,
-            },
+            tabBarStyle: styles.tabBar,
+            tabBarShowLabel: false,
             headerStyle: {
               backgroundColor: theme.colors.background,
             },
@@ -80,50 +73,36 @@ export function AppNavigator() {
             headerTitleStyle: {
               fontWeight: theme.typography.weights.bold,
             },
-          }}
+            tabBarIcon: ({ focused, color }) => {
+              const icons = TAB_ICONS[route.name];
+              const iconName = focused ? icons.active : icons.inactive;
+              return (
+                <View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
+                  <Ionicons name={iconName} size={22} color={focused ? '#FFFFFF' : color} />
+                </View>
+              );
+            },
+          })}
         >
-          {/* Playlists Tab */}
           <Tab.Screen
             name="PlaylistsTab"
             component={PlaylistsNavigator}
-            options={{
-              title: 'Playlists',
-              tabBarIcon: () => <Text style={{ fontSize: 24 }}>🎵</Text>,
-              headerShown: false,
-            }}
+            options={{ title: 'Playlists', headerShown: false }}
           />
-
-          {/* Search Tab */}
           <Tab.Screen
             name="SearchTab"
             component={SearchNavigator}
-            options={{
-              title: 'Search',
-              tabBarIcon: () => <Text style={{ fontSize: 24 }}>🔍</Text>,
-              headerShown: false,
-            }}
+            options={{ title: 'Search', headerShown: false }}
           />
-
-          {/* Friends Tab */}
           <Tab.Screen
             name="FriendsTab"
             component={FriendsNavigator}
-            options={{
-              title: 'Friends',
-              tabBarIcon: () => <Text style={{ fontSize: 24 }}>👥</Text>,
-              headerShown: false,
-            }}
+            options={{ title: 'Friends', headerShown: false }}
           />
-
-          {/* Profile Tab */}
           <Tab.Screen
             name="ProfileTab"
             component={ProfileNavigator}
-            options={{
-              title: 'Profile',
-              tabBarIcon: () => <Text style={{ fontSize: 24 }}>👤</Text>,
-              headerShown: false,
-            }}
+            options={{ title: 'Profile', headerShown: false }}
           />
         </Tab.Navigator>
 
@@ -136,3 +115,27 @@ export function AppNavigator() {
     </PlayerProvider>
   );
 }
+
+const createStyles = (theme: Theme, bottomInset: number) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    tabBar: {
+      height: 70 + bottomInset,
+      paddingTop: 10,
+      paddingBottom: bottomInset + 10,
+      backgroundColor: theme.colors.background,
+      borderTopWidth: 0,
+    },
+    iconContainer: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    iconContainerActive: {
+      backgroundColor: theme.colors.primary,
+    },
+  });

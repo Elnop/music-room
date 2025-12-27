@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme, ThemeName } from '@/themes/types';
 
@@ -8,11 +9,12 @@ const AVAILABLE_THEMES: Array<{
   name: ThemeName;
   displayName: string;
   primaryColor: string;
-  icon: string;
+  icon: keyof typeof Ionicons.glyphMap;
 }> = [
-  { name: 'royalBlue', displayName: 'Bleu Roi', primaryColor: '#1E3A8A', icon: '👑' },
-  { name: 'christmas', displayName: 'Noël', primaryColor: '#DC2626', icon: '🎄' },
-  { name: 'pastelLime', displayName: 'Lime', primaryColor: '#84CC16', icon: '🍋' },
+  { name: 'original', displayName: 'Original', primaryColor: '#EA3E7A', icon: 'musical-notes' },
+  { name: 'royalBlue', displayName: 'Bleu Roi', primaryColor: '#1E3A8A', icon: 'sparkles' },
+  { name: 'christmas', displayName: 'Noël', primaryColor: '#DC2626', icon: 'snow' },
+  { name: 'pastelLime', displayName: 'Lime', primaryColor: '#84CC16', icon: 'leaf' },
 ];
 
 export function ThemeSelector() {
@@ -35,11 +37,20 @@ export function ThemeSelector() {
             onPress={() => setTheme(themeOption.name)}
             activeOpacity={0.7}
           >
-            <Text style={styles.themeIcon}>{themeOption.icon}</Text>
+            <Ionicons
+              name={themeOption.icon}
+              size={24}
+              color={isSelected ? '#FFFFFF' : themeOption.primaryColor}
+              style={styles.themeIcon}
+            />
             <Text style={[styles.themeName, isSelected && styles.themeNameSelected]}>
               {themeOption.displayName}
             </Text>
-            {isSelected && <Text style={styles.checkmark}>✓</Text>}
+            {isSelected && (
+              <View style={styles.checkmarkContainer}>
+                <Ionicons name="checkmark" size={12} color="#FFFFFF" />
+              </View>
+            )}
           </TouchableOpacity>
         );
       })}
@@ -68,7 +79,6 @@ const createStyles = (theme: Theme) =>
       borderWidth: 3,
     },
     themeIcon: {
-      fontSize: 24,
       marginBottom: theme.spacing.xs,
     },
     themeName: {
@@ -81,12 +91,9 @@ const createStyles = (theme: Theme) =>
       color: '#FFFFFF',
       fontWeight: theme.typography.weights.bold,
     },
-    checkmark: {
+    checkmarkContainer: {
       position: 'absolute',
       top: 4,
       right: 6,
-      fontSize: 12,
-      color: '#FFFFFF',
-      fontWeight: theme.typography.weights.bold,
     },
   });

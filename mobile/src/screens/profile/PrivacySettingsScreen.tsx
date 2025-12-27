@@ -137,15 +137,6 @@ export function PrivacySettingsScreen() {
             onChange={value => handleVisibilityChange('musicPreferencesVisibility', value)}
           />
         </View>
-
-        <View style={styles.infoBox}>
-          <Text style={styles.infoIcon}>💡</Text>
-          <Text style={styles.infoText}>
-            <Text style={styles.infoLabel}>Public:</Text> Everyone can see{'\n'}
-            <Text style={styles.infoLabel}>Friends Only:</Text> Only mutual friends{'\n'}
-            <Text style={styles.infoLabel}>Private:</Text> Only you can see
-          </Text>
-        </View>
       </ScrollView>
 
       <View style={styles.footer}>
@@ -189,26 +180,6 @@ const createStyles = (theme: Theme) =>
     },
     settings: {
       marginBottom: theme.spacing.xl,
-    },
-    infoBox: {
-      flexDirection: 'row',
-      backgroundColor: theme.colors.surface,
-      borderRadius: 12,
-      padding: theme.spacing.md,
-      gap: theme.spacing.sm,
-    },
-    infoIcon: {
-      fontSize: 20,
-    },
-    infoText: {
-      flex: 1,
-      fontSize: 13,
-      color: theme.colors.textSecondary,
-      lineHeight: 20,
-    },
-    infoLabel: {
-      fontWeight: theme.typography.weights.semibold,
-      color: theme.colors.text,
     },
     footer: {
       padding: theme.spacing.lg,
