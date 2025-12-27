@@ -42,13 +42,11 @@ app.use(
 
       // In development, auto-allow ngrok domains for tunnel mode
       if (env.NODE_ENV === "development" && origin.includes("ngrok")) {
-        logger.debug(`✓ CORS allowed (ngrok tunnel): ${origin}`);
         return callback(null, true);
       }
 
       // In development, auto-allow exp:// URLs for Expo
       if (env.NODE_ENV === "development" && origin.startsWith("exp://")) {
-        logger.debug(`✓ CORS allowed (Expo): ${origin}`);
         return callback(null, true);
       }
 
@@ -89,9 +87,6 @@ app.get("/health", (req, res) => {
 
 routes.forEach(({ path, router, description }) => {
   app.use(path, router);
-  logger.debug(
-    `✓ Registered route: ${path}${description ? ` - ${description}` : ""}`,
-  );
 });
 
 // 404 handler

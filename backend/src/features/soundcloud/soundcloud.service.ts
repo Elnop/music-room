@@ -7,10 +7,7 @@ const SoundcloudModule = require("soundcloud.ts") as {
 const Soundcloud = SoundcloudModule.default || SoundcloudModule;
 
 import { logger } from "@/shared/utils/logger.js";
-import {
-  extractClientId,
-  initializeSoundcloudInstance,
-} from "./utils/client-extractor.js";
+import { initializeSoundcloudInstance } from "./utils/client-extractor.js";
 import { SoundCloudSearchService } from "./services/soundcloud-search.service.js";
 import { SoundCloudStreamService } from "./services/soundcloud-stream.service.js";
 import type {
@@ -26,7 +23,6 @@ import type {
  */
 export class SoundCloudService {
   private soundcloud: SoundCloudClient;
-  private clientId: string | null = null;
   private searchService: SoundCloudSearchService;
   private streamService: SoundCloudStreamService;
 
@@ -34,9 +30,6 @@ export class SoundCloudService {
     // Initialize soundcloud.ts instance
     // The library automatically extracts client_id from SoundCloud website
     this.soundcloud = initializeSoundcloudInstance(Soundcloud);
-
-    // Extract client_id (optional, for debugging)
-    this.clientId = extractClientId(this.soundcloud);
 
     // Initialize sub-services
     this.searchService = new SoundCloudSearchService(this.soundcloud);
