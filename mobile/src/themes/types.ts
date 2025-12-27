@@ -1,5 +1,9 @@
 import { SPACING } from '@constants';
-import { NEOBRUTALISM_BORDERS, NEOBRUTALISM_SHADOWS, NEOBRUTALISM_TYPOGRAPHY } from './tokens';
+import {
+  NEOBRUTALISM_BORDERS,
+  NEOBRUTALISM_SHADOWS,
+  NEOBRUTALISM_TYPOGRAPHY,
+} from '@/themes/tokens';
 
 export type ThemeName = 'royalBlue' | 'christmas' | 'pastelLime';
 

@@ -1,11 +1,11 @@
 import type { Request, Response, NextFunction } from "express";
-import { AuthService } from "./auth.service.js";
+import { AuthService } from "@/features/auth/auth.service.js";
 import {
   registerSchema,
   loginSchema,
   googleLoginSchema,
   facebookLoginSchema,
-} from "./auth.validators.js";
+} from "@/features/auth/auth.validators.js";
 import type { ApiResponse } from "@/shared/types/global.types.js";
 import type { AuthenticatedRequest } from "@/shared/types/global.types.js";
 import { logger } from "@/shared/utils/logger.js";

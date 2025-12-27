@@ -1,7 +1,7 @@
-import { supabase } from "../../../shared/config/supabase.js";
-import { AppError } from "../../../shared/middleware/error-handler.js";
-import { logger } from "../../../shared/utils/logger.js";
-import type { OAuthProvider, LinkedProvidersResponse } from "../auth.types.js";
+import { supabase } from "@/shared/config/supabase.js";
+import { AppError } from "@/shared/middleware/error-handler.js";
+import { logger } from "@/shared/utils/logger.js";
+import type { OAuthProvider, LinkedProvidersResponse } from "@/features/auth/auth.types.js";
 
 /**
  * Provider Service

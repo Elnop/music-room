@@ -2,7 +2,7 @@ import type {
   Tables,
   TablesInsert,
   TablesUpdate,
-} from "@/shared/types/supabase.helpers.js";
+} from "@/shared/types/supabase.generated.js";
 
 // Database types (now using Supabase generated types)
 export type FollowRow = Tables<"follows">;

@@ -1,4 +1,4 @@
-import type { SoundCloudClient } from "../soundcloud.types.js";
+import type { SoundCloudClient } from "@/features/soundcloud/soundcloud.types.js";
 
 /**
  * SoundCloud module/class constructor

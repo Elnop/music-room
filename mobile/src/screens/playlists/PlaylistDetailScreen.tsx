@@ -3,12 +3,13 @@ import { FlatList, StyleSheet, Alert, TouchableOpacity, Text } from 'react-nativ
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useFocusEffect } from '@react-navigation/native';
-import { useTheme } from '@contexts';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
-import type { Track, SoundCloudTrack } from '@types';
-import { usePlaylistStore } from '../../store/playlistStore';
-import { useAuthStore } from '../../store/authStore';
-import { usePlayerStore } from '../../store/playerStore';
+import type { Track } from '@/types/track.types';
+import type { SoundCloudTrack } from '@/types/soundcloud.types';
+import { usePlaylistStore } from '@store/playlistStore';
+import { useAuthStore } from '@store/authStore';
+import { usePlayerStore } from '@store/playerStore';
 import { usePlaylistSocket } from '@hooks/usePlaylistSocket';
 import { PlaylistHeader } from '@components/playlist/PlaylistHeader';
 import { TrackItem } from '@components/playlist/TrackItem';

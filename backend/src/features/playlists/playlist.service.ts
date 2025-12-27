@@ -1,18 +1,18 @@
 import { supabaseAdmin } from "@/shared/config/supabase.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
 import { logger } from "@/shared/utils/logger.js";
-import { PlaylistPermissions } from "./permissions/playlist.permissions.js";
+import { PlaylistPermissions } from "@/features/playlists/permissions/playlist.permissions.js";
 import {
   formatPlaylistResponse,
   formatTrackResponse,
-} from "./utils/playlist.helpers.js";
+} from "@/features/playlists/utils/playlist.helpers.js";
 import type {
   CreatePlaylistDTO,
   UpdatePlaylistDTO,
   PlaylistResponse,
   PlaylistWithTracksResponse,
   TrackRow,
-} from "./playlist.types.js";
+} from "@/features/playlists/playlist.types.js";
 
 /**
  * Service for playlist CRUD operations

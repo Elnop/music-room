@@ -9,12 +9,12 @@
  */
 
 import { Router } from "express";
-import authRoutes from "../../features/auth/auth.routes.js";
-import profileRoutes from "../../features/profile/profile.routes.js";
-import playlistRoutes from "../../features/playlists/playlist.routes.js";
-import soundcloudRoutes from "../../features/soundcloud/soundcloud.routes.js";
-import friendsRoutes from "../../features/friends/friends.routes.js";
-import musicControlRoutes from "../../features/music-control/music-control.routes.js";
+import authRoutes from "@/features/auth/auth.routes.js";
+import profileRoutes from "@/features/profile/profile.routes.js";
+import playlistRoutes from "@/features/playlists/playlist.routes.js";
+import soundcloudRoutes from "@/features/soundcloud/soundcloud.routes.js";
+import friendsRoutes from "@/features/friends/friends.routes.js";
+import musicControlRoutes from "@/features/music-control/music-control.routes.js";
 
 export interface RouteConfig {
   /** API path prefix (e.g., "/api/auth") */

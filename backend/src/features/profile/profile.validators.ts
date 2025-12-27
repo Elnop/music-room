@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MAX_GENRES } from "./profile.types.js";
+import { MAX_GENRES } from "@/features/profile/profile.types";
 
 // =====================================================
 // Visibility Level Enum

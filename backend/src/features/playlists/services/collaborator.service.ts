@@ -1,7 +1,7 @@
 import { supabaseAdmin } from "@/shared/config/supabase.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
 import { logger } from "@/shared/utils/logger.js";
-import { PlaylistPermissions } from "../permissions/playlist.permissions.js";
+import { PlaylistPermissions } from "@/features/playlists/permissions/playlist.permissions.js";
 
 /**
  * Service for managing playlist collaborators

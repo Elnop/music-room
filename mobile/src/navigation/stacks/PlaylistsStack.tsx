@@ -7,12 +7,12 @@
 
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useTheme } from '@contexts';
-import { PlaylistsScreen } from '../../screens/playlists/PlaylistsScreen';
-import { PlaylistDetailScreen } from '../../screens/playlists/PlaylistDetailScreen';
-import { CreatePlaylistScreen } from '../../screens/playlists/CreatePlaylistScreen';
-import { SearchTracksScreen } from '../../screens/playlists/SearchTracksScreen';
-import { PlaylistSharingScreen } from '../../screens/playlists/PlaylistSharingScreen';
+import { useTheme } from '@/contexts/ThemeContext';
+import { PlaylistsScreen } from '@/screens/playlists/PlaylistsScreen';
+import { PlaylistDetailScreen } from '@/screens/playlists/PlaylistDetailScreen';
+import { CreatePlaylistScreen } from '@/screens/playlists/CreatePlaylistScreen';
+import { SearchTracksScreen } from '@/screens/playlists/SearchTracksScreen';
+import { PlaylistSharingScreen } from '@/screens/playlists/PlaylistSharingScreen';
 
 export type PlaylistStackParamList = {
   Playlists: undefined;

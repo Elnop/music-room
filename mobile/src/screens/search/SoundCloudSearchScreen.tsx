@@ -1,15 +1,15 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTheme } from '@/contexts';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@/themes/types';
-import { useSoundCloudStore } from '@/store/soundcloudStore';
-import { usePlayerStore } from '@/store/playerStore';
-import { SoundCloudTrackItem } from './components/SoundCloudTrackItem';
-import { PlaylistSelectorModal } from './components/PlaylistSelectorModal';
-import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { useSoundCloudStore } from '@store/soundcloudStore';
+import { usePlayerStore } from '@store/playerStore';
+import { SoundCloudTrackItem } from '@screens/search/components/SoundCloudTrackItem';
+import { PlaylistSelectorModal } from '@screens/search/components/PlaylistSelectorModal';
+import { LoadingSpinner } from '@components/common/LoadingSpinner';
 import debounce from 'lodash/debounce';
-import type { SoundCloudTrack } from '@/types';
+import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
 export function SoundCloudSearchScreen() {
   const { theme } = useTheme();

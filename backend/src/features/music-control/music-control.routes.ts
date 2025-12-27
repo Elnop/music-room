@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { musicControlController } from "./music-control.controller.js";
+import { musicControlController } from "@/features/music-control/music-control.controller.js";
 import { authMiddleware } from "@/features/auth/auth.middleware.js";
 
 const router = Router();

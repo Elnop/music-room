@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { Avatar } from '@components/common/Avatar';
-import { useTheme } from '@contexts';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
-import type { PlaylistWithTracks } from '@types';
+import type { PlaylistWithTracks } from '@/types/playlist.types';
 
 interface PlaylistHeaderProps {
   playlist: PlaylistWithTracks;

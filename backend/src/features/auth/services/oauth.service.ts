@@ -1,7 +1,10 @@
 import { OAuth2Client } from "google-auth-library";
-import { AppError } from "../../../shared/middleware/error-handler.js";
-import { logger } from "../../../shared/utils/logger.js";
-import { GoogleTokenPayload, FacebookTokenPayload } from "../auth.types.js";
+import { AppError } from "@/shared/middleware/error-handler.js";
+import { logger } from "@/shared/utils/logger.js";
+import type {
+  GoogleTokenPayload,
+  FacebookTokenPayload,
+} from "@/features/auth/auth.types.js";
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID;
@@ -13,7 +16,7 @@ if (!GOOGLE_CLIENT_ID) {
 
 if (!FACEBOOK_APP_ID || !FACEBOOK_APP_SECRET) {
   throw new Error(
-    "FACEBOOK_APP_ID and FACEBOOK_APP_SECRET environment variables must be set",
+    "FACEBOOK_APP_ID and FACEBOOK_APP_SECRET environment variables must be set"
   );
 }
 
@@ -47,7 +50,7 @@ export class OAuthService {
         throw new AppError(
           400,
           "Email not verified with Google",
-          "EMAIL_NOT_VERIFIED",
+          "EMAIL_NOT_VERIFIED"
         );
       }
 
@@ -77,7 +80,7 @@ export class OAuthService {
       throw new AppError(
         401,
         "Invalid or expired Google token",
-        "INVALID_TOKEN",
+        "INVALID_TOKEN"
       );
     }
   }
@@ -89,7 +92,7 @@ export class OAuthService {
    * @throws AppError if token is invalid or email is not provided
    */
   static async verifyFacebookToken(
-    accessToken: string,
+    accessToken: string
   ): Promise<FacebookTokenPayload> {
     try {
       // 1. Verify the access token using Facebook's debug_token endpoint
@@ -113,7 +116,7 @@ export class OAuthService {
         throw new AppError(
           401,
           "Invalid Facebook token",
-          "INVALID_FACEBOOK_TOKEN",
+          "INVALID_FACEBOOK_TOKEN"
         );
       }
 
@@ -123,7 +126,7 @@ export class OAuthService {
         throw new AppError(
           401,
           "Invalid or expired Facebook token",
-          "INVALID_TOKEN",
+          "INVALID_TOKEN"
         );
       }
 
@@ -136,7 +139,7 @@ export class OAuthService {
         throw new AppError(
           401,
           "Token was not issued for this app",
-          "INVALID_TOKEN",
+          "INVALID_TOKEN"
         );
       }
 
@@ -145,7 +148,7 @@ export class OAuthService {
         throw new AppError(
           401,
           "Facebook token missing user_id",
-          "INVALID_TOKEN",
+          "INVALID_TOKEN"
         );
       }
 
@@ -176,7 +179,7 @@ export class OAuthService {
         throw new AppError(
           401,
           "Failed to fetch Facebook profile",
-          "PROFILE_FETCH_ERROR",
+          "PROFILE_FETCH_ERROR"
         );
       }
 
@@ -212,7 +215,7 @@ export class OAuthService {
       throw new AppError(
         401,
         "Invalid or expired Facebook token",
-        "INVALID_TOKEN",
+        "INVALID_TOKEN"
       );
     }
   }

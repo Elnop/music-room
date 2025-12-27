@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import debounce from 'lodash/debounce';
-import { useTheme } from '@/contexts';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import { useAuthStore } from '@/store/authStore';
 import { profileApi } from '@/services/profileApi';
@@ -13,7 +13,7 @@ import { musicControlApi } from '@/services/musicControlApi';
 import { SearchBar } from '@/components/common/SearchBar';
 import { Avatar } from '@/components/common/Avatar';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import type { UserProfile } from '@/types';
+import type { UserProfile } from '@/types/user.types';
 import type { FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
 
 type NavigationProp = NativeStackNavigationProp<FriendsStackParamList, 'Friends'>;

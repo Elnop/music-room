@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
-import { useTheme } from '@contexts';
-import { ThemeSelector } from '@components/theme';
+import { useTheme } from '@/contexts/ThemeContext';
+import { ThemeSelector } from '@components/theme/ThemeSelector';
 import type { Theme } from '@themes/types';
 
 export function SettingsScreen() {

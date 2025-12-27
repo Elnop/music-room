@@ -31,6 +31,17 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-return': 'warn',
       '@typescript-eslint/no-unsafe-argument': 'warn',
       '@typescript-eslint/require-await': 'warn',
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['../*'],
+              message: 'Use @/ alias instead of relative parent imports (../)',
+            },
+          ],
+        },
+      ],
     },
   },
   {

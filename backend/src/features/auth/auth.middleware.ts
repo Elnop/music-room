@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { AuthService } from "./auth.service.js";
+import { AuthService } from "@/features/auth/auth.service.js";
 import type { AuthenticatedRequest } from "@/shared/types/global.types.js";
 import { logger } from "@/shared/utils/logger.js";
 

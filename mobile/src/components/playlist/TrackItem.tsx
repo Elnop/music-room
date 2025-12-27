@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
-import { useTheme } from '@contexts';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import { formatDuration } from '@utils/formatters';
-import type { Track } from '@types';
+import type { Track } from '@/types/track.types';
 
 interface TrackItemProps {
   track: Track;

@@ -77,7 +77,6 @@ export function useMusicControlEmitter() {
     if (__DEV__)
       console.log('[MusicControl] Registered user with device:', user.id, deviceInfo.deviceName);
 
-    // Mark as registered after a small delay to ensure server processed it
     const timer = setTimeout(() => {
       isRegistered.current = true;
     }, 100);
@@ -88,14 +87,11 @@ export function useMusicControlEmitter() {
     };
   }, [socket, isConnected, user, deviceInfo]);
 
-  // Emit listening status when track or playing state changes
   useEffect(() => {
     if (!socket || !isConnected || !user || !deviceInfo) return;
 
-    // Wait for registration before emitting
     const emitStatus = () => {
       if (!isRegistered.current) {
-        // Retry after a short delay if not yet registered
         const retryTimer = setTimeout(emitStatus, 150);
         return () => clearTimeout(retryTimer);
       }

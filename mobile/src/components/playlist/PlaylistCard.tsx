@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { Card } from '@components/common/Card';
-import { useTheme } from '@contexts';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
-import type { Playlist } from '@types';
+import type { Playlist } from '@/types/playlist.types';
 
 interface PlaylistCardProps {
   playlist: Playlist;

@@ -13,16 +13,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useFocusEffect } from '@react-navigation/native';
 import debounce from 'lodash/debounce';
-import { useTheme } from '@contexts';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
-import { useAuthStore } from '../../store/authStore';
-import { usePlaylistStore } from '../../store/playlistStore';
+import { useAuthStore } from '@store/authStore';
+import { usePlaylistStore } from '@store/playlistStore';
 import { profileApi } from '@services/profileApi';
 import { playlistApi, ViewerProfile } from '@api/playlistApi';
 import { SearchBar } from '@components/common/SearchBar';
 import { Avatar } from '@components/common/Avatar';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
-import type { UserProfile } from '@types';
+import type { UserProfile } from '@/types/user.types';
 
 type PlaylistStackParamList = {
   Playlists: undefined;

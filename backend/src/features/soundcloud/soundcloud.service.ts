@@ -7,16 +7,16 @@ const SoundcloudModule = require("soundcloud.ts") as {
 const Soundcloud = SoundcloudModule.default || SoundcloudModule;
 
 import { logger } from "@/shared/utils/logger.js";
-import { initializeSoundcloudInstance } from "./utils/client-extractor.js";
-import { SoundCloudSearchService } from "./services/soundcloud-search.service.js";
-import { SoundCloudStreamService } from "./services/soundcloud-stream.service.js";
+import { initializeSoundcloudInstance } from "@/features/soundcloud/utils/client-extractor.js";
+import { SoundCloudSearchService } from "@/features/soundcloud/services/soundcloud-search.service.js";
+import { SoundCloudStreamService } from "@/features/soundcloud/services/soundcloud-stream.service.js";
 import type {
   SoundCloudClient,
   SoundCloudSearchQuery,
   SoundCloudSearchResult,
   SoundCloudTrack,
   TrackDTO,
-} from "./soundcloud.types.js";
+} from "@/features/soundcloud/soundcloud.types.js";
 
 /**
  * Main SoundCloud service - orchestrates search and streaming operations

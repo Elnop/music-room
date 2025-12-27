@@ -1,10 +1,10 @@
 import { supabaseAdmin } from "@/shared/config/supabase.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
 import { logger } from "@/shared/utils/logger.js";
-import { PlaylistPermissions } from "../permissions/playlist.permissions.js";
-import { reindexPositions } from "../utils/playlist.helpers.js";
+import { PlaylistPermissions } from "@/features/playlists/permissions/playlist.permissions.js";
+import { reindexPositions } from "@/features/playlists/utils/playlist.helpers.js";
 import { realtime } from "@/realtime/index.js";
-import type { AddTrackDTO } from "../playlist.types.js";
+import type { AddTrackDTO } from "@/features/playlists/playlist.types.js";
 
 /**
  * Service for managing tracks in playlists

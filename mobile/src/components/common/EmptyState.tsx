@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
-import { useTheme } from '@contexts';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 
 interface EmptyStateProps {

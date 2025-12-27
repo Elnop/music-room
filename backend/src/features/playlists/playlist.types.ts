@@ -6,7 +6,7 @@ import type {
   Tables,
   TablesInsert,
   TablesUpdate,
-} from "@/shared/types/supabase.helpers.js";
+} from "@/shared/types/supabase.generated.js";
 
 export type EditMode = "open" | "restricted";
 

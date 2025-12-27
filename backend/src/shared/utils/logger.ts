@@ -1,4 +1,4 @@
-import { env } from "../config/env.js";
+import { env } from "@/shared/config/env.js";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";

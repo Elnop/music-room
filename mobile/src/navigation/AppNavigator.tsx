@@ -14,18 +14,18 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTheme } from '@contexts';
+import { useTheme } from '@/contexts/ThemeContext';
 
 // Import feature stacks (each feature owns its navigation)
-import { PlaylistsNavigator } from './stacks/PlaylistsStack';
-import { ProfileNavigator } from './stacks/ProfileStack';
-import { SearchNavigator } from './stacks/SearchStack';
-import { FriendsNavigator } from './stacks/FriendsStack';
+import { PlaylistsNavigator } from '@/navigation/stacks/PlaylistsStack';
+import { ProfileNavigator } from '@/navigation/stacks/ProfileStack';
+import { SearchNavigator } from '@/navigation/stacks/SearchStack';
+import { FriendsNavigator } from '@/navigation/stacks/FriendsStack';
 
 // Player components
-import { MiniPlayer } from '../components/player/MiniPlayer';
-import { PlayerModal } from '../components/player/PlayerModal';
-import { PlayerProvider } from '../contexts/PlayerContext';
+import { MiniPlayer } from '@/components/player/MiniPlayer';
+import { PlayerModal } from '@/components/player/PlayerModal';
+import { PlayerProvider } from '@/contexts/PlayerContext';
 
 // Tab navigation types
 export type AppTabsParamList = {
@@ -36,10 +36,10 @@ export type AppTabsParamList = {
 };
 
 // Re-export stack param lists for type safety
-export type { PlaylistStackParamList } from './stacks/PlaylistsStack';
-export type { ProfileStackParamList } from './stacks/ProfileStack';
-export type { SearchStackParamList } from './stacks/SearchStack';
-export type { FriendsStackParamList } from './stacks/FriendsStack';
+export type { PlaylistStackParamList } from '@/navigation/stacks/PlaylistsStack';
+export type { ProfileStackParamList } from '@/navigation/stacks/ProfileStack';
+export type { SearchStackParamList } from '@/navigation/stacks/SearchStack';
+export type { FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
 
 const Tab = createBottomTabNavigator<AppTabsParamList>();
 

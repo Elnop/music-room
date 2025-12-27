@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useTheme } from '@contexts';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import { useAuthStore } from '@/store/authStore';
 import { profileApi } from '@/services/profileApi';
@@ -19,7 +19,9 @@ import { PlaylistCard } from '@/components/playlist/PlaylistCard';
 import { DeviceListeningCard } from '@/components/music-control/DeviceListeningCard';
 import { ProfileSection } from '@/components/profile/ProfileSection';
 import { GenreChip } from '@/components/profile/GenreChip';
-import type { UserProfile, Playlist, FilteredProfile, MusicGenre } from '@/types';
+import type { Playlist } from '@/types/playlist.types';
+import type { FilteredProfile } from '@/types/user.types';
+import type { MusicGenre } from '@/types/user.types';
 import type { FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
 
 type Props = NativeStackScreenProps<FriendsStackParamList, 'UserProfile'>;
@@ -30,7 +32,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
   const styles = React.useMemo(() => createStyles(theme), [theme]);
   const { accessToken } = useAuthStore();
 
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [profile, setProfile] = useState<FilteredProfile | null>(null);
   const [filteredProfile, setFilteredProfile] = useState<FilteredProfile | null>(null);
   const [followStatus, setFollowStatus] = useState<FollowStatus | null>(null);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);

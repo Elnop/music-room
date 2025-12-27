@@ -1,8 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
-import { PlaylistService } from "./playlist.service.js";
-import { PlaylistTrackService } from "./services/playlist-track.service.js";
-import { CollaboratorService } from "./services/collaborator.service.js";
-import { ViewerService } from "./services/viewer.service.js";
+import { PlaylistService } from "@/features/playlists/playlist.service.js";
+import { PlaylistTrackService } from "@/features/playlists/services/playlist-track.service.js";
+import { CollaboratorService } from "@/features/playlists/services/collaborator.service.js";
+import { ViewerService } from "@/features/playlists/services/viewer.service.js";
 import {
   createPlaylistSchema,
   updatePlaylistSchema,
@@ -10,7 +10,7 @@ import {
   reorderTracksSchema,
   addCollaboratorSchema,
   addViewerSchema,
-} from "./playlist.validators.js";
+} from "@/features/playlists/playlist.validators.js";
 import type {
   ApiResponse,
   AuthenticatedRequest,

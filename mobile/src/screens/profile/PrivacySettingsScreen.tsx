@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { useTheme } from '@contexts';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import type { ProfilePrivacy, VisibilityLevel } from '@/types/user.types';
 import { useAuthStore } from '@/store/authStore';
@@ -22,26 +22,26 @@ export function PrivacySettingsScreen() {
   const [privacy, setPrivacy] = useState<ProfilePrivacy | null>(null);
   const [initialPrivacy, setInitialPrivacy] = useState<ProfilePrivacy | null>(null);
 
-  // Load privacy settings
+  // Load privacy settings on mount
   useEffect(() => {
+    const loadPrivacySettings = async () => {
+      if (!accessToken) return;
+
+      try {
+        setIsLoading(true);
+        const data = await privacyApi.getPrivacySettings(accessToken);
+        setPrivacy(data);
+        setInitialPrivacy(data);
+      } catch (error) {
+        const message = error instanceof ApiError ? error.message : 'Failed to load settings';
+        Alert.alert('Error', message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     loadPrivacySettings();
-  }, []);
-
-  const loadPrivacySettings = async () => {
-    if (!accessToken) return;
-
-    try {
-      setIsLoading(true);
-      const data = await privacyApi.getPrivacySettings(accessToken);
-      setPrivacy(data);
-      setInitialPrivacy(data);
-    } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'Failed to load settings';
-      Alert.alert('Error', message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, [accessToken]);
 
   const handleVisibilityChange = (field: keyof ProfilePrivacy, value: VisibilityLevel) => {
     if (!privacy) return;

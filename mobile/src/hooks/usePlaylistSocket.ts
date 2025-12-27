@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useSocketStore } from '@store/socketStore';
 import { usePlaylistStore } from '@store/playlistStore';
-import type { TrackWithPosition } from '@types';
+import type { TrackWithPosition } from '@/types/track.types';
 
 interface PlaylistUpdateData {
   playlistId: string;

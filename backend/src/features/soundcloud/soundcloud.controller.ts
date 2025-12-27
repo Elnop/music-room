@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { SoundCloudService } from "./soundcloud.service.js";
-import { soundcloudSearchSchema } from "./soundcloud.validators.js";
+import { SoundCloudService } from "@/features/soundcloud/soundcloud.service.js";
+import { soundcloudSearchSchema } from "@/features/soundcloud/soundcloud.validators.js";
 import { logger } from "@/shared/utils/logger.js";
 
 const soundcloudService = new SoundCloudService();

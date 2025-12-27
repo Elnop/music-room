@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { useTheme } from '@/contexts';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@/themes/types';
-import type { SoundCloudTrack } from '@/types';
+import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
 interface Props {
   track: SoundCloudTrack;

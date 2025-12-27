@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useTheme } from '@contexts';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import type { MusicGenre, MusicPreferences } from '@/types/user.types';
 import { useAuthStore } from '@/store/authStore';
@@ -140,7 +140,7 @@ export function ProfileScreen() {
           style={styles.heroGradient}
         >
           <View style={styles.heroContent}>
-            <Avatar size="xl" name={user.displayName || user.username} uri={user.avatarUrl} />
+            <Avatar size="lg" name={user.displayName || user.username} uri={user.avatarUrl} />
 
             <Text style={styles.username}>@{user.username}</Text>
 

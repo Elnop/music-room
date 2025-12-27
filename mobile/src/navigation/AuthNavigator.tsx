@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { WelcomeScreen } from '@screens/auth/WelcomeScreen';
 import { LoginScreen } from '@screens/auth/LoginScreen';
 import { RegisterScreen } from '@screens/auth/RegisterScreen';
-import { useTheme } from '@contexts';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export type AuthStackParamList = {
   Welcome: undefined;
@@ -23,13 +23,13 @@ export function AuthNavigator() {
           backgroundColor: theme.colors.background,
         },
         contentStyle: {
-          borderTopWidth: theme.borders.medium, // 2px bordure
-          borderTopColor: theme.colors.border, // Noir
+          borderTopWidth: theme.borders.medium,
+          borderTopColor: theme.colors.border,
         },
         headerTintColor: theme.colors.text,
         headerShadowVisible: false,
         headerTitleStyle: {
-          fontWeight: theme.typography.weights.bold, // 700
+          fontWeight: theme.typography.weights.bold,
         },
       }}
     >

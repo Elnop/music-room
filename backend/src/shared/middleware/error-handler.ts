@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { ZodError } from "zod";
-import { logger } from "../utils/logger.js";
-import type { ApiResponse } from "../types/global.types.js";
+import { logger } from "@/shared/utils/logger.js";
+import type { ApiResponse } from "@/shared/types/global.types.js";
 
 /**
  * Custom application error class

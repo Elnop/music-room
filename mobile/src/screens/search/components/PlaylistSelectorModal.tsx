@@ -9,10 +9,11 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import { useTheme } from '@/contexts';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@/themes/types';
 import { usePlaylistStore } from '@/store/playlistStore';
-import type { SoundCloudTrack, Track } from '@/types';
+import type { SoundCloudTrack } from '@/types/soundcloud.types';
+import type { Track } from '@/types/track.types';
 
 interface Props {
   visible: boolean;

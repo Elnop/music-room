@@ -1,13 +1,13 @@
 import { logger } from "@/shared/utils/logger.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
-import { SoundCloudCache, CACHE_TTL } from "../utils/soundcloud-cache.js";
+import { SoundCloudCache, CACHE_TTL } from "@/features/soundcloud/utils/soundcloud-cache.js";
 import type {
   SoundCloudClient,
   SoundCloudSearchQuery,
   SoundCloudSearchResult,
   SoundCloudTrack,
   TrackDTO,
-} from "../soundcloud.types.js";
+} from "@/features/soundcloud/soundcloud.types.js";
 
 /**
  * Service for SoundCloud search and track retrieval

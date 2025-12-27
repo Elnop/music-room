@@ -50,6 +50,32 @@ export type Database = {
           },
         ]
       }
+      music_preferences: {
+        Row: {
+          genres: string[] | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          genres?: string[] | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          genres?: string[] | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "music_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       playlist_tracks: {
         Row: {
           added_at: string | null
@@ -149,6 +175,66 @@ export type Database = {
           },
         ]
       }
+      profile_privacy: {
+        Row: {
+          avatar_visibility:
+            | Database["public"]["Enums"]["visibility_level"]
+            | null
+          bio_visibility: Database["public"]["Enums"]["visibility_level"] | null
+          created_at: string | null
+          email_visibility:
+            | Database["public"]["Enums"]["visibility_level"]
+            | null
+          music_preferences_visibility:
+            | Database["public"]["Enums"]["visibility_level"]
+            | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          avatar_visibility?:
+            | Database["public"]["Enums"]["visibility_level"]
+            | null
+          bio_visibility?:
+            | Database["public"]["Enums"]["visibility_level"]
+            | null
+          created_at?: string | null
+          email_visibility?:
+            | Database["public"]["Enums"]["visibility_level"]
+            | null
+          music_preferences_visibility?:
+            | Database["public"]["Enums"]["visibility_level"]
+            | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          avatar_visibility?:
+            | Database["public"]["Enums"]["visibility_level"]
+            | null
+          bio_visibility?:
+            | Database["public"]["Enums"]["visibility_level"]
+            | null
+          created_at?: string | null
+          email_visibility?:
+            | Database["public"]["Enums"]["visibility_level"]
+            | null
+          music_preferences_visibility?:
+            | Database["public"]["Enums"]["visibility_level"]
+            | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_privacy_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tracks: {
         Row: {
           album: string | null
@@ -198,6 +284,7 @@ export type Database = {
           email_verification_token: string | null
           email_verified: boolean | null
           facebook_id: string | null
+          favorite_artist: string | null
           google_id: string | null
           has_password: boolean | null
           id: string
@@ -213,6 +300,7 @@ export type Database = {
           email_verification_token?: string | null
           email_verified?: boolean | null
           facebook_id?: string | null
+          favorite_artist?: string | null
           google_id?: string | null
           has_password?: boolean | null
           id: string
@@ -228,6 +316,7 @@ export type Database = {
           email_verification_token?: string | null
           email_verified?: boolean | null
           facebook_id?: string | null
+          favorite_artist?: string | null
           google_id?: string | null
           has_password?: boolean | null
           id?: string
@@ -247,7 +336,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      visibility_level: "public" | "friends_only" | "private"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -374,6 +463,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      visibility_level: ["public", "friends_only", "private"],
+    },
   },
 } as const

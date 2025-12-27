@@ -5,7 +5,7 @@ import type {
   UpdateProfileDTO,
   ProfileUpdateResponse,
   PublicProfile,
-} from "../profile.types.js";
+} from "@/features/profile/profile.types.js";
 
 export class ProfileService {
   /**
@@ -13,7 +13,7 @@ export class ProfileService {
    */
   async updateProfile(
     userId: string,
-    data: UpdateProfileDTO,
+    data: UpdateProfileDTO
   ): Promise<ProfileUpdateResponse> {
     try {
       logger.info("Updating user profile", { userId, data });
@@ -44,7 +44,7 @@ export class ProfileService {
         throw new AppError(
           500,
           "Failed to update profile",
-          "PROFILE_UPDATE_ERROR",
+          "PROFILE_UPDATE_ERROR"
         );
       }
 
@@ -67,12 +67,12 @@ export class ProfileService {
         id: profileData.id,
         email: userData.user.email ?? "",
         username: profileData.username,
-        displayName: profileData.display_name,
-        avatarUrl: profileData.avatar_url,
-        bio: profileData.bio,
-        favoriteArtist: profileData.favorite_artist,
-        createdAt: profileData.created_at,
-        updatedAt: profileData.updated_at,
+        displayName: profileData.display_name ?? undefined,
+        avatarUrl: profileData.avatar_url ?? undefined,
+        bio: profileData.bio ?? undefined,
+        favoriteArtist: profileData.favorite_artist ?? undefined,
+        createdAt: profileData.created_at ?? new Date().toISOString(),
+        updatedAt: profileData.updated_at ?? new Date().toISOString(),
       };
     } catch (error) {
       if (error instanceof AppError) throw error;
@@ -113,12 +113,12 @@ export class ProfileService {
         id: profileData.id,
         email: userData.user.email ?? "",
         username: profileData.username,
-        displayName: profileData.display_name,
-        avatarUrl: profileData.avatar_url,
-        bio: profileData.bio,
-        favoriteArtist: profileData.favorite_artist,
-        createdAt: profileData.created_at,
-        updatedAt: profileData.updated_at,
+        displayName: profileData.display_name ?? undefined,
+        avatarUrl: profileData.avatar_url ?? undefined,
+        bio: profileData.bio ?? undefined,
+        favoriteArtist: profileData.favorite_artist ?? undefined,
+        createdAt: profileData.created_at ?? new Date().toISOString(),
+        updatedAt: profileData.updated_at ?? new Date().toISOString(),
       };
     } catch (error) {
       if (error instanceof AppError) throw error;
@@ -133,7 +133,7 @@ export class ProfileService {
   async searchUsers(
     query: string,
     limit = 20,
-    excludeUserId?: string,
+    excludeUserId?: string
   ): Promise<PublicProfile[]> {
     try {
       logger.info("Searching users", { query, limit, excludeUserId });
@@ -142,7 +142,7 @@ export class ProfileService {
       let queryBuilder = supabase
         .from("user_profiles")
         .select(
-          "id, username, display_name, avatar_url, bio, favorite_artist, created_at",
+          "id, username, display_name, avatar_url, bio, favorite_artist, created_at"
         )
         .or(`username.ilike.%${query}%,display_name.ilike.%${query}%`)
         .limit(limit);
@@ -162,11 +162,11 @@ export class ProfileService {
       return (data || []).map((profile) => ({
         id: profile.id,
         username: profile.username,
-        displayName: profile.display_name,
-        avatarUrl: profile.avatar_url,
-        bio: profile.bio,
-        favoriteArtist: profile.favorite_artist,
-        createdAt: profile.created_at,
+        displayName: profile.display_name ?? undefined,
+        avatarUrl: profile.avatar_url ?? undefined,
+        bio: profile.bio ?? undefined,
+        favoriteArtist: profile.favorite_artist ?? undefined,
+        createdAt: profile.created_at ?? new Date().toISOString(),
       }));
     } catch (error) {
       if (error instanceof AppError) throw error;

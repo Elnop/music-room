@@ -1,4 +1,4 @@
-import type { User } from './user.types';
+import type { User } from '@/types/user.types';
 
 // Auth Types (Supabase Auth v2.50.0+)
 export interface AuthSession {

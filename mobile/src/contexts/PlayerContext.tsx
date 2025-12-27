@@ -15,10 +15,8 @@ const PlayerContext = createContext<PlayerContextValue | null>(null);
 export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const { currentTrack, streamUrl, setStreamUrl, setLoading, setError } = usePlayerStore();
 
-  // Create the single audio player instance
   const player = useAudioPlayer(streamUrl || '');
 
-  // Log player state changes
   useEffect(() => {
     if (!player) return;
 
@@ -32,7 +30,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       });
   }, [player, player?.isLoaded, player?.playing, player?.duration, streamUrl]);
 
-  // Fetch stream URL when track changes
   useEffect(() => {
     if (!currentTrack) {
       if (__DEV__) console.log('🎵 [PlayerProvider] No track, clearing stream');
@@ -103,11 +100,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     loadStream();
   }, [currentTrack, currentTrack?.id, setStreamUrl, setLoading, setError]);
 
-  // Auto-play when stream is loaded and player is ready
   useEffect(() => {
     if (!player || !streamUrl) return;
 
-    // Wait for player to be loaded
     if (player.isLoaded && player.duration > 0) {
       if (__DEV__) console.log('🎵 [PlayerProvider] Player loaded, auto-playing');
       player.play();

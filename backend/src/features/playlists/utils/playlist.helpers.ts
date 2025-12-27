@@ -5,7 +5,7 @@ import type {
   PlaylistResponse,
   PlaylistOwner,
   TrackResponse,
-} from "../playlist.types.js";
+} from "@/features/playlists/playlist.types.js";
 
 /**
  * Format playlist row to response object

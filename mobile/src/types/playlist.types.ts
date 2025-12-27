@@ -1,5 +1,5 @@
-import type { TrackWithPosition } from './track.types';
-import type { UserProfile } from './user.types';
+import type { TrackWithPosition } from '@/types/track.types';
+import type { UserProfile } from '@/types/user.types';
 
 export type EditMode = 'open' | 'restricted';
 

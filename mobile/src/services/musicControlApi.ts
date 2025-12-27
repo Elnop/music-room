@@ -1,5 +1,5 @@
 import { API_CONFIG } from '@constants';
-import type { ApiResponse } from '@types';
+import type { ApiResponse } from '@/types/api.types';
 
 export interface MusicControlPermissionsResponse {
   allowedUserIds: string[];

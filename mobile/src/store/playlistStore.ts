@@ -1,5 +1,8 @@
 import { create } from 'zustand';
-import type { Playlist, PlaylistWithTracks, Track, TrackWithPosition } from '@types';
+import type { Playlist } from '@/types/playlist.types';
+import type { PlaylistWithTracks } from '@/types/playlist.types';
+import type { Track } from '@/types/track.types';
+import type { TrackWithPosition } from '@/types/track.types';
 import type { PlaylistInput } from '@utils/validators';
 import { playlistApi } from '@api/playlistApi';
 

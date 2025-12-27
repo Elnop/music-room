@@ -1,13 +1,16 @@
 import { supabase } from "@/shared/config/supabase.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
 import { logger } from "@/shared/utils/logger.js";
+import type { Tables } from "@/shared/types/supabase.generated.js";
 import type {
   MusicPreferences,
   UpdateMusicPreferencesDTO,
-  MusicPreferencesRow,
   MusicGenre,
-} from "../profile.types.js";
-import { MUSIC_GENRES, MAX_GENRES } from "../profile.types.js";
+} from "@/features/profile/profile.types.js";
+import { MUSIC_GENRES, MAX_GENRES } from "@/features/profile/profile.types.js";
+
+// Use Supabase generated type
+type MusicPreferencesRow = Tables<"music_preferences">;
 
 export class MusicPreferencesService {
   /**
@@ -36,7 +39,7 @@ export class MusicPreferencesService {
         );
       }
 
-      return this.mapRowToPreferences(data as MusicPreferencesRow);
+      return this.mapRowToPreferences(data);
     } catch (error) {
       if (error instanceof AppError) throw error;
       logger.error("Unexpected error fetching music preferences", { error });
@@ -56,7 +59,10 @@ export class MusicPreferencesService {
     data: UpdateMusicPreferencesDTO
   ): Promise<MusicPreferences> {
     try {
-      logger.info("Updating music preferences", { userId, genres: data.genres });
+      logger.info("Updating music preferences", {
+        userId,
+        genres: data.genres,
+      });
 
       // Validate genres
       this.validateGenres(data.genres);
@@ -87,7 +93,7 @@ export class MusicPreferencesService {
       }
 
       logger.info("Music preferences updated successfully", { userId });
-      return this.mapRowToPreferences(updatedData as MusicPreferencesRow);
+      return this.mapRowToPreferences(updatedData);
     } catch (error) {
       if (error instanceof AppError) throw error;
       logger.error("Unexpected error updating music preferences", { error });
@@ -132,7 +138,7 @@ export class MusicPreferencesService {
         );
       }
 
-      return this.mapRowToPreferences(data as MusicPreferencesRow);
+      return this.mapRowToPreferences(data);
     } catch (error) {
       if (error instanceof AppError) throw error;
       logger.error("Unexpected error creating music preferences", { error });
@@ -160,7 +166,11 @@ export class MusicPreferencesService {
     // Check for duplicates
     const uniqueGenres = new Set(genres);
     if (uniqueGenres.size !== genres.length) {
-      throw new AppError(400, "Duplicate genres not allowed", "DUPLICATE_GENRES");
+      throw new AppError(
+        400,
+        "Duplicate genres not allowed",
+        "DUPLICATE_GENRES"
+      );
     }
 
     // Validate each genre
@@ -183,14 +193,40 @@ export class MusicPreferencesService {
   }
 
   /**
+   * Type guard for MusicGenre validation
+   */
+  private isValidGenre(genre: string): genre is MusicGenre {
+    const validGenres: readonly string[] = [
+      "pop",
+      "rock",
+      "hiphop",
+      "rnb",
+      "jazz",
+      "classical",
+      "electronic",
+      "country",
+      "latin",
+      "metal",
+    ];
+    return validGenres.includes(genre);
+  }
+
+  /**
+   * Parse genres from database to typed array
+   */
+  private parseGenres(genres: string[] | null): MusicGenre[] {
+    if (!genres) return [];
+    return genres.filter((g): g is MusicGenre => this.isValidGenre(g));
+  }
+
+  /**
    * Map database row to MusicPreferences
    */
   private mapRowToPreferences(row: MusicPreferencesRow): MusicPreferences {
     return {
       userId: row.user_id,
-      genres: row.genres as MusicGenre[],
-      updatedAt: row.updated_at,
+      genres: this.parseGenres(row.genres),
+      updatedAt: row.updated_at ?? new Date().toISOString(),
     };
   }
 }
-

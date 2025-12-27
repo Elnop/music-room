@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { SoundCloudController } from "./soundcloud.controller.js";
+import { SoundCloudController } from "@/features/soundcloud/soundcloud.controller.js";
 
 const router = Router();
 const controller = new SoundCloudController();

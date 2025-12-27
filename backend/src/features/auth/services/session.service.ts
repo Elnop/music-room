@@ -1,6 +1,6 @@
 import { supabase } from "@/shared/config/supabase.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
-import type { SupabaseUser } from "../auth.types.js";
+import type { SupabaseUser } from "@/features/auth/auth.types.js";
 
 /**
  * Service for session and token management

@@ -1,7 +1,7 @@
-import { supabase } from "../../../shared/config/supabase.js";
-import { AppError } from "../../../shared/middleware/error-handler.js";
-import { logger } from "../../../shared/utils/logger.js";
-import type { UserProfile, UserProfileRow } from "../auth.types.js";
+import { supabase } from "@/shared/config/supabase.js";
+import { AppError } from "@/shared/middleware/error-handler.js";
+import { logger } from "@/shared/utils/logger.js";
+import type { UserProfile, UserProfileRow } from "@/features/auth/auth.types.js";
 import type { Session } from "@supabase/supabase-js";
 
 export class UserService {

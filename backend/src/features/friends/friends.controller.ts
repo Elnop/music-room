@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { FriendsService } from "./friends.service.js";
+import { FriendsService } from "@/features/friends/services/friends.service.js";
 import type { AuthenticatedRequest } from "@/shared/types/global.types.js";
 import type { ApiResponse } from "@/shared/types/global.types.js";
 

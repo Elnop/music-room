@@ -7,8 +7,8 @@
 
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useTheme } from '@contexts';
-import { SoundCloudSearchScreen } from '../../screens/search/SoundCloudSearchScreen';
+import { useTheme } from '@/contexts/ThemeContext';
+import { SoundCloudSearchScreen } from '@/screens/search/SoundCloudSearchScreen';
 
 export type SearchStackParamList = {
   Search: undefined;

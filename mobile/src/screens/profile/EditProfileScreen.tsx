@@ -13,7 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useTheme } from '@contexts';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import type { UpdateProfileData } from '@/types/user.types';
 import { useAuthStore } from '@/store/authStore';

@@ -1,15 +1,15 @@
 import type { Request, Response, NextFunction } from "express";
-import { ProfileService } from "./profile.service.js";
-import { PrivacyService } from "./services/privacy.service.js";
-import { MusicPreferencesService } from "./services/music-preferences.service.js";
+import { ProfileService } from "@/features/profile/services/profile.service";
+import { PrivacyService } from "@/features/profile/services/privacy.service";
+import { MusicPreferencesService } from "@/features/profile/services/music-preferences.service";
 import {
   updateProfileSchema,
   searchUsersSchema,
   updatePrivacySchema,
   updateMusicPreferencesSchema,
-} from "./profile.validators.js";
-import type { AuthenticatedRequest } from "@/shared/types/global.types.js";
-import type { ApiResponse } from "@/shared/types/global.types.js";
+} from "@/features/profile/profile.validators";
+import type { AuthenticatedRequest } from "@/shared/types/global.types";
+import type { ApiResponse } from "@/shared/types/global.types";
 
 const profileService = new ProfileService();
 const privacyService = new PrivacyService();
@@ -31,7 +31,7 @@ export class ProfileController {
 
       const profile = await profileService.updateProfile(
         authReq.user.id,
-        validated,
+        validated
       );
 
       const response: ApiResponse = {
@@ -60,7 +60,7 @@ export class ProfileController {
       // Use privacy-filtered profile
       const profile = await privacyService.getFilteredProfile(
         authReq.user.id,
-        userId,
+        userId
       );
 
       const response: ApiResponse = {
@@ -113,7 +113,7 @@ export class ProfileController {
       const users = await profileService.searchUsers(
         validated.q,
         validated.limit,
-        authReq.user.id, // Exclude current user from results
+        authReq.user.id // Exclude current user from results
       );
 
       const response: ApiResponse = {
@@ -169,7 +169,7 @@ export class ProfileController {
 
       const privacy = await privacyService.updatePrivacySettings(
         authReq.user.id,
-        validated,
+        validated
       );
 
       const response: ApiResponse = {
@@ -199,7 +199,7 @@ export class ProfileController {
       const authReq = req as AuthenticatedRequest;
 
       const preferences = await musicPreferencesService.getMusicPreferences(
-        authReq.user.id,
+        authReq.user.id
       );
 
       const response: ApiResponse = {
@@ -223,7 +223,7 @@ export class ProfileController {
   async updateMusicPreferences(
     req: Request,
     res: Response,
-    next: NextFunction,
+    next: NextFunction
   ) {
     try {
       const authReq = req as AuthenticatedRequest;
@@ -231,7 +231,7 @@ export class ProfileController {
 
       const preferences = await musicPreferencesService.updateMusicPreferences(
         authReq.user.id,
-        validated,
+        validated
       );
 
       const response: ApiResponse = {
@@ -252,7 +252,7 @@ export class ProfileController {
    * Get all available music genres
    * GET /api/profile/music-preferences/genres
    */
-  async getAvailableGenres(req: Request, res: Response, next: NextFunction) {
+  getAvailableGenres(req: Request, res: Response, next: NextFunction) {
     try {
       const genres = musicPreferencesService.getAvailableGenres();
 

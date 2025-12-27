@@ -1,8 +1,10 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { useTheme } from '@contexts';
-import { royalBlueTheme, christmasTheme, pastelLimeTheme } from '@themes';
+import { useTheme } from '@/contexts/ThemeContext';
+import { royalBlueTheme } from '@themes/royalBlue.theme';
+import { christmasTheme } from '@themes/christmas.theme';
+import { pastelLimeTheme } from '@themes/pastelLime.theme';
 import type { ThemeName, Theme } from '@themes/types';
 
 const THEME_OPTIONS: Array<{

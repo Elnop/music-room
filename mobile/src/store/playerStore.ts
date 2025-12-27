@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { SoundCloudTrack } from '@/types';
+import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
 interface PlayerState {
   // Track and stream info

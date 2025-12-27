@@ -5,11 +5,11 @@ import {
   formatAuthResponse,
   fetchUserProfile,
   getUserProfile,
-} from "./utils/auth.helpers.js";
-import { SessionService } from "./services/session.service.js";
-import { OAuthService } from "./services/oauth.service.js";
-import { UserService } from "./services/user.service.js";
-import { ProviderService } from "./services/provider.service.js";
+} from "@/features/auth/utils/auth.helpers.js";
+import { SessionService } from "@/features/auth/services/session.service.js";
+import { OAuthService } from "@/features/auth/services/oauth.service.js";
+import { UserService } from "@/features/auth/services/user.service.js";
+import { ProviderService } from "@/features/auth/services/provider.service.js";
 import type {
   RegisterDTO,
   LoginDTO,
@@ -18,7 +18,7 @@ import type {
   SupabaseUser,
   LinkedProvidersResponse,
   OAuthProvider,
-} from "./auth.types.js";
+} from "@/features/auth/auth.types.js";
 
 export class AuthService {
   private sessionService: SessionService;

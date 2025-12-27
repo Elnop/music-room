@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { env } from "./env.js";
+import { env } from "@/shared/config/env.js";
 import type { Database } from "@/shared/types/supabase.generated.js";
 
 /**

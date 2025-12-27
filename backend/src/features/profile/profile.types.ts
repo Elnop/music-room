@@ -2,14 +2,17 @@
  * Profile Feature Types
  */
 
+import type { Enums } from "@/shared/types/supabase.generated.js";
+
 // =====================================================
 // Visibility Types
 // =====================================================
 
 /**
  * Visibility level for profile fields
+ * Aligned with Supabase enum: visibility_level
  */
-export type VisibilityLevel = "public" | "friends_only" | "private";
+export type VisibilityLevel = Enums<"visibility_level">;
 
 /**
  * Music genre options (10 total, user can select max 5)
@@ -156,32 +159,5 @@ export interface FilteredProfile {
   isFriend: boolean;
 }
 
-/**
- * Database row types (snake_case)
- */
-export interface ProfilePrivacyRow {
-  user_id: string;
-  email_visibility: VisibilityLevel;
-  bio_visibility: VisibilityLevel;
-  avatar_visibility: VisibilityLevel;
-  music_preferences_visibility: VisibilityLevel;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface MusicPreferencesRow {
-  user_id: string;
-  genres: string[];
-  updated_at: string;
-}
-
-export interface UserProfileRow {
-  id: string;
-  username: string;
-  display_name?: string;
-  avatar_url?: string;
-  bio?: string;
-  favorite_artist?: string;
-  created_at: string;
-  updated_at: string;
-}
+// Database row types: Use Tables<'table_name'> from @/shared/types/supabase.generated.js
+// Example: type ProfilePrivacyRow = Tables<'profile_privacy'>

@@ -7,12 +7,12 @@
 
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useTheme } from '@contexts';
-import { ProfileScreen } from '../../screens/profile/ProfileScreen';
-import { EditProfileScreen } from '../../screens/profile/EditProfileScreen';
-import { PrivacySettingsScreen } from '../../screens/profile/PrivacySettingsScreen';
-import { MusicPreferencesScreen } from '../../screens/profile/MusicPreferencesScreen';
-import { SettingsScreen } from '../../screens/settings';
+import { useTheme } from '@/contexts/ThemeContext';
+import { ProfileScreen } from '@/screens/profile/ProfileScreen';
+import { EditProfileScreen } from '@/screens/profile/EditProfileScreen';
+import { PrivacySettingsScreen } from '@/screens/profile/PrivacySettingsScreen';
+import { MusicPreferencesScreen } from '@/screens/profile/MusicPreferencesScreen';
+import { SettingsScreen } from '@/screens/settings/SettingsScreen';
 
 export type ProfileStackParamList = {
   Profile: undefined;

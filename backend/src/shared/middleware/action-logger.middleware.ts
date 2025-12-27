@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
-import { logger } from "../utils/logger.js";
-import type { AuthenticatedRequest } from "../types/global.types.js";
+import { logger } from "@/shared/utils/logger.js";
+import type { AuthenticatedRequest } from "@/shared/types/global.types.js";
 
 /**
  * Action logging middleware

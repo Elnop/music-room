@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { useTheme } from '@contexts';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import type { MusicGenre } from '@/types/user.types';
 import { MAX_GENRES } from '@/types/user.types';
@@ -23,27 +23,27 @@ export function MusicPreferencesScreen() {
   const [initialGenres, setInitialGenres] = useState<MusicGenre[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<MusicGenre[]>([]);
 
-  // Load music preferences
+  // Load music preferences on mount
   useEffect(() => {
+    const loadMusicPreferences = async () => {
+      if (!accessToken) return;
+
+      try {
+        setIsLoading(true);
+        const data = await privacyApi.getMusicPreferences(accessToken);
+        const genres = data.genres || [];
+        setInitialGenres(genres);
+        setSelectedGenres(genres);
+      } catch (error) {
+        const message = error instanceof ApiError ? error.message : 'Failed to load preferences';
+        Alert.alert('Error', message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     loadMusicPreferences();
-  }, []);
-
-  const loadMusicPreferences = async () => {
-    if (!accessToken) return;
-
-    try {
-      setIsLoading(true);
-      const data = await privacyApi.getMusicPreferences(accessToken);
-      const genres = data.genres || [];
-      setInitialGenres(genres);
-      setSelectedGenres(genres);
-    } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'Failed to load preferences';
-      Alert.alert('Error', message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, [accessToken]);
 
   const handleGenreToggle = (genre: MusicGenre) => {
     const isSelected = selectedGenres.includes(genre);

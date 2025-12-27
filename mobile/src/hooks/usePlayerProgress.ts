@@ -13,7 +13,6 @@ export function usePlayerProgress() {
   useEffect(() => {
     if (!player) return;
 
-    // Update every 100ms for smooth progress
     const interval = setInterval(() => {
       setCurrentTime(player.currentTime);
       setDuration(player.duration);

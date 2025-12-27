@@ -1,6 +1,6 @@
 import { supabaseAdmin } from "@/shared/config/supabase.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
-import type { PlaylistRow } from "../playlist.types.js";
+import type { PlaylistRow } from "@/features/playlists/playlist.types.js";
 
 /**
  * Playlist permissions and authorization checks

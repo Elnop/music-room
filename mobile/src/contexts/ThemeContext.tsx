@@ -1,7 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { royalBlueTheme, christmasTheme, pastelLimeTheme } from '@themes';
-import type { Theme, ThemeName, ThemeContextValue } from '@themes/types';
+import { royalBlueTheme } from '@themes/royalBlue.theme';
+import { christmasTheme } from '@themes/christmas.theme';
+import { pastelLimeTheme } from '@themes/pastelLime.theme';
+import type { ThemeName, ThemeContextValue } from '@/themes/types';
+import type { Theme } from '@/themes/types';
 
 const THEME_STORAGE_KEY = '@musicroom/theme_preference';
 
@@ -11,7 +14,6 @@ const THEMES: Record<ThemeName, Theme> = {
   pastelLime: pastelLimeTheme,
 };
 
-// Debug log to verify themes are properly constructed
 if (__DEV__)
   console.log('🔵 [ThemeContext] Themes initialized:', {
     royalBlue: {
@@ -38,7 +40,6 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   const [themeName, setThemeName] = useState<ThemeName>('royalBlue');
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load theme from storage on mount
   useEffect(() => {
     if (isLoaded) return;
 
@@ -56,8 +57,6 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     };
 
     void loadTheme();
-    // setThemeName and setIsLoaded are stable (React setState functions)
-    // isLoaded is checked at the start to prevent re-runs
   }, [isLoaded, setThemeName, setIsLoaded]);
 
   const setTheme = async (name: ThemeName) => {
@@ -71,7 +70,6 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
   const theme = THEMES[themeName];
 
-  // Debug log the currently active theme
   React.useEffect(() => {
     if (__DEV__)
       console.log('🔵 [ThemeContext] Active theme:', {

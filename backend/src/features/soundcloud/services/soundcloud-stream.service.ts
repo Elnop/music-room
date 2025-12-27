@@ -1,7 +1,7 @@
 import { logger } from "@/shared/utils/logger.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
-import { SoundCloudCache, CACHE_TTL } from "../utils/soundcloud-cache.js";
-import type { SoundCloudClient } from "../soundcloud.types.js";
+import { SoundCloudCache, CACHE_TTL } from "@/features/soundcloud/utils/soundcloud-cache.js";
+import type { SoundCloudClient } from "@/features/soundcloud/soundcloud.types.js";
 
 /**
  * Extended SoundCloud client with util methods

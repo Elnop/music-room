@@ -13,13 +13,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useTheme } from '@contexts';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import { Button } from '@components/common/Button';
 import { Input } from '@components/common/Input';
 import { FormError } from '@components/common/FormError';
 import { loginSchema, LoginInput } from '@utils/validators';
-import { useAuthStore } from '../../store/authStore';
+import { useAuthStore } from '@/store/authStore';
 
 type AuthStackParamList = {
   Welcome: undefined;

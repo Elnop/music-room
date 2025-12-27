@@ -1,12 +1,12 @@
 import express from "express";
 import cors from "cors";
 import { createServer } from "http";
-import { env } from "./shared/config/env.js";
-import { logger } from "./shared/utils/logger.js";
-import { errorHandler } from "./shared/middleware/error-handler.js";
-import { actionLoggerMiddleware } from "./shared/middleware/action-logger.middleware.js";
-import { routes } from "./shared/config/routes.js";
-import { realtime } from "./realtime/index.js";
+import { env } from "@/shared/config/env.js";
+import { logger } from "@/shared/utils/logger.js";
+import { errorHandler } from "@/shared/middleware/error-handler.js";
+import { actionLoggerMiddleware } from "@/shared/middleware/action-logger.middleware.js";
+import { routes } from "@/shared/config/routes.js";
+import { realtime } from "@/realtime/index.js";
 
 // Initialize Express app
 const app = express();
@@ -85,7 +85,7 @@ app.get("/health", (req, res) => {
 // API Routes (registered from central registry)
 // =====================================================
 
-routes.forEach(({ path, router, description }) => {
+routes.forEach(({ path, router }) => {
   app.use(path, router);
 });
 

@@ -13,14 +13,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useTheme } from '@contexts';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
-import { useAuthStore } from '../../store/authStore';
-import { usePlaylistStore } from '../../store/playlistStore';
+import { useAuthStore } from '@store/authStore';
+import { usePlaylistStore } from '@store/playlistStore';
 import { Button } from '@components/common/Button';
 import { Input } from '@components/common/Input';
 import { playlistFormSchema, type PlaylistFormInput } from '@utils/validators';
-import type { EditMode } from '@types';
+import type { EditMode } from '@/types/playlist.types';
 
 type PlaylistStackParamList = {
   Playlists: undefined;

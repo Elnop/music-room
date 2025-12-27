@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { ThemeProvider } from '@contexts';
-import { RootNavigator } from './src/navigation';
-import { ErrorBoundary } from './src/components/common/ErrorBoundary';
+import { ThemeProvider } from '@contexts/ThemeContext';
+import { RootNavigator } from '@/navigation/RootNavigator';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { configureGoogleSignIn, initializeFacebookSDK } from '@services/oauth';
 import 'react-native-gesture-handler';
 

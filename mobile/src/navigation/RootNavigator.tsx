@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { AuthNavigator } from './AuthNavigator';
-import { AppNavigator } from './AppNavigator';
-import { useAuthStore } from '../store/authStore';
-import { useSocketStore } from '../store/socketStore';
+import { AuthNavigator } from '@/navigation/AuthNavigator';
+import { AppNavigator } from '@/navigation/AppNavigator';
+import { useAuthStore } from '@/store/authStore';
+import { useSocketStore } from '@/store/socketStore';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
 import { supabase } from '@/lib/supabase';
 import { useMusicControlEmitter } from '@hooks/useMusicControl';

@@ -3,10 +3,10 @@ import { View, FlatList, StyleSheet, RefreshControl, TouchableOpacity, Text } fr
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
-import { useTheme } from '@contexts';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
-import { useAuthStore } from '../../store/authStore';
-import { usePlaylistStore } from '../../store/playlistStore';
+import { useAuthStore } from '@store/authStore';
+import { usePlaylistStore } from '@store/playlistStore';
 import { PlaylistCard } from '@components/playlist/PlaylistCard';
 import { EmptyState } from '@components/common/EmptyState';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
@@ -33,14 +33,14 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
   useFocusEffect(
     useCallback(() => {
       if (user) {
-        fetchPlaylists();
+        fetchPlaylists(user.id);
       }
     }, [user, fetchPlaylists])
   );
 
   const handleRefresh = async () => {
     if (user) {
-      await fetchPlaylists();
+      await fetchPlaylists(user.id);
     }
   };
 

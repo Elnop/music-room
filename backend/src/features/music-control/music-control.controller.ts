@@ -3,7 +3,7 @@ import type {
   AuthenticatedRequest,
   ApiResponse,
 } from "@/shared/types/global.types.js";
-import { musicControlService } from "./music-control.service.js";
+import { musicControlService } from "@/features/music-control/music-control.service.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
 
 // UUID v4 validation regex

@@ -12,14 +12,15 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
-import { useTheme } from '@contexts';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
-import { usePlaylistStore } from '../../store/playlistStore';
-import { useSoundCloudStore } from '../../store/soundcloudStore';
+import { usePlaylistStore } from '@store/playlistStore';
+import { useSoundCloudStore } from '@store/soundcloudStore';
 import { EmptyState } from '@components/common/EmptyState';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
 import debounce from 'lodash/debounce';
-import type { SoundCloudTrack, Track } from '@types';
+import type { SoundCloudTrack } from '@/types/soundcloud.types';
+import type { Track } from '@/types/track.types';
 
 type NewTrackInput = Omit<Track, 'id'> & { id?: string };
 

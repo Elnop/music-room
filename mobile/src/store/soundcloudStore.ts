@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { SoundCloudTrack } from '@/types';
+import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
 

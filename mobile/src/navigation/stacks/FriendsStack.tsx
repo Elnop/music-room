@@ -7,11 +7,11 @@
 
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useTheme } from '@contexts';
-import { FriendsScreen } from '../../screens/friends/FriendsScreen';
-import { UserProfileScreen } from '../../screens/friends/UserProfileScreen';
-import { PlaylistDetailScreen } from '../../screens/playlists/PlaylistDetailScreen';
-import { SearchTracksScreen } from '../../screens/playlists/SearchTracksScreen';
+import { useTheme } from '@/contexts/ThemeContext';
+import { FriendsScreen } from '@/screens/friends/FriendsScreen';
+import { UserProfileScreen } from '@/screens/friends/UserProfileScreen';
+import { PlaylistDetailScreen } from '@/screens/playlists/PlaylistDetailScreen';
+import { SearchTracksScreen } from '@/screens/playlists/SearchTracksScreen';
 
 export type FriendsStackParamList = {
   Friends: undefined;

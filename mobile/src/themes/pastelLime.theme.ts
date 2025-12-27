@@ -1,6 +1,10 @@
 import { SPACING } from '@constants';
-import { NEOBRUTALISM_BORDERS, NEOBRUTALISM_SHADOWS, NEOBRUTALISM_TYPOGRAPHY } from './tokens';
-import type { Theme } from './types';
+import {
+  NEOBRUTALISM_BORDERS,
+  NEOBRUTALISM_SHADOWS,
+  NEOBRUTALISM_TYPOGRAPHY,
+} from '@/themes/tokens';
+import type { Theme } from '@/themes/types';
 
 export const pastelLimeTheme: Theme = {
   name: 'pastelLime',
