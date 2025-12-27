@@ -1,12 +1,27 @@
 import { create } from 'zustand';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
+/**
+ * Playback states for the player state machine
+ * - idle: No track loaded
+ * - loading: Track selected, stream being fetched
+ * - ready: Stream loaded, ready to play (transitions to playing automatically)
+ * - playing: Audio is playing
+ * - paused: Audio is paused
+ */
+export type PlaybackState = 'idle' | 'loading' | 'ready' | 'playing' | 'paused';
+
 interface PlayerState {
   // Track and stream info
   currentTrack: SoundCloudTrack | null;
   streamUrl: string | null;
+  pendingTrackId: number | null; // Track ID being loaded
+  loadCounter: number; // Incremented on each playTrack to force reload even for same track
 
-  // Playback state
+  // State machine
+  playbackState: PlaybackState;
+
+  // Legacy compatibility (derived from playbackState)
   isPlaying: boolean;
   loading: boolean;
   error: string | null;
@@ -18,6 +33,10 @@ interface PlayerState {
   setStreamUrl: (url: string | null) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
+  setTrackUnavailableError: (message: string) => void;
+  clearError: () => void;
+  setPlaybackReady: () => void;
+  setPlaybackPlaying: () => void;
   playTrack: (track: SoundCloudTrack) => void;
   play: () => void;
   pause: () => void;
@@ -27,10 +46,13 @@ interface PlayerState {
   setModalOpen: (isOpen: boolean) => void;
 }
 
-export const usePlayerStore = create<PlayerState>(set => ({
+export const usePlayerStore = create<PlayerState>((set, get) => ({
   // Initial state
   currentTrack: null,
   streamUrl: null,
+  pendingTrackId: null,
+  loadCounter: 0,
+  playbackState: 'idle',
   isPlaying: false,
   loading: false,
   error: null,
@@ -41,47 +63,143 @@ export const usePlayerStore = create<PlayerState>(set => ({
     set({ streamUrl: url });
   },
 
-  // Set loading state
+  // Set loading state (updates playbackState accordingly)
   setLoading: loading => {
-    set({ loading });
+    set(state => ({
+      loading,
+      // Only update playbackState if we're in a relevant state
+      playbackState: loading && state.playbackState === 'idle' ? 'loading' : state.playbackState,
+    }));
   },
 
   // Set error state
   setError: error => {
-    set({ error });
-  },
-
-  // Play a track (sets track and prepares for playback)
-  playTrack: track => {
     set({
-      currentTrack: track,
-      isPlaying: true,
-      isModalOpen: false,
-      error: null,
+      error,
+      loading: false,
+      playbackState: error ? 'idle' : get().playbackState,
+      pendingTrackId: error ? null : get().pendingTrackId,
     });
   },
 
-  // Start playback (just updates state - actual playback controlled by PlayerContext)
+  // Set error for unavailable track (404) - clears track and shows error toast
+  setTrackUnavailableError: message => {
+    if (__DEV__) console.log('🔴 [playerStore] Track unavailable:', message);
+    set({
+      error: message,
+      currentTrack: null,
+      streamUrl: null,
+      pendingTrackId: null,
+      playbackState: 'idle',
+      isPlaying: false,
+      loading: false,
+    });
+  },
+
+  // Clear error (used to dismiss error toast)
+  clearError: () => {
+    set({ error: null });
+  },
+
+  // Called when stream is loaded and ready to play
+  setPlaybackReady: () => {
+    const state = get();
+    // Only transition if we're in loading state
+    if (state.playbackState === 'loading') {
+      if (__DEV__) console.log('🎵 [playerStore] Stream ready, transitioning to ready state');
+      set({
+        playbackState: 'ready',
+        loading: false,
+        pendingTrackId: null,
+      });
+    }
+  },
+
+  // Called when playback actually starts
+  setPlaybackPlaying: () => {
+    const state = get();
+    // Transition from loading, ready, or paused to playing
+    if (
+      state.playbackState === 'loading' ||
+      state.playbackState === 'ready' ||
+      state.playbackState === 'paused'
+    ) {
+      if (__DEV__) console.log('🎵 [playerStore] Transitioning to playing state');
+      set({
+        playbackState: 'playing',
+        isPlaying: true,
+        loading: false,
+        pendingTrackId: null,
+      });
+    }
+  },
+
+  // Play a track (sets track and starts loading)
+  playTrack: track => {
+    if (__DEV__)
+      console.log('🎵 [playerStore] playTrack called:', {
+        id: track.id,
+        title: track.title,
+      });
+
+    set(state => ({
+      currentTrack: track,
+      pendingTrackId: track.id,
+      loadCounter: state.loadCounter + 1, // Increment to force reload even for same track
+      playbackState: 'loading',
+      streamUrl: null, // Reset stream URL to force reload
+      isPlaying: false, // Not playing yet - will be set when ready
+      loading: true,
+      isModalOpen: false,
+      error: null,
+    }));
+  },
+
+  // Start playback (legacy - use setPlaybackPlaying for state machine)
   play: () => {
-    set({ isPlaying: true });
+    const state = get();
+    if (state.playbackState === 'ready' || state.playbackState === 'paused') {
+      set({
+        playbackState: 'playing',
+        isPlaying: true,
+      });
+    }
   },
 
-  // Pause playback (just updates state - actual playback controlled by PlayerContext)
+  // Pause playback
   pause: () => {
-    set({ isPlaying: false });
+    const state = get();
+    if (state.playbackState === 'playing') {
+      if (__DEV__) console.log('🎵 [playerStore] Pausing playback');
+      set({
+        playbackState: 'paused',
+        isPlaying: false,
+      });
+    }
   },
 
-  // Resume playback (just updates state - actual playback controlled by PlayerContext)
+  // Resume playback
   resume: () => {
-    set({ isPlaying: true });
+    const state = get();
+    if (state.playbackState === 'paused') {
+      if (__DEV__) console.log('🎵 [playerStore] Resuming playback');
+      set({
+        playbackState: 'playing',
+        isPlaying: true,
+      });
+    }
   },
 
   // Stop playback and clear track
   stop: () => {
+    if (__DEV__) console.log('🎵 [playerStore] Stopping playback');
     set({
       currentTrack: null,
-      isPlaying: false,
       streamUrl: null,
+      pendingTrackId: null,
+      playbackState: 'idle',
+      isPlaying: false,
+      loading: false,
       error: null,
     });
   },

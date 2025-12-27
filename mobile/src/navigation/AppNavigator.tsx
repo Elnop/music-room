@@ -22,6 +22,7 @@ import { FriendsNavigator } from '@/navigation/stacks/FriendsStack';
 // Player components
 import { MiniPlayer } from '@/components/player/MiniPlayer';
 import { PlayerModal } from '@/components/player/PlayerModal';
+import { PlayerErrorToast } from '@/components/player/PlayerErrorToast';
 import { PlayerProvider } from '@/contexts/PlayerContext';
 
 // Tab navigation types
@@ -111,6 +112,9 @@ export function AppNavigator() {
 
         {/* Full Player Modal */}
         <PlayerModal />
+
+        {/* Error Toast - appears center screen when track is unavailable */}
+        <PlayerErrorToast />
       </View>
     </PlayerProvider>
   );

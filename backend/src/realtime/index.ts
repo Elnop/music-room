@@ -1,6 +1,5 @@
 import { Server as SocketIOServer, Socket } from "socket.io";
 import type { Server as HTTPServer } from "http";
-import { logger } from "@/shared/utils/logger.js";
 import { socketLogger } from "@/shared/middleware/socket-logger.middleware.js";
 import type { TrackWithPositionResponse } from "@/features/playlists/playlist.types.js";
 import { musicControlService } from "@/features/music-control/music-control.service.js";

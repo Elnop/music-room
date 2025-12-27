@@ -6,7 +6,6 @@ import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { usePlayerStore } from '@/store/playerStore';
-import { usePlayerSync } from '@/hooks/usePlayerSync';
 import { usePlayerProgress } from '@/hooks/usePlayerProgress';
 
 export function MiniPlayer() {
@@ -14,21 +13,24 @@ export function MiniPlayer() {
   const insets = useSafeAreaInsets();
   const styles = React.useMemo(() => createStyles(theme, insets), [theme, insets]);
 
-  const { player, loading } = usePlayer();
-  const { currentTrack, isPlaying, pause, resume, toggleModal } = usePlayerStore();
+  const { player } = usePlayer();
+  const { currentTrack, playbackState, pause, resume, toggleModal } = usePlayerStore();
   const { progress } = usePlayerProgress();
-
-  usePlayerSync();
 
   if (!currentTrack) {
     return null;
   }
 
+  // Derive UI state from playbackState
+  const isLoading = playbackState === 'loading';
+  const isPlaying = playbackState === 'playing';
+  const canInteract = playbackState === 'playing' || playbackState === 'paused';
+
   const artworkUrl =
     currentTrack.artwork_url || currentTrack.user.avatar_url || 'https://via.placeholder.com/40';
 
   const handlePlayPause = () => {
-    if (loading || !player) return;
+    if (!canInteract || !player) return;
 
     if (isPlaying) {
       pause();
@@ -54,8 +56,9 @@ export function MiniPlayer() {
           style={styles.playButton}
           onPress={handlePlayPause}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          disabled={isLoading}
         >
-          {loading ? (
+          {isLoading ? (
             <ActivityIndicator size="small" color="#FFFFFF" />
           ) : (
             <Ionicons
@@ -68,8 +71,8 @@ export function MiniPlayer() {
         </TouchableOpacity>
       </View>
 
-      {/* Progress bar at the bottom of the mini player */}
-      {progress > 0 && (
+      {/* Progress bar at the bottom of the mini player - always rendered to avoid layout shift */}
+      <View style={styles.progressBarContainer}>
         <View
           style={[
             styles.progressBar,
@@ -78,7 +81,7 @@ export function MiniPlayer() {
             },
           ]}
         />
-      )}
+      </View>
     </TouchableOpacity>
   );
 }
@@ -125,6 +128,11 @@ const createStyles = (theme: Theme, insets: EdgeInsets) =>
       backgroundColor: theme.colors.primary,
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    progressBarContainer: {
+      height: 2,
+      width: '100%',
+      backgroundColor: 'transparent',
     },
     progressBar: {
       height: 2,

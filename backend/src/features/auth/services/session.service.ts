@@ -1,7 +1,7 @@
 import { supabase } from "@/shared/config/supabase.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
-import type { SupabaseUser, AuthResponse } from "../auth.types.js";
-import { formatAuthResponse, fetchUserProfile } from "../utils/auth.helpers.js";
+import type { SupabaseUser, AuthResponse } from "@/features/auth/auth.types.js";
+import { formatAuthResponse, fetchUserProfile } from "@/features/auth/utils/auth.helpers.js";
 
 /**
  * Service for session and token management

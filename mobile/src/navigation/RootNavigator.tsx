@@ -24,7 +24,8 @@ export function RootNavigator() {
     loadFromStorage()
       .then(async () => {
         // After loading, check if token needs refresh
-        const { isAuthenticated, isTokenExpiringSoon, refreshAccessToken } = useAuthStore.getState();
+        const { isAuthenticated, isTokenExpiringSoon, refreshAccessToken } =
+          useAuthStore.getState();
 
         if (isAuthenticated && isTokenExpiringSoon()) {
           console.log('[RootNavigator] Token expired/expiring, refreshing...');

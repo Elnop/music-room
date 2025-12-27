@@ -15,7 +15,6 @@ import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@/themes/types';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { usePlayerStore } from '@/store/playerStore';
-import { usePlayerSync } from '@/hooks/usePlayerSync';
 import { usePlayerProgress } from '@/hooks/usePlayerProgress';
 
 const { width } = Dimensions.get('window');
@@ -24,16 +23,20 @@ export function PlayerModal() {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
 
-  const { player, loading, error } = usePlayer();
-  const { currentTrack, isPlaying, isModalOpen, setModalOpen, pause, resume } = usePlayerStore();
+  const { player, error } = usePlayer();
+  const { currentTrack, playbackState, isModalOpen, setModalOpen, pause, resume } =
+    usePlayerStore();
 
   const { currentTime, duration } = usePlayerProgress();
-
-  usePlayerSync();
 
   if (!currentTrack) {
     return null;
   }
+
+  // Derive UI state from playbackState
+  const isLoading = playbackState === 'loading';
+  const isPlaying = playbackState === 'playing';
+  const canInteract = playbackState === 'playing' || playbackState === 'paused';
 
   const formatTime = (seconds: number): string => {
     if (!seconds || isNaN(seconds)) return '0:00';
@@ -43,7 +46,7 @@ export function PlayerModal() {
   };
 
   const handlePlayPause = () => {
-    if (loading || !player) return;
+    if (!canInteract || !player) return;
 
     if (isPlaying) {
       pause();
@@ -114,7 +117,7 @@ export function PlayerModal() {
             minimumTrackTintColor={theme.colors.primary}
             maximumTrackTintColor={theme.colors.border}
             thumbTintColor={theme.colors.primary}
-            disabled={loading || !player}
+            disabled={isLoading || !player}
           />
           <View style={styles.timeContainer}>
             <Text style={styles.timeText}>{formatTime(currentTime)}</Text>
@@ -126,14 +129,18 @@ export function PlayerModal() {
           <TouchableOpacity
             style={styles.controlButton}
             onPress={() => handleSkip(-10)}
-            disabled={loading}
+            disabled={isLoading || !canInteract}
           >
             <Ionicons name="play-back" size={24} color={theme.colors.text} />
             <Text style={styles.controlText}>10s</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.playButton} onPress={handlePlayPause} disabled={loading}>
-            {loading ? (
+          <TouchableOpacity
+            style={styles.playButton}
+            onPress={handlePlayPause}
+            disabled={isLoading}
+          >
+            {isLoading ? (
               <ActivityIndicator size="large" color="#FFFFFF" />
             ) : (
               <Ionicons
@@ -148,14 +155,14 @@ export function PlayerModal() {
           <TouchableOpacity
             style={styles.controlButton}
             onPress={() => handleSkip(10)}
-            disabled={loading}
+            disabled={isLoading || !canInteract}
           >
             <Ionicons name="play-forward" size={24} color={theme.colors.text} />
             <Text style={styles.controlText}>10s</Text>
           </TouchableOpacity>
         </View>
 
-        {loading && (
+        {isLoading && (
           <View style={styles.loadingContainer}>
             <Text style={styles.loadingText}>Loading stream...</Text>
           </View>

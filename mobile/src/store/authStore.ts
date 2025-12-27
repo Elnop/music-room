@@ -539,7 +539,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     // Prevent concurrent refresh (race condition)
     if (isRefreshing) {
       console.log('[AuthStore] Refresh already in progress, waiting...');
-      return new Promise<boolean>((resolve) => {
+      return new Promise<boolean>(resolve => {
         let attempts = 0;
         const maxAttempts = 50; // 5 seconds max wait
         const checkInterval = setInterval(() => {
