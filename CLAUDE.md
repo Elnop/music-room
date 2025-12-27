@@ -2,6 +2,66 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## CRITICAL: Project Guidelines Priority
+
+**THIS PROJECT MUST STRICTLY FOLLOW THE REQUIREMENTS SPECIFIED IN `doc/en.subject.pdf` (Version 5.3).**
+
+All development decisions, architectural choices, and feature implementations MUST align with the official project subject guidelines. When there is any conflict or ambiguity between this documentation and the subject PDF, **the subject PDF takes absolute priority**.
+
+### Mandatory Requirements from Subject PDF
+
+The project must implement:
+
+1. **User Management (IV.1)**:
+   - Account creation via email/password OR Facebook/Google OAuth
+   - Link network accounts (Facebook/Google) after registration
+   - Email validation and password reset for email/password accounts
+   - Profile with public, friends-only, private, and music preferences sections
+
+2. **Core Services (IV.2)** - At least 2 of the following 3:
+   - **Music Track Vote** (IV.2.1): Live voting system with visibility (public/private) and license management
+   - **Music Control Delegation** (IV.2.2): Device-specific music control delegation to friends
+   - **Music Playlist Editor** (IV.2.3): Real-time multi-user playlist editing with visibility and license management
+
+3. **Backend & API (IV.3, IV.4)**:
+   - Backend as single source of truth for all data
+   - RESTful API with JSON format
+   - API documentation (methods, inputs, outputs) - can use Swagger
+   - Configurable backend address in mobile app
+
+4. **Security (IV.6)**:
+   - User data isolation and protection
+   - Malicious behavior protection (bruteforce, session theft)
+   - Backend logging (Platform, Device, Application Version)
+   - ⚠️ **CRITICAL**: NO credentials/API keys in git - use .env files
+
+5. **Performance (IV.7)**:
+   - Ramp-up testing with load evaluation tools (AB, Gatling, Siege, etc.)
+   - Document max concurrent users with server specifications
+
+6. **Quality (IV.8)**:
+   - Agile development with team collaboration
+   - Layer-specific testing
+   - Automatic dependency management via Makefile
+
+### Technology Constraints
+
+- **Backend**: Free choice (Node.js, PHP, Golang, Firebase, etc.) - must justify decisions
+- **Mobile**: Android OR iOS with technology of choice
+- **Dependencies**: Must be auto-downloadable from repo (no committed libraries)
+- **SDK Warning**: SDKs must not do the core work for you
+
+### Bonus Features (Only if Mandatory Part is PERFECT)
+
+- Multi-platform support (Web responsive)
+- IoT integration (IBeacon for events)
+- Subscription tiers (Free vs Paid)
+- Offline mode with synchronization
+
+**Current Implementation Status**: The project has implemented Music Playlist Editor and Music Control Delegation (2/3 mandatory services). Continue development following subject requirements.
+
+---
+
 ## Project Overview
 
 Music Room is a collaborative music listening platform built with:
