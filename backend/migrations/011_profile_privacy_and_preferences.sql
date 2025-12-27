@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS public.profile_privacy (
   user_id UUID PRIMARY KEY REFERENCES public.user_profiles(id) ON DELETE CASCADE,
   email_visibility visibility_level DEFAULT 'private',
   bio_visibility visibility_level DEFAULT 'public',
-  location_visibility visibility_level DEFAULT 'friends_only',
+  avatar_visibility visibility_level DEFAULT 'public',
   music_preferences_visibility visibility_level DEFAULT 'public',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -87,13 +87,6 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
                    WHERE table_schema = 'public' 
                    AND table_name = 'user_profiles' 
-                   AND column_name = 'location') THEN
-        ALTER TABLE public.user_profiles ADD COLUMN location TEXT;
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                   WHERE table_schema = 'public' 
-                   AND table_name = 'user_profiles' 
                    AND column_name = 'favorite_artist') THEN
         ALTER TABLE public.user_profiles ADD COLUMN favorite_artist TEXT;
     END IF;
@@ -146,12 +139,11 @@ CREATE TRIGGER create_privacy_on_profile
 COMMENT ON TABLE public.profile_privacy IS 'Privacy settings controlling visibility of user profile fields';
 COMMENT ON COLUMN public.profile_privacy.email_visibility IS 'Who can see the user email (default: private)';
 COMMENT ON COLUMN public.profile_privacy.bio_visibility IS 'Who can see the user bio (default: public)';
-COMMENT ON COLUMN public.profile_privacy.location_visibility IS 'Who can see the user location (default: friends_only)';
+COMMENT ON COLUMN public.profile_privacy.avatar_visibility IS 'Who can see the profile picture (default: public)';
 COMMENT ON COLUMN public.profile_privacy.music_preferences_visibility IS 'Who can see music preferences (default: public)';
 
 COMMENT ON TABLE public.music_preferences IS 'User music genre preferences (max 5 genres)';
 COMMENT ON COLUMN public.music_preferences.genres IS 'Array of selected music genres (max 5)';
 
-COMMENT ON COLUMN public.user_profiles.location IS 'User location (city, country)';
 COMMENT ON COLUMN public.user_profiles.favorite_artist IS 'User favorite artist';
 

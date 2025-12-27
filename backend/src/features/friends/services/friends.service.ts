@@ -9,7 +9,7 @@ export class FriendsService {
    */
   async getFollowStatus(
     currentUserId: string,
-    targetUserId: string,
+    targetUserId: string
   ): Promise<FollowStatus> {
     try {
       const [
@@ -47,7 +47,7 @@ export class FriendsService {
         throw new AppError(
           500,
           "Failed to get follow status",
-          "FOLLOW_STATUS_ERROR",
+          "FOLLOW_STATUS_ERROR"
         );
       }
 
@@ -58,7 +58,7 @@ export class FriendsService {
         throw new AppError(
           500,
           "Failed to get follow status",
-          "FOLLOW_STATUS_ERROR",
+          "FOLLOW_STATUS_ERROR"
         );
       }
 
@@ -78,7 +78,7 @@ export class FriendsService {
       throw new AppError(
         500,
         "Failed to get follow status",
-        "FOLLOW_STATUS_ERROR",
+        "FOLLOW_STATUS_ERROR"
       );
     }
   }
@@ -87,7 +87,7 @@ export class FriendsService {
    * Get own stats (followers and following count)
    */
   async getMyStats(
-    userId: string,
+    userId: string
   ): Promise<{ followersCount: number; followingCount: number }> {
     try {
       const [followersCountResult, followingCountResult] = await Promise.all([
@@ -116,7 +116,7 @@ export class FriendsService {
    */
   async followUser(
     currentUserId: string,
-    targetUserId: string,
+    targetUserId: string
   ): Promise<FollowActionResponse> {
     try {
       // Prevent self-follow
@@ -166,7 +166,7 @@ export class FriendsService {
    */
   async unfollowUser(
     currentUserId: string,
-    targetUserId: string,
+    targetUserId: string
   ): Promise<FollowActionResponse> {
     try {
       const { error: deleteError } = await supabase
@@ -249,8 +249,8 @@ export class FriendsService {
       return (profiles || []).map((p) => ({
         id: p.id,
         username: p.username,
-        displayName: p.display_name,
-        avatarUrl: p.avatar_url,
+        displayName: p.display_name ?? undefined,
+        avatarUrl: p.avatar_url ?? undefined,
       }));
     } catch (error) {
       if (error instanceof AppError) throw error;

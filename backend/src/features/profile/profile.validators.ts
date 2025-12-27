@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MUSIC_GENRES, MAX_GENRES } from "./profile.types.js";
+import { MAX_GENRES } from "./profile.types.js";
 
 // =====================================================
 // Visibility Level Enum
@@ -32,11 +32,10 @@ const musicGenreSchema = z.enum([
 export const updateProfileSchema = z.object({
   displayName: z
     .string()
-    .min(1, "Display name cannot be empty")
     .max(50, "Display name must be less than 50 characters")
     .optional()
     .refine((val) => val === undefined || val.trim().length > 0, {
-      message: "Display name cannot be empty",
+      message: "Display name cannot be empty or whitespace only",
     }),
   bio: z.string().max(500, "Bio must be less than 500 characters").optional(),
   avatarUrl: z.string().url("Avatar URL must be a valid URL").optional(),

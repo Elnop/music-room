@@ -20,7 +20,7 @@ export function PrivacySettingsScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [privacy, setPrivacy] = useState<ProfilePrivacy | null>(null);
-  const [hasChanges, setHasChanges] = useState(false);
+  const [initialPrivacy, setInitialPrivacy] = useState<ProfilePrivacy | null>(null);
 
   // Load privacy settings
   useEffect(() => {
@@ -34,6 +34,7 @@ export function PrivacySettingsScreen() {
       setIsLoading(true);
       const data = await privacyApi.getPrivacySettings(accessToken);
       setPrivacy(data);
+      setInitialPrivacy(data);
     } catch (error) {
       const message = error instanceof ApiError ? error.message : 'Failed to load settings';
       Alert.alert('Error', message);
@@ -49,8 +50,18 @@ export function PrivacySettingsScreen() {
       ...privacy,
       [field]: value,
     });
-    setHasChanges(true);
   };
+
+  // Check if there are actual changes compared to initial state
+  const hasChanges = React.useMemo(() => {
+    if (!privacy || !initialPrivacy) return false;
+    return (
+      privacy.emailVisibility !== initialPrivacy.emailVisibility ||
+      privacy.bioVisibility !== initialPrivacy.bioVisibility ||
+      privacy.avatarVisibility !== initialPrivacy.avatarVisibility ||
+      privacy.musicPreferencesVisibility !== initialPrivacy.musicPreferencesVisibility
+    );
+  }, [privacy, initialPrivacy]);
 
   const handleSave = async () => {
     if (!accessToken || !privacy) return;
@@ -63,7 +74,7 @@ export function PrivacySettingsScreen() {
         avatarVisibility: privacy.avatarVisibility,
         musicPreferencesVisibility: privacy.musicPreferencesVisibility,
       });
-      setHasChanges(false);
+      setInitialPrivacy(privacy); // Reset initial state after save
       navigation.goBack();
     } catch (error) {
       const message = error instanceof ApiError ? error.message : 'Failed to save settings';

@@ -13,7 +13,7 @@ export class FriendsController {
 
       const status = await friendsService.getFollowStatus(
         authReq.user.id,
-        userId,
+        userId
       );
 
       const response: ApiResponse = {

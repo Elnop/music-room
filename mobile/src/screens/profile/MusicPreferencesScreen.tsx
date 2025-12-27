@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '@contexts';
 import type { Theme } from '@themes/types';
-import type { MusicGenre, MusicPreferences } from '@/types/user.types';
+import type { MusicGenre } from '@/types/user.types';
 import { MAX_GENRES } from '@/types/user.types';
 import { useAuthStore } from '@/store/authStore';
 import { privacyApi, ApiError } from '@/services/privacyApi';
@@ -20,9 +20,8 @@ export function MusicPreferencesScreen() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [preferences, setPreferences] = useState<MusicPreferences | null>(null);
+  const [initialGenres, setInitialGenres] = useState<MusicGenre[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<MusicGenre[]>([]);
-  const [hasChanges, setHasChanges] = useState(false);
 
   // Load music preferences
   useEffect(() => {
@@ -35,8 +34,9 @@ export function MusicPreferencesScreen() {
     try {
       setIsLoading(true);
       const data = await privacyApi.getMusicPreferences(accessToken);
-      setPreferences(data);
-      setSelectedGenres(data.genres || []);
+      const genres = data.genres || [];
+      setInitialGenres(genres);
+      setSelectedGenres(genres);
     } catch (error) {
       const message = error instanceof ApiError ? error.message : 'Failed to load preferences';
       Alert.alert('Error', message);
@@ -55,9 +55,15 @@ export function MusicPreferencesScreen() {
       // Add genre
       setSelectedGenres([...selectedGenres, genre]);
     }
-
-    setHasChanges(true);
   };
+
+  // Check if there are actual changes compared to initial state
+  const hasChanges = React.useMemo(() => {
+    if (initialGenres.length !== selectedGenres.length) return true;
+    const sortedInitial = [...initialGenres].sort();
+    const sortedSelected = [...selectedGenres].sort();
+    return !sortedInitial.every((g, i) => g === sortedSelected[i]);
+  }, [initialGenres, selectedGenres]);
 
   const handleSave = async () => {
     if (!accessToken) return;
@@ -67,7 +73,7 @@ export function MusicPreferencesScreen() {
       await privacyApi.updateMusicPreferences(accessToken, {
         genres: selectedGenres,
       });
-      setHasChanges(false);
+      setInitialGenres(selectedGenres); // Reset initial state after save
       navigation.goBack();
     } catch (error) {
       const message = error instanceof ApiError ? error.message : 'Failed to save preferences';

@@ -360,7 +360,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
       await fetchPlaylistById(playlistId);
     } catch (error) {
       console.error('[PlaylistSharing] Failed to update edit mode:', error);
-      Alert.alert('Erreur', 'Impossible de modifier le mode d\'édition');
+      Alert.alert('Erreur', "Impossible de modifier le mode d'édition");
     } finally {
       setIsUpdatingSettings(false);
     }

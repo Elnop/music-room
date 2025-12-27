@@ -294,13 +294,12 @@ export class PrivacyService {
     userId2: string
   ): Promise<boolean> {
     try {
-      // Check if both users follow each other
+      // Check if both users follow each other using parameterized queries
       const { data: follows } = await supabase
         .from("follows")
         .select("follower_id, following_id")
-        .or(
-          `and(follower_id.eq.${userId1},following_id.eq.${userId2}),and(follower_id.eq.${userId2},following_id.eq.${userId1})`
-        );
+        .in("follower_id", [userId1, userId2])
+        .in("following_id", [userId1, userId2]);
 
       if (!follows || follows.length < 2) {
         return false;

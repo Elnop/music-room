@@ -16,7 +16,7 @@ router.use(authMiddleware);
  * @access  Private
  */
 router.get("/", (req, res, next) =>
-  controller.getMutualFriends(req, res, next),
+  controller.getMutualFriends(req, res, next)
 );
 
 /**
@@ -24,7 +24,9 @@ router.get("/", (req, res, next) =>
  * @desc    Get own followers/following stats
  * @access  Private
  */
-router.get("/stats/me", (req, res, next) => controller.getMyStats(req, res, next));
+router.get("/stats/me", (req, res, next) =>
+  controller.getMyStats(req, res, next)
+);
 
 /**
  * @route   GET /api/friends/status/:userId
@@ -32,7 +34,7 @@ router.get("/stats/me", (req, res, next) => controller.getMyStats(req, res, next
  * @access  Private
  */
 router.get("/status/:userId", (req, res, next) =>
-  controller.getFollowStatus(req, res, next),
+  controller.getFollowStatus(req, res, next)
 );
 
 /**
@@ -41,7 +43,7 @@ router.get("/status/:userId", (req, res, next) =>
  * @access  Private
  */
 router.post("/follow/:userId", (req, res, next) =>
-  controller.followUser(req, res, next),
+  controller.followUser(req, res, next)
 );
 
 /**
@@ -50,7 +52,7 @@ router.post("/follow/:userId", (req, res, next) =>
  * @access  Private
  */
 router.delete("/follow/:userId", (req, res, next) =>
-  controller.unfollowUser(req, res, next),
+  controller.unfollowUser(req, res, next)
 );
 
 export default router;
