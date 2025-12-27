@@ -22,13 +22,23 @@ import { Button } from '@components/common/Button';
 import { Input } from '@components/common/Input';
 import { FormError } from '@components/common/FormError';
 
+// Profile field limits (aligned with backend)
+const PROFILE_LIMITS = {
+  DISPLAY_NAME_MAX: 15,
+  BIO_MAX: 300,
+};
+
 // Validation schema (aligned with backend)
 const updateProfileSchema = z.object({
   displayName: z
     .string()
     .min(1, 'Display name cannot be empty')
-    .max(50, 'Display name must be less than 50 characters'),
-  bio: z.string().max(500, 'Bio must be less than 500 characters').optional().or(z.literal('')),
+    .max(PROFILE_LIMITS.DISPLAY_NAME_MAX, `${PROFILE_LIMITS.DISPLAY_NAME_MAX} characters max`),
+  bio: z
+    .string()
+    .max(PROFILE_LIMITS.BIO_MAX, `${PROFILE_LIMITS.BIO_MAX} characters max`)
+    .optional()
+    .or(z.literal('')),
 });
 
 type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
@@ -114,16 +124,22 @@ export function EditProfileScreen() {
             control={control}
             name="displayName"
             render={({ field: { onChange, onBlur, value } }) => (
-              <Input
-                label="Display Name"
-                placeholder="Enter your display name"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                error={errors.displayName?.message}
-                autoCapitalize="words"
-                returnKeyType="next"
-              />
+              <View>
+                <Input
+                  label="Display Name"
+                  placeholder="Enter your display name"
+                  value={value}
+                  onChangeText={text => onChange(text.slice(0, PROFILE_LIMITS.DISPLAY_NAME_MAX))}
+                  onBlur={onBlur}
+                  error={errors.displayName?.message}
+                  autoCapitalize="words"
+                  returnKeyType="next"
+                  maxLength={PROFILE_LIMITS.DISPLAY_NAME_MAX}
+                />
+                <Text style={styles.charCount}>
+                  {value?.length || 0}/{PROFILE_LIMITS.DISPLAY_NAME_MAX}
+                </Text>
+              </View>
             )}
           />
 
@@ -132,18 +148,24 @@ export function EditProfileScreen() {
             control={control}
             name="bio"
             render={({ field: { onChange, onBlur, value } }) => (
-              <Input
-                label="Bio"
-                placeholder="Tell us about yourself..."
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                error={errors.bio?.message}
-                multiline
-                numberOfLines={4}
-                style={styles.bioInput}
-                returnKeyType="done"
-              />
+              <View>
+                <Input
+                  label="Bio"
+                  placeholder="Tell us about yourself..."
+                  value={value}
+                  onChangeText={text => onChange(text.slice(0, PROFILE_LIMITS.BIO_MAX))}
+                  onBlur={onBlur}
+                  error={errors.bio?.message}
+                  multiline
+                  numberOfLines={4}
+                  style={styles.bioInput}
+                  returnKeyType="done"
+                  maxLength={PROFILE_LIMITS.BIO_MAX}
+                />
+                <Text style={styles.charCount}>
+                  {value?.length || 0}/{PROFILE_LIMITS.BIO_MAX}
+                </Text>
+              </View>
             )}
           />
 
@@ -209,6 +231,13 @@ const createStyles = (theme: Theme) =>
     bioInput: {
       minHeight: 100,
       textAlignVertical: 'top',
+    },
+    charCount: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+      textAlign: 'right',
+      marginTop: -theme.spacing.sm,
+      marginBottom: theme.spacing.sm,
     },
     infoText: {
       fontSize: 12,

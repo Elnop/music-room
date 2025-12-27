@@ -26,23 +26,34 @@ const musicGenreSchema = z.enum([
 // Profile Validators
 // =====================================================
 
+// Profile field limits
+export const PROFILE_LIMITS = {
+  DISPLAY_NAME_MAX: 15,
+  BIO_MAX: 300,
+};
+
 /**
  * Validation schema for updating user profile
  */
 export const updateProfileSchema = z.object({
   displayName: z
     .string()
-    .max(50, "Display name must be less than 50 characters")
+    .max(
+      PROFILE_LIMITS.DISPLAY_NAME_MAX,
+      `Display name must be ${PROFILE_LIMITS.DISPLAY_NAME_MAX} characters max`
+    )
     .optional()
     .refine((val) => val === undefined || val.trim().length > 0, {
       message: "Display name cannot be empty or whitespace only",
     }),
-  bio: z.string().max(500, "Bio must be less than 500 characters").optional(),
-  avatarUrl: z.string().url("Avatar URL must be a valid URL").optional(),
-  favoriteArtist: z
+  bio: z
     .string()
-    .max(100, "Favorite artist must be less than 100 characters")
+    .max(
+      PROFILE_LIMITS.BIO_MAX,
+      `Bio must be ${PROFILE_LIMITS.BIO_MAX} characters max`
+    )
     .optional(),
+  avatarUrl: z.string().url("Avatar URL must be a valid URL").optional(),
 });
 
 /**
