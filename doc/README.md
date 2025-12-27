@@ -346,6 +346,7 @@ API_URL=http://localhost:3000
 ## Documentation
 
 - **[REDIS.md](./REDIS.md)**: Redis cache & brute force protection
+- **[TESTING_SECURITY.md](./TESTING_SECURITY.md)**: Security testing guide (IV.6 Securing)
 - **[DOCKER.md](./DOCKER.md)**: Complete Docker guide with troubleshooting
 - **[GETTING_STARTED.md](./GETTING_STARTED.md)**: Getting started guide
 - **[GIT_WORKFLOW.md](./GIT_WORKFLOW.md)**: Git workflow and best practices

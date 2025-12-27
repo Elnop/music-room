@@ -77,6 +77,7 @@ make stop
 - [doc/README.md](./doc/README.md) - Project overview
 - [doc/GETTING_STARTED.md](./doc/GETTING_STARTED.md) - Setup instructions
 - [doc/REDIS.md](./doc/REDIS.md) - Redis cache & brute force protection
+- [doc/TESTING_SECURITY.md](./doc/TESTING_SECURITY.md) - Security testing guide (IV.6 Securing)
 - [doc/DOCKER.md](./doc/DOCKER.md) - Docker architecture
 - [doc/TUNNEL_MODE.md](./doc/TUNNEL_MODE.md) - Cross-network development
 - [doc/REALTIME.md](./doc/REALTIME.md) - Real-time Socket.io documentation
