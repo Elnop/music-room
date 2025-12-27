@@ -221,8 +221,8 @@ export class FriendsService {
       return (profiles || []).map((p) => ({
         id: p.id,
         username: p.username,
-        displayName: p.display_name,
-        avatarUrl: p.avatar_url,
+        displayName: p.display_name ?? undefined,
+        avatarUrl: p.avatar_url ?? undefined,
       }));
     } catch (error) {
       if (error instanceof AppError) throw error;

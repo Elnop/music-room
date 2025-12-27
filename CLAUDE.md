@@ -136,19 +136,18 @@ Music Room provides build commands for backend validation and production mobile 
 
 ```bash
 # TypeScript compilation (validation)
-make build              # Build backend TypeScript (fast validation)
-make build-backend      # Same as above
+make compile-backend    # Build backend TypeScript (fast validation)
 make verify-backend     # Check backend/dist/ artifacts exist
 make build-clean        # Remove build artifacts only
 
 # Production Docker image
-make build-backend-docker # Build production backend image
+make compile-backend-docker # Build production backend image
 ```
 
 **When to use backend builds**:
-- `make build` - Quick validation before commits (check TypeScript compiles)
+- `make compile-backend` - Quick validation before commits (check TypeScript compiles)
 - `make verify-backend` - CI/CD pipelines to verify artifacts exist
-- `make build-backend-docker` - Build production Docker image for deployment
+- `make compile-backend-docker` - Build production Docker image for deployment
 
 **Note**: Normal development does **not** need builds - `make dev-docker` and `make dev-local` use hot reload (tsx watch / Metro bundler).
 

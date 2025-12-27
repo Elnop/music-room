@@ -65,11 +65,11 @@ export class ProfileService {
         id: profileData.id,
         email: userData.user.email ?? "",
         username: profileData.username,
-        displayName: profileData.display_name,
-        avatarUrl: profileData.avatar_url,
-        bio: profileData.bio,
-        createdAt: profileData.created_at,
-        updatedAt: profileData.updated_at,
+        displayName: profileData.display_name ?? undefined,
+        avatarUrl: profileData.avatar_url ?? undefined,
+        bio: profileData.bio ?? undefined,
+        createdAt: profileData.created_at ?? new Date().toISOString(),
+        updatedAt: profileData.updated_at ?? new Date().toISOString(),
       };
     } catch (error) {
       if (error instanceof AppError) throw error;
@@ -110,11 +110,11 @@ export class ProfileService {
         id: profileData.id,
         email: userData.user.email ?? "",
         username: profileData.username,
-        displayName: profileData.display_name,
-        avatarUrl: profileData.avatar_url,
-        bio: profileData.bio,
-        createdAt: profileData.created_at,
-        updatedAt: profileData.updated_at,
+        displayName: profileData.display_name ?? undefined,
+        avatarUrl: profileData.avatar_url ?? undefined,
+        bio: profileData.bio ?? undefined,
+        createdAt: profileData.created_at ?? new Date().toISOString(),
+        updatedAt: profileData.updated_at ?? new Date().toISOString(),
       };
     } catch (error) {
       if (error instanceof AppError) throw error;
@@ -156,10 +156,10 @@ export class ProfileService {
       return (data || []).map((profile) => ({
         id: profile.id,
         username: profile.username,
-        displayName: profile.display_name,
-        avatarUrl: profile.avatar_url,
-        bio: profile.bio,
-        createdAt: profile.created_at,
+        displayName: profile.display_name ?? undefined,
+        avatarUrl: profile.avatar_url ?? undefined,
+        bio: profile.bio ?? undefined,
+        createdAt: profile.created_at ?? new Date().toISOString(),
       }));
     } catch (error) {
       if (error instanceof AppError) throw error;

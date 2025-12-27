@@ -27,8 +27,7 @@ Music Room provides build commands for two main components:
 Build backend TypeScript to JavaScript for validation before commits:
 
 ```bash
-make build              # Quick TypeScript compilation
-make build-backend      # Same as above
+make compile-backend    # TypeScript compilation + type checking
 ```
 
 **Output**: `backend/dist/` directory with compiled JavaScript
@@ -43,7 +42,7 @@ make build-backend      # Same as above
 Build production backend Docker image (distroless, 0 CVE):
 
 ```bash
-make build-backend-docker
+make compile-backend-docker
 ```
 
 **Output**: Docker image `music-room-backend:latest`
@@ -56,7 +55,7 @@ make build-backend-docker
 **Deployment workflow**:
 ```bash
 # Build production image
-make build-backend-docker
+make compile-backend-docker
 
 # Tag for registry
 docker tag music-room-backend:latest registry.example.com/music-room:v1.0.0

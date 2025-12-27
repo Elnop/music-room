@@ -98,6 +98,11 @@ export class SoundCloudStreamService {
     try {
       logger.debug(`Trying ${protocol} stream`, { trackUrl });
 
+      if (!this.soundcloud.util) {
+        logger.error("SoundCloud util methods not available");
+        return null;
+      }
+
       const streamUrl = await this.soundcloud.util.streamLink(
         trackUrl,
         protocol,

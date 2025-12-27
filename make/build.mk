@@ -4,23 +4,19 @@
 # Provides backend TypeScript compilation and verification targets
 #
 # Usage:
-#   make build              - Build backend TypeScript (fast validation)
-#   make build-backend      - Same as above
-#   make build-backend-docker - Build production Docker image
+#   make compile-backend    - Build backend TypeScript (fast validation)
+#   make compile-backend-docker - Build production Docker image
 #   make verify-backend     - Check backend build artifacts exist
 #   make build-clean        - Clean build artifacts only
 # ==============================================================================
 
-.PHONY: build build-backend build-backend-docker verify-backend build-clean
+.PHONY: compile-backend compile-backend-docker verify-backend build-clean
 
 #------------------------------------------------------------
 # Main Build Targets
 #------------------------------------------------------------
 
-build: ## Build backend TypeScript (fast validation)
-	@$(MAKE) build-backend
-
-build-backend: ## Build backend TypeScript locally
+compile-backend: ## Build backend TypeScript locally
 	$(call print_header,Building Backend TypeScript)
 	$(call print_subsection,📦 Compiling TypeScript → JavaScript)
 	@cd backend && npm run build && npm run type-check
@@ -28,7 +24,7 @@ build-backend: ## Build backend TypeScript locally
 	$(call print_success,Backend build successful)
 	$(call print_subsection,📂 Artifacts: backend/dist/)
 
-build-backend-docker: ## Build production backend Docker image
+compile-backend-docker: ## Build production backend Docker image
 	$(call print_header,Building Production Backend Docker Image)
 	$(call print_subsection,🐳 Target: production (distroless))
 	@docker build -t music-room-backend:latest --target production ./backend
@@ -43,12 +39,12 @@ verify-backend: ## Check backend build artifacts exist
 	$(call print_header,Verifying Backend Build Artifacts)
 	@test -f backend/dist/server.js || { \
 		$(call print_error,Backend build artifact missing: backend/dist/server.js); \
-		echo "$(YELLOW)$(ICON_WARNING) Run: make build-backend$(NC)"; \
+		echo "$(YELLOW)$(ICON_WARNING) Run: make compile-backend$(NC)"; \
 		exit 1; \
 	}
 	@test -d backend/dist/features || { \
 		$(call print_error,Backend features missing: backend/dist/features/); \
-		echo "$(YELLOW)$(ICON_WARNING) Run: make build-backend$(NC)"; \
+		echo "$(YELLOW)$(ICON_WARNING) Run: make compile-backend$(NC)"; \
 		exit 1; \
 	}
 	$(call blank_line)
