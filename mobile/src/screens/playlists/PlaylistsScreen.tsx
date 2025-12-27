@@ -56,7 +56,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
   };
 
   if (isLoading && playlists.length === 0) {
-    return <LoadingSpinner fullScreen message="Loading playlists..." />;
+    return <LoadingSpinner fullScreen message="Chargement des playlists..." />;
   }
 
   return (

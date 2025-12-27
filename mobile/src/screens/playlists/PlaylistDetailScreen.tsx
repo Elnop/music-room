@@ -179,7 +179,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
   };
 
   if (isLoading || !currentPlaylist) {
-    return <LoadingSpinner fullScreen message="Loading playlist..." />;
+    return <LoadingSpinner fullScreen message="Chargement de la playlist..." />;
   }
 
   return (

@@ -1,7 +1,10 @@
-import React from 'react';
-import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
+import React, { useEffect, useMemo } from 'react';
+import { View, StyleSheet, Text, Animated, Easing, Image } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const AppLogo = require('@/assets/logo/app-icon.png');
 
 interface LoadingSpinnerProps {
   size?: 'small' | 'large';
@@ -15,11 +18,73 @@ export function LoadingSpinner({
   fullScreen = false,
 }: LoadingSpinnerProps) {
   const { theme } = useTheme();
-  const styles = React.useMemo(() => createStyles(theme), [theme]);
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
+  // Animation values - created once and memoized
+  const rotateAnim = useMemo(() => new Animated.Value(0), []);
+  const scaleAnim = useMemo(() => new Animated.Value(1), []);
+
+  // Calculate logo size based on prop
+  const logoSize = size === 'small' ? 28 : 64;
+
+  useEffect(() => {
+    // Rotation animation - continuous spin
+    const rotateAnimation = Animated.loop(
+      Animated.timing(rotateAnim, {
+        toValue: 1,
+        duration: 2000,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    );
+
+    // Pulse animation - subtle scale up/down
+    const pulseAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(scaleAnim, {
+          toValue: 1.1,
+          duration: 800,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 0.9,
+          duration: 800,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    );
+
+    // Start both animations
+    rotateAnimation.start();
+    pulseAnimation.start();
+
+    return () => {
+      rotateAnimation.stop();
+      pulseAnimation.stop();
+    };
+  }, [rotateAnim, scaleAnim]);
+
+  // Interpolate rotation
+  const spin = rotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
 
   return (
     <View style={[styles.container, fullScreen && styles.fullScreen]}>
-      <ActivityIndicator size={size} color={theme.colors.primary} />
+      <Animated.View
+        style={{
+          transform: [{ rotate: spin }, { scale: scaleAnim }],
+        }}
+      >
+        <Image
+          source={AppLogo}
+          style={{ width: logoSize, height: logoSize }}
+          resizeMode="contain"
+        />
+      </Animated.View>
       {message && <Text style={styles.message}>{message}</Text>}
     </View>
   );
