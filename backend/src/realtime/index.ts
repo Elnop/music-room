@@ -1,6 +1,7 @@
 import { Server as SocketIOServer, Socket } from "socket.io";
 import type { Server as HTTPServer } from "http";
 import { logger } from "@/shared/utils/logger.js";
+import { socketLogger } from "@/shared/middleware/socket-logger.middleware.js";
 import type { TrackWithPositionResponse } from "@/features/playlists/playlist.types.js";
 import { musicControlService } from "@/features/music-control/music-control.service.js";
 import type {
@@ -106,7 +107,7 @@ class RealtimeService {
   initialize(httpServer: HTTPServer) {
     const corsOrigin = process.env.SOCKET_IO_CORS_ORIGIN || "*";
 
-    logger.info(`[Socket] Initializing with CORS origin: ${corsOrigin}`);
+    socketLogger.init("initializing", { corsOrigin });
 
     this.io = new SocketIOServer(httpServer, {
       cors: {
@@ -121,15 +122,15 @@ class RealtimeService {
 
     this.io.on("connection", (socket) => {
       const transport = socket.conn.transport.name;
-      logger.info(
-        `[Socket] ✅ Client connected: ${socket.id} via ${transport}`,
-      );
+      socketLogger.connection(socket.id, transport, { action: "connected" });
 
       // Log transport upgrades
       socket.conn.on("upgrade", (newTransport: { name: string }) => {
-        logger.debug(
-          `[Socket] Transport upgraded: ${socket.id} from ${transport} to ${newTransport.name}`,
-        );
+        socketLogger.event("transport:upgraded", socket.id, {
+          from: transport,
+          to: newTransport.name,
+          action: "upgraded",
+        });
       });
 
       this.registerAuthHandlers(socket);
@@ -138,17 +139,15 @@ class RealtimeService {
 
       socket.on("disconnect", (reason) => {
         this.handleDisconnect(socket);
-        logger.info(
-          `[Socket] ❌ Client disconnected: ${socket.id} - ${reason}`,
-        );
+        socketLogger.disconnect(socket.id, reason, { action: "disconnected" });
       });
 
       socket.on("error", (error) => {
-        logger.error(`[Socket] Error on ${socket.id}:`, error);
+        socketLogger.error(socket.id, error, { action: "error" });
       });
     });
 
-    logger.info("[Socket] Realtime service initialized");
+    socketLogger.init("initialized", { action: "ready" });
   }
 
   /**
@@ -166,9 +165,11 @@ class RealtimeService {
       // Join personal room for targeted messages
       void socket.join(`user:${userId}`);
 
-      logger.debug(
-        `[Socket] User ${userId} registered device "${device.deviceName}" (${device.deviceId}) with socket ${socket.id}`,
-      );
+      socketLogger.auth("register", userId, socket.id, {
+        deviceId: device.deviceId,
+        deviceName: device.deviceName,
+        action: "device_registered",
+      });
     });
   }
 
@@ -178,12 +179,20 @@ class RealtimeService {
   private registerPlaylistHandlers(socket: Socket) {
     socket.on("playlist:join", (playlistId: string) => {
       void socket.join(`playlist:${playlistId}`);
-      logger.debug(`[Socket] ${socket.id} joined playlist:${playlistId}`);
+      socketLogger.event("playlist:join", socket.id, {
+        playlistId,
+        room: `playlist:${playlistId}`,
+        action: "joined",
+      });
     });
 
     socket.on("playlist:leave", (playlistId: string) => {
       void socket.leave(`playlist:${playlistId}`);
-      logger.debug(`[Socket] ${socket.id} left playlist:${playlistId}`);
+      socketLogger.event("playlist:leave", socket.id, {
+        playlistId,
+        room: `playlist:${playlistId}`,
+        action: "left",
+      });
     });
   }
 
@@ -192,15 +201,23 @@ class RealtimeService {
    */
   private registerMusicControlHandlers(socket: Socket) {
     socket.on("listening:update", (data: unknown) => {
+      const startTime = Date.now();
+
       // Validate payload structure
       if (!isValidListeningUpdatePayload(data)) {
-        logger.warn("[Socket] listening:update received invalid payload");
+        socketLogger.event("listening:update", socket.id, {
+          level: "warn",
+          action: "invalid_payload",
+        });
         return;
       }
 
       const socketInfo = this.socketToDevice.get(socket.id);
       if (!socketInfo) {
-        logger.warn("[Socket] listening:update from unauthenticated socket");
+        socketLogger.event("listening:update", socket.id, {
+          level: "warn",
+          action: "unauthenticated",
+        });
         return;
       }
 
@@ -229,13 +246,16 @@ class RealtimeService {
       };
       userDevices.set(deviceId, status);
 
-      logger.debug(
-        `[Socket] User ${userId} device "${data.device.deviceName}" updated status`,
-        {
-          track: status.track?.title,
-          isPlaying: status.isPlaying,
-        },
-      );
+      const processingTime = Date.now() - startTime;
+      socketLogger.event("listening:update", socket.id, {
+        userId,
+        deviceId,
+        deviceName: data.device.deviceName,
+        track: status.track?.title,
+        isPlaying: status.isPlaying,
+        processingTime: `${processingTime}ms`,
+        action: "status_updated",
+      });
 
       this.broadcastUserListeningStatus(userId);
     });
@@ -244,7 +264,10 @@ class RealtimeService {
     socket.on("listening:subscribe", async (targetUserId: string) => {
       const socketInfo = this.socketToDevice.get(socket.id);
       if (!socketInfo) {
-        logger.warn("[Socket] listening:subscribe from unauthenticated socket");
+        socketLogger.event("listening:subscribe", socket.id, {
+          level: "warn",
+          action: "unauthenticated",
+        });
         return;
       }
 
@@ -273,22 +296,30 @@ class RealtimeService {
       };
       socket.emit("listening:status", userStatus);
 
-      logger.debug(
-        `[Socket] User ${myUserId} subscribed to ${targetUserId} (${devices.length} devices online)`,
-      );
+      socketLogger.auth("subscribe", myUserId, socket.id, {
+        targetUserId,
+        devicesOnline: devices.length,
+        action: "subscribed",
+      });
     });
 
     socket.on("listening:unsubscribe", (targetUserId: string) => {
       void socket.leave(`listening:${targetUserId}`);
-      logger.debug(
-        `[Socket] ${socket.id} unsubscribed from listening:${targetUserId}`,
-      );
+      socketLogger.auth("unsubscribe", targetUserId, socket.id, {
+        room: `listening:${targetUserId}`,
+        action: "unsubscribed",
+      });
     });
 
     socket.on("control:action", async (data: ControlActionPayload) => {
+      const startTime = Date.now();
+
       const socketInfo = this.socketToDevice.get(socket.id);
       if (!socketInfo) {
-        logger.warn("[Socket] control:action from unauthenticated socket");
+        socketLogger.event("control:action", socket.id, {
+          level: "warn",
+          action: "unauthenticated",
+        });
         return;
       }
 
@@ -316,9 +347,15 @@ class RealtimeService {
           fromUserId: controllerId,
         });
 
-        logger.info(
-          `[Socket] Control action ${data.action} sent from ${controllerId} to device ${data.targetDeviceId} of user ${data.targetUserId}`,
-        );
+        const processingTime = Date.now() - startTime;
+        socketLogger.event("control:action", socket.id, {
+          controllerId,
+          targetUserId: data.targetUserId,
+          targetDeviceId: data.targetDeviceId,
+          controlAction: data.action,
+          processingTime: `${processingTime}ms`,
+          action: "command_sent",
+        });
 
         socket.emit("control:success", {
           action: data.action,
@@ -352,9 +389,13 @@ class RealtimeService {
       devices,
     };
 
-    logger.debug(
-      `[Socket] Broadcasting ${devices.length} devices for user ${userId} to ${subscriberCount} subscribers`,
-    );
+    socketLogger.broadcast("device_status", {
+      userId,
+      room,
+      deviceCount: devices.length,
+      subscriberCount,
+      action: "broadcasted",
+    });
 
     // Emit to the listening room for this user
     this.io.to(room).emit("listening:status", userStatus);
@@ -386,9 +427,11 @@ class RealtimeService {
       this.socketToDevice.delete(socket.id);
       this.deviceToSocket.delete(deviceKey);
 
-      logger.debug(
-        `[Socket] Cleaned up device ${deviceId} for user ${userId} on disconnect`,
-      );
+      socketLogger.event("device:cleanup", socket.id, {
+        userId,
+        deviceId,
+        action: "cleaned_up",
+      });
     }
   }
 
@@ -412,7 +455,12 @@ class RealtimeService {
     data?: PlaylistEventPayload,
   ) {
     if (!this.io) {
-      logger.warn("[Socket] Cannot emit - Socket.io not initialized");
+      socketLogger.event("playlist:updated", "N/A", {
+        level: "warn",
+        playlistId,
+        event,
+        action: "not_initialized",
+      });
       return;
     }
 
@@ -420,9 +468,12 @@ class RealtimeService {
       .to(`playlist:${playlistId}`)
       .emit("playlist:updated", { playlistId, event, ...data });
 
-    logger.debug(
-      `[Socket] Emitted playlist:updated (${event}) to playlist:${playlistId}`,
-    );
+    socketLogger.broadcast("playlist_updated", {
+      playlistId,
+      event,
+      room: `playlist:${playlistId}`,
+      action: "broadcasted",
+    });
   }
 
   /**
@@ -449,9 +500,13 @@ class RealtimeService {
       canControl: granted,
     });
 
-    logger.debug(
-      `[Socket] Permission ${granted ? "granted" : "revoked"}: ${ownerId} -> ${targetUserId}`,
-    );
+    socketLogger.broadcast("permission_changed", {
+      ownerId,
+      targetUserId,
+      granted,
+      room: `user:${targetUserId}`,
+      action: granted ? "granted" : "revoked",
+    });
   }
 
   /**

@@ -191,6 +191,13 @@ export class AuthService {
   }
 
   /**
+   * Refresh access token using refresh token
+   */
+  async refreshToken(refreshToken: string): Promise<AuthResponse> {
+    return this.sessionService.refreshToken(refreshToken);
+  }
+
+  /**
    * Get user profile by ID
    */
   async getUserProfile(userId: string): Promise<UserProfile> {

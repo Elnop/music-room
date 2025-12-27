@@ -56,10 +56,17 @@ export class ApiError extends Error {
  * Get client metadata headers for action logging
  */
 function getClientHeaders(): Record<string, string> {
+  // Try multiple sources for app version
+  const appVersion =
+    Constants.expoConfig?.version ||
+    Constants.manifest?.version ||
+    Constants.manifest2?.extra?.expoClient?.version ||
+    '1.0.0'; // Fallback to default version from app.json
+
   const headers = {
     'X-Platform': Platform.OS, // "android" or "ios"
     'X-Device-Model': Device.modelName || Device.deviceName || 'Unknown Device',
-    'X-App-Version': Constants.expoConfig?.version || Constants.manifest?.version || '0.0.0',
+    'X-App-Version': appVersion,
   };
 
   // Debug: Log headers being sent (only in development)
@@ -70,6 +77,8 @@ function getClientHeaders(): Record<string, string> {
       deviceName: Device.deviceName,
       expoConfigVersion: Constants.expoConfig?.version,
       manifestVersion: Constants.manifest?.version,
+      manifest2Version: Constants.manifest2?.extra?.expoClient?.version,
+      finalAppVersion: appVersion,
       headers,
     });
   }
@@ -78,61 +87,75 @@ function getClientHeaders(): Record<string, string> {
 }
 
 /**
- * Make API request with error handling
+ * Make API request with automatic token refresh on 401
  */
 async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_URL}${endpoint}`;
 
-  try {
-    const response = await fetch(url, {
+  // Helper to make the actual request
+  const makeRequest = async (authToken?: string): Promise<Response> => {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...getClientHeaders(),
+      ...(options.headers as Record<string, string>),
+    };
+
+    // Add authorization header if provided
+    if (authToken) {
+      headers['Authorization'] = `Bearer ${authToken}`;
+    }
+
+    return fetch(url, {
       ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...getClientHeaders(), // Add client metadata for backend logging
-        ...options.headers,
-      },
+      headers,
     });
+  };
 
-    // Check if response is OK (status 200-299)
-    if (!response.ok) {
-      // Try to parse error response as JSON
-      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.error?.message || errorData.message || errorMessage;
-      } catch {
-        // If response is not JSON, try to get text
-        try {
-          const errorText = await response.text();
-          errorMessage = errorText || errorMessage;
-        } catch {
-          // Keep default error message
-        }
+  try {
+    // Skip token refresh logic for the /refresh endpoint itself to avoid recursion
+    if (endpoint === '/api/auth/refresh') {
+      console.log('[API] Skipping interceptor for /refresh endpoint');
+      const response = await makeRequest();
+      return handleResponse<T>(response);
+    }
+
+    // Import authStore dynamically to avoid circular dependency
+    const { useAuthStore } = await import('@/store/authStore');
+    const { accessToken, isTokenExpiringSoon, refreshAccessToken } = useAuthStore.getState();
+
+    // Proactive refresh: Check if token is about to expire
+    if (accessToken && isTokenExpiringSoon()) {
+      console.log('[API] Token expiring soon, proactively refreshing...');
+      await refreshAccessToken();
+
+      // Get the new token after refresh
+      const { accessToken: newAccessToken } = useAuthStore.getState();
+      const response = await makeRequest(newAccessToken || undefined);
+      return handleResponse<T>(response);
+    }
+
+    // Make initial request
+    const response = await makeRequest(accessToken || undefined);
+
+    // Check if response is 401 Unauthorized
+    if (response.status === 401) {
+      console.log('[API] Received 401, attempting token refresh...');
+
+      // Try to refresh token
+      const refreshSuccess = await refreshAccessToken();
+
+      if (!refreshSuccess) {
+        throw new ApiError('Session expired. Please login again.', 'SESSION_EXPIRED');
       }
-      throw new ApiError(errorMessage, `HTTP_${response.status}`);
+
+      // Retry request with new token
+      const { accessToken: newAccessToken } = useAuthStore.getState();
+      const retryResponse = await makeRequest(newAccessToken || undefined);
+
+      return handleResponse<T>(retryResponse);
     }
 
-    // Parse successful response
-    let data: ApiResponse<T>;
-    try {
-      data = await response.json();
-    } catch (parseError) {
-      throw new ApiError('Invalid JSON response from server', 'PARSE_ERROR', parseError);
-    }
-
-    if (!data.success || data.error) {
-      throw new ApiError(
-        data.error?.message || 'API request failed',
-        data.error?.code || 'UNKNOWN_ERROR',
-        data.error?.details
-      );
-    }
-
-    if (!data.data) {
-      throw new ApiError('No data in response', 'NO_DATA');
-    }
-
-    return data.data;
+    return handleResponse<T>(response);
   } catch (error) {
     if (error instanceof ApiError) {
       throw error;
@@ -145,6 +168,50 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
 
     throw new ApiError('Unknown error occurred', 'UNKNOWN_ERROR');
   }
+}
+
+/**
+ * Handle response parsing and errors
+ */
+async function handleResponse<T>(response: Response): Promise<T> {
+  // Check if response is OK (status 200-299)
+  if (!response.ok) {
+    let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.error?.message || errorData.message || errorMessage;
+    } catch {
+      try {
+        const errorText = await response.text();
+        errorMessage = errorText || errorMessage;
+      } catch {
+        // Keep default error message
+      }
+    }
+    throw new ApiError(errorMessage, `HTTP_${response.status}`);
+  }
+
+  // Parse successful response
+  let data: ApiResponse<T>;
+  try {
+    data = await response.json();
+  } catch (parseError) {
+    throw new ApiError('Invalid JSON response from server', 'PARSE_ERROR', parseError);
+  }
+
+  if (!data.success || data.error) {
+    throw new ApiError(
+      data.error?.message || 'API request failed',
+      data.error?.code || 'UNKNOWN_ERROR',
+      data.error?.details
+    );
+  }
+
+  if (!data.data) {
+    throw new ApiError('No data in response', 'NO_DATA');
+  }
+
+  return data.data;
 }
 
 /**

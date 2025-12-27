@@ -22,6 +22,15 @@ router.post("/register", (req, res, next) =>
 router.post("/login", (req, res, next) => authController.login(req, res, next));
 
 /**
+ * @route   POST /api/auth/refresh
+ * @desc    Refresh access token using refresh token
+ * @access  Public (no auth middleware - uses refresh token)
+ */
+router.post("/refresh", (req, res, next) =>
+  authController.refreshToken(req, res, next),
+);
+
+/**
  * @route   GET /api/auth/me
  * @desc    Get current authenticated user profile
  * @access  Private (requires authentication)

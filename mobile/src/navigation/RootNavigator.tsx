@@ -22,6 +22,15 @@ export function RootNavigator() {
   useEffect(() => {
     // Load auth state from AsyncStorage on app start
     loadFromStorage()
+      .then(async () => {
+        // After loading, check if token needs refresh
+        const { isAuthenticated, isTokenExpiringSoon, refreshAccessToken } = useAuthStore.getState();
+
+        if (isAuthenticated && isTokenExpiringSoon()) {
+          console.log('[RootNavigator] Token expired/expiring, refreshing...');
+          await refreshAccessToken();
+        }
+      })
       .catch((error: Error) => {
         console.error('Failed to load auth state:', error);
       })
@@ -50,6 +59,7 @@ export function RootNavigator() {
           user: null,
           accessToken: null,
           refreshToken: null,
+          tokenExpiresAt: null,
           isAuthenticated: false,
           isLoading: false,
           error: null,
@@ -64,6 +74,7 @@ export function RootNavigator() {
             useAuthStore.setState({
               accessToken: session.access_token,
               refreshToken: session.refresh_token,
+              tokenExpiresAt: session.expires_at ? session.expires_at * 1000 : null,
             });
           }
         }

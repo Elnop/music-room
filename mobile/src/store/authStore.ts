@@ -12,6 +12,7 @@ const STORAGE_KEYS = {
   ACCESS_TOKEN: '@musicroom/access_token',
   REFRESH_TOKEN: '@musicroom/refresh_token',
   IS_AUTHENTICATED: '@musicroom/is_authenticated',
+  TOKEN_EXPIRES_AT: '@musicroom/token_expires_at',
 } as const;
 
 /**
@@ -30,8 +31,10 @@ interface AuthState {
   user: UserProfile | null;
   accessToken: string | null;
   refreshToken: string | null;
+  tokenExpiresAt: number | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isRefreshing: boolean;
   error: string | null;
   linkedProviders: LinkedProvider[] | null;
 
@@ -42,6 +45,10 @@ interface AuthState {
   loginWithFacebook: () => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (data: Partial<UserProfile>) => Promise<void>;
+
+  // Token refresh
+  refreshAccessToken: () => Promise<boolean>;
+  isTokenExpiringSoon: () => boolean;
 
   // Provider management
   fetchLinkedProviders: () => Promise<void>;
@@ -65,8 +72,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   accessToken: null,
   refreshToken: null,
+  tokenExpiresAt: null,
   isAuthenticated: false,
   isLoading: false,
+  isRefreshing: false,
   error: null,
   linkedProviders: null,
 
@@ -91,6 +100,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         user: response.user,
         accessToken: response.session.accessToken,
         refreshToken: response.session.refreshToken,
+        tokenExpiresAt: response.session.expiresAt * 1000, // Convert to milliseconds
         isAuthenticated: true,
         isLoading: false,
       });
@@ -106,6 +116,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         user: null,
         accessToken: null,
         refreshToken: null,
+        tokenExpiresAt: null,
       });
       throw error;
     }
@@ -126,6 +137,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         user: response.user,
         accessToken: response.session.accessToken,
         refreshToken: response.session.refreshToken,
+        tokenExpiresAt: response.session.expiresAt * 1000, // Convert to milliseconds
         isAuthenticated: true,
         isLoading: false,
       });
@@ -141,6 +153,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         user: null,
         accessToken: null,
         refreshToken: null,
+        tokenExpiresAt: null,
       });
       throw error;
     }
@@ -173,6 +186,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         user: null,
         accessToken: null,
         refreshToken: null,
+        tokenExpiresAt: null,
         isAuthenticated: false,
         isLoading: false,
         error: null,
@@ -207,6 +221,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         user: response.user,
         accessToken: response.session.accessToken,
         refreshToken: response.session.refreshToken,
+        tokenExpiresAt: response.session.expiresAt * 1000, // Convert to milliseconds
         isAuthenticated: true,
         isLoading: false,
       });
@@ -294,6 +309,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         user: response.user,
         accessToken: response.session.accessToken,
         refreshToken: response.session.refreshToken,
+        tokenExpiresAt: response.session.expiresAt * 1000, // Convert to milliseconds
         isAuthenticated: true,
         isLoading: false,
       });
@@ -403,19 +419,23 @@ export const useAuthStore = create<AuthState>((set, get) => ({
    */
   loadFromStorage: async () => {
     try {
-      const [userJson, accessToken, refreshToken, isAuthJson] = await Promise.all([
+      const [userJson, accessToken, refreshToken, isAuthJson, expiresAtStr] = await Promise.all([
         AsyncStorage.getItem(STORAGE_KEYS.AUTH_USER),
         AsyncStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN),
         AsyncStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN),
         AsyncStorage.getItem(STORAGE_KEYS.IS_AUTHENTICATED),
+        AsyncStorage.getItem(STORAGE_KEYS.TOKEN_EXPIRES_AT),
       ]);
 
       if (userJson && accessToken && isAuthJson === 'true') {
         const user: UserProfile = JSON.parse(userJson);
+        const tokenExpiresAt = expiresAtStr ? parseInt(expiresAtStr, 10) : null;
+
         set({
           user,
           accessToken,
           refreshToken,
+          tokenExpiresAt,
           isAuthenticated: true,
         });
       }
@@ -430,7 +450,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
    * Save auth state to AsyncStorage
    */
   saveToStorage: async () => {
-    const { user, accessToken, refreshToken, isAuthenticated } = get();
+    const { user, accessToken, refreshToken, tokenExpiresAt, isAuthenticated } = get();
 
     try {
       if (user && accessToken && isAuthenticated) {
@@ -439,6 +459,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           AsyncStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, accessToken),
           AsyncStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken || ''),
           AsyncStorage.setItem(STORAGE_KEYS.IS_AUTHENTICATED, 'true'),
+          AsyncStorage.setItem(STORAGE_KEYS.TOKEN_EXPIRES_AT, tokenExpiresAt?.toString() || ''),
         ]);
       }
     } catch (error) {
@@ -456,6 +477,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         AsyncStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN),
         AsyncStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN),
         AsyncStorage.removeItem(STORAGE_KEYS.IS_AUTHENTICATED),
+        AsyncStorage.removeItem(STORAGE_KEYS.TOKEN_EXPIRES_AT),
       ]);
     } catch (error) {
       console.error('Failed to clear auth storage:', error);
@@ -506,6 +528,98 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       });
       throw error;
     }
+  },
+
+  /**
+   * Refresh access token using refresh token
+   */
+  refreshAccessToken: async () => {
+    const { refreshToken, isRefreshing } = get();
+
+    // Prevent concurrent refresh (race condition)
+    if (isRefreshing) {
+      console.log('[AuthStore] Refresh already in progress, waiting...');
+      return new Promise<boolean>((resolve) => {
+        let attempts = 0;
+        const maxAttempts = 50; // 5 seconds max wait
+        const checkInterval = setInterval(() => {
+          attempts++;
+          if (!get().isRefreshing) {
+            clearInterval(checkInterval);
+            console.log('[AuthStore] Refresh completed, continuing...');
+            resolve(true);
+          } else if (attempts >= maxAttempts) {
+            clearInterval(checkInterval);
+            console.error('[AuthStore] Refresh timeout - forcing reset');
+            set({ isRefreshing: false });
+            resolve(false);
+          }
+        }, 100);
+      });
+    }
+
+    if (!refreshToken) {
+      console.error('[AuthStore] No refresh token available');
+      await get().logout();
+      return false;
+    }
+
+    set({ isRefreshing: true });
+
+    try {
+      console.log('[AuthStore] Refreshing access token...', {
+        refreshTokenLength: refreshToken.length,
+        refreshTokenStart: refreshToken.substring(0, 20) + '...',
+      });
+
+      const response = await authApi.refreshToken(refreshToken);
+
+      console.log('[AuthStore] Refresh API call successful, updating state...');
+
+      set({
+        user: response.user,
+        accessToken: response.session.accessToken,
+        refreshToken: response.session.refreshToken,
+        tokenExpiresAt: response.session.expiresAt * 1000,
+        isAuthenticated: true,
+        isRefreshing: false,
+      });
+
+      await get().saveToStorage();
+
+      await supabase.auth.setSession({
+        access_token: response.session.accessToken,
+        refresh_token: response.session.refreshToken,
+      });
+
+      console.log('[AuthStore] Token refreshed successfully');
+      return true;
+    } catch (error) {
+      console.error('[AuthStore] Token refresh failed:', {
+        error,
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+        errorType: error?.constructor?.name,
+      });
+      set({ isRefreshing: false });
+
+      // Don't logout immediately on refresh failure - could be network issue
+      // Instead, let the next API call trigger another refresh attempt
+      console.warn('[AuthStore] Skipping auto-logout on refresh failure');
+      return false;
+    }
+  },
+
+  /**
+   * Check if token is expired or about to expire
+   */
+  isTokenExpiringSoon: () => {
+    const { tokenExpiresAt } = get();
+    if (!tokenExpiresAt) return true;
+
+    const now = Date.now();
+    const fiveMinutes = 5 * 60 * 1000;
+
+    return tokenExpiresAt - now < fiveMinutes;
   },
 
   /**

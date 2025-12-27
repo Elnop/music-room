@@ -86,14 +86,7 @@ class Logger {
 
     // Console output
     if (env.NODE_ENV === "development") {
-      const emoji = {
-        info: "ℹ️",
-        warn: "⚠️",
-        error: "❌",
-        debug: "🐛",
-      }[level];
-
-      console.log(`${emoji} [${level.toUpperCase()}] ${message}`, meta || "");
+      console.log(`[${level.toUpperCase()}] ${message}`, meta || "");
     } else {
       // Production: JSON to stdout (for Docker logs)
       console.log(JSON.stringify(logEntry));
