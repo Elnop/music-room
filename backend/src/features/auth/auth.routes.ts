@@ -1,16 +1,32 @@
 import { Router } from "express";
 import { AuthController } from "@/features/auth/auth.controller.js";
 import { authMiddleware } from "@/features/auth/auth.middleware.js";
+import {
+  loginRateLimiter,
+  registerRateLimiter,
+  oauthRateLimiter,
+  globalAuthRateLimiter,
+} from "@/features/auth/middleware/rate-limit.middleware.js";
+import {
+  checkAccountLockout,
+  checkIPBlacklist,
+} from "@/features/auth/middleware/account-lockout.middleware.js";
 
 const router = Router();
 const authController = new AuthController();
+
+// Apply IP blacklist check to ALL auth routes (first line of defense)
+router.use(checkIPBlacklist);
+
+// Apply global rate limiter to ALL auth routes (safety net)
+router.use(globalAuthRateLimiter);
 
 /**
  * @route   POST /api/auth/register
  * @desc    Register a new user
  * @access  Public
  */
-router.post("/register", (req, res, next) =>
+router.post("/register", registerRateLimiter, (req, res, next) =>
   authController.register(req, res, next),
 );
 
@@ -19,14 +35,19 @@ router.post("/register", (req, res, next) =>
  * @desc    Login user with email and password
  * @access  Public
  */
-router.post("/login", (req, res, next) => authController.login(req, res, next));
+router.post(
+  "/login",
+  loginRateLimiter,
+  checkAccountLockout,
+  (req, res, next) => authController.login(req, res, next),
+);
 
 /**
  * @route   POST /api/auth/refresh
  * @desc    Refresh access token using refresh token
  * @access  Public (no auth middleware - uses refresh token)
  */
-router.post("/refresh", (req, res, next) =>
+router.post("/refresh", loginRateLimiter, (req, res, next) =>
   authController.refreshToken(req, res, next),
 );
 
@@ -53,7 +74,7 @@ router.post("/logout", authMiddleware, (req, res, next) =>
  * @desc    Login with Google OAuth
  * @access  Public
  */
-router.post("/google", (req, res, next) =>
+router.post("/google", oauthRateLimiter, (req, res, next) =>
   authController.googleLogin(req, res, next),
 );
 
@@ -62,7 +83,7 @@ router.post("/google", (req, res, next) =>
  * @desc    Login with Facebook OAuth
  * @access  Public
  */
-router.post("/facebook", (req, res, next) =>
+router.post("/facebook", oauthRateLimiter, (req, res, next) =>
   authController.facebookLogin(req, res, next),
 );
 

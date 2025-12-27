@@ -25,6 +25,7 @@ Music_Room/
 - **Real-time**: Socket.io
 - **Database**: PostgreSQL (Supabase)
 - **Authentication**: Supabase Auth
+- **Cache & Rate Limiting**: Redis 7-alpine
 
 ### Mobile
 - **Framework**: React Native 0.81 + Expo SDK 54
@@ -300,10 +301,11 @@ See the [doc/SUMMARY.md](./SUMMARY.md) for project status and completed features
 └────────┬────────┘
          │ Supabase Client SDK
          ▼
-┌─────────────────┐
-│  Supabase       │  PostgreSQL + Auth
-│  (Cloud)        │  Cloud-hosted
-└─────────────────┘
+┌─────────────────┐       ┌─────────────────┐
+│  Supabase       │       │  Redis          │
+│  (Cloud)        │       │  Port: 6379     │
+│  PostgreSQL     │       │  Cache & Limits │
+└─────────────────┘       └─────────────────┘
 ```
 
 ## Environment Variables
@@ -315,6 +317,13 @@ See the [doc/SUMMARY.md](./SUMMARY.md) for project status and completed features
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_KEY=your-service-key
+
+# Redis (Rate Limiting & Brute Force Protection)
+REDIS_HOST=redis                    # "redis" en Docker, "localhost" en local
+REDIS_PORT=6379
+REDIS_PASSWORD=                     # Optionnel
+RATE_LIMIT_ENABLED=true
+ACCOUNT_LOCKOUT_ENABLED=true
 
 # Server
 PORT=3000
@@ -336,6 +345,7 @@ API_URL=http://localhost:3000
 
 ## Documentation
 
+- **[REDIS.md](./REDIS.md)**: Redis cache & brute force protection
 - **[DOCKER.md](./DOCKER.md)**: Complete Docker guide with troubleshooting
 - **[GETTING_STARTED.md](./GETTING_STARTED.md)**: Getting started guide
 - **[GIT_WORKFLOW.md](./GIT_WORKFLOW.md)**: Git workflow and best practices

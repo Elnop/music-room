@@ -50,6 +50,7 @@ make stop
 - **Real-time**: Socket.io for WebSocket communication
 - **Database**: PostgreSQL via Supabase
 - **Auth**: Supabase Auth with JWT tokens
+- **Cache & Rate Limiting**: Redis 7-alpine
 - **Validation**: Zod schemas
 - **Music**: SoundCloud API via `soundcloud.ts` package
 
@@ -75,6 +76,7 @@ make stop
 - [CLAUDE.md](./CLAUDE.md) - Complete development guide
 - [doc/README.md](./doc/README.md) - Project overview
 - [doc/GETTING_STARTED.md](./doc/GETTING_STARTED.md) - Setup instructions
+- [doc/REDIS.md](./doc/REDIS.md) - Redis cache & brute force protection
 - [doc/DOCKER.md](./doc/DOCKER.md) - Docker architecture
 - [doc/TUNNEL_MODE.md](./doc/TUNNEL_MODE.md) - Cross-network development
 - [doc/REALTIME.md](./doc/REALTIME.md) - Real-time Socket.io documentation

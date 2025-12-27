@@ -64,6 +64,25 @@ services:
     stdin_open: true
     tty: true
 
+  # Redis Service (Rate Limiting & Brute Force Protection)
+  redis:
+    image: redis:7-alpine
+    container_name: music-room-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - music-room-network
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
 networks:
   music-room-network:
     driver: bridge
@@ -71,4 +90,6 @@ networks:
 
 volumes:
   tunnel-info:
+    driver: local
+  redis-data:
     driver: local

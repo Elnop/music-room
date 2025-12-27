@@ -110,3 +110,11 @@ EXPO_URL := exp://$(HOST_IP):$(METRO_PORT)
 # Example for macOS:
 #   export ANDROID_HOME=$HOME/Library/Android/sdk
 #   export JAVA_HOME=/opt/homebrew/opt/openjdk@17
+
+# ========================================
+# Redis Configuration
+# ========================================
+REDIS_CONTAINER_NAME := music-room-redis
+REDIS_IMAGE := redis:7-alpine
+REDIS_PORT := 6379
+REDIS_DATA_VOLUME := redis-data
