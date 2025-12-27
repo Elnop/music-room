@@ -20,7 +20,7 @@ export function formatAuthResponse(
   return {
     user: {
       id: user.id,
-      email: user.email,
+      email: user.email ?? "",
       username,
       displayName,
       avatarUrl,
@@ -31,8 +31,8 @@ export function formatAuthResponse(
     session: {
       accessToken: session.access_token,
       refreshToken: session.refresh_token,
-      expiresIn: session.expires_in,
-      expiresAt: session.expires_at,
+      expiresIn: session.expires_in ?? 0,
+      expiresAt: session.expires_at ?? 0,
     },
   };
 }
@@ -62,7 +62,14 @@ export async function fetchUserProfile(userId: string): Promise<{
     throw new AppError(500, "Failed to fetch user profile", "PROFILE_ERROR");
   }
 
-  return profile;
+  return {
+    username: profile.username,
+    display_name: profile.display_name ?? undefined,
+    avatar_url: profile.avatar_url ?? undefined,
+    bio: profile.bio ?? undefined,
+    created_at: profile.created_at ?? new Date().toISOString(),
+    updated_at: profile.updated_at ?? new Date().toISOString(),
+  };
 }
 
 /**
@@ -91,11 +98,11 @@ export async function getUserProfile(userId: string): Promise<UserProfile> {
       id: user.user.id,
       email: user.user.email ?? "",
       username: profile.username,
-      displayName: profile.display_name,
-      avatarUrl: profile.avatar_url,
-      bio: profile.bio,
-      createdAt: profile.created_at,
-      updatedAt: profile.updated_at,
+      displayName: profile.display_name ?? undefined,
+      avatarUrl: profile.avatar_url ?? undefined,
+      bio: profile.bio ?? undefined,
+      createdAt: profile.created_at ?? new Date().toISOString(),
+      updatedAt: profile.updated_at ?? new Date().toISOString(),
     };
   } catch (error) {
     if (error instanceof AppError) throw error;

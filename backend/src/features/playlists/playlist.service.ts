@@ -93,8 +93,8 @@ export class PlaylistService {
           acc[owner.id] = {
             id: owner.id,
             username: owner.username,
-            displayName: owner.display_name,
-            avatarUrl: owner.avatar_url,
+            displayName: owner.display_name ?? undefined,
+            avatarUrl: owner.avatar_url ?? undefined,
           };
           return acc;
         },
@@ -206,8 +206,8 @@ export class PlaylistService {
         ? {
             id: owner.id,
             username: owner.username,
-            displayName: owner.display_name,
-            avatarUrl: owner.avatar_url,
+            displayName: owner.display_name ?? undefined,
+            avatarUrl: owner.avatar_url ?? undefined,
           }
         : undefined;
 
@@ -285,7 +285,7 @@ export class PlaylistService {
         ...formatTrackResponse(pt.tracks as unknown as TrackRow),
         position: pt.position,
         addedBy: pt.added_by,
-        addedAt: pt.added_at,
+        addedAt: pt.added_at ?? new Date().toISOString(),
       }));
 
       return {
@@ -294,8 +294,8 @@ export class PlaylistService {
         owner: {
           id: owner.id,
           username: owner.username,
-          displayName: owner.display_name,
-          avatarUrl: owner.avatar_url,
+          displayName: owner.display_name ?? undefined,
+          avatarUrl: owner.avatar_url ?? undefined,
         },
       };
     } catch (error) {

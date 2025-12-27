@@ -1,3 +1,6 @@
+import Constants from 'expo-constants';
+import * as Device from 'expo-device';
+import { Platform } from 'react-native';
 import type { LoginInput, RegisterInput } from '@utils/validators';
 import type { UserProfile } from '@types';
 
@@ -50,6 +53,17 @@ export class ApiError extends Error {
 }
 
 /**
+ * Get client metadata headers for action logging
+ */
+function getClientHeaders(): Record<string, string> {
+  return {
+    'X-Platform': Platform.OS, // "android" or "ios"
+    'X-Device-Model': Device.modelName || 'Unknown Device',
+    'X-App-Version': Constants.expoConfig?.version || '0.0.0',
+  };
+}
+
+/**
  * Make API request with error handling
  */
 async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -60,6 +74,7 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
       ...options,
       headers: {
         'Content-Type': 'application/json',
+        ...getClientHeaders(), // Add client metadata for backend logging
         ...options.headers,
       },
     });

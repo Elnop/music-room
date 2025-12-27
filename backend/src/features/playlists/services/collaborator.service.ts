@@ -48,7 +48,7 @@ export class CollaboratorService {
       }
 
       // Check if already collaborator
-      if (playlist.collaborator_ids.includes(collaboratorId)) {
+      if ((playlist.collaborator_ids ?? []).includes(collaboratorId)) {
         throw new AppError(
           409,
           "User is already a collaborator",
@@ -60,7 +60,7 @@ export class CollaboratorService {
       const { error: updateError } = await supabaseAdmin
         .from("playlists")
         .update({
-          collaborator_ids: [...playlist.collaborator_ids, collaboratorId],
+          collaborator_ids: [...(playlist.collaborator_ids ?? []), collaboratorId],
         })
         .eq("id", playlistId);
 
@@ -109,7 +109,7 @@ export class CollaboratorService {
       const { error: updateError } = await supabaseAdmin
         .from("playlists")
         .update({
-          collaborator_ids: playlist.collaborator_ids.filter(
+          collaborator_ids: (playlist.collaborator_ids ?? []).filter(
             (id: string) => id !== collaboratorId,
           ),
         })

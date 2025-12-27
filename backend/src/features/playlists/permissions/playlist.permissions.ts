@@ -24,8 +24,8 @@ export class PlaylistPermissions {
     return (
       playlist.visibility === "public" ||
       playlist.owner_id === userId ||
-      playlist.collaborator_ids.includes(userId) ||
-      playlist.viewer_ids.includes(userId)
+      (playlist.collaborator_ids ?? []).includes(userId) ||
+      (playlist.viewer_ids ?? []).includes(userId)
     );
   }
 
@@ -41,7 +41,7 @@ export class PlaylistPermissions {
       return true;
     }
 
-    if (playlist.collaborator_ids.includes(userId)) {
+    if ((playlist.collaborator_ids ?? []).includes(userId)) {
       return true;
     }
 
@@ -107,7 +107,10 @@ export class PlaylistPermissions {
       throw new AppError(404, "Playlist not found", "PLAYLIST_NOT_FOUND");
     }
 
-    return playlist;
+    return {
+      owner_id: playlist.owner_id,
+      collaborator_ids: playlist.collaborator_ids ?? [],
+    };
   }
 
   /**

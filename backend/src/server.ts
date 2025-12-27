@@ -4,6 +4,7 @@ import { createServer } from "http";
 import { env } from "./shared/config/env.js";
 import { logger } from "./shared/utils/logger.js";
 import { errorHandler } from "./shared/middleware/error-handler.js";
+import { actionLoggerMiddleware } from "./shared/middleware/action-logger.middleware.js";
 import { routes } from "./shared/config/routes.js";
 import { realtime } from "./realtime/index.js";
 
@@ -66,29 +67,8 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Request logging
-app.use((req, res, next) => {
-  const logData: {
-    ip: string | undefined;
-    userAgent: string | undefined;
-    origin: string | undefined;
-    body?: Record<string, unknown>;
-  } = {
-    ip: req.ip,
-    userAgent: req.get("user-agent"),
-    origin: req.get("origin"),
-  };
-
-  // Log body for POST/PUT/PATCH requests (hide passwords)
-  if (["POST", "PUT", "PATCH"].includes(req.method) && req.body) {
-    const body = { ...req.body } as Record<string, unknown>;
-    if (body.password) body.password = "***";
-    logData.body = body;
-  }
-
-  logger.info(`📨 ${req.method} ${req.path}`, logData);
-  next();
-});
+// Action logging middleware (extracts platform/device/version + logs all requests)
+app.use(actionLoggerMiddleware);
 
 // =====================================================
 // Health Check

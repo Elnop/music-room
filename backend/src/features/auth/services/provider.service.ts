@@ -35,7 +35,7 @@ export class ProviderService {
     if (profile.has_password) {
       providers.push({
         type: "password",
-        connectedAt: profile.created_at,
+        connectedAt: profile.created_at ?? new Date().toISOString(),
         isPrimary: providers.length === 0,
       });
     }
@@ -43,7 +43,7 @@ export class ProviderService {
     if (profile.google_id) {
       providers.push({
         type: "google",
-        connectedAt: profile.created_at,
+        connectedAt: profile.created_at ?? new Date().toISOString(),
         isPrimary: providers.length === 0,
       });
     }
@@ -51,7 +51,7 @@ export class ProviderService {
     if (profile.facebook_id) {
       providers.push({
         type: "facebook",
-        connectedAt: profile.created_at,
+        connectedAt: profile.created_at ?? new Date().toISOString(),
         isPrimary: providers.length === 0,
       });
     }

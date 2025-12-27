@@ -53,7 +53,7 @@ export class ViewerService {
       }
 
       // Check if already a collaborator (editors don't need viewer access)
-      if (playlist.collaborator_ids.includes(viewerId)) {
+      if ((playlist.collaborator_ids ?? []).includes(viewerId)) {
         throw new AppError(
           409,
           "User is already a collaborator with edit access",
@@ -61,14 +61,14 @@ export class ViewerService {
         );
       }
 
-      if (playlist.viewer_ids.includes(viewerId)) {
+      if ((playlist.viewer_ids ?? []).includes(viewerId)) {
         throw new AppError(409, "User is already a viewer", "ALREADY_VIEWER");
       }
 
       const { error: updateError } = await supabaseAdmin
         .from("playlists")
         .update({
-          viewer_ids: [...playlist.viewer_ids, viewerId],
+          viewer_ids: [...(playlist.viewer_ids ?? []), viewerId],
         })
         .eq("id", playlistId);
 
@@ -113,7 +113,7 @@ export class ViewerService {
       const { error: updateError } = await supabaseAdmin
         .from("playlists")
         .update({
-          viewer_ids: playlist.viewer_ids.filter(
+          viewer_ids: (playlist.viewer_ids ?? []).filter(
             (id: string) => id !== viewerId,
           ),
         })
@@ -160,22 +160,22 @@ export class ViewerService {
         throw new AppError(404, "Playlist not found", "PLAYLIST_NOT_FOUND");
       }
 
-      if (playlist.viewer_ids.length === 0) {
+      if ((playlist.viewer_ids ?? []).length === 0) {
         return [];
       }
 
       const { data: viewers, error: viewersError } = await supabaseAdmin
         .from("user_profiles")
         .select("id, username, display_name, avatar_url")
-        .in("id", playlist.viewer_ids);
+        .in("id", playlist.viewer_ids ?? []);
 
       if (viewersError) throw viewersError;
 
       return (viewers || []).map((v) => ({
         id: v.id,
         username: v.username,
-        displayName: v.display_name,
-        avatarUrl: v.avatar_url,
+        displayName: v.display_name ?? undefined,
+        avatarUrl: v.avatar_url ?? undefined,
       }));
     } catch (error) {
       if (error instanceof AppError) throw error;
