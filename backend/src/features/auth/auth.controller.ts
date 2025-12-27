@@ -10,6 +10,7 @@ import {
 import type { ApiResponse } from "@/shared/types/global.types.js";
 import type { AuthenticatedRequest } from "@/shared/types/global.types.js";
 import { logger } from "@/shared/utils/logger.js";
+import { bruteForceService } from "@/features/auth/services/brute-force.service.js";
 
 const authService = new AuthService();
 
@@ -57,6 +58,9 @@ export class AuthController {
    * Login user with email and password
    */
   async login(req: Request, res: Response, next: NextFunction) {
+    const email = req.body?.email || "unknown";
+    const ip = req.ip || req.socket.remoteAddress || "unknown";
+
     try {
       const body = req.body as { email?: string; password?: string };
       logger.info("Login request received", {
@@ -64,16 +68,22 @@ export class AuthController {
         hasPassword: !!body?.password,
         contentType: req.headers["content-type"],
         origin: req.headers["origin"],
+        ip,
       });
 
       const validated = loginSchema.parse(req.body);
       logger.info("Login validation passed", { email: validated.email });
 
       const result = await authService.login(validated);
+
+      // SUCCESS: Reset failed attempts counter
+      await bruteForceService.resetFailedAttempts(email, ip);
+
       logger.info("Login successful", {
         userId: result.user.id,
         email: result.user.email,
         hasAccessToken: !!result.session.accessToken,
+        ip,
       });
 
       const response: ApiResponse = {
@@ -86,12 +96,30 @@ export class AuthController {
 
       res.json(response);
     } catch (error) {
-      const body = req.body as { email?: string };
-      logger.error("Login error", {
+      // FAILURE: Record failed attempt and IP activity
+      const lockStatus = await bruteForceService.recordFailedAttempt(
+        email,
+        ip,
+      );
+      await bruteForceService.recordIPActivity(ip);
+
+      logger.warn("Login failed", {
         error: error instanceof Error ? error.message : "Unknown error",
-        stack: error instanceof Error ? error.stack : undefined,
-        email: body?.email,
+        email,
+        ip,
+        failedAttempts: lockStatus.failedAttempts,
+        remainingAttempts: lockStatus.remainingAttempts,
       });
+
+      // Add lockout warning to error if approaching threshold
+      if (!lockStatus.isLocked && lockStatus.failedAttempts >= 3) {
+        // Check if error has a response property (like AppError)
+        if (error && typeof error === "object") {
+          (error as any).remainingAttempts = lockStatus.remainingAttempts;
+          (error as any).lockoutWarning = `Account will be locked after ${lockStatus.remainingAttempts} more failed attempts`;
+        }
+      }
+
       next(error);
     }
   }

@@ -118,3 +118,90 @@ endef
 define docker_build_service
 	@$(DOCKER_COMPOSE) build $(1)
 endef
+
+# ==============================================================================
+# Redis-Specific Helpers
+# ==============================================================================
+
+# Check if Redis container is running
+# Usage: $(call is_redis_running)
+# Returns: "true" or "false"
+define is_redis_running
+$(shell docker ps --filter "name=$(REDIS_CONTAINER_NAME)" --filter "status=running" --format "{{.Names}}" 2>/dev/null | grep -q "$(REDIS_CONTAINER_NAME)" && echo "true" || echo "false")
+endef
+
+# Check if Redis container exists (running or stopped)
+# Usage: $(call redis_exists)
+# Returns: "true" or "false"
+define redis_exists
+$(shell docker ps -a --filter "name=$(REDIS_CONTAINER_NAME)" --format "{{.Names}}" 2>/dev/null | grep -q "$(REDIS_CONTAINER_NAME)" && echo "true" || echo "false")
+endef
+
+# Start Redis container (docker-compose up -d redis)
+# Usage: $(call ensure_redis_started)
+define ensure_redis_started
+	@if [ "$(call is_redis_running)" = "true" ]; then \
+		echo "$(GREEN)✓$(RESET) Redis is already running"; \
+	else \
+		echo "$(YELLOW)→$(RESET) Starting Redis container..."; \
+		$(DOCKER_COMPOSE) up -d redis; \
+		echo "$(GREEN)✓$(RESET) Redis started"; \
+	fi
+endef
+
+# Stop Redis container
+# Usage: $(call stop_redis)
+define stop_redis
+	@if [ "$(call is_redis_running)" = "true" ]; then \
+		echo "$(YELLOW)→$(RESET) Stopping Redis container..."; \
+		$(DOCKER_COMPOSE) stop redis; \
+		echo "$(GREEN)✓$(RESET) Redis stopped"; \
+	else \
+		echo "$(YELLOW)⚠$(RESET) Redis is not running"; \
+	fi
+endef
+
+# Restart Redis container
+# Usage: $(call restart_redis)
+define restart_redis
+	@if [ "$(call redis_exists)" = "true" ]; then \
+		echo "$(YELLOW)→$(RESET) Restarting Redis container..."; \
+		$(DOCKER_COMPOSE) restart redis; \
+		echo "$(GREEN)✓$(RESET) Redis restarted"; \
+	else \
+		echo "$(YELLOW)⚠$(RESET) Redis container does not exist. Use 'make redis-start' first."; \
+	fi
+endef
+
+# Check Redis health (PING command)
+# Usage: $(call check_redis_health_verbose)
+define check_redis_health_verbose
+	@if [ "$(call is_redis_running)" != "true" ]; then \
+		echo "$(RED)✗$(RESET) Redis container is not running"; \
+		exit 1; \
+	fi; \
+	PONG=$$(docker exec $(REDIS_CONTAINER_NAME) redis-cli PING 2>/dev/null); \
+	if [ "$$PONG" = "PONG" ]; then \
+		echo "$(GREEN)✓$(RESET) Redis is healthy (PONG received)"; \
+	else \
+		echo "$(RED)✗$(RESET) Redis is not responding"; \
+		exit 1; \
+	fi
+endef
+
+# Check Redis status (container + health)
+# Usage: $(call check_redis_status)
+define check_redis_status
+	@if [ "$(call is_redis_running)" = "true" ]; then \
+		PONG=$$(docker exec $(REDIS_CONTAINER_NAME) redis-cli PING 2>/dev/null); \
+		if [ "$$PONG" = "PONG" ]; then \
+			echo "$(GREEN)✓$(RESET) Redis: Running and healthy"; \
+		else \
+			echo "$(YELLOW)⚠$(RESET) Redis: Running but not responding"; \
+		fi; \
+	elif [ "$(call redis_exists)" = "true" ]; then \
+		echo "$(YELLOW)⚠$(RESET) Redis: Stopped"; \
+	else \
+		echo "$(RED)✗$(RESET) Redis: Not created"; \
+	fi
+endef

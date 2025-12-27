@@ -49,16 +49,21 @@ clean-deps: ## Remove all dependencies and build artifacts (node_modules, dist, 
 clean-all: ## Complete cleanup - Docker system + project artifacts + global caches
 	@echo "$(BOLD)$(RED)⚠️  COMPLETE CLEANUP - THIS WILL REMOVE EVERYTHING!$(RESET)"
 	@echo "$(YELLOW)This will remove:$(RESET)"
+	@echo "  - Redis container and data volume"
 	@echo "  - ALL Docker resources on this machine (containers, images, volumes, networks, cache)"
 	@echo "  - ALL node_modules and build artifacts (backend + mobile)"
 	@echo "  - ALL project caches (coverage, logs, .expo, native builds, etc.)"
 	@echo "  - ALL global caches (Expo, Metro, Watchman, Gradle)"
 	@echo ""
 	@echo "$(RED)Starting complete cleanup...$(RESET)"
-	@echo "$(CYAN)Step 1/5: Stopping all Docker containers...$(RESET)"
+	@echo "$(CYAN)Step 1/6: Stopping all Docker containers...$(RESET)"
 	@containers=$$(docker ps -aq 2>/dev/null); \
 	if [ -n "$$containers" ]; then docker stop $$containers 2>/dev/null || true; fi
-	@echo "$(CYAN)Step 2/5: Removing all Docker resources...$(RESET)"
+	@echo "$(CYAN)Step 2/6: Removing Redis resources...$(RESET)"
+	@docker stop $(REDIS_CONTAINER_NAME) 2>/dev/null || true
+	@docker rm $(REDIS_CONTAINER_NAME) 2>/dev/null || true
+	@docker volume rm music-room_$(REDIS_DATA_VOLUME) 2>/dev/null || true
+	@echo "$(CYAN)Step 3/6: Removing all Docker resources...$(RESET)"
 	@containers=$$(docker ps -aq 2>/dev/null); \
 	if [ -n "$$containers" ]; then docker rm $$containers 2>/dev/null || true; fi; \
 	images=$$(docker images -aq 2>/dev/null); \
@@ -68,7 +73,7 @@ clean-all: ## Complete cleanup - Docker system + project artifacts + global cach
 	docker network prune -f 2>/dev/null || true; \
 	docker builder prune -af 2>/dev/null || true; \
 	docker system prune -af --volumes 2>/dev/null || true
-	@echo "$(CYAN)Step 3/5: Cleaning project artifacts...$(RESET)"
+	@echo "$(CYAN)Step 4/6: Cleaning project artifacts...$(RESET)"
 	@rm -rf backend/node_modules mobile/node_modules 2>/dev/null || true
 	@rm -rf backend/dist mobile/.expo 2>/dev/null || true
 	@rm -rf mobile/android mobile/ios 2>/dev/null || true
@@ -77,11 +82,11 @@ clean-all: ## Complete cleanup - Docker system + project artifacts + global cach
 	@rm -rf /tmp/shared 2>/dev/null || true
 	@find . -name "*.tsbuildinfo" -type f -delete 2>/dev/null || true
 	@find mobile -name ".eas-build-*.json" -type f -delete 2>/dev/null || true
-	@echo "$(CYAN)Step 4/5: Cleaning global caches...$(RESET)"
+	@echo "$(CYAN)Step 5/6: Cleaning global caches...$(RESET)"
 	@rm -rf ~/.expo ~/.cache/expo 2>/dev/null || true
 	@rm -rf ~/.cache/metro-bundler 2>/dev/null || true
 	@rm -rf ~/.watchman 2>/dev/null || true
-	@echo "$(CYAN)Step 5/5: Cleaning Gradle caches...$(RESET)"
+	@echo "$(CYAN)Step 6/6: Cleaning Gradle caches...$(RESET)"
 	@rm -rf ~/.gradle ~/.android/build-cache 2>/dev/null || true
 	@echo ""
 	@echo "$(BOLD)$(GREEN)✓✓✓ COMPLETE CLEANUP FINISHED ✓✓✓$(RESET)"

@@ -18,6 +18,7 @@ include make/sync.mk
 include make/onboarding.mk
 include make/quality.mk
 include make/supabase.mk
+include make/redis.mk
 include make/build.mk
 include make/production.mk
 include make/cleanup.mk

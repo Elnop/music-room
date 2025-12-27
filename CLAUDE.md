@@ -278,6 +278,51 @@ make prod-keystore-setup  # Generate signing keystore
 
 **Documentation**: See [BUILD.md](./BUILD.md) for complete build guide, troubleshooting, and CI/CD integration.
 
+### Redis Management
+
+Redis can be launched independently for local development, useful for brute force protection and rate limiting.
+
+```bash
+# Start Redis container
+make redis-start       # Start Redis independently
+make redis-stop        # Stop Redis
+make redis-restart     # Restart Redis
+
+# Monitoring
+make redis-logs        # View Redis logs (live)
+make redis-health      # Check Redis health status
+make redis-status      # Quick status check
+
+# Management
+make redis-shell       # Open Redis CLI shell (debug/inspect data)
+make redis-info        # Display Redis server info
+make redis-flush       # Flush all data (with confirmation)
+make redis-help        # Show all Redis commands
+```
+
+**Common Workflows**:
+```bash
+# Start Redis with local backend
+make redis-start && make backend-local
+
+# Inspect rate limit data
+make redis-shell
+> KEYS *
+> GET failed_login:test@example.com:127.0.0.1
+> TTL failed_login:test@example.com:127.0.0.1
+
+# Check memory usage
+make redis-info | grep -A 10 "# Memory"
+```
+
+**When to use:**
+- Running backend locally (`make backend-local`)
+- Testing rate limiting and brute force protection
+- Debugging authentication lockouts
+- Inspecting cached data
+
+**Note:** Redis automatically starts with `make dev-docker`. Standalone commands are for local development mode only.
+
 ### Code Quality
 
 ```bash

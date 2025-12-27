@@ -13,6 +13,41 @@ const envSchema = z.object({
     .default("development"),
   ALLOWED_ORIGINS: z.string().default("http://localhost:8081"),
   TUNNEL_URL: z.string().optional(), // Optional ngrok tunnel URL for cross-network development
+
+  // Redis Configuration
+  REDIS_HOST: z.string().default("redis"),
+  REDIS_PORT: z.string().default("6379"),
+  REDIS_PASSWORD: z.string().optional(),
+  REDIS_DB: z.string().default("0"),
+
+  // Rate Limiting Configuration
+  RATE_LIMIT_ENABLED: z.string().default("true"),
+  RATE_LIMIT_LOGIN_WINDOW_MS: z.string().default("900000"),
+  RATE_LIMIT_LOGIN_MAX: z.string().default("5"),
+  RATE_LIMIT_REGISTER_WINDOW_MS: z.string().default("3600000"),
+  RATE_LIMIT_REGISTER_MAX: z.string().default("3"),
+  RATE_LIMIT_OAUTH_WINDOW_MS: z.string().default("900000"),
+  RATE_LIMIT_OAUTH_MAX: z.string().default("10"),
+  RATE_LIMIT_AUTH_WINDOW_MS: z.string().default("900000"),
+  RATE_LIMIT_AUTH_MAX: z.string().default("20"),
+
+  // Account Lockout Configuration
+  ACCOUNT_LOCKOUT_ENABLED: z.string().default("true"),
+  ACCOUNT_LOCKOUT_THRESHOLD: z.string().default("5"),
+  ACCOUNT_LOCKOUT_DURATION_SOFT: z.string().default("900"),
+  ACCOUNT_LOCKOUT_DURATION_HARD: z.string().default("3600"),
+  ACCOUNT_LOCKOUT_DURATION_SEVERE: z.string().default("86400"),
+
+  // IP Reputation Configuration
+  IP_THROTTLE_THRESHOLD: z.string().default("10"),
+  IP_BLOCK_THRESHOLD: z.string().default("20"),
+  IP_BLACKLIST_THRESHOLD: z.string().default("50"),
+
+  // IP Whitelist
+  RATE_LIMIT_WHITELIST_IPS: z.string().default(""),
+
+  // Graceful Degradation
+  RATE_LIMIT_FALLBACK_MEMORY: z.string().default("true"),
 });
 
 export type Env = z.infer<typeof envSchema>;

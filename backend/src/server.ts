@@ -7,6 +7,7 @@ import { errorHandler } from "@/shared/middleware/error-handler.js";
 import { actionLoggerMiddleware } from "@/shared/middleware/action-logger.middleware.js";
 import { routes } from "@/shared/config/routes.js";
 import { realtime } from "@/realtime/index.js";
+import { connectRedis, disconnectRedis, checkRedisHealth } from "@/shared/config/redis.js";
 
 // Initialize Express app
 const app = express();
@@ -15,6 +16,13 @@ const app = express();
 const httpServer = createServer(app);
 
 realtime.initialize(httpServer);
+
+// Initialize Redis connection
+connectRedis().catch((error) => {
+  logger.error("Failed to initialize Redis", {
+    error: error instanceof Error ? error.message : "Unknown error",
+  });
+});
 
 // =====================================================
 // Middleware
@@ -72,12 +80,17 @@ app.use(actionLoggerMiddleware);
 // Health Check
 // =====================================================
 
-app.get("/health", (req, res) => {
+app.get("/health", async (req, res) => {
+  const redisHealthy = await checkRedisHealth();
+
   res.json({
     status: "ok",
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     environment: env.NODE_ENV,
+    services: {
+      redis: redisHealthy ? "connected" : "disconnected",
+    },
   });
 });
 
@@ -130,16 +143,18 @@ httpServer.listen(PORT, () => {
 });
 
 // Graceful shutdown
-process.on("SIGTERM", () => {
+process.on("SIGTERM", async () => {
   logger.info("SIGTERM received, shutting down gracefully...");
+  await disconnectRedis();
   httpServer.close(() => {
     logger.info("Server closed");
     process.exit(0);
   });
 });
 
-process.on("SIGINT", () => {
+process.on("SIGINT", async () => {
   logger.info("SIGINT received, shutting down gracefully...");
+  await disconnectRedis();
   httpServer.close(() => {
     logger.info("Server closed");
     process.exit(0);
