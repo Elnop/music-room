@@ -13,6 +13,12 @@ pnpm-lock.yaml
 dist/
 build/
 
+# Android signing keys
+*.keystore
+*.jks
+mobile/android/gradle.properties
+mobile/android/key.properties
+
 # Logs
 logs/
 *.log

@@ -128,6 +128,96 @@ make clean-native     # Clean android/ios/expo folders
 - Testing native modules
 - Expo Go limitations
 
+### Build Commands
+
+Music Room provides build commands for backend validation and production mobile releases.
+
+#### Backend Builds
+
+```bash
+# TypeScript compilation (validation)
+make compile-backend    # Build backend TypeScript (fast validation)
+make verify-backend     # Check backend/dist/ artifacts exist
+make build-clean        # Remove build artifacts only
+
+# Production Docker image
+make compile-backend-docker # Build production backend image
+```
+
+**When to use backend builds**:
+- `make compile-backend` - Quick validation before commits (check TypeScript compiles)
+- `make verify-backend` - CI/CD pipelines to verify artifacts exist
+- `make compile-backend-docker` - Build production Docker image for deployment
+
+**Note**: Normal development does **not** need builds - `make dev-docker` and `make dev-local` use hot reload (tsx watch / Metro bundler).
+
+#### Production Mobile Builds (Android)
+
+Build production Android apps (AAB format) for Google Play Store deployment.
+
+```bash
+# Build production AAB for Google Play Store
+make prod-build         # EAS cloud build (~15-25 min, recommended)
+make prod-build-local   # EAS local build (requires Android SDK)
+make prod-build-manual  # Manual Gradle build (full control)
+
+# Version management
+make prod-version-bump  # Interactive version bump (e.g., 1.0.0 → 1.0.1)
+make prod-version-auto  # Auto-increment versionCode only
+
+# Deployment
+make prod-submit        # Submit AAB to Google Play Store
+make prod-info          # Display build information
+
+# Setup (one-time, for manual builds only)
+make prod-keystore-setup # Generate production keystore for signing
+```
+
+**Production Release Workflow**:
+```bash
+# 1. Bump version
+make prod-version-bump   # e.g., 1.0.0 → 1.0.1
+
+# 2. Build production AAB
+make prod-build          # Cloud build (easiest, ~15-25 min)
+
+# 3. Submit to Play Store
+make prod-submit         # Automatic submission via EAS
+```
+
+**Build Options Explained**:
+
+- **`prod-build`** (EAS Cloud - Recommended)
+  - Builds AAB on EAS servers
+  - No local Android SDK needed
+  - Auto-increments versionCode
+  - Duration: ~15-25 minutes
+  - Requires: EAS CLI (`npm install -g eas-cli`), Expo account
+
+- **`prod-build-local`** (EAS Local)
+  - Builds AAB on your machine
+  - Faster (~5-15 min, no queue)
+  - Requires: Android SDK, ANDROID_HOME set
+
+- **`prod-build-manual`** (Gradle)
+  - Full control over build process
+  - No EAS dependency
+  - Requires: Keystore setup (`make prod-keystore-setup`)
+
+**First-Time Setup**:
+```bash
+# Install EAS CLI (if using cloud/local builds)
+npm install -g eas-cli
+
+# Login to Expo
+cd mobile && eas login
+
+# For manual builds only
+make prod-keystore-setup  # Generate signing keystore
+```
+
+**Documentation**: See [BUILD.md](./BUILD.md) for complete build guide, troubleshooting, and CI/CD integration.
+
 ### Code Quality
 
 ```bash

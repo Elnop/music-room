@@ -1,6 +1,15 @@
 import type { Request } from "express";
 
 /**
+ * Action log context containing client metadata
+ */
+export interface ActionLogContext {
+  platform?: string;
+  device?: string;
+  appVersion?: string;
+}
+
+/**
  * Extended Express Request with authenticated user
  */
 export interface AuthenticatedRequest extends Request {
@@ -9,6 +18,7 @@ export interface AuthenticatedRequest extends Request {
     email: string;
     role?: string;
   };
+  actionLogContext?: ActionLogContext;
 }
 
 /**

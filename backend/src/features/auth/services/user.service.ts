@@ -145,7 +145,7 @@ export class UserService {
     providerId: string,
     email: string | undefined,
     profile: { name: string; picture?: string | { data: { url: string } } },
-  ): Promise<{ userProfile: UserProfileRow; session: Session }> {
+  ): Promise<{ userProfile: UserProfile; session: Session }> {
     try {
       const providerColumn = `${provider}_id`; // 'google_id' or 'facebook_id'
 
@@ -175,7 +175,16 @@ export class UserService {
         const session = await this.createSessionForOAuthUser(effectiveEmail);
 
         return {
-          userProfile: existingOAuth,
+          userProfile: {
+            id: existingOAuth.id,
+            email: effectiveEmail,
+            username: existingOAuth.username,
+            displayName: existingOAuth.display_name ?? undefined,
+            avatarUrl: existingOAuth.avatar_url ?? undefined,
+            bio: existingOAuth.bio ?? undefined,
+            createdAt: existingOAuth.created_at ?? new Date().toISOString(),
+            updatedAt: existingOAuth.updated_at ?? new Date().toISOString(),
+          },
           session,
         };
       }
@@ -225,22 +234,36 @@ export class UserService {
 
         if (existingProfile) {
           // Check if this provider is already linked to the account
-          if (existingProfile[providerColumn]) {
+          const providerValue = existingProfile[providerColumn as keyof UserProfileRow];
+          if (providerValue) {
             // Provider already linked, just create session
             const session =
               await this.createSessionForOAuthUser(effectiveEmail);
             return {
-              userProfile: existingProfile as UserProfile,
+              userProfile: {
+                id: existingProfile.id,
+                email: effectiveEmail,
+                username: existingProfile.username,
+                displayName: existingProfile.display_name ?? undefined,
+                avatarUrl: existingProfile.avatar_url ?? undefined,
+                bio: existingProfile.bio ?? undefined,
+                createdAt: existingProfile.created_at ?? new Date().toISOString(),
+                updatedAt: existingProfile.updated_at ?? new Date().toISOString(),
+              },
               session,
             };
           }
 
           // Update profile with OAuth provider ID (additive - doesn't overwrite other providers)
+          const avatarUrl = typeof profile.picture === 'string'
+            ? profile.picture
+            : profile.picture?.data?.url ?? existingProfile.avatar_url;
+
           const { error: updateError } = await supabase
             .from("user_profiles")
             .update({
               [providerColumn]: providerId,
-              avatar_url: profile.picture || existingProfile.avatar_url,
+              avatar_url: avatarUrl || existingProfile.avatar_url || null,
               updated_at: new Date().toISOString(),
             })
             .eq("id", existingProfile.id);
@@ -255,7 +278,16 @@ export class UserService {
           const session = await this.createSessionForOAuthUser(effectiveEmail);
 
           return {
-            userProfile: existingProfile as UserProfile,
+            userProfile: {
+              id: existingProfile.id,
+              email: effectiveEmail,
+              username: existingProfile.username,
+              displayName: existingProfile.display_name ?? undefined,
+              avatarUrl: existingProfile.avatar_url ?? undefined,
+              bio: existingProfile.bio ?? undefined,
+              createdAt: existingProfile.created_at ?? new Date().toISOString(),
+              updatedAt: existingProfile.updated_at ?? new Date().toISOString(),
+            },
             session,
           };
         }
@@ -293,13 +325,18 @@ export class UserService {
 
       // Create user profile with race condition handling
       try {
+        // Extract avatar URL from Facebook's picture object or use string directly
+        const avatarUrlValue = typeof profile.picture === 'string'
+          ? profile.picture
+          : profile.picture?.data?.url ?? null;
+
         const { data: userProfile, error: profileError } = await supabase
           .from("user_profiles")
           .insert({
             id: authData.user.id,
             username,
             display_name: profile.name || username,
-            avatar_url: profile.picture || null,
+            avatar_url: avatarUrlValue,
             [providerColumn]: providerId,
             email_verified: true, // OAuth email verified by provider
           })
@@ -339,7 +376,16 @@ export class UserService {
         const session = await this.createSessionForOAuthUser(effectiveEmail);
 
         return {
-          userProfile,
+          userProfile: {
+            id: userProfile.id,
+            email: effectiveEmail,
+            username: userProfile.username,
+            displayName: userProfile.display_name ?? undefined,
+            avatarUrl: userProfile.avatar_url ?? undefined,
+            bio: userProfile.bio ?? undefined,
+            createdAt: userProfile.created_at ?? new Date().toISOString(),
+            updatedAt: userProfile.updated_at ?? new Date().toISOString(),
+          },
           session,
         };
       } catch (error) {

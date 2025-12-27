@@ -19,18 +19,18 @@ export function formatPlaylistResponse(
   return {
     id: row.id,
     name: row.name,
-    description: row.description,
-    coverUrl: row.cover_url,
+    description: row.description ?? undefined,
+    coverUrl: row.cover_url ?? undefined,
     firstTrackCover,
     ownerId: row.owner_id,
     owner,
-    collaboratorIds: row.collaborator_ids,
-    viewerIds: row.viewer_ids,
-    visibility: row.visibility,
-    editMode: row.edit_mode,
+    collaboratorIds: row.collaborator_ids ?? [],
+    viewerIds: row.viewer_ids ?? [],
+    visibility: row.visibility as "public" | "private",
+    editMode: row.edit_mode as "open" | "restricted",
     trackCount,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
+    createdAt: row.created_at ?? new Date().toISOString(),
+    updatedAt: row.updated_at ?? new Date().toISOString(),
   };
 }
 
@@ -43,12 +43,12 @@ export function formatTrackResponse(row: TrackRow): TrackResponse {
     trackUri: row.track_uri,
     title: row.title,
     artist: row.artist,
-    album: row.album,
-    albumArt: row.album_art,
+    album: row.album ?? undefined,
+    albumArt: row.album_art ?? undefined,
     durationMs: row.duration_ms,
-    previewUrl: row.preview_url,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
+    previewUrl: row.preview_url ?? undefined,
+    createdAt: row.created_at ?? new Date().toISOString(),
+    updatedAt: row.updated_at ?? new Date().toISOString(),
   };
 }
 
