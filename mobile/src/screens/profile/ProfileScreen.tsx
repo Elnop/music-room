@@ -22,6 +22,7 @@ import { Avatar } from '@components/common/Avatar';
 import { Button } from '@components/common/Button';
 import { ProfileSection } from '@components/profile/ProfileSection';
 import { GenreChip } from '@components/profile/GenreChip';
+import { ThemeSelector } from '@components/theme/ThemeSelector';
 
 type ProfileStackParamList = {
   Profile: undefined;
@@ -206,6 +207,11 @@ export function ProfileScreen() {
             <Text style={styles.infoLabel}>Member Since</Text>
             <Text style={styles.infoValue}>{new Date(user.createdAt).toLocaleDateString()}</Text>
           </View>
+        </ProfileSection>
+
+        {/* Theme Section */}
+        <ProfileSection title="Theme">
+          <ThemeSelector />
         </ProfileSection>
 
         {/* Quick Actions Section */}
