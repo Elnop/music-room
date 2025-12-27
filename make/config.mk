@@ -102,10 +102,11 @@ export HOST_IP
 # Expo URL
 EXPO_URL := exp://$(HOST_IP):$(METRO_PORT)
 
-# Android SDK (for local builds)
-export ANDROID_HOME := $(HOME)/Library/Android/sdk
-export PATH := $(PATH):$(ANDROID_HOME)/emulator:$(ANDROID_HOME)/platform-tools:$(ANDROID_HOME)/tools:$(ANDROID_HOME)/tools/bin
-
-# Java JDK (Homebrew OpenJDK 17)
-export JAVA_HOME := /opt/homebrew/opt/openjdk@17
-export PATH := $(JAVA_HOME)/bin:$(PATH)
+# Android SDK and Java JDK (for local builds)
+# These should be configured in your shell environment (~/.zshrc or ~/.bashrc)
+# Example for Linux:
+#   export ANDROID_HOME=$HOME/Android/Sdk
+#   export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+# Example for macOS:
+#   export ANDROID_HOME=$HOME/Library/Android/sdk
+#   export JAVA_HOME=/opt/homebrew/opt/openjdk@17
