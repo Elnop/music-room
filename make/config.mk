@@ -103,9 +103,9 @@ export HOST_IP
 EXPO_URL := exp://$(HOST_IP):$(METRO_PORT)
 
 # Android SDK (for local builds)
-export ANDROID_HOME := $(HOME)/Android/Sdk
+export ANDROID_HOME := $(HOME)/Library/Android/sdk
 export PATH := $(PATH):$(ANDROID_HOME)/emulator:$(ANDROID_HOME)/platform-tools:$(ANDROID_HOME)/tools:$(ANDROID_HOME)/tools/bin
 
-# Java JDK (bundled with Android Studio)
-export JAVA_HOME := $(HOME)/android-studio/jbr
+# Java JDK (Homebrew OpenJDK 17)
+export JAVA_HOME := /opt/homebrew/opt/openjdk@17
 export PATH := $(JAVA_HOME)/bin:$(PATH)

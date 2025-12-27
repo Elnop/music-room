@@ -85,9 +85,20 @@ async function apiRequest<T>(
   }
 }
 
+export interface MyStats {
+  followersCount: number;
+  followingCount: number;
+}
+
 export const friendsApi = {
   async getFriends(accessToken: string): Promise<FriendProfile[]> {
     return apiRequest<FriendProfile[]>('/api/friends', accessToken, {
+      method: 'GET',
+    });
+  },
+
+  async getMyStats(accessToken: string): Promise<MyStats> {
+    return apiRequest<MyStats>('/api/friends/stats/me', accessToken, {
       method: 'GET',
     });
   },

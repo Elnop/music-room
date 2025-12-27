@@ -13,7 +13,7 @@ export class FriendsController {
 
       const status = await friendsService.getFollowStatus(
         authReq.user.id,
-        userId,
+        userId
       );
 
       const response: ApiResponse = {
@@ -81,6 +81,26 @@ export class FriendsController {
       const response: ApiResponse = {
         success: true,
         data: friends,
+        meta: {
+          timestamp: new Date().toISOString(),
+        },
+      };
+
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getMyStats(req: Request, res: Response, next: NextFunction) {
+    try {
+      const authReq = req as AuthenticatedRequest;
+
+      const stats = await friendsService.getMyStats(authReq.user.id);
+
+      const response: ApiResponse = {
+        success: true,
+        data: stats,
         meta: {
           timestamp: new Date().toISOString(),
         },

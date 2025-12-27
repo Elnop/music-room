@@ -99,8 +99,6 @@ export function PlaylistSelectorModal({ visible, track, onClose }: Props) {
 
       if (__DEV__) console.log('🟢 [PlaylistSelector] Track added successfully');
 
-      Alert.alert('Success', `Added "${track.title}" to playlist`, [{ text: 'OK' }]);
-
       onClose();
     } catch (error) {
       console.error('🔴 [PlaylistSelector] Error adding track:', error);

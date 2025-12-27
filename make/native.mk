@@ -96,7 +96,15 @@ dev-build-local: .ensure-mobile-deps .ensure-backend-deps ## Build development c
 	$(call print_arrow,Building and installing on device...)
 	$(call print_info,Connect Android device via USB (USB debugging enabled))
 	$(call blank_line)
-	$(call expo_mobile,run:android --device)
+	@cd $(MOBILE_DIR) && \
+	DEVICE_COUNT=$$($(ANDROID_HOME)/platform-tools/adb devices | grep -E 'device$$' | wc -l | tr -d ' '); \
+	if [ "$$DEVICE_COUNT" -eq 0 ]; then \
+		echo "$(RED)$(ICON_ERROR) No Android device/emulator found$(NC)"; \
+		echo "$(YELLOW)$(ICON_WARNING) Start an emulator: make emulator-start$(NC)"; \
+		exit 1; \
+	fi; \
+	echo "$(GREEN)$(ICON_SUCCESS) Found $$DEVICE_COUNT device(s)$(NC)"; \
+	CI=false npx expo run:android
 	$(call blank_line)
 	$(call print_header,✓ Installed on Device)
 	$(call display_next_steps,Disconnect USB,$(GREEN)make dev-tunnel$(NC),Open dev build app and scan QR)

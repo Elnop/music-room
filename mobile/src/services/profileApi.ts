@@ -1,17 +1,8 @@
-import type { UserProfile } from '@types';
+import type { UserProfile, UpdateProfileData, FilteredProfile } from '@/types/user.types';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
 
 if (__DEV__) console.log('[ProfileAPI] Using API URL:', API_URL);
-
-/**
- * Profile update data
- */
-export interface UpdateProfileData {
-  displayName?: string;
-  bio?: string;
-  avatarUrl?: string;
-}
 
 /**
  * Standard API Response format (matches backend)
@@ -117,10 +108,10 @@ export const profileApi = {
   },
 
   /**
-   * Get user profile by ID
+   * Get user profile by ID (with privacy filtering)
    */
-  async getUserProfile(accessToken: string, userId: string): Promise<UserProfile> {
-    return apiRequest<UserProfile>(`/api/profile/${userId}`, accessToken, {
+  async getUserProfile(accessToken: string, userId: string): Promise<FilteredProfile> {
+    return apiRequest<FilteredProfile>(`/api/profile/${userId}`, accessToken, {
       method: 'GET',
     });
   },

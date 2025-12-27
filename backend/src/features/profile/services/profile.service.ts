@@ -24,6 +24,8 @@ export class ProfileService {
         updateData.display_name = data.displayName;
       if (data.bio !== undefined) updateData.bio = data.bio;
       if (data.avatarUrl !== undefined) updateData.avatar_url = data.avatarUrl;
+      if (data.favoriteArtist !== undefined)
+        updateData.favorite_artist = data.favoriteArtist;
       updateData.updated_at = new Date().toISOString();
 
       // Update user_profiles table
@@ -65,11 +67,12 @@ export class ProfileService {
         id: profileData.id,
         email: userData.user.email ?? "",
         username: profileData.username,
-        displayName: profileData.display_name ?? undefined,
-        avatarUrl: profileData.avatar_url ?? undefined,
-        bio: profileData.bio ?? undefined,
-        createdAt: profileData.created_at ?? new Date().toISOString(),
-        updatedAt: profileData.updated_at ?? new Date().toISOString(),
+        displayName: profileData.display_name,
+        avatarUrl: profileData.avatar_url,
+        bio: profileData.bio,
+        favoriteArtist: profileData.favorite_artist,
+        createdAt: profileData.created_at,
+        updatedAt: profileData.updated_at,
       };
     } catch (error) {
       if (error instanceof AppError) throw error;
@@ -110,11 +113,12 @@ export class ProfileService {
         id: profileData.id,
         email: userData.user.email ?? "",
         username: profileData.username,
-        displayName: profileData.display_name ?? undefined,
-        avatarUrl: profileData.avatar_url ?? undefined,
-        bio: profileData.bio ?? undefined,
-        createdAt: profileData.created_at ?? new Date().toISOString(),
-        updatedAt: profileData.updated_at ?? new Date().toISOString(),
+        displayName: profileData.display_name,
+        avatarUrl: profileData.avatar_url,
+        bio: profileData.bio,
+        favoriteArtist: profileData.favorite_artist,
+        createdAt: profileData.created_at,
+        updatedAt: profileData.updated_at,
       };
     } catch (error) {
       if (error instanceof AppError) throw error;
@@ -137,7 +141,9 @@ export class ProfileService {
       // Search by username or display_name using ilike (case-insensitive)
       let queryBuilder = supabase
         .from("user_profiles")
-        .select("id, username, display_name, avatar_url, bio, created_at")
+        .select(
+          "id, username, display_name, avatar_url, bio, favorite_artist, created_at",
+        )
         .or(`username.ilike.%${query}%,display_name.ilike.%${query}%`)
         .limit(limit);
 
@@ -156,10 +162,11 @@ export class ProfileService {
       return (data || []).map((profile) => ({
         id: profile.id,
         username: profile.username,
-        displayName: profile.display_name ?? undefined,
-        avatarUrl: profile.avatar_url ?? undefined,
-        bio: profile.bio ?? undefined,
-        createdAt: profile.created_at ?? new Date().toISOString(),
+        displayName: profile.display_name,
+        avatarUrl: profile.avatar_url,
+        bio: profile.bio,
+        favoriteArtist: profile.favorite_artist,
+        createdAt: profile.created_at,
       }));
     } catch (error) {
       if (error instanceof AppError) throw error;
