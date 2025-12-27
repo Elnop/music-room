@@ -56,11 +56,25 @@ export class ApiError extends Error {
  * Get client metadata headers for action logging
  */
 function getClientHeaders(): Record<string, string> {
-  return {
+  const headers = {
     'X-Platform': Platform.OS, // "android" or "ios"
-    'X-Device-Model': Device.modelName || 'Unknown Device',
-    'X-App-Version': Constants.expoConfig?.version || '0.0.0',
+    'X-Device-Model': Device.modelName || Device.deviceName || 'Unknown Device',
+    'X-App-Version': Constants.expoConfig?.version || Constants.manifest?.version || '0.0.0',
   };
+
+  // Debug: Log headers being sent (only in development)
+  if (__DEV__) {
+    console.log('[API] Client headers:', {
+      platform: Platform.OS,
+      deviceModelName: Device.modelName,
+      deviceName: Device.deviceName,
+      expoConfigVersion: Constants.expoConfig?.version,
+      manifestVersion: Constants.manifest?.version,
+      headers,
+    });
+  }
+
+  return headers;
 }
 
 /**
