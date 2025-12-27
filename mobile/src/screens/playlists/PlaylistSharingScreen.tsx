@@ -1,5 +1,14 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, Switch } from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  Switch,
+  ScrollView,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useFocusEffect } from '@react-navigation/native';
@@ -74,8 +83,10 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
   const [isSearching, setIsSearching] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [processingUserId, setProcessingUserId] = useState<string | null>(null);
+  const [isUpdatingSettings, setIsUpdatingSettings] = useState(false);
 
   const loadingRef = useRef(false);
+  const { updatePlaylist } = usePlaylistStore();
 
   const isPrivate = currentPlaylist?.visibility === 'private';
   const isEditRestricted = currentPlaylist?.editMode === 'restricted';
@@ -279,6 +290,82 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
     ]);
   };
 
+  const handleToggleVisibility = async () => {
+    if (isUpdatingSettings || !currentPlaylist) return;
+
+    const newVisibility = isPrivate ? 'public' : 'private';
+
+    // If switching to public, warn about removing access restrictions
+    if (isPrivate) {
+      Alert.alert(
+        'Rendre publique',
+        'Cette playlist sera visible par tout le monde. Les personnes ayant accès actuellement le conserveront.',
+        [
+          { text: 'Annuler', style: 'cancel' },
+          {
+            text: 'Confirmer',
+            onPress: async () => {
+              await performVisibilityUpdate(newVisibility);
+            },
+          },
+        ]
+      );
+    } else {
+      await performVisibilityUpdate(newVisibility);
+    }
+  };
+
+  const performVisibilityUpdate = async (newVisibility: 'public' | 'private') => {
+    setIsUpdatingSettings(true);
+    try {
+      await updatePlaylist(playlistId, { visibility: newVisibility });
+      await fetchPlaylistById(playlistId);
+    } catch (error) {
+      console.error('[PlaylistSharing] Failed to update visibility:', error);
+      Alert.alert('Erreur', 'Impossible de modifier la visibilité');
+    } finally {
+      setIsUpdatingSettings(false);
+    }
+  };
+
+  const handleToggleEditMode = async () => {
+    if (isUpdatingSettings || !currentPlaylist) return;
+
+    const newEditMode = isEditRestricted ? 'open' : 'restricted';
+
+    // If switching to open, warn about giving everyone edit access
+    if (isEditRestricted) {
+      const message = isPrivate
+        ? 'Toutes les personnes ayant accès pourront modifier cette playlist.'
+        : 'Tout le monde pourra modifier cette playlist.';
+
+      Alert.alert('Édition ouverte', message, [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Confirmer',
+          onPress: async () => {
+            await performEditModeUpdate(newEditMode);
+          },
+        },
+      ]);
+    } else {
+      await performEditModeUpdate(newEditMode);
+    }
+  };
+
+  const performEditModeUpdate = async (newEditMode: 'open' | 'restricted') => {
+    setIsUpdatingSettings(true);
+    try {
+      await updatePlaylist(playlistId, { editMode: newEditMode });
+      await fetchPlaylistById(playlistId);
+    } catch (error) {
+      console.error('[PlaylistSharing] Failed to update edit mode:', error);
+      Alert.alert('Erreur', 'Impossible de modifier le mode d\'édition');
+    } finally {
+      setIsUpdatingSettings(false);
+    }
+  };
+
   const handleToggleEdit = async (userId: string, currentCanEdit: boolean) => {
     if (processingUserId) return;
 
@@ -369,9 +456,63 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
     );
   };
 
+  const renderSettingsSection = () => (
+    <View style={styles.settingsSection}>
+      <Text style={styles.settingsSectionTitle}>Paramètres</Text>
+
+      {/* Visibility Toggle */}
+      <View style={styles.settingItem}>
+        <View style={styles.settingInfo}>
+          <Text style={styles.settingIcon}>{isPrivate ? '🔒' : '🌍'}</Text>
+          <View style={styles.settingTextContainer}>
+            <Text style={styles.settingLabel}>Visibilité</Text>
+            <Text style={styles.settingDescription}>
+              {isPrivate ? 'Privée - Seuls les invités peuvent voir' : 'Publique - Visible par tous'}
+            </Text>
+          </View>
+        </View>
+        {isUpdatingSettings ? (
+          <LoadingSpinner size="small" />
+        ) : (
+          <Switch
+            value={isPrivate}
+            onValueChange={handleToggleVisibility}
+            trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+            thumbColor={theme.colors.surface}
+          />
+        )}
+      </View>
+
+      {/* Edit Mode Toggle */}
+      <View style={styles.settingItem}>
+        <View style={styles.settingInfo}>
+          <Text style={styles.settingIcon}>{isEditRestricted ? '✏️' : '📝'}</Text>
+          <View style={styles.settingTextContainer}>
+            <Text style={styles.settingLabel}>Mode d'édition</Text>
+            <Text style={styles.settingDescription}>
+              {isEditRestricted
+                ? 'Restreint - Seuls les éditeurs peuvent modifier'
+                : 'Ouvert - Tout le monde peut modifier'}
+            </Text>
+          </View>
+        </View>
+        {isUpdatingSettings ? (
+          <LoadingSpinner size="small" />
+        ) : (
+          <Switch
+            value={isEditRestricted}
+            onValueChange={handleToggleEditMode}
+            trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+            thumbColor={theme.colors.surface}
+          />
+        )}
+      </View>
+    </View>
+  );
+
   const renderInfoCard = () => (
     <View style={styles.infoCard}>
-      <Text style={styles.infoIcon}>🌍</Text>
+      <Text style={styles.infoIcon}>ℹ️</Text>
       <View style={styles.infoContent}>
         <Text style={styles.infoTitle}>Playlist ouverte</Text>
         <Text style={styles.infoText}>
@@ -433,60 +574,66 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
-      <View style={styles.header}>
-        <Text style={styles.title}>{headerContent.title}</Text>
-        <Text style={styles.subtitle}>{headerContent.subtitle}</Text>
-      </View>
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        <View style={styles.header}>
+          <Text style={styles.title}>{headerContent.title}</Text>
+          <Text style={styles.subtitle}>{headerContent.subtitle}</Text>
+        </View>
 
-      <View style={styles.content}>
-        {isInfoOnly && renderInfoCard()}
+        <View style={styles.content}>
+          {/* Settings Section - Always visible */}
+          {renderSettingsSection()}
 
-        {!isInfoOnly && (
-          <SearchBar
-            value={searchQuery}
-            onChangeText={handleSearchChange}
-            placeholder="Rechercher un utilisateur..."
-            style={styles.searchBar}
-          />
-        )}
+          {isInfoOnly && renderInfoCard()}
 
-        {searchQuery.trim() && !isInfoOnly && (
-          <View style={styles.searchResults}>
-            <Text style={styles.sectionTitle}>Résultats</Text>
-            {isSearching ? (
-              <LoadingSpinner size="small" />
-            ) : searchResults.length > 0 ? (
-              <FlatList
-                data={searchResults}
-                keyExtractor={item => item.id}
-                renderItem={renderSearchResultItem}
-                style={styles.resultsList}
-                scrollEnabled={false}
-              />
-            ) : (
-              <Text style={styles.noResults}>Aucun utilisateur trouvé</Text>
-            )}
-          </View>
-        )}
+          {!isInfoOnly && (
+            <SearchBar
+              value={searchQuery}
+              onChangeText={handleSearchChange}
+              placeholder="Rechercher un utilisateur..."
+              style={styles.searchBar}
+            />
+          )}
 
-        {(!isInfoOnly || members.length > 0) && (
-          <View style={styles.membersSection}>
-            <Text style={styles.sectionTitle}>{getSectionTitle()}</Text>
+          {searchQuery.trim() && !isInfoOnly && (
+            <View style={styles.searchResults}>
+              <Text style={styles.sectionTitle}>Résultats</Text>
+              {isSearching ? (
+                <LoadingSpinner size="small" />
+              ) : searchResults.length > 0 ? (
+                <FlatList
+                  data={searchResults}
+                  keyExtractor={item => item.id}
+                  renderItem={renderSearchResultItem}
+                  style={styles.resultsList}
+                  scrollEnabled={false}
+                />
+              ) : (
+                <Text style={styles.noResults}>Aucun utilisateur trouvé</Text>
+              )}
+            </View>
+          )}
 
-            {members.length > 0 ? (
-              <FlatList
-                data={members}
-                keyExtractor={item => item.id}
-                renderItem={renderMemberItem}
-                style={styles.membersList}
-                extraData={processingUserId}
-              />
-            ) : (
-              !isInfoOnly && <Text style={styles.noMembers}>{getEmptyMessage()}</Text>
-            )}
-          </View>
-        )}
-      </View>
+          {(!isInfoOnly || members.length > 0) && (
+            <View style={styles.membersSection}>
+              <Text style={styles.sectionTitle}>{getSectionTitle()}</Text>
+
+              {members.length > 0 ? (
+                <FlatList
+                  data={members}
+                  keyExtractor={item => item.id}
+                  renderItem={renderMemberItem}
+                  style={styles.membersList}
+                  scrollEnabled={false}
+                  extraData={processingUserId}
+                />
+              ) : (
+                !isInfoOnly && <Text style={styles.noMembers}>{getEmptyMessage()}</Text>
+              )}
+            </View>
+          )}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -496,6 +643,12 @@ const createStyles = (theme: Theme) =>
     container: {
       flex: 1,
       backgroundColor: theme.colors.background,
+    },
+    scrollView: {
+      flex: 1,
+    },
+    scrollContent: {
+      flexGrow: 1,
     },
     header: {
       padding: theme.spacing.lg,
@@ -516,6 +669,51 @@ const createStyles = (theme: Theme) =>
     content: {
       flex: 1,
       padding: theme.spacing.lg,
+    },
+    settingsSection: {
+      marginBottom: theme.spacing.lg,
+    },
+    settingsSectionTitle: {
+      fontSize: theme.typography.sizes.sm,
+      fontWeight: theme.typography.weights.semibold,
+      color: theme.colors.textSecondary,
+      marginBottom: theme.spacing.sm,
+      textTransform: 'uppercase',
+      letterSpacing: 1,
+    },
+    settingItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: theme.colors.surface,
+      padding: theme.spacing.md,
+      borderRadius: theme.spacing.sm,
+      marginBottom: theme.spacing.sm,
+      borderWidth: theme.borders.medium,
+      borderColor: theme.colors.border,
+    },
+    settingInfo: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+      marginRight: theme.spacing.md,
+    },
+    settingIcon: {
+      fontSize: 24,
+      marginRight: theme.spacing.md,
+    },
+    settingTextContainer: {
+      flex: 1,
+    },
+    settingLabel: {
+      fontSize: theme.typography.sizes.md,
+      fontWeight: theme.typography.weights.semibold,
+      color: theme.colors.text,
+    },
+    settingDescription: {
+      fontSize: theme.typography.sizes.xs,
+      color: theme.colors.textSecondary,
+      marginTop: 2,
     },
     infoCard: {
       flexDirection: 'row',

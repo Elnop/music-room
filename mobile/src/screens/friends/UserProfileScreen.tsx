@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '@contexts';
 import type { Theme } from '@themes/types';
 import { useAuthStore } from '@/store/authStore';
 import { profileApi } from '@/services/profileApi';
+import { privacyApi } from '@/services/privacyApi';
 import { friendsApi, type FollowStatus } from '@/services/friendsApi';
 import { playlistApi } from '@/api/playlistApi';
 import { musicControlApi } from '@/services/musicControlApi';
@@ -15,7 +17,9 @@ import { Button } from '@/components/common/Button';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { PlaylistCard } from '@/components/playlist/PlaylistCard';
 import { DeviceListeningCard } from '@/components/music-control/DeviceListeningCard';
-import type { UserProfile, Playlist } from '@/types';
+import { ProfileSection } from '@/components/profile/ProfileSection';
+import { GenreChip } from '@/components/profile/GenreChip';
+import type { UserProfile, Playlist, FilteredProfile, MusicGenre } from '@/types';
 import type { FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
 
 type Props = NativeStackScreenProps<FriendsStackParamList, 'UserProfile'>;
@@ -27,6 +31,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
   const { accessToken } = useAuthStore();
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [filteredProfile, setFilteredProfile] = useState<FilteredProfile | null>(null);
   const [followStatus, setFollowStatus] = useState<FollowStatus | null>(null);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -50,13 +55,17 @@ export function UserProfileScreen({ route, navigation }: Props) {
       setError(null);
 
       try {
-        const [profileData, statusData, playlistsData, canControl] = await Promise.all([
-          profileApi.getUserProfile(accessToken, userId),
-          friendsApi.getFollowStatus(accessToken, userId),
-          playlistApi.fetchUserPublicPlaylists(userId),
-          musicControlApi.canControl(userId),
-        ]);
+        const [profileData, filteredData, statusData, playlistsData, canControl] = await Promise.all(
+          [
+            profileApi.getUserProfile(accessToken, userId),
+            privacyApi.getFilteredProfile(accessToken, userId),
+            friendsApi.getFollowStatus(accessToken, userId),
+            playlistApi.fetchUserPublicPlaylists(userId),
+            musicControlApi.canControl(userId),
+          ]
+        );
         setProfile(profileData);
+        setFilteredProfile(filteredData);
         setFollowStatus(statusData);
         setPlaylists(playlistsData);
         setInitialCanControl(canControl);
@@ -112,44 +121,75 @@ export function UserProfileScreen({ route, navigation }: Props) {
     );
   }
 
+  const isFriend = followStatus?.isFriend ?? false;
+  
+  // Privacy logic: undefined = hidden by privacy, value present = visible (even if empty)
+  const isAvatarHidden = filteredProfile?.avatarUrl === undefined;
+  const isBioHidden = filteredProfile?.bio === undefined;
+  const isMusicPrefsHidden = filteredProfile?.musicPreferences === undefined;
+  
+  const genres = filteredProfile?.musicPreferences || [];
+
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
-        <View style={styles.header}>
+        <LinearGradient
+          colors={[theme.colors.primary + '30', theme.colors.background]}
+          style={styles.heroGradient}
+        >
+          <View style={styles.header}>
           <View style={styles.topRow}>
-            <Avatar
-              size="lg"
-              name={profile.displayName || profile.username}
-              uri={profile.avatarUrl}
-            />
-
-            {followStatus && (
-              <View style={styles.statsContainer}>
-                <View style={styles.statItem}>
-                  <Text style={styles.statNumber}>{followStatus.followersCount}</Text>
-                  <Text style={styles.statLabel}>Abonnés</Text>
-                </View>
-                <View style={styles.statItem}>
-                  <Text style={styles.statNumber}>{followStatus.followingCount}</Text>
-                  <Text style={styles.statLabel}>Abonnements</Text>
-                </View>
+            {isAvatarHidden ? (
+              <View style={styles.hiddenAvatar}>
+                <Text style={styles.hiddenAvatarIcon}>🔒</Text>
               </View>
+            ) : (
+              <Avatar
+                size="lg"
+                name={profile.displayName || profile.username}
+                uri={filteredProfile?.avatarUrl}
+              />
             )}
-          </View>
 
-          <View style={styles.nameSection}>
-            <View style={styles.usernameRow}>
-              <Text style={styles.username}>{profile.username}</Text>
-              {followStatus?.isFollowedBy && (
-                <View style={styles.followsYouBadge}>
-                  <Text style={styles.followsYouText}>Vous suit</Text>
+              {followStatus && (
+                <View style={styles.statsContainer}>
+                  <View style={styles.statItem}>
+                    <Text style={styles.statNumber}>{followStatus.followersCount}</Text>
+                    <Text style={styles.statLabel}>Abonnés</Text>
+                  </View>
+                  <View style={styles.statItem}>
+                    <Text style={styles.statNumber}>{followStatus.followingCount}</Text>
+                    <Text style={styles.statLabel}>Abonnements</Text>
+                  </View>
                 </View>
               )}
             </View>
-            {profile.displayName && <Text style={styles.displayName}>{profile.displayName}</Text>}
-          </View>
 
-          {profile.bio && <Text style={styles.bio}>{profile.bio}</Text>}
+            <View style={styles.nameSection}>
+              <View style={styles.usernameRow}>
+                <Text style={styles.username}>{profile.username}</Text>
+                {followStatus?.isFollowedBy && (
+                  <View style={styles.followsYouBadge}>
+                    <Text style={styles.followsYouText}>Vous suit</Text>
+                  </View>
+                )}
+              </View>
+              {profile.displayName && (
+                <Text style={styles.displayName}>{profile.displayName}</Text>
+              )}
+            </View>
+
+            {/* Bio - with privacy check */}
+            {isBioHidden ? (
+              <View style={styles.hiddenField}>
+                <Text style={styles.hiddenIcon}>🔒</Text>
+                <Text style={styles.hiddenText}>
+                  {isFriend ? 'Bio privée' : 'Visible uniquement pour les amis'}
+                </Text>
+              </View>
+            ) : filteredProfile?.bio ? (
+              <Text style={styles.bio}>{filteredProfile.bio}</Text>
+            ) : null}
 
           {followStatus && (
             <View style={styles.actionButtons}>
@@ -213,6 +253,29 @@ export function UserProfileScreen({ route, navigation }: Props) {
             </View>
           )}
         </View>
+        </LinearGradient>
+
+        {/* Music Preferences Section */}
+        <ProfileSection title="Préférences musicales">
+          {isMusicPrefsHidden ? (
+            <View style={styles.hiddenFieldInline}>
+              <Text style={styles.hiddenIcon}>🔒</Text>
+              <Text style={styles.hiddenText}>
+                {isFriend ? 'Préférences privées' : 'Visible uniquement pour les amis'}
+              </Text>
+            </View>
+          ) : genres.length > 0 ? (
+            <View style={styles.genresContainer}>
+              {genres.map((genre: MusicGenre) => (
+                <GenreChip key={genre} genre={genre} selected size="sm" />
+              ))}
+            </View>
+          ) : (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyStateText}>Aucun genre sélectionné</Text>
+            </View>
+          )}
+        </ProfileSection>
 
         <View style={styles.playlistsSection}>
           <Text style={styles.sectionTitle}>Playlists</Text>
@@ -258,6 +321,9 @@ const createStyles = (theme: Theme) =>
     },
     contentContainer: {
       paddingBottom: theme.spacing.xl,
+    },
+    heroGradient: {
+      paddingBottom: theme.spacing.md,
     },
     header: {
       paddingHorizontal: theme.spacing.lg,
@@ -322,6 +388,52 @@ const createStyles = (theme: Theme) =>
       color: theme.colors.text,
       marginTop: theme.spacing.sm,
       lineHeight: 20,
+    },
+    hiddenField: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: theme.spacing.sm,
+      gap: 6,
+    },
+    hiddenFieldInline: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: theme.spacing.sm,
+      gap: 8,
+    },
+    hiddenIcon: {
+      fontSize: 14,
+    },
+    hiddenText: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      fontStyle: 'italic',
+    },
+    hiddenAvatar: {
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      backgroundColor: theme.colors.surface,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    hiddenAvatarIcon: {
+      fontSize: 32,
+    },
+    genresContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: theme.spacing.xs,
+    },
+    emptyState: {
+      paddingVertical: theme.spacing.sm,
+    },
+    emptyStateText: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      fontStyle: 'italic',
     },
     actionButtons: {
       flexDirection: 'row',

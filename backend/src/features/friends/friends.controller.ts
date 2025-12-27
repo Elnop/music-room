@@ -91,4 +91,24 @@ export class FriendsController {
       next(error);
     }
   }
+
+  async getMyStats(req: Request, res: Response, next: NextFunction) {
+    try {
+      const authReq = req as AuthenticatedRequest;
+
+      const stats = await friendsService.getMyStats(authReq.user.id);
+
+      const response: ApiResponse = {
+        success: true,
+        data: stats,
+        meta: {
+          timestamp: new Date().toISOString(),
+        },
+      };
+
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

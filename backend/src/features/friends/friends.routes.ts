@@ -20,6 +20,13 @@ router.get("/", (req, res, next) =>
 );
 
 /**
+ * @route   GET /api/friends/stats/me
+ * @desc    Get own followers/following stats
+ * @access  Private
+ */
+router.get("/stats/me", (req, res, next) => controller.getMyStats(req, res, next));
+
+/**
  * @route   GET /api/friends/status/:userId
  * @desc    Get follow status with a user
  * @access  Private

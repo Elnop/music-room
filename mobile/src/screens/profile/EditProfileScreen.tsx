@@ -27,9 +27,7 @@ const updateProfileSchema = z.object({
   displayName: z
     .string()
     .min(1, 'Display name cannot be empty')
-    .max(50, 'Display name must be less than 50 characters')
-    .optional()
-    .or(z.literal('')),
+    .max(50, 'Display name must be less than 50 characters'),
   bio: z.string().max(500, 'Bio must be less than 500 characters').optional().or(z.literal('')),
 });
 
@@ -50,7 +48,8 @@ export function EditProfileScreen() {
   } = useForm<UpdateProfileInput>({
     resolver: zodResolver(updateProfileSchema),
     defaultValues: {
-      displayName: user?.displayName || '',
+      // Display name defaults to username if not set
+      displayName: user?.displayName || user?.username || '',
       bio: user?.bio || '',
     },
   });
@@ -65,12 +64,16 @@ export function EditProfileScreen() {
     setError(null);
 
     try {
-      // Only send fields that have values
       const updateData: Partial<UpdateProfileData> = {};
-      if (data.displayName && data.displayName.trim()) {
-        updateData.displayName = data.displayName.trim();
+      
+      // Display name: required, cannot be empty
+      const trimmedDisplayName = data.displayName.trim();
+      if (trimmedDisplayName) {
+        updateData.displayName = trimmedDisplayName;
       }
-      if (data.bio && data.bio.trim()) {
+      
+      // Bio: can be empty (to clear)
+      if (data.bio !== undefined) {
         updateData.bio = data.bio.trim();
       }
 
@@ -79,12 +82,7 @@ export function EditProfileScreen() {
       // Update local user state
       useAuthStore.setState({ user: updatedProfile });
 
-      Alert.alert('Success', 'Profile updated successfully', [
-        {
-          text: 'OK',
-          onPress: () => navigation.goBack(),
-        },
-      ]);
+      navigation.goBack();
     } catch (err) {
       const errorMessage = err instanceof ApiError ? err.message : 'Failed to update profile';
       setError(errorMessage);

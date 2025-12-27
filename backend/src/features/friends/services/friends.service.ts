@@ -84,6 +84,34 @@ export class FriendsService {
   }
 
   /**
+   * Get own stats (followers and following count)
+   */
+  async getMyStats(
+    userId: string,
+  ): Promise<{ followersCount: number; followingCount: number }> {
+    try {
+      const [followersCountResult, followingCountResult] = await Promise.all([
+        supabase
+          .from("follows")
+          .select("*", { count: "exact", head: true })
+          .eq("following_id", userId),
+        supabase
+          .from("follows")
+          .select("*", { count: "exact", head: true })
+          .eq("follower_id", userId),
+      ]);
+
+      return {
+        followersCount: followersCountResult.count || 0,
+        followingCount: followingCountResult.count || 0,
+      };
+    } catch (error) {
+      logger.error("Unexpected error getting my stats", { error });
+      throw new AppError(500, "Failed to get stats", "STATS_ERROR");
+    }
+  }
+
+  /**
    * Follow a user
    */
   async followUser(
