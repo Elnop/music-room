@@ -119,6 +119,7 @@ define remove_build_logs
 	@rm -f /tmp/ngrok.log 2>/dev/null || true
 	@rm -f /tmp/backend-tunnel-url.txt 2>/dev/null || true
 	@rm -rf /tmp/shared 2>/dev/null || true
+	@rm -rf backend/logs 2>/dev/null || true
 	@echo "$(GREEN)✓ Build logs removed$(RESET)"
 endef
 
