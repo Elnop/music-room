@@ -36,7 +36,7 @@ export function GenreSelector({
       </Text>
 
       <View style={styles.genresGrid}>
-        {MUSIC_GENRES.map((genre) => {
+        {MUSIC_GENRES.map(genre => {
           const isSelected = selectedGenres.includes(genre);
           const isDisabled = !isSelected && isMaxReached;
 
@@ -53,9 +53,7 @@ export function GenreSelector({
       </View>
 
       {isMaxReached && (
-        <Text style={styles.maxWarning}>
-          Maximum genres selected. Deselect one to add another.
-        </Text>
+        <Text style={styles.maxWarning}>Maximum genres selected. Deselect one to add another.</Text>
       )}
     </View>
   );
@@ -99,4 +97,3 @@ const createStyles = (theme: Theme) =>
       fontStyle: 'italic',
     },
   });
-

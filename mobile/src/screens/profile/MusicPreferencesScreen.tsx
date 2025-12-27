@@ -50,7 +50,7 @@ export function MusicPreferencesScreen() {
 
     if (isSelected) {
       // Remove genre
-      setSelectedGenres(selectedGenres.filter((g) => g !== genre));
+      setSelectedGenres(selectedGenres.filter(g => g !== genre));
     } else if (selectedGenres.length < MAX_GENRES) {
       // Add genre
       setSelectedGenres([...selectedGenres, genre]);
@@ -216,4 +216,3 @@ const createStyles = (theme: Theme) =>
       borderTopColor: theme.colors.border,
     },
   });
-

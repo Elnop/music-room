@@ -53,10 +53,10 @@ const createStyles = (theme: Theme) =>
     container: {
       alignItems: 'center',
       padding: theme.spacing.lg,
-      backgroundColor: theme.colors.surface, // Blanc
-      borderBottomWidth: theme.borders.thick, // 3px bordure bottom
-      borderBottomColor: theme.colors.border, // Noir
-      ...theme.shadows.medium, // Ombre
+      backgroundColor: theme.colors.surface,
+      borderBottomWidth: theme.borders.thick,
+      borderBottomColor: theme.colors.border,
+      ...theme.shadows.medium,
     },
     cover: {
       width: 200,
@@ -76,7 +76,7 @@ const createStyles = (theme: Theme) =>
     },
     name: {
       fontSize: theme.typography.sizes.xxl,
-      fontWeight: theme.typography.weights.bold, // 700 - bold
+      fontWeight: theme.typography.weights.bold,
       color: theme.colors.text,
       textAlign: 'center',
       marginBottom: theme.spacing.sm,

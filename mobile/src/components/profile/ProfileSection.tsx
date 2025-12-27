@@ -65,4 +65,3 @@ const createStyles = (theme: Theme) =>
       paddingBottom: theme.spacing.md,
     },
   });
-

@@ -55,21 +55,21 @@ const createStyles = (theme: Theme) =>
     },
     label: {
       fontSize: theme.typography.sizes.sm,
-      fontWeight: theme.typography.weights.semibold, // 600 - bold
+      fontWeight: theme.typography.weights.semibold,
       color: theme.colors.text,
       marginBottom: theme.spacing.xs,
     },
     inputContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: theme.colors.surface, // Blanc
-      borderRadius: theme.borders.medium, // 8px
-      borderWidth: theme.borders.medium, // 2px bordure par défaut
-      borderColor: theme.colors.border, // Noir
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borders.medium,
+      borderWidth: theme.borders.medium,
+      borderColor: theme.colors.border,
     },
     inputContainerError: {
-      borderWidth: theme.borders.thick, // 3px en erreur
-      borderColor: theme.colors.error, // Rouge
+      borderWidth: theme.borders.thick,
+      borderColor: theme.colors.error,
       backgroundColor: theme.colors.surface,
     },
     leftIcon: {

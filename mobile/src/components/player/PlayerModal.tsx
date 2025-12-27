@@ -26,10 +26,8 @@ export function PlayerModal() {
   const { player, loading, error } = usePlayer();
   const { currentTrack, isPlaying, isModalOpen, setModalOpen, pause, resume } = usePlayerStore();
 
-  // Track player progress in real-time
   const { currentTime, duration } = usePlayerProgress();
 
-  // Synchronize player with store state
   usePlayerSync();
 
   if (!currentTrack) {
@@ -75,7 +73,6 @@ export function PlayerModal() {
       onRequestClose={() => setModalOpen(false)}
     >
       <View style={styles.container}>
-        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
             onPress={() => setModalOpen(false)}
@@ -87,12 +84,10 @@ export function PlayerModal() {
           <View style={{ width: 24 }} />
         </View>
 
-        {/* Artwork */}
         <View style={styles.artworkContainer}>
           <Image source={{ uri: artworkUrl }} style={styles.artwork} />
         </View>
 
-        {/* Track Info */}
         <View style={styles.trackInfo}>
           <Text style={styles.title} numberOfLines={2}>
             {currentTrack.title}
@@ -102,14 +97,12 @@ export function PlayerModal() {
           </Text>
         </View>
 
-        {/* Error State */}
         {error && (
           <View style={styles.errorContainer}>
             <Text style={styles.errorText}>{error}</Text>
           </View>
         )}
 
-        {/* Progress Slider */}
         <View style={styles.progressContainer}>
           <Slider
             style={styles.slider}
@@ -128,7 +121,6 @@ export function PlayerModal() {
           </View>
         </View>
 
-        {/* Controls */}
         <View style={styles.controls}>
           <TouchableOpacity
             style={styles.controlButton}
@@ -155,7 +147,6 @@ export function PlayerModal() {
           </TouchableOpacity>
         </View>
 
-        {/* Loading State */}
         {loading && (
           <View style={styles.loadingContainer}>
             <Text style={styles.loadingText}>Loading stream...</Text>

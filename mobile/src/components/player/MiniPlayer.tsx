@@ -17,10 +17,8 @@ export function MiniPlayer() {
   const { currentTrack, isPlaying, pause, resume, toggleModal } = usePlayerStore();
   const { progress } = usePlayerProgress();
 
-  // Synchronize player with store state
   usePlayerSync();
 
-  // Don't render if no track
   if (!currentTrack) {
     return null;
   }
@@ -64,7 +62,6 @@ export function MiniPlayer() {
         </TouchableOpacity>
       </View>
 
-      {/* Simple progress bar */}
       <View style={styles.progressBarContainer}>
         <View
           style={[
@@ -83,7 +80,7 @@ const createStyles = (theme: Theme, insets: EdgeInsets) =>
   StyleSheet.create({
     container: {
       position: 'absolute',
-      bottom: 60 + insets.bottom, // Tab bar height (60px) + bottom safe area
+      bottom: 60 + insets.bottom,
       left: 0,
       right: 0,
       backgroundColor: theme.colors.surface,

@@ -30,13 +30,13 @@ export function Card({ children, onPress, style, elevation = true }: CardProps) 
 const createStyles = (theme: Theme) =>
   StyleSheet.create({
     card: {
-      backgroundColor: theme.colors.surface, // Blanc
-      borderRadius: theme.borders.medium, // 8px
-      borderWidth: theme.borders.thick, // 3px bordure noire
-      borderColor: theme.colors.border, // Noir
+      backgroundColor: theme.colors.surface,
+      borderRadius: theme.borders.medium,
+      borderWidth: theme.borders.thick,
+      borderColor: theme.colors.border,
       padding: theme.spacing.md,
     },
     elevation: {
-      ...theme.shadows.large, // Ombre offset 6px (grande ombre pour les cartes)
+      ...theme.shadows.large,
     },
   });

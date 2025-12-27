@@ -23,16 +23,16 @@ export function FormError({ message }: FormErrorProps) {
 const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
-      backgroundColor: theme.colors.error + '20', // 20% opacity rouge
-      borderLeftWidth: theme.borders.thick, // 3px bordure gauche
-      borderLeftColor: theme.colors.error, // Rouge
+      backgroundColor: theme.colors.error + '20',
+      borderLeftWidth: theme.borders.thick,
+      borderLeftColor: theme.colors.error,
       padding: theme.spacing.sm,
-      borderRadius: theme.borders.small, // 4px
+      borderRadius: theme.borders.small,
       marginBottom: theme.spacing.md,
     },
     text: {
       fontSize: theme.typography.sizes.sm,
       color: theme.colors.error,
-      fontWeight: theme.typography.weights.semibold, // 600 - bold
+      fontWeight: theme.typography.weights.semibold,
     },
   });

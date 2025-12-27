@@ -44,7 +44,6 @@ export function Button({
 
   const textStyle = [styles.text, styles[`${variant}Text` as keyof typeof styles]].filter(Boolean);
 
-  // Spinner color based on variant
   const spinnerColor = variant === 'outline' ? theme.colors.primary : theme.colors.textInverse;
 
   return (
@@ -71,14 +70,14 @@ const createStyles = (theme: Theme) =>
     container: {
       paddingVertical: theme.spacing.sm + 4,
       paddingHorizontal: theme.spacing.lg,
-      borderRadius: theme.borders.medium, // 8px arrondi léger
-      borderWidth: theme.borders.thick, // 3px bordure noire épaisse
-      borderColor: theme.colors.border, // Noir
+      borderRadius: theme.borders.medium,
+      borderWidth: theme.borders.thick,
+      borderColor: theme.colors.border,
       alignItems: 'center',
       justifyContent: 'center',
       flexDirection: 'row',
       gap: theme.spacing.xs,
-      ...theme.shadows.medium, // Ombre offset 4px
+      ...theme.shadows.medium,
     },
     fullWidth: {
       width: '100%',
@@ -86,10 +85,8 @@ const createStyles = (theme: Theme) =>
     disabled: {
       backgroundColor: theme.colors.surfaceAlt,
       borderColor: theme.colors.borderLight,
-      // Pas d'opacity - utilisation de couleurs désactivées
     },
 
-    // Variants
     primary: {
       backgroundColor: theme.colors.primary,
     },
@@ -98,13 +95,12 @@ const createStyles = (theme: Theme) =>
     },
     outline: {
       backgroundColor: 'transparent',
-      borderWidth: theme.borders.medium, // 2px pour outline
+      borderWidth: theme.borders.medium,
     },
 
-    // Text styles
     text: {
       fontSize: theme.typography.sizes.md,
-      fontWeight: theme.typography.weights.bold, // 700 - bold par défaut
+      fontWeight: theme.typography.weights.bold,
     },
     primaryText: {
       color: theme.colors.textInverse,

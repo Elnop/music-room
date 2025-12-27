@@ -41,13 +41,13 @@ export function SearchBar({
 const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
-      backgroundColor: theme.colors.surface, // Blanc
-      borderRadius: 24, // Conserve le style pill
+      backgroundColor: theme.colors.surface,
+      borderRadius: 24,
       paddingHorizontal: theme.spacing.md,
       height: 48,
       justifyContent: 'center',
-      borderWidth: theme.borders.medium, // 2px bordure
-      borderColor: theme.colors.border, // Noir
+      borderWidth: theme.borders.medium,
+      borderColor: theme.colors.border,
     },
     input: {
       fontSize: theme.typography.sizes.md,

@@ -55,15 +55,14 @@ export function UserProfileScreen({ route, navigation }: Props) {
       setError(null);
 
       try {
-        const [profileData, filteredData, statusData, playlistsData, canControl] = await Promise.all(
-          [
+        const [profileData, filteredData, statusData, playlistsData, canControl] =
+          await Promise.all([
             profileApi.getUserProfile(accessToken, userId),
             privacyApi.getFilteredProfile(accessToken, userId),
             friendsApi.getFollowStatus(accessToken, userId),
             playlistApi.fetchUserPublicPlaylists(userId),
             musicControlApi.canControl(userId),
-          ]
-        );
+          ]);
         setProfile(profileData);
         setFilteredProfile(filteredData);
         setFollowStatus(statusData);
@@ -122,12 +121,12 @@ export function UserProfileScreen({ route, navigation }: Props) {
   }
 
   const isFriend = followStatus?.isFriend ?? false;
-  
+
   // Privacy logic: undefined = hidden by privacy, value present = visible (even if empty)
   const isAvatarHidden = filteredProfile?.avatarUrl === undefined;
   const isBioHidden = filteredProfile?.bio === undefined;
   const isMusicPrefsHidden = filteredProfile?.musicPreferences === undefined;
-  
+
   const genres = filteredProfile?.musicPreferences || [];
 
   return (
@@ -138,18 +137,18 @@ export function UserProfileScreen({ route, navigation }: Props) {
           style={styles.heroGradient}
         >
           <View style={styles.header}>
-          <View style={styles.topRow}>
-            {isAvatarHidden ? (
-              <View style={styles.hiddenAvatar}>
-                <Text style={styles.hiddenAvatarIcon}>🔒</Text>
-              </View>
-            ) : (
-              <Avatar
-                size="lg"
-                name={profile.displayName || profile.username}
-                uri={filteredProfile?.avatarUrl}
-              />
-            )}
+            <View style={styles.topRow}>
+              {isAvatarHidden ? (
+                <View style={styles.hiddenAvatar}>
+                  <Text style={styles.hiddenAvatarIcon}>🔒</Text>
+                </View>
+              ) : (
+                <Avatar
+                  size="lg"
+                  name={profile.displayName || profile.username}
+                  uri={filteredProfile?.avatarUrl}
+                />
+              )}
 
               {followStatus && (
                 <View style={styles.statsContainer}>
@@ -174,9 +173,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
                   </View>
                 )}
               </View>
-              {profile.displayName && (
-                <Text style={styles.displayName}>{profile.displayName}</Text>
-              )}
+              {profile.displayName && <Text style={styles.displayName}>{profile.displayName}</Text>}
             </View>
 
             {/* Bio - with privacy check */}
@@ -191,68 +188,68 @@ export function UserProfileScreen({ route, navigation }: Props) {
               <Text style={styles.bio}>{filteredProfile.bio}</Text>
             ) : null}
 
-          {followStatus && (
-            <View style={styles.actionButtons}>
-              {followStatus.isFriend ? (
-                <>
-                  <View style={styles.friendBadge}>
-                    <Text style={styles.friendBadgeText}>Amis</Text>
-                  </View>
+            {followStatus && (
+              <View style={styles.actionButtons}>
+                {followStatus.isFriend ? (
+                  <>
+                    <View style={styles.friendBadge}>
+                      <Text style={styles.friendBadgeText}>Amis</Text>
+                    </View>
+                    <Button
+                      variant="outline"
+                      onPress={handleFollowToggle}
+                      loading={isFollowLoading}
+                      style={styles.actionButton}
+                    >
+                      Abonné
+                    </Button>
+                  </>
+                ) : followStatus.isFollowing ? (
                   <Button
                     variant="outline"
                     onPress={handleFollowToggle}
                     loading={isFollowLoading}
-                    style={styles.actionButton}
+                    style={styles.fullWidthButton}
                   >
                     Abonné
                   </Button>
-                </>
-              ) : followStatus.isFollowing ? (
-                <Button
-                  variant="outline"
-                  onPress={handleFollowToggle}
-                  loading={isFollowLoading}
-                  style={styles.fullWidthButton}
-                >
-                  Abonné
-                </Button>
-              ) : (
-                <Button
-                  variant="primary"
-                  onPress={handleFollowToggle}
-                  loading={isFollowLoading}
-                  style={styles.fullWidthButton}
-                >
-                  Suivre
-                </Button>
-              )}
-            </View>
-          )}
+                ) : (
+                  <Button
+                    variant="primary"
+                    onPress={handleFollowToggle}
+                    loading={isFollowLoading}
+                    style={styles.fullWidthButton}
+                  >
+                    Suivre
+                  </Button>
+                )}
+              </View>
+            )}
 
-          {canControlMusic && followStatus?.isFriend && (
-            <View style={styles.listeningSection}>
-              <Text style={styles.listeningSectionTitle}>🎵 Écoute en direct</Text>
-              {isListeningLoading ? (
-                <View style={styles.listeningLoading}>
-                  <LoadingSpinner size="small" />
-                </View>
-              ) : devices.length > 0 ? (
-                devices.map(deviceStatus => (
-                  <DeviceListeningCard
-                    key={deviceStatus.device.deviceId}
-                    status={deviceStatus}
-                    onPlay={() => remotePlay(deviceStatus.device.deviceId)}
-                    onPause={() => remotePause(deviceStatus.device.deviceId)}
-                  />
-                ))
-              ) : (
-                <View style={styles.listeningEmpty}>
-                  <Text style={styles.listeningEmptyText}>Aucun appareil connecté</Text>
-                </View>
-              )}
-            </View>
-          )}
-        </View>
+            {canControlMusic && followStatus?.isFriend && (
+              <View style={styles.listeningSection}>
+                <Text style={styles.listeningSectionTitle}>🎵 Écoute en direct</Text>
+                {isListeningLoading ? (
+                  <View style={styles.listeningLoading}>
+                    <LoadingSpinner size="small" />
+                  </View>
+                ) : devices.length > 0 ? (
+                  devices.map(deviceStatus => (
+                    <DeviceListeningCard
+                      key={deviceStatus.device.deviceId}
+                      status={deviceStatus}
+                      onPlay={() => remotePlay(deviceStatus.device.deviceId)}
+                      onPause={() => remotePause(deviceStatus.device.deviceId)}
+                    />
+                  ))
+                ) : (
+                  <View style={styles.listeningEmpty}>
+                    <Text style={styles.listeningEmptyText}>Aucun appareil connecté</Text>
+                  </View>
+                )}
+              </View>
+            )}
+          </View>
         </LinearGradient>
 
         {/* Music Preferences Section */}

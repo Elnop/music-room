@@ -44,6 +44,7 @@ make stop
 ## Tech Stack
 
 ### Backend
+
 - **Runtime**: Node.js 22 + TypeScript
 - **Framework**: Express.js
 - **Real-time**: Socket.io for WebSocket communication
@@ -53,6 +54,7 @@ make stop
 - **Music**: SoundCloud API via `soundcloud.ts` package
 
 ### Mobile
+
 - **Framework**: React Native 0.81 + Expo SDK 54
 - **Language**: TypeScript
 - **State Management**: Zustand stores + React Context
@@ -62,6 +64,7 @@ make stop
 - **Forms**: React Hook Form + Zod validation
 
 ### Infrastructure
+
 - **Containers**: Docker Compose orchestration
 - **Images**: Chainguard Images (0 CVE, distroless)
 - **Development**: Hot reload for backend + Expo Metro bundler
@@ -72,10 +75,10 @@ make stop
 - [CLAUDE.md](./CLAUDE.md) - Complete development guide
 - [doc/README.md](./doc/README.md) - Project overview
 - [doc/GETTING_STARTED.md](./doc/GETTING_STARTED.md) - Setup instructions
-- [doc/PLAN.md](./doc/PLAN.md) - Implementation roadmap
 - [doc/DOCKER.md](./doc/DOCKER.md) - Docker architecture
-- [doc/SOUNDCLOUD_MIGRATION_PLAN.md](./doc/SOUNDCLOUD_MIGRATION_PLAN.md) - SoundCloud integration plan
 - [doc/TUNNEL_MODE.md](./doc/TUNNEL_MODE.md) - Cross-network development
+- [doc/REALTIME.md](./doc/REALTIME.md) - Real-time Socket.io documentation
+- [doc/SECURITY.md](./doc/SECURITY.md) - Security best practices
 
 ## Links
 

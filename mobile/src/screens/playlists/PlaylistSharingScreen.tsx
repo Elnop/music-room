@@ -467,7 +467,9 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
           <View style={styles.settingTextContainer}>
             <Text style={styles.settingLabel}>Visibilité</Text>
             <Text style={styles.settingDescription}>
-              {isPrivate ? 'Privée - Seuls les invités peuvent voir' : 'Publique - Visible par tous'}
+              {isPrivate
+                ? 'Privée - Seuls les invités peuvent voir'
+                : 'Publique - Visible par tous'}
             </Text>
           </View>
         </View>

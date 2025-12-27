@@ -43,10 +43,7 @@ export const MUSIC_GENRES: MusicGenre[] = [
 /**
  * Genre display information with icons and colors
  */
-export const GENRE_INFO: Record<
-  MusicGenre,
-  { label: string; icon: string; color: string }
-> = {
+export const GENRE_INFO: Record<MusicGenre, { label: string; icon: string; color: string }> = {
   pop: { label: 'Pop', icon: '🎵', color: '#FF6B9D' },
   rock: { label: 'Rock', icon: '🎸', color: '#E74C3C' },
   hiphop: { label: 'Hip-Hop', icon: '🎤', color: '#9B59B6' },

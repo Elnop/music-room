@@ -26,7 +26,7 @@ export function VisibilityToggle({ label, description, value, onChange }: Visibi
       </View>
 
       <View style={styles.options}>
-        {VISIBILITY_OPTIONS.map((option) => {
+        {VISIBILITY_OPTIONS.map(option => {
           const isSelected = value === option;
           return (
             <TouchableOpacity
@@ -97,4 +97,3 @@ const createStyles = (theme: Theme) =>
       color: '#FFFFFF',
     },
   });
-

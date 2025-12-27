@@ -86,7 +86,7 @@ const createStyles = (theme: Theme) =>
     },
     name: {
       fontSize: theme.typography.sizes.lg,
-      fontWeight: theme.typography.weights.semibold, // 600 - bold
+      fontWeight: theme.typography.weights.semibold,
       color: theme.colors.text,
       marginBottom: theme.spacing.xs,
     },
@@ -111,6 +111,6 @@ const createStyles = (theme: Theme) =>
     private: {
       fontSize: theme.typography.sizes.xs,
       color: theme.colors.primary,
-      fontWeight: theme.typography.weights.semibold, // 600
+      fontWeight: theme.typography.weights.semibold,
     },
   });

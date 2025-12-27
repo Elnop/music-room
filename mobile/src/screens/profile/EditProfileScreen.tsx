@@ -65,13 +65,13 @@ export function EditProfileScreen() {
 
     try {
       const updateData: Partial<UpdateProfileData> = {};
-      
+
       // Display name: required, cannot be empty
       const trimmedDisplayName = data.displayName.trim();
       if (trimmedDisplayName) {
         updateData.displayName = trimmedDisplayName;
       }
-      
+
       // Bio: can be empty (to clear)
       if (data.bio !== undefined) {
         updateData.bio = data.bio.trim();

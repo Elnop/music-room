@@ -283,7 +283,7 @@ make dev
 - **Device Control**: Delegate playback control to friends
 - **Music Discovery**: Recommendations and shared listening stats
 
-For detailed implementation plan, see [PLAN.md](./PLAN.md).
+See the [doc/SUMMARY.md](./SUMMARY.md) for project status and completed features.
 
 ## Architecture
 
@@ -337,8 +337,10 @@ API_URL=http://localhost:3000
 ## Documentation
 
 - **[DOCKER.md](./DOCKER.md)**: Complete Docker guide with troubleshooting
-- **[PLAN.md](./PLAN.md)**: Implementation plan and roadmap
-- **[Git_Workflow.md](./Git_Workflow.md)**: Git workflow and best practices
+- **[GETTING_STARTED.md](./GETTING_STARTED.md)**: Getting started guide
+- **[GIT_WORKFLOW.md](./GIT_WORKFLOW.md)**: Git workflow and best practices
+- **[TUNNEL_MODE.md](./TUNNEL_MODE.md)**: Cross-network development
+- **[REALTIME.md](./REALTIME.md)**: Real-time Socket.io documentation
 - **Backend Makefile**: `make -C backend help` for backend-specific commands
 
 ## Git Workflow
@@ -357,7 +359,7 @@ git commit -m "feat: your feature description"
 git push origin feature/your-feature
 ```
 
-For detailed workflow, see [Git_Workflow.md](./Git_Workflow.md).
+For detailed workflow, see [GIT_WORKFLOW.md](./GIT_WORKFLOW.md).
 
 ## Troubleshooting
 
@@ -407,7 +409,7 @@ This project is private and proprietary.
 For issues or questions:
 
 1. Check the documentation in [DOCKER.md](./DOCKER.md)
-2. Review [PLAN.md](./PLAN.md) for project structure
+2. Review [SUMMARY.md](./SUMMARY.md) for project status
 3. Check container logs: `make logs`
 4. Create an issue in the repository
 

@@ -26,13 +26,13 @@ const createStyles = (theme: Theme) =>
       bottom: theme.spacing.lg,
       width: 56,
       height: 56,
-      borderRadius: 28, // Cercle
+      borderRadius: 28,
       backgroundColor: theme.colors.primary,
       justifyContent: 'center',
       alignItems: 'center',
-      borderWidth: theme.borders.thick, // 3px bordure
-      borderColor: theme.colors.border, // Noir
-      ...theme.shadows.large, // Grande ombre offset
+      borderWidth: theme.borders.thick,
+      borderColor: theme.colors.border,
+      ...theme.shadows.large,
     },
     icon: {
       fontSize: 32,

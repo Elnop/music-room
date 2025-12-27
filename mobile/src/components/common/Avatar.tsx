@@ -28,7 +28,6 @@ export function Avatar({ uri, size = 'md', name, style }: AvatarProps) {
         ? theme.typography.sizes.md
         : theme.typography.sizes.xl;
 
-  // Get initials from name
   const getInitials = (name?: string): string => {
     if (!name) return '?';
     const parts = name.trim().split(' ');
@@ -72,18 +71,18 @@ export function Avatar({ uri, size = 'md', name, style }: AvatarProps) {
 const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
-      backgroundColor: theme.colors.surfaceAlt, // Surface alternative
+      backgroundColor: theme.colors.surfaceAlt,
       justifyContent: 'center',
       alignItems: 'center',
       overflow: 'hidden',
-      borderWidth: theme.borders.medium, // 2px bordure
-      borderColor: theme.colors.border, // Noir
+      borderWidth: theme.borders.medium,
+      borderColor: theme.colors.border,
     },
     image: {
       resizeMode: 'cover',
     },
     initials: {
       color: theme.colors.text,
-      fontWeight: theme.typography.weights.bold, // 700
+      fontWeight: theme.typography.weights.bold,
     },
   });

@@ -45,7 +45,7 @@ Music_Room/
 │   ├── API_DOCUMENTATION.md                   ✅ Doc API complète
 │   ├── Music_Room_API.postman_collection.json ✅ Collection Postman
 │   └── Music_Room_Local.postman_environment.json ✅ Env Postman
-├── PLAN.md                                    📋 Plan du projet original
+├── SUMMARY.md                                 📋 Ce fichier - récapitulatif
 ├── GETTING_STARTED.md                         📖 Guide de démarrage
 └── SUMMARY.md                                 📝 Ce fichier
 ```
@@ -165,10 +165,10 @@ Ou utilisez **Postman** avec la collection fournie !
 
 | Fichier | Description |
 |---------|-------------|
-| `GETTING_STARTED.md` | Guide de démarrage pas à pas |
+| `doc/GETTING_STARTED.md` | Guide de démarrage pas à pas |
 | `backend/README.md` | Documentation backend |
 | `backend/API_DOCUMENTATION.md` | Documentation API complète |
-| `PLAN.md` | Plan du projet original |
+| `doc/SUMMARY.md` | Ce récapitulatif du projet |
 
 ---
 
