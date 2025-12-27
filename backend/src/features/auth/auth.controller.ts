@@ -3,6 +3,7 @@ import { AuthService } from "@/features/auth/auth.service.js";
 import {
   registerSchema,
   loginSchema,
+  refreshTokenSchema,
   googleLoginSchema,
   facebookLoginSchema,
 } from "@/features/auth/auth.validators.js";
@@ -19,7 +20,7 @@ export class AuthController {
    */
   async register(req: Request, res: Response, next: NextFunction) {
     try {
-      logger.debug("🔵 Register request received", {
+      logger.debug("Register request received", {
         body: req.body,
         headers: {
           "content-type": req.headers["content-type"],
@@ -28,13 +29,13 @@ export class AuthController {
       });
 
       const validated = registerSchema.parse(req.body);
-      logger.debug("🔵 Validation passed", {
+      logger.debug("Validation passed", {
         email: validated.email,
         username: validated.username,
       });
 
       const result = await authService.register(validated);
-      logger.debug("🔵 Registration successful", { userId: result.user.id });
+      logger.debug("Registration successful", { userId: result.user.id });
 
       const response: ApiResponse = {
         success: true,
@@ -46,7 +47,7 @@ export class AuthController {
 
       res.status(201).json(response);
     } catch (error) {
-      logger.error("🔴 Register error", { error });
+      logger.error("Register error", { error });
       next(error);
     }
   }
@@ -58,7 +59,7 @@ export class AuthController {
   async login(req: Request, res: Response, next: NextFunction) {
     try {
       const body = req.body as { email?: string; password?: string };
-      logger.info("🔵 Login request received", {
+      logger.info("Login request received", {
         email: body?.email,
         hasPassword: !!body?.password,
         contentType: req.headers["content-type"],
@@ -66,10 +67,10 @@ export class AuthController {
       });
 
       const validated = loginSchema.parse(req.body);
-      logger.info("🔵 Login validation passed", { email: validated.email });
+      logger.info("Login validation passed", { email: validated.email });
 
       const result = await authService.login(validated);
-      logger.info("🔵 Login successful", {
+      logger.info("Login successful", {
         userId: result.user.id,
         email: result.user.email,
         hasAccessToken: !!result.session.accessToken,
@@ -86,7 +87,7 @@ export class AuthController {
       res.json(response);
     } catch (error) {
       const body = req.body as { email?: string };
-      logger.error("🔴 Login error", {
+      logger.error("Login error", {
         error: error instanceof Error ? error.message : "Unknown error",
         stack: error instanceof Error ? error.stack : undefined,
         email: body?.email,
@@ -138,6 +139,34 @@ export class AuthController {
 
       res.json(response);
     } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * POST /api/auth/refresh
+   * Refresh access token using refresh token
+   */
+  async refreshToken(req: Request, res: Response, next: NextFunction) {
+    try {
+      logger.info("Token refresh request received");
+
+      const validated = refreshTokenSchema.parse(req.body);
+      const result = await authService.refreshToken(validated.refreshToken);
+
+      logger.info("Token refresh successful", { userId: result.user.id });
+
+      const response: ApiResponse = {
+        success: true,
+        data: result,
+        meta: {
+          timestamp: new Date().toISOString(),
+        },
+      };
+
+      res.json(response);
+    } catch (error) {
+      logger.error("Token refresh error", { error });
       next(error);
     }
   }

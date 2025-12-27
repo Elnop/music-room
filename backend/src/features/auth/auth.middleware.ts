@@ -65,8 +65,6 @@ export async function authMiddleware(
     // Attach user to request
     (req as AuthenticatedRequest).user = user;
 
-    logger.debug("User authenticated", { userId: user.id });
-
     next();
   } catch (error: unknown) {
     const err = error as Error & { code?: string };
@@ -110,12 +108,9 @@ export async function optionalAuthMiddleware(
     const user = await authService.verifyToken(token);
     (req as AuthenticatedRequest).user = user;
 
-    logger.debug("User optionally authenticated", { userId: user.id });
-
     next();
   } catch {
     // Don't fail, just continue without user
-    logger.debug("Optional auth failed, continuing without user");
     next();
   }
 }

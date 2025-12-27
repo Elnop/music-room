@@ -19,14 +19,6 @@ export function actionLoggerMiddleware(
   const device = req.get("X-Device-Model") || "Unknown Device";
   const appVersion = req.get("X-App-Version") || "0.0.0";
 
-  // Debug: Log header extraction to identify missing headers
-  logger.debug("Header extraction", {
-    "X-Platform": req.get("X-Platform"),
-    "X-Device-Model": req.get("X-Device-Model"),
-    "X-App-Version": req.get("X-App-Version"),
-    resolved: { platform, device, appVersion },
-  });
-
   // Attach to request object for use in controllers
   (req as AuthenticatedRequest).actionLogContext = {
     platform,
@@ -35,7 +27,7 @@ export function actionLoggerMiddleware(
   };
 
   // Log request start (without userId - auth hasn't run yet)
-  logger.info("→ REQUEST", {
+  logger.info("HTTP Request", {
     method: req.method,
     path: req.originalUrl,
     platform,
@@ -52,12 +44,15 @@ export function actionLoggerMiddleware(
     const userId = (req as AuthenticatedRequest).user?.id;
 
     // Log response with actual userId
-    logger.info("← RESPONSE", {
+    logger.info("HTTP Response", {
       method: req.method,
       path: req.originalUrl,
       userId: userId || "anonymous",
       status: res.statusCode,
       responseTime: `${responseTime}ms`,
+      platform,
+      device,
+      appVersion,
     });
   });
 

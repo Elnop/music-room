@@ -178,7 +178,7 @@ export class PlaylistController {
       const { id } = req.params;
 
       const body = req.body as { albumArt?: string; previewUrl?: string };
-      logger.debug("🎵 [Playlist Controller] Add track request", {
+      logger.debug("[Playlist Controller] Add track request", {
         playlistId: id,
         userId: authReq.user.id,
         body: {
@@ -190,7 +190,7 @@ export class PlaylistController {
 
       const validated = addTrackSchema.parse(req.body);
 
-      logger.debug("🎵 [Playlist Controller] Validation passed", {
+      logger.debug("[Playlist Controller] Validation passed", {
         validated: {
           ...validated,
           albumArt: validated.albumArt ? "present" : "undefined",
@@ -200,7 +200,7 @@ export class PlaylistController {
 
       await trackService.addTrack(id, authReq.user.id, validated);
 
-      logger.info("🟢 [Playlist Controller] Track added successfully", {
+      logger.info("[Playlist Controller] Track added successfully", {
         playlistId: id,
         trackUri: validated.trackUri,
       });
@@ -213,7 +213,7 @@ export class PlaylistController {
 
       res.status(201).json(response);
     } catch (error) {
-      logger.error("🔴 [Playlist Controller] Error adding track", {
+      logger.error("[Playlist Controller] Error adding track", {
         error: error instanceof Error ? error.message : "Unknown error",
         playlistId: req.params.id,
         body: req.body,

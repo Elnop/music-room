@@ -53,7 +53,7 @@ app.use(
       if (allowedOrigins.includes(origin) || allowedOrigins.includes("*")) {
         callback(null, true);
       } else {
-        logger.warn(`❌ CORS blocked origin: ${origin}`);
+        logger.warn(`CORS blocked origin: ${origin}`);
         callback(new Error("Not allowed by CORS"));
       }
     },
@@ -116,14 +116,17 @@ app.use(errorHandler);
 const PORT = env.PORT;
 
 httpServer.listen(PORT, () => {
-  logger.info(`🚀 Music Room backend is running!`);
-  logger.info(`📍 Server: http://localhost:${PORT}`);
-  logger.info(`🏥 Health: http://localhost:${PORT}/health`);
-  logger.info(`🔐 Auth API: http://localhost:${PORT}/api/auth`);
-  logger.info(`👤 Profile API: http://localhost:${PORT}/api/profile`);
-  logger.info(`📝 Playlist API: http://localhost:${PORT}/api/playlists`);
-  logger.info(`🎵 SoundCloud API: http://localhost:${PORT}/api/soundcloud`);
-  logger.info(`🌍 Environment: ${env.NODE_ENV}`);
+  logger.info("Music Room backend is running", {
+    server: `http://localhost:${PORT}`,
+    health: `http://localhost:${PORT}/health`,
+    environment: env.NODE_ENV,
+  });
+  logger.info("API endpoints available", {
+    auth: `http://localhost:${PORT}/api/auth`,
+    profile: `http://localhost:${PORT}/api/profile`,
+    playlists: `http://localhost:${PORT}/api/playlists`,
+    soundcloud: `http://localhost:${PORT}/api/soundcloud`,
+  });
 });
 
 // Graceful shutdown
