@@ -29,12 +29,14 @@ interface ApiResponse<T> {
  */
 export interface AuthResponse {
   user: UserProfile;
-  session: {
+  session?: {
     accessToken: string;
     refreshToken: string;
     expiresIn: number;
     expiresAt: number;
   };
+  requiresVerification?: boolean;
+  message?: string;
 }
 
 /**
@@ -336,6 +338,32 @@ export const authApi = {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
+    });
+  },
+
+  /**
+   * Verify email with 6-digit code
+   */
+  async verifyEmail(userId: string, code: string): Promise<AuthResponse> {
+    return apiRequest<AuthResponse>('/api/auth/verify-email', {
+      method: 'POST',
+      body: JSON.stringify({
+        userId,
+        code,
+      }),
+    });
+  },
+
+  /**
+   * Resend verification code
+   */
+  async resendVerificationCode(userId: string, email: string): Promise<{ message: string }> {
+    return apiRequest('/api/auth/resend-verification', {
+      method: 'POST',
+      body: JSON.stringify({
+        userId,
+        email,
+      }),
     });
   },
 };

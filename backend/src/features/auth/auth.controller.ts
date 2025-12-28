@@ -6,11 +6,17 @@ import {
   refreshTokenSchema,
   googleLoginSchema,
   facebookLoginSchema,
+  verifyEmailSchema,
+  resendVerificationSchema,
 } from "@/features/auth/auth.validators.js";
+import { EmailService } from "@/features/auth/services/email.service.js";
+import { EmailVerificationService } from "@/features/auth/services/email-verification.service.js";
+import { supabase } from "@/shared/config/supabase.js";
 import type { ApiResponse } from "@/shared/types/global.types.js";
 import type { AuthenticatedRequest } from "@/shared/types/global.types.js";
 import { logger } from "@/shared/utils/logger.js";
 import { bruteForceService } from "@/features/auth/services/brute-force.service.js";
+import { AppError } from "@/shared/middleware/error-handler.js";
 
 const authService = new AuthService();
 
@@ -82,7 +88,7 @@ export class AuthController {
       logger.info("Login successful", {
         userId: result.user.id,
         email: result.user.email,
-        hasAccessToken: !!result.session.accessToken,
+        hasAccessToken: !!result.session?.accessToken,
         ip,
       });
 
@@ -319,6 +325,177 @@ export class AuthController {
       res.json(response);
     } catch (error) {
       logger.error("Unlink provider error", { error });
+      next(error);
+    }
+  }
+
+  /**
+   * POST /api/auth/verify-email
+   * Verify email with 6-digit code
+   */
+  async verifyEmail(req: Request, res: Response, next: NextFunction) {
+    try {
+      const validated = verifyEmailSchema.parse(req.body);
+      const ip = req.ip || req.socket.remoteAddress || "unknown";
+
+      logger.info("Email verification attempt", {
+        userId: validated.userId,
+        ip,
+      });
+
+      const verificationService = new EmailVerificationService();
+      await verificationService.verifyCode(
+        validated.userId,
+        validated.code,
+        ip,
+      );
+
+      // Fetch user email for session creation
+      const { data: profile, error: profileError } = await supabase
+        .from("user_profiles")
+        .select("*, id")
+        .eq("id", validated.userId)
+        .single();
+
+      if (profileError || !profile) {
+        throw new AppError(404, "User not found", "USER_NOT_FOUND");
+      }
+
+      // Get user from Supabase Auth
+      const { data: authUser, error: authError } =
+        await supabase.auth.admin.getUserById(validated.userId);
+
+      if (authError || !authUser.user) {
+        throw new AppError(404, "Auth user not found", "AUTH_USER_NOT_FOUND");
+      }
+
+      // Generate session using Admin Magic Link API
+      const { data: linkData, error: linkError } =
+        await supabase.auth.admin.generateLink({
+          type: "magiclink",
+          email: authUser.user.email!,
+        });
+
+      if (linkError || !linkData) {
+        throw new AppError(
+          500,
+          "Failed to generate session",
+          "SESSION_GENERATION_FAILED",
+        );
+      }
+
+      const { hashed_token } = linkData.properties;
+      if (!hashed_token) {
+        throw new AppError(
+          500,
+          "Invalid session response",
+          "INVALID_SESSION_RESPONSE",
+        );
+      }
+
+      // Verify the token hash to obtain session
+      const { data: verifyData, error: verifyError } =
+        await supabase.auth.verifyOtp({
+          token_hash: hashed_token,
+          type: "email",
+        });
+
+      if (verifyError || !verifyData.session) {
+        throw new AppError(
+          500,
+          "Failed to create session",
+          "SESSION_CREATION_FAILED",
+        );
+      }
+
+      logger.info("Email verified successfully", { userId: validated.userId });
+
+      const response: ApiResponse = {
+        success: true,
+        data: {
+          user: {
+            id: profile.id,
+            email: authUser.user.email!,
+            username: profile.username,
+            displayName: profile.display_name ?? undefined,
+            avatarUrl: profile.avatar_url ?? undefined,
+            bio: profile.bio ?? undefined,
+            createdAt: profile.created_at ?? new Date().toISOString(),
+            updatedAt: profile.updated_at ?? new Date().toISOString(),
+          },
+          session: {
+            accessToken: verifyData.session.access_token,
+            refreshToken: verifyData.session.refresh_token,
+            expiresIn: verifyData.session.expires_in || 3600,
+            expiresAt: verifyData.session.expires_at || 0,
+          },
+          message: "Email verified successfully",
+        },
+        meta: { timestamp: new Date().toISOString() },
+      };
+
+      res.json(response);
+    } catch (error) {
+      logger.error("Email verification error", { error });
+      next(error);
+    }
+  }
+
+  /**
+   * POST /api/auth/resend-verification
+   * Resend verification code
+   */
+  async resendVerification(req: Request, res: Response, next: NextFunction) {
+    try {
+      const validated = resendVerificationSchema.parse(req.body);
+      const ip = req.ip || req.socket.remoteAddress || "unknown";
+
+      logger.info("Resend verification request", {
+        userId: validated.userId,
+        email: validated.email,
+        ip,
+      });
+
+      const verificationService = new EmailVerificationService();
+
+      // Check rate limiting
+      const { canResend, remainingSeconds } =
+        await verificationService.canResendCode(validated.userId, ip);
+
+      if (!canResend) {
+        throw new AppError(
+          429,
+          `Please wait ${remainingSeconds} seconds before requesting a new code`,
+          "RESEND_COOLDOWN",
+        );
+      }
+
+      // Generate new code
+      const code = await verificationService.generateAndStore(validated.userId);
+
+      // Send email
+      const emailService = new EmailService();
+      await emailService.sendVerificationEmail(validated.email, code);
+
+      // Record resend attempt
+      await verificationService.recordResendAttempt(validated.userId, ip);
+
+      logger.info("Verification code resent", {
+        userId: validated.userId,
+        email: validated.email,
+      });
+
+      const response: ApiResponse = {
+        success: true,
+        data: {
+          message: "Verification code sent. Please check your email.",
+        },
+        meta: { timestamp: new Date().toISOString() },
+      };
+
+      res.json(response);
+    } catch (error) {
+      logger.error("Resend verification error", { error });
       next(error);
     }
   }

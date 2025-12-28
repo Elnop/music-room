@@ -41,8 +41,23 @@ export const facebookLoginSchema = z.object({
   accessToken: z.string().min(1, "Access token is required"),
 });
 
+export const verifyEmailSchema = z.object({
+  userId: z.string().uuid("Invalid user ID"),
+  code: z
+    .string()
+    .length(6, "Verification code must be 6 digits")
+    .regex(/^\d{6}$/, "Verification code must contain only digits"),
+});
+
+export const resendVerificationSchema = z.object({
+  userId: z.string().uuid("Invalid user ID"),
+  email: z.string().email("Invalid email address"),
+});
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>;
 export type GoogleLoginInput = z.infer<typeof googleLoginSchema>;
 export type FacebookLoginInput = z.infer<typeof facebookLoginSchema>;
+export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
+export type ResendVerificationInput = z.infer<typeof resendVerificationSchema>;

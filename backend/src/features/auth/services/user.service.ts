@@ -171,6 +171,14 @@ export class UserService {
         .single();
 
       if (existingOAuth) {
+        // Ensure OAuth user is marked as email verified (for existing users)
+        if (!existingOAuth.email_verified) {
+          await supabase
+            .from("user_profiles")
+            .update({ email_verified: true })
+            .eq("id", existingOAuth.id);
+        }
+
         // User exists, create session
         const session = await this.createSessionForOAuthUser(effectiveEmail);
 
@@ -264,6 +272,7 @@ export class UserService {
             .update({
               [providerColumn]: providerId,
               avatar_url: avatarUrl || existingProfile.avatar_url || null,
+              email_verified: true, // Auto-verify when linking OAuth account
               updated_at: new Date().toISOString(),
             })
             .eq("id", existingProfile.id);

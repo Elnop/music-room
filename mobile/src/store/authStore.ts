@@ -40,11 +40,15 @@ interface AuthState {
 
   // Actions
   login: (email: string, password: string) => Promise<void>;
-  register: (data: RegisterInput) => Promise<void>;
+  register: (data: RegisterInput) => Promise<{ requiresVerification: boolean; userId?: string; email?: string }>;
   loginWithGoogle: () => Promise<void>;
   loginWithFacebook: () => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (data: Partial<UserProfile>) => Promise<void>;
+
+  // Email verification
+  verifyEmail: (userId: string, code: string) => Promise<void>;
+  resendVerificationCode: (userId: string, email: string) => Promise<void>;
 
   // Token refresh
   refreshAccessToken: () => Promise<boolean>;
@@ -132,18 +136,29 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // Call backend API
       const response = await authApi.register(data);
 
-      // Set authenticated state
+      // Check if email verification is required
+      if (response.requiresVerification) {
+        set({ isLoading: false });
+        return {
+          requiresVerification: true,
+          userId: response.user.id,
+          email: data.email,
+        };
+      }
+
+      // Set authenticated state (OAuth or already verified)
       set({
         user: response.user,
-        accessToken: response.session.accessToken,
-        refreshToken: response.session.refreshToken,
-        tokenExpiresAt: response.session.expiresAt * 1000, // Convert to milliseconds
+        accessToken: response.session!.accessToken,
+        refreshToken: response.session!.refreshToken,
+        tokenExpiresAt: response.session!.expiresAt * 1000,
         isAuthenticated: true,
         isLoading: false,
       });
 
       // Persist to storage
       await get().saveToStorage();
+      return { requiresVerification: false };
     } catch (error) {
       const errorMessage = error instanceof ApiError ? error.message : 'Registration failed';
       set({
@@ -155,6 +170,56 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         refreshToken: null,
         tokenExpiresAt: null,
       });
+      throw error;
+    }
+  },
+
+  /**
+   * Verify email with 6-digit code
+   */
+  verifyEmail: async (userId: string, code: string) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const response = await authApi.verifyEmail(userId, code);
+
+      // Set authenticated state
+      set({
+        user: response.user,
+        accessToken: response.session!.accessToken,
+        refreshToken: response.session!.refreshToken,
+        tokenExpiresAt: response.session!.expiresAt * 1000,
+        isAuthenticated: true,
+        isLoading: false,
+      });
+
+      // Persist to storage
+      await get().saveToStorage();
+    } catch (error) {
+      const errorMessage =
+        error instanceof ApiError
+          ? error.message
+          : 'Email verification failed';
+      set({
+        error: errorMessage,
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  /**
+   * Resend verification code
+   */
+  resendVerificationCode: async (userId: string, email: string) => {
+    set({ error: null });
+
+    try {
+      await authApi.resendVerificationCode(userId, email);
+    } catch (error) {
+      const errorMessage =
+        error instanceof ApiError ? error.message : 'Failed to resend code';
+      set({ error: errorMessage });
       throw error;
     }
   },

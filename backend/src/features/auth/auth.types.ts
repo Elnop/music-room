@@ -25,6 +25,16 @@ export interface LoginDTO {
 	password: string;
 }
 
+export interface VerifyEmailDTO {
+	userId: string;
+	code: string;
+}
+
+export interface ResendVerificationDTO {
+	userId: string;
+	email: string;
+}
+
 export interface OAuthCallbackDTO {
 	code: string;
 	state?: string;
@@ -97,12 +107,14 @@ export interface UserProfile {
 
 export interface AuthResponse {
 	user: UserProfile;
-	session: {
+	session?: {
 		accessToken: string;
 		refreshToken: string;
 		expiresIn: number;
 		expiresAt: number;
 	};
+	requiresVerification?: boolean;
+	message?: string;
 }
 
 export interface RefreshTokenDTO {
