@@ -102,4 +102,49 @@ make lint                 # Linter
 make format               # Formatter
 ```
 
+### Gestion des émulateurs Android
+
+Music Room fournit plusieurs commandes pour gérer les émulateurs Android :
+
+**Lister les émulateurs disponibles :**
+```bash
+make list-emulators
+```
+
+Affiche tous les Android Virtual Devices (AVDs) configurés dans Android Studio.
+
+**Ouvrir un émulateur spécifique (interactif) :**
+```bash
+make open-emulator
+```
+
+Cette commande :
+1. Liste tous les AVDs disponibles
+2. Demande de sélectionner un émulateur
+3. Lance l'émulateur sélectionné en arrière-plan
+
+**Ouvrir un émulateur spécifique (direct) :**
+```bash
+make open-emulator AVD=Pixel_6_API_34
+```
+
+Lance un émulateur spécifique par son nom sans menu interactif.
+
+**Démarrer le premier émulateur (automatique) :**
+```bash
+make start-emulator
+```
+
+Lance automatiquement le premier AVD disponible avec rendu logiciel (idéal pour Linux).
+
+**Arrêter tous les émulateurs :**
+```bash
+make kill-emulator
+```
+
+**Vérifier les devices connectés :**
+```bash
+make check-devices
+```
+
 **Documentation complète** : [`CLAUDE.md`](./CLAUDE.md)

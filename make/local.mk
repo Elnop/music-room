@@ -3,7 +3,7 @@
 # ==============================================================================
 # Commands for local development, useful with Android Studio emulator
 
-.PHONY: dev-local dev-android backend-local mobile-local expo-android expo-clear clean-native check-devices start-emulator kill-emulator
+.PHONY: dev-local dev-android backend-local mobile-local expo-android expo-clear clean-native check-devices start-emulator kill-emulator list-emulators open-emulator
 
 dev-local: .ensure-backend-deps .ensure-mobile-deps ## Start development locally (no Docker) - for Android Studio emulator
 	$(call print_header,Starting Local Development Mode)
@@ -144,4 +144,84 @@ kill-emulator: ## Stop all running Android emulators
 	done
 	@sleep 2
 	$(call print_success,All emulators stopped)
+	$(call blank_line)
+
+list-emulators: ## List all available Android Virtual Devices (AVDs)
+	$(call print_header,Available Android Emulators)
+	@if [ -z "$(ANDROID_HOME)" ]; then \
+		echo "$(RED)$(ICON_ERROR) ANDROID_HOME not set$(NC)"; \
+		exit 1; \
+	fi
+	@if [ ! -f "$(ANDROID_HOME)/emulator/emulator" ]; then \
+		echo "$(RED)$(ICON_ERROR) Android emulator not found$(NC)"; \
+		exit 1; \
+	fi
+	$(call print_subsection,📱 Available AVDs)
+	@AVD_COUNT=$$($(ANDROID_HOME)/emulator/emulator -list-avds 2>/dev/null | wc -l); \
+	if [ $$AVD_COUNT -eq 0 ]; then \
+		echo "$(YELLOW)$(ICON_WARNING) No AVDs found$(NC)"; \
+		echo "$(BLUE)$(ICON_INFO) Create one in Android Studio: Tools > Device Manager$(NC)"; \
+	else \
+		$(ANDROID_HOME)/emulator/emulator -list-avds 2>/dev/null | nl -w2 -s'. ' | while read line; do \
+			echo "  $(GREEN)$$line$(NC)"; \
+		done; \
+	fi
+	$(call blank_line)
+
+open-emulator: ## Open a specific Android emulator (interactive selection or specify AVD=name)
+	$(call print_header,Open Android Emulator)
+	@if [ -z "$(ANDROID_HOME)" ]; then \
+		echo "$(RED)$(ICON_ERROR) ANDROID_HOME not set$(NC)"; \
+		exit 1; \
+	fi
+	@if [ ! -f "$(ANDROID_HOME)/emulator/emulator" ]; then \
+		echo "$(RED)$(ICON_ERROR) Android emulator not found$(NC)"; \
+		exit 1; \
+	fi
+	$(call print_arrow,Checking for running emulators...)
+	@RUNNING=$$($(ANDROID_HOME)/platform-tools/adb devices | grep emulator | wc -l); \
+	if [ $$RUNNING -gt 0 ]; then \
+		echo "$(YELLOW)$(ICON_WARNING) Emulator already running$(NC)"; \
+		$(ANDROID_HOME)/platform-tools/adb devices | grep emulator | while read device rest; do \
+			echo "  $(GREEN)$$device$(NC) - $$rest"; \
+		done; \
+		echo ""; \
+		echo "$(BLUE)$(ICON_INFO) Use $(GREEN)make kill-emulator$(NC) to stop running emulators$(NC)"; \
+		exit 1; \
+	fi
+	$(call blank_line)
+	@if [ -n "$(AVD)" ]; then \
+		echo "$(BLUE)$(ICON_INFO) Opening emulator: $(GREEN)$(AVD)$(NC)"; \
+		$(ANDROID_HOME)/emulator/emulator -avd $(AVD) -gpu swiftshader_indirect > /dev/null 2>&1 & \
+		echo ""; \
+		$(call print_success,Emulator starting in background...); \
+		echo "$(BLUE)$(ICON_INFO) Wait ~30 seconds for boot$(NC)"; \
+	else \
+		$(call print_subsection,📱 Available AVDs); \
+		AVDS=$$($(ANDROID_HOME)/emulator/emulator -list-avds 2>/dev/null); \
+		if [ -z "$$AVDS" ]; then \
+			echo "$(RED)$(ICON_ERROR) No AVDs found$(NC)"; \
+			echo "$(YELLOW)$(ICON_WARNING) Create one in Android Studio: Tools > Device Manager$(NC)"; \
+			exit 1; \
+		fi; \
+		COUNT=1; \
+		echo "$$AVDS" | while read avd; do \
+			echo "  $(GREEN)$$COUNT.$(NC) $$avd"; \
+			COUNT=$$((COUNT + 1)); \
+		done; \
+		echo ""; \
+		echo "$(YELLOW)Select emulator (1-$$(echo "$$AVDS" | wc -l)):$(NC) "; \
+		read -r SELECTION; \
+		SELECTED_AVD=$$(echo "$$AVDS" | sed -n "$${SELECTION}p"); \
+		if [ -z "$$SELECTED_AVD" ]; then \
+			echo "$(RED)$(ICON_ERROR) Invalid selection$(NC)"; \
+			exit 1; \
+		fi; \
+		echo ""; \
+		echo "$(BLUE)$(ICON_INFO) Opening emulator: $(GREEN)$$SELECTED_AVD$(NC)"; \
+		$(ANDROID_HOME)/emulator/emulator -avd $$SELECTED_AVD -gpu swiftshader_indirect > /dev/null 2>&1 & \
+		echo ""; \
+		$(call print_success,Emulator starting in background...); \
+		echo "$(BLUE)$(ICON_INFO) Wait ~30 seconds for boot$(NC)"; \
+	fi
 	$(call blank_line)
