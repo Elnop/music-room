@@ -1,5 +1,23 @@
 import type { Request } from "express";
 
+// RateLimitInfo type from express-rate-limit
+interface RateLimitInfo {
+  limit: number;
+  used: number;
+  remaining: number;
+  resetTime: Date | undefined;
+  key: string;
+}
+
+// Extend Express Request to include rateLimit info
+declare global {
+  namespace Express {
+    interface Request {
+      rateLimit?: RateLimitInfo;
+    }
+  }
+}
+
 /**
  * Action log context containing client metadata
  */
