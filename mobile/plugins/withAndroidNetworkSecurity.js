@@ -31,7 +31,9 @@ function getApiUrlFromEnv(projectRoot) {
 
   // Try process.env first (available during expo prebuild)
   if (process.env.EXPO_PUBLIC_API_URL) {
-    console.log(`[withAndroidNetworkSecurity] Found in process.env: ${process.env.EXPO_PUBLIC_API_URL}`);
+    console.log(
+      `[withAndroidNetworkSecurity] Found in process.env: ${process.env.EXPO_PUBLIC_API_URL}`
+    );
     return process.env.EXPO_PUBLIC_API_URL;
   }
 
@@ -57,7 +59,7 @@ function getApiUrlFromEnv(projectRoot) {
  */
 module.exports = function withAndroidNetworkSecurity(config) {
   // Step 1: Modify AndroidManifest.xml
-  config = withAndroidManifest(config, (config) => {
+  config = withAndroidManifest(config, config => {
     const manifest = config.modResults;
     const mainApplication = AndroidConfig.Manifest.getMainApplicationOrThrow(manifest);
 
@@ -67,7 +69,9 @@ module.exports = function withAndroidNetworkSecurity(config) {
     // Add networkSecurityConfig attribute
     mainApplication.$['android:networkSecurityConfig'] = '@xml/network_security_config';
 
-    console.log('[withAndroidNetworkSecurity] Added usesCleartextTraffic and networkSecurityConfig to manifest');
+    console.log(
+      '[withAndroidNetworkSecurity] Added usesCleartextTraffic and networkSecurityConfig to manifest'
+    );
 
     return config;
   });
@@ -75,7 +79,7 @@ module.exports = function withAndroidNetworkSecurity(config) {
   // Step 2: Generate network_security_config.xml dynamically
   config = withDangerousMod(config, [
     'android',
-    async (config) => {
+    async config => {
       const projectRoot = config.modRequest.projectRoot;
       const androidResXmlPath = path.join(
         projectRoot,
@@ -99,8 +103,8 @@ module.exports = function withAndroidNetworkSecurity(config) {
 
       // Build domain list
       const domains = [
-        'localhost',     // Development: localhost
-        '10.0.2.2',      // Development: Android emulator
+        'localhost', // Development: localhost
+        '10.0.2.2', // Development: Android emulator
       ];
 
       // Add backend hostname if found

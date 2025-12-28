@@ -1,0 +1,616 @@
+import { OpenAPIV3 } from 'openapi-types';
+
+/**
+ * OpenAPI paths pour feature Authentication
+ */
+export const authPaths: OpenAPIV3.PathsObject = {
+  '/api/auth/register': {
+    post: {
+      tags: ['Authentication'],
+      summary: 'Register new user with email/password',
+      description: `
+        Creates new user account.
+
+        **Validation rules:**
+        - Email must be valid and unique
+        - Password minimum 8 characters with uppercase, lowercase, and number
+        - Username 3-20 characters, alphanumeric and underscores only
+        - Display name optional, max 50 characters
+
+        **Rate limit:** 3 requests per hour per IP
+      `,
+      operationId: 'registerUser',
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: { $ref: '#/components/schemas/RegisterRequest' },
+            example: {
+              email: 'user@example.com',
+              password: 'SecurePass123',
+              username: 'johndoe',
+              displayName: 'John Doe'
+            }
+          }
+        }
+      },
+      responses: {
+        '201': {
+          description: 'User registered successfully',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/AuthResponse' }
+            }
+          }
+        },
+        '400': { $ref: '#/components/responses/ValidationError' },
+        '409': {
+          description: 'Email or username already exists',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ErrorResponse' },
+              example: {
+                success: false,
+                error: {
+                  message: 'Email already registered',
+                  code: 'CONFLICT'
+                },
+                meta: {
+                  timestamp: '2025-01-15T10:30:00.000Z'
+                }
+              }
+            }
+          }
+        },
+        '429': { $ref: '#/components/responses/RateLimitError' }
+      }
+    }
+  },
+
+  '/api/auth/login': {
+    post: {
+      tags: ['Authentication'],
+      summary: 'Login with email and password',
+      description: `
+        Authenticate user and receive JWT tokens.
+
+        **Security:**
+        - Account locked after 5 failed attempts (15min lockout)
+        - Rate limited: 5 attempts per 15 minutes per IP
+        - IP blacklist for persistent abuse
+
+        **Response includes:**
+        - Access token (expires in 1 hour)
+        - Refresh token (expires in 7 days)
+      `,
+      operationId: 'loginUser',
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: { $ref: '#/components/schemas/LoginRequest' },
+            example: {
+              email: 'user@example.com',
+              password: 'SecurePass123'
+            }
+          }
+        }
+      },
+      responses: {
+        '200': {
+          description: 'Login successful',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/AuthResponse' }
+            }
+          }
+        },
+        '401': {
+          description: 'Invalid email or password',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+            }
+          }
+        },
+        '423': {
+          description: 'Account locked due to failed attempts',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ErrorResponse' },
+              example: {
+                success: false,
+                error: {
+                  message: 'Account temporarily locked',
+                  code: 'ACCOUNT_LOCKED',
+                  details: { lockoutEndsAt: '2025-01-15T11:00:00Z' }
+                }
+              }
+            }
+          }
+        },
+        '429': { $ref: '#/components/responses/RateLimitError' }
+      }
+    }
+  },
+
+  '/api/auth/refresh': {
+    post: {
+      tags: ['Authentication'],
+      summary: 'Refresh access token',
+      description: 'Exchange refresh token for new access token when expired (after 1h)',
+      operationId: 'refreshToken',
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: { $ref: '#/components/schemas/RefreshTokenRequest' },
+            example: {
+              refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+            }
+          }
+        }
+      },
+      responses: {
+        '200': {
+          description: 'New access token generated',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/AuthResponse' }
+            }
+          }
+        },
+        '401': { $ref: '#/components/responses/UnauthorizedError' }
+      }
+    }
+  },
+
+  '/api/auth/me': {
+    get: {
+      tags: ['Authentication'],
+      summary: 'Get current authenticated user profile',
+      operationId: 'getCurrentUser',
+      security: [{ bearerAuth: [] }],
+      responses: {
+        '200': {
+          description: 'User profile retrieved',
+          content: {
+            'application/json': {
+              schema: {
+                allOf: [
+                  { $ref: '#/components/schemas/SuccessResponse' },
+                  {
+                    type: 'object',
+                    properties: {
+                      data: { $ref: '#/components/schemas/UserProfile' }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        '401': { $ref: '#/components/responses/UnauthorizedError' }
+      }
+    }
+  },
+
+  '/api/auth/logout': {
+    post: {
+      tags: ['Authentication'],
+      summary: 'Logout current user',
+      description: 'Invalidates session and refresh token',
+      operationId: 'logoutUser',
+      security: [{ bearerAuth: [] }],
+      responses: {
+        '200': {
+          description: 'Logout successful',
+          content: {
+            'application/json': {
+              schema: {
+                allOf: [
+                  { $ref: '#/components/schemas/SuccessResponse' },
+                  {
+                    type: 'object',
+                    properties: {
+                      data: {
+                        type: 'object',
+                        properties: {
+                          message: { type: 'string', example: 'Logout successful' }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        '401': { $ref: '#/components/responses/UnauthorizedError' }
+      }
+    }
+  },
+
+  '/api/auth/google': {
+    post: {
+      tags: ['Authentication', 'OAuth'],
+      summary: 'Login with Google account',
+      description: `
+        Authenticate using Google ID token (OAuth 2.0).
+
+        **Flow:**
+        1. Client obtains Google ID token via Google Sign-In SDK
+        2. Send ID token to this endpoint
+        3. Backend verifies with Google APIs
+        4. Returns Music Room session tokens
+
+        **Behavior:**
+        - Existing user → Login
+        - New user → Create account and login
+        - Email required (Google provides verified email)
+
+        **Rate limit:** 10 requests per 15 minutes per IP
+      `,
+      operationId: 'googleLogin',
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: { $ref: '#/components/schemas/GoogleLoginRequest' },
+            example: {
+              idToken: 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjU5NmI...'
+            }
+          }
+        }
+      },
+      responses: {
+        '200': {
+          description: 'Login successful (existing account)',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/AuthResponse' }
+            }
+          }
+        },
+        '201': {
+          description: 'Account created and logged in',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/AuthResponse' }
+            }
+          }
+        },
+        '401': { $ref: '#/components/responses/UnauthorizedError' },
+        '429': { $ref: '#/components/responses/RateLimitError' }
+      }
+    }
+  },
+
+  '/api/auth/facebook': {
+    post: {
+      tags: ['Authentication', 'OAuth'],
+      summary: 'Login with Facebook account',
+      description: `
+        Authenticate using Facebook access token (OAuth 2.0).
+
+        **Email handling:**
+        - If Facebook provides email → Use real email
+        - No email permission → Generate synthetic (facebook_{id}@music-room.local)
+        - User can add real email later in profile
+
+        **Rate limit:** 10 requests per 15 minutes per IP
+      `,
+      operationId: 'facebookLogin',
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: { $ref: '#/components/schemas/FacebookLoginRequest' },
+            example: {
+              accessToken: 'EAABwzLixnjYBOwJ4x...'
+            }
+          }
+        }
+      },
+      responses: {
+        '200': {
+          description: 'Login successful',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/AuthResponse' }
+            }
+          }
+        },
+        '201': {
+          description: 'Account created',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/AuthResponse' }
+            }
+          }
+        },
+        '401': { $ref: '#/components/responses/UnauthorizedError' },
+        '429': { $ref: '#/components/responses/RateLimitError' }
+      }
+    }
+  },
+
+  '/api/auth/providers': {
+    get: {
+      tags: ['Authentication', 'OAuth'],
+      summary: 'Get linked OAuth providers',
+      description: 'Returns list of providers linked to current user account',
+      operationId: 'getLinkedProviders',
+      security: [{ bearerAuth: [] }],
+      responses: {
+        '200': {
+          description: 'Providers retrieved',
+          content: {
+            'application/json': {
+              schema: {
+                allOf: [
+                  { $ref: '#/components/schemas/SuccessResponse' },
+                  {
+                    type: 'object',
+                    properties: {
+                      data: {
+                        type: 'object',
+                        properties: {
+                          providers: {
+                            type: 'array',
+                            items: {
+                              type: 'object',
+                              properties: {
+                                type: {
+                                  type: 'string',
+                                  enum: ['password', 'google', 'facebook']
+                                },
+                                connectedAt: {
+                                  type: 'string',
+                                  format: 'date-time'
+                                },
+                                isPrimary: {
+                                  type: 'boolean'
+                                }
+                              }
+                            },
+                            example: [
+                              {
+                                type: 'password',
+                                connectedAt: '2025-01-15T10:00:00.000Z',
+                                isPrimary: true
+                              },
+                              {
+                                type: 'google',
+                                connectedAt: '2025-01-16T14:30:00.000Z',
+                                isPrimary: false
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        '401': { $ref: '#/components/responses/UnauthorizedError' }
+      }
+    }
+  },
+
+  '/api/auth/providers/{provider}': {
+    delete: {
+      tags: ['Authentication', 'OAuth'],
+      summary: 'Unlink OAuth provider',
+      description: `
+        Removes link between user and OAuth provider.
+
+        **Safety:** Cannot unlink last authentication method.
+      `,
+      operationId: 'unlinkProvider',
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          in: 'path',
+          name: 'provider',
+          required: true,
+          schema: {
+            type: 'string',
+            enum: ['google', 'facebook']
+          },
+          description: 'OAuth provider to unlink'
+        }
+      ],
+      responses: {
+        '200': {
+          description: 'Provider unlinked',
+          content: {
+            'application/json': {
+              schema: {
+                allOf: [
+                  { $ref: '#/components/schemas/SuccessResponse' },
+                  {
+                    type: 'object',
+                    properties: {
+                      data: {
+                        type: 'object',
+                        properties: {
+                          message: { type: 'string', example: 'Provider unlinked successfully' }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        '400': {
+          description: 'Cannot unlink last authentication method',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+            }
+          }
+        },
+        '401': { $ref: '#/components/responses/UnauthorizedError' },
+        '404': { $ref: '#/components/responses/NotFoundError' }
+      }
+    }
+  }
+};
+
+/**
+ * Schemas spécifiques à Authentication
+ */
+export const authSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
+  RegisterRequest: {
+    type: 'object',
+    required: ['email', 'password', 'username'],
+    properties: {
+      email: {
+        type: 'string',
+        format: 'email',
+        example: 'user@example.com',
+        description: 'Valid email address (unique)'
+      },
+      password: {
+        type: 'string',
+        format: 'password',
+        minLength: 8,
+        maxLength: 100,
+        example: 'SecurePass123',
+        description: 'Must contain uppercase, lowercase, and number'
+      },
+      username: {
+        type: 'string',
+        minLength: 3,
+        maxLength: 20,
+        pattern: '^[a-zA-Z0-9_]+$',
+        example: 'johndoe',
+        description: 'Alphanumeric and underscores only'
+      },
+      displayName: {
+        type: 'string',
+        maxLength: 50,
+        example: 'John Doe',
+        description: 'Optional display name'
+      }
+    }
+  },
+
+  LoginRequest: {
+    type: 'object',
+    required: ['email', 'password'],
+    properties: {
+      email: {
+        type: 'string',
+        format: 'email',
+        example: 'user@example.com'
+      },
+      password: {
+        type: 'string',
+        format: 'password',
+        example: 'SecurePass123'
+      }
+    }
+  },
+
+  RefreshTokenRequest: {
+    type: 'object',
+    required: ['refreshToken'],
+    properties: {
+      refreshToken: {
+        type: 'string',
+        description: 'Refresh token from login/register'
+      }
+    }
+  },
+
+  GoogleLoginRequest: {
+    type: 'object',
+    required: ['idToken'],
+    properties: {
+      idToken: {
+        type: 'string',
+        description: 'Google ID token from @react-native-google-signin/google-signin'
+      }
+    }
+  },
+
+  FacebookLoginRequest: {
+    type: 'object',
+    required: ['accessToken'],
+    properties: {
+      accessToken: {
+        type: 'string',
+        description: 'Facebook access token from react-native-fbsdk-next'
+      }
+    }
+  },
+
+  UserProfile: {
+    type: 'object',
+    properties: {
+      id: { type: 'string', format: 'uuid' },
+      email: { type: 'string', format: 'email' },
+      username: { type: 'string' },
+      displayName: { type: 'string', nullable: true },
+      avatarUrl: { type: 'string', format: 'uri', nullable: true },
+      bio: { type: 'string', nullable: true },
+      createdAt: { type: 'string', format: 'date-time' },
+      updatedAt: { type: 'string', format: 'date-time' },
+      connectedProviders: {
+        type: 'object',
+        properties: {
+          hasPassword: { type: 'boolean' },
+          hasGoogle: { type: 'boolean' },
+          hasFacebook: { type: 'boolean' }
+        }
+      }
+    }
+  },
+
+  AuthResponse: {
+    allOf: [
+      { $ref: '#/components/schemas/SuccessResponse' },
+      {
+        type: 'object',
+        properties: {
+          data: {
+            type: 'object',
+            properties: {
+              user: { $ref: '#/components/schemas/UserProfile' },
+              session: {
+                type: 'object',
+                properties: {
+                  accessToken: {
+                    type: 'string',
+                    description: 'JWT access token (expires in 1 hour)'
+                  },
+                  refreshToken: {
+                    type: 'string',
+                    description: 'JWT refresh token (expires in 7 days)'
+                  },
+                  expiresIn: {
+                    type: 'integer',
+                    description: 'Token lifetime in seconds',
+                    example: 3600
+                  },
+                  expiresAt: {
+                    type: 'integer',
+                    description: 'Unix timestamp when token expires',
+                    example: 1705318200
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+};
