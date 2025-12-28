@@ -1,9 +1,10 @@
-import React from 'react';
-import { View, FlatList, StyleSheet, Alert } from 'react-native';
+import React, { useCallback } from 'react';
+import { View, FlatList, StyleSheet, Alert, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useFocusEffect } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useImageColors, hexToRgba } from '@/hooks/useImageColors';
@@ -18,7 +19,6 @@ import { PlaylistHeader } from '@components/playlist/PlaylistHeader';
 import { TrackItem } from '@components/playlist/TrackItem';
 import { EmptyState } from '@components/common/EmptyState';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
-import { FloatingHeader } from '@/components/common/FloatingHeader';
 
 type PlaylistStackParamList = {
   Playlists: undefined;
@@ -118,12 +118,27 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
     }, [id, fetchPlaylistById])
   );
 
-  // Hide the default header
+  const handleShare = useCallback(() => {
+    navigation.navigate('PlaylistSharing', { playlistId: id });
+  }, [navigation, id]);
+
+  // Configure header natif transparent avec bouton partage
   React.useLayoutEffect(() => {
     navigation.setOptions({
-      headerShown: false,
+      headerTransparent: true,
+      headerTitle: '',
+      headerRight: isOwner
+        ? () => (
+            <Pressable
+              onPress={handleShare}
+              style={{ width: 36, height: 36, alignItems: 'center', justifyContent: 'center' }}
+            >
+              <Ionicons name="ellipsis-horizontal" size={24} color={theme.colors.text} />
+            </Pressable>
+          )
+        : undefined,
     });
-  }, [navigation]);
+  }, [navigation, isOwner, handleShare, theme.colors.text]);
 
   const handleAddTrack = () => {
     navigation.navigate('SearchTracks', { playlistId: id });
@@ -192,15 +207,6 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
         colors={gradientColors as unknown as [string, string, ...string[]]}
         locations={[0, 0.25, 0.5, 0.8]}
         style={styles.gradientBackground}
-      />
-
-      {/* Floating header */}
-      <FloatingHeader
-        rightIcon="ellipsis-horizontal"
-        onRightPress={
-          isOwner ? () => navigation.navigate('PlaylistSharing', { playlistId: id }) : undefined
-        }
-        showRightButton={isOwner}
       />
 
       {/* Content */}

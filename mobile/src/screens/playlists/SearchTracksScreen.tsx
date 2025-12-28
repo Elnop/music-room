@@ -9,7 +9,6 @@ import {
   Alert,
   Image,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,7 +18,6 @@ import { usePlaylistStore } from '@store/playlistStore';
 import { useSoundCloudStore } from '@store/soundcloudStore';
 import { EmptyState } from '@components/common/EmptyState';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
-import { FloatingHeader } from '@/components/common/FloatingHeader';
 import debounce from 'lodash/debounce';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import type { Track } from '@/types/track.types';
@@ -45,21 +43,15 @@ interface SearchTracksScreenProps {
   route: SearchTracksScreenRouteProp;
 }
 
-export function SearchTracksScreen({ navigation, route }: SearchTracksScreenProps) {
+export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
   const { theme } = useTheme();
-  const insets = useSafeAreaInsets();
-  const styles = React.useMemo(() => createStyles(theme, insets.top), [theme, insets.top]);
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const { playlistId } = route.params;
   const { addTrack, currentPlaylist } = usePlaylistStore();
   const { searchResults, isSearching, search, clearSearch } = useSoundCloudStore();
   const [query, setQuery] = useState('');
   const [addingTrackId, setAddingTrackId] = useState<number | null>(null);
   const [addedTrackUris, setAddedTrackUris] = useState<Set<string>>(new Set());
-
-  // Hide navigation header
-  React.useLayoutEffect(() => {
-    navigation.setOptions({ headerShown: false });
-  }, [navigation]);
 
   React.useEffect(() => {
     if (currentPlaylist?.tracks) {
@@ -189,9 +181,6 @@ export function SearchTracksScreen({ navigation, route }: SearchTracksScreenProp
 
   return (
     <View style={styles.container}>
-      {/* Floating header */}
-      <FloatingHeader />
-
       <View style={styles.header}>
         <TextInput
           style={styles.searchInput}
@@ -229,7 +218,7 @@ export function SearchTracksScreen({ navigation, route }: SearchTracksScreenProp
   );
 }
 
-const createStyles = (theme: Theme, topInset: number) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -237,7 +226,6 @@ const createStyles = (theme: Theme, topInset: number) =>
     },
     header: {
       padding: theme.spacing.md,
-      paddingTop: topInset + 60, // Space for floating header
       borderBottomWidth: 1,
       borderBottomColor: theme.colors.border,
     },

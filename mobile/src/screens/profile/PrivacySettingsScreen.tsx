@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -10,13 +9,11 @@ import { useAuthStore } from '@/store/authStore';
 import { privacyApi, ApiError } from '@/services/privacyApi';
 import { Button } from '@components/common/Button';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
-import { FloatingHeader } from '@/components/common/FloatingHeader';
 import { VisibilityToggle } from '@components/profile/VisibilityToggle';
 
 export function PrivacySettingsScreen() {
   const { theme } = useTheme();
-  const insets = useSafeAreaInsets();
-  const styles = React.useMemo(() => createStyles(theme, insets.top), [theme, insets.top]);
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const navigation = useNavigation<NativeStackNavigationProp<Record<string, undefined>>>();
   const { accessToken } = useAuthStore();
 
@@ -24,11 +21,6 @@ export function PrivacySettingsScreen() {
   const [isSaving, setIsSaving] = useState(false);
   const [privacy, setPrivacy] = useState<ProfilePrivacy | null>(null);
   const [initialPrivacy, setInitialPrivacy] = useState<ProfilePrivacy | null>(null);
-
-  // Hide navigation header
-  React.useLayoutEffect(() => {
-    navigation.setOptions({ headerShown: false });
-  }, [navigation]);
 
   // Load privacy settings on mount
   useEffect(() => {
@@ -100,7 +92,6 @@ export function PrivacySettingsScreen() {
   if (!privacy) {
     return (
       <View style={styles.container}>
-        <FloatingHeader />
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>Impossible de charger les paramètres</Text>
         </View>
@@ -110,9 +101,6 @@ export function PrivacySettingsScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Floating header */}
-      <FloatingHeader />
-
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
         <View style={styles.header}>
           <Text style={styles.title}>Confidentialité</Text>
@@ -161,7 +149,7 @@ export function PrivacySettingsScreen() {
   );
 }
 
-const createStyles = (theme: Theme, topInset: number) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -172,7 +160,6 @@ const createStyles = (theme: Theme, topInset: number) =>
     },
     content: {
       padding: theme.spacing.lg,
-      paddingTop: topInset + 60, // Space for floating header
     },
     header: {
       marginBottom: theme.spacing.xl,

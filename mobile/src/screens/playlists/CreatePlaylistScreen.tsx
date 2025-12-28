@@ -9,7 +9,6 @@ import {
   Alert,
   Switch,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -19,7 +18,6 @@ import { useAuthStore } from '@store/authStore';
 import { usePlaylistStore } from '@store/playlistStore';
 import { Button } from '@components/common/Button';
 import { Input } from '@components/common/Input';
-import { FloatingHeader } from '@/components/common/FloatingHeader';
 import { playlistFormSchema, type PlaylistFormInput } from '@utils/validators';
 import type { EditMode } from '@/types/playlist.types';
 
@@ -47,8 +45,7 @@ interface CreatePlaylistScreenProps {
 
 export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) {
   const { theme } = useTheme();
-  const insets = useSafeAreaInsets();
-  const styles = React.useMemo(() => createStyles(theme, insets.top), [theme, insets.top]);
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const { user } = useAuthStore();
   const { createPlaylist, isLoading } = usePlaylistStore();
 
@@ -91,9 +88,6 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
 
   return (
     <View style={styles.container}>
-      {/* Floating header */}
-      <FloatingHeader />
-
       <KeyboardAvoidingView
         style={styles.keyboardAvoid}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -202,7 +196,7 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
   );
 }
 
-const createStyles = (theme: Theme, topInset: number) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -213,7 +207,7 @@ const createStyles = (theme: Theme, topInset: number) =>
     },
     scrollContent: {
       flexGrow: 1,
-      paddingTop: topInset + 60, // Space for FloatingHeader
+      paddingTop: theme.spacing.md,
     },
     content: {
       flex: 1,

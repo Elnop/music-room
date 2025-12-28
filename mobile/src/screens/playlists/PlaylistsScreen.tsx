@@ -1,7 +1,8 @@
-import React, { useCallback } from 'react';
-import { View, FlatList, StyleSheet, RefreshControl } from 'react-native';
+import React, { useCallback, useState, useLayoutEffect } from 'react';
+import { View, FlatList, StyleSheet, RefreshControl, Pressable } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
 import type { Theme } from '@themes/types';
@@ -10,7 +11,6 @@ import { usePlaylistStore } from '@store/playlistStore';
 import { PlaylistCard } from '@components/playlist/PlaylistCard';
 import { EmptyState } from '@components/common/EmptyState';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
-import { FloatingHeader } from '@/components/common/FloatingHeader';
 
 type PlaylistStackParamList = {
   Playlists: undefined;
@@ -32,6 +32,28 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
   const { user } = useAuthStore();
   const { playlists, isLoading, fetchPlaylists } = usePlaylistStore();
 
+  // État séparé pour le pull-to-refresh manuel (évite le décalage au focus)
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleCreatePress = useCallback(() => {
+    navigation.navigate('CreatePlaylist');
+  }, [navigation]);
+
+  // Configure le bouton "+" dans le header natif
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Pressable
+          onPress={handleCreatePress}
+          style={{ width: 36, height: 36, alignItems: 'center', justifyContent: 'center' }}
+        >
+          <Ionicons name="add" size={28} color={theme.colors.text} />
+        </Pressable>
+      ),
+    });
+  }, [navigation, handleCreatePress, theme.colors.text]);
+
+  // Refresh silencieux au focus (pas de spinner visible)
   useFocusEffect(
     useCallback(() => {
       if (user) {
@@ -40,18 +62,17 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
     }, [user, fetchPlaylists])
   );
 
+  // Pull-to-refresh manuel (avec spinner)
   const handleRefresh = async () => {
     if (user) {
+      setIsRefreshing(true);
       await fetchPlaylists(user.id);
+      setIsRefreshing(false);
     }
   };
 
   const handlePlaylistPress = (id: string) => {
     navigation.navigate('PlaylistDetail', { id });
-  };
-
-  const handleCreatePress = () => {
-    navigation.navigate('CreatePlaylist');
   };
 
   if (isLoading && playlists.length === 0) {
@@ -60,16 +81,6 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
 
   return (
     <View style={styles.container}>
-      {/* Header with title and create button */}
-      <FloatingHeader
-        title="Mes Playlists"
-        titleAlign="left"
-        showBackButton={false}
-        rightIcon="add"
-        onRightPress={handleCreatePress}
-        showRightButton
-      />
-
       <FlatList
         data={playlists}
         keyExtractor={item => item.id}
@@ -92,7 +103,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
         contentContainerStyle={[styles.list, { paddingBottom: playerHeight + theme.spacing.xl }]}
         refreshControl={
           <RefreshControl
-            refreshing={isLoading}
+            refreshing={isRefreshing}
             onRefresh={handleRefresh}
             tintColor={theme.colors.primary}
           />
@@ -116,6 +127,6 @@ const createStyles = (theme: Theme) =>
     },
     list: {
       flexGrow: 1,
-      paddingTop: theme.spacing.md,
+      paddingTop: theme.spacing.xs,
     },
   });

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { WelcomeScreen } from '@screens/auth/WelcomeScreen';
 import { LoginScreen } from '@screens/auth/LoginScreen';
@@ -19,27 +20,24 @@ export function AuthNavigator() {
   return (
     <Stack.Navigator
       screenOptions={{
+        // Header opaque avec effet blur natif sur iOS
         headerStyle: {
           backgroundColor: theme.colors.background,
         },
-        contentStyle: {
-          borderTopWidth: theme.borders.medium,
-          borderTopColor: theme.colors.border,
-        },
+        headerBlurEffect: Platform.OS === 'ios' ? 'systemMaterialDark' : undefined,
         headerTintColor: theme.colors.text,
         headerShadowVisible: false,
         headerTitleStyle: {
           fontWeight: theme.typography.weights.bold,
         },
+        headerTitleAlign: 'center',
+        // Pas de titre dans le header (on a le logo)
+        headerTitle: '',
       }}
     >
       <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Sign In' }} />
-      <Stack.Screen
-        name="Register"
-        component={RegisterScreen}
-        options={{ title: 'Create Account' }}
-      />
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Register" component={RegisterScreen} />
     </Stack.Navigator>
   );
 }

@@ -17,7 +17,6 @@ import { useFriendListening } from '@/hooks/useMusicControl';
 import { Avatar } from '@/components/common/Avatar';
 import { Button } from '@/components/common/Button';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { FloatingHeader } from '@/components/common/FloatingHeader';
 import { PlaylistCard } from '@/components/playlist/PlaylistCard';
 import { DeviceListeningCard } from '@/components/music-control/DeviceListeningCard';
 import { ProfileSection } from '@/components/profile/ProfileSection';
@@ -57,9 +56,12 @@ export function UserProfileScreen({ route, navigation }: Props) {
     isLoading: isListeningLoading,
   } = useFriendListening(userId, initialCanControl);
 
-  // Hide navigation header
+  // Configure header natif transparent
   React.useLayoutEffect(() => {
-    navigation.setOptions({ headerShown: false });
+    navigation.setOptions({
+      headerTransparent: true,
+      headerTitle: '',
+    });
   }, [navigation]);
 
   useEffect(() => {
@@ -139,7 +141,6 @@ export function UserProfileScreen({ route, navigation }: Props) {
   if (error || !profile) {
     return (
       <View style={styles.container}>
-        <FloatingHeader />
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>{error || 'Profil introuvable'}</Text>
         </View>
@@ -164,9 +165,6 @@ export function UserProfileScreen({ route, navigation }: Props) {
         locations={[0, 0.2, 0.4, 0.7]}
         style={styles.gradientBackground}
       />
-
-      {/* Floating header */}
-      <FloatingHeader />
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
         <View style={styles.header}>

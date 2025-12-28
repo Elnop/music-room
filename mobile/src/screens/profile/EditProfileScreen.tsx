@@ -8,7 +8,6 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useForm, Controller } from 'react-hook-form';
@@ -22,7 +21,6 @@ import { profileApi, ApiError } from '@/services/profileApi';
 import { Button } from '@components/common/Button';
 import { Input } from '@components/common/Input';
 import { FormError } from '@components/common/FormError';
-import { FloatingHeader } from '@/components/common/FloatingHeader';
 
 // Profile field limits (aligned with backend)
 const PROFILE_LIMITS = {
@@ -47,17 +45,11 @@ type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 
 export function EditProfileScreen() {
   const { theme } = useTheme();
-  const insets = useSafeAreaInsets();
-  const styles = React.useMemo(() => createStyles(theme, insets.top), [theme, insets.top]);
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const navigation = useNavigation<NativeStackNavigationProp<Record<string, undefined>>>();
   const { user, accessToken } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Hide navigation header
-  React.useLayoutEffect(() => {
-    navigation.setOptions({ headerShown: false });
-  }, [navigation]);
 
   const {
     control,
@@ -109,9 +101,6 @@ export function EditProfileScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Floating header */}
-      <FloatingHeader />
-
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -210,7 +199,7 @@ export function EditProfileScreen() {
   );
 }
 
-const createStyles = (theme: Theme, topInset: number) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -224,7 +213,6 @@ const createStyles = (theme: Theme, topInset: number) =>
     },
     contentContainer: {
       padding: theme.spacing.lg,
-      paddingTop: topInset + 60, // Space for floating header
     },
     title: {
       fontSize: 28,

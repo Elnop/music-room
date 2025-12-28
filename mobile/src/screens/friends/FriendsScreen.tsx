@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Switch, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import debounce from 'lodash/debounce';
@@ -209,10 +208,8 @@ export function FriendsScreen() {
   const hasFriends = friends.length > 0;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Amis</Text>
-
         {/* Tabs - only show if user has friends */}
         {hasFriends && (
           <View style={styles.tabsContainer}>
@@ -313,7 +310,7 @@ export function FriendsScreen() {
             }
           />
         ))}
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -324,14 +321,9 @@ const createStyles = (theme: Theme) =>
       backgroundColor: theme.colors.background,
     },
     header: {
-      padding: theme.spacing.lg,
+      paddingHorizontal: theme.spacing.lg,
+      paddingTop: theme.spacing.xs,
       paddingBottom: theme.spacing.sm,
-    },
-    title: {
-      fontSize: 28,
-      fontWeight: theme.typography.weights.bold,
-      color: theme.colors.text,
-      marginBottom: theme.spacing.md,
     },
     tabsContainer: {
       flexDirection: 'row',

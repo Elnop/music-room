@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -11,13 +10,11 @@ import { useAuthStore } from '@/store/authStore';
 import { privacyApi, ApiError } from '@/services/privacyApi';
 import { Button } from '@components/common/Button';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
-import { FloatingHeader } from '@/components/common/FloatingHeader';
 import { GenreSelector } from '@components/profile/GenreSelector';
 
 export function MusicPreferencesScreen() {
   const { theme } = useTheme();
-  const insets = useSafeAreaInsets();
-  const styles = React.useMemo(() => createStyles(theme, insets.top), [theme, insets.top]);
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const navigation = useNavigation<NativeStackNavigationProp<Record<string, undefined>>>();
   const { accessToken } = useAuthStore();
 
@@ -25,11 +22,6 @@ export function MusicPreferencesScreen() {
   const [isSaving, setIsSaving] = useState(false);
   const [initialGenres, setInitialGenres] = useState<MusicGenre[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<MusicGenre[]>([]);
-
-  // Hide navigation header
-  React.useLayoutEffect(() => {
-    navigation.setOptions({ headerShown: false });
-  }, [navigation]);
 
   // Load music preferences on mount
   useEffect(() => {
@@ -96,9 +88,6 @@ export function MusicPreferencesScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Floating header */}
-      <FloatingHeader />
-
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
         <View style={styles.header}>
           <Text style={styles.title}>Préférences musicales</Text>
@@ -130,7 +119,7 @@ export function MusicPreferencesScreen() {
   );
 }
 
-const createStyles = (theme: Theme, topInset: number) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -141,7 +130,6 @@ const createStyles = (theme: Theme, topInset: number) =>
     },
     content: {
       paddingVertical: theme.spacing.lg,
-      paddingTop: topInset + 60, // Space for floating header
     },
     header: {
       paddingHorizontal: theme.spacing.lg,

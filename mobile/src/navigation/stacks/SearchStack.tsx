@@ -1,11 +1,12 @@
 /**
  * Search Feature Navigation Stack
  *
- * This file contains all navigation configuration for the Search feature.
- * Developers working on search can modify this file without conflicts with other features.
+ * Architecture:
+ * - Pages principales: Header opaque standard avec effet blur natif iOS
  */
 
 import React from 'react';
+import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '@/contexts/ThemeContext';
 import { SoundCloudSearchScreen } from '@/screens/search/SoundCloudSearchScreen';
@@ -22,24 +23,23 @@ export function SearchNavigator() {
   return (
     <SearchStack.Navigator
       screenOptions={{
+        // Header opaque avec effet blur natif sur iOS
         headerStyle: {
           backgroundColor: theme.colors.background,
         },
-        contentStyle: {
-          borderTopWidth: theme.borders.medium,
-          borderTopColor: theme.colors.border,
-        },
+        headerBlurEffect: Platform.OS === 'ios' ? 'systemMaterialDark' : undefined,
         headerTintColor: theme.colors.text,
         headerShadowVisible: false,
         headerTitleStyle: {
           fontWeight: theme.typography.weights.bold,
         },
+        headerTitleAlign: 'center',
       }}
     >
       <SearchStack.Screen
         name="Search"
         component={SoundCloudSearchScreen}
-        options={{ headerShown: false }}
+        options={{ title: 'Recherche' }}
       />
     </SearchStack.Navigator>
   );

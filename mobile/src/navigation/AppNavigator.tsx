@@ -131,6 +131,7 @@ const createStyles = (theme: Theme, bottomInset: number) =>
       paddingBottom: bottomInset + 10,
       backgroundColor: theme.colors.background,
       borderTopWidth: 0,
+      elevation: 0,
     },
     iconContainer: {
       width: 44,

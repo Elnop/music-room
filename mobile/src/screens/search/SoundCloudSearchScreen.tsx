@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
@@ -54,12 +53,11 @@ export function SoundCloudSearchScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Search Music</Text>
         <TextInput
           style={styles.searchInput}
-          placeholder="Search SoundCloud..."
+          placeholder="Rechercher sur SoundCloud..."
           placeholderTextColor={theme.colors.textSecondary}
           value={searchQuery}
           onChangeText={handleSearchChange}
@@ -118,7 +116,7 @@ export function SoundCloudSearchScreen() {
         track={selectedTrack}
         onClose={() => setShowPlaylistModal(false)}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -129,13 +127,8 @@ const createStyles = (theme: Theme) =>
       backgroundColor: theme.colors.background,
     },
     header: {
-      padding: theme.spacing.lg,
-    },
-    title: {
-      fontSize: 28,
-      fontWeight: theme.typography.weights.bold,
-      color: theme.colors.text,
-      marginBottom: theme.spacing.md,
+      paddingHorizontal: theme.spacing.lg,
+      paddingTop: theme.spacing.xs,
     },
     searchInput: {
       backgroundColor: theme.colors.surfaceAlt,

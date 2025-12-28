@@ -1,12 +1,17 @@
-import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React, { useState, useCallback, useLayoutEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  RefreshControl,
+  Pressable,
+} from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '@/contexts/ThemeContext';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
-import { useImageColors, hexToRgba } from '@/hooks/useImageColors';
 import type { Theme } from '@themes/types';
 import type { MusicGenre, MusicPreferences } from '@/types/user.types';
 import { useAuthStore } from '@/store/authStore';
@@ -14,7 +19,6 @@ import { privacyApi } from '@/services/privacyApi';
 import { friendsApi, type MyStats } from '@/services/friendsApi';
 import { Ionicons } from '@expo/vector-icons';
 import { Avatar } from '@components/common/Avatar';
-import { FloatingHeader } from '@/components/common/FloatingHeader';
 import { ProfileSection } from '@components/profile/ProfileSection';
 import { GenreChip } from '@components/profile/GenreChip';
 import { ThemeSelector } from '@components/theme/ThemeSelector';
@@ -31,9 +35,8 @@ type NavigationProp = NativeStackNavigationProp<ProfileStackParamList>;
 
 export function ProfileScreen() {
   const { theme } = useTheme();
-  const insets = useSafeAreaInsets();
   const playerHeight = usePlayerHeight();
-  const styles = React.useMemo(() => createStyles(theme, insets.top), [theme, insets.top]);
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const navigation = useNavigation<NavigationProp>();
   const { user, logout, isLoading, accessToken, isAuthenticated } = useAuthStore();
 
@@ -41,18 +44,23 @@ export function ProfileScreen() {
   const [stats, setStats] = useState<MyStats | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Get avatar URL for color extraction
-  const avatarUrl = user?.avatarUrl;
-  const { dominantColor } = useImageColors(avatarUrl, theme.colors.primary);
+  const handleEditProfile = useCallback(() => {
+    navigation.navigate('EditProfile');
+  }, [navigation]);
 
-  // Gradient colors based on avatar
-  const gradientColors = dominantColor
-    ? ([
-        hexToRgba(dominantColor, 0.6),
-        hexToRgba(dominantColor, 0.3),
-        theme.colors.background,
-      ] as const)
-    : ([theme.colors.primary + '40', theme.colors.background, theme.colors.background] as const);
+  // Configure le bouton settings dans le header natif
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Pressable
+          onPress={handleEditProfile}
+          style={{ width: 36, height: 36, alignItems: 'center', justifyContent: 'center' }}
+        >
+          <Ionicons name="settings-outline" size={24} color={theme.colors.text} />
+        </Pressable>
+      ),
+    });
+  }, [navigation, handleEditProfile, theme.colors.text]);
 
   // Load profile data (music preferences + stats)
   const loadProfileData = useCallback(async () => {
@@ -85,10 +93,6 @@ export function ProfileScreen() {
     setIsRefreshing(false);
   };
 
-  const handleEditProfile = () => {
-    navigation.navigate('EditProfile');
-  };
-
   const handlePrivacySettings = () => {
     navigation.navigate('PrivacySettings');
   };
@@ -117,23 +121,6 @@ export function ProfileScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Full screen gradient */}
-      <LinearGradient
-        colors={gradientColors as unknown as [string, string, ...string[]]}
-        locations={[0, 0.3, 0.6]}
-        style={styles.gradientBackground}
-      />
-
-      {/* Floating header with edit button */}
-      <FloatingHeader
-        title="Mon Profil"
-        titleAlign="left"
-        showBackButton={false}
-        rightIcon="settings-outline"
-        onRightPress={handleEditProfile}
-        showRightButton
-      />
-
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={[
@@ -261,29 +248,22 @@ export function ProfileScreen() {
   );
 }
 
-const createStyles = (theme: Theme, topInset: number) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: theme.colors.background,
     },
-    gradientBackground: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      height: 350,
-    },
     scrollView: {
       flex: 1,
     },
     contentContainer: {
-      paddingTop: topInset + 10, // Space for floating header
       paddingBottom: theme.spacing.xl,
     },
     heroContent: {
       alignItems: 'center',
       paddingHorizontal: theme.spacing.lg,
+      paddingTop: theme.spacing.lg,
       paddingBottom: theme.spacing.xl,
     },
     username: {

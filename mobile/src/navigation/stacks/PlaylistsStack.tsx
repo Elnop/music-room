@@ -1,11 +1,13 @@
 /**
  * Playlists Feature Navigation Stack
  *
- * This file contains all navigation configuration for the Playlists feature.
- * Developers working on playlists can modify this file without conflicts with other features.
+ * Architecture:
+ * - Toutes les pages utilisent le header natif avec effet liquid glass sur iOS
+ * - Pages avec gradient: header transparent (headerTransparent: true)
  */
 
 import React from 'react';
+import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '@/contexts/ThemeContext';
 import { PlaylistsScreen } from '@/screens/playlists/PlaylistsScreen';
@@ -30,35 +32,44 @@ export function PlaylistsNavigator() {
   return (
     <PlaylistStack.Navigator
       screenOptions={{
+        // Header opaque avec effet blur natif sur iOS
         headerStyle: {
           backgroundColor: theme.colors.background,
         },
+        headerBlurEffect: Platform.OS === 'ios' ? 'systemMaterialDark' : undefined,
         headerTintColor: theme.colors.text,
-        headerShadowVisible: true,
+        headerShadowVisible: false,
         headerTitleStyle: {
           fontWeight: theme.typography.weights.bold,
         },
+        headerTitleAlign: 'center',
+        headerLargeTitle: false,
       }}
     >
       <PlaylistStack.Screen
         name="Playlists"
         component={PlaylistsScreen}
-        options={{ headerShown: false }}
+        options={{ title: 'Mes Playlists' }}
       />
       <PlaylistStack.Screen
         name="PlaylistDetail"
         component={PlaylistDetailScreen}
-        options={{ title: 'Playlist' }}
+        options={{
+          headerTransparent: true,
+          headerBlurEffect: undefined,
+          headerStyle: { backgroundColor: 'transparent' },
+          title: '',
+        }}
       />
       <PlaylistStack.Screen
         name="CreatePlaylist"
         component={CreatePlaylistScreen}
-        options={{ headerShown: false }}
+        options={{ title: 'Nouvelle Playlist' }}
       />
       <PlaylistStack.Screen
         name="SearchTracks"
         component={SearchTracksScreen}
-        options={{ title: 'Add Tracks' }}
+        options={{ title: 'Ajouter des titres' }}
       />
       <PlaylistStack.Screen
         name="PlaylistSharing"

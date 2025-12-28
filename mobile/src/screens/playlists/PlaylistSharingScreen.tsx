@@ -9,7 +9,6 @@ import {
   Switch,
   ScrollView,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useFocusEffect } from '@react-navigation/native';
 import debounce from 'lodash/debounce';
@@ -23,7 +22,6 @@ import { playlistApi, ViewerProfile } from '@api/playlistApi';
 import { SearchBar } from '@components/common/SearchBar';
 import { Avatar } from '@components/common/Avatar';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
-import { FloatingHeader } from '@/components/common/FloatingHeader';
 import type { UserProfile } from '@/types/user.types';
 
 type PlaylistStackParamList = {
@@ -72,16 +70,11 @@ const toMember = (user: UserProfile | ViewerProfile, canEdit: boolean): Member =
  * | private    | open       | Manage access (viewers = can also edit)     |
  * | private    | restricted | Manage access (viewers) + editors (collabs) |
  */
-export function PlaylistSharingScreen({ route, navigation }: PlaylistSharingScreenProps) {
+export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
   const { theme } = useTheme();
-  const insets = useSafeAreaInsets();
-  const styles = React.useMemo(() => createStyles(theme, insets.top), [theme, insets.top]);
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const { playlistId } = route.params;
 
-  // Hide navigation header
-  React.useLayoutEffect(() => {
-    navigation.setOptions({ headerShown: false });
-  }, [navigation]);
   const { accessToken } = useAuthStore();
   const { currentPlaylist, fetchPlaylistById } = usePlaylistStore();
 
@@ -596,9 +589,6 @@ export function PlaylistSharingScreen({ route, navigation }: PlaylistSharingScre
 
   return (
     <View style={styles.container}>
-      {/* Floating header */}
-      <FloatingHeader />
-
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <Text style={styles.title}>{headerContent.title}</Text>
@@ -663,7 +653,7 @@ export function PlaylistSharingScreen({ route, navigation }: PlaylistSharingScre
   );
 }
 
-const createStyles = (theme: Theme, topInset: number) =>
+const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -674,7 +664,6 @@ const createStyles = (theme: Theme, topInset: number) =>
     },
     scrollContent: {
       flexGrow: 1,
-      paddingTop: topInset + 60, // Space for floating header
     },
     header: {
       padding: theme.spacing.lg,

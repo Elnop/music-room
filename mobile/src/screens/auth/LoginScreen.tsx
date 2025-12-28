@@ -8,8 +8,8 @@ import {
   ScrollView,
   Alert,
   TouchableOpacity,
+  Image,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -21,6 +21,9 @@ import { Input } from '@components/common/Input';
 import { FormError } from '@components/common/FormError';
 import { loginSchema, LoginInput } from '@utils/validators';
 import { useAuthStore } from '@/store/authStore';
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const Logo = require('@/assets/logo/logo.png');
 
 type AuthStackParamList = {
   Welcome: undefined;
@@ -106,7 +109,7 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <KeyboardAvoidingView
         style={styles.keyboardAvoid}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -114,11 +117,12 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
+          bounces={false}
+          showsVerticalScrollIndicator={false}
         >
           <View style={styles.content}>
             <View style={styles.header}>
-              <Text style={styles.title}>Welcome Back</Text>
-              <Text style={styles.subtitle}>Sign in to continue</Text>
+              <Image source={Logo} style={styles.logo} resizeMode="contain" />
             </View>
 
             {error && <FormError message={error} />}
@@ -201,7 +205,7 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -223,17 +227,12 @@ const createStyles = (theme: Theme) =>
       justifyContent: 'center',
     },
     header: {
+      alignItems: 'center',
       marginBottom: theme.spacing.xl,
     },
-    title: {
-      fontSize: theme.typography.sizes.xxl,
-      fontWeight: theme.typography.weights.bold,
-      color: theme.colors.text,
-      marginBottom: theme.spacing.xs,
-    },
-    subtitle: {
-      fontSize: theme.typography.sizes.md,
-      color: theme.colors.textSecondary,
+    logo: {
+      width: 150,
+      height: 150,
     },
     form: {
       gap: theme.spacing.md,
