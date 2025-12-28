@@ -105,4 +105,22 @@ router.delete("/providers/:provider", authMiddleware, (req, res, next) =>
   authController.unlinkProvider(req, res, next),
 );
 
+/**
+ * @route   POST /api/auth/verify-email
+ * @desc    Verify email with 6-digit code
+ * @access  Public
+ */
+router.post("/verify-email", loginRateLimiter, (req, res, next) =>
+  authController.verifyEmail(req, res, next),
+);
+
+/**
+ * @route   POST /api/auth/resend-verification
+ * @desc    Resend email verification code
+ * @access  Public
+ */
+router.post("/resend-verification", registerRateLimiter, (req, res, next) =>
+  authController.resendVerification(req, res, next),
+);
+
 export default router;

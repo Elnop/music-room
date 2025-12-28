@@ -48,6 +48,17 @@ const envSchema = z.object({
 
   // Graceful Degradation
   RATE_LIMIT_FALLBACK_MEMORY: z.string().default("true"),
+
+  // Gmail SMTP Configuration
+  GMAIL_USER: z.string().email("Invalid Gmail user address"),
+  GMAIL_APP_PASSWORD: z.string().min(1, "Gmail app password is required"),
+
+  // Email Verification Configuration
+  EMAIL_VERIFICATION_ENABLED: z.string().default("true"),
+  EMAIL_VERIFICATION_CODE_EXPIRY_MINUTES: z.string().default("15"),
+  EMAIL_VERIFICATION_MAX_ATTEMPTS: z.string().default("5"),
+  EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS: z.string().default("60"),
+  EMAIL_VERIFICATION_MAX_RESENDS_PER_HOUR: z.string().default("3"),
 });
 
 export type Env = z.infer<typeof envSchema>;

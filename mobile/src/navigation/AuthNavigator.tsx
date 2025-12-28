@@ -4,12 +4,14 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { WelcomeScreen } from '@screens/auth/WelcomeScreen';
 import { LoginScreen } from '@screens/auth/LoginScreen';
 import { RegisterScreen } from '@screens/auth/RegisterScreen';
+import EmailVerificationScreen from '@screens/auth/EmailVerificationScreen';
 import { useTheme } from '@/contexts/ThemeContext';
 
 export type AuthStackParamList = {
   Welcome: undefined;
   Login: undefined;
   Register: undefined;
+  EmailVerification: { userId: string; email: string };
 };
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
@@ -38,6 +40,11 @@ export function AuthNavigator() {
       <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen
+        name="EmailVerification"
+        component={EmailVerificationScreen}
+        options={{ title: 'Verify Email' }}
+      />
     </Stack.Navigator>
   );
 }

@@ -68,9 +68,13 @@ redis-info:
 .PHONY: redis-flush
 redis-flush:
 	@$(call display_step,"Flushing all Redis data...")
-	@read -p "Are you sure? This will delete all rate limit data (y/N): " confirm && \
-	[ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ] && \
-	docker exec -it $(REDIS_CONTAINER_NAME) redis-cli FLUSHALL || echo "Cancelled"
+	@read "?Are you sure? This will delete all rate limit data (y/N): " confirm && \
+	if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ]; then \
+		docker exec -it $(REDIS_CONTAINER_NAME) redis-cli FLUSHALL; \
+		echo "$(GREEN)✓$(RESET) Redis data flushed"; \
+	else \
+		echo "$(YELLOW)✗$(RESET) Cancelled"; \
+	fi
 
 # ==============================================================================
 # Cleanup

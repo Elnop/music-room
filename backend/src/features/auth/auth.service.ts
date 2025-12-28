@@ -10,6 +10,8 @@ import { SessionService } from "@/features/auth/services/session.service.js";
 import { OAuthService } from "@/features/auth/services/oauth.service.js";
 import { UserService } from "@/features/auth/services/user.service.js";
 import { ProviderService } from "@/features/auth/services/provider.service.js";
+import { EmailService } from "@/features/auth/services/email.service.js";
+import { EmailVerificationService } from "@/features/auth/services/email-verification.service.js";
 import type {
   RegisterDTO,
   LoginDTO,
@@ -36,7 +38,54 @@ export class AuthService {
         username: data.username,
       });
 
-      // 1. Check if username already exists
+      // 1. Check if email exists with unverified account
+      // If exists and unverified, delete it to allow re-registration
+      // This MUST be done BEFORE username check to clean up old username
+      const { data: existingUser } = await supabase.auth.admin.listUsers();
+      const userWithEmail = existingUser?.users?.find(
+        (u) => u.email === data.email,
+      );
+
+      if (userWithEmail) {
+        // Check if email is verified
+        const { data: profile } = await supabase
+          .from("user_profiles")
+          .select("email_verified")
+          .eq("id", userWithEmail.id)
+          .single();
+
+        if (profile && !profile.email_verified) {
+          logger.info(
+            "Found unverified account with same email, deleting old account",
+            {
+              email: data.email,
+              oldUserId: userWithEmail.id,
+            },
+          );
+
+          // Delete old profile first (this removes the old username too)
+          await supabase
+            .from("user_profiles")
+            .delete()
+            .eq("id", userWithEmail.id);
+
+          // Delete old auth user
+          await supabase.auth.admin.deleteUser(userWithEmail.id);
+
+          logger.info("Old unverified account deleted successfully", {
+            email: data.email,
+          });
+        } else {
+          // Email is verified, cannot re-register
+          throw new AppError(
+            409,
+            "Email already registered",
+            "EMAIL_ALREADY_EXISTS",
+          );
+        }
+      }
+
+      // 2. Check if username already exists (after cleanup)
       const { data: existingProfile } = await supabase
         .from("user_profiles")
         .select("username")
@@ -47,13 +96,13 @@ export class AuthService {
         throw new AppError(409, "Username already taken", "USERNAME_TAKEN");
       }
 
-      // 2. Create user in Supabase Auth using Admin API
-      // Using admin.createUser to bypass email confirmation in development
+      // 3. Create user in Supabase Auth using Admin API
+      // email_confirm: false requires email verification
       const { data: authData, error: authError } =
         await supabase.auth.admin.createUser({
           email: data.email,
           password: data.password,
-          email_confirm: true, // Auto-confirm email for development
+          email_confirm: false, // Require email verification
         });
 
       if (authError) {
@@ -66,24 +115,6 @@ export class AuthService {
           400,
           "Failed to create user - no user returned",
           "AUTH_ERROR",
-        );
-      }
-
-      // Generate a session manually using signInWithPassword
-      const { data: sessionData, error: sessionError } =
-        await supabase.auth.signInWithPassword({
-          email: data.email,
-          password: data.password,
-        });
-
-      if (sessionError || !sessionData.session) {
-        logger.error("Failed to create session after user creation", {
-          error: sessionError,
-        });
-        throw new AppError(
-          500,
-          "User created but failed to generate session",
-          "SESSION_ERROR",
         );
       }
 
@@ -107,14 +138,34 @@ export class AuthService {
         );
       }
 
-      logger.info("User registered successfully", { userId: authData.user.id });
+      // 4. Generate and send verification code
+      const emailService = new EmailService();
+      const verificationService = new EmailVerificationService();
 
-      return formatAuthResponse(
-        authData.user,
-        sessionData.session,
-        data.username,
-        data.displayName,
-      );
+      const code = await verificationService.generateAndStore(authData.user.id);
+      await emailService.sendVerificationEmail(data.email, code);
+
+      logger.info("User registered successfully, verification email sent", {
+        userId: authData.user.id,
+        email: data.email,
+      });
+
+      // Return response WITHOUT session (user must verify email first)
+      return {
+        user: {
+          id: authData.user.id,
+          email: data.email,
+          username: data.username,
+          displayName: data.displayName,
+          avatarUrl: undefined,
+          bio: undefined,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        requiresVerification: true,
+        message:
+          "Registration successful. Please check your email for verification code.",
+      };
     } catch (error) {
       if (error instanceof AppError) throw error;
       logger.error("Unexpected error during registration", { error });
@@ -156,8 +207,39 @@ export class AuthService {
         );
       }
 
-      // Fetch user profile
-      const profile = await fetchUserProfile(authData.user.id);
+      // Fetch user profile and check email verification
+      const { data: profile, error: profileError } = await supabase
+        .from("user_profiles")
+        .select("*, email_verified, google_id, facebook_id")
+        .eq("id", authData.user.id)
+        .single();
+
+      if (profileError || !profile) {
+        logger.error("Failed to fetch user profile", {
+          userId: authData.user.id,
+          error: profileError,
+        });
+        throw new AppError(404, "User profile not found", "PROFILE_NOT_FOUND");
+      }
+
+      // Check if email/password user has verified email
+      // OAuth accounts (Google/Facebook) are auto-verified
+      const isOAuthAccount = profile.google_id || profile.facebook_id;
+      if (!isOAuthAccount && !profile.email_verified) {
+        logger.warn("Login blocked - email not verified", {
+          userId: authData.user.id,
+          email: authData.user.email,
+        });
+        throw new AppError(
+          403,
+          "Please verify your email before logging in. Check your inbox for the verification code.",
+          "EMAIL_NOT_VERIFIED",
+          {
+            userId: authData.user.id,
+            email: authData.user.email,
+          },
+        );
+      }
 
       logger.info("User logged in successfully", {
         userId: authData.user.id,
@@ -168,11 +250,11 @@ export class AuthService {
         authData.user,
         authData.session,
         profile.username,
-        profile.display_name,
-        profile.avatar_url,
-        profile.bio,
-        profile.created_at,
-        profile.updated_at,
+        profile.display_name ?? undefined,
+        profile.avatar_url ?? undefined,
+        profile.bio ?? undefined,
+        profile.created_at ?? undefined,
+        profile.updated_at ?? undefined,
       );
     } catch (error) {
       if (error instanceof AppError) throw error;

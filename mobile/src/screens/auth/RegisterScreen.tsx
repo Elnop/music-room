@@ -28,6 +28,7 @@ type AuthStackParamList = {
   Welcome: undefined;
   Login: undefined;
   Register: undefined;
+  EmailVerification: { userId: string; email: string };
 };
 
 type RegisterScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Register'>;
@@ -64,8 +65,16 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
 
   const onSubmit = async (data: RegisterInput) => {
     try {
-      await register(data);
-      // Navigation handled by RootNavigator based on auth state
+      const result = await register(data);
+
+      // If email verification is required, navigate to verification screen
+      if (result.requiresVerification && result.userId && result.email) {
+        navigation.navigate('EmailVerification', {
+          userId: result.userId,
+          email: result.email,
+        });
+      }
+      // Otherwise, navigation handled by RootNavigator based on auth state
     } catch (error) {
       console.error('[RegisterScreen] Register error:', error);
       // Error shown via alert (from auth store)
