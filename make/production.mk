@@ -34,12 +34,12 @@ prod-build: ## Build production AAB via EAS cloud (Google Play Store)
 	@echo ""
 	$(call print_arrow,Checking prerequisites...)
 	@command -v eas >/dev/null 2>&1 || { \
-		$(call print_error,EAS CLI not installed); \
+		echo "$(RED)$(ICON_ERROR) EAS CLI not installed$(NC)"; \
 		echo "$(YELLOW)$(ICON_WARNING) Run: npm install -g eas-cli$(NC)"; \
 		exit 1; \
 	}
 	@cd mobile && eas whoami >/dev/null 2>&1 || { \
-		$(call print_error,Not logged into EAS); \
+		echo "$(RED)$(ICON_ERROR) Not logged into EAS$(NC)"; \
 		echo "$(YELLOW)$(ICON_WARNING) Run: cd mobile && eas login$(NC)"; \
 		exit 1; \
 	}
@@ -131,12 +131,12 @@ prod-build-apk: ## Build production APK via EAS cloud (directly installable)
 	@echo ""
 	$(call print_arrow,Checking prerequisites...)
 	@command -v eas >/dev/null 2>&1 || { \
-		$(call print_error,EAS CLI not installed); \
+		echo "$(RED)$(ICON_ERROR) EAS CLI not installed$(NC)"; \
 		echo "$(YELLOW)$(ICON_WARNING) Run: npm install -g eas-cli$(NC)"; \
 		exit 1; \
 	}
 	@cd mobile && eas whoami >/dev/null 2>&1 || { \
-		$(call print_error,Not logged into EAS); \
+		echo "$(RED)$(ICON_ERROR) Not logged into EAS$(NC)"; \
 		echo "$(YELLOW)$(ICON_WARNING) Run: cd mobile && eas login$(NC)"; \
 		exit 1; \
 	}
