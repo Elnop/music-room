@@ -16,29 +16,7 @@ const openapiDocument: OpenAPIV3.Document = {
 	info: {
 		title: 'Music Room API',
 		version: '1.0.0',
-		description: `Music Room - Collaborative music listening platform
-
-## Features
-
-- User authentication (email/password, Google OAuth, Facebook OAuth)
-- Collaborative playlist management
-- Real-time track synchronization
-- SoundCloud music integration
-- Friends system with music control delegation
-
-## Authentication
-
-Most endpoints require JWT Bearer token:
-
-1. Register or login to get access token
-2. Click "Authorize" button
-3. Enter: Bearer <your_token>
-4. Token valid for 1 hour
-
-## Rate Limiting
-
-- Auth endpoints: 5 req/15min per IP
-- General endpoints: 100 req/15min per IP`,
+		description: `Music Room - Collaborative music listening platform`,
 		contact: {
 			name: 'Music Room Team',
 			email: 'contact@music-room.local'
