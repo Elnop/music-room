@@ -65,11 +65,11 @@
           "android": {
             "compileSdkVersion": 35,
             "targetSdkVersion": 35,
-            "buildToolsVersion": "35.0.0",
-            "javaVersion": "17"
+            "buildToolsVersion": "35.0.0"
           }
         }
       ],
+      "./plugins/withJvmTarget.js",
       [
         "@react-native-google-signin/google-signin",
         {
