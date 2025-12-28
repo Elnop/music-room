@@ -127,12 +127,14 @@ app.use(errorHandler);
 // =====================================================
 
 const PORT = env.PORT;
+const HOST = "0.0.0.0"; // Listen on all network interfaces (allows LAN connections)
 
-httpServer.listen(PORT, () => {
+httpServer.listen(PORT, HOST, () => {
   logger.info("Music Room backend is running", {
     server: `http://localhost:${PORT}`,
     health: `http://localhost:${PORT}/health`,
     environment: env.NODE_ENV,
+    host: HOST,
   });
   logger.info("API endpoints available", {
     auth: `http://localhost:${PORT}/api/auth`,

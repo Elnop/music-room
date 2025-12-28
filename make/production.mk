@@ -5,6 +5,9 @@
 #
 # Usage:
 #   make prod-build          - Build production AAB via EAS cloud (~15-25 min)
+#   make prod-build-apk      - Build production APK via EAS cloud (directly installable)
+#   make prod-build-apk-local - Build production APK locally with EAS (requires Android SDK, ~5-15 min)
+#   make prod-build-apk-manual - Build production APK with Gradle (NO EAS, ~5-10 min)
 #   make prod-build-local    - Build production AAB locally (requires Android SDK)
 #   make prod-build-manual   - Build AAB manually with Gradle (full control)
 #   make prod-version-bump   - Bump app version interactively
@@ -14,7 +17,7 @@
 #   make prod-keystore-setup - Generate production keystore for signing
 # ==============================================================================
 
-.PHONY: prod-build prod-build-local prod-build-manual prod-submit \
+.PHONY: prod-build prod-build-local prod-build-manual prod-build-apk prod-build-apk-local prod-build-apk-manual prod-submit \
         prod-version-bump prod-version-auto prod-keystore-setup prod-info
 
 #------------------------------------------------------------
@@ -84,6 +87,93 @@ prod-build-manual: ## Build AAB manually with Gradle (no EAS)
 	$(call blank_line)
 	$(call print_header,✓ Build Complete)
 	@echo "   AAB: mobile/android/app/build/outputs/bundle/release/app-release.aab"
+	@echo ""
+
+prod-build-apk-manual: ## Build production APK manually with Gradle (no EAS, directly installable)
+	$(call print_header,Building Production APK (Manual - No EAS))
+	$(call print_subsection,📱 Target: Direct installation on devices)
+	@echo "   Format: APK (Android Package)"
+	@echo "   No EAS required - 100% local build"
+	@echo "   Time: ~5-10 minutes"
+	@echo ""
+	$(call print_arrow,Checking Android SDK...)
+	@command -v adb >/dev/null 2>&1 || { \
+		$(call print_error,Android SDK not found); \
+		echo "$(YELLOW)$(ICON_WARNING) Set ANDROID_HOME and add platform-tools to PATH$(NC)"; \
+		exit 1; \
+	}
+	$(call print_success,Android SDK found: $${ANDROID_HOME})
+	@echo ""
+	$(call print_arrow,Running expo prebuild...)
+	@cd mobile && npx expo prebuild --clean
+	$(call blank_line)
+	$(call print_arrow,Building APK with Gradle...)
+	@cd mobile/android && ./gradlew assembleRelease
+	$(call blank_line)
+	$(call print_header,✓ Build Complete)
+	$(call print_subsection,📦 APK Location)
+	@echo "   mobile/android/app/build/outputs/apk/release/app-release.apk"
+	@echo ""
+	$(call print_subsection,📱 Install on Device)
+	@echo "   adb install mobile/android/app/build/outputs/apk/release/app-release.apk"
+	@echo ""
+
+prod-build-apk: ## Build production APK via EAS cloud (directly installable)
+	$(call print_header,Building Production APK (Cloud))
+	$(call print_subsection,📱 Target: Direct installation on devices)
+	@echo "   Format: APK (Android Package)"
+	@echo "   Profile: preview"
+	@echo "   Time: ~15-25 minutes"
+	@echo ""
+	$(call print_arrow,Checking prerequisites...)
+	@command -v eas >/dev/null 2>&1 || { \
+		$(call print_error,EAS CLI not installed); \
+		echo "$(YELLOW)$(ICON_WARNING) Run: npm install -g eas-cli$(NC)"; \
+		exit 1; \
+	}
+	@cd mobile && eas whoami >/dev/null 2>&1 || { \
+		$(call print_error,Not logged into EAS); \
+		echo "$(YELLOW)$(ICON_WARNING) Run: cd mobile && eas login$(NC)"; \
+		exit 1; \
+	}
+	$(call print_success,EAS ready)
+	@echo ""
+	$(call print_arrow,Starting cloud build...)
+	$(call print_warning,⏳ This takes ~15-25 minutes)
+	$(call blank_line)
+	@cd mobile && eas build --profile preview --platform android
+	$(call blank_line)
+	$(call print_header,✓ Build Complete)
+	$(call print_subsection,📦 Next Steps)
+	@echo "   1. Download APK from EAS dashboard: https://expo.dev"
+	@echo "   2. Install via USB: adb install downloaded-file.apk"
+	@echo "   3. Or scan QR code to download on device"
+	@echo ""
+
+prod-build-apk-local: ## Build production APK locally (requires Android SDK)
+	$(call print_header,Building Production APK (Local))
+	$(call print_subsection,📱 Target: Direct installation on devices)
+	@echo "   Format: APK (Android Package)"
+	@echo "   Profile: preview"
+	@echo "   Time: ~5-15 minutes"
+	@echo ""
+	$(call print_arrow,Checking Android SDK...)
+	@command -v adb >/dev/null 2>&1 || { \
+		$(call print_error,Android SDK not found); \
+		echo "$(YELLOW)$(ICON_WARNING) Set ANDROID_HOME and add platform-tools to PATH$(NC)"; \
+		exit 1; \
+	}
+	$(call print_success,Android SDK found: $${ANDROID_HOME})
+	@echo ""
+	$(call print_arrow,Building with EAS local...)
+	$(call print_warning,⏳ This takes ~5-15 minutes)
+	$(call blank_line)
+	@cd mobile && eas build --profile preview --platform android --local
+	$(call blank_line)
+	$(call print_header,✓ Build Complete)
+	$(call print_subsection,📦 Next Steps)
+	@echo "   1. Find APK in EAS output above"
+	@echo "   2. Install via USB: adb install path/to/file.apk"
 	@echo ""
 
 #------------------------------------------------------------
