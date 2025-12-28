@@ -254,7 +254,7 @@ export class AuthService {
         profile.avatar_url ?? undefined,
         profile.bio ?? undefined,
         profile.created_at ?? undefined,
-        profile.updated_at,
+        profile.updated_at ?? undefined,
       );
     } catch (error) {
       if (error instanceof AppError) throw error;
