@@ -28,12 +28,19 @@ export function PlaylistCard({ playlist, trackCount, ownerName, onPress }: Playl
         </View>
       )}
       <View style={styles.info}>
-        <Text style={styles.name} numberOfLines={1}>
-          {playlist.name}
-        </Text>
+        <View style={styles.nameRow}>
+          <Text style={styles.name} numberOfLines={1}>
+            {playlist.name}
+          </Text>
+          {playlist.visibility === 'private' && (
+            <View style={styles.privateBadge}>
+              <Ionicons name="lock-closed" size={10} color={theme.colors.textSecondary} />
+              <Text style={styles.privateBadgeText}>Privée</Text>
+            </View>
+          )}
+        </View>
         <Text style={styles.metaText} numberOfLines={1}>
-          {trackCount} {trackCount === 1 ? 'track' : 'tracks'} • {ownerName}
-          {playlist.visibility === 'private' && ' • 🔒'}
+          {trackCount} {trackCount === 1 ? 'titre' : 'titres'} • {ownerName}
         </Text>
       </View>
     </TouchableOpacity>
@@ -62,11 +69,31 @@ const createStyles = (theme: Theme) =>
       flex: 1,
       marginLeft: theme.spacing.md,
     },
+    nameRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 2,
+    },
     name: {
       fontSize: theme.typography.sizes.md,
       fontWeight: theme.typography.weights.medium,
       color: theme.colors.text,
-      marginBottom: 2,
+      flexShrink: 1,
+    },
+    privateBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.colors.surfaceAlt,
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      borderRadius: 8,
+      marginLeft: 8,
+    },
+    privateBadgeText: {
+      fontSize: 10,
+      color: theme.colors.textSecondary,
+      marginLeft: 3,
+      fontWeight: theme.typography.weights.medium,
     },
     metaText: {
       fontSize: theme.typography.sizes.sm,

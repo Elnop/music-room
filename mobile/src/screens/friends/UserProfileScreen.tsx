@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useImageColors, hexToRgba } from '@/hooks/useImageColors';
 import type { Theme } from '@themes/types';
 import { useAuthStore } from '@/store/authStore';
 import { profileApi } from '@/services/profileApi';
@@ -16,6 +17,7 @@ import { useFriendListening } from '@/hooks/useMusicControl';
 import { Avatar } from '@/components/common/Avatar';
 import { Button } from '@/components/common/Button';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { FloatingHeader } from '@/components/common/FloatingHeader';
 import { PlaylistCard } from '@/components/playlist/PlaylistCard';
 import { DeviceListeningCard } from '@/components/music-control/DeviceListeningCard';
 import { ProfileSection } from '@/components/profile/ProfileSection';
@@ -30,7 +32,8 @@ type Props = NativeStackScreenProps<FriendsStackParamList, 'UserProfile'>;
 export function UserProfileScreen({ route, navigation }: Props) {
   const { userId } = route.params;
   const { theme } = useTheme();
-  const styles = React.useMemo(() => createStyles(theme), [theme]);
+  const insets = useSafeAreaInsets();
+  const styles = React.useMemo(() => createStyles(theme, insets.top), [theme, insets.top]);
   const { accessToken } = useAuthStore();
 
   const [profile, setProfile] = useState<FilteredProfile | null>(null);
@@ -42,6 +45,10 @@ export function UserProfileScreen({ route, navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [initialCanControl, setInitialCanControl] = useState(false);
 
+  // Get avatar URL for color extraction
+  const avatarUrl = filteredProfile?.avatarUrl;
+  const { dominantColor } = useImageColors(avatarUrl, theme.colors.primary);
+
   const {
     devices,
     canControl: canControlMusic,
@@ -49,6 +56,11 @@ export function UserProfileScreen({ route, navigation }: Props) {
     remotePause,
     isLoading: isListeningLoading,
   } = useFriendListening(userId, initialCanControl);
+
+  // Hide navigation header
+  React.useLayoutEffect(() => {
+    navigation.setOptions({ headerShown: false });
+  }, [navigation]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -105,21 +117,33 @@ export function UserProfileScreen({ route, navigation }: Props) {
     }
   };
 
+  // Gradient colors based on avatar
+  const gradientColors = dominantColor
+    ? ([
+        hexToRgba(dominantColor, 0.8),
+        hexToRgba(dominantColor, 0.5),
+        hexToRgba(dominantColor, 0.2),
+        theme.colors.background,
+      ] as const)
+    : ([
+        theme.colors.primary + '30',
+        theme.colors.background,
+        theme.colors.background,
+        theme.colors.background,
+      ] as const);
+
   if (isLoading) {
-    return (
-      <SafeAreaView style={styles.container} edges={['bottom']}>
-        <LoadingSpinner size="large" />
-      </SafeAreaView>
-    );
+    return <LoadingSpinner fullScreen message="Chargement du profil..." />;
   }
 
   if (error || !profile) {
     return (
-      <SafeAreaView style={styles.container} edges={['bottom']}>
+      <View style={styles.container}>
+        <FloatingHeader />
         <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{error || 'Profile not found'}</Text>
+          <Text style={styles.errorText}>{error || 'Profil introuvable'}</Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
@@ -133,135 +157,140 @@ export function UserProfileScreen({ route, navigation }: Props) {
   const genres = filteredProfile?.musicPreferences || [];
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <View style={styles.container}>
+      {/* Full screen gradient */}
+      <LinearGradient
+        colors={gradientColors as unknown as [string, string, ...string[]]}
+        locations={[0, 0.2, 0.4, 0.7]}
+        style={styles.gradientBackground}
+      />
+
+      {/* Floating header */}
+      <FloatingHeader />
+
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
-        <LinearGradient
-          colors={[theme.colors.primary + '30', theme.colors.background]}
-          style={styles.heroGradient}
-        >
-          <View style={styles.header}>
-            <View style={styles.topRow}>
-              {isAvatarHidden ? (
-                <View style={styles.hiddenAvatar}>
-                  <Ionicons name="lock-closed" size={32} color={theme.colors.textSecondary} />
-                </View>
-              ) : (
-                <Avatar
-                  size="lg"
-                  name={profile.displayName || profile.username}
-                  uri={filteredProfile?.avatarUrl}
-                />
-              )}
-
-              {followStatus && (
-                <View style={styles.statsContainer}>
-                  <View style={styles.statItem}>
-                    <Text style={styles.statNumber}>{followStatus.followersCount}</Text>
-                    <Text style={styles.statLabel}>Abonnés</Text>
-                  </View>
-                  <View style={styles.statItem}>
-                    <Text style={styles.statNumber}>{followStatus.followingCount}</Text>
-                    <Text style={styles.statLabel}>Abonnements</Text>
-                  </View>
-                </View>
-              )}
-            </View>
-
-            <View style={styles.nameSection}>
-              <View style={styles.usernameRow}>
-                <Text style={styles.username}>{profile.username}</Text>
-                {followStatus?.isFollowedBy && (
-                  <View style={styles.followsYouBadge}>
-                    <Text style={styles.followsYouText}>Vous suit</Text>
-                  </View>
-                )}
+        <View style={styles.header}>
+          <View style={styles.topRow}>
+            {isAvatarHidden ? (
+              <View style={styles.hiddenAvatar}>
+                <Ionicons name="lock-closed" size={32} color={theme.colors.textSecondary} />
               </View>
-              {profile.displayName && <Text style={styles.displayName}>{profile.displayName}</Text>}
-            </View>
-
-            {/* Bio - with privacy check */}
-            {isBioHidden ? (
-              <View style={styles.hiddenField}>
-                <Ionicons
-                  name="lock-closed"
-                  size={16}
-                  color={theme.colors.textSecondary}
-                  style={styles.hiddenIcon}
-                />
-                <Text style={styles.hiddenText}>
-                  {isFriend ? 'Bio privée' : 'Visible uniquement pour les amis'}
-                </Text>
-              </View>
-            ) : filteredProfile?.bio ? (
-              <Text style={styles.bio}>{filteredProfile.bio}</Text>
-            ) : null}
+            ) : (
+              <Avatar
+                size="lg"
+                name={profile.displayName || profile.username}
+                uri={filteredProfile?.avatarUrl}
+              />
+            )}
 
             {followStatus && (
-              <View style={styles.actionButtons}>
-                {followStatus.isFriend ? (
-                  <>
-                    <View style={styles.friendBadge}>
-                      <Text style={styles.friendBadgeText}>Amis</Text>
-                    </View>
-                    <Button
-                      variant="outline"
-                      onPress={handleFollowToggle}
-                      loading={isFollowLoading}
-                      style={styles.actionButton}
-                    >
-                      Abonné
-                    </Button>
-                  </>
-                ) : followStatus.isFollowing ? (
+              <View style={styles.statsContainer}>
+                <View style={styles.statItem}>
+                  <Text style={styles.statNumber}>{followStatus.followersCount}</Text>
+                  <Text style={styles.statLabel}>Abonnés</Text>
+                </View>
+                <View style={styles.statItem}>
+                  <Text style={styles.statNumber}>{followStatus.followingCount}</Text>
+                  <Text style={styles.statLabel}>Abonnements</Text>
+                </View>
+              </View>
+            )}
+          </View>
+
+          <View style={styles.nameSection}>
+            <View style={styles.usernameRow}>
+              <Text style={styles.username}>{profile.username}</Text>
+              {followStatus?.isFollowedBy && (
+                <View style={styles.followsYouBadge}>
+                  <Text style={styles.followsYouText}>Vous suit</Text>
+                </View>
+              )}
+            </View>
+            {profile.displayName && <Text style={styles.displayName}>{profile.displayName}</Text>}
+          </View>
+
+          {/* Bio - with privacy check */}
+          {isBioHidden ? (
+            <View style={styles.hiddenField}>
+              <Ionicons
+                name="lock-closed"
+                size={16}
+                color={theme.colors.textSecondary}
+                style={styles.hiddenIcon}
+              />
+              <Text style={styles.hiddenText}>
+                {isFriend ? 'Bio privée' : 'Visible uniquement pour les amis'}
+              </Text>
+            </View>
+          ) : filteredProfile?.bio ? (
+            <Text style={styles.bio}>{filteredProfile.bio}</Text>
+          ) : null}
+
+          {followStatus && (
+            <View style={styles.actionButtons}>
+              {followStatus.isFriend ? (
+                <>
+                  <View style={styles.friendBadge}>
+                    <Text style={styles.friendBadgeText}>Amis</Text>
+                  </View>
                   <Button
                     variant="outline"
                     onPress={handleFollowToggle}
                     loading={isFollowLoading}
-                    style={styles.fullWidthButton}
+                    style={styles.actionButton}
                   >
                     Abonné
                   </Button>
-                ) : (
-                  <Button
-                    variant="primary"
-                    onPress={handleFollowToggle}
-                    loading={isFollowLoading}
-                    style={styles.fullWidthButton}
-                  >
-                    Suivre
-                  </Button>
-                )}
-              </View>
-            )}
+                </>
+              ) : followStatus.isFollowing ? (
+                <Button
+                  variant="outline"
+                  onPress={handleFollowToggle}
+                  loading={isFollowLoading}
+                  style={styles.fullWidthButton}
+                >
+                  Abonné
+                </Button>
+              ) : (
+                <Button
+                  variant="primary"
+                  onPress={handleFollowToggle}
+                  loading={isFollowLoading}
+                  style={styles.fullWidthButton}
+                >
+                  Suivre
+                </Button>
+              )}
+            </View>
+          )}
 
-            {canControlMusic && followStatus?.isFriend && (
-              <View style={styles.listeningSection}>
-                <View style={styles.listeningSectionHeader}>
-                  <Ionicons name="musical-notes" size={16} color={theme.colors.primary} />
-                  <Text style={styles.listeningSectionTitle}>Écoute en direct</Text>
-                </View>
-                {isListeningLoading ? (
-                  <View style={styles.listeningLoading}>
-                    <LoadingSpinner size="small" />
-                  </View>
-                ) : devices.length > 0 ? (
-                  devices.map(deviceStatus => (
-                    <DeviceListeningCard
-                      key={deviceStatus.device.deviceId}
-                      status={deviceStatus}
-                      onPlay={() => remotePlay(deviceStatus.device.deviceId)}
-                      onPause={() => remotePause(deviceStatus.device.deviceId)}
-                    />
-                  ))
-                ) : (
-                  <View style={styles.listeningEmpty}>
-                    <Text style={styles.listeningEmptyText}>Aucun appareil connecté</Text>
-                  </View>
-                )}
+          {canControlMusic && followStatus?.isFriend && (
+            <View style={styles.listeningSection}>
+              <View style={styles.listeningSectionHeader}>
+                <Ionicons name="musical-notes" size={16} color={theme.colors.primary} />
+                <Text style={styles.listeningSectionTitle}>Écoute en direct</Text>
               </View>
-            )}
-          </View>
-        </LinearGradient>
+              {isListeningLoading ? (
+                <View style={styles.listeningLoading}>
+                  <LoadingSpinner size="small" />
+                </View>
+              ) : devices.length > 0 ? (
+                devices.map(deviceStatus => (
+                  <DeviceListeningCard
+                    key={deviceStatus.device.deviceId}
+                    status={deviceStatus}
+                    onPlay={() => remotePlay(deviceStatus.device.deviceId)}
+                    onPause={() => remotePause(deviceStatus.device.deviceId)}
+                  />
+                ))
+              ) : (
+                <View style={styles.listeningEmpty}>
+                  <Text style={styles.listeningEmptyText}>Aucun appareil connecté</Text>
+                </View>
+              )}
+            </View>
+          )}
+        </View>
 
         {/* Music Preferences Section */}
         <ProfileSection title="Préférences musicales">
@@ -319,24 +348,29 @@ export function UserProfileScreen({ route, navigation }: Props) {
           </Text>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
-const createStyles = (theme: Theme) =>
+const createStyles = (theme: Theme, topInset: number) =>
   StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: theme.colors.background,
     },
+    gradientBackground: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      height: 400,
+    },
     scrollView: {
       flex: 1,
     },
     contentContainer: {
+      paddingTop: topInset + 60, // Space for floating header
       paddingBottom: theme.spacing.xl,
-    },
-    heroGradient: {
-      paddingBottom: theme.spacing.md,
     },
     header: {
       paddingHorizontal: theme.spacing.lg,

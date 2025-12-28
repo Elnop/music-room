@@ -1,9 +1,7 @@
 import React, { useCallback } from 'react';
-import { View, FlatList, StyleSheet, RefreshControl, TouchableOpacity, Text } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, FlatList, StyleSheet, RefreshControl } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
 import type { Theme } from '@themes/types';
@@ -12,6 +10,7 @@ import { usePlaylistStore } from '@store/playlistStore';
 import { PlaylistCard } from '@components/playlist/PlaylistCard';
 import { EmptyState } from '@components/common/EmptyState';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
+import { FloatingHeader } from '@/components/common/FloatingHeader';
 
 type PlaylistStackParamList = {
   Playlists: undefined;
@@ -60,14 +59,16 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>My Playlists</Text>
-        <TouchableOpacity style={styles.createButton} onPress={handleCreatePress}>
-          <Ionicons name="add" size={20} color="#FFFFFF" />
-          <Text style={styles.createButtonText}>New</Text>
-        </TouchableOpacity>
-      </View>
+    <View style={styles.container}>
+      {/* Header with title and create button */}
+      <FloatingHeader
+        title="Mes Playlists"
+        titleAlign="left"
+        showBackButton={false}
+        rightIcon="add"
+        onRightPress={handleCreatePress}
+        showRightButton
+      />
 
       <FlatList
         data={playlists}
@@ -77,7 +78,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
           const ownerName =
             item.owner?.displayName ||
             item.owner?.username ||
-            (isOwner ? user.displayName || user.username || 'You' : 'Unknown');
+            (isOwner ? user.displayName || user.username || 'Vous' : 'Inconnu');
 
           return (
             <PlaylistCard
@@ -99,11 +100,11 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
         ListEmptyComponent={
           <EmptyState
             icon="musical-notes-outline"
-            message="No playlists yet. Create your first playlist to get started!"
+            message="Aucune playlist pour l'instant. Créez votre première playlist !"
           />
         }
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -113,33 +114,8 @@ const createStyles = (theme: Theme) =>
       flex: 1,
       backgroundColor: theme.colors.background,
     },
-    header: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingHorizontal: theme.spacing.lg,
-      paddingVertical: theme.spacing.lg,
-    },
-    title: {
-      fontSize: 28,
-      fontWeight: theme.typography.weights.bold,
-      color: theme.colors.text,
-    },
-    createButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: theme.colors.primary,
-      paddingHorizontal: theme.spacing.md,
-      paddingVertical: theme.spacing.sm,
-      borderRadius: 20,
-      gap: 4,
-    },
-    createButtonText: {
-      fontSize: theme.typography.sizes.md,
-      fontWeight: theme.typography.weights.semibold,
-      color: '#FFFFFF',
-    },
     list: {
       flexGrow: 1,
+      paddingTop: theme.spacing.md,
     },
   });

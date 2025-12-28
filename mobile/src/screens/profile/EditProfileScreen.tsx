@@ -8,8 +8,9 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -21,6 +22,7 @@ import { profileApi, ApiError } from '@/services/profileApi';
 import { Button } from '@components/common/Button';
 import { Input } from '@components/common/Input';
 import { FormError } from '@components/common/FormError';
+import { FloatingHeader } from '@/components/common/FloatingHeader';
 
 // Profile field limits (aligned with backend)
 const PROFILE_LIMITS = {
@@ -32,11 +34,11 @@ const PROFILE_LIMITS = {
 const updateProfileSchema = z.object({
   displayName: z
     .string()
-    .min(1, 'Display name cannot be empty')
-    .max(PROFILE_LIMITS.DISPLAY_NAME_MAX, `${PROFILE_LIMITS.DISPLAY_NAME_MAX} characters max`),
+    .min(1, 'Le nom ne peut pas être vide')
+    .max(PROFILE_LIMITS.DISPLAY_NAME_MAX, `${PROFILE_LIMITS.DISPLAY_NAME_MAX} caractères max`),
   bio: z
     .string()
-    .max(PROFILE_LIMITS.BIO_MAX, `${PROFILE_LIMITS.BIO_MAX} characters max`)
+    .max(PROFILE_LIMITS.BIO_MAX, `${PROFILE_LIMITS.BIO_MAX} caractères max`)
     .optional()
     .or(z.literal('')),
 });
@@ -45,11 +47,17 @@ type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 
 export function EditProfileScreen() {
   const { theme } = useTheme();
-  const styles = React.useMemo(() => createStyles(theme), [theme]);
-  const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
+  const styles = React.useMemo(() => createStyles(theme, insets.top), [theme, insets.top]);
+  const navigation = useNavigation<NativeStackNavigationProp<Record<string, undefined>>>();
   const { user, accessToken } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Hide navigation header
+  React.useLayoutEffect(() => {
+    navigation.setOptions({ headerShown: false });
+  }, [navigation]);
 
   const {
     control,
@@ -58,7 +66,6 @@ export function EditProfileScreen() {
   } = useForm<UpdateProfileInput>({
     resolver: zodResolver(updateProfileSchema),
     defaultValues: {
-      // Display name defaults to username if not set
       displayName: user?.displayName || user?.username || '',
       bio: user?.bio || '',
     },
@@ -66,7 +73,7 @@ export function EditProfileScreen() {
 
   const onSubmit = async (data: UpdateProfileInput) => {
     if (!accessToken) {
-      Alert.alert('Error', 'You are not authenticated');
+      Alert.alert('Erreur', "Vous n'êtes pas authentifié");
       return;
     }
 
@@ -76,34 +83,35 @@ export function EditProfileScreen() {
     try {
       const updateData: Partial<UpdateProfileData> = {};
 
-      // Display name: required, cannot be empty
       const trimmedDisplayName = data.displayName.trim();
       if (trimmedDisplayName) {
         updateData.displayName = trimmedDisplayName;
       }
 
-      // Bio: can be empty (to clear)
       if (data.bio !== undefined) {
         updateData.bio = data.bio.trim();
       }
 
       const updatedProfile = await profileApi.updateProfile(accessToken, updateData);
 
-      // Update local user state
       useAuthStore.setState({ user: updatedProfile });
 
       navigation.goBack();
     } catch (err) {
-      const errorMessage = err instanceof ApiError ? err.message : 'Failed to update profile';
+      const errorMessage =
+        err instanceof ApiError ? err.message : 'Impossible de mettre à jour le profil';
       setError(errorMessage);
-      Alert.alert('Error', errorMessage);
+      Alert.alert('Erreur', errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <View style={styles.container}>
+      {/* Floating header */}
+      <FloatingHeader />
+
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -114,8 +122,8 @@ export function EditProfileScreen() {
           contentContainerStyle={styles.contentContainer}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.title}>Edit Profile</Text>
-          <Text style={styles.subtitle}>Update your profile information</Text>
+          <Text style={styles.title}>Modifier le profil</Text>
+          <Text style={styles.subtitle}>Mettez à jour vos informations</Text>
 
           {error && <FormError message={error} />}
 
@@ -126,8 +134,8 @@ export function EditProfileScreen() {
             render={({ field: { onChange, onBlur, value } }) => (
               <View>
                 <Input
-                  label="Display Name"
-                  placeholder="Enter your display name"
+                  label="Nom d'affichage"
+                  placeholder="Entrez votre nom"
                   value={value}
                   onChangeText={text => onChange(text.slice(0, PROFILE_LIMITS.DISPLAY_NAME_MAX))}
                   onBlur={onBlur}
@@ -151,7 +159,7 @@ export function EditProfileScreen() {
               <View>
                 <Input
                   label="Bio"
-                  placeholder="Tell us about yourself..."
+                  placeholder="Parlez-nous de vous..."
                   value={value}
                   onChangeText={text => onChange(text.slice(0, PROFILE_LIMITS.BIO_MAX))}
                   onBlur={onBlur}
@@ -171,8 +179,8 @@ export function EditProfileScreen() {
 
           {/* Info Text */}
           <Text style={styles.infoText}>
-            Note: You cannot change your username or email. Contact support if you need to update
-            these fields.
+            Note : Vous ne pouvez pas modifier votre nom d'utilisateur ou email. Contactez le
+            support si nécessaire.
           </Text>
 
           {/* Action Buttons */}
@@ -184,7 +192,7 @@ export function EditProfileScreen() {
               disabled={!isDirty || isLoading}
               style={styles.actionButton}
             >
-              Save Changes
+              Enregistrer
             </Button>
 
             <Button
@@ -193,16 +201,16 @@ export function EditProfileScreen() {
               disabled={isLoading}
               style={styles.actionButton}
             >
-              Cancel
+              Annuler
             </Button>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }
 
-const createStyles = (theme: Theme) =>
+const createStyles = (theme: Theme, topInset: number) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -216,6 +224,7 @@ const createStyles = (theme: Theme) =>
     },
     contentContainer: {
       padding: theme.spacing.lg,
+      paddingTop: topInset + 60, // Space for floating header
     },
     title: {
       fontSize: 28,
