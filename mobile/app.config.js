@@ -18,7 +18,7 @@ module.exports = {
     ios: {
       supportsTablet: true,
       bundleIdentifier: 'com.zumik.app',
-      associatedDomains: ['applinks:zumik.app'],
+      // associatedDomains: ['applinks:zumik.app'], // Requires paid Apple Developer account
     },
     android: {
       adaptiveIcon: {

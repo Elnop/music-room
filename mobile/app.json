@@ -19,10 +19,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.zumik.app",
-      "associatedDomains": [
-        "applinks:zumik.app"
-      ]
+      "bundleIdentifier": "com.zumik.app"
     },
     "android": {
       "adaptiveIcon": {

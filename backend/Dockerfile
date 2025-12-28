@@ -83,4 +83,4 @@ COPY --chown=node:node --from=builder /app/node_modules ./node_modules
 EXPOSE 3000
 
 # Run the application (distroless already has proper init)
-CMD ["dist/index.js"]
+CMD ["dist/server.js"]
