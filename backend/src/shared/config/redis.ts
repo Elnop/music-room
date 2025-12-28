@@ -1,6 +1,6 @@
 import Redis from "ioredis";
 import { env } from "./env.js";
-import { logger } from "../utils/logger.js";
+import { logger } from "@/shared/utils/logger.js";
 
 /**
  * Redis client configuration

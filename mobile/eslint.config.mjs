@@ -26,11 +26,37 @@ export default [
 
   // Base recommended configs
   js.configs.recommended,
-  ...tseslint.configs.recommended,
+
+  // TypeScript config - exclude config files
+  ...tseslint.configs.recommended.map(config => ({
+    ...config,
+    ignores: ['babel.config.js', 'plugins/**/*.js'],
+  })),
+
+  // Special configuration for CommonJS config files (babel, plugins)
+  {
+    files: ['babel.config.js', 'plugins/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'commonjs',
+      globals: {
+        ...globals.node,
+      },
+    },
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off', // Allow require() in config files
+      'no-unused-vars': ['warn', {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
+      }],
+    },
+  },
 
   // Main configuration for TypeScript and React files
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
+    ignores: ['babel.config.js', 'plugins/**/*.js'],
     plugins: {
       react: reactPlugin,
       'react-hooks': reactHooksPlugin,
@@ -70,6 +96,7 @@ export default [
         },
       ],
       '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-require-imports': 'error', // Disallow require() in source files
 
       // React rules
       'react/react-in-jsx-scope': 'off', // Not needed with React 17+

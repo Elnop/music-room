@@ -13,7 +13,7 @@ function extractHostname(url) {
   try {
     const urlObj = new URL(url);
     return urlObj.hostname;
-  } catch (e) {
+  } catch (_e) {
     console.warn('[withAndroidNetworkSecurity] Invalid URL:', url);
     return null;
   }
