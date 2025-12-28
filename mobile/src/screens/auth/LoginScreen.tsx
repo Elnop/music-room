@@ -21,6 +21,8 @@ import { Input } from '@components/common/Input';
 import { FormError } from '@components/common/FormError';
 import { loginSchema, LoginInput } from '@utils/validators';
 import { useAuthStore } from '@/store/authStore';
+import { ApiError } from '@services/api';
+import { RouteProp } from '@react-navigation/native';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Logo = require('@/assets/logo/logo.png');
@@ -29,6 +31,7 @@ type AuthStackParamList = {
   Welcome: undefined;
   Login: undefined;
   Register: undefined;
+  EmailVerification: { userId: string; email: string };
 };
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Login'>;
@@ -84,6 +87,34 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
       // Navigation handled by RootNavigator based on auth state
     } catch (error) {
       console.error('[LoginScreen] Login error:', error);
+
+      // Check if error is EMAIL_NOT_VERIFIED
+      if (error instanceof ApiError && error.code === 'EMAIL_NOT_VERIFIED') {
+        const details = error.details as { userId?: string; email?: string } | undefined;
+
+        if (details?.userId && details?.email) {
+          // Show alert with option to resend verification code
+          Alert.alert(
+            'Email Not Verified',
+            'Your email address has not been verified yet. Would you like to receive a new verification code?',
+            [
+              { text: 'Cancel', style: 'cancel', onPress: clearError },
+              {
+                text: 'Resend Code',
+                onPress: () => {
+                  clearError();
+                  navigation.navigate('EmailVerification', {
+                    userId: details.userId!,
+                    email: details.email!,
+                  });
+                },
+              },
+            ]
+          );
+          return;
+        }
+      }
+
       // Error shown via alert (from auth store)
     }
   };

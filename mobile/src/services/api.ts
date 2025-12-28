@@ -179,9 +179,14 @@ async function handleResponse<T>(response: Response): Promise<T> {
   // Check if response is OK (status 200-299)
   if (!response.ok) {
     let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+    let errorCode = `HTTP_${response.status}`;
+    let errorDetails: unknown = undefined;
+
     try {
       const errorData = await response.json();
       errorMessage = errorData.error?.message || errorData.message || errorMessage;
+      errorCode = errorData.error?.code || errorCode;
+      errorDetails = errorData.error?.details;
     } catch {
       try {
         const errorText = await response.text();
@@ -190,7 +195,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
         // Keep default error message
       }
     }
-    throw new ApiError(errorMessage, `HTTP_${response.status}`);
+    throw new ApiError(errorMessage, errorCode, errorDetails);
   }
 
   // Parse successful response

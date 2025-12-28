@@ -38,7 +38,54 @@ export class AuthService {
         username: data.username,
       });
 
-      // 1. Check if username already exists
+      // 1. Check if email exists with unverified account
+      // If exists and unverified, delete it to allow re-registration
+      // This MUST be done BEFORE username check to clean up old username
+      const { data: existingUser } = await supabase.auth.admin.listUsers();
+      const userWithEmail = existingUser?.users?.find(
+        (u) => u.email === data.email,
+      );
+
+      if (userWithEmail) {
+        // Check if email is verified
+        const { data: profile } = await supabase
+          .from("user_profiles")
+          .select("email_verified")
+          .eq("id", userWithEmail.id)
+          .single();
+
+        if (profile && !profile.email_verified) {
+          logger.info(
+            "Found unverified account with same email, deleting old account",
+            {
+              email: data.email,
+              oldUserId: userWithEmail.id,
+            },
+          );
+
+          // Delete old profile first (this removes the old username too)
+          await supabase
+            .from("user_profiles")
+            .delete()
+            .eq("id", userWithEmail.id);
+
+          // Delete old auth user
+          await supabase.auth.admin.deleteUser(userWithEmail.id);
+
+          logger.info("Old unverified account deleted successfully", {
+            email: data.email,
+          });
+        } else {
+          // Email is verified, cannot re-register
+          throw new AppError(
+            409,
+            "Email already registered",
+            "EMAIL_ALREADY_EXISTS",
+          );
+        }
+      }
+
+      // 2. Check if username already exists (after cleanup)
       const { data: existingProfile } = await supabase
         .from("user_profiles")
         .select("username")
@@ -49,7 +96,7 @@ export class AuthService {
         throw new AppError(409, "Username already taken", "USERNAME_TAKEN");
       }
 
-      // 2. Create user in Supabase Auth using Admin API
+      // 3. Create user in Supabase Auth using Admin API
       // email_confirm: false requires email verification
       const { data: authData, error: authError } =
         await supabase.auth.admin.createUser({
@@ -187,6 +234,10 @@ export class AuthService {
           403,
           "Please verify your email before logging in. Check your inbox for the verification code.",
           "EMAIL_NOT_VERIFIED",
+          {
+            userId: authData.user.id,
+            email: authData.user.email,
+          },
         );
       }
 
