@@ -6,11 +6,11 @@ module.exports = {
     owner: '@anonymous',
     version: '1.0.0',
     orientation: 'portrait',
-    icon: './assets/icon.png',
+    icon: './src/assets/logo/app-icon.png',
     userInterfaceStyle: 'dark',
     newArchEnabled: true,
     splash: {
-      image: './assets/splash-icon.png',
+      image: './src/assets/logo/logo.png',
       resizeMode: 'contain',
       backgroundColor: '#121212',
     },
@@ -19,6 +19,9 @@ module.exports = {
       supportsTablet: true,
       bundleIdentifier: 'com.zumik.app',
       // associatedDomains: ['applinks:zumik.app'], // Requires paid Apple Developer account
+      infoPlist: {
+        UIBackgroundModes: ['audio'],
+      },
     },
     android: {
       adaptiveIcon: {

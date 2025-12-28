@@ -4,6 +4,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Slider from '@react-native-community/slider';
 import { Ionicons } from '@expo/vector-icons';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  runOnJS,
+  Easing,
+} from 'react-native-reanimated';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@/themes/types';
 import { usePlayer } from '@/contexts/PlayerContext';
@@ -12,7 +20,8 @@ import { usePlayerProgress } from '@/hooks/usePlayerProgress';
 import { useImageColors, hexToRgba, getAdaptiveColors, isLightColor } from '@/hooks/useImageColors';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
-const { width } = Dimensions.get('window');
+const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const DISMISS_THRESHOLD = SCREEN_HEIGHT * 0.2; // 20% de l'écran pour fermer
 const ARTWORK_SIZE = width * 0.75;
 
 export function PlayerModal() {
@@ -24,6 +33,43 @@ export function PlayerModal() {
     usePlayerStore();
 
   const { currentTime, duration } = usePlayerProgress();
+
+  // Swipe to dismiss
+  const translateY = useSharedValue(0);
+
+  const closeModal = () => {
+    setModalOpen(false);
+  };
+
+  const panGesture = Gesture.Pan()
+    .onUpdate(event => {
+      if (event.translationY > 0) {
+        translateY.value = event.translationY;
+      }
+    })
+    .onEnd(event => {
+      if (event.translationY > DISMISS_THRESHOLD || event.velocityY > 500) {
+        translateY.value = withTiming(
+          SCREEN_HEIGHT,
+          { duration: 250, easing: Easing.out(Easing.cubic) },
+          () => {
+            runOnJS(closeModal)();
+          }
+        );
+      } else {
+        translateY.value = withTiming(0, { duration: 200, easing: Easing.out(Easing.cubic) });
+      }
+    });
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+  }));
+
+  React.useEffect(() => {
+    if (isModalOpen) {
+      translateY.value = 0;
+    }
+  }, [isModalOpen, translateY]);
 
   // Extract colors from artwork
   const artworkUrl = currentTrack?.artwork_url || currentTrack?.user?.avatar_url || null;
@@ -111,130 +157,128 @@ export function PlayerModal() {
     <Modal
       visible={isModalOpen}
       animationType="slide"
-      presentationStyle="fullScreen"
+      presentationStyle="overFullScreen"
+      transparent
       onRequestClose={() => setModalOpen(false)}
     >
-      <View style={styles.container}>
-        {/* Background gradient - covers entire screen */}
-        <LinearGradient
-          colors={gradientColors}
-          style={StyleSheet.absoluteFill}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-        />
-
-        {/* Close button */}
-        <TouchableOpacity
-          style={styles.closeButton}
-          onPress={() => setModalOpen(false)}
-          activeOpacity={0.7}
-        >
-          <View style={[styles.headerButton, { backgroundColor: colors.buttonBg }]}>
-            <Ionicons name="chevron-down" size={24} color={colors.text} />
-          </View>
-        </TouchableOpacity>
-
-        {/* Now Playing label */}
-        <View style={styles.nowPlayingContainer}>
-          <Text style={[styles.nowPlayingText, { color: colors.textSecondary }]}>EN LECTURE</Text>
-        </View>
-
-        {/* Artwork */}
-        <View style={styles.artworkWrapper}>
-          <View style={styles.artworkShadow}>
-            <Image source={{ uri: displayArtwork }} style={styles.artwork} />
-          </View>
-        </View>
-
-        {/* Track info */}
-        <View style={styles.trackInfo}>
-          <Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
-            {currentTrack.title}
-          </Text>
-          <Text style={[styles.artist, { color: colors.textSecondary }]} numberOfLines={1}>
-            {currentTrack.user.username}
-          </Text>
-        </View>
-
-        {/* Error message */}
-        {error && (
-          <View style={styles.errorContainer}>
-            <Ionicons name="warning" size={16} color={theme.colors.error} />
-            <Text style={styles.errorText}>{error}</Text>
-          </View>
-        )}
-
-        {/* Progress bar */}
-        <View style={styles.progressContainer}>
-          <Slider
-            style={styles.slider}
-            minimumValue={0}
-            maximumValue={duration || 1}
-            value={currentTime}
-            onSlidingComplete={handleSeek}
-            minimumTrackTintColor={colors.slider}
-            maximumTrackTintColor={colors.sliderBg}
-            thumbTintColor={colors.slider}
-            disabled={isLoading || !player}
+      <GestureDetector gesture={panGesture}>
+        <Animated.View style={[styles.container, styles.modalContent, animatedStyle]}>
+          <LinearGradient
+            colors={gradientColors}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}
           />
-          <View style={styles.timeContainer}>
-            <Text style={[styles.timeText, { color: colors.textSecondary }]}>
-              {formatTime(currentTime)}
-            </Text>
-            <Text style={[styles.timeText, { color: colors.textSecondary }]}>
-              {formatTime(duration)}
-            </Text>
-          </View>
-        </View>
 
-        {/* Controls */}
-        <View style={styles.controls}>
+          <View style={styles.swipeIndicator}>
+            <View style={[styles.swipeBar, { backgroundColor: colors.textSecondary }]} />
+          </View>
+
           <TouchableOpacity
-            style={[styles.secondaryButton, { backgroundColor: colors.buttonBg }]}
-            onPress={() => handleSkip(-15)}
-            disabled={isLoading || !canInteract}
+            style={styles.closeButton}
+            onPress={() => setModalOpen(false)}
             activeOpacity={0.7}
           >
-            <Ionicons name="play-back" size={28} color={colors.text} />
+            <View style={[styles.headerButton, { backgroundColor: colors.buttonBg }]}>
+              <Ionicons name="chevron-down" size={24} color={colors.text} />
+            </View>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.playButton, { backgroundColor: colors.playBtnBg }]}
-            onPress={handlePlayPause}
-            disabled={isLoading}
-            activeOpacity={0.8}
-          >
-            {isLoading ? (
-              <LoadingSpinner size="small" />
-            ) : (
-              <Ionicons
-                name={isPlaying ? 'pause' : 'play'}
-                size={40}
-                color={colors.playBtnIcon}
-                style={isPlaying ? undefined : { marginLeft: 4 }}
-              />
-            )}
-          </TouchableOpacity>
+          <View style={styles.nowPlayingContainer}>
+            <Text style={[styles.nowPlayingText, { color: colors.textSecondary }]}>EN LECTURE</Text>
+          </View>
 
-          <TouchableOpacity
-            style={[styles.secondaryButton, { backgroundColor: colors.buttonBg }]}
-            onPress={() => handleSkip(15)}
-            disabled={isLoading || !canInteract}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="play-forward" size={28} color={colors.text} />
-          </TouchableOpacity>
-        </View>
+          <View style={styles.artworkWrapper}>
+            <View style={styles.artworkShadow}>
+              <Image source={{ uri: displayArtwork }} style={styles.artwork} />
+            </View>
+          </View>
 
-        {/* Loading indicator */}
-        {isLoading && (
-          <View style={styles.loadingContainer}>
-            <Text style={[styles.loadingText, { color: colors.textSecondary }]}>
-              Chargement du flux audio...
+          <View style={styles.trackInfo}>
+            <Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
+              {currentTrack.title}
+            </Text>
+            <Text style={[styles.artist, { color: colors.textSecondary }]} numberOfLines={1}>
+              {currentTrack.user.username}
             </Text>
           </View>
-        )}
-      </View>
+
+          {error && (
+            <View style={styles.errorContainer}>
+              <Ionicons name="warning" size={16} color={theme.colors.error} />
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          )}
+
+          <View style={styles.progressContainer}>
+            <Slider
+              style={styles.slider}
+              minimumValue={0}
+              maximumValue={duration || 1}
+              value={currentTime}
+              onSlidingComplete={handleSeek}
+              minimumTrackTintColor={colors.slider}
+              maximumTrackTintColor={colors.sliderBg}
+              thumbTintColor={colors.slider}
+              disabled={isLoading || !player}
+            />
+            <View style={styles.timeContainer}>
+              <Text style={[styles.timeText, { color: colors.textSecondary }]}>
+                {formatTime(currentTime)}
+              </Text>
+              <Text style={[styles.timeText, { color: colors.textSecondary }]}>
+                {formatTime(duration)}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.controls}>
+            <TouchableOpacity
+              style={[styles.secondaryButton, { backgroundColor: colors.buttonBg }]}
+              onPress={() => handleSkip(-15)}
+              disabled={isLoading || !canInteract}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="play-back" size={28} color={colors.text} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.playButton, { backgroundColor: colors.playBtnBg }]}
+              onPress={handlePlayPause}
+              disabled={isLoading}
+              activeOpacity={0.8}
+            >
+              {isLoading ? (
+                <LoadingSpinner size="small" />
+              ) : (
+                <Ionicons
+                  name={isPlaying ? 'pause' : 'play'}
+                  size={40}
+                  color={colors.playBtnIcon}
+                  style={isPlaying ? undefined : { marginLeft: 4 }}
+                />
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.secondaryButton, { backgroundColor: colors.buttonBg }]}
+              onPress={() => handleSkip(15)}
+              disabled={isLoading || !canInteract}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="play-forward" size={28} color={colors.text} />
+            </TouchableOpacity>
+          </View>
+
+          {isLoading && (
+            <View style={styles.loadingContainer}>
+              <Text style={[styles.loadingText, { color: colors.textSecondary }]}>
+                Chargement du flux audio...
+              </Text>
+            </View>
+          )}
+        </Animated.View>
+      </GestureDetector>
     </Modal>
   );
 }
@@ -243,7 +287,23 @@ const createStyles = (theme: Theme, insets: { top: number; bottom: number }) =>
   StyleSheet.create({
     container: {
       flex: 1,
+    },
+    modalContent: {
       backgroundColor: theme.colors.background,
+    },
+    swipeIndicator: {
+      position: 'absolute',
+      top: insets.top + 8,
+      left: 0,
+      right: 0,
+      alignItems: 'center',
+      zIndex: 20,
+    },
+    swipeBar: {
+      width: 40,
+      height: 5,
+      borderRadius: 3,
+      opacity: 0.5,
     },
     closeButton: {
       position: 'absolute',

@@ -1,6 +1,16 @@
 import React, { createContext, useContext, useEffect, useRef } from 'react';
-import { useAudioPlayer } from 'expo-audio';
+import { useAudioPlayer, setAudioModeAsync } from 'expo-audio';
 import { usePlayerStore } from '@/store/playerStore';
+
+// Configure audio mode for iOS - play in silent mode and background
+setAudioModeAsync({
+  playsInSilentMode: true,
+  shouldPlayInBackground: true,
+  interruptionMode: 'duckOthers',
+  interruptionModeAndroid: 'duckOthers',
+}).catch(err => {
+  console.warn('[PlayerContext] Failed to set audio mode:', err);
+});
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
 

@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ThemeProvider } from '@contexts/ThemeContext';
 import { RootNavigator } from '@/navigation/RootNavigator';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { configureGoogleSignIn, initializeFacebookSDK } from '@services/oauth';
-import 'react-native-gesture-handler';
 
 export default function App() {
   // Configure OAuth providers on app start
@@ -15,13 +15,15 @@ export default function App() {
   }, []);
 
   return (
-    <ErrorBoundary>
-      <ThemeProvider>
-        <SafeAreaProvider>
-          <RootNavigator />
-          <StatusBar style="dark" />
-        </SafeAreaProvider>
-      </ThemeProvider>
-    </ErrorBoundary>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ErrorBoundary>
+        <ThemeProvider>
+          <SafeAreaProvider>
+            <RootNavigator />
+            <StatusBar style="dark" />
+          </SafeAreaProvider>
+        </ThemeProvider>
+      </ErrorBoundary>
+    </GestureHandlerRootView>
   );
 }
