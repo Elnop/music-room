@@ -28,6 +28,7 @@ type AuthStackParamList = {
   Welcome: undefined;
   Login: undefined;
   Register: undefined;
+  EmailVerification: { userId: string; email: string };
 };
 
 type RegisterScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Register'>;

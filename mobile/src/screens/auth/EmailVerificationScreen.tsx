@@ -9,6 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
+import type { Theme } from '@themes/types';
 import { useAuthStore } from '@/store/authStore';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '@/navigation/AuthNavigator';
@@ -16,7 +17,8 @@ import type { AuthStackParamList } from '@/navigation/AuthNavigator';
 type Props = NativeStackScreenProps<AuthStackParamList, 'EmailVerification'>;
 
 export default function EmailVerificationScreen({ route, navigation }: Props) {
-  const { colors } = useTheme();
+  const { theme } = useTheme();
+  const styles = React.useMemo(() => createStyles(theme), [theme]);
   const { verifyEmail, resendVerificationCode, isLoading, error } = useAuthStore();
   const { userId, email } = route.params;
 
@@ -94,15 +96,15 @@ export default function EmailVerificationScreen({ route, navigation }: Props) {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={styles.container}>
       <View style={styles.content}>
         {/* Header */}
-        <Text style={[styles.title, { color: colors.text }]}>
+        <Text style={styles.title}>
           Verify Your Email
         </Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+        <Text style={styles.subtitle}>
           We sent a 6-digit code to{'\n'}
-          <Text style={{ color: colors.primary }}>{email}</Text>
+          <Text style={styles.emailHighlight}>{email}</Text>
         </Text>
 
         {/* OTP Input */}
@@ -110,14 +112,12 @@ export default function EmailVerificationScreen({ route, navigation }: Props) {
           {code.map((digit, index) => (
             <TextInput
               key={index}
-              ref={(ref) => (inputRefs.current[index] = ref)}
+              ref={(ref) => {
+                inputRefs.current[index] = ref;
+              }}
               style={[
                 styles.codeInput,
-                {
-                  borderColor: digit ? colors.primary : colors.border,
-                  backgroundColor: colors.card,
-                  color: colors.text,
-                },
+                digit ? styles.codeInputFilled : styles.codeInputEmpty,
               ]}
               value={digit}
               onChangeText={(text) => handleCodeChange(text, index)}
@@ -132,7 +132,7 @@ export default function EmailVerificationScreen({ route, navigation }: Props) {
 
         {/* Error Message */}
         {error && (
-          <Text style={[styles.error, { color: colors.error }]}>
+          <Text style={styles.error}>
             {error}
           </Text>
         )}
@@ -141,16 +141,15 @@ export default function EmailVerificationScreen({ route, navigation }: Props) {
         <TouchableOpacity
           style={[
             styles.button,
-            { backgroundColor: colors.primary },
             (isLoading || code.some((d) => !d)) && styles.buttonDisabled,
           ]}
           onPress={() => handleVerify()}
           disabled={isLoading || code.some((d) => !d)}
         >
           {isLoading ? (
-            <ActivityIndicator color={colors.background} />
+            <ActivityIndicator color={theme.colors.background} />
           ) : (
-            <Text style={[styles.buttonText, { color: colors.background }]}>
+            <Text style={styles.buttonText}>
               Verify Email
             </Text>
           )}
@@ -158,7 +157,7 @@ export default function EmailVerificationScreen({ route, navigation }: Props) {
 
         {/* Resend Code */}
         <View style={styles.resendContainer}>
-          <Text style={[styles.resendText, { color: colors.textSecondary }]}>
+          <Text style={styles.resendText}>
             Didn't receive the code?{' '}
           </Text>
           <TouchableOpacity
@@ -168,12 +167,7 @@ export default function EmailVerificationScreen({ route, navigation }: Props) {
             <Text
               style={[
                 styles.resendLink,
-                {
-                  color:
-                    isResending || cooldown > 0
-                      ? colors.textSecondary
-                      : colors.primary,
-                },
+                (isResending || cooldown > 0) && styles.resendLinkDisabled,
               ]}
             >
               {cooldown > 0
@@ -190,7 +184,7 @@ export default function EmailVerificationScreen({ route, navigation }: Props) {
           style={styles.backButton}
           onPress={() => navigation.navigate('Login')}
         >
-          <Text style={[styles.backText, { color: colors.textSecondary }]}>
+          <Text style={styles.backText}>
             Back to Login
           </Text>
         </TouchableOpacity>
@@ -199,80 +193,107 @@ export default function EmailVerificationScreen({ route, navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 60,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
-    marginBottom: 40,
-    textAlign: 'center',
-    lineHeight: 24,
-  },
-  codeContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 12,
-    marginBottom: 24,
-  },
-  codeInput: {
-    width: 50,
-    height: 60,
-    borderWidth: 2,
-    borderRadius: 12,
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  error: {
-    fontSize: 14,
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  button: {
-    width: '100%',
-    height: 56,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  buttonDisabled: {
-    opacity: 0.5,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  resendContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  resendText: {
-    fontSize: 14,
-  },
-  resendLink: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  backButton: {
-    marginTop: 8,
-  },
-  backText: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    content: {
+      flex: 1,
+      paddingHorizontal: 24,
+      paddingTop: 60,
+      alignItems: 'center',
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: 'bold',
+      marginBottom: 12,
+      textAlign: 'center',
+      color: theme.colors.text,
+    },
+    subtitle: {
+      fontSize: 16,
+      marginBottom: 40,
+      textAlign: 'center',
+      lineHeight: 24,
+      color: theme.colors.textSecondary,
+    },
+    emailHighlight: {
+      color: theme.colors.primary,
+    },
+    codeContainer: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      gap: 12,
+      marginBottom: 24,
+    },
+    codeInput: {
+      width: 50,
+      height: 60,
+      borderWidth: 2,
+      borderRadius: 12,
+      fontSize: 24,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      backgroundColor: theme.colors.surface,
+      color: theme.colors.text,
+    },
+    codeInputFilled: {
+      borderColor: theme.colors.primary,
+    },
+    codeInputEmpty: {
+      borderColor: theme.colors.border,
+    },
+    error: {
+      fontSize: 14,
+      marginBottom: 16,
+      textAlign: 'center',
+      color: theme.colors.error,
+    },
+    button: {
+      width: '100%',
+      height: 56,
+      borderRadius: 12,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: 24,
+      backgroundColor: theme.colors.primary,
+    },
+    buttonDisabled: {
+      opacity: 0.5,
+    },
+    buttonText: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: theme.colors.background,
+    },
+    activityIndicator: {
+      color: theme.colors.background,
+    },
+    resendContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 16,
+    },
+    resendText: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+    },
+    resendLink: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: theme.colors.primary,
+    },
+    resendLinkDisabled: {
+      color: theme.colors.textSecondary,
+    },
+    backButton: {
+      marginTop: 8,
+    },
+    backText: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: theme.colors.textSecondary,
+    },
+  });

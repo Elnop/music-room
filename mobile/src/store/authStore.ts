@@ -100,14 +100,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       });
 
       // Set authenticated state
-      set({
-        user: response.user,
-        accessToken: response.session.accessToken,
-        refreshToken: response.session.refreshToken,
-        tokenExpiresAt: response.session.expiresAt * 1000, // Convert to milliseconds
-        isAuthenticated: true,
-        isLoading: false,
-      });
+      if (response.session) {
+        set({
+          user: response.user,
+          accessToken: response.session.accessToken,
+          refreshToken: response.session.refreshToken,
+          tokenExpiresAt: response.session.expiresAt * 1000, // Convert to milliseconds
+          isAuthenticated: true,
+          isLoading: false,
+        });
+      } else {
+        // Email not verified - clear loading state
+        set({
+          isLoading: false,
+        });
+      }
 
       // Persist to storage
       await get().saveToStorage();
@@ -282,6 +289,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const response = await authApi.loginWithGoogle(idToken);
 
       // 3. Set authenticated state
+      if (!response.session) {
+        throw new Error('OAuth login did not return a session');
+      }
+
       set({
         user: response.user,
         accessToken: response.session.accessToken,
@@ -370,6 +381,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const response = await authApi.loginWithFacebook(accessToken);
 
       // 3. Set authenticated state
+      if (!response.session) {
+        throw new Error('OAuth login did not return a session');
+      }
+
       set({
         user: response.user,
         accessToken: response.session.accessToken,
@@ -640,6 +655,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const response = await authApi.refreshToken(refreshToken);
 
       console.log('[AuthStore] Refresh API call successful, updating state...');
+
+      if (!response.session) {
+        throw new Error('Token refresh did not return a session');
+      }
 
       set({
         user: response.user,
