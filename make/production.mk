@@ -10,6 +10,7 @@
 #   make prod-build-apk-manual - Build production APK with Gradle (NO EAS, ~5-10 min)
 #   make prod-build-local    - Build production AAB locally (requires Android SDK)
 #   make prod-build-manual   - Build AAB manually with Gradle (full control)
+#   make set-cluzob-url      - Set mobile/.env to Cluzhub backend (https://zumik.cluzhub.com)
 #   make prod-version-bump   - Bump app version interactively
 #   make prod-version-auto   - Auto-increment versionCode
 #   make prod-submit         - Submit AAB to Google Play Store
@@ -18,7 +19,7 @@
 # ==============================================================================
 
 .PHONY: prod-build prod-build-local prod-build-manual prod-build-apk prod-build-apk-local prod-build-apk-manual prod-submit \
-        prod-version-bump prod-version-auto prod-keystore-setup prod-info
+        prod-version-bump prod-version-auto prod-keystore-setup prod-info prod-install-apk set-cluzob-url
 
 #------------------------------------------------------------
 # Production Mobile Build Commands
@@ -107,6 +108,9 @@ prod-build-apk-manual: ## Build production APK manually with Gradle (no EAS, dir
 	$(call print_arrow,Running expo prebuild...)
 	@cd mobile && npx expo prebuild --clean
 	$(call blank_line)
+	$(call print_arrow,Generating dynamic network security config...)
+	@cd mobile && ./scripts/generate-network-config.sh
+	$(call blank_line)
 	$(call print_arrow,Building APK with Gradle...)
 	@cd mobile/android && ./gradlew assembleRelease
 	$(call blank_line)
@@ -176,6 +180,52 @@ prod-build-apk-local: ## Build production APK locally (requires Android SDK)
 	@echo "   2. Install via USB: adb install path/to/file.apk"
 	@echo ""
 
+#------------------------------------------------------------
+# Backend URL Configuration
+#------------------------------------------------------------
+
+set-cluzob-url: ## Configure mobile/.env for Cluzhub backend (https://zumik.cluzhub.com - port 80/443)
+	$(call print_header,Configuring Cluzhub Backend URL)
+	@if [ ! -f "$(MOBILE_ENV)" ]; then \
+		echo "$(RED)$(ICON_ERROR) Mobile .env not found: $(MOBILE_ENV)$(NC)"; \
+		exit 1; \
+	fi; \
+	API_URL="https://zumik.cluzhub.com"; \
+	WS_URL="wss://zumik.cluzhub.com"; \
+	echo "$(GREEN)$(ICON_SUCCESS) Target: Cluzhub Production$(NC)"; \
+	echo "  $(BLUE)$(ICON_BULLET)$(NC) API: $$API_URL (port 80)"; \
+	echo "  $(BLUE)$(ICON_BULLET)$(NC) WebSocket: $$WS_URL (port 443)"; \
+	echo ""; \
+	echo "$(YELLOW)$(ICON_ARROW) Updating mobile/.env...$(NC)"; \
+	if grep -q '^EXPO_PUBLIC_API_URL=' $(MOBILE_ENV); then \
+		if [ "$(OS_TYPE)" = "macos" ]; then \
+			sed -i '' "s|^EXPO_PUBLIC_API_URL=.*|EXPO_PUBLIC_API_URL=$$API_URL|" $(MOBILE_ENV); \
+		else \
+			sed -i "s|^EXPO_PUBLIC_API_URL=.*|EXPO_PUBLIC_API_URL=$$API_URL|" $(MOBILE_ENV); \
+		fi; \
+		echo "$(GREEN)$(ICON_SUCCESS) Updated EXPO_PUBLIC_API_URL$(NC)"; \
+	else \
+		echo "" >> $(MOBILE_ENV); \
+		echo "# Cluzhub Production (configured by make set-cluzob-url)" >> $(MOBILE_ENV); \
+		echo "EXPO_PUBLIC_API_URL=$$API_URL" >> $(MOBILE_ENV); \
+		echo "$(GREEN)$(ICON_SUCCESS) Added EXPO_PUBLIC_API_URL$(NC)"; \
+	fi; \
+	if grep -q '^EXPO_PUBLIC_WS_URL=' $(MOBILE_ENV); then \
+		if [ "$(OS_TYPE)" = "macos" ]; then \
+			sed -i '' "s|^EXPO_PUBLIC_WS_URL=.*|EXPO_PUBLIC_WS_URL=$$WS_URL|" $(MOBILE_ENV); \
+		else \
+			sed -i "s|^EXPO_PUBLIC_WS_URL=.*|EXPO_PUBLIC_WS_URL=$$WS_URL|" $(MOBILE_ENV); \
+		fi; \
+		echo "$(GREEN)$(ICON_SUCCESS) Updated EXPO_PUBLIC_WS_URL$(NC)"; \
+	else \
+		echo "EXPO_PUBLIC_WS_URL=$$WS_URL" >> $(MOBILE_ENV); \
+		echo "$(GREEN)$(ICON_SUCCESS) Added EXPO_PUBLIC_WS_URL$(NC)"; \
+	fi; \
+	echo ""; \
+	echo "$(BLUE)$(ICON_INFO) Next steps:$(NC)"; \
+	echo "  1. $(GREEN)make prod-build-apk-manual$(NC) - Build APK"; \
+	echo "  2. $(GREEN)make prod-install-apk$(NC) - Install on device"; \
+	echo ""
 #------------------------------------------------------------
 # Keystore Management
 #------------------------------------------------------------
