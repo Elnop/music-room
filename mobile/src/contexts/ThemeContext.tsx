@@ -39,7 +39,7 @@ interface ThemeProviderProps {
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [themeName, setThemeName] = useState<ThemeName>('royalBlue');
+  const [themeName, setThemeName] = useState<ThemeName>('original');
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
