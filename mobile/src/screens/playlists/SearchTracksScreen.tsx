@@ -90,13 +90,13 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 
       switch (code) {
         case 'PLAYLIST_ACCESS_DENIED':
-          return "Vous n'avez plus accès à cette playlist";
+          return 'You no longer have access to this playlist';
         case 'PLAYLIST_NOT_FOUND':
-          return 'Cette playlist a été supprimée';
+          return 'This playlist has been deleted';
         case 'TRACK_DUPLICATE':
-          return 'Cette musique est déjà dans la playlist';
+          return 'This track is already in the playlist';
         default:
-          return apiError.error?.message || "Échec de l'ajout";
+          return apiError.error?.message || 'Failed to add';
       }
     }
 
@@ -104,7 +104,7 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
       return error.message;
     }
 
-    return "Échec de l'ajout";
+    return 'Failed to add';
   };
 
   const handleAddTrack = async (track: SoundCloudTrack) => {
@@ -128,7 +128,7 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 
       setAddedTrackUris(prev => new Set(prev).add(track.permalink_url));
     } catch (error) {
-      Alert.alert('Erreur', getErrorMessage(error));
+      Alert.alert('Error', getErrorMessage(error));
     } finally {
       setAddingTrackId(null);
     }
@@ -184,7 +184,7 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
       <View style={styles.header}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Rechercher sur SoundCloud..."
+          placeholder="Search on SoundCloud..."
           placeholderTextColor={theme.colors.textSecondary}
           value={query}
           onChangeText={handleSearchChange}
@@ -207,8 +207,8 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
               icon="musical-notes-outline"
               message={
                 query.trim()
-                  ? 'Aucune musique trouvée'
-                  : 'Recherchez des musiques sur SoundCloud pour les ajouter à votre playlist'
+                  ? 'No track found'
+                  : 'Search for tracks on SoundCloud to add them to your playlist'
               }
             />
           }

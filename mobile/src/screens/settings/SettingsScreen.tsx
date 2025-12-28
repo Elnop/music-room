@@ -11,20 +11,20 @@ export function SettingsScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Apparence</Text>
+        <Text style={styles.sectionTitle}>Appearance</Text>
         <ThemeSelector />
       </View>
 
-      {/* Section future : Compte */}
+      {/* Future section: Account */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Compte</Text>
-        <Text style={styles.placeholder}>Paramètres du compte à venir...</Text>
+        <Text style={styles.sectionTitle}>Account</Text>
+        <Text style={styles.placeholder}>Account settings coming soon...</Text>
       </View>
 
-      {/* Section future : Notifications */}
+      {/* Future section: Notifications */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Notifications</Text>
-        <Text style={styles.placeholder}>Paramètres des notifications à venir...</Text>
+        <Text style={styles.placeholder}>Notification settings coming soon...</Text>
       </View>
     </ScrollView>
   );

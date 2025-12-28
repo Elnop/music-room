@@ -8,34 +8,34 @@ import type { Theme } from '@/themes/types';
 
 export const christmasTheme: Theme = {
   name: 'christmas',
-  displayName: 'Noël',
+  displayName: 'Christmas',
 
   colors: {
-    // Primary - Rouge Noël
+    // Primary - Christmas Red
     primary: '#DC2626', // Red 600
     primaryLight: '#F87171', // Red 400
     primaryDark: '#991B1B', // Red 800
 
-    // Secondary - Vert Noël
+    // Secondary - Christmas Green
     secondary: '#16A34A', // Green 600
     secondaryLight: '#4ADE80', // Green 400
 
-    // Accent - Or
-    accent: '#F59E0B', // Amber 500 (or)
-    accentAlt: '#FBBF24', // Amber 400 (or clair)
+    // Accent - Gold
+    accent: '#F59E0B', // Amber 500 (gold)
+    accentAlt: '#FBBF24', // Amber 400 (light gold)
 
-    // Backgrounds - Crème
+    // Backgrounds - Cream
     background: '#FFFBEB', // Amber 50
-    surface: '#FFFFFF', // Blanc
-    surfaceAlt: '#FEE2E2', // Red 100 (teinte rouge subtile)
+    surface: '#FFFFFF', // White
+    surfaceAlt: '#FEE2E2', // Red 100 (subtle red tint)
 
     // Text colors
     text: '#1F2937', // Gray 800
     textSecondary: '#4B5563', // Gray 600
-    textInverse: '#FFFFFF', // Blanc
+    textInverse: '#FFFFFF', // White
 
     // Border
-    border: '#000000', // Noir pur
+    border: '#000000', // Pure black
     borderLight: '#374151', // Gray 700
 
     // State colors

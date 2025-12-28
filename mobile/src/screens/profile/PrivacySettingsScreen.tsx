@@ -34,8 +34,8 @@ export function PrivacySettingsScreen() {
         setInitialPrivacy(data);
       } catch (error) {
         const message =
-          error instanceof ApiError ? error.message : 'Impossible de charger les paramètres';
-        Alert.alert('Erreur', message);
+          error instanceof ApiError ? error.message : 'Unable to load settings';
+        Alert.alert('Error', message);
       } finally {
         setIsLoading(false);
       }
@@ -78,22 +78,22 @@ export function PrivacySettingsScreen() {
       navigation.goBack();
     } catch (error) {
       const message =
-        error instanceof ApiError ? error.message : 'Impossible de sauvegarder les paramètres';
-      Alert.alert('Erreur', message);
+        error instanceof ApiError ? error.message : 'Unable to save settings';
+      Alert.alert('Error', message);
     } finally {
       setIsSaving(false);
     }
   };
 
   if (isLoading) {
-    return <LoadingSpinner fullScreen message="Chargement..." />;
+    return <LoadingSpinner fullScreen message="Loading..." />;
   }
 
   if (!privacy) {
     return (
       <View style={styles.container}>
         <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>Impossible de charger les paramètres</Text>
+          <Text style={styles.errorText}>Unable to load settings</Text>
         </View>
       </View>
     );
@@ -103,35 +103,35 @@ export function PrivacySettingsScreen() {
     <View style={styles.container}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
         <View style={styles.header}>
-          <Text style={styles.title}>Confidentialité</Text>
-          <Text style={styles.subtitle}>Contrôlez qui peut voir vos informations</Text>
+          <Text style={styles.title}>Privacy</Text>
+          <Text style={styles.subtitle}>Control who can see your information</Text>
         </View>
 
         <View style={styles.settings}>
           <VisibilityToggle
-            label="Photo de profil"
-            description="Qui peut voir votre avatar"
+            label="Profile picture"
+            description="Who can see your avatar"
             value={privacy.avatarVisibility}
             onChange={value => handleVisibilityChange('avatarVisibility', value)}
           />
 
           <VisibilityToggle
-            label="Adresse email"
-            description="Qui peut voir votre email"
+            label="Email address"
+            description="Who can see your email"
             value={privacy.emailVisibility}
             onChange={value => handleVisibilityChange('emailVisibility', value)}
           />
 
           <VisibilityToggle
             label="Bio"
-            description="Qui peut voir votre bio"
+            description="Who can see your bio"
             value={privacy.bioVisibility}
             onChange={value => handleVisibilityChange('bioVisibility', value)}
           />
 
           <VisibilityToggle
-            label="Préférences musicales"
-            description="Qui peut voir vos genres favoris"
+            label="Music preferences"
+            description="Who can see your favorite genres"
             value={privacy.musicPreferencesVisibility}
             onChange={value => handleVisibilityChange('musicPreferencesVisibility', value)}
           />
@@ -142,7 +142,7 @@ export function PrivacySettingsScreen() {
           loading={isSaving}
           disabled={!hasChanges || isSaving}
         >
-          Enregistrer
+          Save
         </Button>
       </ScrollView>
     </View>

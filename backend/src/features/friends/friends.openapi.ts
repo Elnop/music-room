@@ -1,7 +1,7 @@
 import { OpenAPIV3 } from 'openapi-types';
 
 /**
- * OpenAPI paths pour feature Friends
+ * OpenAPI paths for Friends feature
  */
 export const friendsPaths: OpenAPIV3.PathsObject = {
   '/api/friends': {
@@ -223,7 +223,7 @@ export const friendsPaths: OpenAPIV3.PathsObject = {
 };
 
 /**
- * Schemas spécifiques aux Friends
+ * Schemas specific to Friends
  */
 export const friendsSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
   Friend: {

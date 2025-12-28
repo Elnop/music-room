@@ -1,7 +1,7 @@
 import { OpenAPIV3 } from 'openapi-types';
 
 /**
- * OpenAPI paths pour feature Profile
+ * OpenAPI paths for Profile feature
  */
 export const profilePaths: OpenAPIV3.PathsObject = {
   '/api/profile': {
@@ -354,7 +354,7 @@ export const profilePaths: OpenAPIV3.PathsObject = {
 };
 
 /**
- * Schemas spécifiques au Profile
+ * Schemas specific to Profile
  */
 export const profileSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
   UpdateProfileRequest: {

@@ -32,11 +32,11 @@ const PROFILE_LIMITS = {
 const updateProfileSchema = z.object({
   displayName: z
     .string()
-    .min(1, 'Le nom ne peut pas être vide')
-    .max(PROFILE_LIMITS.DISPLAY_NAME_MAX, `${PROFILE_LIMITS.DISPLAY_NAME_MAX} caractères max`),
+    .min(1, 'Name cannot be empty')
+    .max(PROFILE_LIMITS.DISPLAY_NAME_MAX, `${PROFILE_LIMITS.DISPLAY_NAME_MAX} characters max`),
   bio: z
     .string()
-    .max(PROFILE_LIMITS.BIO_MAX, `${PROFILE_LIMITS.BIO_MAX} caractères max`)
+    .max(PROFILE_LIMITS.BIO_MAX, `${PROFILE_LIMITS.BIO_MAX} characters max`)
     .optional()
     .or(z.literal('')),
 });
@@ -65,7 +65,7 @@ export function EditProfileScreen() {
 
   const onSubmit = async (data: UpdateProfileInput) => {
     if (!accessToken) {
-      Alert.alert('Erreur', "Vous n'êtes pas authentifié");
+      Alert.alert('Error', 'You are not authenticated');
       return;
     }
 
@@ -91,9 +91,9 @@ export function EditProfileScreen() {
       navigation.goBack();
     } catch (err) {
       const errorMessage =
-        err instanceof ApiError ? err.message : 'Impossible de mettre à jour le profil';
+        err instanceof ApiError ? err.message : 'Unable to update profile';
       setError(errorMessage);
-      Alert.alert('Erreur', errorMessage);
+      Alert.alert('Error', errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -111,8 +111,8 @@ export function EditProfileScreen() {
           contentContainerStyle={styles.contentContainer}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.title}>Modifier le profil</Text>
-          <Text style={styles.subtitle}>Mettez à jour vos informations</Text>
+          <Text style={styles.title}>Edit profile</Text>
+          <Text style={styles.subtitle}>Update your information</Text>
 
           {error && <FormError message={error} />}
 
@@ -123,8 +123,8 @@ export function EditProfileScreen() {
             render={({ field: { onChange, onBlur, value } }) => (
               <View>
                 <Input
-                  label="Nom d'affichage"
-                  placeholder="Entrez votre nom"
+                  label="Display name"
+                  placeholder="Enter your name"
                   value={value}
                   onChangeText={text => onChange(text.slice(0, PROFILE_LIMITS.DISPLAY_NAME_MAX))}
                   onBlur={onBlur}
@@ -148,7 +148,7 @@ export function EditProfileScreen() {
               <View>
                 <Input
                   label="Bio"
-                  placeholder="Parlez-nous de vous..."
+                  placeholder="Tell us about yourself..."
                   value={value}
                   onChangeText={text => onChange(text.slice(0, PROFILE_LIMITS.BIO_MAX))}
                   onBlur={onBlur}
@@ -168,8 +168,7 @@ export function EditProfileScreen() {
 
           {/* Info Text */}
           <Text style={styles.infoText}>
-            Note : Vous ne pouvez pas modifier votre nom d'utilisateur ou email. Contactez le
-            support si nécessaire.
+            Note: You cannot change your username or email. Contact support if needed.
           </Text>
 
           {/* Action Buttons */}
@@ -181,7 +180,7 @@ export function EditProfileScreen() {
               disabled={!isDirty || isLoading}
               style={styles.actionButton}
             >
-              Enregistrer
+              Save
             </Button>
 
             <Button
@@ -190,7 +189,7 @@ export function EditProfileScreen() {
               disabled={isLoading}
               style={styles.actionButton}
             >
-              Annuler
+              Cancel
             </Button>
           </View>
         </ScrollView>

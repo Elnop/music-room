@@ -66,7 +66,7 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
 
   const onSubmit = async (data: PlaylistFormInput) => {
     if (!user) {
-      Alert.alert('Erreur', 'Vous devez être connecté pour créer une playlist');
+      Alert.alert('Error', 'You must be logged in to create a playlist');
       return;
     }
 
@@ -82,7 +82,7 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
       navigation.goBack();
     } catch (error) {
       console.error('[CreatePlaylistScreen] Create playlist failed:', error);
-      Alert.alert('Erreur', 'Impossible de créer la playlist');
+      Alert.alert('Error', 'Unable to create playlist');
     }
   };
 
@@ -104,10 +104,10 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
                 render={({ field: { onChange, value } }) => (
                   <View>
                     <Input
-                      label="Nom de la playlist"
+                      label="Playlist name"
                       value={value}
                       onChangeText={text => onChange(text.slice(0, PLAYLIST_LIMITS.NAME_MAX))}
-                      placeholder="Ma super playlist"
+                      placeholder="My awesome playlist"
                       error={errors.name?.message}
                       autoFocus
                       maxLength={PLAYLIST_LIMITS.NAME_MAX}
@@ -125,12 +125,12 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
                 render={({ field: { onChange, value } }) => (
                   <View>
                     <Input
-                      label="Description (Optionnel)"
+                      label="Description (Optional)"
                       value={value || ''}
                       onChangeText={text =>
                         onChange(text.slice(0, PLAYLIST_LIMITS.DESCRIPTION_MAX))
                       }
-                      placeholder="Décrivez votre playlist..."
+                      placeholder="Describe your playlist..."
                       error={errors.description?.message}
                       multiline
                       numberOfLines={3}
@@ -146,11 +146,11 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
               <View style={styles.toggleSection}>
                 <View style={styles.toggleRow}>
                   <View style={styles.toggleInfo}>
-                    <Text style={styles.toggleLabel}>Playlist privée</Text>
+                    <Text style={styles.toggleLabel}>Private playlist</Text>
                     <Text style={styles.toggleDescription}>
                       {isPrivate
-                        ? 'Visible uniquement par les personnes invitées'
-                        : 'Visible par tous les utilisateurs'}
+                        ? 'Visible only to invited people'
+                        : 'Visible to all users'}
                     </Text>
                   </View>
                   <Switch
@@ -165,11 +165,11 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
               <View style={styles.toggleSection}>
                 <View style={styles.toggleRow}>
                   <View style={styles.toggleInfo}>
-                    <Text style={styles.toggleLabel}>Édition restreinte</Text>
+                    <Text style={styles.toggleLabel}>Restricted editing</Text>
                     <Text style={styles.toggleDescription}>
                       {isEditRestricted
-                        ? 'Seules les personnes autorisées peuvent modifier'
-                        : 'Tout le monde peut ajouter/supprimer des morceaux'}
+                        ? 'Only authorized people can edit'
+                        : 'Everyone can add/remove tracks'}
                     </Text>
                   </View>
                   <Switch
@@ -182,7 +182,7 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
               </View>
 
               <Button
-                title="Créer la playlist"
+                title="Create playlist"
                 onPress={handleSubmit(onSubmit)}
                 loading={isLoading}
                 fullWidth

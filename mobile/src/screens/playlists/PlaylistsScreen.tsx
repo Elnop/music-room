@@ -63,7 +63,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
     navigation.navigate('CreatePlaylist');
   }, [navigation]);
 
-  // Configure le bouton "+" dans le header natif
+  // Configure the "+" button in native header
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -144,7 +144,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
   };
 
   if (isLoading && playlists.length === 0) {
-    return <LoadingSpinner fullScreen message="Chargement des playlists..." />;
+    return <LoadingSpinner fullScreen message="Loading playlists..." />;
   }
 
   const renderHeader = () => (

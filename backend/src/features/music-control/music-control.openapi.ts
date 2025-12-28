@@ -1,7 +1,7 @@
 import { OpenAPIV3 } from 'openapi-types';
 
 /**
- * OpenAPI paths pour feature Music Control Delegation
+ * OpenAPI paths for Music Control Delegation feature
  */
 export const musicControlPaths: OpenAPIV3.PathsObject = {
   '/api/music-control/permissions': {
@@ -192,7 +192,7 @@ export const musicControlPaths: OpenAPIV3.PathsObject = {
 };
 
 /**
- * Schemas spécifiques à Music Control
+ * Schemas specific to Music Control
  */
 export const musicControlSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
   MusicControlPermission: {

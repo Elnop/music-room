@@ -103,14 +103,14 @@ export function UserProfileScreen({ route, navigation }: Props) {
   };
 
   if (isLoading) {
-    return <LoadingSpinner fullScreen message="Chargement du profil..." />;
+    return <LoadingSpinner fullScreen message="Loading profile..." />;
   }
 
   if (error || !profile) {
     return (
       <View style={styles.container}>
         <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{error || 'Profil introuvable'}</Text>
+          <Text style={styles.errorText}>{error || 'Profile not found'}</Text>
         </View>
       </View>
     );
@@ -146,11 +146,11 @@ export function UserProfileScreen({ route, navigation }: Props) {
               <View style={styles.statsContainer}>
                 <View style={styles.statItem}>
                   <Text style={styles.statNumber}>{followStatus.followersCount}</Text>
-                  <Text style={styles.statLabel}>Abonnés</Text>
+                  <Text style={styles.statLabel}>Followers</Text>
                 </View>
                 <View style={styles.statItem}>
                   <Text style={styles.statNumber}>{followStatus.followingCount}</Text>
-                  <Text style={styles.statLabel}>Abonnements</Text>
+                  <Text style={styles.statLabel}>Following</Text>
                 </View>
               </View>
             )}
@@ -169,7 +169,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
               )}
               {followStatus?.isFollowedBy && (
                 <View style={styles.followsYouBadge}>
-                  <Text style={styles.followsYouText}>Vous suit</Text>
+                  <Text style={styles.followsYouText}>Follows you</Text>
                 </View>
               )}
             </View>
@@ -186,7 +186,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
                 style={styles.hiddenIcon}
               />
               <Text style={styles.hiddenText}>
-                {isFriend ? 'Bio privée' : 'Visible uniquement pour les amis'}
+                {isFriend ? 'Private bio' : 'Visible only to friends'}
               </Text>
             </View>
           ) : filteredProfile?.bio ? (
@@ -207,7 +207,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
               {followStatus.isFriend ? (
                 <>
                   <View style={styles.friendBadge}>
-                    <Text style={styles.friendBadgeText}>Amis</Text>
+                    <Text style={styles.friendBadgeText}>Friends</Text>
                   </View>
                   <Button
                     variant="outline"
@@ -215,7 +215,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
                     loading={isFollowLoading}
                     style={styles.actionButton}
                   >
-                    Abonné
+                    Following
                   </Button>
                 </>
               ) : followStatus.isFollowing ? (
@@ -225,7 +225,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
                   loading={isFollowLoading}
                   style={styles.fullWidthButton}
                 >
-                  Abonné
+                  Following
                 </Button>
               ) : (
                 <Button
@@ -234,7 +234,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
                   loading={isFollowLoading}
                   style={styles.fullWidthButton}
                 >
-                  Suivre
+                  Follow
                 </Button>
               )}
             </View>
@@ -260,7 +260,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
         <View style={styles.playlistsSection}>
           <Text style={styles.sectionTitle}>Playlists</Text>
           {playlists.length === 0 ? (
-            <Text style={styles.emptyPlaylists}>Aucune playlist</Text>
+            <Text style={styles.emptyPlaylists}>No playlist</Text>
           ) : (
             playlists.map(playlist => (
               <PlaylistCard
@@ -278,8 +278,8 @@ export function UserProfileScreen({ route, navigation }: Props) {
 
         <View style={styles.infoSection}>
           <Text style={styles.infoText}>
-            Membre depuis{' '}
-            {new Date(profile.createdAt).toLocaleDateString('fr-FR', {
+            Member since{' '}
+            {new Date(profile.createdAt).toLocaleDateString('en-US', {
               month: 'long',
               year: 'numeric',
             })}
