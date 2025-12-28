@@ -21,9 +21,13 @@ router.get("/track/:urlOrId", controller.getTrack.bind(controller));
 
 /**
  * Get stream URL for a track
- * GET /api/soundcloud/stream/:trackUrl
- * Note: trackUrl should be URL-encoded
+ * GET /api/soundcloud/stream?url=<trackUrl>
+ * Note: trackUrl should be URL-encoded as a query parameter
+ * (Changed from path param to avoid Cloudflare WAF blocking URLs in paths)
+ *
+ * Legacy support: GET /api/soundcloud/stream/:trackUrl still works
  */
+router.get("/stream", controller.getStreamUrl.bind(controller));
 router.get("/stream/:trackUrl", controller.getStreamUrl.bind(controller));
 
 export default router;

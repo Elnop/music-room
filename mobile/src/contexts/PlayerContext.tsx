@@ -107,8 +107,15 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
       try {
+        // Use query param instead of path param to avoid Cloudflare WAF blocking URLs in paths
         const encodedUrl = encodeURIComponent(currentTrack.permalink_url);
-        const streamEndpoint = `${API_URL}/api/soundcloud/stream/${encodedUrl}`;
+        const streamEndpoint = `${API_URL}/api/soundcloud/stream?url=${encodedUrl}`;
+
+        if (__DEV__)
+          console.log('🌐 [PlayerProvider] Fetching stream URL:', {
+            endpoint: streamEndpoint.substring(0, 100) + '...',
+            trackUrl: currentTrack.permalink_url,
+          });
 
         const response = await fetch(streamEndpoint, { signal: controller.signal });
         clearTimeout(timeoutId);
@@ -119,6 +126,13 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
+        if (__DEV__)
+          console.log('🌐 [PlayerProvider] Stream response:', {
+            status: response.status,
+            ok: response.ok,
+            statusText: response.statusText,
+          });
+
         // Handle 404 - track not available
         if (response.status === 404) {
           setTrackUnavailableError("Cette musique n'est plus disponible ( les droits c'est cher )");
@@ -126,7 +140,18 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         }
 
         if (!response.ok) {
-          throw new Error(`Erreur serveur (${response.status})`);
+          // Try to get more error details
+          let errorDetail = '';
+          try {
+            const errorData = await response.text();
+            errorDetail = errorData.substring(0, 200);
+            console.error('🔴 [PlayerProvider] Server error details:', errorDetail);
+          } catch {
+            // ignore
+          }
+          throw new Error(
+            `Erreur serveur (${response.status}): ${errorDetail || response.statusText}`
+          );
         }
 
         const data = await response.json();

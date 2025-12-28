@@ -60,19 +60,25 @@ export class SoundCloudController {
 
   /**
    * Get stream URL for a track
-   * GET /api/soundcloud/stream/:trackUrl
+   * GET /api/soundcloud/stream?url=<trackUrl> (preferred - avoids WAF issues)
+   * GET /api/soundcloud/stream/:trackUrl (legacy - kept for compatibility)
    */
   async getStreamUrl(req: Request, res: Response, next: NextFunction) {
     try {
+      // Support both query param (new) and path param (legacy)
+      const rawUrl = (req.query.url as string) || req.params.trackUrl;
+
       logger.info("[SoundCloud] Stream URL request received", {
-        rawParam: req.params.trackUrl,
+        rawQueryParam: req.query.url,
+        rawPathParam: req.params.trackUrl,
+        source: req.query.url ? "query" : "path",
         headers: {
           "user-agent": req.headers["user-agent"],
           origin: req.headers["origin"],
         },
       });
 
-      const trackUrl = decodeURIComponent(req.params.trackUrl);
+      const trackUrl = rawUrl ? decodeURIComponent(rawUrl) : "";
 
       logger.info("[SoundCloud] Decoded track URL", { trackUrl });
 
