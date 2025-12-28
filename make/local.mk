@@ -189,15 +189,17 @@ open-emulator: ## Open a specific Android emulator (interactive selection or spe
 		echo "$(BLUE)$(ICON_INFO) Use $(GREEN)make kill-emulator$(NC) to stop running emulators$(NC)"; \
 		exit 1; \
 	fi
-	$(call blank_line)
+	@echo ""
 	@if [ -n "$(AVD)" ]; then \
 		echo "$(BLUE)$(ICON_INFO) Opening emulator: $(GREEN)$(AVD)$(NC)"; \
 		$(ANDROID_HOME)/emulator/emulator -avd $(AVD) -gpu swiftshader_indirect > /dev/null 2>&1 & \
 		echo ""; \
-		$(call print_success,Emulator starting in background...); \
+		echo "$(GREEN)$(ICON_SUCCESS) Emulator starting in background...$(NC)"; \
 		echo "$(BLUE)$(ICON_INFO) Wait ~30 seconds for boot$(NC)"; \
+		echo ""; \
 	else \
-		$(call print_subsection,📱 Available AVDs); \
+		echo "$(YELLOW)📱 Available AVDs$(NC)"; \
+		echo "$(YELLOW)──────────────────$(NC)"; \
 		AVDS=$$($(ANDROID_HOME)/emulator/emulator -list-avds 2>/dev/null); \
 		if [ -z "$$AVDS" ]; then \
 			echo "$(RED)$(ICON_ERROR) No AVDs found$(NC)"; \
@@ -210,7 +212,7 @@ open-emulator: ## Open a specific Android emulator (interactive selection or spe
 			COUNT=$$((COUNT + 1)); \
 		done; \
 		echo ""; \
-		echo "$(YELLOW)Select emulator (1-$$(echo "$$AVDS" | wc -l)):$(NC) "; \
+		printf "$(YELLOW)Select emulator (1-$$(echo "$$AVDS" | wc -l)): $(NC)"; \
 		read -r SELECTION; \
 		SELECTED_AVD=$$(echo "$$AVDS" | sed -n "$${SELECTION}p"); \
 		if [ -z "$$SELECTED_AVD" ]; then \
@@ -221,7 +223,7 @@ open-emulator: ## Open a specific Android emulator (interactive selection or spe
 		echo "$(BLUE)$(ICON_INFO) Opening emulator: $(GREEN)$$SELECTED_AVD$(NC)"; \
 		$(ANDROID_HOME)/emulator/emulator -avd $$SELECTED_AVD -gpu swiftshader_indirect > /dev/null 2>&1 & \
 		echo ""; \
-		$(call print_success,Emulator starting in background...); \
+		echo "$(GREEN)$(ICON_SUCCESS) Emulator starting in background...$(NC)"; \
 		echo "$(BLUE)$(ICON_INFO) Wait ~30 seconds for boot$(NC)"; \
+		echo ""; \
 	fi
-	$(call blank_line)
