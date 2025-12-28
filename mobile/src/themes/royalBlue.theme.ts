@@ -8,35 +8,35 @@ import type { Theme } from '@/themes/types';
 
 export const royalBlueTheme: Theme = {
   name: 'royalBlue',
-  displayName: 'Bleu Roi',
+  displayName: 'Royal Blue',
 
   colors: {
-    // Primary - Bleu roi/Navy
-    primary: '#1E3A8A', // Navy blue (boutons primaires)
-    primaryLight: '#3B82F6', // Bright blue (survol/actif)
-    primaryDark: '#1E293B', // Slate dark (texte sur primary)
+    // Primary - Royal blue/Navy
+    primary: '#1E3A8A', // Navy blue (primary buttons)
+    primaryLight: '#3B82F6', // Bright blue (hover/active)
+    primaryDark: '#1E293B', // Slate dark (text on primary)
 
     // Secondary - Cyan
-    secondary: '#06B6D4', // Cyan (accents secondaires)
+    secondary: '#06B6D4', // Cyan (secondary accents)
     secondaryLight: '#22D3EE', // Cyan light
 
-    // Accent - Jaune/Orange
+    // Accent - Yellow/Orange
     accent: '#FBBF24', // Amber (highlights)
-    accentAlt: '#F59E0B', // Orange (CTA secondaires)
+    accentAlt: '#F59E0B', // Orange (secondary CTA)
 
-    // Backgrounds - Clair
-    background: '#F8FAFC', // Slate 50 (fond principal)
-    surface: '#FFFFFF', // Blanc (cartes, inputs)
-    surfaceAlt: '#E2E8F0', // Slate 200 (surfaces désactivées)
+    // Backgrounds - Light
+    background: '#F8FAFC', // Slate 50 (main background)
+    surface: '#FFFFFF', // White (cards, inputs)
+    surfaceAlt: '#E2E8F0', // Slate 200 (disabled surfaces)
 
     // Text colors
-    text: '#0F172A', // Slate 900 (texte principal)
-    textSecondary: '#475569', // Slate 600 (texte secondaire)
-    textInverse: '#FFFFFF', // Blanc (texte sur primary)
+    text: '#0F172A', // Slate 900 (main text)
+    textSecondary: '#475569', // Slate 600 (secondary text)
+    textInverse: '#FFFFFF', // White (text on primary)
 
-    // Border - Toujours noir en néobrutalism
-    border: '#000000', // Noir pur
-    borderLight: '#1F2937', // Gray 800 (bordures subtiles)
+    // Border - Always black in neobrutalism
+    border: '#000000', // Pure black
+    borderLight: '#1F2937', // Gray 800 (subtle borders)
 
     // State colors
     error: '#DC2626', // Red 600

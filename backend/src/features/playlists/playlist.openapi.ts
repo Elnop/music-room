@@ -1,7 +1,7 @@
 import { OpenAPIV3 } from 'openapi-types';
 
 /**
- * OpenAPI paths pour feature Playlists
+ * OpenAPI paths for Playlists feature
  */
 export const playlistPaths: OpenAPIV3.PathsObject = {
   '/api/playlists': {
@@ -700,7 +700,7 @@ export const playlistPaths: OpenAPIV3.PathsObject = {
 };
 
 /**
- * Schemas spécifiques aux Playlists
+ * Schemas specific to Playlists
  */
 export const playlistSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
   CreatePlaylistRequest: {

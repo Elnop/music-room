@@ -145,7 +145,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
         // Handle 404 - track not available
         if (response.status === 404) {
-          setTrackUnavailableError("Cette musique n'est plus disponible ( les droits c'est cher )");
+          setTrackUnavailableError('This track is no longer available (rights are expensive)');
           return;
         }
 
@@ -160,7 +160,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
             // ignore
           }
           throw new Error(
-            `Erreur serveur (${response.status}): ${errorDetail || response.statusText}`
+            `Server error (${response.status}): ${errorDetail || response.statusText}`
           );
         }
 
@@ -170,7 +170,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
           if (__DEV__) console.log('🟢 [PlayerProvider] Stream URL obtained');
           setStreamUrl(data.data.streamUrl);
         } else {
-          throw new Error('Stream non disponible');
+          throw new Error('Stream not available');
         }
       } catch (err) {
         clearTimeout(timeoutId);
@@ -180,9 +180,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
         if (err instanceof Error && err.name === 'AbortError') {
           console.error('🔴 [PlayerProvider] Fetch timeout!');
-          setTrackUnavailableError('Chargement trop long - réessayez');
+          setTrackUnavailableError('Loading too long - try again');
         } else {
-          const errorMsg = err instanceof Error ? err.message : 'Erreur de chargement';
+          const errorMsg = err instanceof Error ? err.message : 'Loading error';
           console.error('🔴 [PlayerProvider] Error:', errorMsg);
           setTrackUnavailableError(errorMsg);
         }
@@ -266,7 +266,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         }
 
         // Show error
-        setTrackUnavailableError('Impossible de charger cette musique');
+        setTrackUnavailableError('Unable to load this track');
       }
     }, PLAYER_LOAD_TIMEOUT_MS);
 

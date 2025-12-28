@@ -32,14 +32,14 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
   const { user } = useAuthStore();
   const { playlists, isLoading, fetchPlaylists } = usePlaylistStore();
 
-  // État séparé pour le pull-to-refresh manuel (évite le décalage au focus)
+  // Separate state for manual pull-to-refresh (avoids shift on focus)
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleCreatePress = useCallback(() => {
     navigation.navigate('CreatePlaylist');
   }, [navigation]);
 
-  // Configure le bouton "+" dans le header natif
+  // Configure the "+" button in native header
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -53,7 +53,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
     });
   }, [navigation, handleCreatePress, theme.colors.text]);
 
-  // Refresh silencieux au focus (pas de spinner visible)
+  // Silent refresh on focus (no visible spinner)
   useFocusEffect(
     useCallback(() => {
       if (user) {
@@ -62,7 +62,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
     }, [user, fetchPlaylists])
   );
 
-  // Pull-to-refresh manuel (avec spinner)
+  // Manual pull-to-refresh (with spinner)
   const handleRefresh = async () => {
     if (user) {
       setIsRefreshing(true);
@@ -76,7 +76,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
   };
 
   if (isLoading && playlists.length === 0) {
-    return <LoadingSpinner fullScreen message="Chargement des playlists..." />;
+    return <LoadingSpinner fullScreen message="Loading playlists..." />;
   }
 
   return (
@@ -89,7 +89,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
           const ownerName =
             item.owner?.displayName ||
             item.owner?.username ||
-            (isOwner ? user.displayName || user.username || 'Vous' : 'Inconnu');
+            (isOwner ? user.displayName || user.username || 'You' : 'Unknown');
 
           return (
             <PlaylistCard
@@ -111,7 +111,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
         ListEmptyComponent={
           <EmptyState
             icon="musical-notes-outline"
-            message="Aucune playlist pour l'instant. Créez votre première playlist !"
+            message="No playlist yet. Create your first playlist!"
           />
         }
       />

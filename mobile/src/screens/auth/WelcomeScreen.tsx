@@ -46,7 +46,7 @@ function FloatingIcon({
   const scaleAnim = useMemo(() => new Animated.Value(1), []);
 
   useEffect(() => {
-    // Float animation (up and down) - plus prononcé
+    // Float animation (up and down) - more pronounced
     Animated.loop(
       Animated.sequence([
         Animated.timing(floatAnim, {

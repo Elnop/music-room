@@ -1,7 +1,7 @@
 import { OpenAPIV3 } from 'openapi-types';
 
 /**
- * OpenAPI paths pour feature Authentication
+ * OpenAPI paths for Authentication feature
  */
 export const authPaths: OpenAPIV3.PathsObject = {
   '/api/auth/register': {
@@ -464,7 +464,7 @@ export const authPaths: OpenAPIV3.PathsObject = {
 };
 
 /**
- * Schemas spécifiques à Authentication
+ * Schemas specific to Authentication
  */
 export const authSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
   RegisterRequest: {

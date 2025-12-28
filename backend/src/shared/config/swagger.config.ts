@@ -3,7 +3,7 @@ import swaggerUi from 'swagger-ui-express';
 import { env } from './env.js';
 import { commonSchemas, commonResponses } from './swagger.schemas.js';
 
-// Imports des specs par feature
+// Feature specs imports
 import { authPaths, authSchemas } from '@/features/auth/auth.openapi.js';
 import { playlistPaths, playlistSchemas } from '@/features/playlists/playlist.openapi.js';
 import { profilePaths, profileSchemas } from '@/features/profile/profile.openapi.js';
@@ -36,7 +36,7 @@ const openapiDocument: OpenAPIV3.Document = {
 		}
 	],
 
-	// Merge tous les paths des features
+	// Merge all feature paths
 	paths: {
 		'/health': {
 			get: {
@@ -88,7 +88,7 @@ const openapiDocument: OpenAPIV3.Document = {
 			}
 		},
 
-		// Merge tous les schemas
+		// Merge all schemas
 		schemas: {
 			...commonSchemas,
 			// Feature schemas
@@ -100,7 +100,7 @@ const openapiDocument: OpenAPIV3.Document = {
 			...musicControlSchemas
 		},
 
-		// Responses communes
+		// Common responses
 		responses: commonResponses
 	},
 

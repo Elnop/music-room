@@ -48,7 +48,7 @@ export function ProfileScreen() {
     navigation.navigate('EditProfile');
   }, [navigation]);
 
-  // Configure le bouton settings dans le header natif
+  // Configure settings button in native header
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -149,21 +149,21 @@ export function ProfileScreen() {
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{stats?.followersCount ?? 0}</Text>
-              <Text style={styles.statLabel}>Abonnés</Text>
+              <Text style={styles.statLabel}>Followers</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{stats?.followingCount ?? 0}</Text>
-              <Text style={styles.statLabel}>Abonnements</Text>
+              <Text style={styles.statLabel}>Following</Text>
             </View>
           </View>
         </View>
 
         {/* Music Preferences Section */}
         <ProfileSection
-          title="Préférences musicales"
+          title="Music preferences"
           rightAction={{
-            label: 'Modifier',
+            label: 'Edit',
             onPress: handleMusicPreferences,
           }}
         >
@@ -181,14 +181,14 @@ export function ProfileScreen() {
                 color={theme.colors.textSecondary}
                 style={styles.emptyStateIcon}
               />
-              <Text style={styles.emptyStateText}>Ajoutez vos genres favoris</Text>
-              <Text style={styles.emptyStateHint}>Appuyez pour sélectionner jusqu'à 5 genres</Text>
+              <Text style={styles.emptyStateText}>Add your favorite genres</Text>
+              <Text style={styles.emptyStateHint}>Tap to select up to 5 genres</Text>
             </TouchableOpacity>
           )}
         </ProfileSection>
 
         {/* Profile Info Section */}
-        <ProfileSection title="Informations">
+        <ProfileSection title="Information">
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>Email</Text>
             <Text style={styles.infoValue}>{user.email}</Text>
@@ -197,16 +197,16 @@ export function ProfileScreen() {
           <View style={styles.divider} />
 
           <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Nom d'utilisateur</Text>
+            <Text style={styles.infoLabel}>Username</Text>
             <Text style={styles.infoValue}>@{user.username}</Text>
           </View>
 
           <View style={styles.divider} />
 
           <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Membre depuis</Text>
+            <Text style={styles.infoLabel}>Member since</Text>
             <Text style={styles.infoValue}>
-              {new Date(user.createdAt).toLocaleDateString('fr-FR', {
+              {new Date(user.createdAt).toLocaleDateString('en-US', {
                 month: 'long',
                 year: 'numeric',
               })}
@@ -215,7 +215,7 @@ export function ProfileScreen() {
         </ProfileSection>
 
         {/* Theme Section */}
-        <ProfileSection title="Thème">
+        <ProfileSection title="Theme">
           <ThemeSelector />
         </ProfileSection>
 
@@ -226,8 +226,8 @@ export function ProfileScreen() {
               <Ionicons name="lock-closed" size={20} color={theme.colors.primary} />
             </View>
             <View style={styles.privacyTextContainer}>
-              <Text style={styles.privacyTitle}>Confidentialité</Text>
-              <Text style={styles.privacySubtitle}>Gérez qui peut voir vos informations</Text>
+              <Text style={styles.privacyTitle}>Privacy</Text>
+              <Text style={styles.privacySubtitle}>Manage who can see your information</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
           </TouchableOpacity>
@@ -237,7 +237,7 @@ export function ProfileScreen() {
         <View style={styles.logoutSection}>
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout} disabled={isLoading}>
             <Ionicons name="log-out-outline" size={20} color="#DC2626" />
-            <Text style={styles.logoutText}>Déconnexion</Text>
+            <Text style={styles.logoutText}>Logout</Text>
           </TouchableOpacity>
         </View>
 
