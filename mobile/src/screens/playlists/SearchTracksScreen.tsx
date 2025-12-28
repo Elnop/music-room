@@ -9,7 +9,7 @@ import {
   Alert,
   Image,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,6 +19,7 @@ import { usePlaylistStore } from '@store/playlistStore';
 import { useSoundCloudStore } from '@store/soundcloudStore';
 import { EmptyState } from '@components/common/EmptyState';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
+import { FloatingHeader } from '@/components/common/FloatingHeader';
 import debounce from 'lodash/debounce';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import type { Track } from '@/types/track.types';
@@ -44,15 +45,21 @@ interface SearchTracksScreenProps {
   route: SearchTracksScreenRouteProp;
 }
 
-export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
+export function SearchTracksScreen({ navigation, route }: SearchTracksScreenProps) {
   const { theme } = useTheme();
-  const styles = React.useMemo(() => createStyles(theme), [theme]);
+  const insets = useSafeAreaInsets();
+  const styles = React.useMemo(() => createStyles(theme, insets.top), [theme, insets.top]);
   const { playlistId } = route.params;
   const { addTrack, currentPlaylist } = usePlaylistStore();
   const { searchResults, isSearching, search, clearSearch } = useSoundCloudStore();
   const [query, setQuery] = useState('');
   const [addingTrackId, setAddingTrackId] = useState<number | null>(null);
   const [addedTrackUris, setAddedTrackUris] = useState<Set<string>>(new Set());
+
+  // Hide navigation header
+  React.useLayoutEffect(() => {
+    navigation.setOptions({ headerShown: false });
+  }, [navigation]);
 
   React.useEffect(() => {
     if (currentPlaylist?.tracks) {
@@ -181,7 +188,10 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <View style={styles.container}>
+      {/* Floating header */}
+      <FloatingHeader />
+
       <View style={styles.header}>
         <TextInput
           style={styles.searchInput}
@@ -215,11 +225,11 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
           }
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 
-const createStyles = (theme: Theme) =>
+const createStyles = (theme: Theme, topInset: number) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -227,6 +237,7 @@ const createStyles = (theme: Theme) =>
     },
     header: {
       padding: theme.spacing.md,
+      paddingTop: topInset + 60, // Space for floating header
       borderBottomWidth: 1,
       borderBottomColor: theme.colors.border,
     },
@@ -288,15 +299,5 @@ const createStyles = (theme: Theme) =>
     },
     addedButton: {
       backgroundColor: theme.colors.success,
-    },
-    addButtonText: {
-      fontSize: 28,
-      fontWeight: theme.typography.weights.bold,
-      color: theme.colors.background,
-      lineHeight: 30,
-    },
-    addedButtonText: {
-      fontSize: 20,
-      color: theme.colors.background,
     },
   });

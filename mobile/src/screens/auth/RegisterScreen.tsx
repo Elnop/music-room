@@ -102,7 +102,7 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
           <View style={styles.content}>
             <View style={styles.header}>
               <Text style={styles.title}>Create Account</Text>
-              <Text style={styles.subtitle}>Join Music Room today</Text>
+              <Text style={styles.subtitle}>Rejoins Zumik</Text>
             </View>
 
             {error && <FormError message={error} />}

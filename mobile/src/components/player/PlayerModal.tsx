@@ -1,14 +1,7 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Modal,
-  ActivityIndicator,
-  Dimensions,
-} from 'react-native';
+import React, { useMemo } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Modal, Dimensions } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Slider from '@react-native-community/slider';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -16,18 +9,27 @@ import type { Theme } from '@/themes/types';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { usePlayerStore } from '@/store/playerStore';
 import { usePlayerProgress } from '@/hooks/usePlayerProgress';
+import { useImageColors, hexToRgba, getAdaptiveColors, isLightColor } from '@/hooks/useImageColors';
+import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
 const { width } = Dimensions.get('window');
+const ARTWORK_SIZE = width * 0.75;
 
 export function PlayerModal() {
   const { theme } = useTheme();
-  const styles = React.useMemo(() => createStyles(theme), [theme]);
+  const insets = useSafeAreaInsets();
 
   const { player, error } = usePlayer();
   const { currentTrack, playbackState, isModalOpen, setModalOpen, pause, resume } =
     usePlayerStore();
 
   const { currentTime, duration } = usePlayerProgress();
+
+  // Extract colors from artwork
+  const artworkUrl = currentTrack?.artwork_url || currentTrack?.user?.avatar_url || null;
+  const { dominantColor } = useImageColors(artworkUrl, theme.colors.primary);
+
+  const styles = useMemo(() => createStyles(theme, insets), [theme, insets]);
 
   if (!currentTrack) {
     return null;
@@ -38,6 +40,29 @@ export function PlayerModal() {
   const isPlaying = playbackState === 'playing';
   const canInteract = playbackState === 'playing' || playbackState === 'paused';
 
+  // UI Colors - adapt to dominant color or use theme defaults
+  const adaptive = dominantColor ? getAdaptiveColors(dominantColor) : null;
+  const isDarkBg = dominantColor ? !isLightColor(dominantColor) : false;
+  const colors = adaptive
+    ? {
+        text: adaptive.text,
+        textSecondary: adaptive.textSecondary,
+        buttonBg: adaptive.buttonBg,
+        slider: adaptive.accent,
+        sliderBg: adaptive.accentBg,
+        playBtnBg: adaptive.accent,
+        playBtnIcon: isDarkBg ? dominantColor! : '#FFF',
+      }
+    : {
+        text: theme.colors.text,
+        textSecondary: theme.colors.textSecondary,
+        buttonBg: theme.colors.surface,
+        slider: theme.colors.primary,
+        sliderBg: theme.colors.border,
+        playBtnBg: theme.colors.primary,
+        playBtnIcon: '#FFF',
+      };
+
   const formatTime = (seconds: number): string => {
     if (!seconds || isNaN(seconds)) return '0:00';
     const mins = Math.floor(seconds / 60);
@@ -47,7 +72,6 @@ export function PlayerModal() {
 
   const handlePlayPause = () => {
     if (!canInteract || !player) return;
-
     if (isPlaying) {
       pause();
     } else {
@@ -66,8 +90,22 @@ export function PlayerModal() {
     player.seekTo(newPosition);
   };
 
-  const artworkUrl =
-    currentTrack.artwork_url || currentTrack.user.avatar_url || 'https://via.placeholder.com/300';
+  // Gradient colors - extend colored gradient to bottom so controls have consistent background
+  const gradientColors: [string, string, string, string] = dominantColor
+    ? [
+        hexToRgba(dominantColor, 0.95),
+        hexToRgba(dominantColor, 0.7),
+        hexToRgba(dominantColor, 0.5),
+        hexToRgba(dominantColor, 0.4),
+      ]
+    : [
+        theme.colors.background,
+        theme.colors.background,
+        theme.colors.background,
+        theme.colors.background,
+      ];
+
+  const displayArtwork = artworkUrl || 'https://via.placeholder.com/300';
 
   return (
     <Modal
@@ -77,36 +115,56 @@ export function PlayerModal() {
       onRequestClose={() => setModalOpen(false)}
     >
       <View style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => setModalOpen(false)}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <Ionicons name="chevron-down" size={28} color={theme.colors.text} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Now Playing</Text>
-          <View style={{ width: 28 }} />
+        {/* Background gradient - covers entire screen */}
+        <LinearGradient
+          colors={gradientColors}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+        />
+
+        {/* Close button */}
+        <TouchableOpacity
+          style={styles.closeButton}
+          onPress={() => setModalOpen(false)}
+          activeOpacity={0.7}
+        >
+          <View style={[styles.headerButton, { backgroundColor: colors.buttonBg }]}>
+            <Ionicons name="chevron-down" size={24} color={colors.text} />
+          </View>
+        </TouchableOpacity>
+
+        {/* Now Playing label */}
+        <View style={styles.nowPlayingContainer}>
+          <Text style={[styles.nowPlayingText, { color: colors.textSecondary }]}>EN LECTURE</Text>
         </View>
 
-        <View style={styles.artworkContainer}>
-          <Image source={{ uri: artworkUrl }} style={styles.artwork} />
+        {/* Artwork */}
+        <View style={styles.artworkWrapper}>
+          <View style={styles.artworkShadow}>
+            <Image source={{ uri: displayArtwork }} style={styles.artwork} />
+          </View>
         </View>
 
+        {/* Track info */}
         <View style={styles.trackInfo}>
-          <Text style={styles.title} numberOfLines={2}>
+          <Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
             {currentTrack.title}
           </Text>
-          <Text style={styles.artist} numberOfLines={1}>
+          <Text style={[styles.artist, { color: colors.textSecondary }]} numberOfLines={1}>
             {currentTrack.user.username}
           </Text>
         </View>
 
+        {/* Error message */}
         {error && (
           <View style={styles.errorContainer}>
+            <Ionicons name="warning" size={16} color={theme.colors.error} />
             <Text style={styles.errorText}>{error}</Text>
           </View>
         )}
 
+        {/* Progress bar */}
         <View style={styles.progressContainer}>
           <Slider
             style={styles.slider}
@@ -114,57 +172,66 @@ export function PlayerModal() {
             maximumValue={duration || 1}
             value={currentTime}
             onSlidingComplete={handleSeek}
-            minimumTrackTintColor={theme.colors.primary}
-            maximumTrackTintColor={theme.colors.border}
-            thumbTintColor={theme.colors.primary}
+            minimumTrackTintColor={colors.slider}
+            maximumTrackTintColor={colors.sliderBg}
+            thumbTintColor={colors.slider}
             disabled={isLoading || !player}
           />
           <View style={styles.timeContainer}>
-            <Text style={styles.timeText}>{formatTime(currentTime)}</Text>
-            <Text style={styles.timeText}>{formatTime(duration)}</Text>
+            <Text style={[styles.timeText, { color: colors.textSecondary }]}>
+              {formatTime(currentTime)}
+            </Text>
+            <Text style={[styles.timeText, { color: colors.textSecondary }]}>
+              {formatTime(duration)}
+            </Text>
           </View>
         </View>
 
+        {/* Controls */}
         <View style={styles.controls}>
           <TouchableOpacity
-            style={styles.controlButton}
-            onPress={() => handleSkip(-10)}
+            style={[styles.secondaryButton, { backgroundColor: colors.buttonBg }]}
+            onPress={() => handleSkip(-15)}
             disabled={isLoading || !canInteract}
+            activeOpacity={0.7}
           >
-            <Ionicons name="play-back" size={24} color={theme.colors.text} />
-            <Text style={styles.controlText}>10s</Text>
+            <Ionicons name="play-back" size={28} color={colors.text} />
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.playButton}
+            style={[styles.playButton, { backgroundColor: colors.playBtnBg }]}
             onPress={handlePlayPause}
             disabled={isLoading}
+            activeOpacity={0.8}
           >
             {isLoading ? (
-              <ActivityIndicator size="large" color="#FFFFFF" />
+              <LoadingSpinner size="small" />
             ) : (
               <Ionicons
                 name={isPlaying ? 'pause' : 'play'}
-                size={36}
-                color="#FFFFFF"
+                size={40}
+                color={colors.playBtnIcon}
                 style={isPlaying ? undefined : { marginLeft: 4 }}
               />
             )}
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.controlButton}
-            onPress={() => handleSkip(10)}
+            style={[styles.secondaryButton, { backgroundColor: colors.buttonBg }]}
+            onPress={() => handleSkip(15)}
             disabled={isLoading || !canInteract}
+            activeOpacity={0.7}
           >
-            <Ionicons name="play-forward" size={24} color={theme.colors.text} />
-            <Text style={styles.controlText}>10s</Text>
+            <Ionicons name="play-forward" size={28} color={colors.text} />
           </TouchableOpacity>
         </View>
 
+        {/* Loading indicator */}
         {isLoading && (
           <View style={styles.loadingContainer}>
-            <Text style={styles.loadingText}>Loading stream...</Text>
+            <Text style={[styles.loadingText, { color: colors.textSecondary }]}>
+              Chargement du flux audio...
+            </Text>
           </View>
         )}
       </View>
@@ -172,67 +239,87 @@ export function PlayerModal() {
   );
 }
 
-const createStyles = (theme: Theme) =>
+const createStyles = (theme: Theme, insets: { top: number; bottom: number }) =>
   StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: theme.colors.background,
-      paddingTop: theme.spacing.xl,
     },
-    header: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
+    closeButton: {
+      position: 'absolute',
+      top: insets.top + 12,
+      left: 20,
+      zIndex: 10,
+    },
+    headerButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      justifyContent: 'center',
       alignItems: 'center',
-      paddingHorizontal: theme.spacing.lg,
-      paddingVertical: theme.spacing.md,
     },
-    headerTitle: {
-      fontSize: 16,
-      fontWeight: theme.typography.weights.semibold,
-      color: theme.colors.text,
-    },
-    artworkContainer: {
+    nowPlayingContainer: {
+      marginTop: insets.top + 16,
       alignItems: 'center',
-      marginTop: theme.spacing.xl,
-      marginBottom: theme.spacing.xl,
+    },
+    nowPlayingText: {
+      fontSize: 12,
+      fontWeight: '600',
+      letterSpacing: 2,
+    },
+    artworkWrapper: {
+      alignItems: 'center',
+      marginTop: 32,
+      marginBottom: 40,
+    },
+    artworkShadow: {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 16 },
+      shadowOpacity: 0.3,
+      shadowRadius: 24,
+      elevation: 16,
     },
     artwork: {
-      width: width - theme.spacing.xxl * 2,
-      height: width - theme.spacing.xxl * 2,
-      borderRadius: 16,
+      width: ARTWORK_SIZE,
+      height: ARTWORK_SIZE,
+      borderRadius: 12,
       backgroundColor: theme.colors.surface,
     },
     trackInfo: {
-      paddingHorizontal: theme.spacing.xl,
-      marginBottom: theme.spacing.lg,
+      paddingHorizontal: 32,
+      marginBottom: 32,
     },
     title: {
       fontSize: 24,
-      fontWeight: theme.typography.weights.bold,
-      color: theme.colors.text,
-      marginBottom: theme.spacing.sm,
+      fontWeight: '700',
+      marginBottom: 8,
       textAlign: 'center',
     },
     artist: {
-      fontSize: 18,
-      color: theme.colors.textSecondary,
+      fontSize: 17,
+      fontWeight: '500',
       textAlign: 'center',
     },
     errorContainer: {
-      backgroundColor: theme.colors.error + '20',
-      padding: theme.spacing.md,
-      marginHorizontal: theme.spacing.xl,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: 'rgba(255, 59, 48, 0.15)',
+      paddingVertical: 10,
+      paddingHorizontal: 16,
+      marginHorizontal: 32,
       borderRadius: 12,
-      marginBottom: theme.spacing.md,
+      marginBottom: 16,
+      gap: 8,
     },
     errorText: {
-      color: theme.colors.error,
+      color: '#FF3B30',
       fontSize: 14,
-      textAlign: 'center',
+      fontWeight: '500',
     },
     progressContainer: {
-      paddingHorizontal: theme.spacing.xl,
-      marginBottom: theme.spacing.xl,
+      paddingHorizontal: 24,
+      marginBottom: 24,
     },
     slider: {
       width: '100%',
@@ -241,44 +328,44 @@ const createStyles = (theme: Theme) =>
     timeContainer: {
       flexDirection: 'row',
       justifyContent: 'space-between',
+      marginTop: -8,
     },
     timeText: {
-      fontSize: 14,
-      color: theme.colors.textSecondary,
+      fontSize: 13,
+      fontWeight: '500',
     },
     controls: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: theme.spacing.xl,
-      paddingHorizontal: theme.spacing.xl,
+      gap: 40,
+      paddingHorizontal: 32,
     },
-    controlButton: {
-      padding: theme.spacing.md,
-      backgroundColor: theme.colors.surface,
-      borderRadius: 16,
-      minWidth: 70,
-      alignItems: 'center',
-    },
-    controlText: {
-      fontSize: 12,
-      color: theme.colors.textSecondary,
-      marginTop: 2,
-    },
-    playButton: {
-      width: 80,
-      height: 80,
-      borderRadius: 40,
-      backgroundColor: theme.colors.primary,
+    secondaryButton: {
+      width: 56,
+      height: 56,
+      borderRadius: 28,
       alignItems: 'center',
       justifyContent: 'center',
     },
+    playButton: {
+      width: 72,
+      height: 72,
+      borderRadius: 36,
+      alignItems: 'center',
+      justifyContent: 'center',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.2,
+      shadowRadius: 8,
+      elevation: 8,
+    },
     loadingContainer: {
-      marginTop: theme.spacing.lg,
+      marginTop: 24,
       alignItems: 'center',
     },
     loadingText: {
       fontSize: 14,
-      color: theme.colors.textSecondary,
+      fontWeight: '500',
     },
   });

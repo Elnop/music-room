@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import type { MusicGenre } from '@/types/user.types';
@@ -10,18 +11,25 @@ import { useAuthStore } from '@/store/authStore';
 import { privacyApi, ApiError } from '@/services/privacyApi';
 import { Button } from '@components/common/Button';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
+import { FloatingHeader } from '@/components/common/FloatingHeader';
 import { GenreSelector } from '@components/profile/GenreSelector';
 
 export function MusicPreferencesScreen() {
   const { theme } = useTheme();
-  const styles = React.useMemo(() => createStyles(theme), [theme]);
-  const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
+  const styles = React.useMemo(() => createStyles(theme, insets.top), [theme, insets.top]);
+  const navigation = useNavigation<NativeStackNavigationProp<Record<string, undefined>>>();
   const { accessToken } = useAuthStore();
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [initialGenres, setInitialGenres] = useState<MusicGenre[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<MusicGenre[]>([]);
+
+  // Hide navigation header
+  React.useLayoutEffect(() => {
+    navigation.setOptions({ headerShown: false });
+  }, [navigation]);
 
   // Load music preferences on mount
   useEffect(() => {
@@ -35,8 +43,9 @@ export function MusicPreferencesScreen() {
         setInitialGenres(genres);
         setSelectedGenres(genres);
       } catch (error) {
-        const message = error instanceof ApiError ? error.message : 'Failed to load preferences';
-        Alert.alert('Error', message);
+        const message =
+          error instanceof ApiError ? error.message : 'Impossible de charger les préférences';
+        Alert.alert('Erreur', message);
       } finally {
         setIsLoading(false);
       }
@@ -49,15 +58,12 @@ export function MusicPreferencesScreen() {
     const isSelected = selectedGenres.includes(genre);
 
     if (isSelected) {
-      // Remove genre
       setSelectedGenres(selectedGenres.filter(g => g !== genre));
     } else if (selectedGenres.length < MAX_GENRES) {
-      // Add genre
       setSelectedGenres([...selectedGenres, genre]);
     }
   };
 
-  // Check if there are actual changes compared to initial state
   const hasChanges = React.useMemo(() => {
     if (initialGenres.length !== selectedGenres.length) return true;
     const sortedInitial = [...initialGenres].sort();
@@ -73,31 +79,31 @@ export function MusicPreferencesScreen() {
       await privacyApi.updateMusicPreferences(accessToken, {
         genres: selectedGenres,
       });
-      setInitialGenres(selectedGenres); // Reset initial state after save
+      setInitialGenres(selectedGenres);
       navigation.goBack();
     } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'Failed to save preferences';
-      Alert.alert('Error', message);
+      const message =
+        error instanceof ApiError ? error.message : 'Impossible de sauvegarder les préférences';
+      Alert.alert('Erreur', message);
     } finally {
       setIsSaving(false);
     }
   };
 
   if (isLoading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <LoadingSpinner />
-      </SafeAreaView>
-    );
+    return <LoadingSpinner fullScreen message="Chargement..." />;
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <View style={styles.container}>
+      {/* Floating header */}
+      <FloatingHeader />
+
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
         <View style={styles.header}>
-          <Text style={styles.title}>Music Preferences</Text>
+          <Text style={styles.title}>Préférences musicales</Text>
           <Text style={styles.subtitle}>
-            Tell us what music you love! Select up to {MAX_GENRES} genres.
+            Dites-nous quels genres vous aimez ! Sélectionnez jusqu'à {MAX_GENRES} genres.
           </Text>
         </View>
 
@@ -108,6 +114,7 @@ export function MusicPreferencesScreen() {
             maxGenres={MAX_GENRES}
           />
         </View>
+
         <Button
           variant="primary"
           onPress={handleSave}
@@ -116,14 +123,14 @@ export function MusicPreferencesScreen() {
           fullWidth={false}
           style={styles.saveButton}
         >
-          Save Preferences
+          Enregistrer
         </Button>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
-const createStyles = (theme: Theme) =>
+const createStyles = (theme: Theme, topInset: number) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -134,6 +141,7 @@ const createStyles = (theme: Theme) =>
     },
     content: {
       paddingVertical: theme.spacing.lg,
+      paddingTop: topInset + 60, // Space for floating header
     },
     header: {
       paddingHorizontal: theme.spacing.lg,
@@ -155,45 +163,6 @@ const createStyles = (theme: Theme) =>
       borderRadius: 16,
       marginHorizontal: theme.spacing.lg,
       marginBottom: theme.spacing.lg,
-    },
-    previewSection: {
-      backgroundColor: theme.colors.surface,
-      borderRadius: 16,
-      marginHorizontal: theme.spacing.lg,
-      marginBottom: theme.spacing.lg,
-      padding: theme.spacing.md,
-    },
-    previewTitle: {
-      fontSize: 14,
-      fontWeight: theme.typography.weights.semibold,
-      color: theme.colors.text,
-      marginBottom: theme.spacing.xs,
-    },
-    previewText: {
-      fontSize: 14,
-      color: theme.colors.primary,
-    },
-    tipBox: {
-      flexDirection: 'row',
-      backgroundColor: theme.colors.surface,
-      borderRadius: 12,
-      marginHorizontal: theme.spacing.lg,
-      padding: theme.spacing.md,
-      gap: theme.spacing.sm,
-    },
-    tipIcon: {
-      fontSize: 20,
-    },
-    tipText: {
-      flex: 1,
-      fontSize: 13,
-      color: theme.colors.textSecondary,
-      lineHeight: 18,
-    },
-    footer: {
-      padding: theme.spacing.lg,
-      borderTopWidth: 1,
-      borderTopColor: theme.colors.border,
     },
     saveButton: {
       marginHorizontal: theme.spacing.lg,

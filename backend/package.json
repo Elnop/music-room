@@ -1,8 +1,8 @@
 {
-  "name": "music-room-backend",
+  "name": "zumik-backend",
   "version": "1.0.0",
   "type": "module",
-  "description": "Music Room backend with Supabase, Express, and Socket.io",
+  "description": "Zumik backend with Supabase, Express, and Socket.io",
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",

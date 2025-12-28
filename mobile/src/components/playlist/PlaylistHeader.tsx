@@ -36,7 +36,7 @@ export function PlaylistHeader({ playlist, onAddTrack, canEdit = false }: Playli
         <Text style={styles.owner}>{playlist.owner.displayName || playlist.owner.username}</Text>
         <Text style={styles.separator}>•</Text>
         <Text style={styles.trackCount}>
-          {trackCount} {trackCount === 1 ? 'track' : 'tracks'}
+          {trackCount} {trackCount === 1 ? 'titre' : 'titres'}
         </Text>
       </View>
       {playlist.collaboratorIds.length > 0 && (
@@ -44,7 +44,7 @@ export function PlaylistHeader({ playlist, onAddTrack, canEdit = false }: Playli
           <Ionicons name="people-outline" size={14} color={theme.colors.primary} />
           <Text style={styles.collaboratorsText}>
             {playlist.collaboratorIds.length}{' '}
-            {playlist.collaboratorIds.length === 1 ? 'collaborator' : 'collaborators'}
+            {playlist.collaboratorIds.length === 1 ? 'collaborateur' : 'collaborateurs'}
           </Text>
         </View>
       )}
@@ -75,6 +75,12 @@ const createStyles = (theme: Theme) =>
       borderRadius: 8,
       backgroundColor: theme.colors.surfaceAlt,
       marginBottom: theme.spacing.lg,
+      // Add shadow for depth
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.3,
+      shadowRadius: 12,
+      elevation: 8,
     },
     emptyCover: {
       justifyContent: 'center',

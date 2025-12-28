@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Music Room",
-    "slug": "music-room",
-    "scheme": "musicroom",
+    "name": "Zumik",
+    "slug": "zumik",
+    "scheme": "zumik",
     "owner": "@anonymous",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -19,9 +19,9 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.musicroom.app",
+      "bundleIdentifier": "com.zumik.app",
       "associatedDomains": [
-        "applinks:musicroom.app"
+        "applinks:zumik.app"
       ]
     },
     "android": {
@@ -29,7 +29,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#121212"
       },
-      "package": "com.musicroom.app",
+      "package": "com.zumik.app",
       "versionCode": 2,
       "permissions": [
         "android.permission.RECORD_AUDIO",
@@ -45,7 +45,7 @@
           "autoVerify": true,
           "data": [
             {
-              "scheme": "musicroom",
+              "scheme": "zumik",
               "host": "auth"
             }
           ],
@@ -82,7 +82,7 @@
         {
           "appID": "335709326982644",
           "clientToken": "e7df3370baef0cac5ac750531fc3bcca",
-          "displayName": "Music Room",
+          "displayName": "Zumik",
           "scheme": "fb335709326982644",
           "advertiserIDCollectionEnabled": false,
           "autoLogAppEventsEnabled": false,

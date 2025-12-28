@@ -1,11 +1,12 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '@/contexts/ThemeContext';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
+import { useImageColors, hexToRgba } from '@/hooks/useImageColors';
 import type { Theme } from '@themes/types';
 import type { MusicGenre, MusicPreferences } from '@/types/user.types';
 import { useAuthStore } from '@/store/authStore';
@@ -13,6 +14,7 @@ import { privacyApi } from '@/services/privacyApi';
 import { friendsApi, type MyStats } from '@/services/friendsApi';
 import { Ionicons } from '@expo/vector-icons';
 import { Avatar } from '@components/common/Avatar';
+import { FloatingHeader } from '@/components/common/FloatingHeader';
 import { ProfileSection } from '@components/profile/ProfileSection';
 import { GenreChip } from '@components/profile/GenreChip';
 import { ThemeSelector } from '@components/theme/ThemeSelector';
@@ -29,8 +31,9 @@ type NavigationProp = NativeStackNavigationProp<ProfileStackParamList>;
 
 export function ProfileScreen() {
   const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
   const playerHeight = usePlayerHeight();
-  const styles = React.useMemo(() => createStyles(theme), [theme]);
+  const styles = React.useMemo(() => createStyles(theme, insets.top), [theme, insets.top]);
   const navigation = useNavigation<NavigationProp>();
   const { user, logout, isLoading, accessToken, isAuthenticated } = useAuthStore();
 
@@ -38,9 +41,21 @@ export function ProfileScreen() {
   const [stats, setStats] = useState<MyStats | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Get avatar URL for color extraction
+  const avatarUrl = user?.avatarUrl;
+  const { dominantColor } = useImageColors(avatarUrl, theme.colors.primary);
+
+  // Gradient colors based on avatar
+  const gradientColors = dominantColor
+    ? ([
+        hexToRgba(dominantColor, 0.6),
+        hexToRgba(dominantColor, 0.3),
+        theme.colors.background,
+      ] as const)
+    : ([theme.colors.primary + '40', theme.colors.background, theme.colors.background] as const);
+
   // Load profile data (music preferences + stats)
   const loadProfileData = useCallback(async () => {
-    // Don't load if not authenticated or during logout
     if (!accessToken || !isAuthenticated) return;
 
     try {
@@ -48,7 +63,6 @@ export function ProfileScreen() {
         privacyApi.getMusicPreferences(accessToken),
         friendsApi.getMyStats(accessToken),
       ]);
-      // Double-check we're still authenticated before setting state
       if (useAuthStore.getState().isAuthenticated) {
         setMusicPreferences(prefsData);
         setStats(statsData);
@@ -93,16 +107,33 @@ export function ProfileScreen() {
 
   if (!user) {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         <Text style={styles.errorText}>No user data available</Text>
-      </SafeAreaView>
+      </View>
     );
   }
 
   const genres = musicPreferences?.genres || [];
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={styles.container}>
+      {/* Full screen gradient */}
+      <LinearGradient
+        colors={gradientColors as unknown as [string, string, ...string[]]}
+        locations={[0, 0.3, 0.6]}
+        style={styles.gradientBackground}
+      />
+
+      {/* Floating header with edit button */}
+      <FloatingHeader
+        title="Mon Profil"
+        titleAlign="left"
+        showBackButton={false}
+        rightIcon="settings-outline"
+        onRightPress={handleEditProfile}
+        showRightButton
+      />
+
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={[
@@ -117,46 +148,35 @@ export function ProfileScreen() {
           />
         }
       >
-        {/* Hero Section with Gradient */}
-        <LinearGradient
-          colors={[theme.colors.primary + '40', theme.colors.background]}
-          style={styles.heroGradient}
-        >
-          {/* Edit Profile Button - Top Right */}
-          <TouchableOpacity style={styles.editProfileButton} onPress={handleEditProfile}>
-            <Ionicons name="pencil" size={14} color={theme.colors.primary} />
-            <Text style={styles.editProfileText}>Edit</Text>
-          </TouchableOpacity>
+        {/* Hero Section */}
+        <View style={styles.heroContent}>
+          <Avatar size="lg" name={user.displayName || user.username} uri={user.avatarUrl} />
 
-          <View style={styles.heroContent}>
-            <Avatar size="lg" name={user.displayName || user.username} uri={user.avatarUrl} />
+          <Text style={styles.username}>@{user.username}</Text>
 
-            <Text style={styles.username}>@{user.username}</Text>
+          {user.displayName && <Text style={styles.displayName}>{user.displayName}</Text>}
 
-            {user.displayName && <Text style={styles.displayName}>{user.displayName}</Text>}
+          {user.bio && <Text style={styles.bio}>{user.bio}</Text>}
 
-            {user.bio && <Text style={styles.bio}>{user.bio}</Text>}
-
-            {/* Stats Row */}
-            <View style={styles.statsRow}>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>{stats?.followersCount ?? 0}</Text>
-                <Text style={styles.statLabel}>Abonnés</Text>
-              </View>
-              <View style={styles.statDivider} />
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>{stats?.followingCount ?? 0}</Text>
-                <Text style={styles.statLabel}>Abonnements</Text>
-              </View>
+          {/* Stats Row */}
+          <View style={styles.statsRow}>
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>{stats?.followersCount ?? 0}</Text>
+              <Text style={styles.statLabel}>Abonnés</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>{stats?.followingCount ?? 0}</Text>
+              <Text style={styles.statLabel}>Abonnements</Text>
             </View>
           </View>
-        </LinearGradient>
+        </View>
 
         {/* Music Preferences Section */}
         <ProfileSection
-          title="Music Preferences"
+          title="Préférences musicales"
           rightAction={{
-            label: 'Edit',
+            label: 'Modifier',
             onPress: handleMusicPreferences,
           }}
         >
@@ -174,14 +194,14 @@ export function ProfileScreen() {
                 color={theme.colors.textSecondary}
                 style={styles.emptyStateIcon}
               />
-              <Text style={styles.emptyStateText}>Add your favorite genres</Text>
-              <Text style={styles.emptyStateHint}>Tap to select up to 5 genres</Text>
+              <Text style={styles.emptyStateText}>Ajoutez vos genres favoris</Text>
+              <Text style={styles.emptyStateHint}>Appuyez pour sélectionner jusqu'à 5 genres</Text>
             </TouchableOpacity>
           )}
         </ProfileSection>
 
         {/* Profile Info Section */}
-        <ProfileSection title="Profile Info">
+        <ProfileSection title="Informations">
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>Email</Text>
             <Text style={styles.infoValue}>{user.email}</Text>
@@ -190,20 +210,25 @@ export function ProfileScreen() {
           <View style={styles.divider} />
 
           <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Username</Text>
+            <Text style={styles.infoLabel}>Nom d'utilisateur</Text>
             <Text style={styles.infoValue}>@{user.username}</Text>
           </View>
 
           <View style={styles.divider} />
 
           <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Member Since</Text>
-            <Text style={styles.infoValue}>{new Date(user.createdAt).toLocaleDateString()}</Text>
+            <Text style={styles.infoLabel}>Membre depuis</Text>
+            <Text style={styles.infoValue}>
+              {new Date(user.createdAt).toLocaleDateString('fr-FR', {
+                month: 'long',
+                year: 'numeric',
+              })}
+            </Text>
           </View>
         </ProfileSection>
 
         {/* Theme Section */}
-        <ProfileSection title="Theme">
+        <ProfileSection title="Thème">
           <ThemeSelector />
         </ProfileSection>
 
@@ -214,8 +239,8 @@ export function ProfileScreen() {
               <Ionicons name="lock-closed" size={20} color={theme.colors.primary} />
             </View>
             <View style={styles.privacyTextContainer}>
-              <Text style={styles.privacyTitle}>Privacy Settings</Text>
-              <Text style={styles.privacySubtitle}>Control who sees your info</Text>
+              <Text style={styles.privacyTitle}>Confidentialité</Text>
+              <Text style={styles.privacySubtitle}>Gérez qui peut voir vos informations</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
           </TouchableOpacity>
@@ -225,56 +250,41 @@ export function ProfileScreen() {
         <View style={styles.logoutSection}>
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout} disabled={isLoading}>
             <Ionicons name="log-out-outline" size={20} color="#DC2626" />
-            <Text style={styles.logoutText}>Logout</Text>
+            <Text style={styles.logoutText}>Déconnexion</Text>
           </TouchableOpacity>
         </View>
 
         {/* Footer */}
-        <Text style={styles.footer}>Music Room v1.0.0</Text>
+        <Text style={styles.footer}>Zumik v1.0.0</Text>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
-const createStyles = (theme: Theme) =>
+const createStyles = (theme: Theme, topInset: number) =>
   StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: theme.colors.background,
     },
+    gradientBackground: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      height: 350,
+    },
     scrollView: {
       flex: 1,
     },
     contentContainer: {
-      paddingBottom: theme.spacing.xl,
-    },
-    heroGradient: {
-      paddingTop: theme.spacing.lg,
+      paddingTop: topInset + 10, // Space for floating header
       paddingBottom: theme.spacing.xl,
     },
     heroContent: {
       alignItems: 'center',
       paddingHorizontal: theme.spacing.lg,
-    },
-    editProfileButton: {
-      position: 'absolute',
-      top: theme.spacing.md,
-      right: theme.spacing.lg,
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 6,
-      backgroundColor: theme.colors.surface,
-      paddingHorizontal: theme.spacing.md,
-      paddingVertical: theme.spacing.sm,
-      borderRadius: 20,
-      borderWidth: 2,
-      borderColor: theme.colors.border,
-      zIndex: 10,
-    },
-    editProfileText: {
-      fontSize: 13,
-      color: theme.colors.text,
-      fontWeight: theme.typography.weights.bold,
+      paddingBottom: theme.spacing.xl,
     },
     username: {
       fontSize: 14,

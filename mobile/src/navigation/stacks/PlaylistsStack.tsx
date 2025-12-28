@@ -53,7 +53,7 @@ export function PlaylistsNavigator() {
       <PlaylistStack.Screen
         name="CreatePlaylist"
         component={CreatePlaylistScreen}
-        options={{ title: 'New Playlist' }}
+        options={{ headerShown: false }}
       />
       <PlaylistStack.Screen
         name="SearchTracks"

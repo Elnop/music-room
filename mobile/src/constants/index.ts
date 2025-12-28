@@ -13,7 +13,7 @@ export const SUPABASE_CONFIG = {
 
 // App Configuration
 export const APP_CONFIG = {
-  NAME: 'Music Room',
+  NAME: 'Zumik',
   VERSION: '1.0.0',
   BUILD_NUMBER: 1,
 } as const;

@@ -1,8 +1,8 @@
 module.exports = {
   expo: {
-    name: 'Music Room',
-    slug: 'music-room',
-    scheme: 'musicroom',
+    name: 'Zumik',
+    slug: 'zumik',
+    scheme: 'zumik',
     owner: '@anonymous',
     version: '1.0.0',
     orientation: 'portrait',
@@ -17,15 +17,15 @@ module.exports = {
     assetBundlePatterns: ['**/*'],
     ios: {
       supportsTablet: true,
-      bundleIdentifier: 'com.musicroom.app',
-      associatedDomains: ['applinks:musicroom.app'],
+      bundleIdentifier: 'com.zumik.app',
+      associatedDomains: ['applinks:zumik.app'],
     },
     android: {
       adaptiveIcon: {
         foregroundImage: './assets/adaptive-icon.png',
         backgroundColor: '#121212',
       },
-      package: 'com.musicroom.app',
+      package: 'com.zumik.app',
       permissions: [
         'android.permission.RECORD_AUDIO',
         'android.permission.READ_EXTERNAL_STORAGE',
@@ -40,7 +40,7 @@ module.exports = {
           autoVerify: true,
           data: [
             {
-              scheme: 'musicroom',
+              scheme: 'zumik',
               host: 'auth',
             },
           ],
@@ -77,7 +77,7 @@ module.exports = {
           appID: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID || '335709326982644',
           clientToken:
             process.env.EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN || 'e7df3370baef0cac5ac750531fc3bcca',
-          displayName: 'Music Room',
+          displayName: 'Zumik',
           scheme: `fb${process.env.EXPO_PUBLIC_FACEBOOK_APP_ID || '335709326982644'}`,
           advertiserIDCollectionEnabled: false,
           autoLogAppEventsEnabled: false,
