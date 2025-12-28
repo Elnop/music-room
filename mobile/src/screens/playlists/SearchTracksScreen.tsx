@@ -224,14 +224,16 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
-            <EmptyState
-              icon="musical-notes-outline"
-              message={
-                query.trim()
-                  ? 'Aucun titre trouvé'
-                  : 'Recherchez des titres sur SoundCloud pour les ajouter à votre playlist'
-              }
-            />
+            query.trim() && isSearching ? null : (
+              <EmptyState
+                icon="musical-notes-outline"
+                message={
+                  query.trim()
+                    ? 'Aucun titre trouvé'
+                    : 'Recherchez des titres sur SoundCloud pour les ajouter à votre playlist'
+                }
+              />
+            )
           }
         />
       )}

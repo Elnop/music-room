@@ -20,24 +20,26 @@ export class MusicControlService {
       // Verify they are mutual friends
       const followStatus = await friendsService.getFollowStatus(
         ownerId,
-        allowedUserId,
+        allowedUserId
       );
 
       if (!followStatus.isFriend) {
         throw new AppError(
           400,
           "You can only grant control to mutual friends",
-          "NOT_FRIENDS",
+          "NOT_FRIENDS"
         );
       }
 
       // Update the follows table where allowedUserId follows ownerId
       // This is: follows(follower_id=allowedUserId, following_id=ownerId)
-      const { error } = await supabaseAdmin
+      // Use .select() to verify the update actually affected a row
+      const { data, error } = await supabaseAdmin
         .from("follows")
         .update({ can_control_music: true })
         .eq("follower_id", allowedUserId)
-        .eq("following_id", ownerId);
+        .eq("following_id", ownerId)
+        .select();
 
       if (error) {
         logger.error("Failed to grant music control", {
@@ -48,7 +50,20 @@ export class MusicControlService {
         throw new AppError(
           500,
           "Failed to grant control",
-          "GRANT_CONTROL_ERROR",
+          "GRANT_CONTROL_ERROR"
+        );
+      }
+
+      // Verify that a row was actually updated
+      if (!data || data.length === 0) {
+        logger.error("No follow relationship found to update", {
+          ownerId,
+          allowedUserId,
+        });
+        throw new AppError(
+          400,
+          "Follow relationship not found",
+          "FOLLOW_NOT_FOUND"
         );
       }
 
@@ -68,11 +83,12 @@ export class MusicControlService {
    */
   async revokeControl(ownerId: string, allowedUserId: string): Promise<void> {
     try {
-      const { error } = await supabaseAdmin
+      const { data, error } = await supabaseAdmin
         .from("follows")
         .update({ can_control_music: false })
         .eq("follower_id", allowedUserId)
-        .eq("following_id", ownerId);
+        .eq("following_id", ownerId)
+        .select();
 
       if (error) {
         logger.error("Failed to revoke music control", {
@@ -83,8 +99,16 @@ export class MusicControlService {
         throw new AppError(
           500,
           "Failed to revoke control",
-          "REVOKE_CONTROL_ERROR",
+          "REVOKE_CONTROL_ERROR"
         );
+      }
+
+      // Log if no row was found (might happen if friendship was removed)
+      if (!data || data.length === 0) {
+        logger.warn("No follow relationship found to revoke", {
+          ownerId,
+          allowedUserId,
+        });
       }
 
       // Notify the user that their permission was revoked in real-time
@@ -97,7 +121,7 @@ export class MusicControlService {
       throw new AppError(
         500,
         "Failed to revoke control",
-        "REVOKE_CONTROL_ERROR",
+        "REVOKE_CONTROL_ERROR"
       );
     }
   }
@@ -118,7 +142,7 @@ export class MusicControlService {
         throw new AppError(
           500,
           "Failed to get permissions",
-          "GET_PERMISSIONS_ERROR",
+          "GET_PERMISSIONS_ERROR"
         );
       }
 
@@ -129,7 +153,7 @@ export class MusicControlService {
       throw new AppError(
         500,
         "Failed to get permissions",
-        "GET_PERMISSIONS_ERROR",
+        "GET_PERMISSIONS_ERROR"
       );
     }
   }
@@ -172,7 +196,7 @@ export class MusicControlService {
    */
   async hasGrantedControlToMe(
     targetUserId: string,
-    myUserId: string,
+    myUserId: string
   ): Promise<boolean> {
     return this.canControl(myUserId, targetUserId);
   }

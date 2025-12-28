@@ -93,9 +93,9 @@ export function SoundCloudSearchScreen() {
             flexGrow: 1,
           }}
           ListEmptyComponent={
-            searchQuery ? (
-              <Text style={styles.emptyText}>No tracks found</Text>
-            ) : (
+            searchQuery && !isSearching ? (
+              <Text style={styles.emptyText}>Aucun titre trouvé</Text>
+            ) : !searchQuery ? (
               <View style={styles.emptyState}>
                 <Ionicons
                   name="musical-notes-outline"
@@ -103,10 +103,12 @@ export function SoundCloudSearchScreen() {
                   color={theme.colors.textSecondary}
                   style={styles.emptyIcon}
                 />
-                <Text style={styles.emptyText}>Search for music on SoundCloud</Text>
-                <Text style={styles.emptySubtext}>Find tracks to add to your playlists</Text>
+                <Text style={styles.emptyText}>Rechercher sur SoundCloud</Text>
+                <Text style={styles.emptySubtext}>
+                  Trouvez des titres à ajouter à vos playlists
+                </Text>
               </View>
-            )
+            ) : null
           }
         />
       )}
