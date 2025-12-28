@@ -58,11 +58,11 @@ export class AuthController {
    * Login user with email and password
    */
   async login(req: Request, res: Response, next: NextFunction) {
-    const email = req.body?.email || "unknown";
+    const body = req.body as { email?: string; password?: string };
+    const email = body?.email || "unknown";
     const ip = req.ip || req.socket.remoteAddress || "unknown";
 
     try {
-      const body = req.body as { email?: string; password?: string };
       logger.info("Login request received", {
         email: body?.email,
         hasPassword: !!body?.password,
@@ -115,8 +115,8 @@ export class AuthController {
       if (!lockStatus.isLocked && lockStatus.failedAttempts >= 3) {
         // Check if error has a response property (like AppError)
         if (error && typeof error === "object") {
-          (error as any).remainingAttempts = lockStatus.remainingAttempts;
-          (error as any).lockoutWarning = `Account will be locked after ${lockStatus.remainingAttempts} more failed attempts`;
+          (error as Record<string, unknown>).remainingAttempts = lockStatus.remainingAttempts;
+          (error as Record<string, unknown>).lockoutWarning = `Account will be locked after ${lockStatus.remainingAttempts} more failed attempts`;
         }
       }
 

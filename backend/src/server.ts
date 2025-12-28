@@ -159,21 +159,23 @@ httpServer.listen(PORT, HOST, () => {
 });
 
 // Graceful shutdown
-process.on("SIGTERM", async () => {
+process.on("SIGTERM", () => {
   logger.info("SIGTERM received, shutting down gracefully...");
-  await disconnectRedis();
-  httpServer.close(() => {
-    logger.info("Server closed");
-    process.exit(0);
+  void disconnectRedis().then(() => {
+    httpServer.close(() => {
+      logger.info("Server closed");
+      process.exit(0);
+    });
   });
 });
 
-process.on("SIGINT", async () => {
+process.on("SIGINT", () => {
   logger.info("SIGINT received, shutting down gracefully...");
-  await disconnectRedis();
-  httpServer.close(() => {
-    logger.info("Server closed");
-    process.exit(0);
+  void disconnectRedis().then(() => {
+    httpServer.close(() => {
+      logger.info("Server closed");
+      process.exit(0);
+    });
   });
 });
 

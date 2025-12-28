@@ -10,11 +10,9 @@ interface RateLimitInfo {
 }
 
 // Extend Express Request to include rateLimit info
-declare global {
-  namespace Express {
-    interface Request {
-      rateLimit?: RateLimitInfo;
-    }
+declare module "express-serve-static-core" {
+  interface Request {
+    rateLimit?: RateLimitInfo;
   }
 }
 

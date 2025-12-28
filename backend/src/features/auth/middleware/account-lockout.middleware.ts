@@ -7,12 +7,18 @@ import { logger } from "@/shared/utils/logger.js";
  * Checks if an account is locked before allowing login attempts
  * Should be applied to the login endpoint AFTER rate limiting
  */
+interface LockoutWarning {
+  remainingAttempts: number;
+  failedAttempts: number;
+}
+
 export async function checkAccountLockout(
   req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> {
-  const email = req.body.email;
+  const body = req.body as { email?: string };
+  const email = body.email;
   const ip = req.ip || req.socket.remoteAddress || "unknown";
 
   if (!email) {
@@ -51,7 +57,7 @@ export async function checkAccountLockout(
     // Check if approaching lockout threshold (3+ failed attempts)
     if (lockStatus.failedAttempts >= 3) {
       // Attach warning to request for use in controller
-      (req as any).lockoutWarning = {
+      (req as Request & { lockoutWarning?: LockoutWarning }).lockoutWarning = {
         remainingAttempts: lockStatus.remainingAttempts,
         failedAttempts: lockStatus.failedAttempts,
       };

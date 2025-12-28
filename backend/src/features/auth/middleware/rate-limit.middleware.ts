@@ -1,4 +1,4 @@
-import rateLimit, { type RateLimitRequestHandler } from "express-rate-limit";
+import rateLimit from "express-rate-limit";
 import RedisStore from "rate-limit-redis";
 import { Request, Response } from "express";
 import { redisClient, isRedisConnected } from "@/shared/config/redis.js";
@@ -20,10 +20,11 @@ const baseRateLimitConfig = {
   standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   handler: (req: Request, res: Response) => {
+    const body = req.body as { email?: string };
     logger.warn("Rate limit exceeded", {
       endpoint: req.path,
       ip: req.ip,
-      email: req.body.email,
+      email: body.email,
       userAgent: req.get("user-agent"),
     });
 
@@ -91,16 +92,18 @@ export const loginRateLimiter = rateLimit({
   max: rateLimitConfig.login.max,
   keyGenerator: (req: Request) => {
     // Combine email + IP for granular tracking
-    const email = req.body.email || "unknown";
+    const body = req.body as { email?: string };
+    const email = body.email || "unknown";
     const ip = getClientIp(req);
     return `login:${email}:${ip}`;
   },
   skipSuccessfulRequests: true, // Only count failed login attempts
   store: getStore("auth:login"),
   handler: (req: Request, res: Response) => {
+    const body = req.body as { email?: string };
     logger.warn("Login rate limit exceeded", {
       ip: req.ip,
-      email: req.body.email,
+      email: body.email,
       userAgent: req.get("user-agent"),
       remainingAttempts: 0,
     });
@@ -134,9 +137,10 @@ export const registerRateLimiter = rateLimit({
   },
   store: getStore("auth:register"),
   handler: (req: Request, res: Response) => {
+    const body = req.body as { email?: string };
     logger.warn("Registration rate limit exceeded", {
       ip: req.ip,
-      email: req.body.email,
+      email: body.email,
       userAgent: req.get("user-agent"),
     });
 
