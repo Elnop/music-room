@@ -450,10 +450,8 @@ const createStyles = (theme: Theme) =>
       fontSize: 14,
     },
     playlistsSection: {
-      paddingTop: theme.spacing.xl,
-      borderTopWidth: 1,
-      borderTopColor: theme.colors.border,
-      marginTop: theme.spacing.xl,
+      paddingTop: theme.spacing.lg,
+      marginTop: theme.spacing.md,
     },
     sectionTitle: {
       fontSize: 18,
@@ -471,10 +469,8 @@ const createStyles = (theme: Theme) =>
     },
     infoSection: {
       paddingHorizontal: theme.spacing.lg,
-      paddingTop: theme.spacing.xl,
-      borderTopWidth: 1,
-      borderTopColor: theme.colors.border,
-      marginTop: theme.spacing.lg,
+      paddingTop: theme.spacing.lg,
+      marginTop: theme.spacing.md,
     },
     infoText: {
       fontSize: 13,

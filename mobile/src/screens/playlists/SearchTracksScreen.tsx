@@ -8,6 +8,7 @@ import {
   TextInput,
   Alert,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
@@ -170,7 +171,7 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
           ]}
         >
           {isAdding ? (
-            <LoadingSpinner size="small" />
+            <ActivityIndicator size="small" color="#FFFFFF" />
           ) : (
             <Ionicons name={isAdded ? 'checkmark' : 'add'} size={20} color="#FFFFFF" />
           )}
@@ -181,17 +182,36 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search on SoundCloud..."
-          placeholderTextColor={theme.colors.textSecondary}
-          value={query}
-          onChangeText={handleSearchChange}
-          autoCapitalize="none"
-          autoCorrect={false}
-          autoFocus
-        />
+      <View style={styles.searchContainer}>
+        <View style={styles.searchInputWrapper}>
+          <Ionicons
+            name="search"
+            size={20}
+            color={theme.colors.textSecondary}
+            style={styles.searchIcon}
+          />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Rechercher sur SoundCloud..."
+            placeholderTextColor={theme.colors.textSecondary}
+            value={query}
+            onChangeText={handleSearchChange}
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoFocus
+          />
+          {query.length > 0 && (
+            <TouchableOpacity
+              onPress={() => {
+                setQuery('');
+                clearSearch();
+              }}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Ionicons name="close-circle" size={20} color={theme.colors.textSecondary} />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       {isSearching && searchResults.length === 0 ? (
@@ -202,13 +222,14 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
           keyExtractor={item => item.id.toString()}
           renderItem={renderTrackItem}
           contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <EmptyState
               icon="musical-notes-outline"
               message={
                 query.trim()
-                  ? 'No track found'
-                  : 'Search for tracks on SoundCloud to add them to your playlist'
+                  ? 'Aucun titre trouvé'
+                  : 'Recherchez des titres sur SoundCloud pour les ajouter à votre playlist'
               }
             />
           }
@@ -224,66 +245,74 @@ const createStyles = (theme: Theme) =>
       flex: 1,
       backgroundColor: theme.colors.background,
     },
-    header: {
-      padding: theme.spacing.md,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
+    searchContainer: {
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
+    },
+    searchInputWrapper: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.colors.surfaceAlt,
+      borderRadius: 12,
+      paddingHorizontal: theme.spacing.md,
+      height: 48,
+    },
+    searchIcon: {
+      marginRight: theme.spacing.sm,
     },
     searchInput: {
-      backgroundColor: theme.colors.surface,
-      borderRadius: theme.borders.medium,
-      padding: theme.spacing.md,
+      flex: 1,
       fontSize: 16,
       color: theme.colors.text,
-      borderWidth: 2,
-      borderColor: theme.colors.border,
+      paddingVertical: 0,
     },
     list: {
       flexGrow: 1,
+      paddingTop: theme.spacing.sm,
     },
     trackItem: {
       flexDirection: 'row',
       alignItems: 'center',
-      padding: theme.spacing.md,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
+      marginBottom: theme.spacing.xs,
     },
     artwork: {
-      width: 56,
-      height: 56,
-      borderRadius: theme.borders.small,
-      backgroundColor: theme.colors.surface,
+      width: 52,
+      height: 52,
+      borderRadius: 8,
+      backgroundColor: theme.colors.surfaceAlt,
       marginRight: theme.spacing.md,
     },
     trackInfo: {
       flex: 1,
     },
     trackTitle: {
-      fontSize: theme.typography.sizes.md,
+      fontSize: 15,
       fontWeight: theme.typography.weights.semibold,
       color: theme.colors.text,
-      marginBottom: 2,
+      marginBottom: 3,
     },
     trackArtist: {
-      fontSize: theme.typography.sizes.sm,
+      fontSize: 13,
       color: theme.colors.textSecondary,
       marginBottom: 2,
     },
     trackDuration: {
-      fontSize: theme.typography.sizes.xs,
+      fontSize: 12,
       color: theme.colors.textSecondary,
     },
     addButton: {
       backgroundColor: theme.colors.primary,
-      width: 44,
-      height: 44,
-      borderRadius: 22,
+      width: 36,
+      height: 36,
+      borderRadius: 18,
       justifyContent: 'center',
       alignItems: 'center',
-      marginLeft: theme.spacing.md,
+      marginLeft: theme.spacing.sm,
     },
     addButtonDisabled: {
-      opacity: 0.6,
+      opacity: 0.7,
     },
     addedButton: {
       backgroundColor: theme.colors.success,

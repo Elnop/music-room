@@ -315,9 +315,7 @@ export function FriendsScreen() {
                     style={styles.emptyIcon}
                   />
                   <Text style={styles.emptyTitle}>Search for a profile</Text>
-                  <Text style={styles.emptySubtext}>
-                    Start typing to find users!
-                  </Text>
+                  <Text style={styles.emptySubtext}>Start typing to find users!</Text>
                 </View>
               )
             }

@@ -129,6 +129,7 @@ const createStyles = (theme: Theme) =>
     header: {
       paddingHorizontal: theme.spacing.lg,
       paddingTop: theme.spacing.xs,
+      paddingBottom: theme.spacing.md,
     },
     searchInput: {
       backgroundColor: theme.colors.surfaceAlt,

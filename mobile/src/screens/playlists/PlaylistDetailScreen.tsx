@@ -196,8 +196,15 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
         theme.colors.background,
       ] as const);
 
-  if (isLoading || !currentPlaylist) {
-    return <LoadingSpinner fullScreen message="Loading playlist..." />;
+  // Only show loading spinner if we have no data at all
+  // Otherwise, show cached data immediately while refreshing in background
+  if (isLoading && !currentPlaylist) {
+    return <LoadingSpinner fullScreen message="Chargement..." />;
+  }
+
+  // If no playlist data available (error case or invalid id)
+  if (!currentPlaylist) {
+    return <LoadingSpinner fullScreen message="Chargement..." />;
   }
 
   return (

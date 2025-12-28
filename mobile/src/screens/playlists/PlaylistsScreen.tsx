@@ -77,11 +77,14 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
     });
   }, [navigation, handleCreatePress, theme.colors.text]);
 
-  // Charger les playlists des amis
+  // Charger les playlists des amis (stale-while-revalidate)
   const loadFriendsPlaylists = useCallback(async () => {
     if (!accessToken) return;
 
-    setIsFriendsLoading(true);
+    // Only show loading if we have no cached data
+    if (friendsPlaylists.length === 0) {
+      setIsFriendsLoading(true);
+    }
     try {
       const friends = await friendsApi.getFriends(accessToken);
 
@@ -104,20 +107,23 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
     } finally {
       setIsFriendsLoading(false);
     }
-  }, [accessToken]);
+  }, [accessToken, friendsPlaylists.length]);
 
-  // Charger les playlists publiques
+  // Charger les playlists publiques (stale-while-revalidate)
   const loadPublicPlaylists = useCallback(async () => {
-    setIsPublicLoading(true);
+    // Only show loading if we have no cached data
+    if (publicPlaylists.length === 0) {
+      setIsPublicLoading(true);
+    }
     try {
-      const playlists = await playlistApi.fetchPublicPlaylists();
-      setPublicPlaylists(playlists);
+      const fetchedPlaylists = await playlistApi.fetchPublicPlaylists();
+      setPublicPlaylists(fetchedPlaylists);
     } catch (error) {
       console.error('[PlaylistsScreen] Failed to load public playlists:', error);
     } finally {
       setIsPublicLoading(false);
     }
-  }, []);
+  }, [publicPlaylists.length]);
 
   // Refresh silencieux au focus
   useFocusEffect(
@@ -144,7 +150,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
   };
 
   if (isLoading && playlists.length === 0) {
-    return <LoadingSpinner fullScreen message="Loading playlists..." />;
+    return <LoadingSpinner fullScreen message="Chargement..." />;
   }
 
   const renderHeader = () => (

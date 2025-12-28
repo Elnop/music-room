@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import { View, StyleSheet, Text, Animated, Easing, Image } from 'react-native';
+import { View, StyleSheet, Text, Animated, Easing, Image, ActivityIndicator } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 
@@ -10,12 +10,15 @@ interface LoadingSpinnerProps {
   size?: 'small' | 'large';
   message?: string;
   fullScreen?: boolean;
+  /** Use 'spinner' for a simple ActivityIndicator, 'logo' (default) for animated app logo */
+  variant?: 'logo' | 'spinner';
 }
 
 export function LoadingSpinner({
   size = 'large',
   message,
   fullScreen = false,
+  variant = 'logo',
 }: LoadingSpinnerProps) {
   const { theme } = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
@@ -72,6 +75,20 @@ export function LoadingSpinner({
     outputRange: ['0deg', '360deg'],
   });
 
+  // Simple spinner variant
+  if (variant === 'spinner') {
+    return (
+      <View style={[styles.container, fullScreen && styles.fullScreen]}>
+        <ActivityIndicator
+          size={size === 'small' ? 'small' : 'large'}
+          color={theme.colors.primary}
+        />
+        {message && <Text style={styles.message}>{message}</Text>}
+      </View>
+    );
+  }
+
+  // Logo variant (default)
   return (
     <View style={[styles.container, fullScreen && styles.fullScreen]}>
       <Animated.View
