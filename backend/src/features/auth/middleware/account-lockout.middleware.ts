@@ -58,7 +58,7 @@ export async function checkAccountLockout(
     if (lockStatus.failedAttempts >= 3) {
       // Attach warning to request for use in controller
       (req as Request & { lockoutWarning?: LockoutWarning }).lockoutWarning = {
-        remainingAttempts: lockStatus.remainingAttempts,
+        remainingAttempts: lockStatus.remainingAttempts ?? 0,
         failedAttempts: lockStatus.failedAttempts,
       };
 

@@ -47,7 +47,7 @@ export function FriendsNavigator() {
       <FriendsStack.Screen
         name="UserProfile"
         component={UserProfileScreen}
-        options={{ headerShown: false }}
+        options={{ title: '' }}
       />
       <FriendsStack.Screen
         name="PlaylistDetail"

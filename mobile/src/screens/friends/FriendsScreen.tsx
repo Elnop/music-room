@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Switch, Alert } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -30,7 +30,8 @@ export function FriendsScreen() {
 
   const [activeTab, setActiveTab] = useState<Tab>('friends');
   const [friends, setFriends] = useState<FriendProfile[]>([]);
-  const [isFriendsLoading, setIsFriendsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const hasMountedRef = useRef(false);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
@@ -41,22 +42,29 @@ export function FriendsScreen() {
   const [controlPermissions, setControlPermissions] = useState<Set<string>>(new Set());
   const [togglingUserId, setTogglingUserId] = useState<string | null>(null);
 
-  const loadFriends = useCallback(async () => {
-    if (!accessToken) return;
+  const loadFriends = useCallback(
+    async (silent = false) => {
+      if (!accessToken) return;
 
-    setIsFriendsLoading(true);
-    try {
-      const data = await friendsApi.getFriends(accessToken);
-      setFriends(data);
-      if (data.length === 0 && activeTab === 'friends') {
-        setActiveTab('search');
+      // Only show spinner on first load (no cached data)
+      if (!silent) {
+        setIsLoading(true);
       }
-    } catch (err) {
-      console.error('[FriendsScreen] Failed to load friends:', err);
-    } finally {
-      setIsFriendsLoading(false);
-    }
-  }, [accessToken, activeTab]);
+
+      try {
+        const data = await friendsApi.getFriends(accessToken);
+        setFriends(data);
+        if (data.length === 0 && activeTab === 'friends') {
+          setActiveTab('search');
+        }
+      } catch (err) {
+        console.error('[FriendsScreen] Failed to load friends:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [accessToken, activeTab]
+  );
 
   const loadPermissions = useCallback(async () => {
     try {
@@ -89,11 +97,17 @@ export function FriendsScreen() {
     }
   }, []);
 
+  // Background refresh on focus - show spinner only on first load
   useFocusEffect(
     useCallback(() => {
-      loadFriends();
+      const isFirstMount = !hasMountedRef.current;
+      hasMountedRef.current = true;
+
+      // Silent refresh if we already have data, otherwise show spinner
+      const silent = friends.length > 0 && !isFirstMount;
+      loadFriends(silent);
       loadPermissions();
-    }, [loadFriends, loadPermissions])
+    }, [loadFriends, loadPermissions, friends.length])
   );
 
   const performSearch = useCallback(
@@ -249,8 +263,7 @@ export function FriendsScreen() {
       )}
 
       {activeTab === 'friends' &&
-        hasFriends &&
-        (isFriendsLoading ? (
+        (isLoading && friends.length === 0 ? (
           <LoadingSpinner size="large" />
         ) : (
           <FlatList

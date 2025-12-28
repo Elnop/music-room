@@ -45,6 +45,29 @@ export class PlaylistController {
   }
 
   /**
+   * GET /api/playlists/public
+   * Get all public playlists (excluding current user's)
+   */
+  async getPublicPlaylists(req: Request, res: Response, next: NextFunction) {
+    try {
+      const authReq = req as AuthenticatedRequest;
+      const playlists = await playlistService.getPublicPlaylists(
+        authReq.user.id
+      );
+
+      const response: ApiResponse = {
+        success: true,
+        data: { playlists },
+        meta: { timestamp: new Date().toISOString() },
+      };
+
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
    * GET /api/playlists/user/:userId
    * Get playlists of a specific user (public + private where current user is invited)
    */
@@ -54,7 +77,7 @@ export class PlaylistController {
       const { userId } = req.params;
       const playlists = await playlistService.getPlaylistsByUser(
         userId,
-        authReq.user.id,
+        authReq.user.id
       );
 
       const response: ApiResponse = {
@@ -79,7 +102,7 @@ export class PlaylistController {
       const validated = createPlaylistSchema.parse(req.body);
       const playlist = await playlistService.createPlaylist(
         authReq.user.id,
-        validated,
+        validated
       );
 
       const response: ApiResponse = {
@@ -104,7 +127,7 @@ export class PlaylistController {
       const { id } = req.params;
       const playlist = await playlistService.getPlaylistById(
         id,
-        authReq.user.id,
+        authReq.user.id
       );
 
       const response: ApiResponse = {
@@ -131,7 +154,7 @@ export class PlaylistController {
       const playlist = await playlistService.updatePlaylist(
         id,
         authReq.user.id,
-        validated,
+        validated
       );
 
       const response: ApiResponse = {
@@ -279,7 +302,7 @@ export class PlaylistController {
       await collaboratorService.addCollaborator(
         id,
         authReq.user.id,
-        validated.userId,
+        validated.userId
       );
 
       const response: ApiResponse = {

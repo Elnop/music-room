@@ -14,7 +14,7 @@ router.use(authMiddleware);
  * @access  Private
  */
 router.get("/", (req, res, next) =>
-  playlistController.getUserPlaylists(req, res, next),
+  playlistController.getUserPlaylists(req, res, next)
 );
 
 /**
@@ -23,7 +23,16 @@ router.get("/", (req, res, next) =>
  * @access  Private
  */
 router.post("/", (req, res, next) =>
-  playlistController.createPlaylist(req, res, next),
+  playlistController.createPlaylist(req, res, next)
+);
+
+/**
+ * @route   GET /api/playlists/public
+ * @desc    Get all public playlists (excluding current user's)
+ * @access  Private
+ */
+router.get("/public", (req, res, next) =>
+  playlistController.getPublicPlaylists(req, res, next)
 );
 
 /**
@@ -32,7 +41,7 @@ router.post("/", (req, res, next) =>
  * @access  Private
  */
 router.get("/user/:userId", (req, res, next) =>
-  playlistController.getPlaylistsByUser(req, res, next),
+  playlistController.getPlaylistsByUser(req, res, next)
 );
 
 /**
@@ -41,7 +50,7 @@ router.get("/user/:userId", (req, res, next) =>
  * @access  Private
  */
 router.get("/:id", (req, res, next) =>
-  playlistController.getPlaylistById(req, res, next),
+  playlistController.getPlaylistById(req, res, next)
 );
 
 /**
@@ -50,7 +59,7 @@ router.get("/:id", (req, res, next) =>
  * @access  Private (owner only)
  */
 router.patch("/:id", (req, res, next) =>
-  playlistController.updatePlaylist(req, res, next),
+  playlistController.updatePlaylist(req, res, next)
 );
 
 /**
@@ -59,7 +68,7 @@ router.patch("/:id", (req, res, next) =>
  * @access  Private (owner only)
  */
 router.delete("/:id", (req, res, next) =>
-  playlistController.deletePlaylist(req, res, next),
+  playlistController.deletePlaylist(req, res, next)
 );
 
 /**
@@ -68,7 +77,7 @@ router.delete("/:id", (req, res, next) =>
  * @access  Private (owner + collaborators)
  */
 router.post("/:id/tracks", (req, res, next) =>
-  playlistController.addTrack(req, res, next),
+  playlistController.addTrack(req, res, next)
 );
 
 /**
@@ -77,7 +86,7 @@ router.post("/:id/tracks", (req, res, next) =>
  * @access  Private (owner + collaborators)
  */
 router.delete("/:id/tracks/:trackId", (req, res, next) =>
-  playlistController.removeTrack(req, res, next),
+  playlistController.removeTrack(req, res, next)
 );
 
 /**
@@ -86,7 +95,7 @@ router.delete("/:id/tracks/:trackId", (req, res, next) =>
  * @access  Private (owner + collaborators)
  */
 router.put("/:id/tracks/reorder", (req, res, next) =>
-  playlistController.reorderTracks(req, res, next),
+  playlistController.reorderTracks(req, res, next)
 );
 
 /**
@@ -95,7 +104,7 @@ router.put("/:id/tracks/reorder", (req, res, next) =>
  * @access  Private (owner only)
  */
 router.post("/:id/collaborators", (req, res, next) =>
-  playlistController.addCollaborator(req, res, next),
+  playlistController.addCollaborator(req, res, next)
 );
 
 /**
@@ -104,7 +113,7 @@ router.post("/:id/collaborators", (req, res, next) =>
  * @access  Private (owner only)
  */
 router.delete("/:id/collaborators/:userId", (req, res, next) =>
-  playlistController.removeCollaborator(req, res, next),
+  playlistController.removeCollaborator(req, res, next)
 );
 
 /**
@@ -113,7 +122,7 @@ router.delete("/:id/collaborators/:userId", (req, res, next) =>
  * @access  Private (owner only)
  */
 router.get("/:id/viewers", (req, res, next) =>
-  playlistController.getViewers(req, res, next),
+  playlistController.getViewers(req, res, next)
 );
 
 /**
@@ -122,7 +131,7 @@ router.get("/:id/viewers", (req, res, next) =>
  * @access  Private (owner only)
  */
 router.post("/:id/viewers", (req, res, next) =>
-  playlistController.addViewer(req, res, next),
+  playlistController.addViewer(req, res, next)
 );
 
 /**
@@ -131,7 +140,7 @@ router.post("/:id/viewers", (req, res, next) =>
  * @access  Private (owner only)
  */
 router.delete("/:id/viewers/:userId", (req, res, next) =>
-  playlistController.removeViewer(req, res, next),
+  playlistController.removeViewer(req, res, next)
 );
 
 export default router;

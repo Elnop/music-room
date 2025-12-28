@@ -49,7 +49,7 @@ export function PlaylistsNavigator() {
       <PlaylistStack.Screen
         name="Playlists"
         component={PlaylistsScreen}
-        options={{ title: 'Mes Playlists' }}
+        options={{ title: 'Playlists' }}
       />
       <PlaylistStack.Screen
         name="PlaylistDetail"

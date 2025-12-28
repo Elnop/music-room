@@ -33,7 +33,7 @@ export class PlaylistService {
         .from("playlists")
         .select("*")
         .or(
-          `owner_id.eq.${userId},collaborator_ids.cs.{${userId}},viewer_ids.cs.{${userId}}`,
+          `owner_id.eq.${userId},collaborator_ids.cs.{${userId}},viewer_ids.cs.{${userId}}`
         )
         .order("created_at", { ascending: false });
 
@@ -57,26 +57,30 @@ export class PlaylistService {
           acc[row.playlist_id] = (acc[row.playlist_id] || 0) + 1;
           return acc;
         },
-        {} as Record<string, number>,
+        {} as Record<string, number>
       );
 
-      const { data: firstTracks, error: firstTracksError } = await supabaseAdmin
+      // Get first track cover for each playlist (by lowest position, not necessarily 0)
+      const { data: allTracks, error: tracksError } = await supabaseAdmin
         .from("playlist_tracks")
-        .select("playlist_id, tracks:track_id(album_art)")
+        .select("playlist_id, position, tracks:track_id(album_art)")
         .in("playlist_id", playlistIds)
-        .eq("position", 0);
+        .order("position", { ascending: true });
 
-      if (firstTracksError) throw firstTracksError;
+      if (tracksError) throw tracksError;
 
-      const firstTrackCoverMap = (firstTracks || []).reduce(
+      // Build map: keep only the first track (lowest position) for each playlist
+      const firstTrackCoverMap = (allTracks || []).reduce(
         (acc, row) => {
+          // Only keep the first occurrence (lowest position) for each playlist
+          if (acc[row.playlist_id] !== undefined) return acc;
           const track = row.tracks as { album_art?: string } | null;
           if (track?.album_art) {
             acc[row.playlist_id] = track.album_art;
           }
           return acc;
         },
-        {} as Record<string, string>,
+        {} as Record<string, string>
       );
 
       // Get owner info for all playlists
@@ -106,7 +110,7 @@ export class PlaylistService {
             displayName?: string;
             avatarUrl?: string;
           }
-        >,
+        >
       );
 
       return playlists.map((p) =>
@@ -114,15 +118,15 @@ export class PlaylistService {
           p,
           countMap[p.id] || 0,
           ownerMap[p.owner_id],
-          firstTrackCoverMap[p.id],
-        ),
+          firstTrackCoverMap[p.id]
+        )
       );
     } catch (error) {
       logger.error("Failed to get user playlists", { error, userId });
       throw new AppError(
         500,
         "Failed to fetch playlists",
-        "PLAYLIST_FETCH_ERROR",
+        "PLAYLIST_FETCH_ERROR"
       );
     }
   }
@@ -133,7 +137,7 @@ export class PlaylistService {
    */
   async getPlaylistsByUser(
     targetUserId: string,
-    currentUserId?: string,
+    currentUserId?: string
   ): Promise<PlaylistResponse[]> {
     try {
       let query = supabaseAdmin
@@ -143,7 +147,7 @@ export class PlaylistService {
 
       if (currentUserId) {
         query = query.or(
-          `visibility.eq.public,and(visibility.eq.private,or(viewer_ids.cs.{${currentUserId}},collaborator_ids.cs.{${currentUserId}}))`,
+          `visibility.eq.public,and(visibility.eq.private,or(viewer_ids.cs.{${currentUserId}},collaborator_ids.cs.{${currentUserId}}))`
         );
       } else {
         query = query.eq("visibility", "public");
@@ -172,26 +176,30 @@ export class PlaylistService {
           acc[row.playlist_id] = (acc[row.playlist_id] || 0) + 1;
           return acc;
         },
-        {} as Record<string, number>,
+        {} as Record<string, number>
       );
 
-      const { data: firstTracks, error: firstTracksError } = await supabaseAdmin
+      // Get first track cover for each playlist (by lowest position, not necessarily 0)
+      const { data: allTracks, error: tracksError } = await supabaseAdmin
         .from("playlist_tracks")
-        .select("playlist_id, tracks:track_id(album_art)")
+        .select("playlist_id, position, tracks:track_id(album_art)")
         .in("playlist_id", playlistIds)
-        .eq("position", 0);
+        .order("position", { ascending: true });
 
-      if (firstTracksError) throw firstTracksError;
+      if (tracksError) throw tracksError;
 
-      const firstTrackCoverMap = (firstTracks || []).reduce(
+      // Build map: keep only the first track (lowest position) for each playlist
+      const firstTrackCoverMap = (allTracks || []).reduce(
         (acc, row) => {
+          // Only keep the first occurrence (lowest position) for each playlist
+          if (acc[row.playlist_id] !== undefined) return acc;
           const track = row.tracks as { album_art?: string } | null;
           if (track?.album_art) {
             acc[row.playlist_id] = track.album_art;
           }
           return acc;
         },
-        {} as Record<string, string>,
+        {} as Record<string, string>
       );
 
       const { data: owner, error: ownerError } = await supabaseAdmin
@@ -216,15 +224,121 @@ export class PlaylistService {
           p,
           countMap[p.id] || 0,
           ownerInfo,
-          firstTrackCoverMap[p.id],
-        ),
+          firstTrackCoverMap[p.id]
+        )
       );
     } catch (error) {
       logger.error("Failed to get user playlists", { error, targetUserId });
       throw new AppError(
         500,
         "Failed to fetch playlists",
-        "PLAYLIST_FETCH_ERROR",
+        "PLAYLIST_FETCH_ERROR"
+      );
+    }
+  }
+
+  /**
+   * Get all public playlists (excluding current user's)
+   */
+  async getPublicPlaylists(currentUserId: string): Promise<PlaylistResponse[]> {
+    try {
+      const { data: playlists, error } = await supabaseAdmin
+        .from("playlists")
+        .select("*")
+        .eq("visibility", "public")
+        .neq("owner_id", currentUserId)
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+
+      if (!playlists || playlists.length === 0) {
+        return [];
+      }
+
+      const playlistIds = playlists.map((p) => p.id);
+
+      // Get track counts
+      const { data: trackCounts, error: countError } = await supabaseAdmin
+        .from("playlist_tracks")
+        .select("playlist_id")
+        .in("playlist_id", playlistIds);
+
+      if (countError) throw countError;
+
+      const countMap = (trackCounts || []).reduce(
+        (acc, row) => {
+          acc[row.playlist_id] = (acc[row.playlist_id] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>
+      );
+
+      // Get first track cover for each playlist
+      const { data: allTracks, error: tracksError } = await supabaseAdmin
+        .from("playlist_tracks")
+        .select("playlist_id, position, tracks:track_id(album_art)")
+        .in("playlist_id", playlistIds)
+        .order("position", { ascending: true });
+
+      if (tracksError) throw tracksError;
+
+      const firstTrackCoverMap = (allTracks || []).reduce(
+        (acc, row) => {
+          if (acc[row.playlist_id] !== undefined) return acc;
+          const track = row.tracks as { album_art?: string } | null;
+          if (track?.album_art) {
+            acc[row.playlist_id] = track.album_art;
+          }
+          return acc;
+        },
+        {} as Record<string, string>
+      );
+
+      // Get owner info for all playlists
+      const ownerIds = [...new Set(playlists.map((p) => p.owner_id))];
+      const { data: owners, error: ownersError } = await supabaseAdmin
+        .from("user_profiles")
+        .select("id, username, display_name, avatar_url")
+        .in("id", ownerIds);
+
+      if (ownersError) throw ownersError;
+
+      const ownerMap = (owners || []).reduce(
+        (acc, owner) => {
+          acc[owner.id] = {
+            id: owner.id,
+            username: owner.username,
+            displayName: owner.display_name ?? undefined,
+            avatarUrl: owner.avatar_url ?? undefined,
+          };
+          return acc;
+        },
+        {} as Record<
+          string,
+          {
+            id: string;
+            username: string;
+            displayName?: string;
+            avatarUrl?: string;
+          }
+        >
+      );
+
+      return playlists.map((p) =>
+        formatPlaylistResponse(
+          p,
+          countMap[p.id] || 0,
+          ownerMap[p.owner_id],
+          firstTrackCoverMap[p.id]
+        )
+      );
+    } catch (error) {
+      logger.error("Failed to get public playlists", { error, currentUserId });
+      throw new AppError(
+        500,
+        "Failed to fetch public playlists",
+        "PLAYLIST_FETCH_ERROR"
       );
     }
   }
@@ -234,7 +348,7 @@ export class PlaylistService {
    */
   async getPlaylistById(
     playlistId: string,
-    userId?: string,
+    userId?: string
   ): Promise<PlaylistWithTracksResponse> {
     try {
       // Get playlist
@@ -262,7 +376,7 @@ export class PlaylistService {
           added_by,
           added_at,
           tracks:track_id (*)
-        `,
+        `
         )
         .eq("playlist_id", playlistId)
         .order("position", { ascending: true });
@@ -304,7 +418,7 @@ export class PlaylistService {
       throw new AppError(
         500,
         "Failed to fetch playlist",
-        "PLAYLIST_FETCH_ERROR",
+        "PLAYLIST_FETCH_ERROR"
       );
     }
   }
@@ -315,7 +429,7 @@ export class PlaylistService {
    */
   async createPlaylist(
     userId: string,
-    data: CreatePlaylistDTO,
+    data: CreatePlaylistDTO
   ): Promise<PlaylistResponse> {
     try {
       const { data: playlist, error } = await supabaseAdmin
@@ -344,7 +458,7 @@ export class PlaylistService {
       throw new AppError(
         500,
         "Failed to create playlist",
-        "PLAYLIST_CREATE_ERROR",
+        "PLAYLIST_CREATE_ERROR"
       );
     }
   }
@@ -355,7 +469,7 @@ export class PlaylistService {
   async updatePlaylist(
     playlistId: string,
     userId: string,
-    data: UpdatePlaylistDTO,
+    data: UpdatePlaylistDTO
   ): Promise<PlaylistResponse> {
     try {
       // Only owner can update playlist metadata
@@ -392,7 +506,7 @@ export class PlaylistService {
       throw new AppError(
         500,
         "Failed to update playlist",
-        "PLAYLIST_UPDATE_ERROR",
+        "PLAYLIST_UPDATE_ERROR"
       );
     }
   }
@@ -419,7 +533,7 @@ export class PlaylistService {
       throw new AppError(
         500,
         "Failed to delete playlist",
-        "PLAYLIST_DELETE_ERROR",
+        "PLAYLIST_DELETE_ERROR"
       );
     }
   }
