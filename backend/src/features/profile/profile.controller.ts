@@ -1,15 +1,15 @@
 import type { Request, Response, NextFunction } from "express";
-import { ProfileService } from "@/features/profile/services/profile.service";
-import { PrivacyService } from "@/features/profile/services/privacy.service";
-import { MusicPreferencesService } from "@/features/profile/services/music-preferences.service";
+import { ProfileService } from "@/features/profile/services/profile.service.js";
+import { PrivacyService } from "@/features/profile/services/privacy.service.js";
+import { MusicPreferencesService } from "@/features/profile/services/music-preferences.service.js";
 import {
   updateProfileSchema,
   searchUsersSchema,
   updatePrivacySchema,
   updateMusicPreferencesSchema,
-} from "@/features/profile/profile.validators";
-import type { AuthenticatedRequest } from "@/shared/types/global.types";
-import type { ApiResponse } from "@/shared/types/global.types";
+} from "@/features/profile/profile.validators.js";
+import type { AuthenticatedRequest } from "@/shared/types/global.types.js";
+import type { ApiResponse } from "@/shared/types/global.types.js";
 
 const profileService = new ProfileService();
 const privacyService = new PrivacyService();
