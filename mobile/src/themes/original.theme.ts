@@ -11,32 +11,32 @@ export const originalTheme: Theme = {
   displayName: 'Original',
 
   colors: {
-    // Primary - Rose/Magenta vibrant
-    primary: '#EA3E7A', // Rose magenta (boutons primaires)
-    primaryLight: '#F472B6', // Rose clair (survol/actif)
-    primaryDark: '#BE185D', // Rose foncé
+    // Primary - Vibrant Rose/Magenta
+    primary: '#EA3E7A', // Rose magenta (primary buttons)
+    primaryLight: '#F472B6', // Light rose (hover/active)
+    primaryDark: '#BE185D', // Dark rose
 
-    // Secondary - Blanc
-    secondary: '#FFFFFF', // Blanc (accents secondaires)
-    secondaryLight: '#F5F5F5', // Blanc cassé
+    // Secondary - White
+    secondary: '#FFFFFF', // White (secondary accents)
+    secondaryLight: '#F5F5F5', // Off-white
 
-    // Accent - Blanc
-    accent: '#FFFFFF', // Blanc (highlights)
-    accentAlt: '#E5E5E5', // Gris très clair
+    // Accent - White
+    accent: '#FFFFFF', // White (highlights)
+    accentAlt: '#E5E5E5', // Very light gray
 
-    // Backgrounds - Sombre pour contraste
-    background: '#0D0D0D', // Noir profond (fond principal)
-    surface: '#1A1A1A', // Noir surface (cartes, inputs)
-    surfaceAlt: '#262626', // Gris sombre (surfaces désactivées)
+    // Backgrounds - Dark for contrast
+    background: '#0D0D0D', // Deep black (main background)
+    surface: '#1A1A1A', // Black surface (cards, inputs)
+    surfaceAlt: '#262626', // Dark gray (disabled surfaces)
 
     // Text colors
-    text: '#FFFFFF', // Blanc (texte principal)
-    textSecondary: '#A3A3A3', // Gris clair (texte secondaire)
-    textInverse: '#000000', // Noir (texte sur primary)
+    text: '#FFFFFF', // White (main text)
+    textSecondary: '#A3A3A3', // Light gray (secondary text)
+    textInverse: '#000000', // Black (text on primary)
 
-    // Border - Blanc
-    border: '#FFFFFF', // Blanc pour les bordures
-    borderLight: '#404040', // Gris foncé (bordures subtiles)
+    // Border - White
+    border: '#FFFFFF', // White for borders
+    borderLight: '#404040', // Dark gray (subtle borders)
 
     // State colors
     error: '#EF4444', // Red

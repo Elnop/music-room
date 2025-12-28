@@ -160,21 +160,21 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 
   const handleDeleteTrack = async (trackId: string) => {
     if (!canEdit) {
-      Alert.alert('Permission refusée', 'Vous ne pouvez pas modifier cette playlist');
+      Alert.alert('Permission denied', 'You cannot edit this playlist');
       return;
     }
 
-    Alert.alert('Supprimer le titre', 'Voulez-vous vraiment supprimer ce titre de la playlist ?', [
-      { text: 'Annuler', style: 'cancel' },
+    Alert.alert('Delete track', 'Do you really want to delete this track from the playlist?', [
+      { text: 'Cancel', style: 'cancel' },
       {
-        text: 'Supprimer',
+        text: 'Delete',
         style: 'destructive',
         onPress: async () => {
           try {
             await removeTrack(id, trackId);
           } catch (error) {
             console.error('[PlaylistDetailScreen] Remove track failed:', error);
-            Alert.alert('Erreur', 'Impossible de supprimer le titre');
+            Alert.alert('Error', 'Unable to delete track');
           }
         },
       },
@@ -197,7 +197,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
       ] as const);
 
   if (isLoading || !currentPlaylist) {
-    return <LoadingSpinner fullScreen message="Chargement de la playlist..." />;
+    return <LoadingSpinner fullScreen message="Loading playlist..." />;
   }
 
   return (
@@ -237,7 +237,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
         ListEmptyComponent={
           <EmptyState
             icon="musical-notes-outline"
-            message="Aucun titre dans cette playlist. Ajoutez des titres pour commencer !"
+            message="No track in this playlist. Add tracks to get started!"
           />
         }
         showsVerticalScrollIndicator={false}

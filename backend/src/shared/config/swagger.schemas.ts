@@ -1,8 +1,8 @@
 import { OpenAPIV3 } from 'openapi-types';
 
 /**
- * Schemas OpenAPI communs réutilisables
- * Référencés via $ref dans toutes les features
+ * Common reusable OpenAPI schemas
+ * Referenced via $ref in all features
  */
 export const commonSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
   // Responses standards

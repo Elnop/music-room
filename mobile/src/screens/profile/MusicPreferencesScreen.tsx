@@ -36,8 +36,8 @@ export function MusicPreferencesScreen() {
         setSelectedGenres(genres);
       } catch (error) {
         const message =
-          error instanceof ApiError ? error.message : 'Impossible de charger les préférences';
-        Alert.alert('Erreur', message);
+          error instanceof ApiError ? error.message : 'Unable to load preferences';
+        Alert.alert('Error', message);
       } finally {
         setIsLoading(false);
       }
@@ -75,24 +75,24 @@ export function MusicPreferencesScreen() {
       navigation.goBack();
     } catch (error) {
       const message =
-        error instanceof ApiError ? error.message : 'Impossible de sauvegarder les préférences';
-      Alert.alert('Erreur', message);
+        error instanceof ApiError ? error.message : 'Unable to save preferences';
+      Alert.alert('Error', message);
     } finally {
       setIsSaving(false);
     }
   };
 
   if (isLoading) {
-    return <LoadingSpinner fullScreen message="Chargement..." />;
+    return <LoadingSpinner fullScreen message="Loading..." />;
   }
 
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
         <View style={styles.header}>
-          <Text style={styles.title}>Préférences musicales</Text>
+          <Text style={styles.title}>Music preferences</Text>
           <Text style={styles.subtitle}>
-            Dites-nous quels genres vous aimez ! Sélectionnez jusqu'à {MAX_GENRES} genres.
+            Tell us what genres you like! Select up to {MAX_GENRES} genres.
           </Text>
         </View>
 
@@ -112,7 +112,7 @@ export function MusicPreferencesScreen() {
           fullWidth={false}
           style={styles.saveButton}
         >
-          Enregistrer
+          Save
         </Button>
       </ScrollView>
     </View>

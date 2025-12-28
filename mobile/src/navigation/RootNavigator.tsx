@@ -89,7 +89,7 @@ export function RootNavigator() {
 
   // Show loading screen while checking auth state
   if (!isReady) {
-    return <LoadingSpinner fullScreen message="Chargement..." />;
+    return <LoadingSpinner fullScreen message="Loading..." />;
   }
 
   return (

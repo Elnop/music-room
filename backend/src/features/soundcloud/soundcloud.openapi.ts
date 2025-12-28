@@ -1,7 +1,7 @@
 import { OpenAPIV3 } from 'openapi-types';
 
 /**
- * OpenAPI paths pour feature SoundCloud
+ * OpenAPI paths for SoundCloud feature
  * Note: SoundCloud endpoints are PUBLIC (no authentication required)
  */
 export const soundcloudPaths: OpenAPIV3.PathsObject = {
@@ -157,7 +157,7 @@ export const soundcloudPaths: OpenAPIV3.PathsObject = {
 };
 
 /**
- * Schemas spécifiques à SoundCloud
+ * Schemas specific to SoundCloud
  */
 export const soundcloudSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
   SoundCloudTrack: {

@@ -170,7 +170,7 @@ export function PlayerModal() {
             end={{ x: 0.5, y: 1 }}
           />
 
-          {/* Header fixe en haut */}
+          {/* Fixed header at top */}
           <View style={styles.header}>
             <View style={styles.swipeIndicator}>
               <View style={[styles.swipeBar, { backgroundColor: colors.textSecondary }]} />
@@ -186,10 +186,10 @@ export function PlayerModal() {
               </View>
             </TouchableOpacity>
 
-            <Text style={[styles.nowPlayingText, { color: colors.textSecondary }]}>EN LECTURE</Text>
+            <Text style={[styles.nowPlayingText, { color: colors.textSecondary }]}>NOW PLAYING</Text>
           </View>
 
-          {/* Contenu principal centré */}
+          {/* Main content centered */}
           <View style={styles.mainContent}>
             <View style={styles.artworkWrapper}>
               <View style={styles.artworkShadow}>
@@ -276,13 +276,13 @@ export function PlayerModal() {
             {isLoading && (
               <View style={styles.loadingContainer}>
                 <Text style={[styles.loadingText, { color: colors.textSecondary }]}>
-                  Chargement du flux audio...
+                  Loading audio stream...
                 </Text>
               </View>
             )}
           </View>
 
-          {/* Espaceur en bas pour le safe area */}
+          {/* Bottom spacer for safe area */}
           <View style={styles.bottomSpacer} />
         </Animated.View>
       </GestureDetector>

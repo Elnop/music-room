@@ -83,7 +83,7 @@ export function FriendsScreen() {
       }
     } catch (err) {
       console.error('[FriendsScreen] Failed to toggle control:', err);
-      Alert.alert('Erreur', 'Impossible de modifier les permissions');
+      Alert.alert('Error', 'Unable to modify permissions');
     } finally {
       setTogglingUserId(null);
     }
@@ -111,7 +111,7 @@ export function FriendsScreen() {
         setSearchResults(results);
       } catch (error) {
         console.error('[FriendsScreen] User search failed:', error);
-        setError('Erreur lors de la recherche');
+        setError('Search error');
         setSearchResults([]);
       } finally {
         setIsSearching(false);
@@ -166,7 +166,7 @@ export function FriendsScreen() {
               style={styles.controlIcon}
             />
             <Text style={[styles.controlText, canControl && styles.controlTextActive]}>
-              {canControl ? 'Peut contrôler ma musique' : 'Contrôle de ma musique'}
+              {canControl ? 'Can control my music' : 'Music control'}
             </Text>
           </View>
         </View>
@@ -218,7 +218,7 @@ export function FriendsScreen() {
               onPress={() => setActiveTab('friends')}
             >
               <Text style={[styles.tabText, activeTab === 'friends' && styles.tabTextActive]}>
-                Mes amis ({friends.length})
+                My friends ({friends.length})
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -226,7 +226,7 @@ export function FriendsScreen() {
               onPress={() => setActiveTab('search')}
             >
               <Text style={[styles.tabText, activeTab === 'search' && styles.tabTextActive]}>
-                Rechercher
+                Search
               </Text>
             </TouchableOpacity>
           </View>
@@ -236,7 +236,7 @@ export function FriendsScreen() {
           <SearchBar
             value={searchQuery}
             onChangeText={handleSearchChange}
-            placeholder="Rechercher un utilisateur..."
+            placeholder="Search for a user..."
             style={styles.searchBar}
           />
         )}
@@ -269,9 +269,9 @@ export function FriendsScreen() {
                   color={theme.colors.textSecondary}
                   style={styles.emptyIcon}
                 />
-                <Text style={styles.emptyTitle}>Pas encore d'amis</Text>
+                <Text style={styles.emptyTitle}>No friends yet</Text>
                 <Text style={styles.emptySubtext}>
-                  Suivez des utilisateurs qui vous suivent en retour pour devenir amis !
+                  Follow users who follow you back to become friends!
                 </Text>
               </View>
             }
@@ -292,7 +292,7 @@ export function FriendsScreen() {
             ]}
             ListEmptyComponent={
               searchQuery ? (
-                <Text style={styles.emptyText}>Aucun utilisateur trouvé</Text>
+                <Text style={styles.emptyText}>No user found</Text>
               ) : (
                 <View style={styles.emptyState}>
                   <Ionicons
@@ -301,9 +301,9 @@ export function FriendsScreen() {
                     color={theme.colors.textSecondary}
                     style={styles.emptyIcon}
                   />
-                  <Text style={styles.emptyTitle}>Chercher un profil</Text>
+                  <Text style={styles.emptyTitle}>Search for a profile</Text>
                   <Text style={styles.emptySubtext}>
-                    Commencez à taper pour trouver des utilisateurs !
+                    Start typing to find users!
                   </Text>
                 </View>
               )
