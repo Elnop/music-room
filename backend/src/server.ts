@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { createServer } from "http";
+import swaggerUi from "swagger-ui-express";
 import { env } from "@/shared/config/env.js";
 import { logger } from "@/shared/utils/logger.js";
 import { errorHandler } from "@/shared/middleware/error-handler.js";
@@ -8,6 +9,7 @@ import { actionLoggerMiddleware } from "@/shared/middleware/action-logger.middle
 import { routes } from "@/shared/config/routes.js";
 import { realtime } from "@/realtime/index.js";
 import { connectRedis, disconnectRedis, checkRedisHealth } from "@/shared/config/redis.js";
+import { swaggerSpec, swaggerUiOptions } from "@/shared/config/swagger.config.js";
 
 // Initialize Express app
 const app = express();
@@ -77,6 +79,17 @@ app.use(express.urlencoded({ extended: true }));
 app.use(actionLoggerMiddleware);
 
 // =====================================================
+// Swagger API Documentation
+// =====================================================
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerUiOptions));
+
+app.get('/api-docs.json', (_req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
+
+// =====================================================
 // Health Check
 // =====================================================
 
@@ -133,6 +146,7 @@ httpServer.listen(PORT, HOST, () => {
   logger.info("Music Room backend is running", {
     server: `http://localhost:${PORT}`,
     health: `http://localhost:${PORT}/health`,
+    docs: `http://localhost:${PORT}/api-docs`,
     environment: env.NODE_ENV,
     host: HOST,
   });

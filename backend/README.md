@@ -60,6 +60,66 @@ make dev
 
 Le serveur démarre sur `http://localhost:3000`
 
+## 📚 API Documentation
+
+Music Room provides interactive OpenAPI 3.0 documentation via Swagger UI.
+
+### Accessing Documentation
+
+- **Swagger UI:** http://localhost:3000/api-docs
+- **OpenAPI Spec (JSON):** http://localhost:3000/api-docs.json
+
+### Features
+
+- **45 documented endpoints** across 6 features (Auth, Playlists, Profile, SoundCloud, Friends, Music Control)
+- **Interactive testing** - Try endpoints directly from the browser
+- **Request/Response examples** for all endpoints
+- **Schema validation** with detailed parameter descriptions
+- **Authentication support** - Built-in JWT Bearer token authorization
+
+### Usage
+
+1. Start backend: `make dev`
+2. Open http://localhost:3000/api-docs
+3. Register or login to get JWT token
+4. Click "Authorize" button in Swagger UI
+5. Paste token: `Bearer <your_token>`
+6. Test endpoints with "Try it out"
+
+### Documentation Architecture
+
+Documentation is organized by feature with separate OpenAPI files:
+
+- `features/auth/auth.openapi.ts` - 9 auth endpoints (register, login, OAuth, providers)
+- `features/playlists/playlist.openapi.ts` - 14 playlist endpoints (CRUD, tracks, collaborators)
+- `features/profile/profile.openapi.ts` - 9 profile endpoints (update, search, privacy, music preferences)
+- `features/soundcloud/soundcloud.openapi.ts` - 4 SoundCloud endpoints (search, track details, stream)
+- `features/friends/friends.openapi.ts` - 5 friends endpoints (follow, unfollow, stats)
+- `features/music-control/music-control.openapi.ts` - 4 music control endpoints (grant/revoke permissions)
+
+All specifications are merged in `shared/config/swagger.config.ts`.
+
+### Export & Validation
+
+```bash
+# Export OpenAPI spec to JSON file
+npm run swagger:export
+
+# Validate OpenAPI spec
+npm run swagger:validate
+
+# Serve documentation with Redoc
+npm run swagger:serve
+```
+
+### Import to Postman
+
+1. Run `npm run swagger:export`
+2. Import generated `openapi.json` in Postman
+3. All endpoints, schemas, and examples will be available
+
+**Satisfies project subject (IV.4):** ✅ API documentation with methods, inputs, outputs
+
 ## 📝 Commandes disponibles
 
 ```bash

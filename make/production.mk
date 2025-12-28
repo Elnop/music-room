@@ -180,6 +180,36 @@ prod-build-apk-local: ## Build production APK locally (requires Android SDK)
 	@echo "   2. Install via USB: adb install path/to/file.apk"
 	@echo ""
 
+prod-install-apk: ## Install production APK on connected device via adb
+	$(call print_header,Installing Production APK)
+	@if [ ! -f "mobile/android/app/build/outputs/apk/release/app-release.apk" ]; then \
+		echo ""; \
+		echo "$(RED)$(ICON_ERROR) APK not found: mobile/android/app/build/outputs/apk/release/app-release.apk$(NC)"; \
+		echo ""; \
+		echo "$(YELLOW)$(ICON_WARNING) Run one of these commands first:$(NC)"; \
+		echo "  $(GREEN)make prod-build-apk-manual$(NC) - Build APK locally"; \
+		echo ""; \
+		exit 1; \
+	fi
+	$(call print_arrow,Checking for connected devices...)
+	@DEVICES=$$(adb devices | grep -v "List" | grep "device$$" | wc -l); \
+	if [ "$$DEVICES" -eq 0 ]; then \
+		echo ""; \
+		echo "$(RED)$(ICON_ERROR) No devices connected$(NC)"; \
+		echo ""; \
+		echo "$(YELLOW)$(ICON_WARNING) Connect your device via USB and enable USB debugging$(NC)"; \
+		echo ""; \
+		exit 1; \
+	fi; \
+	echo "$(GREEN)$(ICON_SUCCESS) Found $$DEVICES device(s)$(NC)"
+	@echo ""
+	$(call print_arrow,Installing APK...)
+	@adb install -r mobile/android/app/build/outputs/apk/release/app-release.apk
+	$(call blank_line)
+	$(call print_header,✓ Installation Complete)
+	@echo "$(GREEN)$(ICON_SUCCESS) App installed successfully$(NC)"
+	@echo ""
+
 #------------------------------------------------------------
 # Backend URL Configuration
 #------------------------------------------------------------
