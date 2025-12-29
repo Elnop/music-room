@@ -544,6 +544,19 @@ backend/src/
 │   │   ├── music-control.service.ts   # Grant/revoke control permissions
 │   │   ├── music-control.controller.ts
 │   │   └── music-control.routes.ts
+│   ├── mail/             # Email service (transactional emails, templates, rate limiting)
+│   │   ├── services/           # Email services
+│   │   │   ├── mail.service.ts              # Main email sending (Gmail SMTP)
+│   │   │   ├── rate-limiter.service.ts      # Generic rate limiting (Redis + in-memory)
+│   │   │   └── template-renderer.service.ts # Template registry
+│   │   ├── templates/          # Email templates
+│   │   │   ├── base.template.ts             # Base HTML layout (dark theme)
+│   │   │   └── verification-email.template.ts # Verification email
+│   │   ├── utils/              # Email helpers
+│   │   │   └── mail.helpers.ts              # Validation, formatting
+│   │   ├── mail.types.ts       # TypeScript types
+│   │   ├── mail.config.ts      # Gmail SMTP config
+│   │   └── README.md           # Documentation
 │   └── [future features: rooms, social features]
 ├── shared/                # Shared code across features
 │   ├── config/           # Environment vars (env.ts), Supabase clients
@@ -849,6 +862,150 @@ make restart
 ```
 
 **Why this works**: The chmod commands make files readable by all users (including Docker's non-root `node` user), while keeping write permissions restricted to the owner. Shell scripts need execute permissions (+x) to run. Git tracks execute permissions, so the fix persists across commits.
+
+## Mail Feature - Transactional Emails
+
+Music Room implements a dedicated **mail feature** for sending transactional emails with template support and rate limiting.
+
+### Architecture
+
+The mail feature is fully decoupled from the auth feature and can be used by any backend feature:
+
+```
+features/mail/
+├── services/
+│   ├── mail.service.ts              # Gmail SMTP email sending
+│   ├── rate-limiter.service.ts      # Generic rate limiting (Redis + fallback)
+│   └── template-renderer.service.ts # Template registry
+├── templates/
+│   ├── base.template.ts             # Base HTML layout (dark theme)
+│   └── verification-email.template.ts # Verification email template
+├── utils/
+│   └── mail.helpers.ts              # Email validation, formatting
+├── mail.types.ts                    # TypeScript types
+├── mail.config.ts                   # Gmail SMTP configuration
+└── README.md                        # Complete documentation
+```
+
+### Core Services
+
+**1. MailService** - Main email sending service via Gmail SMTP:
+- `sendTemplatedEmail(to, templateName, data)` - Send email using a template
+- `sendEmail(options)` - Send custom HTML/text email
+- `verifyConnection()` - Health check for SMTP connection
+
+**2. RateLimiterService** - Generic rate limiting (reusable across features):
+- `checkLimit(key, config)` - Check if action is within rate limit
+- `incrementAndCheck(key, config)` - Increment and check (throws on exceed)
+- `reset(key)` - Reset rate limit for a key
+- Redis-backed with automatic in-memory fallback
+
+**3. TemplateRendererService** - Email template registry:
+- `render(templateName, data)` - Render template by name
+- `registerTemplate(name, renderer)` - Add new templates
+- Type-safe template names via TypeScript union types
+
+### Available Templates
+
+**verification-email**: Email verification code template
+- Dark theme matching Music Room branding (#121212 background, #1DB954 green)
+- Large monospace code display
+- Responsive HTML + plain text fallback
+- Data: `{ code: string, expiresInMinutes: number }`
+
+### Usage Example
+
+```typescript
+// In any feature that needs to send emails
+import { MailService } from '@features/mail/services/mail.service.js';
+
+const mailService = new MailService();
+
+// Send verification email
+await mailService.sendTemplatedEmail(
+  'user@example.com',
+  'verification-email',
+  { code: '123456', expiresInMinutes: 15 }
+);
+```
+
+### Integration with Auth
+
+The auth feature's `EmailVerificationService` uses the mail service:
+
+```typescript
+// features/auth/services/email-verification.service.ts
+import { MailService } from '@features/mail/services/mail.service.js';
+import { RateLimiterService } from '@features/mail/services/rate-limiter.service.js';
+
+class EmailVerificationService {
+  private mailService = new MailService();
+  private rateLimiter = new RateLimiterService();
+
+  async sendVerificationEmail(email: string, code: string) {
+    await this.mailService.sendTemplatedEmail(email, 'verification-email', {
+      code,
+      expiresInMinutes: this.CODE_EXPIRY_MINUTES
+    });
+  }
+
+  async verifyCode(userId: string, code: string, ip: string) {
+    // Use rate limiter to prevent brute force
+    await this.rateLimiter.incrementAndCheck(`email_verify:${userId}:${ip}`, {
+      maxAttempts: 5,
+      windowSeconds: 900
+    });
+    // ... verification logic ...
+  }
+}
+```
+
+### Adding New Templates
+
+1. Create template file in `features/mail/templates/`
+2. Add template name to `TemplateName` union type in `mail.types.ts`
+3. Register template in `TemplateRendererService`
+4. Use via `MailService.sendTemplatedEmail()`
+
+**Example** (future password reset):
+```typescript
+// features/mail/templates/password-reset.template.ts
+export function renderPasswordResetEmail(data: { resetLink: string }): EmailTemplate {
+  // ... template logic ...
+}
+
+// Register in template-renderer.service.ts
+this.templates.set('password-reset', renderPasswordResetEmail);
+
+// Use in any feature
+await mailService.sendTemplatedEmail(email, 'password-reset', { resetLink: '...' });
+```
+
+### Configuration
+
+Environment variables in `backend/.env`:
+
+```bash
+# Gmail SMTP (required)
+GMAIL_USER=your-email@gmail.com
+GMAIL_APP_PASSWORD=xxxx-xxxx-xxxx-xxxx  # 16-char app password
+
+# Email Verification
+EMAIL_VERIFICATION_CODE_EXPIRY_MINUTES=15
+EMAIL_VERIFICATION_MAX_ATTEMPTS=5
+EMAIL_VERIFICATION_MAX_RESENDS_PER_HOUR=3
+EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS=60
+```
+
+### Future Enhancements
+
+- **Password Reset Email** - Template for password reset flows
+- **Notification Emails** - Playlist invites, friend requests, activity alerts
+- **Email Queue** - Async sending with Bull/BullMQ for high volume
+- **Multi-Provider Support** - Abstract SMTP to support SendGrid, AWS SES
+- **Email Analytics** - Track open rates, click rates
+
+See `backend/src/features/mail/README.md` for complete documentation.
 
 ## Real-time Features (Socket.io)
 

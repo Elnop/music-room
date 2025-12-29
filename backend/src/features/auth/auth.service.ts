@@ -3,14 +3,12 @@ import { AppError } from "@/shared/middleware/error-handler.js";
 import { logger } from "@/shared/utils/logger.js";
 import {
   formatAuthResponse,
-  fetchUserProfile,
   getUserProfile,
 } from "@/features/auth/utils/auth.helpers.js";
 import { SessionService } from "@/features/auth/services/session.service.js";
 import { OAuthService } from "@/features/auth/services/oauth.service.js";
 import { UserService } from "@/features/auth/services/user.service.js";
 import { ProviderService } from "@/features/auth/services/provider.service.js";
-import { EmailService } from "@/features/auth/services/email.service.js";
 import { EmailVerificationService } from "@/features/auth/services/email-verification.service.js";
 import type {
   RegisterDTO,
@@ -139,11 +137,10 @@ export class AuthService {
       }
 
       // 4. Generate and send verification code
-      const emailService = new EmailService();
       const verificationService = new EmailVerificationService();
 
       const code = await verificationService.generateAndStore(authData.user.id);
-      await emailService.sendVerificationEmail(data.email, code);
+      await verificationService.sendVerificationEmail(data.email, code);
 
       logger.info("User registered successfully, verification email sent", {
         userId: authData.user.id,

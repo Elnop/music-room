@@ -2,26 +2,30 @@ import crypto from "crypto";
 import { supabase } from "@/shared/config/supabase.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
 import { logger } from "@/shared/utils/logger.js";
-import { redisClient, isRedisConnected } from "@/shared/config/redis.js";
-import { env } from "@/shared/config/env.js";
+import { MailService } from "@/features/mail/services/mail.service.js";
+import { RateLimiterService } from "@/features/mail/services/rate-limiter.service.js";
+import { verificationConfig } from "@/features/mail/mail.config.js";
 
 /**
- * Email verification service for managing verification codes and rate limiting
+ * Email verification service for managing verification codes
+ *
+ * Handles code generation, storage, and verification logic.
+ * Delegates email sending to MailService and rate limiting to RateLimiterService.
  */
 export class EmailVerificationService {
-  private readonly CODE_LENGTH = 6;
-  private readonly CODE_EXPIRY_MINUTES = parseInt(
-    env.EMAIL_VERIFICATION_CODE_EXPIRY_MINUTES,
-  );
-  private readonly MAX_VERIFICATION_ATTEMPTS = parseInt(
-    env.EMAIL_VERIFICATION_MAX_ATTEMPTS,
-  );
-  private readonly MAX_RESEND_ATTEMPTS = parseInt(
-    env.EMAIL_VERIFICATION_MAX_RESENDS_PER_HOUR,
-  );
-  private readonly RESEND_COOLDOWN_SECONDS = parseInt(
-    env.EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS,
-  );
+  private readonly mailService: MailService;
+  private readonly rateLimiter: RateLimiterService;
+  private readonly CODE_LENGTH = verificationConfig.codeLength;
+  private readonly CODE_EXPIRY_MINUTES = verificationConfig.expiryMinutes;
+  private readonly MAX_VERIFICATION_ATTEMPTS = verificationConfig.maxAttempts;
+  private readonly MAX_RESEND_ATTEMPTS = verificationConfig.maxResends;
+  private readonly RESEND_COOLDOWN_SECONDS =
+    verificationConfig.resendCooldownSeconds;
+
+  constructor() {
+    this.mailService = new MailService();
+    this.rateLimiter = new RateLimiterService();
+  }
 
   /**
    * Generate cryptographically secure 6-digit verification code
@@ -63,32 +67,26 @@ export class EmailVerificationService {
   }
 
   /**
+   * Send verification email with code
+   */
+  async sendVerificationEmail(email: string, code: string): Promise<void> {
+    await this.mailService.sendTemplatedEmail(email, "verification-email", {
+      code,
+      expiresInMinutes: this.CODE_EXPIRY_MINUTES,
+    });
+  }
+
+  /**
    * Verify code with rate limiting and expiration check
    */
   async verifyCode(userId: string, code: string, ip: string): Promise<boolean> {
-    // Check rate limiting using Redis
+    // Check rate limiting
     const attemptsKey = `email_verify_attempts:${userId}:${ip}`;
 
-    if (isRedisConnected()) {
-      const attempts = await redisClient.incr(attemptsKey);
-
-      if (attempts === 1) {
-        // Set expiration on first attempt (matches code expiry)
-        await redisClient.expire(
-          attemptsKey,
-          this.CODE_EXPIRY_MINUTES * 60,
-        );
-      }
-
-      if (attempts > this.MAX_VERIFICATION_ATTEMPTS) {
-        logger.warn("Verification attempts exceeded", { userId, ip, attempts });
-        throw new AppError(
-          429,
-          "Too many verification attempts. Please request a new code.",
-          "VERIFICATION_ATTEMPTS_EXCEEDED",
-        );
-      }
-    }
+    await this.rateLimiter.incrementAndCheck(attemptsKey, {
+      maxAttempts: this.MAX_VERIFICATION_ATTEMPTS,
+      windowSeconds: this.CODE_EXPIRY_MINUTES * 60,
+    });
 
     // Fetch stored code from database
     const { data: profile, error } = await supabase
@@ -155,9 +153,7 @@ export class EmailVerificationService {
     }
 
     // Clear rate limit attempts on success
-    if (isRedisConnected()) {
-      await redisClient.del(attemptsKey);
-    }
+    await this.rateLimiter.reset(attemptsKey);
 
     logger.info("Email verified successfully", { userId });
     return true;
@@ -170,26 +166,28 @@ export class EmailVerificationService {
     userId: string,
     ip: string,
   ): Promise<{ canResend: boolean; remainingSeconds?: number }> {
-    if (!isRedisConnected()) {
-      return { canResend: true };
-    }
-
-    const resendKey = `email_resend:${userId}:${ip}`;
-    const resendCountKey = `email_resend_count:${userId}:${ip}`;
+    const cooldownKey = `email_resend:${userId}:${ip}`;
+    const countKey = `email_resend_count:${userId}:${ip}`;
 
     // Check cooldown (60 seconds between resends)
-    const cooldownTTL = await redisClient.ttl(resendKey);
-    if (cooldownTTL > 0) {
-      return { canResend: false, remainingSeconds: cooldownTTL };
+    const cooldownResult = await this.rateLimiter.checkLimit(cooldownKey, {
+      maxAttempts: 1,
+      windowSeconds: this.RESEND_COOLDOWN_SECONDS,
+    });
+
+    if (!cooldownResult.canProceed) {
+      return {
+        canResend: false,
+        remainingSeconds: cooldownResult.remainingSeconds,
+      };
     }
 
     // Check resend count (max 3 per hour)
-    const resendCount = await redisClient.get(resendCountKey);
-    if (resendCount && parseInt(resendCount) >= this.MAX_RESEND_ATTEMPTS) {
-      const countTTL = await redisClient.ttl(resendCountKey);
+    const attempts = await this.rateLimiter.getAttempts(countKey);
+    if (attempts >= this.MAX_RESEND_ATTEMPTS) {
       throw new AppError(
         429,
-        `Too many resend attempts. Please try again in ${Math.ceil(countTTL / 60)} minutes.`,
+        `Too many resend attempts. Please try again later.`,
         "RESEND_LIMIT_EXCEEDED",
       );
     }
@@ -201,22 +199,22 @@ export class EmailVerificationService {
    * Record resend attempt (for rate limiting)
    */
   async recordResendAttempt(userId: string, ip: string): Promise<void> {
-    if (!isRedisConnected()) return;
-
-    const resendKey = `email_resend:${userId}:${ip}`;
-    const resendCountKey = `email_resend_count:${userId}:${ip}`;
+    const cooldownKey = `email_resend:${userId}:${ip}`;
+    const countKey = `email_resend_count:${userId}:${ip}`;
 
     // Set cooldown (60 seconds)
-    await redisClient.setex(resendKey, this.RESEND_COOLDOWN_SECONDS, "1");
+    await this.rateLimiter.increment(cooldownKey, {
+      maxAttempts: 1,
+      windowSeconds: this.RESEND_COOLDOWN_SECONDS,
+    });
 
-    // Increment resend count
-    const count = await redisClient.incr(resendCountKey);
-    if (count === 1) {
-      // Set expiration on first resend (1 hour)
-      await redisClient.expire(resendCountKey, 3600);
-    }
+    // Increment resend count (1 hour window)
+    await this.rateLimiter.increment(countKey, {
+      maxAttempts: this.MAX_RESEND_ATTEMPTS,
+      windowSeconds: 3600,
+    });
 
-    logger.info("Resend attempt recorded", { userId, ip, count });
+    logger.info("Resend attempt recorded", { userId, ip });
   }
 
   /**

@@ -9,7 +9,6 @@ import {
   verifyEmailSchema,
   resendVerificationSchema,
 } from "@/features/auth/auth.validators.js";
-import { EmailService } from "@/features/auth/services/email.service.js";
 import { EmailVerificationService } from "@/features/auth/services/email-verification.service.js";
 import { supabase } from "@/shared/config/supabase.js";
 import type { ApiResponse } from "@/shared/types/global.types.js";
@@ -474,8 +473,7 @@ export class AuthController {
       const code = await verificationService.generateAndStore(validated.userId);
 
       // Send email
-      const emailService = new EmailService();
-      await emailService.sendVerificationEmail(validated.email, code);
+      await verificationService.sendVerificationEmail(validated.email, code);
 
       // Record resend attempt
       await verificationService.recordResendAttempt(validated.userId, ip);
