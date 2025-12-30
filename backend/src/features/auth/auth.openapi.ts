@@ -242,7 +242,7 @@ export const authPaths: OpenAPIV3.PathsObject = {
         1. Client obtains Google ID token via Google Sign-In SDK
         2. Send ID token to this endpoint
         3. Backend verifies with Google APIs
-        4. Returns Music Room session tokens
+        4. Returns Zumik session tokens
 
         **Behavior:**
         - Existing user → Login
@@ -295,7 +295,7 @@ export const authPaths: OpenAPIV3.PathsObject = {
 
         **Email handling:**
         - If Facebook provides email → Use real email
-        - No email permission → Generate synthetic (facebook_{id}@music-room.local)
+        - No email permission → Generate synthetic (facebook_{id}@zumik.local)
         - User can add real email later in profile
 
         **Rate limit:** 10 requests per 15 minutes per IP

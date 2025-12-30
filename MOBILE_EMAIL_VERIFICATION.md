@@ -18,7 +18,7 @@ L'écran de vérification email OTP a été implémenté pour permettre aux util
 - ✅ Affichage des erreurs
 - ✅ Loading state pendant la vérification
 - ✅ Navigation vers Login si besoin
-- ✅ Design cohérent avec le thème Music Room
+- ✅ Design cohérent avec le thème Zumik
 
 **UX Features**:
 - Auto-focus sur le premier input

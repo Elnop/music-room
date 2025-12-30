@@ -74,7 +74,7 @@ make dev-build
 
 ⏳ This will take ~15-20 minutes
    You can close this terminal - build continues in the cloud
-   Check status: https://expo.dev/accounts/[username]/projects/music-room/builds
+   Check status: https://expo.dev/accounts/[username]/projects/zumik/builds
 
 Build finished!
 Download: https://expo.dev/artifacts/[build-id]
@@ -129,7 +129,7 @@ make dev-tunnel
 ```
 
 **Sur votre téléphone:**
-1. Ouvrez l'app "Music Room" (PAS Expo Go!)
+1. Ouvrez l'app "Zumik" (PAS Expo Go!)
 2. Scannez le QR code affiché
 3. L'app se connecte au serveur de dev
 4. ✨ Hot reload fonctionne!
@@ -144,7 +144,7 @@ make dev-build        # Build l'APK (~20 min)
 
 # Jours suivants: Développement normal
 make dev-tunnel       # Démarrer le serveur
-# Ouvrir app Music Room sur téléphone
+# Ouvrir app Zumik sur téléphone
 # Coder normalement - hot reload fonctionne!
 ```
 
@@ -201,7 +201,7 @@ grep EXPO_TOKEN mobile/.env
 ```
 
 ### "Build failed"
-Vérifiez les logs sur: https://expo.dev/accounts/[username]/projects/music-room/builds
+Vérifiez les logs sur: https://expo.dev/accounts/[username]/projects/zumik/builds
 
 ### "App ne se connecte pas au serveur"
 1. Vérifiez que `make dev-tunnel` est en cours
@@ -260,7 +260,7 @@ make dev-build
 
 # 3. Développement quotidien
 make dev-tunnel
-# Ouvrir app Music Room sur téléphone
+# Ouvrir app Zumik sur téléphone
 # Scanner QR code
 # Coder! ✨
 ```

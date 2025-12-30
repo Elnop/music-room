@@ -1,4 +1,4 @@
-# Guide de Démarrage - Music Room
+# Guide de Démarrage - Zumik
 
 ## 🎯 Phase 1 & 2 : Backend Auth (Terminée ✅)
 
@@ -48,7 +48,7 @@ backend/
 
 2. **Créer un projet**
    - Cliquez sur "New Project"
-   - Nom du projet : `music-room`
+   - Nom du projet : `zumik`
    - Choisissez une région proche de vous
    - Créez un mot de passe fort (notez-le !)
    - Attendez ~2 minutes que le projet soit créé
@@ -107,7 +107,7 @@ make dev
 Vous devriez voir :
 
 ```
-🚀 Music Room backend is running!
+🚀 Zumik backend is running!
 📍 Server: http://localhost:3000
 🏥 Health: http://localhost:3000/health
 🔐 Auth API: http://localhost:3000/api/auth

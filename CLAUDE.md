@@ -64,7 +64,7 @@ The project must implement:
 
 ## Project Overview
 
-Music Room is a collaborative music listening platform built with:
+Zumik is a collaborative music listening platform built with:
 - **Backend**: Node.js + Express + Socket.io + TypeScript + Supabase (PostgreSQL + Auth)
 - **Mobile**: React Native 0.81 + Expo SDK 54 + TypeScript + Zustand
 - **Infrastructure**: Docker Compose for orchestrated development
@@ -73,7 +73,7 @@ The app allows users to create collaborative music playlists with friends, featu
 
 ## Development Commands
 
-Music Room provides **three development modes** orchestrated by a modular Makefile system. Use `make help` to see all available commands.
+Zumik provides **three development modes** orchestrated by a modular Makefile system. Use `make help` to see all available commands.
 
 ### Quick Start
 
@@ -190,7 +190,7 @@ make clean-native     # Clean android/ios/expo folders
 
 ### Build Commands
 
-Music Room provides build commands for backend validation and production mobile releases.
+Zumik provides build commands for backend validation and production mobile releases.
 
 #### Backend Builds
 
@@ -343,7 +343,7 @@ make clean-native     # Native build folders (android/, ios/)
 make clean-project    # All project artifacts (comprehensive, no Docker/global)
 
 # Docker-specific cleanup
-make clean-docker     # Music Room Docker resources only
+make clean-docker     # Zumik Docker resources only
 make prune            # Unused Docker resources across all projects
 
 # Global/system-wide cleanup (affects ALL projects - use with caution)
@@ -356,7 +356,7 @@ make clean-all            # EVERYTHING: Docker + project + global caches (needs 
 
 ### Cleanup Matrix
 
-| Command | Files/Deps | Docker (Music Room) | Docker (System) | Global Caches | Confirmation |
+| Command | Files/Deps | Docker (Zumik) | Docker (System) | Global Caches | Confirmation |
 |---------|-----------|---------------------|-----------------|---------------|--------------|
 | `make clean` | ✓ | ✓ | ✗ | ✗ | Yes (y/n) |
 | `make clean-deps` | ✓ | ✗ | ✗ | ✗ | No |
@@ -382,10 +382,10 @@ make clean-all            # EVERYTHING: Docker + project + global caches (needs 
 - `/tmp/ngrok.log`, `/tmp/backend-tunnel-url.txt` - Build logs
 
 **Docker Resources:**
-- Containers: `music-room-backend`, `music-room-mobile`
-- Images: `music_room-backend`, `music_room-mobile`
-- Volumes: Associated with Music Room services
-- Network: `music-room-network`
+- Containers: `zumik-backend`, `zumik-mobile`
+- Images: `zumik-backend`, `zumik-mobile`
+- Volumes: Associated with Zumik services
+- Network: `zumik-network`
 - System: ALL Docker resources when using `clean-all`
 
 **Global Caches (only with explicit commands):**
@@ -818,7 +818,7 @@ See `DOCKER.md` for detailed Docker documentation and troubleshooting.
 
 ### Why This Matters
 
-Music Room uses Chainguard container images that run as non-root user (UID 65532, user `node`). This is a security best practice that prevents potential privilege escalation attacks.
+Zumik uses Chainguard container images that run as non-root user (UID 65532, user `node`). This is a security best practice that prevents potential privilege escalation attacks.
 
 Source code files must be readable by this user for:
 - Metro bundler to scan and watch files during development
@@ -865,7 +865,7 @@ make restart
 
 ## Mail Feature - Transactional Emails
 
-Music Room implements a dedicated **mail feature** for sending transactional emails with template support and rate limiting.
+Zumik implements a dedicated **mail feature** for sending transactional emails with template support and rate limiting.
 
 ### Architecture
 
@@ -908,7 +908,7 @@ features/mail/
 ### Available Templates
 
 **verification-email**: Email verification code template
-- Dark theme matching Music Room branding (#121212 background, #1DB954 green)
+- Dark theme matching Zumik branding (#121212 background, #1DB954 green)
 - Large monospace code display
 - Responsive HTML + plain text fallback
 - Data: `{ code: string, expiresInMinutes: number }`
@@ -1009,7 +1009,7 @@ See `backend/src/features/mail/README.md` for complete documentation.
 
 ## Real-time Features (Socket.io)
 
-Music Room implements real-time synchronization using **Socket.io** for live updates across devices.
+Zumik implements real-time synchronization using **Socket.io** for live updates across devices.
 
 ### Backend Real-time Service
 
@@ -1074,7 +1074,7 @@ usePlaylistSocket(playlistId, {
 
 ## Music Integration - SoundCloud
 
-Music Room uses **SoundCloud** for music search and streaming via the `soundcloud.ts` npm package.
+Zumik uses **SoundCloud** for music search and streaming via the `soundcloud.ts` npm package.
 
 ### Key Features
 
@@ -1191,10 +1191,6 @@ curl http://localhost:3000/api/auth/me \
   -H "Authorization: Bearer TOKEN"
 ```
 
-**Postman collection** available:
-- `backend/Music_Room_API.postman_collection.json`
-- `backend/Music_Room_Local.postman_environment.json`
-
 The collection auto-saves JWT tokens after login/register.
 
 ## Security
@@ -1207,13 +1203,13 @@ The collection auto-saves JWT tokens after login/register.
 
 ## Music Integration
 
-Music Room uses a universal `trackUri` field to support multiple music services. SoundCloud integration is **fully implemented** and functional.
+Zumik uses a universal `trackUri` field to support multiple music services. SoundCloud integration is **fully implemented** and functional.
 
 ## Current Implementation Status
 
 **Project Completion: ~70%**
 
-Music Room has evolved significantly beyond initial planning, with several major features fully implemented.
+Zumik has evolved significantly beyond initial planning, with several major features fully implemented.
 
 **Phase 1 - ✅ Complete (Foundation)**:
 - Backend foundation with Express + Socket.io setup
@@ -1309,7 +1305,7 @@ Music Room has evolved significantly beyond initial planning, with several major
   - Token verification via Facebook Graph API (`/debug_token` + `/me` endpoints)
   - Database: `facebook_id` column in `user_profiles` table
   - **Email optional** - Works with only `public_profile` permission
-  - Synthetic email generation: `facebook_{id}@music-room.local` when email not provided
+  - Synthetic email generation: `facebook_{id}@zumik.local` when email not provided
 - **Multi-provider support**:
   - Users can link multiple OAuth providers to single account
   - Provider management endpoints (`GET /api/auth/providers`, `DELETE /api/auth/providers/:provider`)
@@ -1323,7 +1319,7 @@ Music Room has evolved significantly beyond initial planning, with several major
   - Error handling with user-friendly messages
   - Session persistence to AsyncStorage
 - **Synthetic email system**:
-  - Format: `{provider}_{providerId}@music-room.local`
+  - Format: `{provider}_{providerId}@zumik.local`
   - Supabase-compatible (auth.users requires email)
   - Allows Facebook login without email permission
   - User can add real email later via profile settings

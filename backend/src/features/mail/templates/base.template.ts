@@ -1,12 +1,12 @@
 /**
  * Base email template
  *
- * Provides common HTML structure and styling for all Music Room emails.
+ * Provides common HTML structure and styling for all Zumik emails.
  * Follows the dark theme matching the app UI (Spotify-inspired).
  */
 
 /**
- * Music Room branding colors
+ * Zumik branding colors
  */
 export const colors = {
   background: "#121212",
@@ -83,13 +83,13 @@ export function renderBaseTemplate(content: string, title: string): string {
     <body>
       <div class="container">
         <div class="logo">
-          <h1>🎵 Music Room</h1>
+          <h1>🎵 Zumik</h1>
         </div>
         <div class="content">
           ${content}
         </div>
         <div class="footer">
-          <p><strong>Music Room</strong></p>
+          <p><strong>Zumik</strong></p>
           <p>Collaborative Music Listening Platform</p>
         </div>
       </div>
@@ -104,6 +104,6 @@ export function renderBaseTemplate(content: string, title: string): string {
 export function renderTextFooter(): string {
   return `
 ---
-Music Room - Collaborative Music Listening Platform
+Zumik - Collaborative Music Listening Platform
   `.trim();
 }

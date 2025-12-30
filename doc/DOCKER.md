@@ -1,6 +1,6 @@
-# Music Room - Docker Guide
+# Zumik - Docker Guide
 
-This guide explains how to use Docker and Docker Compose to run the Music Room project in a containerized environment.
+This guide explains how to use Docker and Docker Compose to run the Zumik project in a containerized environment.
 
 ## Table of Contents
 
@@ -38,7 +38,7 @@ docker-compose --version
 ```bash
 # Clone the repository (if not already done)
 git clone <repository-url>
-cd Music_Room
+cd Zumik
 
 # Install dependencies and setup environment files
 make install
@@ -399,11 +399,11 @@ Example deployment (AWS ECR):
 
 ```bash
 # Tag image for ECR
-docker tag music-room-backend:latest \
-  your-account.dkr.ecr.us-east-1.amazonaws.com/music-room-backend:latest
+docker tag zumik-backend:latest \
+  your-account.dkr.ecr.us-east-1.amazonaws.com/zumik-backend:latest
 
 # Push to ECR
-docker push your-account.dkr.ecr.us-east-1.amazonaws.com/music-room-backend:latest
+docker push your-account.dkr.ecr.us-east-1.amazonaws.com/zumik-backend:latest
 ```
 
 ---

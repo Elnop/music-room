@@ -14,12 +14,12 @@ import { musicControlPaths, musicControlSchemas } from '@/features/music-control
 const openapiDocument: OpenAPIV3.Document = {
 	openapi: '3.0.0',
 	info: {
-		title: 'Music Room API',
+		title: 'Zumik API',
 		version: '1.0.0',
-		description: `Music Room - Collaborative music listening platform`,
+		description: `Zumik - Collaborative music listening platform`,
 		contact: {
-			name: 'Music Room Team',
-			email: 'contact@music-room.local'
+			name: 'Zumik Team',
+			email: 'contact@zumik.local'
 		},
 		license: {
 			name: 'MIT',
@@ -30,7 +30,7 @@ const openapiDocument: OpenAPIV3.Document = {
 	servers: [
 		{
 			url: env.NODE_ENV === 'production'
-				? 'https://api.music-room.com'
+				? 'https://api.zumik.com'
 				: `http://localhost:${env.PORT || 3000}`,
 			description: env.NODE_ENV === 'production' ? 'Production' : 'Development'
 		}
@@ -126,7 +126,7 @@ export const swaggerUiOptions: swaggerUi.SwaggerUiOptions = {
     .swagger-ui .info { margin: 20px 0; }
     .swagger-ui .info .title { font-size: 36px; }
   `,
-	customSiteTitle: 'Music Room API Documentation',
+	customSiteTitle: 'Zumik API Documentation',
 	swaggerOptions: {
 		persistAuthorization: true,
 		displayRequestDuration: true,

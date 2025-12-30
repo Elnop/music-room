@@ -2,7 +2,7 @@
 
 ## Implementation Complete ✅
 
-Email verification has been successfully implemented for Music Room. This satisfies the mandatory requirement from `doc/en.subject.pdf` Section IV.1 (Page 6).
+Email verification has been successfully implemented for Zumik. This satisfies the mandatory requirement from `doc/en.subject.pdf` Section IV.1 (Page 6).
 
 ---
 
@@ -17,7 +17,7 @@ Email verification has been successfully implemented for Music Room. This satisf
 
 2. **Email Service** (`backend/src/features/auth/services/email.service.ts`)
    - Gmail SMTP integration with nodemailer
-   - HTML email templates with Music Room branding
+   - HTML email templates with Zumik branding
    - 6-digit verification code delivery
 
 3. **Verification Service** (`backend/src/features/auth/services/email-verification.service.ts`)
@@ -61,7 +61,7 @@ Email verification has been successfully implemented for Music Room. This satisf
 1. Go to: https://myaccount.google.com/security
 2. Enable **2-Step Verification** if not already enabled
 3. Navigate to: **Security → 2-Step Verification → App passwords**
-4. Generate a new app password for "Music Room Backend"
+4. Generate a new app password for "Zumik Backend"
 5. Copy the 16-character password (remove spaces)
 
 ### Step 3: Update Backend .env
@@ -278,7 +278,7 @@ Existing OAuth users will be auto-verified on next login. No manual action neede
 ## Production Checklist
 
 - [ ] Execute migration in production Supabase
-- [ ] Configure production Gmail account (e.g., `noreply@musicroom.com`)
+- [ ] Configure production Gmail account (e.g., `noreply@zumik.com`)
 - [ ] Set up SPF, DKIM, DMARC records for email domain
 - [ ] Add Gmail credentials to production `.env`
 - [ ] Test email delivery to Gmail, Outlook, Yahoo

@@ -1,4 +1,4 @@
--- Music Room - Profile Privacy and Music Preferences
+-- Zumik - Profile Privacy and Music Preferences
 -- This migration adds privacy settings and music genre preferences
 
 -- =====================================================

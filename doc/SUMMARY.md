@@ -1,4 +1,4 @@
-# Music Room - Récapitulatif du Projet
+# Zumik - Récapitulatif du Projet
 
 ## ✅ Ce qui a été créé
 
@@ -11,7 +11,7 @@ Le backend est **100% fonctionnel** avec une architecture feature-first moderne.
 ## 📂 Structure du Projet
 
 ```
-Music_Room/
+Zumik/
 ├── backend/                                    ✅ Backend Node.js + TypeScript
 │   ├── src/
 │   │   ├── features/
@@ -43,8 +43,8 @@ Music_Room/
 │   ├── .gitignore                             ✅ Git ignore
 │   ├── README.md                              ✅ Documentation
 │   ├── API_DOCUMENTATION.md                   ✅ Doc API complète
-│   ├── Music_Room_API.postman_collection.json ✅ Collection Postman
-│   └── Music_Room_Local.postman_environment.json ✅ Env Postman
+│   ├── Zumik_API.postman_collection.json ✅ Collection Postman
+│   └── Zumik_Local.postman_environment.json ✅ Env Postman
 ├── SUMMARY.md                                 📋 Ce fichier - récapitulatif
 ├── GETTING_STARTED.md                         📖 Guide de démarrage
 └── SUMMARY.md                                 📝 Ce fichier
@@ -297,5 +297,5 @@ Pour ajouter une nouvelle feature :
 
 ---
 
-**Projet Music Room - Backend v1.0.0**
+**Projet Zumik - Backend v1.0.0**
 Dernière mise à jour : 2025-01-15

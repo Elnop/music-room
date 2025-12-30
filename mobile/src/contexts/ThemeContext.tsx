@@ -7,7 +7,7 @@ import { originalTheme } from '@themes/original.theme';
 import type { ThemeName, ThemeContextValue } from '@/themes/types';
 import type { Theme } from '@/themes/types';
 
-const THEME_STORAGE_KEY = '@musicroom/theme_preference';
+const THEME_STORAGE_KEY = '@zumik/theme_preference';
 
 const THEMES: Record<ThemeName, Theme> = {
   royalBlue: royalBlueTheme,

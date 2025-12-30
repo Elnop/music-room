@@ -1,15 +1,15 @@
-# Music Room
+# Zumik
 
 A collaborative music listening platform where friends can share and control music playback together in real-time.
 
 ## Overview
 
-Music Room is a mobile-first application that allows users to create collaborative music playlists with their friends. The platform integrates with music streaming services to provide music playback capabilities and features real-time synchronization using Socket.io for a seamless shared listening experience.
+Zumik is a mobile-first application that allows users to create collaborative music playlists with their friends. The platform integrates with music streaming services to provide music playback capabilities and features real-time synchronization using Socket.io for a seamless shared listening experience.
 
 ## Project Structure
 
 ```
-Music_Room/
+Zumik/
 ├── backend/          # Node.js + Express + Socket.io API
 ├── mobile/           # React Native + Expo mobile app
 ├── docker-compose.yml
@@ -56,7 +56,7 @@ The easiest way to run the project is using Docker:
 ```bash
 # 1. Clone the repository
 git clone <repository-url>
-cd Music_Room
+cd Zumik
 
 # 2. Install dependencies and setup environment
 make install
@@ -160,7 +160,7 @@ For detailed Docker documentation, see [DOCKER.md](./DOCKER.md).
 
 ### Development Modes
 
-Music Room supports two development modes for mobile testing:
+Zumik supports two development modes for mobile testing:
 
 #### LAN Mode (Default - Same WiFi Network)
 

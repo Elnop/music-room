@@ -8,11 +8,11 @@ import { signInWithGoogle, signInWithFacebook } from '@services/oauth';
 
 // AsyncStorage keys
 const STORAGE_KEYS = {
-  AUTH_USER: '@musicroom/auth_user',
-  ACCESS_TOKEN: '@musicroom/access_token',
-  REFRESH_TOKEN: '@musicroom/refresh_token',
-  IS_AUTHENTICATED: '@musicroom/is_authenticated',
-  TOKEN_EXPIRES_AT: '@musicroom/token_expires_at',
+  AUTH_USER: '@zumik/auth_user',
+  ACCESS_TOKEN: '@zumik/access_token',
+  REFRESH_TOKEN: '@zumik/refresh_token',
+  IS_AUTHENTICATED: '@zumik/is_authenticated',
+  TOKEN_EXPIRES_AT: '@zumik/token_expires_at',
 } as const;
 
 /**

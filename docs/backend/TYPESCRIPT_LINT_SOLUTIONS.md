@@ -186,7 +186,7 @@ rules: {
 
 ## Recommandation finale
 
-**Pour Music Room** :
+**Pour Zumik** :
 
 1. ✅ **Court terme (maintenant)** : Solution 3 activée (warnings seulement)
    - Les erreurs critiques (floating promises) sont fixées

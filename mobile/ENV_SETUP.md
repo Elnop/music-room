@@ -77,7 +77,7 @@ EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME=com.googleusercontent.apps.your-ios-client-id
 
 4. **Create Web Client ID:**
    - Application type: **Web application**
-   - Name: "Music Room Backend"
+   - Name: "Zumik Backend"
    - Authorized JavaScript origins: `http://localhost:3000`
    - Authorized redirect URIs: `http://localhost:3000/api/auth/google/callback`
    - Click "Create"
@@ -85,16 +85,16 @@ EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME=com.googleusercontent.apps.your-ios-client-id
 
 5. **Create iOS Client ID:**
    - Application type: **iOS**
-   - Name: "Music Room iOS"
-   - Bundle ID: `com.musicroom.app` (or your app's bundle ID)
+   - Name: "Zumik iOS"
+   - Bundle ID: `com.zumik.app` (or your app's bundle ID)
    - Click "Create"
    - **Copy the iOS URL scheme** → Use as `EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME`
    - Format: `com.googleusercontent.apps.[CLIENT_ID]`
 
 6. **Create Android Client ID (optional):**
    - Application type: **Android**
-   - Name: "Music Room Android"
-   - Package name: `com.musicroom.app`
+   - Name: "Zumik Android"
+   - Package name: `com.zumik.app`
    - SHA-1 certificate fingerprint (get with `keytool`)
    - Click "Create"
 
@@ -116,7 +116,7 @@ EXPO_TOKEN=your-personal-access-token
 
 1. Go to [Expo Access Tokens](https://expo.dev/settings/access-tokens)
 2. Click "Create Token"
-3. Give it a name (e.g., "Music Room Dev")
+3. Give it a name (e.g., "Zumik Dev")
 4. Copy the token
 
 ## Optional Variables

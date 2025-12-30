@@ -1,4 +1,4 @@
--- Music Room - Edit Mode for Playlists
+-- Zumik - Edit Mode for Playlists
 -- This migration adds edit_mode column to support the subject requirements:
 -- By default, everyone can edit the playlist (open mode)
 -- With restricted mode, only collaborators can edit

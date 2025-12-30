@@ -1,4 +1,4 @@
-# Music Room API Documentation
+# Zumik API Documentation
 
 Version: 1.0.0
 Base URL: `http://localhost:3000`
@@ -1300,7 +1300,7 @@ Vérifier si un utilisateur spécifique vous a accordé le contrôle de sa musiq
 
 ## Socket.io Real-time Events
 
-Music Room utilise Socket.io pour les mises à jour en temps réel.
+Zumik utilise Socket.io pour les mises à jour en temps réel.
 
 **WebSocket URL:** `ws://localhost:3000` (ou `EXPO_PUBLIC_WS_URL`)
 

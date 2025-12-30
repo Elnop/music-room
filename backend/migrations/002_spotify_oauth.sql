@@ -1,4 +1,4 @@
--- Music Room - Spotify OAuth Integration
+-- Zumik - Spotify OAuth Integration
 -- This migration adds Spotify token storage to user_profiles table
 
 -- =====================================================

@@ -167,7 +167,7 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
                     label="Email"
                     value={value}
                     onChangeText={onChange}
-                    placeholder="demo@musicroom.com"
+                    placeholder="demo@zumik.com"
                     error={errors.email?.message}
                     keyboardType="email-address"
                     autoCapitalize="none"

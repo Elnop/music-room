@@ -9,7 +9,7 @@ help: ## Show this help message
 	@clear 2>/dev/null || true
 	@echo ""
 	$(call print_separator)
-	@echo "$(BLUE)              Music Room - Development Commands               $(NC)"
+	@echo "$(BLUE)                  Zumik - Development Commands                 $(NC)"
 	$(call print_separator)
 	@echo ""
 	@echo "$(BLUE)🚀 DEVELOPMENT MODES$(NC)"
@@ -128,7 +128,7 @@ help: ## Show this help message
 	@echo "    $(GREEN)clean-project$(NC)     All project artifacts (no Docker/global)"
 	@echo ""
 	@echo "  $(YELLOW)Docker-specific:$(NC)"
-	@echo "    $(GREEN)clean-docker$(NC)      Music Room Docker resources only"
+	@echo "    $(GREEN)clean-docker$(NC)      Zumik Docker resources only"
 	@echo "    $(GREEN)prune$(NC)             Unused Docker resources"
 	@echo ""
 	@echo "  $(YELLOW)Global cleanup $(RED)(affects ALL projects!)$(NC):"
@@ -161,7 +161,7 @@ help: ## Show this help message
 	@echo ""
 
 info: ## Show system information
-	$(call print_header,Music Room - System Information)
+	$(call print_header,Zumik - System Information)
 	$(call print_subsection,Network Information)
 	@echo "  Local IP:  $(GREEN)$(HOST_IP)$(NC)"
 	@echo "  Expo URL:  $(GREEN)$(EXPO_URL)$(NC)"

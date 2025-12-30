@@ -1,6 +1,6 @@
-# Music Room - Mobile App
+# Zumik - Mobile App
 
-Application mobile React Native pour Music Room - Partage de musique collaboratif.
+Application mobile React Native pour Zumik - Partage de musique collaboratif.
 
 ## Stack Technique
 
@@ -17,7 +17,7 @@ Application mobile React Native pour Music Room - Partage de musique collaborati
 ## Prérequis
 
 - Node.js 18+
-- Backend Music Room running sur `http://localhost:3000`
+- Backend Zumik running sur `http://localhost:3000`
 - Compte Supabase configuré (optionnel pour débuter)
 - Expo CLI: `npm install -g expo-cli` (optionnel, `npx` fonctionne)
 

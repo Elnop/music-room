@@ -72,9 +72,9 @@ clean-native: ## Clean native build folders (android, ios, .expo)
 check-devices: ## Check if Android device is connected
 	$(call print_header,Checking Connected Devices)
 	$(call print_subsection,📱 Android Devices)
-	@if docker ps --format '{{.Names}}' | grep -q music-room-$(MOBILE_SERVICE); then \
+	@if docker ps --format '{{.Names}}' | grep -q zumik-$(MOBILE_SERVICE); then \
 		echo "$(BLUE)$(ICON_INFO) Using Docker container$(NC)"; \
-		$(call docker_exec,music-room-$(MOBILE_SERVICE),adb devices) 2>/dev/null || echo "$(RED)$(ICON_ERROR) No devices$(NC)"; \
+		$(call docker_exec,zumik-$(MOBILE_SERVICE),adb devices) 2>/dev/null || echo "$(RED)$(ICON_ERROR) No devices$(NC)"; \
 	else \
 		if command -v adb >/dev/null 2>&1; then \
 			echo "$(BLUE)$(ICON_INFO) Using local adb$(NC)"; \

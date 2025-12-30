@@ -18,7 +18,7 @@ WHERE oauth_provider IS NULL;
 ALTER TABLE user_profiles
 ALTER COLUMN oauth_provider SET NOT NULL;
 
--- Unique constraint: one Google account = one Music Room account
+-- Unique constraint: one Google account = one Zumik account
 CREATE UNIQUE INDEX idx_oauth_google_id
   ON user_profiles(oauth_provider_id)
   WHERE oauth_provider = 'google' AND oauth_provider_id IS NOT NULL;

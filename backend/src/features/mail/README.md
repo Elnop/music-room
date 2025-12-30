@@ -3,7 +3,7 @@
 **Status**: ✅ Active
 **Purpose**: Send transactional emails with template support and rate limiting
 
-The mail feature provides a reusable, extensible email service for Music Room. It decouples email sending logic from specific features and supports multiple email types through a template registry system.
+The mail feature provides a reusable, extensible email service for Zumik. It decouples email sending logic from specific features and supports multiple email types through a template registry system.
 
 ---
 
@@ -16,7 +16,7 @@ features/mail/
 │   ├── rate-limiter.service.ts      # Generic rate limiting (Redis + in-memory)
 │   └── template-renderer.service.ts # Template registry and rendering
 ├── templates/
-│   ├── base.template.ts             # Base HTML layout (dark theme, Music Room branding)
+│   ├── base.template.ts             # Base HTML layout (dark theme, Zumik branding)
 │   └── verification-email.template.ts # Verification email template
 ├── utils/
 │   └── mail.helpers.ts              # Helper functions (validation, formatting)
@@ -55,7 +55,7 @@ await mailService.sendTemplatedEmail(
 // Send custom email
 await mailService.sendEmail({
   to: 'user@example.com',
-  subject: 'Welcome to Music Room',
+  subject: 'Welcome to Zumik',
   html: '<p>Welcome!</p>',
   text: 'Welcome!'
 });
@@ -117,7 +117,7 @@ const emailTemplate = renderer.render('verification-email', {
   expiresInMinutes: 15
 });
 
-console.log(emailTemplate.subject); // "Verify Your Music Room Account"
+console.log(emailTemplate.subject); // "Verify Your Zumik Account"
 console.log(emailTemplate.html);    // HTML version
 console.log(emailTemplate.text);    // Plain text version
 ```
@@ -134,10 +134,10 @@ Sends a 6-digit verification code to verify user email addresses.
 - `code` (string) - 6-digit verification code
 - `expiresInMinutes` (number) - Code expiration time in minutes
 
-**Subject**: "Verify Your Music Room Account"
+**Subject**: "Verify Your Zumik Account"
 
 **Visual Design**:
-- Dark theme matching Music Room app (#121212 background, #1DB954 green accent)
+- Dark theme matching Zumik app (#121212 background, #1DB954 green accent)
 - Large monospace code display with green background
 - Responsive design for mobile and desktop
 - Plain text fallback version
@@ -206,7 +206,7 @@ export function renderPasswordResetEmail(
   `;
 
   return {
-    subject: "Reset Your Music Room Password",
+    subject: "Reset Your Zumik Password",
     html: renderBaseTemplate(content, "Reset Password"),
     text: `Reset your password: ${resetLink}\n\nExpires in ${expiresInHours} hours.\n\n${renderTextFooter()}`
   };
@@ -500,4 +500,4 @@ Emails are sent synchronously (await). For high-volume scenarios, consider:
 For questions or issues with the mail feature, see:
 - Project Documentation: `/CLAUDE.md`
 - Backend README: `/backend/README.md`
-- Issue Tracker: [GitHub Issues](https://github.com/Elnop/Music_Room/issues)
+- Issue Tracker: [GitHub Issues](https://github.com/Elnop/zumik/issues)

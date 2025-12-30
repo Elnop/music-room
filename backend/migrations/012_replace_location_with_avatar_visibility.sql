@@ -1,4 +1,4 @@
--- Music Room - Migration 012 (No-op for existing databases)
+-- Zumik - Migration 012 (No-op for existing databases)
 -- 
 -- NOTE: This migration has been merged into 011 for new installations.
 -- For databases that already ran the original 011 + 012, this file exists

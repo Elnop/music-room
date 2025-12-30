@@ -1,6 +1,6 @@
-# Build Guide - Music Room
+# Build Guide - Zumik
 
-This guide covers building Music Room components for development, testing, and production deployment.
+This guide covers building Zumik components for development, testing, and production deployment.
 
 ## Table of Contents
 
@@ -13,7 +13,7 @@ This guide covers building Music Room components for development, testing, and p
 
 ## Overview
 
-Music Room provides build commands for two main components:
+Zumik provides build commands for two main components:
 
 1. **Backend**: TypeScript compilation for validation and production Docker images
 2. **Mobile**: Production Android app (AAB) for Google Play Store deployment
@@ -45,7 +45,7 @@ Build production backend Docker image (distroless, 0 CVE):
 make compile-backend-docker
 ```
 
-**Output**: Docker image `music-room-backend:latest`
+**Output**: Docker image `zumik-backend:latest`
 
 **Features**:
 - Chainguard distroless base (minimal attack surface)
@@ -58,10 +58,10 @@ make compile-backend-docker
 make compile-backend-docker
 
 # Tag for registry
-docker tag music-room-backend:latest registry.example.com/music-room:v1.0.0
+docker tag zumik-backend:latest registry.example.com/zumik:v1.0.0
 
 # Push to registry
-docker push registry.example.com/music-room:v1.0.0
+docker push registry.example.com/zumik:v1.0.0
 ```
 
 ### Build Verification
@@ -195,8 +195,8 @@ make prod-keystore-setup
 ```
 
 **Interactive prompts**:
-- Keystore filename (e.g., `musicroom.keystore`)
-- Key alias (e.g., `musicroom-key`)
+- Keystore filename (e.g., `zumik.keystore`)
+- Key alias (e.g., `zumik-key`)
 - Keystore password
 - Key password
 
@@ -209,8 +209,8 @@ make prod-keystore-setup
 
 **Configuration**: Add credentials to `mobile/android/gradle.properties`:
 ```properties
-MYAPP_UPLOAD_STORE_FILE=musicroom.keystore
-MYAPP_UPLOAD_KEY_ALIAS=musicroom-key
+MYAPP_UPLOAD_STORE_FILE=zumik.keystore
+MYAPP_UPLOAD_KEY_ALIAS=zumik-key
 MYAPP_UPLOAD_STORE_PASSWORD=your_password
 MYAPP_UPLOAD_KEY_PASSWORD=your_password
 ```
@@ -532,6 +532,6 @@ Follow semantic versioning:
 
 ## Support
 
-- GitHub Issues: https://github.com/your-org/music-room/issues
+- GitHub Issues: https://github.com/Elnop/zumik/issues
 - Expo Forums: https://forums.expo.dev
 - Google Play Support: https://support.google.com/googleplay/android-developer

@@ -95,7 +95,7 @@ redis-clean:
 	fi
 	@if docker volume ls | grep -q $(REDIS_DATA_VOLUME); then \
 		echo "$(YELLOW)→$(RESET) Removing Redis volume..."; \
-		docker volume rm music-room_$(REDIS_DATA_VOLUME) 2>/dev/null || true; \
+		docker volume rm zumik_$(REDIS_DATA_VOLUME) 2>/dev/null || true; \
 		echo "$(GREEN)✓$(RESET) Redis volume removed"; \
 	else \
 		echo "$(YELLOW)⚠$(RESET) Redis volume does not exist"; \

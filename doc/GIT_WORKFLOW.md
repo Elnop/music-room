@@ -1,4 +1,4 @@
-# Git Workflow - Music Room
+# Git Workflow - Zumik
 
 ## ✅ État Actuel
 

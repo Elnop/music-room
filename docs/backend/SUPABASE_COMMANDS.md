@@ -26,7 +26,7 @@ make supabase-status
 
   LINKED | ORG ID | REFERENCE ID | NAME       | REGION | CREATED AT
   -------|--------|--------------|------------|--------|-------------
-         | ...    | vkhspk...    | music-room | EU     | 2025-11-24
+         | ...    | vkhspk...    | zumik | EU     | 2025-11-24
 
 ✓ Authenticated
 ```
@@ -123,7 +123,7 @@ git commit -m "chore: regenerate Supabase types after schema changes"
 ```bash
 # 1. Cloner le repo
 git clone ...
-cd music-room
+cd zumik
 
 # 2. Installer les dépendances
 make install

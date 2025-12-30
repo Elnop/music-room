@@ -6,7 +6,7 @@
 .PHONY: dev-docker start stop restart down logs logs-backend logs-mobile qr ps build build-backend build-mobile
 
 dev-docker: ## Start all services in Docker containers (backend + mobile)
-	$(call print_header,Starting Music Room Development Environment)
+	$(call print_header,Starting Zumik Development Environment)
 	$(call print_arrow,Building and starting containers...)
 	$(call docker_up_build)
 	$(call print_success,Services started)
@@ -14,7 +14,7 @@ dev-docker: ## Start all services in Docker containers (backend + mobile)
 	$(call display_services,lan)
 	$(call blank_line)
 	$(call wait_for,Expo,$(EXPO_WAIT_TIME))
-	$(call clear_and_header,🚀 Music Room Started)
+	$(call clear_and_header,🚀 Zumik Started)
 	$(call display_services,lan)
 	$(call blank_line)
 	$(call display_qr,lan)

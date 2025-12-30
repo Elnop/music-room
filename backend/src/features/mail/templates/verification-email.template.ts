@@ -54,7 +54,7 @@ function renderVerificationContent(
       This code will expire in <strong>${expiresInMinutes} minutes</strong>.
     </p>
     <p class="warning">
-      If you didn't create a Music Room account, please ignore this email.
+      If you didn't create a Zumik account, please ignore this email.
     </p>
   `;
 }
@@ -67,13 +67,13 @@ function renderVerificationText(
   expiresInMinutes: number,
 ): string {
   return `
-Music Room - Email Verification
+Zumik - Email Verification
 
 Your verification code is: ${code}
 
 This code will expire in ${expiresInMinutes} minutes.
 
-If you didn't create a Music Room account, please ignore this email.
+If you didn't create a Zumik account, please ignore this email.
 
 ${renderTextFooter()}
   `.trim();
@@ -92,7 +92,7 @@ export function renderVerificationEmail(
   const content = renderVerificationContent(code, expiresInMinutes);
 
   return {
-    subject: "Verify Your Music Room Account",
+    subject: "Verify Your Zumik Account",
     html: renderBaseTemplate(content, "Verify Your Email"),
     text: renderVerificationText(code, expiresInMinutes),
   };

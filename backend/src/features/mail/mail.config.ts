@@ -21,7 +21,7 @@ export const gmailConfig = {
  * Email sender configuration
  */
 export const senderConfig = {
-  name: "Music Room",
+  name: "Zumik",
   email: env.GMAIL_USER,
 } as const;
 

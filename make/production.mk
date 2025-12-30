@@ -265,8 +265,8 @@ prod-keystore-setup: ## Generate Android keystore for production signing
 	@echo "This will generate a keystore for signing your Android app."
 	@echo "$(RED)$(ICON_WARNING) IMPORTANT: Keep this file secure and backed up!$(NC)"
 	@echo ""
-	@read -p "Enter keystore filename (e.g., musicroom.keystore): " KEYSTORE_NAME; \
-	read -p "Enter key alias (e.g., musicroom-key): " KEY_ALIAS; \
+	@read -p "Enter keystore filename (e.g., zumik.keystore): " KEYSTORE_NAME; \
+	read -p "Enter key alias (e.g., zumik-key): " KEY_ALIAS; \
 	read -s -p "Enter keystore password: " STORE_PASS; echo ""; \
 	read -s -p "Enter key password: " KEY_PASS; echo ""; \
 	echo ""; \

@@ -1,4 +1,4 @@
-# Music Room
+# Zumik
 
 A collaborative music listening platform built with React Native, Node.js, and music streaming integration.
 
@@ -85,7 +85,7 @@ make stop
 
 ## Links
 
-- [GitHub](https://github.com/Elnop/music-room/issues)
+- [GitHub](https://github.com/Elnop/zumik/issues)
 - [Supabase](https://supabase.com/dashboard/project/vkhspkuureoostyupsrx)
 - [Expo](https://expo.dev/)
 - [Ngrok](https://dashboard.ngrok.com/get-started/your-authtoken)

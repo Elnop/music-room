@@ -114,7 +114,7 @@ EXPO_URL := exp://$(HOST_IP):$(METRO_PORT)
 # ========================================
 # Redis Configuration
 # ========================================
-REDIS_CONTAINER_NAME := music-room-redis
+REDIS_CONTAINER_NAME := zumik-redis
 REDIS_IMAGE := redis:7-alpine
 REDIS_PORT := 6379
 REDIS_DATA_VOLUME := redis-data

@@ -143,7 +143,7 @@ const PORT = env.PORT;
 const HOST = "0.0.0.0"; // Listen on all network interfaces (allows LAN connections)
 
 httpServer.listen(PORT, HOST, () => {
-  logger.info("Music Room backend is running", {
+  logger.info("Zumik backend is running", {
     server: `http://localhost:${PORT}`,
     health: `http://localhost:${PORT}/health`,
     docs: `http://localhost:${PORT}/api-docs`,

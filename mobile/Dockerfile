@@ -1,4 +1,4 @@
-# Dockerfile for Music Room Mobile (Expo/React Native)
+# Dockerfile for Zumik Mobile (Expo/React Native)
 # Using Chainguard Node.js image - ZERO CVE vulnerabilities
 FROM cgr.dev/chainguard/node:latest-dev
 

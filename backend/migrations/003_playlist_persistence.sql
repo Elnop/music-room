@@ -1,4 +1,4 @@
--- Music Room - Playlist Persistence
+-- Zumik - Playlist Persistence
 -- This migration creates playlists, tracks, and playlist_tracks tables
 -- Date: 2025-12-07
 

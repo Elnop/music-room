@@ -1,6 +1,6 @@
-# Music Room Backend
+# Zumik Backend
 
-Backend pour l'application Music Room - Collaborative music room with music streaming integration.
+Backend pour l'application Zumik - Plateforme collaborative d'écoute musicale avec streaming intégré.
 
 ## 🏗️ Architecture
 
@@ -38,7 +38,7 @@ Cette commande va :
 ### 2. Configurer Supabase
 
 1. Créez un compte sur [supabase.com](https://supabase.com)
-2. Créez un nouveau projet "music-room"
+2. Créez un nouveau projet "zumik"
 3. Récupérez vos credentials dans Dashboard → Settings → API :
    - `SUPABASE_URL`
    - `SUPABASE_ANON_KEY`
@@ -62,7 +62,7 @@ Le serveur démarre sur `http://localhost:3000`
 
 ## 📚 API Documentation
 
-Music Room provides interactive OpenAPI 3.0 documentation via Swagger UI.
+Zumik provides interactive OpenAPI 3.0 documentation via Swagger UI.
 
 ### Accessing Documentation
 
@@ -134,7 +134,7 @@ make clean         # Nettoyer les artifacts
 
 ## 🔴 Redis Integration
 
-Music Room utilise Redis pour le rate limiting et la protection brute force.
+Zumik utilise Redis pour le rate limiting et la protection brute force.
 
 ### Configuration
 
@@ -267,18 +267,6 @@ Cette documentation inclut :
 - Codes d'erreur
 - Exemples cURL
 - Règles de validation
-
-### Tester avec Postman
-
-Nous fournissons une collection Postman prête à l'emploi :
-
-1. **Importer la collection** : `Music_Room_API.postman_collection.json`
-2. **Importer l'environnement** : `Music_Room_Local.postman_environment.json`
-3. **Commencer à tester !**
-
-La collection inclut des scripts automatiques qui :
-- Sauvegardent le token JWT après login/register
-- L'ajoutent automatiquement aux requêtes authentifiées
 
 ### Exemples rapides
 

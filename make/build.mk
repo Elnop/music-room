@@ -27,9 +27,9 @@ compile-backend: ## Build backend TypeScript locally
 compile-backend-docker: ## Build production backend Docker image
 	$(call print_header,Building Production Backend Docker Image)
 	$(call print_subsection,🐳 Target: production (distroless))
-	@docker build -t music-room-backend:latest --target production ./backend
+	@docker build -t zumik-backend:latest --target production ./backend
 	$(call blank_line)
-	$(call print_success,Production image built: music-room-backend:latest)
+	$(call print_success,Production image built: zumik-backend:latest)
 
 #------------------------------------------------------------
 # Build Verification

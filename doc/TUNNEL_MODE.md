@@ -2,7 +2,7 @@
 
 ## Overview
 
-Tunnel mode allows you to develop Music Room when your phone and computer are on **different WiFi networks** (e.g., phone on cellular data, PC on home WiFi, or working from a coffee shop).
+Tunnel mode allows you to develop Zumik when your phone and computer are on **different WiFi networks** (e.g., phone on cellular data, PC on home WiFi, or working from a coffee shop).
 
 ## 🎯 Quick Facts
 
@@ -146,7 +146,7 @@ make dev
    - Go to https://expo.dev/settings/access-tokens
    - Log in with your Expo account
    - Click "Create Token"
-   - Give it a name (e.g., "music-room-dev")
+   - Give it a name (e.g., "zumik-dev")
    - Copy the token (starts with `expo_`)
    - **Important**: Save it securely, it won't be shown again!
 
@@ -579,7 +579,7 @@ USER node
 docker run --rm -v "$(pwd)/mobile/.expo:/data" alpine chown -R 65532:65532 /data
 
 # Then restart:
-docker restart music-room-mobile
+docker restart zumik-mobile
 ```
 
 ### Issue: `NGROK_AUTHTOKEN not set`

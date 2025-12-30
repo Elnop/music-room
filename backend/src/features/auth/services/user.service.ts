@@ -150,9 +150,9 @@ export class UserService {
       const providerColumn = `${provider}_id`; // 'google_id' or 'facebook_id'
 
       // Generate synthetic email if not provided (e.g., user denied email permission)
-      // Format: facebook_123456789@music-room.local or google_123456789@music-room.local
+      // Format: facebook_123456789@zumik.local or google_123456789@zumik.local
       const effectiveEmail =
-        email || `${provider}_${providerId}@music-room.local`;
+        email || `${provider}_${providerId}@zumik.local`;
 
       // Log if using synthetic email
       if (!email) {

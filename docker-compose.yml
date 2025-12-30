@@ -5,7 +5,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
       target: development
-    container_name: music-room-backend
+    container_name: zumik-backend
     ports:
       - "3000:3000"
     volumes:
@@ -21,7 +21,7 @@ services:
       - NODE_ENV=development
       - PORT=3000
     networks:
-      - music-room-network
+      - zumik-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
@@ -35,7 +35,7 @@ services:
     build:
       context: ./mobile
       dockerfile: Dockerfile
-    container_name: music-room-mobile
+    container_name: zumik-mobile
     ports:
       - "8081:8081"   # Metro bundler
       - "19000:19000" # Expo DevTools
@@ -57,7 +57,7 @@ services:
       # Backend API URL (accessible from mobile container)
       - API_URL=http://backend:3000
     networks:
-      - music-room-network
+      - zumik-network
     depends_on:
       - backend
     restart: unless-stopped
@@ -67,13 +67,13 @@ services:
   # Redis Service (Rate Limiting & Brute Force Protection)
   redis:
     image: redis:7-alpine
-    container_name: music-room-redis
+    container_name: zumik-redis
     ports:
       - "6379:6379"
     volumes:
       - redis-data:/data
     networks:
-      - music-room-network
+      - zumik-network
     command: redis-server --appendonly yes
     restart: unless-stopped
     healthcheck:
@@ -84,9 +84,9 @@ services:
       start_period: 10s
 
 networks:
-  music-room-network:
+  zumik-network:
     driver: bridge
-    name: music-room-network
+    name: zumik-network
 
 volumes:
   tunnel-info:

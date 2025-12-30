@@ -1,6 +1,6 @@
 # Security Testing Guide (IV.6)
 
-This guide covers how to test the security requirements from the Music Room subject (section IV.6 Securing).
+This guide covers how to test the security requirements from the Zumik subject (section IV.6 Securing).
 
 ## Table of Contents
 
@@ -18,7 +18,7 @@ This guide covers how to test the security requirements from the Music Room subj
 
 ### Security Requirements Summary
 
-Music Room implements multiple security layers to meet the IV.6 Securing requirements:
+Zumik implements multiple security layers to meet the IV.6 Securing requirements:
 
 - **Data Isolation**: Users can only access their own data
 - **Brute Force Protection**: Account lockout after failed login attempts
@@ -556,7 +556,7 @@ All rate limits configured in `backend/src/shared/config/rate-limit.config.ts`:
 # Simulate mobile app login with headers
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
-  -H "User-Agent: MusicRoom/1.0.0 (Android 13; Samsung Galaxy S22)" \
+  -H "User-Agent: Zumik/1.0.0 (Android 13; Samsung Galaxy S22)" \
   -H "X-Platform: Android" \
   -H "X-Device-Model: Samsung Galaxy S22" \
   -H "X-App-Version: 1.0.0" \
@@ -718,7 +718,7 @@ API_URL="${API_URL:-http://localhost:3000}"
 TEST_EMAIL="security-test@test.com"
 TEST_PASSWORD="Test1234"
 
-echo "=== Music Room Security Test Suite ==="
+echo "=== Zumik Security Test Suite ==="
 echo ""
 echo "API URL: $API_URL"
 echo "Test Email: $TEST_EMAIL"
@@ -824,7 +824,7 @@ Create `tests/security/Security_Tests.postman_collection.json`:
 ```json
 {
   "info": {
-    "name": "Music Room - Security Tests (IV.6)",
+    "name": "Zumik - Security Tests (IV.6)",
     "description": "Automated security test cases for IV.6 Securing requirements",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
@@ -1283,4 +1283,4 @@ make redis-shell
 
 **Last Updated**: 2025-01-XX (Updated after implementing security features)
 
-**Maintainers**: Music Room Development Team
+**Maintainers**: Zumik Development Team

@@ -6,7 +6,7 @@
 .PHONY: dev-tunnel qr-tunnel tunnel-info tunnel-setup
 
 dev-tunnel: ## Start all services in tunnel mode (different WiFi networks)
-	$(call print_header,Starting Music Room (TUNNEL MODE))
+	$(call print_header,Starting Zumik (TUNNEL MODE))
 	$(call check_eas_configured)
 	$(call blank_line)
 	$(call print_warning,Note: Tunnel mode is slower than LAN mode)
@@ -18,7 +18,7 @@ dev-tunnel: ## Start all services in tunnel mode (different WiFi networks)
 	$(call print_success,Services started in tunnel mode)
 	$(call blank_line)
 	$(call wait_for,tunnels to initialize,$(TUNNEL_WAIT_TIME))
-	$(call clear_and_header,🌐 Music Room - TUNNEL MODE ACTIVE)
+	$(call clear_and_header,🌐 Zumik - TUNNEL MODE ACTIVE)
 	$(call display_tunnel_urls)
 	$(call blank_line)
 	$(call display_qr,tunnel)

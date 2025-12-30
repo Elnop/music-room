@@ -1,10 +1,10 @@
-# 🎵 Music Room - Onboarding
+# 🎵 Zumik - Onboarding
 
 Guide de setup pour lancer l'app en 30 minutes.
 
 ## 📋 Table des matières
 
-- [🎵 Music Room - Onboarding](#-music-room---onboarding)
+- [🎵 Zumik - Onboarding](#-zumik---onboarding)
 	- [📋 Table des matières](#-table-des-matières)
 	- [🔧 Prérequis](#-prérequis)
 		- [Configuration Android](#configuration-android)
@@ -39,8 +39,8 @@ source ~/.zshrc
 
 ```bash
 # 1. Cloner
-git clone https://github.com/Elnop/music-room
-cd music_room
+git clone https://github.com/Elnop/zumik
+cd zumik
 
 # 2. Vérifier l'environnement
 make check-setup
@@ -104,7 +104,7 @@ make format               # Formatter
 
 ### Gestion des émulateurs Android
 
-Music Room fournit plusieurs commandes pour gérer les émulateurs Android :
+Zumik fournit plusieurs commandes pour gérer les émulateurs Android :
 
 **Lister les émulateurs disponibles :**
 ```bash

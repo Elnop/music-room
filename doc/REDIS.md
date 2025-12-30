@@ -3,7 +3,7 @@
 ## Table of Contents
 
 - [Overview](#overview)
-- [Redis Role in Music Room](#redis-role-in-music-room)
+- [Redis Role in Zumik](#redis-role-in-zumik)
 - [Makefile Commands](#makefile-commands)
 - [Technical Architecture](#technical-architecture)
 - [Daily Usage](#daily-usage)
@@ -21,9 +21,9 @@ Redis is used as a distributed cache system for:
 - **Brute force protection** (account lockout after failed login attempts)
 - **IP reputation tracking** (suspicious IP monitoring and blacklisting)
 
-Music Room uses Redis 7-alpine in a Docker container with automatic health checks and data persistence.
+Zumik uses Redis 7-alpine in a Docker container with automatic health checks and data persistence.
 
-## Redis Role in Music Room
+## Redis Role in Zumik
 
 ### 1. Rate Limiting
 
@@ -116,7 +116,7 @@ make redis-clean
 ### Docker Container
 
 - **Image**: `redis:7-alpine`
-- **Container Name**: `music-room-redis`
+- **Container Name**: `zumik-redis`
 - **Port**: 6379 (internal Docker network)
 - **Volume**: `redis-data` (persistent storage)
 - **Health Check**: `redis-cli PING` every 10 seconds
@@ -420,11 +420,11 @@ redis:
 **Backup:**
 ```bash
 # Create snapshot
-docker exec music-room-redis redis-cli SAVE
+docker exec zumik-redis redis-cli SAVE
 # File saved to /data/dump.rdb
 
 # Copy snapshot to host
-docker cp music-room-redis:/data/dump.rdb ./redis-backup-$(date +%Y%m%d).rdb
+docker cp zumik-redis:/data/dump.rdb ./redis-backup-$(date +%Y%m%d).rdb
 ```
 
 **Restore:**
@@ -433,7 +433,7 @@ docker cp music-room-redis:/data/dump.rdb ./redis-backup-$(date +%Y%m%d).rdb
 make redis-stop
 
 # Copy backup to container
-docker cp redis-backup-20231227.rdb music-room-redis:/data/dump.rdb
+docker cp redis-backup-20231227.rdb zumik-redis:/data/dump.rdb
 
 # Restart Redis
 make redis-start
@@ -449,7 +449,7 @@ docker run -d \
   redislabs/redisinsight:latest
 ```
 
-Access at http://localhost:8001 and connect to `music-room-redis:6379`.
+Access at http://localhost:8001 and connect to `zumik-redis:6379`.
 
 ## Resources
 

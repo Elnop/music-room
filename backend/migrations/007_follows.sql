@@ -1,4 +1,4 @@
--- Music Room - Follows System
+-- Zumik - Follows System
 -- This migration creates the follows table for the friend/follow system
 
 -- =====================================================

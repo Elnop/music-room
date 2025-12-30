@@ -1,4 +1,4 @@
--- Music Room - Initial Database Schema
+-- Zumik - Initial Database Schema
 -- This migration creates the user_profiles table and sets up Row Level Security (RLS)
 
 -- Enable UUID extension

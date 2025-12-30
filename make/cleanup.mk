@@ -7,7 +7,7 @@
 
 clean: ## Remove containers, volumes, images, and project dependencies (with confirmation)
 	@echo "$(BOLD)$(YELLOW)This will remove:$(RESET)"
-	@echo "  - Music Room Docker containers, images, and volumes"
+	@echo "  - Zumik Docker containers, images, and volumes"
 	@echo "  - node_modules (backend + mobile)"
 	@echo "  - Build artifacts (dist, .expo)"
 	@echo "  - Coverage reports"
@@ -19,8 +19,8 @@ clean: ## Remove containers, volumes, images, and project dependencies (with con
 		echo "$(CYAN)Stopping and removing containers + volumes...$(RESET)"; \
 		docker-compose down -v 2>/dev/null || true; \
 		echo "$(GREEN)✓ Containers and volumes removed$(RESET)"; \
-		docker rmi music_room-backend music_room-mobile 2>/dev/null || true; \
-		docker network rm music-room-network 2>/dev/null || true; \
+		docker rmi zumik-backend zumik-mobile 2>/dev/null || true; \
+		docker network rm zumik-network 2>/dev/null || true; \
 		rm -rf backend/node_modules mobile/node_modules 2>/dev/null || true; \
 		rm -rf backend/dist mobile/.expo 2>/dev/null || true; \
 		rm -rf mobile/android mobile/ios 2>/dev/null || true; \
@@ -34,11 +34,11 @@ clean: ## Remove containers, volumes, images, and project dependencies (with con
 		echo "$(YELLOW)Cancelled.$(RESET)"; \
 	fi
 
-clean-docker: ## Remove Music Room Docker resources only (containers, images, volumes, network)
-	@echo "$(CYAN)Removing Music Room Docker resources...$(RESET)"
+clean-docker: ## Remove Zumik Docker resources only (containers, images, volumes, network)
+	@echo "$(CYAN)Removing Zumik Docker resources...$(RESET)"
 	@$(call docker_down_volumes)
-	@docker rmi music_room-backend music_room-mobile 2>/dev/null || true
-	@docker network rm music-room-network 2>/dev/null || true
+	@docker rmi zumik-backend zumik-mobile 2>/dev/null || true
+	@docker network rm zumik-network 2>/dev/null || true
 	@echo "$(GREEN)✓ Docker resources removed$(RESET)"
 
 clean-deps: ## Remove all dependencies and build artifacts (node_modules, dist, .expo, coverage, logs)
@@ -62,7 +62,7 @@ clean-all: ## Complete cleanup - Docker system + project artifacts + global cach
 	@echo "$(CYAN)Step 2/6: Removing Redis resources...$(RESET)"
 	@docker stop $(REDIS_CONTAINER_NAME) 2>/dev/null || true
 	@docker rm $(REDIS_CONTAINER_NAME) 2>/dev/null || true
-	@docker volume rm music-room_$(REDIS_DATA_VOLUME) 2>/dev/null || true
+	@docker volume rm zumik_$(REDIS_DATA_VOLUME) 2>/dev/null || true
 	@echo "$(CYAN)Step 3/6: Removing all Docker resources...$(RESET)"
 	@containers=$$(docker ps -aq 2>/dev/null); \
 	if [ -n "$$containers" ]; then docker rm $$containers 2>/dev/null || true; fi; \
@@ -91,7 +91,7 @@ clean-all: ## Complete cleanup - Docker system + project artifacts + global cach
 	@echo ""
 	@echo "$(BOLD)$(GREEN)✓✓✓ COMPLETE CLEANUP FINISHED ✓✓✓$(RESET)"
 	@echo ""
-	@echo "$(YELLOW)To restart Music Room:$(RESET)"
+	@echo "$(YELLOW)To restart Zumik:$(RESET)"
 	@echo "  1. $(GREEN)make install$(RESET)      - Reinstall dependencies"
 	@echo "  2. $(GREEN)make dev-docker$(RESET)   - Start Docker development"
 
@@ -102,11 +102,11 @@ prune: ## Clean up unused Docker resources
 
 deploy-build: ## Build production images (for deployment)
 	$(call print_info,Building production images...)
-	@docker build -t music-room-backend:latest --target production ./$(BACKEND_DIR)
+	@docker build -t zumik-backend:latest --target production ./$(BACKEND_DIR)
 	$(call print_success,Production images built)
 	@echo ""
 	$(call print_subsection,Images ready)
-	@echo "  - music-room-backend:latest"
+	@echo "  - zumik-backend:latest"
 
 clean-cache: ## Remove project-level caches (.expo, coverage, logs)
 	@echo "$(BOLD)$(CYAN)Cleaning project caches...$(RESET)"

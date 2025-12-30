@@ -1,10 +1,10 @@
 # Architecture Realtime - Socket.io
 
-Ce document décrit l'architecture temps réel de Music Room basée sur Socket.io.
+Ce document décrit l'architecture temps réel de Zumik basée sur Socket.io.
 
 ## Vue d'ensemble
 
-Music Room utilise Socket.io pour les communications temps réel entre le backend et les clients mobiles. L'architecture est conçue pour être **modulaire** et **scalable**.
+Zumik utilise Socket.io pour les communications temps réel entre le backend et les clients mobiles. L'architecture est conçue pour être **modulaire** et **scalable**.
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐

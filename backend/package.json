@@ -17,8 +17,9 @@
     "swagger:serve": "npx @redocly/cli preview-docs openapi.json"
   },
   "keywords": [
+    "zumik",
     "music",
-    "room",
+    "collaboration",
     "supabase",
     "socket.io",
     "express"

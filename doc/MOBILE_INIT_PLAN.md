@@ -1,8 +1,8 @@
-# Plan d'Initialisation Mobile - Music Room (Révisé avec Context7)
+# Plan d'Initialisation Mobile - Zumik (Révisé avec Context7)
 
 ## Contexte
 
-**Projet**: Music Room - Application mobile collaborative de musique
+**Projet**: Zumik - Application mobile collaborative de musique
 **État actuel**: Backend existant (Node.js + Express + Supabase + Socket.io), dossier mobile à créer
 **Stack Mobile**: React Native 0.73+ avec Expo, TypeScript
 **Backend existant**: Supabase v2.50.0, Express 4.21.2, Socket.io 4.8.1, Zod 3.24.1
@@ -31,7 +31,7 @@ Les recommandations suivantes sont basées sur la documentation officielle la pl
 ### 1.1 Créer le projet avec template TypeScript
 
 ```bash
-cd /home/bwolf/music-room
+cd /home/bwolf/zumik
 npx create-expo-app@latest mobile --template expo-template-blank-typescript
 cd mobile
 ```
@@ -293,7 +293,7 @@ export const SOUNDCLOUD_CONFIG = {
 
 // App Configuration
 export const APP_CONFIG = {
-  NAME: 'Music Room',
+  NAME: 'Zumik',
   VERSION: '1.0.0',
   BUILD_NUMBER: 1,
 } as const;
@@ -573,8 +573,8 @@ yarn-error.log*
 ```json
 {
   "expo": {
-    "name": "Music Room",
-    "slug": "music-room",
+    "name": "Zumik",
+    "slug": "zumik",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -587,14 +587,14 @@ yarn-error.log*
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.musicroom.app"
+      "bundleIdentifier": "com.zumik.app"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#121212"
       },
-      "package": "com.musicroom.app",
+      "package": "com.zumik.app",
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.READ_EXTERNAL_STORAGE",
@@ -677,7 +677,7 @@ import { COLORS, SPACING, FONT_SIZES } from './src/constants';
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Music Room</Text>
+      <Text style={styles.title}>Zumik</Text>
       <Text style={styles.subtitle}>Mobile App Initialized ✅</Text>
       <Text style={styles.info}>Backend: localhost:3000</Text>
       <StatusBar style="light" />
@@ -738,9 +738,9 @@ Ajouter dans `package.json` section `"scripts"`:
 ## Phase 12: README.md Mobile
 
 ```markdown
-# Music Room - Mobile App
+# Zumik - Mobile App
 
-Application mobile React Native pour Music Room.
+Application mobile React Native pour Zumik.
 
 ## Stack Technique
 
@@ -756,7 +756,7 @@ Application mobile React Native pour Music Room.
 ## Prérequis
 
 - Node.js 18+
-- Backend Music Room running sur `http://localhost:3000`
+- Backend Zumik running sur `http://localhost:3000`
 - Compte Supabase configuré
 - Expo CLI: `npm install -g expo-cli`
 
@@ -807,7 +807,7 @@ Avant de committer, vérifier:
 - [ ] `npm run type-check` - Pas d'erreurs TypeScript
 - [ ] `npm run lint` - Pas d'erreurs ESLint
 - [ ] `npm start` - Expo démarre sans erreurs
-- [ ] App affiche "Music Room - Mobile App Initialized ✅"
+- [ ] App affiche "Zumik - Mobile App Initialized ✅"
 - [ ] `.env` créé avec les bonnes valeurs du backend
 - [ ] Path aliases fonctionnent (`@/`, `@components/`, etc.)
 - [ ] Toutes les dépendances installées
@@ -818,7 +818,7 @@ Avant de committer, vérifier:
 ## Phase 14: Commit Initial
 
 ```bash
-cd /home/bwolf/music-room
+cd /home/bwolf/zumik
 
 git add mobile/
 
@@ -912,4 +912,4 @@ Après ce setup initial:
 - Node.js 18+
 - npm ou yarn
 - Expo CLI (optionnel, `npx` fonctionne)
-- Backend Music Room accessible sur `http://localhost:3000`
+- Backend Zumik accessible sur `http://localhost:3000`

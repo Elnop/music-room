@@ -1,4 +1,4 @@
--- Music Room - Music Control Delegation
+-- Zumik - Music Control Delegation
 -- This migration adds the can_control_music column to the follows table
 -- to enable music control delegation between friends
 

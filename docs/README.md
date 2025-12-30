@@ -1,6 +1,6 @@
-# Documentation Music Room
+# Documentation Zumik
 
-Ce dossier contient toute la documentation technique du projet Music Room.
+Ce dossier contient toute la documentation technique du projet Zumik.
 
 ## Structure
 
