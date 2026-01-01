@@ -1,11 +1,24 @@
 import { supabase } from "@/shared/config/supabase.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
 import { logger } from "@/shared/utils/logger.js";
+import { fetchSingle, updateOne } from "@/shared/utils/database.helpers.js";
 import type {
   UpdateProfileDTO,
   ProfileUpdateResponse,
   PublicProfile,
 } from "@/features/profile/profile.types.js";
+
+// Type for user_profiles table row
+type UserProfileRow = {
+  id: string;
+  username: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+  favorite_artist: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+};
 
 export class ProfileService {
   /**
@@ -29,28 +42,15 @@ export class ProfileService {
       updateData.updated_at = new Date().toISOString();
 
       // Update user_profiles table
-      const { data: profileData, error: profileError } = await supabase
-        .from("user_profiles")
-        .update(updateData)
-        .eq("id", userId)
-        .select("*")
-        .single();
-
-      if (profileError) {
-        logger.error("Failed to update profile", {
-          userId,
-          error: profileError,
-        });
-        throw new AppError(
-          500,
-          "Failed to update profile",
-          "PROFILE_UPDATE_ERROR"
-        );
-      }
-
-      if (!profileData) {
-        throw new AppError(404, "Profile not found", "PROFILE_NOT_FOUND");
-      }
+      const profileData = await updateOne<UserProfileRow>(
+        supabase,
+        "user_profiles",
+        { id: userId },
+        updateData,
+        "*",
+        "Failed to update profile",
+        "PROFILE_UPDATE_ERROR"
+      );
 
       // Get user email from auth.users
       const { data: userData, error: userError } =
@@ -89,16 +89,14 @@ export class ProfileService {
       logger.info("Fetching user profile", { userId });
 
       // Get profile from user_profiles
-      const { data: profileData, error: profileError } = await supabase
-        .from("user_profiles")
-        .select("*")
-        .eq("id", userId)
-        .single();
-
-      if (profileError || !profileData) {
-        logger.error("Profile not found", { userId, error: profileError });
-        throw new AppError(404, "Profile not found", "PROFILE_NOT_FOUND");
-      }
+      const profileData = await fetchSingle<UserProfileRow>(
+        supabase,
+        "user_profiles",
+        { id: userId },
+        "*",
+        "Profile not found",
+        "PROFILE_NOT_FOUND"
+      );
 
       // Get user email from auth.users
       const { data: userData, error: userError } =

@@ -1,6 +1,7 @@
 import { supabase } from "@/shared/config/supabase.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
 import { logger } from "@/shared/utils/logger.js";
+import { fetchSingle } from "@/shared/utils/database.helpers.js";
 import type {
   Tables,
   TablesInsert,
@@ -219,15 +220,22 @@ export class PrivacyService {
       const isOwnProfile = viewerId === targetUserId;
 
       // Get profile data
-      const { data: profileData, error: profileError } = await supabase
-        .from("user_profiles")
-        .select("*")
-        .eq("id", targetUserId)
-        .single();
-
-      if (profileError || !profileData) {
-        throw new AppError(404, "Profile not found", "PROFILE_NOT_FOUND");
-      }
+      const profileData = await fetchSingle<{
+        id: string;
+        username: string;
+        display_name: string | null;
+        avatar_url: string | null;
+        bio: string | null;
+        favorite_artist: string | null;
+        created_at: string | null;
+      }>(
+        supabase,
+        "user_profiles",
+        { id: targetUserId },
+        "*",
+        "Profile not found",
+        "PROFILE_NOT_FOUND"
+      );
 
       // Get privacy settings (pass viewerId to determine if we can create defaults)
       const privacy = await this.getPrivacySettings(
