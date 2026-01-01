@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -11,6 +11,7 @@ import { privacyApi, ApiError } from '@/services/privacyApi';
 import { Button } from '@components/common/Button';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
 import { GenreSelector } from '@components/profile/GenreSelector';
+import { showError } from '@utils/toast';
 
 export function MusicPreferencesScreen() {
   const { theme } = useTheme();
@@ -35,9 +36,8 @@ export function MusicPreferencesScreen() {
         setInitialGenres(genres);
         setSelectedGenres(genres);
       } catch (error) {
-        const message =
-          error instanceof ApiError ? error.message : 'Unable to load preferences';
-        Alert.alert('Error', message);
+        const message = error instanceof ApiError ? error.message : 'Unable to load preferences';
+        showError(message);
       } finally {
         setIsLoading(false);
       }
@@ -74,9 +74,8 @@ export function MusicPreferencesScreen() {
       setInitialGenres(selectedGenres);
       navigation.goBack();
     } catch (error) {
-      const message =
-        error instanceof ApiError ? error.message : 'Unable to save preferences';
-      Alert.alert('Error', message);
+      const message = error instanceof ApiError ? error.message : 'Unable to save preferences';
+      showError(message);
     } finally {
       setIsSaving(false);
     }

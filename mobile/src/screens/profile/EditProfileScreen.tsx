@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
@@ -21,6 +20,7 @@ import { profileApi, ApiError } from '@/services/profileApi';
 import { Button } from '@components/common/Button';
 import { Input } from '@components/common/Input';
 import { FormError } from '@components/common/FormError';
+import { showError } from '@utils/toast';
 
 // Profile field limits (aligned with backend)
 const PROFILE_LIMITS = {
@@ -65,7 +65,7 @@ export function EditProfileScreen() {
 
   const onSubmit = async (data: UpdateProfileInput) => {
     if (!accessToken) {
-      Alert.alert('Error', 'You are not authenticated');
+      showError('Non authentifié');
       return;
     }
 
@@ -90,10 +90,9 @@ export function EditProfileScreen() {
 
       navigation.goBack();
     } catch (err) {
-      const errorMessage =
-        err instanceof ApiError ? err.message : 'Unable to update profile';
+      const errorMessage = err instanceof ApiError ? err.message : 'Unable to update profile';
       setError(errorMessage);
-      Alert.alert('Error', errorMessage);
+      showError(errorMessage);
     } finally {
       setIsLoading(false);
     }

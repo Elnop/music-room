@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Toast from 'react-native-toast-message';
 import { ThemeProvider } from '@contexts/ThemeContext';
 import { RootNavigator } from '@/navigation/RootNavigator';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
@@ -24,6 +25,7 @@ export default function App() {
           </SafeAreaProvider>
         </ThemeProvider>
       </ErrorBoundary>
+      <Toast />
     </GestureHandlerRootView>
   );
 }

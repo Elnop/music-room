@@ -30,10 +30,7 @@ export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 
 export const playlistFormSchema = z.object({
-  name: z
-    .string()
-    .min(1, 'Playlist name is required')
-    .max(20, 'Name must be 20 characters max'),
+  name: z.string().min(1, 'Playlist name is required').max(20, 'Name must be 20 characters max'),
   description: z.string().max(70, 'Description must be 70 characters max').optional(),
 });
 

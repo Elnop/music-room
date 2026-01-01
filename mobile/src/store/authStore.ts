@@ -40,7 +40,9 @@ interface AuthState {
 
   // Actions
   login: (email: string, password: string) => Promise<void>;
-  register: (data: RegisterInput) => Promise<{ requiresVerification: boolean; userId?: string; email?: string }>;
+  register: (
+    data: RegisterInput
+  ) => Promise<{ requiresVerification: boolean; userId?: string; email?: string }>;
   loginWithGoogle: () => Promise<void>;
   loginWithFacebook: () => Promise<void>;
   logout: () => Promise<void>;
@@ -49,6 +51,11 @@ interface AuthState {
   // Email verification
   verifyEmail: (userId: string, code: string) => Promise<void>;
   resendVerificationCode: (userId: string, email: string) => Promise<void>;
+
+  // Password reset
+  forgotPassword: (email: string) => Promise<void>;
+  resetPassword: (email: string, code: string, newPassword: string) => Promise<void>;
+  canResendResetCode: (email: string) => Promise<{ canResend: boolean; remainingSeconds: number }>;
 
   // Token refresh
   refreshAccessToken: () => Promise<boolean>;
@@ -203,10 +210,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // Persist to storage
       await get().saveToStorage();
     } catch (error) {
-      const errorMessage =
-        error instanceof ApiError
-          ? error.message
-          : 'Email verification failed';
+      const errorMessage = error instanceof ApiError ? error.message : 'Email verification failed';
       set({
         error: errorMessage,
         isLoading: false,
@@ -224,11 +228,50 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       await authApi.resendVerificationCode(userId, email);
     } catch (error) {
-      const errorMessage =
-        error instanceof ApiError ? error.message : 'Failed to resend code';
+      const errorMessage = error instanceof ApiError ? error.message : 'Failed to resend code';
       set({ error: errorMessage });
       throw error;
     }
+  },
+
+  /**
+   * Request password reset (send email with code)
+   */
+  forgotPassword: async (email: string) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      await authApi.forgotPassword(email);
+      set({ isLoading: false });
+    } catch (error) {
+      const errorMessage = error instanceof ApiError ? error.message : 'Failed to send reset code';
+      set({ error: errorMessage, isLoading: false });
+      throw error;
+    }
+  },
+
+  /**
+   * Reset password with code
+   */
+  resetPassword: async (email: string, code: string, newPassword: string) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      await authApi.resetPassword(email, code, newPassword);
+      set({ isLoading: false });
+    } catch (error) {
+      const errorMessage = error instanceof ApiError ? error.message : 'Failed to reset password';
+      set({ error: errorMessage, isLoading: false });
+      throw error;
+    }
+  },
+
+  /**
+   * Check if user can resend reset code
+   */
+  canResendResetCode: async (email: string) => {
+    const result = await authApi.canResendResetCode(email);
+    return result;
   },
 
   /**

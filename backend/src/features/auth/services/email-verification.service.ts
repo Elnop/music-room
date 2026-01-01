@@ -2,7 +2,7 @@ import crypto from "crypto";
 import { supabase } from "@/shared/config/supabase.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
 import { logger } from "@/shared/utils/logger.js";
-import { MailService } from "@/features/mail/services/mail.service.js";
+import { sendVerificationEmail } from "@/features/mail/mail.service.js";
 import { RateLimiterService } from "@/features/mail/services/rate-limiter.service.js";
 import { verificationConfig } from "@/features/mail/mail.config.js";
 
@@ -10,10 +10,9 @@ import { verificationConfig } from "@/features/mail/mail.config.js";
  * Email verification service for managing verification codes
  *
  * Handles code generation, storage, and verification logic.
- * Delegates email sending to MailService and rate limiting to RateLimiterService.
+ * Delegates email sending and rate limiting to service functions.
  */
 export class EmailVerificationService {
-  private readonly mailService: MailService;
   private readonly rateLimiter: RateLimiterService;
   private readonly CODE_LENGTH = verificationConfig.codeLength;
   private readonly CODE_EXPIRY_MINUTES = verificationConfig.expiryMinutes;
@@ -23,7 +22,6 @@ export class EmailVerificationService {
     verificationConfig.resendCooldownSeconds;
 
   constructor() {
-    this.mailService = new MailService();
     this.rateLimiter = new RateLimiterService();
   }
 
@@ -70,10 +68,7 @@ export class EmailVerificationService {
    * Send verification email with code
    */
   async sendVerificationEmail(email: string, code: string): Promise<void> {
-    await this.mailService.sendTemplatedEmail(email, "verification-email", {
-      code,
-      expiresInMinutes: this.CODE_EXPIRY_MINUTES,
-    });
+    await sendVerificationEmail(email, code, this.CODE_EXPIRY_MINUTES);
   }
 
   /**

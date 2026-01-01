@@ -6,23 +6,24 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import { useAuthStore } from '@/store/authStore';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '@/navigation/AuthNavigator';
+import { showError, showSuccess } from '@utils/toast';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'EmailVerification'>;
 
-export default function EmailVerificationScreen({ route, navigation }: Props) {
+export function EmailVerificationScreen({ route, navigation }: Props) {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
   const { verifyEmail, resendVerificationCode, isLoading, error } = useAuthStore();
   const { userId, email } = route.params;
 
   const [code, setCode] = useState(['', '', '', '', '', '']);
+  const [codeError, setCodeError] = useState<string | null>(null);
   const [isResending, setIsResending] = useState(false);
   const [cooldown, setCooldown] = useState(0);
 
@@ -50,7 +51,7 @@ export default function EmailVerificationScreen({ route, navigation }: Props) {
     }
 
     // Auto-submit when all digits entered
-    if (newCode.every((digit) => digit !== '') && text) {
+    if (newCode.every(digit => digit !== '') && text) {
       handleVerify(newCode.join(''));
     }
   };
@@ -66,14 +67,15 @@ export default function EmailVerificationScreen({ route, navigation }: Props) {
     const finalCode = verificationCode || code.join('');
 
     if (finalCode.length !== 6) {
-      Alert.alert('Error', 'Please enter all 6 digits');
+      setCodeError('Please enter all 6 digits');
       return;
     }
 
+    setCodeError(null);
     try {
       await verifyEmail(userId, finalCode);
       // Navigation handled by authStore (user will be logged in)
-    } catch (err) {
+    } catch (_err) {
       // Error already handled by authStore
       setCode(['', '', '', '', '', '']);
       inputRefs.current[0]?.focus();
@@ -87,8 +89,8 @@ export default function EmailVerificationScreen({ route, navigation }: Props) {
     try {
       await resendVerificationCode(userId, email);
       setCooldown(60); // 60 second cooldown
-      Alert.alert('Success', 'Verification code sent. Please check your email.');
-    } catch (err) {
+      showSuccess('Code renvoyé. Vérifiez votre email.');
+    } catch (_err) {
       // Error handled by authStore
     } finally {
       setIsResending(false);
@@ -99,9 +101,7 @@ export default function EmailVerificationScreen({ route, navigation }: Props) {
     <View style={styles.container}>
       <View style={styles.content}>
         {/* Header */}
-        <Text style={styles.title}>
-          Verify Your Email
-        </Text>
+        <Text style={styles.title}>Verify Your Email</Text>
         <Text style={styles.subtitle}>
           We sent a 6-digit code to{'\n'}
           <Text style={styles.emailHighlight}>{email}</Text>
@@ -112,15 +112,12 @@ export default function EmailVerificationScreen({ route, navigation }: Props) {
           {code.map((digit, index) => (
             <TextInput
               key={index}
-              ref={(ref) => {
+              ref={ref => {
                 inputRefs.current[index] = ref;
               }}
-              style={[
-                styles.codeInput,
-                digit ? styles.codeInputFilled : styles.codeInputEmpty,
-              ]}
+              style={[styles.codeInput, digit ? styles.codeInputFilled : styles.codeInputEmpty]}
               value={digit}
-              onChangeText={(text) => handleCodeChange(text, index)}
+              onChangeText={text => handleCodeChange(text, index)}
               onKeyPress={({ nativeEvent: { key } }) => handleKeyPress(key, index)}
               keyboardType="number-pad"
               maxLength={1}
@@ -131,62 +128,40 @@ export default function EmailVerificationScreen({ route, navigation }: Props) {
         </View>
 
         {/* Error Message */}
-        {error && (
-          <Text style={styles.error}>
-            {error}
-          </Text>
-        )}
+        {error && <Text style={styles.error}>{error}</Text>}
+        {codeError && <Text style={styles.error}>{codeError}</Text>}
 
         {/* Verify Button */}
         <TouchableOpacity
-          style={[
-            styles.button,
-            (isLoading || code.some((d) => !d)) && styles.buttonDisabled,
-          ]}
+          style={[styles.button, (isLoading || code.some(d => !d)) && styles.buttonDisabled]}
           onPress={() => handleVerify()}
-          disabled={isLoading || code.some((d) => !d)}
+          disabled={isLoading || code.some(d => !d)}
         >
           {isLoading ? (
             <ActivityIndicator color={theme.colors.background} />
           ) : (
-            <Text style={styles.buttonText}>
-              Verify Email
-            </Text>
+            <Text style={styles.buttonText}>Verify Email</Text>
           )}
         </TouchableOpacity>
 
         {/* Resend Code */}
         <View style={styles.resendContainer}>
-          <Text style={styles.resendText}>
-            Didn't receive the code?{' '}
-          </Text>
-          <TouchableOpacity
-            onPress={handleResend}
-            disabled={isResending || cooldown > 0}
-          >
+          <Text style={styles.resendText}>Didn't receive the code? </Text>
+          <TouchableOpacity onPress={handleResend} disabled={isResending || cooldown > 0}>
             <Text
               style={[
                 styles.resendLink,
                 (isResending || cooldown > 0) && styles.resendLinkDisabled,
               ]}
             >
-              {cooldown > 0
-                ? `Resend in ${cooldown}s`
-                : isResending
-                  ? 'Sending...'
-                  : 'Resend Code'}
+              {cooldown > 0 ? `Resend in ${cooldown}s` : isResending ? 'Sending...' : 'Resend Code'}
             </Text>
           </TouchableOpacity>
         </View>
 
         {/* Back to Login */}
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.navigate('Login')}
-        >
-          <Text style={styles.backText}>
-            Back to Login
-          </Text>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Login')}>
+          <Text style={styles.backText}>Back to Login</Text>
         </TouchableOpacity>
       </View>
     </View>

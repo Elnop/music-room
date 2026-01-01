@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -10,6 +10,7 @@ import { privacyApi, ApiError } from '@/services/privacyApi';
 import { Button } from '@components/common/Button';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
 import { VisibilityToggle } from '@components/profile/VisibilityToggle';
+import { showError } from '@utils/toast';
 
 export function PrivacySettingsScreen() {
   const { theme } = useTheme();
@@ -33,9 +34,8 @@ export function PrivacySettingsScreen() {
         setPrivacy(data);
         setInitialPrivacy(data);
       } catch (error) {
-        const message =
-          error instanceof ApiError ? error.message : 'Unable to load settings';
-        Alert.alert('Error', message);
+        const message = error instanceof ApiError ? error.message : 'Unable to load settings';
+        showError(message);
       } finally {
         setIsLoading(false);
       }
@@ -77,9 +77,8 @@ export function PrivacySettingsScreen() {
       setInitialPrivacy(privacy);
       navigation.goBack();
     } catch (error) {
-      const message =
-        error instanceof ApiError ? error.message : 'Unable to save settings';
-      Alert.alert('Error', message);
+      const message = error instanceof ApiError ? error.message : 'Unable to save settings';
+      showError(message);
     } finally {
       setIsSaving(false);
     }

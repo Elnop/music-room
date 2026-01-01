@@ -8,8 +8,11 @@ import {
   facebookLoginSchema,
   verifyEmailSchema,
   resendVerificationSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
 } from "@/features/auth/auth.validators.js";
 import { EmailVerificationService } from "@/features/auth/services/email-verification.service.js";
+import { PasswordResetService } from "@/features/auth/services/password-reset.service.js";
 import { supabase } from "@/shared/config/supabase.js";
 import type { ApiResponse } from "@/shared/types/global.types.js";
 import type { AuthenticatedRequest } from "@/shared/types/global.types.js";
@@ -494,6 +497,116 @@ export class AuthController {
       res.json(response);
     } catch (error) {
       logger.error("Resend verification error", { error });
+      next(error);
+    }
+  }
+
+  /**
+   * POST /api/auth/forgot-password
+   * Request password reset (send email with code)
+   */
+  async forgotPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const validated = forgotPasswordSchema.parse(req.body);
+      const ip = req.ip || req.socket.remoteAddress || "unknown";
+
+      logger.info("Forgot password request", {
+        email: validated.email,
+        ip,
+      });
+
+      const passwordResetService = new PasswordResetService();
+      await passwordResetService.requestPasswordReset(validated.email, ip);
+
+      // Always return success (prevent email enumeration)
+      const response: ApiResponse = {
+        success: true,
+        data: {
+          message: "If this email exists, a reset code has been sent.",
+        },
+        meta: {
+          timestamp: new Date().toISOString(),
+        },
+      };
+
+      res.json(response);
+    } catch (error) {
+      logger.error("Forgot password error", { error });
+      next(error);
+    }
+  }
+
+  /**
+   * POST /api/auth/reset-password
+   * Reset password with code
+   */
+  async resetPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const validated = resetPasswordSchema.parse(req.body);
+      const ip = req.ip || req.socket.remoteAddress || "unknown";
+
+      logger.info("Reset password request", {
+        email: validated.email,
+        ip,
+      });
+
+      const passwordResetService = new PasswordResetService();
+      await passwordResetService.resetPassword(
+        validated.email,
+        validated.code,
+        validated.newPassword,
+        ip
+      );
+
+      logger.info("Password reset successful", { email: validated.email });
+
+      const response: ApiResponse = {
+        success: true,
+        data: {
+          message:
+            "Password reset successful. You can now log in with your new password.",
+        },
+        meta: {
+          timestamp: new Date().toISOString(),
+        },
+      };
+
+      res.json(response);
+    } catch (error) {
+      logger.error("Reset password error", { error });
+      next(error);
+    }
+  }
+
+  /**
+   * GET /api/auth/reset-password/can-resend
+   * Check if user can resend reset code
+   */
+  async canResendResetCode(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { email } = req.query;
+      const ip = req.ip || req.socket.remoteAddress || "unknown";
+
+      if (!email || typeof email !== "string") {
+        throw new AppError(400, "Email is required", "EMAIL_REQUIRED");
+      }
+
+      logger.info("Check resend reset code", { email, ip });
+
+      const passwordResetService = new PasswordResetService();
+      const result = await passwordResetService.canResendCode(email, ip);
+
+      const response: ApiResponse = {
+        success: true,
+        data: result,
+        meta: {
+          timestamp: new Date().toISOString(),
+        },
+      };
+
+      res.json(response);
+    } catch (error) {
+      logger.error("Can resend reset code error", { error });
       next(error);
     }
   }

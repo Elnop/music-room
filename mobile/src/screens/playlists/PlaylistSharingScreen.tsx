@@ -5,10 +5,10 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
-  Alert,
   Switch,
   ScrollView,
 } from 'react-native';
+import { showError, showWarning, showSuccess } from '@utils/toast';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useFocusEffect } from '@react-navigation/native';
 import debounce from 'lodash/debounce';
@@ -21,6 +21,7 @@ import { profileApi } from '@services/profileApi';
 import { playlistApi, ViewerProfile } from '@api/playlistApi';
 import { SearchBar } from '@components/common/SearchBar';
 import { Avatar } from '@components/common/Avatar';
+import { SwipeableUserItem } from '@components/common/SwipeableUserItem';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
 import type { UserProfile } from '@/types/user.types';
 
@@ -105,7 +106,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
       await fetchPlaylistById(playlistId);
     } catch (error) {
       console.error('[PlaylistSharing] Failed to fetch playlist:', error);
-      Alert.alert('Error', 'Unable to load playlist');
+      showError('Impossible de charger la playlist');
       setIsLoading(false);
       loadingRef.current = false;
       return;
@@ -238,11 +239,8 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
       }
     } catch (err) {
       setMembers(prev => prev.filter(m => m.id !== user.id));
-      Alert.alert(
-        'Error',
-        err instanceof Error ? err.message : 'Unable to add user'
-      );
-    } finally {
+      showError(err instanceof Error ? err.message : 'Impossible d\'ajouter l\'utilisateur');
+    } finally{
       setProcessingUserId(null);
     }
   };
@@ -253,42 +251,33 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
     const member = members.find(m => m.id === userId);
     if (!member) return;
 
-    const userName = member.displayName || member.username || 'this user';
+    // Swipe-to-delete: direct removal without confirmation
+    const originalMembers = [...members];
 
-    Alert.alert('Remove access', `Remove ${userName} from the playlist?`, [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Remove',
-        style: 'destructive',
-        onPress: async () => {
-          const originalMembers = [...members];
+    setMembers(prev => prev.filter(m => m.id !== userId));
+    setProcessingUserId(userId);
 
-          setMembers(prev => prev.filter(m => m.id !== userId));
-          setProcessingUserId(userId);
-
-          try {
-            if (isPrivate) {
-              if (member.canEdit) {
-                await playlistApi.removeCollaborator(playlistId, userId);
-              }
-              try {
-                await playlistApi.removeViewer(playlistId, userId);
-              } catch (_error) {
-                // Viewer may not exist, which is acceptable - ignore error
-              }
-            } else {
-              await playlistApi.removeCollaborator(playlistId, userId);
-            }
-          } catch (error) {
-            console.error('[PlaylistSharing] Remove failed:', error);
-            setMembers(originalMembers);
-            Alert.alert('Error', 'Unable to remove user');
-          } finally {
-            setProcessingUserId(null);
-          }
-        },
-      },
-    ]);
+    try {
+      if (isPrivate) {
+        if (member.canEdit) {
+          await playlistApi.removeCollaborator(playlistId, userId);
+        }
+        try {
+          await playlistApi.removeViewer(playlistId, userId);
+        } catch (_error) {
+          // Viewer may not exist, which is acceptable - ignore error
+        }
+      } else {
+        await playlistApi.removeCollaborator(playlistId, userId);
+      }
+      showSuccess('Utilisateur retiré');
+    } catch (error) {
+      console.error('[PlaylistSharing] Remove failed:', error);
+      setMembers(originalMembers);
+      showError('Impossible de retirer l\'utilisateur');
+    } finally {
+      setProcessingUserId(null);
+    }
   };
 
   const handleToggleVisibility = async () => {
@@ -298,22 +287,9 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 
     // If switching to public, warn about removing access restrictions
     if (isPrivate) {
-      Alert.alert(
-        'Make public',
-        'This playlist will be visible to everyone. People with current access will keep it.',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Confirm',
-            onPress: async () => {
-              await performVisibilityUpdate(newVisibility);
-            },
-          },
-        ]
-      );
-    } else {
-      await performVisibilityUpdate(newVisibility);
+      showWarning('Playlist public : visible par tous');
     }
+    await performVisibilityUpdate(newVisibility);
   };
 
   const performVisibilityUpdate = async (newVisibility: 'public' | 'private') => {
@@ -323,7 +299,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
       await fetchPlaylistById(playlistId);
     } catch (error) {
       console.error('[PlaylistSharing] Failed to update visibility:', error);
-      Alert.alert('Error', 'Unable to change visibility');
+      showError('Impossible de changer la visibilité');
     } finally {
       setIsUpdatingSettings(false);
     }
@@ -337,21 +313,11 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
     // If switching to open, warn about giving everyone edit access
     if (isEditRestricted) {
       const message = isPrivate
-        ? 'All people with access will be able to edit this playlist.'
-        : 'Everyone will be able to edit this playlist.';
-
-      Alert.alert('Open editing', message, [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Confirm',
-          onPress: async () => {
-            await performEditModeUpdate(newEditMode);
-          },
-        },
-      ]);
-    } else {
-      await performEditModeUpdate(newEditMode);
+        ? 'Tous les membres pourront éditer'
+        : 'Tout le monde pourra éditer';
+      showWarning(message);
     }
+    await performEditModeUpdate(newEditMode);
   };
 
   const performEditModeUpdate = async (newEditMode: 'open' | 'restricted') => {
@@ -361,7 +327,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
       await fetchPlaylistById(playlistId);
     } catch (error) {
       console.error('[PlaylistSharing] Failed to update edit mode:', error);
-      Alert.alert('Error', 'Unable to change edit mode');
+      showError('Impossible de changer le mode édition');
     } finally {
       setIsUpdatingSettings(false);
     }
@@ -392,7 +358,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
     } catch (error) {
       console.error('[PlaylistSharing] Toggle failed:', error);
       setMembers(originalMembers);
-      Alert.alert('Error', 'Unable to change permissions');
+      showError('Impossible de changer les permissions');
     } finally {
       setProcessingUserId(null);
     }
@@ -418,42 +384,19 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 
   const renderMemberItem = ({ item }: { item: Member }) => {
     const isProcessing = processingUserId === item.id;
+    const role = item.canEdit ? 'collaborator' : 'viewer';
 
     return (
-      <View style={[styles.memberItem, isProcessing && styles.memberItemProcessing]}>
-        <Avatar size="md" name={item.displayName || item.username} uri={item.avatarUrl} />
-        <View style={styles.userInfo}>
-          <Text style={styles.username}>{item.username}</Text>
-          {item.displayName && <Text style={styles.displayName}>{item.displayName}</Text>}
-        </View>
-
-        {showEditToggle && (
-          <View style={styles.editToggleContainer}>
-            <Text style={styles.editLabel}>Edit</Text>
-            {isProcessing ? (
-              <View style={styles.switchPlaceholder}>
-                <LoadingSpinner size="small" />
-              </View>
-            ) : (
-              <Switch
-                value={item.canEdit}
-                onValueChange={() => handleToggleEdit(item.id, item.canEdit)}
-                disabled={!!processingUserId}
-                trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
-                thumbColor={theme.colors.surface}
-              />
-            )}
-          </View>
-        )}
-
-        <TouchableOpacity
-          style={styles.removeButton}
-          onPress={() => handleRemoveUser(item.id)}
-          disabled={!!processingUserId}
-        >
-          <Ionicons name="close" size={20} color="#FFFFFF" />
-        </TouchableOpacity>
-      </View>
+      <SwipeableUserItem
+        user={{
+          id: item.id,
+          username: item.username,
+          display_name: item.displayName,
+          avatar_url: item.avatarUrl,
+        }}
+        role={role}
+        onRemove={handleRemoveUser}
+      />
     );
   };
 
@@ -474,9 +417,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
           <View style={styles.settingTextContainer}>
             <Text style={styles.settingLabel}>Visibility</Text>
             <Text style={styles.settingDescription}>
-              {isPrivate
-                ? 'Private - Only invited people can see'
-                : 'Public - Visible to everyone'}
+              {isPrivate ? 'Private - Only invited people can see' : 'Public - Visible to everyone'}
             </Text>
           </View>
         </View>
@@ -547,8 +488,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
     if (isPrivate && !isEditRestricted) {
       return {
         title: 'Access',
-        subtitle:
-          'Manage who can see and edit this private playlist. All guests can edit.',
+        subtitle: 'Manage who can see and edit this private playlist. All guests can edit.',
       };
     }
     if (!isPrivate && isEditRestricted) {

@@ -6,7 +6,6 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Alert,
   Switch,
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
@@ -20,6 +19,7 @@ import { Button } from '@components/common/Button';
 import { Input } from '@components/common/Input';
 import { playlistFormSchema, type PlaylistFormInput } from '@utils/validators';
 import type { EditMode } from '@/types/playlist.types';
+import { showError } from '@utils/toast';
 
 // Playlist field limits
 const PLAYLIST_LIMITS = {
@@ -66,7 +66,7 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
 
   const onSubmit = async (data: PlaylistFormInput) => {
     if (!user) {
-      Alert.alert('Error', 'You must be logged in to create a playlist');
+      showError('Connexion requise pour créer une playlist');
       return;
     }
 
@@ -82,7 +82,7 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
       navigation.goBack();
     } catch (error) {
       console.error('[CreatePlaylistScreen] Create playlist failed:', error);
-      Alert.alert('Error', 'Unable to create playlist');
+      showError('Impossible de créer la playlist');
     }
   };
 
@@ -148,9 +148,7 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
                   <View style={styles.toggleInfo}>
                     <Text style={styles.toggleLabel}>Private playlist</Text>
                     <Text style={styles.toggleDescription}>
-                      {isPrivate
-                        ? 'Visible only to invited people'
-                        : 'Visible to all users'}
+                      {isPrivate ? 'Visible only to invited people' : 'Visible to all users'}
                     </Text>
                   </View>
                   <Switch

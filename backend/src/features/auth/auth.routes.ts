@@ -123,4 +123,31 @@ router.post("/resend-verification", registerRateLimiter, (req, res, next) =>
   authController.resendVerification(req, res, next),
 );
 
+/**
+ * @route   POST /api/auth/forgot-password
+ * @desc    Request password reset (send email with code)
+ * @access  Public
+ */
+router.post("/forgot-password", globalAuthRateLimiter, (req, res, next) =>
+  authController.forgotPassword(req, res, next),
+);
+
+/**
+ * @route   POST /api/auth/reset-password
+ * @desc    Reset password with code and new password
+ * @access  Public
+ */
+router.post("/reset-password", globalAuthRateLimiter, (req, res, next) =>
+  authController.resetPassword(req, res, next),
+);
+
+/**
+ * @route   GET /api/auth/reset-password/can-resend
+ * @desc    Check if user can resend reset code (cooldown check)
+ * @access  Public
+ */
+router.get("/reset-password/can-resend", globalAuthRateLimiter, (req, res, next) =>
+  authController.canResendResetCode(req, res, next),
+);
+
 export default router;

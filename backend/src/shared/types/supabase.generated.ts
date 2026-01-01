@@ -288,6 +288,8 @@ export type Database = {
           google_id: string | null
           has_password: boolean | null
           id: string
+          password_reset_code: string | null
+          password_reset_code_expires_at: string | null
           updated_at: string | null
           username: string
           verification_code: string | null
@@ -306,6 +308,8 @@ export type Database = {
           google_id?: string | null
           has_password?: boolean | null
           id: string
+          password_reset_code?: string | null
+          password_reset_code_expires_at?: string | null
           updated_at?: string | null
           username: string
           verification_code?: string | null
@@ -324,6 +328,8 @@ export type Database = {
           google_id?: string | null
           has_password?: boolean | null
           id?: string
+          password_reset_code?: string | null
+          password_reset_code_expires_at?: string | null
           updated_at?: string | null
           username?: string
           verification_code?: string | null

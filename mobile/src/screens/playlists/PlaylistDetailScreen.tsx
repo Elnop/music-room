@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
-import { View, FlatList, StyleSheet, Alert, Pressable } from 'react-native';
+import { View, FlatList, StyleSheet, Pressable } from 'react-native';
+import { showError, showSuccess } from '@utils/toast';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -16,7 +17,7 @@ import { useAuthStore } from '@store/authStore';
 import { usePlayerStore } from '@store/playerStore';
 import { usePlaylistSocket } from '@hooks/usePlaylistSocket';
 import { PlaylistHeader } from '@components/playlist/PlaylistHeader';
-import { TrackItem } from '@components/playlist/TrackItem';
+import { SwipeableTrackItem } from '@components/common/SwipeableTrackItem';
 import { EmptyState } from '@components/common/EmptyState';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
 
@@ -160,25 +161,18 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 
   const handleDeleteTrack = async (trackId: string) => {
     if (!canEdit) {
-      Alert.alert('Permission denied', 'You cannot edit this playlist');
+      showError('Vous ne pouvez pas éditer cette playlist');
       return;
     }
 
-    Alert.alert('Delete track', 'Do you really want to delete this track from the playlist?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await removeTrack(id, trackId);
-          } catch (error) {
-            console.error('[PlaylistDetailScreen] Remove track failed:', error);
-            Alert.alert('Error', 'Unable to delete track');
-          }
-        },
-      },
-    ]);
+    // Swipe-to-delete: direct removal without confirmation
+    try {
+      await removeTrack(id, trackId);
+      showSuccess('Track supprimé');
+    } catch (error) {
+      console.error('[PlaylistDetailScreen] Remove track failed:', error);
+      showError('Impossible de supprimer le track');
+    }
   };
 
   // Gradient colors based on extracted dominant color
@@ -221,15 +215,11 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
         data={currentPlaylist.tracks}
         keyExtractor={item => item.id}
         renderItem={({ item }) => {
-          const isCurrentlyPlaying = currentTrack?.permalink_url === item.trackUri;
           return (
-            <TrackItem
+            <SwipeableTrackItem
               track={item}
-              showDelete={canEdit}
               onDelete={() => handleDeleteTrack(item.id)}
-              onPlay={() => handlePlayTrack(item)}
-              isPlaying={isCurrentlyPlaying && isPlaying}
-              isLoading={isCurrentlyPlaying && playerLoading}
+              disabled={!canEdit}
             />
           );
         }}

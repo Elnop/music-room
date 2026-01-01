@@ -371,4 +371,43 @@ export const authApi = {
       }),
     });
   },
+
+  /**
+   * Request password reset (send email with code)
+   */
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    return apiRequest('/api/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  },
+
+  /**
+   * Reset password with code
+   */
+  async resetPassword(
+    email: string,
+    code: string,
+    newPassword: string
+  ): Promise<{ message: string }> {
+    return apiRequest('/api/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({
+        email,
+        code,
+        newPassword,
+      }),
+    });
+  },
+
+  /**
+   * Check if user can resend reset code
+   */
+  async canResendResetCode(
+    email: string
+  ): Promise<{ canResend: boolean; remainingSeconds: number }> {
+    return apiRequest(`/api/auth/reset-password/can-resend?email=${encodeURIComponent(email)}`, {
+      method: 'GET',
+    });
+  },
 };

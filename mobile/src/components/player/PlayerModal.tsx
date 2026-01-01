@@ -186,7 +186,9 @@ export function PlayerModal() {
               </View>
             </TouchableOpacity>
 
-            <Text style={[styles.nowPlayingText, { color: colors.textSecondary }]}>NOW PLAYING</Text>
+            <Text style={[styles.nowPlayingText, { color: colors.textSecondary }]}>
+              NOW PLAYING
+            </Text>
           </View>
 
           {/* Main content centered */}

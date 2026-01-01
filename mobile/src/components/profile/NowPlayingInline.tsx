@@ -118,4 +118,3 @@ const createStyles = (theme: Theme) =>
       alignItems: 'center',
     },
   });
-

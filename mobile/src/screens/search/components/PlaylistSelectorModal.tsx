@@ -6,9 +6,9 @@ import {
   FlatList,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
+import { showError } from '@utils/toast';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@/themes/types';
 import { usePlaylistStore } from '@/store/playlistStore';
@@ -106,8 +106,8 @@ export function PlaylistSelectorModal({ visible, track, onClose }: Props) {
 
       const errorMessage = parseApiError(error);
 
-      Alert.alert('Error', errorMessage, [{ text: 'OK' }]);
-    } finally {
+      showError(errorMessage);
+    } finally{
       setIsAdding(false);
     }
   };

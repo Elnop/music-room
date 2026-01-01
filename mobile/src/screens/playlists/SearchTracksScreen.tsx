@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Text,
   TextInput,
-  Alert,
   Image,
   ActivityIndicator,
 } from 'react-native';
@@ -22,6 +21,7 @@ import { LoadingSpinner } from '@components/common/LoadingSpinner';
 import debounce from 'lodash/debounce';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import type { Track } from '@/types/track.types';
+import { showError } from '@utils/toast';
 
 type NewTrackInput = Omit<Track, 'id'> & { id?: string };
 
@@ -129,7 +129,7 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 
       setAddedTrackUris(prev => new Set(prev).add(track.permalink_url));
     } catch (error) {
-      Alert.alert('Error', getErrorMessage(error));
+      showError(getErrorMessage(error));
     } finally {
       setAddingTrackId(null);
     }

@@ -6,7 +6,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Alert,
   TouchableOpacity,
   Image,
 } from 'react-native';
@@ -20,6 +19,7 @@ import { Input } from '@components/common/Input';
 import { FormError } from '@components/common/FormError';
 import { registerSchema, RegisterInput } from '@utils/validators';
 import { useAuthStore } from '@/store/authStore';
+import { showError } from '@utils/toast';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Logo = require('@/assets/logo/logo.png');
@@ -56,10 +56,11 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
     },
   });
 
-  // Show error alert
+  // Show error toast
   useEffect(() => {
     if (error) {
-      Alert.alert('Registration Failed', error, [{ text: 'OK', onPress: clearError }]);
+      showError(error);
+      clearError();
     }
   }, [error, clearError]);
 

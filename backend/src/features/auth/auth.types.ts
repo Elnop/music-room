@@ -141,5 +141,83 @@ export interface SupabaseUser {
 	role?: string;
 }
 
+// ============================================
+// Supabase Admin Auth API Types
+// ============================================
+
+/**
+ * Supabase Auth User from Admin API
+ * Represents a user record from auth.admin.listUsers()
+ *
+ * Note: Admin Auth API is not covered by Database types
+ * These types must be maintained manually
+ */
+export interface SupabaseAuthUser {
+	id: string;
+	email?: string;
+	created_at: string;
+	updated_at: string;
+	email_confirmed_at?: string;
+	phone?: string;
+	confirmed_at?: string;
+	last_sign_in_at?: string;
+	app_metadata?: Record<string, unknown>;
+	user_metadata?: Record<string, unknown>;
+}
+
+/**
+ * Response from auth.admin.listUsers()
+ */
+export interface SupabaseAdminUsersResponse {
+	users: SupabaseAuthUser[];
+	aud: string;
+}
+
+/**
+ * Response from auth.admin.updateUserById()
+ */
+export interface SupabaseAdminUpdateResponse {
+	user: SupabaseAuthUser;
+}
+
+// ============================================
+// Password Reset Types
+// ============================================
+
+/**
+ * Internal DTO for password reset code metadata
+ */
+export interface ResetCodeMetadata {
+	userId: string;
+	code: string;
+	expiresAt: Date;
+	createdAt: Date;
+}
+
+/**
+ * Response when requesting password reset
+ */
+export interface PasswordResetRequestResponse {
+	success: true;
+	message: string;
+	expiresInMinutes: number;
+}
+
+/**
+ * Response after successful password reset
+ */
+export interface PasswordResetResponse {
+	success: true;
+	message: string;
+}
+
+/**
+ * Response for checking if code can be resent
+ */
+export interface ResendCodeEligibility {
+	canResend: boolean;
+	remainingSeconds?: number;
+}
+
 // DbUserProfile has been replaced by UserProfileRow (from generated types)
 // Use UserProfileRow for database operations instead

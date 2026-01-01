@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Switch, Alert } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Switch } from 'react-native';
+import { showError } from '@utils/toast';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import debounce from 'lodash/debounce';
@@ -91,7 +92,7 @@ export function FriendsScreen() {
       }
     } catch (err) {
       console.error('[FriendsScreen] Failed to toggle control:', err);
-      Alert.alert('Error', 'Unable to modify permissions');
+      showError('Impossible de modifier les permissions');
     } finally {
       setTogglingUserId(null);
     }

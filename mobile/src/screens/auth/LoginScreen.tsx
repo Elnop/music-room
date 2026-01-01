@@ -6,7 +6,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Alert,
   TouchableOpacity,
   Image,
 } from 'react-native';
@@ -22,7 +21,7 @@ import { FormError } from '@components/common/FormError';
 import { loginSchema, LoginInput } from '@utils/validators';
 import { useAuthStore } from '@/store/authStore';
 import { ApiError } from '@services/api';
-import { RouteProp } from '@react-navigation/native';
+import { showError, showWarning } from '@utils/toast';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Logo = require('@/assets/logo/logo.png');
@@ -68,16 +67,11 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
     };
   }, []);
 
-  // Show error alert only when screen is focused and mounted
+  // Show error toast only when screen is focused and mounted
   useEffect(() => {
     if (error && isFocused && isMounted.current) {
-      // Small delay to ensure Activity is attached
-      const timer = setTimeout(() => {
-        if (isMounted.current && isFocused) {
-          Alert.alert('Login Failed', error, [{ text: 'OK', onPress: clearError }]);
-        }
-      }, 100);
-      return () => clearTimeout(timer);
+      showError(error);
+      clearError();
     }
   }, [error, clearError, isFocused]);
 
@@ -93,29 +87,20 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
         const details = error.details as { userId?: string; email?: string } | undefined;
 
         if (details?.userId && details?.email) {
-          // Show alert with option to resend verification code
-          Alert.alert(
-            'Email Not Verified',
-            'Your email address has not been verified yet. Would you like to receive a new verification code?',
-            [
-              { text: 'Cancel', style: 'cancel', onPress: clearError },
-              {
-                text: 'Resend Code',
-                onPress: () => {
-                  clearError();
-                  navigation.navigate('EmailVerification', {
-                    userId: details.userId!,
-                    email: details.email!,
-                  });
-                },
-              },
-            ]
-          );
+          // Show warning toast and navigate to verification screen
+          showWarning('Email non vérifié. Redirection...');
+          clearError();
+          setTimeout(() => {
+            navigation.navigate('EmailVerification', {
+              userId: details.userId!,
+              email: details.email!,
+            });
+          }, 1500);
           return;
         }
       }
 
-      // Error shown via alert (from auth store)
+      // Error shown via toast (from auth store)
     }
   };
 
@@ -199,6 +184,14 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
                 variant="primary"
               />
 
+              {/* Forgot Password Link */}
+              <TouchableOpacity
+                onPress={() => navigation.navigate('ForgotPassword')}
+                style={styles.forgotPasswordButton}
+              >
+                <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+              </TouchableOpacity>
+
               {/* Divider */}
               <View style={styles.divider}>
                 <View style={styles.dividerLine} />
@@ -281,6 +274,16 @@ const createStyles = (theme: Theme) =>
       fontSize: theme.typography.sizes.sm,
       color: theme.colors.primary,
       fontWeight: theme.typography.weights.semibold,
+    },
+    forgotPasswordButton: {
+      alignItems: 'center',
+      marginTop: 16,
+      marginBottom: 8,
+    },
+    forgotPasswordText: {
+      fontSize: 14,
+      color: theme.colors.primary,
+      fontWeight: '600',
     },
     divider: {
       flexDirection: 'row',

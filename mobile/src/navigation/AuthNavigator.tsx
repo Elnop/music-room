@@ -4,7 +4,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { WelcomeScreen } from '@screens/auth/WelcomeScreen';
 import { LoginScreen } from '@screens/auth/LoginScreen';
 import { RegisterScreen } from '@screens/auth/RegisterScreen';
-import EmailVerificationScreen from '@screens/auth/EmailVerificationScreen';
+import { EmailVerificationScreen } from '@screens/auth/EmailVerificationScreen';
+import { ForgotPasswordScreen } from '@screens/auth/ForgotPasswordScreen';
+import { ResetPasswordScreen } from '@screens/auth/ResetPasswordScreen';
 import { useTheme } from '@/contexts/ThemeContext';
 
 export type AuthStackParamList = {
@@ -12,6 +14,8 @@ export type AuthStackParamList = {
   Login: undefined;
   Register: undefined;
   EmailVerification: { userId: string; email: string };
+  ForgotPassword: undefined;
+  ResetPassword: { email: string };
 };
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
@@ -44,6 +48,16 @@ export function AuthNavigator() {
         name="EmailVerification"
         component={EmailVerificationScreen}
         options={{ title: 'Verify Email' }}
+      />
+      <Stack.Screen
+        name="ForgotPassword"
+        component={ForgotPasswordScreen}
+        options={{ title: 'Forgot Password' }}
+      />
+      <Stack.Screen
+        name="ResetPassword"
+        component={ResetPasswordScreen}
+        options={{ title: 'Reset Password' }}
       />
     </Stack.Navigator>
   );
