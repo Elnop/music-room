@@ -1,23 +1,14 @@
 /**
  * Mail feature types
  *
- * Minimal types for rate limiting only.
  * Email templates are now inline functions - no registry needed.
+ * Rate limiting types moved to shared.
  */
 
 /**
- * Rate limit configuration
+ * Re-export rate limiting types from shared for backward compatibility
  */
-export interface RateLimitConfig {
-	maxAttempts: number;
-	windowSeconds: number;
-}
-
-/**
- * Rate limit check result
- */
-export interface RateLimitResult {
-	canProceed: boolean;
-	remainingSeconds?: number;
-	attempts?: number;
-}
+export type {
+  RateLimitConfig,
+  RateLimitResult,
+} from "@/shared/types/rate-limit.types.js";

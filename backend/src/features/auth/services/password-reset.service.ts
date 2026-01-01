@@ -19,7 +19,7 @@
 import crypto from "crypto";
 import { supabaseAdmin } from "@/shared/config/supabase.js";
 import { sendPasswordResetEmail } from "@/features/mail/mail.service.js";
-import { RateLimiterService } from "@/features/mail/services/rate-limiter.service.js";
+import { RateLimiterService } from "@/shared/services/rate-limiter.service.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
 import { logger } from "@/shared/utils/logger.js";
 import type {

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { bruteForceService } from "@/features/auth/services/brute-force.service.js";
+import { bruteForceService } from "@/shared/services/brute-force.service.js";
 import { logger } from "@/shared/utils/logger.js";
 
 /**

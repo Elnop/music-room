@@ -1,17 +1,12 @@
 import { supabaseAdmin } from "@/shared/config/supabase.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
 import { logger } from "@/shared/utils/logger.js";
-import { PlaylistPermissions } from "@/features/playlists/permissions/playlist.permissions.js";
+import { checkOwnership } from "@/features/playlists/permissions/playlist.permissions.js";
 
 /**
  * Service for managing playlist collaborators
  */
 export class CollaboratorService {
-  private permissions: PlaylistPermissions;
-
-  constructor() {
-    this.permissions = new PlaylistPermissions();
-  }
 
   /**
    * Add collaborator to playlist
@@ -23,7 +18,7 @@ export class CollaboratorService {
   ): Promise<void> {
     try {
       // Only owner can add collaborators
-      await this.permissions.checkOwnership(playlistId, userId);
+      await checkOwnership(playlistId, userId);
 
       // Verify collaborator exists
       const { data: user, error: userError } = await supabaseAdmin
@@ -92,7 +87,7 @@ export class CollaboratorService {
   ): Promise<void> {
     try {
       // Only owner can remove collaborators
-      await this.permissions.checkOwnership(playlistId, userId);
+      await checkOwnership(playlistId, userId);
 
       // Get current playlist
       const { data: playlist, error: playlistError } = await supabaseAdmin

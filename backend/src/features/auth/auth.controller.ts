@@ -17,7 +17,7 @@ import { supabase } from "@/shared/config/supabase.js";
 import type { ApiResponse } from "@/shared/types/global.types.js";
 import type { AuthenticatedRequest } from "@/shared/types/global.types.js";
 import { logger } from "@/shared/utils/logger.js";
-import { bruteForceService } from "@/features/auth/services/brute-force.service.js";
+import { bruteForceService } from "@/shared/services/brute-force.service.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
 
 const authService = new AuthService();

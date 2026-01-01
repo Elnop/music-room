@@ -1,13 +1,18 @@
 import { redisClient, isRedisConnected } from "@/shared/config/redis.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
 import { logger } from "@/shared/utils/logger.js";
-import { RateLimitConfig, RateLimitResult } from "@/features/mail/mail.types.js";
+import type {
+  RateLimitConfig,
+  RateLimitResult,
+} from "@/shared/types/rate-limit.types.js";
 
 /**
- * Rate limiter service
+ * Generic rate limiter service
  *
- * Generic rate limiting service using Redis (with in-memory fallback).
- * Can be used for any feature requiring rate limiting (email, API calls, etc.).
+ * Shared rate limiting service using Redis (with in-memory fallback).
+ * Can be used for any feature requiring rate limiting (email, API calls, auth, etc.).
+ *
+ * Moved from features/mail to shared/services for reusability.
  */
 export class RateLimiterService {
   /**
@@ -208,7 +213,7 @@ export class RateLimiterService {
     if (!entry || entry.expiresAt < now) {
       // Create new entry
       this.inMemoryStore.set(key, { count: 1, expiresAt });
-      return { canProceed: true, attempts: 1 };
+      return { canProceed: true, remainingSeconds: windowSeconds, attempts: 1 };
     }
 
     // Increment existing entry

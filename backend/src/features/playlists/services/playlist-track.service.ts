@@ -1,7 +1,11 @@
 import { supabaseAdmin } from "@/shared/config/supabase.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
 import { logger } from "@/shared/utils/logger.js";
-import { PlaylistPermissions } from "@/features/playlists/permissions/playlist.permissions.js";
+import {
+  canEditPlaylist,
+  checkEditPermission,
+  getPlaylistForPermissionCheck,
+} from "@/features/playlists/permissions/playlist.permissions.js";
 import { reindexPositions } from "@/features/playlists/utils/playlist.helpers.js";
 import { realtime } from "@/realtime/index.js";
 import type { AddTrackDTO } from "@/features/playlists/playlist.types.js";
@@ -10,11 +14,6 @@ import type { AddTrackDTO } from "@/features/playlists/playlist.types.js";
  * Service for managing tracks in playlists
  */
 export class PlaylistTrackService {
-  private permissions: PlaylistPermissions;
-
-  constructor() {
-    this.permissions = new PlaylistPermissions();
-  }
 
   /**
    * Add track to playlist
@@ -26,10 +25,9 @@ export class PlaylistTrackService {
     track: AddTrackDTO,
   ): Promise<void> {
     try {
-      const playlist =
-        await this.permissions.getPlaylistForPermissionCheck(playlistId);
+      const playlist = await getPlaylistForPermissionCheck(playlistId);
 
-      if (!this.permissions.canEditPlaylist(playlist, userId)) {
+      if (!canEditPlaylist(playlist, userId)) {
         throw new AppError(403, "Access denied", "PLAYLIST_ACCESS_DENIED");
       }
 
@@ -129,7 +127,7 @@ export class PlaylistTrackService {
   ): Promise<void> {
     try {
       // Check permission (owner or collaborator)
-      await this.permissions.checkEditPermission(playlistId, userId);
+      await checkEditPermission(playlistId, userId);
 
       const { error } = await supabaseAdmin
         .from("playlist_tracks")
@@ -166,7 +164,7 @@ export class PlaylistTrackService {
   ): Promise<void> {
     try {
       // Check permission (owner or collaborator)
-      await this.permissions.checkEditPermission(playlistId, userId);
+      await checkEditPermission(playlistId, userId);
 
       // Verify all tracks belong to playlist
       const { data: existingTracks, error: fetchError } = await supabaseAdmin

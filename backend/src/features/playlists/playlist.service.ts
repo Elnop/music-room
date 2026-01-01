@@ -1,7 +1,10 @@
 import { supabaseAdmin } from "@/shared/config/supabase.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
 import { logger } from "@/shared/utils/logger.js";
-import { PlaylistPermissions } from "@/features/playlists/permissions/playlist.permissions.js";
+import {
+  canViewPlaylist,
+  checkOwnership,
+} from "@/features/playlists/permissions/playlist.permissions.js";
 import {
   formatPlaylistResponse,
   formatTrackResponse,
@@ -18,11 +21,6 @@ import type {
  * Service for playlist CRUD operations
  */
 export class PlaylistService {
-  private permissions: PlaylistPermissions;
-
-  constructor() {
-    this.permissions = new PlaylistPermissions();
-  }
 
   /**
    * Get all playlists for a user (owned + collaborating + viewing)
@@ -363,7 +361,7 @@ export class PlaylistService {
       }
 
       // Check permissions (if userId provided)
-      if (userId && !this.permissions.canViewPlaylist(playlist, userId)) {
+      if (userId && !canViewPlaylist(playlist, userId)) {
         throw new AppError(403, "Access denied", "PLAYLIST_ACCESS_DENIED");
       }
 
@@ -473,7 +471,7 @@ export class PlaylistService {
   ): Promise<PlaylistResponse> {
     try {
       // Only owner can update playlist metadata
-      await this.permissions.checkOwnership(playlistId, userId);
+      await checkOwnership(playlistId, userId);
 
       const updateData: Record<string, unknown> = {};
       if (data.name !== undefined) updateData.name = data.name;
@@ -517,7 +515,7 @@ export class PlaylistService {
   async deletePlaylist(playlistId: string, userId: string): Promise<void> {
     try {
       // Only owner can delete playlist
-      await this.permissions.checkOwnership(playlistId, userId);
+      await checkOwnership(playlistId, userId);
 
       const { error } = await supabaseAdmin
         .from("playlists")

@@ -1,17 +1,12 @@
 import { supabaseAdmin } from "@/shared/config/supabase.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
 import { logger } from "@/shared/utils/logger.js";
-import { PlaylistPermissions } from "@/features/playlists/permissions/playlist.permissions.js";
+import { checkOwnership } from "@/features/playlists/permissions/playlist.permissions.js";
 
 /**
  * Service for managing playlist viewers (read-only access to private playlists)
  */
 export class ViewerService {
-  private permissions: PlaylistPermissions;
-
-  constructor() {
-    this.permissions = new PlaylistPermissions();
-  }
 
   /**
    * Add viewer to playlist (allows viewing private playlist)
@@ -22,7 +17,7 @@ export class ViewerService {
     viewerId: string,
   ): Promise<void> {
     try {
-      await this.permissions.checkOwnership(playlistId, userId);
+      await checkOwnership(playlistId, userId);
 
       const { data: user, error: userError } = await supabaseAdmin
         .from("user_profiles")
@@ -96,7 +91,7 @@ export class ViewerService {
   ): Promise<void> {
     try {
       // Only owner can remove viewers
-      await this.permissions.checkOwnership(playlistId, userId);
+      await checkOwnership(playlistId, userId);
 
       // Get current playlist
       const { data: playlist, error: playlistError } = await supabaseAdmin
@@ -148,7 +143,7 @@ export class ViewerService {
     }>
   > {
     try {
-      await this.permissions.checkOwnership(playlistId, userId);
+      await checkOwnership(playlistId, userId);
 
       const { data: playlist, error: playlistError } = await supabaseAdmin
         .from("playlists")
