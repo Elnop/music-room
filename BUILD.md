@@ -528,7 +528,6 @@ Follow semantic versioning:
 - [Google Play Console](https://play.google.com/console)
 - [Android App Bundle Overview](https://developer.android.com/guide/app-bundle)
 - [Makefile Command Reference](./README.md#development-commands)
-- [Claude Code Documentation](./CLAUDE.md)
 
 ## Support
 
