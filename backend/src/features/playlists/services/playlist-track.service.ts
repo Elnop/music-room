@@ -1,6 +1,7 @@
 import { supabaseAdmin } from "@/shared/config/supabase.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
 import { logger } from "@/shared/utils/logger.js";
+import { deleteRecords } from "@/shared/utils/database.helpers.js";
 import {
   canEditPlaylist,
   checkEditPermission,
@@ -129,13 +130,13 @@ export class PlaylistTrackService {
       // Check permission (owner or collaborator)
       await checkEditPermission(playlistId, userId);
 
-      const { error } = await supabaseAdmin
-        .from("playlist_tracks")
-        .delete()
-        .eq("playlist_id", playlistId)
-        .eq("track_id", trackId);
-
-      if (error) throw error;
+      await deleteRecords(
+        supabaseAdmin,
+        "playlist_tracks",
+        { playlist_id: playlistId, track_id: trackId },
+        "Failed to remove track",
+        "TRACK_REMOVE_ERROR"
+      );
 
       // Re-index positions (close gaps)
       await reindexPositions(playlistId);

@@ -1,6 +1,7 @@
 import { supabaseAdmin } from "@/shared/config/supabase.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
 import { logger } from "@/shared/utils/logger.js";
+import { fetchSingle } from "@/shared/utils/database.helpers.js";
 import { checkOwnership } from "@/features/playlists/permissions/playlist.permissions.js";
 
 /**
@@ -21,26 +22,24 @@ export class CollaboratorService {
       await checkOwnership(playlistId, userId);
 
       // Verify collaborator exists
-      const { data: user, error: userError } = await supabaseAdmin
-        .from("user_profiles")
-        .select("id")
-        .eq("id", collaboratorId)
-        .single();
-
-      if (userError || !user) {
-        throw new AppError(404, "User not found", "USER_NOT_FOUND");
-      }
+      await fetchSingle<{ id: string }>(
+        supabaseAdmin,
+        "user_profiles",
+        { id: collaboratorId },
+        "id",
+        "User not found",
+        "USER_NOT_FOUND"
+      );
 
       // Get current playlist
-      const { data: playlist, error: playlistError } = await supabaseAdmin
-        .from("playlists")
-        .select("collaborator_ids")
-        .eq("id", playlistId)
-        .single();
-
-      if (playlistError || !playlist) {
-        throw new AppError(404, "Playlist not found", "PLAYLIST_NOT_FOUND");
-      }
+      const playlist = await fetchSingle<{ collaborator_ids: string[] | null }>(
+        supabaseAdmin,
+        "playlists",
+        { id: playlistId },
+        "collaborator_ids",
+        "Playlist not found",
+        "PLAYLIST_NOT_FOUND"
+      );
 
       // Check if already collaborator
       if ((playlist.collaborator_ids ?? []).includes(collaboratorId)) {
@@ -90,15 +89,14 @@ export class CollaboratorService {
       await checkOwnership(playlistId, userId);
 
       // Get current playlist
-      const { data: playlist, error: playlistError } = await supabaseAdmin
-        .from("playlists")
-        .select("collaborator_ids")
-        .eq("id", playlistId)
-        .single();
-
-      if (playlistError || !playlist) {
-        throw new AppError(404, "Playlist not found", "PLAYLIST_NOT_FOUND");
-      }
+      const playlist = await fetchSingle<{ collaborator_ids: string[] | null }>(
+        supabaseAdmin,
+        "playlists",
+        { id: playlistId },
+        "collaborator_ids",
+        "Playlist not found",
+        "PLAYLIST_NOT_FOUND"
+      );
 
       // Remove collaborator
       const { error: updateError } = await supabaseAdmin

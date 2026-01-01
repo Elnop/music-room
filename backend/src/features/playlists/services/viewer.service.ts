@@ -1,6 +1,7 @@
 import { supabaseAdmin } from "@/shared/config/supabase.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
 import { logger } from "@/shared/utils/logger.js";
+import { fetchSingle } from "@/shared/utils/database.helpers.js";
 import { checkOwnership } from "@/features/playlists/permissions/playlist.permissions.js";
 
 /**
@@ -19,25 +20,27 @@ export class ViewerService {
     try {
       await checkOwnership(playlistId, userId);
 
-      const { data: user, error: userError } = await supabaseAdmin
-        .from("user_profiles")
-        .select("id")
-        .eq("id", viewerId)
-        .single();
+      await fetchSingle<{ id: string }>(
+        supabaseAdmin,
+        "user_profiles",
+        { id: viewerId },
+        "id",
+        "User not found",
+        "USER_NOT_FOUND"
+      );
 
-      if (userError || !user) {
-        throw new AppError(404, "User not found", "USER_NOT_FOUND");
-      }
-
-      const { data: playlist, error: playlistError } = await supabaseAdmin
-        .from("playlists")
-        .select("viewer_ids, collaborator_ids, owner_id")
-        .eq("id", playlistId)
-        .single();
-
-      if (playlistError || !playlist) {
-        throw new AppError(404, "Playlist not found", "PLAYLIST_NOT_FOUND");
-      }
+      const playlist = await fetchSingle<{
+        viewer_ids: string[] | null;
+        collaborator_ids: string[] | null;
+        owner_id: string;
+      }>(
+        supabaseAdmin,
+        "playlists",
+        { id: playlistId },
+        "viewer_ids, collaborator_ids, owner_id",
+        "Playlist not found",
+        "PLAYLIST_NOT_FOUND"
+      );
 
       if (playlist.owner_id === viewerId) {
         throw new AppError(
@@ -94,15 +97,14 @@ export class ViewerService {
       await checkOwnership(playlistId, userId);
 
       // Get current playlist
-      const { data: playlist, error: playlistError } = await supabaseAdmin
-        .from("playlists")
-        .select("viewer_ids")
-        .eq("id", playlistId)
-        .single();
-
-      if (playlistError || !playlist) {
-        throw new AppError(404, "Playlist not found", "PLAYLIST_NOT_FOUND");
-      }
+      const playlist = await fetchSingle<{ viewer_ids: string[] | null }>(
+        supabaseAdmin,
+        "playlists",
+        { id: playlistId },
+        "viewer_ids",
+        "Playlist not found",
+        "PLAYLIST_NOT_FOUND"
+      );
 
       // Remove viewer
       const { error: updateError } = await supabaseAdmin
@@ -145,15 +147,14 @@ export class ViewerService {
     try {
       await checkOwnership(playlistId, userId);
 
-      const { data: playlist, error: playlistError } = await supabaseAdmin
-        .from("playlists")
-        .select("viewer_ids")
-        .eq("id", playlistId)
-        .single();
-
-      if (playlistError || !playlist) {
-        throw new AppError(404, "Playlist not found", "PLAYLIST_NOT_FOUND");
-      }
+      const playlist = await fetchSingle<{ viewer_ids: string[] | null }>(
+        supabaseAdmin,
+        "playlists",
+        { id: playlistId },
+        "viewer_ids",
+        "Playlist not found",
+        "PLAYLIST_NOT_FOUND"
+      );
 
       if ((playlist.viewer_ids ?? []).length === 0) {
         return [];

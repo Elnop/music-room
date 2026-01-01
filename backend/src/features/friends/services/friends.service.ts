@@ -1,6 +1,7 @@
 import { supabase } from "@/shared/config/supabase.js";
 import { AppError } from "@/shared/middleware/error-handler.js";
 import { logger } from "@/shared/utils/logger.js";
+import { deleteRecords } from "@/shared/utils/database.helpers.js";
 import type { FollowStatus, FollowActionResponse } from "@/features/friends/friends.types.js";
 
 export class FriendsService {
@@ -169,16 +170,13 @@ export class FriendsService {
     targetUserId: string
   ): Promise<FollowActionResponse> {
     try {
-      const { error: deleteError } = await supabase
-        .from("follows")
-        .delete()
-        .eq("follower_id", currentUserId)
-        .eq("following_id", targetUserId);
-
-      if (deleteError) {
-        logger.error("Failed to unfollow user", { error: deleteError });
-        throw new AppError(500, "Failed to unfollow user", "UNFOLLOW_ERROR");
-      }
+      await deleteRecords(
+        supabase,
+        "follows",
+        { follower_id: currentUserId, following_id: targetUserId },
+        "Failed to unfollow user",
+        "UNFOLLOW_ERROR"
+      );
 
       const status = await this.getFollowStatus(currentUserId, targetUserId);
 
