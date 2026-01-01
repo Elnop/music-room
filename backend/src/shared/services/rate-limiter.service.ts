@@ -155,7 +155,6 @@ export class RateLimiterService {
     const attempts = await redisClient.incr(key);
 
     if (attempts === 1) {
-      // Set expiration on first attempt
       await redisClient.expire(key, windowSeconds);
     }
 
@@ -211,12 +210,10 @@ export class RateLimiterService {
     const expiresAt = now + windowSeconds * 1000;
 
     if (!entry || entry.expiresAt < now) {
-      // Create new entry
       this.inMemoryStore.set(key, { count: 1, expiresAt });
       return { canProceed: true, remainingSeconds: windowSeconds, attempts: 1 };
     }
 
-    // Increment existing entry
     entry.count++;
     const remainingSeconds = Math.ceil((entry.expiresAt - now) / 1000);
 

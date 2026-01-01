@@ -11,34 +11,23 @@ import { realtime } from "@/realtime/index.js";
 import { connectRedis, disconnectRedis, checkRedisHealth } from "@/shared/config/redis.js";
 import { swaggerSpec, swaggerUiOptions } from "@/shared/config/swagger.config.js";
 
-// Initialize Express app
 const app = express();
-
-// Create HTTP server
 const httpServer = createServer(app);
 
 realtime.initialize(httpServer);
 
-// Initialize Redis connection
 connectRedis().catch((error) => {
   logger.error("Failed to initialize Redis", {
     error: error instanceof Error ? error.message : "Unknown error",
   });
 });
 
-// =====================================================
-// Middleware
-// =====================================================
-
-// CORS configuration
 const allowedOrigins = env.ALLOWED_ORIGINS.split(",").map((origin) =>
   origin.trim(),
 );
 
-// Add tunnel URL to allowed origins if present (tunnel mode)
 if (env.TUNNEL_URL) {
   allowedOrigins.push(env.TUNNEL_URL);
-  // Also allow exp:// protocol version for Expo
   const expUrl = env.TUNNEL_URL.replace("https://", "exp://");
   allowedOrigins.push(expUrl);
   logger.info(`🌐 Tunnel CORS enabled: ${env.TUNNEL_URL}`);
@@ -47,15 +36,12 @@ if (env.TUNNEL_URL) {
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (mobile apps, Postman, etc.)
       if (!origin) return callback(null, true);
 
-      // In development, auto-allow ngrok domains for tunnel mode
       if (env.NODE_ENV === "development" && origin.includes("ngrok")) {
         return callback(null, true);
       }
 
-      // In development, auto-allow exp:// URLs for Expo
       if (env.NODE_ENV === "development" && origin.startsWith("exp://")) {
         return callback(null, true);
       }
@@ -71,16 +57,9 @@ app.use(
   }),
 );
 
-// Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Action logging middleware (extracts platform/device/version + logs all requests)
 app.use(actionLoggerMiddleware);
-
-// =====================================================
-// Swagger API Documentation
-// =====================================================
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerUiOptions));
 
@@ -88,10 +67,6 @@ app.get('/api-docs.json', (_req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.send(swaggerSpec);
 });
-
-// =====================================================
-// Health Check
-// =====================================================
 
 app.get("/health", async (req, res) => {
   const redisHealthy = await checkRedisHealth();
@@ -107,15 +82,10 @@ app.get("/health", async (req, res) => {
   });
 });
 
-// =====================================================
-// API Routes (registered from central registry)
-// =====================================================
-
 routes.forEach(({ path, router }) => {
   app.use(path, router);
 });
 
-// 404 handler
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -129,18 +99,10 @@ app.use((req, res) => {
   });
 });
 
-// =====================================================
-// Error Handler
-// =====================================================
-
 app.use(errorHandler);
 
-// =====================================================
-// Start Server
-// =====================================================
-
 const PORT = env.PORT;
-const HOST = "0.0.0.0"; // Listen on all network interfaces (allows LAN connections)
+const HOST = "0.0.0.0";
 
 httpServer.listen(PORT, HOST, () => {
   logger.info("Zumik backend is running", {
@@ -158,7 +120,6 @@ httpServer.listen(PORT, HOST, () => {
   });
 });
 
-// Graceful shutdown
 process.on("SIGTERM", () => {
   logger.info("SIGTERM received, shutting down gracefully...");
   void disconnectRedis().then(() => {

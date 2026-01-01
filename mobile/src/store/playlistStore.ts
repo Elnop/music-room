@@ -60,7 +60,6 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
     const { playlists } = get();
     const hasCache = playlists.length > 0;
 
-    // Only show loading spinner if we have no cached data
     if (!hasCache) {
       set({ isLoading: true, error: null });
     } else {
@@ -96,24 +95,19 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
     const isCurrentPlaylistSameId = currentPlaylist?.id === id;
     const hasCache = cachedPlaylist !== undefined || isCurrentPlaylistSameId;
 
-    // If navigating to a different playlist
     if (!isCurrentPlaylistSameId) {
       if (cachedPlaylist) {
-        // We have cache for this playlist - show it immediately
         set({ currentPlaylist: cachedPlaylist, isRefreshing: true, error: null });
       } else {
-        // No cache for this playlist - clear current and show loader
         set({ currentPlaylist: null, isLoading: true, error: null });
       }
     } else {
-      // Same playlist - just refresh in background
       set({ isRefreshing: true, error: null });
     }
 
     try {
       const playlist = await playlistApi.fetchPlaylistById(id);
 
-      // Update cache and current playlist
       const newCache = new Map(get().playlistsCache);
       newCache.set(id, playlist);
 
@@ -125,7 +119,6 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch playlist';
-      // Only clear currentPlaylist if we had no cache
       if (!hasCache) {
         set({
           error: errorMessage,
@@ -153,7 +146,6 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
     try {
       const newPlaylist = await playlistApi.createPlaylist(data);
 
-      // Update state
       const { playlists } = get();
       set({
         playlists: [newPlaylist, ...playlists],
@@ -174,7 +166,6 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
     try {
       const updatedPlaylist = await playlistApi.updatePlaylist(id, data);
 
-      // Update state and cache
       const { playlists, currentPlaylist, playlistsCache } = get();
 
       const updatedCurrentPlaylist =
@@ -192,7 +183,6 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
             }
           : currentPlaylist;
 
-      // Update cache if this playlist is cached
       const newCache = new Map(playlistsCache);
       if (newCache.has(id) && updatedCurrentPlaylist) {
         newCache.set(id, updatedCurrentPlaylist);
@@ -219,7 +209,6 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
     try {
       await playlistApi.deletePlaylist(id);
 
-      // Update state and remove from cache
       const { playlists, currentPlaylist, playlistsCache } = get();
       const newCache = new Map(playlistsCache);
       newCache.delete(id);
@@ -245,9 +234,6 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 
     try {
       await playlistApi.addTrack(playlistId, track);
-
-      // Note: Removed fetchPlaylistById call to avoid race condition
-      // PlaylistDetailScreen will refresh automatically via useFocusEffect
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to add track';
       set({ error: errorMessage });
@@ -263,7 +249,6 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
     const { currentPlaylist, playlistsCache } = get();
     set({ error: null });
 
-    // Optimistic update - remove track immediately from UI
     if (currentPlaylist?.id === playlistId) {
       const updatedPlaylist = {
         ...currentPlaylist,
@@ -277,7 +262,6 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
     try {
       await playlistApi.removeTrack(playlistId, trackId);
 
-      // Silently refresh to sync with server (no loading state)
       const playlist = await playlistApi.fetchPlaylistById(playlistId);
       const newCache = new Map(get().playlistsCache);
       newCache.set(playlistId, playlist);
@@ -290,7 +274,6 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to remove track';
       set({ error: errorMessage });
-      // Revert optimistic update on error by refreshing
       if (currentPlaylist?.id === playlistId) {
         try {
           const playlist = await playlistApi.fetchPlaylistById(playlistId);
@@ -298,7 +281,6 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
           newCache.set(playlistId, playlist);
           set({ currentPlaylist: playlist, playlistsCache: newCache });
         } catch {
-          // Ignore refresh error
         }
       }
       throw error;
@@ -314,7 +296,6 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
     try {
       await playlistApi.reorderTracks(playlistId, trackIds);
 
-      // Silently refresh current playlist if it's the one being modified
       const { currentPlaylist } = get();
       if (currentPlaylist?.id === playlistId) {
         const playlist = await playlistApi.fetchPlaylistById(playlistId);

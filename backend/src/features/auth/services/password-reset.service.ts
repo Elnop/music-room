@@ -42,13 +42,11 @@ export class PasswordResetService {
     this.rateLimiter = new RateLimiterService();
   }
 
-  // Generate 6-digit code (cryptographically secure)
   generateResetCode(): string {
     const code = crypto.randomInt(100000, 999999).toString();
     return code;
   }
 
-  // Store code in database with 15-minute expiry
   async storeResetCode(userId: string, code: string): Promise<void> {
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + this.CODE_EXPIRY_MINUTES);
@@ -75,16 +73,13 @@ export class PasswordResetService {
     logger.info("Password reset code stored", { userId, expiresAt });
   }
 
-  // Request password reset (send email with code)
   async requestPasswordReset(email: string, ip: string): Promise<void> {
-    // Rate limit: 3 requests per hour per email+IP
     const requestKey = `password_reset_request:${email}:${ip}`;
     await this.rateLimiter.incrementAndCheck(requestKey, {
       maxAttempts: this.MAX_RESET_REQUESTS_PER_HOUR,
       windowSeconds: 60 * 60,
     });
 
-    // Find user by email
     const { data: authUserResponse, error: authError } =
       await supabaseAdmin.auth.admin.listUsers();
 
@@ -95,20 +90,17 @@ export class PasswordResetService {
       throw new AppError(500, "Failed to retrieve user", "USER_FETCH_ERROR");
     }
 
-    // Type assertion acceptable: Admin Auth API not typed in Database
     const authUser = authUserResponse as SupabaseAdminUsersResponse;
     const user = authUser.users.find((u) => u.email === email);
 
     if (!user) {
-      // Security: Don't reveal if email exists
       logger.warn("Password reset requested for non-existent email", {
         email,
         ip,
       });
-      return; // Return success to prevent email enumeration
+      return;
     }
 
-    // Check if user registered with OAuth only (no password)
     const { data: profile, error: profileError } = await supabaseAdmin
       .from("user_profiles")
       .select("google_id, facebook_id")
@@ -123,7 +115,6 @@ export class PasswordResetService {
       throw new AppError(500, "Failed to fetch user profile", "PROFILE_FETCH_ERROR");
     }
 
-    // Type is inferred from Database type automatically
     const typedProfile = profile as UserProfileRow | null;
 
     if (
@@ -138,31 +129,26 @@ export class PasswordResetService {
       );
     }
 
-    // Generate and store code
     const code = this.generateResetCode();
     await this.storeResetCode(user.id, code);
 
-    // Send email
     await sendPasswordResetEmail(email, code, this.CODE_EXPIRY_MINUTES);
 
     logger.info("Password reset email sent", { email, userId: user.id });
   }
 
-  // Verify reset code and update password
   async resetPassword(
     email: string,
     code: string,
     newPassword: string,
     ip: string
   ): Promise<void> {
-    // Rate limit: 5 attempts per 15 minutes per email+IP
     const attemptsKey = `password_reset_attempts:${email}:${ip}`;
     await this.rateLimiter.incrementAndCheck(attemptsKey, {
       maxAttempts: this.MAX_RESET_ATTEMPTS,
       windowSeconds: 15 * 60,
     });
 
-    // Find user by email
     const { data: authUserResponse, error: authError } =
       await supabaseAdmin.auth.admin.listUsers();
 
@@ -173,7 +159,6 @@ export class PasswordResetService {
       throw new AppError(500, "Failed to retrieve user", "USER_FETCH_ERROR");
     }
 
-    // Type assertion acceptable: Admin Auth API not typed in Database
     const authUser = authUserResponse as SupabaseAdminUsersResponse;
     const user = authUser.users.find((u) => u.email === email);
 
@@ -181,7 +166,6 @@ export class PasswordResetService {
       throw new AppError(400, "Invalid reset code", "INVALID_RESET_CODE");
     }
 
-    // Get stored code from database
     const { data: profile, error: profileError } = await supabaseAdmin
       .from("user_profiles")
       .select("password_reset_code, password_reset_code_expires_at")
@@ -196,7 +180,6 @@ export class PasswordResetService {
       );
     }
 
-    // Type inferred automatically from select()
     const resetCode = profile.password_reset_code;
     const expiresAt = profile.password_reset_code_expires_at;
 
@@ -204,13 +187,11 @@ export class PasswordResetService {
       throw new AppError(400, "Invalid or expired reset code", "INVALID_RESET_CODE");
     }
 
-    // Check expiration
     const expirationDate = new Date(expiresAt as string);
     if (expirationDate < new Date()) {
       throw new AppError(400, "Reset code has expired", "RESET_CODE_EXPIRED");
     }
 
-    // Timing-safe comparison (prevent timing attacks)
     const isValid = crypto.timingSafeEqual(
       Buffer.from(resetCode),
       Buffer.from(code)
@@ -220,7 +201,6 @@ export class PasswordResetService {
       throw new AppError(400, "Invalid reset code", "INVALID_RESET_CODE");
     }
 
-    // Update password in Supabase Auth
     const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
       user.id,
       { password: newPassword }
@@ -238,7 +218,6 @@ export class PasswordResetService {
       );
     }
 
-    // Clear reset code
     const clearData: UserProfileUpdate = {
       password_reset_code: null,
       password_reset_code_expires_at: null,
@@ -254,16 +233,13 @@ export class PasswordResetService {
         userId: user.id,
         error: clearError.message,
       });
-      // Don't throw - password already reset successfully
     }
 
-    // Reset rate limiters on success
     await this.rateLimiter.reset(attemptsKey);
 
     logger.info("Password reset successful", { userId: user.id });
   }
 
-  // Check if user can resend reset code (60-second cooldown)
   async canResendCode(
     email: string,
     ip: string
@@ -275,7 +251,6 @@ export class PasswordResetService {
       return { canResend: true, remainingSeconds: 0 };
     }
 
-    // Cooldown is RESEND_COOLDOWN_SECONDS
     const remainingSeconds = Math.max(
       0,
       this.RESEND_COOLDOWN_SECONDS - attempts
@@ -286,7 +261,6 @@ export class PasswordResetService {
     };
   }
 
-  // Record resend attempt (enforce cooldown)
   async recordResendAttempt(email: string, ip: string): Promise<void> {
     const resendKey = `password_reset_resend:${email}:${ip}`;
     await this.rateLimiter.increment(resendKey, {

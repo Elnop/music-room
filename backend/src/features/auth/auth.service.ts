@@ -36,16 +36,12 @@ export class AuthService {
         username: data.username,
       });
 
-      // 1. Check if email exists with unverified account
-      // If exists and unverified, delete it to allow re-registration
-      // This MUST be done BEFORE username check to clean up old username
       const { data: existingUser } = await supabase.auth.admin.listUsers();
       const userWithEmail = existingUser?.users?.find(
         (u) => u.email === data.email,
       );
 
       if (userWithEmail) {
-        // Check if email is verified
         const { data: profile } = await supabase
           .from("user_profiles")
           .select("email_verified")
@@ -61,20 +57,17 @@ export class AuthService {
             },
           );
 
-          // Delete old profile first (this removes the old username too)
           await supabase
             .from("user_profiles")
             .delete()
             .eq("id", userWithEmail.id);
 
-          // Delete old auth user
           await supabase.auth.admin.deleteUser(userWithEmail.id);
 
           logger.info("Old unverified account deleted successfully", {
             email: data.email,
           });
         } else {
-          // Email is verified, cannot re-register
           throw new AppError(
             409,
             "Email already registered",
@@ -83,7 +76,6 @@ export class AuthService {
         }
       }
 
-      // 2. Check if username already exists (after cleanup)
       const { data: existingProfile } = await supabase
         .from("user_profiles")
         .select("username")
@@ -94,8 +86,6 @@ export class AuthService {
         throw new AppError(409, "Username already taken", "USERNAME_TAKEN");
       }
 
-      // 3. Create user in Supabase Auth using Admin API
-      // email_confirm: false requires email verification
       const { data: authData, error: authError } =
         await supabase.auth.admin.createUser({
           email: data.email,
@@ -116,7 +106,6 @@ export class AuthService {
         );
       }
 
-      // 3. Create user profile
       const { error: profileError } = await supabase
         .from("user_profiles")
         .insert({
@@ -127,7 +116,6 @@ export class AuthService {
 
       if (profileError) {
         logger.error("Failed to create user profile", { error: profileError });
-        // Rollback: delete the auth user if profile creation fails
         await supabase.auth.admin.deleteUser(authData.user.id);
         throw new AppError(
           500,
@@ -136,7 +124,6 @@ export class AuthService {
         );
       }
 
-      // 4. Generate and send verification code
       const verificationService = new EmailVerificationService();
 
       const code = await verificationService.generateAndStore(authData.user.id);
@@ -147,7 +134,6 @@ export class AuthService {
         email: data.email,
       });
 
-      // Return response WITHOUT session (user must verify email first)
       return {
         user: {
           id: authData.user.id,
@@ -204,7 +190,6 @@ export class AuthService {
         );
       }
 
-      // Fetch user profile and check email verification
       const { data: profile, error: profileError } = await supabase
         .from("user_profiles")
         .select("*, email_verified, google_id, facebook_id")
@@ -219,8 +204,6 @@ export class AuthService {
         throw new AppError(404, "User profile not found", "PROFILE_NOT_FOUND");
       }
 
-      // Check if email/password user has verified email
-      // OAuth accounts (Google/Facebook) are auto-verified
       const isOAuthAccount = profile.google_id || profile.facebook_id;
       if (!isOAuthAccount && !profile.email_verified) {
         logger.warn("Login blocked - email not verified", {
@@ -292,10 +275,8 @@ export class AuthService {
     try {
       logger.info("Google OAuth login attempt");
 
-      // 1. Verify Google ID token
       const googlePayload = await OAuthService.verifyGoogleToken(idToken);
 
-      // 2. Create or retrieve OAuth user (includes session generation)
       const { userProfile, session } = await UserService.createOAuthUser(
         "google",
         googlePayload.sub,
@@ -311,7 +292,6 @@ export class AuthService {
         username: userProfile.username,
       });
 
-      // 3. Return formatted auth response
       return {
         user: {
           id: userProfile.id,
@@ -357,16 +337,13 @@ export class AuthService {
     try {
       logger.info("Facebook OAuth login attempt");
 
-      // 1. Verify Facebook access token
       const facebookPayload =
         await OAuthService.verifyFacebookToken(accessToken);
 
-      // 2. Create or retrieve OAuth user (includes session generation)
-      // Email may be undefined if user denied email permission
       const { userProfile, session } = await UserService.createOAuthUser(
         "facebook",
         facebookPayload.id,
-        facebookPayload.email, // May be undefined - synthetic email will be generated
+        facebookPayload.email,
         {
           name: facebookPayload.name,
           picture: facebookPayload.picture,
@@ -379,8 +356,6 @@ export class AuthService {
         hasSyntheticEmail: !facebookPayload.email,
       });
 
-      // 3. Return formatted auth response
-      // Use real email if provided, otherwise use email from session (which might be synthetic)
       const responseEmail = facebookPayload.email || session.user.email || "";
 
       return {

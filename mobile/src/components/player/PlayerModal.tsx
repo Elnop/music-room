@@ -34,7 +34,6 @@ export function PlayerModal() {
 
   const { currentTime, duration } = usePlayerProgress();
 
-  // Swipe to dismiss
   const translateY = useSharedValue(0);
 
   const closeModal = () => {
@@ -71,7 +70,6 @@ export function PlayerModal() {
     }
   }, [isModalOpen, translateY]);
 
-  // Extract colors from artwork
   const artworkUrl = currentTrack?.artwork_url || currentTrack?.user?.avatar_url || null;
   const { dominantColor } = useImageColors(artworkUrl, theme.colors.primary);
 
@@ -81,12 +79,10 @@ export function PlayerModal() {
     return null;
   }
 
-  // Derive UI state from playbackState
   const isLoading = playbackState === 'loading';
   const isPlaying = playbackState === 'playing';
   const canInteract = playbackState === 'playing' || playbackState === 'paused';
 
-  // UI Colors - adapt to dominant color or use theme defaults
   const adaptive = dominantColor ? getAdaptiveColors(dominantColor) : null;
   const isDarkBg = dominantColor ? !isLightColor(dominantColor) : false;
   const colors = adaptive
@@ -136,7 +132,6 @@ export function PlayerModal() {
     player.seekTo(newPosition);
   };
 
-  // Gradient colors - extend colored gradient to bottom so controls have consistent background
   const gradientColors: [string, string, string, string] = dominantColor
     ? [
         hexToRgba(dominantColor, 0.95),

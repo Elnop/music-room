@@ -97,33 +97,28 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // Call backend API
       const response = await authApi.login({ email, password });
 
-      // Also sign in to Supabase (for auth state sync)
       await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      // Set authenticated state
       if (response.session) {
         set({
           user: response.user,
           accessToken: response.session.accessToken,
           refreshToken: response.session.refreshToken,
-          tokenExpiresAt: response.session.expiresAt * 1000, // Convert to milliseconds
+          tokenExpiresAt: response.session.expiresAt * 1000,
           isAuthenticated: true,
           isLoading: false,
         });
       } else {
-        // Email not verified - clear loading state
         set({
           isLoading: false,
         });
       }
 
-      // Persist to storage
       await get().saveToStorage();
     } catch (error) {
       const errorMessage = error instanceof ApiError ? error.message : 'Login failed';
@@ -147,10 +142,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // Call backend API
       const response = await authApi.register(data);
 
-      // Check if email verification is required
       if (response.requiresVerification) {
         set({ isLoading: false });
         return {
@@ -160,7 +153,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         };
       }
 
-      // Set authenticated state (OAuth or already verified)
       set({
         user: response.user,
         accessToken: response.session!.accessToken,
@@ -170,7 +162,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         isLoading: false,
       });
 
-      // Persist to storage
       await get().saveToStorage();
       return { requiresVerification: false };
     } catch (error) {
@@ -197,7 +188,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const response = await authApi.verifyEmail(userId, code);
 
-      // Set authenticated state
       set({
         user: response.user,
         accessToken: response.session!.accessToken,
@@ -207,7 +197,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         isLoading: false,
       });
 
-      // Persist to storage
       await get().saveToStorage();
     } catch (error) {
       const errorMessage = error instanceof ApiError ? error.message : 'Email verification failed';
@@ -283,20 +272,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const { accessToken } = get();
 
-      // Call backend API to logout (if token exists)
       if (accessToken) {
         try {
           await authApi.logout(accessToken);
         } catch (error) {
-          // Continue with logout even if API call fails
           console.warn('Backend logout failed, continuing with local logout', error);
         }
       }
 
-      // Sign out from Supabase
       await supabase.auth.signOut();
 
-      // Clear state
       set({
         user: null,
         accessToken: null,
@@ -307,7 +292,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         error: null,
       });
 
-      // Clear storage
       await get().clearStorage();
     } catch (error) {
       console.error('[AuthStore] Logout failed:', error);
@@ -325,13 +309,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // 1. Get ID token from Google Sign-In
       const idToken = await signInWithGoogle();
-
-      // 2. Send to backend
       const response = await authApi.loginWithGoogle(idToken);
 
-      // 3. Set authenticated state
       if (!response.session) {
         throw new Error('OAuth login did not return a session');
       }
@@ -340,21 +320,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         user: response.user,
         accessToken: response.session.accessToken,
         refreshToken: response.session.refreshToken,
-        tokenExpiresAt: response.session.expiresAt * 1000, // Convert to milliseconds
+        tokenExpiresAt: response.session.expiresAt * 1000,
         isAuthenticated: true,
         isLoading: false,
       });
 
-      // 4. Persist to storage
       await get().saveToStorage();
 
-      // 5. Set session in Supabase for consistency
       await supabase.auth.setSession({
         access_token: response.session.accessToken,
         refresh_token: response.session.refreshToken,
       });
     } catch (error) {
-      // Log error details for debugging (detailed logs only in development)
       if (__DEV__) {
         console.error('[AuthStore] loginWithGoogle failed:', {
           errorType: error?.constructor?.name,
@@ -365,7 +342,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           fullError: error,
         });
       } else {
-        // Production: Only log safe, sanitized error info
         console.error('[AuthStore] loginWithGoogle failed:', {
           errorType: error?.constructor?.name,
           isApiError: error instanceof ApiError,
@@ -374,19 +350,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         });
       }
 
-      // Handle specific error codes
       if (error instanceof Error && error.message === 'SIGN_IN_CANCELLED') {
-        // User cancelled = no error visible
         set({ isLoading: false, error: null });
       } else {
-        // Determine user-friendly error message
         let errorMessage = 'Google login failed. Please try again.';
 
         if (error instanceof ApiError) {
-          // Use backend error message (already user-friendly)
           errorMessage = error.message;
         } else if (error instanceof Error) {
-          // Use error message from oauth.ts or network layer
           if (error.message === 'Google Play Services not available') {
             errorMessage =
               'Google Play Services not available. Please update Google Play Services and try again.';
@@ -395,7 +366,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           } else if (error.message.includes('network') || error.message.includes('timeout')) {
             errorMessage = 'Network error. Please check your connection and try again.';
           } else {
-            // Fallback: show actual error message (but sanitized)
             errorMessage = `Login failed: ${error.message}`;
           }
         }
@@ -405,8 +375,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           error: errorMessage,
         });
       }
-      // Note: Error is not re-thrown as it's already handled by setting error state
-      // Caller can check the error state instead of catching exceptions
     }
   },
 
@@ -417,13 +385,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // 1. Get access token from Facebook Login
       const accessToken = await signInWithFacebook();
-
-      // 2. Send to backend
       const response = await authApi.loginWithFacebook(accessToken);
 
-      // 3. Set authenticated state
       if (!response.session) {
         throw new Error('OAuth login did not return a session');
       }
@@ -432,21 +396,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         user: response.user,
         accessToken: response.session.accessToken,
         refreshToken: response.session.refreshToken,
-        tokenExpiresAt: response.session.expiresAt * 1000, // Convert to milliseconds
+        tokenExpiresAt: response.session.expiresAt * 1000,
         isAuthenticated: true,
         isLoading: false,
       });
 
-      // 4. Persist to storage
       await get().saveToStorage();
 
-      // 5. Set session in Supabase for consistency
       await supabase.auth.setSession({
         access_token: response.session.accessToken,
         refresh_token: response.session.refreshToken,
       });
     } catch (error) {
-      // Log error details for debugging (detailed logs only in development)
       if (__DEV__) {
         console.error('[AuthStore] loginWithFacebook failed:', {
           errorType: error?.constructor?.name,
@@ -457,7 +418,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           fullError: error,
         });
       } else {
-        // Production: Only log safe, sanitized error info
         console.error('[AuthStore] loginWithFacebook failed:', {
           errorType: error?.constructor?.name,
           isApiError: error instanceof ApiError,
@@ -466,25 +426,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         });
       }
 
-      // Handle specific error codes
       if (error instanceof Error && error.message === 'SIGN_IN_CANCELLED') {
-        // User cancelled = no error visible
         set({ isLoading: false, error: null });
       } else {
-        // Determine user-friendly error message
         let errorMessage = 'Facebook login failed. Please try again.';
 
         if (error instanceof ApiError) {
-          // Use backend error message (already user-friendly)
           errorMessage = error.message;
         } else if (error instanceof Error) {
-          // Use error message from oauth.ts or network layer
           if (error.message.includes('not configured')) {
             errorMessage = 'Facebook login is not configured. Please contact support.';
           } else if (error.message.includes('network') || error.message.includes('timeout')) {
             errorMessage = 'Network error. Please check your connection and try again.';
           } else {
-            // Fallback: show actual error message (but sanitized)
             errorMessage = `Login failed: ${error.message}`;
           }
         }
@@ -494,8 +448,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           error: errorMessage,
         });
       }
-      // Note: Error is not re-thrown as it's already handled by setting error state
-      // Caller can check the error state instead of catching exceptions
     }
   },
 
@@ -513,7 +465,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     try {
       // TODO: Implement backend API call for profile update
-      // For now, just update locally
       const updatedUser: UserProfile = {
         ...user,
         ...data,
@@ -525,7 +476,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         isLoading: false,
       });
 
-      // Persist to storage
       await get().saveToStorage();
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Profile update failed';
@@ -564,7 +514,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
     } catch (error) {
       console.error('Failed to load auth state from storage:', error);
-      // Clear potentially corrupted data
       await get().clearStorage();
     }
   },
@@ -638,8 +587,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     try {
       await authApi.unlinkProvider(accessToken, provider);
-
-      // Refresh linked providers list
       await get().fetchLinkedProviders();
 
       set({ isLoading: false });
@@ -659,12 +606,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   refreshAccessToken: async () => {
     const { refreshToken, isRefreshing } = get();
 
-    // Prevent concurrent refresh (race condition)
     if (isRefreshing) {
       console.log('[AuthStore] Refresh already in progress, waiting...');
       return new Promise<boolean>(resolve => {
         let attempts = 0;
-        const maxAttempts = 50; // 5 seconds max wait
+        const maxAttempts = 50;
         const checkInterval = setInterval(() => {
           attempts++;
           if (!get().isRefreshing) {
@@ -729,8 +675,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       });
       set({ isRefreshing: false });
 
-      // Don't logout immediately on refresh failure - could be network issue
-      // Instead, let the next API call trigger another refresh attempt
       console.warn('[AuthStore] Skipping auto-logout on refresh failure');
       return false;
     }

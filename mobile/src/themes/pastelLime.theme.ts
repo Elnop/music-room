@@ -11,38 +11,31 @@ export const pastelLimeTheme: Theme = {
   displayName: 'Lime Pastel',
 
   colors: {
-    // Primary - Lime
-    primary: '#84CC16', // Lime 500
-    primaryLight: '#BEF264', // Lime 300
-    primaryDark: '#65A30D', // Lime 600
+    primary: '#84CC16',
+    primaryLight: '#BEF264',
+    primaryDark: '#65A30D',
 
-    // Secondary - Rose pastel
-    secondary: '#EC4899', // Pink 500
-    secondaryLight: '#F9A8D4', // Pink 300
+    secondary: '#EC4899',
+    secondaryLight: '#F9A8D4',
 
-    // Accent - Violet pastel
-    accent: '#8B5CF6', // Violet 500
-    accentAlt: '#A78BFA', // Violet 400
+    accent: '#8B5CF6',
+    accentAlt: '#A78BFA',
 
-    // Backgrounds - Jaune doux
-    background: '#FEFCE8', // Yellow 50
-    surface: '#FFFFFF', // Blanc
-    surfaceAlt: '#FEF08A', // Yellow 200
+    background: '#FEFCE8',
+    surface: '#FFFFFF',
+    surfaceAlt: '#FEF08A',
 
-    // Text colors
-    text: '#1F2937', // Gray 800
-    textSecondary: '#4B5563', // Gray 600
-    textInverse: '#FFFFFF', // Blanc
+    text: '#1F2937',
+    textSecondary: '#4B5563',
+    textInverse: '#FFFFFF',
 
-    // Border
-    border: '#000000', // Noir pur
-    borderLight: '#374151', // Gray 700
+    border: '#000000',
+    borderLight: '#374151',
 
-    // State colors
-    error: '#DC2626', // Red 600
-    success: '#10B981', // Emerald 500
-    warning: '#F59E0B', // Amber 500
-    info: '#3B82F6', // Blue 500
+    error: '#DC2626',
+    success: '#10B981',
+    warning: '#F59E0B',
+    info: '#3B82F6',
   },
 
   borders: NEOBRUTALISM_BORDERS,

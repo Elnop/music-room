@@ -58,20 +58,18 @@ export class ApiError extends Error {
  * Get client metadata headers for action logging
  */
 function getClientHeaders(): Record<string, string> {
-  // Try multiple sources for app version
   const appVersion =
     Constants.expoConfig?.version ||
     Constants.manifest?.version ||
     Constants.manifest2?.extra?.expoClient?.version ||
-    '1.0.0'; // Fallback to default version from app.json
+    '1.0.0';
 
   const headers = {
-    'X-Platform': Platform.OS, // "android" or "ios"
+    'X-Platform': Platform.OS,
     'X-Device-Model': Device.modelName || Device.deviceName || 'Unknown Device',
     'X-App-Version': appVersion,
   };
 
-  // Debug: Log headers being sent (only in development)
   if (__DEV__) {
     console.log('[API] Client headers:', {
       platform: Platform.OS,
@@ -94,7 +92,6 @@ function getClientHeaders(): Record<string, string> {
 async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_URL}${endpoint}`;
 
-  // Helper to make the actual request
   const makeRequest = async (authToken?: string): Promise<Response> => {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -102,7 +99,6 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
       ...(options.headers as Record<string, string>),
     };
 
-    // Add authorization header if provided
     if (authToken) {
       headers['Authorization'] = `Bearer ${authToken}`;
     }
@@ -114,43 +110,35 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
   };
 
   try {
-    // Skip token refresh logic for the /refresh endpoint itself to avoid recursion
     if (endpoint === '/api/auth/refresh') {
       console.log('[API] Skipping interceptor for /refresh endpoint');
       const response = await makeRequest();
       return handleResponse<T>(response);
     }
 
-    // Import authStore dynamically to avoid circular dependency
     const { useAuthStore } = await import('@/store/authStore');
     const { accessToken, isTokenExpiringSoon, refreshAccessToken } = useAuthStore.getState();
 
-    // Proactive refresh: Check if token is about to expire
     if (accessToken && isTokenExpiringSoon()) {
       console.log('[API] Token expiring soon, proactively refreshing...');
       await refreshAccessToken();
 
-      // Get the new token after refresh
       const { accessToken: newAccessToken } = useAuthStore.getState();
       const response = await makeRequest(newAccessToken || undefined);
       return handleResponse<T>(response);
     }
 
-    // Make initial request
     const response = await makeRequest(accessToken || undefined);
 
-    // Check if response is 401 Unauthorized
     if (response.status === 401) {
       console.log('[API] Received 401, attempting token refresh...');
 
-      // Try to refresh token
       const refreshSuccess = await refreshAccessToken();
 
       if (!refreshSuccess) {
         throw new ApiError('Session expired. Please login again.', 'SESSION_EXPIRED');
       }
 
-      // Retry request with new token
       const { accessToken: newAccessToken } = useAuthStore.getState();
       const retryResponse = await makeRequest(newAccessToken || undefined);
 
@@ -163,7 +151,6 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
       throw error;
     }
 
-    // Network or parsing errors
     if (error instanceof Error) {
       throw new ApiError(error.message, 'NETWORK_ERROR');
     }
@@ -176,7 +163,6 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
  * Handle response parsing and errors
  */
 async function handleResponse<T>(response: Response): Promise<T> {
-  // Check if response is OK (status 200-299)
   if (!response.ok) {
     let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
     let errorCode = `HTTP_${response.status}`;
@@ -192,13 +178,11 @@ async function handleResponse<T>(response: Response): Promise<T> {
         const errorText = await response.text();
         errorMessage = errorText || errorMessage;
       } catch {
-        // Keep default error message
       }
     }
     throw new ApiError(errorMessage, errorCode, errorDetails);
   }
 
-  // Parse successful response
   let data: ApiResponse<T>;
   try {
     data = await response.json();

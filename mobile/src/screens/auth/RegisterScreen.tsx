@@ -68,37 +68,30 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
     try {
       const result = await register(data);
 
-      // If email verification is required, navigate to verification screen
       if (result.requiresVerification && result.userId && result.email) {
         navigation.navigate('EmailVerification', {
           userId: result.userId,
           email: result.email,
         });
       }
-      // Otherwise, navigation handled by RootNavigator based on auth state
     } catch (error) {
       console.error('[RegisterScreen] Register error:', error);
-      // Error shown via alert (from auth store)
     }
   };
 
   const handleGoogleLogin = async () => {
     try {
       await loginWithGoogle();
-      // Navigation handled by RootNavigator based on auth state
     } catch (error) {
       console.error('[RegisterScreen] Google login error:', error);
-      // Error shown via alert (from auth store)
     }
   };
 
   const handleFacebookLogin = async () => {
     try {
       await loginWithFacebook();
-      // Navigation handled by RootNavigator based on auth state
     } catch (error) {
       console.error('[RegisterScreen] Facebook login error:', error);
-      // Error shown via alert (from auth store)
     }
   };
 

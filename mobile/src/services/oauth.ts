@@ -13,12 +13,10 @@ function hasIdToken(
 
   const obj = response as Record<string, unknown>;
 
-  // Check direct idToken
   if (typeof obj.idToken === 'string' && obj.idToken.length > 0) {
     return true;
   }
 
-  // Check nested data.idToken
   if (typeof obj.data === 'object' && obj.data !== null) {
     const data = obj.data as Record<string, unknown>;
     if (typeof data.idToken === 'string' && data.idToken.length > 0) {
@@ -36,12 +34,10 @@ function extractIdToken(response: unknown): string {
 
   const obj = response as Record<string, unknown>;
 
-  // Try direct idToken first
   if (typeof obj.idToken === 'string') {
     return obj.idToken;
   }
 
-  // Try nested data.idToken
   const data = obj.data as Record<string, unknown>;
   if (typeof data.idToken === 'string') {
     return data.idToken;
@@ -50,7 +46,6 @@ function extractIdToken(response: unknown): string {
   throw new Error('No ID token received from Google Sign-In. Please try again.');
 }
 
-// Get Google OAuth Web Client ID from environment variables
 const WEB_CLIENT_ID =
   Constants.expoConfig?.extra?.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ||
   process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
@@ -59,7 +54,6 @@ if (!WEB_CLIENT_ID) {
   console.warn('EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID is not defined. Google login will not work.');
 }
 
-// Get Facebook OAuth configuration from environment variables
 const FACEBOOK_APP_ID =
   Constants.expoConfig?.extra?.EXPO_PUBLIC_FACEBOOK_APP_ID ||
   process.env.EXPO_PUBLIC_FACEBOOK_APP_ID;
@@ -77,8 +71,8 @@ if (!FACEBOOK_APP_ID) {
  */
 export const configureGoogleSignIn = (): void => {
   GoogleSignin.configure({
-    webClientId: WEB_CLIENT_ID, // Required to get ID tokens
-    offlineAccess: false, // Don't request refresh token from Google
+    webClientId: WEB_CLIENT_ID,
+    offlineAccess: false,
   });
 };
 
@@ -95,16 +89,10 @@ export const signInWithGoogle = async (): Promise<string> => {
   }
 
   try {
-    // Check if device supports Google Play Services (Android)
     await GoogleSignin.hasPlayServices();
-
-    // Open Google consent screen
     const userInfo = await GoogleSignin.signIn();
-
-    // Extract ID token from response using type-safe helper
     const idToken = extractIdToken(userInfo);
 
-    // Log what Google returned for debugging (only in development)
     if (__DEV__) {
       console.log('[OAuth] Google Sign-In successful');
     }
@@ -113,7 +101,6 @@ export const signInWithGoogle = async (): Promise<string> => {
 
     return idToken;
   } catch (error: unknown) {
-    // Handle specific error codes
     const googleError = error as { code?: string; message?: string };
 
     if (googleError.code === statusCodes.SIGN_IN_CANCELLED) {
@@ -123,7 +110,6 @@ export const signInWithGoogle = async (): Promise<string> => {
     } else if (googleError.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
       throw new Error('Google Play Services not available');
     } else {
-      // Log detailed error for debugging (only in development)
       if (__DEV__) {
         console.error('[OAuth] Google Sign-In failed:', {
           errorCode: googleError.code,
@@ -189,14 +175,12 @@ export const signInWithFacebook = async (): Promise<string> => {
       );
     }
 
-    // Request Facebook login with public_profile and email permissions
     const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
 
     if (result.isCancelled) {
       throw new Error('SIGN_IN_CANCELLED');
     }
 
-    // Get access token based on platform
     let accessToken: string | null = null;
 
     if (Platform.OS === 'ios') {
@@ -206,7 +190,6 @@ export const signInWithFacebook = async (): Promise<string> => {
       const authToken = await AuthenticationToken.getAuthenticationTokenIOS();
       const accessTokenData = await AccessToken.getCurrentAccessToken();
 
-      // Prefer AccessToken for backend verification
       accessToken = accessTokenData?.accessToken || null;
 
       if (__DEV__) {
@@ -231,12 +214,10 @@ export const signInWithFacebook = async (): Promise<string> => {
   } catch (error: unknown) {
     const fbError = error as { message?: string };
 
-    // Handle cancellation
     if (fbError.message === 'SIGN_IN_CANCELLED') {
       throw new Error('SIGN_IN_CANCELLED');
     }
 
-    // Log detailed error for debugging
     if (__DEV__) {
       console.error('[OAuth] Facebook Sign-In failed:', {
         errorMessage: fbError.message,

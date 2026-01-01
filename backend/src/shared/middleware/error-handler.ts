@@ -35,7 +35,6 @@ export function errorHandler(
     method: req.method,
   });
 
-  // Zod validation errors
   if (err instanceof ZodError) {
     const response: ApiResponse = {
       success: false,
@@ -54,7 +53,6 @@ export function errorHandler(
     return res.status(400).json(response);
   }
 
-  // Custom AppError
   if (err instanceof AppError) {
     const response: ApiResponse = {
       success: false,
@@ -70,7 +68,6 @@ export function errorHandler(
     return res.status(err.statusCode).json(response);
   }
 
-  // Supabase errors
   if ("code" in err && "message" in err) {
     const supabaseError = err as Error & { code: string };
     const response: ApiResponse = {
@@ -86,7 +83,6 @@ export function errorHandler(
     return res.status(400).json(response);
   }
 
-  // Default error
   const response: ApiResponse = {
     success: false,
     error: {

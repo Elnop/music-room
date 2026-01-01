@@ -11,38 +11,31 @@ export const originalTheme: Theme = {
   displayName: 'Original',
 
   colors: {
-    // Primary - Vibrant Rose/Magenta
-    primary: '#EA3E7A', // Rose magenta (primary buttons)
-    primaryLight: '#F472B6', // Light rose (hover/active)
-    primaryDark: '#BE185D', // Dark rose
+    primary: '#EA3E7A',
+    primaryLight: '#F472B6',
+    primaryDark: '#BE185D',
 
-    // Secondary - White
-    secondary: '#FFFFFF', // White (secondary accents)
-    secondaryLight: '#F5F5F5', // Off-white
+    secondary: '#FFFFFF',
+    secondaryLight: '#F5F5F5',
 
-    // Accent - White
-    accent: '#FFFFFF', // White (highlights)
-    accentAlt: '#E5E5E5', // Very light gray
+    accent: '#FFFFFF',
+    accentAlt: '#E5E5E5',
 
-    // Backgrounds - Dark for contrast
-    background: '#0D0D0D', // Deep black (main background)
-    surface: '#1A1A1A', // Black surface (cards, inputs)
-    surfaceAlt: '#262626', // Dark gray (disabled surfaces)
+    background: '#0D0D0D',
+    surface: '#1A1A1A',
+    surfaceAlt: '#262626',
 
-    // Text colors
-    text: '#FFFFFF', // White (main text)
-    textSecondary: '#A3A3A3', // Light gray (secondary text)
-    textInverse: '#000000', // Black (text on primary)
+    text: '#FFFFFF',
+    textSecondary: '#A3A3A3',
+    textInverse: '#000000',
 
-    // Border - White
-    border: '#FFFFFF', // White for borders
-    borderLight: '#404040', // Dark gray (subtle borders)
+    border: '#FFFFFF',
+    borderLight: '#404040',
 
-    // State colors
-    error: '#EF4444', // Red
-    success: '#22C55E', // Green
-    warning: '#FBBF24', // Amber
-    info: '#EA3E7A', // Rose
+    error: '#EF4444',
+    success: '#22C55E',
+    warning: '#FBBF24',
+    info: '#EA3E7A',
   },
 
   borders: NEOBRUTALISM_BORDERS,

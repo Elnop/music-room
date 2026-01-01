@@ -32,9 +32,8 @@ export class BruteForceProtectionService {
       const key = `failed_login:${email}:${ip}`;
       const attempts = await redisClient.incr(key);
 
-      // Set expiry on first attempt (15 minutes window)
       if (attempts === 1) {
-        await redisClient.expire(key, 15 * 60); // 15 minutes
+        await redisClient.expire(key, 15 * 60);
       }
 
       logger.info("Failed login attempt recorded", {
@@ -44,7 +43,6 @@ export class BruteForceProtectionService {
         threshold: rateLimitConfig.lockout.threshold,
       });
 
-      // Check if lockout threshold reached
       if (attempts >= rateLimitConfig.lockout.threshold) {
         return await this.lockAccount(email, ip, attempts);
       }
@@ -85,20 +83,16 @@ export class BruteForceProtectionService {
     }
 
     try {
-      // Determine lockout duration based on severity
       let lockDuration: number;
       let severity: string;
 
       if (attempts >= 10) {
-        // Severe: 24 hours
         lockDuration = rateLimitConfig.lockout.durationSevere;
         severity = "severe";
       } else if (attempts >= 8) {
-        // Hard: 1 hour
         lockDuration = rateLimitConfig.lockout.durationHard;
         severity = "hard";
       } else {
-        // Soft: 15 minutes
         lockDuration = rateLimitConfig.lockout.durationSoft;
         severity = "soft";
       }
@@ -206,7 +200,6 @@ export class BruteForceProtectionService {
         };
       }
 
-      // Not locked, return current attempt count
       return {
         isLocked: false,
         failedAttempts,
@@ -239,12 +232,10 @@ export class BruteForceProtectionService {
       const key = `ip_failed_logins:${ip}`;
       const count = await redisClient.incr(key);
 
-      // Set expiry on first failure (15 minutes window)
       if (count === 1) {
         await redisClient.expire(key, 15 * 60);
       }
 
-      // Check reputation thresholds
       if (count >= rateLimitConfig.ipReputation.blacklistThreshold) {
         await this.blacklistIP(ip, 24 * 60 * 60); // 24 hours
         logger.error("IP blacklisted", {
@@ -326,5 +317,4 @@ export class BruteForceProtectionService {
   }
 }
 
-// Export singleton instance
 export const bruteForceService = new BruteForceProtectionService();

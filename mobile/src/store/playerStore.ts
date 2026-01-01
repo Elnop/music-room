@@ -58,21 +58,17 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   error: null,
   isModalOpen: false,
 
-  // Set the stream URL
   setStreamUrl: url => {
     set({ streamUrl: url });
   },
 
-  // Set loading state (updates playbackState accordingly)
   setLoading: loading => {
     set(state => ({
       loading,
-      // Only update playbackState if we're in a relevant state
       playbackState: loading && state.playbackState === 'idle' ? 'loading' : state.playbackState,
     }));
   },
 
-  // Set error state
   setError: error => {
     set({
       error,
@@ -82,7 +78,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     });
   },
 
-  // Set error for unavailable track (404) - clears track and shows error toast
   setTrackUnavailableError: message => {
     if (__DEV__) console.log('🔴 [playerStore] Track unavailable:', message);
     set({
@@ -96,15 +91,12 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     });
   },
 
-  // Clear error (used to dismiss error toast)
   clearError: () => {
     set({ error: null });
   },
 
-  // Called when stream is loaded and ready to play
   setPlaybackReady: () => {
     const state = get();
-    // Only transition if we're in loading state
     if (state.playbackState === 'loading') {
       if (__DEV__) console.log('🎵 [playerStore] Stream ready, transitioning to ready state');
       set({
@@ -115,10 +107,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     }
   },
 
-  // Called when playback actually starts
   setPlaybackPlaying: () => {
     const state = get();
-    // Transition from loading, ready, or paused to playing
     if (
       state.playbackState === 'loading' ||
       state.playbackState === 'ready' ||
@@ -134,7 +124,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     }
   },
 
-  // Play a track (sets track and starts loading)
   playTrack: track => {
     if (__DEV__)
       console.log('🎵 [playerStore] playTrack called:', {
@@ -145,17 +134,16 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     set(state => ({
       currentTrack: track,
       pendingTrackId: track.id,
-      loadCounter: state.loadCounter + 1, // Increment to force reload even for same track
+      loadCounter: state.loadCounter + 1,
       playbackState: 'loading',
-      streamUrl: null, // Reset stream URL to force reload
-      isPlaying: false, // Not playing yet - will be set when ready
+      streamUrl: null,
+      isPlaying: false,
       loading: true,
       isModalOpen: false,
       error: null,
     }));
   },
 
-  // Start playback (legacy - use setPlaybackPlaying for state machine)
   play: () => {
     const state = get();
     if (state.playbackState === 'ready' || state.playbackState === 'paused') {
@@ -166,7 +154,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     }
   },
 
-  // Pause playback
   pause: () => {
     const state = get();
     if (state.playbackState === 'playing') {
@@ -178,7 +165,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     }
   },
 
-  // Resume playback
   resume: () => {
     const state = get();
     if (state.playbackState === 'paused') {
@@ -190,7 +176,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     }
   },
 
-  // Stop playback and clear track
   stop: () => {
     if (__DEV__) console.log('🎵 [playerStore] Stopping playback');
     set({
@@ -204,12 +189,10 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     });
   },
 
-  // Toggle modal visibility
   toggleModal: () => {
     set(state => ({ isModalOpen: !state.isModalOpen }));
   },
 
-  // Set modal visibility
   setModalOpen: isOpen => {
     set({ isModalOpen: isOpen });
   },

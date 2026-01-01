@@ -11,38 +11,31 @@ export const christmasTheme: Theme = {
   displayName: 'Christmas',
 
   colors: {
-    // Primary - Christmas Red
-    primary: '#DC2626', // Red 600
-    primaryLight: '#F87171', // Red 400
-    primaryDark: '#991B1B', // Red 800
+    primary: '#DC2626',
+    primaryLight: '#F87171',
+    primaryDark: '#991B1B',
 
-    // Secondary - Christmas Green
-    secondary: '#16A34A', // Green 600
-    secondaryLight: '#4ADE80', // Green 400
+    secondary: '#16A34A',
+    secondaryLight: '#4ADE80',
 
-    // Accent - Gold
-    accent: '#F59E0B', // Amber 500 (gold)
-    accentAlt: '#FBBF24', // Amber 400 (light gold)
+    accent: '#F59E0B',
+    accentAlt: '#FBBF24',
 
-    // Backgrounds - Cream
-    background: '#FFFBEB', // Amber 50
-    surface: '#FFFFFF', // White
-    surfaceAlt: '#FEE2E2', // Red 100 (subtle red tint)
+    background: '#FFFBEB',
+    surface: '#FFFFFF',
+    surfaceAlt: '#FEE2E2',
 
-    // Text colors
-    text: '#1F2937', // Gray 800
-    textSecondary: '#4B5563', // Gray 600
-    textInverse: '#FFFFFF', // White
+    text: '#1F2937',
+    textSecondary: '#4B5563',
+    textInverse: '#FFFFFF',
 
-    // Border
-    border: '#000000', // Pure black
-    borderLight: '#374151', // Gray 700
+    border: '#000000',
+    borderLight: '#374151',
 
-    // State colors
-    error: '#B91C1C', // Red 700
-    success: '#15803D', // Green 700
-    warning: '#D97706', // Amber 600
-    info: '#0891B2', // Cyan 600
+    error: '#B91C1C',
+    success: '#15803D',
+    warning: '#D97706',
+    info: '#0891B2',
   },
 
   borders: NEOBRUTALISM_BORDERS,

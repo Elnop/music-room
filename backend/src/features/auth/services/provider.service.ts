@@ -74,7 +74,6 @@ export class ProviderService {
     userId: string,
     provider: OAuthProvider,
   ): Promise<void> {
-    // 1. Get current user profile
     const { data: profile, error } = await supabase
       .from("user_profiles")
       .select("has_password, google_id, facebook_id")
@@ -90,7 +89,6 @@ export class ProviderService {
       throw new AppError(404, "User not found", "USER_NOT_FOUND");
     }
 
-    // 2. Count connected providers
     const connectedCount = [
       profile.has_password,
       profile.google_id,
@@ -109,7 +107,6 @@ export class ProviderService {
       );
     }
 
-    // 3. Check provider is actually linked
     const providerColumn = `${provider}_id`;
     const dbProfile = profile as Record<string, unknown>;
     if (!dbProfile[providerColumn]) {
@@ -124,7 +121,6 @@ export class ProviderService {
       );
     }
 
-    // 4. Unlink provider
     const { error: updateError } = await supabase
       .from("user_profiles")
       .update({

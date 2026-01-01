@@ -55,16 +55,13 @@ function isValidListeningUpdatePayload(
   if (!data || typeof data !== "object") return false;
   const payload = data as Record<string, unknown>;
 
-  // Validate device
   if (!payload.device || typeof payload.device !== "object") return false;
   const device = payload.device as Record<string, unknown>;
   if (typeof device.deviceId !== "string" || !device.deviceId) return false;
   if (typeof device.deviceName !== "string") return false;
 
-  // Validate isPlaying
   if (typeof payload.isPlaying !== "boolean") return false;
 
-  // Validate track (can be null)
   if (payload.track !== null) {
     if (typeof payload.track !== "object") return false;
     const track = payload.track as Record<string, unknown>;
@@ -96,9 +93,8 @@ class RealtimeService {
 
   private deviceToSocket: Map<string, string> = new Map();
 
-  // Throttle listening updates per device
   private lastListeningUpdate: Map<string, number> = new Map();
-  private static LISTENING_UPDATE_THROTTLE_MS = 1000; // 1 second
+  private static LISTENING_UPDATE_THROTTLE_MS = 1000;
 
   /**
    * Initialize Socket.io server
@@ -123,7 +119,6 @@ class RealtimeService {
       const transport = socket.conn.transport.name;
       socketLogger.connection(socket.id, transport, { action: "connected" });
 
-      // Log transport upgrades
       socket.conn.on("upgrade", (newTransport: { name: string }) => {
         socketLogger.event("transport:upgraded", socket.id, {
           from: transport,
@@ -157,11 +152,9 @@ class RealtimeService {
       const { userId, device } = data;
       const deviceKey = `${userId}:${device.deviceId}`;
 
-      // Store mappings
       this.socketToDevice.set(socket.id, { userId, deviceId: device.deviceId });
       this.deviceToSocket.set(deviceKey, socket.id);
 
-      // Join personal room for targeted messages
       void socket.join(`user:${userId}`);
 
       socketLogger.auth("register", userId, socket.id, {
@@ -202,7 +195,6 @@ class RealtimeService {
     socket.on("listening:update", (data: unknown) => {
       const startTime = Date.now();
 
-      // Validate payload structure
       if (!isValidListeningUpdatePayload(data)) {
         socketLogger.event("listening:update", socket.id, {
           level: "warn",
@@ -259,7 +251,6 @@ class RealtimeService {
       this.broadcastUserListeningStatus(userId);
     });
 
-    // User subscribes to another user's listening status (all devices)
     socket.on("listening:subscribe", async (targetUserId: string) => {
       const socketInfo = this.socketToDevice.get(socket.id);
       if (!socketInfo) {
@@ -340,7 +331,6 @@ class RealtimeService {
       const targetSocketId = this.deviceToSocket.get(targetDeviceKey);
 
       if (targetSocketId && this.io) {
-        // Send command only to the specific device
         this.io.to(targetSocketId).emit("control:command", {
           action: data.action,
           fromUserId: controllerId,
@@ -396,7 +386,6 @@ class RealtimeService {
       action: "broadcasted",
     });
 
-    // Emit to the listening room for this user
     this.io.to(room).emit("listening:status", userStatus);
   }
 
@@ -419,10 +408,8 @@ class RealtimeService {
 
       this.lastListeningUpdate.delete(deviceKey);
 
-      // Broadcast updated status (user has disconnected a device)
       this.broadcastUserListeningStatus(userId);
 
-      // Cleanup maps
       this.socketToDevice.delete(socket.id);
       this.deviceToSocket.delete(deviceKey);
 

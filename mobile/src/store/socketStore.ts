@@ -33,13 +33,11 @@ export const useSocketStore = create<SocketState>((set, get) => ({
   connect: () => {
     const existingSocket = get().socket;
 
-    // If already connected, skip
     if (existingSocket?.connected) {
       if (__DEV__) console.log('[Socket] Already connected:', existingSocket.id);
       return;
     }
 
-    // If socket exists but not connected, disconnect and reconnect
     if (existingSocket) {
       if (__DEV__) console.log('[Socket] Socket exists but not connected, reconnecting...');
       existingSocket.disconnect();
@@ -49,7 +47,6 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     if (__DEV__) console.log('[Socket] Connecting to:', socketUrl);
 
     const socket = io(socketUrl, {
-      // Try WebSocket first, fallback to polling if needed
       transports: ['websocket', 'polling'],
       autoConnect: true,
       reconnection: true,
@@ -57,7 +54,6 @@ export const useSocketStore = create<SocketState>((set, get) => ({
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
       timeout: 20000,
-      // Force new connection
       forceNew: true,
     });
 

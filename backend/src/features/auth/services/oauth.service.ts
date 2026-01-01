@@ -42,7 +42,6 @@ export class OAuthService {
         throw new AppError(401, "Invalid Google token", "INVALID_TOKEN");
       }
 
-      // Security: Reject unverified emails
       if (!payload.email_verified) {
         logger.warn("Google login attempted with unverified email", {
           email: payload.email,
@@ -70,12 +69,10 @@ export class OAuthService {
         family_name: payload.family_name,
       };
     } catch (error) {
-      // Re-throw AppError as-is
       if (error instanceof AppError) {
         throw error;
       }
 
-      // Log and convert other errors
       logger.error("Google token verification failed", { error });
       throw new AppError(
         401,
@@ -95,7 +92,6 @@ export class OAuthService {
     accessToken: string
   ): Promise<FacebookTokenPayload> {
     try {
-      // 1. Verify the access token using Facebook's debug_token endpoint
       const debugUrl = `https://graph.facebook.com/v21.0/debug_token?input_token=${accessToken}&access_token=${FACEBOOK_APP_ID}|${FACEBOOK_APP_SECRET}`;
 
       const debugResponse = await fetch(debugUrl);
@@ -120,7 +116,6 @@ export class OAuthService {
         );
       }
 
-      // Check if token is valid and not expired
       if (!debugData.data?.is_valid) {
         logger.warn("Facebook token is not valid or expired");
         throw new AppError(
@@ -130,7 +125,6 @@ export class OAuthService {
         );
       }
 
-      // Check if app_id matches
       if (debugData.data.app_id !== FACEBOOK_APP_ID) {
         logger.warn("Facebook token app_id mismatch", {
           expected: FACEBOOK_APP_ID,
@@ -152,7 +146,6 @@ export class OAuthService {
         );
       }
 
-      // 2. Fetch user profile from Facebook Graph API
       const profileUrl = `https://graph.facebook.com/v21.0/${userId}?fields=id,name,email,picture.type(large)&access_token=${accessToken}`;
 
       const profileResponse = await fetch(profileUrl);
@@ -183,7 +176,6 @@ export class OAuthService {
         );
       }
 
-      // Email is optional - if user denies email permission, we'll generate a synthetic email
       if (!profileData.email) {
         logger.info("Facebook login without email permission", {
           userId: profileData.id,
@@ -205,12 +197,10 @@ export class OAuthService {
         picture: profileData.picture?.data?.url,
       };
     } catch (error) {
-      // Re-throw AppError as-is
       if (error instanceof AppError) {
         throw error;
       }
 
-      // Log and convert other errors
       logger.error("Facebook token verification failed", { error });
       throw new AppError(
         401,

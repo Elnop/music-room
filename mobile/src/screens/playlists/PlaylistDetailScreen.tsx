@@ -90,7 +90,6 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
     resume,
   } = usePlayerStore();
 
-  // Get cover URL for color extraction
   const coverUrl = currentPlaylist?.coverUrl || currentPlaylist?.tracks[0]?.albumArt;
   const { dominantColor } = useImageColors(coverUrl, theme.colors.primary);
 
@@ -165,7 +164,6 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
       return;
     }
 
-    // Swipe-to-delete: direct removal without confirmation
     try {
       await removeTrack(id, trackId);
       showSuccess('Track supprimé');
@@ -175,7 +173,6 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
     }
   };
 
-  // Gradient colors based on extracted dominant color
   const gradientColors = dominantColor
     ? ([
         hexToRgba(dominantColor, 0.9),
@@ -190,13 +187,10 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
         theme.colors.background,
       ] as const);
 
-  // Only show loading spinner if we have no data at all
-  // Otherwise, show cached data immediately while refreshing in background
   if (isLoading && !currentPlaylist) {
     return <LoadingSpinner fullScreen message="Chargement..." />;
   }
 
-  // If no playlist data available (error case or invalid id)
   if (!currentPlaylist) {
     return <LoadingSpinner fullScreen message="Chargement..." />;
   }

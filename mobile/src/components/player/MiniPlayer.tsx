@@ -21,7 +21,6 @@ export function MiniPlayer() {
     return null;
   }
 
-  // Derive UI state from playbackState
   const isLoading = playbackState === 'loading';
   const isPlaying = playbackState === 'playing';
   const canInteract = playbackState === 'playing' || playbackState === 'paused';

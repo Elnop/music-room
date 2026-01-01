@@ -11,38 +11,31 @@ export const royalBlueTheme: Theme = {
   displayName: 'Royal Blue',
 
   colors: {
-    // Primary - Royal blue/Navy
-    primary: '#1E3A8A', // Navy blue (primary buttons)
-    primaryLight: '#3B82F6', // Bright blue (hover/active)
-    primaryDark: '#1E293B', // Slate dark (text on primary)
+    primary: '#1E3A8A',
+    primaryLight: '#3B82F6',
+    primaryDark: '#1E293B',
 
-    // Secondary - Cyan
-    secondary: '#06B6D4', // Cyan (secondary accents)
-    secondaryLight: '#22D3EE', // Cyan light
+    secondary: '#06B6D4',
+    secondaryLight: '#22D3EE',
 
-    // Accent - Yellow/Orange
-    accent: '#FBBF24', // Amber (highlights)
-    accentAlt: '#F59E0B', // Orange (secondary CTA)
+    accent: '#FBBF24',
+    accentAlt: '#F59E0B',
 
-    // Backgrounds - Light
-    background: '#F8FAFC', // Slate 50 (main background)
-    surface: '#FFFFFF', // White (cards, inputs)
-    surfaceAlt: '#E2E8F0', // Slate 200 (disabled surfaces)
+    background: '#F8FAFC',
+    surface: '#FFFFFF',
+    surfaceAlt: '#E2E8F0',
 
-    // Text colors
-    text: '#0F172A', // Slate 900 (main text)
-    textSecondary: '#475569', // Slate 600 (secondary text)
-    textInverse: '#FFFFFF', // White (text on primary)
+    text: '#0F172A',
+    textSecondary: '#475569',
+    textInverse: '#FFFFFF',
 
-    // Border - Always black in neobrutalism
-    border: '#000000', // Pure black
-    borderLight: '#1F2937', // Gray 800 (subtle borders)
+    border: '#000000',
+    borderLight: '#1F2937',
 
-    // State colors
-    error: '#DC2626', // Red 600
-    success: '#16A34A', // Green 600
-    warning: '#EA580C', // Orange 600
-    info: '#0891B2', // Cyan 600
+    error: '#DC2626',
+    success: '#16A34A',
+    warning: '#EA580C',
+    info: '#0891B2',
   },
 
   borders: NEOBRUTALISM_BORDERS,

@@ -58,7 +58,6 @@ export class PlaylistService {
         {} as Record<string, number>
       );
 
-      // Get first track cover for each playlist (by lowest position, not necessarily 0)
       const { data: allTracks, error: tracksError } = await supabaseAdmin
         .from("playlist_tracks")
         .select("playlist_id, position, tracks:track_id(album_art)")
@@ -67,10 +66,8 @@ export class PlaylistService {
 
       if (tracksError) throw tracksError;
 
-      // Build map: keep only the first track (lowest position) for each playlist
       const firstTrackCoverMap = (allTracks || []).reduce(
         (acc, row) => {
-          // Only keep the first occurrence (lowest position) for each playlist
           if (acc[row.playlist_id] !== undefined) return acc;
           const track = row.tracks as { album_art?: string } | null;
           if (track?.album_art) {
@@ -81,7 +78,6 @@ export class PlaylistService {
         {} as Record<string, string>
       );
 
-      // Get owner info for all playlists
       const ownerIds = [...new Set(playlists.map((p) => p.owner_id))];
       const { data: owners, error: ownersError } = await supabaseAdmin
         .from("user_profiles")
@@ -177,7 +173,6 @@ export class PlaylistService {
         {} as Record<string, number>
       );
 
-      // Get first track cover for each playlist (by lowest position, not necessarily 0)
       const { data: allTracks, error: tracksError } = await supabaseAdmin
         .from("playlist_tracks")
         .select("playlist_id, position, tracks:track_id(album_art)")
@@ -186,10 +181,8 @@ export class PlaylistService {
 
       if (tracksError) throw tracksError;
 
-      // Build map: keep only the first track (lowest position) for each playlist
       const firstTrackCoverMap = (allTracks || []).reduce(
         (acc, row) => {
-          // Only keep the first occurrence (lowest position) for each playlist
           if (acc[row.playlist_id] !== undefined) return acc;
           const track = row.tracks as { album_art?: string } | null;
           if (track?.album_art) {
@@ -293,7 +286,6 @@ export class PlaylistService {
         {} as Record<string, string>
       );
 
-      // Get owner info for all playlists
       const ownerIds = [...new Set(playlists.map((p) => p.owner_id))];
       const { data: owners, error: ownersError } = await supabaseAdmin
         .from("user_profiles")
@@ -360,12 +352,10 @@ export class PlaylistService {
         throw new AppError(404, "Playlist not found", "PLAYLIST_NOT_FOUND");
       }
 
-      // Check permissions (if userId provided)
       if (userId && !canViewPlaylist(playlist, userId)) {
         throw new AppError(403, "Access denied", "PLAYLIST_ACCESS_DENIED");
       }
 
-      // Get tracks with position
       const { data: playlistTracks, error: tracksError } = await supabaseAdmin
         .from("playlist_tracks")
         .select(
@@ -381,7 +371,6 @@ export class PlaylistService {
 
       if (tracksError) throw tracksError;
 
-      // Get owner info
       const { data: owner, error: ownerError } = await supabaseAdmin
         .from("user_profiles")
         .select("id, username, display_name, avatar_url")
@@ -392,7 +381,6 @@ export class PlaylistService {
         throw new AppError(404, "Playlist owner not found", "OWNER_NOT_FOUND");
       }
 
-      // Format tracks
       const formattedTracks = playlistTracks.map((pt) => ({
         ...formatTrackResponse(pt.tracks as unknown as TrackRow),
         position: pt.position,
@@ -490,7 +478,6 @@ export class PlaylistService {
 
       if (error) throw error;
 
-      // Get track count
       const { count } = await supabaseAdmin
         .from("playlist_tracks")
         .select("*", { count: "exact", head: true })
@@ -514,7 +501,6 @@ export class PlaylistService {
    */
   async deletePlaylist(playlistId: string, userId: string): Promise<void> {
     try {
-      // Only owner can delete playlist
       await checkOwnership(playlistId, userId);
 
       const { error } = await supabaseAdmin
