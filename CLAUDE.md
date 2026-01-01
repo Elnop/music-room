@@ -23,9 +23,9 @@ The project must implement:
    - Profile with public, friends-only, private, and music preferences sections
 
 2. **Core Services (IV.2)** - At least 2 of the following 3:
-   - **Music Track Vote** (IV.2.1): Live voting system with visibility (public/private) and license management
-   - **Music Control Delegation** (IV.2.2): Device-specific music control delegation to friends
-   - **Music Playlist Editor** (IV.2.3): Real-time multi-user playlist editing with visibility and license management
+   - **Music Track Vote** (IV.2.1): ⚠️ **NOT IMPLEMENTED** - Not required for this project
+   - **Music Control Delegation** (IV.2.2): ✅ **IMPLEMENTED** - Device-specific music control delegation to friends
+   - **Music Playlist Editor** (IV.2.3): ✅ **IMPLEMENTED** - Real-time multi-user playlist editing with visibility and license management
 
 3. **Backend & API (IV.3, IV.4)**:
    - Backend as single source of truth for all data
@@ -57,7 +57,7 @@ The project must implement:
 
 ### Current Implementation Status
 
-The project has implemented **Music Playlist Editor** and **Music Control Delegation** (2/3 mandatory services). Continue development following subject requirements.
+The project has implemented **Music Playlist Editor** and **Music Control Delegation** (2/3 mandatory services). The **Music Track Vote** feature is **NOT required** and will **NOT be implemented** for this project. Continue development focusing on performance testing and layer-specific testing.
 
 ---
 
@@ -498,12 +498,21 @@ cd mobile && npm run reset
 When assisting with this project:
 
 1. **Follow the Subject PDF requirements first** - They override all other documentation
-2. **Maintain existing patterns** - Check similar features before implementing new ones
-3. **Keep files small** - Split large services into multiple focused files
-4. **Use TypeScript properly** - No `any` types, proper interfaces/types
-5. **Test your changes** - Verify with Swagger UI or Expo before marking complete
-6. **Security conscious** - Always validate inputs, check permissions
-7. **Document breaking changes** - Update relevant README/docs if you change architecture
-8. **Git commits** - Use Conventional Commits format
+2. **DO NOT implement Music Track Vote (IV.2.1)** - This feature is explicitly NOT required for this project
+3. **Maintain existing patterns** - Check similar features before implementing new ones
+4. **Keep files small** - Split large services into multiple focused files
+5. **Use TypeScript properly** - No `any` types, proper interfaces/types
+6. **Test your changes** - Verify with Swagger UI or Expo before marking complete
+7. **Security conscious** - Always validate inputs, check permissions
+8. **Document breaking changes** - Update relevant README/docs if you change architecture
+9. **Git commits** - Use Conventional Commits format
 
 When unsure, ask the user for clarification rather than guessing.
+
+### Priority Focus Areas
+
+The remaining work should focus on:
+1. **Performance Testing (IV.7)** - Load testing and documentation (CRITICAL)
+2. **Layer-Specific Testing (IV.8)** - Unit and integration tests (CRITICAL)
+3. **UI Completeness** - Email verification, password reset, music preferences screens
+4. **Documentation Review** - API documentation completeness
