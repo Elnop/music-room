@@ -1,6 +1,10 @@
 # CLAUDE.md
 
+**AI Assistant Instructions for Zumik Project**
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+---
 
 ## CRITICAL: Project Guidelines Priority
 
@@ -26,7 +30,7 @@ The project must implement:
 3. **Backend & API (IV.3, IV.4)**:
    - Backend as single source of truth for all data
    - RESTful API with JSON format
-   - API documentation (methods, inputs, outputs) - can use Swagger
+   - API documentation (methods, inputs, outputs) - Swagger UI at http://localhost:3000/api-docs
    - Configurable backend address in mobile app
 
 4. **Security (IV.6)**:
@@ -51,1102 +55,292 @@ The project must implement:
 - **Dependencies**: Must be auto-downloadable from repo (no committed libraries)
 - **SDK Warning**: SDKs must not do the core work for you
 
-### Bonus Features (Only if Mandatory Part is PERFECT)
+### Current Implementation Status
 
-- Multi-platform support (Web responsive)
-- IoT integration (IBeacon for events)
-- Subscription tiers (Free vs Paid)
-- Offline mode with synchronization
-
-**Current Implementation Status**: The project has implemented Music Playlist Editor and Music Control Delegation (2/3 mandatory services). Continue development following subject requirements.
+The project has implemented **Music Playlist Editor** and **Music Control Delegation** (2/3 mandatory services). Continue development following subject requirements.
 
 ---
 
-## Project Overview
+## Project Stack & Architecture
 
-Zumik is a collaborative music listening platform built with:
-- **Backend**: Node.js + Express + Socket.io + TypeScript + Supabase (PostgreSQL + Auth)
-- **Mobile**: React Native 0.81 + Expo SDK 54 + TypeScript + Zustand
-- **Infrastructure**: Docker Compose for orchestrated development
+### Tech Stack
 
-The app allows users to create collaborative music playlists with friends, featuring real-time synchronization and music streaming integration.
+**Backend:**
+- Node.js 22 + TypeScript + Express.js
+- Supabase (PostgreSQL + Auth with JWT)
+- Socket.io for real-time communication
+- Redis 7 for caching and rate limiting
+- Zod for validation
+- SoundCloud API via `soundcloud.ts` npm package
 
-## Development Commands
+**Mobile:**
+- React Native 0.81 + Expo SDK 54 + TypeScript
+- Zustand for state management
+- React Navigation 7 (stack-based)
+- expo-audio for HLS AAC streaming
+- Socket.io client for real-time updates
+- React Hook Form + Zod for validation
 
-Zumik provides **three development modes** orchestrated by a modular Makefile system. Use `make help` to see all available commands.
+**Infrastructure:**
+- Docker Compose orchestration
+- Chainguard Images (0 CVE, distroless for production)
+- Makefile-based development workflow
 
-### Quick Start
+### Backend Architecture
 
-```bash
-# 1. First-time setup (required once)
-make install          # Install all dependencies, create .env files
-
-# 2. Choose your development mode
-make dev              # Interactive menu to select mode
-
-# OR directly start your preferred mode:
-make dev-docker       # Docker mode (containerized, recommended for most)
-make dev-local        # Local mode (native, for Android Studio users)
-make dev-tunnel       # Tunnel mode (cross-network, different WiFi)
+**Feature-first structure** (`backend/src/features/`):
+```
+features/
+├── auth/              # Authentication (register, login, OAuth, JWT)
+├── playlists/         # Playlist CRUD + tracks + collaborators
+├── soundcloud/        # Music search and streaming
+├── profile/           # User profiles
+├── friends/           # Follow/unfollow system
+├── music-control/     # Playback control delegation
+└── mail/              # Transactional emails (Gmail SMTP)
 ```
 
-### Development Modes
+**Key patterns**:
+- **No `index.ts` files** - All imports are direct from source files
+- Services layer for business logic (< 150 lines each)
+- Permissions layer for authorization checks (e.g., `playlist.permissions.ts`)
+- Utils layer for helpers and formatters
+- Zod validators aligned with TypeScript types
+- Standard structure per feature: `feature.types.ts`, `feature.validators.ts`, `feature.service.ts`, `feature.controller.ts`, `feature.routes.ts`
 
-#### 🐳 Docker Mode (Recommended)
-Containerized development using Docker Compose. Best for most developers.
+**See `backend/CLAUDE.md` for detailed backend architecture.**
+
+### Mobile Architecture
+
+**Component + feature structure** (`mobile/src/`):
+```
+src/
+├── screens/          # Feature-based screens (Auth, Playlists, Profile, Friends, Search)
+├── components/       # Reusable UI components
+├── store/            # Zustand stores (auth, playlists, player, socket, soundcloud)
+├── contexts/         # React contexts (ThemeContext, PlayerContext)
+├── services/         # API clients (authApi, playlistApi, friendsApi, etc.)
+├── navigation/       # React Navigation stacks
+└── utils/            # Helpers and constants
+```
+
+**Key patterns**:
+- Path aliases: `@components`, `@screens`, `@store`, `@utils`, `@services`
+- Zustand stores for global state
+- React Context for UI state (theme, player)
+- Custom hooks for complex logic (e.g., `useSoundCloudPlayer`, `useMusicControl`)
+- Music-inspired dark theme (#1DB954 green, #121212 background)
+
+**See `mobile/CLAUDE.md` for detailed mobile architecture.**
+
+---
+
+## Development Workflow
+
+### Quick Start Commands
 
 ```bash
-# Start services
-make dev-docker       # Start backend + mobile in containers
-make stop             # Stop all containers
+# First-time setup
+make install          # Install deps, create .env files
+
+# Development (choose one mode)
+make dev-docker       # Docker mode (recommended)
+make dev-local        # Local mode (for Android Studio)
+make dev-tunnel       # Tunnel mode (different WiFi networks)
+
+# Useful commands
+make logs             # View all logs
+make ps               # Check container status
+make health           # Check services health
 make restart          # Restart all services
-make start            # Start existing containers (no rebuild)
-make down             # Stop and remove containers + networks
-
-# View logs
-make logs             # View all logs (backend + mobile)
-make logs-backend     # Backend logs only
-make logs-mobile      # Mobile logs only
-
-# Testing
-make qr               # Show Expo QR code (device must be on same WiFi)
-make ps               # Show container status
-make health           # Check services health status
-
-# Container access
-make shell-backend    # Open shell in backend container
-make shell-mobile     # Open shell in mobile container
-make build            # Rebuild Docker images
+make clean            # Clean containers + artifacts
 ```
 
-**When to use:** Default choice for development. Works out of the box.
+### When to Use Each Mode
 
-#### 💻 Local Mode (Native Development)
-Run services directly on your machine without Docker. Required for Android Studio emulator integration.
+- **Docker mode** (`make dev-docker`): Default for most development
+- **Local mode** (`make dev-local`): Android Studio emulator, native debugging
+- **Tunnel mode** (`make dev-tunnel`): Device on different WiFi/cellular
 
-```bash
-# Start services
-make dev-local        # Start backend + mobile locally
-make backend-local    # Start backend only
-make mobile-local     # Start Expo only
+**Full command reference**: See [DEVELOPMENT.md](./DEVELOPMENT.md)
 
-# Android development
-make dev-android      # Start Expo for Android emulator
-make expo-android     # Quick launch in Android emulator
-make expo-clear       # Start Expo with cleared cache
-make check-devices    # Check connected Android devices
-```
-
-**When to use:**
-- Using Android Studio emulator
-- Need native debugging
-- Docker not available
-- Prefer native development
-
-**Requirements:** Node.js 20+, npm installed locally
-
-#### 🌐 Tunnel Mode (Cross-Network Development)
-Uses ngrok tunneling for development across different networks. Adds ~50-200ms latency.
-
-```bash
-# One-time setup (required once)
-make tunnel-setup     # Auto-configures EAS, requires EXPO_TOKEN in mobile/.env
-
-# Daily usage
-make dev-tunnel       # Start all services with tunnel
-make qr-tunnel        # Show tunnel QR code and URLs
-make tunnel-info      # Display detailed tunnel information
-```
-
-**When to use:**
-- Phone on cellular data while PC on WiFi
-- Different WiFi networks
-- Testing from multiple devices simultaneously
-- Remote development/testing
-
-**Performance:** ~50-200ms latency vs <10ms LAN mode.
-
-See [TUNNEL_MODE.md](./TUNNEL_MODE.md) for complete documentation.
-
-### 📱 Native Builds (Custom Development Builds)
-Required for OAuth (Google/Facebook Sign-In) and native modules. Keeps hot reload functionality.
-
-```bash
-# One-time setup
-make dev-build-setup  # Configure EAS for development builds
-
-# Build custom development APK
-make dev-build        # Cloud build (~15-20 minutes)
-make dev-build-local  # Local build (requires Android SDK)
-
-# Cleanup
-make clean-native     # Clean android/ios/expo folders
-```
-
-**When to use:**
-- Need Google/Facebook OAuth
-- Testing native modules
-- Expo Go limitations
-
-### Build Commands
-
-Zumik provides build commands for backend validation and production mobile releases.
-
-#### Backend Builds
-
-```bash
-# TypeScript compilation (validation)
-make compile-backend    # Build backend TypeScript (fast validation)
-make verify-backend     # Check backend/dist/ artifacts exist
-make build-clean        # Remove build artifacts only
-
-# Production Docker image
-make compile-backend-docker # Build production backend image
-```
-
-**When to use backend builds**:
-- `make compile-backend` - Quick validation before commits (check TypeScript compiles)
-- `make verify-backend` - CI/CD pipelines to verify artifacts exist
-- `make compile-backend-docker` - Build production Docker image for deployment
-
-**Note**: Normal development does **not** need builds - `make dev-docker` and `make dev-local` use hot reload (tsx watch / Metro bundler).
-
-#### Production Mobile Builds (Android)
-
-Build production Android apps (AAB format) for Google Play Store deployment.
-
-```bash
-# Build production AAB for Google Play Store
-make prod-build         # EAS cloud build (~15-25 min, recommended)
-make prod-build-local   # EAS local build (requires Android SDK)
-make prod-build-manual  # Manual Gradle build (full control)
-
-# Version management
-make prod-version-bump  # Interactive version bump (e.g., 1.0.0 → 1.0.1)
-make prod-version-auto  # Auto-increment versionCode only
-
-# Deployment
-make prod-submit        # Submit AAB to Google Play Store
-make prod-info          # Display build information
-
-# Setup (one-time, for manual builds only)
-make prod-keystore-setup # Generate production keystore for signing
-```
-
-**Production Release Workflow**:
-```bash
-# 1. Bump version
-make prod-version-bump   # e.g., 1.0.0 → 1.0.1
-
-# 2. Build production AAB
-make prod-build          # Cloud build (easiest, ~15-25 min)
-
-# 3. Submit to Play Store
-make prod-submit         # Automatic submission via EAS
-```
-
-**Build Options Explained**:
-
-- **`prod-build`** (EAS Cloud - Recommended)
-  - Builds AAB on EAS servers
-  - No local Android SDK needed
-  - Auto-increments versionCode
-  - Duration: ~15-25 minutes
-  - Requires: EAS CLI (`npm install -g eas-cli`), Expo account
-
-- **`prod-build-local`** (EAS Local)
-  - Builds AAB on your machine
-  - Faster (~5-15 min, no queue)
-  - Requires: Android SDK, ANDROID_HOME set
-
-- **`prod-build-manual`** (Gradle)
-  - Full control over build process
-  - No EAS dependency
-  - Requires: Keystore setup (`make prod-keystore-setup`)
-
-**First-Time Setup**:
-```bash
-# Install EAS CLI (if using cloud/local builds)
-npm install -g eas-cli
-
-# Login to Expo
-cd mobile && eas login
-
-# For manual builds only
-make prod-keystore-setup  # Generate signing keystore
-```
-
-**Documentation**: See [BUILD.md](./BUILD.md) for complete build guide, troubleshooting, and CI/CD integration.
-
-### Redis Management
-
-Redis can be launched independently for local development, useful for brute force protection and rate limiting.
-
-```bash
-# Start Redis container
-make redis-start       # Start Redis independently
-make redis-stop        # Stop Redis
-make redis-restart     # Restart Redis
-
-# Monitoring
-make redis-logs        # View Redis logs (live)
-make redis-health      # Check Redis health status
-make redis-status      # Quick status check
-
-# Management
-make redis-shell       # Open Redis CLI shell (debug/inspect data)
-make redis-info        # Display Redis server info
-make redis-flush       # Flush all data (with confirmation)
-make redis-help        # Show all Redis commands
-```
-
-**Common Workflows**:
-```bash
-# Start Redis with local backend
-make redis-start && make backend-local
-
-# Inspect rate limit data
-make redis-shell
-> KEYS *
-> GET failed_login:test@example.com:127.0.0.1
-> TTL failed_login:test@example.com:127.0.0.1
-
-# Check memory usage
-make redis-info | grep -A 10 "# Memory"
-```
-
-**When to use:**
-- Running backend locally (`make backend-local`)
-- Testing rate limiting and brute force protection
-- Debugging authentication lockouts
-- Inspecting cached data
-
-**Note:** Redis automatically starts with `make dev-docker`. Standalone commands are for local development mode only.
-
-### Code Quality
+### Code Quality Tools
 
 ```bash
 make test             # Run all tests
-make lint             # Run linters on all code
+make lint             # Run linters
 make lint-fix         # Auto-fix linting issues
-make format           # Format all code with Prettier
+make format           # Format with Prettier
 ```
 
-### Cleanup
+---
 
-```bash
-# Project-level cleanup (recommended for most cases)
-make clean            # Containers + volumes + project artifacts (with confirmation)
-make clean-deps       # Dependencies + build artifacts only (no Docker)
-make clean-cache      # Project caches only (.expo, coverage, logs)
-make clean-native     # Native build folders (android/, ios/)
-make clean-project    # All project artifacts (comprehensive, no Docker/global)
+## Database Schema (Supabase PostgreSQL)
 
-# Docker-specific cleanup
-make clean-docker     # Zumik Docker resources only
-make prune            # Unused Docker resources across all projects
+**Tables:**
+- `user_profiles` - User data (username, display_name, avatar_url, bio, google_id, facebook_id)
+- `playlists` - Playlist metadata (name, description, cover_url, owner_id, collaborator_ids, viewer_ids, visibility, edit_mode)
+- `tracks` - Universal track data (track_uri, title, artist, album, album_art, duration_ms, preview_url)
+- `playlist_tracks` - Junction table (playlist_id, track_id, position, added_by)
+- `follows` - Follow relationships (follower_id, following_id, can_control_music)
 
-# Global/system-wide cleanup (affects ALL projects - use with caution)
-make clean-global-cache   # Expo, Metro, Watchman caches (needs 'yes' confirmation)
-make clean-gradle         # Gradle/Android caches (needs 'yes' confirmation)
+**Migrations location**: `backend/migrations/*.sql` (executed manually in Supabase Dashboard)
 
-# Nuclear option (use with extreme caution)
-make clean-all            # EVERYTHING: Docker + project + global caches (needs 'yes' confirmation)
-```
+**Key fields**:
+- `track_uri` stores universal identifiers (e.g., SoundCloud permalink URLs)
+- `edit_mode` on playlists: `'open'` (anyone can edit) or `'restricted'` (collaborators only)
+- `can_control_music` on follows: Boolean for music control delegation permission
 
-### Cleanup Matrix
+**Create migration**: `cd backend && make migrate-create name=description`
 
-| Command | Files/Deps | Docker (Zumik) | Docker (System) | Global Caches | Confirmation |
-|---------|-----------|---------------------|-----------------|---------------|--------------|
-| `make clean` | ✓ | ✓ | ✗ | ✗ | Yes (y/n) |
-| `make clean-deps` | ✓ | ✗ | ✗ | ✗ | No |
-| `make clean-cache` | Cache only | ✗ | ✗ | ✗ | No |
-| `make clean-docker` | ✗ | ✓ | ✗ | ✗ | No |
-| `make clean-native` | Native only | ✗ | ✗ | ✗ | No |
-| `make clean-project` | ✓ (all) | ✗ | ✗ | ✗ | No |
-| `make prune` | ✗ | Unused | Unused | ✗ | No |
-| `make clean-global-cache` | ✗ | ✗ | ✗ | ✓ (Expo, Metro) | Yes (type 'yes') |
-| `make clean-gradle` | ✗ | ✗ | ✗ | ✓ (Android) | Yes (type 'yes') |
-| `make clean-all` | ✓ | ✓ | ✓ | ✓ | Yes (type 'yes') |
+---
 
-### What Gets Cleaned
+## API Documentation
 
-**Project Artifacts:**
-- `backend/node_modules`, `mobile/node_modules` - Dependencies
-- `backend/dist` - TypeScript build output
-- `mobile/.expo` - Expo development cache
-- `mobile/android`, `mobile/ios` - Native builds (clean-native only)
-- `backend/coverage`, `mobile/coverage` - Test coverage reports
-- `*.tsbuildinfo` - TypeScript incremental build info
-- `.eas-build-*.json` - EAS build artifacts
-- `/tmp/ngrok.log`, `/tmp/backend-tunnel-url.txt` - Build logs
+**Interactive Swagger UI**: http://localhost:3000/api-docs
 
-**Docker Resources:**
-- Containers: `zumik-backend`, `zumik-mobile`
-- Images: `zumik-backend`, `zumik-mobile`
-- Volumes: Associated with Zumik services
-- Network: `zumik-network`
-- System: ALL Docker resources when using `clean-all`
+**45 REST endpoints** across 6 features:
+- **Auth** (7): register, login, OAuth (Google/Facebook), provider management
+- **Playlists** (13): CRUD, tracks, collaborators, viewers, edit modes
+- **Profile** (4): get, update, search users
+- **Friends** (4): follow, unfollow, list, check status
+- **Music Control** (4): grant, revoke, check permissions
+- **SoundCloud** (3): search, track details, stream URLs
 
-**Global Caches (only with explicit commands):**
-- `~/.expo/`, `~/.cache/expo/` - Expo global cache
-- `~/.cache/metro-bundler/` - Metro bundler cache
-- `~/.watchman` - Watchman file watcher cache
-- `~/.gradle/`, `~/.android/` - Gradle/Android SDK caches
+**Authentication**: JWT tokens in `Authorization: Bearer <token>` header
 
-### Utilities
-
-```bash
-make info             # Show system information
-make fix-permissions  # Fix file permissions for Docker
-make fix-node-modules # Fix node_modules ownership (for local builds)
-```
-
-### Common Workflows
-
-```bash
-# Different WiFi networks?
-make tunnel-setup && make dev-tunnel
-
-# Android Studio emulator?
-make dev-local
-
-# Need Google Sign-In?
-make dev-build-setup && make dev-build
-
-# Fresh start after git pull?
-make restart          # Docker mode
-# OR
-make backend-local    # Local mode (restart manually)
-```
-
-### Backend (Non-Docker Development)
-
-When working directly in `backend/` without Docker:
-
-```bash
-cd backend
-
-# Development
-npm run dev           # Start dev server with hot reload (tsx watch)
-npm run build         # Build TypeScript to dist/
-npm start             # Start production server (requires build first)
-npm run type-check    # Type check without emitting
-
-# Makefile shortcuts
-make dev              # Same as npm run dev
-make build            # Same as npm run build
-make setup            # Install deps + create .env from .env.example
-```
-
-Backend runs on `http://localhost:3000`
-
-### Mobile (Non-Docker Development)
-
-When working directly in `mobile/` without Docker:
-
-```bash
-cd mobile
-
-# Start Expo
-npm start             # Normal mode
-npm run start:lan     # LAN mode (recommended for physical devices)
-npm run start:tunnel  # Tunnel mode (different WiFi networks)
-npm run start:clear   # Clear cache and start
-
-# Platform-specific
-npm run android       # Launch on Android emulator/device
-npm run ios           # Launch on iOS simulator (macOS only)
-
-# Code quality
-npm run check         # Type check + lint (fast pre-commit check)
-npm run fix           # Format + lint fix (auto-fix everything)
-npm run lint          # ESLint only
-npm run format        # Prettier only
-npm run type-check    # TypeScript only
-
-# Troubleshooting
-npm run reset         # Clear cache and restart Expo
-npm run clean:cache   # Clear Expo cache (~5 seconds)
-npm run doctor        # Diagnose Expo configuration issues
-```
-
-Expo DevTools: `http://localhost:19000`
-Metro Bundler: `http://localhost:8081`
-
-### Testing Mobile App on Physical Device
-
-1. Ensure device and computer on same WiFi
-2. Run `make dev-docker` (or `make qr` if already running)
-3. Install Expo Go app on device (Play Store / App Store)
-4. Scan QR code from terminal or http://localhost:19000
-
-## Architecture
-
-### Backend: Feature-First Architecture (Refactored for Team Collaboration)
-
-```
-backend/src/
-├── features/              # Features organized by domain
-│   ├── auth/             # Authentication feature (194 lines, refactored)
-│   │   ├── services/           # Business logic services
-│   │   │   └── session.service.ts    # Session and token management
-│   │   ├── utils/              # Auth helpers
-│   │   │   └── auth.helpers.ts       # Format response, fetch profile
-│   │   ├── auth.types.ts       # TypeScript types
-│   │   ├── auth.validators.ts  # Zod validation schemas
-│   │   ├── auth.service.ts     # Main auth service (register, login)
-│   │   ├── auth.controller.ts  # Express request handlers
-│   │   ├── auth.middleware.ts  # JWT verification middleware
-│   │   └── auth.routes.ts      # Express routes
-│   ├── playlists/        # Playlist management (254 lines main service, refactored)
-│   │   ├── services/           # Business logic services
-│   │   │   ├── playlist-track.service.ts  # Track management (add/remove/reorder)
-│   │   │   └── collaborator.service.ts    # Collaborator management
-│   │   ├── permissions/        # Authorization checks
-│   │   │   └── playlist.permissions.ts    # Ownership and edit permissions
-│   │   ├── utils/              # Helpers
-│   │   │   └── playlist.helpers.ts        # Format responses, reindex positions
-│   │   ├── playlist.types.ts
-│   │   ├── playlist.validators.ts
-│   │   ├── playlist.service.ts          # Main playlist CRUD service
-│   │   ├── playlist.controller.ts       # Express request handlers
-│   │   └── playlist.routes.ts
-│   ├── soundcloud/       # SoundCloud integration (75 lines main service, refactored)
-│   │   ├── services/           # Business logic services
-│   │   │   ├── soundcloud-search.service.ts  # Search and track retrieval
-│   │   │   └── soundcloud-stream.service.ts  # Stream URL management
-│   │   ├── utils/              # Helpers
-│   │   │   ├── soundcloud-cache.ts           # Cache management with TTL
-│   │   │   └── client-extractor.ts           # Client ID extraction
-│   │   ├── soundcloud.types.ts
-│   │   ├── soundcloud.validators.ts
-│   │   ├── soundcloud.service.ts      # Main orchestrator service
-│   │   ├── soundcloud.controller.ts
-│   │   └── soundcloud.routes.ts
-│   ├── profile/          # User profile management (124 lines, refactored for consistency)
-│   │   ├── services/           # Business logic services
-│   │   │   └── profile.service.ts    # Profile CRUD operations
-│   │   ├── profile.types.ts
-│   │   ├── profile.validators.ts
-│   │   ├── profile.service.ts         # Re-export for backward compatibility
-│   │   ├── profile.controller.ts
-│   │   └── profile.routes.ts
-│   ├── friends/          # Friends system (follow/unfollow, mutual friends)
-│   │   ├── friends.types.ts
-│   │   ├── friends.validators.ts
-│   │   ├── friends.service.ts         # Follow/unfollow logic, get friends
-│   │   ├── friends.controller.ts
-│   │   └── friends.routes.ts
-│   ├── music-control/    # Music control delegation system
-│   │   ├── music-control.types.ts
-│   │   ├── music-control.validators.ts
-│   │   ├── music-control.service.ts   # Grant/revoke control permissions
-│   │   ├── music-control.controller.ts
-│   │   └── music-control.routes.ts
-│   ├── mail/             # Email service (transactional emails, templates, rate limiting)
-│   │   ├── services/           # Email services
-│   │   │   ├── mail.service.ts              # Main email sending (Gmail SMTP)
-│   │   │   ├── rate-limiter.service.ts      # Generic rate limiting (Redis + in-memory)
-│   │   │   └── template-renderer.service.ts # Template registry
-│   │   ├── templates/          # Email templates
-│   │   │   ├── base.template.ts             # Base HTML layout (dark theme)
-│   │   │   └── verification-email.template.ts # Verification email
-│   │   ├── utils/              # Email helpers
-│   │   │   └── mail.helpers.ts              # Validation, formatting
-│   │   ├── mail.types.ts       # TypeScript types
-│   │   ├── mail.config.ts      # Gmail SMTP config
-│   │   └── README.md           # Documentation
-│   └── [future features: rooms, social features]
-├── shared/                # Shared code across features
-│   ├── config/           # Environment vars (env.ts), Supabase clients
-│   ├── middleware/       # Global middleware (error-handler.ts)
-│   ├── types/            # Global TypeScript types
-│   └── utils/            # Logger, helpers
-│       ├── logger.ts
-│       └── database.helpers.ts  # Shared DB utilities (fetchSingle, fetchMany, etc.)
-├── realtime/             # Socket.io real-time service (478 lines)
-│   └── index.ts          # WebSocket event handlers (playlist sync, music control, device management)
-└── server.ts             # Entry point (Express + Socket.io setup)
-```
-
-**Key Backend Patterns** (Updated for Team Collaboration):
-- **Feature-first structure**: Each feature is self-contained with clear boundaries
-- **Services layer**: Business logic split into focused services (< 150 lines each)
-- **Permissions layer**: Authorization checks separated for testability (playlists)
-- **Utils layer**: Reusable helpers and formatters to reduce duplication
-- **Consistent structure**: All features follow the same organizational pattern
-- **Improved maintainability**: Smaller files, clearer responsibilities, easier code reviews
-- **Testability**: Isolated services and helpers are easier to unit test
-- **Reduced debug noise**: Excessive logging removed, cleaner codebase
-
-**Refactoring Results**:
-- **Playlists**: 657 lines → 254 lines main service (60% reduction)
-- **SoundCloud**: 342 lines → 75 lines main service (78% reduction)
-- **Auth**: 307 lines → 194 lines main service (37% reduction)
-- **Profile**: 124 lines → organized in services/ for consistency
-
-**Standard Feature Structure**:
-```
-feature/
-  ├── services/          # Business logic divided by responsibility
-  │   ├── feature.service.ts        # Main CRUD operations
-  │   └── feature-secondary.service.ts  # Secondary operations
-  ├── utils/            # Helpers and utilities
-  │   └── feature.helpers.ts
-  ├── permissions/      # Authorization checks (if needed)
-  │   └── feature.permissions.ts
-  ├── feature.types.ts
-  ├── feature.validators.ts
-  ├── feature.controller.ts
-  ├── feature.routes.ts
-  └── feature.middleware.ts (if applicable)
-```
-
-**Import Convention**:
-- **No index.ts files anywhere** - All imports are direct from source files
-- Example: `import { PlaylistService } from "./services/playlist.service.js"`
-- Example: `import { formatResponse } from "./utils/playlist.helpers.js"`
-- Example: `import authRoutes from "./features/auth/auth.routes.js"` (from server.ts)
-
-**Database Integration**:
-- Supabase for PostgreSQL database + authentication
-- Zod for runtime validation aligned with TypeScript types
-- Shared database helpers in `shared/utils/database.helpers.ts`
-- Error responses follow standardized format from `error-handler.ts`
-- JWT tokens verified via `auth.middleware.ts` for protected routes
-
-**Backend API Routes** (37 total endpoints):
-- `/health` - Health check endpoint
-- `/api/auth/*` - Authentication endpoints (8 routes):
-  - Email/password: register, login, me, logout
-  - OAuth: google, facebook
-  - Provider management: get providers, unlink provider
-- `/api/profile/*` - Profile management endpoints (4 routes: get own profile, update profile, search users, get user profile)
-- `/api/playlists/*` - Playlist CRUD and track management (13 routes)
-  - CRUD operations (create, get all, get by ID, update, delete)
-  - Track management (add, remove, reorder tracks)
-  - Collaborator management (add, remove - list returned in playlist details)
-  - Viewer management (add, remove - list returned in playlist details)
-- `/api/soundcloud/*` - SoundCloud music search and streaming (3 routes: search, track details, stream URLs)
-- `/api/friends/*` - Friends system (4 routes: get friends, follow, unfollow, check follow status)
-- `/api/music-control/*` - Music control delegation (4 routes: grant control, revoke control, get permissions, check if user can control)
-
-### Mobile: Component + Feature Architecture
-
-```
-mobile/src/
-├── screens/              # Screens by feature
-│   ├── auth/            # WelcomeScreen, LoginScreen, RegisterScreen
-│   ├── playlists/       # PlaylistsScreen, CreatePlaylistScreen, PlaylistDetailScreen, PlaylistEditorScreen
-│   ├── profile/         # ProfileScreen, EditProfileScreen
-│   ├── friends/         # FriendsScreen (455 lines - tabs for friends list + search), UserProfileScreen
-│   ├── settings/        # SettingsScreen
-│   └── search/          # SoundCloudSearchScreen, SoundCloudTrackItem, PlaylistSelectorModal
-├── components/
-│   ├── common/          # Reusable UI (Button, Card, Input, LoadingSpinner, Avatar, etc.)
-│   ├── playlist/        # Feature-specific (TrackItem, PlaylistCard, PlaylistHeader, AddTrackButton)
-│   ├── player/          # MiniPlayer, PlayerModal (full player with controls, progress, artwork)
-│   └── music-control/   # DeviceListeningCard (displays friends listening with control delegation)
-├── navigation/
-│   ├── RootNavigator.tsx    # Main navigator (switches Auth/App based on auth state)
-│   ├── AuthNavigator.tsx    # Stack for unauthenticated users
-│   ├── AppNavigator.tsx     # Bottom tabs for authenticated users
-│   └── stacks/              # Feature-specific navigation stacks
-│       ├── PlaylistsStack.tsx
-│       ├── FriendsStack.tsx
-│       ├── ProfileStack.tsx
-│       └── SearchStack.tsx
-├── contexts/             # React Context providers
-│   ├── ThemeContext.tsx     # Theme state and colors (2705 lines)
-│   └── PlayerContext.tsx    # Audio player lifecycle management (4058 lines)
-├── store/               # Zustand state management
-│   ├── authStore.ts         # Authentication state (user, tokens, login/logout)
-│   ├── playlistStore.ts     # Playlist state with API integration
-│   ├── soundcloudStore.ts   # SoundCloud search state
-│   ├── playerStore.ts       # Audio player state (current track, play state, modal state)
-│   └── socketStore.ts       # Socket.io connection management
-├── hooks/               # Custom React hooks
-│   ├── useSoundCloudPlayer.ts   # Audio playback hook (fetch stream, manage player)
-│   ├── usePlayerController.ts   # Player controls (play, pause, seek, skip)
-│   ├── usePlayerProgress.ts     # Progress tracking and slider
-│   ├── usePlayerSync.ts         # Sync player state across components
-│   ├── useMusicControl.ts       # Music control delegation (7849 lines!)
-│   └── usePlaylistSocket.ts     # Real-time playlist updates
-├── api/                 # API client layer
-│   └── playlistApi.ts  # Playlist API calls
-├── services/            # Service layer
-│   ├── api.ts          # Base API configuration
-│   ├── profileApi.ts   # Profile API calls
-│   ├── friendsApi.ts   # Friends API calls (follow, unfollow, get friends)
-│   ├── musicControlApi.ts  # Music control delegation API
-│   ├── oauth.ts        # OAuth integration (Google, etc.)
-│   └── deviceService.ts    # Device registration and management
-├── lib/                 # Third-party library configuration
-│   └── supabase.ts     # Supabase client setup
-├── types/              # TypeScript types aligned with backend
-├── utils/              # Validators (Zod), formatters, helpers
-├── constants/          # Theme colors, API URLs, spacing
-└── mocks/              # Mock data for development (users, playlists, tracks)
-```
-
-**Key Mobile Patterns**:
-- Path aliases: `@/*` (root), `@components`, `@screens`, `@store`, `@utils`, `@types`, `@constants`, `@mocks`, `@api`, `@services`, `@hooks`, `@contexts`
-- Zustand stores for state management (auth, playlists, soundcloud, player, socket)
-- React Context for cross-cutting concerns (ThemeContext, PlayerContext)
-- React Hook Form + Zod for form validation
-- React Navigation 7 with stack-based organization and bottom tab navigators
-- Custom hooks for complex logic (7 hooks for audio, music control, real-time)
-- Music-inspired dark theme (Green #1DB954, Black #121212)
-- Authentication state persisted to AsyncStorage, loaded on app start in RootNavigator
-- API layer (`@api`, `@services`) for backend communication
-- Socket.io for real-time updates (playlist changes, music control delegation)
-- expo-audio for SoundCloud streaming playback
-
-## Environment Configuration
-
-### Backend `.env`
-```bash
-# Supabase (required)
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_KEY=your-service-key  # Keep secret!
-
-# Server
-PORT=3000
-NODE_ENV=development
-
-# CORS
-ALLOWED_ORIGINS=http://localhost:8081,exp://localhost:8081
-
-# Tunnel Mode (for cross-network development)
-NGROK_AUTHTOKEN=your_ngrok_token  # Get from https://dashboard.ngrok.com/get-started/your-authtoken
-TUNNEL_URL=  # Auto-configured by tunnel script, leave empty
-
-# OAuth (Google)
-GOOGLE_CLIENT_ID=your_google_client_id  # Get from Google Cloud Console
-
-# OAuth (Facebook)
-FACEBOOK_APP_ID=your_facebook_app_id  # Get from Facebook Developers
-FACEBOOK_APP_SECRET=your_facebook_app_secret  # Keep secret!
-```
-
-### Mobile `.env`
-```bash
-# Backend API (use local IP for physical devices)
-EXPO_PUBLIC_API_URL=http://localhost:3000
-
-# For physical device testing:
-# EXPO_PUBLIC_API_URL=http://YOUR_LOCAL_IP:3000
-
-# WebSocket URL (for real-time features)
-EXPO_PUBLIC_WS_URL=ws://localhost:3000
-
-# Supabase (optional, primarily using backend API)
-EXPO_PUBLIC_SUPABASE_URL=
-EXPO_PUBLIC_SUPABASE_ANON_KEY=
-
-# EAS / Tunnel Mode
-EXPO_TOKEN=your_expo_token  # For tunnel mode, get from expo.dev
-
-# OAuth (Google Sign-In)
-EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=your_google_client_id
-EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME=your_ios_scheme
-
-# OAuth (Facebook)
-EXPO_PUBLIC_FACEBOOK_APP_ID=your_facebook_app_id  # Get from Facebook Developers
-EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN=your_facebook_client_token  # Get from Facebook Developers
-```
-
-## Database Migrations
-
-Migrations are SQL files in `backend/migrations/` executed manually in Supabase Dashboard:
-
-1. Open Supabase Dashboard → SQL Editor
-2. Create new query
-3. Copy content from migration file (e.g., `001_initial_schema.sql`)
-4. Execute
-
-**Current schema**:
-- `user_profiles` table - User profile data (id, username, display_name, avatar_url, bio, created_at, updated_at)
-  - Linked to Supabase auth.users via foreign key
-- `playlists` table - Playlist metadata (id, name, description, cover_url, owner_id, collaborator_ids, viewer_ids, visibility, edit_mode, timestamps)
-  - `edit_mode` - 'open' (anyone can edit) or 'restricted' (only collaborators)
-- `tracks` table - Universal track data (id, track_uri, title, artist, album, album_art, duration_ms, preview_url, timestamps)
-  - `track_uri` stores universal track identifiers from any music service
-  - `album` field is nullable (some tracks may not have album info)
-- `playlist_tracks` junction table - Many-to-many relationship (playlist_id, track_id, position, added_by, timestamps)
-- `follows` table - Follow relationships (follower_id, following_id, can_control_music, timestamps)
-  - `can_control_music` - Boolean flag for music control delegation permission
-
-**Migrations** (in execution order):
-1. `001_initial_schema.sql` - User profiles table with basic fields
-2. `002_spotify_oauth.sql` - ⚠️ **Deprecated** - Previous Spotify OAuth integration
-3. `003_playlist_persistence.sql` - Playlists, tracks, and playlist_tracks tables
-4. `004_remove_spotify.sql` - Remove all Spotify columns from user_profiles
-5. `005_rename_spotify_uri_to_track_uri.sql` - Rename spotify_uri to track_uri for universal support
-6. `006_make_album_nullable.sql` - Make album field nullable in tracks table
-7. `006_oauth_providers.sql` - ⚠️ **Deprecated** - Initial OAuth provider support attempt
-8. `007_follows.sql` - Friends system with follows table
-9. `007_multi_provider_oauth.sql` - ⚠️ **Deprecated** - Multi-provider OAuth attempt
-10. `007_multi_provider_oauth_safe.sql` - ✅ **Active** - Safe multi-provider OAuth implementation
-11. `009_music_control.sql` - Add can_control_music column to follows table (skips 008)
-12. `010_edit_mode.sql` - Add edit_mode column to playlists table and update RLS policies
-
-**Note**: Multiple files share the same numbers (006, 007) due to iterative development. Files marked "Deprecated" were superseded by later versions. The "safe" variants include proper error handling and rollback capabilities.
-
-**Create new migration**:
-```bash
-cd backend
-make migrate-create name=add_friends_table
-```
-
-## Docker Architecture
-
-The project uses Docker Compose with two services:
-
-- **Backend**: Runs Node.js dev server with hot reload, exposed on port 3000
-- **Mobile**: Runs Expo with Metro bundler, exposed on ports 8081, 19000-19002
-
-Both services use **Chainguard Images** (0 CVE, Wolfi OS, updated daily):
-- Dev: `cgr.dev/chainguard/node:latest-dev` (with shell and tools)
-- Prod: `cgr.dev/chainguard/node:latest` (distroless, minimal attack surface)
-
-See `DOCKER.md` for detailed Docker documentation and troubleshooting.
-
-## File Permissions
-
-### Why This Matters
-
-Zumik uses Chainguard container images that run as non-root user (UID 65532, user `node`). This is a security best practice that prevents potential privilege escalation attacks.
-
-Source code files must be readable by this user for:
-- Metro bundler to scan and watch files during development
-- Hot reload to work properly
-- Docker bind mounts (`./mobile:/app`) to function correctly
-
-**The Issue**: When source files have owner-only permissions (0700 for directories, 0600 for files), the Docker container's `node` user cannot read them, causing errors like:
-```
-Error: EACCES: permission denied, scandir '/app/src/mocks'
-```
-
-### Expected Permissions
-
-Source code should have standard readable permissions:
-- **Directories**: 0755 (drwxr-xr-x) - owner write, everyone read+execute
-- **Files**: 0644 (-rw-r--r--) - owner write, everyone read
-
-These are standard for shared development environments and are tracked by git.
-
-### Fixing Permission Issues
-
-If you see `EACCES: permission denied` errors (e.g., `scandir '/app/src/mocks'` or `open '/app/babel.config.js'`):
-
-```bash
-# Fix Mobile directory (excluding node_modules and .expo)
-find mobile -type d \( -name node_modules -o -name .expo \) -prune -o -type d -exec chmod 0755 {} \;
-find mobile -type d \( -name node_modules -o -name .expo \) -prune -o -type f -exec chmod 0644 {} \;
-chmod +x mobile/*.sh  # Make shell scripts executable
-
-# Fix Backend directory (excluding node_modules and dist)
-find backend -type d \( -name node_modules -o -name dist \) -prune -o -type d -exec chmod 0755 {} \;
-find backend -type d \( -name node_modules -o -name dist \) -prune -o -type f -exec chmod 0644 {} \;
-chmod +x backend/*.sh  # Make shell scripts executable
-
-# Verify fix
-ls -la mobile/babel.config.js mobile/src/mocks/  # Should show -rw-r--r-- and drwxr-xr-x
-ls -la backend/src/  # Should show drwxr-xr-x
-
-# Restart Docker
-make restart
-```
-
-**Why this works**: The chmod commands make files readable by all users (including Docker's non-root `node` user), while keeping write permissions restricted to the owner. Shell scripts need execute permissions (+x) to run. Git tracks execute permissions, so the fix persists across commits.
-
-## Mail Feature - Transactional Emails
-
-Zumik implements a dedicated **mail feature** for sending transactional emails with template support and rate limiting.
-
-### Architecture
-
-The mail feature is fully decoupled from the auth feature and can be used by any backend feature:
-
-```
-features/mail/
-├── services/
-│   ├── mail.service.ts              # Gmail SMTP email sending
-│   ├── rate-limiter.service.ts      # Generic rate limiting (Redis + fallback)
-│   └── template-renderer.service.ts # Template registry
-├── templates/
-│   ├── base.template.ts             # Base HTML layout (dark theme)
-│   └── verification-email.template.ts # Verification email template
-├── utils/
-│   └── mail.helpers.ts              # Email validation, formatting
-├── mail.types.ts                    # TypeScript types
-├── mail.config.ts                   # Gmail SMTP configuration
-└── README.md                        # Complete documentation
-```
-
-### Core Services
-
-**1. MailService** - Main email sending service via Gmail SMTP:
-- `sendTemplatedEmail(to, templateName, data)` - Send email using a template
-- `sendEmail(options)` - Send custom HTML/text email
-- `verifyConnection()` - Health check for SMTP connection
-
-**2. RateLimiterService** - Generic rate limiting (reusable across features):
-- `checkLimit(key, config)` - Check if action is within rate limit
-- `incrementAndCheck(key, config)` - Increment and check (throws on exceed)
-- `reset(key)` - Reset rate limit for a key
-- Redis-backed with automatic in-memory fallback
-
-**3. TemplateRendererService** - Email template registry:
-- `render(templateName, data)` - Render template by name
-- `registerTemplate(name, renderer)` - Add new templates
-- Type-safe template names via TypeScript union types
-
-### Available Templates
-
-**verification-email**: Email verification code template
-- Dark theme matching Zumik branding (#121212 background, #1DB954 green)
-- Large monospace code display
-- Responsive HTML + plain text fallback
-- Data: `{ code: string, expiresInMinutes: number }`
-
-### Usage Example
-
-```typescript
-// In any feature that needs to send emails
-import { MailService } from '@features/mail/services/mail.service.js';
-
-const mailService = new MailService();
-
-// Send verification email
-await mailService.sendTemplatedEmail(
-  'user@example.com',
-  'verification-email',
-  { code: '123456', expiresInMinutes: 15 }
-);
-```
-
-### Integration with Auth
-
-The auth feature's `EmailVerificationService` uses the mail service:
-
-```typescript
-// features/auth/services/email-verification.service.ts
-import { MailService } from '@features/mail/services/mail.service.js';
-import { RateLimiterService } from '@features/mail/services/rate-limiter.service.js';
-
-class EmailVerificationService {
-  private mailService = new MailService();
-  private rateLimiter = new RateLimiterService();
-
-  async sendVerificationEmail(email: string, code: string) {
-    await this.mailService.sendTemplatedEmail(email, 'verification-email', {
-      code,
-      expiresInMinutes: this.CODE_EXPIRY_MINUTES
-    });
-  }
-
-  async verifyCode(userId: string, code: string, ip: string) {
-    // Use rate limiter to prevent brute force
-    await this.rateLimiter.incrementAndCheck(`email_verify:${userId}:${ip}`, {
-      maxAttempts: 5,
-      windowSeconds: 900
-    });
-    // ... verification logic ...
-  }
-}
-```
-
-### Adding New Templates
-
-1. Create template file in `features/mail/templates/`
-2. Add template name to `TemplateName` union type in `mail.types.ts`
-3. Register template in `TemplateRendererService`
-4. Use via `MailService.sendTemplatedEmail()`
-
-**Example** (future password reset):
-```typescript
-// features/mail/templates/password-reset.template.ts
-export function renderPasswordResetEmail(data: { resetLink: string }): EmailTemplate {
-  // ... template logic ...
-}
-
-// Register in template-renderer.service.ts
-this.templates.set('password-reset', renderPasswordResetEmail);
-
-// Use in any feature
-await mailService.sendTemplatedEmail(email, 'password-reset', { resetLink: '...' });
-```
-
-### Configuration
-
-Environment variables in `backend/.env`:
-
-```bash
-# Gmail SMTP (required)
-GMAIL_USER=your-email@gmail.com
-GMAIL_APP_PASSWORD=xxxx-xxxx-xxxx-xxxx  # 16-char app password
-
-# Email Verification
-EMAIL_VERIFICATION_CODE_EXPIRY_MINUTES=15
-EMAIL_VERIFICATION_MAX_ATTEMPTS=5
-EMAIL_VERIFICATION_MAX_RESENDS_PER_HOUR=3
-EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS=60
-```
-
-### Future Enhancements
-
-- **Password Reset Email** - Template for password reset flows
-- **Notification Emails** - Playlist invites, friend requests, activity alerts
-- **Email Queue** - Async sending with Bull/BullMQ for high volume
-- **Multi-Provider Support** - Abstract SMTP to support SendGrid, AWS SES
-- **Email Analytics** - Track open rates, click rates
-
-See `backend/src/features/mail/README.md` for complete documentation.
+---
 
 ## Real-time Features (Socket.io)
 
-Zumik implements real-time synchronization using **Socket.io** for live updates across devices.
+**Backend**: `backend/src/realtime/index.ts` (478 lines)
 
-### Backend Real-time Service
+**Event types**:
+- `playlist:track:added` - Track added to playlist
+- `playlist:track:removed` - Track removed from playlist
+- `playlist:updated` - Playlist metadata changed
+- `music-control:granted` - User granted control permission
+- `music-control:revoked` - User revoked control permission
+- `device:register` - Device registered for listening
+- `device:status` - Listening status updated
 
-**Location**: `backend/src/realtime/index.ts` (478 lines)
+**Mobile**: `socketStore` for connection management, `usePlaylistSocket` hook for playlist sync
 
-**Key Features**:
-- **Playlist Sync**: Real-time updates when tracks are added/removed from playlists
-- **Music Control Delegation**: Live updates when friends grant/revoke playback control
-- **Device Management**: Register devices and track listening status
-- **Room-based Events**: Events scoped to specific playlists or user groups
+---
 
-**Event Types**:
-```typescript
-// Playlist events
-'playlist:track:added' - Track added to playlist
-'playlist:track:removed' - Track removed from playlist
-'playlist:updated' - Playlist metadata updated
+## Coding Standards & Best Practices
 
-// Music control events
-'music-control:granted' - User granted control permission
-'music-control:revoked' - User revoked control permission
+### General Principles
 
-// Device events
-'device:register' - Device registered for listening
-'device:status' - Listening status updated
+1. **Follow existing patterns** - Check similar features before implementing new ones
+2. **Keep services small** - Aim for < 150 lines per service file
+3. **Use Zod for validation** - Define schemas aligned with TypeScript types
+4. **No `index.ts` barrel files** - Import directly from source files
+5. **TypeScript strict mode** - No `any` types unless absolutely necessary
+6. **Error handling** - Use try/catch, return proper HTTP status codes
+7. **Security first** - Never commit credentials, validate all inputs, check permissions
+
+### Backend Patterns
+
+**Feature structure**:
+```
+features/feature-name/
+├── services/                    # Business logic
+│   ├── feature.service.ts       # Main CRUD operations
+│   └── feature-secondary.service.ts  # Secondary operations
+├── utils/                       # Helpers
+│   └── feature.helpers.ts
+├── permissions/                 # Authorization (if needed)
+│   └── feature.permissions.ts
+├── feature.types.ts             # TypeScript types
+├── feature.validators.ts        # Zod schemas
+├── feature.controller.ts        # Express handlers
+├── feature.routes.ts            # Express routes
+└── feature.middleware.ts        # (optional)
 ```
 
-### Mobile Integration
-
-**Socket Store** (`mobile/src/store/socketStore.ts`):
-- Connection state management
-- Auto-reconnection logic
-- Event subscription handling
-
-**Custom Hooks**:
-- `usePlaylistSocket` - Subscribe to playlist updates in real-time
-- `useMusicControl` - Handle music control delegation events (7849 lines!)
-
-**Usage Example**:
+**Import pattern**:
 ```typescript
-// In PlaylistDetailScreen
-const { socket, isConnected } = socketStore();
+// ✅ Good - direct import
+import { PlaylistService } from "./services/playlist.service.js";
+import { formatResponse } from "./utils/playlist.helpers.js";
 
-usePlaylistSocket(playlistId, {
-  onTrackAdded: (track) => {
-    // Refresh playlist when track added by another user
-    playlistStore.fetchPlaylist(playlistId);
-  },
-  onTrackRemoved: (trackId) => {
-    // Remove track from local state
-    playlistStore.removeTrackLocally(playlistId, trackId);
+// ❌ Bad - barrel file
+import { PlaylistService } from "./services/index.js";
+```
+
+**Service pattern**:
+```typescript
+export class FeatureService {
+  async getById(id: string): Promise<FeatureType> {
+    // 1. Validate input
+    // 2. Fetch from database
+    // 3. Format response
+    // 4. Return result
   }
-});
+}
 ```
 
-**Connection Flow**:
-1. User logs in → `socketStore` connects to backend WebSocket
-2. User opens playlist → Subscribe to `playlist:${id}` room
-3. Another user adds track → Backend emits `playlist:track:added` event
-4. All connected clients in room receive event and update UI
-5. User leaves playlist → Unsubscribe from room
+### Mobile Patterns
 
-## Music Integration - SoundCloud
+**Component structure**:
+```typescript
+// Functional component with TypeScript
+interface Props {
+  title: string;
+  onPress: () => void;
+}
 
-Zumik uses **SoundCloud** for music search and streaming via the `soundcloud.ts` npm package.
+export const MyComponent: React.FC<Props> = ({ title, onPress }) => {
+  // Hooks first
+  const { user } = useAuthStore();
+  const theme = useTheme();
 
-### Key Features
+  // Event handlers
+  const handlePress = () => {
+    // Logic here
+    onPress();
+  };
 
-**Backend** (`/api/soundcloud/*`):
-- **Search Tracks**: `GET /api/soundcloud/search?q=query&limit=20`
-- **Get Track Details**: `GET /api/soundcloud/track/:urlOrId`
-- **Get Stream URL**: `GET /api/soundcloud/stream/:trackUrl` (returns AAC HLS stream URL)
-
-**Mobile**:
-- **Search Screen**: SoundCloudSearchScreen with debounced search (500ms)
-- **Track Items**: Display artwork, title, artist, duration
-- **Add to Playlist**: Modal to select playlist and add SoundCloud track
-- **Mini Player**: Persistent player at bottom of screen (above tab bar)
-- **Full Player Modal**: Complete player with controls, progress slider, artwork
-
-### Implementation Details
-
-**soundcloud.ts package**:
-- Automatically extracts `client_id` from SoundCloud website (no manual API registration needed)
-- Provides TypeScript wrapper for SoundCloud API
-- Handles track search, metadata, and stream URL retrieval
-
-**Backend Service** (`soundcloud.service.ts`):
-- In-memory cache (Map) for search results (1h TTL) and stream URLs (30min TTL)
-- Filters for playable/streamable tracks only
-- Converts SoundCloud tracks to internal Track format (`trackUri` = `permalink_url`)
-
-**Mobile Audio** (`expo-audio`):
-- Hook: `useSoundCloudPlayer(track)` fetches stream URL and manages playback
-- Supports play/pause, seek, skip ±10s
-- Progress tracking with slider
-- Auto-plays when stream loads
-
-**State Management**:
-- `soundcloudStore`: Search results, loading, errors
-- `playerStore`: Current track, play state, modal state
-
-### Usage Flow
-
-1. User searches for music in Search tab → `soundcloudStore.search(query)`
-2. Backend queries SoundCloud API via `soundcloud.ts`
-3. Results displayed in `SoundCloudSearchScreen`
-4. User taps play → `playerStore.playTrack(track)` → mini-player appears
-5. Hook `useSoundCloudPlayer` fetches stream URL from backend
-6. expo-audio plays HLS AAC stream
-7. User can expand to full player modal or add track to playlist
-
-### API Routes (Public - No Auth Required)
-
-```bash
-# Search
-curl "http://localhost:3000/api/soundcloud/search?q=lofi&limit=10"
-
-# Get Track
-curl "http://localhost:3000/api/soundcloud/track/user/song-name"
-
-# Get Stream URL (URL-encoded)
-curl "http://localhost:3000/api/soundcloud/stream/https%3A%2F%2Fsoundcloud.com%2Fuser%2Fsong"
+  // Render
+  return (
+    <View style={styles.container}>
+      <Text>{title}</Text>
+    </View>
+  );
+};
 ```
 
-### Track Storage
+**Store pattern** (Zustand):
+```typescript
+interface FeatureStore {
+  data: FeatureType[];
+  loading: boolean;
+  fetchData: () => Promise<void>;
+}
 
-When adding SoundCloud track to playlist:
-- `track_uri` = `permalink_url` (e.g., `https://soundcloud.com/artist/track`)
-- `title`, `artist`, `album_art`, `duration_ms` stored in `tracks` table
-- Stream URL fetched on-demand (not stored, as it expires)
+export const useFeatureStore = create<FeatureStore>((set, get) => ({
+  data: [],
+  loading: false,
 
-## Git Workflow
+  fetchData: async () => {
+    set({ loading: true });
+    try {
+      const response = await featureApi.getAll();
+      set({ data: response.data, loading: false });
+    } catch (error) {
+      set({ loading: false });
+      throw error;
+    }
+  },
+}));
+```
 
-Branch: `main` (NOT `master`)
+### Git Workflow
 
-**Commit message format** (Conventional Commits):
+**Branch**: `main` (NOT `master`)
+
+**Commit format** (Conventional Commits):
 - `feat:` - New feature
 - `fix:` - Bug fix
 - `docs:` - Documentation
@@ -1156,230 +350,160 @@ Branch: `main` (NOT `master`)
 
 **Feature branch workflow**:
 ```bash
-git checkout -b feature/friends-system
-# ... make changes ...
+git checkout -b feature/feature-name
+# Make changes
 git add .
-git commit -m "feat: Add friends system"
-git push -u origin feature/friends-system
-# ... create PR on GitHub ...
-git checkout main
-git merge feature/friends-system
-git push
+git commit -m "feat: Add feature description"
+git push -u origin feature/feature-name
+# Create PR on GitHub
 ```
 
-See `GIT_WORKFLOW.md` for detailed Git guidance.
+---
 
-## Testing the Backend API
+## Common Tasks
+
+### Adding a New Backend Feature
+
+1. Create feature directory: `backend/src/features/feature-name/`
+2. Define types: `feature.types.ts`
+3. Define validators: `feature.validators.ts` (Zod schemas)
+4. Implement service: `feature.service.ts` (business logic)
+5. Implement controller: `feature.controller.ts` (request handlers)
+6. Define routes: `feature.routes.ts` (Express router)
+7. Register routes in `backend/src/server.ts`
+8. Add to Swagger documentation (if applicable)
+9. Test with curl or Swagger UI
+
+### Adding a New Mobile Screen
+
+1. Create screen file: `mobile/src/screens/FeatureScreen.tsx`
+2. Define navigation params in appropriate navigator
+3. Add screen to navigator stack
+4. Implement screen component with proper TypeScript types
+5. Use Zustand stores for state management
+6. Use API services for backend communication
+7. Add proper error handling and loading states
+
+### Adding a Real-time Feature
+
+1. **Backend**: Add event handlers in `backend/src/realtime/index.ts`
+2. **Mobile**: Subscribe to events in appropriate hook or store
+3. Test with multiple devices/sessions
+
+### Running Database Migration
+
+1. Write SQL migration file in `backend/migrations/`
+2. Open Supabase Dashboard → SQL Editor
+3. Copy migration content and execute
+4. Verify changes in database schema
+5. Update TypeScript types if schema changed
+
+---
+
+## Security Checklist
+
+When implementing features, ensure:
+
+- [ ] No credentials in git (use `.env` files)
+- [ ] Input validation with Zod schemas
+- [ ] JWT authentication on protected routes (use `auth.middleware.ts`)
+- [ ] Permission checks for user-owned resources
+- [ ] Rate limiting on sensitive endpoints (Redis-based)
+- [ ] CORS configured properly (`ALLOWED_ORIGINS` in backend `.env`)
+- [ ] SQL injection protection (Supabase client handles this)
+- [ ] XSS protection (validate/sanitize user input)
+- [ ] No sensitive data in logs
+
+---
+
+## Testing Guidelines
+
+### Backend Testing
+
+**Manual testing with Swagger UI**:
+1. Start backend: `make dev-docker`
+2. Open http://localhost:3000/api-docs
+3. Authorize with JWT token (after login)
+4. Test endpoints interactively
 
 **Manual testing with curl**:
 ```bash
-# Health check
-curl http://localhost:3000/health
-
-# Register
+# Example: Test auth
 curl -X POST http://localhost:3000/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"Test1234","username":"testuser"}'
-
-# Login
-curl -X POST http://localhost:3000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"Test1234"}'
-
-# Get current user (replace TOKEN)
-curl http://localhost:3000/api/auth/me \
-  -H "Authorization: Bearer TOKEN"
 ```
 
-The collection auto-saves JWT tokens after login/register.
+### Mobile Testing
 
-## Security
+**Physical device**:
+1. Ensure device and PC on same WiFi
+2. Run `make dev-docker` or `make qr`
+3. Install Expo Go app
+4. Scan QR code
 
-- **Docker Images**: Chainguard Images with 0 CVE (see `SECURITY.md`)
-- **Authentication**: Supabase Auth with JWT tokens
-- **Validation**: Zod schemas on both backend and mobile
-- **CORS**: Configured for development origins only
-- **Secrets**: Never commit `.env` files (in `.gitignore`)
+**Android Studio emulator**:
+```bash
+make dev-local        # Start in local mode
+make expo-android     # Launch in emulator
+```
 
-## Music Integration
+---
 
-Zumik uses a universal `trackUri` field to support multiple music services. SoundCloud integration is **fully implemented** and functional.
+## Troubleshooting
 
-## Current Implementation Status
-
-**Project Completion: ~70%**
-
-Zumik has evolved significantly beyond initial planning, with several major features fully implemented.
-
-**Phase 1 - ✅ Complete (Foundation)**:
-- Backend foundation with Express + Socket.io setup
-- Authentication feature (register, login, logout, refresh, user profile)
-- Mobile app with navigation (Auth stack, App stack, feature-based stacks)
-- Basic UI screens (Welcome, Login, Register, Playlist views)
-- State management with Zustand (auth, playlists, socket, player, soundcloud)
-- Docker development environment with Chainguard images
-
-**Phase 2 - ✅ Complete (Infrastructure Removed - Spotify)**:
-- Previous Spotify OAuth integration removed
-- Database cleaned: Removed all `spotify_*` columns from `user_profiles`
-- Renamed `spotify_uri` to `track_uri` for universal music service support
-- Migrated to SoundCloud (Phase 5 completed)
-
-**Phase 3 - ✅ Complete (Playlist System)**:
-- Database migration: `003_playlist_persistence.sql` (playlists, tracks, playlist_tracks tables)
-- Backend feature: `/api/playlists/*` (13 API endpoints)
-  - Full CRUD operations (create, read, update, delete)
-  - Track management (add, remove, reorder)
-  - Collaborator management (add, remove - list in playlist details)
-  - Viewer management (add, remove - list in playlist details)
-  - Edit modes ('open' or 'restricted')
-- Mobile screens: PlaylistsScreen, PlaylistDetailScreen, CreatePlaylistScreen, PlaylistEditorScreen
-- Playlist store: Zustand state with full API integration
-- Playlist API client: `playlistApi.ts` for backend communication
-- Real-time playlist sync via Socket.io
-
-**Phase 4 - ✅ Complete (Profile System)**:
-- Backend feature: `/api/profile/*` (4 API endpoints: get own, update, search users, get by ID)
-- Mobile screens: ProfileScreen, EditProfileScreen
-- Profile API client: `profileApi.ts`
-- Profile tab in bottom navigation
-- Avatar upload and display support
-
-**Phase 5 - ✅ Complete (Music Search & Playback)**:
-- **SoundCloud integration** (3 API endpoints: search, track details, stream URLs)
-- Backend service with caching (1h for search, 30min for streams)
-- Public API access via `soundcloud.ts` npm package (no OAuth required)
-- **Mobile audio playback system**:
-  - PlayerContext (4058 lines) for lifecycle management
-  - MiniPlayer component (persistent above tab bar)
-  - Full PlayerModal with controls, progress slider, skip ±10s
-  - 4 custom hooks (useSoundCloudPlayer, usePlayerController, usePlayerProgress, usePlayerSync)
-  - expo-audio for HLS AAC streaming
-- Search tab in bottom navigation with debounced search
-- SoundCloudSearchScreen with track results
-- PlaylistSelectorModal to add tracks to playlists
-
-**Phase 6 - ✅ Complete (Friends System)**:
-- Database migration: `007_follows.sql` (follows table)
-- Backend feature: `/api/friends/*` (4 API endpoints)
-  - Follow/unfollow users
-  - Get mutual friends list
-  - Check follow status
-- Mobile screens: FriendsScreen (455 lines with tabs), UserProfileScreen
-- FriendsNavigator stack for friend-related navigation
-- Friends API client: `friendsApi.ts`
-- Friends tab in bottom navigation
-
-**Phase 7 - ✅ Complete (Music Control Delegation)**:
-- Database migration: `009_music_control.sql` (can_control_music column in follows)
-- Backend feature: `/api/music-control/*` (4 API endpoints)
-  - Grant/revoke playback control to friends
-  - Check who has control permissions
-  - Check if friend granted you control
-- Mobile integration:
-  - musicControlApi service
-  - useMusicControl hook (7849 lines!) for complex delegation logic
-  - DeviceListeningCard component
-  - Toggle switches in FriendsScreen for control permissions
-- Real-time updates via Socket.io when permissions change
-
-**Phase 8 - ✅ Complete (Real-time Synchronization)**:
-- Backend: Real-time service `realtime/index.ts` (478 lines)
-- Socket.io event system for:
-  - Playlist updates (track added/removed)
-  - Music control delegation events
-  - Device registration and listening status
-- Mobile: socketStore for connection management
-- Mobile: usePlaylistSocket hook for real-time playlist updates
-- Auto-reconnection logic
-
-**Phase 9 - ✅ Complete (OAuth Integration - Google & Facebook)**:
-- **Google OAuth** (fully implemented):
-  - Backend: `/api/auth/google` endpoint with ID token verification
-  - Mobile: `@react-native-google-signin/google-signin` integration
-  - Token verification via `google-auth-library`
-  - **Email required** (Google always provides verified email)
-- **Facebook OAuth** (fully implemented):
-  - Backend: `/api/auth/facebook` endpoint with access token verification
-  - Mobile: `react-native-fbsdk-next` integration with platform-specific handling
-  - Token verification via Facebook Graph API (`/debug_token` + `/me` endpoints)
-  - Database: `facebook_id` column in `user_profiles` table
-  - **Email optional** - Works with only `public_profile` permission
-  - Synthetic email generation: `facebook_{id}@zumik.local` when email not provided
-- **Multi-provider support**:
-  - Users can link multiple OAuth providers to single account
-  - Provider management endpoints (`GET /api/auth/providers`, `DELETE /api/auth/providers/:provider`)
-  - Safety: Cannot unlink last authentication method
-- **Mobile OAuth service** (`oauth.ts`):
-  - `configureGoogleSignIn()`, `signInWithGoogle()` for Google
-  - `initializeFacebookSDK()`, `signInWithFacebook()` for Facebook
-  - Platform-specific token handling (iOS Limited Login vs Android standard flow)
-- **Auth store integration**:
-  - `loginWithGoogle()` and `loginWithFacebook()` actions
-  - Error handling with user-friendly messages
-  - Session persistence to AsyncStorage
-- **Synthetic email system**:
-  - Format: `{provider}_{providerId}@zumik.local`
-  - Supabase-compatible (auth.users requires email)
-  - Allows Facebook login without email permission
-  - User can add real email later via profile settings
-
-**In Progress**:
-- Multi-device music control coordination
-- Playlist edit mode RLS policies
-
-**Planned Features** (see `PLAN.md`):
-- Music rooms (group listening spaces)
-- Web responsive version
-- Offline mode / caching
-- Subscription system
-- IoT / iBeacon integration
-- Advanced social features (activity feed, recommendations)
-
-## Common Issues & Solutions
-
-**Mobile can't connect to backend**:
-1. Check backend is running: `make ps` or `curl http://localhost:3000/health`
+### Mobile can't connect to backend
+1. Check backend running: `make ps` or `curl http://localhost:3000/health`
 2. For physical device: Use `http://YOUR_LOCAL_IP:3000` in mobile `.env`
-3. Ensure device and computer on same WiFi
-4. Check `ALLOWED_ORIGINS` in backend `.env` includes Expo URLs
+3. Ensure same WiFi network
+4. Check `ALLOWED_ORIGINS` in backend `.env`
 
-**Docker build failures**:
+### Docker issues
 ```bash
-make clean       # Remove all containers and deps
-make install     # Reinstall
-make dev-docker  # Rebuild and start
+make clean           # Clean everything
+make install         # Reinstall
+make dev-docker      # Restart
 ```
 
-**Expo cache issues**:
+### Type errors after git pull
 ```bash
-cd mobile
-npm run reset    # Clear Expo cache and restart
-```
-
-**Type errors after pulling changes**:
-```bash
-# Backend
 cd backend && npm install && npm run type-check
-
-# Mobile
 cd mobile && npm install && npm run type-check
 ```
 
-## Additional Documentation
+### Expo cache issues
+```bash
+cd mobile && npm run reset
+```
 
-- `README.md` - Project overview and quick start
-- `GETTING_STARTED.md` - Detailed setup instructions
-- `PLAN.md` - Complete implementation plan and roadmap
-- `DOCKER.md` - Docker architecture and troubleshooting
-- `GIT_WORKFLOW.md` - Git workflow and best practices
-- `SECURITY.md` - Security details (Chainguard Images, 0 CVE)
-- `docs/README.md` - Documentation index
-- `docs/backend/` - Backend technical documentation
-  - `SUPABASE_TYPES_MIGRATION.md` - Guide migration types Supabase
-  - `EXAMPLE_TYPED_SERVICE.md` - Exemple de service typé
-  - `TYPESCRIPT_LINT_SOLUTIONS.md` - Solutions TypeScript/ESLint
-- `backend/README.md` - Backend-specific documentation
-- `backend/API_DOCUMENTATION.md` - Complete API reference
-- `backend/DOCS.md` - Pointer to backend docs
-- `mobile/README.md` - Mobile-specific documentation
+---
+
+## Documentation for Humans
+
+**This file is for AI assistants. Human developers should read:**
+
+- [DEVELOPMENT.md](./DEVELOPMENT.md) - Complete development guide
+- [README.md](./README.md) - Project overview and quick start
+- [BUILD.md](./BUILD.md) - Build and deployment guide
+- [backend/README.md](./backend/README.md) - Backend architecture
+- [mobile/README.md](./mobile/README.md) - Mobile architecture
+- [doc/TUNNEL_MODE.md](./doc/TUNNEL_MODE.md) - Tunnel mode guide
+- [doc/SECURITY.md](./doc/SECURITY.md) - Security documentation
+- [doc/TESTING_SECURITY.md](./doc/TESTING_SECURITY.md) - Security testing
+
+---
+
+## AI Assistant Guidelines
+
+When assisting with this project:
+
+1. **Follow the Subject PDF requirements first** - They override all other documentation
+2. **Maintain existing patterns** - Check similar features before implementing new ones
+3. **Keep files small** - Split large services into multiple focused files
+4. **Use TypeScript properly** - No `any` types, proper interfaces/types
+5. **Test your changes** - Verify with Swagger UI or Expo before marking complete
+6. **Security conscious** - Always validate inputs, check permissions
+7. **Document breaking changes** - Update relevant README/docs if you change architecture
+8. **Git commits** - Use Conventional Commits format
+
+When unsure, ask the user for clarification rather than guessing.

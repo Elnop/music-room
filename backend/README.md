@@ -257,16 +257,32 @@ make redis-shell
 
 ## 🔐 API Documentation
 
-### Documentation complète
+### Interactive Swagger UI
 
-Consultez la **documentation API complète** : [API_DOCUMENTATION.md](./API_DOCUMENTATION.md)
+The backend exposes **45 REST endpoints** across 6 features with **interactive documentation** via Swagger UI.
 
-Cette documentation inclut :
-- Tous les endpoints disponibles
-- Format des requêtes et réponses
-- Codes d'erreur
-- Exemples cURL
-- Règles de validation
+**Access Swagger UI**:
+```bash
+# 1. Start backend
+make dev-docker    # or make backend-local
+
+# 2. Open browser
+http://localhost:3000/api-docs
+```
+
+**Features**:
+- Interactive endpoint testing with authentication
+- Request/response schemas with examples
+- Real-time validation
+- JWT token management
+
+**Endpoints by feature**:
+- **Auth**: 7 endpoints (register, login, OAuth Google/Facebook, providers)
+- **Playlists**: 13 endpoints (CRUD, tracks, collaborators, viewers)
+- **Profile**: 4 endpoints (get, update, search users)
+- **Friends**: 4 endpoints (follow, unfollow, list, check status)
+- **Music Control**: 4 endpoints (grant, revoke, check permissions)
+- **SoundCloud**: 3 endpoints (search, track details, stream URLs)
 
 ### Exemples rapides
 

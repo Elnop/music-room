@@ -6,7 +6,6 @@
 # Documentation
 *.md
 docs/
-PLAN.md
 Git_Workflow.md
 DOCKER.md
 

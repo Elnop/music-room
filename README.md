@@ -4,10 +4,9 @@ A collaborative music listening platform built with React Native, Node.js, and m
 
 ## Quick Links
 
-- **[Full Documentation](./doc/README.md)** - Complete project overview and setup instructions
-- **[Getting Started](./doc/GETTING_STARTED.md)** - Detailed setup guide for developers
-- **[Development Guide](./CLAUDE.md)** - Architecture, commands, and development workflow
-- **[API Documentation](./backend/API_DOCUMENTATION.md)** - Backend API reference
+- **[Development Guide](./DEVELOPMENT.md)** - Complete development guide (setup, commands, architecture)
+- **[Build Guide](./BUILD.md)** - Production builds (Android, EAS, Google Play)
+- **[API Documentation](http://localhost:3000/api-docs)** - Interactive Swagger UI (45 endpoints)
 
 ## Quick Start
 
@@ -73,15 +72,25 @@ make stop
 
 ## Documentation
 
-- [CLAUDE.md](./CLAUDE.md) - Complete development guide
-- [doc/README.md](./doc/README.md) - Project overview
-- [doc/GETTING_STARTED.md](./doc/GETTING_STARTED.md) - Setup instructions
-- [doc/REDIS.md](./doc/REDIS.md) - Redis cache & brute force protection
-- [doc/TESTING_SECURITY.md](./doc/TESTING_SECURITY.md) - Security testing guide (IV.6 Securing)
-- [doc/DOCKER.md](./doc/DOCKER.md) - Docker architecture
-- [doc/TUNNEL_MODE.md](./doc/TUNNEL_MODE.md) - Cross-network development
-- [doc/REALTIME.md](./doc/REALTIME.md) - Real-time Socket.io documentation
-- [doc/SECURITY.md](./doc/SECURITY.md) - Security best practices
+### Main Guides
+
+| Document | Purpose |
+|----------|---------|
+| [DEVELOPMENT.md](./DEVELOPMENT.md) | **Complete development guide** (setup, commands, architecture) |
+| [BUILD.md](./BUILD.md) | Production builds (Android, EAS, Google Play) |
+| [Swagger UI](http://localhost:3000/api-docs) | **Interactive API documentation** (45 endpoints) |
+
+### Specialized Guides
+
+- [Tunnel Mode](./doc/TUNNEL_MODE.md) - Cross-network development (different WiFi)
+- [Redis Setup](./doc/REDIS.md) - Cache and rate limiting configuration
+- [Security](./doc/SECURITY.md) - Docker security (Chainguard Images, 0 CVE)
+- [Testing Security](./doc/TESTING_SECURITY.md) - Subject IV.6 compliance
+
+### Architecture
+
+- **Backend**: [backend/README.md](./backend/README.md) - Node.js + Express + Supabase
+- **Mobile**: [mobile/README.md](./mobile/README.md) - React Native + Expo
 
 ## Links
 
@@ -90,11 +99,3 @@ make stop
 - [Expo](https://expo.dev/)
 - [Ngrok](https://dashboard.ngrok.com/get-started/your-authtoken)
 - [SoundCloud API](https://developers.soundcloud.com/docs/api/explorer/open-api)
-
-## Contributing
-
-See [doc/GIT_WORKFLOW.md](./doc/GIT_WORKFLOW.md) for Git workflow and contribution guidelines.
-
-## License
-
-[Your License Here]

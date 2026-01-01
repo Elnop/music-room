@@ -200,7 +200,7 @@ Les types, validateurs et versions sont alignés avec le backend :
 
 ## Documentation
 
-- [Plan complet du projet](../PLAN.md)
+- [Documentation complète du projet](../README.md)
 - [Documentation backend](../backend/README.md)
 - [Expo Documentation](https://docs.expo.dev)
 - [React Navigation](https://reactnavigation.org)
