@@ -22,7 +22,7 @@
 #   7. Display APK location and installation instructions
 # ==============================================================================
 
-.PHONY: dev-tunnel-build-apk dev-tunnel-build-apk-install dev-tunnel-build-apk-check-prereqs dev-tunnel-build-apk-update-env dev-tunnel-build-apk-build dev-tunnel-build-apk-docker dev-tunnel-build-apk-docker-build build-apk-docker build-apk-docker-with-tunnel build-apk-docker-with-tunnel-legacy
+.PHONY: dev-tunnel-build-apk dev-tunnel-build-apk-install dev-tunnel-build-apk-check-prereqs dev-tunnel-build-apk-update-env dev-tunnel-build-apk-build dev-tunnel-build-apk-docker dev-tunnel-build-apk-docker-build build-apk-docker build-apk-docker-with-tunnel build-apk-docker-with-tunnel-legacy clean-legacy-containers
 
 #------------------------------------------------------------
 # Main Commands
@@ -352,14 +352,19 @@ build-apk-docker-with-tunnel:
 	@echo "$(BLUE)$(ICON_INFO) Step 1/3: Starting backend + tunnel...$(NC)"
 	@COMPOSE_PROFILES="" $(DOCKER_COMPOSE) -f docker-compose.yml -f docker-compose.tunnel.yml up -d --build backend redis
 
-build-apk-docker-with-tunnel-legacy:
+clean-legacy-containers:
+	@echo "$(BLUE)$(ICON_INFO) Cleaning legacy containers...$(NC)"
+	@docker rm -f zumik-backend zumik-redis 2>/dev/null || true
+	@echo "$(GREEN)$(ICON_SUCCESS) Containers cleaned$(NC)"
+
+build-apk-docker-with-tunnel-legacy: clean-legacy-containers
 	@# Build APK with Docker (legacy mode for old Docker versions)
 	@echo ""
 	@echo "$(YELLOW)=========================================="
 	@echo "🏗️  Build APK with Docker + Tunnel (Legacy)"
 	@echo "==========================================$(NC)"
 	@echo ""
-	@echo "$(YELLOW)ℹ Using legacy compose files for Docker API 1.42 compatibility$(NC)"
+	@echo "$(YELLOW)ℹ Using docker run instead of docker-compose (Docker API 1.42)$(NC)"
 	@echo ""
 	@echo "$(BLUE)$(ICON_INFO) Step 1/3: Building backend image (legacy mode)...$(NC)"
 	@# Disable BuildKit for Docker API 1.42 compatibility
@@ -380,13 +385,39 @@ build-apk-docker-with-tunnel-legacy:
 	}
 	@echo "$(GREEN)$(ICON_SUCCESS) Backend image built$(NC)"
 	@echo ""
-	@COMPOSE_PROFILES="" $(DOCKER_COMPOSE) -f docker-compose.legacy.yml -f docker-compose.tunnel.legacy.yml up -d backend redis
+	@echo "$(BLUE)$(ICON_INFO) Starting services with docker run (bypassing compose API check)...$(NC)"
+	@# Create network if not exists
+	@docker network create zumik-network 2>/dev/null || true
+	@# Create volume if not exists
+	@docker volume create tunnel-info 2>/dev/null || true
+	@docker volume create redis-data 2>/dev/null || true
+	@# Start Redis
+	@docker run -d --name zumik-redis \
+		--network zumik-network \
+		-v redis-data:/data \
+		redis:7-alpine redis-server --appendonly yes 2>/dev/null || \
+		docker start zumik-redis 2>/dev/null || true
+	@# Start Backend with tunnel
+	@docker run -d --name zumik-backend \
+		--network zumik-network \
+		-p 3000:3000 -p 4040:4040 \
+		-v $(shell pwd)/backend:/app \
+		-v tunnel-info:/tmp/shared \
+		-v /app/node_modules \
+		--env-file ./backend/.env \
+		-e NODE_ENV=development \
+		-e PORT=3000 \
+		-e TUNNEL_MODE=true \
+		-e REDIS_HOST=redis \
+		music-room-backend:latest sh start-with-tunnel.sh 2>/dev/null || \
+		docker start zumik-backend 2>/dev/null || true
+	@echo "$(GREEN)$(ICON_SUCCESS) Services started$(NC)"
 	@echo ""
 	@echo "$(BLUE)$(ICON_INFO) Step 2/3: Waiting for tunnel initialization...$(NC)"
 	@MAX_WAIT=120; \
 	COUNTER=0; \
 	while [ $$COUNTER -lt $$MAX_WAIT ]; do \
-		if $(DOCKER_COMPOSE) -f docker-compose.legacy.yml -f docker-compose.tunnel.legacy.yml exec -T $(BACKEND_SERVICE) sh -c 'test -f $(SHARED_TUNNEL_FILE)' >/dev/null 2>&1; then \
+		if docker exec zumik-backend sh -c 'test -f $(SHARED_TUNNEL_FILE)' >/dev/null 2>&1; then \
 			echo "$(GREEN)$(ICON_SUCCESS) Tunnel ready after $$COUNTER seconds$(NC)"; \
 			break; \
 		fi; \
@@ -402,7 +433,7 @@ build-apk-docker-with-tunnel-legacy:
 	fi
 	@echo ""
 	@echo "$(BLUE)$(ICON_INFO) Step 3/3: Building APK with tunnel URL...$(NC)"
-	@TUNNEL_URL=$$($(DOCKER_COMPOSE) -f docker-compose.legacy.yml -f docker-compose.tunnel.legacy.yml exec -T $(BACKEND_SERVICE) cat $(SHARED_TUNNEL_FILE) 2>/dev/null | tr -d '\r\n' || echo ""); \
+	@TUNNEL_URL=$$(docker exec zumik-backend cat $(SHARED_TUNNEL_FILE) 2>/dev/null | tr -d '\r\n' || echo ""); \
 	if [ -z "$$TUNNEL_URL" ]; then \
 		echo "$(RED)$(ICON_ERROR) Could not detect tunnel URL$(NC)"; \
 		exit 1; \

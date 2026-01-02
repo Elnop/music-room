@@ -32,9 +32,10 @@ make build-apk-docker-with-tunnel-legacy
 Cette commande :
 1. **Build l'image backend** avec `Dockerfile.legacy` (single-stage, compatible API 1.42)
 2. Désactive BuildKit automatiquement (`DOCKER_BUILDKIT=0`)
-3. Démarre backend + Redis + tunnel ngrok
-4. Build l'APK avec l'URL du tunnel
-5. Copie l'APK dans `build/app-release.apk`
+3. **Utilise `docker run` au lieu de `docker-compose`** (contourne la vérification API)
+4. Démarre backend + Redis + tunnel ngrok
+5. Build l'APK avec l'URL du tunnel
+6. Copie l'APK dans `build/app-release.apk`
 
 **Si le build échoue avec "API version too old"**, forcez manuellement :
 
@@ -47,51 +48,63 @@ DOCKER_BUILDKIT=0 docker build -t music-room-backend:latest -f backend/Dockerfil
 make build-apk-docker-with-tunnel-legacy
 ```
 
-### 2. Développement avec Tunnel
-
-Pour le développement quotidien avec tunnel :
+### 2. Commandes Utiles
 
 ```bash
-# Démarrer backend + redis avec tunnel (mode legacy)
-docker-compose -f docker-compose.legacy.yml -f docker-compose.tunnel.legacy.yml up -d
+# Nettoyer les containers legacy
+make clean-legacy-containers
 
-# Vérifier les logs
-docker-compose -f docker-compose.legacy.yml -f docker-compose.tunnel.legacy.yml logs -f
+# Voir les containers actifs
+docker ps
 
-# Arrêter
-docker-compose -f docker-compose.legacy.yml -f docker-compose.tunnel.legacy.yml down
+# Voir les logs backend
+docker logs -f zumik-backend
+
+# Voir les logs Redis
+docker logs -f zumik-redis
+
+# Arrêter les containers
+docker stop zumik-backend zumik-redis
+
+# Supprimer les containers
+docker rm -f zumik-backend zumik-redis
 ```
 
 ## Différences avec le Mode Normal
 
-Le mode legacy utilise `docker-compose.legacy.yml` au lieu de `docker-compose.yml`.
+Le mode legacy utilise `docker run` directement au lieu de `docker-compose`.
 
-### Fonctionnalités retirées pour compatibilité :
+### Changements pour compatibilité API 1.42 :
 
-1. ❌ **Healthchecks** - Retirés (nécessitent API 1.43+)
-2. ❌ **Container mobile** - Retiré (développement APK uniquement)
-3. ✅ **Backend + Redis** - Fonctionnent normalement
-4. ✅ **Tunnel ngrok** - Fonctionne normalement
-5. ✅ **Build APK** - Fonctionne normalement
+1. ✅ **Build image** - Utilise `Dockerfile.legacy` (single-stage)
+2. ✅ **BuildKit désactivé** - Force `DOCKER_BUILDKIT=0`
+3. ✅ **Pas de docker-compose** - Utilise `docker run` directement
+4. ✅ **Backend + Redis** - Démarrés avec `docker run`
+5. ✅ **Tunnel ngrok** - Fonctionne normalement
+6. ✅ **Build APK** - Fonctionne normalement
+7. ❌ **Container mobile** - Pas nécessaire pour build APK
+8. ❌ **Healthchecks** - Pas critiques pour cette utilisation
 
-### Fichier docker-compose.legacy.yml
+### Comment ça fonctionne
 
-```yaml
-# Compatible Docker API 1.42 (Docker 20.10.x)
-services:
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-      target: development
-    # ... (sans healthcheck)
+Au lieu d'utiliser `docker-compose` qui vérifie l'API version, le mode legacy utilise directement `docker run` :
 
-  redis:
-    image: redis:7-alpine
-    # ... (sans healthcheck)
+```bash
+# Créer le network
+docker network create zumik-network
+
+# Démarrer Redis
+docker run -d --name zumik-redis --network zumik-network redis:7-alpine
+
+# Démarrer Backend avec tunnel
+docker run -d --name zumik-backend --network zumik-network \
+  -p 3000:3000 -p 4040:4040 \
+  -v $(pwd)/backend:/app \
+  -e TUNNEL_MODE=true \
+  music-room-backend:latest sh start-with-tunnel.sh
 ```
 
-Les healthchecks ne sont **pas critiques** - ils permettent juste de vérifier que les services sont prêts, mais le projet fonctionne sans.
+Cette approche **contourne complètement** la vérification d'API version de docker-compose.
 
 ## Workflow Complet
 
