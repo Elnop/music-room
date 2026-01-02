@@ -41,13 +41,13 @@ Pour le développement quotidien avec tunnel :
 
 ```bash
 # Démarrer backend + redis avec tunnel (mode legacy)
-docker-compose -f docker-compose.legacy.yml -f docker-compose.tunnel.yml up -d
+docker-compose -f docker-compose.legacy.yml -f docker-compose.tunnel.legacy.yml up -d
 
 # Vérifier les logs
-docker-compose -f docker-compose.legacy.yml -f docker-compose.tunnel.yml logs -f
+docker-compose -f docker-compose.legacy.yml -f docker-compose.tunnel.legacy.yml logs -f
 
 # Arrêter
-docker-compose -f docker-compose.legacy.yml -f docker-compose.tunnel.yml down
+docker-compose -f docker-compose.legacy.yml -f docker-compose.tunnel.legacy.yml down
 ```
 
 ## Différences avec le Mode Normal
@@ -119,6 +119,21 @@ adb install build/app-release.apk
 # Ou transférer le fichier et installer manuellement
 ```
 
+## Fichiers Legacy Créés
+
+Le mode legacy utilise des fichiers docker-compose spécifiques :
+
+```
+music-room/
+├── docker-compose.legacy.yml          # Base: backend + redis (sans healthchecks)
+├── docker-compose.tunnel.legacy.yml   # Override: active le tunnel ngrok
+└── mobile/Dockerfile.android-build    # Builder APK (déjà compatible API 1.42)
+```
+
+**Différences clés** :
+- `docker-compose.legacy.yml` : Pas de service `mobile`, pas de healthchecks
+- `docker-compose.tunnel.legacy.yml` : Seulement override pour `backend` (pas `mobile`)
+
 ## Vérification Docker API Version
 
 ### Commande rapide
@@ -167,13 +182,13 @@ docker-compose -f docker-compose.legacy.yml -f docker-compose.tunnel.yml logs ba
 **Vérification** :
 ```bash
 # Vérifier les logs ngrok
-docker-compose -f docker-compose.legacy.yml -f docker-compose.tunnel.yml exec backend cat /tmp/ngrok.log
+docker-compose -f docker-compose.legacy.yml -f docker-compose.tunnel.legacy.yml exec backend cat /tmp/ngrok.log
 ```
 
 **Solution** :
 1. Vérifier NGROK_AUTHTOKEN dans `backend/.env`
 2. Vérifier la connexion internet
-3. Redémarrer : `docker-compose -f docker-compose.legacy.yml -f docker-compose.tunnel.yml restart backend`
+3. Redémarrer : `docker-compose -f docker-compose.legacy.yml -f docker-compose.tunnel.legacy.yml restart backend`
 
 ### Build APK bloqué longtemps
 
@@ -213,8 +228,8 @@ make build-apk-docker-with-tunnel  # sans -legacy
 
 ```
 music-room/
-├── docker-compose.legacy.yml          # ← Nouveau : Compatible API 1.42
-├── docker-compose.tunnel.yml          # Fonctionne avec legacy et normal
+├── docker-compose.legacy.yml          # ← Nouveau : Base compatible API 1.42
+├── docker-compose.tunnel.legacy.yml   # ← Nouveau : Tunnel override pour legacy
 ├── make/build-apk.mk                  # build-apk-docker-with-tunnel-legacy
 └── DOCKER_LEGACY_MODE.md             # ← Ce fichier
 ```

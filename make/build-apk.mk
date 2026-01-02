@@ -362,13 +362,13 @@ build-apk-docker-with-tunnel-legacy:
 	@echo "$(YELLOW)ℹ Using legacy compose files for Docker API 1.42 compatibility$(NC)"
 	@echo ""
 	@echo "$(BLUE)$(ICON_INFO) Step 1/3: Starting backend + tunnel...$(NC)"
-	@COMPOSE_PROFILES="" $(DOCKER_COMPOSE) -f docker-compose.legacy.yml -f docker-compose.tunnel.yml up -d --build backend redis
+	@COMPOSE_PROFILES="" $(DOCKER_COMPOSE) -f docker-compose.legacy.yml -f docker-compose.tunnel.legacy.yml up -d --build backend redis
 	@echo ""
 	@echo "$(BLUE)$(ICON_INFO) Step 2/3: Waiting for tunnel initialization...$(NC)"
 	@MAX_WAIT=120; \
 	COUNTER=0; \
 	while [ $$COUNTER -lt $$MAX_WAIT ]; do \
-		if $(DOCKER_COMPOSE) -f docker-compose.legacy.yml -f docker-compose.tunnel.yml exec -T $(BACKEND_SERVICE) sh -c 'test -f $(SHARED_TUNNEL_FILE)' >/dev/null 2>&1; then \
+		if $(DOCKER_COMPOSE) -f docker-compose.legacy.yml -f docker-compose.tunnel.legacy.yml exec -T $(BACKEND_SERVICE) sh -c 'test -f $(SHARED_TUNNEL_FILE)' >/dev/null 2>&1; then \
 			echo "$(GREEN)$(ICON_SUCCESS) Tunnel ready after $$COUNTER seconds$(NC)"; \
 			break; \
 		fi; \
@@ -384,7 +384,7 @@ build-apk-docker-with-tunnel-legacy:
 	fi
 	@echo ""
 	@echo "$(BLUE)$(ICON_INFO) Step 3/3: Building APK with tunnel URL...$(NC)"
-	@TUNNEL_URL=$$($(DOCKER_COMPOSE) -f docker-compose.legacy.yml -f docker-compose.tunnel.yml exec -T $(BACKEND_SERVICE) cat $(SHARED_TUNNEL_FILE) 2>/dev/null | tr -d '\r\n' || echo ""); \
+	@TUNNEL_URL=$$($(DOCKER_COMPOSE) -f docker-compose.legacy.yml -f docker-compose.tunnel.legacy.yml exec -T $(BACKEND_SERVICE) cat $(SHARED_TUNNEL_FILE) 2>/dev/null | tr -d '\r\n' || echo ""); \
 	if [ -z "$$TUNNEL_URL" ]; then \
 		echo "$(RED)$(ICON_ERROR) Could not detect tunnel URL$(NC)"; \
 		exit 1; \
