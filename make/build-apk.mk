@@ -1,0 +1,215 @@
+# ==============================================================================
+# APK Build with Tunnel Commands Module
+# ==============================================================================
+# Build production APK with ngrok tunnel URL configured
+#
+# Usage:
+#   make dev-build-apk          - Start backend+redis+ngrok, build APK with tunnel URL
+#   make dev-build-apk-install  - Build APK and install on connected device
+#
+# Requirements:
+#   - NGROK_AUTHTOKEN in backend/.env
+#   - Android SDK (ANDROID_HOME, adb in PATH)
+#   - No EAS required (100% local build)
+#
+# Flow:
+#   1. Validate prerequisites (ngrok token, Android SDK)
+#   2. Start backend + redis in tunnel mode (no mobile container)
+#   3. Wait for ngrok tunnel to initialize
+#   4. Extract tunnel URL from backend container
+#   5. Update mobile/.env with tunnel URL (EXPO_PUBLIC_API_URL, EXPO_PUBLIC_WS_URL)
+#   6. Build APK with Gradle (expo prebuild + assembleRelease)
+#   7. Display APK location and installation instructions
+# ==============================================================================
+
+.PHONY: dev-build-apk dev-build-apk-install dev-build-apk-check-prereqs dev-build-apk-update-env dev-build-apk-build
+
+#------------------------------------------------------------
+# Main Commands
+#------------------------------------------------------------
+
+dev-build-apk: dev-build-apk-check-prereqs ## Build production APK with ngrok tunnel URL
+	$(call print_header,Building APK with Tunnel URL)
+	$(call print_subsection,📱 Target: APK for installation on any device)
+	@echo "   Backend: Docker container + ngrok tunnel"
+	@echo "   Redis: Docker container"
+	@echo "   Mobile: Local build (no container)"
+	@echo "   URL: Dynamic ngrok tunnel (configured automatically)"
+	@echo ""
+	$(call print_arrow,Starting backend + redis with tunnel...)
+	@COMPOSE_PROFILES="" $(DOCKER_COMPOSE) -f docker-compose.yml -f docker-compose.tunnel.yml up -d --build backend redis
+	$(call blank_line)
+	$(call print_success,Backend and Redis started)
+	$(call blank_line)
+	$(call print_arrow,Waiting for ngrok tunnel to initialize...)
+	@echo "   This may take 30-60 seconds on first run..."
+	@echo ""
+	@# Wait for tunnel URL file with active polling (max 90 seconds)
+	@MAX_WAIT=90; \
+	COUNTER=0; \
+	while [ $$COUNTER -lt $$MAX_WAIT ]; do \
+		if $(DOCKER_COMPOSE) -f docker-compose.yml -f docker-compose.tunnel.yml exec -T $(BACKEND_SERVICE) sh -c 'test -f $(TUNNEL_URL_FILE)' >/dev/null 2>&1; then \
+			echo "$(GREEN)$(ICON_SUCCESS) Tunnel initialized after $$COUNTER seconds$(NC)"; \
+			break; \
+		fi; \
+		if [ $$((COUNTER % 10)) -eq 0 ] && [ $$COUNTER -gt 0 ]; then \
+			echo "   Still waiting... ($$COUNTER/$$MAX_WAIT seconds)"; \
+		fi; \
+		sleep 1; \
+		COUNTER=$$((COUNTER + 1)); \
+	done; \
+	if [ $$COUNTER -ge $$MAX_WAIT ]; then \
+		echo "$(RED)$(ICON_ERROR) Timeout waiting for tunnel ($$MAX_WAIT seconds)$(NC)"; \
+		exit 1; \
+	fi
+	$(call blank_line)
+	$(call print_arrow,Extracting tunnel URL...)
+	@TUNNEL_URL=$$($(DOCKER_COMPOSE) -f docker-compose.yml -f docker-compose.tunnel.yml exec -T $(BACKEND_SERVICE) cat $(TUNNEL_URL_FILE) 2>/dev/null | tr -d '\r\n' || echo ""); \
+	if [ -z "$$TUNNEL_URL" ]; then \
+		echo "$(RED)$(ICON_ERROR) Failed to get tunnel URL$(NC)"; \
+		echo ""; \
+		echo "$(YELLOW)$(ICON_WARNING) Possible causes:$(NC)"; \
+		echo "  1. ngrok tunnel not initialized yet (wait 10 more seconds and retry)"; \
+		echo "  2. Invalid NGROK_AUTHTOKEN in backend/.env"; \
+		echo "  3. Backend container failed to start"; \
+		echo ""; \
+		echo "$(YELLOW)$(ICON_ARROW) Check logs:$(NC) make logs"; \
+		echo ""; \
+		exit 1; \
+	fi; \
+	echo "$(GREEN)$(ICON_SUCCESS) Tunnel URL: $$TUNNEL_URL$(NC)"; \
+	echo ""; \
+	echo "$(YELLOW)$(ICON_ARROW) Updating mobile/.env with tunnel URL...$(NC)"; \
+	$(MAKE) dev-build-apk-update-env TUNNEL_URL=$$TUNNEL_URL; \
+	echo ""; \
+	echo "$(YELLOW)$(ICON_ARROW) Building APK...$(NC)"; \
+	echo "$(YELLOW)$(ICON_WARNING) ⏳ This takes ~5-10 minutes$(NC)"; \
+	echo ""; \
+	$(MAKE) dev-build-apk-build; \
+	echo ""; \
+	echo "$(BLUE)=== ✓ Build Complete ===$(NC)"; \
+	echo ""; \
+	echo "$(YELLOW)📦 APK Location:$(NC)"; \
+	echo "   mobile/android/app/build/outputs/apk/release/app-release.apk"; \
+	echo ""; \
+	echo "$(YELLOW)📡 Configured Backend URL:$(NC)"; \
+	echo "   $$TUNNEL_URL"; \
+	echo ""; \
+	echo "$(YELLOW)📱 Install on Device:$(NC)"; \
+	echo "   adb install mobile/android/app/build/outputs/apk/release/app-release.apk"; \
+	echo "   OR: make dev-build-apk-install (if APK already built)"; \
+	echo ""; \
+	echo "$(YELLOW)🛑 Stop Services:$(NC)"; \
+	echo "   make stop"; \
+	echo ""
+
+dev-build-apk-install: ## Install APK on connected device (requires APK built first)
+	$(call print_header,Installing APK on Device)
+	@if [ ! -f "mobile/android/app/build/outputs/apk/release/app-release.apk" ]; then \
+		echo ""; \
+		echo "$(RED)$(ICON_ERROR) APK not found: mobile/android/app/build/outputs/apk/release/app-release.apk$(NC)"; \
+		echo ""; \
+		echo "$(YELLOW)$(ICON_WARNING) Run this command first:$(NC)"; \
+		echo "  $(GREEN)make dev-build-apk$(NC) - Build APK with tunnel URL"; \
+		echo ""; \
+		exit 1; \
+	fi
+	$(call print_arrow,Checking for connected devices...)
+	@DEVICES=$$(adb devices | grep -v "List" | grep "device$$" | wc -l); \
+	if [ "$$DEVICES" -eq 0 ]; then \
+		echo ""; \
+		echo "$(RED)$(ICON_ERROR) No devices connected$(NC)"; \
+		echo ""; \
+		echo "$(YELLOW)$(ICON_WARNING) Connect your device via USB and enable USB debugging$(NC)"; \
+		echo ""; \
+		exit 1; \
+	fi; \
+	echo "$(GREEN)$(ICON_SUCCESS) Found $$DEVICES device(s)$(NC)"
+	@echo ""
+	$(call print_arrow,Installing APK...)
+	@adb install -r mobile/android/app/build/outputs/apk/release/app-release.apk
+	$(call blank_line)
+	$(call print_header,✓ Installation Complete)
+	@echo "$(GREEN)$(ICON_SUCCESS) App installed successfully$(NC)"
+	@echo ""
+	@echo "$(BLUE)$(ICON_INFO) The app is configured to use the tunnel URL from mobile/.env$(NC)"
+	@echo ""
+
+#------------------------------------------------------------
+# Helper Targets (Internal)
+#------------------------------------------------------------
+
+dev-build-apk-check-prereqs:
+	@# Check NGROK_AUTHTOKEN in backend/.env
+	@if [ ! -f "$(BACKEND_ENV)" ]; then \
+		echo "$(RED)$(ICON_ERROR) Backend .env not found: $(BACKEND_ENV)$(NC)"; \
+		echo ""; \
+		echo "$(YELLOW)$(ICON_WARNING) Run: make install$(NC)"; \
+		echo ""; \
+		exit 1; \
+	fi; \
+	if ! grep -q "^NGROK_AUTHTOKEN=" $(BACKEND_ENV) || grep -q "^NGROK_AUTHTOKEN=your_ngrok_authtoken_here" $(BACKEND_ENV) || grep -q "^NGROK_AUTHTOKEN=$$" $(BACKEND_ENV); then \
+		echo "$(RED)$(ICON_ERROR) NGROK_AUTHTOKEN not configured in backend/.env$(NC)"; \
+		echo ""; \
+		echo "$(YELLOW)$(ICON_WARNING) Get your token from: https://dashboard.ngrok.com/get-started/your-authtoken$(NC)"; \
+		echo "$(YELLOW)$(ICON_WARNING) Then add to backend/.env: NGROK_AUTHTOKEN=your_token_here$(NC)"; \
+		echo ""; \
+		exit 1; \
+	fi
+	@# Check Android SDK
+	@if ! command -v adb >/dev/null 2>&1; then \
+		echo "$(RED)$(ICON_ERROR) Android SDK not found - adb command missing$(NC)"; \
+		echo ""; \
+		echo "$(YELLOW)$(ICON_WARNING) Install Android SDK and set ANDROID_HOME$(NC)"; \
+		echo "$(YELLOW)$(ICON_WARNING) Add platform-tools to PATH: export PATH=\$$ANDROID_HOME/platform-tools:\$$PATH$(NC)"; \
+		echo ""; \
+		exit 1; \
+	fi
+	@# Check mobile/.env
+	@if [ ! -f "$(MOBILE_ENV)" ]; then \
+		echo "$(RED)$(ICON_ERROR) Mobile .env not found: $(MOBILE_ENV)$(NC)"; \
+		echo ""; \
+		echo "$(YELLOW)$(ICON_WARNING) Run: make install$(NC)"; \
+		echo ""; \
+		exit 1; \
+	fi
+
+dev-build-apk-update-env:
+	@# Update mobile/.env with tunnel URL
+	@# Usage: make dev-build-apk-update-env TUNNEL_URL=https://xxx.ngrok-free.app
+	@if [ -z "$(TUNNEL_URL)" ]; then \
+		echo "$(RED)$(ICON_ERROR) TUNNEL_URL not provided$(NC)"; \
+		exit 1; \
+	fi; \
+	API_URL="$(TUNNEL_URL)"; \
+	WS_URL="$$(echo $(TUNNEL_URL) | sed 's|^http|ws|')"; \
+	if grep -q '^EXPO_PUBLIC_API_URL=' $(MOBILE_ENV); then \
+		if [ "$(OS_TYPE)" = "macos" ]; then \
+			sed -i '' "s|^EXPO_PUBLIC_API_URL=.*|EXPO_PUBLIC_API_URL=$$API_URL|" $(MOBILE_ENV); \
+		else \
+			sed -i "s|^EXPO_PUBLIC_API_URL=.*|EXPO_PUBLIC_API_URL=$$API_URL|" $(MOBILE_ENV); \
+		fi; \
+		echo "$(GREEN)$(ICON_SUCCESS) Updated EXPO_PUBLIC_API_URL=$$API_URL$(NC)"; \
+	else \
+		echo "" >> $(MOBILE_ENV); \
+		echo "# Tunnel URL (configured by make dev-build-apk)" >> $(MOBILE_ENV); \
+		echo "EXPO_PUBLIC_API_URL=$$API_URL" >> $(MOBILE_ENV); \
+		echo "$(GREEN)$(ICON_SUCCESS) Added EXPO_PUBLIC_API_URL=$$API_URL$(NC)"; \
+	fi; \
+	if grep -q '^EXPO_PUBLIC_WS_URL=' $(MOBILE_ENV); then \
+		if [ "$(OS_TYPE)" = "macos" ]; then \
+			sed -i '' "s|^EXPO_PUBLIC_WS_URL=.*|EXPO_PUBLIC_WS_URL=$$WS_URL|" $(MOBILE_ENV); \
+		else \
+			sed -i "s|^EXPO_PUBLIC_WS_URL=.*|EXPO_PUBLIC_WS_URL=$$WS_URL|" $(MOBILE_ENV); \
+		fi; \
+		echo "$(GREEN)$(ICON_SUCCESS) Updated EXPO_PUBLIC_WS_URL=$$WS_URL$(NC)"; \
+	else \
+		echo "EXPO_PUBLIC_WS_URL=$$WS_URL" >> $(MOBILE_ENV); \
+		echo "$(GREEN)$(ICON_SUCCESS) Added EXPO_PUBLIC_WS_URL=$$WS_URL$(NC)"; \
+	fi
+
+dev-build-apk-build:
+	@# Build APK (internal target - reuses prod-build-apk-manual logic)
+	@cd mobile && npx expo prebuild --clean
+	@cd mobile && ./scripts/generate-network-config.sh
+	@cd mobile/android && ./gradlew assembleRelease

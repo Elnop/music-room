@@ -1,10 +1,28 @@
-# Simple production Dockerfile for Zumik Backend
-FROM node:20-alpine AS builder
+# Multi-stage Dockerfile for Zumik Backend
+FROM node:20-alpine AS base
 
 WORKDIR /app
 
-# Install ALL dependencies (including devDependencies for build)
+# Copy package files
 COPY package*.json ./
+
+# Development stage (for docker-compose dev mode)
+FROM base AS development
+
+# Install ALL dependencies (including devDependencies)
+RUN npm install --include=dev
+
+# Copy source code (will be mounted as volume in dev mode)
+COPY . .
+
+EXPOSE 3000
+
+CMD ["npm", "run", "dev"]
+
+# Builder stage (for production build)
+FROM base AS builder
+
+# Install ALL dependencies (including devDependencies for build)
 RUN npm install --include=dev
 
 # Copy source and build

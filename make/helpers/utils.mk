@@ -89,6 +89,12 @@ help: ## Show this help message
 	@echo "    $(GREEN)prod-build-apk$(NC)     Build APK via EAS cloud $(YELLOW)[~15-25min]$(NC)"
 	@echo "    $(GREEN)prod-build-apk-local$(NC) Build APK locally $(YELLOW)[requires: Android SDK]$(NC)"
 	@echo "    $(GREEN)prod-build-apk-manual$(NC) Build APK with Gradle $(YELLOW)[no EAS, ~5-10min]$(NC)"
+	@echo "    $(GREEN)prod-install-apk$(NC)   Install APK on connected device via USB"
+	@echo ""
+	@echo "  $(YELLOW)APK with Tunnel URL (Cross-Network Testing):$(NC)"
+	@echo "    $(GREEN)dev-build-apk$(NC)      Build APK with ngrok tunnel $(YELLOW)[~6-11min, no EAS]$(NC)"
+	@echo "    $(GREEN)dev-build-apk-install$(NC) Install tunnel APK on device"
+	@echo "    $(YELLOW)💡 Auto-configures APK for cellular/different WiFi$(NC)"
 	@echo ""
 	@echo "  $(YELLOW)Version Management:$(NC)"
 	@echo "    $(GREEN)prod-version-bump$(NC)  Bump version interactively $(YELLOW)[manual]$(NC)"
@@ -157,6 +163,7 @@ help: ## Show this help message
 	@echo "  • Different WiFi?     → $(GREEN)make tunnel-setup$(NC) then $(GREEN)make dev-tunnel$(NC)"
 	@echo "  • Android Studio?     → $(GREEN)make dev-local$(NC)"
 	@echo "  • Google Sign-In?     → $(GREEN)make dev-build-setup$(NC) then $(GREEN)make dev-build$(NC)"
+	@echo "  • Test on cellular?   → $(GREEN)make dev-build-apk$(NC) then $(GREEN)make dev-build-apk-install$(NC)"
 	$(call print_separator)
 	@echo ""
 

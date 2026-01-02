@@ -12,12 +12,13 @@ services:
       - NODE_ENV=development
       - PORT=3000
       - TUNNEL_MODE=true
+      - REDIS_HOST=redis
     ports:
       - "3000:3000"
       - "4040:4040"  # ngrok web interface
     volumes:
       # Share tunnel URL with mobile container (consistent with base compose)
-      - tunnel-data:/tmp/shared
+      - tunnel-info:/tmp/shared
       # Keep existing volumes
       - ./backend:/app
       - /app/node_modules
@@ -36,7 +37,7 @@ services:
       - "19002:19002"
     volumes:
       # Access to backend tunnel URL (consistent with base compose)
-      - tunnel-data:/tmp/shared
+      - tunnel-info:/tmp/shared
       # Keep existing volumes
       - ./mobile:/app
       - /app/node_modules
@@ -44,8 +45,3 @@ services:
       - /app/.expo
     depends_on:
       - backend
-
-volumes:
-  # Shared volume for tunnel URL communication
-  tunnel-data:
-    driver: local
