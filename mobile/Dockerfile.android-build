@@ -1,0 +1,144 @@
+# ==============================================================================
+# Android APK Builder Dockerfile (Debian-based with glibc)
+# ==============================================================================
+# Purpose: Build Android APK with tunnel URL configured
+# Base: Debian Bookworm with glibc (compatible with Android SDK/NDK binaries)
+#
+# Previous version used Alpine (musl libc) which is incompatible with
+# pre-compiled Gradle/CMake binaries from Android SDK. This version uses
+# Debian with glibc to ensure full compatibility with React Native native modules.
+#
+# Usage: docker build -f mobile/Dockerfile.android-build -t zumik-apk-builder .
+#        docker run --rm -v $(pwd)/build:/output \
+#          -e EXPO_PUBLIC_API_URL=https://xxx.ngrok-free.app \
+#          -e EXPO_PUBLIC_WS_URL=wss://xxx.ngrok-free.app \
+#          zumik-apk-builder
+# ==============================================================================
+
+FROM node:22-bookworm
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    bash \
+    coreutils \
+    openjdk-17-jdk \
+    unzip \
+    wget \
+    git \
+    curl \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install global npm packages
+RUN npm install -g npm@10.3.0 && \
+    npm -g i eas-cli @expo/ngrok@^4.1.0 sharp-cli@^2.1.0
+
+# Setup Yarn
+RUN corepack enable && \
+    corepack prepare yarn@stable --activate && \
+    yarn set version stable
+
+# Download and setup Android SDK
+RUN wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip && \
+    unzip -q commandlinetools-linux-9477386_latest.zip && \
+    rm commandlinetools-linux-9477386_latest.zip && \
+    wget -q https://dl.google.com/android/repository/platform-tools-latest-linux.zip && \
+    unzip -q platform-tools-latest-linux.zip && \
+    rm platform-tools-latest-linux.zip
+
+# Setup Android SDK directories
+RUN mkdir -p /android-sdk/cmdline-tools/latest && \
+    mv ./cmdline-tools/* ./android-sdk/cmdline-tools/latest && \
+    mkdir -p /android-sdk/platform-tools && \
+    mv ./platform-tools/* ./android-sdk/platform-tools
+
+# Set environment variables
+ENV PATH=/android-sdk/cmdline-tools/latest/bin:$PATH
+ENV PATH=/usr/lib/jvm/java-17-openjdk-amd64/bin:$PATH
+ENV ANDROID_SDK_ROOT=/android-sdk
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+ENV EAS_NO_VCS=1
+
+# Accept Android SDK licenses
+RUN yes | sdkmanager --licenses
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files first for better caching
+COPY mobile/package*.json ./
+
+# Install dependencies
+RUN npm install --ignore-scripts && \
+    npm run postinstall || true
+
+# Copy mobile source code
+COPY mobile/ ./
+
+# Copy scripts
+COPY scripts/ /scripts/
+RUN chmod +x /scripts/*.sh
+
+# Build arguments with defaults
+ARG EXPO_PUBLIC_API_URL=https://placeholder.ngrok-free.app
+ARG EXPO_PUBLIC_WS_URL=wss://placeholder.ngrok-free.app
+
+# Environment variables
+ENV EXPO_PUBLIC_API_URL=${EXPO_PUBLIC_API_URL}
+ENV EXPO_PUBLIC_WS_URL=${EXPO_PUBLIC_WS_URL}
+ENV NODE_ENV=production
+
+# Create output directory
+RUN mkdir -p /output
+
+# Build script
+RUN printf '#!/bin/bash\n\
+set -e\n\
+\n\
+echo "=========================================="\n\
+echo "Building Android APK (Debian + glibc)"\n\
+echo "=========================================="\n\
+echo ""\n\
+\n\
+echo "Environment:"\n\
+echo "   Base Image: node:22-bookworm (Debian with glibc)"\n\
+echo "   Java: $(java -version 2>&1 | head -1)"\n\
+echo "   Node: $(node --version)"\n\
+echo "   API URL: $EXPO_PUBLIC_API_URL"\n\
+echo "   WS URL: $EXPO_PUBLIC_WS_URL"\n\
+echo ""\n\
+\n\
+# Verify glibc is available\n\
+echo "Verifying glibc compatibility..."\n\
+ldd --version | head -1\n\
+echo ""\n\
+\n\
+echo "Running expo prebuild..."\n\
+npx expo prebuild --clean --platform android\n\
+\n\
+echo ""\n\
+echo "Generating network security config..."\n\
+/scripts/generate-network-config.sh\n\
+\n\
+echo ""\n\
+echo "Building APK with Gradle..."\n\
+cd android\n\
+./gradlew assembleRelease --no-daemon --console=plain\n\
+\n\
+echo ""\n\
+echo "Build complete!"\n\
+echo ""\n\
+echo "APK location inside container:"\n\
+echo "   /app/android/app/build/outputs/apk/release/app-release.apk"\n\
+echo ""\n\
+\n\
+if [ -d "/output" ]; then\n\
+    echo "Copying APK to /output..."\n\
+    cp /app/android/app/build/outputs/apk/release/app-release.apk /output/\n\
+    echo "APK copied to /output/app-release.apk"\n\
+    echo ""\n\
+    echo "✅ Success! APK is ready at /output/app-release.apk"\n\
+fi\n' > /build.sh && chmod +x /build.sh
+
+# Default command
+CMD ["bash", "/build.sh"]
