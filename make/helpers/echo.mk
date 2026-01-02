@@ -104,10 +104,10 @@ define display_qr
 	$(if $(filter tunnel,$(1)),@echo "$(YELLOW)   (Works across different WiFi networks)$(NC)")
 	$(call print_separator)
 	$(call blank_line)
-	@LC_ALL=C.UTF-8 $(DOCKER_COMPOSE) logs $(MOBILE_SERVICE) 2>/dev/null | grep -B 5 -A 50 "▄▄▄▄▄▄▄" | head -70 || \
-	LC_ALL=en_US.UTF-8 $(DOCKER_COMPOSE) logs $(MOBILE_SERVICE) 2>/dev/null | grep -B 5 -A 50 "▄▄▄▄▄▄▄" | head -70 || \
-	$(DOCKER_COMPOSE) logs $(MOBILE_SERVICE) 2>/dev/null | grep -B 5 -A 50 "▄▄▄▄▄▄▄" | head -70 || \
-	$(DOCKER_COMPOSE) logs $(MOBILE_SERVICE) | tail -60
+	@LC_ALL=C.UTF-8 docker logs $(MOBILE_CONTAINER) 2>/dev/null | grep -B 5 -A 50 "▄▄▄▄▄▄▄" | head -70 || \
+	LC_ALL=en_US.UTF-8 docker logs $(MOBILE_CONTAINER) 2>/dev/null | grep -B 5 -A 50 "▄▄▄▄▄▄▄" | head -70 || \
+	docker logs $(MOBILE_CONTAINER) 2>/dev/null | grep -B 5 -A 50 "▄▄▄▄▄▄▄" | head -70 || \
+	docker logs $(MOBILE_CONTAINER) | tail -60
 	$(call blank_line)
 	$(if $(filter lan,$(1)),\
 		@echo "$(GREEN)🌐 Local IP: $(HOST_IP)$(NC)"; \
@@ -144,7 +144,7 @@ endef
 define display_tunnel_urls
 	$(call print_subsection,📡 Tunnel URLs)
 	$(call print_arrow,Backend tunnel URL:)
-	@$(DOCKER_COMPOSE) exec -T $(BACKEND_SERVICE) cat $(TUNNEL_URL_FILE) 2>/dev/null || echo "   $(YELLOW)Initializing...$(NC)"
+	@docker exec $(BACKEND_CONTAINER) cat $(TUNNEL_URL_FILE) 2>/dev/null || echo "   $(YELLOW)Initializing...$(NC)"
 	$(call blank_line)
 	$(call blank_line)
 	$(call print_subsection,🔍 ngrok Web Interface)

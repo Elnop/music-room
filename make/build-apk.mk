@@ -22,7 +22,7 @@
 #   7. Display APK location and installation instructions
 # ==============================================================================
 
-.PHONY: dev-tunnel-build-apk dev-tunnel-build-apk-install dev-tunnel-build-apk-check-prereqs dev-tunnel-build-apk-update-env dev-tunnel-build-apk-build dev-tunnel-build-apk-docker dev-tunnel-build-apk-docker-build build-apk-docker build-apk-docker-with-tunnel build-apk-docker-with-tunnel-legacy clean-legacy-containers
+.PHONY: dev-tunnel-build-apk dev-tunnel-build-apk-install dev-tunnel-build-apk-check-prereqs dev-tunnel-build-apk-update-env dev-tunnel-build-apk-build dev-tunnel-build-apk-docker dev-tunnel-build-apk-docker-build build-apk-docker build-apk-docker-with-tunnel
 
 #------------------------------------------------------------
 # Main Commands
@@ -37,7 +37,8 @@ dev-tunnel-build-apk: dev-tunnel-build-apk-check-prereqs ## Build APK with ngrok
 	@echo "   URL: Dynamic ngrok tunnel (configured automatically)"
 	@echo ""
 	$(call print_arrow,Starting backend + redis with tunnel...)
-	@COMPOSE_PROFILES="" $(DOCKER_COMPOSE) -f docker-compose.yml -f docker-compose.tunnel.yml up -d --build backend redis
+	$(call start_redis)
+	$(call start_backend_tunnel)
 	$(call blank_line)
 	$(call print_success,Backend and Redis started)
 	$(call blank_line)
@@ -48,7 +49,7 @@ dev-tunnel-build-apk: dev-tunnel-build-apk-check-prereqs ## Build APK with ngrok
 	@MAX_WAIT=120; \
 	COUNTER=0; \
 	while [ $$COUNTER -lt $$MAX_WAIT ]; do \
-		if $(DOCKER_COMPOSE) -f docker-compose.yml -f docker-compose.tunnel.yml exec -T $(BACKEND_SERVICE) sh -c 'test -f $(SHARED_TUNNEL_FILE)' >/dev/null 2>&1; then \
+		if docker exec $(BACKEND_CONTAINER) sh -c 'test -f $(SHARED_TUNNEL_FILE)' >/dev/null 2>&1; then \
 			echo "$(GREEN)$(ICON_SUCCESS) Tunnel initialized after $$COUNTER seconds$(NC)"; \
 			break; \
 		fi; \
@@ -62,14 +63,14 @@ dev-tunnel-build-apk: dev-tunnel-build-apk-check-prereqs ## Build APK with ngrok
 		echo "$(RED)$(ICON_ERROR) Timeout waiting for tunnel ($$MAX_WAIT seconds)$(NC)"; \
 		echo ""; \
 		echo "$(YELLOW)$(ICON_ARROW) Checking ngrok logs...$(NC)"; \
-		$(DOCKER_COMPOSE) -f docker-compose.yml -f docker-compose.tunnel.yml exec -T $(BACKEND_SERVICE) cat /tmp/ngrok.log 2>/dev/null | tail -20 || echo "$(YELLOW)$(ICON_WARNING) Could not read ngrok logs$(NC)"; \
+		docker exec $(BACKEND_CONTAINER) cat /tmp/ngrok.log 2>/dev/null | tail -20 || echo "$(YELLOW)$(ICON_WARNING) Could not read ngrok logs$(NC)"; \
 		echo ""; \
 		exit 1; \
 	fi
 	@echo "$(BLUE)$(ICON_INFO) Tunnel file found at: $(SHARED_TUNNEL_FILE)$(NC)"
 	$(call blank_line)
 	$(call print_arrow,Extracting tunnel URL...)
-	@TUNNEL_URL=$$($(DOCKER_COMPOSE) -f docker-compose.yml -f docker-compose.tunnel.yml exec -T $(BACKEND_SERVICE) cat $(SHARED_TUNNEL_FILE) 2>/dev/null | tr -d '\r\n' || echo ""); \
+	@TUNNEL_URL=$$(docker exec $(BACKEND_CONTAINER) cat $(SHARED_TUNNEL_FILE) 2>/dev/null | tr -d '\r\n' || echo ""); \
 	if [ -z "$$TUNNEL_URL" ]; then \
 		echo "$(RED)$(ICON_ERROR) Failed to get tunnel URL$(NC)"; \
 		echo ""; \
@@ -234,7 +235,8 @@ dev-tunnel-build-apk-docker: dev-tunnel-build-apk-check-prereqs ## Build APK wit
 	@echo "   URL: Dynamic ngrok tunnel (configured automatically)"
 	@echo ""
 	$(call print_arrow,Starting backend + redis with tunnel...)
-	@COMPOSE_PROFILES="" $(DOCKER_COMPOSE) -f docker-compose.yml -f docker-compose.tunnel.yml up -d --build backend redis
+	$(call start_redis)
+	$(call start_backend_tunnel)
 	$(call blank_line)
 	$(call print_success,Backend and Redis started)
 	$(call blank_line)
@@ -245,7 +247,7 @@ dev-tunnel-build-apk-docker: dev-tunnel-build-apk-check-prereqs ## Build APK wit
 	@MAX_WAIT=120; \
 	COUNTER=0; \
 	while [ $$COUNTER -lt $$MAX_WAIT ]; do \
-		if $(DOCKER_COMPOSE) -f docker-compose.yml -f docker-compose.tunnel.yml exec -T $(BACKEND_SERVICE) sh -c 'test -f $(SHARED_TUNNEL_FILE)' >/dev/null 2>&1; then \
+		if docker exec $(BACKEND_CONTAINER) sh -c 'test -f $(SHARED_TUNNEL_FILE)' >/dev/null 2>&1; then \
 			echo "$(GREEN)$(ICON_SUCCESS) Tunnel initialized after $$COUNTER seconds$(NC)"; \
 			break; \
 		fi; \
@@ -259,14 +261,14 @@ dev-tunnel-build-apk-docker: dev-tunnel-build-apk-check-prereqs ## Build APK wit
 		echo "$(RED)$(ICON_ERROR) Timeout waiting for tunnel ($$MAX_WAIT seconds)$(NC)"; \
 		echo ""; \
 		echo "$(YELLOW)$(ICON_ARROW) Checking ngrok logs...$(NC)"; \
-		$(DOCKER_COMPOSE) -f docker-compose.yml -f docker-compose.tunnel.yml exec -T $(BACKEND_SERVICE) cat /tmp/ngrok.log 2>/dev/null | tail -20 || echo "$(YELLOW)$(ICON_WARNING) Could not read ngrok logs$(NC)"; \
+		docker exec $(BACKEND_CONTAINER) cat /tmp/ngrok.log 2>/dev/null | tail -20 || echo "$(YELLOW)$(ICON_WARNING) Could not read ngrok logs$(NC)"; \
 		echo ""; \
 		exit 1; \
 	fi
 	@echo "$(BLUE)$(ICON_INFO) Tunnel file found at: $(SHARED_TUNNEL_FILE)$(NC)"
 	$(call blank_line)
 	$(call print_arrow,Extracting tunnel URL...)
-	@TUNNEL_URL=$$($(DOCKER_COMPOSE) -f docker-compose.yml -f docker-compose.tunnel.yml exec -T $(BACKEND_SERVICE) cat $(SHARED_TUNNEL_FILE) 2>/dev/null | tr -d '\r\n' || echo ""); \
+	@TUNNEL_URL=$$(docker exec $(BACKEND_CONTAINER) cat $(SHARED_TUNNEL_FILE) 2>/dev/null | tr -d '\r\n' || echo ""); \
 	if [ -z "$$TUNNEL_URL" ]; then \
 		echo "$(RED)$(ICON_ERROR) Failed to get tunnel URL$(NC)"; \
 		echo ""; \
@@ -285,7 +287,19 @@ dev-tunnel-build-apk-docker: dev-tunnel-build-apk-check-prereqs ## Build APK wit
 	$(MAKE) dev-tunnel-build-apk-update-env TUNNEL_URL=$$TUNNEL_URL; \
 	echo ""; \
 	echo "$(YELLOW)$(ICON_ARROW) Starting Android builder container...$(NC)"; \
-	$(DOCKER_COMPOSE) -f docker-compose.android-build.yml up -d; \
+	docker volume create zumik-gradle-cache 2>/dev/null || true; \
+	docker volume create zumik-mobile-node-modules 2>/dev/null || true; \
+	docker run -d --name zumik-android-builder \
+		--network host \
+		-w /project/app/mobile \
+		-v $(shell pwd)/:/project/app \
+		-v zumik-gradle-cache:/root/.gradle \
+		-v zumik-mobile-node-modules:/project/app/mobile/node_modules \
+		-e NODE_ENV=production \
+		-e ANDROID_SDK_ROOT=/android-sdk \
+		-e EAS_NO_VCS=1 \
+		hmerritt/android-sdk:latest /bin/bash -c "tail -f /dev/null" 2>/dev/null || \
+		docker start zumik-android-builder 2>/dev/null || true; \
 	echo ""; \
 	echo "$(YELLOW)$(ICON_ARROW) Building APK in container...$(NC)"; \
 	echo "$(YELLOW)$(ICON_WARNING) ⏳ This takes ~10-15 minutes on first run$(NC)"; \
@@ -305,22 +319,22 @@ dev-tunnel-build-apk-docker: dev-tunnel-build-apk-check-prereqs ## Build APK wit
 	echo "   OR: make dev-tunnel-build-apk-install (if APK already built)"; \
 	echo ""; \
 	echo "$(YELLOW)🛑 Stop Services:$(NC)"; \
-	echo "   make stop && docker-compose -f docker-compose.android-build.yml down"; \
+	echo "   make stop && docker stop zumik-android-builder && docker rm zumik-android-builder"; \
 	echo ""
 
 dev-tunnel-build-apk-docker-build:
 	@# Build APK inside Android builder container
 	@echo "$(BLUE)$(ICON_INFO) Installing mobile dependencies...$(NC)"
-	@$(DOCKER_COMPOSE) -f docker-compose.android-build.yml exec -T android-builder sh -c "npm install --ignore-scripts && npm run postinstall || true"
+	@docker exec zumik-android-builder sh -c "npm install --ignore-scripts && npm run postinstall || true"
 	@echo ""
 	@echo "$(BLUE)$(ICON_INFO) Running expo prebuild...$(NC)"
-	@$(DOCKER_COMPOSE) -f docker-compose.android-build.yml exec -T android-builder npx expo prebuild --clean
+	@docker exec zumik-android-builder npx expo prebuild --clean
 	@echo ""
 	@echo "$(BLUE)$(ICON_INFO) Generating network security config...$(NC)"
-	@$(DOCKER_COMPOSE) -f docker-compose.android-build.yml exec -T android-builder ./scripts/generate-network-config.sh
+	@docker exec zumik-android-builder ./scripts/generate-network-config.sh
 	@echo ""
 	@echo "$(BLUE)$(ICON_INFO) Building APK with Gradle...$(NC)"
-	@$(DOCKER_COMPOSE) -f docker-compose.android-build.yml exec -T android-builder sh -c "cd android && ./gradlew assembleRelease"
+	@docker exec zumik-android-builder sh -c "cd android && ./gradlew assembleRelease"
 
 #------------------------------------------------------------
 # Simplified Docker Build Commands (Standalone)
@@ -350,94 +364,5 @@ build-apk-docker-with-tunnel:
 	@echo "==========================================$(NC)"
 	@echo ""
 	@echo "$(BLUE)$(ICON_INFO) Step 1/3: Starting backend + tunnel...$(NC)"
-	@COMPOSE_PROFILES="" $(DOCKER_COMPOSE) -f docker-compose.yml -f docker-compose.tunnel.yml up -d --build backend redis
-
-clean-legacy-containers:
-	@echo "$(BLUE)$(ICON_INFO) Cleaning legacy containers...$(NC)"
-	@docker rm -f zumik-backend zumik-redis 2>/dev/null || true
-	@echo "$(GREEN)$(ICON_SUCCESS) Containers cleaned$(NC)"
-
-build-apk-docker-with-tunnel-legacy: clean-legacy-containers
-	@# Build APK with Docker (legacy mode for old Docker versions)
-	@echo ""
-	@echo "$(YELLOW)=========================================="
-	@echo "🏗️  Build APK with Docker + Tunnel (Legacy)"
-	@echo "==========================================$(NC)"
-	@echo ""
-	@echo "$(YELLOW)ℹ Using docker run instead of docker-compose (Docker API 1.42)$(NC)"
-	@echo ""
-	@echo "$(BLUE)$(ICON_INFO) Step 1/3: Building backend image (legacy mode)...$(NC)"
-	@# Disable BuildKit for Docker API 1.42 compatibility
-	@export DOCKER_BUILDKIT=0; \
-	docker build -t music-room-backend:latest -f ./backend/Dockerfile.legacy ./backend 2>/dev/null || { \
-		echo "$(YELLOW)$(ICON_WARNING) Legacy build failed, trying standard Dockerfile...$(NC)"; \
-		docker build -t music-room-backend:latest --target development ./backend || { \
-			echo "$(RED)$(ICON_ERROR) Both build attempts failed$(NC)"; \
-			echo ""; \
-			echo "$(YELLOW)Your Docker version might not support building images.$(NC)"; \
-			echo ""; \
-			echo "Solutions:"; \
-			echo "  1. Update Docker daemon (requires admin): apt install docker-ce"; \
-			echo "  2. Use DOCKER_BUILDKIT=0: DOCKER_BUILDKIT=0 make build-apk-docker-with-tunnel-legacy"; \
-			echo "  3. Get pre-built image from another machine (see DOCKER_LEGACY_MODE.md)"; \
-			exit 1; \
-		}; \
-	}
-	@echo "$(GREEN)$(ICON_SUCCESS) Backend image built$(NC)"
-	@echo ""
-	@echo "$(BLUE)$(ICON_INFO) Starting services with docker run (bypassing compose API check)...$(NC)"
-	@# Create network if not exists
-	@docker network create zumik-network 2>/dev/null || true
-	@# Create volume if not exists
-	@docker volume create tunnel-info 2>/dev/null || true
-	@docker volume create redis-data 2>/dev/null || true
-	@# Start Redis
-	@docker run -d --name zumik-redis \
-		--network zumik-network \
-		-v redis-data:/data \
-		redis:7-alpine redis-server --appendonly yes 2>/dev/null || \
-		docker start zumik-redis 2>/dev/null || true
-	@# Start Backend with tunnel
-	@docker run -d --name zumik-backend \
-		--network zumik-network \
-		-p 3000:3000 -p 4040:4040 \
-		-v $(shell pwd)/backend:/app \
-		-v tunnel-info:/tmp/shared \
-		-v /app/node_modules \
-		--env-file $(shell pwd)/backend/.env \
-		-e NODE_ENV=development \
-		-e PORT=3000 \
-		-e TUNNEL_MODE=true \
-		-e REDIS_HOST=redis \
-		music-room-backend:latest sh start-with-tunnel.sh 2>/dev/null || \
-		docker start zumik-backend 2>/dev/null || true
-	@echo "$(GREEN)$(ICON_SUCCESS) Services started$(NC)"
-	@echo ""
-	@echo "$(BLUE)$(ICON_INFO) Step 2/3: Waiting for tunnel initialization...$(NC)"
-	@MAX_WAIT=120; \
-	COUNTER=0; \
-	while [ $$COUNTER -lt $$MAX_WAIT ]; do \
-		if docker exec zumik-backend sh -c 'test -f $(SHARED_TUNNEL_FILE)' >/dev/null 2>&1; then \
-			echo "$(GREEN)$(ICON_SUCCESS) Tunnel ready after $$COUNTER seconds$(NC)"; \
-			break; \
-		fi; \
-		if [ $$((COUNTER % 10)) -eq 0 ] && [ $$COUNTER -gt 0 ]; then \
-			echo "   Still waiting... ($$COUNTER/$$MAX_WAIT seconds)"; \
-		fi; \
-		sleep 1; \
-		COUNTER=$$((COUNTER + 1)); \
-	done; \
-	if [ $$COUNTER -ge $$MAX_WAIT ]; then \
-		echo "$(RED)$(ICON_ERROR) Timeout waiting for tunnel$(NC)"; \
-		exit 1; \
-	fi
-	@echo ""
-	@echo "$(BLUE)$(ICON_INFO) Step 3/3: Building APK with tunnel URL...$(NC)"
-	@TUNNEL_URL=$$(docker exec zumik-backend cat $(SHARED_TUNNEL_FILE) 2>/dev/null | tr -d '\r\n' || echo ""); \
-	if [ -z "$$TUNNEL_URL" ]; then \
-		echo "$(RED)$(ICON_ERROR) Could not detect tunnel URL$(NC)"; \
-		exit 1; \
-	fi; \
-	echo "$(GREEN)$(ICON_SUCCESS) Tunnel URL: $$TUNNEL_URL$(NC)"; \
-	echo ""; \
-	./scripts/build-apk-docker.sh "$$TUNNEL_URL"
+	$(call start_redis)
+	$(call start_backend_tunnel)

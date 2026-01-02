@@ -17,10 +17,12 @@ clean: ## Remove containers, volumes, images, and project dependencies (with con
 	read confirm; \
 	if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ]; then \
 		echo "$(CYAN)Stopping and removing containers + volumes...$(RESET)"; \
-		docker-compose down -v 2>/dev/null || true; \
+		docker stop $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true; \
+		docker rm $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true; \
+		docker volume rm $(TUNNEL_VOLUME) $(REDIS_VOLUME) 2>/dev/null || true; \
 		echo "$(GREEN)✓ Containers and volumes removed$(RESET)"; \
-		docker rmi zumik-backend zumik-mobile 2>/dev/null || true; \
-		docker network rm zumik-network 2>/dev/null || true; \
+		docker rmi music-room-backend:latest music-room-mobile:latest 2>/dev/null || true; \
+		docker network rm $(DOCKER_NETWORK) 2>/dev/null || true; \
 		rm -rf backend/node_modules mobile/node_modules 2>/dev/null || true; \
 		rm -rf backend/dist mobile/.expo 2>/dev/null || true; \
 		rm -rf mobile/android mobile/ios 2>/dev/null || true; \
@@ -36,9 +38,11 @@ clean: ## Remove containers, volumes, images, and project dependencies (with con
 
 clean-docker: ## Remove Zumik Docker resources only (containers, images, volumes, network)
 	@echo "$(CYAN)Removing Zumik Docker resources...$(RESET)"
-	@$(call docker_down_volumes)
-	@docker rmi zumik-backend zumik-mobile 2>/dev/null || true
-	@docker network rm zumik-network 2>/dev/null || true
+	@docker stop $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true
+	@docker rm $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true
+	@docker volume rm $(TUNNEL_VOLUME) $(REDIS_VOLUME) 2>/dev/null || true
+	@docker rmi music-room-backend:latest music-room-mobile:latest 2>/dev/null || true
+	@docker network rm $(DOCKER_NETWORK) 2>/dev/null || true
 	@echo "$(GREEN)✓ Docker resources removed$(RESET)"
 
 clean-deps: ## Remove all dependencies and build artifacts (node_modules, dist, .expo, coverage, logs)

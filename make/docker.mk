@@ -3,7 +3,7 @@
 # ==============================================================================
 # Commands for Docker-based development environment
 
-.PHONY: dev-docker start stop restart down logs logs-backend logs-mobile logs-legacy ps ps-legacy build build-backend build-mobile
+.PHONY: dev-docker start stop restart down logs logs-backend logs-mobile ps build build-backend build-mobile
 
 dev-docker: ## Start all services in Docker containers (backend + mobile)
 	$(call print_header,Starting Zumik Development Environment)
@@ -50,35 +50,11 @@ logs: ## Show logs from all services (ctrl+c to exit)
 
 logs-backend: ## Show backend logs only
 	$(call print_info,Backend logs (press Ctrl+C to exit)...)
-	$(call docker_logs_service,$(BACKEND_SERVICE))
+	$(call docker_logs_service,$(BACKEND_CONTAINER))
 
 logs-mobile: ## Show mobile logs only
 	$(call print_info,Mobile logs (press Ctrl+C to exit)...)
-	$(call docker_logs_service,$(MOBILE_SERVICE))
-
-logs-legacy: ## Show logs from legacy containers (Docker API 1.42)
-	@echo "$(BLUE)$(ICON_INFO) Legacy containers logs$(NC)"
-	@echo ""
-	@if docker ps --filter "name=zumik-backend" --format "{{.Names}}" | grep -q "zumik-backend"; then \
-		echo "$(YELLOW)━━━ Backend Logs ━━━$(NC)"; \
-		docker logs --tail 50 zumik-backend; \
-		echo ""; \
-	else \
-		echo "$(YELLOW)$(ICON_WARNING) Backend container not running$(NC)"; \
-		echo ""; \
-	fi
-	@if docker ps --filter "name=zumik-redis" --format "{{.Names}}" | grep -q "zumik-redis"; then \
-		echo "$(YELLOW)━━━ Redis Logs ━━━$(NC)"; \
-		docker logs --tail 20 zumik-redis; \
-		echo ""; \
-	else \
-		echo "$(YELLOW)$(ICON_WARNING) Redis container not running$(NC)"; \
-	fi
-
-ps-legacy: ## Show legacy containers status (Docker API 1.42)
-	@echo "$(BLUE)$(ICON_INFO) Legacy containers status$(NC)"
-	@echo ""
-	@docker ps -a --filter "name=zumik-backend" --filter "name=zumik-redis" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+	$(call docker_logs_service,$(MOBILE_CONTAINER))
 
 qr: ## Display Expo QR code and connection URL
 	$(call clear_and_header,📱 Expo QR Code)
@@ -106,10 +82,10 @@ build: ## Build all Docker images
 
 build-backend: ## Build backend Docker image only
 	$(call print_info,Building backend image...)
-	$(call docker_build_service,$(BACKEND_SERVICE))
+	$(call build_backend_image)
 	$(call print_success,Backend image built)
 
 build-mobile: ## Build mobile Docker image only
 	$(call print_info,Building mobile image...)
-	$(call docker_build_service,$(MOBILE_SERVICE))
+	$(call build_mobile_image)
 	$(call print_success,Mobile image built)

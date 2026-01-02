@@ -31,7 +31,7 @@ dev-tunnel: ## Start all services in tunnel mode (different WiFi networks)
 qr-tunnel: ## Show tunnel QR code and URLs
 	$(call clear_and_header,📱 Tunnel Mode - Connection Info)
 	$(call print_subsection,🌐 Backend Tunnel URL)
-	@$(call docker_exec_no_tty,$(BACKEND_SERVICE),cat $(TUNNEL_URL_FILE)) 2>/dev/null || echo "$(RED)$(ICON_ERROR) Backend tunnel not available$(NC)"
+	@docker exec -T $(BACKEND_CONTAINER) cat $(TUNNEL_URL_FILE) 2>/dev/null || echo "$(RED)$(ICON_ERROR) Backend tunnel not available$(NC)"
 	$(call blank_line)
 	$(call blank_line)
 	$(call print_subsection,🔍 ngrok Web Interface)
@@ -47,7 +47,7 @@ qr-tunnel: ## Show tunnel QR code and URLs
 tunnel-info: ## Display detailed tunnel connection info
 	$(call print_header,Tunnel Mode Information)
 	$(call print_subsection,Backend Tunnel)
-	@$(call docker_exec_no_tty,$(BACKEND_SERVICE),cat $(TUNNEL_URL_FILE)) 2>/dev/null || echo "$(RED)$(ICON_ERROR) Not running$(NC)"
+	@docker exec -T $(BACKEND_CONTAINER) cat $(TUNNEL_URL_FILE) 2>/dev/null || echo "$(RED)$(ICON_ERROR) Not running$(NC)"
 	$(call blank_line)
 	$(call print_subsection,ngrok Web UI)
 	@echo "   $(NGROK_UI_URL)"
@@ -70,14 +70,14 @@ tunnel-info: ## Display detailed tunnel connection info
 tunnel-setup: ## One-time setup for tunnel mode (auto EAS login)
 	$(call print_header,Tunnel Mode - Automatic Setup)
 	$(call print_arrow,Starting mobile container...)
-	$(call docker_up_service,$(MOBILE_SERVICE))
+	$(call start_mobile)
 	@sleep $(SETUP_WAIT_TIME)
 	$(call blank_line)
 	$(call print_arrow,Configuring EAS (automatic login)...)
-	$(call docker_exec,$(MOBILE_SERVICE),sh setup-eas-auto.sh)
+	@docker exec $(MOBILE_CONTAINER) sh setup-eas-auto.sh
 	$(call blank_line)
 	$(call print_arrow,Stopping setup container...)
-	$(call docker_stop_service,$(MOBILE_SERVICE))
+	@docker stop $(MOBILE_CONTAINER)
 	$(call blank_line)
 	$(call print_header,✓ Tunnel Setup Complete)
 	$(call display_next_steps,Run: make dev-tunnel to start tunnel mode)

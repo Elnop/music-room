@@ -36,13 +36,26 @@ ICON_ARROW := →
 ICON_BULLET := •
 ICON_INFO := ℹ
 
-# Docker Compose command (detect version)
-DOCKER_COMPOSE := $(shell command -v docker-compose 2>/dev/null)
-ifeq ($(DOCKER_COMPOSE),)
-	DOCKER_COMPOSE := docker compose
-endif
+# ==============================================================================
+# Docker Configuration (API 1.42 compatible - using docker run instead of docker-compose)
+# ==============================================================================
 
-# Service names
+# Disable BuildKit for Docker API 1.42 compatibility
+export DOCKER_BUILDKIT := 0
+
+# Docker network name (shared between all containers)
+DOCKER_NETWORK := zumik-network
+
+# Container names (consistent naming scheme)
+BACKEND_CONTAINER := zumik-backend
+MOBILE_CONTAINER := zumik-mobile
+REDIS_CONTAINER := zumik-redis
+
+# Docker volumes
+TUNNEL_VOLUME := tunnel-info
+REDIS_VOLUME := redis-data
+
+# Legacy service names (for backward compatibility with existing code)
 BACKEND_SERVICE := backend
 MOBILE_SERVICE := mobile
 
@@ -114,7 +127,10 @@ EXPO_URL := exp://$(HOST_IP):$(METRO_PORT)
 # ========================================
 # Redis Configuration
 # ========================================
-REDIS_CONTAINER_NAME := zumik-redis
+# Note: REDIS_CONTAINER_NAME is now defined above as REDIS_CONTAINER
+# Keeping this for backward compatibility with existing scripts
+REDIS_CONTAINER_NAME := $(REDIS_CONTAINER)
 REDIS_IMAGE := redis:7-alpine
 REDIS_PORT := 6379
-REDIS_DATA_VOLUME := redis-data
+# Note: REDIS_DATA_VOLUME now uses REDIS_VOLUME defined above
+REDIS_DATA_VOLUME := $(REDIS_VOLUME)

@@ -1,207 +1,455 @@
 # ==============================================================================
-# Docker Compose Helper Functions
+# Docker Helper Functions (API 1.42 Compatible - using docker run)
 # ==============================================================================
-# Reusable functions for Docker Compose commands
+# Reusable functions for Docker commands using native docker CLI instead of docker-compose
+# This ensures compatibility with Docker API 1.42 and newer versions
 
-# Start services with build
+# ==============================================================================
+# Infrastructure Functions
+# ==============================================================================
+
+# Ensure Docker network exists (idempotent)
+# Usage: $(call ensure_network)
+define ensure_network
+	@docker network inspect $(DOCKER_NETWORK) >/dev/null 2>&1 || \
+		docker network create $(DOCKER_NETWORK) >/dev/null 2>&1 || true
+endef
+
+# Ensure Docker volumes exist (idempotent)
+# Usage: $(call ensure_volumes)
+define ensure_volumes
+	@docker volume inspect $(TUNNEL_VOLUME) >/dev/null 2>&1 || \
+		docker volume create $(TUNNEL_VOLUME) >/dev/null 2>&1 || true
+	@docker volume inspect $(REDIS_VOLUME) >/dev/null 2>&1 || \
+		docker volume create $(REDIS_VOLUME) >/dev/null 2>&1 || true
+endef
+
+# Check if container is running
+# Usage: $(call container_running,zumik-backend)
+# Returns: "true" or "false"
+define container_running
+$(shell docker ps --filter "name=^/$(1)$$" --filter "status=running" --format "{{.Names}}" 2>/dev/null | grep -q "^$(1)$$" && echo "true" || echo "false")
+endef
+
+# Check if container exists (running or stopped)
+# Usage: $(call container_exists,zumik-backend)
+# Returns: "true" or "false"
+define container_exists
+$(shell docker ps -a --filter "name=^/$(1)$$" --format "{{.Names}}" 2>/dev/null | grep -q "^$(1)$$" && echo "true" || echo "false")
+endef
+
+# ==============================================================================
+# Image Building Functions
+# ==============================================================================
+
+# Build backend image
+# Usage: $(call build_backend_image)
+define build_backend_image
+	@echo "$(BLUE)$(ICON_INFO) Building backend image...$(NC)"
+	@docker build -t music-room-backend:latest \
+		--target development \
+		-f ./$(BACKEND_DIR)/Dockerfile \
+		./$(BACKEND_DIR) || { \
+		echo "$(RED)$(ICON_ERROR) Backend build failed$(NC)"; \
+		exit 1; \
+	}
+	@echo "$(GREEN)$(ICON_SUCCESS) Backend image built$(NC)"
+endef
+
+# Build mobile image
+# Usage: $(call build_mobile_image)
+define build_mobile_image
+	@echo "$(BLUE)$(ICON_INFO) Building mobile image...$(NC)"
+	@docker build -t music-room-mobile:latest \
+		-f ./$(MOBILE_DIR)/Dockerfile \
+		./$(MOBILE_DIR) || { \
+		echo "$(RED)$(ICON_ERROR) Mobile build failed$(NC)"; \
+		exit 1; \
+	}
+	@echo "$(GREEN)$(ICON_SUCCESS) Mobile image built$(NC)"
+endef
+
+# ==============================================================================
+# Container Start Functions
+# ==============================================================================
+
+# Start Redis container
+# Usage: $(call start_redis)
+define start_redis
+	@$(call ensure_network)
+	@$(call ensure_volumes)
+	@if [ "$(call container_running,$(REDIS_CONTAINER))" = "true" ]; then \
+		echo "$(YELLOW)$(ICON_INFO) Redis already running$(NC)"; \
+	else \
+		docker stop $(REDIS_CONTAINER) 2>/dev/null || true; \
+		docker rm $(REDIS_CONTAINER) 2>/dev/null || true; \
+		echo "$(BLUE)$(ICON_INFO) Starting Redis...$(NC)"; \
+		docker run -d \
+			--name $(REDIS_CONTAINER) \
+			--network $(DOCKER_NETWORK) \
+			-p $(REDIS_PORT):$(REDIS_PORT) \
+			-v $(REDIS_VOLUME):/data \
+			--restart unless-stopped \
+			$(REDIS_IMAGE) redis-server --appendonly yes || { \
+			echo "$(RED)$(ICON_ERROR) Failed to start Redis$(NC)"; \
+			exit 1; \
+		}; \
+		echo "$(GREEN)$(ICON_SUCCESS) Redis started$(NC)"; \
+	fi
+endef
+
+# Start backend container
+# Usage: $(call start_backend)
+define start_backend
+	@$(call ensure_network)
+	@$(call ensure_volumes)
+	@if [ "$(call container_running,$(BACKEND_CONTAINER))" = "true" ]; then \
+		echo "$(YELLOW)$(ICON_INFO) Backend already running$(NC)"; \
+	else \
+		$(call build_backend_image); \
+		docker stop $(BACKEND_CONTAINER) 2>/dev/null || true; \
+		docker rm $(BACKEND_CONTAINER) 2>/dev/null || true; \
+		echo "$(BLUE)$(ICON_INFO) Starting backend...$(NC)"; \
+		docker run -d \
+			--name $(BACKEND_CONTAINER) \
+			--network $(DOCKER_NETWORK) \
+			-p $(BACKEND_PORT):$(BACKEND_PORT) \
+			-v $(shell pwd)/$(BACKEND_DIR):/app \
+			-v /app/node_modules \
+			-v $(TUNNEL_VOLUME):/tmp/shared \
+			--env-file $(shell pwd)/$(BACKEND_ENV) \
+			-e NODE_ENV=development \
+			-e PORT=$(BACKEND_PORT) \
+			-e REDIS_HOST=$(REDIS_CONTAINER) \
+			--restart unless-stopped \
+			music-room-backend:latest || { \
+			echo "$(RED)$(ICON_ERROR) Failed to start backend$(NC)"; \
+			docker logs $(BACKEND_CONTAINER) 2>&1 | tail -20; \
+			exit 1; \
+		}; \
+		echo "$(GREEN)$(ICON_SUCCESS) Backend started$(NC)"; \
+	fi
+endef
+
+# Start backend with tunnel mode
+# Usage: $(call start_backend_tunnel)
+define start_backend_tunnel
+	@$(call ensure_network)
+	@$(call ensure_volumes)
+	@if [ "$(call container_running,$(BACKEND_CONTAINER))" = "true" ]; then \
+		echo "$(YELLOW)$(ICON_INFO) Backend already running$(NC)"; \
+	else \
+		$(call build_backend_image); \
+		docker stop $(BACKEND_CONTAINER) 2>/dev/null || true; \
+		docker rm $(BACKEND_CONTAINER) 2>/dev/null || true; \
+		echo "$(BLUE)$(ICON_INFO) Starting backend with tunnel...$(NC)"; \
+		docker run -d \
+			--name $(BACKEND_CONTAINER) \
+			--network $(DOCKER_NETWORK) \
+			-p $(BACKEND_PORT):$(BACKEND_PORT) \
+			-p $(NGROK_PORT):$(NGROK_PORT) \
+			-v $(shell pwd)/$(BACKEND_DIR):/app \
+			-v /app/node_modules \
+			-v $(TUNNEL_VOLUME):/tmp/shared \
+			--env-file $(shell pwd)/$(BACKEND_ENV) \
+			-e NODE_ENV=development \
+			-e PORT=$(BACKEND_PORT) \
+			-e TUNNEL_MODE=true \
+			-e REDIS_HOST=$(REDIS_CONTAINER) \
+			--restart unless-stopped \
+			music-room-backend:latest sh start-with-tunnel.sh || { \
+			echo "$(RED)$(ICON_ERROR) Failed to start backend with tunnel$(NC)"; \
+			docker logs $(BACKEND_CONTAINER) 2>&1 | tail -20; \
+			exit 1; \
+		}; \
+		echo "$(GREEN)$(ICON_SUCCESS) Backend started with tunnel$(NC)"; \
+	fi
+endef
+
+# Start mobile container
+# Usage: $(call start_mobile)
+define start_mobile
+	@$(call ensure_network)
+	@$(call ensure_volumes)
+	@if [ "$(call container_running,$(MOBILE_CONTAINER))" = "true" ]; then \
+		echo "$(YELLOW)$(ICON_INFO) Mobile already running$(NC)"; \
+	else \
+		$(call build_mobile_image); \
+		docker stop $(MOBILE_CONTAINER) 2>/dev/null || true; \
+		docker rm $(MOBILE_CONTAINER) 2>/dev/null || true; \
+		echo "$(BLUE)$(ICON_INFO) Starting mobile...$(NC)"; \
+		docker run -d \
+			--name $(MOBILE_CONTAINER) \
+			--network $(DOCKER_NETWORK) \
+			-p $(METRO_PORT):$(METRO_PORT) \
+			-p $(EXPO_PORT):$(EXPO_PORT) \
+			-p 19001:19001 \
+			-p 19002:19002 \
+			-v $(shell pwd)/$(MOBILE_DIR):/app \
+			-v /app/node_modules \
+			-v /app/.expo \
+			-v $(TUNNEL_VOLUME):/tmp/shared \
+			--env-file $(shell pwd)/$(MOBILE_ENV) \
+			-e EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0 \
+			-e REACT_NATIVE_PACKAGER_HOSTNAME=$(HOST_IP) \
+			-e API_URL=http://$(BACKEND_CONTAINER):$(BACKEND_PORT) \
+			--restart unless-stopped \
+			-it \
+			music-room-mobile:latest || { \
+			echo "$(RED)$(ICON_ERROR) Failed to start mobile$(NC)"; \
+			docker logs $(MOBILE_CONTAINER) 2>&1 | tail -20; \
+			exit 1; \
+		}; \
+		echo "$(GREEN)$(ICON_SUCCESS) Mobile started$(NC)"; \
+	fi
+endef
+
+# ==============================================================================
+# High-level Orchestration Functions
+# ==============================================================================
+
+# Start all services with build (equivalent to docker-compose up -d --build)
 # Usage: $(call docker_up_build)
 define docker_up_build
-	@$(DOCKER_COMPOSE) up -d --build
+	@$(call start_redis)
+	@$(call start_backend)
+	@$(call start_mobile)
 endef
 
 # Start with tunnel configuration
 # Usage: $(call docker_up_tunnel)
 define docker_up_tunnel
-	@$(DOCKER_COMPOSE) -f docker-compose.yml -f docker-compose.tunnel.yml up -d --build
+	@$(call start_redis)
+	@$(call start_backend_tunnel)
+	@$(call start_mobile)
 endef
 
 # Start single service with build
 # Usage: $(call docker_up_service,mobile)
 define docker_up_service
-	@$(DOCKER_COMPOSE) up $(1) -d --build
+	@if [ "$(1)" = "backend" ]; then \
+		$(call start_redis); \
+		$(call start_backend); \
+	elif [ "$(1)" = "mobile" ]; then \
+		$(call start_mobile); \
+	elif [ "$(1)" = "redis" ]; then \
+		$(call start_redis); \
+	else \
+		echo "$(RED)$(ICON_ERROR) Unknown service: $(1)$(NC)"; \
+		exit 1; \
+	fi
 endef
 
 # Start existing containers (no build)
 # Usage: $(call docker_start)
 define docker_start
-	@$(DOCKER_COMPOSE) start
+	@for container in $(REDIS_CONTAINER) $(BACKEND_CONTAINER) $(MOBILE_CONTAINER); do \
+		if [ "$(call container_exists,$$container)" = "true" ]; then \
+			if [ "$(call container_running,$$container)" = "false" ]; then \
+				echo "$(BLUE)$(ICON_INFO) Starting $$container...$(NC)"; \
+				docker start $$container || true; \
+			fi; \
+		fi; \
+	done
+	@echo "$(GREEN)$(ICON_SUCCESS) Containers started$(NC)"
 endef
 
 # Stop all services
 # Usage: $(call docker_stop)
 define docker_stop
-	@$(DOCKER_COMPOSE) stop
+	@echo "$(BLUE)$(ICON_INFO) Stopping containers...$(NC)"
+	@docker stop $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true
+	@echo "$(GREEN)$(ICON_SUCCESS) Containers stopped$(NC)"
 endef
 
 # Stop specific service
 # Usage: $(call docker_stop_service,mobile)
 define docker_stop_service
-	@$(DOCKER_COMPOSE) stop $(1)
+	@if [ "$(1)" = "backend" ]; then \
+		docker stop $(BACKEND_CONTAINER) 2>/dev/null || true; \
+	elif [ "$(1)" = "mobile" ]; then \
+		docker stop $(MOBILE_CONTAINER) 2>/dev/null || true; \
+	elif [ "$(1)" = "redis" ]; then \
+		docker stop $(REDIS_CONTAINER) 2>/dev/null || true; \
+	fi
 endef
 
 # Restart all services
 # Usage: $(call docker_restart)
 define docker_restart
-	@$(DOCKER_COMPOSE) restart
+	@echo "$(BLUE)$(ICON_INFO) Restarting containers...$(NC)"
+	@docker restart $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true
+	@echo "$(GREEN)$(ICON_SUCCESS) Containers restarted$(NC)"
 endef
+
+# ==============================================================================
+# Logging Functions
+# ==============================================================================
 
 # Show all logs (follow mode)
 # Usage: $(call docker_logs_all)
 define docker_logs_all
-	@$(DOCKER_COMPOSE) logs -f
+	@echo "$(BLUE)$(ICON_INFO) Showing logs (press Ctrl+C to exit)...$(NC)"
+	@(docker logs -f $(BACKEND_CONTAINER) 2>&1 | sed 's/^/[BACKEND] /' &); \
+	(docker logs -f $(MOBILE_CONTAINER) 2>&1 | sed 's/^/[MOBILE] /' &); \
+	(docker logs -f $(REDIS_CONTAINER) 2>&1 | sed 's/^/[REDIS] /' &); \
+	wait
 endef
 
 # Show service logs (follow mode)
 # Usage: $(call docker_logs_service,backend)
 define docker_logs_service
-	@$(DOCKER_COMPOSE) logs -f $(1)
+	@if [ "$(1)" = "backend" ]; then \
+		docker logs -f $(BACKEND_CONTAINER) 2>&1; \
+	elif [ "$(1)" = "mobile" ]; then \
+		docker logs -f $(MOBILE_CONTAINER) 2>&1; \
+	elif [ "$(1)" = "redis" ]; then \
+		docker logs -f $(REDIS_CONTAINER) 2>&1; \
+	fi
 endef
 
 # Extract QR code from mobile logs
 # Usage: $(call docker_logs_qr)
 define docker_logs_qr
-	@$(DOCKER_COMPOSE) logs $(MOBILE_SERVICE) 2>/dev/null | grep -B 5 -A 50 "▄▄▄▄▄▄▄" | head -70 || $(DOCKER_COMPOSE) logs $(MOBILE_SERVICE) | tail -60
+	@docker logs $(MOBILE_CONTAINER) 2>/dev/null | grep -B 5 -A 50 "▄▄▄▄▄▄▄" | head -70 || docker logs $(MOBILE_CONTAINER) | tail -60
 endef
+
+# ==============================================================================
+# Execution Functions
+# ==============================================================================
 
 # Execute command in container
 # Usage: $(call docker_exec,backend,npm test)
 define docker_exec
-	@$(DOCKER_COMPOSE) exec $(1) $(2)
+	@if [ "$(1)" = "backend" ]; then \
+		docker exec -it $(BACKEND_CONTAINER) $(2); \
+	elif [ "$(1)" = "mobile" ]; then \
+		docker exec -it $(MOBILE_CONTAINER) $(2); \
+	elif [ "$(1)" = "redis" ]; then \
+		docker exec -it $(REDIS_CONTAINER) $(2); \
+	fi
 endef
 
 # Execute command with -T flag (no TTY)
 # Usage: $(call docker_exec_no_tty,backend,cat /tmp/file)
 define docker_exec_no_tty
-	@$(DOCKER_COMPOSE) exec -T $(1) $(2)
+	@if [ "$(1)" = "backend" ]; then \
+		docker exec -T $(BACKEND_CONTAINER) $(2); \
+	elif [ "$(1)" = "mobile" ]; then \
+		docker exec -T $(MOBILE_CONTAINER) $(2); \
+	elif [ "$(1)" = "redis" ]; then \
+		docker exec -T $(REDIS_CONTAINER) $(2); \
+	fi
 endef
 
 # Run disposable command in container
 # Usage: $(call docker_run_rm,mobile,npx eas whoami)
 define docker_run_rm
-	@$(DOCKER_COMPOSE) run --rm $(1) $(2)
+	@docker run --rm \
+		--network $(DOCKER_NETWORK) \
+		-v $(shell pwd)/$(MOBILE_DIR):/app \
+		-v /app/node_modules \
+		--env-file $(shell pwd)/$(MOBILE_ENV) \
+		music-room-$(1):latest $(2)
 endef
+
+# ==============================================================================
+# Status Functions
+# ==============================================================================
 
 # Show container status
 # Usage: $(call docker_ps)
 define docker_ps
-	@$(DOCKER_COMPOSE) ps
+	@docker ps -a --filter "name=zumik-" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 endef
+
+# ==============================================================================
+# Cleanup Functions
+# ==============================================================================
 
 # Stop and remove containers/networks
 # Usage: $(call docker_down)
 define docker_down
-	@$(DOCKER_COMPOSE) down
+	@echo "$(BLUE)$(ICON_INFO) Stopping and removing containers...$(NC)"
+	@docker stop $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true
+	@docker rm $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true
+	@docker network rm $(DOCKER_NETWORK) 2>/dev/null || true
+	@echo "$(GREEN)$(ICON_SUCCESS) Cleanup complete$(NC)"
 endef
 
 # Stop and remove containers/networks with volumes
 # Usage: $(call docker_down_volumes)
 define docker_down_volumes
 	@echo "$(CYAN)Stopping and removing containers + volumes...$(RESET)"
-	@$(DOCKER_COMPOSE) down -v 2>/dev/null || true
-	@echo "$(GREEN)✓ Containers and volumes removed$(RESET)"
+	@docker stop $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true
+	@docker rm $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true
+	@docker volume rm $(TUNNEL_VOLUME) $(REDIS_VOLUME) 2>/dev/null || true
+	@docker network rm $(DOCKER_NETWORK) 2>/dev/null || true
+	@echo "$(GREEN)$(ICON_SUCCESS) Full cleanup complete$(NC)"
 endef
 
-# Stop and remove with volumes and images
+# Full cleanup: containers, networks, volumes, images
 # Usage: $(call docker_down_full)
 define docker_down_full
-	@$(DOCKER_COMPOSE) down -v --rmi local 2>/dev/null || true
+	@echo "$(RED)Full cleanup: removing all Zumik Docker resources...$(RESET)"
+	@docker stop $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true
+	@docker rm $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true
+	@docker volume rm $(TUNNEL_VOLUME) $(REDIS_VOLUME) 2>/dev/null || true
+	@docker network rm $(DOCKER_NETWORK) 2>/dev/null || true
+	@docker rmi music-room-backend:latest music-room-mobile:latest 2>/dev/null || true
+	@echo "$(GREEN)$(ICON_SUCCESS) Full cleanup complete$(NC)"
 endef
 
 # Build all images
 # Usage: $(call docker_build_all)
 define docker_build_all
-	@$(DOCKER_COMPOSE) build
+	@$(call build_backend_image)
+	@$(call build_mobile_image)
 endef
 
-# Build single service
+# Build specific service image
 # Usage: $(call docker_build_service,backend)
 define docker_build_service
-	@$(DOCKER_COMPOSE) build $(1)
+	@if [ "$(1)" = "backend" ]; then \
+		$(call build_backend_image); \
+	elif [ "$(1)" = "mobile" ]; then \
+		$(call build_mobile_image); \
+	fi
 endef
 
 # ==============================================================================
-# Redis-Specific Helpers
+# Redis-Specific Helpers (for backward compatibility)
 # ==============================================================================
 
-# Check if Redis container is running
-# Usage: $(call is_redis_running)
-# Returns: "true" or "false"
-define is_redis_running
-$(shell docker ps --filter "name=$(REDIS_CONTAINER_NAME)" --filter "status=running" --format "{{.Names}}" 2>/dev/null | grep -q "$(REDIS_CONTAINER_NAME)" && echo "true" || echo "false")
-endef
-
-# Check if Redis container exists (running or stopped)
-# Usage: $(call redis_exists)
-# Returns: "true" or "false"
-define redis_exists
-$(shell docker ps -a --filter "name=$(REDIS_CONTAINER_NAME)" --format "{{.Names}}" 2>/dev/null | grep -q "$(REDIS_CONTAINER_NAME)" && echo "true" || echo "false")
-endef
-
-# Start Redis container (docker-compose up -d redis)
+# Ensure Redis is started
 # Usage: $(call ensure_redis_started)
 define ensure_redis_started
-	@if [ "$(call is_redis_running)" = "true" ]; then \
-		echo "$(GREEN)✓$(RESET) Redis is already running"; \
-	else \
-		echo "$(YELLOW)→$(RESET) Starting Redis container..."; \
-		$(DOCKER_COMPOSE) up -d redis; \
-		echo "$(GREEN)✓$(RESET) Redis started"; \
-	fi
+	@$(call start_redis)
 endef
 
-# Stop Redis container
+# Stop Redis
 # Usage: $(call stop_redis)
 define stop_redis
-	@if [ "$(call is_redis_running)" = "true" ]; then \
-		echo "$(YELLOW)→$(RESET) Stopping Redis container..."; \
-		$(DOCKER_COMPOSE) stop redis; \
-		echo "$(GREEN)✓$(RESET) Redis stopped"; \
-	else \
-		echo "$(YELLOW)⚠$(RESET) Redis is not running"; \
-	fi
+	@docker stop $(REDIS_CONTAINER) 2>/dev/null || true
+	@echo "$(GREEN)$(ICON_SUCCESS) Redis stopped$(NC)"
 endef
 
-# Restart Redis container
+# Restart Redis
 # Usage: $(call restart_redis)
 define restart_redis
-	@if [ "$(call redis_exists)" = "true" ]; then \
-		echo "$(YELLOW)→$(RESET) Restarting Redis container..."; \
-		$(DOCKER_COMPOSE) restart redis; \
-		echo "$(GREEN)✓$(RESET) Redis restarted"; \
-	else \
-		echo "$(YELLOW)⚠$(RESET) Redis container does not exist. Use 'make redis-start' first."; \
-	fi
+	@docker restart $(REDIS_CONTAINER) 2>/dev/null || true
+	@echo "$(GREEN)$(ICON_SUCCESS) Redis restarted$(NC)"
 endef
 
-# Check Redis health (PING command)
-# Usage: $(call check_redis_health_verbose)
-define check_redis_health_verbose
-	@if [ "$(call is_redis_running)" != "true" ]; then \
-		echo "$(RED)✗$(RESET) Redis container is not running"; \
-		exit 1; \
-	fi; \
-	PONG=$$(docker exec $(REDIS_CONTAINER_NAME) redis-cli PING 2>/dev/null); \
-	if [ "$$PONG" = "PONG" ]; then \
-		echo "$(GREEN)✓$(RESET) Redis is healthy (PONG received)"; \
-	else \
-		echo "$(RED)✗$(RESET) Redis is not responding"; \
-		exit 1; \
-	fi
+# Access Redis CLI
+# Usage: $(call redis_cli)
+define redis_cli
+	@docker exec -it $(REDIS_CONTAINER) redis-cli
 endef
 
-# Check Redis status (container + health)
-# Usage: $(call check_redis_status)
-define check_redis_status
-	@if [ "$(call is_redis_running)" = "true" ]; then \
-		PONG=$$(docker exec $(REDIS_CONTAINER_NAME) redis-cli PING 2>/dev/null); \
-		if [ "$$PONG" = "PONG" ]; then \
-			echo "$(GREEN)✓$(RESET) Redis: Running and healthy"; \
-		else \
-			echo "$(YELLOW)⚠$(RESET) Redis: Running but not responding"; \
-		fi; \
-	elif [ "$(call redis_exists)" = "true" ]; then \
-		echo "$(YELLOW)⚠$(RESET) Redis: Stopped"; \
-	else \
-		echo "$(RED)✗$(RESET) Redis: Not created"; \
-	fi
+# Flush Redis database
+# Usage: $(call redis_flush)
+define redis_flush
+	@docker exec $(REDIS_CONTAINER) redis-cli FLUSHALL
+	@echo "$(GREEN)$(ICON_SUCCESS) Redis database flushed$(NC)"
 endef
