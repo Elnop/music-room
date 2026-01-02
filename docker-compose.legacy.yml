@@ -1,0 +1,54 @@
+# Docker Compose compatible with Docker API 1.42 (Docker 20.10.x)
+# Use this file on machines where you cannot upgrade Docker
+#
+# Usage: docker-compose -f docker-compose.legacy.yml -f docker-compose.tunnel.yml up
+
+services:
+  # Backend API Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: zumik-backend
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount source code for hot reload
+      - ./backend:/app
+      # Prevent node_modules from being overwritten
+      - /app/node_modules
+      # Shared volume for tunnel URL communication
+      - tunnel-info:/tmp/shared
+    env_file:
+      - ./backend/.env
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+    networks:
+      - zumik-network
+    restart: unless-stopped
+
+  # Redis Service (Rate Limiting & Brute Force Protection)
+  redis:
+    image: redis:7-alpine
+    container_name: zumik-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - zumik-network
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+
+networks:
+  zumik-network:
+    driver: bridge
+    name: zumik-network
+
+volumes:
+  tunnel-info:
+    driver: local
+  redis-data:
+    driver: local

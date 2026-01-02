@@ -83,6 +83,7 @@ make stop
 ### Specialized Guides
 
 - [Tunnel Mode](./doc/TUNNEL_MODE.md) - Cross-network development (different WiFi)
+- [Docker Legacy Mode](./DOCKER_LEGACY_MODE.md) - **Docker API 1.42 compatibility (no admin rights)**
 - [Redis Setup](./doc/REDIS.md) - Cache and rate limiting configuration
 - [Security](./doc/SECURITY.md) - Docker security (Chainguard Images, 0 CVE)
 - [Testing Security](./doc/TESTING_SECURITY.md) - Subject IV.6 compliance
