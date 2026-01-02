@@ -252,3 +252,31 @@ build-apk-docker-with-tunnel:
 	@echo "$(BLUE)$(ICON_INFO) Step 1/3: Starting backend + tunnel...$(NC)"
 	$(call start_redis)
 	$(call start_backend_tunnel)
+	@echo ""
+	@echo "$(BLUE)$(ICON_INFO) Step 2/3: Waiting for tunnel initialization...$(NC)"
+	@MAX_WAIT=120; \
+	COUNTER=0; \
+	while [ $$COUNTER -lt $$MAX_WAIT ]; do \
+		if docker exec $(BACKEND_CONTAINER) sh -c 'test -f $(SHARED_TUNNEL_FILE)' >/dev/null 2>&1; then \
+			echo "$(GREEN)$(ICON_SUCCESS) Tunnel initialized after $$COUNTER seconds$(NC)"; \
+			break; \
+		fi; \
+		if [ $$((COUNTER % 10)) -eq 0 ] && [ $$COUNTER -gt 0 ]; then \
+			echo "   Still waiting... ($$COUNTER/$$MAX_WAIT seconds)"; \
+		fi; \
+		sleep 1; \
+		COUNTER=$$((COUNTER + 1)); \
+	done; \
+	if [ $$COUNTER -ge $$MAX_WAIT ]; then \
+		echo "$(RED)$(ICON_ERROR) Timeout waiting for tunnel$(NC)"; \
+		exit 1; \
+	fi
+	@echo ""
+	@TUNNEL_URL=$$(docker exec $(BACKEND_CONTAINER) cat $(SHARED_TUNNEL_FILE) 2>/dev/null | tr -d '\r\n'); \
+	echo "$(BLUE)$(ICON_INFO) Step 3/3: Building APK with tunnel URL...$(NC)"; \
+	echo "$(GREEN)$(ICON_SUCCESS) Tunnel URL: $$TUNNEL_URL$(NC)"; \
+	echo ""; \
+	./scripts/build-apk-docker.sh "$$TUNNEL_URL"
+	@echo ""
+	@echo "$(GREEN)$(ICON_SUCCESS) Build complete with tunnel URL$(NC)"
+	@echo ""
