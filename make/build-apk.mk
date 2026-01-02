@@ -404,7 +404,7 @@ build-apk-docker-with-tunnel-legacy: clean-legacy-containers
 		-v $(shell pwd)/backend:/app \
 		-v tunnel-info:/tmp/shared \
 		-v /app/node_modules \
-		--env-file ./backend/.env \
+		--env-file $(shell pwd)/backend/.env \
 		-e NODE_ENV=development \
 		-e PORT=3000 \
 		-e TUNNEL_MODE=true \
