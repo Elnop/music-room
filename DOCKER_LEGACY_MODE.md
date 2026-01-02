@@ -23,17 +23,29 @@ Si vous voyez `API version: 1.42` ou moins, utilisez le mode legacy.
 
 ## Commandes Mode Legacy
 
-### 1. Build APK avec Tunnel (Recommandé)
+### 1. Build APK avec Tunnel
 
 ```bash
 make build-apk-docker-with-tunnel-legacy
 ```
 
 Cette commande :
-- ✅ Compatible Docker API 1.42
-- ✅ Démarre backend + Redis + ngrok tunnel
-- ✅ Build l'APK avec l'URL du tunnel configurée
-- ✅ Copie l'APK dans `build/`
+1. **Build l'image backend** avec `Dockerfile.legacy` (single-stage, compatible API 1.42)
+2. Désactive BuildKit automatiquement (`DOCKER_BUILDKIT=0`)
+3. Démarre backend + Redis + tunnel ngrok
+4. Build l'APK avec l'URL du tunnel
+5. Copie l'APK dans `build/app-release.apk`
+
+**Si le build échoue avec "API version too old"**, forcez manuellement :
+
+```bash
+# Forcer l'ancien builder Docker
+DOCKER_BUILDKIT=0 make build-apk-docker-with-tunnel-legacy
+
+# Ou builder l'image manuellement d'abord
+DOCKER_BUILDKIT=0 docker build -t music-room-backend:latest -f backend/Dockerfile.legacy backend/
+make build-apk-docker-with-tunnel-legacy
+```
 
 ### 2. Développement avec Tunnel
 
@@ -228,10 +240,14 @@ make build-apk-docker-with-tunnel  # sans -legacy
 
 ```
 music-room/
+├── backend/
+│   └── Dockerfile.legacy              # ← Nouveau : Dockerfile simple (API 1.42)
 ├── docker-compose.legacy.yml          # ← Nouveau : Base compatible API 1.42
 ├── docker-compose.tunnel.legacy.yml   # ← Nouveau : Tunnel override pour legacy
 ├── make/build-apk.mk                  # build-apk-docker-with-tunnel-legacy
-└── DOCKER_LEGACY_MODE.md             # ← Ce fichier
+├── DOCKER_LEGACY_MODE.md             # ← Ce fichier
+├── QUICKSTART_NON_ADMIN.md           # Quick start
+└── SOLUTION_DOCKER_API_142.md        # Solution détaillée
 ```
 
 ## Support

@@ -361,8 +361,26 @@ build-apk-docker-with-tunnel-legacy:
 	@echo ""
 	@echo "$(YELLOW)ℹ Using legacy compose files for Docker API 1.42 compatibility$(NC)"
 	@echo ""
-	@echo "$(BLUE)$(ICON_INFO) Step 1/3: Starting backend + tunnel...$(NC)"
-	@COMPOSE_PROFILES="" $(DOCKER_COMPOSE) -f docker-compose.legacy.yml -f docker-compose.tunnel.legacy.yml up -d --build backend redis
+	@echo "$(BLUE)$(ICON_INFO) Step 1/3: Building backend image (legacy mode)...$(NC)"
+	@# Disable BuildKit for Docker API 1.42 compatibility
+	@export DOCKER_BUILDKIT=0; \
+	docker build -t music-room-backend:latest -f ./backend/Dockerfile.legacy ./backend 2>/dev/null || { \
+		echo "$(YELLOW)$(ICON_WARNING) Legacy build failed, trying standard Dockerfile...$(NC)"; \
+		docker build -t music-room-backend:latest --target development ./backend || { \
+			echo "$(RED)$(ICON_ERROR) Both build attempts failed$(NC)"; \
+			echo ""; \
+			echo "$(YELLOW)Your Docker version might not support building images.$(NC)"; \
+			echo ""; \
+			echo "Solutions:"; \
+			echo "  1. Update Docker daemon (requires admin): apt install docker-ce"; \
+			echo "  2. Use DOCKER_BUILDKIT=0: DOCKER_BUILDKIT=0 make build-apk-docker-with-tunnel-legacy"; \
+			echo "  3. Get pre-built image from another machine (see DOCKER_LEGACY_MODE.md)"; \
+			exit 1; \
+		}; \
+	}
+	@echo "$(GREEN)$(ICON_SUCCESS) Backend image built$(NC)"
+	@echo ""
+	@COMPOSE_PROFILES="" $(DOCKER_COMPOSE) -f docker-compose.legacy.yml -f docker-compose.tunnel.legacy.yml up -d backend redis
 	@echo ""
 	@echo "$(BLUE)$(ICON_INFO) Step 2/3: Waiting for tunnel initialization...$(NC)"
 	@MAX_WAIT=120; \

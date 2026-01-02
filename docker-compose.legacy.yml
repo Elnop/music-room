@@ -6,10 +6,7 @@
 services:
   # Backend API Service
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-      target: development
+    image: music-room-backend:latest
     container_name: zumik-backend
     ports:
       - "3000:3000"

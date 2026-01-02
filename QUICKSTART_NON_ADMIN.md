@@ -2,7 +2,7 @@
 
 **Problème** : `Error response from daemon: client version 1.42 is too old`
 
-**Solution** : Utilisez le mode legacy.
+**Solution** : Utilisez le mode legacy qui build l'image localement avec Dockerfile.legacy.
 
 ## Installation Rapide
 
@@ -21,7 +21,16 @@ nano backend/.env
 # NGROK_AUTHTOKEN=votre_token_ici
 
 # 4. Build APK avec tunnel (MODE LEGACY)
+# Cette commande utilise Dockerfile.legacy (single-stage, compatible API 1.42)
 make build-apk-docker-with-tunnel-legacy
+```
+
+## Si le build d'image échoue
+
+Si vous voyez encore "API version 1.42 too old", forcez l'ancien builder :
+
+```bash
+DOCKER_BUILDKIT=0 make build-apk-docker-with-tunnel-legacy
 ```
 
 ## Temps de Build
