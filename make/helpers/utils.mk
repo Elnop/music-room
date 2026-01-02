@@ -181,9 +181,6 @@ info: ## Show system information
 	$(call print_subsection,Docker Version)
 	@docker --version
 	@echo ""
-	$(call print_subsection,Docker Compose Version)
-	@$(DOCKER_COMPOSE) --version
-	@echo ""
 	$(call print_subsection,Node.js Versions)
 	@echo "  Backend:  $$(cd $(BACKEND_DIR) && node --version 2>/dev/null || echo 'Not installed')"
 	@echo "  Mobile:   $$(cd $(MOBILE_DIR) && node --version 2>/dev/null || echo 'Not installed')"
