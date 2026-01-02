@@ -13,13 +13,11 @@ include make/dev-menu.mk
 include make/docker.mk
 include make/local.mk
 include make/tunnel.mk
-include make/native.mk
 include make/sync.mk
 include make/onboarding.mk
 include make/quality.mk
 include make/supabase.mk
 include make/redis.mk
-include make/build.mk
 include make/build-apk.mk
 include make/production.mk
 include make/cleanup.mk
