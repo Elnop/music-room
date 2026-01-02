@@ -3,14 +3,12 @@
 # ==============================================================================
 # Commands for testing, linting, and formatting code
 
-.PHONY: test test-backend lint format lint-fix
+.PHONY: test lint format lint-fix
 
-test: test-backend ## Run all tests (backend)
-	$(call print_success,All tests completed)
-
-test-backend: ## Run backend tests
+test: ## Run all tests (backend)
 	$(call print_info,Running backend tests...)
 	$(call npm_safe,backend,test,No tests configured)
+	$(call print_success,All tests completed)
 
 lint: ## Run linters on all code
 	$(call print_header,Running Linters)

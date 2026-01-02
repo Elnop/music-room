@@ -3,7 +3,7 @@
 # ==============================================================================
 # Commands for cleaning Docker resources, dependencies, and build artifacts
 
-.PHONY: clean clean-docker clean-deps clean-all prune deploy-build clean-cache clean-global-cache clean-gradle clean-project clean-native
+.PHONY: clean clean-docker clean-all prune clean-global-cache clean-gradle clean-project
 
 clean: ## Remove containers, volumes, images, and project dependencies (with confirmation)
 	@echo "$(BOLD)$(YELLOW)This will remove:$(RESET)"
@@ -44,11 +44,6 @@ clean-docker: ## Remove Zumik Docker resources only (containers, images, volumes
 	@docker rmi music-room-backend:latest music-room-mobile:latest 2>/dev/null || true
 	@docker network rm $(DOCKER_NETWORK) 2>/dev/null || true
 	@echo "$(GREEN)✓ Docker resources removed$(RESET)"
-
-clean-deps: ## Remove all dependencies and build artifacts (node_modules, dist, .expo, coverage, logs)
-	@echo "$(CYAN)Removing all dependencies and build artifacts...$(RESET)"
-	@$(call remove_all_project_artifacts)
-	@echo "$(GREEN)✓ Dependencies and artifacts removed$(RESET)"
 
 clean-all: ## Complete cleanup - Docker system + project artifacts + global caches
 	@echo "$(BOLD)$(RED)⚠️  COMPLETE CLEANUP - THIS WILL REMOVE EVERYTHING!$(RESET)"
@@ -103,23 +98,6 @@ prune: ## Clean up unused Docker resources
 	$(call print_arrow,Pruning unused Docker resources...)
 	$(call docker_system_prune)
 	$(call print_success,Docker resources pruned)
-
-deploy-build: ## Build production images (for deployment)
-	$(call print_info,Building production images...)
-	@docker build -t zumik-backend:latest --target production ./$(BACKEND_DIR)
-	$(call print_success,Production images built)
-	@echo ""
-	$(call print_subsection,Images ready)
-	@echo "  - zumik-backend:latest"
-
-clean-cache: ## Remove project-level caches (.expo, coverage, logs)
-	@echo "$(BOLD)$(CYAN)Cleaning project caches...$(RESET)"
-	@$(call remove_build_artifacts)
-	@$(call remove_coverage)
-	@$(call remove_build_logs)
-	@$(call remove_ts_buildinfo)
-	@$(call remove_eas_artifacts)
-	@echo "$(BOLD)$(GREEN)✓ Project caches cleaned$(RESET)"
 
 clean-global-cache: ## Remove global caches (Expo, Metro, Watchman) - affects all projects
 	@echo "$(BOLD)$(RED)⚠️  WARNING: This will remove GLOBAL caches affecting ALL projects!$(RESET)"

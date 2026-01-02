@@ -22,7 +22,7 @@
 #   7. Display APK location and installation instructions
 # ==============================================================================
 
-.PHONY: dev-tunnel-build-apk dev-tunnel-build-apk-install dev-tunnel-build-apk-check-prereqs dev-tunnel-build-apk-update-env dev-tunnel-build-apk-build dev-tunnel-build-apk-docker dev-tunnel-build-apk-docker-build build-apk-docker build-apk-docker-with-tunnel
+.PHONY: dev-tunnel-build-apk dev-tunnel-build-apk-install dev-tunnel-build-apk-check-prereqs dev-tunnel-build-apk-update-env dev-tunnel-build-apk-build build-apk-docker build-apk-docker-with-tunnel
 
 #------------------------------------------------------------
 # Main Commands
@@ -221,120 +221,6 @@ dev-tunnel-build-apk-build:
 	@cd mobile && npx expo prebuild --clean
 	@cd mobile && ./scripts/generate-network-config.sh
 	@cd mobile/android && ./gradlew assembleRelease
-
-#------------------------------------------------------------
-# Containerized Android Build (using hmerritt/android-sdk)
-#------------------------------------------------------------
-
-dev-tunnel-build-apk-docker: dev-tunnel-build-apk-check-prereqs ## Build APK with ngrok tunnel (containerized Android SDK)
-	$(call print_header,Building APK with Tunnel URL (Docker Android SDK))
-	$(call print_subsection,📱 Target: APK for installation on any device)
-	@echo "   Backend: Docker container + ngrok tunnel"
-	@echo "   Redis: Docker container"
-	@echo "   Mobile: Docker container with Android SDK"
-	@echo "   URL: Dynamic ngrok tunnel (configured automatically)"
-	@echo ""
-	$(call print_arrow,Starting backend + redis with tunnel...)
-	$(call start_redis)
-	$(call start_backend_tunnel)
-	$(call blank_line)
-	$(call print_success,Backend and Redis started)
-	$(call blank_line)
-	$(call print_arrow,Waiting for ngrok tunnel to initialize...)
-	@echo "   This may take 30-60 seconds on first run..."
-	@echo ""
-	@# Wait for tunnel URL file with active polling (max 120 seconds)
-	@MAX_WAIT=120; \
-	COUNTER=0; \
-	while [ $$COUNTER -lt $$MAX_WAIT ]; do \
-		if docker exec $(BACKEND_CONTAINER) sh -c 'test -f $(SHARED_TUNNEL_FILE)' >/dev/null 2>&1; then \
-			echo "$(GREEN)$(ICON_SUCCESS) Tunnel initialized after $$COUNTER seconds$(NC)"; \
-			break; \
-		fi; \
-		if [ $$((COUNTER % 10)) -eq 0 ] && [ $$COUNTER -gt 0 ]; then \
-			echo "   Still waiting... ($$COUNTER/$$MAX_WAIT seconds)"; \
-		fi; \
-		sleep 1; \
-		COUNTER=$$((COUNTER + 1)); \
-	done; \
-	if [ $$COUNTER -ge $$MAX_WAIT ]; then \
-		echo "$(RED)$(ICON_ERROR) Timeout waiting for tunnel ($$MAX_WAIT seconds)$(NC)"; \
-		echo ""; \
-		echo "$(YELLOW)$(ICON_ARROW) Checking ngrok logs...$(NC)"; \
-		docker exec $(BACKEND_CONTAINER) cat /tmp/ngrok.log 2>/dev/null | tail -20 || echo "$(YELLOW)$(ICON_WARNING) Could not read ngrok logs$(NC)"; \
-		echo ""; \
-		exit 1; \
-	fi
-	@echo "$(BLUE)$(ICON_INFO) Tunnel file found at: $(SHARED_TUNNEL_FILE)$(NC)"
-	$(call blank_line)
-	$(call print_arrow,Extracting tunnel URL...)
-	@TUNNEL_URL=$$(docker exec $(BACKEND_CONTAINER) cat $(SHARED_TUNNEL_FILE) 2>/dev/null | tr -d '\r\n' || echo ""); \
-	if [ -z "$$TUNNEL_URL" ]; then \
-		echo "$(RED)$(ICON_ERROR) Failed to get tunnel URL$(NC)"; \
-		echo ""; \
-		echo "$(YELLOW)$(ICON_WARNING) Possible causes:$(NC)"; \
-		echo "  1. ngrok tunnel not initialized yet (wait 10 more seconds and retry)"; \
-		echo "  2. Invalid NGROK_AUTHTOKEN in backend/.env"; \
-		echo "  3. Backend container failed to start"; \
-		echo ""; \
-		echo "$(YELLOW)$(ICON_ARROW) Check logs:$(NC) make logs"; \
-		echo ""; \
-		exit 1; \
-	fi; \
-	echo "$(GREEN)$(ICON_SUCCESS) Tunnel URL: $$TUNNEL_URL$(NC)"; \
-	echo ""; \
-	echo "$(YELLOW)$(ICON_ARROW) Updating mobile/.env with tunnel URL...$(NC)"; \
-	$(MAKE) dev-tunnel-build-apk-update-env TUNNEL_URL=$$TUNNEL_URL; \
-	echo ""; \
-	echo "$(YELLOW)$(ICON_ARROW) Starting Android builder container...$(NC)"; \
-	docker volume create zumik-gradle-cache 2>/dev/null || true; \
-	docker volume create zumik-mobile-node-modules 2>/dev/null || true; \
-	docker run -d --name zumik-android-builder \
-		--network host \
-		-w /project/app/mobile \
-		-v $(shell pwd)/:/project/app \
-		-v zumik-gradle-cache:/root/.gradle \
-		-v zumik-mobile-node-modules:/project/app/mobile/node_modules \
-		-e NODE_ENV=production \
-		-e ANDROID_SDK_ROOT=/android-sdk \
-		-e EAS_NO_VCS=1 \
-		hmerritt/android-sdk:latest /bin/bash -c "tail -f /dev/null" 2>/dev/null || \
-		docker start zumik-android-builder 2>/dev/null || true; \
-	echo ""; \
-	echo "$(YELLOW)$(ICON_ARROW) Building APK in container...$(NC)"; \
-	echo "$(YELLOW)$(ICON_WARNING) ⏳ This takes ~10-15 minutes on first run$(NC)"; \
-	echo ""; \
-	$(MAKE) dev-tunnel-build-apk-docker-build TUNNEL_URL=$$TUNNEL_URL; \
-	echo ""; \
-	echo "$(BLUE)=== ✓ Build Complete ===$(NC)"; \
-	echo ""; \
-	echo "$(YELLOW)📦 APK Location:$(NC)"; \
-	echo "   mobile/android/app/build/outputs/apk/release/app-release.apk"; \
-	echo ""; \
-	echo "$(YELLOW)📡 Configured Backend URL:$(NC)"; \
-	echo "   $$TUNNEL_URL"; \
-	echo ""; \
-	echo "$(YELLOW)📱 Install on Device:$(NC)"; \
-	echo "   adb install mobile/android/app/build/outputs/apk/release/app-release.apk"; \
-	echo "   OR: make dev-tunnel-build-apk-install (if APK already built)"; \
-	echo ""; \
-	echo "$(YELLOW)🛑 Stop Services:$(NC)"; \
-	echo "   make stop && docker stop zumik-android-builder && docker rm zumik-android-builder"; \
-	echo ""
-
-dev-tunnel-build-apk-docker-build:
-	@# Build APK inside Android builder container
-	@echo "$(BLUE)$(ICON_INFO) Installing mobile dependencies...$(NC)"
-	@docker exec zumik-android-builder sh -c "npm install --ignore-scripts && npm run postinstall || true"
-	@echo ""
-	@echo "$(BLUE)$(ICON_INFO) Running expo prebuild...$(NC)"
-	@docker exec zumik-android-builder npx expo prebuild --clean
-	@echo ""
-	@echo "$(BLUE)$(ICON_INFO) Generating network security config...$(NC)"
-	@docker exec zumik-android-builder ./scripts/generate-network-config.sh
-	@echo ""
-	@echo "$(BLUE)$(ICON_INFO) Building APK with Gradle...$(NC)"
-	@docker exec zumik-android-builder sh -c "cd android && ./gradlew assembleRelease"
 
 #------------------------------------------------------------
 # Simplified Docker Build Commands (Standalone)
