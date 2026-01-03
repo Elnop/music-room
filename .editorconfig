@@ -1,0 +1,27 @@
+# EditorConfig helps maintain consistent coding styles across editors and IDEs
+# https://editorconfig.org
+
+root = true
+
+# All files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = tab
+indent_size = 2
+tab_width = 2
+
+# Markdown files (preserve trailing spaces for line breaks)
+[*.md]
+trim_trailing_whitespace = false
+
+# YAML files (require spaces, not tabs)
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+
+# Package manager lock files (do not modify)
+[{package-lock.json,yarn.lock,pnpm-lock.yaml}]
+insert_final_newline = false
