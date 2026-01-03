@@ -9,8 +9,9 @@ COPY package*.json ./
 # Development stage (for docker-compose dev mode)
 FROM base AS development
 
-# Install ALL dependencies (including devDependencies)
-RUN npm install --include=dev
+# Update npm to latest version and install dependencies
+RUN npm install -g npm@11.7.0 && \
+    npm install --include=dev
 
 # Copy source code (will be mounted as volume in dev mode)
 COPY . .
@@ -22,8 +23,9 @@ CMD ["npm", "run", "dev"]
 # Builder stage (for production build)
 FROM base AS builder
 
-# Install ALL dependencies (including devDependencies for build)
-RUN npm install --include=dev
+# Update npm and install dependencies for build
+RUN npm install -g npm@11.7.0 && \
+    npm install --include=dev
 
 # Copy source and build
 COPY . .
