@@ -1,6 +1,6 @@
-import { createClient } from "@supabase/supabase-js";
-import { env } from "@/shared/config/env.js";
-import type { Database } from "@/shared/types/supabase.generated.js";
+import { createClient } from '@supabase/supabase-js';
+import { env } from '@/shared/config/env.js';
+import type { Database } from '@/shared/types/supabase.generated.js';
 
 /**
  * Supabase client with SERVICE_ROLE key for backend operations
@@ -10,16 +10,12 @@ import type { Database } from "@/shared/types/supabase.generated.js";
  * IMPORTANT: This client is now fully typed with the Database type!
  * All queries will have proper TypeScript autocomplete and type checking.
  */
-export const supabaseAdmin = createClient<Database>(
-  env.SUPABASE_URL,
-  env.SUPABASE_SERVICE_KEY,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  },
-);
+export const supabaseAdmin = createClient<Database>(env.SUPABASE_URL, env.SUPABASE_SERVICE_KEY, {
+	auth: {
+		autoRefreshToken: false,
+		persistSession: false,
+	},
+});
 
 /**
  * Supabase client with ANON key
@@ -29,16 +25,12 @@ export const supabaseAdmin = createClient<Database>(
  * IMPORTANT: This client is now fully typed with the Database type!
  * All queries will have proper TypeScript autocomplete and type checking.
  */
-export const supabaseAnon = createClient<Database>(
-  env.SUPABASE_URL,
-  env.SUPABASE_ANON_KEY,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  },
-);
+export const supabaseAnon = createClient<Database>(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
+	auth: {
+		autoRefreshToken: false,
+		persistSession: false,
+	},
+});
 
 /**
  * Default export for convenience (admin client)

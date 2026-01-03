@@ -129,6 +129,7 @@ features/feature-name/
 ```
 
 **Implementation Steps**:
+
 1. Define types in `feature.types.ts`
 2. Define Zod validators in `feature.validators.ts`
 3. Implement main service in `feature.service.ts` or `services/feature.service.ts`
@@ -146,14 +147,14 @@ features/feature-name/
 
 ```typescript
 // ✅ Good - direct imports
-import { PlaylistService } from "./services/playlist.service.js";
-import { formatResponse } from "./utils/playlist.helpers.js";
-import authRoutes from "./features/auth/auth.routes.js";
+import { PlaylistService } from './services/playlist.service.js';
+import { formatResponse } from './utils/playlist.helpers.js';
+import authRoutes from './features/auth/auth.routes.js';
 
 // ❌ Bad - barrel file imports
-import { PlaylistService } from "./services/index.js";
-import { formatResponse } from "./utils/index.js";
-import authRoutes from "./features/auth/index.js";
+import { PlaylistService } from './services/index.js';
+import { formatResponse } from './utils/index.js';
+import authRoutes from './features/auth/index.js';
 ```
 
 **File extension**: Always use `.js` extension in TypeScript imports (ESM requirement).
@@ -169,6 +170,7 @@ import authRoutes from "./features/auth/index.js";
 - **Error handling**: Standardized format from `shared/middleware/error-handler.ts`
 
 **Protected Routes**:
+
 ```typescript
 import { authenticateJWT } from '@features/auth/auth.middleware.js';
 
@@ -176,6 +178,7 @@ router.get('/protected', authenticateJWT, controller.getProtected);
 ```
 
 **Database Tables**:
+
 - `user_profiles` - User data (id, username, display_name, avatar_url, bio, google_id, facebook_id)
 - `playlists` - Playlist metadata
 - `tracks` - Universal track data (track_uri, title, artist, album, album_art)
@@ -207,27 +210,30 @@ router.get('/protected', authenticateJWT, controller.getProtected);
 **Location**: `backend/src/realtime/index.ts` (478 lines)
 
 **Event Types**:
+
 ```typescript
 // Playlist events
-'playlist:track:added'     // Track added to playlist
-'playlist:track:removed'   // Track removed from playlist
-'playlist:updated'         // Playlist metadata changed
+'playlist:track:added'; // Track added to playlist
+'playlist:track:removed'; // Track removed from playlist
+'playlist:updated'; // Playlist metadata changed
 
 // Music control events
-'music-control:granted'    // User granted control permission
-'music-control:revoked'    // User revoked control permission
+'music-control:granted'; // User granted control permission
+'music-control:revoked'; // User revoked control permission
 
 // Device events
-'device:register'          // Device registered for listening
-'device:status'            // Listening status updated
+'device:register'; // Device registered for listening
+'device:status'; // Listening status updated
 ```
 
 **Room Management**:
+
 - Users join rooms: `socket.join('playlist:${playlistId}')`
 - Emit to room: `io.to('playlist:${playlistId}').emit('playlist:track:added', data)`
 - Leave room: `socket.leave('playlist:${playlistId}')`
 
 **Connection Flow**:
+
 1. Client connects → Socket.io handshake
 2. Client joins playlist room → `socket.join('playlist:${id}')`
 3. Track added → Backend emits to room
@@ -239,11 +245,13 @@ router.get('/protected', authenticateJWT, controller.getProtected);
 ## SoundCloud Integration
 
 **Backend Service** (`soundcloud.service.ts`):
+
 - In-memory cache (Map) for search results (1h TTL) and stream URLs (30min TTL)
 - Filters for playable/streamable tracks only
 - Converts SoundCloud tracks to internal Track format
 
 **API Routes** (Public - No Auth):
+
 ```bash
 # Search
 GET /api/soundcloud/search?q=lofi&limit=20
@@ -256,6 +264,7 @@ GET /api/soundcloud/stream/:trackUrl
 ```
 
 **Track Storage**:
+
 - `track_uri` = SoundCloud permalink URL (e.g., `https://soundcloud.com/artist/track`)
 - Metadata stored in `tracks` table
 - Stream URL fetched on-demand (expires after 30min)
@@ -267,23 +276,25 @@ GET /api/soundcloud/stream/:trackUrl
 **Location**: `backend/src/features/mail/`
 
 **Core Services**:
+
 1. **MailService** - Gmail SMTP email sending
 2. **RateLimiterService** - Redis + in-memory rate limiting
 3. **TemplateRendererService** - Email template registry
 
 **Available Templates**:
+
 - `verification-email` - Email verification code (dark theme, monospace code)
 
 **Usage Example**:
+
 ```typescript
 import { MailService } from '@features/mail/services/mail.service.js';
 
 const mailService = new MailService();
-await mailService.sendTemplatedEmail(
-  'user@example.com',
-  'verification-email',
-  { code: '123456', expiresInMinutes: 15 }
-);
+await mailService.sendTemplatedEmail('user@example.com', 'verification-email', {
+	code: '123456',
+	expiresInMinutes: 15,
+});
 ```
 
 See `backend/src/features/mail/README.md` for complete documentation.
@@ -305,12 +316,14 @@ When working on the backend:
 9. **Test with Swagger** - Verify endpoints in Swagger UI before marking complete
 
 **When adding features**:
+
 - Create feature directory following standard structure
 - Implement types → validators → service → controller → routes
 - Register routes in `server.ts`
 - Test with Swagger UI (http://localhost:3000/api-docs)
 
 **Security Checklist**:
+
 - [ ] Input validated with Zod
 - [ ] JWT authentication on protected routes
 - [ ] Permission checks for user-owned resources

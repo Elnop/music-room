@@ -1,59 +1,59 @@
 import { SPACING } from '@constants';
 import {
-  NEOBRUTALISM_BORDERS,
-  NEOBRUTALISM_SHADOWS,
-  NEOBRUTALISM_TYPOGRAPHY,
+	NEOBRUTALISM_BORDERS,
+	NEOBRUTALISM_SHADOWS,
+	NEOBRUTALISM_TYPOGRAPHY,
 } from '@/themes/tokens';
 
 export type ThemeName = 'royalBlue' | 'christmas' | 'pastelLime' | 'original';
 
 export interface ThemeColors {
-  // Primary colors
-  primary: string;
-  primaryLight: string;
-  primaryDark: string;
+	// Primary colors
+	primary: string;
+	primaryLight: string;
+	primaryDark: string;
 
-  // Secondary colors
-  secondary: string;
-  secondaryLight: string;
+	// Secondary colors
+	secondary: string;
+	secondaryLight: string;
 
-  // Accent colors
-  accent: string;
-  accentAlt: string;
+	// Accent colors
+	accent: string;
+	accentAlt: string;
 
-  // Backgrounds
-  background: string;
-  surface: string;
-  surfaceAlt: string;
+	// Backgrounds
+	background: string;
+	surface: string;
+	surfaceAlt: string;
 
-  // Text colors
-  text: string;
-  textSecondary: string;
-  textInverse: string;
+	// Text colors
+	text: string;
+	textSecondary: string;
+	textInverse: string;
 
-  // Border colors (always black in neobrutalism)
-  border: string;
-  borderLight: string;
+	// Border colors (always black in neobrutalism)
+	border: string;
+	borderLight: string;
 
-  // State colors
-  error: string;
-  success: string;
-  warning: string;
-  info: string;
+	// State colors
+	error: string;
+	success: string;
+	warning: string;
+	info: string;
 }
 
 export interface Theme {
-  name: ThemeName;
-  displayName: string;
-  colors: ThemeColors;
-  borders: typeof NEOBRUTALISM_BORDERS;
-  shadows: typeof NEOBRUTALISM_SHADOWS;
-  typography: typeof NEOBRUTALISM_TYPOGRAPHY;
-  spacing: typeof SPACING;
+	name: ThemeName;
+	displayName: string;
+	colors: ThemeColors;
+	borders: typeof NEOBRUTALISM_BORDERS;
+	shadows: typeof NEOBRUTALISM_SHADOWS;
+	typography: typeof NEOBRUTALISM_TYPOGRAPHY;
+	spacing: typeof SPACING;
 }
 
 export interface ThemeContextValue {
-  theme: Theme;
-  themeName: ThemeName;
-  setTheme: (name: ThemeName) => void;
+	theme: Theme;
+	themeName: ThemeName;
+	setTheme: (name: ThemeName) => void;
 }

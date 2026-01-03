@@ -6,12 +6,12 @@ import { API_CONFIG } from '@constants';
  * Socket State Interface
  */
 interface SocketState {
-  socket: Socket | null;
-  isConnected: boolean;
+	socket: Socket | null;
+	isConnected: boolean;
 
-  // Actions
-  connect: () => void;
-  disconnect: () => void;
+	// Actions
+	connect: () => void;
+	disconnect: () => void;
 }
 
 /**
@@ -24,87 +24,87 @@ interface SocketState {
  * - Use socket and isConnected in feature-specific hooks
  */
 export const useSocketStore = create<SocketState>((set, get) => ({
-  socket: null,
-  isConnected: false,
+	socket: null,
+	isConnected: false,
 
-  /**
-   * Connect to the Socket.io server
-   */
-  connect: () => {
-    const existingSocket = get().socket;
+	/**
+	 * Connect to the Socket.io server
+	 */
+	connect: () => {
+		const existingSocket = get().socket;
 
-    if (existingSocket?.connected) {
-      if (__DEV__) console.log('[Socket] Already connected:', existingSocket.id);
-      return;
-    }
+		if (existingSocket?.connected) {
+			if (__DEV__) console.log('[Socket] Already connected:', existingSocket.id);
+			return;
+		}
 
-    if (existingSocket) {
-      if (__DEV__) console.log('[Socket] Socket exists but not connected, reconnecting...');
-      existingSocket.disconnect();
-    }
+		if (existingSocket) {
+			if (__DEV__) console.log('[Socket] Socket exists but not connected, reconnecting...');
+			existingSocket.disconnect();
+		}
 
-    const socketUrl = API_CONFIG.BASE_URL;
-    if (__DEV__) console.log('[Socket] Connecting to:', socketUrl);
+		const socketUrl = API_CONFIG.BASE_URL;
+		if (__DEV__) console.log('[Socket] Connecting to:', socketUrl);
 
-    const socket = io(socketUrl, {
-      transports: ['websocket', 'polling'],
-      autoConnect: true,
-      reconnection: true,
-      reconnectionAttempts: 10,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
-      timeout: 20000,
-      forceNew: true,
-    });
+		const socket = io(socketUrl, {
+			transports: ['websocket', 'polling'],
+			autoConnect: true,
+			reconnection: true,
+			reconnectionAttempts: 10,
+			reconnectionDelay: 1000,
+			reconnectionDelayMax: 5000,
+			timeout: 20000,
+			forceNew: true,
+		});
 
-    socket.on('connect', () => {
-      if (__DEV__) console.log('[Socket] ✅ Connected successfully:', socket.id);
-      set({ isConnected: true });
-    });
+		socket.on('connect', () => {
+			if (__DEV__) console.log('[Socket] ✅ Connected successfully:', socket.id);
+			set({ isConnected: true });
+		});
 
-    socket.on('disconnect', reason => {
-      if (__DEV__) console.log('[Socket] ❌ Disconnected:', reason);
-      set({ isConnected: false });
-    });
+		socket.on('disconnect', reason => {
+			if (__DEV__) console.log('[Socket] ❌ Disconnected:', reason);
+			set({ isConnected: false });
+		});
 
-    socket.on('connect_error', error => {
-      console.error('[Socket] ❌ Connection error:', error.message);
-      const transport = socket.io?.engine?.transport?.name ?? 'unknown';
-      console.error('[Socket] Error details:', {
-        url: socketUrl,
-        transport,
-      });
-    });
+		socket.on('connect_error', error => {
+			console.error('[Socket] ❌ Connection error:', error.message);
+			const transport = socket.io?.engine?.transport?.name ?? 'unknown';
+			console.error('[Socket] Error details:', {
+				url: socketUrl,
+				transport,
+			});
+		});
 
-    socket.on('reconnect', attemptNumber => {
-      if (__DEV__) console.log('[Socket] 🔄 Reconnected after', attemptNumber, 'attempts');
-    });
+		socket.on('reconnect', attemptNumber => {
+			if (__DEV__) console.log('[Socket] 🔄 Reconnected after', attemptNumber, 'attempts');
+		});
 
-    socket.on('reconnect_attempt', attemptNumber => {
-      if (__DEV__) console.log('[Socket] 🔄 Reconnect attempt', attemptNumber);
-    });
+		socket.on('reconnect_attempt', attemptNumber => {
+			if (__DEV__) console.log('[Socket] 🔄 Reconnect attempt', attemptNumber);
+		});
 
-    socket.on('reconnect_error', error => {
-      console.error('[Socket] ❌ Reconnect error:', error.message);
-    });
+		socket.on('reconnect_error', error => {
+			console.error('[Socket] ❌ Reconnect error:', error.message);
+		});
 
-    socket.on('reconnect_failed', () => {
-      console.error('[Socket] ❌ Reconnect failed after all attempts');
-    });
+		socket.on('reconnect_failed', () => {
+			console.error('[Socket] ❌ Reconnect failed after all attempts');
+		});
 
-    set({ socket });
-  },
+		set({ socket });
+	},
 
-  /**
-   * Disconnect from the Socket.io server
-   */
-  disconnect: () => {
-    const { socket } = get();
+	/**
+	 * Disconnect from the Socket.io server
+	 */
+	disconnect: () => {
+		const { socket } = get();
 
-    if (socket) {
-      if (__DEV__) console.log('[Socket] Disconnecting...');
-      socket.disconnect();
-      set({ socket: null, isConnected: false });
-    }
-  },
+		if (socket) {
+			if (__DEV__) console.log('[Socket] Disconnecting...');
+			socket.disconnect();
+			set({ socket: null, isConnected: false });
+		}
+	},
 }));

@@ -2,16 +2,12 @@
  * Data Transfer Objects (DTOs) for authentication
  */
 
-import type {
-	Tables,
-	TablesInsert,
-	TablesUpdate,
-} from "@/shared/types/supabase.generated.js";
+import type { Tables, TablesInsert, TablesUpdate } from '@/shared/types/supabase.generated.js';
 
 // Database types (now using Supabase generated types)
-export type UserProfileRow = Tables<"user_profiles">;
-export type UserProfileInsert = TablesInsert<"user_profiles">;
-export type UserProfileUpdate = TablesUpdate<"user_profiles">;
+export type UserProfileRow = Tables<'user_profiles'>;
+export type UserProfileInsert = TablesInsert<'user_profiles'>;
+export type UserProfileUpdate = TablesUpdate<'user_profiles'>;
 
 export interface RegisterDTO {
 	email: string;
@@ -44,7 +40,7 @@ export interface OAuthCallbackDTO {
  * OAuth Provider Types
  */
 
-export type OAuthProvider = "google" | "facebook";
+export type OAuthProvider = 'google' | 'facebook';
 
 export interface GoogleTokenPayload {
 	sub: string; // Google user ID
@@ -126,7 +122,7 @@ export interface RefreshTokenDTO {
  */
 export interface LinkedProvidersResponse {
 	providers: {
-		type: "password" | OAuthProvider;
+		type: 'password' | OAuthProvider;
 		connectedAt: string;
 		isPrimary: boolean;
 	}[];

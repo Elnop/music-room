@@ -10,10 +10,10 @@ const DEVICE_ID_KEY = '@zumik_device_id';
  * Device information for multi-device music control
  */
 export interface DeviceInfo {
-  deviceId: string;
-  deviceName: string;
-  platform: string;
-  model: string;
+	deviceId: string;
+	deviceName: string;
+	platform: string;
+	model: string;
 }
 
 /**
@@ -24,32 +24,32 @@ export interface DeviceInfo {
  * across app restarts. Each physical device gets a unique ID.
  */
 export const deviceService = {
-  /**
-   * Get device information including a persistent device ID
-   * Creates a new ID if one doesn't exist
-   */
-  async getDeviceInfo(): Promise<DeviceInfo> {
-    let deviceId = await AsyncStorage.getItem(DEVICE_ID_KEY);
-    if (!deviceId) {
-      deviceId = uuidv4();
-      await AsyncStorage.setItem(DEVICE_ID_KEY, deviceId);
-    }
+	/**
+	 * Get device information including a persistent device ID
+	 * Creates a new ID if one doesn't exist
+	 */
+	async getDeviceInfo(): Promise<DeviceInfo> {
+		let deviceId = await AsyncStorage.getItem(DEVICE_ID_KEY);
+		if (!deviceId) {
+			deviceId = uuidv4();
+			await AsyncStorage.setItem(DEVICE_ID_KEY, deviceId);
+		}
 
-    const deviceName = Device.deviceName || `${Platform.OS} Device`;
-    const model = Device.modelName || 'Unknown';
+		const deviceName = Device.deviceName || `${Platform.OS} Device`;
+		const model = Device.modelName || 'Unknown';
 
-    return {
-      deviceId,
-      deviceName,
-      platform: Platform.OS,
-      model,
-    };
-  },
+		return {
+			deviceId,
+			deviceName,
+			platform: Platform.OS,
+			model,
+		};
+	},
 
-  /**
-   * Clear the device ID (useful for testing or resetting)
-   */
-  async clearDeviceId(): Promise<void> {
-    await AsyncStorage.removeItem(DEVICE_ID_KEY);
-  },
+	/**
+	 * Clear the device ID (useful for testing or resetting)
+	 */
+	async clearDeviceId(): Promise<void> {
+		await AsyncStorage.removeItem(DEVICE_ID_KEY);
+	},
 };

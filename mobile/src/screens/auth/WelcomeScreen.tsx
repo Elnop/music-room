@@ -11,206 +11,206 @@ import appIcon from '@/assets/logo/app-icon.png';
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 type AuthStackParamList = {
-  Welcome: undefined;
-  Login: undefined;
-  Register: undefined;
+	Welcome: undefined;
+	Login: undefined;
+	Register: undefined;
 };
 
 type WelcomeScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Welcome'>;
 
 interface WelcomeScreenProps {
-  navigation: WelcomeScreenNavigationProp;
+	navigation: WelcomeScreenNavigationProp;
 }
 
 interface FloatingIconProps {
-  size: number;
-  top: number;
-  left: number;
-  delay: number;
-  duration: number;
-  rotateDirection: 1 | -1;
-  floatRange?: number;
+	size: number;
+	top: number;
+	left: number;
+	delay: number;
+	duration: number;
+	rotateDirection: 1 | -1;
+	floatRange?: number;
 }
 
 function FloatingIcon({
-  size,
-  top,
-  left,
-  delay,
-  duration,
-  rotateDirection,
-  floatRange = 25,
+	size,
+	top,
+	left,
+	delay,
+	duration,
+	rotateDirection,
+	floatRange = 25,
 }: FloatingIconProps) {
-  const floatAnim = useMemo(() => new Animated.Value(0), []);
-  const rotateAnim = useMemo(() => new Animated.Value(0), []);
-  const scaleAnim = useMemo(() => new Animated.Value(1), []);
+	const floatAnim = useMemo(() => new Animated.Value(0), []);
+	const rotateAnim = useMemo(() => new Animated.Value(0), []);
+	const scaleAnim = useMemo(() => new Animated.Value(1), []);
 
-  useEffect(() => {
-    // Float animation (up and down) - more pronounced
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(floatAnim, {
-          toValue: 1,
-          duration: duration,
-          delay: delay,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-        Animated.timing(floatAnim, {
-          toValue: 0,
-          duration: duration,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
+	useEffect(() => {
+		// Float animation (up and down) - more pronounced
+		Animated.loop(
+			Animated.sequence([
+				Animated.timing(floatAnim, {
+					toValue: 1,
+					duration: duration,
+					delay: delay,
+					easing: Easing.inOut(Easing.sin),
+					useNativeDriver: true,
+				}),
+				Animated.timing(floatAnim, {
+					toValue: 0,
+					duration: duration,
+					easing: Easing.inOut(Easing.sin),
+					useNativeDriver: true,
+				}),
+			])
+		).start();
 
-    // Rotate animation - plus rapide
-    Animated.loop(
-      Animated.timing(rotateAnim, {
-        toValue: 1,
-        duration: duration * 2.5,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      })
-    ).start();
+		// Rotate animation - plus rapide
+		Animated.loop(
+			Animated.timing(rotateAnim, {
+				toValue: 1,
+				duration: duration * 2.5,
+				easing: Easing.linear,
+				useNativeDriver: true,
+			})
+		).start();
 
-    // Scale pulsation
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(scaleAnim, {
-          toValue: 1.15,
-          duration: duration * 1.5,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 1,
-          duration: duration * 1.5,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-  }, [floatAnim, rotateAnim, scaleAnim, delay, duration]);
+		// Scale pulsation
+		Animated.loop(
+			Animated.sequence([
+				Animated.timing(scaleAnim, {
+					toValue: 1.15,
+					duration: duration * 1.5,
+					easing: Easing.inOut(Easing.ease),
+					useNativeDriver: true,
+				}),
+				Animated.timing(scaleAnim, {
+					toValue: 1,
+					duration: duration * 1.5,
+					easing: Easing.inOut(Easing.ease),
+					useNativeDriver: true,
+				}),
+			])
+		).start();
+	}, [floatAnim, rotateAnim, scaleAnim, delay, duration]);
 
-  const translateY = floatAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -floatRange],
-  });
+	const translateY = floatAnim.interpolate({
+		inputRange: [0, 1],
+		outputRange: [0, -floatRange],
+	});
 
-  const rotate = rotateAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', `${rotateDirection * 360}deg`],
-  });
+	const rotate = rotateAnim.interpolate({
+		inputRange: [0, 1],
+		outputRange: ['0deg', `${rotateDirection * 360}deg`],
+	});
 
-  return (
-    <Animated.Image
-      source={appIcon}
-      style={{
-        position: 'absolute',
-        width: size,
-        height: size,
-        top,
-        left,
-        opacity: 0.4,
-        transform: [{ translateY }, { rotate }, { scale: scaleAnim }],
-      }}
-      resizeMode="contain"
-    />
-  );
+	return (
+		<Animated.Image
+			source={appIcon}
+			style={{
+				position: 'absolute',
+				width: size,
+				height: size,
+				top,
+				left,
+				opacity: 0.4,
+				transform: [{ translateY }, { rotate }, { scale: scaleAnim }],
+			}}
+			resizeMode="contain"
+		/>
+	);
 }
 
 export function WelcomeScreen({ navigation }: WelcomeScreenProps) {
-  const { theme } = useTheme();
-  const styles = React.useMemo(() => createStyles(theme), [theme]);
+	const { theme } = useTheme();
+	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
-  return (
-    <SafeAreaView style={styles.container}>
-      {/* Floating background icons - plus visibles et dynamiques */}
-      <FloatingIcon
-        size={80}
-        top={60}
-        left={20}
-        delay={0}
-        duration={1200}
-        rotateDirection={1}
-        floatRange={35}
-      />
-      <FloatingIcon
-        size={65}
-        top={120}
-        left={SCREEN_WIDTH - 100}
-        delay={400}
-        duration={1400}
-        rotateDirection={-1}
-        floatRange={30}
-      />
-      <FloatingIcon
-        size={70}
-        top={SCREEN_HEIGHT * 0.45}
-        left={15}
-        delay={200}
-        duration={1100}
-        rotateDirection={1}
-        floatRange={40}
-      />
-      <FloatingIcon
-        size={75}
-        top={SCREEN_HEIGHT * 0.55}
-        left={SCREEN_WIDTH - 95}
-        delay={600}
-        duration={1300}
-        rotateDirection={-1}
-        floatRange={32}
-      />
+	return (
+		<SafeAreaView style={styles.container}>
+			{/* Floating background icons - plus visibles et dynamiques */}
+			<FloatingIcon
+				size={80}
+				top={60}
+				left={20}
+				delay={0}
+				duration={1200}
+				rotateDirection={1}
+				floatRange={35}
+			/>
+			<FloatingIcon
+				size={65}
+				top={120}
+				left={SCREEN_WIDTH - 100}
+				delay={400}
+				duration={1400}
+				rotateDirection={-1}
+				floatRange={30}
+			/>
+			<FloatingIcon
+				size={70}
+				top={SCREEN_HEIGHT * 0.45}
+				left={15}
+				delay={200}
+				duration={1100}
+				rotateDirection={1}
+				floatRange={40}
+			/>
+			<FloatingIcon
+				size={75}
+				top={SCREEN_HEIGHT * 0.55}
+				left={SCREEN_WIDTH - 95}
+				delay={600}
+				duration={1300}
+				rotateDirection={-1}
+				floatRange={32}
+			/>
 
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <Image source={logo} style={styles.logo} resizeMode="contain" />
-        </View>
+			<View style={styles.content}>
+				<View style={styles.header}>
+					<Image source={logo} style={styles.logo} resizeMode="contain" />
+				</View>
 
-        <View style={styles.buttonContainer}>
-          <Button
-            title="Get Started"
-            onPress={() => navigation.navigate('Register')}
-            variant="primary"
-            fullWidth
-          />
-          <Button
-            title="Login"
-            onPress={() => navigation.navigate('Login')}
-            variant="outline"
-            fullWidth
-          />
-        </View>
-      </View>
-    </SafeAreaView>
-  );
+				<View style={styles.buttonContainer}>
+					<Button
+						title="Get Started"
+						onPress={() => navigation.navigate('Register')}
+						variant="primary"
+						fullWidth
+					/>
+					<Button
+						title="Login"
+						onPress={() => navigation.navigate('Login')}
+						variant="outline"
+						fullWidth
+					/>
+				</View>
+			</View>
+		</SafeAreaView>
+	);
 }
 
 const createStyles = (theme: Theme) =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: theme.colors.background,
-    },
-    content: {
-      flex: 1,
-      justifyContent: 'space-between',
-      padding: theme.spacing.lg,
-    },
-    header: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    logo: {
-      width: 300,
-      height: 300,
-    },
-    buttonContainer: {
-      gap: theme.spacing.md,
-      marginBottom: theme.spacing.xl,
-    },
-  });
+	StyleSheet.create({
+		container: {
+			flex: 1,
+			backgroundColor: theme.colors.background,
+		},
+		content: {
+			flex: 1,
+			justifyContent: 'space-between',
+			padding: theme.spacing.lg,
+		},
+		header: {
+			flex: 1,
+			justifyContent: 'center',
+			alignItems: 'center',
+		},
+		logo: {
+			width: 300,
+			height: 300,
+		},
+		buttonContainer: {
+			gap: theme.spacing.md,
+			marginBottom: theme.spacing.xl,
+		},
+	});

@@ -1,6 +1,6 @@
-import nodemailer from "nodemailer";
-import { gmailConfig, senderConfig } from "./mail.config.js";
-import { logger } from "@/shared/utils/logger.js";
+import nodemailer from 'nodemailer';
+import { gmailConfig, senderConfig } from './mail.config.js';
+import { logger } from '@/shared/utils/logger.js';
 
 /**
  * Simple email service with inline templates
@@ -77,7 +77,7 @@ export async function sendVerificationEmail(
       🔒 For your security, never share this code with anyone.
     </p>
     `,
-		"Verify Your Email"
+		'Verify Your Email'
 	);
 
 	const text = `Verify Your Email
@@ -96,12 +96,12 @@ This email was sent from Zumik`;
 	await getTransporter().sendMail({
 		from: `${senderConfig.name} <${senderConfig.email}>`,
 		to: email,
-		subject: "🎵 Verify Your Zumik Account",
+		subject: '🎵 Verify Your Zumik Account',
 		html,
 		text,
 	});
 
-	logger.info("Verification email sent", { to: email });
+	logger.info('Verification email sent', { to: email });
 }
 
 /**
@@ -145,7 +145,7 @@ export async function sendPasswordResetEmail(
       </p>
     </div>
     `,
-		"Reset Your Password"
+		'Reset Your Password'
 	);
 
 	const text = `Reset Your Password
@@ -168,10 +168,10 @@ This email was sent from Zumik`;
 	await getTransporter().sendMail({
 		from: `${senderConfig.name} <${senderConfig.email}>`,
 		to: email,
-		subject: "🔐 Reset Your Zumik Password",
+		subject: '🔐 Reset Your Zumik Password',
 		html,
 		text,
 	});
 
-	logger.info("Password reset email sent", { to: email });
+	logger.info('Password reset email sent', { to: email });
 }

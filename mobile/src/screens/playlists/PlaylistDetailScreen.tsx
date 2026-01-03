@@ -22,237 +22,237 @@ import { EmptyState } from '@components/common/EmptyState';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
 
 type PlaylistStackParamList = {
-  Playlists: undefined;
-  PlaylistDetail: { id: string };
-  CreatePlaylist: undefined;
-  SearchTracks: { playlistId: string };
-  PlaylistSharing: { playlistId: string };
+	Playlists: undefined;
+	PlaylistDetail: { id: string };
+	CreatePlaylist: undefined;
+	SearchTracks: { playlistId: string };
+	PlaylistSharing: { playlistId: string };
 };
 
 type PlaylistDetailScreenNavigationProp = NativeStackNavigationProp<
-  PlaylistStackParamList,
-  'PlaylistDetail'
+	PlaylistStackParamList,
+	'PlaylistDetail'
 >;
 
 type PlaylistDetailScreenRouteProp = RouteProp<PlaylistStackParamList, 'PlaylistDetail'>;
 
 interface PlaylistDetailScreenProps {
-  navigation: PlaylistDetailScreenNavigationProp;
-  route: PlaylistDetailScreenRouteProp;
+	navigation: PlaylistDetailScreenNavigationProp;
+	route: PlaylistDetailScreenRouteProp;
 }
 
 const hashStringToNumber = (str: string): number => {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const chr = str.charCodeAt(i);
-    hash = (hash << 5) - hash + chr;
-    hash |= 0;
-  }
-  return Math.abs(hash);
+	let hash = 0;
+	for (let i = 0; i < str.length; i++) {
+		const chr = str.charCodeAt(i);
+		hash = (hash << 5) - hash + chr;
+		hash |= 0;
+	}
+	return Math.abs(hash);
 };
 
 const trackToSoundCloud = (track: Track): SoundCloudTrack => {
-  const parsed = parseInt(track.id, 10);
-  const trackId = !Number.isNaN(parsed) ? parsed : hashStringToNumber(track.trackUri || track.id);
+	const parsed = parseInt(track.id, 10);
+	const trackId = !Number.isNaN(parsed) ? parsed : hashStringToNumber(track.trackUri || track.id);
 
-  return {
-    id: trackId,
-    title: track.title,
-    description: null,
-    duration: track.durationMs,
-    genre: null,
-    artwork_url: track.albumArt || null,
-    permalink_url: track.trackUri,
-    user: {
-      id: trackId,
-      username: track.artist,
-      avatar_url: track.albumArt || null,
-      permalink_url: track.trackUri,
-    },
-    playable: true,
-  };
+	return {
+		id: trackId,
+		title: track.title,
+		description: null,
+		duration: track.durationMs,
+		genre: null,
+		artwork_url: track.albumArt || null,
+		permalink_url: track.trackUri,
+		user: {
+			id: trackId,
+			username: track.artist,
+			avatar_url: track.albumArt || null,
+			permalink_url: track.trackUri,
+		},
+		playable: true,
+	};
 };
 
 export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreenProps) {
-  const { theme } = useTheme();
-  const insets = useSafeAreaInsets();
-  const playerHeight = usePlayerHeight();
-  const styles = React.useMemo(() => createStyles(theme, insets.top), [theme, insets.top]);
-  const { id } = route.params;
-  const { user } = useAuthStore();
-  const { currentPlaylist, isLoading, fetchPlaylistById, removeTrack } = usePlaylistStore();
-  const {
-    currentTrack,
-    isPlaying,
-    loading: playerLoading,
-    playTrack,
-    pause,
-    resume,
-  } = usePlayerStore();
+	const { theme } = useTheme();
+	const insets = useSafeAreaInsets();
+	const playerHeight = usePlayerHeight();
+	const styles = React.useMemo(() => createStyles(theme, insets.top), [theme, insets.top]);
+	const { id } = route.params;
+	const { user } = useAuthStore();
+	const { currentPlaylist, isLoading, fetchPlaylistById, removeTrack } = usePlaylistStore();
+	const {
+		currentTrack,
+		isPlaying,
+		loading: playerLoading,
+		playTrack,
+		pause,
+		resume,
+	} = usePlayerStore();
 
-  const coverUrl = currentPlaylist?.coverUrl || currentPlaylist?.tracks[0]?.albumArt;
-  const { dominantColor } = useImageColors(coverUrl, theme.colors.primary);
+	const coverUrl = currentPlaylist?.coverUrl || currentPlaylist?.tracks[0]?.albumArt;
+	const { dominantColor } = useImageColors(coverUrl, theme.colors.primary);
 
-  const isOwner = user && currentPlaylist?.ownerId === user.id;
+	const isOwner = user && currentPlaylist?.ownerId === user.id;
 
-  const canEdit = React.useMemo(() => {
-    if (!user || !currentPlaylist) return false;
-    if (currentPlaylist.ownerId === user.id) return true;
-    if (currentPlaylist.collaboratorIds.includes(user.id)) return true;
-    if (currentPlaylist.editMode === 'open') {
-      if (currentPlaylist.visibility === 'public') return true;
-      if (currentPlaylist.viewerIds?.includes(user.id)) return true;
-    }
-    return false;
-  }, [user, currentPlaylist]);
+	const canEdit = React.useMemo(() => {
+		if (!user || !currentPlaylist) return false;
+		if (currentPlaylist.ownerId === user.id) return true;
+		if (currentPlaylist.collaboratorIds.includes(user.id)) return true;
+		if (currentPlaylist.editMode === 'open') {
+			if (currentPlaylist.visibility === 'public') return true;
+			if (currentPlaylist.viewerIds?.includes(user.id)) return true;
+		}
+		return false;
+	}, [user, currentPlaylist]);
 
-  const handleReorderUpdate = React.useCallback(() => {
-    fetchPlaylistById(id);
-  }, [id, fetchPlaylistById]);
+	const handleReorderUpdate = React.useCallback(() => {
+		fetchPlaylistById(id);
+	}, [id, fetchPlaylistById]);
 
-  usePlaylistSocket(id, handleReorderUpdate);
+	usePlaylistSocket(id, handleReorderUpdate);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchPlaylistById(id);
-    }, [id, fetchPlaylistById])
-  );
+	useFocusEffect(
+		React.useCallback(() => {
+			fetchPlaylistById(id);
+		}, [id, fetchPlaylistById])
+	);
 
-  const handleShare = useCallback(() => {
-    navigation.navigate('PlaylistSharing', { playlistId: id });
-  }, [navigation, id]);
+	const handleShare = useCallback(() => {
+		navigation.navigate('PlaylistSharing', { playlistId: id });
+	}, [navigation, id]);
 
-  // Configure header natif transparent avec bouton partage
-  React.useLayoutEffect(() => {
-    navigation.setOptions({
-      headerTransparent: true,
-      headerTitle: '',
-      headerRight: isOwner
-        ? () => (
-            <Pressable
-              onPress={handleShare}
-              style={{ width: 36, height: 36, alignItems: 'center', justifyContent: 'center' }}
-            >
-              <Ionicons name="ellipsis-horizontal" size={24} color={theme.colors.text} />
-            </Pressable>
-          )
-        : undefined,
-    });
-  }, [navigation, isOwner, handleShare, theme.colors.text]);
+	// Configure header natif transparent avec bouton partage
+	React.useLayoutEffect(() => {
+		navigation.setOptions({
+			headerTransparent: true,
+			headerTitle: '',
+			headerRight: isOwner
+				? () => (
+						<Pressable
+							onPress={handleShare}
+							style={{ width: 36, height: 36, alignItems: 'center', justifyContent: 'center' }}
+						>
+							<Ionicons name="ellipsis-horizontal" size={24} color={theme.colors.text} />
+						</Pressable>
+					)
+				: undefined,
+		});
+	}, [navigation, isOwner, handleShare, theme.colors.text]);
 
-  const handleAddTrack = () => {
-    navigation.navigate('SearchTracks', { playlistId: id });
-  };
+	const handleAddTrack = () => {
+		navigation.navigate('SearchTracks', { playlistId: id });
+	};
 
-  const handlePlayTrack = (track: Track) => {
-    const isCurrentTrack = currentTrack?.permalink_url === track.trackUri;
+	const handlePlayTrack = (track: Track) => {
+		const isCurrentTrack = currentTrack?.permalink_url === track.trackUri;
 
-    if (isCurrentTrack) {
-      if (isPlaying) {
-        pause();
-      } else {
-        resume();
-      }
-    } else {
-      playTrack(trackToSoundCloud(track));
-    }
-  };
+		if (isCurrentTrack) {
+			if (isPlaying) {
+				pause();
+			} else {
+				resume();
+			}
+		} else {
+			playTrack(trackToSoundCloud(track));
+		}
+	};
 
-  const handleDeleteTrack = async (trackId: string) => {
-    if (!canEdit) {
-      showError('Vous ne pouvez pas éditer cette playlist');
-      return;
-    }
+	const handleDeleteTrack = async (trackId: string) => {
+		if (!canEdit) {
+			showError('Vous ne pouvez pas éditer cette playlist');
+			return;
+		}
 
-    try {
-      await removeTrack(id, trackId);
-      showSuccess('Track supprimé');
-    } catch (error) {
-      console.error('[PlaylistDetailScreen] Remove track failed:', error);
-      showError('Impossible de supprimer le track');
-    }
-  };
+		try {
+			await removeTrack(id, trackId);
+			showSuccess('Track supprimé');
+		} catch (error) {
+			console.error('[PlaylistDetailScreen] Remove track failed:', error);
+			showError('Impossible de supprimer le track');
+		}
+	};
 
-  const gradientColors = dominantColor
-    ? ([
-        hexToRgba(dominantColor, 0.9),
-        hexToRgba(dominantColor, 0.6),
-        hexToRgba(dominantColor, 0.3),
-        theme.colors.background,
-      ] as const)
-    : ([
-        theme.colors.background,
-        theme.colors.background,
-        theme.colors.background,
-        theme.colors.background,
-      ] as const);
+	const gradientColors = dominantColor
+		? ([
+				hexToRgba(dominantColor, 0.9),
+				hexToRgba(dominantColor, 0.6),
+				hexToRgba(dominantColor, 0.3),
+				theme.colors.background,
+			] as const)
+		: ([
+				theme.colors.background,
+				theme.colors.background,
+				theme.colors.background,
+				theme.colors.background,
+			] as const);
 
-  if (isLoading && !currentPlaylist) {
-    return <LoadingSpinner fullScreen message="Chargement..." />;
-  }
+	if (isLoading && !currentPlaylist) {
+		return <LoadingSpinner fullScreen message="Chargement..." />;
+	}
 
-  if (!currentPlaylist) {
-    return <LoadingSpinner fullScreen message="Chargement..." />;
-  }
+	if (!currentPlaylist) {
+		return <LoadingSpinner fullScreen message="Chargement..." />;
+	}
 
-  return (
-    <View style={styles.container}>
-      {/* Full screen gradient background */}
-      <LinearGradient
-        colors={gradientColors as unknown as [string, string, ...string[]]}
-        locations={[0, 0.25, 0.5, 0.8]}
-        style={styles.gradientBackground}
-      />
+	return (
+		<View style={styles.container}>
+			{/* Full screen gradient background */}
+			<LinearGradient
+				colors={gradientColors as unknown as [string, string, ...string[]]}
+				locations={[0, 0.25, 0.5, 0.8]}
+				style={styles.gradientBackground}
+			/>
 
-      {/* Content */}
-      <FlatList
-        data={currentPlaylist.tracks}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => {
-          return (
-            <SwipeableTrackItem
-              track={item}
-              onDelete={() => handleDeleteTrack(item.id)}
-              disabled={!canEdit}
-            />
-          );
-        }}
-        ListHeaderComponent={
-          <PlaylistHeader
-            playlist={currentPlaylist}
-            canEdit={canEdit}
-            onAddTrack={handleAddTrack}
-          />
-        }
-        contentContainerStyle={[styles.list, { paddingBottom: playerHeight + theme.spacing.xxl }]}
-        ListEmptyComponent={
-          <EmptyState
-            icon="musical-notes-outline"
-            message="No track in this playlist. Add tracks to get started!"
-          />
-        }
-        showsVerticalScrollIndicator={false}
-      />
-    </View>
-  );
+			{/* Content */}
+			<FlatList
+				data={currentPlaylist.tracks}
+				keyExtractor={item => item.id}
+				renderItem={({ item }) => {
+					return (
+						<SwipeableTrackItem
+							track={item}
+							onDelete={() => handleDeleteTrack(item.id)}
+							disabled={!canEdit}
+						/>
+					);
+				}}
+				ListHeaderComponent={
+					<PlaylistHeader
+						playlist={currentPlaylist}
+						canEdit={canEdit}
+						onAddTrack={handleAddTrack}
+					/>
+				}
+				contentContainerStyle={[styles.list, { paddingBottom: playerHeight + theme.spacing.xxl }]}
+				ListEmptyComponent={
+					<EmptyState
+						icon="musical-notes-outline"
+						message="No track in this playlist. Add tracks to get started!"
+					/>
+				}
+				showsVerticalScrollIndicator={false}
+			/>
+		</View>
+	);
 }
 
 const createStyles = (theme: Theme, topInset: number) =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: theme.colors.background,
-    },
-    gradientBackground: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      height: 450, // Gradient covers top portion
-    },
-    list: {
-      flexGrow: 1,
-      paddingTop: topInset + 60, // Space for floating header
-      paddingBottom: theme.spacing.xxl,
-    },
-  });
+	StyleSheet.create({
+		container: {
+			flex: 1,
+			backgroundColor: theme.colors.background,
+		},
+		gradientBackground: {
+			position: 'absolute',
+			top: 0,
+			left: 0,
+			right: 0,
+			height: 450, // Gradient covers top portion
+		},
+		list: {
+			flexGrow: 1,
+			paddingTop: topInset + 60, // Space for floating header
+			paddingBottom: theme.spacing.xxl,
+		},
+	});

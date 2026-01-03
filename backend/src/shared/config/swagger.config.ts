@@ -9,7 +9,10 @@ import { playlistPaths, playlistSchemas } from '@/features/playlists/playlist.op
 import { profilePaths, profileSchemas } from '@/features/profile/profile.openapi.js';
 import { soundcloudPaths, soundcloudSchemas } from '@/features/soundcloud/soundcloud.openapi.js';
 import { friendsPaths, friendsSchemas } from '@/features/friends/friends.openapi.js';
-import { musicControlPaths, musicControlSchemas } from '@/features/music-control/music-control.openapi.js';
+import {
+	musicControlPaths,
+	musicControlSchemas,
+} from '@/features/music-control/music-control.openapi.js';
 
 const openapiDocument: OpenAPIV3.Document = {
 	openapi: '3.0.0',
@@ -19,21 +22,22 @@ const openapiDocument: OpenAPIV3.Document = {
 		description: `Zumik - Collaborative music listening platform`,
 		contact: {
 			name: 'Zumik Team',
-			email: 'contact@zumik.local'
+			email: 'contact@zumik.local',
 		},
 		license: {
 			name: 'MIT',
-			url: 'https://opensource.org/licenses/MIT'
-		}
+			url: 'https://opensource.org/licenses/MIT',
+		},
 	},
 
 	servers: [
 		{
-			url: env.NODE_ENV === 'production'
-				? 'https://api.zumik.com'
-				: `http://localhost:${env.PORT || 3000}`,
-			description: env.NODE_ENV === 'production' ? 'Production' : 'Development'
-		}
+			url:
+				env.NODE_ENV === 'production'
+					? 'https://api.zumik.com'
+					: `http://localhost:${env.PORT || 3000}`,
+			description: env.NODE_ENV === 'production' ? 'Production' : 'Development',
+		},
 	],
 
 	// Merge all feature paths
@@ -52,14 +56,14 @@ const openapiDocument: OpenAPIV3.Document = {
 									properties: {
 										status: { type: 'string', example: 'ok' },
 										timestamp: { type: 'string', format: 'date-time' },
-										redis: { type: 'string', enum: ['connected', 'disconnected'] }
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+										redis: { type: 'string', enum: ['connected', 'disconnected'] },
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 		// Feature paths
 		...authPaths,
@@ -67,7 +71,7 @@ const openapiDocument: OpenAPIV3.Document = {
 		...profilePaths,
 		...soundcloudPaths,
 		...friendsPaths,
-		...musicControlPaths
+		...musicControlPaths,
 	},
 
 	components: {
@@ -84,8 +88,8 @@ const openapiDocument: OpenAPIV3.Document = {
           - POST /api/auth/facebook
 
           Token expires after 1 hour. Use refresh token for renewal.
-        `
-			}
+        `,
+			},
 		},
 
 		// Merge all schemas
@@ -97,11 +101,11 @@ const openapiDocument: OpenAPIV3.Document = {
 			...profileSchemas,
 			...soundcloudSchemas,
 			...friendsSchemas,
-			...musicControlSchemas
+			...musicControlSchemas,
 		},
 
 		// Common responses
-		responses: commonResponses
+		responses: commonResponses,
 	},
 
 	tags: [
@@ -114,8 +118,8 @@ const openapiDocument: OpenAPIV3.Document = {
 		{ name: 'Collaborators', description: 'Playlist collaborator management' },
 		{ name: 'SoundCloud', description: 'Music search and streaming (public)' },
 		{ name: 'Friends', description: 'Friends system (follow/unfollow)' },
-		{ name: 'Music Control', description: 'Music control delegation' }
-	]
+		{ name: 'Music Control', description: 'Music control delegation' },
+	],
 };
 
 export const swaggerSpec = openapiDocument;
@@ -135,7 +139,7 @@ export const swaggerUiOptions: swaggerUi.SwaggerUiOptions = {
 		tryItOutEnabled: true,
 		syntaxHighlight: {
 			activate: true,
-			theme: 'monokai'
-		}
-	}
+			theme: 'monokai',
+		},
+	},
 };

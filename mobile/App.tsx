@@ -9,23 +9,23 @@ import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { configureGoogleSignIn, initializeFacebookSDK } from '@services/oauth';
 
 export default function App() {
-  // Configure OAuth providers on app start
-  useEffect(() => {
-    configureGoogleSignIn();
-    initializeFacebookSDK();
-  }, []);
+	// Configure OAuth providers on app start
+	useEffect(() => {
+		configureGoogleSignIn();
+		initializeFacebookSDK();
+	}, []);
 
-  return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <ErrorBoundary>
-        <ThemeProvider>
-          <SafeAreaProvider>
-            <RootNavigator />
-            <StatusBar style="dark" />
-          </SafeAreaProvider>
-        </ThemeProvider>
-      </ErrorBoundary>
-      <Toast />
-    </GestureHandlerRootView>
-  );
+	return (
+		<GestureHandlerRootView style={{ flex: 1 }}>
+			<ErrorBoundary>
+				<ThemeProvider>
+					<SafeAreaProvider>
+						<RootNavigator />
+						<StatusBar style="dark" />
+					</SafeAreaProvider>
+				</ThemeProvider>
+			</ErrorBoundary>
+			<Toast />
+		</GestureHandlerRootView>
+	);
 }

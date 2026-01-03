@@ -32,6 +32,7 @@ make setup
 ```
 
 Cette commande va :
+
 - Installer les dépendances npm
 - Créer le fichier `.env` depuis `.env.example`
 
@@ -180,6 +181,7 @@ RATE_LIMIT_FALLBACK_MEMORY=true
 ### Architecture Redis
 
 #### Fichiers clés
+
 - `src/shared/config/redis.ts` - Client Redis (ioredis) avec auto-reconnect
 - `src/shared/config/rate-limit.config.ts` - Configuration centralisée
 - `src/features/auth/middleware/rate-limit.middleware.ts` - Middlewares rate limiting
@@ -189,6 +191,7 @@ RATE_LIMIT_FALLBACK_MEMORY=true
 #### Clés Redis utilisées
 
 **Rate Limiting:**
+
 ```
 rl:auth:login:{email}:{ip}       # Compteur login
 rl:auth:register:{ip}            # Compteur register
@@ -197,6 +200,7 @@ rl:auth:global:{ip}              # Compteur global
 ```
 
 **Brute Force Protection:**
+
 ```
 failed_login:{email}:{ip}        # Compteur échecs (TTL 15min)
 account_locked:{email}:{ip}      # Verrouillage (TTL dynamique)
@@ -207,6 +211,7 @@ ip_blacklist:{ip}                # Blacklist IP (TTL 24h)
 ### Graceful Degradation
 
 Si Redis est indisponible:
+
 - **Rate limiting**: Fallback vers stockage in-memory (express-rate-limit)
 - **Account lockout**: Désactivé automatiquement (log warning)
 - **Backend**: Continue de fonctionner normalement
@@ -262,6 +267,7 @@ make redis-shell
 The backend exposes **45 REST endpoints** across 6 features with **interactive documentation** via Swagger UI.
 
 **Access Swagger UI**:
+
 ```bash
 # 1. Start backend
 make dev-docker    # or make backend-local
@@ -271,12 +277,14 @@ http://localhost:3000/api-docs
 ```
 
 **Features**:
+
 - Interactive endpoint testing with authentication
 - Request/response schemas with examples
 - Real-time validation
 - JWT token management
 
 **Endpoints by feature**:
+
 - **Auth**: 7 endpoints (register, login, OAuth Google/Facebook, providers)
 - **Playlists**: 13 endpoints (CRUD, tracks, collaborators, viewers)
 - **Profile**: 4 endpoints (get, update, search users)
@@ -287,6 +295,7 @@ http://localhost:3000/api-docs
 ### Exemples rapides
 
 **Register**
+
 ```bash
 curl -X POST http://localhost:3000/api/auth/register \
   -H "Content-Type: application/json" \
@@ -294,6 +303,7 @@ curl -X POST http://localhost:3000/api/auth/register \
 ```
 
 **Login**
+
 ```bash
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
@@ -301,6 +311,7 @@ curl -X POST http://localhost:3000/api/auth/login \
 ```
 
 **Get Current User**
+
 ```bash
 curl http://localhost:3000/api/auth/me \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"

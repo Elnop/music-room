@@ -1,6 +1,6 @@
-import { Router } from "express";
-import { authMiddleware } from "@/features/auth/auth.middleware.js";
-import { ProfileController } from "@/features/profile/profile.controller.js";
+import { Router } from 'express';
+import { authMiddleware } from '@/features/auth/auth.middleware.js';
+import { ProfileController } from '@/features/profile/profile.controller.js';
 
 const router = Router();
 const controller = new ProfileController();
@@ -19,14 +19,14 @@ router.use(authMiddleware);
  * @desc    Update current user's profile
  * @access  Private
  */
-router.patch("/", (req, res, next) => controller.updateProfile(req, res, next));
+router.patch('/', (req, res, next) => controller.updateProfile(req, res, next));
 
 /**
  * @route   GET /api/profile
  * @desc    Get current user's profile
  * @access  Private
  */
-router.get("/", (req, res, next) => controller.getOwnProfile(req, res, next));
+router.get('/', (req, res, next) => controller.getOwnProfile(req, res, next));
 
 /**
  * @route   GET /api/profile/search
@@ -35,9 +35,7 @@ router.get("/", (req, res, next) => controller.getOwnProfile(req, res, next));
  * @query   q - Search query (required)
  * @query   limit - Max results (default: 20, max: 50)
  */
-router.get("/search", (req, res, next) =>
-  controller.searchUsers(req, res, next)
-);
+router.get('/search', (req, res, next) => controller.searchUsers(req, res, next));
 
 // =====================================================
 // Privacy Routes
@@ -48,18 +46,14 @@ router.get("/search", (req, res, next) =>
  * @desc    Get current user's privacy settings
  * @access  Private
  */
-router.get("/privacy", (req, res, next) =>
-  controller.getPrivacySettings(req, res, next)
-);
+router.get('/privacy', (req, res, next) => controller.getPrivacySettings(req, res, next));
 
 /**
  * @route   PUT /api/profile/privacy
  * @desc    Update current user's privacy settings
  * @access  Private
  */
-router.put("/privacy", (req, res, next) =>
-  controller.updatePrivacySettings(req, res, next)
-);
+router.put('/privacy', (req, res, next) => controller.updatePrivacySettings(req, res, next));
 
 // =====================================================
 // Music Preferences Routes
@@ -70,8 +64,8 @@ router.put("/privacy", (req, res, next) =>
  * @desc    Get current user's music preferences
  * @access  Private
  */
-router.get("/music-preferences", (req, res, next) =>
-  controller.getMusicPreferences(req, res, next)
+router.get('/music-preferences', (req, res, next) =>
+	controller.getMusicPreferences(req, res, next)
 );
 
 /**
@@ -79,8 +73,8 @@ router.get("/music-preferences", (req, res, next) =>
  * @desc    Update current user's music preferences (max 5 genres)
  * @access  Private
  */
-router.put("/music-preferences", (req, res, next) =>
-  controller.updateMusicPreferences(req, res, next)
+router.put('/music-preferences', (req, res, next) =>
+	controller.updateMusicPreferences(req, res, next)
 );
 
 /**
@@ -88,8 +82,8 @@ router.put("/music-preferences", (req, res, next) =>
  * @desc    Get all available music genres
  * @access  Private
  */
-router.get("/music-preferences/genres", (req, res, next) =>
-  controller.getAvailableGenres(req, res, next)
+router.get('/music-preferences/genres', (req, res, next) =>
+	controller.getAvailableGenres(req, res, next)
 );
 
 // =====================================================
@@ -101,8 +95,6 @@ router.get("/music-preferences/genres", (req, res, next) =>
  * @desc    Get user profile by ID (filtered by privacy settings)
  * @access  Private
  */
-router.get("/:userId", (req, res, next) =>
-  controller.getProfile(req, res, next)
-);
+router.get('/:userId', (req, res, next) => controller.getProfile(req, res, next));
 
 export default router;

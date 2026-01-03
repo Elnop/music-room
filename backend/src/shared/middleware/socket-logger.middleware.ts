@@ -1,4 +1,4 @@
-import { logger } from "@/shared/utils/logger.js";
+import { logger } from '@/shared/utils/logger.js';
 
 /**
  * Socket Logger Middleware
@@ -18,15 +18,15 @@ import { logger } from "@/shared/utils/logger.js";
  * @param metadata - Additional metadata
  */
 export function connectionLog(
-  socketId: string,
-  transport: string,
-  metadata?: Record<string, unknown>,
+	socketId: string,
+	transport: string,
+	metadata?: Record<string, unknown>
 ): void {
-  logger.info("[Socket] connection", {
-    socketId,
-    transport,
-    ...metadata,
-  });
+	logger.info('[Socket] connection', {
+		socketId,
+		transport,
+		...metadata,
+	});
 }
 
 /**
@@ -36,15 +36,15 @@ export function connectionLog(
  * @param metadata - Additional metadata
  */
 export function disconnectLog(
-  socketId: string,
-  reason: string,
-  metadata?: Record<string, unknown>,
+	socketId: string,
+	reason: string,
+	metadata?: Record<string, unknown>
 ): void {
-  logger.info("[Socket] disconnect", {
-    socketId,
-    reason,
-    ...metadata,
-  });
+	logger.info('[Socket] disconnect', {
+		socketId,
+		reason,
+		...metadata,
+	});
 }
 
 /**
@@ -55,16 +55,16 @@ export function disconnectLog(
  * @param metadata - Additional metadata
  */
 export function authLog(
-  action: string,
-  userId: string,
-  socketId: string,
-  metadata?: Record<string, unknown>,
+	action: string,
+	userId: string,
+	socketId: string,
+	metadata?: Record<string, unknown>
 ): void {
-  logger.info(`[Socket] auth:${action}`, {
-    socketId,
-    userId,
-    ...metadata,
-  });
+	logger.info(`[Socket] auth:${action}`, {
+		socketId,
+		userId,
+		...metadata,
+	});
 }
 
 /**
@@ -74,25 +74,25 @@ export function authLog(
  * @param metadata - Event metadata
  */
 export function eventLog(
-  eventName: string,
-  socketId: string,
-  metadata?: Record<string, unknown>,
+	eventName: string,
+	socketId: string,
+	metadata?: Record<string, unknown>
 ): void {
-  const level = metadata?.level === "warn" ? "warn" : "info";
-  const cleanedMeta = { ...metadata };
-  delete cleanedMeta.level;
+	const level = metadata?.level === 'warn' ? 'warn' : 'info';
+	const cleanedMeta = { ...metadata };
+	delete cleanedMeta.level;
 
-  if (level === "warn") {
-    logger.warn(`[Socket] ${eventName}`, {
-      socketId,
-      ...cleanedMeta,
-    });
-  } else {
-    logger.info(`[Socket] ${eventName}`, {
-      socketId,
-      ...cleanedMeta,
-    });
-  }
+	if (level === 'warn') {
+		logger.warn(`[Socket] ${eventName}`, {
+			socketId,
+			...cleanedMeta,
+		});
+	} else {
+		logger.info(`[Socket] ${eventName}`, {
+			socketId,
+			...cleanedMeta,
+		});
+	}
 }
 
 /**
@@ -101,17 +101,13 @@ export function eventLog(
  * @param error - Error object
  * @param metadata - Additional metadata
  */
-export function errorLog(
-  socketId: string,
-  error: Error,
-  metadata?: Record<string, unknown>,
-): void {
-  logger.error(`[Socket] error`, {
-    socketId,
-    error: error.message,
-    stack: error.stack,
-    ...metadata,
-  });
+export function errorLog(socketId: string, error: Error, metadata?: Record<string, unknown>): void {
+	logger.error(`[Socket] error`, {
+		socketId,
+		error: error.message,
+		stack: error.stack,
+		...metadata,
+	});
 }
 
 /**
@@ -119,11 +115,8 @@ export function errorLog(
  * @param message - Initialization message
  * @param metadata - Additional metadata
  */
-export function initLog(
-  message: string,
-  metadata?: Record<string, unknown>,
-): void {
-  logger.info(`[Socket] ${message}`, metadata);
+export function initLog(message: string, metadata?: Record<string, unknown>): void {
+	logger.info(`[Socket] ${message}`, metadata);
 }
 
 /**
@@ -131,22 +124,19 @@ export function initLog(
  * @param eventType - Type of broadcast (device_status, permissions, etc.)
  * @param metadata - Broadcast metadata
  */
-export function broadcastLog(
-  eventType: string,
-  metadata: Record<string, unknown>,
-): void {
-  logger.info(`[Socket] broadcast:${eventType}`, metadata);
+export function broadcastLog(eventType: string, metadata: Record<string, unknown>): void {
+	logger.info(`[Socket] broadcast:${eventType}`, metadata);
 }
 
 /**
  * Exported namespace for structured socket logging
  */
 export const socketLogger = {
-  connection: connectionLog,
-  disconnect: disconnectLog,
-  auth: authLog,
-  event: eventLog,
-  error: errorLog,
-  init: initLog,
-  broadcast: broadcastLog,
+	connection: connectionLog,
+	disconnect: disconnectLog,
+	auth: authLog,
+	event: eventLog,
+	error: errorLog,
+	init: initLog,
+	broadcast: broadcastLog,
 };
