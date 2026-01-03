@@ -27,6 +27,34 @@ make logs
 make stop
 ```
 
+## Code Formatting
+
+This project uses **tabs** for indentation (visually displayed as 2 spaces).
+
+**Editor Configuration:**
+- A `.editorconfig` file is provided at the root - most modern editors will read it automatically
+- Configure your editor: Set **tab width = 2** for proper visual alignment
+- VS Code: Install the "EditorConfig" extension for automatic configuration
+
+**Before Committing:**
+```bash
+# Format code automatically
+make format
+
+# Or format individually
+cd backend && npm run format
+cd mobile && npm run format
+```
+
+**Working with Feature Branches:**
+- If you have an existing feature branch, you may encounter merge conflicts due to the indentation change
+- Use these git options to handle whitespace-only changes:
+  ```bash
+  git merge main -X ignore-all-space
+  # OR
+  git rebase main --ignore-whitespace
+  ```
+
 ## Features
 
 - 🎵 **Collaborative Playlists** - Create, share, and manage music playlists with friends
