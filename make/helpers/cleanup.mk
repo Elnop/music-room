@@ -6,19 +6,21 @@
 # Remove all node_modules
 # Usage: $(call remove_node_modules)
 define remove_node_modules
-	@rm -rf $(BACKEND_NODE_MODULES) $(MOBILE_NODE_MODULES)
+	@docker run --rm -v $(PWD):/workspace alpine sh -c "rm -rf /workspace/backend/node_modules /workspace/mobile/node_modules" 2>/dev/null || true
 endef
 
 # Remove build artifacts
 # Usage: $(call remove_build_artifacts)
 define remove_build_artifacts
-	@rm -rf $(BACKEND_DIST) $(MOBILE_EXPO)
+	@docker run --rm -v $(PWD):/workspace alpine sh -c "rm -rf /workspace/mobile/.expo" 2>/dev/null || true
+	@rm -rf $(BACKEND_DIST) build 2>/dev/null || true
 endef
 
 # Remove native build folders
 # Usage: $(call remove_native_builds)
 define remove_native_builds
-	@rm -rf $(MOBILE_DIR)/android $(MOBILE_DIR)/ios $(MOBILE_EXPO)
+	@docker run --rm -v $(PWD):/workspace alpine sh -c "rm -rf /workspace/mobile/android /workspace/mobile/ios" 2>/dev/null || true
+	@rm -rf $(MOBILE_EXPO) 2>/dev/null || true
 endef
 
 # Remove all dependencies and builds

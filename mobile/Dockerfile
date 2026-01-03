@@ -37,7 +37,7 @@ RUN mkdir -p /app/.expo && chown -R node:node /app/.expo && chmod -R 755 /app/.e
 USER node
 
 # Make scripts executable
-RUN chmod +x setup-eas-auto.sh start-expo.sh start-expo-tunnel.sh 2>/dev/null || true
+RUN chmod +x scripts/*.sh 2>/dev/null || true
 
 # Expose Expo ports
 # 8081: Metro bundler
@@ -56,4 +56,4 @@ ENV REACT_NATIVE_PACKAGER_HOSTNAME=0.0.0.0
 ENTRYPOINT []
 
 # Start Expo development server using the startup script
-CMD ["sh", "start-expo.sh"]
+CMD ["sh", "scripts/start-expo.sh"]

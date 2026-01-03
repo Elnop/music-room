@@ -311,8 +311,8 @@ docker-compose -f docker-compose.yml -f docker-compose.tunnel.yml up
 ```
 
 **Key Differences:**
-- Backend uses `start-with-tunnel.sh` instead of `npm run dev`
-- Mobile uses `start-expo-tunnel.sh` instead of `start-expo.sh`
+- Backend uses `scripts/start-with-tunnel.sh` instead of `npm run dev`
+- Mobile uses `scripts/start-expo-tunnel.sh` instead of `scripts/start-expo.sh`
 - Shared volume `tunnel-data` for URL communication
 - Exposes port 4040 for ngrok web interface
 
@@ -436,7 +436,7 @@ Tunnel mode can be used in CI for E2E testing:
 
 ### Custom ngrok Configuration
 
-For advanced users, modify `backend/start-with-tunnel.sh`:
+For advanced users, modify `backend/scripts/start-with-tunnel.sh`:
 
 ```bash
 # Add custom ngrok flags
@@ -492,7 +492,7 @@ Yes, but you'll need to manually run the scripts:
 cd backend && npm run dev:tunnel
 
 # Mobile (in separate terminal)
-cd mobile && sh start-expo-tunnel.sh
+cd mobile && sh scripts/start-expo-tunnel.sh
 ```
 
 ### Q: How do I switch back to LAN mode?
@@ -531,7 +531,7 @@ Before asking for help, verify:
 **Solution**: The script verification was looking for "@" in the output, but Expo returns a different format.
 
 ```bash
-# Fixed in mobile/setup-eas-auto.sh:
+# Fixed in mobile/scripts/setup-eas-auto.sh:
 # Changed from: grep -q "@"
 # Changed to: grep -q "authenticated using EXPO_TOKEN"
 ```

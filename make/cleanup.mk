@@ -23,9 +23,8 @@ clean: ## Remove containers, volumes, images, and project dependencies (with con
 		echo "$(GREEN)✓ Containers and volumes removed$(RESET)"; \
 		docker rmi music-room-backend:latest music-room-mobile:latest 2>/dev/null || true; \
 		docker network rm $(DOCKER_NETWORK) 2>/dev/null || true; \
-		rm -rf backend/node_modules mobile/node_modules 2>/dev/null || true; \
-		rm -rf backend/dist mobile/.expo 2>/dev/null || true; \
-		rm -rf mobile/android mobile/ios 2>/dev/null || true; \
+		docker run --rm -v $(PWD):/workspace alpine sh -c "rm -rf /workspace/backend/node_modules /workspace/mobile/node_modules /workspace/mobile/.expo /workspace/mobile/android /workspace/mobile/ios /workspace/backend/logs" 2>/dev/null || true; \
+		rm -rf backend/dist build 2>/dev/null || true; \
 		rm -rf backend/coverage mobile/coverage 2>/dev/null || true; \
 		rm -f /tmp/ngrok.log /tmp/backend-tunnel-url.txt 2>/dev/null || true; \
 		rm -rf /tmp/shared 2>/dev/null || true; \
@@ -73,10 +72,8 @@ clean-all: ## Complete cleanup - Docker system + project artifacts + global cach
 	docker builder prune -af 2>/dev/null || true; \
 	docker system prune -af --volumes 2>/dev/null || true
 	@echo "$(CYAN)Step 4/6: Cleaning project artifacts...$(RESET)"
-	@rm -rf backend/node_modules mobile/node_modules 2>/dev/null || true
-	@rm -rf backend/dist mobile/.expo 2>/dev/null || true
-	@rm -rf mobile/android mobile/ios 2>/dev/null || true
-	@rm -rf backend/coverage mobile/coverage 2>/dev/null || true
+	@docker run --rm -v $(PWD):/workspace alpine sh -c "rm -rf /workspace/backend/node_modules /workspace/mobile/node_modules /workspace/mobile/.expo /workspace/mobile/android /workspace/mobile/ios /workspace/backend/logs" 2>/dev/null || true
+	@rm -rf backend/dist build backend/coverage mobile/coverage 2>/dev/null || true
 	@rm -f /tmp/ngrok.log /tmp/backend-tunnel-url.txt 2>/dev/null || true
 	@rm -rf /tmp/shared 2>/dev/null || true
 	@find . -name "*.tsbuildinfo" -type f -delete 2>/dev/null || true

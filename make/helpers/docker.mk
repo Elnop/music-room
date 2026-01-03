@@ -157,7 +157,7 @@ define start_backend_tunnel
 			-e TUNNEL_MODE=true \
 			-e REDIS_HOST=$(REDIS_CONTAINER) \
 			--restart unless-stopped \
-			music-room-backend:latest sh start-with-tunnel.sh || { \
+			music-room-backend:latest sh scripts/start-with-tunnel.sh || { \
 			echo "$(RED)$(ICON_ERROR) Failed to start backend with tunnel$(NC)"; \
 			docker logs $(BACKEND_CONTAINER) 2>&1 | tail -20; \
 			exit 1; \

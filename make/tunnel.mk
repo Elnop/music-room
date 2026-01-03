@@ -74,7 +74,7 @@ tunnel-setup: ## One-time setup for tunnel mode (auto EAS login)
 	@sleep $(SETUP_WAIT_TIME)
 	$(call blank_line)
 	$(call print_arrow,Configuring EAS (automatic login)...)
-	@docker exec $(MOBILE_CONTAINER) sh setup-eas-auto.sh
+	@docker exec $(MOBILE_CONTAINER) sh scripts/setup-eas-auto.sh
 	$(call blank_line)
 	$(call print_arrow,Stopping setup container...)
 	@docker stop $(MOBILE_CONTAINER)
