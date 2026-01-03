@@ -45,28 +45,28 @@ endef
 # Build backend image
 # Usage: $(call build_backend_image)
 define build_backend_image
-	@echo "$(BLUE)$(ICON_INFO) Building backend image...$(NC)"
-	@docker build -t music-room-backend:latest \
+	echo "$(BLUE)$(ICON_INFO) Building backend image...$(NC)"; \
+	docker build -t music-room-backend:latest \
 		--target development \
 		-f ./$(BACKEND_DIR)/Dockerfile \
 		./$(BACKEND_DIR) || { \
 		echo "$(RED)$(ICON_ERROR) Backend build failed$(NC)"; \
 		exit 1; \
-	}
-	@echo "$(GREEN)$(ICON_SUCCESS) Backend image built$(NC)"
+	}; \
+	echo "$(GREEN)$(ICON_SUCCESS) Backend image built$(NC)"
 endef
 
 # Build mobile image
 # Usage: $(call build_mobile_image)
 define build_mobile_image
-	@echo "$(BLUE)$(ICON_INFO) Building mobile image...$(NC)"
-	@docker build -t music-room-mobile:latest \
+	echo "$(BLUE)$(ICON_INFO) Building mobile image...$(NC)"; \
+	docker build -t music-room-mobile:latest \
 		-f ./$(MOBILE_DIR)/Dockerfile \
 		./$(MOBILE_DIR) || { \
 		echo "$(RED)$(ICON_ERROR) Mobile build failed$(NC)"; \
 		exit 1; \
-	}
-	@echo "$(GREEN)$(ICON_SUCCESS) Mobile image built$(NC)"
+	}; \
+	echo "$(GREEN)$(ICON_SUCCESS) Mobile image built$(NC)"
 endef
 
 # ==============================================================================
