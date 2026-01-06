@@ -210,8 +210,10 @@ export class AuthController {
 	 * Login with Google OAuth
 	 */
 	async googleLogin(req: Request, res: Response, next: NextFunction) {
+		const ip = req.ip || req.socket.remoteAddress || 'unknown';
+
 		try {
-			logger.info('Google OAuth login request received');
+			logger.info('Google OAuth login request received', { ip });
 
 			const validated = googleLoginSchema.parse(req.body);
 			const result = await authService.loginWithGoogle(validated.idToken);
@@ -226,7 +228,10 @@ export class AuthController {
 
 			res.status(200).json(response);
 		} catch (error) {
-			logger.error('Google login error', { error });
+			// Record OAuth failure for IP reputation tracking
+			await bruteForceService.recordIPActivity(ip);
+
+			logger.error('Google login error', { error, ip });
 			next(error);
 		}
 	}
@@ -236,8 +241,10 @@ export class AuthController {
 	 * Login with Facebook OAuth
 	 */
 	async facebookLogin(req: Request, res: Response, next: NextFunction) {
+		const ip = req.ip || req.socket.remoteAddress || 'unknown';
+
 		try {
-			logger.info('Facebook OAuth login request received');
+			logger.info('Facebook OAuth login request received', { ip });
 
 			const validated = facebookLoginSchema.parse(req.body);
 			const result = await authService.loginWithFacebook(validated.accessToken);
@@ -252,7 +259,10 @@ export class AuthController {
 
 			res.status(200).json(response);
 		} catch (error) {
-			logger.error('Facebook login error', { error });
+			// Record OAuth failure for IP reputation tracking
+			await bruteForceService.recordIPActivity(ip);
+
+			logger.error('Facebook login error', { error, ip });
 			next(error);
 		}
 	}

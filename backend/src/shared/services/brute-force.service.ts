@@ -6,6 +6,9 @@ import type { LockoutStatus, IPReputationStatus } from '@/shared/types/rate-limi
 /**
  * Brute Force Protection Service
  * Handles failed login attempt tracking, account lockouts, and IP reputation
+ *
+ * Architecture decision: Redis required for production.
+ * Can be disabled in development via ACCOUNT_LOCKOUT_ENABLED=false.
  */
 export class BruteForceProtectionService {
 	/**
@@ -13,8 +16,20 @@ export class BruteForceProtectionService {
 	 * @returns Current lockout status
 	 */
 	async recordFailedAttempt(email: string, ip: string): Promise<LockoutStatus> {
-		if (!isRedisConnected() || !rateLimitConfig.lockout.enabled) {
-			logger.warn('Brute force protection disabled (Redis unavailable or disabled)');
+		// Development mode: bypass brute force protection
+		if (!rateLimitConfig.lockout.enabled) {
+			logger.debug('Brute force protection disabled (development mode)', { email, ip });
+			return {
+				isLocked: false,
+				failedAttempts: 0,
+				remainingAttempts: Infinity,
+			};
+		}
+
+		// Production mode: Redis required
+		if (!isRedisConnected()) {
+			logger.error('Brute force protection unavailable - Redis not connected', { email, ip });
+			// Return safe defaults but log error
 			return {
 				isLocked: false,
 				failedAttempts: 0,
@@ -65,7 +80,16 @@ export class BruteForceProtectionService {
 	 * @returns Lockout status with expiry time
 	 */
 	async lockAccount(email: string, ip: string, attempts: number): Promise<LockoutStatus> {
+		if (!rateLimitConfig.lockout.enabled) {
+			logger.debug('Account lockout disabled (development mode)', { email, ip, attempts });
+			return {
+				isLocked: false,
+				failedAttempts: attempts,
+			};
+		}
+
 		if (!isRedisConnected()) {
+			logger.error('Cannot lock account - Redis not connected', { email, ip, attempts });
 			return {
 				isLocked: false,
 				failedAttempts: attempts,
@@ -124,7 +148,13 @@ export class BruteForceProtectionService {
 	 * Reset failed attempts counter (called on successful login)
 	 */
 	async resetFailedAttempts(email: string, ip: string): Promise<void> {
+		if (!rateLimitConfig.lockout.enabled) {
+			logger.debug('Brute force protection disabled - skip reset', { email, ip });
+			return;
+		}
+
 		if (!isRedisConnected()) {
+			logger.warn('Cannot reset failed attempts - Redis not connected', { email, ip });
 			return;
 		}
 
@@ -156,7 +186,19 @@ export class BruteForceProtectionService {
 	 * @returns Current lockout status
 	 */
 	async checkLockout(email: string, ip: string): Promise<LockoutStatus> {
-		if (!isRedisConnected() || !rateLimitConfig.lockout.enabled) {
+		// Development mode: no lockouts
+		if (!rateLimitConfig.lockout.enabled) {
+			logger.debug('Account lockout disabled (development mode)', { email, ip });
+			return {
+				isLocked: false,
+				failedAttempts: 0,
+				remainingAttempts: Infinity,
+			};
+		}
+
+		// Production mode: Redis required
+		if (!isRedisConnected()) {
+			logger.warn('Cannot check lockout - Redis not connected', { email, ip });
 			return {
 				isLocked: false,
 				failedAttempts: 0,
@@ -211,7 +253,13 @@ export class BruteForceProtectionService {
 	 * @returns IP reputation status
 	 */
 	async recordIPActivity(ip: string): Promise<IPReputationStatus> {
+		if (!rateLimitConfig.lockout.enabled) {
+			logger.debug('IP reputation tracking disabled (development mode)', { ip });
+			return { status: 'normal', count: 0 };
+		}
+
 		if (!isRedisConnected()) {
+			logger.warn('Cannot record IP activity - Redis not connected', { ip });
 			return { status: 'normal', count: 0 };
 		}
 
@@ -261,7 +309,13 @@ export class BruteForceProtectionService {
 	 * Add an IP to the blacklist
 	 */
 	async blacklistIP(ip: string, durationSeconds: number): Promise<void> {
+		if (!rateLimitConfig.lockout.enabled) {
+			logger.debug('IP blacklisting disabled (development mode)', { ip });
+			return;
+		}
+
 		if (!isRedisConnected()) {
+			logger.warn('Cannot blacklist IP - Redis not connected', { ip });
 			return;
 		}
 
@@ -286,7 +340,13 @@ export class BruteForceProtectionService {
 	 * Check if an IP is blacklisted
 	 */
 	async isIPBlacklisted(ip: string): Promise<boolean> {
+		if (!rateLimitConfig.lockout.enabled) {
+			logger.debug('IP blacklist check disabled (development mode)', { ip });
+			return false;
+		}
+
 		if (!isRedisConnected()) {
+			logger.warn('Cannot check IP blacklist - Redis not connected', { ip });
 			return false;
 		}
 

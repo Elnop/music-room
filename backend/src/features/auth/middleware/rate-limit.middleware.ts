@@ -54,30 +54,31 @@ const baseRateLimitConfig = {
 
 /**
  * Get Redis store for rate limiting
- * Falls back to in-memory store if Redis is unavailable
+ *
+ * Architecture decision: Redis-only for production consistency.
+ * Returns undefined if disabled (development mode) or Redis unavailable (will skip rate limiting).
  */
 function getStore(prefix: string): RedisStore | undefined {
+	// Development mode: skip rate limiting entirely
 	if (!rateLimitConfig.enabled) {
-		logger.info('Rate limiting is disabled via configuration');
+		logger.info(`Rate limiting disabled for: ${prefix} (development mode)`);
 		return undefined;
 	}
 
-	if (isRedisConnected()) {
-		logger.debug(`Using Redis store for rate limiting: ${prefix}`);
-		return new RedisStore({
-			// @ts-expect-error - RedisStore types don't match ioredis perfectly but it works
-			sendCommand: (...args: string[]) => redisClient.call(...args),
-			prefix: `rl:${prefix}:`,
-		});
+	// Production mode: Redis required
+	if (!isRedisConnected()) {
+		logger.error(`Rate limiting unavailable for: ${prefix} - Redis not connected`);
+		// Return undefined - express-rate-limit will skip rate limiting
+		// This is safer than throwing (allows app to function) but logs the error
+		return undefined;
 	}
 
-	if (rateLimitConfig.fallbackToMemory) {
-		logger.warn(`Redis unavailable, using in-memory store for rate limiting: ${prefix}`);
-		return undefined; // express-rate-limit uses in-memory store by default
-	}
-
-	logger.error('Rate limiting disabled: Redis unavailable and fallback disabled');
-	return undefined;
+	logger.debug(`Using Redis store for rate limiting: ${prefix}`);
+	return new RedisStore({
+		// @ts-expect-error - RedisStore types don't match ioredis perfectly but it works
+		sendCommand: (...args: string[]) => redisClient.call(...args),
+		prefix: `rl:${prefix}:`,
+	});
 }
 
 /**

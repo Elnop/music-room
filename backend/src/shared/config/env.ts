@@ -44,9 +44,6 @@ const envSchema = z.object({
 	// IP Whitelist
 	RATE_LIMIT_WHITELIST_IPS: z.string().default(''),
 
-	// Graceful Degradation
-	RATE_LIMIT_FALLBACK_MEMORY: z.string().default('true'),
-
 	// Gmail SMTP Configuration
 	GMAIL_USER: z.string().email('Invalid Gmail user address'),
 	GMAIL_APP_PASSWORD: z.string().min(1, 'Gmail app password is required'),

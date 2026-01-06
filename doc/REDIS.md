@@ -139,14 +139,24 @@ ip_failed_logins:{ip}            # IP failure counter (TTL: 15min)
 ip_blacklist:{ip}                # IP blacklist flag (TTL: 24h)
 ```
 
-### Graceful Degradation
+### Architecture Decision: No In-Memory Fallback
 
-If Redis is unavailable:
-- **Rate limiting** → Falls back to in-memory storage (express-rate-limit default)
-- **Account lockout** → Automatically disabled (warning logged)
-- **Backend** → Continues to function normally
+**Production mode** (Redis required):
+- Redis unavailable → Backend logs errors but continues running
+- Rate limiting skipped (logged as error)
+- Account lockout disabled (logged as warning)
 
-Backend logs: `"Redis unavailable, using in-memory store"`
+**Development mode** (Redis optional):
+- Set `RATE_LIMIT_ENABLED=false` and `ACCOUNT_LOCKOUT_ENABLED=false`
+- All protections bypassed entirely
+- No Redis required
+
+**Why no fallback?**
+In-memory fallback creates security vulnerabilities in multi-instance deployments (load balancers) because each instance has separate state. Redis-only ensures consistent protection across all instances.
+
+Backend logs:
+- Dev mode: `"Rate limiting disabled (development mode)"`
+- Redis down: `"Rate limiting unavailable - Redis not connected"` (ERROR)
 
 ## Daily Usage
 
@@ -312,10 +322,9 @@ IP_BLACKLIST_THRESHOLD=50
 
 # Whitelist IPs (comma-separated)
 RATE_LIMIT_WHITELIST_IPS=127.0.0.1,::1
-
-# Graceful Degradation
-RATE_LIMIT_FALLBACK_MEMORY=true
 ```
+
+**Note**: `RATE_LIMIT_FALLBACK_MEMORY` removed in favor of explicit dev/prod modes. See "Temporarily Disable Redis (Development)" below.
 
 ### Adjust Thresholds for Testing
 
@@ -329,7 +338,9 @@ ACCOUNT_LOCKOUT_DURATION_SOFT=60    # 1 min instead of 15
 
 ⚠️ **Never commit these changes** - Keep production values.
 
-### Temporarily Disable Redis (Development)
+### Development Mode Without Redis
+
+To develop without running Redis:
 
 ```bash
 # backend/.env
@@ -337,7 +348,14 @@ RATE_LIMIT_ENABLED=false
 ACCOUNT_LOCKOUT_ENABLED=false
 ```
 
-Backend will run without rate limiting (avoid in production).
+This **completely disables** all security protections:
+- ✅ No Redis connection required
+- ✅ Fast local iteration
+- ❌ No rate limiting
+- ❌ No brute force protection
+- ❌ No IP tracking
+
+**Production**: MUST use `RATE_LIMIT_ENABLED=true` with Redis running.
 
 ## Useful Redis CLI Commands
 

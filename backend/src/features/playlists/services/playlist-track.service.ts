@@ -2,11 +2,7 @@ import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import { deleteRecords } from '@/shared/utils/database.helpers.js';
-import {
-	canEditPlaylist,
-	checkEditPermission,
-	getPlaylistForPermissionCheck,
-} from '@/features/playlists/permissions/playlist.permissions.js';
+import { checkEditPermission } from '@/features/playlists/permissions/playlist.permissions.js';
 import { reindexPositions } from '@/features/playlists/utils/playlist.helpers.js';
 import { realtime } from '@/realtime/index.js';
 import type { AddTrackDTO } from '@/features/playlists/playlist.types.js';
@@ -21,11 +17,8 @@ export class PlaylistTrackService {
 	 */
 	async addTrack(playlistId: string, userId: string, track: AddTrackDTO): Promise<void> {
 		try {
-			const playlist = await getPlaylistForPermissionCheck(playlistId);
-
-			if (!canEditPlaylist(playlist, userId)) {
-				throw new AppError(403, 'Access denied', 'PLAYLIST_ACCESS_DENIED');
-			}
+			// Check edit permissions (unified approach)
+			await checkEditPermission(playlistId, userId);
 
 			// Upsert track (insert if not exists, return existing if duplicate track_uri)
 			const { data: trackData, error: trackError } = await supabaseAdmin

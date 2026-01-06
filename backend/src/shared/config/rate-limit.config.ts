@@ -60,7 +60,4 @@ export const rateLimitConfig = {
 	whitelist: env.RATE_LIMIT_WHITELIST_IPS
 		? env.RATE_LIMIT_WHITELIST_IPS.split(',').map(ip => ip.trim())
 		: [],
-
-	// Graceful degradation (fallback to in-memory if Redis unavailable)
-	fallbackToMemory: env.RATE_LIMIT_FALLBACK_MEMORY !== 'false',
 };

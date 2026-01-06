@@ -173,10 +173,9 @@ IP_BLACKLIST_THRESHOLD=50
 
 # Whitelist IP (séparées par virgules)
 RATE_LIMIT_WHITELIST_IPS=
-
-# Graceful Degradation
-RATE_LIMIT_FALLBACK_MEMORY=true
 ```
+
+**Note**: `RATE_LIMIT_FALLBACK_MEMORY` supprimée. Voir "Mode développement sans Redis" ci-dessous.
 
 ### Architecture Redis
 
@@ -208,13 +207,30 @@ ip_failed_logins:{ip}            # Compteur échecs IP (TTL 15min)
 ip_blacklist:{ip}                # Blacklist IP (TTL 24h)
 ```
 
-### Graceful Degradation
+### Décision d'architecture : Pas de fallback in-memory
 
-Si Redis est indisponible:
+**Mode production** (Redis requis):
+- Redis indisponible → Backend log erreurs mais continue
+- Rate limiting désactivé (log ERROR)
+- Account lockout désactivé (log WARNING)
 
-- **Rate limiting**: Fallback vers stockage in-memory (express-rate-limit)
-- **Account lockout**: Désactivé automatiquement (log warning)
-- **Backend**: Continue de fonctionner normalement
+**Mode développement** (Redis optionnel):
+- `RATE_LIMIT_ENABLED=false` et `ACCOUNT_LOCKOUT_ENABLED=false`
+- Toutes les protections bypassed
+- Redis non requis
+
+**Pourquoi pas de fallback ?**
+Un fallback in-memory crée des vulnérabilités en multi-instance (load balancer) car chaque instance a son propre état. Redis-only garantit une protection cohérente.
+
+**Mode développement sans Redis:**
+
+```bash
+# backend/.env
+RATE_LIMIT_ENABLED=false
+ACCOUNT_LOCKOUT_ENABLED=false
+```
+
+Ceci désactive **complètement** toutes les protections de sécurité pour permettre le développement local sans Redis
 
 ### Commandes utiles
 
