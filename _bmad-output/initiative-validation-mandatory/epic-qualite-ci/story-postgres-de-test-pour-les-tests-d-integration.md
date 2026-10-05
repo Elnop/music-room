@@ -16,7 +16,7 @@ tracker_status: backlog
 
 ## Description
 
-Fournit un Postgres local (docker) avec les migrations du repo appliquées, utilisable par les tests d'intégration backend en local et comme service en CI, selon 6.
+Fournit la stack Supabase locale (`supabase start` : Postgres, PostgREST, Auth) avec les migrations du repo appliquées, derrière `make test-int`, utilisable par les tests d'intégration backend en local et en CI, selon doc/TESTING.md (story 6).
 
 ## Acceptance Criteria
 
