@@ -37,6 +37,9 @@ coverage/
 
 # Misc
 *.tsbuildinfo
-.claude/
+# Claude Code: share skills and team settings, keep personal config local
+.claude/*
+!.claude/skills/
+!.claude/settings.json
 
 tmp/
