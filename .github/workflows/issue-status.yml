@@ -18,7 +18,8 @@ permissions:
 jobs:
   pr-opened:
     if: github.event_name == 'pull_request' && !github.event.pull_request.draft
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
     steps:
       - name: Move closing issues to review
         env:
@@ -37,7 +38,8 @@ jobs:
 
   issue-closed:
     if: github.event_name == 'issues'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
     steps:
       - name: Drop status labels
         env:

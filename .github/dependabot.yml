@@ -1,0 +1,11 @@
+# Workflow actions are pinned to commit SHAs; Dependabot proposes the bumps as PRs.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: develop
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ['*']
