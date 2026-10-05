@@ -9,7 +9,7 @@
 		"allowSyntheticDefaultImports": true,
 		"jsx": "react-native",
 		"lib": ["esnext"],
-		"types": ["react-native"],
+		"types": ["react-native", "jest"],
 		"paths": {
 			"@/*": ["./src/*"],
 			"@api/*": ["./src/api/*"],
