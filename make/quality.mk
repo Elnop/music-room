@@ -5,10 +5,14 @@
 
 .PHONY: test lint format lint-fix
 
-test: ## Run all tests (backend)
-	$(call print_info,Running backend tests...)
-	$(call npm_safe,backend,test,No tests configured)
-	$(call print_success,All tests completed)
+test: ## Run backend and mobile tests (fails on any failure)
+	$(call print_header,Running Tests)
+	$(call print_arrow,Testing backend...)
+	$(call npm_backend,test)
+	$(call blank_line)
+	$(call print_arrow,Testing mobile...)
+	$(call npm_mobile,test)
+	$(call print_success,All tests passed)
 
 lint: ## Run linters on all code
 	$(call print_header,Running Linters)

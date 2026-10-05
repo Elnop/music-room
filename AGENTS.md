@@ -26,7 +26,7 @@
 ## Running and verifying
 
 - The root `make` is the entry point: `make dev-docker` by default, `make dev-local` for the Android Studio emulator, `make dev-tunnel` when the phone is on another network.
-- There are no automated tests yet: `make test` prints "No tests configured" and exits 0. Verify with `npm run type-check` and `npm run lint` in both `backend/` and `mobile/`, plus a call through Swagger UI.
+- `make test` runs the backend (Vitest) and mobile (jest-expo) unit tests and exits non-zero on any failure; `npm test` runs one side. Strategy, mocks and single-test commands are in `doc/TESTING.md`. Also verify with `npm run type-check` and `npm run lint` in both `backend/` and `mobile/`, plus a call through Swagger UI for endpoints.
 - The Node version is not settled: `backend/Dockerfile` uses Node 20. Do not change it without a ticket.
 - Google and Facebook sign-in need a development build; they fail in Expo Go.
 
