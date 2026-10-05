@@ -12,19 +12,13 @@ export const createPlaylistSchema = z.object({
 	description: z.string().max(500, 'Description must be at most 500 characters').optional(),
 	visibility: z
 		.enum(['public', 'private'], {
-			errorMap: () => ({
-				message: 'Visibility must be either public or private',
-			}),
+			error: 'Visibility must be either public or private',
 		})
-		.optional()
 		.default('public'),
 	editMode: z
 		.enum(['open', 'restricted'], {
-			errorMap: () => ({
-				message: 'Edit mode must be either open or restricted',
-			}),
+			error: 'Edit mode must be either open or restricted',
 		})
-		.optional()
 		.default('open'),
 });
 
@@ -54,26 +48,26 @@ export const addTrackSchema = z.object({
 		.string()
 		.optional()
 		.transform(val => (val === '' ? undefined : val))
-		.pipe(z.string().url().optional()),
+		.pipe(z.url().optional()),
 	durationMs: z.number().int().positive(),
 	// Accept empty string or valid URL, transform empty string to undefined
 	previewUrl: z
 		.string()
 		.optional()
 		.transform(val => (val === '' ? undefined : val))
-		.pipe(z.string().url().optional()),
+		.pipe(z.url().optional()),
 });
 
 export const reorderTracksSchema = z.object({
-	trackIds: z.array(z.string().uuid()).min(1, 'Track IDs array cannot be empty'),
+	trackIds: z.array(z.uuid()).min(1, 'Track IDs array cannot be empty'),
 });
 
 export const addCollaboratorSchema = z.object({
-	userId: z.string().uuid('Invalid user ID format'),
+	userId: z.uuid('Invalid user ID format'),
 });
 
 export const addViewerSchema = z.object({
-	userId: z.string().uuid('Invalid user ID format'),
+	userId: z.uuid('Invalid user ID format'),
 });
 
 export type CreatePlaylistInput = z.infer<typeof createPlaylistSchema>;

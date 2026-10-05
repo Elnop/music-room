@@ -50,7 +50,7 @@ export const updateProfileSchema = z.object({
 		.string()
 		.max(PROFILE_LIMITS.BIO_MAX, `Bio must be ${PROFILE_LIMITS.BIO_MAX} characters max`)
 		.optional(),
-	avatarUrl: z.string().url('Avatar URL must be a valid URL').optional(),
+	avatarUrl: z.url('Avatar URL must be a valid URL').optional(),
 });
 
 /**
@@ -58,7 +58,7 @@ export const updateProfileSchema = z.object({
  */
 export const searchUsersSchema = z.object({
 	q: z.string().min(1, 'Search query is required').max(100),
-	limit: z.coerce.number().min(1).max(50).optional().default(20),
+	limit: z.coerce.number().min(1).max(50).default(20),
 });
 
 // =====================================================

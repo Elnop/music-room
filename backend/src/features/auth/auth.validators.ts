@@ -5,7 +5,7 @@ import { z } from 'zod';
  */
 
 export const registerSchema = z.object({
-	email: z.string().email('Invalid email address'),
+	email: z.email('Invalid email address'),
 	password: z
 		.string()
 		.min(8, 'Password must be at least 8 characters')
@@ -22,7 +22,7 @@ export const registerSchema = z.object({
 });
 
 export const loginSchema = z.object({
-	email: z.string().email('Invalid email address'),
+	email: z.email('Invalid email address'),
 	password: z.string().min(1, 'Password is required'),
 });
 
@@ -39,7 +39,7 @@ export const facebookLoginSchema = z.object({
 });
 
 export const verifyEmailSchema = z.object({
-	userId: z.string().uuid('Invalid user ID'),
+	userId: z.uuid('Invalid user ID'),
 	code: z
 		.string()
 		.length(6, 'Verification code must be 6 digits')
@@ -47,16 +47,16 @@ export const verifyEmailSchema = z.object({
 });
 
 export const resendVerificationSchema = z.object({
-	userId: z.string().uuid('Invalid user ID'),
-	email: z.string().email('Invalid email address'),
+	userId: z.uuid('Invalid user ID'),
+	email: z.email('Invalid email address'),
 });
 
 export const forgotPasswordSchema = z.object({
-	email: z.string().email('Invalid email address'),
+	email: z.email('Invalid email address'),
 });
 
 export const resetPasswordSchema = z.object({
-	email: z.string().email('Invalid email address'),
+	email: z.email('Invalid email address'),
 	code: z
 		.string()
 		.length(6, 'Reset code must be 6 digits')
