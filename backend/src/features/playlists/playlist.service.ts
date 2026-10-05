@@ -14,7 +14,7 @@ import type {
 	UpdatePlaylistDTO,
 	PlaylistResponse,
 	PlaylistWithTracksResponse,
-	TrackRow,
+	PlaylistUpdate,
 } from '@/features/playlists/playlist.types.js';
 
 /**
@@ -356,7 +356,7 @@ export class PlaylistService {
 			}
 
 			const formattedTracks = playlistTracks.map(pt => ({
-				...formatTrackResponse(pt.tracks as unknown as TrackRow),
+				...formatTrackResponse(pt.tracks),
 				position: pt.position,
 				addedBy: pt.added_by,
 				addedAt: pt.added_at ?? new Date().toISOString(),
@@ -424,7 +424,7 @@ export class PlaylistService {
 			// Only owner can update playlist metadata
 			await checkOwnership(playlistId, userId);
 
-			const updateData: Record<string, unknown> = {};
+			const updateData: PlaylistUpdate = {};
 			if (data.name !== undefined) updateData.name = data.name;
 			if (data.description !== undefined) updateData.description = data.description;
 			if (data.visibility !== undefined) updateData.visibility = data.visibility;

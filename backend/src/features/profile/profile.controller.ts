@@ -10,6 +10,7 @@ import {
 } from '@/features/profile/profile.validators.js';
 import type { AuthenticatedRequest } from '@/shared/types/global.types.js';
 import type { ApiResponse } from '@/shared/types/global.types.js';
+import { routeParam } from '@/shared/utils/route-params.js';
 
 const profileService = new ProfileService();
 const privacyService = new PrivacyService();
@@ -52,7 +53,7 @@ export class ProfileController {
 	async getProfile(req: Request, res: Response, next: NextFunction) {
 		try {
 			const authReq = req as AuthenticatedRequest;
-			const { userId } = req.params;
+			const userId = routeParam(req, 'userId');
 
 			// Use privacy-filtered profile
 			const profile = await privacyService.getFilteredProfile(authReq.user.id, userId);

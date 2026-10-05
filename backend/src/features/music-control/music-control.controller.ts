@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import type { AuthenticatedRequest, ApiResponse } from '@/shared/types/global.types.js';
 import { musicControlService } from '@/features/music-control/music-control.service.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
+import { routeParam } from '@/shared/utils/route-params.js';
 
 // UUID v4 validation regex
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -46,7 +47,7 @@ export class MusicControlController {
 		try {
 			const authReq = req as AuthenticatedRequest;
 			const ownerId = authReq.user.id;
-			const allowedUserId = req.params.userId;
+			const allowedUserId = routeParam(req, 'userId');
 
 			if (!isValidUuid(allowedUserId)) {
 				throw new AppError(400, 'Invalid user ID format', 'INVALID_USER_ID');
@@ -76,7 +77,7 @@ export class MusicControlController {
 		try {
 			const authReq = req as AuthenticatedRequest;
 			const ownerId = authReq.user.id;
-			const allowedUserId = req.params.userId;
+			const allowedUserId = routeParam(req, 'userId');
 
 			if (!isValidUuid(allowedUserId)) {
 				throw new AppError(400, 'Invalid user ID format', 'INVALID_USER_ID');
@@ -106,7 +107,7 @@ export class MusicControlController {
 		try {
 			const authReq = req as AuthenticatedRequest;
 			const myUserId = authReq.user.id;
-			const targetUserId = req.params.userId;
+			const targetUserId = routeParam(req, 'userId');
 
 			if (!isValidUuid(targetUserId)) {
 				throw new AppError(400, 'Invalid user ID format', 'INVALID_USER_ID');

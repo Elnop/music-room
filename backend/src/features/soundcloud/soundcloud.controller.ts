@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { SoundCloudService } from '@/features/soundcloud/soundcloud.service.js';
 import { soundcloudSearchSchema } from '@/features/soundcloud/soundcloud.validators.js';
 import { logger } from '@/shared/utils/logger.js';
+import { routeParam, optionalRouteParam } from '@/shared/utils/route-params.js';
 
 const soundcloudService = new SoundCloudService();
 
@@ -33,7 +34,7 @@ export class SoundCloudController {
 	 */
 	async getTrack(req: Request, res: Response, next: NextFunction) {
 		try {
-			const { urlOrId } = req.params;
+			const urlOrId = routeParam(req, 'urlOrId');
 
 			if (!urlOrId) {
 				return res.status(400).json({
@@ -66,7 +67,7 @@ export class SoundCloudController {
 	async getStreamUrl(req: Request, res: Response, next: NextFunction) {
 		try {
 			// Support both query param (new) and path param (legacy)
-			const rawUrl = (req.query.url as string) || req.params.trackUrl;
+			const rawUrl = (req.query.url as string) || optionalRouteParam(req, 'trackUrl');
 
 			logger.info('[SoundCloud] Stream URL request received', {
 				rawQueryParam: req.query.url,

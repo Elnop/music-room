@@ -8,19 +8,15 @@ vi.mock('@/shared/config/supabase.js', () => {
 	return { supabaseAdmin: { from: () => query } };
 });
 
-const { canViewPlaylist, canEditPlaylist, checkEditPermission } = await import(
-	'@/features/playlists/permissions/playlist.permissions.js'
-);
+const { canViewPlaylist, canEditPlaylist, checkEditPermission } =
+	await import('@/features/playlists/permissions/playlist.permissions.js');
 
 const OWNER = 'owner-id';
 const COLLABORATOR = 'collaborator-id';
 const VIEWER = 'viewer-id';
 const STRANGER = 'stranger-id';
 
-function playlist(
-	visibility: 'public' | 'private',
-	editMode: 'open' | 'restricted'
-): PlaylistRow {
+function playlist(visibility: 'public' | 'private', editMode: 'open' | 'restricted'): PlaylistRow {
 	return {
 		id: 'playlist-id',
 		name: 'Playlist',
@@ -74,9 +70,11 @@ describe('checkEditPermission', () => {
 		single.mockReset();
 	});
 
-	it('resolves when the user can edit', async () => {
+	it('returns the edit mode when the user can edit', async () => {
 		single.mockResolvedValue({ data: playlist('public', 'restricted'), error: null });
-		await expect(checkEditPermission('playlist-id', COLLABORATOR)).resolves.toBeUndefined();
+		await expect(checkEditPermission('playlist-id', COLLABORATOR)).resolves.toEqual({
+			edit_mode: 'restricted',
+		});
 	});
 
 	it('rejects when the user cannot edit', async () => {
