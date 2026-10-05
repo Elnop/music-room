@@ -109,10 +109,9 @@ define display_qr
 	docker logs $(MOBILE_CONTAINER) 2>/dev/null | grep -B 5 -A 50 "▄▄▄▄▄▄▄" | head -70 || \
 	docker logs $(MOBILE_CONTAINER) | tail -60
 	$(call blank_line)
-	$(if $(filter lan,$(1)),\
-		@echo "$(GREEN)🌐 Local IP: $(HOST_IP)$(NC)"; \
-		@echo "$(GREEN)📱 Expo URL: $(EXPO_URL)$(NC)"; \
-		$(call blank_line))
+	$(if $(filter lan,$(1)),@echo "$(GREEN)🌐 Local IP: $(HOST_IP)$(NC)"; \
+		echo "$(GREEN)📱 Expo URL: $(EXPO_URL)$(NC)"; \
+		echo "")
 	$(call print_separator)
 endef
 
