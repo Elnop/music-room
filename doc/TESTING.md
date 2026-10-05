@@ -20,7 +20,7 @@ Subject requirement: IV.8 (tests for each layer). Goal (CAP-3): `make test` runs
 | External services | None: every client is mocked | Local Supabase stack, Redis, real Socket.io server |
 | Secrets | None | None: only local-stack keys |
 | Command | `npm test` | `npm run test:int` |
-| Runs in | `make test`, CI | `make test-int`, CI (services job) |
+| Runs in | `make test`, CI job `test` | `make test-int`, CI job `test-int` |
 
 Unit tests are the default. Write an integration test only for behavior that lives in the database or the wire protocol: RLS policies, constraints, concurrent playlist edits (IV.2.3), socket authentication and rooms.
 
@@ -52,7 +52,7 @@ The backend uses `supabase-js`, which goes through PostgREST and Supabase Auth, 
 - `make test-int` runs `make test-db-up`, then `npm run test:int`. Every run starts from a fresh database.
 - `make test-db-down` stops the stack and drops its data.
 - The stack is named `music-room-test` and listens on ports 554xx (API `http://127.0.0.1:55421`, Postgres `127.0.0.1:55422`), set in `backend/supabase/config.toml`, so it runs next to another local Supabase project on the default 543xx ports.
-- In CI: the same script runs in the integration job (story [1.11], #59).
+- In CI: the `test-int` job of `.github/workflows/ci.yml` runs the same script.
 - Integration test files run one after another (they share the database). Tests create their own users and rows, delete them afterwards, and never depend on data left by another test.
 
 The migrations must build the schema from an empty database: a column added by hand in the dashboard and not committed breaks `make test-int`. The cloud Supabase project is never used by tests.
@@ -91,3 +91,16 @@ npx jest -t "formatDuration"                          # tests whose name matches
 - Route tests go through Supertest with a token from a mocked `authMiddleware` (unit) or a user created in the local stack (integration).
 - A bug fix comes with the test that would have caught it.
 - No test may depend on another test's order or state; reset mocks in `beforeEach`.
+
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every pull request to `develop` and every push to it, with the Node version from `.nvmrc` and `npm ci` (lockfiles are committed):
+
+| Job | Runs | Packages |
+| --- | --- | --- |
+| `lint` | `npm run lint` | backend, mobile |
+| `type-check` | `npm run type-check` | backend, mobile |
+| `test` | `npm test` | backend, mobile |
+| `test-int` | `scripts/test-db.sh up`, then `npm run test:int` | backend |
+
+A failing job marks the pull request red. Lint warnings do not fail it; errors do.
