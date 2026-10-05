@@ -1,0 +1,55 @@
+# Keeps the status labels read by bmad-ticket (GitHub store) in step with the work:
+# a PR to develop moves the issues it closes from `in-progress` to `review`, and a
+# closed issue drops both labels. The board columns follow through the project's
+# built-in workflows (Pull request linked to issue -> Review, Item closed -> Done).
+name: Issue status
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, edited]
+    branches: [develop]
+  issues:
+    types: [closed]
+
+permissions:
+  issues: write
+  pull-requests: read
+
+jobs:
+  pr-opened:
+    if: github.event_name == 'pull_request' && !github.event.pull_request.draft
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    steps:
+      - name: Move closing issues to review
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          issues=$(gh pr view "$PR" --repo "$REPO" --json closingIssuesReferences \
+            -q '.closingIssuesReferences[].number')
+          for n in $issues; do
+            state=$(gh issue view "$n" --repo "$REPO" --json state -q .state)
+            [ "$state" = "OPEN" ] || continue
+            gh issue edit "$n" --repo "$REPO" --add-label review --remove-label in-progress
+            echo "#$n -> review"
+          done
+
+  issue-closed:
+    if: github.event_name == 'issues'
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    steps:
+      - name: Drop status labels
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          ISSUE: ${{ github.event.issue.number }}
+          LABELS: ${{ join(github.event.issue.labels.*.name, ',') }}
+        run: |
+          for label in in-progress review; do
+            case ",$LABELS," in
+              *",$label,"*) gh issue edit "$ISSUE" --repo "$REPO" --remove-label "$label" ;;
+            esac
+          done

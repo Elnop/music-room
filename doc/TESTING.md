@@ -104,3 +104,5 @@ npx jest -t "formatDuration"                          # tests whose name matches
 | `test-int` | `scripts/test-db.sh up`, then `npm run test:int` | backend |
 
 A failing job marks the pull request red. Lint warnings do not fail it; errors do.
+
+`lint`, `type-check` and `test` run on `ubuntu-slim` (1 vCPU container, 15-minute cap, no Docker); `test-int` needs Docker for the Supabase stack and runs on `ubuntu-24.04`. Actions are pinned to commit SHAs and bumped by Dependabot (`.github/dependabot.yml`).
