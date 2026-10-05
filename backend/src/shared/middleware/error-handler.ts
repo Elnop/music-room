@@ -36,7 +36,7 @@ export function errorHandler(err: Error, req: Request, res: Response, _next: Nex
 			error: {
 				message: 'Validation error',
 				code: 'VALIDATION_ERROR',
-				details: err.errors.map(e => ({
+				details: err.issues.map(e => ({
 					path: e.path.join('.'),
 					message: e.message,
 				})),

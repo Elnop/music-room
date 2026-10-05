@@ -4,7 +4,7 @@ import { z } from 'zod';
 config();
 
 const envSchema = z.object({
-	SUPABASE_URL: z.string().url('Invalid Supabase URL'),
+	SUPABASE_URL: z.url('Invalid Supabase URL'),
 	SUPABASE_ANON_KEY: z.string().min(1, 'Supabase anon key is required'),
 	SUPABASE_SERVICE_KEY: z.string().min(1, 'Supabase service key is required'),
 	PORT: z.string().default('3000').transform(Number),
@@ -45,7 +45,7 @@ const envSchema = z.object({
 	RATE_LIMIT_WHITELIST_IPS: z.string().default(''),
 
 	// Gmail SMTP Configuration
-	GMAIL_USER: z.string().email('Invalid Gmail user address'),
+	GMAIL_USER: z.email('Invalid Gmail user address'),
 	GMAIL_APP_PASSWORD: z.string().min(1, 'Gmail app password is required'),
 
 	// Email Verification Configuration
