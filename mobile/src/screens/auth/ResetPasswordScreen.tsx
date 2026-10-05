@@ -10,7 +10,7 @@ import {
 	TextInput,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AuthStackParamList } from '@navigation/AuthNavigator';
+import type { AuthStackParamList } from '@/navigation/AuthNavigator';
 import { useAuthStore } from '@store/authStore';
 import { Input } from '@components/common/Input';
 import { Button } from '@components/common/Button';
@@ -185,7 +185,9 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
 					{code.map((digit, index) => (
 						<TextInput
 							key={index}
-							ref={ref => (inputRefs.current[index] = ref)}
+							ref={ref => {
+								inputRefs.current[index] = ref;
+							}}
 							style={[
 								styles.codeInput,
 								{
@@ -217,7 +219,7 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
 						placeholder="Enter new password"
 						secureTextEntry
 						autoCapitalize="none"
-						error={passwordError}
+						error={passwordError ?? undefined}
 						editable={!isLoading}
 					/>
 
