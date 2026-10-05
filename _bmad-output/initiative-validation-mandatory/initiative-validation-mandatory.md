@@ -48,3 +48,4 @@ Un epic par section du sujet, pour que chaque personne porte et présente sa par
 - Decision: priorités P0/P1/P2 de `priorities.md` (2026-10-05).
 - Assumption: `develop` est publié sur `main` au moins une fois avant la soutenance.
 - Open question: machine de référence pour IV.7 ; tranchée dans epic-montee-en-charge.
+- Decision: les epics avancent en parallèle, chacun porté par sa personne ; les dépendances sont au niveau des entrées. Ordre volontairement en conflit : 2.6 (modèle de menaces) attend 3.1, 4.5 et 5.5 pour décrire le système final, et 5.6 attend 6.3 (accès unique à l'URL du backend) (2026-10-05).

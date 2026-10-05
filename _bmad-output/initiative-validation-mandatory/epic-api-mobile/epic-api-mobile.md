@@ -41,3 +41,7 @@ Documentation d'API des endpoints existants non documentés, configuration du ba
 
 Handoff: les entrées sur `auth.openapi.ts` attendent celles de epic-comptes-auth ; celle sur `playlist.openapi.ts` attend celles de epic-editeur-playlist ; l'adresse du backend dans l'app (`socketStore`, `api.ts`) attend l'entrée mobile socket de epic-securite.
 - Waits on epic-qualite-ci because: le tri des branches, la stratégie de test et le harness.
+- Decision: tracer bullet 3 : changer l'adresse du backend dans l'app redirige API et socket sans rebuild (2026-10-05).
+- Decision: chaque epic documente dans Swagger les endpoints qu'il modifie ; cet epic documente les 8 manquants et ajoute le test qui garde Swagger complet (2026-10-05).
+- Decision: pas de story « Refactor sweep » (choix de l'utilisateur, 2026-10-05).
+- Assumption: /health est documenté dans swagger.config.ts bien qu'hors de /api.

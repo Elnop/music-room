@@ -43,3 +43,8 @@ Socle qualité et outillage : il ne teste pas les features (chaque epic de featu
 Decision: le tri des branches passe avant toute autre story, `aggressive-updates` réécrivant 42 fichiers que les autres epics touchent (2026-10-05).
 Decision: la story Node aligne aussi les Dockerfiles et pine la CI (choix de l'utilisateur, 2026-10-05).
 Open question: Node 20 ou 22 ; tranché par une story hitl de cet epic.
+- Decision: pas de tracer bullet classique pour cet epic de socle ; le chemin le plus fin est 7 → 9 → 11 : un test backend lancé par `make test` puis par la CI (2026-10-05).
+- Decision: les trois branches non mergées sont triées en premier, une story chacune, car aggressive-updates réécrit des fichiers que tous les epics touchent (2026-10-05).
+- Decision: les tests d'intégration tournent sur un Postgres local et en CI (story 10), notamment pour la concurrence des playlists (choix de l'utilisateur, 2026-10-05).
+- Decision: pas de story « Refactor sweep » dans les epics ; chacun nettoie dans sa story (choix de l'utilisateur, 2026-10-05).
+- Open question: passer mobile/Dockerfile du tag Chainguard latest-dev à un tag versionné ; tranché dans la story 5.

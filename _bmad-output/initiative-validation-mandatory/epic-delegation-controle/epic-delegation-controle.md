@@ -40,3 +40,7 @@ Feature music-control (`backend/src/features/music-control/`, partie contrôle d
 
 Assumption: la licence s'applique aux appareils de celui qui accorde, identifiés par le deviceId déjà persisté par l'app (spec, Assumptions).
 - Waits on epic-securite because: le contrat d'authentification du socket et l'identité issue du token.
+- Decision: tracer bullet 1 → 3 → 5 : un appareil est enregistré à la connexion et une commande vers lui est autorisée ou refusée selon sa licence (2026-10-05).
+- Decision: l'interrupteur global follows.can_control_music est gardé comme raccourci « tous mes appareils », en plus des licences par appareil (choix de l'utilisateur, 2026-10-05).
+- Decision: pas de story « Refactor sweep » (choix de l'utilisateur, 2026-10-05).
+- Handoff: la migration 015 est à cet epic, la 016 à epic-editeur-playlist.

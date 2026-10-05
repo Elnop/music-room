@@ -39,6 +39,11 @@ Authentification et autorisation du socket (`backend/src/realtime/index.ts`, `mo
 
 ## Notes
 
-Handoff: la poignée de main socket appelle `verifyToken` de `auth.service.ts` ; la révocation (denylist Redis) y est ajoutée par epic-comptes-auth, donc le socket hérite de la révocation sans changement ici.
+Handoff: la poignée de main socket appelle `verifyToken` de `backend/src/features/auth/services/session.service.ts` ; la révocation (denylist Redis) y est ajoutée par epic-comptes-auth, donc le socket hérite de la révocation sans changement ici.
 Decision: la story « modèle de menaces » attend les entrées des epics comptes, délégation et playlist, pour décrire le système final (2026-10-05).
 - Waits on epic-qualite-ci because: le tri des branches, la stratégie de test et le harness.
+- Decision: tracer bullet 1 → 2 : l'app se connecte au socket avec son token et l'identité vient du token (2026-10-05).
+- Decision: l'event auth:register est supprimé ; l'appareil est envoyé dans la poignée de main (choix de l'utilisateur, 2026-10-05).
+- Decision: pas de story « Refactor sweep » (choix de l'utilisateur, 2026-10-05).
+- Handoff: la poignée de main appelle verifyToken de `backend/src/features/auth/services/session.service.ts` ; la denylist de révocation y est ajoutée par 3.1, le socket en hérite sans changement ici.
+- Handoff: le logger de 5 lit socket.data ; les nouveaux events des autres epics passent par lui.

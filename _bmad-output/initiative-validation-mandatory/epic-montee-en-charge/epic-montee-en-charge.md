@@ -43,3 +43,6 @@ Open question: machine de référence pour IV.7 ; tranchée par une story hitl d
 - Waits on epic-comptes-auth because: la révocation (lookup Redis par requête).
 - Waits on epic-delegation-controle because: la délégation par appareil.
 - Waits on epic-editeur-playlist because: l'édition concurrente.
+- Decision: ordre 1 → 2 → 3 → 4 ; tracer bullet : le premier scénario de 2 (login puis lecture de playlist) via `make perf-test` (2026-10-05).
+- Decision: pas de story « Refactor sweep », l'epic n'ajoute que des scripts et de la doc (choix de l'utilisateur, 2026-10-05).
+- Assumption: le rapport précise que Track Vote n'est pas implémenté, donc pas mesuré ; seules l'API, la délégation et l'éditeur le sont.

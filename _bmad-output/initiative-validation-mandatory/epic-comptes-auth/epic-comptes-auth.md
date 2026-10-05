@@ -39,5 +39,9 @@ Feature auth (`backend/src/features/auth/`, écrans `mobile/src/screens/auth/`, 
 
 ## Notes
 
-Handoff: la denylist Redis de révocation vit dans `verifyToken` de `auth.service.ts` ; epic-securite en hérite.
+Handoff: la denylist Redis de révocation vit dans `verifyToken` de `backend/src/features/auth/services/session.service.ts` ; epic-securite en hérite.
 - Waits on epic-qualite-ci because: le tri des branches (dont la branche 28 sur la liaison), la stratégie de test et le harness.
+- Decision: tracer bullet 1 → 2 : un logout dans l'app révoque la session côté serveur et coupe le socket (2026-10-05).
+- Decision: pas de story « Refactor sweep » (choix de l'utilisateur, 2026-10-05).
+- Handoff: la denylist Redis de révocation vit dans verifyToken de `backend/src/features/auth/services/session.service.ts` ; epic-securite en hérite.
+- Note: la branche 28 sur la liaison ne contient qu'un commit Makefile ; elle est triée en 1.2.

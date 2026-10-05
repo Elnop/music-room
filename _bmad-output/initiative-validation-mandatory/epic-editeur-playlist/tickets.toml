@@ -1,0 +1,86 @@
+# epic-editeur-playlist
+# Ordre des tables = ordre de build. `area` = label GitHub area: <valeur>.
+
+[[entry]]
+id = 1
+type = "spike"
+title = "Choisir la stratégie de concurrence des tracks"
+description = "Compare version optimiste avec refus 409, opération unitaire « déplacer une track » et verrou côté base, et retient celle qui satisfait CAP-5 avec Supabase."
+verify = "Une ligne Decision dans l'epic nomme la stratégie, le format de version et le comportement en conflit."
+covers = ["CAP-5"]
+after = []
+hitl = true
+risk = "high"
+area = "backend"
+
+[[entry]]
+id = 2
+type = "story"
+title = "Contrat d'API d'édition concurrente"
+description = "Définit dans playlist.openapi.ts les requêtes add, remove et reorder avec la version attendue, la réponse 409 et le payload playlist:updated (version et ordre), selon 1, et les types dans playlist.types.ts et mobile/src/types/playlist.types.ts."
+verify = "Les endpoints et le payload apparaissent dans Swagger et dans les deux fichiers de types."
+covers = ["CAP-5"]
+after = [1]
+hitl = false
+risk = "medium"
+area = "backend"
+
+[[entry]]
+id = 3
+type = "story"
+title = "Opérations atomiques sur les tracks (migration)"
+description = "Ajoute la migration 016 (après la 015 de 4.1) selon la stratégie retenue en 1, pour que ajout, retrait et réordonnancement se fassent en une transaction ; régénère les types."
+verify = "Migration appliquée ; un test d'intégration sur le Postgres de 1.10 lance deux opérations concurrentes sans doublon ni trou de position."
+covers = ["CAP-5", "CAP-3"]
+after = [1, "4.1", "1.10"]
+hitl = true
+risk = "high"
+area = "backend"
+
+[[entry]]
+id = 4
+type = "story"
+title = "Brancher add, remove et reorder sur les opérations atomiques (backend)"
+description = "Le service playlist-track utilise 3, vérifie la version attendue du contrat de 2, renvoie 409 en conflit et conserve added_by."
+verify = "Tests d'intégration concurrents : reorder, ajout et retrait simultanés laissent chaque track une fois et added_by intact ; version périmée renvoie 409."
+covers = ["CAP-5", "CAP-3"]
+after = [2, 3]
+hitl = false
+risk = "high"
+area = "backend"
+
+[[entry]]
+id = 5
+type = "story"
+title = "Diffuser la nouvelle version aux clients (backend)"
+description = "notifyPlaylistUpdate envoie version et ordre selon le contrat de 2 après chaque opération de 4."
+verify = "Test : deux clients de la room reçoivent la même version et le même ordre après une modification."
+covers = ["CAP-5", "CAP-3"]
+after = [4, "4.5", "2.5"]
+hitl = false
+risk = "medium"
+area = "backend"
+
+[[entry]]
+id = 6
+type = "story"
+title = "Gérer les conflits et converger côté mobile"
+description = "playlistStore envoie la version attendue, sur 409 recharge et prévient l'utilisateur, applique l'ordre de playlist:updated ; ses tests couvrent tout le store (chargement, CRUD, collaborateurs, conflits)."
+verify = "Tests de playlistStore : 409 déclenche rechargement et message ; playlist:updated remplace l'ordre local ; CRUD et collaborateurs couverts."
+covers = ["CAP-5", "CAP-3"]
+after = [2, "1.8", "6.3"]
+hitl = false
+risk = "medium"
+area = "mobile"
+
+[[entry]]
+id = 7
+type = "story"
+title = "Tests du CRUD playlist et des permissions (backend)"
+description = "Étend le fichier de test de 1.7 : création, lecture, mise à jour, suppression, publiques, collaborateurs, viewers, canViewPlaylist et canEditPlaylist dans les quatre combinaisons visibilité × edit_mode."
+verify = "Les tests passent et échouent si un viewer peut éditer en mode restricted."
+covers = ["CAP-3"]
+after = ["1.7"]
+hitl = false
+risk = "low"
+area = "backend"

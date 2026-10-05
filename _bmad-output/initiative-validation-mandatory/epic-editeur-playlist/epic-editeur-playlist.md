@@ -42,3 +42,6 @@ Feature playlists (`backend/src/features/playlists/`, notification playlist de `
 Decision: une éventuelle migration de cet epic passe après celle de epic-delegation-controle (numérotation, 2026-10-05).
 Handoff: `realtime/index.ts` est aussi modifié par epic-delegation-controle ; les entrées qui y touchent attendent l'entrée correspondante de cet epic-là.
 - Waits on epic-securite because: le contrôle d'accès aux rooms de playlist sur le socket.
+- Decision: le spike 1 passe d'abord car la stratégie de concurrence décide du contrat, de la migration et du service ; tracer bullet ensuite 2 → 3 → 4 → 5 → 6 sur le seul réordonnancement (2026-10-05).
+- Decision: les tests de concurrence tournent sur le Postgres d'intégration de 1.10, en local et en CI (choix de l'utilisateur, 2026-10-05).
+- Decision: pas de story « Refactor sweep » (choix de l'utilisateur, 2026-10-05).
