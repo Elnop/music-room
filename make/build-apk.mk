@@ -17,7 +17,8 @@
 #   2. Start backend + redis in tunnel mode (no mobile container)
 #   3. Wait for ngrok tunnel to initialize
 #   4. Extract tunnel URL from backend container
-#   5. Update mobile/.env with tunnel URL (EXPO_PUBLIC_API_URL, EXPO_PUBLIC_WS_URL)
+#   5. Pass the tunnel URL as EXPO_PUBLIC_API_URL / EXPO_PUBLIC_WS_URL to the build
+#      (mobile/.env is left untouched)
 #   6. Build APK with Gradle (expo prebuild + assembleRelease)
 #   7. Display APK location and installation instructions
 # ==============================================================================
@@ -85,12 +86,11 @@ dev-tunnel-build-apk: dev-tunnel-build-apk-check-prereqs ## Build APK with ngrok
 	fi; \
 	echo "$(GREEN)$(ICON_SUCCESS) Tunnel URL: $$TUNNEL_URL$(NC)"; \
 	echo ""; \
-	echo "$(YELLOW)$(ICON_ARROW) Updating mobile/.env with tunnel URL...$(NC)"; \
-	$(MAKE) dev-tunnel-build-apk-update-env TUNNEL_URL=$$TUNNEL_URL; \
-	echo ""; \
 	echo "$(YELLOW)$(ICON_ARROW) Building APK...$(NC)"; \
 	echo "$(YELLOW)$(ICON_WARNING) ⏳ This takes ~5-10 minutes$(NC)"; \
 	echo ""; \
+	EXPO_PUBLIC_API_URL=$$TUNNEL_URL \
+	EXPO_PUBLIC_WS_URL=$$(echo $$TUNNEL_URL | sed 's|^http|ws|') \
 	$(MAKE) dev-tunnel-build-apk-build; \
 	echo ""; \
 	echo "$(BLUE)=== ✓ Build Complete ===$(NC)"; \

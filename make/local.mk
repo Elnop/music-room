@@ -5,6 +5,10 @@
 
 .PHONY: dev-local expo-android expo-clear check-devices start-emulator kill-emulator list-emulators open-emulator
 
+# The app calls the local backend, whatever mobile/.env says (see DEV_API_URL).
+dev-local expo-android expo-clear: export EXPO_PUBLIC_API_URL := $(DEV_API_URL)
+dev-local expo-android expo-clear: export EXPO_PUBLIC_WS_URL := $(DEV_WS_URL)
+
 dev-local: .ensure-backend-deps .ensure-mobile-deps ## Start development locally (no Docker) - for Android Studio emulator
 	$(call print_header,Starting Local Development Mode)
 	$(call print_success,Dependencies OK)

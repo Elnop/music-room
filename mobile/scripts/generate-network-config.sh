@@ -18,13 +18,16 @@ if [ ! -f "$MANIFEST_PATH" ]; then
     exit 1
 fi
 
-# Extract API URL from .env
-if [ ! -f "$ENV_FILE" ]; then
-    echo "❌ .env file not found"
-    exit 1
+# API URL: the environment wins (make dev-tunnel-build-apk passes the tunnel
+# URL that way), then .env
+API_URL="${EXPO_PUBLIC_API_URL:-}"
+if [ -z "$API_URL" ]; then
+    if [ ! -f "$ENV_FILE" ]; then
+        echo "❌ .env file not found"
+        exit 1
+    fi
+    API_URL=$(grep "^EXPO_PUBLIC_API_URL=" "$ENV_FILE" | cut -d'=' -f2- | tr -d ' ')
 fi
-
-API_URL=$(grep "^EXPO_PUBLIC_API_URL=" "$ENV_FILE" | cut -d'=' -f2- | tr -d ' ')
 
 if [ -z "$API_URL" ]; then
     echo "❌ EXPO_PUBLIC_API_URL not found in .env"
