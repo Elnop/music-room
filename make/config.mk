@@ -112,6 +112,12 @@ HOST_IP := $(shell \
 )
 export HOST_IP
 
+# Backend the app calls in dev-docker and dev-local. These override the
+# EXPO_PUBLIC_API_URL / EXPO_PUBLIC_WS_URL lines of mobile/.env, which may hold
+# an old tunnel URL; dev-tunnel sets its own from the live ngrok tunnel.
+DEV_API_URL := http://$(HOST_IP):$(BACKEND_PORT)
+DEV_WS_URL := ws://$(HOST_IP):$(BACKEND_PORT)
+
 # Expo URL
 EXPO_URL := exp://$(HOST_IP):$(METRO_PORT)
 

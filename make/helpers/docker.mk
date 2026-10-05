@@ -192,7 +192,8 @@ define start_mobile
 			--env-file $(shell pwd)/$(MOBILE_ENV) \
 			-e EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0 \
 			-e REACT_NATIVE_PACKAGER_HOSTNAME=$(HOST_IP) \
-			-e API_URL=http://$(BACKEND_CONTAINER):$(BACKEND_PORT) \
+			-e EXPO_PUBLIC_API_URL=$(DEV_API_URL) \
+			-e EXPO_PUBLIC_WS_URL=$(DEV_WS_URL) \
 			--restart unless-stopped \
 			-it \
 			music-room-mobile:latest || { \
