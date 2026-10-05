@@ -5,4 +5,5 @@ persistent_facts = [
   "Each issue takes the matching existing area label: `area: backend`, `area: mobile`, `area: fullstack` or `area: devops`.",
   "Work branches are named `<issue-number>-<slug>` from `develop`, and PRs target `develop`, never `main`.",
   "Every issue is added to the GitHub Project 'Music Room – Validation' once it exists.",
+  "Starting a ticket requires its assignee: assign the person who works it before moving it to in-progress, and refuse to start a ticket assigned to someone else. Every state change (in-progress, review, done, dropped) updates both the status label and the board card.",
 ]
