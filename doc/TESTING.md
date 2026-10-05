@@ -28,7 +28,7 @@ Unit tests are the default. Write an integration test only for behavior that liv
 
 `src/shared/config/env.ts` validates `process.env` at import and calls `process.exit(1)` when a variable is missing, so importing almost any module needs a valid environment.
 
-- Unit tests: a Vitest setup file (`backend/test/setup-env.ts`) sets placeholder values for every required variable before any import. No real URL or key is ever used.
+- Unit tests: a Vitest setup file (`backend/src/test/setup-env.ts`) sets placeholder values for every required variable before any import. No real URL or key is ever used.
 - Integration tests: `backend/.env.test` (git-ignored, template in `backend/.env.test.example`) points at the local stack. The keys printed by `supabase start` are local-only demo keys.
 
 ## External dependencies
