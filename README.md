@@ -123,7 +123,7 @@ cd mobile && npm run format
 
 - Work is tracked in GitHub Issues and on the [Music Room – Validation board](https://github.com/users/Elnop/projects/1): one epic per subject section, small stories labelled `area: backend` / `area: mobile`.
 - **Assign yourself** on an issue before starting it, and never take an issue assigned to someone else.
-- **Keep its state current**: label `in-progress` when you start, `review` when the PR is open (with `Closes #<n>`), closed when merged; move the board card to match.
+- **Keep its state current**: label `in-progress` when you start, `review` when the PR is open (with `Closes #<n>`), closed when merged; move the board card to match (`Todo` → `In Progress` → `Review` → `Done`).
 - Branch `<issue-number>-<slug>` from `develop`, PR into `develop`. `main` is the deploy branch.
 
 ## Troubleshooting

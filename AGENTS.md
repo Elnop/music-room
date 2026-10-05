@@ -9,7 +9,7 @@
 
 - `main` is the deploy branch: never commit, push or open a PR to `main`. Branch from `develop`.
 - One branch per GitHub issue, named `<issue-number>-<slug>`, PR into `develop`. Commits follow Conventional Commits.
-- Before starting an issue, assign yourself on it; never work an issue assigned to someone else. Keep its state current: label `in-progress` when work starts, `review` when the PR is open (with `Closes #<n>` in the PR), closed when merged into `develop`; move the card on the "Music Room – Validation" board to match (`In Progress` for in-progress and review, `Done` when closed).
+- Before starting an issue, assign yourself on it; never work an issue assigned to someone else. Keep its state current: label `in-progress` when work starts, `review` when the PR is open (with `Closes #<n>` in the PR), closed when merged into `develop`; move the card on the "Music Room – Validation" board to match (`In Progress`, `Review`, `Done`) and set its `Area` field.
 - Never implement Music Track Vote (IV.2.1); the project delivers Playlist Editor and Music Control Delegation.
 - Never commit credentials or API keys; they go in `backend/.env` and `mobile/.env`, with placeholders in `.env.example`.
 - Never commit installed dependencies; everything installs from manifests via `make install`.
