@@ -7,9 +7,11 @@
 	"scripts": {
 		"dev": "tsx watch src/server.ts",
 		"dev:tunnel": "sh start-with-tunnel.sh",
-		"build": "tsc && tsc-alias",
+		"build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
 		"start": "node dist/server.js",
 		"type-check": "tsc --noEmit",
+		"test": "vitest run",
+		"test:watch": "vitest",
 		"format": "prettier --write \"**/*.{ts,json,md}\"",
 		"lint": "eslint . --ext .ts",
 		"lint:fix": "eslint . --ext .ts --fix",
@@ -61,7 +63,8 @@
 		"tsc-alias": "^1.8.10",
 		"tsx": "^4.19.2",
 		"typescript": "^5.9.3",
-		"typescript-eslint": "^8.50.1"
+		"typescript-eslint": "^8.50.1",
+		"vitest": "^4.1.11"
 	},
 	"overrides": {
 		"node-domexception": "npm:domexception@^4.0.0",
