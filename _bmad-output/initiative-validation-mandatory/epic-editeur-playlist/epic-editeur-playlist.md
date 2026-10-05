@@ -1,4 +1,6 @@
 ---
+tracker_id: "85"
+remote: "https://github.com/Elnop/music-room/issues/85"
 type: epic
 title: "Édition de playlist concurrente sûre (IV.2.3)"
 parent: initiative-validation-mandatory

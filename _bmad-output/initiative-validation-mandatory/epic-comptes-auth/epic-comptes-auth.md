@@ -1,4 +1,6 @@
 ---
+tracker_id: "68"
+remote: "https://github.com/Elnop/music-room/issues/68"
 type: epic
 title: "Comptes et authentification (IV.1)"
 parent: initiative-validation-mandatory

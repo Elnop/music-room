@@ -1,4 +1,6 @@
 ---
+tracker_id: "48"
+remote: "https://github.com/Elnop/music-room/issues/48"
 type: epic
 title: "Qualité et intégration continue (IV.8)"
 parent: initiative-validation-mandatory

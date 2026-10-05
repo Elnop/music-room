@@ -1,4 +1,6 @@
 ---
+tracker_id: "77"
+remote: "https://github.com/Elnop/music-room/issues/77"
 type: epic
 title: "Délégation du contrôle musical par appareil (IV.2.2)"
 parent: initiative-validation-mandatory

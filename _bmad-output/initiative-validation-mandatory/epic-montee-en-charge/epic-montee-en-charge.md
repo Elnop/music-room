@@ -1,4 +1,6 @@
 ---
+tracker_id: "102"
+remote: "https://github.com/Elnop/music-room/issues/102"
 type: epic
 title: "Capacité de charge mesurée (IV.7)"
 parent: initiative-validation-mandatory
