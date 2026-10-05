@@ -3,12 +3,24 @@
 # ==============================================================================
 # Commands for testing, linting, and formatting code
 
-.PHONY: test lint format lint-fix
+.PHONY: test test-int test-db-up test-db-down lint format lint-fix
 
 test: ## Run all tests (backend)
 	$(call print_info,Running backend tests...)
 	$(call npm_safe,backend,test,No tests configured)
 	$(call print_success,All tests completed)
+
+test-int: test-db-up ## Run backend integration tests on the local Supabase stack
+	$(call print_arrow,Running backend integration tests...)
+	$(call npm_backend,run test:int)
+	$(call print_success,Integration tests passed)
+
+test-db-up: ## Start the local Supabase stack for integration tests (fresh database)
+	$(call print_arrow,Starting local Supabase stack and applying migrations...)
+	@cd $(BACKEND_DIR) && sh scripts/test-db.sh up
+
+test-db-down: ## Stop the local Supabase stack used by integration tests
+	@cd $(BACKEND_DIR) && sh scripts/test-db.sh down
 
 lint: ## Run linters on all code
 	$(call print_header,Running Linters)

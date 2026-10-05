@@ -29,14 +29,14 @@ Unit tests are the default. Write an integration test only for behavior that liv
 `src/shared/config/env.ts` validates `process.env` at import and calls `process.exit(1)` when a variable is missing, so importing almost any module needs a valid environment.
 
 - Unit tests: a Vitest setup file (`backend/src/test/setup-env.ts`) sets placeholder values for every required variable before any import. No real URL or key is ever used.
-- Integration tests: `backend/.env.test` (git-ignored, template in `backend/.env.test.example`) points at the local stack. The keys printed by `supabase start` are local-only demo keys.
+- Integration tests: `backend/.env.test` (git-ignored) is written by `scripts/test-db.sh up` with the local stack's URL and keys, which are local-only demo keys. `src/test/setup-int-env.ts` loads it before any import and refuses to run without it.
 
 ## External dependencies
 
 | Dependency | Unit tests | Integration tests |
 | --- | --- | --- |
 | Supabase (Postgres, PostgREST, Auth) via `@/shared/config/supabase.js` | `vi.mock` the module; the test sets what `supabaseAdmin.from(...)` returns. Pure functions such as `canViewPlaylist` need no mock. | Local Supabase stack (see below), with `backend/migrations` applied. The real `supabase-js` client talks to it unchanged. |
-| Redis via `@/shared/config/redis.js` | `vi.mock` the module. The client is created with `lazyConnect`, so importing it does not connect, but nothing may call it unmocked. | Real Redis (container). Rate limiting has no in-memory fallback and `rate-limit-redis` relies on Lua scripts, so it is never simulated. |
+| Redis via `@/shared/config/redis.js` | `vi.mock` the module. The client is created with `lazyConnect`, so importing it does not connect, but nothing may call it unmocked. | Real Redis (container), added to `make test-int` with the first integration test that needs it. Rate limiting has no in-memory fallback and `rate-limit-redis` relies on Lua scripts, so it is never simulated. |
 | Socket.io (`src/realtime/index.ts`) | Mock the emitter (`io.to(...).emit`) and assert the event name and payload. Read event names from the source; never retype them. | Start the HTTP + Socket.io server on port `0` (random) and connect with `socket.io-client`. |
 | SoundCloud (`soundcloud.ts`) | Always mocked. Tests never call SoundCloud: it is rate-limited and its stream URLs expire. | Mocked as well. |
 | Mail (`features/mail/mail.service.ts`) | Mock the service and assert the call (recipient, template). | Mocked as well; no email is ever sent. |
@@ -48,9 +48,14 @@ Mobile tests never reach the network. `mobile/src/services/api.ts`, the socket s
 
 The backend uses `supabase-js`, which goes through PostgREST and Supabase Auth, and the migrations rely on `auth.uid()` and `auth.users`. A plain Postgres cannot run them, so integration tests run against the local Supabase stack from the Supabase CLI, already a backend dev dependency (`supabase`).
 
-- Locally: `supabase start` (Docker) starts Postgres, PostgREST and Auth; `backend/migrations/*.sql` are then applied in file order. Story [1.10] (#58) wires this behind a make target and documents the exact commands here.
-- In CI: the same CLI runs in the integration job (story [1.11], #59).
-- Tests create their own users and rows and never depend on data left by another test.
+- `make test-db-up` (`backend/scripts/test-db.sh up`) starts the stack in Docker with only Postgres, PostgREST, Auth and Kong, resets the database, applies `backend/migrations/*.sql` in file order and writes `backend/.env.test`. It takes about 20 s once the images are pulled.
+- `make test-int` runs `make test-db-up`, then `npm run test:int`. Every run starts from a fresh database.
+- `make test-db-down` stops the stack and drops its data.
+- The stack is named `music-room-test` and listens on ports 554xx (API `http://127.0.0.1:55421`, Postgres `127.0.0.1:55422`), set in `backend/supabase/config.toml`, so it runs next to another local Supabase project on the default 543xx ports.
+- In CI: the same script runs in the integration job (story [1.11], #59).
+- Integration test files run one after another (they share the database). Tests create their own users and rows, delete them afterwards, and never depend on data left by another test.
+
+The migrations must build the schema from an empty database: a column added by hand in the dashboard and not committed breaks `make test-int`. The cloud Supabase project is never used by tests.
 
 The cloud Supabase project is never used by tests.
 
@@ -60,7 +65,7 @@ From the repository root:
 
 ```bash
 make test        # backend unit tests + mobile tests (no services needed)
-make test-int    # backend integration tests (local Supabase stack + Redis)
+make test-int    # backend integration tests (local Supabase stack)
 ```
 
 From a package:
@@ -78,7 +83,6 @@ npx jest src/utils/formatters.test.ts                 # one file
 npx jest -t "formatDuration"                          # tests whose name matches
 ```
 
-`make test` and `make test-int` are wired by stories [1.9] (#57) and [1.10] (#58); until then use the package commands.
 
 ## Writing a test
 
