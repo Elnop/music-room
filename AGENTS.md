@@ -27,7 +27,7 @@
 
 - The root `make` is the entry point: `make dev-docker` by default, `make dev-local` for the Android Studio emulator, `make dev-tunnel` when the phone is on another network.
 - `make test` runs the backend (Vitest) and mobile (jest-expo) unit tests and exits non-zero on any failure; `npm test` runs one side. Strategy, mocks and single-test commands are in `doc/TESTING.md`. Also verify with `npm run type-check` and `npm run lint` in both `backend/` and `mobile/`, plus a call through Swagger UI for endpoints. The CI (`.github/workflows/ci.yml`) runs lint, type-check, `npm test` and the integration tests on every PR to `develop`; keep it green.
-- The Node version is not settled: `backend/Dockerfile` uses Node 20. Do not change it without a ticket.
+- Node 22 everywhere: `.nvmrc`, `backend/Dockerfile`, `mobile/Dockerfile`, `mobile/Dockerfile.android-build` and the CI. Change them together, with a ticket.
 - Google and Facebook sign-in need a development build; they fail in Expo Go.
 
 ## Conventions that differ from defaults
