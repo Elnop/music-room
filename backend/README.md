@@ -9,18 +9,24 @@ Ce projet utilise une **architecture feature-first** (colocation par feature) :
 ```
 backend/
 ├── src/
-│   ├── features/           # Features organisées par domaine métier
-│   │   ├── auth/          # Authentication feature
-│   │   ├── friends/       # Friends system (à venir)
-│   │   ├── rooms/         # Music rooms (à venir)
-│   │   └── ...
-│   ├── shared/            # Code partagé entre features
-│   │   ├── config/        # Configuration (Supabase, env, etc.)
-│   │   ├── types/         # Types TypeScript globaux
-│   │   ├── utils/         # Utilitaires (logger, etc.)
-│   │   └── middleware/    # Middleware Express globaux
-│   └── server.ts          # Point d'entrée
-└── migrations/            # Migrations SQL Supabase
+│   ├── features/
+│   │   ├── auth/           # Inscription, login, refresh, OAuth Google/Facebook, vérif email, reset password
+│   │   ├── friends/        # Follow / unfollow, statut, stats
+│   │   ├── mail/           # Emails transactionnels (Gmail SMTP, nodemailer)
+│   │   ├── music-control/  # Délégation du contrôle de lecture à des amis
+│   │   ├── playlists/      # Playlists, tracks, collaborateurs, viewers
+│   │   ├── profile/        # Profil, confidentialité, préférences musicales
+│   │   └── soundcloud/     # Recherche, détails de track, URLs de stream
+│   ├── realtime/
+│   │   └── index.ts        # Serveur Socket.io (playlists, écoute, contrôle)
+│   ├── shared/
+│   │   ├── config/         # env, Supabase, Redis, Swagger, rate limits, montage des routes (routes.ts)
+│   │   ├── middleware/     # error handler, action logger (HTTP + socket)
+│   │   ├── services/       # rate limiter, anti-bruteforce (Redis)
+│   │   ├── types/          # Types globaux + supabase.generated.ts (généré : make generate-types)
+│   │   └── utils/          # logger, database.helpers.ts
+│   └── server.ts           # Point d'entrée Express + Socket.io
+└── migrations/             # Migrations SQL, appliquées à la main dans le dashboard Supabase
 ```
 
 ## 🚀 Quick Start
@@ -335,36 +341,77 @@ curl http://localhost:3000/api/auth/me \
 
 ## 🛠️ Stack Technique
 
-- **Runtime**: Node.js 18+
-- **Framework**: Express.js
-- **Language**: TypeScript
-- **Database**: PostgreSQL (Supabase)
-- **Auth**: Supabase Auth
+- **Runtime**: Node.js 20 (`Dockerfile`)
+- **Framework**: Express 4 + TypeScript 5
+- **Database / Auth**: Supabase (PostgreSQL + Supabase Auth, JWT)
+- **Cache / rate limiting**: Redis (ioredis), sans fallback in-memory
 - **Validation**: Zod
-- **Real-time**: Socket.io (à venir)
+- **Temps réel**: Socket.io 4
+- **Email**: nodemailer (Gmail SMTP)
 
 ## 📂 Structure d'une Feature
 
-Chaque feature suit cette structure :
+Chaque feature suit cette structure (pas de fichier `index.ts` : on importe directement le fichier source, via `@/features/...` ou `@/shared/...`, avec l'extension `.js`) :
 
 ```
-features/auth/
-├── auth.types.ts        # Types TypeScript
-├── auth.validators.ts   # Validation Zod
-├── auth.service.ts      # Business logic
-├── auth.controller.ts   # Handlers Express
-├── auth.middleware.ts   # Middleware spécifiques
-├── auth.routes.ts       # Routes Express
-└── index.ts             # Exports publics
+features/<name>/
+├── services/                  # Logique métier, découpée par responsabilité (~150 lignes max par service)
+├── permissions/               # Contrôles d'autorisation (si besoin)
+├── utils/                     # Helpers et formatters
+├── middleware/                # Middleware spécifiques (si besoin)
+├── <name>.types.ts            # Types TypeScript
+├── <name>.validators.ts       # Schémas Zod
+├── <name>.controller.ts       # Handlers Express
+├── <name>.routes.ts           # Router Express
+└── <name>.openapi.ts          # Documentation Swagger des endpoints
 ```
+
+Ajouter une feature : types → validators → service → controller → routes → openapi, puis monter le router dans `src/shared/config/routes.ts`.
+
+## 🗄️ Base de données
+
+Tables Supabase utilisées par le backend :
+
+- `user_profiles` : profil (username, display_name, avatar_url, bio, google_id, facebook_id)
+- `profile_privacy` : visibilité par champ du profil (email, bio, avatar, préférences musicales) : `public`, `friends_only` ou `private`
+- `music_preferences` : genres préférés (5 max)
+- `playlists` : métadonnées (owner_id, visibility `public` / `private`, edit_mode `open` / `restricted`)
+- `playlist_tracks` : tracks d'une playlist (position, added_by)
+- `tracks` : données universelles d'un morceau ; `track_uri` contient le permalink SoundCloud
+- `follows` : relations de follow, avec `can_control_music` pour la délégation
+
+## 🛣️ Endpoints
+
+Montés dans `src/shared/config/routes.ts`, documentés dans Swagger (`/api-docs`) :
+
+| Préfixe | Endpoints |
+|---|---|
+| `/api/auth` | register, login, refresh, logout, me, OAuth google/facebook, providers (liste, unlink), verify-email, resend-verification, forgot-password, reset-password |
+| `/api/profile` | profil (get, patch), search, privacy, music-preferences (+ genres), profil d'un autre user |
+| `/api/playlists` | CRUD, publiques, par user, tracks (ajout, retrait, reorder), collaborateurs, viewers |
+| `/api/friends` | liste, stats, statut, follow / unfollow |
+| `/api/music-control` | permissions (liste, grant, revoke), can-control |
+| `/api/soundcloud` | search, track, stream |
+| `/health` | santé du serveur et de Redis (sans auth) |
+
+## ⚡ Temps réel (Socket.io)
+
+Serveur : `src/realtime/index.ts`. Events :
+
+- **Client → serveur** : `auth:register`, `playlist:join`, `playlist:leave`, `listening:subscribe`, `listening:unsubscribe`, `listening:update`, `control:action`
+- **Serveur → client** : `playlist:updated`, `listening:status`, `listening:error`, `permission:changed`, `control:command`, `control:success`, `control:error`
+
+Les clients d'une playlist rejoignent la room `playlist:<id>` et reçoivent `playlist:updated` à chaque modification.
+
+## 🎵 SoundCloud
+
+- Cache des résultats : recherche et détails de track 1 h, URLs de stream 30 min (`features/soundcloud/utils/soundcloud-cache.ts`)
+- Seuls les morceaux lisibles en streaming sont renvoyés
+- L'URL de stream est récupérée à la demande et expire : ne jamais la stocker en base
 
 ## 🔄 Prochaines étapes
 
-- [ ] Feature Friends (système d'amis)
-- [ ] Feature Rooms (salles de musique)
-- [ ] Socket.io integration
-- [ ] Feature Music Search (SoundCloud integration)
-- [x] Feature Playlists (collaborative playlists) - Complete
+Le reste à faire est suivi dans les GitHub Issues du repo (epics et stories BMAD).
 
 ## 📖 Documentation
 

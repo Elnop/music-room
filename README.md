@@ -4,9 +4,9 @@ A collaborative music listening platform built with React Native, Node.js, and m
 
 ## Quick Links
 
-- **[Development Guide](./DEVELOPMENT.md)** - Complete development guide (setup, commands, architecture)
-- **[Build Guide](./BUILD.md)** - Production builds (Android, EAS, Google Play)
-- **[API Documentation](http://localhost:3000/api-docs)** - Interactive Swagger UI (45 endpoints)
+- **[API Documentation](http://localhost:3000/api-docs)** - Interactive Swagger UI
+- **[Backend](./backend/README.md)** / **[Mobile](./mobile/README.md)** - Architecture and commands
+- **Project tracking** - GitHub Issues (epics and stories), planning in `_bmad-output/`
 
 ## Quick Start
 
@@ -104,14 +104,12 @@ cd mobile && npm run format
 
 | Document | Purpose |
 |----------|---------|
-| [DEVELOPMENT.md](./DEVELOPMENT.md) | **Complete development guide** (setup, commands, architecture) |
-| [BUILD.md](./BUILD.md) | Production builds (Android, EAS, Google Play) |
-| [Swagger UI](http://localhost:3000/api-docs) | **Interactive API documentation** (45 endpoints) |
+| [Swagger UI](http://localhost:3000/api-docs) | **Interactive API documentation** |
+| [AGENTS.md](./AGENTS.md) | Rules for AI agents (branches, policy, conventions) |
 
 ### Specialized Guides
 
 - [Tunnel Mode](./doc/TUNNEL_MODE.md) - Cross-network development (different WiFi)
-- [Docker Legacy Mode](./DOCKER_LEGACY_MODE.md) - **Docker API 1.42 compatibility (no admin rights)**
 - [Redis Setup](./doc/REDIS.md) - Cache and rate limiting configuration
 - [Security](./doc/SECURITY.md) - Docker security (Chainguard Images, 0 CVE)
 - [Testing Security](./doc/TESTING_SECURITY.md) - Subject IV.6 compliance
@@ -120,6 +118,21 @@ cd mobile && npm run format
 
 - **Backend**: [backend/README.md](./backend/README.md) - Node.js + Express + Supabase
 - **Mobile**: [mobile/README.md](./mobile/README.md) - React Native + Expo
+
+## Troubleshooting
+
+**Mobile can't reach the backend**
+1. Check the backend: `make ps` or `curl http://localhost:3000/health`
+2. On a physical device, set `http://YOUR_LOCAL_IP:3000` in `mobile/.env` and use the same Wi-Fi (or `make dev-tunnel`)
+3. Check `ALLOWED_ORIGINS` in `backend/.env`
+
+**Docker issues**: `make clean`, then `make install` and `make dev-docker`
+
+**Type errors after a pull**: `npm install && npm run type-check` in `backend/` and `mobile/`
+
+**Expo cache issues**: `cd mobile && npm run reset`
+
+**Google / Facebook sign-in fails in Expo Go**: OAuth needs a development build.
 
 ## Links
 

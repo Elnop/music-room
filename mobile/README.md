@@ -125,35 +125,51 @@ Pour débuter, voici les 5 commandes que vous utiliserez le plus :
 ## Architecture
 
 ```
-mobile/
-├── src/
-│   ├── screens/          # Écrans par feature
-│   │   ├── auth/         # Login, Register
-│   │   ├── friends/      # Liste amis, invitations
-│   │   ├── playlists/    # Playlists collaboratives
-│   │   ├── devices/      # Gestion devices
-│   │   └── search/       # Music search
-│   ├── components/       # Composants réutilisables
-│   │   ├── common/       # Button, Card, Input...
-│   │   ├── playlist/     # TrackItem, PlaylistCard...
-│   │   ├── player/       # PlayerControls, ProgressBar...
-│   │   └── friends/      # FriendItem, InviteButton...
-│   ├── navigation/       # Configuration navigation
-│   ├── services/         # API clients
-│   │   ├── api.ts        # Axios config
-│   │   ├── auth.service.ts
-│   │   ├── playlist.service.ts
-│   │   └── socket.service.ts
-│   ├── store/            # Zustand stores
-│   │   ├── authStore.ts
-│   │   ├── playlistStore.ts
-│   │   └── playerStore.ts
-│   ├── hooks/            # Custom hooks
-│   ├── types/            # TypeScript types
-│   ├── constants/        # Constantes (colors, API URLs)
-│   └── utils/            # Fonctions utilitaires
-└── assets/               # Images, fonts, icons
+mobile/src/
+├── screens/            # Écrans par feature
+│   ├── auth/           # Welcome, Login, Register, EmailVerification, ForgotPassword, ResetPassword
+│   ├── playlists/      # Playlists, PlaylistDetail, CreatePlaylist, SearchTracks, PlaylistSharing
+│   ├── friends/        # Friends, UserProfile
+│   ├── profile/        # Profile, EditProfile, PrivacySettings, MusicPreferences
+│   ├── search/         # SoundCloudSearch (+ components/)
+│   └── settings/       # Settings
+├── components/
+│   ├── common/         # Button, Card, Input, Avatar, SearchBar, ErrorBoundary, items swipeables...
+│   ├── playlist/       # TrackItem, PlaylistCard, PlaylistGridCard, PlaylistHeader, AddTrackButton...
+│   ├── player/         # MiniPlayer, PlayerModal, PlayerErrorToast
+│   ├── profile/        # GenreSelector, VisibilityToggle, NowPlayingInline...
+│   ├── music-control/  # DeviceListeningCard
+│   └── theme/          # ThemeSelector
+├── navigation/         # RootNavigator, AuthNavigator, AppNavigator (onglets) + stacks/
+├── store/              # Zustand : authStore, playlistStore, playerStore, socketStore, soundcloudStore
+├── contexts/           # ThemeContext, PlayerContext
+├── hooks/              # useMusicControl, usePlaylistSocket, usePlayerSync, usePlayerProgress, useImageColors
+├── api/                # playlistApi.ts
+├── services/           # api.ts (client HTTP de base), profileApi, friendsApi, musicControlApi, privacyApi, oauth, deviceService
+├── lib/                # supabase.ts
+├── themes/             # Thèmes (original, royalBlue, pastelLime, christmas) + tokens
+├── types/              # Types alignés sur les réponses du backend
+├── utils/              # validators (Zod), formatters, toast
+├── constants/          # Config API, constantes
+└── config/             # toastConfig
 ```
+
+## Navigation
+
+- **RootNavigator** bascule entre `AuthNavigator` et `AppNavigator` selon l'état d'auth (persisté par `authStore`).
+- **AuthNavigator** : Welcome, Login, Register, EmailVerification, ForgotPassword, ResetPassword.
+- **AppNavigator** (onglets) :
+  - Playlists → Playlists, PlaylistDetail, CreatePlaylist, SearchTracks, PlaylistSharing
+  - Search → Search
+  - Friends → Friends, UserProfile, PlaylistDetail, SearchTracks
+  - Profile → Profile, EditProfile, PrivacySettings, MusicPreferences, Settings
+
+## État, temps réel et lecture
+
+- **Appels HTTP** : toujours via `services/api.ts`, qui ajoute le token et les headers `X-Platform`, `X-Device-Model`, `X-App-Version` logués par le backend.
+- **Temps réel** : `socketStore` gère la connexion Socket.io ; `usePlaylistSocket` rejoint la room d'une playlist et réagit à `playlist:updated` ; `useMusicControl` gère l'écoute des amis et les commandes de contrôle délégué.
+- **Lecture audio** : expo-audio lit le stream HLS SoundCloud ; `PlayerContext` gère le cycle de vie du lecteur, `playerStore` l'état (track courante, play/pause, modal), `MiniPlayer` et `PlayerModal` l'affichage.
+- **OAuth** : `services/oauth.ts` (Google Sign-In, Facebook SDK). Le token obtenu est vérifié par le backend (`/api/auth/google`, `/api/auth/facebook`). Ne fonctionne pas dans Expo Go : il faut un development build.
 
 ## Développement
 
@@ -169,18 +185,11 @@ import { Button } from '../../../components/common/Button';
 import { Button } from '@components/common/Button';
 ```
 
-Alias disponibles : `@components`, `@screens`, `@services`, `@store`, `@hooks`, `@utils`, `@types`, `@constants`
+Alias disponibles (voir `tsconfig.json`) : `@/*`, `@api`, `@components`, `@screens`, `@services`, `@store`, `@hooks`, `@utils`, `@types`, `@constants`, `@contexts`, `@themes`
 
 ### Thème
 
-Le projet utilise un thème dark inspiré des applications musicales :
-
-- **Primary**: #1DB954 (Music Green)
-- **Background**: #121212 (Pure Black)
-- **Surface**: #282828 (Dark Gray)
-- **Text**: #FFFFFF (White)
-
-Voir `src/constants/index.ts` pour tous les tokens de design.
+Plusieurs thèmes sont disponibles dans `src/themes/` (original, royalBlue, pastelLime, christmas), sélectionnables via `ThemeSelector`. Les tokens communs sont dans `src/themes/tokens.ts`.
 
 ### Hot Reload
 
@@ -207,12 +216,7 @@ Les types, validateurs et versions sont alignés avec le backend :
 
 ## Prochaines Étapes
 
-1. Configuration Supabase Client
-2. Configuration Socket.io Client (temps réel)
-3. Navigation (Auth Stack + App Stack)
-4. Zustand Stores (auth, playlists, playback)
-5. Écrans Auth (Login, Register)
-6. Services API & WebSocket
+Le reste à faire est suivi dans les GitHub Issues du repo (epics et stories BMAD).
 
 ## Support
 
