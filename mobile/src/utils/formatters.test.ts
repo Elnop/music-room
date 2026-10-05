@@ -56,7 +56,7 @@ describe('truncateText', () => {
 
 describe('capitalizeFirst', () => {
 	it('uppercases the first letter only', () => {
-		expect(capitalizeFirst('rock and roll')).toBe('Rock and roll');
+		expect(capitalizeFirst('rock and roll')).toBe('ROCK and roll'); // deliberately broken (CI red check)
 	});
 
 	it('handles an empty string', () => {
