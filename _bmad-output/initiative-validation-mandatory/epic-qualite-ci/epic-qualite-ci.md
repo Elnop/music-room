@@ -50,3 +50,5 @@ Open question: Node 20 ou 22 ; tranché par une story hitl de cet epic.
 - Decision: les tests d'intégration tournent sur un Postgres local et en CI (story 10), notamment pour la concurrence des playlists (choix de l'utilisateur, 2026-10-05).
 - Decision: pas de story « Refactor sweep » dans les epics ; chacun nettoie dans sa story (choix de l'utilisateur, 2026-10-05).
 - Open question: passer mobile/Dockerfile du tag Chainguard latest-dev à un tag versionné ; tranché dans la story 5.
+- Decision: stratégie de test consignée dans doc/TESTING.md (story 6) : Vitest + Supertest au backend, jest-expo + @testing-library/react-native au mobile ; tests unitaires sans service (Supabase, Redis, Socket.io mockés), tests d'intégration `*.int.test.ts` sur la stack Supabase locale (`supabase start`) avec Redis et Socket.io réels (choix de l'utilisateur, 2026-10-05).
+- Decision: la stack Supabase locale remplace le « Postgres local » de la story 10 : supabase-js passe par PostgREST et Auth, et les migrations utilisent auth.uid() et auth.users (2026-10-05).
