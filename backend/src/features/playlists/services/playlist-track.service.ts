@@ -18,7 +18,7 @@ export class PlaylistTrackService {
 	async addTrack(playlistId: string, userId: string, track: AddTrackDTO): Promise<void> {
 		try {
 			// Check edit permissions (unified approach)
-			await checkEditPermission(playlistId, userId);
+			const playlist = await checkEditPermission(playlistId, userId);
 
 			// Upsert track (insert if not exists, return existing if duplicate track_uri)
 			const { data: trackData, error: trackError } = await supabaseAdmin

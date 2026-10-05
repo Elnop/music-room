@@ -1,8 +1,19 @@
 import { supabase } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
-import type { AuthResponse, UserProfile } from '@/features/auth/auth.types.js';
+import type { AuthResponse, OAuthProvider, UserProfile } from '@/features/auth/auth.types.js';
 import type { User, Session } from '@supabase/supabase-js';
+
+/**
+ * user_profiles column holding the provider's user ID, as a typed object to
+ * spread into an insert or update (a computed `${provider}_id` key is untyped).
+ */
+export function providerIdField(
+	provider: OAuthProvider,
+	providerId: string | null
+): { google_id: string | null } | { facebook_id: string | null } {
+	return provider === 'google' ? { google_id: providerId } : { facebook_id: providerId };
+}
 
 /**
  * Format auth response with user and session data

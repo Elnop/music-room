@@ -3,6 +3,7 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { UserProfile, UserProfileRow } from '@/features/auth/auth.types.js';
 import type { Session } from '@supabase/supabase-js';
+import { providerIdField } from '@/features/auth/utils/auth.helpers.js';
 
 export class UserService {
 	/**
@@ -233,7 +234,7 @@ export class UserService {
 					const { error: updateError } = await supabase
 						.from('user_profiles')
 						.update({
-							[providerColumn]: providerId,
+							...providerIdField(provider, providerId),
 							avatar_url: avatarUrl || existingProfile.avatar_url || null,
 							email_verified: true,
 							updated_at: new Date().toISOString(),
@@ -300,7 +301,7 @@ export class UserService {
 						username,
 						display_name: profile.name || username,
 						avatar_url: avatarUrlValue,
-						[providerColumn]: providerId,
+						...providerIdField(provider, providerId),
 						email_verified: true,
 					})
 					.select()

@@ -12,7 +12,7 @@
 - Before starting an issue, assign yourself on it; never work an issue assigned to someone else. Keep its state current: label `in-progress` when work starts, `review` when the PR is open (with `Closes #<n>` in the PR), closed when merged into `develop`; move the card on the "Music Room – Validation" board to match (`In Progress`, `Review`, `Done`) and set its `Area` field.
 - Never implement Music Track Vote (IV.2.1); the project delivers Playlist Editor and Music Control Delegation.
 - Never commit credentials or API keys; they go in `backend/.env` and `mobile/.env`, with placeholders in `.env.example`.
-- Never commit installed dependencies; everything installs from manifests via `make install`.
+- Never commit installed dependencies; everything installs from manifests via `make install`. `backend/` and `mobile/` lockfiles are committed: change dependencies with `npm install <pkg>` and commit the lockfile with it.
 - An SDK must not do the core work the subject asks for; implement it in project code.
 - Never hand-edit `backend/src/shared/types/supabase.generated.ts`; run `make generate-types`.
 
@@ -26,8 +26,8 @@
 ## Running and verifying
 
 - The root `make` is the entry point: `make dev-docker` by default, `make dev-local` for the Android Studio emulator, `make dev-tunnel` when the phone is on another network.
-- `make test` runs the backend (Vitest) and mobile (jest-expo) unit tests and exits non-zero on any failure; `npm test` runs one side. Strategy, mocks and single-test commands are in `doc/TESTING.md`. Also verify with `npm run type-check` and `npm run lint` in both `backend/` and `mobile/`, plus a call through Swagger UI for endpoints.
-- The Node version is not settled: `backend/Dockerfile` uses Node 20. Do not change it without a ticket.
+- `make test` runs the backend (Vitest) and mobile (jest-expo) unit tests and exits non-zero on any failure; `npm test` runs one side. Strategy, mocks and single-test commands are in `doc/TESTING.md`. Also verify with `npm run type-check` and `npm run lint` in both `backend/` and `mobile/`, plus a call through Swagger UI for endpoints. The CI (`.github/workflows/ci.yml`) runs lint, type-check, `npm test` and the integration tests on every PR to `develop`; keep it green.
+- Node 22 everywhere: `.nvmrc`, `backend/Dockerfile`, `mobile/Dockerfile`, `mobile/Dockerfile.android-build` and the CI. Change them together, with a ticket.
 - Google and Facebook sign-in need a development build; they fail in Expo Go.
 
 ## Conventions that differ from defaults

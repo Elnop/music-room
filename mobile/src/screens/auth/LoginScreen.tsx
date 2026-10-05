@@ -13,6 +13,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useIsFocused } from '@react-navigation/native';
+import type { AuthStackParamList } from '@/navigation/AuthNavigator';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import { Button } from '@components/common/Button';
@@ -25,13 +26,6 @@ import { showError, showWarning } from '@utils/toast';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Logo = require('@/assets/logo/logo.png');
-
-type AuthStackParamList = {
-	Welcome: undefined;
-	Login: undefined;
-	Register: undefined;
-	EmailVerification: { userId: string; email: string };
-};
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Login'>;
 
