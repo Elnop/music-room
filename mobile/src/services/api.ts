@@ -87,6 +87,23 @@ function getClientHeaders(): Record<string, string> {
 }
 
 /**
+ * Session hooks the auth store registers at load time. A static import of the
+ * store here would be circular, and a dynamic `import()` makes Metro load a
+ * separate bundle whose HMR registration reloads the app in development.
+ */
+export interface AuthSession {
+	getAccessToken: () => string | null;
+	isTokenExpiringSoon: () => boolean;
+	refreshAccessToken: () => Promise<boolean>;
+}
+
+let authSession: AuthSession | null = null;
+
+export function registerAuthSession(session: AuthSession): void {
+	authSession = session;
+}
+
+/**
  * Make API request with automatic token refresh on 401
  */
 async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -116,15 +133,19 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
 			return handleResponse<T>(response);
 		}
 
-		const { useAuthStore } = await import('@/store/authStore');
-		const { accessToken, isTokenExpiringSoon, refreshAccessToken } = useAuthStore.getState();
+		if (!authSession) {
+			const response = await makeRequest();
+			return handleResponse<T>(response);
+		}
+
+		const { getAccessToken, isTokenExpiringSoon, refreshAccessToken } = authSession;
+		const accessToken = getAccessToken();
 
 		if (accessToken && isTokenExpiringSoon()) {
 			console.log('[API] Token expiring soon, proactively refreshing...');
 			await refreshAccessToken();
 
-			const { accessToken: newAccessToken } = useAuthStore.getState();
-			const response = await makeRequest(newAccessToken || undefined);
+			const response = await makeRequest(getAccessToken() || undefined);
 			return handleResponse<T>(response);
 		}
 
@@ -139,7 +160,7 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
 				throw new ApiError('Session expired. Please login again.', 'SESSION_EXPIRED');
 			}
 
-			const { accessToken: newAccessToken } = useAuthStore.getState();
+			const newAccessToken = getAccessToken();
 			const retryResponse = await makeRequest(newAccessToken || undefined);
 
 			return handleResponse<T>(retryResponse);

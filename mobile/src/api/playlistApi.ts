@@ -1,6 +1,7 @@
 import { API_CONFIG } from '@constants';
 import type { Playlist, PlaylistWithTracks, Track, ApiResponse } from '@types';
 import type { PlaylistInput } from '@utils/validators';
+import { useAuthStore } from '@/store/authStore';
 
 // Viewer profile type for API responses
 export interface ViewerProfile {
@@ -16,8 +17,6 @@ export interface ViewerProfile {
  */
 
 const getAuthToken = async (): Promise<string> => {
-	// Import authStore dynamically to avoid circular dependencies
-	const { useAuthStore } = await import('../store/authStore');
 	const token = useAuthStore.getState().accessToken;
 	if (!token) throw new Error('No authentication token available');
 	return token;

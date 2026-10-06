@@ -1,5 +1,6 @@
 import { API_CONFIG } from '@constants';
 import type { ApiResponse } from '@/types/api.types';
+import { useAuthStore } from '@/store/authStore';
 
 export interface MusicControlPermissionsResponse {
 	allowedUserIds: string[];
@@ -16,8 +17,6 @@ export interface ControlActionResponse {
 }
 
 const getAuthToken = async (): Promise<string> => {
-	// Import authStore dynamically to avoid circular dependencies
-	const { useAuthStore } = await import('../store/authStore');
 	const token = useAuthStore.getState().accessToken;
 	if (!token) throw new Error('No authentication token available');
 	return token;

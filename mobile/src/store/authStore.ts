@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { UserProfile } from '@types';
 import type { RegisterInput } from '@utils/validators';
-import { authApi, ApiError } from '@services/api';
+import { authApi, ApiError, registerAuthSession } from '@services/api';
 import { supabase } from '@/lib/supabase';
 import { signInWithGoogle, signInWithFacebook } from '@services/oauth';
 
@@ -700,3 +700,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 		set({ error: null });
 	},
 }));
+
+registerAuthSession({
+	getAccessToken: () => useAuthStore.getState().accessToken,
+	isTokenExpiringSoon: () => useAuthStore.getState().isTokenExpiringSoon(),
+	refreshAccessToken: () => useAuthStore.getState().refreshAccessToken(),
+});
