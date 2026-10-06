@@ -112,9 +112,11 @@ HOST_IP := $(shell \
 )
 export HOST_IP
 
-# Backend the app calls in dev-docker and dev-local. These override the
-# EXPO_PUBLIC_API_URL / EXPO_PUBLIC_WS_URL lines of mobile/.env, which may hold
-# an old tunnel URL; dev-tunnel sets its own from the live ngrok tunnel.
+# Backend the app calls in dev-docker and dev-local. In development Expo reads
+# EXPO_PUBLIC_* from the .env files before the environment, so make writes them
+# to mobile/.env.development.local (last in Expo's priority order, git-ignored);
+# dev-tunnel writes the live ngrok URL there instead.
+MOBILE_DEV_ENV := $(MOBILE_DIR)/.env.development.local
 DEV_API_URL := http://$(HOST_IP):$(BACKEND_PORT)
 DEV_WS_URL := ws://$(HOST_IP):$(BACKEND_PORT)
 
