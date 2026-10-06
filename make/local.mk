@@ -3,7 +3,24 @@
 # ==============================================================================
 # Commands for local development, useful with Android Studio emulator
 
-.PHONY: dev-local expo-android expo-clear check-devices start-emulator kill-emulator list-emulators open-emulator
+.PHONY: dev-local expo-android expo-clear check-devices start-emulator kill-emulator restart-emulator list-emulators open-emulator
+
+ADB := $(ANDROID_HOME)/platform-tools/adb
+
+# Cold boot by default: the emulator neither resumes nor overwrites its saved
+# state, so a frozen app or an old bundle does not come back. FAST=1 keeps
+# Android's quick boot (resume the snapshot, save it on exit).
+EMULATOR_FLAGS := -gpu swiftshader_indirect $(if $(FAST),,-no-snapshot-load -no-snapshot-save)
+
+# Wait until Android reports the boot as complete (3 minutes max)
+# Usage: @$(call wait_emulator_boot)
+define wait_emulator_boot
+	i=0; until [ "$$($(ADB) shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = "1" ]; do \
+		i=$$((i + 1)); \
+		if [ $$i -gt 90 ]; then echo "$(RED)$(ICON_ERROR) Emulator did not boot within 3 minutes$(NC)"; exit 1; fi; \
+		sleep 2; \
+	done
+endef
 
 # The app calls the local backend, whatever mobile/.env says (see DEV_API_URL).
 dev-local expo-android expo-clear: export EXPO_PUBLIC_API_URL := $(DEV_API_URL)
@@ -56,11 +73,12 @@ check-devices: ## Check if Android device is connected
 	@echo "   • Use $(GREEN)make dev-android$(NC) to launch"
 	$(call blank_line)
 
-start-emulator: ## Start Android emulator with software rendering (fixes black screen)
+start-emulator: ## Start the Android emulator, cold boot by default (AVD=name, FAST=1 to resume saved state)
 	$(call print_header,Starting Android Emulator)
 	$(call print_subsection,🔧 Configuration)
 	@echo "   • GPU: Software rendering (swiftshader_indirect)"
 	@echo "   • Fixes black screen issues on Linux"
+	@echo "   • Boot: $(if $(FAST),quick boot (resumes saved state),cold boot (FAST=1 to resume saved state))"
 	@echo ""
 	$(call print_arrow,Checking for running emulators...)
 	@RUNNING=$$($(ANDROID_HOME)/platform-tools/adb devices | grep emulator | wc -l); \
@@ -76,21 +94,28 @@ start-emulator: ## Start Android emulator with software rendering (fixes black s
 	done
 	$(call blank_line)
 	$(call print_arrow,Starting emulator with software rendering...)
-	@AVD=$$($(ANDROID_HOME)/emulator/emulator -list-avds | head -1); \
+	@AVD="$(AVD)"; [ -n "$$AVD" ] || AVD=$$($(ANDROID_HOME)/emulator/emulator -list-avds | head -1); \
 	if [ -z "$$AVD" ]; then \
 		echo "$(RED)$(ICON_ERROR) No AVD found$(NC)"; \
 		echo "$(YELLOW)$(ICON_WARNING) Create one in Android Studio: Tools > Device Manager$(NC)"; \
 		exit 1; \
 	fi; \
 	echo "$(BLUE)$(ICON_INFO) Launching: $$AVD$(NC)"; \
-	$(ANDROID_HOME)/emulator/emulator -avd $$AVD -gpu swiftshader_indirect > /dev/null 2>&1 &
+	$(ANDROID_HOME)/emulator/emulator -avd $$AVD $(EMULATOR_FLAGS) > /dev/null 2>&1 &
 	$(call blank_line)
-	$(call print_info,⏳ Waiting for emulator to boot (30 seconds)...)
-	@sleep 30
+	$(call print_info,⏳ Waiting for emulator to boot...)
+	@$(call wait_emulator_boot)
 	$(call blank_line)
 	$(call print_success,Emulator started!)
-	$(call print_info,Run $(GREEN)make dev-build-local$(NC) to install the app)
+	$(call print_info,Open Zumik on the emulator: it loads the code served by $(GREEN)make dev-docker$(NC) or $(GREEN)make dev-local$(NC))
 	$(call blank_line)
+
+restart-emulator: ## Stop the emulator and cold boot it again (AVD=name, FAST=1 to resume saved state)
+	@$(MAKE) --no-print-directory kill-emulator
+	@i=0; while $(ADB) devices | grep -q emulator; do \
+		i=$$((i + 1)); [ $$i -gt 30 ] && break; sleep 1; \
+	done
+	@$(MAKE) --no-print-directory start-emulator
 
 kill-emulator: ## Stop all running Android emulators
 	$(call print_header,Stopping Android Emulators)
@@ -156,7 +181,7 @@ open-emulator: ## Open a specific Android emulator (interactive selection or spe
 	@echo ""
 	@if [ -n "$(AVD)" ]; then \
 		echo "$(BLUE)$(ICON_INFO) Opening emulator: $(GREEN)$(AVD)$(NC)"; \
-		$(ANDROID_HOME)/emulator/emulator -avd $(AVD) -gpu swiftshader_indirect > /dev/null 2>&1 & \
+		$(ANDROID_HOME)/emulator/emulator -avd $(AVD) $(EMULATOR_FLAGS) > /dev/null 2>&1 & \
 		echo ""; \
 		echo "$(GREEN)$(ICON_SUCCESS) Emulator starting in background...$(NC)"; \
 		echo "$(BLUE)$(ICON_INFO) Wait ~30 seconds for boot$(NC)"; \
@@ -185,7 +210,7 @@ open-emulator: ## Open a specific Android emulator (interactive selection or spe
 		fi; \
 		echo ""; \
 		echo "$(BLUE)$(ICON_INFO) Opening emulator: $(GREEN)$$SELECTED_AVD$(NC)"; \
-		$(ANDROID_HOME)/emulator/emulator -avd $$SELECTED_AVD -gpu swiftshader_indirect > /dev/null 2>&1 & \
+		$(ANDROID_HOME)/emulator/emulator -avd $$SELECTED_AVD $(EMULATOR_FLAGS) > /dev/null 2>&1 & \
 		echo ""; \
 		echo "$(GREEN)$(ICON_SUCCESS) Emulator starting in background...$(NC)"; \
 		echo "$(BLUE)$(ICON_INFO) Wait ~30 seconds for boot$(NC)"; \
