@@ -16,7 +16,7 @@ tracker_status: backlog
 
 ## Description
 
-notifyPlaylistUpdate envoie version et ordre selon le contrat de 2 après chaque opération de 4.
+notifyPlaylistUpdate envoie tracks_version et l'ordre selon le contrat de 2 après chaque opération de 4.
 
 ## Acceptance Criteria
 

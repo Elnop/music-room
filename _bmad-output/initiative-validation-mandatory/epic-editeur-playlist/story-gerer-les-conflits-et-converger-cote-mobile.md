@@ -16,11 +16,11 @@ tracker_status: backlog
 
 ## Description
 
-playlistStore envoie la version attendue, sur 409 recharge et prévient l'utilisateur, applique l'ordre de playlist:updated ; ses tests couvrent tout le store (chargement, CRUD, collaborateurs, conflits).
+playlistStore envoie un move avec afterRank et la version affichée, un seul à la fois en reprenant la version de la réponse précédente ; sur 409 recharge et prévient l'utilisateur ; applique playlist:updated de version +1, ignore les versions déjà vues, recharge s'il en manque une ; ses tests couvrent tout le store (chargement, CRUD, collaborateurs, conflits).
 
 ## Acceptance Criteria
 
-Verify: Tests de playlistStore : 409 déclenche rechargement et message ; playlist:updated remplace l'ordre local ; CRUD et collaborateurs couverts.
+Verify: Tests de playlistStore : deux moves rapides partent l'un après l'autre avec la version renvoyée ; 409 déclenche rechargement et message ; playlist:updated remplace l'ordre local, une version manquante déclenche un rechargement ; CRUD et collaborateurs couverts.
 
 ## References
 

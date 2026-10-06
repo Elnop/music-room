@@ -16,11 +16,11 @@ tracker_status: backlog
 
 ## Description
 
-Ajoute la migration 016 (après la 015 de 4.1) selon la stratégie retenue en 1, pour que ajout, retrait et réordonnancement se fassent en une transaction ; régénère les types.
+Ajoute la migration 016 (après la 015 de 4.1) selon doc/PLAYLIST_CONCURRENCY.md : playlist_tracks.rank (texte COLLATE "C", unique par playlist) à la place de position, moved_at_version, playlists.tracks_version, la fonction rank_between écrite dans le projet, et les fonctions add, remove et move qui verrouillent la playlist (FOR UPDATE) et rééquilibrent les rangs au-delà d'un seuil de longueur à fixer ; régénère les types.
 
 ## Acceptance Criteria
 
-Verify: Migration appliquée ; un test d'intégration sur le Postgres de 1.10 lance deux opérations concurrentes sans doublon ni trou de position.
+Verify: Migration appliquée ; tests d'intégration sur le Postgres de 1.10 : moves concurrents de tracks différentes tous appliqués, moves concurrents de la même track dont un seul passe, rangs uniques, added_by inchangé, rééquilibrage après une longue série de moves dans le même intervalle.
 
 ## References
 

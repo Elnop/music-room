@@ -16,11 +16,11 @@ tracker_status: backlog
 
 ## Description
 
-Le service playlist-track utilise 3, vérifie la version attendue du contrat de 2, renvoie 409 en conflit et conserve added_by.
+Le service playlist-track appelle les fonctions de 3 par RPC (plus de suppression puis réinsertion), traduit leurs refus en 409 et 404 du contrat de 2, et conserve added_by.
 
 ## Acceptance Criteria
 
-Verify: Tests d'intégration concurrents : reorder, ajout et retrait simultanés laissent chaque track une fois et added_by intact ; version périmée renvoie 409.
+Verify: Tests d'intégration concurrents : move, ajout et retrait simultanés laissent chaque track une fois et added_by intact ; un move de la même track avec une version périmée renvoie 409 TRACK_MOVED_CONCURRENTLY.
 
 ## References
 

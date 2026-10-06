@@ -25,7 +25,7 @@ Le cas de concurrence cité par le sujet est géré et démontrable ; signal : C
 1. Sous réordonnancement, ajout et retrait concurrents, chaque track reste présente une seule fois et aucun déplacement n'est perdu sans que le client le sache (test).
 2. Tous les clients convergent vers l'ordre du serveur, et `added_by` garde l'auteur de l'ajout.
 3. Le CRUD playlist, `canViewPlaylist`, `canEditPlaylist` et `playlistStore` sont couverts par des tests.
-4. Les endpoints modifiés sont documentés dans `playlist.openapi.ts`.
+4. Les endpoints modifiés sont documentés dans `playlist.openapi.ts`, et `doc/PLAYLIST_CONCURRENCY.md` décrit le comportement livré.
 5. L'epic est mergé dans `develop` et vérifié (type-check, lint et tests au vert).
 
 ## Boundaries
@@ -47,3 +47,4 @@ Handoff: `realtime/index.ts` est aussi modifié par epic-delegation-controle ; l
 - Decision: le spike 1 passe d'abord car la stratégie de concurrence décide du contrat, de la migration et du service ; tracer bullet ensuite 2 → 3 → 4 → 5 → 6 sur le seul réordonnancement (2026-10-05).
 - Decision: les tests de concurrence tournent sur le Postgres d'intégration de 1.10, en local et en CI (choix de l'utilisateur, 2026-10-05).
 - Decision: pas de story « Refactor sweep » (choix de l'utilisateur, 2026-10-05).
+- Decision: stratégie de concurrence (spike 1) : ordre par rangs fractionnaires (`playlist_tracks.rank` texte `COLLATE "C"`, généré par une fonction SQL du projet) ; chaque opération est une fonction Postgres qui verrouille la playlist (`FOR UPDATE`) ; version `playlists.tracks_version` (bigint, +1 par add/remove/move) et `playlist_tracks.moved_at_version` ; un move `{ trackId, afterRank, expectedVersion }` est refusé en 409 seulement si la même track a bougé ou disparu depuis `expectedVersion` ; add et remove ne sont jamais refusés pour concurrence. Détail : `doc/PLAYLIST_CONCURRENCY.md` (choix de l'utilisateur, 2026-10-06).

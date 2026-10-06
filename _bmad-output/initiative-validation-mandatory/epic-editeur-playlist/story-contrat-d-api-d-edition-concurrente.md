@@ -16,7 +16,7 @@ tracker_status: backlog
 
 ## Description
 
-Définit dans playlist.openapi.ts les requêtes add, remove et reorder avec la version attendue, la réponse 409 et le payload playlist:updated (version et ordre), selon 1, et les types dans playlist.types.ts et mobile/src/types/playlist.types.ts.
+Définit dans playlist.openapi.ts, selon doc/PLAYLIST_CONCURRENCY.md : add, remove et move ({ trackId, afterRank, expectedVersion }, qui remplace reorder), la version tracks_version dans chaque réponse et dans le fetch de playlist, les erreurs 409 TRACK_DUPLICATE, TRACK_NOT_IN_PLAYLIST, TRACK_MOVED_CONCURRENTLY et 404 TRACK_NOT_IN_PLAYLIST, le rank de chaque track et le payload playlist:updated (version et ordre) ; les types dans playlist.types.ts et mobile/src/types/playlist.types.ts.
 
 ## Acceptance Criteria
 
