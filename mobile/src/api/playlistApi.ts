@@ -1,5 +1,7 @@
 import { API_CONFIG } from '@constants';
-import type { Playlist, PlaylistWithTracks, Track, ApiResponse } from '@types';
+import type { ApiResponse } from '@/types/api.types';
+import type { Playlist, PlaylistWithTracks } from '@/types/playlist.types';
+import type { Track } from '@/types/track.types';
 import type { PlaylistInput } from '@utils/validators';
 import { useAuthStore } from '@/store/authStore';
 

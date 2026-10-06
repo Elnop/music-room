@@ -187,7 +187,7 @@ import { Button } from '../../../components/common/Button';
 import { Button } from '@components/common/Button';
 ```
 
-Alias disponibles (voir `tsconfig.json`) : `@/*`, `@api`, `@components`, `@screens`, `@services`, `@store`, `@hooks`, `@utils`, `@types`, `@constants`, `@contexts`, `@themes`
+Alias disponibles (voir `tsconfig.json`) : `@/*`, `@api`, `@components`, `@screens`, `@services`, `@store`, `@hooks`, `@utils`, `@constants`, `@contexts`, `@themes`
 
 ### Thème
 

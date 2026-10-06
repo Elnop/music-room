@@ -32,7 +32,7 @@
 
 ## Conventions that differ from defaults
 
-- Never add a barrel `index.ts` that re-exports, in backend or mobile; import the source file. `mobile/src/types/index.ts` is an existing barrel slated for removal.
+- Never add a barrel `index.ts` that re-exports, in backend or mobile; import the source file.
 - Backend imports go through `@/features/...` or `@/shared/...`, always with a `.js` extension.
 - Backend: protect routes with `authMiddleware` from `@/features/auth/auth.middleware.js`; rate-limit sensitive routes with `features/auth/middleware/rate-limit.middleware.ts` (Redis-backed, no in-memory fallback).
 - Backend feature layout: `features/<name>/` holds `<name>.types.ts`, `<name>.validators.ts` (Zod), `<name>.controller.ts`, `<name>.routes.ts`, `<name>.openapi.ts`, logic in `services/`, authorization in `permissions/`, helpers in `utils/`. Keep a service under ~150 lines; split it rather than grow it.

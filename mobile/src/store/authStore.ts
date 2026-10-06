@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { UserProfile } from '@types';
+import type { UserProfile } from '@/types/user.types';
 import type { RegisterInput } from '@utils/validators';
 import { authApi, ApiError, registerAuthSession } from '@services/api';
 import { supabase } from '@/lib/supabase';

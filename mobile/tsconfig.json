@@ -20,7 +20,6 @@
 			"@store/*": ["./src/store/*"],
 			"@hooks/*": ["./src/hooks/*"],
 			"@utils/*": ["./src/utils/*"],
-			"@types": ["./src/types"],
 			"@constants": ["./src/constants"],
 			"@contexts": ["./src/contexts"],
 			"@contexts/*": ["./src/contexts/*"],
