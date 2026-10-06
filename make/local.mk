@@ -10,6 +10,7 @@ dev-local expo-android expo-clear: export EXPO_PUBLIC_API_URL := $(DEV_API_URL)
 dev-local expo-android expo-clear: export EXPO_PUBLIC_WS_URL := $(DEV_WS_URL)
 
 dev-local: .ensure-backend-deps .ensure-mobile-deps ## Start development locally (no Docker) - for Android Studio emulator
+	@$(call write_mobile_dev_env)
 	$(call print_header,Starting Local Development Mode)
 	$(call print_success,Dependencies OK)
 	$(call blank_line)
@@ -23,10 +24,12 @@ dev-local: .ensure-backend-deps .ensure-mobile-deps ## Start development locally
 	$(call expo_mobile,start --localhost --android)
 
 expo-android: ## Quick start: Open app directly in Android emulator
+	@$(call write_mobile_dev_env)
 	$(call print_info,📱 Opening in Android emulator...)
 	$(call expo_mobile,start --localhost --android)
 
 expo-clear: ## Start Expo with cleared cache (local)
+	@$(call write_mobile_dev_env)
 	$(call print_info,🧹 Starting Expo (cleared cache)...)
 	$(call expo_mobile,start --localhost --clear)
 
