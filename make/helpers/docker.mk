@@ -298,25 +298,31 @@ endef
 # Logging Functions
 # ==============================================================================
 
-# Show all logs (follow mode)
+# Show all logs (follow mode), each line prefixed by its service
+# Starts at the last $(LOGS_TAIL) lines. Background jobs ignore SIGINT in a
+# non-interactive shell, so the trap kills them when Ctrl+C reaches the shell.
 # Usage: $(call docker_logs_all)
 define docker_logs_all
-	@echo "$(BLUE)$(ICON_INFO) Showing logs (press Ctrl+C to exit)...$(NC)"
-	@(docker logs -f $(BACKEND_CONTAINER) 2>&1 | sed 's/^/[BACKEND] /' &); \
-	(docker logs -f $(MOBILE_CONTAINER) 2>&1 | sed 's/^/[MOBILE] /' &); \
-	(docker logs -f $(REDIS_CONTAINER) 2>&1 | sed 's/^/[REDIS] /' &); \
+	@trap 'pkill -P $$$$ 2>/dev/null; exit 130' INT TERM; \
+	for svc in BACKEND:$(BACKEND_CONTAINER) MOBILE:$(MOBILE_CONTAINER) REDIS:$(REDIS_CONTAINER); do \
+		docker logs -f --tail $(LOGS_TAIL) $${svc#*:} 2>&1 \
+			| awk -v prefix="[$${svc%%:*}] " '{ print prefix $$0; fflush() }' & \
+	done; \
 	wait
 endef
 
-# Show service logs (follow mode)
+# Show service logs (follow mode), starting at the last $(LOGS_TAIL) lines
 # Usage: $(call docker_logs_service,backend)
 define docker_logs_service
 	@if [ "$(1)" = "backend" ]; then \
-		docker logs -f $(BACKEND_CONTAINER) 2>&1; \
+		docker logs -f --tail $(LOGS_TAIL) $(BACKEND_CONTAINER) 2>&1; \
 	elif [ "$(1)" = "mobile" ]; then \
-		docker logs -f $(MOBILE_CONTAINER) 2>&1; \
+		docker logs -f --tail $(LOGS_TAIL) $(MOBILE_CONTAINER) 2>&1; \
 	elif [ "$(1)" = "redis" ]; then \
-		docker logs -f $(REDIS_CONTAINER) 2>&1; \
+		docker logs -f --tail $(LOGS_TAIL) $(REDIS_CONTAINER) 2>&1; \
+	else \
+		echo "$(RED)$(ICON_ERROR) Unknown service: $(1)$(NC)"; \
+		exit 1; \
 	fi
 endef
 
