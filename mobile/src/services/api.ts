@@ -2,7 +2,7 @@ import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import type { LoginInput, RegisterInput } from '@utils/validators';
-import type { UserProfile } from '@types';
+import type { UserProfile } from '@/types/user.types';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
 
