@@ -51,6 +51,9 @@ BACKEND_CONTAINER := zumik-backend
 MOBILE_CONTAINER := zumik-mobile
 REDIS_CONTAINER := zumik-redis
 
+# Lines of history shown before following logs (make logs LOGS_TAIL=500)
+LOGS_TAIL ?= 100
+
 # Docker volumes
 TUNNEL_VOLUME := tunnel-info
 REDIS_VOLUME := redis-data

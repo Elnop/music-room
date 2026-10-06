@@ -50,7 +50,7 @@ logs: ## Show logs from all services (ctrl+c to exit)
 
 logs-mobile: ## Show mobile logs only
 	$(call print_info,Mobile logs (press Ctrl+C to exit)...)
-	$(call docker_logs_service,$(MOBILE_CONTAINER))
+	$(call docker_logs_service,mobile)
 
 qr: ## Display Expo QR code and connection URL
 	$(call clear_and_header,📱 Expo QR Code)
