@@ -16,11 +16,11 @@ tracker_status: backlog
 
 ## Description
 
-Compare version optimiste avec refus 409, opération unitaire « déplacer une track » et verrou côté base, et retient celle qui satisfait CAP-5 avec Supabase.
+Retient la stratégie de concurrence des tracks qui satisfait CAP-5 avec Supabase et la documente dans doc/PLAYLIST_CONCURRENCY.md : rangs fractionnaires, fonctions Postgres sous verrou de playlist, version par playlist et par track, 409 seulement sur la même track.
 
 ## Acceptance Criteria
 
-Verify: Une ligne Decision dans l'epic nomme la stratégie, le format de version et le comportement en conflit.
+Verify: Une ligne Decision dans l'epic nomme la stratégie, le format de version et le comportement en conflit, et doc/PLAYLIST_CONCURRENCY.md la décrit.
 
 ## References
 

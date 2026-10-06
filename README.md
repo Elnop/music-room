@@ -113,6 +113,7 @@ cd mobile && npm run format
 - [Redis Setup](./doc/REDIS.md) - Cache and rate limiting configuration
 - [Security](./doc/SECURITY.md) - Docker security (Chainguard Images, 0 CVE)
 - [Testing Security](./doc/TESTING_SECURITY.md) - Subject IV.6 compliance
+- [Playlist Concurrency](./doc/PLAYLIST_CONCURRENCY.md) - Concurrent track edits (subject IV.2.3)
 
 ### Architecture
 
