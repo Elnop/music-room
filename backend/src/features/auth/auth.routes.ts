@@ -99,6 +99,15 @@ router.delete('/providers/:provider', authMiddleware, (req, res, next) =>
 );
 
 /**
+ * @route   POST /api/auth/providers/:provider/link
+ * @desc    Link a Google or Facebook account to the account
+ * @access  Private (requires authentication)
+ */
+router.post('/providers/:provider/link', authMiddleware, oauthRateLimiter, (req, res, next) =>
+	authController.linkProvider(req, res, next)
+);
+
+/**
  * @route   POST /api/auth/verify-email
  * @desc    Verify email with 6-digit code
  * @access  Public

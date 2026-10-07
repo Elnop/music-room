@@ -1,0 +1,3 @@
+- source_plan: `_bmad-output/initiative-validation-mandatory/epic-comptes-auth/story-lier-google-ou-facebook-a-un-compte-connecte-backend-plan.md`
+  summary: Sign-ins (`signInWithPassword`, `verifyOtp`, `refreshSession`) run on the shared `supabaseAdmin` client, which then queries PostgREST as the last signed-in user under RLS instead of service role; do them on a throwaway client.
+  evidence: supabase-js 2.117.2 `_getAccessToken` returns the in-memory session token before `supabaseKey` even with `persistSession: false`; calls at auth.service.ts:140, user.service.ts:82, auth.controller.ts:428, session.service.ts:40; the #73 integration test had every write after a Google login refused by RLS until it signed the client out.

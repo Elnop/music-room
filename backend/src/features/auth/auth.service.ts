@@ -6,6 +6,7 @@ import { SessionService } from '@/features/auth/services/session.service.js';
 import { OAuthService } from '@/features/auth/services/oauth.service.js';
 import { UserService } from '@/features/auth/services/user.service.js';
 import { ProviderService } from '@/features/auth/services/provider.service.js';
+import { ProviderLinkService } from '@/features/auth/services/provider-link.service.js';
 import { EmailVerificationService } from '@/features/auth/services/email-verification.service.js';
 import type {
 	RegisterDTO,
@@ -259,7 +260,7 @@ export class AuthService {
 			return {
 				user: {
 					id: userProfile.id,
-					email: googlePayload.email,
+					email: userProfile.email,
 					username: userProfile.username,
 					displayName: userProfile.displayName,
 					avatarUrl: userProfile.avatarUrl,
@@ -319,12 +320,10 @@ export class AuthService {
 				hasSyntheticEmail: !facebookPayload.email,
 			});
 
-			const responseEmail = facebookPayload.email || session.user.email || '';
-
 			return {
 				user: {
 					id: userProfile.id,
-					email: responseEmail,
+					email: userProfile.email,
 					username: userProfile.username,
 					displayName: userProfile.displayName,
 					avatarUrl: userProfile.avatarUrl,
@@ -355,5 +354,20 @@ export class AuthService {
 	 */
 	async unlinkProvider(userId: string, provider: OAuthProvider): Promise<void> {
 		return ProviderService.unlinkProvider(userId, provider);
+	}
+
+	/**
+	 * Link an OAuth provider to a user's account
+	 * @param userId - User ID
+	 * @param provider - Provider to link ('google' or 'facebook')
+	 * @param token - Google ID token or Facebook access token
+	 * @returns Every linked provider afterwards
+	 */
+	async linkProvider(
+		userId: string,
+		provider: OAuthProvider,
+		token: string
+	): Promise<LinkedProvidersResponse> {
+		return ProviderLinkService.linkProvider(userId, provider, token);
 	}
 }

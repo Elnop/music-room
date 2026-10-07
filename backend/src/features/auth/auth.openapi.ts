@@ -358,22 +358,7 @@ export const authPaths: OpenAPIV3.PathsObject = {
 												properties: {
 													providers: {
 														type: 'array',
-														items: {
-															type: 'object',
-															properties: {
-																type: {
-																	type: 'string',
-																	enum: ['password', 'google', 'facebook'],
-																},
-																connectedAt: {
-																	type: 'string',
-																	format: 'date-time',
-																},
-																isPrimary: {
-																	type: 'boolean',
-																},
-															},
-														},
+														items: { $ref: '#/components/schemas/LinkedProvider' },
 														example: [
 															{
 																type: 'password',
@@ -458,6 +443,149 @@ export const authPaths: OpenAPIV3.PathsObject = {
 				},
 				'401': { $ref: '#/components/responses/UnauthorizedError' },
 				'404': { $ref: '#/components/responses/NotFoundError' },
+			},
+		},
+	},
+
+	'/api/auth/providers/{provider}/link': {
+		post: {
+			tags: ['Authentication', 'OAuth'],
+			summary: 'Link OAuth provider to current account',
+			description: `
+        Links a Google or Facebook account to the signed-in user, whatever the email of the social account.
+        Afterwards the user can sign in with any linked method and reach the same account.
+
+        **Body:** the token the app already gets for sign-in. The \`provider\` path value decides which field is required:
+        - google → \`{ idToken }\` (same as POST /api/auth/google)
+        - facebook → \`{ accessToken }\` (same as POST /api/auth/facebook)
+
+        **Errors:**
+        - \`INVALID_PROVIDER_TOKEN\` (400): the provider token is invalid or expired. Not a 401, so the client does not take it for an expired session
+        - \`PROVIDER_ALREADY_LINKED\` (409): this social account is linked to another user
+        - \`PROVIDER_ALREADY_SET\` (409): the current user already has an account of this provider linked, this one or another
+      `,
+			operationId: 'linkProvider',
+			security: [{ bearerAuth: [] }],
+			parameters: [
+				{
+					in: 'path',
+					name: 'provider',
+					required: true,
+					schema: {
+						type: 'string',
+						enum: ['google', 'facebook'],
+					},
+					description: 'OAuth provider to link',
+				},
+			],
+			requestBody: {
+				required: true,
+				content: {
+					'application/json': {
+						schema: {
+							anyOf: [
+								{ $ref: '#/components/schemas/GoogleLoginRequest' },
+								{ $ref: '#/components/schemas/FacebookLoginRequest' },
+							],
+						},
+						examples: {
+							google: { value: { idToken: 'eyJhbGciOiJSUzI1NiIs...' } },
+							facebook: { value: { accessToken: 'EAAGm0PX4ZCpsBA...' } },
+						},
+					},
+				},
+			},
+			responses: {
+				'200': {
+					description: 'Provider linked; returns every linked provider',
+					content: {
+						'application/json': {
+							schema: {
+								allOf: [
+									{ $ref: '#/components/schemas/SuccessResponse' },
+									{
+										type: 'object',
+										properties: {
+											data: {
+												type: 'object',
+												properties: {
+													providers: {
+														type: 'array',
+														items: { $ref: '#/components/schemas/LinkedProvider' },
+													},
+												},
+											},
+										},
+									},
+								],
+							},
+						},
+					},
+				},
+				'400': {
+					description: 'Validation failed, or invalid provider token',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+							examples: {
+								validation: {
+									value: {
+										success: false,
+										error: {
+											message: 'Validation failed',
+											code: 'VALIDATION_ERROR',
+											details: { field: 'idToken', issue: 'ID token is required' },
+										},
+										meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+									},
+								},
+								invalidProviderToken: {
+									value: {
+										success: false,
+										error: {
+											message: 'Invalid or expired Google token',
+											code: 'INVALID_PROVIDER_TOKEN',
+										},
+										meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+									},
+								},
+							},
+						},
+					},
+				},
+				'401': { $ref: '#/components/responses/UnauthorizedError' },
+				'409': {
+					description:
+						'Social account already linked to another user, or this provider already linked to the current user',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+							examples: {
+								linkedToAnotherUser: {
+									value: {
+										success: false,
+										error: {
+											message: 'This Google account is already linked to another user',
+											code: 'PROVIDER_ALREADY_LINKED',
+										},
+										meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+									},
+								},
+								alreadySetOnThisUser: {
+									value: {
+										success: false,
+										error: {
+											message: 'A Google account is already linked to this user',
+											code: 'PROVIDER_ALREADY_SET',
+										},
+										meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+									},
+								},
+							},
+						},
+					},
+				},
+				'429': { $ref: '#/components/responses/RateLimitError' },
 			},
 		},
 	},
@@ -548,6 +676,24 @@ export const authSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 			accessToken: {
 				type: 'string',
 				description: 'Facebook access token from react-native-fbsdk-next',
+			},
+		},
+	},
+
+	LinkedProvider: {
+		type: 'object',
+		required: ['type', 'connectedAt', 'isPrimary'],
+		properties: {
+			type: {
+				type: 'string',
+				enum: ['password', 'google', 'facebook'],
+			},
+			connectedAt: {
+				type: 'string',
+				format: 'date-time',
+			},
+			isPrimary: {
+				type: 'boolean',
 			},
 		},
 	},
