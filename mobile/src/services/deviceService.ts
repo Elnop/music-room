@@ -1,10 +1,24 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 
 const DEVICE_ID_KEY = '@zumik_device_id';
+
+/**
+ * App version sent to the backend (HTTP `X-App-Version` header and the
+ * Socket.io handshake). Single source for both.
+ */
+export function getAppVersion(): string {
+	return (
+		Constants.expoConfig?.version ||
+		Constants.manifest?.version ||
+		Constants.manifest2?.extra?.expoClient?.version ||
+		'1.0.0'
+	);
+}
 
 /**
  * Device information for multi-device music control

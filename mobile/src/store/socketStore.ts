@@ -1,6 +1,33 @@
 import { create } from 'zustand';
 import { io, Socket } from 'socket.io-client';
 import { API_CONFIG } from '@constants';
+import { useAuthStore } from '@store/authStore';
+import { deviceService, getAppVersion } from '@/services/deviceService';
+
+/**
+ * Handshake refusal codes sent by the server as the `connect_error` message
+ * (backend/src/realtime/socket-auth.ts).
+ */
+const NO_TOKEN = 'NO_TOKEN';
+const INVALID_HANDSHAKE = 'INVALID_HANDSHAKE';
+const INVALID_TOKEN = 'INVALID_TOKEN';
+
+/**
+ * Builds the Socket.io handshake `auth` payload. Called on every connection
+ * attempt, so the token is always the one currently in the auth store.
+ * The auth store is read lazily (never at import time) to avoid an import cycle.
+ */
+async function buildHandshake(): Promise<Record<string, string>> {
+	const token = useAuthStore.getState().accessToken ?? '';
+	const appVersion = getAppVersion();
+	try {
+		const device = await deviceService.getDeviceInfo();
+		return { token, ...device, appVersion };
+	} catch (error) {
+		console.error('[Socket] Could not read device info for the handshake:', error);
+		return { token, deviceId: '', deviceName: '', platform: '', model: '', appVersion };
+	}
+}
 
 /**
  * Socket State Interface
@@ -55,10 +82,40 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 			reconnectionDelayMax: 5000,
 			timeout: 20000,
 			forceNew: true,
+			auth: cb => {
+				void buildHandshake().then(cb);
+			},
 		});
+
+		// One token refresh per handshake refusal; reset once a connection succeeds.
+		let hasRefreshed = false;
+
+		const stop = () => {
+			if (get().socket === socket) get().disconnect();
+			else socket.disconnect();
+		};
+
+		const handleRefusal = async (code: string) => {
+			if (code === INVALID_TOKEN && !hasRefreshed) {
+				hasRefreshed = true;
+				if (__DEV__) console.log('[Socket] Token refused, refreshing it once');
+				const refreshed = await useAuthStore.getState().refreshAccessToken();
+				if (get().socket !== socket) return;
+				if (refreshed) {
+					socket.connect();
+					return;
+				}
+				console.error('[Socket] Token refresh failed, staying disconnected');
+				stop();
+				return;
+			}
+			console.error('[Socket] Handshake refused, staying disconnected:', code);
+			stop();
+		};
 
 		socket.on('connect', () => {
 			if (__DEV__) console.log('[Socket] ✅ Connected successfully:', socket.id);
+			hasRefreshed = false;
 			set({ isConnected: true });
 		});
 
@@ -69,6 +126,14 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 
 		socket.on('connect_error', error => {
 			console.error('[Socket] ❌ Connection error:', error.message);
+			if (
+				error.message === NO_TOKEN ||
+				error.message === INVALID_HANDSHAKE ||
+				error.message === INVALID_TOKEN
+			) {
+				void handleRefusal(error.message);
+				return;
+			}
 			const transport = socket.io?.engine?.transport?.name ?? 'unknown';
 			console.error('[Socket] Error details:', {
 				url: socketUrl,

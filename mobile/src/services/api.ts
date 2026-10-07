@@ -3,6 +3,7 @@ import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import type { LoginInput, RegisterInput } from '@utils/validators';
 import type { UserProfile } from '@/types/user.types';
+import { getAppVersion } from '@/services/deviceService';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
 
@@ -58,11 +59,7 @@ export class ApiError extends Error {
  * Get client metadata headers for action logging
  */
 function getClientHeaders(): Record<string, string> {
-	const appVersion =
-		Constants.expoConfig?.version ||
-		Constants.manifest?.version ||
-		Constants.manifest2?.extra?.expoClient?.version ||
-		'1.0.0';
+	const appVersion = getAppVersion();
 
 	const headers = {
 		'X-Platform': Platform.OS,
