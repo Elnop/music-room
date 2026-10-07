@@ -3,7 +3,7 @@
 # ==============================================================================
 # Commands for local development, useful with Android Studio emulator
 
-.PHONY: dev-local expo-android expo-clear check-devices start-emulator start-emulators kill-emulator restart-emulator list-emulators open-emulator
+.PHONY: dev-local expo-android expo-clear check-devices start-emulator start-emulators start-emulators-app restart-emulators open-app kill-emulator restart-emulator list-emulators open-emulator
 
 ADB := $(ANDROID_HOME)/platform-tools/adb
 
@@ -145,8 +145,56 @@ start-emulators: ## Start two Android emulators for two-account tests (AVD1=name
 		echo "$(GREEN)$(ICON_SUCCESS) $$serial booted$(NC)"; \
 	done
 	$(call blank_line)
-	$(call print_info,Open Zumik on each: $(GREEN)adb -s emulator-5554 shell am start -a android.intent.action.VIEW -d exp://$(HOST_IP):8081$(NC) (same with emulator-5556))
+	$(call print_info,Open the app on both: $(GREEN)make open-app$(NC))
 	$(call blank_line)
+
+EXPO_GO_PACKAGE := host.exp.exponent
+EXPO_GO_CACHE := $(HOME)/.cache/zumik/expo-go.apk
+# Metro URL opened in Expo Go (LAN, as served by make dev-docker); override with APP_URL=...
+APP_URL ?= exp://$(HOST_IP):$(METRO_PORT)
+
+open-app: ## Open the app in Expo Go on every running emulator, installing Expo Go where missing (APP_URL=exp://...)
+	$(call print_header,Opening Zumik on Emulators)
+	@DEVICES=$$($(ADB) devices | grep '^emulator' | grep -w device | cut -f1); \
+	if [ -z "$$DEVICES" ]; then \
+		echo "$(RED)$(ICON_ERROR) No emulator running$(NC)"; \
+		echo "$(BLUE)$(ICON_INFO) Use $(GREEN)make start-emulators-app$(NC)"; \
+		exit 1; \
+	fi; \
+	for serial in $$(echo "$$DEVICES"); do \
+		if ! $(ADB) -s $$serial shell pm path $(EXPO_GO_PACKAGE) 2>/dev/null | grep -q package; then \
+			if [ ! -f "$(EXPO_GO_CACHE)" ]; then \
+				for other in $$(echo "$$DEVICES"); do \
+					APK=$$($(ADB) -s $$other shell pm path $(EXPO_GO_PACKAGE) 2>/dev/null | grep base.apk | sed 's/^package://' | tr -d '\r'); \
+					if [ -n "$$APK" ]; then \
+						mkdir -p "$$(dirname "$(EXPO_GO_CACHE)")"; \
+						$(ADB) -s $$other pull "$$APK" "$(EXPO_GO_CACHE)" > /dev/null 2>&1 && break; \
+					fi; \
+				done; \
+			fi; \
+			if [ ! -f "$(EXPO_GO_CACHE)" ]; then \
+				echo "$(RED)$(ICON_ERROR) Expo Go missing on $$serial and on every other emulator$(NC)"; \
+				echo "$(YELLOW)$(ICON_WARNING) Install it once from https://expo.dev/go (Android), it is then reused$(NC)"; \
+				exit 1; \
+			fi; \
+			echo "$(BLUE)$(ICON_INFO) Installing Expo Go on $$serial...$(NC)"; \
+			$(ADB) -s $$serial install -r "$(EXPO_GO_CACHE)" > /dev/null || exit 1; \
+		fi; \
+		$(ADB) -s $$serial shell am start -a android.intent.action.VIEW -d "$(APP_URL)" -p $(EXPO_GO_PACKAGE) > /dev/null || exit 1; \
+		echo "$(GREEN)$(ICON_SUCCESS) $$serial: $(APP_URL)$(NC)"; \
+	done
+	$(call blank_line)
+
+start-emulators-app: ## Start two emulators and open the app on both (AVD1= AVD2=, APP_URL=)
+	@$(MAKE) --no-print-directory start-emulators
+	@$(MAKE) --no-print-directory open-app
+
+restart-emulators: ## Stop all emulators, cold boot two again (no saved state) and open the app on both
+	@$(MAKE) --no-print-directory kill-emulator
+	@i=0; while $(ADB) devices | grep -q emulator; do \
+		i=$$((i + 1)); [ $$i -gt 30 ] && break; sleep 1; \
+	done
+	@$(MAKE) --no-print-directory start-emulators-app FAST=
 
 restart-emulator: ## Stop the emulator and cold boot it again (AVD=name, FAST=1 to resume saved state)
 	@$(MAKE) --no-print-directory kill-emulator
