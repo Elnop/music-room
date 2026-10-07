@@ -54,7 +54,7 @@ help: ## Show this help message
 	@echo "    $(GREEN)start-emulators$(NC)   Start two AVDs for two-account tests $(YELLOW)[AVD1= AVD2=]$(NC)"
 	@echo "    $(GREEN)start-emulators-app$(NC) Start two AVDs and open the app on both"
 	@echo "    $(GREEN)restart-emulators$(NC) Cold boot two AVDs again and open the app"
-	@echo "    $(GREEN)open-app$(NC)          Open the app in Expo Go on running emulators"
+	@echo "    $(GREEN)open-app$(NC)          Launch the Zumik debug build on running emulators"
 	@echo "    $(GREEN)kill-emulator$(NC)     Stop all running emulators"
 	@echo "    $(GREEN)check-devices$(NC)     Check connected Android devices"
 	@echo ""

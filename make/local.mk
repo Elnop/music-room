@@ -148,12 +148,13 @@ start-emulators: ## Start two Android emulators for two-account tests (AVD1=name
 	$(call print_info,Open the app on both: $(GREEN)make open-app$(NC))
 	$(call blank_line)
 
-EXPO_GO_PACKAGE := host.exp.exponent
-EXPO_GO_CACHE := $(HOME)/.cache/zumik/expo-go.apk
-# Metro URL opened in Expo Go (LAN, as served by make dev-docker); override with APP_URL=...
-APP_URL ?= exp://$(HOST_IP):$(METRO_PORT)
+# The app runs as the Zumik debug build (Expo Go cannot load its native modules,
+# e.g. Google Sign-In). A debug build loads the JS from Metro on the host
+# (10.0.2.2:8081 from an emulator), so it runs the current branch.
+APP_PACKAGE := com.zumik.app
+APP_APK_CACHE := $(HOME)/.cache/zumik/zumik-debug.apk
 
-open-app: ## Open the app in Expo Go on every running emulator, installing Expo Go where missing (APP_URL=exp://...)
+open-app: ## Launch the Zumik debug build on every running emulator, copying it where missing
 	$(call print_header,Opening Zumik on Emulators)
 	@DEVICES=$$($(ADB) devices | grep '^emulator' | grep -w device | cut -f1); \
 	if [ -z "$$DEVICES" ]; then \
@@ -162,38 +163,38 @@ open-app: ## Open the app in Expo Go on every running emulator, installing Expo 
 		exit 1; \
 	fi; \
 	for serial in $$(echo "$$DEVICES"); do \
-		if ! $(ADB) -s $$serial shell pm path $(EXPO_GO_PACKAGE) 2>/dev/null | grep -q package; then \
-			if [ ! -f "$(EXPO_GO_CACHE)" ]; then \
+		if ! $(ADB) -s $$serial shell pm path $(APP_PACKAGE) 2>/dev/null | grep -q package; then \
+			if [ ! -f "$(APP_APK_CACHE)" ]; then \
 				for other in $$(echo "$$DEVICES"); do \
-					APK=$$($(ADB) -s $$other shell pm path $(EXPO_GO_PACKAGE) 2>/dev/null | grep base.apk | sed 's/^package://' | tr -d '\r'); \
+					APK=$$($(ADB) -s $$other shell pm path $(APP_PACKAGE) 2>/dev/null | grep base.apk | sed 's/^package://' | tr -d '\r'); \
 					if [ -n "$$APK" ]; then \
-						mkdir -p "$$(dirname "$(EXPO_GO_CACHE)")"; \
-						$(ADB) -s $$other pull "$$APK" "$(EXPO_GO_CACHE)" > /dev/null 2>&1 && break; \
+						mkdir -p "$$(dirname "$(APP_APK_CACHE)")"; \
+						$(ADB) -s $$other pull "$$APK" "$(APP_APK_CACHE)" > /dev/null 2>&1 && break; \
 					fi; \
 				done; \
 			fi; \
-			if [ ! -f "$(EXPO_GO_CACHE)" ]; then \
-				echo "$(RED)$(ICON_ERROR) Expo Go missing on $$serial and on every other emulator$(NC)"; \
-				echo "$(YELLOW)$(ICON_WARNING) Install it once from https://expo.dev/go (Android), it is then reused$(NC)"; \
+			if [ ! -f "$(APP_APK_CACHE)" ]; then \
+				echo "$(RED)$(ICON_ERROR) Zumik is not installed on $$serial nor on any other emulator$(NC)"; \
+				echo "$(YELLOW)$(ICON_WARNING) Install a debug build once: cd mobile && npx expo run:android (it is then reused)$(NC)"; \
 				exit 1; \
 			fi; \
-			echo "$(BLUE)$(ICON_INFO) Installing Expo Go on $$serial...$(NC)"; \
-			$(ADB) -s $$serial install -r "$(EXPO_GO_CACHE)" > /dev/null || exit 1; \
+			echo "$(BLUE)$(ICON_INFO) Installing Zumik on $$serial...$(NC)"; \
+			$(ADB) -s $$serial install -r "$(APP_APK_CACHE)" > /dev/null || exit 1; \
 		fi; \
-		$(ADB) -s $$serial shell am start -a android.intent.action.VIEW -d "$(APP_URL)" -p $(EXPO_GO_PACKAGE) > /dev/null || exit 1; \
-		echo "$(GREEN)$(ICON_SUCCESS) $$serial: $(APP_URL)$(NC)"; \
+		$(ADB) -s $$serial shell am start -n $(APP_PACKAGE)/.MainActivity > /dev/null 2>&1 || exit 1; \
+		echo "$(GREEN)$(ICON_SUCCESS) $$serial: Zumik started$(NC)"; \
 	done; \
-	echo "$(BLUE)$(ICON_INFO) ⏳ Checking Expo Go stays open (a launch right after boot can crash)...$(NC)"; \
+	echo "$(BLUE)$(ICON_INFO) ⏳ Checking the app stays open (a launch right after boot can crash)...$(NC)"; \
 	sleep 20; \
 	for serial in $$(echo "$$DEVICES"); do \
-		if ! $(ADB) -s $$serial shell dumpsys activity activities 2>/dev/null | grep -m1 topResumedActivity | grep -q $(EXPO_GO_PACKAGE); then \
-			echo "$(YELLOW)$(ICON_WARNING) Expo Go is not in the foreground on $$serial, relaunching$(NC)"; \
-			$(ADB) -s $$serial shell am start -a android.intent.action.VIEW -d "$(APP_URL)" -p $(EXPO_GO_PACKAGE) > /dev/null || exit 1; \
+		if ! $(ADB) -s $$serial shell dumpsys activity activities 2>/dev/null | grep -m1 topResumedActivity | grep -q $(APP_PACKAGE); then \
+			echo "$(YELLOW)$(ICON_WARNING) Zumik is not in the foreground on $$serial, relaunching$(NC)"; \
+			$(ADB) -s $$serial shell am start -n $(APP_PACKAGE)/.MainActivity > /dev/null 2>&1 || exit 1; \
 		fi; \
 	done
 	$(call blank_line)
 
-start-emulators-app: ## Start two emulators and open the app on both (AVD1= AVD2=, APP_URL=)
+start-emulators-app: ## Start two emulators and open the app on both (AVD1= AVD2=)
 	@$(MAKE) --no-print-directory start-emulators
 	@$(MAKE) --no-print-directory open-app
 
