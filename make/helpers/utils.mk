@@ -21,7 +21,7 @@ help: ## Show this help message
 	@echo "  $(GREEN)dev-docker$(NC)          Start all services in Docker (backend + mobile)"
 	@echo "                      $(YELLOW)[requires: install]$(NC)"
 	@echo "  $(GREEN)stop$(NC)                Stop all containers"
-	@echo "  $(GREEN)restart$(NC)             Restart all services"
+	@echo "  $(GREEN)containers-restart$(NC)  Restart the containers (no rebuild)"
 	@echo "  $(GREEN)start$(NC)               Start existing containers (no rebuild)"
 	@echo "  $(GREEN)down$(NC)                Stop and remove containers + networks"
 	@echo "  $(GREEN)logs$(NC)                View all logs → see: backend-logs, logs-mobile"
@@ -193,7 +193,7 @@ fix-permissions: ## Fix file permissions for Docker non-root user compatibility
 	$(call print_header,Permissions Fixed)
 	$(call display_permissions_info)
 	$(call blank_line)
-	$(call print_warning,Run 'make restart' to apply in Docker)
+	$(call print_warning,Run 'make containers-restart' to apply in Docker)
 	$(call blank_line)
 
 fix-node-modules: ## Fix node_modules ownership (for local builds outside Docker)
