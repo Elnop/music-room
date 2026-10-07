@@ -51,6 +51,7 @@ help: ## Show this help message
 	@echo "    $(GREEN)list-emulators$(NC)    List all available AVDs"
 	@echo "    $(GREEN)open-emulator$(NC)     Open specific emulator $(YELLOW)[interactive]$(NC)"
 	@echo "    $(GREEN)start-emulator$(NC)    Start first AVD with software GPU"
+	@echo "    $(GREEN)start-emulators$(NC)   Start two AVDs for two-account tests $(YELLOW)[AVD1= AVD2=]$(NC)"
 	@echo "    $(GREEN)kill-emulator$(NC)     Stop all running emulators"
 	@echo "    $(GREEN)check-devices$(NC)     Check connected Android devices"
 	@echo ""

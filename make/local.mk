@@ -3,7 +3,7 @@
 # ==============================================================================
 # Commands for local development, useful with Android Studio emulator
 
-.PHONY: dev-local expo-android expo-clear check-devices start-emulator kill-emulator restart-emulator list-emulators open-emulator
+.PHONY: dev-local expo-android expo-clear check-devices start-emulator start-emulators kill-emulator restart-emulator list-emulators open-emulator
 
 ADB := $(ANDROID_HOME)/platform-tools/adb
 
@@ -108,6 +108,44 @@ start-emulator: ## Start the Android emulator, cold boot by default (AVD=name, F
 	$(call blank_line)
 	$(call print_success,Emulator started!)
 	$(call print_info,Open Zumik on the emulator: it loads the code served by $(GREEN)make dev-docker$(NC) or $(GREEN)make dev-local$(NC))
+	$(call blank_line)
+
+start-emulators: ## Start two Android emulators for two-account tests (AVD1=name AVD2=name, FAST=1 to resume saved state)
+	$(call print_header,Starting Two Android Emulators)
+	@RUNNING=$$($(ADB) devices | grep emulator | wc -l); \
+	if [ $$RUNNING -gt 0 ]; then \
+		echo "$(YELLOW)$(ICON_WARNING) Emulator already running$(NC)"; \
+		echo "$(BLUE)$(ICON_INFO) Use $(GREEN)make kill-emulator$(NC) to stop it first$(NC)"; \
+		exit 1; \
+	fi; \
+	AVDS=$$($(ANDROID_HOME)/emulator/emulator -list-avds 2>/dev/null); \
+	AVD1="$(AVD1)"; [ -n "$$AVD1" ] || AVD1=$$(echo "$$AVDS" | sed -n 1p); \
+	AVD2="$(AVD2)"; [ -n "$$AVD2" ] || AVD2=$$(echo "$$AVDS" | grep -vxF "$$AVD1" | sed -n 1p); \
+	if [ -z "$$AVD1" ] || [ -z "$$AVD2" ]; then \
+		echo "$(RED)$(ICON_ERROR) Two AVDs are needed$(NC)"; \
+		echo "$(YELLOW)$(ICON_WARNING) Create another one in Android Studio: Tools > Device Manager$(NC)"; \
+		exit 1; \
+	fi; \
+	if [ "$$AVD1" = "$$AVD2" ]; then \
+		echo "$(RED)$(ICON_ERROR) AVD1 and AVD2 must be different (one AVD cannot run twice)$(NC)"; \
+		exit 1; \
+	fi; \
+	echo "$(BLUE)$(ICON_INFO) emulator-5554: $(GREEN)$$AVD1$(NC)"; \
+	echo "$(BLUE)$(ICON_INFO) emulator-5556: $(GREEN)$$AVD2$(NC)"; \
+	$(ANDROID_HOME)/emulator/emulator -avd "$$AVD1" -port 5554 $(EMULATOR_FLAGS) > /dev/null 2>&1 & \
+	$(ANDROID_HOME)/emulator/emulator -avd "$$AVD2" -port 5556 $(EMULATOR_FLAGS) > /dev/null 2>&1 & \
+	echo ""; \
+	echo "$(BLUE)$(ICON_INFO) ⏳ Waiting for both emulators to boot...$(NC)"; \
+	for serial in emulator-5554 emulator-5556; do \
+		i=0; until [ "$$($(ADB) -s $$serial shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = "1" ]; do \
+			i=$$((i + 1)); \
+			if [ $$i -gt 90 ]; then echo "$(RED)$(ICON_ERROR) $$serial did not boot within 3 minutes$(NC)"; exit 1; fi; \
+			sleep 2; \
+		done; \
+		echo "$(GREEN)$(ICON_SUCCESS) $$serial booted$(NC)"; \
+	done
+	$(call blank_line)
+	$(call print_info,Open Zumik on each: $(GREEN)adb -s emulator-5554 shell am start -a android.intent.action.VIEW -d exp://$(HOST_IP):8081$(NC) (same with emulator-5556))
 	$(call blank_line)
 
 restart-emulator: ## Stop the emulator and cold boot it again (AVD=name, FAST=1 to resume saved state)
