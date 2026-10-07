@@ -593,7 +593,7 @@ docker restart zumik-mobile
    ```bash
    NGROK_AUTHTOKEN=your_authtoken_here
    ```
-4. Restart: `make restart`
+4. Restart: `make containers-restart`
 
 ### Issue: Expo starts in LAN mode instead of tunnel mode
 
