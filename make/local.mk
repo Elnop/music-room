@@ -182,6 +182,14 @@ open-app: ## Open the app in Expo Go on every running emulator, installing Expo 
 		fi; \
 		$(ADB) -s $$serial shell am start -a android.intent.action.VIEW -d "$(APP_URL)" -p $(EXPO_GO_PACKAGE) > /dev/null || exit 1; \
 		echo "$(GREEN)$(ICON_SUCCESS) $$serial: $(APP_URL)$(NC)"; \
+	done; \
+	echo "$(BLUE)$(ICON_INFO) ⏳ Checking Expo Go stays open (a launch right after boot can crash)...$(NC)"; \
+	sleep 20; \
+	for serial in $$(echo "$$DEVICES"); do \
+		if ! $(ADB) -s $$serial shell dumpsys activity activities 2>/dev/null | grep -m1 topResumedActivity | grep -q $(EXPO_GO_PACKAGE); then \
+			echo "$(YELLOW)$(ICON_WARNING) Expo Go is not in the foreground on $$serial, relaunching$(NC)"; \
+			$(ADB) -s $$serial shell am start -a android.intent.action.VIEW -d "$(APP_URL)" -p $(EXPO_GO_PACKAGE) > /dev/null || exit 1; \
+		fi; \
 	done
 	$(call blank_line)
 
