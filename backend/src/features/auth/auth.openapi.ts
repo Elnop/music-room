@@ -585,6 +585,7 @@ export const authPaths: OpenAPIV3.PathsObject = {
 						},
 					},
 				},
+				'429': { $ref: '#/components/responses/RateLimitError' },
 			},
 		},
 	},

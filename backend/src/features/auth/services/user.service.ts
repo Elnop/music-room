@@ -150,12 +150,27 @@ export class UserService {
 						.eq('id', existingOAuth.id);
 				}
 
-				const session = await this.createSessionForOAuthUser(effectiveEmail);
+				// The provider may have been linked with another email: open the
+				// session for the account's own auth email, not the network's.
+				const { data: authUser, error: authUserError } = await supabase.auth.admin.getUserById(
+					existingOAuth.id
+				);
+				const accountEmail = authUser?.user?.email;
+
+				if (authUserError || !accountEmail) {
+					logger.error('Failed to get auth user for OAuth login', {
+						userId: existingOAuth.id,
+						error: authUserError,
+					});
+					throw new AppError(500, 'Failed to load OAuth user', 'OAUTH_USER_LOOKUP_FAILED');
+				}
+
+				const session = await this.createSessionForOAuthUser(accountEmail);
 
 				return {
 					userProfile: {
 						id: existingOAuth.id,
-						email: effectiveEmail,
+						email: accountEmail,
 						username: existingOAuth.username,
 						displayName: existingOAuth.display_name ?? undefined,
 						avatarUrl: existingOAuth.avatar_url ?? undefined,
