@@ -134,7 +134,7 @@ define display_common_commands
 	$(call print_command,logs,View all logs (live))
 	$(if $(filter lan,$(1)),$(call print_command,logs-mobile,View Expo logs only))
 	$(call print_command,stop,Stop all services)
-	$(if $(filter lan,$(1)),$(call print_command,restart,Restart all services))
+	$(if $(filter lan,$(1)),$(call print_command,containers-restart,Restart the containers))
 	$(if $(filter tunnel,$(1)),$(call print_command,dev,Switch to LAN mode))
 endef
 

@@ -44,6 +44,6 @@ set-backend-url: ## Configure mobile .env with backend URL (auto-detect HOST_IP)
 	fi; \
 	echo ""; \
 	echo "$(BLUE)$(ICON_INFO) Next steps:$(NC)"; \
-	echo "  1. $(GREEN)make restart$(NC) - Restart backend"; \
+	echo "  1. $(GREEN)make containers-restart$(NC) - Restart the containers"; \
 	echo "  2. Reload mobile app"; \
 	echo ""

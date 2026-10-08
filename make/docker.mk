@@ -3,7 +3,7 @@
 # ==============================================================================
 # Commands for Docker-based development environment
 
-.PHONY: dev-docker start stop restart down logs logs-mobile ps build build-backend build-mobile
+.PHONY: dev-docker start stop containers-restart down logs logs-mobile ps build build-backend build-mobile
 
 dev-docker: ## Start all services in Docker containers (backend + mobile)
 	$(call print_header,Starting Zumik Development Environment)
@@ -34,7 +34,7 @@ stop: ## Stop all running containers
 	$(call docker_stop)
 	$(call print_success,Services stopped)
 
-restart: ## Restart all services
+containers-restart: ## Restart the backend, mobile and redis containers (no rebuild)
 	$(call print_arrow,Restarting all services...)
 	$(call docker_restart)
 	$(call print_success,Services restarted)
@@ -64,7 +64,7 @@ qr: ## Display Expo QR code and connection URL
 	$(call print_warning,Note: Phone and computer must be on the same WiFi)
 	@echo "   Your local IP: $(GREEN)$(HOST_IP)$(NC)"
 	$(call blank_line)
-	@echo "$(YELLOW)💡 Commands:$(NC) $(GREEN)make logs$(NC) | $(GREEN)make stop$(NC) | $(GREEN)make restart$(NC) | $(GREEN)make help$(NC)"
+	@echo "$(YELLOW)💡 Commands:$(NC) $(GREEN)make logs$(NC) | $(GREEN)make stop$(NC) | $(GREEN)make containers-restart$(NC) | $(GREEN)make help$(NC)"
 	$(call blank_line)
 
 ps: ## Show status of all containers

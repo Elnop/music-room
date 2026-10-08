@@ -6,6 +6,7 @@ import {
 	refreshTokenSchema,
 	googleLoginSchema,
 	facebookLoginSchema,
+	providerParamSchema,
 	verifyEmailSchema,
 	resendVerificationSchema,
 	forgotPasswordSchema,
@@ -335,6 +336,38 @@ export class AuthController {
 			res.json(response);
 		} catch (error) {
 			logger.error('Unlink provider error', { error });
+			next(error);
+		}
+	}
+
+	/**
+	 * POST /api/auth/providers/:provider/link
+	 * Link a Google or Facebook account to the current user's account
+	 */
+	async linkProvider(req: Request, res: Response, next: NextFunction) {
+		try {
+			const authReq = req as AuthenticatedRequest;
+			const { provider } = providerParamSchema.parse(req.params);
+			const token =
+				provider === 'google'
+					? googleLoginSchema.parse(req.body).idToken
+					: facebookLoginSchema.parse(req.body).accessToken;
+
+			logger.info('Link provider request', { userId: authReq.user.id, provider });
+
+			const result = await authService.linkProvider(authReq.user.id, provider, token);
+
+			const response: ApiResponse = {
+				success: true,
+				data: result,
+				meta: {
+					timestamp: new Date().toISOString(),
+				},
+			};
+
+			res.json(response);
+		} catch (error) {
+			logger.error('Link provider error', { error });
 			next(error);
 		}
 	}
