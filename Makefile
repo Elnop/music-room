@@ -22,3 +22,4 @@ include make/backend.mk
 include make/build-apk.mk
 include make/production.mk
 include make/cleanup.mk
+include make/help.mk
