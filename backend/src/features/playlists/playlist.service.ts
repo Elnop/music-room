@@ -5,6 +5,7 @@ import {
 	canViewPlaylist,
 	checkOwnership,
 } from '@/features/playlists/permissions/playlist.permissions.js';
+import { realtime } from '@/realtime/index.js';
 import {
 	formatPlaylistResponse,
 	formatTrackResponse,
@@ -439,6 +440,9 @@ export class PlaylistService {
 
 			if (error) throw error;
 
+			// Visibility may have changed: evict sockets that lost access (fire-and-forget).
+			void realtime.revalidatePlaylistRoom(playlistId);
+
 			const { count } = await supabaseAdmin
 				.from('playlist_tracks')
 				.select('*', { count: 'exact', head: true })
@@ -463,6 +467,9 @@ export class PlaylistService {
 			const { error } = await supabaseAdmin.from('playlists').delete().eq('id', playlistId);
 
 			if (error) throw error;
+
+			// Evict every socket from the deleted playlist's room (fire-and-forget).
+			void realtime.revalidatePlaylistRoom(playlistId);
 
 			logger.info('Playlist deleted', { playlistId, userId });
 		} catch (error) {

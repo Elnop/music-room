@@ -3,6 +3,7 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import { fetchSingle } from '@/shared/utils/database.helpers.js';
 import { checkOwnership } from '@/features/playlists/permissions/playlist.permissions.js';
+import { realtime } from '@/realtime/index.js';
 
 /**
  * Service for managing playlist viewers (read-only access to private playlists)
@@ -102,6 +103,9 @@ export class ViewerService {
 				.eq('id', playlistId);
 
 			if (updateError) throw updateError;
+
+			// Evict the removed viewer from the playlist room (fire-and-forget).
+			void realtime.revalidatePlaylistRoom(playlistId);
 
 			logger.info('Viewer removed from playlist', {
 				playlistId,
