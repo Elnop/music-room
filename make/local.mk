@@ -172,7 +172,13 @@ open-app: ## Launch the Zumik debug build on every running emulator, copying it 
 		echo "$(BLUE)$(ICON_INFO) Use $(GREEN)make start-emulators-app$(NC)"; \
 		exit 1; \
 	fi; \
+	if ! curl -s --max-time 2 $(METRO_URL)/status | grep -q packager-status:running; then \
+		echo "$(RED)$(ICON_ERROR) Metro is not running on $(METRO_URL): the app would show \"Unable to load script\"$(NC)"; \
+		echo "$(BLUE)$(ICON_INFO) Start it with $(GREEN)make dev-local$(NC) or $(GREEN)make dev-docker$(NC), then $(GREEN)make open-app$(NC)"; \
+		exit 1; \
+	fi; \
 	for serial in $$(echo "$$DEVICES"); do \
+		$(ADB) -s $$serial reverse tcp:$(METRO_PORT) tcp:$(METRO_PORT) > /dev/null 2>&1; \
 		if ! $(ADB) -s $$serial shell pm path $(APP_PACKAGE) 2>/dev/null | grep -q package; then \
 			if [ ! -f "$(APP_APK_CACHE)" ]; then \
 				for other in $$(echo "$$DEVICES"); do \
