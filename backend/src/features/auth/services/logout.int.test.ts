@@ -1,8 +1,16 @@
 import { randomUUID } from 'node:crypto';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { connectRedis, disconnectRedis, isRedisConnected } from '@/shared/config/redis.js';
 import { AuthService } from '@/features/auth/auth.service.js';
+
+// Token verification calls Google and Facebook: always mocked (doc/TESTING.md).
+vi.mock('@/features/auth/services/oauth.service.js', () => ({
+	OAuthService: {
+		verifyGoogleToken: vi.fn(),
+		verifyFacebookToken: vi.fn(),
+	},
+}));
 
 const PASSWORD = 'integration-test-password';
 const createdUserIds: string[] = [];
