@@ -96,28 +96,3 @@ backend-status:
 	else \
 		echo "$(RED)$(ICON_ERROR) Not found$(RESET)"; \
 	fi
-
-# ==============================================================================
-# Help
-# ==============================================================================
-
-# Backend help (list commands)
-.PHONY: backend-help
-backend-help:
-	@echo "$(BOLD)$(GREEN)Backend Management Commands:$(RESET)"
-	@echo ""
-	@echo "$(BOLD)Core:$(RESET)"
-	@echo "  $(CYAN)make backend-docker$(RESET)   - Start backend in Docker"
-	@echo "  $(CYAN)make backend-local$(RESET)    - Start backend locally (npm run dev)"
-	@echo "  $(CYAN)make backend-stop$(RESET)     - Stop backend container"
-	@echo "  $(CYAN)make backend-restart$(RESET)  - Restart backend container"
-	@echo ""
-	@echo "$(BOLD)Monitoring:$(RESET)"
-	@echo "  $(CYAN)make backend-logs$(RESET)     - View backend logs (live)"
-	@echo "  $(CYAN)make backend-health$(RESET)   - Check backend health status"
-	@echo "  $(CYAN)make backend-status$(RESET)   - Quick status check"
-	@echo ""
-	@echo "$(BOLD)Example Usage:$(RESET)"
-	@echo "  $(YELLOW)make redis-start && make backend-docker$(RESET)  # Redis + backend in Docker"
-	@echo "  $(YELLOW)make backend-local$(RESET)                       # Local development (no Redis)"
-	@echo "  $(YELLOW)make backend-logs$(RESET)                        # View logs"

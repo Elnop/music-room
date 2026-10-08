@@ -130,7 +130,7 @@ npm run swagger:serve
 ## 📝 Commandes disponibles
 
 ```bash
-make help          # Afficher toutes les commandes
+make help          # Démarrage rapide et catégories (make emulator, make docker…)
 make install       # Installer les dépendances
 make dev           # Lancer en mode développement
 make build         # Build pour production
