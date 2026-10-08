@@ -217,6 +217,10 @@ describe('Socket.io handshake authentication', () => {
 		await expect(
 			refused(connect({ token: alice.token, ...deviceFields(), platform: 42 }))
 		).resolves.toBe('INVALID_HANDSHAKE');
+		// devices.device_id holds at most 128 characters (015_devices.sql).
+		await expect(
+			refused(connect({ token: alice.token, ...deviceFields(), deviceId: 'd'.repeat(129) }))
+		).resolves.toBe('INVALID_HANDSHAKE');
 	});
 
 	it('refuses an invalid or expired token with INVALID_TOKEN', async () => {
