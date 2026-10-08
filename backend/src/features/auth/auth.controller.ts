@@ -156,13 +156,17 @@ export class AuthController {
 
 	/**
 	 * POST /api/auth/logout
-	 * Logout current user (client-side token removal)
+	 * Logout current user: revoke the access token and end its session
 	 */
-	logout(req: Request, res: Response, next: NextFunction) {
+	async logout(req: Request, res: Response, next: NextFunction) {
 		try {
-			logger.info('User logout', {
-				userId: (req as AuthenticatedRequest).user.id,
-			});
+			const userId = (req as AuthenticatedRequest).user.id;
+			// authMiddleware already checked the header is "Bearer <token>".
+			const token = (req.headers.authorization ?? '').replace('Bearer ', '');
+
+			await authService.logout(token, userId);
+
+			logger.info('User logout', { userId });
 
 			const response: ApiResponse = {
 				success: true,

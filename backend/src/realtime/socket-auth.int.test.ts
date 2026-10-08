@@ -4,6 +4,7 @@ import type { AddressInfo } from 'node:net';
 import { io as ioClient, type Socket as ClientSocket } from 'socket.io-client';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { supabaseAdmin, supabaseAnon } from '@/shared/config/supabase.js';
+import { connectRedis, disconnectRedis, isRedisConnected } from '@/shared/config/redis.js';
 import type { UserListeningStatus } from '@/features/music-control/music-control.types.js';
 import { realtime } from '@/realtime/index.js';
 
@@ -119,6 +120,10 @@ describe('Socket.io handshake authentication', () => {
 	}
 
 	beforeAll(async () => {
+		// verifyToken checks the logout denylist and fails closed without Redis.
+		await connectRedis();
+		if (!isRedisConnected()) throw new Error('Redis from scripts/test-db.sh is not reachable');
+
 		alice = await createUser();
 		bob = await createUser();
 
@@ -144,6 +149,7 @@ describe('Socket.io handshake authentication', () => {
 		// Cascades to user_profiles and follows.
 		if (alice) await supabaseAdmin.auth.admin.deleteUser(alice.id);
 		if (bob) await supabaseAdmin.auth.admin.deleteUser(bob.id);
+		await disconnectRedis();
 	});
 
 	it('accepts a valid handshake: identity from the token, user room joined', async () => {

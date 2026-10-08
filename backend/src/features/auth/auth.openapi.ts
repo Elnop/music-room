@@ -199,7 +199,8 @@ export const authPaths: OpenAPIV3.PathsObject = {
 		post: {
 			tags: ['Authentication'],
 			summary: 'Logout current user',
-			description: 'Invalidates session and refresh token',
+			description:
+				"Ends the session the bearer token belongs to. The access token goes to a Redis denylist until it expires, so every authenticated route then answers 401 TOKEN_REVOKED for it. The Supabase session is revoked (scope local), so its refresh token can no longer mint tokens; the user's other sessions stay signed in.",
 			operationId: 'logoutUser',
 			security: [{ bearerAuth: [] }],
 			responses: {
@@ -227,6 +228,24 @@ export const authPaths: OpenAPIV3.PathsObject = {
 					},
 				},
 				'401': { $ref: '#/components/responses/UnauthorizedError' },
+				'500': {
+					description:
+						'LOGOUT_FAILED: the access token was revoked, but the Supabase session could not be ended; the refresh token may still work',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+						},
+					},
+				},
+				'503': {
+					description:
+						'REVOCATION_UNAVAILABLE: Redis is not ready, the token cannot be revoked or checked',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+						},
+					},
+				},
 			},
 		},
 	},

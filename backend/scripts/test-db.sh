@@ -1,9 +1,10 @@
 #!/usr/bin/env sh
-# Local Supabase stack for backend integration tests (see doc/TESTING.md).
+# Local Supabase stack and Redis for backend integration tests (see doc/TESTING.md).
 #
 #   scripts/test-db.sh up     start the stack, reset the database, apply
-#                             migrations/*.sql in order, write .env.test
-#   scripts/test-db.sh down   stop the stack and drop its data
+#                             migrations/*.sql in order, start a Redis
+#                             container on a free port, write .env.test
+#   scripts/test-db.sh down   stop the stack, drop its data, remove Redis
 #
 # Runs from backend/. Needs Docker. Ports are in supabase/config.toml (554xx,
 # so the stack can run next to another local Supabase project).
@@ -19,6 +20,27 @@ DB_CONTAINER="supabase_db_${SUPABASE_PROJECT_ID}"
 # Only Postgres, PostgREST, Auth and Kong are needed by supabase-js.
 EXCLUDED=studio,storage-api,imgproxy,realtime,edge-runtime,logflare,vector,mailpit,supavisor,postgres-meta
 
+# Real Redis (session revocation denylist); Docker picks a free host port.
+REDIS_CONTAINER=music-room-test-redis
+REDIS_IMAGE=redis:7-alpine
+
+start_redis() {
+	docker rm -f "$REDIS_CONTAINER" >/dev/null 2>&1 || true
+	docker run -d --name "$REDIS_CONTAINER" -p 127.0.0.1::6379 "$REDIS_IMAGE" >/dev/null
+
+	tries=0
+	until docker exec "$REDIS_CONTAINER" redis-cli ping 2>/dev/null | grep -q PONG; do
+		tries=$((tries + 1))
+		if [ "$tries" -ge 30 ]; then
+			echo "Redis did not start" >&2
+			exit 1
+		fi
+		sleep 1
+	done
+
+	REDIS_PORT=$(docker port "$REDIS_CONTAINER" 6379/tcp | head -n 1 | sed 's/.*://')
+}
+
 up() {
 	npx supabase start -x "$EXCLUDED" >/dev/null
 	npx supabase db reset --local --no-seed >/dev/null
@@ -33,6 +55,8 @@ up() {
 	# PostgREST caches the schema; reload it after the migrations.
 	docker exec "$DB_CONTAINER" psql -U postgres -d postgres -qc "NOTIFY pgrst, 'reload schema';" >/dev/null
 
+	start_redis
+
 	status=$(npx supabase status -o env 2>/dev/null)
 	value() { printf '%s\n' "$status" | sed -n "s/^$1=\"\(.*\)\"$/\1/p"; }
 
@@ -41,11 +65,16 @@ up() {
 SUPABASE_URL=$(value API_URL)
 SUPABASE_ANON_KEY=$(value ANON_KEY)
 SUPABASE_SERVICE_KEY=$(value SERVICE_ROLE_KEY)
+REDIS_HOST=127.0.0.1
+REDIS_PORT=$REDIS_PORT
+REDIS_PASSWORD=
+REDIS_DB=0
 EOF
-	echo "Local Supabase ready on $(value API_URL); wrote .env.test"
+	echo "Local Supabase ready on $(value API_URL), Redis on 127.0.0.1:$REDIS_PORT; wrote .env.test"
 }
 
 down() {
+	docker rm -f "$REDIS_CONTAINER" >/dev/null 2>&1 || true
 	npx supabase stop --no-backup
 }
 

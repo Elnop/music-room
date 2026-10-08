@@ -226,6 +226,13 @@ export class AuthService {
 	}
 
 	/**
+	 * Revoke the access token and end its Supabase session
+	 */
+	async logout(token: string, userId: string): Promise<void> {
+		return this.sessionService.logout(token, userId);
+	}
+
+	/**
 	 * Get user profile by ID
 	 */
 	async getUserProfile(userId: string): Promise<UserProfile> {

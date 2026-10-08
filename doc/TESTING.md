@@ -36,7 +36,7 @@ Unit tests are the default. Write an integration test only for behavior that liv
 | Dependency | Unit tests | Integration tests |
 | --- | --- | --- |
 | Supabase (Postgres, PostgREST, Auth) via `@/shared/config/supabase.js` | `vi.mock` the module; the test sets what `supabaseAdmin.from(...)` returns. Pure functions such as `canViewPlaylist` need no mock. | Local Supabase stack (see below), with `backend/migrations` applied. The real `supabase-js` client talks to it unchanged. |
-| Redis via `@/shared/config/redis.js` | `vi.mock` the module. The client is created with `lazyConnect`, so importing it does not connect, but nothing may call it unmocked. | Real Redis (container), added to `make test-int` with the first integration test that needs it. Rate limiting has no in-memory fallback and `rate-limit-redis` relies on Lua scripts, so it is never simulated. |
+| Redis via `@/shared/config/redis.js` | `vi.mock` the module. The client is created with `lazyConnect`, so importing it does not connect, but nothing may call it unmocked. | Real Redis: `scripts/test-db.sh up` starts a `redis:7-alpine` container (`music-room-test-redis`) on a free port and writes `REDIS_HOST`/`REDIS_PORT` to `.env.test`; `down` removes it. A test that needs Redis calls `connectRedis()` in `beforeAll` and `disconnectRedis()` in `afterAll`. The logout denylist and rate limiting have no in-memory fallback and `rate-limit-redis` relies on Lua scripts, so Redis is never simulated. |
 | Socket.io (`src/realtime/index.ts`) | Mock the emitter (`io.to(...).emit`) and assert the event name and payload. Read event names from the source; never retype them. | Start the HTTP + Socket.io server on port `0` (random) and connect with `socket.io-client`. |
 | SoundCloud (`soundcloud.ts`) | Always mocked. Tests never call SoundCloud: it is rate-limited and its stream URLs expire. | Mocked as well. |
 | Mail (`features/mail/mail.service.ts`) | Mock the service and assert the call (recipient, template). | Mocked as well; no email is ever sent. |
@@ -48,9 +48,9 @@ Mobile tests never reach the network. `mobile/src/services/api.ts`, the socket s
 
 The backend uses `supabase-js`, which goes through PostgREST and Supabase Auth, and the migrations rely on `auth.uid()` and `auth.users`. A plain Postgres cannot run them, so integration tests run against the local Supabase stack from the Supabase CLI, already a backend dev dependency (`supabase`).
 
-- `make test-db-up` (`backend/scripts/test-db.sh up`) starts the stack in Docker with only Postgres, PostgREST, Auth and Kong, resets the database, applies `backend/migrations/*.sql` in file order and writes `backend/.env.test`. It takes about 20 s once the images are pulled.
+- `make test-db-up` (`backend/scripts/test-db.sh up`) starts the stack in Docker with only Postgres, PostgREST, Auth and Kong, resets the database, applies `backend/migrations/*.sql` in file order, starts the test Redis container and writes `backend/.env.test`. It takes about 20 s once the images are pulled.
 - `make test-int` runs `make test-db-up`, then `npm run test:int`. Every run starts from a fresh database.
-- `make test-db-down` stops the stack and drops its data.
+- `make test-db-down` stops the stack, drops its data and removes the Redis container.
 - The stack is named `music-room-test` and listens on ports 554xx (API `http://127.0.0.1:55421`, Postgres `127.0.0.1:55422`), set in `backend/supabase/config.toml`, so it runs next to another local Supabase project on the default 543xx ports.
 - In CI: the `test-int` job of `.github/workflows/ci.yml` runs the same script.
 - Integration test files run one after another (they share the database). Tests create their own users and rows, delete them afterwards, and never depend on data left by another test.
@@ -101,7 +101,7 @@ npx jest -t "formatDuration"                          # tests whose name matches
 | `lint` | `npm run lint` | backend, mobile |
 | `type-check` | `npm run type-check` | backend, mobile |
 | `test` | `npm test` | backend, mobile |
-| `test-int` | `scripts/test-db.sh up`, then `npm run test:int` | backend |
+| `test-int` | `scripts/test-db.sh up` (Supabase stack + Redis), then `npm run test:int` | backend |
 
 A failing job marks the pull request red. Lint warnings do not fail it; errors do.
 
