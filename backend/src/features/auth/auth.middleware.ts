@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { AuthService } from '@/features/auth/auth.service.js';
 import type { AuthenticatedRequest } from '@/shared/types/global.types.js';
+import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 
 const authService = new AuthService();
@@ -63,8 +64,10 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
 		next();
 	} catch (error: unknown) {
 		const err = error as Error & { code?: string };
-		logger.warn('Authentication failed', { error: err.message });
-		return res.status(401).json({
+		// Keep an AppError's status (503 REVOCATION_UNAVAILABLE); anything else is 401.
+		const status = error instanceof AppError ? error.statusCode : 401;
+		logger.warn('Authentication failed', { error: err.message, status });
+		return res.status(status).json({
 			success: false,
 			error: {
 				message: err.message || 'Authentication failed',

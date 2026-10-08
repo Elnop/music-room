@@ -41,11 +41,16 @@ endef
 # The app calls the local backend, whatever mobile/.env says (see DEV_API_URL).
 dev-local expo-android expo-clear: export EXPO_PUBLIC_API_URL := $(DEV_API_URL)
 dev-local expo-android expo-clear: export EXPO_PUBLIC_WS_URL := $(DEV_WS_URL)
+# The local backend reaches the Redis container through its published port.
+dev-local: export REDIS_HOST := localhost
 
 dev-local: .ensure-backend-deps .ensure-mobile-deps ## Start development locally (no Docker) - for Android Studio emulator
 	@$(call write_mobile_dev_env)
 	$(call print_header,Starting Local Development Mode)
 	$(call print_success,Dependencies OK)
+	$(call blank_line)
+	$(call print_arrow,Starting Redis (session revocation needs it)...)
+	@$(call start_redis)
 	$(call blank_line)
 	$(call print_arrow,Starting backend server...)
 	$(call npm_backend,run dev) &

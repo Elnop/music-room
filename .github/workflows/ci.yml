@@ -92,7 +92,8 @@ jobs:
           cache: npm
           cache-dependency-path: backend/package-lock.json
       - run: npm ci
-      # Local Supabase stack (Docker) with backend/migrations applied; see doc/TESTING.md.
+      # Local Supabase stack (Docker) with backend/migrations applied, plus a Redis
+      # container on a free port (session revocation); see doc/TESTING.md.
       - run: sh scripts/test-db.sh up
       - run: npm run test:int
       - if: always()

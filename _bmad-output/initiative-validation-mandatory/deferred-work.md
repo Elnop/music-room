@@ -11,3 +11,6 @@
 - source_plan: `_bmad-output/initiative-validation-mandatory/epic-delegation-controle/story-schema-des-appareils-et-des-licences-par-appareil-migration-plan.md`
   summary: Stories 4.4 and 4.5 check mutual follow (friendship) both when a device license is granted and on every control check, not only the license row.
   evidence: 015_devices.sql ties a license to follows(grantee_id → owner_id) only; when the owner unfollows the grantee the friendship ends but the license row stays (it cascades only on the grantee's follow).
+- source_plan: `_bmad-output/initiative-validation-mandatory/epic-comptes-auth/story-revoquer-la-session-au-logout-backend-plan.md`
+  summary: The socket handshake (`backend/src/realtime/socket-auth.ts`) refuses a revoked token and a Redis outage both as `INVALID_TOKEN`, hiding `TOKEN_REVOKED` and `REVOCATION_UNAVAILABLE`; settle it in #71 (3.3) together with the mobile `socketStore` handling.
+  evidence: `verifyToken` now checks the logout denylist and throws 401 TOKEN_REVOKED or 503 REVOCATION_UNAVAILABLE; the handshake's bare `catch {}` maps every error to INVALID_TOKEN, and mobile refreshes once on INVALID_TOKEN.

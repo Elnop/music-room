@@ -3,17 +3,13 @@ import { env } from './env.js';
 import { logger } from '@/shared/utils/logger.js';
 
 /**
- * Check if Redis is needed based on configuration
- */
-const isRedisRequired = (): boolean => {
-	const rateLimitEnabled = env.RATE_LIMIT_ENABLED !== 'false';
-	const lockoutEnabled = env.ACCOUNT_LOCKOUT_ENABLED !== 'false';
-	return rateLimitEnabled || lockoutEnabled;
-};
-
-/**
  * Redis client configuration
- * Used for rate limiting and brute force protection
+ * Used for session revocation, rate limiting and brute force protection.
+ *
+ * Redis is always required: the logout denylist lives in Redis and
+ * authentication fails closed without it (503 REVOCATION_UNAVAILABLE). The
+ * client therefore never gives up: it reconnects forever with a capped backoff,
+ * so an outage ends as soon as Redis is back, without restarting the backend.
  */
 const redisConfig = {
 	host: env.REDIS_HOST || 'redis',
@@ -21,24 +17,13 @@ const redisConfig = {
 	password: env.REDIS_PASSWORD || undefined,
 	db: parseInt(env.REDIS_DB || '0'),
 	maxRetriesPerRequest: 3,
-	enableOfflineQueue: false, // Disable offline queue to prevent infinite retries
+	enableOfflineQueue: false, // Commands fail fast while disconnected (fail-closed)
 	lazyConnect: true,
 	autoResubscribe: false, // Disable automatic resubscription
 	autoResendUnfulfilledCommands: false, // Don't resend commands on reconnect
 	retryStrategy(times: number) {
-		// If Redis is not required (dev mode), stop retrying after 3 attempts
-		if (!isRedisRequired() && times > 3) {
-			return null; // Stop retrying
-		}
-
-		// Production mode: retry with exponential backoff up to 10 attempts
-		if (times > 10) {
-			return null; // Stop after 10 attempts
-		}
-
-		// Exponential backoff: 50ms, 100ms, 200ms, 400ms, 800ms, max 2s
-		const delay = Math.min(times * 50, 2000);
-		return delay;
+		// Linear backoff: 50ms, 100ms, 150ms ... capped at 2s, forever
+		return Math.min(times * 50, 2000);
 	},
 };
 
@@ -48,26 +33,17 @@ export const redisClient = new Redis(redisConfig);
 // Track connection status
 let isConnected = false;
 let isConnecting = false;
-let retryAttempts = 0;
-let hasStoppedRetrying = false;
+let hasLoggedError = false;
 
 // Connection event handlers
 redisClient.on('connect', () => {
 	isConnecting = true;
-	// Only log first connection attempt
-	if (retryAttempts === 0) {
-		logger.info('Redis connecting...', {
-			host: redisConfig.host,
-			port: redisConfig.port,
-		});
-	}
 });
 
 redisClient.on('ready', () => {
 	isConnected = true;
 	isConnecting = false;
-	retryAttempts = 0; // Reset on successful connection
-	hasStoppedRetrying = false;
+	hasLoggedError = false;
 	logger.info('Redis connection established', {
 		host: redisConfig.host,
 		port: redisConfig.port,
@@ -76,31 +52,14 @@ redisClient.on('ready', () => {
 });
 
 redisClient.on('error', error => {
-	retryAttempts++;
-
-	// Check if we should stop retrying
-	const maxRetries = isRedisRequired() ? 10 : 3;
-	if (retryAttempts >= maxRetries && !hasStoppedRetrying) {
-		hasStoppedRetrying = true;
-		const logLevel = isRedisRequired() ? 'error' : 'info';
-		logger[logLevel](`Redis connection failed after ${retryAttempts} attempts, giving up`, {
-			required: isRedisRequired(),
-			host: redisConfig.host,
-			port: redisConfig.port,
-			lastError: error.message,
-		});
-		// Disconnect to prevent further retries
-		redisClient.disconnect();
-		return;
-	}
-
-	// Only log first error to avoid spam
-	if (retryAttempts === 1) {
-		logger.warn('Redis connection failed, retrying...', {
-			error: error.message,
-			maxRetries,
-		});
-	}
+	// Log the first error of an outage only; 'ready' logs the recovery
+	if (hasLoggedError) return;
+	hasLoggedError = true;
+	logger.error('Redis connection failed, retrying until it is back', {
+		host: redisConfig.host,
+		port: redisConfig.port,
+		error: error.message,
+	});
 });
 
 redisClient.on('close', () => {
@@ -123,27 +82,12 @@ export async function connectRedis(): Promise<void> {
 			return;
 		}
 
-		// If Redis is not required (dev mode), skip connection attempt
-		if (!isRedisRequired()) {
-			logger.info('Redis connection skipped (rate limiting and lockout disabled)', {
-				RATE_LIMIT_ENABLED: env.RATE_LIMIT_ENABLED,
-				ACCOUNT_LOCKOUT_ENABLED: env.ACCOUNT_LOCKOUT_ENABLED,
-			});
-			return;
-		}
-
 		await redisClient.connect();
 		logger.info('Redis initialization successful');
 	} catch (error) {
-		const redisNeeded = isRedisRequired();
-		const logLevel = redisNeeded ? 'error' : 'info';
-
-		logger[logLevel]('Failed to connect to Redis', {
+		logger.error('Failed to connect to Redis', {
 			error: error instanceof Error ? error.message : 'Unknown error',
-			required: redisNeeded,
-			note: redisNeeded
-				? 'Security protections will not function properly'
-				: 'Security protections disabled, Redis not required',
+			note: 'Authenticated requests answer 503 REVOCATION_UNAVAILABLE until Redis is ready',
 		});
 		// Don't throw - allow backend to start even if Redis fails
 	}
@@ -156,6 +100,8 @@ export async function connectRedis(): Promise<void> {
 export async function disconnectRedis(): Promise<void> {
 	try {
 		if (!isConnected) {
+			// Stop the endless reconnection attempts
+			redisClient.disconnect();
 			return;
 		}
 
