@@ -3,7 +3,7 @@
 # ==============================================================================
 # Commands for local development, useful with Android Studio emulator
 
-.PHONY: dev-local expo-android expo-clear check-devices start-emulator start-emulators start-emulators-app restart-emulators open-app kill-emulator restart-emulator list-emulators open-emulator
+.PHONY: dev-local expo-android expo-clear check-devices start-emulator start-emulators start-emulators-app restart-emulators restart-emulators-clean clean-emulators .stop-emulators .clear-emulator-snapshots .clear-metro-cache .cache-app-apk open-app kill-emulator restart-emulator list-emulators open-emulator
 
 ADB := $(ANDROID_HOME)/platform-tools/adb
 
@@ -21,7 +21,12 @@ EMULATOR_FLAGS := -gpu $(GPU) -no-boot-anim $(if $(FAST),,-no-snapshot-load -no-
 # cores and less RAM than an AVD usually asks for.
 EMULATOR_CORES ?= 2
 EMULATOR_MEMORY ?= 2048
-EMULATOR_PAIR_FLAGS := $(EMULATOR_FLAGS) -cores $(EMULATOR_CORES) -memory $(EMULATOR_MEMORY)
+EMULATOR_PAIR_FLAGS := $(EMULATOR_FLAGS) -cores $(EMULATOR_CORES) -memory $(EMULATOR_MEMORY) $(if $(WIPE),-wipe-data)
+
+AVD_HOME := $(or $(ANDROID_AVD_HOME),$(HOME)/.android/avd)
+# The emulator VM itself (netsimd and crashpad_handler outlive it on purpose).
+# [q] keeps pgrep/pkill from matching the shell that runs them.
+EMULATOR_PROCESS := $(ANDROID_HOME)/emulator/qemu/.*/[q]emu-system
 
 # Wait until Android reports the boot as complete (3 minutes max)
 # Usage: @$(call wait_emulator_boot)
@@ -164,6 +169,18 @@ start-emulators: ## Start two Android emulators for two-account tests (AVD1=name
 APP_PACKAGE := com.zumik.app
 APP_APK_CACHE := $(HOME)/.cache/zumik/zumik-debug.apk
 
+# Copy the debug build from a running emulator into APP_APK_CACHE, once
+.cache-app-apk:
+	@[ -f "$(APP_APK_CACHE)" ] && exit 0; \
+	for serial in $$($(ADB) devices | grep '^emulator' | grep -w device | cut -f1); do \
+		APK=$$($(ADB) -s $$serial shell pm path $(APP_PACKAGE) 2>/dev/null | grep base.apk | sed 's/^package://' | tr -d '\r'); \
+		if [ -n "$$APK" ]; then \
+			mkdir -p "$$(dirname "$(APP_APK_CACHE)")"; \
+			$(ADB) -s $$serial pull "$$APK" "$(APP_APK_CACHE)" > /dev/null 2>&1 && exit 0; \
+		fi; \
+	done; \
+	rm -f "$(APP_APK_CACHE)"
+
 open-app: ## Launch the Zumik debug build on every running emulator, copying it where missing
 	$(call print_header,Opening Zumik on Emulators)
 	@DEVICES=$$($(ADB) devices | grep '^emulator' | grep -w device | cut -f1); \
@@ -180,15 +197,7 @@ open-app: ## Launch the Zumik debug build on every running emulator, copying it 
 	for serial in $$(echo "$$DEVICES"); do \
 		$(ADB) -s $$serial reverse tcp:$(METRO_PORT) tcp:$(METRO_PORT) > /dev/null 2>&1; \
 		if ! $(ADB) -s $$serial shell pm path $(APP_PACKAGE) 2>/dev/null | grep -q package; then \
-			if [ ! -f "$(APP_APK_CACHE)" ]; then \
-				for other in $$(echo "$$DEVICES"); do \
-					APK=$$($(ADB) -s $$other shell pm path $(APP_PACKAGE) 2>/dev/null | grep base.apk | sed 's/^package://' | tr -d '\r'); \
-					if [ -n "$$APK" ]; then \
-						mkdir -p "$$(dirname "$(APP_APK_CACHE)")"; \
-						$(ADB) -s $$other pull "$$APK" "$(APP_APK_CACHE)" > /dev/null 2>&1 && break; \
-					fi; \
-				done; \
-			fi; \
+			$(MAKE) --no-print-directory .cache-app-apk; \
 			if [ ! -f "$(APP_APK_CACHE)" ]; then \
 				echo "$(RED)$(ICON_ERROR) Zumik is not installed on $$serial nor on any other emulator$(NC)"; \
 				echo "$(YELLOW)$(ICON_WARNING) Install a debug build once: cd mobile && npx expo run:android (it is then reused)$(NC)"; \
@@ -220,6 +229,75 @@ restart-emulators: ## Stop all emulators, cold boot two again (no saved state) a
 		i=$$((i + 1)); [ $$i -gt 30 ] && break; sleep 1; \
 	done
 	@$(MAKE) --no-print-directory start-emulators-app FAST=
+
+restart-emulators-clean: ## Restart two emulators with no cache: snapshots, Metro cache and app data cleared (WIPE=1 also resets the AVDs)
+	$(call print_header,Restarting Emulators With a Clean Cache)
+	@if [ -n "$(WIPE)" ]; then \
+		$(MAKE) --no-print-directory .cache-app-apk; \
+		if [ ! -f "$(APP_APK_CACHE)" ]; then \
+			echo "$(RED)$(ICON_ERROR) WIPE=1 removes Zumik and no copy of it is cached to reinstall it$(NC)"; \
+			echo "$(BLUE)$(ICON_INFO) Start an emulator where Zumik is installed first, or run without WIPE=1$(NC)"; \
+			exit 1; \
+		fi; \
+	fi
+	@$(MAKE) --no-print-directory .stop-emulators
+	@$(MAKE) --no-print-directory .clear-emulator-snapshots
+	@$(MAKE) --no-print-directory .clear-metro-cache
+	@$(MAKE) --no-print-directory start-emulators FAST=
+	@for serial in emulator-5554 emulator-5556; do \
+		if $(ADB) -s $$serial shell pm path $(APP_PACKAGE) 2>/dev/null | grep -q package; then \
+			$(ADB) -s $$serial shell pm clear $(APP_PACKAGE) > /dev/null 2>&1 \
+				&& echo "$(GREEN)$(ICON_SUCCESS) $$serial: Zumik data cleared$(NC)"; \
+		elif [ -f "$(APP_APK_CACHE)" ]; then \
+			$(ADB) -s $$serial install "$(APP_APK_CACHE)" > /dev/null \
+				&& echo "$(GREEN)$(ICON_SUCCESS) $$serial: Zumik reinstalled$(NC)"; \
+		fi; \
+	done
+	@if curl -s --max-time 2 $(METRO_URL)/status | grep -q packager-status:running; then \
+		$(MAKE) --no-print-directory open-app; \
+	else \
+		echo "$(BLUE)$(ICON_INFO) Start Metro ($(GREEN)make dev-local$(NC) or $(GREEN)make expo-clear$(NC)), then $(GREEN)make open-app$(NC)"; \
+	fi
+
+clean-emulators: ## Stop the emulators and remove their snapshots, stale locks and the cached Zumik APK
+	$(call print_header,Cleaning Android Emulators)
+	@$(MAKE) --no-print-directory .stop-emulators
+	@$(MAKE) --no-print-directory .clear-emulator-snapshots
+	@rm -rf "$$(dirname "$(APP_APK_CACHE)")"
+	$(call print_success,Cached Zumik APK removed)
+	$(call blank_line)
+
+# Stop every emulator, kill the ones that ignore "adb emu kill" (frozen), then
+# remove the lock files a crashed emulator leaves behind
+.stop-emulators:
+	@$(MAKE) --no-print-directory kill-emulator
+	@i=0; while pgrep -u "$$(id -u)" -f "$(EMULATOR_PROCESS)" > /dev/null; do \
+		i=$$((i + 1)); \
+		if [ $$i -gt 15 ]; then \
+			echo "$(YELLOW)$(ICON_WARNING) Emulator still running, killing it$(NC)"; \
+			pkill -9 -u "$$(id -u)" -f "$(EMULATOR_PROCESS)"; sleep 1; break; \
+		fi; \
+		sleep 1; \
+	done
+	@find "$(AVD_HOME)" -mindepth 2 -maxdepth 2 -path "*.avd/*.lock" -exec rm -rf {} +
+	$(call print_success,Emulators stopped and lock files removed)
+
+# Snapshots only serve quick boot (FAST=1) and take several GB per AVD
+.clear-emulator-snapshots:
+	@SIZE=$$(find "$(AVD_HOME)" -mindepth 2 -maxdepth 2 -path "*.avd/snapshots" -exec du -shc {} + 2>/dev/null | tail -1 | cut -f1); \
+	find "$(AVD_HOME)" -mindepth 3 -maxdepth 3 -path "*.avd/snapshots/*" -exec rm -rf {} +; \
+	echo "$(GREEN)$(ICON_SUCCESS) Emulator snapshots removed ($${SIZE:-0} freed)$(NC)"
+
+# Metro keeps its cache in memory while it runs: only a stopped Metro can be
+# cleared, a running one must be restarted with make expo-clear
+.clear-metro-cache:
+	@if curl -s --max-time 2 $(METRO_URL)/status | grep -q packager-status:running; then \
+		echo "$(YELLOW)$(ICON_WARNING) Metro is running, its cache is kept: stop it and run $(GREEN)make expo-clear$(NC)"; \
+	else \
+		find "$${TMPDIR:-/tmp}" -mindepth 1 -maxdepth 1 -user "$$(id -u)" \( -name "metro-*" -o -name "haste-map-*" \) -exec rm -rf {} +; \
+		rm -rf mobile/node_modules/.cache; \
+		echo "$(GREEN)$(ICON_SUCCESS) Metro cache removed$(NC)"; \
+	fi
 
 restart-emulator: ## Stop the emulator and cold boot it again (AVD=name, FAST=1 to resume saved state)
 	@$(MAKE) --no-print-directory kill-emulator
