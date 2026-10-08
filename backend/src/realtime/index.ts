@@ -7,6 +7,12 @@ import {
 	type AppSocketServer,
 } from '@/realtime/socket-auth.js';
 import { LatestThrottle } from '@/realtime/latest-throttle.js';
+import {
+	authorizePlaylistJoin,
+	playlistRoom,
+	playlistRoomPayloadSchema,
+	revalidatePlaylistRoom,
+} from '@/realtime/playlist-room.js';
 import type { TrackWithPositionResponse } from '@/features/playlists/playlist.types.js';
 import { musicControlService } from '@/features/music-control/music-control.service.js';
 import type {
@@ -161,22 +167,66 @@ class RealtimeService {
 	 * Playlist event handlers
 	 */
 	private registerPlaylistHandlers(socket: AppSocket) {
-		socket.on('playlist:join', (playlistId: string) => {
-			void socket.join(`playlist:${playlistId}`);
-			socketLogger.event('playlist:join', socket.id, {
-				playlistId,
-				room: `playlist:${playlistId}`,
-				action: 'joined',
+		// join awaits a DB lookup while leave does not: run this socket's
+		// join/leave events one after another, in arrival order, so a quick
+		// join(A) + leave(A) never ends with the socket in the room.
+		let queue: Promise<void> = Promise.resolve();
+		const enqueue = (task: () => Promise<void> | void) => {
+			queue = queue.then(task).catch((error: unknown) => {
+				socketLogger.error(socket.id, error instanceof Error ? error : new Error(String(error)), {
+					action: 'playlist_room_task_failed',
+				});
 			});
+		};
+
+		socket.on('playlist:join', (payload: unknown) => {
+			enqueue(() => this.joinPlaylistRoom(socket, payload));
 		});
 
-		socket.on('playlist:leave', (playlistId: string) => {
-			void socket.leave(`playlist:${playlistId}`);
-			socketLogger.event('playlist:leave', socket.id, {
-				playlistId,
-				room: `playlist:${playlistId}`,
-				action: 'left',
+		socket.on('playlist:leave', (payload: unknown) => {
+			enqueue(() => {
+				const parsed = playlistRoomPayloadSchema.safeParse(payload);
+				if (!parsed.success) return;
+
+				const room = playlistRoom(parsed.data);
+				void socket.leave(room);
+				socketLogger.event('playlist:leave', socket.id, {
+					playlistId: parsed.data,
+					room,
+					action: 'left',
+				});
 			});
+		});
+	}
+
+	/**
+	 * Join `playlist:<id>` if the user can view the playlist, else emit
+	 * `playlist:error` (see playlist-room.ts).
+	 */
+	private async joinPlaylistRoom(socket: AppSocket, payload: unknown): Promise<void> {
+		const { userId } = socket.data;
+		const result = await authorizePlaylistJoin(payload, userId);
+
+		if (!result.ok) {
+			const { ok: _ok, ...error } = result;
+			socket.emit('playlist:error', error);
+			socketLogger.event('playlist:join', socket.id, {
+				level: 'warn',
+				userId,
+				playlistId: error.playlistId,
+				code: error.code,
+				action: 'refused',
+			});
+			return;
+		}
+
+		const room = playlistRoom(result.playlistId);
+		void socket.join(room);
+		socketLogger.event('playlist:join', socket.id, {
+			userId,
+			playlistId: result.playlistId,
+			room,
+			action: 'joined',
 		});
 	}
 
@@ -447,6 +497,15 @@ class RealtimeService {
 			room: `playlist:${playlistId}`,
 			action: 'broadcasted',
 		});
+	}
+
+	/**
+	 * Re-check access of every socket in a playlist room and evict those that
+	 * lost it (see playlist-room.ts). Never throws; no-op before initialize.
+	 */
+	async revalidatePlaylistRoom(playlistId: string): Promise<void> {
+		if (!this.io) return;
+		await revalidatePlaylistRoom(this.io, playlistId);
 	}
 
 	/**

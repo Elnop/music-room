@@ -416,9 +416,19 @@ Refus : `connect_error` dont le `message` vaut `NO_TOKEN` (pas de `token`), `INV
 ### Events
 
 - **Client → serveur** : `playlist:join`, `playlist:leave`, `listening:subscribe`, `listening:unsubscribe`, `listening:update`, `control:action`
-- **Serveur → client** : `playlist:updated`, `listening:status`, `listening:error`, `permission:changed`, `control:command`, `control:success`, `control:error`
+- **Serveur → client** : `playlist:updated`, `playlist:error`, `listening:status`, `listening:error`, `permission:changed`, `control:command`, `control:success`, `control:error`
 
 Les clients d'une playlist rejoignent la room `playlist:<id>` et reçoivent `playlist:updated` à chaque modification.
+
+`playlist:join <id>` n'ajoute la socket à la room que si son utilisateur (`socket.data.userId`) peut voir la playlist (`canViewPlaylist` : publique, ou propriétaire / viewer / collaborateur), contrôle fait dans `src/realtime/playlist-room.ts`. Sinon la socket reçoit `playlist:error` `{ playlistId, code, message }` :
+
+| `code` | Cas |
+| --- | --- |
+| `INVALID_PAYLOAD` | l'id n'est pas une chaîne UUID (`playlistId` vaut `null` si ce n'est pas une chaîne) |
+| `PLAYLIST_NOT_FOUND` | playlist inconnue (ou lecture en base échouée), ou supprimée pendant que la socket était dans la room |
+| `PLAYLIST_ACCESS_DENIED` | l'utilisateur ne peut pas voir la playlist, ou a perdu l'accès |
+
+L'accès est revérifié quand il peut se perdre : après le retrait d'un viewer ou d'un collaborateur, une mise à jour de la playlist (visibilité) ou sa suppression, les sockets de `playlist:<id>` sans accès quittent la room et reçoivent `playlist:error`. Un échec de cette revérification est seulement loggé.
 
 ## 🎵 SoundCloud
 
