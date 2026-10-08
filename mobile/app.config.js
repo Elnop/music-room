@@ -66,6 +66,7 @@ module.exports = {
 					},
 				},
 			],
+			'./plugins/withDebugKeystore.js',
 			[
 				'@react-native-google-signin/google-signin',
 				{

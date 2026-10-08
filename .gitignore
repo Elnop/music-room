@@ -17,6 +17,8 @@ build/
 # Android signing keys
 *.keystore
 *.jks
+# Shared debug key (public passwords), registered for Google Sign-In: see mobile/plugins/withDebugKeystore.js
+!mobile/keystores/debug.keystore
 mobile/android/gradle.properties
 mobile/android/key.properties
 
