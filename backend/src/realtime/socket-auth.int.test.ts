@@ -297,4 +297,91 @@ describe('Socket.io handshake authentication', () => {
 			model: device.model,
 		});
 	});
+
+	it('keeps the latest listening:update of a burst (#151)', async () => {
+		const device = deviceFields();
+		const owner = connect({ token: alice.token, ...device });
+		const watcher = connect({ token: bob.token, ...deviceFields() });
+		await Promise.all([connected(owner), connected(watcher)]);
+
+		const initial = nextEvent<UserListeningStatus>(watcher, 'listening:status');
+		watcher.emit('listening:subscribe', alice.id);
+		await initial;
+
+		const ownDevice = (status: UserListeningStatus) =>
+			status.devices.find(d => d.device.deviceId === device.deviceId);
+		const paused = nextEvent<UserListeningStatus>(
+			watcher,
+			'listening:status',
+			status => ownDevice(status)?.isPlaying === false
+		);
+		const playing = nextEvent<UserListeningStatus>(
+			watcher,
+			'listening:status',
+			status => ownDevice(status)?.isPlaying === true
+		);
+		owner.emit('listening:update', { track: null, isPlaying: false });
+		owner.emit('listening:update', { track: null, isPlaying: true });
+
+		await paused;
+		const status = await playing;
+		expect(ownDevice(status)?.isPlaying).toBe(true);
+	});
+
+	it('keeps the pending listening:update when an invalid one arrives in the window', async () => {
+		const device = deviceFields();
+		const owner = connect({ token: alice.token, ...device });
+		const watcher = connect({ token: bob.token, ...deviceFields() });
+		await Promise.all([connected(owner), connected(watcher)]);
+
+		const initial = nextEvent<UserListeningStatus>(watcher, 'listening:status');
+		watcher.emit('listening:subscribe', alice.id);
+		await initial;
+
+		const playing = nextEvent<UserListeningStatus>(watcher, 'listening:status', status =>
+			status.devices.some(d => d.device.deviceId === device.deviceId && d.isPlaying === true)
+		);
+		owner.emit('listening:update', { track: null, isPlaying: false });
+		owner.emit('listening:update', { track: null, isPlaying: true });
+		owner.emit('listening:update', { track: null, isPlaying: 'yes' });
+
+		await expect(playing).resolves.toBeDefined();
+	});
+
+	it('drops the pending listening:update when the device disconnects', async () => {
+		const device = deviceFields();
+		const owner = connect({ token: alice.token, ...device });
+		const watcher = connect({ token: bob.token, ...deviceFields() });
+		await Promise.all([connected(owner), connected(watcher)]);
+
+		const initial = nextEvent<UserListeningStatus>(watcher, 'listening:status');
+		watcher.emit('listening:subscribe', alice.id);
+		await initial;
+
+		const hasDevice = (status: UserListeningStatus) =>
+			status.devices.some(d => d.device.deviceId === device.deviceId);
+		const paused = nextEvent<UserListeningStatus>(watcher, 'listening:status', hasDevice);
+		owner.emit('listening:update', { track: null, isPlaying: false });
+		owner.emit('listening:update', { track: null, isPlaying: true });
+		await paused;
+
+		// `isPlaying: true` is now pending; the disconnect must discard it.
+		const cleanup = nextEvent<UserListeningStatus>(
+			watcher,
+			'listening:status',
+			status => !hasDevice(status)
+		);
+		owner.disconnect();
+		await cleanup;
+
+		const late: UserListeningStatus[] = [];
+		const collect = (status: UserListeningStatus) => {
+			if (hasDevice(status)) late.push(status);
+		};
+		watcher.on('listening:status', collect);
+		await new Promise(resolve => setTimeout(resolve, 1500));
+		watcher.off('listening:status', collect);
+
+		expect(late).toEqual([]);
+	});
 });
