@@ -6,6 +6,7 @@ import {
 	type AppSocket,
 	type AppSocketServer,
 } from '@/realtime/socket-auth.js';
+import { LatestThrottle } from '@/realtime/latest-throttle.js';
 import type { TrackWithPositionResponse } from '@/features/playlists/playlist.types.js';
 import { musicControlService } from '@/features/music-control/music-control.service.js';
 import type {
@@ -78,8 +79,10 @@ class RealtimeService {
 
 	private deviceToSocket: Map<string, string> = new Map();
 
-	private lastListeningUpdate: Map<string, number> = new Map();
 	private static LISTENING_UPDATE_THROTTLE_MS = 1000;
+	private listeningUpdateThrottle = new LatestThrottle(
+		RealtimeService.LISTENING_UPDATE_THROTTLE_MS
+	);
 
 	/**
 	 * Initialize Socket.io server
@@ -182,8 +185,6 @@ class RealtimeService {
 	 */
 	private registerMusicControlHandlers(socket: AppSocket) {
 		socket.on('listening:update', (data: unknown) => {
-			const startTime = Date.now();
-
 			if (!isValidListeningUpdatePayload(data)) {
 				socketLogger.event('listening:update', socket.id, {
 					level: 'warn',
@@ -202,42 +203,11 @@ class RealtimeService {
 			}
 
 			const { userId, deviceId } = socketInfo;
-			const throttleKey = `${userId}:${deviceId}`;
-
-			const now = Date.now();
-			const lastUpdate = this.lastListeningUpdate.get(throttleKey) || 0;
-			if (now - lastUpdate < RealtimeService.LISTENING_UPDATE_THROTTLE_MS) {
-				return;
-			}
-			this.lastListeningUpdate.set(throttleKey, now);
-
-			let userDevices = this.listeningStatuses.get(userId);
-			if (!userDevices) {
-				userDevices = new Map();
-				this.listeningStatuses.set(userId, userDevices);
-			}
-
-			const status: ListeningStatus = {
-				ownerId: userId,
-				device: socket.data.device,
-				track: data.track,
-				isPlaying: data.isPlaying,
-				updatedAt: new Date().toISOString(),
-			};
-			userDevices.set(deviceId, status);
-
-			const processingTime = Date.now() - startTime;
-			socketLogger.event('listening:update', socket.id, {
-				userId,
-				deviceId,
-				deviceName: socket.data.device.deviceName,
-				track: status.track?.title,
-				isPlaying: status.isPlaying,
-				processingTime: `${processingTime}ms`,
-				action: 'status_updated',
-			});
-
-			this.broadcastUserListeningStatus(userId);
+			// Leading + trailing: the first update applies now, the latest one
+			// received during the window applies when it ends (#151).
+			this.listeningUpdateThrottle.submit(`${userId}:${deviceId}`, () =>
+				this.applyListeningUpdate(socket, userId, deviceId, data)
+			);
 		});
 
 		socket.on('listening:subscribe', async (targetUserId: string) => {
@@ -373,6 +343,46 @@ class RealtimeService {
 	}
 
 	/**
+	 * Store a device's listening status and broadcast it to the user's subscribers.
+	 */
+	private applyListeningUpdate(
+		socket: AppSocket,
+		userId: string,
+		deviceId: string,
+		data: ListeningUpdatePayload
+	) {
+		const startTime = Date.now();
+
+		let userDevices = this.listeningStatuses.get(userId);
+		if (!userDevices) {
+			userDevices = new Map();
+			this.listeningStatuses.set(userId, userDevices);
+		}
+
+		const status: ListeningStatus = {
+			ownerId: userId,
+			device: socket.data.device,
+			track: data.track,
+			isPlaying: data.isPlaying,
+			updatedAt: new Date().toISOString(),
+		};
+		userDevices.set(deviceId, status);
+
+		const processingTime = Date.now() - startTime;
+		socketLogger.event('listening:update', socket.id, {
+			userId,
+			deviceId,
+			deviceName: socket.data.device.deviceName,
+			track: status.track?.title,
+			isPlaying: status.isPlaying,
+			processingTime: `${processingTime}ms`,
+			action: 'status_updated',
+		});
+
+		this.broadcastUserListeningStatus(userId);
+	}
+
+	/**
 	 * Handle socket disconnect - cleanup only the disconnected device
 	 */
 	private handleDisconnect(socket: AppSocket) {
@@ -394,7 +404,7 @@ class RealtimeService {
 				}
 			}
 
-			this.lastListeningUpdate.delete(deviceKey);
+			this.listeningUpdateThrottle.cancel(deviceKey);
 
 			this.broadcastUserListeningStatus(userId);
 
