@@ -33,6 +33,22 @@ export const supabaseAnon = createClient<Database>(env.SUPABASE_URL, env.SUPABAS
 });
 
 /**
+ * New client for one sign-in call (signInWithPassword, verifyOtp, refreshSession).
+ * supabase-js keeps the session a sign-in returns, even with persistSession: false,
+ * and then queries PostgREST with that user's JWT instead of its key. Signing in on
+ * supabaseAdmin would make every later server query run as that user, under RLS.
+ * Never sign in on a shared client.
+ */
+export function createSignInClient() {
+	return createClient<Database>(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
+		auth: {
+			autoRefreshToken: false,
+			persistSession: false,
+		},
+	});
+}
+
+/**
  * Default export for convenience (admin client)
  */
 export const supabase = supabaseAdmin;

@@ -1,4 +1,4 @@
-import { supabase } from '@/shared/config/supabase.js';
+import { supabase, createSignInClient } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { UserProfile, UserProfileRow } from '@/features/auth/auth.types.js';
@@ -79,7 +79,7 @@ export class UserService {
 				throw new AppError(500, 'Invalid magic link response', 'INVALID_MAGIC_LINK_RESPONSE');
 			}
 
-			const { data: verifyData, error: verifyError } = await supabase.auth.verifyOtp({
+			const { data: verifyData, error: verifyError } = await createSignInClient().auth.verifyOtp({
 				token_hash: hashed_token,
 				type: 'email',
 			});

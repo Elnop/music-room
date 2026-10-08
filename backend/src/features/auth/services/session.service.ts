@@ -1,4 +1,4 @@
-import { supabase } from '@/shared/config/supabase.js';
+import { supabase, createSignInClient } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import type { SupabaseUser, AuthResponse } from '@/features/auth/auth.types.js';
 import { formatAuthResponse, fetchUserProfile } from '@/features/auth/utils/auth.helpers.js';
@@ -37,7 +37,7 @@ export class SessionService {
 	 */
 	async refreshToken(refreshToken: string): Promise<AuthResponse> {
 		try {
-			const { data, error } = await supabase.auth.refreshSession({
+			const { data, error } = await createSignInClient().auth.refreshSession({
 				refresh_token: refreshToken,
 			});
 

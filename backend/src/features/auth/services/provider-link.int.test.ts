@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { ProviderService } from '@/features/auth/services/provider.service.js';
@@ -65,13 +65,6 @@ describe('ProviderLinkService.linkProvider (local Supabase stack)', () => {
 	beforeEach(() => {
 		verifyGoogleToken.mockReset();
 		vi.restoreAllMocks();
-	});
-
-	afterEach(async () => {
-		// Login opens the session with verifyOtp on the shared admin client, which
-		// keeps it in memory and then queries PostgREST as that user (under RLS).
-		// Drop it so the next test talks to the database as service role again.
-		await supabaseAdmin.auth.signOut({ scope: 'local' });
 	});
 
 	afterAll(async () => {
