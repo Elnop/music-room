@@ -54,7 +54,7 @@ fix-permissions: ## Fix file permissions for Docker non-root user compatibility
 	$(call print_header,Permissions Fixed)
 	$(call display_permissions_info)
 	$(call blank_line)
-	$(call print_warning,Run 'make restart' to apply in Docker)
+	$(call print_warning,Run 'make containers-restart' to apply in Docker)
 	$(call blank_line)
 
 fix-node-modules: ## Fix node_modules ownership (for local builds outside Docker)

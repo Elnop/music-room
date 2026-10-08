@@ -44,7 +44,7 @@ docker: ## List the Docker mode commands
 	$(HELP_CMD) dev-docker "Build and start all services in Docker (backend + mobile)"
 	$(HELP_CMD) start "Start existing containers (no rebuild)"
 	$(HELP_CMD) stop "Stop all containers"
-	$(HELP_CMD) restart "Restart all services"
+	$(HELP_CMD) containers-restart "Restart the containers (no rebuild)"
 	$(HELP_CMD) down "Stop and remove containers + networks"
 	$(HELP_CMD) ps "Show container status"
 	$(HELP_CMD) logs "Show logs from all services"

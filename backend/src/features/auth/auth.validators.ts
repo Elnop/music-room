@@ -38,6 +38,10 @@ export const facebookLoginSchema = z.object({
 	accessToken: z.string().min(1, 'Access token is required'),
 });
 
+export const providerParamSchema = z.object({
+	provider: z.enum(['google', 'facebook']),
+});
+
 export const verifyEmailSchema = z.object({
 	userId: z.uuid('Invalid user ID'),
 	code: z
@@ -75,6 +79,7 @@ export type LoginInput = z.infer<typeof loginSchema>;
 export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>;
 export type GoogleLoginInput = z.infer<typeof googleLoginSchema>;
 export type FacebookLoginInput = z.infer<typeof facebookLoginSchema>;
+export type ProviderParamInput = z.infer<typeof providerParamSchema>;
 export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
 export type ResendVerificationInput = z.infer<typeof resendVerificationSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
