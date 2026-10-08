@@ -5,6 +5,7 @@ import { io as ioClient, type Socket as ClientSocket } from 'socket.io-client';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { supabaseAdmin, supabaseAnon } from '@/shared/config/supabase.js';
 import { connectRedis, disconnectRedis, isRedisConnected } from '@/shared/config/redis.js';
+import { logger } from '@/shared/utils/logger.js';
 import type { UserListeningStatus } from '@/features/music-control/music-control.types.js';
 import { realtime } from '@/realtime/index.js';
 
@@ -167,6 +168,33 @@ describe('Socket.io handshake authentication', () => {
 		});
 		expect(server.data.appVersion).toBe(device.appVersion);
 		expect(server.rooms.has(`user:${alice.id}`)).toBe(true);
+	});
+
+	it('logs each incoming event with the handshake platform, device and app version', async () => {
+		const device = deviceFields();
+		const socket = connect({ token: alice.token, ...device });
+		await connected(socket);
+		const info = vi.spyOn(logger, 'info');
+
+		try {
+			// Wait for the reply so the event has been handled (and logged).
+			const answered = nextEvent(socket, 'listening:error');
+			socket.emit('listening:subscribe', 'not-a-uuid');
+			await answered;
+
+			expect(info).toHaveBeenCalledWith('[Socket] in:listening:subscribe', {
+				socketId: socket.id,
+				userId: alice.id,
+				platform: device.platform,
+				device: device.model,
+				deviceId: device.deviceId,
+				appVersion: device.appVersion,
+			});
+			// Event arguments are never logged.
+			expect(JSON.stringify(info.mock.calls)).not.toContain('not-a-uuid');
+		} finally {
+			info.mockRestore();
+		}
 	});
 
 	it('registers the handshake device: a control:action from a friend reaches it', async () => {

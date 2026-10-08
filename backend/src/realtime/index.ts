@@ -133,6 +133,13 @@ class RealtimeService {
 				});
 			});
 
+			// Every incoming event, including those added later, is logged with
+			// the handshake's platform, device and app version (subject IV.6).
+			socket.use(([eventName]: unknown[], next) => {
+				socketLogger.incoming(socket.id, eventName, socket.data);
+				next();
+			});
+
 			this.registerDevice(socket);
 			this.registerPlaylistHandlers(socket);
 			this.registerMusicControlHandlers(socket);
