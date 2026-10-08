@@ -18,8 +18,15 @@ import { musicControlService } from '@/features/music-control/music-control.serv
 import type {
 	ListeningStatus,
 	UserListeningStatus,
-	ControlActionPayload,
 } from '@/features/music-control/music-control.types.js';
+import {
+	controlActionSchema,
+	INVALID_CONTROL_PAYLOAD,
+	INVALID_LISTENING_PAYLOAD,
+	leaveListeningRoom,
+	listeningRoom,
+	listeningTargetSchema,
+} from '@/realtime/music-control-access.js';
 
 // Typed payloads for playlist events
 export interface TrackAddedPayload {
@@ -260,7 +267,18 @@ class RealtimeService {
 			);
 		});
 
-		socket.on('listening:subscribe', async (targetUserId: string) => {
+		socket.on('listening:subscribe', async (payload: unknown) => {
+			const parsed = listeningTargetSchema.safeParse(payload);
+			if (!parsed.success) {
+				socket.emit('listening:error', INVALID_LISTENING_PAYLOAD);
+				socketLogger.event('listening:subscribe', socket.id, {
+					level: 'warn',
+					action: 'invalid_payload',
+				});
+				return;
+			}
+			const targetUserId = parsed.data;
+
 			const socketInfo = this.socketToDevice.get(socket.id);
 			if (!socketInfo) {
 				socketLogger.event('listening:subscribe', socket.id, {
@@ -281,7 +299,7 @@ class RealtimeService {
 				return;
 			}
 
-			void socket.join(`listening:${targetUserId}`);
+			void socket.join(listeningRoom(targetUserId));
 
 			const userDevices = this.listeningStatuses.get(targetUserId);
 			const devices = userDevices ? Array.from(userDevices.values()) : [];
@@ -299,16 +317,33 @@ class RealtimeService {
 			});
 		});
 
-		socket.on('listening:unsubscribe', (targetUserId: string) => {
-			void socket.leave(`listening:${targetUserId}`);
+		socket.on('listening:unsubscribe', (payload: unknown) => {
+			const parsed = listeningTargetSchema.safeParse(payload);
+			if (!parsed.success) return;
+
+			const targetUserId = parsed.data;
+			void socket.leave(listeningRoom(targetUserId));
 			socketLogger.auth('unsubscribe', targetUserId, socket.id, {
-				room: `listening:${targetUserId}`,
+				room: listeningRoom(targetUserId),
 				action: 'unsubscribed',
 			});
 		});
 
-		socket.on('control:action', async (data: ControlActionPayload) => {
+		socket.on('control:action', async (payload: unknown) => {
 			const startTime = Date.now();
+
+			// Unknown keys (e.g. a forged fromUserId) are stripped: the sender
+			// is always the socket's user.
+			const parsed = controlActionSchema.safeParse(payload);
+			if (!parsed.success) {
+				socket.emit('control:error', INVALID_CONTROL_PAYLOAD);
+				socketLogger.event('control:action', socket.id, {
+					level: 'warn',
+					action: 'invalid_payload',
+				});
+				return;
+			}
+			const data = parsed.data;
 
 			const socketInfo = this.socketToDevice.get(socket.id);
 			if (!socketInfo) {
@@ -369,7 +404,7 @@ class RealtimeService {
 	private broadcastUserListeningStatus(userId: string) {
 		if (!this.io) return;
 
-		const room = `listening:${userId}`;
+		const room = listeningRoom(userId);
 		const socketsInRoom = this.io.sockets.adapter.rooms.get(room);
 		const subscriberCount = socketsInRoom ? socketsInRoom.size : 0;
 
@@ -509,6 +544,16 @@ class RealtimeService {
 	}
 
 	/**
+	 * Make every socket of `controllerId` leave `listening:<ownerId>` after it
+	 * lost control of the owner (revoke, unfollow). Never throws; no-op
+	 * before initialize.
+	 */
+	revokeListeningAccess(controllerId: string, ownerId: string): void {
+		if (!this.io) return;
+		leaveListeningRoom(this.io, controllerId, ownerId);
+	}
+
+	/**
 	 * Get the Socket.io server instance (for advanced use cases)
 	 */
 	getIO(): AppSocketServer | null {
@@ -521,6 +566,8 @@ class RealtimeService {
 	 */
 	notifyPermissionChange(targetUserId: string, ownerId: string, granted: boolean) {
 		if (!this.io) return;
+
+		if (!granted) this.revokeListeningAccess(targetUserId, ownerId);
 
 		this.io.to(`user:${targetUserId}`).emit('permission:changed', {
 			ownerId,
