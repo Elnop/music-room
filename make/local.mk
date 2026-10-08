@@ -7,10 +7,21 @@
 
 ADB := $(ANDROID_HOME)/platform-tools/adb
 
+# Rendering goes through the host GPU: software rendering (swiftshader) puts the
+# whole screen on the CPU and two emulators lag. GPU=swiftshader_indirect brings
+# it back if the window stays black.
+GPU ?= host
+
 # Cold boot by default: the emulator neither resumes nor overwrites its saved
 # state, so a frozen app or an old bundle does not come back. FAST=1 keeps
 # Android's quick boot (resume the snapshot, save it on exit).
-EMULATOR_FLAGS := -gpu swiftshader_indirect $(if $(FAST),,-no-snapshot-load -no-snapshot-save)
+EMULATOR_FLAGS := -gpu $(GPU) -no-boot-anim $(if $(FAST),,-no-snapshot-load -no-snapshot-save)
+
+# Two emulators share the CPU with Metro and the backend: each one gets fewer
+# cores and less RAM than an AVD usually asks for.
+EMULATOR_CORES ?= 2
+EMULATOR_MEMORY ?= 2048
+EMULATOR_PAIR_FLAGS := $(EMULATOR_FLAGS) -cores $(EMULATOR_CORES) -memory $(EMULATOR_MEMORY)
 
 # Wait until Android reports the boot as complete (3 minutes max)
 # Usage: @$(call wait_emulator_boot)
@@ -76,8 +87,7 @@ check-devices: ## Check if Android device is connected
 start-emulator: ## Start the Android emulator, cold boot by default (AVD=name, FAST=1 to resume saved state)
 	$(call print_header,Starting Android Emulator)
 	$(call print_subsection,🔧 Configuration)
-	@echo "   • GPU: Software rendering (swiftshader_indirect)"
-	@echo "   • Fixes black screen issues on Linux"
+	@echo "   • GPU: $(GPU) (GPU=swiftshader_indirect if the screen stays black)"
 	@echo "   • Boot: $(if $(FAST),quick boot (resumes saved state),cold boot (FAST=1 to resume saved state))"
 	@echo ""
 	$(call print_arrow,Checking for running emulators...)
@@ -93,7 +103,7 @@ start-emulator: ## Start the Android emulator, cold boot by default (AVD=name, F
 		echo "  $(GREEN)$$avd$(NC)"; \
 	done
 	$(call blank_line)
-	$(call print_arrow,Starting emulator with software rendering...)
+	$(call print_arrow,Starting emulator...)
 	@AVD="$(AVD)"; [ -n "$$AVD" ] || AVD=$$($(ANDROID_HOME)/emulator/emulator -list-avds | head -1); \
 	if [ -z "$$AVD" ]; then \
 		echo "$(RED)$(ICON_ERROR) No AVD found$(NC)"; \
@@ -110,7 +120,7 @@ start-emulator: ## Start the Android emulator, cold boot by default (AVD=name, F
 	$(call print_info,Open Zumik on the emulator: it loads the code served by $(GREEN)make dev-docker$(NC) or $(GREEN)make dev-local$(NC))
 	$(call blank_line)
 
-start-emulators: ## Start two Android emulators for two-account tests (AVD1=name AVD2=name, FAST=1 to resume saved state)
+start-emulators: ## Start two Android emulators for two-account tests (AVD1=name AVD2=name, FAST=1 to resume saved state, GPU=, EMULATOR_CORES=, EMULATOR_MEMORY=)
 	$(call print_header,Starting Two Android Emulators)
 	@RUNNING=$$($(ADB) devices | grep emulator | wc -l); \
 	if [ $$RUNNING -gt 0 ]; then \
@@ -132,8 +142,8 @@ start-emulators: ## Start two Android emulators for two-account tests (AVD1=name
 	fi; \
 	echo "$(BLUE)$(ICON_INFO) emulator-5554: $(GREEN)$$AVD1$(NC)"; \
 	echo "$(BLUE)$(ICON_INFO) emulator-5556: $(GREEN)$$AVD2$(NC)"; \
-	$(ANDROID_HOME)/emulator/emulator -avd "$$AVD1" -port 5554 $(EMULATOR_FLAGS) > /dev/null 2>&1 & \
-	$(ANDROID_HOME)/emulator/emulator -avd "$$AVD2" -port 5556 $(EMULATOR_FLAGS) > /dev/null 2>&1 & \
+	$(ANDROID_HOME)/emulator/emulator -avd "$$AVD1" -port 5554 $(EMULATOR_PAIR_FLAGS) > /dev/null 2>&1 & \
+	$(ANDROID_HOME)/emulator/emulator -avd "$$AVD2" -port 5556 $(EMULATOR_PAIR_FLAGS) > /dev/null 2>&1 & \
 	echo ""; \
 	echo "$(BLUE)$(ICON_INFO) ⏳ Waiting for both emulators to boot...$(NC)"; \
 	for serial in emulator-5554 emulator-5556; do \

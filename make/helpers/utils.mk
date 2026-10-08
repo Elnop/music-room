@@ -50,7 +50,7 @@ help: ## Show this help message
 	@echo "  $(YELLOW)Android Emulator Management:$(NC)"
 	@echo "    $(GREEN)list-emulators$(NC)    List all available AVDs"
 	@echo "    $(GREEN)open-emulator$(NC)     Open specific emulator $(YELLOW)[interactive]$(NC)"
-	@echo "    $(GREEN)start-emulator$(NC)    Start first AVD with software GPU"
+	@echo "    $(GREEN)start-emulator$(NC)    Start first AVD on the host GPU $(YELLOW)[GPU=]$(NC)"
 	@echo "    $(GREEN)start-emulators$(NC)   Start two AVDs for two-account tests $(YELLOW)[AVD1= AVD2=]$(NC)"
 	@echo "    $(GREEN)start-emulators-app$(NC) Start two AVDs and open the app on both"
 	@echo "    $(GREEN)restart-emulators$(NC) Cold boot two AVDs again and open the app"
