@@ -14,3 +14,6 @@
 - source_plan: `_bmad-output/initiative-validation-mandatory/epic-comptes-auth/story-revoquer-la-session-au-logout-backend-plan.md`
   summary: The socket handshake (`backend/src/realtime/socket-auth.ts`) refuses a revoked token and a Redis outage both as `INVALID_TOKEN`, hiding `TOKEN_REVOKED` and `REVOCATION_UNAVAILABLE`; settle it in #71 (3.3) together with the mobile `socketStore` handling.
   evidence: `verifyToken` now checks the logout denylist and throws 401 TOKEN_REVOKED or 503 REVOCATION_UNAVAILABLE; the handshake's bare `catch {}` maps every error to INVALID_TOKEN, and mobile refreshes once on INVALID_TOKEN.
+- source_plan: `_bmad-output/initiative-validation-mandatory/epic-securite/story-tester-l-acces-a-l-ecoute-et-au-controle-backend-plan.md`
+  summary: A quick `listening:subscribe X` then `listening:unsubscribe X` leaves the socket subscribed, because the unsubscribe runs before the subscribe's awaited `canControl`; order a socket's listening events as #64 does for playlist rooms.
+  evidence: `backend/src/realtime/index.ts` `listening:subscribe` joins after `await musicControlService.canControl(...)` while `listening:unsubscribe` leaves synchronously; pre-existing, found in #65 review.

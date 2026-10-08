@@ -430,6 +430,20 @@ Les clients d'une playlist rejoignent la room `playlist:<id>` et reçoivent `pla
 
 L'accès est revérifié quand il peut se perdre : après le retrait d'un viewer ou d'un collaborateur, une mise à jour de la playlist (visibilité) ou sa suppression, les sockets de `playlist:<id>` sans accès quittent la room et reçoivent `playlist:error`. Un échec de cette revérification est seulement loggé.
 
+#### Écoute et contrôle
+
+`listening:subscribe <ownerId>` et `control:action` ne passent que si l'utilisateur de la socket peut contrôler la musique du propriétaire (`musicControlService.canControl` : il le suit avec `follows.can_control_music`). L'identité vient toujours de la socket : les champs en trop du payload (`fromUserId`, `controllerId`...) sont ignorés et `control:command.fromUserId` est l'utilisateur de la socket. Payloads validés par Zod dans `src/realtime/music-control-access.ts`, avant toute lecture en base :
+
+| Event | Payload | Erreur |
+| --- | --- | --- |
+| `listening:subscribe` | id utilisateur (UUID) | `listening:error` |
+| `listening:unsubscribe` | id utilisateur (UUID) | aucune : un payload invalide est ignoré |
+| `control:action` | `{ targetUserId: UUID, targetDeviceId: string (1-128), action: 'play' \| 'pause' }` | `control:error` |
+
+Les erreurs ont la forme `{ message, code }` : `INVALID_PAYLOAD` (payload invalide), `NOT_AUTHORIZED` (pas le droit de contrôle), `DEVICE_OFFLINE` (`control:action` vers un appareil non connecté).
+
+Quand le contrôle se perd, toutes les sockets du contrôleur quittent `listening:<ownerId>` et ne reçoivent plus `listening:status` : après `revokeControl` (le contrôleur reçoit toujours `permission:changed` avec `canControl: false`) ou quand le contrôleur arrête de suivre le propriétaire (`unfollowUser`). Un échec de cette éviction est seulement loggé et ne fait jamais échouer la requête HTTP.
+
 ## 🎵 SoundCloud
 
 - Cache des résultats : recherche et détails de track 1 h, URLs de stream 30 min (`features/soundcloud/utils/soundcloud-cache.ts`)
