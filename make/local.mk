@@ -3,7 +3,7 @@
 # ==============================================================================
 # Commands for local development, useful with Android Studio emulator
 
-.PHONY: dev-local expo-android expo-clear check-devices start-emulator start-emulator-app start-emulators start-emulators-app restart-emulators restart-emulators-clean clean-emulators .stop-emulators .clear-emulator-snapshots .clear-metro-cache .cache-app-apk open-app kill-emulator restart-emulator list-emulators open-emulator
+.PHONY: dev-local expo-android expo-clear check-devices start-emulator start-emulators .boot-emulators restart-emulators restart-emulators-clean clean-emulators .stop-emulators .clear-emulator-snapshots .clear-metro-cache .cache-app-apk open-app kill-emulator restart-emulator list-emulators open-emulator
 
 ADB := $(ANDROID_HOME)/platform-tools/adb
 
@@ -89,7 +89,7 @@ check-devices: ## Check if Android device is connected
 	@echo "   • Use $(GREEN)make dev-android$(NC) to launch"
 	$(call blank_line)
 
-start-emulator: ## Start the Android emulator, cold boot by default (AVD=name, FAST=1 to resume saved state)
+start-emulator: ## Start the Android emulator and open the app, cold boot by default (AVD=name, FAST=1 to resume saved state)
 	$(call print_header,Starting Android Emulator)
 	$(call print_subsection,🔧 Configuration)
 	@echo "   • GPU: $(GPU) (GPU=swiftshader_indirect if the screen stays black)"
@@ -122,10 +122,14 @@ start-emulator: ## Start the Android emulator, cold boot by default (AVD=name, F
 	@$(call wait_emulator_boot)
 	$(call blank_line)
 	$(call print_success,Emulator started!)
-	$(call print_info,Open Zumik on the emulator: it loads the code served by $(GREEN)make dev-docker$(NC) or $(GREEN)make dev-local$(NC))
-	$(call blank_line)
+	@$(MAKE) --no-print-directory open-app
 
-start-emulators: ## Start two Android emulators for two-account tests (AVD1=name AVD2=name, FAST=1 to resume saved state, GPU=, EMULATOR_CORES=, EMULATOR_MEMORY=)
+start-emulators: ## Start two Android emulators for two-account tests and open the app on both (AVD1=name AVD2=name, FAST=1 to resume saved state, GPU=, EMULATOR_CORES=, EMULATOR_MEMORY=)
+	@$(MAKE) --no-print-directory .boot-emulators
+	@$(MAKE) --no-print-directory open-app
+
+# Boot two emulators on fixed ports, without opening the app
+.boot-emulators:
 	$(call print_header,Starting Two Android Emulators)
 	@RUNNING=$$($(ADB) devices | grep emulator | wc -l); \
 	if [ $$RUNNING -gt 0 ]; then \
@@ -159,14 +163,15 @@ start-emulators: ## Start two Android emulators for two-account tests (AVD1=name
 		done; \
 		echo "$(GREEN)$(ICON_SUCCESS) $$serial booted$(NC)"; \
 	done
-	$(call blank_line)
-	$(call print_info,Open the app on both: $(GREEN)make open-app$(NC))
-	$(call blank_line)
 
 # The app runs as the Zumik debug build (Expo Go cannot load its native modules,
 # e.g. Google Sign-In). A debug build loads the JS from Metro on the host
 # (10.0.2.2:8081 from an emulator), so it runs the current branch.
 APP_PACKAGE := com.zumik.app
+# The host as seen from an emulator. Android reports the boot as complete
+# before its network is up: launched then, the app misses Metro and shows
+# "Unable to load script", so open-app waits until Metro answers here.
+EMULATOR_HOST := 10.0.2.2
 APP_APK_CACHE := $(HOME)/.cache/zumik/zumik-debug.apk
 
 # Copy the debug build from a running emulator into APP_APK_CACHE, once
@@ -186,15 +191,23 @@ open-app: ## Launch the Zumik debug build on every running emulator, copying it 
 	@DEVICES=$$($(ADB) devices | grep '^emulator' | grep -w device | cut -f1); \
 	if [ -z "$$DEVICES" ]; then \
 		echo "$(RED)$(ICON_ERROR) No emulator running$(NC)"; \
-		echo "$(BLUE)$(ICON_INFO) Use $(GREEN)make start-emulators-app$(NC)"; \
+		echo "$(BLUE)$(ICON_INFO) Use $(GREEN)make start-emulator$(NC) or $(GREEN)make start-emulators$(NC)"; \
 		exit 1; \
 	fi; \
+	METRO=1; \
 	if ! curl -s --max-time 2 $(METRO_URL)/status | grep -q packager-status:running; then \
+		METRO=; \
 		echo "$(YELLOW)$(ICON_WARNING) Metro is not running on $(METRO_URL): the app opens on \"Unable to load script\"$(NC)"; \
 		echo "$(BLUE)$(ICON_INFO) Start it with $(GREEN)make dev-local$(NC) or $(GREEN)make dev-docker$(NC), then tap RELOAD in the app$(NC)"; \
 	fi; \
 	for serial in $$(echo "$$DEVICES"); do \
-		$(ADB) -s $$serial reverse tcp:$(METRO_PORT) tcp:$(METRO_PORT) > /dev/null 2>&1; \
+		if [ -n "$$METRO" ]; then \
+			i=0; until $(ADB) -s $$serial shell 'printf "GET /status HTTP/1.0\r\n\r\n" | toybox nc -w 2 $(EMULATOR_HOST) $(METRO_PORT)' 2>/dev/null | grep -q packager-status:running; do \
+				i=$$((i + 1)); \
+				if [ $$i -gt 30 ]; then echo "$(YELLOW)$(ICON_WARNING) $$serial cannot reach Metro yet, launching anyway$(NC)"; break; fi; \
+				sleep 2; \
+			done; \
+		fi; \
 		if ! $(ADB) -s $$serial shell pm path $(APP_PACKAGE) 2>/dev/null | grep -q package; then \
 			$(MAKE) --no-print-directory .cache-app-apk; \
 			if [ ! -f "$(APP_APK_CACHE)" ]; then \
@@ -218,20 +231,12 @@ open-app: ## Launch the Zumik debug build on every running emulator, copying it 
 	done
 	$(call blank_line)
 
-start-emulator-app: ## Start one emulator and open the app on it (AVD=name, FAST=1 to resume saved state)
-	@$(MAKE) --no-print-directory start-emulator
-	@$(MAKE) --no-print-directory open-app
-
-start-emulators-app: ## Start two emulators and open the app on both (AVD1= AVD2=)
-	@$(MAKE) --no-print-directory start-emulators
-	@$(MAKE) --no-print-directory open-app
-
 restart-emulators: ## Stop all emulators, cold boot two again (no saved state) and open the app on both
 	@$(MAKE) --no-print-directory kill-emulator
 	@i=0; while $(ADB) devices | grep -q emulator; do \
 		i=$$((i + 1)); [ $$i -gt 30 ] && break; sleep 1; \
 	done
-	@$(MAKE) --no-print-directory start-emulators-app FAST=
+	@$(MAKE) --no-print-directory start-emulators FAST=
 
 restart-emulators-clean: ## Restart two emulators with no cache: snapshots, Metro cache and app data cleared (WIPE=1 also resets the AVDs)
 	$(call print_header,Restarting Emulators With a Clean Cache)
@@ -246,7 +251,7 @@ restart-emulators-clean: ## Restart two emulators with no cache: snapshots, Metr
 	@$(MAKE) --no-print-directory .stop-emulators
 	@$(MAKE) --no-print-directory .clear-emulator-snapshots
 	@$(MAKE) --no-print-directory .clear-metro-cache
-	@$(MAKE) --no-print-directory start-emulators FAST=
+	@$(MAKE) --no-print-directory .boot-emulators FAST=
 	@for serial in emulator-5554 emulator-5556; do \
 		if $(ADB) -s $$serial shell pm path $(APP_PACKAGE) 2>/dev/null | grep -q package; then \
 			$(ADB) -s $$serial shell pm clear $(APP_PACKAGE) > /dev/null 2>&1 \
@@ -345,7 +350,7 @@ list-emulators: ## List all available Android Virtual Devices (AVDs)
 	fi
 	$(call blank_line)
 
-open-emulator: ## Open a specific Android emulator (interactive selection or specify AVD=name)
+open-emulator: ## Open a specific Android emulator and the app on it (interactive selection or specify AVD=name)
 	$(call print_header,Open Android Emulator)
 	@if [ -z "$(ANDROID_HOME)" ]; then \
 		echo "$(RED)$(ICON_ERROR) ANDROID_HOME not set$(NC)"; \
@@ -370,10 +375,6 @@ open-emulator: ## Open a specific Android emulator (interactive selection or spe
 	@if [ -n "$(AVD)" ]; then \
 		echo "$(BLUE)$(ICON_INFO) Opening emulator: $(GREEN)$(AVD)$(NC)"; \
 		$(ANDROID_HOME)/emulator/emulator -avd $(AVD) $(EMULATOR_FLAGS) > /dev/null 2>&1 & \
-		echo ""; \
-		echo "$(GREEN)$(ICON_SUCCESS) Emulator starting in background...$(NC)"; \
-		echo "$(BLUE)$(ICON_INFO) Wait ~30 seconds for boot$(NC)"; \
-		echo ""; \
 	else \
 		echo "$(YELLOW)📱 Available AVDs$(NC)"; \
 		echo "$(YELLOW)──────────────────$(NC)"; \
@@ -399,8 +400,8 @@ open-emulator: ## Open a specific Android emulator (interactive selection or spe
 		echo ""; \
 		echo "$(BLUE)$(ICON_INFO) Opening emulator: $(GREEN)$$SELECTED_AVD$(NC)"; \
 		$(ANDROID_HOME)/emulator/emulator -avd $$SELECTED_AVD $(EMULATOR_FLAGS) > /dev/null 2>&1 & \
-		echo ""; \
-		echo "$(GREEN)$(ICON_SUCCESS) Emulator starting in background...$(NC)"; \
-		echo "$(BLUE)$(ICON_INFO) Wait ~30 seconds for boot$(NC)"; \
-		echo ""; \
 	fi
+	$(call print_info,⏳ Waiting for emulator to boot...)
+	@$(call wait_emulator_boot)
+	$(call print_success,Emulator started!)
+	@$(MAKE) --no-print-directory open-app
