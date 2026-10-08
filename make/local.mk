@@ -3,7 +3,7 @@
 # ==============================================================================
 # Commands for local development, useful with Android Studio emulator
 
-.PHONY: dev-local expo-android expo-clear check-devices start-emulator start-emulators start-emulators-app restart-emulators restart-emulators-clean clean-emulators .stop-emulators .clear-emulator-snapshots .clear-metro-cache .cache-app-apk open-app kill-emulator restart-emulator list-emulators open-emulator
+.PHONY: dev-local expo-android expo-clear check-devices start-emulator start-emulator-app start-emulators start-emulators-app restart-emulators restart-emulators-clean clean-emulators .stop-emulators .clear-emulator-snapshots .clear-metro-cache .cache-app-apk open-app kill-emulator restart-emulator list-emulators open-emulator
 
 ADB := $(ANDROID_HOME)/platform-tools/adb
 
@@ -217,6 +217,10 @@ open-app: ## Launch the Zumik debug build on every running emulator, copying it 
 		fi; \
 	done
 	$(call blank_line)
+
+start-emulator-app: ## Start one emulator and open the app on it (AVD=name, FAST=1 to resume saved state)
+	@$(MAKE) --no-print-directory start-emulator
+	@$(MAKE) --no-print-directory open-app
 
 start-emulators-app: ## Start two emulators and open the app on both (AVD1= AVD2=)
 	@$(MAKE) --no-print-directory start-emulators
