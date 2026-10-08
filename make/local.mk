@@ -190,9 +190,8 @@ open-app: ## Launch the Zumik debug build on every running emulator, copying it 
 		exit 1; \
 	fi; \
 	if ! curl -s --max-time 2 $(METRO_URL)/status | grep -q packager-status:running; then \
-		echo "$(RED)$(ICON_ERROR) Metro is not running on $(METRO_URL): the app would show \"Unable to load script\"$(NC)"; \
-		echo "$(BLUE)$(ICON_INFO) Start it with $(GREEN)make dev-local$(NC) or $(GREEN)make dev-docker$(NC), then $(GREEN)make open-app$(NC)"; \
-		exit 1; \
+		echo "$(YELLOW)$(ICON_WARNING) Metro is not running on $(METRO_URL): the app opens on \"Unable to load script\"$(NC)"; \
+		echo "$(BLUE)$(ICON_INFO) Start it with $(GREEN)make dev-local$(NC) or $(GREEN)make dev-docker$(NC), then tap RELOAD in the app$(NC)"; \
 	fi; \
 	for serial in $$(echo "$$DEVICES"); do \
 		$(ADB) -s $$serial reverse tcp:$(METRO_PORT) tcp:$(METRO_PORT) > /dev/null 2>&1; \
@@ -253,11 +252,7 @@ restart-emulators-clean: ## Restart two emulators with no cache: snapshots, Metr
 				&& echo "$(GREEN)$(ICON_SUCCESS) $$serial: Zumik reinstalled$(NC)"; \
 		fi; \
 	done
-	@if curl -s --max-time 2 $(METRO_URL)/status | grep -q packager-status:running; then \
-		$(MAKE) --no-print-directory open-app; \
-	else \
-		echo "$(BLUE)$(ICON_INFO) Start Metro ($(GREEN)make dev-local$(NC) or $(GREEN)make expo-clear$(NC)), then $(GREEN)make open-app$(NC)"; \
-	fi
+	@$(MAKE) --no-print-directory open-app
 
 clean-emulators: ## Stop the emulators and remove their snapshots, stale locks and the cached Zumik APK
 	$(call print_header,Cleaning Android Emulators)
