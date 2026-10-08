@@ -1,10 +1,14 @@
-import { Server as SocketIOServer, Socket } from 'socket.io';
+import { Server as SocketIOServer } from 'socket.io';
 import type { Server as HTTPServer } from 'http';
 import { socketLogger } from '@/shared/middleware/socket-logger.middleware.js';
+import {
+	authenticateSocket,
+	type AppSocket,
+	type AppSocketServer,
+} from '@/realtime/socket-auth.js';
 import type { TrackWithPositionResponse } from '@/features/playlists/playlist.types.js';
 import { musicControlService } from '@/features/music-control/music-control.service.js';
 import type {
-	DeviceInfo,
 	ListeningStatus,
 	UserListeningStatus,
 	ControlActionPayload,
@@ -22,18 +26,11 @@ export interface TrackRemovedPayload {
 export type PlaylistEventPayload = TrackAddedPayload | TrackRemovedPayload | undefined;
 
 /**
- * Auth registration payload with device info
- */
-interface AuthRegisterPayload {
-	userId: string;
-	device: DeviceInfo;
-}
-
-/**
- * Listening update payload from client
+ * Listening update payload from client.
+ * Older clients may still send a `device` field: it is ignored, and the
+ * device comes from the handshake (`socket.data.device`).
  */
 interface ListeningUpdatePayload {
-	device: DeviceInfo;
 	track: {
 		id: number;
 		title: string;
@@ -49,11 +46,6 @@ interface ListeningUpdatePayload {
 function isValidListeningUpdatePayload(data: unknown): data is ListeningUpdatePayload {
 	if (!data || typeof data !== 'object') return false;
 	const payload = data as Record<string, unknown>;
-
-	if (!payload.device || typeof payload.device !== 'object') return false;
-	const device = payload.device as Record<string, unknown>;
-	if (typeof device.deviceId !== 'string' || !device.deviceId) return false;
-	if (typeof device.deviceName !== 'string') return false;
 
 	if (typeof payload.isPlaying !== 'boolean') return false;
 
@@ -78,7 +70,7 @@ function isValidListeningUpdatePayload(data: unknown): data is ListeningUpdatePa
  * - Handler methods for each feature (playlist, player, etc.)
  */
 class RealtimeService {
-	private io: SocketIOServer | null = null;
+	private io: AppSocketServer | null = null;
 
 	private listeningStatuses: Map<string, Map<string, ListeningStatus>> = new Map();
 
@@ -108,6 +100,11 @@ class RealtimeService {
 			pingInterval: 25000,
 		});
 
+		// Every connection must carry a valid token (see socket-auth.ts).
+		this.io.use((socket, next) => {
+			authenticateSocket(socket, next).catch(() => next(new Error('INVALID_TOKEN')));
+		});
+
 		this.io.on('connection', socket => {
 			const transport = socket.conn.transport.name;
 			socketLogger.connection(socket.id, transport, { action: 'connected' });
@@ -120,7 +117,7 @@ class RealtimeService {
 				});
 			});
 
-			this.registerAuthHandlers(socket);
+			this.registerDevice(socket);
 			this.registerPlaylistHandlers(socket);
 			this.registerMusicControlHandlers(socket);
 
@@ -138,30 +135,29 @@ class RealtimeService {
 	}
 
 	/**
-	 * Authentication handlers - associate socket with user and device
+	 * Register the handshake device for control and join the user's room.
+	 * Identity comes from socket.data, filled by authenticateSocket.
 	 */
-	private registerAuthHandlers(socket: Socket) {
-		socket.on('auth:register', (data: AuthRegisterPayload) => {
-			const { userId, device } = data;
-			const deviceKey = `${userId}:${device.deviceId}`;
+	private registerDevice(socket: AppSocket) {
+		const { userId, device } = socket.data;
+		const deviceKey = `${userId}:${device.deviceId}`;
 
-			this.socketToDevice.set(socket.id, { userId, deviceId: device.deviceId });
-			this.deviceToSocket.set(deviceKey, socket.id);
+		this.socketToDevice.set(socket.id, { userId, deviceId: device.deviceId });
+		this.deviceToSocket.set(deviceKey, socket.id);
 
-			void socket.join(`user:${userId}`);
+		void socket.join(`user:${userId}`);
 
-			socketLogger.auth('register', userId, socket.id, {
-				deviceId: device.deviceId,
-				deviceName: device.deviceName,
-				action: 'device_registered',
-			});
+		socketLogger.auth('register', userId, socket.id, {
+			deviceId: device.deviceId,
+			deviceName: device.deviceName,
+			action: 'device_registered',
 		});
 	}
 
 	/**
 	 * Playlist event handlers
 	 */
-	private registerPlaylistHandlers(socket: Socket) {
+	private registerPlaylistHandlers(socket: AppSocket) {
 		socket.on('playlist:join', (playlistId: string) => {
 			void socket.join(`playlist:${playlistId}`);
 			socketLogger.event('playlist:join', socket.id, {
@@ -184,7 +180,7 @@ class RealtimeService {
 	/**
 	 * Music control handlers - multi-device support
 	 */
-	private registerMusicControlHandlers(socket: Socket) {
+	private registerMusicControlHandlers(socket: AppSocket) {
 		socket.on('listening:update', (data: unknown) => {
 			const startTime = Date.now();
 
@@ -223,7 +219,7 @@ class RealtimeService {
 
 			const status: ListeningStatus = {
 				ownerId: userId,
-				device: data.device,
+				device: socket.data.device,
 				track: data.track,
 				isPlaying: data.isPlaying,
 				updatedAt: new Date().toISOString(),
@@ -234,7 +230,7 @@ class RealtimeService {
 			socketLogger.event('listening:update', socket.id, {
 				userId,
 				deviceId,
-				deviceName: data.device.deviceName,
+				deviceName: socket.data.device.deviceName,
 				track: status.track?.title,
 				isPlaying: status.isPlaying,
 				processingTime: `${processingTime}ms`,
@@ -379,11 +375,16 @@ class RealtimeService {
 	/**
 	 * Handle socket disconnect - cleanup only the disconnected device
 	 */
-	private handleDisconnect(socket: Socket) {
+	private handleDisconnect(socket: AppSocket) {
 		const socketInfo = this.socketToDevice.get(socket.id);
 		if (socketInfo) {
 			const { userId, deviceId } = socketInfo;
 			const deviceKey = `${userId}:${deviceId}`;
+
+			this.socketToDevice.delete(socket.id);
+
+			// The device reconnected on a newer socket: leave its state to that socket.
+			if (this.deviceToSocket.get(deviceKey) !== socket.id) return;
 
 			const userDevices = this.listeningStatuses.get(userId);
 			if (userDevices) {
@@ -397,7 +398,6 @@ class RealtimeService {
 
 			this.broadcastUserListeningStatus(userId);
 
-			this.socketToDevice.delete(socket.id);
 			this.deviceToSocket.delete(deviceKey);
 
 			socketLogger.event('device:cleanup', socket.id, {
@@ -442,7 +442,7 @@ class RealtimeService {
 	/**
 	 * Get the Socket.io server instance (for advanced use cases)
 	 */
-	getIO(): SocketIOServer | null {
+	getIO(): AppSocketServer | null {
 		return this.io;
 	}
 

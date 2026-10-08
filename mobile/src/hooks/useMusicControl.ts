@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState, useRef } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { useSocketStore } from '@store/socketStore';
 import { usePlayerStore } from '@store/playerStore';
 import { useAuthStore } from '@store/authStore';
@@ -57,8 +57,6 @@ export function useMusicControlEmitter() {
 
 	const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
 
-	const isRegistered = useRef(false);
-
 	useEffect(() => {
 		deviceService.getDeviceInfo().then(info => {
 			setDeviceInfo(info);
@@ -68,36 +66,10 @@ export function useMusicControlEmitter() {
 	}, []);
 
 	useEffect(() => {
-		if (!socket || !isConnected || !user || !deviceInfo) {
-			isRegistered.current = false;
-			return;
-		}
-
-		socket.emit('auth:register', { userId: user.id, device: deviceInfo });
-		if (__DEV__)
-			console.log('[MusicControl] Registered user with device:', user.id, deviceInfo.deviceName);
-
-		const timer = setTimeout(() => {
-			isRegistered.current = true;
-		}, 100);
-
-		return () => {
-			clearTimeout(timer);
-			isRegistered.current = false;
-		};
-	}, [socket, isConnected, user, deviceInfo]);
-
-	useEffect(() => {
 		if (!socket || !isConnected || !user || !deviceInfo) return;
 
 		const emitStatus = () => {
-			if (!isRegistered.current) {
-				const retryTimer = setTimeout(emitStatus, 150);
-				return () => clearTimeout(retryTimer);
-			}
-
 			const status = {
-				device: deviceInfo,
 				track: currentTrack
 					? {
 							id: currentTrack.id,

@@ -396,9 +396,26 @@ Montés dans `src/shared/config/routes.ts`, documentés dans Swagger (`/api-docs
 
 ## ⚡ Temps réel (Socket.io)
 
-Serveur : `src/realtime/index.ts`. Events :
+Serveur : `src/realtime/index.ts`.
 
-- **Client → serveur** : `auth:register`, `playlist:join`, `playlist:leave`, `listening:subscribe`, `listening:unsubscribe`, `listening:update`, `control:action`
+### Authentification du handshake
+
+Toute connexion est authentifiée au handshake par `src/realtime/socket-auth.ts` (middleware `io.use`), qui documente le contrat. Le client passe dans `io(url, { auth: { ... } })` six chaînes obligatoires :
+
+| Champ | Contenu |
+| --- | --- |
+| `token` | access token Supabase (JWT), vérifié par `SessionService.verifyToken` |
+| `deviceId` | identifiant stable de l'appareil (non vide) |
+| `deviceName` | nom de l'appareil |
+| `platform` | plateforme (`ios`, `android`, ...) |
+| `model` | modèle de l'appareil |
+| `appVersion` | version de l'app |
+
+Refus : `connect_error` dont le `message` vaut `NO_TOKEN` (pas de `token`), `INVALID_HANDSHAKE` (champ manquant ou pas une chaîne) ou `INVALID_TOKEN` (token invalide ou expiré). Accepté : `socket.data` contient `{ userId, email, device, appVersion }`, l'identité venant uniquement du token ; l'appareil est enregistré pour le contrôle et la socket rejoint `user:<id>`. Le token n'est vérifié qu'à la connexion. `listening:update` prend l'appareil du handshake, jamais celui du payload.
+
+### Events
+
+- **Client → serveur** : `playlist:join`, `playlist:leave`, `listening:subscribe`, `listening:unsubscribe`, `listening:update`, `control:action`
 - **Serveur → client** : `playlist:updated`, `listening:status`, `listening:error`, `permission:changed`, `control:command`, `control:success`, `control:error`
 
 Les clients d'une playlist rejoignent la room `playlist:<id>` et reçoivent `playlist:updated` à chaque modification.
