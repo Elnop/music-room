@@ -1,4 +1,4 @@
-import { supabase } from '@/shared/config/supabase.js';
+import { supabase, createSignInClient } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import { formatAuthResponse, getUserProfile } from '@/features/auth/utils/auth.helpers.js';
@@ -137,10 +137,11 @@ export class AuthService {
 		try {
 			logger.info('User login attempt', { email: data.email });
 
-			const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-				email: data.email,
-				password: data.password,
-			});
+			const { data: authData, error: authError } =
+				await createSignInClient().auth.signInWithPassword({
+					email: data.email,
+					password: data.password,
+				});
 
 			if (authError) {
 				logger.warn('Login failed - auth error', {

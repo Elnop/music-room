@@ -14,7 +14,7 @@ import {
 } from '@/features/auth/auth.validators.js';
 import { EmailVerificationService } from '@/features/auth/services/email-verification.service.js';
 import { PasswordResetService } from '@/features/auth/services/password-reset.service.js';
-import { supabase } from '@/shared/config/supabase.js';
+import { supabase, createSignInClient } from '@/shared/config/supabase.js';
 import type { ApiResponse } from '@/shared/types/global.types.js';
 import type { AuthenticatedRequest } from '@/shared/types/global.types.js';
 import { logger } from '@/shared/utils/logger.js';
@@ -425,7 +425,7 @@ export class AuthController {
 			}
 
 			// Verify the token hash to obtain session
-			const { data: verifyData, error: verifyError } = await supabase.auth.verifyOtp({
+			const { data: verifyData, error: verifyError } = await createSignInClient().auth.verifyOtp({
 				token_hash: hashed_token,
 				type: 'email',
 			});
