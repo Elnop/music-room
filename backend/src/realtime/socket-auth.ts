@@ -11,7 +11,7 @@ import { socketLogger } from '@/shared/middleware/socket-logger.middleware.js';
  * all required strings:
  *
  *   token       Supabase access token (JWT), verified with SessionService.verifyToken
- *   deviceId    stable id of the device (non-empty)
+ *   deviceId    stable id of the device (1 to 128 characters, devices.device_id)
  *   deviceName  human-readable device name
  *   platform    ios | android | web ...
  *   model       device model
@@ -30,7 +30,7 @@ import { socketLogger } from '@/shared/middleware/socket-logger.middleware.js';
 
 export const handshakeAuthSchema = z.object({
 	token: z.string().min(1),
-	deviceId: z.string().min(1),
+	deviceId: z.string().min(1).max(128),
 	deviceName: z.string(),
 	platform: z.string(),
 	model: z.string(),
