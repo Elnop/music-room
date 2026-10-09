@@ -3,14 +3,14 @@ title: 'Opérations atomiques sur les tracks (migration 016)'
 type: 'feature'
 ticket: '3'
 created: '2026-10-09'
-status: 'in-progress'
+status: 'built'
 baseline_revision: '752ef263847b2614dc1194855f22fcfd366a9eb4'
 route: 'full'
 route_source: 'auto'
 risk: 'high'
-review: ''
-review_source: ''
-lenses_ran: []
+review: 'quick'
+review_source: 'pinned'
+lenses_ran: ['quick']
 review_loop_iteration: 0
 context: ['{project-root}/doc/PLAYLIST_CONCURRENCY.md']
 ---
@@ -87,3 +87,12 @@ context: ['{project-root}/doc/PLAYLIST_CONCURRENCY.md']
 ## Plan Change Log
 
 ## Review Triage Log
+
+Quick review, pass 1: 0 high, 2 medium, 4 low (4 patched, 2 rejected), 0 false.
+
+- medium, patch: `authenticated` kept INSERT/DELETE RLS policies on `playlist_tracks` (010), so a signed-in user could write rows over PostgREST without the lock or the version bump, breaking convergence. No legitimate caller (mobile never touches the table; backend uses `supabaseAdmin`). 016 drops those policies (SELECT kept); int test: the owner's user client cannot insert or delete directly.
+- medium, patch: the "burst of concurrent moves, adds and removes" test discarded the `Promise.all` results, so a spurious refusal of unrelated moves would pass. Now asserts every operation succeeded except, at most, the removed track's move with `TRACK_NOT_IN_PLAYLIST`.
+- low, patch: `idx_playlist_tracks_rank` duplicated the index of `playlist_tracks_rank_unique`; removed.
+- low, patch: the anon-key test accepted any error; now asserts a permission denial and covers every function 016 creates.
+- low, rejected: `playlist_move_track` does not validate `p_expected_version` (NULL skips both refusals) or `p_after_rank` (over 128 chars → raw CHECK error; out-of-alphabet → key not strictly between). Only the backend calls it (service_role), and #89 validates both with `moveTrackSchema` (non-negative int; base-62 regex, max 128). A 128-char `afterRank` cannot exist in the table (rebalance at 64); the fix adds branches in SQL.
+- low, rejected: the move-vs-remove race test checks the move-wins case loosely (track absent + invariants). Matches the matrix row; tightening adds assertions for no user-facing gain.
