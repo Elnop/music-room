@@ -58,10 +58,6 @@ export const addTrackSchema = z.object({
 		.pipe(z.url().optional()),
 });
 
-export const reorderTracksSchema = z.object({
-	trackIds: z.array(z.uuid()).min(1, 'Track IDs array cannot be empty'),
-});
-
 // A rank is a base-62 fraction that never ends with '0' (doc/PLAYLIST_CONCURRENCY.md).
 export const rankSchema = z
 	.string()
@@ -71,6 +67,11 @@ export const rankSchema = z
 export const moveTrackSchema = z.object({
 	afterRank: rankSchema.nullable(),
 	expectedVersion: z.number().int().nonnegative(),
+});
+
+// Path segment of /:id/tracks/:trackId routes: a non-uuid is a 400, not a failed RPC.
+export const trackIdParamSchema = z.object({
+	trackId: z.uuid('Invalid track ID format'),
 });
 
 export const addCollaboratorSchema = z.object({
@@ -84,7 +85,6 @@ export const addViewerSchema = z.object({
 export type CreatePlaylistInput = z.infer<typeof createPlaylistSchema>;
 export type UpdatePlaylistInput = z.infer<typeof updatePlaylistSchema>;
 export type AddTrackInput = z.infer<typeof addTrackSchema>;
-export type ReorderTracksInput = z.infer<typeof reorderTracksSchema>;
 export type MoveTrackInput = z.infer<typeof moveTrackSchema>;
 export type AddCollaboratorInput = z.infer<typeof addCollaboratorSchema>;
 export type AddViewerInput = z.infer<typeof addViewerSchema>;

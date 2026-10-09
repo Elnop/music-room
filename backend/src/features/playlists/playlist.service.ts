@@ -58,9 +58,9 @@ export class PlaylistService {
 
 			const { data: allTracks, error: tracksError } = await supabaseAdmin
 				.from('playlist_tracks')
-				.select('playlist_id, position, tracks:track_id(album_art)')
+				.select('playlist_id, rank, tracks:track_id(album_art)')
 				.in('playlist_id', playlistIds)
-				.order('position', { ascending: true });
+				.order('rank', { ascending: true });
 
 			if (tracksError) throw tracksError;
 
@@ -166,9 +166,9 @@ export class PlaylistService {
 
 			const { data: allTracks, error: tracksError } = await supabaseAdmin
 				.from('playlist_tracks')
-				.select('playlist_id, position, tracks:track_id(album_art)')
+				.select('playlist_id, rank, tracks:track_id(album_art)')
 				.in('playlist_id', playlistIds)
-				.order('position', { ascending: true });
+				.order('rank', { ascending: true });
 
 			if (tracksError) throw tracksError;
 
@@ -250,9 +250,9 @@ export class PlaylistService {
 			// Get first track cover for each playlist
 			const { data: allTracks, error: tracksError } = await supabaseAdmin
 				.from('playlist_tracks')
-				.select('playlist_id, position, tracks:track_id(album_art)')
+				.select('playlist_id, rank, tracks:track_id(album_art)')
 				.in('playlist_id', playlistIds)
-				.order('position', { ascending: true });
+				.order('rank', { ascending: true });
 
 			if (tracksError) throw tracksError;
 
@@ -335,14 +335,14 @@ export class PlaylistService {
 				.from('playlist_tracks')
 				.select(
 					`
-          position,
+          rank,
           added_by,
           added_at,
           tracks:track_id (*)
         `
 				)
 				.eq('playlist_id', playlistId)
-				.order('position', { ascending: true });
+				.order('rank', { ascending: true });
 
 			if (tracksError) throw tracksError;
 
@@ -358,7 +358,7 @@ export class PlaylistService {
 
 			const formattedTracks = playlistTracks.map(pt => ({
 				...formatTrackResponse(pt.tracks),
-				position: pt.position,
+				rank: pt.rank,
 				addedBy: pt.added_by,
 				addedAt: pt.added_at ?? new Date().toISOString(),
 			}));
@@ -372,8 +372,7 @@ export class PlaylistService {
 					displayName: owner.display_name ?? undefined,
 					avatarUrl: owner.avatar_url ?? undefined,
 				},
-				// Placeholder until playlists.tracks_version exists (#88).
-				tracksVersion: 0,
+				tracksVersion: playlist.tracks_version,
 			};
 		} catch (error) {
 			if (error instanceof AppError) throw error;

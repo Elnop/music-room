@@ -7,7 +7,8 @@ import {
 	createPlaylistSchema,
 	updatePlaylistSchema,
 	addTrackSchema,
-	reorderTracksSchema,
+	moveTrackSchema,
+	trackIdParamSchema,
 	addCollaboratorSchema,
 	addViewerSchema,
 } from '@/features/playlists/playlist.validators.js';
@@ -204,7 +205,7 @@ export class PlaylistController {
 				},
 			});
 
-			await trackService.addTrack(id, authReq.user.id, validated);
+			const result = await trackService.addTrack(id, authReq.user.id, validated);
 
 			logger.info('[Playlist Controller] Track added successfully', {
 				playlistId: id,
@@ -213,7 +214,7 @@ export class PlaylistController {
 
 			const response: ApiResponse = {
 				success: true,
-				data: { message: 'Track added successfully' },
+				data: result,
 				meta: { timestamp: new Date().toISOString() },
 			};
 
@@ -236,12 +237,12 @@ export class PlaylistController {
 		try {
 			const authReq = req as AuthenticatedRequest;
 			const id = routeParam(req, 'id');
-			const trackId = routeParam(req, 'trackId');
-			await trackService.removeTrack(id, authReq.user.id, trackId);
+			const { trackId } = trackIdParamSchema.parse(req.params);
+			const result = await trackService.removeTrack(id, authReq.user.id, trackId);
 
 			const response: ApiResponse = {
 				success: true,
-				data: { message: 'Track removed successfully' },
+				data: result,
 				meta: { timestamp: new Date().toISOString() },
 			};
 
@@ -252,19 +253,20 @@ export class PlaylistController {
 	}
 
 	/**
-	 * PUT /api/playlists/:id/tracks/reorder
-	 * Reorder tracks in playlist
+	 * POST /api/playlists/:id/tracks/:trackId/move
+	 * Move a track right after afterRank (doc/PLAYLIST_CONCURRENCY.md)
 	 */
-	async reorderTracks(req: Request, res: Response, next: NextFunction) {
+	async moveTrack(req: Request, res: Response, next: NextFunction) {
 		try {
 			const authReq = req as AuthenticatedRequest;
 			const id = routeParam(req, 'id');
-			const validated = reorderTracksSchema.parse(req.body);
-			await trackService.reorderTracks(id, authReq.user.id, validated.trackIds);
+			const { trackId } = trackIdParamSchema.parse(req.params);
+			const validated = moveTrackSchema.parse(req.body);
+			const result = await trackService.moveTrack(id, authReq.user.id, trackId, validated);
 
 			const response: ApiResponse = {
 				success: true,
-				data: { message: 'Tracks reordered successfully' },
+				data: result,
 				meta: { timestamp: new Date().toISOString() },
 			};
 

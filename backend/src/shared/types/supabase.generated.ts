@@ -149,24 +149,27 @@ export type Database = {
 					added_at: string | null;
 					added_by: string | null;
 					id: string;
+					moved_at_version: number;
 					playlist_id: string;
-					position: number;
+					rank: string;
 					track_id: string;
 				};
 				Insert: {
 					added_at?: string | null;
 					added_by?: string | null;
 					id?: string;
+					moved_at_version?: number;
 					playlist_id: string;
-					position: number;
+					rank: string;
 					track_id: string;
 				};
 				Update: {
 					added_at?: string | null;
 					added_by?: string | null;
 					id?: string;
+					moved_at_version?: number;
 					playlist_id?: string;
-					position?: number;
+					rank?: string;
 					track_id?: string;
 				};
 				Relationships: [
@@ -203,6 +206,8 @@ export type Database = {
 					id: string;
 					name: string;
 					owner_id: string;
+					ranks_rebalanced_at_version: number;
+					tracks_version: number;
 					updated_at: string | null;
 					viewer_ids: string[] | null;
 					visibility: string;
@@ -216,6 +221,8 @@ export type Database = {
 					id?: string;
 					name: string;
 					owner_id: string;
+					ranks_rebalanced_at_version?: number;
+					tracks_version?: number;
 					updated_at?: string | null;
 					viewer_ids?: string[] | null;
 					visibility: string;
@@ -229,6 +236,8 @@ export type Database = {
 					id?: string;
 					name?: string;
 					owner_id?: string;
+					ranks_rebalanced_at_version?: number;
+					tracks_version?: number;
 					updated_at?: string | null;
 					viewer_ids?: string[] | null;
 					visibility?: string;
@@ -388,9 +397,34 @@ export type Database = {
 			[_ in never]: never;
 		};
 		Functions: {
-			get_next_playlist_position: {
-				Args: { p_playlist_id: string };
-				Returns: number;
+			playlist_add_track: {
+				Args: { p_added_by?: string; p_playlist_id: string; p_track_id: string };
+				Returns: Json;
+			};
+			playlist_lock: { Args: { p_playlist_id: string }; Returns: number };
+			playlist_move_track: {
+				Args: {
+					p_after_rank?: string;
+					p_expected_version: number;
+					p_playlist_id: string;
+					p_track_id: string;
+				};
+				Returns: Json;
+			};
+			playlist_rebalance: {
+				Args: { p_playlist_id: string; p_version: number };
+				Returns: undefined;
+			};
+			playlist_remove_track: {
+				Args: { p_playlist_id: string; p_track_id: string };
+				Returns: Json;
+			};
+			rank_after: { Args: { p_a: string }; Returns: string };
+			rank_between: { Args: { p_a: string; p_b: string }; Returns: string };
+			rank_max_length: { Args: never; Returns: number };
+			rank_spaced: {
+				Args: { p_count: number; p_index: number };
+				Returns: string;
 			};
 		};
 		Enums: {

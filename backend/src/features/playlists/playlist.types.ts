@@ -46,10 +46,6 @@ export interface AddTrackDTO {
 	previewUrl?: string;
 }
 
-export interface ReorderTracksDTO {
-	trackIds: string[]; // Array of track IDs in new order
-}
-
 export interface AddCollaboratorDTO {
 	userId: string;
 }
@@ -97,13 +93,14 @@ export interface PlaylistResponse {
 }
 
 export interface PlaylistWithTracksResponse extends PlaylistResponse {
-	// Becomes TrackInPlaylistResponse[] (ordered by rank) in 5.4 (#89).
-	tracks: TrackWithPositionResponse[];
+	/** Ordered by rank. */
+	tracks: TrackInPlaylistResponse[];
 	owner: PlaylistOwner;
 	/** Incremented by every add, remove and move; sent back as expectedVersion. */
 	tracksVersion: number;
 }
 
+// Old socket payload track, kept until #90 (5.5) switches realtime to TrackInPlaylistResponse.
 export interface TrackWithPositionResponse extends TrackResponse {
 	position: number;
 	addedBy: string | null;

@@ -388,7 +388,7 @@ Montés dans `src/shared/config/routes.ts`, documentés dans Swagger (`/api-docs
 |---|---|
 | `/api/auth` | register, login, refresh, logout, me, OAuth google/facebook, providers (liste, unlink), verify-email, resend-verification, forgot-password, reset-password |
 | `/api/profile` | profil (get, patch), search, privacy, music-preferences (+ genres), profil d'un autre user |
-| `/api/playlists` | CRUD, publiques, par user, tracks (ajout, retrait, reorder), collaborateurs, viewers |
+| `/api/playlists` | CRUD, publiques, par user, tracks (ajout, retrait, move `POST /:id/tracks/:trackId/move`), collaborateurs, viewers |
 | `/api/friends` | liste, stats, statut, follow / unfollow |
 | `/api/music-control` | permissions (liste, grant, revoke), can-control |
 | `/api/soundcloud` | search, track, stream |

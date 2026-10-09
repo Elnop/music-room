@@ -1,4 +1,3 @@
-import { supabaseAdmin } from '@/shared/config/supabase.js';
 import type {
 	PlaylistRow,
 	TrackRow,
@@ -50,25 +49,4 @@ export function formatTrackResponse(row: TrackRow): TrackResponse {
 		createdAt: row.created_at ?? new Date().toISOString(),
 		updatedAt: row.updated_at ?? new Date().toISOString(),
 	};
-}
-
-/**
- * Re-index track positions after deletion to close gaps
- * Ensures positions are sequential: 0, 1, 2, 3...
- */
-export async function reindexPositions(playlistId: string): Promise<void> {
-	const { data: tracks, error } = await supabaseAdmin
-		.from('playlist_tracks')
-		.select('*')
-		.eq('playlist_id', playlistId)
-		.order('position', { ascending: true });
-
-	if (error) throw error;
-
-	// Update positions only if they're out of sequence
-	for (let i = 0; i < tracks.length; i++) {
-		if (tracks[i].position !== i) {
-			await supabaseAdmin.from('playlist_tracks').update({ position: i }).eq('id', tracks[i].id);
-		}
-	}
 }

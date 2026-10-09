@@ -29,6 +29,8 @@ function playlist(visibility: 'public' | 'private', editMode: 'open' | 'restrict
 		viewer_ids: [VIEWER],
 		created_at: null,
 		updated_at: null,
+		tracks_version: 0,
+		ranks_rebalanced_at_version: 0,
 	};
 }
 
