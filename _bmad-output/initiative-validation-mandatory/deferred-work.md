@@ -26,3 +26,9 @@
 - source_plan: `_bmad-output/initiative-validation-mandatory/plan-gh-160-token-verification-rate-limit.md`
   summary: Configure Express `trust proxy` (and the matching client IP for Socket.io) so per-IP limiters key on the real client behind a tunnel or reverse proxy instead of the proxy's address.
   evidence: No `trust proxy` in `backend/src`; behind `make dev-tunnel` or a reverse proxy every client shares one IP, so the token-verification limiter (#160) and the auth limiters (#120) count all users together.
+- source_plan: `_bmad-output/initiative-validation-mandatory/plan-gh-126-session-expired-logout.md`
+  summary: In `mobile/src/store/authStore.ts`, the `!refreshToken` branch of `refreshAccessToken` calls `logout()`, whose `authApi.logout` goes through `apiRequest`; with an expiring access token the proactive refresh calls `refreshAccessToken` again, which calls `logout()` again (recursion). Use the local session end there too.
+  evidence: `apiRequest` (`mobile/src/services/api.ts:142-145`) refreshes before any request when `isTokenExpiringSoon()`; the logout endpoint is not exempted, and the `!refreshToken` branch never clears `accessToken` before calling `logout()`.
+- source_plan: `_bmad-output/initiative-validation-mandatory/plan-gh-126-session-expired-logout.md`
+  summary: Document the 429 `RATE_LIMIT_EXCEEDED` answered by `loginRateLimiter` on `POST /api/auth/refresh` in `auth.openapi.ts`.
+  evidence: `backend/src/features/auth/auth.routes.ts:47` puts the refresh route behind `loginRateLimiter`; the OpenAPI entry lists 200/401/503 only, unlike `/api/auth/login`.

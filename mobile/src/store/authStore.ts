@@ -673,9 +673,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 				errorMessage: error instanceof Error ? error.message : 'Unknown error',
 				errorType: error?.constructor?.name,
 			});
+
+			// Only a 401 from the refresh call means the backend refused the
+			// refresh token; anything else (network, 5xx, 503, 429) is an outage.
+			// isRefreshing is reset with the cleared session, so waiting callers
+			// never retry with the stale token.
+			if (error instanceof ApiError && error.status === 401) {
+				console.warn('[AuthStore] Refresh token refused, ending the session locally');
+				await endSessionLocally();
+				return false;
+			}
+
 			set({ isRefreshing: false });
 
-			console.warn('[AuthStore] Skipping auto-logout on refresh failure');
+			console.warn('[AuthStore] Keeping the session after a refresh failure; will retry later');
 			return false;
 		}
 	},
@@ -700,6 +711,31 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 		set({ error: null });
 	},
 }));
+
+/**
+ * End the session without calling the backend: `authApi.logout` goes through
+ * `apiRequest`, whose proactive refresh would call `refreshAccessToken` again.
+ * RootNavigator shows the auth screens once `isAuthenticated` is false.
+ */
+async function endSessionLocally(): Promise<void> {
+	try {
+		await supabase.auth.signOut({ scope: 'local' });
+	} catch (error) {
+		console.warn('[AuthStore] Supabase local sign-out failed', error);
+	}
+
+	useAuthStore.setState({
+		user: null,
+		accessToken: null,
+		refreshToken: null,
+		tokenExpiresAt: null,
+		isAuthenticated: false,
+		isRefreshing: false,
+		linkedProviders: null,
+	});
+
+	await useAuthStore.getState().clearStorage();
+}
 
 registerAuthSession({
 	getAccessToken: () => useAuthStore.getState().accessToken,
