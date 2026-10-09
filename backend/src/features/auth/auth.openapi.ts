@@ -944,6 +944,7 @@ export const authPaths: OpenAPIV3.PathsObject = {
 			description: `
         Sends a 6-digit reset code (valid 15 minutes) to the email.
         An account that signs in only with Google or Facebook gets a code too: resetting adds email/password sign-in to it.
+        Each request starts the 60-second resend cooldown reported by GET /api/auth/reset-password/can-resend, even for an email with no account.
         The answer is the same whether the email belongs to an account or not, so it cannot be used to find accounts.
 
         **Rate limits:**
@@ -1150,7 +1151,8 @@ export const authPaths: OpenAPIV3.PathsObject = {
 			summary: 'Check whether a new reset code can be requested',
 			description: `
         Reports the resend cooldown for this email and IP: \`canResend\` and the \`remainingSeconds\` before a new code can be requested.
-        The cooldown is not recorded yet (tracked in #187), so the endpoint currently always answers \`{ canResend: true, remainingSeconds: 0 }\`.
+        Reports whether a new POST /api/auth/forgot-password for this email and IP would be accepted. Each request starts a 60-second resend cooldown (advisory: the client waits for it), and at most 3 requests per hour are accepted; both count whether the email belongs to an account or not.
+        When \`canResend\` is false, \`remainingSeconds\` is the real time left of whichever limit blocks the next request (up to an hour for the hourly limit).
 
         **Rate limit:** 20 requests per 15 minutes per IP (global auth limiter)
       `,
@@ -1180,13 +1182,18 @@ export const authPaths: OpenAPIV3.PathsObject = {
 					},
 				},
 				'400': {
-					description: 'EMAIL_REQUIRED: the email query parameter is missing',
+					description:
+						'VALIDATION_ERROR: the email query parameter is missing or not a valid email',
 					content: {
 						'application/json': {
 							schema: { $ref: '#/components/schemas/ErrorResponse' },
 							example: {
 								success: false,
-								error: { message: 'Email is required', code: 'EMAIL_REQUIRED' },
+								error: {
+									message: 'Validation error',
+									code: 'VALIDATION_ERROR',
+									details: [{ path: 'email', message: 'Invalid email address' }],
+								},
 								meta: { timestamp: '2025-01-15T10:30:00.000Z' },
 							},
 						},
@@ -1489,7 +1496,7 @@ export const authSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 								minimum: 0,
 								example: 0,
 								description:
-									'Seconds before a new code can be requested; 0 when canResend is true. Always 0 until the cooldown is recorded (#187)',
+									'Seconds before a new forgot-password request is accepted (resend cooldown or hourly limit); 0 when canResend is true',
 							},
 						},
 					},

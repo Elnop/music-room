@@ -11,9 +11,11 @@ import {
 	resendVerificationSchema,
 	forgotPasswordSchema,
 	resetPasswordSchema,
+	canResendResetCodeQuerySchema,
 } from '@/features/auth/auth.validators.js';
 import { EmailVerificationService } from '@/features/auth/services/email-verification.service.js';
 import { PasswordResetService } from '@/features/auth/services/password-reset.service.js';
+import { PasswordResetCooldownService } from '@/features/auth/services/password-reset-cooldown.service.js';
 import { supabase, createSignInClient } from '@/shared/config/supabase.js';
 import type { ApiResponse } from '@/shared/types/global.types.js';
 import type { AuthenticatedRequest } from '@/shared/types/global.types.js';
@@ -514,10 +516,7 @@ export class AuthController {
 			await verificationService.recordResendAttempt(validated.userId, ip);
 
 			// The recipient comes from the stored account, never from the request body.
-			const recipient = await this.resolveVerificationRecipient(
-				validated.userId,
-				validated.email
-			);
+			const recipient = await this.resolveVerificationRecipient(validated.userId, validated.email);
 			if (!recipient) {
 				res.json(response);
 				return;
@@ -666,17 +665,12 @@ export class AuthController {
 	 */
 	async canResendResetCode(req: Request, res: Response, next: NextFunction) {
 		try {
-			const { email } = req.query;
+			const { email } = canResendResetCodeQuerySchema.parse(req.query);
 			const ip = req.ip || req.socket.remoteAddress || 'unknown';
-
-			if (!email || typeof email !== 'string') {
-				throw new AppError(400, 'Email is required', 'EMAIL_REQUIRED');
-			}
 
 			logger.info('Check resend reset code', { email, ip });
 
-			const passwordResetService = new PasswordResetService();
-			const result = await passwordResetService.canResendCode(email, ip);
+			const result = await new PasswordResetCooldownService().status(email, ip);
 
 			const response: ApiResponse = {
 				success: true,
