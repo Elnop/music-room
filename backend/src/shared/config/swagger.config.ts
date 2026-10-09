@@ -88,6 +88,11 @@ const openapiDocument: OpenAPIV3.Document = {
           - POST /api/auth/facebook
 
           Token expires after 1 hour. Use refresh token for renewal.
+
+          Every protected route can also answer 429 RATE_LIMIT_EXCEEDED: after
+          RATE_LIMIT_TOKEN_MAX (default 20) failed token verifications from an
+          IP, every token from it is refused until the window ends
+          (RATE_LIMIT_TOKEN_WINDOW_MS, default 15 minutes).
         `,
 			},
 		},

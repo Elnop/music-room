@@ -40,6 +40,12 @@ export const rateLimitConfig = {
 		max: parseInt(env.RATE_LIMIT_AUTH_MAX || '20'), // 20 total requests
 	},
 
+	// Failed access token verifications per IP (HTTP auth and socket handshake)
+	token: {
+		windowMs: env.RATE_LIMIT_TOKEN_WINDOW_MS, // 15 minutes by default
+		max: env.RATE_LIMIT_TOKEN_MAX, // 20 failed verifications by default
+	},
+
 	// Account lockout configuration
 	lockout: {
 		enabled: env.ACCOUNT_LOCKOUT_ENABLED !== 'false',

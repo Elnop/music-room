@@ -152,19 +152,22 @@ describe('socketStore connect_error', () => {
 		);
 	});
 
-	it.each(['NO_TOKEN', 'INVALID_HANDSHAKE'])('disconnects without refresh on %s', async code => {
-		socket.trigger('connect_error', new Error(code));
-		await flush();
+	it.each(['NO_TOKEN', 'INVALID_HANDSHAKE', 'TOO_MANY_ATTEMPTS'])(
+		'disconnects without refresh on %s',
+		async code => {
+			socket.trigger('connect_error', new Error(code));
+			await flush();
 
-		expect(mockAuthState.refreshAccessToken).not.toHaveBeenCalled();
-		expect(socket.connect).not.toHaveBeenCalled();
-		expect(socket.disconnect).toHaveBeenCalled();
-		expect(useSocketStore.getState().socket).toBeNull();
-		expect(console.error).toHaveBeenCalledWith(
-			'[Socket] Handshake refused, staying disconnected:',
-			code
-		);
-	});
+			expect(mockAuthState.refreshAccessToken).not.toHaveBeenCalled();
+			expect(socket.connect).not.toHaveBeenCalled();
+			expect(socket.disconnect).toHaveBeenCalled();
+			expect(useSocketStore.getState().socket).toBeNull();
+			expect(console.error).toHaveBeenCalledWith(
+				'[Socket] Handshake refused, staying disconnected:',
+				code
+			);
+		}
+	);
 });
 
 describe('socketStore DEVICE_REGISTRATION_FAILED', () => {

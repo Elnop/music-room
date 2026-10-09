@@ -23,3 +23,6 @@
 - source_plan: `_bmad-output/initiative-validation-mandatory/epic-api-mobile/story-adresse-du-backend-modifiable-dans-l-app-mobile-plan.md`
   summary: Move `friendsApi`, `profileApi`, `privacyApi` and `musicControlApi` onto the exported `apiRequest` (`mobile/src/services/api.ts`) so they send the `X-Platform` / `X-Device-Model` / `X-App-Version` headers (IV.6) and get the token refresh; #96 only switched their URL source to `getBackendUrl()`.
   evidence: each still builds its own `fetch` (friendsApi.ts, profileApi.ts, privacyApi.ts local `apiRequest`; musicControlApi.ts inline `fetch` with a manual token).
+- source_plan: `_bmad-output/initiative-validation-mandatory/plan-gh-160-token-verification-rate-limit.md`
+  summary: Configure Express `trust proxy` (and the matching client IP for Socket.io) so per-IP limiters key on the real client behind a tunnel or reverse proxy instead of the proxy's address.
+  evidence: No `trust proxy` in `backend/src`; behind `make dev-tunnel` or a reverse proxy every client shares one IP, so the token-verification limiter (#160) and the auth limiters (#120) count all users together.

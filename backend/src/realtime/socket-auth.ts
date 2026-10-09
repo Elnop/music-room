@@ -1,6 +1,10 @@
 import type { DefaultEventsMap, ExtendedError, Server, Socket } from 'socket.io';
 import { z } from 'zod';
 import { SessionService } from '@/features/auth/services/session.service.js';
+import {
+	TokenVerifyLimitError,
+	verifyTokenLimited,
+} from '@/features/auth/utils/token-verify-limiter.js';
 import type { DeviceInfo } from '@/features/music-control/music-control.types.js';
 import { DeviceService } from '@/features/music-control/services/device.service.js';
 import { socketLogger } from '@/shared/middleware/socket-logger.middleware.js';
@@ -23,6 +27,9 @@ import { socketLogger } from '@/shared/middleware/socket-logger.middleware.js';
  *   NO_TOKEN           `auth` is empty or has no `token`
  *   INVALID_HANDSHAKE  a field is missing or not a string
  *   INVALID_TOKEN      the token is invalid or expired
+ *   TOO_MANY_ATTEMPTS  too many failed token verifications from this IP
+ *                      (RATE_LIMIT_TOKEN_*): refused without verifying the
+ *                      token until the window ends; refreshing does not help
  *   DEVICE_REGISTRATION_FAILED  the device could not be recorded in `devices`;
  *                      Socket.io does not retry a refusal, so the client retries
  *
@@ -52,7 +59,11 @@ export interface SocketData {
 }
 
 export type SocketAuthErrorCode =
-	'NO_TOKEN' | 'INVALID_HANDSHAKE' | 'INVALID_TOKEN' | 'DEVICE_REGISTRATION_FAILED';
+	| 'NO_TOKEN'
+	| 'INVALID_HANDSHAKE'
+	| 'INVALID_TOKEN'
+	| 'TOO_MANY_ATTEMPTS'
+	| 'DEVICE_REGISTRATION_FAILED';
 
 export type AppSocketServer = Server<
 	DefaultEventsMap,
@@ -105,9 +116,15 @@ export async function authenticateSocket(
 
 	let user: { id: string; email: string };
 	try {
-		user = await sessionService.verifyToken(parsed.data.token);
-	} catch {
-		refuse(socket, next, 'INVALID_TOKEN');
+		user = await verifyTokenLimited(parsed.data.token, socket.handshake.address, token =>
+			sessionService.verifyToken(token)
+		);
+	} catch (error) {
+		refuse(
+			socket,
+			next,
+			error instanceof TokenVerifyLimitError ? 'TOO_MANY_ATTEMPTS' : 'INVALID_TOKEN'
+		);
 		return;
 	}
 
