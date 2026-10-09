@@ -264,42 +264,23 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 	},
 
 	/**
-	 * Logout current user
+	 * Logout current user: revoke the session on the backend, then end it on
+	 * the device even if the backend call fails (socketStore disconnects).
 	 */
 	logout: async () => {
 		set({ isLoading: true, error: null });
 
-		try {
-			const { accessToken } = get();
+		const { accessToken } = get();
 
-			if (accessToken) {
-				try {
-					await authApi.logout(accessToken);
-				} catch (error) {
-					console.warn('Backend logout failed, continuing with local logout', error);
-				}
+		if (accessToken) {
+			try {
+				await authApi.logout(accessToken);
+			} catch (error) {
+				console.warn('Backend logout failed, continuing with local logout', error);
 			}
-
-			await supabase.auth.signOut();
-
-			set({
-				user: null,
-				accessToken: null,
-				refreshToken: null,
-				tokenExpiresAt: null,
-				isAuthenticated: false,
-				isLoading: false,
-				error: null,
-			});
-
-			await get().clearStorage();
-		} catch (error) {
-			console.error('[AuthStore] Logout failed:', error);
-			set({
-				error: 'Logout failed',
-				isLoading: false,
-			});
 		}
+
+		await endSessionLocally();
 	},
 
 	/**
@@ -713,9 +694,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 }));
 
 /**
- * End the session without calling the backend: `authApi.logout` goes through
- * `apiRequest`, whose proactive refresh would call `refreshAccessToken` again.
- * RootNavigator shows the auth screens once `isAuthenticated` is false.
+ * End the session on the device only, without calling the backend: for a
+ * refused refresh, `authApi.logout` goes through `apiRequest`, whose proactive
+ * refresh would call `refreshAccessToken` again. Scope 'local' keeps the
+ * user's other devices signed in, like the backend logout.
+ * RootNavigator shows the auth screens once `isAuthenticated` is false, and
+ * socketStore disconnects.
  */
 async function endSessionLocally(): Promise<void> {
 	try {
@@ -731,6 +715,8 @@ async function endSessionLocally(): Promise<void> {
 		tokenExpiresAt: null,
 		isAuthenticated: false,
 		isRefreshing: false,
+		isLoading: false,
+		error: null,
 		linkedProviders: null,
 	});
 

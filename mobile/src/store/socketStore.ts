@@ -205,6 +205,16 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 }));
 
 /**
+ * Every end of session (logout, refused refresh) closes the socket, so no
+ * connection authenticated with the old token outlives it.
+ */
+useAuthStore.subscribe((state, previous) => {
+	if (previous.isAuthenticated && !state.isAuthenticated) {
+		useSocketStore.getState().disconnect();
+	}
+});
+
+/**
  * A backend address change (services/backendUrl.ts) moves a live socket to the
  * new server; without a socket, the next connect() reads the new address.
  */

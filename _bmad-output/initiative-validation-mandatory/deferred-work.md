@@ -32,3 +32,6 @@
 - source_plan: `_bmad-output/initiative-validation-mandatory/plan-gh-126-session-expired-logout.md`
   summary: Document the 429 `RATE_LIMIT_EXCEEDED` answered by `loginRateLimiter` on `POST /api/auth/refresh` in `auth.openapi.ts`.
   evidence: `backend/src/features/auth/auth.routes.ts:47` puts the refresh route behind `loginRateLimiter`; the OpenAPI entry lists 200/401/503 only, unlike `/api/auth/login`.
+- source_plan: `_bmad-output/initiative-validation-mandatory/epic-comptes-auth/story-couper-le-socket-au-logout-mobile-plan.md`
+  summary: Since #70, `logout` always ends the session through `endSessionLocally()`, except on the #176 recursion (access token, no refresh token, expiring token), which never reaches it; fixing #176 completes the guarantee.
+  evidence: `loadFromStorage` restores a session without a refresh token (`saveToStorage` writes `refreshToken || ''`); `refreshAccessToken`'s `!refreshToken` branch calls `logout()`, whose `authApi.logout` goes through `apiRequest`'s proactive refresh.
