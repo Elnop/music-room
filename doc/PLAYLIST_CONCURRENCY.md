@@ -21,7 +21,9 @@ Each `playlist_tracks` row carries a `rank`: a text key compared byte by byte (`
 - `UNIQUE (playlist_id, rank)` and `UNIQUE (playlist_id, track_id)` guard the invariants: a track appears once, and two tracks never share a place.
 - The old integer `position` column and its renumbering go away. The API still returns tracks in order; a client that needs an index derives it from the order.
 
-**Rebalancing.** Moving tracks again and again into the same gap makes keys longer (Jira's LexoRank, the same idea at a much larger scale, rebalances past 128 characters). When a key generated for a playlist exceeds a length threshold, the operation that produced it respaces every rank of that playlist evenly within the same transaction and bumps the version like any other change. The threshold is set and measured in #88.
+**Rebalancing.** Moving tracks again and again into the same gap makes keys longer (Jira's LexoRank, the same idea at a much larger scale, rebalances past 128 characters). When a key generated for a playlist exceeds a length threshold, the operation that produced it respaces every rank of that playlist evenly within the same transaction and bumps the version like any other change. The threshold is set and measured in #88. The add or move result and its `playlist:updated` event carry `rebalanced: true`, and `playlists.ranks_rebalanced_at_version` records the version of the last rebalance.
+
+**A client holding old ranks.** After a rebalance, every rank a client displayed from before it is meaningless. A move whose `expectedVersion` is older than `ranks_rebalanced_at_version` is therefore refused with `409 PLAYLIST_REBALANCED`, since its `afterRank` points into the old key space; the client reloads the playlist and the user drops the track again. A client that receives `rebalanced: true` reloads before its next move.
 
 ## Versions
 
@@ -44,7 +46,7 @@ Under READ COMMITTED, this makes the writers of one playlist go one at a time: t
 |---|---|---|---|
 | **Add** | `{ track }` | `rank = rank_between(last rank, NULL)`; `added_by` set; version + 1 | `409 TRACK_DUPLICATE` if the track is already in the playlist |
 | **Remove** | `trackId` | delete the row; version + 1 | `404 TRACK_NOT_IN_PLAYLIST` |
-| **Move** | `{ trackId, afterRank, expectedVersion }` | see below | `409 TRACK_NOT_IN_PLAYLIST`, `409 TRACK_MOVED_CONCURRENTLY` |
+| **Move** | `{ trackId, afterRank, expectedVersion }` | see below | `409 TRACK_NOT_IN_PLAYLIST`, `409 TRACK_MOVED_CONCURRENTLY`, `409 PLAYLIST_REBALANCED` |
 
 Add and remove are never refused because of concurrency: two adds append one after the other, a remove does not disturb any other row.
 
@@ -54,7 +56,8 @@ The client sends the rank of the track it drops the moved track after (`afterRan
 
 1. reads the moved track's row; if it is gone, `409 TRACK_NOT_IN_PLAYLIST`;
 2. if `moved_at_version > expectedVersion`, someone moved this track after the client's version: `409 TRACK_MOVED_CONCURRENTLY`;
-3. otherwise takes `next`, the smallest existing rank greater than `afterRank` (other than the moved track's own), and sets the moved track's `rank = rank_between(afterRank, next)`, `moved_at_version = tracks_version + 1`, `tracks_version + 1`.
+3. if `ranks_rebalanced_at_version > expectedVersion`, the ranks were respaced after the client's version and `afterRank` no longer means anything: `409 PLAYLIST_REBALANCED`;
+4. otherwise takes `next`, the smallest existing rank greater than `afterRank` (other than the moved track's own), and sets the moved track's `rank = rank_between(afterRank, next)`, `moved_at_version = tracks_version + 1`, `tracks_version + 1`.
 
 `afterRank` is a point in key space, not a track: if the track the user dropped after was itself moved or removed in the meantime, the point stays where the user saw it, and the moved track lands there. If another track was moved into the same gap meanwhile, the server places the moved track right after `afterRank`, before the newcomer; both stay where their authors put them, give or take that neighbour.
 
@@ -70,13 +73,23 @@ The playlist is at version 10. Alice and Bob both display version 10; track E ha
 
 ## Broadcast and convergence
 
-After each operation the backend emits `playlist:updated` to the `playlist:<id>` room with the new `tracks_version` and the playlist's order. A client:
+After each operation the backend emits `playlist:updated` to the `playlist:<id>` room. The payload is a per-operation delta carrying the new `tracksVersion` (types `PlaylistUpdatedPayload` in `backend/src/features/playlists/playlist.types.ts` and `PlaylistUpdatedEvent` in `mobile/src/types/playlist.types.ts`):
+
+```ts
+{ playlistId, tracksVersion, rebalanced, event: 'track_added', track }    // track carries rank, addedBy, addedAt
+{ playlistId, tracksVersion, rebalanced, event: 'track_removed', trackId }
+{ playlistId, tracksVersion, rebalanced, event: 'track_moved', trackId, rank }
+```
+
+The server emits this payload from #90 on; until then it still sends the old `{ playlistId, event, ...data }` shape.
+
+A client:
 
 - ignores an event whose version is not above the one it displays;
-- applies an event whose version is exactly one above;
-- reloads the playlist when it skipped a version.
+- applies an event whose version is exactly one above, unless `rebalanced` is true;
+- reloads the playlist when it skipped a version or when `rebalanced` is true.
 
-All clients therefore end on the server's order. The exact payload is defined in the contract (#87).
+All clients therefore end on the server's order. The HTTP contract (move endpoint, add and remove results, `tracksVersion` on the fetch, `rank` on each track) is in `backend/src/features/playlists/playlist.openapi.ts`.
 
 **Moves from one client go one at a time.** A user who drags twice quickly would otherwise send the second move with the version from before the first, and get a `409` against themselves. The mobile store sends a move only after the previous one answered, using the version from that answer.
 
