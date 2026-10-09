@@ -81,6 +81,63 @@ export const playlistPaths: OpenAPIV3.PathsObject = {
 		},
 	},
 
+	'/api/playlists/public': {
+		get: {
+			tags: ['Playlists'],
+			summary: 'Get public playlists',
+			description:
+				"Returns up to 50 public playlists not owned by the authenticated user, newest first, each with its owner's profile and track count",
+			operationId: 'getPublicPlaylists',
+			security: [{ bearerAuth: [] }],
+			responses: {
+				'200': {
+					description: 'Public playlists retrieved',
+					content: {
+						'application/json': {
+							schema: {
+								allOf: [
+									{ $ref: '#/components/schemas/SuccessResponse' },
+									{
+										type: 'object',
+										properties: {
+											data: {
+												type: 'object',
+												properties: {
+													playlists: {
+														type: 'array',
+														maxItems: 50,
+														items: { $ref: '#/components/schemas/PlaylistResponse' },
+													},
+												},
+											},
+										},
+									},
+								],
+							},
+						},
+					},
+				},
+				'401': { $ref: '#/components/responses/UnauthorizedError' },
+				'500': {
+					description: 'PLAYLIST_FETCH_ERROR: the public playlists could not be read',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+							example: {
+								success: false,
+								error: {
+									message: 'Failed to fetch public playlists',
+									code: 'PLAYLIST_FETCH_ERROR',
+								},
+								meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+
 	'/api/playlists/user/{userId}': {
 		get: {
 			tags: ['Playlists'],
@@ -988,6 +1045,42 @@ export const playlistSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 			rank: { type: 'string', example: 'l' },
 			tracksVersion: { type: 'integer', example: 11 },
 			rebalanced: { type: 'boolean', description: 'Every rank of the playlist changed' },
+		},
+	},
+
+	PlaylistResponse: {
+		type: 'object',
+		required: [
+			'id',
+			'name',
+			'ownerId',
+			'collaboratorIds',
+			'viewerIds',
+			'visibility',
+			'editMode',
+			'trackCount',
+			'createdAt',
+			'updatedAt',
+		],
+		properties: {
+			id: { type: 'string', format: 'uuid' },
+			name: { type: 'string' },
+			description: { type: 'string' },
+			coverUrl: { type: 'string', format: 'uri' },
+			firstTrackCover: {
+				type: 'string',
+				format: 'uri',
+				description: 'Album art of the first track by rank, when it has one',
+			},
+			ownerId: { type: 'string', format: 'uuid' },
+			owner: { $ref: '#/components/schemas/PlaylistMember' },
+			collaboratorIds: { type: 'array', items: { type: 'string', format: 'uuid' } },
+			viewerIds: { type: 'array', items: { type: 'string', format: 'uuid' } },
+			visibility: { type: 'string', enum: ['public', 'private'] },
+			editMode: { type: 'string', enum: ['open', 'restricted'] },
+			trackCount: { type: 'integer', example: 10 },
+			createdAt: { type: 'string', format: 'date-time' },
+			updatedAt: { type: 'string', format: 'date-time' },
 		},
 	},
 
