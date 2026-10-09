@@ -104,4 +104,21 @@ export const commonResponses: OpenAPIV3.ComponentsObject['responses'] = {
 			},
 		},
 	},
+
+	RateLimitUnavailable: {
+		description:
+			'RATE_LIMIT_UNAVAILABLE: Redis is not ready, so the rate limiter cannot count the request (fails closed)',
+		content: {
+			'application/json': {
+				schema: { $ref: '#/components/schemas/ErrorResponse' },
+				example: {
+					success: false,
+					error: {
+						message: 'Rate limiting is unavailable',
+						code: 'RATE_LIMIT_UNAVAILABLE',
+					},
+				},
+			},
+		},
+	},
 };

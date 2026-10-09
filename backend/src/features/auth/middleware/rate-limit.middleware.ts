@@ -1,7 +1,6 @@
 import rateLimit from 'express-rate-limit';
-import RedisStore from 'rate-limit-redis';
 import { Request, Response } from 'express';
-import { redisClient, isRedisConnected } from '@/shared/config/redis.js';
+import { RedisRateLimitStore } from '@/features/auth/utils/redis-rate-limit-store.js';
 import { rateLimitConfig } from '@/shared/config/rate-limit.config.js';
 import { logger } from '@/shared/utils/logger.js';
 
@@ -43,6 +42,9 @@ const baseRateLimitConfig = {
 		});
 	},
 	skip: (req: Request) => {
+		// Disabled mode: skip every request, no store is touched
+		if (!rateLimitConfig.enabled) return true;
+
 		// Skip rate limiting for whitelisted IPs
 		if (rateLimitConfig.whitelist.length > 0) {
 			const clientIp = req.ip || '';
@@ -53,32 +55,19 @@ const baseRateLimitConfig = {
 };
 
 /**
- * Get Redis store for rate limiting
+ * Redis store for one limiter, prefix `rl:<name>:`.
  *
- * Architecture decision: Redis-only for production consistency.
- * Returns undefined if disabled (development mode) or Redis unavailable (will skip rate limiting).
+ * Redis only, no in-memory fallback: the store is created on first use once
+ * Redis is ready, whatever the startup order, and requests fail closed (503
+ * RATE_LIMIT_UNAVAILABLE) while Redis is down. When rate limiting is disabled,
+ * `skip` short-circuits every request, so the store is never used.
  */
-function getStore(prefix: string): RedisStore | undefined {
-	// Development mode: skip rate limiting entirely
-	if (!rateLimitConfig.enabled) {
-		logger.info(`Rate limiting disabled for: ${prefix} (development mode)`);
-		return undefined;
-	}
+function getStore(name: string): RedisRateLimitStore {
+	return new RedisRateLimitStore(name);
+}
 
-	// Production mode: Redis required
-	if (!isRedisConnected()) {
-		logger.error(`Rate limiting unavailable for: ${prefix} - Redis not connected`);
-		// Return undefined - express-rate-limit will skip rate limiting
-		// This is safer than throwing (allows app to function) but logs the error
-		return undefined;
-	}
-
-	logger.debug(`Using Redis store for rate limiting: ${prefix}`);
-	return new RedisStore({
-		// @ts-expect-error - RedisStore types don't match ioredis perfectly but it works
-		sendCommand: (...args: string[]) => redisClient.call(...args),
-		prefix: `rl:${prefix}:`,
-	});
+if (!rateLimitConfig.enabled) {
+	logger.info('Rate limiting disabled (RATE_LIMIT_ENABLED=false)');
 }
 
 /**

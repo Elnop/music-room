@@ -141,22 +141,26 @@ ip_blacklist:{ip}                # IP blacklist flag (TTL: 24h)
 
 ### Architecture Decision: No In-Memory Fallback
 
-**Production mode** (Redis required):
-- Redis unavailable → Backend logs errors but continues running
-- Rate limiting skipped (logged as error)
-- Account lockout disabled (logged as warning)
+**Rate limiting** (`RATE_LIMIT_ENABLED=true`, the default):
+- Each limiter has a Redis store (`features/auth/utils/redis-rate-limit-store.ts`), created lazily on first use once Redis is ready, so the startup order does not matter
+- No command is sent while Redis is not ready
+- Redis unavailable → fail closed: the request answers 503 `RATE_LIMIT_UNAVAILABLE`; it is never counted in memory and never let through unlimited
+- Redis back → limiting resumes on Redis, without restarting the backend
 
-**Development mode** (Redis optional):
+**Account lockout** with Redis unavailable: disabled (logged as warning).
+
+**Development mode** (Redis optional for these protections):
 - Set `RATE_LIMIT_ENABLED=false` and `ACCOUNT_LOCKOUT_ENABLED=false`
-- All protections bypassed entirely
-- No Redis required
+- Rate limiting is skipped entirely (no store used); lockout is bypassed
 
 **Why no fallback?**
 In-memory fallback creates security vulnerabilities in multi-instance deployments (load balancers) because each instance has separate state. Redis-only ensures consistent protection across all instances.
 
 Backend logs:
-- Dev mode: `"Rate limiting disabled (development mode)"`
-- Redis down: `"Rate limiting unavailable - Redis not connected"` (ERROR)
+- Disabled mode, at startup: `"Rate limiting disabled (RATE_LIMIT_ENABLED=false)"` (INFO)
+- Redis command error during limiting: `"Rate limiting failed: Redis command error"` (ERROR)
+- Redis not ready during a request: the 503 `Rate limiting is unavailable` is logged by the error handler (`"Error occurred"`, ERROR)
+- Decrement skipped after a response while Redis is down: `"Rate limit decrement skipped: Redis unavailable"` (WARN)
 
 ## Daily Usage
 
