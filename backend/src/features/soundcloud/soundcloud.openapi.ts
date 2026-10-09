@@ -108,6 +108,69 @@ export const soundcloudPaths: OpenAPIV3.PathsObject = {
 		},
 	},
 
+	'/api/soundcloud/stream': {
+		get: {
+			tags: ['SoundCloud'],
+			summary: 'Get SoundCloud stream URL',
+			description:
+				'Public endpoint - no authentication required. Returns AAC HLS stream URL for playback. The track URL goes in the query string (a URL in the path can be blocked by Cloudflare WAF); `/api/soundcloud/stream/{trackUrl}` is the legacy form.',
+			operationId: 'getSoundCloudStreamUrlByQuery',
+			parameters: [
+				{
+					in: 'query',
+					name: 'url',
+					required: true,
+					schema: { type: 'string' },
+					description: 'URL-encoded SoundCloud track permalink URL',
+					example: 'https%3A%2F%2Fsoundcloud.com%2Fartist%2Ftrack',
+				},
+			],
+			responses: {
+				'200': {
+					description: 'Stream URL retrieved',
+					content: {
+						'application/json': {
+							schema: {
+								allOf: [
+									{ $ref: '#/components/schemas/SuccessResponse' },
+									{
+										type: 'object',
+										properties: {
+											data: {
+												type: 'object',
+												properties: {
+													streamUrl: {
+														type: 'string',
+														format: 'uri',
+														description: 'HLS AAC stream URL (expires after 30 minutes)',
+													},
+												},
+											},
+										},
+									},
+								],
+							},
+						},
+					},
+				},
+				'400': {
+					description: 'MISSING_TRACK_URL: the `url` query parameter is missing or empty',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+							example: {
+								success: false,
+								error: { message: 'Track URL is required', code: 'MISSING_TRACK_URL' },
+								meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+							},
+						},
+					},
+				},
+				'404': { $ref: '#/components/responses/NotFoundError' },
+			},
+		},
+	},
+
 	'/api/soundcloud/stream/{trackUrl}': {
 		get: {
 			tags: ['SoundCloud'],
