@@ -3,7 +3,7 @@ title: 'Fermer la prise de contrôle de compte par verify-email et resend-verifi
 type: 'bugfix'
 ticket: ''
 created: '2026-10-09'
-status: 'in-review'
+status: 'built'
 baseline_revision: '748aa816f0c364e552a6ec0ed8bad13308012a1e'
 route: 'full'
 route_source: 'auto'
@@ -75,8 +75,8 @@ Pass 1 (quick): medium 1 · low 3 · false 0 · already handled 1.
 
 | # | Finding | Verdict | Route | Evidence / action |
 |---|---------|---------|-------|-------------------|
-| 1 | Cooldown only on the matching path: a 429 on the 2nd call reveals a matching email on an unverified account | medium | patch | `canResendCode` ran after `resolveVerificationRecipient`. Fix: cooldown first, attempt recorded on every path past it + test. Residual SMTP timing gap accepted. |
-| 2 | `getUserById` error logged at info as "no such account", error dropped | low | patch | Outage indistinguishable from a missing user in logs. Fix: warn with the error. |
-| 3 | Unknown-user test does not prove its own branch refused | low | patch | Random UUID is also refused by later checks. Fix: assert the branch log. |
-| 4 | Mismatch warning not asserted | low | patch | Matrix says "logged as warning". Fix: assert `logger.warn`. |
-| 5 | No OpenAPI entry for the touched routes | — | handled | Entries arrive with #190; the changes are commented there (plan fallback). |
+| 1 | Cooldown only on the matching path: a 429 on the 2nd call reveals a matching email on an unverified account | medium | patch | `canResendCode` ran after `resolveVerificationRecipient`. Fix: cooldown first, attempt recorded on every path past it + test. Residual SMTP timing gap accepted. Patched. |
+| 2 | `getUserById` error logged at info as "no such account", error dropped | low | patch | Outage indistinguishable from a missing user in logs. Fix: warn with the error. Patched. |
+| 3 | Unknown-user test does not prove its own branch refused | low | patch | Random UUID is also refused by later checks. Fix: assert the branch log. Patched. |
+| 4 | Mismatch warning not asserted | low | patch | Matrix says "logged as warning". Fix: assert `logger.warn`. Patched. |
+| 5 | No OpenAPI entry for the touched routes | — | handled | Entries arrive with #190; #190 merged first; ALREADY_VERIFIED and the resend email rule added to its entries in this PR. |

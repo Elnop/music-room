@@ -698,7 +698,7 @@ export const authPaths: OpenAPIV3.PathsObject = {
 				},
 				'400': {
 					description:
-						'VALIDATION_ERROR: userId is not a UUID or code is not 6 digits. NO_CODE_FOUND: no code is stored for this user; request a new one. CODE_EXPIRED: the code is past its lifetime; request a new one. INVALID_CODE: the code does not match',
+						'VALIDATION_ERROR: userId is not a UUID or code is not 6 digits. NO_CODE_FOUND: no code is stored for this user; request a new one. CODE_EXPIRED: the code is past its lifetime; request a new one. INVALID_CODE: the code does not match. ALREADY_VERIFIED: the email is already verified; no session is issued, sign in instead',
 					content: {
 						'application/json': {
 							schema: { $ref: '#/components/schemas/ErrorResponse' },
@@ -738,6 +738,13 @@ export const authPaths: OpenAPIV3.PathsObject = {
 									value: {
 										success: false,
 										error: { message: 'Invalid verification code', code: 'INVALID_CODE' },
+										meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+									},
+								},
+								alreadyVerified: {
+									value: {
+										success: false,
+										error: { message: 'Email already verified', code: 'ALREADY_VERIFIED' },
 										meta: { timestamp: '2025-01-15T10:30:00.000Z' },
 									},
 								},
@@ -822,7 +829,9 @@ export const authPaths: OpenAPIV3.PathsObject = {
 			tags: ['Authentication'],
 			summary: 'Send a new email verification code',
 			description: `
-        Generates a new 6-digit code for the user, replaces the previous one and sends it to \`email\`.
+        Generates a new 6-digit code for the user, replaces the previous one and sends it to the account's own email.
+        A code is sent only when \`userId\` is an existing, not yet verified account and \`email\` matches its email (case-insensitive).
+        Otherwise nothing is generated or sent, but the answer is the same 200 (and the same cooldown 429), so the endpoint does not reveal whether an account or an email exists.
 
         **Rate limits:**
         - 3 requests per hour per IP (register limiter, keyed on \`register:<ip>\`: the bucket is shared with POST /api/auth/register)
@@ -844,7 +853,8 @@ export const authPaths: OpenAPIV3.PathsObject = {
 			},
 			responses: {
 				'200': {
-					description: 'New code sent',
+					description:
+						'Request accepted: a code was sent to the account email if the account is unverified and the email matches (same answer otherwise)',
 					content: {
 						'application/json': {
 							schema: { $ref: '#/components/schemas/AuthMessageResponse' },
