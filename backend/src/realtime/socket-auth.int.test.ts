@@ -11,6 +11,7 @@ import {
 	redisClient,
 } from '@/shared/config/redis.js';
 import { logger } from '@/shared/utils/logger.js';
+import { SessionService } from '@/features/auth/services/session.service.js';
 import type { UserListeningStatus } from '@/features/music-control/music-control.types.js';
 import { realtime } from '@/realtime/index.js';
 
@@ -275,6 +276,30 @@ describe('Socket.io handshake authentication', () => {
 		await expect(
 			refused(connect({ token: expiredJwt(alice.id), ...deviceFields() }))
 		).resolves.toBe('INVALID_TOKEN');
+	});
+
+	it('refuses a token revoked by logout with INVALID_TOKEN (#71)', async () => {
+		// A user of its own: the shared users' tokens must stay valid.
+		const carol = await createUser();
+		try {
+			await connected(connect({ token: carol.token, ...deviceFields() }));
+
+			await new SessionService().logout(carol.token, carol.id);
+
+			// logout also ends the Supabase session, and the handshake maps every
+			// verification failure to INVALID_TOKEN: check the denylist refused it.
+			const verify = vi.spyOn(SessionService.prototype, 'verifyToken');
+			await expect(refused(connect({ token: carol.token, ...deviceFields() }))).resolves.toBe(
+				'INVALID_TOKEN'
+			);
+			expect(verify).toHaveBeenCalledWith(carol.token);
+			await expect(verify.mock.results[0].value).rejects.toMatchObject({
+				code: 'TOKEN_REVOKED',
+			});
+		} finally {
+			vi.restoreAllMocks();
+			await supabaseAdmin.auth.admin.deleteUser(carol.id);
+		}
 	});
 
 	describe('device registration (devices table)', () => {
