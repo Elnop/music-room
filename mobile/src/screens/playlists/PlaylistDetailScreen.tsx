@@ -12,7 +12,9 @@ import { useImageColors, hexToRgba } from '@/hooks/useImageColors';
 import type { Theme } from '@themes/types';
 import type { Track } from '@/types/track.types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
-import { usePlaylistStore } from '@store/playlistStore';
+import { CONFLICT_CODES, usePlaylistStore } from '@store/playlistStore';
+import { afterRankFor } from '@store/moveTarget';
+import { ApiError } from '@/services/api';
 import { useAuthStore } from '@store/authStore';
 import { usePlayerStore } from '@store/playerStore';
 import { usePlaylistSocket } from '@hooks/usePlaylistSocket';
@@ -80,7 +82,16 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 	const styles = React.useMemo(() => createStyles(theme, insets.top), [theme, insets.top]);
 	const { id } = route.params;
 	const { user } = useAuthStore();
-	const { currentPlaylist, isLoading, fetchPlaylistById, removeTrack } = usePlaylistStore();
+	const {
+		currentPlaylist,
+		isLoading,
+		fetchPlaylistById,
+		removeTrack,
+		moveTrack,
+		pendingMoves,
+		conflictMessage,
+		clearConflictMessage,
+	} = usePlaylistStore();
 	const {
 		currentTrack,
 		isPlaying,
@@ -106,11 +117,17 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 		return false;
 	}, [user, currentPlaylist]);
 
-	const handleReorderUpdate = React.useCallback(() => {
-		fetchPlaylistById(id);
-	}, [id, fetchPlaylistById]);
+	usePlaylistSocket(id);
 
-	usePlaylistSocket(id, handleReorderUpdate);
+	// A move refused because someone else changed the track: the store reloaded it.
+	React.useEffect(() => {
+		if (!conflictMessage) return;
+		showError(conflictMessage);
+		clearConflictMessage();
+	}, [conflictMessage, clearConflictMessage]);
+
+	// A message left by this screen must not show on the next playlist opened.
+	React.useEffect(() => () => clearConflictMessage(), [clearConflictMessage]);
 
 	useFocusEffect(
 		React.useCallback(() => {
@@ -173,6 +190,22 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 		}
 	};
 
+	const handleMove = async (index: number, direction: 'up' | 'down') => {
+		const tracks = currentPlaylist?.tracks ?? [];
+		const afterRank = afterRankFor(tracks, index, direction);
+		if (afterRank === undefined) return;
+		try {
+			await moveTrack(id, tracks[index].id, afterRank);
+		} catch (error) {
+			// Conflicts are reported through conflictMessage once the playlist is reloaded.
+			if (error instanceof ApiError && CONFLICT_CODES.includes(error.code)) return;
+			console.error('[PlaylistDetailScreen] Move track failed:', error);
+			showError('Impossible de déplacer le track');
+		}
+	};
+
+	const isMoving = pendingMoves > 0;
+
 	const gradientColors = dominantColor
 		? ([
 				hexToRgba(dominantColor, 0.9),
@@ -208,12 +241,17 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 			<FlatList
 				data={currentPlaylist.tracks}
 				keyExtractor={item => item.id}
-				renderItem={({ item }) => {
+				renderItem={({ item, index }) => {
+					const canMoveUp = !isMoving && index > 0;
+					const canMoveDown = !isMoving && index < currentPlaylist.tracks.length - 1;
 					return (
 						<SwipeableTrackItem
 							track={item}
 							onDelete={() => handleDeleteTrack(item.id)}
 							disabled={!canEdit}
+							showMoveButtons={canEdit}
+							onMoveUp={canMoveUp ? () => handleMove(index, 'up') : undefined}
+							onMoveDown={canMoveDown ? () => handleMove(index, 'down') : undefined}
 						/>
 					);
 				}}

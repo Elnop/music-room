@@ -12,8 +12,8 @@ const mockSocket = {
 
 const mockSocketState = { socket: mockSocket, isConnected: true };
 const mockPlaylistState = {
-	addTrackLocally: jest.fn(),
-	removeTrackLocally: jest.fn(),
+	applyPlaylistEvent: jest.fn(),
+	fetchPlaylistById: jest.fn(),
 };
 
 jest.mock('@store/socketStore', () => ({
@@ -42,15 +42,16 @@ const track: TrackInPlaylist = {
 const base = { playlistId: 'p1', tracksVersion: 2, rebalanced: false };
 
 /** Render the hook and return the playlist:updated handler it registered. */
-function setup(onReorder = jest.fn()) {
-	renderHook(() => usePlaylistSocket('p1', onReorder));
+function setup() {
+	renderHook(() => usePlaylistSocket('p1'));
 	const call = mockSocket.on.mock.calls.find(([event]) => event === 'playlist:updated');
-	return { handler: call?.[1] as (data: PlaylistUpdatedEvent) => void, onReorder };
+	return call?.[1] as (data: PlaylistUpdatedEvent) => void;
 }
 
 beforeEach(() => {
 	jest.clearAllMocks();
 	jest.spyOn(console, 'log').mockImplementation(() => undefined);
+	mockPlaylistState.fetchPlaylistById.mockResolvedValue(undefined);
 });
 
 afterEach(() => {
@@ -63,30 +64,53 @@ describe('usePlaylistSocket', () => {
 		expect(mockSocket.emit).toHaveBeenCalledWith('playlist:join', 'p1');
 	});
 
-	it('adds the track of a track_added event locally', () => {
-		const { handler, onReorder } = setup();
-		handler({ ...base, event: 'track_added', track });
-		expect(mockPlaylistState.addTrackLocally).toHaveBeenCalledWith('p1', track);
-		expect(onReorder).not.toHaveBeenCalled();
+	it('passes every event of the playlist to the store', () => {
+		mockPlaylistState.applyPlaylistEvent.mockReturnValue('applied');
+		const handler = setup();
+		const added: PlaylistUpdatedEvent = { ...base, event: 'track_added', track };
+		const moved: PlaylistUpdatedEvent = { ...base, event: 'track_moved', trackId: 't1', rank: 'a' };
+		handler(added);
+		handler(moved);
+		expect(mockPlaylistState.applyPlaylistEvent).toHaveBeenNthCalledWith(1, added);
+		expect(mockPlaylistState.applyPlaylistEvent).toHaveBeenNthCalledWith(2, moved);
+		expect(mockPlaylistState.fetchPlaylistById).not.toHaveBeenCalled();
 	});
 
-	it('removes the track of a track_removed event locally', () => {
-		const { handler } = setup();
-		handler({ ...base, event: 'track_removed', trackId: 't1' });
-		expect(mockPlaylistState.removeTrackLocally).toHaveBeenCalledWith('p1', 't1');
+	it('does not reload for an event already seen', () => {
+		mockPlaylistState.applyPlaylistEvent.mockReturnValue('ignored');
+		setup()({ ...base, event: 'track_removed', trackId: 't1' });
+		expect(mockPlaylistState.fetchPlaylistById).not.toHaveBeenCalled();
 	});
 
-	it('refreshes the playlist on a track_moved event', () => {
-		const { handler, onReorder } = setup();
-		handler({ ...base, event: 'track_moved', trackId: 't1', rank: 'a' });
-		expect(onReorder).toHaveBeenCalledTimes(1);
-		expect(mockPlaylistState.addTrackLocally).not.toHaveBeenCalled();
-		expect(mockPlaylistState.removeTrackLocally).not.toHaveBeenCalled();
+	it('reloads the playlist when the store asks for it', () => {
+		mockPlaylistState.applyPlaylistEvent.mockReturnValue('reload');
+		setup()({ ...base, rebalanced: true, event: 'track_moved', trackId: 't1', rank: 'a' });
+		expect(mockPlaylistState.fetchPlaylistById).toHaveBeenCalledWith('p1');
 	});
 
 	it('ignores an event of another playlist', () => {
-		const { handler, onReorder } = setup();
-		handler({ ...base, playlistId: 'p2', event: 'track_moved', trackId: 't1', rank: 'a' });
-		expect(onReorder).not.toHaveBeenCalled();
+		setup()({ ...base, playlistId: 'p2', event: 'track_moved', trackId: 't1', rank: 'a' });
+		expect(mockPlaylistState.applyPlaylistEvent).not.toHaveBeenCalled();
+	});
+
+	it('reloads the playlist when it re-joins the room after a reconnect', () => {
+		const { rerender } = renderHook(() => usePlaylistSocket('p1'));
+		expect(mockPlaylistState.fetchPlaylistById).not.toHaveBeenCalled();
+
+		mockSocketState.isConnected = false;
+		rerender({});
+		mockSocketState.isConnected = true;
+		rerender({});
+
+		expect(mockSocket.emit).toHaveBeenLastCalledWith('playlist:join', 'p1');
+		expect(mockPlaylistState.fetchPlaylistById).toHaveBeenCalledTimes(1);
+		expect(mockPlaylistState.fetchPlaylistById).toHaveBeenCalledWith('p1');
+	});
+
+	it('leaves the room on unmount', () => {
+		const { unmount } = renderHook(() => usePlaylistSocket('p1'));
+		unmount();
+		expect(mockSocket.off).toHaveBeenCalledWith('playlist:updated', expect.any(Function));
+		expect(mockSocket.emit).toHaveBeenCalledWith('playlist:leave', 'p1');
 	});
 });

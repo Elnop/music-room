@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSocketStore } from '@store/socketStore';
 import { usePlaylistStore } from '@store/playlistStore';
 import type { PlaylistUpdatedEvent } from '@/types/playlist.types';
@@ -6,18 +6,21 @@ import type { PlaylistUpdatedEvent } from '@/types/playlist.types';
 /**
  * Hook for real-time playlist updates
  *
- * Joins the playlist room on mount, leaves on unmount.
- * Updates the playlist locally when tracks are added/removed.
+ * Joins the playlist room on mount, leaves on unmount. Each `playlist:updated`
+ * delta goes through the store, which applies it in version order; a skipped
+ * version or a rebalance reloads the playlist (doc/PLAYLIST_CONCURRENCY.md).
+ * Re-joining after a reconnect reloads too, since events sent while
+ * disconnected are lost; the first join relies on the screen's own load.
  *
  * @param playlistId - The playlist ID to watch
- * @param onReorder - Optional callback for move events (full refresh until
- *   version-aware convergence, #91)
  */
-export function usePlaylistSocket(playlistId: string, onReorder?: () => void) {
+export function usePlaylistSocket(playlistId: string) {
 	const socket = useSocketStore(state => state.socket);
 	const isConnected = useSocketStore(state => state.isConnected);
-	const addTrackLocally = usePlaylistStore(state => state.addTrackLocally);
-	const removeTrackLocally = usePlaylistStore(state => state.removeTrackLocally);
+	const applyPlaylistEvent = usePlaylistStore(state => state.applyPlaylistEvent);
+	const fetchPlaylistById = usePlaylistStore(state => state.fetchPlaylistById);
+	/** Playlist whose room this hook already joined once. */
+	const joinedRef = useRef<string | null>(null);
 
 	useEffect(() => {
 		if (!socket || !isConnected) {
@@ -26,35 +29,29 @@ export function usePlaylistSocket(playlistId: string, onReorder?: () => void) {
 
 		socket.emit('playlist:join', playlistId);
 		if (__DEV__) console.log(`[Socket] Joined playlist room: ${playlistId}`);
+		if (joinedRef.current === playlistId) {
+			fetchPlaylistById(playlistId).catch(() => undefined);
+		}
+		joinedRef.current = playlistId;
 
 		const handlePlaylistUpdate = (data: PlaylistUpdatedEvent) => {
 			if (data.playlistId !== playlistId) return;
 
 			if (__DEV__) console.log(`[Socket] Playlist updated: ${data.event}`, data);
 
-			switch (data.event) {
-				case 'track_added':
-					addTrackLocally(playlistId, data.track);
-					break;
-				case 'track_removed':
-					removeTrackLocally(playlistId, data.trackId);
-					break;
-				case 'track_moved':
-					onReorder?.();
-					break;
+			if (applyPlaylistEvent(data) === 'reload') {
+				fetchPlaylistById(playlistId).catch(() => undefined);
 			}
 		};
 
 		socket.on('playlist:updated', handlePlaylistUpdate);
 
 		return () => {
-			if (socket) {
-				socket.off('playlist:updated', handlePlaylistUpdate);
-				if (socket.connected) {
-					socket.emit('playlist:leave', playlistId);
-				}
-				if (__DEV__) console.log(`[Socket] Left playlist room: ${playlistId}`);
+			socket.off('playlist:updated', handlePlaylistUpdate);
+			if (socket.connected) {
+				socket.emit('playlist:leave', playlistId);
 			}
+			if (__DEV__) console.log(`[Socket] Left playlist room: ${playlistId}`);
 		};
-	}, [socket, isConnected, playlistId, addTrackLocally, removeTrackLocally, onReorder]);
+	}, [socket, isConnected, playlistId, applyPlaylistEvent, fetchPlaylistById]);
 }

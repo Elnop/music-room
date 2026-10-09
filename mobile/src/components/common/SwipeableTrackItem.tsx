@@ -10,9 +10,20 @@ interface SwipeableTrackItemProps {
 	track: Track;
 	onDelete: (trackId: string) => Promise<void>;
 	disabled?: boolean;
+	/** Shows the up / down buttons; a missing handler shows its button disabled. */
+	showMoveButtons?: boolean;
+	onMoveUp?: () => void;
+	onMoveDown?: () => void;
 }
 
-export function SwipeableTrackItem({ track, onDelete, disabled = false }: SwipeableTrackItemProps) {
+export function SwipeableTrackItem({
+	track,
+	onDelete,
+	disabled = false,
+	showMoveButtons = false,
+	onMoveUp,
+	onMoveDown,
+}: SwipeableTrackItemProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
@@ -58,6 +69,39 @@ export function SwipeableTrackItem({ track, onDelete, disabled = false }: Swipea
 
 				{track.durationMs && (
 					<Text style={styles.duration}>{formatDuration(track.durationMs)}</Text>
+				)}
+
+				{!disabled && showMoveButtons && (
+					<View style={styles.moveButtons}>
+						<TouchableOpacity
+							onPress={onMoveUp}
+							disabled={!onMoveUp}
+							hitSlop={6}
+							accessibilityRole="button"
+							accessibilityLabel="Move track up"
+							accessibilityState={{ disabled: !onMoveUp }}
+						>
+							<Ionicons
+								name="chevron-up"
+								size={22}
+								color={onMoveUp ? theme.colors.text : theme.colors.border}
+							/>
+						</TouchableOpacity>
+						<TouchableOpacity
+							onPress={onMoveDown}
+							disabled={!onMoveDown}
+							hitSlop={6}
+							accessibilityRole="button"
+							accessibilityLabel="Move track down"
+							accessibilityState={{ disabled: !onMoveDown }}
+						>
+							<Ionicons
+								name="chevron-down"
+								size={22}
+								color={onMoveDown ? theme.colors.text : theme.colors.border}
+							/>
+						</TouchableOpacity>
+					</View>
 				)}
 			</View>
 		</Swipeable>
@@ -108,6 +152,10 @@ const createStyles = (theme: Theme) =>
 		duration: {
 			fontSize: 13,
 			color: theme.colors.textSecondary,
+		},
+		moveButtons: {
+			marginLeft: theme.spacing.sm,
+			alignItems: 'center',
 		},
 		deleteButton: {
 			backgroundColor: '#FF6B6B',

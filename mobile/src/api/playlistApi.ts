@@ -1,5 +1,11 @@
 import { apiRequest } from '@/services/api';
-import type { Playlist, PlaylistWithTracks } from '@/types/playlist.types';
+import type {
+	AddTrackResult,
+	MoveTrackResult,
+	Playlist,
+	PlaylistWithTracks,
+	RemoveTrackResult,
+} from '@/types/playlist.types';
 import type { Track } from '@/types/track.types';
 import type { PlaylistInput } from '@utils/validators';
 
@@ -82,7 +88,7 @@ export const playlistApi = {
 	/**
 	 * Add track to playlist
 	 */
-	async addTrack(playlistId: string, track: Track): Promise<void> {
+	async addTrack(playlistId: string, track: Track): Promise<AddTrackResult> {
 		if (__DEV__)
 			console.log('🎵 [PlaylistApi] Sending add track request', {
 				playlistId,
@@ -92,7 +98,7 @@ export const playlistApi = {
 				previewUrl: track.previewUrl ? 'present' : 'undefined',
 			});
 
-		await apiRequest(`/api/playlists/${playlistId}/tracks`, {
+		const result = await apiRequest<AddTrackResult>(`/api/playlists/${playlistId}/tracks`, {
 			method: 'POST',
 			body: JSON.stringify({
 				trackUri: track.trackUri,
@@ -106,22 +112,31 @@ export const playlistApi = {
 		});
 
 		if (__DEV__) console.log('🟢 [PlaylistApi] Track added successfully');
+		return result;
 	},
 
 	/**
 	 * Remove track from playlist
 	 */
-	async removeTrack(playlistId: string, trackId: string): Promise<void> {
-		await apiRequest(`/api/playlists/${playlistId}/tracks/${trackId}`, { method: 'DELETE' });
+	removeTrack(playlistId: string, trackId: string): Promise<RemoveTrackResult> {
+		return apiRequest<RemoveTrackResult>(`/api/playlists/${playlistId}/tracks/${trackId}`, {
+			method: 'DELETE',
+		});
 	},
 
 	/**
-	 * Reorder tracks in playlist
+	 * Move a track right after `afterRank` (null = top), checked against the
+	 * version the client displays. See doc/PLAYLIST_CONCURRENCY.md, "Move".
 	 */
-	async reorderTracks(playlistId: string, trackIds: string[]): Promise<void> {
-		await apiRequest(`/api/playlists/${playlistId}/tracks/reorder`, {
-			method: 'PUT',
-			body: JSON.stringify({ trackIds }),
+	moveTrack(
+		playlistId: string,
+		trackId: string,
+		afterRank: string | null,
+		expectedVersion: number
+	): Promise<MoveTrackResult> {
+		return apiRequest<MoveTrackResult>(`/api/playlists/${playlistId}/tracks/${trackId}/move`, {
+			method: 'POST',
+			body: JSON.stringify({ afterRank, expectedVersion }),
 		});
 	},
 
