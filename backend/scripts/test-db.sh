@@ -21,11 +21,27 @@ DB_CONTAINER="supabase_db_${SUPABASE_PROJECT_ID}"
 EXCLUDED=studio,storage-api,imgproxy,realtime,edge-runtime,logflare,vector,mailpit,supavisor,postgres-meta
 
 # Real Redis (session revocation denylist); Docker picks a free host port.
+# The official image through ECR Public, like the Supabase images: Docker Hub
+# refuses anonymous pulls past its rate limit on shared CI runners.
 REDIS_CONTAINER=music-room-test-redis
-REDIS_IMAGE=redis:7-alpine
+REDIS_IMAGE=public.ecr.aws/docker/library/redis:7-alpine
+
+# ECR Public throttles bursts ("Rate exceeded"): retry with a growing delay.
+pull_image() {
+	tries=0
+	until docker image inspect "$1" >/dev/null 2>&1 || docker pull -q "$1" >/dev/null; do
+		tries=$((tries + 1))
+		if [ "$tries" -ge 5 ]; then
+			echo "Could not pull $1" >&2
+			exit 1
+		fi
+		sleep $((tries * 5))
+	done
+}
 
 start_redis() {
 	docker rm -f "$REDIS_CONTAINER" >/dev/null 2>&1 || true
+	pull_image "$REDIS_IMAGE"
 	docker run -d --name "$REDIS_CONTAINER" -p 127.0.0.1::6379 "$REDIS_IMAGE" >/dev/null
 
 	tries=0
