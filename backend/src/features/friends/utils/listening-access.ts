@@ -1,20 +1,22 @@
 import { logger } from '@/shared/utils/logger.js';
 
 /**
- * Evict the controller's sockets from the owner's listening room. Imported
- * lazily: realtime/index.ts imports music-control.service.ts, which builds a
- * FriendsService at load time, so a static import would form a cycle. Never
- * throws: eviction must not fail the unfollow.
+ * Re-check controllerId's access to ownerId's devices and evict its sockets
+ * from the owner's listening room when none is left (see
+ * realtime.revalidateListeningAccess). Imported lazily so that loading the
+ * friends feature does not load the Socket.io server, and so that no import
+ * cycle forms if realtime/index.ts ever imports a service that builds a
+ * FriendsService at load time. Never throws: eviction must not fail the
+ * unfollow or the revoke.
  */
-export async function revokeListeningAccess(controllerId: string, ownerId: string): Promise<void> {
+export async function revalidateListeningAccess(
+	controllerId: string,
+	ownerId: string
+): Promise<void> {
 	try {
 		const { realtime } = await import('@/realtime/index.js');
-		realtime.revokeListeningAccess(controllerId, ownerId);
+		await realtime.revalidateListeningAccess(controllerId, ownerId);
 	} catch (error) {
-		logger.error('Failed to revoke listening access after unfollow', {
-			error,
-			controllerId,
-			ownerId,
-		});
+		logger.error('Failed to revalidate listening access', { error, controllerId, ownerId });
 	}
 }

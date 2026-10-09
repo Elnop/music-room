@@ -432,7 +432,7 @@ L'accès est revérifié quand il peut se perdre : après le retrait d'un viewer
 
 #### Écoute et contrôle
 
-`listening:subscribe <ownerId>` et `control:action` ne passent que si l'utilisateur de la socket peut contrôler la musique du propriétaire (`musicControlService.canControl` : il le suit avec `follows.can_control_music`). L'identité vient toujours de la socket : les champs en trop du payload (`fromUserId`, `controllerId`...) sont ignorés et `control:command.fromUserId` est l'utilisateur de la socket. Payloads validés par Zod dans `src/realtime/music-control-access.ts`, avant toute lecture en base :
+`listening:subscribe <ownerId>` et `control:action` ne passent que si l'utilisateur de la socket et le propriétaire sont amis mutuels et que le propriétaire lui a ouvert l'interrupteur « tous mes appareils » (`follows.can_control_music`) ou une licence sur l'appareil (`device_control_licenses`) : sur l'appareil ciblé pour `control:action`, sur au moins un appareil pour `listening:subscribe`, qui montre alors le statut de tous les appareils du propriétaire (règle dans `features/music-control/services/control-access.service.ts` ; une erreur de base refuse). L'identité vient toujours de la socket : les champs en trop du payload (`fromUserId`, `controllerId`...) sont ignorés et `control:command.fromUserId` est l'utilisateur de la socket. Payloads validés par Zod dans `src/realtime/music-control-access.ts`, avant toute lecture en base :
 
 | Event | Payload | Erreur |
 | --- | --- | --- |
@@ -442,7 +442,7 @@ L'accès est revérifié quand il peut se perdre : après le retrait d'un viewer
 
 Les erreurs ont la forme `{ message, code }` : `INVALID_PAYLOAD` (payload invalide), `NOT_AUTHORIZED` (pas le droit de contrôle), `DEVICE_OFFLINE` (`control:action` vers un appareil non connecté).
 
-Quand le contrôle se perd, toutes les sockets du contrôleur quittent `listening:<ownerId>` et ne reçoivent plus `listening:status` : après `revokeControl` (le contrôleur reçoit toujours `permission:changed` avec `canControl: false`) ou quand le contrôleur arrête de suivre le propriétaire (`unfollowUser`). Un échec de cette éviction est seulement loggé et ne fait jamais échouer la requête HTTP.
+Quand l'accès peut se perdre, il est revérifié : après le retrait de l'interrupteur (`revokeControl` ; le contrôleur reçoit toujours `permission:changed` avec `canControl: false`), le retrait d'une licence, ou un `unfollowUser` dans un sens ou dans l'autre. Les sockets du contrôleur ne quittent `listening:<ownerId>`, et ne reçoivent plus `listening:status`, que s'il ne lui reste aucun appareil contrôlable. Un échec de cette éviction est seulement loggé et ne fait jamais échouer la requête HTTP.
 
 ## 🎵 SoundCloud
 

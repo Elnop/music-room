@@ -17,3 +17,6 @@
 - source_plan: `_bmad-output/initiative-validation-mandatory/epic-securite/story-tester-l-acces-a-l-ecoute-et-au-controle-backend-plan.md`
   summary: A quick `listening:subscribe X` then `listening:unsubscribe X` leaves the socket subscribed, because the unsubscribe runs before the subscribe's awaited `canControl`; order a socket's listening events as #64 does for playlist rooms.
   evidence: `backend/src/realtime/index.ts` `listening:subscribe` joins after `await musicControlService.canControl(...)` while `listening:unsubscribe` leaves synchronously; pre-existing, found in #65 review.
+- source_plan: `_bmad-output/initiative-validation-mandatory/epic-delegation-controle/story-verifier-la-licence-par-appareil-sur-le-temps-reel-backend-plan.md`
+  summary: Story 4.7 must not read `permission:changed` with `canControl: false` as "lost all access": it only reports the "all my devices" switch, and a per-device license may remain (re-check with `GET /users/{userId}/devices`).
+  evidence: Since 4.5, a switch revoke keeps the listening subscription when a license remains (`realtime.notifyPermissionChange` → `revalidateListeningAccess`), but the event payload is unchanged.

@@ -53,7 +53,7 @@ export class MusicControlService {
 			}
 
 			// Notify the allowed user in real-time
-			realtime.notifyPermissionChange(allowedUserId, ownerId, true);
+			await realtime.notifyPermissionChange(allowedUserId, ownerId, true);
 
 			logger.info('Music control granted', { ownerId, allowedUserId });
 		} catch (error) {
@@ -92,8 +92,9 @@ export class MusicControlService {
 				});
 			}
 
-			// Notify the user that their permission was revoked in real-time
-			realtime.notifyPermissionChange(allowedUserId, ownerId, false);
+			// Notify the user that their permission was revoked in real-time;
+			// evicts them from the listening room unless a license remains.
+			await realtime.notifyPermissionChange(allowedUserId, ownerId, false);
 
 			logger.info('Music control revoked', { ownerId, allowedUserId });
 		} catch (error) {
