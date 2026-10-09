@@ -71,7 +71,9 @@ function requests(): { url: string; method: string; body?: unknown }[] {
 }
 
 // Generous timeout: the first render transforms lazily-required modules on a cold cache (CI).
-const FIRST_RENDER = { timeout: 5000 };
+const FIRST_RENDER = { timeout: 15_000 };
+// Above FIRST_RENDER: the whole test must outlive a slow first render.
+jest.setTimeout(20_000);
 
 async function renderLoaded(): Promise<void> {
 	render(<LinkedAccountsScreen />);
