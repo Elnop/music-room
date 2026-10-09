@@ -628,8 +628,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 		}
 
 		if (!refreshToken) {
-			console.error('[AuthStore] No refresh token available');
-			await get().logout();
+			// Locally, not through logout(): its backend call would refresh again.
+			console.error('[AuthStore] No refresh token available, ending the session locally');
+			await endSessionLocally();
 			return false;
 		}
 
