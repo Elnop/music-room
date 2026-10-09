@@ -9,13 +9,20 @@ interface DeviceListeningCardProps {
 	status: ListeningStatus;
 	onPlay: () => void;
 	onPause: () => void;
+	/** False hides the play/pause button (device I may not control) */
+	controllable?: boolean;
 }
 
 /**
  * Card component to display a device's listening status
  * Shows device name, current track info, and play/pause controls
  */
-export function DeviceListeningCard({ status, onPlay, onPause }: DeviceListeningCardProps) {
+export function DeviceListeningCard({
+	status,
+	onPlay,
+	onPause,
+	controllable = true,
+}: DeviceListeningCardProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
@@ -61,18 +68,20 @@ export function DeviceListeningCard({ status, onPlay, onPause }: DeviceListening
 							{status.track.artist}
 						</Text>
 					</View>
-					<TouchableOpacity
-						style={[styles.controlButton, status.isPlaying && styles.controlButtonActive]}
-						onPress={status.isPlaying ? onPause : onPlay}
-						hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-					>
-						<Ionicons
-							name={status.isPlaying ? 'pause' : 'play'}
-							size={20}
-							color="#FFFFFF"
-							style={status.isPlaying ? undefined : { marginLeft: 2 }}
-						/>
-					</TouchableOpacity>
+					{controllable && (
+						<TouchableOpacity
+							style={[styles.controlButton, status.isPlaying && styles.controlButtonActive]}
+							onPress={status.isPlaying ? onPause : onPlay}
+							hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+						>
+							<Ionicons
+								name={status.isPlaying ? 'pause' : 'play'}
+								size={20}
+								color="#FFFFFF"
+								style={status.isPlaying ? undefined : { marginLeft: 2 }}
+							/>
+						</TouchableOpacity>
+					)}
 				</View>
 			) : (
 				<View style={styles.emptyContainer}>
