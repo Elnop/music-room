@@ -372,6 +372,8 @@ export class PlaylistService {
 					displayName: owner.display_name ?? undefined,
 					avatarUrl: owner.avatar_url ?? undefined,
 				},
+				// Placeholder until playlists.tracks_version exists (#88).
+				tracksVersion: 0,
 			};
 		} catch (error) {
 			if (error instanceof AppError) throw error;

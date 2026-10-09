@@ -62,6 +62,17 @@ export const reorderTracksSchema = z.object({
 	trackIds: z.array(z.uuid()).min(1, 'Track IDs array cannot be empty'),
 });
 
+// A rank is a base-62 fraction that never ends with '0' (doc/PLAYLIST_CONCURRENCY.md).
+export const rankSchema = z
+	.string()
+	.max(128)
+	.regex(/^[0-9A-Za-z]*[1-9A-Za-z]$/, 'Invalid rank');
+
+export const moveTrackSchema = z.object({
+	afterRank: rankSchema.nullable(),
+	expectedVersion: z.number().int().nonnegative(),
+});
+
 export const addCollaboratorSchema = z.object({
 	userId: z.uuid('Invalid user ID format'),
 });
@@ -74,5 +85,6 @@ export type CreatePlaylistInput = z.infer<typeof createPlaylistSchema>;
 export type UpdatePlaylistInput = z.infer<typeof updatePlaylistSchema>;
 export type AddTrackInput = z.infer<typeof addTrackSchema>;
 export type ReorderTracksInput = z.infer<typeof reorderTracksSchema>;
+export type MoveTrackInput = z.infer<typeof moveTrackSchema>;
 export type AddCollaboratorInput = z.infer<typeof addCollaboratorSchema>;
 export type AddViewerInput = z.infer<typeof addViewerSchema>;
