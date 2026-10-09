@@ -59,6 +59,10 @@ export const forgotPasswordSchema = z.object({
 	email: z.email('Invalid email address'),
 });
 
+export const canResendResetCodeQuerySchema = z.object({
+	email: z.email('Invalid email address'),
+});
+
 export const resetPasswordSchema = z.object({
 	email: z.email('Invalid email address'),
 	code: z

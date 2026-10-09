@@ -12,14 +12,12 @@
  * - Use of generated Supabase types (UserProfileRow, UserProfileUpdate)
  * - Proper error handling with typed AppError
  */
- 
- 
- 
 
 import crypto from 'crypto';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { sendPasswordResetEmail } from '@/features/mail/mail.service.js';
 import { RateLimiterService } from '@/shared/services/rate-limiter.service.js';
+import { PasswordResetCooldownService } from '@/features/auth/services/password-reset-cooldown.service.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import type {
@@ -30,13 +28,12 @@ import type {
 
 export class PasswordResetService {
 	private rateLimiter: RateLimiterService;
+	private cooldown = new PasswordResetCooldownService();
 
 	// Configuration (similar to email verification)
 	private readonly CODE_LENGTH = 6;
 	private readonly CODE_EXPIRY_MINUTES = 15;
 	private readonly MAX_RESET_ATTEMPTS = 5;
-	private readonly MAX_RESET_REQUESTS_PER_HOUR = 3;
-	private readonly RESEND_COOLDOWN_SECONDS = 60;
 
 	constructor() {
 		this.rateLimiter = new RateLimiterService();
@@ -67,11 +64,8 @@ export class PasswordResetService {
 	}
 
 	async requestPasswordReset(email: string, ip: string): Promise<void> {
-		const requestKey = `password_reset_request:${email}:${ip}`;
-		await this.rateLimiter.incrementAndCheck(requestKey, {
-			maxAttempts: this.MAX_RESET_REQUESTS_PER_HOUR,
-			windowSeconds: 60 * 60,
-		});
+		// Hourly limit and resend cooldown, whether the email exists or not (#187).
+		await this.cooldown.consumeRequest(email, ip);
 
 		const { data: authUserResponse, error: authError } = await supabaseAdmin.auth.admin.listUsers();
 
@@ -212,31 +206,5 @@ export class PasswordResetService {
 		await this.rateLimiter.reset(attemptsKey);
 
 		logger.info('Password reset successful', { userId: user.id });
-	}
-
-	async canResendCode(
-		email: string,
-		ip: string
-	): Promise<{ canResend: boolean; remainingSeconds: number }> {
-		const resendKey = `password_reset_resend:${email}:${ip}`;
-		const attempts = await this.rateLimiter.getAttempts(resendKey);
-
-		if (attempts === 0) {
-			return { canResend: true, remainingSeconds: 0 };
-		}
-
-		const remainingSeconds = Math.max(0, this.RESEND_COOLDOWN_SECONDS - attempts);
-		return {
-			canResend: remainingSeconds === 0,
-			remainingSeconds,
-		};
-	}
-
-	async recordResendAttempt(email: string, ip: string): Promise<void> {
-		const resendKey = `password_reset_resend:${email}:${ip}`;
-		await this.rateLimiter.increment(resendKey, {
-			maxAttempts: 1,
-			windowSeconds: this.RESEND_COOLDOWN_SECONDS,
-		});
 	}
 }
