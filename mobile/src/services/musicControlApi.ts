@@ -3,6 +3,7 @@ import type { ApiResponse } from '@/types/api.types';
 import { useAuthStore } from '@/store/authStore';
 import { apiRequest } from '@services/api';
 import type {
+	ControllableDevicesResponse,
 	GrantDeviceLicenseResponse,
 	MyDevicesResponse,
 	RevokeDeviceLicenseResponse,
@@ -129,6 +130,16 @@ export const musicControlApi = {
 			headers: await authHeaders(),
 		});
 		return data.devices;
+	},
+
+	/**
+	 * List the devices of a user that I may control (all-devices switch or per-device license)
+	 */
+	async getControllableDevices(userId: string): Promise<ControllableDevicesResponse> {
+		return apiRequest<ControllableDevicesResponse>(
+			`/api/music-control/users/${encodeURIComponent(userId)}/devices`,
+			{ headers: await authHeaders() }
+		);
 	},
 
 	/**

@@ -1,8 +1,9 @@
-import { useEffect, useCallback, useState } from 'react';
+import { useEffect, useCallback, useMemo, useState } from 'react';
 import { useSocketStore } from '@store/socketStore';
 import { usePlayerStore } from '@store/playerStore';
 import { useAuthStore } from '@store/authStore';
 import { deviceService, type DeviceInfo } from '@/services/deviceService';
+import { musicControlApi } from '@/services/musicControlApi';
 
 /**
  * Listening status for a single device
@@ -119,52 +120,126 @@ export function useMusicControlEmitter() {
 }
 
 /**
- * Hook to subscribe to a friend's listening status (all devices) and control their music
- * Use this in UserProfileScreen when viewing a friend who granted you control
- *
- * Multi-device support: returns all connected devices for the target user
+ * A friend's device as seen from their profile, with whether I may control it
  */
-export function useFriendListening(
-	targetUserId: string | null,
-	initialCanControl: boolean = false
-) {
+export interface FriendDeviceStatus extends ListeningStatus {
+	controllable: boolean;
+}
+
+/**
+ * Last `control:error` received from the server for a remote command
+ */
+export interface ControlError {
+	code: string;
+	message: string;
+}
+
+/**
+ * Text to show the user for a `control:error`
+ */
+export function controlErrorMessage(err: ControlError): string {
+	switch (err.code) {
+		case 'NOT_AUTHORIZED':
+			return 'Vous ne pouvez pas contrôler cet appareil';
+		case 'DEVICE_OFFLINE':
+			return "Cet appareil n'est plus en ligne";
+		default:
+			return err.message;
+	}
+}
+
+interface ControllableIds {
+	userId: string;
+	allDevices: boolean;
+	ids: string[];
+}
+
+const NO_IDS: string[] = [];
+
+/**
+ * Hook to subscribe to a friend's listening status (all devices) and control their music
+ * Use this in UserProfileScreen when viewing a friend
+ *
+ * Only the devices the friend let me control (all-devices switch or per-device license)
+ * get controls; the listening status is subscribed only when at least one is controllable.
+ */
+export function useFriendListening(targetUserId: string | null) {
 	const socket = useSocketStore(state => state.socket);
 	const isConnected = useSocketStore(state => state.isConnected);
 
-	const [devices, setDevices] = useState<ListeningStatus[]>([]);
-	const [canControl, setCanControl] = useState(initialCanControl);
+	const [statuses, setStatuses] = useState<ListeningStatus[]>([]);
+	const [controllable, setControllable] = useState<ControllableIds | null>(null);
+	const [reloadCount, setReloadCount] = useState(0);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [controlError, setControlError] = useState<ControlError | null>(null);
+
+	const reloadControllable = useCallback(() => setReloadCount(count => count + 1), []);
+
+	// Devices I may control: the list belongs to one user, ignore a stale one
+	const current = controllable && controllable.userId === targetUserId ? controllable : null;
+	const allDevices = current?.allDevices ?? false;
+	const controllableIds = current ? current.ids : NO_IDS;
+	const canControl = allDevices || controllableIds.length > 0;
+	// The all-devices switch also covers devices that connected after the list was loaded
+	const isControllable = useCallback(
+		(deviceId: string) => allDevices || controllableIds.includes(deviceId),
+		[allDevices, controllableIds]
+	);
 
 	useEffect(() => {
-		setCanControl(initialCanControl);
-	}, [initialCanControl]);
+		if (!targetUserId) return;
+		let cancelled = false;
+
+		musicControlApi
+			.getControllableDevices(targetUserId)
+			.then(res => {
+				if (!cancelled) {
+					setControllable({
+						userId: targetUserId,
+						allDevices: res.allDevices,
+						ids: res.devices.map(d => d.deviceId),
+					});
+				}
+			})
+			.catch(err => {
+				console.error('[MusicControl] Load controllable devices failed:', err);
+				if (!cancelled) setControllable({ userId: targetUserId, allDevices: false, ids: [] });
+			});
+
+		return () => {
+			cancelled = true;
+		};
+	}, [targetUserId, reloadCount]);
 
 	useEffect(() => {
 		if (!socket || !isConnected || !targetUserId) return;
 
 		const handlePermissionChanged = (data: PermissionChangedEvent) => {
 			if (__DEV__) console.log('[MusicControl] Permission changed:', data);
-			if (data.ownerId === targetUserId) {
-				setCanControl(data.canControl);
-				if (!data.canControl) {
-					// Permission revoked - clear devices
-					setDevices([]);
-				}
-			}
+			if (data.ownerId === targetUserId) reloadControllable();
+		};
+
+		const handleControlError = (err: ControlError) => {
+			console.error('[MusicControl] Control error:', err);
+			setControlError({ code: err.code, message: err.message });
+			if (err.code === 'NOT_AUTHORIZED') reloadControllable();
 		};
 
 		socket.on('permission:changed', handlePermissionChanged);
+		socket.on('control:error', handleControlError);
 
 		return () => {
 			socket.off('permission:changed', handlePermissionChanged);
+			socket.off('control:error', handleControlError);
 		};
-	}, [socket, isConnected, targetUserId]);
+	}, [socket, isConnected, targetUserId, reloadControllable]);
 
 	useEffect(() => {
 		if (!socket || !isConnected || !targetUserId || !canControl) {
 			if (!canControl) {
-				setDevices([]);
+				setStatuses([]);
+				setIsLoading(false);
 			}
 			return;
 		}
@@ -181,7 +256,7 @@ export function useFriendListening(
 			if (__DEV__)
 				console.log('[MusicControl] Received listening status:', status.devices.length, 'devices');
 			if (status.ownerId === targetUserId) {
-				setDevices(status.devices);
+				setStatuses(status.devices);
 				setIsLoading(false);
 			}
 		};
@@ -206,24 +281,37 @@ export function useFriendListening(
 		};
 	}, [socket, isConnected, targetUserId, canControl]);
 
-	const remotePlay = useCallback(
-		(targetDeviceId: string) => {
-			if (!socket || !isConnected || !targetUserId) return;
+	const devices = useMemo<FriendDeviceStatus[]>(
+		() =>
+			statuses.map(status => ({
+				...status,
+				controllable: isControllable(status.device.deviceId),
+			})),
+		[statuses, isControllable]
+	);
 
-			socket.emit('control:action', { targetUserId, targetDeviceId, action: 'play' });
-			if (__DEV__) console.log('[MusicControl] Sent play command to device:', targetDeviceId);
+	const sendAction = useCallback(
+		(targetDeviceId: string, action: 'play' | 'pause') => {
+			if (!socket || !isConnected || !targetUserId) return;
+			if (!isControllable(targetDeviceId)) {
+				if (__DEV__) console.log('[MusicControl] Device not controllable:', targetDeviceId);
+				return;
+			}
+
+			socket.emit('control:action', { targetUserId, targetDeviceId, action });
+			if (__DEV__) console.log(`[MusicControl] Sent ${action} command to device:`, targetDeviceId);
 		},
-		[socket, isConnected, targetUserId]
+		[socket, isConnected, targetUserId, isControllable]
+	);
+
+	const remotePlay = useCallback(
+		(targetDeviceId: string) => sendAction(targetDeviceId, 'play'),
+		[sendAction]
 	);
 
 	const remotePause = useCallback(
-		(targetDeviceId: string) => {
-			if (!socket || !isConnected || !targetUserId) return;
-
-			socket.emit('control:action', { targetUserId, targetDeviceId, action: 'pause' });
-			if (__DEV__) console.log('[MusicControl] Sent pause command to device:', targetDeviceId);
-		},
-		[socket, isConnected, targetUserId]
+		(targetDeviceId: string) => sendAction(targetDeviceId, 'pause'),
+		[sendAction]
 	);
 
 	return {
@@ -231,6 +319,7 @@ export function useFriendListening(
 		canControl,
 		isLoading,
 		error,
+		controlError,
 		remotePlay,
 		remotePause,
 	};
