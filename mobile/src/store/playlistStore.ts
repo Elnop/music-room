@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import type { Playlist } from '@/types/playlist.types';
 import type { PlaylistWithTracks } from '@/types/playlist.types';
 import type { Track } from '@/types/track.types';
-import type { TrackWithPosition } from '@/types/track.types';
+import type { TrackInPlaylist } from '@/types/track.types';
 import type { PlaylistInput } from '@utils/validators';
 import { playlistApi } from '@api/playlistApi';
 
@@ -31,7 +31,7 @@ interface PlaylistState {
 	removeTrack: (playlistId: string, trackId: string) => Promise<void>;
 	reorderTracks: (playlistId: string, trackIds: string[]) => Promise<void>;
 
-	addTrackLocally: (playlistId: string, track: TrackWithPosition) => void;
+	addTrackLocally: (playlistId: string, track: TrackInPlaylist) => void;
 	removeTrackLocally: (playlistId: string, trackId: string) => void;
 
 	// Error handling
@@ -314,7 +314,7 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 	/**
 	 * Add track locally (for realtime updates without API call)
 	 */
-	addTrackLocally: (playlistId: string, track: TrackWithPosition) => {
+	addTrackLocally: (playlistId: string, track: TrackInPlaylist) => {
 		const { currentPlaylist, playlistsCache } = get();
 		if (currentPlaylist?.id === playlistId) {
 			const trackExists = currentPlaylist.tracks.some(t => t.id === track.id);

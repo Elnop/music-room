@@ -10,12 +10,6 @@ export interface Track {
 	previewUrl?: string;
 }
 
-// Track of the old `track_added` socket payload: the server sends
-// `{ ...TrackInPlaylist, position: 0 }` until #90 (5.5) switches to the versioned delta.
-export interface TrackWithPosition extends TrackInPlaylist {
-	position: number;
-}
-
 // Track in a playlist, ordered by rank (doc/PLAYLIST_CONCURRENCY.md)
 // Mirrors backend TrackInPlaylistResponse (extends TrackResponse).
 export interface TrackInPlaylist extends Track {

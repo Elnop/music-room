@@ -13,7 +13,7 @@ import {
 	playlistRoomPayloadSchema,
 	revalidatePlaylistRoom,
 } from '@/realtime/playlist-room.js';
-import type { TrackWithPositionResponse } from '@/features/playlists/playlist.types.js';
+import type { PlaylistUpdatedPayload } from '@/features/playlists/playlist.types.js';
 import { controlAccessService } from '@/features/music-control/services/control-access.service.js';
 import type {
 	ListeningStatus,
@@ -27,17 +27,6 @@ import {
 	listeningRoom,
 	listeningTargetSchema,
 } from '@/realtime/music-control-access.js';
-
-// Typed payloads for playlist events
-export interface TrackAddedPayload {
-	track: TrackWithPositionResponse;
-}
-
-export interface TrackRemovedPayload {
-	trackId: string;
-}
-
-export type PlaylistEventPayload = TrackAddedPayload | TrackRemovedPayload | undefined;
 
 /**
  * Listening update payload from client.
@@ -530,16 +519,11 @@ class RealtimeService {
 	}
 
 	/**
-	 * Notify all clients watching a playlist that it was updated
+	 * Notify all clients watching a playlist of one track operation and the
+	 * version it produced (doc/PLAYLIST_CONCURRENCY.md, "Broadcast and convergence")
 	 */
-	notifyPlaylistUpdate(playlistId: string, event: 'track_added', data: TrackAddedPayload): void;
-	notifyPlaylistUpdate(playlistId: string, event: 'track_removed', data: TrackRemovedPayload): void;
-	notifyPlaylistUpdate(playlistId: string, event: 'reordered'): void;
-	notifyPlaylistUpdate(
-		playlistId: string,
-		event: 'track_added' | 'track_removed' | 'reordered',
-		data?: PlaylistEventPayload
-	) {
+	notifyPlaylistUpdate(payload: PlaylistUpdatedPayload): void {
+		const { playlistId, event, tracksVersion } = payload;
 		if (!this.io) {
 			socketLogger.event('playlist:updated', 'N/A', {
 				level: 'warn',
@@ -550,11 +534,12 @@ class RealtimeService {
 			return;
 		}
 
-		this.io.to(`playlist:${playlistId}`).emit('playlist:updated', { playlistId, event, ...data });
+		this.io.to(`playlist:${playlistId}`).emit('playlist:updated', payload);
 
 		socketLogger.broadcast('playlist_updated', {
 			playlistId,
 			event,
+			tracksVersion,
 			room: `playlist:${playlistId}`,
 			action: 'broadcasted',
 		});
