@@ -405,13 +405,13 @@ Toute connexion est authentifiée au handshake par `src/realtime/socket-auth.ts`
 | Champ | Contenu |
 | --- | --- |
 | `token` | access token Supabase (JWT), vérifié par `SessionService.verifyToken` |
-| `deviceId` | identifiant stable de l'appareil (non vide) |
+| `deviceId` | identifiant stable de l'appareil (1 à 128 caractères) |
 | `deviceName` | nom de l'appareil |
 | `platform` | plateforme (`ios`, `android`, ...) |
 | `model` | modèle de l'appareil |
 | `appVersion` | version de l'app |
 
-Refus : `connect_error` dont le `message` vaut `NO_TOKEN` (pas de `token`), `INVALID_HANDSHAKE` (champ manquant ou pas une chaîne) ou `INVALID_TOKEN` (token invalide ou expiré). Accepté : `socket.data` contient `{ userId, email, device, appVersion }`, l'identité venant uniquement du token ; l'appareil est enregistré pour le contrôle et la socket rejoint `user:<id>`. Le token n'est vérifié qu'à la connexion. `listening:update` prend l'appareil du handshake, jamais celui du payload.
+Refus : `connect_error` dont le `message` vaut `NO_TOKEN` (pas de `token`), `INVALID_HANDSHAKE` (champ manquant ou pas une chaîne), `INVALID_TOKEN` (token invalide ou expiré) ou `DEVICE_REGISTRATION_FAILED` (l'appareil n'a pas pu être enregistré ; Socket.io ne relance pas un refus, c'est le client qui réessaie). Accepté : l'appareil est enregistré dans `devices` avant l'acceptation (une ligne par utilisateur et `deviceId`, `last_seen_at` rafraîchi) et `socket.data` contient `{ userId, email, device, appVersion }`, l'identité venant uniquement du token ; l'appareil est enregistré pour le contrôle et la socket rejoint `user:<id>`. Le token n'est vérifié qu'à la connexion. `listening:update` prend l'appareil du handshake, jamais celui du payload.
 
 ### Events
 

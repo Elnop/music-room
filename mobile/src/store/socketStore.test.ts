@@ -1,5 +1,5 @@
 import { io } from 'socket.io-client';
-import { useSocketStore } from '@store/socketStore';
+import { DEVICE_RETRY_DELAY_MS, DEVICE_RETRY_MAX, useSocketStore } from '@store/socketStore';
 
 type Handler = (...args: unknown[]) => void;
 
@@ -157,5 +157,70 @@ describe('socketStore connect_error', () => {
 			'[Socket] Handshake refused, staying disconnected:',
 			code
 		);
+	});
+});
+
+describe('socketStore DEVICE_REGISTRATION_FAILED', () => {
+	const refuseDevice = () =>
+		socket.trigger('connect_error', new Error('DEVICE_REGISTRATION_FAILED'));
+
+	beforeEach(() => {
+		jest.useFakeTimers();
+	});
+
+	afterEach(() => {
+		jest.useRealTimers();
+	});
+
+	it('reconnects after the retry delay', () => {
+		refuseDevice();
+
+		jest.advanceTimersByTime(DEVICE_RETRY_DELAY_MS - 1);
+		expect(socket.connect).not.toHaveBeenCalled();
+		jest.advanceTimersByTime(1);
+		expect(socket.connect).toHaveBeenCalledTimes(1);
+		expect(socket.disconnect).not.toHaveBeenCalled();
+		expect(mockAuthState.refreshAccessToken).not.toHaveBeenCalled();
+	});
+
+	it(`stops after ${DEVICE_RETRY_MAX} retries and stays disconnected`, () => {
+		for (let i = 0; i < DEVICE_RETRY_MAX; i++) {
+			refuseDevice();
+			jest.advanceTimersByTime(DEVICE_RETRY_DELAY_MS);
+		}
+		expect(socket.connect).toHaveBeenCalledTimes(DEVICE_RETRY_MAX);
+
+		refuseDevice();
+		jest.advanceTimersByTime(DEVICE_RETRY_DELAY_MS);
+
+		expect(socket.connect).toHaveBeenCalledTimes(DEVICE_RETRY_MAX);
+		expect(socket.disconnect).toHaveBeenCalled();
+		expect(useSocketStore.getState().socket).toBeNull();
+		expect(console.error).toHaveBeenCalledWith(
+			'[Socket] Handshake refused, staying disconnected:',
+			'DEVICE_REGISTRATION_FAILED'
+		);
+	});
+
+	it('resets the retry counter after a successful connect', () => {
+		for (let i = 0; i < DEVICE_RETRY_MAX; i++) {
+			refuseDevice();
+			jest.advanceTimersByTime(DEVICE_RETRY_DELAY_MS);
+		}
+		socket.trigger('connect');
+
+		refuseDevice();
+		jest.advanceTimersByTime(DEVICE_RETRY_DELAY_MS);
+
+		expect(socket.connect).toHaveBeenCalledTimes(DEVICE_RETRY_MAX + 1);
+		expect(socket.disconnect).not.toHaveBeenCalled();
+	});
+
+	it('does not reconnect a socket the store has replaced', () => {
+		refuseDevice();
+		useSocketStore.getState().disconnect();
+
+		jest.advanceTimersByTime(DEVICE_RETRY_DELAY_MS);
+		expect(socket.connect).not.toHaveBeenCalled();
 	});
 });

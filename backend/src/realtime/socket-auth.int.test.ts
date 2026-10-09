@@ -266,6 +266,78 @@ describe('Socket.io handshake authentication', () => {
 		).resolves.toBe('INVALID_TOKEN');
 	});
 
+	describe('device registration (devices table)', () => {
+		async function deviceRows(deviceId: string) {
+			const { data, error } = await supabaseAdmin
+				.from('devices')
+				.select('*')
+				.eq('device_id', deviceId);
+			if (error) throw error;
+			return data;
+		}
+
+		it('records the handshake device on the first connection', async () => {
+			const device = deviceFields();
+			const before = Date.now();
+			await connected(connect({ token: alice.token, ...device }));
+
+			const rows = await deviceRows(device.deviceId);
+			expect(rows).toHaveLength(1);
+			expect(rows[0]).toMatchObject({
+				user_id: alice.id,
+				device_id: device.deviceId,
+				device_name: device.deviceName,
+				platform: device.platform,
+				model: device.model,
+			});
+			expect(new Date(rows[0].last_seen_at).getTime()).toBeGreaterThanOrEqual(before);
+		});
+
+		it('keeps one row on reconnection: last_seen_at and fields updated, created_at kept', async () => {
+			const device = deviceFields();
+			const first = connect({ token: alice.token, ...device });
+			await connected(first);
+			const [initial] = await deviceRows(device.deviceId);
+			first.disconnect();
+
+			await new Promise(resolve => setTimeout(resolve, 20));
+			await connected(
+				connect({
+					token: alice.token,
+					...device,
+					deviceName: 'Renamed device',
+					model: 'Pixel Next',
+				})
+			);
+
+			const rows = await deviceRows(device.deviceId);
+			expect(rows).toHaveLength(1);
+			expect(rows[0]).toMatchObject({ device_name: 'Renamed device', model: 'Pixel Next' });
+			expect(rows[0].created_at).toBe(initial.created_at);
+			expect(new Date(rows[0].last_seen_at).getTime()).toBeGreaterThan(
+				new Date(initial.last_seen_at).getTime()
+			);
+		});
+
+		it('keeps one row per user when two accounts share a deviceId', async () => {
+			const device = deviceFields();
+			await connected(connect({ token: alice.token, ...device }));
+			await connected(connect({ token: bob.token, ...device }));
+
+			const rows = await deviceRows(device.deviceId);
+			expect(rows.map(row => row.user_id).sort()).toEqual([alice.id, bob.id].sort());
+		});
+
+		it('writes no row for a handshake refused with INVALID_TOKEN', async () => {
+			const device = deviceFields();
+			await expect(refused(connect({ token: 'garbage', ...device }))).resolves.toBe(
+				'INVALID_TOKEN'
+			);
+
+			await expect(deviceRows(device.deviceId)).resolves.toEqual([]);
+		});
+	});
+
 	it('ignores a forged userId in the handshake', async () => {
 		const socket = connect({ token: alice.token, ...deviceFields(), userId: bob.id });
 		await connected(socket);
