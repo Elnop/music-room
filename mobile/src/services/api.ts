@@ -3,6 +3,7 @@ import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import type { LoginInput, RegisterInput } from '@utils/validators';
 import type { UserProfile } from '@/types/user.types';
+import type { LinkedProvidersResponse, OAuthProvider } from '@/types/auth.types';
 import { getAppVersion } from '@/services/deviceService';
 import { getBackendUrl } from '@/services/backendUrl';
 
@@ -320,13 +321,7 @@ export const authApi = {
 	/**
 	 * Get linked authentication providers
 	 */
-	async getLinkedProviders(accessToken: string): Promise<{
-		providers: {
-			type: 'password' | 'google' | 'facebook';
-			connectedAt: string;
-			isPrimary: boolean;
-		}[];
-	}> {
+	async getLinkedProviders(accessToken: string): Promise<LinkedProvidersResponse> {
 		return apiRequest('/api/auth/providers', {
 			method: 'GET',
 			headers: {
@@ -338,15 +333,30 @@ export const authApi = {
 	/**
 	 * Unlink an OAuth provider
 	 */
-	async unlinkProvider(
-		accessToken: string,
-		provider: 'google' | 'facebook'
-	): Promise<{ message: string }> {
+	async unlinkProvider(accessToken: string, provider: OAuthProvider): Promise<{ message: string }> {
 		return apiRequest(`/api/auth/providers/${provider}`, {
 			method: 'DELETE',
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
 			},
+		});
+	},
+
+	/**
+	 * Link a Google (ID token) or Facebook (access token) account to the signed-in user
+	 */
+	async linkProvider(
+		accessToken: string,
+		provider: OAuthProvider,
+		token: string
+	): Promise<LinkedProvidersResponse> {
+		const body = provider === 'google' ? { idToken: token } : { accessToken: token };
+		return apiRequest<LinkedProvidersResponse>(`/api/auth/providers/${provider}/link`, {
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+			},
+			body: JSON.stringify(body),
 		});
 	},
 

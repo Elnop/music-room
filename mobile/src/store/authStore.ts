@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { UserProfile } from '@/types/user.types';
+import type { LinkedProvider, OAuthProvider } from '@/types/auth.types';
 import type { RegisterInput } from '@utils/validators';
 import { authApi, ApiError, registerAuthSession } from '@services/api';
 import { supabase } from '@/lib/supabase';
@@ -14,15 +15,6 @@ const STORAGE_KEYS = {
 	IS_AUTHENTICATED: '@zumik/is_authenticated',
 	TOKEN_EXPIRES_AT: '@zumik/token_expires_at',
 } as const;
-
-/**
- * Linked provider info
- */
-interface LinkedProvider {
-	type: 'password' | 'google' | 'facebook';
-	connectedAt: string;
-	isPrimary: boolean;
-}
 
 /**
  * Auth State Interface
@@ -63,7 +55,8 @@ interface AuthState {
 
 	// Provider management
 	fetchLinkedProviders: () => Promise<void>;
-	unlinkProvider: (provider: 'google' | 'facebook') => Promise<void>;
+	linkProvider: (provider: OAuthProvider) => Promise<void>;
+	unlinkProvider: (provider: OAuthProvider) => Promise<void>;
 
 	// Storage helpers
 	loadFromStorage: () => Promise<void>;
@@ -556,9 +549,41 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 	},
 
 	/**
+	 * Link an OAuth provider: native sign-in, then send its token to the backend.
+	 * A cancelled sign-in rethrows Error('SIGN_IN_CANCELLED') without an API call.
+	 */
+	linkProvider: async (provider: OAuthProvider) => {
+		const { accessToken } = get();
+		if (!accessToken) {
+			throw new Error('No access token available');
+		}
+
+		set({ isLoading: true, error: null });
+
+		try {
+			const token = provider === 'google' ? await signInWithGoogle() : await signInWithFacebook();
+			const response = await authApi.linkProvider(accessToken, provider, token);
+
+			set({ linkedProviders: response.providers, isLoading: false });
+		} catch (error) {
+			const cancelled = error instanceof Error && error.message === 'SIGN_IN_CANCELLED';
+			const errorMessage = cancelled
+				? null
+				: error instanceof ApiError
+					? error.message
+					: 'Failed to link provider';
+			set({
+				error: errorMessage,
+				isLoading: false,
+			});
+			throw error;
+		}
+	},
+
+	/**
 	 * Unlink an OAuth provider
 	 */
-	unlinkProvider: async (provider: 'google' | 'facebook') => {
+	unlinkProvider: async (provider: OAuthProvider) => {
 		const { accessToken } = get();
 		if (!accessToken) {
 			throw new Error('No access token available');
