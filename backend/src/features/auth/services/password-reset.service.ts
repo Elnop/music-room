@@ -9,7 +9,7 @@
  *
  * Type safety is maintained through:
  * - Explicit type annotations on all public methods
- * - Use of generated Supabase types (UserProfileRow, UserProfileUpdate)
+ * - Use of generated Supabase types (UserProfileUpdate)
  * - Proper error handling with typed AppError
  */
 
@@ -20,11 +20,7 @@ import { RateLimiterService } from '@/shared/services/rate-limiter.service.js';
 import { PasswordResetCooldownService } from '@/features/auth/services/password-reset-cooldown.service.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
-import type {
-	UserProfileRow,
-	UserProfileUpdate,
-	SupabaseAdminUsersResponse,
-} from '@/features/auth/auth.types.js';
+import type { UserProfileUpdate, SupabaseAdminUsersResponse } from '@/features/auth/auth.types.js';
 
 export class PasswordResetService {
 	private rateLimiter: RateLimiterService;
@@ -87,34 +83,8 @@ export class PasswordResetService {
 			return;
 		}
 
-		const { data: profile, error: profileError } = await supabaseAdmin
-			.from('user_profiles')
-			.select('google_id, facebook_id')
-			.eq('id', user.id)
-			.single();
-
-		if (profileError) {
-			logger.error('Failed to fetch user profile', {
-				userId: user.id,
-				error: profileError.message,
-			});
-			throw new AppError(500, 'Failed to fetch user profile', 'PROFILE_FETCH_ERROR');
-		}
-
-		const typedProfile = profile as UserProfileRow | null;
-
-		if (
-			typedProfile &&
-			!user.email?.includes('@') &&
-			(typedProfile.google_id || typedProfile.facebook_id)
-		) {
-			throw new AppError(
-				400,
-				'This account uses social login. Please sign in with Google or Facebook.',
-				'OAUTH_ONLY_ACCOUNT'
-			);
-		}
-
+		// An account without a password (Google or Facebook only) also gets a code:
+		// resetting adds email/password sign-in to it (#189).
 		const code = this.generateResetCode();
 		await this.storeResetCode(user.id, code);
 
@@ -186,9 +156,11 @@ export class PasswordResetService {
 			throw new AppError(500, 'Failed to update password', 'PASSWORD_UPDATE_ERROR');
 		}
 
+		// The account now has a password, even if it was Google or Facebook only (#189).
 		const clearData: UserProfileUpdate = {
 			password_reset_code: null,
 			password_reset_code_expires_at: null,
+			has_password: true,
 		};
 
 		const { error: clearError } = await supabaseAdmin
@@ -197,10 +169,13 @@ export class PasswordResetService {
 			.eq('id', user.id);
 
 		if (clearError) {
-			logger.error('Failed to clear reset code', {
+			logger.error('Failed to clear reset code and set has_password', {
 				userId: user.id,
 				error: clearError.message,
 			});
+			// The password is set but has_password would stay false: fail so the client
+			// retries (the code is still stored) instead of leaving the account wrong.
+			throw new AppError(500, 'Failed to update password', 'PASSWORD_UPDATE_ERROR');
 		}
 
 		await this.rateLimiter.reset(attemptsKey);

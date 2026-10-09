@@ -318,6 +318,8 @@ export class UserService {
 						avatar_url: avatarUrlValue,
 						...providerIdField(provider, providerId),
 						email_verified: true,
+						// Signed up with Google or Facebook: no password until one is set (#189).
+						has_password: false,
 					})
 					.select()
 					.single();

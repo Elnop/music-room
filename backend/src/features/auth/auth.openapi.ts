@@ -943,6 +943,7 @@ export const authPaths: OpenAPIV3.PathsObject = {
 			summary: 'Request a password reset code',
 			description: `
         Sends a 6-digit reset code (valid 15 minutes) to the email.
+        An account that signs in only with Google or Facebook gets a code too: resetting adds email/password sign-in to it.
         Each request starts the 60-second resend cooldown reported by GET /api/auth/reset-password/can-resend, even for an email with no account.
         The answer is the same whether the email belongs to an account or not, so it cannot be used to find accounts.
 
@@ -1007,7 +1008,7 @@ export const authPaths: OpenAPIV3.PathsObject = {
 				},
 				'500': {
 					description:
-						'USER_FETCH_ERROR: Supabase Auth users could not be listed. PROFILE_FETCH_ERROR: the profile could not be read. PASSWORD_RESET_STORE_ERROR: the code could not be saved',
+						'USER_FETCH_ERROR: Supabase Auth users could not be listed. PASSWORD_RESET_STORE_ERROR: the code could not be saved',
 					content: {
 						'application/json': {
 							schema: { $ref: '#/components/schemas/ErrorResponse' },
@@ -1033,6 +1034,7 @@ export const authPaths: OpenAPIV3.PathsObject = {
 			summary: 'Reset the password with the emailed code',
 			description: `
         Checks the code sent by POST /api/auth/forgot-password and sets the new password.
+        For an account that had no password (Google or Facebook only), the new password becomes an additional sign-in method.
         The code is single use; the user then signs in with the login endpoint.
 
         **Password rules:** 8 to 100 characters, with at least one uppercase letter, one lowercase letter and one digit.
