@@ -450,7 +450,9 @@ L'accès est revérifié quand il peut se perdre : après le retrait d'un viewer
 
 Les erreurs ont la forme `{ message, code }` : `INVALID_PAYLOAD` (payload invalide), `NOT_AUTHORIZED` (pas le droit de contrôle), `DEVICE_OFFLINE` (`control:action` vers un appareil non connecté).
 
-Quand l'accès peut se perdre, il est revérifié : après le retrait de l'interrupteur (`revokeControl` ; le contrôleur reçoit toujours `permission:changed` avec `canControl: false`), le retrait d'une licence, ou un `unfollowUser` dans un sens ou dans l'autre. Les sockets du contrôleur ne quittent `listening:<ownerId>`, et ne reçoivent plus `listening:status`, que s'il ne lui reste aucun appareil contrôlable. Un échec de cette éviction est seulement loggé et ne fait jamais échouer la requête HTTP.
+Le contrôleur reçoit `permission:changed` (`{ ownerId, targetUserId, canControl }`) quand l'interrupteur change (`grantControl` / `revokeControl`) et quand une licence d'appareil lui est accordée ou retirée ; pour une licence, `canControl` dit s'il lui reste au moins un appareil contrôlable, et l'app recharge alors sa liste d'appareils contrôlables.
+
+Quand l'accès peut se perdre, il est revérifié : après le retrait de l'interrupteur, le retrait d'une licence, ou un `unfollowUser` dans un sens ou dans l'autre. Les sockets du contrôleur ne quittent `listening:<ownerId>`, et ne reçoivent plus `listening:status`, que s'il ne lui reste aucun appareil contrôlable. Un échec de cette éviction est seulement loggé et ne fait jamais échouer la requête HTTP.
 
 ## 🎵 SoundCloud
 

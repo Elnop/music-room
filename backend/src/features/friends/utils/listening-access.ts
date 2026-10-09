@@ -20,3 +20,23 @@ export async function revalidateListeningAccess(
 		logger.error('Failed to revalidate listening access', { error, controllerId, ownerId });
 	}
 }
+
+/**
+ * Tell controllerId that its access to ownerId's devices changed
+ * (`permission:changed`, `canControl` = whether at least one device remains
+ * controllable) and, when none remains, evict it from the owner's listening
+ * room (see realtime.notifyPermissionChange). Lazy import and never throws,
+ * like revalidateListeningAccess.
+ */
+export async function notifyListeningAccessChange(
+	controllerId: string,
+	ownerId: string,
+	canControl: boolean
+): Promise<void> {
+	try {
+		const { realtime } = await import('@/realtime/index.js');
+		await realtime.notifyPermissionChange(controllerId, ownerId, canControl);
+	} catch (error) {
+		logger.error('Failed to notify listening access change', { error, controllerId, ownerId });
+	}
+}

@@ -28,6 +28,12 @@ interface SocketError {
 	code: string;
 }
 
+interface PermissionChanged {
+	ownerId: string;
+	targetUserId: string;
+	canControl: boolean;
+}
+
 interface ControlCommand {
 	action: string;
 	fromUserId: string;
@@ -525,6 +531,45 @@ describe('Listening and control access', () => {
 
 			await new FriendsService().unfollowUser(alice.id, bob.id);
 			expect(await inListeningRoom(bobSocket, alice.id)).toBe(false);
+		});
+
+		it('tells Bob when Alice grants him a license (#183)', async () => {
+			const deviceA = `dev-${randomUUID()}`;
+			await connect(alice, deviceA);
+			const bobSocket = await connect(bob);
+			await setBobSwitch(false);
+
+			const changed = nextEvent<PermissionChanged>(bobSocket, 'permission:changed');
+			await deviceLicenseService.grant(alice.id, deviceA, bob.id);
+			expect(await changed).toEqual({ ownerId: alice.id, targetUserId: bob.id, canControl: true });
+		});
+
+		it('tells Bob when Alice revokes a license, with whether access remains (#183)', async () => {
+			const { deviceA, deviceB, bobSocket } = await bobLicensedOnA();
+			await licenseBob(deviceB);
+
+			let changed = nextEvent<PermissionChanged>(bobSocket, 'permission:changed');
+			await deviceLicenseService.revoke(alice.id, deviceA, bob.id);
+			expect(await changed).toMatchObject({ ownerId: alice.id, canControl: true });
+
+			changed = nextEvent<PermissionChanged>(bobSocket, 'permission:changed');
+			await deviceLicenseService.revoke(alice.id, deviceB, bob.id);
+			expect(await changed).toMatchObject({ ownerId: alice.id, canControl: false });
+		});
+
+		it('tells nobody when a revoke removes no license (#183)', async () => {
+			const deviceA = `dev-${randomUUID()}`;
+			await connect(alice, deviceA);
+			const [bobSocket, carolSocket] = await Promise.all([connect(bob), connect(carol)]);
+			const bobEvents = record<PermissionChanged>(bobSocket, 'permission:changed');
+			const carolEvents = record<PermissionChanged>(carolSocket, 'permission:changed');
+
+			await deviceLicenseService.revoke(alice.id, deviceA, bob.id);
+			await deviceLicenseService.revoke(alice.id, deviceA, carol.id);
+			await new Promise(resolve => setTimeout(resolve, 300));
+
+			expect(bobEvents).toEqual([]);
+			expect(carolEvents).toEqual([]);
 		});
 
 		it('keeps Bob subscribed when the switch is cut but a license remains', async () => {
