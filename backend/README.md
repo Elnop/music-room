@@ -164,6 +164,8 @@ RATE_LIMIT_OAUTH_WINDOW_MS=900000
 RATE_LIMIT_OAUTH_MAX=10
 RATE_LIMIT_AUTH_WINDOW_MS=900000
 RATE_LIMIT_AUTH_MAX=20
+RATE_LIMIT_TOKEN_WINDOW_MS=900000     # échecs de vérification de token par IP
+RATE_LIMIT_TOKEN_MAX=20
 
 # Account Lockout (brute-force.service.ts)
 ACCOUNT_LOCKOUT_ENABLED=true
@@ -191,6 +193,7 @@ RATE_LIMIT_WHITELIST_IPS=
 - `src/shared/config/rate-limit.config.ts` - Configuration centralisée
 - `src/features/auth/middleware/rate-limit.middleware.ts` - Middlewares rate limiting
 - `src/features/auth/middleware/account-lockout.middleware.ts` - Vérification lockout
+- `src/features/auth/utils/token-verify-limiter.ts` - Limite des échecs de vérification de token par IP
 - `src/features/auth/services/brute-force.service.ts` - Logique métier protection
 
 #### Clés Redis utilisées
@@ -202,6 +205,7 @@ rl:auth:login:{email}:{ip}       # Compteur login
 rl:auth:register:{ip}            # Compteur register
 rl:auth:oauth:{provider}:{ip}    # Compteur OAuth
 rl:auth:global:{ip}              # Compteur global
+rl:auth:token:{ip}               # Échecs de vérification de token (TTL = fenêtre)
 ```
 
 **Brute Force Protection:**
@@ -394,6 +398,10 @@ Montés dans `src/shared/config/routes.ts`, documentés dans Swagger (`/api-docs
 | `/api/soundcloud` | search, track, stream |
 | `/health` | santé du serveur et de Redis (sans auth) |
 
+**Limite des tokens invalides (#160)** : chaque route protégée (`authMiddleware`) et chaque handshake Socket.io vérifie le token auprès de Supabase. Les échecs (`INVALID_TOKEN`, `TOKEN_REVOKED`) sont comptés par IP dans Redis (`rl:auth:token:{ip}`, fenêtre fixe `RATE_LIMIT_TOKEN_WINDOW_MS`, 15 min par défaut). À `RATE_LIMIT_TOKEN_MAX` échecs (20 par défaut), l'IP est refusée sans appel à Supabase jusqu'à la fin de la fenêtre, pour tout token, valide ou non : toute route protégée répond alors `429 RATE_LIMIT_EXCEEDED` (avec `retryAfter`), une route à auth optionnelle (`optionalAuthMiddleware`) continue en anonyme, et le handshake est refusé avec `TOO_MANY_ATTEMPTS`. Les vérifications réussies ne sont jamais comptées. Même interrupteur et même whitelist que les autres limiteurs (`RATE_LIMIT_ENABLED`, `RATE_LIMIT_WHITELIST_IPS`) ; Redis non prêt : la limite ne bloque ni ne compte, et `verifyToken` répond déjà 503. Chaque vérification réserve un créneau avant d'appeler Supabase (rendu en cas de succès ou d'échec non compté) : au-delà de `RATE_LIMIT_TOKEN_MAX` vérifications simultanées depuis une IP, les suivantes reçoivent un 429 passager.
+
+**IP partagée** : cette limite couvre toutes les routes protégées et la socket, par IP. Derrière une IP partagée (tunnel ngrok, reverse proxy sans `trust proxy`, NAT d'un réseau commun), les échecs d'un seul client bloquent tous les clients de cette IP, routes protégées et socket comprises, jusqu'à la fin de la fenêtre. Ajouter l'IP à `RATE_LIMIT_WHITELIST_IPS` ou configurer `trust proxy` si besoin.
+
 ## ⚡ Temps réel (Socket.io)
 
 Serveur : `src/realtime/index.ts`.
@@ -411,7 +419,7 @@ Toute connexion est authentifiée au handshake par `src/realtime/socket-auth.ts`
 | `model` | modèle de l'appareil |
 | `appVersion` | version de l'app |
 
-Refus : `connect_error` dont le `message` vaut `NO_TOKEN` (pas de `token`), `INVALID_HANDSHAKE` (champ manquant ou pas une chaîne), `INVALID_TOKEN` (token invalide ou expiré) ou `DEVICE_REGISTRATION_FAILED` (l'appareil n'a pas pu être enregistré ; Socket.io ne relance pas un refus, c'est le client qui réessaie). Accepté : l'appareil est enregistré dans `devices` avant l'acceptation (une ligne par utilisateur et `deviceId`, `last_seen_at` rafraîchi) et `socket.data` contient `{ userId, email, device, appVersion }`, l'identité venant uniquement du token ; l'appareil est enregistré pour le contrôle et la socket rejoint `user:<id>`. Le token n'est vérifié qu'à la connexion. `listening:update` prend l'appareil du handshake, jamais celui du payload.
+Refus : `connect_error` dont le `message` vaut `NO_TOKEN` (pas de `token`), `INVALID_HANDSHAKE` (champ manquant ou pas une chaîne), `INVALID_TOKEN` (token invalide ou expiré), `TOO_MANY_ATTEMPTS` (trop d'échecs de vérification de token depuis cette IP, voir la limite des tokens invalides ci-dessus ; rafraîchir le token n'y change rien) ou `DEVICE_REGISTRATION_FAILED` (l'appareil n'a pas pu être enregistré ; Socket.io ne relance pas un refus, c'est le client qui réessaie). Accepté : l'appareil est enregistré dans `devices` avant l'acceptation (une ligne par utilisateur et `deviceId`, `last_seen_at` rafraîchi) et `socket.data` contient `{ userId, email, device, appVersion }`, l'identité venant uniquement du token ; l'appareil est enregistré pour le contrôle et la socket rejoint `user:<id>`. Le token n'est vérifié qu'à la connexion. `listening:update` prend l'appareil du handshake, jamais celui du payload.
 
 ### Events
 

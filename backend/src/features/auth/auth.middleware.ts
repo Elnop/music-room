@@ -3,8 +3,18 @@ import { AuthService } from '@/features/auth/auth.service.js';
 import type { AuthenticatedRequest } from '@/shared/types/global.types.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
+import {
+	TokenVerifyLimitError,
+	verifyTokenLimited,
+} from '@/features/auth/utils/token-verify-limiter.js';
 
 const authService = new AuthService();
+const verify = (token: string) => authService.verifyToken(token);
+
+// Same client IP as the rate limiters (rate-limit.middleware.ts).
+function clientIp(req: Request): string {
+	return req.ip || req.socket?.remoteAddress || 'unknown';
+}
 
 /**
  * Authentication middleware
@@ -55,14 +65,28 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
 			});
 		}
 
-		// Verify token with Supabase
-		const user = await authService.verifyToken(token);
+		// Verify token with Supabase, unless this IP failed too often (429)
+		const user = await verifyTokenLimited(token, clientIp(req), verify);
 
 		// Attach user to request
 		(req as AuthenticatedRequest).user = user;
 
 		next();
 	} catch (error: unknown) {
+		if (error instanceof TokenVerifyLimitError) {
+			return res.status(429).json({
+				success: false,
+				error: {
+					message: error.message,
+					code: error.code,
+					retryAfter: new Date(Date.now() + error.retryAfterMs).toISOString(),
+				},
+				meta: {
+					timestamp: new Date().toISOString(),
+				},
+			});
+		}
+
 		const err = error as Error & { code?: string };
 		// Keep an AppError's status (503 REVOCATION_UNAVAILABLE); anything else is 401.
 		const status = error instanceof AppError ? error.statusCode : 401;
@@ -99,7 +123,8 @@ export async function optionalAuthMiddleware(req: Request, res: Response, next: 
 			return next();
 		}
 
-		const user = await authService.verifyToken(token);
+		// A blocked IP continues anonymously, without calling Supabase.
+		const user = await verifyTokenLimited(token, clientIp(req), verify);
 		(req as AuthenticatedRequest).user = user;
 
 		next();

@@ -4,7 +4,12 @@ import type { AddressInfo } from 'node:net';
 import { io as ioClient, type Socket as ClientSocket } from 'socket.io-client';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { supabaseAdmin, supabaseAnon } from '@/shared/config/supabase.js';
-import { connectRedis, disconnectRedis, isRedisConnected } from '@/shared/config/redis.js';
+import {
+	connectRedis,
+	disconnectRedis,
+	isRedisConnected,
+	redisClient,
+} from '@/shared/config/redis.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { UserListeningStatus } from '@/features/music-control/music-control.types.js';
 import { realtime } from '@/realtime/index.js';
@@ -124,6 +129,10 @@ describe('Socket.io handshake authentication', () => {
 		// verifyToken checks the logout denylist and fails closed without Redis.
 		await connectRedis();
 		if (!isRedisConnected()) throw new Error('Redis from scripts/test-db.sh is not reachable');
+		// Invalid-token handshakes below count against 127.0.0.1 (#160): start
+		// from a clean counter so repeated runs never reach the limit.
+		const tokenKeys = await redisClient.keys('rl:auth:token:*');
+		if (tokenKeys.length > 0) await redisClient.del(...tokenKeys);
 
 		alice = await createUser();
 		bob = await createUser();

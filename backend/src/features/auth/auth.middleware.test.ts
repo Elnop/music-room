@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { authMiddleware } from '@/features/auth/auth.middleware.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
+import { TokenVerifyLimitError } from '@/features/auth/utils/token-verify-limiter.js';
 
 const { verifyToken } = vi.hoisted(() => ({ verifyToken: vi.fn() }));
 
@@ -72,6 +73,19 @@ describe('authMiddleware', () => {
 
 		expect(res.statusCode).toBe(401);
 		expect(res.body).toMatchObject({ error: { code: 'TOKEN_REVOKED' } });
+	});
+
+	it('answers 429 RATE_LIMIT_EXCEEDED with retryAfter when the IP is blocked', async () => {
+		verifyToken.mockRejectedValue(new TokenVerifyLimitError(60_000));
+
+		const before = Date.now();
+		const { res, next } = await run();
+
+		expect(res.statusCode).toBe(429);
+		expect(res.body).toMatchObject({ success: false, error: { code: 'RATE_LIMIT_EXCEEDED' } });
+		const { retryAfter } = (res.body as { error: { retryAfter: string } }).error;
+		expect(new Date(retryAfter).getTime()).toBeGreaterThanOrEqual(before + 60_000);
+		expect(next).not.toHaveBeenCalled();
 	});
 
 	it('answers 401 for an error that is not an AppError', async () => {
