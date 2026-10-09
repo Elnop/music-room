@@ -53,7 +53,7 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 );
 
 jest.mock('@store/authStore', () => ({
-	useAuthStore: { getState: () => mockAuthState },
+	useAuthStore: { getState: () => mockAuthState, subscribe: jest.fn() },
 }));
 
 jest.mock('@/services/deviceService', () => ({

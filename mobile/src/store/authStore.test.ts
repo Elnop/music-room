@@ -1,5 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import type { Socket } from 'socket.io-client';
 import { useAuthStore } from '@store/authStore';
+import { useSocketStore } from '@store/socketStore';
 import { resetBackendUrl } from '@/services/backendUrl';
 
 const mockSupabaseAuth = {
@@ -28,6 +30,17 @@ jest.mock('@services/oauth', () => ({
 jest.mock('@/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
+
+jest.mock('socket.io-client', () => ({ io: jest.fn() }));
+
+const socketDisconnect = jest.fn();
+
+function withOpenSocket(): void {
+	useSocketStore.setState({
+		socket: { disconnect: socketDisconnect } as unknown as Socket,
+		isConnected: true,
+	});
+}
 
 const fetchMock = jest.fn();
 
@@ -84,6 +97,8 @@ afterEach(() => {
 
 describe('refreshAccessToken', () => {
 	it('ends the session locally when the refresh token is refused (401)', async () => {
+		socketDisconnect.mockReset();
+		withOpenSocket();
 		fetchMock.mockResolvedValue(
 			jsonResponse(401, {
 				success: false,
@@ -107,6 +122,7 @@ describe('refreshAccessToken', () => {
 		expect(calledUrls()).toHaveLength(1);
 		expect(calledUrls()[0]).toMatch(/\/api\/auth\/refresh$/);
 		expect(calledUrls().some(url => url.endsWith('/api/auth/logout'))).toBe(false);
+		expect(socketDisconnect).toHaveBeenCalledTimes(1);
 	});
 
 	it('keeps the session when the auth service is unavailable (503)', async () => {
@@ -189,5 +205,61 @@ describe('refreshAccessToken', () => {
 			access_token: 'new-access',
 			refresh_token: 'new-refresh',
 		});
+	});
+});
+
+describe('logout', () => {
+	beforeEach(() => {
+		// A valid token: apiRequest would refresh an expiring one first.
+		useAuthStore.setState({ tokenExpiresAt: Date.now() + 3_600_000 });
+		socketDisconnect.mockReset();
+		withOpenSocket();
+	});
+
+	async function expectSignedOut(): Promise<void> {
+		expect(useAuthStore.getState()).toMatchObject({
+			user: null,
+			accessToken: null,
+			refreshToken: null,
+			tokenExpiresAt: null,
+			isAuthenticated: false,
+			isLoading: false,
+			error: null,
+		});
+		expect(await AsyncStorage.getItem('@zumik/access_token')).toBeNull();
+		expect(await AsyncStorage.getItem('@zumik/refresh_token')).toBeNull();
+		expect(await AsyncStorage.getItem('@zumik/is_authenticated')).toBeNull();
+		expect(mockSupabaseAuth.signOut).toHaveBeenCalledWith({ scope: 'local' });
+		expect(socketDisconnect).toHaveBeenCalledTimes(1);
+		expect(useSocketStore.getState()).toMatchObject({ socket: null, isConnected: false });
+	}
+
+	it('revokes the session on the backend, disconnects the socket and clears the session', async () => {
+		fetchMock.mockResolvedValue(jsonResponse(200, { success: true, data: {} }));
+
+		await useAuthStore.getState().logout();
+
+		expect(calledUrls()).toHaveLength(1);
+		expect(calledUrls()[0]).toMatch(/\/api\/auth\/logout$/);
+		const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+		expect((init.headers as Record<string, string>).Authorization).toBe('Bearer old-access');
+		await expectSignedOut();
+	});
+
+	it('still ends the session when the backend logout fails', async () => {
+		fetchMock.mockRejectedValue(new TypeError('Network request failed'));
+
+		await useAuthStore.getState().logout();
+
+		await expectSignedOut();
+	});
+
+	it('still ends the session when the Supabase sign-out throws', async () => {
+		fetchMock.mockResolvedValue(jsonResponse(200, { success: true, data: {} }));
+		mockSupabaseAuth.signOut.mockRejectedValue(new Error('storage unavailable'));
+
+		await useAuthStore.getState().logout();
+
+		await expectSignedOut();
 	});
 });
