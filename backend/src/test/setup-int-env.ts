@@ -29,6 +29,9 @@ const placeholders: Record<string, string> = {
 	NODE_ENV: 'test',
 	GMAIL_USER: 'test@example.com',
 	GMAIL_APP_PASSWORD: 'test-app-password',
+	GOOGLE_CLIENT_ID: 'test-google-client-id.apps.googleusercontent.com',
+	FACEBOOK_APP_ID: 'test-facebook-app-id',
+	FACEBOOK_APP_SECRET: 'test-facebook-app-secret',
 };
 
 for (const [key, value] of Object.entries(placeholders)) {
