@@ -87,10 +87,10 @@ export class EmailVerificationService {
 			throw new AppError(404, 'User not found', 'USER_NOT_FOUND');
 		}
 
-		// Already verified
+		// Already verified: refuse, so a session is never minted without a valid code (#188)
 		if (profile.email_verified) {
-			logger.info('User already verified', { userId });
-			return true;
+			logger.warn('Verification attempt on an already verified account', { userId, ip });
+			throw new AppError(400, 'Email already verified', 'ALREADY_VERIFIED');
 		}
 
 		// No code stored
