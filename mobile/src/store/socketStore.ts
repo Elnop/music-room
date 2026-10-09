@@ -11,6 +11,16 @@ import { deviceService, getAppVersion } from '@/services/deviceService';
 const NO_TOKEN = 'NO_TOKEN';
 const INVALID_HANDSHAKE = 'INVALID_HANDSHAKE';
 const INVALID_TOKEN = 'INVALID_TOKEN';
+const DEVICE_REGISTRATION_FAILED = 'DEVICE_REGISTRATION_FAILED';
+
+const HANDSHAKE_CODES = [NO_TOKEN, INVALID_HANDSHAKE, INVALID_TOKEN, DEVICE_REGISTRATION_FAILED];
+
+/**
+ * DEVICE_REGISTRATION_FAILED is a transient server error, but Socket.io never
+ * retries a middleware refusal: retry it ourselves, a bounded number of times.
+ */
+export const DEVICE_RETRY_DELAY_MS = 5000;
+export const DEVICE_RETRY_MAX = 3;
 
 /**
  * Builds the Socket.io handshake `auth` payload. Called on every connection
@@ -87,8 +97,10 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 			},
 		});
 
-		// One token refresh per handshake refusal; reset once a connection succeeds.
+		// One token refresh per handshake refusal and at most DEVICE_RETRY_MAX
+		// device registration retries; both reset once a connection succeeds.
 		let hasRefreshed = false;
+		let deviceRetries = 0;
 
 		const stop = () => {
 			if (get().socket === socket) get().disconnect();
@@ -96,6 +108,19 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 		};
 
 		const handleRefusal = async (code: string) => {
+			if (code === DEVICE_REGISTRATION_FAILED && deviceRetries < DEVICE_RETRY_MAX) {
+				deviceRetries += 1;
+				if (__DEV__) {
+					console.log(
+						`[Socket] Device registration failed, retry ${deviceRetries}/${DEVICE_RETRY_MAX} in ${DEVICE_RETRY_DELAY_MS} ms`
+					);
+				}
+				setTimeout(() => {
+					if (get().socket !== socket || socket.connected) return;
+					socket.connect();
+				}, DEVICE_RETRY_DELAY_MS);
+				return;
+			}
 			if (code === INVALID_TOKEN && !hasRefreshed) {
 				hasRefreshed = true;
 				if (__DEV__) console.log('[Socket] Token refused, refreshing it once');
@@ -116,6 +141,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 		socket.on('connect', () => {
 			if (__DEV__) console.log('[Socket] ✅ Connected successfully:', socket.id);
 			hasRefreshed = false;
+			deviceRetries = 0;
 			set({ isConnected: true });
 		});
 
@@ -126,11 +152,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 
 		socket.on('connect_error', error => {
 			console.error('[Socket] ❌ Connection error:', error.message);
-			if (
-				error.message === NO_TOKEN ||
-				error.message === INVALID_HANDSHAKE ||
-				error.message === INVALID_TOKEN
-			) {
+			if (HANDSHAKE_CODES.includes(error.message)) {
 				void handleRefusal(error.message);
 				return;
 			}

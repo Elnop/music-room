@@ -2,6 +2,7 @@ import type { DefaultEventsMap, ExtendedError, Server, Socket } from 'socket.io'
 import { z } from 'zod';
 import { SessionService } from '@/features/auth/services/session.service.js';
 import type { DeviceInfo } from '@/features/music-control/music-control.types.js';
+import { DeviceService } from '@/features/music-control/services/device.service.js';
 import { socketLogger } from '@/shared/middleware/socket-logger.middleware.js';
 
 /**
@@ -22,8 +23,12 @@ import { socketLogger } from '@/shared/middleware/socket-logger.middleware.js';
  *   NO_TOKEN           `auth` is empty or has no `token`
  *   INVALID_HANDSHAKE  a field is missing or not a string
  *   INVALID_TOKEN      the token is invalid or expired
+ *   DEVICE_REGISTRATION_FAILED  the device could not be recorded in `devices`;
+ *                      Socket.io does not retry a refusal, so the client retries
  *
- * On success `socket.data` holds `{ userId, email, device, appVersion }`. The
+ * On success the device is recorded in `devices` (one row per user and
+ * deviceId, `last_seen_at` refreshed) before the connection is accepted, and
+ * `socket.data` holds `{ userId, email, device, appVersion }`. The
  * identity comes only from the verified token: any `userId` sent by the client
  * is ignored. The token is checked once, at the handshake.
  */
@@ -46,7 +51,8 @@ export interface SocketData {
 	appVersion: string;
 }
 
-export type SocketAuthErrorCode = 'NO_TOKEN' | 'INVALID_HANDSHAKE' | 'INVALID_TOKEN';
+export type SocketAuthErrorCode =
+	'NO_TOKEN' | 'INVALID_HANDSHAKE' | 'INVALID_TOKEN' | 'DEVICE_REGISTRATION_FAILED';
 
 export type AppSocketServer = Server<
 	DefaultEventsMap,
@@ -57,6 +63,7 @@ export type AppSocketServer = Server<
 export type AppSocket = Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, SocketData>;
 
 const sessionService = new SessionService();
+const deviceService = new DeviceService();
 
 function refuse(
 	socket: AppSocket,
@@ -104,10 +111,19 @@ export async function authenticateSocket(
 		return;
 	}
 
+	const device: DeviceInfo = { deviceId, deviceName, platform, model };
+	try {
+		await deviceService.recordConnection(user.id, device);
+	} catch {
+		// DeviceService has already logged the database error.
+		refuse(socket, next, 'DEVICE_REGISTRATION_FAILED');
+		return;
+	}
+
 	socket.data = {
 		userId: user.id,
 		email: user.email,
-		device: { deviceId, deviceName, platform, model },
+		device,
 		appVersion,
 	};
 
