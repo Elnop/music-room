@@ -23,6 +23,3 @@
 - source_plan: `_bmad-output/initiative-validation-mandatory/epic-api-mobile/story-adresse-du-backend-modifiable-dans-l-app-mobile-plan.md`
   summary: Move `friendsApi`, `profileApi`, `privacyApi` and `musicControlApi` onto the exported `apiRequest` (`mobile/src/services/api.ts`) so they send the `X-Platform` / `X-Device-Model` / `X-App-Version` headers (IV.6) and get the token refresh; #96 only switched their URL source to `getBackendUrl()`.
   evidence: each still builds its own `fetch` (friendsApi.ts, profileApi.ts, privacyApi.ts local `apiRequest`; musicControlApi.ts inline `fetch` with a manual token).
-- source_plan: `_bmad-output/initiative-validation-mandatory/epic-api-mobile/story-adresse-du-backend-modifiable-dans-l-app-mobile-plan.md`
-  summary: `playlistApi.reorderTracks` calls `PUT /api/playlists/:id/tracks/reorder`, which the backend no longer exposes (moves go through `POST /:id/tracks/:trackId/move` since #88); fix or remove it with `playlistStore.reorderTracks`.
-  evidence: `backend/src/features/playlists/playlist.routes.ts` has no `reorder` route; pre-existing, found while moving playlistApi onto `apiRequest` in #96.

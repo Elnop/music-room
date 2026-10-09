@@ -21,7 +21,7 @@ Each `playlist_tracks` row carries a `rank`: a text key compared byte by byte (`
 - `UNIQUE (playlist_id, rank)` and `UNIQUE (playlist_id, track_id)` guard the invariants: a track appears once, and two tracks never share a place.
 - The old integer `position` column and its renumbering go away. The API still returns tracks in order; a client that needs an index derives it from the order.
 
-**Rebalancing.** Moving tracks again and again into the same gap makes keys longer (Jira's LexoRank, the same idea at a much larger scale, rebalances past 128 characters). When a key generated for a playlist exceeds a length threshold, the operation that produced it respaces every rank of that playlist evenly within the same transaction and bumps the version like any other change. The threshold is set and measured in #88. The add or move result and its `playlist:updated` event carry `rebalanced: true`, and `playlists.ranks_rebalanced_at_version` records the version of the last rebalance.
+**Rebalancing.** Moving tracks again and again into the same gap makes keys longer (Jira's LexoRank, the same idea at a much larger scale, rebalances past 128 characters). When a key generated for a playlist exceeds a length threshold, the operation that produced it respaces every rank of that playlist evenly within the same transaction and bumps the version like any other change. The threshold is `rank_max_length() = 64` characters (`backend/migrations/016_playlist_track_ranks.sql`), reached after about 320 moves into the same gap. The add or move result and its `playlist:updated` event carry `rebalanced: true`, and `playlists.ranks_rebalanced_at_version` records the version of the last rebalance.
 
 **A client holding old ranks.** After a rebalance, every rank a client displayed from before it is meaningless. A move whose `expectedVersion` is older than `ranks_rebalanced_at_version` is therefore refused with `409 PLAYLIST_REBALANCED`, since its `afterRank` points into the old key space; the client reloads the playlist and the user drops the track again. A client that receives `rebalanced: true` reloads before its next move.
 
@@ -44,9 +44,9 @@ Under READ COMMITTED, this makes the writers of one playlist go one at a time: t
 
 | Operation | Request | Server, under the lock | Refusals |
 |---|---|---|---|
-| **Add** | `{ track }` | `rank = rank_between(last rank, NULL)`; `added_by` set; version + 1 | `409 TRACK_DUPLICATE` if the track is already in the playlist |
-| **Remove** | `trackId` | delete the row; version + 1 | `404 TRACK_NOT_IN_PLAYLIST` |
-| **Move** | `{ trackId, afterRank, expectedVersion }` | see below | `409 TRACK_NOT_IN_PLAYLIST`, `409 TRACK_MOVED_CONCURRENTLY`, `409 PLAYLIST_REBALANCED` |
+| **Add** | `POST /api/playlists/:id/tracks` `{ track }` | `rank = rank_between(last rank, NULL)`; `added_by` set; version + 1 | `409 TRACK_DUPLICATE` if the track is already in the playlist |
+| **Remove** | `DELETE /api/playlists/:id/tracks/:trackId` | delete the row; version + 1 | `404 TRACK_NOT_IN_PLAYLIST` |
+| **Move** | `POST /api/playlists/:id/tracks/:trackId/move` `{ afterRank, expectedVersion }` | see below | `409 TRACK_NOT_IN_PLAYLIST`, `409 TRACK_MOVED_CONCURRENTLY`, `409 PLAYLIST_REBALANCED` |
 
 Add and remove are never refused because of concurrency: two adds append one after the other, a remove does not disturb any other row.
 
@@ -89,13 +89,28 @@ A client:
 
 All clients therefore end on the server's order. The HTTP contract (move endpoint, add and remove results, `tracksVersion` on the fetch, `rank` on each track) is in `backend/src/features/playlists/playlist.openapi.ts`.
 
-**Moves from one client go one at a time.** A user who drags twice quickly would otherwise send the second move with the version from before the first, and get a `409` against themselves. The mobile store sends a move only after the previous one answered, using the version from that answer.
+**Moves from one client go one at a time.** A user who taps twice quickly would otherwise send the second move with the version from before the first, and get a `409` against themselves. The mobile store (`mobile/src/store/playlistStore.ts`, `moveTrack`) queues moves: each is sent only after the previous one answered, with the version from that answer. The playlist screen moves a track one row with up / down buttons, shown to users who can edit and disabled at the list edges and while a move is pending; `afterRank` is the rank of the track two rows above (`null` for the second row) to go up, or of the next track to go down (`mobile/src/store/moveTarget.ts`).
 
-**On a `409`**, the mobile store reloads the playlist and tells the user that the track was changed by someone else (#91).
+**Own operations.** The answer to an add, remove or move carries the new `tracksVersion`; the store applies it like an event, so the echo of that operation on the socket arrives with a version already displayed and is ignored. The store never reorders before the answer: the order changes when the answer or the event arrives. Only a remove hides the track at once, and a reload brings it back if the remove fails.
+
+**On a `409`** (`TRACK_MOVED_CONCURRENTLY`, `TRACK_NOT_IN_PLAYLIST` or `PLAYLIST_REBALANCED`), the mobile store reloads the playlist and the screen tells the user "This track was changed by someone else".
+
+The pure rules (sort by rank, apply an event → new playlist, ignore or reload) are in `mobile/src/store/playlistSync.ts`; `mobile/src/hooks/usePlaylistSocket.ts` passes each event to the store and reloads when it answers `reload`.
 
 ## Tests
 
 Concurrency is tested on the integration Postgres (story 1.10, see `doc/TESTING.md`), with separate connections running operations at the same time. Every test checks the invariants: each track appears once, ranks are unique, `added_by` is unchanged by moves, and the final order is the same for every client. Cases: concurrent moves of different tracks (all apply), concurrent moves of the same track (one applies, the others get `409`), moves concurrent with adds and removes, and a long run of moves into one gap (rebalancing).
+
+| File | Covers |
+|---|---|
+| `backend/src/features/playlists/services/track-ranks.int.test.ts` | `rank_between` and rank ordering |
+| `backend/src/features/playlists/services/track-operations.int.test.ts` | add, remove, move, concurrency, rebalancing |
+| `backend/src/realtime/playlist-updated.int.test.ts` | the `playlist:updated` deltas |
+| `mobile/src/store/playlistSync.test.ts` | sort by rank, event application (apply, ignore, reload) |
+| `mobile/src/store/moveTarget.test.ts` | `afterRank` for up / down and the list edges |
+| `mobile/src/store/playlistStore.test.ts` | move queue, `409` reload and message, events, loading, CRUD, add and remove |
+| `mobile/src/hooks/usePlaylistSocket.test.ts` | events through the store, reload |
+| `mobile/src/api/playlistApi.test.ts` | move request, collaborators and viewers |
 
 ## Alternatives not chosen
 

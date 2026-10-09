@@ -1,10 +1,32 @@
 import { create } from 'zustand';
-import type { Playlist } from '@/types/playlist.types';
-import type { PlaylistWithTracks } from '@/types/playlist.types';
+import type { Playlist, PlaylistUpdatedEvent, PlaylistWithTracks } from '@/types/playlist.types';
 import type { Track } from '@/types/track.types';
-import type { TrackInPlaylist } from '@/types/track.types';
 import type { PlaylistInput } from '@utils/validators';
 import { playlistApi } from '@api/playlistApi';
+import { ApiError } from '@/services/api';
+import { applyPlaylistEvent as applyEvent, sortByRank } from '@/store/playlistSync';
+
+/** Refusals of a move that mean the track changed under us: reload and tell the user. */
+export const CONFLICT_CODES = [
+	'TRACK_MOVED_CONCURRENTLY',
+	'TRACK_NOT_IN_PLAYLIST',
+	'PLAYLIST_REBALANCED',
+];
+
+export const CONFLICT_MESSAGE = 'This track was changed by someone else';
+
+// Moves from this client go one at a time: each one is sent with the version the
+// previous one returned, so a quick second move is never refused against ourselves.
+let moveQueue: Promise<unknown> = Promise.resolve();
+
+// Reload the playlist if it is still the one on screen (never switch to it). A failed
+// reload is stored in `error` by fetchPlaylistById and is not rethrown.
+async function reloadQuietly(get: () => PlaylistState, playlistId: string): Promise<void> {
+	if (get().currentPlaylist?.id !== playlistId) return;
+	await get()
+		.fetchPlaylistById(playlistId)
+		.catch(() => undefined);
+}
 
 /**
  * Playlist State Interface
@@ -20,6 +42,10 @@ interface PlaylistState {
 	/** True when refreshing in background (with existing data) */
 	isRefreshing: boolean;
 	error: string | null;
+	/** Moves sent or queued and not answered yet. */
+	pendingMoves: number;
+	/** Set when a move was refused because someone else changed the track. */
+	conflictMessage: string | null;
 
 	// Actions
 	fetchPlaylists: (userId: string) => Promise<void>;
@@ -29,13 +55,21 @@ interface PlaylistState {
 	deletePlaylist: (id: string) => Promise<void>;
 	addTrack: (playlistId: string, track: Track) => Promise<void>;
 	removeTrack: (playlistId: string, trackId: string) => Promise<void>;
-	reorderTracks: (playlistId: string, trackIds: string[]) => Promise<void>;
-
-	addTrackLocally: (playlistId: string, track: TrackInPlaylist) => void;
-	removeTrackLocally: (playlistId: string, trackId: string) => void;
+	/**
+	 * Rejects with the ApiError on a refusal; on a conflict, reloads first.
+	 * Resolves 'skipped' (nothing sent) when the playlist is no longer open.
+	 */
+	moveTrack: (
+		playlistId: string,
+		trackId: string,
+		afterRank: string | null
+	) => Promise<'moved' | 'skipped'>;
+	/** Applies a `playlist:updated` delta to the current playlist; 'reload' asks the caller to refetch. */
+	applyPlaylistEvent: (event: PlaylistUpdatedEvent) => 'applied' | 'ignored' | 'reload';
 
 	// Error handling
 	clearError: () => void;
+	clearConflictMessage: () => void;
 	clearCurrentPlaylist: () => void;
 }
 
@@ -51,6 +85,8 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 	isLoading: false,
 	isRefreshing: false,
 	error: null,
+	pendingMoves: 0,
+	conflictMessage: null,
 
 	/**
 	 * Fetch playlists for the current user
@@ -106,7 +142,13 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 		}
 
 		try {
-			const playlist = await playlistApi.fetchPlaylistById(id);
+			const fetched = await playlistApi.fetchPlaylistById(id);
+			// An event applied while the request was in flight may be newer than the answer.
+			const shown = get().currentPlaylist;
+			const playlist =
+				shown?.id === id && shown.tracksVersion > fetched.tracksVersion
+					? { ...fetched, tracks: shown.tracks, tracksVersion: shown.tracksVersion }
+					: { ...fetched, tracks: sortByRank(fetched.tracks) };
 
 			const newCache = new Map(get().playlistsCache);
 			newCache.set(id, playlist);
@@ -233,7 +275,15 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 		set({ error: null });
 
 		try {
-			await playlistApi.addTrack(playlistId, track);
+			const result = await playlistApi.addTrack(playlistId, track);
+			const outcome = get().applyPlaylistEvent({
+				playlistId,
+				tracksVersion: result.tracksVersion,
+				rebalanced: result.rebalanced,
+				event: 'track_added',
+				track: result.track,
+			});
+			if (outcome === 'reload') await reloadQuietly(get, playlistId);
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : 'Failed to add track';
 			set({ error: errorMessage });
@@ -260,96 +310,84 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 		}
 
 		try {
-			await playlistApi.removeTrack(playlistId, trackId);
-
-			const playlist = await playlistApi.fetchPlaylistById(playlistId);
-			const newCache = new Map(get().playlistsCache);
-			newCache.set(playlistId, playlist);
-
-			if (get().currentPlaylist?.id === playlistId) {
-				set({ currentPlaylist: playlist, playlistsCache: newCache });
-			} else {
-				set({ playlistsCache: newCache });
-			}
+			const result = await playlistApi.removeTrack(playlistId, trackId);
+			// The track is already gone locally: the event only advances the version.
+			const outcome = get().applyPlaylistEvent({
+				playlistId,
+				tracksVersion: result.tracksVersion,
+				rebalanced: false,
+				event: 'track_removed',
+				trackId,
+			});
+			if (outcome === 'reload') await reloadQuietly(get, playlistId);
 		} catch (error) {
+			// Bring the optimistically removed track back from the server.
+			await reloadQuietly(get, playlistId);
 			const errorMessage = error instanceof Error ? error.message : 'Failed to remove track';
 			set({ error: errorMessage });
-			if (currentPlaylist?.id === playlistId) {
-				try {
-					const playlist = await playlistApi.fetchPlaylistById(playlistId);
-					const newCache = new Map(get().playlistsCache);
-					newCache.set(playlistId, playlist);
-					set({ currentPlaylist: playlist, playlistsCache: newCache });
-				} catch {
-					// Ignore cache update errors
-				}
-			}
 			throw error;
 		}
 	},
 
 	/**
-	 * Reorder tracks in playlist
+	 * Move a track right after afterRank (null = top). Queued behind the previous
+	 * move so it carries the version that move returned.
 	 */
-	reorderTracks: async (playlistId: string, trackIds: string[]) => {
-		set({ error: null });
-
-		try {
-			await playlistApi.reorderTracks(playlistId, trackIds);
-
-			const { currentPlaylist } = get();
-			if (currentPlaylist?.id === playlistId) {
-				const playlist = await playlistApi.fetchPlaylistById(playlistId);
-				const newCache = new Map(get().playlistsCache);
-				newCache.set(playlistId, playlist);
-				set({ currentPlaylist: playlist, playlistsCache: newCache });
-			}
-		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : 'Failed to reorder tracks';
-			set({ error: errorMessage });
-			throw error;
-		}
-	},
-
-	/**
-	 * Add track locally (for realtime updates without API call)
-	 */
-	addTrackLocally: (playlistId: string, track: TrackInPlaylist) => {
-		const { currentPlaylist, playlistsCache } = get();
-		if (currentPlaylist?.id === playlistId) {
-			const trackExists = currentPlaylist.tracks.some(t => t.id === track.id);
-			if (!trackExists) {
-				const updatedPlaylist = {
-					...currentPlaylist,
-					tracks: [...currentPlaylist.tracks, track],
-				};
-				const newCache = new Map(playlistsCache);
-				newCache.set(playlistId, updatedPlaylist);
-				set({
-					currentPlaylist: updatedPlaylist,
-					playlistsCache: newCache,
+	moveTrack: (playlistId: string, trackId: string, afterRank: string | null) => {
+		const run = async (): Promise<'moved' | 'skipped'> => {
+			try {
+				const playlist = get().currentPlaylist;
+				if (playlist?.id !== playlistId) return 'skipped';
+				const result = await playlistApi.moveTrack(
+					playlistId,
+					trackId,
+					afterRank,
+					playlist.tracksVersion
+				);
+				const outcome = get().applyPlaylistEvent({
+					playlistId,
+					tracksVersion: result.tracksVersion,
+					rebalanced: result.rebalanced,
+					event: 'track_moved',
+					trackId,
+					rank: result.rank,
 				});
+				if (outcome === 'reload') await reloadQuietly(get, playlistId);
+				return 'moved';
+			} catch (error) {
+				if (error instanceof ApiError && CONFLICT_CODES.includes(error.code)) {
+					await reloadQuietly(get, playlistId);
+					// Only tell the user if they are still looking at this playlist.
+					if (get().currentPlaylist?.id === playlistId) {
+						set({ conflictMessage: CONFLICT_MESSAGE });
+					}
+				} else {
+					set({ error: error instanceof Error ? error.message : 'Failed to move track' });
+				}
+				throw error;
+			} finally {
+				set(state => ({ pendingMoves: state.pendingMoves - 1 }));
 			}
-		}
+		};
+		set(state => ({ pendingMoves: state.pendingMoves + 1 }));
+		const next = moveQueue.then(run, run);
+		moveQueue = next.catch(() => undefined);
+		return next;
 	},
 
 	/**
-	 * Remove track locally (for realtime updates without API call)
+	 * Apply a track event (socket delta or our own HTTP answer) in version order.
 	 */
-	removeTrackLocally: (playlistId: string, trackId: string) => {
+	applyPlaylistEvent: (event: PlaylistUpdatedEvent) => {
 		const { currentPlaylist, playlistsCache } = get();
-		if (currentPlaylist?.id === playlistId) {
-			const updatedPlaylist = {
-				...currentPlaylist,
-				tracks: currentPlaylist.tracks.filter(t => t.id !== trackId),
-			};
-			const newCache = new Map(playlistsCache);
-			newCache.set(playlistId, updatedPlaylist);
-			set({
-				currentPlaylist: updatedPlaylist,
-				playlistsCache: newCache,
-			});
-		}
+		if (currentPlaylist?.id !== event.playlistId) return 'ignored';
+		const next = applyEvent(currentPlaylist, event);
+		if (next === 'ignore') return 'ignored';
+		if (next === 'reload') return 'reload';
+		const newCache = new Map(playlistsCache);
+		newCache.set(next.id, next);
+		set({ currentPlaylist: next, playlistsCache: newCache });
+		return 'applied';
 	},
 
 	/**
@@ -360,9 +398,16 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 	},
 
 	/**
+	 * Clear the conflict message once shown
+	 */
+	clearConflictMessage: () => {
+		set({ conflictMessage: null });
+	},
+
+	/**
 	 * Clear current playlist
 	 */
 	clearCurrentPlaylist: () => {
-		set({ currentPlaylist: null });
+		set({ currentPlaylist: null, conflictMessage: null });
 	},
 }));
