@@ -178,6 +178,7 @@ export const authPaths: OpenAPIV3.PathsObject = {
 						},
 					},
 				},
+				'429': { $ref: '#/components/responses/RateLimitError' },
 				'503': {
 					description:
 						'AUTH_UNAVAILABLE: Supabase Auth is unreachable or failing, so the token was neither accepted nor refused; the client keeps its session and retries later. RATE_LIMIT_UNAVAILABLE: Redis is not ready, so the rate limiter cannot count the request (fails closed).',
@@ -660,6 +661,530 @@ export const authPaths: OpenAPIV3.PathsObject = {
 			},
 		},
 	},
+
+	'/api/auth/verify-email': {
+		post: {
+			tags: ['Authentication'],
+			summary: 'Verify email with the 6-digit code',
+			description: `
+        Checks the 6-digit code sent by email after registration, marks the email as verified and signs the user in.
+        Answers with the same \`user\` and \`session\` as login, plus a \`message\`.
+
+        **Rate limits:**
+        - 5 failed requests per 15 minutes (login limiter; successful requests are not counted). The bucket is keyed on \`login:unknown:<ip>\` because the body has no email, so it is shared with POST /api/auth/refresh
+        - EMAIL_VERIFICATION_MAX_ATTEMPTS checks per user and IP while the code is valid
+      `,
+			operationId: 'verifyEmail',
+			requestBody: {
+				required: true,
+				content: {
+					'application/json': {
+						schema: { $ref: '#/components/schemas/VerifyEmailRequest' },
+						example: {
+							userId: '3f1c2a9e-8b7d-4c6e-9a1f-2b3c4d5e6f70',
+							code: '482915',
+						},
+					},
+				},
+			},
+			responses: {
+				'200': {
+					description: 'Email verified; the user is signed in',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/VerifyEmailResponse' },
+						},
+					},
+				},
+				'400': {
+					description:
+						'VALIDATION_ERROR: userId is not a UUID or code is not 6 digits. NO_CODE_FOUND: no code is stored for this user; request a new one. CODE_EXPIRED: the code is past its lifetime; request a new one. INVALID_CODE: the code does not match',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+							examples: {
+								validation: {
+									value: {
+										success: false,
+										error: {
+											message: 'Validation error',
+											code: 'VALIDATION_ERROR',
+											details: [{ path: 'code', message: 'Verification code must be 6 digits' }],
+										},
+										meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+									},
+								},
+								noCodeFound: {
+									value: {
+										success: false,
+										error: {
+											message: 'No verification code found. Please request a new code.',
+											code: 'NO_CODE_FOUND',
+										},
+										meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+									},
+								},
+								codeExpired: {
+									value: {
+										success: false,
+										error: {
+											message: 'Verification code expired. Please request a new code.',
+											code: 'CODE_EXPIRED',
+										},
+										meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+									},
+								},
+								invalidCode: {
+									value: {
+										success: false,
+										error: { message: 'Invalid verification code', code: 'INVALID_CODE' },
+										meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+									},
+								},
+							},
+						},
+					},
+				},
+				'404': {
+					description:
+						'USER_NOT_FOUND: no profile for this userId. AUTH_USER_NOT_FOUND: the profile exists but Supabase Auth has no matching user',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+							example: {
+								success: false,
+								error: { message: 'User not found', code: 'USER_NOT_FOUND' },
+								meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+							},
+						},
+					},
+				},
+				'429': {
+					description:
+						'RATE_LIMIT_EXCEEDED: the IP passed 5 failed requests per 15 minutes on the login limiter bucket it shares with POST /api/auth/refresh, or this user and IP passed the verification attempt limit',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+							examples: {
+								loginLimiter: {
+									value: {
+										success: false,
+										error: {
+											message: 'Too many login attempts. Please try again later.',
+											code: 'RATE_LIMIT_EXCEEDED',
+										},
+										meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+									},
+								},
+								verificationAttempts: {
+									value: {
+										success: false,
+										error: {
+											message: 'Rate limit exceeded. Please try again in 15 minutes.',
+											code: 'RATE_LIMIT_EXCEEDED',
+										},
+										meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+									},
+								},
+							},
+						},
+					},
+				},
+				'500': {
+					description:
+						'VERIFICATION_ERROR: the code matched but the profile could not be marked as verified. SESSION_GENERATION_FAILED, INVALID_SESSION_RESPONSE, SESSION_CREATION_FAILED: the email is verified but no session could be created; the user can sign in with the login endpoint',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+							example: {
+								success: false,
+								error: { message: 'Failed to create session', code: 'SESSION_CREATION_FAILED' },
+								meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+							},
+						},
+					},
+				},
+				'503': {
+					description:
+						'Redis is not ready. RATE_LIMIT_UNAVAILABLE: the route rate limiter cannot count the request. REDIS_UNAVAILABLE: the verification attempt counter cannot be read',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+						},
+					},
+				},
+			},
+		},
+	},
+
+	'/api/auth/resend-verification': {
+		post: {
+			tags: ['Authentication'],
+			summary: 'Send a new email verification code',
+			description: `
+        Generates a new 6-digit code for the user, replaces the previous one and sends it to \`email\`.
+
+        **Rate limits:**
+        - 3 requests per hour per IP (register limiter, keyed on \`register:<ip>\`: the bucket is shared with POST /api/auth/register)
+        - EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS between two codes for the same user and IP
+        - EMAIL_VERIFICATION_MAX_RESENDS_PER_HOUR codes per hour for the same user and IP
+      `,
+			operationId: 'resendVerification',
+			requestBody: {
+				required: true,
+				content: {
+					'application/json': {
+						schema: { $ref: '#/components/schemas/ResendVerificationRequest' },
+						example: {
+							userId: '3f1c2a9e-8b7d-4c6e-9a1f-2b3c4d5e6f70',
+							email: 'user@example.com',
+						},
+					},
+				},
+			},
+			responses: {
+				'200': {
+					description: 'New code sent',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/AuthMessageResponse' },
+							example: {
+								success: true,
+								data: { message: 'Verification code sent. Please check your email.' },
+								meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+							},
+						},
+					},
+				},
+				'400': {
+					description:
+						'VALIDATION_ERROR: userId is not a UUID or email is invalid. The verification email could not be sent: the code is the mail transport error code (for example EAUTH, ECONNECTION)',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+						},
+					},
+				},
+				'429': {
+					description:
+						'RESEND_COOLDOWN: a code was sent too recently; the message gives the seconds left. RESEND_LIMIT_EXCEEDED: the hourly resend limit for this user and IP is reached. RATE_LIMIT_EXCEEDED: the IP passed the register limiter, whose bucket is shared with POST /api/auth/register',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+							examples: {
+								cooldown: {
+									value: {
+										success: false,
+										error: {
+											message: 'Please wait 42 seconds before requesting a new code',
+											code: 'RESEND_COOLDOWN',
+										},
+										meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+									},
+								},
+								resendLimit: {
+									value: {
+										success: false,
+										error: {
+											message: 'Too many resend attempts. Please try again later.',
+											code: 'RESEND_LIMIT_EXCEEDED',
+										},
+										meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+									},
+								},
+								rateLimit: {
+									value: {
+										success: false,
+										error: {
+											message: 'Too many registration attempts. Please try again later.',
+											code: 'RATE_LIMIT_EXCEEDED',
+										},
+										meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+									},
+								},
+							},
+						},
+					},
+				},
+				'500': {
+					description: 'CODE_STORE_ERROR: the new code could not be saved',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+						},
+					},
+				},
+				'503': {
+					description:
+						'Redis is not ready. RATE_LIMIT_UNAVAILABLE: the route rate limiter cannot count the request. REDIS_UNAVAILABLE: the resend cooldown cannot be checked',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+						},
+					},
+				},
+			},
+		},
+	},
+
+	'/api/auth/forgot-password': {
+		post: {
+			tags: ['Authentication'],
+			summary: 'Request a password reset code',
+			description: `
+        Sends a 6-digit reset code (valid 15 minutes) to the email.
+        The answer is the same whether the email belongs to an account or not, so it cannot be used to find accounts.
+
+        **Rate limits:**
+        - 20 requests per 15 minutes per IP (global auth limiter)
+        - 3 requests per hour for the same email and IP
+      `,
+			operationId: 'forgotPassword',
+			requestBody: {
+				required: true,
+				content: {
+					'application/json': {
+						schema: { $ref: '#/components/schemas/ForgotPasswordRequest' },
+						example: { email: 'user@example.com' },
+					},
+				},
+			},
+			responses: {
+				'200': {
+					description: 'Request accepted; a code was sent if the email belongs to an account',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/AuthMessageResponse' },
+							example: {
+								success: true,
+								data: { message: 'If this email exists, a reset code has been sent.' },
+								meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+							},
+						},
+					},
+				},
+				'400': {
+					description:
+						'VALIDATION_ERROR: the email is invalid. The reset email could not be sent: the code is the mail transport error code (for example EAUTH, ECONNECTION)',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+							examples: {
+								validation: {
+									value: {
+										success: false,
+										error: {
+											message: 'Validation error',
+											code: 'VALIDATION_ERROR',
+											details: [{ path: 'email', message: 'Invalid email address' }],
+										},
+										meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+									},
+								},
+							},
+						},
+					},
+				},
+				'429': {
+					description:
+						'RATE_LIMIT_EXCEEDED: the IP passed the global auth limiter, or this email and IP passed 3 requests per hour',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+						},
+					},
+				},
+				'500': {
+					description:
+						'USER_FETCH_ERROR: Supabase Auth users could not be listed. PROFILE_FETCH_ERROR: the profile could not be read. PASSWORD_RESET_STORE_ERROR: the code could not be saved',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+						},
+					},
+				},
+				'503': {
+					description:
+						'Redis is not ready. RATE_LIMIT_UNAVAILABLE: the route rate limiter cannot count the request. REDIS_UNAVAILABLE: the per-email request counter cannot be updated',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+						},
+					},
+				},
+			},
+		},
+	},
+
+	'/api/auth/reset-password': {
+		post: {
+			tags: ['Authentication'],
+			summary: 'Reset the password with the emailed code',
+			description: `
+        Checks the code sent by POST /api/auth/forgot-password and sets the new password.
+        The code is single use; the user then signs in with the login endpoint.
+
+        **Password rules:** 8 to 100 characters, with at least one uppercase letter, one lowercase letter and one digit.
+
+        **Rate limits:**
+        - 20 requests per 15 minutes per IP (global auth limiter)
+        - 5 attempts per 15 minutes for the same email and IP
+      `,
+			operationId: 'resetPassword',
+			requestBody: {
+				required: true,
+				content: {
+					'application/json': {
+						schema: { $ref: '#/components/schemas/ResetPasswordRequest' },
+						example: {
+							email: 'user@example.com',
+							code: '739204',
+							newPassword: 'NewSecurePass456',
+						},
+					},
+				},
+			},
+			responses: {
+				'200': {
+					description: 'Password changed',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/AuthMessageResponse' },
+							example: {
+								success: true,
+								data: {
+									message: 'Password reset successful. You can now log in with your new password.',
+								},
+								meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+							},
+						},
+					},
+				},
+				'400': {
+					description:
+						'VALIDATION_ERROR: invalid email, code not 6 digits, or password breaking the rules. INVALID_RESET_CODE: unknown email, no code stored, or the code does not match. RESET_CODE_EXPIRED: the code is older than 15 minutes; request a new one',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+							examples: {
+								validation: {
+									value: {
+										success: false,
+										error: {
+											message: 'Validation error',
+											code: 'VALIDATION_ERROR',
+											details: [
+												{
+													path: 'newPassword',
+													message: 'Password must contain at least one uppercase letter',
+												},
+											],
+										},
+										meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+									},
+								},
+								invalidCode: {
+									value: {
+										success: false,
+										error: { message: 'Invalid reset code', code: 'INVALID_RESET_CODE' },
+										meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+									},
+								},
+								expiredCode: {
+									value: {
+										success: false,
+										error: { message: 'Reset code has expired', code: 'RESET_CODE_EXPIRED' },
+										meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+									},
+								},
+							},
+						},
+					},
+				},
+				'429': {
+					description:
+						'RATE_LIMIT_EXCEEDED: the IP passed the global auth limiter, or this email and IP passed 5 attempts per 15 minutes',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+						},
+					},
+				},
+				'500': {
+					description:
+						'USER_FETCH_ERROR: Supabase Auth users could not be listed. PASSWORD_UPDATE_ERROR: Supabase Auth refused the new password',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+						},
+					},
+				},
+				'503': {
+					description:
+						'Redis is not ready. RATE_LIMIT_UNAVAILABLE: the route rate limiter cannot count the request. REDIS_UNAVAILABLE: the per-email attempt counter cannot be updated',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+						},
+					},
+				},
+			},
+		},
+	},
+
+	'/api/auth/reset-password/can-resend': {
+		get: {
+			tags: ['Authentication'],
+			summary: 'Check whether a new reset code can be requested',
+			description: `
+        Reports the resend cooldown for this email and IP: \`canResend\` and the \`remainingSeconds\` before a new code can be requested.
+        The cooldown is not recorded yet (tracked in #187), so the endpoint currently always answers \`{ canResend: true, remainingSeconds: 0 }\`.
+
+        **Rate limit:** 20 requests per 15 minutes per IP (global auth limiter)
+      `,
+			operationId: 'canResendResetCode',
+			parameters: [
+				{
+					in: 'query',
+					name: 'email',
+					required: true,
+					schema: { type: 'string' },
+					example: 'user@example.com',
+					description: 'Email the reset code was requested for',
+				},
+			],
+			responses: {
+				'200': {
+					description: 'Cooldown state',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/CanResendResetCodeResponse' },
+							example: {
+								success: true,
+								data: { canResend: true, remainingSeconds: 0 },
+								meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+							},
+						},
+					},
+				},
+				'400': {
+					description: 'EMAIL_REQUIRED: the email query parameter is missing',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+							example: {
+								success: false,
+								error: { message: 'Email is required', code: 'EMAIL_REQUIRED' },
+								meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+							},
+						},
+					},
+				},
+				'429': { $ref: '#/components/responses/RateLimitError' },
+				'503': { $ref: '#/components/responses/RateLimitUnavailable' },
+			},
+		},
+	},
 };
 
 /**
@@ -823,6 +1348,136 @@ export const authSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 										example: 1705318200,
 									},
 								},
+							},
+						},
+					},
+				},
+			},
+		],
+	},
+
+	VerifyEmailRequest: {
+		type: 'object',
+		required: ['userId', 'code'],
+		properties: {
+			userId: {
+				type: 'string',
+				format: 'uuid',
+				description: 'ID of the user returned by POST /api/auth/register',
+			},
+			code: {
+				type: 'string',
+				pattern: '^\\d{6}$',
+				minLength: 6,
+				maxLength: 6,
+				example: '482915',
+				description: '6-digit code received by email',
+			},
+		},
+	},
+
+	VerifyEmailResponse: {
+		allOf: [
+			{ $ref: '#/components/schemas/AuthResponse' },
+			{
+				type: 'object',
+				properties: {
+					data: {
+						type: 'object',
+						properties: {
+							message: { type: 'string', example: 'Email verified successfully' },
+						},
+					},
+				},
+			},
+		],
+	},
+
+	ResendVerificationRequest: {
+		type: 'object',
+		required: ['userId', 'email'],
+		properties: {
+			userId: {
+				type: 'string',
+				format: 'uuid',
+				description: 'ID of the user returned by POST /api/auth/register',
+			},
+			email: {
+				type: 'string',
+				format: 'email',
+				example: 'user@example.com',
+				description: 'Address the new code is sent to',
+			},
+		},
+	},
+
+	ForgotPasswordRequest: {
+		type: 'object',
+		required: ['email'],
+		properties: {
+			email: { type: 'string', format: 'email', example: 'user@example.com' },
+		},
+	},
+
+	ResetPasswordRequest: {
+		type: 'object',
+		required: ['email', 'code', 'newPassword'],
+		properties: {
+			email: { type: 'string', format: 'email', example: 'user@example.com' },
+			code: {
+				type: 'string',
+				pattern: '^\\d{6}$',
+				minLength: 6,
+				maxLength: 6,
+				example: '739204',
+				description: '6-digit code received by email',
+			},
+			newPassword: {
+				type: 'string',
+				format: 'password',
+				minLength: 8,
+				maxLength: 100,
+				example: 'NewSecurePass456',
+				description: 'Must contain uppercase, lowercase, and number',
+			},
+		},
+	},
+
+	AuthMessageResponse: {
+		allOf: [
+			{ $ref: '#/components/schemas/SuccessResponse' },
+			{
+				type: 'object',
+				properties: {
+					data: {
+						type: 'object',
+						required: ['message'],
+						properties: {
+							message: { type: 'string' },
+						},
+					},
+				},
+			},
+		],
+	},
+
+	CanResendResetCodeResponse: {
+		allOf: [
+			{ $ref: '#/components/schemas/SuccessResponse' },
+			{
+				type: 'object',
+				properties: {
+					data: {
+						type: 'object',
+						required: ['canResend', 'remainingSeconds'],
+						properties: {
+							canResend: { type: 'boolean', example: true },
+							remainingSeconds: {
+								type: 'integer',
+								minimum: 0,
+								example: 0,
+								description:
+									'Seconds before a new code can be requested; 0 when canResend is true. Always 0 until the cooldown is recorded (#187)',
 							},
 						},
 					},
