@@ -2,7 +2,7 @@ import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import { FriendsService } from '@/features/friends/services/friends.service.js';
-import { revalidateListeningAccess } from '@/features/friends/utils/listening-access.js';
+import { notifyListeningAccessChange } from '@/features/friends/utils/listening-access.js';
 import { controlAccessService } from '@/features/music-control/services/control-access.service.js';
 import type {
 	ControllableDevicesResponse,
@@ -80,6 +80,8 @@ export class DeviceLicenseService {
 		}
 
 		logger.info('Device license granted', context);
+		// The grantee's open profile of the owner reloads its controllable devices (#183).
+		await notifyListeningAccessChange(granteeId, ownerId, true);
 		return { deviceId, license: { user, grantedAt: license.created_at } };
 	}
 
@@ -90,9 +92,9 @@ export class DeviceLicenseService {
 	async revoke(ownerId: string, deviceId: string, granteeId: string): Promise<void> {
 		await findOwnedDevice(ownerId, deviceId);
 
-		const { error } = await supabaseAdmin
+		const { error, count } = await supabaseAdmin
 			.from('device_control_licenses')
-			.delete()
+			.delete({ count: 'exact' })
 			.eq('owner_id', ownerId)
 			.eq('device_id', deviceId)
 			.eq('grantee_id', granteeId);
@@ -104,9 +106,14 @@ export class DeviceLicenseService {
 			});
 		}
 
+		// Idempotent: nothing to tell anyone when there was no such license.
+		if (!count) return;
+
 		logger.info('Device license revoked', { ownerId, deviceId, granteeId });
-		// The grantee may have lost its last access to the owner's devices.
-		await revalidateListeningAccess(granteeId, ownerId);
+		// Tell the grantee (#183); evicts it from the owner's listening room when it
+		// has lost its last controllable device.
+		const stillAllowed = await controlAccessService.canControlAnyDevice(granteeId, ownerId);
+		await notifyListeningAccessChange(granteeId, ownerId, stillAllowed);
 	}
 
 	/**
