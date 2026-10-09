@@ -1,7 +1,6 @@
 import { create } from 'zustand';
-import type { SoundCloudTrack } from '@/types/soundcloud.types';
-
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
+import type { SoundCloudSearchResult, SoundCloudTrack } from '@/types/soundcloud.types';
+import { apiRequest } from '@/services/api';
 
 interface SoundCloudState {
 	searchResults: SoundCloudTrack[];
@@ -35,23 +34,15 @@ export const useSoundCloudStore = create<SoundCloudState>(set => ({
 				limit: limit.toString(),
 			});
 
-			const response = await fetch(`${API_URL}/api/soundcloud/search?${params.toString()}`);
+			const data = await apiRequest<SoundCloudSearchResult>(
+				`/api/soundcloud/search?${params.toString()}`
+			);
 
-			if (!response.ok) {
-				throw new Error(`Search failed: ${response.statusText}`);
-			}
-
-			const data = await response.json();
-
-			if (data.success && data.data) {
-				set({
-					searchResults: data.data.collection || [],
-					totalResults: data.data.total_results || 0,
-					isSearching: false,
-				});
-			} else {
-				throw new Error(data.error?.message || 'Search failed');
-			}
+			set({
+				searchResults: data.collection || [],
+				totalResults: data.total_results || 0,
+				isSearching: false,
+			});
 		} catch (error) {
 			set({
 				error: error instanceof Error ? error.message : 'Search failed',

@@ -14,6 +14,7 @@ import type { Theme } from '@/themes/types';
 import { usePlaylistStore } from '@/store/playlistStore';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import type { Track } from '@/types/track.types';
+import { ApiError as ApiRequestError } from '@/services/api';
 
 interface Props {
 	visible: boolean;
@@ -32,6 +33,17 @@ interface ApiError {
 }
 
 function parseApiError(error: unknown): string {
+	// ApiError thrown by apiRequest (services/api.ts)
+	if (error instanceof ApiRequestError) {
+		if (error.code === 'TRACK_DUPLICATE') {
+			return 'This track is already in the playlist';
+		}
+		if (error.code === 'PLAYLIST_ACCESS_DENIED') {
+			return "You don't have permission to add tracks to this playlist";
+		}
+		return error.message;
+	}
+
 	// Check if it's a structured API error
 	if (error && typeof error === 'object' && 'error' in error) {
 		const apiError = error as ApiError;

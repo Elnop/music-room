@@ -22,6 +22,7 @@ import debounce from 'lodash/debounce';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import type { Track } from '@/types/track.types';
 import { showError } from '@utils/toast';
+import { ApiError } from '@/services/api';
 
 type NewTrackInput = Omit<Track, 'id'> & { id?: string };
 
@@ -85,8 +86,13 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 	};
 
 	const getErrorMessage = (error: unknown): string => {
-		if (error && typeof error === 'object' && 'error' in error) {
-			const apiError = error as { error?: { code?: string; message?: string } };
+		const isLegacy = !!error && typeof error === 'object' && 'error' in error;
+		if (error instanceof ApiError || isLegacy) {
+			// ApiError from apiRequest, or the raw `{ error: { code, message } }` body
+			const apiError =
+				error instanceof ApiError
+					? { error: { code: error.code, message: error.message } }
+					: (error as { error?: { code?: string; message?: string } });
 			const code = apiError.error?.code;
 
 			switch (code) {

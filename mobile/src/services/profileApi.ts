@@ -1,8 +1,6 @@
 import type { UserProfile, UpdateProfileData, FilteredProfile } from '@/types/user.types';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
-
-if (__DEV__) console.log('[ProfileAPI] Using API URL:', API_URL);
+import { getBackendUrl } from '@/services/backendUrl';
 
 /**
  * Standard API Response format (matches backend)
@@ -43,7 +41,7 @@ async function apiRequest<T>(
 	accessToken: string,
 	options: RequestInit = {}
 ): Promise<T> {
-	const url = `${API_URL}${endpoint}`;
+	const url = `${getBackendUrl()}${endpoint}`;
 
 	try {
 		const response = await fetch(url, {

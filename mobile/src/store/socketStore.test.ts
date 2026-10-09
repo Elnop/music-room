@@ -1,5 +1,6 @@
 import { io } from 'socket.io-client';
 import { DEVICE_RETRY_DELAY_MS, DEVICE_RETRY_MAX, useSocketStore } from '@store/socketStore';
+import { DEFAULT_BACKEND_URL, resetBackendUrl, setBackendUrl } from '@/services/backendUrl';
 
 type Handler = (...args: unknown[]) => void;
 
@@ -47,6 +48,10 @@ const mockAuthState = {
 
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
 
+jest.mock('@react-native-async-storage/async-storage', () =>
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+);
+
 jest.mock('@store/authStore', () => ({
 	useAuthStore: { getState: () => mockAuthState },
 }));
@@ -73,10 +78,12 @@ function readHandshake(): Promise<object> {
 
 const flush = () => new Promise<void>(resolve => setImmediate(resolve));
 
-beforeEach(() => {
-	jest.clearAllMocks();
+beforeEach(async () => {
 	jest.spyOn(console, 'log').mockImplementation(() => undefined);
 	jest.spyOn(console, 'error').mockImplementation(() => undefined);
+	useSocketStore.setState({ socket: null, isConnected: false });
+	await resetBackendUrl();
+	jest.clearAllMocks();
 	mockAuthState.accessToken = 'token-1';
 	mockAuthState.refreshAccessToken.mockResolvedValue(true);
 	socket = createFakeSocket();
@@ -222,5 +229,37 @@ describe('socketStore DEVICE_REGISTRATION_FAILED', () => {
 
 		jest.advanceTimersByTime(DEVICE_RETRY_DELAY_MS);
 		expect(socket.connect).not.toHaveBeenCalled();
+	});
+});
+
+describe('socketStore backend address', () => {
+	const lastUrl = () => ioMock.mock.calls[ioMock.mock.calls.length - 1][0];
+
+	it('connects to the current backend address', () => {
+		expect(lastUrl()).toBe(DEFAULT_BACKEND_URL);
+	});
+
+	it('disconnects and reconnects to the new address when a socket exists', async () => {
+		const oldSocket = socket;
+		const newSocket = createFakeSocket();
+		ioMock.mockReturnValue(newSocket);
+
+		await setBackendUrl('http://192.168.1.20:3000/');
+
+		expect(oldSocket.disconnect).toHaveBeenCalled();
+		expect(ioMock).toHaveBeenCalledTimes(2);
+		expect(lastUrl()).toBe('http://192.168.1.20:3000');
+		expect(useSocketStore.getState().socket).toBe(newSocket);
+	});
+
+	it('only records the address when no socket exists; the next connect uses it', async () => {
+		useSocketStore.getState().disconnect();
+		ioMock.mockClear();
+
+		await setBackendUrl('http://192.168.1.20:3000');
+		expect(ioMock).not.toHaveBeenCalled();
+
+		useSocketStore.getState().connect();
+		expect(lastUrl()).toBe('http://192.168.1.20:3000');
 	});
 });
