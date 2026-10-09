@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ThemeSelector } from '@components/theme/ThemeSelector';
+import { BackendUrlField } from '@components/common/BackendUrlField';
 import type { Theme } from '@themes/types';
 
 export function SettingsScreen() {
@@ -9,10 +10,15 @@ export function SettingsScreen() {
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
 	return (
-		<ScrollView style={styles.container}>
+		<ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
 			<View style={styles.section}>
 				<Text style={styles.sectionTitle}>Appearance</Text>
 				<ThemeSelector />
+			</View>
+
+			<View style={styles.section}>
+				<Text style={styles.sectionTitle}>Server</Text>
+				<BackendUrlField />
 			</View>
 
 			{/* Future section: Account */}

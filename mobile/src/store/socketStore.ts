@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { io, Socket } from 'socket.io-client';
-import { API_CONFIG } from '@constants';
 import { useAuthStore } from '@store/authStore';
 import { deviceService, getAppVersion } from '@/services/deviceService';
+import { getBackendUrl, onBackendUrlChange } from '@/services/backendUrl';
 
 /**
  * Handshake refusal codes sent by the server as the `connect_error` message
@@ -80,7 +80,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 			existingSocket.disconnect();
 		}
 
-		const socketUrl = API_CONFIG.BASE_URL;
+		const socketUrl = getBackendUrl();
 		if (__DEV__) console.log('[Socket] Connecting to:', socketUrl);
 
 		const socket = io(socketUrl, {
@@ -195,3 +195,15 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 		}
 	},
 }));
+
+/**
+ * A backend address change (services/backendUrl.ts) moves a live socket to the
+ * new server; without a socket, the next connect() reads the new address.
+ */
+onBackendUrlChange(() => {
+	const { socket, connect, disconnect } = useSocketStore.getState();
+	if (!socket) return;
+	if (__DEV__) console.log('[Socket] Backend address changed, reconnecting');
+	disconnect();
+	connect();
+});

@@ -4,10 +4,7 @@ import { Platform } from 'react-native';
 import type { LoginInput, RegisterInput } from '@utils/validators';
 import type { UserProfile } from '@/types/user.types';
 import { getAppVersion } from '@/services/deviceService';
-
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
-
-if (__DEV__) console.log('[API] Using API URL:', API_URL);
+import { getBackendUrl } from '@/services/backendUrl';
 
 /**
  * Standard API Response format (matches backend)
@@ -46,12 +43,15 @@ export interface AuthResponse {
 export class ApiError extends Error {
 	code: string;
 	details?: unknown;
+	/** HTTP status when the server answered with an error status */
+	status?: number;
 
-	constructor(message: string, code: string, details?: unknown) {
+	constructor(message: string, code: string, details?: unknown, status?: number) {
 		super(message);
 		this.name = 'ApiError';
 		this.code = code;
 		this.details = details;
+		this.status = status;
 	}
 }
 
@@ -101,10 +101,11 @@ export function registerAuthSession(session: AuthSession): void {
 }
 
 /**
- * Make API request with automatic token refresh on 401
+ * Make API request with automatic token refresh on 401.
+ * The backend address is read at call time (services/backendUrl.ts).
  */
-async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-	const url = `${API_URL}${endpoint}`;
+export async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+	const url = `${getBackendUrl()}${endpoint}`;
 
 	const makeRequest = async (authToken?: string): Promise<Response> => {
 		const headers: Record<string, string> = {
@@ -199,7 +200,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
 				// Ignore text parsing errors
 			}
 		}
-		throw new ApiError(errorMessage, errorCode, errorDetails);
+		throw new ApiError(errorMessage, errorCode, errorDetails, response.status);
 	}
 
 	let data: ApiResponse<T>;

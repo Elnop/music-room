@@ -7,6 +7,7 @@ import { useSocketStore } from '@/store/socketStore';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
 import { supabase } from '@/lib/supabase';
 import { useMusicControlEmitter } from '@hooks/useMusicControl';
+import { loadBackendUrl } from '@/services/backendUrl';
 
 export function RootNavigator() {
 	const isAuthenticated = useAuthStore(state => state.isAuthenticated);
@@ -20,8 +21,10 @@ export function RootNavigator() {
 	useMusicControlEmitter();
 
 	useEffect(() => {
-		// Load auth state from AsyncStorage on app start
-		loadFromStorage()
+		// Load the backend address, then the auth state, from AsyncStorage on app
+		// start; the address must be known before the first request (token refresh)
+		loadBackendUrl()
+			.then(() => loadFromStorage())
 			.then(async () => {
 				// After loading, check if token needs refresh
 				const { isAuthenticated, isTokenExpiringSoon, refreshAccessToken } =

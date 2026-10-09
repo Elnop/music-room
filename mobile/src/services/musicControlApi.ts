@@ -1,4 +1,4 @@
-import { API_CONFIG } from '@constants';
+import { getBackendUrl } from '@/services/backendUrl';
 import type { ApiResponse } from '@/types/api.types';
 import { useAuthStore } from '@/store/authStore';
 
@@ -32,7 +32,7 @@ export const musicControlApi = {
 	 */
 	async getMyPermissions(): Promise<string[]> {
 		const token = await getAuthToken();
-		const response = await fetch(`${API_CONFIG.BASE_URL}/api/music-control/permissions`, {
+		const response = await fetch(`${getBackendUrl()}/api/music-control/permissions`, {
 			headers: {
 				Authorization: `Bearer ${token}`,
 				'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ export const musicControlApi = {
 	 */
 	async grantControl(userId: string): Promise<void> {
 		const token = await getAuthToken();
-		const response = await fetch(`${API_CONFIG.BASE_URL}/api/music-control/permissions/${userId}`, {
+		const response = await fetch(`${getBackendUrl()}/api/music-control/permissions/${userId}`, {
 			method: 'POST',
 			headers: {
 				Authorization: `Bearer ${token}`,
@@ -72,7 +72,7 @@ export const musicControlApi = {
 	 */
 	async revokeControl(userId: string): Promise<void> {
 		const token = await getAuthToken();
-		const response = await fetch(`${API_CONFIG.BASE_URL}/api/music-control/permissions/${userId}`, {
+		const response = await fetch(`${getBackendUrl()}/api/music-control/permissions/${userId}`, {
 			method: 'DELETE',
 			headers: {
 				Authorization: `Bearer ${token}`,
@@ -91,7 +91,7 @@ export const musicControlApi = {
 	 */
 	async canControl(userId: string): Promise<boolean> {
 		const token = await getAuthToken();
-		const response = await fetch(`${API_CONFIG.BASE_URL}/api/music-control/can-control/${userId}`, {
+		const response = await fetch(`${getBackendUrl()}/api/music-control/can-control/${userId}`, {
 			headers: {
 				Authorization: `Bearer ${token}`,
 				'Content-Type': 'application/json',

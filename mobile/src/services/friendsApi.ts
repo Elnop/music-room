@@ -1,4 +1,4 @@
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
+import { getBackendUrl } from '@/services/backendUrl';
 
 export interface FollowStatus {
 	isFollowing: boolean;
@@ -45,7 +45,7 @@ async function apiRequest<T>(
 	accessToken: string,
 	options: RequestInit = {}
 ): Promise<T> {
-	const url = `${API_URL}${endpoint}`;
+	const url = `${getBackendUrl()}${endpoint}`;
 
 	try {
 		const response = await fetch(url, {
