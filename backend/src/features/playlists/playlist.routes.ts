@@ -76,12 +76,12 @@ router.delete('/:id/tracks/:trackId', (req, res, next) =>
 );
 
 /**
- * @route   PUT /api/playlists/:id/tracks/reorder
- * @desc    Reorder tracks in playlist
+ * @route   POST /api/playlists/:id/tracks/:trackId/move
+ * @desc    Move a track right after afterRank (concurrency-safe)
  * @access  Private (owner + collaborators)
  */
-router.put('/:id/tracks/reorder', (req, res, next) =>
-	playlistController.reorderTracks(req, res, next)
+router.post('/:id/tracks/:trackId/move', (req, res, next) =>
+	playlistController.moveTrack(req, res, next)
 );
 
 /**

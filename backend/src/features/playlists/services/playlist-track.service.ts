@@ -1,184 +1,121 @@
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
-import { deleteRecords } from '@/shared/utils/database.helpers.js';
 import { checkEditPermission } from '@/features/playlists/permissions/playlist.permissions.js';
-import { reindexPositions } from '@/features/playlists/utils/playlist.helpers.js';
+import { formatTrackResponse } from '@/features/playlists/utils/playlist.helpers.js';
+import { addTrackRpc, moveTrackRpc, removeTrackRpc } from '@/features/playlists/utils/track-rpc.js';
 import { realtime } from '@/realtime/index.js';
-import type { AddTrackDTO } from '@/features/playlists/playlist.types.js';
+import type {
+	AddTrackDTO,
+	AddTrackResult,
+	MoveTrackResult,
+	RemoveTrackResult,
+	TrackInPlaylistResponse,
+} from '@/features/playlists/playlist.types.js';
+import type { MoveTrackInput } from '@/features/playlists/playlist.validators.js';
 
 /**
- * Service for managing tracks in playlists
+ * Adds, removes and moves tracks through the atomic operations of migration 016.
+ * See doc/PLAYLIST_CONCURRENCY.md.
  */
 export class PlaylistTrackService {
 	/**
 	 * Add track to playlist
 	 * Note: In 'open' edit mode, we don't track who added the track (added_by = null)
 	 */
-	async addTrack(playlistId: string, userId: string, track: AddTrackDTO): Promise<void> {
-		try {
-			// Check edit permissions (unified approach)
-			const playlist = await checkEditPermission(playlistId, userId);
+	async addTrack(playlistId: string, userId: string, track: AddTrackDTO): Promise<AddTrackResult> {
+		const playlist = await checkEditPermission(playlistId, userId);
 
-			// Upsert track (insert if not exists, return existing if duplicate track_uri)
-			const { data: trackData, error: trackError } = await supabaseAdmin
-				.from('tracks')
-				.upsert(
-					{
-						track_uri: track.trackUri,
-						title: track.title,
-						artist: track.artist,
-						album: track.album,
-						album_art: track.albumArt,
-						duration_ms: track.durationMs,
-						preview_url: track.previewUrl,
-					},
-					{ onConflict: 'track_uri' }
-				)
-				.select()
-				.single();
-
-			if (trackError) throw trackError;
-
-			// Get next position using RPC function
-			const { data: maxPos } = await supabaseAdmin.rpc('get_next_playlist_position', {
-				p_playlist_id: playlistId,
-			});
-
-			const nextPosition = maxPos ?? 0;
-
-			const addedBy = playlist.edit_mode === 'restricted' ? userId : null;
-
-			// Add to playlist_tracks
-			const { error: addError } = await supabaseAdmin.from('playlist_tracks').insert({
-				playlist_id: playlistId,
-				track_id: trackData.id,
-				position: nextPosition,
-				added_by: addedBy,
-			});
-
-			if (addError) {
-				// Check if duplicate track (unique constraint violation)
-				if (addError.code === '23505') {
-					throw new AppError(409, 'Track already in playlist', 'TRACK_DUPLICATE');
-				}
-				throw addError;
-			}
-
-			logger.info('Track added to playlist', {
-				playlistId,
-				trackId: trackData.id,
-				userId,
-				editMode: playlist.edit_mode,
-			});
-
-			const now = new Date().toISOString();
-			realtime.notifyPlaylistUpdate(playlistId, 'track_added', {
-				track: {
-					id: trackData.id,
-					trackUri: trackData.track_uri,
-					title: trackData.title,
-					artist: trackData.artist,
-					album: trackData.album ?? undefined,
-					albumArt: trackData.album_art ?? undefined,
-					durationMs: trackData.duration_ms,
-					previewUrl: trackData.preview_url ?? undefined,
-					createdAt: trackData.created_at ?? new Date().toISOString(),
-					updatedAt: trackData.updated_at ?? new Date().toISOString(),
-					position: nextPosition,
-					addedBy: addedBy,
-					addedAt: now,
+		const { data: trackRow, error } = await supabaseAdmin
+			.from('tracks')
+			.upsert(
+				{
+					track_uri: track.trackUri,
+					title: track.title,
+					artist: track.artist,
+					album: track.album,
+					album_art: track.albumArt,
+					duration_ms: track.durationMs,
+					preview_url: track.previewUrl,
 				},
-			});
-		} catch (error) {
-			if (error instanceof AppError) throw error;
-			logger.error('Failed to add track', { error, playlistId });
+				{ onConflict: 'track_uri' }
+			)
+			.select()
+			.single();
+		if (error) {
+			logger.error('Failed to upsert track', { error, playlistId });
 			throw new AppError(500, 'Failed to add track', 'TRACK_ADD_ERROR');
 		}
+
+		const addedBy = playlist.edit_mode === 'restricted' ? userId : null;
+		const result = await addTrackRpc(playlistId, trackRow.id, addedBy);
+
+		const added: TrackInPlaylistResponse = {
+			...formatTrackResponse(trackRow),
+			rank: result.rank,
+			addedBy,
+			addedAt: result.addedAt,
+		};
+		logger.info('Track added to playlist', {
+			playlistId,
+			trackId: trackRow.id,
+			userId,
+			editMode: playlist.edit_mode,
+			version: result.tracksVersion,
+		});
+		// Old socket payload until #90 (5.5) switches to the versioned delta.
+		realtime.notifyPlaylistUpdate(playlistId, 'track_added', { track: { ...added, position: 0 } });
+
+		return { track: added, tracksVersion: result.tracksVersion, rebalanced: result.rebalanced };
 	}
 
 	/**
 	 * Remove track from playlist
 	 */
-	async removeTrack(playlistId: string, userId: string, trackId: string): Promise<void> {
-		try {
-			// Check permission (owner or collaborator)
-			await checkEditPermission(playlistId, userId);
+	async removeTrack(
+		playlistId: string,
+		userId: string,
+		trackId: string
+	): Promise<RemoveTrackResult> {
+		await checkEditPermission(playlistId, userId);
+		const result = await removeTrackRpc(playlistId, trackId);
 
-			await deleteRecords(
-				supabaseAdmin,
-				'playlist_tracks',
-				{ playlist_id: playlistId, track_id: trackId },
-				'Failed to remove track',
-				'TRACK_REMOVE_ERROR'
-			);
+		logger.info('Track removed from playlist', {
+			playlistId,
+			trackId,
+			userId,
+			version: result.tracksVersion,
+		});
+		realtime.notifyPlaylistUpdate(playlistId, 'track_removed', { trackId });
 
-			// Re-index positions (close gaps)
-			await reindexPositions(playlistId);
-
-			logger.info('Track removed from playlist', {
-				playlistId,
-				trackId,
-				userId,
-			});
-
-			realtime.notifyPlaylistUpdate(playlistId, 'track_removed', { trackId });
-		} catch (error) {
-			if (error instanceof AppError) throw error;
-			logger.error('Failed to remove track', { error, playlistId, trackId });
-			throw new AppError(500, 'Failed to remove track', 'TRACK_REMOVE_ERROR');
-		}
+		return { tracksVersion: result.tracksVersion };
 	}
 
 	/**
-	 * Reorder tracks in playlist
+	 * Move a track right after move.afterRank (null = top of the list)
 	 */
-	async reorderTracks(playlistId: string, userId: string, trackIds: string[]): Promise<void> {
-		try {
-			// Check permission (owner or collaborator)
-			await checkEditPermission(playlistId, userId);
+	async moveTrack(
+		playlistId: string,
+		userId: string,
+		trackId: string,
+		move: MoveTrackInput
+	): Promise<MoveTrackResult> {
+		await checkEditPermission(playlistId, userId);
+		const result = await moveTrackRpc(playlistId, trackId, move);
 
-			// Verify all tracks belong to playlist
-			const { data: existingTracks, error: fetchError } = await supabaseAdmin
-				.from('playlist_tracks')
-				.select('track_id')
-				.eq('playlist_id', playlistId);
+		logger.info('Track moved in playlist', {
+			playlistId,
+			trackId,
+			userId,
+			version: result.tracksVersion,
+		});
+		realtime.notifyPlaylistUpdate(playlistId, 'reordered');
 
-			if (fetchError) throw fetchError;
-
-			const existingIds = new Set(existingTracks.map(t => t.track_id));
-			const allExist = trackIds.every(id => existingIds.has(id));
-
-			if (!allExist || trackIds.length !== existingIds.size) {
-				throw new AppError(400, 'Invalid track IDs for reordering', 'INVALID_TRACK_IDS');
-			}
-
-			// Delete and re-insert with new positions
-			const { error: deleteError } = await supabaseAdmin
-				.from('playlist_tracks')
-				.delete()
-				.eq('playlist_id', playlistId);
-
-			if (deleteError) throw deleteError;
-
-			const inserts = trackIds.map((trackId, index) => ({
-				playlist_id: playlistId,
-				track_id: trackId,
-				position: index,
-				added_by: userId,
-			}));
-
-			const { error: insertError } = await supabaseAdmin.from('playlist_tracks').insert(inserts);
-
-			if (insertError) throw insertError;
-
-			logger.info('Playlist tracks reordered', { playlistId, userId });
-
-			realtime.notifyPlaylistUpdate(playlistId, 'reordered');
-		} catch (error) {
-			if (error instanceof AppError) throw error;
-			logger.error('Failed to reorder tracks', { error, playlistId });
-			throw new AppError(500, 'Failed to reorder tracks', 'TRACK_REORDER_ERROR');
-		}
+		return {
+			trackId,
+			rank: result.rank,
+			tracksVersion: result.tracksVersion,
+			rebalanced: result.rebalanced,
+		};
 	}
 }

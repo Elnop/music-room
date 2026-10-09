@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { moveTrackSchema, rankSchema } from '@/features/playlists/playlist.validators.js';
+import {
+	moveTrackSchema,
+	rankSchema,
+	trackIdParamSchema,
+} from '@/features/playlists/playlist.validators.js';
 
 describe('rankSchema', () => {
 	it.each(['V', 'a1', 'zz1', '0V', 'x'.repeat(128)])('accepts %s', rank => {
@@ -42,5 +46,16 @@ describe('moveTrackSchema', () => {
 	it('rejects an invalid afterRank', () => {
 		expect(moveTrackSchema.safeParse({ afterRank: 'V0', expectedVersion: 1 }).success).toBe(false);
 		expect(moveTrackSchema.safeParse({ afterRank: '', expectedVersion: 1 }).success).toBe(false);
+	});
+});
+
+describe('trackIdParamSchema', () => {
+	it('accepts a uuid', () => {
+		const trackId = '123e4567-e89b-12d3-a456-426614174000';
+		expect(trackIdParamSchema.parse({ id: 'p', trackId })).toEqual({ trackId });
+	});
+
+	it.each(['not-a-uuid', '', '123'])('rejects %s', trackId => {
+		expect(trackIdParamSchema.safeParse({ trackId }).success).toBe(false);
 	});
 });

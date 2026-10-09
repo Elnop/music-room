@@ -389,7 +389,7 @@ export const playlistPaths: OpenAPIV3.PathsObject = {
 							schema: { $ref: '#/components/schemas/ErrorResponse' },
 							example: {
 								success: false,
-								error: { code: 'TRACK_NOT_IN_PLAYLIST', message: 'Track not in playlist' },
+								error: { code: 'TRACK_NOT_IN_PLAYLIST', message: 'Track is not in the playlist' },
 							},
 						},
 					},
@@ -470,70 +470,6 @@ export const playlistPaths: OpenAPIV3.PathsObject = {
 						},
 					},
 				},
-			},
-		},
-	},
-
-	'/api/playlists/{id}/tracks/reorder': {
-		put: {
-			tags: ['Tracks'],
-			summary: 'Reorder tracks in playlist (deprecated)',
-			description:
-				'Deprecated: replaced by POST /api/playlists/{id}/tracks/{trackId}/move and removed in #88. Changes the order of tracks in the playlist. Provide array of track IDs in desired order.',
-			operationId: 'reorderTracks',
-			deprecated: true,
-			security: [{ bearerAuth: [] }],
-			parameters: [
-				{
-					in: 'path',
-					name: 'id',
-					required: true,
-					schema: { type: 'string', format: 'uuid' },
-				},
-			],
-			requestBody: {
-				required: true,
-				content: {
-					'application/json': {
-						schema: { $ref: '#/components/schemas/ReorderTracksRequest' },
-						example: {
-							trackIds: [
-								'123e4567-e89b-12d3-a456-426614174003',
-								'123e4567-e89b-12d3-a456-426614174001',
-								'123e4567-e89b-12d3-a456-426614174002',
-							],
-						},
-					},
-				},
-			},
-			responses: {
-				'200': {
-					description: 'Tracks reordered',
-					content: {
-						'application/json': {
-							schema: {
-								allOf: [
-									{ $ref: '#/components/schemas/SuccessResponse' },
-									{
-										type: 'object',
-										properties: {
-											data: {
-												type: 'object',
-												properties: {
-													message: { type: 'string', example: 'Tracks reordered successfully' },
-												},
-											},
-										},
-									},
-								],
-							},
-						},
-					},
-				},
-				'400': { $ref: '#/components/responses/ValidationError' },
-				'401': { $ref: '#/components/responses/UnauthorizedError' },
-				'403': { $ref: '#/components/responses/ForbiddenError' },
-				'404': { $ref: '#/components/responses/NotFoundError' },
 			},
 		},
 	},
@@ -907,27 +843,6 @@ export const playlistSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 		},
 	},
 
-	ReorderTracksRequest: {
-		type: 'object',
-		required: ['trackIds'],
-		properties: {
-			trackIds: {
-				type: 'array',
-				minItems: 1,
-				items: {
-					type: 'string',
-					format: 'uuid',
-				},
-				description: 'Array of track IDs in desired order',
-				example: [
-					'123e4567-e89b-12d3-a456-426614174003',
-					'123e4567-e89b-12d3-a456-426614174001',
-					'123e4567-e89b-12d3-a456-426614174002',
-				],
-			},
-		},
-	},
-
 	AddCollaboratorRequest: {
 		type: 'object',
 		required: ['userId'],
@@ -1012,11 +927,6 @@ export const playlistSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 			albumArt: { type: 'string', format: 'uri', nullable: true },
 			durationMs: { type: 'integer' },
 			previewUrl: { type: 'string', format: 'uri', nullable: true },
-			position: {
-				type: 'integer',
-				description: 'Track position in playlist (deprecated, replaced by rank)',
-				deprecated: true,
-			},
 			rank: {
 				type: 'string',
 				description: 'Sort key: tracks are ordered by rank, compared byte by byte',

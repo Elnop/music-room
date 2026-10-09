@@ -1,4 +1,4 @@
-import type { TrackInPlaylist, TrackWithPosition } from '@/types/track.types';
+import type { TrackInPlaylist } from '@/types/track.types';
 import type { UserProfile } from '@/types/user.types';
 
 export type EditMode = 'open' | 'restricted';
@@ -30,8 +30,8 @@ export interface Playlist {
 
 // Playlist with full track data and owner info
 export interface PlaylistWithTracks extends Omit<Playlist, 'trackCount'> {
-	// Becomes TrackInPlaylist[] (ordered by rank) in 5.6 (#91).
-	tracks: TrackWithPosition[];
+	/** Ordered by rank. */
+	tracks: TrackInPlaylist[];
 	owner: UserProfile;
 	/** Incremented by every add, remove and move; sent back as expectedVersion. */
 	tracksVersion: number;

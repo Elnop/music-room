@@ -4,23 +4,21 @@ export interface Track {
 	title: string;
 	artist: string;
 	album?: string; // Optional - SoundCloud and other services may not have albums
-	albumArt: string;
+	albumArt?: string; // Omitted by the API when the track has no artwork
 	durationMs: number; // milliseconds
 	trackUri: string; // Universal track identifier (SoundCloud permalink, etc.)
 	previewUrl?: string;
 }
 
-// Track with position metadata (from playlist_tracks table)
-export interface TrackWithPosition extends Track {
+// Track of the old `track_added` socket payload: the server sends
+// `{ ...TrackInPlaylist, position: 0 }` until #90 (5.5) switches to the versioned delta.
+export interface TrackWithPosition extends TrackInPlaylist {
 	position: number;
-	addedBy: string | null;
-	addedAt: string;
 }
 
 // Track in a playlist, ordered by rank (doc/PLAYLIST_CONCURRENCY.md)
 // Mirrors backend TrackInPlaylistResponse (extends TrackResponse).
-export interface TrackInPlaylist extends Omit<Track, 'albumArt'> {
-	albumArt?: string;
+export interface TrackInPlaylist extends Track {
 	createdAt: string;
 	updatedAt: string;
 	/** Sort key: compare with < on strings (byte order, same as the server's COLLATE "C"). */
