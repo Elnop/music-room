@@ -1,6 +1,13 @@
 import { getBackendUrl } from '@/services/backendUrl';
 import type { ApiResponse } from '@/types/api.types';
 import { useAuthStore } from '@/store/authStore';
+import { apiRequest } from '@services/api';
+import type {
+	GrantDeviceLicenseResponse,
+	MyDevicesResponse,
+	RevokeDeviceLicenseResponse,
+	UserDeviceWithLicenses,
+} from '@/types/device.types';
 
 export interface MusicControlPermissionsResponse {
 	allowedUserIds: string[];
@@ -21,6 +28,13 @@ const getAuthToken = async (): Promise<string> => {
 	if (!token) throw new Error('No authentication token available');
 	return token;
 };
+
+const authHeaders = async (): Promise<Record<string, string>> => ({
+	Authorization: `Bearer ${await getAuthToken()}`,
+});
+
+const licensePath = (deviceId: string, userId: string): string =>
+	`/api/music-control/devices/${encodeURIComponent(deviceId)}/licenses/${encodeURIComponent(userId)}`;
 
 /**
  * Music Control API
@@ -105,5 +119,38 @@ export const musicControlApi = {
 
 		const data: ApiResponse<CanControlResponse> = await response.json();
 		return data.data!.canControl;
+	},
+
+	/**
+	 * List my devices with the friends licensed on each
+	 */
+	async getMyDevices(): Promise<UserDeviceWithLicenses[]> {
+		const data = await apiRequest<MyDevicesResponse>('/api/music-control/devices', {
+			headers: await authHeaders(),
+		});
+		return data.devices;
+	},
+
+	/**
+	 * Grant a friend control of one of my devices
+	 */
+	async grantDeviceLicense(deviceId: string, userId: string): Promise<GrantDeviceLicenseResponse> {
+		return apiRequest<GrantDeviceLicenseResponse>(licensePath(deviceId, userId), {
+			method: 'POST',
+			headers: await authHeaders(),
+		});
+	},
+
+	/**
+	 * Revoke a friend's control of one of my devices
+	 */
+	async revokeDeviceLicense(
+		deviceId: string,
+		userId: string
+	): Promise<RevokeDeviceLicenseResponse> {
+		return apiRequest<RevokeDeviceLicenseResponse>(licensePath(deviceId, userId), {
+			method: 'DELETE',
+			headers: await authHeaders(),
+		});
 	},
 };
