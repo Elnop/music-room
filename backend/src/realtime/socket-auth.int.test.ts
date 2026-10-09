@@ -128,10 +128,12 @@ describe('Socket.io handshake authentication', () => {
 		alice = await createUser();
 		bob = await createUser();
 
-		// follows(bob -> alice, can_control_music): alice lets bob control her music.
-		const { error } = await supabaseAdmin
-			.from('follows')
-			.insert({ follower_id: bob.id, following_id: alice.id, can_control_music: true });
+		// Mutual friends, and follows(bob -> alice, can_control_music): alice
+		// lets bob control her music.
+		const { error } = await supabaseAdmin.from('follows').insert([
+			{ follower_id: bob.id, following_id: alice.id, can_control_music: true },
+			{ follower_id: alice.id, following_id: bob.id },
+		]);
 		if (error) throw error;
 
 		httpServer = createServer();

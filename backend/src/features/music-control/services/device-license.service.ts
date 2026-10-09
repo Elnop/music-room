@@ -2,6 +2,8 @@ import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import { FriendsService } from '@/features/friends/services/friends.service.js';
+import { revalidateListeningAccess } from '@/features/friends/utils/listening-access.js';
+import { controlAccessService } from '@/features/music-control/services/control-access.service.js';
 import type {
 	ControllableDevicesResponse,
 	GrantDeviceLicenseResponse,
@@ -103,52 +105,27 @@ export class DeviceLicenseService {
 		}
 
 		logger.info('Device license revoked', { ownerId, deviceId, granteeId });
+		// The grantee may have lost its last access to the owner's devices.
+		await revalidateListeningAccess(granteeId, ownerId);
 	}
 
 	/**
-	 * Devices of ownerId that viewerId may control. Not mutual friends answers
-	 * the empty shape before any device query, so nothing about ownerId leaks.
+	 * Devices of ownerId that viewerId may control, on the shared rule of
+	 * control-access.service.ts. Not mutual friends answers the empty shape
+	 * before any device query, so nothing about ownerId leaks.
 	 */
 	async listControllable(viewerId: string, ownerId: string): Promise<ControllableDevicesResponse> {
-		const empty: ControllableDevicesResponse = { allDevices: false, devices: [] };
-		if (viewerId === ownerId) return empty;
-
-		const { isFriend } = await friendsService.getFollowStatus(viewerId, ownerId);
-		if (!isFriend) return empty;
-
-		const [followResult, licensesResult] = await Promise.all([
-			supabaseAdmin
-				.from('follows')
-				.select('can_control_music')
-				.eq('follower_id', viewerId)
-				.eq('following_id', ownerId)
-				.maybeSingle(),
-			supabaseAdmin
-				.from('device_control_licenses')
-				.select('device_id')
-				.eq('owner_id', ownerId)
-				.eq('grantee_id', viewerId),
-		]);
-		const queryError = followResult.error ?? licensesResult.error;
-		if (queryError) {
-			failQuery('Failed to fetch controllable devices', 'DEVICE_FETCH_ERROR', queryError, {
-				viewerId,
-				ownerId,
-			});
-		}
-
-		if (followResult.data?.can_control_music === true) {
+		const access = await controlAccessService.getAccess(viewerId, ownerId);
+		if (access.allDevices) {
 			const rows = await listOwnerDevices(ownerId);
 			return {
 				allDevices: true,
 				devices: rows.map(row => ({ ...toDevice(row), access: 'all-devices' as const })),
 			};
 		}
+		if (access.licensedDeviceIds.length === 0) return { allDevices: false, devices: [] };
 
-		const deviceIds = (licensesResult.data ?? []).map(l => l.device_id);
-		if (deviceIds.length === 0) return empty;
-
-		const rows = await listOwnerDevices(ownerId, deviceIds);
+		const rows = await listOwnerDevices(ownerId, access.licensedDeviceIds);
 		return {
 			allDevices: false,
 			devices: rows.map(row => ({ ...toDevice(row), access: 'license' as const })),

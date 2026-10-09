@@ -14,7 +14,7 @@ import {
 	revalidatePlaylistRoom,
 } from '@/realtime/playlist-room.js';
 import type { TrackWithPositionResponse } from '@/features/playlists/playlist.types.js';
-import { musicControlService } from '@/features/music-control/music-control.service.js';
+import { controlAccessService } from '@/features/music-control/services/control-access.service.js';
 import type {
 	ListeningStatus,
 	UserListeningStatus,
@@ -297,7 +297,8 @@ class RealtimeService {
 
 			const { userId: myUserId } = socketInfo;
 
-			const canControl = await musicControlService.canControl(myUserId, targetUserId);
+			// Access to at least one device shows the status of all of them.
+			const canControl = await controlAccessService.canControlAnyDevice(myUserId, targetUserId);
 			if (!canControl) {
 				socket.emit('listening:error', {
 					message: "Not authorized to view this user's listening status",
@@ -306,7 +307,19 @@ class RealtimeService {
 				return;
 			}
 
-			void socket.join(listeningRoom(targetUserId));
+			const room = listeningRoom(targetUserId);
+			void socket.join(room);
+
+			// A revoke or unfollow whose revalidation ran during the check above
+			// found nothing to evict: re-check now that the socket is in the room.
+			if (!(await controlAccessService.canControlAnyDevice(myUserId, targetUserId))) {
+				void socket.leave(room);
+				socket.emit('listening:error', {
+					message: "Not authorized to view this user's listening status",
+					code: 'NOT_AUTHORIZED',
+				});
+				return;
+			}
 
 			const userDevices = this.listeningStatuses.get(targetUserId);
 			const devices = userDevices ? Array.from(userDevices.values()) : [];
@@ -363,7 +376,13 @@ class RealtimeService {
 
 			const { userId: controllerId } = socketInfo;
 
-			const canControl = await musicControlService.canControl(controllerId, data.targetUserId);
+			// Checked before the device lookup: a refused controller learns
+			// nothing about which devices are online.
+			const canControl = await controlAccessService.canControlDevice(
+				controllerId,
+				data.targetUserId,
+				data.targetDeviceId
+			);
 			if (!canControl) {
 				socket.emit('control:error', {
 					message: "Not authorized to control this user's music",
@@ -551,12 +570,14 @@ class RealtimeService {
 	}
 
 	/**
-	 * Make every socket of `controllerId` leave `listening:<ownerId>` after it
-	 * lost control of the owner (revoke, unfollow). Never throws; no-op
-	 * before initialize.
+	 * Re-check `controllerId`'s access to `ownerId`'s devices after a change
+	 * (switch or license revoked, unfollow) and make its sockets leave
+	 * `listening:<ownerId>` only when no device is left. A failed check
+	 * evicts (fail closed). Never throws; no-op before initialize.
 	 */
-	revokeListeningAccess(controllerId: string, ownerId: string): void {
+	async revalidateListeningAccess(controllerId: string, ownerId: string): Promise<void> {
 		if (!this.io) return;
+		if (await controlAccessService.canControlAnyDevice(controllerId, ownerId)) return;
 		leaveListeningRoom(this.io, controllerId, ownerId);
 	}
 
@@ -571,10 +592,15 @@ class RealtimeService {
 	 * Notify a user that their music control permission has changed
 	 * Called when someone grants or revokes control to them
 	 */
-	notifyPermissionChange(targetUserId: string, ownerId: string, granted: boolean) {
+	async notifyPermissionChange(
+		targetUserId: string,
+		ownerId: string,
+		granted: boolean
+	): Promise<void> {
 		if (!this.io) return;
 
-		if (!granted) this.revokeListeningAccess(targetUserId, ownerId);
+		// A license may still give access to some device: re-check, not leave.
+		if (!granted) await this.revalidateListeningAccess(targetUserId, ownerId);
 
 		this.io.to(`user:${targetUserId}`).emit('permission:changed', {
 			ownerId,

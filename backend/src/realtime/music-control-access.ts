@@ -7,14 +7,24 @@ import type { AppSocketServer } from '@/realtime/socket-auth.js';
 /**
  * Access control for listening status and music control (subject IV.6, CAP-1).
  *
- * The rule is `musicControlService.canControl(controller, owner)`: the
- * controller follows the owner with `can_control_music`. Identity always
- * comes from the socket, never from the payload; unknown payload keys (such
- * as `fromUserId`) are stripped.
+ * The rule is per device (control-access.service.ts, subject IV.2.2): the
+ * controller and the owner are mutual friends, and either the owner's "all
+ * my devices" switch is on for the controller or the controller holds a
+ * license on the device. A failed check refuses. Identity always comes from
+ * the socket, never from the payload; unknown payload keys (such as
+ * `fromUserId`) are stripped.
  *
- *   listening:subscribe   <ownerId: UUID>   joins `listening:<ownerId>`
+ *   listening:subscribe   <ownerId: UUID>   joins `listening:<ownerId>` with
+ *                                            access to at least one device;
+ *                                            the status covers all devices
  *   listening:unsubscribe <ownerId: UUID>   invalid payloads are ignored
  *   control:action        { targetUserId: UUID, targetDeviceId, action: 'play' | 'pause' }
+ *                                            needs access to targetDeviceId
+ *
+ * Refusals are answered on `listening:error` / `control:error` with
+ * `NOT_AUTHORIZED`. When access shrinks (switch or license revoked,
+ * unfollow in either direction) the subscription is re-checked and the
+ * controller leaves the room only when no device is left.
  *
  * A malformed payload is answered on `listening:error` / `control:error` with
  * `{ message, code: 'INVALID_PAYLOAD' }`, before any lookup.
@@ -44,7 +54,7 @@ export function listeningRoom(ownerId: string): string {
 
 /**
  * Make every socket of `controllerId` leave `listening:<ownerId>`, after the
- * controller lost control of the owner (revoked or unfollowed). Never throws.
+ * controller lost access to every device of the owner. Never throws.
  */
 export function leaveListeningRoom(
 	io: AppSocketServer,

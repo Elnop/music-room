@@ -6,14 +6,17 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } 
 import { supabaseAdmin, supabaseAnon } from '@/shared/config/supabase.js';
 import { connectRedis, disconnectRedis, isRedisConnected } from '@/shared/config/redis.js';
 import { musicControlService } from '@/features/music-control/music-control.service.js';
+import { controlAccessService } from '@/features/music-control/services/control-access.service.js';
+import { deviceLicenseService } from '@/features/music-control/services/device-license.service.js';
 import { FriendsService } from '@/features/friends/services/friends.service.js';
 import type { UserListeningStatus } from '@/features/music-control/music-control.types.js';
 import { realtime } from '@/realtime/index.js';
 
 // Access to listening status and music control (music-control-access.ts,
 // realtime/index.ts) against a real Socket.io server and the local Supabase
-// stack. Alice owns the music; Bob and Dave may control it; Erin follows
-// Alice without control; Carol does not follow her.
+// stack. Alice owns the music; Bob and Dave are her mutual friends with her
+// "all my devices" switch on; Erin is a mutual friend without switch or
+// license; Carol does not follow her. Per-device licenses are added per test.
 
 interface TestUser {
 	id: string;
@@ -127,14 +130,62 @@ describe('Listening and control access', () => {
 	const settle = () => new Promise(resolve => setTimeout(resolve, 150));
 
 	async function setFollows(): Promise<void> {
-		const ids = [bob.id, carol.id, dave.id, erin.id];
+		// Deleting the follows also drops their licenses (015 foreign key).
+		const ids = [alice.id, bob.id, carol.id, dave.id, erin.id];
 		await supabaseAdmin.from('follows').delete().in('follower_id', ids);
 		const { error } = await supabaseAdmin.from('follows').insert([
 			{ follower_id: bob.id, following_id: alice.id, can_control_music: true },
+			{ follower_id: alice.id, following_id: bob.id },
 			{ follower_id: dave.id, following_id: alice.id, can_control_music: true },
+			{ follower_id: alice.id, following_id: dave.id },
 			{ follower_id: erin.id, following_id: alice.id, can_control_music: false },
+			{ follower_id: alice.id, following_id: erin.id },
 		]);
 		if (error) throw error;
+	}
+
+	/** Set Alice's "all my devices" switch for Bob. */
+	async function setBobSwitch(on: boolean): Promise<void> {
+		const { error } = await supabaseAdmin
+			.from('follows')
+			.update({ can_control_music: on })
+			.eq('follower_id', bob.id)
+			.eq('following_id', alice.id);
+		if (error) throw error;
+	}
+
+	/** License Bob on Alice's device (the device row exists once it connected). */
+	async function licenseBob(deviceId: string): Promise<void> {
+		const { error } = await supabaseAdmin
+			.from('device_control_licenses')
+			.insert({ owner_id: alice.id, device_id: deviceId, grantee_id: bob.id });
+		if (error) throw error;
+	}
+
+	/** Alice stops following Bob: Bob's switch row stays, but they are no longer friends. */
+	async function aliceDropsBob(): Promise<void> {
+		const { error } = await supabaseAdmin
+			.from('follows')
+			.delete()
+			.eq('follower_id', alice.id)
+			.eq('following_id', bob.id);
+		if (error) throw error;
+	}
+
+	/** Send a control action and wait for its success or error. */
+	async function control(
+		socket: ClientSocket,
+		targetDeviceId: string
+	): Promise<{ ok: true } | { ok: false; error: SocketError }> {
+		const outcome = new Promise<{ ok: true } | { ok: false; error: SocketError }>(resolve => {
+			socket.once('control:success', () => resolve({ ok: true }));
+			socket.once('control:error', (error: SocketError) => resolve({ ok: false, error }));
+		});
+		socket.emit('control:action', { targetUserId: alice.id, targetDeviceId, action: 'pause' });
+		const result = await outcome;
+		socket.off('control:success');
+		socket.off('control:error');
+		return result;
 	}
 
 	beforeAll(async () => {
@@ -199,7 +250,7 @@ describe('Listening and control access', () => {
 
 		it.each([
 			['does not follow Alice', () => carol],
-			['follows Alice without control', () => erin],
+			['is her mutual friend without switch or license', () => erin],
 		])('refuses a user who %s with NOT_AUTHORIZED', async (_label, user) => {
 			const [socket, daveSocket] = await Promise.all([connect(user()), connect(dave)]);
 			await subscribe(daveSocket, alice.id);
@@ -224,7 +275,7 @@ describe('Listening and control access', () => {
 			['null', null],
 			['an object', { targetUserId: randomUUID() }],
 		])('refuses a payload that is %s with INVALID_PAYLOAD, before any lookup', async (_l, p) => {
-			const canControl = vi.spyOn(musicControlService, 'canControl');
+			const canControl = vi.spyOn(controlAccessService, 'getAccess');
 			const socket = await connect(bob);
 
 			const refusal = nextEvent<SocketError>(socket, 'listening:error');
@@ -367,6 +418,122 @@ describe('Listening and control access', () => {
 			await vi.waitFor(() => expect(hasDevice(daveStatuses, deviceId)).toBe(true));
 			await settle();
 			expect(bobStatuses).toEqual([]);
+		});
+	});
+
+	describe('per-device access (story 4.5)', () => {
+		/** Connect Alice's devices A and B, then Bob, with his switch off and a license on A. */
+		async function bobLicensedOnA() {
+			const [deviceA, deviceB] = [`dev-${randomUUID()}`, `dev-${randomUUID()}`];
+			const [aliceA, aliceB, bobSocket] = await Promise.all([
+				connect(alice, deviceA),
+				connect(alice, deviceB),
+				connect(bob),
+			]);
+			await setBobSwitch(false);
+			await licenseBob(deviceA);
+			return { deviceA, deviceB, aliceA, aliceB, bobSocket };
+		}
+
+		it('delivers to the licensed device only, until B is licensed or the switch is on', async () => {
+			const { deviceA, deviceB, aliceA, aliceB, bobSocket } = await bobLicensedOnA();
+			const commandsA = record<ControlCommand>(aliceA, 'control:command');
+			const commandsB = record<ControlCommand>(aliceB, 'control:command');
+
+			expect(await control(bobSocket, deviceA)).toEqual({ ok: true });
+			await vi.waitFor(() => expect(commandsA).toHaveLength(1));
+
+			const refused = await control(bobSocket, deviceB);
+			expect(refused).toMatchObject({ ok: false, error: { code: 'NOT_AUTHORIZED' } });
+			await settle();
+			expect(commandsB).toEqual([]);
+
+			await licenseBob(deviceB);
+			expect(await control(bobSocket, deviceB)).toEqual({ ok: true });
+			await vi.waitFor(() => expect(commandsB).toHaveLength(1));
+		});
+
+		it('lets the switch reach an unlicensed device', async () => {
+			const { deviceB, aliceB, bobSocket } = await bobLicensedOnA();
+			await setBobSwitch(true);
+			const commandsB = record<ControlCommand>(aliceB, 'control:command');
+
+			expect(await control(bobSocket, deviceB)).toEqual({ ok: true });
+			await vi.waitFor(() => expect(commandsB).toHaveLength(1));
+		});
+
+		it('refuses B once the switch is cut, and still reaches the licensed A', async () => {
+			const { deviceA, deviceB, aliceB, bobSocket } = await bobLicensedOnA();
+			await setBobSwitch(true);
+			await musicControlService.revokeControl(alice.id, bob.id);
+			const commandsB = record<ControlCommand>(aliceB, 'control:command');
+
+			const refused = await control(bobSocket, deviceB);
+			expect(refused).toMatchObject({ ok: false, error: { code: 'NOT_AUTHORIZED' } });
+			expect(await control(bobSocket, deviceA)).toEqual({ ok: true });
+			await settle();
+			expect(commandsB).toEqual([]);
+		});
+
+		it('refuses a stale switch once Alice no longer follows Bob', async () => {
+			const deviceId = `dev-${randomUUID()}`;
+			const [aliceDevice, bobSocket] = await Promise.all([connect(alice, deviceId), connect(bob)]);
+			await aliceDropsBob();
+			const commands = record<ControlCommand>(aliceDevice, 'control:command');
+
+			const refused = await control(bobSocket, deviceId);
+			expect(refused).toMatchObject({ ok: false, error: { code: 'NOT_AUTHORIZED' } });
+
+			const subscribeRefusal = nextEvent<SocketError>(bobSocket, 'listening:error');
+			bobSocket.emit('listening:subscribe', alice.id);
+			await expect(subscribeRefusal).resolves.toMatchObject({ code: 'NOT_AUTHORIZED' });
+			expect(await inListeningRoom(bobSocket, alice.id)).toBe(false);
+			await settle();
+			expect(commands).toEqual([]);
+		});
+
+		it("subscribes through a license and receives all of Alice's devices", async () => {
+			const { bobSocket } = await bobLicensedOnA();
+			await subscribe(bobSocket, alice.id);
+			expect(await inListeningRoom(bobSocket, alice.id)).toBe(true);
+
+			// A device Bob holds no license on still shows in the status.
+			const statuses = record<UserListeningStatus>(bobSocket, 'listening:status');
+			const deviceId = await publishAliceStatus();
+			await vi.waitFor(() => expect(hasDevice(statuses, deviceId)).toBe(true));
+		});
+
+		it('evicts Bob when Alice revokes his last license', async () => {
+			const { deviceA, bobSocket } = await bobLicensedOnA();
+			await subscribe(bobSocket, alice.id);
+
+			await deviceLicenseService.revoke(alice.id, deviceA, bob.id);
+			expect(await inListeningRoom(bobSocket, alice.id)).toBe(false);
+		});
+
+		it('evicts Bob when Alice cuts the switch and he holds no license', async () => {
+			const bobSocket = await connect(bob);
+			await subscribe(bobSocket, alice.id);
+
+			await musicControlService.revokeControl(alice.id, bob.id);
+			expect(await inListeningRoom(bobSocket, alice.id)).toBe(false);
+		});
+
+		it('evicts Bob when Alice unfollows him', async () => {
+			const { bobSocket } = await bobLicensedOnA();
+			await subscribe(bobSocket, alice.id);
+
+			await new FriendsService().unfollowUser(alice.id, bob.id);
+			expect(await inListeningRoom(bobSocket, alice.id)).toBe(false);
+		});
+
+		it('keeps Bob subscribed when the switch is cut but a license remains', async () => {
+			const { bobSocket } = await bobLicensedOnA();
+			await setBobSwitch(true);
+			await subscribe(bobSocket, alice.id);
+
+			await musicControlService.revokeControl(alice.id, bob.id);
+			expect(await inListeningRoom(bobSocket, alice.id)).toBe(true);
 		});
 	});
 });
