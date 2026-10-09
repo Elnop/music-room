@@ -129,6 +129,22 @@ describe('refreshAccessToken', () => {
 		expect(mockSupabaseAuth.signOut).not.toHaveBeenCalled();
 	});
 
+	it('ends the session locally without any request when there is no refresh token', async () => {
+		// Expiring access token, no refresh token (a session restored from storage).
+		useAuthStore.setState({ refreshToken: null });
+
+		await expect(useAuthStore.getState().refreshAccessToken()).resolves.toBe(false);
+
+		expect(useAuthStore.getState()).toMatchObject({
+			user: null,
+			accessToken: null,
+			isAuthenticated: false,
+		});
+		expect(await AsyncStorage.getItem('@zumik/access_token')).toBeNull();
+		expect(mockSupabaseAuth.signOut).toHaveBeenCalledWith({ scope: 'local' });
+		expect(fetchMock).not.toHaveBeenCalled();
+	});
+
 	it('keeps the session when the backend is unreachable', async () => {
 		fetchMock.mockRejectedValue(new TypeError('Network request failed'));
 
