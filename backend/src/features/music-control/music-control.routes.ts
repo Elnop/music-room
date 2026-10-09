@@ -39,4 +39,34 @@ router.get('/can-control/:userId', (req, res, next) =>
 	musicControlController.checkCanControl(req, res, next)
 );
 
+/**
+ * GET /api/music-control/devices
+ * List my devices and their licenses
+ */
+router.get('/devices', (req, res, next) => musicControlController.getMyDevices(req, res, next));
+
+/**
+ * POST /api/music-control/devices/:deviceId/licenses/:userId
+ * Grant a friend control of one of my devices
+ */
+router.post('/devices/:deviceId/licenses/:userId', (req, res, next) =>
+	musicControlController.grantDeviceLicense(req, res, next)
+);
+
+/**
+ * DELETE /api/music-control/devices/:deviceId/licenses/:userId
+ * Revoke a friend from one of my devices
+ */
+router.delete('/devices/:deviceId/licenses/:userId', (req, res, next) =>
+	musicControlController.revokeDeviceLicense(req, res, next)
+);
+
+/**
+ * GET /api/music-control/users/:userId/devices
+ * List a friend's devices I can control
+ */
+router.get('/users/:userId/devices', (req, res, next) =>
+	musicControlController.getControllableDevices(req, res, next)
+);
+
 export default router;

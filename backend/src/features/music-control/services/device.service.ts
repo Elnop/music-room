@@ -1,7 +1,17 @@
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
-import type { DeviceInfo } from '@/features/music-control/music-control.types.js';
+import type {
+	DeviceInfo,
+	DeviceLicense,
+	DeviceWithLicenses,
+} from '@/features/music-control/music-control.types.js';
+import {
+	failQuery,
+	fetchLicenseUsers,
+	listOwnerDevices,
+	toDevice,
+} from '@/features/music-control/utils/device.helpers.js';
 
 /**
  * Persists the devices a user connects from (`devices`, one row per
@@ -35,5 +45,47 @@ export class DeviceService {
 			});
 			throw new AppError(500, 'Failed to record device', 'DEVICE_REGISTRATION_FAILED');
 		}
+	}
+
+	/**
+	 * The owner's devices, most recently seen first, each with the friends
+	 * licensed to control it (oldest grant first). A license whose grantee is no
+	 * longer a mutual friend is still listed so the owner can revoke it.
+	 */
+	async listMyDevices(ownerId: string): Promise<DeviceWithLicenses[]> {
+		const [devices, licensesResult] = await Promise.all([
+			listOwnerDevices(ownerId),
+			supabaseAdmin
+				.from('device_control_licenses')
+				.select('device_id, grantee_id, created_at')
+				.eq('owner_id', ownerId)
+				.order('created_at', { ascending: true }),
+		]);
+
+		if (licensesResult.error) {
+			failQuery(
+				'Failed to fetch device licenses',
+				'DEVICE_LICENSE_FETCH_ERROR',
+				licensesResult.error,
+				{ ownerId }
+			);
+		}
+
+		const licenses = licensesResult.data ?? [];
+		const users = await fetchLicenseUsers(licenses.map(l => l.grantee_id));
+
+		const byDevice = new Map<string, DeviceLicense[]>();
+		for (const license of licenses) {
+			const user = users.get(license.grantee_id);
+			if (!user) continue;
+			const list = byDevice.get(license.device_id) ?? [];
+			list.push({ user, grantedAt: license.created_at });
+			byDevice.set(license.device_id, list);
+		}
+
+		return devices.map(row => ({
+			...toDevice(row),
+			licenses: byDevice.get(row.device_id) ?? [],
+		}));
 	}
 }
