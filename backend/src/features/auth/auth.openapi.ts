@@ -162,8 +162,51 @@ export const authPaths: OpenAPIV3.PathsObject = {
 						},
 					},
 				},
-				'401': { $ref: '#/components/responses/UnauthorizedError' },
-				'503': { $ref: '#/components/responses/RateLimitUnavailable' },
+				'401': {
+					description:
+						'INVALID_REFRESH_TOKEN: Supabase Auth refused the refresh token (revoked, expired, already used or unknown). The client must sign in again.',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+							example: {
+								success: false,
+								error: {
+									message: 'Invalid or expired refresh token',
+									code: 'INVALID_REFRESH_TOKEN',
+								},
+							},
+						},
+					},
+				},
+				'503': {
+					description:
+						'AUTH_UNAVAILABLE: Supabase Auth is unreachable or failing, so the token was neither accepted nor refused; the client keeps its session and retries later. RATE_LIMIT_UNAVAILABLE: Redis is not ready, so the rate limiter cannot count the request (fails closed).',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+							examples: {
+								authUnavailable: {
+									value: {
+										success: false,
+										error: {
+											message: 'Authentication service is unavailable',
+											code: 'AUTH_UNAVAILABLE',
+										},
+									},
+								},
+								rateLimitUnavailable: {
+									value: {
+										success: false,
+										error: {
+											message: 'Rate limiting is unavailable',
+											code: 'RATE_LIMIT_UNAVAILABLE',
+										},
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 		},
 	},
