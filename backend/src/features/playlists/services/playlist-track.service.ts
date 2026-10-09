@@ -63,8 +63,13 @@ export class PlaylistTrackService {
 			editMode: playlist.edit_mode,
 			version: result.tracksVersion,
 		});
-		// Old socket payload until #90 (5.5) switches to the versioned delta.
-		realtime.notifyPlaylistUpdate(playlistId, 'track_added', { track: { ...added, position: 0 } });
+		realtime.notifyPlaylistUpdate({
+			playlistId,
+			tracksVersion: result.tracksVersion,
+			rebalanced: result.rebalanced,
+			event: 'track_added',
+			track: added,
+		});
 
 		return { track: added, tracksVersion: result.tracksVersion, rebalanced: result.rebalanced };
 	}
@@ -86,7 +91,13 @@ export class PlaylistTrackService {
 			userId,
 			version: result.tracksVersion,
 		});
-		realtime.notifyPlaylistUpdate(playlistId, 'track_removed', { trackId });
+		realtime.notifyPlaylistUpdate({
+			playlistId,
+			tracksVersion: result.tracksVersion,
+			rebalanced: false,
+			event: 'track_removed',
+			trackId,
+		});
 
 		return { tracksVersion: result.tracksVersion };
 	}
@@ -109,7 +120,14 @@ export class PlaylistTrackService {
 			userId,
 			version: result.tracksVersion,
 		});
-		realtime.notifyPlaylistUpdate(playlistId, 'reordered');
+		realtime.notifyPlaylistUpdate({
+			playlistId,
+			tracksVersion: result.tracksVersion,
+			rebalanced: result.rebalanced,
+			event: 'track_moved',
+			trackId,
+			rank: result.rank,
+		});
 
 		return {
 			trackId,

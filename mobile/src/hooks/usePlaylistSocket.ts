@@ -1,14 +1,7 @@
 import { useEffect } from 'react';
 import { useSocketStore } from '@store/socketStore';
 import { usePlaylistStore } from '@store/playlistStore';
-import type { TrackWithPosition } from '@/types/track.types';
-
-interface PlaylistUpdateData {
-	playlistId: string;
-	event: 'track_added' | 'track_removed' | 'reordered';
-	track?: TrackWithPosition;
-	trackId?: string;
-}
+import type { PlaylistUpdatedEvent } from '@/types/playlist.types';
 
 /**
  * Hook for real-time playlist updates
@@ -17,7 +10,8 @@ interface PlaylistUpdateData {
  * Updates the playlist locally when tracks are added/removed.
  *
  * @param playlistId - The playlist ID to watch
- * @param onReorder - Optional callback for reorder events (requires full refresh)
+ * @param onReorder - Optional callback for move events (full refresh until
+ *   version-aware convergence, #91)
  */
 export function usePlaylistSocket(playlistId: string, onReorder?: () => void) {
 	const socket = useSocketStore(state => state.socket);
@@ -33,23 +27,19 @@ export function usePlaylistSocket(playlistId: string, onReorder?: () => void) {
 		socket.emit('playlist:join', playlistId);
 		if (__DEV__) console.log(`[Socket] Joined playlist room: ${playlistId}`);
 
-		const handlePlaylistUpdate = (data: PlaylistUpdateData) => {
+		const handlePlaylistUpdate = (data: PlaylistUpdatedEvent) => {
 			if (data.playlistId !== playlistId) return;
 
 			if (__DEV__) console.log(`[Socket] Playlist updated: ${data.event}`, data);
 
 			switch (data.event) {
 				case 'track_added':
-					if (data.track) {
-						addTrackLocally(playlistId, data.track);
-					}
+					addTrackLocally(playlistId, data.track);
 					break;
 				case 'track_removed':
-					if (data.trackId) {
-						removeTrackLocally(playlistId, data.trackId);
-					}
+					removeTrackLocally(playlistId, data.trackId);
 					break;
-				case 'reordered':
+				case 'track_moved':
 					onReorder?.();
 					break;
 			}

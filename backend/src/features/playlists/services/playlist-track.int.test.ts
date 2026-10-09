@@ -111,8 +111,12 @@ describe('PlaylistTrackService on atomic operations', () => {
 		expect(typeof result.track.addedAt).toBe('string');
 		const last = (await rows()).at(-1);
 		expect(last).toEqual({ track_id: result.track.id, rank: result.track.rank, added_by: ownerId });
-		expect(notifyPlaylistUpdate).toHaveBeenLastCalledWith(playlistId, 'track_added', {
-			track: { ...result.track, position: 0 },
+		expect(notifyPlaylistUpdate).toHaveBeenLastCalledWith({
+			playlistId,
+			tracksVersion: 5,
+			rebalanced: false,
+			event: 'track_added',
+			track: result.track,
 		});
 	});
 
@@ -150,7 +154,11 @@ describe('PlaylistTrackService on atomic operations', () => {
 			tracksVersion: 5,
 		});
 		expect(await rows()).toEqual(before.filter(r => r.track_id !== trackIds[1]));
-		expect(notifyPlaylistUpdate).toHaveBeenLastCalledWith(playlistId, 'track_removed', {
+		expect(notifyPlaylistUpdate).toHaveBeenLastCalledWith({
+			playlistId,
+			tracksVersion: 5,
+			rebalanced: false,
+			event: 'track_removed',
 			trackId: trackIds[1],
 		});
 
@@ -176,10 +184,19 @@ describe('PlaylistTrackService on atomic operations', () => {
 			rank: result.rank,
 			added_by: ownerId,
 		});
-		expect(notifyPlaylistUpdate).toHaveBeenLastCalledWith(playlistId, 'reordered');
+		expect(notifyPlaylistUpdate).toHaveBeenLastCalledWith({
+			playlistId,
+			tracksVersion: 5,
+			rebalanced: false,
+			event: 'track_moved',
+			trackId: trackIds[0],
+			rank: result.rank,
+		});
 
+		notifyPlaylistUpdate.mockClear();
 		const error = await rejection(service.moveTrack(playlistId, ownerId, trackIds[0], move));
 		expect(error).toMatchObject({ statusCode: 409, code: 'TRACK_MOVED_CONCURRENTLY' });
+		expect(notifyPlaylistUpdate).not.toHaveBeenCalled();
 	});
 
 	it('refuses the move of a removed track with 409 TRACK_NOT_IN_PLAYLIST', async () => {

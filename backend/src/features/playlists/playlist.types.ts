@@ -100,13 +100,6 @@ export interface PlaylistWithTracksResponse extends PlaylistResponse {
 	tracksVersion: number;
 }
 
-// Old socket payload track, kept until #90 (5.5) switches realtime to TrackInPlaylistResponse.
-export interface TrackWithPositionResponse extends TrackResponse {
-	position: number;
-	addedBy: string | null;
-	addedAt: string;
-}
-
 export interface TrackInPlaylistResponse extends TrackResponse {
 	/** Sort key: tracks are ordered by rank, compared byte by byte. */
 	rank: string;

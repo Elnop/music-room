@@ -81,8 +81,6 @@ After each operation the backend emits `playlist:updated` to the `playlist:<id>`
 { playlistId, tracksVersion, rebalanced, event: 'track_moved', trackId, rank }
 ```
 
-The server emits this payload from #90 on; until then it still sends the old `{ playlistId, event, ...data }` shape.
-
 A client:
 
 - ignores an event whose version is not above the one it displays;

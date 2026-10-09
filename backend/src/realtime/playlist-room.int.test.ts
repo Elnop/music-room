@@ -10,6 +10,7 @@ import { CollaboratorService } from '@/features/playlists/services/collaborator.
 import { PlaylistService } from '@/features/playlists/playlist.service.js';
 import { realtime } from '@/realtime/index.js';
 import type { PlaylistRoomError } from '@/realtime/playlist-room.js';
+import type { PlaylistUpdatedPayload } from '@/features/playlists/playlist.types.js';
 
 // Access control of the playlist:<id> rooms (playlist-room.ts) against a real
 // Socket.io server and the local Supabase stack.
@@ -25,6 +26,18 @@ interface PlaylistUpdated {
 }
 
 const PASSWORD = 'integration-test-password';
+
+/** Any versioned delta: these tests only check who receives it. */
+function moved(playlistId: string): PlaylistUpdatedPayload {
+	return {
+		playlistId,
+		tracksVersion: 1,
+		rebalanced: false,
+		event: 'track_moved',
+		trackId: randomUUID(),
+		rank: 'V',
+	};
+}
 
 async function createUser(): Promise<TestUser> {
 	const email = `int-${randomUUID()}@example.com`;
@@ -177,10 +190,10 @@ describe('Playlist room access control', () => {
 		const outsiderUpdates = record(outsiderSocket);
 		const ownerUpdate = nextEvent<PlaylistUpdated>(ownerSocket, 'playlist:updated');
 		const viewerUpdate = nextEvent<PlaylistUpdated>(viewerSocket, 'playlist:updated');
-		realtime.notifyPlaylistUpdate(playlistId, 'reordered');
+		realtime.notifyPlaylistUpdate(moved(playlistId));
 
-		await expect(ownerUpdate).resolves.toMatchObject({ playlistId, event: 'reordered' });
-		await expect(viewerUpdate).resolves.toMatchObject({ playlistId, event: 'reordered' });
+		await expect(ownerUpdate).resolves.toMatchObject({ playlistId, event: 'track_moved' });
+		await expect(viewerUpdate).resolves.toMatchObject({ playlistId, event: 'track_moved' });
 		await settle();
 		expect(outsiderUpdates).toEqual([]);
 	});
@@ -191,8 +204,8 @@ describe('Playlist room access control', () => {
 		await join(outsiderSocket, playlistId);
 
 		const update = nextEvent<PlaylistUpdated>(outsiderSocket, 'playlist:updated');
-		realtime.notifyPlaylistUpdate(playlistId, 'reordered');
-		await expect(update).resolves.toMatchObject({ playlistId, event: 'reordered' });
+		realtime.notifyPlaylistUpdate(moved(playlistId));
+		await expect(update).resolves.toMatchObject({ playlistId, event: 'track_moved' });
 	});
 
 	it('refuses an unknown playlist with PLAYLIST_NOT_FOUND', async () => {
@@ -230,7 +243,7 @@ describe('Playlist room access control', () => {
 
 		const viewerUpdates = record(viewerSocket);
 		const ownerUpdate = nextEvent<PlaylistUpdated>(ownerSocket, 'playlist:updated');
-		realtime.notifyPlaylistUpdate(playlistId, 'reordered');
+		realtime.notifyPlaylistUpdate(moved(playlistId));
 		await expect(ownerUpdate).resolves.toMatchObject({ playlistId });
 		await settle();
 		expect(viewerUpdates).toEqual([]);
@@ -255,7 +268,7 @@ describe('Playlist room access control', () => {
 
 		const collaboratorUpdates = record(collaboratorSocket);
 		const ownerUpdate = nextEvent<PlaylistUpdated>(ownerSocket, 'playlist:updated');
-		realtime.notifyPlaylistUpdate(playlistId, 'reordered');
+		realtime.notifyPlaylistUpdate(moved(playlistId));
 		await expect(ownerUpdate).resolves.toMatchObject({ playlistId });
 		await settle();
 		expect(collaboratorUpdates).toEqual([]);
@@ -276,7 +289,7 @@ describe('Playlist room access control', () => {
 
 		const ownerUpdates = record(ownerSocket);
 		const viewerUpdate = nextEvent<PlaylistUpdated>(viewerSocket, 'playlist:updated');
-		realtime.notifyPlaylistUpdate(playlistId, 'reordered');
+		realtime.notifyPlaylistUpdate(moved(playlistId));
 		await expect(viewerUpdate).resolves.toMatchObject({ playlistId });
 		await settle();
 		expect(ownerUpdates).toEqual([]);
