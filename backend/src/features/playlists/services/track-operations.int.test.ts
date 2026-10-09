@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { createClient, type PostgrestError, type SupabaseClient } from '@supabase/supabase-js';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { supabaseAdmin } from '@/shared/config/supabase.js';
+import { createSignInClient, supabaseAdmin } from '@/shared/config/supabase.js';
 
 // Concurrent playlist edits (subject IV.2.3) against the local Supabase stack, migration 016.
 // Each rpc() is its own HTTP request, so Promise.all runs real concurrent transactions.
@@ -26,6 +26,7 @@ interface AddResult extends MoveResult {
 }
 
 const db = supabaseAdmin as unknown as SupabaseClient;
+const PASSWORD = 'integration-test-password';
 
 let ownerId: string;
 let playlistId: string;
@@ -108,7 +109,7 @@ async function expectInvariants(): Promise<Row[]> {
 beforeAll(async () => {
 	const { data, error } = await supabaseAdmin.auth.admin.createUser({
 		email: `int-${randomUUID()}@example.com`,
-		password: 'integration-test-password',
+		password: PASSWORD,
 		email_confirm: true,
 	});
 	if (error) throw error;
@@ -268,11 +269,16 @@ describe('playlist track operations (migration 016)', () => {
 	it('keeps every invariant under a burst of concurrent moves, adds and removes', async () => {
 		const v = await version();
 		const rows = await order();
-		await Promise.all([
+		const results = await Promise.all([
 			...rows.map((row, i) => move(row.track_id, rows[(i + 2) % rows.length].rank, v)),
 			add(trackIds[5]),
 			remove(rows[1].track_id),
 		]);
+		// Every operation applies, except the move of the removed track if the remove ran first.
+		results.forEach((result, i) => {
+			if (i === 1 && result.error !== null) expect(result.error).toBe('TRACK_NOT_IN_PLAYLIST');
+			else expect(result.error).toBeNull();
+		});
 		const now = ids(await expectInvariants());
 		expect(now).toHaveLength(5);
 		expect(now).toContain(trackIds[5]);
@@ -319,23 +325,51 @@ describe('playlist track operations (migration 016)', () => {
 		expect(fresh.data!.rebalanced).toBe(false);
 	}, 60_000);
 
-	it('refuses calls made with the anon key', async () => {
+	it('refuses every 016 function to the anon key with a permission error', async () => {
 		const anon = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
 			auth: { autoRefreshToken: false, persistSession: false },
 		});
-		for (const [fn, args] of [
-			['playlist_remove_track', { p_playlist_id: playlistId, p_track_id: trackIds[0] }],
+		const calls: [string, Record<string, unknown>][] = [
+			['rank_between', { p_a: null, p_b: null }],
+			['rank_after', { p_a: null }],
+			['rank_spaced', { p_index: 1, p_count: 1 }],
+			['rank_max_length', {}],
+			['playlist_lock', { p_playlist_id: playlistId }],
+			['playlist_rebalance', { p_playlist_id: playlistId, p_version: 99 }],
 			['playlist_add_track', { p_playlist_id: playlistId, p_track_id: trackIds[5] }],
+			['playlist_remove_track', { p_playlist_id: playlistId, p_track_id: trackIds[0] }],
 			[
 				'playlist_move_track',
 				{ p_playlist_id: playlistId, p_track_id: trackIds[0], p_expected_version: 5 },
 			],
-			['rank_between', { p_a: null, p_b: null }],
-		] as const) {
+		];
+		for (const [fn, args] of calls) {
 			const { error } = await anon.rpc(fn, args);
-			expect(error).not.toBeNull();
+			expect(error, fn).not.toBeNull();
+			expect(error!.code === '42501' || /permission denied/i.test(error!.message), fn).toBe(true);
 		}
 		expect(await order()).toHaveLength(5);
+		expect(await playlistState()).toEqual({ tracks_version: 5, ranks_rebalanced_at_version: 0 });
+	});
+
+	it('refuses direct inserts and deletes on playlist_tracks to the playlist owner', async () => {
+		const { data: owner } = await supabaseAdmin.auth.admin.getUserById(ownerId);
+		const user = createSignInClient() as unknown as SupabaseClient;
+		const { error: signInError } = await user.auth.signInWithPassword({
+			email: owner.user!.email!,
+			password: PASSWORD,
+		});
+		expect(signInError).toBeNull();
+
+		const { error: insertError } = await user
+			.from('playlist_tracks')
+			.insert({ playlist_id: playlistId, track_id: trackIds[5], rank: 'zz', added_by: ownerId });
+		expect(insertError).not.toBeNull();
+
+		// RLS hides rows from a delete without a policy instead of raising.
+		await user.from('playlist_tracks').delete().eq('playlist_id', playlistId);
+
+		expect(ids(await order())).toEqual(trackIds.slice(0, 5));
 		expect(await version()).toBe(5);
 	});
 });

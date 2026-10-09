@@ -146,7 +146,12 @@ ALTER TABLE public.playlist_tracks
 ALTER TABLE public.playlist_tracks DROP CONSTRAINT unique_playlist_position;
 DROP INDEX IF EXISTS public.idx_playlist_tracks_playlist;
 ALTER TABLE public.playlist_tracks DROP COLUMN position;
-CREATE INDEX idx_playlist_tracks_rank ON public.playlist_tracks (playlist_id, rank);
+
+-- Track writes go only through the operation functions below, as service_role:
+-- a direct insert or delete would skip the playlist lock and the version bump.
+-- The select policy stays.
+DROP POLICY IF EXISTS "playlist_tracks_insert_policy" ON public.playlist_tracks;
+DROP POLICY IF EXISTS "playlist_tracks_delete_policy" ON public.playlist_tracks;
 
 DROP FUNCTION IF EXISTS public.get_next_playlist_position(uuid);
 
