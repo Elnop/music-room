@@ -1,6 +1,7 @@
 import { Server as SocketIOServer } from 'socket.io';
 import type { Server as HTTPServer } from 'http';
 import { socketLogger } from '@/shared/middleware/socket-logger.middleware.js';
+import { isOriginAllowed, isSameOrigin } from '@/shared/config/cors.config.js';
 import {
 	authenticateSocket,
 	type AppSocket,
@@ -90,15 +91,29 @@ class RealtimeService {
 	 * Initialize Socket.io server
 	 */
 	initialize(httpServer: HTTPServer) {
-		const corsOrigin = process.env.SOCKET_IO_CORS_ORIGIN || '*';
-
-		socketLogger.init('initializing', { corsOrigin });
+		socketLogger.init('initializing', { cors: 'ALLOWED_ORIGINS' });
 
 		this.io = new SocketIOServer(httpServer, {
+			// Same origin rule as the HTTP API (cors.config.ts). `cors` only covers
+			// the polling transport's headers; `allowRequest` also refuses a
+			// browser WebSocket from a disallowed origin. A same-origin request is
+			// not cross-origin: the Android app sends the backend's own address.
 			cors: {
-				origin: corsOrigin,
+				origin: (origin, callback) => callback(null, isOriginAllowed(origin)),
 				methods: ['GET', 'POST'],
 				credentials: true,
+			},
+			allowRequest: (req, callback) => {
+				const allowed =
+					isOriginAllowed(req.headers.origin) || isSameOrigin(req.headers.origin, req.headers.host);
+				if (!allowed) {
+					socketLogger.event('connection:refused', 'N/A', {
+						level: 'warn',
+						origin: req.headers.origin,
+						action: 'origin_not_allowed',
+					});
+				}
+				callback(allowed ? null : 'ORIGIN_NOT_ALLOWED', allowed);
 			},
 			transports: ['websocket', 'polling'],
 			pingTimeout: 60000,
