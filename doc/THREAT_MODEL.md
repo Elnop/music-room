@@ -72,17 +72,18 @@ Les seuils viennent de `backend/src/shared/config/rate-limit.config.ts` (variabl
 - `resendVerification` (`auth.controller.ts`) envoie le code à l'email du compte, jamais à celui du corps, et seulement si l'email du corps correspond (`resolveVerificationRecipient`). Même réponse dans tous les cas, cooldown compté avant toute recherche : un 429 ne trahit pas un compte existant (#188).
 - `forgotPassword` répond toujours « If this email exists… » ; le quota horaire et le cooldown sont consommés que l'email existe ou non (`PasswordResetCooldownService.consumeRequest`, #187). `GET /reset-password/can-resend` donne la même réponse pour un email inconnu.
 - Un compte Google/Facebook sans mot de passe peut recevoir un code et en définir un (#189) : il faut quand même lire la boîte mail.
+- `has_password` est faux sur les comptes créés par Google/Facebook avant #189 (migration 019, #196) : `LAST_PROVIDER` ne compte plus un mot de passe inexistant.
 - Un reset termine toutes les sessions du compte : Supabase Auth (GoTrue v2.197.0, même version en local et sur le projet hébergé) les supprime quand `auth.admin.updateUserById` change le mot de passe. Les access et refresh tokens émis avant le reset sont refusés aussitôt (L5, #203). Le test ne tourne que sur la stack locale : une montée de version de GoTrue est à revérifier.
 
 **Tests.**
 - `backend/src/features/auth/services/email-verification.int.test.ts` : « refuses a verified account with ALREADY_VERIFIED and returns no session », « sends nothing when the body email is not the account email », « answers 429 RESEND_COOLDOWN on a second call even when the email does not match », « sends nothing for an unknown user ».
 - `backend/src/features/auth/services/password-reset-resend.int.test.ts` : « reports the same cooldown for an email with no account (no enumeration) ».
 - `backend/src/features/auth/services/password-reset-oauth.int.test.ts` : « sends a code, resets, records the password and allows password sign-in ».
+- `backend/src/features/auth/services/has-password-backfill.int.test.ts` : « sets false on Google and Facebook sign-ups made before #189 », « keeps password accounts and later sign-ups that set a password ».
 - `backend/src/features/auth/services/password-reset-sessions.int.test.ts` : « refuses the access and refresh tokens issued before the reset ».
 
 **Ouvert.**
 - #194 : `listUsers()` sans pagination ; au-delà de la première page, un compte n'est pas trouvé par le reset.
-- #196 : `has_password` faux sur d'anciens comptes Google/Facebook.
 - Les codes sont stockés en clair dans `user_profiles` ; ils étaient lisibles avec la clé anon (L1), ils ne le sont plus depuis #201.
 
 ## M4. Bruteforce et rejeu de tokens
@@ -265,4 +266,4 @@ Trouvées en écrivant ce document. L1 à L3 ont été corrigées par #201, L10 
 | L10 | Moyenne, corrigé (#208) | Routes SoundCloud publiques, sans rate limit, et sans validation Zod sauf `search` : proxy ouvert vers SoundCloud (M7). | `backend/src/features/soundcloud/soundcloud.routes.ts` | #208 |
 | L11 | Moyenne (dev) | En développement, toute origine contenant « ngrok » est acceptée par le CORS HTTP et socket ; le backend de dev tourne toujours dans ce mode (M9). | `backend/src/shared/config/cors.config.ts` (`isOriginAllowed`) | #209 |
 
-Déjà suivis ailleurs : #159 (M10), #173 (L4), #194 et #196 (M3).
+Déjà suivis ailleurs : #159 (M10), #173 (L4), #194 (M3).
