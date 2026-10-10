@@ -1,6 +1,6 @@
 import { Server as SocketIOServer } from 'socket.io';
 import type { Server as HTTPServer } from 'http';
-import { socketLogger } from '@/shared/middleware/socket-logger.middleware.js';
+import { loggableEventName, socketLogger } from '@/shared/middleware/socket-logger.middleware.js';
 import { isOriginAllowed, isSameOrigin } from '@/shared/config/cors.config.js';
 import {
 	authenticateSocket,
@@ -8,6 +8,7 @@ import {
 	type AppSocketServer,
 } from '@/realtime/socket-auth.js';
 import { LatestThrottle } from '@/realtime/latest-throttle.js';
+import { rateLimitedErrorFor, SocketEventLimiter } from '@/realtime/event-rate-limit.js';
 import {
 	authorizePlaylistJoin,
 	playlistRoom,
@@ -24,44 +25,13 @@ import {
 	controlActionSchema,
 	INVALID_CONTROL_PAYLOAD,
 	INVALID_LISTENING_PAYLOAD,
+	INVALID_LISTENING_UPDATE_PAYLOAD,
 	leaveListeningRoom,
 	listeningRoom,
 	listeningTargetSchema,
+	listeningUpdateSchema,
+	type ListeningUpdatePayload,
 } from '@/realtime/music-control-access.js';
-
-/**
- * Listening update payload from client.
- * Older clients may still send a `device` field: it is ignored, and the
- * device comes from the handshake (`socket.data.device`).
- */
-interface ListeningUpdatePayload {
-	track: {
-		id: number;
-		title: string;
-		artist: string;
-		artworkUrl: string | null;
-	} | null;
-	isPlaying: boolean;
-}
-
-/**
- * Validate listening update payload structure
- */
-function isValidListeningUpdatePayload(data: unknown): data is ListeningUpdatePayload {
-	if (!data || typeof data !== 'object') return false;
-	const payload = data as Record<string, unknown>;
-
-	if (typeof payload.isPlaying !== 'boolean') return false;
-
-	if (payload.track !== null) {
-		if (typeof payload.track !== 'object') return false;
-		const track = payload.track as Record<string, unknown>;
-		if (typeof track.title !== 'string') return false;
-		if (typeof track.artist !== 'string') return false;
-	}
-
-	return true;
-}
 
 /**
  * Realtime Service
@@ -138,10 +108,27 @@ class RealtimeService {
 			});
 
 			// Every incoming event, including those added later, is logged with
-			// the handshake's platform, device and app version (subject IV.6).
+			// the handshake's platform, device and app version (subject IV.6),
+			// then counted against the socket's per-event limit (#204).
+			const limiter = new SocketEventLimiter();
 			socket.use(([eventName]: unknown[], next) => {
 				socketLogger.incoming(socket.id, eventName, socket.data);
-				next();
+
+				const name = typeof eventName === 'string' ? eventName : '';
+				const decision = limiter.check(name);
+				if (decision === 'allowed') {
+					next();
+					return;
+				}
+
+				const refusal = rateLimitedErrorFor(name);
+				if (refusal) socket.emit(refusal.event, refusal.payload);
+				if (decision === 'limited') {
+					socketLogger.event(loggableEventName(name), socket.id, {
+						level: 'warn',
+						action: 'rate_limited',
+					});
+				}
 			});
 
 			this.registerDevice(socket);
@@ -327,14 +314,17 @@ class RealtimeService {
 	 * Music control handlers - multi-device support
 	 */
 	private registerMusicControlHandlers(socket: AppSocket) {
-		socket.on('listening:update', (data: unknown) => {
-			if (!isValidListeningUpdatePayload(data)) {
+		socket.on('listening:update', (payload: unknown) => {
+			const parsed = listeningUpdateSchema.safeParse(payload);
+			if (!parsed.success) {
+				socket.emit('listening:error', INVALID_LISTENING_UPDATE_PAYLOAD);
 				socketLogger.event('listening:update', socket.id, {
 					level: 'warn',
 					action: 'invalid_payload',
 				});
 				return;
 			}
+			const data = parsed.data;
 
 			const socketInfo = this.socketToDevice.get(socket.id);
 			if (!socketInfo) {

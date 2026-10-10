@@ -494,6 +494,40 @@ describe('Socket.io handshake authentication', () => {
 		await expect(playing).resolves.toBeDefined();
 	});
 
+	it('answers INVALID_PAYLOAD to a listening:update with a title too long (#204)', async () => {
+		const owner = connect({ token: alice.token, ...deviceFields() });
+		await connected(owner);
+
+		const error = nextEvent<{ code: string }>(owner, 'listening:error');
+		owner.emit('listening:update', {
+			track: { id: 1, title: 'x'.repeat(301), artist: 'a', artworkUrl: null },
+			isPlaying: true,
+		});
+		await expect(error).resolves.toMatchObject({ code: 'INVALID_PAYLOAD' });
+	});
+
+	it('refuses events past the per-socket limit with RATE_LIMITED (#204)', async () => {
+		const socket = connect({ token: bob.token, ...deviceFields() });
+		await connected(socket);
+
+		// control:action allows 20 per 10 s: malformed payloads answer
+		// INVALID_PAYLOAD up to there, the 21st is refused before validation.
+		const codes: string[] = [];
+		socket.on('control:error', (err: { code: string }) => codes.push(err.code));
+		for (let i = 0; i < 21; i++) socket.emit('control:action', {});
+		await vi.waitFor(() => expect(codes).toHaveLength(21));
+		// The refusal can arrive before earlier answers: count, not order.
+		expect(codes.filter(code => code === 'INVALID_PAYLOAD')).toHaveLength(20);
+		expect(codes.filter(code => code === 'RATE_LIMITED')).toHaveLength(1);
+
+		// Counted per socket: another socket of the same user is not limited.
+		const other = connect({ token: bob.token, ...deviceFields() });
+		await connected(other);
+		const answer = nextEvent<{ code: string }>(other, 'control:error');
+		other.emit('control:action', {});
+		await expect(answer).resolves.toMatchObject({ code: 'INVALID_PAYLOAD' });
+	});
+
 	it('drops the pending listening:update when the device disconnects', async () => {
 		const device = deviceFields();
 		const owner = connect({ token: alice.token, ...device });
