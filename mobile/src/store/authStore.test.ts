@@ -3,8 +3,10 @@ import type { Socket } from 'socket.io-client';
 import { useAuthStore } from '@store/authStore';
 import { useSocketStore } from '@store/socketStore';
 import { resetBackendUrl } from '@/services/backendUrl';
+import { signInWithFacebook, signInWithGoogle } from '@services/oauth';
 
 const mockSupabaseAuth = {
+	signInWithPassword: jest.fn(),
 	signOut: jest.fn(),
 	setSession: jest.fn(),
 };
@@ -84,6 +86,9 @@ beforeEach(async () => {
 	jest.spyOn(console, 'error').mockImplementation(() => undefined);
 	globalThis.fetch = fetchMock as unknown as typeof fetch;
 	fetchMock.mockReset();
+	jest.mocked(signInWithGoogle).mockReset();
+	jest.mocked(signInWithFacebook).mockReset();
+	mockSupabaseAuth.signInWithPassword.mockReset().mockResolvedValue({ data: {}, error: null });
 	mockSupabaseAuth.signOut.mockReset().mockResolvedValue({ error: null });
 	mockSupabaseAuth.setSession.mockReset().mockResolvedValue({ data: {}, error: null });
 	await AsyncStorage.clear();
@@ -261,5 +266,349 @@ describe('logout', () => {
 		await useAuthStore.getState().logout();
 
 		await expectSignedOut();
+	});
+});
+
+// Keys as defined by STORAGE_KEYS in authStore.ts.
+const KEYS = {
+	user: '@zumik/auth_user',
+	access: '@zumik/access_token',
+	refresh: '@zumik/refresh_token',
+	isAuth: '@zumik/is_authenticated',
+	expiresAt: '@zumik/token_expires_at',
+} as const;
+
+/** The in-memory state of a fresh app start; storage is left untouched. */
+function resetMemory(): void {
+	useAuthStore.setState({
+		user: null,
+		accessToken: null,
+		refreshToken: null,
+		tokenExpiresAt: null,
+		isAuthenticated: false,
+		isLoading: false,
+		isRefreshing: false,
+		error: null,
+		linkedProviders: null,
+	});
+}
+
+async function signedOut(): Promise<void> {
+	resetMemory();
+	await AsyncStorage.clear();
+}
+
+const sessionExpiresAt = Math.floor(Date.now() / 1000) + 3600;
+
+const session = {
+	accessToken: 'new-access',
+	refreshToken: 'new-refresh',
+	expiresIn: 3600,
+	expiresAt: sessionExpiresAt,
+};
+
+function authResponse(withSession: object | null = session, extra: object = {}): Response {
+	return jsonResponse(200, {
+		success: true,
+		data: { user, ...(withSession ? { session: withSession } : {}), ...extra },
+	});
+}
+
+function requestAt(index = 0): { url: string; init: RequestInit; body: unknown } {
+	const [url, init] = fetchMock.mock.calls[index] as [string, RequestInit];
+	return { url, init, body: JSON.parse(init.body as string) };
+}
+
+function expectAuthenticated(): void {
+	expect(useAuthStore.getState()).toMatchObject({
+		user,
+		accessToken: 'new-access',
+		refreshToken: 'new-refresh',
+		tokenExpiresAt: sessionExpiresAt * 1000,
+		isAuthenticated: true,
+		isLoading: false,
+		error: null,
+	});
+}
+
+async function expectPersisted(): Promise<void> {
+	expect(JSON.parse((await AsyncStorage.getItem(KEYS.user)) as string)).toEqual(user);
+	expect(await AsyncStorage.getItem(KEYS.access)).toBe('new-access');
+	expect(await AsyncStorage.getItem(KEYS.refresh)).toBe('new-refresh');
+	expect(await AsyncStorage.getItem(KEYS.isAuth)).toBe('true');
+	expect(await AsyncStorage.getItem(KEYS.expiresAt)).toBe(String(sessionExpiresAt * 1000));
+}
+
+async function expectSignedOutAndNothingStored(): Promise<void> {
+	expect(useAuthStore.getState()).toMatchObject({
+		user: null,
+		accessToken: null,
+		refreshToken: null,
+		tokenExpiresAt: null,
+		isAuthenticated: false,
+		isLoading: false,
+	});
+	expect(await AsyncStorage.multiGet(Object.values(KEYS))).toEqual(
+		Object.values(KEYS).map(key => [key, null])
+	);
+}
+
+describe('login', () => {
+	beforeEach(signedOut);
+
+	it('authenticates and persists the session', async () => {
+		fetchMock.mockResolvedValue(authResponse());
+
+		await useAuthStore.getState().login('a@example.com', 'Secret1!');
+
+		const { url, init, body } = requestAt();
+		expect(fetchMock).toHaveBeenCalledTimes(1);
+		expect(url).toMatch(/\/api\/auth\/login$/);
+		expect(init.method).toBe('POST');
+		expect(body).toEqual({ email: 'a@example.com', password: 'Secret1!' });
+		expect(mockSupabaseAuth.signInWithPassword).toHaveBeenCalledWith({
+			email: 'a@example.com',
+			password: 'Secret1!',
+		});
+		expectAuthenticated();
+		await expectPersisted();
+	});
+
+	it('rejects and stores nothing when the password is wrong', async () => {
+		fetchMock.mockResolvedValue(
+			jsonResponse(401, {
+				success: false,
+				error: { message: 'Invalid email or password', code: 'INVALID_CREDENTIALS' },
+			})
+		);
+
+		// The message itself is GitHub #235 (the 401 goes through the refresh path).
+		await expect(useAuthStore.getState().login('a@example.com', 'wrong')).rejects.toThrow();
+
+		expect(calledUrls()[0]).toMatch(/\/api\/auth\/login$/);
+		expect(useAuthStore.getState().error).toEqual(expect.any(String));
+		expect(mockSupabaseAuth.signInWithPassword).not.toHaveBeenCalled();
+		await expectSignedOutAndNothingStored();
+	});
+});
+
+describe('register', () => {
+	beforeEach(signedOut);
+
+	const input = {
+		email: 'new@example.com',
+		password: 'Secret1!',
+		username: 'newbie',
+		displayName: 'New',
+	};
+
+	it('returns the verification step without signing in', async () => {
+		fetchMock.mockResolvedValue(
+			jsonResponse(201, {
+				success: true,
+				data: { user: { ...user, id: 'user-new' }, requiresVerification: true },
+			})
+		);
+
+		await expect(useAuthStore.getState().register(input)).resolves.toEqual({
+			requiresVerification: true,
+			userId: 'user-new',
+			email: 'new@example.com',
+		});
+
+		const { url, init, body } = requestAt();
+		expect(url).toMatch(/\/api\/auth\/register$/);
+		expect(init.method).toBe('POST');
+		expect(body).toEqual(input);
+		await expectSignedOutAndNothingStored();
+		expect(useAuthStore.getState().error).toBeNull();
+	});
+
+	it('authenticates and persists the session when the backend returns one', async () => {
+		fetchMock.mockResolvedValue(
+			jsonResponse(201, { success: true, data: { user, session, requiresVerification: false } })
+		);
+
+		await expect(useAuthStore.getState().register(input)).resolves.toEqual({
+			requiresVerification: false,
+		});
+
+		expect(requestAt().url).toMatch(/\/api\/auth\/register$/);
+		expectAuthenticated();
+		await expectPersisted();
+	});
+});
+
+describe('loginWithGoogle', () => {
+	beforeEach(signedOut);
+
+	it('exchanges the Google ID token for a persisted session', async () => {
+		jest.mocked(signInWithGoogle).mockResolvedValue('google-id-token');
+		fetchMock.mockResolvedValue(authResponse());
+
+		await useAuthStore.getState().loginWithGoogle();
+
+		const { url, init, body } = requestAt();
+		expect(fetchMock).toHaveBeenCalledTimes(1);
+		expect(url).toMatch(/\/api\/auth\/google$/);
+		expect(init.method).toBe('POST');
+		expect(body).toEqual({ idToken: 'google-id-token' });
+		expectAuthenticated();
+		await expectPersisted();
+		expect(mockSupabaseAuth.setSession).toHaveBeenCalledWith({
+			access_token: 'new-access',
+			refresh_token: 'new-refresh',
+		});
+	});
+
+	it('stays signed out without error or request when the user cancels', async () => {
+		jest.mocked(signInWithGoogle).mockRejectedValue(new Error('SIGN_IN_CANCELLED'));
+
+		await expect(useAuthStore.getState().loginWithGoogle()).resolves.toBeUndefined();
+
+		expect(fetchMock).not.toHaveBeenCalled();
+		expect(useAuthStore.getState().error).toBeNull();
+		await expectSignedOutAndNothingStored();
+	});
+
+	it('shows the backend message and stores nothing when the backend refuses the token', async () => {
+		jest.mocked(signInWithGoogle).mockResolvedValue('google-id-token');
+		fetchMock.mockResolvedValue(
+			jsonResponse(400, {
+				success: false,
+				error: { message: 'Invalid Google token', code: 'INVALID_TOKEN' },
+			})
+		);
+
+		await expect(useAuthStore.getState().loginWithGoogle()).resolves.toBeUndefined();
+
+		expect(useAuthStore.getState().error).toBe('Invalid Google token');
+		expect(mockSupabaseAuth.setSession).not.toHaveBeenCalled();
+		await expectSignedOutAndNothingStored();
+	});
+});
+
+describe('loginWithFacebook', () => {
+	beforeEach(signedOut);
+
+	it('exchanges the Facebook access token for a persisted session', async () => {
+		jest.mocked(signInWithFacebook).mockResolvedValue('facebook-access-token');
+		fetchMock.mockResolvedValue(authResponse());
+
+		await useAuthStore.getState().loginWithFacebook();
+
+		const { url, init, body } = requestAt();
+		expect(fetchMock).toHaveBeenCalledTimes(1);
+		expect(url).toMatch(/\/api\/auth\/facebook$/);
+		expect(init.method).toBe('POST');
+		expect(body).toEqual({ accessToken: 'facebook-access-token' });
+		expectAuthenticated();
+		await expectPersisted();
+		expect(mockSupabaseAuth.setSession).toHaveBeenCalledWith({
+			access_token: 'new-access',
+			refresh_token: 'new-refresh',
+		});
+	});
+
+	it('stays signed out without error or request when the user cancels', async () => {
+		jest.mocked(signInWithFacebook).mockRejectedValue(new Error('SIGN_IN_CANCELLED'));
+
+		await expect(useAuthStore.getState().loginWithFacebook()).resolves.toBeUndefined();
+
+		expect(fetchMock).not.toHaveBeenCalled();
+		expect(useAuthStore.getState().error).toBeNull();
+		await expectSignedOutAndNothingStored();
+	});
+
+	it('shows the backend message and stores nothing when the backend refuses the token', async () => {
+		jest.mocked(signInWithFacebook).mockResolvedValue('facebook-access-token');
+		fetchMock.mockResolvedValue(
+			jsonResponse(400, {
+				success: false,
+				error: { message: 'Invalid Facebook token', code: 'INVALID_TOKEN' },
+			})
+		);
+
+		await expect(useAuthStore.getState().loginWithFacebook()).resolves.toBeUndefined();
+
+		expect(useAuthStore.getState().error).toBe('Invalid Facebook token');
+		await expectSignedOutAndNothingStored();
+		expect(mockSupabaseAuth.setSession).not.toHaveBeenCalled();
+	});
+});
+
+describe('session persistence', () => {
+	beforeEach(signedOut);
+
+	it('restores a stored session after a restart', async () => {
+		const expiresAtMs = sessionExpiresAt * 1000;
+		await AsyncStorage.multiSet([
+			[KEYS.user, JSON.stringify(user)],
+			[KEYS.access, 'stored-access'],
+			[KEYS.refresh, 'stored-refresh'],
+			[KEYS.isAuth, 'true'],
+			[KEYS.expiresAt, String(expiresAtMs)],
+		]);
+
+		await useAuthStore.getState().loadFromStorage();
+
+		expect(useAuthStore.getState()).toMatchObject({
+			user,
+			accessToken: 'stored-access',
+			refreshToken: 'stored-refresh',
+			tokenExpiresAt: expiresAtMs,
+			isAuthenticated: true,
+		});
+		expect(typeof useAuthStore.getState().tokenExpiresAt).toBe('number');
+	});
+
+	it('stays signed out when nothing is stored', async () => {
+		await useAuthStore.getState().loadFromStorage();
+
+		await expectSignedOutAndNothingStored();
+	});
+
+	it('stays signed out when the session flag is missing', async () => {
+		await AsyncStorage.multiSet([
+			[KEYS.user, JSON.stringify(user)],
+			[KEYS.access, 'stored-access'],
+			[KEYS.refresh, 'stored-refresh'],
+		]);
+
+		await useAuthStore.getState().loadFromStorage();
+
+		expect(useAuthStore.getState()).toMatchObject({
+			user: null,
+			accessToken: null,
+			isAuthenticated: false,
+		});
+	});
+
+	it('clears the stored session when the stored user is corrupt', async () => {
+		await AsyncStorage.multiSet([
+			[KEYS.user, '{not json'],
+			[KEYS.access, 'stored-access'],
+			[KEYS.refresh, 'stored-refresh'],
+			[KEYS.isAuth, 'true'],
+			[KEYS.expiresAt, String(sessionExpiresAt * 1000)],
+		]);
+
+		await useAuthStore.getState().loadFromStorage();
+
+		await expectSignedOutAndNothingStored();
+		expect(console.error).toHaveBeenCalledWith(
+			'Failed to load auth state from storage:',
+			expect.anything()
+		);
+	});
+
+	it('restores the same session after login and a restart', async () => {
+		fetchMock.mockResolvedValue(authResponse());
+		await useAuthStore.getState().login('a@example.com', 'Secret1!');
+
+		resetMemory();
+		await useAuthStore.getState().loadFromStorage();
+
+		expectAuthenticated();
 	});
 });
