@@ -248,11 +248,11 @@ Avant 017, `anon` et `authenticated` avaient les privilèges de table par défau
 
 **Tests.** `redis-rate-limit-store.test.ts` : « throws 503 and sends nothing while Redis is not ready », « fails closed again when Redis drops after creation, then resumes » ; `token-revocation.service.test.ts` : « throws 503 REVOCATION_UNAVAILABLE when Redis is not ready » ; `auth.middleware.test.ts` : « answers 503 REVOCATION_UNAVAILABLE when the denylist cannot be checked ».
 
-**Risque accepté.** `checkAccountLockout`, `checkIPBlacklist` et `brute-force.service.ts` laissent passer en cas d'erreur Redis (fail open). Le limiteur de login, placé avant, échoue fermé, donc une panne Redis complète bloque le login au lieu de l'ouvrir ; seule une erreur ponctuelle sur une commande Redis laisse passer une tentative. En dev, Redis est exposé sans mot de passe (L8).
+**Risque accepté.** `checkAccountLockout`, `checkIPBlacklist` et `brute-force.service.ts` laissent passer en cas d'erreur Redis (fail open). Le limiteur de login, placé avant, échoue fermé, donc une panne Redis complète bloque le login au lieu de l'ouvrir ; seule une erreur ponctuelle sur une commande Redis laisse passer une tentative. En dev, Redis est sans mot de passe mais publié sur `127.0.0.1` seulement (L8, #205).
 
 ## Lacunes ouvertes
 
-Trouvées en écrivant ce document. L1 à L3 ont été corrigées par #201, L4 par #173, L7 par #204, L10 par #208, L11 réduite par #209 (risque restant accepté), L5 n'était pas reproductible (#203) ; les autres ont chacune leur ticket, sauf L6, risque accepté.
+Trouvées en écrivant ce document. L1 à L3 ont été corrigées par #201, L4 par #173, L7 par #204, L8 par #205, L10 par #208, L11 réduite par #209 (risque restant accepté), L5 n'était pas reproductible (#203) ; les autres ont chacune leur ticket, sauf L6, risque accepté.
 
 | # | Gravité | Lacune | Où | Suivi |
 |---|---------|--------|-----|-------|
@@ -263,7 +263,7 @@ Trouvées en écrivant ce document. L1 à L3 ont été corrigées par #201, L4 p
 | L5 | Moyenne, non reproduite (#203) | Un reset de mot de passe ne terminerait pas les sessions ouvertes. Vérifié sur GoTrue v2.197.0 (local et hébergé) : Supabase Auth supprime toutes les sessions du compte quand l'admin change le mot de passe ; un test d'intégration verrouille ce comportement sur la stack locale. | `PasswordResetService.resetPassword` | #203 |
 | L6 | Moyenne | Une socket ouverte survit au logout et à l'expiration du token (M6). | `backend/src/realtime/socket-auth.ts` | risque accepté (M6) |
 | L7 | Basse, corrigé (#204) | Pas de limite de débit par événement socket ni de longueur max sur `listening:update` (M9). Limite par socket et par événement, chaînes bornées par Zod. | `backend/src/realtime/event-rate-limit.ts`, `backend/src/realtime/music-control-access.ts` | #204 |
-| L8 | Basse (dev) | Redis est publié sur le port 6379 de toutes les interfaces de l'hôte, sans mot de passe : quelqu'un sur le même réseau peut effacer les verrous, la liste noire et la liste de révocation. | `make/helpers/docker.mk` (`start_redis`), voir [SECURITY.md](SECURITY.md) | #205 |
+| L8 | Basse (dev), corrigé (#205) | Redis était publié sur le port 6379 de toutes les interfaces de l'hôte, sans mot de passe : quelqu'un sur le même réseau pouvait effacer les verrous, la liste noire et la liste de révocation. Publié sur `127.0.0.1` seulement ; reste sans mot de passe pour les processus de l'hôte et les conteneurs du réseau Docker. | `make/helpers/docker.mk` (`start_redis`), voir [SECURITY.md](SECURITY.md) | #205 |
 | L9 | Tests | Pas de test pour : `brute-force.service.ts`, `checkAccountLockout`, `checkIPBlacklist`, le nombre max d'essais des codes de vérification et de reset, `PrivacyService.getFilteredProfile`. | — | #206 |
 | L10 | Moyenne, corrigé (#208) | Routes SoundCloud publiques, sans rate limit, et sans validation Zod sauf `search` : proxy ouvert vers SoundCloud (M7). | `backend/src/features/soundcloud/soundcloud.routes.ts` | #208 |
 | L11 | Moyenne (dev), réduite (#209) | En développement, toute origine contenant « ngrok » était acceptée par le CORS HTTP et socket ; seuls les sous-domaines https des domaines ngrok le sont maintenant, sur le nom d'hôte parsé. Risque accepté : un sous-domaine ngrok s'obtient avec un compte gratuit, donc le tunnel d'un attaquant passe encore ; l'authentification par token reste exigée (M9). | `backend/src/shared/config/cors.config.ts` (`isOriginAllowed`) | #209 |
