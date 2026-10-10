@@ -1,12 +1,14 @@
 #!/usr/bin/env node
-// Turns the Artillery JSON reports of one run into summary.md (make perf-test).
+// Turns the JSON reports of one run into summary.md (make perf-test): the
+// Artillery reports (<scenario>.json) and the real-time report (socket.json,
+// written by backend/src/test/perf-socket.ts, its own shape).
 // No dependency: runs with the Node of the host.
 //
 // Usage: node tests/performance/summarize.mjs <results/<timestamp> directory>
 // Run conditions come from the environment: PERF_TARGET, PERF_USERS,
 // PERF_RATE_LIMIT_ENABLED, PERF_RATE_LIMIT_WHITELIST_IPS.
 
-import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
 
 const ENDPOINT_PREFIX = 'plugins.metrics-by-endpoint.response_time.';
@@ -18,11 +20,16 @@ if (!dir) {
 	process.exit(1);
 }
 
-const reports = readdirSync(dir)
-	.filter(file => file.endsWith('.json'))
-	.sort();
-if (reports.length === 0) {
-	console.error(`No Artillery report (*.json) in ${dir}`);
+const SOCKET_REPORT = 'socket.json';
+const SOCKET_LOG = 'socket.log';
+
+const files = readdirSync(dir).filter(file => file.endsWith('.json'));
+const reports = files.filter(file => file !== SOCKET_REPORT).sort();
+const hasSocketReport = files.includes(SOCKET_REPORT);
+// perf-socket.ts crashed before writing its report.
+const socketFailed = !hasSocketReport && existsSync(join(dir, SOCKET_LOG));
+if (reports.length === 0 && !hasSocketReport && !socketFailed) {
+	console.error(`No report (*.json) in ${dir}`);
 	process.exit(1);
 }
 
@@ -80,10 +87,49 @@ function scenarioSection(file) {
 	return lines.join('\n');
 }
 
+function socketLatencyRow(label, summary) {
+	const s = summary ?? {};
+	return `| ${label} | ${s.count ?? 0} | ${ms(s.min)} | ${ms(s.median)} | ${ms(s.p95)} | ${ms(s.p99)} | ${ms(s.max)} |`;
+}
+
+function entries(obj) {
+	const list = Object.entries(obj ?? {}).map(([k, v]) => `${k}: ${v}`);
+	return list.join(', ') || 'none';
+}
+
+function socketSection() {
+	const r = JSON.parse(readFileSync(join(dir, SOCKET_REPORT), 'utf8'));
+	const c = r.connections ?? {};
+	const m = r.metrics ?? {};
+	const e = r.edits ?? {};
+	const t = r.timeouts ?? {};
+	const late = r.late ?? {};
+	return [
+		'## socket (real time)',
+		'',
+		`${r.clients} Socket.io clients (${r.fixtureUsers} fixture users, round-robin) on \`perf-shared\` for ${r.durationSeconds} s (elapsed ${r.elapsedSeconds} s); events not received within ${r.timeoutMs} ms count as timeouts.`,
+		'',
+		`- Connections: ${c.ok} ok, ${c.failed} failed (${entries(c.failuresByReason)}); ${c.joined} in the playlist room; control target (perf_0 device): ${c.controlTarget}`,
+		`- Edits: ${e.sent} sent, ${e.failed} failed; broadcast deliveries ${e.deliveriesReceived}/${e.deliveriesExpected}`,
+		`- Control actions: ${r.controls?.sent ?? 0} sent, ${r.controls?.failed ?? 0} refused`,
+		`- Timeouts: edit broadcast ${t.editBroadcast ?? 0} (deliveries), control:success ${t.controlSuccess ?? 0}, control:command ${t.controlCommand ?? 0}; late arrivals: edit broadcast ${late.editBroadcast ?? 0}, control:success ${late.controlSuccess ?? 0}, control:command ${late.controlCommand ?? 0}`,
+		`- Errors: ${entries(r.errors)}`,
+		'',
+		'| Metric | Samples | min (ms) | median (ms) | p95 (ms) | p99 (ms) | max (ms) |',
+		'| --- | --- | --- | --- | --- | --- | --- |',
+		socketLatencyRow('Connect (handshake)', m.connect),
+		socketLatencyRow('Edit: HTTP add track', m.editHttp),
+		socketLatencyRow('Edit: send -> playlist:updated (each client)', m.editBroadcast),
+		socketLatencyRow('Control: emit -> control:success', m.controlSuccess),
+		socketLatencyRow('Control: emit -> control:command (perf_0)', m.controlCommand),
+		'',
+	].join('\n');
+}
+
 const rateLimitEnabled = process.env.PERF_RATE_LIMIT_ENABLED || 'true (default)';
 const whitelist = process.env.PERF_RATE_LIMIT_WHITELIST_IPS || '(empty)';
 const conditions = [
-	'# HTTP load test summary',
+	'# Load test summary',
 	'',
 	`Run: ${basename(dir)}`,
 	'',
@@ -102,7 +148,19 @@ if (!rateLimitEnabled.startsWith('false') && whitelist === '(empty)') {
 	);
 }
 
-const summary = [conditions.join('\n'), '', ...reports.map(scenarioSection)].join('\n');
+const sections = reports.map(scenarioSection);
+if (hasSocketReport) sections.push(socketSection());
+else if (socketFailed) {
+	sections.push(
+		[
+			'## socket (real time)',
+			'',
+			`The socket scenario failed before writing ${SOCKET_REPORT}; see ${join(dir, SOCKET_LOG)}.`,
+			'',
+		].join('\n')
+	);
+}
+const summary = [conditions.join('\n'), '', ...sections].join('\n');
 const out = join(dir, 'summary.md');
 writeFileSync(out, summary);
 console.log(summary);

@@ -2,8 +2,10 @@
 # Performance (load tests, subject IV.7)
 # ==============================================================================
 # HTTP load scenarios run by Artillery from its pinned Docker image (no npm
-# manifest). Fixtures (users, tokens, shared playlist) are written by
-# backend/src/test/perf-fixtures.ts to tests/performance/fixtures/ (git-ignored).
+# manifest). The real-time scenario (Socket.io) is backend/src/test/perf-socket.ts,
+# run with tsx on the backend's socket.io-client. Fixtures (users, tokens,
+# shared playlist) are written by backend/src/test/perf-fixtures.ts to
+# tests/performance/fixtures/ (git-ignored).
 # See tests/performance/README.md.
 
 .PHONY: perf-fixtures perf-test
@@ -12,14 +14,16 @@ PERF_TARGET ?= $(BACKEND_URL)
 PERF_USERS ?= 20
 PERF_DIR := tests/performance
 PERF_SCENARIOS := login-read track-edit
+PERF_SOCKET_CLIENTS ?=
+PERF_SOCKET_DURATION ?= 30
 ARTILLERY_IMAGE := artilleryio/artillery:2.0.34
 
 perf-fixtures: .ensure-backend-deps ## Create or refresh the load test users and tokens [PERF_USERS=20]
 	$(call print_arrow,Preparing $(PERF_USERS) perf users in Supabase...)
 	@cd $(BACKEND_DIR) && PERF_USERS=$(PERF_USERS) npx tsx src/test/perf-fixtures.ts
 
-perf-test: ## Run the HTTP load scenarios and write a summary [PERF_TARGET= PERF_USERS=]
-	$(call print_header,HTTP load test)
+perf-test: ## Run the HTTP and real-time load scenarios and write a summary [PERF_TARGET= PERF_USERS= PERF_SOCKET_CLIENTS= PERF_SOCKET_DURATION=30]
+	$(call print_header,Load test)
 	@if ! curl -sf -m 5 "$(PERF_TARGET)/health" > /dev/null; then \
 		echo "$(RED)$(ICON_ERROR) No backend answers on $(PERF_TARGET)/health$(NC)"; \
 		echo "$(YELLOW)$(ICON_ARROW) Start it (make dev-docker or make backend-local) or set PERF_TARGET$(NC)"; \
@@ -50,6 +54,11 @@ perf-test: ## Run the HTTP load scenarios and write a summary [PERF_TARGET= PERF
 			"scenarios/$$scenario.yml" > "$$run_dir/$$scenario.log" 2>&1 \
 			|| { rc=1; echo "$(RED)$(ICON_ERROR) Scenario $$scenario failed, see $$run_dir/$$scenario.log$(NC)"; }; \
 	done; \
+	echo "$(YELLOW)$(ICON_ARROW) Scenario socket (clients: $(if $(PERF_SOCKET_CLIENTS),$(PERF_SOCKET_CLIENTS),one per fixture user), $(PERF_SOCKET_DURATION) s)...$(NC)"; \
+	( cd $(BACKEND_DIR) && PERF_TARGET="$(PERF_TARGET)" PERF_SOCKET_CLIENTS="$(PERF_SOCKET_CLIENTS)" \
+		PERF_SOCKET_DURATION="$(PERF_SOCKET_DURATION)" \
+		npx tsx src/test/perf-socket.ts --out "$(CURDIR)/$$run_dir/socket.json" ) > "$$run_dir/socket.log" 2>&1 \
+		|| { rc=1; echo "$(RED)$(ICON_ERROR) Scenario socket failed, see $$run_dir/socket.log$(NC)"; }; \
 	PERF_TARGET="$(PERF_TARGET)" PERF_USERS="$(PERF_USERS)" \
 		PERF_RATE_LIMIT_ENABLED="$$rl_enabled" PERF_RATE_LIMIT_WHITELIST_IPS="$$rl_whitelist" \
 		node $(PERF_DIR)/summarize.mjs "$$run_dir" || rc=1; \
