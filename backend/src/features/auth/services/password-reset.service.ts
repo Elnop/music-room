@@ -20,7 +20,8 @@ import { RateLimiterService } from '@/shared/services/rate-limiter.service.js';
 import { PasswordResetCooldownService } from '@/features/auth/services/password-reset-cooldown.service.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
-import type { UserProfileUpdate, SupabaseAdminUsersResponse } from '@/features/auth/auth.types.js';
+import { findAuthUserIdByEmail } from '@/features/auth/utils/find-auth-user.js';
+import type { UserProfileUpdate } from '@/features/auth/auth.types.js';
 
 export class PasswordResetService {
 	private rateLimiter: RateLimiterService;
@@ -63,19 +64,9 @@ export class PasswordResetService {
 		// Hourly limit and resend cooldown, whether the email exists or not (#187).
 		await this.cooldown.consumeRequest(email, ip);
 
-		const { data: authUserResponse, error: authError } = await supabaseAdmin.auth.admin.listUsers();
+		const userId = await findAuthUserIdByEmail(email);
 
-		if (authError) {
-			logger.error('Failed to list users for password reset', {
-				error: authError.message,
-			});
-			throw new AppError(500, 'Failed to retrieve user', 'USER_FETCH_ERROR');
-		}
-
-		const authUser = authUserResponse as SupabaseAdminUsersResponse;
-		const user = authUser.users.find(u => u.email === email);
-
-		if (!user) {
+		if (!userId) {
 			logger.warn('Password reset requested for non-existent email', {
 				email,
 				ip,
@@ -86,40 +77,31 @@ export class PasswordResetService {
 		// An account without a password (Google or Facebook only) also gets a code:
 		// resetting adds email/password sign-in to it (#189).
 		const code = this.generateResetCode();
-		await this.storeResetCode(user.id, code);
+		await this.storeResetCode(userId, code);
 
 		await sendPasswordResetEmail(email, code, this.CODE_EXPIRY_MINUTES);
 
-		logger.info('Password reset email sent', { email, userId: user.id });
+		logger.info('Password reset email sent', { email, userId });
 	}
 
 	async resetPassword(email: string, code: string, newPassword: string, ip: string): Promise<void> {
-		const attemptsKey = `password_reset_attempts:${email}:${ip}`;
+		// Normalized: the lookup ignores case, so must the attempts limit.
+		const attemptsKey = `password_reset_attempts:${email.trim().toLowerCase()}:${ip}`;
 		await this.rateLimiter.incrementAndCheck(attemptsKey, {
 			maxAttempts: this.MAX_RESET_ATTEMPTS,
 			windowSeconds: 15 * 60,
 		});
 
-		const { data: authUserResponse, error: authError } = await supabaseAdmin.auth.admin.listUsers();
+		const userId = await findAuthUserIdByEmail(email);
 
-		if (authError) {
-			logger.error('Failed to list users for password reset', {
-				error: authError.message,
-			});
-			throw new AppError(500, 'Failed to retrieve user', 'USER_FETCH_ERROR');
-		}
-
-		const authUser = authUserResponse as SupabaseAdminUsersResponse;
-		const user = authUser.users.find(u => u.email === email);
-
-		if (!user) {
+		if (!userId) {
 			throw new AppError(400, 'Invalid reset code', 'INVALID_RESET_CODE');
 		}
 
 		const { data: profile, error: profileError } = await supabaseAdmin
 			.from('user_profiles')
 			.select('password_reset_code, password_reset_code_expires_at')
-			.eq('id', user.id)
+			.eq('id', userId)
 			.single();
 
 		if (profileError || !profile) {
@@ -147,13 +129,13 @@ export class PasswordResetService {
 		// Supabase Auth deletes every session of the account when an admin sets its
 		// password, so stolen access and refresh tokens stop working (#203, tested
 		// in password-reset-sessions.int.test.ts).
-		const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(user.id, {
+		const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
 			password: newPassword,
 		});
 
 		if (updateError) {
 			logger.error('Failed to update password', {
-				userId: user.id,
+				userId: userId,
 				error: updateError,
 			});
 			throw new AppError(500, 'Failed to update password', 'PASSWORD_UPDATE_ERROR');
@@ -169,11 +151,11 @@ export class PasswordResetService {
 		const { error: clearError } = await supabaseAdmin
 			.from('user_profiles')
 			.update(clearData)
-			.eq('id', user.id);
+			.eq('id', userId);
 
 		if (clearError) {
 			logger.error('Failed to clear reset code and set has_password', {
-				userId: user.id,
+				userId: userId,
 				error: clearError.message,
 			});
 			// The password is set but has_password would stay false: fail so the client
@@ -183,6 +165,6 @@ export class PasswordResetService {
 
 		await this.rateLimiter.reset(attemptsKey);
 
-		logger.info('Password reset successful', { userId: user.id });
+		logger.info('Password reset successful', { userId: userId });
 	}
 }
