@@ -214,12 +214,13 @@ check-setup: ## Verify development environment is correctly configured
 		echo ""; \
 		echo "$(BLUE)$(ICON_INFO) Next steps:$(NC)"; \
 		echo "  1. $(GREEN)make start-emulator$(NC) - Start Android emulator"; \
-		echo "  2. $(GREEN)make dev-build-local$(NC) - Build and install app"; \
+		echo "  2. $(GREEN)cd mobile && npx expo run:android --no-bundler$(NC) - Build and install the debug build"; \
+		echo "  3. $(GREEN)make dev-local$(NC) - Start backend + Metro and open the app"; \
 		echo ""; \
 	else \
 		echo "$(RED)$(ICON_ERROR) Found $$ERRORS error(s)$(NC)"; \
 		echo ""; \
-		echo "$(YELLOW)$(ICON_WARNING) Fix the errors above before running 'make dev-build-local'$(NC)"; \
+		echo "$(YELLOW)$(ICON_WARNING) Fix the errors above before building the app$(NC)"; \
 		echo ""; \
 		exit 1; \
 	fi

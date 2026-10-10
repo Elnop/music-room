@@ -88,7 +88,8 @@ echo ""
 # Start Expo with tunnel mode (cannot use --offline with --tunnel)
 # @expo/ngrok is now installed locally, so no interactive prompt
 # Force --host tunnel explicitly
-npx expo start --host tunnel --port 8081
+# --dev-client: the app runs as the Zumik debug build, not in Expo Go
+npx expo start --host tunnel --dev-client --port 8081
 
 echo ""
 echo "Expo tunnel stopped"

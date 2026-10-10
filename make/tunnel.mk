@@ -21,14 +21,14 @@ dev-tunnel: ## Start all services in tunnel mode (different WiFi networks)
 	$(call clear_and_header,🌐 Zumik - TUNNEL MODE ACTIVE)
 	$(call display_tunnel_urls)
 	$(call blank_line)
-	$(call display_qr,tunnel)
+	$(call display_metro_connect,tunnel)
 	$(call blank_line)
 	$(call display_common_commands,tunnel)
 	$(call blank_line)
-	$(call print_success,Tunnel mode active! Scan QR from any network)
+	$(call print_success,Tunnel mode active! Point the debug build at the Metro tunnel host)
 	$(call blank_line)
 
-qr-tunnel: ## Show tunnel QR code and URLs
+qr-tunnel: ## Show the tunnel URLs and the Metro host to enter in the debug build
 	$(call clear_and_header,📱 Tunnel Mode - Connection Info)
 	$(call print_subsection,🌐 Backend Tunnel URL)
 	@docker exec $(BACKEND_CONTAINER) cat $(SHARED_TUNNEL_FILE) 2>/dev/null || echo "$(RED)$(ICON_ERROR) Backend tunnel not available$(NC)"
@@ -37,7 +37,7 @@ qr-tunnel: ## Show tunnel QR code and URLs
 	$(call print_subsection,🔍 ngrok Web Interface)
 	@echo "   $(NGROK_UI_URL) (view traffic, connections)"
 	$(call blank_line)
-	$(call display_qr,tunnel)
+	$(call display_metro_connect,tunnel)
 	$(call blank_line)
 	$(call print_success,Works across different WiFi networks)
 	$(call blank_line)
@@ -61,7 +61,7 @@ tunnel-info: ## Display detailed tunnel connection info
 	@echo "   Hot reload may be slower (internet round-trip)"
 	$(call blank_line)
 	$(call print_subsection,Quick Commands)
-	$(call print_command,qr-tunnel,Show QR code)
+	$(call print_command,qr-tunnel,Show the Metro tunnel host)
 	$(call print_command,logs,View logs)
 	$(call print_command,stop,Stop tunnel)
 	$(call print_command,dev,Switch to LAN)

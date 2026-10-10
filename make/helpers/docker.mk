@@ -372,12 +372,6 @@ define docker_logs_service
 	fi
 endef
 
-# Extract QR code from mobile logs
-# Usage: $(call docker_logs_qr)
-define docker_logs_qr
-	@docker logs $(MOBILE_CONTAINER) 2>/dev/null | grep -B 5 -A 50 "▄▄▄▄▄▄▄" | head -70 || docker logs $(MOBILE_CONTAINER) | tail -60
-endef
-
 # ==============================================================================
 # Execution Functions
 # ==============================================================================

@@ -38,3 +38,7 @@
 - source_plan: `_bmad-output/initiative-validation-mandatory/epic-delegation-controle/story-cibler-uniquement-les-appareils-autorises-mobile-plan.md`
   summary: Emit an event to the grantee when a device license is granted or revoked, so a friend's profile updates its controllable devices without a reload (#183).
   evidence: only the all-devices switch emits `permission:changed`; `device-license.service.ts` only calls `revalidateListeningAccess`, which can drop the subscription silently.
+
+- source_plan: `_bmad-output/initiative-validation-mandatory/plan-gh-141-native-debug-build-docs.md`
+  summary: Verify on a phone on another network that a debug build loads the bundle from the Expo tunnel host with `:80` (Change Bundle Location), as documented in README, mobile/README and doc/TUNNEL_MODE.md.
+  evidence: maybe-false, unverified: no phone or tunnel run was available during #141; settle by running `make dev-tunnel`, entering the `make qr-tunnel` host plus `:80` in the debug build's dev menu, and checking the app loads.
