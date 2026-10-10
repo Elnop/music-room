@@ -5,8 +5,10 @@ import express, { type Request } from 'express';
 import { io as ioClient, type Socket as ClientSocket } from 'socket.io-client';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Before env.ts is parsed: limiting on, nobody whitelisted, a low token limit.
+// Before env.ts is parsed: limiting on, nobody whitelisted, a low token limit,
+// no trusted proxy (whatever backend/.env says).
 vi.hoisted(() => {
+	process.env.TRUST_PROXY = '';
 	process.env.RATE_LIMIT_ENABLED = 'true';
 	process.env.RATE_LIMIT_WHITELIST_IPS = '';
 	process.env.RATE_LIMIT_TOKEN_MAX = '3';
@@ -20,6 +22,7 @@ const { authMiddleware, optionalAuthMiddleware } =
 	await import('@/features/auth/auth.middleware.js');
 const { rateLimitConfig } = await import('@/shared/config/rate-limit.config.js');
 const { realtime } = await import('@/realtime/index.js');
+const { configureTrustProxy } = await import('@/shared/config/trust-proxy.js');
 
 // Failed token verifications limited per IP (#160), against the test Redis and
 // the local Supabase stack: HTTP through authMiddleware / optionalAuthMiddleware
@@ -67,6 +70,8 @@ describe('token verification limit per IP', () => {
 		validToken = session.session.access_token;
 
 		const app = express();
+		// As in server.ts; TRUST_PROXY is empty here.
+		configureTrustProxy(app);
 		const whoAmI = (req: Request) => (req as Request & { user?: { id: string } }).user?.id ?? null;
 		app.get('/protected', authMiddleware, (req, res) => {
 			res.json({ userId: whoAmI(req) });
@@ -110,7 +115,7 @@ describe('token verification limit per IP', () => {
 		return body.error.code;
 	}
 
-	function handshake(token: string): Promise<string> {
+	function handshake(token: string, forwardedFor?: string): Promise<string> {
 		const socket = ioClient(baseUrl, {
 			auth: {
 				token,
@@ -120,6 +125,7 @@ describe('token verification limit per IP', () => {
 				model: 'Pixel Test',
 				appVersion: '1.0.0',
 			},
+			extraHeaders: forwardedFor ? { 'X-Forwarded-For': forwardedFor } : {},
 			transports: ['websocket'],
 			reconnection: false,
 			forceNew: true,
@@ -217,5 +223,22 @@ describe('token verification limit per IP', () => {
 		const res = await call('/protected', validToken);
 		expect(res.status).toBe(200);
 		expect(await res.json()).toEqual({ userId });
+	});
+
+	it('ignores a client-sent X-Forwarded-For without TRUST_PROXY (#173)', async () => {
+		for (let i = 0; i < MAX; i++) {
+			const res = await fetch(`${baseUrl}/protected`, {
+				headers: { Authorization: `Bearer garbage-${i}`, 'X-Forwarded-For': `203.0.113.${i}` },
+			});
+			expect(res.status).toBe(401);
+		}
+
+		// Every request counted against the connection's address.
+		expect(await redisClient.keys(KEY_PATTERN)).toHaveLength(1);
+		const res = await fetch(`${baseUrl}/protected`, {
+			headers: { Authorization: 'Bearer garbage-more', 'X-Forwarded-For': '203.0.113.99' },
+		});
+		expect(res.status).toBe(429);
+		await expect(handshake('garbage-socket', '203.0.113.98')).resolves.toBe('TOO_MANY_ATTEMPTS');
 	});
 });

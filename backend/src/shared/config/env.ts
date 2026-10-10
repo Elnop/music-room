@@ -1,5 +1,6 @@
 import { config } from 'dotenv';
 import { z } from 'zod';
+import { compileTrust, parseTrustProxy } from '@/shared/config/trust-proxy-setting.js';
 
 config();
 
@@ -48,6 +49,25 @@ const envSchema = z.object({
 
 	// IP Whitelist
 	RATE_LIMIT_WHITELIST_IPS: z.string().default(''),
+
+	// Proxies trusted to set X-Forwarded-For (see shared/config/trust-proxy-setting.ts)
+	TRUST_PROXY: z
+		.string()
+		.default('')
+		.refine(
+			value => {
+				try {
+					compileTrust(parseTrustProxy(value));
+					return true;
+				} catch {
+					return false;
+				}
+			},
+			{
+				message:
+					'Expected empty, true, false, a hop count, or addresses, subnets, loopback, linklocal, uniquelocal (comma-separated)',
+			}
+		),
 
 	// Gmail SMTP Configuration
 	GMAIL_USER: z.email('Invalid Gmail user address'),
