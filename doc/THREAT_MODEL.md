@@ -12,7 +12,7 @@ Conteneurs et images Docker : [SECURITY.md](SECURITY.md). Comment tester à la m
 |---|--------|------------|
 | M1 | Bruteforce du mot de passe | Limiteurs Redis + verrouillage + liste noire d'IP. Seul le limiteur de login est testé. |
 | M2 | Bruteforce des codes à 6 chiffres (vérification d'email, reset) | Compteur d'essais par compte et IP. Non testé. Risque accepté pour une attaque répartie sur beaucoup d'IP. |
-| M3 | Prise de compte et énumération par la vérification d'email et le reset (#188, #187, #189, #194) | Corrigé et testé. |
+| M3 | Prise de compte et énumération par la vérification d'email et le reset (#188, #187, #189, #194, #196) | Corrigé et testé. |
 | M4 | Bruteforce et rejeu de tokens (#160) | Limite des échecs de vérification par IP, testée. |
 | M5 | Vol de session (token volé) | Logout révoque access et refresh token, testé. Risques acceptés : durée de vie du token, stockage en clair sur le téléphone, HTTP en clair en dev. |
 | M6 | Token révoqué alors qu'une socket est déjà ouverte | **Risque accepté** : le token n'est vérifié qu'au handshake. L'app ferme sa socket (#70, testé). |
@@ -72,6 +72,7 @@ Les seuils viennent de `backend/src/shared/config/rate-limit.config.ts` (variabl
 - `resendVerification` (`auth.controller.ts`) envoie le code à l'email du compte, jamais à celui du corps, et seulement si l'email du corps correspond (`resolveVerificationRecipient`). Même réponse dans tous les cas, cooldown compté avant toute recherche : un 429 ne trahit pas un compte existant (#188).
 - `forgotPassword` répond toujours « If this email exists… » ; le quota horaire et le cooldown sont consommés que l'email existe ou non (`PasswordResetCooldownService.consumeRequest`, #187). `GET /reset-password/can-resend` donne la même réponse pour un email inconnu.
 - Un compte Google/Facebook sans mot de passe peut recevoir un code et en définir un (#189) : il faut quand même lire la boîte mail.
+- `has_password` est faux sur les comptes créés par Google/Facebook avant #189 (migration 019, #196) : `LAST_PROVIDER` ne compte plus un mot de passe inexistant.
 - Un reset termine toutes les sessions du compte : Supabase Auth (GoTrue v2.197.0, même version en local et sur le projet hébergé) les supprime quand `auth.admin.updateUserById` change le mot de passe. Les access et refresh tokens émis avant le reset sont refusés aussitôt (L5, #203). Le test ne tourne que sur la stack locale : une montée de version de GoTrue est à revérifier.
 - Le reset et l'inscription trouvent le compte par `find_auth_user_id_by_email` (migration 018, clé service uniquement), sans tenir compte de la casse et quel que soit le nombre de comptes ; le compteur d'essais du code de reset est par email en minuscules, donc commun à toutes les casses (#194).
 
@@ -79,11 +80,11 @@ Les seuils viennent de `backend/src/shared/config/rate-limit.config.ts` (variabl
 - `backend/src/features/auth/services/email-verification.int.test.ts` : « refuses a verified account with ALREADY_VERIFIED and returns no session », « sends nothing when the body email is not the account email », « answers 429 RESEND_COOLDOWN on a second call even when the email does not match », « sends nothing for an unknown user ».
 - `backend/src/features/auth/services/password-reset-resend.int.test.ts` : « reports the same cooldown for an email with no account (no enumeration) ».
 - `backend/src/features/auth/services/password-reset-oauth.int.test.ts` : « sends a code, resets, records the password and allows password sign-in ».
+- `backend/src/features/auth/services/has-password-backfill.int.test.ts` : « sets false on Google and Facebook sign-ups made before #189 », « keeps password accounts and later sign-ups that set a password ».
 - `backend/src/features/auth/services/password-reset-sessions.int.test.ts` : « refuses the access and refresh tokens issued before the reset ».
 - `backend/src/features/auth/utils/find-auth-user.int.test.ts` : « sends a reset code and resets the password, whatever the case of the email », « refuses a sign-up with the email of a verified account, whatever its case », « counts reset attempts once per account across case variants of the email ».
 
 **Ouvert.**
-- #196 : `has_password` faux sur d'anciens comptes Google/Facebook.
 - Les codes sont stockés en clair dans `user_profiles` ; ils étaient lisibles avec la clé anon (L1), ils ne le sont plus depuis #201.
 
 ## M4. Bruteforce et rejeu de tokens
@@ -266,4 +267,4 @@ Trouvées en écrivant ce document. L1 à L3 ont été corrigées par #201, L10 
 | L10 | Moyenne, corrigé (#208) | Routes SoundCloud publiques, sans rate limit, et sans validation Zod sauf `search` : proxy ouvert vers SoundCloud (M7). | `backend/src/features/soundcloud/soundcloud.routes.ts` | #208 |
 | L11 | Moyenne (dev) | En développement, toute origine contenant « ngrok » est acceptée par le CORS HTTP et socket ; le backend de dev tourne toujours dans ce mode (M9). | `backend/src/shared/config/cors.config.ts` (`isOriginAllowed`) | #209 |
 
-Déjà suivis ailleurs : #159 (M10), #173 (L4), #196 (M3).
+Déjà suivis ailleurs : #159 (M10), #173 (L4).
