@@ -26,7 +26,7 @@ clean: ## Remove containers, volumes, images, and project dependencies (with con
 		docker run --rm -v $(PWD):/workspace alpine sh -c "rm -rf /workspace/backend/node_modules /workspace/mobile/node_modules /workspace/mobile/.expo /workspace/mobile/android /workspace/mobile/ios /workspace/backend/logs" 2>/dev/null || true; \
 		rm -rf backend/dist build 2>/dev/null || true; \
 		rm -rf backend/coverage mobile/coverage 2>/dev/null || true; \
-		rm -f /tmp/ngrok.log /tmp/backend-tunnel-url.txt 2>/dev/null || true; \
+		rm -f /tmp/ngrok.log 2>/dev/null || true; \
 		rm -rf /tmp/shared 2>/dev/null || true; \
 		find . -name "*.tsbuildinfo" -type f -delete 2>/dev/null || true; \
 		find mobile -name ".eas-build-*.json" -type f -delete 2>/dev/null || true; \
@@ -74,7 +74,7 @@ clean-all: ## Complete cleanup - Docker system + project artifacts + global cach
 	@echo "$(CYAN)Step 4/6: Cleaning project artifacts...$(RESET)"
 	@docker run --rm -v $(PWD):/workspace alpine sh -c "rm -rf /workspace/backend/node_modules /workspace/mobile/node_modules /workspace/mobile/.expo /workspace/mobile/android /workspace/mobile/ios /workspace/backend/logs" 2>/dev/null || true
 	@rm -rf backend/dist build backend/coverage mobile/coverage 2>/dev/null || true
-	@rm -f /tmp/ngrok.log /tmp/backend-tunnel-url.txt 2>/dev/null || true
+	@rm -f /tmp/ngrok.log 2>/dev/null || true
 	@rm -rf /tmp/shared 2>/dev/null || true
 	@find . -name "*.tsbuildinfo" -type f -delete 2>/dev/null || true
 	@find mobile -name ".eas-build-*.json" -type f -delete 2>/dev/null || true

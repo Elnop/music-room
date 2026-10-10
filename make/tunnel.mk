@@ -31,7 +31,7 @@ dev-tunnel: ## Start all services in tunnel mode (different WiFi networks)
 qr-tunnel: ## Show tunnel QR code and URLs
 	$(call clear_and_header,📱 Tunnel Mode - Connection Info)
 	$(call print_subsection,🌐 Backend Tunnel URL)
-	@docker exec -T $(BACKEND_CONTAINER) cat $(TUNNEL_URL_FILE) 2>/dev/null || echo "$(RED)$(ICON_ERROR) Backend tunnel not available$(NC)"
+	@docker exec $(BACKEND_CONTAINER) cat $(SHARED_TUNNEL_FILE) 2>/dev/null || echo "$(RED)$(ICON_ERROR) Backend tunnel not available$(NC)"
 	$(call blank_line)
 	$(call blank_line)
 	$(call print_subsection,🔍 ngrok Web Interface)
@@ -47,7 +47,7 @@ qr-tunnel: ## Show tunnel QR code and URLs
 tunnel-info: ## Display detailed tunnel connection info
 	$(call print_header,Tunnel Mode Information)
 	$(call print_subsection,Backend Tunnel)
-	@docker exec -T $(BACKEND_CONTAINER) cat $(TUNNEL_URL_FILE) 2>/dev/null || echo "$(RED)$(ICON_ERROR) Not running$(NC)"
+	@docker exec $(BACKEND_CONTAINER) cat $(SHARED_TUNNEL_FILE) 2>/dev/null || echo "$(RED)$(ICON_ERROR) Not running$(NC)"
 	$(call blank_line)
 	$(call print_subsection,ngrok Web UI)
 	@echo "   $(NGROK_UI_URL)"

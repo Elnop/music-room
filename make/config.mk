@@ -83,7 +83,6 @@ BACKEND_ENV := $(BACKEND_DIR)/.env
 BACKEND_ENV_EXAMPLE := $(BACKEND_DIR)/.env.example
 MOBILE_ENV := $(MOBILE_DIR)/.env
 MOBILE_ENV_EXAMPLE := $(MOBILE_DIR)/.env.example
-TUNNEL_URL_FILE := /tmp/backend-tunnel-url.txt
 SHARED_TUNNEL_FILE := /tmp/shared/backend-tunnel-url.txt
 
 # Node modules

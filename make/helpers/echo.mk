@@ -143,7 +143,7 @@ endef
 define display_tunnel_urls
 	$(call print_subsection,📡 Tunnel URLs)
 	$(call print_arrow,Backend tunnel URL:)
-	@docker exec $(BACKEND_CONTAINER) cat $(TUNNEL_URL_FILE) 2>/dev/null || echo "   $(YELLOW)Initializing...$(NC)"
+	@docker exec $(BACKEND_CONTAINER) cat $(SHARED_TUNNEL_FILE) 2>/dev/null || echo "   $(YELLOW)Initializing...$(NC)"
 	$(call blank_line)
 	$(call blank_line)
 	$(call print_subsection,🔍 ngrok Web Interface)
