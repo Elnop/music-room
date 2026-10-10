@@ -16,17 +16,37 @@ if (env.TUNNEL_URL) {
 /**
  * Whether a request with this `Origin` header may reach the API or the socket.
  * No `Origin` (the mobile app's HTTP calls, server-to-server calls) is allowed:
- * CORS only concerns browsers. In development, ngrok and `exp://` origins are
- * allowed. The socket also accepts same-origin requests (`isSameOrigin`).
+ * CORS only concerns browsers. In development, ngrok tunnel and `exp://` origins
+ * are allowed. The socket also accepts same-origin requests (`isSameOrigin`).
  */
 export function isOriginAllowed(origin: string | undefined): boolean {
 	if (!origin) return true;
 
-	if (env.NODE_ENV === 'development' && (origin.includes('ngrok') || origin.startsWith('exp://'))) {
+	if (env.NODE_ENV === 'development' && (isNgrokOrigin(origin) || origin.startsWith('exp://'))) {
 		return true;
 	}
 
 	return allowedOrigins.includes(origin) || allowedOrigins.includes('*');
+}
+
+/** Domains ngrok serves tunnels under (free and paid plans). */
+const NGROK_DOMAINS = ['ngrok-free.app', 'ngrok-free.dev', 'ngrok.app', 'ngrok.dev', 'ngrok.io'];
+
+/**
+ * An https origin on a subdomain of an ngrok domain. Matched on the parsed
+ * host name, not the raw string: `https://ngrok.attacker.example` is not one (#209).
+ * Any ngrok account can get such a subdomain, so this only narrows the dev
+ * rule; the project's own tunnel is also allowed exactly through TUNNEL_URL.
+ */
+export function isNgrokOrigin(origin: string): boolean {
+	let url: URL;
+	try {
+		url = new URL(origin);
+	} catch {
+		return false;
+	}
+	if (url.protocol !== 'https:') return false;
+	return NGROK_DOMAINS.some(domain => url.hostname.endsWith(`.${domain}`));
 }
 
 /**
