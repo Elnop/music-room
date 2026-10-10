@@ -562,7 +562,7 @@ docker compose -f docker-compose.yml -f docker-compose.tunnel.yml build mobile -
 
 ### Issue: `EACCES: permission denied, open '/app/.expo/README.md'`
 
-**Problem**: The `.expo` directory has incorrect permissions (owned by root instead of node user, UID 65532).
+**Problem**: The `.expo` directory has incorrect permissions (owned by root instead of the `node` user, UID 1000 in `node:22-bookworm-slim`).
 
 **Solution**: Create `.expo` directory with correct permissions in Dockerfile.
 
@@ -576,7 +576,7 @@ USER node
 **If you still see this error**:
 ```bash
 # Manually fix permissions:
-docker run --rm -v "$(pwd)/mobile/.expo:/data" alpine chown -R 65532:65532 /data
+docker run --rm -v "$(pwd)/mobile/.expo:/data" alpine chown -R 1000:1000 /data
 
 # Then restart:
 docker restart zumik-mobile

@@ -66,7 +66,7 @@ cd mobile && npm run format
 - 📱 **Cross-platform Mobile App** - iOS + Android support via React Native & Expo
 - ⚡ **Real-time Sync** - Socket.io for live playlist updates and music control
 - 🎚️ **Advanced Playlist Features** - Edit modes (open/restricted), viewers, collaborators
-- 🐳 **Docker Development** - Containerized environment with 0 CVE Chainguard images
+- 🐳 **Docker Development** - Containerized environment (official Node 22 images, see [doc/SECURITY.md](doc/SECURITY.md))
 
 ## Tech Stack
 
@@ -93,8 +93,8 @@ cd mobile && npm run format
 
 ### Infrastructure
 
-- **Containers**: Docker Compose orchestration
-- **Images**: Chainguard Images (0 CVE, distroless)
+- **Containers**: started with `docker run` by the make targets (`make/helpers/docker.mk`)
+- **Images**: official `node:22-alpine` (backend) and `node:22-bookworm-slim` (mobile); see [doc/SECURITY.md](doc/SECURITY.md)
 - **Development**: Hot reload for backend + Expo Metro bundler
 - **Tunnel Mode**: Ngrok integration for cross-network development
 

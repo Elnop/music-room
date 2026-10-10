@@ -4,7 +4,7 @@ Ce document liste les menaces prises en compte pour l'API (`backend/`), le temps
 
 Conteneurs et images Docker : [SECURITY.md](SECURITY.md). Comment tester à la main : [TESTING_SECURITY.md](TESTING_SECURITY.md). Clés Redis : [REDIS.md](REDIS.md).
 
-État relevé sur `develop` au commit `2c1f210`. Chemins relatifs à la racine du dépôt ; `int.test` = test d'intégration (Supabase local + Redis, voir [TESTING.md](TESTING.md)).
+État relevé sur `develop` au commit `8477871`. Chemins relatifs à la racine du dépôt ; `int.test` = test d'intégration (Supabase local + Redis, voir [TESTING.md](TESTING.md)).
 
 ## Vue d'ensemble
 
@@ -17,7 +17,7 @@ Conteneurs et images Docker : [SECURITY.md](SECURITY.md). Comment tester à la m
 | M5 | Vol de session (token volé) | Logout révoque access et refresh token, testé. Risques acceptés : durée de vie du token, stockage en clair sur le téléphone, HTTP en clair en dev. |
 | M6 | Token révoqué alors qu'une socket est déjà ouverte | **Risque accepté** : le token n'est vérifié qu'au handshake. L'app ferme sa socket (#70, testé). |
 | M7 | Accès aux données d'un autre utilisateur par l'API | Contrôles dans le code (clé service), testés pour playlists et contrôle musical. Filtre de confidentialité du profil non testé. |
-| M8 | Accès direct à Supabase avec la clé anon embarquée dans l'app | **Lacune critique** (L1, L2, L3) : RLS trop large sur `user_profiles`, `follows` ; pas de RLS sur `tracks`. |
+| M8 | Accès direct à Supabase avec la clé anon embarquée dans l'app | Corrigé par #201 (migration 017) : `anon` et `authenticated` n'ont plus aucun privilège sur les tables de `public` ; testé. |
 | M9 | Abus du temps réel (origine, identité forgée, payloads, flood) | Origine, handshake et payloads contrôlés et testés. Pas de limite de débit par événement (L7). |
 | M10 | Accès conservé dans une room après son retrait | Revérification et éviction, testées. |
 | M11 | Contrôle musical d'un appareil non autorisé | Règle par appareil, fail closed, testée. |
@@ -80,7 +80,7 @@ Les seuils viennent de `backend/src/shared/config/rate-limit.config.ts` (variabl
 - #194 : `listUsers()` sans pagination ; au-delà de la première page, un compte n'est pas trouvé par le reset.
 - #196 : `has_password` faux sur d'anciens comptes Google/Facebook.
 - Un reset ne termine pas les sessions déjà ouvertes (L5).
-- Les codes sont stockés en clair dans `user_profiles`, lisibles avec la clé anon (L1).
+- Les codes sont stockés en clair dans `user_profiles` ; ils étaient lisibles avec la clé anon (L1), ils ne le sont plus depuis #201.
 
 ## M4. Bruteforce et rejeu de tokens
 
@@ -151,7 +151,9 @@ Les seuils viennent de `backend/src/shared/config/rate-limit.config.ts` (variabl
 
 **Menace.** L'app contient `EXPO_PUBLIC_SUPABASE_URL` et `EXPO_PUBLIC_SUPABASE_ANON_KEY` (`mobile/src/lib/supabase.ts`) ; n'importe qui peut les extraire de l'APK et appeler PostgREST directement, anonymement ou avec son propre token. Seules la RLS et les privilèges SQL protègent alors les tables.
 
-**Où la RLS s'applique.** Seulement à ces accès directs, jamais au backend (clé service). Politiques dans `backend/migrations/*.sql` :
+**Protection.** Depuis la migration `backend/migrations/017_revoke_direct_table_access.sql` (#201), `anon` et `authenticated` n'ont plus aucun privilège sur les tables, séquences et fonctions de `public` (y compris pour les objets créés ensuite par `postgres`) : toute requête PostgREST directe répond `42501`. Seul le backend, avec la clé service, accède aux tables.
+
+**Politiques RLS, désormais seconde barrière.** Elles ne s'appliquent qu'à ces accès directs, jamais au backend (clé service). État avant 017, dans `backend/migrations/*.sql` :
 
 | Table | RLS | Lecture | Écriture |
 |-------|-----|---------|----------|
@@ -165,11 +167,13 @@ Les seuils viennent de `backend/src/shared/config/rate-limit.config.ts` (variabl
 | `devices`, `device_control_licenses` | oui (015) | soi / propriétaire ou bénéficiaire | soi / propriétaire |
 | fonctions `rank_*`, `playlist_*` | — | `EXECUTE` retiré à `anon` et `authenticated` (016) | idem |
 
-Vérifié sur la base de test locale construite depuis ces migrations (`backend/scripts/test-db.sh`) : `anon` et `authenticated` ont les privilèges de table par défaut de Supabase (SELECT, INSERT, UPDATE, DELETE), `tracks` a `relrowsecurity = false`, et une requête PostgREST anonyme `GET /rest/v1/user_profiles?select=password_reset_code` répond 200. Non vérifié sur le projet Supabase hébergé.
+Avant 017, `anon` et `authenticated` avaient les privilèges de table par défaut de Supabase : une requête anonyme lisait `password_reset_code` (L1). La migration a été appliquée sur le projet hébergé.
 
-**Tests.** `backend/src/features/playlists/services/track-operations.int.test.ts` : « refuses every 016 function to the anon key with a permission error », « refuses direct inserts and deletes on playlist_tracks to the playlist owner ». Rien d'autre.
+**Tests.**
+- `backend/src/shared/config/supabase-direct-access.int.test.ts` : lecture anonyme de `user_profiles`, `follows`, `tracks`, `music_preferences`, `playlists` refusée ; un utilisateur connecté ne peut ni lire les codes, ni se marquer vérifié, ni se donner `can_control_music` ; écriture anonyme de `tracks` refusée ; la clé service lit toujours.
+- `backend/src/features/playlists/services/track-operations.int.test.ts` : « refuses every 016 function to the anon key with a permission error », « refuses direct inserts and deletes on playlist_tracks to the playlist owner ».
 
-**Lacunes.** L1, L2, L3 ci-dessous. Ce sont les seules failles critiques relevées.
+**Lacunes.** L1, L2, L3 ci-dessous, corrigées par #201.
 
 ## M9. Abus du temps réel
 
@@ -216,7 +220,7 @@ Vérifié sur la base de test locale construite depuis ces migrations (`backend/
 - `backend/src/realtime/music-control-access.int.test.ts` (bloc « per-device access (story 4.5) ») : « delivers to the licensed device only, until B is licensed or the switch is on », « refuses B once the switch is cut, and still reaches the licensed A », « tells Bob when Alice revokes a license, with whether access remains (#183) ».
 - `backend/src/features/music-control/services/device-license.int.test.ts` : « refuses a grant to a non-friend (one-way follow or none) ».
 
-**Lacune.** Par accès direct à Supabase, un contrôleur peut se donner l'interrupteur lui-même (L2).
+**Lacune corrigée.** Par accès direct à Supabase, un contrôleur pouvait se donner l'interrupteur lui-même (L2) ; fermé par #201.
 
 ## M12. Éditions concurrentes de playlist
 
@@ -240,18 +244,18 @@ Vérifié sur la base de test locale construite depuis ces migrations (`backend/
 
 ## Lacunes ouvertes
 
-Trouvées en écrivant ce document, non corrigées ici. Chacune est à transformer en ticket.
+Trouvées en écrivant ce document. L1 à L3 ont été corrigées par #201 ; les autres ont chacune leur ticket, sauf L6, risque accepté.
 
-| # | Gravité | Lacune | Où |
-|---|---------|--------|-----|
-| L1 | **Critique** | `user_profiles` est lisible par tous (`USING (true)`), y compris `password_reset_code` et `verification_code`. Avec la clé anon de l'APK : demander un reset pour la victime (`forgot-password`), lire le code, changer son mot de passe. Prise de compte sans accès à la boîte mail. Expose aussi tous les profils sans filtre de confidentialité. | `backend/migrations/001_initial_schema.sql`, `013_email_verification.sql`, `014_password_reset.sql` |
-| L2 | Haute | La politique UPDATE de `user_profiles` autorise toutes les colonnes de sa propre ligne : un utilisateur peut se mettre `email_verified = true` sans code. La politique INSERT de `follows` ne contrôle pas `can_control_music` : un contrôleur peut supprimer puis recréer sa ligne `follows` vers le propriétaire avec `can_control_music = true` et, si le propriétaire le suit, contrôler tous ses appareils. | `001_initial_schema.sql`, `007_follows.sql`, `009_music_control.sql` |
-| L3 | Haute | `tracks` n'a pas de RLS : lecture, modification et suppression par la clé anon. `music_preferences` et `follows` sont lisibles par tous, sans les réglages de confidentialité. | `003_playlist_persistence.sql`, `011_profile_privacy_and_preferences.sql`, `007_follows.sql` |
-| L4 | Moyenne | Toutes les limites anti-bruteforce sont par IP (M1, M2) ; IP faussée derrière un proxy. | #173 (existe) |
-| L5 | Moyenne | Un reset de mot de passe ne termine pas les sessions ouvertes : un voleur de session la garde après que la victime a changé son mot de passe. | `PasswordResetService.resetPassword` |
-| L6 | Moyenne | Une socket ouverte survit au logout et à l'expiration du token (M6). | `backend/src/realtime/socket-auth.ts` |
-| L7 | Basse | Pas de limite de débit par événement socket ni de longueur max sur `listening:update` (M9). | `backend/src/realtime/index.ts` |
-| L8 | Basse (dev) | Redis est publié sur le port 6379 de toutes les interfaces de l'hôte, sans mot de passe : quelqu'un sur le même réseau peut effacer les verrous, la liste noire et la liste de révocation. | `make/helpers/docker.mk` (`start_redis`), voir [SECURITY.md](SECURITY.md) |
-| L9 | Tests | Pas de test pour : `brute-force.service.ts`, `checkAccountLockout`, `checkIPBlacklist`, le nombre max d'essais des codes de vérification et de reset, `PrivacyService.getFilteredProfile`. | — |
+| # | Gravité | Lacune | Où | Suivi |
+|---|---------|--------|-----|-------|
+| L1 | **Critique**, corrigé (#201) | `user_profiles` est lisible par tous (`USING (true)`), y compris `password_reset_code` et `verification_code`. Avec la clé anon de l'APK : demander un reset pour la victime (`forgot-password`), lire le code, changer son mot de passe. Prise de compte sans accès à la boîte mail. Expose aussi tous les profils sans filtre de confidentialité. | `backend/migrations/001_initial_schema.sql`, `013_email_verification.sql`, `014_password_reset.sql` | #201 |
+| L2 | Haute, corrigé (#201) | La politique UPDATE de `user_profiles` autorise toutes les colonnes de sa propre ligne : un utilisateur peut se mettre `email_verified = true` sans code. La politique INSERT de `follows` ne contrôle pas `can_control_music` : un contrôleur peut supprimer puis recréer sa ligne `follows` vers le propriétaire avec `can_control_music = true` et, si le propriétaire le suit, contrôler tous ses appareils. | `001_initial_schema.sql`, `007_follows.sql`, `009_music_control.sql` | #201 |
+| L3 | Haute, corrigé (#201) | `tracks` n'a pas de RLS : lecture, modification et suppression par la clé anon. `music_preferences` et `follows` sont lisibles par tous, sans les réglages de confidentialité. | `003_playlist_persistence.sql`, `011_profile_privacy_and_preferences.sql`, `007_follows.sql` | #201 |
+| L4 | Moyenne | Toutes les limites anti-bruteforce sont par IP (M1, M2) ; IP faussée derrière un proxy. | #173 (existe) | #173 |
+| L5 | Moyenne | Un reset de mot de passe ne termine pas les sessions ouvertes : un voleur de session la garde après que la victime a changé son mot de passe. | `PasswordResetService.resetPassword` | #203 |
+| L6 | Moyenne | Une socket ouverte survit au logout et à l'expiration du token (M6). | `backend/src/realtime/socket-auth.ts` | risque accepté (M6) |
+| L7 | Basse | Pas de limite de débit par événement socket ni de longueur max sur `listening:update` (M9). | `backend/src/realtime/index.ts` | #204 |
+| L8 | Basse (dev) | Redis est publié sur le port 6379 de toutes les interfaces de l'hôte, sans mot de passe : quelqu'un sur le même réseau peut effacer les verrous, la liste noire et la liste de révocation. | `make/helpers/docker.mk` (`start_redis`), voir [SECURITY.md](SECURITY.md) | #205 |
+| L9 | Tests | Pas de test pour : `brute-force.service.ts`, `checkAccountLockout`, `checkIPBlacklist`, le nombre max d'essais des codes de vérification et de reset, `PrivacyService.getFilteredProfile`. | — | #206 |
 
 Déjà suivis ailleurs : #159 (M10), #173 (L4), #194 et #196 (M3).
