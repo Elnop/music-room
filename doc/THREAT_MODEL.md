@@ -205,16 +205,15 @@ Avant 017, `anon` et `authenticated` avaient les privilèges de table par défau
 
 **Protection.**
 - Playlists : après le retrait d'un viewer (`viewer.service.ts`) ou d'un collaborateur (`collaborator.service.ts`), une mise à jour (visibilité) ou une suppression (`playlist.service.ts`), `realtime.revalidatePlaylistRoom` refait `canViewPlaylist` pour chaque socket de la room et évince celles qui ont perdu l'accès (`revalidatePlaylistRoom`, `backend/src/realtime/playlist-room.ts`). Les `join` / `leave` d'une socket sont traités dans l'ordre d'arrivée.
-- Écoute : après le retrait de l'interrupteur ou d'une licence (`realtime.notifyPermissionChange`) et après un `unfollowUser` (`friends.service.ts`, `backend/src/features/friends/utils/listening-access.ts`), `revalidateListeningAccess` sort les sockets du contrôleur de `listening:<ownerId>` s'il ne lui reste aucun appareil ; une erreur évince (fail closed). `listening:subscribe` revérifie l'accès après avoir rejoint la room.
+- Écoute : après le retrait de l'interrupteur ou d'une licence (`realtime.notifyPermissionChange`) et après un `unfollowUser` (`friends.service.ts`, `backend/src/features/friends/utils/listening-access.ts`), `revalidateListeningAccess` sort les sockets du contrôleur de `listening:<ownerId>` s'il ne lui reste aucun appareil ; une erreur évince (fail closed). `listening:subscribe` revérifie l'accès après avoir rejoint la room. Les `subscribe` / `unsubscribe` d'une socket sont traités dans l'ordre d'arrivée (#159).
 
 **Tests.**
 - `backend/src/realtime/playlist-room.int.test.ts` : « evicts a viewer removed while in the room », « evicts a collaborator removed while in the room », « evicts the outsider when a public playlist becomes private », « evicts everyone when the playlist is deleted », « handles join then leave in order: the socket ends outside the room ».
-- `backend/src/realtime/music-control-access.int.test.ts` : « removes Bob's sockets when Alice revokes his control », « removes Bob's sockets when he unfollows Alice », « evicts Bob when Alice revokes his last license », « keeps Bob subscribed when the switch is cut but a license remains ».
+- `backend/src/realtime/music-control-access.int.test.ts` : « removes Bob's sockets when Alice revokes his control », « removes Bob's sockets when he unfollows Alice », « evicts Bob when Alice revokes his last license », « keeps Bob subscribed when the switch is cut but a license remains », « handles subscribe then unsubscribe in order: the socket ends outside the room (#159) ».
 - `backend/src/realtime/playlist-room.test.ts` : « evicts nobody when the lookup fails ».
 
 **Risques acceptés.**
 - `revalidatePlaylistRoom` n'évince personne si la lecture de la playlist échoue (fail open, choisi pour ne pas expulser les membres d'une playlist qui existe encore ; test ci-dessus). La revérification est lancée sans attendre (fire-and-forget) : quelques événements peuvent partir entre le changement et l'éviction.
-- #159 : un `listening:subscribe` suivi d'un `listening:unsubscribe` rapide laisse la socket abonnée. L'accès reste revérifié à chaque retrait, donc ce n'est pas un gain de droits.
 
 ## M11. Contrôle musical d'un appareil non autorisé
 
@@ -267,4 +266,4 @@ Trouvées en écrivant ce document. L1 à L3 ont été corrigées par #201, L10 
 | L10 | Moyenne, corrigé (#208) | Routes SoundCloud publiques, sans rate limit, et sans validation Zod sauf `search` : proxy ouvert vers SoundCloud (M7). | `backend/src/features/soundcloud/soundcloud.routes.ts` | #208 |
 | L11 | Moyenne (dev) | En développement, toute origine contenant « ngrok » est acceptée par le CORS HTTP et socket ; le backend de dev tourne toujours dans ce mode (M9). | `backend/src/shared/config/cors.config.ts` (`isOriginAllowed`) | #209 |
 
-Déjà suivis ailleurs : #159 (M10), #173 (L4).
+Déjà suivis ailleurs : #173 (L4).
