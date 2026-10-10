@@ -8,7 +8,7 @@ vi.mock('@/shared/config/supabase.js', () => {
 	return { supabaseAdmin: { from: () => query } };
 });
 
-const { canViewPlaylist, canEditPlaylist, checkEditPermission } =
+const { canViewPlaylist, canEditPlaylist, checkEditPermission, checkOwnership } =
 	await import('@/features/playlists/permissions/playlist.permissions.js');
 
 const OWNER = 'owner-id';
@@ -65,6 +65,15 @@ describe('canEditPlaylist', () => {
 		for (const user of allowed) expect(canEditPlaylist(p, user), user).toBe(true);
 		for (const user of denied) expect(canEditPlaylist(p, user), user).toBe(false);
 	});
+
+	it.each(['public', 'private'] as const)(
+		'a viewer cannot edit a restricted playlist (%s)',
+		visibility => {
+			const p = playlist(visibility, 'restricted');
+			expect(canViewPlaylist(p, VIEWER)).toBe(true);
+			expect(canEditPlaylist(p, VIEWER)).toBe(false);
+		}
+	);
 });
 
 describe('checkEditPermission', () => {
@@ -87,9 +96,47 @@ describe('checkEditPermission', () => {
 		});
 	});
 
+	it.each(['public', 'private'] as const)(
+		'a viewer cannot edit a restricted playlist (%s): 403',
+		async visibility => {
+			single.mockResolvedValue({ data: playlist(visibility, 'restricted'), error: null });
+			await expect(checkEditPermission('playlist-id', VIEWER)).rejects.toMatchObject({
+				statusCode: 403,
+				code: 'PLAYLIST_ACCESS_DENIED',
+			});
+		}
+	);
+
 	it('rejects when the playlist does not exist', async () => {
 		single.mockResolvedValue({ data: null, error: { message: 'not found' } });
 		await expect(checkEditPermission('playlist-id', OWNER)).rejects.toMatchObject({
+			statusCode: 404,
+			code: 'PLAYLIST_NOT_FOUND',
+		});
+	});
+});
+
+describe('checkOwnership', () => {
+	beforeEach(() => {
+		single.mockReset();
+	});
+
+	it('resolves for the owner', async () => {
+		single.mockResolvedValue({ data: { owner_id: OWNER }, error: null });
+		await expect(checkOwnership('playlist-id', OWNER)).resolves.toBeUndefined();
+	});
+
+	it.each([COLLABORATOR, VIEWER, STRANGER])('rejects %s with 403', async user => {
+		single.mockResolvedValue({ data: { owner_id: OWNER }, error: null });
+		await expect(checkOwnership('playlist-id', user)).rejects.toMatchObject({
+			statusCode: 403,
+			code: 'PLAYLIST_ACCESS_DENIED',
+		});
+	});
+
+	it('rejects when the playlist does not exist with 404', async () => {
+		single.mockResolvedValue({ data: null, error: { message: 'not found' } });
+		await expect(checkOwnership('playlist-id', OWNER)).rejects.toMatchObject({
 			statusCode: 404,
 			code: 'PLAYLIST_NOT_FOUND',
 		});
