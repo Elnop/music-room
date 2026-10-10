@@ -84,6 +84,18 @@ npx jest -t "formatDuration"                          # tests whose name matches
 ```
 
 
+## Load tests (HTTP)
+
+Subject IV.7 asks how many users the API supports. `make perf-test` creates or refreshes load test users in the Supabase project of `backend/.env` (`backend/src/test/perf-fixtures.ts`), then runs the Artillery scenarios of `tests/performance/scenarios/` (Docker image `artilleryio/artillery:2.0.34`) against `PERF_TARGET` (default `http://localhost:3000`) and writes `tests/performance/results/<timestamp>/summary.md` (req/s, latencies, status codes, run conditions).
+
+| Variable | Default | Effect |
+| --- | --- | --- |
+| `PERF_TARGET` | `http://localhost:3000` | Backend under test; it must answer `/health` |
+| `PERF_USERS` | `20` | Fixture users (`perf-<i>@zumik.test`), reused across runs |
+
+The backend's global auth limiter (20 `/api/auth` requests per 15 minutes per IP) throttles a second login run within 15 minutes unless `RATE_LIMIT_ENABLED=false` or the client IP is in `RATE_LIMIT_WHITELIST_IPS`; Supabase Auth caps password sign-ins per IP; Artillery uses host networking (Linux). Details: `tests/performance/README.md`. Load tests are not part of `make test` or the CI.
+
+
 ## Writing a test
 
 - Test behavior through the public function, route or store action, not private helpers.

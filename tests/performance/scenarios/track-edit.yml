@@ -1,0 +1,61 @@
+# Track editing on the shared open playlist (make perf-test).
+# Every virtual user takes a row of fixtures/users.csv and uses its pre-issued
+# token (no sign-in): it adds a uniquely named track, moves it to the first
+# place and deletes it. A 409 on the move is expected under contention: another
+# user changed the playlist since the add (doc/PLAYLIST_CONCURRENCY.md).
+# The target comes from `--target`; sharedPlaylistId from fixtures/env.json.
+config:
+  phases:
+    - name: warm-up
+      duration: 10
+      arrivalRate: 2
+    - name: ramp-up
+      duration: 30
+      arrivalRate: 2
+      rampTo: 10
+    - name: sustained
+      duration: 30
+      arrivalRate: 10
+  payload:
+    path: "../fixtures/users.csv"
+    fields: ["email", "password", "token", "userId"]
+    skipHeader: true
+    order: sequence
+  http:
+    timeout: 10
+  plugins:
+    metrics-by-endpoint:
+      useOnlyRequestNames: true
+
+scenarios:
+  - name: track-edit
+    flow:
+      # Track URIs start with the prefix perf-fixtures.ts cleans up on every run.
+      - post:
+          url: "/api/playlists/{{ sharedPlaylistId }}/tracks"
+          name: "POST /api/playlists/:id/tracks"
+          headers:
+            Authorization: "Bearer {{ token }}"
+          json:
+            trackUri: "https://soundcloud.com/zumik-perf/{{ $uuid }}"
+            title: "Perf track {{ $randomString(8) }}"
+            artist: "Zumik perf"
+            durationMs: 180000
+          capture:
+            - json: "$.data.track.id"
+              as: "trackId"
+            - json: "$.data.tracksVersion"
+              as: "tracksVersion"
+      - post:
+          url: "/api/playlists/{{ sharedPlaylistId }}/tracks/{{ trackId }}/move"
+          name: "POST /api/playlists/:id/tracks/:trackId/move"
+          headers:
+            Authorization: "Bearer {{ token }}"
+          json:
+            afterRank: null
+            expectedVersion: "{{ tracksVersion }}"
+      - delete:
+          url: "/api/playlists/{{ sharedPlaylistId }}/tracks/{{ trackId }}"
+          name: "DELETE /api/playlists/:id/tracks/:trackId"
+          headers:
+            Authorization: "Bearer {{ token }}"
