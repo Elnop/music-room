@@ -182,20 +182,28 @@ class RealtimeService {
 	}
 
 	/**
+	 * Run a socket's tasks one after another, in arrival order. A failed task
+	 * is logged under `failureAction` and does not stop the next ones.
+	 */
+	private createSocketQueue(socket: AppSocket, failureAction: string) {
+		let queue: Promise<void> = Promise.resolve();
+		return (task: () => Promise<void> | void) => {
+			queue = queue.then(task).catch((error: unknown) => {
+				socketLogger.error(socket.id, error instanceof Error ? error : new Error(String(error)), {
+					action: failureAction,
+				});
+			});
+		};
+	}
+
+	/**
 	 * Playlist event handlers
 	 */
 	private registerPlaylistHandlers(socket: AppSocket) {
 		// join awaits a DB lookup while leave does not: run this socket's
 		// join/leave events one after another, in arrival order, so a quick
 		// join(A) + leave(A) never ends with the socket in the room.
-		let queue: Promise<void> = Promise.resolve();
-		const enqueue = (task: () => Promise<void> | void) => {
-			queue = queue.then(task).catch((error: unknown) => {
-				socketLogger.error(socket.id, error instanceof Error ? error : new Error(String(error)), {
-					action: 'playlist_room_task_failed',
-				});
-			});
-		};
+		const enqueue = this.createSocketQueue(socket, 'playlist_room_task_failed');
 
 		socket.on('playlist:join', (payload: unknown) => {
 			enqueue(() => this.joinPlaylistRoom(socket, payload));
@@ -249,6 +257,73 @@ class RealtimeService {
 	}
 
 	/**
+	 * Join `listening:<target>` if the user can control at least one of the
+	 * target's devices, then send the current status; else emit `listening:error`.
+	 */
+	private async subscribeToListening(socket: AppSocket, payload: unknown): Promise<void> {
+		const parsed = listeningTargetSchema.safeParse(payload);
+		if (!parsed.success) {
+			socket.emit('listening:error', INVALID_LISTENING_PAYLOAD);
+			socketLogger.event('listening:subscribe', socket.id, {
+				level: 'warn',
+				action: 'invalid_payload',
+			});
+			return;
+		}
+		const targetUserId = parsed.data;
+
+		const socketInfo = this.socketToDevice.get(socket.id);
+		if (!socketInfo) {
+			socketLogger.event('listening:subscribe', socket.id, {
+				level: 'warn',
+				action: 'unauthenticated',
+			});
+			return;
+		}
+
+		const { userId: myUserId } = socketInfo;
+
+		// Access to at least one device shows the status of all of them.
+		const canControl = await controlAccessService.canControlAnyDevice(myUserId, targetUserId);
+		if (!canControl) {
+			socket.emit('listening:error', {
+				message: "Not authorized to view this user's listening status",
+				code: 'NOT_AUTHORIZED',
+			});
+			return;
+		}
+
+		const room = listeningRoom(targetUserId);
+		void socket.join(room);
+
+		// A revoke or unfollow whose revalidation ran during the check above
+		// found nothing to evict: re-check now that the socket is in the room.
+		if (!(await controlAccessService.canControlAnyDevice(myUserId, targetUserId))) {
+			void socket.leave(room);
+			socket.emit('listening:error', {
+				message: "Not authorized to view this user's listening status",
+				code: 'NOT_AUTHORIZED',
+			});
+			return;
+		}
+
+		const userDevices = this.listeningStatuses.get(targetUserId);
+		const devices = userDevices ? Array.from(userDevices.values()) : [];
+
+		const userStatus: UserListeningStatus = {
+			ownerId: targetUserId,
+			devices,
+		};
+		socket.emit('listening:status', userStatus);
+
+		socketLogger.auth('subscribe', myUserId, socket.id, {
+			targetUserId,
+			devicesOnline: devices.length,
+			action: 'subscribed',
+		});
+	}
+
+	/**
 	 * Music control handlers - multi-device support
 	 */
 	private registerMusicControlHandlers(socket: AppSocket) {
@@ -278,78 +353,26 @@ class RealtimeService {
 			);
 		});
 
-		socket.on('listening:subscribe', async (payload: unknown) => {
-			const parsed = listeningTargetSchema.safeParse(payload);
-			if (!parsed.success) {
-				socket.emit('listening:error', INVALID_LISTENING_PAYLOAD);
-				socketLogger.event('listening:subscribe', socket.id, {
-					level: 'warn',
-					action: 'invalid_payload',
-				});
-				return;
-			}
-			const targetUserId = parsed.data;
+		// subscribe awaits access checks while unsubscribe does not: same
+		// ordering as playlist join/leave, so a quick subscribe(X) +
+		// unsubscribe(X) never ends with the socket in the room (#159).
+		const enqueue = this.createSocketQueue(socket, 'listening_room_task_failed');
 
-			const socketInfo = this.socketToDevice.get(socket.id);
-			if (!socketInfo) {
-				socketLogger.event('listening:subscribe', socket.id, {
-					level: 'warn',
-					action: 'unauthenticated',
-				});
-				return;
-			}
-
-			const { userId: myUserId } = socketInfo;
-
-			// Access to at least one device shows the status of all of them.
-			const canControl = await controlAccessService.canControlAnyDevice(myUserId, targetUserId);
-			if (!canControl) {
-				socket.emit('listening:error', {
-					message: "Not authorized to view this user's listening status",
-					code: 'NOT_AUTHORIZED',
-				});
-				return;
-			}
-
-			const room = listeningRoom(targetUserId);
-			void socket.join(room);
-
-			// A revoke or unfollow whose revalidation ran during the check above
-			// found nothing to evict: re-check now that the socket is in the room.
-			if (!(await controlAccessService.canControlAnyDevice(myUserId, targetUserId))) {
-				void socket.leave(room);
-				socket.emit('listening:error', {
-					message: "Not authorized to view this user's listening status",
-					code: 'NOT_AUTHORIZED',
-				});
-				return;
-			}
-
-			const userDevices = this.listeningStatuses.get(targetUserId);
-			const devices = userDevices ? Array.from(userDevices.values()) : [];
-
-			const userStatus: UserListeningStatus = {
-				ownerId: targetUserId,
-				devices,
-			};
-			socket.emit('listening:status', userStatus);
-
-			socketLogger.auth('subscribe', myUserId, socket.id, {
-				targetUserId,
-				devicesOnline: devices.length,
-				action: 'subscribed',
-			});
+		socket.on('listening:subscribe', (payload: unknown) => {
+			enqueue(() => this.subscribeToListening(socket, payload));
 		});
 
 		socket.on('listening:unsubscribe', (payload: unknown) => {
-			const parsed = listeningTargetSchema.safeParse(payload);
-			if (!parsed.success) return;
+			enqueue(() => {
+				const parsed = listeningTargetSchema.safeParse(payload);
+				if (!parsed.success) return;
 
-			const targetUserId = parsed.data;
-			void socket.leave(listeningRoom(targetUserId));
-			socketLogger.auth('unsubscribe', targetUserId, socket.id, {
-				room: listeningRoom(targetUserId),
-				action: 'unsubscribed',
+				const targetUserId = parsed.data;
+				void socket.leave(listeningRoom(targetUserId));
+				socketLogger.auth('unsubscribe', targetUserId, socket.id, {
+					room: listeningRoom(targetUserId),
+					action: 'unsubscribed',
+				});
 			});
 		});
 

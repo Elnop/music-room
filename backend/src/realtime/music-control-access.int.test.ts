@@ -275,6 +275,27 @@ describe('Listening and control access', () => {
 			expect(statuses).toEqual([]);
 		});
 
+		it('handles subscribe then unsubscribe in order: the socket ends outside the room (#159)', async () => {
+			const [bobSocket, daveSocket] = await Promise.all([connect(bob), connect(dave)]);
+			await subscribe(daveSocket, alice.id);
+
+			bobSocket.emit('listening:subscribe', alice.id);
+			bobSocket.emit('listening:unsubscribe', alice.id);
+			// Queued after the unsubscribe: once it answers, both were processed.
+			const done = nextEvent<SocketError>(bobSocket, 'listening:error');
+			bobSocket.emit('listening:subscribe', 'not-a-uuid');
+			await expect(done).resolves.toMatchObject({ code: 'INVALID_PAYLOAD' });
+			expect(await inListeningRoom(bobSocket, alice.id)).toBe(false);
+
+			// Dave witnesses the broadcast; Bob gets nothing.
+			const bobStatuses = record<UserListeningStatus>(bobSocket, 'listening:status');
+			const daveStatuses = record<UserListeningStatus>(daveSocket, 'listening:status');
+			const deviceId = await publishAliceStatus();
+			await vi.waitFor(() => expect(hasDevice(daveStatuses, deviceId)).toBe(true));
+			await settle();
+			expect(bobStatuses).toEqual([]);
+		});
+
 		it.each([
 			['not a UUID', 'alice'],
 			['a number', 42],
