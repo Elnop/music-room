@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { RedisRateLimitStore } from '@/features/auth/utils/redis-rate-limit-store.js';
 import { rateLimitConfig } from '@/shared/config/rate-limit.config.js';
 import { logger } from '@/shared/utils/logger.js';
+import type { AuthenticatedRequest } from '@/shared/types/global.types.js';
 
 // Helper function to get IP address (handles both IPv4 and IPv6)
 const getClientIp = (req: Request): string => {
@@ -211,6 +212,42 @@ export const globalAuthRateLimiter = rateLimit({
 			success: false,
 			error: {
 				message: 'Too many authentication requests. Please try again later.',
+				code: 'RATE_LIMIT_EXCEEDED',
+				retryAfter: new Date(
+					Date.now() + (req.rateLimit?.resetTime?.getTime() || 0) - Date.now()
+				).toISOString(),
+			},
+			meta: {
+				timestamp: new Date().toISOString(),
+			},
+		});
+	},
+});
+
+/**
+ * SoundCloud Rate Limiter
+ * Per signed-in user: 120 requests per minute by default to /api/soundcloud/*.
+ * Must run after `authMiddleware`, which sets `req.user`.
+ */
+export const soundcloudRateLimiter = rateLimit({
+	...baseRateLimitConfig,
+	windowMs: rateLimitConfig.soundcloud.windowMs,
+	max: rateLimitConfig.soundcloud.max,
+	keyGenerator: (req: Request) => {
+		return `soundcloud:${(req as AuthenticatedRequest).user.id}`;
+	},
+	store: getStore('soundcloud'),
+	handler: (req: Request, res: Response) => {
+		logger.warn('SoundCloud rate limit exceeded', {
+			endpoint: req.path,
+			userId: (req as AuthenticatedRequest).user.id,
+			ip: req.ip,
+		});
+
+		res.status(429).json({
+			success: false,
+			error: {
+				message: 'Too many SoundCloud requests. Please try again later.',
 				code: 'RATE_LIMIT_EXCEEDED',
 				retryAfter: new Date(
 					Date.now() + (req.rateLimit?.resetTime?.getTime() || 0) - Date.now()

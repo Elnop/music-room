@@ -166,6 +166,8 @@ RATE_LIMIT_AUTH_WINDOW_MS=900000
 RATE_LIMIT_AUTH_MAX=20
 RATE_LIMIT_TOKEN_WINDOW_MS=900000     # échecs de vérification de token par IP
 RATE_LIMIT_TOKEN_MAX=20
+RATE_LIMIT_SOUNDCLOUD_WINDOW_MS=60000  # requêtes /api/soundcloud par utilisateur
+RATE_LIMIT_SOUNDCLOUD_MAX=120
 
 # Account Lockout (brute-force.service.ts)
 ACCOUNT_LOCKOUT_ENABLED=true
@@ -459,6 +461,8 @@ Quand l'accès peut se perdre, il est revérifié : après le retrait de l'inter
 - Cache des résultats : recherche et détails de track 1 h, URLs de stream 30 min (`features/soundcloud/utils/soundcloud-cache.ts`)
 - Seuls les morceaux lisibles en streaming sont renvoyés
 - L'URL de stream est récupérée à la demande et expire : ne jamais la stocker en base
+- Routes authentifiées (`authMiddleware`) et limitées par utilisateur dans Redis (`rl:soundcloud:`, 120 requêtes par minute par défaut, `RATE_LIMIT_SOUNDCLOUD_MAX` / `RATE_LIMIT_SOUNDCLOUD_WINDOW_MS`) : `429 RATE_LIMIT_EXCEEDED` au-delà, `503` sans Redis (`REVOCATION_UNAVAILABLE` de l'auth, qui passe en premier) (#208)
+- `track/:urlOrId` accepte un id numérique ou une URL https sur `soundcloud.com`, `www.soundcloud.com`, `m.soundcloud.com` ou `on.soundcloud.com` ; `stream` n'accepte qu'une telle URL : sinon `400 VALIDATION_ERROR`, sans appel à SoundCloud
 
 ## 🔄 Prochaines étapes
 

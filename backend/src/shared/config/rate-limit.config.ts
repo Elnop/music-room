@@ -46,6 +46,12 @@ export const rateLimitConfig = {
 		max: env.RATE_LIMIT_TOKEN_MAX, // 20 failed verifications by default
 	},
 
+	// SoundCloud proxy routes, per authenticated user (search, track, stream)
+	soundcloud: {
+		windowMs: env.RATE_LIMIT_SOUNDCLOUD_WINDOW_MS, // 1 minute by default
+		max: env.RATE_LIMIT_SOUNDCLOUD_MAX, // 120 requests by default
+	},
+
 	// Account lockout configuration
 	lockout: {
 		enabled: env.ACCOUNT_LOCKOUT_ENABLED !== 'false',

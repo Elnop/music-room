@@ -16,7 +16,7 @@ Conteneurs et images Docker : [SECURITY.md](SECURITY.md). Comment tester à la m
 | M4 | Bruteforce et rejeu de tokens (#160) | Limite des échecs de vérification par IP, testée. |
 | M5 | Vol de session (token volé) | Logout révoque access et refresh token, testé. Risques acceptés : durée de vie du token, stockage en clair sur le téléphone, HTTP en clair en dev. |
 | M6 | Token révoqué alors qu'une socket est déjà ouverte | **Risque accepté** : le token n'est vérifié qu'au handshake. L'app ferme sa socket (#70, testé). |
-| M7 | Accès aux données d'un autre utilisateur par l'API | Contrôles dans le code (clé service), testés pour playlists et contrôle musical. Filtre de confidentialité du profil non testé. Routes SoundCloud publiques sans limite (L10). |
+| M7 | Accès aux données d'un autre utilisateur par l'API | Contrôles dans le code (clé service), testés pour playlists et contrôle musical. Filtre de confidentialité du profil non testé. Routes SoundCloud authentifiées et limitées par utilisateur (L10 corrigée, #208). |
 | M8 | Accès direct à Supabase avec la clé anon embarquée dans l'app | Corrigé par #201 (migration 017) : `anon` et `authenticated` n'ont plus aucun privilège sur les tables de `public` ; testé. |
 | M9 | Abus du temps réel (origine, identité forgée, payloads, flood) | Origine, handshake et payloads contrôlés et testés ; en dev, toute origine contenant « ngrok » passe (L11). Pas de limite de débit par événement (L7). |
 | M10 | Accès conservé dans une room après son retrait | Revérification et éviction, testées. |
@@ -137,16 +137,18 @@ Les seuils viennent de `backend/src/shared/config/rate-limit.config.ts` (variabl
 **Menace.** Un utilisateur authentifié lit ou modifie les playlists, appareils, profils ou réglages d'un autre en changeant un identifiant dans la requête.
 
 **Protection.** Le backend parle à Supabase avec la clé service (`supabaseAdmin` et son alias `supabase`, `backend/src/shared/config/supabase.ts`), qui **ignore la RLS** : toutes les features (`auth`, `friends`, `music-control`, `playlists`, `profile`, `realtime`) l'utilisent. L'isolation est donc dans le code :
-- Toutes les routes de `playlists`, `profile`, `friends`, `music-control` passent par `authMiddleware` (`router.use(authMiddleware)` dans chaque `*.routes.ts`) ; l'identité vient du token (`req.user.id`), jamais du corps.
+- Toutes les routes de `playlists`, `profile`, `friends`, `music-control`, `soundcloud` passent par `authMiddleware` (`router.use(authMiddleware)` dans chaque `*.routes.ts`) ; l'identité vient du token (`req.user.id`), jamais du corps.
 - Playlists : `canViewPlaylist`, `canEditPlaylist`, `checkOwnership`, `checkEditPermission` dans `backend/src/features/playlists/permissions/playlist.permissions.ts`.
 - Contrôle musical : `ControlAccessService` (M11) ; un appareil n'est licencié que par son propriétaire (`findOwnedDevice` dans `DeviceLicenseService.grant`).
 - Profil d'un autre utilisateur : `PrivacyService.getFilteredProfile` (`backend/src/features/profile/services/privacy.service.ts`) applique ses réglages de confidentialité.
-- Les entrées des routes authentifiées sont validées par Zod (`*.validators.ts`). Exception : les routes SoundCloud (`backend/src/features/soundcloud/soundcloud.routes.ts`, `GET /api/soundcloud/search`, `/track/:urlOrId`, `/stream`, `/stream/:trackUrl`) sont publiques, sans `authMiddleware` ni rate limit, et seule `search` valide son entrée par Zod (`soundcloudSearchSchema`). Elles ne touchent pas aux données des utilisateurs, mais n'importe qui peut s'en servir comme proxy vers SoundCloud (L10).
+- Les entrées des routes authentifiées sont validées par Zod (`*.validators.ts`).
+- Routes SoundCloud (`backend/src/features/soundcloud/soundcloud.routes.ts`, `GET /api/soundcloud/search`, `/track/:urlOrId`, `/stream`, `/stream/:trackUrl`), corrigé par #208 (L10) : `authMiddleware` puis `soundcloudRateLimiter` (`backend/src/features/auth/middleware/rate-limit.middleware.ts`), compté dans Redis par utilisateur (120 requêtes par minute par défaut, `RATE_LIMIT_SOUNDCLOUD_MAX` / `RATE_LIMIT_SOUNDCLOUD_WINDOW_MS`), `429 RATE_LIMIT_EXCEEDED` au-delà, `503` sans Redis (`REVOCATION_UNAVAILABLE` de l'auth, qui passe en premier). Toutes les entrées passent par Zod (`soundcloud.validators.ts`) : `track/:urlOrId` n'accepte qu'un id numérique ou une URL https sur `soundcloud.com`, `www.soundcloud.com`, `m.soundcloud.com` ou `on.soundcloud.com`, `stream` qu'une telle URL (`400 VALIDATION_ERROR` sinon, sans appel à SoundCloud). Le backend ne sert donc plus de proxy ouvert vers SoundCloud.
 
 **Tests.**
 - `backend/src/features/playlists/permissions/playlist.permissions.test.ts` (`canViewPlaylist`, `canEditPlaylist`, `checkEditPermission`).
 - `backend/src/features/playlists/services/playlist-track.int.test.ts` : « refuses every operation to a user without the edit right ».
 - `backend/src/features/music-control/services/device-license.int.test.ts` : « refuses a grant on another user's device or an unknown device », « refuses a revoke on another user's device and leaves its license untouched ».
+- `backend/src/features/soundcloud/soundcloud.int.test.ts` : « answers 401 without a token on every route, without calling SoundCloud », « answers 400 VALIDATION_ERROR for a stream url that is not a SoundCloud URL », « answers 429 past the per-user limit, in Redis, without affecting another user », « fails closed with 503 RATE_LIMIT_UNAVAILABLE while Redis is down ».
 - **Aucun test** pour `getFilteredProfile` ni pour les routes profil (prévu par #98) (L9).
 
 ## M8. Accès direct à Supabase avec la clé anon
@@ -246,7 +248,7 @@ Avant 017, `anon` et `authenticated` avaient les privilèges de table par défau
 
 ## Lacunes ouvertes
 
-Trouvées en écrivant ce document. L1 à L3 ont été corrigées par #201 ; les autres ont chacune leur ticket, sauf L6, risque accepté.
+Trouvées en écrivant ce document. L1 à L3 ont été corrigées par #201, L10 par #208 ; les autres ont chacune leur ticket, sauf L6, risque accepté.
 
 | # | Gravité | Lacune | Où | Suivi |
 |---|---------|--------|-----|-------|
@@ -259,7 +261,7 @@ Trouvées en écrivant ce document. L1 à L3 ont été corrigées par #201 ; les
 | L7 | Basse | Pas de limite de débit par événement socket ni de longueur max sur `listening:update` (M9). | `backend/src/realtime/index.ts` | #204 |
 | L8 | Basse (dev) | Redis est publié sur le port 6379 de toutes les interfaces de l'hôte, sans mot de passe : quelqu'un sur le même réseau peut effacer les verrous, la liste noire et la liste de révocation. | `make/helpers/docker.mk` (`start_redis`), voir [SECURITY.md](SECURITY.md) | #205 |
 | L9 | Tests | Pas de test pour : `brute-force.service.ts`, `checkAccountLockout`, `checkIPBlacklist`, le nombre max d'essais des codes de vérification et de reset, `PrivacyService.getFilteredProfile`. | — | #206 |
-| L10 | Moyenne | Routes SoundCloud publiques, sans rate limit, et sans validation Zod sauf `search` : proxy ouvert vers SoundCloud (M7). | `backend/src/features/soundcloud/soundcloud.routes.ts` | #208 |
+| L10 | Moyenne, corrigé (#208) | Routes SoundCloud publiques, sans rate limit, et sans validation Zod sauf `search` : proxy ouvert vers SoundCloud (M7). | `backend/src/features/soundcloud/soundcloud.routes.ts` | #208 |
 | L11 | Moyenne (dev) | En développement, toute origine contenant « ngrok » est acceptée par le CORS HTTP et socket ; le backend de dev tourne toujours dans ce mode (M9). | `backend/src/shared/config/cors.config.ts` (`isOriginAllowed`) | #209 |
 
 Déjà suivis ailleurs : #159 (M10), #173 (L4), #194 et #196 (M3).
