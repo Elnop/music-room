@@ -1,86 +1,6 @@
 import type { UserProfile, UpdateProfileData, FilteredProfile } from '@/types/user.types';
 
-import { getBackendUrl } from '@/services/backendUrl';
-
-/**
- * Standard API Response format (matches backend)
- */
-interface ApiResponse<T> {
-	success: boolean;
-	data?: T;
-	error?: {
-		message: string;
-		code: string;
-		details?: unknown;
-	};
-	meta: {
-		timestamp: string;
-	};
-}
-
-/**
- * API Error class
- */
-export class ApiError extends Error {
-	code: string;
-	details?: unknown;
-
-	constructor(message: string, code: string, details?: unknown) {
-		super(message);
-		this.name = 'ApiError';
-		this.code = code;
-		this.details = details;
-	}
-}
-
-/**
- * Make API request with error handling
- */
-async function apiRequest<T>(
-	endpoint: string,
-	accessToken: string,
-	options: RequestInit = {}
-): Promise<T> {
-	const url = `${getBackendUrl()}${endpoint}`;
-
-	try {
-		const response = await fetch(url, {
-			...options,
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${accessToken}`,
-				...options.headers,
-			},
-		});
-
-		const data: ApiResponse<T> = await response.json();
-
-		if (!data.success || data.error) {
-			throw new ApiError(
-				data.error?.message || 'API request failed',
-				data.error?.code || 'UNKNOWN_ERROR',
-				data.error?.details
-			);
-		}
-
-		if (!data.data) {
-			throw new ApiError('No data in response', 'NO_DATA');
-		}
-
-		return data.data;
-	} catch (error) {
-		if (error instanceof ApiError) {
-			throw error;
-		}
-
-		// Network or parsing errors
-		if (error instanceof Error) {
-			throw new ApiError(error.message, 'NETWORK_ERROR');
-		}
-
-		throw new ApiError('Unknown error occurred', 'UNKNOWN_ERROR');
-	}
-}
+import { authRequest } from '@/services/api';
 
 /**
  * Profile API
@@ -90,7 +10,7 @@ export const profileApi = {
 	 * Update current user's profile
 	 */
 	async updateProfile(accessToken: string, data: UpdateProfileData): Promise<UserProfile> {
-		return apiRequest<UserProfile>('/api/profile', accessToken, {
+		return authRequest<UserProfile>('/api/profile', accessToken, {
 			method: 'PATCH',
 			body: JSON.stringify(data),
 		});
@@ -100,7 +20,7 @@ export const profileApi = {
 	 * Get current user's profile
 	 */
 	async getOwnProfile(accessToken: string): Promise<UserProfile> {
-		return apiRequest<UserProfile>('/api/profile', accessToken, {
+		return authRequest<UserProfile>('/api/profile', accessToken, {
 			method: 'GET',
 		});
 	},
@@ -109,7 +29,7 @@ export const profileApi = {
 	 * Get user profile by ID (with privacy filtering)
 	 */
 	async getUserProfile(accessToken: string, userId: string): Promise<FilteredProfile> {
-		return apiRequest<FilteredProfile>(`/api/profile/${userId}`, accessToken, {
+		return authRequest<FilteredProfile>(`/api/profile/${userId}`, accessToken, {
 			method: 'GET',
 		});
 	},
@@ -119,7 +39,7 @@ export const profileApi = {
 	 */
 	async searchUsers(accessToken: string, query: string, limit = 20): Promise<UserProfile[]> {
 		const params = new URLSearchParams({ q: query, limit: limit.toString() });
-		return apiRequest<UserProfile[]>(`/api/profile/search?${params.toString()}`, accessToken, {
+		return authRequest<UserProfile[]>(`/api/profile/search?${params.toString()}`, accessToken, {
 			method: 'GET',
 		});
 	},
