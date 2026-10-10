@@ -150,7 +150,9 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
 
 		const response = await makeRequest(accessToken || undefined);
 
-		if (response.status === 401) {
+		// Refresh only when a session exists: signed out (e.g. a wrong password
+		// at login), the 401 is the backend's answer, not an expired token (#235).
+		if (response.status === 401 && accessToken) {
 			console.log('[API] Received 401, attempting token refresh...');
 
 			const refreshSuccess = await refreshAccessToken();
