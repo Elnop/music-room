@@ -4,8 +4,6 @@
 
 Tunnel mode allows you to develop Zumik when your phone and computer are on **different WiFi networks** (e.g., phone on cellular data, PC on home WiFi, or working from a coffee shop).
 
-> **Known gap (#225)**: `make dev-tunnel` currently tunnels the backend only. The mobile container starts Expo as in LAN mode (`scripts/start-expo.sh`), so the Expo tunnel described below is not started; see "How `make dev-tunnel` starts the containers".
-
 ## 🎯 Quick Facts
 
 - ✅ **Multiple devices supported**: Scan the same QR code on unlimited phones
@@ -81,7 +79,7 @@ Slower (+50-200ms latency), works across any network
 
 ### Architecture Components
 
-1. **Expo Tunnel** (not started by `make dev-tunnel` today, #225): Managed automatically by Expo CLI using ngrok
+1. **Expo Tunnel**: Managed automatically by Expo CLI using ngrok (`mobile/scripts/start-expo-tunnel.sh`, `npx expo start --host tunnel`)
    - Exposes Metro bundler (port 8081) via public tunnel
    - Requires EAS account (free tier is sufficient)
 
@@ -256,9 +254,10 @@ docker logs zumik-backend 2>&1 | grep "Tunnel CORS enabled"
 #### App Loads But Can't Connect to Backend
 
 ```bash
-# Check which backend URL the mobile container was given
-# (make dev-tunnel passes the LAN URL, DEV_API_URL, not the tunnel URL: #225)
-docker exec zumik-mobile printenv EXPO_PUBLIC_API_URL
+# Check which backend URL Expo was started with: start-expo-tunnel.sh exports
+# it to Expo and writes the same value to mobile/.env.development.local
+# (docker exec printenv shows the container's environment, not the script's)
+docker exec zumik-mobile cat .env.development.local
 
 # Verify backend tunnel is accessible
 curl "$(docker exec zumik-backend cat /tmp/shared/backend-tunnel-url.txt)/health"
@@ -312,7 +311,9 @@ There is no compose file: `make dev-tunnel` calls `docker_up_tunnel` in `make/he
 
 - `zumik-redis`: same as LAN mode (`start_redis`).
 - `zumik-backend` (`start_backend_tunnel`): runs `sh scripts/start-with-tunnel.sh` instead of `npm run dev`, with `TUNNEL_MODE=true`, publishes port 3000 and 4040 (ngrok web interface), and mounts the `tunnel-info` volume at `/tmp/shared`.
-- `zumik-mobile`: same container as LAN mode (`start_mobile`, image command `sh scripts/start-expo.sh`), with the `tunnel-info` volume mounted. `mobile/scripts/start-expo-tunnel.sh` exists but no make target runs it.
+- `zumik-mobile` (`start_mobile_tunnel`, recreated on every `make dev-tunnel`): runs `sh scripts/start-expo-tunnel.sh`, which waits until the backend tunnel URL in `/tmp/shared` answers `/health` (the backend script deletes the previous run's file first), writes it to `mobile/.env.development.local` (`EXPO_PUBLIC_API_URL`, and `wss://` for `EXPO_PUBLIC_WS_URL`), then starts `npx expo start --host tunnel`. Unlike LAN mode it sets neither `REACT_NATIVE_PACKAGER_HOSTNAME` nor `EXPO_DEVTOOLS_LISTEN_ADDRESS`, which would replace the tunnel URL in the manifest.
+
+Each container carries a `zumik.mode` label (`lan` or `tunnel`): `make dev-tunnel` recreates a backend or mobile container left running by `make dev-docker`, and the other way round.
 
 ### Environment Variables
 
@@ -596,7 +597,9 @@ docker restart zumik-mobile
 
 ### Issue: Expo starts in LAN mode instead of tunnel mode
 
-This is the current behavior, tracked in #225: `start_mobile` (`make/helpers/docker.mk`) sets `EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0` in every mode, and `make dev-tunnel` starts Expo with `scripts/start-expo.sh` (`npx expo start --offline`), not with `--tunnel`. Only the backend goes through ngrok; the phone loads the bundle from Metro on the LAN address, or from an APK built with `make dev-tunnel-build-apk`.
+**Problem**: `REACT_NATIVE_PACKAGER_HOSTNAME` or `EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0` make Expo advertise the LAN address even with `--host tunnel`.
+
+**Solution**: `start_mobile_tunnel` sets neither (#225). If the QR still shows a LAN address, the mobile container was started in LAN mode: check `docker inspect -f '{{index .Config.Labels "zumik.mode"}}' zumik-mobile`, then `make dev-tunnel` recreates it.
 
 ### Issue: Docker volumes override package installations
 
