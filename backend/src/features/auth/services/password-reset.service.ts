@@ -144,6 +144,9 @@ export class PasswordResetService {
 			throw new AppError(400, 'Invalid reset code', 'INVALID_RESET_CODE');
 		}
 
+		// Supabase Auth deletes every session of the account when an admin sets its
+		// password, so stolen access and refresh tokens stop working (#203, tested
+		// in password-reset-sessions.int.test.ts).
 		const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(user.id, {
 			password: newPassword,
 		});
