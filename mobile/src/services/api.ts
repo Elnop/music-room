@@ -180,6 +180,24 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
 }
 
 /**
+ * apiRequest with the given access token, for callers that pass it explicitly.
+ * The registered session's token, when there is one, takes precedence.
+ */
+export function authRequest<T>(
+	endpoint: string,
+	accessToken: string,
+	options: RequestInit = {}
+): Promise<T> {
+	return apiRequest<T>(endpoint, {
+		...options,
+		headers: {
+			Authorization: `Bearer ${accessToken}`,
+			...(options.headers as Record<string, string>),
+		},
+	});
+}
+
+/**
  * Handle response parsing and errors
  */
 async function handleResponse<T>(response: Response): Promise<T> {
