@@ -4,6 +4,8 @@
 
 Tunnel mode allows you to develop Zumik when your phone and computer are on **different WiFi networks** (e.g., phone on cellular data, PC on home WiFi, or working from a coffee shop).
 
+> **Known gap (#225)**: `make dev-tunnel` currently tunnels the backend only. The mobile container starts Expo as in LAN mode (`scripts/start-expo.sh`), so the Expo tunnel described below is not started; see "How `make dev-tunnel` starts the containers".
+
 ## 🎯 Quick Facts
 
 - ✅ **Multiple devices supported**: Scan the same QR code on unlimited phones
@@ -79,7 +81,7 @@ Slower (+50-200ms latency), works across any network
 
 ### Architecture Components
 
-1. **Expo Tunnel**: Managed automatically by Expo CLI using ngrok
+1. **Expo Tunnel** (not started by `make dev-tunnel` today, #225): Managed automatically by Expo CLI using ngrok
    - Exposes Metro bundler (port 8081) via public tunnel
    - Requires EAS account (free tier is sufficient)
 
@@ -88,8 +90,8 @@ Slower (+50-200ms latency), works across any network
    - Automatically configured CORS for tunnel URLs
 
 3. **Shared Volume**: Docker volume for URL communication
-   - Backend writes tunnel URL to `/tmp/backend-tunnel-url.txt`
-   - Mobile container reads it to configure API endpoint
+   - Backend writes the tunnel URL to `/tmp/shared/backend-tunnel-url.txt` (Docker volume `tunnel-info`, mounted at `/tmp/shared` in both containers)
+   - `make dev-tunnel-build-apk` reads it to point the APK at the backend tunnel
 
 ## Quick Start
 
@@ -97,9 +99,10 @@ Slower (+50-200ms latency), works across any network
 
 1. **EAS Account** (free):
    ```bash
-   # Sign up at https://expo.dev
-   # Then login in your mobile container:
-   docker-compose -f docker-compose.yml -f docker-compose.tunnel.yml exec mobile npx eas login
+   # Sign up at https://expo.dev, then either let make log in with EXPO_TOKEN:
+   make tunnel-setup
+   # or log in by hand in the running mobile container:
+   docker exec -it zumik-mobile npx eas login
    ```
 
 2. **Verify Prerequisites**:
@@ -201,7 +204,7 @@ Access ngrok web interface at **http://localhost:4040**:
 
 ```bash
 # Check backend logs for ngrok errors
-make logs-backend
+docker logs zumik-backend
 
 # Look for ngrok initialization messages
 # Should see: "Backend Tunnel: https://xxxxx.ngrok-free.app"
@@ -216,7 +219,7 @@ make logs-backend
 
 ```bash
 # Check if tunnel URL file exists
-docker-compose exec backend cat /tmp/backend-tunnel-url.txt
+docker exec zumik-backend cat /tmp/shared/backend-tunnel-url.txt
 
 # If not found, restart with more time
 make stop
@@ -228,10 +231,10 @@ make dev-tunnel
 
 ```bash
 # Verify EAS login
-docker-compose exec mobile npx eas whoami
+docker exec -it zumik-mobile npx eas whoami
 
 # Re-login if needed
-docker-compose exec mobile npx eas login
+docker exec -it zumik-mobile npx eas login
 
 # Check mobile logs
 make logs-mobile
@@ -239,24 +242,26 @@ make logs-mobile
 
 #### CORS Errors
 
-The backend is configured to auto-allow ngrok domains in development. If you see CORS errors:
+The backend allows https ngrok subdomains in development, and the exact tunnel URL through `TUNNEL_URL` (see `backend/src/shared/config/cors.config.ts`). If you see CORS errors:
 
 ```bash
 # Check backend logs for CORS messages
-make logs-backend | grep CORS
+docker logs zumik-backend 2>&1 | grep CORS
 
-# Verify tunnel URL is in allowed origins
-docker-compose exec backend printenv TUNNEL_URL
+# Verify the tunnel URL was added to the allowed origins
+# (TUNNEL_URL is exported by scripts/start-with-tunnel.sh, not set on the container)
+docker logs zumik-backend 2>&1 | grep "Tunnel CORS enabled"
 ```
 
 #### App Loads But Can't Connect to Backend
 
 ```bash
-# Check mobile app is using correct backend URL
-make logs-mobile | grep EXPO_PUBLIC_API_URL
+# Check which backend URL the mobile container was given
+# (make dev-tunnel passes the LAN URL, DEV_API_URL, not the tunnel URL: #225)
+docker exec zumik-mobile printenv EXPO_PUBLIC_API_URL
 
 # Verify backend tunnel is accessible
-curl $(docker-compose exec -T backend cat /tmp/backend-tunnel-url.txt)/health
+curl "$(docker exec zumik-backend cat /tmp/shared/backend-tunnel-url.txt)/health"
 ```
 
 ## Performance Considerations
@@ -301,20 +306,13 @@ curl $(docker-compose exec -T backend cat /tmp/backend-tunnel-url.txt)/health
 }
 ```
 
-### Docker Compose Override (`docker-compose.tunnel.yml`)
+### How `make dev-tunnel` starts the containers
 
-The tunnel mode uses Docker Compose's override feature:
+There is no compose file: `make dev-tunnel` calls `docker_up_tunnel` in `make/helpers/docker.mk`, which runs plain `docker run` commands on the `zumik-network` network (details in [SECURITY.md](SECURITY.md)):
 
-```bash
-# Equivalent to:
-docker-compose -f docker-compose.yml -f docker-compose.tunnel.yml up
-```
-
-**Key Differences:**
-- Backend uses `scripts/start-with-tunnel.sh` instead of `npm run dev`
-- Mobile uses `scripts/start-expo-tunnel.sh` instead of `scripts/start-expo.sh`
-- Shared volume `tunnel-data` for URL communication
-- Exposes port 4040 for ngrok web interface
+- `zumik-redis`: same as LAN mode (`start_redis`).
+- `zumik-backend` (`start_backend_tunnel`): runs `sh scripts/start-with-tunnel.sh` instead of `npm run dev`, with `TUNNEL_MODE=true`, publishes port 3000 and 4040 (ngrok web interface), and mounts the `tunnel-info` volume at `/tmp/shared`.
+- `zumik-mobile`: same container as LAN mode (`start_mobile`, image command `sh scripts/start-expo.sh`), with the `tunnel-info` volume mounted. `mobile/scripts/start-expo-tunnel.sh` exists but no make target runs it.
 
 ### Environment Variables
 
@@ -518,8 +516,7 @@ Before asking for help, verify:
 - [ ] Firewall/VPN not blocking ngrok
 - [ ] Backend tunnel URL exists (`make tunnel-info`)
 - [ ] ngrok web interface accessible (http://localhost:4040)
-- [ ] Mobile logs show Expo tunnel started (`make logs-mobile`)
-- [ ] Backend logs show ngrok tunnel started (`make logs-backend`)
+- [ ] Backend logs show ngrok tunnel started (`docker logs zumik-backend`)
 - [ ] Expo Go app is updated to latest version
 
 ## Advanced Troubleshooting
@@ -555,9 +552,11 @@ Before asking for help, verify:
 }
 ```
 
-**If you see this error**: Rebuild the mobile container:
+**If you see this error**: Rebuild the mobile image and recreate the container:
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.tunnel.yml build mobile --no-cache
+docker rm -fv zumik-mobile
+docker build --no-cache -t music-room-mobile:latest -f mobile/Dockerfile mobile
+make dev-tunnel
 ```
 
 ### Issue: `EACCES: permission denied, open '/app/.expo/README.md'`
@@ -597,24 +596,15 @@ docker restart zumik-mobile
 
 ### Issue: Expo starts in LAN mode instead of tunnel mode
 
-**Problem**: `EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0` forces LAN mode even with `--tunnel` flag.
-
-**Solution**: Remove `EXPO_DEVTOOLS_LISTEN_ADDRESS` in tunnel mode.
-
-```bash
-# Already fixed in docker-compose.tunnel.yml:
-# Removed: EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
-# This allows Expo to use tunnel mode properly
-```
+This is the current behavior, tracked in #225: `start_mobile` (`make/helpers/docker.mk`) sets `EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0` in every mode, and `make dev-tunnel` starts Expo with `scripts/start-expo.sh` (`npx expo start --offline`), not with `--tunnel`. Only the backend goes through ngrok; the phone loads the bundle from Metro on the LAN address, or from an APK built with `make dev-tunnel-build-apk`.
 
 ### Issue: Docker volumes override package installations
 
 **Problem**: The anonymous volume `/app/node_modules` was created before adding `@expo/ngrok`, so the package isn't available.
 
-**Solution**: Remove all volumes and rebuild:
+**Solution**: Remove the containers with their anonymous volumes (`-v`) and start again:
 ```bash
-docker compose down -v
-docker volume prune -f
+docker rm -fv zumik-backend zumik-mobile
 make dev-tunnel
 ```
 
@@ -622,15 +612,7 @@ make dev-tunnel
 
 **Problem**: `EXPO_TOKEN` not available even though it's in `mobile/.env`.
 
-**Solution**: Add `env_file` to mobile service in `docker-compose.yml`:
-
-```yaml
-# Already fixed in docker-compose.yml:
-services:
-  mobile:
-    env_file:
-      - ./mobile/.env
-```
+**Solution**: already handled: `start_mobile` passes `--env-file mobile/.env` to `docker run`. If the variable is still missing, the container predates the change to `mobile/.env`: recreate it with `docker rm -f zumik-mobile && make dev-tunnel`.
 
 ## Getting Help
 
@@ -641,7 +623,7 @@ If tunnel mode isn't working:
 3. Visit ngrok interface: http://localhost:4040
 4. Review this guide's Troubleshooting section above
 5. Check Docker volumes: `docker volume ls`
-6. Rebuild containers: `docker compose down -v && make dev-tunnel`
+6. Recreate containers: `docker rm -fv zumik-backend zumik-mobile && make dev-tunnel`
 7. Open issue on GitHub with logs
 
 ---
