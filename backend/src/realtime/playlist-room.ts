@@ -5,6 +5,7 @@ import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { socketLogger } from '@/shared/middleware/socket-logger.middleware.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { AppSocketServer } from '@/realtime/socket-auth.js';
+import { RATE_LIMITED } from '@/realtime/event-rate-limit.js';
 
 /**
  * Access control for the `playlist:<id>` rooms (subject IV.6, CAP-1).
@@ -23,7 +24,7 @@ import type { AppSocketServer } from '@/realtime/socket-auth.js';
 export const playlistRoomPayloadSchema = z.uuid();
 
 export type PlaylistRoomErrorCode =
-	'INVALID_PAYLOAD' | 'PLAYLIST_NOT_FOUND' | 'PLAYLIST_ACCESS_DENIED';
+	'INVALID_PAYLOAD' | 'PLAYLIST_NOT_FOUND' | 'PLAYLIST_ACCESS_DENIED' | 'RATE_LIMITED';
 
 export interface PlaylistRoomError {
 	playlistId: string | null;
@@ -38,6 +39,7 @@ const MESSAGES: Record<PlaylistRoomErrorCode, string> = {
 	INVALID_PAYLOAD: 'playlist:join expects a playlist id (UUID)',
 	PLAYLIST_NOT_FOUND: 'Playlist not found',
 	PLAYLIST_ACCESS_DENIED: 'Not authorized to view this playlist',
+	RATE_LIMITED: RATE_LIMITED.message,
 };
 
 export function playlistRoom(playlistId: string): string {

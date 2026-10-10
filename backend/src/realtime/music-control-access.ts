@@ -1,5 +1,8 @@
 import { z } from 'zod';
-import type { ControlActionPayload } from '@/features/music-control/music-control.types.js';
+import type {
+	ControlActionPayload,
+	ListeningStatus,
+} from '@/features/music-control/music-control.types.js';
 import { socketLogger } from '@/shared/middleware/socket-logger.middleware.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { AppSocketServer } from '@/realtime/socket-auth.js';
@@ -26,8 +29,10 @@ import type { AppSocketServer } from '@/realtime/socket-auth.js';
  * unfollow in either direction) the subscription is re-checked and the
  * controller leaves the room only when no device is left.
  *
- * A malformed payload is answered on `listening:error` / `control:error` with
- * `{ message, code: 'INVALID_PAYLOAD' }`, before any lookup.
+ * A malformed payload (including a listening:update with a title or artist
+ * over 300 characters) is answered on `listening:error` / `control:error`
+ * with `{ message, code: 'INVALID_PAYLOAD' }`, before any lookup. Every event
+ * is also rate-limited per socket (event-rate-limit.ts, `RATE_LIMITED`).
  */
 
 export const listeningTargetSchema = z.uuid();
@@ -37,6 +42,35 @@ export const controlActionSchema = z.object({
 	targetDeviceId: z.string().min(1).max(128),
 	action: z.enum(['play', 'pause']),
 }) satisfies z.ZodType<ControlActionPayload>;
+
+/**
+ * listening:update from the device that plays. Strings are bounded (#204);
+ * older clients may still send a `device` field: it is stripped, and the
+ * device comes from the handshake.
+ */
+export const listeningUpdateSchema = z.object({
+	track: z
+		.object({
+			id: z.number(),
+			title: z.string().max(300),
+			artist: z.string().max(300),
+			artworkUrl: z
+				.string()
+				.max(2048)
+				.nullish()
+				.transform(url => url ?? null),
+		})
+		.nullable(),
+	isPlaying: z.boolean(),
+}) satisfies z.ZodType<Pick<ListeningStatus, 'track' | 'isPlaying'>, unknown>;
+
+export type ListeningUpdatePayload = z.infer<typeof listeningUpdateSchema>;
+
+export const INVALID_LISTENING_UPDATE_PAYLOAD = {
+	message:
+		'listening:update expects { track: { id, title, artist, artworkUrl } | null, isPlaying } (title and artist up to 300 characters)',
+	code: 'INVALID_PAYLOAD',
+} as const;
 
 export const INVALID_LISTENING_PAYLOAD = {
 	message: 'listening:subscribe expects a user id (UUID)',

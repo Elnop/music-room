@@ -109,6 +109,15 @@ const eventNameSchema = z.string().regex(/^[\w:.-]{1,64}$/);
 const INVALID_EVENT_NAME = '<invalid-event-name>';
 
 /**
+ * An event name from the client, safe to log: kept only when it looks like an
+ * event name, so a huge or multi-line string never reaches the log file.
+ */
+export function loggableEventName(eventName: unknown): string {
+	const name = eventNameSchema.safeParse(eventName);
+	return name.success ? name.data : INVALID_EVENT_NAME;
+}
+
+/**
  * Log every incoming socket event with the client's platform, device and app
  * version (subject IV.6), with the same field names as the HTTP action logger.
  * Event arguments are never logged.
@@ -121,10 +130,7 @@ export function incomingLog(
 	eventName: unknown,
 	client: SocketClientContext
 ): void {
-	// The name comes from the client: log it only when it looks like an event
-	// name, so a huge or multi-line string never reaches the log file.
-	const name = eventNameSchema.safeParse(eventName);
-	logger.info(`[Socket] in:${name.success ? name.data : INVALID_EVENT_NAME}`, {
+	logger.info(`[Socket] in:${loggableEventName(eventName)}`, {
 		socketId,
 		userId: client.userId,
 		platform: client.device.platform,

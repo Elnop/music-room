@@ -439,6 +439,7 @@ Les clients d'une playlist rejoignent la room `playlist:<id>` et reçoivent `pla
 | `INVALID_PAYLOAD` | l'id n'est pas une chaîne UUID (`playlistId` vaut `null` si ce n'est pas une chaîne) |
 | `PLAYLIST_NOT_FOUND` | playlist inconnue (ou lecture en base échouée), ou supprimée pendant que la socket était dans la room |
 | `PLAYLIST_ACCESS_DENIED` | l'utilisateur ne peut pas voir la playlist, ou a perdu l'accès |
+| `RATE_LIMITED` | trop de `playlist:join` / `playlist:leave` sur cette socket (voir Débit ci-dessous ; `playlistId` vaut `null`) |
 
 L'accès est revérifié quand il peut se perdre : après le retrait d'un viewer ou d'un collaborateur, une mise à jour de la playlist (visibilité) ou sa suppression, les sockets de `playlist:<id>` sans accès quittent la room et reçoivent `playlist:error`. Un échec de cette revérification est seulement loggé.
 
@@ -449,10 +450,13 @@ L'accès est revérifié quand il peut se perdre : après le retrait d'un viewer
 | Event | Payload | Erreur |
 | --- | --- | --- |
 | `listening:subscribe` | id utilisateur (UUID) | `listening:error` |
-| `listening:unsubscribe` | id utilisateur (UUID) | aucune : un payload invalide est ignoré |
+| `listening:unsubscribe` | id utilisateur (UUID) | aucune pour un payload invalide (ignoré) ; `listening:error` `RATE_LIMITED` au-delà du débit |
+| `listening:update` | `{ track: { id: number, title: string (≤ 300), artist: string (≤ 300), artworkUrl: string (≤ 2048) \| null } \| null, isPlaying: boolean }` | `listening:error` |
 | `control:action` | `{ targetUserId: UUID, targetDeviceId: string (1-128), action: 'play' \| 'pause' }` | `control:error` |
 
-Les erreurs ont la forme `{ message, code }` : `INVALID_PAYLOAD` (payload invalide), `NOT_AUTHORIZED` (pas le droit de contrôle), `DEVICE_OFFLINE` (`control:action` vers un appareil non connecté).
+Les erreurs ont la forme `{ message, code }` : `INVALID_PAYLOAD` (payload invalide), `NOT_AUTHORIZED` (pas le droit de contrôle), `DEVICE_OFFLINE` (`control:action` vers un appareil non connecté), `RATE_LIMITED` (débit dépassé).
+
+**Débit (#204)** : chaque socket a un compteur par événement, en mémoire, sur une fenêtre fixe de 10 s : 20 `listening:update` ou `control:action`, 30 pour chacun des autres événements de l'app, un compteur commun pour tout autre nom (`src/realtime/event-rate-limit.ts`). Au-delà, l'événement n'est pas traité et la socket reçoit `RATE_LIMITED` sur `listening:error`, `playlist:error` ou `control:error` selon l'événement. Le compteur est par socket : une autre connexion du même utilisateur a le sien.
 
 Le contrôleur reçoit `permission:changed` (`{ ownerId, targetUserId, canControl }`) quand l'interrupteur change (`grantControl` / `revokeControl`) et quand une licence d'appareil lui est accordée ou retirée ; pour une licence, `canControl` dit s'il lui reste au moins un appareil contrôlable, et l'app recharge alors sa liste d'appareils contrôlables.
 
