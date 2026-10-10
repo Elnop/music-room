@@ -397,6 +397,7 @@ export type Database = {
 			[_ in never]: never;
 		};
 		Functions: {
+			find_auth_user_id_by_email: { Args: { p_email: string }; Returns: string };
 			playlist_add_track: {
 				Args: { p_added_by?: string; p_playlist_id: string; p_track_id: string };
 				Returns: Json;

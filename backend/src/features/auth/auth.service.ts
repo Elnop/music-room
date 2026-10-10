@@ -8,6 +8,7 @@ import { UserService } from '@/features/auth/services/user.service.js';
 import { ProviderService } from '@/features/auth/services/provider.service.js';
 import { ProviderLinkService } from '@/features/auth/services/provider-link.service.js';
 import { EmailVerificationService } from '@/features/auth/services/email-verification.service.js';
+import { findAuthUserIdByEmail } from '@/features/auth/utils/find-auth-user.js';
 import type {
 	RegisterDTO,
 	LoginDTO,
@@ -34,25 +35,24 @@ export class AuthService {
 				username: data.username,
 			});
 
-			const { data: existingUser } = await supabase.auth.admin.listUsers();
-			const userWithEmail = existingUser?.users?.find(u => u.email === data.email);
+			const existingUserId = await findAuthUserIdByEmail(data.email);
 
-			if (userWithEmail) {
+			if (existingUserId) {
 				const { data: profile } = await supabase
 					.from('user_profiles')
 					.select('email_verified')
-					.eq('id', userWithEmail.id)
+					.eq('id', existingUserId)
 					.single();
 
 				if (profile && !profile.email_verified) {
 					logger.info('Found unverified account with same email, deleting old account', {
 						email: data.email,
-						oldUserId: userWithEmail.id,
+						oldUserId: existingUserId,
 					});
 
-					await supabase.from('user_profiles').delete().eq('id', userWithEmail.id);
+					await supabase.from('user_profiles').delete().eq('id', existingUserId);
 
-					await supabase.auth.admin.deleteUser(userWithEmail.id);
+					await supabase.auth.admin.deleteUser(existingUserId);
 
 					logger.info('Old unverified account deleted successfully', {
 						email: data.email,
