@@ -97,7 +97,7 @@ define start_redis
 		docker run -d \
 			--name $(REDIS_CONTAINER) \
 			--network $(DOCKER_NETWORK) \
-			-p $(REDIS_PORT):$(REDIS_PORT) \
+			-p 127.0.0.1:$(REDIS_PORT):$(REDIS_PORT) \
 			-v $(REDIS_VOLUME):/data \
 			--restart unless-stopped \
 			$(REDIS_IMAGE) redis-server --appendonly yes || { \
