@@ -34,14 +34,14 @@ Ce qui sert vraiment : `make` construit seulement `--target development` (`build
 - `node_modules` vient de `builder`, installé avec `--include=dev` et sans `npm prune` : les dépendances de dev sont dans l'image ;
 - `/app` appartient à `nodejs`, donc le code est modifiable par le processus qui l'exécute.
 
-`backend/.dockerignore` exclut `.env*`, `node_modules`, `dist`, les tests et `*.md` du contexte de build.
+`backend/.dockerignore` exclut du contexte de build `.env`, `.env.local`, `.env.*.local`, `node_modules`, `dist`, les tests et `*.md`. Les autres fichiers d'environnement ne sont pas exclus : `COPY . .` copie `backend/.env.example` (valeurs fictives) et, s'il existe, `backend/.env.test` dans les étapes `development` et `builder`. `.env.test` est écrit par `backend/scripts/test-db.sh` et contient les clés anon et service de la stack Supabase **locale** de test : il se retrouve dans l'image (#207).
 
 ### Conteneur `zumik-backend` (`start_backend`)
 
 - Image `music-room-backend:latest` (étape `development`), donc **root dans le conteneur**.
 - `-v backend/:/app` : le code de l'hôte est monté en écriture ; un fichier créé par le conteneur sur ce montage appartient à root sur l'hôte. `node_modules` est un volume anonyme (`-v /app/node_modules`).
 - `-v tunnel-info:/tmp/shared` : volume partagé avec le conteneur mobile (URL du tunnel).
-- `--env-file backend/.env` : les secrets (clé service Supabase, etc.) sont passés en variables d'environnement, visibles par `docker inspect`. Ils ne sont pas dans l'image.
+- `--env-file backend/.env` : les secrets (clé service Supabase, etc.) sont passés en variables d'environnement, visibles par `docker inspect`. `backend/.env` n'est pas dans l'image, mais `backend/.env.test` y est (voir ci-dessus, #207).
 - `-e NODE_ENV=development` : dans ce mode, le backend accepte toute origine `ngrok` ou `exp://` (`isOriginAllowed`, `backend/src/shared/config/cors.config.ts`).
 - `-p 3000:3000` sur toutes les interfaces de l'hôte (nécessaire : le téléphone appelle l'IP de l'hôte sur le réseau local, en HTTP).
 - `--restart unless-stopped`.
@@ -60,13 +60,13 @@ Une seule étape, `node:22-bookworm-slim`, serveur de développement Expo (pas d
 | `chmod +x scripts/*.sh` | `node` |
 | exécution : `CMD ["sh", "scripts/start-expo.sh"]` (`npx expo start --offline --port 8081`) | **`node`** (uid 1000 de l'image officielle) |
 
-`EXPOSE 8081 19000 19001 19002` (Metro et Expo DevTools). `ENV EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0` et `REACT_NATIVE_PACKAGER_HOSTNAME=0.0.0.0`. `ENTRYPOINT []`. `mobile/.dockerignore` exclut `.env*`, `node_modules`, `android/`, `ios/`, `*.keystore`, les tests et `*.md`.
+`EXPOSE 8081 19000 19001 19002` (Metro et Expo DevTools). `ENV EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0` et `REACT_NATIVE_PACKAGER_HOSTNAME=0.0.0.0`. `ENTRYPOINT []`. `mobile/.dockerignore` exclut `.env`, `.env.local`, `.env.*.local`, `node_modules`, `android/`, `ios/`, `*.keystore`, les tests et `*.md` ; `mobile/.env.example` (valeurs fictives) est donc copié dans l'image, comme tout autre `.env.*` qui ne finit pas par `.local` (#207).
 
 ### Conteneur `zumik-mobile` (`start_mobile`)
 
 - `-p 8081:8081 -p 19000:19000 -p 19001:19001 -p 19002:19002` sur toutes les interfaces de l'hôte : Metro sert le bundle JavaScript de l'app à quiconque atteint l'hôte. Ce bundle contient les variables `EXPO_PUBLIC_*`, dont l'URL et la clé anon Supabase ; elles sont publiques par nature (elles sont aussi dans l'APK), c'est la RLS qui doit protéger la base ([THREAT_MODEL.md](THREAT_MODEL.md#m8-accès-direct-à-supabase-avec-la-clé-anon)).
 - `-v mobile/:/app`, volumes anonymes `/app/node_modules` et `/app/.expo`, `-v tunnel-info:/tmp/shared`.
-- `--env-file mobile/.env`, plus `REACT_NATIVE_PACKAGER_HOSTNAME=<IP de l'hôte>`, `EXPO_PUBLIC_API_URL` et `EXPO_PUBLIC_WS_URL` (`http://` et `ws://` vers l'IP de l'hôte, port 3000).
+- `--env-file mobile/.env` (pas dans l'image), plus `REACT_NATIVE_PACKAGER_HOSTNAME=<IP de l'hôte>`, `EXPO_PUBLIC_API_URL` et `EXPO_PUBLIC_WS_URL` (`http://` et `ws://` vers l'IP de l'hôte, port 3000).
 - `--restart unless-stopped`, `-it`.
 
 ## Build de l'APK (`mobile/Dockerfile.android-build`)
@@ -86,7 +86,7 @@ Image de build, lancée par `scripts/build-apk-docker.sh` (`make build-apk-docke
 ## Redis (`start_redis`)
 
 - `redis:7-alpine`, `redis-server --appendonly yes`, volume `redis-data:/data`, `--restart unless-stopped`.
-- `-p 6379:6379` sur toutes les interfaces de l'hôte, **sans mot de passe** (`REDIS_PASSWORD` vide dans `backend/.env.example`, pas de `--requirepass`). Toute machine qui atteint l'hôte peut lire et effacer les compteurs de rate limiting, les verrous de compte, la liste noire d'IP et la liste de révocation des tokens. Lacune L8 du [modèle de menaces](THREAT_MODEL.md#lacunes-ouvertes). Les recommandations de production sont dans [REDIS.md](REDIS.md#redis-in-production).
+- `-p 6379:6379` sur toutes les interfaces de l'hôte, **sans mot de passe** (`REDIS_PASSWORD` vide dans `backend/.env.example`, pas de `--requirepass`). Toute machine qui atteint l'hôte peut lire et effacer les compteurs de rate limiting, les verrous de compte, la liste noire d'IP et la liste de révocation des tokens. Lacune L8 du [modèle de menaces](THREAT_MODEL.md#lacunes-ouvertes). Les recommandations de production sont dans [REDIS.md](REDIS.md#redis-in-production) ; ses exemples sont écrits pour Docker Compose, que le projet n'utilise plus (#210).
 
 ## Ce qui tourne en root
 

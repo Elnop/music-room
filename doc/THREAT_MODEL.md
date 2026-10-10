@@ -16,9 +16,9 @@ Conteneurs et images Docker : [SECURITY.md](SECURITY.md). Comment tester à la m
 | M4 | Bruteforce et rejeu de tokens (#160) | Limite des échecs de vérification par IP, testée. |
 | M5 | Vol de session (token volé) | Logout révoque access et refresh token, testé. Risques acceptés : durée de vie du token, stockage en clair sur le téléphone, HTTP en clair en dev. |
 | M6 | Token révoqué alors qu'une socket est déjà ouverte | **Risque accepté** : le token n'est vérifié qu'au handshake. L'app ferme sa socket (#70, testé). |
-| M7 | Accès aux données d'un autre utilisateur par l'API | Contrôles dans le code (clé service), testés pour playlists et contrôle musical. Filtre de confidentialité du profil non testé. |
+| M7 | Accès aux données d'un autre utilisateur par l'API | Contrôles dans le code (clé service), testés pour playlists et contrôle musical. Filtre de confidentialité du profil non testé. Routes SoundCloud publiques sans limite (L10). |
 | M8 | Accès direct à Supabase avec la clé anon embarquée dans l'app | Corrigé par #201 (migration 017) : `anon` et `authenticated` n'ont plus aucun privilège sur les tables de `public` ; testé. |
-| M9 | Abus du temps réel (origine, identité forgée, payloads, flood) | Origine, handshake et payloads contrôlés et testés. Pas de limite de débit par événement (L7). |
+| M9 | Abus du temps réel (origine, identité forgée, payloads, flood) | Origine, handshake et payloads contrôlés et testés ; en dev, toute origine contenant « ngrok » passe (L11). Pas de limite de débit par événement (L7). |
 | M10 | Accès conservé dans une room après son retrait | Revérification et éviction, testées. |
 | M11 | Contrôle musical d'un appareil non autorisé | Règle par appareil, fail closed, testée. |
 | M12 | Éditions concurrentes de playlist | Verrou par playlist + versions, testé. |
@@ -30,10 +30,12 @@ Conteneurs et images Docker : [SECURITY.md](SECURITY.md). Comment tester à la m
 
 **Protection.** Dans l'ordre des middlewares de `backend/src/features/auth/auth.routes.ts` :
 
-1. `checkIPBlacklist` (`backend/src/features/auth/middleware/account-lockout.middleware.ts`) sur toutes les routes `/api/auth/*` : une IP en liste noire reçoit `403 IP_BLOCKED`. Une IP y entre après `IP_BLACKLIST_THRESHOLD` (50) échecs de login ou d'OAuth en 15 min, pour 24 h (`recordIPActivity` dans `backend/src/shared/services/brute-force.service.ts`).
+1. `checkIPBlacklist` (`backend/src/features/auth/middleware/account-lockout.middleware.ts`) sur toutes les routes `/api/auth/*` : une IP en liste noire reçoit `403 IP_BLOCKED`. Une IP y entre après `IP_BLACKLIST_THRESHOLD` (50) échecs de login ou d'OAuth en 15 min, pour 24 h (`recordIPActivity` dans `backend/src/shared/services/brute-force.service.ts`). Avec les valeurs par défaut, ce seuil n'est jamais atteint : le limiteur global (point 2) arrête l'IP à 20 requêtes par 15 min.
 2. `globalAuthRateLimiter` (`backend/src/features/auth/middleware/rate-limit.middleware.ts`) : 20 requêtes par IP et 15 min sur `/api/auth/*`.
 3. `loginRateLimiter` : 5 échecs par couple email + IP et 15 min (`skipSuccessfulRequests`).
 4. `checkAccountLockout` : après 5 échecs pour un couple email + IP (`recordFailedAttempt`, appelé par `AuthController.login` dans `backend/src/features/auth/auth.controller.ts`), le couple est verrouillé 15 min, 1 h à partir de 8 échecs, 24 h à partir de 10 (`lockAccount`). `429 ACCOUNT_LOCKED`.
+
+Effet réel avec les valeurs par défaut : ce sont les limiteurs qui agissent. Au 5e échec, `loginRateLimiter` atteint sa limite et le couple est verrouillé 15 min ; la requête suivante reçoit `429 RATE_LIMIT_EXCEEDED` de `loginRateLimiter`, placé avant `checkAccountLockout`, donc `ACCOUNT_LOCKED` n'est jamais renvoyé. Comme aucun nouvel échec n'est compté pendant ce temps et que le compteur expire après 15 min, les paliers à 8 et 10 échecs ne sont jamais atteints. La liste noire et les paliers hauts ne servent que si l'on relève les seuils des limiteurs.
 
 Les seuils viennent de `backend/src/shared/config/rate-limit.config.ts` (variables d'environnement, valeurs par défaut citées ici). Les compteurs sont dans Redis (`RedisRateLimitStore`, `backend/src/features/auth/utils/redis-rate-limit-store.ts`).
 
@@ -49,7 +51,7 @@ Les seuils viennent de `backend/src/shared/config/rate-limit.config.ts` (variabl
 
 ## M2. Bruteforce des codes à 6 chiffres
 
-**Menace.** Deviner le code de vérification d'email (`POST /api/auth/verify-email`, il ouvre une session) ou le code de reset (`POST /api/auth/reset-password`, il change le mot de passe). L'espace est de 900 000 codes, valables 15 min.
+**Menace.** Deviner le code de vérification d'email (`POST /api/auth/verify-email`, il ouvre une session) ou le code de reset (`POST /api/auth/reset-password`, il change le mot de passe). `crypto.randomInt(100000, 999999)` donne 899 999 codes possibles (la borne haute est exclue), valables 15 min.
 
 **Protection.**
 - Code tiré par `crypto.randomInt`, comparé par `crypto.timingSafeEqual`, format validé par Zod (`auth.validators.ts`).
@@ -59,7 +61,7 @@ Les seuils viennent de `backend/src/shared/config/rate-limit.config.ts` (variabl
 
 **Tests.** `email-verification.int.test.ts` : « refuses a wrong code with INVALID_CODE ». **Aucun test** ne vérifie le nombre maximal d'essais, ni pour la vérification ni pour le reset (L9).
 
-**Risque accepté.** Comme M1, les essais sont comptés par IP : avec N adresses IP, un attaquant a environ 5 × N essais par code de reset. Raison : même arbitrage que M1 ; la durée de vie de 15 min et la limite de 3 demandes de code par heure et par email + IP (`PasswordResetCooldownService`) bornent la fenêtre.
+**Risque accepté.** Comme M1, tous les compteurs sont par IP, aucun par compte : avec N adresses IP, un attaquant a environ 5 × N essais par code de reset pendant ses 15 min de validité, soit une chance d'environ 5 × N / 899 999 par code. La limite de 3 demandes de code par heure (`PasswordResetCooldownService`) a la même clé email + IP : elle passe aussi à 3 × N et ne borne pas une attaque répartie. Même chose pour la vérification d'email (essais par `userId` + IP). Raison : même arbitrage que M1 ; une limite par compte laisserait n'importe qui bloquer le reset ou la vérification d'un autre. L'attaque demande un grand nombre d'IP.
 
 ## M3. Prise de compte et énumération par la vérification d'email et le reset
 
@@ -139,7 +141,7 @@ Les seuils viennent de `backend/src/shared/config/rate-limit.config.ts` (variabl
 - Playlists : `canViewPlaylist`, `canEditPlaylist`, `checkOwnership`, `checkEditPermission` dans `backend/src/features/playlists/permissions/playlist.permissions.ts`.
 - Contrôle musical : `ControlAccessService` (M11) ; un appareil n'est licencié que par son propriétaire (`findOwnedDevice` dans `DeviceLicenseService.grant`).
 - Profil d'un autre utilisateur : `PrivacyService.getFilteredProfile` (`backend/src/features/profile/services/privacy.service.ts`) applique ses réglages de confidentialité.
-- Toutes les entrées sont validées par Zod (`*.validators.ts`).
+- Les entrées des routes authentifiées sont validées par Zod (`*.validators.ts`). Exception : les routes SoundCloud (`backend/src/features/soundcloud/soundcloud.routes.ts`, `GET /api/soundcloud/search`, `/track/:urlOrId`, `/stream`, `/stream/:trackUrl`) sont publiques, sans `authMiddleware` ni rate limit, et seule `search` valide son entrée par Zod (`soundcloudSearchSchema`). Elles ne touchent pas aux données des utilisateurs, mais n'importe qui peut s'en servir comme proxy vers SoundCloud (L10).
 
 **Tests.**
 - `backend/src/features/playlists/permissions/playlist.permissions.test.ts` (`canViewPlaylist`, `canEditPlaylist`, `checkEditPermission`).
@@ -180,7 +182,7 @@ Avant 017, `anon` et `authenticated` avaient les privilèges de table par défau
 **Menace.** Se connecter depuis un site web tiers, se faire passer pour un autre utilisateur ou un autre appareil, envoyer des payloads malformés ou inonder le serveur d'événements.
 
 **Protection.**
-- Origine : `allowRequest` et `cors` dans `RealtimeService.initialize` (`backend/src/realtime/index.ts`) appliquent `isOriginAllowed` / `isSameOrigin` (`backend/src/shared/config/cors.config.ts`, `ALLOWED_ORIGINS`, #137). Une connexion sans en-tête `Origin` (app native) est acceptée : la règle d'origine ne protège que des navigateurs, l'authentification fait le reste. En `NODE_ENV=development`, toute origine `ngrok` ou `exp://` est acceptée.
+- Origine : `allowRequest` et `cors` dans `RealtimeService.initialize` (`backend/src/realtime/index.ts`) appliquent `isOriginAllowed` / `isSameOrigin` (`backend/src/shared/config/cors.config.ts`, `ALLOWED_ORIGINS`, #137). Une connexion sans en-tête `Origin` (app native) est acceptée : la règle d'origine ne protège que des navigateurs, l'authentification fait le reste. En `NODE_ENV=development`, `isOriginAllowed` accepte toute origine qui **contient** la chaîne `ngrok` (test `origin.includes('ngrok')`, `cors.config.ts` ligne 25), par exemple `https://ngrok.attacker.example`, et toute origine commençant par `exp://`. Le backend lancé par `make` tourne toujours avec `NODE_ENV=development` ([SECURITY.md](SECURITY.md)) : un site web quelconque dont le nom contient « ngrok » passe la règle d'origine, HTTP comme socket (L11). L'authentification par token reste exigée.
 - Handshake : token obligatoire et vérifié, champs validés par Zod (`handshakeAuthSchema`), appareil enregistré en base avant acceptation (`authenticateSocket`, `backend/src/realtime/socket-auth.ts`). L'identité (`socket.data.userId`) vient du token seul.
 - Événements : `playlist:join` / `leave` (UUID), `listening:subscribe` / `unsubscribe` (UUID), `control:action` (`controlActionSchema`, champs inconnus retirés) validés avant toute lecture en base (`backend/src/realtime/playlist-room.ts`, `backend/src/realtime/music-control-access.ts`) ; `listening:update` validé par `isValidListeningUpdatePayload` et limité à une application par seconde et par appareil (`LatestThrottle`, `backend/src/realtime/latest-throttle.ts`, #151). L'appareil vient du handshake, jamais du payload.
 - Chaque événement entrant est loggé avec plateforme, appareil et version (subject IV.6).
@@ -257,5 +259,7 @@ Trouvées en écrivant ce document. L1 à L3 ont été corrigées par #201 ; les
 | L7 | Basse | Pas de limite de débit par événement socket ni de longueur max sur `listening:update` (M9). | `backend/src/realtime/index.ts` | #204 |
 | L8 | Basse (dev) | Redis est publié sur le port 6379 de toutes les interfaces de l'hôte, sans mot de passe : quelqu'un sur le même réseau peut effacer les verrous, la liste noire et la liste de révocation. | `make/helpers/docker.mk` (`start_redis`), voir [SECURITY.md](SECURITY.md) | #205 |
 | L9 | Tests | Pas de test pour : `brute-force.service.ts`, `checkAccountLockout`, `checkIPBlacklist`, le nombre max d'essais des codes de vérification et de reset, `PrivacyService.getFilteredProfile`. | — | #206 |
+| L10 | Moyenne | Routes SoundCloud publiques, sans rate limit, et sans validation Zod sauf `search` : proxy ouvert vers SoundCloud (M7). | `backend/src/features/soundcloud/soundcloud.routes.ts` | #208 |
+| L11 | Moyenne (dev) | En développement, toute origine contenant « ngrok » est acceptée par le CORS HTTP et socket ; le backend de dev tourne toujours dans ce mode (M9). | `backend/src/shared/config/cors.config.ts` (`isOriginAllowed`) | #209 |
 
 Déjà suivis ailleurs : #159 (M10), #173 (L4), #194 et #196 (M3).

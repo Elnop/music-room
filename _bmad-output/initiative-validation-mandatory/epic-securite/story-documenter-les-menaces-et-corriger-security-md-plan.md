@@ -3,14 +3,14 @@ title: 'Documenter les menaces et corriger SECURITY.md'
 type: 'chore'
 ticket: '6'
 created: '2026-10-10'
-status: 'in-progress'
+status: 'built'
 baseline_revision: '2c1f210603fda190bfdd37d8a1891e9cd7aada69'
 route: 'full'
 route_source: 'auto'
 risk: 'low'
-review: ''
-review_source: ''
-lenses_ran: []
+review: 'quick'
+review_source: 'pinned'
+lenses_ran: ['quick']
 review_loop_iteration: 0
 context: []
 ---
@@ -56,3 +56,19 @@ context: []
 **Manual checks (if no CLI):**
 - Every file path and test name cited exists (`ls` / `grep` each one).
 - SECURITY.md statements checked line by line against the Dockerfiles.
+
+## Review Triage Log
+
+Before review: the doc found L1–L3 (direct table access with the anon key); fixed by #201 (migration 017, applied to the hosted project) and the doc updated; L5, L7, L8, L9 → #203–#206; L6 accepted risk.
+
+Pass 1 (quick): 7 findings, all real.
+
+| # | Finding | Verdict | Route | Evidence / action |
+|---|---------|---------|-------|-------------------|
+| 1 | SECURITY.md claims `.env*` is excluded from images | medium | patch + ticket | `.dockerignore` lacks `.env.test` / `.env.example`; `.env.test` (local keys) lands in the backend dev image. Doc corrected; fix in #207. |
+| 2 | IP blacklist presented as working; cannot trigger with defaults | low | patch | `globalAuthRateLimiter` 20/15 min per IP < 50 needed. |
+| 3 | Lockout tiers 8/10 unreachable; `ACCOUNT_LOCKED` hidden behind the login limiter | low | patch | `loginRateLimiter` 429 at the 6th failure. |
+| 4 | M2 reasoning wrong (3 codes/h also scales with N IPs); 899,999 codes | low | patch | Keyed email+IP. |
+| 5 | "All inputs validated by Zod" false; public unthrottled SoundCloud proxy uncovered | medium | patch + ticket | `soundcloud.routes.ts` public, no limiter, only `search` uses Zod. Gap L10 → #208. |
+| 6 | Dev CORS accepts any origin containing "ngrok" | low | patch + ticket | `cors.config.ts:25` `includes('ngrok')`. Gap L11 → #209. |
+| 7 | TUNNEL_MODE.md / REDIS.md still describe Compose | low | defer | Pre-existing; #210. |
