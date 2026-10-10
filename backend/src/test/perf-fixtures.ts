@@ -6,7 +6,8 @@
  * - auth users `perf-<i>@zumik.test` with a new random password on every run,
  *   and verified profiles `perf_<i>`;
  * - perf_0 and every other user follow each other (friends);
- * - a device of perf_0 and a control licence on it for every friend;
+ * - a device of perf_0 and a control licence on it for every friend; the
+ *   devices `perf-socket-<k>` the socket scenario (perf-socket.ts) left are removed;
  * - one public, open playlist `perf-shared` owned by perf_0, emptied of the
  *   tracks a previous run left behind.
  * Then signs every user in and writes tests/performance/fixtures/users.csv
@@ -23,6 +24,8 @@ const PLAYLIST_NAME = 'perf-shared';
 const DEVICE_ID = 'perf-device-0';
 /** Prefix of the track URIs the track-edit scenario adds (tests/performance/scenarios). */
 const PERF_TRACK_URI_PREFIX = 'https://soundcloud.com/zumik-perf/';
+/** Prefix of the device ids the socket scenario connects with (perf-socket.ts). */
+const PERF_SOCKET_DEVICE_PREFIX = 'perf-socket-';
 const BATCH_SIZE = 5;
 
 const userCount = z.coerce
@@ -99,6 +102,16 @@ async function upsertUser(index: number): Promise<Omit<PerfUser, 'token'>> {
 	if (error) fail(`profile perf_${index}`, error);
 
 	return { index, email, password, id };
+}
+
+/** Removes the devices the socket scenario recorded for the perf users. */
+async function deleteSocketDevices(userIds: string[]): Promise<void> {
+	const { error } = await supabaseAdmin
+		.from('devices')
+		.delete()
+		.in('user_id', userIds)
+		.like('device_id', `${PERF_SOCKET_DEVICE_PREFIX}%`);
+	if (error) fail('delete socket devices', error);
 }
 
 async function linkFriendsAndDevice(ownerId: string, friendIds: string[]): Promise<void> {
@@ -198,6 +211,7 @@ async function main(): Promise<void> {
 	const indexes = Array.from({ length: userCount }, (_, i) => i);
 	const created = await inBatches(indexes, upsertUser);
 
+	await deleteSocketDevices(created.map(user => user.id));
 	const [owner, ...friends] = created;
 	await linkFriendsAndDevice(
 		owner.id,
