@@ -23,9 +23,7 @@ DOCKER.md
 **/yarn-error.log
 
 # Environment files
-**/.env
-**/.env.local
-**/.env.*.local
+**/.env*
 
 # Build outputs
 **/dist
