@@ -72,16 +72,17 @@ Les seuils viennent de `backend/src/shared/config/rate-limit.config.ts` (variabl
 - `resendVerification` (`auth.controller.ts`) envoie le code à l'email du compte, jamais à celui du corps, et seulement si l'email du corps correspond (`resolveVerificationRecipient`). Même réponse dans tous les cas, cooldown compté avant toute recherche : un 429 ne trahit pas un compte existant (#188).
 - `forgotPassword` répond toujours « If this email exists… » ; le quota horaire et le cooldown sont consommés que l'email existe ou non (`PasswordResetCooldownService.consumeRequest`, #187). `GET /reset-password/can-resend` donne la même réponse pour un email inconnu.
 - Un compte Google/Facebook sans mot de passe peut recevoir un code et en définir un (#189) : il faut quand même lire la boîte mail.
+- Un reset termine toutes les sessions du compte : Supabase Auth (GoTrue v2.197.0, même version en local et sur le projet hébergé) les supprime quand `auth.admin.updateUserById` change le mot de passe. Les access et refresh tokens émis avant le reset sont refusés aussitôt (L5, #203). Le test ne tourne que sur la stack locale : une montée de version de GoTrue est à revérifier.
 
 **Tests.**
 - `backend/src/features/auth/services/email-verification.int.test.ts` : « refuses a verified account with ALREADY_VERIFIED and returns no session », « sends nothing when the body email is not the account email », « answers 429 RESEND_COOLDOWN on a second call even when the email does not match », « sends nothing for an unknown user ».
 - `backend/src/features/auth/services/password-reset-resend.int.test.ts` : « reports the same cooldown for an email with no account (no enumeration) ».
 - `backend/src/features/auth/services/password-reset-oauth.int.test.ts` : « sends a code, resets, records the password and allows password sign-in ».
+- `backend/src/features/auth/services/password-reset-sessions.int.test.ts` : « refuses the access and refresh tokens issued before the reset ».
 
 **Ouvert.**
 - #194 : `listUsers()` sans pagination ; au-delà de la première page, un compte n'est pas trouvé par le reset.
 - #196 : `has_password` faux sur d'anciens comptes Google/Facebook.
-- Un reset ne termine pas les sessions déjà ouvertes (L5).
 - Les codes sont stockés en clair dans `user_profiles` ; ils étaient lisibles avec la clé anon (L1), ils ne le sont plus depuis #201.
 
 ## M4. Bruteforce et rejeu de tokens
@@ -248,7 +249,7 @@ Avant 017, `anon` et `authenticated` avaient les privilèges de table par défau
 
 ## Lacunes ouvertes
 
-Trouvées en écrivant ce document. L1 à L3 ont été corrigées par #201, L10 par #208 ; les autres ont chacune leur ticket, sauf L6, risque accepté.
+Trouvées en écrivant ce document. L1 à L3 ont été corrigées par #201, L10 par #208, L5 n'était pas reproductible (#203) ; les autres ont chacune leur ticket, sauf L6, risque accepté.
 
 | # | Gravité | Lacune | Où | Suivi |
 |---|---------|--------|-----|-------|
@@ -256,7 +257,7 @@ Trouvées en écrivant ce document. L1 à L3 ont été corrigées par #201, L10 
 | L2 | Haute, corrigé (#201) | La politique UPDATE de `user_profiles` autorise toutes les colonnes de sa propre ligne : un utilisateur peut se mettre `email_verified = true` sans code. La politique INSERT de `follows` ne contrôle pas `can_control_music` : un contrôleur peut supprimer puis recréer sa ligne `follows` vers le propriétaire avec `can_control_music = true` et, si le propriétaire le suit, contrôler tous ses appareils. | `001_initial_schema.sql`, `007_follows.sql`, `009_music_control.sql` | #201 |
 | L3 | Haute, corrigé (#201) | `tracks` n'a pas de RLS : lecture, modification et suppression par la clé anon. `music_preferences` et `follows` sont lisibles par tous, sans les réglages de confidentialité. | `003_playlist_persistence.sql`, `011_profile_privacy_and_preferences.sql`, `007_follows.sql` | #201 |
 | L4 | Moyenne | Toutes les limites anti-bruteforce sont par IP (M1, M2) ; IP faussée derrière un proxy. | #173 (existe) | #173 |
-| L5 | Moyenne | Un reset de mot de passe ne termine pas les sessions ouvertes : un voleur de session la garde après que la victime a changé son mot de passe. | `PasswordResetService.resetPassword` | #203 |
+| L5 | Moyenne, non reproduite (#203) | Un reset de mot de passe ne terminerait pas les sessions ouvertes. Vérifié sur GoTrue v2.197.0 (local et hébergé) : Supabase Auth supprime toutes les sessions du compte quand l'admin change le mot de passe ; un test d'intégration verrouille ce comportement sur la stack locale. | `PasswordResetService.resetPassword` | #203 |
 | L6 | Moyenne | Une socket ouverte survit au logout et à l'expiration du token (M6). | `backend/src/realtime/socket-auth.ts` | risque accepté (M6) |
 | L7 | Basse | Pas de limite de débit par événement socket ni de longueur max sur `listening:update` (M9). | `backend/src/realtime/index.ts` | #204 |
 | L8 | Basse (dev) | Redis est publié sur le port 6379 de toutes les interfaces de l'hôte, sans mot de passe : quelqu'un sur le même réseau peut effacer les verrous, la liste noire et la liste de révocation. | `make/helpers/docker.mk` (`start_redis`), voir [SECURITY.md](SECURITY.md) | #205 |
