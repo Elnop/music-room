@@ -42,7 +42,7 @@ Ce qui sert vraiment : `make` construit seulement `--target development` (`build
 - `-v backend/:/app` : le code de l'hôte est monté en écriture ; un fichier créé par le conteneur sur ce montage appartient à root sur l'hôte. `node_modules` est un volume anonyme (`-v /app/node_modules`).
 - `-v tunnel-info:/tmp/shared` : volume partagé avec le conteneur mobile (URL du tunnel).
 - `--env-file backend/.env` : les secrets (clé service Supabase, etc.) sont passés en variables d'environnement, visibles par `docker inspect`. Aucun fichier `.env*` n'est dans l'image (voir ci-dessus).
-- `-e NODE_ENV=development` : dans ce mode, le backend accepte toute origine `ngrok` ou `exp://` (`isOriginAllowed`, `backend/src/shared/config/cors.config.ts`).
+- `-e NODE_ENV=development` : dans ce mode, le backend accepte aussi les origines `exp://` et les sous-domaines https des domaines ngrok (`isOriginAllowed` / `isNgrokOrigin`, `backend/src/shared/config/cors.config.ts`, #209). Un sous-domaine ngrok s'obtient avec un compte gratuit : c'est un risque de dev accepté (L11 dans [THREAT_MODEL.md](THREAT_MODEL.md)).
 - `-p 3000:3000` sur toutes les interfaces de l'hôte (nécessaire : le téléphone appelle l'IP de l'hôte sur le réseau local, en HTTP).
 - `--restart unless-stopped`.
 - Mode tunnel (`start_backend_tunnel`, `make dev-tunnel`) : en plus `-p 4040:4040` (interface web de ngrok, sur toutes les interfaces), `TUNNEL_MODE=true`, commande `sh scripts/start-with-tunnel.sh`.

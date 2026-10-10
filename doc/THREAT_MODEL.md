@@ -18,7 +18,7 @@ Conteneurs et images Docker : [SECURITY.md](SECURITY.md). Comment tester à la m
 | M6 | Token révoqué alors qu'une socket est déjà ouverte | **Risque accepté** : le token n'est vérifié qu'au handshake. L'app ferme sa socket (#70, testé). |
 | M7 | Accès aux données d'un autre utilisateur par l'API | Contrôles dans le code (clé service), testés pour playlists et contrôle musical. Filtre de confidentialité du profil non testé. Routes SoundCloud authentifiées et limitées par utilisateur (L10 corrigée, #208). |
 | M8 | Accès direct à Supabase avec la clé anon embarquée dans l'app | Corrigé par #201 (migration 017) : `anon` et `authenticated` n'ont plus aucun privilège sur les tables de `public` ; testé. |
-| M9 | Abus du temps réel (origine, identité forgée, payloads, flood) | Origine, handshake et payloads contrôlés et testés ; en dev, toute origine contenant « ngrok » passe (L11). Pas de limite de débit par événement (L7). |
+| M9 | Abus du temps réel (origine, identité forgée, payloads, flood) | Origine, handshake et payloads contrôlés et testés ; en dev, toute origine sur un sous-domaine ngrok passe, y compris le tunnel d'un attaquant (L11 réduite, #209). Pas de limite de débit par événement (L7). |
 | M10 | Accès conservé dans une room après son retrait | Revérification et éviction, testées. |
 | M11 | Contrôle musical d'un appareil non autorisé | Règle par appareil, fail closed, testée. |
 | M12 | Éditions concurrentes de playlist | Verrou par playlist + versions, testé. |
@@ -187,13 +187,14 @@ Avant 017, `anon` et `authenticated` avaient les privilèges de table par défau
 **Menace.** Se connecter depuis un site web tiers, se faire passer pour un autre utilisateur ou un autre appareil, envoyer des payloads malformés ou inonder le serveur d'événements.
 
 **Protection.**
-- Origine : `allowRequest` et `cors` dans `RealtimeService.initialize` (`backend/src/realtime/index.ts`) appliquent `isOriginAllowed` / `isSameOrigin` (`backend/src/shared/config/cors.config.ts`, `ALLOWED_ORIGINS`, #137). Une connexion sans en-tête `Origin` (app native) est acceptée : la règle d'origine ne protège que des navigateurs, l'authentification fait le reste. En `NODE_ENV=development`, `isOriginAllowed` accepte toute origine qui **contient** la chaîne `ngrok` (test `origin.includes('ngrok')`, `cors.config.ts` ligne 25), par exemple `https://ngrok.attacker.example`, et toute origine commençant par `exp://`. Le backend lancé par `make` tourne toujours avec `NODE_ENV=development` ([SECURITY.md](SECURITY.md)) : un site web quelconque dont le nom contient « ngrok » passe la règle d'origine, HTTP comme socket (L11). L'authentification par token reste exigée.
+- Origine : `allowRequest` et `cors` dans `RealtimeService.initialize` (`backend/src/realtime/index.ts`) appliquent `isOriginAllowed` / `isSameOrigin` (`backend/src/shared/config/cors.config.ts`, `ALLOWED_ORIGINS`, #137). Une connexion sans en-tête `Origin` (app native) est acceptée : la règle d'origine ne protège que des navigateurs, l'authentification fait le reste. En `NODE_ENV=development`, `isOriginAllowed` accepte aussi les origines `exp://` et les sous-domaines https des domaines ngrok (`isNgrokOrigin` : `ngrok-free.app`, `ngrok-free.dev`, `ngrok.app`, `ngrok.dev`, `ngrok.io`), comparés sur le nom d'hôte parsé : `https://ngrok.attacker.example` est refusé (#209). Reste ouvert : n'importe qui peut obtenir un sous-domaine ngrok gratuit, donc une page servie par le tunnel d'un attaquant passe encore (le tunnel du projet est aussi autorisé exactement par `TUNNEL_URL`). Le backend lancé par `make` tourne toujours en `development` ([SECURITY.md](SECURITY.md)) ; l'authentification par token reste exigée.
 - Handshake : token obligatoire et vérifié, champs validés par Zod (`handshakeAuthSchema`), appareil enregistré en base avant acceptation (`authenticateSocket`, `backend/src/realtime/socket-auth.ts`). L'identité (`socket.data.userId`) vient du token seul.
 - Événements : `playlist:join` / `leave` (UUID), `listening:subscribe` / `unsubscribe` (UUID), `control:action` (`controlActionSchema`, champs inconnus retirés) validés avant toute lecture en base (`backend/src/realtime/playlist-room.ts`, `backend/src/realtime/music-control-access.ts`) ; `listening:update` validé par `isValidListeningUpdatePayload` et limité à une application par seconde et par appareil (`LatestThrottle`, `backend/src/realtime/latest-throttle.ts`, #151). L'appareil vient du handshake, jamais du payload.
 - Chaque événement entrant est loggé avec plateforme, appareil et version (subject IV.6).
 
 **Tests.**
 - `backend/src/realtime/socket-origin.int.test.ts` : « refuses a %s connection from an origin outside ALLOWED_ORIGINS », « accepts a connection without Origin header ».
+- `backend/src/shared/config/cors.config.test.ts` : « allows %s », « refuses %s » (ngrok look-alikes, http, bare domain).
 - `backend/src/realtime/socket-auth.int.test.ts` : « refuses a handshake without token with NO_TOKEN », « refuses a missing or non-string device field with INVALID_HANDSHAKE », « ignores a forged userId in the handshake », « stores listening:update with the handshake device, not the payload one », « keeps the latest listening:update of a burst (#151) ».
 - `backend/src/realtime/music-control-access.int.test.ts` : « refuses Carol even when the payload claims to come from Bob », « ignores a forged sender field from an allowed controller », « answers malformed payloads with INVALID_PAYLOAD and keeps serving the socket ».
 
@@ -250,7 +251,7 @@ Avant 017, `anon` et `authenticated` avaient les privilèges de table par défau
 
 ## Lacunes ouvertes
 
-Trouvées en écrivant ce document. L1 à L3 ont été corrigées par #201, L4 par #173, L10 par #208, L5 n'était pas reproductible (#203) ; les autres ont chacune leur ticket, sauf L6, risque accepté.
+Trouvées en écrivant ce document. L1 à L3 ont été corrigées par #201, L4 par #173, L10 par #208, L11 réduite par #209 (risque restant accepté), L5 n'était pas reproductible (#203) ; les autres ont chacune leur ticket, sauf L6, risque accepté.
 
 | # | Gravité | Lacune | Où | Suivi |
 |---|---------|--------|-----|-------|
@@ -264,5 +265,5 @@ Trouvées en écrivant ce document. L1 à L3 ont été corrigées par #201, L4 p
 | L8 | Basse (dev) | Redis est publié sur le port 6379 de toutes les interfaces de l'hôte, sans mot de passe : quelqu'un sur le même réseau peut effacer les verrous, la liste noire et la liste de révocation. | `make/helpers/docker.mk` (`start_redis`), voir [SECURITY.md](SECURITY.md) | #205 |
 | L9 | Tests | Pas de test pour : `brute-force.service.ts`, `checkAccountLockout`, `checkIPBlacklist`, le nombre max d'essais des codes de vérification et de reset, `PrivacyService.getFilteredProfile`. | — | #206 |
 | L10 | Moyenne, corrigé (#208) | Routes SoundCloud publiques, sans rate limit, et sans validation Zod sauf `search` : proxy ouvert vers SoundCloud (M7). | `backend/src/features/soundcloud/soundcloud.routes.ts` | #208 |
-| L11 | Moyenne (dev) | En développement, toute origine contenant « ngrok » est acceptée par le CORS HTTP et socket ; le backend de dev tourne toujours dans ce mode (M9). | `backend/src/shared/config/cors.config.ts` (`isOriginAllowed`) | #209 |
+| L11 | Moyenne (dev), réduite (#209) | En développement, toute origine contenant « ngrok » était acceptée par le CORS HTTP et socket ; seuls les sous-domaines https des domaines ngrok le sont maintenant, sur le nom d'hôte parsé. Risque accepté : un sous-domaine ngrok s'obtient avec un compte gratuit, donc le tunnel d'un attaquant passe encore ; l'authentification par token reste exigée (M9). | `backend/src/shared/config/cors.config.ts` (`isOriginAllowed`) | #209 |
 
