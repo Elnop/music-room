@@ -348,15 +348,15 @@ define docker_exec
 	fi
 endef
 
-# Execute command with -T flag (no TTY)
+# Execute command without a TTY (docker exec has no -T flag)
 # Usage: $(call docker_exec_no_tty,backend,cat /tmp/file)
 define docker_exec_no_tty
 	@if [ "$(1)" = "backend" ]; then \
-		docker exec -T $(BACKEND_CONTAINER) $(2); \
+		docker exec $(BACKEND_CONTAINER) $(2); \
 	elif [ "$(1)" = "mobile" ]; then \
-		docker exec -T $(MOBILE_CONTAINER) $(2); \
+		docker exec $(MOBILE_CONTAINER) $(2); \
 	elif [ "$(1)" = "redis" ]; then \
-		docker exec -T $(REDIS_CONTAINER) $(2); \
+		docker exec $(REDIS_CONTAINER) $(2); \
 	fi
 endef
 
