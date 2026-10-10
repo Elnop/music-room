@@ -8,23 +8,28 @@ echo "Mode: Tunnel (cross-network development)"
 echo "Port: 8081"
 echo "=========================================="
 
-# Wait for backend tunnel URL (max 30 seconds)
+# Wait for a live backend tunnel URL (max 60 seconds)
 BACKEND_TUNNEL_URL=""
-MAX_ATTEMPTS=6
+MAX_ATTEMPTS=12
 ATTEMPT=0
 
 echo "→ Waiting for backend tunnel to initialize..."
 while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
   if [ -f /tmp/shared/backend-tunnel-url.txt ]; then
-    BACKEND_TUNNEL_URL=$(cat /tmp/shared/backend-tunnel-url.txt)
+    BACKEND_TUNNEL_URL=$(cat /tmp/shared/backend-tunnel-url.txt 2>/dev/null || true)
 
-    # Verify the URL is not empty
-    if [ -n "$BACKEND_TUNNEL_URL" ]; then
+    # Accept the URL only once the backend answers through it: a file left by
+    # a previous run, or by a backend that exited, points at a dead tunnel.
+    if [ -n "$BACKEND_TUNNEL_URL" ] && node -e '
+      fetch(process.argv[1] + "/health", { headers: { "ngrok-skip-browser-warning": "1" } })
+        .then(r => process.exit(r.ok ? 0 : 1), () => process.exit(1));
+    ' "$BACKEND_TUNNEL_URL"; then
       echo "✓ Backend tunnel URL found: $BACKEND_TUNNEL_URL"
 
       # Export backend tunnel URL for mobile app to use
       export EXPO_PUBLIC_API_URL="$BACKEND_TUNNEL_URL"
-      export EXPO_PUBLIC_WS_URL="${BACKEND_TUNNEL_URL/https/wss}"
+      # POSIX sh (dash in the image): no ${var/x/y} substitution.
+      export EXPO_PUBLIC_WS_URL="$(printf '%s' "$BACKEND_TUNNEL_URL" | sed 's|^https|wss|')"
 
       echo "→ Mobile app will connect to:"
       echo "   API: $EXPO_PUBLIC_API_URL"
@@ -51,7 +56,7 @@ done
 # If we exhausted all attempts, fail explicitly
 if [ -z "$BACKEND_TUNNEL_URL" ]; then
   echo ""
-  echo "❌ ERROR: Backend tunnel URL not found after 30 seconds"
+  echo "❌ ERROR: no live backend tunnel URL after 60 seconds"
   echo ""
   echo "Debugging information:"
   echo "  Shared volume mount: $(ls -la /tmp/shared 2>/dev/null || echo 'NOT FOUND')"
@@ -64,10 +69,10 @@ if [ -z "$BACKEND_TUNNEL_URL" ]; then
   echo "  4. Permission issues (files not readable by mobile container)"
   echo ""
   echo "To fix:"
-  echo "  1. Check backend logs: make logs-backend"
+  echo "  1. Check backend logs: docker logs zumik-backend"
   echo "  2. Verify backend container: docker ps"
   echo "  3. Check tunnel file: docker exec zumik-backend cat /tmp/shared/backend-tunnel-url.txt"
-  echo "  4. Rebuild and restart: make stop && docker compose down -v && make dev-tunnel"
+  echo "  4. Recreate the containers: docker rm -fv zumik-backend zumik-mobile && make dev-tunnel"
   echo ""
   exit 1
 fi

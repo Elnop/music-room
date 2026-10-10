@@ -41,6 +41,13 @@ define container_running
 $(shell docker ps --filter "name=^/$(1)$$" --filter "status=running" --format "{{.Names}}" 2>/dev/null | grep -q "^$(1)$$" && echo "true" || echo "false")
 endef
 
+# Mode a container was started in (label zumik.mode: lan or tunnel; empty
+# for a container started before the label existed, treated as lan)
+# Usage: $(call container_mode,zumik-backend)
+define container_mode
+$(shell docker inspect -f '{{index .Config.Labels "zumik.mode"}}' $(1) 2>/dev/null)
+endef
+
 # Check if container exists (running or stopped)
 # Usage: $(call container_exists,zumik-backend)
 # Returns: "true" or "false"
@@ -113,7 +120,7 @@ endef
 define start_backend
 	@$(call ensure_network)
 	@$(call ensure_volumes)
-	@if [ "$(call container_running,$(BACKEND_CONTAINER))" = "true" ]; then \
+	@if [ "$(call container_running,$(BACKEND_CONTAINER))" = "true" ] && [ "$(call container_mode,$(BACKEND_CONTAINER))" != "tunnel" ]; then \
 		echo "$(YELLOW)$(ICON_INFO) Backend already running$(NC)"; \
 	else \
 		$(call build_backend_image); \
@@ -122,6 +129,7 @@ define start_backend
 		echo "$(BLUE)$(ICON_INFO) Starting backend...$(NC)"; \
 		docker run -d \
 			--name $(BACKEND_CONTAINER) \
+			--label zumik.mode=lan \
 			--network $(DOCKER_NETWORK) \
 			-p $(BACKEND_PORT):$(BACKEND_PORT) \
 			-v $(shell pwd)/$(BACKEND_DIR):/app \
@@ -146,7 +154,7 @@ endef
 define start_backend_tunnel
 	@$(call ensure_network)
 	@$(call ensure_volumes)
-	@if [ "$(call container_running,$(BACKEND_CONTAINER))" = "true" ]; then \
+	@if [ "$(call container_running,$(BACKEND_CONTAINER))" = "true" ] && [ "$(call container_mode,$(BACKEND_CONTAINER))" = "tunnel" ]; then \
 		echo "$(YELLOW)$(ICON_INFO) Backend already running$(NC)"; \
 	else \
 		$(call build_backend_image); \
@@ -155,6 +163,7 @@ define start_backend_tunnel
 		echo "$(BLUE)$(ICON_INFO) Starting backend with tunnel...$(NC)"; \
 		docker run -d \
 			--name $(BACKEND_CONTAINER) \
+			--label zumik.mode=tunnel \
 			--network $(DOCKER_NETWORK) \
 			-p $(BACKEND_PORT):$(BACKEND_PORT) \
 			-p $(NGROK_PORT):$(NGROK_PORT) \
@@ -182,7 +191,7 @@ define start_mobile
 	@$(call write_mobile_dev_env)
 	@$(call ensure_network)
 	@$(call ensure_volumes)
-	@if [ "$(call container_running,$(MOBILE_CONTAINER))" = "true" ]; then \
+	@if [ "$(call container_running,$(MOBILE_CONTAINER))" = "true" ] && [ "$(call container_mode,$(MOBILE_CONTAINER))" != "tunnel" ]; then \
 		echo "$(YELLOW)$(ICON_INFO) Mobile already running$(NC)"; \
 	else \
 		$(call build_mobile_image); \
@@ -191,6 +200,7 @@ define start_mobile
 		echo "$(BLUE)$(ICON_INFO) Starting mobile...$(NC)"; \
 		docker run -d \
 			--name $(MOBILE_CONTAINER) \
+			--label zumik.mode=lan \
 			--network $(DOCKER_NETWORK) \
 			-p $(METRO_PORT):$(METRO_PORT) \
 			-p $(EXPO_PORT):$(EXPO_PORT) \
@@ -216,6 +226,42 @@ define start_mobile
 	fi
 endef
 
+# Start mobile container in tunnel mode (#225): Expo through its own ngrok
+# tunnel (scripts/start-expo-tunnel.sh), API and socket on the backend tunnel
+# URL read from the shared volume. No LAN host name or devtools address: they
+# would override the tunnel URL Expo puts in the manifest. Always recreated:
+# a running container keeps the backend URL it read at start, which changes
+# whenever the backend tunnel restarts.
+# Usage: $(call start_mobile_tunnel)
+define start_mobile_tunnel
+	@$(call ensure_network)
+	@$(call ensure_volumes)
+	@if true; then \
+		$(call build_mobile_image); \
+		docker stop $(MOBILE_CONTAINER) 2>/dev/null || true; \
+		docker rm $(MOBILE_CONTAINER) 2>/dev/null || true; \
+		echo "$(BLUE)$(ICON_INFO) Starting mobile with Expo tunnel...$(NC)"; \
+		docker run -d \
+			--name $(MOBILE_CONTAINER) \
+			--label zumik.mode=tunnel \
+			--network $(DOCKER_NETWORK) \
+			-p $(METRO_PORT):$(METRO_PORT) \
+			-v $(shell pwd)/$(MOBILE_DIR):/app \
+			-v /app/node_modules \
+			-v /app/.expo \
+			-v $(TUNNEL_VOLUME):/tmp/shared \
+			--env-file $(shell pwd)/$(MOBILE_ENV) \
+			--restart unless-stopped \
+			-it \
+			music-room-mobile:latest sh scripts/start-expo-tunnel.sh || { \
+			echo "$(RED)$(ICON_ERROR) Failed to start mobile with tunnel$(NC)"; \
+			docker logs $(MOBILE_CONTAINER) 2>&1 | tail -20; \
+			exit 1; \
+		}; \
+		echo "$(GREEN)$(ICON_SUCCESS) Mobile started with Expo tunnel$(NC)"; \
+	fi
+endef
+
 # ==============================================================================
 # High-level Orchestration Functions
 # ==============================================================================
@@ -233,7 +279,7 @@ endef
 define docker_up_tunnel
 	@$(call start_redis)
 	@$(call start_backend_tunnel)
-	@$(call start_mobile)
+	@$(call start_mobile_tunnel)
 endef
 
 # Start single service with build

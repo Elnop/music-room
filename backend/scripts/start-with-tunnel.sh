@@ -5,6 +5,10 @@ echo "=========================================="
 echo "Starting Backend with ngrok Tunnel"
 echo "=========================================="
 
+# The shared volume outlives the container: drop the previous run's URL so the
+# mobile container never picks it up while ngrok starts (#225).
+rm -f /tmp/shared/backend-tunnel-url.txt
+
 # Check if NGROK_AUTHTOKEN is set
 if [ -z "$NGROK_AUTHTOKEN" ]; then
   echo "❌ Error: NGROK_AUTHTOKEN not set"
