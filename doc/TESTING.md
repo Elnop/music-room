@@ -8,7 +8,7 @@ Subject requirement: IV.8 (tests for each layer). Goal (CAP-3): `make test` runs
 
 | Layer | Framework | Why |
 | --- | --- | --- |
-| Backend (services, permissions, utils, routes) | [Vitest](https://vitest.dev) + [Supertest](https://github.com/ladjs/supertest) | The backend is ESM (`"type": "module"`, `.js` imports, `@/` aliases); Vitest runs it without Babel or experimental Node flags. Supertest drives the Express app without opening a port. |
+| Backend (services, permissions, utils, routes) | [Vitest](https://vitest.dev) + Node's `fetch` | The backend is ESM (`"type": "module"`, `.js` imports, `@/` aliases); Vitest runs it without Babel or experimental Node flags. Route tests start the Express app on port 0 of `127.0.0.1` and call it with `fetch`, so no HTTP test library is needed. |
 | Mobile (stores, utils, components) | [jest-expo](https://docs.expo.dev/develop/unit-testing/) + [@testing-library/react-native](https://callstack.github.io/react-native-testing-library/) | Expo's official preset, with the native modules already mocked. Zustand stores are tested directly, without rendering. |
 
 ## Two kinds of backend tests
@@ -102,7 +102,7 @@ The backend's global auth limiter (20 `/api/auth` requests per 15 minutes per IP
 
 - Test behavior through the public function, route or store action, not private helpers.
 - One file per module under test, named after it: `playlist.permissions.ts` → `playlist.permissions.test.ts`.
-- Route tests go through Supertest with a token from a mocked `authMiddleware` (unit) or a user created in the local stack (integration).
+- Route tests mount the router on an Express app listening on port 0 of `127.0.0.1` (closed in `afterAll`) and call it with `fetch`, as a user that a mocked `authMiddleware` sets (unit) or a user created in the local stack (integration).
 - A bug fix comes with the test that would have caught it.
 - No test may depend on another test's order or state; reset mocks in `beforeEach`.
 
