@@ -398,44 +398,33 @@ CLIENT LIST         # List connected clients
 
 ## Redis in Production
 
+There is no compose file: in development, `start_redis` (`make/helpers/docker.mk`) runs Redis with `docker run`, published on `127.0.0.1` only and without a password (see [SECURITY.md](SECURITY.md)). For a deployed instance, start from the same command:
+
+```bash
+docker run -d --name zumik-redis \
+  --network zumik-network \
+  -v redis-data:/data \
+  --restart unless-stopped \
+  redis:7-alpine redis-server \
+    --appendonly yes \
+    --requirepass "$REDIS_PASSWORD" \
+    --maxmemory 256mb --maxmemory-policy noeviction
+```
+
 ### Security
 
-1. **Set a password:**
-   ```yaml
-   # docker-compose.yml
-   redis:
-     command: redis-server --requirepass your_strong_password
-   ```
-
+1. **Set a password**: `--requirepass` above, and the same value in `backend/.env`:
    ```bash
-   # backend/.env
    REDIS_PASSWORD=your_strong_password
    ```
 
-2. **Do not expose port publicly:**
-   ```yaml
-   # docker-compose.yml - REMOVE this line:
-   # ports: ["6379:6379"]
-   # Redis accessible only via Docker network
-   ```
+2. **Do not publish the port**: leave out `-p` (as above) so Redis is reachable only from containers on `zumik-network`, which reach it as `zumik-redis` (`REDIS_HOST`). If the host itself needs it, publish on loopback only: `-p 127.0.0.1:6379:6379`.
 
-3. **Limit memory usage:**
-   ```yaml
-   # docker-compose.yml
-   redis:
-     command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
-   ```
+3. **Limit memory usage**: `--maxmemory 256mb`. Use `--maxmemory-policy noeviction`: Redis holds rate-limit counters, account lockouts, the IP blacklist and the token revocation list, all with a TTL, so an LRU policy would evict security state first. With `noeviction` a full Redis refuses writes instead: the rate limiters and logout (revocation) answer 503 (fail closed), while lockouts and the IP blacklist stop counting new failures (`brute-force.service.ts` fails open, an accepted risk in [THREAT_MODEL.md](THREAT_MODEL.md)); existing entries stay enforced. Watch memory (`INFO memory`) rather than relying on eviction.
 
 ### Data Persistence
 
-Redis automatically saves data using AOF (Append Only File):
-```yaml
-# docker-compose.yml
-redis:
-  command: redis-server --appendonly yes
-  volumes:
-    - redis-data:/data
-```
+Redis saves data with AOF (Append Only File): `--appendonly yes` with the `redis-data` volume mounted at `/data`, as in the command above and in `start_redis`.
 
 ### Backup and Restore
 
