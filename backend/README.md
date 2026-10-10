@@ -357,7 +357,7 @@ curl http://localhost:3000/api/auth/me \
 
 ## 📂 Structure d'une Feature
 
-Chaque feature suit cette structure (pas de fichier `index.ts` : on importe directement le fichier source, via `@/features/...` ou `@/shared/...`, avec l'extension `.js`) :
+Chaque feature suit cette structure (pas de fichier `index.ts` : on importe directement le fichier source, via `@/features/...`, `@/shared/...` ou `@/realtime/...`, avec l'extension `.js`) :
 
 ```
 features/<name>/
