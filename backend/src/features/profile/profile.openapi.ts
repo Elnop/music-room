@@ -170,9 +170,8 @@ export const profilePaths: OpenAPIV3.PathsObject = {
 					'application/json': {
 						schema: { $ref: '#/components/schemas/UpdatePrivacySettingsRequest' },
 						example: {
-							profileVisibility: 'friends',
-							showEmail: false,
-							showListeningActivity: true,
+							bioVisibility: 'friends_only',
+							emailVisibility: 'private',
 						},
 					},
 				},
@@ -385,35 +384,67 @@ export const profileSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 
 	PrivacySettings: {
 		type: 'object',
+		description:
+			'Visibility of each profile field: public (everyone), friends_only (mutual follows), private (only you)',
 		properties: {
-			profileVisibility: {
+			userId: { type: 'string', format: 'uuid' },
+			emailVisibility: {
 				type: 'string',
-				enum: ['public', 'friends', 'private'],
-				description: 'Who can view your profile',
+				enum: ['public', 'friends_only', 'private'],
+				description: 'Who can see your email',
 			},
-			showEmail: {
-				type: 'boolean',
-				description: 'Show email on profile',
+			bioVisibility: {
+				type: 'string',
+				enum: ['public', 'friends_only', 'private'],
+				description: 'Who can see your bio',
 			},
-			showListeningActivity: {
-				type: 'boolean',
-				description: 'Show current listening activity',
+			avatarVisibility: {
+				type: 'string',
+				enum: ['public', 'friends_only', 'private'],
+				description: 'Who can see your avatar',
 			},
+			musicPreferencesVisibility: {
+				type: 'string',
+				enum: ['public', 'friends_only', 'private'],
+				description: 'Who can see your music preferences',
+			},
+			createdAt: { type: 'string', format: 'date-time' },
+			updatedAt: { type: 'string', format: 'date-time' },
 		},
+		required: [
+			'userId',
+			'emailVisibility',
+			'bioVisibility',
+			'avatarVisibility',
+			'musicPreferencesVisibility',
+			'createdAt',
+			'updatedAt',
+		],
 	},
 
 	UpdatePrivacySettingsRequest: {
 		type: 'object',
+		description: 'Fields to change; omitted fields keep their value, unknown fields are ignored',
 		properties: {
-			profileVisibility: {
+			emailVisibility: {
 				type: 'string',
-				enum: ['public', 'friends', 'private'],
+				enum: ['public', 'friends_only', 'private'],
+				description: 'Who can see your email',
 			},
-			showEmail: {
-				type: 'boolean',
+			bioVisibility: {
+				type: 'string',
+				enum: ['public', 'friends_only', 'private'],
+				description: 'Who can see your bio',
 			},
-			showListeningActivity: {
-				type: 'boolean',
+			avatarVisibility: {
+				type: 'string',
+				enum: ['public', 'friends_only', 'private'],
+				description: 'Who can see your avatar',
+			},
+			musicPreferencesVisibility: {
+				type: 'string',
+				enum: ['public', 'friends_only', 'private'],
+				description: 'Who can see your music preferences',
 			},
 		},
 	},
