@@ -46,7 +46,7 @@ Les seuils viennent de `backend/src/shared/config/rate-limit.config.ts` (variabl
 
 **Risques acceptés.**
 - Tous les compteurs sont par IP ou par email + IP. Une attaque répartie sur beaucoup d'IP n'est pas bornée par compte. Raison : un verrou par compte seul permettrait à n'importe qui de bloquer le compte d'un autre.
-- Sans `trust proxy`, toutes les requêtes passées par un proxy (tunnel ngrok, reverse proxy) partagent une IP : #173.
+- L'IP du client derrière un proxy dépend de `TRUST_PROXY` (#173), lu par Express (`req.ip`) et par le handshake Socket.io. Vide par défaut : `X-Forwarded-For` est ignoré (un client ne choisit pas son IP), mais tous les clients d'un même proxy partagent une IP. Le régler sur un déploiement derrière un proxy, seulement si tout le trafic passe par lui (`backend/README.md`). Tests : `backend/src/shared/config/trust-proxy.int.test.ts`, et « ignores a client-sent X-Forwarded-For without TRUST_PROXY (#173) » dans `token-verify-limiter.int.test.ts`.
 - `RATE_LIMIT_ENABLED=false` et `ACCOUNT_LOCKOUT_ENABLED=false` coupent ces protections ; c'est un réglage de dev, à laisser actif ailleurs.
 
 ## M2. Bruteforce des codes à 6 chiffres
@@ -97,7 +97,7 @@ Les seuils viennent de `backend/src/shared/config/rate-limit.config.ts` (variabl
 - `backend/src/features/auth/utils/token-verify-limiter.int.test.ts` : « counts failures with an expiry, then answers 429 without calling getUser », « refuses the socket handshake with TOO_MANY_ATTEMPTS without calling getUser ».
 - `backend/src/features/auth/utils/token-verify-limiter.test.ts` : « lets at most max of a parallel burst of invalid tokens reach verify ».
 
-**Risque accepté.** Sans Redis, ce limiteur ne bloque ni ne compte ; `verifyToken` répond déjà 503 dans ce cas (M13). IP partagée : #173.
+**Risque accepté.** Sans Redis, ce limiteur ne bloque ni ne compte ; `verifyToken` répond déjà 503 dans ce cas (M13). IP derrière un proxy : `TRUST_PROXY` (#173).
 
 ## M5. Vol de session
 
@@ -250,14 +250,14 @@ Avant 017, `anon` et `authenticated` avaient les privilèges de table par défau
 
 ## Lacunes ouvertes
 
-Trouvées en écrivant ce document. L1 à L3 ont été corrigées par #201, L10 par #208, L5 n'était pas reproductible (#203) ; les autres ont chacune leur ticket, sauf L6, risque accepté.
+Trouvées en écrivant ce document. L1 à L3 ont été corrigées par #201, L4 par #173, L10 par #208, L5 n'était pas reproductible (#203) ; les autres ont chacune leur ticket, sauf L6, risque accepté.
 
 | # | Gravité | Lacune | Où | Suivi |
 |---|---------|--------|-----|-------|
 | L1 | **Critique**, corrigé (#201) | `user_profiles` est lisible par tous (`USING (true)`), y compris `password_reset_code` et `verification_code`. Avec la clé anon de l'APK : demander un reset pour la victime (`forgot-password`), lire le code, changer son mot de passe. Prise de compte sans accès à la boîte mail. Expose aussi tous les profils sans filtre de confidentialité. | `backend/migrations/001_initial_schema.sql`, `013_email_verification.sql`, `014_password_reset.sql` | #201 |
 | L2 | Haute, corrigé (#201) | La politique UPDATE de `user_profiles` autorise toutes les colonnes de sa propre ligne : un utilisateur peut se mettre `email_verified = true` sans code. La politique INSERT de `follows` ne contrôle pas `can_control_music` : un contrôleur peut supprimer puis recréer sa ligne `follows` vers le propriétaire avec `can_control_music = true` et, si le propriétaire le suit, contrôler tous ses appareils. | `001_initial_schema.sql`, `007_follows.sql`, `009_music_control.sql` | #201 |
 | L3 | Haute, corrigé (#201) | `tracks` n'a pas de RLS : lecture, modification et suppression par la clé anon. `music_preferences` et `follows` sont lisibles par tous, sans les réglages de confidentialité. | `003_playlist_persistence.sql`, `011_profile_privacy_and_preferences.sql`, `007_follows.sql` | #201 |
-| L4 | Moyenne | Toutes les limites anti-bruteforce sont par IP (M1, M2) ; IP faussée derrière un proxy. | #173 (existe) | #173 |
+| L4 | Moyenne, corrigé (#173) | Toutes les limites anti-bruteforce sont par IP (M1, M2) ; derrière un proxy, tous les clients avaient la même IP. `TRUST_PROXY` règle quels proxies peuvent fixer `X-Forwarded-For`, pour HTTP et la socket. | `backend/src/shared/config/trust-proxy.ts` | #173 |
 | L5 | Moyenne, non reproduite (#203) | Un reset de mot de passe ne terminerait pas les sessions ouvertes. Vérifié sur GoTrue v2.197.0 (local et hébergé) : Supabase Auth supprime toutes les sessions du compte quand l'admin change le mot de passe ; un test d'intégration verrouille ce comportement sur la stack locale. | `PasswordResetService.resetPassword` | #203 |
 | L6 | Moyenne | Une socket ouverte survit au logout et à l'expiration du token (M6). | `backend/src/realtime/socket-auth.ts` | risque accepté (M6) |
 | L7 | Basse | Pas de limite de débit par événement socket ni de longueur max sur `listening:update` (M9). | `backend/src/realtime/index.ts` | #204 |
@@ -266,4 +266,3 @@ Trouvées en écrivant ce document. L1 à L3 ont été corrigées par #201, L10 
 | L10 | Moyenne, corrigé (#208) | Routes SoundCloud publiques, sans rate limit, et sans validation Zod sauf `search` : proxy ouvert vers SoundCloud (M7). | `backend/src/features/soundcloud/soundcloud.routes.ts` | #208 |
 | L11 | Moyenne (dev) | En développement, toute origine contenant « ngrok » est acceptée par le CORS HTTP et socket ; le backend de dev tourne toujours dans ce mode (M9). | `backend/src/shared/config/cors.config.ts` (`isOriginAllowed`) | #209 |
 
-Déjà suivis ailleurs : #173 (L4).

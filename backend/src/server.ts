@@ -11,8 +11,10 @@ import { realtime } from '@/realtime/index.js';
 import { connectRedis, disconnectRedis, checkRedisHealth } from '@/shared/config/redis.js';
 import { swaggerSpec, swaggerUiOptions } from '@/shared/config/swagger.config.js';
 import { isOriginAllowed } from '@/shared/config/cors.config.js';
+import { configureTrustProxy } from '@/shared/config/trust-proxy.js';
 
 const app = express();
+configureTrustProxy(app);
 const httpServer = createServer(app);
 
 realtime.initialize(httpServer);

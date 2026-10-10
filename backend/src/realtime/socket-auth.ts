@@ -8,6 +8,7 @@ import {
 import type { DeviceInfo } from '@/features/music-control/music-control.types.js';
 import { DeviceService } from '@/features/music-control/services/device.service.js';
 import { socketLogger } from '@/shared/middleware/socket-logger.middleware.js';
+import { clientIp } from '@/shared/config/trust-proxy.js';
 
 /**
  * Socket.io handshake authentication (subject IV.6, CAP-1).
@@ -116,7 +117,7 @@ export async function authenticateSocket(
 
 	let user: { id: string; email: string };
 	try {
-		user = await verifyTokenLimited(parsed.data.token, socket.handshake.address, token =>
+		user = await verifyTokenLimited(parsed.data.token, clientIp(socket.request), token =>
 			sessionService.verifyToken(token)
 		);
 	} catch (error) {
