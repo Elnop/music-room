@@ -382,11 +382,14 @@ describe('login', () => {
 			})
 		);
 
-		// The message itself is GitHub #235 (the 401 goes through the refresh path).
-		await expect(useAuthStore.getState().login('a@example.com', 'wrong')).rejects.toThrow();
+		// Signed out, the 401 is the backend's answer, not an expired session (#235).
+		await expect(useAuthStore.getState().login('a@example.com', 'wrong')).rejects.toThrow(
+			'Invalid email or password'
+		);
 
+		expect(calledUrls()).toHaveLength(1);
 		expect(calledUrls()[0]).toMatch(/\/api\/auth\/login$/);
-		expect(useAuthStore.getState().error).toEqual(expect.any(String));
+		expect(useAuthStore.getState().error).toBe('Invalid email or password');
 		expect(mockSupabaseAuth.signInWithPassword).not.toHaveBeenCalled();
 		await expectSignedOutAndNothingStored();
 	});
