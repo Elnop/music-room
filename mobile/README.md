@@ -20,6 +20,7 @@ Application mobile React Native pour Zumik - Partage de musique collaboratif.
 - Backend Zumik running sur `http://localhost:3000`
 - Compte Supabase configuré (optionnel pour débuter)
 - Expo CLI: `npm install -g expo-cli` (optionnel, `npx` fonctionne)
+- SDK Android (Android Studio), ou Xcode sur macOS, pour construire le build de debug
 
 ## Installation
 
@@ -52,38 +53,46 @@ EXPO_PUBLIC_SOUNDCLOUD_CLIENT_ID=
 
 ## Démarrage
 
-### Développement avec Expo Go
+L'app tourne uniquement en build natif de debug (`com.zumik.app`). Elle ne démarre pas dans Expo Go, à qui manquent ses modules natifs (Google Sign-In, Facebook SDK, couleurs d'image) : ne pas l'utiliser.
 
-1. Installer Expo Go sur votre téléphone Android/iOS
-2. Lancer le serveur :
-
-```bash
-npm start
-```
-
-3. Scanner le QR code avec Expo Go
-
-### Développement sur émulateur
+### 1. Installer le build de debug (une fois)
 
 ```bash
-# Android
-npm run android
+# Android (SDK Android requis) : build et installation sur l'émulateur ou le téléphone USB branché
+npx expo run:android --no-bundler   # --device pour choisir l'appareil ; --no-bundler : pas de second Metro sur 8081
 
 # iOS (macOS uniquement)
-npm run ios
+npx expo run:ios
 ```
+
+Le build charge ensuite le JS depuis Metro : il suffit de le réinstaller quand le code natif ou les dépendances natives changent. `make open-app` le copie sur les autres émulateurs lancés.
+
+### 2. Lancer Metro
+
+Depuis la racine : `make dev-docker` (Docker), `make dev-local` (émulateur Android Studio) ou `make dev-tunnel` (téléphone sur un autre réseau). Sans make : `npm start` dans `mobile/`.
+
+### 3. Connecter l'app à Metro
+
+`make qr` (ou `make qr-tunnel`) affiche ces étapes avec les bonnes adresses.
+
+- **Émulateur** : automatique, il joint Metro sur `10.0.2.2:8081` ; `make open-app` lance l'app.
+- **Téléphone en USB** : `adb reverse tcp:8081 tcp:8081`, puis ouvrir Zumik.
+- **Téléphone sur le même WiFi** : secouer le téléphone, menu de dev › **Change Bundle Location** › `<HOST_IP>:8081` (adresse donnée par `make info`).
+- **Téléphone sur un autre réseau** (`make dev-tunnel`) : même menu, saisir l'hôte du tunnel Expo affiché par `make qr-tunnel` (`xxxx-8081.exp.direct:80`).
+
+« Unable to load script » : l'app ne joint pas Metro. Vérifier que Metro tourne et l'adresse saisie, puis toucher **RELOAD**.
 
 ## Scripts Disponibles
 
 ### Démarrage Expo
 
 - `npm start` - Mode normal (défaut)
-- `npm run start:lan` - Mode LAN (recommandé avec Expo Go sur même WiFi)
+- `npm run start:lan` - Mode LAN (téléphone sur le même WiFi)
 - `npm run start:tunnel` - Mode tunnel (fonctionne avec WiFi différents)
 - `npm run start:clear` - Démarrer avec cache effacé
 - `npm run start:lan-clear` - Mode LAN + cache effacé
-- `npm run android` - Lancer sur émulateur/appareil Android
-- `npm run ios` - Lancer sur simulateur iOS (macOS uniquement)
+- `npm run android` - Build de debug et lancement sur émulateur/appareil Android (`expo run:android`)
+- `npm run ios` - Build de debug et lancement sur simulateur iOS (macOS uniquement)
 - `npm run web` - Lancer dans le navigateur
 
 ### Qualité de Code
@@ -118,7 +127,7 @@ npm run ios
 
 Pour débuter, voici les 5 commandes que vous utiliserez le plus :
 
-1. **`npm run start:lan`** - Tester avec Expo Go (recommandé)
+1. **`npm run android`** - Installer le build de debug (il lance aussi son propre Metro : l'arrêter, ou utiliser `npx expo run:android --no-bundler`), puis `make dev-docker` pour Metro
 2. **`npm run fix`** - Corriger automatiquement le code
 3. **`npm run check`** - Vérifier avant un commit
 4. **`npm run reset`** - Résoudre les bugs étranges
@@ -171,7 +180,7 @@ mobile/src/
 - **Appels HTTP** : toujours via `services/api.ts`, qui ajoute le token et les headers `X-Platform`, `X-Device-Model`, `X-App-Version` logués par le backend.
 - **Temps réel** : `socketStore` gère la connexion Socket.io ; `usePlaylistSocket` rejoint la room d'une playlist et réagit à `playlist:updated` ; `useMusicControl` gère l'écoute des amis et les commandes de contrôle délégué.
 - **Lecture audio** : expo-audio lit le stream HLS SoundCloud ; `PlayerContext` gère le cycle de vie du lecteur, `playerStore` l'état (track courante, play/pause, modal), `MiniPlayer` et `PlayerModal` l'affichage.
-- **OAuth** : `services/oauth.ts` (Google Sign-In, Facebook SDK). Le token obtenu est vérifié par le backend (`/api/auth/google`, `/api/auth/facebook`). Ne fonctionne pas dans Expo Go : il faut un development build.
+- **OAuth** : `services/oauth.ts` (Google Sign-In, Facebook SDK). Le token obtenu est vérifié par le backend (`/api/auth/google`, `/api/auth/facebook`). Modules natifs : comme le reste de l'app, il faut le build de debug, pas Expo Go.
 - **Signature Android** : `plugins/withDebugKeystore.js` remplace pendant `expo prebuild` le keystore de debug du template Expo (partagé par toutes les apps Expo) par `keystores/debug.keystore`. Son SHA-1 `5D:26:8F:52:F7:A8:2D:71:3A:D9:68:BF:60:6A:79:BB:85:AA:71:C0` est celui à enregistrer, avec le package `com.zumik.app`, dans le client OAuth Android du projet Google Cloud qui contient `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`. Sinon Google Sign-In renvoie `DEVELOPER_ERROR`.
 
 ## Développement

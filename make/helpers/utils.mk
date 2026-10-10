@@ -9,7 +9,7 @@ info: ## Show system information
 	$(call print_header,Zumik - System Information)
 	$(call print_subsection,Network Information)
 	@echo "  Local IP:  $(GREEN)$(HOST_IP)$(NC)"
-	@echo "  Expo URL:  $(GREEN)$(EXPO_URL)$(NC)"
+	@echo "  Metro:     $(GREEN)$(METRO_ADDRESS)$(NC)"
 	@echo ""
 	$(call print_subsection,Docker Version)
 	@docker --version

@@ -3,7 +3,7 @@
 # ==============================================================================
 # Commands for local development, useful with Android Studio emulator
 
-.PHONY: dev-local expo-android expo-clear check-devices start-emulator start-emulators .boot-emulators restart-emulators restart-emulators-clean clean-emulators .stop-emulators .clear-emulator-snapshots .clear-metro-cache .cache-app-apk open-app kill-emulator restart-emulator list-emulators open-emulator
+.PHONY: dev-local expo-android expo-clear check-devices start-emulator start-emulators .boot-emulators restart-emulators restart-emulators-clean clean-emulators .stop-emulators .clear-emulator-snapshots .clear-metro-cache .cache-app-apk .open-app-when-metro open-app kill-emulator restart-emulator list-emulators open-emulator
 
 ADB := $(ANDROID_HOME)/platform-tools/adb
 
@@ -57,14 +57,26 @@ dev-local: .ensure-backend-deps .ensure-mobile-deps ## Start development locally
 	@sleep $(SHORT_WAIT_TIME)
 	$(call print_success,Backend started: $(BACKEND_URL))
 	$(call blank_line)
-	$(call print_arrow,Starting Expo for Android...)
+	$(call print_arrow,Starting Metro; the Zumik debug build opens on the emulator once it is up...)
 	$(call blank_line)
-	$(call expo_mobile,start --localhost --android)
+	@$(MAKE) --no-print-directory .open-app-when-metro &
+	$(call expo_mobile,start --localhost --dev-client)
 
-expo-android: ## Quick start: Open app directly in Android emulator
+expo-android: ## Quick start: Start Metro and open the debug build on the Android emulator
 	@$(call write_mobile_dev_env)
-	$(call print_info,📱 Opening in Android emulator...)
-	$(call expo_mobile,start --localhost --android)
+	$(call print_info,📱 Starting Metro, then opening the debug build on the emulator...)
+	@$(MAKE) --no-print-directory .open-app-when-metro &
+	$(call expo_mobile,start --localhost --dev-client)
+
+# Wait (up to 2 minutes) until Metro answers, then open the debug build.
+# Expo CLI's --android would open Expo Go, which cannot run the app.
+.open-app-when-metro:
+	@i=0; until curl -s --max-time 2 $(METRO_URL)/status | grep -q packager-status:running; do \
+		i=$$((i + 1)); \
+		if [ $$i -gt 60 ]; then echo "$(YELLOW)$(ICON_WARNING) Metro did not start; run make open-app once it is up$(NC)"; exit 0; fi; \
+		sleep 2; \
+	done; \
+	$(MAKE) --no-print-directory open-app
 
 expo-clear: ## Start Expo with cleared cache (local)
 	@$(call write_mobile_dev_env)
@@ -217,7 +229,7 @@ open-app: ## Launch the Zumik debug build on every running emulator, copying it 
 			$(MAKE) --no-print-directory .cache-app-apk; \
 			if [ ! -f "$(APP_APK_CACHE)" ]; then \
 				echo "$(RED)$(ICON_ERROR) Zumik is not installed on $$serial nor on any other emulator$(NC)"; \
-				echo "$(YELLOW)$(ICON_WARNING) Install a debug build once: cd mobile && npx expo run:android (it is then reused)$(NC)"; \
+				echo "$(YELLOW)$(ICON_WARNING) Install a debug build once: cd mobile && npx expo run:android --no-bundler (it is then reused)$(NC)"; \
 				exit 1; \
 			fi; \
 			echo "$(BLUE)$(ICON_INFO) Installing Zumik on $$serial...$(NC)"; \

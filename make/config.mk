@@ -122,8 +122,8 @@ MOBILE_DEV_ENV := $(MOBILE_DIR)/.env.development.local
 DEV_API_URL := http://$(HOST_IP):$(BACKEND_PORT)
 DEV_WS_URL := ws://$(HOST_IP):$(BACKEND_PORT)
 
-# Expo URL
-EXPO_URL := exp://$(HOST_IP):$(METRO_PORT)
+# Metro address a phone on the same WiFi enters as its bundle location
+METRO_ADDRESS := $(HOST_IP):$(METRO_PORT)
 
 # Android SDK and Java JDK (for local builds)
 # These should be configured in your shell environment (~/.zshrc or ~/.bashrc)

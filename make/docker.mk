@@ -17,11 +17,11 @@ dev-docker: ## Start all services in Docker containers (backend + mobile)
 	$(call clear_and_header,🚀 Zumik Started)
 	$(call display_services,lan)
 	$(call blank_line)
-	$(call display_qr,lan)
+	$(call display_metro_connect,lan)
 	$(call blank_line)
 	$(call display_common_commands,lan)
 	$(call blank_line)
-	$(call print_success,Ready! Open Expo Go and scan the QR code)
+	$(call print_success,Ready! Open the Zumik debug build (make open-app on an emulator))
 	$(call blank_line)
 
 start: ## Start existing containers (without rebuild)
@@ -52,16 +52,11 @@ logs-mobile: ## Show mobile logs only
 	$(call print_info,Mobile logs (press Ctrl+C to exit)...)
 	$(call docker_logs_service,mobile)
 
-qr: ## Display Expo QR code and connection URL
-	$(call clear_and_header,📱 Expo QR Code)
-	$(call display_qr,lan)
+qr: ## Show how to connect the Zumik debug build to Metro (same WiFi)
+	$(call clear_and_header,📱 Connect the App to Metro)
+	$(call display_metro_connect,lan)
 	$(call blank_line)
-	$(call print_subsection,💡 Instructions)
-	@echo "   1. Install $(GREEN)Expo Go$(NC) app (Play Store / App Store)"
-	@echo "   2. Open Expo Go and tap $(GREEN)Scan QR Code$(NC)"
-	@echo "   3. Point your camera at the QR code above"
-	$(call blank_line)
-	$(call print_warning,Note: Phone and computer must be on the same WiFi)
+	$(call print_warning,Note: a phone over WiFi must be on the same network as this computer)
 	@echo "   Your local IP: $(GREEN)$(HOST_IP)$(NC)"
 	$(call blank_line)
 	@echo "$(YELLOW)💡 Commands:$(NC) $(GREEN)make logs$(NC) | $(GREEN)make stop$(NC) | $(GREEN)make containers-restart$(NC) | $(GREEN)make help$(NC)"

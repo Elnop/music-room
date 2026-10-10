@@ -6,7 +6,7 @@ Tunnel mode allows you to develop Zumik when your phone and computer are on **di
 
 ## 🎯 Quick Facts
 
-- ✅ **Multiple devices supported**: Scan the same QR code on unlimited phones
+- ✅ **Multiple devices supported**: every phone with the debug build enters the same Metro tunnel host
 - ✅ **One-command setup**: `make tunnel-setup` (automatic EAS login)
 - ✅ **Works across networks**: Phone on cellular, PC on WiFi
 - ⚠️ **Slower than LAN**: Adds 50-200ms latency
@@ -23,9 +23,12 @@ make dev-tunnel
 ```
 
 ### Connect Multiple Devices
-1. Run `make qr-tunnel` to show QR code
-2. Each person scans QR code with Expo Go app
-3. All devices connect to same backend automatically
+The app runs only as the Zumik debug build (`com.zumik.app`); it does not start in Expo Go, which lacks its native modules.
+
+1. Install the debug build once on each phone: `cd mobile && npx expo run:android --device --no-bundler` (phone over USB)
+2. Run `make qr-tunnel` to show the Metro tunnel host (`xxxx-8081.exp.direct`)
+3. On each phone: shake it, dev menu › **Change Bundle Location** › `<tunnel host>:80`, then **RELOAD**
+4. All devices connect to same backend automatically
 
 ## When to Use Tunnel Mode
 
@@ -117,13 +120,14 @@ make dev-tunnel
 
 # Wait ~20 seconds for tunnels to initialize
 
-# Scan the QR code displayed with Expo Go app
+# On the phone (debug build installed): dev menu › Change Bundle Location
+# › the Metro tunnel host shown, followed by :80
 ```
 
 ### Common Commands
 
 ```bash
-# Show QR code and tunnel URLs
+# Show the tunnel URLs and the Metro tunnel host
 make qr-tunnel
 
 # Display detailed tunnel info
@@ -174,13 +178,13 @@ make dev
    - Build Docker images with ngrok support
    - Start backend with ngrok tunnel
    - Start Expo with tunnel mode
-   - Display QR code and tunnel URLs
+   - Display the tunnel URLs and the Metro tunnel host
 
-3. **Connect Your Phone**:
-   - Install [Expo Go](https://expo.dev/go) on your phone
-   - Open Expo Go app
-   - Tap "Scan QR Code"
-   - Scan the QR code from terminal
+3. **Connect Your Phone** (Zumik debug build, not Expo Go: the app needs its native modules):
+   - Install the debug build once: plug the phone over USB, `cd mobile && npx expo run:android --device --no-bundler`
+   - Open Zumik, shake the phone to open the dev menu
+   - Tap **Change Bundle Location**, enter the Metro tunnel host from `make qr-tunnel` followed by `:80` (e.g. `xxxx-8081.exp.direct:80`)
+   - Tap **RELOAD**; "Unable to load script" means the host is wrong or the tunnel is not ready yet
 
 4. **Verify Connection**:
    - App should load on your phone
@@ -389,13 +393,13 @@ Tunnel mode supports **unlimited simultaneous connections**:
 # 1. Start tunnel mode (if not running)
 make dev-tunnel
 
-# 2. Show QR code
+# 2. Show the Metro tunnel host
 make qr-tunnel
 
 # 3. Share with team
-# - Share QR code screenshot
+# - Share the Metro tunnel host (xxxx-8081.exp.direct)
 # - Share ngrok URL: check `make tunnel-info`
-# - Everyone scans with their Expo Go app
+# - Everyone enters it in the debug build: dev menu › Change Bundle Location › <host>:80
 
 # 4. All devices connect to same backend
 # No additional configuration needed!
@@ -411,7 +415,7 @@ make qr-tunnel
 #### Limitations (ngrok free tier)
 
 - **40 connections/minute**: Sufficient for small teams
-- **URL changes on restart**: Need to rescan QR after restart
+- **URL changes on restart**: Enter the new Metro tunnel host after a restart
 - **Shared tunnel**: All devices see same backend state
 
 #### Security Note
@@ -518,7 +522,7 @@ Before asking for help, verify:
 - [ ] Backend tunnel URL exists (`make tunnel-info`)
 - [ ] ngrok web interface accessible (http://localhost:4040)
 - [ ] Backend logs show ngrok tunnel started (`docker logs zumik-backend`)
-- [ ] Expo Go app is updated to latest version
+- [ ] The Zumik debug build is installed (not Expo Go) and its bundle location is the current tunnel host
 
 ## Advanced Troubleshooting
 
@@ -599,7 +603,7 @@ docker restart zumik-mobile
 
 **Problem**: `REACT_NATIVE_PACKAGER_HOSTNAME` or `EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0` make Expo advertise the LAN address even with `--host tunnel`.
 
-**Solution**: `start_mobile_tunnel` sets neither (#225). If the QR still shows a LAN address, the mobile container was started in LAN mode: check `docker inspect -f '{{index .Config.Labels "zumik.mode"}}' zumik-mobile`, then `make dev-tunnel` recreates it.
+**Solution**: `start_mobile_tunnel` sets neither (#225). If `docker logs zumik-mobile` still shows a LAN address instead of an `exp.direct` host, the mobile container was started in LAN mode: check `docker inspect -f '{{index .Config.Labels "zumik.mode"}}' zumik-mobile`, then `make dev-tunnel` recreates it.
 
 ### Issue: Docker volumes override package installations
 
