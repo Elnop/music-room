@@ -34,14 +34,14 @@ Ce qui sert vraiment : `make` construit seulement `--target development` (`build
 - `node_modules` vient de `builder`, installé avec `--include=dev` et sans `npm prune` : les dépendances de dev sont dans l'image ;
 - `/app` appartient à `nodejs`, donc le code est modifiable par le processus qui l'exécute.
 
-`backend/.dockerignore` exclut du contexte de build `.env`, `.env.local`, `.env.*.local`, `node_modules`, `dist`, les tests et `*.md`. Les autres fichiers d'environnement ne sont pas exclus : `COPY . .` copie `backend/.env.example` (valeurs fictives) et, s'il existe, `backend/.env.test` dans les étapes `development` et `builder`. `.env.test` est écrit par `backend/scripts/test-db.sh` et contient les clés anon et service de la stack Supabase **locale** de test : il se retrouve dans l'image (#207).
+`backend/.dockerignore` exclut du contexte de build tous les fichiers `.env*` (dont `.env.test`, écrit par `backend/scripts/test-db.sh` avec les clés de la stack Supabase locale, et `.env.example`), `node_modules`, `dist`, les tests et `*.md` : aucun fichier d'environnement n'est copié dans l'image (#207).
 
 ### Conteneur `zumik-backend` (`start_backend`)
 
 - Image `music-room-backend:latest` (étape `development`), donc **root dans le conteneur**.
 - `-v backend/:/app` : le code de l'hôte est monté en écriture ; un fichier créé par le conteneur sur ce montage appartient à root sur l'hôte. `node_modules` est un volume anonyme (`-v /app/node_modules`).
 - `-v tunnel-info:/tmp/shared` : volume partagé avec le conteneur mobile (URL du tunnel).
-- `--env-file backend/.env` : les secrets (clé service Supabase, etc.) sont passés en variables d'environnement, visibles par `docker inspect`. `backend/.env` n'est pas dans l'image, mais `backend/.env.test` y est (voir ci-dessus, #207).
+- `--env-file backend/.env` : les secrets (clé service Supabase, etc.) sont passés en variables d'environnement, visibles par `docker inspect`. Aucun fichier `.env*` n'est dans l'image (voir ci-dessus).
 - `-e NODE_ENV=development` : dans ce mode, le backend accepte toute origine `ngrok` ou `exp://` (`isOriginAllowed`, `backend/src/shared/config/cors.config.ts`).
 - `-p 3000:3000` sur toutes les interfaces de l'hôte (nécessaire : le téléphone appelle l'IP de l'hôte sur le réseau local, en HTTP).
 - `--restart unless-stopped`.
@@ -60,7 +60,7 @@ Une seule étape, `node:22-bookworm-slim`, serveur de développement Expo (pas d
 | `chmod +x scripts/*.sh` | `node` |
 | exécution : `CMD ["sh", "scripts/start-expo.sh"]` (`npx expo start --offline --port 8081`) | **`node`** (uid 1000 de l'image officielle) |
 
-`EXPOSE 8081 19000 19001 19002` (Metro et Expo DevTools). `ENV EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0` et `REACT_NATIVE_PACKAGER_HOSTNAME=0.0.0.0`. `ENTRYPOINT []`. `mobile/.dockerignore` exclut `.env`, `.env.local`, `.env.*.local`, `node_modules`, `android/`, `ios/`, `*.keystore`, les tests et `*.md` ; `mobile/.env.example` (valeurs fictives) est donc copié dans l'image, comme tout autre `.env.*` qui ne finit pas par `.local` (#207).
+`EXPOSE 8081 19000 19001 19002` (Metro et Expo DevTools). `ENV EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0` et `REACT_NATIVE_PACKAGER_HOSTNAME=0.0.0.0`. `ENTRYPOINT []`. `mobile/.dockerignore` exclut tous les fichiers `.env*`, `node_modules`, `android/`, `ios/`, `*.keystore`, les tests et `*.md` : aucun fichier d'environnement n'est copié dans l'image.
 
 ### Conteneur `zumik-mobile` (`start_mobile`)
 
@@ -77,7 +77,7 @@ Image de build, lancée par `scripts/build-apk-docker.sh` (`make build-apk-docke
 - Installe par `apt-get` : `openjdk-17-jdk`, `build-essential`, `git`, `curl`, `wget`, `unzip`, `bash`, `coreutils`.
 - `npm install -g npm@10.3.0`, puis `eas-cli` (version non fixée), `@expo/ngrok@^4.1.0`, `sharp-cli@^2.1.0` ; Yarn via `corepack` (`yarn@stable`).
 - Télécharge les outils Android (`commandlinetools-linux-9477386_latest.zip`, `platform-tools-latest-linux.zip`) depuis `dl.google.com` par `wget`, sans vérification de somme de contrôle, et accepte les licences (`yes | sdkmanager --licenses`).
-- Contexte de build : la racine du dépôt. Le `.dockerignore` racine exclut `**/.env`, `**/node_modules` et `.git`. Copie `mobile/` dans `/app` et `scripts/` dans `/scripts`.
+- Contexte de build : la racine du dépôt. Le `.dockerignore` racine exclut `**/.env*`, `**/node_modules` et `.git`. Copie `mobile/` dans `/app` et `scripts/` dans `/scripts`.
 - `npm install --ignore-scripts && npm run postinstall || true` : un échec de cette ligne n'arrête pas le build.
 - `EXPO_PUBLIC_API_URL` / `EXPO_PUBLIC_WS_URL` : `ARG` avec une valeur fictive, remplacés au `docker run` par l'URL du tunnel ; `NODE_ENV=production`.
 - Pas de `EXPOSE`. `CMD ["bash", "/build.sh"]` : `expo prebuild`, `scripts/generate-network-config.sh` (HTTP en clair autorisé pour `localhost`, `10.0.2.2`, `127.0.0.1` et le domaine du tunnel), `./gradlew assembleRelease`.

@@ -4,10 +4,8 @@ npm-debug.log
 yarn-error.log
 yarn.lock
 
-# Environment files
-.env
-.env.local
-.env.*.local
+# Environment files: none goes into the image (.env.test holds local Supabase keys)
+.env*
 
 # Build output
 dist
