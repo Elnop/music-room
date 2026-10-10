@@ -115,6 +115,8 @@ quality: ## List the test and code quality commands
 	$(HELP_CMD) lint "Run linters on all code"
 	$(HELP_CMD) lint-fix "Auto-fix linting issues"
 	$(HELP_CMD) format "Format all code with Prettier"
+	$(HELP_CMD) perf-test "HTTP load test, summary in tests/performance/results [PERF_TARGET= PERF_USERS=]"
+	$(HELP_CMD) perf-fixtures "Create or refresh the load test users and tokens [PERF_USERS=20]"
 	@echo ""
 
 supabase: ## List the Supabase commands
