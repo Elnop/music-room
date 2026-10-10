@@ -11,6 +11,7 @@
 # Start Backend (Docker mode)
 .PHONY: backend-docker
 backend-docker:
+	$(SUPABASE_UP_IF_LOCAL)
 	@$(call display_step,"Starting backend container...")
 	@$(call start_backend)
 	@echo ""
@@ -29,7 +30,8 @@ backend-local: .ensure-backend-deps
 	@echo "$(YELLOW)$(ICON_INFO) Starting backend on http://localhost:$(BACKEND_PORT)$(RESET)"
 	@echo "$(YELLOW)$(ICON_INFO) Press Ctrl+C to stop$(RESET)"
 	@echo ""
-	@cd $(BACKEND_DIR) && npm run dev
+	$(SUPABASE_UP_IF_LOCAL)
+	@cd $(BACKEND_DIR) && $(LOCAL_SUPABASE_ENV) npm run dev
 
 # Stop Backend
 .PHONY: backend-stop

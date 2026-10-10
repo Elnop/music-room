@@ -26,7 +26,9 @@ backend/
 │   │   ├── types/          # Types globaux + supabase.generated.ts (généré : make generate-types)
 │   │   └── utils/          # logger, database.helpers.ts
 │   └── server.ts           # Point d'entrée Express + Socket.io
-└── migrations/             # Migrations SQL, appliquées à la main dans le dashboard Supabase
+├── migrations/             # Migrations SQL (stack locale : make supabase-up ; hébergé : à la main dans le dashboard)
+├── scripts/dev-db.sh       # Stack Supabase locale de dev (make supabase-up/down/reset)
+└── supabase-dev/           # Config CLI de la stack de dev (music-room-dev, ports 544xx)
 ```
 
 ## 🚀 Quick Start
@@ -42,22 +44,40 @@ Cette commande va :
 - Installer les dépendances npm
 - Créer le fichier `.env` depuis `.env.example`
 
-### 2. Configurer Supabase
+### 2. Supabase : stack locale (par défaut) ou projet hébergé
 
-1. Créez un compte sur [supabase.com](https://supabase.com)
-2. Créez un nouveau projet "zumik"
-3. Récupérez vos credentials dans Dashboard → Settings → API :
-   - `SUPABASE_URL`
-   - `SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_KEY`
-4. Ajoutez-les dans le fichier `.env`
+`SUPABASE_MODE` (variable make, `local` par défaut) choisit la base utilisée par `make dev-docker`, `make dev-local` et `make generate-types`. Toute autre valeur que `local` ou `hosted` arrête make avant de lancer quoi que ce soit.
 
-### 3. Exécuter la migration SQL
+**`SUPABASE_MODE=local` (par défaut)** : une stack Supabase locale, `music-room-dev`, qui garde ses données. Aucune clé hébergée n'est nécessaire : `.env` peut rester la copie de `.env.example`.
 
-1. Allez dans Supabase Dashboard → SQL Editor
-2. Créez une nouvelle query
-3. Copiez le contenu de `migrations/001_initial_schema.sql`
-4. Exécutez la query
+| Commande | Effet |
+| --- | --- |
+| `make supabase-up` | Démarre la stack (Postgres, PostgREST, Auth, Kong), applique les fichiers de `migrations/` pas encore appliqués, écrit `.env.supabase.local` |
+| `make supabase-down` | Arrête la stack ; les données restent |
+| `make supabase-reset` | Vide la base et réapplique toutes les migrations |
+
+- Script : `scripts/dev-db.sh` ; config CLI : `supabase-dev/supabase/config.toml` (workdir séparé de `supabase/`, qui sert à la stack de test `music-room-test`).
+- Ports 544xx : API `http://127.0.0.1:54421`, Postgres `127.0.0.1:54422`. La stack de test (554xx) et `make test-int` n'y touchent pas.
+- Migrations suivies dans `zumik_dev.applied_migrations` (hors `public`) : chaque fichier tourne dans une transaction avec sa ligne de suivi ; un fichier en échec est nommé et rien n'en reste. Pas de `db reset` dans `supabase-up`.
+- `.env.supabase.local` (git-ignoré, clés locales de démo) contient `SUPABASE_URL=http://<IP LAN>:54421` et les clés anon et service. `make dev-docker` le passe au conteneur backend en second `--env-file` (il l'emporte sur `.env` ; seule l'URL est remplacée, voir plus bas) et écrit l'URL et la clé anon dans `mobile/.env.development.local` (`EXPO_PUBLIC_SUPABASE_*`). `make dev-local`, `make backend-local` et `make perf-fixtures` exportent les mêmes valeurs avec `localhost`. Toutes les cibles qui en ont besoin (`dev-docker`, `dev-local`, `backend-docker`, `backend-local`, `expo-android`, `expo-clear`, `perf-fixtures`, `generate-types`) lancent d'abord `supabase-up`.
+- Un conteneur backend ou mobile lancé dans l'autre mode (label `zumik.supabase`) est recréé par `make dev-docker`.
+- `make generate-types` applique d'abord les migrations (`supabase-up`), génère les types depuis la stack locale (sans login ni project ID), les formate avec Prettier et signale tout écart avec le fichier commité.
+- `make dev-tunnel` ne gère pas encore la stack locale (un téléphone sur un autre réseau ne la joint pas) : utilisez `SUPABASE_MODE=hosted make dev-tunnel`.
+- Google et Facebook : `config.toml` déclare `[auth.external.google]` et `[auth.external.facebook]` avec `GOOGLE_CLIENT_ID`, `FACEBOOK_APP_ID` et `FACEBOOK_APP_SECRET` lus dans `.env`. Le flux actuel ne s'en sert pas : `oauth.service.ts` vérifie lui-même les tokens et crée les comptes via `auth.admin`. Il marche en local tant que ces variables sont renseignées (build de développement requis).
+- Chaque développeur part d'une base vide ; les données du projet hébergé ne sont pas copiées.
+- Sécurité : la stack écoute sur toutes les interfaces (54421 pour l'API, 54422 pour Postgres), car le téléphone la joint par l'IP LAN. Le login Postgres `postgres`/`postgres` et la clé service-role de démo sont publics : n'importe qui sur le même réseau peut lire et modifier la base. Elle ne doit contenir que des données de dev locales.
+- `make dev-docker` donne au conteneur backend `SUPABASE_URL=http://host.docker.internal:54421` (passerelle de l'hôte), qui reste valide quand l'IP LAN change ; le fichier mobile garde l'IP LAN.
+
+**`SUPABASE_MODE=hosted`** : le comportement d'avant, avec le projet dont l'URL et les clés sont dans `.env`. Aucune stack locale n'est lancée.
+
+1. Créez un compte sur [supabase.com](https://supabase.com) et un projet "zumik"
+2. Récupérez `SUPABASE_URL`, `SUPABASE_ANON_KEY` et `SUPABASE_SERVICE_KEY` dans Dashboard → Settings → API, et `SUPABASE_PROJECT_ID` dans l'URL du dashboard
+3. Ajoutez-les dans `.env`, puis lancez par exemple `SUPABASE_MODE=hosted make dev-docker`
+
+### 3. Migrations SQL
+
+- Mode local : `make supabase-up` applique les nouveaux fichiers de `migrations/`.
+- Projet hébergé : appliquez chaque nouveau fichier à la main (Dashboard → SQL Editor).
 
 ### 4. Lancer le serveur
 

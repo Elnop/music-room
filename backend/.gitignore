@@ -34,3 +34,6 @@ coverage/
 # Misc
 *.tsbuildinfo
 .env.test
+
+# Left by an interrupted make generate-types (local mode)
+src/shared/types/supabase.generated.ts.tmp

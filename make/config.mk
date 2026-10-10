@@ -122,6 +122,30 @@ MOBILE_DEV_ENV := $(MOBILE_DIR)/.env.development.local
 DEV_API_URL := http://$(HOST_IP):$(BACKEND_PORT)
 DEV_WS_URL := ws://$(HOST_IP):$(BACKEND_PORT)
 
+# Supabase the backend and the app use in dev-docker, dev-local and
+# generate-types: local (default) is the music-room-dev stack started by
+# make supabase-up (backend/scripts/dev-db.sh, ports 544xx); hosted is the
+# project whose URL and keys are in backend/.env.
+SUPABASE_MODE ?= local
+ifneq ($(SUPABASE_MODE),local)
+ifneq ($(SUPABASE_MODE),hosted)
+$(error SUPABASE_MODE must be local or hosted (got "$(SUPABASE_MODE)"))
+endif
+endif
+export SUPABASE_MODE
+# Written by make supabase-up: the dev stack's URL (host LAN address) and keys
+SUPABASE_LOCAL_ENV := $(BACKEND_DIR)/.env.supabase.local
+SUPABASE_LOCAL_PORT := 54421
+# Recipe line that starts the dev stack in local mode (empty in hosted mode)
+# Usage: $(SUPABASE_UP_IF_LOCAL)
+SUPABASE_UP_IF_LOCAL = $(if $(filter local,$(SUPABASE_MODE)),@$(MAKE) --no-print-directory supabase-up)
+# Prefix for a command run from backend/ on the host (dev-local, backend-local,
+# perf-fixtures): in local mode it exports the dev stack's keys with
+# localhost; the exported values win over backend/.env (dotenv never overrides
+# a set variable). Empty in hosted mode.
+# Usage: cd $(BACKEND_DIR) && $(LOCAL_SUPABASE_ENV) npm run dev
+LOCAL_SUPABASE_ENV = $(if $(filter local,$(SUPABASE_MODE)),set -a && . ./$(notdir $(SUPABASE_LOCAL_ENV)) && set +a && export SUPABASE_URL=http://localhost:$(SUPABASE_LOCAL_PORT) &&)
+
 # Metro address a phone on the same WiFi enters as its bundle location
 METRO_ADDRESS := $(HOST_IP):$(METRO_PORT)
 

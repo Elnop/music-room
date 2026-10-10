@@ -19,8 +19,9 @@ PERF_SOCKET_DURATION ?= 30
 ARTILLERY_IMAGE := artilleryio/artillery:2.0.34
 
 perf-fixtures: .ensure-backend-deps ## Create or refresh the load test users and tokens [PERF_USERS=20]
-	$(call print_arrow,Preparing $(PERF_USERS) perf users in Supabase...)
-	@cd $(BACKEND_DIR) && PERF_USERS=$(PERF_USERS) npx tsx src/test/perf-fixtures.ts
+	$(SUPABASE_UP_IF_LOCAL)
+	$(call print_arrow,Preparing $(PERF_USERS) perf users in Supabase ($(SUPABASE_MODE))...)
+	@cd $(BACKEND_DIR) && $(LOCAL_SUPABASE_ENV) PERF_USERS=$(PERF_USERS) npx tsx src/test/perf-fixtures.ts
 
 perf-test: ## Run the HTTP and real-time load scenarios and write a summary [PERF_TARGET= PERF_USERS= PERF_SOCKET_CLIENTS= PERF_SOCKET_DURATION=30]
 	$(call print_header,Load test)

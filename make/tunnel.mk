@@ -5,7 +5,13 @@
 
 .PHONY: dev-tunnel qr-tunnel tunnel-info tunnel-setup
 
-dev-tunnel: ## Start all services in tunnel mode (different WiFi networks)
+dev-tunnel: ## Start all services in tunnel mode (different WiFi networks; needs SUPABASE_MODE=hosted for now)
+ifeq ($(SUPABASE_MODE),local)
+	@echo "$(RED)$(ICON_ERROR) make dev-tunnel does not support the local Supabase stack yet$(NC)"
+	@echo "$(YELLOW)$(ICON_ARROW) A phone on another network cannot reach it. Use the hosted project:$(NC)"
+	@echo "   $(GREEN)SUPABASE_MODE=hosted make dev-tunnel$(NC)"
+	@exit 1
+endif
 	$(call print_header,Starting Zumik (TUNNEL MODE))
 	$(call check_eas_configured)
 	$(call blank_line)
