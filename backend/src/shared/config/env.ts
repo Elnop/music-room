@@ -31,6 +31,8 @@ const envSchema = z.object({
 	// Validated: NaN or 0 would block every IP forever
 	RATE_LIMIT_TOKEN_WINDOW_MS: z.coerce.number().int().positive().default(900000),
 	RATE_LIMIT_TOKEN_MAX: z.coerce.number().int().positive().default(20),
+	RATE_LIMIT_SOUNDCLOUD_WINDOW_MS: z.coerce.number().int().positive().default(60000),
+	RATE_LIMIT_SOUNDCLOUD_MAX: z.coerce.number().int().positive().default(120),
 
 	// Account Lockout Configuration
 	ACCOUNT_LOCKOUT_ENABLED: z.string().default('true'),

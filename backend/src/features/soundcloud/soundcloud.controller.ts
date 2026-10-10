@@ -1,8 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { SoundCloudService } from '@/features/soundcloud/soundcloud.service.js';
-import { soundcloudSearchSchema } from '@/features/soundcloud/soundcloud.validators.js';
+import {
+	soundcloudSearchSchema,
+	soundcloudStreamRawSchema,
+	soundcloudStreamUrlSchema,
+	soundcloudTrackParamsSchema,
+} from '@/features/soundcloud/soundcloud.validators.js';
 import { logger } from '@/shared/utils/logger.js';
-import { routeParam, optionalRouteParam } from '@/shared/utils/route-params.js';
 
 const soundcloudService = new SoundCloudService();
 
@@ -34,18 +38,7 @@ export class SoundCloudController {
 	 */
 	async getTrack(req: Request, res: Response, next: NextFunction) {
 		try {
-			const urlOrId = routeParam(req, 'urlOrId');
-
-			if (!urlOrId) {
-				return res.status(400).json({
-					success: false,
-					error: {
-						message: 'Track URL or ID is required',
-						code: 'MISSING_TRACK_ID',
-					},
-					meta: { timestamp: new Date().toISOString() },
-				});
-			}
+			const { urlOrId } = soundcloudTrackParamsSchema.parse(req.params);
 
 			const track = await soundcloudService.getTrack(urlOrId);
 
@@ -67,23 +60,23 @@ export class SoundCloudController {
 	async getStreamUrl(req: Request, res: Response, next: NextFunction) {
 		try {
 			// Support both query param (new) and path param (legacy)
-			const rawUrl = (req.query.url as string) || optionalRouteParam(req, 'trackUrl');
+			const { query, params } = soundcloudStreamRawSchema.parse({
+				query: req.query,
+				params: req.params,
+			});
+			const rawUrl = query.url || params.trackUrl;
 
 			logger.info('[SoundCloud] Stream URL request received', {
-				rawQueryParam: req.query.url,
-				rawPathParam: req.params.trackUrl,
-				source: req.query.url ? 'query' : 'path',
+				rawQueryParam: query.url,
+				rawPathParam: params.trackUrl,
+				source: query.url ? 'query' : 'path',
 				headers: {
 					'user-agent': req.headers['user-agent'],
 					origin: req.headers['origin'],
 				},
 			});
 
-			const trackUrl = rawUrl ? decodeURIComponent(rawUrl) : '';
-
-			logger.info('[SoundCloud] Decoded track URL', { trackUrl });
-
-			if (!trackUrl) {
+			if (!rawUrl) {
 				logger.warn('[SoundCloud] Missing track URL in request');
 				return res.status(400).json({
 					success: false,
@@ -94,6 +87,10 @@ export class SoundCloudController {
 					meta: { timestamp: new Date().toISOString() },
 				});
 			}
+
+			const { url: trackUrl } = soundcloudStreamUrlSchema.parse({ url: rawUrl });
+
+			logger.info('[SoundCloud] Decoded track URL', { trackUrl });
 
 			logger.info('[SoundCloud] Fetching stream URL from service', {
 				trackUrl,
