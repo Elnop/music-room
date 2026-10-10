@@ -143,6 +143,21 @@ export class AuthService {
 					password: data.password,
 				});
 
+			// register creates the auth user unconfirmed until the email code is
+			// verified. Supabase checks the password first and answers
+			// email_not_confirmed only to the right one, so this 403 reveals
+			// nothing about which emails have an account (#243).
+			if (authError?.code === 'email_not_confirmed') {
+				const userId = await findAuthUserIdByEmail(data.email);
+				logger.warn('Login blocked - email not verified', { userId, email: data.email });
+				throw new AppError(
+					403,
+					'Please verify your email before logging in. Check your inbox for the verification code.',
+					'EMAIL_NOT_VERIFIED',
+					{ userId, email: data.email }
+				);
+			}
+
 			if (authError) {
 				logger.warn('Login failed - auth error', {
 					email: data.email,
