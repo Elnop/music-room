@@ -111,7 +111,8 @@ cd mobile && npm run format
 
 - [Tunnel Mode](./doc/TUNNEL_MODE.md) - Cross-network development (different WiFi)
 - [Redis Setup](./doc/REDIS.md) - Cache and rate limiting configuration
-- [Security](./doc/SECURITY.md) - Docker security (Chainguard Images, 0 CVE)
+- [Security](./doc/SECURITY.md) - What the Docker images and containers actually do (base images, users, ports)
+- [Threat Model](./doc/THREAT_MODEL.md) - Hazards, their protections and tests, accepted risks (subject IV.6)
 - [Testing Security](./doc/TESTING_SECURITY.md) - Subject IV.6 compliance
 - [Playlist Concurrency](./doc/PLAYLIST_CONCURRENCY.md) - Concurrent track edits (subject IV.2.3)
 

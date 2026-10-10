@@ -1,127 +1,103 @@
-# Sécurité Docker - Zumik
+# Sécurité des conteneurs - Zumik
 
-## 📊 État actuel de la sécurité
+Ce que font réellement les images et les conteneurs du projet : images de base, étapes, utilisateurs, ports, et ce qui tourne en root. Les menaces applicatives (bruteforce, vol de session, isolation des données, temps réel) sont dans [THREAT_MODEL.md](THREAT_MODEL.md).
 
-### Images utilisées
-- **Backend Dev**: `cgr.dev/chainguard/node:latest-dev` - **0 CVE** ✅
-- **Backend Prod**: `cgr.dev/chainguard/node:latest` - **0 CVE** ✅ (distroless)
-- **Mobile**: `cgr.dev/chainguard/node:latest-dev` - **0 CVE** ✅
-- **Base**: Wolfi (distribution Linux sécurisée par Chainguard)
+Sources : `backend/Dockerfile`, `mobile/Dockerfile`, `mobile/Dockerfile.android-build`, `make/helpers/docker.mk`, `make/config.mk`, `scripts/build-apk-docker.sh`, et les `.dockerignore` (racine, `backend/`, `mobile/`).
 
-### Pourquoi Chainguard Images ?
-- ✅ **ZÉRO vulnérabilité CVE** (vs 759 pour node:latest, 61 pour node:slim, 1-3 pour Alpine)
-- ✅ **Mises à jour automatiques quotidiennes** avec derniers patchs de sécurité
-- ✅ **Image minimale** (~50MB pour distroless vs 120MB Alpine)
-- ✅ **SBOM inclus** (Software Bill of Materials) pour chaque image
-- ✅ **Non-root par défaut** (uid 65532)
-- ✅ **Basé sur Wolfi** - distribution Linux conçue pour les conteneurs
+## Pas de fichier compose
 
-### Vulnérabilités détectées
-**Aucune** - Les images Chainguard maintiennent 0 CVE grâce à des builds quotidiens automatisés.
+Le dépôt n'a pas de `docker-compose.yml`. Les conteneurs sont lancés par `docker run` depuis `make/helpers/docker.mk` (fonctions `start_redis`, `start_backend`, `start_backend_tunnel`, `start_mobile`), avec `DOCKER_BUILDKIT=0` (`make/config.mk`, compatibilité Docker API 1.42). Les trois conteneurs partagent le réseau `zumik-network`.
 
-## 🎉 Plus de vulnérabilités !
+## Images de base
 
-Grâce à **Chainguard Images**, nous avons éliminé toutes les vulnérabilités CVE !
+| Image | Base | Version |
+|-------|------|---------|
+| `backend/Dockerfile` | `node:22-alpine` | tag, pas de digest : le patch de Node et d'Alpine suit le dernier build du tag |
+| `mobile/Dockerfile` | `node:22-bookworm-slim` | idem |
+| `mobile/Dockerfile.android-build` | `node:22-bookworm` | idem |
+| Redis (pas de Dockerfile) | `redis:7-alpine` (`REDIS_IMAGE`) | idem |
 
-### Comment Chainguard maintient 0 CVE ?
+Ce sont les images officielles Docker Hub, pas des images Chainguard ni distroless : elles contiennent un shell et un gestionnaire de paquets, et leurs CVE dépendent de la date du build. Aucun scan (Trivy, Docker Scout) ne tourne en CI. Pour en lancer un à la main : `trivy image music-room-backend:latest`.
 
-1. **Builds automatiques quotidiens** - Chaque jour, de nouvelles images sont construites avec les derniers patchs
-2. **Wolfi OS** - Distribution Linux créée from scratch pour la sécurité des conteneurs
-3. **Équipe dédiée** - Maintenue par des experts en sécurité container
-4. **Pas de packages inutiles** - Seulement ce qui est nécessaire pour Node.js
+## Backend (`backend/Dockerfile`)
 
-### Différence avec les images traditionnelles
+Quatre étapes :
 
-| Aspect | Images officielles | Chainguard |
-|--------|-------------------|------------|
-| Vulnérabilités | 1-759 CVE | **0 CVE** ✅ |
-| Mises à jour | Hebdomadaires/mensuelles | Quotidiennes |
-| Base OS | Debian/Alpine | Wolfi (optimisé) |
-| SBOM | Non inclus | Inclus ✅ |
-| Taille | 120MB-1GB | 50-100MB |
+| Étape | Base | Contenu | Utilisateur |
+|-------|------|---------|-------------|
+| `base` | `node:22-alpine` | `WORKDIR /app`, copie de `package*.json` | root |
+| `development` | `base` | `npm install -g npm@11.7.0`, `npm install --include=dev`, copie du code, `EXPOSE 3000`, `CMD ["npm", "run", "dev"]` | **root** (aucun `USER`) |
+| `builder` | `base` | mêmes installations, copie du code, `npm run build` | root (étape de build) |
+| `production` | `node:22-alpine` | copie depuis `builder` de `package*.json`, `node_modules` et `dist` ; crée le groupe et l'utilisateur `nodejs` (uid/gid 1001) ; `chown -R nodejs:nodejs /app` ; `EXPOSE 3000` ; `CMD ["node", "dist/server.js"]` | `nodejs` (1001) |
 
-## ✅ Configuration actuelle
+Ce qui sert vraiment : `make` construit seulement `--target development` (`build_backend_image`). L'étape `production` n'est construite par aucune commande `make` ni par la CI. Si on l'utilise :
+- `node_modules` vient de `builder`, installé avec `--include=dev` et sans `npm prune` : les dépendances de dev sont dans l'image ;
+- `/app` appartient à `nodejs`, donc le code est modifiable par le processus qui l'exécute.
 
-- ✅ **Images Chainguard** (0 CVE garanti)
-- ✅ **Mises à jour quotidiennes automatiques**
-- ✅ **Images minimales** (50-100MB)
-- ✅ **Utilisateur non-root** par défaut (uid 65532)
-- ✅ **Multi-stage build** (dev avec outils, prod distroless)
-- ✅ **SBOM inclus** (traçabilité complète)
-- ✅ **Basé sur Wolfi** (distribution sécurisée)
-- ✅ **Services fonctionnels** - Backend et Mobile démarrés avec succès
+`backend/.dockerignore` exclut `.env*`, `node_modules`, `dist`, les tests et `*.md` du contexte de build.
 
-**Configuration de sécurité maximale pour Node.js en 2025.**
+### Conteneur `zumik-backend` (`start_backend`)
 
-### Note technique : Fix ENTRYPOINT
-Les images Chainguard utilisent un ENTRYPOINT personnalisé qui exécute directement `node` avec les arguments CMD. Pour exécuter des commandes shell (npm, npx), nous avons réinitialisé l'ENTRYPOINT :
+- Image `music-room-backend:latest` (étape `development`), donc **root dans le conteneur**.
+- `-v backend/:/app` : le code de l'hôte est monté en écriture ; un fichier créé par le conteneur sur ce montage appartient à root sur l'hôte. `node_modules` est un volume anonyme (`-v /app/node_modules`).
+- `-v tunnel-info:/tmp/shared` : volume partagé avec le conteneur mobile (URL du tunnel).
+- `--env-file backend/.env` : les secrets (clé service Supabase, etc.) sont passés en variables d'environnement, visibles par `docker inspect`. Ils ne sont pas dans l'image.
+- `-e NODE_ENV=development` : dans ce mode, le backend accepte toute origine `ngrok` ou `exp://` (`isOriginAllowed`, `backend/src/shared/config/cors.config.ts`).
+- `-p 3000:3000` sur toutes les interfaces de l'hôte (nécessaire : le téléphone appelle l'IP de l'hôte sur le réseau local, en HTTP).
+- `--restart unless-stopped`.
+- Mode tunnel (`start_backend_tunnel`, `make dev-tunnel`) : en plus `-p 4040:4040` (interface web de ngrok, sur toutes les interfaces), `TUNNEL_MODE=true`, commande `sh scripts/start-with-tunnel.sh`.
 
-```dockerfile
-ENTRYPOINT []
-CMD ["sh", "-c", "npm run dev"]
-```
+## Mobile (`mobile/Dockerfile`)
 
-Cela permet d'exécuter correctement les commandes shell tout en conservant la sécurité de l'image Chainguard.
+Une seule étape, `node:22-bookworm-slim`, serveur de développement Expo (pas de build de production) :
 
-## 🚀 Avantages de Chainguard
+| Instruction | Utilisateur |
+|-------------|-------------|
+| `npm install -g expo-cli @expo/ngrok` (versions non fixées) | root |
+| création de `/tmp/shared` et `/app`, `chown node:node` | root |
+| `npm install`, copie du code | `node` |
+| création de `/app/.expo`, `chown` | root |
+| `chmod +x scripts/*.sh` | `node` |
+| exécution : `CMD ["sh", "scripts/start-expo.sh"]` (`npx expo start --offline --port 8081`) | **`node`** (uid 1000 de l'image officielle) |
 
-### Pour le développement
-- **0 CVE** - Pas de warnings VSCode/Docker
-- **Debugging facile** - Version `-dev` inclut shell et outils
-- **Compatible** - Fonctionne avec tous vos outils (Expo, npm, etc.)
-- **Léger** - Téléchargement et builds plus rapides
+`EXPOSE 8081 19000 19001 19002` (Metro et Expo DevTools). `ENV EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0` et `REACT_NATIVE_PACKAGER_HOSTNAME=0.0.0.0`. `ENTRYPOINT []`. `mobile/.dockerignore` exclut `.env*`, `node_modules`, `android/`, `ios/`, `*.keystore`, les tests et `*.md`.
 
-### Pour la production
-- **Distroless** - Image de production ultra-minimale sans shell
-- **Sécurité maximale** - Surface d'attaque minimale
-- **Compliance** - SBOM inclus pour audits de sécurité
-- **Maintenance zéro** - Mises à jour automatiques quotidiennes
+### Conteneur `zumik-mobile` (`start_mobile`)
 
-## 📋 Recommandation
+- `-p 8081:8081 -p 19000:19000 -p 19001:19001 -p 19002:19002` sur toutes les interfaces de l'hôte : Metro sert le bundle JavaScript de l'app à quiconque atteint l'hôte. Ce bundle contient les variables `EXPO_PUBLIC_*`, dont l'URL et la clé anon Supabase ; elles sont publiques par nature (elles sont aussi dans l'APK), c'est la RLS qui doit protéger la base ([THREAT_MODEL.md](THREAT_MODEL.md#m8-accès-direct-à-supabase-avec-la-clé-anon)).
+- `-v mobile/:/app`, volumes anonymes `/app/node_modules` et `/app/.expo`, `-v tunnel-info:/tmp/shared`.
+- `--env-file mobile/.env`, plus `REACT_NATIVE_PACKAGER_HOSTNAME=<IP de l'hôte>`, `EXPO_PUBLIC_API_URL` et `EXPO_PUBLIC_WS_URL` (`http://` et `ws://` vers l'IP de l'hôte, port 3000).
+- `--restart unless-stopped`, `-it`.
 
-**Vous utilisez maintenant la meilleure configuration possible :**
-- ✅ **Chainguard Images** - 0 CVE garanti
-- ✅ **Mises à jour automatiques** - Aucune action manuelle nécessaire
-- ✅ **Production-ready** - Multi-stage avec distroless pour prod
-- ✅ **Développement optimal** - Version `-dev` avec tous les outils
+## Build de l'APK (`mobile/Dockerfile.android-build`)
 
-**Aucune action supplémentaire requise !**
+Image de build, lancée par `scripts/build-apk-docker.sh` (`make build-apk-docker`), jamais par `make dev-*`.
 
-Les images se mettent à jour automatiquement à chaque `docker pull` ou rebuild.
+- Base `node:22-bookworm`. **Aucun `USER` : tout tourne en root**, installation comme build.
+- Installe par `apt-get` : `openjdk-17-jdk`, `build-essential`, `git`, `curl`, `wget`, `unzip`, `bash`, `coreutils`.
+- `npm install -g npm@10.3.0`, puis `eas-cli` (version non fixée), `@expo/ngrok@^4.1.0`, `sharp-cli@^2.1.0` ; Yarn via `corepack` (`yarn@stable`).
+- Télécharge les outils Android (`commandlinetools-linux-9477386_latest.zip`, `platform-tools-latest-linux.zip`) depuis `dl.google.com` par `wget`, sans vérification de somme de contrôle, et accepte les licences (`yes | sdkmanager --licenses`).
+- Contexte de build : la racine du dépôt. Le `.dockerignore` racine exclut `**/.env`, `**/node_modules` et `.git`. Copie `mobile/` dans `/app` et `scripts/` dans `/scripts`.
+- `npm install --ignore-scripts && npm run postinstall || true` : un échec de cette ligne n'arrête pas le build.
+- `EXPO_PUBLIC_API_URL` / `EXPO_PUBLIC_WS_URL` : `ARG` avec une valeur fictive, remplacés au `docker run` par l'URL du tunnel ; `NODE_ENV=production`.
+- Pas de `EXPOSE`. `CMD ["bash", "/build.sh"]` : `expo prebuild`, `scripts/generate-network-config.sh` (HTTP en clair autorisé pour `localhost`, `10.0.2.2`, `127.0.0.1` et le domaine du tunnel), `./gradlew assembleRelease`.
+- `docker run --rm -v <sortie>:/output` : l'APK est copié dans `/output` par root, donc il appartient à root sur l'hôte.
 
-## 🔍 Vérifier l'absence de CVEs
+## Redis (`start_redis`)
 
-Pour confirmer que les images Chainguard ont 0 CVE :
+- `redis:7-alpine`, `redis-server --appendonly yes`, volume `redis-data:/data`, `--restart unless-stopped`.
+- `-p 6379:6379` sur toutes les interfaces de l'hôte, **sans mot de passe** (`REDIS_PASSWORD` vide dans `backend/.env.example`, pas de `--requirepass`). Toute machine qui atteint l'hôte peut lire et effacer les compteurs de rate limiting, les verrous de compte, la liste noire d'IP et la liste de révocation des tokens. Lacune L8 du [modèle de menaces](THREAT_MODEL.md#lacunes-ouvertes). Les recommandations de production sont dans [REDIS.md](REDIS.md#redis-in-production).
 
-```bash
-# Installer Trivy
-sudo apt install trivy
+## Ce qui tourne en root
 
-# Scanner l'image Chainguard
-trivy image cgr.dev/chainguard/node:latest-dev
+| Conteneur ou étape | Root à l'exécution |
+|--------------------|--------------------|
+| `zumik-backend` (`development`) | oui |
+| backend `production` (non utilisé) | non (`nodejs`, 1001) |
+| `zumik-mobile` | non (`node`) ; les `npm install -g` et `chown` du build sont en root |
+| build de l'APK | oui, build et exécution |
+| `zumik-redis` | non : l'image officielle lance `redis-server` sous l'utilisateur `redis` |
 
-# Scanner l'image de production
-trivy image cgr.dev/chainguard/node:latest
+## Limites de cette configuration
 
-# Résultat attendu : 0 vulnerabilities
-```
-
-## 📚 Ressources
-
-- [Chainguard Images Documentation](https://edu.chainguard.dev/chainguard/chainguard-images/)
-- [Chainguard Node.js Guide](https://edu.chainguard.dev/chainguard/chainguard-images/getting-started/node/)
-- [Wolfi OS](https://wolfi.dev/)
-- [Docker Security Best Practices](https://docs.docker.com/engine/security/)
-- [SBOM (Software Bill of Materials)](https://www.cisa.gov/sbom)
-
-## 💡 Conclusion
-
-**Félicitations ! Vous utilisez la configuration de sécurité maximale pour Node.js en 2025.**
-
-✅ **0 CVE** - Aucune vulnérabilité connue
-✅ **Mises à jour automatiques** - Builds quotidiens
-✅ **Production-ready** - Multi-stage avec distroless
-✅ **Minimal** - Images légères (50-100MB)
-✅ **Compliance** - SBOM inclus pour audits
-
-**Votre projet est parfaitement sécurisé !** 🔒🎉
+C'est une configuration de développement : aucune image n'est publiée ni déployée, et aucun conteneur n'a `--read-only`, `--cap-drop` ni limite de mémoire ou de CPU. Les écarts relevés (root dans `zumik-backend`, ports publiés sur toutes les interfaces, Redis sans mot de passe, téléchargements sans somme de contrôle, versions non fixées) sont des constats, pas des choix validés ; ceux qui touchent la sécurité de l'application sont suivis dans [THREAT_MODEL.md](THREAT_MODEL.md#lacunes-ouvertes).
