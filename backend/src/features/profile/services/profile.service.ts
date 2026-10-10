@@ -2,6 +2,7 @@ import { supabase } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import { fetchSingle, updateOne } from '@/shared/utils/database.helpers.js';
+import { ilikeContains } from '@/shared/utils/postgrest-filter.js';
 import type {
 	UpdateProfileDTO,
 	ProfileUpdateResponse,
@@ -125,11 +126,13 @@ export class ProfileService {
 		try {
 			logger.info('Searching users', { query, limit, excludeUserId });
 
-			// Search by username or display_name using ilike (case-insensitive)
+			// Search by username or display_name using ilike (case-insensitive);
+			// the query is matched literally, never read as filter syntax (#236)
+			const pattern = ilikeContains(query);
 			let queryBuilder = supabase
 				.from('user_profiles')
 				.select('id, username, display_name, avatar_url, bio, favorite_artist, created_at')
-				.or(`username.ilike.%${query}%,display_name.ilike.%${query}%`)
+				.or(`username.ilike.${pattern},display_name.ilike.${pattern}`)
 				.limit(limit);
 
 			// Exclude current user from results
