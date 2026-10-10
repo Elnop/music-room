@@ -24,6 +24,7 @@ const { sendVerificationEmail } = await import('@/features/mail/mail.service.js'
 const { default: authRouter } = await import('@/features/auth/auth.routes.js');
 const { errorHandler } = await import('@/shared/middleware/error-handler.js');
 const { logger } = await import('@/shared/utils/logger.js');
+const { verificationConfig } = await import('@/features/mail/mail.config.js');
 
 // verify-email and resend-verification cannot hand out an account (#188), through
 // HTTP on the real auth router against the local Supabase stack and test Redis.
@@ -168,6 +169,32 @@ describe('email verification cannot take over an account (#188)', () => {
 			expect(status).toBe(400);
 			expect(errorCode(body)).toBe('INVALID_CODE');
 			expect(body.data).toBeUndefined();
+		});
+
+		it('refuses even the right code once the attempt limit is reached (#206)', async () => {
+			const user = await createUser({ email_verified: false, verification_code: '482913' });
+			const maxAttempts = verificationConfig.maxAttempts;
+			expect(maxAttempts).toBe(5);
+
+			for (let i = 0; i < maxAttempts; i++) {
+				const { status, body } = await post('verify-email', { userId: user.id, code: '111111' });
+				expect(status).toBe(400);
+				expect(errorCode(body)).toBe('INVALID_CODE');
+			}
+
+			const { status, body } = await post('verify-email', { userId: user.id, code: '482913' });
+
+			expect(status).toBe(429);
+			expect(errorCode(body)).toBe('RATE_LIMIT_EXCEEDED');
+			expect(JSON.stringify(body)).not.toMatch(/accessToken|refreshToken/);
+			const { data, error } = await supabaseAdmin
+				.from('user_profiles')
+				.select('email_verified')
+				.eq('id', user.id)
+				.single();
+			if (error) throw error;
+			expect(data.email_verified).toBe(false);
+			expect(await storedCode(user.id)).toBe('482913');
 		});
 	});
 
