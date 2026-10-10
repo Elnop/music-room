@@ -60,6 +60,16 @@ export const commonSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 						format: 'date-time',
 						description: 'RATE_LIMIT_EXCEEDED only: when the rate-limit window ends',
 					},
+					lockedUntil: {
+						type: 'string',
+						format: 'date-time',
+						description: 'ACCOUNT_LOCKED only: when the lockout ends',
+					},
+					remainingTime: {
+						type: 'integer',
+						description: 'ACCOUNT_LOCKED only: seconds until the lockout ends',
+						example: 900,
+					},
 				},
 			},
 			meta: {
