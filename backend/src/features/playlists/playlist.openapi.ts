@@ -24,8 +24,13 @@ export const playlistPaths: OpenAPIV3.PathsObject = {
 										type: 'object',
 										properties: {
 											data: {
-												type: 'array',
-												items: { $ref: '#/components/schemas/PlaylistSummary' },
+												type: 'object',
+												properties: {
+													playlists: {
+														type: 'array',
+														items: { $ref: '#/components/schemas/PlaylistResponse' },
+													},
+												},
 											},
 										},
 									},
@@ -167,8 +172,13 @@ export const playlistPaths: OpenAPIV3.PathsObject = {
 										type: 'object',
 										properties: {
 											data: {
-												type: 'array',
-												items: { $ref: '#/components/schemas/PlaylistSummary' },
+												type: 'object',
+												properties: {
+													playlists: {
+														type: 'array',
+														items: { $ref: '#/components/schemas/PlaylistResponse' },
+													},
+												},
 											},
 										},
 									},
@@ -924,22 +934,6 @@ export const playlistSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 		},
 	},
 
-	PlaylistSummary: {
-		type: 'object',
-		properties: {
-			id: { type: 'string', format: 'uuid' },
-			name: { type: 'string' },
-			description: { type: 'string', nullable: true },
-			coverUrl: { type: 'string', format: 'uri', nullable: true },
-			visibility: { type: 'string', enum: ['public', 'private'] },
-			editMode: { type: 'string', enum: ['open', 'restricted'] },
-			trackCount: { type: 'integer', example: 10 },
-			owner: { $ref: '#/components/schemas/PlaylistMember' },
-			createdAt: { type: 'string', format: 'date-time' },
-			updatedAt: { type: 'string', format: 'date-time' },
-		},
-	},
-
 	PlaylistDetail: {
 		type: 'object',
 		properties: {
@@ -1086,11 +1080,13 @@ export const playlistSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 
 	PlaylistMember: {
 		type: 'object',
+		description: 'displayName and avatarUrl are omitted when the profile has none',
+		required: ['id', 'username'],
 		properties: {
 			id: { type: 'string', format: 'uuid' },
 			username: { type: 'string' },
-			displayName: { type: 'string', nullable: true },
-			avatarUrl: { type: 'string', format: 'uri', nullable: true },
+			displayName: { type: 'string' },
+			avatarUrl: { type: 'string', format: 'uri' },
 		},
 	},
 };

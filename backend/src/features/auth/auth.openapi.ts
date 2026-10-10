@@ -114,23 +114,43 @@ export const authPaths: OpenAPIV3.PathsObject = {
 						},
 					},
 				},
-				'423': {
-					description: 'Account locked due to failed attempts',
+				'429': {
+					description:
+						'RATE_LIMIT_EXCEEDED: too many failed attempts for this email from this IP within the limiter window (checked first; the usual answer to repeated failures). ACCOUNT_LOCKED: the email is locked for this IP and the limiter window has ended (longer escalated locks)',
 					content: {
 						'application/json': {
 							schema: { $ref: '#/components/schemas/ErrorResponse' },
-							example: {
-								success: false,
-								error: {
-									message: 'Account temporarily locked',
-									code: 'ACCOUNT_LOCKED',
-									details: { lockoutEndsAt: '2025-01-15T11:00:00Z' },
+							examples: {
+								rateLimited: {
+									summary: 'Login rate limit',
+									value: {
+										success: false,
+										error: {
+											message: 'Too many login attempts. Please try again later.',
+											code: 'RATE_LIMIT_EXCEEDED',
+											retryAfter: '2025-01-15T11:00:00.000Z',
+										},
+										meta: { timestamp: '2025-01-15T10:45:00.000Z' },
+									},
+								},
+								accountLocked: {
+									summary: 'Account locked',
+									value: {
+										success: false,
+										error: {
+											message:
+												'Account temporarily locked due to too many failed login attempts. Please try again later.',
+											code: 'ACCOUNT_LOCKED',
+											lockedUntil: '2025-01-15T11:00:00.000Z',
+											remainingTime: 900,
+										},
+										meta: { timestamp: '2025-01-15T10:45:00.000Z' },
+									},
 								},
 							},
 						},
 					},
 				},
-				'429': { $ref: '#/components/responses/RateLimitError' },
 				'503': { $ref: '#/components/responses/RateLimitUnavailable' },
 			},
 		},
