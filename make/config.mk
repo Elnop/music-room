@@ -114,10 +114,11 @@ HOST_IP := $(shell \
 )
 export HOST_IP
 
-# Backend the app calls in dev-docker and dev-local. In development Expo reads
-# EXPO_PUBLIC_* from the .env files before the environment, so make writes them
-# to mobile/.env.development.local (last in Expo's priority order, git-ignored);
-# dev-tunnel writes the live ngrok URL there instead.
+# Backend the app calls in dev-docker and dev-local. make writes EXPO_PUBLIC_*
+# to mobile/.env.development.local (git-ignored), which Expo prefers over
+# mobile/.env for a variable not already in the environment; the mobile
+# container gets it as its last --env-file. dev-tunnel writes the live ngrok
+# URL there instead.
 MOBILE_DEV_ENV := $(MOBILE_DIR)/.env.development.local
 DEV_API_URL := http://$(HOST_IP):$(BACKEND_PORT)
 DEV_WS_URL := ws://$(HOST_IP):$(BACKEND_PORT)
@@ -136,6 +137,8 @@ export SUPABASE_MODE
 # Written by make supabase-up: the dev stack's URL (host LAN address) and keys
 SUPABASE_LOCAL_ENV := $(BACKEND_DIR)/.env.supabase.local
 SUPABASE_LOCAL_PORT := 54421
+# Mailpit web UI of the dev stack (emails the backend sends in local mode)
+SUPABASE_MAIL_UI_PORT := 54424
 # Recipe line that starts the dev stack in local mode (empty in hosted mode)
 # Usage: $(SUPABASE_UP_IF_LOCAL)
 SUPABASE_UP_IF_LOCAL = $(if $(filter local,$(SUPABASE_MODE)),@$(MAKE) --no-print-directory supabase-up)
@@ -144,7 +147,7 @@ SUPABASE_UP_IF_LOCAL = $(if $(filter local,$(SUPABASE_MODE)),@$(MAKE) --no-print
 # localhost; the exported values win over backend/.env (dotenv never overrides
 # a set variable). Empty in hosted mode.
 # Usage: cd $(BACKEND_DIR) && $(LOCAL_SUPABASE_ENV) npm run dev
-LOCAL_SUPABASE_ENV = $(if $(filter local,$(SUPABASE_MODE)),set -a && . ./$(notdir $(SUPABASE_LOCAL_ENV)) && set +a && export SUPABASE_URL=http://localhost:$(SUPABASE_LOCAL_PORT) &&)
+LOCAL_SUPABASE_ENV = $(if $(filter local,$(SUPABASE_MODE)),set -a && . ./$(notdir $(SUPABASE_LOCAL_ENV)) && set +a && export SUPABASE_URL=http://localhost:$(SUPABASE_LOCAL_PORT) SMTP_HOST=localhost &&)
 
 # Metro address a phone on the same WiFi enters as its bundle location
 METRO_ADDRESS := $(HOST_IP):$(METRO_PORT)

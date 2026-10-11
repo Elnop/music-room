@@ -64,7 +64,6 @@ dev-local: .ensure-backend-deps .ensure-mobile-deps ## Start development locally
 	$(call expo_mobile,start --localhost --dev-client)
 
 expo-android: ## Quick start: Start Metro and open the debug build on the Android emulator
-	$(SUPABASE_UP_IF_LOCAL)
 	@$(call write_mobile_dev_env)
 	$(call print_info,📱 Starting Metro, then opening the debug build on the emulator...)
 	@$(MAKE) --no-print-directory .open-app-when-metro &
@@ -81,7 +80,6 @@ expo-android: ## Quick start: Start Metro and open the debug build on the Androi
 	$(MAKE) --no-print-directory open-app
 
 expo-clear: ## Start Expo with cleared cache (local)
-	$(SUPABASE_UP_IF_LOCAL)
 	@$(call write_mobile_dev_env)
 	$(call print_info,🧹 Starting Expo (cleared cache)...)
 	$(call expo_mobile,start --localhost --clear)

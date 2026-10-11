@@ -31,6 +31,8 @@ perf-test: ## Run the HTTP and real-time load scenarios and write a summary [PER
 		exit 1; \
 	fi
 	$(call print_success,Backend up on $(PERF_TARGET))
+	$(if $(and $(filter local,$(SUPABASE_MODE)),$(filter-out file,$(origin PERF_TARGET))),\
+		$(call print_warning,Fixtures go to the local dev stack; if $(PERF_TARGET) uses another Supabase project run with SUPABASE_MODE=hosted))
 	@$(MAKE) --no-print-directory perf-fixtures PERF_USERS=$(PERF_USERS)
 	@rl_enabled=$$(sed -n 's/^RATE_LIMIT_ENABLED=\([^ #]*\).*/\1/p' $(BACKEND_ENV) 2>/dev/null | tail -1 | tr -d "\"'"); \
 	rl_whitelist=$$(sed -n 's/^RATE_LIMIT_WHITELIST_IPS=\([^ #]*\).*/\1/p' $(BACKEND_ENV) 2>/dev/null | tail -1 | tr -d "\"'"); \

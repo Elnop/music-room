@@ -7,15 +7,18 @@ import { env } from '@/shared/config/env.js';
  */
 
 /**
- * Gmail SMTP configuration
+ * SMTP transport: Gmail, or the plain SMTP server named by SMTP_HOST
+ * (Mailpit in local development, web UI on http://localhost:54424)
  */
-export const gmailConfig = {
-	service: 'gmail',
-	auth: {
-		user: env.GMAIL_USER,
-		pass: env.GMAIL_APP_PASSWORD,
-	},
-} as const;
+export const transportConfig = env.SMTP_HOST
+	? { host: env.SMTP_HOST, port: env.SMTP_PORT, secure: false, ignoreTLS: true }
+	: {
+			service: 'gmail',
+			auth: {
+				user: env.GMAIL_USER,
+				pass: env.GMAIL_APP_PASSWORD,
+			},
+		};
 
 /**
  * Email sender configuration

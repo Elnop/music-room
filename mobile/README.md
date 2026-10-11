@@ -38,7 +38,7 @@ npm install
 
 `make dev-docker` et `make dev-local` imposent `EXPO_PUBLIC_API_URL=http://<IP locale>:3000` et `EXPO_PUBLIC_WS_URL=ws://<IP locale>:3000` (variables `DEV_API_URL` et `DEV_WS_URL` de `make/config.mk`), quelle que soit la valeur dans `.env`. `make dev-tunnel` utilise l'URL du tunnel ngrok. Les valeurs de `.env` ne servent que pour un `npx expo start` lancé à la main.
 
-Avec `SUPABASE_MODE=local` (le défaut, voir `backend/README.md`), `make dev-docker`, `make dev-local`, `make expo-android` et `make expo-clear` écrivent aussi `EXPO_PUBLIC_SUPABASE_URL=http://<IP locale>:54421` et `EXPO_PUBLIC_SUPABASE_ANON_KEY` (stack Supabase locale) dans `.env.development.local`, qui l'emporte sur `.env`. Avec `SUPABASE_MODE=hosted`, ce sont les valeurs Supabase de `.env` qui servent.
+Avec `SUPABASE_MODE=local` (le défaut, voir `backend/README.md`), `make dev-docker`, `make dev-local`, `make expo-android` et `make expo-clear` écrivent aussi `EXPO_PUBLIC_SUPABASE_URL=http://<IP locale>:54421` et `EXPO_PUBLIC_SUPABASE_ANON_KEY` (stack Supabase locale) dans `.env.development.local`, qui l'emporte sur `.env` : Expo le préfère à `.env` pour Metro lancé sur l'hôte, et `make dev-docker` le passe au conteneur mobile en dernier `--env-file` (Expo ne remplace jamais une variable déjà dans l'environnement). `expo-android` et `expo-clear` ne démarrent pas la stack : lancez `make supabase-up` avant si `backend/.env.supabase.local` manque. Avec `SUPABASE_MODE=hosted`, ce sont les valeurs Supabase de `.env` qui servent.
 
 ```env
 # Backend API (ignoré par make dev-docker, dev-local et dev-tunnel)

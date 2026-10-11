@@ -19,6 +19,7 @@ backend-docker:
 	@echo "$(CYAN)API:$(RESET)          http://localhost:$(BACKEND_PORT)"
 	@echo "$(CYAN)Health:$(RESET)       http://localhost:$(BACKEND_PORT)/health"
 	@echo "$(CYAN)API Docs:$(RESET)     http://localhost:$(BACKEND_PORT)/api-docs"
+	$(if $(filter local,$(SUPABASE_MODE)),@echo "$(CYAN)Emails:$(RESET)       http://localhost:$(SUPABASE_MAIL_UI_PORT) (Mailpit)")
 	@echo ""
 	@echo "$(YELLOW)$(ICON_INFO) Redis is separate - start with: make redis-start$(RESET)"
 	@echo "$(YELLOW)$(ICON_INFO) View logs with: make backend-logs$(RESET)"

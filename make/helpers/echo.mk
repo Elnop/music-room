@@ -131,6 +131,7 @@ define display_services
 	$(call print_service,Backend API,$(BACKEND_URL))
 	$(call print_service,Expo DevTools,$(EXPO_DEVTOOLS_URL))
 	$(call print_service,Metro Bundler,$(METRO_URL))
+	$(if $(and $(filter lan,$(1)),$(filter local,$(SUPABASE_MODE))),$(call print_service,Emails (Mailpit),http://localhost:$(SUPABASE_MAIL_UI_PORT)))
 endef
 
 # Display common commands

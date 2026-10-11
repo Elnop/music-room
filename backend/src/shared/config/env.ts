@@ -72,6 +72,10 @@ const envSchema = z.object({
 	// Gmail SMTP Configuration
 	GMAIL_USER: z.email('Invalid Gmail user address'),
 	GMAIL_APP_PASSWORD: z.string().min(1, 'Gmail app password is required'),
+	// Plain SMTP server used instead of Gmail when set: the dev Supabase stack's
+	// Mailpit (written by make supabase-up). No TLS, no auth.
+	SMTP_HOST: z.string().min(1).optional(),
+	SMTP_PORT: z.coerce.number().int().positive().default(54425),
 
 	// Email Verification Configuration
 	EMAIL_VERIFICATION_ENABLED: z.string().default('true'),
