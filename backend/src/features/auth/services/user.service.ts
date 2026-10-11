@@ -4,57 +4,9 @@ import { logger } from '@/shared/utils/logger.js';
 import type { UserProfile, UserProfileRow } from '@/features/auth/auth.types.js';
 import type { Session } from '@supabase/supabase-js';
 import { providerIdField } from '@/features/auth/utils/auth.helpers.js';
-
-// user_profiles.username CHECK (001_initial_schema.sql), as in auth.validators.ts
-const USERNAME_MAX_LENGTH = 20;
-
-function withSuffix(username: string, suffix: string): string {
-	return `${username.slice(0, USERNAME_MAX_LENGTH - suffix.length)}${suffix}`;
-}
+import { generateUniqueUsername } from '@/features/auth/services/username.service.js';
 
 export class UserService {
-	/**
-	 * Generate unique username from base name
-	 * @param baseName - Base name to generate username from (e.g., "John Doe")
-	 * @returns Unique username (e.g., "johndoe" or "johndoe1"), at most
-	 * USERNAME_MAX_LENGTH characters: the base is cut to leave room for a suffix
-	 */
-	private static async generateUniqueUsername(baseName: string): Promise<string> {
-		let username = baseName
-			.toLowerCase()
-			.replace(/[^a-z0-9]/g, '')
-			.slice(0, USERNAME_MAX_LENGTH);
-
-		if (username.length < 3) {
-			username = `user${Date.now()}`;
-		}
-
-		const { data: existing } = await supabase
-			.from('user_profiles')
-			.select('username')
-			.eq('username', username)
-			.single();
-
-		if (!existing) {
-			return username;
-		}
-
-		for (let i = 1; i <= 999; i++) {
-			const candidate = withSuffix(username, String(i));
-			const { data } = await supabase
-				.from('user_profiles')
-				.select('username')
-				.eq('username', candidate)
-				.single();
-
-			if (!data) {
-				return candidate;
-			}
-		}
-
-		return withSuffix(username, String(Date.now()));
-	}
-
 	/**
 	 * Create session for OAuth user using Admin Magic Link API
 	 * This method does NOT modify user passwords - safe for all user types
@@ -291,7 +243,7 @@ export class UserService {
 				}
 			}
 
-			const username = await this.generateUniqueUsername(
+			const username = await generateUniqueUsername(
 				profile.name || effectiveEmail.split('@')[0]
 			);
 

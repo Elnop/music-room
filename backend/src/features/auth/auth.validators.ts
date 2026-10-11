@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH } from '@/features/auth/utils/username.js';
 
 /**
  * Validation schemas using Zod
@@ -15,8 +16,8 @@ export const registerSchema = z.object({
 		.regex(/[0-9]/, 'Password must contain at least one number'),
 	username: z
 		.string()
-		.min(3, 'Username must be at least 3 characters')
-		.max(20, 'Username must be at most 20 characters')
+		.min(USERNAME_MIN_LENGTH, `Username must be at least ${USERNAME_MIN_LENGTH} characters`)
+		.max(USERNAME_MAX_LENGTH, `Username must be at most ${USERNAME_MAX_LENGTH} characters`)
 		.regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
 	displayName: z.string().max(50, 'Display name is too long').optional(),
 });

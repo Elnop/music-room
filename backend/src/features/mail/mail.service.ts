@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { transportConfig, senderConfig } from './mail.config.js';
+import { transportConfig, senderConfig } from '@/features/mail/mail.config.js';
 import { logger } from '@/shared/utils/logger.js';
 
 /**
