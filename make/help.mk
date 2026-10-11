@@ -44,11 +44,13 @@ docker: ## List the Docker mode commands
 	$(HELP_CMD) dev-docker "Build and start all services in Docker (backend + mobile)"
 	$(HELP_CMD) start "Start existing containers (no rebuild)"
 	$(HELP_CMD) stop "Stop all containers"
-	$(HELP_CMD) containers-restart "Restart the containers (no rebuild)"
+	$(HELP_CMD) containers-restart "Restart the containers and, in local mode, the dev Supabase stack (no rebuild)"
 	$(HELP_CMD) down "Stop and remove containers + networks"
 	$(HELP_CMD) ps "Show container status"
-	$(HELP_CMD) logs "Show logs from all services"
+	$(HELP_CMD) logs "Show logs from all services (and the dev Supabase stack in local mode)"
+	$(HELP_CMD) logs-backend "Show backend logs only"
 	$(HELP_CMD) logs-mobile "Show mobile logs only"
+	$(HELP_CMD) logs-supabase "Show the dev Supabase stack logs (local mode)"
 	$(HELP_CMD) qr "Show how to connect the debug build to Metro"
 	$(HELP_CMD) build "Build all Docker images"
 	$(HELP_CMD) build-backend "Build the backend image only"
@@ -89,7 +91,7 @@ emulator: ## List the Android emulator commands
 tunnel: ## List the tunnel mode commands
 	$(HELP_SECTION) "🌐 TUNNEL MODE (phone and PC on different networks)"
 	$(HELP_CMD) tunnel-setup "One-time EAS setup [requires: install]"
-	$(HELP_CMD) dev-tunnel "Start all services through the tunnel [~50-200ms latency]"
+	$(HELP_CMD) dev-tunnel "Start all services through the tunnel [~50-200ms latency, SUPABASE_MODE=hosted]"
 	$(HELP_CMD) qr-tunnel "Show the tunnel URLs and Metro host"
 	$(HELP_CMD) tunnel-info "Show detailed tunnel information"
 	@echo ""
@@ -120,10 +122,15 @@ quality: ## List the test and code quality commands
 	@echo ""
 
 supabase: ## List the Supabase commands
-	$(HELP_SECTION) "🗄️  SUPABASE"
-	$(HELP_CMD) supabase-login "Log in to the Supabase CLI [one-time]"
-	$(HELP_CMD) generate-types "Generate TypeScript types from the schema"
+	$(HELP_SECTION) "🗄️  SUPABASE  (SUPABASE_MODE=$(SUPABASE_MODE))"
+	$(HELP_CMD) supabase-up "Start the local dev stack (ports 544xx, dashboard on :54423, emails on :54424), apply new migrations"
+	$(HELP_CMD) supabase-down "Stop the local dev stack (data kept)"
+	$(HELP_CMD) supabase-reset "Empty the local dev database, apply every migration again"
+	$(HELP_CMD) generate-types "Generate TypeScript types from the schema (dev stack or hosted)"
+	$(HELP_CMD) supabase-login "Log in to the Supabase CLI [one-time, hosted mode only]"
 	$(HELP_CMD) supabase-status "Check the CLI installation and auth status"
+	$(HELP_NOTE) "SUPABASE_MODE=local (default): dev-docker, dev-local and generate-types use the local stack"
+	$(HELP_NOTE) "SUPABASE_MODE=hosted: they use the project in backend/.env (needed by dev-tunnel for now)"
 	@echo ""
 
 redis: ## List the Redis commands

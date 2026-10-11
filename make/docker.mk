@@ -3,7 +3,7 @@
 # ==============================================================================
 # Commands for Docker-based development environment
 
-.PHONY: dev-docker start stop containers-restart down logs logs-mobile ps build build-backend build-mobile
+.PHONY: dev-docker start stop containers-restart down logs logs-backend logs-mobile logs-supabase ps build build-backend build-mobile
 
 dev-docker: ## Start all services in Docker containers (backend + mobile)
 	$(call print_header,Starting Zumik Development Environment)
@@ -34,8 +34,10 @@ stop: ## Stop all running containers
 	$(call docker_stop)
 	$(call print_success,Services stopped)
 
-containers-restart: ## Restart the backend, mobile and redis containers (no rebuild)
+containers-restart: ## Restart the backend, mobile and redis containers, and the dev Supabase stack in local mode (no rebuild)
 	$(call print_arrow,Restarting all services...)
+	$(if $(filter local,$(SUPABASE_MODE)),@$(MAKE) --no-print-directory supabase-down)
+	$(SUPABASE_UP_IF_LOCAL)
 	$(call docker_restart)
 	$(call print_success,Services restarted)
 
@@ -47,6 +49,14 @@ down: ## Stop and remove all containers, networks
 logs: ## Show logs from all services (ctrl+c to exit)
 	$(call print_info,Showing logs (press Ctrl+C to exit)...)
 	$(call docker_logs_all)
+
+logs-backend: ## Show backend logs only
+	$(call print_info,Backend logs (press Ctrl+C to exit)...)
+	$(call docker_logs_service,backend)
+
+logs-supabase: ## Show the dev Supabase stack logs (Postgres, Auth, PostgREST, Kong, Mailpit, Studio)
+	$(call print_info,Supabase dev stack logs (press Ctrl+C to exit)...)
+	$(call docker_logs_prefixed,$(SUPABASE_DEV_LOG_SOURCES))
 
 logs-mobile: ## Show mobile logs only
 	$(call print_info,Mobile logs (press Ctrl+C to exit)...)

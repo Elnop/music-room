@@ -1,11 +1,11 @@
 import nodemailer from 'nodemailer';
-import { gmailConfig, senderConfig } from './mail.config.js';
+import { transportConfig, senderConfig } from '@/features/mail/mail.config.js';
 import { logger } from '@/shared/utils/logger.js';
 
 /**
  * Simple email service with inline templates
  *
- * Sends transactional emails via Gmail SMTP.
+ * Sends transactional emails via Gmail SMTP (Mailpit in local development).
  * No classes, no registry pattern - just direct functions.
  */
 
@@ -14,7 +14,7 @@ let transporter: nodemailer.Transporter;
 
 function getTransporter(): nodemailer.Transporter {
 	if (!transporter) {
-		transporter = nodemailer.createTransport(gmailConfig);
+		transporter = nodemailer.createTransport(transportConfig);
 	}
 	return transporter;
 }

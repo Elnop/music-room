@@ -131,6 +131,12 @@ define display_services
 	$(call print_service,Backend API,$(BACKEND_URL))
 	$(call print_service,Expo DevTools,$(EXPO_DEVTOOLS_URL))
 	$(call print_service,Metro Bundler,$(METRO_URL))
+	$(call print_service,API Docs (Swagger),$(BACKEND_URL)/api-docs)
+	$(if $(and $(filter lan,$(1)),$(filter local,$(SUPABASE_MODE))),\
+		$(call print_service,Supabase Studio,http://localhost:$(SUPABASE_STUDIO_PORT))
+	$(call print_service,Supabase API,http://localhost:$(SUPABASE_LOCAL_PORT))
+	$(call print_service,Postgres,postgresql://postgres:postgres@127.0.0.1:$(SUPABASE_DB_PORT)/postgres)
+	$(call print_service,Emails (Mailpit),http://localhost:$(SUPABASE_MAIL_UI_PORT)))
 endef
 
 # Display common commands
@@ -141,7 +147,9 @@ define display_common_commands
 		$(call print_command,qr,Show how to connect the app again), \
 		$(call print_command,qr-tunnel,Show tunnel URLs and Metro host))
 	$(call print_command,logs,View all logs (live))
+	$(if $(filter lan,$(1)),$(call print_command,logs-backend,View backend logs only))
 	$(if $(filter lan,$(1)),$(call print_command,logs-mobile,View Expo logs only))
+	$(if $(and $(filter lan,$(1)),$(filter local,$(SUPABASE_MODE))),$(call print_command,logs-supabase,View the dev Supabase stack logs))
 	$(call print_command,stop,Stop all services)
 	$(if $(filter lan,$(1)),$(call print_command,containers-restart,Restart the containers))
 	$(if $(filter tunnel,$(1)),$(call print_command,dev,Switch to LAN mode))

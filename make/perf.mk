@@ -19,8 +19,9 @@ PERF_SOCKET_DURATION ?= 30
 ARTILLERY_IMAGE := artilleryio/artillery:2.0.34
 
 perf-fixtures: .ensure-backend-deps ## Create or refresh the load test users and tokens [PERF_USERS=20]
-	$(call print_arrow,Preparing $(PERF_USERS) perf users in Supabase...)
-	@cd $(BACKEND_DIR) && PERF_USERS=$(PERF_USERS) npx tsx src/test/perf-fixtures.ts
+	$(SUPABASE_UP_IF_LOCAL)
+	$(call print_arrow,Preparing $(PERF_USERS) perf users in Supabase ($(SUPABASE_MODE))...)
+	@cd $(BACKEND_DIR) && $(LOCAL_SUPABASE_ENV) PERF_USERS=$(PERF_USERS) npx tsx src/test/perf-fixtures.ts
 
 perf-test: ## Run the HTTP and real-time load scenarios and write a summary [PERF_TARGET= PERF_USERS= PERF_SOCKET_CLIENTS= PERF_SOCKET_DURATION=30]
 	$(call print_header,Load test)
@@ -30,6 +31,8 @@ perf-test: ## Run the HTTP and real-time load scenarios and write a summary [PER
 		exit 1; \
 	fi
 	$(call print_success,Backend up on $(PERF_TARGET))
+	$(if $(and $(filter local,$(SUPABASE_MODE)),$(filter-out file,$(origin PERF_TARGET))),\
+		$(call print_warning,Fixtures go to the local dev stack; if $(PERF_TARGET) uses another Supabase project run with SUPABASE_MODE=hosted))
 	@$(MAKE) --no-print-directory perf-fixtures PERF_USERS=$(PERF_USERS)
 	@rl_enabled=$$(sed -n 's/^RATE_LIMIT_ENABLED=\([^ #]*\).*/\1/p' $(BACKEND_ENV) 2>/dev/null | tail -1 | tr -d "\"'"); \
 	rl_whitelist=$$(sed -n 's/^RATE_LIMIT_WHITELIST_IPS=\([^ #]*\).*/\1/p' $(BACKEND_ENV) 2>/dev/null | tail -1 | tr -d "\"'"); \

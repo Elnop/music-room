@@ -40,16 +40,37 @@ describe('mail.service', () => {
 		config = await import('@/features/mail/mail.config.js');
 	});
 
-	it('creates the Gmail transport once from gmailConfig', async () => {
+	it('creates the Gmail transport once from transportConfig', async () => {
 		await mail.sendVerificationEmail(TO, CODE, 15);
 		await mail.sendPasswordResetEmail(TO, CODE, 15);
 
 		expect(createTransport).toHaveBeenCalledTimes(1);
-		expect(createTransport).toHaveBeenCalledWith(config.gmailConfig);
-		expect(config.gmailConfig).toMatchObject({
+		expect(createTransport).toHaveBeenCalledWith(config.transportConfig);
+		expect(config.transportConfig).toMatchObject({
 			service: 'gmail',
 			auth: { user: 'test@example.com', pass: 'test-app-password' },
 		});
+	});
+
+	it('sends through the SMTP_HOST server without auth when it is set', async () => {
+		vi.stubEnv('SMTP_HOST', 'localhost');
+		vi.stubEnv('SMTP_PORT', '2525');
+		vi.resetModules();
+		try {
+			mail = await import('@/features/mail/mail.service.js');
+			config = await import('@/features/mail/mail.config.js');
+			await mail.sendVerificationEmail(TO, CODE, 15);
+
+			expect(createTransport).toHaveBeenCalledWith({
+				host: 'localhost',
+				port: 2525,
+				secure: false,
+				ignoreTLS: true,
+			});
+			expect(sentMessage().from).toBe('Zumik <test@example.com>');
+		} finally {
+			vi.unstubAllEnvs();
+		}
 	});
 
 	it('sends the verification code', async () => {

@@ -4,46 +4,9 @@ import { logger } from '@/shared/utils/logger.js';
 import type { UserProfile, UserProfileRow } from '@/features/auth/auth.types.js';
 import type { Session } from '@supabase/supabase-js';
 import { providerIdField } from '@/features/auth/utils/auth.helpers.js';
+import { generateUniqueUsername } from '@/features/auth/services/username.service.js';
 
 export class UserService {
-	/**
-	 * Generate unique username from base name
-	 * @param baseName - Base name to generate username from (e.g., "John Doe")
-	 * @returns Unique username (e.g., "johndoe" or "johndoe1")
-	 */
-	private static async generateUniqueUsername(baseName: string): Promise<string> {
-		let username = baseName.toLowerCase().replace(/[^a-z0-9]/g, '');
-
-		if (username.length < 3) {
-			username = `user${Date.now()}`;
-		}
-
-		const { data: existing } = await supabase
-			.from('user_profiles')
-			.select('username')
-			.eq('username', username)
-			.single();
-
-		if (!existing) {
-			return username;
-		}
-
-		for (let i = 1; i <= 999; i++) {
-			const candidate = `${username}${i}`;
-			const { data } = await supabase
-				.from('user_profiles')
-				.select('username')
-				.eq('username', candidate)
-				.single();
-
-			if (!data) {
-				return candidate;
-			}
-		}
-
-		return `${username}${Date.now()}`;
-	}
-
 	/**
 	 * Create session for OAuth user using Admin Magic Link API
 	 * This method does NOT modify user passwords - safe for all user types
@@ -280,7 +243,7 @@ export class UserService {
 				}
 			}
 
-			const username = await this.generateUniqueUsername(
+			const username = await generateUniqueUsername(
 				profile.name || effectiveEmail.split('@')[0]
 			);
 
