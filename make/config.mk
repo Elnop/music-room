@@ -140,9 +140,13 @@ SUPABASE_LOCAL_PORT := 54421
 # Containers of the dev stack (named by the CLI) as PREFIX:container, for the
 # log targets
 SUPABASE_DEV_LOG_SOURCES := SB-DB:supabase_db_music-room-dev SB-AUTH:supabase_auth_music-room-dev \
-	SB-REST:supabase_rest_music-room-dev SB-KONG:supabase_kong_music-room-dev SB-MAIL:supabase_inbucket_music-room-dev
+	SB-REST:supabase_rest_music-room-dev SB-KONG:supabase_kong_music-room-dev SB-MAIL:supabase_inbucket_music-room-dev \
+	SB-STUDIO:supabase_studio_music-room-dev SB-META:supabase_pg_meta_music-room-dev
 # Mailpit web UI of the dev stack (emails the backend sends in local mode)
 SUPABASE_MAIL_UI_PORT := 54424
+# Supabase Studio (dashboard) and Postgres of the dev stack
+SUPABASE_STUDIO_PORT := 54423
+SUPABASE_DB_PORT := 54422
 # Recipe line that starts the dev stack in local mode (empty in hosted mode)
 # Usage: $(SUPABASE_UP_IF_LOCAL)
 SUPABASE_UP_IF_LOCAL = $(if $(filter local,$(SUPABASE_MODE)),@$(MAKE) --no-print-directory supabase-up)

@@ -52,13 +52,13 @@ Cette commande va :
 
 | Commande | Effet |
 | --- | --- |
-| `make supabase-up` | Démarre la stack (Postgres, PostgREST, Auth, Kong, Mailpit), applique les fichiers de `migrations/` pas encore appliqués, écrit `.env.supabase.local` |
+| `make supabase-up` | Démarre la stack (Postgres, PostgREST, Auth, Kong, Mailpit, Studio), applique les fichiers de `migrations/` pas encore appliqués, écrit `.env.supabase.local` |
 | `make supabase-down` | Arrête la stack ; les données restent |
 | `make supabase-reset` | Vide la base et réapplique toutes les migrations |
-| `make logs-supabase` | Suit les logs de la stack (préfixes `[SB-DB]`, `[SB-AUTH]`, `[SB-REST]`, `[SB-KONG]`, `[SB-MAIL]`) ; `make logs` les inclut en mode local |
+| `make logs-supabase` | Suit les logs de la stack (préfixes `[SB-DB]`, `[SB-AUTH]`, `[SB-REST]`, `[SB-KONG]`, `[SB-MAIL]`, `[SB-STUDIO]`, `[SB-META]`) ; `make logs` les inclut en mode local |
 
 - Script : `scripts/dev-db.sh` ; config CLI : `supabase-dev/supabase/config.toml` (workdir séparé de `supabase/`, qui sert à la stack de test `music-room-test`).
-- Ports 544xx : API `http://127.0.0.1:54421`, Postgres `127.0.0.1:54422`, Mailpit `http://127.0.0.1:54424` (interface web) et `54425` (SMTP). La stack de test (554xx) et `make test-int` n'y touchent pas.
+- Ports 544xx : API `http://127.0.0.1:54421`, Postgres `127.0.0.1:54422`, Studio (dashboard) `http://127.0.0.1:54423`, Mailpit `http://127.0.0.1:54424` (interface web) et `54425` (SMTP). La stack de test (554xx) et `make test-int` n'y touchent pas.
 - Migrations suivies dans `zumik_dev.applied_migrations` (hors `public`) : chaque fichier tourne dans une transaction avec sa ligne de suivi ; un fichier en échec est nommé et rien n'en reste. Pas de `db reset` dans `supabase-up`.
 - `.env.supabase.local` (git-ignoré, clés locales de démo) contient `SUPABASE_URL=http://<IP LAN>:54421`, les clés anon et service, et `SMTP_HOST`/`SMTP_PORT` (Mailpit). `make dev-docker` le passe au conteneur backend en second `--env-file` (il l'emporte sur `.env` ; seuls `SUPABASE_URL` et `SMTP_HOST` sont remplacés, voir plus bas) et écrit l'URL et la clé anon dans `mobile/.env.development.local` (`EXPO_PUBLIC_SUPABASE_*`). `make dev-local`, `make backend-local` et `make perf-fixtures` exportent les mêmes valeurs avec `localhost`. Les cibles qui lancent le backend ou écrivent dans la base (`dev-docker`, `dev-local`, `backend-docker`, `backend-local`, `perf-fixtures`, `generate-types`) lancent d'abord `supabase-up` ; `expo-android` et `expo-clear` (Metro seul) reprennent les clés de `.env.supabase.local` sans démarrer la stack.
 - Un conteneur backend ou mobile lancé dans l'autre mode (label `zumik.supabase`) est recréé par `make dev-docker`.
@@ -67,7 +67,7 @@ Cette commande va :
 - Google et Facebook : `config.toml` déclare `[auth.external.google]` et `[auth.external.facebook]` avec `GOOGLE_CLIENT_ID`, `FACEBOOK_APP_ID` et `FACEBOOK_APP_SECRET` lus dans `.env`. Le flux actuel ne s'en sert pas : `oauth.service.ts` vérifie lui-même les tokens et crée les comptes via `auth.admin`. Il marche en local tant que ces variables sont renseignées (build de développement requis).
 - Chaque développeur part d'une base vide ; les données du projet hébergé ne sont pas copiées.
 - Emails : en mode local, le backend envoie ses emails (code de vérification, reset du mot de passe) au Mailpit de la stack au lieu de Gmail, sans identifiants. Ils s'affichent sur http://localhost:54424 ; rien ne part vers de vraies adresses. `GMAIL_USER` reste l'expéditeur affiché. En mode hosted, `SMTP_HOST` n'est pas défini et Gmail sert.
-- Sécurité : la stack écoute sur toutes les interfaces (54421 pour l'API, 54422 pour Postgres, 54424 et 54425 pour Mailpit), car le téléphone la joint par l'IP LAN et la CLI Supabase (2.119) ne permet pas de choisir l'adresse d'écoute. Le login Postgres `postgres`/`postgres` et la clé service-role de démo sont publics : n'importe qui sur le même réseau peut lire et modifier la base, et lire les codes reçus dans Mailpit. Elle ne doit contenir que des données de dev locales.
+- Sécurité : la stack écoute sur toutes les interfaces (54421 pour l'API, 54422 pour Postgres, 54423 pour Studio, 54424 et 54425 pour Mailpit), car le téléphone la joint par l'IP LAN et la CLI Supabase (2.119) ne permet pas de choisir l'adresse d'écoute. Le login Postgres `postgres`/`postgres` et la clé service-role de démo sont publics : n'importe qui sur le même réseau peut lire et modifier la base, et lire les codes reçus dans Mailpit. Elle ne doit contenir que des données de dev locales.
 - `make dev-docker` donne au conteneur backend `SUPABASE_URL=http://host.docker.internal:54421` et `SMTP_HOST=host.docker.internal` (passerelle de l'hôte), qui reste valide quand l'IP LAN change ; le fichier mobile garde l'IP LAN.
 
 **`SUPABASE_MODE=hosted`** : le comportement d'avant, avec le projet dont l'URL et les clés sont dans `.env`. Aucune stack locale n'est lancée.

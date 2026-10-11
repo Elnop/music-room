@@ -52,7 +52,7 @@ logs-backend: ## Show backend logs only
 	$(call print_info,Backend logs (press Ctrl+C to exit)...)
 	$(call docker_logs_service,backend)
 
-logs-supabase: ## Show the dev Supabase stack logs (Postgres, Auth, PostgREST, Kong, Mailpit)
+logs-supabase: ## Show the dev Supabase stack logs (Postgres, Auth, PostgREST, Kong, Mailpit, Studio)
 	$(call print_info,Supabase dev stack logs (press Ctrl+C to exit)...)
 	$(call docker_logs_prefixed,$(SUPABASE_DEV_LOG_SOURCES))
 

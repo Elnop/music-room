@@ -25,10 +25,12 @@ DB_CONTAINER="supabase_db_${SUPABASE_PROJECT_ID}"
 API_PORT=54421
 SMTP_PORT=54425
 MAIL_UI_PORT=54424
+STUDIO_PORT=54423
 
 # supabase-js needs Postgres, PostgREST, Auth and Kong (as in test-db.sh); Mailpit
-# catches the backend's emails (web UI on $MAIL_UI_PORT).
-EXCLUDED=studio,storage-api,imgproxy,realtime,edge-runtime,logflare,vector,supavisor,postgres-meta
+# catches the backend's emails (web UI on $MAIL_UI_PORT); Studio, with
+# postgres-meta, is the dashboard (on $STUDIO_PORT).
+EXCLUDED=storage-api,imgproxy,realtime,edge-runtime,logflare,vector,supavisor
 
 # Migrations already applied, one row per file name. Outside `public`, so
 # PostgREST never exposes it and the generated types never list it.
@@ -123,7 +125,7 @@ up() {
 	"$CLI" start --workdir "$WORKDIR" -x "$EXCLUDED"
 	apply_migrations
 	write_env_file
-	echo "Dev Supabase ready on http://127.0.0.1:$API_PORT, emails on http://127.0.0.1:$MAIL_UI_PORT; wrote backend/$ENV_FILE"
+	echo "Dev Supabase ready on http://127.0.0.1:$API_PORT, dashboard on http://127.0.0.1:$STUDIO_PORT, emails on http://127.0.0.1:$MAIL_UI_PORT; wrote backend/$ENV_FILE"
 }
 
 down() {

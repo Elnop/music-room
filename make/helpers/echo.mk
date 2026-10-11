@@ -131,7 +131,12 @@ define display_services
 	$(call print_service,Backend API,$(BACKEND_URL))
 	$(call print_service,Expo DevTools,$(EXPO_DEVTOOLS_URL))
 	$(call print_service,Metro Bundler,$(METRO_URL))
-	$(if $(and $(filter lan,$(1)),$(filter local,$(SUPABASE_MODE))),$(call print_service,Emails (Mailpit),http://localhost:$(SUPABASE_MAIL_UI_PORT)))
+	$(call print_service,API Docs (Swagger),$(BACKEND_URL)/api-docs)
+	$(if $(and $(filter lan,$(1)),$(filter local,$(SUPABASE_MODE))),\
+		$(call print_service,Supabase Studio,http://localhost:$(SUPABASE_STUDIO_PORT))
+	$(call print_service,Supabase API,http://localhost:$(SUPABASE_LOCAL_PORT))
+	$(call print_service,Postgres,postgresql://postgres:postgres@127.0.0.1:$(SUPABASE_DB_PORT)/postgres)
+	$(call print_service,Emails (Mailpit),http://localhost:$(SUPABASE_MAIL_UI_PORT)))
 endef
 
 # Display common commands

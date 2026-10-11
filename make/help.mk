@@ -123,7 +123,7 @@ quality: ## List the test and code quality commands
 
 supabase: ## List the Supabase commands
 	$(HELP_SECTION) "🗄️  SUPABASE  (SUPABASE_MODE=$(SUPABASE_MODE))"
-	$(HELP_CMD) supabase-up "Start the local dev stack (ports 544xx, emails on :54424), apply new migrations"
+	$(HELP_CMD) supabase-up "Start the local dev stack (ports 544xx, dashboard on :54423, emails on :54424), apply new migrations"
 	$(HELP_CMD) supabase-down "Stop the local dev stack (data kept)"
 	$(HELP_CMD) supabase-reset "Empty the local dev database, apply every migration again"
 	$(HELP_CMD) generate-types "Generate TypeScript types from the schema (dev stack or hosted)"
