@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { ProfileService } from '@/features/profile/services/profile.service.js';
+import { ProfileSearchService } from '@/features/profile/services/profile-search.service.js';
 import { PrivacyService } from '@/features/profile/services/privacy.service.js';
 import { MusicPreferencesService } from '@/features/profile/services/music-preferences.service.js';
 import {
@@ -13,6 +14,7 @@ import type { ApiResponse } from '@/shared/types/global.types.js';
 import { routeParam } from '@/shared/utils/route-params.js';
 
 const profileService = new ProfileService();
+const profileSearchService = new ProfileSearchService();
 const privacyService = new PrivacyService();
 const musicPreferencesService = new MusicPreferencesService();
 
@@ -105,7 +107,7 @@ export class ProfileController {
 			const authReq = req as AuthenticatedRequest;
 			const validated = searchUsersSchema.parse(req.query);
 
-			const users = await profileService.searchUsers(
+			const users = await profileSearchService.searchUsers(
 				validated.q,
 				validated.limit,
 				authReq.user.id // Exclude current user from results

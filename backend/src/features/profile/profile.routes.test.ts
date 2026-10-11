@@ -475,6 +475,8 @@ describe('PATCH /api/profile', () => {
 describe('GET /api/profile/search', () => {
 	it('excludes the requester, passes the limit and maps the rows', async () => {
 		setResult('user_profiles', 'select', [profileRow(ALICE)]);
+		setResult('profile_privacy', 'select', []);
+		setResult('follows', 'select', []);
 
 		const res = await api('GET', '/search?q=ali&limit=5', { user: BOB });
 
@@ -485,6 +487,88 @@ describe('GET /api/profile/search', () => {
 		expect(callsOn('user_profiles', 'neq')[0]?.args).toEqual(['id', BOB]);
 		expect(callsOn('user_profiles', 'limit')[0]?.args).toEqual([5]);
 		expect(callsOn('user_profiles', 'or')).toHaveLength(1);
+	});
+
+	// Avatar and bio follow the found profile's privacy settings, as on GET /:userId (#247)
+	it.each([
+		['public', [], true],
+		['friends_only', [], false],
+		['friends_only', ONE_WAY, false],
+		['friends_only', ONE_WAY_BACK, false],
+		['friends_only', MUTUAL, true],
+		['private', MUTUAL, false],
+	] as const)(
+		'shows a %s bio and avatar to the viewer: follows %j -> %s',
+		async (level, follows, visible) => {
+			setResult('user_profiles', 'select', [profileRow(ALICE)]);
+			setResult('profile_privacy', 'select', [
+				privacyRow(ALICE, { bio_visibility: level, avatar_visibility: level }),
+			]);
+			setResult('follows', 'select', follows);
+
+			const res = await api('GET', '/search?q=ali', { user: BOB });
+
+			expect(res.status).toBe(200);
+			const [found] = res.body.data as unknown as Record<string, unknown>[];
+			expect(found).toMatchObject({ id: ALICE, username: 'alice', favoriteArtist: 'Daft Punk' });
+			expect(found.bio).toBe(visible ? 'Hello there' : undefined);
+			expect(found.avatarUrl).toBe(visible ? 'https://cdn.zumik.test/alice.png' : undefined);
+		}
+	);
+
+	it('looks up privacy once and the follows in both directions for the whole page', async () => {
+		setResult('user_profiles', 'select', [profileRow(ALICE), { ...profileRow(BOB), id: 'user-c' }]);
+		setResult('profile_privacy', 'select', []);
+		setResult('follows', 'select', []);
+
+		const res = await api('GET', '/search?q=ali', { user: BOB });
+
+		expect(res.status).toBe(200);
+		expect(callsOn('profile_privacy', 'in')).toEqual([
+			expect.objectContaining({ args: ['user_id', [ALICE, 'user-c']] }),
+		]);
+		expect(callsOn('follows', 'eq').map(c => c.args)).toEqual([
+			['follower_id', BOB],
+			['following_id', BOB],
+		]);
+		expect(callsOn('follows', 'in').map(c => c.args)).toEqual([
+			['following_id', [ALICE, 'user-c']],
+			['follower_id', [ALICE, 'user-c']],
+		]);
+	});
+
+	it("returns '' for a visible empty bio, as GET /:userId does", async () => {
+		setResult('user_profiles', 'select', [{ ...profileRow(ALICE), bio: null }]);
+		setResult('profile_privacy', 'select', []);
+		setResult('follows', 'select', []);
+
+		const res = await api('GET', '/search?q=ali', { user: BOB });
+
+		const [found] = res.body.data as unknown as Record<string, unknown>[];
+		expect(found.bio).toBe('');
+	});
+
+	it('treats a failed follows lookup as "not a friend"', async () => {
+		setResult('user_profiles', 'select', [profileRow(ALICE)]);
+		setResult('profile_privacy', 'select', [privacyRow(ALICE, { bio_visibility: 'friends_only' })]);
+		setResult('follows', 'select', null, { code: 'XX000', message: 'boom' });
+
+		const res = await api('GET', '/search?q=ali', { user: BOB });
+
+		expect(res.status).toBe(200);
+		const [found] = res.body.data as unknown as Record<string, unknown>[];
+		expect(found.bio).toBeUndefined();
+		expect(found.avatarUrl).toBe('https://cdn.zumik.test/alice.png');
+	});
+
+	it('answers 500 instead of unfiltered results when the privacy lookup fails', async () => {
+		setResult('user_profiles', 'select', [profileRow(ALICE)]);
+		setResult('profile_privacy', 'select', null, { code: 'XX000', message: 'boom' });
+		setResult('follows', 'select', []);
+
+		const res = await api('GET', '/search?q=ali', { user: BOB });
+
+		expect(res.status).toBe(500);
 	});
 
 	it('defaults the limit to 20', async () => {

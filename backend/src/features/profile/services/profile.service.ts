@@ -2,12 +2,7 @@ import { supabase } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import { fetchSingle, updateOne } from '@/shared/utils/database.helpers.js';
-import { ilikeContains } from '@/shared/utils/postgrest-filter.js';
-import type {
-	UpdateProfileDTO,
-	ProfileUpdateResponse,
-	PublicProfile,
-} from '@/features/profile/profile.types.js';
+import type { UpdateProfileDTO, ProfileUpdateResponse } from '@/features/profile/profile.types.js';
 
 // Type for user_profiles table row
 type UserProfileRow = {
@@ -116,50 +111,6 @@ export class ProfileService {
 			if (error instanceof AppError) throw error;
 			logger.error('Unexpected error fetching profile', { error });
 			throw new AppError(500, 'Failed to fetch profile', 'PROFILE_FETCH_ERROR');
-		}
-	}
-
-	/**
-	 * Search users by username or display name
-	 */
-	async searchUsers(query: string, limit = 20, excludeUserId?: string): Promise<PublicProfile[]> {
-		try {
-			logger.info('Searching users', { query, limit, excludeUserId });
-
-			// Search by username or display_name using ilike (case-insensitive);
-			// the query is matched literally, never read as filter syntax (#236)
-			const pattern = ilikeContains(query);
-			let queryBuilder = supabase
-				.from('user_profiles')
-				.select('id, username, display_name, avatar_url, bio, favorite_artist, created_at')
-				.or(`username.ilike.${pattern},display_name.ilike.${pattern}`)
-				.limit(limit);
-
-			// Exclude current user from results
-			if (excludeUserId) {
-				queryBuilder = queryBuilder.neq('id', excludeUserId);
-			}
-
-			const { data, error } = await queryBuilder;
-
-			if (error) {
-				logger.error('Failed to search users', { error });
-				throw new AppError(500, 'Failed to search users', 'SEARCH_ERROR');
-			}
-
-			return (data || []).map(profile => ({
-				id: profile.id,
-				username: profile.username,
-				displayName: profile.display_name ?? undefined,
-				avatarUrl: profile.avatar_url ?? undefined,
-				bio: profile.bio ?? undefined,
-				favoriteArtist: profile.favorite_artist ?? undefined,
-				createdAt: profile.created_at ?? new Date().toISOString(),
-			}));
-		} catch (error) {
-			if (error instanceof AppError) throw error;
-			logger.error('Unexpected error searching users', { error });
-			throw new AppError(500, 'Failed to search users', 'SEARCH_ERROR');
 		}
 	}
 }
