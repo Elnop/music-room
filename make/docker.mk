@@ -34,8 +34,10 @@ stop: ## Stop all running containers
 	$(call docker_stop)
 	$(call print_success,Services stopped)
 
-containers-restart: ## Restart the backend, mobile and redis containers (no rebuild)
+containers-restart: ## Restart the backend, mobile and redis containers, and the dev Supabase stack in local mode (no rebuild)
 	$(call print_arrow,Restarting all services...)
+	$(if $(filter local,$(SUPABASE_MODE)),@$(MAKE) --no-print-directory supabase-down)
+	$(SUPABASE_UP_IF_LOCAL)
 	$(call docker_restart)
 	$(call print_success,Services restarted)
 

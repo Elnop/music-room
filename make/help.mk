@@ -44,7 +44,7 @@ docker: ## List the Docker mode commands
 	$(HELP_CMD) dev-docker "Build and start all services in Docker (backend + mobile)"
 	$(HELP_CMD) start "Start existing containers (no rebuild)"
 	$(HELP_CMD) stop "Stop all containers"
-	$(HELP_CMD) containers-restart "Restart the containers (no rebuild)"
+	$(HELP_CMD) containers-restart "Restart the containers and, in local mode, the dev Supabase stack (no rebuild)"
 	$(HELP_CMD) down "Stop and remove containers + networks"
 	$(HELP_CMD) ps "Show container status"
 	$(HELP_CMD) logs "Show logs from all services (and the dev Supabase stack in local mode)"
