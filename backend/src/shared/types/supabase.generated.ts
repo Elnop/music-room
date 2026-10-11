@@ -1,11 +1,6 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
-	// Allows to automatically instantiate createClient with right options
-	// instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-	__InternalSupabase: {
-		PostgrestVersion: '14.5';
-	};
 	public: {
 		Tables: {
 			device_control_licenses: {
@@ -335,8 +330,6 @@ export type Database = {
 					bio: string | null;
 					created_at: string | null;
 					display_name: string | null;
-					email_verification_expires_at: string | null;
-					email_verification_token: string | null;
 					email_verified: boolean | null;
 					facebook_id: string | null;
 					favorite_artist: string | null;
@@ -355,8 +348,6 @@ export type Database = {
 					bio?: string | null;
 					created_at?: string | null;
 					display_name?: string | null;
-					email_verification_expires_at?: string | null;
-					email_verification_token?: string | null;
 					email_verified?: boolean | null;
 					facebook_id?: string | null;
 					favorite_artist?: string | null;
@@ -375,8 +366,6 @@ export type Database = {
 					bio?: string | null;
 					created_at?: string | null;
 					display_name?: string | null;
-					email_verification_expires_at?: string | null;
-					email_verification_token?: string | null;
 					email_verified?: boolean | null;
 					facebook_id?: string | null;
 					favorite_artist?: string | null;
@@ -416,17 +405,11 @@ export type Database = {
 				Args: { p_playlist_id: string; p_version: number };
 				Returns: undefined;
 			};
-			playlist_remove_track: {
-				Args: { p_playlist_id: string; p_track_id: string };
-				Returns: Json;
-			};
+			playlist_remove_track: { Args: { p_playlist_id: string; p_track_id: string }; Returns: Json };
 			rank_after: { Args: { p_a: string }; Returns: string };
 			rank_between: { Args: { p_a: string; p_b: string }; Returns: string };
-			rank_max_length: { Args: never; Returns: number };
-			rank_spaced: {
-				Args: { p_count: number; p_index: number };
-				Returns: string;
-			};
+			rank_max_length: { Args: Record<PropertyKey, never>; Returns: number };
+			rank_spaced: { Args: { p_count: number; p_index: number }; Returns: string };
 		};
 		Enums: {
 			visibility_level: 'public' | 'friends_only' | 'private';
@@ -451,9 +434,7 @@ export type Tables<
 		? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
 				DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
 		: never) = never,
-> = DefaultSchemaTableNameOrOptions extends {
-	schema: keyof DatabaseWithoutInternals;
-}
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
 	? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
 			DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
 			Row: infer R;
@@ -476,9 +457,7 @@ export type TablesInsert<
 	}
 		? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
 		: never) = never,
-> = DefaultSchemaTableNameOrOptions extends {
-	schema: keyof DatabaseWithoutInternals;
-}
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
 	? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
 			Insert: infer I;
 		}
@@ -500,9 +479,7 @@ export type TablesUpdate<
 	}
 		? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
 		: never) = never,
-> = DefaultSchemaTableNameOrOptions extends {
-	schema: keyof DatabaseWithoutInternals;
-}
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
 	? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
 			Update: infer U;
 		}
@@ -524,9 +501,7 @@ export type Enums<
 	}
 		? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
 		: never) = never,
-> = DefaultSchemaEnumNameOrOptions extends {
-	schema: keyof DatabaseWithoutInternals;
-}
+> = DefaultSchemaEnumNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
 	? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
 	: DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
 		? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
@@ -540,9 +515,7 @@ export type CompositeTypes<
 	}
 		? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
 		: never) = never,
-> = PublicCompositeTypeNameOrOptions extends {
-	schema: keyof DatabaseWithoutInternals;
-}
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
 	? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
 	: PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
 		? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
