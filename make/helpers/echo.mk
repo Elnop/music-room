@@ -144,6 +144,7 @@ define display_common_commands
 	$(call print_command,logs,View all logs (live))
 	$(if $(filter lan,$(1)),$(call print_command,logs-backend,View backend logs only))
 	$(if $(filter lan,$(1)),$(call print_command,logs-mobile,View Expo logs only))
+	$(if $(and $(filter lan,$(1)),$(filter local,$(SUPABASE_MODE))),$(call print_command,logs-supabase,View the dev Supabase stack logs))
 	$(call print_command,stop,Stop all services)
 	$(if $(filter lan,$(1)),$(call print_command,containers-restart,Restart the containers))
 	$(if $(filter tunnel,$(1)),$(call print_command,dev,Switch to LAN mode))

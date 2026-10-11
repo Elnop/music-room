@@ -3,7 +3,7 @@
 # ==============================================================================
 # Commands for Docker-based development environment
 
-.PHONY: dev-docker start stop containers-restart down logs logs-backend logs-mobile ps build build-backend build-mobile
+.PHONY: dev-docker start stop containers-restart down logs logs-backend logs-mobile logs-supabase ps build build-backend build-mobile
 
 dev-docker: ## Start all services in Docker containers (backend + mobile)
 	$(call print_header,Starting Zumik Development Environment)
@@ -51,6 +51,10 @@ logs: ## Show logs from all services (ctrl+c to exit)
 logs-backend: ## Show backend logs only
 	$(call print_info,Backend logs (press Ctrl+C to exit)...)
 	$(call docker_logs_service,backend)
+
+logs-supabase: ## Show the dev Supabase stack logs (Postgres, Auth, PostgREST, Kong, Mailpit)
+	$(call print_info,Supabase dev stack logs (press Ctrl+C to exit)...)
+	$(call docker_logs_prefixed,$(SUPABASE_DEV_LOG_SOURCES))
 
 logs-mobile: ## Show mobile logs only
 	$(call print_info,Mobile logs (press Ctrl+C to exit)...)

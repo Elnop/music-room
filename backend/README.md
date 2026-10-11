@@ -55,6 +55,7 @@ Cette commande va :
 | `make supabase-up` | Démarre la stack (Postgres, PostgREST, Auth, Kong, Mailpit), applique les fichiers de `migrations/` pas encore appliqués, écrit `.env.supabase.local` |
 | `make supabase-down` | Arrête la stack ; les données restent |
 | `make supabase-reset` | Vide la base et réapplique toutes les migrations |
+| `make logs-supabase` | Suit les logs de la stack (préfixes `[SB-DB]`, `[SB-AUTH]`, `[SB-REST]`, `[SB-KONG]`, `[SB-MAIL]`) ; `make logs` les inclut en mode local |
 
 - Script : `scripts/dev-db.sh` ; config CLI : `supabase-dev/supabase/config.toml` (workdir séparé de `supabase/`, qui sert à la stack de test `music-room-test`).
 - Ports 544xx : API `http://127.0.0.1:54421`, Postgres `127.0.0.1:54422`, Mailpit `http://127.0.0.1:54424` (interface web) et `54425` (SMTP). La stack de test (554xx) et `make test-int` n'y touchent pas.

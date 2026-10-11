@@ -375,19 +375,29 @@ endef
 # Logging Functions
 # ==============================================================================
 
-# Show all logs (follow mode), each line prefixed by its service
+# Follow the logs of several containers (PREFIX:container list), each line
+# prefixed by its PREFIX; a container that does not exist is skipped.
 # Starts at the last $(LOGS_TAIL) lines. The prefix is added by a shell read
 # loop, not awk: mawk (Ubuntu's awk) buffers its input from a pipe, so the
 # history only showed up on Ctrl+C. Background jobs ignore SIGINT in a
 # non-interactive shell, so the trap kills them when Ctrl+C reaches the shell.
-# Usage: $(call docker_logs_all)
-define docker_logs_all
+# Usage: $(call docker_logs_prefixed,BACKEND:zumik-backend REDIS:zumik-redis)
+define docker_logs_prefixed
 	@trap 'pkill -P $$$$ 2>/dev/null; exit 130' INT TERM; \
-	for svc in BACKEND:$(BACKEND_CONTAINER) MOBILE:$(MOBILE_CONTAINER) REDIS:$(REDIS_CONTAINER); do \
+	for svc in $(1); do \
+		docker inspect $${svc#*:} >/dev/null 2>&1 || continue; \
 		( prefix="[$${svc%%:*}] "; docker logs -f --tail $(LOGS_TAIL) $${svc#*:} 2>&1 \
 			| while IFS= read -r line; do printf '%s%s\n' "$$prefix" "$$line"; done ) & \
 	done; \
 	wait
+endef
+
+# Show all logs (follow mode): backend, mobile, Redis and, in
+# SUPABASE_MODE=local, the dev Supabase stack
+# Usage: $(call docker_logs_all)
+define docker_logs_all
+	$(call docker_logs_prefixed,BACKEND:$(BACKEND_CONTAINER) MOBILE:$(MOBILE_CONTAINER) REDIS:$(REDIS_CONTAINER) \
+		$(if $(filter local,$(SUPABASE_MODE)),$(SUPABASE_DEV_LOG_SOURCES)))
 endef
 
 # Show service logs (follow mode), starting at the last $(LOGS_TAIL) lines
