@@ -17,6 +17,12 @@ export const authPaths: OpenAPIV3.PathsObject = {
         - Username 3-20 characters, alphanumeric and underscores only
         - Display name optional, max 50 characters
 
+        **Email verification:** with \`EMAIL_VERIFICATION_ENABLED=true\` (default) the
+        account waits for the emailed code (\`requiresVerification: true\`, no session); if the
+        email cannot be sent, the account is removed and the call answers 503 EMAIL_UNAVAILABLE.
+        With \`EMAIL_VERIFICATION_ENABLED=false\` the account is created verified and signed in
+        (\`requiresVerification: false\` and a session).
+
         **Rate limit:** 3 requests per hour per IP
       `,
 			operationId: 'registerUser',
@@ -63,7 +69,22 @@ export const authPaths: OpenAPIV3.PathsObject = {
 					},
 				},
 				'429': { $ref: '#/components/responses/RateLimitError' },
-				'503': { $ref: '#/components/responses/RateLimitUnavailable' },
+				'503': {
+					description:
+						'EMAIL_UNAVAILABLE: the verification email could not be sent, the account was not kept; or RATE_LIMIT_UNAVAILABLE: Redis is not ready',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+							example: {
+								success: false,
+								error: {
+									message: 'Could not send the verification email, please try again later',
+									code: 'EMAIL_UNAVAILABLE',
+								},
+							},
+						},
+					},
+				},
 			},
 		},
 	},
