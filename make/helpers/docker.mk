@@ -376,14 +376,16 @@ endef
 # ==============================================================================
 
 # Show all logs (follow mode), each line prefixed by its service
-# Starts at the last $(LOGS_TAIL) lines. Background jobs ignore SIGINT in a
+# Starts at the last $(LOGS_TAIL) lines. The prefix is added by a shell read
+# loop, not awk: mawk (Ubuntu's awk) buffers its input from a pipe, so the
+# history only showed up on Ctrl+C. Background jobs ignore SIGINT in a
 # non-interactive shell, so the trap kills them when Ctrl+C reaches the shell.
 # Usage: $(call docker_logs_all)
 define docker_logs_all
 	@trap 'pkill -P $$$$ 2>/dev/null; exit 130' INT TERM; \
 	for svc in BACKEND:$(BACKEND_CONTAINER) MOBILE:$(MOBILE_CONTAINER) REDIS:$(REDIS_CONTAINER); do \
-		docker logs -f --tail $(LOGS_TAIL) $${svc#*:} 2>&1 \
-			| awk -v prefix="[$${svc%%:*}] " '{ print prefix $$0; fflush() }' & \
+		( prefix="[$${svc%%:*}] "; docker logs -f --tail $(LOGS_TAIL) $${svc#*:} 2>&1 \
+			| while IFS= read -r line; do printf '%s%s\n' "$$prefix" "$$line"; done ) & \
 	done; \
 	wait
 endef

@@ -142,6 +142,7 @@ define display_common_commands
 		$(call print_command,qr,Show how to connect the app again), \
 		$(call print_command,qr-tunnel,Show tunnel URLs and Metro host))
 	$(call print_command,logs,View all logs (live))
+	$(if $(filter lan,$(1)),$(call print_command,logs-backend,View backend logs only))
 	$(if $(filter lan,$(1)),$(call print_command,logs-mobile,View Expo logs only))
 	$(call print_command,stop,Stop all services)
 	$(if $(filter lan,$(1)),$(call print_command,containers-restart,Restart the containers))

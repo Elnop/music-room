@@ -3,7 +3,7 @@
 # ==============================================================================
 # Commands for Docker-based development environment
 
-.PHONY: dev-docker start stop containers-restart down logs logs-mobile ps build build-backend build-mobile
+.PHONY: dev-docker start stop containers-restart down logs logs-backend logs-mobile ps build build-backend build-mobile
 
 dev-docker: ## Start all services in Docker containers (backend + mobile)
 	$(call print_header,Starting Zumik Development Environment)
@@ -47,6 +47,10 @@ down: ## Stop and remove all containers, networks
 logs: ## Show logs from all services (ctrl+c to exit)
 	$(call print_info,Showing logs (press Ctrl+C to exit)...)
 	$(call docker_logs_all)
+
+logs-backend: ## Show backend logs only
+	$(call print_info,Backend logs (press Ctrl+C to exit)...)
+	$(call docker_logs_service,backend)
 
 logs-mobile: ## Show mobile logs only
 	$(call print_info,Mobile logs (press Ctrl+C to exit)...)

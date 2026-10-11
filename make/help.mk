@@ -48,6 +48,7 @@ docker: ## List the Docker mode commands
 	$(HELP_CMD) down "Stop and remove containers + networks"
 	$(HELP_CMD) ps "Show container status"
 	$(HELP_CMD) logs "Show logs from all services"
+	$(HELP_CMD) logs-backend "Show backend logs only"
 	$(HELP_CMD) logs-mobile "Show mobile logs only"
 	$(HELP_CMD) qr "Show how to connect the debug build to Metro"
 	$(HELP_CMD) build "Build all Docker images"

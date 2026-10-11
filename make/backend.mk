@@ -69,7 +69,7 @@ backend-restart:
 .PHONY: backend-logs
 backend-logs:
 	@$(call display_step,"Backend logs (Ctrl+C to exit)...")
-	@docker logs -f $(BACKEND_CONTAINER)
+	$(call docker_logs_service,backend)
 
 # Check Backend health
 .PHONY: backend-health
