@@ -5,7 +5,8 @@
 #   scripts/dev-db.sh up      start the stack, apply the backend/migrations files
 #                             not applied yet, write .env.supabase.local
 #   scripts/dev-db.sh down    stop the stack, keep its data
-#   scripts/dev-db.sh reset   empty the database, apply every migration again
+#   scripts/dev-db.sh reset   empty the database, apply every migration again,
+#                             load the demo data (supabase-dev/seed.sql)
 #
 # Runs from backend/. Needs Docker. The CLI workdir is supabase-dev/ (config in
 # supabase-dev/supabase/config.toml, ports 544xx), so this stack never shares
@@ -17,6 +18,7 @@ cd "$(dirname "$0")/.."
 CLI=node_modules/.bin/supabase
 WORKDIR=supabase-dev
 ENV_FILE=.env.supabase.local
+SEED_FILE=$WORKDIR/seed.sql
 
 # Pin the stack's name: backend/.env sets SUPABASE_PROJECT_ID to the hosted
 # project, and the CLI would name the containers after it.
@@ -97,6 +99,13 @@ apply_migrations() {
 	echo "$count migration(s) applied"
 }
 
+# Demo accounts, friends and playlists (doc/DEMO_ACCOUNTS.md), in one
+# transaction: a failing seed leaves the freshly migrated database empty.
+load_seed() {
+	psql_db -1 -f - <"$SEED_FILE" >/dev/null || fail "Demo data failed: $SEED_FILE (nothing from it was loaded)"
+	echo "Loaded the demo data (doc/DEMO_ACCOUNTS.md)"
+}
+
 write_env_file() {
 	status=$("$CLI" status -o env --workdir "$WORKDIR" 2>/dev/null)
 	value() { printf '%s\n' "$status" | sed -n "s/^$1=\"\(.*\)\"$/\1/p"; }
@@ -139,6 +148,7 @@ reset() {
 	"$CLI" start --workdir "$WORKDIR" -x "$EXCLUDED"
 	"$CLI" db reset --local --no-seed --workdir "$WORKDIR" >/dev/null
 	apply_migrations
+	load_seed
 	write_env_file
 	echo "Dev Supabase reset on http://127.0.0.1:$API_PORT; wrote backend/$ENV_FILE"
 }
