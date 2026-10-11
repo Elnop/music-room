@@ -29,6 +29,8 @@ export const senderConfig = {
  * Email verification configuration
  */
 export const verificationConfig = {
+	// "false" turns verification off: accounts are created verified, no email (#253)
+	enabled: env.EMAIL_VERIFICATION_ENABLED.trim().toLowerCase() !== 'false',
 	codeLength: 6,
 	expiryMinutes: parseInt(env.EMAIL_VERIFICATION_CODE_EXPIRY_MINUTES),
 	maxAttempts: parseInt(env.EMAIL_VERIFICATION_MAX_ATTEMPTS),

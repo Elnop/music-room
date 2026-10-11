@@ -13,7 +13,9 @@ const {
 	findAuthUserIdByEmail,
 	generateAndStore,
 	sendVerificationEmail,
+	verification,
 } = vi.hoisted(() => ({
+	verification: { enabled: true },
 	from: vi.fn(),
 	selectSingle:
 		vi.fn<(table: string, columns: string, col: string, value: unknown) => Promise<unknown>>(),
@@ -41,6 +43,18 @@ vi.mock('@/features/auth/services/email-verification.service.js', () => ({
 		sendVerificationEmail = sendVerificationEmail;
 	},
 }));
+
+// EMAIL_VERIFICATION_ENABLED, switched per test (#253)
+vi.mock('@/features/mail/mail.config.js', async importOriginal => {
+	const original = await importOriginal<typeof import('@/features/mail/mail.config.js')>();
+	return {
+		...original,
+		verificationConfig: Object.assign(verification, {
+			...original.verificationConfig,
+			enabled: true,
+		}),
+	};
+});
 
 vi.mock('@/shared/utils/logger.js', () => ({
 	logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() },
@@ -113,6 +127,7 @@ describe('AuthService', () => {
 		findAuthUserIdByEmail.mockReset().mockResolvedValue(null);
 		generateAndStore.mockReset().mockResolvedValue('123456');
 		sendVerificationEmail.mockReset().mockResolvedValue(undefined);
+		verification.enabled = true;
 	});
 
 	describe('register', () => {
@@ -135,10 +150,57 @@ describe('AuthService', () => {
 				id: 'new-id',
 				username: registration.username,
 				display_name: registration.displayName,
+				email_verified: false,
 			});
 			expect(generateAndStore).toHaveBeenCalledWith('new-id');
 			expect(sendVerificationEmail).toHaveBeenCalledWith(registration.email, '123456');
 			expect(deleteUser).not.toHaveBeenCalled();
+		});
+
+		it('removes the new account and answers 503 EMAIL_UNAVAILABLE when the code cannot be mailed', async () => {
+			sendVerificationEmail.mockRejectedValue(new Error('Invalid login: 535 bad credentials'));
+
+			const error = await caught(service.register(registration));
+
+			expect(error).toMatchObject({ statusCode: 503, code: 'EMAIL_UNAVAILABLE' });
+			expect(profileDelete).toHaveBeenCalledWith('user_profiles', 'id', 'new-id');
+			expect(deleteUser).toHaveBeenCalledWith('new-id');
+		});
+
+		it('with EMAIL_VERIFICATION_ENABLED=false, creates a verified account and signs it in', async () => {
+			verification.enabled = false;
+			signInWithPassword.mockResolvedValue({
+				data: { user: { id: 'new-id', email: registration.email }, session: authSession },
+				error: null,
+			});
+			selectSingle.mockImplementation((_table: string, columns: string) =>
+				Promise.resolve(
+					columns.includes('email_verified, google_id')
+						? {
+								data: {
+									username: registration.username,
+									display_name: registration.displayName,
+									email_verified: true,
+									google_id: null,
+									facebook_id: null,
+								},
+								error: null,
+							}
+						: NOT_FOUND
+				)
+			);
+
+			const result = await service.register(registration);
+
+			expect(createUser).toHaveBeenCalledWith(expect.objectContaining({ email_confirm: true }));
+			expect(profileInsert).toHaveBeenCalledWith(
+				'user_profiles',
+				expect.objectContaining({ id: 'new-id', email_verified: true })
+			);
+			expect(generateAndStore).not.toHaveBeenCalled();
+			expect(sendVerificationEmail).not.toHaveBeenCalled();
+			expect(result.requiresVerification).toBe(false);
+			expect(result.session).toMatchObject({ accessToken: 'access-token' });
 		});
 
 		it('answers 409 EMAIL_ALREADY_EXISTS when the email belongs to a verified account', async () => {

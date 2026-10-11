@@ -7,7 +7,7 @@ import { OAuthService } from '@/features/auth/services/oauth.service.js';
 import { UserService } from '@/features/auth/services/user.service.js';
 import { ProviderService } from '@/features/auth/services/provider.service.js';
 import { ProviderLinkService } from '@/features/auth/services/provider-link.service.js';
-import { EmailVerificationService } from '@/features/auth/services/email-verification.service.js';
+import { RegistrationService } from '@/features/auth/services/registration.service.js';
 import { findAuthUserIdByEmail } from '@/features/auth/utils/find-auth-user.js';
 import type {
 	RegisterDTO,
@@ -26,108 +26,10 @@ export class AuthService {
 		this.sessionService = new SessionService();
 	}
 	/**
-	 * Register a new user
+	 * Register a new user (see RegistrationService)
 	 */
 	async register(data: RegisterDTO): Promise<AuthResponse> {
-		try {
-			logger.info('Registering new user', {
-				email: data.email,
-				username: data.username,
-			});
-
-			const existingUserId = await findAuthUserIdByEmail(data.email);
-
-			if (existingUserId) {
-				const { data: profile } = await supabase
-					.from('user_profiles')
-					.select('email_verified')
-					.eq('id', existingUserId)
-					.single();
-
-				if (profile && !profile.email_verified) {
-					logger.info('Found unverified account with same email, deleting old account', {
-						email: data.email,
-						oldUserId: existingUserId,
-					});
-
-					await supabase.from('user_profiles').delete().eq('id', existingUserId);
-
-					await supabase.auth.admin.deleteUser(existingUserId);
-
-					logger.info('Old unverified account deleted successfully', {
-						email: data.email,
-					});
-				} else {
-					throw new AppError(409, 'Email already registered', 'EMAIL_ALREADY_EXISTS');
-				}
-			}
-
-			const { data: existingProfile } = await supabase
-				.from('user_profiles')
-				.select('username')
-				.eq('username', data.username)
-				.single();
-
-			if (existingProfile) {
-				throw new AppError(409, 'Username already taken', 'USERNAME_TAKEN');
-			}
-
-			const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-				email: data.email,
-				password: data.password,
-				email_confirm: false, // Require email verification
-			});
-
-			if (authError) {
-				logger.error('Supabase auth signup error', { error: authError });
-				throw new AppError(400, authError.message, 'AUTH_ERROR');
-			}
-
-			if (!authData.user) {
-				throw new AppError(400, 'Failed to create user - no user returned', 'AUTH_ERROR');
-			}
-
-			const { error: profileError } = await supabase.from('user_profiles').insert({
-				id: authData.user.id,
-				username: data.username,
-				display_name: data.displayName,
-			});
-
-			if (profileError) {
-				logger.error('Failed to create user profile', { error: profileError });
-				await supabase.auth.admin.deleteUser(authData.user.id);
-				throw new AppError(500, 'Failed to create user profile', 'PROFILE_ERROR');
-			}
-
-			const verificationService = new EmailVerificationService();
-
-			const code = await verificationService.generateAndStore(authData.user.id);
-			await verificationService.sendVerificationEmail(data.email, code);
-
-			logger.info('User registered successfully, verification email sent', {
-				userId: authData.user.id,
-				email: data.email,
-			});
-
-			return {
-				user: {
-					id: authData.user.id,
-					email: data.email,
-					username: data.username,
-					displayName: data.displayName,
-					avatarUrl: undefined,
-					bio: undefined,
-					createdAt: new Date().toISOString(),
-					updatedAt: new Date().toISOString(),
-				},
-				requiresVerification: true,
-				message: 'Registration successful. Please check your email for verification code.',
-			};
-		} catch (error) {
-			if (error instanceof AppError) throw error;
-			logger.error('Unexpected error during registration', { error });
-			throw new AppError(500, 'Registration failed', 'REGISTRATION_ERROR');
-		}
+		return new RegistrationService().register(data, credentials => this.login(credentials));
 	}
 
 	/**
