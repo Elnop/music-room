@@ -80,6 +80,8 @@ export const profilePaths: OpenAPIV3.PathsObject = {
 		get: {
 			tags: ['Profile'],
 			summary: 'Search users by username or display name',
+			description:
+				"Excludes the requester. Each result's avatarUrl and bio follow that profile's privacy settings for the requester (absent when hidden), as on GET /api/profile/{userId}.",
 			operationId: 'searchUsers',
 			security: [{ bearerAuth: [] }],
 			parameters: [
@@ -109,14 +111,8 @@ export const profilePaths: OpenAPIV3.PathsObject = {
 										type: 'object',
 										properties: {
 											data: {
-												type: 'object',
-												properties: {
-													users: {
-														type: 'array',
-														items: { $ref: '#/components/schemas/UserProfile' },
-													},
-													count: { type: 'integer' },
-												},
+												type: 'array',
+												items: { $ref: '#/components/schemas/SearchProfile' },
 											},
 										},
 									},
@@ -357,6 +353,21 @@ export const profilePaths: OpenAPIV3.PathsObject = {
  * Schemas specific to Profile
  */
 export const profileSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
+	SearchProfile: {
+		type: 'object',
+		description:
+			'A found profile; avatarUrl and bio are absent when its privacy settings hide them',
+		required: ['id', 'username', 'createdAt'],
+		properties: {
+			id: { type: 'string', format: 'uuid' },
+			username: { type: 'string' },
+			displayName: { type: 'string' },
+			avatarUrl: { type: 'string', format: 'uri' },
+			bio: { type: 'string' },
+			favoriteArtist: { type: 'string' },
+			createdAt: { type: 'string', format: 'date-time' },
+		},
+	},
 	UpdateProfileRequest: {
 		type: 'object',
 		properties: {
