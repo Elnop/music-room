@@ -41,9 +41,12 @@ containers-restart: ## Restart the backend, mobile and redis containers, and the
 	$(call docker_restart)
 	$(call print_success,Services restarted)
 
-down: ## Stop and remove all containers, networks
+down: ## Stop and remove all containers, networks; stop the dev Supabase stack (its data is kept)
 	$(call print_arrow,Stopping and removing containers...)
 	$(call docker_down)
+	@if docker ps -q --filter label=$(SUPABASE_DEV_LABEL) | grep -q .; then \
+		$(MAKE) --no-print-directory supabase-down; \
+	fi
 	$(call print_success,Containers removed)
 
 logs: ## Show logs from all services (ctrl+c to exit)

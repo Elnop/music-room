@@ -137,6 +137,8 @@ export SUPABASE_MODE
 # Written by make supabase-up: the dev stack's URL (host LAN address) and keys
 SUPABASE_LOCAL_ENV := $(BACKEND_DIR)/.env.supabase.local
 SUPABASE_LOCAL_PORT := 54421
+# Label the Supabase CLI puts on the dev stack's containers, volumes and network
+SUPABASE_DEV_LABEL := com.supabase.cli.project=music-room-dev
 # Containers of the dev stack (named by the CLI) as PREFIX:container, for the
 # log targets
 SUPABASE_DEV_LOG_SOURCES := SB-DB:supabase_db_music-room-dev SB-AUTH:supabase_auth_music-room-dev \

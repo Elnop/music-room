@@ -133,13 +133,41 @@ check-setup: ## Verify development environment is correctly configured
 		ERRORS=$$((ERRORS + 1)); \
 	else \
 		echo "  $(GREEN)$(ICON_SUCCESS) mobile/.env exists$(NC)"; \
-		if ! grep -q "^EXPO_PUBLIC_API_URL=" $(MOBILE_ENV); then \
-			echo "  $(YELLOW)$(ICON_WARNING) EXPO_PUBLIC_API_URL not configured$(NC)"; \
-			echo "  $(YELLOW)→ Run: make set-backend-url$(NC)"; \
+	fi; \
+	API_URL=$$(cat $(MOBILE_DEV_ENV) $(MOBILE_ENV) 2>/dev/null | sed -n 's/^EXPO_PUBLIC_API_URL=//p' | head -n 1); \
+	if [ -z "$$API_URL" ]; then \
+		echo "  $(YELLOW)$(ICON_WARNING) EXPO_PUBLIC_API_URL not configured$(NC)"; \
+		echo "  $(YELLOW)→ Run: make set-backend-url$(NC)"; \
+	else \
+		echo "  $(BLUE)$(ICON_INFO) API URL: $$API_URL$(NC)"; \
+	fi; \
+	echo ""; \
+	\
+	echo "$(YELLOW)$(ICON_ARROW) Supabase (SUPABASE_MODE=$(SUPABASE_MODE))...$(NC)"; \
+	if [ "$(SUPABASE_MODE)" = "local" ]; then \
+		echo "  $(BLUE)$(ICON_INFO) Local dev stack music-room-dev: no hosted keys needed$(NC)"; \
+		if docker ps --format '{{.Names}}' 2>/dev/null | grep -qx 'supabase_db_music-room-dev'; then \
+			echo "  $(GREEN)$(ICON_SUCCESS) Stack running: API http://127.0.0.1:$(SUPABASE_LOCAL_PORT), Studio http://127.0.0.1:$(SUPABASE_STUDIO_PORT)$(NC)"; \
 		else \
-			API_URL=$$(grep "^EXPO_PUBLIC_API_URL=" $(MOBILE_ENV) | cut -d'=' -f2); \
-			echo "  $(BLUE)$(ICON_INFO) API URL: $$API_URL$(NC)"; \
+			echo "  $(YELLOW)$(ICON_WARNING) Stack stopped$(NC)"; \
+			echo "  $(YELLOW)→ Run: make supabase-up (make dev-docker and make dev-local start it too)$(NC)"; \
 		fi; \
+		if [ -f "$(SUPABASE_LOCAL_ENV)" ]; then \
+			echo "  $(GREEN)$(ICON_SUCCESS) $(SUPABASE_LOCAL_ENV) exists$(NC)"; \
+		else \
+			echo "  $(YELLOW)$(ICON_WARNING) $(SUPABASE_LOCAL_ENV) not written yet$(NC)"; \
+			echo "  $(YELLOW)→ Run: make supabase-up$(NC)"; \
+		fi; \
+	else \
+		for key in SUPABASE_URL SUPABASE_ANON_KEY SUPABASE_SERVICE_KEY; do \
+			VALUE=$$(sed -n "s/^$$key=//p" $(BACKEND_ENV) 2>/dev/null | tail -n 1); \
+			case "$$VALUE" in \
+				""|*your-*) \
+					echo "  $(RED)$(ICON_ERROR) $$key not configured in backend/.env$(NC)"; \
+					ERRORS=$$((ERRORS + 1)) ;; \
+				*) echo "  $(GREEN)$(ICON_SUCCESS) $$key configured$(NC)" ;; \
+			esac; \
+		done; \
 	fi; \
 	echo ""; \
 	\

@@ -64,7 +64,7 @@ local: ## List the local mode commands
 	$(HELP_CMD) dev-local "Start backend + Metro locally (Android Studio emulator)"
 	$(HELP_CMD) expo-android "Start Metro and open the app in the emulator"
 	$(HELP_CMD) expo-clear "Start Metro with a cleared cache"
-	$(HELP_CMD) set-backend-url "Write the backend URL in mobile/.env (HOST_IP)"
+	$(HELP_CMD) set-backend-url "Write the backend URL in mobile/.env.development.local (HOST_IP)"
 	$(HELP_NOTE) "Emulator commands: make emulator"
 	@echo ""
 
