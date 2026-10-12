@@ -6,7 +6,7 @@ name: Release APK
 
 on:
   push:
-    branches: [main]
+    branches: [main, 264-apk-github-release] # TEMP: test run, removed before review
   workflow_dispatch:
 
 concurrency:
