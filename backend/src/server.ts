@@ -10,8 +10,11 @@ import { routes } from '@/shared/config/routes.js';
 import { realtime } from '@/realtime/index.js';
 import { connectRedis, disconnectRedis, checkRedisHealth } from '@/shared/config/redis.js';
 import { swaggerSpec, swaggerUiOptions } from '@/shared/config/swagger.config.js';
+import { isOriginAllowed } from '@/shared/config/cors.config.js';
+import { configureTrustProxy } from '@/shared/config/trust-proxy.js';
 
 const app = express();
+configureTrustProxy(app);
 const httpServer = createServer(app);
 
 realtime.initialize(httpServer);
@@ -22,29 +25,10 @@ connectRedis().catch(error => {
 	});
 });
 
-const allowedOrigins = env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim());
-
-if (env.TUNNEL_URL) {
-	allowedOrigins.push(env.TUNNEL_URL);
-	const expUrl = env.TUNNEL_URL.replace('https://', 'exp://');
-	allowedOrigins.push(expUrl);
-	logger.info(`🌐 Tunnel CORS enabled: ${env.TUNNEL_URL}`);
-}
-
 app.use(
 	cors({
 		origin: (origin, callback) => {
-			if (!origin) return callback(null, true);
-
-			if (env.NODE_ENV === 'development' && origin.includes('ngrok')) {
-				return callback(null, true);
-			}
-
-			if (env.NODE_ENV === 'development' && origin.startsWith('exp://')) {
-				return callback(null, true);
-			}
-
-			if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+			if (isOriginAllowed(origin)) {
 				callback(null, true);
 			} else {
 				logger.warn(`CORS blocked origin: ${origin}`);

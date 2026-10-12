@@ -9,7 +9,7 @@ import {
 	TouchableOpacity,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AuthStackParamList } from '@navigation/AuthNavigator';
+import type { AuthStackParamList } from '@/navigation/AuthNavigator';
 import { useAuthStore } from '@store/authStore';
 import { Input } from '@components/common/Input';
 import { Button } from '@components/common/Button';
@@ -82,7 +82,7 @@ export function ForgotPasswordScreen({ navigation }: Props) {
 						keyboardType="email-address"
 						autoCapitalize="none"
 						autoComplete="email"
-						error={emailError}
+						error={emailError ?? undefined}
 						editable={!isLoading}
 					/>
 

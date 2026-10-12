@@ -181,7 +181,7 @@ export function FriendsScreen() {
 							style={styles.controlIcon}
 						/>
 						<Text style={[styles.controlText, canControl && styles.controlTextActive]}>
-							{canControl ? 'Can control my music' : 'Music control'}
+							Tous mes appareils
 						</Text>
 					</View>
 				</View>

@@ -1,4 +1,8 @@
-import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import {
+	GoogleSignin,
+	isCancelledResponse,
+	statusCodes,
+} from '@react-native-google-signin/google-signin';
 import { LoginManager, AccessToken, AuthenticationToken, Settings } from 'react-native-fbsdk-next';
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
@@ -91,6 +95,10 @@ export const signInWithGoogle = async (): Promise<string> => {
 	try {
 		await GoogleSignin.hasPlayServices();
 		const userInfo = await GoogleSignin.signIn();
+		// v13+: a cancel resolves { type: 'cancelled' } instead of throwing
+		if (isCancelledResponse(userInfo)) {
+			throw new Error('SIGN_IN_CANCELLED');
+		}
 		const idToken = extractIdToken(userInfo);
 
 		if (__DEV__) {
@@ -103,7 +111,10 @@ export const signInWithGoogle = async (): Promise<string> => {
 	} catch (error: unknown) {
 		const googleError = error as { code?: string; message?: string };
 
-		if (googleError.code === statusCodes.SIGN_IN_CANCELLED) {
+		if (
+			googleError.code === statusCodes.SIGN_IN_CANCELLED ||
+			googleError.message === 'SIGN_IN_CANCELLED'
+		) {
 			throw new Error('SIGN_IN_CANCELLED');
 		} else if (googleError.code === statusCodes.IN_PROGRESS) {
 			throw new Error('Sign-in already in progress');

@@ -1,0 +1,294 @@
+import React from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { act, render, screen, fireEvent, waitFor } from '@testing-library/react-native';
+import { useAuthStore } from '@store/authStore';
+import { resetBackendUrl } from '@/services/backendUrl';
+import { musicControlApi } from '@/services/musicControlApi';
+import { friendsApi, type FriendProfile } from '@/services/friendsApi';
+import { showError, showSuccess } from '@utils/toast';
+import type { UserDeviceWithLicenses } from '@/types/device.types';
+import { MyDevicesScreen } from '@/screens/profile/MyDevicesScreen';
+
+jest.mock('@react-native-async-storage/async-storage', () =>
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+);
+
+jest.mock('@/lib/supabase', () => ({
+	supabase: { auth: { signOut: jest.fn(), setSession: jest.fn() } },
+}));
+
+jest.mock('@services/oauth', () => ({
+	signInWithGoogle: jest.fn(),
+	signInWithFacebook: jest.fn(),
+}));
+
+const mockGetDeviceInfo = jest.fn();
+jest.mock('@/services/deviceService', () => ({
+	getAppVersion: () => '1.2.3',
+	deviceService: { getDeviceInfo: () => mockGetDeviceInfo() },
+}));
+
+jest.mock('socket.io-client', () => ({ io: jest.fn() }));
+
+jest.mock('@utils/toast', () => ({
+	showError: jest.fn(),
+	showSuccess: jest.fn(),
+}));
+
+jest.mock('@/contexts/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@themes/original.theme');
+	return { useTheme: () => ({ theme: originalTheme }) };
+});
+
+jest.mock('@components/common/LoadingSpinner', () => ({
+	LoadingSpinner: () => null,
+}));
+
+const fetchMock = jest.fn();
+
+function jsonResponse(status: number, body: object): Response {
+	return {
+		ok: status >= 200 && status < 300,
+		status,
+		statusText: '',
+		json: () => Promise.resolve(body),
+		text: () => Promise.resolve(JSON.stringify(body)),
+	} as unknown as Response;
+}
+
+const ok = (data: object) => jsonResponse(200, { success: true, data });
+const fail = (status: number, code: string, message: string) =>
+	jsonResponse(status, { success: false, error: { code, message } });
+
+const alice: FriendProfile = { id: 'user-a', username: 'alice' };
+const bob: FriendProfile = { id: 'user-b', username: 'bob', displayName: 'Bob' };
+const carol: FriendProfile = { id: 'user-c', username: 'carol' };
+
+function device(
+	deviceId: string,
+	deviceName: string,
+	licensed: FriendProfile[] = []
+): UserDeviceWithLicenses {
+	return {
+		deviceId,
+		deviceName,
+		platform: 'android',
+		model: 'Pixel 8',
+		lastSeenAt: '2026-10-01T10:00:00Z',
+		licenses: licensed.map(friend => ({
+			user: {
+				id: friend.id,
+				username: friend.username,
+				displayName: friend.displayName ?? null,
+				avatarUrl: null,
+			},
+			grantedAt: '2026-10-01T10:00:00Z',
+		})),
+	};
+}
+
+const phone = device('device-1', 'Phone', [alice]);
+const tablet = device('device-2', 'Tablet');
+
+function requests(): { url: string; method: string; authorization?: string }[] {
+	return fetchMock.mock.calls.map(([url, init]) => ({
+		url: url as string,
+		method: (init as RequestInit).method ?? 'GET',
+		authorization: ((init as RequestInit).headers as Record<string, string>)?.Authorization,
+	}));
+}
+
+const toggle = (label: string) => screen.getByLabelText(label);
+
+// Generous timeout: the first render transforms lazily-required modules on a cold cache (CI).
+const FIRST_RENDER = { timeout: 15_000 };
+// Above FIRST_RENDER: the whole test must outlive a slow first render.
+jest.setTimeout(20_000);
+
+let getPermissions: jest.SpyInstance;
+let getFriends: jest.SpyInstance;
+
+async function renderLoaded(
+	devices: UserDeviceWithLicenses[],
+	friends: FriendProfile[],
+	allDevicesIds: string[] = []
+): Promise<void> {
+	fetchMock.mockResolvedValueOnce(ok({ devices }));
+	getFriends.mockResolvedValue(friends);
+	getPermissions.mockResolvedValue(allDevicesIds);
+	render(<MyDevicesScreen />);
+	await screen.findByText('Mes appareils', {}, FIRST_RENDER);
+}
+
+beforeEach(async () => {
+	jest.spyOn(console, 'log').mockImplementation(() => undefined);
+	jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+	jest.spyOn(console, 'error').mockImplementation(() => undefined);
+	globalThis.fetch = fetchMock as unknown as typeof fetch;
+	fetchMock.mockReset();
+	mockGetDeviceInfo.mockReset();
+	mockGetDeviceInfo.mockResolvedValue({ deviceId: 'device-1' });
+	getPermissions = jest.spyOn(musicControlApi, 'getMyPermissions');
+	getFriends = jest.spyOn(friendsApi, 'getFriends');
+	(showError as jest.Mock).mockReset();
+	(showSuccess as jest.Mock).mockReset();
+	await AsyncStorage.clear();
+	await resetBackendUrl();
+	useAuthStore.setState({
+		accessToken: 'access',
+		refreshToken: 'refresh',
+		tokenExpiresAt: Date.now() + 3600_000,
+		isAuthenticated: true,
+		isRefreshing: false,
+		isLoading: false,
+	});
+});
+
+afterEach(() => {
+	jest.restoreAllMocks();
+});
+
+describe('MyDevicesScreen', () => {
+	it('lists my devices with a switch per friend and marks the current device', async () => {
+		await renderLoaded([phone, tablet], [alice, bob]);
+
+		expect(requests()[0]).toMatchObject({ method: 'GET', authorization: 'Bearer access' });
+		expect(requests()[0].url).toMatch(/\/api\/music-control\/devices$/);
+		expect(getFriends).toHaveBeenCalledWith('access');
+
+		expect(screen.getByTestId('device-device-1')).toHaveTextContent(/Cet appareil/);
+		expect(screen.getByTestId('device-device-2')).not.toHaveTextContent(/Cet appareil/);
+		expect(screen.getByTestId('device-device-1')).toHaveTextContent(/Pixel 8/);
+
+		expect(toggle('alice sur Phone').props.value).toBe(true);
+		expect(toggle('alice sur Tablet').props.value).toBe(false);
+		expect(toggle('Bob sur Phone').props.value).toBe(false);
+		expect(toggle('Bob sur Tablet').props.value).toBe(false);
+		expect(toggle('Bob sur Tablet')).toBeEnabled();
+	});
+
+	it('shows an error toast and no list when loading fails', async () => {
+		fetchMock.mockResolvedValueOnce(fail(500, 'INTERNAL_ERROR', 'Server exploded'));
+		getFriends.mockResolvedValue([alice]);
+		getPermissions.mockResolvedValue([]);
+
+		render(<MyDevicesScreen />);
+
+		await screen.findByText('Impossible de charger vos appareils', {}, FIRST_RENDER);
+		expect(showError).toHaveBeenCalledWith('Server exploded');
+		expect(screen.queryByTestId('device-device-1')).toBeNull();
+	});
+
+	it('shows an empty state when I have no device', async () => {
+		await renderLoaded([], [alice]);
+
+		expect(screen.getByText(/Aucun appareil/)).toBeTruthy();
+		expect(screen.queryByLabelText(/sur/)).toBeNull();
+	});
+
+	it('shows an empty state when I have no friend', async () => {
+		await renderLoaded([tablet], []);
+
+		expect(screen.getByTestId('device-device-2')).toHaveTextContent(/Aucun ami/);
+		expect(screen.queryByLabelText(/sur Tablet/)).toBeNull();
+	});
+
+	it('grants a friend one device and keeps the switch on', async () => {
+		await renderLoaded([phone, tablet], [alice, bob]);
+		fetchMock.mockResolvedValueOnce(ok({ deviceId: 'device-2', license: phone.licenses[0] }));
+
+		fireEvent(toggle('Bob sur Tablet'), 'valueChange', true);
+
+		await waitFor(() => expect(showSuccess).toHaveBeenCalled());
+		expect(requests()[1]).toMatchObject({ method: 'POST', authorization: 'Bearer access' });
+		expect(requests()[1].url).toMatch(/\/api\/music-control\/devices\/device-2\/licenses\/user-b$/);
+		expect(toggle('Bob sur Tablet').props.value).toBe(true);
+		expect(toggle('Bob sur Phone').props.value).toBe(false);
+	});
+
+	it('puts the switch back off and shows the backend message when granting fails', async () => {
+		await renderLoaded([phone, tablet], [alice, bob]);
+		fetchMock.mockResolvedValueOnce(fail(400, 'NOT_FRIENDS', 'You can only license friends'));
+
+		fireEvent(toggle('Bob sur Tablet'), 'valueChange', true);
+
+		await waitFor(() => expect(showError).toHaveBeenCalledWith('You can only license friends'));
+		expect(toggle('Bob sur Tablet').props.value).toBe(false);
+		expect(toggle('Bob sur Tablet')).toBeEnabled();
+		expect(showSuccess).not.toHaveBeenCalled();
+	});
+
+	it('revokes a friend from one device and keeps the switch off', async () => {
+		await renderLoaded([phone, tablet], [alice, bob]);
+		fetchMock.mockResolvedValueOnce(ok({ message: 'License revoked' }));
+
+		fireEvent(toggle('alice sur Phone'), 'valueChange', false);
+
+		await waitFor(() => expect(showSuccess).toHaveBeenCalled());
+		expect(requests()[1]).toMatchObject({ method: 'DELETE' });
+		expect(requests()[1].url).toMatch(/\/api\/music-control\/devices\/device-1\/licenses\/user-a$/);
+		expect(toggle('alice sur Phone').props.value).toBe(false);
+	});
+
+	it('puts the switch back on and shows the backend message when revoking fails', async () => {
+		await renderLoaded([phone, tablet], [alice, bob]);
+		fetchMock.mockResolvedValueOnce(fail(404, 'DEVICE_NOT_FOUND', 'Device not found'));
+
+		fireEvent(toggle('alice sur Phone'), 'valueChange', false);
+
+		await waitFor(() => expect(showError).toHaveBeenCalledWith('Device not found'));
+		expect(toggle('alice sur Phone').props.value).toBe(true);
+	});
+
+	it('disables only the pending switch while a toggle runs', async () => {
+		await renderLoaded([phone, tablet], [alice, bob]);
+		let answer: (response: Response) => void = () => undefined;
+		fetchMock.mockReturnValueOnce(
+			new Promise<Response>(resolve => {
+				answer = resolve;
+			})
+		);
+
+		fireEvent(toggle('Bob sur Tablet'), 'valueChange', true);
+
+		await waitFor(() => expect(toggle('Bob sur Tablet')).toBeDisabled());
+		expect(toggle('Bob sur Phone')).toBeEnabled();
+		expect(toggle('alice sur Tablet')).toBeEnabled();
+
+		answer(ok({ deviceId: 'device-2', license: phone.licenses[0] }));
+		await waitFor(() => expect(toggle('Bob sur Tablet')).toBeEnabled());
+		expect(toggle('Bob sur Tablet').props.value).toBe(true);
+	});
+
+	it('shows a friend with "all my devices" on and disabled on every device', async () => {
+		await renderLoaded([phone, tablet], [alice, carol], ['user-c']);
+
+		for (const label of ['carol sur Phone', 'carol sur Tablet']) {
+			expect(toggle(label).props.value).toBe(true);
+			expect(toggle(label)).toBeDisabled();
+		}
+		expect(screen.getAllByText('Contrôle tous mes appareils')).toHaveLength(2);
+		expect(toggle('alice sur Tablet')).toBeEnabled();
+	});
+
+	it('does not reload when the access token is refreshed', async () => {
+		await renderLoaded([phone, tablet], [alice]);
+
+		act(() => {
+			useAuthStore.setState({ accessToken: 'refreshed' });
+		});
+
+		expect(screen.getByTestId('device-device-1')).toBeTruthy();
+		expect(fetchMock).toHaveBeenCalledTimes(1);
+		expect(getFriends).toHaveBeenCalledTimes(1);
+		expect(getPermissions).toHaveBeenCalledTimes(1);
+	});
+
+	it('still lists the devices when the current device id is unavailable', async () => {
+		mockGetDeviceInfo.mockRejectedValue(new Error('storage down'));
+		await renderLoaded([phone], [alice]);
+
+		expect(screen.getByTestId('device-device-1')).not.toHaveTextContent(/Cet appareil/);
+		expect(toggle('alice sur Phone').props.value).toBe(true);
+	});
+});

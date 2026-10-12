@@ -2,12 +2,12 @@ import { z } from 'zod';
 
 // Auth Validators (aligned with backend Zod schemas)
 export const loginSchema = z.object({
-	email: z.string().email('Invalid email format'),
+	email: z.email('Invalid email format'),
 	password: z.string().min(1, 'Password is required'),
 });
 
 export const registerSchema = z.object({
-	email: z.string().email('Invalid email format'),
+	email: z.email('Invalid email format'),
 	password: z
 		.string()
 		.min(8, 'Password must be at least 8 characters')

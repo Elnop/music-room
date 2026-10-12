@@ -13,13 +13,21 @@ interface NowPlayingInlineProps {
 	isPlaying: boolean;
 	onPlay: () => void;
 	onPause: () => void;
+	/** False hides the play/pause button (device I may not control) */
+	controllable?: boolean;
 }
 
 /**
  * Compact inline component showing currently playing track
  * Used in friend profiles to display listening activity
  */
-export function NowPlayingInline({ track, isPlaying, onPlay, onPause }: NowPlayingInlineProps) {
+export function NowPlayingInline({
+	track,
+	isPlaying,
+	onPlay,
+	onPause,
+	controllable = true,
+}: NowPlayingInlineProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
@@ -50,18 +58,20 @@ export function NowPlayingInline({ track, isPlaying, onPlay, onPause }: NowPlayi
 				</Text>
 			</View>
 
-			<TouchableOpacity
-				style={styles.playButton}
-				onPress={isPlaying ? onPause : onPlay}
-				hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-			>
-				<Ionicons
-					name={isPlaying ? 'pause' : 'play'}
-					size={16}
-					color="#FFFFFF"
-					style={!isPlaying ? { marginLeft: 1 } : undefined}
-				/>
-			</TouchableOpacity>
+			{controllable && (
+				<TouchableOpacity
+					style={styles.playButton}
+					onPress={isPlaying ? onPause : onPlay}
+					hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+				>
+					<Ionicons
+						name={isPlaying ? 'pause' : 'play'}
+						size={16}
+						color="#FFFFFF"
+						style={!isPlaying ? { marginLeft: 1 } : undefined}
+					/>
+				</TouchableOpacity>
+			)}
 		</View>
 	);
 }

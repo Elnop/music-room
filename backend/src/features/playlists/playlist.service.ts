@@ -5,6 +5,7 @@ import {
 	canViewPlaylist,
 	checkOwnership,
 } from '@/features/playlists/permissions/playlist.permissions.js';
+import { realtime } from '@/realtime/index.js';
 import {
 	formatPlaylistResponse,
 	formatTrackResponse,
@@ -14,7 +15,7 @@ import type {
 	UpdatePlaylistDTO,
 	PlaylistResponse,
 	PlaylistWithTracksResponse,
-	TrackRow,
+	PlaylistUpdate,
 } from '@/features/playlists/playlist.types.js';
 
 /**
@@ -57,9 +58,9 @@ export class PlaylistService {
 
 			const { data: allTracks, error: tracksError } = await supabaseAdmin
 				.from('playlist_tracks')
-				.select('playlist_id, position, tracks:track_id(album_art)')
+				.select('playlist_id, rank, tracks:track_id(album_art)')
 				.in('playlist_id', playlistIds)
-				.order('position', { ascending: true });
+				.order('rank', { ascending: true });
 
 			if (tracksError) throw tracksError;
 
@@ -165,9 +166,9 @@ export class PlaylistService {
 
 			const { data: allTracks, error: tracksError } = await supabaseAdmin
 				.from('playlist_tracks')
-				.select('playlist_id, position, tracks:track_id(album_art)')
+				.select('playlist_id, rank, tracks:track_id(album_art)')
 				.in('playlist_id', playlistIds)
-				.order('position', { ascending: true });
+				.order('rank', { ascending: true });
 
 			if (tracksError) throw tracksError;
 
@@ -249,9 +250,9 @@ export class PlaylistService {
 			// Get first track cover for each playlist
 			const { data: allTracks, error: tracksError } = await supabaseAdmin
 				.from('playlist_tracks')
-				.select('playlist_id, position, tracks:track_id(album_art)')
+				.select('playlist_id, rank, tracks:track_id(album_art)')
 				.in('playlist_id', playlistIds)
-				.order('position', { ascending: true });
+				.order('rank', { ascending: true });
 
 			if (tracksError) throw tracksError;
 
@@ -334,14 +335,14 @@ export class PlaylistService {
 				.from('playlist_tracks')
 				.select(
 					`
-          position,
+          rank,
           added_by,
           added_at,
           tracks:track_id (*)
         `
 				)
 				.eq('playlist_id', playlistId)
-				.order('position', { ascending: true });
+				.order('rank', { ascending: true });
 
 			if (tracksError) throw tracksError;
 
@@ -356,8 +357,8 @@ export class PlaylistService {
 			}
 
 			const formattedTracks = playlistTracks.map(pt => ({
-				...formatTrackResponse(pt.tracks as unknown as TrackRow),
-				position: pt.position,
+				...formatTrackResponse(pt.tracks),
+				rank: pt.rank,
 				addedBy: pt.added_by,
 				addedAt: pt.added_at ?? new Date().toISOString(),
 			}));
@@ -371,6 +372,7 @@ export class PlaylistService {
 					displayName: owner.display_name ?? undefined,
 					avatarUrl: owner.avatar_url ?? undefined,
 				},
+				tracksVersion: playlist.tracks_version,
 			};
 		} catch (error) {
 			if (error instanceof AppError) throw error;
@@ -424,7 +426,7 @@ export class PlaylistService {
 			// Only owner can update playlist metadata
 			await checkOwnership(playlistId, userId);
 
-			const updateData: Record<string, unknown> = {};
+			const updateData: PlaylistUpdate = {};
 			if (data.name !== undefined) updateData.name = data.name;
 			if (data.description !== undefined) updateData.description = data.description;
 			if (data.visibility !== undefined) updateData.visibility = data.visibility;
@@ -438,6 +440,9 @@ export class PlaylistService {
 				.single();
 
 			if (error) throw error;
+
+			// Visibility may have changed: evict sockets that lost access (fire-and-forget).
+			void realtime.revalidatePlaylistRoom(playlistId);
 
 			const { count } = await supabaseAdmin
 				.from('playlist_tracks')
@@ -463,6 +468,9 @@ export class PlaylistService {
 			const { error } = await supabaseAdmin.from('playlists').delete().eq('id', playlistId);
 
 			if (error) throw error;
+
+			// Evict every socket from the deleted playlist's room (fire-and-forget).
+			void realtime.revalidatePlaylistRoom(playlistId);
 
 			logger.info('Playlist deleted', { playlistId, userId });
 		} catch (error) {

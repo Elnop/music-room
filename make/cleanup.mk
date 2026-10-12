@@ -8,6 +8,7 @@
 clean: ## Remove containers, volumes, images, and project dependencies (with confirmation)
 	@echo "$(BOLD)$(YELLOW)This will remove:$(RESET)"
 	@echo "  - Zumik Docker containers, images, and volumes"
+	@echo "  - The dev Supabase stack and its data (make supabase-up starts an empty one)"
 	@echo "  - node_modules (backend + mobile)"
 	@echo "  - Build artifacts (dist, .expo)"
 	@echo "  - Coverage reports"
@@ -23,10 +24,12 @@ clean: ## Remove containers, volumes, images, and project dependencies (with con
 		echo "$(GREEN)✓ Containers and volumes removed$(RESET)"; \
 		docker rmi music-room-backend:latest music-room-mobile:latest 2>/dev/null || true; \
 		docker network rm $(DOCKER_NETWORK) 2>/dev/null || true; \
+		$(SUPABASE_DEV_REMOVE); \
+		echo "$(GREEN)✓ Dev Supabase stack and its data removed$(RESET)"; \
 		docker run --rm -v $(PWD):/workspace alpine sh -c "rm -rf /workspace/backend/node_modules /workspace/mobile/node_modules /workspace/mobile/.expo /workspace/mobile/android /workspace/mobile/ios /workspace/backend/logs" 2>/dev/null || true; \
 		rm -rf backend/dist build 2>/dev/null || true; \
 		rm -rf backend/coverage mobile/coverage 2>/dev/null || true; \
-		rm -f /tmp/ngrok.log /tmp/backend-tunnel-url.txt 2>/dev/null || true; \
+		rm -f /tmp/ngrok.log 2>/dev/null || true; \
 		rm -rf /tmp/shared 2>/dev/null || true; \
 		find . -name "*.tsbuildinfo" -type f -delete 2>/dev/null || true; \
 		find mobile -name ".eas-build-*.json" -type f -delete 2>/dev/null || true; \
@@ -35,14 +38,15 @@ clean: ## Remove containers, volumes, images, and project dependencies (with con
 		echo "$(YELLOW)Cancelled.$(RESET)"; \
 	fi
 
-clean-docker: ## Remove Zumik Docker resources only (containers, images, volumes, network)
+clean-docker: ## Remove Zumik Docker resources only (containers, images, volumes, network), dev Supabase stack and its data included
 	@echo "$(CYAN)Removing Zumik Docker resources...$(RESET)"
 	@docker stop $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true
 	@docker rm $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true
 	@docker volume rm $(TUNNEL_VOLUME) $(REDIS_VOLUME) 2>/dev/null || true
 	@docker rmi music-room-backend:latest music-room-mobile:latest 2>/dev/null || true
 	@docker network rm $(DOCKER_NETWORK) 2>/dev/null || true
-	@echo "$(GREEN)✓ Docker resources removed$(RESET)"
+	@$(SUPABASE_DEV_REMOVE)
+	@echo "$(GREEN)✓ Docker resources removed (dev Supabase stack and its data included)$(RESET)"
 
 clean-all: ## Complete cleanup - Docker system + project artifacts + global caches
 	@echo "$(BOLD)$(RED)⚠️  COMPLETE CLEANUP - THIS WILL REMOVE EVERYTHING!$(RESET)"
@@ -74,7 +78,7 @@ clean-all: ## Complete cleanup - Docker system + project artifacts + global cach
 	@echo "$(CYAN)Step 4/6: Cleaning project artifacts...$(RESET)"
 	@docker run --rm -v $(PWD):/workspace alpine sh -c "rm -rf /workspace/backend/node_modules /workspace/mobile/node_modules /workspace/mobile/.expo /workspace/mobile/android /workspace/mobile/ios /workspace/backend/logs" 2>/dev/null || true
 	@rm -rf backend/dist build backend/coverage mobile/coverage 2>/dev/null || true
-	@rm -f /tmp/ngrok.log /tmp/backend-tunnel-url.txt 2>/dev/null || true
+	@rm -f /tmp/ngrok.log 2>/dev/null || true
 	@rm -rf /tmp/shared 2>/dev/null || true
 	@find . -name "*.tsbuildinfo" -type f -delete 2>/dev/null || true
 	@find mobile -name ".eas-build-*.json" -type f -delete 2>/dev/null || true

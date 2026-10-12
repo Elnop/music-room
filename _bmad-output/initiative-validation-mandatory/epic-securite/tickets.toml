@@ -1,0 +1,74 @@
+# epic-securite
+# Ordre des tables = ordre de build. `area` = label GitHub area: <valeur>.
+
+[[entry]]
+id = 1
+type = "story"
+title = "Authentifier la connexion Socket.io par JWT (backend)"
+description = "Définit le contrat de poignée de main (handshake.auth : token, deviceId, deviceName, platform, appVersion) documenté dans realtime, vérifie le token avec verifyToken (session.service.ts) dans un middleware io.use, place l'identité et l'appareil dans socket.data et supprime l'event auth:register. Le socket hérite ainsi de la révocation ajoutée par 3.1."
+verify = "Tests : connexion sans token, avec token invalide ou expiré refusée ; l'identité de socket.data est celle du token ; auth:register n'est plus écouté."
+covers = ["CAP-1", "CAP-3"]
+after = ["1.7"]
+hitl = false
+risk = "high"
+area = "backend"
+
+[[entry]]
+id = 2
+type = "story"
+title = "Envoyer le token et l'appareil à la connexion socket (mobile)"
+description = "socketStore envoie la poignée de main du contrat de 1, se reconnecte avec le token rafraîchi et gère le refus ; useMusicControl n'émet plus auth:register."
+verify = "Tests de socketStore : handshake avec token et champs d'appareil ; une erreur d'auth déclenche reconnexion ou déconnexion ; plus aucun emit auth:register."
+covers = ["CAP-1", "CAP-3"]
+after = [1, "1.8"]
+hitl = false
+risk = "medium"
+area = "mobile"
+
+[[entry]]
+id = 3
+type = "story"
+title = "Contrôler l'accès aux rooms de playlist (backend)"
+description = "playlist:join vérifie canViewPlaylist avec l'identité de socket.data avant de rejoindre la room et renvoie une erreur sinon."
+verify = "Test : un non-invité ne reçoit aucun playlist:updated d'une playlist privée ; un invité les reçoit."
+covers = ["CAP-1", "CAP-3"]
+after = [1]
+hitl = false
+risk = "medium"
+area = "backend"
+
+[[entry]]
+id = 4
+type = "story"
+title = "Tester l'accès à l'écoute et au contrôle (backend)"
+description = "Couvre par des tests listening:subscribe et control:action, qui vérifient déjà canControl sur l'identité du socket, et refuse l'abonnement à l'écoute d'un utilisateur que l'abonné n'a pas le droit de voir."
+verify = "Tests : abonnement à l'écoute d'un non-ami refusé ; control:action au nom d'un autre utilisateur impossible."
+covers = ["CAP-1", "CAP-3"]
+after = [3]
+hitl = false
+risk = "medium"
+area = "backend"
+
+[[entry]]
+id = 5
+type = "story"
+title = "Loguer plateforme, appareil et version des events socket (backend)"
+description = "socket-logger.middleware.ts lit socket.data et ajoute plateforme, appareil et version à chaque event entrant ; les nouveaux events des autres epics passent par ce logger."
+verify = "Test : un event socket produit une ligne de log contenant plateforme, appareil et version."
+covers = ["CAP-1", "CAP-3"]
+after = [1]
+hitl = false
+risk = "low"
+area = "backend"
+
+[[entry]]
+id = 6
+type = "story"
+title = "Documenter les menaces et corriger SECURITY.md"
+description = "Rédige doc/THREAT_MODEL.md : bruteforce, vol de session, token révoqué alors qu'un socket est déjà connecté, isolation des données, abus du temps réel, accès conservé dans une room après retrait, contrôle par appareil, concurrence ; protection ou risque accepté pour chacun. Aligne doc/SECURITY.md sur les Dockerfiles laissés par 1.5."
+verify = "Chaque menace renvoie au code ou au test qui la couvre, ou est marquée risque accepté ; SECURITY.md ne contredit aucun Dockerfile."
+covers = ["CAP-10"]
+after = [4, 5, "1.5", "3.1", "4.5", "5.5"]
+hitl = false
+risk = "low"
+area = "fullstack"

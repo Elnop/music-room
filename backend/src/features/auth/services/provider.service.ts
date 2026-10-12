@@ -2,6 +2,7 @@ import { supabase } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { OAuthProvider, LinkedProvidersResponse } from '@/features/auth/auth.types.js';
+import { providerIdField } from '@/features/auth/utils/auth.helpers.js';
 
 /**
  * Provider Service
@@ -113,7 +114,7 @@ export class ProviderService {
 		const { error: updateError } = await supabase
 			.from('user_profiles')
 			.update({
-				[providerColumn]: null,
+				...providerIdField(provider, null),
 				updated_at: new Date().toISOString(),
 			})
 			.eq('id', userId);

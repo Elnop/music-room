@@ -1,0 +1,43 @@
+# Login, then playlist reads (make perf-test).
+# Every virtual user takes the next row of fixtures/users.csv, signs in with its
+# password and reads with the token it gets back. The arrival rate stays low:
+# hosted Supabase caps password sign-ins per IP (tests/performance/README.md).
+# The target comes from `--target`; sharedPlaylistId from fixtures/env.json.
+config:
+  phases:
+    - name: login-read
+      duration: 10
+      arrivalRate: 1
+  payload:
+    path: "../fixtures/users.csv"
+    fields: ["email", "password", "token", "userId"]
+    skipHeader: true
+    order: sequence
+  http:
+    timeout: 10
+  plugins:
+    metrics-by-endpoint:
+      useOnlyRequestNames: true
+
+scenarios:
+  - name: login-read
+    flow:
+      - post:
+          url: "/api/auth/login"
+          name: "POST /api/auth/login"
+          json:
+            email: "{{ email }}"
+            password: "{{ password }}"
+          capture:
+            - json: "$.data.session.accessToken"
+              as: "accessToken"
+      - get:
+          url: "/api/playlists"
+          name: "GET /api/playlists"
+          headers:
+            Authorization: "Bearer {{ accessToken }}"
+      - get:
+          url: "/api/playlists/{{ sharedPlaylistId }}"
+          name: "GET /api/playlists/:id"
+          headers:
+            Authorization: "Bearer {{ accessToken }}"

@@ -12,6 +12,8 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { ProfileScreen } from '@/screens/profile/ProfileScreen';
 import { EditProfileScreen } from '@/screens/profile/EditProfileScreen';
 import { PrivacySettingsScreen } from '@/screens/profile/PrivacySettingsScreen';
+import { LinkedAccountsScreen } from '@/screens/profile/LinkedAccountsScreen';
+import { MyDevicesScreen } from '@/screens/profile/MyDevicesScreen';
 import { MusicPreferencesScreen } from '@/screens/profile/MusicPreferencesScreen';
 import { SettingsScreen } from '@/screens/settings/SettingsScreen';
 
@@ -19,6 +21,8 @@ export type ProfileStackParamList = {
 	Profile: undefined;
 	EditProfile: undefined;
 	PrivacySettings: undefined;
+	LinkedAccounts: undefined;
+	MyDevices: undefined;
 	MusicPreferences: undefined;
 	Settings: undefined;
 };
@@ -58,6 +62,16 @@ export function ProfileNavigator() {
 				name="PrivacySettings"
 				component={PrivacySettingsScreen}
 				options={{ title: 'Confidentialité' }}
+			/>
+			<ProfileStack.Screen
+				name="LinkedAccounts"
+				component={LinkedAccountsScreen}
+				options={{ title: 'Linked accounts' }}
+			/>
+			<ProfileStack.Screen
+				name="MyDevices"
+				component={MyDevicesScreen}
+				options={{ title: 'Mes appareils' }}
 			/>
 			<ProfileStack.Screen
 				name="MusicPreferences"

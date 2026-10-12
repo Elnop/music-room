@@ -75,7 +75,10 @@ export async function checkOwnership(playlistId: string, userId: string): Promis
  * Check if user can edit playlist (throws if not)
  * Uses edit_mode to determine permissions
  */
-export async function checkEditPermission(playlistId: string, userId: string): Promise<void> {
+export async function checkEditPermission(
+	playlistId: string,
+	userId: string
+): Promise<Pick<PlaylistRow, 'edit_mode'>> {
 	const { data: playlist, error } = await supabaseAdmin
 		.from('playlists')
 		.select('owner_id, collaborator_ids, viewer_ids, visibility, edit_mode')
@@ -89,6 +92,8 @@ export async function checkEditPermission(playlistId: string, userId: string): P
 	if (!canEditPlaylist(playlist as PlaylistRow, userId)) {
 		throw new AppError(403, 'Access denied', 'PLAYLIST_ACCESS_DENIED');
 	}
+
+	return { edit_mode: playlist.edit_mode };
 }
 
 /**
@@ -127,5 +132,5 @@ export async function getPlaylistForPermissionCheck(playlistId: string): Promise
 		throw new AppError(404, 'Playlist not found', 'PLAYLIST_NOT_FOUND');
 	}
 
-	return playlist as PlaylistRow;
+	return playlist;
 }

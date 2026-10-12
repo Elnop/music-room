@@ -95,24 +95,32 @@ define wait_for
 	@sleep $(2)
 endef
 
-# Display Expo QR code (unified for LAN and tunnel modes)
-# Usage: $(call display_qr,lan) or $(call display_qr,tunnel)
-# Improved: explicit locale for Unicode QR code chars (BSD/GNU grep compatibility)
-define display_qr
+# Tell how to point the Zumik debug build at Metro (the app does not run in
+# Expo Go: it needs its native modules). LAN: the host address; tunnel: the
+# Expo tunnel host read from the mobile container logs.
+# Usage: $(call display_metro_connect,lan) or $(call display_metro_connect,tunnel)
+define display_metro_connect
 	$(call print_separator)
-	@echo "$(YELLOW)📱 EXPO QR CODE - Scan with Expo Go app$(NC)"
+	@echo "$(YELLOW)📱 CONNECT THE ZUMIK DEBUG BUILD TO METRO$(NC)"
 	$(if $(filter tunnel,$(1)),@echo "$(YELLOW)   (Works across different WiFi networks)$(NC)")
 	$(call print_separator)
 	$(call blank_line)
-	@LC_ALL=C.UTF-8 docker logs $(MOBILE_CONTAINER) 2>/dev/null | grep -B 5 -A 50 "▄▄▄▄▄▄▄" | head -70 || \
-	LC_ALL=en_US.UTF-8 docker logs $(MOBILE_CONTAINER) 2>/dev/null | grep -B 5 -A 50 "▄▄▄▄▄▄▄" | head -70 || \
-	docker logs $(MOBILE_CONTAINER) 2>/dev/null | grep -B 5 -A 50 "▄▄▄▄▄▄▄" | head -70 || \
-	docker logs $(MOBILE_CONTAINER) | tail -60
-	$(call blank_line)
 	$(if $(filter lan,$(1)),\
-		@echo "$(GREEN)🌐 Local IP: $(HOST_IP)$(NC)"; \
-		@echo "$(GREEN)📱 Expo URL: $(EXPO_URL)$(NC)"; \
-		$(call blank_line))
+		@echo "   Emulator:      $(GREEN)make open-app$(NC) (reaches Metro on $(EMULATOR_HOST):$(METRO_PORT) by itself)"; \
+		echo "   Phone (USB):   $(GREEN)adb reverse tcp:$(METRO_PORT) tcp:$(METRO_PORT)$(NC) and open Zumik"; \
+		echo "   Phone (WiFi):  dev menu (shake) > Change Bundle Location > $(GREEN)$(METRO_ADDRESS)$(NC)")
+	$(if $(filter tunnel,$(1)),\
+		@HOST=$$(docker logs $(MOBILE_CONTAINER) 2>&1 | grep -o '[a-z0-9-]*\.exp\.direct' | tail -1); \
+		if [ -n "$$HOST" ]; then \
+			echo "   Metro tunnel:  $(GREEN)$$HOST$(NC)"; \
+			echo "   Phone:         dev menu (shake) > Change Bundle Location > $(GREEN)$$HOST:80$(NC)"; \
+		else \
+			echo "   $(YELLOW)$(ICON_WARNING) Expo tunnel not ready yet: run $(GREEN)make qr-tunnel$(YELLOW) again in a few seconds$(NC)"; \
+		fi)
+	$(call blank_line)
+	@echo "   No debug build on the device? $(GREEN)cd mobile && npx expo run:android --no-bundler$(NC) (add $(GREEN)--device$(NC) for a phone)"
+	@echo "   \"Unable to load script\": Metro is unreachable; check the address above, then tap RELOAD"
+	$(call blank_line)
 	$(call print_separator)
 endef
 
@@ -123,6 +131,12 @@ define display_services
 	$(call print_service,Backend API,$(BACKEND_URL))
 	$(call print_service,Expo DevTools,$(EXPO_DEVTOOLS_URL))
 	$(call print_service,Metro Bundler,$(METRO_URL))
+	$(call print_service,API Docs (Swagger),$(BACKEND_URL)/api-docs)
+	$(if $(and $(filter lan,$(1)),$(filter local,$(SUPABASE_MODE))),\
+		$(call print_service,Supabase Studio,http://localhost:$(SUPABASE_STUDIO_PORT))
+	$(call print_service,Supabase API,http://localhost:$(SUPABASE_LOCAL_PORT))
+	$(call print_service,Postgres,postgresql://postgres:postgres@127.0.0.1:$(SUPABASE_DB_PORT)/postgres)
+	$(call print_service,Emails (Mailpit),http://localhost:$(SUPABASE_MAIL_UI_PORT)))
 endef
 
 # Display common commands
@@ -130,12 +144,14 @@ endef
 define display_common_commands
 	$(call print_subsection,💡 Quick Commands)
 	$(if $(filter lan,$(1)),\
-		$(call print_command,qr,Show QR code again), \
-		$(call print_command,qr-tunnel,Show tunnel URLs and QR))
+		$(call print_command,qr,Show how to connect the app again), \
+		$(call print_command,qr-tunnel,Show tunnel URLs and Metro host))
 	$(call print_command,logs,View all logs (live))
+	$(if $(filter lan,$(1)),$(call print_command,logs-backend,View backend logs only))
 	$(if $(filter lan,$(1)),$(call print_command,logs-mobile,View Expo logs only))
+	$(if $(and $(filter lan,$(1)),$(filter local,$(SUPABASE_MODE))),$(call print_command,logs-supabase,View the dev Supabase stack logs))
 	$(call print_command,stop,Stop all services)
-	$(if $(filter lan,$(1)),$(call print_command,restart,Restart all services))
+	$(if $(filter lan,$(1)),$(call print_command,containers-restart,Restart the containers))
 	$(if $(filter tunnel,$(1)),$(call print_command,dev,Switch to LAN mode))
 endef
 
@@ -144,7 +160,7 @@ endef
 define display_tunnel_urls
 	$(call print_subsection,📡 Tunnel URLs)
 	$(call print_arrow,Backend tunnel URL:)
-	@docker exec $(BACKEND_CONTAINER) cat $(TUNNEL_URL_FILE) 2>/dev/null || echo "   $(YELLOW)Initializing...$(NC)"
+	@docker exec $(BACKEND_CONTAINER) cat $(SHARED_TUNNEL_FILE) 2>/dev/null || echo "   $(YELLOW)Initializing...$(NC)"
 	$(call blank_line)
 	$(call blank_line)
 	$(call print_subsection,🔍 ngrok Web Interface)

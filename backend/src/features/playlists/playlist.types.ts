@@ -46,10 +46,6 @@ export interface AddTrackDTO {
 	previewUrl?: string;
 }
 
-export interface ReorderTracksDTO {
-	trackIds: string[]; // Array of track IDs in new order
-}
-
 export interface AddCollaboratorDTO {
 	userId: string;
 }
@@ -97,12 +93,48 @@ export interface PlaylistResponse {
 }
 
 export interface PlaylistWithTracksResponse extends PlaylistResponse {
-	tracks: TrackWithPositionResponse[];
+	/** Ordered by rank. */
+	tracks: TrackInPlaylistResponse[];
 	owner: PlaylistOwner;
+	/** Incremented by every add, remove and move; sent back as expectedVersion. */
+	tracksVersion: number;
 }
 
-export interface TrackWithPositionResponse extends TrackResponse {
-	position: number;
+export interface TrackInPlaylistResponse extends TrackResponse {
+	/** Sort key: tracks are ordered by rank, compared byte by byte. */
+	rank: string;
 	addedBy: string | null;
 	addedAt: string;
 }
+
+export interface AddTrackResult {
+	track: TrackInPlaylistResponse;
+	tracksVersion: number;
+	rebalanced: boolean;
+}
+
+export interface RemoveTrackResult {
+	tracksVersion: number;
+}
+
+export interface MoveTrackResult {
+	trackId: string;
+	rank: string;
+	tracksVersion: number;
+	rebalanced: boolean;
+}
+
+interface PlaylistUpdateBase {
+	playlistId: string;
+	tracksVersion: number;
+	/** Every rank of the playlist changed: clients reload it. */
+	rebalanced: boolean;
+}
+
+/** Payload of the `playlist:updated` socket event: one delta per operation. */
+export type PlaylistUpdatedPayload = PlaylistUpdateBase &
+	(
+		| { event: 'track_added'; track: TrackInPlaylistResponse }
+		| { event: 'track_removed'; trackId: string }
+		| { event: 'track_moved'; trackId: string; rank: string }
+	);

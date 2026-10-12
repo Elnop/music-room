@@ -12,19 +12,13 @@ export const createPlaylistSchema = z.object({
 	description: z.string().max(500, 'Description must be at most 500 characters').optional(),
 	visibility: z
 		.enum(['public', 'private'], {
-			errorMap: () => ({
-				message: 'Visibility must be either public or private',
-			}),
+			error: 'Visibility must be either public or private',
 		})
-		.optional()
 		.default('public'),
 	editMode: z
 		.enum(['open', 'restricted'], {
-			errorMap: () => ({
-				message: 'Edit mode must be either open or restricted',
-			}),
+			error: 'Edit mode must be either open or restricted',
 		})
-		.optional()
 		.default('open'),
 });
 
@@ -54,31 +48,43 @@ export const addTrackSchema = z.object({
 		.string()
 		.optional()
 		.transform(val => (val === '' ? undefined : val))
-		.pipe(z.string().url().optional()),
+		.pipe(z.url().optional()),
 	durationMs: z.number().int().positive(),
 	// Accept empty string or valid URL, transform empty string to undefined
 	previewUrl: z
 		.string()
 		.optional()
 		.transform(val => (val === '' ? undefined : val))
-		.pipe(z.string().url().optional()),
+		.pipe(z.url().optional()),
 });
 
-export const reorderTracksSchema = z.object({
-	trackIds: z.array(z.string().uuid()).min(1, 'Track IDs array cannot be empty'),
+// A rank is a base-62 fraction that never ends with '0' (doc/PLAYLIST_CONCURRENCY.md).
+export const rankSchema = z
+	.string()
+	.max(128)
+	.regex(/^[0-9A-Za-z]*[1-9A-Za-z]$/, 'Invalid rank');
+
+export const moveTrackSchema = z.object({
+	afterRank: rankSchema.nullable(),
+	expectedVersion: z.number().int().nonnegative(),
+});
+
+// Path segment of /:id/tracks/:trackId routes: a non-uuid is a 400, not a failed RPC.
+export const trackIdParamSchema = z.object({
+	trackId: z.uuid('Invalid track ID format'),
 });
 
 export const addCollaboratorSchema = z.object({
-	userId: z.string().uuid('Invalid user ID format'),
+	userId: z.uuid('Invalid user ID format'),
 });
 
 export const addViewerSchema = z.object({
-	userId: z.string().uuid('Invalid user ID format'),
+	userId: z.uuid('Invalid user ID format'),
 });
 
 export type CreatePlaylistInput = z.infer<typeof createPlaylistSchema>;
 export type UpdatePlaylistInput = z.infer<typeof updatePlaylistSchema>;
 export type AddTrackInput = z.infer<typeof addTrackSchema>;
-export type ReorderTracksInput = z.infer<typeof reorderTracksSchema>;
+export type MoveTrackInput = z.infer<typeof moveTrackSchema>;
 export type AddCollaboratorInput = z.infer<typeof addCollaboratorSchema>;
 export type AddViewerInput = z.infer<typeof addViewerSchema>;

@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import { FriendsService } from '@/features/friends/services/friends.service.js';
 import type { AuthenticatedRequest } from '@/shared/types/global.types.js';
 import type { ApiResponse } from '@/shared/types/global.types.js';
+import { routeParam } from '@/shared/utils/route-params.js';
 
 const friendsService = new FriendsService();
 
@@ -9,7 +10,7 @@ export class FriendsController {
 	async getFollowStatus(req: Request, res: Response, next: NextFunction) {
 		try {
 			const authReq = req as AuthenticatedRequest;
-			const { userId } = req.params;
+			const userId = routeParam(req, 'userId');
 
 			const status = await friendsService.getFollowStatus(authReq.user.id, userId);
 
@@ -30,7 +31,7 @@ export class FriendsController {
 	async followUser(req: Request, res: Response, next: NextFunction) {
 		try {
 			const authReq = req as AuthenticatedRequest;
-			const { userId } = req.params;
+			const userId = routeParam(req, 'userId');
 
 			const result = await friendsService.followUser(authReq.user.id, userId);
 
@@ -51,7 +52,7 @@ export class FriendsController {
 	async unfollowUser(req: Request, res: Response, next: NextFunction) {
 		try {
 			const authReq = req as AuthenticatedRequest;
-			const { userId } = req.params;
+			const userId = routeParam(req, 'userId');
 
 			const result = await friendsService.unfollowUser(authReq.user.id, userId);
 

@@ -3,7 +3,7 @@
 # ==============================================================================
 # Commands for Docker-based development environment
 
-.PHONY: dev-docker start stop restart down logs logs-mobile ps build build-backend build-mobile
+.PHONY: dev-docker start stop containers-restart down logs logs-backend logs-mobile logs-supabase ps build build-backend build-mobile
 
 dev-docker: ## Start all services in Docker containers (backend + mobile)
 	$(call print_header,Starting Zumik Development Environment)
@@ -17,11 +17,11 @@ dev-docker: ## Start all services in Docker containers (backend + mobile)
 	$(call clear_and_header,🚀 Zumik Started)
 	$(call display_services,lan)
 	$(call blank_line)
-	$(call display_qr,lan)
+	$(call display_metro_connect,lan)
 	$(call blank_line)
 	$(call display_common_commands,lan)
 	$(call blank_line)
-	$(call print_success,Ready! Open Expo Go and scan the QR code)
+	$(call print_success,Ready! Open the Zumik debug build (make open-app on an emulator))
 	$(call blank_line)
 
 start: ## Start existing containers (without rebuild)
@@ -34,37 +34,45 @@ stop: ## Stop all running containers
 	$(call docker_stop)
 	$(call print_success,Services stopped)
 
-restart: ## Restart all services
+containers-restart: ## Restart the backend, mobile and redis containers, and the dev Supabase stack in local mode (no rebuild)
 	$(call print_arrow,Restarting all services...)
+	$(if $(filter local,$(SUPABASE_MODE)),@$(MAKE) --no-print-directory supabase-down)
+	$(SUPABASE_UP_IF_LOCAL)
 	$(call docker_restart)
 	$(call print_success,Services restarted)
 
-down: ## Stop and remove all containers, networks
+down: ## Stop and remove all containers, networks; stop the dev Supabase stack (its data is kept)
 	$(call print_arrow,Stopping and removing containers...)
 	$(call docker_down)
+	@if docker ps -q --filter label=$(SUPABASE_DEV_LABEL) | grep -q .; then \
+		$(MAKE) --no-print-directory supabase-down; \
+	fi
 	$(call print_success,Containers removed)
 
 logs: ## Show logs from all services (ctrl+c to exit)
 	$(call print_info,Showing logs (press Ctrl+C to exit)...)
 	$(call docker_logs_all)
 
+logs-backend: ## Show backend logs only
+	$(call print_info,Backend logs (press Ctrl+C to exit)...)
+	$(call docker_logs_service,backend)
+
+logs-supabase: ## Show the dev Supabase stack logs (Postgres, Auth, PostgREST, Kong, Mailpit, Studio)
+	$(call print_info,Supabase dev stack logs (press Ctrl+C to exit)...)
+	$(call docker_logs_prefixed,$(SUPABASE_DEV_LOG_SOURCES))
+
 logs-mobile: ## Show mobile logs only
 	$(call print_info,Mobile logs (press Ctrl+C to exit)...)
-	$(call docker_logs_service,$(MOBILE_CONTAINER))
+	$(call docker_logs_service,mobile)
 
-qr: ## Display Expo QR code and connection URL
-	$(call clear_and_header,📱 Expo QR Code)
-	$(call display_qr,lan)
+qr: ## Show how to connect the Zumik debug build to Metro (same WiFi)
+	$(call clear_and_header,📱 Connect the App to Metro)
+	$(call display_metro_connect,lan)
 	$(call blank_line)
-	$(call print_subsection,💡 Instructions)
-	@echo "   1. Install $(GREEN)Expo Go$(NC) app (Play Store / App Store)"
-	@echo "   2. Open Expo Go and tap $(GREEN)Scan QR Code$(NC)"
-	@echo "   3. Point your camera at the QR code above"
-	$(call blank_line)
-	$(call print_warning,Note: Phone and computer must be on the same WiFi)
+	$(call print_warning,Note: a phone over WiFi must be on the same network as this computer)
 	@echo "   Your local IP: $(GREEN)$(HOST_IP)$(NC)"
 	$(call blank_line)
-	@echo "$(YELLOW)💡 Commands:$(NC) $(GREEN)make logs$(NC) | $(GREEN)make stop$(NC) | $(GREEN)make restart$(NC) | $(GREEN)make help$(NC)"
+	@echo "$(YELLOW)💡 Commands:$(NC) $(GREEN)make logs$(NC) | $(GREEN)make stop$(NC) | $(GREEN)make containers-restart$(NC) | $(GREEN)make help$(NC)"
 	$(call blank_line)
 
 ps: ## Show status of all containers

@@ -39,8 +39,8 @@ export function SwipeableUserItem({ user, role, onRemove }: SwipeableUserItemPro
 			<View style={styles.userContainer}>
 				<Avatar
 					uri={user.avatar_url || undefined}
-					size={44}
-					username={user.username}
+					size="md"
+					name={user.username}
 					style={styles.avatar}
 				/>
 

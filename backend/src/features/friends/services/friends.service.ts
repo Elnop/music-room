@@ -3,6 +3,7 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import { deleteRecords } from '@/shared/utils/database.helpers.js';
 import type { FollowStatus, FollowActionResponse } from '@/features/friends/friends.types.js';
+import { revalidateListeningAccess } from '@/features/friends/utils/listening-access.js';
 
 export class FriendsService {
 	/**
@@ -150,6 +151,13 @@ export class FriendsService {
 				'Failed to unfollow user',
 				'UNFOLLOW_ERROR'
 			);
+
+			// Control requires mutual friends: neither side may keep receiving
+			// the other's listening status.
+			await Promise.all([
+				revalidateListeningAccess(currentUserId, targetUserId),
+				revalidateListeningAccess(targetUserId, currentUserId),
+			]);
 
 			const status = await this.getFollowStatus(currentUserId, targetUserId);
 

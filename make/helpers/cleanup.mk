@@ -23,6 +23,15 @@ define remove_native_builds
 	@rm -rf $(MOBILE_EXPO) 2>/dev/null || true
 endef
 
+# Delete the dev Supabase stack and its data (containers, volumes, network),
+# found by label so it works in both modes and without node_modules. Shell
+# commands with no leading @, to use inside a recipe line.
+# Usage: $(SUPABASE_DEV_REMOVE)
+SUPABASE_DEV_REMOVE = \
+	docker rm -f $$(docker ps -aq --filter label=$(SUPABASE_DEV_LABEL)) >/dev/null 2>&1 || true; \
+	docker volume rm $$(docker volume ls -q --filter label=$(SUPABASE_DEV_LABEL)) >/dev/null 2>&1 || true; \
+	docker network rm $$(docker network ls -q --filter label=$(SUPABASE_DEV_LABEL)) >/dev/null 2>&1 || true
+
 # Remove all dependencies and builds
 # Usage: $(call remove_all_deps)
 define remove_all_deps
@@ -119,7 +128,6 @@ endef
 define remove_build_logs
 	@echo "$(CYAN)Removing build logs...$(RESET)"
 	@rm -f /tmp/ngrok.log 2>/dev/null || true
-	@rm -f /tmp/backend-tunnel-url.txt 2>/dev/null || true
 	@rm -rf /tmp/shared 2>/dev/null || true
 	@rm -rf backend/logs 2>/dev/null || true
 	@echo "$(GREEN)✓ Build logs removed$(RESET)"

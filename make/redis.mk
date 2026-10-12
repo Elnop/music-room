@@ -101,35 +101,3 @@ redis-clean:
 		echo "$(YELLOW)⚠$(RESET) Redis volume does not exist"; \
 	fi
 	@echo "$(GREEN)✓$(RESET) Redis cleanup complete"
-
-# ==============================================================================
-# Help
-# ==============================================================================
-
-# Redis help (list commands)
-.PHONY: redis-help
-redis-help:
-	@echo "$(BOLD)$(GREEN)Redis Management Commands:$(RESET)"
-	@echo ""
-	@echo "$(BOLD)Core:$(RESET)"
-	@echo "  $(CYAN)make redis-start$(RESET)    - Start Redis container"
-	@echo "  $(CYAN)make redis-stop$(RESET)     - Stop Redis container"
-	@echo "  $(CYAN)make redis-restart$(RESET)  - Restart Redis container"
-	@echo ""
-	@echo "$(BOLD)Monitoring:$(RESET)"
-	@echo "  $(CYAN)make redis-logs$(RESET)     - View Redis logs (live)"
-	@echo "  $(CYAN)make redis-health$(RESET)   - Check Redis health status"
-	@echo "  $(CYAN)make redis-status$(RESET)   - Quick status check"
-	@echo ""
-	@echo "$(BOLD)Management:$(RESET)"
-	@echo "  $(CYAN)make redis-shell$(RESET)    - Open Redis CLI shell"
-	@echo "  $(CYAN)make redis-info$(RESET)     - Display Redis server info"
-	@echo "  $(CYAN)make redis-flush$(RESET)    - Flush all Redis data (with confirmation)"
-	@echo ""
-	@echo "$(BOLD)Cleanup:$(RESET)"
-	@echo "  $(CYAN)make redis-clean$(RESET)    - Remove Redis container and volume"
-	@echo ""
-	@echo "$(BOLD)Example Usage:$(RESET)"
-	@echo "  $(YELLOW)make redis-start && make backend-local$(RESET)  # Redis + backend locally"
-	@echo "  $(YELLOW)make redis-shell$(RESET)                        # Access Redis CLI"
-	@echo "  $(YELLOW)make redis-info | grep -A 10 \"# Memory\"$(RESET)    # Check memory usage"

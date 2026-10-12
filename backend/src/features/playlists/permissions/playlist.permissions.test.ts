@@ -1,0 +1,144 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { PlaylistRow } from '@/features/playlists/playlist.types.js';
+
+const { single } = vi.hoisted(() => ({ single: vi.fn() }));
+
+vi.mock('@/shared/config/supabase.js', () => {
+	const query = { select: () => query, eq: () => query, single };
+	return { supabaseAdmin: { from: () => query } };
+});
+
+const { canViewPlaylist, canEditPlaylist, checkEditPermission, checkOwnership } =
+	await import('@/features/playlists/permissions/playlist.permissions.js');
+
+const OWNER = 'owner-id';
+const COLLABORATOR = 'collaborator-id';
+const VIEWER = 'viewer-id';
+const STRANGER = 'stranger-id';
+
+function playlist(visibility: 'public' | 'private', editMode: 'open' | 'restricted'): PlaylistRow {
+	return {
+		id: 'playlist-id',
+		name: 'Playlist',
+		description: null,
+		cover_url: null,
+		owner_id: OWNER,
+		visibility,
+		edit_mode: editMode,
+		collaborator_ids: [COLLABORATOR],
+		viewer_ids: [VIEWER],
+		created_at: null,
+		updated_at: null,
+		tracks_version: 0,
+		ranks_rebalanced_at_version: 0,
+	};
+}
+
+// Permission matrix documented in playlist.permissions.ts
+describe('canViewPlaylist', () => {
+	it.each([
+		['public', 'open', [OWNER, COLLABORATOR, VIEWER, STRANGER], []],
+		['public', 'restricted', [OWNER, COLLABORATOR, VIEWER, STRANGER], []],
+		['private', 'open', [OWNER, COLLABORATOR, VIEWER], [STRANGER]],
+		['private', 'restricted', [OWNER, COLLABORATOR, VIEWER], [STRANGER]],
+	] as const)('%s/%s', (visibility, editMode, allowed, denied) => {
+		const p = playlist(visibility, editMode);
+		for (const user of allowed) expect(canViewPlaylist(p, user), user).toBe(true);
+		for (const user of denied) expect(canViewPlaylist(p, user), user).toBe(false);
+	});
+
+	it('treats null member lists as empty', () => {
+		const p = { ...playlist('private', 'open'), collaborator_ids: null, viewer_ids: null };
+		expect(canViewPlaylist(p, OWNER)).toBe(true);
+		expect(canViewPlaylist(p, VIEWER)).toBe(false);
+	});
+});
+
+describe('canEditPlaylist', () => {
+	it.each([
+		['public', 'open', [OWNER, COLLABORATOR, VIEWER, STRANGER], []],
+		['public', 'restricted', [OWNER, COLLABORATOR], [VIEWER, STRANGER]],
+		['private', 'open', [OWNER, COLLABORATOR, VIEWER], [STRANGER]],
+		['private', 'restricted', [OWNER, COLLABORATOR], [VIEWER, STRANGER]],
+	] as const)('%s/%s', (visibility, editMode, allowed, denied) => {
+		const p = playlist(visibility, editMode);
+		for (const user of allowed) expect(canEditPlaylist(p, user), user).toBe(true);
+		for (const user of denied) expect(canEditPlaylist(p, user), user).toBe(false);
+	});
+
+	it.each(['public', 'private'] as const)(
+		'a viewer cannot edit a restricted playlist (%s)',
+		visibility => {
+			const p = playlist(visibility, 'restricted');
+			expect(canViewPlaylist(p, VIEWER)).toBe(true);
+			expect(canEditPlaylist(p, VIEWER)).toBe(false);
+		}
+	);
+});
+
+describe('checkEditPermission', () => {
+	beforeEach(() => {
+		single.mockReset();
+	});
+
+	it('returns the edit mode when the user can edit', async () => {
+		single.mockResolvedValue({ data: playlist('public', 'restricted'), error: null });
+		await expect(checkEditPermission('playlist-id', COLLABORATOR)).resolves.toEqual({
+			edit_mode: 'restricted',
+		});
+	});
+
+	it('rejects when the user cannot edit', async () => {
+		single.mockResolvedValue({ data: playlist('public', 'restricted'), error: null });
+		await expect(checkEditPermission('playlist-id', STRANGER)).rejects.toMatchObject({
+			statusCode: 403,
+			code: 'PLAYLIST_ACCESS_DENIED',
+		});
+	});
+
+	it.each(['public', 'private'] as const)(
+		'a viewer cannot edit a restricted playlist (%s): 403',
+		async visibility => {
+			single.mockResolvedValue({ data: playlist(visibility, 'restricted'), error: null });
+			await expect(checkEditPermission('playlist-id', VIEWER)).rejects.toMatchObject({
+				statusCode: 403,
+				code: 'PLAYLIST_ACCESS_DENIED',
+			});
+		}
+	);
+
+	it('rejects when the playlist does not exist', async () => {
+		single.mockResolvedValue({ data: null, error: { message: 'not found' } });
+		await expect(checkEditPermission('playlist-id', OWNER)).rejects.toMatchObject({
+			statusCode: 404,
+			code: 'PLAYLIST_NOT_FOUND',
+		});
+	});
+});
+
+describe('checkOwnership', () => {
+	beforeEach(() => {
+		single.mockReset();
+	});
+
+	it('resolves for the owner', async () => {
+		single.mockResolvedValue({ data: { owner_id: OWNER }, error: null });
+		await expect(checkOwnership('playlist-id', OWNER)).resolves.toBeUndefined();
+	});
+
+	it.each([COLLABORATOR, VIEWER, STRANGER])('rejects %s with 403', async user => {
+		single.mockResolvedValue({ data: { owner_id: OWNER }, error: null });
+		await expect(checkOwnership('playlist-id', user)).rejects.toMatchObject({
+			statusCode: 403,
+			code: 'PLAYLIST_ACCESS_DENIED',
+		});
+	});
+
+	it('rejects when the playlist does not exist with 404', async () => {
+		single.mockResolvedValue({ data: null, error: { message: 'not found' } });
+		await expect(checkOwnership('playlist-id', OWNER)).rejects.toMatchObject({
+			statusCode: 404,
+			code: 'PLAYLIST_NOT_FOUND',
+		});
+	});
+});

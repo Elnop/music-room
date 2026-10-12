@@ -28,6 +28,8 @@ type ProfileStackParamList = {
 	EditProfile: undefined;
 	Settings: undefined;
 	PrivacySettings: undefined;
+	LinkedAccounts: undefined;
+	MyDevices: undefined;
 	MusicPreferences: undefined;
 };
 
@@ -95,6 +97,14 @@ export function ProfileScreen() {
 
 	const handlePrivacySettings = () => {
 		navigation.navigate('PrivacySettings');
+	};
+
+	const handleLinkedAccounts = () => {
+		navigation.navigate('LinkedAccounts');
+	};
+
+	const handleMyDevices = () => {
+		navigation.navigate('MyDevices');
 	};
 
 	const handleMusicPreferences = () => {
@@ -228,6 +238,36 @@ export function ProfileScreen() {
 						<View style={styles.privacyTextContainer}>
 							<Text style={styles.privacyTitle}>Privacy</Text>
 							<Text style={styles.privacySubtitle}>Manage who can see your information</Text>
+						</View>
+						<Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
+					</TouchableOpacity>
+				</View>
+
+				{/* Linked Accounts Button */}
+				<View style={styles.privacyButtonContainer}>
+					<TouchableOpacity style={styles.privacyButton} onPress={handleLinkedAccounts}>
+						<View style={styles.privacyIconContainer}>
+							<Ionicons name="link" size={20} color={theme.colors.primary} />
+						</View>
+						<View style={styles.privacyTextContainer}>
+							<Text style={styles.privacyTitle}>Linked accounts</Text>
+							<Text style={styles.privacySubtitle}>Add or remove Google and Facebook sign-in</Text>
+						</View>
+						<Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
+					</TouchableOpacity>
+				</View>
+
+				{/* My Devices Button */}
+				<View style={styles.privacyButtonContainer}>
+					<TouchableOpacity style={styles.privacyButton} onPress={handleMyDevices}>
+						<View style={styles.privacyIconContainer}>
+							<Ionicons name="phone-portrait-outline" size={20} color={theme.colors.primary} />
+						</View>
+						<View style={styles.privacyTextContainer}>
+							<Text style={styles.privacyTitle}>Mes appareils</Text>
+							<Text style={styles.privacySubtitle}>
+								Choisissez quels amis contrôlent chaque appareil
+							</Text>
 						</View>
 						<Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
 					</TouchableOpacity>

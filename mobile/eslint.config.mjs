@@ -102,6 +102,12 @@ export default [
       'react/react-in-jsx-scope': 'off', // Not needed with React 17+
       'react/prop-types': 'off', // Using TypeScript for prop validation
       ...reactHooksPlugin.configs.recommended.rules,
+      // React Compiler rules from eslint-plugin-react-hooks 7.1, kept visible
+      // as warnings: `immutability` flags Reanimated shared values
+      // (`sv.value = x`) by design, and the `set-state-in-effect` cases are
+      // realtime hooks to refactor with device testing, not blindly.
+      'react-hooks/immutability': 'warn',
+      'react-hooks/set-state-in-effect': 'warn',
 
       // Console rules - allow console.log in development (__DEV__ wrapped)
       'no-console': ['warn', { allow: ['log', 'warn', 'error'] }],

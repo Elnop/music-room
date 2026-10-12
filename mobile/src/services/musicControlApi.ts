@@ -1,5 +1,12 @@
-import { API_CONFIG } from '@constants';
-import type { ApiResponse } from '@/types/api.types';
+import { useAuthStore } from '@/store/authStore';
+import { apiRequest } from '@services/api';
+import type {
+	ControllableDevicesResponse,
+	GrantDeviceLicenseResponse,
+	MyDevicesResponse,
+	RevokeDeviceLicenseResponse,
+	UserDeviceWithLicenses,
+} from '@/types/device.types';
 
 export interface MusicControlPermissionsResponse {
 	allowedUserIds: string[];
@@ -16,12 +23,17 @@ export interface ControlActionResponse {
 }
 
 const getAuthToken = async (): Promise<string> => {
-	// Import authStore dynamically to avoid circular dependencies
-	const { useAuthStore } = await import('../store/authStore');
 	const token = useAuthStore.getState().accessToken;
 	if (!token) throw new Error('No authentication token available');
 	return token;
 };
+
+const authHeaders = async (): Promise<Record<string, string>> => ({
+	Authorization: `Bearer ${await getAuthToken()}`,
+});
+
+const licensePath = (deviceId: string, userId: string): string =>
+	`/api/music-control/devices/${encodeURIComponent(deviceId)}/licenses/${encodeURIComponent(userId)}`;
 
 /**
  * Music Control API
@@ -32,79 +44,89 @@ export const musicControlApi = {
 	 * Get list of users that I have granted control to
 	 */
 	async getMyPermissions(): Promise<string[]> {
-		const token = await getAuthToken();
-		const response = await fetch(`${API_CONFIG.BASE_URL}/api/music-control/permissions`, {
-			headers: {
-				Authorization: `Bearer ${token}`,
-				'Content-Type': 'application/json',
-			},
-		});
-
-		if (!response.ok) {
-			const error = await response.json();
-			throw new Error(error.error?.message || 'Failed to get permissions');
-		}
-
-		const data: ApiResponse<MusicControlPermissionsResponse> = await response.json();
-		return data.data!.allowedUserIds;
+		const data = await apiRequest<MusicControlPermissionsResponse>(
+			'/api/music-control/permissions',
+			{ headers: await authHeaders() }
+		);
+		return data.allowedUserIds;
 	},
 
 	/**
 	 * Grant control permission to a friend
 	 */
 	async grantControl(userId: string): Promise<void> {
-		const token = await getAuthToken();
-		const response = await fetch(`${API_CONFIG.BASE_URL}/api/music-control/permissions/${userId}`, {
+		await apiRequest<ControlActionResponse>(`/api/music-control/permissions/${userId}`, {
 			method: 'POST',
-			headers: {
-				Authorization: `Bearer ${token}`,
-				'Content-Type': 'application/json',
-			},
+			headers: await authHeaders(),
 		});
-
-		if (!response.ok) {
-			const error = await response.json();
-			throw new Error(error.error?.message || 'Failed to grant control');
-		}
 	},
 
 	/**
 	 * Revoke control permission from a user
 	 */
 	async revokeControl(userId: string): Promise<void> {
-		const token = await getAuthToken();
-		const response = await fetch(`${API_CONFIG.BASE_URL}/api/music-control/permissions/${userId}`, {
+		await apiRequest<ControlActionResponse>(`/api/music-control/permissions/${userId}`, {
 			method: 'DELETE',
-			headers: {
-				Authorization: `Bearer ${token}`,
-				'Content-Type': 'application/json',
-			},
+			headers: await authHeaders(),
 		});
-
-		if (!response.ok) {
-			const error = await response.json();
-			throw new Error(error.error?.message || 'Failed to revoke control');
-		}
 	},
 
 	/**
 	 * Check if a user has granted me control
 	 */
 	async canControl(userId: string): Promise<boolean> {
-		const token = await getAuthToken();
-		const response = await fetch(`${API_CONFIG.BASE_URL}/api/music-control/can-control/${userId}`, {
-			headers: {
-				Authorization: `Bearer ${token}`,
-				'Content-Type': 'application/json',
-			},
-		});
-
-		if (!response.ok) {
+		try {
+			const data = await apiRequest<CanControlResponse>(
+				`/api/music-control/can-control/${userId}`,
+				{ headers: await authHeaders() }
+			);
+			return data.canControl;
+		} catch {
 			// If error, assume no control
 			return false;
 		}
+	},
 
-		const data: ApiResponse<CanControlResponse> = await response.json();
-		return data.data!.canControl;
+	/**
+	 * List my devices with the friends licensed on each
+	 */
+	async getMyDevices(): Promise<UserDeviceWithLicenses[]> {
+		const data = await apiRequest<MyDevicesResponse>('/api/music-control/devices', {
+			headers: await authHeaders(),
+		});
+		return data.devices;
+	},
+
+	/**
+	 * List the devices of a user that I may control (all-devices switch or per-device license)
+	 */
+	async getControllableDevices(userId: string): Promise<ControllableDevicesResponse> {
+		return apiRequest<ControllableDevicesResponse>(
+			`/api/music-control/users/${encodeURIComponent(userId)}/devices`,
+			{ headers: await authHeaders() }
+		);
+	},
+
+	/**
+	 * Grant a friend control of one of my devices
+	 */
+	async grantDeviceLicense(deviceId: string, userId: string): Promise<GrantDeviceLicenseResponse> {
+		return apiRequest<GrantDeviceLicenseResponse>(licensePath(deviceId, userId), {
+			method: 'POST',
+			headers: await authHeaders(),
+		});
+	},
+
+	/**
+	 * Revoke a friend's control of one of my devices
+	 */
+	async revokeDeviceLicense(
+		deviceId: string,
+		userId: string
+	): Promise<RevokeDeviceLicenseResponse> {
+		return apiRequest<RevokeDeviceLicenseResponse>(licensePath(deviceId, userId), {
+			method: 'DELETE',
+			headers: await authHeaders(),
+		});
 	},
 };

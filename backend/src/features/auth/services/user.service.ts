@@ -1,48 +1,12 @@
-import { supabase } from '@/shared/config/supabase.js';
+import { supabase, createSignInClient } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { UserProfile, UserProfileRow } from '@/features/auth/auth.types.js';
 import type { Session } from '@supabase/supabase-js';
+import { providerIdField } from '@/features/auth/utils/auth.helpers.js';
+import { generateUniqueUsername } from '@/features/auth/services/username.service.js';
 
 export class UserService {
-	/**
-	 * Generate unique username from base name
-	 * @param baseName - Base name to generate username from (e.g., "John Doe")
-	 * @returns Unique username (e.g., "johndoe" or "johndoe1")
-	 */
-	private static async generateUniqueUsername(baseName: string): Promise<string> {
-		let username = baseName.toLowerCase().replace(/[^a-z0-9]/g, '');
-
-		if (username.length < 3) {
-			username = `user${Date.now()}`;
-		}
-
-		const { data: existing } = await supabase
-			.from('user_profiles')
-			.select('username')
-			.eq('username', username)
-			.single();
-
-		if (!existing) {
-			return username;
-		}
-
-		for (let i = 1; i <= 999; i++) {
-			const candidate = `${username}${i}`;
-			const { data } = await supabase
-				.from('user_profiles')
-				.select('username')
-				.eq('username', candidate)
-				.single();
-
-			if (!data) {
-				return candidate;
-			}
-		}
-
-		return `${username}${Date.now()}`;
-	}
-
 	/**
 	 * Create session for OAuth user using Admin Magic Link API
 	 * This method does NOT modify user passwords - safe for all user types
@@ -78,7 +42,7 @@ export class UserService {
 				throw new AppError(500, 'Invalid magic link response', 'INVALID_MAGIC_LINK_RESPONSE');
 			}
 
-			const { data: verifyData, error: verifyError } = await supabase.auth.verifyOtp({
+			const { data: verifyData, error: verifyError } = await createSignInClient().auth.verifyOtp({
 				token_hash: hashed_token,
 				type: 'email',
 			});
@@ -149,12 +113,27 @@ export class UserService {
 						.eq('id', existingOAuth.id);
 				}
 
-				const session = await this.createSessionForOAuthUser(effectiveEmail);
+				// The provider may have been linked with another email: open the
+				// session for the account's own auth email, not the network's.
+				const { data: authUser, error: authUserError } = await supabase.auth.admin.getUserById(
+					existingOAuth.id
+				);
+				const accountEmail = authUser?.user?.email;
+
+				if (authUserError || !accountEmail) {
+					logger.error('Failed to get auth user for OAuth login', {
+						userId: existingOAuth.id,
+						error: authUserError,
+					});
+					throw new AppError(500, 'Failed to load OAuth user', 'OAUTH_USER_LOOKUP_FAILED');
+				}
+
+				const session = await this.createSessionForOAuthUser(accountEmail);
 
 				return {
 					userProfile: {
 						id: existingOAuth.id,
-						email: effectiveEmail,
+						email: accountEmail,
 						username: existingOAuth.username,
 						displayName: existingOAuth.display_name ?? undefined,
 						avatarUrl: existingOAuth.avatar_url ?? undefined,
@@ -233,7 +212,7 @@ export class UserService {
 					const { error: updateError } = await supabase
 						.from('user_profiles')
 						.update({
-							[providerColumn]: providerId,
+							...providerIdField(provider, providerId),
 							avatar_url: avatarUrl || existingProfile.avatar_url || null,
 							email_verified: true,
 							updated_at: new Date().toISOString(),
@@ -264,7 +243,7 @@ export class UserService {
 				}
 			}
 
-			const username = await this.generateUniqueUsername(
+			const username = await generateUniqueUsername(
 				profile.name || effectiveEmail.split('@')[0]
 			);
 
@@ -300,8 +279,10 @@ export class UserService {
 						username,
 						display_name: profile.name || username,
 						avatar_url: avatarUrlValue,
-						[providerColumn]: providerId,
+						...providerIdField(provider, providerId),
 						email_verified: true,
+						// Signed up with Google or Facebook: no password until one is set (#189).
+						has_password: false,
 					})
 					.select()
 					.single();

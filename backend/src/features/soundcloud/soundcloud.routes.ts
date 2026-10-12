@@ -1,11 +1,15 @@
 import { Router } from 'express';
+import { authMiddleware } from '@/features/auth/auth.middleware.js';
+import { soundcloudRateLimiter } from '@/features/auth/middleware/rate-limit.middleware.js';
 import { SoundCloudController } from '@/features/soundcloud/soundcloud.controller.js';
 
 const router = Router();
 const controller = new SoundCloudController();
 
-// Public routes (no authentication required)
-// Note: soundcloud.ts handles client_id extraction automatically
+// Every route: signed-in users only, rate limited per user (Redis, fail closed).
+// The limiter keys on req.user, so it runs after authMiddleware.
+// Note: soundcloud.service.ts handles client_id extraction automatically
+router.use(authMiddleware, soundcloudRateLimiter);
 
 /**
  * Search SoundCloud tracks

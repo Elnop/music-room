@@ -11,6 +11,7 @@
 # Start Backend (Docker mode)
 .PHONY: backend-docker
 backend-docker:
+	$(SUPABASE_UP_IF_LOCAL)
 	@$(call display_step,"Starting backend container...")
 	@$(call start_backend)
 	@echo ""
@@ -18,6 +19,7 @@ backend-docker:
 	@echo "$(CYAN)API:$(RESET)          http://localhost:$(BACKEND_PORT)"
 	@echo "$(CYAN)Health:$(RESET)       http://localhost:$(BACKEND_PORT)/health"
 	@echo "$(CYAN)API Docs:$(RESET)     http://localhost:$(BACKEND_PORT)/api-docs"
+	$(if $(filter local,$(SUPABASE_MODE)),@echo "$(CYAN)Emails:$(RESET)       http://localhost:$(SUPABASE_MAIL_UI_PORT) (Mailpit)")
 	@echo ""
 	@echo "$(YELLOW)$(ICON_INFO) Redis is separate - start with: make redis-start$(RESET)"
 	@echo "$(YELLOW)$(ICON_INFO) View logs with: make backend-logs$(RESET)"
@@ -29,7 +31,8 @@ backend-local: .ensure-backend-deps
 	@echo "$(YELLOW)$(ICON_INFO) Starting backend on http://localhost:$(BACKEND_PORT)$(RESET)"
 	@echo "$(YELLOW)$(ICON_INFO) Press Ctrl+C to stop$(RESET)"
 	@echo ""
-	@cd $(BACKEND_DIR) && npm run dev
+	$(SUPABASE_UP_IF_LOCAL)
+	@cd $(BACKEND_DIR) && $(LOCAL_SUPABASE_ENV) npm run dev
 
 # Stop Backend
 .PHONY: backend-stop
@@ -66,7 +69,7 @@ backend-restart:
 .PHONY: backend-logs
 backend-logs:
 	@$(call display_step,"Backend logs (Ctrl+C to exit)...")
-	@docker logs -f $(BACKEND_CONTAINER)
+	$(call docker_logs_service,backend)
 
 # Check Backend health
 .PHONY: backend-health
@@ -96,28 +99,3 @@ backend-status:
 	else \
 		echo "$(RED)$(ICON_ERROR) Not found$(RESET)"; \
 	fi
-
-# ==============================================================================
-# Help
-# ==============================================================================
-
-# Backend help (list commands)
-.PHONY: backend-help
-backend-help:
-	@echo "$(BOLD)$(GREEN)Backend Management Commands:$(RESET)"
-	@echo ""
-	@echo "$(BOLD)Core:$(RESET)"
-	@echo "  $(CYAN)make backend-docker$(RESET)   - Start backend in Docker"
-	@echo "  $(CYAN)make backend-local$(RESET)    - Start backend locally (npm run dev)"
-	@echo "  $(CYAN)make backend-stop$(RESET)     - Stop backend container"
-	@echo "  $(CYAN)make backend-restart$(RESET)  - Restart backend container"
-	@echo ""
-	@echo "$(BOLD)Monitoring:$(RESET)"
-	@echo "  $(CYAN)make backend-logs$(RESET)     - View backend logs (live)"
-	@echo "  $(CYAN)make backend-health$(RESET)   - Check backend health status"
-	@echo "  $(CYAN)make backend-status$(RESET)   - Quick status check"
-	@echo ""
-	@echo "$(BOLD)Example Usage:$(RESET)"
-	@echo "  $(YELLOW)make redis-start && make backend-docker$(RESET)  # Redis + backend in Docker"
-	@echo "  $(YELLOW)make backend-local$(RESET)                       # Local development (no Redis)"
-	@echo "  $(YELLOW)make backend-logs$(RESET)                        # View logs"

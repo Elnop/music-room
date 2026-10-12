@@ -1,0 +1,50 @@
+# epic-montee-en-charge
+# Ordre des tables = ordre de build. `area` = label GitHub area: <valeur>.
+
+[[entry]]
+id = 1
+type = "story"
+title = "Choisir et documenter la machine de référence"
+description = "Choisit avec l'équipe la machine de mesure et consigne dans doc/PERFORMANCE.md CPU, RAM, OS, cloud ou local, configuration Docker, et le plan et la région Supabase dont les limites peuvent plafonner la mesure."
+verify = "doc/PERFORMANCE.md contient la fiche de la machine et de Supabase."
+covers = ["CAP-2"]
+after = []
+hitl = true
+risk = "low"
+area = "devops"
+
+[[entry]]
+id = 2
+type = "story"
+title = "Fixtures et scénarios de charge HTTP"
+description = "Crée les utilisateurs de test directement dans Supabase (amis, playlists, licences), des tokens générés à l'avance, et une configuration de rate limit pour la mesure (désactivée ou IP en liste blanche, notée comme condition) ; ajoute make/perf.mk avec `make perf-test` et tests/performance/, d'abord un scénario login puis lecture de playlist, puis édition de tracks, avec un résumé requêtes par seconde et latences."
+verify = "`make perf-test` exécute les scénarios HTTP et écrit le résumé dans tests/performance/results/."
+covers = ["CAP-2"]
+after = [1, "3.1", "5.4"]
+hitl = false
+risk = "medium"
+area = "devops"
+
+[[entry]]
+id = 3
+type = "story"
+title = "Scénario de charge temps réel"
+description = "Étend `make perf-test` et tests/performance/ avec N clients socket authentifiés réutilisant les fixtures de 2, qui éditent une playlist et envoient des commandes de contrôle, avec un outil justifié si aucun de la liste ne gère Socket.io."
+verify = "`make perf-test` lance aussi le scénario socket et rapporte connexions réussies et latence des events."
+covers = ["CAP-2"]
+after = [2, "2.1", "4.5", "5.5"]
+hitl = false
+risk = "medium"
+area = "devops"
+
+[[entry]]
+id = 4
+type = "story"
+title = "Campagne de mesures et rapport de capacité"
+description = "À partir des résumés de 2 et 3, lance les scénarios à charge croissante sur la machine de référence et documente méthode, résultats, goulots et nombre max d'utilisateurs simultanés pour l'API, la délégation et l'éditeur ; précise que Track Vote n'est pas implémenté donc pas mesuré."
+verify = "doc/PERFORMANCE.md donne le max d'utilisateurs simultanés par service, cohérent avec la machine, chiffres à l'appui."
+covers = ["CAP-2"]
+after = [3]
+hitl = true
+risk = "medium"
+area = "devops"

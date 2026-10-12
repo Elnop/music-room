@@ -5,6 +5,21 @@ echo "=========================================="
 echo "Starting Backend with ngrok Tunnel"
 echo "=========================================="
 
+# In Docker /tmp/shared is the tunnel-info volume; outside Docker
+# (npm run dev:tunnel) it is a plain directory shared with
+# mobile/scripts/start-expo-tunnel.sh on the same machine.
+mkdir -p /tmp/shared
+
+# The shared volume outlives the container: drop the previous run's URL so the
+# mobile container never picks it up while ngrok starts (#225).
+rm -f /tmp/shared/backend-tunnel-url.txt
+
+# Docker passes backend/.env as the environment; outside Docker read the token
+# from it (the script runs from backend/).
+if [ -z "$NGROK_AUTHTOKEN" ] && [ -f .env ]; then
+  NGROK_AUTHTOKEN=$(sed -n 's/^NGROK_AUTHTOKEN=//p' .env | tail -1 | tr -d "\"'")
+fi
+
 # Check if NGROK_AUTHTOKEN is set
 if [ -z "$NGROK_AUTHTOKEN" ]; then
   echo "❌ Error: NGROK_AUTHTOKEN not set"
@@ -52,8 +67,7 @@ echo "📍 Local URL:  http://localhost:3000"
 echo "🔍 ngrok Web Interface: http://localhost:4040"
 echo "=========================================="
 
-# Save tunnel URL to shared volume for mobile to read
-# Directory is created by Dockerfile with correct permissions
+# Save tunnel URL to the shared directory for mobile to read
 echo "$TUNNEL_URL" > /tmp/shared/backend-tunnel-url.txt
 chmod 644 /tmp/shared/backend-tunnel-url.txt
 echo "✓ Tunnel URL saved: /tmp/shared/backend-tunnel-url.txt"

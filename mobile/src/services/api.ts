@@ -2,11 +2,10 @@ import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import type { LoginInput, RegisterInput } from '@utils/validators';
-import type { UserProfile } from '@types';
-
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
-
-if (__DEV__) console.log('[API] Using API URL:', API_URL);
+import type { UserProfile } from '@/types/user.types';
+import type { LinkedProvidersResponse, OAuthProvider } from '@/types/auth.types';
+import { getAppVersion } from '@/services/deviceService';
+import { getBackendUrl } from '@/services/backendUrl';
 
 /**
  * Standard API Response format (matches backend)
@@ -45,12 +44,15 @@ export interface AuthResponse {
 export class ApiError extends Error {
 	code: string;
 	details?: unknown;
+	/** HTTP status when the server answered with an error status */
+	status?: number;
 
-	constructor(message: string, code: string, details?: unknown) {
+	constructor(message: string, code: string, details?: unknown, status?: number) {
 		super(message);
 		this.name = 'ApiError';
 		this.code = code;
 		this.details = details;
+		this.status = status;
 	}
 }
 
@@ -58,11 +60,7 @@ export class ApiError extends Error {
  * Get client metadata headers for action logging
  */
 function getClientHeaders(): Record<string, string> {
-	const appVersion =
-		Constants.expoConfig?.version ||
-		Constants.manifest?.version ||
-		Constants.manifest2?.extra?.expoClient?.version ||
-		'1.0.0';
+	const appVersion = getAppVersion();
 
 	const headers = {
 		'X-Platform': Platform.OS,
@@ -87,10 +85,28 @@ function getClientHeaders(): Record<string, string> {
 }
 
 /**
- * Make API request with automatic token refresh on 401
+ * Session hooks the auth store registers at load time. A static import of the
+ * store here would be circular, and a dynamic `import()` makes Metro load a
+ * separate bundle whose HMR registration reloads the app in development.
  */
-async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-	const url = `${API_URL}${endpoint}`;
+export interface AuthSession {
+	getAccessToken: () => string | null;
+	isTokenExpiringSoon: () => boolean;
+	refreshAccessToken: () => Promise<boolean>;
+}
+
+let authSession: AuthSession | null = null;
+
+export function registerAuthSession(session: AuthSession): void {
+	authSession = session;
+}
+
+/**
+ * Make API request with automatic token refresh on 401.
+ * The backend address is read at call time (services/backendUrl.ts).
+ */
+export async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+	const url = `${getBackendUrl()}${endpoint}`;
 
 	const makeRequest = async (authToken?: string): Promise<Response> => {
 		const headers: Record<string, string> = {
@@ -116,21 +132,27 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
 			return handleResponse<T>(response);
 		}
 
-		const { useAuthStore } = await import('@/store/authStore');
-		const { accessToken, isTokenExpiringSoon, refreshAccessToken } = useAuthStore.getState();
+		if (!authSession) {
+			const response = await makeRequest();
+			return handleResponse<T>(response);
+		}
+
+		const { getAccessToken, isTokenExpiringSoon, refreshAccessToken } = authSession;
+		const accessToken = getAccessToken();
 
 		if (accessToken && isTokenExpiringSoon()) {
 			console.log('[API] Token expiring soon, proactively refreshing...');
 			await refreshAccessToken();
 
-			const { accessToken: newAccessToken } = useAuthStore.getState();
-			const response = await makeRequest(newAccessToken || undefined);
+			const response = await makeRequest(getAccessToken() || undefined);
 			return handleResponse<T>(response);
 		}
 
 		const response = await makeRequest(accessToken || undefined);
 
-		if (response.status === 401) {
+		// Refresh only when a session exists: signed out (e.g. a wrong password
+		// at login), the 401 is the backend's answer, not an expired token (#235).
+		if (response.status === 401 && accessToken) {
 			console.log('[API] Received 401, attempting token refresh...');
 
 			const refreshSuccess = await refreshAccessToken();
@@ -139,7 +161,7 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
 				throw new ApiError('Session expired. Please login again.', 'SESSION_EXPIRED');
 			}
 
-			const { accessToken: newAccessToken } = useAuthStore.getState();
+			const newAccessToken = getAccessToken();
 			const retryResponse = await makeRequest(newAccessToken || undefined);
 
 			return handleResponse<T>(retryResponse);
@@ -157,6 +179,24 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
 
 		throw new ApiError('Unknown error occurred', 'UNKNOWN_ERROR');
 	}
+}
+
+/**
+ * apiRequest with the given access token, for callers that pass it explicitly.
+ * The registered session's token, when there is one, takes precedence.
+ */
+export function authRequest<T>(
+	endpoint: string,
+	accessToken: string,
+	options: RequestInit = {}
+): Promise<T> {
+	return apiRequest<T>(endpoint, {
+		...options,
+		headers: {
+			Authorization: `Bearer ${accessToken}`,
+			...(options.headers as Record<string, string>),
+		},
+	});
 }
 
 /**
@@ -181,7 +221,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
 				// Ignore text parsing errors
 			}
 		}
-		throw new ApiError(errorMessage, errorCode, errorDetails);
+		throw new ApiError(errorMessage, errorCode, errorDetails, response.status);
 	}
 
 	let data: ApiResponse<T>;
@@ -301,13 +341,7 @@ export const authApi = {
 	/**
 	 * Get linked authentication providers
 	 */
-	async getLinkedProviders(accessToken: string): Promise<{
-		providers: {
-			type: 'password' | 'google' | 'facebook';
-			connectedAt: string;
-			isPrimary: boolean;
-		}[];
-	}> {
+	async getLinkedProviders(accessToken: string): Promise<LinkedProvidersResponse> {
 		return apiRequest('/api/auth/providers', {
 			method: 'GET',
 			headers: {
@@ -319,15 +353,30 @@ export const authApi = {
 	/**
 	 * Unlink an OAuth provider
 	 */
-	async unlinkProvider(
-		accessToken: string,
-		provider: 'google' | 'facebook'
-	): Promise<{ message: string }> {
+	async unlinkProvider(accessToken: string, provider: OAuthProvider): Promise<{ message: string }> {
 		return apiRequest(`/api/auth/providers/${provider}`, {
 			method: 'DELETE',
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
 			},
+		});
+	},
+
+	/**
+	 * Link a Google (ID token) or Facebook (access token) account to the signed-in user
+	 */
+	async linkProvider(
+		accessToken: string,
+		provider: OAuthProvider,
+		token: string
+	): Promise<LinkedProvidersResponse> {
+		const body = provider === 'google' ? { idToken: token } : { accessToken: token };
+		return apiRequest<LinkedProvidersResponse>(`/api/auth/providers/${provider}/link`, {
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+			},
+			body: JSON.stringify(body),
 		});
 	},
 

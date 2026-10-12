@@ -9,8 +9,8 @@ import { profileApi } from '@/services/profileApi';
 import { privacyApi } from '@/services/privacyApi';
 import { friendsApi, type FollowStatus } from '@/services/friendsApi';
 import { playlistApi } from '@/api/playlistApi';
-import { musicControlApi } from '@/services/musicControlApi';
-import { useFriendListening } from '@/hooks/useMusicControl';
+import { controlErrorMessage, useFriendListening } from '@/hooks/useMusicControl';
+import { showError } from '@utils/toast';
 import { Avatar } from '@/components/common/Avatar';
 import { Button } from '@/components/common/Button';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
@@ -37,7 +37,6 @@ export function UserProfileScreen({ route, navigation }: Props) {
 	const [isLoading, setIsLoading] = useState(true);
 	const [isFollowLoading, setIsFollowLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	const [initialCanControl, setInitialCanControl] = useState(false);
 
 	const {
 		devices,
@@ -45,7 +44,12 @@ export function UserProfileScreen({ route, navigation }: Props) {
 		remotePlay,
 		remotePause,
 		isLoading: isListeningLoading,
-	} = useFriendListening(userId, initialCanControl);
+		controlError,
+	} = useFriendListening(userId);
+
+	useEffect(() => {
+		if (controlError) showError(controlErrorMessage(controlError));
+	}, [controlError]);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -55,19 +59,16 @@ export function UserProfileScreen({ route, navigation }: Props) {
 			setError(null);
 
 			try {
-				const [profileData, filteredData, statusData, playlistsData, canControl] =
-					await Promise.all([
-						profileApi.getUserProfile(accessToken, userId),
-						privacyApi.getFilteredProfile(accessToken, userId),
-						friendsApi.getFollowStatus(accessToken, userId),
-						playlistApi.fetchUserPublicPlaylists(userId),
-						musicControlApi.canControl(userId),
-					]);
+				const [profileData, filteredData, statusData, playlistsData] = await Promise.all([
+					profileApi.getUserProfile(accessToken, userId),
+					privacyApi.getFilteredProfile(accessToken, userId),
+					friendsApi.getFollowStatus(accessToken, userId),
+					playlistApi.fetchUserPublicPlaylists(userId),
+				]);
 				setProfile(profileData);
 				setFilteredProfile(filteredData);
 				setFollowStatus(statusData);
 				setPlaylists(playlistsData);
-				setInitialCanControl(canControl);
 			} catch (error) {
 				console.error('[UserProfileScreen] Load profile failed:', error);
 				setError('Failed to load profile');
@@ -253,6 +254,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
 									isPlaying={deviceStatus.isPlaying}
 									onPlay={() => remotePlay(deviceStatus.device.deviceId)}
 									onPause={() => remotePause(deviceStatus.device.deviceId)}
+									controllable={deviceStatus.controllable}
 								/>
 							))}
 				</View>

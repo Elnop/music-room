@@ -7,12 +7,14 @@ import {
 	createPlaylistSchema,
 	updatePlaylistSchema,
 	addTrackSchema,
-	reorderTracksSchema,
+	moveTrackSchema,
+	trackIdParamSchema,
 	addCollaboratorSchema,
 	addViewerSchema,
 } from '@/features/playlists/playlist.validators.js';
 import type { ApiResponse, AuthenticatedRequest } from '@/shared/types/global.types.js';
 import { logger } from '@/shared/utils/logger.js';
+import { routeParam } from '@/shared/utils/route-params.js';
 
 const playlistService = new PlaylistService();
 const trackService = new PlaylistTrackService();
@@ -69,7 +71,7 @@ export class PlaylistController {
 	async getPlaylistsByUser(req: Request, res: Response, next: NextFunction) {
 		try {
 			const authReq = req as AuthenticatedRequest;
-			const { userId } = req.params;
+			const userId = routeParam(req, 'userId');
 			const playlists = await playlistService.getPlaylistsByUser(userId, authReq.user.id);
 
 			const response: ApiResponse = {
@@ -113,7 +115,7 @@ export class PlaylistController {
 	async getPlaylistById(req: Request, res: Response, next: NextFunction) {
 		try {
 			const authReq = req as AuthenticatedRequest;
-			const { id } = req.params;
+			const id = routeParam(req, 'id');
 			const playlist = await playlistService.getPlaylistById(id, authReq.user.id);
 
 			const response: ApiResponse = {
@@ -135,7 +137,7 @@ export class PlaylistController {
 	async updatePlaylist(req: Request, res: Response, next: NextFunction) {
 		try {
 			const authReq = req as AuthenticatedRequest;
-			const { id } = req.params;
+			const id = routeParam(req, 'id');
 			const validated = updatePlaylistSchema.parse(req.body);
 			const playlist = await playlistService.updatePlaylist(id, authReq.user.id, validated);
 
@@ -158,7 +160,7 @@ export class PlaylistController {
 	async deletePlaylist(req: Request, res: Response, next: NextFunction) {
 		try {
 			const authReq = req as AuthenticatedRequest;
-			const { id } = req.params;
+			const id = routeParam(req, 'id');
 			await playlistService.deletePlaylist(id, authReq.user.id);
 
 			const response: ApiResponse = {
@@ -180,7 +182,7 @@ export class PlaylistController {
 	async addTrack(req: Request, res: Response, next: NextFunction) {
 		try {
 			const authReq = req as AuthenticatedRequest;
-			const { id } = req.params;
+			const id = routeParam(req, 'id');
 
 			const body = req.body as { albumArt?: string; previewUrl?: string };
 			logger.debug('[Playlist Controller] Add track request', {
@@ -203,7 +205,7 @@ export class PlaylistController {
 				},
 			});
 
-			await trackService.addTrack(id, authReq.user.id, validated);
+			const result = await trackService.addTrack(id, authReq.user.id, validated);
 
 			logger.info('[Playlist Controller] Track added successfully', {
 				playlistId: id,
@@ -212,7 +214,7 @@ export class PlaylistController {
 
 			const response: ApiResponse = {
 				success: true,
-				data: { message: 'Track added successfully' },
+				data: result,
 				meta: { timestamp: new Date().toISOString() },
 			};
 
@@ -234,12 +236,13 @@ export class PlaylistController {
 	async removeTrack(req: Request, res: Response, next: NextFunction) {
 		try {
 			const authReq = req as AuthenticatedRequest;
-			const { id, trackId } = req.params;
-			await trackService.removeTrack(id, authReq.user.id, trackId);
+			const id = routeParam(req, 'id');
+			const { trackId } = trackIdParamSchema.parse(req.params);
+			const result = await trackService.removeTrack(id, authReq.user.id, trackId);
 
 			const response: ApiResponse = {
 				success: true,
-				data: { message: 'Track removed successfully' },
+				data: result,
 				meta: { timestamp: new Date().toISOString() },
 			};
 
@@ -250,19 +253,20 @@ export class PlaylistController {
 	}
 
 	/**
-	 * PUT /api/playlists/:id/tracks/reorder
-	 * Reorder tracks in playlist
+	 * POST /api/playlists/:id/tracks/:trackId/move
+	 * Move a track right after afterRank (doc/PLAYLIST_CONCURRENCY.md)
 	 */
-	async reorderTracks(req: Request, res: Response, next: NextFunction) {
+	async moveTrack(req: Request, res: Response, next: NextFunction) {
 		try {
 			const authReq = req as AuthenticatedRequest;
-			const { id } = req.params;
-			const validated = reorderTracksSchema.parse(req.body);
-			await trackService.reorderTracks(id, authReq.user.id, validated.trackIds);
+			const id = routeParam(req, 'id');
+			const { trackId } = trackIdParamSchema.parse(req.params);
+			const validated = moveTrackSchema.parse(req.body);
+			const result = await trackService.moveTrack(id, authReq.user.id, trackId, validated);
 
 			const response: ApiResponse = {
 				success: true,
-				data: { message: 'Tracks reordered successfully' },
+				data: result,
 				meta: { timestamp: new Date().toISOString() },
 			};
 
@@ -279,7 +283,7 @@ export class PlaylistController {
 	async addCollaborator(req: Request, res: Response, next: NextFunction) {
 		try {
 			const authReq = req as AuthenticatedRequest;
-			const { id } = req.params;
+			const id = routeParam(req, 'id');
 			const validated = addCollaboratorSchema.parse(req.body);
 			await collaboratorService.addCollaborator(id, authReq.user.id, validated.userId);
 
@@ -302,7 +306,8 @@ export class PlaylistController {
 	async removeCollaborator(req: Request, res: Response, next: NextFunction) {
 		try {
 			const authReq = req as AuthenticatedRequest;
-			const { id, userId } = req.params;
+			const id = routeParam(req, 'id');
+			const userId = routeParam(req, 'userId');
 			await collaboratorService.removeCollaborator(id, authReq.user.id, userId);
 
 			const response: ApiResponse = {
@@ -324,7 +329,7 @@ export class PlaylistController {
 	async getViewers(req: Request, res: Response, next: NextFunction) {
 		try {
 			const authReq = req as AuthenticatedRequest;
-			const { id } = req.params;
+			const id = routeParam(req, 'id');
 			const viewers = await viewerService.getViewers(id, authReq.user.id);
 
 			const response: ApiResponse = {
@@ -346,7 +351,7 @@ export class PlaylistController {
 	async addViewer(req: Request, res: Response, next: NextFunction) {
 		try {
 			const authReq = req as AuthenticatedRequest;
-			const { id } = req.params;
+			const id = routeParam(req, 'id');
 			const validated = addViewerSchema.parse(req.body);
 			await viewerService.addViewer(id, authReq.user.id, validated.userId);
 
@@ -369,7 +374,8 @@ export class PlaylistController {
 	async removeViewer(req: Request, res: Response, next: NextFunction) {
 		try {
 			const authReq = req as AuthenticatedRequest;
-			const { id, userId } = req.params;
+			const id = routeParam(req, 'id');
+			const userId = routeParam(req, 'userId');
 			await viewerService.removeViewer(id, authReq.user.id, userId);
 
 			const response: ApiResponse = {

@@ -24,8 +24,13 @@ export const playlistPaths: OpenAPIV3.PathsObject = {
 										type: 'object',
 										properties: {
 											data: {
-												type: 'array',
-												items: { $ref: '#/components/schemas/PlaylistSummary' },
+												type: 'object',
+												properties: {
+													playlists: {
+														type: 'array',
+														items: { $ref: '#/components/schemas/PlaylistResponse' },
+													},
+												},
 											},
 										},
 									},
@@ -81,6 +86,63 @@ export const playlistPaths: OpenAPIV3.PathsObject = {
 		},
 	},
 
+	'/api/playlists/public': {
+		get: {
+			tags: ['Playlists'],
+			summary: 'Get public playlists',
+			description:
+				"Returns up to 50 public playlists not owned by the authenticated user, newest first, each with its owner's profile and track count",
+			operationId: 'getPublicPlaylists',
+			security: [{ bearerAuth: [] }],
+			responses: {
+				'200': {
+					description: 'Public playlists retrieved',
+					content: {
+						'application/json': {
+							schema: {
+								allOf: [
+									{ $ref: '#/components/schemas/SuccessResponse' },
+									{
+										type: 'object',
+										properties: {
+											data: {
+												type: 'object',
+												properties: {
+													playlists: {
+														type: 'array',
+														maxItems: 50,
+														items: { $ref: '#/components/schemas/PlaylistResponse' },
+													},
+												},
+											},
+										},
+									},
+								],
+							},
+						},
+					},
+				},
+				'401': { $ref: '#/components/responses/UnauthorizedError' },
+				'500': {
+					description: 'PLAYLIST_FETCH_ERROR: the public playlists could not be read',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+							example: {
+								success: false,
+								error: {
+									message: 'Failed to fetch public playlists',
+									code: 'PLAYLIST_FETCH_ERROR',
+								},
+								meta: { timestamp: '2025-01-15T10:30:00.000Z' },
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+
 	'/api/playlists/user/{userId}': {
 		get: {
 			tags: ['Playlists'],
@@ -110,8 +172,13 @@ export const playlistPaths: OpenAPIV3.PathsObject = {
 										type: 'object',
 										properties: {
 											data: {
-												type: 'array',
-												items: { $ref: '#/components/schemas/PlaylistSummary' },
+												type: 'object',
+												properties: {
+													playlists: {
+														type: 'array',
+														items: { $ref: '#/components/schemas/PlaylistResponse' },
+													},
+												},
 											},
 										},
 									},
@@ -268,7 +335,7 @@ export const playlistPaths: OpenAPIV3.PathsObject = {
 			tags: ['Tracks'],
 			summary: 'Add track to playlist',
 			description:
-				'Adds a new track to the playlist. Owner and collaborators with edit permission can add tracks.',
+				'Appends a track at the end of the playlist and increments tracksVersion. Never refused because of concurrency. Owner and collaborators with edit permission can add tracks. See doc/PLAYLIST_CONCURRENCY.md.',
 			operationId: 'addTrack',
 			security: [{ bearerAuth: [] }],
 			parameters: [
@@ -308,7 +375,7 @@ export const playlistPaths: OpenAPIV3.PathsObject = {
 									{
 										type: 'object',
 										properties: {
-											data: { $ref: '#/components/schemas/PlaylistTrack' },
+											data: { $ref: '#/components/schemas/AddTrackResult' },
 										},
 									},
 								],
@@ -320,6 +387,18 @@ export const playlistPaths: OpenAPIV3.PathsObject = {
 				'401': { $ref: '#/components/responses/UnauthorizedError' },
 				'403': { $ref: '#/components/responses/ForbiddenError' },
 				'404': { $ref: '#/components/responses/NotFoundError' },
+				'409': {
+					description: 'TRACK_DUPLICATE: the track is already in the playlist',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+							example: {
+								success: false,
+								error: { code: 'TRACK_DUPLICATE', message: 'Track already in playlist' },
+							},
+						},
+					},
+				},
 			},
 		},
 	},
@@ -359,12 +438,7 @@ export const playlistPaths: OpenAPIV3.PathsObject = {
 									{
 										type: 'object',
 										properties: {
-											data: {
-												type: 'object',
-												properties: {
-													message: { type: 'string', example: 'Track removed successfully' },
-												},
-											},
+											data: { $ref: '#/components/schemas/RemoveTrackResult' },
 										},
 									},
 								],
@@ -374,18 +448,30 @@ export const playlistPaths: OpenAPIV3.PathsObject = {
 				},
 				'401': { $ref: '#/components/responses/UnauthorizedError' },
 				'403': { $ref: '#/components/responses/ForbiddenError' },
-				'404': { $ref: '#/components/responses/NotFoundError' },
+				'404': {
+					description:
+						'PLAYLIST_NOT_FOUND: the playlist does not exist. TRACK_NOT_IN_PLAYLIST: the track is not (or no longer) in the playlist.',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+							example: {
+								success: false,
+								error: { code: 'TRACK_NOT_IN_PLAYLIST', message: 'Track is not in the playlist' },
+							},
+						},
+					},
+				},
 			},
 		},
 	},
 
-	'/api/playlists/{id}/tracks/reorder': {
-		put: {
+	'/api/playlists/{id}/tracks/{trackId}/move': {
+		post: {
 			tags: ['Tracks'],
-			summary: 'Reorder tracks in playlist',
+			summary: 'Move a track',
 			description:
-				'Changes the order of tracks in the playlist. Provide array of track IDs in desired order.',
-			operationId: 'reorderTracks',
+				'Places the track right after afterRank. Refused with 409 only when this same track moved or was removed since expectedVersion, or when the playlist ranks were rebalanced since then. See doc/PLAYLIST_CONCURRENCY.md.',
+			operationId: 'moveTrack',
 			security: [{ bearerAuth: [] }],
 			parameters: [
 				{
@@ -393,26 +479,28 @@ export const playlistPaths: OpenAPIV3.PathsObject = {
 					name: 'id',
 					required: true,
 					schema: { type: 'string', format: 'uuid' },
+					description: 'Playlist ID',
+				},
+				{
+					in: 'path',
+					name: 'trackId',
+					required: true,
+					schema: { type: 'string', format: 'uuid' },
+					description: 'Track ID to move',
 				},
 			],
 			requestBody: {
 				required: true,
 				content: {
 					'application/json': {
-						schema: { $ref: '#/components/schemas/ReorderTracksRequest' },
-						example: {
-							trackIds: [
-								'123e4567-e89b-12d3-a456-426614174003',
-								'123e4567-e89b-12d3-a456-426614174001',
-								'123e4567-e89b-12d3-a456-426614174002',
-							],
-						},
+						schema: { $ref: '#/components/schemas/MoveTrackRequest' },
+						example: { afterRank: 'h', expectedVersion: 10 },
 					},
 				},
 			},
 			responses: {
 				'200': {
-					description: 'Tracks reordered',
+					description: 'Track moved',
 					content: {
 						'application/json': {
 							schema: {
@@ -421,12 +509,7 @@ export const playlistPaths: OpenAPIV3.PathsObject = {
 									{
 										type: 'object',
 										properties: {
-											data: {
-												type: 'object',
-												properties: {
-													message: { type: 'string', example: 'Tracks reordered successfully' },
-												},
-											},
+											data: { $ref: '#/components/schemas/MoveTrackResult' },
 										},
 									},
 								],
@@ -438,6 +521,22 @@ export const playlistPaths: OpenAPIV3.PathsObject = {
 				'401': { $ref: '#/components/responses/UnauthorizedError' },
 				'403': { $ref: '#/components/responses/ForbiddenError' },
 				'404': { $ref: '#/components/responses/NotFoundError' },
+				'409': {
+					description:
+						'TRACK_MOVED_CONCURRENTLY: the track moved since expectedVersion. TRACK_NOT_IN_PLAYLIST: it was removed. PLAYLIST_REBALANCED: every rank changed since expectedVersion. The client reloads the playlist.',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+							example: {
+								success: false,
+								error: {
+									code: 'TRACK_MOVED_CONCURRENTLY',
+									message: 'Track was moved by someone else',
+								},
+							},
+						},
+					},
+				},
 			},
 		},
 	},
@@ -811,27 +910,6 @@ export const playlistSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 		},
 	},
 
-	ReorderTracksRequest: {
-		type: 'object',
-		required: ['trackIds'],
-		properties: {
-			trackIds: {
-				type: 'array',
-				minItems: 1,
-				items: {
-					type: 'string',
-					format: 'uuid',
-				},
-				description: 'Array of track IDs in desired order',
-				example: [
-					'123e4567-e89b-12d3-a456-426614174003',
-					'123e4567-e89b-12d3-a456-426614174001',
-					'123e4567-e89b-12d3-a456-426614174002',
-				],
-			},
-		},
-	},
-
 	AddCollaboratorRequest: {
 		type: 'object',
 		required: ['userId'],
@@ -856,22 +934,6 @@ export const playlistSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 		},
 	},
 
-	PlaylistSummary: {
-		type: 'object',
-		properties: {
-			id: { type: 'string', format: 'uuid' },
-			name: { type: 'string' },
-			description: { type: 'string', nullable: true },
-			coverUrl: { type: 'string', format: 'uri', nullable: true },
-			visibility: { type: 'string', enum: ['public', 'private'] },
-			editMode: { type: 'string', enum: ['open', 'restricted'] },
-			trackCount: { type: 'integer', example: 10 },
-			owner: { $ref: '#/components/schemas/PlaylistMember' },
-			createdAt: { type: 'string', format: 'date-time' },
-			updatedAt: { type: 'string', format: 'date-time' },
-		},
-	},
-
 	PlaylistDetail: {
 		type: 'object',
 		properties: {
@@ -882,8 +944,14 @@ export const playlistSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 			visibility: { type: 'string', enum: ['public', 'private'] },
 			editMode: { type: 'string', enum: ['open', 'restricted'] },
 			owner: { $ref: '#/components/schemas/PlaylistMember' },
+			tracksVersion: {
+				type: 'integer',
+				description: 'Incremented by every add, remove and move; sent back as expectedVersion',
+				example: 10,
+			},
 			tracks: {
 				type: 'array',
+				description: 'Tracks ordered by rank',
 				items: { $ref: '#/components/schemas/PlaylistTrack' },
 			},
 			collaborators: {
@@ -910,19 +978,115 @@ export const playlistSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 			albumArt: { type: 'string', format: 'uri', nullable: true },
 			durationMs: { type: 'integer' },
 			previewUrl: { type: 'string', format: 'uri', nullable: true },
-			position: { type: 'integer', description: 'Track position in playlist' },
-			addedBy: { $ref: '#/components/schemas/PlaylistMember' },
+			rank: {
+				type: 'string',
+				description: 'Sort key: tracks are ordered by rank, compared byte by byte',
+				example: 'h',
+			},
+			addedBy: {
+				type: 'string',
+				format: 'uuid',
+				nullable: true,
+				description: 'ID of the user who added the track',
+			},
+			addedAt: { type: 'string', format: 'date-time' },
 			createdAt: { type: 'string', format: 'date-time' },
+			updatedAt: { type: 'string', format: 'date-time' },
+		},
+	},
+
+	MoveTrackRequest: {
+		type: 'object',
+		required: ['afterRank', 'expectedVersion'],
+		properties: {
+			afterRank: {
+				type: 'string',
+				nullable: true,
+				pattern: '^[0-9A-Za-z]*[1-9A-Za-z]$',
+				minLength: 1,
+				maxLength: 128,
+				description:
+					'Rank of the track the moved track is dropped after, as the client displayed it; null for the top of the list.',
+				example: 'h',
+			},
+			expectedVersion: {
+				type: 'integer',
+				minimum: 0,
+				description: 'tracksVersion the client was displaying when the user moved the track.',
+				example: 10,
+			},
+		},
+	},
+
+	AddTrackResult: {
+		type: 'object',
+		properties: {
+			track: { $ref: '#/components/schemas/PlaylistTrack' },
+			tracksVersion: { type: 'integer', example: 11 },
+			rebalanced: { type: 'boolean', description: 'Every rank of the playlist changed' },
+		},
+	},
+
+	RemoveTrackResult: {
+		type: 'object',
+		properties: { tracksVersion: { type: 'integer', example: 12 } },
+	},
+
+	MoveTrackResult: {
+		type: 'object',
+		properties: {
+			trackId: { type: 'string', format: 'uuid' },
+			rank: { type: 'string', example: 'l' },
+			tracksVersion: { type: 'integer', example: 11 },
+			rebalanced: { type: 'boolean', description: 'Every rank of the playlist changed' },
+		},
+	},
+
+	PlaylistResponse: {
+		type: 'object',
+		required: [
+			'id',
+			'name',
+			'ownerId',
+			'collaboratorIds',
+			'viewerIds',
+			'visibility',
+			'editMode',
+			'trackCount',
+			'createdAt',
+			'updatedAt',
+		],
+		properties: {
+			id: { type: 'string', format: 'uuid' },
+			name: { type: 'string' },
+			description: { type: 'string' },
+			coverUrl: { type: 'string', format: 'uri' },
+			firstTrackCover: {
+				type: 'string',
+				format: 'uri',
+				description: 'Album art of the first track by rank, when it has one',
+			},
+			ownerId: { type: 'string', format: 'uuid' },
+			owner: { $ref: '#/components/schemas/PlaylistMember' },
+			collaboratorIds: { type: 'array', items: { type: 'string', format: 'uuid' } },
+			viewerIds: { type: 'array', items: { type: 'string', format: 'uuid' } },
+			visibility: { type: 'string', enum: ['public', 'private'] },
+			editMode: { type: 'string', enum: ['open', 'restricted'] },
+			trackCount: { type: 'integer', example: 10 },
+			createdAt: { type: 'string', format: 'date-time' },
+			updatedAt: { type: 'string', format: 'date-time' },
 		},
 	},
 
 	PlaylistMember: {
 		type: 'object',
+		description: 'displayName and avatarUrl are omitted when the profile has none',
+		required: ['id', 'username'],
 		properties: {
 			id: { type: 'string', format: 'uuid' },
 			username: { type: 'string' },
-			displayName: { type: 'string', nullable: true },
-			avatarUrl: { type: 'string', format: 'uri', nullable: true },
+			displayName: { type: 'string' },
+			avatarUrl: { type: 'string', format: 'uri' },
 		},
 	},
 };

@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { logger } from '@/shared/utils/logger.js';
 
 /**
@@ -96,6 +97,50 @@ export function eventLog(
 }
 
 /**
+ * Client identity set on `socket.data` by the handshake (see realtime/socket-auth.ts)
+ */
+export interface SocketClientContext {
+	userId: string;
+	device: { deviceId: string; platform: string; model: string };
+	appVersion: string;
+}
+
+const eventNameSchema = z.string().regex(/^[\w:.-]{1,64}$/);
+const INVALID_EVENT_NAME = '<invalid-event-name>';
+
+/**
+ * An event name from the client, safe to log: kept only when it looks like an
+ * event name, so a huge or multi-line string never reaches the log file.
+ */
+export function loggableEventName(eventName: unknown): string {
+	const name = eventNameSchema.safeParse(eventName);
+	return name.success ? name.data : INVALID_EVENT_NAME;
+}
+
+/**
+ * Log every incoming socket event with the client's platform, device and app
+ * version (subject IV.6), with the same field names as the HTTP action logger.
+ * Event arguments are never logged.
+ * @param socketId - Socket ID
+ * @param eventName - Incoming event name, as sent by the client
+ * @param client - Identity from socket.data
+ */
+export function incomingLog(
+	socketId: string,
+	eventName: unknown,
+	client: SocketClientContext
+): void {
+	logger.info(`[Socket] in:${loggableEventName(eventName)}`, {
+		socketId,
+		userId: client.userId,
+		platform: client.device.platform,
+		device: client.device.model,
+		deviceId: client.device.deviceId,
+		appVersion: client.appVersion,
+	});
+}
+
+/**
  * Log socket errors
  * @param socketId - Socket ID
  * @param error - Error object
@@ -136,6 +181,7 @@ export const socketLogger = {
 	disconnect: disconnectLog,
 	auth: authLog,
 	event: eventLog,
+	incoming: incomingLog,
 	error: errorLog,
 	init: initLog,
 	broadcast: broadcastLog,

@@ -51,6 +51,9 @@ BACKEND_CONTAINER := zumik-backend
 MOBILE_CONTAINER := zumik-mobile
 REDIS_CONTAINER := zumik-redis
 
+# Lines of history shown before following logs (make logs LOGS_TAIL=500)
+LOGS_TAIL ?= 100
+
 # Docker volumes
 TUNNEL_VOLUME := tunnel-info
 REDIS_VOLUME := redis-data
@@ -80,7 +83,6 @@ BACKEND_ENV := $(BACKEND_DIR)/.env
 BACKEND_ENV_EXAMPLE := $(BACKEND_DIR)/.env.example
 MOBILE_ENV := $(MOBILE_DIR)/.env
 MOBILE_ENV_EXAMPLE := $(MOBILE_DIR)/.env.example
-TUNNEL_URL_FILE := /tmp/backend-tunnel-url.txt
 SHARED_TUNNEL_FILE := /tmp/shared/backend-tunnel-url.txt
 
 # Node modules
@@ -112,8 +114,53 @@ HOST_IP := $(shell \
 )
 export HOST_IP
 
-# Expo URL
-EXPO_URL := exp://$(HOST_IP):$(METRO_PORT)
+# Backend the app calls in dev-docker and dev-local. make writes EXPO_PUBLIC_*
+# to mobile/.env.development.local (git-ignored), which Expo prefers over
+# mobile/.env for a variable not already in the environment; the mobile
+# container gets it as its last --env-file. dev-tunnel writes the live ngrok
+# URL there instead.
+MOBILE_DEV_ENV := $(MOBILE_DIR)/.env.development.local
+DEV_API_URL := http://$(HOST_IP):$(BACKEND_PORT)
+DEV_WS_URL := ws://$(HOST_IP):$(BACKEND_PORT)
+
+# Supabase the backend and the app use in dev-docker, dev-local and
+# generate-types: local (default) is the music-room-dev stack started by
+# make supabase-up (backend/scripts/dev-db.sh, ports 544xx); hosted is the
+# project whose URL and keys are in backend/.env.
+SUPABASE_MODE ?= local
+ifneq ($(SUPABASE_MODE),local)
+ifneq ($(SUPABASE_MODE),hosted)
+$(error SUPABASE_MODE must be local or hosted (got "$(SUPABASE_MODE)"))
+endif
+endif
+export SUPABASE_MODE
+# Written by make supabase-up: the dev stack's URL (host LAN address) and keys
+SUPABASE_LOCAL_ENV := $(BACKEND_DIR)/.env.supabase.local
+SUPABASE_LOCAL_PORT := 54421
+# Label the Supabase CLI puts on the dev stack's containers, volumes and network
+SUPABASE_DEV_LABEL := com.supabase.cli.project=music-room-dev
+# Containers of the dev stack (named by the CLI) as PREFIX:container, for the
+# log targets
+SUPABASE_DEV_LOG_SOURCES := SB-DB:supabase_db_music-room-dev SB-AUTH:supabase_auth_music-room-dev \
+	SB-REST:supabase_rest_music-room-dev SB-KONG:supabase_kong_music-room-dev SB-MAIL:supabase_inbucket_music-room-dev \
+	SB-STUDIO:supabase_studio_music-room-dev SB-META:supabase_pg_meta_music-room-dev
+# Mailpit web UI of the dev stack (emails the backend sends in local mode)
+SUPABASE_MAIL_UI_PORT := 54424
+# Supabase Studio (dashboard) and Postgres of the dev stack
+SUPABASE_STUDIO_PORT := 54423
+SUPABASE_DB_PORT := 54422
+# Recipe line that starts the dev stack in local mode (empty in hosted mode)
+# Usage: $(SUPABASE_UP_IF_LOCAL)
+SUPABASE_UP_IF_LOCAL = $(if $(filter local,$(SUPABASE_MODE)),@$(MAKE) --no-print-directory supabase-up)
+# Prefix for a command run from backend/ on the host (dev-local, backend-local,
+# perf-fixtures): in local mode it exports the dev stack's keys with
+# localhost; the exported values win over backend/.env (dotenv never overrides
+# a set variable). Empty in hosted mode.
+# Usage: cd $(BACKEND_DIR) && $(LOCAL_SUPABASE_ENV) npm run dev
+LOCAL_SUPABASE_ENV = $(if $(filter local,$(SUPABASE_MODE)),set -a && . ./$(notdir $(SUPABASE_LOCAL_ENV)) && set +a && export SUPABASE_URL=http://localhost:$(SUPABASE_LOCAL_PORT) SMTP_HOST=localhost &&)
+
+# Metro address a phone on the same WiFi enters as its bundle location
+METRO_ADDRESS := $(HOST_IP):$(METRO_PORT)
 
 # Android SDK and Java JDK (for local builds)
 # These should be configured in your shell environment (~/.zshrc or ~/.bashrc)

@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { UserProfile } from '@types';
+import type { UserProfile } from '@/types/user.types';
+import type { LinkedProvider, OAuthProvider } from '@/types/auth.types';
 import type { RegisterInput } from '@utils/validators';
-import { authApi, ApiError } from '@services/api';
+import { authApi, ApiError, registerAuthSession } from '@services/api';
 import { supabase } from '@/lib/supabase';
 import { signInWithGoogle, signInWithFacebook } from '@services/oauth';
 
@@ -14,15 +15,6 @@ const STORAGE_KEYS = {
 	IS_AUTHENTICATED: '@zumik/is_authenticated',
 	TOKEN_EXPIRES_AT: '@zumik/token_expires_at',
 } as const;
-
-/**
- * Linked provider info
- */
-interface LinkedProvider {
-	type: 'password' | 'google' | 'facebook';
-	connectedAt: string;
-	isPrimary: boolean;
-}
 
 /**
  * Auth State Interface
@@ -63,7 +55,8 @@ interface AuthState {
 
 	// Provider management
 	fetchLinkedProviders: () => Promise<void>;
-	unlinkProvider: (provider: 'google' | 'facebook') => Promise<void>;
+	linkProvider: (provider: OAuthProvider) => Promise<void>;
+	unlinkProvider: (provider: OAuthProvider) => Promise<void>;
 
 	// Storage helpers
 	loadFromStorage: () => Promise<void>;
@@ -264,42 +257,23 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 	},
 
 	/**
-	 * Logout current user
+	 * Logout current user: revoke the session on the backend, then end it on
+	 * the device even if the backend call fails (socketStore disconnects).
 	 */
 	logout: async () => {
 		set({ isLoading: true, error: null });
 
-		try {
-			const { accessToken } = get();
+		const { accessToken } = get();
 
-			if (accessToken) {
-				try {
-					await authApi.logout(accessToken);
-				} catch (error) {
-					console.warn('Backend logout failed, continuing with local logout', error);
-				}
+		if (accessToken) {
+			try {
+				await authApi.logout(accessToken);
+			} catch (error) {
+				console.warn('Backend logout failed, continuing with local logout', error);
 			}
-
-			await supabase.auth.signOut();
-
-			set({
-				user: null,
-				accessToken: null,
-				refreshToken: null,
-				tokenExpiresAt: null,
-				isAuthenticated: false,
-				isLoading: false,
-				error: null,
-			});
-
-			await get().clearStorage();
-		} catch (error) {
-			console.error('[AuthStore] Logout failed:', error);
-			set({
-				error: 'Logout failed',
-				isLoading: false,
-			});
 		}
+
+		await endSessionLocally();
 	},
 
 	/**
@@ -575,9 +549,41 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 	},
 
 	/**
+	 * Link an OAuth provider: native sign-in, then send its token to the backend.
+	 * A cancelled sign-in rethrows Error('SIGN_IN_CANCELLED') without an API call.
+	 */
+	linkProvider: async (provider: OAuthProvider) => {
+		const { accessToken } = get();
+		if (!accessToken) {
+			throw new Error('No access token available');
+		}
+
+		set({ isLoading: true, error: null });
+
+		try {
+			const token = provider === 'google' ? await signInWithGoogle() : await signInWithFacebook();
+			const response = await authApi.linkProvider(accessToken, provider, token);
+
+			set({ linkedProviders: response.providers, isLoading: false });
+		} catch (error) {
+			const cancelled = error instanceof Error && error.message === 'SIGN_IN_CANCELLED';
+			const errorMessage = cancelled
+				? null
+				: error instanceof ApiError
+					? error.message
+					: 'Failed to link provider';
+			set({
+				error: errorMessage,
+				isLoading: false,
+			});
+			throw error;
+		}
+	},
+
+	/**
 	 * Unlink an OAuth provider
 	 */
-	unlinkProvider: async (provider: 'google' | 'facebook') => {
+	unlinkProvider: async (provider: OAuthProvider) => {
 		const { accessToken } = get();
 		if (!accessToken) {
 			throw new Error('No access token available');
@@ -628,8 +634,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 		}
 
 		if (!refreshToken) {
-			console.error('[AuthStore] No refresh token available');
-			await get().logout();
+			// Locally, not through logout(): its backend call would refresh again.
+			console.error('[AuthStore] No refresh token available, ending the session locally');
+			await endSessionLocally();
 			return false;
 		}
 
@@ -673,9 +680,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 				errorMessage: error instanceof Error ? error.message : 'Unknown error',
 				errorType: error?.constructor?.name,
 			});
+
+			// Only a 401 from the refresh call means the backend refused the
+			// refresh token; anything else (network, 5xx, 503, 429) is an outage.
+			// isRefreshing is reset with the cleared session, so waiting callers
+			// never retry with the stale token.
+			if (error instanceof ApiError && error.status === 401) {
+				console.warn('[AuthStore] Refresh token refused, ending the session locally');
+				await endSessionLocally();
+				return false;
+			}
+
 			set({ isRefreshing: false });
 
-			console.warn('[AuthStore] Skipping auto-logout on refresh failure');
+			console.warn('[AuthStore] Keeping the session after a refresh failure; will retry later');
 			return false;
 		}
 	},
@@ -700,3 +718,39 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 		set({ error: null });
 	},
 }));
+
+/**
+ * End the session on the device only, without calling the backend: for a
+ * refused refresh, `authApi.logout` goes through `apiRequest`, whose proactive
+ * refresh would call `refreshAccessToken` again. Scope 'local' keeps the
+ * user's other devices signed in, like the backend logout.
+ * RootNavigator shows the auth screens once `isAuthenticated` is false, and
+ * socketStore disconnects.
+ */
+async function endSessionLocally(): Promise<void> {
+	try {
+		await supabase.auth.signOut({ scope: 'local' });
+	} catch (error) {
+		console.warn('[AuthStore] Supabase local sign-out failed', error);
+	}
+
+	useAuthStore.setState({
+		user: null,
+		accessToken: null,
+		refreshToken: null,
+		tokenExpiresAt: null,
+		isAuthenticated: false,
+		isRefreshing: false,
+		isLoading: false,
+		error: null,
+		linkedProviders: null,
+	});
+
+	await useAuthStore.getState().clearStorage();
+}
+
+registerAuthSession({
+	getAccessToken: () => useAuthStore.getState().accessToken,
+	isTokenExpiringSoon: () => useAuthStore.getState().isTokenExpiringSoon(),
+	refreshAccessToken: () => useAuthStore.getState().refreshAccessToken(),
+});

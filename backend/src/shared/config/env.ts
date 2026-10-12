@@ -1,10 +1,11 @@
 import { config } from 'dotenv';
 import { z } from 'zod';
+import { compileTrust, parseTrustProxy } from '@/shared/config/trust-proxy-setting.js';
 
 config();
 
 const envSchema = z.object({
-	SUPABASE_URL: z.string().url('Invalid Supabase URL'),
+	SUPABASE_URL: z.url('Invalid Supabase URL'),
 	SUPABASE_ANON_KEY: z.string().min(1, 'Supabase anon key is required'),
 	SUPABASE_SERVICE_KEY: z.string().min(1, 'Supabase service key is required'),
 	PORT: z.string().default('3000').transform(Number),
@@ -28,6 +29,11 @@ const envSchema = z.object({
 	RATE_LIMIT_OAUTH_MAX: z.string().default('10'),
 	RATE_LIMIT_AUTH_WINDOW_MS: z.string().default('900000'),
 	RATE_LIMIT_AUTH_MAX: z.string().default('20'),
+	// Validated: NaN or 0 would block every IP forever
+	RATE_LIMIT_TOKEN_WINDOW_MS: z.coerce.number().int().positive().default(900000),
+	RATE_LIMIT_TOKEN_MAX: z.coerce.number().int().positive().default(20),
+	RATE_LIMIT_SOUNDCLOUD_WINDOW_MS: z.coerce.number().int().positive().default(60000),
+	RATE_LIMIT_SOUNDCLOUD_MAX: z.coerce.number().int().positive().default(120),
 
 	// Account Lockout Configuration
 	ACCOUNT_LOCKOUT_ENABLED: z.string().default('true'),
@@ -44,9 +50,32 @@ const envSchema = z.object({
 	// IP Whitelist
 	RATE_LIMIT_WHITELIST_IPS: z.string().default(''),
 
+	// Proxies trusted to set X-Forwarded-For (see shared/config/trust-proxy-setting.ts)
+	TRUST_PROXY: z
+		.string()
+		.default('')
+		.refine(
+			value => {
+				try {
+					compileTrust(parseTrustProxy(value));
+					return true;
+				} catch {
+					return false;
+				}
+			},
+			{
+				message:
+					'Expected empty, true, false, a hop count, or addresses, subnets, loopback, linklocal, uniquelocal (comma-separated)',
+			}
+		),
+
 	// Gmail SMTP Configuration
-	GMAIL_USER: z.string().email('Invalid Gmail user address'),
+	GMAIL_USER: z.email('Invalid Gmail user address'),
 	GMAIL_APP_PASSWORD: z.string().min(1, 'Gmail app password is required'),
+	// Plain SMTP server used instead of Gmail when set: the dev Supabase stack's
+	// Mailpit (written by make supabase-up). No TLS, no auth.
+	SMTP_HOST: z.string().min(1).optional(),
+	SMTP_PORT: z.coerce.number().int().positive().default(54425),
 
 	// Email Verification Configuration
 	EMAIL_VERIFICATION_ENABLED: z.string().default('true'),

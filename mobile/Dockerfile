@@ -1,6 +1,8 @@
 # Dockerfile for Zumik Mobile (Expo/React Native)
-# Using Chainguard Node.js image - ZERO CVE vulnerabilities
-FROM cgr.dev/chainguard/node:latest-dev
+# Node 22 (LTS), same major as backend/Dockerfile, Dockerfile.android-build and .nvmrc.
+# Chainguard only publishes unpinned tags (latest, latest-dev) for free, so the
+# official Debian slim image is used to pin the Node version.
+FROM node:22-bookworm-slim
 
 # Switch to root for global installations and setup
 USER root

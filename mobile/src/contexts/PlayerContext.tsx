@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useRef } from 'react';
 import { useAudioPlayer, setAudioModeAsync } from 'expo-audio';
 import { usePlayerStore } from '@/store/playerStore';
+import { ApiError, apiRequest } from '@/services/api';
 
 // Configure audio mode for iOS - play in silent mode and background
 setAudioModeAsync({
@@ -11,8 +12,6 @@ setAudioModeAsync({
 }).catch(err => {
 	console.warn('[PlayerContext] Failed to set audio mode:', err);
 });
-
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
 
 // Timeouts - be aggressive!
 const FETCH_TIMEOUT_MS = 8000; // 8 seconds max for API call
@@ -119,7 +118,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 			try {
 				// Use query param instead of path param to avoid Cloudflare WAF blocking URLs in paths
 				const encodedUrl = encodeURIComponent(currentTrack.permalink_url);
-				const streamEndpoint = `${API_URL}/api/soundcloud/stream?url=${encodedUrl}`;
+				const streamEndpoint = `/api/soundcloud/stream?url=${encodedUrl}`;
 
 				if (__DEV__)
 					console.log('🌐 [PlayerProvider] Fetching stream URL:', {
@@ -127,7 +126,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 						trackUrl: currentTrack.permalink_url,
 					});
 
-				const response = await fetch(streamEndpoint, { signal: controller.signal });
+				const data = await apiRequest<{ streamUrl?: string }>(streamEndpoint, {
+					signal: controller.signal,
+				});
 				clearTimeout(timeoutId);
 
 				// Check if this request is still relevant
@@ -136,39 +137,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 					return;
 				}
 
-				if (__DEV__)
-					console.log('🌐 [PlayerProvider] Stream response:', {
-						status: response.status,
-						ok: response.ok,
-						statusText: response.statusText,
-					});
-
-				// Handle 404 - track not available
-				if (response.status === 404) {
-					setTrackUnavailableError('This track is no longer available (rights are expensive)');
-					return;
-				}
-
-				if (!response.ok) {
-					// Try to get more error details
-					let errorDetail = '';
-					try {
-						const errorData = await response.text();
-						errorDetail = errorData.substring(0, 200);
-						console.error('🔴 [PlayerProvider] Server error details:', errorDetail);
-					} catch {
-						// ignore
-					}
-					throw new Error(
-						`Server error (${response.status}): ${errorDetail || response.statusText}`
-					);
-				}
-
-				const data = await response.json();
-
-				if (data.success && data.data.streamUrl) {
+				if (data.streamUrl) {
 					if (__DEV__) console.log('🟢 [PlayerProvider] Stream URL obtained');
-					setStreamUrl(data.data.streamUrl);
+					setStreamUrl(data.streamUrl);
 				} else {
 					throw new Error('Stream not available');
 				}
@@ -178,9 +149,16 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 				// Check if still relevant
 				if (currentLoadCounterRef.current !== thisLoadCounter) return;
 
-				if (err instanceof Error && err.name === 'AbortError') {
+				// apiRequest wraps the abort in an ApiError, so read the signal itself
+				if (controller.signal.aborted) {
 					console.error('🔴 [PlayerProvider] Fetch timeout!');
 					setTrackUnavailableError('Loading too long - try again');
+				} else if (err instanceof ApiError && err.status === 404) {
+					// Track not available
+					setTrackUnavailableError('This track is no longer available (rights are expensive)');
+				} else if (err instanceof ApiError && err.status !== undefined) {
+					console.error('🔴 [PlayerProvider] Server error details:', err.message);
+					setTrackUnavailableError(`Server error (${err.status}): ${err.message}`);
 				} else {
 					const errorMsg = err instanceof Error ? err.message : 'Loading error';
 					console.error('🔴 [PlayerProvider] Error:', errorMsg);
