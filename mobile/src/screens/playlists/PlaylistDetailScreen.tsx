@@ -21,6 +21,10 @@ import { useQueueStore } from '@store/queueStore';
 import { toTrackInput } from '@utils/trackInput';
 import { usePlaylistSocket } from '@hooks/usePlaylistSocket';
 import { PlaylistHeader } from '@components/playlist/PlaylistHeader';
+import {
+	PLAY_PLAYLIST_BUTTON_SIZE,
+	PlayPlaylistButton,
+} from '@components/playlist/PlayPlaylistButton';
 import { SwipeableTrackItem } from '@components/common/SwipeableTrackItem';
 import { ReorderableList } from '@components/common/ReorderableList';
 import { EmptyState } from '@components/common/EmptyState';
@@ -235,7 +239,13 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 						onAddTrack={handleAddTrack}
 					/>
 				}
-				contentContainerStyle={[styles.list, { paddingBottom: playerHeight + theme.spacing.xxl }]}
+				// The last track scrolls clear of the floating Play button and the mini player.
+				contentContainerStyle={[
+					styles.list,
+					{
+						paddingBottom: playerHeight + PLAY_PLAYLIST_BUTTON_SIZE + theme.spacing.md * 2,
+					},
+				]}
 				ListEmptyComponent={
 					<EmptyState
 						icon="musical-notes-outline"
@@ -244,6 +254,8 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 				}
 				showsVerticalScrollIndicator={false}
 			/>
+
+			<PlayPlaylistButton playlistId={id} trackCount={currentPlaylist.tracks.length} />
 		</View>
 	);
 }
