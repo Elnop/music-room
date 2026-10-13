@@ -4,6 +4,7 @@ import { checkEditPermission } from '@/features/playlists/permissions/playlist.p
 import { formatTrackResponse } from '@/features/playlists/utils/playlist.helpers.js';
 import { addTrackRpc, moveTrackRpc, removeTrackRpc } from '@/features/playlists/utils/track-rpc.js';
 import { realtime } from '@/realtime/index.js';
+import { queueSyncService } from '@/features/queue/services/queue-sync.service.js';
 import type {
 	AddTrackDTO,
 	AddTrackResult,
@@ -15,7 +16,8 @@ import type { MoveTrackInput } from '@/features/playlists/playlist.validators.js
 
 /**
  * Adds, removes and moves tracks through the atomic operations of migration 016.
- * See doc/PLAYLIST_CONCURRENCY.md.
+ * See doc/PLAYLIST_CONCURRENCY.md. Each change is then mirrored in the queue
+ * blocks of the playlist (#278); a sync failure never fails the operation.
  */
 export class PlaylistTrackService {
 	/**
@@ -50,6 +52,7 @@ export class PlaylistTrackService {
 			event: 'track_added',
 			track: added,
 		});
+		await queueSyncService.syncPlaylistChange('added', playlistId, trackRow.id);
 
 		return { track: added, tracksVersion: result.tracksVersion, rebalanced: result.rebalanced };
 	}
@@ -78,6 +81,7 @@ export class PlaylistTrackService {
 			event: 'track_removed',
 			trackId,
 		});
+		await queueSyncService.syncPlaylistChange('removed', playlistId, trackId);
 
 		return { tracksVersion: result.tracksVersion };
 	}
@@ -108,6 +112,7 @@ export class PlaylistTrackService {
 			trackId,
 			rank: result.rank,
 		});
+		await queueSyncService.syncPlaylistChange('moved', playlistId, trackId);
 
 		return {
 			trackId,

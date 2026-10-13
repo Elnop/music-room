@@ -488,6 +488,7 @@ export type Database = {
 			};
 			playlist_remove_track: { Args: { p_playlist_id: string; p_track_id: string }; Returns: Json };
 			queue_add_item: { Args: { p_track_id: string; p_user: string }; Returns: Json };
+			queue_current_rank: { Args: { p_user: string }; Returns: string };
 			queue_detach_block: { Args: { p_block_id: string; p_user: string }; Returns: undefined };
 			queue_find_item: {
 				Args: { p_item_id: string; p_user: string };
@@ -516,11 +517,29 @@ export type Database = {
 			};
 			queue_play_item: { Args: { p_item_id: string; p_user: string }; Returns: Json };
 			queue_play_playlist: { Args: { p_playlist_id: string; p_user: string }; Returns: Json };
+			queue_rank_after: {
+				Args: { p_after: string; p_exclude: string; p_user: string };
+				Returns: string;
+			};
 			queue_rebalance: { Args: { p_user: string }; Returns: undefined };
 			queue_remove_item: { Args: { p_item_id: string; p_user: string }; Returns: Json };
 			queue_set_current: { Args: { p_item_id: string; p_user: string }; Returns: undefined };
 			queue_state: { Args: { p_user: string }; Returns: Json };
 			queue_step: { Args: { p_direction: string; p_user: string }; Returns: Json };
+			queue_sync_blocks: { Args: { p_playlist_id: string; p_user: string }; Returns: string[] };
+			queue_sync_track_added: {
+				Args: { p_playlist_id: string; p_track_id: string };
+				Returns: string[];
+			};
+			queue_sync_track_moved: {
+				Args: { p_playlist_id: string; p_track_id: string };
+				Returns: string[];
+			};
+			queue_sync_track_removed: {
+				Args: { p_playlist_id: string; p_track_id: string };
+				Returns: string[];
+			};
+			queue_sync_users: { Args: { p_playlist_id: string }; Returns: string[] };
 			rank_after: { Args: { p_a: string }; Returns: string };
 			rank_between: { Args: { p_a: string; p_b: string }; Returns: string };
 			rank_max_length: { Args: Record<PropertyKey, never>; Returns: number };
