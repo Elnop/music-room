@@ -13,6 +13,7 @@ import {
 	musicControlPaths,
 	musicControlSchemas,
 } from '@/features/music-control/music-control.openapi.js';
+import { queuePaths, queueSchemas } from '@/features/queue/queue.openapi.js';
 
 const openapiDocument: OpenAPIV3.Document = {
 	openapi: '3.0.0',
@@ -72,6 +73,7 @@ const openapiDocument: OpenAPIV3.Document = {
 		...soundcloudPaths,
 		...friendsPaths,
 		...musicControlPaths,
+		...queuePaths,
 	},
 
 	components: {
@@ -107,6 +109,7 @@ const openapiDocument: OpenAPIV3.Document = {
 			...soundcloudSchemas,
 			...friendsSchemas,
 			...musicControlSchemas,
+			...queueSchemas,
 		},
 
 		// Common responses
@@ -124,6 +127,7 @@ const openapiDocument: OpenAPIV3.Document = {
 		{ name: 'SoundCloud', description: 'Music search and streaming (public)' },
 		{ name: 'Friends', description: 'Friends system (follow/unfollow)' },
 		{ name: 'Music Control', description: 'Music control delegation' },
+		{ name: 'Queue', description: 'Play queue synced across your devices' },
 	],
 };
 
