@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { ApiError } from '@/services/api';
 import { queueApi } from '@/services/queueApi';
 import { usePlayerStore } from '@/store/playerStore';
 import { trackToSoundCloud } from '@utils/trackToSoundCloud';
@@ -24,8 +25,8 @@ export type QueueStepOutcome = 'played' | 'stopped' | 'boundary' | 'error' | 'ig
 let stepPending = false;
 
 interface StepOptions {
-	/** Toast shown when the request fails; none for next/previous. */
-	errorMessage?: string;
+	/** Toast shown when the request fails, or built from the error; none for next/previous. */
+	errorMessage?: string | ((error: unknown) => string);
 	/** Stop playback when the returned queue has no current item. */
 	stopWhenEmpty?: boolean;
 }
@@ -55,6 +56,11 @@ interface QueueStoreState extends QueueState {
 	removeItem: (itemId: string) => Promise<boolean>;
 	/** Move an upcoming item after `afterItemId` (null = right after the current item). */
 	moveItem: (itemId: string, afterItemId: string | null) => Promise<boolean>;
+	/**
+	 * Queue a playlist as a block after the current item and play its first
+	 * track on this device (#277).
+	 */
+	playPlaylist: (playlistId: string) => Promise<QueueStepOutcome>;
 }
 
 const initialState: QueueState & { loaded: boolean } = {
@@ -79,9 +85,31 @@ const currentItem = (state: QueueState): QueueItem | undefined =>
 	state.items.find(item => item.id === state.currentItemId);
 
 /**
+ * The queue item this device plays (`playerStore.queueItemId`) was queued from
+ * `playlistId`. False for a list-tapped track or an item no longer in the queue.
+ */
+export const selectPlaysPlaylist = (
+	state: QueueState,
+	queueItemId: string | null,
+	playlistId: string
+): boolean =>
+	queueItemId !== null &&
+	state.items.some(item => item.id === queueItemId && item.sourcePlaylistId === playlistId);
+
+/** French toast for a failed play-playlist request. */
+const playPlaylistError = (error: unknown): string => {
+	if (error instanceof ApiError) {
+		if (error.code === 'PLAYLIST_EMPTY') return 'Cette playlist est vide';
+		if (error.code === 'PLAYLIST_ACCESS_DENIED') return "Vous n'avez pas accès à cette playlist";
+		if (error.code === 'PLAYLIST_NOT_FOUND') return "Cette playlist n'existe plus";
+	}
+	return 'Impossible de lire cette playlist';
+};
+
+/**
  * Mirror of the server play queue (#274). `queue:updated` and every action
  * replace it whole. Actions of this device that change the current item
- * (next / previous, play or remove an item, #276) start audio; an event never does.
+ * (next / previous, play or remove an item, #276, play a playlist, #277) start audio; an event never does.
  * Stream URLs are fetched by the player on demand, never kept here.
  */
 export const useQueueStore = create<QueueStoreState>((set, get) => {
@@ -103,7 +131,9 @@ export const useQueueStore = create<QueueStoreState>((set, get) => {
 			result = await request();
 		} catch (error) {
 			console.error(`[queueStore] ${label} failed:`, error);
-			if (errorMessage) showError(errorMessage);
+			if (errorMessage) {
+				showError(typeof errorMessage === 'function' ? errorMessage(error) : errorMessage);
+			}
 			return 'error';
 		} finally {
 			stepPending = false;
@@ -211,5 +241,12 @@ export const useQueueStore = create<QueueStoreState>((set, get) => {
 				return false;
 			}
 		},
+
+		playPlaylist: playlistId =>
+			runStep(
+				asStep(() => queueApi.playPlaylist(playlistId)),
+				'Play playlist',
+				{ errorMessage: playPlaylistError }
+			),
 	};
 });

@@ -2,6 +2,7 @@ import {
 	previousAction,
 	selectHasNext,
 	selectHasPrevious,
+	selectPlaysPlaylist,
 	useQueueStore,
 } from '@/store/queueStore';
 import { usePlayerStore } from '@/store/playerStore';
@@ -28,6 +29,7 @@ jest.mock('@/services/queueApi', () => ({
 		addItem: jest.fn(),
 		moveItem: jest.fn(),
 		removeItem: jest.fn(),
+		playPlaylist: jest.fn(),
 	},
 }));
 
@@ -441,5 +443,67 @@ describe('queueStore moveItem', () => {
 
 		expect(showError).toHaveBeenCalled();
 		expect(store().items.map(i => i.id)).toEqual(['a', 'b', 'c']);
+	});
+});
+
+describe('queueStore playPlaylist', () => {
+	/** `ids` queued from playlist `p1`, after a list item `x`. */
+	const withBlock = (currentItemId: string | null, ids: string[]): QueueState => ({
+		currentItemId,
+		items: [item('x'), ...ids.map(id => ({ ...item(id), sourcePlaylistId: 'p1', blockId: 'blk' }))],
+	});
+
+	it('plays the first item of the block on this device', async () => {
+		store().applyState(queue('a'));
+		usePlayerStore.getState().playTrack(listTrack);
+		api.playPlaylist.mockResolvedValue(withBlock('p-1', ['p-1', 'p-2']));
+
+		await expect(store().playPlaylist('p1')).resolves.toBe('played');
+
+		expect(api.playPlaylist).toHaveBeenCalledWith('p1');
+		expect(store().currentItemId).toBe('p-1');
+		expect(player().queueItemId).toBe('p-1');
+		expect(player().currentTrack?.title).toBe('Title p-1');
+		expect(player().playbackState).toBe('loading');
+	});
+
+	it.each([
+		['PLAYLIST_EMPTY', 409, 'Cette playlist est vide'],
+		['PLAYLIST_ACCESS_DENIED', 403, "Vous n'avez pas accès à cette playlist"],
+		['PLAYLIST_NOT_FOUND', 404, "Cette playlist n'existe plus"],
+		['NETWORK_ERROR', undefined, 'Impossible de lire cette playlist'],
+	])('toasts %s and leaves playback alone', async (code, status, message) => {
+		store().applyState(queue('a'));
+		usePlayerStore.getState().playTrack(listTrack);
+		api.playPlaylist.mockRejectedValue(new ApiError('failed', code, undefined, status));
+
+		await expect(store().playPlaylist('p1')).resolves.toBe('error');
+
+		expect(showError).toHaveBeenCalledWith(message);
+		expect(store().currentItemId).toBe('a');
+		expect(player().currentTrack).toBe(listTrack);
+	});
+
+	it('is ignored while another step is pending', async () => {
+		let resolve!: (value: QueueState) => void;
+		api.playPlaylist.mockReturnValue(new Promise(r => (resolve = r)));
+
+		const first = store().playPlaylist('p1');
+		await expect(store().playPlaylist('p1')).resolves.toBe('ignored');
+		await expect(store().next()).resolves.toBe('ignored');
+		resolve(withBlock('p-1', ['p-1']));
+
+		await expect(first).resolves.toBe('played');
+		expect(api.playPlaylist).toHaveBeenCalledTimes(1);
+		expect(api.next).not.toHaveBeenCalled();
+	});
+
+	it('tells whether this device plays an item of a playlist', () => {
+		const state = withBlock('p-1', ['p-1', 'p-2']);
+		expect(selectPlaysPlaylist(state, 'p-2', 'p1')).toBe(true);
+		expect(selectPlaysPlaylist(state, 'p-1', 'other')).toBe(false);
+		expect(selectPlaysPlaylist(state, 'x', 'p1')).toBe(false);
+		expect(selectPlaysPlaylist(state, null, 'p1')).toBe(false);
+		expect(selectPlaysPlaylist(state, 'gone', 'p1')).toBe(false);
 	});
 });

@@ -68,4 +68,14 @@ export const queueApi = {
 			method: 'POST',
 		});
 	},
+
+	/**
+	 * Queue a playlist's tracks as one block right after the current item and
+	 * make its first track current. 409 `PLAYLIST_EMPTY`, 403 / 404 throw.
+	 */
+	playPlaylist(playlistId: string): Promise<QueueState> {
+		return apiRequest<QueueState>(`/api/queue/playlists/${encodeURIComponent(playlistId)}/play`, {
+			method: 'POST',
+		});
+	},
 };
