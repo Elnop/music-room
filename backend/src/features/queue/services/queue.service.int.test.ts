@@ -2,11 +2,14 @@ import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { QueueService } from '@/features/queue/services/queue.service.js';
+import { playPlaylistRpc } from '@/features/queue/utils/queue-rpc.js';
+import { PlaylistService } from '@/features/playlists/playlist.service.js';
+import { PlaylistTrackService } from '@/features/playlists/services/playlist-track.service.js';
 import type { QueueState } from '@/features/queue/queue.types.js';
 
-// The play queue of migration 021 against the local Supabase stack (#273):
-// every row of the plan's I/O matrix, block detachment, history trim and
-// rank rebalance. No Socket.io server runs here: notifyQueueUpdate is a no-op.
+// The play queue of migrations 021 and 022 against the local Supabase stack
+// (#273, #277): every row of the plans' I/O matrices, block detachment,
+// history trim and rank rebalance. No Socket.io server runs here: notifyQueueUpdate is a no-op.
 
 const URI_PREFIX = `https://soundcloud.com/int-queue/${randomUUID()}`;
 const queue = new QueueService();
@@ -49,6 +52,13 @@ function expectRanked(state: QueueState) {
 	const ranks = state.items.map(item => item.rank);
 	expect(new Set(ranks).size).toBe(ranks.length);
 	for (let i = 1; i < ranks.length; i++) expect(ranks[i - 1] < ranks[i]).toBe(true);
+}
+
+async function createProfile(id: string) {
+	const { error } = await supabaseAdmin
+		.from('user_profiles')
+		.insert({ id, username: `int_${id.slice(0, 8)}` });
+	if (error) throw error;
 }
 
 async function seedBlock(itemIds: string[]): Promise<string> {
@@ -327,4 +337,199 @@ describe('rank rebalance', () => {
 		expect(state.items.every(item => item.rank.length <= 2)).toBe(true);
 		expectRanked(state);
 	});
+});
+
+describe('play a playlist', () => {
+	const playlists = new PlaylistService();
+	const playlistTracks = new PlaylistTrackService();
+	let ownerId: string;
+
+	beforeEach(async () => {
+		ownerId = await createUser();
+		await createProfile(ownerId);
+	});
+
+	/** A playlist of n tracks added through the playlist services; returns its id and track URIs. */
+	async function createPlaylist(
+		n: number,
+		visibility: 'public' | 'private' = 'public'
+	): Promise<{ id: string; uris: string[] }> {
+		const { id } = await playlists.createPlaylist(ownerId, { name: 'int-play', visibility });
+		const uris: string[] = [];
+		for (let i = 0; i < n; i++) {
+			const track = dto();
+			await playlistTracks.addTrack(id, ownerId, track);
+			uris.push(track.trackUri);
+		}
+		return { id, uris };
+	}
+
+	const uris = (state: QueueState) => state.items.map(item => item.track.trackUri);
+
+	function expectBlock(state: QueueState, playlistId: string, from: number, count: number) {
+		const block = state.items.slice(from, from + count);
+		expect(new Set(block.map(item => item.blockId)).size).toBe(1);
+		expect(block[0].blockId).not.toBeNull();
+		for (const item of block) {
+			expect(item).toMatchObject({ sourcePlaylistId: playlistId, blockDetached: false });
+		}
+		return block[0].blockId;
+	}
+
+	it('fills an empty queue with the playlist, in order, and plays its first track', async () => {
+		const playlist = await createPlaylist(3);
+		const state = await queue.playPlaylist(userId, playlist.id);
+
+		expect(uris(state)).toEqual(playlist.uris);
+		expectBlock(state, playlist.id, 0, 3);
+		expect(state.currentItemId).toBe(state.items[0].id);
+		expectRanked(state);
+		expect(await queue.getQueue(userId)).toEqual(state);
+	});
+
+	it('places the block after the current item and before the upcoming ones', async () => {
+		const [x, y, z] = await addItems(3);
+		await queue.playItem(userId, x);
+		const playlist = await createPlaylist(2);
+		const state = await queue.playPlaylist(userId, playlist.id);
+
+		expect(ids(state)[0]).toBe(x);
+		expect(ids(state).slice(3)).toEqual([y, z]);
+		expect(uris(state).slice(1, 3)).toEqual(playlist.uris);
+		expectBlock(state, playlist.id, 1, 2);
+		expect(state.currentItemId).toBe(state.items[1].id);
+		expectRanked(state);
+	});
+
+	it('puts the block first when nothing is current', async () => {
+		const [y, z] = await addItems(2);
+		const playlist = await createPlaylist(2);
+		const state = await queue.playPlaylist(userId, playlist.id);
+
+		expect(uris(state).slice(0, 2)).toEqual(playlist.uris);
+		expect(ids(state).slice(2)).toEqual([y, z]);
+		expect(state.currentItemId).toBe(state.items[0].id);
+		expectRanked(state);
+	});
+
+	it('adds a second, separate block when the same playlist is played again', async () => {
+		const playlist = await createPlaylist(2);
+		const first = await queue.playPlaylist(userId, playlist.id);
+		const state = await queue.playPlaylist(userId, playlist.id);
+
+		expect(ids(state).slice(0, 1)).toEqual(ids(first).slice(0, 1));
+		expect(uris(state)).toEqual([playlist.uris[0], ...playlist.uris, playlist.uris[1]]);
+		const firstBlock = expectBlock(first, playlist.id, 0, 2);
+		const secondBlock = expectBlock(state, playlist.id, 1, 2);
+		expect(secondBlock).not.toBe(firstBlock);
+		expect(state.currentItemId).toBe(state.items[1].id);
+		expectRanked(state);
+	});
+
+	it('answers 409 PLAYLIST_EMPTY for an empty playlist and changes nothing', async () => {
+		const [x] = await addItems(2);
+		await queue.playItem(userId, x);
+		const before = await queue.getQueue(userId);
+		const playlist = await createPlaylist(0);
+
+		await expect(queue.playPlaylist(userId, playlist.id)).rejects.toMatchObject({
+			statusCode: 409,
+			code: 'PLAYLIST_EMPTY',
+		});
+		expect(await queue.getQueue(userId)).toEqual(before);
+	});
+
+	it('answers 403 PLAYLIST_ACCESS_DENIED for a private playlist the caller cannot view', async () => {
+		await addItems(1);
+		const before = await queue.getQueue(userId);
+		const playlist = await createPlaylist(1, 'private');
+
+		await expect(queue.playPlaylist(userId, playlist.id)).rejects.toMatchObject({
+			statusCode: 403,
+			code: 'PLAYLIST_ACCESS_DENIED',
+		});
+		expect(await queue.getQueue(userId)).toEqual(before);
+
+		// The owner can play their own private playlist.
+		expect(uris(await queue.playPlaylist(ownerId, playlist.id))).toEqual(playlist.uris);
+	});
+
+	it('answers 404 when the playlist is deleted after the permission check', async () => {
+		await addItems(1);
+		const before = await queue.getQueue(userId);
+		const playlist = await createPlaylist(1);
+		await playlists.deletePlaylist(playlist.id, ownerId);
+
+		await expect(playPlaylistRpc(userId, playlist.id)).rejects.toMatchObject({
+			statusCode: 404,
+			code: 'PLAYLIST_NOT_FOUND',
+		});
+		expect(await queue.getQueue(userId)).toEqual(before);
+	});
+
+	it('answers 404 PLAYLIST_NOT_FOUND for an unknown playlist', async () => {
+		await addItems(1);
+		const before = await queue.getQueue(userId);
+		await expect(queue.playPlaylist(userId, randomUUID())).rejects.toMatchObject({
+			statusCode: 404,
+			code: 'PLAYLIST_NOT_FOUND',
+		});
+		expect(await queue.getQueue(userId)).toEqual(before);
+	});
+
+	it('respaces the ranks when the block makes a key too long, keeping the order', async () => {
+		const [x, y] = await addItems(2);
+		await setRank(x, '1');
+		await setRank(y, '1' + '0'.repeat(62) + '1'); // right above x: no room at 64 characters
+		await queue.playItem(userId, x);
+		const playlist = await createPlaylist(3);
+		const state = await queue.playPlaylist(userId, playlist.id);
+
+		expect(ids(state)[0]).toBe(x);
+		expect(uris(state).slice(1, 4)).toEqual(playlist.uris);
+		expect(ids(state)[4]).toBe(y);
+		expect(state.items.every(item => item.rank.length <= 2)).toBe(true);
+		expectRanked(state);
+	});
+
+	it('keeps the order of a long playlist squeezed between two items', async () => {
+		const [x, y] = await addItems(2);
+		await queue.playItem(userId, x);
+		const { id } = await playlists.createPlaylist(ownerId, { name: 'int-long' });
+		// 450 tracks seeded directly: rank_between halves the gap at each one,
+		// so a key passes rank_max_length() and the queue is respaced mid-block.
+		const count = 450;
+		const tracks = Array.from({ length: count }, () => dto());
+		const { data: rows, error } = await supabaseAdmin
+			.from('tracks')
+			.insert(tracks.map(toRow))
+			.select('id, track_uri');
+		if (error) throw error;
+		const trackIdOf = new Map(rows.map(row => [row.track_uri, row.id]));
+		const digits = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+		const rankOf = (i: number) => digits[1 + Math.floor(i / 61)] + digits[1 + (i % 61)];
+		const { error: linkError } = await supabaseAdmin.from('playlist_tracks').insert(
+			tracks.map((track, i) => ({
+				playlist_id: id,
+				track_id: trackIdOf.get(track.trackUri) ?? '',
+				rank: rankOf(i),
+			}))
+		);
+		if (linkError) throw linkError;
+
+		const state = await queue.playPlaylist(userId, id);
+		expect(state.items).toHaveLength(count + 2);
+		expect(ids(state)[0]).toBe(x);
+		expect(ids(state)[count + 1]).toBe(y);
+		expect(uris(state).slice(1, count + 1)).toEqual(tracks.map(track => track.trackUri));
+		expect(state.items.every(item => item.rank.length <= 64)).toBe(true);
+		expectRanked(state);
+	});
+});
+
+const toRow = (track: ReturnType<typeof dto>) => ({
+	track_uri: track.trackUri,
+	title: track.title,
+	artist: track.artist,
+	duration_ms: track.durationMs,
 });

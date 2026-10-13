@@ -1,6 +1,6 @@
 import { OpenAPIV3 } from 'openapi-types';
 
-// Play queue (#273): one queue per user, synced across their devices.
+// Play queue (#273, #277): one queue per user, synced across their devices.
 // Every endpoint answers the full QueueState and sends it as `queue:updated`
 // to the caller's sockets (room `user:<id>`).
 
@@ -163,6 +163,45 @@ export const queuePaths: OpenAPIV3.PathsObject = {
 				'400': { $ref: '#/components/responses/ValidationError' },
 				'401': { $ref: '#/components/responses/UnauthorizedError' },
 				'404': itemNotFound,
+			},
+		},
+	},
+
+	'/api/queue/playlists/{playlistId}/play': {
+		post: {
+			...common,
+			summary: 'Play a playlist through the queue',
+			description:
+				"Copies the playlist's tracks, in playlist order, into your queue as a new block (one new `blockId`, `sourcePlaylistId` = the playlist) placed right after the current item, or at the top when nothing is current, and makes the block's first item current. The item that was playing becomes history; the upcoming items follow the block. Playing the same playlist again adds a second, separate block. History beyond the 50 most recent items is dropped.",
+			operationId: 'queuePlayPlaylist',
+			parameters: [
+				{
+					in: 'path',
+					name: 'playlistId',
+					required: true,
+					schema: { type: 'string', format: 'uuid' },
+					description: 'Id of a playlist you can view',
+				},
+			],
+			responses: {
+				'200': stateResponse,
+				'400': { $ref: '#/components/responses/ValidationError' },
+				'401': { $ref: '#/components/responses/UnauthorizedError' },
+				'403': errorResponse(
+					'You cannot view the playlist (`PLAYLIST_ACCESS_DENIED`)',
+					'PLAYLIST_ACCESS_DENIED',
+					'Access denied'
+				),
+				'404': errorResponse(
+					'No playlist has this id (`PLAYLIST_NOT_FOUND`)',
+					'PLAYLIST_NOT_FOUND',
+					'Playlist not found'
+				),
+				'409': errorResponse(
+					'The playlist has no track (`PLAYLIST_EMPTY`); the queue is unchanged',
+					'PLAYLIST_EMPTY',
+					'The playlist has no track to play'
+				),
 			},
 		},
 	},

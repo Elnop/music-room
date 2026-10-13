@@ -4,7 +4,7 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { QueueState, QueueStepDirection } from '@/features/queue/queue.types.js';
 
-// Calls the queue functions of migration 021, which all return the full queue
+// Calls the queue functions of migrations 021 and 022, which all return the full queue
 // state, and turns their RAISE EXCEPTION codes into API errors.
 
 const queueStateSchema: z.ZodType<QueueState> = z.object({
@@ -36,6 +36,8 @@ const ERRORS: Record<string, { status: number; message: string }> = {
 	},
 	QUEUE_END: { status: 409, message: 'No next item in the queue' },
 	QUEUE_START: { status: 409, message: 'No previous item in the queue' },
+	PLAYLIST_NOT_FOUND: { status: 404, message: 'Playlist not found' },
+	PLAYLIST_EMPTY: { status: 409, message: 'The playlist has no track to play' },
 };
 
 function toAppError(operation: string, message: string): AppError {
@@ -96,5 +98,12 @@ export function stepQueueRpc(userId: string, direction: QueueStepDirection): Pro
 	return call(
 		direction,
 		supabaseAdmin.rpc('queue_step', { p_user: userId, p_direction: direction })
+	);
+}
+
+export function playPlaylistRpc(userId: string, playlistId: string): Promise<QueueState> {
+	return call(
+		'play-playlist',
+		supabaseAdmin.rpc('queue_play_playlist', { p_user: userId, p_playlist_id: playlistId })
 	);
 }

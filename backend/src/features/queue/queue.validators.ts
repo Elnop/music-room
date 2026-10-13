@@ -12,6 +12,11 @@ export const queueItemParamsSchema = z.object({
 	itemId: z.uuid('Invalid queue item ID format'),
 });
 
+/** Path segment of POST /api/queue/playlists/:playlistId/play. */
+export const queuePlaylistParamsSchema = z.object({
+	playlistId: z.uuid('Invalid playlist ID format'),
+});
+
 /** Body of POST /api/queue/items/:itemId/move; null = right after the current item. */
 export const moveQueueItemSchema = z.object({
 	afterItemId: z.uuid('Invalid queue item ID format').nullable(),
