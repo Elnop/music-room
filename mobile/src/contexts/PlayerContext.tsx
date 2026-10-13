@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useRef } from 'react';
-import { useAudioPlayer, setAudioModeAsync } from 'expo-audio';
+import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
 import { usePlayerStore } from '@/store/playerStore';
+import { useQueueStore } from '@/store/queueStore';
 import { ApiError, apiRequest } from '@/services/api';
 
 // Configure audio mode for iOS - play in silent mode and background
@@ -27,6 +28,32 @@ interface PlayerContextValue {
 }
 
 const PlayerContext = createContext<PlayerContextValue | null>(null);
+
+/**
+ * Plays the next queue item when a track ends (#274), once per loaded track;
+ * at the queue end the store stops playback. Fires on the rising edge of
+ * `didJustFinish` while playing, so a stale flag left from the previous track
+ * cannot skip the next one. A component of its own so the frequent status
+ * updates re-render only it, not the context consumers.
+ */
+function QueueAutoAdvance({ player }: { player: ReturnType<typeof useAudioPlayer> }) {
+	const { didJustFinish } = useAudioPlayerStatus(player);
+	const loadCounter = usePlayerStore(state => state.loadCounter);
+	const isPlaying = usePlayerStore(state => state.playbackState === 'playing');
+	const wasFinishedRef = useRef(false);
+	const finishedLoadRef = useRef<number | null>(null);
+
+	useEffect(() => {
+		const risingEdge = didJustFinish && !wasFinishedRef.current;
+		wasFinishedRef.current = didJustFinish;
+		if (!risingEdge || !isPlaying || finishedLoadRef.current === loadCounter) return;
+		finishedLoadRef.current = loadCounter;
+		if (__DEV__) console.log('🎵 [PlayerProvider] Track finished, playing next queue item');
+		useQueueStore.getState().next();
+	}, [didJustFinish, isPlaying, loadCounter]);
+
+	return null;
+}
 
 export function PlayerProvider({ children }: { children: React.ReactNode }) {
 	const {
@@ -279,7 +306,12 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 		error: usePlayerStore(state => state.error),
 	};
 
-	return <PlayerContext.Provider value={value}>{children}</PlayerContext.Provider>;
+	return (
+		<PlayerContext.Provider value={value}>
+			<QueueAutoAdvance player={player} />
+			{children}
+		</PlayerContext.Provider>
+	);
 }
 
 export function usePlayer() {

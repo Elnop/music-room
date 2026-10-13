@@ -16,6 +16,13 @@ import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@/themes/types';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { usePlayerStore } from '@/store/playerStore';
+import {
+	previousAction,
+	RESTART_THRESHOLD_S,
+	selectHasNext,
+	selectHasPrevious,
+	useQueueStore,
+} from '@/store/queueStore';
 import { usePlayerProgress } from '@/hooks/usePlayerProgress';
 import { useImageColors, hexToRgba, getAdaptiveColors, isLightColor } from '@/hooks/useImageColors';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
@@ -33,6 +40,13 @@ export function PlayerModal() {
 		usePlayerStore();
 
 	const { currentTime, duration } = usePlayerProgress();
+	const hasNext = useQueueStore(selectHasNext);
+	const queueHasPrevious = useQueueStore(selectHasPrevious);
+	const queueItemId = usePlayerStore(state => state.queueItemId);
+	// Only a queue item steps back; a list-tapped track restarts instead.
+	const hasPrevious = queueHasPrevious && queueItemId !== null;
+	const queueNext = useQueueStore(state => state.next);
+	const queuePrevious = useQueueStore(state => state.previous);
 
 	const translateY = useSharedValue(0);
 
@@ -126,11 +140,21 @@ export function PlayerModal() {
 		player.seekTo(value);
 	};
 
-	const handleSkip = (seconds: number) => {
+	// Previous restarts the track past RESTART_THRESHOLD_S, otherwise steps back in the queue.
+	const handlePrevious = () => {
 		if (!player) return;
-		const newPosition = Math.max(0, Math.min(duration, currentTime + seconds));
-		player.seekTo(newPosition);
+		if (previousAction(currentTime, hasPrevious) === 'restart') {
+			player.seekTo(0);
+		} else {
+			queuePrevious();
+		}
 	};
+
+	const handleNext = () => {
+		queueNext();
+	};
+
+	const canGoPrevious = canInteract && (hasPrevious || currentTime > RESTART_THRESHOLD_S);
 
 	const gradientColors: [string, string, string, string] = dominantColor
 		? [
@@ -235,11 +259,17 @@ export function PlayerModal() {
 						<View style={styles.controls}>
 							<TouchableOpacity
 								style={[styles.secondaryButton, { backgroundColor: colors.buttonBg }]}
-								onPress={() => handleSkip(-15)}
-								disabled={isLoading || !canInteract}
+								onPress={handlePrevious}
+								disabled={!canGoPrevious}
 								activeOpacity={0.7}
+								accessibilityLabel="Previous track"
 							>
-								<Ionicons name="play-back" size={28} color={colors.text} />
+								<Ionicons
+									name="play-skip-back"
+									size={28}
+									color={colors.text}
+									style={canGoPrevious ? undefined : styles.disabledIcon}
+								/>
 							</TouchableOpacity>
 
 							<TouchableOpacity
@@ -262,11 +292,17 @@ export function PlayerModal() {
 
 							<TouchableOpacity
 								style={[styles.secondaryButton, { backgroundColor: colors.buttonBg }]}
-								onPress={() => handleSkip(15)}
-								disabled={isLoading || !canInteract}
+								onPress={handleNext}
+								disabled={!hasNext}
 								activeOpacity={0.7}
+								accessibilityLabel="Next track"
 							>
-								<Ionicons name="play-forward" size={28} color={colors.text} />
+								<Ionicons
+									name="play-skip-forward"
+									size={28}
+									color={colors.text}
+									style={hasNext ? undefined : styles.disabledIcon}
+								/>
 							</TouchableOpacity>
 						</View>
 
@@ -416,6 +452,9 @@ const createStyles = (theme: Theme, insets: { top: number; bottom: number }) =>
 			borderRadius: 28,
 			alignItems: 'center',
 			justifyContent: 'center',
+		},
+		disabledIcon: {
+			opacity: 0.35,
 		},
 		playButton: {
 			width: 72,

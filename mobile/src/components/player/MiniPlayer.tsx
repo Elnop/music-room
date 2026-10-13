@@ -6,6 +6,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { usePlayerStore } from '@/store/playerStore';
+import { selectHasNext, useQueueStore } from '@/store/queueStore';
 import { usePlayerProgress } from '@/hooks/usePlayerProgress';
 
 export function MiniPlayer() {
@@ -16,6 +17,8 @@ export function MiniPlayer() {
 	const { player } = usePlayer();
 	const { currentTrack, playbackState, pause, resume, toggleModal } = usePlayerStore();
 	const { progress } = usePlayerProgress();
+	const hasNext = useQueueStore(selectHasNext);
+	const queueNext = useQueueStore(state => state.next);
 
 	if (!currentTrack) {
 		return null;
@@ -67,6 +70,21 @@ export function MiniPlayer() {
 							style={isPlaying ? undefined : { marginLeft: 2 }}
 						/>
 					)}
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					style={styles.nextButton}
+					onPress={() => queueNext()}
+					hitSlop={{ top: 10, bottom: 10, left: 6, right: 10 }}
+					disabled={!hasNext}
+					accessibilityLabel="Next track"
+				>
+					<Ionicons
+						name="play-skip-forward"
+						size={22}
+						color={theme.colors.text}
+						style={hasNext ? undefined : styles.disabledIcon}
+					/>
 				</TouchableOpacity>
 			</View>
 
@@ -127,6 +145,16 @@ const createStyles = (theme: Theme, insets: EdgeInsets) =>
 			backgroundColor: theme.colors.primary,
 			alignItems: 'center',
 			justifyContent: 'center',
+		},
+		nextButton: {
+			width: 36,
+			height: 40,
+			marginLeft: theme.spacing.xs,
+			alignItems: 'center',
+			justifyContent: 'center',
+		},
+		disabledIcon: {
+			opacity: 0.35,
 		},
 		progressBarContainer: {
 			height: 2,
