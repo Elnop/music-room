@@ -1,5 +1,10 @@
 import { ApiError, apiRequest } from '@/services/api';
-import type { QueueState, QueueStepBoundary, QueueStepResult } from '@/types/queue.types';
+import type {
+	AddQueueItemBody,
+	QueueState,
+	QueueStepBoundary,
+	QueueStepResult,
+} from '@/types/queue.types';
 
 /**
  * Play queue API (#273). Requests go through `apiRequest`, which adds the
@@ -32,6 +37,14 @@ export const queueApi = {
 	/** Step to the previous item; `QUEUE_START` when there is none. */
 	previous(): Promise<QueueStepResult> {
 		return step('/api/queue/previous', 'QUEUE_START');
+	},
+
+	/** Append a track to the end of the queue. */
+	addItem(body: AddQueueItemBody): Promise<QueueState> {
+		return apiRequest<QueueState>('/api/queue/items', {
+			method: 'POST',
+			body: JSON.stringify(body),
+		});
 	},
 
 	/** Make an item current. */

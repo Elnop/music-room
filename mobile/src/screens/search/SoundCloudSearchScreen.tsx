@@ -6,6 +6,8 @@ import { usePlayerHeight } from '@/contexts/PlayerContext';
 import type { Theme } from '@/themes/types';
 import { useSoundCloudStore } from '@store/soundcloudStore';
 import { usePlayerStore } from '@store/playerStore';
+import { useQueueStore } from '@store/queueStore';
+import { toTrackInput } from '@utils/trackInput';
 import { SoundCloudTrackItem } from '@screens/search/components/SoundCloudTrackItem';
 import { PlaylistSelectorModal } from '@screens/search/components/PlaylistSelectorModal';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
@@ -24,6 +26,7 @@ export function SoundCloudSearchScreen() {
 	const { searchResults, isSearching, error, search, clearSearch, clearError } =
 		useSoundCloudStore();
 	const { playTrack } = usePlayerStore();
+	const addToQueue = useQueueStore(state => state.addItem);
 
 	// Debounced search
 	const debouncedSearch = useMemo(
@@ -85,6 +88,7 @@ export function SoundCloudSearchScreen() {
 						<SoundCloudTrackItem
 							track={item}
 							onPlay={handlePlay}
+							onAddToQueue={track => addToQueue(toTrackInput(track))}
 							onAddToPlaylist={handleAddToPlaylist}
 						/>
 					)}

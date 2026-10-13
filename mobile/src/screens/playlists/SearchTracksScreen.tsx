@@ -16,6 +16,9 @@ import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import { usePlaylistStore } from '@store/playlistStore';
 import { useSoundCloudStore } from '@store/soundcloudStore';
+import { useQueueStore } from '@store/queueStore';
+import { QueueSwipe } from '@components/common/QueueSwipe';
+import { toTrackInput } from '@utils/trackInput';
 import { EmptyState } from '@components/common/EmptyState';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
 import debounce from 'lodash/debounce';
@@ -23,8 +26,6 @@ import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import type { Track } from '@/types/track.types';
 import { showError } from '@utils/toast';
 import { ApiError } from '@/services/api';
-
-type NewTrackInput = Omit<Track, 'id'> & { id?: string };
 
 type PlaylistStackParamList = {
 	Playlists: undefined;
@@ -51,6 +52,7 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 	const { playlistId } = route.params;
 	const { addTrack, currentPlaylist } = usePlaylistStore();
 	const { searchResults, isSearching, search, clearSearch } = useSoundCloudStore();
+	const addToQueue = useQueueStore(state => state.addItem);
 	const [query, setQuery] = useState('');
 	const [addingTrackId, setAddingTrackId] = useState<number | null>(null);
 	const [addedTrackUris, setAddedTrackUris] = useState<Set<string>>(new Set());
@@ -121,17 +123,8 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 
 		setAddingTrackId(track.id);
 		try {
-			const internalTrack: NewTrackInput = {
-				title: track.title,
-				artist: track.user.username,
-				album: undefined,
-				albumArt: track.artwork_url || track.user.avatar_url || '',
-				durationMs: track.duration,
-				trackUri: track.permalink_url,
-				previewUrl: undefined,
-			};
-
-			await addTrack(playlistId, internalTrack as Track);
+			// The backend generates the id; the cast only satisfies the store signature.
+			await addTrack(playlistId, toTrackInput(track) as Track);
 
 			setAddedTrackUris(prev => new Set(prev).add(track.permalink_url));
 		} catch (error) {
@@ -153,36 +146,40 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 		const isAdded = addedTrackUris.has(item.permalink_url);
 
 		return (
-			<TouchableOpacity
-				style={styles.trackItem}
-				onPress={() => !isAdded && handleAddTrack(item)}
-				disabled={isAdding || isAdded}
-				activeOpacity={0.7}
-			>
-				<Image source={{ uri: artworkUrl }} style={styles.artwork} />
-				<View style={styles.trackInfo}>
-					<Text style={styles.trackTitle} numberOfLines={1}>
-						{item.title}
-					</Text>
-					<Text style={styles.trackArtist} numberOfLines={1}>
-						{item.user.username}
-					</Text>
-					<Text style={styles.trackDuration}>{formatDuration(item.duration)}</Text>
-				</View>
-				<View
-					style={[
-						styles.addButton,
-						isAdding && styles.addButtonDisabled,
-						isAdded && styles.addedButton,
-					]}
-				>
-					{isAdding ? (
-						<ActivityIndicator size="small" color="#FFFFFF" />
-					) : (
-						<Ionicons name={isAdded ? 'checkmark' : 'add'} size={20} color="#FFFFFF" />
-					)}
-				</View>
-			</TouchableOpacity>
+			<View style={styles.trackRow}>
+				<QueueSwipe onAddToQueue={() => addToQueue(toTrackInput(item))}>
+					<TouchableOpacity
+						style={styles.trackItem}
+						onPress={() => !isAdded && handleAddTrack(item)}
+						disabled={isAdding || isAdded}
+						activeOpacity={0.7}
+					>
+						<Image source={{ uri: artworkUrl }} style={styles.artwork} />
+						<View style={styles.trackInfo}>
+							<Text style={styles.trackTitle} numberOfLines={1}>
+								{item.title}
+							</Text>
+							<Text style={styles.trackArtist} numberOfLines={1}>
+								{item.user.username}
+							</Text>
+							<Text style={styles.trackDuration}>{formatDuration(item.duration)}</Text>
+						</View>
+						<View
+							style={[
+								styles.addButton,
+								isAdding && styles.addButtonDisabled,
+								isAdded && styles.addedButton,
+							]}
+						>
+							{isAdding ? (
+								<ActivityIndicator size="small" color="#FFFFFF" />
+							) : (
+								<Ionicons name={isAdded ? 'checkmark' : 'add'} size={20} color="#FFFFFF" />
+							)}
+						</View>
+					</TouchableOpacity>
+				</QueueSwipe>
+			</View>
 		);
 	};
 
@@ -278,12 +275,17 @@ const createStyles = (theme: Theme) =>
 			flexGrow: 1,
 			paddingTop: theme.spacing.sm,
 		},
+		// Spacing outside the swipe, so the queue panel matches the row's height.
+		trackRow: {
+			marginBottom: theme.spacing.xs,
+		},
 		trackItem: {
 			flexDirection: 'row',
 			alignItems: 'center',
 			paddingHorizontal: theme.spacing.md,
 			paddingVertical: theme.spacing.sm,
-			marginBottom: theme.spacing.xs,
+			// Opaque so the queue panel stays hidden behind the row until swiped.
+			backgroundColor: theme.colors.background,
 		},
 		artwork: {
 			width: 52,

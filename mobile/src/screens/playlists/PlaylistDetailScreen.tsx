@@ -17,6 +17,8 @@ import { trackToSoundCloud } from '@utils/trackToSoundCloud';
 import { ApiError } from '@/services/api';
 import { useAuthStore } from '@store/authStore';
 import { usePlayerStore } from '@store/playerStore';
+import { useQueueStore } from '@store/queueStore';
+import { toTrackInput } from '@utils/trackInput';
 import { usePlaylistSocket } from '@hooks/usePlaylistSocket';
 import { PlaylistHeader } from '@components/playlist/PlaylistHeader';
 import { SwipeableTrackItem } from '@components/common/SwipeableTrackItem';
@@ -51,6 +53,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 	const styles = React.useMemo(() => createStyles(theme, insets.top), [theme, insets.top]);
 	const { id } = route.params;
 	const { user } = useAuthStore();
+	const addToQueue = useQueueStore(state => state.addItem);
 	const {
 		currentPlaylist,
 		isLoading,
@@ -220,6 +223,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 						track={item}
 						onDelete={() => handleDeleteTrack(item.id)}
 						disabled={!canEdit}
+						onAddToQueue={() => addToQueue(toTrackInput(item))}
 						onDragStart={canEdit ? drag : undefined}
 						isDragActive={isActive}
 					/>

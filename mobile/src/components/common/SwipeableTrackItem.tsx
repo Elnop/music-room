@@ -1,15 +1,18 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Pressable } from 'react-native';
-import { Swipeable } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
+import { QueueSwipe } from '@/components/common/QueueSwipe';
 import type { Theme } from '@/themes/types';
 import type { Track } from '@/types/track.types';
 
 interface SwipeableTrackItemProps {
 	track: Track;
 	onDelete: (trackId: string) => Promise<void>;
+	/** True for a viewer who cannot edit: no delete swipe, no drag handle. */
 	disabled?: boolean;
+	/** A right swipe adds the track to the play queue, for any viewer. */
+	onAddToQueue?: () => void;
 	/** Shows the drag handle; pressing it starts a reorder drag. */
 	onDragStart?: () => void;
 	/** Raises the row while it is being dragged. */
@@ -20,33 +23,28 @@ export function SwipeableTrackItem({
 	track,
 	onDelete,
 	disabled = false,
+	onAddToQueue,
 	onDragStart,
 	isDragActive = false,
 }: SwipeableTrackItemProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
-	const renderRightActions = () => {
-		if (disabled) return null;
-
-		return (
-			<TouchableOpacity
-				style={styles.deleteButton}
-				onPress={() => onDelete(track.id)}
-				activeOpacity={0.7}
-			>
-				<Ionicons name="trash-outline" size={24} color="#FFFFFF" />
-				<Text style={styles.deleteText}>Supprimer</Text>
-			</TouchableOpacity>
-		);
-	};
+	const renderRightActions = () => (
+		<TouchableOpacity
+			style={styles.deleteButton}
+			onPress={() => onDelete(track.id)}
+			activeOpacity={0.7}
+		>
+			<Ionicons name="trash-outline" size={24} color="#FFFFFF" />
+			<Text style={styles.deleteText}>Supprimer</Text>
+		</TouchableOpacity>
+	);
 
 	return (
-		<Swipeable
-			renderRightActions={renderRightActions}
-			overshootRight={false}
-			friction={2}
-			enabled={!disabled}
+		<QueueSwipe
+			onAddToQueue={onAddToQueue}
+			renderRightActions={disabled ? undefined : renderRightActions}
 		>
 			<View style={[styles.trackContainer, isDragActive && styles.trackContainerActive]}>
 				{track.albumArt ? (
@@ -82,7 +80,7 @@ export function SwipeableTrackItem({
 					</Pressable>
 				)}
 			</View>
-		</Swipeable>
+		</QueueSwipe>
 	);
 }
 
