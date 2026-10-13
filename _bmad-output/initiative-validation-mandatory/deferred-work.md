@@ -50,3 +50,7 @@
 - source_plan: `_bmad-output/initiative-validation-mandatory/plan-gh-271-playlist-drag-and-drop.md`
   summary: ReorderableList's vertical pan gesture (`activeOffsetY([-5, 5])`) has no `failOffsetX`, so a slightly diagonal left swipe may be captured by the list instead of the row's swipe-to-delete.
   evidence: Unverified (would be medium). Settled by trying swipe-to-delete with a diagonal swipe on a native debug build; if it fails, add `.failOffsetX([-10, 10])` to the pan gesture.
+
+- source_plan: `_bmad-output/initiative-validation-mandatory/plan-gh-273-play-queue-backend.md`
+  summary: `POST /api/playlists/:id/tracks` accepts `previewUrl` (a SoundCloud stream URL) and persists it in `tracks.preview_url`, against the rule never to persist stream URLs.
+  evidence: `addTrackSchema` (playlist.validators.ts) accepts `previewUrl`; `upsertTrack` writes it; soundcloud.types.ts:77 documents it as the stream URL. The mobile app sends `undefined`, so only a crafted request stores one. Found by the gh-273 review.

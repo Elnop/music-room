@@ -16,6 +16,7 @@ import {
 	revalidatePlaylistRoom,
 } from '@/realtime/playlist-room.js';
 import type { PlaylistUpdatedPayload } from '@/features/playlists/playlist.types.js';
+import type { QueueState } from '@/features/queue/queue.types.js';
 import { controlAccessService } from '@/features/music-control/services/control-access.service.js';
 import type {
 	ListeningStatus,
@@ -569,6 +570,30 @@ class RealtimeService {
 			event,
 			tracksVersion,
 			room: `playlist:${playlistId}`,
+			action: 'broadcasted',
+		});
+	}
+
+	/**
+	 * Send a user's whole play queue to all of their devices (`user:<id>`)
+	 * after any change to it (#273). Other users never receive it.
+	 */
+	notifyQueueUpdate(userId: string, state: QueueState): void {
+		if (!this.io) {
+			socketLogger.event('queue:updated', 'N/A', {
+				level: 'warn',
+				userId,
+				action: 'not_initialized',
+			});
+			return;
+		}
+
+		this.io.to(`user:${userId}`).emit('queue:updated', state);
+
+		socketLogger.broadcast('queue_updated', {
+			userId,
+			items: state.items.length,
+			room: `user:${userId}`,
 			action: 'broadcasted',
 		});
 	}

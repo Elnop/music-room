@@ -1,6 +1,5 @@
-import { supabaseAdmin } from '@/shared/config/supabase.js';
-import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
+import { upsertTrack } from '@/shared/utils/track-upsert.js';
 import { checkEditPermission } from '@/features/playlists/permissions/playlist.permissions.js';
 import { formatTrackResponse } from '@/features/playlists/utils/playlist.helpers.js';
 import { addTrackRpc, moveTrackRpc, removeTrackRpc } from '@/features/playlists/utils/track-rpc.js';
@@ -26,26 +25,7 @@ export class PlaylistTrackService {
 	async addTrack(playlistId: string, userId: string, track: AddTrackDTO): Promise<AddTrackResult> {
 		const playlist = await checkEditPermission(playlistId, userId);
 
-		const { data: trackRow, error } = await supabaseAdmin
-			.from('tracks')
-			.upsert(
-				{
-					track_uri: track.trackUri,
-					title: track.title,
-					artist: track.artist,
-					album: track.album,
-					album_art: track.albumArt,
-					duration_ms: track.durationMs,
-					preview_url: track.previewUrl,
-				},
-				{ onConflict: 'track_uri' }
-			)
-			.select()
-			.single();
-		if (error) {
-			logger.error('Failed to upsert track', { error, playlistId });
-			throw new AppError(500, 'Failed to add track', 'TRACK_ADD_ERROR');
-		}
+		const trackRow = await upsertTrack(track);
 
 		const addedBy = playlist.edit_mode === 'restricted' ? userId : null;
 		const result = await addTrackRpc(playlistId, trackRow.id, addedBy);
