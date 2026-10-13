@@ -1,29 +1,30 @@
-import { afterRankFor } from '@/store/moveTarget';
+import { afterRankForDrop } from '@/store/moveTarget';
 import type { TrackInPlaylist } from '@/types/track.types';
 
 const tracks = ['a', 'h', 'p', 't'].map((rank, i) => ({ id: `${i}`, rank }) as TrackInPlaylist);
 
-describe('afterRankFor', () => {
-	it('moves up by dropping after the track two rows above', () => {
-		expect(afterRankFor(tracks, 2, 'up')).toBe('a');
+describe('afterRankForDrop', () => {
+	it('drags down by dropping after the target row', () => {
+		expect(afterRankForDrop(tracks, 1, 3)).toBe('t');
+		expect(afterRankForDrop(tracks, 0, 1)).toBe('h');
 	});
 
-	it('moves the second track to the top', () => {
-		expect(afterRankFor(tracks, 1, 'up')).toBeNull();
+	it('drags up to the top', () => {
+		expect(afterRankForDrop(tracks, 2, 0)).toBeNull();
 	});
 
-	it('moves down by dropping after the next track', () => {
-		expect(afterRankFor(tracks, 1, 'down')).toBe('p');
+	it('drags up mid list by dropping after the row above the target', () => {
+		expect(afterRankForDrop(tracks, 3, 1)).toBe('a');
 	});
 
-	it('moves the second to last track to the bottom', () => {
-		expect(afterRankFor(tracks, 2, 'down')).toBe('t');
+	it('sends nothing when the track is dropped where it was', () => {
+		expect(afterRankForDrop(tracks, 2, 2)).toBeUndefined();
 	});
 
-	it('cannot move past the edges or outside the list', () => {
-		expect(afterRankFor(tracks, 0, 'up')).toBeUndefined();
-		expect(afterRankFor(tracks, 3, 'down')).toBeUndefined();
-		expect(afterRankFor(tracks, 4, 'up')).toBeUndefined();
-		expect(afterRankFor([], 0, 'down')).toBeUndefined();
+	it('ignores indexes outside the list', () => {
+		expect(afterRankForDrop(tracks, 4, 0)).toBeUndefined();
+		expect(afterRankForDrop(tracks, 0, 4)).toBeUndefined();
+		expect(afterRankForDrop(tracks, -1, 1)).toBeUndefined();
+		expect(afterRankForDrop([], 0, 1)).toBeUndefined();
 	});
 });

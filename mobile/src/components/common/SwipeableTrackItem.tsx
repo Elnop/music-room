@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Pressable } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -10,19 +10,18 @@ interface SwipeableTrackItemProps {
 	track: Track;
 	onDelete: (trackId: string) => Promise<void>;
 	disabled?: boolean;
-	/** Shows the up / down buttons; a missing handler shows its button disabled. */
-	showMoveButtons?: boolean;
-	onMoveUp?: () => void;
-	onMoveDown?: () => void;
+	/** Shows the drag handle; pressing it starts a reorder drag. */
+	onDragStart?: () => void;
+	/** Raises the row while it is being dragged. */
+	isDragActive?: boolean;
 }
 
 export function SwipeableTrackItem({
 	track,
 	onDelete,
 	disabled = false,
-	showMoveButtons = false,
-	onMoveUp,
-	onMoveDown,
+	onDragStart,
+	isDragActive = false,
 }: SwipeableTrackItemProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
@@ -49,7 +48,7 @@ export function SwipeableTrackItem({
 			friction={2}
 			enabled={!disabled}
 		>
-			<View style={styles.trackContainer}>
+			<View style={[styles.trackContainer, isDragActive && styles.trackContainerActive]}>
 				{track.albumArt ? (
 					<Image source={{ uri: track.albumArt }} style={styles.albumArt} />
 				) : (
@@ -71,37 +70,16 @@ export function SwipeableTrackItem({
 					<Text style={styles.duration}>{formatDuration(track.durationMs)}</Text>
 				)}
 
-				{!disabled && showMoveButtons && (
-					<View style={styles.moveButtons}>
-						<TouchableOpacity
-							onPress={onMoveUp}
-							disabled={!onMoveUp}
-							hitSlop={6}
-							accessibilityRole="button"
-							accessibilityLabel="Move track up"
-							accessibilityState={{ disabled: !onMoveUp }}
-						>
-							<Ionicons
-								name="chevron-up"
-								size={22}
-								color={onMoveUp ? theme.colors.text : theme.colors.border}
-							/>
-						</TouchableOpacity>
-						<TouchableOpacity
-							onPress={onMoveDown}
-							disabled={!onMoveDown}
-							hitSlop={6}
-							accessibilityRole="button"
-							accessibilityLabel="Move track down"
-							accessibilityState={{ disabled: !onMoveDown }}
-						>
-							<Ionicons
-								name="chevron-down"
-								size={22}
-								color={onMoveDown ? theme.colors.text : theme.colors.border}
-							/>
-						</TouchableOpacity>
-					</View>
+				{!disabled && onDragStart && (
+					<Pressable
+						onPressIn={onDragStart}
+						hitSlop={10}
+						style={styles.dragHandle}
+						accessibilityRole="button"
+						accessibilityLabel="Reorder track"
+					>
+						<Ionicons name="reorder-three-outline" size={24} color={theme.colors.textSecondary} />
+					</Pressable>
 				)}
 			</View>
 		</Swipeable>
@@ -153,9 +131,16 @@ const createStyles = (theme: Theme) =>
 			fontSize: 13,
 			color: theme.colors.textSecondary,
 		},
-		moveButtons: {
+		trackContainerActive: {
+			elevation: 6,
+			shadowColor: '#000000',
+			shadowOpacity: 0.25,
+			shadowRadius: 6,
+			shadowOffset: { width: 0, height: 3 },
+		},
+		dragHandle: {
 			marginLeft: theme.spacing.sm,
-			alignItems: 'center',
+			padding: theme.spacing.xs,
 		},
 		deleteButton: {
 			backgroundColor: '#FF6B6B',

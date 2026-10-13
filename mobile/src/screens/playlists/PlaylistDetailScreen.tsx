@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { View, FlatList, StyleSheet, Pressable } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
 import { showError, showSuccess } from '@utils/toast';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -13,13 +13,14 @@ import type { Theme } from '@themes/types';
 import type { Track } from '@/types/track.types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import { CONFLICT_CODES, usePlaylistStore } from '@store/playlistStore';
-import { afterRankFor } from '@store/moveTarget';
+import { afterRankForDrop } from '@store/moveTarget';
 import { ApiError } from '@/services/api';
 import { useAuthStore } from '@store/authStore';
 import { usePlayerStore } from '@store/playerStore';
 import { usePlaylistSocket } from '@hooks/usePlaylistSocket';
 import { PlaylistHeader } from '@components/playlist/PlaylistHeader';
 import { SwipeableTrackItem } from '@components/common/SwipeableTrackItem';
+import { ReorderableList } from '@components/common/ReorderableList';
 import { EmptyState } from '@components/common/EmptyState';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
 
@@ -190,17 +191,20 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 		}
 	};
 
-	const handleMove = async (index: number, direction: 'up' | 'down') => {
+	// Rejects on failure so the list drops its local order and shows the store's again.
+	const handleReorder = async (from: number, to: number) => {
 		const tracks = currentPlaylist?.tracks ?? [];
-		const afterRank = afterRankFor(tracks, index, direction);
+		const afterRank = afterRankForDrop(tracks, from, to);
 		if (afterRank === undefined) return;
 		try {
-			await moveTrack(id, tracks[index].id, afterRank);
+			await moveTrack(id, tracks[from].id, afterRank);
 		} catch (error) {
 			// Conflicts are reported through conflictMessage once the playlist is reloaded.
-			if (error instanceof ApiError && CONFLICT_CODES.includes(error.code)) return;
-			console.error('[PlaylistDetailScreen] Move track failed:', error);
-			showError('Impossible de déplacer le track');
+			if (!(error instanceof ApiError && CONFLICT_CODES.includes(error.code))) {
+				console.error('[PlaylistDetailScreen] Move track failed:', error);
+				showError('Impossible de déplacer le track');
+			}
+			throw error;
 		}
 	};
 
@@ -238,23 +242,20 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 			/>
 
 			{/* Content */}
-			<FlatList
+			<ReorderableList
 				data={currentPlaylist.tracks}
 				keyExtractor={item => item.id}
-				renderItem={({ item, index }) => {
-					const canMoveUp = !isMoving && index > 0;
-					const canMoveDown = !isMoving && index < currentPlaylist.tracks.length - 1;
-					return (
-						<SwipeableTrackItem
-							track={item}
-							onDelete={() => handleDeleteTrack(item.id)}
-							disabled={!canEdit}
-							showMoveButtons={canEdit}
-							onMoveUp={canMoveUp ? () => handleMove(index, 'up') : undefined}
-							onMoveDown={canMoveDown ? () => handleMove(index, 'down') : undefined}
-						/>
-					);
-				}}
+				onReorder={handleReorder}
+				dragEnabled={canEdit && !isMoving}
+				renderItem={({ item, drag, isActive }) => (
+					<SwipeableTrackItem
+						track={item}
+						onDelete={() => handleDeleteTrack(item.id)}
+						disabled={!canEdit}
+						onDragStart={canEdit ? drag : undefined}
+						isDragActive={isActive}
+					/>
+				)}
 				ListHeaderComponent={
 					<PlaylistHeader
 						playlist={currentPlaylist}
