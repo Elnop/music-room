@@ -46,3 +46,7 @@
 - source_plan: `_bmad-output/initiative-validation-mandatory/epic-comptes-auth/story-tests-de-authstore-mobile-plan.md`
   summary: Align doc/TESTING.md (mobile tests "mock services/api.ts") with the authStore tests, which mock fetch under the real apiRequest.
   evidence: doc/TESTING.md:45 vs mobile/src/store/authStore.test.ts (existing refresh/logout tests and #76's tests).
+
+- source_plan: `_bmad-output/initiative-validation-mandatory/plan-gh-271-playlist-drag-and-drop.md`
+  summary: ReorderableList's vertical pan gesture (`activeOffsetY([-5, 5])`) has no `failOffsetX`, so a slightly diagonal left swipe may be captured by the list instead of the row's swipe-to-delete.
+  evidence: Unverified (would be medium). Settled by trying swipe-to-delete with a diagonal swipe on a native debug build; if it fails, add `.failOffsetX([-10, 10])` to the pan gesture.
