@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { queueApi } from '@/services/queueApi';
 import { usePlayerStore } from '@/store/playerStore';
 import { trackToSoundCloud } from '@utils/trackToSoundCloud';
-import { showError, showSuccess } from '@utils/toast';
+import { showError, showInfo, showSuccess } from '@utils/toast';
 import type { AddQueueItemBody, QueueItem, QueueState, QueueStepResult } from '@/types/queue.types';
 
 /** Past this many seconds played, "previous" restarts the track instead. */
@@ -14,13 +14,21 @@ export function previousAction(currentTime: number, hasPrevious: boolean): 'rest
 }
 
 /**
- * Outcome of a step: playing the new current item, at a queue boundary,
- * failed, or ignored because another step was still pending.
+ * Outcome of a step: the new current item plays, the queue has no current
+ * item left (playback stopped when asked), at a queue boundary, failed, or
+ * ignored because another step was still pending.
  */
-export type QueueStepOutcome = 'played' | 'boundary' | 'error' | 'ignored';
+export type QueueStepOutcome = 'played' | 'stopped' | 'boundary' | 'error' | 'ignored';
 
-/** True while a next/previous request is in flight. */
+/** True while a request that changes the current item is in flight. */
 let stepPending = false;
+
+interface StepOptions {
+	/** Toast shown when the request fails; none for next/previous. */
+	errorMessage?: string;
+	/** Stop playback when the returned queue has no current item. */
+	stopWhenEmpty?: boolean;
+}
 
 interface QueueStoreState extends QueueState {
 	/** True once the server queue was read at least once. */
@@ -37,6 +45,16 @@ interface QueueStoreState extends QueueState {
 	 * true once added. Never changes what is playing.
 	 */
 	addItem: (track: AddQueueItemBody) => Promise<boolean>;
+	/** Make an item current and play it on this device. */
+	playItem: (itemId: string) => Promise<QueueStepOutcome>;
+	/**
+	 * Remove an item; resolves true once the server removed it. Removing the
+	 * item this device plays starts the item the server makes current, or
+	 * stops playback when none is left; otherwise playback is untouched.
+	 */
+	removeItem: (itemId: string) => Promise<boolean>;
+	/** Move an upcoming item after `afterItemId` (null = right after the current item). */
+	moveItem: (itemId: string, afterItemId: string | null) => Promise<boolean>;
 }
 
 const initialState: QueueState & { loaded: boolean } = {
@@ -61,8 +79,9 @@ const currentItem = (state: QueueState): QueueItem | undefined =>
 	state.items.find(item => item.id === state.currentItemId);
 
 /**
- * Mirror of the server play queue (#274). `queue:updated` and every step
- * replace it whole; only `next` / `previous` start audio, never an event.
+ * Mirror of the server play queue (#274). `queue:updated` and every action
+ * replace it whole. Actions of this device that change the current item
+ * (next / previous, play or remove an item, #276) start audio; an event never does.
  * Stream URLs are fetched by the player on demand, never kept here.
  */
 export const useQueueStore = create<QueueStoreState>((set, get) => {
@@ -72,7 +91,8 @@ export const useQueueStore = create<QueueStoreState>((set, get) => {
 	 */
 	const runStep = async (
 		request: () => Promise<QueueStepResult>,
-		label: string
+		label: string,
+		{ errorMessage, stopWhenEmpty = false }: StepOptions = {}
 	): Promise<QueueStepOutcome> => {
 		// One step at a time: a second tap would move the server queue twice.
 		if (stepPending) return 'ignored';
@@ -83,6 +103,7 @@ export const useQueueStore = create<QueueStoreState>((set, get) => {
 			result = await request();
 		} catch (error) {
 			console.error(`[queueStore] ${label} failed:`, error);
+			if (errorMessage) showError(errorMessage);
 			return 'error';
 		} finally {
 			stepPending = false;
@@ -92,11 +113,20 @@ export const useQueueStore = create<QueueStoreState>((set, get) => {
 		get().applyState(result.state);
 		const item = currentItem(result.state);
 		const player = usePlayerStore.getState();
-		if (item && player.loadCounter === loadCounter) {
+		if (player.loadCounter !== loadCounter) return 'played';
+		if (item) {
 			player.playTrack(trackToSoundCloud(item), item.id);
+			return 'played';
 		}
-		return 'played';
+		if (stopWhenEmpty) player.stop();
+		return 'stopped';
 	};
+
+	/** A queue request that returns the whole state, as a step result. */
+	const asStep = (request: () => Promise<QueueState>) => async (): Promise<QueueStepResult> => ({
+		ok: true,
+		state: await request(),
+	});
 
 	return {
 		...initialState,
@@ -139,6 +169,47 @@ export const useQueueStore = create<QueueStoreState>((set, get) => {
 			}
 			showSuccess('Ajouté à la file de lecture');
 			return true;
+		},
+
+		playItem: itemId =>
+			runStep(
+				asStep(() => queueApi.playItem(itemId)),
+				'Play item',
+				{ errorMessage: 'Impossible de lire ce titre' }
+			),
+
+		removeItem: async itemId => {
+			const errorMessage = 'Impossible de retirer ce titre';
+			// Removing the item this device plays changes what it plays: it goes
+			// through the step guard. A list-tapped track or another item keeps playing.
+			if (usePlayerStore.getState().queueItemId === itemId) {
+				const outcome = await runStep(
+					asStep(() => queueApi.removeItem(itemId)),
+					'Remove current item',
+					{ errorMessage, stopWhenEmpty: true }
+				);
+				if (outcome === 'ignored') showInfo('Une action est déjà en cours');
+				return outcome === 'played' || outcome === 'stopped';
+			}
+			try {
+				get().applyState(await queueApi.removeItem(itemId));
+				return true;
+			} catch (error) {
+				console.error('[queueStore] Remove item failed:', error);
+				showError(errorMessage);
+				return false;
+			}
+		},
+
+		moveItem: async (itemId, afterItemId) => {
+			try {
+				get().applyState(await queueApi.moveItem(itemId, afterItemId));
+				return true;
+			} catch (error) {
+				console.error('[queueStore] Move item failed:', error);
+				showError('Impossible de déplacer ce titre');
+				return false;
+			}
 		},
 	};
 });

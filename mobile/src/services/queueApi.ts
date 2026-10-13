@@ -47,6 +47,21 @@ export const queueApi = {
 		});
 	},
 
+	/** Move an upcoming item after `afterItemId`; null = right after the current item. */
+	moveItem(itemId: string, afterItemId: string | null): Promise<QueueState> {
+		return apiRequest<QueueState>(`/api/queue/items/${encodeURIComponent(itemId)}/move`, {
+			method: 'POST',
+			body: JSON.stringify({ afterItemId }),
+		});
+	},
+
+	/** Remove an item; removing the current one makes the next item current. */
+	removeItem(itemId: string): Promise<QueueState> {
+		return apiRequest<QueueState>(`/api/queue/items/${encodeURIComponent(itemId)}`, {
+			method: 'DELETE',
+		});
+	},
+
 	/** Make an item current. */
 	playItem(itemId: string): Promise<QueueState> {
 		return apiRequest<QueueState>(`/api/queue/items/${encodeURIComponent(itemId)}/play`, {

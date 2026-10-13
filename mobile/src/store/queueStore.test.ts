@@ -7,7 +7,7 @@ import {
 import { usePlayerStore } from '@/store/playerStore';
 import { queueApi } from '@/services/queueApi';
 import { ApiError } from '@/services/api';
-import { showError, showSuccess } from '@utils/toast';
+import { showError, showInfo, showSuccess } from '@utils/toast';
 import type { QueueItem, QueueState } from '@/types/queue.types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
@@ -26,12 +26,15 @@ jest.mock('@/services/queueApi', () => ({
 		previous: jest.fn(),
 		playItem: jest.fn(),
 		addItem: jest.fn(),
+		moveItem: jest.fn(),
+		removeItem: jest.fn(),
 	},
 }));
 
 jest.mock('@utils/toast', () => ({
 	showSuccess: jest.fn(),
 	showError: jest.fn(),
+	showInfo: jest.fn(),
 }));
 
 const api = queueApi as jest.Mocked<typeof queueApi>;
@@ -299,5 +302,144 @@ describe('queueStore addItem', () => {
 		expect(store().items.map(i => i.id)).toEqual(['a']);
 		expect(showError).toHaveBeenCalledWith('Queue is full');
 		expect(showSuccess).not.toHaveBeenCalled();
+	});
+});
+
+describe('queueStore playItem', () => {
+	it('makes the item current and plays it on this device', async () => {
+		store().applyState(queue('a'));
+		api.playItem.mockResolvedValue(queue('c'));
+
+		await expect(store().playItem('c')).resolves.toBe('played');
+
+		expect(api.playItem).toHaveBeenCalledWith('c');
+		expect(store().currentItemId).toBe('c');
+		expect(player().queueItemId).toBe('c');
+		expect(player().currentTrack?.title).toBe('Title c');
+	});
+
+	it('shows an error and leaves playback alone when the request fails', async () => {
+		store().applyState(queue('a'));
+		usePlayerStore.getState().playTrack(listTrack);
+		api.playItem.mockRejectedValue(new ApiError('gone', 'NOT_FOUND', undefined, 404));
+
+		await expect(store().playItem('c')).resolves.toBe('error');
+
+		expect(showError).toHaveBeenCalled();
+		expect(store().currentItemId).toBe('a');
+		expect(player().currentTrack).toBe(listTrack);
+	});
+
+	it('shares the step guard with next', async () => {
+		let resolve!: (value: QueueState) => void;
+		api.playItem.mockReturnValue(new Promise(r => (resolve = r)));
+
+		const pending = store().playItem('b');
+		await expect(store().next()).resolves.toBe('ignored');
+		resolve(queue('b'));
+		await expect(pending).resolves.toBe('played');
+		expect(api.next).not.toHaveBeenCalled();
+	});
+});
+
+describe('queueStore removeItem', () => {
+	it('removes an upcoming item without touching playback', async () => {
+		store().applyState(queue('a'));
+		usePlayerStore.getState().playTrack(listTrack);
+		const before = player().loadCounter;
+		api.removeItem.mockResolvedValue(queue('a', ['a', 'c']));
+
+		await expect(store().removeItem('b')).resolves.toBe(true);
+
+		expect(api.removeItem).toHaveBeenCalledWith('b');
+		expect(store().items.map(i => i.id)).toEqual(['a', 'c']);
+		expect(player().loadCounter).toBe(before);
+	});
+
+	it('plays the next item when the current one, playing here, is removed', async () => {
+		store().applyState(queue('a'));
+		api.playItem.mockResolvedValue(queue('a'));
+		await store().playItem('a');
+		api.removeItem.mockResolvedValue(queue('b', ['b', 'c']));
+
+		await expect(store().removeItem('a')).resolves.toBe(true);
+
+		expect(store().currentItemId).toBe('b');
+		expect(player().queueItemId).toBe('b');
+		expect(player().currentTrack?.title).toBe('Title b');
+	});
+
+	it('stops playback when the removed current item was the last', async () => {
+		store().applyState(queue('c', ['c']));
+		api.playItem.mockResolvedValue(queue('c', ['c']));
+		await store().playItem('c');
+		api.removeItem.mockResolvedValue(queue(null, []));
+
+		await expect(store().removeItem('c')).resolves.toBe(true);
+
+		expect(store().items).toEqual([]);
+		expect(player().currentTrack).toBeNull();
+		expect(player().playbackState).toBe('idle');
+	});
+
+	it('leaves a list-tapped track playing when the current item is removed', async () => {
+		store().applyState(queue('a'));
+		usePlayerStore.getState().playTrack(listTrack);
+		const before = player().loadCounter;
+		api.removeItem.mockResolvedValue(queue(null, []));
+
+		await expect(store().removeItem('a')).resolves.toBe(true);
+
+		expect(store().items).toEqual([]);
+		expect(player().currentTrack).toBe(listTrack);
+		expect(player().loadCounter).toBe(before);
+	});
+
+	it('tells the user when another step is still pending', async () => {
+		store().applyState(queue('a'));
+		api.playItem.mockResolvedValue(queue('a'));
+		await store().playItem('a');
+		let resolve!: (value: { ok: true; state: QueueState }) => void;
+		api.next.mockReturnValue(new Promise(r => (resolve = r)));
+
+		const pending = store().next();
+		await expect(store().removeItem('a')).resolves.toBe(false);
+		expect(showInfo).toHaveBeenCalledWith('Une action est déjà en cours');
+		expect(api.removeItem).not.toHaveBeenCalled();
+		resolve({ ok: true, state: queue('b') });
+		await pending;
+	});
+
+	it('shows an error and keeps the store when the request fails', async () => {
+		store().applyState(queue('a'));
+		api.removeItem.mockRejectedValue(new ApiError('gone', 'NOT_FOUND', undefined, 404));
+
+		await expect(store().removeItem('b')).resolves.toBe(false);
+		await expect(store().removeItem('a')).resolves.toBe(false);
+
+		expect(showError).toHaveBeenCalledTimes(2);
+		expect(store().items.map(i => i.id)).toEqual(['a', 'b', 'c']);
+	});
+});
+
+describe('queueStore moveItem', () => {
+	it('applies the order the server returns', async () => {
+		store().applyState(queue('a'));
+		api.moveItem.mockResolvedValue(queue('a', ['a', 'c', 'b']));
+
+		await expect(store().moveItem('c', null)).resolves.toBe(true);
+
+		expect(api.moveItem).toHaveBeenCalledWith('c', null);
+		expect(store().items.map(i => i.id)).toEqual(['a', 'c', 'b']);
+	});
+
+	it('shows an error and keeps the store order on a conflict', async () => {
+		store().applyState(queue('a'));
+		api.moveItem.mockRejectedValue(new ApiError('conflict', 'CONFLICT', undefined, 409));
+
+		await expect(store().moveItem('c', null)).resolves.toBe(false);
+
+		expect(showError).toHaveBeenCalled();
+		expect(store().items.map(i => i.id)).toEqual(['a', 'b', 'c']);
 	});
 });

@@ -26,6 +26,7 @@ import {
 import { usePlayerProgress } from '@/hooks/usePlayerProgress';
 import { useImageColors, hexToRgba, getAdaptiveColors, isLightColor } from '@/hooks/useImageColors';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { QueueModal } from '@/components/player/QueueModal';
 
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const DISMISS_THRESHOLD = SCREEN_HEIGHT * 0.2; // 20% de l'écran pour fermer
@@ -47,6 +48,14 @@ export function PlayerModal() {
 	const hasPrevious = queueHasPrevious && queueItemId !== null;
 	const queueNext = useQueueStore(state => state.next);
 	const queuePrevious = useQueueStore(state => state.previous);
+
+	const [isQueueOpen, setQueueOpen] = React.useState(false);
+	// The queue opens over the player only: closing the player closes it too.
+	const [wasModalOpen, setWasModalOpen] = React.useState(isModalOpen);
+	if (wasModalOpen !== isModalOpen) {
+		setWasModalOpen(isModalOpen);
+		if (!isModalOpen) setQueueOpen(false);
+	}
 
 	const translateY = useSharedValue(0);
 
@@ -205,6 +214,17 @@ export function PlayerModal() {
 							</View>
 						</TouchableOpacity>
 
+						<TouchableOpacity
+							style={styles.queueButton}
+							onPress={() => setQueueOpen(true)}
+							activeOpacity={0.7}
+							accessibilityLabel="File d'attente"
+						>
+							<View style={[styles.headerButton, { backgroundColor: colors.buttonBg }]}>
+								<Ionicons name="list" size={22} color={colors.text} />
+							</View>
+						</TouchableOpacity>
+
 						<Text style={[styles.nowPlayingText, { color: colors.textSecondary }]}>
 							NOW PLAYING
 						</Text>
@@ -319,6 +339,8 @@ export function PlayerModal() {
 					<View style={styles.bottomSpacer} />
 				</Animated.View>
 			</GestureDetector>
+
+			<QueueModal visible={isModalOpen && isQueueOpen} onClose={() => setQueueOpen(false)} />
 		</Modal>
 	);
 }
@@ -350,6 +372,12 @@ const createStyles = (theme: Theme, insets: { top: number; bottom: number }) =>
 			position: 'absolute',
 			top: insets.top + 16,
 			left: 20,
+			zIndex: 10,
+		},
+		queueButton: {
+			position: 'absolute',
+			top: insets.top + 16,
+			right: 20,
 			zIndex: 10,
 		},
 		headerButton: {
