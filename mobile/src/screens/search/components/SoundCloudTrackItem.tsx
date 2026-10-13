@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
+import { QueueSwipe } from '@/components/common/QueueSwipe';
 import type { Theme } from '@/themes/types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
@@ -9,9 +10,11 @@ interface Props {
 	track: SoundCloudTrack;
 	onPlay: (track: SoundCloudTrack) => void;
 	onAddToPlaylist: (track: SoundCloudTrack) => void;
+	/** A right swipe adds the track to the play queue. */
+	onAddToQueue: (track: SoundCloudTrack) => void;
 }
 
-export function SoundCloudTrackItem({ track, onPlay, onAddToPlaylist }: Props) {
+export function SoundCloudTrackItem({ track, onPlay, onAddToPlaylist, onAddToQueue }: Props) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
@@ -24,28 +27,30 @@ export function SoundCloudTrackItem({ track, onPlay, onAddToPlaylist }: Props) {
 	const artworkUrl = track.artwork_url || track.user.avatar_url || 'https://via.placeholder.com/50';
 
 	return (
-		<TouchableOpacity style={styles.container} onPress={() => onPlay(track)} activeOpacity={0.6}>
-			<Image source={{ uri: artworkUrl }} style={styles.artwork} />
-			<View style={styles.info}>
-				<Text style={styles.title} numberOfLines={1}>
-					{track.title}
-				</Text>
-				<Text style={styles.artist} numberOfLines={1}>
-					{track.user.username}
-				</Text>
-			</View>
-			<Text style={styles.duration}>{formatDuration(track.duration)}</Text>
-			<TouchableOpacity
-				style={styles.addButton}
-				onPress={e => {
-					e.stopPropagation();
-					onAddToPlaylist(track);
-				}}
-				hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-			>
-				<Ionicons name="add" size={24} color={theme.colors.primary} />
+		<QueueSwipe onAddToQueue={() => onAddToQueue(track)}>
+			<TouchableOpacity style={styles.container} onPress={() => onPlay(track)} activeOpacity={0.6}>
+				<Image source={{ uri: artworkUrl }} style={styles.artwork} />
+				<View style={styles.info}>
+					<Text style={styles.title} numberOfLines={1}>
+						{track.title}
+					</Text>
+					<Text style={styles.artist} numberOfLines={1}>
+						{track.user.username}
+					</Text>
+				</View>
+				<Text style={styles.duration}>{formatDuration(track.duration)}</Text>
+				<TouchableOpacity
+					style={styles.addButton}
+					onPress={e => {
+						e.stopPropagation();
+						onAddToPlaylist(track);
+					}}
+					hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+				>
+					<Ionicons name="add" size={24} color={theme.colors.primary} />
+				</TouchableOpacity>
 			</TouchableOpacity>
-		</TouchableOpacity>
+		</QueueSwipe>
 	);
 }
 
@@ -56,6 +61,8 @@ const createStyles = (theme: Theme) =>
 			alignItems: 'center',
 			paddingVertical: 8,
 			paddingHorizontal: theme.spacing.md,
+			// Opaque so the queue panel stays hidden behind the row until swiped.
+			backgroundColor: theme.colors.background,
 		},
 		artwork: {
 			width: 48,

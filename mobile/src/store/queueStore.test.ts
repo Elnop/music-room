@@ -7,6 +7,7 @@ import {
 import { usePlayerStore } from '@/store/playerStore';
 import { queueApi } from '@/services/queueApi';
 import { ApiError } from '@/services/api';
+import { showError, showSuccess } from '@utils/toast';
 import type { QueueItem, QueueState } from '@/types/queue.types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
@@ -24,7 +25,13 @@ jest.mock('@/services/queueApi', () => ({
 		next: jest.fn(),
 		previous: jest.fn(),
 		playItem: jest.fn(),
+		addItem: jest.fn(),
 	},
+}));
+
+jest.mock('@utils/toast', () => ({
+	showSuccess: jest.fn(),
+	showError: jest.fn(),
 }));
 
 const api = queueApi as jest.Mocked<typeof queueApi>;
@@ -255,5 +262,42 @@ describe('queueStore selectors and list taps', () => {
 		await store().next();
 		usePlayerStore.getState().stop();
 		expect(player().queueItemId).toBeNull();
+	});
+});
+
+describe('queueStore addItem', () => {
+	const body = {
+		trackUri: 'https://soundcloud.com/artist/new',
+		title: 'New',
+		artist: 'Artist',
+		durationMs: 1000,
+	};
+
+	it('applies the returned state, toasts and leaves the player alone', async () => {
+		store().applyState(queue('a', ['a']));
+		usePlayerStore.getState().playTrack(listTrack);
+		const before = player().loadCounter;
+		api.addItem.mockResolvedValue(queue('a', ['a', 'n']));
+
+		await expect(store().addItem(body)).resolves.toBe(true);
+
+		expect(api.addItem).toHaveBeenCalledWith(body);
+		expect(store().items.map(i => i.id)).toEqual(['a', 'n']);
+		expect(store().currentItemId).toBe('a');
+		expect(showSuccess).toHaveBeenCalledWith('Ajouté à la file de lecture');
+		expect(player().loadCounter).toBe(before);
+		expect(player().currentTrack).toBe(listTrack);
+		expect(player().queueItemId).toBeNull();
+	});
+
+	it('keeps the state and toasts the API message on failure', async () => {
+		store().applyState(queue('a', ['a']));
+		api.addItem.mockRejectedValue(new ApiError('Queue is full', 'QUEUE_FULL'));
+
+		await expect(store().addItem(body)).resolves.toBe(false);
+
+		expect(store().items.map(i => i.id)).toEqual(['a']);
+		expect(showError).toHaveBeenCalledWith('Queue is full');
+		expect(showSuccess).not.toHaveBeenCalled();
 	});
 });

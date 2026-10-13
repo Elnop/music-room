@@ -34,6 +34,19 @@ export interface QueueState {
 	items: QueueItem[];
 }
 
+/**
+ * Body of `POST /api/queue/items`: the backend `addQueueItemSchema`, i.e. a
+ * playlist add's track without `previewUrl` (stream URLs are never stored).
+ */
+export interface AddQueueItemBody {
+	trackUri: string;
+	title: string;
+	artist: string;
+	album?: string;
+	albumArt?: string;
+	durationMs: number;
+}
+
 /** 409 codes of `POST /api/queue/next` and `/previous`. */
 export type QueueStepBoundary = 'QUEUE_END' | 'QUEUE_START';
 

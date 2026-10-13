@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import { queueApi } from '@/services/queueApi';
 import { usePlayerStore } from '@/store/playerStore';
 import { trackToSoundCloud } from '@utils/trackToSoundCloud';
-import type { QueueItem, QueueState, QueueStepResult } from '@/types/queue.types';
+import { showError, showSuccess } from '@utils/toast';
+import type { AddQueueItemBody, QueueItem, QueueState, QueueStepResult } from '@/types/queue.types';
 
 /** Past this many seconds played, "previous" restarts the track instead. */
 export const RESTART_THRESHOLD_S = 3;
@@ -31,6 +32,11 @@ interface QueueStoreState extends QueueState {
 	next: () => Promise<QueueStepOutcome>;
 	/** Step to the previous item and play it; nothing happens at the queue start. */
 	previous: () => Promise<QueueStepOutcome>;
+	/**
+	 * Append a track to the end of the queue and toast the outcome; resolves
+	 * true once added. Never changes what is playing.
+	 */
+	addItem: (track: AddQueueItemBody) => Promise<boolean>;
 }
 
 const initialState: QueueState & { loaded: boolean } = {
@@ -118,5 +124,21 @@ export const useQueueStore = create<QueueStoreState>((set, get) => {
 		},
 
 		previous: () => runStep(queueApi.previous, 'Previous'),
+
+		addItem: async track => {
+			try {
+				get().applyState(await queueApi.addItem(track));
+			} catch (error) {
+				console.error('[queueStore] Add failed:', error);
+				showError(
+					error instanceof Error && error.message
+						? error.message
+						: "Impossible d'ajouter à la file de lecture"
+				);
+				return false;
+			}
+			showSuccess('Ajouté à la file de lecture');
+			return true;
+		},
 	};
 });
