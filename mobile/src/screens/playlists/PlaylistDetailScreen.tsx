@@ -11,9 +11,9 @@ import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useImageColors, hexToRgba } from '@/hooks/useImageColors';
 import type { Theme } from '@themes/types';
 import type { Track } from '@/types/track.types';
-import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import { CONFLICT_CODES, usePlaylistStore } from '@store/playlistStore';
 import { afterRankForDrop } from '@store/moveTarget';
+import { trackToSoundCloud } from '@utils/trackToSoundCloud';
 import { ApiError } from '@/services/api';
 import { useAuthStore } from '@store/authStore';
 import { usePlayerStore } from '@store/playerStore';
@@ -43,38 +43,6 @@ interface PlaylistDetailScreenProps {
 	navigation: PlaylistDetailScreenNavigationProp;
 	route: PlaylistDetailScreenRouteProp;
 }
-
-const hashStringToNumber = (str: string): number => {
-	let hash = 0;
-	for (let i = 0; i < str.length; i++) {
-		const chr = str.charCodeAt(i);
-		hash = (hash << 5) - hash + chr;
-		hash |= 0;
-	}
-	return Math.abs(hash);
-};
-
-const trackToSoundCloud = (track: Track): SoundCloudTrack => {
-	const parsed = parseInt(track.id, 10);
-	const trackId = !Number.isNaN(parsed) ? parsed : hashStringToNumber(track.trackUri || track.id);
-
-	return {
-		id: trackId,
-		title: track.title,
-		description: null,
-		duration: track.durationMs,
-		genre: null,
-		artwork_url: track.albumArt || null,
-		permalink_url: track.trackUri,
-		user: {
-			id: trackId,
-			username: track.artist,
-			avatar_url: track.albumArt || null,
-			permalink_url: track.trackUri,
-		},
-		playable: true,
-	};
-};
 
 export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreenProps) {
 	const { theme } = useTheme();

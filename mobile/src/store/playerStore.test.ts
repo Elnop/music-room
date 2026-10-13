@@ -72,6 +72,18 @@ describe('playerStore playTrack', () => {
 		expect(usePlayerStore.getState().currentTrack?.id).toBe(2);
 		expect(usePlayerStore.getState().pendingTrackId).toBe(2);
 	});
+
+	it('keeps the modal open for a queue item and closes it for a list tap', () => {
+		usePlayerStore.setState({ isModalOpen: true });
+
+		usePlayerStore.getState().playTrack(makeTrack(1), 'item-1');
+		expect(usePlayerStore.getState().isModalOpen).toBe(true);
+		expect(usePlayerStore.getState().queueItemId).toBe('item-1');
+
+		usePlayerStore.getState().playTrack(makeTrack(2));
+		expect(usePlayerStore.getState().isModalOpen).toBe(false);
+		expect(usePlayerStore.getState().queueItemId).toBeNull();
+	});
 });
 
 describe('playerStore state machine', () => {
