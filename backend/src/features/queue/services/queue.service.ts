@@ -2,9 +2,15 @@ import { logger } from '@/shared/utils/logger.js';
 import { upsertTrack, type TrackUpsertInput } from '@/shared/utils/track-upsert.js';
 import { realtime } from '@/realtime/index.js';
 import {
+	canViewPlaylist,
+	getPlaylistForPermissionCheck,
+} from '@/features/playlists/permissions/playlist.permissions.js';
+import { AppError } from '@/shared/middleware/error-handler.js';
+import {
 	addQueueItemRpc,
 	getQueueRpc,
 	moveQueueItemRpc,
+	playPlaylistRpc,
 	playQueueItemRpc,
 	removeQueueItemRpc,
 	stepQueueRpc,
@@ -37,6 +43,18 @@ export class QueueService {
 
 	async playItem(userId: string, itemId: string): Promise<QueueState> {
 		return this.publish(userId, 'play', await playQueueItemRpc(userId, itemId));
+	}
+
+	/**
+	 * Copies the playlist's tracks into the queue as a new block right after
+	 * the current item and plays its first item (#277).
+	 */
+	async playPlaylist(userId: string, playlistId: string): Promise<QueueState> {
+		const playlist = await getPlaylistForPermissionCheck(playlistId);
+		if (!canViewPlaylist(playlist, userId)) {
+			throw new AppError(403, 'Access denied', 'PLAYLIST_ACCESS_DENIED');
+		}
+		return this.publish(userId, 'play-playlist', await playPlaylistRpc(userId, playlistId));
 	}
 
 	async step(userId: string, direction: QueueStepDirection): Promise<QueueState> {

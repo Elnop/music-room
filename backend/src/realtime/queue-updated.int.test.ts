@@ -6,10 +6,12 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from
 import { supabaseAdmin, supabaseAnon } from '@/shared/config/supabase.js';
 import { connectRedis, disconnectRedis, isRedisConnected } from '@/shared/config/redis.js';
 import { QueueService } from '@/features/queue/services/queue.service.js';
+import { PlaylistService } from '@/features/playlists/playlist.service.js';
+import { PlaylistTrackService } from '@/features/playlists/services/playlist-track.service.js';
 import { realtime } from '@/realtime/index.js';
 import type { QueueState } from '@/features/queue/queue.types.js';
 
-// queue:updated (#273): every queue mutation sends the full state to all the
+// queue:updated (#273, #277): every queue mutation sends the full state to all the
 // sockets of its user (room user:<id>) and to no one else, through a real
 // Socket.io server against the local Supabase stack.
 
@@ -177,5 +179,32 @@ describe('queue:updated broadcast', () => {
 		});
 		await settle();
 		expect(phoneUpdates).toEqual([]);
+	});
+
+	it('sends the block of a played playlist to both devices, and nothing for an empty one', async () => {
+		const playlists = new PlaylistService();
+		const playlistTracks = new PlaylistTrackService();
+		const otherUpdates = record(otherSocket);
+		const { id } = await playlists.createPlaylist(owner.id, { name: 'int-play' });
+		await playlistTracks.addTrack(id, owner.id, dto());
+		await playlistTracks.addTrack(id, owner.id, dto());
+
+		const received = bothReceive();
+		const state = await queue.playPlaylist(owner.id, id);
+		expect(await received).toEqual([state, state]);
+		const block = state.items.filter(item => item.sourcePlaylistId === id);
+		expect(block).toHaveLength(2);
+		expect(state.currentItemId).toBe(block[0].id);
+
+		const { id: emptyId } = await playlists.createPlaylist(owner.id, { name: 'int-empty' });
+		await settle();
+		const phoneUpdates = record(phone);
+		await expect(queue.playPlaylist(owner.id, emptyId)).rejects.toMatchObject({
+			statusCode: 409,
+			code: 'PLAYLIST_EMPTY',
+		});
+		await settle();
+		expect(phoneUpdates).toEqual([]);
+		expect(otherUpdates).toEqual([]);
 	});
 });

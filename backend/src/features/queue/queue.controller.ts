@@ -5,6 +5,7 @@ import {
 	addQueueItemSchema,
 	moveQueueItemSchema,
 	queueItemParamsSchema,
+	queuePlaylistParamsSchema,
 } from '@/features/queue/queue.validators.js';
 import type { QueueState, QueueStepDirection } from '@/features/queue/queue.types.js';
 
@@ -68,6 +69,16 @@ export class QueueController {
 		try {
 			const { itemId } = queueItemParamsSchema.parse(req.params);
 			sendState(res, await queueService.playItem(userIdOf(req), itemId));
+		} catch (error) {
+			next(error);
+		}
+	}
+
+	/** POST /api/queue/playlists/:playlistId/play */
+	async playPlaylist(req: Request, res: Response, next: NextFunction) {
+		try {
+			const { playlistId } = queuePlaylistParamsSchema.parse(req.params);
+			sendState(res, await queueService.playPlaylist(userIdOf(req), playlistId));
 		} catch (error) {
 			next(error);
 		}

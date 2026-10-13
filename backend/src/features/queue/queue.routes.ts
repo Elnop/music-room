@@ -22,6 +22,11 @@ router.post('/items/:itemId/move', (req, res, next) => queueController.moveItem(
 /** POST /api/queue/items/:itemId/play - make an item current */
 router.post('/items/:itemId/play', (req, res, next) => queueController.playItem(req, res, next));
 
+/** POST /api/queue/playlists/:playlistId/play - play a playlist as a new block */
+router.post('/playlists/:playlistId/play', (req, res, next) =>
+	queueController.playPlaylist(req, res, next)
+);
+
 /** POST /api/queue/next - step to the next item */
 router.post('/next', queueController.step('next'));
 
