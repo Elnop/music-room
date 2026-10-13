@@ -121,6 +121,8 @@ Depuis la racine : `make dev-docker` (Docker), `make dev-local` (émulateur Andr
 - `npm run prebuild` - Générer les dossiers natifs Android/iOS
 - `npm run build:local` - Build Android local (nécessite Android Studio)
 
+L'APK de production (backend `https://zumik.cluzhub.com`) est construit par `.github/workflows/release-apk.yml` à chaque push sur `main` et publié dans les [GitHub Releases](https://github.com/Elnop/music-room/releases/latest). Il lit `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`, `EXPO_PUBLIC_FACEBOOK_APP_ID` et `EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN` dans les secrets Actions du repo. Lancé à la main (`gh workflow run release-apk.yml --ref <branche>`) hors de `main`, il dépose l'APK en artefact du run sans créer de release.
+
 ### Backend
 
 - `npm run dev:backend` - Lancer le backend depuis le dossier mobile
