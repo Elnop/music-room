@@ -193,6 +193,16 @@ describe('add', () => {
 		expect(await queue.getQueue(userId)).toEqual(before);
 		expect(notified()).toEqual([]);
 	});
+
+	it('bumps the version of a queue it changes', async () => {
+		const playlist = await createPlaylist(2);
+		await queue.playPlaylist(userId, playlist.id);
+		const before = await queue.getQueue(userId);
+
+		await addTrack(playlist.id);
+
+		expect((await queue.getQueue(userId)).version).toBeGreaterThan(before.version);
+	});
 });
 
 describe('add after a remove that kept the current item', () => {

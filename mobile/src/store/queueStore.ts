@@ -31,7 +31,9 @@ interface StepOptions {
 	stopWhenEmpty?: boolean;
 }
 
-interface QueueStoreState extends QueueState {
+interface QueueStoreState extends Omit<QueueState, 'ownerId' | 'version'> {
+	/** Version of the state held; null before the first one and after reset. */
+	version: number | null;
 	/** True once the server queue was read at least once. */
 	loaded: boolean;
 	load: () => Promise<void>;
@@ -63,25 +65,31 @@ interface QueueStoreState extends QueueState {
 	playPlaylist: (playlistId: string) => Promise<QueueStepOutcome>;
 }
 
-const initialState: QueueState & { loaded: boolean } = {
+const initialState: Omit<QueueState, 'ownerId' | 'version'> & {
+	version: number | null;
+	loaded: boolean;
+} = {
 	currentItemId: null,
 	items: [],
+	version: null,
 	loaded: false,
 };
 
-const currentIndex = (state: QueueState): number =>
+type QueueItemsView = Pick<QueueState, 'currentItemId' | 'items'>;
+
+const currentIndex = (state: QueueItemsView): number =>
 	state.currentItemId === null
 		? -1
 		: state.items.findIndex(item => item.id === state.currentItemId);
 
 /** An upcoming item exists (with nothing current, every item is upcoming). */
-export const selectHasNext = (state: QueueState): boolean =>
+export const selectHasNext = (state: QueueItemsView): boolean =>
 	currentIndex(state) < state.items.length - 1;
 
 /** A history item exists before the current one. */
-export const selectHasPrevious = (state: QueueState): boolean => currentIndex(state) > 0;
+export const selectHasPrevious = (state: QueueItemsView): boolean => currentIndex(state) > 0;
 
-const currentItem = (state: QueueState): QueueItem | undefined =>
+const currentItem = (state: QueueItemsView): QueueItem | undefined =>
 	state.items.find(item => item.id === state.currentItemId);
 
 /**
@@ -89,7 +97,7 @@ const currentItem = (state: QueueState): QueueItem | undefined =>
  * `playlistId`. False for a list-tapped track or an item no longer in the queue.
  */
 export const selectPlaysPlaylist = (
-	state: QueueState,
+	state: QueueItemsView,
 	queueItemId: string | null,
 	playlistId: string
 ): boolean =>
@@ -108,7 +116,7 @@ const playPlaylistError = (error: unknown): string => {
 
 /**
  * Mirror of the server play queue (#274). `queue:updated` and every action
- * replace it whole. Actions of this device that change the current item
+ * replace it whole, unless they carry a version not above the one held (#285). Actions of this device that change the current item
  * (next / previous, play or remove an item, #276, play a playlist, #277) start audio; an event never does.
  * Stream URLs are fetched by the player on demand, never kept here.
  */
@@ -170,7 +178,15 @@ export const useQueueStore = create<QueueStoreState>((set, get) => {
 		},
 
 		applyState: state => {
-			set({ currentItemId: state.currentItemId, items: state.items, loaded: true });
+			// Answers and queue:updated events can arrive out of commit order (#285).
+			const { version } = get();
+			if (version !== null && state.version <= version) return;
+			set({
+				currentItemId: state.currentItemId,
+				items: state.items,
+				version: state.version,
+				loaded: true,
+			});
 		},
 
 		reset: () => {

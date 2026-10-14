@@ -40,7 +40,7 @@ const dto = () => {
 
 /** Adds n tracks and returns the item ids in queue order. */
 async function addItems(n: number, user = userId): Promise<string[]> {
-	let state: QueueState = { currentItemId: null, items: [] };
+	let state: QueueState = { ownerId: user, version: 0, currentItemId: null, items: [] };
 	for (let i = 0; i < n; i++) state = await queue.addItem(user, dto());
 	return state.items.map(item => item.id);
 }
@@ -94,7 +94,12 @@ afterAll(async () => {
 
 describe('read and add', () => {
 	it('returns an empty queue to a user who never queued anything', async () => {
-		expect(await queue.getQueue(userId)).toEqual({ currentItemId: null, items: [] });
+		expect(await queue.getQueue(userId)).toEqual({
+			ownerId: userId,
+			version: 0,
+			currentItemId: null,
+			items: [],
+		});
 	});
 
 	it('appends after the last rank and keeps the current item', async () => {
@@ -176,7 +181,7 @@ describe('remove', () => {
 	it('empties the queue when the last current item is removed', async () => {
 		const [, , c] = await addItems(3);
 		await queue.playItem(userId, c);
-		expect(await queue.removeItem(userId, c)).toEqual({ currentItemId: null, items: [] });
+		expect(await queue.removeItem(userId, c)).toMatchObject({ currentItemId: null, items: [] });
 	});
 
 	it('keeps 50 history items when the removed current item is followed', async () => {
@@ -532,4 +537,51 @@ const toRow = (track: ReturnType<typeof dto>) => ({
 	title: track.title,
 	artist: track.artist,
 	duration_ms: track.durationMs,
+});
+
+describe('version', () => {
+	it('starts at 0 without a queue and grows by one with each add', async () => {
+		expect((await queue.getQueue(userId)).version).toBe(0);
+		expect((await queue.addItem(userId, dto())).version).toBe(1);
+		expect((await queue.addItem(userId, dto())).version).toBe(2);
+	});
+
+	it('grows with every mutation', async () => {
+		const [a, b, c] = await addItems(3);
+		let version = (await queue.getQueue(userId)).version;
+		const steps: Array<() => Promise<QueueState>> = [
+			() => queue.playItem(userId, a),
+			() => queue.step(userId, 'next'),
+			() => queue.step(userId, 'previous'),
+			() => queue.moveItem(userId, c, null),
+			() => queue.removeItem(userId, b),
+		];
+		for (const step of steps) {
+			const next = (await step()).version;
+			expect(next).toBeGreaterThan(version);
+			version = next;
+		}
+	});
+
+	it('keeps the version when a mutation is refused', async () => {
+		await addItems(1);
+		const before = await queue.getQueue(userId);
+		await expect(queue.step(userId, 'previous')).rejects.toMatchObject({ code: 'QUEUE_START' });
+		await expect(queue.removeItem(userId, randomUUID())).rejects.toMatchObject({ statusCode: 404 });
+		expect(await queue.getQueue(userId)).toEqual(before);
+	});
+
+	it('gives each of two concurrent adds its own version', async () => {
+		const [first, second] = await Promise.all([
+			queue.addItem(userId, dto()),
+			queue.addItem(userId, dto()),
+		]);
+		expect(new Set([first.version, second.version]).size).toBe(2);
+		const last = first.version > second.version ? first : second;
+		expect(last.items).toHaveLength(2);
+	});
+
+	it('carries the owner id', async () => {
+		expect((await queue.addItem(userId, dto())).ownerId).toBe(userId);
+	});
 });

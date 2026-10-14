@@ -86,7 +86,9 @@ const item = (id: string): QueueItem => ({
 	blockDetached: false,
 });
 
-const setQueue = (state: QueueState) => useQueueStore.getState().applyState(state);
+let nextVersion = 0;
+const setQueue = (state: Pick<QueueState, 'currentItemId' | 'items'>) =>
+	useQueueStore.getState().applyState({ ownerId: 'owner', version: ++nextVersion, ...state });
 
 // Row titles in screen order.
 const titles = () => screen.queryAllByText(/^Title /).map(node => node.props.children);

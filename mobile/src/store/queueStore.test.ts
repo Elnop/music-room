@@ -9,7 +9,7 @@ import { usePlayerStore } from '@/store/playerStore';
 import { queueApi } from '@/services/queueApi';
 import { ApiError } from '@/services/api';
 import { showError, showInfo, showSuccess } from '@utils/toast';
-import type { QueueItem, QueueState } from '@/types/queue.types';
+import type { QueueItem, QueueState, QueueStepResult } from '@/types/queue.types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -57,10 +57,19 @@ const item = (id: string): QueueItem => ({
 	blockDetached: false,
 });
 
+let nextVersion = 0;
+
 const queue = (currentItemId: string | null, ids = ['a', 'b', 'c']): QueueState => ({
+	ownerId: 'owner',
+	version: ++nextVersion,
 	currentItemId,
 	items: ids.map(item),
 });
+
+const body = (id: string) => {
+	const { trackUri, title, artist, durationMs } = item(id).track;
+	return { trackUri, title, artist, durationMs };
+};
 
 const listTrack: SoundCloudTrack = {
 	id: 99,
@@ -449,6 +458,8 @@ describe('queueStore moveItem', () => {
 describe('queueStore playPlaylist', () => {
 	/** `ids` queued from playlist `p1`, after a list item `x`. */
 	const withBlock = (currentItemId: string | null, ids: string[]): QueueState => ({
+		ownerId: 'owner',
+		version: ++nextVersion,
 		currentItemId,
 		items: [item('x'), ...ids.map(id => ({ ...item(id), sourcePlaylistId: 'p1', blockId: 'blk' }))],
 	});
@@ -505,5 +516,86 @@ describe('queueStore playPlaylist', () => {
 		expect(selectPlaysPlaylist(state, 'x', 'p1')).toBe(false);
 		expect(selectPlaysPlaylist(state, null, 'p1')).toBe(false);
 		expect(selectPlaysPlaylist(state, 'gone', 'p1')).toBe(false);
+	});
+});
+
+const deferred = <T>() => {
+	let resolve!: (value: T) => void;
+	const promise = new Promise<T>(r => {
+		resolve = r;
+	});
+	return { promise, resolve };
+};
+
+describe('queueStore versions (#285)', () => {
+	it('accepts version 0 into an empty store', () => {
+		store().applyState({ ownerId: 'owner', version: 0, currentItemId: null, items: [] });
+		expect(store().loaded).toBe(true);
+		expect(store().version).toBe(0);
+	});
+
+	it('ignores a socket state older than the one it holds', () => {
+		const older = queue('a');
+		const newer = queue('b');
+		store().applyState(newer);
+		store().applyState(older);
+		expect(store().currentItemId).toBe('b');
+		expect(store().version).toBe(newer.version);
+	});
+
+	it('ignores the echo of a state it already holds', () => {
+		const state = queue('a');
+		store().applyState(state);
+		const items = store().items;
+		store().applyState({ ...state, items: [] });
+		expect(store().items).toBe(items);
+	});
+
+	it('ignores a load answer older than a queue:updated received meanwhile', async () => {
+		const answer = deferred<QueueState>();
+		api.getQueue.mockReturnValueOnce(answer.promise);
+		const stale = queue('a');
+		const fresh = queue('b');
+		const loading = store().load();
+		store().applyState(fresh);
+		answer.resolve(stale);
+		await loading;
+		expect(store().currentItemId).toBe('b');
+	});
+
+	it('ends on the state holding both of two adds whose answers arrive in reverse', async () => {
+		const first = deferred<QueueState>();
+		const second = deferred<QueueState>();
+		api.addItem.mockReturnValueOnce(first.promise).mockReturnValueOnce(second.promise);
+		const withA = queue(null, ['a']);
+		const withAB = queue(null, ['a', 'b']);
+		const addA = store().addItem(body('a'));
+		const addB = store().addItem(body('b'));
+		second.resolve(withAB);
+		await addB;
+		first.resolve(withA);
+		await addA;
+		expect(store().items.map(i => i.id)).toEqual(['a', 'b']);
+	});
+
+	it('plays the item of a stale step answer but keeps the newer state', async () => {
+		const answer = deferred<QueueStepResult>();
+		api.next.mockReturnValueOnce(answer.promise);
+		const stepped = queue('b');
+		const newer = queue('c');
+		const stepping = store().next();
+		store().applyState(newer);
+		answer.resolve({ ok: true, state: stepped });
+		await stepping;
+		expect(store().currentItemId).toBe('c');
+		expect(player().queueItemId).toBe('b');
+	});
+
+	it('reset forgets the version', () => {
+		store().applyState(queue('a'));
+		store().reset();
+		expect(store().version).toBeNull();
+		store().applyState({ ownerId: 'owner', version: 0, currentItemId: null, items: [] });
+		expect(store().loaded).toBe(true);
 	});
 });
