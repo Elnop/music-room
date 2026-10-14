@@ -24,7 +24,7 @@ Date : 2026-10-14 · Epic parent : #272 (Queue de lecture) · Remplace #279 et i
 ### Version de la queue (#285)
 
 - Migration `024` : `play_queues.version bigint NOT NULL DEFAULT 0`.
-- `queue_lock` augmente la version en verrouillant la ligne (`UPDATE … SET version = version + 1 … RETURNING current_item_id` à la place du `SELECT … FOR UPDATE`). Toute mutation prend ce verrou, y compris les `queue_sync_*` (#278) ; une mutation qui échoue est annulée avec sa version.
+- Un trigger `BEFORE UPDATE` sur `play_queues` augmente la version. Toute mutation qui change la queue met déjà à jour cette ligne (`updated_at` ou `current_item_id`) sous `queue_lock`, alors qu'une synchro `queue_sync_*` (#278) qui ne change rien n'y touche pas : sa version reste la même. Une mutation qui échoue est annulée avec sa version.
 - `updated_at` ne convient pas : `now()` est l'heure de début de la transaction, pas de son commit.
 - `queue_state` renvoie `version` (0 sans queue) et `ownerId`. `QueueState` gagne `version: number` et `ownerId: string` (backend `queue.types.ts`, Zod de `queue-rpc.ts`, `queue.openapi.ts`, mobile `types/queue.types.ts`).
 
