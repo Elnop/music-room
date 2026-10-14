@@ -56,8 +56,10 @@ export class QueueTransferService {
 		}
 
 		this.send(ownerId, deviceId, command, actorId);
-		if (input.source) {
-			const { userId, deviceId: sourceDevice } = input.source;
+		const source = input.source;
+		const sourceIsTarget = source?.userId === ownerId && source.deviceId === deviceId;
+		if (source && !sourceIsTarget) {
+			const { userId, deviceId: sourceDevice } = source;
 			this.send(userId, sourceDevice, { action: 'pause', fromUserId: actorId }, actorId);
 		}
 		logger.info('Queue transfer', {

@@ -73,6 +73,7 @@ export function useMusicControlEmitter() {
 		if (!socket || !isConnected || !user || !deviceInfo) return;
 
 		const emitStatus = () => {
+			const position = readPositionMs();
 			const status = {
 				track: currentTrack
 					? {
@@ -83,7 +84,8 @@ export function useMusicControlEmitter() {
 						}
 					: null,
 				isPlaying,
-				positionMs: Math.round(readPositionMs() ?? 0),
+				positionMs:
+					position != null && Number.isFinite(position) ? Math.max(0, Math.round(position)) : 0,
 			};
 
 			socket.emit('listening:update', status);

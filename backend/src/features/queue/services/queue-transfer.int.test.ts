@@ -143,6 +143,38 @@ describe('transfer to one of my devices', () => {
 		expect(await queue.getQueue(me, me)).toEqual(before);
 	});
 
+	it('refuses an offline device of mine with 409, changing nothing and sending nothing', async () => {
+		const before = await playingQueue(1, 0);
+		await expect(
+			transfer.transfer(me, {
+				targetUserId: me,
+				targetDeviceId: 'tablet',
+				positionMs: 0,
+				playing: { queueItemId: before.currentItemId! },
+			})
+		).rejects.toMatchObject({ statusCode: 409, code: 'DEVICE_OFFLINE' });
+		expect(await queue.getQueue(me, me)).toEqual(before);
+		expect(sendDeviceCommand).not.toHaveBeenCalled();
+	});
+
+	it('does not pause the source when it is the target device', async () => {
+		online.add(`${me}:tablet`);
+		const before = await playingQueue(1, 0);
+		await transfer.transfer(me, {
+			targetUserId: me,
+			targetDeviceId: 'tablet',
+			positionMs: 0,
+			playing: { queueItemId: before.currentItemId! },
+			source: { userId: me, deviceId: 'tablet' },
+		});
+		expect(sendDeviceCommand).toHaveBeenCalledTimes(1);
+		expect(sendDeviceCommand).toHaveBeenCalledWith(
+			me,
+			'tablet',
+			expect.objectContaining({ action: 'play-item' })
+		);
+	});
+
 	it('pauses the remote source after the play command', async () => {
 		online.add(`${me}:tablet`);
 		const before = await playingQueue(1, 0);
@@ -241,12 +273,42 @@ describe('transfer to a friend device', () => {
 			positionMs: 0,
 			playing: { queueItemId: mine.currentItemId! },
 		};
-		await expect(transfer.transfer(me, input)).rejects.toMatchObject({ statusCode: 403 });
+		await expect(transfer.transfer(me, input)).rejects.toMatchObject({
+			statusCode: 403,
+			code: 'QUEUE_ACCESS_DENIED',
+		});
 		await license('tv');
 		await expect(transfer.transfer(me, input)).rejects.toMatchObject({
 			statusCode: 409,
 			code: 'DEVICE_OFFLINE',
 		});
+		expect(await queue.getQueue(me, me)).toEqual(mine);
+		expect(await queue.getQueue(friend, friend)).toEqual(friendBefore);
+		expect(sendDeviceCommand).not.toHaveBeenCalled();
+		expect(notifyQueueUpdate).not.toHaveBeenCalled();
+	});
+
+	it('refuses a device the friend did not license to me, even with another licensed', async () => {
+		await license('radio');
+		await supabaseAdmin.from('devices').upsert({
+			user_id: friend,
+			device_id: 'tv',
+			device_name: 'TV',
+			platform: 'android',
+			model: 'X',
+		});
+		online.add(`${friend}:tv`);
+		const mine = await playingQueue(1, 0);
+		const friendBefore = await friendQueue();
+		notifyQueueUpdate.mockClear();
+		await expect(
+			transfer.transfer(me, {
+				targetUserId: friend,
+				targetDeviceId: 'tv',
+				positionMs: 0,
+				playing: { queueItemId: mine.currentItemId! },
+			})
+		).rejects.toMatchObject({ statusCode: 403, code: 'QUEUE_ACCESS_DENIED' });
 		expect(await queue.getQueue(me, me)).toEqual(mine);
 		expect(await queue.getQueue(friend, friend)).toEqual(friendBefore);
 		expect(sendDeviceCommand).not.toHaveBeenCalled();

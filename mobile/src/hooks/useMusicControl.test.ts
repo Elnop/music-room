@@ -117,6 +117,26 @@ describe('useMusicControlEmitter', () => {
 		setPositionReader(null);
 	});
 
+	it('sends 0 when the reader returns a non-finite position', async () => {
+		setPositionReader(() => NaN);
+		const { unmount } = renderHook(() => useMusicControlEmitter());
+		await act(async () => {
+			await Promise.resolve();
+		});
+		await act(async () => {
+			jest.advanceTimersByTime(500);
+		});
+
+		expect(mockSocket.emit).toHaveBeenCalledWith('listening:update', {
+			track: null,
+			isPlaying: true,
+			positionMs: 0,
+		});
+
+		unmount();
+		setPositionReader(null);
+	});
+
 	it('emits again with the new position when a seek happens', async () => {
 		let position = 1000;
 		setPositionReader(() => position);
