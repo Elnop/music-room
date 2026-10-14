@@ -30,6 +30,10 @@ export interface QueueItem {
  * is upcoming. Every queue endpoint returns it, and `queue:updated` carries it.
  */
 export interface QueueState {
+	/** The user whose queue this is. */
+	ownerId: string;
+	/** Grows with every change of the queue; the store drops a state not newer than its own (#285). */
+	version: number;
 	currentItemId: string | null;
 	items: QueueItem[];
 }
