@@ -1,4 +1,9 @@
-import { usePlayerStore, type PlaybackState } from '@/store/playerStore';
+import {
+	usePlayerStore,
+	readPositionMs,
+	setPositionReader,
+	type PlaybackState,
+} from '@/store/playerStore';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
 const initialState = usePlayerStore.getState();
@@ -281,5 +286,23 @@ describe('playerStore stream and modal', () => {
 
 		usePlayerStore.getState().setModalOpen(false);
 		expect(usePlayerStore.getState().isModalOpen).toBe(false);
+	});
+});
+
+describe('playback position (#295)', () => {
+	afterEach(() => setPositionReader(null));
+
+	it('reads null without a reader and the reader value otherwise', () => {
+		expect(readPositionMs()).toBeNull();
+		setPositionReader(() => 4200);
+		expect(readPositionMs()).toBe(4200);
+		setPositionReader(null);
+		expect(readPositionMs()).toBeNull();
+	});
+
+	it('markSeek increments seekCount', () => {
+		const before = usePlayerStore.getState().seekCount;
+		usePlayerStore.getState().markSeek();
+		expect(usePlayerStore.getState().seekCount).toBe(before + 1);
 	});
 });

@@ -144,6 +144,7 @@ export function PlayerModal() {
 	const handleSeek = (value: number) => {
 		if (!player) return;
 		player.seekTo(value);
+		usePlayerStore.getState().markSeek();
 	};
 
 	// Previous restarts the track past RESTART_THRESHOLD_S, otherwise steps back in the queue.
@@ -151,6 +152,7 @@ export function PlayerModal() {
 		if (!player) return;
 		if (previousAction(currentTime, hasPrevious) === 'restart') {
 			player.seekTo(0);
+			usePlayerStore.getState().markSeek();
 		} else {
 			queuePrevious();
 		}

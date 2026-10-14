@@ -11,6 +11,21 @@ import type { SoundCloudTrack } from '@/types/soundcloud.types';
  */
 export type PlaybackState = 'idle' | 'loading' | 'ready' | 'playing' | 'paused';
 
+let positionReader: (() => number) | null = null;
+
+/**
+ * Registers how to read the playback position in ms. `PlayerProvider` owns the audio
+ * player but the listening status is emitted outside it, so the position goes through here (#295).
+ */
+export function setPositionReader(reader: (() => number) | null): void {
+	positionReader = reader;
+}
+
+/** Current playback position in ms, null while no player is registered. */
+export function readPositionMs(): number | null {
+	return positionReader ? positionReader() : null;
+}
+
 interface PlayerState {
 	// Track and stream info
 	currentTrack: SoundCloudTrack | null;
@@ -31,6 +46,9 @@ interface PlayerState {
 	// UI state
 	isModalOpen: boolean;
 
+	/** Incremented on each user seek, so the listening status is re-sent with the new position (#295). */
+	seekCount: number;
+
 	// Actions
 	setStreamUrl: (url: string | null) => void;
 	setLoading: (loading: boolean) => void;
@@ -46,6 +64,7 @@ interface PlayerState {
 	stop: () => void;
 	toggleModal: () => void;
 	setModalOpen: (isOpen: boolean) => void;
+	markSeek: () => void;
 }
 
 export const usePlayerStore = create<PlayerState>((set, get) => ({
@@ -60,6 +79,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 	loading: false,
 	error: null,
 	isModalOpen: false,
+	seekCount: 0,
 
 	setStreamUrl: url => {
 		set({ streamUrl: url });
@@ -203,5 +223,9 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 
 	setModalOpen: isOpen => {
 		set({ isModalOpen: isOpen });
+	},
+
+	markSeek: () => {
+		set(state => ({ seekCount: state.seekCount + 1 }));
 	},
 }));

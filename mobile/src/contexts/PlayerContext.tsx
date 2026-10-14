@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useRef } from 'react';
 import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
-import { usePlayerStore } from '@/store/playerStore';
+import { usePlayerStore, setPositionReader } from '@/store/playerStore';
 import { useQueueStore } from '@/store/queueStore';
 import { ApiError, apiRequest } from '@/services/api';
 
@@ -299,6 +299,12 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 			player.pause();
 		}
 	}, [player, playbackState]);
+
+	// The listening status is emitted outside this provider: expose the position (#295)
+	useEffect(() => {
+		setPositionReader(() => player.currentTime * 1000);
+		return () => setPositionReader(null);
+	}, [player]);
 
 	const value: PlayerContextValue = {
 		player,
