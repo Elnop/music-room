@@ -11,14 +11,20 @@ import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useImageColors, hexToRgba } from '@/hooks/useImageColors';
 import type { Theme } from '@themes/types';
 import type { Track } from '@/types/track.types';
-import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import { CONFLICT_CODES, usePlaylistStore } from '@store/playlistStore';
 import { afterRankForDrop } from '@store/moveTarget';
+import { trackToSoundCloud } from '@utils/trackToSoundCloud';
 import { ApiError } from '@/services/api';
 import { useAuthStore } from '@store/authStore';
 import { usePlayerStore } from '@store/playerStore';
+import { useQueueStore } from '@store/queueStore';
+import { toTrackInput } from '@utils/trackInput';
 import { usePlaylistSocket } from '@hooks/usePlaylistSocket';
 import { PlaylistHeader } from '@components/playlist/PlaylistHeader';
+import {
+	PLAY_PLAYLIST_BUTTON_SIZE,
+	PlayPlaylistButton,
+} from '@components/playlist/PlayPlaylistButton';
 import { SwipeableTrackItem } from '@components/common/SwipeableTrackItem';
 import { ReorderableList } from '@components/common/ReorderableList';
 import { EmptyState } from '@components/common/EmptyState';
@@ -44,38 +50,6 @@ interface PlaylistDetailScreenProps {
 	route: PlaylistDetailScreenRouteProp;
 }
 
-const hashStringToNumber = (str: string): number => {
-	let hash = 0;
-	for (let i = 0; i < str.length; i++) {
-		const chr = str.charCodeAt(i);
-		hash = (hash << 5) - hash + chr;
-		hash |= 0;
-	}
-	return Math.abs(hash);
-};
-
-const trackToSoundCloud = (track: Track): SoundCloudTrack => {
-	const parsed = parseInt(track.id, 10);
-	const trackId = !Number.isNaN(parsed) ? parsed : hashStringToNumber(track.trackUri || track.id);
-
-	return {
-		id: trackId,
-		title: track.title,
-		description: null,
-		duration: track.durationMs,
-		genre: null,
-		artwork_url: track.albumArt || null,
-		permalink_url: track.trackUri,
-		user: {
-			id: trackId,
-			username: track.artist,
-			avatar_url: track.albumArt || null,
-			permalink_url: track.trackUri,
-		},
-		playable: true,
-	};
-};
-
 export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreenProps) {
 	const { theme } = useTheme();
 	const insets = useSafeAreaInsets();
@@ -83,6 +57,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 	const styles = React.useMemo(() => createStyles(theme, insets.top), [theme, insets.top]);
 	const { id } = route.params;
 	const { user } = useAuthStore();
+	const addToQueue = useQueueStore(state => state.addItem);
 	const {
 		currentPlaylist,
 		isLoading,
@@ -252,6 +227,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 						track={item}
 						onDelete={() => handleDeleteTrack(item.id)}
 						disabled={!canEdit}
+						onAddToQueue={() => addToQueue(toTrackInput(item))}
 						onDragStart={canEdit ? drag : undefined}
 						isDragActive={isActive}
 					/>
@@ -263,7 +239,13 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 						onAddTrack={handleAddTrack}
 					/>
 				}
-				contentContainerStyle={[styles.list, { paddingBottom: playerHeight + theme.spacing.xxl }]}
+				// The last track scrolls clear of the floating Play button and the mini player.
+				contentContainerStyle={[
+					styles.list,
+					{
+						paddingBottom: playerHeight + PLAY_PLAYLIST_BUTTON_SIZE + theme.spacing.md * 2,
+					},
+				]}
 				ListEmptyComponent={
 					<EmptyState
 						icon="musical-notes-outline"
@@ -272,6 +254,8 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 				}
 				showsVerticalScrollIndicator={false}
 			/>
+
+			<PlayPlaylistButton playlistId={id} trackCount={currentPlaylist.tracks.length} />
 		</View>
 	);
 }

@@ -1,10 +1,10 @@
-import { supabaseAdmin } from '@/shared/config/supabase.js';
-import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
+import { upsertTrack } from '@/shared/utils/track-upsert.js';
 import { checkEditPermission } from '@/features/playlists/permissions/playlist.permissions.js';
 import { formatTrackResponse } from '@/features/playlists/utils/playlist.helpers.js';
 import { addTrackRpc, moveTrackRpc, removeTrackRpc } from '@/features/playlists/utils/track-rpc.js';
 import { realtime } from '@/realtime/index.js';
+import { queueSyncService } from '@/features/queue/services/queue-sync.service.js';
 import type {
 	AddTrackDTO,
 	AddTrackResult,
@@ -16,7 +16,8 @@ import type { MoveTrackInput } from '@/features/playlists/playlist.validators.js
 
 /**
  * Adds, removes and moves tracks through the atomic operations of migration 016.
- * See doc/PLAYLIST_CONCURRENCY.md.
+ * See doc/PLAYLIST_CONCURRENCY.md. Each change is then mirrored in the queue
+ * blocks of the playlist (#278); a sync failure never fails the operation.
  */
 export class PlaylistTrackService {
 	/**
@@ -26,26 +27,7 @@ export class PlaylistTrackService {
 	async addTrack(playlistId: string, userId: string, track: AddTrackDTO): Promise<AddTrackResult> {
 		const playlist = await checkEditPermission(playlistId, userId);
 
-		const { data: trackRow, error } = await supabaseAdmin
-			.from('tracks')
-			.upsert(
-				{
-					track_uri: track.trackUri,
-					title: track.title,
-					artist: track.artist,
-					album: track.album,
-					album_art: track.albumArt,
-					duration_ms: track.durationMs,
-					preview_url: track.previewUrl,
-				},
-				{ onConflict: 'track_uri' }
-			)
-			.select()
-			.single();
-		if (error) {
-			logger.error('Failed to upsert track', { error, playlistId });
-			throw new AppError(500, 'Failed to add track', 'TRACK_ADD_ERROR');
-		}
+		const trackRow = await upsertTrack(track);
 
 		const addedBy = playlist.edit_mode === 'restricted' ? userId : null;
 		const result = await addTrackRpc(playlistId, trackRow.id, addedBy);
@@ -70,6 +52,7 @@ export class PlaylistTrackService {
 			event: 'track_added',
 			track: added,
 		});
+		await queueSyncService.syncPlaylistChange('added', playlistId, trackRow.id);
 
 		return { track: added, tracksVersion: result.tracksVersion, rebalanced: result.rebalanced };
 	}
@@ -98,6 +81,7 @@ export class PlaylistTrackService {
 			event: 'track_removed',
 			trackId,
 		});
+		await queueSyncService.syncPlaylistChange('removed', playlistId, trackId);
 
 		return { tracksVersion: result.tracksVersion };
 	}
@@ -128,6 +112,7 @@ export class PlaylistTrackService {
 			trackId,
 			rank: result.rank,
 		});
+		await queueSyncService.syncPlaylistChange('moved', playlistId, trackId);
 
 		return {
 			trackId,

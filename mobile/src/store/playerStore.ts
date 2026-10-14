@@ -17,6 +17,8 @@ interface PlayerState {
 	streamUrl: string | null;
 	pendingTrackId: number | null; // Track ID being loaded
 	loadCounter: number; // Incremented on each playTrack to force reload even for same track
+	/** Queue item being played, null for a track tapped in a list (#274). */
+	queueItemId: string | null;
 
 	// State machine
 	playbackState: PlaybackState;
@@ -37,7 +39,7 @@ interface PlayerState {
 	clearError: () => void;
 	setPlaybackReady: () => void;
 	setPlaybackPlaying: () => void;
-	playTrack: (track: SoundCloudTrack) => void;
+	playTrack: (track: SoundCloudTrack, queueItemId?: string | null) => void;
 	play: () => void;
 	pause: () => void;
 	resume: () => void;
@@ -52,6 +54,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 	streamUrl: null,
 	pendingTrackId: null,
 	loadCounter: 0,
+	queueItemId: null,
 	playbackState: 'idle',
 	isPlaying: false,
 	loading: false,
@@ -83,6 +86,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 		set({
 			error: message,
 			currentTrack: null,
+			queueItemId: null,
 			streamUrl: null,
 			pendingTrackId: null,
 			playbackState: 'idle',
@@ -124,22 +128,25 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 		}
 	},
 
-	playTrack: track => {
+	playTrack: (track, queueItemId = null) => {
 		if (__DEV__)
 			console.log('🎵 [playerStore] playTrack called:', {
 				id: track.id,
 				title: track.title,
+				queueItemId,
 			});
 
 		set(state => ({
 			currentTrack: track,
+			queueItemId,
 			pendingTrackId: track.id,
 			loadCounter: state.loadCounter + 1,
 			playbackState: 'loading',
 			streamUrl: null,
 			isPlaying: false,
 			loading: true,
-			isModalOpen: false,
+			// A list tap closes the modal; a queue step (next/previous, auto-advance) keeps it.
+			isModalOpen: queueItemId === null ? false : state.isModalOpen,
 			error: null,
 		}));
 	},
@@ -180,6 +187,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 		if (__DEV__) console.log('🎵 [playerStore] Stopping playback');
 		set({
 			currentTrack: null,
+			queueItemId: null,
 			streamUrl: null,
 			pendingTrackId: null,
 			playbackState: 'idle',

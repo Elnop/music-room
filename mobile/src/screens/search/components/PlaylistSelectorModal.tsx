@@ -14,6 +14,7 @@ import type { Theme } from '@/themes/types';
 import { usePlaylistStore } from '@/store/playlistStore';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import type { Track } from '@/types/track.types';
+import { toTrackInput } from '@utils/trackInput';
 import { ApiError as ApiRequestError } from '@/services/api';
 
 interface Props {
@@ -88,19 +89,8 @@ export function PlaylistSelectorModal({ visible, track, onClose }: Props) {
 		setIsAdding(true);
 
 		try {
-			// Convert SoundCloud track to internal format
-			const internalTrack = {
-				id: '', // Temporary ID, backend will generate UUID
-				title: track.title,
-				artist: track.user.username,
-				album: undefined, // SoundCloud tracks don't have albums
-				// Send undefined instead of empty string for better validation
-				albumArt: track.artwork_url || track.user.avatar_url || undefined,
-				durationMs: track.duration,
-				trackUri: track.permalink_url,
-				// Send undefined instead of empty string
-				previewUrl: undefined,
-			};
+			// Convert SoundCloud track to the add body; the backend generates the id
+			const internalTrack = toTrackInput(track);
 
 			if (__DEV__)
 				console.log('🎵 [PlaylistSelector] Converted track:', {
