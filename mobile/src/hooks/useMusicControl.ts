@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useMemo, useState } from 'react';
 import { useSocketStore } from '@store/socketStore';
-import { usePlayerStore } from '@store/playerStore';
+import { usePlayerStore, readPositionMs } from '@store/playerStore';
 import { useAuthStore } from '@store/authStore';
 import { deviceService, type DeviceInfo } from '@/services/deviceService';
 import { musicControlApi } from '@/services/musicControlApi';
@@ -18,6 +18,8 @@ export interface ListeningStatus {
 		artworkUrl: string | null;
 	} | null;
 	isPlaying: boolean;
+	/** Playback position when the status was sent, in ms; null from older clients (#295). */
+	positionMs: number | null;
 	updatedAt: string;
 }
 
@@ -53,6 +55,7 @@ export function useMusicControlEmitter() {
 
 	const currentTrack = usePlayerStore(state => state.currentTrack);
 	const isPlaying = usePlayerStore(state => state.isPlaying);
+	const seekCount = usePlayerStore(state => state.seekCount);
 	const pause = usePlayerStore(state => state.pause);
 	const resume = usePlayerStore(state => state.resume);
 
@@ -70,6 +73,7 @@ export function useMusicControlEmitter() {
 		if (!socket || !isConnected || !user || !deviceInfo) return;
 
 		const emitStatus = () => {
+			const position = readPositionMs();
 			const status = {
 				track: currentTrack
 					? {
@@ -80,6 +84,8 @@ export function useMusicControlEmitter() {
 						}
 					: null,
 				isPlaying,
+				positionMs:
+					position != null && Number.isFinite(position) ? Math.max(0, Math.round(position)) : 0,
 			};
 
 			socket.emit('listening:update', status);
@@ -96,7 +102,7 @@ export function useMusicControlEmitter() {
 		const timer = setTimeout(emitStatus, 200);
 
 		return () => clearTimeout(timer);
-	}, [socket, isConnected, user, deviceInfo, currentTrack, isPlaying]);
+	}, [socket, isConnected, user, deviceInfo, currentTrack, isPlaying, seekCount]);
 
 	useEffect(() => {
 		if (!socket || !isConnected) return;

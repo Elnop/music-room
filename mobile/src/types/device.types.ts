@@ -60,3 +60,21 @@ export interface ControllableDevicesResponse {
 	allDevices: boolean;
 	devices: ControllableDevice[];
 }
+
+/** GET /api/music-control/controllable-devices (#295) */
+export interface DevicePickerOwner {
+	ownerId: string;
+	username: string;
+	isSelf: boolean;
+	devices: Array<ControllableDevice & { online: boolean }>;
+}
+
+export interface DevicePickerResponse {
+	/** Me first, then friends with at least one controllable device, by username */
+	owners: DevicePickerOwner[];
+}
+
+/** control:revoked: the receiver no longer controls any of ownerId's devices. */
+export interface ControlRevokedPayload {
+	ownerId: string;
+}

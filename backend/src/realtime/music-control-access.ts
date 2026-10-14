@@ -65,13 +65,17 @@ export const listeningUpdateSchema = z.object({
 		})
 		.nullable(),
 	isPlaying: z.boolean(),
-}) satisfies z.ZodType<Pick<ListeningStatus, 'track' | 'isPlaying'>, unknown>;
+	positionMs: z.number().int().min(0).max(86_400_000).optional(),
+}) satisfies z.ZodType<
+	Pick<ListeningStatus, 'track' | 'isPlaying'> & { positionMs?: number },
+	unknown
+>;
 
 export type ListeningUpdatePayload = z.infer<typeof listeningUpdateSchema>;
 
 export const INVALID_LISTENING_UPDATE_PAYLOAD = {
 	message:
-		'listening:update expects { track: { id, title, artist, artworkUrl } | null, isPlaying } (title and artist up to 300 characters)',
+		'listening:update expects { track: { id, title, artist, artworkUrl } | null, isPlaying, positionMs? (ms) } (title and artist up to 300 characters)',
 	code: 'INVALID_PAYLOAD',
 } as const;
 

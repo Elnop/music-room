@@ -4,6 +4,7 @@ import {
 	useFriendListening,
 	useMusicControlEmitter,
 } from '@/hooks/useMusicControl';
+import { setPositionReader } from '@/store/playerStore';
 import { musicControlApi } from '@/services/musicControlApi';
 
 const mockSocket = {
@@ -18,6 +19,7 @@ const mockAuthState = { user: { id: 'user-1' } };
 const mockPlayerState = {
 	currentTrack: null,
 	isPlaying: true,
+	seekCount: 0,
 	pause: jest.fn(),
 	resume: jest.fn(),
 };
@@ -31,10 +33,17 @@ jest.mock('@store/authStore', () => ({
 	useAuthStore: (selector: (state: typeof mockAuthState) => unknown) => selector(mockAuthState),
 }));
 
-jest.mock('@store/playerStore', () => ({
-	usePlayerStore: (selector: (state: typeof mockPlayerState) => unknown) =>
-		selector(mockPlayerState),
-}));
+jest.mock('@store/playerStore', () => {
+	let reader: (() => number) | null = null;
+	return {
+		usePlayerStore: (selector: (state: typeof mockPlayerState) => unknown) =>
+			selector(mockPlayerState),
+		setPositionReader: (r: (() => number) | null) => {
+			reader = r;
+		},
+		readPositionMs: () => (reader ? reader() : null),
+	};
+});
 
 jest.mock('@/services/deviceService', () => ({
 	deviceService: {
@@ -82,9 +91,80 @@ describe('useMusicControlEmitter', () => {
 		expect(mockSocket.emit).toHaveBeenCalledWith('listening:update', {
 			track: null,
 			isPlaying: true,
+			positionMs: 0,
 		});
 
 		unmount();
+	});
+
+	it('sends the rounded position of the registered reader', async () => {
+		setPositionReader(() => 12_345.6);
+		const { unmount } = renderHook(() => useMusicControlEmitter());
+		await act(async () => {
+			await Promise.resolve();
+		});
+		await act(async () => {
+			jest.advanceTimersByTime(500);
+		});
+
+		expect(mockSocket.emit).toHaveBeenCalledWith('listening:update', {
+			track: null,
+			isPlaying: true,
+			positionMs: 12_346,
+		});
+
+		unmount();
+		setPositionReader(null);
+	});
+
+	it('sends 0 when the reader returns a non-finite position', async () => {
+		setPositionReader(() => NaN);
+		const { unmount } = renderHook(() => useMusicControlEmitter());
+		await act(async () => {
+			await Promise.resolve();
+		});
+		await act(async () => {
+			jest.advanceTimersByTime(500);
+		});
+
+		expect(mockSocket.emit).toHaveBeenCalledWith('listening:update', {
+			track: null,
+			isPlaying: true,
+			positionMs: 0,
+		});
+
+		unmount();
+		setPositionReader(null);
+	});
+
+	it('emits again with the new position when a seek happens', async () => {
+		let position = 1000;
+		setPositionReader(() => position);
+		const { rerender, unmount } = renderHook(() => useMusicControlEmitter());
+		await act(async () => {
+			await Promise.resolve();
+		});
+		await act(async () => {
+			jest.advanceTimersByTime(500);
+		});
+		mockSocket.emit.mockClear();
+
+		position = 60_000;
+		mockPlayerState.seekCount = 1;
+		rerender({});
+		await act(async () => {
+			jest.advanceTimersByTime(200);
+		});
+
+		expect(mockSocket.emit).toHaveBeenCalledWith('listening:update', {
+			track: null,
+			isPlaying: true,
+			positionMs: 60_000,
+		});
+
+		mockPlayerState.seekCount = 0;
+		unmount();
+		setPositionReader(null);
 	});
 });
 

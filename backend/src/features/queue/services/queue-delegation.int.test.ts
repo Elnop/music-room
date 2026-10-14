@@ -46,7 +46,7 @@ const dto = () => {
 };
 
 const online = new Set<string>();
-const sendQueuePlay = vi.spyOn(realtime, 'sendQueuePlay').mockReturnValue(true);
+const sendDeviceCommand = vi.spyOn(realtime, 'sendDeviceCommand').mockReturnValue(true);
 vi.spyOn(realtime, 'isDeviceOnline').mockImplementation((userId, deviceId) =>
 	online.has(`${userId}:${deviceId}`)
 );
@@ -60,15 +60,13 @@ async function befriend(allDevices: boolean) {
 }
 
 async function license(deviceId: string) {
-	const { error: deviceError } = await supabaseAdmin
-		.from('devices')
-		.upsert({
-			user_id: owner,
-			device_id: deviceId,
-			device_name: 'TV',
-			platform: 'android',
-			model: 'X',
-		});
+	const { error: deviceError } = await supabaseAdmin.from('devices').upsert({
+		user_id: owner,
+		device_id: deviceId,
+		device_name: 'TV',
+		platform: 'android',
+		model: 'X',
+	});
 	if (deviceError) throw deviceError;
 	const { error } = await supabaseAdmin
 		.from('device_control_licenses')
@@ -84,7 +82,7 @@ beforeAll(async () => {
 
 beforeEach(async () => {
 	online.clear();
-	sendQueuePlay.mockClear();
+	sendDeviceCommand.mockClear();
 	await supabaseAdmin.from('devices').delete().eq('user_id', owner); // cascades to licenses
 	await supabaseAdmin.from('follows').delete().in('follower_id', [owner, friend, stranger]);
 	await supabaseAdmin.from('play_queues').delete().eq('user_id', owner); // cascades to items
@@ -150,7 +148,7 @@ describe('playback by a delegate', () => {
 		await queue.addItem(owner, owner, dto());
 		await queue.addItem(owner, owner, dto());
 		const state = await queue.step(friend, owner, 'next', 'tv');
-		expect(sendQueuePlay).toHaveBeenCalledWith(owner, 'tv', {
+		expect(sendDeviceCommand).toHaveBeenCalledWith(owner, 'tv', {
 			action: 'play-item',
 			fromUserId: friend,
 			item: state.items.find(i => i.id === state.currentItemId),
@@ -184,7 +182,7 @@ describe('playback by a delegate', () => {
 			code: 'DEVICE_OFFLINE',
 		});
 		expect(await queue.getQueue(owner, owner)).toEqual(before);
-		expect(sendQueuePlay).not.toHaveBeenCalled();
+		expect(sendDeviceCommand).not.toHaveBeenCalled();
 	});
 
 	it("checks the playlist's visibility for the delegate, not the owner", async () => {
@@ -203,7 +201,7 @@ describe('playback by a delegate', () => {
 		online.add(`${owner}:tablet`);
 		const added = await queue.addItem(owner, owner, dto());
 		await queue.playItem(owner, owner, added.items[0].id, 'tablet');
-		expect(sendQueuePlay).toHaveBeenCalledWith(
+		expect(sendDeviceCommand).toHaveBeenCalledWith(
 			owner,
 			'tablet',
 			expect.objectContaining({ action: 'play-item', fromUserId: owner })
@@ -213,6 +211,6 @@ describe('playback by a delegate', () => {
 	it('sends no command when the owner plays from the calling device', async () => {
 		const added = await queue.addItem(owner, owner, dto());
 		await queue.playItem(owner, owner, added.items[0].id);
-		expect(sendQueuePlay).not.toHaveBeenCalled();
+		expect(sendDeviceCommand).not.toHaveBeenCalled();
 	});
 });

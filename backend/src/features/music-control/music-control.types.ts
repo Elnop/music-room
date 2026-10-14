@@ -2,7 +2,7 @@
  * Music Control Types
  */
 
-import type { QueueItem } from '@/features/queue/queue.types.js';
+import type { QueueItem, QueueTrack } from '@/features/queue/queue.types.js';
 
 /**
  * Device information for multi-device support
@@ -27,6 +27,8 @@ export interface ListeningStatus {
 		artworkUrl: string | null;
 	} | null;
 	isPlaying: boolean;
+	/** Playback position when the status was sent, in ms; null from older clients (#295). */
+	positionMs: number | null;
 	updatedAt: string;
 }
 
@@ -123,6 +125,19 @@ export interface ControllableDevicesResponse {
 	devices: ControllableDevice[];
 }
 
+/** GET /api/music-control/controllable-devices (#295) */
+export interface DevicePickerOwner {
+	ownerId: string;
+	username: string;
+	isSelf: boolean;
+	devices: Array<ControllableDevice & { online: boolean }>;
+}
+
+export interface DevicePickerResponse {
+	/** Me first, then friends with at least one controllable device, by username */
+	owners: DevicePickerOwner[];
+}
+
 /**
  * control:command sent by the server to the owner's device chosen by a
  * playback action on the queue (#294): play `item` from `positionMs`.
@@ -135,6 +150,22 @@ export interface QueuePlayCommand {
 	/** Version of the queue state that made `item` current. */
 	version: number;
 }
+
+/** control:command: play `track` from `positionMs` (playback transfer, #295). */
+export interface QueueTrackCommand {
+	action: 'play-track';
+	fromUserId: string;
+	track: QueueTrack;
+	positionMs: number;
+}
+
+/** control:command: pause the device (playback transfer, #295). */
+export interface DevicePauseCommand {
+	action: 'pause';
+	fromUserId: string;
+}
+
+export type DeviceCommand = QueuePlayCommand | QueueTrackCommand | DevicePauseCommand;
 
 /** control:revoked: the receiver no longer controls any of ownerId's devices. */
 export interface ControlRevokedPayload {

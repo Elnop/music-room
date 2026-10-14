@@ -5,18 +5,21 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import { routeParam } from '@/shared/utils/route-params.js';
 import { DeviceService } from '@/features/music-control/services/device.service.js';
 import { deviceLicenseService } from '@/features/music-control/services/device-license.service.js';
+import { ControllableDevicesService } from '@/features/music-control/services/controllable-devices.service.js';
 import {
 	deviceLicenseParamsSchema,
 	userDevicesParamsSchema,
 } from '@/features/music-control/music-control.validators.js';
 import type {
 	ControllableDevicesResponse,
+	DevicePickerResponse,
 	GrantDeviceLicenseResponse,
 	MyDevicesResponse,
 	RevokeDeviceLicenseResponse,
 } from '@/features/music-control/music-control.types.js';
 
 const deviceService = new DeviceService();
+const controllableDevicesService = new ControllableDevicesService();
 
 function sendData<T>(res: Response, data: T) {
 	const response: ApiResponse<T> = {
@@ -210,6 +213,20 @@ export class MusicControlController {
 			const { userId } = userDevicesParamsSchema.parse(req.params);
 			const result = await deviceLicenseService.listControllable(viewerId, userId);
 			sendData<ControllableDevicesResponse>(res, result);
+		} catch (error) {
+			next(error);
+		}
+	}
+
+	/**
+	 * GET /api/music-control/controllable-devices
+	 * List the devices I can play on: mine, then my friends'
+	 */
+	async getDevicePicker(req: Request, res: Response, next: NextFunction) {
+		try {
+			const viewerId = (req as AuthenticatedRequest).user.id;
+			const result = await controllableDevicesService.list(viewerId);
+			sendData<DevicePickerResponse>(res, result);
 		} catch (error) {
 			next(error);
 		}

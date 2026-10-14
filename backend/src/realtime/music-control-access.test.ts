@@ -4,6 +4,7 @@ import {
 	controlActionSchema,
 	leaveListeningRoom,
 	listeningTargetSchema,
+	listeningUpdateSchema,
 } from '@/realtime/music-control-access.js';
 import type { AppSocketServer } from '@/realtime/socket-auth.js';
 
@@ -80,5 +81,23 @@ describe('leaveListeningRoom', () => {
 		} as unknown as AppSocketServer;
 
 		expect(() => leaveListeningRoom(io, BOB, ALICE)).not.toThrow();
+	});
+});
+
+describe('listeningUpdateSchema positionMs (#295)', () => {
+	const base = { track: null, isPlaying: true };
+
+	it('accepts a payload without positionMs (older clients)', () => {
+		expect(listeningUpdateSchema.parse(base)).toEqual(base);
+	});
+
+	it('accepts a whole, non-negative position', () => {
+		expect(listeningUpdateSchema.parse({ ...base, positionMs: 61_500 }).positionMs).toBe(61_500);
+	});
+
+	it('rejects a negative, fractional or absurd position', () => {
+		for (const positionMs of [-1, 1.5, 86_400_001]) {
+			expect(listeningUpdateSchema.safeParse({ ...base, positionMs }).success).toBe(false);
+		}
 	});
 });

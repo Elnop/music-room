@@ -16,6 +16,7 @@ import soundcloudRoutes from '@/features/soundcloud/soundcloud.routes.js';
 import friendsRoutes from '@/features/friends/friends.routes.js';
 import musicControlRoutes from '@/features/music-control/music-control.routes.js';
 import queueRoutes from '@/features/queue/queue.routes.js';
+import queueTransferRoutes from '@/features/queue/queue-transfer.routes.js';
 
 export interface RouteConfig {
 	/** API path prefix (e.g., "/api/auth") */
@@ -64,6 +65,11 @@ export const routes: RouteConfig[] = [
 		path: '/api/music-control',
 		router: musicControlRoutes,
 		description: 'Music control delegation between friends',
+	},
+	{
+		path: '/api/queue/transfer',
+		router: queueTransferRoutes,
+		description: "Moves playback to one of the caller's devices or a friend's device",
 	},
 	{
 		path: '/api/queue',
