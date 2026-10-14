@@ -68,8 +68,11 @@ describe('MiniPlayer', () => {
 	});
 
 	it('disables play and next without a track', () => {
-		const resume = jest.spyOn(usePlayerStore.getState(), 'resume');
+		const resume = jest.fn();
+		usePlayerStore.setState({ resume });
 		render(<MiniPlayer />);
+		expect(screen.getByLabelText('Play')).toBeDisabled();
+		expect(screen.getByLabelText('Next track')).toBeDisabled();
 		fireEvent.press(screen.getByLabelText('Play'));
 		fireEvent.press(screen.getByLabelText('Next track'));
 		expect(resume).not.toHaveBeenCalled();
