@@ -108,7 +108,7 @@ describe('PlayerModal without a track', () => {
 		expect(screen.getByText("File d'attente")).toBeTruthy();
 	});
 
-	it('asks for no artwork colors and keeps the theme colors', () => {
+	it('asks for no artwork colors', () => {
 		render(<PlayerModal />);
 		expect(useImageColors).toHaveBeenCalledWith(null, expect.anything());
 	});

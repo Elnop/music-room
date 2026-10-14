@@ -263,7 +263,7 @@ export function PlayerModal() {
 								style={styles.slider}
 								minimumValue={0}
 								maximumValue={duration || 1}
-								value={currentTime}
+								value={currentTrack ? currentTime : 0}
 								onSlidingComplete={handleSeek}
 								minimumTrackTintColor={colors.slider}
 								maximumTrackTintColor={colors.sliderBg}
@@ -272,10 +272,10 @@ export function PlayerModal() {
 							/>
 							<View style={styles.timeContainer}>
 								<Text style={[styles.timeText, { color: colors.textSecondary }]}>
-									{formatTime(currentTime)}
+									{formatTime(currentTrack ? currentTime : 0)}
 								</Text>
 								<Text style={[styles.timeText, { color: colors.textSecondary }]}>
-									{formatTime(duration)}
+									{formatTime(currentTrack ? duration : 0)}
 								</Text>
 							</View>
 						</View>
@@ -310,7 +310,10 @@ export function PlayerModal() {
 										name={isPlaying ? 'pause' : 'play'}
 										size={40}
 										color={colors.playBtnIcon}
-										style={isPlaying ? undefined : { marginLeft: 4 }}
+										style={[
+											isPlaying ? undefined : { marginLeft: 4 },
+											currentTrack ? undefined : styles.disabledIcon,
+										]}
 									/>
 								)}
 							</TouchableOpacity>
