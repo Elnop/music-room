@@ -452,7 +452,7 @@ Refus : `connect_error` dont le `message` vaut `NO_TOKEN` (pas de `token`), `INV
 ### Events
 
 - **Client → serveur** : `playlist:join`, `playlist:leave`, `listening:subscribe`, `listening:unsubscribe`, `listening:update`, `control:action`
-- **Serveur → client** : `playlist:updated`, `playlist:error`, `listening:status`, `listening:error`, `permission:changed`, `control:command`, `control:success`, `control:error`
+- **Serveur → client** : `playlist:updated`, `playlist:error`, `listening:status`, `listening:error`, `permission:changed`, `control:command`, `control:success`, `control:error`, `control:revoked`, `queue:updated`
 
 Les clients d'une playlist rejoignent la room `playlist:<id>` et reçoivent `playlist:updated` à chaque modification.
 
@@ -469,7 +469,7 @@ L'accès est revérifié quand il peut se perdre : après le retrait d'un viewer
 
 #### Écoute et contrôle
 
-`listening:subscribe <ownerId>` et `control:action` ne passent que si l'utilisateur de la socket et le propriétaire sont amis mutuels et que le propriétaire lui a ouvert l'interrupteur « tous mes appareils » (`follows.can_control_music`) ou une licence sur l'appareil (`device_control_licenses`) : sur l'appareil ciblé pour `control:action`, sur au moins un appareil pour `listening:subscribe`, qui montre alors le statut de tous les appareils du propriétaire (règle dans `features/music-control/services/control-access.service.ts` ; une erreur de base refuse). L'identité vient toujours de la socket : les champs en trop du payload (`fromUserId`, `controllerId`...) sont ignorés et `control:command.fromUserId` est l'utilisateur de la socket. Payloads validés par Zod dans `src/realtime/music-control-access.ts`, avant toute lecture en base :
+`listening:subscribe <ownerId>` et `control:action` ne passent que si l'utilisateur de la socket et le propriétaire sont amis mutuels et que le propriétaire lui a ouvert l'interrupteur « tous mes appareils » (`follows.can_control_music`) ou une licence sur l'appareil (`device_control_licenses`) : sur l'appareil ciblé pour `control:action`, sur au moins un appareil pour `listening:subscribe`, qui montre alors le statut de tous les appareils du propriétaire (règle dans `features/music-control/services/control-access.service.ts` ; une erreur de base refuse). L'identité vient toujours de la socket : les champs en trop du payload (`fromUserId`, `controllerId`...) sont ignorés et `control:command.fromUserId` est l'utilisateur de la socket. Le propriétaire est aussi autorisé sur ses propres appareils (`listening:subscribe` sur soi-même, `control:action` vers l'un d'eux), sans interrupteur ni licence. Payloads validés par Zod dans `src/realtime/music-control-access.ts`, avant toute lecture en base :
 
 | Event | Payload | Erreur |
 | --- | --- | --- |
@@ -481,6 +481,8 @@ L'accès est revérifié quand il peut se perdre : après le retrait d'un viewer
 Les erreurs ont la forme `{ message, code }` : `INVALID_PAYLOAD` (payload invalide), `NOT_AUTHORIZED` (pas le droit de contrôle), `DEVICE_OFFLINE` (`control:action` vers un appareil non connecté), `RATE_LIMITED` (débit dépassé).
 
 **Débit (#204)** : chaque socket a un compteur par événement, en mémoire, sur une fenêtre fixe de 10 s : 20 `listening:update` ou `control:action`, 30 pour chacun des autres événements de l'app, un compteur commun pour tout autre nom (`src/realtime/event-rate-limit.ts`). Au-delà, l'événement n'est pas traité et la socket reçoit `RATE_LIMITED` sur `listening:error`, `playlist:error` ou `control:error` selon l'événement. Le compteur est par socket : une autre connexion du même utilisateur a le sien.
+
+**File de lecture (#294).** `queue:updated` (la file entière) part vers `user:<id>` et `listening:<id>` du propriétaire : ses appareils et les délégués qui l'écoutent reçoivent le même état (une seule émission, une socket dans les deux rooms le reçoit une fois). Les amis qui contrôlent au moins un appareil du propriétaire gèrent sa file par les routes `/api/users/:userId/queue/...` (les mêmes que `/api/queue/...`, voir Swagger) ; une action qui change ce qui joue (jouer un morceau, suivant, précédent, jouer une playlist) cible un appareil (`deviceId`, obligatoire pour un délégué, qui doit le contrôler et qu'il faut en ligne, sinon rien ne change). Le serveur envoie alors à cet appareil `control:command` `{ action: 'play-item', fromUserId, item, positionMs, version }`. Quand un contrôleur perd son dernier appareil contrôlable, ses sockets reçoivent `control:revoked` `{ ownerId }`.
 
 Le contrôleur reçoit `permission:changed` (`{ ownerId, targetUserId, canControl }`) quand l'interrupteur change (`grantControl` / `revokeControl`) et quand une licence d'appareil lui est accordée ou retirée ; pour une licence, `canControl` dit s'il lui reste au moins un appareil contrôlable, et l'app recharge alors sa liste d'appareils contrôlables.
 
