@@ -4,6 +4,7 @@ import { useSafeAreaInsets, type EdgeInsets } from 'react-native-safe-area-conte
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
+import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { usePlayerStore } from '@/store/playerStore';
 import { selectHasNext, useQueueStore } from '@/store/queueStore';
@@ -20,16 +21,9 @@ export function MiniPlayer() {
 	const hasNext = useQueueStore(selectHasNext);
 	const queueNext = useQueueStore(state => state.next);
 
-	if (!currentTrack) {
-		return null;
-	}
-
 	const isLoading = playbackState === 'loading';
 	const isPlaying = playbackState === 'playing';
-	const canInteract = playbackState === 'playing' || playbackState === 'paused';
-
-	const artworkUrl =
-		currentTrack.artwork_url || currentTrack.user.avatar_url || 'https://via.placeholder.com/40';
+	const canInteract = !!currentTrack && (playbackState === 'playing' || playbackState === 'paused');
 
 	const handlePlayPause = () => {
 		if (!canInteract || !player) return;
@@ -44,21 +38,14 @@ export function MiniPlayer() {
 	return (
 		<TouchableOpacity style={styles.container} onPress={toggleModal} activeOpacity={0.9}>
 			<View style={styles.content}>
-				<Image source={{ uri: artworkUrl }} style={styles.artwork} />
-				<View style={styles.info}>
-					<Text style={styles.title} numberOfLines={1}>
-						{currentTrack.title}
-					</Text>
-					<Text style={styles.artist} numberOfLines={1}>
-						{currentTrack.user.username}
-					</Text>
-				</View>
+				<NowPlayingInfo currentTrack={currentTrack} styles={styles} theme={theme} />
 
 				<TouchableOpacity
 					style={styles.playButton}
 					onPress={handlePlayPause}
 					hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-					disabled={isLoading}
+					disabled={isLoading || !currentTrack}
+					accessibilityLabel={isPlaying ? 'Pause' : 'Play'}
 				>
 					{isLoading ? (
 						<ActivityIndicator size="small" color="#FFFFFF" />
@@ -67,7 +54,10 @@ export function MiniPlayer() {
 							name={isPlaying ? 'pause' : 'play'}
 							size={20}
 							color="#FFFFFF"
-							style={isPlaying ? undefined : { marginLeft: 2 }}
+							style={[
+								isPlaying ? undefined : { marginLeft: 2 },
+								currentTrack ? undefined : styles.disabledIcon,
+							]}
 						/>
 					)}
 				</TouchableOpacity>
@@ -76,14 +66,14 @@ export function MiniPlayer() {
 					style={styles.nextButton}
 					onPress={() => queueNext()}
 					hitSlop={{ top: 10, bottom: 10, left: 6, right: 10 }}
-					disabled={!hasNext}
+					disabled={!currentTrack || !hasNext}
 					accessibilityLabel="Next track"
 				>
 					<Ionicons
 						name="play-skip-forward"
 						size={22}
 						color={theme.colors.text}
-						style={hasNext ? undefined : styles.disabledIcon}
+						style={currentTrack && hasNext ? undefined : styles.disabledIcon}
 					/>
 				</TouchableOpacity>
 			</View>
@@ -94,12 +84,59 @@ export function MiniPlayer() {
 					style={[
 						styles.progressBar,
 						{
-							width: `${progress}%`,
+							width: `${currentTrack ? progress : 0}%`,
 						},
 					]}
 				/>
 			</View>
 		</TouchableOpacity>
+	);
+}
+
+type MiniPlayerStyles = ReturnType<typeof createStyles>;
+
+function NowPlayingInfo({
+	currentTrack,
+	styles,
+	theme,
+}: {
+	currentTrack: SoundCloudTrack | null;
+	styles: MiniPlayerStyles;
+	theme: Theme;
+}) {
+	if (!currentTrack) {
+		return (
+			<>
+				<View style={[styles.artwork, styles.emptyArtwork]}>
+					<Ionicons name="musical-notes" size={20} color={theme.colors.textSecondary} />
+				</View>
+				<View style={styles.info}>
+					<Text style={styles.title} numberOfLines={1}>
+						Rien en lecture
+					</Text>
+					<Text style={styles.artist} numberOfLines={1}>
+						Choisis un son pour commencer
+					</Text>
+				</View>
+			</>
+		);
+	}
+
+	const artworkUrl =
+		currentTrack.artwork_url || currentTrack.user.avatar_url || 'https://via.placeholder.com/40';
+
+	return (
+		<>
+			<Image source={{ uri: artworkUrl }} style={styles.artwork} />
+			<View style={styles.info}>
+				<Text style={styles.title} numberOfLines={1}>
+					{currentTrack.title}
+				</Text>
+				<Text style={styles.artist} numberOfLines={1}>
+					{currentTrack.user.username}
+				</Text>
+			</View>
+		</>
 	);
 }
 
@@ -123,6 +160,11 @@ const createStyles = (theme: Theme, insets: EdgeInsets) =>
 			borderRadius: 8,
 			marginRight: theme.spacing.sm,
 			backgroundColor: theme.colors.surfaceAlt,
+		},
+		emptyArtwork: {
+			backgroundColor: theme.colors.surface,
+			alignItems: 'center',
+			justifyContent: 'center',
 		},
 		info: {
 			flex: 1,
