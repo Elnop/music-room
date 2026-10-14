@@ -8,6 +8,8 @@ import type { QueueState, QueueStepDirection } from '@/features/queue/queue.type
 // state, and turns their RAISE EXCEPTION codes into API errors.
 
 const queueStateSchema: z.ZodType<QueueState> = z.object({
+	ownerId: z.uuid(),
+	version: z.number().int().nonnegative(),
 	currentItemId: z.uuid().nullable(),
 	items: z.array(
 		z.object({

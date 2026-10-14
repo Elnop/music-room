@@ -67,6 +67,7 @@ export class QueueService {
 			operation,
 			items: state.items.length,
 			currentItemId: state.currentItemId,
+			version: state.version,
 		});
 		realtime.notifyQueueUpdate(userId, state);
 		return state;

@@ -65,7 +65,8 @@ export const queuePaths: OpenAPIV3.PathsObject = {
 		get: {
 			...common,
 			summary: 'Get your play queue',
-			description: 'Returns `{ currentItemId: null, items: [] }` when you never queued anything.',
+			description:
+				'Returns `{ ownerId, version: 0, currentItemId: null, items: [] }` when you never queued anything.',
 			operationId: 'getQueue',
 			responses: {
 				'200': stateResponse,
@@ -283,10 +284,12 @@ export const queueSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 	},
 	QueueState: {
 		type: 'object',
-		required: ['currentItemId', 'items'],
+		required: ['ownerId', 'version', 'currentItemId', 'items'],
 		description:
-			'Items in rank order. Items before the current one are history, those after it upcoming; with `currentItemId` null every item is upcoming. Also the payload of the `queue:updated` socket event.',
+			'Items in rank order. Items before the current one are history, those after it upcoming; with `currentItemId` null every item is upcoming. `version` grows with every change: a client drops a state whose version is not above the one it holds. Also the payload of the `queue:updated` socket event.',
 		properties: {
+			ownerId: { type: 'string', format: 'uuid' },
+			version: { type: 'integer', minimum: 0, example: 12 },
 			currentItemId: { type: 'string', format: 'uuid', nullable: true },
 			items: { type: 'array', items: { $ref: '#/components/schemas/QueueItem' } },
 		},
