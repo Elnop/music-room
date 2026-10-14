@@ -395,9 +395,9 @@ describe('Socket.io handshake authentication', () => {
 		});
 
 		// Round-trip on the intruder's own socket so auth:register was processed
-		// before the controller asks for the device (bob cannot control himself).
+		// before the controller asks for the device (bob cannot control a stranger).
 		const ack = nextEvent<{ code: string }>(intruder, 'listening:error');
-		intruder.emit('listening:subscribe', bob.id);
+		intruder.emit('listening:subscribe', randomUUID());
 		await ack;
 
 		// Nothing registered: the spoofed device is unknown to control:action.
