@@ -11,6 +11,7 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import { useAuthStore } from '@store/authStore';
@@ -45,6 +46,7 @@ interface CreatePlaylistScreenProps {
 
 export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) {
 	const { theme } = useTheme();
+	const playerHeight = usePlayerHeight();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 	const { user } = useAuthStore();
 	const { createPlaylist, isLoading } = usePlaylistStore();
@@ -93,7 +95,10 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
 				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 			>
 				<ScrollView
-					contentContainerStyle={styles.scrollContent}
+					contentContainerStyle={[
+						styles.scrollContent,
+						{ paddingBottom: playerHeight + theme.spacing.xl },
+					]}
 					keyboardShouldPersistTaps="handled"
 				>
 					<View style={styles.content}>

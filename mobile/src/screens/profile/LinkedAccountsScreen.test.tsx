@@ -11,6 +11,10 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
+jest.mock('@/contexts/PlayerContext', () => ({
+	usePlayerHeight: () => 0,
+}));
+
 jest.mock('@/lib/supabase', () => ({
 	supabase: { auth: { signOut: jest.fn(), setSession: jest.fn() } },
 }));
