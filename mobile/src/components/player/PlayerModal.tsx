@@ -98,13 +98,10 @@ export function PlayerModal() {
 
 	const styles = useMemo(() => createStyles(theme, insets), [theme, insets]);
 
-	if (!currentTrack) {
-		return null;
-	}
-
 	const isLoading = playbackState === 'loading';
 	const isPlaying = playbackState === 'playing';
-	const canInteract = playbackState === 'playing' || playbackState === 'paused';
+	const canInteract =
+		currentTrack !== null && (playbackState === 'playing' || playbackState === 'paused');
 
 	const adaptive = dominantColor ? getAdaptiveColors(dominantColor) : null;
 	const isDarkBg = dominantColor ? !isLightColor(dominantColor) : false;
@@ -180,6 +177,7 @@ export function PlayerModal() {
 			];
 
 	const displayArtwork = artworkUrl || 'https://via.placeholder.com/300';
+	const canGoNext = currentTrack !== null && hasNext;
 
 	return (
 		<Modal
@@ -234,16 +232,22 @@ export function PlayerModal() {
 					<View style={styles.mainContent}>
 						<View style={styles.artworkWrapper}>
 							<View style={styles.artworkShadow}>
-								<Image source={{ uri: displayArtwork }} style={styles.artwork} />
+								{currentTrack ? (
+									<Image source={{ uri: displayArtwork }} style={styles.artwork} />
+								) : (
+									<View style={[styles.artwork, styles.emptyArtwork]}>
+										<Ionicons name="musical-notes" size={64} color={colors.textSecondary} />
+									</View>
+								)}
 							</View>
 						</View>
 
 						<View style={styles.trackInfo}>
 							<Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
-								{currentTrack.title}
+								{currentTrack ? currentTrack.title : 'Rien en lecture'}
 							</Text>
 							<Text style={[styles.artist, { color: colors.textSecondary }]} numberOfLines={1}>
-								{currentTrack.user.username}
+								{currentTrack ? currentTrack.user.username : 'Choisis un son pour commencer'}
 							</Text>
 						</View>
 
@@ -264,7 +268,7 @@ export function PlayerModal() {
 								minimumTrackTintColor={colors.slider}
 								maximumTrackTintColor={colors.sliderBg}
 								thumbTintColor={colors.slider}
-								disabled={isLoading || !player}
+								disabled={isLoading || !player || !currentTrack}
 							/>
 							<View style={styles.timeContainer}>
 								<Text style={[styles.timeText, { color: colors.textSecondary }]}>
@@ -295,8 +299,9 @@ export function PlayerModal() {
 							<TouchableOpacity
 								style={[styles.playButton, { backgroundColor: colors.playBtnBg }]}
 								onPress={handlePlayPause}
-								disabled={isLoading}
+								disabled={isLoading || !currentTrack}
 								activeOpacity={0.8}
+								accessibilityLabel={isPlaying ? 'Pause' : 'Play'}
 							>
 								{isLoading ? (
 									<LoadingSpinner size="small" />
@@ -313,7 +318,7 @@ export function PlayerModal() {
 							<TouchableOpacity
 								style={[styles.secondaryButton, { backgroundColor: colors.buttonBg }]}
 								onPress={handleNext}
-								disabled={!hasNext}
+								disabled={!canGoNext}
 								activeOpacity={0.7}
 								accessibilityLabel="Next track"
 							>
@@ -321,7 +326,7 @@ export function PlayerModal() {
 									name="play-skip-forward"
 									size={28}
 									color={colors.text}
-									style={hasNext ? undefined : styles.disabledIcon}
+									style={canGoNext ? undefined : styles.disabledIcon}
 								/>
 							</TouchableOpacity>
 						</View>
@@ -417,6 +422,10 @@ const createStyles = (theme: Theme, insets: { top: number; bottom: number }) =>
 			height: ARTWORK_SIZE,
 			borderRadius: 12,
 			backgroundColor: theme.colors.surface,
+		},
+		emptyArtwork: {
+			alignItems: 'center',
+			justifyContent: 'center',
 		},
 		trackInfo: {
 			paddingHorizontal: 32,
