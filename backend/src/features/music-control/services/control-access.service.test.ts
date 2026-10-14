@@ -45,6 +45,14 @@ describe('ControlAccessService', () => {
 		results.device_control_licenses = [];
 	});
 
+	it('gives the owner every one of their own devices, without any query', async () => {
+		const access = await service.getAccess('owner', 'owner');
+		expect(access).toEqual({ isFriend: false, allDevices: true, licensedDeviceIds: [] });
+		expect(from).not.toHaveBeenCalled();
+		expect(await service.canControlDevice('owner', 'owner', 'any-device')).toBe(true);
+		expect(await service.canControlAnyDevice('owner', 'owner')).toBe(true);
+	});
+
 	it('allows the licensed device only, between mutual friends with the switch off', async () => {
 		const serve = () => {
 			results.follows = [ok({ can_control_music: false }), ok({ follower_id: 'owner' })];

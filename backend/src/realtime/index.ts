@@ -663,6 +663,11 @@ class RealtimeService {
 		const devices = userDevices ? Array.from(userDevices.values()) : [];
 		return { ownerId: userId, devices };
 	}
+
+	/** Whether a device of userId has a connected socket (#294). */
+	isDeviceOnline(userId: string, deviceId: string): boolean {
+		return this.deviceToSocket.has(`${userId}:${deviceId}`);
+	}
 }
 
 export const realtime = new RealtimeService();
