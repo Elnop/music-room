@@ -83,7 +83,7 @@ const playbackBody: OpenAPIV3.RequestBodyObject = {
 	},
 };
 
-/** Optional body and device errors shared by the four playback routes. */
+/** Optional body and device errors of the four playback routes (the 400 and 403 only apply to a delegate). */
 const playback = {
 	requestBody: playbackBody,
 	errors: {
@@ -92,7 +92,6 @@ const playback = {
 			'DEVICE_ID_REQUIRED',
 			'A delegate must name the device to play on'
 		),
-		'403': accessDenied,
 		'409': errorResponse(
 			'The chosen device is not connected (`DEVICE_OFFLINE`); the queue is unchanged',
 			'DEVICE_OFFLINE',
@@ -101,11 +100,8 @@ const playback = {
 	},
 };
 
-/** A playback route's own error response, extended with the device one on the same status. */
-function withDevice(
-	status: '403' | '409',
-	own: OpenAPIV3.ResponseObject
-): OpenAPIV3.ResponseObject {
+/** A playback route's own 409 response, extended with the device-offline one. */
+function withDevice(status: '409', own: OpenAPIV3.ResponseObject): OpenAPIV3.ResponseObject {
 	const device = playback.errors[status];
 	return { ...own, description: `${own.description}; ${device.description}` };
 }
@@ -217,9 +213,8 @@ const ownPaths: OpenAPIV3.PathsObject = {
 			requestBody: playback.requestBody,
 			responses: {
 				'200': stateResponse,
-				'400': playback.errors['400'],
+				'400': { $ref: '#/components/responses/ValidationError' },
 				'401': { $ref: '#/components/responses/UnauthorizedError' },
-				'403': playback.errors['403'],
 				'404': itemNotFound,
 				'409': playback.errors['409'],
 			},
@@ -245,15 +240,12 @@ const ownPaths: OpenAPIV3.PathsObject = {
 			requestBody: playback.requestBody,
 			responses: {
 				'200': stateResponse,
-				'400': playback.errors['400'],
+				'400': { $ref: '#/components/responses/ValidationError' },
 				'401': { $ref: '#/components/responses/UnauthorizedError' },
-				'403': withDevice(
-					'403',
-					errorResponse(
-						'You cannot view the playlist (`PLAYLIST_ACCESS_DENIED`)',
-						'PLAYLIST_ACCESS_DENIED',
-						'Access denied'
-					)
+				'403': errorResponse(
+					'You cannot view the playlist (`PLAYLIST_ACCESS_DENIED`)',
+					'PLAYLIST_ACCESS_DENIED',
+					'Access denied'
 				),
 				'404': errorResponse(
 					'No playlist has this id (`PLAYLIST_NOT_FOUND`)',
@@ -283,8 +275,7 @@ const ownPaths: OpenAPIV3.PathsObject = {
 			responses: {
 				'200': stateResponse,
 				'401': { $ref: '#/components/responses/UnauthorizedError' },
-				'400': playback.errors['400'],
-				'403': playback.errors['403'],
+				'400': { $ref: '#/components/responses/ValidationError' },
 				'409': withDevice(
 					'409',
 					errorResponse('No next item (`QUEUE_END`)', 'QUEUE_END', 'No next item in the queue')
@@ -303,8 +294,7 @@ const ownPaths: OpenAPIV3.PathsObject = {
 			responses: {
 				'200': stateResponse,
 				'401': { $ref: '#/components/responses/UnauthorizedError' },
-				'400': playback.errors['400'],
-				'403': playback.errors['403'],
+				'400': { $ref: '#/components/responses/ValidationError' },
 				'409': withDevice(
 					'409',
 					errorResponse(
@@ -328,12 +318,21 @@ function delegatedPaths(paths: OpenAPIV3.PathsObject): OpenAPIV3.PathsObject {
 		for (const method of METHODS) {
 			const operation = item?.[method];
 			if (!operation) continue;
+			const isPlayback = operation.requestBody === playback.requestBody;
+			const own403 = operation.responses['403'] as OpenAPIV3.ResponseObject | undefined;
 			mirror[method] = {
 				...operation,
 				summary: `${operation.summary} (queue of a friend you control)`,
 				operationId: `${operation.operationId}ForUser`,
 				parameters: [ownerIdParam, ...(operation.parameters ?? [])],
-				responses: { '403': accessDenied, ...operation.responses },
+				responses: {
+					...operation.responses,
+					// A delegate must name the device (400) and may lack access (403).
+					...(isPlayback && { '400': playback.errors['400'] }),
+					'403': own403
+						? { ...own403, description: `${own403.description}; ${accessDenied.description}` }
+						: accessDenied,
+				},
 			};
 		}
 		mirrored[path.replace('/api/queue', '/api/users/{userId}/queue')] = mirror;
