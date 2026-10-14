@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, Switch } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import type { UserDeviceWithLicenses } from '@/types/device.types';
@@ -51,6 +52,7 @@ function licensedPairs(devices: UserDeviceWithLicenses[]): Set<string> {
 
 export function MyDevicesScreen() {
 	const { theme } = useTheme();
+	const playerHeight = usePlayerHeight();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
 	const [isLoading, setIsLoading] = useState(true);
@@ -201,7 +203,10 @@ export function MyDevicesScreen() {
 
 	return (
 		<View style={styles.container}>
-			<ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+			<ScrollView
+				style={styles.scrollView}
+				contentContainerStyle={[styles.content, { paddingBottom: playerHeight + theme.spacing.xl }]}
+			>
 				<View style={styles.header}>
 					<Text style={styles.title}>Mes appareils</Text>
 					<Text style={styles.subtitle}>

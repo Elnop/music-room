@@ -13,6 +13,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useFocusEffect } from '@react-navigation/native';
 import debounce from 'lodash/debounce';
 import { Ionicons } from '@expo/vector-icons';
+import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import { useAuthStore } from '@store/authStore';
@@ -73,6 +74,7 @@ const toMember = (user: UserProfile | ViewerProfile, canEdit: boolean): Member =
  */
 export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 	const { theme } = useTheme();
+	const playerHeight = usePlayerHeight();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 	const { playlistId } = route.params;
 
@@ -529,7 +531,13 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 
 	return (
 		<View style={styles.container}>
-			<ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+			<ScrollView
+				style={styles.scrollView}
+				contentContainerStyle={[
+					styles.scrollContent,
+					{ paddingBottom: playerHeight + theme.spacing.xl },
+				]}
+			>
 				<View style={styles.header}>
 					<Text style={styles.title}>{headerContent.title}</Text>
 					<Text style={styles.subtitle}>{headerContent.subtitle}</Text>

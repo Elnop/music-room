@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
+import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import { useAuthStore } from '@/store/authStore';
@@ -27,6 +28,7 @@ type Props = NativeStackScreenProps<FriendsStackParamList, 'UserProfile'>;
 export function UserProfileScreen({ route, navigation }: Props) {
 	const { userId } = route.params;
 	const { theme } = useTheme();
+	const playerHeight = usePlayerHeight();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 	const { accessToken } = useAuthStore();
 
@@ -128,7 +130,13 @@ export function UserProfileScreen({ route, navigation }: Props) {
 
 	return (
 		<View style={styles.container}>
-			<ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
+			<ScrollView
+				style={styles.scrollView}
+				contentContainerStyle={[
+					styles.contentContainer,
+					{ paddingBottom: playerHeight + theme.spacing.xl },
+				]}
+			>
 				<View style={styles.header}>
 					<View style={styles.topRow}>
 						{isAvatarHidden ? (

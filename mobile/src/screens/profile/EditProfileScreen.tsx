@@ -5,6 +5,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import type { UpdateProfileData } from '@/types/user.types';
@@ -39,6 +40,7 @@ type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 
 export function EditProfileScreen() {
 	const { theme } = useTheme();
+	const playerHeight = usePlayerHeight();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 	const navigation = useNavigation<NativeStackNavigationProp<Record<string, undefined>>>();
 	const { user, accessToken } = useAuthStore();
@@ -101,7 +103,10 @@ export function EditProfileScreen() {
 			>
 				<ScrollView
 					style={styles.scrollView}
-					contentContainerStyle={styles.contentContainer}
+					contentContainerStyle={[
+						styles.contentContainer,
+						{ paddingBottom: playerHeight + theme.spacing.xl },
+					]}
 					keyboardShouldPersistTaps="handled"
 				>
 					<Text style={styles.title}>Edit profile</Text>

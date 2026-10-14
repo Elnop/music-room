@@ -323,10 +323,9 @@ export function usePlayer() {
 }
 
 /**
- * Hook to get the height of the MiniPlayer for padding calculations.
- * Returns MINI_PLAYER_HEIGHT when a track is playing, 0 otherwise.
+ * Height of the MiniPlayer, for bottom padding: always MINI_PLAYER_HEIGHT,
+ * since the mini-player is always shown (#296).
  */
 export function usePlayerHeight(): number {
-	const currentTrack = usePlayerStore(state => state.currentTrack);
-	return currentTrack ? MINI_PLAYER_HEIGHT : 0;
+	return MINI_PLAYER_HEIGHT;
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ThemeSelector } from '@components/theme/ThemeSelector';
 import { BackendUrlField } from '@components/common/BackendUrlField';
@@ -7,10 +8,15 @@ import type { Theme } from '@themes/types';
 
 export function SettingsScreen() {
 	const { theme } = useTheme();
+	const playerHeight = usePlayerHeight();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
 	return (
-		<ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
+		<ScrollView
+			style={styles.container}
+			keyboardShouldPersistTaps="handled"
+			contentContainerStyle={{ paddingBottom: playerHeight + theme.spacing.xl }}
+		>
 			<View style={styles.section}>
 				<Text style={styles.sectionTitle}>Appearance</Text>
 				<ThemeSelector />
