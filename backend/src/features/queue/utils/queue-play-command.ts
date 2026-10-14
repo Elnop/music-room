@@ -22,7 +22,7 @@ export function sendPlayCommand(
 		positionMs: 0,
 		version: state.version,
 	};
-	if (!realtime.sendQueuePlay(ownerId, deviceId, command)) {
+	if (!realtime.sendDeviceCommand(ownerId, deviceId, command)) {
 		logger.warn('Queue play command not delivered: device went offline', {
 			ownerId,
 			deviceId,

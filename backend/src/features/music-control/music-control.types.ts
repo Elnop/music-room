@@ -2,7 +2,7 @@
  * Music Control Types
  */
 
-import type { QueueItem } from '@/features/queue/queue.types.js';
+import type { QueueItem, QueueTrack } from '@/features/queue/queue.types.js';
 
 /**
  * Device information for multi-device support
@@ -27,6 +27,8 @@ export interface ListeningStatus {
 		artworkUrl: string | null;
 	} | null;
 	isPlaying: boolean;
+	/** Playback position when the status was sent, in ms; null from older clients (#295). */
+	positionMs: number | null;
 	updatedAt: string;
 }
 
@@ -135,6 +137,22 @@ export interface QueuePlayCommand {
 	/** Version of the queue state that made `item` current. */
 	version: number;
 }
+
+/** control:command: play `track` from `positionMs` (playback transfer, #295). */
+export interface QueueTrackCommand {
+	action: 'play-track';
+	fromUserId: string;
+	track: QueueTrack;
+	positionMs: number;
+}
+
+/** control:command: pause the device (playback transfer, #295). */
+export interface DevicePauseCommand {
+	action: 'pause';
+	fromUserId: string;
+}
+
+export type DeviceCommand = QueuePlayCommand | QueueTrackCommand | DevicePauseCommand;
 
 /** control:revoked: the receiver no longer controls any of ownerId's devices. */
 export interface ControlRevokedPayload {

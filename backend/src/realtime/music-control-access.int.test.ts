@@ -122,10 +122,10 @@ describe('Listening and control access', () => {
 	}
 
 	/** Publish a listening update from a new device of Alice's (not throttled). */
-	async function publishAliceStatus(): Promise<string> {
+	async function publishAliceStatus(positionMs?: number): Promise<string> {
 		const deviceId = `dev-${randomUUID()}`;
 		const device = await connect(alice, deviceId);
-		device.emit('listening:update', { track: null, isPlaying: true });
+		device.emit('listening:update', { track: null, isPlaying: true, positionMs });
 		return deviceId;
 	}
 
@@ -252,6 +252,18 @@ describe('Listening and control access', () => {
 			const statuses = record<UserListeningStatus>(bobSocket, 'listening:status');
 			const deviceId = await publishAliceStatus();
 			await vi.waitFor(() => expect(hasDevice(statuses, deviceId)).toBe(true));
+		});
+
+		it('relays positionMs in the status, null when the client sends none (#295)', async () => {
+			const bobSocket = await connect(bob);
+			await subscribe(bobSocket, alice.id);
+			const statuses = record<UserListeningStatus>(bobSocket, 'listening:status');
+			const withPos = await publishAliceStatus(42_000);
+			const without = await publishAliceStatus();
+			const positionOf = (id: string) =>
+				statuses.flatMap(s => s.devices).find(d => d.device.deviceId === id)?.positionMs;
+			await vi.waitFor(() => expect(positionOf(withPos)).toBe(42_000));
+			await vi.waitFor(() => expect(positionOf(without)).toBeNull());
 		});
 
 		it.each([

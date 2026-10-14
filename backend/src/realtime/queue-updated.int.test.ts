@@ -213,11 +213,37 @@ describe('queue:updated broadcast', () => {
 				positionMs: 0,
 				version: state.version,
 			};
-			expect(realtime.sendQueuePlay(owner.id, deviceId, command)).toBe(true);
-			expect(realtime.sendQueuePlay(owner.id, 'offline-device', command)).toBe(false);
+			expect(realtime.sendDeviceCommand(owner.id, deviceId, command)).toBe(true);
+			expect(realtime.sendDeviceCommand(owner.id, 'offline-device', command)).toBe(false);
 			await settle();
 			expect(commands).toEqual([command]);
 			expect(phoneCommands).toEqual([]);
+		});
+
+		it('sends play-track and pause commands to the one device named', async () => {
+			const deviceId = `dev-${randomUUID()}`;
+			const target = await connect(owner, deviceId);
+			const commands: unknown[] = [];
+			target.on('control:command', c => commands.push(c));
+			const track = {
+				trackUri: 'https://soundcloud.com/a/b',
+				title: 'B',
+				artist: 'A',
+				album: null,
+				albumArt: null,
+				durationMs: 1000,
+			};
+			const playTrack = {
+				action: 'play-track' as const,
+				fromUserId: other.id,
+				track,
+				positionMs: 1200,
+			};
+			const pause = { action: 'pause' as const, fromUserId: other.id };
+			expect(realtime.sendDeviceCommand(owner.id, deviceId, playTrack)).toBe(true);
+			expect(realtime.sendDeviceCommand(owner.id, deviceId, pause)).toBe(true);
+			await settle();
+			expect(commands).toEqual([playTrack, pause]);
 		});
 	});
 

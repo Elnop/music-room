@@ -19,7 +19,7 @@ import type { PlaylistUpdatedPayload } from '@/features/playlists/playlist.types
 import type { QueueState } from '@/features/queue/queue.types.js';
 import { controlAccessService } from '@/features/music-control/services/control-access.service.js';
 import type {
-	QueuePlayCommand,
+	DeviceCommand,
 	ListeningStatus,
 	UserListeningStatus,
 } from '@/features/music-control/music-control.types.js';
@@ -494,6 +494,7 @@ class RealtimeService {
 			device: socket.data.device,
 			track: data.track,
 			isPlaying: data.isPlaying,
+			positionMs: data.positionMs ?? null,
 			updatedAt: new Date().toISOString(),
 		};
 		userDevices.set(deviceId, status);
@@ -603,10 +604,10 @@ class RealtimeService {
 	}
 
 	/**
-	 * Tell one of ownerId's devices to play a queue item (#294). False when the
-	 * device has no socket any more.
+	 * Send one control command to one of ownerId's devices (#294, #295). False
+	 * when the device has no socket any more.
 	 */
-	sendQueuePlay(ownerId: string, deviceId: string, command: QueuePlayCommand): boolean {
+	sendDeviceCommand(ownerId: string, deviceId: string, command: DeviceCommand): boolean {
 		const socketId = this.deviceToSocket.get(`${ownerId}:${deviceId}`);
 		if (!socketId || !this.io) return false;
 		this.io.to(socketId).emit('control:command', command);
@@ -614,7 +615,7 @@ class RealtimeService {
 			ownerId,
 			deviceId,
 			fromUserId: command.fromUserId,
-			itemId: command.item.id,
+			command: command.action,
 			action: 'command_sent',
 		});
 		return true;
