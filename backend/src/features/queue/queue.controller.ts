@@ -5,6 +5,8 @@ import {
 	addQueueItemSchema,
 	moveQueueItemSchema,
 	queueItemParamsSchema,
+	queueOwnerParamsSchema,
+	queuePlaybackSchema,
 	queuePlaylistParamsSchema,
 } from '@/features/queue/queue.validators.js';
 import type { QueueState, QueueStepDirection } from '@/features/queue/queue.types.js';
@@ -18,16 +20,19 @@ function sendState(res: Response, data: QueueState) {
 	res.status(200).json(response);
 }
 
-const userIdOf = (req: Request) => (req as AuthenticatedRequest).user.id;
+const actorOf = (req: Request) => (req as AuthenticatedRequest).user.id;
+
+/** The queue owner: `:userId` on /api/users/:userId/queue, else the caller. */
+const ownerOf = (req: Request) => queueOwnerParamsSchema.parse(req.params).userId ?? actorOf(req);
 
 /**
- * Play queue controller: every route answers the caller's full queue state.
+ * Play queue controller: every route answers the full queue state of its owner, the caller or `:userId` (#294).
  */
 export class QueueController {
 	/** GET /api/queue */
 	async getQueue(req: Request, res: Response, next: NextFunction) {
 		try {
-			sendState(res, await queueService.getQueue(userIdOf(req)));
+			sendState(res, await queueService.getQueue(actorOf(req), ownerOf(req)));
 		} catch (error) {
 			next(error);
 		}
@@ -37,7 +42,7 @@ export class QueueController {
 	async addItem(req: Request, res: Response, next: NextFunction) {
 		try {
 			const track = addQueueItemSchema.parse(req.body);
-			sendState(res, await queueService.addItem(userIdOf(req), track));
+			sendState(res, await queueService.addItem(actorOf(req), ownerOf(req), track));
 		} catch (error) {
 			next(error);
 		}
@@ -47,7 +52,7 @@ export class QueueController {
 	async removeItem(req: Request, res: Response, next: NextFunction) {
 		try {
 			const { itemId } = queueItemParamsSchema.parse(req.params);
-			sendState(res, await queueService.removeItem(userIdOf(req), itemId));
+			sendState(res, await queueService.removeItem(actorOf(req), ownerOf(req), itemId));
 		} catch (error) {
 			next(error);
 		}
@@ -58,7 +63,7 @@ export class QueueController {
 		try {
 			const { itemId } = queueItemParamsSchema.parse(req.params);
 			const { afterItemId } = moveQueueItemSchema.parse(req.body);
-			sendState(res, await queueService.moveItem(userIdOf(req), itemId, afterItemId));
+			sendState(res, await queueService.moveItem(actorOf(req), ownerOf(req), itemId, afterItemId));
 		} catch (error) {
 			next(error);
 		}
@@ -68,7 +73,8 @@ export class QueueController {
 	async playItem(req: Request, res: Response, next: NextFunction) {
 		try {
 			const { itemId } = queueItemParamsSchema.parse(req.params);
-			sendState(res, await queueService.playItem(userIdOf(req), itemId));
+			const { deviceId } = queuePlaybackSchema.parse(req.body);
+			sendState(res, await queueService.playItem(actorOf(req), ownerOf(req), itemId, deviceId));
 		} catch (error) {
 			next(error);
 		}
@@ -78,7 +84,11 @@ export class QueueController {
 	async playPlaylist(req: Request, res: Response, next: NextFunction) {
 		try {
 			const { playlistId } = queuePlaylistParamsSchema.parse(req.params);
-			sendState(res, await queueService.playPlaylist(userIdOf(req), playlistId));
+			const { deviceId } = queuePlaybackSchema.parse(req.body);
+			sendState(
+				res,
+				await queueService.playPlaylist(actorOf(req), ownerOf(req), playlistId, deviceId)
+			);
 		} catch (error) {
 			next(error);
 		}
@@ -88,7 +98,8 @@ export class QueueController {
 	step(direction: QueueStepDirection) {
 		return async (req: Request, res: Response, next: NextFunction) => {
 			try {
-				sendState(res, await queueService.step(userIdOf(req), direction));
+				const { deviceId } = queuePlaybackSchema.parse(req.body);
+				sendState(res, await queueService.step(actorOf(req), ownerOf(req), direction, deviceId));
 			} catch (error) {
 				next(error);
 			}
