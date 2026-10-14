@@ -460,7 +460,7 @@ export const musicControlPaths: OpenAPIV3.PathsObject = {
 						},
 					},
 				},
-				'401': { $ref: '#/components/responses/Unauthorized' },
+				'401': { $ref: '#/components/responses/UnauthorizedError' },
 			},
 		},
 	},

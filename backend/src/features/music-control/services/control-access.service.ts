@@ -79,11 +79,7 @@ export class ControlAccessService {
 	}
 
 	/** Whether controllerId may control ownerId's device. Fails closed. */
-	async canControlDevice(
-		controllerId: string,
-		ownerId: string,
-		deviceId: string
-	): Promise<boolean> {
+	async canControlDevice(controllerId: string, ownerId: string, deviceId: string): Promise<boolean> {
 		const access = await this.safeAccess(controllerId, ownerId);
 		return access.allDevices || access.licensedDeviceIds.includes(deviceId);
 	}
