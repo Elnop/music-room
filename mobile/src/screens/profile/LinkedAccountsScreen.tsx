@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import type { LinkedProvider, OAuthProvider } from '@/types/auth.types';
@@ -38,6 +39,7 @@ function errorMessage(error: unknown, fallback: string): string {
 
 export function LinkedAccountsScreen() {
 	const { theme } = useTheme();
+	const playerHeight = usePlayerHeight();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 	const linkedProviders = useAuthStore(state => state.linkedProviders);
 	const fetchLinkedProviders = useAuthStore(state => state.fetchLinkedProviders);
@@ -140,7 +142,10 @@ export function LinkedAccountsScreen() {
 
 	return (
 		<View style={styles.container}>
-			<ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+			<ScrollView
+				style={styles.scrollView}
+				contentContainerStyle={[styles.content, { paddingBottom: playerHeight + theme.spacing.xl }]}
+			>
 				<View style={styles.header}>
 					<Text style={styles.title}>Linked accounts</Text>
 					<Text style={styles.subtitle}>Choose how you sign in to Zumik</Text>
