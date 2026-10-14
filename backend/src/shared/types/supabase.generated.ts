@@ -513,6 +513,7 @@ export type Database = {
 				};
 			};
 			queue_history_max: { Args: Record<PropertyKey, never>; Returns: number };
+			queue_insert_block: { Args: { p_track_ids: string[]; p_user: string }; Returns: Json };
 			queue_lock: { Args: { p_user: string }; Returns: string };
 			queue_move_item: {
 				Args: { p_after_item_id?: string; p_item_id: string; p_user: string };
@@ -543,6 +544,8 @@ export type Database = {
 				Returns: string[];
 			};
 			queue_sync_users: { Args: { p_playlist_id: string }; Returns: string[] };
+			queue_track_ids_from: { Args: { p_item_id: string; p_user: string }; Returns: string[] };
+			queue_track_ids_upcoming: { Args: { p_user: string }; Returns: string[] };
 			rank_after: { Args: { p_a: string }; Returns: string };
 			rank_between: { Args: { p_a: string; p_b: string }; Returns: string };
 			rank_max_length: { Args: Record<PropertyKey, never>; Returns: number };
