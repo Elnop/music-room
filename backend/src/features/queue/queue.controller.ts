@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import type { AuthenticatedRequest, ApiResponse } from '@/shared/types/global.types.js';
+import { queueTransferService } from '@/features/queue/services/queue-transfer.service.js';
 import { queueService } from '@/features/queue/services/queue.service.js';
 import {
 	addQueueItemSchema,
@@ -8,17 +9,24 @@ import {
 	queueOwnerParamsSchema,
 	queuePlaybackSchema,
 	queuePlaylistParamsSchema,
+	transferSchema,
 } from '@/features/queue/queue.validators.js';
-import type { QueueState, QueueStepDirection } from '@/features/queue/queue.types.js';
+import type {
+	QueueState,
+	QueueStepDirection,
+	TransferResult,
+} from '@/features/queue/queue.types.js';
 
-function sendState(res: Response, data: QueueState) {
-	const response: ApiResponse<QueueState> = {
+function sendData<T>(res: Response, data: T) {
+	const response: ApiResponse<T> = {
 		success: true,
 		data,
 		meta: { timestamp: new Date().toISOString() },
 	};
 	res.status(200).json(response);
 }
+
+const sendState = (res: Response, data: QueueState) => sendData(res, data);
 
 const actorOf = (req: Request) => (req as AuthenticatedRequest).user.id;
 
@@ -89,6 +97,16 @@ export class QueueController {
 				res,
 				await queueService.playPlaylist(actorOf(req), ownerOf(req), playlistId, deviceId)
 			);
+		} catch (error) {
+			next(error);
+		}
+	}
+
+	/** POST /api/queue/transfer: always from the caller, never under /api/users/:userId/queue */
+	async transfer(req: Request, res: Response, next: NextFunction) {
+		try {
+			const input = transferSchema.parse(req.body);
+			sendData<TransferResult>(res, await queueTransferService.transfer(actorOf(req), input));
 		} catch (error) {
 			next(error);
 		}

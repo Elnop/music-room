@@ -340,7 +340,70 @@ function delegatedPaths(paths: OpenAPIV3.PathsObject): OpenAPIV3.PathsObject {
 	return mirrored;
 }
 
-export const queuePaths: OpenAPIV3.PathsObject = { ...ownPaths, ...delegatedPaths(ownPaths) };
+// Not part of ownPaths: a transfer always starts from the caller, so it has no /api/users/{userId} mirror.
+const transferPath: OpenAPIV3.PathsObject = {
+	'/api/queue/transfer': {
+		post: {
+			...common,
+			summary: "Transfer playback to one of your devices or a friend's",
+			description:
+				"Checked in this order, before anything changes: the target device (you own it, or have its license; it must be online), the `source` device (you must control it; offline is fine), and `playing.queueItemId` (must be in your own queue). **Target is one of your devices**: your queue is unchanged and the device gets `control:command` `play-item` (item of your queue) or `play-track` (`playing.track`, played outside the queue) at `positionMs`; `queue` is null. **Target is a friend's device**: the played track and the items that follow it in your queue (or `playing.track` then your upcoming items) are inserted as one block right after the friend's current item and the block's first item becomes current; the friend's sockets get `queue:updated`, the device gets `play-item`, and `queue` is the friend's new queue. If `source` is given, it then gets `control:command` `pause`.",
+			operationId: 'queueTransfer',
+			requestBody: {
+				required: true,
+				content: {
+					'application/json': {
+						schema: { $ref: '#/components/schemas/TransferRequest' },
+						example: {
+							targetUserId: '3f2b8c1e-4d5a-4b6c-8d7e-9f0a1b2c3d4e',
+							targetDeviceId: 'living-room-tv',
+							positionMs: 42000,
+							playing: { queueItemId: '7a1d9e2c-5b3f-4c8a-9d6e-1f2a3b4c5d6e' },
+							source: { userId: '9c8b7a6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d', deviceId: 'phone' },
+						},
+					},
+				},
+			},
+			responses: {
+				'200': {
+					description: 'Playback was ordered on the target device',
+					content: {
+						'application/json': {
+							schema: {
+								allOf: [
+									{ $ref: '#/components/schemas/SuccessResponse' },
+									{
+										type: 'object',
+										properties: { data: { $ref: '#/components/schemas/TransferResult' } },
+									},
+								],
+							},
+						},
+					},
+				},
+				'400': { $ref: '#/components/responses/ValidationError' },
+				'401': { $ref: '#/components/responses/UnauthorizedError' },
+				'403': errorResponse(
+					'You do not control the target device or the `source` device (`QUEUE_ACCESS_DENIED`)',
+					'QUEUE_ACCESS_DENIED',
+					"Not authorized to manage this user's queue"
+				),
+				'404': itemNotFound,
+				'409': errorResponse(
+					'The target device is not connected (`DEVICE_OFFLINE`), or there is nothing to transfer (`QUEUE_BLOCK_EMPTY`); no queue changed',
+					'DEVICE_OFFLINE',
+					'Target device is not online'
+				),
+			},
+		},
+	},
+};
+
+export const queuePaths: OpenAPIV3.PathsObject = {
+	...ownPaths,
+	...delegatedPaths(ownPaths),
+	...transferPath,
+};
 
 export const queueSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 	QueueTrack: {
@@ -418,6 +481,50 @@ export const queueSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 				maxLength: 128,
 				description:
 					'Device of the owner that must play; required from a delegate, optional for the owner (omitted: the calling device plays)',
+			},
+		},
+	},
+	TransferRequest: {
+		type: 'object',
+		required: ['targetUserId', 'targetDeviceId', 'positionMs', 'playing'],
+		properties: {
+			targetUserId: {
+				type: 'string',
+				format: 'uuid',
+				description: 'Owner of the target device: you or a friend',
+			},
+			targetDeviceId: { type: 'string', minLength: 1, maxLength: 128 },
+			positionMs: { type: 'integer', minimum: 0, maximum: 86400000 },
+			playing: {
+				type: 'object',
+				description: 'Exactly one of `queueItemId` (an item of your queue) or `track`',
+				properties: {
+					queueItemId: { type: 'string', format: 'uuid' },
+					track: { $ref: '#/components/schemas/AddQueueItemRequest' },
+				},
+			},
+			source: {
+				type: 'object',
+				description:
+					'The remote device that plays now, which is paused; leave out when playing on this device',
+				required: ['userId', 'deviceId'],
+				properties: {
+					userId: { type: 'string', format: 'uuid' },
+					deviceId: { type: 'string', minLength: 1, maxLength: 128 },
+				},
+			},
+		},
+	},
+	TransferResult: {
+		type: 'object',
+		required: ['ownerId', 'deviceId', 'queue'],
+		properties: {
+			ownerId: { type: 'string', format: 'uuid' },
+			deviceId: { type: 'string' },
+			queue: {
+				allOf: [{ $ref: '#/components/schemas/QueueState' }],
+				nullable: true,
+				description: "The friend's new queue; null when the target is one of your devices",
 			},
 		},
 	},

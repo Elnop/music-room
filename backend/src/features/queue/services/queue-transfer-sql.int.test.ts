@@ -56,7 +56,10 @@ async function addItemsTo(user: string, n: number): Promise<QueueState> {
 /** The tracks.id of each item, in the items' order. */
 async function trackIdsOf(items: QueueItem[]): Promise<string[]> {
 	const uris = items.map(item => item.track.trackUri);
-	const { data, error } = await supabaseAdmin.from('tracks').select('id, track_uri').in('track_uri', uris);
+	const { data, error } = await supabaseAdmin
+		.from('tracks')
+		.select('id, track_uri')
+		.in('track_uri', uris);
 	if (error) throw error;
 	const byUri = new Map((data ?? []).map(row => [row.track_uri, row.id]));
 	return uris.map(uri => {

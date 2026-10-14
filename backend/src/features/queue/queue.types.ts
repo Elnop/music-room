@@ -38,3 +38,10 @@ export interface QueueState {
 }
 
 export type QueueStepDirection = 'next' | 'previous';
+
+/** Answer of POST /api/queue/transfer (#295); `queue` is the target's new queue when it changed, else null. */
+export interface TransferResult {
+	ownerId: string;
+	deviceId: string;
+	queue: QueueState | null;
+}
