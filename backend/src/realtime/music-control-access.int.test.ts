@@ -316,6 +316,21 @@ describe('Listening and control access', () => {
 	});
 
 	describe('control:action', () => {
+		it('lets the owner pause another of their own devices', async () => {
+			const deviceA = `dev-${randomUUID()}`;
+			const tv = await connect(alice, deviceA);
+			const phone = await connect(alice);
+			const command = nextEvent<ControlCommand>(tv, 'control:command');
+			const outcome = nextEvent(phone, 'control:success');
+			phone.emit('control:action', {
+				targetUserId: alice.id,
+				targetDeviceId: deviceA,
+				action: 'pause',
+			});
+			await outcome;
+			expect(await command).toMatchObject({ action: 'pause', fromUserId: alice.id });
+		});
+
 		it("delivers Bob's command to Alice's device, sent by Bob", async () => {
 			const deviceId = `dev-${randomUUID()}`;
 			const [aliceDevice, bobSocket] = await Promise.all([connect(alice, deviceId), connect(bob)]);

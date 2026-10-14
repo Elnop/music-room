@@ -398,7 +398,7 @@ export const musicControlPaths: OpenAPIV3.PathsObject = {
 			tags: ['Music Control'],
 			summary: "List a friend's devices I can control",
 			description:
-				'When `allDevices` is true (the friend turned on "all my devices" for you), every device of the friend is listed with `access: all-devices`. Otherwise only the devices licensed to you are listed, with `access: license`. When you and userId are not mutual friends, `allDevices` is false and `devices` is [] (even if a stale "all my devices" flag remains); the same empty answer comes when nothing is granted, so the response never reveals whether the user exists or how many devices they have.',
+				'When `allDevices` is true (the friend turned on "all my devices" for you), every device of the friend is listed with `access: all-devices`. Otherwise only the devices licensed to you are listed, with `access: license`. When you and userId are not mutual friends, `allDevices` is false and `devices` is [] (even if a stale "all my devices" flag remains); the same empty answer comes when nothing is granted, so the response never reveals whether the user exists or how many devices they have. Calling it with your own `userId` returns all your devices with `access: all-devices` (#294).',
 			operationId: 'getControllableDevices',
 			security: [{ bearerAuth: [] }],
 			parameters: [

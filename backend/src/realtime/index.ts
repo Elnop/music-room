@@ -19,6 +19,7 @@ import type { PlaylistUpdatedPayload } from '@/features/playlists/playlist.types
 import type { QueueState } from '@/features/queue/queue.types.js';
 import { controlAccessService } from '@/features/music-control/services/control-access.service.js';
 import type {
+	QueuePlayCommand,
 	ListeningStatus,
 	UserListeningStatus,
 } from '@/features/music-control/music-control.types.js';
@@ -575,8 +576,9 @@ class RealtimeService {
 	}
 
 	/**
-	 * Send a user's whole play queue to all of their devices (`user:<id>`)
-	 * after any change to it (#273). Other users never receive it.
+	 * Send a user's whole play queue after any change to it (#273): to all of
+	 * their devices (`user:<id>`) and to the delegates watching them
+	 * (`listening:<id>`, #294). One emit, so a socket in both rooms gets it once.
 	 */
 	notifyQueueUpdate(userId: string, state: QueueState): void {
 		if (!this.io) {
@@ -588,14 +590,34 @@ class RealtimeService {
 			return;
 		}
 
-		this.io.to(`user:${userId}`).emit('queue:updated', state);
+		const rooms = [`user:${userId}`, listeningRoom(userId)];
+		this.io.to(rooms).emit('queue:updated', state);
 
 		socketLogger.broadcast('queue_updated', {
 			userId,
 			items: state.items.length,
-			room: `user:${userId}`,
+			version: state.version,
+			room: rooms.join(','),
 			action: 'broadcasted',
 		});
+	}
+
+	/**
+	 * Tell one of ownerId's devices to play a queue item (#294). False when the
+	 * device has no socket any more.
+	 */
+	sendQueuePlay(ownerId: string, deviceId: string, command: QueuePlayCommand): boolean {
+		const socketId = this.deviceToSocket.get(`${ownerId}:${deviceId}`);
+		if (!socketId || !this.io) return false;
+		this.io.to(socketId).emit('control:command', command);
+		socketLogger.broadcast('queue_play_command', {
+			ownerId,
+			deviceId,
+			fromUserId: command.fromUserId,
+			itemId: command.item.id,
+			action: 'command_sent',
+		});
+		return true;
 	}
 
 	/**

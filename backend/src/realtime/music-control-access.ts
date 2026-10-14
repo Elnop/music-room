@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type {
 	ControlActionPayload,
+	ControlRevokedPayload,
 	ListeningStatus,
 } from '@/features/music-control/music-control.types.js';
 import { socketLogger } from '@/shared/middleware/socket-logger.middleware.js';
@@ -27,7 +28,9 @@ import type { AppSocketServer } from '@/realtime/socket-auth.js';
  * Refusals are answered on `listening:error` / `control:error` with
  * `NOT_AUTHORIZED`. When access shrinks (switch or license revoked,
  * unfollow in either direction) the subscription is re-checked and the
- * controller leaves the room only when no device is left.
+ * controller leaves the room only when no device is left. When access
+ * shrinks to no device, the controller also gets `control:revoked { ownerId }`
+ * (#294).
  *
  * A malformed payload (including a listening:update with a title or artist
  * over 300 characters) is answered on `listening:error` / `control:error`
@@ -98,6 +101,8 @@ export function leaveListeningRoom(
 	const room = listeningRoom(ownerId);
 	try {
 		io.in(`user:${controllerId}`).socketsLeave(room);
+		const payload: ControlRevokedPayload = { ownerId };
+		io.to(`user:${controllerId}`).emit('control:revoked', payload);
 		socketLogger.broadcast('listening_access_revoked', {
 			controllerId,
 			ownerId,

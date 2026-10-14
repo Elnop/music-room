@@ -68,11 +68,11 @@ describe('queue:updated broadcast', () => {
 		};
 	};
 
-	async function connect(user: TestUser): Promise<ClientSocket> {
+	async function connect(user: TestUser, deviceId = `dev-${randomUUID()}`): Promise<ClientSocket> {
 		const socket = ioClient(url, {
 			auth: {
 				token: user.token,
-				deviceId: `dev-${randomUUID()}`,
+				deviceId,
 				deviceName: 'Test device',
 				platform: 'android',
 				model: 'Pixel Test',
@@ -140,6 +140,85 @@ describe('queue:updated broadcast', () => {
 		}
 		await supabaseAdmin.from('tracks').delete().like('track_uri', `${URI_PREFIX}/%`);
 		await disconnectRedis();
+	});
+
+	describe('queue:updated for delegates', () => {
+		async function befriend(controllerId: string, ownerId: string, allDevices: boolean) {
+			await supabaseAdmin.from('follows').delete().in('follower_id', [controllerId, ownerId]);
+			const { error } = await supabaseAdmin.from('follows').insert([
+				{ follower_id: controllerId, following_id: ownerId, can_control_music: allDevices },
+				{ follower_id: ownerId, following_id: controllerId },
+			]);
+			if (error) throw error;
+		}
+
+		function subscribe(socket: ClientSocket, ownerId: string) {
+			return new Promise<void>((resolve, reject) => {
+				socket.once('listening:status', () => resolve());
+				socket.once('listening:error', reject);
+				socket.emit('listening:subscribe', ownerId);
+			});
+		}
+
+		afterEach(async () => {
+			await supabaseAdmin.from('follows').delete().in('follower_id', [owner.id, other.id]);
+		});
+
+		it('reaches a subscribed delegate', async () => {
+			await befriend(other.id, owner.id, true);
+			await subscribe(otherSocket, owner.id);
+			const received = record(otherSocket);
+			const state = await queue.addItem(owner.id, dto());
+			await settle();
+			expect(received).toEqual([state]);
+		});
+
+		it('reaches a subscribed owner device once', async () => {
+			await subscribe(phone, owner.id);
+			const received = record(phone);
+			const state = await queue.addItem(owner.id, dto());
+			await settle();
+			expect(received).toEqual([state]);
+		});
+
+		it('stops reaching a delegate whose access was revoked, who gets control:revoked', async () => {
+			await befriend(other.id, owner.id, true);
+			await subscribe(otherSocket, owner.id);
+			const revoked = new Promise(resolve => otherSocket.once('control:revoked', resolve));
+			await supabaseAdmin
+				.from('follows')
+				.update({ can_control_music: false })
+				.eq('follower_id', other.id)
+				.eq('following_id', owner.id);
+			await realtime.revalidateListeningAccess(other.id, owner.id);
+			expect(await revoked).toEqual({ ownerId: owner.id });
+			const received = record(otherSocket);
+			await queue.addItem(owner.id, dto());
+			await settle();
+			expect(received).toEqual([]);
+		});
+
+		it('sends a play-item command to the one device named', async () => {
+			const deviceId = `dev-${randomUUID()}`;
+			const target = await connect(owner, deviceId);
+			const commands: unknown[] = [];
+			target.on('control:command', c => commands.push(c));
+			const phoneCommands: unknown[] = [];
+			phone.on('control:command', c => phoneCommands.push(c));
+			const state = await queue.addItem(owner.id, dto());
+			const command = {
+				action: 'play-item' as const,
+				fromUserId: other.id,
+				item: state.items[0],
+				positionMs: 0,
+				version: state.version,
+			};
+			expect(realtime.sendQueuePlay(owner.id, deviceId, command)).toBe(true);
+			expect(realtime.sendQueuePlay(owner.id, 'offline-device', command)).toBe(false);
+			await settle();
+			expect(commands).toEqual([command]);
+			expect(phoneCommands).toEqual([]);
+		});
 	});
 
 	it('sends the new state of an add to both devices of the user and to no one else', async () => {
