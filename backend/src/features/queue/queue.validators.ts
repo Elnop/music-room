@@ -7,6 +7,20 @@ import { addTrackSchema } from '@/features/playlists/playlist.validators.js';
  */
 export const addQueueItemSchema = addTrackSchema.omit({ previewUrl: true });
 
+/** Path segment of /api/users/:userId/queue routes. */
+export const queueOwnerParamsSchema = z.object({
+	userId: z.uuid('Invalid user ID format').optional(),
+});
+
+/**
+ * Body of the playback routes (play an item, next, previous, play a playlist):
+ * the owner's device that must play; a delegate must send it (#294).
+ */
+export const queuePlaybackSchema = z
+	.object({ deviceId: z.string().min(1).max(128).optional() })
+	.optional()
+	.transform(body => body ?? {});
+
 /** Path segment of /api/queue/items/:itemId routes. */
 export const queueItemParamsSchema = z.object({
 	itemId: z.uuid('Invalid queue item ID format'),

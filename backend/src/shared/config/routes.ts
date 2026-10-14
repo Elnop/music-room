@@ -70,4 +70,9 @@ export const routes: RouteConfig[] = [
 		router: queueRoutes,
 		description: "The caller's play queue, synced across their devices",
 	},
+	{
+		path: '/api/users/:userId/queue',
+		router: queueRoutes,
+		description: "A friend's play queue, for a delegate who controls one of their devices",
+	},
 ];

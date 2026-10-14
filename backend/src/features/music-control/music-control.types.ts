@@ -2,6 +2,8 @@
  * Music Control Types
  */
 
+import type { QueueItem } from '@/features/queue/queue.types.js';
+
 /**
  * Device information for multi-device support
  */
@@ -119,4 +121,22 @@ export interface RevokeDeviceLicenseResponse {
 export interface ControllableDevicesResponse {
 	allDevices: boolean;
 	devices: ControllableDevice[];
+}
+
+/**
+ * control:command sent by the server to the owner's device chosen by a
+ * playback action on the queue (#294): play `item` from `positionMs`.
+ */
+export interface QueuePlayCommand {
+	action: 'play-item';
+	fromUserId: string;
+	item: QueueItem;
+	positionMs: number;
+	/** Version of the queue state that made `item` current. */
+	version: number;
+}
+
+/** control:revoked: the receiver no longer controls any of ownerId's devices. */
+export interface ControlRevokedPayload {
+	ownerId: string;
 }

@@ -3,6 +3,8 @@ import {
 	addQueueItemSchema,
 	moveQueueItemSchema,
 	queueItemParamsSchema,
+	queueOwnerParamsSchema,
+	queuePlaybackSchema,
 	queuePlaylistParamsSchema,
 } from '@/features/queue/queue.validators.js';
 
@@ -66,5 +68,30 @@ describe('queuePlaylistParamsSchema', () => {
 	it('rejects a missing or non-uuid playlistId', () => {
 		expect(queuePlaylistParamsSchema.safeParse({}).success).toBe(false);
 		expect(queuePlaylistParamsSchema.safeParse({ playlistId: 'not-a-uuid' }).success).toBe(false);
+	});
+});
+
+describe('queuePlaybackSchema', () => {
+	it('accepts no body, an empty body, or a deviceId', () => {
+		expect(queuePlaybackSchema.parse(undefined)).toEqual({});
+		expect(queuePlaybackSchema.parse({})).toEqual({});
+		expect(queuePlaybackSchema.parse({ deviceId: 'tv' })).toEqual({ deviceId: 'tv' });
+	});
+
+	it('rejects an empty or oversized deviceId', () => {
+		expect(() => queuePlaybackSchema.parse({ deviceId: '' })).toThrow();
+		expect(() => queuePlaybackSchema.parse({ deviceId: 'x'.repeat(129) })).toThrow();
+	});
+});
+
+describe('queueOwnerParamsSchema', () => {
+	it('accepts a missing userId (own queue) or a uuid', () => {
+		expect(queueOwnerParamsSchema.parse({})).toEqual({});
+		const id = '0b0e7b4e-0000-4000-8000-000000000000';
+		expect(queueOwnerParamsSchema.parse({ userId: id })).toEqual({ userId: id });
+	});
+
+	it('rejects a non-uuid userId', () => {
+		expect(() => queueOwnerParamsSchema.parse({ userId: 'nope' })).toThrow();
 	});
 });
