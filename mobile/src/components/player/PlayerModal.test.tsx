@@ -38,6 +38,32 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 
 jest.mock('@/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
+	deviceService: { getDeviceInfo: jest.fn(async () => ({ deviceId: 'phone' })) },
+}));
+
+jest.mock('@/services/musicControlApi', () => ({
+	musicControlApi: {
+		getDevicePicker: jest.fn(async () => ({
+			owners: [
+				{
+					ownerId: 'me',
+					username: 'moi',
+					isSelf: true,
+					devices: [
+						{
+							deviceId: 'phone',
+							deviceName: 'Mon téléphone',
+							platform: 'android',
+							model: 'Pixel',
+							lastSeenAt: '2026-10-15T00:00:00Z',
+							access: 'all-devices',
+							online: true,
+						},
+					],
+				},
+			],
+		})),
+	},
 }));
 
 jest.mock('@/services/queueApi', () => ({
@@ -48,6 +74,7 @@ jest.mock('@/services/queueApi', () => ({
 		playItem: jest.fn(),
 		moveItem: jest.fn(),
 		removeItem: jest.fn(),
+		transfer: jest.fn(),
 	},
 }));
 
@@ -121,6 +148,13 @@ describe('PlayerModal without a track', () => {
 		render(<PlayerModal />);
 		fireEvent.press(screen.getByLabelText("File d'attente"));
 		expect(screen.getByText("File d'attente")).toBeTruthy();
+	});
+
+	it('opens the device picker', async () => {
+		render(<PlayerModal />);
+		fireEvent.press(screen.getByLabelText("Choisir l'appareil"));
+		expect(screen.getByText('Choisir un appareil')).toBeTruthy();
+		expect(await screen.findByText('Mon téléphone')).toBeTruthy();
 	});
 
 	it('asks for no artwork colors', () => {
