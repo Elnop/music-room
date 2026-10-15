@@ -21,6 +21,7 @@ import { useNowPlaying } from '@/hooks/useNowPlaying';
 import { useImageColors, hexToRgba, getAdaptiveColors, isLightColor } from '@/hooks/useImageColors';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { QueueModal } from '@/components/player/QueueModal';
+import { DevicePickerSheet } from '@/components/player/DevicePickerSheet';
 
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const DISMISS_THRESHOLD = SCREEN_HEIGHT * 0.2; // 20% de l'écran pour fermer
@@ -52,11 +53,15 @@ export function PlayerModal() {
 	const duration = durationMs !== null ? durationMs / 1000 : null;
 
 	const [isQueueOpen, setQueueOpen] = React.useState(false);
-	// The queue opens over the player only: closing the player closes it too.
+	const [isDevicesOpen, setDevicesOpen] = React.useState(false);
+	// The queue and the device picker open over the player only: closing the player closes them too.
 	const [wasModalOpen, setWasModalOpen] = React.useState(isModalOpen);
 	if (wasModalOpen !== isModalOpen) {
 		setWasModalOpen(isModalOpen);
-		if (!isModalOpen) setQueueOpen(false);
+		if (!isModalOpen) {
+			setQueueOpen(false);
+			setDevicesOpen(false);
+		}
 	}
 
 	const translateY = useSharedValue(0);
@@ -192,6 +197,17 @@ export function PlayerModal() {
 						>
 							<View style={[styles.headerButton, { backgroundColor: colors.buttonBg }]}>
 								<Ionicons name="chevron-down" size={24} color={colors.text} />
+							</View>
+						</TouchableOpacity>
+
+						<TouchableOpacity
+							style={styles.devicesButton}
+							onPress={() => setDevicesOpen(true)}
+							activeOpacity={0.7}
+							accessibilityLabel="Choisir l'appareil"
+						>
+							<View style={[styles.headerButton, { backgroundColor: colors.buttonBg }]}>
+								<Ionicons name="phone-portrait-outline" size={20} color={colors.text} />
 							</View>
 						</TouchableOpacity>
 
@@ -344,6 +360,10 @@ export function PlayerModal() {
 			</GestureDetector>
 
 			<QueueModal visible={isModalOpen && isQueueOpen} onClose={() => setQueueOpen(false)} />
+			<DevicePickerSheet
+				visible={isModalOpen && isDevicesOpen}
+				onClose={() => setDevicesOpen(false)}
+			/>
 		</Modal>
 	);
 }
@@ -383,6 +403,12 @@ const createStyles = (theme: Theme, insets: { top: number; bottom: number }) =>
 			right: 20,
 			zIndex: 10,
 		},
+		devicesButton: {
+			position: 'absolute',
+			top: insets.top + 16,
+			right: 68,
+			zIndex: 10,
+		},
 		headerButton: {
 			width: 40,
 			height: 40,
@@ -400,7 +426,7 @@ const createStyles = (theme: Theme, insets: { top: number; bottom: number }) =>
 			fontSize: 13,
 			fontWeight: '600',
 			marginTop: 4,
-			paddingHorizontal: 72,
+			paddingHorizontal: 112,
 		},
 		mainContent: {
 			flex: 1,
