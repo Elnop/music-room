@@ -82,7 +82,7 @@ jest.mock('@/services/queueApi', () => ({
 }));
 
 jest.mock('@/contexts/PlayerContext', () => ({
-	usePlayer: () => ({ player: { playing: false }, error: null }),
+	usePlayer: () => ({ player: { playing: false }, error: null, seekTo: jest.fn() }),
 }));
 
 jest.mock('@/hooks/usePlayerProgress', () => ({

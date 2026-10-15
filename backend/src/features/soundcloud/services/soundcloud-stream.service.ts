@@ -1,7 +1,17 @@
 import { logger } from '@/shared/utils/logger.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
-import { SoundCloudCache, CACHE_TTL } from '@/features/soundcloud/utils/soundcloud-cache.js';
+import {
+	SoundCloudCache,
+	CACHE_TTL,
+	STREAM_URL_LIFETIME_S,
+} from '@/features/soundcloud/utils/soundcloud-cache.js';
 import type { SoundCloudClient } from '@/features/soundcloud/soundcloud.types.js';
+
+/** A stream URL and the moment it expires (ISO 8601) */
+export interface StreamUrlResult {
+	streamUrl: string;
+	expiresAt: string;
+}
 
 /**
  * Extended SoundCloud client with util methods
@@ -27,11 +37,12 @@ export class SoundCloudStreamService {
 	/**
 	 * Get stream URL for a track
 	 * Uses soundcloud.ts util.streamLink() which handles transcoding internally
-	 * Tries HLS first, falls back to progressive if HLS not available
+	 * Tries HLS first, falls back to progressive if HLS not available.
+	 * `expiresAt` is when SoundCloud's URL expires; a cached result keeps its original one.
 	 */
-	async getStreamUrl(trackUrl: string): Promise<string> {
+	async getStreamUrl(trackUrl: string): Promise<StreamUrlResult> {
 		const cacheKey = `stream:${trackUrl}`;
-		const cached = this.cache.get<string>(cacheKey);
+		const cached = this.cache.get<StreamUrlResult>(cacheKey);
 		if (cached) {
 			logger.debug('Returning cached stream URL', { trackUrl });
 			return cached;
@@ -46,22 +57,21 @@ export class SoundCloudStreamService {
 				throw new AppError(500, 'SoundCloud API client not properly initialized', 'API_ERROR');
 			}
 
-			// Try HLS protocol first (better for streaming)
-			const streamUrl = await this.tryGetStreamUrl(trackUrl, 'hls');
+			const obtainedAt = Date.now();
+
+			// Try HLS protocol first (better for streaming), fall back to progressive
+			const streamUrl =
+				(await this.tryGetStreamUrl(trackUrl, 'hls')) ??
+				(await this.tryGetStreamUrl(trackUrl, 'progressive'));
 
 			if (streamUrl) {
-				logger.info('Stream URL obtained (HLS)', { trackUrl });
-				this.cache.set(cacheKey, streamUrl, CACHE_TTL.STREAM);
-				return streamUrl;
-			}
-
-			// Fallback to progressive
-			const progressiveUrl = await this.tryGetStreamUrl(trackUrl, 'progressive');
-
-			if (progressiveUrl) {
-				logger.info('Stream URL obtained (progressive fallback)', { trackUrl });
-				this.cache.set(cacheKey, progressiveUrl, CACHE_TTL.STREAM);
-				return progressiveUrl;
+				logger.info('Stream URL obtained', { trackUrl });
+				const result: StreamUrlResult = {
+					streamUrl,
+					expiresAt: new Date(obtainedAt + STREAM_URL_LIFETIME_S * 1000).toISOString(),
+				};
+				this.cache.set(cacheKey, result, CACHE_TTL.STREAM);
+				return result;
 			}
 
 			// No valid stream URL found

@@ -96,17 +96,18 @@ export class SoundCloudController {
 				trackUrl,
 			});
 
-			const streamUrl = await soundcloudService.getStreamUrl(trackUrl);
+			const { streamUrl, expiresAt } = await soundcloudService.getStreamUrl(trackUrl);
 
 			logger.info('[SoundCloud] Stream URL obtained successfully', {
 				trackUrl,
 				streamUrlLength: streamUrl.length,
 				streamUrlPreview: streamUrl.substring(0, 100) + '...',
+				expiresAt,
 			});
 
 			return res.json({
 				success: true,
-				data: { streamUrl },
+				data: { streamUrl, expiresAt },
 				meta: { timestamp: new Date().toISOString() },
 			});
 		} catch (error) {

@@ -229,6 +229,12 @@ export const soundcloudPaths: OpenAPIV3.PathsObject = {
 														format: 'uri',
 														description: 'HLS AAC stream URL (expires after 30 minutes)',
 													},
+													expiresAt: {
+														type: 'string',
+														format: 'date-time',
+														description:
+															'When the stream URL expires; request a new one shortly before',
+													},
 												},
 											},
 										},
@@ -281,6 +287,12 @@ export const soundcloudPaths: OpenAPIV3.PathsObject = {
 														type: 'string',
 														format: 'uri',
 														description: 'HLS AAC stream URL (expires after 30 minutes)',
+													},
+													expiresAt: {
+														type: 'string',
+														format: 'date-time',
+														description:
+															'When the stream URL expires; request a new one shortly before',
 													},
 												},
 											},

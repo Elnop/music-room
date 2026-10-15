@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useEffect, useRef } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useRef } from 'react';
 import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
 import { usePlayerStore, setPositionReader } from '@/store/playerStore';
 import { useQueueStore } from '@/store/queueStore';
 import { useConnectStore } from '@/store/connectStore';
 import { ApiError, apiRequest } from '@/services/api';
+import type { StreamUrlResponse } from '@/types/soundcloud.types';
 
 // Configure audio mode for iOS - play in silent mode and background
 setAudioModeAsync({
@@ -19,6 +20,22 @@ setAudioModeAsync({
 const FETCH_TIMEOUT_MS = 8000; // 8 seconds max for API call
 const PLAYER_LOAD_TIMEOUT_MS = 10000; // 10 seconds max for player to load
 
+// A renewed stream that played this long past its start position is healthy again (#313)
+export const RENEWAL_HEALTHY_MS = 30 * 1000;
+
+// A stream URL this close to its expiry is renewed before play or seek (#313)
+export const STREAM_RENEW_MARGIN_MS = 2 * 60 * 1000;
+
+/** Whether a stream URL expiring at `expiresAt` (epoch ms) must be renewed before use. */
+export function isStreamStale(expiresAt: number | null, now: number = Date.now()): boolean {
+	return expiresAt !== null && expiresAt - now < STREAM_RENEW_MARGIN_MS;
+}
+
+/** This device plays its own audio (renewal is local only: in remote mode another device plays). */
+function playsLocally(): boolean {
+	return useConnectStore.getState().target.kind === 'local';
+}
+
 // MiniPlayer height for padding calculations (content + progress bar + margins)
 export const MINI_PLAYER_HEIGHT = 75;
 
@@ -26,6 +43,8 @@ interface PlayerContextValue {
 	player: ReturnType<typeof useAudioPlayer>;
 	loading: boolean;
 	error: string | null;
+	/** Seek the current track; renews an expiring stream URL by reloading at `seconds` (#313). */
+	seekTo: (seconds: number) => void;
 }
 
 const PlayerContext = createContext<PlayerContextValue | null>(null);
@@ -58,6 +77,61 @@ function QueueAutoAdvance({ player }: { player: ReturnType<typeof useAudioPlayer
 	return null;
 }
 
+/**
+ * Renews the stream once when the player fails mid-track (#313): expo-audio sends
+ * no error event, so a failure shows as a loaded player going to `idle` (Android)
+ * or `failed` (iOS) while the store plays. A second failure in the same load is
+ * final, unless the renewed stream has since played RENEWAL_HEALTHY_MS: a long
+ * track then survives every URL expiry. Status updates are compared by player id, since a new player is created
+ * per stream URL and the hook can still hold the previous player's last status.
+ */
+function StreamWatchdog({ player }: { player: ReturnType<typeof useAudioPlayer> }) {
+	const status = useAudioPlayerStatus(player);
+	const isPlaying = usePlayerStore(state => state.playbackState === 'playing');
+	const loadedPlayerIdRef = useRef<number | null>(null);
+	const handledPlayerIdRef = useRef<number | null>(null);
+	const lastPositionMsRef = useRef(0);
+
+	const statusId = status?.id;
+	const playerState = status?.playbackState;
+	const isLoaded = status?.isLoaded ?? false;
+	const currentTime = status?.currentTime ?? 0;
+
+	useEffect(() => {
+		if (statusId === undefined || statusId !== player?.id) return;
+		const failed = playerState === 'idle' || playerState === 'failed';
+		if (!failed) {
+			if (isLoaded) {
+				loadedPlayerIdRef.current = statusId;
+				lastPositionMsRef.current = currentTime * 1000;
+				const { streamRenewed, startPositionMs } = usePlayerStore.getState();
+				if (
+					isPlaying &&
+					streamRenewed &&
+					currentTime * 1000 >= (startPositionMs ?? 0) + RENEWAL_HEALTHY_MS
+				) {
+					usePlayerStore.setState({ streamRenewed: false });
+				}
+			}
+			return;
+		}
+		if (!isPlaying || loadedPlayerIdRef.current !== statusId) return;
+		if (handledPlayerIdRef.current === statusId || !playsLocally()) return;
+		handledPlayerIdRef.current = statusId;
+
+		const { streamRenewed, renewStream, setTrackUnavailableError } = usePlayerStore.getState();
+		if (streamRenewed) {
+			if (__DEV__) console.log('🔴 [StreamWatchdog] Failed again after a renewal');
+			setTrackUnavailableError('Unable to load this track');
+		} else {
+			if (__DEV__) console.log('🟠 [StreamWatchdog] Player failed mid-track, renewing stream');
+			renewStream(lastPositionMsRef.current, true, true);
+		}
+	}, [statusId, player, playerState, isLoaded, currentTime, isPlaying]);
+
+	return null;
+}
+
 export function PlayerProvider({ children }: { children: React.ReactNode }) {
 	const {
 		currentTrack,
@@ -67,6 +141,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 		setStreamUrl,
 		setTrackUnavailableError,
 		setPlaybackPlaying,
+		setPlaybackReady,
 	} = usePlayerStore();
 
 	const player = useAudioPlayer(streamUrl || '');
@@ -156,7 +231,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 						trackUrl: currentTrack.permalink_url,
 					});
 
-				const data = await apiRequest<{ streamUrl?: string }>(streamEndpoint, {
+				const data = await apiRequest<Partial<StreamUrlResponse>>(streamEndpoint, {
 					signal: controller.signal,
 				});
 				clearTimeout(timeoutId);
@@ -169,7 +244,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
 				if (data.streamUrl) {
 					if (__DEV__) console.log('🟢 [PlayerProvider] Stream URL obtained');
-					setStreamUrl(data.streamUrl);
+					const expiresAt = data.expiresAt ? Date.parse(data.expiresAt) : NaN;
+					setStreamUrl(data.streamUrl, Number.isFinite(expiresAt) ? expiresAt : null);
 				} else {
 					throw new Error('Stream not available');
 				}
@@ -247,8 +323,13 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 							console.warn('[PlayerContext] Start position seek failed:', err);
 						});
 				}
-				player.play();
-				setPlaybackPlaying();
+				// A stream renewed while paused reloads paused (#313).
+				if (usePlayerStore.getState().resumeAfterLoad) {
+					player.play();
+					setPlaybackPlaying();
+				} else {
+					setPlaybackReady();
+				}
 
 				// Cleanup
 				if (pollingIntervalRef.current) {
@@ -299,13 +380,27 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 				loadTimeoutRef.current = null;
 			}
 		};
-	}, [streamUrl, player, playbackState, setPlaybackPlaying, setTrackUnavailableError]);
+	}, [
+		streamUrl,
+		player,
+		playbackState,
+		setPlaybackPlaying,
+		setPlaybackReady,
+		setTrackUnavailableError,
+	]);
 
 	// Sync pause/resume
 	useEffect(() => {
 		if (!player || !player.isLoaded) return;
 
 		if (playbackState === 'playing' && !player.playing) {
+			const { streamExpiresAt, renewStream } = usePlayerStore.getState();
+			// Resuming on an expiring URL: reload at the paused position instead (#313).
+			if (isStreamStale(streamExpiresAt) && playsLocally()) {
+				if (__DEV__) console.log('🟠 [PlayerProvider] Stream URL expiring, renewing on resume');
+				renewStream(player.currentTime * 1000, true);
+				return;
+			}
 			if (__DEV__) console.log('🎵 [PlayerProvider] Resuming playback');
 			player.play();
 		} else if (playbackState === 'paused' && player.playing) {
@@ -316,12 +411,41 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
 	// The listening status is emitted outside this provider: expose the position (#295)
 	useEffect(() => {
-		setPositionReader(() => player.currentTime * 1000);
+		// While a renewal reloads, the player is the empty one: report where it resumes (#313).
+		setPositionReader(() => {
+			const { playbackState: state, startPositionMs } = usePlayerStore.getState();
+			if (state === 'loading' && startPositionMs !== null) return startPositionMs;
+			return player.currentTime * 1000;
+		});
 		return () => setPositionReader(null);
 	}, [player]);
 
+	const seekTo = useCallback(
+		(seconds: number) => {
+			if (!player) return;
+			const {
+				playbackState: state,
+				streamExpiresAt,
+				renewStream,
+				markSeek,
+			} = usePlayerStore.getState();
+			const canRenew = state === 'playing' || state === 'paused';
+			if (canRenew && isStreamStale(streamExpiresAt) && playsLocally()) {
+				// The reload seeks to the position and re-sends the listening status then;
+				// a reload from 0 does not seek, so re-send it now.
+				renewStream(seconds * 1000, state === 'playing');
+				if (seconds <= 0) markSeek();
+				return;
+			}
+			player.seekTo(seconds);
+			markSeek();
+		},
+		[player]
+	);
+
 	const value: PlayerContextValue = {
 		player,
+		seekTo,
 		loading: usePlayerStore(state => state.loading),
 		error: usePlayerStore(state => state.error),
 	};
@@ -329,6 +453,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 	return (
 		<PlayerContext.Provider value={value}>
 			<QueueAutoAdvance player={player} />
+			<StreamWatchdog player={player} />
 			{children}
 		</PlayerContext.Provider>
 	);
