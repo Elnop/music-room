@@ -5,7 +5,6 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
 import type { Theme } from '@/themes/types';
 import { useSoundCloudStore } from '@store/soundcloudStore';
-import { usePlayerStore } from '@store/playerStore';
 import { useQueueStore } from '@store/queueStore';
 import { toTrackInput } from '@utils/trackInput';
 import { SoundCloudTrackItem } from '@screens/search/components/SoundCloudTrackItem';
@@ -25,7 +24,7 @@ export function SoundCloudSearchScreen() {
 
 	const { searchResults, isSearching, error, search, clearSearch, clearError } =
 		useSoundCloudStore();
-	const { playTrack } = usePlayerStore();
+	const playListTrack = useQueueStore(state => state.playListTrack);
 	const addToQueue = useQueueStore(state => state.addItem);
 
 	// Debounced search
@@ -46,8 +45,9 @@ export function SoundCloudSearchScreen() {
 		}
 	};
 
+	// On the phone, or on the remote device in remote mode (#297).
 	const handlePlay = (track: SoundCloudTrack) => {
-		playTrack(track);
+		void playListTrack(track);
 	};
 
 	const handleAddToPlaylist = (track: SoundCloudTrack) => {

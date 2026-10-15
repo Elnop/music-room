@@ -14,12 +14,16 @@ export interface ControlAccess {
 
 const NO_ACCESS: ControlAccess = { isFriend: false, allDevices: false, licensedDeviceIds: [] };
 
+/** The owner controls every one of their own devices (#294). */
+const SELF_ACCESS: ControlAccess = { isFriend: false, allDevices: true, licensedDeviceIds: [] };
+
 /**
  * Per-device music control rule (subject IV.2.2), shared by the realtime
  * events and `GET /users/{userId}/devices`: the controller and the owner are
  * mutual friends, and either the owner's "all my devices" switch
  * (`follows(controller → owner).can_control_music`) is on, or the controller
- * holds a license on the device (`device_control_licenses`).
+ * holds a license on the device (`device_control_licenses`), or the
+ * controller is the owner (#294), who controls all of their devices.
  */
 export class ControlAccessService {
 	/**
@@ -28,7 +32,7 @@ export class ControlAccessService {
 	 * a 500 DEVICE_FETCH_ERROR on a query error.
 	 */
 	async getAccess(controllerId: string, ownerId: string): Promise<ControlAccess> {
-		if (controllerId === ownerId) return NO_ACCESS;
+		if (controllerId === ownerId) return SELF_ACCESS;
 
 		const [toOwner, toController] = await Promise.all([
 			supabaseAdmin

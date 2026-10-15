@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import type { MusicGenre } from '@/types/user.types';
@@ -16,6 +17,7 @@ import { showError } from '@utils/toast';
 
 export function MusicPreferencesScreen() {
 	const { theme } = useTheme();
+	const playerHeight = usePlayerHeight();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 	const navigation = useNavigation<NativeStackNavigationProp<Record<string, undefined>>>();
 	const { accessToken } = useAuthStore();
@@ -88,7 +90,10 @@ export function MusicPreferencesScreen() {
 
 	return (
 		<View style={styles.container}>
-			<ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+			<ScrollView
+				style={styles.scrollView}
+				contentContainerStyle={[styles.content, { paddingBottom: playerHeight + theme.spacing.xl }]}
+			>
 				<View style={styles.header}>
 					<Text style={styles.title}>Music preferences</Text>
 					<Text style={styles.subtitle}>

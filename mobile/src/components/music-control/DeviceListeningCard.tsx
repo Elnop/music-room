@@ -3,7 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
-import type { ListeningStatus } from '@/hooks/useMusicControl';
+import type { ListeningStatus } from '@/types/listening.types';
 
 interface DeviceListeningCardProps {
 	status: ListeningStatus;

@@ -10,13 +10,10 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useImageColors, hexToRgba } from '@/hooks/useImageColors';
 import type { Theme } from '@themes/types';
-import type { Track } from '@/types/track.types';
 import { CONFLICT_CODES, usePlaylistStore } from '@store/playlistStore';
 import { afterRankForDrop } from '@store/moveTarget';
-import { trackToSoundCloud } from '@utils/trackToSoundCloud';
 import { ApiError } from '@/services/api';
 import { useAuthStore } from '@store/authStore';
-import { usePlayerStore } from '@store/playerStore';
 import { useQueueStore } from '@store/queueStore';
 import { toTrackInput } from '@utils/trackInput';
 import { usePlaylistSocket } from '@hooks/usePlaylistSocket';
@@ -68,14 +65,6 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 		conflictMessage,
 		clearConflictMessage,
 	} = usePlaylistStore();
-	const {
-		currentTrack,
-		isPlaying,
-		loading: playerLoading,
-		playTrack,
-		pause,
-		resume,
-	} = usePlayerStore();
 
 	const coverUrl = currentPlaylist?.coverUrl || currentPlaylist?.tracks[0]?.albumArt;
 	const { dominantColor } = useImageColors(coverUrl, theme.colors.primary);
@@ -135,20 +124,6 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 
 	const handleAddTrack = () => {
 		navigation.navigate('SearchTracks', { playlistId: id });
-	};
-
-	const handlePlayTrack = (track: Track) => {
-		const isCurrentTrack = currentTrack?.permalink_url === track.trackUri;
-
-		if (isCurrentTrack) {
-			if (isPlaying) {
-				pause();
-			} else {
-				resume();
-			}
-		} else {
-			playTrack(trackToSoundCloud(track));
-		}
 	};
 
 	const handleDeleteTrack = async (trackId: string) => {

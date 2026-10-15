@@ -3,7 +3,10 @@ import {
 	addQueueItemSchema,
 	moveQueueItemSchema,
 	queueItemParamsSchema,
+	queueOwnerParamsSchema,
+	queuePlaybackSchema,
 	queuePlaylistParamsSchema,
+	transferSchema,
 } from '@/features/queue/queue.validators.js';
 
 const ITEM_ID = '3f2b8c1e-4d5a-4b6c-8d7e-9f0a1b2c3d4e';
@@ -66,5 +69,63 @@ describe('queuePlaylistParamsSchema', () => {
 	it('rejects a missing or non-uuid playlistId', () => {
 		expect(queuePlaylistParamsSchema.safeParse({}).success).toBe(false);
 		expect(queuePlaylistParamsSchema.safeParse({ playlistId: 'not-a-uuid' }).success).toBe(false);
+	});
+});
+
+describe('queuePlaybackSchema', () => {
+	it('accepts no body, an empty body, or a deviceId', () => {
+		expect(queuePlaybackSchema.parse(undefined)).toEqual({});
+		expect(queuePlaybackSchema.parse({})).toEqual({});
+		expect(queuePlaybackSchema.parse({ deviceId: 'tv' })).toEqual({ deviceId: 'tv' });
+	});
+
+	it('rejects an empty or oversized deviceId', () => {
+		expect(() => queuePlaybackSchema.parse({ deviceId: '' })).toThrow();
+		expect(() => queuePlaybackSchema.parse({ deviceId: 'x'.repeat(129) })).toThrow();
+	});
+});
+
+describe('queueOwnerParamsSchema', () => {
+	it('accepts a missing userId (own queue) or a uuid', () => {
+		expect(queueOwnerParamsSchema.parse({})).toEqual({});
+		const id = '0b0e7b4e-0000-4000-8000-000000000000';
+		expect(queueOwnerParamsSchema.parse({ userId: id })).toEqual({ userId: id });
+	});
+
+	it('rejects a non-uuid userId', () => {
+		expect(() => queueOwnerParamsSchema.parse({ userId: 'nope' })).toThrow();
+	});
+});
+
+describe('transferSchema', () => {
+	const track = {
+		trackUri: 'https://soundcloud.com/artist/track',
+		title: 'Song',
+		artist: 'Artist',
+		durationMs: 1000,
+	};
+	const base = { targetUserId: ITEM_ID, targetDeviceId: 'tv', positionMs: 5000 };
+
+	it('accepts both forms of playing, with and without a source', () => {
+		expect(transferSchema.safeParse({ ...base, playing: { queueItemId: ITEM_ID } }).success).toBe(
+			true
+		);
+		expect(transferSchema.safeParse({ ...base, playing: { track } }).success).toBe(true);
+		expect(
+			transferSchema.safeParse({
+				...base,
+				playing: { track },
+				source: { userId: ITEM_ID, deviceId: 'phone' },
+			}).success
+		).toBe(true);
+	});
+
+	it('rejects a negative position, an empty playing and a non-uuid target', () => {
+		const playing = { queueItemId: ITEM_ID };
+		expect(transferSchema.safeParse({ ...base, positionMs: -1, playing }).success).toBe(false);
+		expect(transferSchema.safeParse({ ...base, playing: {} }).success).toBe(false);
+		expect(transferSchema.safeParse({ ...base, targetUserId: 'nope', playing }).success).toBe(
+			false
+		);
 	});
 });

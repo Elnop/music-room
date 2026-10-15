@@ -46,6 +46,14 @@ router.get('/can-control/:userId', (req, res, next) =>
 router.get('/devices', (req, res, next) => musicControlController.getMyDevices(req, res, next));
 
 /**
+ * GET /api/music-control/controllable-devices
+ * List the devices I can play on (mine, then friends'), with online state
+ */
+router.get('/controllable-devices', (req, res, next) =>
+	musicControlController.getDevicePicker(req, res, next)
+);
+
+/**
  * POST /api/music-control/devices/:deviceId/licenses/:userId
  * Grant a friend control of one of my devices
  */

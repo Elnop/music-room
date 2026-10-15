@@ -12,6 +12,7 @@ import {
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import { usePlaylistStore } from '@store/playlistStore';
@@ -48,6 +49,7 @@ interface SearchTracksScreenProps {
 
 export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 	const { theme } = useTheme();
+	const playerHeight = usePlayerHeight();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 	const { playlistId } = route.params;
 	const { addTrack, currentPlaylist } = usePlaylistStore();
@@ -224,7 +226,7 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 					data={searchResults}
 					keyExtractor={item => item.id.toString()}
 					renderItem={renderTrackItem}
-					contentContainerStyle={styles.list}
+					contentContainerStyle={[styles.list, { paddingBottom: playerHeight + theme.spacing.xl }]}
 					showsVerticalScrollIndicator={false}
 					ListEmptyComponent={
 						query.trim() && isSearching ? null : (

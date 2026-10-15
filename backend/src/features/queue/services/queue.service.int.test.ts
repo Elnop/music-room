@@ -40,8 +40,8 @@ const dto = () => {
 
 /** Adds n tracks and returns the item ids in queue order. */
 async function addItems(n: number, user = userId): Promise<string[]> {
-	let state: QueueState = { currentItemId: null, items: [] };
-	for (let i = 0; i < n; i++) state = await queue.addItem(user, dto());
+	let state: QueueState = { ownerId: user, version: 0, currentItemId: null, items: [] };
+	for (let i = 0; i < n; i++) state = await queue.addItem(user, user, dto());
 	return state.items.map(item => item.id);
 }
 
@@ -94,14 +94,19 @@ afterAll(async () => {
 
 describe('read and add', () => {
 	it('returns an empty queue to a user who never queued anything', async () => {
-		expect(await queue.getQueue(userId)).toEqual({ currentItemId: null, items: [] });
+		expect(await queue.getQueue(userId, userId)).toEqual({
+			ownerId: userId,
+			version: 0,
+			currentItemId: null,
+			items: [],
+		});
 	});
 
 	it('appends after the last rank and keeps the current item', async () => {
 		const [first] = await addItems(2);
-		await queue.playItem(userId, first);
+		await queue.playItem(userId, userId, first);
 		const track = dto();
-		const state = await queue.addItem(userId, track);
+		const state = await queue.addItem(userId, userId, track);
 
 		expect(state.currentItemId).toBe(first);
 		expect(state.items).toHaveLength(3);
@@ -112,13 +117,13 @@ describe('read and add', () => {
 			blockDetached: false,
 		});
 		expectRanked(state);
-		expect(await queue.getQueue(userId)).toEqual(state);
+		expect(await queue.getQueue(userId, userId)).toEqual(state);
 	});
 
 	it('reuses the tracks row of a known track_uri', async () => {
 		const track = dto();
-		await queue.addItem(userId, track);
-		const state = await queue.addItem(userId, { ...track, title: 'Renamed' });
+		await queue.addItem(userId, userId, track);
+		const state = await queue.addItem(userId, userId, { ...track, title: 'Renamed' });
 		expect(state.items.map(item => item.track.title)).toEqual(['Renamed', 'Renamed']);
 		const { count } = await supabaseAdmin
 			.from('tracks')
@@ -128,8 +133,8 @@ describe('read and add', () => {
 	});
 
 	it('serializes concurrent adds of one user', async () => {
-		await Promise.all(Array.from({ length: 8 }, () => queue.addItem(userId, dto())));
-		const state = await queue.getQueue(userId);
+		await Promise.all(Array.from({ length: 8 }, () => queue.addItem(userId, userId, dto())));
+		const state = await queue.getQueue(userId, userId);
 		expect(state.items).toHaveLength(8);
 		expectRanked(state);
 	});
@@ -137,7 +142,7 @@ describe('read and add', () => {
 	it('stores no stream URL', async () => {
 		await addItems(2);
 		const withPreview = { ...dto(), previewUrl: 'https://api.soundcloud.com/tracks/1/stream' };
-		await queue.addItem(userId, withPreview);
+		await queue.addItem(userId, userId, withPreview);
 		const { data: track, error: trackError } = await supabaseAdmin
 			.from('tracks')
 			.select('preview_url')
@@ -158,31 +163,34 @@ describe('read and add', () => {
 describe('remove', () => {
 	it('removes an upcoming or a history item', async () => {
 		const [a, b, c, d] = await addItems(4);
-		await queue.playItem(userId, b);
-		await queue.removeItem(userId, a);
-		const state = await queue.removeItem(userId, d);
+		await queue.playItem(userId, userId, b);
+		await queue.removeItem(userId, userId, a);
+		const state = await queue.removeItem(userId, userId, d);
 		expect(ids(state)).toEqual([b, c]);
 		expect(state.currentItemId).toBe(b);
 	});
 
 	it('moves current to the next item when the current one is removed', async () => {
 		const [a, b, c] = await addItems(3);
-		await queue.playItem(userId, b);
-		const state = await queue.removeItem(userId, b);
+		await queue.playItem(userId, userId, b);
+		const state = await queue.removeItem(userId, userId, b);
 		expect(state).toMatchObject({ currentItemId: c });
 		expect(ids(state)).toEqual([a, c]);
 	});
 
 	it('empties the queue when the last current item is removed', async () => {
 		const [, , c] = await addItems(3);
-		await queue.playItem(userId, c);
-		expect(await queue.removeItem(userId, c)).toEqual({ currentItemId: null, items: [] });
+		await queue.playItem(userId, userId, c);
+		expect(await queue.removeItem(userId, userId, c)).toMatchObject({
+			currentItemId: null,
+			items: [],
+		});
 	});
 
 	it('keeps 50 history items when the removed current item is followed', async () => {
 		const all = await addItems(52);
-		await queue.playItem(userId, all[50]); // 50 items of history
-		const state = await queue.removeItem(userId, all[50]);
+		await queue.playItem(userId, userId, all[50]); // 50 items of history
+		const state = await queue.removeItem(userId, userId, all[50]);
 		expect(state.currentItemId).toBe(all[51]);
 		expect(ids(state)).toEqual([...all.slice(0, 50), all[51]]);
 	});
@@ -190,7 +198,7 @@ describe('remove', () => {
 	it('detaches the whole block of a removed item', async () => {
 		const [a, b, c, d] = await addItems(4);
 		await seedBlock([a, b, c]);
-		const state = await queue.removeItem(userId, b);
+		const state = await queue.removeItem(userId, userId, b);
 		expect(blockFlags(state, [a, c, d])).toEqual([true, true, false]);
 	});
 
@@ -198,57 +206,57 @@ describe('remove', () => {
 		const other = await createUser();
 		const [theirs] = await addItems(1, other);
 		await addItems(1);
-		const before = await queue.getQueue(userId);
+		const before = await queue.getQueue(userId, userId);
 
-		await expect(queue.removeItem(userId, randomUUID())).rejects.toMatchObject({
+		await expect(queue.removeItem(userId, userId, randomUUID())).rejects.toMatchObject({
 			statusCode: 404,
 			code: 'QUEUE_ITEM_NOT_FOUND',
 		});
-		await expect(queue.removeItem(userId, theirs)).rejects.toMatchObject({
+		await expect(queue.removeItem(userId, userId, theirs)).rejects.toMatchObject({
 			statusCode: 404,
 			code: 'QUEUE_ITEM_NOT_FOUND',
 		});
-		expect(await queue.getQueue(userId)).toEqual(before);
-		expect(ids(await queue.getQueue(other))).toEqual([theirs]);
+		expect(await queue.getQueue(userId, userId)).toEqual(before);
+		expect(ids(await queue.getQueue(other, other))).toEqual([theirs]);
 	});
 });
 
 describe('move', () => {
 	it('places the item right after the current one when afterItemId is null', async () => {
 		const [a, b, c, d] = await addItems(4);
-		await queue.playItem(userId, a);
-		const state = await queue.moveItem(userId, d, null);
+		await queue.playItem(userId, userId, a);
+		const state = await queue.moveItem(userId, userId, d, null);
 		expect(ids(state)).toEqual([a, d, b, c]);
 		expectRanked(state);
 	});
 
 	it('places the item at the top when nothing is current', async () => {
 		const [a, b, c] = await addItems(3);
-		expect(ids(await queue.moveItem(userId, c, null))).toEqual([c, a, b]);
+		expect(ids(await queue.moveItem(userId, userId, c, null))).toEqual([c, a, b]);
 	});
 
 	it('places the item between afterItemId and the next item', async () => {
 		const [a, b, c, d] = await addItems(4);
-		await queue.playItem(userId, a);
-		expect(ids(await queue.moveItem(userId, b, c))).toEqual([a, c, b, d]);
+		await queue.playItem(userId, userId, a);
+		expect(ids(await queue.moveItem(userId, userId, b, c))).toEqual([a, c, b, d]);
 	});
 
 	it('detaches the whole block of a moved item', async () => {
 		const [a, b, c, d] = await addItems(4);
 		await seedBlock([b, c]);
-		const state = await queue.moveItem(userId, b, d);
+		const state = await queue.moveItem(userId, userId, b, d);
 		expect(blockFlags(state, [a, b, c, d])).toEqual([false, true, true, false]);
 	});
 
 	it('refuses to move the current item, a history item, or after one of them', async () => {
 		const [a, b, c, d] = await addItems(4);
-		await queue.playItem(userId, b);
+		await queue.playItem(userId, userId, b);
 		const notUpcoming = { statusCode: 409, code: 'QUEUE_ITEM_NOT_UPCOMING' };
-		await expect(queue.moveItem(userId, b, null)).rejects.toMatchObject(notUpcoming);
-		await expect(queue.moveItem(userId, a, null)).rejects.toMatchObject(notUpcoming);
-		await expect(queue.moveItem(userId, d, b)).rejects.toMatchObject(notUpcoming);
-		await expect(queue.moveItem(userId, d, a)).rejects.toMatchObject(notUpcoming);
-		expect(ids(await queue.getQueue(userId))).toEqual([a, b, c, d]);
+		await expect(queue.moveItem(userId, userId, b, null)).rejects.toMatchObject(notUpcoming);
+		await expect(queue.moveItem(userId, userId, a, null)).rejects.toMatchObject(notUpcoming);
+		await expect(queue.moveItem(userId, userId, d, b)).rejects.toMatchObject(notUpcoming);
+		await expect(queue.moveItem(userId, userId, d, a)).rejects.toMatchObject(notUpcoming);
+		expect(ids(await queue.getQueue(userId, userId))).toEqual([a, b, c, d]);
 	});
 
 	it("answers 404 for an unknown item or afterItemId, or another user's", async () => {
@@ -256,19 +264,21 @@ describe('move', () => {
 		const [theirs] = await addItems(1, other);
 		const [a, b] = await addItems(2);
 		const notFound = { statusCode: 404, code: 'QUEUE_ITEM_NOT_FOUND' };
-		await expect(queue.moveItem(userId, randomUUID(), null)).rejects.toMatchObject(notFound);
-		await expect(queue.moveItem(userId, theirs, null)).rejects.toMatchObject(notFound);
-		await expect(queue.moveItem(userId, a, theirs)).rejects.toMatchObject(notFound);
-		expect(ids(await queue.getQueue(userId))).toEqual([a, b]);
+		await expect(queue.moveItem(userId, userId, randomUUID(), null)).rejects.toMatchObject(
+			notFound
+		);
+		await expect(queue.moveItem(userId, userId, theirs, null)).rejects.toMatchObject(notFound);
+		await expect(queue.moveItem(userId, userId, a, theirs)).rejects.toMatchObject(notFound);
+		expect(ids(await queue.getQueue(userId, userId))).toEqual([a, b]);
 	});
 });
 
 describe('play, next and previous', () => {
 	it('plays any item of the caller', async () => {
 		const [a, b, c] = await addItems(3);
-		expect((await queue.playItem(userId, c)).currentItemId).toBe(c);
-		expect((await queue.playItem(userId, a)).currentItemId).toBe(a);
-		expect(ids(await queue.getQueue(userId))).toEqual([a, b, c]);
+		expect((await queue.playItem(userId, userId, c)).currentItemId).toBe(c);
+		expect((await queue.playItem(userId, userId, a)).currentItemId).toBe(a);
+		expect(ids(await queue.getQueue(userId, userId))).toEqual([a, b, c]);
 	});
 
 	it("answers 404 to play an unknown item or another user's", async () => {
@@ -276,41 +286,41 @@ describe('play, next and previous', () => {
 		const [theirs] = await addItems(1, other);
 		await addItems(1);
 		const notFound = { statusCode: 404, code: 'QUEUE_ITEM_NOT_FOUND' };
-		await expect(queue.playItem(userId, randomUUID())).rejects.toMatchObject(notFound);
-		await expect(queue.playItem(userId, theirs)).rejects.toMatchObject(notFound);
-		expect((await queue.getQueue(userId)).currentItemId).toBeNull();
-		expect((await queue.getQueue(other)).currentItemId).toBeNull();
+		await expect(queue.playItem(userId, userId, randomUUID())).rejects.toMatchObject(notFound);
+		await expect(queue.playItem(userId, userId, theirs)).rejects.toMatchObject(notFound);
+		expect((await queue.getQueue(userId, userId)).currentItemId).toBeNull();
+		expect((await queue.getQueue(other, other)).currentItemId).toBeNull();
 	});
 
 	it('steps to the first item from no current, then forward, then back', async () => {
 		const [a, b] = await addItems(2);
-		expect((await queue.step(userId, 'next')).currentItemId).toBe(a);
-		expect((await queue.step(userId, 'next')).currentItemId).toBe(b);
-		expect((await queue.step(userId, 'previous')).currentItemId).toBe(a);
+		expect((await queue.step(userId, userId, 'next')).currentItemId).toBe(a);
+		expect((await queue.step(userId, userId, 'next')).currentItemId).toBe(b);
+		expect((await queue.step(userId, userId, 'previous')).currentItemId).toBe(a);
 	});
 
 	it('answers 409 QUEUE_END with no next item', async () => {
 		const queueEnd = { statusCode: 409, code: 'QUEUE_END' };
-		await expect(queue.step(userId, 'next')).rejects.toMatchObject(queueEnd);
+		await expect(queue.step(userId, userId, 'next')).rejects.toMatchObject(queueEnd);
 		const [, b] = await addItems(2);
-		await queue.playItem(userId, b);
-		await expect(queue.step(userId, 'next')).rejects.toMatchObject(queueEnd);
+		await queue.playItem(userId, userId, b);
+		await expect(queue.step(userId, userId, 'next')).rejects.toMatchObject(queueEnd);
 	});
 
 	it('answers 409 QUEUE_START with no previous item or no current', async () => {
 		const queueStart = { statusCode: 409, code: 'QUEUE_START' };
 		const [a] = await addItems(2);
-		await expect(queue.step(userId, 'previous')).rejects.toMatchObject(queueStart);
-		await queue.playItem(userId, a);
-		await expect(queue.step(userId, 'previous')).rejects.toMatchObject(queueStart);
+		await expect(queue.step(userId, userId, 'previous')).rejects.toMatchObject(queueStart);
+		await queue.playItem(userId, userId, a);
+		await expect(queue.step(userId, userId, 'previous')).rejects.toMatchObject(queueStart);
 	});
 
 	it('keeps only the 50 most recent history items after a step forward', async () => {
 		const all = await addItems(53);
-		await queue.playItem(userId, all[50]); // 50 items of history, none dropped
-		expect((await queue.getQueue(userId)).items).toHaveLength(53);
+		await queue.playItem(userId, userId, all[50]); // 50 items of history, none dropped
+		expect((await queue.getQueue(userId, userId)).items).toHaveLength(53);
 
-		const state = await queue.step(userId, 'next');
+		const state = await queue.step(userId, userId, 'next');
 		expect(state.currentItemId).toBe(all[51]);
 		expect(ids(state)).toEqual(all.slice(1));
 	});
@@ -322,7 +332,7 @@ describe('rank rebalance', () => {
 	it('respaces the ranks when an add makes a key too long', async () => {
 		const [a, b] = await addItems(2);
 		await setRank(b, longRank);
-		const state = await queue.addItem(userId, dto());
+		const state = await queue.addItem(userId, userId, dto());
 		expect(ids(state).slice(0, 2)).toEqual([a, b]);
 		expect(state.items.every(item => item.rank.length <= 2)).toBe(true);
 		expectRanked(state);
@@ -332,7 +342,7 @@ describe('rank rebalance', () => {
 		const [a, b, c] = await addItems(3);
 		await setRank(a, '1');
 		await setRank(b, '1' + '0'.repeat(62) + '1'); // right above a: no room at 64 characters
-		const state = await queue.moveItem(userId, c, a);
+		const state = await queue.moveItem(userId, userId, c, a);
 		expect(ids(state)).toEqual([a, c, b]);
 		expect(state.items.every(item => item.rank.length <= 2)).toBe(true);
 		expectRanked(state);
@@ -378,20 +388,20 @@ describe('play a playlist', () => {
 
 	it('fills an empty queue with the playlist, in order, and plays its first track', async () => {
 		const playlist = await createPlaylist(3);
-		const state = await queue.playPlaylist(userId, playlist.id);
+		const state = await queue.playPlaylist(userId, userId, playlist.id);
 
 		expect(uris(state)).toEqual(playlist.uris);
 		expectBlock(state, playlist.id, 0, 3);
 		expect(state.currentItemId).toBe(state.items[0].id);
 		expectRanked(state);
-		expect(await queue.getQueue(userId)).toEqual(state);
+		expect(await queue.getQueue(userId, userId)).toEqual(state);
 	});
 
 	it('places the block after the current item and before the upcoming ones', async () => {
 		const [x, y, z] = await addItems(3);
-		await queue.playItem(userId, x);
+		await queue.playItem(userId, userId, x);
 		const playlist = await createPlaylist(2);
-		const state = await queue.playPlaylist(userId, playlist.id);
+		const state = await queue.playPlaylist(userId, userId, playlist.id);
 
 		expect(ids(state)[0]).toBe(x);
 		expect(ids(state).slice(3)).toEqual([y, z]);
@@ -404,7 +414,7 @@ describe('play a playlist', () => {
 	it('puts the block first when nothing is current', async () => {
 		const [y, z] = await addItems(2);
 		const playlist = await createPlaylist(2);
-		const state = await queue.playPlaylist(userId, playlist.id);
+		const state = await queue.playPlaylist(userId, userId, playlist.id);
 
 		expect(uris(state).slice(0, 2)).toEqual(playlist.uris);
 		expect(ids(state).slice(2)).toEqual([y, z]);
@@ -414,8 +424,8 @@ describe('play a playlist', () => {
 
 	it('adds a second, separate block when the same playlist is played again', async () => {
 		const playlist = await createPlaylist(2);
-		const first = await queue.playPlaylist(userId, playlist.id);
-		const state = await queue.playPlaylist(userId, playlist.id);
+		const first = await queue.playPlaylist(userId, userId, playlist.id);
+		const state = await queue.playPlaylist(userId, userId, playlist.id);
 
 		expect(ids(state).slice(0, 1)).toEqual(ids(first).slice(0, 1));
 		expect(uris(state)).toEqual([playlist.uris[0], ...playlist.uris, playlist.uris[1]]);
@@ -428,35 +438,35 @@ describe('play a playlist', () => {
 
 	it('answers 409 PLAYLIST_EMPTY for an empty playlist and changes nothing', async () => {
 		const [x] = await addItems(2);
-		await queue.playItem(userId, x);
-		const before = await queue.getQueue(userId);
+		await queue.playItem(userId, userId, x);
+		const before = await queue.getQueue(userId, userId);
 		const playlist = await createPlaylist(0);
 
-		await expect(queue.playPlaylist(userId, playlist.id)).rejects.toMatchObject({
+		await expect(queue.playPlaylist(userId, userId, playlist.id)).rejects.toMatchObject({
 			statusCode: 409,
 			code: 'PLAYLIST_EMPTY',
 		});
-		expect(await queue.getQueue(userId)).toEqual(before);
+		expect(await queue.getQueue(userId, userId)).toEqual(before);
 	});
 
 	it('answers 403 PLAYLIST_ACCESS_DENIED for a private playlist the caller cannot view', async () => {
 		await addItems(1);
-		const before = await queue.getQueue(userId);
+		const before = await queue.getQueue(userId, userId);
 		const playlist = await createPlaylist(1, 'private');
 
-		await expect(queue.playPlaylist(userId, playlist.id)).rejects.toMatchObject({
+		await expect(queue.playPlaylist(userId, userId, playlist.id)).rejects.toMatchObject({
 			statusCode: 403,
 			code: 'PLAYLIST_ACCESS_DENIED',
 		});
-		expect(await queue.getQueue(userId)).toEqual(before);
+		expect(await queue.getQueue(userId, userId)).toEqual(before);
 
 		// The owner can play their own private playlist.
-		expect(uris(await queue.playPlaylist(ownerId, playlist.id))).toEqual(playlist.uris);
+		expect(uris(await queue.playPlaylist(ownerId, ownerId, playlist.id))).toEqual(playlist.uris);
 	});
 
 	it('answers 404 when the playlist is deleted after the permission check', async () => {
 		await addItems(1);
-		const before = await queue.getQueue(userId);
+		const before = await queue.getQueue(userId, userId);
 		const playlist = await createPlaylist(1);
 		await playlists.deletePlaylist(playlist.id, ownerId);
 
@@ -464,26 +474,26 @@ describe('play a playlist', () => {
 			statusCode: 404,
 			code: 'PLAYLIST_NOT_FOUND',
 		});
-		expect(await queue.getQueue(userId)).toEqual(before);
+		expect(await queue.getQueue(userId, userId)).toEqual(before);
 	});
 
 	it('answers 404 PLAYLIST_NOT_FOUND for an unknown playlist', async () => {
 		await addItems(1);
-		const before = await queue.getQueue(userId);
-		await expect(queue.playPlaylist(userId, randomUUID())).rejects.toMatchObject({
+		const before = await queue.getQueue(userId, userId);
+		await expect(queue.playPlaylist(userId, userId, randomUUID())).rejects.toMatchObject({
 			statusCode: 404,
 			code: 'PLAYLIST_NOT_FOUND',
 		});
-		expect(await queue.getQueue(userId)).toEqual(before);
+		expect(await queue.getQueue(userId, userId)).toEqual(before);
 	});
 
 	it('respaces the ranks when the block makes a key too long, keeping the order', async () => {
 		const [x, y] = await addItems(2);
 		await setRank(x, '1');
 		await setRank(y, '1' + '0'.repeat(62) + '1'); // right above x: no room at 64 characters
-		await queue.playItem(userId, x);
+		await queue.playItem(userId, userId, x);
 		const playlist = await createPlaylist(3);
-		const state = await queue.playPlaylist(userId, playlist.id);
+		const state = await queue.playPlaylist(userId, userId, playlist.id);
 
 		expect(ids(state)[0]).toBe(x);
 		expect(uris(state).slice(1, 4)).toEqual(playlist.uris);
@@ -494,7 +504,7 @@ describe('play a playlist', () => {
 
 	it('keeps the order of a long playlist squeezed between two items', async () => {
 		const [x, y] = await addItems(2);
-		await queue.playItem(userId, x);
+		await queue.playItem(userId, userId, x);
 		const { id } = await playlists.createPlaylist(ownerId, { name: 'int-long' });
 		// 450 tracks seeded directly: rank_between halves the gap at each one,
 		// so a key passes rank_max_length() and the queue is respaced mid-block.
@@ -517,7 +527,7 @@ describe('play a playlist', () => {
 		);
 		if (linkError) throw linkError;
 
-		const state = await queue.playPlaylist(userId, id);
+		const state = await queue.playPlaylist(userId, userId, id);
 		expect(state.items).toHaveLength(count + 2);
 		expect(ids(state)[0]).toBe(x);
 		expect(ids(state)[count + 1]).toBe(y);
@@ -532,4 +542,59 @@ const toRow = (track: ReturnType<typeof dto>) => ({
 	title: track.title,
 	artist: track.artist,
 	duration_ms: track.durationMs,
+});
+
+describe('version', () => {
+	it('starts at 0 without a queue and grows by one with each add', async () => {
+		expect((await queue.getQueue(userId, userId)).version).toBe(0);
+		expect((await queue.addItem(userId, userId, dto())).version).toBe(1);
+		expect((await queue.addItem(userId, userId, dto())).version).toBe(2);
+	});
+
+	it('grows with every mutation', async () => {
+		const [a, b, c] = await addItems(3);
+		let version = (await queue.getQueue(userId, userId)).version;
+		const steps: Array<() => Promise<QueueState>> = [
+			() => queue.playItem(userId, userId, a),
+			() => queue.step(userId, userId, 'next'),
+			() => queue.step(userId, userId, 'previous'),
+			() => queue.moveItem(userId, userId, c, null),
+			() => queue.removeItem(userId, userId, b),
+		];
+		for (const step of steps) {
+			const next = (await step()).version;
+			expect(next).toBeGreaterThan(version);
+			version = next;
+		}
+	});
+
+	it('keeps the version when a mutation is refused', async () => {
+		const [a] = await addItems(1);
+		const before = await queue.getQueue(userId, userId);
+		await expect(queue.step(userId, userId, 'previous')).rejects.toMatchObject({
+			code: 'QUEUE_START',
+		});
+		await expect(queue.removeItem(userId, userId, randomUUID())).rejects.toMatchObject({
+			statusCode: 404,
+		});
+		await expect(queue.moveItem(userId, userId, a, randomUUID())).rejects.toMatchObject({
+			statusCode: 404,
+			code: 'QUEUE_ITEM_NOT_FOUND',
+		});
+		expect(await queue.getQueue(userId, userId)).toEqual(before);
+	});
+
+	it('gives each of two concurrent adds its own version', async () => {
+		const [first, second] = await Promise.all([
+			queue.addItem(userId, userId, dto()),
+			queue.addItem(userId, userId, dto()),
+		]);
+		expect(new Set([first.version, second.version]).size).toBe(2);
+		const last = first.version > second.version ? first : second;
+		expect(last.items).toHaveLength(2);
+	});
+
+	it('carries the owner id', async () => {
+		expect((await queue.addItem(userId, userId, dto())).ownerId).toBe(userId);
+	});
 });

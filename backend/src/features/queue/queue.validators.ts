@@ -7,6 +7,20 @@ import { addTrackSchema } from '@/features/playlists/playlist.validators.js';
  */
 export const addQueueItemSchema = addTrackSchema.omit({ previewUrl: true });
 
+/** Path segment of /api/users/:userId/queue routes. */
+export const queueOwnerParamsSchema = z.object({
+	userId: z.uuid('Invalid user ID format').optional(),
+});
+
+/**
+ * Body of the playback routes (play an item, next, previous, play a playlist):
+ * the owner's device that must play; a delegate must send it (#294).
+ */
+export const queuePlaybackSchema = z
+	.object({ deviceId: z.string().min(1).max(128).optional() })
+	.optional()
+	.transform(body => body ?? {});
+
 /** Path segment of /api/queue/items/:itemId routes. */
 export const queueItemParamsSchema = z.object({
 	itemId: z.uuid('Invalid queue item ID format'),
@@ -22,5 +36,26 @@ export const moveQueueItemSchema = z.object({
 	afterItemId: z.uuid('Invalid queue item ID format').nullable(),
 });
 
+const deviceIdSchema = z.string().min(1).max(128);
+
+/**
+ * Body of POST /api/queue/transfer (#295): play on a device of mine or of a
+ * friend. `playing` is an item of my queue or a track played outside it;
+ * `source` is the remote device that plays now, to be paused.
+ */
+export const transferSchema = z.object({
+	targetUserId: z.uuid('Invalid user ID format'),
+	targetDeviceId: deviceIdSchema,
+	positionMs: z.number().int().min(0).max(86_400_000),
+	playing: z.union([
+		z.object({ queueItemId: z.uuid('Invalid queue item ID format') }),
+		z.object({ track: addQueueItemSchema }),
+	]),
+	source: z
+		.object({ userId: z.uuid('Invalid user ID format'), deviceId: deviceIdSchema })
+		.optional(),
+});
+
 export type AddQueueItemInput = z.infer<typeof addQueueItemSchema>;
 export type MoveQueueItemInput = z.infer<typeof moveQueueItemSchema>;
+export type TransferInput = z.infer<typeof transferSchema>;

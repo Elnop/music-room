@@ -1,38 +1,18 @@
 import { useEffect, useCallback, useMemo, useState } from 'react';
 import { useSocketStore } from '@store/socketStore';
-import { usePlayerStore } from '@store/playerStore';
+import { usePlayerStore, readPositionMs } from '@store/playerStore';
 import { useAuthStore } from '@store/authStore';
+import { useQueueStore } from '@store/queueStore';
+import { useConnectStore } from '@store/connectStore';
 import { deviceService, type DeviceInfo } from '@/services/deviceService';
 import { musicControlApi } from '@/services/musicControlApi';
+import { acquireListening, releaseListening } from '@/services/listeningRooms';
+import { queueTrackToSoundCloud, trackToSoundCloud } from '@utils/trackToSoundCloud';
+import type { DeviceCommand } from '@/types/queue.types';
+import type { ListeningStatus, UserListeningStatus } from '@/types/listening.types';
 
-/**
- * Listening status for a single device
- */
-export interface ListeningStatus {
-	ownerId: string;
-	device: DeviceInfo;
-	track: {
-		id: number;
-		title: string;
-		artist: string;
-		artworkUrl: string | null;
-	} | null;
-	isPlaying: boolean;
-	updatedAt: string;
-}
-
-/**
- * Aggregated listening status for a user (all devices)
- */
-export interface UserListeningStatus {
-	ownerId: string;
-	devices: ListeningStatus[];
-}
-
-interface ControlCommand {
-	action: 'play' | 'pause';
-	fromUserId: string;
-}
+/** control:command received by this device: play / pause, or a queue playback (#294, #295). */
+type ControlCommand = DeviceCommand | { action: 'play'; fromUserId: string };
 
 interface PermissionChangedEvent {
 	ownerId: string;
@@ -53,6 +33,7 @@ export function useMusicControlEmitter() {
 
 	const currentTrack = usePlayerStore(state => state.currentTrack);
 	const isPlaying = usePlayerStore(state => state.isPlaying);
+	const seekCount = usePlayerStore(state => state.seekCount);
 	const pause = usePlayerStore(state => state.pause);
 	const resume = usePlayerStore(state => state.resume);
 
@@ -70,6 +51,7 @@ export function useMusicControlEmitter() {
 		if (!socket || !isConnected || !user || !deviceInfo) return;
 
 		const emitStatus = () => {
+			const position = readPositionMs();
 			const status = {
 				track: currentTrack
 					? {
@@ -80,6 +62,8 @@ export function useMusicControlEmitter() {
 						}
 					: null,
 				isPlaying,
+				positionMs:
+					position != null && Number.isFinite(position) ? Math.max(0, Math.round(position)) : 0,
 			};
 
 			socket.emit('listening:update', status);
@@ -96,7 +80,7 @@ export function useMusicControlEmitter() {
 		const timer = setTimeout(emitStatus, 200);
 
 		return () => clearTimeout(timer);
-	}, [socket, isConnected, user, deviceInfo, currentTrack, isPlaying]);
+	}, [socket, isConnected, user, deviceInfo, currentTrack, isPlaying, seekCount]);
 
 	useEffect(() => {
 		if (!socket || !isConnected) return;
@@ -104,10 +88,29 @@ export function useMusicControlEmitter() {
 		const handleControlCommand = (data: ControlCommand) => {
 			if (__DEV__) console.log('[MusicControl] Received control command:', data);
 
-			if (data.action === 'play') {
-				resume();
-			} else if (data.action === 'pause') {
-				pause();
+			switch (data.action) {
+				case 'play':
+					resume();
+					break;
+				case 'pause':
+					pause();
+					break;
+				case 'play-item': {
+					// This device plays its owner's queue: mine.
+					const { item, positionMs, version } = data;
+					usePlayerStore.getState().playTrack(trackToSoundCloud(item), item.id, positionMs);
+					const me = useAuthStore.getState().user?.id;
+					if (me) useQueueStore.getState().setCurrentItem(me, item.id, version);
+					// The phone plays again: it is no longer a remote.
+					useConnectStore.getState().setLocal();
+					break;
+				}
+				case 'play-track':
+					usePlayerStore
+						.getState()
+						.playTrack(queueTrackToSoundCloud(data.track), null, data.positionMs);
+					useConnectStore.getState().setLocal();
+					break;
 			}
 		};
 
@@ -122,7 +125,7 @@ export function useMusicControlEmitter() {
 /**
  * A friend's device as seen from their profile, with whether I may control it
  */
-export interface FriendDeviceStatus extends ListeningStatus {
+interface FriendDeviceStatus extends ListeningStatus {
 	controllable: boolean;
 }
 
@@ -247,8 +250,11 @@ export function useFriendListening(targetUserId: string | null) {
 		setIsLoading(true);
 		setError(null);
 
+		let subscribed = false;
 		const subscribeTimer = setTimeout(() => {
-			socket.emit('listening:subscribe', targetUserId);
+			// Shared with the remote target (useRemoteTarget): counted, not emitted directly.
+			acquireListening(socket, targetUserId);
+			subscribed = true;
 			if (__DEV__) console.log('[MusicControl] Subscribed to listening status of:', targetUserId);
 		}, 200);
 
@@ -274,8 +280,8 @@ export function useFriendListening(targetUserId: string | null) {
 			clearTimeout(subscribeTimer);
 			socket.off('listening:status', handleStatus);
 			socket.off('listening:error', handleError);
-			if (socket.connected) {
-				socket.emit('listening:unsubscribe', targetUserId);
+			if (subscribed) {
+				releaseListening(socket, targetUserId);
 				if (__DEV__) console.log('[MusicControl] Unsubscribed from:', targetUserId);
 			}
 		};

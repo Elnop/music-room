@@ -144,14 +144,14 @@ afterAll(async () => {
 describe('add', () => {
 	it('appends the track after the block last item, in the same block, and notifies', async () => {
 		const playlist = await createPlaylist(2);
-		await queue.playPlaylist(userId, playlist.id);
+		await queue.playPlaylist(userId, userId, playlist.id);
 		const standalone = dto();
-		const before = await queue.addItem(userId, standalone);
+		const before = await queue.addItem(userId, userId, standalone);
 		const blockId = before.items[0].blockId;
 		notifyQueueUpdate.mockClear();
 
 		const added = await addTrack(playlist.id);
-		const state = await queue.getQueue(userId);
+		const state = await queue.getQueue(userId, userId);
 
 		expect(uris(state)).toEqual([
 			...playlist.tracks.map(t => t.uri),
@@ -171,27 +171,37 @@ describe('add', () => {
 
 	it('leaves a finished block alone (its last item is current)', async () => {
 		const playlist = await createPlaylist(2);
-		await queue.playPlaylist(userId, playlist.id);
-		const before = await queue.step(userId, 'next');
+		await queue.playPlaylist(userId, userId, playlist.id);
+		const before = await queue.step(userId, userId, 'next');
 		notifyQueueUpdate.mockClear();
 
 		await addTrack(playlist.id);
 
-		expect(await queue.getQueue(userId)).toEqual(before);
+		expect(await queue.getQueue(userId, userId)).toEqual(before);
 		expect(notified()).toEqual([]);
 	});
 
 	it('leaves a finished block alone (its last item is history)', async () => {
 		const playlist = await createPlaylist(1);
-		await queue.playPlaylist(userId, playlist.id);
-		await queue.addItem(userId, dto());
-		const before = await queue.step(userId, 'next');
+		await queue.playPlaylist(userId, userId, playlist.id);
+		await queue.addItem(userId, userId, dto());
+		const before = await queue.step(userId, userId, 'next');
 		notifyQueueUpdate.mockClear();
 
 		await addTrack(playlist.id);
 
-		expect(await queue.getQueue(userId)).toEqual(before);
+		expect(await queue.getQueue(userId, userId)).toEqual(before);
 		expect(notified()).toEqual([]);
+	});
+
+	it('bumps the version of a queue it changes', async () => {
+		const playlist = await createPlaylist(2);
+		await queue.playPlaylist(userId, userId, playlist.id);
+		const before = await queue.getQueue(userId, userId);
+
+		await addTrack(playlist.id);
+
+		expect((await queue.getQueue(userId, userId)).version).toBeGreaterThan(before.version);
 	});
 });
 
@@ -199,12 +209,12 @@ describe('add after a remove that kept the current item', () => {
 	it('appends the re-added track to the block', async () => {
 		const playlist = await createPlaylist(2);
 		const [t1, t2] = playlist.tracks;
-		await queue.playPlaylist(userId, playlist.id);
+		await queue.playPlaylist(userId, userId, playlist.id);
 		await playlistTracks.removeTrack(playlist.id, ownerId, t1.id); // t1 is current: kept
 		notifyQueueUpdate.mockClear();
 
 		await addTrack(playlist.id, { trackUri: t1.uri, title: 'T', artist: 'A', durationMs: 1000 });
-		const state = await queue.getQueue(userId);
+		const state = await queue.getQueue(userId, userId);
 
 		expect(uris(state)).toEqual([t1.uri, t2.uri, t1.uri]);
 		expect(current(state)).toBe(t1.uri);
@@ -221,16 +231,16 @@ describe('rank rebalance during a sync', () => {
 	it('compares the next block against the rebalanced current item', async () => {
 		const playlist = await createPlaylist(3);
 		const [t1, t2, t3] = playlist.tracks;
-		await queue.playPlaylist(userId, playlist.id); // block A
-		await queue.playPlaylist(userId, playlist.id); // block B after a1
-		await queue.step(userId, 'next');
-		const seeded = await queue.step(userId, 'next'); // b3 current: B finished
+		await queue.playPlaylist(userId, userId, playlist.id); // block A
+		await queue.playPlaylist(userId, userId, playlist.id); // block B after a1
+		await queue.step(userId, userId, 'next');
+		const seeded = await queue.step(userId, userId, 'next'); // b3 current: B finished
 		// a1, b1, b2, b3 (current), a2, a3: an append after a3 needs a long key.
 		const ranks = ['1', '2', '3', '4', '5', '5' + '0'.repeat(63) + '1'];
 		for (const [i, item] of seeded.items.entries()) await setRank(item.id, ranks[i]);
 
 		const added = await addTrack(playlist.id);
-		const state = await queue.getQueue(userId);
+		const state = await queue.getQueue(userId, userId);
 
 		expect(uris(state)).toEqual([t1.uri, t1.uri, t2.uri, t3.uri, t2.uri, t3.uri, added.uri]);
 		expect(state.currentItemId).toBe(seeded.currentItemId);
@@ -242,17 +252,17 @@ describe('rank rebalance during a sync', () => {
 	it('does not move the current item after a rebalance', async () => {
 		const playlist = await createPlaylist(4);
 		const [t1, t2, t3, t4] = playlist.tracks;
-		await queue.playPlaylist(userId, playlist.id); // block A
-		await queue.playPlaylist(userId, playlist.id); // block B after a1
-		await queue.step(userId, 'next');
-		await queue.step(userId, 'next');
-		const seeded = await queue.step(userId, 'next'); // b4 current
+		await queue.playPlaylist(userId, userId, playlist.id); // block A
+		await queue.playPlaylist(userId, userId, playlist.id); // block B after a1
+		await queue.step(userId, userId, 'next');
+		await queue.step(userId, userId, 'next');
+		const seeded = await queue.step(userId, userId, 'next'); // b4 current
 		// a1, b1..b4 (b4 current), a2, a3, a4: moving a4 after a2 needs a long key.
 		const ranks = ['1', '2', '3', '4', '5', '6', '6' + '0'.repeat(62) + '1', '7'];
 		for (const [i, item] of seeded.items.entries()) await setRank(item.id, ranks[i]);
 
 		await moveTrack(playlist.id, t4.id, t2.id); // playlist: t1, t2, t4, t3
-		const state = await queue.getQueue(userId);
+		const state = await queue.getQueue(userId, userId);
 
 		expect(uris(state)).toEqual([t1.uri, t1.uri, t2.uri, t3.uri, t4.uri, t2.uri, t4.uri, t3.uri]);
 		expect(state.currentItemId).toBe(seeded.currentItemId);
@@ -267,11 +277,11 @@ describe('rank rebalance during a sync', () => {
 describe('remove', () => {
 	it('deletes the upcoming block item of the track', async () => {
 		const playlist = await createPlaylist(3);
-		await queue.playPlaylist(userId, playlist.id);
+		await queue.playPlaylist(userId, userId, playlist.id);
 		notifyQueueUpdate.mockClear();
 
 		await playlistTracks.removeTrack(playlist.id, ownerId, playlist.tracks[2].id);
-		const state = await queue.getQueue(userId);
+		const state = await queue.getQueue(userId, userId);
 
 		expect(uris(state)).toEqual(playlist.tracks.slice(0, 2).map(t => t.uri));
 		expect(state.items.every(item => !item.blockDetached)).toBe(true);
@@ -280,24 +290,24 @@ describe('remove', () => {
 
 	it('keeps the current item', async () => {
 		const playlist = await createPlaylist(3);
-		const before = await queue.playPlaylist(userId, playlist.id);
+		const before = await queue.playPlaylist(userId, userId, playlist.id);
 		notifyQueueUpdate.mockClear();
 
 		await playlistTracks.removeTrack(playlist.id, ownerId, playlist.tracks[0].id);
 
-		expect(await queue.getQueue(userId)).toEqual(before);
+		expect(await queue.getQueue(userId, userId)).toEqual(before);
 		expect(notified()).toEqual([]);
 	});
 
 	it('keeps history items', async () => {
 		const playlist = await createPlaylist(3);
-		await queue.playPlaylist(userId, playlist.id);
-		const before = await queue.step(userId, 'next');
+		await queue.playPlaylist(userId, userId, playlist.id);
+		const before = await queue.step(userId, userId, 'next');
 		notifyQueueUpdate.mockClear();
 
 		await playlistTracks.removeTrack(playlist.id, ownerId, playlist.tracks[0].id);
 
-		expect(await queue.getQueue(userId)).toEqual(before);
+		expect(await queue.getQueue(userId, userId)).toEqual(before);
 		expect(notified()).toEqual([]);
 	});
 });
@@ -306,11 +316,11 @@ describe('move', () => {
 	it('moves an upcoming block item to match the playlist order', async () => {
 		const playlist = await createPlaylist(4);
 		const [t1, t2, t3, t4] = playlist.tracks;
-		await queue.playPlaylist(userId, playlist.id);
+		await queue.playPlaylist(userId, userId, playlist.id);
 		notifyQueueUpdate.mockClear();
 
 		await moveTrack(playlist.id, t4.id, t2.id);
-		const state = await queue.getQueue(userId);
+		const state = await queue.getQueue(userId, userId);
 
 		expect(uris(state)).toEqual([t1.uri, t2.uri, t4.uri, t3.uri]);
 		expect(current(state)).toBe(t1.uri);
@@ -323,14 +333,14 @@ describe('move', () => {
 		const playlist = await createPlaylist(3);
 		const [t1, t2, t3] = playlist.tracks;
 		const standalone = dto();
-		await queue.addItem(userId, standalone);
-		const playing = await queue.step(userId, 'next');
-		await queue.playPlaylist(userId, playlist.id); // after the standalone item
-		await queue.playItem(userId, playing.items[0].id); // the whole block is upcoming again
+		await queue.addItem(userId, userId, standalone);
+		const playing = await queue.step(userId, userId, 'next');
+		await queue.playPlaylist(userId, userId, playlist.id); // after the standalone item
+		await queue.playItem(userId, userId, playing.items[0].id); // the whole block is upcoming again
 		notifyQueueUpdate.mockClear();
 
 		await moveTrack(playlist.id, t3.id, null);
-		const state = await queue.getQueue(userId);
+		const state = await queue.getQueue(userId, userId);
 
 		expect(uris(state)).toEqual([standalone.trackUri, t3.uri, t1.uri, t2.uri]);
 		expect(current(state)).toBe(standalone.trackUri);
@@ -342,10 +352,10 @@ describe('move', () => {
 		const playlist = await createPlaylist(3);
 		const [t1, t2, t3] = playlist.tracks;
 		const standalone = dto();
-		await queue.addItem(userId, standalone);
-		const playing = await queue.step(userId, 'next');
-		const played = await queue.playPlaylist(userId, playlist.id);
-		await queue.playItem(userId, playing.items[0].id);
+		await queue.addItem(userId, userId, standalone);
+		const playing = await queue.step(userId, userId, 'next');
+		const played = await queue.playPlaylist(userId, userId, playlist.id);
+		await queue.playItem(userId, userId, playing.items[0].id);
 		// t1's block item is gone, as a history trim would leave it.
 		const { error } = await supabaseAdmin
 			.from('play_queue_items')
@@ -355,7 +365,7 @@ describe('move', () => {
 		notifyQueueUpdate.mockClear();
 
 		await moveTrack(playlist.id, t3.id, t1.id); // playlist: t1, t3, t2
-		const state = await queue.getQueue(userId);
+		const state = await queue.getQueue(userId, userId);
 
 		expect(uris(state)).toEqual([standalone.trackUri, t3.uri, t2.uri]);
 		expectRanked(state);
@@ -365,38 +375,38 @@ describe('move', () => {
 	it('leaves the current item where it is', async () => {
 		const playlist = await createPlaylist(3);
 		const [t1, , t3] = playlist.tracks;
-		const before = await queue.playPlaylist(userId, playlist.id);
+		const before = await queue.playPlaylist(userId, userId, playlist.id);
 		notifyQueueUpdate.mockClear();
 
 		await moveTrack(playlist.id, t1.id, t3.id);
 
-		expect(await queue.getQueue(userId)).toEqual(before);
+		expect(await queue.getQueue(userId, userId)).toEqual(before);
 		expect(notified()).toEqual([]);
 	});
 
 	it('does not move an upcoming item into the history', async () => {
 		const playlist = await createPlaylist(3);
 		const [, , t3] = playlist.tracks;
-		await queue.playPlaylist(userId, playlist.id);
-		const before = await queue.step(userId, 'next'); // t1 history, t2 current
+		await queue.playPlaylist(userId, userId, playlist.id);
+		const before = await queue.step(userId, userId, 'next'); // t1 history, t2 current
 		notifyQueueUpdate.mockClear();
 
 		await moveTrack(playlist.id, t3.id, null); // its new place is before t1
 
-		expect(await queue.getQueue(userId)).toEqual(before);
+		expect(await queue.getQueue(userId, userId)).toEqual(before);
 		expect(notified()).toEqual([]);
 	});
 
 	it('does not move a history item', async () => {
 		const playlist = await createPlaylist(3);
 		const [t1, , t3] = playlist.tracks;
-		await queue.playPlaylist(userId, playlist.id);
-		const before = await queue.step(userId, 'next');
+		await queue.playPlaylist(userId, userId, playlist.id);
+		const before = await queue.step(userId, userId, 'next');
 		notifyQueueUpdate.mockClear();
 
 		await moveTrack(playlist.id, t1.id, t3.id);
 
-		expect(await queue.getQueue(userId)).toEqual(before);
+		expect(await queue.getQueue(userId, userId)).toEqual(before);
 		expect(notified()).toEqual([]);
 	});
 });
@@ -405,8 +415,8 @@ describe('detached block', () => {
 	it('is never synced', async () => {
 		const playlist = await createPlaylist(4);
 		const [t1, t2, t3] = playlist.tracks;
-		const played = await queue.playPlaylist(userId, playlist.id);
-		const before = await queue.removeItem(userId, played.items[3].id); // detaches the block
+		const played = await queue.playPlaylist(userId, userId, playlist.id);
+		const before = await queue.removeItem(userId, userId, played.items[3].id); // detaches the block
 		notifyQueueUpdate.mockClear();
 
 		await addTrack(playlist.id);
@@ -414,7 +424,7 @@ describe('detached block', () => {
 		await moveTrack(playlist.id, t3.id, t1.id);
 		await moveTrack(playlist.id, t3.id, null);
 
-		expect(await queue.getQueue(userId)).toEqual(before);
+		expect(await queue.getQueue(userId, userId)).toEqual(before);
 		expect(uris(before)).toEqual([t1.uri, t2.uri, t3.uri]);
 		expect(notified()).toEqual([]);
 	});
@@ -431,26 +441,26 @@ describe('access to the playlist', () => {
 
 	it('stops syncing a user who can no longer view the playlist', async () => {
 		const playlist = await createPlaylist(2);
-		const before = await queue.playPlaylist(userId, playlist.id);
+		const before = await queue.playPlaylist(userId, userId, playlist.id);
 		await setAccess(playlist.id, { visibility: 'private' });
 		notifyQueueUpdate.mockClear();
 
 		await addTrack(playlist.id);
 		await playlistTracks.removeTrack(playlist.id, ownerId, playlist.tracks[1].id);
 
-		expect(await queue.getQueue(userId)).toEqual(before);
+		expect(await queue.getQueue(userId, userId)).toEqual(before);
 		expect(notified()).toEqual([]);
 	});
 
 	it('keeps syncing a viewer of a private playlist', async () => {
 		const playlist = await createPlaylist(2);
-		await queue.playPlaylist(userId, playlist.id);
+		await queue.playPlaylist(userId, userId, playlist.id);
 		await setAccess(playlist.id, { visibility: 'private', viewer_ids: [userId] });
 		notifyQueueUpdate.mockClear();
 
 		const added = await addTrack(playlist.id);
 
-		expect(uris(await queue.getQueue(userId))).toEqual([
+		expect(uris(await queue.getQueue(userId, userId))).toEqual([
 			...playlist.tracks.map(t => t.uri),
 			added.uri,
 		]);
@@ -463,18 +473,18 @@ describe('several users and blocks', () => {
 		const otherId = await createUser();
 		const bystanderId = await createUser();
 		const playlist = await createPlaylist(2);
-		await queue.playPlaylist(userId, playlist.id);
-		await queue.playPlaylist(otherId, playlist.id);
-		await queue.playPlaylist(otherId, playlist.id); // a second block for otherId
-		await queue.addItem(bystanderId, dto());
+		await queue.playPlaylist(userId, userId, playlist.id);
+		await queue.playPlaylist(otherId, otherId, playlist.id);
+		await queue.playPlaylist(otherId, otherId, playlist.id); // a second block for otherId
+		await queue.addItem(bystanderId, bystanderId, dto());
 		notifyQueueUpdate.mockClear();
 
 		const added = await addTrack(playlist.id);
 
-		const mine = await queue.getQueue(userId);
+		const mine = await queue.getQueue(userId, userId);
 		expect(uris(mine)).toEqual([...playlist.tracks.map(t => t.uri), added.uri]);
 
-		const other = await queue.getQueue(otherId);
+		const other = await queue.getQueue(otherId, otherId);
 		const blocks = new Map<string, string[]>();
 		for (const item of other.items) {
 			const key = item.blockId ?? 'none';
@@ -493,14 +503,16 @@ describe('several users and blocks', () => {
 		const otherId = await createUser();
 		const playlist = await createPlaylist(4);
 		const [t1, t2, t3, t4] = playlist.tracks;
-		await queue.playPlaylist(userId, playlist.id);
-		await queue.playPlaylist(otherId, playlist.id);
-		await queue.playPlaylist(otherId, playlist.id); // a second block for otherId
+		await queue.playPlaylist(userId, userId, playlist.id);
+		await queue.playPlaylist(otherId, otherId, playlist.id);
+		await queue.playPlaylist(otherId, otherId, playlist.id); // a second block for otherId
 		notifyQueueUpdate.mockClear();
 
 		await moveTrack(playlist.id, t4.id, t2.id);
-		expect(blocksOf(await queue.getQueue(userId))).toEqual([[t1.uri, t2.uri, t4.uri, t3.uri]]);
-		const moved = await queue.getQueue(otherId);
+		expect(blocksOf(await queue.getQueue(userId, userId))).toEqual([
+			[t1.uri, t2.uri, t4.uri, t3.uri],
+		]);
+		const moved = await queue.getQueue(otherId, otherId);
 		expect(blocksOf(moved)).toEqual([
 			[t1.uri, t2.uri, t4.uri, t3.uri],
 			[t1.uri, t2.uri, t4.uri, t3.uri],
@@ -510,8 +522,8 @@ describe('several users and blocks', () => {
 		notifyQueueUpdate.mockClear();
 
 		await playlistTracks.removeTrack(playlist.id, ownerId, t2.id);
-		expect(blocksOf(await queue.getQueue(userId))).toEqual([[t1.uri, t4.uri, t3.uri]]);
-		expect(blocksOf(await queue.getQueue(otherId))).toEqual([
+		expect(blocksOf(await queue.getQueue(userId, userId))).toEqual([[t1.uri, t4.uri, t3.uri]]);
+		expect(blocksOf(await queue.getQueue(otherId, otherId))).toEqual([
 			[t1.uri, t4.uri, t3.uri],
 			[t1.uri, t4.uri, t3.uri],
 		]);
@@ -523,7 +535,7 @@ describe('sync failure', () => {
 	it('logs the error and never fails the playlist operation', async () => {
 		const playlist = await createPlaylist(3);
 		const [t1, t2, t3] = playlist.tracks;
-		const before = await queue.playPlaylist(userId, playlist.id);
+		const before = await queue.playPlaylist(userId, userId, playlist.id);
 		notifyQueueUpdate.mockClear();
 
 		const realRpc = supabaseAdmin.rpc.bind(supabaseAdmin);
@@ -559,7 +571,7 @@ describe('sync failure', () => {
 			);
 		}
 		logError.mockRestore();
-		expect(await queue.getQueue(userId)).toEqual(before);
+		expect(await queue.getQueue(userId, userId)).toEqual(before);
 		expect(notified()).toEqual([]);
 	});
 });

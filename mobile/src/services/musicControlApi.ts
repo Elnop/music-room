@@ -2,6 +2,7 @@ import { useAuthStore } from '@/store/authStore';
 import { apiRequest } from '@services/api';
 import type {
 	ControllableDevicesResponse,
+	DevicePickerResponse,
 	GrantDeviceLicenseResponse,
 	MyDevicesResponse,
 	RevokeDeviceLicenseResponse,
@@ -105,6 +106,15 @@ export const musicControlApi = {
 			`/api/music-control/users/${encodeURIComponent(userId)}/devices`,
 			{ headers: await authHeaders() }
 		);
+	},
+
+	/**
+	 * Devices the player can play on (#298): mine, then my friends' I may control, with their online state
+	 */
+	async getDevicePicker(): Promise<DevicePickerResponse> {
+		return apiRequest<DevicePickerResponse>('/api/music-control/controllable-devices', {
+			headers: await authHeaders(),
+		});
 	},
 
 	/**

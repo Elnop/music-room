@@ -4,7 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { usePlayerStore } from '@store/playerStore';
-import { selectPlaysPlaylist, useQueueStore } from '@store/queueStore';
+import { useActiveQueue, useQueueStore } from '@store/queueStore';
+import { selectPlaysPlaylist } from '@store/queueSelectors';
 import { showInfo } from '@utils/toast';
 import type { Theme } from '@themes/types';
 
@@ -32,7 +33,7 @@ export function PlayPlaylistButton({ playlistId, trackCount }: PlayPlaylistButto
 	const pause = usePlayerStore(state => state.pause);
 	const resume = usePlayerStore(state => state.resume);
 	const playPlaylist = useQueueStore(state => state.playPlaylist);
-	const fromPlaylist = useQueueStore(state => selectPlaysPlaylist(state, queueItemId, playlistId));
+	const fromPlaylist = selectPlaysPlaylist(useActiveQueue(), queueItemId, playlistId);
 	const [pending, setPending] = React.useState(false);
 	// Guards a second tap before the re-render that disables the button.
 	const pendingRef = React.useRef(false);

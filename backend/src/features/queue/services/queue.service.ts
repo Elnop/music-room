@@ -5,6 +5,11 @@ import {
 	canViewPlaylist,
 	getPlaylistForPermissionCheck,
 } from '@/features/playlists/permissions/playlist.permissions.js';
+import {
+	assertCanManageQueue,
+	resolvePlaybackDevice,
+} from '@/features/queue/permissions/queue.permissions.js';
+import { sendPlayCommand } from '@/features/queue/utils/queue-play-command.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import {
 	addQueueItemRpc,
@@ -18,57 +23,124 @@ import {
 import type { QueueState, QueueStepDirection } from '@/features/queue/queue.types.js';
 
 /**
- * The caller's play queue, mutated only through the functions of migration
- * 021 (serialized per user). Every mutation sends the new state to all of the
- * user's devices as `queue:updated`.
+ * The play queue of ownerId, read or changed by its owner or a delegate
+ * (#294), mutated only through the functions of migration 021 (serialized per
+ * owner). Every mutation sends the new state to all of the owner's devices as
+ * `queue:updated`; playback actions also tell the chosen device to play.
  */
 export class QueueService {
-	getQueue(userId: string): Promise<QueueState> {
-		return getQueueRpc(userId);
+	async getQueue(actorId: string, ownerId: string): Promise<QueueState> {
+		await assertCanManageQueue(actorId, ownerId);
+		return getQueueRpc(ownerId);
 	}
 
-	async addItem(userId: string, track: TrackUpsertInput): Promise<QueueState> {
+	async addItem(actorId: string, ownerId: string, track: TrackUpsertInput): Promise<QueueState> {
+		await assertCanManageQueue(actorId, ownerId);
 		// previewUrl is a stream URL: never persisted from a queue add.
 		const trackRow = await upsertTrack({ ...track, previewUrl: undefined });
-		return this.publish(userId, 'add', await addQueueItemRpc(userId, trackRow.id));
+		return this.publish(actorId, ownerId, 'add', await addQueueItemRpc(ownerId, trackRow.id));
 	}
 
-	async removeItem(userId: string, itemId: string): Promise<QueueState> {
-		return this.publish(userId, 'remove', await removeQueueItemRpc(userId, itemId));
+	async removeItem(actorId: string, ownerId: string, itemId: string): Promise<QueueState> {
+		await assertCanManageQueue(actorId, ownerId);
+		return this.publish(actorId, ownerId, 'remove', await removeQueueItemRpc(ownerId, itemId));
 	}
 
-	async moveItem(userId: string, itemId: string, afterItemId: string | null): Promise<QueueState> {
-		return this.publish(userId, 'move', await moveQueueItemRpc(userId, itemId, afterItemId));
+	async moveItem(
+		actorId: string,
+		ownerId: string,
+		itemId: string,
+		afterItemId: string | null
+	): Promise<QueueState> {
+		await assertCanManageQueue(actorId, ownerId);
+		return this.publish(
+			actorId,
+			ownerId,
+			'move',
+			await moveQueueItemRpc(ownerId, itemId, afterItemId)
+		);
 	}
 
-	async playItem(userId: string, itemId: string): Promise<QueueState> {
-		return this.publish(userId, 'play', await playQueueItemRpc(userId, itemId));
+	async playItem(
+		actorId: string,
+		ownerId: string,
+		itemId: string,
+		deviceId?: string
+	): Promise<QueueState> {
+		const device = await this.playbackDevice(actorId, ownerId, deviceId);
+		const state = await playQueueItemRpc(ownerId, itemId);
+		return this.play(actorId, ownerId, 'play', state, device);
 	}
 
 	/**
 	 * Copies the playlist's tracks into the queue as a new block right after
 	 * the current item and plays its first item (#277).
 	 */
-	async playPlaylist(userId: string, playlistId: string): Promise<QueueState> {
+	async playPlaylist(
+		actorId: string,
+		ownerId: string,
+		playlistId: string,
+		deviceId?: string
+	): Promise<QueueState> {
+		const device = await this.playbackDevice(actorId, ownerId, deviceId);
+		// The actor chooses the playlist: its visibility is checked for them (#294).
 		const playlist = await getPlaylistForPermissionCheck(playlistId);
-		if (!canViewPlaylist(playlist, userId)) {
+		if (!canViewPlaylist(playlist, actorId)) {
 			throw new AppError(403, 'Access denied', 'PLAYLIST_ACCESS_DENIED');
 		}
-		return this.publish(userId, 'play-playlist', await playPlaylistRpc(userId, playlistId));
+		const state = await playPlaylistRpc(ownerId, playlistId);
+		return this.play(actorId, ownerId, 'play-playlist', state, device);
 	}
 
-	async step(userId: string, direction: QueueStepDirection): Promise<QueueState> {
-		return this.publish(userId, direction, await stepQueueRpc(userId, direction));
+	async step(
+		actorId: string,
+		ownerId: string,
+		direction: QueueStepDirection,
+		deviceId?: string
+	): Promise<QueueState> {
+		const device = await this.playbackDevice(actorId, ownerId, deviceId);
+		const state = await stepQueueRpc(ownerId, direction);
+		return this.play(actorId, ownerId, direction, state, device);
 	}
 
-	private publish(userId: string, operation: string, state: QueueState): QueueState {
+	/** Access to the queue, then the device that must play: both before any change. */
+	private async playbackDevice(
+		actorId: string,
+		ownerId: string,
+		deviceId: string | undefined
+	): Promise<string | null> {
+		await assertCanManageQueue(actorId, ownerId);
+		return resolvePlaybackDevice(actorId, ownerId, deviceId);
+	}
+
+	/** Publishes the state, then tells the target device to play its current item. */
+	private play(
+		actorId: string,
+		ownerId: string,
+		operation: string,
+		state: QueueState,
+		deviceId: string | null
+	): QueueState {
+		this.publish(actorId, ownerId, operation, state);
+		if (deviceId) sendPlayCommand(actorId, ownerId, deviceId, state);
+		return state;
+	}
+
+	private publish(
+		actorId: string,
+		ownerId: string,
+		operation: string,
+		state: QueueState
+	): QueueState {
 		logger.info('Queue updated', {
-			userId,
+			actorId,
+			ownerId,
 			operation,
 			items: state.items.length,
 			currentItemId: state.currentItemId,
+			version: state.version,
 		});
-		realtime.notifyQueueUpdate(userId, state);
+		realtime.notifyQueueUpdate(ownerId, state);
 		return state;
 	}
 }

@@ -19,6 +19,7 @@ import type { PlaylistUpdatedPayload } from '@/features/playlists/playlist.types
 import type { QueueState } from '@/features/queue/queue.types.js';
 import { controlAccessService } from '@/features/music-control/services/control-access.service.js';
 import type {
+	DeviceCommand,
 	ListeningStatus,
 	UserListeningStatus,
 } from '@/features/music-control/music-control.types.js';
@@ -270,14 +271,16 @@ class RealtimeService {
 		}
 
 		const { userId: myUserId } = socketInfo;
-
-		// Access to at least one device shows the status of all of them.
-		const canControl = await controlAccessService.canControlAnyDevice(myUserId, targetUserId);
-		if (!canControl) {
+		const denyListening = () =>
 			socket.emit('listening:error', {
 				message: "Not authorized to view this user's listening status",
 				code: 'NOT_AUTHORIZED',
 			});
+
+		// Access to at least one device shows the status of all of them.
+		const canControl = await controlAccessService.canControlAnyDevice(myUserId, targetUserId);
+		if (!canControl) {
+			denyListening();
 			return;
 		}
 
@@ -288,10 +291,7 @@ class RealtimeService {
 		// found nothing to evict: re-check now that the socket is in the room.
 		if (!(await controlAccessService.canControlAnyDevice(myUserId, targetUserId))) {
 			void socket.leave(room);
-			socket.emit('listening:error', {
-				message: "Not authorized to view this user's listening status",
-				code: 'NOT_AUTHORIZED',
-			});
+			denyListening();
 			return;
 		}
 
@@ -493,6 +493,7 @@ class RealtimeService {
 			device: socket.data.device,
 			track: data.track,
 			isPlaying: data.isPlaying,
+			positionMs: data.positionMs ?? null,
 			updatedAt: new Date().toISOString(),
 		};
 		userDevices.set(deviceId, status);
@@ -575,8 +576,9 @@ class RealtimeService {
 	}
 
 	/**
-	 * Send a user's whole play queue to all of their devices (`user:<id>`)
-	 * after any change to it (#273). Other users never receive it.
+	 * Send a user's whole play queue after any change to it (#273): to all of
+	 * their devices (`user:<id>`) and to the delegates watching them
+	 * (`listening:<id>`, #294). One emit, so a socket in both rooms gets it once.
 	 */
 	notifyQueueUpdate(userId: string, state: QueueState): void {
 		if (!this.io) {
@@ -588,14 +590,34 @@ class RealtimeService {
 			return;
 		}
 
-		this.io.to(`user:${userId}`).emit('queue:updated', state);
+		const rooms = [`user:${userId}`, listeningRoom(userId)];
+		this.io.to(rooms).emit('queue:updated', state);
 
 		socketLogger.broadcast('queue_updated', {
 			userId,
 			items: state.items.length,
-			room: `user:${userId}`,
+			version: state.version,
+			room: rooms.join(','),
 			action: 'broadcasted',
 		});
+	}
+
+	/**
+	 * Send one control command to one of ownerId's devices (#294, #295). False
+	 * when the device has no socket any more.
+	 */
+	sendDeviceCommand(ownerId: string, deviceId: string, command: DeviceCommand): boolean {
+		const socketId = this.deviceToSocket.get(`${ownerId}:${deviceId}`);
+		if (!socketId || !this.io) return false;
+		this.io.to(socketId).emit('control:command', command);
+		socketLogger.broadcast('queue_play_command', {
+			ownerId,
+			deviceId,
+			fromUserId: command.fromUserId,
+			command: command.action,
+			action: 'command_sent',
+		});
+		return true;
 	}
 
 	/**
@@ -662,6 +684,11 @@ class RealtimeService {
 		const userDevices = this.listeningStatuses.get(userId);
 		const devices = userDevices ? Array.from(userDevices.values()) : [];
 		return { ownerId: userId, devices };
+	}
+
+	/** Whether a device of userId has a connected socket (#294). */
+	isDeviceOnline(userId: string, deviceId: string): boolean {
+		return this.deviceToSocket.has(`${userId}:${deviceId}`);
 	}
 }
 

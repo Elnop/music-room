@@ -4,10 +4,12 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { QueueState, QueueStepDirection } from '@/features/queue/queue.types.js';
 
-// Calls the queue functions of migrations 021 and 022, which all return the full queue
+// Calls the queue functions of migrations 021, 022 and 025, which all return the full queue
 // state, and turns their RAISE EXCEPTION codes into API errors.
 
 const queueStateSchema: z.ZodType<QueueState> = z.object({
+	ownerId: z.uuid(),
+	version: z.number().int().nonnegative(),
 	currentItemId: z.uuid().nullable(),
 	items: z.array(
 		z.object({
@@ -38,6 +40,7 @@ const ERRORS: Record<string, { status: number; message: string }> = {
 	QUEUE_START: { status: 409, message: 'No previous item in the queue' },
 	PLAYLIST_NOT_FOUND: { status: 404, message: 'Playlist not found' },
 	PLAYLIST_EMPTY: { status: 409, message: 'The playlist has no track to play' },
+	QUEUE_BLOCK_EMPTY: { status: 409, message: 'Nothing to transfer' },
 };
 
 function toAppError(operation: string, message: string): AppError {
@@ -56,6 +59,16 @@ async function call(operation: string, request: PromiseLike<RpcResponse>): Promi
 	const { data, error } = await request;
 	if (error) throw toAppError(operation, error.message);
 	const parsed = queueStateSchema.safeParse(data);
+	if (!parsed.success) throw toAppError(operation, `malformed ${operation} result`);
+	return parsed.data;
+}
+
+const trackIdsSchema = z.array(z.uuid());
+
+async function callIds(operation: string, request: PromiseLike<RpcResponse>): Promise<string[]> {
+	const { data, error } = await request;
+	if (error) throw toAppError(operation, error.message);
+	const parsed = trackIdsSchema.safeParse(data);
 	if (!parsed.success) throw toAppError(operation, `malformed ${operation} result`);
 	return parsed.data;
 }
@@ -105,5 +118,29 @@ export function playPlaylistRpc(userId: string, playlistId: string): Promise<Que
 	return call(
 		'play-playlist',
 		supabaseAdmin.rpc('queue_play_playlist', { p_user: userId, p_playlist_id: playlistId })
+	);
+}
+
+/** The track of the item, then those of the items that follow it, in queue order. */
+export function trackIdsFromRpc(userId: string, itemId: string): Promise<string[]> {
+	return callIds(
+		'track-ids-from',
+		supabaseAdmin.rpc('queue_track_ids_from', { p_user: userId, p_item_id: itemId })
+	);
+}
+
+/** The tracks after the current item (all of them when nothing is current). */
+export function upcomingTrackIdsRpc(userId: string): Promise<string[]> {
+	return callIds(
+		'track-ids-upcoming',
+		supabaseAdmin.rpc('queue_track_ids_upcoming', { p_user: userId })
+	);
+}
+
+/** Inserts the tracks as one block after the current item and plays the first. */
+export function insertBlockRpc(userId: string, trackIds: string[]): Promise<QueueState> {
+	return call(
+		'insert-block',
+		supabaseAdmin.rpc('queue_insert_block', { p_user: userId, p_track_ids: trackIds })
 	);
 }

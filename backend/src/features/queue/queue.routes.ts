@@ -2,9 +2,10 @@ import { Router } from 'express';
 import { queueController } from '@/features/queue/queue.controller.js';
 import { authMiddleware } from '@/features/auth/auth.middleware.js';
 
-const router = Router();
+const router = Router({ mergeParams: true });
 
-// All routes require authentication; each acts on the caller's own queue.
+// All routes require authentication; they act on the caller's queue, or on
+// `:userId`'s when mounted under /api/users/:userId/queue (#294).
 router.use(authMiddleware);
 
 /** GET /api/queue - the caller's queue */

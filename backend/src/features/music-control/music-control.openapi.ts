@@ -393,12 +393,84 @@ export const musicControlPaths: OpenAPIV3.PathsObject = {
 		},
 	},
 
+	'/api/music-control/controllable-devices': {
+		get: {
+			tags: ['Music Control'],
+			summary: "List the devices I can play on, mine then my friends'",
+			description:
+				'Device picker for playback transfer (#295). The first owner is the caller (`isSelf: true`, every device, `access: all-devices`). Then come the mutual friends who let the caller control at least one device (all of them with the "all my devices" switch, otherwise only the licensed ones), ordered by username; other friends and non-friends never appear. `online` is whether the device currently has a live socket.',
+			operationId: 'getDevicePicker',
+			security: [{ bearerAuth: [] }],
+			responses: {
+				'200': {
+					description: 'Controllable devices retrieved',
+					content: {
+						'application/json': {
+							schema: {
+								allOf: [
+									{ $ref: '#/components/schemas/SuccessResponse' },
+									{
+										type: 'object',
+										properties: {
+											data: { $ref: '#/components/schemas/DevicePickerResponse' },
+										},
+									},
+								],
+							},
+							example: {
+								success: true,
+								data: {
+									owners: [
+										{
+											ownerId: '3f1c2d4e-5a6b-4c7d-8e9f-0a1b2c3d4e5f',
+											username: 'me',
+											isSelf: true,
+											devices: [
+												{
+													deviceId: 'phone-1',
+													deviceName: 'My phone',
+													platform: 'android',
+													model: 'Pixel 7',
+													lastSeenAt: '2026-10-14T10:00:00.000Z',
+													access: 'all-devices',
+													online: true,
+												},
+											],
+										},
+										{
+											ownerId: '9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d',
+											username: 'alice',
+											isSelf: false,
+											devices: [
+												{
+													deviceId: 'tv-1',
+													deviceName: 'Living room TV',
+													platform: 'android',
+													model: 'Shield',
+													lastSeenAt: '2026-10-14T09:30:00.000Z',
+													access: 'license',
+													online: false,
+												},
+											],
+										},
+									],
+								},
+								meta: { timestamp: '2026-10-14T10:00:05.000Z' },
+							},
+						},
+					},
+				},
+				'401': { $ref: '#/components/responses/UnauthorizedError' },
+			},
+		},
+	},
+
 	'/api/music-control/users/{userId}/devices': {
 		get: {
 			tags: ['Music Control'],
 			summary: "List a friend's devices I can control",
 			description:
-				'When `allDevices` is true (the friend turned on "all my devices" for you), every device of the friend is listed with `access: all-devices`. Otherwise only the devices licensed to you are listed, with `access: license`. When you and userId are not mutual friends, `allDevices` is false and `devices` is [] (even if a stale "all my devices" flag remains); the same empty answer comes when nothing is granted, so the response never reveals whether the user exists or how many devices they have.',
+				'When `allDevices` is true (the friend turned on "all my devices" for you), every device of the friend is listed with `access: all-devices`. Otherwise only the devices licensed to you are listed, with `access: license`. When you and userId are not mutual friends, `allDevices` is false and `devices` is [] (even if a stale "all my devices" flag remains); the same empty answer comes when nothing is granted, so the response never reveals whether the user exists or how many devices they have. Calling it with your own `userId` returns all your devices with `access: all-devices` (#294).',
 			operationId: 'getControllableDevices',
 			security: [{ bearerAuth: [] }],
 			parameters: [
@@ -525,6 +597,37 @@ export const musicControlSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 				},
 			},
 		],
+	},
+	DevicePickerResponse: {
+		type: 'object',
+		required: ['owners'],
+		properties: {
+			owners: {
+				type: 'array',
+				items: {
+					type: 'object',
+					required: ['ownerId', 'username', 'isSelf', 'devices'],
+					properties: {
+						ownerId: { type: 'string', format: 'uuid' },
+						username: { type: 'string' },
+						isSelf: { type: 'boolean' },
+						devices: {
+							type: 'array',
+							items: {
+								allOf: [
+									{ $ref: '#/components/schemas/ControllableDevice' },
+									{
+										type: 'object',
+										required: ['online'],
+										properties: { online: { type: 'boolean' } },
+									},
+								],
+							},
+						},
+					},
+				},
+			},
+		},
 	},
 	ControllableDevice: {
 		allOf: [

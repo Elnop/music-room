@@ -2,7 +2,11 @@ import { OpenAPIV3 } from 'openapi-types';
 
 // Play queue (#273, #277): one queue per user, synced across their devices.
 // Every endpoint answers the full QueueState and sends it as `queue:updated`
-// to the caller's sockets (room `user:<id>`).
+// to the owner's sockets (room `user:<id>`) and to the sockets listening to
+// them (room `listening:<id>`). Under /api/users/{userId}/queue a friend who
+// controls one of the owner's devices manages the owner's queue (#294); a
+// playback action with a `deviceId` also sends `control:command play-item` to
+// that device of the owner.
 
 const itemIdParam: OpenAPIV3.ParameterObject = {
 	in: 'path',
@@ -10,6 +14,14 @@ const itemIdParam: OpenAPIV3.ParameterObject = {
 	required: true,
 	schema: { type: 'string', format: 'uuid' },
 	description: 'Id of an item of your queue',
+};
+
+const ownerIdParam: OpenAPIV3.ParameterObject = {
+	in: 'path',
+	name: 'userId',
+	required: true,
+	schema: { type: 'string', format: 'uuid' },
+	description: 'Id of the queue owner; you must control at least one of their devices',
 };
 
 function errorResponse(
@@ -55,17 +67,57 @@ const stateResponse: OpenAPIV3.ResponseObject = {
 	},
 };
 
+const accessDenied = errorResponse(
+	'You do not control any device of the owner, or not the chosen `deviceId` (`QUEUE_ACCESS_DENIED`)',
+	'QUEUE_ACCESS_DENIED',
+	"Not authorized to manage this user's queue"
+);
+
+const playbackBody: OpenAPIV3.RequestBodyObject = {
+	required: false,
+	content: {
+		'application/json': {
+			schema: { $ref: '#/components/schemas/QueuePlaybackRequest' },
+			example: { deviceId: 'living-room-tv' },
+		},
+	},
+};
+
+/** Optional body and device errors of the four playback routes (the 400 and 403 only apply to a delegate). */
+const playback = {
+	requestBody: playbackBody,
+	errors: {
+		'400': errorResponse(
+			'Invalid input, or `deviceId` missing from a delegate (`DEVICE_ID_REQUIRED`)',
+			'DEVICE_ID_REQUIRED',
+			'A delegate must name the device to play on'
+		),
+		'409': errorResponse(
+			'The chosen device is not connected (`DEVICE_OFFLINE`); the queue is unchanged',
+			'DEVICE_OFFLINE',
+			'Target device is not online'
+		),
+	},
+};
+
+/** A playback route's own 409 response, extended with the device-offline one. */
+function withDevice(status: '409', own: OpenAPIV3.ResponseObject): OpenAPIV3.ResponseObject {
+	const device = playback.errors[status];
+	return { ...own, description: `${own.description}; ${device.description}` };
+}
+
 const common = {
 	tags: ['Queue'],
 	security: [{ bearerAuth: [] }],
 };
 
-export const queuePaths: OpenAPIV3.PathsObject = {
+const ownPaths: OpenAPIV3.PathsObject = {
 	'/api/queue': {
 		get: {
 			...common,
 			summary: 'Get your play queue',
-			description: 'Returns `{ currentItemId: null, items: [] }` when you never queued anything.',
+			description:
+				'Returns `{ ownerId, version: 0, currentItemId: null, items: [] }` when you never queued anything.',
 			operationId: 'getQueue',
 			responses: {
 				'200': stateResponse,
@@ -155,14 +207,16 @@ export const queuePaths: OpenAPIV3.PathsObject = {
 			...common,
 			summary: 'Play an item of the queue',
 			description:
-				'Makes the item current; the items before it become history. History beyond the 50 most recent items is dropped.',
+				'Makes the item current; the items before it become history. History beyond the 50 most recent items is dropped. With `deviceId`, that device of the owner is told to play the item. A delegate must send `deviceId`: a device they control and that is online.',
 			operationId: 'playQueueItem',
 			parameters: [itemIdParam],
+			requestBody: playback.requestBody,
 			responses: {
 				'200': stateResponse,
 				'400': { $ref: '#/components/responses/ValidationError' },
 				'401': { $ref: '#/components/responses/UnauthorizedError' },
 				'404': itemNotFound,
+				'409': playback.errors['409'],
 			},
 		},
 	},
@@ -183,6 +237,7 @@ export const queuePaths: OpenAPIV3.PathsObject = {
 					description: 'Id of a playlist you can view',
 				},
 			],
+			requestBody: playback.requestBody,
 			responses: {
 				'200': stateResponse,
 				'400': { $ref: '#/components/responses/ValidationError' },
@@ -197,10 +252,13 @@ export const queuePaths: OpenAPIV3.PathsObject = {
 					'PLAYLIST_NOT_FOUND',
 					'Playlist not found'
 				),
-				'409': errorResponse(
-					'The playlist has no track (`PLAYLIST_EMPTY`); the queue is unchanged',
-					'PLAYLIST_EMPTY',
-					'The playlist has no track to play'
+				'409': withDevice(
+					'409',
+					errorResponse(
+						'The playlist has no track (`PLAYLIST_EMPTY`); the queue is unchanged',
+						'PLAYLIST_EMPTY',
+						'The playlist has no track to play'
+					)
 				),
 			},
 		},
@@ -213,13 +271,14 @@ export const queuePaths: OpenAPIV3.PathsObject = {
 			description:
 				'The item after the current one becomes current (the first item when nothing is current). History beyond the 50 most recent items is dropped.',
 			operationId: 'queueNext',
+			requestBody: playback.requestBody,
 			responses: {
 				'200': stateResponse,
 				'401': { $ref: '#/components/responses/UnauthorizedError' },
-				'409': errorResponse(
-					'No next item (`QUEUE_END`)',
-					'QUEUE_END',
-					'No next item in the queue'
+				'400': { $ref: '#/components/responses/ValidationError' },
+				'409': withDevice(
+					'409',
+					errorResponse('No next item (`QUEUE_END`)', 'QUEUE_END', 'No next item in the queue')
 				),
 			},
 		},
@@ -231,17 +290,119 @@ export const queuePaths: OpenAPIV3.PathsObject = {
 			summary: 'Step to the previous item',
 			description: 'The item before the current one becomes current.',
 			operationId: 'queuePrevious',
+			requestBody: playback.requestBody,
 			responses: {
 				'200': stateResponse,
 				'401': { $ref: '#/components/responses/UnauthorizedError' },
-				'409': errorResponse(
-					'No previous item, or nothing is current (`QUEUE_START`)',
-					'QUEUE_START',
-					'No previous item in the queue'
+				'400': { $ref: '#/components/responses/ValidationError' },
+				'409': withDevice(
+					'409',
+					errorResponse(
+						'No previous item, or nothing is current (`QUEUE_START`)',
+						'QUEUE_START',
+						'No previous item in the queue'
+					)
 				),
 			},
 		},
 	},
+};
+
+const METHODS = ['get', 'post', 'delete'] as const;
+
+/** The same operations under /api/users/{userId}/queue, for a delegate (#294). */
+function delegatedPaths(paths: OpenAPIV3.PathsObject): OpenAPIV3.PathsObject {
+	const mirrored: OpenAPIV3.PathsObject = {};
+	for (const [path, item] of Object.entries(paths)) {
+		const mirror: OpenAPIV3.PathItemObject = {};
+		for (const method of METHODS) {
+			const operation = item?.[method];
+			if (!operation) continue;
+			const isPlayback = operation.requestBody === playback.requestBody;
+			const own403 = operation.responses['403'] as OpenAPIV3.ResponseObject | undefined;
+			mirror[method] = {
+				...operation,
+				summary: `${operation.summary} (queue of a friend you control)`,
+				operationId: `${operation.operationId}ForUser`,
+				parameters: [ownerIdParam, ...(operation.parameters ?? [])],
+				responses: {
+					...operation.responses,
+					// A delegate must name the device (400) and may lack access (403).
+					...(isPlayback && { '400': playback.errors['400'] }),
+					'403': own403
+						? { ...own403, description: `${own403.description}; ${accessDenied.description}` }
+						: accessDenied,
+				},
+			};
+		}
+		mirrored[path.replace('/api/queue', '/api/users/{userId}/queue')] = mirror;
+	}
+	return mirrored;
+}
+
+// Not part of ownPaths: a transfer always starts from the caller, so it has no /api/users/{userId} mirror.
+const transferPath: OpenAPIV3.PathsObject = {
+	'/api/queue/transfer': {
+		post: {
+			...common,
+			summary: "Transfer playback to one of your devices or a friend's",
+			description:
+				"Checked in this order, before anything changes: the target device (you own it, or have its license; it must be online), the `source` device (you must control it; offline is fine), and `playing.queueItemId` (must be in your own queue). **Target is one of your devices**: your queue is unchanged and the device gets `control:command` `play-item` (item of your queue) or `play-track` (`playing.track`, played outside the queue) at `positionMs`; `queue` is null. **Target is a friend's device**: the played track and the items that follow it in your queue (or `playing.track` then your upcoming items) are inserted as one block right after the friend's current item and the block's first item becomes current; the friend's sockets get `queue:updated`, the device gets `play-item`, and `queue` is the friend's new queue. If `source` is given, it then gets `control:command` `pause`.",
+			operationId: 'queueTransfer',
+			requestBody: {
+				required: true,
+				content: {
+					'application/json': {
+						schema: { $ref: '#/components/schemas/TransferRequest' },
+						example: {
+							targetUserId: '3f2b8c1e-4d5a-4b6c-8d7e-9f0a1b2c3d4e',
+							targetDeviceId: 'living-room-tv',
+							positionMs: 42000,
+							playing: { queueItemId: '7a1d9e2c-5b3f-4c8a-9d6e-1f2a3b4c5d6e' },
+							source: { userId: '9c8b7a6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d', deviceId: 'phone' },
+						},
+					},
+				},
+			},
+			responses: {
+				'200': {
+					description: 'Playback was ordered on the target device',
+					content: {
+						'application/json': {
+							schema: {
+								allOf: [
+									{ $ref: '#/components/schemas/SuccessResponse' },
+									{
+										type: 'object',
+										properties: { data: { $ref: '#/components/schemas/TransferResult' } },
+									},
+								],
+							},
+						},
+					},
+				},
+				'400': { $ref: '#/components/responses/ValidationError' },
+				'401': { $ref: '#/components/responses/UnauthorizedError' },
+				'403': errorResponse(
+					'You do not control the target device or the `source` device (`QUEUE_ACCESS_DENIED`)',
+					'QUEUE_ACCESS_DENIED',
+					"Not authorized to manage this user's queue"
+				),
+				'404': itemNotFound,
+				'409': errorResponse(
+					'The target device is not connected (`DEVICE_OFFLINE`), or there is nothing to transfer (`QUEUE_BLOCK_EMPTY`); no queue changed',
+					'DEVICE_OFFLINE',
+					'Target device is not online'
+				),
+			},
+		},
+	},
+};
+
+export const queuePaths: OpenAPIV3.PathsObject = {
+	...ownPaths,
+	...delegatedPaths(ownPaths),
+	...transferPath,
 };
 
 export const queueSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
@@ -283,10 +444,12 @@ export const queueSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 	},
 	QueueState: {
 		type: 'object',
-		required: ['currentItemId', 'items'],
+		required: ['ownerId', 'version', 'currentItemId', 'items'],
 		description:
-			'Items in rank order. Items before the current one are history, those after it upcoming; with `currentItemId` null every item is upcoming. Also the payload of the `queue:updated` socket event.',
+			'Items in rank order. Items before the current one are history, those after it upcoming; with `currentItemId` null every item is upcoming. `version` grows with every change: a client drops a state whose version is not above the one it holds. Also the payload of the `queue:updated` socket event.',
 		properties: {
+			ownerId: { type: 'string', format: 'uuid' },
+			version: { type: 'integer', minimum: 0, example: 12 },
 			currentItemId: { type: 'string', format: 'uuid', nullable: true },
 			items: { type: 'array', items: { $ref: '#/components/schemas/QueueItem' } },
 		},
@@ -307,6 +470,62 @@ export const queueSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 			album: { type: 'string', maxLength: 200 },
 			albumArt: { type: 'string', format: 'uri' },
 			durationMs: { type: 'integer', minimum: 1 },
+		},
+	},
+	QueuePlaybackRequest: {
+		type: 'object',
+		properties: {
+			deviceId: {
+				type: 'string',
+				minLength: 1,
+				maxLength: 128,
+				description:
+					'Device of the owner that must play; required from a delegate, optional for the owner (omitted: the calling device plays)',
+			},
+		},
+	},
+	TransferRequest: {
+		type: 'object',
+		required: ['targetUserId', 'targetDeviceId', 'positionMs', 'playing'],
+		properties: {
+			targetUserId: {
+				type: 'string',
+				format: 'uuid',
+				description: 'Owner of the target device: you or a friend',
+			},
+			targetDeviceId: { type: 'string', minLength: 1, maxLength: 128 },
+			positionMs: { type: 'integer', minimum: 0, maximum: 86400000 },
+			playing: {
+				type: 'object',
+				description: 'Exactly one of `queueItemId` (an item of your queue) or `track`',
+				properties: {
+					queueItemId: { type: 'string', format: 'uuid' },
+					track: { $ref: '#/components/schemas/AddQueueItemRequest' },
+				},
+			},
+			source: {
+				type: 'object',
+				description:
+					'The remote device that plays now, which is paused; leave out when playing on this device',
+				required: ['userId', 'deviceId'],
+				properties: {
+					userId: { type: 'string', format: 'uuid' },
+					deviceId: { type: 'string', minLength: 1, maxLength: 128 },
+				},
+			},
+		},
+	},
+	TransferResult: {
+		type: 'object',
+		required: ['ownerId', 'deviceId', 'queue'],
+		properties: {
+			ownerId: { type: 'string', format: 'uuid' },
+			deviceId: { type: 'string' },
+			queue: {
+				allOf: [{ $ref: '#/components/schemas/QueueState' }],
+				nullable: true,
+				description: "The friend's new queue; null when the target is one of your devices",
+			},
 		},
 	},
 	MoveQueueItemRequest: {

@@ -1,20 +1,34 @@
+import { useQueueStore } from '@/store/queueStore';
 import {
+	EMPTY_QUEUE,
 	previousAction,
 	selectHasNext,
 	selectHasPrevious,
 	selectPlaysPlaylist,
-	useQueueStore,
-} from '@/store/queueStore';
+} from '@/store/queueSelectors';
 import { usePlayerStore } from '@/store/playerStore';
+import { deferred } from '@/test/deferred';
+import { useAuthStore } from '@/store/authStore';
+import { useConnectStore } from '@/store/connectStore';
+import type { UserProfile } from '@/types/user.types';
 import { queueApi } from '@/services/queueApi';
 import { ApiError } from '@/services/api';
 import { showError, showInfo, showSuccess } from '@utils/toast';
-import type { QueueItem, QueueState } from '@/types/queue.types';
+import type { QueueItem, QueueState, QueueStepResult } from '@/types/queue.types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
+
+jest.mock('@/lib/supabase', () => ({
+	supabase: { auth: { signOut: jest.fn(), setSession: jest.fn() } },
+}));
+
+jest.mock('@services/oauth', () => ({
+	signInWithGoogle: jest.fn(),
+	signInWithFacebook: jest.fn(),
+}));
 
 jest.mock('@/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
@@ -30,6 +44,7 @@ jest.mock('@/services/queueApi', () => ({
 		moveItem: jest.fn(),
 		removeItem: jest.fn(),
 		playPlaylist: jest.fn(),
+		transfer: jest.fn(),
 	},
 }));
 
@@ -57,10 +72,19 @@ const item = (id: string): QueueItem => ({
 	blockDetached: false,
 });
 
+let nextVersion = 0;
+
 const queue = (currentItemId: string | null, ids = ['a', 'b', 'c']): QueueState => ({
+	ownerId: 'owner',
+	version: ++nextVersion,
 	currentItemId,
 	items: ids.map(item),
 });
+
+const body = (id: string) => {
+	const { trackUri, title, artist, durationMs } = item(id).track;
+	return { trackUri, title, artist, durationMs };
+};
 
 const listTrack: SoundCloudTrack = {
 	id: 99,
@@ -76,6 +100,8 @@ const listTrack: SoundCloudTrack = {
 
 const initialPlayer = usePlayerStore.getState();
 const store = () => useQueueStore.getState();
+/** The signed-in user's queue (the test user is `owner`). */
+const mine = () => store().queues.owner ?? EMPTY_QUEUE;
 const player = () => usePlayerStore.getState();
 
 beforeEach(() => {
@@ -83,6 +109,8 @@ beforeEach(() => {
 	jest.spyOn(console, 'log').mockImplementation(() => undefined);
 	jest.spyOn(console, 'error').mockImplementation(() => undefined);
 	usePlayerStore.setState(initialPlayer, true);
+	useAuthStore.setState({ user: { id: 'owner' } as UserProfile });
+	useConnectStore.setState({ target: { kind: 'local' }, remoteStatus: null });
 	store().reset();
 });
 
@@ -94,8 +122,8 @@ describe('queueStore load and events', () => {
 	it('holds the server queue after load', async () => {
 		api.getQueue.mockResolvedValue(queue('a'));
 		await store().load();
-		expect(store().currentItemId).toBe('a');
-		expect(store().items.map(i => i.id)).toEqual(['a', 'b', 'c']);
+		expect(mine().currentItemId).toBe('a');
+		expect(mine().items.map(i => i.id)).toEqual(['a', 'b', 'c']);
 		expect(store().loaded).toBe(true);
 	});
 
@@ -103,7 +131,7 @@ describe('queueStore load and events', () => {
 		store().applyState(queue('b'));
 		api.getQueue.mockRejectedValue(new ApiError('down', 'NETWORK_ERROR'));
 		await store().load();
-		expect(store().currentItemId).toBe('b');
+		expect(mine().currentItemId).toBe('b');
 		expect(console.error).toHaveBeenCalled();
 	});
 
@@ -111,8 +139,8 @@ describe('queueStore load and events', () => {
 		usePlayerStore.getState().playTrack(listTrack);
 		const before = player().loadCounter;
 		store().applyState(queue('c', ['a', 'c']));
-		expect(store().currentItemId).toBe('c');
-		expect(store().items.map(i => i.id)).toEqual(['a', 'c']);
+		expect(mine().currentItemId).toBe('c');
+		expect(mine().items.map(i => i.id)).toEqual(['a', 'c']);
 		expect(player().loadCounter).toBe(before);
 		expect(player().currentTrack).toBe(listTrack);
 	});
@@ -120,7 +148,7 @@ describe('queueStore load and events', () => {
 	it('reset empties the store', () => {
 		store().applyState(queue('a'));
 		store().reset();
-		expect(store().items).toEqual([]);
+		expect(mine().items).toEqual([]);
 		expect(store().loaded).toBe(false);
 	});
 });
@@ -132,7 +160,7 @@ describe('queueStore next', () => {
 
 		await expect(store().next()).resolves.toBe('played');
 
-		expect(store().currentItemId).toBe('b');
+		expect(mine().currentItemId).toBe('b');
 		expect(player().queueItemId).toBe('b');
 		expect(player().currentTrack?.permalink_url).toBe('https://soundcloud.com/artist/b');
 		expect(player().playbackState).toBe('loading');
@@ -167,7 +195,7 @@ describe('queueStore next', () => {
 		await expect(store().next()).resolves.toBe('error');
 
 		expect(player().currentTrack).toBe(listTrack);
-		expect(store().currentItemId).toBe('a');
+		expect(mine().currentItemId).toBe('a');
 	});
 
 	it('does not override a track tapped while the request ran', async () => {
@@ -179,7 +207,7 @@ describe('queueStore next', () => {
 		resolve({ ok: true, state: queue('b') });
 		await pending;
 
-		expect(store().currentItemId).toBe('b');
+		expect(mine().currentItemId).toBe('b');
 		expect(player().currentTrack).toBe(listTrack);
 		expect(player().queueItemId).toBeNull();
 	});
@@ -197,7 +225,7 @@ describe('queueStore concurrent steps', () => {
 		await expect(second).resolves.toBe('ignored');
 		await expect(first).resolves.toBe('played');
 		expect(api.next).toHaveBeenCalledTimes(1);
-		expect(store().currentItemId).toBe('b');
+		expect(mine().currentItemId).toBe('b');
 		expect(player().queueItemId).toBe('b');
 
 		// The flag is cleared: a later step goes through.
@@ -257,7 +285,7 @@ describe('queueStore selectors and list taps', () => {
 		usePlayerStore.getState().playTrack(listTrack);
 
 		expect(player().queueItemId).toBeNull();
-		expect(store().currentItemId).toBe('a');
+		expect(mine().currentItemId).toBe('a');
 		expect(api.next).not.toHaveBeenCalled();
 		expect(api.playItem).not.toHaveBeenCalled();
 	});
@@ -286,9 +314,9 @@ describe('queueStore addItem', () => {
 
 		await expect(store().addItem(body)).resolves.toBe(true);
 
-		expect(api.addItem).toHaveBeenCalledWith(body);
-		expect(store().items.map(i => i.id)).toEqual(['a', 'n']);
-		expect(store().currentItemId).toBe('a');
+		expect(api.addItem).toHaveBeenCalledWith(body, {});
+		expect(mine().items.map(i => i.id)).toEqual(['a', 'n']);
+		expect(mine().currentItemId).toBe('a');
 		expect(showSuccess).toHaveBeenCalledWith('Ajouté à la file de lecture');
 		expect(player().loadCounter).toBe(before);
 		expect(player().currentTrack).toBe(listTrack);
@@ -301,7 +329,7 @@ describe('queueStore addItem', () => {
 
 		await expect(store().addItem(body)).resolves.toBe(false);
 
-		expect(store().items.map(i => i.id)).toEqual(['a']);
+		expect(mine().items.map(i => i.id)).toEqual(['a']);
 		expect(showError).toHaveBeenCalledWith('Queue is full');
 		expect(showSuccess).not.toHaveBeenCalled();
 	});
@@ -314,8 +342,8 @@ describe('queueStore playItem', () => {
 
 		await expect(store().playItem('c')).resolves.toBe('played');
 
-		expect(api.playItem).toHaveBeenCalledWith('c');
-		expect(store().currentItemId).toBe('c');
+		expect(api.playItem).toHaveBeenCalledWith('c', {});
+		expect(mine().currentItemId).toBe('c');
 		expect(player().queueItemId).toBe('c');
 		expect(player().currentTrack?.title).toBe('Title c');
 	});
@@ -328,7 +356,7 @@ describe('queueStore playItem', () => {
 		await expect(store().playItem('c')).resolves.toBe('error');
 
 		expect(showError).toHaveBeenCalled();
-		expect(store().currentItemId).toBe('a');
+		expect(mine().currentItemId).toBe('a');
 		expect(player().currentTrack).toBe(listTrack);
 	});
 
@@ -353,8 +381,8 @@ describe('queueStore removeItem', () => {
 
 		await expect(store().removeItem('b')).resolves.toBe(true);
 
-		expect(api.removeItem).toHaveBeenCalledWith('b');
-		expect(store().items.map(i => i.id)).toEqual(['a', 'c']);
+		expect(api.removeItem).toHaveBeenCalledWith('b', {});
+		expect(mine().items.map(i => i.id)).toEqual(['a', 'c']);
 		expect(player().loadCounter).toBe(before);
 	});
 
@@ -366,7 +394,7 @@ describe('queueStore removeItem', () => {
 
 		await expect(store().removeItem('a')).resolves.toBe(true);
 
-		expect(store().currentItemId).toBe('b');
+		expect(mine().currentItemId).toBe('b');
 		expect(player().queueItemId).toBe('b');
 		expect(player().currentTrack?.title).toBe('Title b');
 	});
@@ -379,7 +407,7 @@ describe('queueStore removeItem', () => {
 
 		await expect(store().removeItem('c')).resolves.toBe(true);
 
-		expect(store().items).toEqual([]);
+		expect(mine().items).toEqual([]);
 		expect(player().currentTrack).toBeNull();
 		expect(player().playbackState).toBe('idle');
 	});
@@ -392,7 +420,7 @@ describe('queueStore removeItem', () => {
 
 		await expect(store().removeItem('a')).resolves.toBe(true);
 
-		expect(store().items).toEqual([]);
+		expect(mine().items).toEqual([]);
 		expect(player().currentTrack).toBe(listTrack);
 		expect(player().loadCounter).toBe(before);
 	});
@@ -420,7 +448,7 @@ describe('queueStore removeItem', () => {
 		await expect(store().removeItem('a')).resolves.toBe(false);
 
 		expect(showError).toHaveBeenCalledTimes(2);
-		expect(store().items.map(i => i.id)).toEqual(['a', 'b', 'c']);
+		expect(mine().items.map(i => i.id)).toEqual(['a', 'b', 'c']);
 	});
 });
 
@@ -431,8 +459,8 @@ describe('queueStore moveItem', () => {
 
 		await expect(store().moveItem('c', null)).resolves.toBe(true);
 
-		expect(api.moveItem).toHaveBeenCalledWith('c', null);
-		expect(store().items.map(i => i.id)).toEqual(['a', 'c', 'b']);
+		expect(api.moveItem).toHaveBeenCalledWith('c', null, {});
+		expect(mine().items.map(i => i.id)).toEqual(['a', 'c', 'b']);
 	});
 
 	it('shows an error and keeps the store order on a conflict', async () => {
@@ -442,13 +470,15 @@ describe('queueStore moveItem', () => {
 		await expect(store().moveItem('c', null)).resolves.toBe(false);
 
 		expect(showError).toHaveBeenCalled();
-		expect(store().items.map(i => i.id)).toEqual(['a', 'b', 'c']);
+		expect(mine().items.map(i => i.id)).toEqual(['a', 'b', 'c']);
 	});
 });
 
 describe('queueStore playPlaylist', () => {
 	/** `ids` queued from playlist `p1`, after a list item `x`. */
 	const withBlock = (currentItemId: string | null, ids: string[]): QueueState => ({
+		ownerId: 'owner',
+		version: ++nextVersion,
 		currentItemId,
 		items: [item('x'), ...ids.map(id => ({ ...item(id), sourcePlaylistId: 'p1', blockId: 'blk' }))],
 	});
@@ -460,8 +490,8 @@ describe('queueStore playPlaylist', () => {
 
 		await expect(store().playPlaylist('p1')).resolves.toBe('played');
 
-		expect(api.playPlaylist).toHaveBeenCalledWith('p1');
-		expect(store().currentItemId).toBe('p-1');
+		expect(api.playPlaylist).toHaveBeenCalledWith('p1', {});
+		expect(mine().currentItemId).toBe('p-1');
 		expect(player().queueItemId).toBe('p-1');
 		expect(player().currentTrack?.title).toBe('Title p-1');
 		expect(player().playbackState).toBe('loading');
@@ -480,7 +510,7 @@ describe('queueStore playPlaylist', () => {
 		await expect(store().playPlaylist('p1')).resolves.toBe('error');
 
 		expect(showError).toHaveBeenCalledWith(message);
-		expect(store().currentItemId).toBe('a');
+		expect(mine().currentItemId).toBe('a');
 		expect(player().currentTrack).toBe(listTrack);
 	});
 
@@ -505,5 +535,246 @@ describe('queueStore playPlaylist', () => {
 		expect(selectPlaysPlaylist(state, 'x', 'p1')).toBe(false);
 		expect(selectPlaysPlaylist(state, null, 'p1')).toBe(false);
 		expect(selectPlaysPlaylist(state, 'gone', 'p1')).toBe(false);
+	});
+});
+
+describe('queueStore versions (#285)', () => {
+	it('accepts version 0 into an empty store', () => {
+		store().applyState({ ownerId: 'owner', version: 0, currentItemId: null, items: [] });
+		expect(store().loaded).toBe(true);
+		expect(mine().version).toBe(0);
+	});
+
+	it('ignores a socket state older than the one it holds', () => {
+		const older = queue('a');
+		const newer = queue('b');
+		store().applyState(newer);
+		store().applyState(older);
+		expect(mine().currentItemId).toBe('b');
+		expect(mine().version).toBe(newer.version);
+	});
+
+	it('ignores the echo of a state it already holds', () => {
+		const state = queue('a');
+		store().applyState(state);
+		const items = mine().items;
+		store().applyState({ ...state, items: [] });
+		expect(mine().items).toBe(items);
+	});
+
+	it('ignores a load answer older than a queue:updated received meanwhile', async () => {
+		const answer = deferred<QueueState>();
+		api.getQueue.mockReturnValueOnce(answer.promise);
+		const stale = queue('a');
+		const fresh = queue('b');
+		const loading = store().load();
+		store().applyState(fresh);
+		answer.resolve(stale);
+		await loading;
+		expect(mine().currentItemId).toBe('b');
+	});
+
+	it('ends on the state holding both of two adds whose answers arrive in reverse', async () => {
+		const first = deferred<QueueState>();
+		const second = deferred<QueueState>();
+		api.addItem.mockReturnValueOnce(first.promise).mockReturnValueOnce(second.promise);
+		const withA = queue(null, ['a']);
+		const withAB = queue(null, ['a', 'b']);
+		const addA = store().addItem(body('a'));
+		const addB = store().addItem(body('b'));
+		second.resolve(withAB);
+		await addB;
+		first.resolve(withA);
+		await addA;
+		expect(mine().items.map(i => i.id)).toEqual(['a', 'b']);
+	});
+
+	it('plays the item of a stale step answer but keeps the newer state', async () => {
+		const answer = deferred<QueueStepResult>();
+		api.next.mockReturnValueOnce(answer.promise);
+		const stepped = queue('b');
+		const newer = queue('c');
+		const stepping = store().next();
+		store().applyState(newer);
+		answer.resolve({ ok: true, state: stepped });
+		await stepping;
+		expect(mine().currentItemId).toBe('c');
+		expect(player().queueItemId).toBe('b');
+	});
+
+	it('reset forgets the version', () => {
+		store().applyState(queue('a'));
+		store().reset();
+		expect(store().queues.owner).toBeUndefined();
+		store().applyState({ ownerId: 'owner', version: 0, currentItemId: null, items: [] });
+		expect(store().loaded).toBe(true);
+	});
+});
+
+describe('queueStore owners (#297)', () => {
+	const ownedBy = (ownerId: string, version: number, currentItemId: string | null): QueueState => ({
+		ownerId,
+		version,
+		currentItemId,
+		items: ['a', 'b', 'c'].map(item),
+	});
+
+	const goRemote = (ownerId: string, deviceId = 'tablet') =>
+		useConnectStore.setState({ target: { kind: 'remote', ownerId, deviceId }, remoteStatus: null });
+
+	it('compares versions per owner and never touches another owner', () => {
+		goRemote('friend');
+		store().applyState(ownedBy('owner', 5, 'a'));
+		store().applyState(ownedBy('friend', 2, 'b'));
+		store().applyState(ownedBy('owner', 4, 'c'));
+		expect(store().queues.owner).toMatchObject({ version: 5, currentItemId: 'a' });
+		expect(store().queues.friend).toMatchObject({ version: 2, currentItemId: 'b' });
+	});
+
+	it('ignores an owner that is neither me nor the remote owner', () => {
+		store().applyState(ownedBy('stranger', 1, 'a'));
+		expect(store().queues.stranger).toBeUndefined();
+	});
+
+	it('applies the new account state after a late state of the old one', () => {
+		useAuthStore.setState({ user: { id: 'A' } as UserProfile });
+		store().applyState(ownedBy('A', 56, 'a'));
+		store().reset(); // logout of A
+		useAuthStore.setState({ user: { id: 'B' } as UserProfile });
+		store().applyState(ownedBy('A', 57, 'b')); // late answer
+		store().applyState(ownedBy('B', 3, 'c'));
+		expect(store().queues.A).toBeUndefined();
+		expect(store().queues.B).toMatchObject({ version: 3, currentItemId: 'c' });
+	});
+
+	it("loads a friend's queue from their route, forgets it, and drops a late answer", async () => {
+		goRemote('friend');
+		api.getQueue.mockResolvedValue(ownedBy('friend', 1, 'a'));
+		await store().load('friend');
+		expect(api.getQueue).toHaveBeenCalledWith({ ownerId: 'friend' });
+		expect(store().queues.friend).toBeDefined();
+
+		useConnectStore.setState({ target: { kind: 'local' } });
+		store().forget('friend');
+		store().applyState(ownedBy('friend', 2, 'b'));
+		expect(store().queues.friend).toBeUndefined();
+	});
+
+	it('loads my own queue from /api/queue', async () => {
+		api.getQueue.mockResolvedValue(queue('a'));
+		await store().load('owner');
+		expect(api.getQueue).toHaveBeenCalledWith({});
+	});
+
+	it("steps a friend's queue on their device without playing on the phone", async () => {
+		goRemote('friend');
+		store().applyState(ownedBy('friend', 1, 'a'));
+		api.next.mockResolvedValue({ ok: true, state: ownedBy('friend', 2, 'b') });
+
+		await expect(store().next()).resolves.toBe('played');
+
+		expect(api.next).toHaveBeenCalledWith({ ownerId: 'friend', deviceId: 'tablet' });
+		expect(store().queues.friend.currentItemId).toBe('b');
+		expect(player().currentTrack).toBeNull();
+		expect(player().loadCounter).toBe(initialPlayer.loadCounter);
+	});
+
+	it('targets my own device through /api/queue with its deviceId', async () => {
+		goRemote('owner');
+		api.playItem.mockResolvedValue(queue('c'));
+		await store().playItem('c');
+		expect(api.playItem).toHaveBeenCalledWith('c', { ownerId: undefined, deviceId: 'tablet' });
+		expect(player().currentTrack).toBeNull();
+	});
+
+	it('does not stop the phone at the end of a remote queue', async () => {
+		goRemote('friend');
+		const stop = jest.spyOn(player(), 'stop');
+		api.next.mockResolvedValue({ ok: false, code: 'QUEUE_END' });
+		await expect(store().next()).resolves.toBe('boundary');
+		expect(stop).not.toHaveBeenCalled();
+	});
+
+	it.each([
+		['DEVICE_OFFLINE', 409, "Cet appareil n'est plus en ligne"],
+		['QUEUE_ACCESS_DENIED', 403, 'Vous ne pouvez plus contrôler cet appareil'],
+	])('on %s toasts and goes back to local', async (code, status, message) => {
+		goRemote('friend');
+		api.next.mockRejectedValue(new ApiError('refused', code, undefined, status));
+
+		await expect(store().next()).resolves.toBe('error');
+
+		expect(showError).toHaveBeenCalledWith(message);
+		expect(useConnectStore.getState().target).toEqual({ kind: 'local' });
+	});
+
+	it('goes back to local when a remote add is refused', async () => {
+		goRemote('friend');
+		api.addItem.mockRejectedValue(new ApiError('refused', 'QUEUE_ACCESS_DENIED', undefined, 403));
+		await expect(store().addItem(body('n'))).resolves.toBe(false);
+		expect(useConnectStore.getState().target).toEqual({ kind: 'local' });
+	});
+
+	it('marks a play-item current only when it is newer than the state held', () => {
+		store().applyState(ownedBy('owner', 3, 'a'));
+		store().setCurrentItem('owner', 'b', 3);
+		expect(mine().currentItemId).toBe('a');
+		store().setCurrentItem('owner', 'b', 4);
+		expect(mine().currentItemId).toBe('b');
+		// The queue:updated of that version still applies.
+		store().applyState(ownedBy('owner', 4, 'c'));
+		expect(mine().currentItemId).toBe('c');
+	});
+
+	describe('playListTrack', () => {
+		const transfer = queueApi.transfer as jest.Mock;
+
+		it('plays on the phone in local mode', async () => {
+			await store().playListTrack(listTrack);
+			expect(player().currentTrack).toBe(listTrack);
+			expect(transfer).not.toHaveBeenCalled();
+		});
+
+		it('transfers the track to the remote device and stays silent', async () => {
+			goRemote('friend');
+			const queued = ownedBy('friend', 3, 'b');
+			transfer.mockResolvedValue({ ownerId: 'friend', deviceId: 'tablet', queue: queued });
+
+			await store().playListTrack(listTrack);
+
+			expect(transfer).toHaveBeenCalledWith({
+				targetUserId: 'friend',
+				targetDeviceId: 'tablet',
+				positionMs: 0,
+				playing: {
+					track: {
+						trackUri: listTrack.permalink_url,
+						title: 'Tapped',
+						artist: 'x',
+						album: undefined,
+						albumArt: undefined,
+						durationMs: 1000,
+					},
+				},
+			});
+			expect(store().queues.friend.currentItemId).toBe('b');
+			expect(player().currentTrack).toBeNull();
+		});
+
+		it('goes back to local when the device is offline', async () => {
+			goRemote('friend');
+			transfer.mockRejectedValue(new ApiError('offline', 'DEVICE_OFFLINE', undefined, 409));
+			await store().playListTrack(listTrack);
+			expect(showError).toHaveBeenCalledWith("Cet appareil n'est plus en ligne");
+			expect(useConnectStore.getState().target).toEqual({ kind: 'local' });
+		});
+
+		it('toasts another failure and stays remote', async () => {
+			goRemote('friend');
+			transfer.mockRejectedValue(new ApiError('down', 'NETWORK_ERROR'));
+			await store().playListTrack(listTrack);
+			expect(showError).toHaveBeenCalledWith('Impossible de lire ce titre');
+			expect(useConnectStore.getState().target.kind).toBe('remote');
+		});
 	});
 });

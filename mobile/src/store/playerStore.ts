@@ -11,6 +11,21 @@ import type { SoundCloudTrack } from '@/types/soundcloud.types';
  */
 export type PlaybackState = 'idle' | 'loading' | 'ready' | 'playing' | 'paused';
 
+let positionReader: (() => number) | null = null;
+
+/**
+ * Registers how to read the playback position in ms. `PlayerProvider` owns the audio
+ * player but the listening status is emitted outside it, so the position goes through here (#295).
+ */
+export function setPositionReader(reader: (() => number) | null): void {
+	positionReader = reader;
+}
+
+/** Current playback position in ms, null while no player is registered. */
+export function readPositionMs(): number | null {
+	return positionReader ? positionReader() : null;
+}
+
 interface PlayerState {
 	// Track and stream info
 	currentTrack: SoundCloudTrack | null;
@@ -19,6 +34,8 @@ interface PlayerState {
 	loadCounter: number; // Incremented on each playTrack to force reload even for same track
 	/** Queue item being played, null for a track tapped in a list (#274). */
 	queueItemId: string | null;
+	/** Where the loaded track starts, in ms, for a transferred playback (#297); null = from 0. */
+	startPositionMs: number | null;
 
 	// State machine
 	playbackState: PlaybackState;
@@ -31,6 +48,9 @@ interface PlayerState {
 	// UI state
 	isModalOpen: boolean;
 
+	/** Incremented on each user seek, so the listening status is re-sent with the new position (#295). */
+	seekCount: number;
+
 	// Actions
 	setStreamUrl: (url: string | null) => void;
 	setLoading: (loading: boolean) => void;
@@ -39,13 +59,19 @@ interface PlayerState {
 	clearError: () => void;
 	setPlaybackReady: () => void;
 	setPlaybackPlaying: () => void;
-	playTrack: (track: SoundCloudTrack, queueItemId?: string | null) => void;
+	/** Load and play `track`; `startPositionMs` seeks there once the stream is loaded. */
+	playTrack: (
+		track: SoundCloudTrack,
+		queueItemId?: string | null,
+		startPositionMs?: number | null
+	) => void;
 	play: () => void;
 	pause: () => void;
 	resume: () => void;
 	stop: () => void;
 	toggleModal: () => void;
 	setModalOpen: (isOpen: boolean) => void;
+	markSeek: () => void;
 }
 
 export const usePlayerStore = create<PlayerState>((set, get) => ({
@@ -55,11 +81,13 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 	pendingTrackId: null,
 	loadCounter: 0,
 	queueItemId: null,
+	startPositionMs: null,
 	playbackState: 'idle',
 	isPlaying: false,
 	loading: false,
 	error: null,
 	isModalOpen: false,
+	seekCount: 0,
 
 	setStreamUrl: url => {
 		set({ streamUrl: url });
@@ -128,17 +156,22 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 		}
 	},
 
-	playTrack: (track, queueItemId = null) => {
+	playTrack: (track, queueItemId = null, startPositionMs = null) => {
 		if (__DEV__)
 			console.log('🎵 [playerStore] playTrack called:', {
 				id: track.id,
 				title: track.title,
 				queueItemId,
+				startPositionMs,
 			});
 
 		set(state => ({
 			currentTrack: track,
 			queueItemId,
+			startPositionMs:
+				startPositionMs !== null && Number.isFinite(startPositionMs) && startPositionMs > 0
+					? startPositionMs
+					: null,
 			pendingTrackId: track.id,
 			loadCounter: state.loadCounter + 1,
 			playbackState: 'loading',
@@ -188,6 +221,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 		set({
 			currentTrack: null,
 			queueItemId: null,
+			startPositionMs: null,
 			streamUrl: null,
 			pendingTrackId: null,
 			playbackState: 'idle',
@@ -203,5 +237,9 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 
 	setModalOpen: isOpen => {
 		set({ isModalOpen: isOpen });
+	},
+
+	markSeek: () => {
+		set(state => ({ seekCount: state.seekCount + 1 }));
 	},
 }));
