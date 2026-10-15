@@ -569,13 +569,17 @@ describe('version', () => {
 	});
 
 	it('keeps the version when a mutation is refused', async () => {
-		await addItems(1);
+		const [a] = await addItems(1);
 		const before = await queue.getQueue(userId, userId);
 		await expect(queue.step(userId, userId, 'previous')).rejects.toMatchObject({
 			code: 'QUEUE_START',
 		});
 		await expect(queue.removeItem(userId, userId, randomUUID())).rejects.toMatchObject({
 			statusCode: 404,
+		});
+		await expect(queue.moveItem(userId, userId, a, randomUUID())).rejects.toMatchObject({
+			statusCode: 404,
+			code: 'QUEUE_ITEM_NOT_FOUND',
 		});
 		expect(await queue.getQueue(userId, userId)).toEqual(before);
 	});

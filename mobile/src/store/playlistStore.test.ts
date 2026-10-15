@@ -1,6 +1,7 @@
 import { CONFLICT_MESSAGE, usePlaylistStore } from '@/store/playlistStore';
 import { playlistApi } from '@api/playlistApi';
 import { ApiError } from '@/services/api';
+import { deferred } from '@/test/deferred';
 import type { Playlist, PlaylistUpdatedEvent, PlaylistWithTracks } from '@/types/playlist.types';
 import type { Track, TrackInPlaylist } from '@/types/track.types';
 
@@ -51,13 +52,6 @@ const summary = (id: string, name = id) => ({ id, name }) as Playlist;
 
 const state = () => usePlaylistStore.getState();
 const order = () => state().currentPlaylist!.tracks.map(t => t.id);
-
-/** A promise with its resolve exposed, to answer a request when the test decides. */
-function deferred<T>() {
-	let resolve!: (value: T) => void;
-	const promise = new Promise<T>(r => (resolve = r));
-	return { promise, resolve };
-}
 
 beforeEach(() => {
 	jest.resetAllMocks();

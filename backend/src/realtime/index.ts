@@ -271,14 +271,16 @@ class RealtimeService {
 		}
 
 		const { userId: myUserId } = socketInfo;
-
-		// Access to at least one device shows the status of all of them.
-		const canControl = await controlAccessService.canControlAnyDevice(myUserId, targetUserId);
-		if (!canControl) {
+		const denyListening = () =>
 			socket.emit('listening:error', {
 				message: "Not authorized to view this user's listening status",
 				code: 'NOT_AUTHORIZED',
 			});
+
+		// Access to at least one device shows the status of all of them.
+		const canControl = await controlAccessService.canControlAnyDevice(myUserId, targetUserId);
+		if (!canControl) {
+			denyListening();
 			return;
 		}
 
@@ -289,10 +291,7 @@ class RealtimeService {
 		// found nothing to evict: re-check now that the socket is in the room.
 		if (!(await controlAccessService.canControlAnyDevice(myUserId, targetUserId))) {
 			void socket.leave(room);
-			socket.emit('listening:error', {
-				message: "Not authorized to view this user's listening status",
-				code: 'NOT_AUTHORIZED',
-			});
+			denyListening();
 			return;
 		}
 

@@ -14,7 +14,7 @@ export interface RemoteTarget {
 }
 
 /** Where the player acts: this phone's audio, or another device. */
-export type ConnectTarget = { kind: 'local' } | RemoteTarget;
+type ConnectTarget = { kind: 'local' } | RemoteTarget;
 
 interface ConnectState {
 	target: ConnectTarget;

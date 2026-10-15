@@ -5,16 +5,15 @@ import { usePlayerStore } from '@/store/playerStore';
 import { useConnectStore } from '@/store/connectStore';
 import { useAuthStore } from '@/store/authStore';
 import { useSocketStore } from '@/store/socketStore';
+import { useActiveQueue, useQueueStore } from '@/store/queueStore';
 import {
 	previousAction,
 	selectHasNext,
 	selectHasPrevious,
-	useActiveQueue,
-	useQueueStore,
 	type OwnerQueue,
-} from '@/store/queueStore';
+} from '@/store/queueSelectors';
 import { hashStringToNumber } from '@utils/trackToSoundCloud';
-import type { ListeningStatus } from '@/types/listening.types';
+import { estimatePositionMs } from '@utils/remotePosition';
 
 /** What the player shows of a track, wherever it plays. */
 export interface NowPlayingTrack {
@@ -49,19 +48,6 @@ export interface NowPlaying {
 
 /** Refresh rate of the estimated remote progress. */
 export const REMOTE_TICK_MS = 1000;
-
-/** Remote progress: the sent position, plus the time elapsed since while playing. */
-export function estimatePositionMs(
-	status: Pick<ListeningStatus, 'positionMs' | 'updatedAt' | 'isPlaying'>,
-	now: number,
-	durationMs: number | null
-): number {
-	const base = status.positionMs ?? 0;
-	const sentAt = Date.parse(status.updatedAt);
-	const elapsed = status.isPlaying && Number.isFinite(sentAt) ? Math.max(0, now - sentAt) : 0;
-	const position = base + elapsed;
-	return durationMs !== null ? Math.min(position, durationMs) : position;
-}
 
 /** Duration of the owner's current queue item when it is the track the device plays. */
 function remoteDurationMs(queue: OwnerQueue, trackId: number | undefined): number | null {

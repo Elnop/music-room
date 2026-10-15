@@ -5,6 +5,10 @@
 -- (updated_at or current_item_id), so a BEFORE UPDATE trigger counts them.
 -- A playlist sync that changes nothing leaves the row, and the version, alone.
 -- updated_at cannot serve: now() is the transaction start, not its commit.
+-- Known gap: the ON DELETE cascades from deleting playlists / tracks change
+-- items (source_playlist_id set to null, items deleted) without updating the
+-- play_queues row, so they do not bump the version. Only the deletion of the
+-- current item does, through its SET NULL on current_item_id.
 -- =====================================================
 
 ALTER TABLE public.play_queues ADD COLUMN version bigint NOT NULL DEFAULT 0;

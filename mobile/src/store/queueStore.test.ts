@@ -1,12 +1,13 @@
+import { useQueueStore } from '@/store/queueStore';
 import {
 	EMPTY_QUEUE,
 	previousAction,
 	selectHasNext,
 	selectHasPrevious,
 	selectPlaysPlaylist,
-	useQueueStore,
-} from '@/store/queueStore';
+} from '@/store/queueSelectors';
 import { usePlayerStore } from '@/store/playerStore';
+import { deferred } from '@/test/deferred';
 import { useAuthStore } from '@/store/authStore';
 import { useConnectStore } from '@/store/connectStore';
 import type { UserProfile } from '@/types/user.types';
@@ -536,14 +537,6 @@ describe('queueStore playPlaylist', () => {
 		expect(selectPlaysPlaylist(state, 'gone', 'p1')).toBe(false);
 	});
 });
-
-const deferred = <T>() => {
-	let resolve!: (value: T) => void;
-	const promise = new Promise<T>(r => {
-		resolve = r;
-	});
-	return { promise, resolve };
-};
 
 describe('queueStore versions (#285)', () => {
 	it('accepts version 0 into an empty store', () => {
