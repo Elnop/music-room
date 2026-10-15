@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { PlayerModal } from '@/components/player/PlayerModal';
 import { usePlayerStore } from '@/store/playerStore';
 import { useConnectStore } from '@/store/connectStore';
@@ -8,6 +8,9 @@ import { useAuthStore } from '@/store/authStore';
 import { hashStringToNumber } from '@utils/trackToSoundCloud';
 import type { UserProfile } from '@/types/user.types';
 import { useImageColors } from '@/hooks/useImageColors';
+import { fireGestureHandler, getByGestureTestId } from 'react-native-gesture-handler/jest-utils';
+import { State } from 'react-native-gesture-handler';
+import type { PanGesture } from 'react-native-gesture-handler';
 
 jest.mock('@/lib/supabase', () => ({
 	supabase: { auth: { signOut: jest.fn(), setSession: jest.fn() } },
@@ -160,6 +163,54 @@ describe('PlayerModal without a track', () => {
 	it('asks for no artwork colors', () => {
 		render(<PlayerModal />);
 		expect(useImageColors).toHaveBeenCalledWith(null, expect.anything());
+	});
+});
+
+describe('PlayerModal swipe down', () => {
+	const swipe = (translationY: number, velocityY = 0) =>
+		act(() =>
+			fireGestureHandler<PanGesture>(getByGestureTestId('player-modal-pan'), [
+				{ state: State.BEGAN, translationY: 0 },
+				{ state: State.ACTIVE, translationY: translationY / 2 },
+				{ state: State.ACTIVE, translationY },
+				{ state: State.END, translationY, velocityY },
+			])
+		);
+
+	beforeEach(() => {
+		jest.clearAllMocks();
+		useConnectStore.setState({ target: { kind: 'local' }, remoteStatus: null });
+		usePlayerStore.setState({ currentTrack: null, playbackState: 'idle', isModalOpen: true });
+	});
+
+	it('closes the modal past the threshold', () => {
+		render(<PlayerModal />);
+		swipe(400);
+		expect(usePlayerStore.getState().isModalOpen).toBe(false);
+	});
+
+	it('closes the modal on a quick flick', () => {
+		render(<PlayerModal />);
+		swipe(40, 1200);
+		expect(usePlayerStore.getState().isModalOpen).toBe(false);
+	});
+
+	// fireGestureHandler skips activation rules: check them on the gesture itself.
+	it('starts on a downward drag only and gives way to horizontal moves', () => {
+		render(<PlayerModal />);
+		const { config } = getByGestureTestId('player-modal-pan') as PanGesture;
+		expect(config).toMatchObject({
+			activeOffsetYEnd: 10,
+			failOffsetXStart: -15,
+			failOffsetXEnd: 15,
+		});
+		expect(config.activeOffsetYStart).toBeUndefined();
+	});
+
+	it('keeps the modal open under the threshold', () => {
+		render(<PlayerModal />);
+		swipe(40);
+		expect(usePlayerStore.getState().isModalOpen).toBe(true);
 	});
 });
 
