@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Slider from '@react-native-community/slider';
 import { Ionicons } from '@expo/vector-icons';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, {
 	useSharedValue,
 	useAnimatedStyle,
@@ -70,7 +70,13 @@ export function PlayerModal() {
 		setModalOpen(false);
 	};
 
+	// A Modal is its own native window on Android: gestures reach it only through the
+	// GestureHandlerRootView below. The pan starts on a downward drag only and gives way to
+	// horizontal moves, so the progress slider keeps working.
 	const panGesture = Gesture.Pan()
+		.withTestId('player-modal-pan')
+		.activeOffsetY(10)
+		.failOffsetX([-15, 15])
 		.onUpdate(event => {
 			if (event.translationY > 0) {
 				translateY.value = event.translationY;
@@ -175,195 +181,197 @@ export function PlayerModal() {
 			transparent
 			onRequestClose={() => setModalOpen(false)}
 		>
-			<GestureDetector gesture={panGesture}>
-				<Animated.View style={[styles.container, styles.modalContent, animatedStyle]}>
-					<LinearGradient
-						colors={gradientColors}
-						style={StyleSheet.absoluteFill}
-						start={{ x: 0.5, y: 0 }}
-						end={{ x: 0.5, y: 1 }}
-					/>
+			<GestureHandlerRootView style={styles.container}>
+				<GestureDetector gesture={panGesture}>
+					<Animated.View style={[styles.container, styles.modalContent, animatedStyle]}>
+						<LinearGradient
+							colors={gradientColors}
+							style={StyleSheet.absoluteFill}
+							start={{ x: 0.5, y: 0 }}
+							end={{ x: 0.5, y: 1 }}
+						/>
 
-					{/* Fixed header at top */}
-					<View style={styles.header}>
-						<View style={styles.swipeIndicator}>
-							<View style={[styles.swipeBar, { backgroundColor: colors.textSecondary }]} />
-						</View>
-
-						<TouchableOpacity
-							style={styles.closeButton}
-							onPress={() => setModalOpen(false)}
-							activeOpacity={0.7}
-						>
-							<View style={[styles.headerButton, { backgroundColor: colors.buttonBg }]}>
-								<Ionicons name="chevron-down" size={24} color={colors.text} />
+						{/* Fixed header at top */}
+						<View style={styles.header}>
+							<View style={styles.swipeIndicator}>
+								<View style={[styles.swipeBar, { backgroundColor: colors.textSecondary }]} />
 							</View>
-						</TouchableOpacity>
 
-						<TouchableOpacity
-							style={styles.devicesButton}
-							onPress={() => setDevicesOpen(true)}
-							activeOpacity={0.7}
-							accessibilityLabel="Choisir l'appareil"
-						>
-							<View style={[styles.headerButton, { backgroundColor: colors.buttonBg }]}>
-								<Ionicons name="phone-portrait-outline" size={20} color={colors.text} />
-							</View>
-						</TouchableOpacity>
-
-						<TouchableOpacity
-							style={styles.queueButton}
-							onPress={() => setQueueOpen(true)}
-							activeOpacity={0.7}
-							accessibilityLabel="File d'attente"
-						>
-							<View style={[styles.headerButton, { backgroundColor: colors.buttonBg }]}>
-								<Ionicons name="list" size={22} color={colors.text} />
-							</View>
-						</TouchableOpacity>
-
-						<Text style={[styles.nowPlayingText, { color: colors.textSecondary }]}>
-							NOW PLAYING
-						</Text>
-						{deviceLabel && (
-							<Text
-								style={[styles.deviceText, { color: colors.text }]}
-								numberOfLines={1}
-								accessibilityLabel={`Lecture sur ${deviceLabel}`}
+							<TouchableOpacity
+								style={styles.closeButton}
+								onPress={() => setModalOpen(false)}
+								activeOpacity={0.7}
 							>
-								Sur {deviceLabel}
-							</Text>
-						)}
-					</View>
+								<View style={[styles.headerButton, { backgroundColor: colors.buttonBg }]}>
+									<Ionicons name="chevron-down" size={24} color={colors.text} />
+								</View>
+							</TouchableOpacity>
 
-					{/* Main content centered */}
-					<View style={styles.mainContent}>
-						<View style={styles.artworkWrapper}>
-							<View style={styles.artworkShadow}>
-								{track ? (
-									<Image source={{ uri: displayArtwork }} style={styles.artwork} />
-								) : (
-									<View style={[styles.artwork, styles.emptyArtwork]}>
-										<Ionicons name="musical-notes" size={64} color={colors.textSecondary} />
-									</View>
-								)}
-							</View>
+							<TouchableOpacity
+								style={styles.devicesButton}
+								onPress={() => setDevicesOpen(true)}
+								activeOpacity={0.7}
+								accessibilityLabel="Choisir l'appareil"
+							>
+								<View style={[styles.headerButton, { backgroundColor: colors.buttonBg }]}>
+									<Ionicons name="phone-portrait-outline" size={20} color={colors.text} />
+								</View>
+							</TouchableOpacity>
+
+							<TouchableOpacity
+								style={styles.queueButton}
+								onPress={() => setQueueOpen(true)}
+								activeOpacity={0.7}
+								accessibilityLabel="File d'attente"
+							>
+								<View style={[styles.headerButton, { backgroundColor: colors.buttonBg }]}>
+									<Ionicons name="list" size={22} color={colors.text} />
+								</View>
+							</TouchableOpacity>
+
+							<Text style={[styles.nowPlayingText, { color: colors.textSecondary }]}>
+								NOW PLAYING
+							</Text>
+							{deviceLabel && (
+								<Text
+									style={[styles.deviceText, { color: colors.text }]}
+									numberOfLines={1}
+									accessibilityLabel={`Lecture sur ${deviceLabel}`}
+								>
+									Sur {deviceLabel}
+								</Text>
+							)}
 						</View>
 
-						<View style={styles.trackInfo}>
-							<Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
-								{track ? track.title : 'Rien en lecture'}
-							</Text>
-							<Text style={[styles.artist, { color: colors.textSecondary }]} numberOfLines={1}>
-								{track ? track.artist : 'Choisis un son pour commencer'}
-							</Text>
-						</View>
-
-						{error && !isRemote && (
-							<View style={styles.errorContainer}>
-								<Ionicons name="warning" size={16} color={theme.colors.error} />
-								<Text style={styles.errorText}>{error}</Text>
-							</View>
-						)}
-
-						{/* Hidden when the length is unknown (a remote track off the queue). */}
-						{duration !== null && (
-							<View style={styles.progressContainer}>
-								<Slider
-									style={styles.slider}
-									minimumValue={0}
-									maximumValue={duration || 1}
-									value={track ? currentTime : 0}
-									onSlidingComplete={handleSeek}
-									minimumTrackTintColor={colors.slider}
-									maximumTrackTintColor={colors.sliderBg}
-									thumbTintColor={colors.slider}
-									disabled={isRemote || isLoading || !player || !track}
-								/>
-								<View style={styles.timeContainer}>
-									<Text style={[styles.timeText, { color: colors.textSecondary }]}>
-										{formatTime(track ? currentTime : 0)}
-									</Text>
-									<Text style={[styles.timeText, { color: colors.textSecondary }]}>
-										{formatTime(track ? duration : 0)}
-									</Text>
+						{/* Main content centered */}
+						<View style={styles.mainContent}>
+							<View style={styles.artworkWrapper}>
+								<View style={styles.artworkShadow}>
+									{track ? (
+										<Image source={{ uri: displayArtwork }} style={styles.artwork} />
+									) : (
+										<View style={[styles.artwork, styles.emptyArtwork]}>
+											<Ionicons name="musical-notes" size={64} color={colors.textSecondary} />
+										</View>
+									)}
 								</View>
 							</View>
-						)}
 
-						<View style={styles.controls}>
-							<TouchableOpacity
-								style={[styles.secondaryButton, { backgroundColor: colors.buttonBg }]}
-								onPress={previous}
-								disabled={!canGoPrevious}
-								activeOpacity={0.7}
-								accessibilityLabel="Previous track"
-							>
-								<Ionicons
-									name="play-skip-back"
-									size={28}
-									color={colors.text}
-									style={canGoPrevious ? undefined : styles.disabledIcon}
-								/>
-							</TouchableOpacity>
-
-							<TouchableOpacity
-								style={[styles.playButton, { backgroundColor: colors.playBtnBg }]}
-								onPress={handlePlayPause}
-								disabled={isLoading || !track}
-								activeOpacity={0.8}
-								accessibilityLabel={isPlaying ? 'Pause' : 'Play'}
-							>
-								{isLoading ? (
-									<LoadingSpinner size="small" />
-								) : (
-									<Ionicons
-										name={isPlaying ? 'pause' : 'play'}
-										size={40}
-										color={colors.playBtnIcon}
-										style={[
-											isPlaying ? undefined : { marginLeft: 4 },
-											track ? undefined : styles.disabledIcon,
-										]}
-									/>
-								)}
-							</TouchableOpacity>
-
-							<TouchableOpacity
-								style={[styles.secondaryButton, { backgroundColor: colors.buttonBg }]}
-								onPress={next}
-								disabled={!canGoNext}
-								activeOpacity={0.7}
-								accessibilityLabel="Next track"
-							>
-								<Ionicons
-									name="play-skip-forward"
-									size={28}
-									color={colors.text}
-									style={canGoNext ? undefined : styles.disabledIcon}
-								/>
-							</TouchableOpacity>
-						</View>
-
-						{isLoading && (
-							<View style={styles.loadingContainer}>
-								<Text style={[styles.loadingText, { color: colors.textSecondary }]}>
-									Loading audio stream...
+							<View style={styles.trackInfo}>
+								<Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
+									{track ? track.title : 'Rien en lecture'}
+								</Text>
+								<Text style={[styles.artist, { color: colors.textSecondary }]} numberOfLines={1}>
+									{track ? track.artist : 'Choisis un son pour commencer'}
 								</Text>
 							</View>
-						)}
-					</View>
 
-					{/* Bottom spacer for safe area */}
-					<View style={styles.bottomSpacer} />
-				</Animated.View>
-			</GestureDetector>
+							{error && !isRemote && (
+								<View style={styles.errorContainer}>
+									<Ionicons name="warning" size={16} color={theme.colors.error} />
+									<Text style={styles.errorText}>{error}</Text>
+								</View>
+							)}
 
-			<QueueModal visible={isModalOpen && isQueueOpen} onClose={() => setQueueOpen(false)} />
-			<DevicePickerSheet
-				visible={isModalOpen && isDevicesOpen}
-				onClose={() => setDevicesOpen(false)}
-			/>
+							{/* Hidden when the length is unknown (a remote track off the queue). */}
+							{duration !== null && (
+								<View style={styles.progressContainer}>
+									<Slider
+										style={styles.slider}
+										minimumValue={0}
+										maximumValue={duration || 1}
+										value={track ? currentTime : 0}
+										onSlidingComplete={handleSeek}
+										minimumTrackTintColor={colors.slider}
+										maximumTrackTintColor={colors.sliderBg}
+										thumbTintColor={colors.slider}
+										disabled={isRemote || isLoading || !player || !track}
+									/>
+									<View style={styles.timeContainer}>
+										<Text style={[styles.timeText, { color: colors.textSecondary }]}>
+											{formatTime(track ? currentTime : 0)}
+										</Text>
+										<Text style={[styles.timeText, { color: colors.textSecondary }]}>
+											{formatTime(track ? duration : 0)}
+										</Text>
+									</View>
+								</View>
+							)}
+
+							<View style={styles.controls}>
+								<TouchableOpacity
+									style={[styles.secondaryButton, { backgroundColor: colors.buttonBg }]}
+									onPress={previous}
+									disabled={!canGoPrevious}
+									activeOpacity={0.7}
+									accessibilityLabel="Previous track"
+								>
+									<Ionicons
+										name="play-skip-back"
+										size={28}
+										color={colors.text}
+										style={canGoPrevious ? undefined : styles.disabledIcon}
+									/>
+								</TouchableOpacity>
+
+								<TouchableOpacity
+									style={[styles.playButton, { backgroundColor: colors.playBtnBg }]}
+									onPress={handlePlayPause}
+									disabled={isLoading || !track}
+									activeOpacity={0.8}
+									accessibilityLabel={isPlaying ? 'Pause' : 'Play'}
+								>
+									{isLoading ? (
+										<LoadingSpinner size="small" />
+									) : (
+										<Ionicons
+											name={isPlaying ? 'pause' : 'play'}
+											size={40}
+											color={colors.playBtnIcon}
+											style={[
+												isPlaying ? undefined : { marginLeft: 4 },
+												track ? undefined : styles.disabledIcon,
+											]}
+										/>
+									)}
+								</TouchableOpacity>
+
+								<TouchableOpacity
+									style={[styles.secondaryButton, { backgroundColor: colors.buttonBg }]}
+									onPress={next}
+									disabled={!canGoNext}
+									activeOpacity={0.7}
+									accessibilityLabel="Next track"
+								>
+									<Ionicons
+										name="play-skip-forward"
+										size={28}
+										color={colors.text}
+										style={canGoNext ? undefined : styles.disabledIcon}
+									/>
+								</TouchableOpacity>
+							</View>
+
+							{isLoading && (
+								<View style={styles.loadingContainer}>
+									<Text style={[styles.loadingText, { color: colors.textSecondary }]}>
+										Loading audio stream...
+									</Text>
+								</View>
+							)}
+						</View>
+
+						{/* Bottom spacer for safe area */}
+						<View style={styles.bottomSpacer} />
+					</Animated.View>
+				</GestureDetector>
+
+				<QueueModal visible={isModalOpen && isQueueOpen} onClose={() => setQueueOpen(false)} />
+				<DevicePickerSheet
+					visible={isModalOpen && isDevicesOpen}
+					onClose={() => setDevicesOpen(false)}
+				/>
+			</GestureHandlerRootView>
 		</Modal>
 	);
 }
