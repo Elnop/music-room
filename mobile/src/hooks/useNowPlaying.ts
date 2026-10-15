@@ -66,7 +66,7 @@ function remoteDurationMs(queue: OwnerQueue, trackId: number | undefined): numbe
  * nothing and cannot seek.
  */
 export function useNowPlaying(): NowPlaying {
-	const { player } = usePlayer();
+	const { player, seekTo } = usePlayer();
 	const { currentTime, duration } = usePlayerProgress();
 	const currentTrack = usePlayerStore(state => state.currentTrack);
 	const playbackState = usePlayerStore(state => state.playbackState);
@@ -108,12 +108,11 @@ export function useNowPlaying(): NowPlaying {
 	const localPrevious = useCallback(() => {
 		if (!player) return;
 		if (previousAction(currentTime, localHasPrevious) === 'restart') {
-			player.seekTo(0);
-			usePlayerStore.getState().markSeek();
+			seekTo(0);
 		} else {
 			void queuePrevious();
 		}
-	}, [player, currentTime, localHasPrevious, queuePrevious]);
+	}, [player, seekTo, currentTime, localHasPrevious, queuePrevious]);
 
 	const next = useCallback(() => {
 		void queueNext();

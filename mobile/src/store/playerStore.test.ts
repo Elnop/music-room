@@ -299,6 +299,82 @@ describe('playerStore stream and modal', () => {
 	});
 });
 
+describe('playerStore stream renewal (#313)', () => {
+	it('setStreamUrl stores the expiry with the url, and clears it with the url', () => {
+		usePlayerStore.getState().setStreamUrl('https://stream/1', 1234);
+		expect(usePlayerStore.getState().streamExpiresAt).toBe(1234);
+
+		usePlayerStore.getState().setStreamUrl(null, 1234);
+		expect(usePlayerStore.getState().streamExpiresAt).toBeNull();
+	});
+
+	it('renewStream reloads the same track at the position, keeping queue item and modal', () => {
+		const track = makeTrack(9);
+		usePlayerStore.getState().playTrack(track, 'q9');
+		usePlayerStore.getState().setStreamUrl('https://stream/9', 1000);
+		usePlayerStore.getState().setPlaybackPlaying();
+		usePlayerStore.setState({ isModalOpen: true });
+
+		usePlayerStore.getState().renewStream(90000, true, true);
+
+		const state = usePlayerStore.getState();
+		expect(state.currentTrack).toEqual(track);
+		expect(state.queueItemId).toBe('q9');
+		expect(state.isModalOpen).toBe(true);
+		expect(state.startPositionMs).toBe(90000);
+		expect(state.loadCounter).toBe(2);
+		expect(state.playbackState).toBe('loading');
+		expect(state.streamUrl).toBeNull();
+		expect(state.streamExpiresAt).toBeNull();
+		expect(state.streamRenewed).toBe(true);
+		expect(state.resumeAfterLoad).toBe(true);
+		expect(state.isPlaying).toBe(true);
+	});
+
+	it('a renewal of an expiring URL keeps the retry for a later failure', () => {
+		usePlayerStore.getState().playTrack(makeTrack(13));
+		usePlayerStore.getState().renewStream(5000, true);
+		expect(usePlayerStore.getState().streamRenewed).toBe(false);
+
+		usePlayerStore.getState().renewStream(6000, true, true);
+		usePlayerStore.getState().renewStream(7000, true);
+		expect(usePlayerStore.getState().streamRenewed).toBe(true);
+	});
+
+	it('a stream renewed while paused comes back paused, and play resumes it', () => {
+		usePlayerStore.getState().playTrack(makeTrack(10));
+		usePlayerStore.getState().setPlaybackPlaying();
+		usePlayerStore.getState().pause();
+
+		usePlayerStore.getState().renewStream(0, false);
+		expect(usePlayerStore.getState().startPositionMs).toBeNull();
+		expect(usePlayerStore.getState().isPlaying).toBe(false);
+
+		usePlayerStore.getState().setPlaybackReady();
+		expect(usePlayerStore.getState().playbackState).toBe('paused');
+
+		usePlayerStore.getState().resume();
+		expect(usePlayerStore.getState().playbackState).toBe('playing');
+	});
+
+	it('playTrack resets the renewal flags', () => {
+		usePlayerStore.getState().playTrack(makeTrack(11));
+		usePlayerStore.getState().renewStream(5000, false, true);
+
+		usePlayerStore.getState().playTrack(makeTrack(12));
+
+		const state = usePlayerStore.getState();
+		expect(state.streamRenewed).toBe(false);
+		expect(state.resumeAfterLoad).toBe(true);
+	});
+
+	it('renewStream does nothing without a track', () => {
+		usePlayerStore.getState().renewStream(5000, true);
+		expect(usePlayerStore.getState().loadCounter).toBe(0);
+		expect(usePlayerStore.getState().playbackState).toBe('idle');
+	});
+});
+
 describe('playback position (#295)', () => {
 	afterEach(() => setPositionReader(null));
 

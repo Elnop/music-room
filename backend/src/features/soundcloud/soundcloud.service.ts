@@ -9,7 +9,10 @@ const Soundcloud = SoundcloudModule.default || SoundcloudModule;
 import { logger } from '@/shared/utils/logger.js';
 import { initializeSoundcloudInstance } from '@/features/soundcloud/utils/client-extractor.js';
 import { SoundCloudSearchService } from '@/features/soundcloud/services/soundcloud-search.service.js';
-import { SoundCloudStreamService } from '@/features/soundcloud/services/soundcloud-stream.service.js';
+import {
+	SoundCloudStreamService,
+	type StreamUrlResult,
+} from '@/features/soundcloud/services/soundcloud-stream.service.js';
 import type {
 	SoundCloudClient,
 	SoundCloudSearchQuery,
@@ -55,7 +58,7 @@ export class SoundCloudService {
 	/**
 	 * Get stream URL for a track
 	 */
-	async getStreamUrl(trackUrl: string): Promise<string> {
+	async getStreamUrl(trackUrl: string): Promise<StreamUrlResult> {
 		return this.streamService.getStreamUrl(trackUrl);
 	}
 

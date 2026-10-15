@@ -106,7 +106,10 @@ describe('SoundCloud routes: auth, per-user rate limit, validation', () => {
 		if (isRedisConnected()) await clearKeys();
 		service.searchTracks.mockReset().mockResolvedValue({ tracks: [], count: 0 });
 		service.getTrack.mockReset().mockResolvedValue({ id: 1, title: 'Track' });
-		service.getStreamUrl.mockReset().mockResolvedValue('https://cf-hls-media.sndcdn.com/x.m3u8');
+		service.getStreamUrl.mockReset().mockResolvedValue({
+			streamUrl: 'https://cf-hls-media.sndcdn.com/x.m3u8',
+			expiresAt: '2026-01-01T00:30:00.000Z',
+		});
 	});
 
 	afterAll(async () => {
@@ -172,7 +175,10 @@ describe('SoundCloud routes: auth, per-user rate limit, validation', () => {
 		expect(stream.status).toBe(200);
 		expect(await stream.json()).toMatchObject({
 			success: true,
-			data: { streamUrl: 'https://cf-hls-media.sndcdn.com/x.m3u8' },
+			data: {
+				streamUrl: 'https://cf-hls-media.sndcdn.com/x.m3u8',
+				expiresAt: '2026-01-01T00:30:00.000Z',
+			},
 		});
 		expect(service.getStreamUrl).toHaveBeenLastCalledWith(TRACK_URL);
 	});

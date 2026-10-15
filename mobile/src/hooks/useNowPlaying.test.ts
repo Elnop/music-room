@@ -19,7 +19,7 @@ jest.mock('@/store/socketStore', () => ({
 }));
 
 jest.mock('@/contexts/PlayerContext', () => ({
-	usePlayer: () => ({ player: { seekTo: mockSeekTo } }),
+	usePlayer: () => ({ player: {}, seekTo: mockSeekTo }),
 }));
 
 jest.mock('@/hooks/usePlayerProgress', () => ({

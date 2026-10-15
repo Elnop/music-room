@@ -36,6 +36,12 @@ interface PlayerState {
 	queueItemId: string | null;
 	/** Where the loaded track starts, in ms, for a transferred playback (#297); null = from 0. */
 	startPositionMs: number | null;
+	/** When `streamUrl` expires, in epoch ms; null while unknown (#313). */
+	streamExpiresAt: number | null;
+	/** The stream was renewed after a failure since the last `playTrack`: a further failure is final (#313). */
+	streamRenewed: boolean;
+	/** Whether the loaded stream starts playing; false after a renewal made while paused (#313). */
+	resumeAfterLoad: boolean;
 
 	// State machine
 	playbackState: PlaybackState;
@@ -52,7 +58,8 @@ interface PlayerState {
 	seekCount: number;
 
 	// Actions
-	setStreamUrl: (url: string | null) => void;
+	/** Set the stream URL and, when known, its expiry (epoch ms). */
+	setStreamUrl: (url: string | null, expiresAt?: number | null) => void;
 	setLoading: (loading: boolean) => void;
 	setError: (error: string | null) => void;
 	setTrackUnavailableError: (message: string) => void;
@@ -65,6 +72,12 @@ interface PlayerState {
 		queueItemId?: string | null,
 		startPositionMs?: number | null
 	) => void;
+	/**
+	 * Reload the current track with a new stream URL, at `positionMs`, playing or
+	 * paused (#313). Keeps the track, queue item and modal. `afterFailure` marks the
+	 * stream renewed, so a renewal made only because the URL was expiring keeps the retry.
+	 */
+	renewStream: (positionMs: number, keepPlaying: boolean, afterFailure?: boolean) => void;
 	play: () => void;
 	pause: () => void;
 	resume: () => void;
@@ -82,6 +95,9 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 	loadCounter: 0,
 	queueItemId: null,
 	startPositionMs: null,
+	streamExpiresAt: null,
+	streamRenewed: false,
+	resumeAfterLoad: true,
 	playbackState: 'idle',
 	isPlaying: false,
 	loading: false,
@@ -89,8 +105,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 	isModalOpen: false,
 	seekCount: 0,
 
-	setStreamUrl: url => {
-		set({ streamUrl: url });
+	setStreamUrl: (url, expiresAt = null) => {
+		set({ streamUrl: url, streamExpiresAt: url ? expiresAt : null });
 	},
 
 	setLoading: loading => {
@@ -116,6 +132,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 			currentTrack: null,
 			queueItemId: null,
 			streamUrl: null,
+			streamExpiresAt: null,
 			pendingTrackId: null,
 			playbackState: 'idle',
 			isPlaying: false,
@@ -132,7 +149,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 		if (state.playbackState === 'loading') {
 			if (__DEV__) console.log('🎵 [playerStore] Stream ready, transitioning to ready state');
 			set({
-				playbackState: 'ready',
+				// A stream renewed while paused comes back paused, so play resumes it (#313).
+				playbackState: state.resumeAfterLoad ? 'ready' : 'paused',
 				loading: false,
 				pendingTrackId: null,
 			});
@@ -176,10 +194,34 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 			loadCounter: state.loadCounter + 1,
 			playbackState: 'loading',
 			streamUrl: null,
+			streamExpiresAt: null,
+			streamRenewed: false,
+			resumeAfterLoad: true,
 			isPlaying: false,
 			loading: true,
 			// A list tap closes the modal; a queue step (next/previous, auto-advance) keeps it.
 			isModalOpen: queueItemId === null ? false : state.isModalOpen,
+			error: null,
+		}));
+	},
+
+	renewStream: (positionMs, keepPlaying, afterFailure = false) => {
+		const { currentTrack } = get();
+		if (!currentTrack) return;
+		if (__DEV__) console.log('🎵 [playerStore] Renewing stream URL:', { positionMs, keepPlaying });
+
+		set(state => ({
+			startPositionMs: Number.isFinite(positionMs) && positionMs > 0 ? positionMs : null,
+			pendingTrackId: currentTrack.id,
+			loadCounter: state.loadCounter + 1,
+			playbackState: 'loading',
+			streamUrl: null,
+			streamExpiresAt: null,
+			streamRenewed: afterFailure || state.streamRenewed,
+			resumeAfterLoad: keepPlaying,
+			// Unchanged play state: the listening status is not re-sent for a renewal.
+			isPlaying: keepPlaying,
+			loading: true,
 			error: null,
 		}));
 	},
@@ -223,6 +265,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 			queueItemId: null,
 			startPositionMs: null,
 			streamUrl: null,
+			streamExpiresAt: null,
 			pendingTrackId: null,
 			playbackState: 'idle',
 			isPlaying: false,

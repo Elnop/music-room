@@ -31,7 +31,7 @@ export function PlayerModal() {
 	const { theme } = useTheme();
 	const insets = useSafeAreaInsets();
 
-	const { player, error } = usePlayer();
+	const { player, error, seekTo } = usePlayer();
 	const isModalOpen = usePlayerStore(state => state.isModalOpen);
 	const setModalOpen = usePlayerStore(state => state.setModalOpen);
 	const {
@@ -147,8 +147,7 @@ export function PlayerModal() {
 	// No remote seek: the backend has no such command (#297).
 	const handleSeek = (value: number) => {
 		if (!player || isRemote) return;
-		player.seekTo(value);
-		usePlayerStore.getState().markSeek();
+		seekTo(value);
 	};
 
 	// Local: previous restarts the track past RESTART_THRESHOLD_S, otherwise steps back

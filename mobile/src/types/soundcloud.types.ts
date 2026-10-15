@@ -23,3 +23,9 @@ export interface SoundCloudSearchResult {
 	total_results?: number;
 	next_href?: string | null;
 }
+
+/** `data` of GET /api/soundcloud/stream: a stream URL and when it expires (ISO 8601) */
+export interface StreamUrlResponse {
+	streamUrl: string;
+	expiresAt: string;
+}

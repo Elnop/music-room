@@ -6,8 +6,13 @@
 export const CACHE_TTL = {
 	SEARCH: 3600, // 1 hour for search results
 	TRACK: 3600, // 1 hour for track details
-	STREAM: 1800, // 30 minutes for stream URLs (they can expire)
+	// Stream URLs live STREAM_URL_LIFETIME_S; caching them for less guarantees a cached URL
+	// still has 10 minutes left, and a renewal made 2 minutes before expiry misses the cache.
+	STREAM: 1200,
 } as const;
+
+/** Lifetime of a SoundCloud stream URL, in seconds */
+export const STREAM_URL_LIFETIME_S = 1800;
 
 export interface CacheEntry<T> {
 	data: T;
