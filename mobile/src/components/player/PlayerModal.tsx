@@ -16,14 +16,8 @@ import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@/themes/types';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { usePlayerStore } from '@/store/playerStore';
-import {
-	previousAction,
-	RESTART_THRESHOLD_S,
-	selectHasNext,
-	selectHasPrevious,
-	useQueueStore,
-} from '@/store/queueStore';
-import { usePlayerProgress } from '@/hooks/usePlayerProgress';
+import { RESTART_THRESHOLD_S } from '@/store/queueStore';
+import { useNowPlaying } from '@/hooks/useNowPlaying';
 import { useImageColors, hexToRgba, getAdaptiveColors, isLightColor } from '@/hooks/useImageColors';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { QueueModal } from '@/components/player/QueueModal';
@@ -37,17 +31,25 @@ export function PlayerModal() {
 	const insets = useSafeAreaInsets();
 
 	const { player, error } = usePlayer();
-	const { currentTrack, playbackState, isModalOpen, setModalOpen, pause, resume } =
-		usePlayerStore();
-
-	const { currentTime, duration } = usePlayerProgress();
-	const hasNext = useQueueStore(selectHasNext);
-	const queueHasPrevious = useQueueStore(selectHasPrevious);
-	const queueItemId = usePlayerStore(state => state.queueItemId);
-	// Only a queue item steps back; a list-tapped track restarts instead.
-	const hasPrevious = queueHasPrevious && queueItemId !== null;
-	const queueNext = useQueueStore(state => state.next);
-	const queuePrevious = useQueueStore(state => state.previous);
+	const isModalOpen = usePlayerStore(state => state.isModalOpen);
+	const setModalOpen = usePlayerStore(state => state.setModalOpen);
+	const {
+		isRemote,
+		track,
+		isPlaying,
+		isLoading,
+		canToggle,
+		positionMs,
+		durationMs,
+		deviceLabel,
+		toggle,
+		next,
+		previous,
+		hasNext,
+		hasPrevious,
+	} = useNowPlaying();
+	const currentTime = positionMs / 1000;
+	const duration = durationMs !== null ? durationMs / 1000 : null;
 
 	const [isQueueOpen, setQueueOpen] = React.useState(false);
 	// The queue opens over the player only: closing the player closes it too.
@@ -93,15 +95,10 @@ export function PlayerModal() {
 		}
 	}, [isModalOpen, translateY]);
 
-	const artworkUrl = currentTrack?.artwork_url || currentTrack?.user?.avatar_url || null;
+	const artworkUrl = track?.artworkUrl || null;
 	const { dominantColor } = useImageColors(artworkUrl, theme.colors.primary);
 
 	const styles = useMemo(() => createStyles(theme, insets), [theme, insets]);
-
-	const isLoading = playbackState === 'loading';
-	const isPlaying = playbackState === 'playing';
-	const canInteract =
-		currentTrack !== null && (playbackState === 'playing' || playbackState === 'paused');
 
 	const adaptive = dominantColor ? getAdaptiveColors(dominantColor) : null;
 	const isDarkBg = dominantColor ? !isLightColor(dominantColor) : false;
@@ -133,36 +130,20 @@ export function PlayerModal() {
 	};
 
 	const handlePlayPause = () => {
-		if (!canInteract || !player) return;
-		if (isPlaying) {
-			pause();
-		} else {
-			resume();
-		}
+		if (canToggle) toggle();
 	};
 
+	// No remote seek: the backend has no such command (#297).
 	const handleSeek = (value: number) => {
-		if (!player) return;
+		if (!player || isRemote) return;
 		player.seekTo(value);
 		usePlayerStore.getState().markSeek();
 	};
 
-	// Previous restarts the track past RESTART_THRESHOLD_S, otherwise steps back in the queue.
-	const handlePrevious = () => {
-		if (!player) return;
-		if (previousAction(currentTime, hasPrevious) === 'restart') {
-			player.seekTo(0);
-			usePlayerStore.getState().markSeek();
-		} else {
-			queuePrevious();
-		}
-	};
-
-	const handleNext = () => {
-		queueNext();
-	};
-
-	const canGoPrevious = canInteract && (hasPrevious || currentTime > RESTART_THRESHOLD_S);
+	// Local: previous restarts the track past RESTART_THRESHOLD_S, otherwise steps back
+	// in the queue. Remote: always steps back, since the phone cannot seek the device.
+	const canGoPrevious =
+		canToggle && (hasPrevious || (!isRemote && currentTime > RESTART_THRESHOLD_S));
 
 	const gradientColors: [string, string, string, string] = dominantColor
 		? [
@@ -179,7 +160,7 @@ export function PlayerModal() {
 			];
 
 	const displayArtwork = artworkUrl || 'https://via.placeholder.com/300';
-	const canGoNext = currentTrack !== null && hasNext;
+	const canGoNext = track !== null && hasNext;
 
 	return (
 		<Modal
@@ -228,13 +209,22 @@ export function PlayerModal() {
 						<Text style={[styles.nowPlayingText, { color: colors.textSecondary }]}>
 							NOW PLAYING
 						</Text>
+						{deviceLabel && (
+							<Text
+								style={[styles.deviceText, { color: colors.text }]}
+								numberOfLines={1}
+								accessibilityLabel={`Lecture sur ${deviceLabel}`}
+							>
+								Sur {deviceLabel}
+							</Text>
+						)}
 					</View>
 
 					{/* Main content centered */}
 					<View style={styles.mainContent}>
 						<View style={styles.artworkWrapper}>
 							<View style={styles.artworkShadow}>
-								{currentTrack ? (
+								{track ? (
 									<Image source={{ uri: displayArtwork }} style={styles.artwork} />
 								) : (
 									<View style={[styles.artwork, styles.emptyArtwork]}>
@@ -246,46 +236,49 @@ export function PlayerModal() {
 
 						<View style={styles.trackInfo}>
 							<Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
-								{currentTrack ? currentTrack.title : 'Rien en lecture'}
+								{track ? track.title : 'Rien en lecture'}
 							</Text>
 							<Text style={[styles.artist, { color: colors.textSecondary }]} numberOfLines={1}>
-								{currentTrack ? currentTrack.user.username : 'Choisis un son pour commencer'}
+								{track ? track.artist : 'Choisis un son pour commencer'}
 							</Text>
 						</View>
 
-						{error && (
+						{error && !isRemote && (
 							<View style={styles.errorContainer}>
 								<Ionicons name="warning" size={16} color={theme.colors.error} />
 								<Text style={styles.errorText}>{error}</Text>
 							</View>
 						)}
 
-						<View style={styles.progressContainer}>
-							<Slider
-								style={styles.slider}
-								minimumValue={0}
-								maximumValue={duration || 1}
-								value={currentTrack ? currentTime : 0}
-								onSlidingComplete={handleSeek}
-								minimumTrackTintColor={colors.slider}
-								maximumTrackTintColor={colors.sliderBg}
-								thumbTintColor={colors.slider}
-								disabled={isLoading || !player || !currentTrack}
-							/>
-							<View style={styles.timeContainer}>
-								<Text style={[styles.timeText, { color: colors.textSecondary }]}>
-									{formatTime(currentTrack ? currentTime : 0)}
-								</Text>
-								<Text style={[styles.timeText, { color: colors.textSecondary }]}>
-									{formatTime(currentTrack ? duration : 0)}
-								</Text>
+						{/* Hidden when the length is unknown (a remote track off the queue). */}
+						{duration !== null && (
+							<View style={styles.progressContainer}>
+								<Slider
+									style={styles.slider}
+									minimumValue={0}
+									maximumValue={duration || 1}
+									value={track ? currentTime : 0}
+									onSlidingComplete={handleSeek}
+									minimumTrackTintColor={colors.slider}
+									maximumTrackTintColor={colors.sliderBg}
+									thumbTintColor={colors.slider}
+									disabled={isRemote || isLoading || !player || !track}
+								/>
+								<View style={styles.timeContainer}>
+									<Text style={[styles.timeText, { color: colors.textSecondary }]}>
+										{formatTime(track ? currentTime : 0)}
+									</Text>
+									<Text style={[styles.timeText, { color: colors.textSecondary }]}>
+										{formatTime(track ? duration : 0)}
+									</Text>
+								</View>
 							</View>
-						</View>
+						)}
 
 						<View style={styles.controls}>
 							<TouchableOpacity
 								style={[styles.secondaryButton, { backgroundColor: colors.buttonBg }]}
-								onPress={handlePrevious}
+								onPress={previous}
 								disabled={!canGoPrevious}
 								activeOpacity={0.7}
 								accessibilityLabel="Previous track"
@@ -301,7 +294,7 @@ export function PlayerModal() {
 							<TouchableOpacity
 								style={[styles.playButton, { backgroundColor: colors.playBtnBg }]}
 								onPress={handlePlayPause}
-								disabled={isLoading || !currentTrack}
+								disabled={isLoading || !track}
 								activeOpacity={0.8}
 								accessibilityLabel={isPlaying ? 'Pause' : 'Play'}
 							>
@@ -314,7 +307,7 @@ export function PlayerModal() {
 										color={colors.playBtnIcon}
 										style={[
 											isPlaying ? undefined : { marginLeft: 4 },
-											currentTrack ? undefined : styles.disabledIcon,
+											track ? undefined : styles.disabledIcon,
 										]}
 									/>
 								)}
@@ -322,7 +315,7 @@ export function PlayerModal() {
 
 							<TouchableOpacity
 								style={[styles.secondaryButton, { backgroundColor: colors.buttonBg }]}
-								onPress={handleNext}
+								onPress={next}
 								disabled={!canGoNext}
 								activeOpacity={0.7}
 								accessibilityLabel="Next track"
@@ -402,6 +395,12 @@ const createStyles = (theme: Theme, insets: { top: number; bottom: number }) =>
 			fontWeight: '600',
 			letterSpacing: 2,
 			marginTop: 8,
+		},
+		deviceText: {
+			fontSize: 13,
+			fontWeight: '600',
+			marginTop: 4,
+			paddingHorizontal: 72,
 		},
 		mainContent: {
 			flex: 1,

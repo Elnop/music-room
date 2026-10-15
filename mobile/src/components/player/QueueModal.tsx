@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@/themes/types';
-import { useQueueStore } from '@/store/queueStore';
+import { useActiveQueue, useQueueStore } from '@/store/queueStore';
 import { afterItemIdForDrop } from '@/store/moveTarget';
 import { ReorderableList } from '@/components/common/ReorderableList';
 import { EmptyState } from '@/components/common/EmptyState';
@@ -29,8 +29,8 @@ export function QueueModal({ visible, onClose }: QueueModalProps) {
 	const insets = useSafeAreaInsets();
 	const styles = React.useMemo(() => createStyles(theme, insets), [theme, insets]);
 
-	const items = useQueueStore(state => state.items);
-	const currentItemId = useQueueStore(state => state.currentItemId);
+	// The queue of the active device's owner: a friend's in remote mode on their device (#297).
+	const { items, currentItemId } = useActiveQueue();
 	const playItem = useQueueStore(state => state.playItem);
 	const removeItem = useQueueStore(state => state.removeItem);
 	const moveItem = useQueueStore(state => state.moveItem);

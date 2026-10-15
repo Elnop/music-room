@@ -2,7 +2,21 @@ import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { PlayerModal } from '@/components/player/PlayerModal';
 import { usePlayerStore } from '@/store/playerStore';
+import { useConnectStore } from '@/store/connectStore';
+import { useQueueStore } from '@/store/queueStore';
+import { useAuthStore } from '@/store/authStore';
+import { hashStringToNumber } from '@utils/trackToSoundCloud';
+import type { UserProfile } from '@/types/user.types';
 import { useImageColors } from '@/hooks/useImageColors';
+
+jest.mock('@/lib/supabase', () => ({
+	supabase: { auth: { signOut: jest.fn(), setSession: jest.fn() } },
+}));
+
+jest.mock('@services/oauth', () => ({
+	signInWithGoogle: jest.fn(),
+	signInWithFacebook: jest.fn(),
+}));
 
 jest.mock('@/contexts/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@themes/original.theme');
@@ -89,6 +103,7 @@ jest.mock('react-native-reanimated', () => jest.requireActual('react-native-rean
 describe('PlayerModal without a track', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
+		useConnectStore.setState({ target: { kind: 'local' }, remoteStatus: null });
 		usePlayerStore.setState({ currentTrack: null, playbackState: 'idle', isModalOpen: true });
 	});
 
@@ -111,5 +126,66 @@ describe('PlayerModal without a track', () => {
 	it('asks for no artwork colors', () => {
 		render(<PlayerModal />);
 		expect(useImageColors).toHaveBeenCalledWith(null, expect.anything());
+	});
+});
+
+describe('PlayerModal in remote mode', () => {
+	const trackUri = 'https://soundcloud.com/artist/b';
+	const status = (id: number) => ({
+		ownerId: 'friend',
+		device: { deviceId: 'tablet', deviceName: 'Tablette', platform: 'android', model: 'Tab' },
+		track: { id, title: 'Remote song', artist: 'Léa', artworkUrl: null },
+		isPlaying: true,
+		positionMs: 30_000,
+		updatedAt: new Date().toISOString(),
+	});
+
+	beforeEach(() => {
+		jest.clearAllMocks();
+		useAuthStore.setState({ user: { id: 'me' } as UserProfile });
+		useQueueStore.getState().reset();
+		usePlayerStore.setState({ currentTrack: null, playbackState: 'idle', isModalOpen: true });
+		useConnectStore.setState({
+			target: { kind: 'remote', ownerId: 'friend', deviceId: 'tablet', ownerUsername: 'Léa' },
+		});
+	});
+
+	it("shows the device's track with a read-only seek bar", () => {
+		useQueueStore.getState().applyState({
+			ownerId: 'friend',
+			version: 1,
+			currentItemId: 'b',
+			items: [
+				{
+					id: 'b',
+					rank: 'b',
+					track: {
+						trackUri,
+						title: 'Remote song',
+						artist: 'Léa',
+						album: null,
+						albumArt: null,
+						durationMs: 180_000,
+					},
+					sourcePlaylistId: null,
+					blockId: null,
+					blockDetached: false,
+				},
+			],
+		});
+		useConnectStore.setState({ remoteStatus: status(hashStringToNumber(trackUri)) });
+		render(<PlayerModal />);
+
+		expect(screen.getByText('Remote song')).toBeTruthy();
+		expect(screen.getByText('Sur Tablette de Léa')).toBeTruthy();
+		expect(screen.getByTestId('seek-slider').props.disabled).toBe(true);
+		expect(screen.getByText('3:00')).toBeTruthy();
+		expect(screen.getByLabelText('Pause')).not.toBeDisabled();
+	});
+
+	it('hides the progress bar when the duration is unknown', () => {
+		useConnectStore.setState({ remoteStatus: status(1) });
+		render(<PlayerModal />);
+		expect(screen.queryByTestId('seek-slider')).toBeNull();
 	});
 });

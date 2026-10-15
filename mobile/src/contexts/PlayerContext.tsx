@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useRef } from 'react';
 import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
 import { usePlayerStore, setPositionReader } from '@/store/playerStore';
 import { useQueueStore } from '@/store/queueStore';
+import { useConnectStore } from '@/store/connectStore';
 import { ApiError, apiRequest } from '@/services/api';
 
 // Configure audio mode for iOS - play in silent mode and background
@@ -31,7 +32,8 @@ const PlayerContext = createContext<PlayerContextValue | null>(null);
 
 /**
  * Plays the next queue item when a track ends (#274), once per loaded track;
- * at the queue end the store stops playback. Fires on the rising edge of
+ * at the queue end the store stops playback. Only in local mode: in remote
+ * mode the device that plays advances itself (#297). Fires on the rising edge of
  * `didJustFinish` while playing, so a stale flag left from the previous track
  * cannot skip the next one. A component of its own so the frequent status
  * updates re-render only it, not the context consumers.
@@ -47,6 +49,7 @@ function QueueAutoAdvance({ player }: { player: ReturnType<typeof useAudioPlayer
 		const risingEdge = didJustFinish && !wasFinishedRef.current;
 		wasFinishedRef.current = didJustFinish;
 		if (!risingEdge || !isPlaying || finishedLoadRef.current === loadCounter) return;
+		if (useConnectStore.getState().target.kind !== 'local') return;
 		finishedLoadRef.current = loadCounter;
 		if (__DEV__) console.log('🎵 [PlayerProvider] Track finished, playing next queue item');
 		useQueueStore.getState().next();
@@ -233,6 +236,17 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 					});
 
 				hasTriedToPlayRef.current = true;
+				// A transferred playback resumes where the other device was (#297).
+				const { startPositionMs } = usePlayerStore.getState();
+				if (startPositionMs !== null) {
+					player
+						.seekTo(startPositionMs / 1000)
+						// Re-send the listening status with the new position (#295).
+						.then(() => usePlayerStore.getState().markSeek())
+						.catch(err => {
+							console.warn('[PlayerContext] Start position seek failed:', err);
+						});
+				}
 				player.play();
 				setPlaybackPlaying();
 

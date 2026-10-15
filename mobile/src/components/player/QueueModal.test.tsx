@@ -2,7 +2,19 @@ import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { QueueModal } from '@/components/player/QueueModal';
 import { useQueueStore } from '@/store/queueStore';
+import { useAuthStore } from '@/store/authStore';
+import { useConnectStore } from '@/store/connectStore';
+import type { UserProfile } from '@/types/user.types';
 import type { QueueItem, QueueState } from '@/types/queue.types';
+
+jest.mock('@/lib/supabase', () => ({
+	supabase: { auth: { signOut: jest.fn(), setSession: jest.fn() } },
+}));
+
+jest.mock('@services/oauth', () => ({
+	signInWithGoogle: jest.fn(),
+	signInWithFacebook: jest.fn(),
+}));
 
 jest.mock('@/contexts/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@themes/original.theme');
@@ -87,8 +99,8 @@ const item = (id: string): QueueItem => ({
 });
 
 let nextVersion = 0;
-const setQueue = (state: Pick<QueueState, 'currentItemId' | 'items'>) =>
-	useQueueStore.getState().applyState({ ownerId: 'owner', version: ++nextVersion, ...state });
+const setQueue = (state: Pick<QueueState, 'currentItemId' | 'items'>, ownerId = 'owner') =>
+	useQueueStore.getState().applyState({ ownerId, version: ++nextVersion, ...state });
 
 // Row titles in screen order.
 const titles = () => screen.queryAllByText(/^Title /).map(node => node.props.children);
@@ -103,6 +115,8 @@ const initialQueue = useQueueStore.getState();
 
 beforeEach(() => {
 	useQueueStore.setState(initialQueue, true);
+	useAuthStore.setState({ user: { id: 'owner' } as UserProfile });
+	useConnectStore.setState({ target: { kind: 'local' }, remoteStatus: null });
 });
 
 describe('QueueModal', () => {
@@ -163,5 +177,16 @@ describe('QueueModal', () => {
 
 		act(() => setQueue({ currentItemId: 'a', items: ['a', 'c', 'b'].map(item) }));
 		expect(titles()).toEqual(['Title a', 'Title c', 'Title b']);
+	});
+
+	it("shows the friend's queue in remote mode on their device, mine again after", async () => {
+		setQueue({ currentItemId: 'a', items: ['a', 'b'].map(item) });
+		useConnectStore.setState({ target: { kind: 'remote', ownerId: 'friend', deviceId: 'tablet' } });
+		setQueue({ currentItemId: 'c', items: ['c', 'd'].map(item) }, 'friend');
+		await renderModal();
+		expect(titles()).toEqual(['Title c', 'Title d']);
+
+		act(() => useConnectStore.setState({ target: { kind: 'local' } }));
+		expect(titles()).toEqual(['Title a', 'Title b']);
 	});
 });

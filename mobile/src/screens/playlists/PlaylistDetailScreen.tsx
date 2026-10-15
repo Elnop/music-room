@@ -68,14 +68,8 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 		conflictMessage,
 		clearConflictMessage,
 	} = usePlaylistStore();
-	const {
-		currentTrack,
-		isPlaying,
-		loading: playerLoading,
-		playTrack,
-		pause,
-		resume,
-	} = usePlayerStore();
+	const { currentTrack, isPlaying, loading: playerLoading, pause, resume } = usePlayerStore();
+	const playListTrack = useQueueStore(state => state.playListTrack);
 
 	const coverUrl = currentPlaylist?.coverUrl || currentPlaylist?.tracks[0]?.albumArt;
 	const { dominantColor } = useImageColors(coverUrl, theme.colors.primary);
@@ -147,7 +141,8 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 				resume();
 			}
 		} else {
-			playTrack(trackToSoundCloud(track));
+			// On the phone, or on the remote device in remote mode (#297).
+			void playListTrack(trackToSoundCloud(track));
 		}
 	};
 
