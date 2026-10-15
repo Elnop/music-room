@@ -31,10 +31,6 @@ jest.mock('@/services/deviceService', () => ({
 	deviceService: { getDeviceInfo: jest.fn(async () => ({ deviceId: 'phone' })) },
 }));
 
-jest.mock('@/contexts/PlayerContext', () => ({
-	usePlayer: () => ({ player: null, error: null }),
-}));
-
 jest.mock('@/services/queueApi', () => ({
 	queueApi: { getQueue: jest.fn(), transfer: jest.fn() },
 }));

@@ -125,7 +125,7 @@ export function useMusicControlEmitter() {
 /**
  * A friend's device as seen from their profile, with whether I may control it
  */
-export interface FriendDeviceStatus extends ListeningStatus {
+interface FriendDeviceStatus extends ListeningStatus {
 	controllable: boolean;
 }
 

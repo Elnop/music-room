@@ -4,7 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { usePlayerStore } from '@store/playerStore';
-import { selectPlaysPlaylist, useActiveQueue, useQueueStore } from '@store/queueStore';
+import { useActiveQueue, useQueueStore } from '@store/queueStore';
+import { selectPlaysPlaylist } from '@store/queueSelectors';
 import { showInfo } from '@utils/toast';
 import type { Theme } from '@themes/types';
 

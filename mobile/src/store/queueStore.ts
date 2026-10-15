@@ -7,23 +7,21 @@ import { useConnectStore, useActiveOwnerId } from '@/store/connectStore';
 import { trackToSoundCloud } from '@utils/trackToSoundCloud';
 import { toTrackInput } from '@utils/trackInput';
 import { showError, showInfo, showSuccess } from '@utils/toast';
-import type { AddQueueItemBody, QueueItem, QueueState, QueueStepResult } from '@/types/queue.types';
+import type { AddQueueItemBody, QueueState, QueueStepResult } from '@/types/queue.types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
-
-/** Past this many seconds played, "previous" restarts the track instead. */
-export const RESTART_THRESHOLD_S = 3;
-
-/** What the previous button does at `currentTime` seconds into the track. */
-export function previousAction(currentTime: number, hasPrevious: boolean): 'restart' | 'previous' {
-	return currentTime > RESTART_THRESHOLD_S || !hasPrevious ? 'restart' : 'previous';
-}
+import {
+	currentItem,
+	playPlaylistError,
+	selectQueue,
+	type OwnerQueue,
+} from '@/store/queueSelectors';
 
 /**
  * Outcome of a step: the new current item plays, the queue has no current
  * item left (playback stopped when asked), at a queue boundary, failed, or
  * ignored because another step was still pending.
  */
-export type QueueStepOutcome = 'played' | 'stopped' | 'boundary' | 'error' | 'ignored';
+type QueueStepOutcome = 'played' | 'stopped' | 'boundary' | 'error' | 'ignored';
 
 /** True while a request that changes the current item is in flight. */
 let stepPending = false;
@@ -35,16 +33,11 @@ interface StepOptions {
 	stopWhenEmpty?: boolean;
 }
 
-/** One owner's queue as the store holds it. */
-export interface OwnerQueue {
-	currentItemId: string | null;
-	items: QueueItem[];
-	/** Version of the state held (#285). */
-	version: number;
-}
-
 interface QueueStoreState {
-	/** Queues by owner id: mine, and the remote owner's while the phone drives one of their devices (#297). */
+	/**
+	 * Queues by owner id: mine, and the remote owner's while the phone drives
+	 * one of their devices (#297).
+	 */
 	queues: Record<string, OwnerQueue>;
 	/** True once a server queue was read at least once. */
 	loaded: boolean;
@@ -92,61 +85,11 @@ interface QueueStoreState {
 	playListTrack: (track: SoundCloudTrack) => Promise<void>;
 }
 
-type QueueItemsView = Pick<QueueState, 'currentItemId' | 'items'>;
-
-/** The queue of an owner not loaded (yet): stable, so selectors do not re-render. */
-export const EMPTY_QUEUE: OwnerQueue = Object.freeze({
-	currentItemId: null,
-	items: [],
-	version: 0,
-}) as OwnerQueue;
-
-const currentIndex = (state: QueueItemsView): number =>
-	state.currentItemId === null
-		? -1
-		: state.items.findIndex(item => item.id === state.currentItemId);
-
-/** An owner's queue, or `EMPTY_QUEUE`. */
-export const selectQueue = (state: Pick<QueueStoreState, 'queues'>, ownerId: string | null) =>
-	(ownerId !== null && state.queues[ownerId]) || EMPTY_QUEUE;
-
 /** The queue the player shows and acts on: the remote owner's, else mine. */
 export function useActiveQueue(): OwnerQueue {
 	const ownerId = useActiveOwnerId();
 	return useQueueStore(state => selectQueue(state, ownerId));
 }
-
-/** An upcoming item exists (with nothing current, every item is upcoming). */
-export const selectHasNext = (state: QueueItemsView): boolean =>
-	currentIndex(state) < state.items.length - 1;
-
-/** A history item exists before the current one. */
-export const selectHasPrevious = (state: QueueItemsView): boolean => currentIndex(state) > 0;
-
-const currentItem = (state: QueueItemsView): QueueItem | undefined =>
-	state.items.find(item => item.id === state.currentItemId);
-
-/**
- * The queue item this device plays (`playerStore.queueItemId`) was queued from
- * `playlistId`. False for a list-tapped track or an item no longer in the queue.
- */
-export const selectPlaysPlaylist = (
-	state: QueueItemsView,
-	queueItemId: string | null,
-	playlistId: string
-): boolean =>
-	queueItemId !== null &&
-	state.items.some(item => item.id === queueItemId && item.sourcePlaylistId === playlistId);
-
-/** French toast for a failed play-playlist request. */
-const playPlaylistError = (error: unknown): string => {
-	if (error instanceof ApiError) {
-		if (error.code === 'PLAYLIST_EMPTY') return 'Cette playlist est vide';
-		if (error.code === 'PLAYLIST_ACCESS_DENIED') return "Vous n'avez pas accès à cette playlist";
-		if (error.code === 'PLAYLIST_NOT_FOUND') return "Cette playlist n'existe plus";
-	}
-	return 'Impossible de lire cette playlist';
-};
 
 /** Who an action acts on: the queue owner, whether a remote device plays, and the API target. */
 interface ActionScope {

@@ -16,7 +16,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@/themes/types';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { usePlayerStore } from '@/store/playerStore';
-import { RESTART_THRESHOLD_S } from '@/store/queueStore';
+import { RESTART_THRESHOLD_S } from '@/store/queueSelectors';
 import { useNowPlaying } from '@/hooks/useNowPlaying';
 import { useImageColors, hexToRgba, getAdaptiveColors, isLightColor } from '@/hooks/useImageColors';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
