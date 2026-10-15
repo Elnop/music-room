@@ -1,12 +1,16 @@
-# Keeps the status labels read by bmad-ticket (GitHub store) in step with the work:
-# a PR to develop moves the issues it closes from `in-progress` to `review`, and a
-# closed issue drops both labels. The board columns follow through the project's
-# built-in workflows (Pull request linked to issue -> Review, Item closed -> Done).
+# Keeps the status labels read by bmad-ticket (GitHub store) in step with the work.
+# GitHub only links `Closes #n` to issues for PRs into the default branch (`main`),
+# so for PRs into develop the issue numbers are parsed from the PR body:
+# - opening the PR moves them from `in-progress` to `review`, and their board card
+#   to `Review` when the PROJECT_TOKEN secret (classic PAT, `project` scope) is set;
+# - merging it closes them and drops both labels (the board's "Item closed" rule
+#   moves the card to `Done`).
+# An issue closed by hand also drops both labels.
 name: Issue status
 
 on:
   pull_request:
-    types: [opened, reopened, ready_for_review, edited]
+    types: [opened, reopened, ready_for_review, edited, closed]
     branches: [develop]
   issues:
     types: [closed]
@@ -15,25 +19,86 @@ permissions:
   issues: write
   pull-requests: read
 
+env:
+  # Closing keywords GitHub recognises, followed by an issue number.
+  CLOSING_REGEX: '\b(close[sd]?|fix(e[sd])?|resolve[sd]?):?[[:space:]]+#[0-9]+'
+
 jobs:
   pr-opened:
-    if: github.event_name == 'pull_request' && !github.event.pull_request.draft
+    if: >-
+      github.event_name == 'pull_request' && github.event.action != 'closed'
+      && !github.event.pull_request.draft
     runs-on: ubuntu-slim
     timeout-minutes: 5
     steps:
       - name: Move closing issues to review
         env:
           GH_TOKEN: ${{ github.token }}
+          PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN }}
           REPO: ${{ github.repository }}
-          PR: ${{ github.event.pull_request.number }}
+          BODY: ${{ github.event.pull_request.body }}
         run: |
-          issues=$(gh pr view "$PR" --repo "$REPO" --json closingIssuesReferences \
-            -q '.closingIssuesReferences[].number')
+          issues=$(printf '%s' "$BODY" | grep -oiE "$CLOSING_REGEX" | grep -oE '[0-9]+$' | sort -un || true)
           for n in $issues; do
-            state=$(gh issue view "$n" --repo "$REPO" --json state -q .state)
+            state=$(gh issue view "$n" --repo "$REPO" --json state -q .state) || continue
             [ "$state" = "OPEN" ] || continue
             gh issue edit "$n" --repo "$REPO" --add-label review --remove-label in-progress
             echo "#$n -> review"
+
+            if [ -z "$PROJECT_TOKEN" ]; then
+              echo "::notice::PROJECT_TOKEN not set, board card of #$n left as is"
+              continue
+            fi
+            # Every board the issue sits on with a Status field gets its card set to Review.
+            GH_TOKEN="$PROJECT_TOKEN" gh api graphql \
+              -F owner="${REPO%/*}" -F name="${REPO#*/}" -F number="$n" -f query='
+                query($owner: String!, $name: String!, $number: Int!) {
+                  repository(owner: $owner, name: $name) {
+                    issue(number: $number) {
+                      projectItems(first: 10) { nodes { id project { id
+                        field(name: "Status") { ... on ProjectV2SingleSelectField {
+                          id options { id name } } } } } }
+                    }
+                  }
+                }' \
+              -q '.data.repository.issue.projectItems.nodes[]
+                  | select(.project.field != null)
+                  | [.project.id, .id, .project.field.id,
+                     (.project.field.options[] | select(.name == "Review") | .id)]
+                  | @tsv' |
+            while IFS=$'\t' read -r project item field option; do
+              GH_TOKEN="$PROJECT_TOKEN" gh project item-edit --project-id "$project" \
+                --id "$item" --field-id "$field" --single-select-option-id "$option" > /dev/null
+              echo "#$n card -> Review"
+            done
+          done
+
+  pr-merged:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    steps:
+      # Events raised with GITHUB_TOKEN start no workflow, so issue-closed will not
+      # run for these: the labels are dropped here.
+      - name: Close issues and drop status labels
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          BODY: ${{ github.event.pull_request.body }}
+        run: |
+          issues=$(printf '%s' "$BODY" | grep -oiE "$CLOSING_REGEX" | grep -oE '[0-9]+$' | sort -un || true)
+          for n in $issues; do
+            state=$(gh issue view "$n" --repo "$REPO" --json state -q .state) || continue
+            [ "$state" = "OPEN" ] || continue
+            gh issue close "$n" --repo "$REPO" --reason completed --comment "Closed by #$PR (merged into develop)."
+            labels=$(gh issue view "$n" --repo "$REPO" --json labels -q '[.labels[].name] | join(",")')
+            for label in in-progress review; do
+              case ",$labels," in
+                *",$label,"*) gh issue edit "$n" --repo "$REPO" --remove-label "$label" ;;
+              esac
+            done
+            echo "#$n closed"
           done
 
   issue-closed:
