@@ -3,7 +3,18 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { PlayPlaylistButton } from '@/components/playlist/PlayPlaylistButton';
 import { usePlayerStore } from '@/store/playerStore';
 import { useQueueStore } from '@/store/queueStore';
+import { useAuthStore } from '@/store/authStore';
 import type { QueueItem } from '@/types/queue.types';
+import type { UserProfile } from '@/types/user.types';
+
+jest.mock('@/lib/supabase', () => ({
+	supabase: { auth: { signOut: jest.fn(), setSession: jest.fn() } },
+}));
+
+jest.mock('@services/oauth', () => ({
+	signInWithGoogle: jest.fn(),
+	signInWithFacebook: jest.fn(),
+}));
 
 jest.mock('@/contexts/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@themes/original.theme');
@@ -52,7 +63,9 @@ const resume = jest.fn();
 
 /** This device plays `blockItem` (queued from playlist p1) in `playbackState`. */
 const playingFromP1 = (playbackState: 'playing' | 'paused') => {
-	useQueueStore.setState({ currentItemId: 'q1', items: [blockItem] });
+	useQueueStore.setState({
+		queues: { me: { currentItemId: 'q1', items: [blockItem], version: 1 } },
+	});
 	usePlayerStore.setState({ queueItemId: 'q1', playbackState });
 };
 
@@ -64,6 +77,7 @@ const renderButton = async (playlistId = 'p1', trackCount = 2) => {
 
 beforeEach(() => {
 	jest.clearAllMocks();
+	useAuthStore.setState({ user: { id: 'me' } as UserProfile });
 	usePlayerStore.setState({ ...initialPlayer, pause, resume }, true);
 	useQueueStore.setState({ ...initialQueue, playPlaylist }, true);
 	playPlaylist.mockResolvedValue('played');

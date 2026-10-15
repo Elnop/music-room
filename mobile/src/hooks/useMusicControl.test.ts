@@ -22,7 +22,10 @@ const mockPlayerState = {
 	seekCount: 0,
 	pause: jest.fn(),
 	resume: jest.fn(),
+	playTrack: jest.fn(),
 };
+const mockSetCurrentItem = jest.fn();
+const mockSetLocal = jest.fn();
 
 jest.mock('@store/socketStore', () => ({
 	useSocketStore: (selector: (state: typeof mockSocketState) => unknown) =>
@@ -30,14 +33,27 @@ jest.mock('@store/socketStore', () => ({
 }));
 
 jest.mock('@store/authStore', () => ({
-	useAuthStore: (selector: (state: typeof mockAuthState) => unknown) => selector(mockAuthState),
+	useAuthStore: Object.assign(
+		(selector: (state: typeof mockAuthState) => unknown) => selector(mockAuthState),
+		{ getState: () => mockAuthState }
+	),
+}));
+
+jest.mock('@store/queueStore', () => ({
+	useQueueStore: { getState: () => ({ setCurrentItem: mockSetCurrentItem }) },
+}));
+
+jest.mock('@store/connectStore', () => ({
+	useConnectStore: { getState: () => ({ setLocal: mockSetLocal }) },
 }));
 
 jest.mock('@store/playerStore', () => {
 	let reader: (() => number) | null = null;
 	return {
-		usePlayerStore: (selector: (state: typeof mockPlayerState) => unknown) =>
-			selector(mockPlayerState),
+		usePlayerStore: Object.assign(
+			(selector: (state: typeof mockPlayerState) => unknown) => selector(mockPlayerState),
+			{ getState: () => mockPlayerState }
+		),
 		setPositionReader: (r: (() => number) | null) => {
 			reader = r;
 		},
@@ -165,6 +181,73 @@ describe('useMusicControlEmitter', () => {
 		mockPlayerState.seekCount = 0;
 		unmount();
 		setPositionReader(null);
+	});
+});
+
+describe('useMusicControlEmitter control:command', () => {
+	const queueTrack = {
+		trackUri: 'https://soundcloud.com/artist/song',
+		title: 'Song',
+		artist: 'Artist',
+		album: null,
+		albumArt: null,
+		durationMs: 200_000,
+	};
+
+	/** Render the emitter and return its control:command handler. */
+	const commandHandler = async () => {
+		const rendered = renderHook(() => useMusicControlEmitter());
+		await act(async () => {
+			await Promise.resolve();
+		});
+		const calls = mockSocket.on.mock.calls.filter(call => call[0] === 'control:command');
+		return { ...rendered, handle: calls[calls.length - 1][1] as (data: unknown) => void };
+	};
+
+	it('plays a play-item from its position, marks it current and goes back to local', async () => {
+		const { handle, unmount } = await commandHandler();
+		const item = {
+			id: 'item-1',
+			rank: 'a',
+			track: queueTrack,
+			sourcePlaylistId: null,
+			blockId: null,
+			blockDetached: false,
+		};
+		handle({ action: 'play-item', fromUserId: 'friend', item, positionMs: 42_000, version: 7 });
+
+		expect(mockPlayerState.playTrack).toHaveBeenCalledWith(
+			expect.objectContaining({ title: 'Song', permalink_url: queueTrack.trackUri }),
+			'item-1',
+			42_000
+		);
+		expect(mockSetCurrentItem).toHaveBeenCalledWith('user-1', 'item-1', 7);
+		expect(mockSetLocal).toHaveBeenCalledWith();
+		unmount();
+	});
+
+	it('plays a play-track from its position, with no queue item', async () => {
+		const { handle, unmount } = await commandHandler();
+		handle({ action: 'play-track', fromUserId: 'friend', track: queueTrack, positionMs: 5000 });
+
+		expect(mockPlayerState.playTrack).toHaveBeenCalledWith(
+			expect.objectContaining({ title: 'Song' }),
+			null,
+			5000
+		);
+		expect(mockSetCurrentItem).not.toHaveBeenCalled();
+		expect(mockSetLocal).toHaveBeenCalled();
+		unmount();
+	});
+
+	it('still pauses and resumes', async () => {
+		const { handle, unmount } = await commandHandler();
+		handle({ action: 'pause', fromUserId: 'friend' });
+		handle({ action: 'play', fromUserId: 'friend' });
+		expect(mockPlayerState.pause).toHaveBeenCalled();
+		expect(mockPlayerState.resume).toHaveBeenCalled();
+		expect(mockSetLocal).not.toHaveBeenCalled();
+		unmount();
 	});
 });
 

@@ -16,6 +16,9 @@ const mockQueueState = {
 	reset: jest.fn(),
 };
 const mockAuthState = { user: { id: 'me' } };
+let mockTarget: { kind: 'local' } | { kind: 'remote'; ownerId: string; deviceId: string } = {
+	kind: 'local',
+};
 
 jest.mock('@store/socketStore', () => ({
 	useSocketStore: (selector: (state: typeof mockSocketState) => unknown) =>
@@ -24,6 +27,10 @@ jest.mock('@store/socketStore', () => ({
 
 jest.mock('@store/queueStore', () => ({
 	useQueueStore: (selector: (state: typeof mockQueueState) => unknown) => selector(mockQueueState),
+}));
+
+jest.mock('@store/connectStore', () => ({
+	useConnectStore: { getState: () => ({ target: mockTarget }) },
 }));
 
 jest.mock('@store/authStore', () => ({
@@ -43,6 +50,7 @@ function setup() {
 
 beforeEach(() => {
 	jest.clearAllMocks();
+	mockTarget = { kind: 'local' };
 	jest.spyOn(console, 'log').mockImplementation(() => undefined);
 });
 
@@ -62,5 +70,15 @@ describe('useQueueSync queue:updated', () => {
 		const handler = setup();
 		handler(stateFor('friend'));
 		expect(mockQueueState.applyState).not.toHaveBeenCalled();
+	});
+
+	it('applies the queue of the owner whose device the phone drives', () => {
+		const handler = setup();
+		mockTarget = { kind: 'remote', ownerId: 'friend', deviceId: 'tablet' };
+		const state = stateFor('friend');
+		handler(state);
+		handler(stateFor('stranger'));
+		expect(mockQueueState.applyState).toHaveBeenCalledTimes(1);
+		expect(mockQueueState.applyState).toHaveBeenCalledWith(state);
 	});
 });

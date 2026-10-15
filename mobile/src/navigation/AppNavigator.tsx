@@ -25,6 +25,7 @@ import { PlayerModal } from '@/components/player/PlayerModal';
 import { PlayerErrorToast } from '@/components/player/PlayerErrorToast';
 import { PlayerProvider } from '@/contexts/PlayerContext';
 import { useQueueSync } from '@/hooks/useQueueSync';
+import { useRemoteTarget } from '@/hooks/useRemoteTarget';
 
 // Tab navigation types
 export type AppTabsParamList = {
@@ -58,6 +59,7 @@ export function AppNavigator() {
 	const insets = useSafeAreaInsets();
 	const styles = React.useMemo(() => createStyles(theme, insets.bottom), [theme, insets.bottom]);
 	useQueueSync();
+	useRemoteTarget();
 
 	return (
 		<PlayerProvider>

@@ -2,8 +2,20 @@ import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { MiniPlayer } from '@/components/player/MiniPlayer';
 import { usePlayerStore } from '@/store/playerStore';
+import { useConnectStore } from '@/store/connectStore';
+import { useAuthStore } from '@/store/authStore';
+import type { UserProfile } from '@/types/user.types';
 import { queueApi } from '@/services/queueApi';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
+
+jest.mock('@/lib/supabase', () => ({
+	supabase: { auth: { signOut: jest.fn(), setSession: jest.fn() } },
+}));
+
+jest.mock('@services/oauth', () => ({
+	signInWithGoogle: jest.fn(),
+	signInWithFacebook: jest.fn(),
+}));
 
 jest.mock('@/contexts/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@themes/original.theme');
@@ -57,6 +69,8 @@ describe('MiniPlayer', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
 		usePlayerStore.setState({ currentTrack: null, playbackState: 'idle', isModalOpen: false });
+		useAuthStore.setState({ user: { id: 'me' } as UserProfile });
+		useConnectStore.setState({ target: { kind: 'local' }, remoteStatus: null });
 	});
 
 	it('shows "Rien en lecture" without a track and opens the modal on tap', () => {
@@ -85,5 +99,42 @@ describe('MiniPlayer', () => {
 		expect(screen.getByText(track.title)).toBeTruthy();
 		act(() => usePlayerStore.getState().stop());
 		expect(screen.getByText('Rien en lecture')).toBeTruthy();
+	});
+
+	describe('in remote mode', () => {
+		const remoteStatus = (ownerId: string) => ({
+			ownerId,
+			device: { deviceId: 'tablet', deviceName: 'Tablette', platform: 'android', model: 'Tab' },
+			track: { id: 5, title: 'Sur la tablette', artist: 'Léa', artworkUrl: null },
+			isPlaying: true,
+			positionMs: 0,
+			updatedAt: new Date().toISOString(),
+		});
+
+		it("shows the friend's device track and « Sur Tablette de Léa »", () => {
+			useConnectStore.setState({
+				target: { kind: 'remote', ownerId: 'friend', deviceId: 'tablet', ownerUsername: 'Léa' },
+				remoteStatus: remoteStatus('friend'),
+			});
+			render(<MiniPlayer />);
+			expect(screen.getByText('Sur la tablette')).toBeTruthy();
+			expect(screen.getByText('Sur Tablette de Léa')).toBeTruthy();
+			expect(screen.getByLabelText('Pause')).not.toBeDisabled();
+		});
+
+		it('shows « Sur Tablette » for one of my devices', () => {
+			useConnectStore.setState({
+				target: { kind: 'remote', ownerId: 'me', deviceId: 'tablet' },
+				remoteStatus: remoteStatus('me'),
+			});
+			render(<MiniPlayer />);
+			expect(screen.getByText('Sur Tablette')).toBeTruthy();
+		});
+
+		it('shows no device line in local mode', () => {
+			usePlayerStore.setState({ currentTrack: track, playbackState: 'paused' });
+			render(<MiniPlayer />);
+			expect(screen.queryByText(/^Sur /)).toBeNull();
+		});
 	});
 });

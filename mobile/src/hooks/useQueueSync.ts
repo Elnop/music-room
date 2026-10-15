@@ -2,17 +2,24 @@ import { useEffect, useRef } from 'react';
 import { useSocketStore } from '@store/socketStore';
 import { useQueueStore } from '@store/queueStore';
 import { useAuthStore } from '@store/authStore';
+import { useConnectStore } from '@store/connectStore';
 import type { QueueState } from '@/types/queue.types';
 
+/** The remote owner while the phone drives another user's device, else null. */
+const remoteOwnerId = (): string | null => {
+	const { target } = useConnectStore.getState();
+	return target.kind === 'remote' ? target.ownerId : null;
+};
+
 /**
- * Keeps the queue store in sync with the server queue (#274).
+ * Keeps the queue store in sync with the server queues (#274).
  *
- * Loads the queue on mount and again on every socket reconnect, since events
- * sent while disconnected are lost, and replaces it on each `queue:updated` (sent
- * to all of the user's devices). An event never touches this device's audio.
- * Resets the store on unmount (sign-out). A state for another owner (the server
- * also sends a friend's queue to a delegate listening to them) is ignored: the
- * store holds only the signed-in user's queue until it becomes multi-owner (#297).
+ * Loads my queue on mount and again on every socket reconnect, since events
+ * sent while disconnected are lost (the remote owner's queue too, #297), and
+ * applies each `queue:updated` (sent to all of the user's devices, and to the
+ * delegates listening to them). An event never touches this device's audio.
+ * Resets the store on unmount (sign-out). Only my queue and the queue of the
+ * owner whose device the phone drives are kept; another owner's state is dropped.
  */
 export function useQueueSync() {
 	const socket = useSocketStore(state => state.socket);
@@ -38,12 +45,16 @@ export function useQueueSync() {
 		if (!socket || !isConnected) return;
 
 		// The mount load covers the first connect; a reconnect refetches.
-		if (connectedOnceRef.current) load();
+		if (connectedOnceRef.current) {
+			load();
+			const remoteOwner = remoteOwnerId();
+			if (remoteOwner && remoteOwner !== userIdRef.current) load(remoteOwner);
+		}
 		connectedOnceRef.current = true;
 
 		const handleQueueUpdated = (state: QueueState) => {
-			if (state.ownerId !== userIdRef.current) return;
-			if (__DEV__) console.log('[Socket] Queue updated', state.currentItemId);
+			if (state.ownerId !== userIdRef.current && state.ownerId !== remoteOwnerId()) return;
+			if (__DEV__) console.log('[Socket] Queue updated', state.ownerId, state.currentItemId);
 			applyState(state);
 		};
 

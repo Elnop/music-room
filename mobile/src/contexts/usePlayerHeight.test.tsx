@@ -3,6 +3,15 @@ import { MINI_PLAYER_HEIGHT, usePlayerHeight } from '@/contexts/PlayerContext';
 import { usePlayerStore } from '@/store/playerStore';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
+jest.mock('@/lib/supabase', () => ({
+	supabase: { auth: { signOut: jest.fn(), setSession: jest.fn() } },
+}));
+
+jest.mock('@services/oauth', () => ({
+	signInWithGoogle: jest.fn(),
+	signInWithFacebook: jest.fn(),
+}));
+
 jest.mock('expo-audio', () => ({
 	useAudioPlayer: jest.fn(),
 	useAudioPlayerStatus: jest.fn(),

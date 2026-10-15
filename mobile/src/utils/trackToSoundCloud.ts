@@ -1,5 +1,5 @@
 import type { Track } from '@/types/track.types';
-import type { QueueItem } from '@/types/queue.types';
+import type { QueueItem, QueueTrack } from '@/types/queue.types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
 export const hashStringToNumber = (str: string): number => {
@@ -38,6 +38,18 @@ const build = ({ id, title, artist, durationMs, trackUri, albumArt }: PlayableFi
 	playable: true,
 });
 
+/** A queue track (a queue item's, or a `play-track` command's) as the player's track. */
+export function queueTrackToSoundCloud(track: QueueTrack): SoundCloudTrack {
+	return build({
+		id: hashStringToNumber(track.trackUri),
+		title: track.title,
+		artist: track.artist,
+		durationMs: track.durationMs,
+		trackUri: track.trackUri,
+		albumArt: track.albumArt,
+	});
+}
+
 /**
  * Turn a stored track (playlist) or a queue item into the player's
  * `SoundCloudTrack`. The stream URL is fetched later from `permalink_url`.
@@ -45,17 +57,7 @@ const build = ({ id, title, artist, durationMs, trackUri, albumArt }: PlayableFi
 export function trackToSoundCloud(track: Track): SoundCloudTrack;
 export function trackToSoundCloud(item: QueueItem): SoundCloudTrack;
 export function trackToSoundCloud(input: Track | QueueItem): SoundCloudTrack {
-	if ('track' in input) {
-		const { track } = input;
-		return build({
-			id: hashStringToNumber(track.trackUri),
-			title: track.title,
-			artist: track.artist,
-			durationMs: track.durationMs,
-			trackUri: track.trackUri,
-			albumArt: track.albumArt,
-		});
-	}
+	if ('track' in input) return queueTrackToSoundCloud(input.track);
 	const parsed = parseInt(input.id, 10);
 	const id = !Number.isNaN(parsed) ? parsed : hashStringToNumber(input.trackUri || input.id);
 	return build({

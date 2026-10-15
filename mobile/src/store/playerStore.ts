@@ -34,6 +34,8 @@ interface PlayerState {
 	loadCounter: number; // Incremented on each playTrack to force reload even for same track
 	/** Queue item being played, null for a track tapped in a list (#274). */
 	queueItemId: string | null;
+	/** Where the loaded track starts, in ms, for a transferred playback (#297); null = from 0. */
+	startPositionMs: number | null;
 
 	// State machine
 	playbackState: PlaybackState;
@@ -57,7 +59,12 @@ interface PlayerState {
 	clearError: () => void;
 	setPlaybackReady: () => void;
 	setPlaybackPlaying: () => void;
-	playTrack: (track: SoundCloudTrack, queueItemId?: string | null) => void;
+	/** Load and play `track`; `startPositionMs` seeks there once the stream is loaded. */
+	playTrack: (
+		track: SoundCloudTrack,
+		queueItemId?: string | null,
+		startPositionMs?: number | null
+	) => void;
 	play: () => void;
 	pause: () => void;
 	resume: () => void;
@@ -74,6 +81,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 	pendingTrackId: null,
 	loadCounter: 0,
 	queueItemId: null,
+	startPositionMs: null,
 	playbackState: 'idle',
 	isPlaying: false,
 	loading: false,
@@ -148,17 +156,22 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 		}
 	},
 
-	playTrack: (track, queueItemId = null) => {
+	playTrack: (track, queueItemId = null, startPositionMs = null) => {
 		if (__DEV__)
 			console.log('🎵 [playerStore] playTrack called:', {
 				id: track.id,
 				title: track.title,
 				queueItemId,
+				startPositionMs,
 			});
 
 		set(state => ({
 			currentTrack: track,
 			queueItemId,
+			startPositionMs:
+				startPositionMs !== null && Number.isFinite(startPositionMs) && startPositionMs > 0
+					? startPositionMs
+					: null,
 			pendingTrackId: track.id,
 			loadCounter: state.loadCounter + 1,
 			playbackState: 'loading',
@@ -208,6 +221,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 		set({
 			currentTrack: null,
 			queueItemId: null,
+			startPositionMs: null,
 			streamUrl: null,
 			pendingTrackId: null,
 			playbackState: 'idle',

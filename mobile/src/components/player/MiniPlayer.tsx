@@ -4,47 +4,41 @@ import { useSafeAreaInsets, type EdgeInsets } from 'react-native-safe-area-conte
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
-import type { SoundCloudTrack } from '@/types/soundcloud.types';
-import { usePlayer } from '@/contexts/PlayerContext';
 import { usePlayerStore } from '@/store/playerStore';
-import { selectHasNext, useQueueStore } from '@/store/queueStore';
-import { usePlayerProgress } from '@/hooks/usePlayerProgress';
+import { useNowPlaying, type NowPlayingTrack } from '@/hooks/useNowPlaying';
 
 export function MiniPlayer() {
 	const { theme } = useTheme();
 	const insets = useSafeAreaInsets();
 	const styles = React.useMemo(() => createStyles(theme, insets), [theme, insets]);
 
-	const { player } = usePlayer();
-	const { currentTrack, playbackState, pause, resume, toggleModal } = usePlayerStore();
-	const { progress } = usePlayerProgress();
-	const hasNext = useQueueStore(selectHasNext);
-	const queueNext = useQueueStore(state => state.next);
-
-	const isLoading = playbackState === 'loading';
-	const isPlaying = playbackState === 'playing';
-	const canInteract = !!currentTrack && (playbackState === 'playing' || playbackState === 'paused');
-
-	const handlePlayPause = () => {
-		if (!canInteract || !player) return;
-
-		if (isPlaying) {
-			pause();
-		} else {
-			resume();
-		}
-	};
+	const toggleModal = usePlayerStore(state => state.toggleModal);
+	const {
+		track,
+		isPlaying,
+		isLoading,
+		canToggle,
+		positionMs,
+		durationMs,
+		deviceLabel,
+		toggle,
+		next,
+		hasNext,
+	} = useNowPlaying();
+	const progress = track && durationMs ? Math.min(100, (positionMs / durationMs) * 100) : 0;
 
 	return (
 		<TouchableOpacity style={styles.container} onPress={toggleModal} activeOpacity={0.9}>
 			<View style={styles.content}>
-				<NowPlayingInfo currentTrack={currentTrack} styles={styles} theme={theme} />
+				<NowPlayingInfo track={track} deviceLabel={deviceLabel} styles={styles} theme={theme} />
 
 				<TouchableOpacity
 					style={styles.playButton}
-					onPress={handlePlayPause}
+					onPress={() => {
+						if (canToggle) toggle();
+					}}
 					hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-					disabled={isLoading || !currentTrack}
+					disabled={isLoading || !track}
 					accessibilityLabel={isPlaying ? 'Pause' : 'Play'}
 				>
 					{isLoading ? (
@@ -56,7 +50,7 @@ export function MiniPlayer() {
 							color="#FFFFFF"
 							style={[
 								isPlaying ? undefined : { marginLeft: 2 },
-								currentTrack ? undefined : styles.disabledIcon,
+								track ? undefined : styles.disabledIcon,
 							]}
 						/>
 					)}
@@ -64,30 +58,23 @@ export function MiniPlayer() {
 
 				<TouchableOpacity
 					style={styles.nextButton}
-					onPress={() => queueNext()}
+					onPress={next}
 					hitSlop={{ top: 10, bottom: 10, left: 6, right: 10 }}
-					disabled={!currentTrack || !hasNext}
+					disabled={!track || !hasNext}
 					accessibilityLabel="Next track"
 				>
 					<Ionicons
 						name="play-skip-forward"
 						size={22}
 						color={theme.colors.text}
-						style={currentTrack && hasNext ? undefined : styles.disabledIcon}
+						style={track && hasNext ? undefined : styles.disabledIcon}
 					/>
 				</TouchableOpacity>
 			</View>
 
 			{/* Progress bar at the bottom of the mini player - always rendered to avoid layout shift */}
 			<View style={styles.progressBarContainer}>
-				<View
-					style={[
-						styles.progressBar,
-						{
-							width: `${currentTrack ? progress : 0}%`,
-						},
-					]}
-				/>
+				<View style={[styles.progressBar, { width: `${progress}%` }]} />
 			</View>
 		</TouchableOpacity>
 	);
@@ -96,15 +83,24 @@ export function MiniPlayer() {
 type MiniPlayerStyles = ReturnType<typeof createStyles>;
 
 function NowPlayingInfo({
-	currentTrack,
+	track,
+	deviceLabel,
 	styles,
 	theme,
 }: {
-	currentTrack: SoundCloudTrack | null;
+	track: NowPlayingTrack | null;
+	/** Device that plays in remote mode: « Sur Tablette de Léa » (#297). */
+	deviceLabel: string | null;
 	styles: MiniPlayerStyles;
 	theme: Theme;
 }) {
-	if (!currentTrack) {
+	const remoteLine = deviceLabel ? (
+		<Text style={styles.device} numberOfLines={1}>
+			Sur {deviceLabel}
+		</Text>
+	) : null;
+
+	if (!track) {
 		return (
 			<>
 				<View style={[styles.artwork, styles.emptyArtwork]}>
@@ -117,24 +113,25 @@ function NowPlayingInfo({
 					<Text style={styles.artist} numberOfLines={1}>
 						Choisis un son pour commencer
 					</Text>
+					{remoteLine}
 				</View>
 			</>
 		);
 	}
 
-	const artworkUrl =
-		currentTrack.artwork_url || currentTrack.user.avatar_url || 'https://via.placeholder.com/40';
+	const artworkUrl = track.artworkUrl || 'https://via.placeholder.com/40';
 
 	return (
 		<>
 			<Image source={{ uri: artworkUrl }} style={styles.artwork} />
 			<View style={styles.info}>
 				<Text style={styles.title} numberOfLines={1}>
-					{currentTrack.title}
+					{track.title}
 				</Text>
 				<Text style={styles.artist} numberOfLines={1}>
-					{currentTrack.user.username}
+					{track.artist}
 				</Text>
+				{remoteLine}
 			</View>
 		</>
 	);
@@ -179,6 +176,11 @@ const createStyles = (theme: Theme, insets: EdgeInsets) =>
 		artist: {
 			fontSize: 12,
 			color: theme.colors.textSecondary,
+		},
+		device: {
+			fontSize: 11,
+			fontWeight: theme.typography.weights.semibold,
+			color: theme.colors.primary,
 		},
 		playButton: {
 			width: 40,

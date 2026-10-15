@@ -89,6 +89,16 @@ describe('playerStore playTrack', () => {
 		expect(usePlayerStore.getState().isModalOpen).toBe(false);
 		expect(usePlayerStore.getState().queueItemId).toBeNull();
 	});
+	it('keeps a start position for a transferred playback, and none otherwise (#297)', () => {
+		usePlayerStore.getState().playTrack(makeTrack(1), 'item-1', 42_000);
+		expect(usePlayerStore.getState().startPositionMs).toBe(42_000);
+
+		usePlayerStore.getState().playTrack(makeTrack(2));
+		expect(usePlayerStore.getState().startPositionMs).toBeNull();
+
+		usePlayerStore.getState().playTrack(makeTrack(3), null, Number.NaN);
+		expect(usePlayerStore.getState().startPositionMs).toBeNull();
+	});
 });
 
 describe('playerStore state machine', () => {
