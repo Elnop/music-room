@@ -463,3 +463,65 @@ describe('pause by the system (#310)', () => {
 		expect(usePlayerStore.getState().pausedBySystem).toBe(false);
 	});
 });
+
+describe('restored track (#312)', () => {
+	const restore = (positionMs = 42_000) =>
+		usePlayerStore.getState().restoreTrack(makeTrack(9), 'q9', positionMs);
+
+	it('shows the track paused, with no stream and no load', () => {
+		restore();
+
+		const state = usePlayerStore.getState();
+		expect(state.currentTrack?.id).toBe(9);
+		expect(state.queueItemId).toBe('q9');
+		expect(state.startPositionMs).toBe(42_000);
+		expect(state.playbackState).toBe('paused');
+		expect(state.isPlaying).toBe(false);
+		expect(state.streamUrl).toBeNull();
+		expect(state.needsStreamLoad).toBe(true);
+		expect(state.loadCounter).toBe(0);
+	});
+
+	it.each(['play', 'resume'] as const)(
+		'%s loads the stream at the saved position, keeping the modal',
+		action => {
+			restore();
+			usePlayerStore.setState({ isModalOpen: true });
+
+			usePlayerStore.getState()[action]();
+
+			const state = usePlayerStore.getState();
+			expect(state.playbackState).toBe('loading');
+			expect(state.loadCounter).toBe(1);
+			expect(state.startPositionMs).toBe(42_000);
+			expect(state.queueItemId).toBe('q9');
+			expect(state.needsStreamLoad).toBe(false);
+			expect(state.isModalOpen).toBe(true);
+		}
+	);
+
+	it('moves the start position on a seek before play', () => {
+		restore();
+		usePlayerStore.getState().setRestoredPosition(10_000);
+		expect(usePlayerStore.getState().startPositionMs).toBe(10_000);
+
+		usePlayerStore.getState().setRestoredPosition(0);
+		expect(usePlayerStore.getState().startPositionMs).toBeNull();
+	});
+
+	it('ignores setRestoredPosition once the stream is loaded', () => {
+		usePlayerStore.getState().playTrack(makeTrack(4), null, 5000);
+		usePlayerStore.getState().setRestoredPosition(10_000);
+		expect(usePlayerStore.getState().startPositionMs).toBe(5000);
+	});
+
+	it.each([
+		['playTrack', () => usePlayerStore.getState().playTrack(makeTrack(4))],
+		['stop', () => usePlayerStore.getState().stop()],
+		['setTrackUnavailableError', () => usePlayerStore.getState().setTrackUnavailableError('x')],
+	])('%s clears the flag', (_name, run) => {
+		restore();
+		run();
+		expect(usePlayerStore.getState().needsStreamLoad).toBe(false);
+	});
+});

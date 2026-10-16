@@ -574,3 +574,65 @@ describe('PlayerProvider audio interruptions (#310)', () => {
 		expect(usePlayerStore.getState().pausedBySystem).toBe(false);
 	});
 });
+
+describe('PlayerProvider restored track (#312)', () => {
+	async function renderRestored() {
+		const view = render(
+			<PlayerProvider>
+				<SeekProbe />
+			</PlayerProvider>
+		);
+		await act(async () => usePlayerStore.getState().restoreTrack(track, 'q1', 42_000));
+		await flush();
+		return view;
+	}
+
+	it('fetches no stream until play, and reports the saved position', async () => {
+		await renderRestored();
+
+		expect(mockApiRequest).not.toHaveBeenCalled();
+		expect(usePlayerStore.getState().playbackState).toBe('paused');
+		expect(readPositionMs()).toBe(42_000);
+	});
+
+	it('loads a fresh stream on play and starts at the saved position', async () => {
+		await renderRestored();
+		answerStreams({ streamUrl: 'u1', expiresAt: inMinutes(30) });
+
+		await act(async () => usePlayerStore.getState().resume());
+		await flush();
+
+		const u1 = mockPlayerFor('u1');
+		expect(mockApiRequest).toHaveBeenCalledTimes(1);
+		expect(u1.seekTo).toHaveBeenCalledWith(42);
+		expect(u1.play).toHaveBeenCalled();
+		expect(usePlayerStore.getState().playbackState).toBe('playing');
+		expect(usePlayerStore.getState().queueItemId).toBe('q1');
+	});
+
+	it('moves the start position on a seek before play', async () => {
+		await renderRestored();
+
+		act(() => seekRef?.(90));
+
+		expect(mockApiRequest).not.toHaveBeenCalled();
+		expect(usePlayerStore.getState().startPositionMs).toBe(90_000);
+		expect(usePlayerStore.getState().seekCount).toBe(1);
+	});
+
+	it('shows the existing error on play when the track is gone', async () => {
+		await renderRestored();
+		mockApiRequest.mockRejectedValueOnce(
+			new MockApiError('Track stream not available', 'STREAM_NOT_FOUND', undefined, 404)
+		);
+
+		await act(async () => usePlayerStore.getState().resume());
+		await flush();
+
+		const state = usePlayerStore.getState();
+		expect(mockApiRequest).toHaveBeenCalledTimes(1);
+		expect(state.error).toBe('This track is no longer available (rights are expensive)');
+		expect(state.currentTrack).toBeNull();
+		expect(state.playbackState).toBe('idle');
+	});
+});

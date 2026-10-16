@@ -44,6 +44,8 @@ interface PlayerState {
 	resumeAfterLoad: boolean;
 	/** Paused by the system (call, unplugged headset), so a resume by the system resumes the store (#310). */
 	pausedBySystem: boolean;
+	/** A restored track with no stream loaded yet: play fetches it, at `startPositionMs` (#312). */
+	needsStreamLoad: boolean;
 
 	// State machine
 	playbackState: PlaybackState;
@@ -80,6 +82,13 @@ interface PlayerState {
 	 * stream renewed, so a renewal made only because the URL was expiring keeps the retry.
 	 */
 	renewStream: (positionMs: number, keepPlaying: boolean, afterFailure?: boolean) => void;
+	/**
+	 * Show `track` paused at `positionMs` without loading its stream (#312): the
+	 * last track of a previous session. Play then loads a fresh stream there.
+	 */
+	restoreTrack: (track: SoundCloudTrack, queueItemId: string | null, positionMs: number) => void;
+	/** Move a restored track's start position, before its stream is loaded (#312). */
+	setRestoredPosition: (positionMs: number) => void;
 	play: () => void;
 	pause: () => void;
 	/** Mirror a pause the system made on the player (call, unplugged headset) (#310). */
@@ -89,6 +98,18 @@ interface PlayerState {
 	toggleModal: () => void;
 	setModalOpen: (isOpen: boolean) => void;
 	markSeek: () => void;
+}
+
+/**
+ * Play of a restored track (#312): load its stream at the saved position, with
+ * the modal left as it is. Returns whether it did.
+ */
+function loadRestored(state: PlayerState): boolean {
+	if (!state.needsStreamLoad || !state.currentTrack) return false;
+	const { isModalOpen } = state;
+	state.playTrack(state.currentTrack, state.queueItemId, state.startPositionMs);
+	usePlayerStore.setState({ isModalOpen });
+	return true;
 }
 
 export const usePlayerStore = create<PlayerState>((set, get) => ({
@@ -103,6 +124,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 	streamRenewed: false,
 	resumeAfterLoad: true,
 	pausedBySystem: false,
+	needsStreamLoad: false,
 	playbackState: 'idle',
 	isPlaying: false,
 	loading: false,
@@ -141,6 +163,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 			pendingTrackId: null,
 			playbackState: 'idle',
 			pausedBySystem: false,
+			needsStreamLoad: false,
 			isPlaying: false,
 			loading: false,
 		});
@@ -204,6 +227,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 			streamRenewed: false,
 			resumeAfterLoad: true,
 			pausedBySystem: false,
+			needsStreamLoad: false,
 			isPlaying: false,
 			loading: true,
 			// A list tap closes the modal; a queue step (next/previous, auto-advance) keeps it.
@@ -234,8 +258,36 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 		}));
 	},
 
+	restoreTrack: (track, queueItemId, positionMs) => {
+		if (__DEV__)
+			console.log('🎵 [playerStore] Restoring last track:', { id: track.id, positionMs });
+		// loadCounter is left as is: the stream is fetched on play, not now.
+		set({
+			currentTrack: track,
+			queueItemId,
+			startPositionMs: Number.isFinite(positionMs) && positionMs > 0 ? positionMs : null,
+			pendingTrackId: null,
+			playbackState: 'paused',
+			streamUrl: null,
+			streamExpiresAt: null,
+			streamRenewed: false,
+			resumeAfterLoad: true,
+			pausedBySystem: false,
+			needsStreamLoad: true,
+			isPlaying: false,
+			loading: false,
+			error: null,
+		});
+	},
+
+	setRestoredPosition: positionMs => {
+		if (!get().needsStreamLoad) return;
+		set({ startPositionMs: Number.isFinite(positionMs) && positionMs > 0 ? positionMs : null });
+	},
+
 	play: () => {
 		const state = get();
+		if (loadRestored(state)) return;
 		if (state.playbackState === 'ready' || state.playbackState === 'paused') {
 			set({
 				playbackState: 'playing',
@@ -273,6 +325,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 
 	resume: () => {
 		const state = get();
+		if (loadRestored(state)) return;
 		if (state.playbackState === 'paused') {
 			if (__DEV__) console.log('🎵 [playerStore] Resuming playback');
 			set({
@@ -294,6 +347,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 			pendingTrackId: null,
 			playbackState: 'idle',
 			pausedBySystem: false,
+			needsStreamLoad: false,
 			isPlaying: false,
 			loading: false,
 			error: null,
