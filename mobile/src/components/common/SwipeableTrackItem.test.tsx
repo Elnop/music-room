@@ -29,6 +29,28 @@ describe('SwipeableTrackItem', () => {
 		expect(screen.queryByLabelText('Reorder track')).toBeNull();
 	});
 
+	it('opens the quick actions on a long press or the ⋯ button, even for a viewer', async () => {
+		const onShowActions = jest.fn();
+		render(
+			<SwipeableTrackItem
+				track={track}
+				onDelete={onDelete}
+				onShowActions={onShowActions}
+				disabled
+			/>
+		);
+		await act(async () => {});
+		fireEvent(screen.getByText('Song'), 'longPress');
+		fireEvent.press(screen.getByLabelText('Actions'));
+		expect(onShowActions).toHaveBeenCalledTimes(2);
+	});
+
+	it('shows no ⋯ button without onShowActions', async () => {
+		render(<SwipeableTrackItem track={track} onDelete={onDelete} />);
+		await act(async () => {});
+		expect(screen.queryByLabelText('Actions')).toBeNull();
+	});
+
 	it('starts the drag when the handle is pressed', async () => {
 		const onDragStart = jest.fn();
 		render(<SwipeableTrackItem track={track} onDelete={onDelete} onDragStart={onDragStart} />);

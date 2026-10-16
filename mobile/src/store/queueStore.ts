@@ -63,6 +63,11 @@ interface QueueStoreState {
 	 * true once added. Never changes what is playing.
 	 */
 	addItem: (track: AddQueueItemBody) => Promise<boolean>;
+	/**
+	 * Insert a track right after the current item (at the top when nothing is
+	 * current) in one call, and toast the outcome (#316). Never changes what is playing.
+	 */
+	playNext: (track: AddQueueItemBody) => Promise<boolean>;
 	/** Make an item current and play it (on this device, or on the remote one). */
 	playItem: (itemId: string) => Promise<QueueStepOutcome>;
 	/**
@@ -288,6 +293,17 @@ export const useQueueStore = create<QueueStoreState>((set, get) => {
 						: "Impossible d'ajouter à la file de lecture"
 			);
 			if (added) showSuccess('Ajouté à la file de lecture');
+			return added;
+		},
+
+		playNext: async track => {
+			const added = await mutate(
+				call => queueApi.addItem({ ...track, next: true }, call),
+				'Play next',
+				error =>
+					error instanceof Error && error.message ? error.message : "Impossible d'ajouter ce titre"
+			);
+			if (added) showSuccess('Lira ensuite');
 			return added;
 		},
 

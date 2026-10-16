@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+	addQueueItemBodySchema,
 	addQueueItemSchema,
 	moveQueueItemSchema,
 	queueItemParamsSchema,
@@ -56,6 +57,29 @@ describe('addQueueItemSchema', () => {
 	it('rejects a track without uri or with a bad duration', () => {
 		expect(addQueueItemSchema.safeParse({ ...track, trackUri: '' }).success).toBe(false);
 		expect(addQueueItemSchema.safeParse({ ...track, durationMs: 0 }).success).toBe(false);
+	});
+});
+
+describe('addQueueItemBodySchema', () => {
+	const track = {
+		trackUri: 'https://soundcloud.com/artist/track',
+		title: 'Song',
+		artist: 'Artist',
+		durationMs: 1000,
+	};
+
+	it('accepts a track with or without a boolean next', () => {
+		expect(addQueueItemBodySchema.parse(track)).not.toHaveProperty('next');
+		expect(addQueueItemBodySchema.parse({ ...track, next: true }).next).toBe(true);
+		expect(addQueueItemBodySchema.parse({ ...track, next: false }).next).toBe(false);
+	});
+
+	it('rejects a non-boolean next', () => {
+		expect(addQueueItemBodySchema.safeParse({ ...track, next: 'yes' }).success).toBe(false);
+	});
+
+	it('keeps next out of the transfer track', () => {
+		expect(addQueueItemSchema.parse({ ...track, next: true })).not.toHaveProperty('next');
 	});
 });
 

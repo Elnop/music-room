@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, Pressable } from 'reac
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import { QueueSwipe } from '@/components/common/QueueSwipe';
+import { TrackActionsButton } from '@/components/track/TrackActionsButton';
 import type { Theme } from '@/themes/types';
 import type { Track } from '@/types/track.types';
 
@@ -17,6 +18,8 @@ interface SwipeableTrackItemProps {
 	onDragStart?: () => void;
 	/** Raises the row while it is being dragged. */
 	isDragActive?: boolean;
+	/** A long press or the ⋯ button opens the track's quick actions (#316). */
+	onShowActions?: () => void;
 }
 
 export function SwipeableTrackItem({
@@ -26,6 +29,7 @@ export function SwipeableTrackItem({
 	onAddToQueue,
 	onDragStart,
 	isDragActive = false,
+	onShowActions,
 }: SwipeableTrackItemProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
@@ -46,7 +50,10 @@ export function SwipeableTrackItem({
 			onAddToQueue={onAddToQueue}
 			renderRightActions={disabled ? undefined : renderRightActions}
 		>
-			<View style={[styles.trackContainer, isDragActive && styles.trackContainerActive]}>
+			<Pressable
+				onLongPress={onShowActions}
+				style={[styles.trackContainer, isDragActive && styles.trackContainerActive]}
+			>
 				{track.albumArt ? (
 					<Image source={{ uri: track.albumArt }} style={styles.albumArt} />
 				) : (
@@ -68,6 +75,8 @@ export function SwipeableTrackItem({
 					<Text style={styles.duration}>{formatDuration(track.durationMs)}</Text>
 				)}
 
+				{onShowActions && <TrackActionsButton onPress={onShowActions} />}
+
 				{!disabled && onDragStart && (
 					<Pressable
 						onPressIn={onDragStart}
@@ -79,7 +88,7 @@ export function SwipeableTrackItem({
 						<Ionicons name="reorder-three-outline" size={24} color={theme.colors.textSecondary} />
 					</Pressable>
 				)}
-			</View>
+			</Pressable>
 		</QueueSwipe>
 	);
 }

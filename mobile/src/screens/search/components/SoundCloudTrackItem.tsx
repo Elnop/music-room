@@ -1,20 +1,21 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import { QueueSwipe } from '@/components/common/QueueSwipe';
+import { TrackActionsButton } from '@/components/track/TrackActionsButton';
 import type { Theme } from '@/themes/types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
 interface Props {
 	track: SoundCloudTrack;
 	onPlay: (track: SoundCloudTrack) => void;
-	onAddToPlaylist: (track: SoundCloudTrack) => void;
 	/** A right swipe adds the track to the play queue. */
 	onAddToQueue: (track: SoundCloudTrack) => void;
+	/** A long press or the ⋯ button opens the track's quick actions (#316). */
+	onShowActions: (track: SoundCloudTrack) => void;
 }
 
-export function SoundCloudTrackItem({ track, onPlay, onAddToPlaylist, onAddToQueue }: Props) {
+export function SoundCloudTrackItem({ track, onPlay, onAddToQueue, onShowActions }: Props) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
@@ -28,7 +29,12 @@ export function SoundCloudTrackItem({ track, onPlay, onAddToPlaylist, onAddToQue
 
 	return (
 		<QueueSwipe onAddToQueue={() => onAddToQueue(track)}>
-			<TouchableOpacity style={styles.container} onPress={() => onPlay(track)} activeOpacity={0.6}>
+			<TouchableOpacity
+				style={styles.container}
+				onPress={() => onPlay(track)}
+				onLongPress={() => onShowActions(track)}
+				activeOpacity={0.6}
+			>
 				<Image source={{ uri: artworkUrl }} style={styles.artwork} />
 				<View style={styles.info}>
 					<Text style={styles.title} numberOfLines={1}>
@@ -39,16 +45,7 @@ export function SoundCloudTrackItem({ track, onPlay, onAddToPlaylist, onAddToQue
 					</Text>
 				</View>
 				<Text style={styles.duration}>{formatDuration(track.duration)}</Text>
-				<TouchableOpacity
-					style={styles.addButton}
-					onPress={e => {
-						e.stopPropagation();
-						onAddToPlaylist(track);
-					}}
-					hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-				>
-					<Ionicons name="add" size={24} color={theme.colors.primary} />
-				</TouchableOpacity>
+				<TrackActionsButton onPress={() => onShowActions(track)} />
 			</TouchableOpacity>
 		</QueueSwipe>
 	);
@@ -88,12 +85,5 @@ const createStyles = (theme: Theme) =>
 			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.textSecondary,
 			marginRight: theme.spacing.sm,
-		},
-		addButton: {
-			width: 40,
-			height: 40,
-			borderRadius: 20,
-			alignItems: 'center',
-			justifyContent: 'center',
 		},
 	});
