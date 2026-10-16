@@ -14,6 +14,7 @@ import type { UserProfile } from '@/types/user.types';
 import { queueApi } from '@/services/queueApi';
 import { ApiError } from '@/services/api';
 import { showError, showInfo, showSuccess } from '@utils/toast';
+import { hapticSuccess } from '@utils/haptics';
 import type { QueueItem, QueueState, QueueStepResult } from '@/types/queue.types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
@@ -47,6 +48,8 @@ jest.mock('@/services/queueApi', () => ({
 		transfer: jest.fn(),
 	},
 }));
+
+jest.mock('@utils/haptics', () => ({ hapticSuccess: jest.fn() }));
 
 jest.mock('@utils/toast', () => ({
 	showSuccess: jest.fn(),
@@ -318,6 +321,7 @@ describe('queueStore addItem', () => {
 		expect(mine().items.map(i => i.id)).toEqual(['a', 'n']);
 		expect(mine().currentItemId).toBe('a');
 		expect(showSuccess).toHaveBeenCalledWith('Ajouté à la file de lecture');
+		expect(hapticSuccess).toHaveBeenCalledTimes(1);
 		expect(player().loadCounter).toBe(before);
 		expect(player().currentTrack).toBe(listTrack);
 		expect(player().queueItemId).toBeNull();
@@ -332,6 +336,7 @@ describe('queueStore addItem', () => {
 		expect(mine().items.map(i => i.id)).toEqual(['a']);
 		expect(showError).toHaveBeenCalledWith('Queue is full');
 		expect(showSuccess).not.toHaveBeenCalled();
+		expect(hapticSuccess).not.toHaveBeenCalled();
 	});
 });
 
@@ -353,6 +358,7 @@ describe('queueStore playNext', () => {
 		expect(mine().items.map(i => i.id)).toEqual(['a', 'n', 'b']);
 		expect(mine().currentItemId).toBe('a');
 		expect(showSuccess).toHaveBeenCalledWith('Lira ensuite');
+		expect(hapticSuccess).toHaveBeenCalledTimes(1);
 	});
 
 	it('keeps the state and toasts an error on failure', async () => {
@@ -364,6 +370,7 @@ describe('queueStore playNext', () => {
 		expect(mine().items.map(i => i.id)).toEqual(['a']);
 		expect(showError).toHaveBeenCalledWith('Queue is full');
 		expect(showSuccess).not.toHaveBeenCalled();
+		expect(hapticSuccess).not.toHaveBeenCalled();
 	});
 });
 

@@ -12,6 +12,13 @@ import { fireGestureHandler, getByGestureTestId } from 'react-native-gesture-han
 import { State } from 'react-native-gesture-handler';
 import type { PanGesture } from 'react-native-gesture-handler';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
+import { hapticTap } from '@/utils/haptics';
+
+jest.mock('@/utils/haptics', () => ({
+	hapticTap: jest.fn(),
+	hapticSelection: jest.fn(),
+	hapticSuccess: jest.fn(),
+}));
 
 const mockSeekTo = jest.fn();
 const mockProgress = { progress: 0, currentTime: 0, duration: 0 };
@@ -341,6 +348,99 @@ describe('PlayerModal slider for a screen reader', () => {
 		});
 		action('increment');
 		expect(mockSeekTo).not.toHaveBeenCalled();
+	});
+});
+
+describe('PlayerModal haptics', () => {
+	const track: SoundCloudTrack = {
+		id: 8,
+		title: 'Haptic song',
+		description: null,
+		duration: 200_000,
+		genre: null,
+		artwork_url: null,
+		permalink_url: 'https://soundcloud.com/artist/haptic',
+		user: { id: 1, username: 'x', avatar_url: null, permalink_url: '' },
+		playable: true,
+	};
+	const pause = jest.fn();
+
+	beforeEach(() => {
+		jest.clearAllMocks();
+		useQueueStore.getState().reset();
+		useConnectStore.setState({ target: { kind: 'local' }, remoteStatus: null });
+		usePlayerStore.setState({
+			currentTrack: track,
+			playbackState: 'playing',
+			isModalOpen: true,
+			pause,
+		});
+		Object.assign(mockProgress, { currentTime: 30, duration: 200 });
+	});
+
+	afterAll(() => {
+		Object.assign(mockProgress, { currentTime: 0, duration: 0 });
+	});
+
+	it('taps once on play/pause', () => {
+		render(<PlayerModal />);
+		fireEvent.press(screen.getByLabelText('Pause'));
+		expect(pause).toHaveBeenCalledTimes(1);
+		expect(hapticTap).toHaveBeenCalledTimes(1);
+	});
+
+	it('taps once on previous', () => {
+		render(<PlayerModal />);
+		fireEvent.press(screen.getByLabelText('Piste précédente'));
+		// Past a few seconds, previous restarts the track.
+		expect(mockSeekTo).toHaveBeenCalledWith(0);
+		expect(hapticTap).toHaveBeenCalledTimes(1);
+	});
+
+	it('taps once on an enabled next', () => {
+		const next = jest.fn();
+		const realNext = useQueueStore.getState().next;
+		useAuthStore.setState({ user: { id: 'me' } as UserProfile });
+		useQueueStore.setState({ next });
+		useQueueStore.getState().applyState({
+			ownerId: 'me',
+			version: 1,
+			currentItemId: 'a',
+			items: ['a', 'b'].map(id => ({
+				id,
+				rank: id,
+				track: {
+					trackUri: `https://soundcloud.com/artist/${id}`,
+					title: id,
+					artist: 'x',
+					album: null,
+					albumArt: null,
+					durationMs: 180_000,
+				},
+				sourcePlaylistId: null,
+				blockId: null,
+				blockDetached: false,
+			})),
+		});
+		render(<PlayerModal />);
+		fireEvent.press(screen.getByLabelText('Piste suivante'));
+		useQueueStore.setState({ next: realNext });
+		expect(next).toHaveBeenCalledTimes(1);
+		expect(hapticTap).toHaveBeenCalledTimes(1);
+	});
+
+	it('does not vibrate when the toggle is not allowed', () => {
+		usePlayerStore.setState({ playbackState: 'idle' });
+		render(<PlayerModal />);
+		fireEvent.press(screen.getByLabelText('Lecture'));
+		expect(hapticTap).not.toHaveBeenCalled();
+	});
+
+	it('does not vibrate on a disabled next', () => {
+		render(<PlayerModal />);
+		expect(screen.getByLabelText('Piste suivante')).toBeDisabled();
+		fireEvent.press(screen.getByLabelText('Piste suivante'));
+		expect(hapticTap).not.toHaveBeenCalled();
 	});
 });
 

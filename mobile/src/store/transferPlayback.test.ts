@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/authStore';
 import { queueApi } from '@/services/queueApi';
 import { ApiError } from '@/services/api';
 import { showError } from '@utils/toast';
+import { hapticSuccess } from '@utils/haptics';
 import type { DevicePickerOwner } from '@/types/device.types';
 import type { QueueItem, QueueState } from '@/types/queue.types';
 import type { ListeningStatus } from '@/types/listening.types';
@@ -34,6 +35,8 @@ jest.mock('@/services/deviceService', () => ({
 jest.mock('@/services/queueApi', () => ({
 	queueApi: { getQueue: jest.fn(), transfer: jest.fn() },
 }));
+
+jest.mock('@utils/haptics', () => ({ hapticSuccess: jest.fn() }));
 
 jest.mock('@utils/toast', () => ({
 	showSuccess: jest.fn(),
@@ -158,6 +161,7 @@ describe('transferTo from this phone', () => {
 			ownerUsername: 'moi',
 		});
 		expect(stop).toHaveBeenCalled();
+		expect(hapticSuccess).toHaveBeenCalledTimes(1);
 	});
 
 	it("sends a list track to Léa's device and applies her new queue", async () => {
@@ -253,6 +257,7 @@ describe('transferTo a track the remote device plays off the queue', () => {
 		expect(transfer).not.toHaveBeenCalled();
 		expect(showError).toHaveBeenCalledWith('Ce titre ne peut pas être transféré');
 		expect(useConnectStore.getState().target).toEqual(target);
+		expect(hapticSuccess).not.toHaveBeenCalled();
 	});
 
 	it('refuses when the queue has no current item', async () => {
@@ -293,6 +298,7 @@ describe('transferTo refused', () => {
 		expect(showError).toHaveBeenCalledWith(message);
 		expect(useConnectStore.getState().target).toEqual({ kind: 'local' });
 		expect(stop).not.toHaveBeenCalled();
+		expect(hapticSuccess).not.toHaveBeenCalled();
 	});
 
 	it('keeps the remote target on a refusal', async () => {
@@ -312,6 +318,7 @@ describe('transferTo with nothing playing', () => {
 		await expect(transferTo(me, 'pc')).resolves.toBe(true);
 		expect(transfer).not.toHaveBeenCalled();
 		expect(useConnectStore.getState().target).toMatchObject({ kind: 'remote', deviceId: 'pc' });
+		expect(hapticSuccess).toHaveBeenCalledTimes(1);
 	});
 
 	it('comes back to this phone without a transfer', async () => {
@@ -331,6 +338,7 @@ describe('transferTo the active device', () => {
 		await expect(transferTo(me, 'phone')).resolves.toBe(true);
 		expect(transfer).not.toHaveBeenCalled();
 		expect(stop).not.toHaveBeenCalled();
+		expect(hapticSuccess).not.toHaveBeenCalled();
 	});
 
 	it('does nothing for the remote target', async () => {
@@ -341,5 +349,6 @@ describe('transferTo the active device', () => {
 		});
 		await expect(transferTo(me, 'pc')).resolves.toBe(true);
 		expect(transfer).not.toHaveBeenCalled();
+		expect(hapticSuccess).not.toHaveBeenCalled();
 	});
 });

@@ -9,6 +9,7 @@ import { estimatePositionMs } from '@utils/remotePosition';
 import { toTrackInput } from '@utils/trackInput';
 import { hashStringToNumber } from '@utils/trackToSoundCloud';
 import { showError } from '@utils/toast';
+import { hapticSuccess } from '@utils/haptics';
 import { apiErrorMessage } from '@utils/apiErrorMessage';
 import type { DevicePickerOwner } from '@/types/device.types';
 import type { AddQueueItemBody, QueueTrack, TransferRequest } from '@/types/queue.types';
@@ -105,6 +106,7 @@ export async function transferTo(owner: DevicePickerOwner, deviceId: string): Pr
 			: localPlayback();
 	if (!playback) {
 		switchTarget();
+		hapticSuccess();
 		return true;
 	}
 	if (playback === 'untransferable') {
@@ -122,6 +124,7 @@ export async function transferTo(owner: DevicePickerOwner, deviceId: string): Pr
 			...(playback.source ? { source: playback.source } : {}),
 		});
 		switchTarget();
+		hapticSuccess();
 		if (result.queue) useQueueStore.getState().applyState(result.queue);
 		return true;
 	} catch (error) {
