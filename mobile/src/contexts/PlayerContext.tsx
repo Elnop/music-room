@@ -6,6 +6,7 @@ import { useConnectStore } from '@/store/connectStore';
 import { ApiError, apiRequest } from '@/services/api';
 import type { StreamUrlResponse } from '@/types/soundcloud.types';
 import { MediaSessionBridge } from '@/components/player/MediaSessionBridge';
+import { useLastTrackPersistence } from '@/hooks/useLastTrackPersistence';
 
 // Play in silent mode and in the background. iOS uses `doNotMix` so that it
 // resumes the player after a call (`shouldResume`, #310); Android ducks others.
@@ -196,6 +197,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 	} = usePlayerStore();
 
 	const player = useAudioPlayer(streamUrl || '');
+	useLastTrackPersistence();
 	const previousTrackIdRef = useRef<number | null>(null);
 	const hasTriedToPlayRef = useRef(false);
 	const pollingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -254,6 +256,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 			setStreamUrl(null);
 			return;
 		}
+
+		// A restored track loads its stream on play, not at start-up (#312).
+		if (usePlayerStore.getState().needsStreamLoad) return;
 
 		const thisLoadCounter = loadCounter;
 
@@ -464,7 +469,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 	useEffect(() => {
 		// While a renewal reloads, the player is the empty one: report where it resumes (#313).
 		setPositionReader(() => {
-			const { playbackState: state, startPositionMs } = usePlayerStore.getState();
+			const { playbackState: state, startPositionMs, needsStreamLoad } = usePlayerStore.getState();
+			// A restored track has no player yet: report its saved position (#312).
+			if (needsStreamLoad) return startPositionMs ?? 0;
 			if (state === 'loading' && startPositionMs !== null) return startPositionMs;
 			return player.currentTime * 1000;
 		});
@@ -479,7 +486,15 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 				streamExpiresAt,
 				renewStream,
 				markSeek,
+				needsStreamLoad,
+				setRestoredPosition,
 			} = usePlayerStore.getState();
+			// A restored track is not loaded yet: play will start it there (#312).
+			if (needsStreamLoad) {
+				setRestoredPosition(seconds * 1000);
+				markSeek();
+				return;
+			}
 			const canRenew = state === 'playing' || state === 'paused';
 			if (canRenew && isStreamStale(streamExpiresAt) && playsLocally()) {
 				// The reload seeks to the position and re-sends the listening status then;

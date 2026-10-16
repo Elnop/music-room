@@ -6,6 +6,8 @@ import type { RegisterInput } from '@utils/validators';
 import { authApi, ApiError, registerAuthSession } from '@services/api';
 import { supabase } from '@/lib/supabase';
 import { signInWithGoogle, signInWithFacebook } from '@services/oauth';
+import { lastTrackStorage } from '@services/lastTrackStorage';
+import { usePlayerStore } from '@/store/playerStore';
 
 // AsyncStorage keys
 const STORAGE_KEYS = {
@@ -263,7 +265,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 	logout: async () => {
 		set({ isLoading: true, error: null });
 
-		const { accessToken } = get();
+		const { accessToken, user } = get();
 
 		if (accessToken) {
 			try {
@@ -274,6 +276,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 		}
 
 		await endSessionLocally();
+		// After the session ends, so the player no longer saves it for this user (#312).
+		if (user) await lastTrackStorage.clear(user.id);
 	},
 
 	/**
@@ -748,6 +752,17 @@ async function endSessionLocally(): Promise<void> {
 
 	await useAuthStore.getState().clearStorage();
 }
+
+/**
+ * Every end of session empties the player (#312): a next user must not inherit
+ * the track, which would skip their restore and be saved under their key. The
+ * user is already null here, so the player no longer saves for anyone.
+ */
+useAuthStore.subscribe((state, previous) => {
+	if (previous.isAuthenticated && !state.isAuthenticated) {
+		usePlayerStore.getState().stop();
+	}
+});
 
 registerAuthSession({
 	getAccessToken: () => useAuthStore.getState().accessToken,
