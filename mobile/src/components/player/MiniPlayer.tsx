@@ -2,10 +2,25 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets, type EdgeInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, {
+	runOnJS,
+	useAnimatedStyle,
+	useSharedValue,
+	withSpring,
+} from 'react-native-reanimated';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import { usePlayerStore } from '@/store/playerStore';
 import { useNowPlaying, type NowPlayingTrack } from '@/hooks/useNowPlaying';
+import { RESTART_THRESHOLD_S } from '@/store/queueSelectors';
+
+/** Horizontal swipe distance that changes the track (#311). */
+export const SWIPE_TRACK_THRESHOLD = 80;
+/** A flick this fast (px/s) changes the track or opens the modal from a shorter swipe. */
+export const SWIPE_FLICK_VELOCITY = 800;
+/** Upward swipe distance that opens the player modal (#311). */
+export const SWIPE_OPEN_THRESHOLD = 40;
 
 export function MiniPlayer() {
 	const { theme } = useTheme();
@@ -13,7 +28,9 @@ export function MiniPlayer() {
 	const styles = React.useMemo(() => createStyles(theme, insets), [theme, insets]);
 
 	const toggleModal = usePlayerStore(state => state.toggleModal);
+	const setModalOpen = usePlayerStore(state => state.setModalOpen);
 	const {
+		isRemote,
 		track,
 		isPlaying,
 		isLoading,
@@ -23,60 +40,103 @@ export function MiniPlayer() {
 		deviceLabel,
 		toggle,
 		next,
+		previous,
 		hasNext,
+		hasPrevious,
 	} = useNowPlaying();
 	const progress = track && durationMs ? Math.min(100, (positionMs / durationMs) * 100) : 0;
 
+	// Same rules as the buttons: previous restarts the track locally past a few seconds.
+	const canGoNext = track !== null && hasNext;
+	const canGoPrevious =
+		canToggle && (hasPrevious || (!isRemote && positionMs / 1000 > RESTART_THRESHOLD_S));
+
+	// Swipe left / right changes the track, swipe up opens the modal (#311). The
+	// offsets let a tap through to the buttons; the info follows the finger.
+	const translateX = useSharedValue(0);
+	const panGesture = Gesture.Pan()
+		.withTestId('mini-player-pan')
+		.activeOffsetX([-15, 15])
+		.activeOffsetY(-15)
+		.onUpdate(event => {
+			translateX.value =
+				Math.abs(event.translationX) > Math.abs(event.translationY) ? event.translationX : 0;
+		})
+		.onEnd(event => {
+			const horizontal = Math.abs(event.translationX) > Math.abs(event.translationY);
+			const toLeft =
+				event.translationX < -SWIPE_TRACK_THRESHOLD || event.velocityX < -SWIPE_FLICK_VELOCITY;
+			const toRight =
+				event.translationX > SWIPE_TRACK_THRESHOLD || event.velocityX > SWIPE_FLICK_VELOCITY;
+			const up =
+				event.translationY < -SWIPE_OPEN_THRESHOLD || event.velocityY < -SWIPE_FLICK_VELOCITY;
+			if (horizontal && toLeft && canGoNext) {
+				runOnJS(next)();
+			} else if (horizontal && toRight && canGoPrevious) {
+				runOnJS(previous)();
+			} else if (!horizontal && up) {
+				runOnJS(setModalOpen)(true);
+			}
+			translateX.value = withSpring(0);
+		});
+	const infoStyle = useAnimatedStyle(() => ({
+		transform: [{ translateX: translateX.value }],
+	}));
+
 	return (
-		<TouchableOpacity style={styles.container} onPress={toggleModal} activeOpacity={0.9}>
-			<View style={styles.content}>
-				<NowPlayingInfo track={track} deviceLabel={deviceLabel} styles={styles} theme={theme} />
+		<GestureDetector gesture={panGesture}>
+			<TouchableOpacity style={styles.container} onPress={toggleModal} activeOpacity={0.9}>
+				<View style={styles.content}>
+					<Animated.View style={[styles.swipeArea, infoStyle]}>
+						<NowPlayingInfo track={track} deviceLabel={deviceLabel} styles={styles} theme={theme} />
+					</Animated.View>
 
-				<TouchableOpacity
-					style={styles.playButton}
-					onPress={() => {
-						if (canToggle) toggle();
-					}}
-					hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-					disabled={isLoading || !track}
-					accessibilityLabel={isPlaying ? 'Pause' : 'Play'}
-				>
-					{isLoading ? (
-						<ActivityIndicator size="small" color="#FFFFFF" />
-					) : (
+					<TouchableOpacity
+						style={styles.playButton}
+						onPress={() => {
+							if (canToggle) toggle();
+						}}
+						hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+						disabled={isLoading || !track}
+						accessibilityLabel={isPlaying ? 'Pause' : 'Play'}
+					>
+						{isLoading ? (
+							<ActivityIndicator size="small" color="#FFFFFF" />
+						) : (
+							<Ionicons
+								name={isPlaying ? 'pause' : 'play'}
+								size={20}
+								color="#FFFFFF"
+								style={[
+									isPlaying ? undefined : { marginLeft: 2 },
+									track ? undefined : styles.disabledIcon,
+								]}
+							/>
+						)}
+					</TouchableOpacity>
+
+					<TouchableOpacity
+						style={styles.nextButton}
+						onPress={next}
+						hitSlop={{ top: 10, bottom: 10, left: 6, right: 10 }}
+						disabled={!track || !hasNext}
+						accessibilityLabel="Next track"
+					>
 						<Ionicons
-							name={isPlaying ? 'pause' : 'play'}
-							size={20}
-							color="#FFFFFF"
-							style={[
-								isPlaying ? undefined : { marginLeft: 2 },
-								track ? undefined : styles.disabledIcon,
-							]}
+							name="play-skip-forward"
+							size={22}
+							color={theme.colors.text}
+							style={track && hasNext ? undefined : styles.disabledIcon}
 						/>
-					)}
-				</TouchableOpacity>
+					</TouchableOpacity>
+				</View>
 
-				<TouchableOpacity
-					style={styles.nextButton}
-					onPress={next}
-					hitSlop={{ top: 10, bottom: 10, left: 6, right: 10 }}
-					disabled={!track || !hasNext}
-					accessibilityLabel="Next track"
-				>
-					<Ionicons
-						name="play-skip-forward"
-						size={22}
-						color={theme.colors.text}
-						style={track && hasNext ? undefined : styles.disabledIcon}
-					/>
-				</TouchableOpacity>
-			</View>
-
-			{/* Progress bar at the bottom of the mini player - always rendered to avoid layout shift */}
-			<View style={styles.progressBarContainer}>
-				<View style={[styles.progressBar, { width: `${progress}%` }]} />
-			</View>
-		</TouchableOpacity>
+				{/* Progress bar at the bottom of the mini player - always rendered to avoid layout shift */}
+				<View style={styles.progressBarContainer}>
+					<View style={[styles.progressBar, { width: `${progress}%` }]} />
+				</View>
+			</TouchableOpacity>
+		</GestureDetector>
 	);
 }
 
@@ -150,6 +210,11 @@ const createStyles = (theme: Theme, insets: EdgeInsets) =>
 			flexDirection: 'row',
 			alignItems: 'center',
 			padding: theme.spacing.sm,
+		},
+		swipeArea: {
+			flex: 1,
+			flexDirection: 'row',
+			alignItems: 'center',
 		},
 		artwork: {
 			width: 40,
