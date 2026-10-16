@@ -67,6 +67,8 @@ module.exports = {
 				},
 			],
 			'./plugins/withDebugKeystore.js',
+			'./plugins/withMedia3Version.js',
+			['expo-media-control', { enableBackgroundAudio: true, audioSessionCategory: 'playback' }],
 			[
 				'@react-native-google-signin/google-signin',
 				{
