@@ -7,11 +7,12 @@ import { ApiError, apiRequest } from '@/services/api';
 import type { StreamUrlResponse } from '@/types/soundcloud.types';
 import { MediaSessionBridge } from '@/components/player/MediaSessionBridge';
 
-// Configure audio mode for iOS - play in silent mode and background
+// Play in silent mode and in the background. iOS uses `doNotMix` so that it
+// resumes the player after a call (`shouldResume`, #310); Android ducks others.
 setAudioModeAsync({
 	playsInSilentMode: true,
 	shouldPlayInBackground: true,
-	interruptionMode: 'duckOthers',
+	interruptionMode: 'doNotMix',
 	interruptionModeAndroid: 'duckOthers',
 }).catch(err => {
 	console.warn('[PlayerContext] Failed to set audio mode:', err);
@@ -129,6 +130,55 @@ function StreamWatchdog({ player }: { player: ReturnType<typeof useAudioPlayer> 
 			renewStream(lastPositionMsRef.current, true, true);
 		}
 	}, [statusId, player, playerState, isLoaded, currentTime, isPlaying]);
+
+	return null;
+}
+
+/**
+ * Mirrors into the store the pauses and resumes the system makes on the player
+ * behind the app's back (#310): a call (Android focus loss, iOS interruption) or
+ * an unplugged headset (Android `AUDIO_BECOMING_NOISY` via the expo-audio patch,
+ * iOS route change). A native pause of a playing track marks the store
+ * `pausedBySystem`; a native resume then resumes the store, unless the user
+ * paused in between, in which case the player is paused again. Ignores loading,
+ * buffering, the track end, a failed player (StreamWatchdog's) and remote mode.
+ */
+function AudioInterruptionSync({ player }: { player: ReturnType<typeof useAudioPlayer> }) {
+	const status = useAudioPlayerStatus(player);
+	const lastRef = useRef<{ id: number; playing: boolean } | null>(null);
+
+	const statusId = status?.id;
+	const nativePlaying = status?.playing === true;
+	const isLoaded = status?.isLoaded ?? false;
+	const isBuffering = status?.isBuffering ?? false;
+	const didJustFinish = status?.didJustFinish ?? false;
+	const playerState = status?.playbackState;
+
+	useEffect(() => {
+		if (statusId === undefined || statusId !== player?.id) return;
+		const last = lastRef.current;
+		const wasPlaying = last !== null && last.id === statusId && last.playing;
+		lastRef.current = { id: statusId, playing: nativePlaying };
+		if (wasPlaying === nativePlaying || !playsLocally()) return;
+		if (!isLoaded || isBuffering || didJustFinish) return;
+		if (playerState === 'idle' || playerState === 'failed') return;
+		// A late event no longer matches the player (fast pause/play): ignore it.
+		if (player.playing !== nativePlaying) return;
+
+		const { playbackState, pausedBySystem, pauseBySystem, resume } = usePlayerStore.getState();
+		if (!nativePlaying && playbackState === 'playing') {
+			if (__DEV__) console.log('🟠 [AudioInterruptionSync] Paused by the system');
+			pauseBySystem();
+		} else if (nativePlaying && playbackState === 'paused') {
+			if (pausedBySystem) {
+				if (__DEV__) console.log('🟢 [AudioInterruptionSync] Resumed by the system');
+				resume();
+			} else {
+				// The user paused during the interruption: it stays paused.
+				player.pause();
+			}
+		}
+	}, [statusId, player, nativePlaying, isLoaded, isBuffering, didJustFinish, playerState]);
 
 	return null;
 }
@@ -455,6 +505,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 		<PlayerContext.Provider value={value}>
 			<QueueAutoAdvance player={player} />
 			<StreamWatchdog player={player} />
+			<AudioInterruptionSync player={player} />
 			<MediaSessionBridge />
 			{children}
 		</PlayerContext.Provider>

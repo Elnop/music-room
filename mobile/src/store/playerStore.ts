@@ -42,6 +42,8 @@ interface PlayerState {
 	streamRenewed: boolean;
 	/** Whether the loaded stream starts playing; false after a renewal made while paused (#313). */
 	resumeAfterLoad: boolean;
+	/** Paused by the system (call, unplugged headset), so a resume by the system resumes the store (#310). */
+	pausedBySystem: boolean;
 
 	// State machine
 	playbackState: PlaybackState;
@@ -80,6 +82,8 @@ interface PlayerState {
 	renewStream: (positionMs: number, keepPlaying: boolean, afterFailure?: boolean) => void;
 	play: () => void;
 	pause: () => void;
+	/** Mirror a pause the system made on the player (call, unplugged headset) (#310). */
+	pauseBySystem: () => void;
 	resume: () => void;
 	stop: () => void;
 	toggleModal: () => void;
@@ -98,6 +102,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 	streamExpiresAt: null,
 	streamRenewed: false,
 	resumeAfterLoad: true,
+	pausedBySystem: false,
 	playbackState: 'idle',
 	isPlaying: false,
 	loading: false,
@@ -135,6 +140,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 			streamExpiresAt: null,
 			pendingTrackId: null,
 			playbackState: 'idle',
+			pausedBySystem: false,
 			isPlaying: false,
 			loading: false,
 		});
@@ -197,6 +203,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 			streamExpiresAt: null,
 			streamRenewed: false,
 			resumeAfterLoad: true,
+			pausedBySystem: false,
 			isPlaying: false,
 			loading: true,
 			// A list tap closes the modal; a queue step (next/previous, auto-advance) keeps it.
@@ -219,6 +226,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 			streamExpiresAt: null,
 			streamRenewed: afterFailure || state.streamRenewed,
 			resumeAfterLoad: keepPlaying,
+			pausedBySystem: false,
 			// Unchanged play state: the listening status is not re-sent for a renewal.
 			isPlaying: keepPlaying,
 			loading: true,
@@ -232,6 +240,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 			set({
 				playbackState: 'playing',
 				isPlaying: true,
+				pausedBySystem: false,
 			});
 		}
 	},
@@ -243,6 +252,21 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 			set({
 				playbackState: 'paused',
 				isPlaying: false,
+				pausedBySystem: false,
+			});
+		} else if (state.pausedBySystem) {
+			// A user pause during an interruption: the system must not resume it (#310).
+			set({ pausedBySystem: false });
+		}
+	},
+
+	pauseBySystem: () => {
+		if (get().playbackState === 'playing') {
+			if (__DEV__) console.log('🎵 [playerStore] Paused by the system');
+			set({
+				playbackState: 'paused',
+				isPlaying: false,
+				pausedBySystem: true,
 			});
 		}
 	},
@@ -254,6 +278,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 			set({
 				playbackState: 'playing',
 				isPlaying: true,
+				pausedBySystem: false,
 			});
 		}
 	},
@@ -268,6 +293,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 			streamExpiresAt: null,
 			pendingTrackId: null,
 			playbackState: 'idle',
+			pausedBySystem: false,
 			isPlaying: false,
 			loading: false,
 			error: null,

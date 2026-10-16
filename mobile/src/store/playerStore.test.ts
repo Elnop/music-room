@@ -392,3 +392,74 @@ describe('playback position (#295)', () => {
 		expect(usePlayerStore.getState().seekCount).toBe(before + 1);
 	});
 });
+
+describe('pause by the system (#310)', () => {
+	it('pauseBySystem pauses a playing track and marks it', () => {
+		withState('playing');
+
+		usePlayerStore.getState().pauseBySystem();
+
+		const state = usePlayerStore.getState();
+		expect(state.playbackState).toBe('paused');
+		expect(state.isPlaying).toBe(false);
+		expect(state.pausedBySystem).toBe(true);
+	});
+
+	it.each<PlaybackState>(['idle', 'loading', 'ready', 'paused'])(
+		'pauseBySystem is a no-op from %s',
+		from => {
+			withState(from);
+			usePlayerStore.getState().pauseBySystem();
+			expect(usePlayerStore.getState().playbackState).toBe(from);
+			expect(usePlayerStore.getState().pausedBySystem).toBe(false);
+		}
+	);
+
+	it('a user pause during the interruption clears the mark and stays paused', () => {
+		withState('playing');
+		usePlayerStore.getState().pauseBySystem();
+
+		usePlayerStore.getState().pause();
+
+		expect(usePlayerStore.getState().playbackState).toBe('paused');
+		expect(usePlayerStore.getState().pausedBySystem).toBe(false);
+	});
+
+	it('resume clears the mark', () => {
+		withState('playing');
+		usePlayerStore.getState().pauseBySystem();
+
+		usePlayerStore.getState().resume();
+
+		expect(usePlayerStore.getState().playbackState).toBe('playing');
+		expect(usePlayerStore.getState().pausedBySystem).toBe(false);
+	});
+
+	it('renewStream clears the mark', () => {
+		usePlayerStore.getState().playTrack(makeTrack(4));
+		withState('playing');
+		usePlayerStore.getState().pauseBySystem();
+
+		usePlayerStore.getState().renewStream(1000, false);
+
+		expect(usePlayerStore.getState().pausedBySystem).toBe(false);
+	});
+
+	it('setTrackUnavailableError clears the mark', () => {
+		withState('playing');
+		usePlayerStore.getState().pauseBySystem();
+
+		usePlayerStore.getState().setTrackUnavailableError('gone');
+
+		expect(usePlayerStore.getState().pausedBySystem).toBe(false);
+	});
+
+	it('playTrack clears the mark', () => {
+		withState('playing');
+		usePlayerStore.getState().pauseBySystem();
+
+		usePlayerStore.getState().playTrack(makeTrack(4));
+
+		expect(usePlayerStore.getState().pausedBySystem).toBe(false);
+	});
+});
