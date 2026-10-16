@@ -44,6 +44,12 @@ jest.mock('@/contexts/ThemeContext', () => {
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
+const mockNavigate = jest.fn();
+jest.mock('@react-navigation/native', () => ({
+	...jest.requireActual('@react-navigation/native'),
+	useNavigation: () => ({ navigate: mockNavigate }),
+}));
+
 jest.mock('@components/common/LoadingSpinner', () => ({
 	LoadingSpinner: () => null,
 }));
@@ -179,7 +185,9 @@ describe('MyDevicesScreen', () => {
 		render(<MyDevicesScreen />);
 
 		await screen.findByText('Impossible de charger vos appareils', {}, FIRST_RENDER);
-		expect(showError).toHaveBeenCalledWith('Server exploded');
+		expect(showError).toHaveBeenCalledWith(
+			'Le serveur a rencontré un problème. Réessayez plus tard.'
+		);
 		expect(screen.queryByTestId('device-device-1')).toBeNull();
 	});
 
@@ -195,6 +203,9 @@ describe('MyDevicesScreen', () => {
 
 		expect(screen.getByTestId('device-device-2')).toHaveTextContent(/Aucun ami/);
 		expect(screen.queryByLabelText(/sur Tablet/)).toBeNull();
+
+		fireEvent.press(screen.getByRole('button', { name: 'Trouver des amis' }));
+		expect(mockNavigate).toHaveBeenCalledWith('FriendsTab');
 	});
 
 	it('grants a friend one device and keeps the switch on', async () => {
@@ -210,13 +221,17 @@ describe('MyDevicesScreen', () => {
 		expect(toggle('Bob sur Phone').props.value).toBe(false);
 	});
 
-	it('puts the switch back off and shows the backend message when granting fails', async () => {
+	it('puts the switch back off and shows a French message when granting fails', async () => {
 		await renderLoaded([phone, tablet], [alice, bob]);
 		fetchMock.mockResolvedValueOnce(fail(400, 'NOT_FRIENDS', 'You can only license friends'));
 
 		fireEvent(toggle('Bob sur Tablet'), 'valueChange', true);
 
-		await waitFor(() => expect(showError).toHaveBeenCalledWith('You can only license friends'));
+		await waitFor(() =>
+			expect(showError).toHaveBeenCalledWith(
+				"Seuls vos amis peuvent recevoir l'accès à vos appareils"
+			)
+		);
 		expect(toggle('Bob sur Tablet').props.value).toBe(false);
 		expect(toggle('Bob sur Tablet')).toBeEnabled();
 		expect(showSuccess).not.toHaveBeenCalled();
@@ -234,13 +249,13 @@ describe('MyDevicesScreen', () => {
 		expect(toggle('alice sur Phone').props.value).toBe(false);
 	});
 
-	it('puts the switch back on and shows the backend message when revoking fails', async () => {
+	it('puts the switch back on and shows a French message when revoking fails', async () => {
 		await renderLoaded([phone, tablet], [alice, bob]);
 		fetchMock.mockResolvedValueOnce(fail(404, 'DEVICE_NOT_FOUND', 'Device not found'));
 
 		fireEvent(toggle('alice sur Phone'), 'valueChange', false);
 
-		await waitFor(() => expect(showError).toHaveBeenCalledWith('Device not found'));
+		await waitFor(() => expect(showError).toHaveBeenCalledWith("Cet appareil n'existe plus"));
 		expect(toggle('alice sur Phone').props.value).toBe(true);
 	});
 

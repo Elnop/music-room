@@ -14,7 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@/themes/types';
-import { ApiError } from '@/services/api';
+import { apiErrorMessage } from '@/utils/apiErrorMessage';
 import { useAuthStore } from '@/store/authStore';
 import { usePlaylistStore } from '@/store/playlistStore';
 import { useQueueStore } from '@/store/queueStore';
@@ -31,20 +31,6 @@ interface TrackActionsSheetProps {
 }
 
 type Step = 'actions' | 'playlists';
-
-function addTrackError(error: unknown): string {
-	if (error instanceof ApiError) {
-		switch (error.code) {
-			case 'TRACK_DUPLICATE':
-				return 'Ce titre est déjà dans la playlist';
-			case 'PLAYLIST_ACCESS_DENIED':
-				return 'Vous ne pouvez pas modifier cette playlist';
-			case 'PLAYLIST_NOT_FOUND':
-				return "Cette playlist n'existe plus";
-		}
-	}
-	return "Impossible d'ajouter le titre à la playlist";
-}
 
 /**
  * Quick actions on a track (#316), the same sheet on every track list: play
@@ -104,7 +90,7 @@ export function TrackActionsSheet({ track, onClose }: TrackActionsSheetProps) {
 				showSuccess(`Ajouté à « ${playlist.name} »`);
 			} catch (error) {
 				console.error('[TrackActionsSheet] Add to playlist failed:', error);
-				showError(addTrackError(error));
+				showError(apiErrorMessage(error, "Impossible d'ajouter le titre à la playlist"));
 			}
 		});
 

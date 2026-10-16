@@ -145,6 +145,11 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
 		}
 	};
 
+	// The friends tab lives in the parent tab navigator.
+	const handleFindFriends = useCallback(() => {
+		navigation.getParent()?.navigate('FriendsTab');
+	}, [navigation]);
+
 	const handlePlaylistPress = (id: string) => {
 		navigation.navigate('PlaylistDetail', { id });
 	};
@@ -182,6 +187,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
 					<FriendPlaylistSection
 						friendsPlaylists={friendsPlaylists}
 						onPlaylistPress={handlePlaylistPress}
+						onFindFriends={handleFindFriends}
 					/>
 				)}
 			</View>
@@ -229,6 +235,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
 						<EmptyState
 							icon="musical-notes-outline"
 							message="Aucune playlist pour l'instant. Créez votre première playlist !"
+							action={{ label: 'Créer une playlist', onPress: handleCreatePress }}
 						/>
 					))}
 			</View>
@@ -282,9 +289,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
 							))}
 						</View>
 					) : (
-						<View style={styles.emptyPublicContainer}>
-							<Text style={styles.emptyPublicText}>Aucune playlist publique disponible</Text>
-						</View>
+						<EmptyState icon="globe-outline" message="Aucune playlist publique disponible" />
 					))}
 			</View>
 		</View>
@@ -371,15 +376,5 @@ const createStyles = (theme: Theme) =>
 			flexWrap: 'wrap',
 			paddingHorizontal: theme.spacing.md,
 			gap: 16,
-		},
-		emptyPublicContainer: {
-			paddingVertical: theme.spacing.lg,
-			paddingHorizontal: theme.spacing.md,
-			alignItems: 'center',
-		},
-		emptyPublicText: {
-			fontSize: theme.typography.sizes.sm,
-			color: theme.colors.textSecondary,
-			fontStyle: 'italic',
 		},
 	});

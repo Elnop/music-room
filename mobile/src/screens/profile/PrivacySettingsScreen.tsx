@@ -8,7 +8,7 @@ import type { Theme } from '@themes/types';
 import type { ProfilePrivacy, VisibilityLevel } from '@/types/user.types';
 import { useAuthStore } from '@/store/authStore';
 import { privacyApi } from '@/services/privacyApi';
-import { ApiError } from '@/services/api';
+import { apiErrorMessage } from '@utils/apiErrorMessage';
 import { Button } from '@components/common/Button';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
 import { VisibilityToggle } from '@components/profile/VisibilityToggle';
@@ -37,7 +37,10 @@ export function PrivacySettingsScreen() {
 				setPrivacy(data);
 				setInitialPrivacy(data);
 			} catch (error) {
-				const message = error instanceof ApiError ? error.message : 'Unable to load settings';
+				const message = apiErrorMessage(
+					error,
+					'Impossible de charger les paramètres de confidentialité'
+				);
 				showError(message);
 			} finally {
 				setIsLoading(false);
@@ -80,7 +83,10 @@ export function PrivacySettingsScreen() {
 			setInitialPrivacy(privacy);
 			navigation.goBack();
 		} catch (error) {
-			const message = error instanceof ApiError ? error.message : 'Unable to save settings';
+			const message = apiErrorMessage(
+				error,
+				"Impossible d'enregistrer les paramètres de confidentialité"
+			);
 			showError(message);
 		} finally {
 			setIsSaving(false);

@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 import { showError, showSuccess } from '@utils/toast';
+import { apiErrorMessage } from '@utils/apiErrorMessage';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -143,7 +144,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 			showSuccess('Track supprimé');
 		} catch (error) {
 			console.error('[PlaylistDetailScreen] Remove track failed:', error);
-			showError('Impossible de supprimer le track');
+			showError(apiErrorMessage(error, 'Impossible de supprimer le track'));
 		}
 	};
 
@@ -158,7 +159,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 			// Conflicts are reported through conflictMessage once the playlist is reloaded.
 			if (!(error instanceof ApiError && CONFLICT_CODES.includes(error.code))) {
 				console.error('[PlaylistDetailScreen] Move track failed:', error);
-				showError('Impossible de déplacer le track');
+				showError(apiErrorMessage(error, 'Impossible de déplacer le track'));
 			}
 			throw error;
 		}
@@ -249,7 +250,8 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 				ListEmptyComponent={
 					<EmptyState
 						icon="musical-notes-outline"
-						message="No track in this playlist. Add tracks to get started!"
+						message="Aucun titre dans cette playlist pour l'instant"
+						action={canEdit ? { label: 'Ajouter des titres', onPress: handleAddTrack } : undefined}
 					/>
 				}
 				showsVerticalScrollIndicator={false}

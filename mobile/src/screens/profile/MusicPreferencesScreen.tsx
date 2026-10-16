@@ -9,7 +9,7 @@ import type { MusicGenre } from '@/types/user.types';
 import { MAX_GENRES } from '@/types/user.types';
 import { useAuthStore } from '@/store/authStore';
 import { privacyApi } from '@/services/privacyApi';
-import { ApiError } from '@/services/api';
+import { apiErrorMessage } from '@utils/apiErrorMessage';
 import { Button } from '@components/common/Button';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
 import { GenreSelector } from '@components/profile/GenreSelector';
@@ -39,7 +39,7 @@ export function MusicPreferencesScreen() {
 				setInitialGenres(genres);
 				setSelectedGenres(genres);
 			} catch (error) {
-				const message = error instanceof ApiError ? error.message : 'Unable to load preferences';
+				const message = apiErrorMessage(error, 'Impossible de charger vos préférences');
 				showError(message);
 			} finally {
 				setIsLoading(false);
@@ -77,7 +77,7 @@ export function MusicPreferencesScreen() {
 			setInitialGenres(selectedGenres);
 			navigation.goBack();
 		} catch (error) {
-			const message = error instanceof ApiError ? error.message : 'Unable to save preferences';
+			const message = apiErrorMessage(error, "Impossible d'enregistrer vos préférences");
 			showError(message);
 		} finally {
 			setIsSaving(false);

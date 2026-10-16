@@ -13,7 +13,7 @@ export const CONFLICT_CODES = [
 	'PLAYLIST_REBALANCED',
 ];
 
-export const CONFLICT_MESSAGE = 'This track was changed by someone else';
+export const CONFLICT_MESSAGE = "Ce titre a été modifié par quelqu'un d'autre";
 
 // Moves from this client go one at a time: each one is sent with the version the
 // previous one returned, so a quick second move is never refused against ourselves.

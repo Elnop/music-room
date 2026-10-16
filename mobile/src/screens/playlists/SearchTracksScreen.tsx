@@ -29,7 +29,7 @@ import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import type { Track } from '@/types/track.types';
 import type { AddQueueItemBody } from '@/types/queue.types';
 import { showError } from '@utils/toast';
-import { ApiError } from '@/services/api';
+import { apiErrorMessage } from '@utils/apiErrorMessage';
 
 type PlaylistStackParamList = {
 	Playlists: undefined;
@@ -93,35 +93,6 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 		debouncedSearch(text);
 	};
 
-	const getErrorMessage = (error: unknown): string => {
-		const isLegacy = !!error && typeof error === 'object' && 'error' in error;
-		if (error instanceof ApiError || isLegacy) {
-			// ApiError from apiRequest, or the raw `{ error: { code, message } }` body
-			const apiError =
-				error instanceof ApiError
-					? { error: { code: error.code, message: error.message } }
-					: (error as { error?: { code?: string; message?: string } });
-			const code = apiError.error?.code;
-
-			switch (code) {
-				case 'PLAYLIST_ACCESS_DENIED':
-					return 'You no longer have access to this playlist';
-				case 'PLAYLIST_NOT_FOUND':
-					return 'This playlist has been deleted';
-				case 'TRACK_DUPLICATE':
-					return 'This track is already in the playlist';
-				default:
-					return apiError.error?.message || 'Failed to add';
-			}
-		}
-
-		if (error instanceof Error) {
-			return error.message;
-		}
-
-		return 'Failed to add';
-	};
-
 	const handleAddTrack = async (track: SoundCloudTrack) => {
 		if (addedTrackUris.has(track.permalink_url)) {
 			return;
@@ -134,7 +105,7 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 
 			setAddedTrackUris(prev => new Set(prev).add(track.permalink_url));
 		} catch (error) {
-			showError(getErrorMessage(error));
+			showError(apiErrorMessage(error, "Impossible d'ajouter le titre à la playlist"));
 		} finally {
 			setAddingTrackId(null);
 		}
