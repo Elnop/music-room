@@ -3,6 +3,7 @@ import { act, render } from '@testing-library/react-native';
 import { PlayerProvider, usePlayer } from '@/contexts/PlayerContext';
 import { readPositionMs, usePlayerStore } from '@/store/playerStore';
 import { useConnectStore } from '@/store/connectStore';
+import { useQueueStore } from '@/store/queueStore';
 import { apiRequest } from '@/services/api';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
@@ -24,6 +25,8 @@ interface MockStatus {
 	isLoaded: boolean;
 	currentTime: number;
 	didJustFinish: boolean;
+	playing?: boolean;
+	isBuffering?: boolean;
 }
 
 const mockPlayers = new Map<string, MockPlayer>();
@@ -138,6 +141,7 @@ function SeekProbe() {
 }
 
 const initialPlayerState = usePlayerStore.getState();
+const initialQueueState = useQueueStore.getState();
 
 /** Next stream responses, in order. */
 function answerStreams(...urls: { streamUrl: string; expiresAt: string }[]) {
@@ -193,6 +197,7 @@ beforeEach(() => {
 	mockApiRequest.mockReset();
 	seekRef = null;
 	usePlayerStore.setState(initialPlayerState, true);
+	useQueueStore.setState(initialQueueState, true);
 	useConnectStore.getState().setLocal();
 	jest.spyOn(console, 'log').mockImplementation(() => undefined);
 });
@@ -430,5 +435,142 @@ describe('PlayerProvider stream renewal (#313)', () => {
 
 		expect(mockApiRequest).toHaveBeenCalledTimes(1);
 		expect(mockPlayerFor('u1').seekTo).toHaveBeenCalledWith(90);
+	});
+});
+
+describe('PlayerProvider audio interruptions (#310)', () => {
+	/** Start playing on u1 and report the native player as playing. */
+	async function playingNatively() {
+		const view = await startPlaying(inMinutes(30));
+		const u1 = mockPlayerFor('u1');
+		setStatus(u1, { playing: true });
+		await rerender(view);
+		return { view, u1 };
+	}
+
+	/** The system pauses or resumes the player behind the app's back. */
+	async function nativeSets(
+		view: ReturnType<typeof render>,
+		player: MockPlayer,
+		playing: boolean,
+		extra: Partial<MockStatus> = {}
+	) {
+		player.playing = playing;
+		setStatus(player, { playing, ...extra });
+		await rerender(view);
+	}
+
+	it('pauses the store when the system stops the player (headset unplugged)', async () => {
+		const { view, u1 } = await playingNatively();
+
+		await nativeSets(view, u1, false);
+
+		const state = usePlayerStore.getState();
+		expect(state.playbackState).toBe('paused');
+		expect(state.isPlaying).toBe(false);
+		expect(state.pausedBySystem).toBe(true);
+	});
+
+	it('resumes the store when the system resumes the player after a call', async () => {
+		const { view, u1 } = await playingNatively();
+		u1.currentTime = 42;
+
+		await nativeSets(view, u1, false);
+		expect(usePlayerStore.getState().playbackState).toBe('paused');
+		await nativeSets(view, u1, true);
+
+		const state = usePlayerStore.getState();
+		expect(state.playbackState).toBe('playing');
+		expect(state.pausedBySystem).toBe(false);
+		// The player resumed itself at its position: no reload, no seek.
+		expect(mockApiRequest).toHaveBeenCalledTimes(1);
+		expect(u1.seekTo).not.toHaveBeenCalled();
+	});
+
+	it('stays paused when the user paused during the interruption', async () => {
+		const { view, u1 } = await playingNatively();
+		await nativeSets(view, u1, false);
+		act(() => usePlayerStore.getState().pause());
+		u1.pause.mockClear();
+
+		await nativeSets(view, u1, true);
+
+		expect(usePlayerStore.getState().playbackState).toBe('paused');
+		expect(u1.pause).toHaveBeenCalled();
+		expect(u1.playing).toBe(false);
+	});
+
+	it('keeps playing when the volume is only ducked', async () => {
+		const { view, u1 } = await playingNatively();
+
+		await nativeSets(view, u1, true, { currentTime: 10 });
+
+		expect(usePlayerStore.getState().playbackState).toBe('playing');
+		expect(usePlayerStore.getState().pausedBySystem).toBe(false);
+	});
+
+	it.each([
+		['buffering', { isBuffering: true }],
+		['at the track end', { didJustFinish: true }],
+	])('does not mirror a stop %s', async (_label, extra) => {
+		const { view, u1 } = await playingNatively();
+		answerStreams({ streamUrl: 'u2', expiresAt: inMinutes(30) });
+		// Auto-advance (#274) is QueueAutoAdvance's: keep it out of the way.
+		const next = jest.fn();
+		useQueueStore.setState({ next } as never);
+
+		await nativeSets(view, u1, false, extra);
+
+		expect(usePlayerStore.getState().pausedBySystem).toBe(false);
+		expect(usePlayerStore.getState().playbackState).not.toBe('paused');
+	});
+
+	it.each(['failed', 'idle'])(
+		'does not mirror a stop when the player is %s',
+		async playbackState => {
+			const view = await startPlaying(inMinutes(30));
+			const u1 = mockPlayerFor('u1');
+			// Never reported loaded, so StreamWatchdog leaves it: only this guard stops the mirror.
+			setStatus(u1, { playing: true, isLoaded: false });
+			await rerender(view);
+
+			await nativeSets(view, u1, false, { isLoaded: true, playbackState });
+
+			expect(usePlayerStore.getState().playbackState).toBe('playing');
+			expect(usePlayerStore.getState().pausedBySystem).toBe(false);
+		}
+	);
+
+	it('ignores a late event that no longer matches the player', async () => {
+		const { view, u1 } = await playingNatively();
+
+		// A stale `playing: false` from a fast pause/play: the player itself plays.
+		setStatus(u1, { playing: false });
+		await rerender(view);
+
+		expect(u1.playing).toBe(true);
+		expect(usePlayerStore.getState().playbackState).toBe('playing');
+		expect(usePlayerStore.getState().pausedBySystem).toBe(false);
+	});
+
+	it('does not mirror a stop in remote mode', async () => {
+		const { view, u1 } = await playingNatively();
+		useConnectStore.setState({
+			target: { kind: 'remote', ownerId: 'o', deviceId: 'd', ownerUsername: null },
+		} as never);
+
+		await nativeSets(view, u1, false);
+
+		expect(usePlayerStore.getState().playbackState).toBe('playing');
+	});
+
+	it('does not mirror a user pause', async () => {
+		const { view, u1 } = await playingNatively();
+		act(() => usePlayerStore.getState().pause());
+
+		await nativeSets(view, u1, false);
+
+		expect(usePlayerStore.getState().playbackState).toBe('paused');
+		expect(usePlayerStore.getState().pausedBySystem).toBe(false);
 	});
 });
