@@ -1,7 +1,10 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef } from 'react';
 import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
 import { usePlayerStore, setPositionReader } from '@/store/playerStore';
-import { useQueueStore } from '@/store/queueStore';
+import { useActiveQueue, useQueueStore } from '@/store/queueStore';
+import { nextItem } from '@/store/queueSelectors';
+import { isStreamStale, streamPrefetch } from '@/store/streamPrefetch';
+import { trackToSoundCloud } from '@utils/trackToSoundCloud';
 import { useConnectStore } from '@/store/connectStore';
 import { ApiError, apiRequest } from '@/services/api';
 import type { StreamUrlResponse } from '@/types/soundcloud.types';
@@ -26,12 +29,29 @@ const PLAYER_LOAD_TIMEOUT_MS = 10000; // 10 seconds max for player to load
 // A renewed stream that played this long past its start position is healthy again (#313)
 export const RENEWAL_HEALTHY_MS = 30 * 1000;
 
-// A stream URL this close to its expiry is renewed before play or seek (#313)
-export const STREAM_RENEW_MARGIN_MS = 2 * 60 * 1000;
+// The next queue item's stream URL is fetched this many seconds before the track end (#314)
+export const PREFETCH_WINDOW_S = 20;
 
-/** Whether a stream URL expiring at `expiresAt` (epoch ms) must be renewed before use. */
-export function isStreamStale(expiresAt: number | null, now: number = Date.now()): boolean {
-	return expiresAt !== null && expiresAt - now < STREAM_RENEW_MARGIN_MS;
+/**
+ * Fetch the stream URL of the track at `permalink`, with its expiry (epoch ms,
+ * null when unknown). Throws when the server sends no URL. `purpose` only labels the dev log.
+ */
+async function fetchStreamUrl(
+	permalink: string,
+	signal: AbortSignal,
+	purpose: 'load' | 'prefetch'
+): Promise<{ streamUrl: string; expiresAt: number | null }> {
+	// Use query param instead of path param to avoid Cloudflare WAF blocking URLs in paths
+	const streamEndpoint = `/api/soundcloud/stream?url=${encodeURIComponent(permalink)}`;
+	if (__DEV__)
+		console.log(`🌐 [PlayerProvider] Fetching stream URL (${purpose}):`, {
+			endpoint: streamEndpoint.substring(0, 100) + '...',
+			trackUrl: permalink,
+		});
+	const data = await apiRequest<Partial<StreamUrlResponse>>(streamEndpoint, { signal });
+	if (!data.streamUrl) throw new Error('Stream not available');
+	const expiresAt = data.expiresAt ? Date.parse(data.expiresAt) : NaN;
+	return { streamUrl: data.streamUrl, expiresAt: Number.isFinite(expiresAt) ? expiresAt : null };
 }
 
 /** This device plays its own audio (renewal is local only: in remote mode another device plays). */
@@ -76,6 +96,78 @@ function QueueAutoAdvance({ player }: { player: ReturnType<typeof useAudioPlayer
 		if (__DEV__) console.log('🎵 [PlayerProvider] Track finished, playing next queue item');
 		useQueueStore.getState().next();
 	}, [didJustFinish, isPlaying, loadCounter]);
+
+	return null;
+}
+
+/**
+ * Fetches the stream URL of the queue's next item in the last PREFETCH_WINDOW_S
+ * seconds of a track played here (#314), so that it starts with no request when
+ * it loads (`streamPrefetch.take` in the load effect). Once per (item, track)
+ * pair; the held URL is dropped when the next item changes, and a response for
+ * an item no longer next is ignored. A failure is silent: the load fetches it
+ * again and reports the error. Not in remote mode: the remote device plays.
+ */
+function NextTrackPrefetcher({ player }: { player: ReturnType<typeof useAudioPlayer> }) {
+	const status = useAudioPlayerStatus(player);
+	const isPlaying = usePlayerStore(state => state.playbackState === 'playing');
+	const isLocal = useConnectStore(state => state.target.kind === 'local');
+	const queue = useActiveQueue();
+	const queueCurrentId = queue.currentItemId;
+	const next = nextItem(queue);
+	const nextId = next?.id ?? null;
+	const nextPermalink = next ? trackToSoundCloud(next).permalink_url : null;
+	const nextKey = nextId !== null && nextPermalink !== null ? `${nextId} ${nextPermalink}` : null;
+	// Read by a prefetch response, to ignore one for an item no longer next.
+	const nextKeyRef = useRef(nextKey);
+	useEffect(() => {
+		nextKeyRef.current = nextKey;
+	}, [nextKey]);
+	const requestedKeyRef = useRef<string | null>(null);
+	const playingItemId = usePlayerStore(state => state.queueItemId);
+
+	// Once per played item: playing it again later prefetches its next item again.
+	useEffect(() => {
+		requestedKeyRef.current = null;
+	}, [playingItemId]);
+
+	// The hook can still hold the previous player's last status: only this player's counts.
+	const ownStatus = status !== undefined && status.id === player?.id;
+	const duration = ownStatus ? (status.duration ?? 0) : 0;
+	const currentTime = ownStatus ? (status.currentTime ?? 0) : 0;
+	const inWindow = duration > 0 && duration - currentTime <= PREFETCH_WINDOW_S;
+
+	useEffect(() => {
+		const held = streamPrefetch.peek();
+		if (!held) return;
+		// Kept while it is next, or current: the queue stepped to it and the player loads it.
+		const stillWanted =
+			nextKey === `${held.queueItemId} ${held.permalink}` || held.queueItemId === queueCurrentId;
+		if (!isLocal || !stillWanted) streamPrefetch.clear();
+	}, [isLocal, nextKey, queueCurrentId]);
+
+	// A queue item still playing while the queue already moved on: not the track before `next`.
+	const stepping = playingItemId !== null && playingItemId !== queueCurrentId;
+
+	useEffect(() => {
+		if (!isLocal || !isPlaying || !inWindow || stepping) return;
+		if (nextKey === null || nextId === null || nextPermalink === null) return;
+		if (requestedKeyRef.current === nextKey) return;
+		requestedKeyRef.current = nextKey;
+		if (__DEV__) console.log('🎵 [NextTrackPrefetcher] Prefetching the next stream URL');
+
+		const controller = new AbortController();
+		const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+		fetchStreamUrl(nextPermalink, controller.signal, 'prefetch')
+			.then(({ streamUrl, expiresAt }) => {
+				if (nextKeyRef.current !== nextKey || !playsLocally()) return;
+				streamPrefetch.set({ queueItemId: nextId, permalink: nextPermalink, streamUrl, expiresAt });
+			})
+			.catch(err => {
+				if (__DEV__) console.log('🟠 [NextTrackPrefetcher] Prefetch failed:', err);
+			})
+			.finally(() => clearTimeout(timeoutId));
+	}, [isLocal, isPlaying, inWindow, stepping, nextKey, nextId, nextPermalink]);
 
 	return null;
 }
@@ -272,24 +364,27 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 					loadCounter: thisLoadCounter,
 				});
 
+			// The next queue item's URL fetched before the previous track ended (#314).
+			const prefetched = streamPrefetch.take(
+				usePlayerStore.getState().queueItemId,
+				currentTrack.permalink_url
+			);
+			if (prefetched) {
+				if (__DEV__) console.log('🟢 [PlayerProvider] Using the prefetched stream URL');
+				setStreamUrl(prefetched.streamUrl, prefetched.expiresAt);
+				return;
+			}
+
 			// Create abort controller for timeout
 			const controller = new AbortController();
 			const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
 			try {
-				// Use query param instead of path param to avoid Cloudflare WAF blocking URLs in paths
-				const encodedUrl = encodeURIComponent(currentTrack.permalink_url);
-				const streamEndpoint = `/api/soundcloud/stream?url=${encodedUrl}`;
-
-				if (__DEV__)
-					console.log('🌐 [PlayerProvider] Fetching stream URL:', {
-						endpoint: streamEndpoint.substring(0, 100) + '...',
-						trackUrl: currentTrack.permalink_url,
-					});
-
-				const data = await apiRequest<Partial<StreamUrlResponse>>(streamEndpoint, {
-					signal: controller.signal,
-				});
+				const { streamUrl: url, expiresAt } = await fetchStreamUrl(
+					currentTrack.permalink_url,
+					controller.signal,
+					'load'
+				);
 				clearTimeout(timeoutId);
 
 				// Check if this request is still relevant
@@ -298,13 +393,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 					return;
 				}
 
-				if (data.streamUrl) {
-					if (__DEV__) console.log('🟢 [PlayerProvider] Stream URL obtained');
-					const expiresAt = data.expiresAt ? Date.parse(data.expiresAt) : NaN;
-					setStreamUrl(data.streamUrl, Number.isFinite(expiresAt) ? expiresAt : null);
-				} else {
-					throw new Error('Stream not available');
-				}
+				if (__DEV__) console.log('🟢 [PlayerProvider] Stream URL obtained');
+				setStreamUrl(url, expiresAt);
 			} catch (err) {
 				clearTimeout(timeoutId);
 
@@ -520,6 +610,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 		<PlayerContext.Provider value={value}>
 			<QueueAutoAdvance player={player} />
 			<StreamWatchdog player={player} />
+			<NextTrackPrefetcher player={player} />
 			<AudioInterruptionSync player={player} />
 			<MediaSessionBridge />
 			{children}

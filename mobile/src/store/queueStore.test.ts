@@ -1,6 +1,7 @@
 import { useQueueStore } from '@/store/queueStore';
 import {
 	EMPTY_QUEUE,
+	nextItem,
 	previousAction,
 	selectHasNext,
 	selectHasPrevious,
@@ -281,6 +282,13 @@ describe('queueStore selectors and list taps', () => {
 		expect(selectHasPrevious(queue('a'))).toBe(false);
 		expect(selectHasNext(queue('c'))).toBe(false);
 		expect(selectHasPrevious(queue('c'))).toBe(true);
+	});
+
+	it('picks the item after the current one, or the first with nothing current', () => {
+		expect(nextItem(queue(null))?.id).toBe('a');
+		expect(nextItem(queue('a'))?.id).toBe('b');
+		expect(nextItem(queue('c'))).toBeUndefined();
+		expect(nextItem(queue(null, []))).toBeUndefined();
 	});
 
 	it('a list tap plays at once and leaves the queue alone', () => {

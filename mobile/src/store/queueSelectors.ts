@@ -34,6 +34,13 @@ const currentIndex = (state: QueueItemsView): number =>
 export const currentItem = (state: QueueItemsView): QueueItem | undefined =>
 	state.items.find(item => item.id === state.currentItemId);
 
+/**
+ * The item after the current one, or the first when nothing is current or the
+ * current item is no longer in `items`.
+ */
+export const nextItem = (state: QueueItemsView): QueueItem | undefined =>
+	state.items[currentIndex(state) + 1];
+
 /** An owner's queue, or `EMPTY_QUEUE`. */
 export const selectQueue = (
 	state: { queues: Record<string, OwnerQueue> },
