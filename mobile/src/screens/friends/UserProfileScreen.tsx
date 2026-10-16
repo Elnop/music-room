@@ -14,6 +14,7 @@ import { controlErrorMessage, useFriendListening } from '@/hooks/useMusicControl
 import { showError } from '@utils/toast';
 import { Avatar } from '@/components/common/Avatar';
 import { Button } from '@/components/common/Button';
+import { ShareLinkButton } from '@/components/common/ShareLinkButton';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { PlaylistCard } from '@/components/playlist/PlaylistCard';
 import { GenreChip } from '@/components/profile/GenreChip';
@@ -22,6 +23,7 @@ import type { Playlist } from '@/types/playlist.types';
 import type { FilteredProfile } from '@/types/user.types';
 import type { MusicGenre } from '@/types/user.types';
 import type { FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
+import { userLink } from '@/navigation/linking';
 
 type Props = NativeStackScreenProps<FriendsStackParamList, 'UserProfile'>;
 
@@ -249,6 +251,12 @@ export function UserProfileScreen({ route, navigation }: Props) {
 						</View>
 					)}
 
+					<ShareLinkButton
+						url={userLink(userId)}
+						title={profile.displayName || profile.username}
+						style={styles.shareButton}
+					/>
+
 					{/* Écoute en cours - affiche seulement si un track est en cours */}
 					{canControlMusic &&
 						followStatus?.isFriend &&
@@ -302,6 +310,10 @@ export function UserProfileScreen({ route, navigation }: Props) {
 
 const createStyles = (theme: Theme) =>
 	StyleSheet.create({
+		shareButton: {
+			alignSelf: 'flex-start',
+			marginTop: theme.spacing.md,
+		},
 		container: {
 			flex: 1,
 			backgroundColor: theme.colors.background,

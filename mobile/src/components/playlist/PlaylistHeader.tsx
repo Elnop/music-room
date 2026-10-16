@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Avatar } from '@components/common/Avatar';
+import { ShareLinkButton } from '@components/common/ShareLinkButton';
+import { playlistLink } from '@/navigation/linking';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import type { PlaylistWithTracks } from '@/types/playlist.types';
@@ -48,6 +50,8 @@ export function PlaylistHeader({ playlist, onAddTrack, canEdit = false }: Playli
 					</Text>
 				</View>
 			)}
+
+			<ShareLinkButton url={playlistLink(playlist.id)} title={playlist.name} style={styles.share} />
 
 			{/* Add track button integrated in header */}
 			{canEdit && onAddTrack && (
@@ -131,6 +135,10 @@ const createStyles = (theme: Theme) =>
 			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.primary,
 			fontWeight: theme.typography.weights.semibold,
+		},
+		share: {
+			marginTop: theme.spacing.md,
+			marginBottom: theme.spacing.sm,
 		},
 		addTrackRow: {
 			flexDirection: 'row',

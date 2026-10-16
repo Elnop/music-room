@@ -29,6 +29,7 @@ import type { AddQueueItemBody } from '@/types/queue.types';
 import { ReorderableList } from '@components/common/ReorderableList';
 import { EmptyState } from '@components/common/EmptyState';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
+import { Button } from '@components/common/Button';
 
 type PlaylistStackParamList = {
 	Playlists: undefined;
@@ -89,11 +90,21 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 	// A message left by this screen must not show on the next playlist opened.
 	React.useEffect(() => () => clearConflictMessage(), [clearConflictMessage]);
 
-	useFocusEffect(
-		React.useCallback(() => {
-			fetchPlaylistById(id);
-		}, [id, fetchPlaylistById])
+	// This screen's own load failure, tied to the playlist it asked for (#321:
+	// a share link may point to a private or deleted playlist).
+	const [loadFailure, setLoadFailure] = React.useState<{ id: string; notFound: boolean } | null>(
+		null
 	);
+
+	const loadPlaylist = React.useCallback(() => {
+		setLoadFailure(null);
+		fetchPlaylistById(id).catch((error: unknown) => {
+			const notFound = error instanceof ApiError && (error.status === 403 || error.status === 404);
+			setLoadFailure({ id, notFound });
+		});
+	}, [id, fetchPlaylistById]);
+
+	useFocusEffect(loadPlaylist);
 
 	const handleShare = useCallback(() => {
 		navigation.navigate('PlaylistSharing', { playlistId: id });
@@ -174,6 +185,24 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 	}
 
 	if (!currentPlaylist) {
+		if (loadFailure?.id === id) {
+			return (
+				<View style={[styles.container, styles.failure]}>
+					{loadFailure.notFound ? (
+						<EmptyState icon="lock-closed-outline" message="Playlist introuvable ou inaccessible" />
+					) : (
+						<>
+							<EmptyState
+								icon="cloud-offline-outline"
+								message="Impossible de charger la playlist"
+								style={styles.failureMessage}
+							/>
+							<Button title="Réessayer" variant="outline" onPress={loadPlaylist} />
+						</>
+					)}
+				</View>
+			);
+		}
 		return <LoadingSpinner fullScreen message="Chargement..." />;
 	}
 
@@ -238,6 +267,14 @@ const createStyles = (theme: Theme, topInset: number) =>
 		container: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
+		},
+		failure: {
+			justifyContent: 'center',
+			alignItems: 'center',
+			padding: theme.spacing.xl,
+		},
+		failureMessage: {
+			flex: 0,
 		},
 		gradientBackground: {
 			position: 'absolute',

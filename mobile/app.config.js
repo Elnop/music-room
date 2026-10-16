@@ -46,6 +46,15 @@ module.exports = {
 							scheme: 'zumik',
 							host: 'auth',
 						},
+						// Share links (#321): zumik://playlist/<id>, zumik://user/<id>
+						{
+							scheme: 'zumik',
+							host: 'playlist',
+						},
+						{
+							scheme: 'zumik',
+							host: 'user',
+						},
 					],
 					category: ['BROWSABLE', 'DEFAULT'],
 				},

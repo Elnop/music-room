@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 import { AuthNavigator } from '@/navigation/AuthNavigator';
-import { AppNavigator } from '@/navigation/AppNavigator';
+import { AppNavigator, type AppTabsParamList } from '@/navigation/AppNavigator';
+import { createLinking, openPendingLink } from '@/navigation/linking';
 import { useAuthStore } from '@/store/authStore';
 import { useSocketStore } from '@/store/socketStore';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
@@ -13,6 +14,9 @@ export function RootNavigator() {
 	const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 	const loadFromStorage = useAuthStore(state => state.loadFromStorage);
 	const [isReady, setIsReady] = useState(false);
+	const navigationRef = useNavigationContainerRef<AppTabsParamList>();
+	// zumik:// links; read at each link so a link received signed out waits for sign-in
+	const linking = useMemo(() => createLinking(() => useAuthStore.getState().isAuthenticated), []);
 
 	const connectSocket = useSocketStore(state => state.connect);
 	const disconnectSocket = useSocketStore(state => state.disconnect);
@@ -50,6 +54,11 @@ export function RootNavigator() {
 			disconnectSocket();
 		}
 	}, [isAuthenticated, connectSocket, disconnectSocket]);
+
+	// A link opened while signed out: the app navigator is mounted once signed in.
+	useEffect(() => {
+		if (isAuthenticated) openPendingLink(navigationRef);
+	}, [isAuthenticated, navigationRef]);
 
 	useEffect(() => {
 		// Listen for auth state changes from Supabase
@@ -96,7 +105,7 @@ export function RootNavigator() {
 	}
 
 	return (
-		<NavigationContainer>
+		<NavigationContainer ref={navigationRef} linking={linking}>
 			{isAuthenticated ? <AppNavigator /> : <AuthNavigator />}
 		</NavigationContainer>
 	);

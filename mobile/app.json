@@ -46,6 +46,14 @@
 						{
 							"scheme": "zumik",
 							"host": "auth"
+						},
+						{
+							"scheme": "zumik",
+							"host": "playlist"
+						},
+						{
+							"scheme": "zumik",
+							"host": "user"
 						}
 					],
 					"category": ["BROWSABLE", "DEFAULT"]

@@ -7,6 +7,7 @@
 
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import type { NavigatorScreenParams } from '@react-navigation/native';
 import { View, StyleSheet } from 'react-native';
 import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,10 +15,13 @@ import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@/themes/types';
 
 // Import feature stacks
-import { PlaylistsNavigator } from '@/navigation/stacks/PlaylistsStack';
+import {
+	PlaylistsNavigator,
+	type PlaylistStackParamList,
+} from '@/navigation/stacks/PlaylistsStack';
 import { ProfileNavigator } from '@/navigation/stacks/ProfileStack';
 import { SearchNavigator } from '@/navigation/stacks/SearchStack';
-import { FriendsNavigator } from '@/navigation/stacks/FriendsStack';
+import { FriendsNavigator, type FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
 
 // Player components
 import { MiniPlayer } from '@/components/player/MiniPlayer';
@@ -30,10 +34,11 @@ import { useConnectionStatus } from '@/hooks/useConnectionStatus';
 import { ConnectionBanner } from '@/components/common/ConnectionBanner';
 
 // Tab navigation types
+// Playlists and Friends take nested params: zumik:// share links open their screens (#321).
 export type AppTabsParamList = {
-	PlaylistsTab: undefined;
+	PlaylistsTab: NavigatorScreenParams<PlaylistStackParamList> | undefined;
 	SearchTab: undefined;
-	FriendsTab: undefined;
+	FriendsTab: NavigatorScreenParams<FriendsStackParamList> | undefined;
 	ProfileTab: undefined;
 };
 
