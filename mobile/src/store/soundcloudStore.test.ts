@@ -58,6 +58,19 @@ describe('soundcloudStore search', () => {
 		expect(state.error).toBeNull();
 	});
 
+	it('keeps the shown results when a refresh fails, and still sets the error', async () => {
+		const tracks = [makeTrack(1)];
+		useSoundCloudStore.setState({ searchResults: tracks, totalResults: 1 });
+		request.mockRejectedValue(new Error('Network down'));
+
+		await useSoundCloudStore.getState().search('rock', undefined, { keepResultsOnError: true });
+
+		const state = useSoundCloudStore.getState();
+		expect(state.searchResults).toEqual(tracks);
+		expect(state.error).toBe('Network down');
+		expect(state.isSearching).toBe(false);
+	});
+
 	it('honours a custom limit', async () => {
 		request.mockResolvedValue({ collection: [] });
 

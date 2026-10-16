@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, Switch } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Switch, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, type NavigationProp } from '@react-navigation/native';
 import type { AppTabsParamList } from '@/navigation/AppNavigator';
@@ -11,7 +11,7 @@ import { useAuthStore } from '@/store/authStore';
 import { musicControlApi } from '@/services/musicControlApi';
 import { friendsApi, type FriendProfile } from '@/services/friendsApi';
 import { deviceService } from '@/services/deviceService';
-import { LoadingSpinner } from '@components/common/LoadingSpinner';
+import { SkeletonBlock, SkeletonList } from '@components/common/Skeleton';
 import { Avatar } from '@components/common/Avatar';
 import { showError, showSuccess } from '@utils/toast';
 import { apiErrorMessage } from '@utils/apiErrorMessage';
@@ -50,6 +50,33 @@ function licensedPairs(devices: UserDeviceWithLicenses[]): Set<string> {
 	return pairs;
 }
 
+/** Same shape as a device card: icon, name and meta lines, then friend rows. */
+function DeviceCardSkeleton() {
+	const { theme } = useTheme();
+	const styles = React.useMemo(() => createStyles(theme), [theme]);
+	return (
+		<View style={styles.card}>
+			<View style={styles.deviceHeader}>
+				<SkeletonBlock width={40} height={40} radius={20} style={styles.skeletonIcon} />
+				<View style={styles.textContainer}>
+					<SkeletonBlock width="55%" height={16} />
+					<SkeletonBlock width="40%" height={12} style={styles.skeletonLine} />
+				</View>
+			</View>
+			<View style={styles.divider} />
+			{[0, 1].map(index => (
+				<View key={index} style={styles.friendRow}>
+					<SkeletonBlock width={32} height={32} radius={16} />
+					<View style={styles.textContainer}>
+						<SkeletonBlock width="45%" height={14} />
+					</View>
+					<SkeletonBlock width={51} height={31} radius={16} />
+				</View>
+			))}
+		</View>
+	);
+}
+
 export function MyDevicesScreen() {
 	const { theme } = useTheme();
 	const navigation = useNavigation<NavigationProp<AppTabsParamList>>();
@@ -65,36 +92,46 @@ export function MyDevicesScreen() {
 	const [licensed, setLicensed] = useState<Set<string>>(new Set());
 	const [pending, setPending] = useState<Set<string>>(new Set());
 
-	useEffect(() => {
-		const load = async () => {
-			setIsLoading(true);
-			try {
-				// Read once: a token refresh must not reload the screen
-				const accessToken = useAuthStore.getState().accessToken;
-				if (!accessToken) throw new Error(LOAD_ERROR);
-				const [myDevices, myFriends, allowedIds, deviceInfo] = await Promise.all([
-					musicControlApi.getMyDevices(),
-					friendsApi.getFriends(accessToken),
-					musicControlApi.getMyPermissions(),
-					// Only marks "Cet appareil": a failure must not hide the list
-					deviceService.getDeviceInfo().catch(() => null),
-				]);
-				setDevices(myDevices);
-				setFriends(myFriends);
-				setAllDevicesIds(new Set(allowedIds));
-				setCurrentDeviceId(deviceInfo?.deviceId ?? null);
-				setLicensed(licensedPairs(myDevices));
-				setLoadFailed(false);
-			} catch (error) {
-				setLoadFailed(true);
-				showError(apiErrorMessage(error, LOAD_ERROR));
-			} finally {
-				setIsLoading(false);
-			}
-		};
+	const [isRefreshing, setIsRefreshing] = useState(false);
 
-		load();
+	// Loads devices, friends and permissions. A failed refresh keeps what is shown.
+	const load = useCallback(async (isRefresh: boolean) => {
+		try {
+			// Read once: a token refresh must not reload the screen
+			const accessToken = useAuthStore.getState().accessToken;
+			if (!accessToken) throw new Error(LOAD_ERROR);
+			const [myDevices, myFriends, allowedIds, deviceInfo] = await Promise.all([
+				musicControlApi.getMyDevices(),
+				friendsApi.getFriends(accessToken),
+				musicControlApi.getMyPermissions(),
+				// Only marks "Cet appareil": a failure must not hide the list
+				deviceService.getDeviceInfo().catch(() => null),
+			]);
+			setDevices(myDevices);
+			setFriends(myFriends);
+			setAllDevicesIds(new Set(allowedIds));
+			setCurrentDeviceId(deviceInfo?.deviceId ?? null);
+			setLicensed(licensedPairs(myDevices));
+			setLoadFailed(false);
+		} catch (error) {
+			if (!isRefresh) setLoadFailed(true);
+			showError(apiErrorMessage(error, LOAD_ERROR));
+		}
 	}, []);
+
+	useEffect(() => {
+		const firstLoad = async () => {
+			await load(false);
+			setIsLoading(false);
+		};
+		firstLoad();
+	}, [load]);
+
+	const handleRefresh = useCallback(async () => {
+		setIsRefreshing(true);
+		await load(true);
+		setIsRefreshing(false);
+	}, [load]);
 
 	const handleToggle = useCallback(
 		async (device: UserDeviceWithLicenses, friend: FriendProfile, grant: boolean) => {
@@ -124,16 +161,41 @@ export function MyDevicesScreen() {
 		[]
 	);
 
+	const refreshControl = (
+		<RefreshControl
+			refreshing={isRefreshing}
+			onRefresh={handleRefresh}
+			tintColor={theme.colors.primary}
+			colors={[theme.colors.primary]}
+		/>
+	);
+
+	const header = (
+		<View style={styles.header}>
+			<Text style={styles.title}>Mes appareils</Text>
+			<Text style={styles.subtitle}>
+				Choisissez quels amis peuvent contrôler la musique de chaque appareil
+			</Text>
+		</View>
+	);
+
 	if (isLoading) {
-		return <LoadingSpinner fullScreen message="Chargement..." />;
+		return (
+			<View style={styles.container}>
+				<ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+					{header}
+					<SkeletonList count={2} row={DeviceCardSkeleton} />
+				</ScrollView>
+			</View>
+		);
 	}
 
 	if (loadFailed) {
 		return (
 			<View style={styles.container}>
-				<View style={styles.centered}>
+				<ScrollView contentContainerStyle={styles.centered} refreshControl={refreshControl}>
 					<Text style={styles.errorText}>{LOAD_ERROR}</Text>
-				</View>
+				</ScrollView>
 			</View>
 		);
 	}
@@ -212,13 +274,9 @@ export function MyDevicesScreen() {
 			<ScrollView
 				style={styles.scrollView}
 				contentContainerStyle={[styles.content, { paddingBottom: playerHeight + theme.spacing.xl }]}
+				refreshControl={refreshControl}
 			>
-				<View style={styles.header}>
-					<Text style={styles.title}>Mes appareils</Text>
-					<Text style={styles.subtitle}>
-						Choisissez quels amis peuvent contrôler la musique de chaque appareil
-					</Text>
-				</View>
+				{header}
 
 				{devices.length === 0 ? (
 					<EmptyState
@@ -335,8 +393,14 @@ const createStyles = (theme: Theme) =>
 			flex: 0,
 			padding: theme.spacing.md,
 		},
+		skeletonIcon: {
+			marginRight: theme.spacing.md,
+		},
+		skeletonLine: {
+			marginTop: 6,
+		},
 		centered: {
-			flex: 1,
+			flexGrow: 1,
 			justifyContent: 'center',
 			alignItems: 'center',
 			padding: theme.spacing.xl,

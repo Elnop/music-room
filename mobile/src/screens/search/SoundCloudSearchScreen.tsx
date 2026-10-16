@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { View, TextInput, FlatList, StyleSheet } from 'react-native';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { View, TextInput, FlatList, StyleSheet, RefreshControl } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
 import type { Theme } from '@/themes/types';
@@ -8,7 +8,7 @@ import { useQueueStore } from '@store/queueStore';
 import { toTrackInput } from '@utils/trackInput';
 import { SoundCloudTrackItem } from '@screens/search/components/SoundCloudTrackItem';
 import { TrackActionsSheet } from '@components/track/TrackActionsSheet';
-import { LoadingSpinner } from '@components/common/LoadingSpinner';
+import { SkeletonList, TrackRowSkeleton } from '@components/common/Skeleton';
 import { EmptyState } from '@components/common/EmptyState';
 import { showError } from '@utils/toast';
 import debounce from 'lodash/debounce';
@@ -53,6 +53,20 @@ export function SoundCloudSearchScreen() {
 		}
 	};
 
+	// Pull to refresh reruns the current query; with no query there is nothing to fetch.
+	const [isRefreshing, setIsRefreshing] = useState(false);
+	const handleRefresh = useCallback(async () => {
+		if (!searchQuery.trim()) return;
+		debouncedSearch.cancel();
+		setIsRefreshing(true);
+		clearError();
+		try {
+			await search(searchQuery, undefined, { keepResultsOnError: true });
+		} finally {
+			setIsRefreshing(false);
+		}
+	}, [searchQuery, debouncedSearch, search, clearError]);
+
 	// On the phone, or on the remote device in remote mode (#297).
 	const handlePlay = (track: SoundCloudTrack) => {
 		void playListTrack(track);
@@ -72,11 +86,19 @@ export function SoundCloudSearchScreen() {
 				/>
 			</View>
 
-			{isSearching && searchResults.length === 0 ? (
-				<LoadingSpinner size="large" />
+			{isSearching && !isRefreshing && searchResults.length === 0 ? (
+				<SkeletonList count={8} row={TrackRowSkeleton} />
 			) : (
 				<FlatList
 					data={searchResults}
+					refreshControl={
+						<RefreshControl
+							refreshing={isRefreshing}
+							onRefresh={handleRefresh}
+							tintColor={theme.colors.primary}
+							colors={[theme.colors.primary]}
+						/>
+					}
 					keyExtractor={item => item.id.toString()}
 					renderItem={({ item }) => (
 						<SoundCloudTrackItem

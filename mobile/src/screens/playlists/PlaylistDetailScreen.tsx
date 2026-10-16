@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { View, StyleSheet, Pressable } from 'react-native';
+import { View, StyleSheet, Pressable, RefreshControl } from 'react-native';
 import { showError, showSuccess } from '@utils/toast';
 import { apiErrorMessage } from '@utils/apiErrorMessage';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -29,7 +29,7 @@ import { TrackActionsSheet } from '@components/track/TrackActionsSheet';
 import type { AddQueueItemBody } from '@/types/queue.types';
 import { ReorderableList } from '@components/common/ReorderableList';
 import { EmptyState } from '@components/common/EmptyState';
-import { LoadingSpinner } from '@components/common/LoadingSpinner';
+import { SkeletonBlock, SkeletonList, TrackRowSkeleton } from '@components/common/Skeleton';
 import { Button } from '@components/common/Button';
 
 type PlaylistStackParamList = {
@@ -97,15 +97,34 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 		null
 	);
 
-	const loadPlaylist = React.useCallback(() => {
+	// Resolves to whether the playlist loaded; never rejects.
+	const loadPlaylist = React.useCallback((): Promise<boolean> => {
 		setLoadFailure(null);
-		fetchPlaylistById(id).catch((error: unknown) => {
-			const notFound = error instanceof ApiError && (error.status === 403 || error.status === 404);
-			setLoadFailure({ id, notFound });
-		});
+		return fetchPlaylistById(id).then(
+			() => true,
+			(error: unknown) => {
+				const notFound =
+					error instanceof ApiError && (error.status === 403 || error.status === 404);
+				setLoadFailure({ id, notFound });
+				return false;
+			}
+		);
 	}, [id, fetchPlaylistById]);
 
-	useFocusEffect(loadPlaylist);
+	useFocusEffect(
+		React.useCallback(() => {
+			loadPlaylist();
+		}, [loadPlaylist])
+	);
+
+	// Pull to refresh: the tracks stay on screen while the playlist reloads.
+	const [isRefreshing, setIsRefreshing] = React.useState(false);
+	const handleRefresh = React.useCallback(async () => {
+		setIsRefreshing(true);
+		const loaded = await loadPlaylist();
+		setIsRefreshing(false);
+		if (!loaded) showError('Impossible de charger la playlist');
+	}, [loadPlaylist]);
 
 	const handleShare = useCallback(() => {
 		navigation.navigate('PlaylistSharing', { playlistId: id });
@@ -181,8 +200,25 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 				theme.colors.background,
 			] as const);
 
+	const skeleton = (
+		<View style={styles.container}>
+			<SkeletonList
+				count={8}
+				row={TrackRowSkeleton}
+				style={styles.list}
+				header={
+					<View style={styles.headerSkeleton}>
+						<SkeletonBlock width={200} height={200} radius={8} />
+						<SkeletonBlock width="60%" height={24} style={styles.headerSkeletonTitle} />
+						<SkeletonBlock width="40%" height={14} style={styles.headerSkeletonLine} />
+					</View>
+				}
+			/>
+		</View>
+	);
+
 	if (isLoading && !currentPlaylist) {
-		return <LoadingSpinner fullScreen message="Chargement..." />;
+		return skeleton;
 	}
 
 	if (!currentPlaylist) {
@@ -204,7 +240,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 				</View>
 			);
 		}
-		return <LoadingSpinner fullScreen message="Chargement..." />;
+		return skeleton;
 	}
 
 	return (
@@ -254,6 +290,14 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 						action={canEdit ? { label: 'Ajouter des titres', onPress: handleAddTrack } : undefined}
 					/>
 				}
+				refreshControl={
+					<RefreshControl
+						refreshing={isRefreshing}
+						onRefresh={handleRefresh}
+						tintColor={theme.colors.primary}
+						colors={[theme.colors.primary]}
+					/>
+				}
 				showsVerticalScrollIndicator={false}
 			/>
 
@@ -277,6 +321,17 @@ const createStyles = (theme: Theme, topInset: number) =>
 		},
 		failureMessage: {
 			flex: 0,
+		},
+		headerSkeleton: {
+			alignItems: 'center',
+			paddingHorizontal: theme.spacing.md,
+			marginBottom: theme.spacing.lg,
+		},
+		headerSkeletonTitle: {
+			marginTop: theme.spacing.lg,
+		},
+		headerSkeletonLine: {
+			marginTop: theme.spacing.sm,
 		},
 		gradientBackground: {
 			position: 'absolute',
