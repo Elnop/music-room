@@ -1,0 +1,92 @@
+import React from 'react';
+import { Share } from 'react-native';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { UserProfileScreen } from '@/screens/friends/UserProfileScreen';
+
+const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
+
+jest.mock('@/contexts/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@themes/original.theme');
+	return { useTheme: () => ({ theme: originalTheme }) };
+});
+
+jest.mock('@/contexts/PlayerContext', () => ({
+	usePlayerHeight: () => 0,
+}));
+
+jest.mock('@/store/authStore', () => ({
+	useAuthStore: () => ({ accessToken: 'token' }),
+}));
+
+jest.mock('@utils/toast', () => ({
+	showSuccess: jest.fn(),
+	showError: jest.fn(),
+	showInfo: jest.fn(),
+}));
+
+jest.mock('@/hooks/useMusicControl', () => ({
+	controlErrorMessage: jest.fn(),
+	useFriendListening: () => ({
+		devices: [],
+		canControl: false,
+		remotePlay: jest.fn(),
+		remotePause: jest.fn(),
+		isLoading: false,
+		controlError: null,
+	}),
+}));
+
+const profile = {
+	id: ID,
+	username: 'alice',
+	displayName: 'Alice',
+	createdAt: '2026-01-01T00:00:00Z',
+	isOwnProfile: false,
+	isFriend: false,
+};
+
+jest.mock('@/services/profileApi', () => ({
+	profileApi: { getUserProfile: jest.fn(() => Promise.resolve(profile)) },
+}));
+
+jest.mock('@/services/privacyApi', () => ({
+	privacyApi: { getFilteredProfile: jest.fn(() => Promise.resolve(profile)) },
+}));
+
+jest.mock('@/services/friendsApi', () => ({
+	friendsApi: {
+		getFollowStatus: jest.fn(() =>
+			Promise.resolve({
+				isFollowing: false,
+				isFollowedBy: false,
+				isFriend: false,
+				followersCount: 0,
+				followingCount: 0,
+			})
+		),
+	},
+}));
+
+jest.mock('@/api/playlistApi', () => ({
+	playlistApi: { fetchUserPublicPlaylists: jest.fn(() => Promise.resolve([])) },
+}));
+
+type Props = React.ComponentProps<typeof UserProfileScreen>;
+
+describe('UserProfileScreen', () => {
+	it('shares the zumik:// link of the profile', async () => {
+		const share = jest.spyOn(Share, 'share').mockResolvedValue({ action: Share.sharedAction });
+		render(
+			<UserProfileScreen
+				route={{ key: 'k', name: 'UserProfile', params: { userId: ID } } as Props['route']}
+				navigation={{ navigate: jest.fn() } as unknown as Props['navigation']}
+			/>
+		);
+
+		fireEvent.press(await screen.findByRole('button', { name: 'Partager' }));
+
+		await waitFor(() =>
+			expect(share).toHaveBeenCalledWith({ message: `Alice\nzumik://user/${ID}`, title: 'Alice' })
+		);
+	});
+});
