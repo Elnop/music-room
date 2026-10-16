@@ -12,6 +12,14 @@ const envSchema = z.object({
 	NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 	ALLOWED_ORIGINS: z.string().default('http://localhost:8081'),
 	TUNNEL_URL: z.string().optional(), // Optional ngrok tunnel URL for cross-network development
+	// Set by make dev-tunnel: with NODE_ENV=development, /supabase/auth/v1/*
+	// is forwarded to SUPABASE_URL (see shared/dev/supabase-auth-proxy.ts)
+	TUNNEL_MODE: z
+		.string()
+		.default('false')
+		.transform(value => value === 'true'),
+	// Set by make on the tunnel backend: the proxy is mounted only for 'local'
+	SUPABASE_MODE: z.enum(['local', 'hosted']).optional(),
 
 	// Redis Configuration
 	REDIS_HOST: z.string().default('redis'),

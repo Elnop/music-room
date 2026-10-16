@@ -29,6 +29,8 @@
 # Main Commands
 #------------------------------------------------------------
 
+# The APK bakes mobile/.env's hosted Supabase project and never runs supabase-up: keep its backend on hosted too (#251).
+dev-tunnel-build-apk: SUPABASE_MODE := hosted
 dev-tunnel-build-apk: dev-tunnel-build-apk-check-prereqs ## Build APK with ngrok tunnel (dev mode)
 	$(call print_header,Building APK with Tunnel URL)
 	$(call print_subsection,📱 Target: APK for installation on any device)
@@ -242,6 +244,8 @@ build-apk-docker:
 	@echo ""
 	@./scripts/build-apk-docker.sh
 
+# The APK bakes mobile/.env's hosted Supabase project and never runs supabase-up: keep its backend on hosted too (#251).
+build-apk-docker-with-tunnel: SUPABASE_MODE := hosted
 build-apk-docker-with-tunnel:
 	@# Build APK with Docker using detected tunnel URL
 	@echo ""

@@ -91,7 +91,7 @@ emulator: ## List the Android emulator commands
 tunnel: ## List the tunnel mode commands
 	$(HELP_SECTION) "🌐 TUNNEL MODE (phone and PC on different networks)"
 	$(HELP_CMD) tunnel-setup "One-time EAS setup [requires: install]"
-	$(HELP_CMD) dev-tunnel "Start all services through the tunnel [~50-200ms latency, SUPABASE_MODE=hosted]"
+	$(HELP_CMD) dev-tunnel "Start all services through the tunnel [~50-200ms latency, both Supabase modes]"
 	$(HELP_CMD) qr-tunnel "Show the tunnel URLs and Metro host"
 	$(HELP_CMD) tunnel-info "Show detailed tunnel information"
 	@echo ""
@@ -129,8 +129,8 @@ supabase: ## List the Supabase commands
 	$(HELP_CMD) generate-types "Generate TypeScript types from the schema (dev stack or hosted)"
 	$(HELP_CMD) supabase-login "Log in to the Supabase CLI [one-time, hosted mode only]"
 	$(HELP_CMD) supabase-status "Check the CLI installation and auth status"
-	$(HELP_NOTE) "SUPABASE_MODE=local (default): dev-docker, dev-local and generate-types use the local stack"
-	$(HELP_NOTE) "SUPABASE_MODE=hosted: they use the project in backend/.env (needed by dev-tunnel for now)"
+	$(HELP_NOTE) "SUPABASE_MODE=local (default): dev-docker, dev-local, dev-tunnel and generate-types use the local stack"
+	$(HELP_NOTE) "SUPABASE_MODE=hosted: they use the project in backend/.env"
 	@echo ""
 
 redis: ## List the Redis commands

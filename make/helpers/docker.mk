@@ -172,12 +172,16 @@ define start_backend
 	fi
 endef
 
-# Start backend with tunnel mode
+# Start backend with tunnel mode. In SUPABASE_MODE=local it gets the same
+# dev-stack env as start_backend; TUNNEL_MODE=true then makes it forward
+# /supabase/auth/v1/* to the stack (#251), so the phone reaches the stack's auth
+# API through the one ngrok endpoint of the free plan. A running tunnel backend
+# started in the other Supabase mode is recreated.
 # Usage: $(call start_backend_tunnel)
 define start_backend_tunnel
 	@$(call ensure_network)
 	@$(call ensure_volumes)
-	@if [ "$(call container_running,$(BACKEND_CONTAINER))" = "true" ] && [ "$(call container_mode,$(BACKEND_CONTAINER))" = "tunnel" ]; then \
+	@if [ "$(call container_running,$(BACKEND_CONTAINER))" = "true" ] && [ "$(call container_mode,$(BACKEND_CONTAINER))" = "tunnel" ] && [ "$(call container_supabase_mode,$(BACKEND_CONTAINER))" = "$(SUPABASE_MODE)" ]; then \
 		echo "$(YELLOW)$(ICON_INFO) Backend already running$(NC)"; \
 	else \
 		$(call build_backend_image); \
@@ -187,6 +191,7 @@ define start_backend_tunnel
 		docker run -d \
 			--name $(BACKEND_CONTAINER) \
 			--label zumik.mode=tunnel \
+			--label zumik.supabase=$(SUPABASE_MODE) \
 			--network $(DOCKER_NETWORK) \
 			-p $(BACKEND_PORT):$(BACKEND_PORT) \
 			-p $(NGROK_PORT):$(NGROK_PORT) \
@@ -194,9 +199,14 @@ define start_backend_tunnel
 			-v /app/node_modules \
 			-v $(TUNNEL_VOLUME):/tmp/shared \
 			--env-file $(shell pwd)/$(BACKEND_ENV) \
+			$(if $(filter local,$(SUPABASE_MODE)),--env-file $(shell pwd)/$(SUPABASE_LOCAL_ENV) \
+				-e SUPABASE_URL=http://host.docker.internal:$(SUPABASE_LOCAL_PORT) \
+				-e SMTP_HOST=host.docker.internal \
+				--add-host=host.docker.internal:host-gateway) \
 			-e NODE_ENV=development \
 			-e PORT=$(BACKEND_PORT) \
 			-e TUNNEL_MODE=true \
+			-e SUPABASE_MODE=$(SUPABASE_MODE) \
 			-e REDIS_HOST=$(REDIS_CONTAINER) \
 			--restart unless-stopped \
 			music-room-backend:latest sh scripts/start-with-tunnel.sh || { \
@@ -258,7 +268,10 @@ endef
 # URL read from the shared volume. No LAN host name or devtools address: they
 # would override the tunnel URL Expo puts in the manifest. Always recreated:
 # a running container keeps the backend URL it read at start, which changes
-# whenever the backend tunnel restarts.
+# whenever the backend tunnel restarts. In SUPABASE_MODE=local the script
+# points the app at <backend tunnel>/supabase with the stack's anon key, read at
+# run time (supabase-up writes SUPABASE_LOCAL_ENV earlier in the same recipe);
+# never the service key.
 # Usage: $(call start_mobile_tunnel)
 define start_mobile_tunnel
 	@$(call ensure_network)
@@ -271,6 +284,7 @@ define start_mobile_tunnel
 		docker run -d \
 			--name $(MOBILE_CONTAINER) \
 			--label zumik.mode=tunnel \
+			--label zumik.supabase=$(SUPABASE_MODE) \
 			--network $(DOCKER_NETWORK) \
 			-p $(METRO_PORT):$(METRO_PORT) \
 			-v $(shell pwd)/$(MOBILE_DIR):/app \
@@ -278,6 +292,8 @@ define start_mobile_tunnel
 			-v /app/.expo \
 			-v $(TUNNEL_VOLUME):/tmp/shared \
 			--env-file $(shell pwd)/$(MOBILE_ENV) \
+			-e SUPABASE_MODE=$(SUPABASE_MODE) \
+			$(if $(filter local,$(SUPABASE_MODE)),-e SUPABASE_ANON_KEY="$$(sed -n 's/^SUPABASE_ANON_KEY=//p' $(SUPABASE_LOCAL_ENV) | tail -1)") \
 			--restart unless-stopped \
 			-it \
 			music-room-mobile:latest sh scripts/start-expo-tunnel.sh || { \
@@ -304,9 +320,11 @@ define docker_up_build
 	@$(call start_mobile)
 endef
 
-# Start with tunnel configuration
+# Start with tunnel configuration. In SUPABASE_MODE=local the dev Supabase
+# stack comes first: both tunnel containers read the env file it writes.
 # Usage: $(call docker_up_tunnel)
 define docker_up_tunnel
+	$(if $(filter local,$(SUPABASE_MODE)),@$(MAKE) --no-print-directory supabase-up)
 	@$(call start_redis)
 	@$(call start_backend_tunnel)
 	@$(call start_mobile_tunnel)
