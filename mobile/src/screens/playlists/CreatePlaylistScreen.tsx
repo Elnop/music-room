@@ -21,6 +21,7 @@ import { Input } from '@components/common/Input';
 import { playlistFormSchema, type PlaylistFormInput } from '@utils/validators';
 import type { EditMode } from '@/types/playlist.types';
 import { showError } from '@utils/toast';
+import { apiErrorMessage } from '@utils/apiErrorMessage';
 
 // Playlist field limits
 const PLAYLIST_LIMITS = {
@@ -84,7 +85,7 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
 			navigation.goBack();
 		} catch (error) {
 			console.error('[CreatePlaylistScreen] Create playlist failed:', error);
-			showError('Impossible de créer la playlist');
+			showError(apiErrorMessage(error, 'Impossible de créer la playlist'));
 		}
 	};
 

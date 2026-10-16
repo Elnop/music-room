@@ -1,4 +1,3 @@
-import { ApiError } from '@/services/api';
 import { queueApi } from '@/services/queueApi';
 import { deviceService } from '@/services/deviceService';
 import { useAuthStore } from '@store/authStore';
@@ -10,6 +9,7 @@ import { estimatePositionMs } from '@utils/remotePosition';
 import { toTrackInput } from '@utils/trackInput';
 import { hashStringToNumber } from '@utils/trackToSoundCloud';
 import { showError } from '@utils/toast';
+import { apiErrorMessage } from '@utils/apiErrorMessage';
 import type { DevicePickerOwner } from '@/types/device.types';
 import type { AddQueueItemBody, QueueTrack, TransferRequest } from '@/types/queue.types';
 
@@ -61,18 +61,6 @@ function remotePlayback(
 		positionMs: Math.max(0, Math.round(estimatePositionMs(remoteStatus, Date.now(), null))),
 		source: { userId: ownerId, deviceId },
 	};
-}
-
-/** French message for a refused or failed transfer. */
-function transferErrorMessage(error: unknown): string {
-	if (error instanceof ApiError) {
-		if (error.code === 'DEVICE_OFFLINE') return "Cet appareil n'est plus en ligne";
-		if (error.status === 403 || error.code === 'QUEUE_ACCESS_DENIED') {
-			return 'Vous ne pouvez pas contrôler cet appareil';
-		}
-		if (error.status === 404) return "Ce titre n'est plus dans la file d'attente";
-	}
-	return 'Impossible de transférer la lecture';
 }
 
 /**
@@ -138,7 +126,7 @@ export async function transferTo(owner: DevicePickerOwner, deviceId: string): Pr
 		return true;
 	} catch (error) {
 		console.error('[transferPlayback] Transfer failed:', error);
-		showError(transferErrorMessage(error));
+		showError(apiErrorMessage(error, 'Impossible de transférer la lecture'));
 		return false;
 	}
 }

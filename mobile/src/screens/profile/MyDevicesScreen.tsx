@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, Switch } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, type NavigationProp } from '@react-navigation/native';
+import type { AppTabsParamList } from '@/navigation/AppNavigator';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
@@ -12,6 +14,8 @@ import { deviceService } from '@/services/deviceService';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
 import { Avatar } from '@components/common/Avatar';
 import { showError, showSuccess } from '@utils/toast';
+import { apiErrorMessage } from '@utils/apiErrorMessage';
+import { EmptyState } from '@components/common/EmptyState';
 
 const LOAD_ERROR = 'Impossible de charger vos appareils';
 
@@ -24,10 +28,6 @@ function setPair(set: Set<string>, key: string, on: boolean): Set<string> {
 	if (on) next.add(key);
 	else next.delete(key);
 	return next;
-}
-
-function errorMessage(error: unknown, fallback: string): string {
-	return error instanceof Error && error.message ? error.message : fallback;
 }
 
 function friendName(friend: FriendProfile): string {
@@ -52,6 +52,7 @@ function licensedPairs(devices: UserDeviceWithLicenses[]): Set<string> {
 
 export function MyDevicesScreen() {
 	const { theme } = useTheme();
+	const navigation = useNavigation<NavigationProp<AppTabsParamList>>();
 	const playerHeight = usePlayerHeight();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
@@ -86,7 +87,7 @@ export function MyDevicesScreen() {
 				setLoadFailed(false);
 			} catch (error) {
 				setLoadFailed(true);
-				showError(errorMessage(error, LOAD_ERROR));
+				showError(apiErrorMessage(error, LOAD_ERROR));
 			} finally {
 				setIsLoading(false);
 			}
@@ -111,7 +112,7 @@ export function MyDevicesScreen() {
 			} catch (error) {
 				setLicensed(current => setPair(current, key, !grant));
 				showError(
-					errorMessage(
+					apiErrorMessage(
 						error,
 						grant ? "Impossible d'accorder l'accès" : "Impossible de retirer l'accès"
 					)
@@ -191,9 +192,14 @@ export function MyDevicesScreen() {
 				</View>
 				<View style={styles.divider} />
 				{friends.length === 0 ? (
-					<Text style={styles.emptyText}>
-						Aucun ami pour l&apos;instant. Ajoutez des amis pour leur confier cet appareil.
-					</Text>
+					<EmptyState
+						style={styles.emptyState}
+						message="Aucun ami pour l'instant. Ajoutez des amis pour leur confier cet appareil."
+						action={{
+							label: 'Trouver des amis',
+							onPress: () => navigation.navigate('FriendsTab'),
+						}}
+					/>
 				) : (
 					friends.map(friend => renderFriendRow(device, friend))
 				)}
@@ -215,9 +221,11 @@ export function MyDevicesScreen() {
 				</View>
 
 				{devices.length === 0 ? (
-					<Text style={styles.emptyText}>
-						Aucun appareil. Ouvrez Zumik sur un appareil pour le voir ici.
-					</Text>
+					<EmptyState
+						icon="phone-portrait-outline"
+						style={styles.emptyState}
+						message="Aucun appareil. Ouvrez Zumik sur un appareil pour le voir ici."
+					/>
 				) : (
 					devices.map(renderDevice)
 				)}
@@ -323,11 +331,9 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.textSecondary,
 			marginTop: 2,
 		},
-		emptyText: {
-			fontSize: 14,
-			color: theme.colors.textSecondary,
-			textAlign: 'center',
-			paddingVertical: theme.spacing.md,
+		emptyState: {
+			flex: 0,
+			padding: theme.spacing.md,
 		},
 		centered: {
 			flex: 1,

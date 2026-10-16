@@ -12,6 +12,7 @@ import { friendsApi, type FollowStatus } from '@/services/friendsApi';
 import { playlistApi } from '@/api/playlistApi';
 import { controlErrorMessage, useFriendListening } from '@/hooks/useMusicControl';
 import { showError } from '@utils/toast';
+import { EmptyState } from '@/components/common/EmptyState';
 import { Avatar } from '@/components/common/Avatar';
 import { Button } from '@/components/common/Button';
 import { ShareLinkButton } from '@/components/common/ShareLinkButton';
@@ -278,7 +279,11 @@ export function UserProfileScreen({ route, navigation }: Props) {
 				<View style={styles.playlistsSection}>
 					<Text style={styles.sectionTitle}>Playlists</Text>
 					{playlists.length === 0 ? (
-						<Text style={styles.emptyPlaylists}>No playlist</Text>
+						<EmptyState
+							icon="musical-notes-outline"
+							style={styles.emptyPlaylists}
+							message="Aucune playlist à afficher"
+						/>
 					) : (
 						playlists.map(playlist => (
 							<PlaylistCard
@@ -483,11 +488,8 @@ const createStyles = (theme: Theme) =>
 			paddingHorizontal: theme.spacing.md,
 		},
 		emptyPlaylists: {
-			fontSize: 14,
-			color: theme.colors.textSecondary,
-			textAlign: 'center',
-			paddingVertical: theme.spacing.lg,
-			paddingHorizontal: theme.spacing.md,
+			flex: 0,
+			padding: theme.spacing.lg,
 		},
 		infoSection: {
 			paddingHorizontal: theme.spacing.lg,

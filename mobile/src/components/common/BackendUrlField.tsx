@@ -46,7 +46,7 @@ export function BackendUrlField() {
 		setError(undefined);
 		setDraft(result.url);
 		setCurrentUrl(result.url);
-		showSuccess(`Backend address set to ${result.url}`);
+		showSuccess(`Adresse du serveur : ${result.url}`);
 	};
 
 	const handleReset = async () => {
@@ -56,7 +56,7 @@ export function BackendUrlField() {
 		setError(undefined);
 		setDraft(url);
 		setCurrentUrl(url);
-		showSuccess('Backend address reset to default');
+		showSuccess('Adresse du serveur par défaut rétablie');
 	};
 
 	return (

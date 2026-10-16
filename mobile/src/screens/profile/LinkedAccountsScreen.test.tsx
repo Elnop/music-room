@@ -131,7 +131,9 @@ describe('LinkedAccountsScreen', () => {
 		render(<LinkedAccountsScreen />);
 
 		await screen.findByText('Unable to load linked accounts', {}, FIRST_RENDER);
-		expect(showError).toHaveBeenCalledWith('Server exploded');
+		expect(showError).toHaveBeenCalledWith(
+			'Le serveur a rencontré un problème. Réessayez plus tard.'
+		);
 		expect(screen.queryByTestId('linked-account-password')).toBeNull();
 	});
 
@@ -150,7 +152,7 @@ describe('LinkedAccountsScreen', () => {
 			body: { idToken: 'google-id-token' },
 		});
 		expect(requests()[1].url).toMatch(/\/api\/auth\/providers\/google\/link$/);
-		expect(showSuccess).toHaveBeenCalledWith('Google linked');
+		expect(showSuccess).toHaveBeenCalledWith('Compte Google lié');
 		expect(fetchMock).toHaveBeenCalledTimes(2);
 	});
 
@@ -186,12 +188,12 @@ describe('LinkedAccountsScreen', () => {
 	});
 
 	it.each([
-		[409, 'PROVIDER_ALREADY_LINKED', 'This Google account is already linked to another user'],
-		[400, 'INVALID_PROVIDER_TOKEN', 'Invalid Google token'],
-	])('keeps the list and shows the backend message on %i %s', async (status, code, message) => {
+		[409, 'PROVIDER_ALREADY_LINKED', 'Ce compte est déjà lié à un autre utilisateur'],
+		[400, 'INVALID_PROVIDER_TOKEN', 'La connexion au service a échoué, réessayez'],
+	])('keeps the list and shows a French message on %i %s', async (status, code, message) => {
 		fetchMock
 			.mockResolvedValueOnce(ok({ providers: [password] }))
-			.mockResolvedValueOnce(fail(status, code, message));
+			.mockResolvedValueOnce(fail(status, code, 'English backend message'));
 		mockedGoogle.mockResolvedValue('google-id-token');
 
 		await renderLoaded();
@@ -215,14 +217,16 @@ describe('LinkedAccountsScreen', () => {
 		expect(requests()[1]).toMatchObject({ method: 'DELETE' });
 		expect(requests()[1].url).toMatch(/\/api\/auth\/providers\/google$/);
 		expect(requests()[2]).toMatchObject({ method: 'GET' });
-		expect(showSuccess).toHaveBeenCalledWith('Google unlinked');
+		expect(showSuccess).toHaveBeenCalledWith('Compte Google délié');
 	});
 
-	it('keeps the list and shows the backend message when unlinking the last method', async () => {
-		const message = 'Cannot unlink the last authentication method';
+	it('keeps the list and shows a French message when unlinking the last method', async () => {
+		const message = 'Impossible de retirer votre dernière méthode de connexion';
 		fetchMock
 			.mockResolvedValueOnce(ok({ providers: [google] }))
-			.mockResolvedValueOnce(fail(400, 'LAST_PROVIDER', message));
+			.mockResolvedValueOnce(
+				fail(400, 'LAST_PROVIDER', 'Cannot unlink the last authentication method')
+			);
 
 		await renderLoaded();
 		fireEvent.press(screen.getByLabelText('Unlink Google'));

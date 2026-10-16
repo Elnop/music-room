@@ -11,7 +11,7 @@ import type { Theme } from '@themes/types';
 import type { UpdateProfileData } from '@/types/user.types';
 import { useAuthStore } from '@/store/authStore';
 import { profileApi } from '@/services/profileApi';
-import { ApiError } from '@/services/api';
+import { apiErrorMessage } from '@utils/apiErrorMessage';
 import { Button } from '@components/common/Button';
 import { Input } from '@components/common/Input';
 import { FormError } from '@components/common/FormError';
@@ -86,7 +86,7 @@ export function EditProfileScreen() {
 
 			navigation.goBack();
 		} catch (err) {
-			const errorMessage = err instanceof ApiError ? err.message : 'Unable to update profile';
+			const errorMessage = apiErrorMessage(err, 'Impossible de mettre à jour le profil');
 			setError(errorMessage);
 			showError(errorMessage);
 		} finally {

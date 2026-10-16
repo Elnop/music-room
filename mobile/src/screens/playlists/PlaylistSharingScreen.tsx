@@ -8,6 +8,8 @@ import {
 	Switch,
 	ScrollView,
 } from 'react-native';
+import { apiErrorMessage } from '@utils/apiErrorMessage';
+import { EmptyState } from '@components/common/EmptyState';
 import { showError, showWarning, showSuccess } from '@utils/toast';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useFocusEffect } from '@react-navigation/native';
@@ -108,7 +110,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 			await fetchPlaylistById(playlistId);
 		} catch (error) {
 			console.error('[PlaylistSharing] Failed to fetch playlist:', error);
-			showError('Impossible de charger la playlist');
+			showError(apiErrorMessage(error, 'Impossible de charger la playlist'));
 			setIsLoading(false);
 			loadingRef.current = false;
 			return;
@@ -241,7 +243,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 			}
 		} catch (err) {
 			setMembers(prev => prev.filter(m => m.id !== user.id));
-			showError(err instanceof Error ? err.message : "Impossible d'ajouter l'utilisateur");
+			showError(apiErrorMessage(err, "Impossible d'ajouter l'utilisateur"));
 		} finally {
 			setProcessingUserId(null);
 		}
@@ -276,7 +278,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 		} catch (error) {
 			console.error('[PlaylistSharing] Remove failed:', error);
 			setMembers(originalMembers);
-			showError("Impossible de retirer l'utilisateur");
+			showError(apiErrorMessage(error, "Impossible de retirer l'utilisateur"));
 		} finally {
 			setProcessingUserId(null);
 		}
@@ -301,7 +303,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 			await fetchPlaylistById(playlistId);
 		} catch (error) {
 			console.error('[PlaylistSharing] Failed to update visibility:', error);
-			showError('Impossible de changer la visibilité');
+			showError(apiErrorMessage(error, 'Impossible de changer la visibilité'));
 		} finally {
 			setIsUpdatingSettings(false);
 		}
@@ -329,7 +331,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 			await fetchPlaylistById(playlistId);
 		} catch (error) {
 			console.error('[PlaylistSharing] Failed to update edit mode:', error);
-			showError('Impossible de changer le mode édition');
+			showError(apiErrorMessage(error, 'Impossible de changer le mode édition'));
 		} finally {
 			setIsUpdatingSettings(false);
 		}
@@ -360,7 +362,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 		} catch (error) {
 			console.error('[PlaylistSharing] Toggle failed:', error);
 			setMembers(originalMembers);
-			showError('Impossible de changer les permissions');
+			showError(apiErrorMessage(error, 'Impossible de changer les permissions'));
 		} finally {
 			setProcessingUserId(null);
 		}
@@ -518,9 +520,9 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 
 	const getEmptyMessage = () => {
 		if (isPrivate) {
-			return 'No one has access to this playlist';
+			return "Personne n'a encore accès à cette playlist";
 		}
-		return 'No editor added';
+		return 'Aucun éditeur ajouté';
 	};
 
 	if (isLoading) {
@@ -572,7 +574,11 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 									scrollEnabled={false}
 								/>
 							) : (
-								<Text style={styles.noResults}>No user found</Text>
+								<EmptyState
+									icon="search-outline"
+									style={styles.noResults}
+									message="Aucun utilisateur trouvé"
+								/>
 							)}
 						</View>
 					)}
@@ -591,7 +597,13 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 									extraData={processingUserId}
 								/>
 							) : (
-								!isInfoOnly && <Text style={styles.noMembers}>{getEmptyMessage()}</Text>
+								!isInfoOnly && (
+									<EmptyState
+										icon="people-outline"
+										style={styles.noMembers}
+										message={getEmptyMessage()}
+									/>
+								)
 							)}
 						</View>
 					)}
@@ -728,10 +740,8 @@ const createStyles = (theme: Theme) =>
 			maxHeight: 200,
 		},
 		noResults: {
-			color: theme.colors.textSecondary,
-			fontSize: theme.typography.sizes.sm,
-			textAlign: 'center',
-			paddingVertical: theme.spacing.md,
+			flex: 0,
+			padding: theme.spacing.md,
 		},
 		userItem: {
 			flexDirection: 'row',
@@ -822,9 +832,7 @@ const createStyles = (theme: Theme) =>
 			flex: 1,
 		},
 		noMembers: {
-			color: theme.colors.textSecondary,
-			fontSize: theme.typography.sizes.sm,
-			textAlign: 'center',
-			paddingVertical: theme.spacing.xl,
+			flex: 0,
+			padding: theme.spacing.lg,
 		},
 	});

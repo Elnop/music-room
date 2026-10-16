@@ -6,9 +6,9 @@ import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import type { LinkedProvider, OAuthProvider } from '@/types/auth.types';
 import { useAuthStore } from '@/store/authStore';
-import { ApiError } from '@services/api';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
 import { showError, showSuccess } from '@utils/toast';
+import { apiErrorMessage } from '@utils/apiErrorMessage';
 
 type MethodType = LinkedProvider['type'];
 
@@ -33,10 +33,6 @@ function isCancelled(error: unknown): boolean {
 	return error instanceof Error && error.message === 'SIGN_IN_CANCELLED';
 }
 
-function errorMessage(error: unknown, fallback: string): string {
-	return error instanceof ApiError ? error.message : fallback;
-}
-
 export function LinkedAccountsScreen() {
 	const { theme } = useTheme();
 	const playerHeight = usePlayerHeight();
@@ -58,7 +54,7 @@ export function LinkedAccountsScreen() {
 				setLoadFailed(false);
 			} catch (error) {
 				setLoadFailed(true);
-				showError(errorMessage(error, 'Unable to load linked accounts'));
+				showError(apiErrorMessage(error, 'Impossible de charger les comptes liés'));
 			} finally {
 				setIsLoading(false);
 			}
@@ -72,10 +68,12 @@ export function LinkedAccountsScreen() {
 			setPending(provider);
 			try {
 				await linkProvider(provider);
-				showSuccess(`${PROVIDER_LABELS[provider]} linked`);
+				showSuccess(`Compte ${PROVIDER_LABELS[provider]} lié`);
 			} catch (error) {
 				if (!isCancelled(error)) {
-					showError(errorMessage(error, `Unable to link ${PROVIDER_LABELS[provider]}`));
+					showError(
+						apiErrorMessage(error, `Impossible de lier le compte ${PROVIDER_LABELS[provider]}`)
+					);
 				}
 			} finally {
 				setPending(null);
@@ -89,9 +87,11 @@ export function LinkedAccountsScreen() {
 			setPending(provider);
 			try {
 				await unlinkProvider(provider);
-				showSuccess(`${PROVIDER_LABELS[provider]} unlinked`);
+				showSuccess(`Compte ${PROVIDER_LABELS[provider]} délié`);
 			} catch (error) {
-				showError(errorMessage(error, `Unable to unlink ${PROVIDER_LABELS[provider]}`));
+				showError(
+					apiErrorMessage(error, `Impossible de délier le compte ${PROVIDER_LABELS[provider]}`)
+				);
 			} finally {
 				setPending(null);
 			}

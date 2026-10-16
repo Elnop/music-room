@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Switch } from 'react-native';
 import { showError } from '@utils/toast';
+import { apiErrorMessage } from '@utils/apiErrorMessage';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import debounce from 'lodash/debounce';
@@ -13,6 +14,7 @@ import { profileApi } from '@/services/profileApi';
 import { friendsApi, FriendProfile } from '@/services/friendsApi';
 import { musicControlApi } from '@/services/musicControlApi';
 import { SearchBar } from '@/components/common/SearchBar';
+import { EmptyState } from '@/components/common/EmptyState';
 import { Avatar } from '@/components/common/Avatar';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import type { UserProfile } from '@/types/user.types';
@@ -37,7 +39,8 @@ export function FriendsScreen() {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
 	const [isSearching, setIsSearching] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+	// The last search for the current query failed: the list must not say "no result".
+	const [searchFailed, setSearchFailed] = useState(false);
 
 	// Music control permissions: Set of friend IDs that can control my music
 	const [controlPermissions, setControlPermissions] = useState<Set<string>>(new Set());
@@ -92,7 +95,7 @@ export function FriendsScreen() {
 			}
 		} catch (err) {
 			console.error('[FriendsScreen] Failed to toggle control:', err);
-			showError('Impossible de modifier les permissions');
+			showError(apiErrorMessage(err, 'Impossible de modifier les permissions'));
 		} finally {
 			setTogglingUserId(null);
 		}
@@ -119,15 +122,16 @@ export function FriendsScreen() {
 			}
 
 			setIsSearching(true);
-			setError(null);
+			setSearchFailed(false);
 
 			try {
 				const results = await profileApi.searchUsers(accessToken, query);
 				setSearchResults(results);
 			} catch (error) {
 				console.error('[FriendsScreen] User search failed:', error);
-				setError('Search error');
+				showError(apiErrorMessage(error, 'La recherche a échoué'));
 				setSearchResults([]);
+				setSearchFailed(true);
 			} finally {
 				setIsSearching(false);
 			}
@@ -146,12 +150,12 @@ export function FriendsScreen() {
 
 	const handleSearchChange = (text: string) => {
 		setSearchQuery(text);
+		setSearchFailed(false);
 		if (text.trim()) {
 			debouncedSearch(text);
 		} else {
 			debouncedSearch.cancel();
 			setSearchResults([]);
-			setError(null);
 		}
 	};
 
@@ -233,7 +237,7 @@ export function FriendsScreen() {
 							onPress={() => setActiveTab('friends')}
 						>
 							<Text style={[styles.tabText, activeTab === 'friends' && styles.tabTextActive]}>
-								My friends ({friends.length})
+								Mes amis ({friends.length})
 							</Text>
 						</TouchableOpacity>
 						<TouchableOpacity
@@ -241,7 +245,7 @@ export function FriendsScreen() {
 							onPress={() => setActiveTab('search')}
 						>
 							<Text style={[styles.tabText, activeTab === 'search' && styles.tabTextActive]}>
-								Search
+								Rechercher
 							</Text>
 						</TouchableOpacity>
 					</View>
@@ -251,17 +255,11 @@ export function FriendsScreen() {
 					<SearchBar
 						value={searchQuery}
 						onChangeText={handleSearchChange}
-						placeholder="Search for a user..."
+						placeholder="Rechercher un utilisateur..."
 						style={styles.searchBar}
 					/>
 				)}
 			</View>
-
-			{error && (
-				<View style={styles.errorContainer}>
-					<Text style={styles.errorText}>{error}</Text>
-				</View>
-			)}
 
 			{activeTab === 'friends' &&
 				(isLoading && friends.length === 0 ? (
@@ -276,18 +274,15 @@ export function FriendsScreen() {
 							{ paddingBottom: playerHeight + theme.spacing.xl },
 						]}
 						ListEmptyComponent={
-							<View style={styles.emptyState}>
-								<Ionicons
-									name="people-outline"
-									size={64}
-									color={theme.colors.textSecondary}
-									style={styles.emptyIcon}
-								/>
-								<Text style={styles.emptyTitle}>No friends yet</Text>
-								<Text style={styles.emptySubtext}>
-									Follow users who follow you back to become friends!
-								</Text>
-							</View>
+							<EmptyState
+								style={styles.emptyState}
+								icon="people-outline"
+								message="Aucun ami pour l'instant. Suivez des utilisateurs qui vous suivent en retour pour devenir amis."
+								action={{
+									label: 'Rechercher des utilisateurs',
+									onPress: () => setActiveTab('search'),
+								}}
+							/>
 						}
 					/>
 				))}
@@ -305,19 +300,23 @@ export function FriendsScreen() {
 							{ paddingBottom: playerHeight + theme.spacing.xl },
 						]}
 						ListEmptyComponent={
-							searchQuery ? (
-								<Text style={styles.emptyText}>No user found</Text>
+							searchFailed && searchQuery.trim() ? (
+								<EmptyState
+									style={styles.emptyState}
+									icon="cloud-offline-outline"
+									message="La recherche a échoué"
+									action={{ label: 'Réessayer', onPress: () => performSearch(searchQuery) }}
+								/>
 							) : (
-								<View style={styles.emptyState}>
-									<Ionicons
-										name="search-outline"
-										size={64}
-										color={theme.colors.textSecondary}
-										style={styles.emptyIcon}
-									/>
-									<Text style={styles.emptyTitle}>Search for a profile</Text>
-									<Text style={styles.emptySubtext}>Start typing to find users!</Text>
-								</View>
+								<EmptyState
+									style={styles.emptyState}
+									icon="search-outline"
+									message={
+										searchQuery
+											? 'Aucun utilisateur trouvé'
+											: 'Commencez à taper pour trouver des utilisateurs'
+									}
+								/>
 							)
 						}
 					/>
@@ -431,42 +430,7 @@ const createStyles = (theme: Theme) =>
 			justifyContent: 'center',
 			alignItems: 'center',
 		},
-		errorContainer: {
-			backgroundColor: theme.colors.error + '20',
-			padding: theme.spacing.md,
-			marginHorizontal: theme.spacing.lg,
-			borderRadius: theme.spacing.sm,
-			marginBottom: theme.spacing.sm,
-		},
-		errorText: {
-			color: theme.colors.error,
-			fontSize: 14,
-		},
 		emptyState: {
-			alignItems: 'center',
-			justifyContent: 'center',
-			paddingTop: theme.spacing.xxl * 2,
-			paddingHorizontal: theme.spacing.xl,
-		},
-		emptyIcon: {
-			marginBottom: theme.spacing.lg,
-			opacity: 0.6,
-		},
-		emptyTitle: {
-			fontSize: theme.typography.sizes.xl,
-			fontWeight: theme.typography.weights.semibold,
-			color: theme.colors.text,
-			marginBottom: theme.spacing.sm,
-		},
-		emptyText: {
-			textAlign: 'center',
-			color: theme.colors.textSecondary,
-			fontSize: 16,
-			marginTop: theme.spacing.xl,
-		},
-		emptySubtext: {
-			textAlign: 'center',
-			color: theme.colors.textSecondary,
-			fontSize: 14,
+			paddingTop: theme.spacing.xxl,
 		},
 	});

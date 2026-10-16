@@ -3,8 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import Toast from 'react-native-toast-message';
 import { useTheme } from '@/contexts/ThemeContext';
+import { AppToast } from '@/components/common/AppToast';
 import type { Theme } from '@/themes/types';
 import { useActiveQueue, useQueueStore } from '@/store/queueStore';
 import { afterItemIdForDrop } from '@/store/moveTarget';
@@ -130,7 +130,7 @@ export function QueueModal({ visible, onClose }: QueueModalProps) {
 				<TrackActionsSheet track={actionTrack} onClose={() => setActionTrack(null)} />
 
 				{/* The app root's toast sits behind native modals: queue errors show here. */}
-				<Toast />
+				<AppToast />
 			</GestureHandlerRootView>
 		</Modal>
 	);

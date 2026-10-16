@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import Toast from 'react-native-toast-message';
 import { useTheme } from '@/contexts/ThemeContext';
+import { AppToast } from '@/components/common/AppToast';
 import type { Theme } from '@/themes/types';
 import { musicControlApi } from '@/services/musicControlApi';
 import { deviceService } from '@/services/deviceService';
@@ -234,7 +234,7 @@ export function DevicePickerSheet({ visible, onClose }: DevicePickerSheetProps) 
 				{renderContent()}
 
 				{/* The app root's toast sits behind native modals: transfer errors show here. */}
-				<Toast />
+				<AppToast />
 			</View>
 		</Modal>
 	);
