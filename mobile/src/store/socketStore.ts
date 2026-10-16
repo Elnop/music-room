@@ -48,15 +48,28 @@ async function buildHandshake(): Promise<Record<string, string>> {
 }
 
 /**
+ * Connection lifecycle, read by the connection banner (#315):
+ * - idle: no socket (signed out, or stopped on purpose after a handshake refusal);
+ * - connecting: first connection attempt of a new socket;
+ * - connected: the socket is up;
+ * - reconnecting: the Manager is retrying after a lost connection;
+ * - failed: the Manager gave up after all its attempts; retry() starts over.
+ */
+export type SocketStatus = 'idle' | 'connecting' | 'connected' | 'reconnecting' | 'failed';
+
+/**
  * Socket State Interface
  */
 interface SocketState {
 	socket: Socket | null;
 	isConnected: boolean;
+	status: SocketStatus;
 
 	// Actions
 	connect: () => void;
 	disconnect: () => void;
+	/** Starts a new connection after the Manager gave up (or at any time). */
+	retry: () => void;
 }
 
 /**
@@ -71,6 +84,7 @@ interface SocketState {
 export const useSocketStore = create<SocketState>((set, get) => ({
 	socket: null,
 	isConnected: false,
+	status: 'idle',
 
 	/**
 	 * Connect to the Socket.io server
@@ -150,12 +164,22 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 			if (__DEV__) console.log('[Socket] ✅ Connected successfully:', socket.id);
 			hasRefreshed = false;
 			deviceRetries = 0;
-			set({ isConnected: true });
+			if (get().socket === socket) set({ isConnected: true, status: 'connected' });
 		});
 
 		socket.on('disconnect', reason => {
 			if (__DEV__) console.log('[Socket] ❌ Disconnected:', reason);
-			set({ isConnected: false });
+			if (get().socket !== socket) return;
+			if (reason === 'io client disconnect') {
+				// Our own disconnect()/connect() set the status themselves.
+				set({ isConnected: false });
+				return;
+			}
+			// The Manager retries every other loss except a server kick.
+			set({
+				isConnected: false,
+				status: reason === 'io server disconnect' ? 'failed' : 'reconnecting',
+			});
 		});
 
 		socket.on('connect_error', error => {
@@ -171,23 +195,29 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 			});
 		});
 
-		socket.on('reconnect', attemptNumber => {
+		// reconnect* are Manager events (socket.io-client 4): they fire on
+		// socket.io, never on the socket itself.
+		const manager = socket.io;
+
+		manager.on('reconnect', attemptNumber => {
 			if (__DEV__) console.log('[Socket] 🔄 Reconnected after', attemptNumber, 'attempts');
 		});
 
-		socket.on('reconnect_attempt', attemptNumber => {
+		manager.on('reconnect_attempt', attemptNumber => {
 			if (__DEV__) console.log('[Socket] 🔄 Reconnect attempt', attemptNumber);
+			if (get().socket === socket) set({ status: 'reconnecting' });
 		});
 
-		socket.on('reconnect_error', error => {
+		manager.on('reconnect_error', error => {
 			console.error('[Socket] ❌ Reconnect error:', error.message);
 		});
 
-		socket.on('reconnect_failed', () => {
+		manager.on('reconnect_failed', () => {
 			console.error('[Socket] ❌ Reconnect failed after all attempts');
+			if (get().socket === socket) set({ isConnected: false, status: 'failed' });
 		});
 
-		set({ socket });
+		set({ socket, status: 'connecting' });
 	},
 
 	/**
@@ -199,8 +229,20 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 		if (socket) {
 			if (__DEV__) console.log('[Socket] Disconnecting...');
 			socket.disconnect();
-			set({ socket: null, isConnected: false });
 		}
+		set({ socket: null, isConnected: false, status: 'idle' });
+	},
+
+	/**
+	 * Reconnects after the Manager gave up: connect() replaces a socket that
+	 * is not connected. The status reads 'reconnecting' meanwhile.
+	 */
+	retry: () => {
+		if (__DEV__) console.log('[Socket] Retrying the connection');
+		get().connect();
+		// A retry follows a lost connection: keep the banner on « Reconnexion… »
+		// until the new socket connects (a first connect() stays 'connecting').
+		if (get().status === 'connecting') set({ status: 'reconnecting' });
 	},
 }));
 
