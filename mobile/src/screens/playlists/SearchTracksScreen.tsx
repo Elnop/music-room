@@ -23,7 +23,7 @@ import { TrackActionsButton } from '@components/track/TrackActionsButton';
 import { TrackActionsSheet } from '@components/track/TrackActionsSheet';
 import { toTrackInput } from '@utils/trackInput';
 import { EmptyState } from '@components/common/EmptyState';
-import { LoadingSpinner } from '@components/common/LoadingSpinner';
+import { SkeletonList, TrackRowSkeleton } from '@components/common/Skeleton';
 import debounce from 'lodash/debounce';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import type { Track } from '@/types/track.types';
@@ -198,7 +198,7 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 			</View>
 
 			{isSearching && searchResults.length === 0 ? (
-				<LoadingSpinner size="large" />
+				<SkeletonList count={8} row={TrackRowSkeleton} />
 			) : (
 				<FlatList
 					data={searchResults}

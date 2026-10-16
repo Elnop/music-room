@@ -1,5 +1,13 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Switch } from 'react-native';
+import {
+	View,
+	Text,
+	FlatList,
+	StyleSheet,
+	TouchableOpacity,
+	Switch,
+	RefreshControl,
+} from 'react-native';
 import { showError } from '@utils/toast';
 import { apiErrorMessage } from '@utils/apiErrorMessage';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -17,6 +25,7 @@ import { SearchBar } from '@/components/common/SearchBar';
 import { EmptyState } from '@/components/common/EmptyState';
 import { Avatar } from '@/components/common/Avatar';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { SkeletonList, UserRowSkeleton } from '@/components/common/Skeleton';
 import type { UserProfile } from '@/types/user.types';
 import type { FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
 
@@ -114,15 +123,16 @@ export function FriendsScreen() {
 		}, [loadFriends, loadPermissions, friends.length])
 	);
 
+	// `isRefresh`: a failed pull-refresh keeps the shown results, toast only.
 	const performSearch = useCallback(
-		async (query: string) => {
+		async (query: string, isRefresh = false) => {
 			if (!query.trim() || !accessToken) {
 				setSearchResults([]);
 				return;
 			}
 
 			setIsSearching(true);
-			setSearchFailed(false);
+			if (!isRefresh) setSearchFailed(false);
 
 			try {
 				const results = await profileApi.searchUsers(accessToken, query);
@@ -130,14 +140,40 @@ export function FriendsScreen() {
 			} catch (error) {
 				console.error('[FriendsScreen] User search failed:', error);
 				showError(apiErrorMessage(error, 'La recherche a échoué'));
-				setSearchResults([]);
-				setSearchFailed(true);
+				if (!isRefresh) {
+					setSearchResults([]);
+					setSearchFailed(true);
+				}
 			} finally {
 				setIsSearching(false);
 			}
 		},
 		[accessToken]
 	);
+
+	// Pull to refresh, one flag per list: the shown list stays while it reloads.
+	const [isRefreshingFriends, setIsRefreshingFriends] = useState(false);
+	const [isRefreshingSearch, setIsRefreshingSearch] = useState(false);
+
+	const handleRefreshFriends = useCallback(async () => {
+		setIsRefreshingFriends(true);
+		try {
+			await Promise.all([loadFriends(true), loadPermissions()]);
+		} finally {
+			setIsRefreshingFriends(false);
+		}
+	}, [loadFriends, loadPermissions]);
+
+	// Reruns the current query; with no query there is nothing to fetch.
+	const handleRefreshSearch = useCallback(async () => {
+		if (!searchQuery.trim()) return;
+		setIsRefreshingSearch(true);
+		try {
+			await performSearch(searchQuery, true);
+		} finally {
+			setIsRefreshingSearch(false);
+		}
+	}, [performSearch, searchQuery]);
 
 	const debouncedSearch = React.useMemo(
 		() => debounce((query: string) => performSearch(query), 500),
@@ -263,10 +299,18 @@ export function FriendsScreen() {
 
 			{activeTab === 'friends' &&
 				(isLoading && friends.length === 0 ? (
-					<LoadingSpinner size="large" />
+					<SkeletonList count={6} row={UserRowSkeleton} />
 				) : (
 					<FlatList
 						data={friends}
+						refreshControl={
+							<RefreshControl
+								refreshing={isRefreshingFriends}
+								onRefresh={handleRefreshFriends}
+								tintColor={theme.colors.primary}
+								colors={[theme.colors.primary]}
+							/>
+						}
 						keyExtractor={item => item.id}
 						renderItem={renderFriendItem}
 						contentContainerStyle={[
@@ -288,11 +332,19 @@ export function FriendsScreen() {
 				))}
 
 			{(activeTab === 'search' || !hasFriends) &&
-				(isSearching && searchResults.length === 0 ? (
-					<LoadingSpinner size="large" />
+				(isSearching && !isRefreshingSearch && searchResults.length === 0 ? (
+					<SkeletonList count={6} row={UserRowSkeleton} />
 				) : (
 					<FlatList
 						data={searchResults}
+						refreshControl={
+							<RefreshControl
+								refreshing={isRefreshingSearch}
+								onRefresh={handleRefreshSearch}
+								tintColor={theme.colors.primary}
+								colors={[theme.colors.primary]}
+							/>
+						}
 						keyExtractor={item => item.id}
 						renderItem={renderSearchResultItem}
 						contentContainerStyle={[

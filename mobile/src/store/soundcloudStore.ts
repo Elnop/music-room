@@ -9,7 +9,12 @@ interface SoundCloudState {
 	totalResults: number;
 
 	// Actions
-	search: (query: string, limit?: number) => Promise<void>;
+	/** `keepResultsOnError`: a failed search (e.g. a pull-refresh) keeps the shown results. */
+	search: (
+		query: string,
+		limit?: number,
+		options?: { keepResultsOnError?: boolean }
+	) => Promise<void>;
 	clearSearch: () => void;
 	clearError: () => void;
 }
@@ -20,7 +25,7 @@ export const useSoundCloudStore = create<SoundCloudState>(set => ({
 	error: null,
 	totalResults: 0,
 
-	search: async (query: string, limit = 20) => {
+	search: async (query: string, limit = 20, options = {}) => {
 		if (!query.trim()) {
 			set({ searchResults: [], totalResults: 0 });
 			return;
@@ -47,7 +52,7 @@ export const useSoundCloudStore = create<SoundCloudState>(set => ({
 			set({
 				error: error instanceof Error ? error.message : 'Search failed',
 				isSearching: false,
-				searchResults: [],
+				...(options.keepResultsOnError ? {} : { searchResults: [] }),
 			});
 		}
 	},

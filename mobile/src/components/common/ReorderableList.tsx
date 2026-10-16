@@ -22,6 +22,7 @@ type PassThroughProps<T> = Pick<
 	| 'ListEmptyComponent'
 	| 'contentContainerStyle'
 	| 'showsVerticalScrollIndicator'
+	| 'refreshControl'
 >;
 
 interface ReorderableListProps<T> extends PassThroughProps<T> {

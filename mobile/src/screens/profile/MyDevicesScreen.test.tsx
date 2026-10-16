@@ -1,4 +1,5 @@
 import React from 'react';
+import { ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { act, render, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import { useAuthStore } from '@store/authStore';
@@ -48,10 +49,6 @@ const mockNavigate = jest.fn();
 jest.mock('@react-navigation/native', () => ({
 	...jest.requireActual('@react-navigation/native'),
 	useNavigation: () => ({ navigate: mockNavigate }),
-}));
-
-jest.mock('@components/common/LoadingSpinner', () => ({
-	LoadingSpinner: () => null,
 }));
 
 const fetchMock = jest.fn();
@@ -128,6 +125,15 @@ async function renderLoaded(
 	getPermissions.mockResolvedValue(allDevicesIds);
 	render(<MyDevicesScreen />);
 	await screen.findByText('Mes appareils', {}, FIRST_RENDER);
+	await waitFor(() => expect(screen.queryByTestId('skeleton-list')).toBeNull(), FIRST_RENDER);
+}
+
+/** Pulls the list down, as the user would to refresh it. */
+async function pullToRefresh(): Promise<void> {
+	const { refreshControl } = screen.UNSAFE_getByType(ScrollView).props;
+	await act(async () => {
+		await refreshControl.props.onRefresh();
+	});
 }
 
 beforeEach(async () => {
@@ -309,5 +315,43 @@ describe('MyDevicesScreen', () => {
 
 		expect(screen.getByTestId('device-device-1')).not.toHaveTextContent(/Cet appareil/);
 		expect(toggle('alice sur Phone').props.value).toBe(true);
+	});
+
+	it('shows skeletons, not a spinner, while the first load runs', async () => {
+		fetchMock.mockReturnValueOnce(new Promise(() => undefined));
+		getFriends.mockResolvedValue([alice]);
+		getPermissions.mockResolvedValue([]);
+
+		render(<MyDevicesScreen />);
+
+		expect(await screen.findByLabelText('Chargement', {}, FIRST_RENDER)).toBeTruthy();
+		expect(screen.queryByTestId('device-device-1')).toBeNull();
+	});
+
+	it('reloads devices, friends and permissions in place when pulled down', async () => {
+		await renderLoaded([phone], [alice]);
+		fetchMock.mockResolvedValueOnce(ok({ devices: [phone, tablet] }));
+		getFriends.mockResolvedValue([alice, bob]);
+
+		await pullToRefresh();
+
+		expect(getFriends).toHaveBeenCalledTimes(2);
+		expect(getPermissions).toHaveBeenCalledTimes(2);
+		expect(screen.getByTestId('device-device-2')).toBeTruthy();
+		expect(toggle('Bob sur Tablet').props.value).toBe(false);
+		expect(screen.queryByTestId('skeleton-list')).toBeNull();
+		expect(screen.UNSAFE_getByType(ScrollView).props.refreshControl.props.refreshing).toBe(false);
+	});
+
+	it('keeps the list and shows a toast when a refresh fails', async () => {
+		await renderLoaded([phone], [alice]);
+		fetchMock.mockResolvedValueOnce(fail(500, 'INTERNAL_ERROR', 'Server exploded'));
+
+		await pullToRefresh();
+
+		expect(showError).toHaveBeenCalledTimes(1);
+		expect(screen.getByTestId('device-device-1')).toBeTruthy();
+		expect(screen.queryByText('Impossible de charger vos appareils')).toBeNull();
+		expect(screen.UNSAFE_getByType(ScrollView).props.refreshControl.props.refreshing).toBe(false);
 	});
 });
