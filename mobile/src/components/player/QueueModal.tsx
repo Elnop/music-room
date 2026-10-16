@@ -98,6 +98,8 @@ export function QueueModal({ visible, onClose }: QueueModalProps) {
 						onPress={onClose}
 						style={styles.closeButton}
 						activeOpacity={0.7}
+						hitSlop={4}
+						accessibilityRole="button"
 						accessibilityLabel="Fermer la file d'attente"
 					>
 						<Ionicons name="chevron-down" size={24} color={theme.colors.text} />

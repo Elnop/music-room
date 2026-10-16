@@ -50,6 +50,7 @@ export function QueueItemRow({
 			style={styles.deleteButton}
 			onPress={handleRemove}
 			activeOpacity={0.7}
+			accessibilityRole="button"
 			accessibilityLabel={`Retirer ${track.title}`}
 		>
 			<Ionicons name="trash-outline" size={24} color="#FFFFFF" />

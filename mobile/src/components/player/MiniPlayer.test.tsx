@@ -85,12 +85,21 @@ describe('MiniPlayer', () => {
 		const resume = jest.fn();
 		usePlayerStore.setState({ resume });
 		render(<MiniPlayer />);
-		expect(screen.getByLabelText('Play')).toBeDisabled();
-		expect(screen.getByLabelText('Next track')).toBeDisabled();
-		fireEvent.press(screen.getByLabelText('Play'));
-		fireEvent.press(screen.getByLabelText('Next track'));
+		expect(screen.getByLabelText('Lecture')).toBeDisabled();
+		expect(screen.getByLabelText('Piste suivante')).toBeDisabled();
+		fireEvent.press(screen.getByLabelText('Lecture'));
+		fireEvent.press(screen.getByLabelText('Piste suivante'));
 		expect(resume).not.toHaveBeenCalled();
 		expect(queueApi.next).not.toHaveBeenCalled();
+	});
+
+	it('opens the modal from the labelled info area', () => {
+		usePlayerStore.setState({ currentTrack: track, playbackState: 'paused' });
+		render(<MiniPlayer />);
+		const info = screen.getByLabelText('Ouvrir le lecteur, Tapped, x');
+		expect(info.props.accessibilityRole).toBe('button');
+		fireEvent.press(info);
+		expect(usePlayerStore.getState().isModalOpen).toBe(true);
 	});
 
 	it('shows the track, then the empty state again after stop', () => {

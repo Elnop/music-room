@@ -160,7 +160,12 @@ export function DevicePickerSheet({ visible, onClose }: DevicePickerSheetProps) 
 			return (
 				<View style={styles.centered}>
 					<Text style={styles.errorText}>Impossible de charger les appareils</Text>
-					<TouchableOpacity style={styles.retryButton} onPress={retry}>
+					<TouchableOpacity
+						style={styles.retryButton}
+						onPress={retry}
+						hitSlop={4}
+						accessibilityRole="button"
+					>
 						<Text style={styles.retryText}>Réessayer</Text>
 					</TouchableOpacity>
 				</View>
@@ -217,6 +222,8 @@ export function DevicePickerSheet({ visible, onClose }: DevicePickerSheetProps) 
 						onPress={onClose}
 						style={styles.closeButton}
 						activeOpacity={0.7}
+						hitSlop={4}
+						accessibilityRole="button"
 						accessibilityLabel="Fermer le choix d'appareil"
 					>
 						<Ionicons name="chevron-down" size={24} color={theme.colors.text} />
