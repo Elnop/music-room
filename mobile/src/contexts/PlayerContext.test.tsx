@@ -4,8 +4,13 @@ import { PlayerProvider, usePlayer } from '@/contexts/PlayerContext';
 import { readPositionMs, usePlayerStore } from '@/store/playerStore';
 import { useConnectStore } from '@/store/connectStore';
 import { useQueueStore } from '@/store/queueStore';
+import { useAuthStore } from '@/store/authStore';
+import { streamPrefetch } from '@/store/streamPrefetch';
 import { apiRequest } from '@/services/api';
+import { trackToSoundCloud } from '@utils/trackToSoundCloud';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
+import type { QueueItem } from '@/types/queue.types';
+import type { UserProfile } from '@/types/user.types';
 
 interface MockPlayer {
 	id: number;
@@ -25,6 +30,7 @@ interface MockStatus {
 	isLoaded: boolean;
 	currentTime: number;
 	didJustFinish: boolean;
+	duration?: number;
 	playing?: boolean;
 	isBuffering?: boolean;
 }
@@ -142,6 +148,7 @@ function SeekProbe() {
 
 const initialPlayerState = usePlayerStore.getState();
 const initialQueueState = useQueueStore.getState();
+const initialAuthState = useAuthStore.getState();
 
 /** Next stream responses, in order. */
 function answerStreams(...urls: { streamUrl: string; expiresAt: string }[]) {
@@ -198,6 +205,8 @@ beforeEach(() => {
 	seekRef = null;
 	usePlayerStore.setState(initialPlayerState, true);
 	useQueueStore.setState(initialQueueState, true);
+	useAuthStore.setState(initialAuthState, true);
+	streamPrefetch.clear();
 	useConnectStore.getState().setLocal();
 	jest.spyOn(console, 'log').mockImplementation(() => undefined);
 });
@@ -427,9 +436,11 @@ describe('PlayerProvider stream renewal (#313)', () => {
 	it('does not renew in remote mode', async () => {
 		await startPlaying(inMinutes(1));
 		act(() => usePlayerStore.getState().pause());
-		useConnectStore.setState({
-			target: { kind: 'remote', ownerId: 'o', deviceId: 'd', ownerUsername: null },
-		} as never);
+		act(() =>
+			useConnectStore.setState({
+				target: { kind: 'remote', ownerId: 'o', deviceId: 'd', ownerUsername: null },
+			} as never)
+		);
 
 		await act(async () => seekRef?.(90));
 
@@ -555,9 +566,11 @@ describe('PlayerProvider audio interruptions (#310)', () => {
 
 	it('does not mirror a stop in remote mode', async () => {
 		const { view, u1 } = await playingNatively();
-		useConnectStore.setState({
-			target: { kind: 'remote', ownerId: 'o', deviceId: 'd', ownerUsername: null },
-		} as never);
+		act(() =>
+			useConnectStore.setState({
+				target: { kind: 'remote', ownerId: 'o', deviceId: 'd', ownerUsername: null },
+			} as never)
+		);
 
 		await nativeSets(view, u1, false);
 
@@ -634,5 +647,196 @@ describe('PlayerProvider restored track (#312)', () => {
 		expect(state.error).toBe('This track is no longer available (rights are expensive)');
 		expect(state.currentTrack).toBeNull();
 		expect(state.playbackState).toBe('idle');
+	});
+});
+
+describe('PlayerProvider next track prefetch (#314)', () => {
+	const queueItem = (id: string, slug: string): QueueItem => ({
+		id,
+		rank: id,
+		track: {
+			trackUri: `https://soundcloud.com/artist/${slug}`,
+			title: slug,
+			artist: 'artist',
+			album: null,
+			albumArt: null,
+			durationMs: 200000,
+		},
+		sourcePlaylistId: null,
+		blockId: null,
+		blockDetached: false,
+	});
+	const A = queueItem('qa', 'a');
+	const B = queueItem('qb', 'b');
+	const C = queueItem('qc', 'c');
+	const D = queueItem('qd', 'd');
+
+	/** My queue, as the player reads it. */
+	function setQueue(currentItemId: string | null, items: QueueItem[]) {
+		act(() =>
+			useQueueStore.setState({ queues: { me: { currentItemId, items, version: 1 } } } as never)
+		);
+	}
+
+	/** Play `item` of the queue `items` on a stream named after it. */
+	async function playQueueItem(item: QueueItem, items: QueueItem[]) {
+		answerStreams({ streamUrl: `u-${item.id}`, expiresAt: inMinutes(30) });
+		setQueue(item.id, items);
+		const view = render(
+			<PlayerProvider>
+				<SeekProbe />
+			</PlayerProvider>
+		);
+		await act(async () => usePlayerStore.getState().playTrack(trackToSoundCloud(item), item.id));
+		await flush();
+		return { view, player: mockPlayerFor(`u-${item.id}`) };
+	}
+
+	/** The playing track reaches `currentTime` seconds of its 200. */
+	async function reach(view: ReturnType<typeof render>, player: MockPlayer, currentTime: number) {
+		setStatus(player, { currentTime, duration: 200, playing: true });
+		await rerender(view);
+		await flush();
+	}
+
+	/** Step to `item` as the queue does: new current item, then playTrack. */
+	async function stepTo(item: QueueItem, items: QueueItem[]) {
+		setQueue(item.id, items);
+		await act(async () => usePlayerStore.getState().playTrack(trackToSoundCloud(item), item.id));
+		await flush();
+	}
+
+	const streamCallFor = (item: QueueItem) =>
+		mockApiRequest.mock.calls.filter(([endpoint]) =>
+			String(endpoint).includes(encodeURIComponent(item.track.trackUri))
+		).length;
+
+	beforeEach(() => {
+		useAuthStore.setState({ user: { id: 'me' } as UserProfile });
+	});
+
+	it('fetches the next stream once in the last 20 s and plays it with no request', async () => {
+		const { view, player } = await playQueueItem(A, [A, B, C]);
+
+		await reach(view, player, 150);
+		expect(mockApiRequest).toHaveBeenCalledTimes(1);
+
+		answerStreams({ streamUrl: 'u-qb', expiresAt: inMinutes(30) });
+		await reach(view, player, 181);
+		await reach(view, player, 190);
+		expect(mockApiRequest).toHaveBeenCalledTimes(2);
+		expect(streamCallFor(B)).toBe(1);
+
+		await stepTo(B, [A, B, C]);
+
+		expect(mockApiRequest).toHaveBeenCalledTimes(2);
+		expect(usePlayerStore.getState().streamUrl).toBe('u-qb');
+		expect(mockPlayerFor('u-qb').play).toHaveBeenCalled();
+		expect(usePlayerStore.getState().playbackState).toBe('playing');
+		expect(streamPrefetch.peek()).toBeNull();
+	});
+
+	it('does not prefetch in remote mode', async () => {
+		const { view, player } = await playQueueItem(A, [A, B]);
+		act(() =>
+			useConnectStore.setState({
+				target: { kind: 'remote', ownerId: 'me', deviceId: 'd', ownerUsername: null },
+			} as never)
+		);
+
+		await reach(view, player, 190);
+
+		expect(mockApiRequest).toHaveBeenCalledTimes(1);
+	});
+
+	it('does not prefetch without a next item', async () => {
+		const { view, player } = await playQueueItem(B, [A, B]);
+
+		await reach(view, player, 190);
+
+		expect(mockApiRequest).toHaveBeenCalledTimes(1);
+	});
+
+	it('does not prefetch while paused', async () => {
+		const { view, player } = await playQueueItem(A, [A, B]);
+		act(() => usePlayerStore.getState().pause());
+
+		await reach(view, player, 190);
+
+		expect(mockApiRequest).toHaveBeenCalledTimes(1);
+	});
+
+	it('switches to the new next item after a reorder', async () => {
+		const { view, player } = await playQueueItem(A, [A, B, C]);
+		answerStreams({ streamUrl: 'u-qb', expiresAt: inMinutes(30) });
+		await reach(view, player, 185);
+		expect(streamPrefetch.peek()?.queueItemId).toBe('qb');
+
+		answerStreams({ streamUrl: 'u-qc', expiresAt: inMinutes(30) });
+		setQueue('qa', [A, C, B]);
+		await reach(view, player, 186);
+		expect(streamCallFor(C)).toBe(1);
+		expect(streamPrefetch.peek()?.queueItemId).toBe('qc');
+
+		await stepTo(C, [A, C, B]);
+
+		expect(mockApiRequest).toHaveBeenCalledTimes(3);
+		expect(usePlayerStore.getState().streamUrl).toBe('u-qc');
+	});
+
+	it('ignores a prefetch answered after the next item changed', async () => {
+		const { view, player } = await playQueueItem(A, [A, B, C]);
+		let answer: (data: { streamUrl: string; expiresAt: string }) => void = () => undefined;
+		mockApiRequest.mockReturnValueOnce(new Promise(resolve => (answer = resolve)));
+		await reach(view, player, 185);
+
+		mockApiRequest.mockReturnValueOnce(new Promise(() => undefined));
+		setQueue('qa', [A, C, B]);
+		await rerender(view);
+		await act(async () => answer({ streamUrl: 'u-qb', expiresAt: inMinutes(30) }));
+		await flush();
+
+		expect(streamPrefetch.peek()).toBeNull();
+	});
+
+	it('fetches another item played meanwhile normally', async () => {
+		const { view, player } = await playQueueItem(A, [A, B, C, D]);
+		answerStreams({ streamUrl: 'u-qb', expiresAt: inMinutes(30) });
+		await reach(view, player, 185);
+
+		answerStreams({ streamUrl: 'u-qd', expiresAt: inMinutes(30) });
+		await stepTo(D, [A, B, C, D]);
+
+		expect(streamCallFor(D)).toBe(1);
+		expect(usePlayerStore.getState().streamUrl).toBe('u-qd');
+		expect(streamPrefetch.peek()).toBeNull();
+	});
+
+	it('fetches again when the prefetched URL is about to expire', async () => {
+		const { view, player } = await playQueueItem(A, [A, B]);
+		answerStreams({ streamUrl: 'u-qb', expiresAt: inMinutes(1) });
+		await reach(view, player, 185);
+
+		answerStreams({ streamUrl: 'u-qb-fresh', expiresAt: inMinutes(30) });
+		await stepTo(B, [A, B]);
+
+		expect(streamCallFor(B)).toBe(2);
+		expect(usePlayerStore.getState().streamUrl).toBe('u-qb-fresh');
+	});
+
+	it('shows nothing when the prefetch fails, and fetches on load', async () => {
+		const { view, player } = await playQueueItem(A, [A, B]);
+		mockApiRequest.mockRejectedValueOnce(new Error('Network request failed'));
+		await reach(view, player, 185);
+
+		expect(usePlayerStore.getState().error).toBeNull();
+		expect(usePlayerStore.getState().playbackState).toBe('playing');
+
+		answerStreams({ streamUrl: 'u-qb', expiresAt: inMinutes(30) });
+		await stepTo(B, [A, B]);
+
+		expect(streamCallFor(B)).toBe(2);
+		expect(usePlayerStore.getState().streamUrl).toBe('u-qb');
+		expect(usePlayerStore.getState().error).toBeNull();
 	});
 });
