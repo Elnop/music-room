@@ -82,3 +82,35 @@ describe('useQueueSync queue:updated', () => {
 		expect(mockQueueState.applyState).toHaveBeenCalledWith(state);
 	});
 });
+
+describe('useQueueSync reconnect', () => {
+	afterEach(() => {
+		mockSocketState.isConnected = true;
+	});
+
+	it('loads on mount only, then reloads my queue on a reconnect', () => {
+		const { rerender } = renderHook(() => useQueueSync());
+		expect(mockQueueState.load).toHaveBeenCalledTimes(1);
+
+		mockSocketState.isConnected = false;
+		rerender({});
+		expect(mockQueueState.load).toHaveBeenCalledTimes(1);
+
+		mockSocketState.isConnected = true;
+		rerender({});
+		expect(mockQueueState.load).toHaveBeenCalledTimes(2);
+		expect(mockQueueState.load).toHaveBeenLastCalledWith();
+	});
+
+	it("also reloads the remote owner's queue on a reconnect", () => {
+		mockTarget = { kind: 'remote', ownerId: 'friend', deviceId: 'tablet' };
+		const { rerender } = renderHook(() => useQueueSync());
+
+		mockSocketState.isConnected = false;
+		rerender({});
+		mockSocketState.isConnected = true;
+		rerender({});
+
+		expect(mockQueueState.load).toHaveBeenCalledWith('friend');
+	});
+});
