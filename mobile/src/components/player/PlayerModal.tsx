@@ -18,6 +18,7 @@ import { usePlayer } from '@/contexts/PlayerContext';
 import { usePlayerStore } from '@/store/playerStore';
 import { RESTART_THRESHOLD_S } from '@/store/queueSelectors';
 import { useNowPlaying } from '@/hooks/useNowPlaying';
+import { hapticTap } from '@utils/haptics';
 import { useImageColors, getAdaptiveColors } from '@/hooks/useImageColors';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { QueueModal } from '@/components/player/QueueModal';
@@ -147,7 +148,9 @@ export function PlayerModal() {
 	};
 
 	const handlePlayPause = () => {
-		if (canToggle) toggle();
+		if (!canToggle) return;
+		hapticTap();
+		toggle();
 	};
 
 	// No remote seek: the backend has no such command (#297).
@@ -169,6 +172,17 @@ export function PlayerModal() {
 	// in the queue. Remote: always steps back, since the phone cannot seek the device.
 	const canGoPrevious =
 		canToggle && (hasPrevious || (!isRemote && currentTime > RESTART_THRESHOLD_S));
+	const canGoNext = track !== null && hasNext;
+	const handlePrevious = () => {
+		if (!canGoPrevious) return;
+		hapticTap();
+		previous();
+	};
+	const handleNext = () => {
+		if (!canGoNext) return;
+		hapticTap();
+		next();
+	};
 
 	const gradientColors: [string, string, string, string] = adaptive
 		? adaptive.gradient
@@ -183,7 +197,6 @@ export function PlayerModal() {
 	const playDisabled = isLoading || !track;
 
 	const displayArtwork = artworkUrl || 'https://via.placeholder.com/300';
-	const canGoNext = track !== null && hasNext;
 
 	return (
 		<Modal
@@ -337,7 +350,7 @@ export function PlayerModal() {
 							<View style={styles.controls}>
 								<TouchableOpacity
 									style={[styles.secondaryButton, { backgroundColor: colors.buttonBg }]}
-									onPress={previous}
+									onPress={handlePrevious}
 									disabled={!canGoPrevious}
 									activeOpacity={0.7}
 									accessibilityRole="button"
@@ -378,7 +391,7 @@ export function PlayerModal() {
 
 								<TouchableOpacity
 									style={[styles.secondaryButton, { backgroundColor: colors.buttonBg }]}
-									onPress={next}
+									onPress={handleNext}
 									disabled={!canGoNext}
 									activeOpacity={0.7}
 									accessibilityRole="button"

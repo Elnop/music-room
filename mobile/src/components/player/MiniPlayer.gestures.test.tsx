@@ -6,6 +6,13 @@ import { fireGestureHandler, getByGestureTestId } from 'react-native-gesture-han
 import { MiniPlayer } from '@/components/player/MiniPlayer';
 import { usePlayerStore } from '@/store/playerStore';
 import type { NowPlaying } from '@/hooks/useNowPlaying';
+import { hapticTap } from '@/utils/haptics';
+
+jest.mock('@/utils/haptics', () => ({
+	hapticTap: jest.fn(),
+	hapticSelection: jest.fn(),
+	hapticSuccess: jest.fn(),
+}));
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -71,6 +78,7 @@ const swipe = (translationX: number, translationY = 0, velocityX = 0) =>
 
 describe('MiniPlayer gestures (#311)', () => {
 	beforeEach(() => {
+		jest.clearAllMocks();
 		mockNowPlaying = nowPlaying();
 		usePlayerStore.setState({ isModalOpen: false });
 	});
@@ -80,6 +88,7 @@ describe('MiniPlayer gestures (#311)', () => {
 		swipe(-150);
 		expect(mockNowPlaying.next).toHaveBeenCalledTimes(1);
 		expect(mockNowPlaying.previous).not.toHaveBeenCalled();
+		expect(hapticTap).toHaveBeenCalledTimes(1);
 	});
 
 	it('swipes right to the previous track', () => {
@@ -87,6 +96,7 @@ describe('MiniPlayer gestures (#311)', () => {
 		swipe(150);
 		expect(mockNowPlaying.previous).toHaveBeenCalledTimes(1);
 		expect(mockNowPlaying.next).not.toHaveBeenCalled();
+		expect(hapticTap).toHaveBeenCalledTimes(1);
 	});
 
 	it('springs back under the threshold', () => {
@@ -95,6 +105,7 @@ describe('MiniPlayer gestures (#311)', () => {
 		swipe(40);
 		expect(mockNowPlaying.next).not.toHaveBeenCalled();
 		expect(mockNowPlaying.previous).not.toHaveBeenCalled();
+		expect(hapticTap).not.toHaveBeenCalled();
 	});
 
 	it('changes the track on a quick flick under the distance threshold', () => {
@@ -108,6 +119,7 @@ describe('MiniPlayer gestures (#311)', () => {
 		render(<MiniPlayer />);
 		swipe(-150);
 		expect(mockNowPlaying.next).not.toHaveBeenCalled();
+		expect(hapticTap).not.toHaveBeenCalled();
 	});
 
 	it('restarts the track with a right swipe past a few seconds, with no previous item', () => {
@@ -129,14 +141,31 @@ describe('MiniPlayer gestures (#311)', () => {
 		swipe(0, -80);
 		expect(usePlayerStore.getState().isModalOpen).toBe(true);
 		expect(mockNowPlaying.next).not.toHaveBeenCalled();
+		expect(hapticTap).not.toHaveBeenCalled();
 	});
 
 	it('keeps the tap and the play button working', () => {
 		render(<MiniPlayer />);
 		fireEvent.press(screen.getByLabelText('Pause'));
 		expect(mockNowPlaying.toggle).toHaveBeenCalledTimes(1);
+		expect(hapticTap).toHaveBeenCalledTimes(1);
 		fireEvent.press(screen.getByText('Song'));
 		expect(usePlayerStore.getState().isModalOpen).toBe(true);
+	});
+
+	it('taps once on the next button', () => {
+		render(<MiniPlayer />);
+		fireEvent.press(screen.getByLabelText('Piste suivante'));
+		expect(mockNowPlaying.next).toHaveBeenCalledTimes(1);
+		expect(hapticTap).toHaveBeenCalledTimes(1);
+	});
+
+	it('does not vibrate when the toggle is not allowed', () => {
+		mockNowPlaying = nowPlaying({ canToggle: false });
+		render(<MiniPlayer />);
+		fireEvent.press(screen.getByLabelText('Pause'));
+		expect(mockNowPlaying.toggle).not.toHaveBeenCalled();
+		expect(hapticTap).not.toHaveBeenCalled();
 	});
 
 	it('only activates on a real drag, so taps reach the buttons', () => {

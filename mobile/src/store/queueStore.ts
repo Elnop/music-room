@@ -7,6 +7,7 @@ import { useConnectStore, useActiveOwnerId } from '@/store/connectStore';
 import { trackToSoundCloud } from '@utils/trackToSoundCloud';
 import { toTrackInput } from '@utils/trackInput';
 import { showError, showInfo, showSuccess } from '@utils/toast';
+import { hapticSuccess } from '@utils/haptics';
 import type { AddQueueItemBody, QueueState, QueueStepResult } from '@/types/queue.types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import {
@@ -292,7 +293,10 @@ export const useQueueStore = create<QueueStoreState>((set, get) => {
 						? error.message
 						: "Impossible d'ajouter à la file de lecture"
 			);
-			if (added) showSuccess('Ajouté à la file de lecture');
+			if (added) {
+				showSuccess('Ajouté à la file de lecture');
+				hapticSuccess();
+			}
 			return added;
 		},
 
@@ -303,7 +307,10 @@ export const useQueueStore = create<QueueStoreState>((set, get) => {
 				error =>
 					error instanceof Error && error.message ? error.message : "Impossible d'ajouter ce titre"
 			);
-			if (added) showSuccess('Lira ensuite');
+			if (added) {
+				showSuccess('Lira ensuite');
+				hapticSuccess();
+			}
 			return added;
 		},
 

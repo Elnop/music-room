@@ -1,12 +1,14 @@
 import React from 'react';
 import type { FlatListProps } from 'react-native';
 import { Gesture } from 'react-native-gesture-handler';
+import { runOnJS } from 'react-native-reanimated';
 import LibReorderableList, {
 	reorderItems,
 	useIsActive,
 	useReorderableDrag,
 	type ReorderableListReorderEvent,
 } from 'react-native-reorderable-list';
+import { hapticSelection } from '@utils/haptics';
 
 export interface ReorderableRenderItemInfo<T> {
 	item: T;
@@ -81,6 +83,12 @@ export function ReorderableList<T>({
 		}
 	};
 
+	// The library calls these on the UI thread: they must be worklets. One tick at pick-up, one at drop.
+	const handleDragEdge = () => {
+		'worklet';
+		runOnJS(hapticSelection)();
+	};
+
 	return (
 		<LibReorderableList
 			{...listProps}
@@ -88,6 +96,8 @@ export function ReorderableList<T>({
 			keyExtractor={keyExtractor}
 			renderItem={({ item, index }) => <Cell item={item} index={index} renderItem={renderItem} />}
 			onReorder={handleReorder}
+			onDragStart={handleDragEdge}
+			onDragEnd={handleDragEdge}
 			dragEnabled={dragEnabled}
 			panGesture={panGesture}
 			shouldUpdateActiveItem

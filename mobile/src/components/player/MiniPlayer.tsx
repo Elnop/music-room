@@ -14,6 +14,7 @@ import type { Theme } from '@themes/types';
 import { usePlayerStore } from '@/store/playerStore';
 import { useNowPlaying, type NowPlayingTrack } from '@/hooks/useNowPlaying';
 import { RESTART_THRESHOLD_S } from '@/store/queueSelectors';
+import { hapticTap } from '@utils/haptics';
 
 /** Horizontal swipe distance that changes the track (#311). */
 export const SWIPE_TRACK_THRESHOLD = 80;
@@ -51,6 +52,23 @@ export function MiniPlayer() {
 	const canGoPrevious =
 		canToggle && (hasPrevious || (!isRemote && positionMs / 1000 > RESTART_THRESHOLD_S));
 
+	// One light tap per action that goes through, from a button or a swipe past its threshold.
+	const handleToggle = () => {
+		if (!canToggle) return;
+		hapticTap();
+		toggle();
+	};
+	const handleNext = () => {
+		if (!canGoNext) return;
+		hapticTap();
+		next();
+	};
+	const handlePrevious = () => {
+		if (!canGoPrevious) return;
+		hapticTap();
+		previous();
+	};
+
 	// Swipe left / right changes the track, swipe up opens the modal (#311). The
 	// offsets let a tap through to the buttons; the info follows the finger.
 	const translateX = useSharedValue(0);
@@ -71,9 +89,9 @@ export function MiniPlayer() {
 			const up =
 				event.translationY < -SWIPE_OPEN_THRESHOLD || event.velocityY < -SWIPE_FLICK_VELOCITY;
 			if (horizontal && toLeft && canGoNext) {
-				runOnJS(next)();
+				runOnJS(handleNext)();
 			} else if (horizontal && toRight && canGoPrevious) {
-				runOnJS(previous)();
+				runOnJS(handlePrevious)();
 			} else if (!horizontal && up) {
 				runOnJS(setModalOpen)(true);
 			}
@@ -120,9 +138,7 @@ export function MiniPlayer() {
 
 					<TouchableOpacity
 						style={styles.playButton}
-						onPress={() => {
-							if (canToggle) toggle();
-						}}
+						onPress={handleToggle}
 						hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
 						disabled={playDisabled}
 						accessibilityRole="button"
@@ -146,7 +162,7 @@ export function MiniPlayer() {
 
 					<TouchableOpacity
 						style={styles.nextButton}
-						onPress={next}
+						onPress={handleNext}
 						hitSlop={{ top: 10, bottom: 10, left: 6, right: 10 }}
 						disabled={nextDisabled}
 						accessibilityRole="button"

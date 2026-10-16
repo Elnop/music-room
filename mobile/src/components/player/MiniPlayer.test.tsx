@@ -7,6 +7,13 @@ import { useAuthStore } from '@/store/authStore';
 import type { UserProfile } from '@/types/user.types';
 import { queueApi } from '@/services/queueApi';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
+import { hapticTap } from '@/utils/haptics';
+
+jest.mock('@/utils/haptics', () => ({
+	hapticTap: jest.fn(),
+	hapticSelection: jest.fn(),
+	hapticSuccess: jest.fn(),
+}));
 
 jest.mock('@/lib/supabase', () => ({
 	supabase: { auth: { signOut: jest.fn(), setSession: jest.fn() } },
@@ -91,6 +98,7 @@ describe('MiniPlayer', () => {
 		fireEvent.press(screen.getByLabelText('Piste suivante'));
 		expect(resume).not.toHaveBeenCalled();
 		expect(queueApi.next).not.toHaveBeenCalled();
+		expect(hapticTap).not.toHaveBeenCalled();
 	});
 
 	it('opens the modal from the labelled info area', () => {

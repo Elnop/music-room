@@ -2,11 +2,17 @@ import React from 'react';
 import { Text } from 'react-native';
 import { act, render, screen } from '@testing-library/react-native';
 import { ReorderableList } from '@/components/common/ReorderableList';
+import { hapticSelection } from '@/utils/haptics';
+
+jest.mock('@/utils/haptics', () => ({ hapticSelection: jest.fn() }));
+jest.mock('react-native-reanimated', () => jest.requireActual('react-native-reanimated/mock'));
 
 type LibProps = {
 	data: string[];
 	renderItem: (info: { item: string; index: number }) => React.ReactElement;
 	onReorder: (event: { from: number; to: number }) => void;
+	onDragStart?: (event: { index: number }) => void;
+	onDragEnd?: (event: { from: number; to: number }) => void;
 };
 
 // The library needs native drag; render its rows plainly and keep its props to fire drops.
@@ -55,6 +61,17 @@ const renderList = (onReorder: (from: number, to: number) => Promise<unknown>) =
 	);
 
 describe('ReorderableList', () => {
+	beforeEach(() => jest.clearAllMocks());
+
+	it('ticks once at pick-up and once at drop, never while moving', () => {
+		renderList(() => Promise.resolve());
+		expect(hapticSelection).not.toHaveBeenCalled();
+		act(() => libProps.onDragStart?.({ index: 0 }));
+		expect(hapticSelection).toHaveBeenCalledTimes(1);
+		act(() => libProps.onDragEnd?.({ from: 0, to: 2 }));
+		expect(hapticSelection).toHaveBeenCalledTimes(2);
+	});
+
 	it('shows the dropped order while the move is in flight', () => {
 		renderList(() => new Promise(() => {}));
 		act(() => libProps.onReorder({ from: 0, to: 2 }));
