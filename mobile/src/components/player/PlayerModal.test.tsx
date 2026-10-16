@@ -11,6 +11,10 @@ import { useImageColors } from '@/hooks/useImageColors';
 import { fireGestureHandler, getByGestureTestId } from 'react-native-gesture-handler/jest-utils';
 import { State } from 'react-native-gesture-handler';
 import type { PanGesture } from 'react-native-gesture-handler';
+import type { SoundCloudTrack } from '@/types/soundcloud.types';
+
+const mockSeekTo = jest.fn();
+const mockProgress = { progress: 0, currentTime: 0, duration: 0 };
 
 jest.mock('@/lib/supabase', () => ({
 	supabase: { auth: { signOut: jest.fn(), setSession: jest.fn() } },
@@ -82,18 +86,17 @@ jest.mock('@/services/queueApi', () => ({
 }));
 
 jest.mock('@/contexts/PlayerContext', () => ({
-	usePlayer: () => ({ player: { playing: false }, error: null, seekTo: jest.fn() }),
+	usePlayer: () => ({ player: { playing: false }, error: null, seekTo: mockSeekTo }),
 }));
 
 jest.mock('@/hooks/usePlayerProgress', () => ({
-	usePlayerProgress: () => ({ progress: 0, currentTime: 0, duration: 0 }),
+	usePlayerProgress: () => mockProgress,
 }));
 
 jest.mock('@/hooks/useImageColors', () => ({
 	useImageColors: jest.fn(() => ({ dominantColor: null })),
 	hexToRgba: (color: string) => color,
-	getAdaptiveColors: (color: string) => color,
-	isLightColor: () => false,
+	getAdaptiveColors: () => null,
 }));
 
 jest.mock('expo-linear-gradient', () => ({
@@ -141,10 +144,21 @@ describe('PlayerModal without a track', () => {
 		render(<PlayerModal />);
 		expect(screen.getByText('Rien en lecture')).toBeTruthy();
 		expect(screen.getByText('Choisis un son pour commencer')).toBeTruthy();
-		expect(screen.getByTestId('seek-slider').props.disabled).toBe(true);
-		for (const label of ['Previous track', 'Play', 'Next track']) {
+		expect(screen.getByTestId('seek-slider', { includeHiddenElements: true }).props.disabled).toBe(
+			true
+		);
+		for (const label of ['Piste précédente', 'Lecture', 'Piste suivante']) {
 			expect(screen.getByLabelText(label)).toBeDisabled();
+			expect(screen.getByLabelText(label).props.accessibilityRole).toBe('button');
 		}
+	});
+
+	it('closes from the labelled close button', () => {
+		render(<PlayerModal />);
+		const close = screen.getByLabelText('Fermer le lecteur');
+		expect(close.props.accessibilityRole).toBe('button');
+		fireEvent.press(close);
+		expect(usePlayerStore.getState().isModalOpen).toBe(false);
 	});
 
 	it('keeps the queue button working', () => {
@@ -214,6 +228,122 @@ describe('PlayerModal swipe down', () => {
 	});
 });
 
+describe('PlayerModal slider for a screen reader', () => {
+	const track: SoundCloudTrack = {
+		id: 7,
+		title: 'Local song',
+		description: null,
+		duration: 200_000,
+		genre: null,
+		artwork_url: null,
+		permalink_url: 'https://soundcloud.com/artist/local',
+		user: { id: 1, username: 'x', avatar_url: null, permalink_url: '' },
+		playable: true,
+	};
+	// The accessible wrapper, not the mocked slider: the real RN View path.
+	const seekControl = () => screen.getByRole('adjustable', { name: 'Position de lecture' });
+	const action = (actionName: string) =>
+		fireEvent(seekControl(), 'accessibilityAction', {
+			nativeEvent: { actionName },
+		});
+
+	beforeEach(() => {
+		jest.clearAllMocks();
+		useConnectStore.setState({ target: { kind: 'local' }, remoteStatus: null });
+		usePlayerStore.setState({ currentTrack: track, playbackState: 'playing', isModalOpen: true });
+		Object.assign(mockProgress, { currentTime: 30, duration: 200 });
+	});
+
+	afterAll(() => {
+		Object.assign(mockProgress, { currentTime: 0, duration: 0 });
+	});
+
+	it('announces the position over the length', () => {
+		render(<PlayerModal />);
+		expect(seekControl().props.testID).not.toBe('seek-slider');
+		expect(
+			screen.getByTestId('seek-slider', { includeHiddenElements: true }).props
+				.importantForAccessibility
+		).toBe('no-hide-descendants');
+		expect(seekControl().props.accessibilityValue).toEqual({
+			text: '0:30 sur 3:20',
+		});
+	});
+
+	it('seeks 10 s forward on increment', () => {
+		render(<PlayerModal />);
+		action('increment');
+		expect(mockSeekTo).toHaveBeenCalledWith(40);
+	});
+
+	it('clamps a decrement at the start', () => {
+		mockProgress.currentTime = 5;
+		render(<PlayerModal />);
+		action('decrement');
+		expect(mockSeekTo).toHaveBeenCalledWith(0);
+	});
+
+	it('clamps an increment at the end', () => {
+		mockProgress.currentTime = 195;
+		render(<PlayerModal />);
+		action('increment');
+		expect(mockSeekTo).toHaveBeenCalledWith(200);
+	});
+
+	it('does not seek in remote mode', () => {
+		const trackUri = 'https://soundcloud.com/artist/remote';
+		useAuthStore.setState({ user: { id: 'me' } as UserProfile });
+		useConnectStore.setState({
+			target: { kind: 'remote', ownerId: 'friend', deviceId: 'tablet', ownerUsername: 'Léa' },
+		});
+		useQueueStore.getState().reset();
+		useQueueStore.getState().applyState({
+			ownerId: 'friend',
+			version: 1,
+			currentItemId: 'r',
+			items: [
+				{
+					id: 'r',
+					rank: 'r',
+					track: {
+						trackUri,
+						title: 'Remote song',
+						artist: 'Léa',
+						album: null,
+						albumArt: null,
+						durationMs: 180_000,
+					},
+					sourcePlaylistId: null,
+					blockId: null,
+					blockDetached: false,
+				},
+			],
+		});
+		useConnectStore.setState({
+			target: { kind: 'remote', ownerId: 'friend', deviceId: 'tablet', ownerUsername: 'Léa' },
+			remoteStatus: {
+				ownerId: 'friend',
+				device: { deviceId: 'tablet', deviceName: 'Tablette', platform: 'android', model: 'Tab' },
+				track: {
+					id: hashStringToNumber(trackUri),
+					title: 'Remote song',
+					artist: 'Léa',
+					artworkUrl: null,
+				},
+				isPlaying: true,
+				positionMs: 30_000,
+				updatedAt: new Date().toISOString(),
+			},
+		});
+		render(<PlayerModal />);
+		expect(seekControl().props.accessibilityState).toMatchObject({
+			disabled: true,
+		});
+		action('increment');
+		expect(mockSeekTo).not.toHaveBeenCalled();
+	});
+});
+
 describe('PlayerModal in remote mode', () => {
 	const trackUri = 'https://soundcloud.com/artist/b';
 	const status = (id: number) => ({
@@ -263,7 +393,9 @@ describe('PlayerModal in remote mode', () => {
 
 		expect(screen.getByText('Remote song')).toBeTruthy();
 		expect(screen.getByText('Sur Tablette de Léa')).toBeTruthy();
-		expect(screen.getByTestId('seek-slider').props.disabled).toBe(true);
+		expect(screen.getByTestId('seek-slider', { includeHiddenElements: true }).props.disabled).toBe(
+			true
+		);
 		expect(screen.getByText('3:00')).toBeTruthy();
 		expect(screen.getByLabelText('Pause')).not.toBeDisabled();
 	});
@@ -271,6 +403,6 @@ describe('PlayerModal in remote mode', () => {
 	it('hides the progress bar when the duration is unknown', () => {
 		useConnectStore.setState({ remoteStatus: status(1) });
 		render(<PlayerModal />);
-		expect(screen.queryByTestId('seek-slider')).toBeNull();
+		expect(screen.queryByTestId('seek-slider', { includeHiddenElements: true })).toBeNull();
 	});
 });

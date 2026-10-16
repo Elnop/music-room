@@ -17,7 +17,7 @@ describe('SwipeableTrackItem', () => {
 		render(<SwipeableTrackItem track={track} onDelete={onDelete} />);
 		// Ionicons loads its font asynchronously and re-renders once it is ready.
 		await act(async () => {});
-		expect(screen.queryByLabelText('Reorder track')).toBeNull();
+		expect(screen.queryByLabelText('Réordonner')).toBeNull();
 	});
 
 	it('hides the drag handle when disabled', async () => {
@@ -26,7 +26,7 @@ describe('SwipeableTrackItem', () => {
 		);
 		// Ionicons loads its font asynchronously and re-renders once it is ready.
 		await act(async () => {});
-		expect(screen.queryByLabelText('Reorder track')).toBeNull();
+		expect(screen.queryByLabelText('Réordonner')).toBeNull();
 	});
 
 	it('opens the quick actions on a long press or the ⋯ button, even for a viewer', async () => {
@@ -45,6 +45,14 @@ describe('SwipeableTrackItem', () => {
 		expect(onShowActions).toHaveBeenCalledTimes(2);
 	});
 
+	it('names the row after the track for a screen reader', async () => {
+		render(<SwipeableTrackItem track={track} onDelete={onDelete} onShowActions={jest.fn()} />);
+		await act(async () => {});
+		expect(screen.getByLabelText('Song, Artist').props.accessibilityHint).toBe(
+			'Appui long pour les actions du titre'
+		);
+	});
+
 	it('shows no ⋯ button without onShowActions', async () => {
 		render(<SwipeableTrackItem track={track} onDelete={onDelete} />);
 		await act(async () => {});
@@ -56,7 +64,7 @@ describe('SwipeableTrackItem', () => {
 		render(<SwipeableTrackItem track={track} onDelete={onDelete} onDragStart={onDragStart} />);
 		// Ionicons loads its font asynchronously and re-renders once it is ready.
 		await act(async () => {});
-		fireEvent(screen.getByLabelText('Reorder track'), 'pressIn');
+		fireEvent(screen.getByLabelText('Réordonner'), 'pressIn');
 		expect(onDragStart).toHaveBeenCalledTimes(1);
 	});
 

@@ -18,7 +18,7 @@ import { usePlayer } from '@/contexts/PlayerContext';
 import { usePlayerStore } from '@/store/playerStore';
 import { RESTART_THRESHOLD_S } from '@/store/queueSelectors';
 import { useNowPlaying } from '@/hooks/useNowPlaying';
-import { useImageColors, hexToRgba, getAdaptiveColors, isLightColor } from '@/hooks/useImageColors';
+import { useImageColors, getAdaptiveColors } from '@/hooks/useImageColors';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { QueueModal } from '@/components/player/QueueModal';
 import { DevicePickerSheet } from '@/components/player/DevicePickerSheet';
@@ -26,6 +26,10 @@ import { DevicePickerSheet } from '@/components/player/DevicePickerSheet';
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const DISMISS_THRESHOLD = SCREEN_HEIGHT * 0.2; // 20% de l'écran pour fermer
 const ARTWORK_SIZE = width * 0.75;
+/** Seek step of the slider's screen-reader increment / decrement actions, in seconds. */
+export const SEEK_STEP_S = 10;
+/** Header buttons are 40×40: this slop brings their tap target to 48×48. */
+const HEADER_HIT_SLOP = { top: 4, bottom: 4, left: 4, right: 4 };
 
 export function PlayerModal() {
 	const { theme } = useTheme();
@@ -111,8 +115,10 @@ export function PlayerModal() {
 
 	const styles = useMemo(() => createStyles(theme, insets), [theme, insets]);
 
-	const adaptive = dominantColor ? getAdaptiveColors(dominantColor) : null;
-	const isDarkBg = dominantColor ? !isLightColor(dominantColor) : false;
+	const adaptive = useMemo(
+		() => (dominantColor ? getAdaptiveColors(dominantColor, theme.colors.background) : null),
+		[dominantColor, theme.colors.background]
+	);
 	const colors = adaptive
 		? {
 				text: adaptive.text,
@@ -121,7 +127,7 @@ export function PlayerModal() {
 				slider: adaptive.accent,
 				sliderBg: adaptive.accentBg,
 				playBtnBg: adaptive.accent,
-				playBtnIcon: isDarkBg ? dominantColor! : '#FFF',
+				playBtnIcon: adaptive.onAccent,
 			}
 		: {
 				text: theme.colors.text,
@@ -150,24 +156,31 @@ export function PlayerModal() {
 		seekTo(value);
 	};
 
+	// Screen readers adjust the slider by steps (TalkBack: swipe up / down, volume keys).
+	const handleSliderAction = (actionName: string) => {
+		if (duration === null) return;
+		const step =
+			actionName === 'increment' ? SEEK_STEP_S : actionName === 'decrement' ? -SEEK_STEP_S : 0;
+		if (step === 0) return;
+		handleSeek(Math.min(duration, Math.max(0, currentTime + step)));
+	};
+
 	// Local: previous restarts the track past RESTART_THRESHOLD_S, otherwise steps back
 	// in the queue. Remote: always steps back, since the phone cannot seek the device.
 	const canGoPrevious =
 		canToggle && (hasPrevious || (!isRemote && currentTime > RESTART_THRESHOLD_S));
 
-	const gradientColors: [string, string, string, string] = dominantColor
-		? [
-				hexToRgba(dominantColor, 0.95),
-				hexToRgba(dominantColor, 0.7),
-				hexToRgba(dominantColor, 0.5),
-				hexToRgba(dominantColor, 0.4),
-			]
+	const gradientColors: [string, string, string, string] = adaptive
+		? adaptive.gradient
 		: [
 				theme.colors.background,
 				theme.colors.background,
 				theme.colors.background,
 				theme.colors.background,
 			];
+
+	const sliderDisabled = isRemote || isLoading || !player || !track;
+	const playDisabled = isLoading || !track;
 
 	const displayArtwork = artworkUrl || 'https://via.placeholder.com/300';
 	const canGoNext = track !== null && hasNext;
@@ -200,6 +213,9 @@ export function PlayerModal() {
 								style={styles.closeButton}
 								onPress={() => setModalOpen(false)}
 								activeOpacity={0.7}
+								hitSlop={HEADER_HIT_SLOP}
+								accessibilityRole="button"
+								accessibilityLabel="Fermer le lecteur"
 							>
 								<View style={[styles.headerButton, { backgroundColor: colors.buttonBg }]}>
 									<Ionicons name="chevron-down" size={24} color={colors.text} />
@@ -210,6 +226,8 @@ export function PlayerModal() {
 								style={styles.devicesButton}
 								onPress={() => setDevicesOpen(true)}
 								activeOpacity={0.7}
+								hitSlop={HEADER_HIT_SLOP}
+								accessibilityRole="button"
 								accessibilityLabel="Choisir l'appareil"
 							>
 								<View style={[styles.headerButton, { backgroundColor: colors.buttonBg }]}>
@@ -221,6 +239,8 @@ export function PlayerModal() {
 								style={styles.queueButton}
 								onPress={() => setQueueOpen(true)}
 								activeOpacity={0.7}
+								hitSlop={HEADER_HIT_SLOP}
+								accessibilityRole="button"
 								accessibilityLabel="File d'attente"
 							>
 								<View style={[styles.headerButton, { backgroundColor: colors.buttonBg }]}>
@@ -275,17 +295,34 @@ export function PlayerModal() {
 							{/* Hidden when the length is unknown (a remote track off the queue). */}
 							{duration !== null && (
 								<View style={styles.progressContainer}>
-									<Slider
-										style={styles.slider}
-										minimumValue={0}
-										maximumValue={duration || 1}
-										value={track ? currentTime : 0}
-										onSlidingComplete={handleSeek}
-										minimumTrackTintColor={colors.slider}
-										maximumTrackTintColor={colors.sliderBg}
-										thumbTintColor={colors.slider}
-										disabled={isRemote || isLoading || !player || !track}
-									/>
+									{/* The slider library drops onAccessibilityAction: this wrapper is what a
+									    screen reader sees and adjusts; touch drags still reach the slider. */}
+									<View
+										accessible
+										accessibilityRole="adjustable"
+										accessibilityLabel="Position de lecture"
+										accessibilityValue={{
+											text: `${formatTime(track ? currentTime : 0)} sur ${formatTime(track ? duration : 0)}`,
+										}}
+										accessibilityState={{ disabled: sliderDisabled }}
+										accessibilityActions={[{ name: 'increment' }, { name: 'decrement' }]}
+										onAccessibilityAction={event => {
+											if (!sliderDisabled) handleSliderAction(event.nativeEvent.actionName);
+										}}
+									>
+										<Slider
+											style={styles.slider}
+											minimumValue={0}
+											maximumValue={duration || 1}
+											value={track ? currentTime : 0}
+											onSlidingComplete={handleSeek}
+											minimumTrackTintColor={colors.slider}
+											maximumTrackTintColor={colors.sliderBg}
+											thumbTintColor={colors.slider}
+											disabled={sliderDisabled}
+											importantForAccessibility="no-hide-descendants"
+										/>
+									</View>
 									<View style={styles.timeContainer}>
 										<Text style={[styles.timeText, { color: colors.textSecondary }]}>
 											{formatTime(track ? currentTime : 0)}
@@ -303,7 +340,9 @@ export function PlayerModal() {
 									onPress={previous}
 									disabled={!canGoPrevious}
 									activeOpacity={0.7}
-									accessibilityLabel="Previous track"
+									accessibilityRole="button"
+									accessibilityLabel="Piste précédente"
+									accessibilityState={{ disabled: !canGoPrevious }}
 								>
 									<Ionicons
 										name="play-skip-back"
@@ -316,9 +355,11 @@ export function PlayerModal() {
 								<TouchableOpacity
 									style={[styles.playButton, { backgroundColor: colors.playBtnBg }]}
 									onPress={handlePlayPause}
-									disabled={isLoading || !track}
+									disabled={playDisabled}
 									activeOpacity={0.8}
-									accessibilityLabel={isPlaying ? 'Pause' : 'Play'}
+									accessibilityRole="button"
+									accessibilityLabel={isPlaying ? 'Pause' : 'Lecture'}
+									accessibilityState={{ disabled: playDisabled, busy: isLoading }}
 								>
 									{isLoading ? (
 										<LoadingSpinner size="small" />
@@ -340,7 +381,9 @@ export function PlayerModal() {
 									onPress={next}
 									disabled={!canGoNext}
 									activeOpacity={0.7}
-									accessibilityLabel="Next track"
+									accessibilityRole="button"
+									accessibilityLabel="Piste suivante"
+									accessibilityState={{ disabled: !canGoNext }}
 								>
 									<Ionicons
 										name="play-skip-forward"

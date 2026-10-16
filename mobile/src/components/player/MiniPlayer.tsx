@@ -83,12 +83,39 @@ export function MiniPlayer() {
 		transform: [{ translateX: translateX.value }],
 	}));
 
+	const playDisabled = isLoading || !track;
+	const nextDisabled = !canGoNext;
+	const openLabel = [
+		'Ouvrir le lecteur',
+		...(track ? [track.title, track.artist] : ['Rien en lecture']),
+		...(deviceLabel ? [`sur ${deviceLabel}`] : []),
+	].join(', ');
+
 	return (
 		<GestureDetector gesture={panGesture}>
-			<TouchableOpacity style={styles.container} onPress={toggleModal} activeOpacity={0.9}>
+			{/* Not one accessible block: the screen reader reaches the info and each button apart. */}
+			<TouchableOpacity
+				style={styles.container}
+				onPress={toggleModal}
+				activeOpacity={0.9}
+				accessible={false}
+			>
 				<View style={styles.content}>
 					<Animated.View style={[styles.swipeArea, infoStyle]}>
-						<NowPlayingInfo track={track} deviceLabel={deviceLabel} styles={styles} theme={theme} />
+						<TouchableOpacity
+							style={styles.infoButton}
+							onPress={toggleModal}
+							activeOpacity={0.9}
+							accessibilityRole="button"
+							accessibilityLabel={openLabel}
+						>
+							<NowPlayingInfo
+								track={track}
+								deviceLabel={deviceLabel}
+								styles={styles}
+								theme={theme}
+							/>
+						</TouchableOpacity>
 					</Animated.View>
 
 					<TouchableOpacity
@@ -97,8 +124,10 @@ export function MiniPlayer() {
 							if (canToggle) toggle();
 						}}
 						hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-						disabled={isLoading || !track}
-						accessibilityLabel={isPlaying ? 'Pause' : 'Play'}
+						disabled={playDisabled}
+						accessibilityRole="button"
+						accessibilityLabel={isPlaying ? 'Pause' : 'Lecture'}
+						accessibilityState={{ disabled: playDisabled, busy: isLoading }}
 					>
 						{isLoading ? (
 							<ActivityIndicator size="small" color="#FFFFFF" />
@@ -119,14 +148,16 @@ export function MiniPlayer() {
 						style={styles.nextButton}
 						onPress={next}
 						hitSlop={{ top: 10, bottom: 10, left: 6, right: 10 }}
-						disabled={!track || !hasNext}
-						accessibilityLabel="Next track"
+						disabled={nextDisabled}
+						accessibilityRole="button"
+						accessibilityLabel="Piste suivante"
+						accessibilityState={{ disabled: nextDisabled }}
 					>
 						<Ionicons
 							name="play-skip-forward"
 							size={22}
 							color={theme.colors.text}
-							style={track && hasNext ? undefined : styles.disabledIcon}
+							style={nextDisabled ? styles.disabledIcon : undefined}
 						/>
 					</TouchableOpacity>
 				</View>
@@ -213,6 +244,8 @@ const createStyles = (theme: Theme, insets: EdgeInsets) =>
 		},
 		swipeArea: {
 			flex: 1,
+		},
+		infoButton: {
 			flexDirection: 'row',
 			alignItems: 'center',
 		},

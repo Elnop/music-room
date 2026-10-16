@@ -39,6 +39,8 @@ export function SwipeableTrackItem({
 			style={styles.deleteButton}
 			onPress={() => onDelete(track.id)}
 			activeOpacity={0.7}
+			accessibilityRole="button"
+			accessibilityLabel={`Supprimer ${track.title}`}
 		>
 			<Ionicons name="trash-outline" size={24} color="#FFFFFF" />
 			<Text style={styles.deleteText}>Supprimer</Text>
@@ -52,6 +54,8 @@ export function SwipeableTrackItem({
 		>
 			<Pressable
 				onLongPress={onShowActions}
+				accessibilityLabel={`${track.title}, ${track.artist}`}
+				accessibilityHint={onShowActions ? 'Appui long pour les actions du titre' : undefined}
 				style={[styles.trackContainer, isDragActive && styles.trackContainerActive]}
 			>
 				{track.albumArt ? (
@@ -83,7 +87,7 @@ export function SwipeableTrackItem({
 						hitSlop={10}
 						style={styles.dragHandle}
 						accessibilityRole="button"
-						accessibilityLabel="Reorder track"
+						accessibilityLabel="Réordonner"
 					>
 						<Ionicons name="reorder-three-outline" size={24} color={theme.colors.textSecondary} />
 					</Pressable>
