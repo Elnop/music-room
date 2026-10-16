@@ -129,19 +129,21 @@ const ownPaths: OpenAPIV3.PathsObject = {
 	'/api/queue/items': {
 		post: {
 			...common,
-			summary: 'Add a track to the end of the queue',
-			description: 'Appends after the last item; the current item does not change.',
+			summary: 'Add a track to the queue',
+			description:
+				'Appends after the last item; the current item does not change. With `next: true`, the item is placed right after the current item instead (at the top when nothing is current), in one call that publishes one state.',
 			operationId: 'addQueueItem',
 			requestBody: {
 				required: true,
 				content: {
 					'application/json': {
-						schema: { $ref: '#/components/schemas/AddQueueItemRequest' },
+						schema: { $ref: '#/components/schemas/AddQueueItemBody' },
 						example: {
 							trackUri: 'https://soundcloud.com/artist/track',
 							title: 'Amazing Song',
 							artist: 'Cool Artist',
 							durationMs: 240000,
+							next: true,
 						},
 					},
 				},
@@ -471,6 +473,21 @@ export const queueSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 			albumArt: { type: 'string', format: 'uri' },
 			durationMs: { type: 'integer', minimum: 1 },
 		},
+	},
+	AddQueueItemBody: {
+		allOf: [
+			{ $ref: '#/components/schemas/AddQueueItemRequest' },
+			{
+				type: 'object',
+				properties: {
+					next: {
+						type: 'boolean',
+						description:
+							'True: place the item right after the current item (at the top when nothing is current) instead of at the end',
+					},
+				},
+			},
+		],
 	},
 	QueuePlaybackRequest: {
 		type: 'object',

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, Pressable } from 'reac
 import { Swipeable } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
+import { TrackActionsButton } from '@/components/track/TrackActionsButton';
 import type { Theme } from '@/themes/types';
 import type { QueueItem } from '@/types/queue.types';
 
@@ -17,9 +18,14 @@ interface QueueItemRowProps {
 	onDragStart?: () => void;
 	/** Raises the row while it is being dragged. */
 	isDragActive?: boolean;
+	/** A long press or the ⋯ button opens the track's quick actions (#316). */
+	onShowActions?: (item: QueueItem) => void;
 }
 
-/** A queue row: tap to play, swipe left to remove, drag the handle to reorder. */
+/**
+ * A queue row: tap to play, swipe left to remove, drag the handle to reorder,
+ * long-press or ⋯ for the track's quick actions.
+ */
 export function QueueItemRow({
 	item,
 	isCurrent = false,
@@ -27,6 +33,7 @@ export function QueueItemRow({
 	onRemove,
 	onDragStart,
 	isDragActive = false,
+	onShowActions,
 }: QueueItemRowProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
@@ -59,6 +66,7 @@ export function QueueItemRow({
 		>
 			<Pressable
 				onPress={() => onPlay(item.id)}
+				onLongPress={onShowActions ? () => onShowActions(item) : undefined}
 				style={[styles.row, isCurrent && styles.rowCurrent, isDragActive && styles.rowActive]}
 				accessibilityRole="button"
 				accessibilityLabel={`Lire ${track.title}`}
@@ -96,6 +104,8 @@ export function QueueItemRow({
 				)}
 
 				<Text style={styles.duration}>{formatDuration(track.durationMs)}</Text>
+
+				{onShowActions && <TrackActionsButton onPress={() => onShowActions(item)} />}
 
 				{onDragStart && (
 					<Pressable

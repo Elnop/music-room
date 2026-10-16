@@ -64,7 +64,7 @@ export const queueApi = {
 		return step(`${base(target)}/previous`, 'QUEUE_START', target);
 	},
 
-	/** Append a track to the end of the queue. */
+	/** Append a track to the end of the queue; with `next: true`, right after the current item. */
 	addItem(body: AddQueueItemBody, target: QueueCallTarget = {}): Promise<QueueState> {
 		return apiRequest<QueueState>(`${base(target)}/items`, {
 			method: 'POST',

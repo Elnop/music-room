@@ -19,12 +19,15 @@ import { usePlaylistStore } from '@store/playlistStore';
 import { useSoundCloudStore } from '@store/soundcloudStore';
 import { useQueueStore } from '@store/queueStore';
 import { QueueSwipe } from '@components/common/QueueSwipe';
+import { TrackActionsButton } from '@components/track/TrackActionsButton';
+import { TrackActionsSheet } from '@components/track/TrackActionsSheet';
 import { toTrackInput } from '@utils/trackInput';
 import { EmptyState } from '@components/common/EmptyState';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
 import debounce from 'lodash/debounce';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import type { Track } from '@/types/track.types';
+import type { AddQueueItemBody } from '@/types/queue.types';
 import { showError } from '@utils/toast';
 import { ApiError } from '@/services/api';
 
@@ -58,6 +61,7 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 	const [query, setQuery] = useState('');
 	const [addingTrackId, setAddingTrackId] = useState<number | null>(null);
 	const [addedTrackUris, setAddedTrackUris] = useState<Set<string>>(new Set());
+	const [actionTrack, setActionTrack] = useState<AddQueueItemBody | null>(null);
 
 	React.useEffect(() => {
 		if (currentPlaylist?.tracks) {
@@ -153,7 +157,9 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 					<TouchableOpacity
 						style={styles.trackItem}
 						onPress={() => !isAdded && handleAddTrack(item)}
-						disabled={isAdding || isAdded}
+						onLongPress={() => setActionTrack(toTrackInput(item))}
+						// An added track keeps its long press: only the tap is a no-op.
+						disabled={isAdding}
 						activeOpacity={0.7}
 					>
 						<Image source={{ uri: artworkUrl }} style={styles.artwork} />
@@ -166,6 +172,7 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 							</Text>
 							<Text style={styles.trackDuration}>{formatDuration(item.duration)}</Text>
 						</View>
+						<TrackActionsButton onPress={() => setActionTrack(toTrackInput(item))} />
 						<View
 							style={[
 								styles.addButton,
@@ -242,6 +249,8 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 					}
 				/>
 			)}
+
+			<TrackActionsSheet track={actionTrack} onClose={() => setActionTrack(null)} />
 		</View>
 	);
 }

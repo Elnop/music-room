@@ -3,7 +3,7 @@ import type { AuthenticatedRequest, ApiResponse } from '@/shared/types/global.ty
 import { queueTransferService } from '@/features/queue/services/queue-transfer.service.js';
 import { queueService } from '@/features/queue/services/queue.service.js';
 import {
-	addQueueItemSchema,
+	addQueueItemBodySchema,
 	moveQueueItemSchema,
 	queueItemParamsSchema,
 	queueOwnerParamsSchema,
@@ -49,8 +49,11 @@ export class QueueController {
 	/** POST /api/queue/items */
 	async addItem(req: Request, res: Response, next: NextFunction) {
 		try {
-			const track = addQueueItemSchema.parse(req.body);
-			sendState(res, await queueService.addItem(actorOf(req), ownerOf(req), track));
+			const { next: playNext, ...track } = addQueueItemBodySchema.parse(req.body);
+			sendState(
+				res,
+				await queueService.addItem(actorOf(req), ownerOf(req), track, { next: playNext })
+			);
 		} catch (error) {
 			next(error);
 		}

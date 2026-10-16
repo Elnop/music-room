@@ -8,10 +8,11 @@ import { useSoundCloudStore } from '@store/soundcloudStore';
 import { useQueueStore } from '@store/queueStore';
 import { toTrackInput } from '@utils/trackInput';
 import { SoundCloudTrackItem } from '@screens/search/components/SoundCloudTrackItem';
-import { PlaylistSelectorModal } from '@screens/search/components/PlaylistSelectorModal';
+import { TrackActionsSheet } from '@components/track/TrackActionsSheet';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
 import debounce from 'lodash/debounce';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
+import type { AddQueueItemBody } from '@/types/queue.types';
 
 export function SoundCloudSearchScreen() {
 	const { theme } = useTheme();
@@ -19,8 +20,7 @@ export function SoundCloudSearchScreen() {
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
 	const [searchQuery, setSearchQuery] = useState('');
-	const [selectedTrack, setSelectedTrack] = useState<SoundCloudTrack | null>(null);
-	const [showPlaylistModal, setShowPlaylistModal] = useState(false);
+	const [actionTrack, setActionTrack] = useState<AddQueueItemBody | null>(null);
 
 	const { searchResults, isSearching, error, search, clearSearch, clearError } =
 		useSoundCloudStore();
@@ -48,11 +48,6 @@ export function SoundCloudSearchScreen() {
 	// On the phone, or on the remote device in remote mode (#297).
 	const handlePlay = (track: SoundCloudTrack) => {
 		void playListTrack(track);
-	};
-
-	const handleAddToPlaylist = (track: SoundCloudTrack) => {
-		setSelectedTrack(track);
-		setShowPlaylistModal(true);
 	};
 
 	return (
@@ -89,7 +84,7 @@ export function SoundCloudSearchScreen() {
 							track={item}
 							onPlay={handlePlay}
 							onAddToQueue={track => addToQueue(toTrackInput(track))}
-							onAddToPlaylist={handleAddToPlaylist}
+							onShowActions={track => setActionTrack(toTrackInput(track))}
 						/>
 					)}
 					contentContainerStyle={{
@@ -117,11 +112,7 @@ export function SoundCloudSearchScreen() {
 				/>
 			)}
 
-			<PlaylistSelectorModal
-				visible={showPlaylistModal}
-				track={selectedTrack}
-				onClose={() => setShowPlaylistModal(false)}
-			/>
+			<TrackActionsSheet track={actionTrack} onClose={() => setActionTrack(null)} />
 		</View>
 	);
 }

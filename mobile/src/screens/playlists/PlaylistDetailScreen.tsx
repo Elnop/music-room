@@ -16,6 +16,7 @@ import { ApiError } from '@/services/api';
 import { useAuthStore } from '@store/authStore';
 import { useQueueStore } from '@store/queueStore';
 import { toTrackInput } from '@utils/trackInput';
+import { canEditPlaylist } from '@utils/playlistPermissions';
 import { usePlaylistSocket } from '@hooks/usePlaylistSocket';
 import { PlaylistHeader } from '@components/playlist/PlaylistHeader';
 import {
@@ -23,6 +24,8 @@ import {
 	PlayPlaylistButton,
 } from '@components/playlist/PlayPlaylistButton';
 import { SwipeableTrackItem } from '@components/common/SwipeableTrackItem';
+import { TrackActionsSheet } from '@components/track/TrackActionsSheet';
+import type { AddQueueItemBody } from '@/types/queue.types';
 import { ReorderableList } from '@components/common/ReorderableList';
 import { EmptyState } from '@components/common/EmptyState';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
@@ -55,6 +58,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 	const { id } = route.params;
 	const { user } = useAuthStore();
 	const addToQueue = useQueueStore(state => state.addItem);
+	const [actionTrack, setActionTrack] = React.useState<AddQueueItemBody | null>(null);
 	const {
 		currentPlaylist,
 		isLoading,
@@ -71,16 +75,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 
 	const isOwner = user && currentPlaylist?.ownerId === user.id;
 
-	const canEdit = React.useMemo(() => {
-		if (!user || !currentPlaylist) return false;
-		if (currentPlaylist.ownerId === user.id) return true;
-		if (currentPlaylist.collaboratorIds.includes(user.id)) return true;
-		if (currentPlaylist.editMode === 'open') {
-			if (currentPlaylist.visibility === 'public') return true;
-			if (currentPlaylist.viewerIds?.includes(user.id)) return true;
-		}
-		return false;
-	}, [user, currentPlaylist]);
+	const canEdit = canEditPlaylist(user?.id, currentPlaylist);
 
 	usePlaylistSocket(id);
 
@@ -203,6 +198,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 						onDelete={() => handleDeleteTrack(item.id)}
 						disabled={!canEdit}
 						onAddToQueue={() => addToQueue(toTrackInput(item))}
+						onShowActions={() => setActionTrack(toTrackInput(item))}
 						onDragStart={canEdit ? drag : undefined}
 						isDragActive={isActive}
 					/>
@@ -231,6 +227,8 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 			/>
 
 			<PlayPlaylistButton playlistId={id} trackCount={currentPlaylist.tracks.length} />
+
+			<TrackActionsSheet track={actionTrack} onClose={() => setActionTrack(null)} />
 		</View>
 	);
 }

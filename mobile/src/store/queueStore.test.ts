@@ -335,6 +335,38 @@ describe('queueStore addItem', () => {
 	});
 });
 
+describe('queueStore playNext', () => {
+	const body = {
+		trackUri: 'https://soundcloud.com/artist/new',
+		title: 'New',
+		artist: 'Artist',
+		durationMs: 1000,
+	};
+
+	it('sends next: true, applies the returned state and toasts', async () => {
+		store().applyState(queue('a', ['a', 'b']));
+		api.addItem.mockResolvedValue(queue('a', ['a', 'n', 'b']));
+
+		await expect(store().playNext(body)).resolves.toBe(true);
+
+		expect(api.addItem).toHaveBeenCalledWith({ ...body, next: true }, {});
+		expect(mine().items.map(i => i.id)).toEqual(['a', 'n', 'b']);
+		expect(mine().currentItemId).toBe('a');
+		expect(showSuccess).toHaveBeenCalledWith('Lira ensuite');
+	});
+
+	it('keeps the state and toasts an error on failure', async () => {
+		store().applyState(queue('a', ['a']));
+		api.addItem.mockRejectedValue(new ApiError('Queue is full', 'QUEUE_FULL'));
+
+		await expect(store().playNext(body)).resolves.toBe(false);
+
+		expect(mine().items.map(i => i.id)).toEqual(['a']);
+		expect(showError).toHaveBeenCalledWith('Queue is full');
+		expect(showSuccess).not.toHaveBeenCalled();
+	});
+});
+
 describe('queueStore playItem', () => {
 	it('makes the item current and plays it on this device', async () => {
 		store().applyState(queue('a'));

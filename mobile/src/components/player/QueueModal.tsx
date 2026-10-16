@@ -11,7 +11,9 @@ import { afterItemIdForDrop } from '@/store/moveTarget';
 import { ReorderableList } from '@/components/common/ReorderableList';
 import { EmptyState } from '@/components/common/EmptyState';
 import { QueueItemRow } from '@/components/player/QueueItemRow';
-import type { QueueItem } from '@/types/queue.types';
+import { TrackActionsSheet } from '@/components/track/TrackActionsSheet';
+import { toTrackInput } from '@/utils/trackInput';
+import type { AddQueueItemBody, QueueItem } from '@/types/queue.types';
 
 interface QueueModalProps {
 	visible: boolean;
@@ -35,6 +37,8 @@ export function QueueModal({ visible, onClose }: QueueModalProps) {
 	const removeItem = useQueueStore(state => state.removeItem);
 	const moveItem = useQueueStore(state => state.moveItem);
 	const [isMoving, setIsMoving] = React.useState(false);
+	const [actionTrack, setActionTrack] = React.useState<AddQueueItemBody | null>(null);
+	const showActions = (item: QueueItem) => setActionTrack(toTrackInput(item.track));
 
 	// Stable per store state: the list keeps a dropped order only while `upcoming` is unchanged.
 	const { current, upcoming } = React.useMemo(() => {
@@ -63,7 +67,13 @@ export function QueueModal({ visible, onClose }: QueueModalProps) {
 	const header = current ? (
 		<View>
 			<Text style={styles.sectionLabel}>En cours de lecture</Text>
-			<QueueItemRow item={current} isCurrent onPlay={handlePlay} onRemove={removeItem} />
+			<QueueItemRow
+				item={current}
+				isCurrent
+				onPlay={handlePlay}
+				onRemove={removeItem}
+				onShowActions={showActions}
+			/>
 			<Text style={styles.sectionLabel}>À suivre</Text>
 		</View>
 	) : null;
@@ -110,9 +120,12 @@ export function QueueModal({ visible, onClose }: QueueModalProps) {
 							onRemove={removeItem}
 							onDragStart={isMoving ? undefined : drag}
 							isDragActive={isActive}
+							onShowActions={showActions}
 						/>
 					)}
 				/>
+
+				<TrackActionsSheet track={actionTrack} onClose={() => setActionTrack(null)} />
 
 				{/* The app root's toast sits behind native modals: queue errors show here. */}
 				<Toast />
