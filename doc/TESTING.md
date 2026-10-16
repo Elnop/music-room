@@ -115,7 +115,7 @@ The backend's global auth limiter (20 `/api/auth` requests per 15 minutes per IP
 | `lint` | `npm run lint` | backend, mobile |
 | `type-check` | `npm run type-check` | backend, mobile |
 | `test` | `npm test` | backend, mobile |
-| `test-int` | `scripts/test-db.sh up` (Supabase stack + Redis), then `npm run test:int` | backend |
+| `test-int` | `scripts/test-db.sh up` (Supabase stack + Redis), then `npm run test:int`. The stack's Docker images are cached between runs (`actions/cache`, keyed on the Supabase CLI and Postgres versions and the Redis image): ECR Public's anonymous quota is shared by every runner. A PR reuses the cache saved on `develop` (GitHub scopes caches by branch), so a new image set reaches other PRs once it is on `develop`. | backend |
 
 A failing job marks the pull request red. Lint warnings do not fail it; errors do.
 

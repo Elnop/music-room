@@ -92,9 +92,30 @@ jobs:
           cache: npm
           cache-dependency-path: backend/package-lock.json
       - run: npm ci
+      # The stack's images, cached between runs: anonymous pulls from ECR Public
+      # run out of its data quota on shared runners (#327). The key follows the
+      # Supabase CLI version, the Postgres version and the Redis image.
+      - id: images
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/docker-images
+          key: test-int-images-${{ hashFiles('backend/package-lock.json', 'backend/supabase/config.toml', 'backend/scripts/test-db.sh') }}
+          # An older set still spares the pulls of the images that did not change.
+          restore-keys: test-int-images-
+      - if: steps.images.outputs.cache-matched-key != ''
+        run: zstd -dc ~/docker-images/images.tar.zst | docker load -q
       # Local Supabase stack (Docker) with backend/migrations applied, plus a Redis
       # container on a free port (session revocation); see doc/TESTING.md.
       - run: sh scripts/test-db.sh up
+      - if: steps.images.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/docker-images
+          docker ps -a --format '{{.Image}}' | sort -u | xargs docker save | zstd -T0 -q -o ~/docker-images/images.tar.zst
+      - if: steps.images.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/docker-images
+          key: ${{ steps.images.outputs.cache-primary-key }}
       - run: npm run test:int
       - if: always()
         run: sh scripts/test-db.sh down
