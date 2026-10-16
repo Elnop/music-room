@@ -5,6 +5,7 @@ import { useQueueStore } from '@/store/queueStore';
 import { useConnectStore } from '@/store/connectStore';
 import { ApiError, apiRequest } from '@/services/api';
 import type { StreamUrlResponse } from '@/types/soundcloud.types';
+import { MediaSessionBridge } from '@/components/player/MediaSessionBridge';
 
 // Configure audio mode for iOS - play in silent mode and background
 setAudioModeAsync({
@@ -454,6 +455,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 		<PlayerContext.Provider value={value}>
 			<QueueAutoAdvance player={player} />
 			<StreamWatchdog player={player} />
+			<MediaSessionBridge />
 			{children}
 		</PlayerContext.Provider>
 	);
