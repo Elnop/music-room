@@ -6,6 +6,7 @@ import { ApiError } from '@/services/api';
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
 
 const mockFetchPlaylistById = jest.fn();
+let mockCurrentPlaylist: { id: string; ownerId: string; tracks: unknown[] } | null = null;
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -53,7 +54,7 @@ jest.mock('@store/queueStore', () => ({
 jest.mock('@store/playlistStore', () => ({
 	CONFLICT_CODES: [],
 	usePlaylistStore: () => ({
-		currentPlaylist: null,
+		currentPlaylist: mockCurrentPlaylist,
 		isLoading: false,
 		fetchPlaylistById: mockFetchPlaylistById,
 		removeTrack: jest.fn(),
@@ -62,6 +63,15 @@ jest.mock('@store/playlistStore', () => ({
 		conflictMessage: null,
 		clearConflictMessage: jest.fn(),
 	}),
+}));
+
+jest.mock('@components/playlist/PlaylistHeader', () => ({
+	PlaylistHeader: () => null,
+}));
+
+jest.mock('@components/playlist/PlayPlaylistButton', () => ({
+	PLAY_PLAYLIST_BUTTON_SIZE: 56,
+	PlayPlaylistButton: () => null,
 }));
 
 jest.mock('@components/track/TrackActionsSheet', () => ({
@@ -76,15 +86,72 @@ jest.mock('@utils/toast', () => ({
 
 type Props = React.ComponentProps<typeof PlaylistDetailScreen>;
 
-const renderScreen = () =>
-	render(
-		<PlaylistDetailScreen
-			route={{ key: 'k', name: 'PlaylistDetail', params: { id: ID } } as Props['route']}
-			navigation={{ navigate: jest.fn(), setOptions: jest.fn() } as unknown as Props['navigation']}
-		/>
-	);
+const mockSetOptions = jest.fn();
+const mockNavigate = jest.fn();
 
-beforeEach(() => jest.clearAllMocks());
+const screenElement = () => (
+	<PlaylistDetailScreen
+		route={{ key: 'k', name: 'PlaylistDetail', params: { id: ID } } as Props['route']}
+		navigation={
+			{ navigate: mockNavigate, setOptions: mockSetOptions } as unknown as Props['navigation']
+		}
+	/>
+);
+
+const renderScreen = () => render(screenElement());
+
+beforeEach(() => {
+	jest.clearAllMocks();
+	mockCurrentPlaylist = null;
+	mockFetchPlaylistById.mockResolvedValue(undefined);
+});
+
+// Last headerRight given to the native header, rendered on its own.
+const renderHeaderRight = () => {
+	const options = mockSetOptions.mock.calls.at(-1)?.[0] as { headerRight?: () => React.ReactNode };
+	expect(options.headerRight).toBeDefined();
+	return render(<>{options.headerRight?.()}</>);
+};
+
+// #343: adding or removing the native header subview while the screen
+// re-attaches crashes on Android, so headerRight never goes undefined.
+describe('PlaylistDetailScreen header button', () => {
+	it('keeps headerRight set, without the options button, while the playlist is not loaded', () => {
+		renderScreen();
+
+		const header = renderHeaderRight();
+		expect(header.queryByLabelText('Options de la playlist')).toBeNull();
+	});
+
+	it("shows the options button on the owner's playlist", () => {
+		mockCurrentPlaylist = { id: ID, ownerId: 'me', tracks: [] };
+		renderScreen();
+
+		const header = renderHeaderRight();
+		fireEvent.press(header.getByLabelText('Options de la playlist'));
+		expect(mockNavigate).toHaveBeenCalledWith('PlaylistSharing', { playlistId: ID });
+	});
+
+	it('keeps headerRight set when the owner playlist goes null during a reload', () => {
+		mockCurrentPlaylist = { id: ID, ownerId: 'me', tracks: [] };
+		const { rerender } = renderScreen();
+
+		mockCurrentPlaylist = null;
+		rerender(screenElement());
+
+		expect(mockSetOptions.mock.calls.length).toBeGreaterThan(1);
+		expect(mockSetOptions.mock.calls.every(([options]) => options.headerRight)).toBe(true);
+		expect(renderHeaderRight().queryByLabelText('Options de la playlist')).toBeNull();
+	});
+
+	it("keeps headerRight set, without the button, on someone else's playlist", () => {
+		mockCurrentPlaylist = { id: ID, ownerId: 'someone-else', tracks: [] };
+		renderScreen();
+
+		const header = renderHeaderRight();
+		expect(header.queryByLabelText('Options de la playlist')).toBeNull();
+	});
+});
 
 describe('PlaylistDetailScreen load failure', () => {
 	it('says the playlist is not found or not accessible on a 404', async () => {
