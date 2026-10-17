@@ -17,11 +17,11 @@ import { useTheme } from '@contexts/ThemeContext';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'ForgotPassword'>;
 
-export function ForgotPasswordScreen({ navigation }: Props) {
+export function ForgotPasswordScreen({ route, navigation }: Props) {
 	const { theme } = useTheme();
 	const { forgotPassword, isLoading, error } = useAuthStore();
 
-	const [email, setEmail] = useState('');
+	const [email, setEmail] = useState(route.params?.email ?? '');
 	const [emailError, setEmailError] = useState<string | null>(null);
 
 	const validateEmail = (email: string): boolean => {
@@ -59,10 +59,6 @@ export function ForgotPasswordScreen({ navigation }: Props) {
 			<ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
 				{/* Header */}
 				<View style={styles.header}>
-					<TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-						<Text style={[styles.backText, { color: theme.colors.primary }]}>← Back</Text>
-					</TouchableOpacity>
-
 					<Text style={[styles.title, { color: theme.colors.text }]}>Forgot Password?</Text>
 					<Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
 						Enter your email address and we'll send you a code to reset your password.
@@ -127,13 +123,6 @@ const styles = StyleSheet.create({
 	},
 	header: {
 		marginBottom: 40,
-	},
-	backButton: {
-		marginBottom: 20,
-	},
-	backText: {
-		fontSize: 16,
-		fontWeight: '600',
 	},
 	title: {
 		fontSize: 32,

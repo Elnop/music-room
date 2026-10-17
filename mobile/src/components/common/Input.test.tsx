@@ -43,4 +43,28 @@ describe('Input', () => {
 		expect(input.props.secureTextEntry).toBe(true);
 		expect(input.props.value).toBe('secret');
 	});
+
+	it('shows and hides a password with the eye button', () => {
+		render(
+			<Input
+				label="Password"
+				value="secret"
+				onChangeText={jest.fn()}
+				secureTextEntry
+				testID="password-input"
+			/>
+		);
+
+		fireEvent.press(screen.getByLabelText('Afficher le mot de passe'));
+		expect(screen.getByTestId('password-input').props.secureTextEntry).toBe(false);
+
+		fireEvent.press(screen.getByLabelText('Masquer le mot de passe'));
+		expect(screen.getByTestId('password-input').props.secureTextEntry).toBe(true);
+	});
+
+	it('has no eye button on a plain field', () => {
+		render(<Input label="Email" value="" onChangeText={jest.fn()} />);
+
+		expect(screen.queryByLabelText('Afficher le mot de passe')).toBeNull();
+	});
 });

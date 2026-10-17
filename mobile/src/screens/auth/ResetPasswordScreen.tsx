@@ -16,6 +16,7 @@ import { Input } from '@components/common/Input';
 import { Button } from '@components/common/Button';
 import { useTheme } from '@contexts/ThemeContext';
 import { showError, showSuccess, showInfo } from '@utils/toast';
+import { CODE_INPUT_MAX_LENGTH, fillCodeDigits } from '@utils/codeDigits';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'ResetPassword'>;
 
@@ -62,16 +63,12 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
 
 	// Handle code input change
 	const handleCodeChange = (index: number, value: string) => {
-		// Only allow digits
-		if (value && !/^\d$/.test(value)) return;
+		const result = fillCodeDigits(code, index, value);
+		if (!result) return;
 
-		const newCode = [...code];
-		newCode[index] = value;
-		setCode(newCode);
-
-		// Auto-advance to next input
-		if (value && index < 5) {
-			inputRefs.current[index + 1]?.focus();
+		setCode(result.code);
+		if (result.focusIndex !== null) {
+			inputRefs.current[result.focusIndex]?.focus();
 		}
 	};
 
@@ -169,10 +166,6 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
 			<ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
 				{/* Header */}
 				<View style={styles.header}>
-					<TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-						<Text style={[styles.backText, { color: theme.colors.primary }]}>← Back</Text>
-					</TouchableOpacity>
-
 					<Text style={[styles.title, { color: theme.colors.text }]}>Reset Password</Text>
 					<Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
 						Enter the 6-digit code sent to{'\n'}
@@ -200,7 +193,9 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
 							onChangeText={value => handleCodeChange(index, value)}
 							onKeyPress={({ nativeEvent: { key } }) => handleKeyPress(index, key)}
 							keyboardType="number-pad"
-							maxLength={1}
+							maxLength={CODE_INPUT_MAX_LENGTH}
+							autoComplete={index === 0 ? 'sms-otp' : 'off'}
+							textContentType={index === 0 ? 'oneTimeCode' : 'none'}
 							selectTextOnFocus
 							editable={!isLoading}
 						/>
@@ -304,13 +299,6 @@ const styles = StyleSheet.create({
 	},
 	header: {
 		marginBottom: 32,
-	},
-	backButton: {
-		marginBottom: 20,
-	},
-	backText: {
-		fontSize: 16,
-		fontWeight: '600',
 	},
 	title: {
 		fontSize: 32,
