@@ -75,7 +75,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 	const coverUrl = currentPlaylist?.coverUrl || currentPlaylist?.tracks[0]?.albumArt;
 	const { dominantColor } = useImageColors(coverUrl, theme.colors.primary);
 
-	const isOwner = user && currentPlaylist?.ownerId === user.id;
+	const isOwner = !!user && currentPlaylist?.ownerId === user.id;
 
 	const canEdit = canEditPlaylist(user?.id, currentPlaylist);
 
@@ -130,23 +130,31 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 		navigation.navigate('PlaylistSharing', { playlistId: id });
 	}, [navigation, id]);
 
-	// Configure header natif transparent avec bouton partage
+	// Configure header natif transparent avec bouton partage. headerRight is
+	// always set and keeps the same view, empty for a non-owner: isOwner turns
+	// false while the playlist reloads, and adding or removing the native header
+	// subview while the screen re-attaches on Android crashes with "The specified
+	// child already has a parent" (#343).
 	React.useLayoutEffect(() => {
 		navigation.setOptions({
 			headerTransparent: true,
 			headerTitle: '',
-			headerRight: isOwner
-				? () => (
+			headerRight: () => (
+				<View style={styles.headerButton}>
+					{isOwner ? (
 						<Pressable
 							onPress={handleShare}
-							style={{ width: 36, height: 36, alignItems: 'center', justifyContent: 'center' }}
+							accessibilityRole="button"
+							accessibilityLabel="Options de la playlist"
+							style={styles.headerButton}
 						>
 							<Ionicons name="ellipsis-horizontal" size={24} color={theme.colors.text} />
 						</Pressable>
-					)
-				: undefined,
+					) : null}
+				</View>
+			),
 		});
-	}, [navigation, isOwner, handleShare, theme.colors.text]);
+	}, [navigation, isOwner, handleShare, theme.colors.text, styles.headerButton]);
 
 	const handleAddTrack = () => {
 		navigation.navigate('SearchTracks', { playlistId: id });
@@ -313,6 +321,12 @@ const createStyles = (theme: Theme, topInset: number) =>
 		container: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
+		},
+		headerButton: {
+			width: 36,
+			height: 36,
+			alignItems: 'center',
+			justifyContent: 'center',
 		},
 		failure: {
 			justifyContent: 'center',
