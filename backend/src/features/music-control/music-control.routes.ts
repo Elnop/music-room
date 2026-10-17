@@ -46,6 +46,14 @@ router.get('/can-control/:userId', (req, res, next) =>
 router.get('/devices', (req, res, next) => musicControlController.getMyDevices(req, res, next));
 
 /**
+ * PATCH /api/music-control/devices/:deviceId
+ * Rename one of my devices, or go back to its system name
+ */
+router.patch('/devices/:deviceId', (req, res, next) =>
+	musicControlController.renameDevice(req, res, next)
+);
+
+/**
  * GET /api/music-control/controllable-devices
  * List the devices I can play on (mine, then friends'), with online state
  */

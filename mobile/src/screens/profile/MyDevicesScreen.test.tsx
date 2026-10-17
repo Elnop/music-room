@@ -97,11 +97,17 @@ function device(
 const phone = device('device-1', 'Phone', [alice]);
 const tablet = device('device-2', 'Tablet');
 
-function requests(): { url: string; method: string; authorization?: string }[] {
+function requests(): {
+	url: string;
+	method: string;
+	authorization?: string;
+	body?: unknown;
+}[] {
 	return fetchMock.mock.calls.map(([url, init]) => ({
 		url: url as string,
 		method: (init as RequestInit).method ?? 'GET',
 		authorization: ((init as RequestInit).headers as Record<string, string>)?.Authorization,
+		body: (init as RequestInit).body ? JSON.parse((init as RequestInit).body as string) : undefined,
 	}));
 }
 
@@ -366,5 +372,89 @@ describe('MyDevicesScreen', () => {
 		expect(screen.getByTestId('device-device-1')).toBeTruthy();
 		expect(screen.queryByText('Impossible de charger vos appareils')).toBeNull();
 		expect(screen.UNSAFE_getByType(ScrollView).props.refreshControl.props.refreshing).toBe(false);
+	});
+	describe('rename (#352)', () => {
+		const renamed = { ...tablet, deviceName: 'Salon' };
+
+		async function openRename(name = 'Tablet'): Promise<void> {
+			fireEvent.press(screen.getByLabelText(`Renommer l'appareil ${name}`));
+			await screen.findByText("Renommer l'appareil");
+		}
+
+		it('opens the form with the current name', async () => {
+			await renderLoaded([phone, tablet], [alice]);
+
+			await openRename();
+
+			expect(screen.getByDisplayValue('Tablet')).toBeTruthy();
+		});
+
+		it('saves the trimmed name, reloads the list and shows a toast', async () => {
+			await renderLoaded([phone, tablet], [alice]);
+			await openRename();
+			fetchMock.mockResolvedValueOnce(ok({ device: renamed }));
+			fetchMock.mockResolvedValueOnce(ok({ devices: [phone, renamed] }));
+
+			fireEvent.changeText(screen.getByDisplayValue('Tablet'), '  Salon ');
+			fireEvent.press(screen.getByText('Enregistrer'));
+
+			await waitFor(() => expect(showSuccess).toHaveBeenCalledWith('Appareil renommé'));
+			expect(requests()[1]).toMatchObject({
+				method: 'PATCH',
+				authorization: 'Bearer access',
+				body: { name: 'Salon' },
+			});
+			expect(requests()[1].url).toMatch(/\/api\/music-control\/devices\/device-2$/);
+			await waitFor(() => expect(screen.getByTestId('device-device-2')).toHaveTextContent(/Salon/));
+			expect(screen.queryByText("Renommer l'appareil")).toBeNull();
+		});
+
+		it("goes back to the system name with « Nom d'origine »", async () => {
+			await renderLoaded([phone, renamed], [alice]);
+			await openRename('Salon');
+			fetchMock.mockResolvedValueOnce(ok({ device: tablet }));
+			fetchMock.mockResolvedValueOnce(ok({ devices: [phone, tablet] }));
+
+			fireEvent.press(screen.getByText("Nom d'origine"));
+
+			await waitFor(() => expect(showSuccess).toHaveBeenCalledWith('Appareil renommé'));
+			expect(requests()[1]).toMatchObject({ method: 'PATCH', body: { name: null } });
+			await waitFor(() =>
+				expect(screen.getByTestId('device-device-2')).toHaveTextContent(/Tablet/)
+			);
+		});
+
+		it('refuses an empty name without calling the server', async () => {
+			await renderLoaded([phone, tablet], [alice]);
+			await openRename();
+
+			fireEvent.changeText(screen.getByDisplayValue('Tablet'), '   ');
+			fireEvent.press(screen.getByText('Enregistrer'));
+
+			expect(await screen.findByText('Saisissez un nom')).toBeTruthy();
+			expect(fetchMock).toHaveBeenCalledTimes(1);
+		});
+
+		it('keeps the form open and shows a French toast when the device is gone', async () => {
+			await renderLoaded([phone, tablet], [alice]);
+			await openRename();
+			fetchMock.mockResolvedValueOnce(fail(404, 'DEVICE_NOT_FOUND', 'Device not found'));
+
+			fireEvent.press(screen.getByText('Enregistrer'));
+
+			await waitFor(() => expect(showError).toHaveBeenCalledWith("Cet appareil n'existe plus"));
+			expect(screen.getByText("Renommer l'appareil")).toBeTruthy();
+			expect(showSuccess).not.toHaveBeenCalled();
+		});
+
+		it('closes the form with « Annuler » without calling the server', async () => {
+			await renderLoaded([phone, tablet], [alice]);
+			await openRename();
+
+			fireEvent.press(screen.getByText('Annuler'));
+
+			await waitFor(() => expect(screen.queryByText("Renommer l'appareil")).toBeNull());
+			expect(fetchMock).toHaveBeenCalledTimes(1);
+		});
 	});
 });

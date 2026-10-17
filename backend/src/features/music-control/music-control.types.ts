@@ -93,6 +93,11 @@ export interface DeviceLicense {
 	grantedAt: string;
 }
 
+/** PATCH /api/music-control/devices/:deviceId */
+export interface RenameDeviceResponse {
+	device: Device;
+}
+
 export interface DeviceWithLicenses extends Device {
 	licenses: DeviceLicense[];
 }

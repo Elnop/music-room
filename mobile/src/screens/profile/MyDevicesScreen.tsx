@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
 import { ThemedSwitch } from '@components/common/ThemedSwitch';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, type NavigationProp } from '@react-navigation/native';
@@ -17,6 +17,7 @@ import { Avatar } from '@components/common/Avatar';
 import { showError, showSuccess } from '@utils/toast';
 import { apiErrorMessage } from '@utils/apiErrorMessage';
 import { EmptyState } from '@components/common/EmptyState';
+import { RenameDeviceModal } from '@components/music-control/RenameDeviceModal';
 
 const LOAD_ERROR = 'Impossible de charger vos appareils';
 
@@ -99,6 +100,8 @@ export function MyDevicesScreen() {
 	const [pending, setPending] = useState<Set<string>>(new Set());
 
 	const [isRefreshing, setIsRefreshing] = useState(false);
+	const [renaming, setRenaming] = useState<UserDeviceWithLicenses | null>(null);
+	const [isRenameSaving, setIsRenameSaving] = useState(false);
 
 	// Loads devices, friends and permissions. A failed refresh keeps what is shown.
 	const load = useCallback(async (isRefresh: boolean) => {
@@ -165,6 +168,25 @@ export function MyDevicesScreen() {
 			}
 		},
 		[]
+	);
+
+	// Renames the device in the modal (#352); null goes back to the system name.
+	const handleRename = useCallback(
+		async (name: string | null) => {
+			if (!renaming) return;
+			setIsRenameSaving(true);
+			try {
+				await musicControlApi.renameDevice(renaming.deviceId, name);
+				setRenaming(null);
+				showSuccess('Appareil renommé');
+				await load(true);
+			} catch (error) {
+				showError(apiErrorMessage(error, "Impossible de renommer l'appareil"));
+			} finally {
+				setIsRenameSaving(false);
+			}
+		},
+		[renaming, load]
 	);
 
 	const refreshControl = (
@@ -256,6 +278,15 @@ export function MyDevicesScreen() {
 								.join(' · ')}
 						</Text>
 					</View>
+					<TouchableOpacity
+						onPress={() => setRenaming(device)}
+						accessibilityRole="button"
+						accessibilityLabel={`Renommer l'appareil ${device.deviceName}`}
+						hitSlop={8}
+						style={styles.renameButton}
+					>
+						<Ionicons name="create-outline" size={20} color={theme.colors.textSecondary} />
+					</TouchableOpacity>
 				</View>
 				<View style={styles.divider} />
 				{friends.length === 0 ? (
@@ -293,6 +324,14 @@ export function MyDevicesScreen() {
 					devices.map(renderDevice)
 				)}
 			</ScrollView>
+			<RenameDeviceModal
+				deviceName={renaming?.deviceName ?? null}
+				saving={isRenameSaving}
+				onClose={() => {
+					if (!isRenameSaving) setRenaming(null);
+				}}
+				onSubmit={handleRename}
+			/>
 		</View>
 	);
 }
@@ -351,6 +390,9 @@ const createStyles = (theme: Theme) =>
 			fontWeight: theme.typography.weights.bold,
 			color: theme.colors.text,
 			marginRight: theme.spacing.sm,
+		},
+		renameButton: {
+			padding: theme.spacing.xs,
 		},
 		badge: {
 			backgroundColor: theme.colors.primary + '25',

@@ -263,6 +263,87 @@ export const musicControlPaths: OpenAPIV3.PathsObject = {
 		},
 	},
 
+	'/api/music-control/devices/{deviceId}': {
+		patch: {
+			tags: ['Music Control'],
+			summary: 'Rename one of my devices',
+			description:
+				"Sets the name shown for one of your devices (#352), everywhere a device is listed (`deviceName` in your devices, the device picker, a friend's view) and on its live socket. The name is trimmed and must be 1 to 40 characters; `null` goes back to the system name the app sends at each connection. Reconnecting never overwrites the chosen name.",
+			operationId: 'renameDevice',
+			security: [{ bearerAuth: [] }],
+			parameters: [deviceIdParam],
+			requestBody: {
+				required: true,
+				content: {
+					'application/json': {
+						schema: {
+							type: 'object',
+							required: ['name'],
+							properties: {
+								name: {
+									type: 'string',
+									nullable: true,
+									minLength: 1,
+									maxLength: 40,
+									description:
+										'New name, trimmed (1 to 40 characters after trimming); null for the system name',
+								},
+							},
+						},
+						examples: {
+							rename: { value: { name: 'Salon' } },
+							reset: { value: { name: null } },
+						},
+					},
+				},
+			},
+			responses: {
+				'200': {
+					description: 'Device renamed',
+					content: {
+						'application/json': {
+							schema: {
+								allOf: [
+									{ $ref: '#/components/schemas/SuccessResponse' },
+									{
+										type: 'object',
+										properties: {
+											data: {
+												type: 'object',
+												required: ['device'],
+												properties: {
+													device: { $ref: '#/components/schemas/Device' },
+												},
+											},
+										},
+									},
+								],
+							},
+							example: {
+								success: true,
+								data: {
+									device: {
+										deviceId: 'phone-1',
+										deviceName: 'Salon',
+										platform: 'android',
+										model: 'Pixel 7',
+										lastSeenAt: '2026-10-17T10:00:00.000Z',
+									},
+								},
+								meta: { timestamp: '2026-10-17T10:00:05.000Z' },
+							},
+						},
+					},
+				},
+				'400': {
+					$ref: '#/components/responses/ValidationError',
+				},
+				'401': { $ref: '#/components/responses/UnauthorizedError' },
+				'404': deviceNotFoundResponse,
+			},
+		},
+	},
+
 	'/api/music-control/devices/{deviceId}/licenses/{userId}': {
 		post: {
 			tags: ['Music Control'],
@@ -555,7 +636,12 @@ export const musicControlSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 				maxLength: 128,
 				description: 'Stable id generated and persisted by the app',
 			},
-			deviceName: { type: 'string', example: "Léo's Pixel" },
+			deviceName: {
+				type: 'string',
+				example: "Léo's Pixel",
+				description:
+					'Name to show: the one the owner chose (PATCH /api/music-control/devices/{deviceId}), else the system name',
+			},
 			platform: { type: 'string', example: 'android' },
 			model: { type: 'string', example: 'Pixel 7' },
 			lastSeenAt: {

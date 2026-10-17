@@ -5,19 +5,20 @@ import type { Tables } from '@/shared/types/supabase.generated.js';
 import type { Device, DeviceLicense } from '@/features/music-control/music-control.types.js';
 
 /** Columns of `devices` exposed through the API */
-export const DEVICE_COLUMNS = 'device_id, device_name, platform, model, last_seen_at';
+export const DEVICE_COLUMNS = 'device_id, device_name, custom_name, platform, model, last_seen_at';
 
 type DeviceRow = Pick<
 	Tables<'devices'>,
-	'device_id' | 'device_name' | 'platform' | 'model' | 'last_seen_at'
+	'device_id' | 'device_name' | 'custom_name' | 'platform' | 'model' | 'last_seen_at'
 >;
 
 type LicenseUser = DeviceLicense['user'];
 
+/** The API's `deviceName` is the name to show: the owner's, else the system's (#352). */
 export function toDevice(row: DeviceRow): Device {
 	return {
 		deviceId: row.device_id,
-		deviceName: row.device_name,
+		deviceName: row.custom_name ?? row.device_name,
 		platform: row.platform,
 		model: row.model,
 		lastSeenAt: row.last_seen_at,
