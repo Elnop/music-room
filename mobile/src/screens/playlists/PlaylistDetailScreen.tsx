@@ -171,10 +171,10 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 
 		try {
 			await removeTrack(id, trackId);
-			showSuccess('Track supprimé');
+			showSuccess('Titre supprimé');
 		} catch (error) {
 			console.error('[PlaylistDetailScreen] Remove track failed:', error);
-			showError(apiErrorMessage(error, 'Impossible de supprimer le track'));
+			showError(apiErrorMessage(error, 'Impossible de supprimer le titre'));
 		}
 	};
 
@@ -189,7 +189,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 			// Conflicts are reported through conflictMessage once the playlist is reloaded.
 			if (!(error instanceof ApiError && CONFLICT_CODES.includes(error.code))) {
 				console.error('[PlaylistDetailScreen] Move track failed:', error);
-				showError(apiErrorMessage(error, 'Impossible de déplacer le track'));
+				showError(apiErrorMessage(error, 'Impossible de déplacer le titre'));
 			}
 			throw error;
 		}

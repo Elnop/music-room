@@ -118,14 +118,14 @@ export function PrivacySettingsScreen() {
 	};
 
 	if (isLoading) {
-		return <LoadingSpinner fullScreen message="Loading..." />;
+		return <LoadingSpinner fullScreen message="Chargement…" />;
 	}
 
 	if (!privacy) {
 		return (
 			<View style={styles.container}>
 				<View style={styles.errorContainer}>
-					<Text style={styles.errorText}>Unable to load settings</Text>
+					<Text style={styles.errorText}>Impossible de charger les paramètres</Text>
 				</View>
 			</View>
 		);
@@ -138,35 +138,34 @@ export function PrivacySettingsScreen() {
 				contentContainerStyle={[styles.content, { paddingBottom: playerHeight + theme.spacing.xl }]}
 			>
 				<View style={styles.header}>
-					<Text style={styles.title}>Privacy</Text>
-					<Text style={styles.subtitle}>Control who can see your information</Text>
+					<Text style={styles.subtitle}>Choisissez qui peut voir vos informations</Text>
 				</View>
 
 				<View style={styles.settings}>
 					<VisibilityToggle
-						label="Profile picture"
-						description="Who can see your avatar"
+						label="Photo de profil"
+						description="Qui peut voir votre photo"
 						value={privacy.avatarVisibility}
 						onChange={value => handleVisibilityChange('avatarVisibility', value)}
 					/>
 
 					<VisibilityToggle
-						label="Email address"
-						description="Who can see your email"
+						label="Adresse email"
+						description="Qui peut voir votre email"
 						value={privacy.emailVisibility}
 						onChange={value => handleVisibilityChange('emailVisibility', value)}
 					/>
 
 					<VisibilityToggle
 						label="Bio"
-						description="Who can see your bio"
+						description="Qui peut voir votre bio"
 						value={privacy.bioVisibility}
 						onChange={value => handleVisibilityChange('bioVisibility', value)}
 					/>
 
 					<VisibilityToggle
-						label="Music preferences"
-						description="Who can see your favorite genres"
+						label="Préférences musicales"
+						description="Qui peut voir vos genres préférés"
 						value={privacy.musicPreferencesVisibility}
 						onChange={value => handleVisibilityChange('musicPreferencesVisibility', value)}
 					/>
@@ -177,7 +176,7 @@ export function PrivacySettingsScreen() {
 					loading={isSaving}
 					disabled={!hasChanges || isSaving}
 				>
-					Save
+					Enregistrer
 				</Button>
 			</ScrollView>
 		</View>
@@ -198,12 +197,6 @@ const createStyles = (theme: Theme) =>
 		},
 		header: {
 			marginBottom: theme.spacing.xl,
-		},
-		title: {
-			fontSize: 28,
-			fontWeight: theme.typography.weights.bold,
-			color: theme.colors.text,
-			marginBottom: theme.spacing.xs,
 		},
 		subtitle: {
 			fontSize: 16,

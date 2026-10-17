@@ -25,7 +25,7 @@ export interface ControlActionResponse {
 
 const getAuthToken = async (): Promise<string> => {
 	const token = useAuthStore.getState().accessToken;
-	if (!token) throw new Error('No authentication token available');
+	if (!token) throw new Error('Non authentifié');
 	return token;
 };
 

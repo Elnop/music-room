@@ -190,13 +190,13 @@ export function WelcomeScreen({ navigation }: WelcomeScreenProps) {
 
 					<View style={styles.buttonContainer}>
 						<Button
-							title="Get Started"
+							title="Commencer"
 							onPress={() => navigation.navigate('Register')}
 							variant="primary"
 							fullWidth
 						/>
 						<Button
-							title="Login"
+							title="Se connecter"
 							onPress={() => navigation.navigate('Login')}
 							variant="outline"
 							fullWidth

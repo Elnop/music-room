@@ -147,7 +147,7 @@ export function controlErrorMessage(err: ControlError): string {
 		case 'DEVICE_OFFLINE':
 			return "Cet appareil n'est plus en ligne";
 		default:
-			return err.message;
+			return 'La commande a échoué, réessayez';
 	}
 }
 

@@ -263,7 +263,7 @@ export function PlayerModal() {
 							</TouchableOpacity>
 
 							<Text style={[styles.nowPlayingText, { color: colors.textSecondary }]}>
-								NOW PLAYING
+								EN COURS DE LECTURE
 							</Text>
 							{deviceLabel && (
 								<Text
@@ -300,7 +300,7 @@ export function PlayerModal() {
 									{track ? track.title : 'Rien en lecture'}
 								</Text>
 								<Text style={[styles.artist, { color: colors.textSecondary }]} numberOfLines={1}>
-									{track ? track.artist : 'Choisis un son pour commencer'}
+									{track ? track.artist : 'Choisissez un titre pour commencer'}
 								</Text>
 							</View>
 
@@ -416,7 +416,7 @@ export function PlayerModal() {
 							{isLoading && (
 								<View style={styles.loadingContainer}>
 									<Text style={[styles.loadingText, { color: colors.textSecondary }]}>
-										Loading audio stream...
+										Chargement du flux audio…
 									</Text>
 								</View>
 							)}

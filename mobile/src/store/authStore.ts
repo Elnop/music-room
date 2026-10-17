@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase';
 import { signInWithGoogle, signInWithFacebook } from '@services/oauth';
 import { lastTrackStorage } from '@services/lastTrackStorage';
 import { usePlayerStore } from '@/store/playerStore';
+import { apiErrorMessage } from '@/utils/apiErrorMessage';
 
 // AsyncStorage keys
 const STORAGE_KEYS = {
@@ -116,7 +117,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
 			await get().saveToStorage();
 		} catch (error) {
-			const errorMessage = error instanceof ApiError ? error.message : 'Login failed';
+			const errorMessage = apiErrorMessage(error, 'Connexion impossible, réessayez');
 			set({
 				error: errorMessage,
 				isLoading: false,
@@ -160,7 +161,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 			await get().saveToStorage();
 			return { requiresVerification: false };
 		} catch (error) {
-			const errorMessage = error instanceof ApiError ? error.message : 'Registration failed';
+			const errorMessage = apiErrorMessage(error, 'Inscription impossible, réessayez');
 			set({
 				error: errorMessage,
 				isLoading: false,
@@ -194,7 +195,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
 			await get().saveToStorage();
 		} catch (error) {
-			const errorMessage = error instanceof ApiError ? error.message : 'Email verification failed';
+			const errorMessage = apiErrorMessage(error, 'Vérification impossible, réessayez');
 			set({
 				error: errorMessage,
 				isLoading: false,
@@ -212,7 +213,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 		try {
 			await authApi.resendVerificationCode(userId, email);
 		} catch (error) {
-			const errorMessage = error instanceof ApiError ? error.message : 'Failed to resend code';
+			const errorMessage = apiErrorMessage(error, "Impossible d'envoyer un nouveau code");
 			set({ error: errorMessage });
 			throw error;
 		}
@@ -228,7 +229,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 			await authApi.forgotPassword(email);
 			set({ isLoading: false });
 		} catch (error) {
-			const errorMessage = error instanceof ApiError ? error.message : 'Failed to send reset code';
+			const errorMessage = apiErrorMessage(
+				error,
+				"Impossible d'envoyer le code de réinitialisation"
+			);
 			set({ error: errorMessage, isLoading: false });
 			throw error;
 		}
@@ -244,7 +248,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 			await authApi.resetPassword(email, code, newPassword);
 			set({ isLoading: false });
 		} catch (error) {
-			const errorMessage = error instanceof ApiError ? error.message : 'Failed to reset password';
+			const errorMessage = apiErrorMessage(error, 'Impossible de réinitialiser le mot de passe');
 			set({ error: errorMessage, isLoading: false });
 			throw error;
 		}
@@ -331,20 +335,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 			if (error instanceof Error && error.message === 'SIGN_IN_CANCELLED') {
 				set({ isLoading: false, error: null });
 			} else {
-				let errorMessage = 'Google login failed. Please try again.';
+				let errorMessage = 'La connexion avec Google a échoué. Réessayez.';
 
 				if (error instanceof ApiError) {
-					errorMessage = error.message;
+					errorMessage = apiErrorMessage(error, errorMessage);
 				} else if (error instanceof Error) {
 					if (error.message === 'Google Play Services not available') {
 						errorMessage =
-							'Google Play Services not available. Please update Google Play Services and try again.';
+							'Google Play Services est indisponible. Mettez-le à jour puis réessayez.';
 					} else if (error.message === 'Sign-in already in progress') {
-						errorMessage = 'A sign-in is already in progress. Please wait.';
+						errorMessage = 'Une connexion est déjà en cours, patientez.';
 					} else if (error.message.includes('network') || error.message.includes('timeout')) {
-						errorMessage = 'Network error. Please check your connection and try again.';
-					} else {
-						errorMessage = `Login failed: ${error.message}`;
+						errorMessage = 'Impossible de joindre le serveur. Vérifiez votre connexion.';
 					}
 				}
 
@@ -407,17 +409,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 			if (error instanceof Error && error.message === 'SIGN_IN_CANCELLED') {
 				set({ isLoading: false, error: null });
 			} else {
-				let errorMessage = 'Facebook login failed. Please try again.';
+				let errorMessage = 'La connexion avec Facebook a échoué. Réessayez.';
 
 				if (error instanceof ApiError) {
-					errorMessage = error.message;
+					errorMessage = apiErrorMessage(error, errorMessage);
 				} else if (error instanceof Error) {
 					if (error.message.includes('not configured')) {
-						errorMessage = 'Facebook login is not configured. Please contact support.';
+						errorMessage = "La connexion avec Facebook n'est pas configurée.";
 					} else if (error.message.includes('network') || error.message.includes('timeout')) {
-						errorMessage = 'Network error. Please check your connection and try again.';
-					} else {
-						errorMessage = `Login failed: ${error.message}`;
+						errorMessage = 'Impossible de joindre le serveur. Vérifiez votre connexion.';
 					}
 				}
 
@@ -456,7 +456,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
 			await get().saveToStorage();
 		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : 'Profile update failed';
+			const errorMessage = apiErrorMessage(error, 'La mise à jour du profil a échoué');
 			set({
 				error: errorMessage,
 				isLoading: false,
@@ -573,9 +573,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 			const cancelled = error instanceof Error && error.message === 'SIGN_IN_CANCELLED';
 			const errorMessage = cancelled
 				? null
-				: error instanceof ApiError
-					? error.message
-					: 'Failed to link provider';
+				: apiErrorMessage(error, 'Impossible de lier ce compte');
 			set({
 				error: errorMessage,
 				isLoading: false,
@@ -601,7 +599,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
 			set({ isLoading: false });
 		} catch (error) {
-			const errorMessage = error instanceof ApiError ? error.message : 'Failed to unlink provider';
+			const errorMessage = apiErrorMessage(error, 'Impossible de délier ce compte');
 			set({
 				error: errorMessage,
 				isLoading: false,

@@ -27,7 +27,7 @@ const HIT_SLOP = { top: 10, bottom: 10, left: 10, right: 10 };
 export function SearchBar({
 	value,
 	onChangeText,
-	placeholder = 'Search...',
+	placeholder = 'Rechercher…',
 	style,
 	autoFocus = false,
 	loading = false,

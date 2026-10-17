@@ -27,11 +27,11 @@ export function ForgotPasswordScreen({ route, navigation }: Props) {
 	const validateEmail = (email: string): boolean => {
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		if (!email) {
-			setEmailError('Email is required');
+			setEmailError("L'email est requis");
 			return false;
 		}
 		if (!emailRegex.test(email)) {
-			setEmailError('Please enter a valid email');
+			setEmailError('Saisissez un email valide');
 			return false;
 		}
 		setEmailError(null);
@@ -59,9 +59,10 @@ export function ForgotPasswordScreen({ route, navigation }: Props) {
 			<ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
 				{/* Header */}
 				<View style={styles.header}>
-					<Text style={[styles.title, { color: theme.colors.text }]}>Forgot Password?</Text>
+					<Text style={[styles.title, { color: theme.colors.text }]}>Mot de passe oublié ?</Text>
 					<Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
-						Enter your email address and we'll send you a code to reset your password.
+						Saisissez votre adresse email : nous vous enverrons un code pour réinitialiser votre mot
+						de passe.
 					</Text>
 				</View>
 
@@ -74,7 +75,7 @@ export function ForgotPasswordScreen({ route, navigation }: Props) {
 							setEmail(text);
 							setEmailError(null);
 						}}
-						placeholder="your.email@example.com"
+						placeholder="vous@exemple.com"
 						keyboardType="email-address"
 						autoCapitalize="none"
 						autoComplete="email"
@@ -89,7 +90,7 @@ export function ForgotPasswordScreen({ route, navigation }: Props) {
 					)}
 
 					<Button
-						title="Send Reset Code"
+						title="Envoyer le code"
 						onPress={handleSendCode}
 						loading={isLoading}
 						disabled={!email || isLoading}
@@ -101,8 +102,8 @@ export function ForgotPasswordScreen({ route, navigation }: Props) {
 				<View style={styles.footer}>
 					<TouchableOpacity onPress={() => navigation.navigate('Login')}>
 						<Text style={[styles.footerText, { color: theme.colors.textSecondary }]}>
-							Remember your password?{' '}
-							<Text style={{ color: theme.colors.primary, fontWeight: '600' }}>Log In</Text>
+							Vous vous en souvenez ?{' '}
+							<Text style={{ color: theme.colors.primary, fontWeight: '600' }}>Se connecter</Text>
 						</Text>
 					</TouchableOpacity>
 				</View>

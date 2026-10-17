@@ -8,6 +8,7 @@ import { trackToSoundCloud } from '@utils/trackToSoundCloud';
 import { toTrackInput } from '@utils/trackInput';
 import { showError, showInfo, showSuccess } from '@utils/toast';
 import { hapticSuccess } from '@utils/haptics';
+import { apiErrorMessage } from '@/utils/apiErrorMessage';
 import type { AddQueueItemBody, QueueState, QueueStepResult } from '@/types/queue.types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import {
@@ -288,10 +289,7 @@ export const useQueueStore = create<QueueStoreState>((set, get) => {
 			const added = await mutate(
 				call => queueApi.addItem(track, call),
 				'Add',
-				error =>
-					error instanceof Error && error.message
-						? error.message
-						: "Impossible d'ajouter à la file d'attente"
+				error => apiErrorMessage(error, "Impossible d'ajouter à la file d'attente")
 			);
 			if (added) {
 				showSuccess("Ajouté à la file d'attente");
@@ -304,8 +302,7 @@ export const useQueueStore = create<QueueStoreState>((set, get) => {
 			const added = await mutate(
 				call => queueApi.addItem({ ...track, next: true }, call),
 				'Play next',
-				error =>
-					error instanceof Error && error.message ? error.message : "Impossible d'ajouter ce titre"
+				error => apiErrorMessage(error, "Impossible d'ajouter ce titre")
 			);
 			if (added) {
 				showSuccess('Lira ensuite');

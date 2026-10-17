@@ -152,7 +152,7 @@ export function ProfileScreen() {
 	if (!user) {
 		return (
 			<View style={styles.container}>
-				<Text style={styles.errorText}>No user data available</Text>
+				<Text style={styles.errorText}>Aucune donnée utilisateur</Text>
 			</View>
 		);
 	}
@@ -189,21 +189,21 @@ export function ProfileScreen() {
 					<View style={styles.statsRow}>
 						<View style={styles.statItem}>
 							<Text style={styles.statValue}>{stats?.followersCount ?? 0}</Text>
-							<Text style={styles.statLabel}>Followers</Text>
+							<Text style={styles.statLabel}>Abonnés</Text>
 						</View>
 						<View style={styles.statDivider} />
 						<View style={styles.statItem}>
 							<Text style={styles.statValue}>{stats?.followingCount ?? 0}</Text>
-							<Text style={styles.statLabel}>Following</Text>
+							<Text style={styles.statLabel}>Abonnements</Text>
 						</View>
 					</View>
 				</View>
 
 				{/* Music Preferences Section */}
 				<ProfileSection
-					title="Music preferences"
+					title="Préférences musicales"
 					rightAction={{
-						label: 'Edit',
+						label: 'Modifier',
 						onPress: handleMusicPreferences,
 					}}
 				>
@@ -221,8 +221,8 @@ export function ProfileScreen() {
 								color={theme.colors.textSecondary}
 								style={styles.emptyStateIcon}
 							/>
-							<Text style={styles.emptyStateText}>Add your favorite genres</Text>
-							<Text style={styles.emptyStateHint}>Tap to select up to 5 genres</Text>
+							<Text style={styles.emptyStateText}>Ajoutez vos genres préférés</Text>
+							<Text style={styles.emptyStateHint}>Touchez pour en choisir jusqu'à 5</Text>
 						</TouchableOpacity>
 					)}
 				</ProfileSection>
@@ -237,16 +237,16 @@ export function ProfileScreen() {
 					<View style={styles.divider} />
 
 					<View style={styles.infoItem}>
-						<Text style={styles.infoLabel}>Username</Text>
+						<Text style={styles.infoLabel}>Nom d'utilisateur</Text>
 						<Text style={styles.infoValue}>@{user.username}</Text>
 					</View>
 
 					<View style={styles.divider} />
 
 					<View style={styles.infoItem}>
-						<Text style={styles.infoLabel}>Member since</Text>
+						<Text style={styles.infoLabel}>Membre depuis</Text>
 						<Text style={styles.infoValue}>
-							{new Date(user.createdAt).toLocaleDateString('en-US', {
+							{new Date(user.createdAt).toLocaleDateString('fr-FR', {
 								month: 'long',
 								year: 'numeric',
 							})}
@@ -255,7 +255,7 @@ export function ProfileScreen() {
 				</ProfileSection>
 
 				{/* Theme Section */}
-				<ProfileSection title="Theme">
+				<ProfileSection title="Thème">
 					<ThemeSelector />
 				</ProfileSection>
 
@@ -266,8 +266,8 @@ export function ProfileScreen() {
 							<Ionicons name="lock-closed" size={20} color={theme.colors.primary} />
 						</View>
 						<View style={styles.privacyTextContainer}>
-							<Text style={styles.privacyTitle}>Privacy</Text>
-							<Text style={styles.privacySubtitle}>Manage who can see your information</Text>
+							<Text style={styles.privacyTitle}>Confidentialité</Text>
+							<Text style={styles.privacySubtitle}>Gérez qui peut voir vos informations</Text>
 						</View>
 						<Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
 					</TouchableOpacity>
@@ -280,8 +280,10 @@ export function ProfileScreen() {
 							<Ionicons name="link" size={20} color={theme.colors.primary} />
 						</View>
 						<View style={styles.privacyTextContainer}>
-							<Text style={styles.privacyTitle}>Linked accounts</Text>
-							<Text style={styles.privacySubtitle}>Add or remove Google and Facebook sign-in</Text>
+							<Text style={styles.privacyTitle}>Comptes liés</Text>
+							<Text style={styles.privacySubtitle}>
+								Ajoutez ou retirez la connexion Google et Facebook
+							</Text>
 						</View>
 						<Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
 					</TouchableOpacity>

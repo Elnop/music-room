@@ -66,7 +66,7 @@ export function ProfileNavigator() {
 			<ProfileStack.Screen
 				name="LinkedAccounts"
 				component={LinkedAccountsScreen}
-				options={{ title: 'Linked accounts' }}
+				options={{ title: 'Comptes liés' }}
 			/>
 			<ProfileStack.Screen
 				name="MyDevices"

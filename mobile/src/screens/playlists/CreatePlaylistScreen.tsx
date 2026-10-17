@@ -103,10 +103,10 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
 								render={({ field: { onChange, value } }) => (
 									<View>
 										<Input
-											label="Playlist name"
+											label="Nom de la playlist"
 											value={value}
 											onChangeText={text => onChange(text.slice(0, PLAYLIST_LIMITS.NAME_MAX))}
-											placeholder="My awesome playlist"
+											placeholder="Ma super playlist"
 											error={errors.name?.message}
 											autoFocus
 											maxLength={PLAYLIST_LIMITS.NAME_MAX}
@@ -124,12 +124,12 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
 								render={({ field: { onChange, value } }) => (
 									<View>
 										<Input
-											label="Description (Optional)"
+											label="Description (facultative)"
 											value={value || ''}
 											onChangeText={text =>
 												onChange(text.slice(0, PLAYLIST_LIMITS.DESCRIPTION_MAX))
 											}
-											placeholder="Describe your playlist..."
+											placeholder="Décrivez votre playlist…"
 											error={errors.description?.message}
 											multiline
 											numberOfLines={3}
@@ -145,9 +145,9 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
 							<View style={styles.toggleSection}>
 								<View style={styles.toggleRow}>
 									<View style={styles.toggleInfo}>
-										<Text style={styles.toggleLabel}>Private playlist</Text>
+										<Text style={styles.toggleLabel}>Playlist privée</Text>
 										<Text style={styles.toggleDescription}>
-											{isPrivate ? 'Visible only to invited people' : 'Visible to all users'}
+											{isPrivate ? 'Visible uniquement par les invités' : 'Visible par tous'}
 										</Text>
 									</View>
 									<ThemedSwitch value={isPrivate} onValueChange={setIsPrivate} />
@@ -157,11 +157,11 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
 							<View style={styles.toggleSection}>
 								<View style={styles.toggleRow}>
 									<View style={styles.toggleInfo}>
-										<Text style={styles.toggleLabel}>Restricted editing</Text>
+										<Text style={styles.toggleLabel}>Modification restreinte</Text>
 										<Text style={styles.toggleDescription}>
 											{isEditRestricted
-												? 'Only authorized people can edit'
-												: 'Everyone can add/remove tracks'}
+												? 'Seules les personnes autorisées peuvent la modifier'
+												: 'Tout le monde peut ajouter ou retirer des titres'}
 										</Text>
 									</View>
 									<ThemedSwitch value={isEditRestricted} onValueChange={setIsEditRestricted} />
@@ -169,7 +169,7 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
 							</View>
 
 							<Button
-								title="Create playlist"
+								title="Créer la playlist"
 								onPress={handleSubmit(onSubmit)}
 								loading={isLoading}
 								fullWidth

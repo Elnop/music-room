@@ -27,11 +27,11 @@ const PROFILE_LIMITS = {
 const updateProfileSchema = z.object({
 	displayName: z
 		.string()
-		.min(1, 'Name cannot be empty')
-		.max(PROFILE_LIMITS.DISPLAY_NAME_MAX, `${PROFILE_LIMITS.DISPLAY_NAME_MAX} characters max`),
+		.min(1, 'Le nom ne peut pas être vide')
+		.max(PROFILE_LIMITS.DISPLAY_NAME_MAX, `${PROFILE_LIMITS.DISPLAY_NAME_MAX} caractères maximum`),
 	bio: z
 		.string()
-		.max(PROFILE_LIMITS.BIO_MAX, `${PROFILE_LIMITS.BIO_MAX} characters max`)
+		.max(PROFILE_LIMITS.BIO_MAX, `${PROFILE_LIMITS.BIO_MAX} caractères maximum`)
 		.optional()
 		.or(z.literal('')),
 });
@@ -109,8 +109,7 @@ export function EditProfileScreen() {
 					]}
 					keyboardShouldPersistTaps="handled"
 				>
-					<Text style={styles.title}>Edit profile</Text>
-					<Text style={styles.subtitle}>Update your information</Text>
+					<Text style={styles.subtitle}>Mettez à jour vos informations</Text>
 
 					{error && <FormError message={error} />}
 
@@ -121,8 +120,8 @@ export function EditProfileScreen() {
 						render={({ field: { onChange, onBlur, value } }) => (
 							<View>
 								<Input
-									label="Display name"
-									placeholder="Enter your name"
+									label="Nom affiché"
+									placeholder="Saisissez votre nom"
 									value={value}
 									onChangeText={text => onChange(text.slice(0, PROFILE_LIMITS.DISPLAY_NAME_MAX))}
 									onBlur={onBlur}
@@ -146,7 +145,7 @@ export function EditProfileScreen() {
 							<View>
 								<Input
 									label="Bio"
-									placeholder="Tell us about yourself..."
+									placeholder="Parlez-nous de vous…"
 									value={value}
 									onChangeText={text => onChange(text.slice(0, PROFILE_LIMITS.BIO_MAX))}
 									onBlur={onBlur}
@@ -166,7 +165,7 @@ export function EditProfileScreen() {
 
 					{/* Info Text */}
 					<Text style={styles.infoText}>
-						Note: You cannot change your username or email. Contact support if needed.
+						Remarque : votre nom d'utilisateur et votre email ne peuvent pas être modifiés.
 					</Text>
 
 					{/* Action Buttons */}
@@ -178,7 +177,7 @@ export function EditProfileScreen() {
 							disabled={!isDirty || isLoading}
 							style={styles.actionButton}
 						>
-							Save
+							Enregistrer
 						</Button>
 
 						<Button
@@ -187,7 +186,7 @@ export function EditProfileScreen() {
 							disabled={isLoading}
 							style={styles.actionButton}
 						>
-							Cancel
+							Annuler
 						</Button>
 					</View>
 				</ScrollView>
@@ -210,12 +209,6 @@ const createStyles = (theme: Theme) =>
 		},
 		contentContainer: {
 			padding: theme.spacing.lg,
-		},
-		title: {
-			fontSize: 28,
-			fontWeight: theme.typography.weights.bold,
-			color: theme.colors.text,
-			marginBottom: theme.spacing.xs,
 		},
 		subtitle: {
 			fontSize: 14,

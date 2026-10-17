@@ -124,7 +124,7 @@ describe('soundcloudStore search', () => {
 		await useSoundCloudStore.getState().search('fail');
 
 		const state = useSoundCloudStore.getState();
-		expect(state.error).toBe('Search failed');
+		expect(state.error).toBe('La recherche a échoué');
 		expect(state.searchResults).toEqual([]);
 		expect(state.isSearching).toBe(false);
 	});

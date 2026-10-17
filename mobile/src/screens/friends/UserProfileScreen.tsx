@@ -76,7 +76,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
 				setPlaylists(playlistsData);
 			} catch (error) {
 				console.error('[UserProfileScreen] Load profile failed:', error);
-				setError('Failed to load profile');
+				setError('Impossible de charger le profil');
 			} finally {
 				setIsLoading(false);
 			}
@@ -109,14 +109,14 @@ export function UserProfileScreen({ route, navigation }: Props) {
 	};
 
 	if (isLoading) {
-		return <LoadingSpinner fullScreen message="Loading profile..." />;
+		return <LoadingSpinner fullScreen message="Chargement du profil…" />;
 	}
 
 	if (error || !profile) {
 		return (
 			<View style={styles.container}>
 				<View style={styles.errorContainer}>
-					<Text style={styles.errorText}>{error || 'Profile not found'}</Text>
+					<Text style={styles.errorText}>{error || 'Profil introuvable'}</Text>
 				</View>
 			</View>
 		);
@@ -152,11 +152,11 @@ export function UserProfileScreen({ route, navigation }: Props) {
 							<View style={styles.statsContainer}>
 								<View style={styles.statItem}>
 									<Text style={styles.statNumber}>{followStatus.followersCount}</Text>
-									<Text style={styles.statLabel}>Followers</Text>
+									<Text style={styles.statLabel}>Abonnés</Text>
 								</View>
 								<View style={styles.statItem}>
 									<Text style={styles.statNumber}>{followStatus.followingCount}</Text>
-									<Text style={styles.statLabel}>Following</Text>
+									<Text style={styles.statLabel}>Abonnements</Text>
 								</View>
 							</View>
 						)}
@@ -175,7 +175,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
 							)}
 							{followStatus?.isFollowedBy && (
 								<View style={styles.followsYouBadge}>
-									<Text style={styles.followsYouText}>Follows you</Text>
+									<Text style={styles.followsYouText}>Vous suit</Text>
 								</View>
 							)}
 						</View>
@@ -198,7 +198,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
 								style={styles.hiddenIcon}
 							/>
 							<Text style={styles.hiddenText}>
-								{isFriend ? 'Private bio' : 'Visible only to friends'}
+								{isFriend ? 'Bio privée' : 'Visible uniquement par ses amis'}
 							</Text>
 						</View>
 					) : filteredProfile?.bio ? (
@@ -219,7 +219,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
 							{followStatus.isFriend ? (
 								<>
 									<View style={styles.friendBadge}>
-										<Text style={styles.friendBadgeText}>Friends</Text>
+										<Text style={styles.friendBadgeText}>Amis</Text>
 									</View>
 									<Button
 										variant="outline"
@@ -227,7 +227,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
 										loading={isFollowLoading}
 										style={styles.actionButton}
 									>
-										Following
+										Abonné
 									</Button>
 								</>
 							) : followStatus.isFollowing ? (
@@ -237,7 +237,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
 									loading={isFollowLoading}
 									style={styles.fullWidthButton}
 								>
-									Following
+									Abonné
 								</Button>
 							) : (
 								<Button
@@ -246,7 +246,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
 									loading={isFollowLoading}
 									style={styles.fullWidthButton}
 								>
-									Follow
+									Suivre
 								</Button>
 							)}
 						</View>
@@ -301,8 +301,8 @@ export function UserProfileScreen({ route, navigation }: Props) {
 
 				<View style={styles.infoSection}>
 					<Text style={styles.infoText}>
-						Member since{' '}
-						{new Date(profile.createdAt).toLocaleDateString('en-US', {
+						Membre depuis{' '}
+						{new Date(profile.createdAt).toLocaleDateString('fr-FR', {
 							month: 'long',
 							year: 'numeric',
 						})}

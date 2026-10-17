@@ -16,6 +16,27 @@ const CODE_MESSAGES: Record<string, string> = {
 	PROVIDER_ALREADY_SET: 'Un compte de ce service est déjà lié à votre profil',
 	INVALID_PROVIDER_TOKEN: 'La connexion au service a échoué, réessayez',
 	LAST_PROVIDER: 'Impossible de retirer votre dernière méthode de connexion',
+	PROVIDER_NOT_LINKED: "Ce compte n'est pas lié à votre profil",
+	// Authentication (#341)
+	INVALID_CREDENTIALS: 'Email ou mot de passe incorrect',
+	EMAIL_ALREADY_EXISTS: 'Cet email est déjà utilisé',
+	USERNAME_TAKEN: "Ce nom d'utilisateur est déjà pris",
+	INVALID_CODE: 'Code de vérification incorrect',
+	NO_CODE_FOUND: 'Aucun code en attente, demandez-en un nouveau',
+	CODE_EXPIRED: 'Ce code a expiré, demandez-en un nouveau',
+	INVALID_RESET_CODE: 'Code de réinitialisation incorrect ou expiré',
+	RESET_CODE_EXPIRED: 'Ce code a expiré, demandez-en un nouveau',
+	ALREADY_VERIFIED: 'Cet email est déjà vérifié, connectez-vous',
+	EMAIL_NOT_VERIFIED: "Votre adresse email n'est pas vérifiée",
+	INVALID_FACEBOOK_TOKEN: 'La connexion Facebook a échoué, réessayez',
+	TOKEN_REVOKED: 'Session expirée, reconnectez-vous.',
+	RATE_LIMIT_EXCEEDED: 'Trop de tentatives, réessayez dans un instant.',
+	TOO_MANY_ATTEMPTS: 'Trop de tentatives, réessayez dans un instant.',
+	RESEND_COOLDOWN: 'Patientez un instant avant de redemander un code.',
+	RESEND_LIMIT_EXCEEDED: 'Trop de codes demandés, réessayez plus tard.',
+	ACCOUNT_LOCKED: 'Compte temporairement bloqué après trop de tentatives. Réessayez plus tard.',
+	IP_BLOCKED: 'Accès temporairement restreint. Réessayez plus tard.',
+	AUTH_UNAVAILABLE: "Le service d'authentification est indisponible. Réessayez plus tard.",
 };
 
 /**

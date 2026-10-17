@@ -111,7 +111,8 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 				isRefreshing: false,
 			});
 		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : 'Failed to fetch playlists';
+			const errorMessage =
+				error instanceof Error ? error.message : 'Impossible de charger les playlists';
 			set({
 				error: errorMessage,
 				isLoading: false,
@@ -160,7 +161,8 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 				isRefreshing: false,
 			});
 		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : 'Failed to fetch playlist';
+			const errorMessage =
+				error instanceof Error ? error.message : 'Impossible de charger la playlist';
 			if (!hasCache) {
 				set({
 					error: errorMessage,
@@ -193,7 +195,8 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 				playlists: [newPlaylist, ...playlists],
 			});
 		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : 'Failed to create playlist';
+			const errorMessage =
+				error instanceof Error ? error.message : 'Impossible de créer la playlist';
 			set({ error: errorMessage });
 			throw error;
 		}
@@ -236,7 +239,8 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 				playlistsCache: newCache,
 			});
 		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : 'Failed to update playlist';
+			const errorMessage =
+				error instanceof Error ? error.message : 'Impossible de modifier la playlist';
 			set({ error: errorMessage });
 			throw error;
 		}
@@ -261,7 +265,8 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 				playlistsCache: newCache,
 			});
 		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : 'Failed to delete playlist';
+			const errorMessage =
+				error instanceof Error ? error.message : 'Impossible de supprimer la playlist';
 			set({ error: errorMessage });
 			throw error;
 		}
@@ -285,7 +290,7 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 			});
 			if (outcome === 'reload') await reloadQuietly(get, playlistId);
 		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : 'Failed to add track';
+			const errorMessage = error instanceof Error ? error.message : "Impossible d'ajouter le titre";
 			set({ error: errorMessage });
 			throw error;
 		}
@@ -323,7 +328,8 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 		} catch (error) {
 			// Bring the optimistically removed track back from the server.
 			await reloadQuietly(get, playlistId);
-			const errorMessage = error instanceof Error ? error.message : 'Failed to remove track';
+			const errorMessage =
+				error instanceof Error ? error.message : 'Impossible de retirer le titre';
 			set({ error: errorMessage });
 			throw error;
 		}
@@ -362,7 +368,9 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 						set({ conflictMessage: CONFLICT_MESSAGE });
 					}
 				} else {
-					set({ error: error instanceof Error ? error.message : 'Failed to move track' });
+					set({
+						error: error instanceof Error ? error.message : 'Impossible de déplacer le titre',
+					});
 				}
 				throw error;
 			} finally {

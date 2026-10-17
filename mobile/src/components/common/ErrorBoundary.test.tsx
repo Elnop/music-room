@@ -26,7 +26,7 @@ describe('ErrorBoundary', () => {
 			</ErrorBoundary>
 		);
 		expect(screen.getByText('Child content')).toBeTruthy();
-		expect(screen.queryByText('Something went wrong')).toBeNull();
+		expect(screen.queryByText("Une erreur s'est produite")).toBeNull();
 	});
 
 	it('shows the fallback with the message and recovers on Try Again', () => {
@@ -39,14 +39,14 @@ describe('ErrorBoundary', () => {
 			</ErrorBoundary>
 		);
 
-		expect(screen.getByText('Something went wrong')).toBeTruthy();
+		expect(screen.getByText("Une erreur s'est produite")).toBeTruthy();
 		expect(screen.getByText('Kaboom')).toBeTruthy();
 		expect(screen.queryByText('Child content')).toBeNull();
 
 		shouldThrow = false;
-		fireEvent.press(screen.getByText('Try Again'));
+		fireEvent.press(screen.getByText('Réessayer'));
 
 		expect(screen.getByText('Child content')).toBeTruthy();
-		expect(screen.queryByText('Something went wrong')).toBeNull();
+		expect(screen.queryByText("Une erreur s'est produite")).toBeNull();
 	});
 });

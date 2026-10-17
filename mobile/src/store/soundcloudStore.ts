@@ -50,7 +50,7 @@ export const useSoundCloudStore = create<SoundCloudState>(set => ({
 			});
 		} catch (error) {
 			set({
-				error: error instanceof Error ? error.message : 'Search failed',
+				error: error instanceof Error ? error.message : 'La recherche a échoué',
 				isSearching: false,
 				...(options.keepResultsOnError ? {} : { searchResults: [] }),
 			});

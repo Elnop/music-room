@@ -55,7 +55,7 @@ export function SwipeableUserItem({ user, role, onRemove }: SwipeableUserItemPro
 
 				<View style={[styles.roleBadge, styles[`roleBadge_${role}`]]}>
 					<Text style={styles.roleText}>
-						{role === 'collaborator' ? 'Collaborateur' : 'Viewer'}
+						{role === 'collaborator' ? 'Collaborateur' : 'Lecteur'}
 					</Text>
 				</View>
 			</View>
