@@ -6,6 +6,7 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	ActivityIndicator,
+	Keyboard,
 } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
@@ -13,6 +14,7 @@ import { useAuthStore } from '@/store/authStore';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '@/navigation/AuthNavigator';
 import { showError, showSuccess } from '@utils/toast';
+import { CODE_INPUT_MAX_LENGTH, fillCodeDigits } from '@utils/codeDigits';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'EmailVerification'>;
 
@@ -38,16 +40,14 @@ export function EmailVerificationScreen({ route, navigation }: Props) {
 	}, [cooldown]);
 
 	const handleCodeChange = (text: string, index: number) => {
-		// Only allow digits
-		if (text && !/^\d$/.test(text)) return;
+		const result = fillCodeDigits(code, index, text);
+		if (!result) return;
 
-		const newCode = [...code];
-		newCode[index] = text;
+		const newCode = result.code;
 		setCode(newCode);
 
-		// Auto-focus next input
-		if (text && index < 5) {
-			inputRefs.current[index + 1]?.focus();
+		if (result.focusIndex !== null) {
+			inputRefs.current[result.focusIndex]?.focus();
 		}
 
 		// Auto-submit when all digits entered
@@ -72,6 +72,7 @@ export function EmailVerificationScreen({ route, navigation }: Props) {
 		}
 
 		setCodeError(null);
+		Keyboard.dismiss();
 		try {
 			await verifyEmail(userId, finalCode);
 			// Navigation handled by authStore (user will be logged in)
@@ -120,7 +121,9 @@ export function EmailVerificationScreen({ route, navigation }: Props) {
 							onChangeText={text => handleCodeChange(text, index)}
 							onKeyPress={({ nativeEvent: { key } }) => handleKeyPress(key, index)}
 							keyboardType="number-pad"
-							maxLength={1}
+							maxLength={CODE_INPUT_MAX_LENGTH}
+							autoComplete={index === 0 ? 'sms-otp' : 'off'}
+							textContentType={index === 0 ? 'oneTimeCode' : 'none'}
 							selectTextOnFocus
 							autoFocus={index === 0}
 						/>

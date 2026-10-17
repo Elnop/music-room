@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
 	View,
 	Text,
 	TextInput,
+	Pressable,
 	StyleSheet,
 	TextInputProps,
 	ViewStyle,
 	StyleProp,
 	TextStyle,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 
@@ -37,6 +39,7 @@ export function Input({
 }: InputProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
+	const [isHidden, setIsHidden] = useState(true);
 
 	return (
 		<View style={[styles.container, containerStyle]}>
@@ -47,6 +50,7 @@ export function Input({
 					style={[
 						styles.input,
 						leftIcon ? styles.inputWithIcon : undefined,
+						secureTextEntry ? styles.inputWithToggle : undefined,
 						multiline ? styles.multilineInput : undefined,
 						style,
 					]}
@@ -54,12 +58,27 @@ export function Input({
 					onChangeText={onChangeText}
 					placeholder={placeholder}
 					placeholderTextColor={theme.colors.textSecondary}
-					secureTextEntry={secureTextEntry}
+					secureTextEntry={secureTextEntry ? isHidden : secureTextEntry}
 					autoCapitalize={autoCapitalize}
 					keyboardType={keyboardType}
 					multiline={multiline}
 					{...rest}
 				/>
+				{secureTextEntry && (
+					<Pressable
+						onPress={() => setIsHidden(hidden => !hidden)}
+						accessibilityRole="button"
+						accessibilityLabel={isHidden ? 'Afficher le mot de passe' : 'Masquer le mot de passe'}
+						hitSlop={8}
+						style={styles.toggle}
+					>
+						<Ionicons
+							name={isHidden ? 'eye-outline' : 'eye-off-outline'}
+							size={20}
+							color={theme.colors.textSecondary}
+						/>
+					</Pressable>
+				)}
 			</View>
 			{error && <Text style={styles.error}>{error}</Text>}
 		</View>
@@ -103,6 +122,13 @@ const createStyles = (theme: Theme) =>
 		},
 		inputWithIcon: {
 			paddingLeft: theme.spacing.xs,
+		},
+		inputWithToggle: {
+			paddingRight: theme.spacing.xs,
+		},
+		toggle: {
+			paddingHorizontal: theme.spacing.sm + 2,
+			paddingVertical: theme.spacing.sm,
 		},
 		multilineInput: {
 			textAlignVertical: 'top',

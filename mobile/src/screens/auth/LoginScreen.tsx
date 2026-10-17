@@ -42,6 +42,7 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
 	const {
 		control,
 		handleSubmit,
+		getValues,
 		formState: { errors },
 	} = useForm<LoginInput>({
 		resolver: zodResolver(loginSchema),
@@ -180,7 +181,9 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
 
 							{/* Forgot Password Link */}
 							<TouchableOpacity
-								onPress={() => navigation.navigate('ForgotPassword')}
+								onPress={() =>
+									navigation.navigate('ForgotPassword', { email: getValues('email').trim() })
+								}
 								style={styles.forgotPasswordButton}
 							>
 								<Text style={styles.forgotPasswordText}>Forgot Password?</Text>

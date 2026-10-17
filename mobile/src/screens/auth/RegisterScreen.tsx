@@ -10,6 +10,7 @@ import {
 	Image,
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -40,6 +41,7 @@ interface RegisterScreenProps {
 export function RegisterScreen({ navigation }: RegisterScreenProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
+	const insets = useSafeAreaInsets();
 	const { register, loginWithGoogle, loginWithFacebook, isLoading, error, clearError } =
 		useAuthStore();
 
@@ -102,7 +104,7 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
 				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 			>
 				<ScrollView
-					contentContainerStyle={styles.scrollContent}
+					contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom }]}
 					keyboardShouldPersistTaps="handled"
 					bounces={false}
 					showsVerticalScrollIndicator={false}
