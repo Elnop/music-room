@@ -44,7 +44,7 @@ export function FriendPlaylistSection({
 		return (
 			<EmptyState
 				icon="people-outline"
-				message="Aucune playlist de vos amis pour l'instant"
+				message="Aucune playlist de vos amis pour l'instant. Vos amis sont les personnes que vous suivez et qui vous suivent en retour."
 				action={onFindFriends ? { label: 'Trouver des amis', onPress: onFindFriends } : undefined}
 			/>
 		);

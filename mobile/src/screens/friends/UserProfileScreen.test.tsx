@@ -2,6 +2,7 @@ import React from 'react';
 import { Share } from 'react-native';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { UserProfileScreen } from '@/screens/friends/UserProfileScreen';
+import { friendsApi } from '@/services/friendsApi';
 
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
 
@@ -73,6 +74,27 @@ jest.mock('@/api/playlistApi', () => ({
 
 type Props = React.ComponentProps<typeof UserProfileScreen>;
 
+const FOLLOW_BACK_HINT = 'Suivez cet utilisateur en retour pour devenir amis.';
+
+function renderScreen() {
+	return render(
+		<UserProfileScreen
+			route={{ key: 'k', name: 'UserProfile', params: { userId: ID } } as Props['route']}
+			navigation={{ navigate: jest.fn() } as unknown as Props['navigation']}
+		/>
+	);
+}
+
+function mockFollowStatus(isFollowing: boolean, isFollowedBy: boolean) {
+	jest.mocked(friendsApi.getFollowStatus).mockResolvedValueOnce({
+		isFollowing,
+		isFollowedBy,
+		isFriend: isFollowing && isFollowedBy,
+		followersCount: 0,
+		followingCount: 0,
+	});
+}
+
 describe('UserProfileScreen', () => {
 	it('shares the zumik:// link of the profile', async () => {
 		const share = jest.spyOn(Share, 'share').mockResolvedValue({ action: Share.sharedAction });
@@ -88,5 +110,26 @@ describe('UserProfileScreen', () => {
 		await waitFor(() =>
 			expect(share).toHaveBeenCalledWith({ message: `Alice\nzumik://user/${ID}`, title: 'Alice' })
 		);
+	});
+
+	it('shows initials, not a lock, when the avatar is hidden by privacy', async () => {
+		renderScreen();
+
+		expect(await screen.findByText('AL')).toBeTruthy();
+	});
+
+	it('explains that following back makes a friend when only they follow me', async () => {
+		mockFollowStatus(false, true);
+		renderScreen();
+
+		expect(await screen.findByText(FOLLOW_BACK_HINT)).toBeTruthy();
+	});
+
+	it('shows no follow-back hint once I follow them too', async () => {
+		mockFollowStatus(true, true);
+		renderScreen();
+
+		await screen.findByText('Follows you');
+		expect(screen.queryByText(FOLLOW_BACK_HINT)).toBeNull();
 	});
 });

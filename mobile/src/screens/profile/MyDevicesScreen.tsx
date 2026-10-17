@@ -35,6 +35,11 @@ function friendName(friend: FriendProfile): string {
 	return friend.displayName || friend.username;
 }
 
+/** The model repeats the device name when the device was never renamed (the default name). */
+function sameName(model: string, deviceName: string): boolean {
+	return model.trim().toLowerCase() === deviceName.trim().toLowerCase();
+}
+
 function formatLastSeen(lastSeenAt: string): string {
 	const date = new Date(lastSeenAt);
 	if (Number.isNaN(date.getTime())) return '';
@@ -247,7 +252,9 @@ export function MyDevicesScreen() {
 							)}
 						</View>
 						<Text style={styles.deviceMeta}>
-							{[device.model, lastSeen].filter(Boolean).join(' · ')}
+							{[sameName(device.model, device.deviceName) ? null : device.model, lastSeen]
+								.filter(Boolean)
+								.join(' · ')}
 						</Text>
 					</View>
 				</View>
@@ -255,7 +262,7 @@ export function MyDevicesScreen() {
 				{friends.length === 0 ? (
 					<EmptyState
 						style={styles.emptyState}
-						message="Aucun ami pour l'instant. Ajoutez des amis pour leur confier cet appareil."
+						message="Aucun ami pour l'instant. Suivez des personnes qui vous suivent en retour : elles deviendront vos amis et vous pourrez leur confier cet appareil."
 						action={{
 							label: 'Trouver des amis',
 							onPress: () => navigation.navigate('FriendsTab'),

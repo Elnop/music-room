@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
+import { useNavigation, usePreventRemove } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -69,6 +69,29 @@ export function PrivacySettingsScreen() {
 		);
 	}, [privacy, initialPrivacy]);
 
+	// Set right before the post-save goBack: only that exit skips the guard. The guard stays
+	// on while the save runs, so a back press then still asks and a failed save keeps guarding.
+	const savedRef = useRef(false);
+
+	usePreventRemove(hasChanges, ({ data }) => {
+		if (savedRef.current) {
+			navigation.dispatch(data.action);
+			return;
+		}
+		Alert.alert(
+			'Quitter sans enregistrer ?',
+			'Vos modifications de confidentialité seront perdues.',
+			[
+				{ text: 'Annuler', style: 'cancel' },
+				{
+					text: 'Quitter sans enregistrer',
+					style: 'destructive',
+					onPress: () => navigation.dispatch(data.action),
+				},
+			]
+		);
+	});
+
 	const handleSave = async () => {
 		if (!accessToken || !privacy) return;
 
@@ -80,6 +103,7 @@ export function PrivacySettingsScreen() {
 				avatarVisibility: privacy.avatarVisibility,
 				musicPreferencesVisibility: privacy.musicPreferencesVisibility,
 			});
+			savedRef.current = true;
 			setInitialPrivacy(privacy);
 			navigation.goBack();
 		} catch (error) {

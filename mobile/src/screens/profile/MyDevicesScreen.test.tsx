@@ -197,6 +197,14 @@ describe('MyDevicesScreen', () => {
 		expect(screen.queryByTestId('device-device-1')).toBeNull();
 	});
 
+	it('hides the model when it repeats the device name', async () => {
+		await renderLoaded([device('device-3', 'Pixel 8'), tablet], [alice]);
+
+		expect(screen.getByTestId('device-device-3')).not.toHaveTextContent(/Pixel 8 ·/);
+		expect(screen.getByTestId('device-device-3')).toHaveTextContent(/Vu le/);
+		expect(screen.getByTestId('device-device-2')).toHaveTextContent(/Pixel 8 ·/);
+	});
+
 	it('shows an empty state when I have no device', async () => {
 		await renderLoaded([], [alice]);
 
@@ -208,6 +216,7 @@ describe('MyDevicesScreen', () => {
 		await renderLoaded([tablet], []);
 
 		expect(screen.getByTestId('device-device-2')).toHaveTextContent(/Aucun ami/);
+		expect(screen.getByTestId('device-device-2')).toHaveTextContent(/vous suivent en retour/);
 		expect(screen.queryByLabelText(/sur Tablet/)).toBeNull();
 
 		fireEvent.press(screen.getByRole('button', { name: 'Trouver des amis' }));

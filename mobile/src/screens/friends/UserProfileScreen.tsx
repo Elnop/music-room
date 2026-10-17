@@ -125,7 +125,6 @@ export function UserProfileScreen({ route, navigation }: Props) {
 	const isFriend = followStatus?.isFriend ?? false;
 
 	// Privacy logic: undefined = hidden by privacy, value present = visible (even if empty)
-	const isAvatarHidden = filteredProfile?.avatarUrl === undefined;
 	const isBioHidden = filteredProfile?.bio === undefined;
 	const isMusicPrefsHidden = filteredProfile?.musicPreferences === undefined;
 
@@ -142,17 +141,12 @@ export function UserProfileScreen({ route, navigation }: Props) {
 			>
 				<View style={styles.header}>
 					<View style={styles.topRow}>
-						{isAvatarHidden ? (
-							<View style={styles.hiddenAvatar}>
-								<Ionicons name="lock-closed" size={32} color={theme.colors.textSecondary} />
-							</View>
-						) : (
-							<Avatar
-								size="lg"
-								name={profile.displayName || profile.username}
-								uri={filteredProfile?.avatarUrl}
-							/>
-						)}
+						{/* A hidden or missing avatar falls back to initials, as in every user list. */}
+						<Avatar
+							size="lg"
+							name={profile.displayName || profile.username}
+							uri={filteredProfile?.avatarUrl}
+						/>
 
 						{followStatus && (
 							<View style={styles.statsContainer}>
@@ -186,6 +180,12 @@ export function UserProfileScreen({ route, navigation }: Props) {
 							)}
 						</View>
 						{profile.displayName && <Text style={styles.displayName}>{profile.displayName}</Text>}
+						{/* Friends are mutual follows: say how to get there from a one-way follow. */}
+						{followStatus?.isFollowedBy && !followStatus.isFollowing && (
+							<Text style={styles.followBackHint}>
+								Suivez cet utilisateur en retour pour devenir amis.
+							</Text>
+						)}
 					</View>
 
 					{/* Bio - with privacy check */}
@@ -416,6 +416,11 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.textSecondary,
 			marginTop: 2,
 		},
+		followBackHint: {
+			fontSize: 13,
+			color: theme.colors.textSecondary,
+			marginTop: theme.spacing.xs,
+		},
 		bio: {
 			fontSize: 14,
 			color: theme.colors.text,
@@ -435,16 +440,6 @@ const createStyles = (theme: Theme) =>
 			fontSize: 14,
 			color: theme.colors.textSecondary,
 			fontStyle: 'italic',
-		},
-		hiddenAvatar: {
-			width: 80,
-			height: 80,
-			borderRadius: 40,
-			backgroundColor: theme.colors.surface,
-			justifyContent: 'center',
-			alignItems: 'center',
-			borderWidth: 1,
-			borderColor: theme.colors.border,
 		},
 		genresInline: {
 			flexDirection: 'row',
