@@ -15,7 +15,11 @@ import {
 	playlistRoomPayloadSchema,
 	revalidatePlaylistRoom,
 } from '@/realtime/playlist-room.js';
-import type { PlaylistUpdatedPayload } from '@/features/playlists/playlist.types.js';
+import type {
+	PlaylistDeletedPayload,
+	PlaylistDetailsPayload,
+	PlaylistUpdatedPayload,
+} from '@/features/playlists/playlist.types.js';
 import type { QueueState } from '@/features/queue/queue.types.js';
 import { controlAccessService } from '@/features/music-control/services/control-access.service.js';
 import type {
@@ -570,6 +574,54 @@ class RealtimeService {
 			playlistId,
 			event,
 			tracksVersion,
+			room: `playlist:${playlistId}`,
+			action: 'broadcasted',
+		});
+	}
+
+	/**
+	 * Notify all clients watching a playlist of its new metadata (name,
+	 * description, visibility, edit mode) after an update (#342)
+	 */
+	notifyPlaylistDetails(payload: PlaylistDetailsPayload): void {
+		const { playlistId } = payload;
+		if (!this.io) {
+			socketLogger.event('playlist:details', 'N/A', {
+				level: 'warn',
+				playlistId,
+				action: 'not_initialized',
+			});
+			return;
+		}
+
+		this.io.to(`playlist:${playlistId}`).emit('playlist:details', payload);
+
+		socketLogger.broadcast('playlist_details', {
+			playlistId,
+			room: `playlist:${playlistId}`,
+			action: 'broadcasted',
+		});
+	}
+
+	/**
+	 * Tell all clients watching a playlist that it was deleted (#342). Must run
+	 * before revalidatePlaylistRoom evicts them from the room.
+	 */
+	notifyPlaylistDeleted(payload: PlaylistDeletedPayload): void {
+		const { playlistId } = payload;
+		if (!this.io) {
+			socketLogger.event('playlist:deleted', 'N/A', {
+				level: 'warn',
+				playlistId,
+				action: 'not_initialized',
+			});
+			return;
+		}
+
+		this.io.to(`playlist:${playlistId}`).emit('playlist:deleted', payload);
+
+		socketLogger.broadcast('playlist_deleted', {
+			playlistId,
 			room: `playlist:${playlistId}`,
 			action: 'broadcasted',
 		});

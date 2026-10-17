@@ -138,7 +138,8 @@ describe('playlist CRUD', () => {
 	it('creates a playlist at the top of the list', async () => {
 		usePlaylistStore.setState({ playlists: [summary('old')] });
 		api.createPlaylist.mockResolvedValue(summary('new'));
-		await state().createPlaylist('user-1', { name: 'new' } as never);
+		const created = await state().createPlaylist('user-1', { name: 'new' } as never);
+		expect(created.id).toBe('new');
 		expect(state().playlists.map(p => p.id)).toEqual(['new', 'old']);
 	});
 
@@ -156,6 +157,34 @@ describe('playlist CRUD', () => {
 		usePlaylistStore.setState({ playlists: [summary('p'), summary('q')] });
 		api.deletePlaylist.mockResolvedValue(undefined);
 		await state().deletePlaylist('p');
+		expect(state().playlists.map(p => p.id)).toEqual(['q']);
+		expect(state().currentPlaylist).toBeNull();
+		expect(state().playlistsCache.has('p')).toBe(false);
+	});
+
+	it('applies new details from a socket event to the list, the cache and the screen (#342)', () => {
+		usePlaylistStore.setState({ playlists: [summary('p', 'Mix'), summary('q', 'Other')] });
+		state().applyDetails({
+			playlistId: 'p',
+			name: 'Les tubes du Crabe Croustillant',
+			visibility: 'private',
+			editMode: 'restricted',
+		});
+		expect(state().playlists.map(p => p.name)).toEqual([
+			'Les tubes du Crabe Croustillant',
+			'Other',
+		]);
+		expect(state().playlists[0]).toMatchObject({ visibility: 'private', editMode: 'restricted' });
+		expect(state().currentPlaylist!.name).toBe('Les tubes du Crabe Croustillant');
+		expect(state().currentPlaylist!.description).toBeUndefined();
+		expect(state().currentPlaylist!.tracks).toHaveLength(3);
+		expect(state().playlistsCache.get('p')!.name).toBe('Les tubes du Crabe Croustillant');
+	});
+
+	it('removes a playlist locally without a request (#342)', () => {
+		usePlaylistStore.setState({ playlists: [summary('p'), summary('q')] });
+		state().removePlaylist('p');
+		expect(api.deletePlaylist).not.toHaveBeenCalled();
 		expect(state().playlists.map(p => p.id)).toEqual(['q']);
 		expect(state().currentPlaylist).toBeNull();
 		expect(state().playlistsCache.has('p')).toBe(false);

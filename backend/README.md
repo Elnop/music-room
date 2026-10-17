@@ -452,9 +452,12 @@ Refus : `connect_error` dont le `message` vaut `NO_TOKEN` (pas de `token`), `INV
 ### Events
 
 - **Client → serveur** : `playlist:join`, `playlist:leave`, `listening:subscribe`, `listening:unsubscribe`, `listening:update`, `control:action`
-- **Serveur → client** : `playlist:updated`, `playlist:error`, `listening:status`, `listening:error`, `permission:changed`, `control:command`, `control:success`, `control:error`, `control:revoked`, `queue:updated`
+- **Serveur → client** : `playlist:updated`, `playlist:details`, `playlist:deleted`, `playlist:error`, `listening:status`, `listening:error`, `permission:changed`, `control:command`, `control:success`, `control:error`, `control:revoked`, `queue:updated`
 
 Les clients d'une playlist rejoignent la room `playlist:<id>` et reçoivent `playlist:updated` à chaque modification.
+
+- `playlist:details` `{ playlistId, name, description?, visibility, editMode }` : envoyé à `playlist:<id>` après chaque `PATCH /api/playlists/:id` réussi (nom, description, visibilité ou mode d'édition), avant la revérification des accès. N'a pas de version : le dernier reçu remplace les métadonnées affichées. Ne touche pas aux morceaux ni à `tracksVersion`.
+- `playlist:deleted` `{ playlistId }` : envoyé à `playlist:<id>` après la suppression de la playlist par son propriétaire, avant que ses sockets ne soient retirées de la room (elles reçoivent ensuite `playlist:error` `PLAYLIST_NOT_FOUND`).
 
 `playlist:join <id>` n'ajoute la socket à la room que si son utilisateur (`socket.data.userId`) peut voir la playlist (`canViewPlaylist` : publique, ou propriétaire / viewer / collaborateur), contrôle fait dans `src/realtime/playlist-room.ts`. Sinon la socket reçoit `playlist:error` `{ playlistId, code, message }` :
 

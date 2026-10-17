@@ -19,7 +19,8 @@ import { PlaylistSharingScreen } from '@/screens/playlists/PlaylistSharingScreen
 export type PlaylistStackParamList = {
 	Playlists: undefined;
 	PlaylistDetail: { id: string };
-	CreatePlaylist: undefined;
+	/** With a playlistId, the form edits that playlist (#342). */
+	CreatePlaylist: { playlistId?: string } | undefined;
 	SearchTracks: { playlistId: string };
 	PlaylistSharing: { playlistId: string };
 };
@@ -64,7 +65,9 @@ export function PlaylistsNavigator() {
 			<PlaylistStack.Screen
 				name="CreatePlaylist"
 				component={CreatePlaylistScreen}
-				options={{ title: 'Nouvelle Playlist' }}
+				options={({ route }) => ({
+					title: route.params?.playlistId ? 'Modifier la playlist' : 'Nouvelle Playlist',
+				})}
 			/>
 			<PlaylistStack.Screen
 				name="SearchTracks"
@@ -74,7 +77,7 @@ export function PlaylistsNavigator() {
 			<PlaylistStack.Screen
 				name="PlaylistSharing"
 				component={PlaylistSharingScreen}
-				options={{ title: 'Partage' }}
+				options={{ title: 'Visibilité et droits' }}
 			/>
 		</PlaylistStack.Navigator>
 	);
