@@ -97,7 +97,7 @@ describe('TrackActionsSheet', () => {
 			'Song',
 			'Artist',
 			'Lire ensuite',
-			'Ajouter à la queue',
+			"Ajouter à la file d'attente",
 			'Ajouter à une playlist',
 			'Partager',
 		]) {
@@ -115,7 +115,7 @@ describe('TrackActionsSheet', () => {
 
 	it('adds to the end of the queue through the queue store and closes', () => {
 		renderSheet();
-		fireEvent.press(screen.getByText('Ajouter à la queue'));
+		fireEvent.press(screen.getByText("Ajouter à la file d'attente"));
 		expect(onClose).toHaveBeenCalled();
 		expect(addItem).toHaveBeenCalledWith(track);
 	});

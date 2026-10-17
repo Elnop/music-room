@@ -3,6 +3,7 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Avatar } from '@components/common/Avatar';
 import { ShareLinkButton } from '@components/common/ShareLinkButton';
+import { PlayPlaylistButton } from '@components/playlist/PlayPlaylistButton';
 import { playlistLink } from '@/navigation/linking';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
@@ -21,6 +22,7 @@ export function PlaylistHeader({ playlist, onAddTrack, canEdit = false }: Playli
 	const firstTrackCover = playlist.tracks[0]?.albumArt;
 	const coverUrl = playlist.coverUrl || firstTrackCover;
 	const trackCount = playlist.tracks.length;
+	const ownerName = playlist.owner.displayName || playlist.owner.username;
 
 	return (
 		<View style={styles.container}>
@@ -34,12 +36,17 @@ export function PlaylistHeader({ playlist, onAddTrack, canEdit = false }: Playli
 			<Text style={styles.name}>{playlist.name}</Text>
 			{playlist.description && <Text style={styles.description}>{playlist.description}</Text>}
 			<View style={styles.meta}>
-				<Avatar uri={playlist.owner.avatarUrl} name={playlist.owner.displayName} size="sm" />
-				<Text style={styles.owner}>{playlist.owner.displayName || playlist.owner.username}</Text>
+				<Avatar uri={playlist.owner.avatarUrl} name={ownerName} size="sm" />
+				<Text style={styles.owner} numberOfLines={1}>
+					{ownerName}
+				</Text>
 				<Text style={styles.separator}>•</Text>
 				<Text style={styles.trackCount}>
 					{trackCount} {trackCount === 1 ? 'titre' : 'titres'}
 				</Text>
+				<View style={styles.play}>
+					<PlayPlaylistButton playlistId={playlist.id} trackCount={trackCount} />
+				</View>
 			</View>
 			{playlist.collaboratorIds.length > 0 && (
 				<View style={styles.collaborators}>
@@ -115,6 +122,7 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.text,
 			fontWeight: theme.typography.weights.medium,
 			marginLeft: theme.spacing.sm,
+			flexShrink: 1,
 		},
 		separator: {
 			fontSize: theme.typography.sizes.sm,
@@ -124,6 +132,9 @@ const createStyles = (theme: Theme) =>
 		trackCount: {
 			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.textSecondary,
+		},
+		play: {
+			marginLeft: theme.spacing.md,
 		},
 		collaborators: {
 			flexDirection: 'row',

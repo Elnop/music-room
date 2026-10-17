@@ -1,13 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import {
-	View,
-	Text,
-	FlatList,
-	StyleSheet,
-	TouchableOpacity,
-	Switch,
-	RefreshControl,
-} from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native';
+import { ThemedSwitch } from '@components/common/ThemedSwitch';
 import { showError } from '@utils/toast';
 import { apiErrorMessage } from '@utils/apiErrorMessage';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -231,12 +224,10 @@ export function FriendsScreen() {
 							<LoadingSpinner size="small" />
 						</View>
 					) : (
-						<Switch
+						<ThemedSwitch
 							value={canControl}
 							onValueChange={() => handleToggleControl(item.id, canControl)}
 							disabled={!!togglingUserId}
-							trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
-							thumbColor={theme.colors.surface}
 						/>
 					)}
 				</View>

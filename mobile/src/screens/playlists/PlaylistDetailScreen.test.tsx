@@ -7,6 +7,11 @@ const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
 
 const mockFetchPlaylistById = jest.fn();
 let mockCurrentPlaylist: { id: string; ownerId: string; tracks: unknown[] } | null = null;
+let mockPlayer: {
+	queueItemId: string | null;
+	currentTrack: { permalink_url: string } | null;
+} = { queueItemId: null, currentTrack: null };
+let mockQueueItems: { id: string; sourcePlaylistId: string | null }[] = [];
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -49,7 +54,57 @@ jest.mock('@store/authStore', () => ({
 
 jest.mock('@store/queueStore', () => ({
 	useQueueStore: (select: (s: { addItem: jest.Mock }) => unknown) => select({ addItem: jest.fn() }),
+	useActiveQueue: () => ({ currentItemId: null, items: mockQueueItems, version: 1 }),
 }));
+
+jest.mock('@store/playerStore', () => ({
+	usePlayerStore: (select: (s: typeof mockPlayer) => unknown) => select(mockPlayer),
+}));
+
+type MockLibProps = {
+	data: { id: string }[];
+	keyExtractor: (item: { id: string }) => string;
+	renderItem: (info: { item: { id: string }; index: number }) => React.ReactElement;
+	ListHeaderComponent?: React.ReactElement | null;
+	ListEmptyComponent?: React.ReactElement | null;
+};
+
+// The library needs native drag: render the rows plainly.
+jest.mock('react-native-reorderable-list', () => {
+	const { Fragment } = jest.requireActual('react');
+	const { View } = jest.requireActual('react-native');
+	return {
+		__esModule: true,
+		default: (props: MockLibProps) => (
+			<View>
+				{props.ListHeaderComponent}
+				{props.data.length === 0
+					? props.ListEmptyComponent
+					: props.data.map((item, index) => (
+							<Fragment key={props.keyExtractor(item)}>
+								{props.renderItem({ item, index })}
+							</Fragment>
+						))}
+			</View>
+		),
+		reorderItems: <T,>(data: T[]) => data,
+		useReorderableDrag: () => jest.fn(),
+		useIsActive: () => false,
+	};
+});
+
+jest.mock('@components/common/SwipeableTrackItem', () => {
+	const { Text } = jest.requireActual('react-native');
+	return {
+		SwipeableTrackItem: ({
+			track,
+			isCurrent,
+		}: {
+			track: { title: string };
+			isCurrent?: boolean;
+		}) => <Text>{`${track.title}${isCurrent ? ' (current)' : ''}`}</Text>,
+	};
+});
 
 jest.mock('@store/playlistStore', () => ({
 	CONFLICT_CODES: [],
@@ -67,11 +122,6 @@ jest.mock('@store/playlistStore', () => ({
 
 jest.mock('@components/playlist/PlaylistHeader', () => ({
 	PlaylistHeader: () => null,
-}));
-
-jest.mock('@components/playlist/PlayPlaylistButton', () => ({
-	PLAY_PLAYLIST_BUTTON_SIZE: 56,
-	PlayPlaylistButton: () => null,
 }));
 
 jest.mock('@components/track/TrackActionsSheet', () => ({
@@ -103,6 +153,8 @@ const renderScreen = () => render(screenElement());
 beforeEach(() => {
 	jest.clearAllMocks();
 	mockCurrentPlaylist = null;
+	mockPlayer = { queueItemId: null, currentTrack: null };
+	mockQueueItems = [];
 	mockFetchPlaylistById.mockResolvedValue(undefined);
 });
 
@@ -175,5 +227,69 @@ describe('PlaylistDetailScreen load failure', () => {
 
 		await waitFor(() => expect(mockFetchPlaylistById).toHaveBeenCalledTimes(2));
 		expect(mockFetchPlaylistById).toHaveBeenLastCalledWith(ID);
+	});
+});
+
+describe('PlaylistDetailScreen tracks (#307)', () => {
+	const URI = 'https://soundcloud.com/artist/song';
+	const track = (id: string, title: string, trackUri: string) => ({
+		id,
+		title,
+		artist: 'Artist',
+		trackUri,
+	});
+
+	beforeEach(() => {
+		mockCurrentPlaylist = {
+			id: ID,
+			ownerId: 'me',
+			tracks: [
+				track('t1', 'Song', URI),
+				track('t2', 'Other', 'https://soundcloud.com/artist/other'),
+				track('t3', 'Song again', URI),
+			],
+		};
+		mockPlayer = { queueItemId: 'q1', currentTrack: { permalink_url: URI } };
+	});
+
+	it('highlights every row of the track playing from this playlist', () => {
+		mockQueueItems = [{ id: 'q1', sourcePlaylistId: ID }];
+		renderScreen();
+
+		expect(screen.getByText('Song (current)')).toBeTruthy();
+		expect(screen.getByText('Song again (current)')).toBeTruthy();
+		expect(screen.getByText('Other')).toBeTruthy();
+	});
+
+	it('highlights nothing when the same track plays from elsewhere', () => {
+		mockQueueItems = [{ id: 'q1', sourcePlaylistId: 'another-playlist' }];
+		renderScreen();
+
+		expect(screen.getByText('Song')).toBeTruthy();
+		expect(screen.getByText('Song again')).toBeTruthy();
+		expect(screen.queryByText(/\(current\)/)).toBeNull();
+	});
+
+	it('highlights nothing for a track played from search, outside the queue', () => {
+		mockPlayer = { queueItemId: null, currentTrack: { permalink_url: URI } };
+		renderScreen();
+
+		expect(screen.queryByText(/\(current\)/)).toBeNull();
+	});
+
+	it('shows the empty state without an add action', () => {
+		mockCurrentPlaylist = { id: ID, ownerId: 'me', tracks: [] };
+		renderScreen();
+
+		expect(screen.getByText("Aucun titre dans cette playlist pour l'instant")).toBeTruthy();
+		expect(screen.queryByText('Ajouter des titres')).toBeNull();
+	});
+
+	it('offers no add action to a viewer of an empty playlist', () => {
+		mockCurrentPlaylist = { id: ID, ownerId: 'someone-else', tracks: [] };
+		renderScreen();
+
+		expect(screen.getByText("Aucun titre dans cette playlist pour l'instant")).toBeTruthy();
+		expect(screen.queryByText('Ajouter des titres')).toBeNull();
 	});
 });

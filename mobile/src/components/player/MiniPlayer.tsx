@@ -137,7 +137,7 @@ export function MiniPlayer() {
 					</Animated.View>
 
 					<TouchableOpacity
-						style={styles.playButton}
+						style={[styles.playButton, !track && styles.playButtonEmpty]}
 						onPress={handleToggle}
 						hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
 						disabled={playDisabled}
@@ -151,11 +151,9 @@ export function MiniPlayer() {
 							<Ionicons
 								name={isPlaying ? 'pause' : 'play'}
 								size={20}
-								color="#FFFFFF"
-								style={[
-									isPlaying ? undefined : { marginLeft: 2 },
-									track ? undefined : styles.disabledIcon,
-								]}
+								// Nothing to play: a neutral icon that stays visible on the neutral button.
+								color={track ? '#FFFFFF' : theme.colors.textSecondary}
+								style={isPlaying ? undefined : { marginLeft: 2 }}
 							/>
 						)}
 					</TouchableOpacity>
@@ -257,6 +255,7 @@ const createStyles = (theme: Theme, insets: EdgeInsets) =>
 			flexDirection: 'row',
 			alignItems: 'center',
 			padding: theme.spacing.sm,
+			paddingRight: theme.spacing.md,
 		},
 		swipeArea: {
 			flex: 1,
@@ -303,6 +302,10 @@ const createStyles = (theme: Theme, insets: EdgeInsets) =>
 			backgroundColor: theme.colors.primary,
 			alignItems: 'center',
 			justifyContent: 'center',
+		},
+		// Nothing to play: a neutral button that does not look tappable.
+		playButtonEmpty: {
+			backgroundColor: theme.colors.surfaceAlt,
 		},
 		nextButton: {
 			width: 36,

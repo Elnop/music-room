@@ -1,13 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import {
-	View,
-	Text,
-	FlatList,
-	StyleSheet,
-	TouchableOpacity,
-	Switch,
-	ScrollView,
-} from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { ThemedSwitch } from '@components/common/ThemedSwitch';
 import { apiErrorMessage } from '@utils/apiErrorMessage';
 import { EmptyState } from '@components/common/EmptyState';
 import { showError, showWarning, showSuccess } from '@utils/toast';
@@ -428,12 +421,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 				{isUpdatingSettings ? (
 					<LoadingSpinner size="small" />
 				) : (
-					<Switch
-						value={isPrivate}
-						onValueChange={handleToggleVisibility}
-						trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
-						thumbColor={theme.colors.surface}
-					/>
+					<ThemedSwitch value={isPrivate} onValueChange={handleToggleVisibility} />
 				)}
 			</View>
 
@@ -459,12 +447,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 				{isUpdatingSettings ? (
 					<LoadingSpinner size="small" />
 				) : (
-					<Switch
-						value={isEditRestricted}
-						onValueChange={handleToggleEditMode}
-						trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
-						thumbColor={theme.colors.surface}
-					/>
+					<ThemedSwitch value={isEditRestricted} onValueChange={handleToggleEditMode} />
 				)}
 			</View>
 		</View>

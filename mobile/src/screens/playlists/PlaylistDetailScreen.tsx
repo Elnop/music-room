@@ -15,15 +15,13 @@ import { CONFLICT_CODES, usePlaylistStore } from '@store/playlistStore';
 import { afterRankForDrop } from '@store/moveTarget';
 import { ApiError } from '@/services/api';
 import { useAuthStore } from '@store/authStore';
-import { useQueueStore } from '@store/queueStore';
+import { useActiveQueue, useQueueStore } from '@store/queueStore';
+import { usePlayerStore } from '@store/playerStore';
+import { selectPlaysPlaylist } from '@store/queueSelectors';
 import { toTrackInput } from '@utils/trackInput';
 import { canEditPlaylist } from '@utils/playlistPermissions';
 import { usePlaylistSocket } from '@hooks/usePlaylistSocket';
 import { PlaylistHeader } from '@components/playlist/PlaylistHeader';
-import {
-	PLAY_PLAYLIST_BUTTON_SIZE,
-	PlayPlaylistButton,
-} from '@components/playlist/PlayPlaylistButton';
 import { SwipeableTrackItem } from '@components/common/SwipeableTrackItem';
 import { TrackActionsSheet } from '@components/track/TrackActionsSheet';
 import type { AddQueueItemBody } from '@/types/queue.types';
@@ -60,6 +58,11 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 	const { id } = route.params;
 	const { user } = useAuthStore();
 	const addToQueue = useQueueStore(state => state.addItem);
+	// The track playing now, when it plays from this playlist's queue block (#307).
+	const queueItemId = usePlayerStore(state => state.queueItemId);
+	const playingUri = usePlayerStore(state => state.currentTrack?.permalink_url ?? null);
+	const playsThisPlaylist = selectPlaysPlaylist(useActiveQueue(), queueItemId, id);
+	const currentUri = playsThisPlaylist ? playingUri : null;
 	const [actionTrack, setActionTrack] = React.useState<AddQueueItemBody | null>(null);
 	const {
 		currentPlaylist,
@@ -266,6 +269,8 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 				keyExtractor={item => item.id}
 				onReorder={handleReorder}
 				dragEnabled={canEdit && !isMoving}
+				// Rows re-render when the playing track changes, to move the highlight.
+				extraData={currentUri}
 				renderItem={({ item, drag, isActive }) => (
 					<SwipeableTrackItem
 						track={item}
@@ -275,6 +280,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 						onShowActions={() => setActionTrack(toTrackInput(item))}
 						onDragStart={canEdit ? drag : undefined}
 						isDragActive={isActive}
+						isCurrent={currentUri !== null && item.trackUri === currentUri}
 					/>
 				)}
 				ListHeaderComponent={
@@ -284,18 +290,12 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 						onAddTrack={handleAddTrack}
 					/>
 				}
-				// The last track scrolls clear of the floating Play button and the mini player.
-				contentContainerStyle={[
-					styles.list,
-					{
-						paddingBottom: playerHeight + PLAY_PLAYLIST_BUTTON_SIZE + theme.spacing.md * 2,
-					},
-				]}
+				// The last track scrolls clear of the mini player.
+				contentContainerStyle={[styles.list, { paddingBottom: playerHeight + theme.spacing.md }]}
 				ListEmptyComponent={
 					<EmptyState
 						icon="musical-notes-outline"
 						message="Aucun titre dans cette playlist pour l'instant"
-						action={canEdit ? { label: 'Ajouter des titres', onPress: handleAddTrack } : undefined}
 					/>
 				}
 				refreshControl={
@@ -308,8 +308,6 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 				}
 				showsVerticalScrollIndicator={false}
 			/>
-
-			<PlayPlaylistButton playlistId={id} trackCount={currentPlaylist.tracks.length} />
 
 			<TrackActionsSheet track={actionTrack} onClose={() => setActionTrack(null)} />
 		</View>

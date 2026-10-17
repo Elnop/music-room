@@ -62,6 +62,11 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 	const [addingTrackId, setAddingTrackId] = useState<number | null>(null);
 	const [addedTrackUris, setAddedTrackUris] = useState<Set<string>>(new Set());
 	const [actionTrack, setActionTrack] = useState<AddQueueItemBody | null>(null);
+	// The rows re-render when a track starts or ends being added: spinner, then check (#307).
+	const rowState = React.useMemo(
+		() => ({ addingTrackId, addedTrackUris }),
+		[addingTrackId, addedTrackUris]
+	);
 
 	React.useEffect(() => {
 		if (currentPlaylist?.tracks) {
@@ -152,9 +157,14 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 							]}
 						>
 							{isAdding ? (
-								<ActivityIndicator size="small" color="#FFFFFF" />
+								<ActivityIndicator size="small" color="#FFFFFF" testID={`adding-${item.id}`} />
 							) : (
-								<Ionicons name={isAdded ? 'checkmark' : 'add'} size={20} color="#FFFFFF" />
+								<Ionicons
+									name={isAdded ? 'checkmark' : 'add'}
+									size={20}
+									color="#FFFFFF"
+									testID={`${isAdded ? 'added' : 'add'}-${item.id}`}
+								/>
 							)}
 						</View>
 					</TouchableOpacity>
@@ -204,6 +214,7 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 					data={searchResults}
 					keyExtractor={item => item.id.toString()}
 					renderItem={renderTrackItem}
+					extraData={rowState}
 					contentContainerStyle={[styles.list, { paddingBottom: playerHeight + theme.spacing.xl }]}
 					showsVerticalScrollIndicator={false}
 					ListEmptyComponent={
