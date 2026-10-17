@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { authMiddleware } from '@/features/auth/auth.middleware.js';
+import { avatarRateLimiter } from '@/features/auth/middleware/rate-limit.middleware.js';
 import { ProfileController } from '@/features/profile/profile.controller.js';
+import { avatarUpload } from '@/features/profile/utils/avatar-upload.js';
 
 const router = Router();
 const controller = new ProfileController();
@@ -84,6 +86,28 @@ router.put('/music-preferences', (req, res, next) =>
  */
 router.get('/music-preferences/genres', (req, res, next) =>
 	controller.getAvailableGenres(req, res, next)
+);
+
+// =====================================================
+// Avatar Routes
+// =====================================================
+
+/**
+ * @route   PUT /api/profile/avatar
+ * @desc    Upload a new profile photo (multipart field `avatar`, JPEG/PNG/WebP, max 2 MB)
+ * @access  Private, rate-limited per user
+ */
+router.put('/avatar', avatarRateLimiter, avatarUpload, (req, res, next) =>
+	controller.uploadAvatar(req, res, next)
+);
+
+/**
+ * @route   DELETE /api/profile/avatar
+ * @desc    Remove the profile photo
+ * @access  Private, rate-limited per user
+ */
+router.delete('/avatar', avatarRateLimiter, (req, res, next) =>
+	controller.removeAvatar(req, res, next)
 );
 
 // =====================================================

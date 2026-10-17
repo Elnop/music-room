@@ -48,7 +48,7 @@ Mobile tests never reach the network. `mobile/src/services/api.ts`, the socket s
 
 The backend uses `supabase-js`, which goes through PostgREST and Supabase Auth, and the migrations rely on `auth.uid()` and `auth.users`. A plain Postgres cannot run them, so integration tests run against the local Supabase stack from the Supabase CLI, already a backend dev dependency (`supabase`).
 
-- `make test-db-up` (`backend/scripts/test-db.sh up`) starts the stack in Docker with only Postgres, PostgREST, Auth and Kong, resets the database, applies `backend/migrations/*.sql` in file order, starts the test Redis container and writes `backend/.env.test`. It takes about 20 s once the images are pulled.
+- `make test-db-up` (`backend/scripts/test-db.sh up`) starts the stack in Docker with only Postgres, PostgREST, Auth, Storage and Kong, resets the database, applies `backend/migrations/*.sql` in file order, starts the test Redis container and writes `backend/.env.test`. It takes about 20 s once the images are pulled. A test stack started before Storage was added (#351) has no `storage-api`: run `make test-db-down` then `make test-db-up` once. For the dev stack, run `make supabase-down` then `make supabase-up` once; on the hosted project, Storage must be enabled before applying migration 027.
 - `make test-int` runs `make test-db-up`, then `npm run test:int`. Every run starts from a fresh database.
 - `make test-db-down` stops the stack, drops its data and removes the Redis container.
 - The stack is named `music-room-test` and listens on ports 554xx (API `http://127.0.0.1:55421`, Postgres `127.0.0.1:55422`), set in `backend/supabase/config.toml`, so it runs next to another local Supabase project on the default 543xx ports.

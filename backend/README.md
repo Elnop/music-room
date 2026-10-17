@@ -52,12 +52,13 @@ Cette commande va :
 
 | Commande | Effet |
 | --- | --- |
-| `make supabase-up` | Démarre la stack (Postgres, PostgREST, Auth, Kong, Mailpit, Studio), applique les fichiers de `migrations/` pas encore appliqués, écrit `.env.supabase.local` |
+| `make supabase-up` | Démarre la stack (Postgres, PostgREST, Auth, Storage, Kong, Mailpit, Studio), applique les fichiers de `migrations/` pas encore appliqués, écrit `.env.supabase.local` |
 | `make supabase-down` | Arrête la stack ; les données restent |
 | `make supabase-reset` | Vide la base, réapplique toutes les migrations et charge les données de démo (comptes Bob l'éponge, amis, playlists : `doc/DEMO_ACCOUNTS.md`) |
 | `make logs-supabase` | Suit les logs de la stack (préfixes `[SB-DB]`, `[SB-AUTH]`, `[SB-REST]`, `[SB-KONG]`, `[SB-MAIL]`, `[SB-STUDIO]`, `[SB-META]`) ; `make logs` les inclut en mode local |
 
 - Script : `scripts/dev-db.sh` ; config CLI : `supabase-dev/supabase/config.toml` (workdir séparé de `supabase/`, qui sert à la stack de test `music-room-test`).
+- Storage (photos de profil, #351) : une stack de dev lancée avant son ajout tourne sans `storage-api`, que `make supabase-up` ne démarre pas sur une stack déjà lancée. Une fois après cette mise à jour, lancez `make supabase-down` puis `make supabase-up` ; sinon les uploads échouent et la migration 027 peut échouer. Sur le projet hébergé, Storage doit être activé avant d'appliquer `027_avatars_bucket.sql`.
 - Ports 544xx : API `http://127.0.0.1:54421`, Postgres `127.0.0.1:54422`, Studio (dashboard) `http://127.0.0.1:54423`, Mailpit `http://127.0.0.1:54424` (interface web) et `54425` (SMTP). La stack de test (554xx) et `make test-int` n'y touchent pas.
 - Migrations suivies dans `zumik_dev.applied_migrations` (hors `public`) : chaque fichier tourne dans une transaction avec sa ligne de suivi ; un fichier en échec est nommé et rien n'en reste. Pas de `db reset` dans `supabase-up`.
 - `.env.supabase.local` (git-ignoré, clés locales de démo) contient `SUPABASE_URL=http://<IP LAN>:54421`, les clés anon et service, et `SMTP_HOST`/`SMTP_PORT` (Mailpit). `make dev-docker` le passe au conteneur backend en second `--env-file` (il l'emporte sur `.env` ; seuls `SUPABASE_URL` et `SMTP_HOST` sont remplacés, voir plus bas) et écrit l'URL et la clé anon dans `mobile/.env.development.local` (`EXPO_PUBLIC_SUPABASE_*`). `make dev-local`, `make backend-local` et `make perf-fixtures` exportent les mêmes valeurs avec `localhost`. Les cibles qui lancent le backend ou écrivent dans la base (`dev-docker`, `dev-local`, `backend-docker`, `backend-local`, `perf-fixtures`, `generate-types`) lancent d'abord `supabase-up` ; `expo-android` et `expo-clear` (Metro seul) reprennent les clés de `.env.supabase.local` sans démarrer la stack.

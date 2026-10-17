@@ -1,4 +1,9 @@
-import type { UserProfile, UpdateProfileData, FilteredProfile } from '@/types/user.types';
+import type {
+	UserProfile,
+	UpdateProfileData,
+	FilteredProfile,
+	AvatarResponse,
+} from '@/types/user.types';
 
 import { authRequest } from '@/services/api';
 
@@ -13,6 +18,29 @@ export const profileApi = {
 		return authRequest<UserProfile>('/api/profile', accessToken, {
 			method: 'PATCH',
 			body: JSON.stringify(data),
+		});
+	},
+
+	/**
+	 * Upload a new profile photo: the local JPEG at `uri` (already square, 512 px)
+	 * as the multipart field `avatar`
+	 */
+	async uploadAvatar(accessToken: string, uri: string): Promise<AvatarResponse> {
+		const form = new FormData();
+		// React Native's FormData reads the file from { uri, name, type }.
+		form.append('avatar', { uri, name: 'avatar.jpg', type: 'image/jpeg' } as unknown as Blob);
+		return authRequest<AvatarResponse>('/api/profile/avatar', accessToken, {
+			method: 'PUT',
+			body: form,
+		});
+	},
+
+	/**
+	 * Remove the profile photo (initials are shown again)
+	 */
+	async removeAvatar(accessToken: string): Promise<AvatarResponse> {
+		return authRequest<AvatarResponse>('/api/profile/avatar', accessToken, {
+			method: 'DELETE',
 		});
 	},
 

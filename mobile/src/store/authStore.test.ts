@@ -615,3 +615,23 @@ describe('session persistence', () => {
 		expectAuthenticated();
 	});
 });
+
+describe('setAvatarUrl (#351)', () => {
+	const URL = 'https://x.supabase.co/storage/v1/object/public/avatars/user-a/new.jpg';
+
+	it('sets the new avatar on the user and persists it', async () => {
+		await useAuthStore.getState().setAvatarUrl(URL);
+
+		expect(useAuthStore.getState().user?.avatarUrl).toBe(URL);
+		const stored = JSON.parse((await AsyncStorage.getItem('@zumik/auth_user')) ?? '{}');
+		expect(stored.avatarUrl).toBe(URL);
+	});
+
+	it('clears the avatar after a removal', async () => {
+		await useAuthStore.getState().setAvatarUrl(URL);
+		await useAuthStore.getState().setAvatarUrl(null);
+
+		expect(useAuthStore.getState().user?.avatarUrl).toBeUndefined();
+		expect(useAuthStore.getState().user?.username).toBe('alice');
+	});
+});

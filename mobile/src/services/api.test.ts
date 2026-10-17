@@ -71,3 +71,33 @@ describe('apiRequest backend address', () => {
 		expect(error).toMatchObject({ status: 404, code: 'STREAM_NOT_FOUND' });
 	});
 });
+
+describe('apiRequest body type (#351)', () => {
+	it('sends JSON with a JSON Content-Type', async () => {
+		await apiRequest('/api/profile', { method: 'PATCH', body: JSON.stringify({ bio: 'x' }) });
+
+		const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+		expect(init.headers).toMatchObject({ 'Content-Type': 'application/json' });
+	});
+
+	it('lets fetch set the multipart Content-Type of a FormData body, keeping the client headers', async () => {
+		const form = new FormData();
+		form.append('avatar', 'x');
+
+		await apiRequest('/api/profile/avatar', {
+			method: 'PUT',
+			body: form,
+			headers: { Authorization: 'Bearer token' },
+		});
+
+		const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+		const headers = init.headers as Record<string, string>;
+		expect(headers['Content-Type']).toBeUndefined();
+		expect(init.body).toBe(form);
+		expect(headers).toMatchObject({
+			Authorization: 'Bearer token',
+			'X-Platform': expect.any(String),
+			'X-App-Version': '1.2.3',
+		});
+	});
+});

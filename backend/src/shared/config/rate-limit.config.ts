@@ -52,6 +52,12 @@ export const rateLimitConfig = {
 		max: env.RATE_LIMIT_SOUNDCLOUD_MAX, // 120 requests by default
 	},
 
+	// Profile photo upload and removal, per authenticated user
+	avatar: {
+		windowMs: env.RATE_LIMIT_AVATAR_WINDOW_MS, // 1 hour by default
+		max: env.RATE_LIMIT_AVATAR_MAX, // 10 changes by default
+	},
+
 	// Account lockout configuration
 	lockout: {
 		enabled: env.ACCOUNT_LOCKOUT_ENABLED !== 'false',

@@ -141,6 +141,13 @@ export interface UpdateProfileData {
 }
 
 /**
+ * Answer of PUT and DELETE /api/profile/avatar: the new photo URL, null once removed
+ */
+export interface AvatarResponse {
+	avatarUrl: string | null;
+}
+
+/**
  * Profile with privacy-filtered fields
  * Fields are undefined if hidden by privacy, present (even if empty) if visible
  */
