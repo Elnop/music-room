@@ -19,6 +19,10 @@ interface SoundCloudState {
 	clearError: () => void;
 }
 
+// Number of the latest search: an answer to an older one, overtaken or cleared
+// since, is dropped (#349).
+let latestSearch = 0;
+
 export const useSoundCloudStore = create<SoundCloudState>(set => ({
 	searchResults: [],
 	isSearching: false,
@@ -26,8 +30,9 @@ export const useSoundCloudStore = create<SoundCloudState>(set => ({
 	totalResults: 0,
 
 	search: async (query: string, limit = 20, options = {}) => {
+		const searchId = ++latestSearch;
 		if (!query.trim()) {
-			set({ searchResults: [], totalResults: 0 });
+			set({ searchResults: [], totalResults: 0, isSearching: false });
 			return;
 		}
 
@@ -42,6 +47,7 @@ export const useSoundCloudStore = create<SoundCloudState>(set => ({
 			const data = await apiRequest<SoundCloudSearchResult>(
 				`/api/soundcloud/search?${params.toString()}`
 			);
+			if (searchId !== latestSearch) return;
 
 			set({
 				searchResults: data.collection || [],
@@ -49,6 +55,7 @@ export const useSoundCloudStore = create<SoundCloudState>(set => ({
 				isSearching: false,
 			});
 		} catch (error) {
+			if (searchId !== latestSearch) return;
 			set({
 				error: error instanceof Error ? error.message : 'La recherche a échoué',
 				isSearching: false,
@@ -58,10 +65,12 @@ export const useSoundCloudStore = create<SoundCloudState>(set => ({
 	},
 
 	clearSearch: () => {
+		latestSearch++;
 		set({
 			searchResults: [],
 			totalResults: 0,
 			error: null,
+			isSearching: false,
 		});
 	},
 
