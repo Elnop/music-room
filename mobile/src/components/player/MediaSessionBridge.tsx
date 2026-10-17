@@ -12,6 +12,7 @@ import {
 } from 'expo-media-control';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { useNowPlaying, type NowPlaying } from '@/hooks/useNowPlaying';
+import { largeArtwork } from '@/utils/artwork';
 
 /** A position this far from where the system extrapolates it is a jump (seek, restart, renewal). */
 export const POSITION_JUMP_MS = 2000;
@@ -141,7 +142,7 @@ export function MediaSessionBridge() {
 	const trackId = track?.id;
 	const title = track?.title;
 	const artist = track?.artist;
-	const artworkUrl = track?.artworkUrl;
+	const artworkUrl = largeArtwork(track?.artworkUrl);
 	useEffect(() => {
 		if (trackId === undefined || title === undefined) return;
 		const metadata: MediaMetadata = { title, artist };
