@@ -36,12 +36,17 @@ jest.mock('@store/playlistStore', () => ({
 	usePlaylistStore: () => ({ addTrack: mockAddTrack, currentPlaylist: null }),
 }));
 
+const mockSearch = jest.fn();
+// Stable like the real store's actions: the screen memoizes its debounce on them.
+const mockClearSearch = jest.fn();
+let mockHasResults = true;
+
 jest.mock('@store/soundcloudStore', () => ({
 	useSoundCloudStore: () => ({
-		searchResults: [mockResult()],
+		searchResults: mockHasResults ? [mockResult()] : [],
 		isSearching: false,
-		search: jest.fn(),
-		clearSearch: jest.fn(),
+		search: mockSearch,
+		clearSearch: mockClearSearch,
 	}),
 }));
 
@@ -79,6 +84,7 @@ const renderScreen = async () => {
 
 beforeEach(() => {
 	jest.clearAllMocks();
+	mockHasResults = true;
 });
 
 describe('SearchTracksScreen adding (#307)', () => {
@@ -113,5 +119,35 @@ describe('SearchTracksScreen adding (#307)', () => {
 		expect(showError).toHaveBeenCalled();
 		expect(screen.queryByTestId('adding-42')).toBeNull();
 		expect(screen.getByTestId('add-42')).toBeTruthy();
+	});
+});
+
+describe('SearchTracksScreen loading (#307)', () => {
+	beforeEach(() => {
+		jest.useFakeTimers();
+		mockHasResults = false;
+	});
+
+	afterEach(() => {
+		jest.useRealTimers();
+	});
+
+	it('shows the skeleton and the bar spinner, not « Aucun titre trouvé », during the debounce', async () => {
+		await renderScreen();
+
+		fireEvent.changeText(screen.getByPlaceholderText('Rechercher sur SoundCloud...'), 'daft');
+
+		expect(screen.getByTestId('skeleton-list')).toBeTruthy();
+		expect(screen.getByTestId('search-bar-loading')).toBeTruthy();
+		expect(screen.queryByText('Aucun titre trouvé')).toBeNull();
+		expect(mockSearch).not.toHaveBeenCalled();
+
+		await act(async () => {
+			jest.advanceTimersByTime(500);
+		});
+
+		expect(mockSearch).toHaveBeenCalledWith('daft');
+		expect(screen.queryByTestId('skeleton-list')).toBeNull();
+		expect(screen.getByText('Aucun titre trouvé')).toBeTruthy();
 	});
 });

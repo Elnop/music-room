@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { View, TextInput, FlatList, StyleSheet, RefreshControl } from 'react-native';
+import { View, FlatList, StyleSheet, RefreshControl } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
 import type { Theme } from '@/themes/types';
@@ -10,6 +10,7 @@ import { SoundCloudTrackItem } from '@screens/search/components/SoundCloudTrackI
 import { TrackActionsSheet } from '@components/track/TrackActionsSheet';
 import { SkeletonList, TrackRowSkeleton } from '@components/common/Skeleton';
 import { EmptyState } from '@components/common/EmptyState';
+import { SearchBar } from '@components/common/SearchBar';
 import { showError } from '@utils/toast';
 import debounce from 'lodash/debounce';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
@@ -21,6 +22,8 @@ export function SoundCloudSearchScreen() {
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
 	const [searchQuery, setSearchQuery] = useState('');
+	// A typed query waiting for its debounce counts as loading (#307).
+	const [isPending, setIsPending] = useState(false);
 	const [actionTrack, setActionTrack] = useState<AddQueueItemBody | null>(null);
 
 	const { searchResults, isSearching, error, search, clearSearch, clearError } =
@@ -32,10 +35,13 @@ export function SoundCloudSearchScreen() {
 	const debouncedSearch = useMemo(
 		() =>
 			debounce((query: string) => {
+				setIsPending(false);
 				search(query);
 			}, 500),
 		[search]
 	);
+
+	useEffect(() => () => debouncedSearch.cancel(), [debouncedSearch]);
 
 	// A failed search is a toast (#318); the store keeps its own (English) text.
 	// `error` stays set until the next search so the list says the search failed.
@@ -47,17 +53,23 @@ export function SoundCloudSearchScreen() {
 		setSearchQuery(text);
 		clearError();
 		if (text.trim()) {
+			setIsPending(true);
 			debouncedSearch(text);
 		} else {
+			debouncedSearch.cancel();
+			setIsPending(false);
 			clearSearch();
 		}
 	};
+
+	const isLoading = isSearching || isPending;
 
 	// Pull to refresh reruns the current query; with no query there is nothing to fetch.
 	const [isRefreshing, setIsRefreshing] = useState(false);
 	const handleRefresh = useCallback(async () => {
 		if (!searchQuery.trim()) return;
 		debouncedSearch.cancel();
+		setIsPending(false);
 		setIsRefreshing(true);
 		clearError();
 		try {
@@ -75,18 +87,15 @@ export function SoundCloudSearchScreen() {
 	return (
 		<View style={styles.container}>
 			<View style={styles.header}>
-				<TextInput
-					style={styles.searchInput}
-					placeholder="Rechercher sur SoundCloud..."
-					placeholderTextColor={theme.colors.textSecondary}
+				<SearchBar
 					value={searchQuery}
 					onChangeText={handleSearchChange}
-					autoCapitalize="none"
-					autoCorrect={false}
+					placeholder="Rechercher sur SoundCloud..."
+					loading={isLoading && !isRefreshing}
 				/>
 			</View>
 
-			{isSearching && !isRefreshing && searchResults.length === 0 ? (
+			{isLoading && !isRefreshing && searchResults.length === 0 ? (
 				<SkeletonList count={8} row={TrackRowSkeleton} />
 			) : (
 				<FlatList
@@ -113,7 +122,7 @@ export function SoundCloudSearchScreen() {
 						flexGrow: 1,
 					}}
 					ListEmptyComponent={
-						isSearching ? null : error && searchQuery.trim() ? (
+						isLoading ? null : error && searchQuery.trim() ? (
 							<EmptyState
 								icon="cloud-offline-outline"
 								message="La recherche a échoué"
@@ -148,13 +157,5 @@ const createStyles = (theme: Theme) =>
 			paddingHorizontal: theme.spacing.lg,
 			paddingTop: theme.spacing.xs,
 			paddingBottom: theme.spacing.md,
-		},
-		searchInput: {
-			backgroundColor: theme.colors.surfaceAlt,
-			borderRadius: 8,
-			paddingVertical: 12,
-			paddingHorizontal: theme.spacing.md,
-			fontSize: 16,
-			color: theme.colors.text,
 		},
 	});

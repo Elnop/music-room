@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Modal, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Slider from '@react-native-community/slider';
@@ -24,6 +24,7 @@ import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { QueueModal } from '@/components/player/QueueModal';
 import { DevicePickerSheet } from '@/components/player/DevicePickerSheet';
 import { largeArtwork } from '@/utils/artwork';
+import { Artwork } from '@/components/common/Artwork';
 
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const DISMISS_THRESHOLD = SCREEN_HEIGHT * 0.2; // 20% de l'écran pour fermer
@@ -198,8 +199,6 @@ export function PlayerModal() {
 	const sliderDisabled = isRemote || isLoading || !player || !track;
 	const playDisabled = isLoading || !track;
 
-	const displayArtwork = artworkUrl || 'https://via.placeholder.com/300';
-
 	return (
 		<Modal
 			visible={isModalOpen}
@@ -282,7 +281,12 @@ export function PlayerModal() {
 							<View style={styles.artworkWrapper}>
 								<View style={styles.artworkShadow}>
 									{track ? (
-										<Image source={{ uri: displayArtwork }} style={styles.artwork} />
+										<Artwork
+											uri={artworkUrl}
+											size={ARTWORK_SIZE}
+											style={styles.artwork}
+											iconSize={64}
+										/>
 									) : (
 										<View style={[styles.artwork, styles.emptyArtwork]}>
 											<Ionicons name="musical-notes" size={64} color={colors.textSecondary} />
@@ -516,7 +520,7 @@ const createStyles = (theme: Theme, insets: { top: number; bottom: number }) =>
 			width: ARTWORK_SIZE,
 			height: ARTWORK_SIZE,
 			borderRadius: 12,
-			backgroundColor: theme.colors.surface,
+			backgroundColor: theme.colors.surfaceAlt,
 		},
 		emptyArtwork: {
 			alignItems: 'center',

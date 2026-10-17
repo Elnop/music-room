@@ -16,6 +16,14 @@ export interface SoundCloudTrack {
 	stream_url?: string;
 	streamable?: boolean;
 	playable: boolean;
+	/** SoundCloud's access policy, e.g. 'ALLOW', or 'SNIP' for a 30-second preview. */
+	policy?: string;
+	media?: {
+		transcodings?: Array<{
+			/** True when this stream is only the 30-second preview. */
+			snipped?: boolean;
+		}>;
+	};
 }
 
 export interface SoundCloudSearchResult {

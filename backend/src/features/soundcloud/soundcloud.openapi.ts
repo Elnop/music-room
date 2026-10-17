@@ -349,6 +349,27 @@ export const soundcloudSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 				format: 'date-time',
 				description: 'Track upload date',
 			},
+			policy: {
+				type: 'string',
+				description: "SoundCloud's access policy, e.g. ALLOW, or SNIP for a 30-second preview",
+			},
+			media: {
+				type: 'object',
+				properties: {
+					transcodings: {
+						type: 'array',
+						items: {
+							type: 'object',
+							properties: {
+								snipped: {
+									type: 'boolean',
+									description: 'True when this stream is only the 30-second preview',
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 	},
 };

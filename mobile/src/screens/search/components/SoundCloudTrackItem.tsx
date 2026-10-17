@@ -1,7 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { QueueSwipe } from '@/components/common/QueueSwipe';
+import { Artwork } from '@/components/common/Artwork';
+import { PreviewBadge } from '@/components/track/PreviewBadge';
+import { isPreviewOnly } from '@/utils/soundcloudPreview';
 import { TrackActionsButton } from '@/components/track/TrackActionsButton';
 import type { Theme } from '@/themes/types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
@@ -25,7 +28,7 @@ export function SoundCloudTrackItem({ track, onPlay, onAddToQueue, onShowActions
 		return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 	};
 
-	const artworkUrl = track.artwork_url || track.user.avatar_url || 'https://via.placeholder.com/50';
+	const artworkUrl = track.artwork_url || track.user.avatar_url;
 
 	return (
 		<QueueSwipe onAddToQueue={() => onAddToQueue(track)}>
@@ -35,14 +38,17 @@ export function SoundCloudTrackItem({ track, onPlay, onAddToQueue, onShowActions
 				onLongPress={() => onShowActions(track)}
 				activeOpacity={0.6}
 			>
-				<Image source={{ uri: artworkUrl }} style={styles.artwork} />
+				<Artwork uri={artworkUrl} size={48} style={styles.artwork} />
 				<View style={styles.info}>
 					<Text style={styles.title} numberOfLines={1}>
 						{track.title}
 					</Text>
-					<Text style={styles.artist} numberOfLines={1}>
-						{track.user.username}
-					</Text>
+					<View style={styles.subtitle}>
+						{isPreviewOnly(track) && <PreviewBadge />}
+						<Text style={styles.artist} numberOfLines={1}>
+							{track.user.username}
+						</Text>
+					</View>
 				</View>
 				<Text style={styles.duration}>{formatDuration(track.duration)}</Text>
 				<TrackActionsButton onPress={() => onShowActions(track)} />
@@ -62,14 +68,18 @@ const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.background,
 		},
 		artwork: {
-			width: 48,
-			height: 48,
 			borderRadius: 4,
-			backgroundColor: theme.colors.surfaceAlt,
 		},
 		info: {
 			flex: 1,
 			marginLeft: theme.spacing.md,
+			// Keeps a long title off the duration (#307).
+			marginRight: theme.spacing.sm,
+		},
+		subtitle: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			gap: theme.spacing.xs,
 		},
 		title: {
 			fontSize: theme.typography.sizes.md,
@@ -78,10 +88,12 @@ const createStyles = (theme: Theme) =>
 			marginBottom: 2,
 		},
 		artist: {
+			flexShrink: 1,
 			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.textSecondary,
 		},
 		duration: {
+			flexShrink: 0,
 			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.textSecondary,
 			marginRight: theme.spacing.sm,
