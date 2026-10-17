@@ -51,19 +51,41 @@ export function ProfileScreen() {
 		navigation.navigate('EditProfile');
 	}, [navigation]);
 
-	// Configure settings button in native header
+	const handleSettings = useCallback(() => {
+		navigation.navigate('Settings');
+	}, [navigation]);
+
+	// Edit-profile and settings buttons in the native header
 	useLayoutEffect(() => {
+		const buttonStyle = {
+			width: 36,
+			height: 36,
+			alignItems: 'center',
+			justifyContent: 'center',
+		} as const;
 		navigation.setOptions({
 			headerRight: () => (
-				<Pressable
-					onPress={handleEditProfile}
-					style={{ width: 36, height: 36, alignItems: 'center', justifyContent: 'center' }}
-				>
-					<Ionicons name="settings-outline" size={24} color={theme.colors.text} />
-				</Pressable>
+				<View style={{ flexDirection: 'row' }}>
+					<Pressable
+						onPress={handleEditProfile}
+						accessibilityRole="button"
+						accessibilityLabel="Modifier le profil"
+						style={buttonStyle}
+					>
+						<Ionicons name="create-outline" size={24} color={theme.colors.text} />
+					</Pressable>
+					<Pressable
+						onPress={handleSettings}
+						accessibilityRole="button"
+						accessibilityLabel="Réglages"
+						style={buttonStyle}
+					>
+						<Ionicons name="settings-outline" size={24} color={theme.colors.text} />
+					</Pressable>
+				</View>
 			),
 		});
-	}, [navigation, handleEditProfile, theme.colors.text]);
+	}, [navigation, handleEditProfile, handleSettings, theme.colors.text]);
 
 	// Load profile data (music preferences + stats)
 	const loadProfileData = useCallback(async () => {

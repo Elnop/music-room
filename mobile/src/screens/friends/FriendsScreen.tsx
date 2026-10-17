@@ -252,6 +252,9 @@ export function FriendsScreen() {
 	);
 
 	const hasFriends = friends.length > 0;
+	// Without friends the search list stands in for the friends tab, but only once the
+	// friends load has finished: before that, the skeleton is the only thing to show.
+	const showSearch = activeTab === 'search' || (!hasFriends && !isLoading);
 
 	return (
 		<View style={styles.container}>
@@ -278,7 +281,7 @@ export function FriendsScreen() {
 					</View>
 				)}
 
-				{(activeTab === 'search' || !hasFriends) && (
+				{showSearch && (
 					<SearchBar
 						value={searchQuery}
 						onChangeText={handleSearchChange}
@@ -322,7 +325,7 @@ export function FriendsScreen() {
 					/>
 				))}
 
-			{(activeTab === 'search' || !hasFriends) &&
+			{showSearch &&
 				(isSearching && !isRefreshingSearch && searchResults.length === 0 ? (
 					<SkeletonList count={6} row={UserRowSkeleton} />
 				) : (

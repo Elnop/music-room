@@ -81,7 +81,7 @@ export function ProfileNavigator() {
 			<ProfileStack.Screen
 				name="Settings"
 				component={SettingsScreen}
-				options={{ title: 'Settings' }}
+				options={{ title: 'Réglages' }}
 			/>
 		</ProfileStack.Navigator>
 	);

@@ -18,25 +18,13 @@ export function SettingsScreen() {
 			contentContainerStyle={{ paddingBottom: playerHeight + theme.spacing.xl }}
 		>
 			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>Appearance</Text>
+				<Text style={styles.sectionTitle}>Thème</Text>
 				<ThemeSelector />
 			</View>
 
 			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>Server</Text>
+				<Text style={styles.sectionTitle}>Serveur</Text>
 				<BackendUrlField />
-			</View>
-
-			{/* Future section: Account */}
-			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>Account</Text>
-				<Text style={styles.placeholder}>Account settings coming soon...</Text>
-			</View>
-
-			{/* Future section: Notifications */}
-			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>Notifications</Text>
-				<Text style={styles.placeholder}>Notification settings coming soon...</Text>
 			</View>
 		</ScrollView>
 	);
@@ -58,10 +46,5 @@ const createStyles = (theme: Theme) =>
 			fontWeight: theme.typography.weights.bold,
 			color: theme.colors.text,
 			marginBottom: theme.spacing.md,
-		},
-		placeholder: {
-			fontSize: theme.typography.sizes.sm,
-			color: theme.colors.textSecondary,
-			fontStyle: 'italic',
 		},
 	});
