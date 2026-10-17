@@ -1,12 +1,21 @@
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { Alert, Platform } from 'react-native';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { PlaylistDetailScreen } from '@/screens/playlists/PlaylistDetailScreen';
 import { ApiError } from '@/services/api';
+import { showError, showInfo, showSuccess } from '@utils/toast';
 
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
 
 const mockFetchPlaylistById = jest.fn();
-let mockCurrentPlaylist: { id: string; ownerId: string; tracks: unknown[] } | null = null;
+const mockDeletePlaylist = jest.fn();
+let mockDeleted = false;
+let mockCurrentPlaylist: {
+	id: string;
+	ownerId: string;
+	name?: string;
+	tracks: unknown[];
+} | null = null;
 let mockPlayer: {
 	queueItemId: string | null;
 	currentTrack: { permalink_url: string } | null;
@@ -45,7 +54,7 @@ jest.mock('@/hooks/useImageColors', () => ({
 }));
 
 jest.mock('@hooks/usePlaylistSocket', () => ({
-	usePlaylistSocket: jest.fn(),
+	usePlaylistSocket: () => ({ deleted: mockDeleted }),
 }));
 
 jest.mock('@store/authStore', () => ({
@@ -117,6 +126,7 @@ jest.mock('@store/playlistStore', () => ({
 		pendingMoves: 0,
 		conflictMessage: null,
 		clearConflictMessage: jest.fn(),
+		deletePlaylist: mockDeletePlaylist,
 	}),
 }));
 
@@ -138,12 +148,21 @@ type Props = React.ComponentProps<typeof PlaylistDetailScreen>;
 
 const mockSetOptions = jest.fn();
 const mockNavigate = jest.fn();
+const mockGoBack = jest.fn();
+const mockPopToTop = jest.fn();
+let mockCanGoBack = true;
 
 const screenElement = () => (
 	<PlaylistDetailScreen
 		route={{ key: 'k', name: 'PlaylistDetail', params: { id: ID } } as Props['route']}
 		navigation={
-			{ navigate: mockNavigate, setOptions: mockSetOptions } as unknown as Props['navigation']
+			{
+				navigate: mockNavigate,
+				setOptions: mockSetOptions,
+				goBack: mockGoBack,
+				popToTop: mockPopToTop,
+				canGoBack: () => mockCanGoBack,
+			} as unknown as Props['navigation']
 		}
 	/>
 );
@@ -153,6 +172,8 @@ const renderScreen = () => render(screenElement());
 beforeEach(() => {
 	jest.clearAllMocks();
 	mockCurrentPlaylist = null;
+	mockDeleted = false;
+	mockCanGoBack = true;
 	mockPlayer = { queueItemId: null, currentTrack: null };
 	mockQueueItems = [];
 	mockFetchPlaylistById.mockResolvedValue(undefined);
@@ -175,13 +196,16 @@ describe('PlaylistDetailScreen header button', () => {
 		expect(header.queryByLabelText('Options de la playlist')).toBeNull();
 	});
 
-	it("shows the options button on the owner's playlist", () => {
+	it("shows the options button on the owner's playlist, which opens the actions sheet", () => {
 		mockCurrentPlaylist = { id: ID, ownerId: 'me', tracks: [] };
-		renderScreen();
+		const view = renderScreen();
+		expect(view.queryByLabelText('Visibilité et droits')).toBeNull();
 
 		const header = renderHeaderRight();
 		fireEvent.press(header.getByLabelText('Options de la playlist'));
-		expect(mockNavigate).toHaveBeenCalledWith('PlaylistSharing', { playlistId: ID });
+		expect(view.getByLabelText('Modifier')).toBeTruthy();
+		expect(view.getByLabelText('Supprimer')).toBeTruthy();
+		expect(mockNavigate).not.toHaveBeenCalled();
 	});
 
 	it('keeps headerRight set when the owner playlist goes null during a reload', () => {
@@ -291,5 +315,113 @@ describe('PlaylistDetailScreen tracks (#307)', () => {
 
 		expect(screen.getByText("Aucun titre dans cette playlist pour l'instant")).toBeTruthy();
 		expect(screen.queryByText('Ajouter des titres')).toBeNull();
+	});
+});
+
+describe('PlaylistDetailScreen owner actions (#342)', () => {
+	beforeEach(() => {
+		mockCurrentPlaylist = { id: ID, ownerId: 'me', name: 'Mix', tracks: [] };
+	});
+
+	/** Open the actions sheet from the header and press one of its rows. */
+	// fireEvent only reaches the latest render, so the header button is pressed
+	// through its element rather than rendered on its own.
+	const pressAction = (view: ReturnType<typeof renderScreen>, label: string) => {
+		const options = mockSetOptions.mock.calls.at(-1)?.[0] as {
+			headerRight: () => React.ReactElement<{
+				children: React.ReactElement<{ onPress: () => void }>;
+			}>;
+		};
+		act(() => options.headerRight().props.children.props.onPress());
+		fireEvent.press(view.getByLabelText(label));
+	};
+
+	/** The button of the last confirmation dialog with this text. */
+	const alertButton = (text: string) => {
+		const buttons = (jest.mocked(Alert.alert).mock.calls.at(-1)?.[2] ?? []) as {
+			text: string;
+			onPress?: () => void;
+		}[];
+		return buttons.find(b => b.text === text);
+	};
+
+	// The sheet runs its action at once on Android (on iOS, after onDismiss).
+	const defaultOS = Platform.OS;
+	beforeEach(() => {
+		jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+		Platform.OS = 'android';
+	});
+	afterEach(() => {
+		Platform.OS = defaultOS;
+	});
+
+	it('opens the edit form', () => {
+		const view = renderScreen();
+		pressAction(view, 'Modifier');
+		expect(mockNavigate).toHaveBeenCalledWith('CreatePlaylist', { playlistId: ID });
+	});
+
+	it('opens « Visibilité et droits »', () => {
+		const view = renderScreen();
+		pressAction(view, 'Visibilité et droits');
+		expect(mockNavigate).toHaveBeenCalledWith('PlaylistSharing', { playlistId: ID });
+	});
+
+	it('does nothing when the deletion is cancelled', () => {
+		const view = renderScreen();
+		pressAction(view, 'Supprimer');
+		expect(Alert.alert).toHaveBeenCalledTimes(1);
+		alertButton('Annuler')?.onPress?.();
+		expect(mockDeletePlaylist).not.toHaveBeenCalled();
+		expect(mockPopToTop).not.toHaveBeenCalled();
+	});
+
+	it('deletes after confirmation and goes back to the list', async () => {
+		mockDeletePlaylist.mockResolvedValue(undefined);
+		const view = renderScreen();
+		pressAction(view, 'Supprimer');
+		alertButton('Supprimer')?.onPress?.();
+
+		await waitFor(() => expect(mockPopToTop).toHaveBeenCalledTimes(1));
+		expect(mockDeletePlaylist).toHaveBeenCalledWith(ID);
+		expect(showSuccess).toHaveBeenCalledWith('Playlist supprimée');
+	});
+
+	it('stays on the playlist with a toast when the deletion fails', async () => {
+		jest.spyOn(console, 'error').mockImplementation(() => undefined);
+		mockDeletePlaylist.mockRejectedValue(new ApiError('Boom', 'INTERNAL', undefined, 500));
+		const view = renderScreen();
+		pressAction(view, 'Supprimer');
+		alertButton('Supprimer')?.onPress?.();
+
+		await waitFor(() => expect(showError).toHaveBeenCalled());
+		expect(mockPopToTop).not.toHaveBeenCalled();
+	});
+
+	it('offers no actions sheet to a non-owner', () => {
+		mockCurrentPlaylist = { id: ID, ownerId: 'someone-else', name: 'Mix', tracks: [] };
+		const view = renderScreen();
+		expect(renderHeaderRight().queryByLabelText('Options de la playlist')).toBeNull();
+		expect(view.queryByLabelText('Supprimer')).toBeNull();
+	});
+});
+
+describe('PlaylistDetailScreen deleted while viewing (#342)', () => {
+	it('tells the user and goes back', () => {
+		mockCurrentPlaylist = null;
+		mockDeleted = true;
+		renderScreen();
+		expect(showInfo).toHaveBeenCalledWith('Cette playlist a été supprimée');
+		expect(mockGoBack).toHaveBeenCalledTimes(1);
+	});
+
+	it('goes to the playlists list when the screen is the root of its stack', () => {
+		mockCurrentPlaylist = null;
+		mockDeleted = true;
+		mockCanGoBack = false;
+		renderScreen();
+		expect(showInfo).toHaveBeenCalledWith('Cette playlist a été supprimée');
+		expect(mockGoBack).not.toHaveBeenCalled();
+		expect(mockNavigate).toHaveBeenCalledWith('Playlists');
 	});
 });

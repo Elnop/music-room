@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
-import { View, StyleSheet, Pressable, RefreshControl } from 'react-native';
-import { showError, showSuccess } from '@utils/toast';
+import { View, StyleSheet, Pressable, RefreshControl, Alert } from 'react-native';
+import { showError, showInfo, showSuccess } from '@utils/toast';
 import { apiErrorMessage } from '@utils/apiErrorMessage';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -24,6 +24,7 @@ import { usePlaylistSocket } from '@hooks/usePlaylistSocket';
 import { PlaylistHeader } from '@components/playlist/PlaylistHeader';
 import { SwipeableTrackItem } from '@components/common/SwipeableTrackItem';
 import { TrackActionsSheet } from '@components/track/TrackActionsSheet';
+import { PlaylistActionsSheet } from '@components/playlist/PlaylistActionsSheet';
 import type { AddQueueItemBody } from '@/types/queue.types';
 import { ReorderableList } from '@components/common/ReorderableList';
 import { EmptyState } from '@components/common/EmptyState';
@@ -33,7 +34,7 @@ import { Button } from '@components/common/Button';
 type PlaylistStackParamList = {
 	Playlists: undefined;
 	PlaylistDetail: { id: string };
-	CreatePlaylist: undefined;
+	CreatePlaylist: { playlistId?: string } | undefined;
 	SearchTracks: { playlistId: string };
 	PlaylistSharing: { playlistId: string };
 };
@@ -64,6 +65,9 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 	const playsThisPlaylist = selectPlaysPlaylist(useActiveQueue(), queueItemId, id);
 	const currentUri = playsThisPlaylist ? playingUri : null;
 	const [actionTrack, setActionTrack] = React.useState<AddQueueItemBody | null>(null);
+	const [playlistActionsVisible, setPlaylistActionsVisible] = React.useState(false);
+	// Set while this screen deletes the playlist: its own playlist:deleted is not news.
+	const deletingRef = React.useRef(false);
 	const {
 		currentPlaylist,
 		isLoading,
@@ -73,6 +77,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 		pendingMoves,
 		conflictMessage,
 		clearConflictMessage,
+		deletePlaylist,
 	} = usePlaylistStore();
 
 	const coverUrl = currentPlaylist?.coverUrl || currentPlaylist?.tracks[0]?.albumArt;
@@ -82,7 +87,16 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 
 	const canEdit = canEditPlaylist(user?.id, currentPlaylist);
 
-	usePlaylistSocket(id);
+	const { deleted } = usePlaylistSocket(id);
+
+	// Deleted by its owner while on screen (#342): tell the user and leave.
+	React.useEffect(() => {
+		if (!deleted || deletingRef.current) return;
+		showInfo('Cette playlist a été supprimée');
+		// Root of its stack (opened from a link): go to the list rather than stay stuck.
+		if (navigation.canGoBack()) navigation.goBack();
+		else navigation.navigate('Playlists');
+	}, [deleted, navigation]);
 
 	// A move refused because someone else changed the track: the store reloaded it.
 	React.useEffect(() => {
@@ -129,11 +143,41 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 		if (!loaded) showError('Impossible de charger la playlist');
 	}, [loadPlaylist]);
 
-	const handleShare = useCallback(() => {
-		navigation.navigate('PlaylistSharing', { playlistId: id });
-	}, [navigation, id]);
+	const openPlaylistActions = useCallback(() => setPlaylistActionsVisible(true), []);
 
-	// Configure header natif transparent avec bouton partage. headerRight is
+	const handleEdit = () => {
+		navigation.navigate('CreatePlaylist', { playlistId: id });
+	};
+
+	const handleSharing = () => {
+		navigation.navigate('PlaylistSharing', { playlistId: id });
+	};
+
+	const confirmDelete = async () => {
+		deletingRef.current = true;
+		try {
+			await deletePlaylist(id);
+			showSuccess('Playlist supprimée');
+			navigation.popToTop();
+		} catch (error) {
+			deletingRef.current = false;
+			console.error('[PlaylistDetailScreen] Delete playlist failed:', error);
+			showError(apiErrorMessage(error, 'Impossible de supprimer la playlist'));
+		}
+	};
+
+	const handleDelete = () => {
+		Alert.alert(
+			'Supprimer la playlist ?',
+			`« ${currentPlaylist?.name ?? ''} » sera supprimée pour tous ses membres. Cette action est définitive.`,
+			[
+				{ text: 'Annuler', style: 'cancel' },
+				{ text: 'Supprimer', style: 'destructive', onPress: () => void confirmDelete() },
+			]
+		);
+	};
+
+	// Configure header natif transparent avec bouton d'options. headerRight is
 	// always set and keeps the same view, empty for a non-owner: isOwner turns
 	// false while the playlist reloads, and adding or removing the native header
 	// subview while the screen re-attaches on Android crashes with "The specified
@@ -146,7 +190,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 				<View style={styles.headerButton}>
 					{isOwner ? (
 						<Pressable
-							onPress={handleShare}
+							onPress={openPlaylistActions}
 							accessibilityRole="button"
 							accessibilityLabel="Options de la playlist"
 							style={styles.headerButton}
@@ -157,7 +201,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 				</View>
 			),
 		});
-	}, [navigation, isOwner, handleShare, theme.colors.text, styles.headerButton]);
+	}, [navigation, isOwner, openPlaylistActions, theme.colors.text, styles.headerButton]);
 
 	const handleAddTrack = () => {
 		navigation.navigate('SearchTracks', { playlistId: id });
@@ -310,6 +354,16 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 			/>
 
 			<TrackActionsSheet track={actionTrack} onClose={() => setActionTrack(null)} />
+			{isOwner && (
+				<PlaylistActionsSheet
+					visible={playlistActionsVisible}
+					playlistName={currentPlaylist.name}
+					onClose={() => setPlaylistActionsVisible(false)}
+					onEdit={handleEdit}
+					onSharing={handleSharing}
+					onDelete={handleDelete}
+				/>
+			)}
 		</View>
 	);
 }

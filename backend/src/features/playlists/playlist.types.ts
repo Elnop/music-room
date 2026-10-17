@@ -138,3 +138,17 @@ export type PlaylistUpdatedPayload = PlaylistUpdateBase &
 		| { event: 'track_removed'; trackId: string }
 		| { event: 'track_moved'; trackId: string; rank: string }
 	);
+
+/** Payload of the `playlist:details` socket event: the playlist's metadata after a PATCH. */
+export interface PlaylistDetailsPayload {
+	playlistId: string;
+	name: string;
+	description?: string;
+	visibility: 'public' | 'private';
+	editMode: 'open' | 'restricted';
+}
+
+/** Payload of the `playlist:deleted` socket event, sent before the room is emptied. */
+export interface PlaylistDeletedPayload {
+	playlistId: string;
+}

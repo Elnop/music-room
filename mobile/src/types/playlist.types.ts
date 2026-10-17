@@ -68,3 +68,17 @@ export type PlaylistUpdatedEvent = PlaylistUpdateBase &
 		| { event: 'track_removed'; trackId: string }
 		| { event: 'track_moved'; trackId: string; rank: string }
 	);
+
+/** Payload of the `playlist:details` socket event: the playlist's metadata after an update. */
+export interface PlaylistDetailsEvent {
+	playlistId: string;
+	name: string;
+	description?: string;
+	visibility: 'public' | 'private';
+	editMode: EditMode;
+}
+
+/** Payload of the `playlist:deleted` socket event. */
+export interface PlaylistDeletedEvent {
+	playlistId: string;
+}

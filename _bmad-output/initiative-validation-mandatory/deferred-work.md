@@ -66,3 +66,6 @@
 - source_plan: `_bmad-output/initiative-validation-mandatory/plan-gh-307-ux-search.md`
   summary: The `SoundCloudTrack` schema in `backend/src/features/soundcloud/soundcloud.openapi.ts` documents fields (`artist`, `trackUri`, `albumArt`) the search endpoint does not return.
   evidence: `soundcloud-search.service.ts` passes SoundCloud's search objects through unchanged (`title`, `user`, `artwork_url`, `permalink_url`…); noticed by the implementer while adding `policy` and `media`.
+- source_plan: `_bmad-output/initiative-validation-mandatory/plan-gh-342-edit-delete-playlist.md`
+  summary: Split `backend/src/features/playlists/playlist.service.ts` (~490 lines) into smaller services, per the ~150-line guideline of AGENTS.md.
+  evidence: The file was already ~480 lines before #342; the review of #342 flagged that it keeps growing.

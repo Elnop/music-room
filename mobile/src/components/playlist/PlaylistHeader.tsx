@@ -34,7 +34,7 @@ export function PlaylistHeader({ playlist, onAddTrack, canEdit = false }: Playli
 				</View>
 			)}
 			<Text style={styles.name}>{playlist.name}</Text>
-			{playlist.description && <Text style={styles.description}>{playlist.description}</Text>}
+			{!!playlist.description && <Text style={styles.description}>{playlist.description}</Text>}
 			<View style={styles.meta}>
 				<Avatar uri={playlist.owner.avatarUrl} name={ownerName} size="sm" />
 				<Text style={styles.owner} numberOfLines={1}>
