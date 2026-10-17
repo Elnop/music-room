@@ -42,6 +42,8 @@ interface AuthState {
 	loginWithFacebook: () => Promise<void>;
 	logout: () => Promise<void>;
 	updateProfile: (data: Partial<UserProfile>) => Promise<void>;
+	/** New avatar URL after an upload, null after a removal (#351) */
+	setAvatarUrl: (avatarUrl: string | null) => Promise<void>;
 
 	// Email verification
 	verifyEmail: (userId: string, code: string) => Promise<void>;
@@ -427,6 +429,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 				});
 			}
 		}
+	},
+
+	/** Set the user's avatar after an upload (URL) or a removal (null), and persist it (#351) */
+	setAvatarUrl: async (avatarUrl: string | null) => {
+		const { user } = get();
+		if (!user) return;
+
+		set({ user: { ...user, avatarUrl: avatarUrl ?? undefined } });
+		await get().saveToStorage();
 	},
 
 	/**

@@ -109,8 +109,10 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
 	const url = `${getBackendUrl()}${endpoint}`;
 
 	const makeRequest = async (authToken?: string): Promise<Response> => {
+		// A FormData body gets its multipart Content-Type (with the boundary) from fetch.
+		const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
 		const headers: Record<string, string> = {
-			'Content-Type': 'application/json',
+			...(isFormData ? {} : { 'Content-Type': 'application/json' }),
 			...getClientHeaders(),
 			...(options.headers as Record<string, string>),
 		};

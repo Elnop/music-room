@@ -259,3 +259,39 @@ export const soundcloudRateLimiter = rateLimit({
 		});
 	},
 });
+
+/**
+ * Avatar Rate Limiter
+ * Per signed-in user: 10 profile photo uploads or removals per hour by default
+ * (PUT and DELETE /api/profile/avatar). Must run after `authMiddleware`.
+ */
+export const avatarRateLimiter = rateLimit({
+	...baseRateLimitConfig,
+	windowMs: rateLimitConfig.avatar.windowMs,
+	max: rateLimitConfig.avatar.max,
+	keyGenerator: (req: Request) => {
+		return `avatar:${(req as AuthenticatedRequest).user.id}`;
+	},
+	store: getStore('profile:avatar'),
+	handler: (req: Request, res: Response) => {
+		logger.warn('Avatar rate limit exceeded', {
+			endpoint: req.path,
+			userId: (req as AuthenticatedRequest).user.id,
+			ip: req.ip,
+		});
+
+		res.status(429).json({
+			success: false,
+			error: {
+				message: 'Too many profile photo changes. Please try again later.',
+				code: 'RATE_LIMIT_EXCEEDED',
+				retryAfter: new Date(
+					Date.now() + (req.rateLimit?.resetTime?.getTime() || 0) - Date.now()
+				).toISOString(),
+			},
+			meta: {
+				timestamp: new Date().toISOString(),
+			},
+		});
+	},
+});

@@ -37,6 +37,9 @@ const CODE_MESSAGES: Record<string, string> = {
 	ACCOUNT_LOCKED: 'Compte temporairement bloqué après trop de tentatives. Réessayez plus tard.',
 	IP_BLOCKED: 'Accès temporairement restreint. Réessayez plus tard.',
 	AUTH_UNAVAILABLE: "Le service d'authentification est indisponible. Réessayez plus tard.",
+	// Profile photo (#351)
+	INVALID_IMAGE: "Ce fichier n'est pas une image JPEG, PNG ou WebP",
+	FILE_TOO_LARGE: 'La photo ne doit pas dépasser 2 Mo',
 };
 
 /**

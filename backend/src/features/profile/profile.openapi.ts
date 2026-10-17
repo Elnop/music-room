@@ -306,6 +306,131 @@ export const profilePaths: OpenAPIV3.PathsObject = {
 		},
 	},
 
+	'/api/profile/avatar': {
+		put: {
+			tags: ['Profile'],
+			summary: 'Upload a new profile photo',
+			description:
+				"Multipart upload of the photo in the `avatar` field: JPEG, PNG or WebP, at most 2 MB. The type is read from the file's bytes; the declared MIME type is ignored. The file is stored in the public `avatars` Storage bucket under a random name and becomes `avatarUrl`; the previous photo is deleted when it was stored there (a Google or Facebook picture is left alone). Who sees the URL still depends on `avatar_visibility`. Rate-limited per user (10 changes per hour by default, shared with DELETE).",
+			operationId: 'uploadAvatar',
+			security: [{ bearerAuth: [] }],
+			requestBody: {
+				required: true,
+				content: {
+					'multipart/form-data': {
+						schema: {
+							type: 'object',
+							required: ['avatar'],
+							properties: {
+								avatar: {
+									type: 'string',
+									format: 'binary',
+									description: 'JPEG, PNG or WebP image, at most 2 MB',
+								},
+							},
+						},
+					},
+				},
+			},
+			responses: {
+				'200': {
+					description: 'Photo stored; `avatarUrl` is its public URL',
+					content: {
+						'application/json': {
+							schema: {
+								allOf: [
+									{ $ref: '#/components/schemas/SuccessResponse' },
+									{
+										type: 'object',
+										properties: {
+											data: {
+												type: 'object',
+												required: ['avatarUrl'],
+												properties: {
+													avatarUrl: {
+														type: 'string',
+														format: 'uri',
+														example:
+															'https://xyz.supabase.co/storage/v1/object/public/avatars/0b5c…/3f2a….jpg',
+													},
+												},
+											},
+										},
+									},
+								],
+							},
+						},
+					},
+				},
+				'400': {
+					description:
+						'INVALID_IMAGE: not a JPEG, PNG or WebP file. VALIDATION_ERROR: no `avatar` file. INVALID_UPLOAD: malformed multipart body',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+							example: {
+								success: false,
+								error: {
+									message: 'The file is not a JPEG, PNG or WebP image',
+									code: 'INVALID_IMAGE',
+								},
+								meta: { timestamp: '2026-10-17T10:30:00.000Z' },
+							},
+						},
+					},
+				},
+				'401': { $ref: '#/components/responses/UnauthorizedError' },
+				'413': {
+					description: 'FILE_TOO_LARGE: the photo is over 2 MB; nothing is stored',
+					content: {
+						'application/json': {
+							schema: { $ref: '#/components/schemas/ErrorResponse' },
+						},
+					},
+				},
+				'429': { $ref: '#/components/responses/RateLimitError' },
+				'503': { $ref: '#/components/responses/RateLimitUnavailable' },
+			},
+		},
+		delete: {
+			tags: ['Profile'],
+			summary: 'Remove the profile photo',
+			description:
+				'Sets `avatarUrl` to null (the app shows initials) and deletes the photo when it was stored in the `avatars` bucket. Rate-limited per user, shared with PUT.',
+			operationId: 'removeAvatar',
+			security: [{ bearerAuth: [] }],
+			responses: {
+				'200': {
+					description: 'Photo removed',
+					content: {
+						'application/json': {
+							schema: {
+								allOf: [
+									{ $ref: '#/components/schemas/SuccessResponse' },
+									{
+										type: 'object',
+										properties: {
+											data: {
+												type: 'object',
+												required: ['avatarUrl'],
+												properties: {
+													avatarUrl: { type: 'string', nullable: true, example: null },
+												},
+											},
+										},
+									},
+								],
+							},
+						},
+					},
+				},
+				'401': { $ref: '#/components/responses/UnauthorizedError' },
+				'429': { $ref: '#/components/responses/RateLimitError' },
+				'503': { $ref: '#/components/responses/RateLimitUnavailable' },
+			},
+		},
+	},
+
 	'/api/profile/{userId}': {
 		get: {
 			tags: ['Profile'],

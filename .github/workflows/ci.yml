@@ -110,7 +110,7 @@ jobs:
       - if: steps.images.outputs.cache-hit != 'true'
         run: |
           mkdir -p ~/docker-images
-          docker ps -a --format '{{.Image}}' | sort -u | xargs docker save | zstd -T0 -q -o ~/docker-images/images.tar.zst
+          docker ps -a --format '{{.Image}}' | sort -u | xargs docker save | zstd -T0 -q -f -o ~/docker-images/images.tar.zst
       - if: steps.images.outputs.cache-hit != 'true'
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:

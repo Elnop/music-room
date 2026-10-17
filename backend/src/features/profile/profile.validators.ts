@@ -97,3 +97,19 @@ export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type SearchUsersInput = z.infer<typeof searchUsersSchema>;
 export type UpdatePrivacyInput = z.infer<typeof updatePrivacySchema>;
 export type UpdateMusicPreferencesInput = z.infer<typeof updateMusicPreferencesSchema>;
+
+// =====================================================
+// Avatar Validators
+// =====================================================
+
+/**
+ * The file multer read from the `avatar` field (PUT /api/profile/avatar).
+ * Size is capped by multer; the type is checked from the bytes, not here.
+ */
+export const avatarFileSchema = z.object(
+	{
+		buffer: z.instanceof(Buffer),
+		size: z.number().int().positive('The photo is empty'),
+	},
+	{ error: 'A photo is required in the multipart field "avatar"' }
+);

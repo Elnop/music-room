@@ -3,11 +3,13 @@ import { ProfileService } from '@/features/profile/services/profile.service.js';
 import { ProfileSearchService } from '@/features/profile/services/profile-search.service.js';
 import { PrivacyService } from '@/features/profile/services/privacy.service.js';
 import { MusicPreferencesService } from '@/features/profile/services/music-preferences.service.js';
+import { AvatarService } from '@/features/profile/services/avatar.service.js';
 import {
 	updateProfileSchema,
 	searchUsersSchema,
 	updatePrivacySchema,
 	updateMusicPreferencesSchema,
+	avatarFileSchema,
 } from '@/features/profile/profile.validators.js';
 import type { AuthenticatedRequest } from '@/shared/types/global.types.js';
 import type { ApiResponse } from '@/shared/types/global.types.js';
@@ -17,6 +19,7 @@ const profileService = new ProfileService();
 const profileSearchService = new ProfileSearchService();
 const privacyService = new PrivacyService();
 const musicPreferencesService = new MusicPreferencesService();
+const avatarService = new AvatarService();
 
 export class ProfileController {
 	// =====================================================
@@ -37,6 +40,55 @@ export class ProfileController {
 			const response: ApiResponse = {
 				success: true,
 				data: profile,
+				meta: {
+					timestamp: new Date().toISOString(),
+				},
+			};
+
+			res.status(200).json(response);
+		} catch (error) {
+			next(error);
+		}
+	}
+
+	/**
+	 * Replace the profile photo with the uploaded file (multipart field `avatar`)
+	 * PUT /api/profile/avatar
+	 */
+	async uploadAvatar(req: Request, res: Response, next: NextFunction) {
+		try {
+			const authReq = req as AuthenticatedRequest;
+			const file = avatarFileSchema.parse(req.file);
+
+			const avatar = await avatarService.uploadAvatar(authReq.user.id, file.buffer);
+
+			const response: ApiResponse = {
+				success: true,
+				data: avatar,
+				meta: {
+					timestamp: new Date().toISOString(),
+				},
+			};
+
+			res.status(200).json(response);
+		} catch (error) {
+			next(error);
+		}
+	}
+
+	/**
+	 * Remove the profile photo (back to initials)
+	 * DELETE /api/profile/avatar
+	 */
+	async removeAvatar(req: Request, res: Response, next: NextFunction) {
+		try {
+			const authReq = req as AuthenticatedRequest;
+
+			const avatar = await avatarService.removeAvatar(authReq.user.id);
+
+			const response: ApiResponse = {
+				success: true,
+				data: avatar,
 				meta: {
 					timestamp: new Date().toISOString(),
 				},

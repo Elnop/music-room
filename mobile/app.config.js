@@ -79,6 +79,16 @@ module.exports = {
 					},
 				},
 			],
+			[
+				'expo-image-picker',
+				{
+					photosPermission:
+						'Zumik accède à vos photos pour que vous choisissiez votre photo de profil.',
+					cameraPermission:
+						"Zumik utilise l'appareil photo pour que vous preniez votre photo de profil.",
+					microphonePermission: false,
+				},
+			],
 			'./plugins/withDebugKeystore.js',
 			'./plugins/withMedia3Version.js',
 			['expo-media-control', { enableBackgroundAudio: true, audioSessionCategory: 'playback' }],

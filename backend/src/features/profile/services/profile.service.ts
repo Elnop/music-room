@@ -2,6 +2,7 @@ import { supabase } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import { fetchSingle, updateOne } from '@/shared/utils/database.helpers.js';
+import { deleteReplacedAvatar } from '@/features/profile/services/avatar.service.js';
 import type { UpdateProfileDTO, ProfileUpdateResponse } from '@/features/profile/profile.types.js';
 
 // Type for user_profiles table row
@@ -32,6 +33,17 @@ export class ProfileService {
 			if (data.favoriteArtist !== undefined) updateData.favorite_artist = data.favoriteArtist;
 			updateData.updated_at = new Date().toISOString();
 
+			// Previous avatar, to delete our stored photo once replaced (#351)
+			let previousAvatarUrl: string | null = null;
+			if (data.avatarUrl !== undefined) {
+				const { data: current } = await supabase
+					.from('user_profiles')
+					.select('avatar_url')
+					.eq('id', userId)
+					.single();
+				previousAvatarUrl = current?.avatar_url ?? null;
+			}
+
 			// Update user_profiles table
 			const profileData = await updateOne<UserProfileRow>(
 				supabase,
@@ -42,6 +54,10 @@ export class ProfileService {
 				'Failed to update profile',
 				'PROFILE_UPDATE_ERROR'
 			);
+
+			if (data.avatarUrl !== undefined) {
+				void deleteReplacedAvatar(previousAvatarUrl, profileData.avatar_url, userId);
+			}
 
 			// Get user email from auth.users
 			const { data: userData, error: userError } = await supabase.auth.admin.getUserById(userId);

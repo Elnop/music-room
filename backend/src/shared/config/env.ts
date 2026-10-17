@@ -42,6 +42,8 @@ const envSchema = z.object({
 	RATE_LIMIT_TOKEN_MAX: z.coerce.number().int().positive().default(20),
 	RATE_LIMIT_SOUNDCLOUD_WINDOW_MS: z.coerce.number().int().positive().default(60000),
 	RATE_LIMIT_SOUNDCLOUD_MAX: z.coerce.number().int().positive().default(120),
+	RATE_LIMIT_AVATAR_WINDOW_MS: z.coerce.number().int().positive().default(3600000),
+	RATE_LIMIT_AVATAR_MAX: z.coerce.number().int().positive().default(10),
 
 	// Account Lockout Configuration
 	ACCOUNT_LOCKOUT_ENABLED: z.string().default('true'),

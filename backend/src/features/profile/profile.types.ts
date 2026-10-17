@@ -161,3 +161,14 @@ export interface FilteredProfile {
 
 // Database row types: Use Tables<'table_name'> from @/shared/types/supabase.generated.js
 // Example: type ProfilePrivacyRow = Tables<'profile_privacy'>
+
+// =====================================================
+// Avatar Types
+// =====================================================
+
+/**
+ * Answer of PUT and DELETE /api/profile/avatar: the new avatar URL, null once removed.
+ */
+export interface AvatarResponse {
+	avatarUrl: string | null;
+}
