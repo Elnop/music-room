@@ -5,8 +5,6 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	Text,
-	TextInput,
-	Image,
 	ActivityIndicator,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -19,6 +17,10 @@ import { usePlaylistStore } from '@store/playlistStore';
 import { useSoundCloudStore } from '@store/soundcloudStore';
 import { useQueueStore } from '@store/queueStore';
 import { QueueSwipe } from '@components/common/QueueSwipe';
+import { SearchBar } from '@components/common/SearchBar';
+import { Artwork } from '@components/common/Artwork';
+import { PreviewBadge } from '@components/track/PreviewBadge';
+import { isPreviewOnly } from '@utils/soundcloudPreview';
 import { TrackActionsButton } from '@components/track/TrackActionsButton';
 import { TrackActionsSheet } from '@components/track/TrackActionsSheet';
 import { toTrackInput } from '@utils/trackInput';
@@ -59,6 +61,8 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 	const { searchResults, isSearching, search, clearSearch } = useSoundCloudStore();
 	const addToQueue = useQueueStore(state => state.addItem);
 	const [query, setQuery] = useState('');
+	// A typed query waiting for its debounce counts as loading (#307).
+	const [isPending, setIsPending] = useState(false);
 	const [addingTrackId, setAddingTrackId] = useState<number | null>(null);
 	const [addedTrackUris, setAddedTrackUris] = useState<Set<string>>(new Set());
 	const [actionTrack, setActionTrack] = useState<AddQueueItemBody | null>(null);
@@ -78,6 +82,7 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 	const debouncedSearch = React.useMemo(
 		() =>
 			debounce((q: string) => {
+				setIsPending(false);
 				if (q.trim()) {
 					search(q);
 				} else {
@@ -95,8 +100,18 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 
 	const handleSearchChange = (text: string) => {
 		setQuery(text);
-		debouncedSearch(text);
+		if (text.trim()) {
+			setIsPending(true);
+			debouncedSearch(text);
+		} else {
+			// Cleared: drop the results now rather than after the debounce.
+			debouncedSearch.cancel();
+			setIsPending(false);
+			clearSearch();
+		}
 	};
+
+	const isLoading = isSearching || isPending;
 
 	const handleAddTrack = async (track: SoundCloudTrack) => {
 		if (addedTrackUris.has(track.permalink_url)) {
@@ -123,7 +138,7 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 	};
 
 	const renderTrackItem = ({ item }: { item: SoundCloudTrack }) => {
-		const artworkUrl = item.artwork_url || item.user.avatar_url || 'https://via.placeholder.com/50';
+		const artworkUrl = item.artwork_url || item.user.avatar_url;
 		const isAdding = addingTrackId === item.id;
 		const isAdded = addedTrackUris.has(item.permalink_url);
 
@@ -138,7 +153,7 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 						disabled={isAdding}
 						activeOpacity={0.7}
 					>
-						<Image source={{ uri: artworkUrl }} style={styles.artwork} />
+						<Artwork uri={artworkUrl} size={52} style={styles.artwork} />
 						<View style={styles.trackInfo}>
 							<Text style={styles.trackTitle} numberOfLines={1}>
 								{item.title}
@@ -146,7 +161,10 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 							<Text style={styles.trackArtist} numberOfLines={1}>
 								{item.user.username}
 							</Text>
-							<Text style={styles.trackDuration}>{formatDuration(item.duration)}</Text>
+							<View style={styles.trackMeta}>
+								{isPreviewOnly(item) && <PreviewBadge />}
+								<Text style={styles.trackDuration}>{formatDuration(item.duration)}</Text>
+							</View>
 						</View>
 						<TrackActionsButton onPress={() => setActionTrack(toTrackInput(item))} />
 						<View
@@ -176,38 +194,16 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 	return (
 		<View style={styles.container}>
 			<View style={styles.searchContainer}>
-				<View style={styles.searchInputWrapper}>
-					<Ionicons
-						name="search"
-						size={20}
-						color={theme.colors.textSecondary}
-						style={styles.searchIcon}
-					/>
-					<TextInput
-						style={styles.searchInput}
-						placeholder="Rechercher sur SoundCloud..."
-						placeholderTextColor={theme.colors.textSecondary}
-						value={query}
-						onChangeText={handleSearchChange}
-						autoCapitalize="none"
-						autoCorrect={false}
-						autoFocus
-					/>
-					{query.length > 0 && (
-						<TouchableOpacity
-							onPress={() => {
-								setQuery('');
-								clearSearch();
-							}}
-							hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-						>
-							<Ionicons name="close-circle" size={20} color={theme.colors.textSecondary} />
-						</TouchableOpacity>
-					)}
-				</View>
+				<SearchBar
+					value={query}
+					onChangeText={handleSearchChange}
+					placeholder="Rechercher sur SoundCloud..."
+					loading={isLoading}
+					autoFocus
+				/>
 			</View>
 
-			{isSearching && searchResults.length === 0 ? (
+			{isLoading && searchResults.length === 0 ? (
 				<SkeletonList count={8} row={TrackRowSkeleton} />
 			) : (
 				<FlatList
@@ -218,7 +214,7 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 					contentContainerStyle={[styles.list, { paddingBottom: playerHeight + theme.spacing.xl }]}
 					showsVerticalScrollIndicator={false}
 					ListEmptyComponent={
-						query.trim() && isSearching ? null : (
+						query.trim() && isLoading ? null : (
 							<EmptyState
 								icon="musical-notes-outline"
 								message={
@@ -247,23 +243,6 @@ const createStyles = (theme: Theme) =>
 			paddingHorizontal: theme.spacing.md,
 			paddingVertical: theme.spacing.sm,
 		},
-		searchInputWrapper: {
-			flexDirection: 'row',
-			alignItems: 'center',
-			backgroundColor: theme.colors.surfaceAlt,
-			borderRadius: 12,
-			paddingHorizontal: theme.spacing.md,
-			height: 48,
-		},
-		searchIcon: {
-			marginRight: theme.spacing.sm,
-		},
-		searchInput: {
-			flex: 1,
-			fontSize: 16,
-			color: theme.colors.text,
-			paddingVertical: 0,
-		},
 		list: {
 			flexGrow: 1,
 			paddingTop: theme.spacing.sm,
@@ -281,14 +260,18 @@ const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.background,
 		},
 		artwork: {
-			width: 52,
-			height: 52,
 			borderRadius: 8,
-			backgroundColor: theme.colors.surfaceAlt,
 			marginRight: theme.spacing.md,
 		},
 		trackInfo: {
 			flex: 1,
+			// Keeps a long title off the buttons (#307).
+			marginRight: theme.spacing.sm,
+		},
+		trackMeta: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			gap: theme.spacing.xs,
 		},
 		trackTitle: {
 			fontSize: 15,

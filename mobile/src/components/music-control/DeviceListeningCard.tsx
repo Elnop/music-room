@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
+import { Artwork } from '@/components/common/Artwork';
 import type { ListeningStatus } from '@/types/listening.types';
 
 interface DeviceListeningCardProps {
@@ -56,10 +57,7 @@ export function DeviceListeningCard({
 
 			{status.track ? (
 				<View style={styles.trackContainer}>
-					<Image
-						source={{ uri: status.track.artworkUrl || 'https://via.placeholder.com/50' }}
-						style={styles.trackArtwork}
-					/>
+					<Artwork uri={status.track.artworkUrl} size={50} style={styles.trackArtwork} />
 					<View style={styles.trackInfo}>
 						<Text style={styles.trackTitle} numberOfLines={1}>
 							{status.track.title}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets, type EdgeInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -15,6 +15,7 @@ import { usePlayerStore } from '@/store/playerStore';
 import { useNowPlaying, type NowPlayingTrack } from '@/hooks/useNowPlaying';
 import { RESTART_THRESHOLD_S } from '@/store/queueSelectors';
 import { hapticTap } from '@utils/haptics';
+import { Artwork } from '@/components/common/Artwork';
 
 /** Horizontal swipe distance that changes the track (#311). */
 export const SWIPE_TRACK_THRESHOLD = 80;
@@ -224,11 +225,9 @@ function NowPlayingInfo({
 		);
 	}
 
-	const artworkUrl = track.artworkUrl || 'https://via.placeholder.com/40';
-
 	return (
 		<>
-			<Image source={{ uri: artworkUrl }} style={styles.artwork} />
+			<Artwork uri={track.artworkUrl} size={40} style={styles.artwork} iconSize={20} />
 			<View style={styles.info}>
 				<Text style={styles.title} numberOfLines={1}>
 					{track.title}

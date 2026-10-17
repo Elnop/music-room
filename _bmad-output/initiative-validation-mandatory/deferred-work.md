@@ -63,3 +63,6 @@
 - source_plan: `_bmad-output/initiative-validation-mandatory/plan-gh-307-ux-playlists.md`
   summary: Find why the « + » on « Ajouter des titres » showed no feedback during the add call (audit #307); `extraData` was not the cause.
   evidence: React Native's FlatList (non-strictMode) rebuilds its renderer each render, so rows already re-rendered on `addingTrackId` and the existing spinner should show. Settle on device: time the call, check the white spinner on `primary` at 0.7 opacity is visible, and check the tap registers at once.
+- source_plan: `_bmad-output/initiative-validation-mandatory/plan-gh-307-ux-search.md`
+  summary: The `SoundCloudTrack` schema in `backend/src/features/soundcloud/soundcloud.openapi.ts` documents fields (`artist`, `trackUri`, `albumArt`) the search endpoint does not return.
+  evidence: `soundcloud-search.service.ts` passes SoundCloud's search objects through unchanged (`title`, `user`, `artwork_url`, `permalink_url`…); noticed by the implementer while adding `policy` and `media`.
