@@ -23,6 +23,7 @@ import { useImageColors, getAdaptiveColors } from '@/hooks/useImageColors';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { QueueModal } from '@/components/player/QueueModal';
 import { DevicePickerSheet } from '@/components/player/DevicePickerSheet';
+import { largeArtwork } from '@/utils/artwork';
 
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const DISMISS_THRESHOLD = SCREEN_HEIGHT * 0.2; // 20% de l'écran pour fermer
@@ -111,7 +112,8 @@ export function PlayerModal() {
 		}
 	}, [isModalOpen, translateY]);
 
-	const artworkUrl = track?.artworkUrl || null;
+	// Shown across the screen: the 500×500 image, not the API's 100×100 (#307).
+	const artworkUrl = largeArtwork(track?.artworkUrl);
 	const { dominantColor } = useImageColors(artworkUrl, theme.colors.primary);
 
 	const styles = useMemo(() => createStyles(theme, insets), [theme, insets]);
