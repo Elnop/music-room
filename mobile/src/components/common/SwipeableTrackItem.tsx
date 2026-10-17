@@ -20,6 +20,8 @@ interface SwipeableTrackItemProps {
 	isDragActive?: boolean;
 	/** A long press or the ⋯ button opens the track's quick actions (#316). */
 	onShowActions?: () => void;
+	/** The track playing now from this playlist: highlighted like the queue's current item. */
+	isCurrent?: boolean;
 }
 
 export function SwipeableTrackItem({
@@ -30,6 +32,7 @@ export function SwipeableTrackItem({
 	onDragStart,
 	isDragActive = false,
 	onShowActions,
+	isCurrent = false,
 }: SwipeableTrackItemProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
@@ -56,7 +59,12 @@ export function SwipeableTrackItem({
 				onLongPress={onShowActions}
 				accessibilityLabel={`${track.title}, ${track.artist}`}
 				accessibilityHint={onShowActions ? 'Appui long pour les actions du titre' : undefined}
-				style={[styles.trackContainer, isDragActive && styles.trackContainerActive]}
+				accessibilityState={{ selected: isCurrent }}
+				style={[
+					styles.trackContainer,
+					isCurrent && styles.trackContainerCurrent,
+					isDragActive && styles.trackContainerActive,
+				]}
 			>
 				{track.albumArt ? (
 					<Image source={{ uri: track.albumArt }} style={styles.albumArt} />
@@ -67,13 +75,26 @@ export function SwipeableTrackItem({
 				)}
 
 				<View style={styles.trackInfo}>
-					<Text style={styles.trackTitle} numberOfLines={1}>
+					<Text
+						style={[styles.trackTitle, isCurrent && styles.trackTitleCurrent]}
+						numberOfLines={1}
+					>
 						{track.title}
 					</Text>
 					<Text style={styles.trackArtist} numberOfLines={1}>
 						{track.artist}
 					</Text>
 				</View>
+
+				{isCurrent && (
+					<Ionicons
+						name="volume-high"
+						size={18}
+						color={theme.colors.primary}
+						style={styles.playingIcon}
+						accessibilityLabel="En cours de lecture"
+					/>
+				)}
 
 				{track.durationMs && (
 					<Text style={styles.duration}>{formatDuration(track.durationMs)}</Text>
@@ -113,6 +134,11 @@ const createStyles = (theme: Theme) =>
 			borderBottomWidth: 1,
 			borderBottomColor: theme.colors.border,
 		},
+		trackContainerCurrent: {
+			backgroundColor: theme.colors.surfaceAlt,
+			borderLeftWidth: 4,
+			borderLeftColor: theme.colors.primary,
+		},
 		albumArt: {
 			width: 50,
 			height: 50,
@@ -133,6 +159,12 @@ const createStyles = (theme: Theme) =>
 			fontWeight: '600',
 			color: theme.colors.text,
 			marginBottom: 4,
+		},
+		trackTitleCurrent: {
+			color: theme.colors.primary,
+		},
+		playingIcon: {
+			marginRight: 8,
 		},
 		trackArtist: {
 			fontSize: 13,

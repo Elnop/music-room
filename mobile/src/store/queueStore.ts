@@ -291,10 +291,10 @@ export const useQueueStore = create<QueueStoreState>((set, get) => {
 				error =>
 					error instanceof Error && error.message
 						? error.message
-						: "Impossible d'ajouter à la file de lecture"
+						: "Impossible d'ajouter à la file d'attente"
 			);
 			if (added) {
-				showSuccess('Ajouté à la file de lecture');
+				showSuccess("Ajouté à la file d'attente");
 				hapticSuccess();
 			}
 			return added;

@@ -328,7 +328,7 @@ describe('queueStore addItem', () => {
 		expect(api.addItem).toHaveBeenCalledWith(body, {});
 		expect(mine().items.map(i => i.id)).toEqual(['a', 'n']);
 		expect(mine().currentItemId).toBe('a');
-		expect(showSuccess).toHaveBeenCalledWith('Ajouté à la file de lecture');
+		expect(showSuccess).toHaveBeenCalledWith("Ajouté à la file d'attente");
 		expect(hapticSuccess).toHaveBeenCalledTimes(1);
 		expect(player().loadCounter).toBe(before);
 		expect(player().currentTrack).toBe(listTrack);

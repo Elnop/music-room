@@ -16,6 +16,10 @@ jest.mock('@utils/toast', () => ({
 	showInfo: jest.fn(),
 }));
 
+jest.mock('@components/playlist/PlayPlaylistButton', () => ({
+	PlayPlaylistButton: () => null,
+}));
+
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
 
 const playlist = {
@@ -46,5 +50,32 @@ describe('PlaylistHeader', () => {
 				title: 'Chill',
 			})
 		);
+	});
+
+	it('shows the username initials when the owner has no display name (#307)', () => {
+		render(
+			<PlaylistHeader
+				playlist={{
+					...playlist,
+					owner: { id: 'owner', username: 'alice', displayName: null } as unknown as UserProfile,
+				}}
+			/>
+		);
+
+		expect(screen.getByText('AL')).toBeTruthy();
+		expect(screen.getByText('alice')).toBeTruthy();
+		expect(screen.queryByText('?')).toBeNull();
+	});
+
+	it('offers « Ajouter un titre » to an editor only (#307)', () => {
+		const onAddTrack = jest.fn();
+		const { rerender } = render(
+			<PlaylistHeader playlist={playlist} canEdit={false} onAddTrack={onAddTrack} />
+		);
+		expect(screen.queryByText('Ajouter un titre')).toBeNull();
+
+		rerender(<PlaylistHeader playlist={playlist} canEdit onAddTrack={onAddTrack} />);
+		fireEvent.press(screen.getByText('Ajouter un titre'));
+		expect(onAddTrack).toHaveBeenCalled();
 	});
 });

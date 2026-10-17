@@ -196,7 +196,7 @@ export function TrackActionsSheet({ track, onClose }: TrackActionsSheetProps) {
 				{step === 'actions' ? (
 					<View>
 						{renderAction('play-forward-outline', 'Lire ensuite', () => run(playNext))}
-						{renderAction('list-outline', 'Ajouter à la queue', () => run(addItem))}
+						{renderAction('list-outline', "Ajouter à la file d'attente", () => run(addItem))}
 						{renderAction('add-circle-outline', 'Ajouter à une playlist', openPlaylists, true)}
 						{renderAction('share-outline', 'Partager', share)}
 					</View>

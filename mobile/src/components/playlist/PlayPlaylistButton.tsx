@@ -2,15 +2,14 @@ import React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
-import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { usePlayerStore } from '@store/playerStore';
 import { useActiveQueue, useQueueStore } from '@store/queueStore';
 import { selectPlaysPlaylist } from '@store/queueSelectors';
 import { showInfo } from '@utils/toast';
 import type { Theme } from '@themes/types';
 
-/** Diameter of the button; the screen's list leaves room for it. */
-export const PLAY_PLAYLIST_BUTTON_SIZE = 56;
+/** Diameter of the round button. */
+const BUTTON_SIZE = 44;
 
 interface PlayPlaylistButtonProps {
 	playlistId: string;
@@ -19,15 +18,14 @@ interface PlayPlaylistButtonProps {
 }
 
 /**
- * Floating Play/Pause button of a playlist (#277), above the mini player and
- * the tab bar. Play queues the playlist as a block and plays its first track;
+ * Play/Pause button of a playlist (#277), in its header next to the track
+ * count, so it scrolls with the list and never covers a row (#307). Play queues the playlist as a block and plays its first track;
  * while this device plays an item queued from this playlist it pauses and
  * resumes the audio without any request.
  */
 export function PlayPlaylistButton({ playlistId, trackCount }: PlayPlaylistButtonProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
-	const playerHeight = usePlayerHeight();
 	const queueItemId = usePlayerStore(state => state.queueItemId);
 	const playbackState = usePlayerStore(state => state.playbackState);
 	const pause = usePlayerStore(state => state.pause);
@@ -68,11 +66,7 @@ export function PlayPlaylistButton({ playlistId, trackCount }: PlayPlaylistButto
 
 	return (
 		<Pressable
-			style={({ pressed }) => [
-				styles.fab,
-				{ bottom: playerHeight + theme.spacing.md },
-				pressed && styles.pressed,
-			]}
+			style={({ pressed }) => [styles.button, pressed && styles.pressed]}
 			onPress={handlePress}
 			disabled={loading}
 			accessibilityRole="button"
@@ -84,7 +78,7 @@ export function PlayPlaylistButton({ playlistId, trackCount }: PlayPlaylistButto
 			) : (
 				<Ionicons
 					name={playing ? 'pause' : 'play'}
-					size={28}
+					size={22}
 					color={theme.colors.textInverse}
 					style={playing ? undefined : styles.playIcon}
 				/>
@@ -95,24 +89,19 @@ export function PlayPlaylistButton({ playlistId, trackCount }: PlayPlaylistButto
 
 const createStyles = (theme: Theme) =>
 	StyleSheet.create({
-		fab: {
-			position: 'absolute',
-			right: theme.spacing.lg,
-			width: PLAY_PLAYLIST_BUTTON_SIZE,
-			height: PLAY_PLAYLIST_BUTTON_SIZE,
-			borderRadius: PLAY_PLAYLIST_BUTTON_SIZE / 2,
+		button: {
+			width: BUTTON_SIZE,
+			height: BUTTON_SIZE,
+			borderRadius: BUTTON_SIZE / 2,
 			backgroundColor: theme.colors.primary,
 			justifyContent: 'center',
 			alignItems: 'center',
-			borderWidth: theme.borders.thick,
-			borderColor: theme.colors.border,
-			...theme.shadows.large,
 		},
 		pressed: {
 			opacity: 0.8,
 		},
 		// The play glyph looks off-centre to the left in a circle.
 		playIcon: {
-			marginLeft: 3,
+			marginLeft: 2,
 		},
 	});

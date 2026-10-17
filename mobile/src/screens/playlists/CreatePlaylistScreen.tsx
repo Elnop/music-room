@@ -1,13 +1,6 @@
 import React, { useState } from 'react';
-import {
-	View,
-	Text,
-	StyleSheet,
-	ScrollView,
-	KeyboardAvoidingView,
-	Platform,
-	Switch,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { ThemedSwitch } from '@components/common/ThemedSwitch';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -157,12 +150,7 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
 											{isPrivate ? 'Visible only to invited people' : 'Visible to all users'}
 										</Text>
 									</View>
-									<Switch
-										value={isPrivate}
-										onValueChange={setIsPrivate}
-										trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
-										thumbColor={theme.colors.surface}
-									/>
+									<ThemedSwitch value={isPrivate} onValueChange={setIsPrivate} />
 								</View>
 							</View>
 
@@ -176,12 +164,7 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
 												: 'Everyone can add/remove tracks'}
 										</Text>
 									</View>
-									<Switch
-										value={isEditRestricted}
-										onValueChange={setIsEditRestricted}
-										trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
-										thumbColor={theme.colors.surface}
-									/>
+									<ThemedSwitch value={isEditRestricted} onValueChange={setIsEditRestricted} />
 								</View>
 							</View>
 

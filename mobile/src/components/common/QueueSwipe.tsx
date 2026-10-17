@@ -25,7 +25,7 @@ export function QueueSwipe({ children, onAddToQueue, renderRightActions }: Queue
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
 	const renderLeftActions = () => (
-		<View style={styles.queueAction} accessible accessibilityLabel="Ajouter à la file de lecture">
+		<View style={styles.queueAction} accessible accessibilityLabel="Ajouter à la file d'attente">
 			<Ionicons name="list" size={24} color="#FFFFFF" />
 			<Text style={styles.queueText}>À la file</Text>
 		</View>

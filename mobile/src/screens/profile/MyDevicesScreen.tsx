@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, Switch, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import { ThemedSwitch } from '@components/common/ThemedSwitch';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, type NavigationProp } from '@react-navigation/native';
 import type { AppTabsParamList } from '@/navigation/AppNavigator';
@@ -214,14 +215,12 @@ export function MyDevicesScreen() {
 					<Text style={styles.friendName}>{name}</Text>
 					{allDevices && <Text style={styles.hint}>Contrôle tous mes appareils</Text>}
 				</View>
-				<Switch
+				<ThemedSwitch
 					value={value}
 					onValueChange={next => handleToggle(device, friend, next)}
 					disabled={allDevices || isPending}
 					accessibilityLabel={`${name} sur ${device.deviceName}`}
 					accessibilityState={{ disabled: allDevices || isPending, busy: isPending }}
-					trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
-					thumbColor={theme.colors.surface}
 				/>
 			</View>
 		);
