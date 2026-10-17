@@ -738,6 +738,22 @@ class RealtimeService {
 		return { ownerId: userId, devices };
 	}
 
+	/**
+	 * Give a connected device the name its owner just chose (#352): its socket
+	 * data and its listening status take it at once, and the owner's listeners
+	 * get the status again. No-op when offline.
+	 */
+	setDeviceName(userId: string, deviceId: string, deviceName: string): void {
+		const socketId = this.deviceToSocket.get(`${userId}:${deviceId}`);
+		const socket = socketId ? this.io?.sockets.sockets.get(socketId) : undefined;
+		if (socket) socket.data.device = { ...socket.data.device, deviceName };
+
+		const status = this.listeningStatuses.get(userId)?.get(deviceId);
+		if (!status) return;
+		status.device = { ...status.device, deviceName };
+		this.broadcastUserListeningStatus(userId);
+	}
+
 	/** Whether a device of userId has a connected socket (#294). */
 	isDeviceOnline(userId: string, deviceId: string): boolean {
 		return this.deviceToSocket.has(`${userId}:${deviceId}`);

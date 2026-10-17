@@ -55,6 +55,11 @@ export interface RevokeDeviceLicenseResponse {
 	message: string;
 }
 
+/** PATCH /api/music-control/devices/:deviceId (#352) */
+export interface RenameDeviceResponse {
+	device: UserDevice;
+}
+
 /** GET /api/music-control/users/:userId/devices */
 export interface ControllableDevicesResponse {
 	allDevices: boolean;

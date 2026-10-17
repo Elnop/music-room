@@ -42,6 +42,7 @@ export type Database = {
 			devices: {
 				Row: {
 					created_at: string;
+					custom_name: string | null;
 					device_id: string;
 					device_name: string;
 					last_seen_at: string;
@@ -51,6 +52,7 @@ export type Database = {
 				};
 				Insert: {
 					created_at?: string;
+					custom_name?: string | null;
 					device_id: string;
 					device_name?: string;
 					last_seen_at?: string;
@@ -60,6 +62,7 @@ export type Database = {
 				};
 				Update: {
 					created_at?: string;
+					custom_name?: string | null;
 					device_id?: string;
 					device_name?: string;
 					last_seen_at?: string;

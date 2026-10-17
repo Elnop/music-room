@@ -5,7 +5,9 @@ import type {
 	DevicePickerResponse,
 	GrantDeviceLicenseResponse,
 	MyDevicesResponse,
+	RenameDeviceResponse,
 	RevokeDeviceLicenseResponse,
+	UserDevice,
 	UserDeviceWithLicenses,
 } from '@/types/device.types';
 
@@ -96,6 +98,21 @@ export const musicControlApi = {
 			headers: await authHeaders(),
 		});
 		return data.devices;
+	},
+
+	/**
+	 * Rename one of my devices (#352); null goes back to the name the system gives
+	 */
+	async renameDevice(deviceId: string, name: string | null): Promise<UserDevice> {
+		const data = await apiRequest<RenameDeviceResponse>(
+			`/api/music-control/devices/${encodeURIComponent(deviceId)}`,
+			{
+				method: 'PATCH',
+				headers: await authHeaders(),
+				body: JSON.stringify({ name }),
+			}
+		);
+		return data.device;
 	},
 
 	/**

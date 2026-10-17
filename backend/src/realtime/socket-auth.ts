@@ -36,7 +36,9 @@ import { clientIp } from '@/shared/config/trust-proxy.js';
  *
  * On success the device is recorded in `devices` (one row per user and
  * deviceId, `last_seen_at` refreshed) before the connection is accepted, and
- * `socket.data` holds `{ userId, email, device, appVersion }`. The
+ * `socket.data` holds `{ userId, email, device, appVersion }`, where
+ * `device.deviceName` is the name the owner gave the device when set, else
+ * the handshake `deviceName` (#352). The
  * identity comes only from the verified token: any `userId` sent by the client
  * is ignored. The token is checked once, at the handshake.
  */
@@ -131,7 +133,9 @@ export async function authenticateSocket(
 
 	const device: DeviceInfo = { deviceId, deviceName, platform, model };
 	try {
-		await deviceService.recordConnection(user.id, device);
+		// The stored device keeps the system name; the socket carries the name
+		// to show, the owner's custom one when set (#352).
+		device.deviceName = await deviceService.recordConnection(user.id, device);
 	} catch {
 		// DeviceService has already logged the database error.
 		refuse(socket, next, 'DEVICE_REGISTRATION_FAILED');
@@ -147,7 +151,7 @@ export async function authenticateSocket(
 
 	socketLogger.auth('handshake', user.id, socket.id, {
 		deviceId,
-		deviceName,
+		deviceName: device.deviceName,
 		platform,
 		model,
 		appVersion,

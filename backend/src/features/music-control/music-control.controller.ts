@@ -6,8 +6,11 @@ import { routeParam } from '@/shared/utils/route-params.js';
 import { DeviceService } from '@/features/music-control/services/device.service.js';
 import { deviceLicenseService } from '@/features/music-control/services/device-license.service.js';
 import { ControllableDevicesService } from '@/features/music-control/services/controllable-devices.service.js';
+import { realtime } from '@/realtime/index.js';
 import {
 	deviceLicenseParamsSchema,
+	deviceParamsSchema,
+	renameDeviceSchema,
 	userDevicesParamsSchema,
 } from '@/features/music-control/music-control.validators.js';
 import type {
@@ -15,6 +18,7 @@ import type {
 	DevicePickerResponse,
 	GrantDeviceLicenseResponse,
 	MyDevicesResponse,
+	RenameDeviceResponse,
 	RevokeDeviceLicenseResponse,
 } from '@/features/music-control/music-control.types.js';
 
@@ -166,6 +170,24 @@ export class MusicControlController {
 			const ownerId = (req as AuthenticatedRequest).user.id;
 			const devices = await deviceService.listMyDevices(ownerId);
 			sendData<MyDevicesResponse>(res, { devices });
+		} catch (error) {
+			next(error);
+		}
+	}
+
+	/**
+	 * PATCH /api/music-control/devices/:deviceId
+	 * Rename one of my devices (`name: null` goes back to the system name); a
+	 * connected socket of that device takes the new name at once
+	 */
+	async renameDevice(req: Request, res: Response, next: NextFunction) {
+		try {
+			const ownerId = (req as AuthenticatedRequest).user.id;
+			const { deviceId } = deviceParamsSchema.parse(req.params);
+			const { name } = renameDeviceSchema.parse(req.body);
+			const device = await deviceService.renameDevice(ownerId, deviceId, name);
+			realtime.setDeviceName(ownerId, deviceId, device.deviceName);
+			sendData<RenameDeviceResponse>(res, { device });
 		} catch (error) {
 			next(error);
 		}
