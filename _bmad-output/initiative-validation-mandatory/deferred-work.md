@@ -60,9 +60,6 @@
 - source_plan: `_bmad-output/initiative-validation-mandatory/plan-gh-310-audio-interruptions.md`
   summary: Unverified (would be medium) — iOS may not resume after a call if the AVPlayer is already paused when expo-audio handles `.began`.
   evidence: `handleInterruptionBegan` (`expo-audio/ios/AudioModule.swift` l.383-398) only records players with `isPlaying` still true. Settle it on an iPhone: start a track, receive a call, end it, and check that playback resumes. If it does not, the JS side must resume after the interruption itself.
-- source_plan: `_bmad-output/initiative-validation-mandatory/plan-gh-307-ux-playlists.md`
-  summary: Find why the « + » on « Ajouter des titres » showed no feedback during the add call (audit #307); `extraData` was not the cause.
-  evidence: React Native's FlatList (non-strictMode) rebuilds its renderer each render, so rows already re-rendered on `addingTrackId` and the existing spinner should show. Settle on device: time the call, check the white spinner on `primary` at 0.7 opacity is visible, and check the tap registers at once.
 - source_plan: `_bmad-output/initiative-validation-mandatory/plan-gh-307-ux-search.md`
   summary: The `SoundCloudTrack` schema in `backend/src/features/soundcloud/soundcloud.openapi.ts` documents fields (`artist`, `trackUri`, `albumArt`) the search endpoint does not return.
   evidence: `soundcloud-search.service.ts` passes SoundCloud's search objects through unchanged (`title`, `user`, `artwork_url`, `permalink_url`…); noticed by the implementer while adding `policy` and `media`.

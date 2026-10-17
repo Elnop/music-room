@@ -33,7 +33,8 @@ jest.mock('@/contexts/PlayerContext', () => ({
 }));
 
 jest.mock('@store/playlistStore', () => ({
-	usePlaylistStore: () => ({ addTrack: mockAddTrack, currentPlaylist: null }),
+	usePlaylistStore: (select: (s: object) => unknown) =>
+		select({ addTrack: mockAddTrack, currentPlaylist: null }),
 }));
 
 const mockSearch = jest.fn();
@@ -88,7 +89,7 @@ beforeEach(() => {
 });
 
 describe('SearchTracksScreen adding (#307)', () => {
-	it('shows a spinner in the row while the add call runs, then a check', async () => {
+	it('shows the check as soon as the row is tapped, before the add call ends', async () => {
 		let resolveAdd: () => void = () => {};
 		mockAddTrack.mockReturnValue(new Promise<void>(resolve => (resolveAdd = resolve)));
 		await renderScreen();
@@ -96,7 +97,7 @@ describe('SearchTracksScreen adding (#307)', () => {
 
 		fireEvent.press(screen.getByText('Song'));
 
-		expect(screen.getByTestId('adding-42')).toBeTruthy();
+		expect(screen.getByTestId('added-42')).toBeTruthy();
 		expect(mockAddTrack).toHaveBeenCalledWith(
 			'p1',
 			expect.objectContaining({ trackUri: result.permalink_url })
@@ -104,8 +105,17 @@ describe('SearchTracksScreen adding (#307)', () => {
 
 		await act(async () => resolveAdd());
 
-		expect(screen.queryByTestId('adding-42')).toBeNull();
 		expect(screen.getByTestId('added-42')).toBeTruthy();
+	});
+
+	it('sends one add call when the row is tapped twice', async () => {
+		mockAddTrack.mockReturnValue(new Promise<void>(() => {}));
+		await renderScreen();
+
+		fireEvent.press(screen.getByText('Song'));
+		fireEvent.press(screen.getByText('Song'));
+
+		expect(mockAddTrack).toHaveBeenCalledTimes(1);
 	});
 
 	it('shows an error toast and the + again when the add fails', async () => {
@@ -117,7 +127,7 @@ describe('SearchTracksScreen adding (#307)', () => {
 		});
 
 		expect(showError).toHaveBeenCalled();
-		expect(screen.queryByTestId('adding-42')).toBeNull();
+		expect(screen.queryByTestId('added-42')).toBeNull();
 		expect(screen.getByTestId('add-42')).toBeTruthy();
 	});
 });
