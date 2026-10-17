@@ -7,6 +7,7 @@ import {
 	TouchableOpacity,
 	RefreshControl,
 	Pressable,
+	Alert,
 } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -117,6 +118,13 @@ export function ProfileScreen() {
 		} catch (error) {
 			console.error('[ProfileScreen] Logout failed:', error);
 		}
+	};
+
+	const confirmLogout = () => {
+		Alert.alert('Se déconnecter ?', 'Vous devrez vous reconnecter pour utiliser Zumik.', [
+			{ text: 'Annuler', style: 'cancel' },
+			{ text: 'Se déconnecter', style: 'destructive', onPress: handleLogout },
+		]);
 	};
 
 	if (!user) {
@@ -275,9 +283,13 @@ export function ProfileScreen() {
 
 				{/* Logout Button */}
 				<View style={styles.logoutSection}>
-					<TouchableOpacity style={styles.logoutButton} onPress={handleLogout} disabled={isLoading}>
+					<TouchableOpacity
+						style={styles.logoutButton}
+						onPress={confirmLogout}
+						disabled={isLoading}
+					>
 						<Ionicons name="log-out-outline" size={20} color="#DC2626" />
-						<Text style={styles.logoutText}>Logout</Text>
+						<Text style={styles.logoutText}>Se déconnecter</Text>
 					</TouchableOpacity>
 				</View>
 

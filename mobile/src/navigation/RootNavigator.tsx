@@ -1,11 +1,18 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
+import {
+	DarkTheme,
+	DefaultTheme,
+	NavigationContainer,
+	useNavigationContainerRef,
+} from '@react-navigation/native';
+import { useTheme } from '@/contexts/ThemeContext';
 import { AuthNavigator } from '@/navigation/AuthNavigator';
 import { AppNavigator, type AppTabsParamList } from '@/navigation/AppNavigator';
 import { createLinking, openPendingLink } from '@/navigation/linking';
 import { useAuthStore } from '@/store/authStore';
 import { useSocketStore } from '@/store/socketStore';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
+import { isDarkBackground } from '@components/common/ConnectionBanner';
 import { supabase } from '@/lib/supabase';
 import { useMusicControlEmitter } from '@hooks/useMusicControl';
 import { loadBackendUrl } from '@/services/backendUrl';
@@ -17,6 +24,25 @@ export function RootNavigator() {
 	const navigationRef = useNavigationContainerRef<AppTabsParamList>();
 	// zumik:// links; read at each link so a link received signed out waits for sign-in
 	const linking = useMemo(() => createLinking(() => useAuthStore.getState().isAuthenticated), []);
+
+	// react-navigation's own light default would flash white behind the screens
+	// of the dark theme during transitions.
+	const { theme } = useTheme();
+	const navigationTheme = useMemo(() => {
+		const base = isDarkBackground(theme.colors.background) ? DarkTheme : DefaultTheme;
+		return {
+			...base,
+			colors: {
+				...base.colors,
+				primary: theme.colors.primary,
+				background: theme.colors.background,
+				card: theme.colors.background,
+				text: theme.colors.text,
+				border: theme.colors.borderLight,
+				notification: theme.colors.primary,
+			},
+		};
+	}, [theme]);
 
 	const connectSocket = useSocketStore(state => state.connect);
 	const disconnectSocket = useSocketStore(state => state.disconnect);
@@ -105,7 +131,7 @@ export function RootNavigator() {
 	}
 
 	return (
-		<NavigationContainer ref={navigationRef} linking={linking}>
+		<NavigationContainer ref={navigationRef} linking={linking} theme={navigationTheme}>
 			{isAuthenticated ? <AppNavigator /> : <AuthNavigator />}
 		</NavigationContainer>
 	);

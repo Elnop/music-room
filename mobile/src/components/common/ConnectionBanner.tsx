@@ -49,6 +49,11 @@ export function textColorOn(background: string): string {
 		: LIGHT_TEXT;
 }
 
+/** Whether a background needs white text and light status bar icons. */
+export function isDarkBackground(background: string): boolean {
+	return textColorOn(background) === LIGHT_TEXT;
+}
+
 /**
  * Discreet top banner telling the user the app is offline or reconnecting
  * (#315). « Réessayer » restarts the socket once the Manager gave up.
