@@ -86,7 +86,7 @@ export function AppNavigator() {
 							tabBarActiveTintColor: theme.colors.primary,
 							tabBarInactiveTintColor: theme.colors.textSecondary,
 							tabBarStyle: styles.tabBar,
-							tabBarShowLabel: false,
+							tabBarLabelStyle: styles.tabLabel,
 							headerStyle: {
 								backgroundColor: theme.colors.background,
 							},
@@ -100,7 +100,7 @@ export function AppNavigator() {
 								const iconName = focused ? icons.active : icons.inactive;
 								return (
 									<View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
-										<Ionicons name={iconName} size={22} color={focused ? '#FFFFFF' : color} />
+										<Ionicons name={iconName} size={20} color={focused ? '#FFFFFF' : color} />
 									</View>
 								);
 							},
@@ -109,22 +109,30 @@ export function AppNavigator() {
 						<Tab.Screen
 							name="PlaylistsTab"
 							component={PlaylistsNavigator}
-							options={{ title: 'Playlists', headerShown: false }}
+							options={{
+								title: 'Playlists',
+								tabBarAccessibilityLabel: 'Playlists',
+								headerShown: false,
+							}}
 						/>
 						<Tab.Screen
 							name="SearchTab"
 							component={SearchNavigator}
-							options={{ title: 'Search', headerShown: false }}
+							options={{
+								title: 'Recherche',
+								tabBarAccessibilityLabel: 'Recherche',
+								headerShown: false,
+							}}
 						/>
 						<Tab.Screen
 							name="FriendsTab"
 							component={FriendsNavigator}
-							options={{ title: 'Friends', headerShown: false }}
+							options={{ title: 'Amis', tabBarAccessibilityLabel: 'Amis', headerShown: false }}
 						/>
 						<Tab.Screen
 							name="ProfileTab"
 							component={ProfileNavigator}
-							options={{ title: 'Profile', headerShown: false }}
+							options={{ title: 'Profil', tabBarAccessibilityLabel: 'Profil', headerShown: false }}
 						/>
 					</Tab.Navigator>
 				</SafeAreaInsetsContext.Provider>
@@ -156,11 +164,15 @@ const createStyles = (theme: Theme, bottomInset: number) =>
 			elevation: 0,
 		},
 		iconContainer: {
-			width: 44,
-			height: 44,
-			borderRadius: 22,
+			width: 56,
+			height: 30,
+			borderRadius: 15,
 			justifyContent: 'center',
 			alignItems: 'center',
+		},
+		tabLabel: {
+			fontSize: 11,
+			marginTop: 2,
 		},
 		iconContainerActive: {
 			backgroundColor: theme.colors.primary,

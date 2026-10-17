@@ -8,6 +8,10 @@ module.exports = {
 		orientation: 'portrait',
 		icon: './src/assets/logo/app-icon.png',
 		userInterfaceStyle: 'dark',
+		// Window background before the first render, applied by expo-system-ui:
+		// without it Android shows a white screen. The original theme's background;
+		// ThemedSystemUI then follows the active theme.
+		backgroundColor: '#0D0D0D',
 		newArchEnabled: true,
 		splash: {
 			image: './src/assets/logo/logo.png',

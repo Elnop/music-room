@@ -30,6 +30,11 @@ jest.mock('@/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 
+jest.mock('@/contexts/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@themes/original.theme');
+	return { useTheme: () => ({ theme: originalTheme }) };
+});
+
 jest.mock('@/services/backendUrl', () => ({
 	loadBackendUrl: () => Promise.resolve(),
 }));
