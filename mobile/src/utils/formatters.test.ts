@@ -1,5 +1,6 @@
 import {
 	capitalizeFirst,
+	formatDate,
 	formatDuration,
 	formatRelativeTime,
 	truncateText,
@@ -18,6 +19,12 @@ describe('formatDuration', () => {
 	});
 });
 
+describe('formatDate', () => {
+	it('formats in French', () => {
+		expect(formatDate('2026-10-01T12:00:00Z')).toBe('1 oct. 2026');
+	});
+});
+
 describe('formatRelativeTime', () => {
 	const NOW = new Date('2026-10-05T12:00:00Z');
 	const ago = (ms: number) => new Date(NOW.getTime() - ms);
@@ -31,10 +38,10 @@ describe('formatRelativeTime', () => {
 	});
 
 	it.each([
-		[30_000, 'Just now'],
-		[5 * 60_000, '5m ago'],
-		[3 * 3_600_000, '3h ago'],
-		[2 * 86_400_000, '2d ago'],
+		[30_000, "à l'instant"],
+		[5 * 60_000, 'il y a 5 min'],
+		[3 * 3_600_000, 'il y a 3 h'],
+		[2 * 86_400_000, 'il y a 2 j'],
 	])('%i ms ago -> %s', (ms, expected) => {
 		expect(formatRelativeTime(ago(ms))).toBe(expected);
 	});

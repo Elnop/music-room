@@ -335,14 +335,14 @@ describe('queueStore addItem', () => {
 		expect(player().queueItemId).toBeNull();
 	});
 
-	it('keeps the state and toasts the API message on failure', async () => {
+	it('keeps the state and toasts a French message on failure', async () => {
 		store().applyState(queue('a', ['a']));
 		api.addItem.mockRejectedValue(new ApiError('Queue is full', 'QUEUE_FULL'));
 
 		await expect(store().addItem(body)).resolves.toBe(false);
 
 		expect(mine().items.map(i => i.id)).toEqual(['a']);
-		expect(showError).toHaveBeenCalledWith('Queue is full');
+		expect(showError).toHaveBeenCalledWith("Impossible d'ajouter à la file d'attente");
 		expect(showSuccess).not.toHaveBeenCalled();
 		expect(hapticSuccess).not.toHaveBeenCalled();
 	});
@@ -376,7 +376,7 @@ describe('queueStore playNext', () => {
 		await expect(store().playNext(body)).resolves.toBe(false);
 
 		expect(mine().items.map(i => i.id)).toEqual(['a']);
-		expect(showError).toHaveBeenCalledWith('Queue is full');
+		expect(showError).toHaveBeenCalledWith("Impossible d'ajouter ce titre");
 		expect(showSuccess).not.toHaveBeenCalled();
 		expect(hapticSuccess).not.toHaveBeenCalled();
 	});

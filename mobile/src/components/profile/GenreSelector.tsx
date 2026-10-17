@@ -25,14 +25,13 @@ export function GenreSelector({
 	return (
 		<View style={styles.container}>
 			<View style={styles.header}>
-				<Text style={styles.title}>Music Preferences</Text>
 				<Text style={styles.counter}>
-					{selectedGenres.length}/{maxGenres} selected
+					{selectedGenres.length}/{maxGenres} {selectedGenres.length > 1 ? 'choisis' : 'choisi'}
 				</Text>
 			</View>
 
 			<Text style={styles.description}>
-				Select up to {maxGenres} genres that define your music taste
+				Choisissez jusqu'à {maxGenres} genres qui définissent vos goûts musicaux
 			</Text>
 
 			<View style={styles.genresGrid}>
@@ -53,7 +52,9 @@ export function GenreSelector({
 			</View>
 
 			{isMaxReached && (
-				<Text style={styles.maxWarning}>Maximum genres selected. Deselect one to add another.</Text>
+				<Text style={styles.maxWarning}>
+					Nombre maximum de genres atteint. Retirez-en un pour en ajouter un autre.
+				</Text>
 			)}
 		</View>
 	);
@@ -66,14 +67,9 @@ const createStyles = (theme: Theme) =>
 		},
 		header: {
 			flexDirection: 'row',
-			justifyContent: 'space-between',
+			justifyContent: 'flex-end',
 			alignItems: 'center',
 			marginBottom: theme.spacing.xs,
-		},
-		title: {
-			fontSize: 18,
-			fontWeight: theme.typography.weights.semibold,
-			color: theme.colors.text,
 		},
 		counter: {
 			fontSize: 14,

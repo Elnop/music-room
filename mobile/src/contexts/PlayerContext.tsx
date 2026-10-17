@@ -7,6 +7,7 @@ import { isStreamStale, streamPrefetch } from '@/store/streamPrefetch';
 import { trackToSoundCloud } from '@utils/trackToSoundCloud';
 import { useConnectStore } from '@/store/connectStore';
 import { ApiError, apiRequest } from '@/services/api';
+import { apiErrorMessage } from '@/utils/apiErrorMessage';
 import type { StreamUrlResponse } from '@/types/soundcloud.types';
 import { MediaSessionBridge } from '@/components/player/MediaSessionBridge';
 import { useLastTrackPersistence } from '@/hooks/useLastTrackPersistence';
@@ -217,7 +218,7 @@ function StreamWatchdog({ player }: { player: ReturnType<typeof useAudioPlayer> 
 		const { streamRenewed, renewStream, setTrackUnavailableError } = usePlayerStore.getState();
 		if (streamRenewed) {
 			if (__DEV__) console.log('🔴 [StreamWatchdog] Failed again after a renewal');
-			setTrackUnavailableError('Unable to load this track');
+			setTrackUnavailableError('Impossible de charger ce titre');
 		} else {
 			if (__DEV__) console.log('🟠 [StreamWatchdog] Player failed mid-track, renewing stream');
 			renewStream(lastPositionMsRef.current, true, true);
@@ -404,17 +405,16 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 				// apiRequest wraps the abort in an ApiError, so read the signal itself
 				if (controller.signal.aborted) {
 					console.error('🔴 [PlayerProvider] Fetch timeout!');
-					setTrackUnavailableError('Loading too long - try again');
+					setTrackUnavailableError('Chargement trop long, réessayez');
 				} else if (err instanceof ApiError && err.status === 404) {
 					// Track not available
-					setTrackUnavailableError('This track is no longer available (rights are expensive)');
+					setTrackUnavailableError("Ce titre n'est plus disponible");
 				} else if (err instanceof ApiError && err.status !== undefined) {
 					console.error('🔴 [PlayerProvider] Server error details:', err.message);
-					setTrackUnavailableError(`Server error (${err.status}): ${err.message}`);
+					setTrackUnavailableError(apiErrorMessage(err, 'Impossible de charger ce titre'));
 				} else {
-					const errorMsg = err instanceof Error ? err.message : 'Loading error';
-					console.error('🔴 [PlayerProvider] Error:', errorMsg);
-					setTrackUnavailableError(errorMsg);
+					console.error('🔴 [PlayerProvider] Error:', err instanceof Error ? err.message : err);
+					setTrackUnavailableError(apiErrorMessage(err, 'Erreur de chargement du titre'));
 				}
 			}
 		}
@@ -512,7 +512,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 				}
 
 				// Show error
-				setTrackUnavailableError('Unable to load this track');
+				setTrackUnavailableError('Impossible de charger ce titre');
 			}
 		}, PLAYER_LOAD_TIMEOUT_MS);
 

@@ -119,10 +119,10 @@ describe('LinkedAccountsScreen', () => {
 
 		expect(requests()[0]).toMatchObject({ method: 'GET' });
 		expect(requests()[0].url).toMatch(/\/api\/auth\/providers$/);
-		expect(screen.getByTestId('linked-account-password')).toHaveTextContent(/Linked · Primary/);
-		expect(screen.getByLabelText('Unlink Google')).toBeTruthy();
-		expect(screen.getByLabelText('Link Facebook')).toBeTruthy();
-		expect(screen.queryByLabelText(/Link Email|Unlink Email/)).toBeNull();
+		expect(screen.getByTestId('linked-account-password')).toHaveTextContent(/Lié · Principal/);
+		expect(screen.getByLabelText('Délier Google')).toBeTruthy();
+		expect(screen.getByLabelText('Lier Facebook')).toBeTruthy();
+		expect(screen.queryByLabelText(/Lier Email|Délier Email/)).toBeNull();
 	});
 
 	it('shows an error toast and no rows when loading fails', async () => {
@@ -130,7 +130,7 @@ describe('LinkedAccountsScreen', () => {
 
 		render(<LinkedAccountsScreen />);
 
-		await screen.findByText('Unable to load linked accounts', {}, FIRST_RENDER);
+		await screen.findByText('Impossible de charger les comptes liés', {}, FIRST_RENDER);
 		expect(showError).toHaveBeenCalledWith(
 			'Le serveur a rencontré un problème. Réessayez plus tard.'
 		);
@@ -144,9 +144,9 @@ describe('LinkedAccountsScreen', () => {
 		mockedGoogle.mockResolvedValue('google-id-token');
 
 		await renderLoaded();
-		fireEvent.press(screen.getByLabelText('Link Google'));
+		fireEvent.press(screen.getByLabelText('Lier Google'));
 
-		await screen.findByLabelText('Unlink Google');
+		await screen.findByLabelText('Délier Google');
 		expect(requests()[1]).toMatchObject({
 			method: 'POST',
 			body: { idToken: 'google-id-token' },
@@ -163,9 +163,9 @@ describe('LinkedAccountsScreen', () => {
 		mockedFacebook.mockResolvedValue('fb-access-token');
 
 		await renderLoaded();
-		fireEvent.press(screen.getByLabelText('Link Facebook'));
+		fireEvent.press(screen.getByLabelText('Lier Facebook'));
 
-		await screen.findByLabelText('Unlink Facebook');
+		await screen.findByLabelText('Délier Facebook');
 		expect(requests()[1]).toMatchObject({
 			method: 'POST',
 			body: { accessToken: 'fb-access-token' },
@@ -178,9 +178,9 @@ describe('LinkedAccountsScreen', () => {
 		mockedGoogle.mockRejectedValue(new Error('SIGN_IN_CANCELLED'));
 
 		await renderLoaded();
-		fireEvent.press(screen.getByLabelText('Link Google'));
+		fireEvent.press(screen.getByLabelText('Lier Google'));
 
-		await waitFor(() => expect(screen.getByLabelText('Link Google')).toBeEnabled());
+		await waitFor(() => expect(screen.getByLabelText('Lier Google')).toBeEnabled());
 		expect(fetchMock).toHaveBeenCalledTimes(1);
 		expect(showError).not.toHaveBeenCalled();
 		expect(showSuccess).not.toHaveBeenCalled();
@@ -197,10 +197,10 @@ describe('LinkedAccountsScreen', () => {
 		mockedGoogle.mockResolvedValue('google-id-token');
 
 		await renderLoaded();
-		fireEvent.press(screen.getByLabelText('Link Google'));
+		fireEvent.press(screen.getByLabelText('Lier Google'));
 
 		await waitFor(() => expect(showError).toHaveBeenCalledWith(message));
-		expect(screen.getByLabelText('Link Google')).toBeTruthy();
+		expect(screen.getByLabelText('Lier Google')).toBeTruthy();
 		expect(showSuccess).not.toHaveBeenCalled();
 	});
 
@@ -211,9 +211,9 @@ describe('LinkedAccountsScreen', () => {
 			.mockResolvedValueOnce(ok({ providers: [password] }));
 
 		await renderLoaded();
-		fireEvent.press(screen.getByLabelText('Unlink Google'));
+		fireEvent.press(screen.getByLabelText('Délier Google'));
 
-		await screen.findByLabelText('Link Google');
+		await screen.findByLabelText('Lier Google');
 		expect(requests()[1]).toMatchObject({ method: 'DELETE' });
 		expect(requests()[1].url).toMatch(/\/api\/auth\/providers\/google$/);
 		expect(requests()[2]).toMatchObject({ method: 'GET' });
@@ -229,10 +229,10 @@ describe('LinkedAccountsScreen', () => {
 			);
 
 		await renderLoaded();
-		fireEvent.press(screen.getByLabelText('Unlink Google'));
+		fireEvent.press(screen.getByLabelText('Délier Google'));
 
 		await waitFor(() => expect(showError).toHaveBeenCalledWith(message));
-		expect(screen.getByLabelText('Unlink Google')).toBeTruthy();
+		expect(screen.getByLabelText('Délier Google')).toBeTruthy();
 		expect(fetchMock).toHaveBeenCalledTimes(2);
 	});
 
@@ -247,13 +247,13 @@ describe('LinkedAccountsScreen', () => {
 		fetchMock.mockResolvedValueOnce(ok({ providers: [password, google] }));
 
 		await renderLoaded();
-		fireEvent.press(screen.getByLabelText('Link Google'));
+		fireEvent.press(screen.getByLabelText('Lier Google'));
 
-		await waitFor(() => expect(screen.getByLabelText('Link Facebook')).toBeDisabled());
-		expect(screen.getByLabelText('Link Google')).toBeDisabled();
+		await waitFor(() => expect(screen.getByLabelText('Lier Facebook')).toBeDisabled());
+		expect(screen.getByLabelText('Lier Google')).toBeDisabled();
 
 		finishSignIn('google-id-token');
-		await screen.findByLabelText('Unlink Google');
-		expect(screen.getByLabelText('Link Facebook')).toBeEnabled();
+		await screen.findByLabelText('Délier Google');
+		expect(screen.getByLabelText('Lier Facebook')).toBeEnabled();
 	});
 });

@@ -284,7 +284,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 
 		// If switching to public, warn about removing access restrictions
 		if (isPrivate) {
-			showWarning('Playlist public : visible par tous');
+			showWarning('Playlist publique : visible par tous');
 		}
 		await performVisibilityUpdate(newVisibility);
 	};
@@ -399,7 +399,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 
 	const renderSettingsSection = () => (
 		<View style={styles.settingsSection}>
-			<Text style={styles.settingsSectionTitle}>Settings</Text>
+			<Text style={styles.settingsSectionTitle}>Paramètres</Text>
 
 			{/* Visibility Toggle */}
 			<View style={styles.settingItem}>
@@ -412,9 +412,11 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 						/>
 					</View>
 					<View style={styles.settingTextContainer}>
-						<Text style={styles.settingLabel}>Visibility</Text>
+						<Text style={styles.settingLabel}>Visibilité</Text>
 						<Text style={styles.settingDescription}>
-							{isPrivate ? 'Private - Only invited people can see' : 'Public - Visible to everyone'}
+							{isPrivate
+								? 'Privée : visible uniquement par les invités'
+								: 'Publique : visible par tous'}
 						</Text>
 					</View>
 				</View>
@@ -436,11 +438,11 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 						/>
 					</View>
 					<View style={styles.settingTextContainer}>
-						<Text style={styles.settingLabel}>Edit mode</Text>
+						<Text style={styles.settingLabel}>Mode de modification</Text>
 						<Text style={styles.settingDescription}>
 							{isEditRestricted
-								? 'Restricted - Only editors can modify'
-								: 'Open - Everyone can modify'}
+								? 'Restreint : seuls les éditeurs peuvent modifier'
+								: 'Ouvert : tout le monde peut modifier'}
 						</Text>
 					</View>
 				</View>
@@ -457,9 +459,9 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 		<View style={styles.infoCard}>
 			<Ionicons name="information-circle" size={28} color={theme.colors.primary} />
 			<View style={styles.infoContent}>
-				<Text style={styles.infoTitle}>Open playlist</Text>
+				<Text style={styles.infoTitle}>Playlist ouverte</Text>
 				<Text style={styles.infoText}>
-					This playlist is public and everyone can add or remove tracks.
+					Cette playlist est publique : tout le monde peut ajouter ou retirer des titres.
 				</Text>
 			</View>
 		</View>
@@ -468,37 +470,38 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 	const getHeaderContent = () => {
 		if (isPrivate && isEditRestricted) {
 			return {
-				title: 'Access and editing',
-				subtitle: 'Manage who can see this playlist and who can edit it.',
+				title: 'Accès et modification',
+				subtitle: 'Gérez qui peut voir cette playlist et qui peut la modifier.',
 			};
 		}
 		if (isPrivate && !isEditRestricted) {
 			return {
-				title: 'Access',
-				subtitle: 'Manage who can see and edit this private playlist. All guests can edit.',
+				title: 'Accès',
+				subtitle:
+					'Gérez qui peut voir et modifier cette playlist privée. Tous les invités peuvent la modifier.',
 			};
 		}
 		if (!isPrivate && isEditRestricted) {
 			return {
-				title: 'Editors',
-				subtitle: 'Manage who can edit this public playlist.',
+				title: 'Éditeurs',
+				subtitle: 'Gérez qui peut modifier cette playlist publique.',
 			};
 		}
 		// public + open
 		return {
-			title: 'Sharing',
-			subtitle: 'This playlist is open to everyone.',
+			title: 'Playlist ouverte à tous',
+			subtitle: 'Cette playlist est ouverte à tous.',
 		};
 	};
 
 	const getSectionTitle = () => {
 		if (isPrivate && isEditRestricted) {
-			return `People with access (${members.length})`;
+			return `Personnes ayant accès (${members.length})`;
 		}
 		if (isPrivate && !isEditRestricted) {
-			return `Guests (${members.length})`;
+			return `Invités (${members.length})`;
 		}
-		return `Editors (${members.length})`;
+		return `Éditeurs (${members.length})`;
 	};
 
 	const getEmptyMessage = () => {
@@ -509,7 +512,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 	};
 
 	if (isLoading) {
-		return <LoadingSpinner fullScreen message="Loading..." />;
+		return <LoadingSpinner fullScreen message="Chargement…" />;
 	}
 
 	const headerContent = getHeaderContent();
@@ -538,14 +541,14 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 						<SearchBar
 							value={searchQuery}
 							onChangeText={handleSearchChange}
-							placeholder="Search for a user..."
+							placeholder="Rechercher un utilisateur…"
 							style={styles.searchBar}
 						/>
 					)}
 
 					{searchQuery.trim() && !isInfoOnly && (
 						<View style={styles.searchResults}>
-							<Text style={styles.sectionTitle}>Results</Text>
+							<Text style={styles.sectionTitle}>Résultats</Text>
 							{isSearching ? (
 								<LoadingSpinner size="small" />
 							) : searchResults.length > 0 ? (

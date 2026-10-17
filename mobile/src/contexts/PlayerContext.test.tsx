@@ -325,7 +325,7 @@ describe('PlayerProvider stream renewal (#313)', () => {
 		await flush();
 
 		expect(mockApiRequest).toHaveBeenCalledTimes(2);
-		expect(usePlayerStore.getState().error).toBe('Unable to load this track');
+		expect(usePlayerStore.getState().error).toBe('Impossible de charger ce titre');
 		expect(usePlayerStore.getState().currentTrack).toBeNull();
 	});
 
@@ -427,9 +427,7 @@ describe('PlayerProvider stream renewal (#313)', () => {
 		await flush();
 
 		expect(mockApiRequest).toHaveBeenCalledTimes(2);
-		expect(usePlayerStore.getState().error).toBe(
-			'This track is no longer available (rights are expensive)'
-		);
+		expect(usePlayerStore.getState().error).toBe("Ce titre n'est plus disponible");
 		expect(usePlayerStore.getState().playbackState).toBe('idle');
 	});
 
@@ -644,7 +642,7 @@ describe('PlayerProvider restored track (#312)', () => {
 
 		const state = usePlayerStore.getState();
 		expect(mockApiRequest).toHaveBeenCalledTimes(1);
-		expect(state.error).toBe('This track is no longer available (rights are expensive)');
+		expect(state.error).toBe("Ce titre n'est plus disponible");
 		expect(state.currentTrack).toBeNull();
 		expect(state.playbackState).toBe('idle');
 	});

@@ -41,7 +41,7 @@ const profile = {
 	id: ID,
 	username: 'alice',
 	displayName: 'Alice',
-	createdAt: '2026-01-01T00:00:00Z',
+	createdAt: '2026-01-15T12:00:00Z',
 	isOwnProfile: false,
 	isFriend: false,
 };
@@ -129,7 +129,13 @@ describe('UserProfileScreen', () => {
 		mockFollowStatus(true, true);
 		renderScreen();
 
-		await screen.findByText('Follows you');
+		await screen.findByText('Vous suit');
 		expect(screen.queryByText(FOLLOW_BACK_HINT)).toBeNull();
+	});
+
+	it('dates the membership in French (#341)', async () => {
+		renderScreen();
+
+		expect(await screen.findByText('Membre depuis janvier 2026')).toBeTruthy();
 	});
 });

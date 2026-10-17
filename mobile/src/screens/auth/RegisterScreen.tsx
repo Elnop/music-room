@@ -125,7 +125,7 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
 										label="Email"
 										value={value}
 										onChangeText={onChange}
-										placeholder="you@example.com"
+										placeholder="vous@exemple.com"
 										error={errors.email?.message}
 										keyboardType="email-address"
 										autoCapitalize="none"
@@ -138,10 +138,10 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
 								name="username"
 								render={({ field: { onChange, value } }) => (
 									<Input
-										label="Username"
+										label="Nom d'utilisateur"
 										value={value}
 										onChangeText={onChange}
-										placeholder="your_username"
+										placeholder="votre_pseudo"
 										error={errors.username?.message}
 										autoCapitalize="none"
 									/>
@@ -153,10 +153,10 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
 								name="password"
 								render={({ field: { onChange, value } }) => (
 									<Input
-										label="Password"
+										label="Mot de passe"
 										value={value}
 										onChangeText={onChange}
-										placeholder="Create a strong password"
+										placeholder="Choisissez un mot de passe robuste"
 										error={errors.password?.message}
 										secureTextEntry
 										autoCapitalize="none"
@@ -166,13 +166,13 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
 
 							<View style={styles.passwordHint}>
 								<Text style={styles.passwordHintText}>
-									Password must contain:{'\n'}• At least 8 characters{'\n'}• One uppercase letter
-									{'\n'}• One number{'\n'}• One special character
+									Le mot de passe doit contenir :{'\n'}• Au moins 8 caractères{'\n'}• Une majuscule
+									{'\n'}• Un chiffre{'\n'}• Un caractère spécial
 								</Text>
 							</View>
 
 							<Button
-								title="Create Account"
+								title="Créer un compte"
 								onPress={handleSubmit(onSubmit)}
 								loading={isLoading}
 								fullWidth
@@ -182,7 +182,7 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
 							{/* Divider */}
 							<View style={styles.divider}>
 								<View style={styles.dividerLine} />
-								<Text style={styles.dividerText}>OR</Text>
+								<Text style={styles.dividerText}>OU</Text>
 								<View style={styles.dividerLine} />
 							</View>
 
@@ -193,7 +193,7 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
 								disabled={isLoading}
 							>
 								<Text style={styles.googleIcon}>G</Text>
-								<Text style={styles.googleButtonText}>Continue with Google</Text>
+								<Text style={styles.googleButtonText}>Continuer avec Google</Text>
 							</TouchableOpacity>
 
 							{/* Facebook Sign-In Button */}
@@ -203,14 +203,14 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
 								disabled={isLoading}
 							>
 								<Text style={styles.facebookIcon}>f</Text>
-								<Text style={styles.facebookButtonText}>Continue with Facebook</Text>
+								<Text style={styles.facebookButtonText}>Continuer avec Facebook</Text>
 							</TouchableOpacity>
 						</View>
 
 						<View style={styles.footer}>
-							<Text style={styles.footerText}>Already have an account? </Text>
+							<Text style={styles.footerText}>Déjà un compte ? </Text>
 							<Text style={styles.footerLink} onPress={() => navigation.navigate('Login')}>
-								Sign in
+								Se connecter
 							</Text>
 						</View>
 					</View>

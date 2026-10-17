@@ -8,7 +8,7 @@ export const formatDuration = (ms: number): string => {
 
 export const formatDate = (date: string | Date): string => {
 	const d = new Date(date);
-	return d.toLocaleDateString('en-US', {
+	return d.toLocaleDateString('fr-FR', {
 		year: 'numeric',
 		month: 'short',
 		day: 'numeric',
@@ -21,14 +21,14 @@ export const formatRelativeTime = (date: string | Date): string => {
 	const diffMs = now.getTime() - past.getTime();
 	const diffMins = Math.floor(diffMs / 60000);
 
-	if (diffMins < 1) return 'Just now';
-	if (diffMins < 60) return `${diffMins}m ago`;
+	if (diffMins < 1) return "à l'instant";
+	if (diffMins < 60) return `il y a ${diffMins} min`;
 
 	const diffHours = Math.floor(diffMins / 60);
-	if (diffHours < 24) return `${diffHours}h ago`;
+	if (diffHours < 24) return `il y a ${diffHours} h`;
 
 	const diffDays = Math.floor(diffHours / 24);
-	if (diffDays < 7) return `${diffDays}d ago`;
+	if (diffDays < 7) return `il y a ${diffDays} j`;
 
 	return formatDate(date);
 };

@@ -83,7 +83,7 @@ describe('MiniPlayer', () => {
 	it('shows "Rien en lecture" without a track and opens the modal on tap', () => {
 		render(<MiniPlayer />);
 		expect(screen.getByText('Rien en lecture')).toBeTruthy();
-		expect(screen.getByText('Choisis un son pour commencer')).toBeTruthy();
+		expect(screen.getByText('Choisissez un titre pour commencer')).toBeTruthy();
 		fireEvent.press(screen.getByText('Rien en lecture'));
 		expect(usePlayerStore.getState().isModalOpen).toBe(true);
 	});

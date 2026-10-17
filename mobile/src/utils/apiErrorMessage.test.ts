@@ -98,12 +98,56 @@ describe('apiErrorMessage', () => {
 			new ApiError('Cannot unlink', 'LAST_PROVIDER', undefined, 400),
 			'Impossible de retirer votre dernière méthode de connexion',
 		],
+		[
+			'wrong password',
+			new ApiError('Invalid email or password', 'INVALID_CREDENTIALS', undefined, 401),
+			'Email ou mot de passe incorrect',
+		],
+		[
+			'email taken',
+			new ApiError('Email already registered', 'EMAIL_ALREADY_EXISTS', undefined, 409),
+			'Cet email est déjà utilisé',
+		],
+		[
+			'username taken',
+			new ApiError('Username already taken', 'USERNAME_TAKEN', undefined, 409),
+			"Ce nom d'utilisateur est déjà pris",
+		],
+		[
+			'wrong verification code',
+			new ApiError('Invalid verification code', 'INVALID_CODE', undefined, 400),
+			'Code de vérification incorrect',
+		],
+		[
+			'expired verification code',
+			new ApiError('Verification code expired', 'CODE_EXPIRED', undefined, 400),
+			'Ce code a expiré, demandez-en un nouveau',
+		],
+		[
+			'wrong reset code',
+			new ApiError('Invalid reset code', 'INVALID_RESET_CODE', undefined, 400),
+			'Code de réinitialisation incorrect ou expiré',
+		],
+		[
+			'locked account',
+			new ApiError('Account temporarily locked', 'ACCOUNT_LOCKED', undefined, 429),
+			'Compte temporairement bloqué après trop de tentatives. Réessayez plus tard.',
+		],
+		[
+			'auth outage',
+			new ApiError('Authentication service is unavailable', 'AUTH_UNAVAILABLE', undefined, 503),
+			"Le service d'authentification est indisponible. Réessayez plus tard.",
+		],
 	])('maps %s to French', (_label, error, expected) => {
 		expect(apiErrorMessage(error, FALLBACK)).toBe(expected);
 	});
 
 	it.each([
 		['an unknown ApiError', new ApiError('Something odd', 'VALIDATION_ERROR', undefined, 400)],
+		[
+			'an expired token on any endpoint',
+			new ApiError('Invalid token', 'INVALID_TOKEN', undefined, 401),
+		],
 		['an ApiError without status', new ApiError('Invalid JSON response', 'PARSE_ERROR')],
 		['a plain Error', new Error('Network request failed')],
 		['a string', 'boom'],

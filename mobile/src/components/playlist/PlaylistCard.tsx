@@ -35,12 +35,12 @@ export function PlaylistCard({ playlist, trackCount, ownerName, onPress }: Playl
 					{playlist.visibility === 'private' && (
 						<View style={styles.privateBadge}>
 							<Ionicons name="lock-closed" size={10} color={theme.colors.textSecondary} />
-							<Text style={styles.privateBadgeText}>Private</Text>
+							<Text style={styles.privateBadgeText}>Privée</Text>
 						</View>
 					)}
 				</View>
 				<Text style={styles.metaText} numberOfLines={1}>
-					{trackCount} {trackCount === 1 ? 'track' : 'tracks'} • {ownerName}
+					{trackCount} {trackCount === 1 ? 'titre' : 'titres'} • {ownerName}
 				</Text>
 			</View>
 		</TouchableOpacity>

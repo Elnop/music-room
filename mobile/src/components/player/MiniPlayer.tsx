@@ -217,7 +217,7 @@ function NowPlayingInfo({
 						Rien en lecture
 					</Text>
 					<Text style={styles.artist} numberOfLines={1}>
-						Choisis un son pour commencer
+						Choisissez un titre pour commencer
 					</Text>
 					{remoteLine}
 				</View>

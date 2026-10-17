@@ -21,7 +21,7 @@ const AUTHORITY = /^(\[[0-9a-f:.]+\]|[a-z0-9-]+(?:\.[a-z0-9-]+)*)(?::(\d{1,5}))?
 export const DEFAULT_BACKEND_URL = normalize(API_CONFIG.BASE_URL) ?? 'http://localhost:3000';
 
 export const INVALID_BACKEND_URL_MESSAGE =
-	'Enter a full http:// or https:// address, e.g. http://192.168.1.20:3000';
+	'Saisissez une adresse http:// ou https:// complète, par exemple http://192.168.1.20:3000';
 
 type Listener = (url: string) => void;
 

@@ -150,7 +150,7 @@ describe('PlayerModal without a track', () => {
 	it('renders the empty state with disabled controls', () => {
 		render(<PlayerModal />);
 		expect(screen.getByText('Rien en lecture')).toBeTruthy();
-		expect(screen.getByText('Choisis un son pour commencer')).toBeTruthy();
+		expect(screen.getByText('Choisissez un titre pour commencer')).toBeTruthy();
 		expect(screen.getByTestId('seek-slider', { includeHiddenElements: true }).props.disabled).toBe(
 			true
 		);

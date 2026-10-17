@@ -178,7 +178,6 @@ export function MyDevicesScreen() {
 
 	const header = (
 		<View style={styles.header}>
-			<Text style={styles.title}>Mes appareils</Text>
 			<Text style={styles.subtitle}>
 				Choisissez quels amis peuvent contrôler la musique de chaque appareil
 			</Text>
@@ -312,12 +311,6 @@ const createStyles = (theme: Theme) =>
 		},
 		header: {
 			marginBottom: theme.spacing.xl,
-		},
-		title: {
-			fontSize: 28,
-			fontWeight: theme.typography.weights.bold,
-			color: theme.colors.text,
-			marginBottom: theme.spacing.xs,
 		},
 		subtitle: {
 			fontSize: 16,

@@ -62,7 +62,7 @@ function pressBack(): void {
 
 async function renderLoaded(): Promise<void> {
 	render(<PrivacySettingsScreen />);
-	await screen.findByText('Privacy');
+	await screen.findByText('Choisissez qui peut voir vos informations');
 }
 
 describe('PrivacySettingsScreen leave guard', () => {
@@ -93,7 +93,7 @@ describe('PrivacySettingsScreen leave guard', () => {
 
 	it('asks before dropping unsaved changes', async () => {
 		await renderLoaded();
-		fireEvent.press(screen.getAllByText('Private')[0]);
+		fireEvent.press(screen.getAllByText('Privé')[0]);
 
 		pressBack();
 
@@ -113,9 +113,9 @@ describe('PrivacySettingsScreen leave guard', () => {
 
 	it('leaves without asking once the changes are saved', async () => {
 		await renderLoaded();
-		fireEvent.press(screen.getAllByText('Private')[0]);
+		fireEvent.press(screen.getAllByText('Privé')[0]);
 
-		fireEvent.press(screen.getByText('Save'));
+		fireEvent.press(screen.getByText('Enregistrer'));
 
 		await waitFor(() => expect(mockGoBack).toHaveBeenCalled());
 		expect(privacyApi.updatePrivacySettings).toHaveBeenCalledWith(
@@ -134,8 +134,8 @@ describe('PrivacySettingsScreen leave guard', () => {
 			})
 		);
 		await renderLoaded();
-		fireEvent.press(screen.getAllByText('Private')[0]);
-		fireEvent.press(screen.getByText('Save'));
+		fireEvent.press(screen.getAllByText('Privé')[0]);
+		fireEvent.press(screen.getByText('Enregistrer'));
 
 		pressBack();
 		expect(Alert.alert).toHaveBeenCalledTimes(1);

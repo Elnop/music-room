@@ -85,7 +85,7 @@ export function MusicPreferencesScreen() {
 	};
 
 	if (isLoading) {
-		return <LoadingSpinner fullScreen message="Loading..." />;
+		return <LoadingSpinner fullScreen message="Chargement…" />;
 	}
 
 	return (
@@ -95,9 +95,8 @@ export function MusicPreferencesScreen() {
 				contentContainerStyle={[styles.content, { paddingBottom: playerHeight + theme.spacing.xl }]}
 			>
 				<View style={styles.header}>
-					<Text style={styles.title}>Music preferences</Text>
 					<Text style={styles.subtitle}>
-						Tell us what genres you like! Select up to {MAX_GENRES} genres.
+						Quels genres aimez-vous ? Choisissez-en jusqu'à {MAX_GENRES}.
 					</Text>
 				</View>
 
@@ -117,7 +116,7 @@ export function MusicPreferencesScreen() {
 					fullWidth={false}
 					style={styles.saveButton}
 				>
-					Save
+					Enregistrer
 				</Button>
 			</ScrollView>
 		</View>
@@ -139,12 +138,6 @@ const createStyles = (theme: Theme) =>
 		header: {
 			paddingHorizontal: theme.spacing.lg,
 			marginBottom: theme.spacing.lg,
-		},
-		title: {
-			fontSize: 28,
-			fontWeight: theme.typography.weights.bold,
-			color: theme.colors.text,
-			marginBottom: theme.spacing.xs,
 		},
 		subtitle: {
 			fontSize: 16,

@@ -10,7 +10,7 @@ jest.mock('@/contexts/ThemeContext', () => {
 describe('SearchBar', () => {
 	it('shows the value and the default placeholder', () => {
 		render(<SearchBar value="daft" onChangeText={jest.fn()} />);
-		expect(screen.getByPlaceholderText('Search...').props.value).toBe('daft');
+		expect(screen.getByPlaceholderText('Rechercher…').props.value).toBe('daft');
 	});
 
 	it('uses a custom placeholder', () => {
@@ -22,7 +22,7 @@ describe('SearchBar', () => {
 		const onChangeText = jest.fn();
 		render(<SearchBar value="" onChangeText={onChangeText} />);
 
-		fireEvent.changeText(screen.getByPlaceholderText('Search...'), 'punk');
+		fireEvent.changeText(screen.getByPlaceholderText('Rechercher…'), 'punk');
 
 		expect(onChangeText).toHaveBeenCalledWith('punk');
 	});

@@ -124,7 +124,11 @@ async function renderLoaded(
 	getFriends.mockResolvedValue(friends);
 	getPermissions.mockResolvedValue(allDevicesIds);
 	render(<MyDevicesScreen />);
-	await screen.findByText('Mes appareils', {}, FIRST_RENDER);
+	await screen.findByText(
+		'Choisissez quels amis peuvent contrôler la musique de chaque appareil',
+		{},
+		FIRST_RENDER
+	);
 	await waitFor(() => expect(screen.queryByTestId('skeleton-list')).toBeNull(), FIRST_RENDER);
 }
 
