@@ -441,16 +441,25 @@ export class PlaylistService {
 
 			if (error) throw error;
 
-			// Visibility may have changed: evict sockets that lost access (fire-and-forget).
-			void realtime.revalidatePlaylistRoom(playlistId);
-
 			const { count } = await supabaseAdmin
 				.from('playlist_tracks')
 				.select('*', { count: 'exact', head: true })
 				.eq('playlist_id', playlistId);
+			const response = formatPlaylistResponse(playlist, count || 0);
+
+			realtime.notifyPlaylistDetails({
+				playlistId,
+				name: response.name,
+				description: response.description,
+				visibility: response.visibility,
+				editMode: response.editMode,
+			});
+
+			// Visibility may have changed: evict sockets that lost access (fire-and-forget).
+			void realtime.revalidatePlaylistRoom(playlistId);
 
 			logger.info('Playlist updated', { playlistId, userId, updateData });
-			return formatPlaylistResponse(playlist, count || 0);
+			return response;
 		} catch (error) {
 			if (error instanceof AppError) throw error;
 			logger.error('Failed to update playlist', { error, playlistId });
@@ -468,6 +477,9 @@ export class PlaylistService {
 			const { error } = await supabaseAdmin.from('playlists').delete().eq('id', playlistId);
 
 			if (error) throw error;
+
+			// Tell the room first: the revalidation below evicts every socket from it.
+			realtime.notifyPlaylistDeleted({ playlistId });
 
 			// Evict every socket from the deleted playlist's room (fire-and-forget).
 			void realtime.revalidatePlaylistRoom(playlistId);

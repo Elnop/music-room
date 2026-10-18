@@ -17,8 +17,9 @@ cd "$(dirname "$0")/.."
 export SUPABASE_PROJECT_ID=music-room-test
 DB_CONTAINER="supabase_db_${SUPABASE_PROJECT_ID}"
 
-# Only Postgres, PostgREST, Auth and Kong are needed by supabase-js.
-EXCLUDED=studio,storage-api,imgproxy,realtime,edge-runtime,logflare,vector,mailpit,supavisor,postgres-meta
+# Only Postgres, PostgREST, Auth, Storage (avatars bucket, #351) and Kong are
+# needed by supabase-js.
+EXCLUDED=studio,imgproxy,realtime,edge-runtime,logflare,vector,mailpit,supavisor,postgres-meta
 
 # Real Redis (session revocation denylist); Docker picks a free host port.
 # The official image through ECR Public, like the Supabase images: Docker Hub

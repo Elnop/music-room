@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Modal, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Slider from '@react-native-community/slider';
 import { Ionicons } from '@expo/vector-icons';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, {
 	useSharedValue,
 	useAnimatedStyle,
@@ -18,20 +18,27 @@ import { usePlayer } from '@/contexts/PlayerContext';
 import { usePlayerStore } from '@/store/playerStore';
 import { RESTART_THRESHOLD_S } from '@/store/queueSelectors';
 import { useNowPlaying } from '@/hooks/useNowPlaying';
-import { useImageColors, hexToRgba, getAdaptiveColors, isLightColor } from '@/hooks/useImageColors';
+import { hapticTap } from '@utils/haptics';
+import { useImageColors, getAdaptiveColors } from '@/hooks/useImageColors';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { QueueModal } from '@/components/player/QueueModal';
 import { DevicePickerSheet } from '@/components/player/DevicePickerSheet';
+import { largeArtwork } from '@/utils/artwork';
+import { Artwork } from '@/components/common/Artwork';
 
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const DISMISS_THRESHOLD = SCREEN_HEIGHT * 0.2; // 20% de l'écran pour fermer
 const ARTWORK_SIZE = width * 0.75;
+/** Seek step of the slider's screen-reader increment / decrement actions, in seconds. */
+export const SEEK_STEP_S = 10;
+/** Header buttons are 40×40: this slop brings their tap target to 48×48. */
+const HEADER_HIT_SLOP = { top: 4, bottom: 4, left: 4, right: 4 };
 
 export function PlayerModal() {
 	const { theme } = useTheme();
 	const insets = useSafeAreaInsets();
 
-	const { player, error } = usePlayer();
+	const { player, error, seekTo } = usePlayer();
 	const isModalOpen = usePlayerStore(state => state.isModalOpen);
 	const setModalOpen = usePlayerStore(state => state.setModalOpen);
 	const {
@@ -70,7 +77,13 @@ export function PlayerModal() {
 		setModalOpen(false);
 	};
 
+	// A Modal is its own native window on Android: gestures reach it only through the
+	// GestureHandlerRootView below. The pan starts on a downward drag only and gives way to
+	// horizontal moves, so the progress slider keeps working.
 	const panGesture = Gesture.Pan()
+		.withTestId('player-modal-pan')
+		.activeOffsetY(10)
+		.failOffsetX([-15, 15])
 		.onUpdate(event => {
 			if (event.translationY > 0) {
 				translateY.value = event.translationY;
@@ -100,13 +113,16 @@ export function PlayerModal() {
 		}
 	}, [isModalOpen, translateY]);
 
-	const artworkUrl = track?.artworkUrl || null;
+	// Shown across the screen: the 500×500 image, not the API's 100×100 (#307).
+	const artworkUrl = largeArtwork(track?.artworkUrl);
 	const { dominantColor } = useImageColors(artworkUrl, theme.colors.primary);
 
 	const styles = useMemo(() => createStyles(theme, insets), [theme, insets]);
 
-	const adaptive = dominantColor ? getAdaptiveColors(dominantColor) : null;
-	const isDarkBg = dominantColor ? !isLightColor(dominantColor) : false;
+	const adaptive = useMemo(
+		() => (dominantColor ? getAdaptiveColors(dominantColor, theme.colors.background) : null),
+		[dominantColor, theme.colors.background]
+	);
 	const colors = adaptive
 		? {
 				text: adaptive.text,
@@ -115,7 +131,7 @@ export function PlayerModal() {
 				slider: adaptive.accent,
 				sliderBg: adaptive.accentBg,
 				playBtnBg: adaptive.accent,
-				playBtnIcon: isDarkBg ? dominantColor! : '#FFF',
+				playBtnIcon: adaptive.onAccent,
 			}
 		: {
 				text: theme.colors.text,
@@ -135,28 +151,44 @@ export function PlayerModal() {
 	};
 
 	const handlePlayPause = () => {
-		if (canToggle) toggle();
+		if (!canToggle) return;
+		hapticTap();
+		toggle();
 	};
 
 	// No remote seek: the backend has no such command (#297).
 	const handleSeek = (value: number) => {
 		if (!player || isRemote) return;
-		player.seekTo(value);
-		usePlayerStore.getState().markSeek();
+		seekTo(value);
+	};
+
+	// Screen readers adjust the slider by steps (TalkBack: swipe up / down, volume keys).
+	const handleSliderAction = (actionName: string) => {
+		if (duration === null) return;
+		const step =
+			actionName === 'increment' ? SEEK_STEP_S : actionName === 'decrement' ? -SEEK_STEP_S : 0;
+		if (step === 0) return;
+		handleSeek(Math.min(duration, Math.max(0, currentTime + step)));
 	};
 
 	// Local: previous restarts the track past RESTART_THRESHOLD_S, otherwise steps back
 	// in the queue. Remote: always steps back, since the phone cannot seek the device.
 	const canGoPrevious =
 		canToggle && (hasPrevious || (!isRemote && currentTime > RESTART_THRESHOLD_S));
+	const canGoNext = track !== null && hasNext;
+	const handlePrevious = () => {
+		if (!canGoPrevious) return;
+		hapticTap();
+		previous();
+	};
+	const handleNext = () => {
+		if (!canGoNext) return;
+		hapticTap();
+		next();
+	};
 
-	const gradientColors: [string, string, string, string] = dominantColor
-		? [
-				hexToRgba(dominantColor, 0.95),
-				hexToRgba(dominantColor, 0.7),
-				hexToRgba(dominantColor, 0.5),
-				hexToRgba(dominantColor, 0.4),
-			]
+	const gradientColors: [string, string, string, string] = adaptive
+		? adaptive.gradient
 		: [
 				theme.colors.background,
 				theme.colors.background,
@@ -164,8 +196,8 @@ export function PlayerModal() {
 				theme.colors.background,
 			];
 
-	const displayArtwork = artworkUrl || 'https://via.placeholder.com/300';
-	const canGoNext = track !== null && hasNext;
+	const sliderDisabled = isRemote || isLoading || !player || !track;
+	const playDisabled = isLoading || !track;
 
 	return (
 		<Modal
@@ -175,195 +207,232 @@ export function PlayerModal() {
 			transparent
 			onRequestClose={() => setModalOpen(false)}
 		>
-			<GestureDetector gesture={panGesture}>
-				<Animated.View style={[styles.container, styles.modalContent, animatedStyle]}>
-					<LinearGradient
-						colors={gradientColors}
-						style={StyleSheet.absoluteFill}
-						start={{ x: 0.5, y: 0 }}
-						end={{ x: 0.5, y: 1 }}
-					/>
+			<GestureHandlerRootView style={styles.container}>
+				<GestureDetector gesture={panGesture}>
+					<Animated.View style={[styles.container, styles.modalContent, animatedStyle]}>
+						<LinearGradient
+							colors={gradientColors}
+							style={StyleSheet.absoluteFill}
+							start={{ x: 0.5, y: 0 }}
+							end={{ x: 0.5, y: 1 }}
+						/>
 
-					{/* Fixed header at top */}
-					<View style={styles.header}>
-						<View style={styles.swipeIndicator}>
-							<View style={[styles.swipeBar, { backgroundColor: colors.textSecondary }]} />
-						</View>
-
-						<TouchableOpacity
-							style={styles.closeButton}
-							onPress={() => setModalOpen(false)}
-							activeOpacity={0.7}
-						>
-							<View style={[styles.headerButton, { backgroundColor: colors.buttonBg }]}>
-								<Ionicons name="chevron-down" size={24} color={colors.text} />
+						{/* Fixed header at top */}
+						<View style={styles.header}>
+							<View style={styles.swipeIndicator}>
+								<View style={[styles.swipeBar, { backgroundColor: colors.textSecondary }]} />
 							</View>
-						</TouchableOpacity>
 
-						<TouchableOpacity
-							style={styles.devicesButton}
-							onPress={() => setDevicesOpen(true)}
-							activeOpacity={0.7}
-							accessibilityLabel="Choisir l'appareil"
-						>
-							<View style={[styles.headerButton, { backgroundColor: colors.buttonBg }]}>
-								<Ionicons name="phone-portrait-outline" size={20} color={colors.text} />
-							</View>
-						</TouchableOpacity>
-
-						<TouchableOpacity
-							style={styles.queueButton}
-							onPress={() => setQueueOpen(true)}
-							activeOpacity={0.7}
-							accessibilityLabel="File d'attente"
-						>
-							<View style={[styles.headerButton, { backgroundColor: colors.buttonBg }]}>
-								<Ionicons name="list" size={22} color={colors.text} />
-							</View>
-						</TouchableOpacity>
-
-						<Text style={[styles.nowPlayingText, { color: colors.textSecondary }]}>
-							NOW PLAYING
-						</Text>
-						{deviceLabel && (
-							<Text
-								style={[styles.deviceText, { color: colors.text }]}
-								numberOfLines={1}
-								accessibilityLabel={`Lecture sur ${deviceLabel}`}
+							<TouchableOpacity
+								style={styles.closeButton}
+								onPress={() => setModalOpen(false)}
+								activeOpacity={0.7}
+								hitSlop={HEADER_HIT_SLOP}
+								accessibilityRole="button"
+								accessibilityLabel="Fermer le lecteur"
 							>
-								Sur {deviceLabel}
-							</Text>
-						)}
-					</View>
+								<View style={[styles.headerButton, { backgroundColor: colors.buttonBg }]}>
+									<Ionicons name="chevron-down" size={24} color={colors.text} />
+								</View>
+							</TouchableOpacity>
 
-					{/* Main content centered */}
-					<View style={styles.mainContent}>
-						<View style={styles.artworkWrapper}>
-							<View style={styles.artworkShadow}>
-								{track ? (
-									<Image source={{ uri: displayArtwork }} style={styles.artwork} />
-								) : (
-									<View style={[styles.artwork, styles.emptyArtwork]}>
-										<Ionicons name="musical-notes" size={64} color={colors.textSecondary} />
-									</View>
-								)}
-							</View>
+							<TouchableOpacity
+								style={styles.devicesButton}
+								onPress={() => setDevicesOpen(true)}
+								activeOpacity={0.7}
+								hitSlop={HEADER_HIT_SLOP}
+								accessibilityRole="button"
+								accessibilityLabel="Choisir l'appareil"
+							>
+								<View style={[styles.headerButton, { backgroundColor: colors.buttonBg }]}>
+									<Ionicons name="phone-portrait-outline" size={20} color={colors.text} />
+								</View>
+							</TouchableOpacity>
+
+							<TouchableOpacity
+								style={styles.queueButton}
+								onPress={() => setQueueOpen(true)}
+								activeOpacity={0.7}
+								hitSlop={HEADER_HIT_SLOP}
+								accessibilityRole="button"
+								accessibilityLabel="File d'attente"
+							>
+								<View style={[styles.headerButton, { backgroundColor: colors.buttonBg }]}>
+									<Ionicons name="list" size={22} color={colors.text} />
+								</View>
+							</TouchableOpacity>
+
+							<Text style={[styles.nowPlayingText, { color: colors.textSecondary }]}>
+								EN COURS DE LECTURE
+							</Text>
+							{deviceLabel && (
+								<Text
+									style={[styles.deviceText, { color: colors.text }]}
+									numberOfLines={1}
+									accessibilityLabel={`Lecture sur ${deviceLabel}`}
+								>
+									Sur {deviceLabel}
+								</Text>
+							)}
 						</View>
 
-						<View style={styles.trackInfo}>
-							<Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
-								{track ? track.title : 'Rien en lecture'}
-							</Text>
-							<Text style={[styles.artist, { color: colors.textSecondary }]} numberOfLines={1}>
-								{track ? track.artist : 'Choisis un son pour commencer'}
-							</Text>
-						</View>
-
-						{error && !isRemote && (
-							<View style={styles.errorContainer}>
-								<Ionicons name="warning" size={16} color={theme.colors.error} />
-								<Text style={styles.errorText}>{error}</Text>
-							</View>
-						)}
-
-						{/* Hidden when the length is unknown (a remote track off the queue). */}
-						{duration !== null && (
-							<View style={styles.progressContainer}>
-								<Slider
-									style={styles.slider}
-									minimumValue={0}
-									maximumValue={duration || 1}
-									value={track ? currentTime : 0}
-									onSlidingComplete={handleSeek}
-									minimumTrackTintColor={colors.slider}
-									maximumTrackTintColor={colors.sliderBg}
-									thumbTintColor={colors.slider}
-									disabled={isRemote || isLoading || !player || !track}
-								/>
-								<View style={styles.timeContainer}>
-									<Text style={[styles.timeText, { color: colors.textSecondary }]}>
-										{formatTime(track ? currentTime : 0)}
-									</Text>
-									<Text style={[styles.timeText, { color: colors.textSecondary }]}>
-										{formatTime(track ? duration : 0)}
-									</Text>
+						{/* Main content centered */}
+						<View style={styles.mainContent}>
+							<View style={styles.artworkWrapper}>
+								<View style={styles.artworkShadow}>
+									{track ? (
+										<Artwork
+											uri={artworkUrl}
+											size={ARTWORK_SIZE}
+											style={styles.artwork}
+											iconSize={64}
+										/>
+									) : (
+										<View style={[styles.artwork, styles.emptyArtwork]}>
+											<Ionicons name="musical-notes" size={64} color={colors.textSecondary} />
+										</View>
+									)}
 								</View>
 							</View>
-						)}
 
-						<View style={styles.controls}>
-							<TouchableOpacity
-								style={[styles.secondaryButton, { backgroundColor: colors.buttonBg }]}
-								onPress={previous}
-								disabled={!canGoPrevious}
-								activeOpacity={0.7}
-								accessibilityLabel="Previous track"
-							>
-								<Ionicons
-									name="play-skip-back"
-									size={28}
-									color={colors.text}
-									style={canGoPrevious ? undefined : styles.disabledIcon}
-								/>
-							</TouchableOpacity>
-
-							<TouchableOpacity
-								style={[styles.playButton, { backgroundColor: colors.playBtnBg }]}
-								onPress={handlePlayPause}
-								disabled={isLoading || !track}
-								activeOpacity={0.8}
-								accessibilityLabel={isPlaying ? 'Pause' : 'Play'}
-							>
-								{isLoading ? (
-									<LoadingSpinner size="small" />
-								) : (
-									<Ionicons
-										name={isPlaying ? 'pause' : 'play'}
-										size={40}
-										color={colors.playBtnIcon}
-										style={[
-											isPlaying ? undefined : { marginLeft: 4 },
-											track ? undefined : styles.disabledIcon,
-										]}
-									/>
-								)}
-							</TouchableOpacity>
-
-							<TouchableOpacity
-								style={[styles.secondaryButton, { backgroundColor: colors.buttonBg }]}
-								onPress={next}
-								disabled={!canGoNext}
-								activeOpacity={0.7}
-								accessibilityLabel="Next track"
-							>
-								<Ionicons
-									name="play-skip-forward"
-									size={28}
-									color={colors.text}
-									style={canGoNext ? undefined : styles.disabledIcon}
-								/>
-							</TouchableOpacity>
-						</View>
-
-						{isLoading && (
-							<View style={styles.loadingContainer}>
-								<Text style={[styles.loadingText, { color: colors.textSecondary }]}>
-									Loading audio stream...
+							<View style={styles.trackInfo}>
+								<Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
+									{track ? track.title : 'Rien en lecture'}
+								</Text>
+								<Text style={[styles.artist, { color: colors.textSecondary }]} numberOfLines={1}>
+									{track ? track.artist : 'Choisissez un titre pour commencer'}
 								</Text>
 							</View>
-						)}
-					</View>
 
-					{/* Bottom spacer for safe area */}
-					<View style={styles.bottomSpacer} />
-				</Animated.View>
-			</GestureDetector>
+							{error && !isRemote && (
+								<View style={styles.errorContainer}>
+									<Ionicons name="warning" size={16} color={theme.colors.error} />
+									<Text style={styles.errorText}>{error}</Text>
+								</View>
+							)}
 
-			<QueueModal visible={isModalOpen && isQueueOpen} onClose={() => setQueueOpen(false)} />
-			<DevicePickerSheet
-				visible={isModalOpen && isDevicesOpen}
-				onClose={() => setDevicesOpen(false)}
-			/>
+							{/* Hidden when the length is unknown (a remote track off the queue). */}
+							{duration !== null && (
+								<View style={styles.progressContainer}>
+									{/* The slider library drops onAccessibilityAction: this wrapper is what a
+									    screen reader sees and adjusts; touch drags still reach the slider. */}
+									<View
+										accessible
+										accessibilityRole="adjustable"
+										accessibilityLabel="Position de lecture"
+										accessibilityValue={{
+											text: `${formatTime(track ? currentTime : 0)} sur ${formatTime(track ? duration : 0)}`,
+										}}
+										accessibilityState={{ disabled: sliderDisabled }}
+										accessibilityActions={[{ name: 'increment' }, { name: 'decrement' }]}
+										onAccessibilityAction={event => {
+											if (!sliderDisabled) handleSliderAction(event.nativeEvent.actionName);
+										}}
+									>
+										<Slider
+											style={styles.slider}
+											minimumValue={0}
+											maximumValue={duration || 1}
+											value={track ? currentTime : 0}
+											onSlidingComplete={handleSeek}
+											minimumTrackTintColor={colors.slider}
+											maximumTrackTintColor={colors.sliderBg}
+											thumbTintColor={colors.slider}
+											disabled={sliderDisabled}
+											importantForAccessibility="no-hide-descendants"
+										/>
+									</View>
+									<View style={styles.timeContainer}>
+										<Text style={[styles.timeText, { color: colors.textSecondary }]}>
+											{formatTime(track ? currentTime : 0)}
+										</Text>
+										<Text style={[styles.timeText, { color: colors.textSecondary }]}>
+											{formatTime(track ? duration : 0)}
+										</Text>
+									</View>
+								</View>
+							)}
+
+							<View style={styles.controls}>
+								<TouchableOpacity
+									style={[styles.secondaryButton, { backgroundColor: colors.buttonBg }]}
+									onPress={handlePrevious}
+									disabled={!canGoPrevious}
+									activeOpacity={0.7}
+									accessibilityRole="button"
+									accessibilityLabel="Piste précédente"
+									accessibilityState={{ disabled: !canGoPrevious }}
+								>
+									<Ionicons
+										name="play-skip-back"
+										size={28}
+										color={colors.text}
+										style={canGoPrevious ? undefined : styles.disabledIcon}
+									/>
+								</TouchableOpacity>
+
+								<TouchableOpacity
+									style={[styles.playButton, { backgroundColor: colors.playBtnBg }]}
+									onPress={handlePlayPause}
+									disabled={playDisabled}
+									activeOpacity={0.8}
+									accessibilityRole="button"
+									accessibilityLabel={isPlaying ? 'Pause' : 'Lecture'}
+									accessibilityState={{ disabled: playDisabled, busy: isLoading }}
+								>
+									{isLoading ? (
+										<LoadingSpinner size="small" />
+									) : (
+										<Ionicons
+											name={isPlaying ? 'pause' : 'play'}
+											size={40}
+											color={colors.playBtnIcon}
+											style={[
+												isPlaying ? undefined : { marginLeft: 4 },
+												track ? undefined : styles.disabledIcon,
+											]}
+										/>
+									)}
+								</TouchableOpacity>
+
+								<TouchableOpacity
+									style={[styles.secondaryButton, { backgroundColor: colors.buttonBg }]}
+									onPress={handleNext}
+									disabled={!canGoNext}
+									activeOpacity={0.7}
+									accessibilityRole="button"
+									accessibilityLabel="Piste suivante"
+									accessibilityState={{ disabled: !canGoNext }}
+								>
+									<Ionicons
+										name="play-skip-forward"
+										size={28}
+										color={colors.text}
+										style={canGoNext ? undefined : styles.disabledIcon}
+									/>
+								</TouchableOpacity>
+							</View>
+
+							{isLoading && (
+								<View style={styles.loadingContainer}>
+									<Text style={[styles.loadingText, { color: colors.textSecondary }]}>
+										Chargement du flux audio…
+									</Text>
+								</View>
+							)}
+						</View>
+
+						{/* Bottom spacer for safe area */}
+						<View style={styles.bottomSpacer} />
+					</Animated.View>
+				</GestureDetector>
+
+				<QueueModal visible={isModalOpen && isQueueOpen} onClose={() => setQueueOpen(false)} />
+				<DevicePickerSheet
+					visible={isModalOpen && isDevicesOpen}
+					onClose={() => setDevicesOpen(false)}
+				/>
+			</GestureHandlerRootView>
 		</Modal>
 	);
 }
@@ -451,7 +520,7 @@ const createStyles = (theme: Theme, insets: { top: number; bottom: number }) =>
 			width: ARTWORK_SIZE,
 			height: ARTWORK_SIZE,
 			borderRadius: 12,
-			backgroundColor: theme.colors.surface,
+			backgroundColor: theme.colors.surfaceAlt,
 		},
 		emptyArtwork: {
 			alignItems: 'center',

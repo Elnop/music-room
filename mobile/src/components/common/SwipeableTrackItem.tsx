@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, Pressable } from 'reac
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import { QueueSwipe } from '@/components/common/QueueSwipe';
+import { TrackActionsButton } from '@/components/track/TrackActionsButton';
 import type { Theme } from '@/themes/types';
 import type { Track } from '@/types/track.types';
 
@@ -17,6 +18,10 @@ interface SwipeableTrackItemProps {
 	onDragStart?: () => void;
 	/** Raises the row while it is being dragged. */
 	isDragActive?: boolean;
+	/** A long press or the ⋯ button opens the track's quick actions (#316). */
+	onShowActions?: () => void;
+	/** The track playing now from this playlist: highlighted like the queue's current item. */
+	isCurrent?: boolean;
 }
 
 export function SwipeableTrackItem({
@@ -26,6 +31,8 @@ export function SwipeableTrackItem({
 	onAddToQueue,
 	onDragStart,
 	isDragActive = false,
+	onShowActions,
+	isCurrent = false,
 }: SwipeableTrackItemProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
@@ -35,6 +42,8 @@ export function SwipeableTrackItem({
 			style={styles.deleteButton}
 			onPress={() => onDelete(track.id)}
 			activeOpacity={0.7}
+			accessibilityRole="button"
+			accessibilityLabel={`Supprimer ${track.title}`}
 		>
 			<Ionicons name="trash-outline" size={24} color="#FFFFFF" />
 			<Text style={styles.deleteText}>Supprimer</Text>
@@ -46,7 +55,17 @@ export function SwipeableTrackItem({
 			onAddToQueue={onAddToQueue}
 			renderRightActions={disabled ? undefined : renderRightActions}
 		>
-			<View style={[styles.trackContainer, isDragActive && styles.trackContainerActive]}>
+			<Pressable
+				onLongPress={onShowActions}
+				accessibilityLabel={`${track.title}, ${track.artist}`}
+				accessibilityHint={onShowActions ? 'Appui long pour les actions du titre' : undefined}
+				accessibilityState={{ selected: isCurrent }}
+				style={[
+					styles.trackContainer,
+					isCurrent && styles.trackContainerCurrent,
+					isDragActive && styles.trackContainerActive,
+				]}
+			>
 				{track.albumArt ? (
 					<Image source={{ uri: track.albumArt }} style={styles.albumArt} />
 				) : (
@@ -56,7 +75,10 @@ export function SwipeableTrackItem({
 				)}
 
 				<View style={styles.trackInfo}>
-					<Text style={styles.trackTitle} numberOfLines={1}>
+					<Text
+						style={[styles.trackTitle, isCurrent && styles.trackTitleCurrent]}
+						numberOfLines={1}
+					>
 						{track.title}
 					</Text>
 					<Text style={styles.trackArtist} numberOfLines={1}>
@@ -64,9 +86,21 @@ export function SwipeableTrackItem({
 					</Text>
 				</View>
 
+				{isCurrent && (
+					<Ionicons
+						name="volume-high"
+						size={18}
+						color={theme.colors.primary}
+						style={styles.playingIcon}
+						accessibilityLabel="En cours de lecture"
+					/>
+				)}
+
 				{track.durationMs && (
 					<Text style={styles.duration}>{formatDuration(track.durationMs)}</Text>
 				)}
+
+				{onShowActions && <TrackActionsButton onPress={onShowActions} />}
 
 				{!disabled && onDragStart && (
 					<Pressable
@@ -74,12 +108,12 @@ export function SwipeableTrackItem({
 						hitSlop={10}
 						style={styles.dragHandle}
 						accessibilityRole="button"
-						accessibilityLabel="Reorder track"
+						accessibilityLabel="Réordonner"
 					>
 						<Ionicons name="reorder-three-outline" size={24} color={theme.colors.textSecondary} />
 					</Pressable>
 				)}
-			</View>
+			</Pressable>
 		</QueueSwipe>
 	);
 }
@@ -99,6 +133,11 @@ const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.surface,
 			borderBottomWidth: 1,
 			borderBottomColor: theme.colors.border,
+		},
+		trackContainerCurrent: {
+			backgroundColor: theme.colors.surfaceAlt,
+			borderLeftWidth: 4,
+			borderLeftColor: theme.colors.primary,
 		},
 		albumArt: {
 			width: 50,
@@ -120,6 +159,12 @@ const createStyles = (theme: Theme) =>
 			fontWeight: '600',
 			color: theme.colors.text,
 			marginBottom: 4,
+		},
+		trackTitleCurrent: {
+			color: theme.colors.primary,
+		},
+		playingIcon: {
+			marginRight: 8,
 		},
 		trackArtist: {
 			fontSize: 13,

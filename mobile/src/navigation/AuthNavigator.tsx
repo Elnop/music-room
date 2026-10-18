@@ -14,7 +14,7 @@ export type AuthStackParamList = {
 	Login: undefined;
 	Register: undefined;
 	EmailVerification: { userId: string; email: string };
-	ForgotPassword: undefined;
+	ForgotPassword: { email?: string } | undefined;
 	ResetPassword: { email: string };
 };
 
@@ -47,17 +47,17 @@ export function AuthNavigator() {
 			<Stack.Screen
 				name="EmailVerification"
 				component={EmailVerificationScreen}
-				options={{ title: 'Verify Email' }}
+				options={{ title: "Vérification de l'email" }}
 			/>
 			<Stack.Screen
 				name="ForgotPassword"
 				component={ForgotPasswordScreen}
-				options={{ title: 'Forgot Password' }}
+				options={{ title: 'Mot de passe oublié' }}
 			/>
 			<Stack.Screen
 				name="ResetPassword"
 				component={ResetPasswordScreen}
-				options={{ title: 'Reset Password' }}
+				options={{ title: 'Nouveau mot de passe' }}
 			/>
 		</Stack.Navigator>
 	);

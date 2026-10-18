@@ -54,8 +54,13 @@ export class ErrorBoundary extends React.Component<Props, State> {
 		if (this.state.hasError) {
 			return (
 				<View style={styles.container}>
-					<Text style={styles.title}>Something went wrong</Text>
-					<Text style={styles.error}>{this.state.error?.message || 'Unknown error'}</Text>
+					<Text style={styles.title}>Une erreur s'est produite</Text>
+					{/* The raw message is English: shown in development only (#341). */}
+					<Text style={styles.error}>
+						{__DEV__ && this.state.error?.message
+							? this.state.error.message
+							: 'Une erreur inattendue est survenue.'}
+					</Text>
 					{__DEV__ && this.state.error?.stack && (
 						<View style={styles.stackContainer}>
 							<Text style={styles.stackTitle}>Stack Trace:</Text>
@@ -69,7 +74,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
 						</View>
 					)}
 					<TouchableOpacity style={styles.button} onPress={this.handleReset}>
-						<Text style={styles.buttonText}>Try Again</Text>
+						<Text style={styles.buttonText}>Réessayer</Text>
 					</TouchableOpacity>
 				</View>
 			);

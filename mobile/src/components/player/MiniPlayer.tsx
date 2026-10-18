@@ -1,11 +1,28 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets, type EdgeInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, {
+	runOnJS,
+	useAnimatedStyle,
+	useSharedValue,
+	withSpring,
+} from 'react-native-reanimated';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import { usePlayerStore } from '@/store/playerStore';
 import { useNowPlaying, type NowPlayingTrack } from '@/hooks/useNowPlaying';
+import { RESTART_THRESHOLD_S } from '@/store/queueSelectors';
+import { hapticTap } from '@utils/haptics';
+import { Artwork } from '@/components/common/Artwork';
+
+/** Horizontal swipe distance that changes the track (#311). */
+export const SWIPE_TRACK_THRESHOLD = 80;
+/** A flick this fast (px/s) changes the track or opens the modal from a shorter swipe. */
+export const SWIPE_FLICK_VELOCITY = 800;
+/** Upward swipe distance that opens the player modal (#311). */
+export const SWIPE_OPEN_THRESHOLD = 40;
 
 export function MiniPlayer() {
 	const { theme } = useTheme();
@@ -13,7 +30,9 @@ export function MiniPlayer() {
 	const styles = React.useMemo(() => createStyles(theme, insets), [theme, insets]);
 
 	const toggleModal = usePlayerStore(state => state.toggleModal);
+	const setModalOpen = usePlayerStore(state => state.setModalOpen);
 	const {
+		isRemote,
 		track,
 		isPlaying,
 		isLoading,
@@ -23,60 +42,147 @@ export function MiniPlayer() {
 		deviceLabel,
 		toggle,
 		next,
+		previous,
 		hasNext,
+		hasPrevious,
 	} = useNowPlaying();
 	const progress = track && durationMs ? Math.min(100, (positionMs / durationMs) * 100) : 0;
 
+	// Same rules as the buttons: previous restarts the track locally past a few seconds.
+	const canGoNext = track !== null && hasNext;
+	const canGoPrevious =
+		canToggle && (hasPrevious || (!isRemote && positionMs / 1000 > RESTART_THRESHOLD_S));
+
+	// One light tap per action that goes through, from a button or a swipe past its threshold.
+	const handleToggle = () => {
+		if (!canToggle) return;
+		hapticTap();
+		toggle();
+	};
+	const handleNext = () => {
+		if (!canGoNext) return;
+		hapticTap();
+		next();
+	};
+	const handlePrevious = () => {
+		if (!canGoPrevious) return;
+		hapticTap();
+		previous();
+	};
+
+	// Swipe left / right changes the track, swipe up opens the modal (#311). The
+	// offsets let a tap through to the buttons; the info follows the finger.
+	const translateX = useSharedValue(0);
+	const panGesture = Gesture.Pan()
+		.withTestId('mini-player-pan')
+		.activeOffsetX([-15, 15])
+		.activeOffsetY(-15)
+		.onUpdate(event => {
+			translateX.value =
+				Math.abs(event.translationX) > Math.abs(event.translationY) ? event.translationX : 0;
+		})
+		.onEnd(event => {
+			const horizontal = Math.abs(event.translationX) > Math.abs(event.translationY);
+			const toLeft =
+				event.translationX < -SWIPE_TRACK_THRESHOLD || event.velocityX < -SWIPE_FLICK_VELOCITY;
+			const toRight =
+				event.translationX > SWIPE_TRACK_THRESHOLD || event.velocityX > SWIPE_FLICK_VELOCITY;
+			const up =
+				event.translationY < -SWIPE_OPEN_THRESHOLD || event.velocityY < -SWIPE_FLICK_VELOCITY;
+			if (horizontal && toLeft && canGoNext) {
+				runOnJS(handleNext)();
+			} else if (horizontal && toRight && canGoPrevious) {
+				runOnJS(handlePrevious)();
+			} else if (!horizontal && up) {
+				runOnJS(setModalOpen)(true);
+			}
+			translateX.value = withSpring(0);
+		});
+	const infoStyle = useAnimatedStyle(() => ({
+		transform: [{ translateX: translateX.value }],
+	}));
+
+	const playDisabled = isLoading || !track;
+	const nextDisabled = !canGoNext;
+	const openLabel = [
+		'Ouvrir le lecteur',
+		...(track ? [track.title, track.artist] : ['Rien en lecture']),
+		...(deviceLabel ? [`sur ${deviceLabel}`] : []),
+	].join(', ');
+
 	return (
-		<TouchableOpacity style={styles.container} onPress={toggleModal} activeOpacity={0.9}>
-			<View style={styles.content}>
-				<NowPlayingInfo track={track} deviceLabel={deviceLabel} styles={styles} theme={theme} />
+		<GestureDetector gesture={panGesture}>
+			{/* Not one accessible block: the screen reader reaches the info and each button apart. */}
+			<TouchableOpacity
+				style={styles.container}
+				onPress={toggleModal}
+				activeOpacity={0.9}
+				accessible={false}
+			>
+				<View style={styles.content}>
+					<Animated.View style={[styles.swipeArea, infoStyle]}>
+						<TouchableOpacity
+							style={styles.infoButton}
+							onPress={toggleModal}
+							activeOpacity={0.9}
+							accessibilityRole="button"
+							accessibilityLabel={openLabel}
+						>
+							<NowPlayingInfo
+								track={track}
+								deviceLabel={deviceLabel}
+								styles={styles}
+								theme={theme}
+							/>
+						</TouchableOpacity>
+					</Animated.View>
 
-				<TouchableOpacity
-					style={styles.playButton}
-					onPress={() => {
-						if (canToggle) toggle();
-					}}
-					hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-					disabled={isLoading || !track}
-					accessibilityLabel={isPlaying ? 'Pause' : 'Play'}
-				>
-					{isLoading ? (
-						<ActivityIndicator size="small" color="#FFFFFF" />
-					) : (
+					<TouchableOpacity
+						style={[styles.playButton, !track && styles.playButtonEmpty]}
+						onPress={handleToggle}
+						hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+						disabled={playDisabled}
+						accessibilityRole="button"
+						accessibilityLabel={isPlaying ? 'Pause' : 'Lecture'}
+						accessibilityState={{ disabled: playDisabled, busy: isLoading }}
+					>
+						{isLoading ? (
+							<ActivityIndicator size="small" color="#FFFFFF" />
+						) : (
+							<Ionicons
+								name={isPlaying ? 'pause' : 'play'}
+								size={20}
+								// Nothing to play: a neutral icon that stays visible on the neutral button.
+								color={track ? '#FFFFFF' : theme.colors.textSecondary}
+								style={isPlaying ? undefined : { marginLeft: 2 }}
+							/>
+						)}
+					</TouchableOpacity>
+
+					<TouchableOpacity
+						style={styles.nextButton}
+						onPress={handleNext}
+						hitSlop={{ top: 10, bottom: 10, left: 6, right: 10 }}
+						disabled={nextDisabled}
+						accessibilityRole="button"
+						accessibilityLabel="Piste suivante"
+						accessibilityState={{ disabled: nextDisabled }}
+					>
 						<Ionicons
-							name={isPlaying ? 'pause' : 'play'}
-							size={20}
-							color="#FFFFFF"
-							style={[
-								isPlaying ? undefined : { marginLeft: 2 },
-								track ? undefined : styles.disabledIcon,
-							]}
+							name="play-skip-forward"
+							size={22}
+							color={theme.colors.text}
+							style={nextDisabled ? styles.disabledIcon : undefined}
 						/>
-					)}
-				</TouchableOpacity>
+					</TouchableOpacity>
+				</View>
 
-				<TouchableOpacity
-					style={styles.nextButton}
-					onPress={next}
-					hitSlop={{ top: 10, bottom: 10, left: 6, right: 10 }}
-					disabled={!track || !hasNext}
-					accessibilityLabel="Next track"
-				>
-					<Ionicons
-						name="play-skip-forward"
-						size={22}
-						color={theme.colors.text}
-						style={track && hasNext ? undefined : styles.disabledIcon}
-					/>
-				</TouchableOpacity>
-			</View>
-
-			{/* Progress bar at the bottom of the mini player - always rendered to avoid layout shift */}
-			<View style={styles.progressBarContainer}>
-				<View style={[styles.progressBar, { width: `${progress}%` }]} />
-			</View>
-		</TouchableOpacity>
+				{/* Progress bar at the bottom of the mini player - always rendered to avoid layout shift */}
+				<View style={styles.progressBarContainer}>
+					<View style={[styles.progressBar, { width: `${progress}%` }]} />
+				</View>
+			</TouchableOpacity>
+		</GestureDetector>
 	);
 }
 
@@ -111,7 +217,7 @@ function NowPlayingInfo({
 						Rien en lecture
 					</Text>
 					<Text style={styles.artist} numberOfLines={1}>
-						Choisis un son pour commencer
+						Choisissez un titre pour commencer
 					</Text>
 					{remoteLine}
 				</View>
@@ -119,11 +225,9 @@ function NowPlayingInfo({
 		);
 	}
 
-	const artworkUrl = track.artworkUrl || 'https://via.placeholder.com/40';
-
 	return (
 		<>
-			<Image source={{ uri: artworkUrl }} style={styles.artwork} />
+			<Artwork uri={track.artworkUrl} size={40} style={styles.artwork} iconSize={20} />
 			<View style={styles.info}>
 				<Text style={styles.title} numberOfLines={1}>
 					{track.title}
@@ -150,6 +254,14 @@ const createStyles = (theme: Theme, insets: EdgeInsets) =>
 			flexDirection: 'row',
 			alignItems: 'center',
 			padding: theme.spacing.sm,
+			paddingRight: theme.spacing.md,
+		},
+		swipeArea: {
+			flex: 1,
+		},
+		infoButton: {
+			flexDirection: 'row',
+			alignItems: 'center',
 		},
 		artwork: {
 			width: 40,
@@ -189,6 +301,10 @@ const createStyles = (theme: Theme, insets: EdgeInsets) =>
 			backgroundColor: theme.colors.primary,
 			alignItems: 'center',
 			justifyContent: 'center',
+		},
+		// Nothing to play: a neutral button that does not look tappable.
+		playButtonEmpty: {
+			backgroundColor: theme.colors.surfaceAlt,
 		},
 		nextButton: {
 			width: 36,

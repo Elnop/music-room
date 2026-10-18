@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import Toast from 'react-native-toast-message';
 import { useTheme } from '@/contexts/ThemeContext';
+import { AppToast } from '@/components/common/AppToast';
 import type { Theme } from '@/themes/types';
 import { musicControlApi } from '@/services/musicControlApi';
 import { deviceService } from '@/services/deviceService';
@@ -160,7 +160,12 @@ export function DevicePickerSheet({ visible, onClose }: DevicePickerSheetProps) 
 			return (
 				<View style={styles.centered}>
 					<Text style={styles.errorText}>Impossible de charger les appareils</Text>
-					<TouchableOpacity style={styles.retryButton} onPress={retry}>
+					<TouchableOpacity
+						style={styles.retryButton}
+						onPress={retry}
+						hitSlop={4}
+						accessibilityRole="button"
+					>
 						<Text style={styles.retryText}>Réessayer</Text>
 					</TouchableOpacity>
 				</View>
@@ -217,6 +222,8 @@ export function DevicePickerSheet({ visible, onClose }: DevicePickerSheetProps) 
 						onPress={onClose}
 						style={styles.closeButton}
 						activeOpacity={0.7}
+						hitSlop={4}
+						accessibilityRole="button"
 						accessibilityLabel="Fermer le choix d'appareil"
 					>
 						<Ionicons name="chevron-down" size={24} color={theme.colors.text} />
@@ -227,7 +234,7 @@ export function DevicePickerSheet({ visible, onClose }: DevicePickerSheetProps) 
 				{renderContent()}
 
 				{/* The app root's toast sits behind native modals: transfer errors show here. */}
-				<Toast />
+				<AppToast />
 			</View>
 		</Modal>
 	);

@@ -54,3 +54,15 @@
 - source_plan: `_bmad-output/initiative-validation-mandatory/plan-gh-273-play-queue-backend.md`
   summary: `POST /api/playlists/:id/tracks` accepts `previewUrl` (a SoundCloud stream URL) and persists it in `tracks.preview_url`, against the rule never to persist stream URLs.
   evidence: `addTrackSchema` (playlist.validators.ts) accepts `previewUrl`; `upsertTrack` writes it; soundcloud.types.ts:77 documents it as the stream URL. The mobile app sends `undefined`, so only a crafted request stores one. Found by the gh-273 review.
+- source_plan: `_bmad-output/initiative-validation-mandatory/plan-gh-310-audio-interruptions.md`
+  summary: A system pause that lands while the player is buffering (for example a headset unplugged mid-rebuffer) is not mirrored, so the store keeps showing "playing".
+  evidence: `AudioInterruptionSync` reacts to edges in `status.playing`. On Android `playing` is already false in `STATE_BUFFERING`, so the noisy pause gives no new edge, and the buffering status is skipped by the `isBuffering` guard. The case is rare, and a level-based check risks false pauses right after `play()`.
+- source_plan: `_bmad-output/initiative-validation-mandatory/plan-gh-310-audio-interruptions.md`
+  summary: Unverified (would be medium) — iOS may not resume after a call if the AVPlayer is already paused when expo-audio handles `.began`.
+  evidence: `handleInterruptionBegan` (`expo-audio/ios/AudioModule.swift` l.383-398) only records players with `isPlaying` still true. Settle it on an iPhone: start a track, receive a call, end it, and check that playback resumes. If it does not, the JS side must resume after the interruption itself.
+- source_plan: `_bmad-output/initiative-validation-mandatory/plan-gh-307-ux-search.md`
+  summary: The `SoundCloudTrack` schema in `backend/src/features/soundcloud/soundcloud.openapi.ts` documents fields (`artist`, `trackUri`, `albumArt`) the search endpoint does not return.
+  evidence: `soundcloud-search.service.ts` passes SoundCloud's search objects through unchanged (`title`, `user`, `artwork_url`, `permalink_url`…); noticed by the implementer while adding `policy` and `media`.
+- source_plan: `_bmad-output/initiative-validation-mandatory/plan-gh-342-edit-delete-playlist.md`
+  summary: Split `backend/src/features/playlists/playlist.service.ts` (~490 lines) into smaller services, per the ~150-line guideline of AGENTS.md.
+  evidence: The file was already ~480 lines before #342; the review of #342 flagged that it keeps growing.

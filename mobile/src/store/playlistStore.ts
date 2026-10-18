@@ -1,5 +1,10 @@
 import { create } from 'zustand';
-import type { Playlist, PlaylistUpdatedEvent, PlaylistWithTracks } from '@/types/playlist.types';
+import type {
+	Playlist,
+	PlaylistDetailsEvent,
+	PlaylistUpdatedEvent,
+	PlaylistWithTracks,
+} from '@/types/playlist.types';
 import type { Track } from '@/types/track.types';
 import type { PlaylistInput } from '@utils/validators';
 import { playlistApi } from '@api/playlistApi';
@@ -13,7 +18,7 @@ export const CONFLICT_CODES = [
 	'PLAYLIST_REBALANCED',
 ];
 
-export const CONFLICT_MESSAGE = 'This track was changed by someone else';
+export const CONFLICT_MESSAGE = "Ce titre a été modifié par quelqu'un d'autre";
 
 // Moves from this client go one at a time: each one is sent with the version the
 // previous one returned, so a quick second move is never refused against ourselves.
@@ -50,7 +55,8 @@ interface PlaylistState {
 	// Actions
 	fetchPlaylists: (userId: string) => Promise<void>;
 	fetchPlaylistById: (id: string) => Promise<void>;
-	createPlaylist: (userId: string, data: PlaylistInput) => Promise<void>;
+	/** Resolves with the created playlist, so the caller can open it. */
+	createPlaylist: (userId: string, data: PlaylistInput) => Promise<Playlist>;
 	updatePlaylist: (id: string, data: Partial<PlaylistInput>) => Promise<void>;
 	deletePlaylist: (id: string) => Promise<void>;
 	addTrack: (playlistId: string, track: Track) => Promise<void>;
@@ -64,6 +70,10 @@ interface PlaylistState {
 		trackId: string,
 		afterRank: string | null
 	) => Promise<'moved' | 'skipped'>;
+	/** Applies a `playlist:details` event (name, description, visibility, edit mode) everywhere it shows. */
+	applyDetails: (details: PlaylistDetailsEvent) => void;
+	/** Drops a deleted playlist from the list, the cache and the screen (no request). */
+	removePlaylist: (id: string) => void;
 	/** Applies a `playlist:updated` delta to the current playlist; 'reload' asks the caller to refetch. */
 	applyPlaylistEvent: (event: PlaylistUpdatedEvent) => 'applied' | 'ignored' | 'reload';
 
@@ -111,7 +121,8 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 				isRefreshing: false,
 			});
 		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : 'Failed to fetch playlists';
+			const errorMessage =
+				error instanceof Error ? error.message : 'Impossible de charger les playlists';
 			set({
 				error: errorMessage,
 				isLoading: false,
@@ -160,7 +171,8 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 				isRefreshing: false,
 			});
 		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : 'Failed to fetch playlist';
+			const errorMessage =
+				error instanceof Error ? error.message : 'Impossible de charger la playlist';
 			if (!hasCache) {
 				set({
 					error: errorMessage,
@@ -192,8 +204,10 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 			set({
 				playlists: [newPlaylist, ...playlists],
 			});
+			return newPlaylist;
 		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : 'Failed to create playlist';
+			const errorMessage =
+				error instanceof Error ? error.message : 'Impossible de créer la playlist';
 			set({ error: errorMessage });
 			throw error;
 		}
@@ -218,6 +232,7 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 							description: updatedPlaylist.description,
 							coverUrl: updatedPlaylist.coverUrl,
 							visibility: updatedPlaylist.visibility,
+							editMode: updatedPlaylist.editMode,
 							collaboratorIds: updatedPlaylist.collaboratorIds,
 							viewerIds: updatedPlaylist.viewerIds,
 							trackCount: updatedPlaylist.trackCount,
@@ -236,7 +251,8 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 				playlistsCache: newCache,
 			});
 		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : 'Failed to update playlist';
+			const errorMessage =
+				error instanceof Error ? error.message : 'Impossible de modifier la playlist';
 			set({ error: errorMessage });
 			throw error;
 		}
@@ -250,21 +266,55 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 
 		try {
 			await playlistApi.deletePlaylist(id);
-
-			const { playlists, currentPlaylist, playlistsCache } = get();
-			const newCache = new Map(playlistsCache);
-			newCache.delete(id);
-
-			set({
-				playlists: playlists.filter(p => p.id !== id),
-				currentPlaylist: currentPlaylist?.id === id ? null : currentPlaylist,
-				playlistsCache: newCache,
-			});
+			get().removePlaylist(id);
 		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : 'Failed to delete playlist';
+			const errorMessage =
+				error instanceof Error ? error.message : 'Impossible de supprimer la playlist';
 			set({ error: errorMessage });
 			throw error;
 		}
+	},
+
+	/**
+	 * Apply new metadata from a `playlist:details` event (#342). Tracks and
+	 * tracksVersion are left alone: they only follow `playlist:updated`.
+	 */
+	applyDetails: (details: PlaylistDetailsEvent) => {
+		const id = details.playlistId;
+		// Explicit fields: an absent description means it was cleared.
+		const patch = {
+			name: details.name,
+			description: details.description,
+			visibility: details.visibility,
+			editMode: details.editMode,
+		};
+		const { playlists, currentPlaylist, playlistsCache } = get();
+
+		const newCache = new Map(playlistsCache);
+		const cached = newCache.get(id);
+		if (cached) newCache.set(id, { ...cached, ...patch });
+
+		set({
+			playlists: playlists.map(p => (p.id === id ? { ...p, ...patch } : p)),
+			currentPlaylist:
+				currentPlaylist?.id === id ? { ...currentPlaylist, ...patch } : currentPlaylist,
+			playlistsCache: newCache,
+		});
+	},
+
+	/**
+	 * Forget a deleted playlist locally: list, cache and the open screen.
+	 */
+	removePlaylist: (id: string) => {
+		const { playlists, currentPlaylist, playlistsCache } = get();
+		const newCache = new Map(playlistsCache);
+		newCache.delete(id);
+
+		set({
+			playlists: playlists.filter(p => p.id !== id),
+			currentPlaylist: currentPlaylist?.id === id ? null : currentPlaylist,
+			playlistsCache: newCache,
+		});
 	},
 
 	/**
@@ -285,7 +335,7 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 			});
 			if (outcome === 'reload') await reloadQuietly(get, playlistId);
 		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : 'Failed to add track';
+			const errorMessage = error instanceof Error ? error.message : "Impossible d'ajouter le titre";
 			set({ error: errorMessage });
 			throw error;
 		}
@@ -323,7 +373,8 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 		} catch (error) {
 			// Bring the optimistically removed track back from the server.
 			await reloadQuietly(get, playlistId);
-			const errorMessage = error instanceof Error ? error.message : 'Failed to remove track';
+			const errorMessage =
+				error instanceof Error ? error.message : 'Impossible de retirer le titre';
 			set({ error: errorMessage });
 			throw error;
 		}
@@ -362,7 +413,9 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 						set({ conflictMessage: CONFLICT_MESSAGE });
 					}
 				} else {
-					set({ error: error instanceof Error ? error.message : 'Failed to move track' });
+					set({
+						error: error instanceof Error ? error.message : 'Impossible de déplacer le titre',
+					});
 				}
 				throw error;
 			} finally {

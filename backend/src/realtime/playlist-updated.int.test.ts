@@ -8,7 +8,11 @@ import { connectRedis, disconnectRedis, isRedisConnected } from '@/shared/config
 import { PlaylistTrackService } from '@/features/playlists/services/playlist-track.service.js';
 import { PlaylistService } from '@/features/playlists/playlist.service.js';
 import { realtime } from '@/realtime/index.js';
-import type { PlaylistUpdatedPayload } from '@/features/playlists/playlist.types.js';
+import type {
+	PlaylistDeletedPayload,
+	PlaylistDetailsPayload,
+	PlaylistUpdatedPayload,
+} from '@/features/playlists/playlist.types.js';
 
 // The versioned playlist:updated delta (#90, doc/PLAYLIST_CONCURRENCY.md,
 // "Broadcast and convergence") emitted by real track operations to clients of
@@ -254,5 +258,38 @@ describe('playlist:updated broadcast', () => {
 		await settle();
 		expect(ownerUpdates).toEqual([]);
 		expect(viewerUpdates).toEqual([]);
+	});
+
+	it('sends the new details to every client of the room after an update (#342)', async () => {
+		const received = Promise.all(
+			[ownerSocket, viewerSocket].map(
+				s => new Promise<PlaylistDetailsPayload>(resolve => s.once('playlist:details', resolve))
+			)
+		);
+		await playlists.updatePlaylist(playlistId, owner.id, {
+			name: 'Les tubes du Crabe Croustillant',
+			description: 'desc',
+		});
+
+		const expected: PlaylistDetailsPayload = {
+			playlistId,
+			name: 'Les tubes du Crabe Croustillant',
+			description: 'desc',
+			visibility: 'private',
+			editMode: 'restricted',
+		};
+		expect(await received).toEqual([expected, expected]);
+	});
+
+	it('tells every client of the room about a deletion before evicting them (#342)', async () => {
+		const received = Promise.all(
+			[ownerSocket, viewerSocket].map(
+				s => new Promise<PlaylistDeletedPayload>(resolve => s.once('playlist:deleted', resolve))
+			)
+		);
+		await playlists.deletePlaylist(playlistId, owner.id);
+
+		expect(await received).toEqual([{ playlistId }, { playlistId }]);
+		await vi.waitFor(async () => expect(await inRoom(viewerSocket)).toBe(false));
 	});
 });

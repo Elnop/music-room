@@ -1,32 +1,25 @@
 import React, { useState } from 'react';
-import {
-	View,
-	FlatList,
-	StyleSheet,
-	TouchableOpacity,
-	Text,
-	TextInput,
-	Image,
-	ActivityIndicator,
-} from 'react-native';
+import { View, FlatList, StyleSheet } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import { usePlaylistStore } from '@store/playlistStore';
 import { useSoundCloudStore } from '@store/soundcloudStore';
 import { useQueueStore } from '@store/queueStore';
-import { QueueSwipe } from '@components/common/QueueSwipe';
+import { SearchBar } from '@components/common/SearchBar';
+import { TrackActionsSheet } from '@components/track/TrackActionsSheet';
+import { AddableTrackRow } from '@components/track/AddableTrackRow';
 import { toTrackInput } from '@utils/trackInput';
 import { EmptyState } from '@components/common/EmptyState';
-import { LoadingSpinner } from '@components/common/LoadingSpinner';
+import { SkeletonList, TrackRowSkeleton } from '@components/common/Skeleton';
 import debounce from 'lodash/debounce';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import type { Track } from '@/types/track.types';
+import type { AddQueueItemBody } from '@/types/queue.types';
 import { showError } from '@utils/toast';
-import { ApiError } from '@/services/api';
+import { apiErrorMessage } from '@utils/apiErrorMessage';
 
 type PlaylistStackParamList = {
 	Playlists: undefined;
@@ -52,23 +45,28 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 	const playerHeight = usePlayerHeight();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 	const { playlistId } = route.params;
-	const { addTrack, currentPlaylist } = usePlaylistStore();
+	const addTrack = usePlaylistStore(state => state.addTrack);
+	const playlistTracks = usePlaylistStore(state => state.currentPlaylist?.tracks);
 	const { searchResults, isSearching, search, clearSearch } = useSoundCloudStore();
 	const addToQueue = useQueueStore(state => state.addItem);
 	const [query, setQuery] = useState('');
-	const [addingTrackId, setAddingTrackId] = useState<number | null>(null);
-	const [addedTrackUris, setAddedTrackUris] = useState<Set<string>>(new Set());
+	// A typed query waiting for its debounce counts as loading (#307).
+	const [isPending, setIsPending] = useState(false);
+	// Tracks tapped here: checked at once, before the add call ends (#307).
+	const [addedHere, setAddedHere] = useState<Set<string>>(new Set());
+	// Calls in flight, so a double tap faster than a render sends one call.
+	const sendingUris = React.useRef(new Set<string>());
+	const [actionTrack, setActionTrack] = useState<AddQueueItemBody | null>(null);
 
-	React.useEffect(() => {
-		if (currentPlaylist?.tracks) {
-			const existingUris = new Set(currentPlaylist.tracks.map(t => t.trackUri));
-			setAddedTrackUris(existingUris);
-		}
-	}, [currentPlaylist?.tracks]);
+	const playlistUris = React.useMemo(
+		() => new Set((playlistTracks ?? []).map(t => t.trackUri)),
+		[playlistTracks]
+	);
 
 	const debouncedSearch = React.useMemo(
 		() =>
 			debounce((q: string) => {
+				setIsPending(false);
 				if (q.trim()) {
 					search(q);
 				} else {
@@ -86,141 +84,76 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 
 	const handleSearchChange = (text: string) => {
 		setQuery(text);
-		debouncedSearch(text);
+		if (text.trim()) {
+			setIsPending(true);
+			debouncedSearch(text);
+		} else {
+			// Cleared: drop the results now rather than after the debounce.
+			debouncedSearch.cancel();
+			setIsPending(false);
+			clearSearch();
+		}
 	};
 
-	const getErrorMessage = (error: unknown): string => {
-		const isLegacy = !!error && typeof error === 'object' && 'error' in error;
-		if (error instanceof ApiError || isLegacy) {
-			// ApiError from apiRequest, or the raw `{ error: { code, message } }` body
-			const apiError =
-				error instanceof ApiError
-					? { error: { code: error.code, message: error.message } }
-					: (error as { error?: { code?: string; message?: string } });
-			const code = apiError.error?.code;
+	const isLoading = isSearching || isPending;
 
-			switch (code) {
-				case 'PLAYLIST_ACCESS_DENIED':
-					return 'You no longer have access to this playlist';
-				case 'PLAYLIST_NOT_FOUND':
-					return 'This playlist has been deleted';
-				case 'TRACK_DUPLICATE':
-					return 'This track is already in the playlist';
-				default:
-					return apiError.error?.message || 'Failed to add';
+	const handleAddTrack = React.useCallback(
+		async (track: SoundCloudTrack) => {
+			const uri = track.permalink_url;
+			if (sendingUris.current.has(uri)) return;
+			sendingUris.current.add(uri);
+			setAddedHere(prev => new Set(prev).add(uri));
+			try {
+				// The backend generates the id; the cast only satisfies the store signature.
+				await addTrack(playlistId, toTrackInput(track) as Track);
+			} catch (error) {
+				setAddedHere(prev => {
+					const next = new Set(prev);
+					next.delete(uri);
+					return next;
+				});
+				showError(apiErrorMessage(error, "Impossible d'ajouter le titre à la playlist"));
+			} finally {
+				sendingUris.current.delete(uri);
 			}
-		}
+		},
+		[addTrack, playlistId]
+	);
 
-		if (error instanceof Error) {
-			return error.message;
-		}
+	const handleAddToQueue = React.useCallback(
+		(track: SoundCloudTrack) => addToQueue(toTrackInput(track)),
+		[addToQueue]
+	);
 
-		return 'Failed to add';
-	};
+	const handleShowActions = React.useCallback(
+		(track: SoundCloudTrack) => setActionTrack(toTrackInput(track)),
+		[]
+	);
 
-	const handleAddTrack = async (track: SoundCloudTrack) => {
-		if (addedTrackUris.has(track.permalink_url)) {
-			return;
-		}
-
-		setAddingTrackId(track.id);
-		try {
-			// The backend generates the id; the cast only satisfies the store signature.
-			await addTrack(playlistId, toTrackInput(track) as Track);
-
-			setAddedTrackUris(prev => new Set(prev).add(track.permalink_url));
-		} catch (error) {
-			showError(getErrorMessage(error));
-		} finally {
-			setAddingTrackId(null);
-		}
-	};
-
-	const formatDuration = (ms: number) => {
-		const minutes = Math.floor(ms / 60000);
-		const seconds = Math.floor((ms % 60000) / 1000);
-		return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-	};
-
-	const renderTrackItem = ({ item }: { item: SoundCloudTrack }) => {
-		const artworkUrl = item.artwork_url || item.user.avatar_url || 'https://via.placeholder.com/50';
-		const isAdding = addingTrackId === item.id;
-		const isAdded = addedTrackUris.has(item.permalink_url);
-
-		return (
-			<View style={styles.trackRow}>
-				<QueueSwipe onAddToQueue={() => addToQueue(toTrackInput(item))}>
-					<TouchableOpacity
-						style={styles.trackItem}
-						onPress={() => !isAdded && handleAddTrack(item)}
-						disabled={isAdding || isAdded}
-						activeOpacity={0.7}
-					>
-						<Image source={{ uri: artworkUrl }} style={styles.artwork} />
-						<View style={styles.trackInfo}>
-							<Text style={styles.trackTitle} numberOfLines={1}>
-								{item.title}
-							</Text>
-							<Text style={styles.trackArtist} numberOfLines={1}>
-								{item.user.username}
-							</Text>
-							<Text style={styles.trackDuration}>{formatDuration(item.duration)}</Text>
-						</View>
-						<View
-							style={[
-								styles.addButton,
-								isAdding && styles.addButtonDisabled,
-								isAdded && styles.addedButton,
-							]}
-						>
-							{isAdding ? (
-								<ActivityIndicator size="small" color="#FFFFFF" />
-							) : (
-								<Ionicons name={isAdded ? 'checkmark' : 'add'} size={20} color="#FFFFFF" />
-							)}
-						</View>
-					</TouchableOpacity>
-				</QueueSwipe>
-			</View>
-		);
-	};
+	const renderTrackItem = ({ item }: { item: SoundCloudTrack }) => (
+		<AddableTrackRow
+			track={item}
+			isAdded={addedHere.has(item.permalink_url) || playlistUris.has(item.permalink_url)}
+			onAdd={handleAddTrack}
+			onAddToQueue={handleAddToQueue}
+			onShowActions={handleShowActions}
+		/>
+	);
 
 	return (
 		<View style={styles.container}>
 			<View style={styles.searchContainer}>
-				<View style={styles.searchInputWrapper}>
-					<Ionicons
-						name="search"
-						size={20}
-						color={theme.colors.textSecondary}
-						style={styles.searchIcon}
-					/>
-					<TextInput
-						style={styles.searchInput}
-						placeholder="Rechercher sur SoundCloud..."
-						placeholderTextColor={theme.colors.textSecondary}
-						value={query}
-						onChangeText={handleSearchChange}
-						autoCapitalize="none"
-						autoCorrect={false}
-						autoFocus
-					/>
-					{query.length > 0 && (
-						<TouchableOpacity
-							onPress={() => {
-								setQuery('');
-								clearSearch();
-							}}
-							hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-						>
-							<Ionicons name="close-circle" size={20} color={theme.colors.textSecondary} />
-						</TouchableOpacity>
-					)}
-				</View>
+				<SearchBar
+					value={query}
+					onChangeText={handleSearchChange}
+					placeholder="Rechercher sur SoundCloud..."
+					loading={isLoading}
+					autoFocus
+				/>
 			</View>
 
-			{isSearching && searchResults.length === 0 ? (
-				<LoadingSpinner size="large" />
+			{isLoading && searchResults.length === 0 ? (
+				<SkeletonList count={8} row={TrackRowSkeleton} />
 			) : (
 				<FlatList
 					data={searchResults}
@@ -229,7 +162,7 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 					contentContainerStyle={[styles.list, { paddingBottom: playerHeight + theme.spacing.xl }]}
 					showsVerticalScrollIndicator={false}
 					ListEmptyComponent={
-						query.trim() && isSearching ? null : (
+						query.trim() && isLoading ? null : (
 							<EmptyState
 								icon="musical-notes-outline"
 								message={
@@ -242,6 +175,8 @@ export function SearchTracksScreen({ route }: SearchTracksScreenProps) {
 					}
 				/>
 			)}
+
+			<TrackActionsSheet track={actionTrack} onClose={() => setActionTrack(null)} />
 		</View>
 	);
 }
@@ -256,77 +191,8 @@ const createStyles = (theme: Theme) =>
 			paddingHorizontal: theme.spacing.md,
 			paddingVertical: theme.spacing.sm,
 		},
-		searchInputWrapper: {
-			flexDirection: 'row',
-			alignItems: 'center',
-			backgroundColor: theme.colors.surfaceAlt,
-			borderRadius: 12,
-			paddingHorizontal: theme.spacing.md,
-			height: 48,
-		},
-		searchIcon: {
-			marginRight: theme.spacing.sm,
-		},
-		searchInput: {
-			flex: 1,
-			fontSize: 16,
-			color: theme.colors.text,
-			paddingVertical: 0,
-		},
 		list: {
 			flexGrow: 1,
 			paddingTop: theme.spacing.sm,
-		},
-		// Spacing outside the swipe, so the queue panel matches the row's height.
-		trackRow: {
-			marginBottom: theme.spacing.xs,
-		},
-		trackItem: {
-			flexDirection: 'row',
-			alignItems: 'center',
-			paddingHorizontal: theme.spacing.md,
-			paddingVertical: theme.spacing.sm,
-			// Opaque so the queue panel stays hidden behind the row until swiped.
-			backgroundColor: theme.colors.background,
-		},
-		artwork: {
-			width: 52,
-			height: 52,
-			borderRadius: 8,
-			backgroundColor: theme.colors.surfaceAlt,
-			marginRight: theme.spacing.md,
-		},
-		trackInfo: {
-			flex: 1,
-		},
-		trackTitle: {
-			fontSize: 15,
-			fontWeight: theme.typography.weights.semibold,
-			color: theme.colors.text,
-			marginBottom: 3,
-		},
-		trackArtist: {
-			fontSize: 13,
-			color: theme.colors.textSecondary,
-			marginBottom: 2,
-		},
-		trackDuration: {
-			fontSize: 12,
-			color: theme.colors.textSecondary,
-		},
-		addButton: {
-			backgroundColor: theme.colors.primary,
-			width: 36,
-			height: 36,
-			borderRadius: 18,
-			justifyContent: 'center',
-			alignItems: 'center',
-			marginLeft: theme.spacing.sm,
-		},
-		addButtonDisabled: {
-			opacity: 0.7,
-		},
-		addedButton: {
-			backgroundColor: theme.colors.success,
 		},
 	});

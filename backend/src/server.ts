@@ -12,9 +12,18 @@ import { connectRedis, disconnectRedis, checkRedisHealth } from '@/shared/config
 import { swaggerSpec, swaggerUiOptions } from '@/shared/config/swagger.config.js';
 import { isOriginAllowed } from '@/shared/config/cors.config.js';
 import { configureTrustProxy } from '@/shared/config/trust-proxy.js';
+import { mountSupabaseAuthProxy } from '@/shared/dev/supabase-auth-proxy.js';
 
 const app = express();
 configureTrustProxy(app);
+// make dev-tunnel with the local Supabase stack (#251): before CORS and the
+// body parsers, so the raw auth request is streamed to the stack.
+if (mountSupabaseAuthProxy(app, env)) {
+	logger.info('Supabase auth proxy enabled', {
+		path: '/supabase/auth/v1',
+		upstream: env.SUPABASE_URL,
+	});
+}
 const httpServer = createServer(app);
 
 realtime.initialize(httpServer);

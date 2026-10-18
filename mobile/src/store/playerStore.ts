@@ -36,6 +36,16 @@ interface PlayerState {
 	queueItemId: string | null;
 	/** Where the loaded track starts, in ms, for a transferred playback (#297); null = from 0. */
 	startPositionMs: number | null;
+	/** When `streamUrl` expires, in epoch ms; null while unknown (#313). */
+	streamExpiresAt: number | null;
+	/** The stream was renewed after a failure since the last `playTrack`: a further failure is final (#313). */
+	streamRenewed: boolean;
+	/** Whether the loaded stream starts playing; false after a renewal made while paused (#313). */
+	resumeAfterLoad: boolean;
+	/** Paused by the system (call, unplugged headset), so a resume by the system resumes the store (#310). */
+	pausedBySystem: boolean;
+	/** A restored track with no stream loaded yet: play fetches it, at `startPositionMs` (#312). */
+	needsStreamLoad: boolean;
 
 	// State machine
 	playbackState: PlaybackState;
@@ -52,7 +62,8 @@ interface PlayerState {
 	seekCount: number;
 
 	// Actions
-	setStreamUrl: (url: string | null) => void;
+	/** Set the stream URL and, when known, its expiry (epoch ms). */
+	setStreamUrl: (url: string | null, expiresAt?: number | null) => void;
 	setLoading: (loading: boolean) => void;
 	setError: (error: string | null) => void;
 	setTrackUnavailableError: (message: string) => void;
@@ -65,13 +76,40 @@ interface PlayerState {
 		queueItemId?: string | null,
 		startPositionMs?: number | null
 	) => void;
+	/**
+	 * Reload the current track with a new stream URL, at `positionMs`, playing or
+	 * paused (#313). Keeps the track, queue item and modal. `afterFailure` marks the
+	 * stream renewed, so a renewal made only because the URL was expiring keeps the retry.
+	 */
+	renewStream: (positionMs: number, keepPlaying: boolean, afterFailure?: boolean) => void;
+	/**
+	 * Show `track` paused at `positionMs` without loading its stream (#312): the
+	 * last track of a previous session. Play then loads a fresh stream there.
+	 */
+	restoreTrack: (track: SoundCloudTrack, queueItemId: string | null, positionMs: number) => void;
+	/** Move a restored track's start position, before its stream is loaded (#312). */
+	setRestoredPosition: (positionMs: number) => void;
 	play: () => void;
 	pause: () => void;
+	/** Mirror a pause the system made on the player (call, unplugged headset) (#310). */
+	pauseBySystem: () => void;
 	resume: () => void;
 	stop: () => void;
 	toggleModal: () => void;
 	setModalOpen: (isOpen: boolean) => void;
 	markSeek: () => void;
+}
+
+/**
+ * Play of a restored track (#312): load its stream at the saved position, with
+ * the modal left as it is. Returns whether it did.
+ */
+function loadRestored(state: PlayerState): boolean {
+	if (!state.needsStreamLoad || !state.currentTrack) return false;
+	const { isModalOpen } = state;
+	state.playTrack(state.currentTrack, state.queueItemId, state.startPositionMs);
+	usePlayerStore.setState({ isModalOpen });
+	return true;
 }
 
 export const usePlayerStore = create<PlayerState>((set, get) => ({
@@ -82,6 +120,11 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 	loadCounter: 0,
 	queueItemId: null,
 	startPositionMs: null,
+	streamExpiresAt: null,
+	streamRenewed: false,
+	resumeAfterLoad: true,
+	pausedBySystem: false,
+	needsStreamLoad: false,
 	playbackState: 'idle',
 	isPlaying: false,
 	loading: false,
@@ -89,8 +132,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 	isModalOpen: false,
 	seekCount: 0,
 
-	setStreamUrl: url => {
-		set({ streamUrl: url });
+	setStreamUrl: (url, expiresAt = null) => {
+		set({ streamUrl: url, streamExpiresAt: url ? expiresAt : null });
 	},
 
 	setLoading: loading => {
@@ -116,8 +159,11 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 			currentTrack: null,
 			queueItemId: null,
 			streamUrl: null,
+			streamExpiresAt: null,
 			pendingTrackId: null,
 			playbackState: 'idle',
+			pausedBySystem: false,
+			needsStreamLoad: false,
 			isPlaying: false,
 			loading: false,
 		});
@@ -132,7 +178,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 		if (state.playbackState === 'loading') {
 			if (__DEV__) console.log('🎵 [playerStore] Stream ready, transitioning to ready state');
 			set({
-				playbackState: 'ready',
+				// A stream renewed while paused comes back paused, so play resumes it (#313).
+				playbackState: state.resumeAfterLoad ? 'ready' : 'paused',
 				loading: false,
 				pendingTrackId: null,
 			});
@@ -176,6 +223,11 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 			loadCounter: state.loadCounter + 1,
 			playbackState: 'loading',
 			streamUrl: null,
+			streamExpiresAt: null,
+			streamRenewed: false,
+			resumeAfterLoad: true,
+			pausedBySystem: false,
+			needsStreamLoad: false,
 			isPlaying: false,
 			loading: true,
 			// A list tap closes the modal; a queue step (next/previous, auto-advance) keeps it.
@@ -184,12 +236,63 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 		}));
 	},
 
+	renewStream: (positionMs, keepPlaying, afterFailure = false) => {
+		const { currentTrack } = get();
+		if (!currentTrack) return;
+		if (__DEV__) console.log('🎵 [playerStore] Renewing stream URL:', { positionMs, keepPlaying });
+
+		set(state => ({
+			startPositionMs: Number.isFinite(positionMs) && positionMs > 0 ? positionMs : null,
+			pendingTrackId: currentTrack.id,
+			loadCounter: state.loadCounter + 1,
+			playbackState: 'loading',
+			streamUrl: null,
+			streamExpiresAt: null,
+			streamRenewed: afterFailure || state.streamRenewed,
+			resumeAfterLoad: keepPlaying,
+			pausedBySystem: false,
+			// Unchanged play state: the listening status is not re-sent for a renewal.
+			isPlaying: keepPlaying,
+			loading: true,
+			error: null,
+		}));
+	},
+
+	restoreTrack: (track, queueItemId, positionMs) => {
+		if (__DEV__)
+			console.log('🎵 [playerStore] Restoring last track:', { id: track.id, positionMs });
+		// loadCounter is left as is: the stream is fetched on play, not now.
+		set({
+			currentTrack: track,
+			queueItemId,
+			startPositionMs: Number.isFinite(positionMs) && positionMs > 0 ? positionMs : null,
+			pendingTrackId: null,
+			playbackState: 'paused',
+			streamUrl: null,
+			streamExpiresAt: null,
+			streamRenewed: false,
+			resumeAfterLoad: true,
+			pausedBySystem: false,
+			needsStreamLoad: true,
+			isPlaying: false,
+			loading: false,
+			error: null,
+		});
+	},
+
+	setRestoredPosition: positionMs => {
+		if (!get().needsStreamLoad) return;
+		set({ startPositionMs: Number.isFinite(positionMs) && positionMs > 0 ? positionMs : null });
+	},
+
 	play: () => {
 		const state = get();
+		if (loadRestored(state)) return;
 		if (state.playbackState === 'ready' || state.playbackState === 'paused') {
 			set({
 				playbackState: 'playing',
 				isPlaying: true,
+				pausedBySystem: false,
 			});
 		}
 	},
@@ -201,17 +304,34 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 			set({
 				playbackState: 'paused',
 				isPlaying: false,
+				pausedBySystem: false,
+			});
+		} else if (state.pausedBySystem) {
+			// A user pause during an interruption: the system must not resume it (#310).
+			set({ pausedBySystem: false });
+		}
+	},
+
+	pauseBySystem: () => {
+		if (get().playbackState === 'playing') {
+			if (__DEV__) console.log('🎵 [playerStore] Paused by the system');
+			set({
+				playbackState: 'paused',
+				isPlaying: false,
+				pausedBySystem: true,
 			});
 		}
 	},
 
 	resume: () => {
 		const state = get();
+		if (loadRestored(state)) return;
 		if (state.playbackState === 'paused') {
 			if (__DEV__) console.log('🎵 [playerStore] Resuming playback');
 			set({
 				playbackState: 'playing',
 				isPlaying: true,
+				pausedBySystem: false,
 			});
 		}
 	},
@@ -223,8 +343,11 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 			queueItemId: null,
 			startPositionMs: null,
 			streamUrl: null,
+			streamExpiresAt: null,
 			pendingTrackId: null,
 			playbackState: 'idle',
+			pausedBySystem: false,
+			needsStreamLoad: false,
 			isPlaying: false,
 			loading: false,
 			error: null,

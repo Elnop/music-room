@@ -5,13 +5,7 @@
 
 .PHONY: dev-tunnel qr-tunnel tunnel-info tunnel-setup
 
-dev-tunnel: ## Start all services in tunnel mode (different WiFi networks; needs SUPABASE_MODE=hosted for now)
-ifeq ($(SUPABASE_MODE),local)
-	@echo "$(RED)$(ICON_ERROR) make dev-tunnel does not support the local Supabase stack yet$(NC)"
-	@echo "$(YELLOW)$(ICON_ARROW) A phone on another network cannot reach it. Use the hosted project:$(NC)"
-	@echo "   $(GREEN)SUPABASE_MODE=hosted make dev-tunnel$(NC)"
-	@exit 1
-endif
+dev-tunnel: ## Start all services in tunnel mode (different WiFi networks; local Supabase stack through the backend tunnel)
 	$(call print_header,Starting Zumik (TUNNEL MODE))
 	$(call check_eas_configured)
 	$(call blank_line)
@@ -39,6 +33,7 @@ qr-tunnel: ## Show the tunnel URLs and the Metro host to enter in the debug buil
 	$(call print_subsection,🌐 Backend Tunnel URL)
 	@docker exec $(BACKEND_CONTAINER) cat $(SHARED_TUNNEL_FILE) 2>/dev/null || echo "$(RED)$(ICON_ERROR) Backend tunnel not available$(NC)"
 	$(call blank_line)
+	$(call display_supabase_tunnel_url)
 	$(call blank_line)
 	$(call print_subsection,🔍 ngrok Web Interface)
 	@echo "   $(NGROK_UI_URL) (view traffic, connections)"
@@ -55,6 +50,7 @@ tunnel-info: ## Display detailed tunnel connection info
 	$(call print_subsection,Backend Tunnel)
 	@docker exec $(BACKEND_CONTAINER) cat $(SHARED_TUNNEL_FILE) 2>/dev/null || echo "$(RED)$(ICON_ERROR) Not running$(NC)"
 	$(call blank_line)
+	$(call display_supabase_tunnel_url)
 	$(call print_subsection,ngrok Web UI)
 	@echo "   $(NGROK_UI_URL)"
 	$(call print_info,Inspect HTTP traffic\, connections\, tunnel status)

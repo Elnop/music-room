@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, Switch } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
+import { ThemedSwitch } from '@components/common/ThemedSwitch';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, type NavigationProp } from '@react-navigation/native';
+import type { AppTabsParamList } from '@/navigation/AppNavigator';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
@@ -9,9 +12,12 @@ import { useAuthStore } from '@/store/authStore';
 import { musicControlApi } from '@/services/musicControlApi';
 import { friendsApi, type FriendProfile } from '@/services/friendsApi';
 import { deviceService } from '@/services/deviceService';
-import { LoadingSpinner } from '@components/common/LoadingSpinner';
+import { SkeletonBlock, SkeletonList } from '@components/common/Skeleton';
 import { Avatar } from '@components/common/Avatar';
 import { showError, showSuccess } from '@utils/toast';
+import { apiErrorMessage } from '@utils/apiErrorMessage';
+import { EmptyState } from '@components/common/EmptyState';
+import { RenameDeviceModal } from '@components/music-control/RenameDeviceModal';
 
 const LOAD_ERROR = 'Impossible de charger vos appareils';
 
@@ -26,12 +32,13 @@ function setPair(set: Set<string>, key: string, on: boolean): Set<string> {
 	return next;
 }
 
-function errorMessage(error: unknown, fallback: string): string {
-	return error instanceof Error && error.message ? error.message : fallback;
-}
-
 function friendName(friend: FriendProfile): string {
 	return friend.displayName || friend.username;
+}
+
+/** The model repeats the device name when the device was never renamed (the default name). */
+function sameName(model: string, deviceName: string): boolean {
+	return model.trim().toLowerCase() === deviceName.trim().toLowerCase();
 }
 
 function formatLastSeen(lastSeenAt: string): string {
@@ -50,8 +57,36 @@ function licensedPairs(devices: UserDeviceWithLicenses[]): Set<string> {
 	return pairs;
 }
 
+/** Same shape as a device card: icon, name and meta lines, then friend rows. */
+function DeviceCardSkeleton() {
+	const { theme } = useTheme();
+	const styles = React.useMemo(() => createStyles(theme), [theme]);
+	return (
+		<View style={styles.card}>
+			<View style={styles.deviceHeader}>
+				<SkeletonBlock width={40} height={40} radius={20} style={styles.skeletonIcon} />
+				<View style={styles.textContainer}>
+					<SkeletonBlock width="55%" height={16} />
+					<SkeletonBlock width="40%" height={12} style={styles.skeletonLine} />
+				</View>
+			</View>
+			<View style={styles.divider} />
+			{[0, 1].map(index => (
+				<View key={index} style={styles.friendRow}>
+					<SkeletonBlock width={32} height={32} radius={16} />
+					<View style={styles.textContainer}>
+						<SkeletonBlock width="45%" height={14} />
+					</View>
+					<SkeletonBlock width={51} height={31} radius={16} />
+				</View>
+			))}
+		</View>
+	);
+}
+
 export function MyDevicesScreen() {
 	const { theme } = useTheme();
+	const navigation = useNavigation<NavigationProp<AppTabsParamList>>();
 	const playerHeight = usePlayerHeight();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
@@ -64,36 +99,48 @@ export function MyDevicesScreen() {
 	const [licensed, setLicensed] = useState<Set<string>>(new Set());
 	const [pending, setPending] = useState<Set<string>>(new Set());
 
-	useEffect(() => {
-		const load = async () => {
-			setIsLoading(true);
-			try {
-				// Read once: a token refresh must not reload the screen
-				const accessToken = useAuthStore.getState().accessToken;
-				if (!accessToken) throw new Error(LOAD_ERROR);
-				const [myDevices, myFriends, allowedIds, deviceInfo] = await Promise.all([
-					musicControlApi.getMyDevices(),
-					friendsApi.getFriends(accessToken),
-					musicControlApi.getMyPermissions(),
-					// Only marks "Cet appareil": a failure must not hide the list
-					deviceService.getDeviceInfo().catch(() => null),
-				]);
-				setDevices(myDevices);
-				setFriends(myFriends);
-				setAllDevicesIds(new Set(allowedIds));
-				setCurrentDeviceId(deviceInfo?.deviceId ?? null);
-				setLicensed(licensedPairs(myDevices));
-				setLoadFailed(false);
-			} catch (error) {
-				setLoadFailed(true);
-				showError(errorMessage(error, LOAD_ERROR));
-			} finally {
-				setIsLoading(false);
-			}
-		};
+	const [isRefreshing, setIsRefreshing] = useState(false);
+	const [renaming, setRenaming] = useState<UserDeviceWithLicenses | null>(null);
+	const [isRenameSaving, setIsRenameSaving] = useState(false);
 
-		load();
+	// Loads devices, friends and permissions. A failed refresh keeps what is shown.
+	const load = useCallback(async (isRefresh: boolean) => {
+		try {
+			// Read once: a token refresh must not reload the screen
+			const accessToken = useAuthStore.getState().accessToken;
+			if (!accessToken) throw new Error(LOAD_ERROR);
+			const [myDevices, myFriends, allowedIds, deviceInfo] = await Promise.all([
+				musicControlApi.getMyDevices(),
+				friendsApi.getFriends(accessToken),
+				musicControlApi.getMyPermissions(),
+				// Only marks "Cet appareil": a failure must not hide the list
+				deviceService.getDeviceInfo().catch(() => null),
+			]);
+			setDevices(myDevices);
+			setFriends(myFriends);
+			setAllDevicesIds(new Set(allowedIds));
+			setCurrentDeviceId(deviceInfo?.deviceId ?? null);
+			setLicensed(licensedPairs(myDevices));
+			setLoadFailed(false);
+		} catch (error) {
+			if (!isRefresh) setLoadFailed(true);
+			showError(apiErrorMessage(error, LOAD_ERROR));
+		}
 	}, []);
+
+	useEffect(() => {
+		const firstLoad = async () => {
+			await load(false);
+			setIsLoading(false);
+		};
+		firstLoad();
+	}, [load]);
+
+	const handleRefresh = useCallback(async () => {
+		setIsRefreshing(true);
+		await load(true);
+		setIsRefreshing(false);
+	}, [load]);
 
 	const handleToggle = useCallback(
 		async (device: UserDeviceWithLicenses, friend: FriendProfile, grant: boolean) => {
@@ -111,7 +158,7 @@ export function MyDevicesScreen() {
 			} catch (error) {
 				setLicensed(current => setPair(current, key, !grant));
 				showError(
-					errorMessage(
+					apiErrorMessage(
 						error,
 						grant ? "Impossible d'accorder l'accès" : "Impossible de retirer l'accès"
 					)
@@ -123,16 +170,59 @@ export function MyDevicesScreen() {
 		[]
 	);
 
+	// Renames the device in the modal (#352); null goes back to the system name.
+	const handleRename = useCallback(
+		async (name: string | null) => {
+			if (!renaming) return;
+			setIsRenameSaving(true);
+			try {
+				await musicControlApi.renameDevice(renaming.deviceId, name);
+				setRenaming(null);
+				showSuccess('Appareil renommé');
+				await load(true);
+			} catch (error) {
+				showError(apiErrorMessage(error, "Impossible de renommer l'appareil"));
+			} finally {
+				setIsRenameSaving(false);
+			}
+		},
+		[renaming, load]
+	);
+
+	const refreshControl = (
+		<RefreshControl
+			refreshing={isRefreshing}
+			onRefresh={handleRefresh}
+			tintColor={theme.colors.primary}
+			colors={[theme.colors.primary]}
+		/>
+	);
+
+	const header = (
+		<View style={styles.header}>
+			<Text style={styles.subtitle}>
+				Choisissez quels amis peuvent contrôler la musique de chaque appareil
+			</Text>
+		</View>
+	);
+
 	if (isLoading) {
-		return <LoadingSpinner fullScreen message="Chargement..." />;
+		return (
+			<View style={styles.container}>
+				<ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+					{header}
+					<SkeletonList count={2} row={DeviceCardSkeleton} />
+				</ScrollView>
+			</View>
+		);
 	}
 
 	if (loadFailed) {
 		return (
 			<View style={styles.container}>
-				<View style={styles.centered}>
+				<ScrollView contentContainerStyle={styles.centered} refreshControl={refreshControl}>
 					<Text style={styles.errorText}>{LOAD_ERROR}</Text>
-				</View>
+				</ScrollView>
 			</View>
 		);
 	}
@@ -151,14 +241,12 @@ export function MyDevicesScreen() {
 					<Text style={styles.friendName}>{name}</Text>
 					{allDevices && <Text style={styles.hint}>Contrôle tous mes appareils</Text>}
 				</View>
-				<Switch
+				<ThemedSwitch
 					value={value}
 					onValueChange={next => handleToggle(device, friend, next)}
 					disabled={allDevices || isPending}
 					accessibilityLabel={`${name} sur ${device.deviceName}`}
 					accessibilityState={{ disabled: allDevices || isPending, busy: isPending }}
-					trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
-					thumbColor={theme.colors.surface}
 				/>
 			</View>
 		);
@@ -185,15 +273,31 @@ export function MyDevicesScreen() {
 							)}
 						</View>
 						<Text style={styles.deviceMeta}>
-							{[device.model, lastSeen].filter(Boolean).join(' · ')}
+							{[sameName(device.model, device.deviceName) ? null : device.model, lastSeen]
+								.filter(Boolean)
+								.join(' · ')}
 						</Text>
 					</View>
+					<TouchableOpacity
+						onPress={() => setRenaming(device)}
+						accessibilityRole="button"
+						accessibilityLabel={`Renommer l'appareil ${device.deviceName}`}
+						hitSlop={8}
+						style={styles.renameButton}
+					>
+						<Ionicons name="create-outline" size={20} color={theme.colors.textSecondary} />
+					</TouchableOpacity>
 				</View>
 				<View style={styles.divider} />
 				{friends.length === 0 ? (
-					<Text style={styles.emptyText}>
-						Aucun ami pour l&apos;instant. Ajoutez des amis pour leur confier cet appareil.
-					</Text>
+					<EmptyState
+						style={styles.emptyState}
+						message="Aucun ami pour l'instant. Suivez des personnes qui vous suivent en retour : elles deviendront vos amis et vous pourrez leur confier cet appareil."
+						action={{
+							label: 'Trouver des amis',
+							onPress: () => navigation.navigate('FriendsTab'),
+						}}
+					/>
 				) : (
 					friends.map(friend => renderFriendRow(device, friend))
 				)}
@@ -206,22 +310,28 @@ export function MyDevicesScreen() {
 			<ScrollView
 				style={styles.scrollView}
 				contentContainerStyle={[styles.content, { paddingBottom: playerHeight + theme.spacing.xl }]}
+				refreshControl={refreshControl}
 			>
-				<View style={styles.header}>
-					<Text style={styles.title}>Mes appareils</Text>
-					<Text style={styles.subtitle}>
-						Choisissez quels amis peuvent contrôler la musique de chaque appareil
-					</Text>
-				</View>
+				{header}
 
 				{devices.length === 0 ? (
-					<Text style={styles.emptyText}>
-						Aucun appareil. Ouvrez Zumik sur un appareil pour le voir ici.
-					</Text>
+					<EmptyState
+						icon="phone-portrait-outline"
+						style={styles.emptyState}
+						message="Aucun appareil. Ouvrez Zumik sur un appareil pour le voir ici."
+					/>
 				) : (
 					devices.map(renderDevice)
 				)}
 			</ScrollView>
+			<RenameDeviceModal
+				deviceName={renaming?.deviceName ?? null}
+				saving={isRenameSaving}
+				onClose={() => {
+					if (!isRenameSaving) setRenaming(null);
+				}}
+				onSubmit={handleRename}
+			/>
 		</View>
 	);
 }
@@ -240,12 +350,6 @@ const createStyles = (theme: Theme) =>
 		},
 		header: {
 			marginBottom: theme.spacing.xl,
-		},
-		title: {
-			fontSize: 28,
-			fontWeight: theme.typography.weights.bold,
-			color: theme.colors.text,
-			marginBottom: theme.spacing.xs,
 		},
 		subtitle: {
 			fontSize: 16,
@@ -287,6 +391,9 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.text,
 			marginRight: theme.spacing.sm,
 		},
+		renameButton: {
+			padding: theme.spacing.xs,
+		},
 		badge: {
 			backgroundColor: theme.colors.primary + '25',
 			borderRadius: 8,
@@ -323,14 +430,18 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.textSecondary,
 			marginTop: 2,
 		},
-		emptyText: {
-			fontSize: 14,
-			color: theme.colors.textSecondary,
-			textAlign: 'center',
-			paddingVertical: theme.spacing.md,
+		emptyState: {
+			flex: 0,
+			padding: theme.spacing.md,
+		},
+		skeletonIcon: {
+			marginRight: theme.spacing.md,
+		},
+		skeletonLine: {
+			marginTop: 6,
 		},
 		centered: {
-			flex: 1,
+			flexGrow: 1,
 			justifyContent: 'center',
 			alignItems: 'center',
 			padding: theme.spacing.xl,

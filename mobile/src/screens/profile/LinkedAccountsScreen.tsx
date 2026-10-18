@@ -6,9 +6,9 @@ import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import type { LinkedProvider, OAuthProvider } from '@/types/auth.types';
 import { useAuthStore } from '@/store/authStore';
-import { ApiError } from '@services/api';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
 import { showError, showSuccess } from '@utils/toast';
+import { apiErrorMessage } from '@utils/apiErrorMessage';
 
 type MethodType = LinkedProvider['type'];
 
@@ -19,7 +19,7 @@ interface MethodRow {
 }
 
 const METHODS: MethodRow[] = [
-	{ type: 'password', label: 'Email & password', icon: 'mail-outline' },
+	{ type: 'password', label: 'Email et mot de passe', icon: 'mail-outline' },
 	{ type: 'google', label: 'Google', icon: 'logo-google' },
 	{ type: 'facebook', label: 'Facebook', icon: 'logo-facebook' },
 ];
@@ -31,10 +31,6 @@ const PROVIDER_LABELS: Record<OAuthProvider, string> = {
 
 function isCancelled(error: unknown): boolean {
 	return error instanceof Error && error.message === 'SIGN_IN_CANCELLED';
-}
-
-function errorMessage(error: unknown, fallback: string): string {
-	return error instanceof ApiError ? error.message : fallback;
 }
 
 export function LinkedAccountsScreen() {
@@ -58,7 +54,7 @@ export function LinkedAccountsScreen() {
 				setLoadFailed(false);
 			} catch (error) {
 				setLoadFailed(true);
-				showError(errorMessage(error, 'Unable to load linked accounts'));
+				showError(apiErrorMessage(error, 'Impossible de charger les comptes liés'));
 			} finally {
 				setIsLoading(false);
 			}
@@ -72,10 +68,12 @@ export function LinkedAccountsScreen() {
 			setPending(provider);
 			try {
 				await linkProvider(provider);
-				showSuccess(`${PROVIDER_LABELS[provider]} linked`);
+				showSuccess(`Compte ${PROVIDER_LABELS[provider]} lié`);
 			} catch (error) {
 				if (!isCancelled(error)) {
-					showError(errorMessage(error, `Unable to link ${PROVIDER_LABELS[provider]}`));
+					showError(
+						apiErrorMessage(error, `Impossible de lier le compte ${PROVIDER_LABELS[provider]}`)
+					);
 				}
 			} finally {
 				setPending(null);
@@ -89,9 +87,11 @@ export function LinkedAccountsScreen() {
 			setPending(provider);
 			try {
 				await unlinkProvider(provider);
-				showSuccess(`${PROVIDER_LABELS[provider]} unlinked`);
+				showSuccess(`Compte ${PROVIDER_LABELS[provider]} délié`);
 			} catch (error) {
-				showError(errorMessage(error, `Unable to unlink ${PROVIDER_LABELS[provider]}`));
+				showError(
+					apiErrorMessage(error, `Impossible de délier le compte ${PROVIDER_LABELS[provider]}`)
+				);
 			} finally {
 				setPending(null);
 			}
@@ -100,14 +100,14 @@ export function LinkedAccountsScreen() {
 	);
 
 	if (isLoading) {
-		return <LoadingSpinner fullScreen message="Loading..." />;
+		return <LoadingSpinner fullScreen message="Chargement…" />;
 	}
 
 	if (loadFailed || !linkedProviders) {
 		return (
 			<View style={styles.container}>
 				<View style={styles.errorContainer}>
-					<Text style={styles.errorText}>Unable to load linked accounts</Text>
+					<Text style={styles.errorText}>Impossible de charger les comptes liés</Text>
 				</View>
 			</View>
 		);
@@ -116,7 +116,7 @@ export function LinkedAccountsScreen() {
 	const renderAction = (type: MethodType, isLinked: boolean) => {
 		if (type === 'password') return null;
 
-		const label = isLinked ? 'Unlink' : 'Link';
+		const label = isLinked ? 'Délier' : 'Lier';
 		const disabled = pending !== null;
 		const onPress = () => (isLinked ? handleUnlink(type) : handleLink(type));
 
@@ -147,8 +147,7 @@ export function LinkedAccountsScreen() {
 				contentContainerStyle={[styles.content, { paddingBottom: playerHeight + theme.spacing.xl }]}
 			>
 				<View style={styles.header}>
-					<Text style={styles.title}>Linked accounts</Text>
-					<Text style={styles.subtitle}>Choose how you sign in to Zumik</Text>
+					<Text style={styles.subtitle}>Choisissez comment vous connecter à Zumik</Text>
 				</View>
 
 				<View style={styles.list}>
@@ -164,7 +163,7 @@ export function LinkedAccountsScreen() {
 									<View style={styles.textContainer}>
 										<Text style={styles.rowTitle}>{method.label}</Text>
 										<Text style={styles.rowStatus}>
-											{linked ? (linked.isPrimary ? 'Linked · Primary' : 'Linked') : 'Not linked'}
+											{linked ? (linked.isPrimary ? 'Lié · Principal' : 'Lié') : 'Non lié'}
 										</Text>
 									</View>
 									{renderAction(method.type, Boolean(linked))}
@@ -192,12 +191,6 @@ const createStyles = (theme: Theme) =>
 		},
 		header: {
 			marginBottom: theme.spacing.xl,
-		},
-		title: {
-			fontSize: 28,
-			fontWeight: theme.typography.weights.bold,
-			color: theme.colors.text,
-			marginBottom: theme.spacing.xs,
 		},
 		subtitle: {
 			fontSize: 16,

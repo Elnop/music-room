@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
 	View,
-	Text,
 	StyleSheet,
 	Image,
 	Animated,
@@ -13,6 +12,7 @@ import {
 	Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
@@ -190,13 +190,13 @@ export function WelcomeScreen({ navigation }: WelcomeScreenProps) {
 
 					<View style={styles.buttonContainer}>
 						<Button
-							title="Get Started"
+							title="Commencer"
 							onPress={() => navigation.navigate('Register')}
 							variant="primary"
 							fullWidth
 						/>
 						<Button
-							title="Login"
+							title="Se connecter"
 							onPress={() => navigation.navigate('Login')}
 							variant="outline"
 							fullWidth
@@ -204,11 +204,16 @@ export function WelcomeScreen({ navigation }: WelcomeScreenProps) {
 						<TouchableOpacity
 							onPress={() => setShowServer(value => !value)}
 							accessibilityRole="button"
-							hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+							accessibilityLabel="Serveur"
+							accessibilityState={{ expanded: showServer }}
+							hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+							style={styles.serverToggle}
 						>
-							<Text style={styles.serverToggle}>
-								{showServer ? 'Hide server settings' : 'Server settings'}
-							</Text>
+							<Ionicons
+								name="settings-outline"
+								size={20}
+								color={showServer ? theme.colors.primary : theme.colors.textSecondary}
+							/>
 						</TouchableOpacity>
 						{showServer && (
 							<View style={styles.serverPanel}>
@@ -250,10 +255,8 @@ const createStyles = (theme: Theme) =>
 			marginBottom: theme.spacing.xl,
 		},
 		serverToggle: {
-			textAlign: 'center',
-			fontSize: theme.typography.sizes.sm,
-			color: theme.colors.textSecondary,
-			textDecorationLine: 'underline',
+			alignSelf: 'center',
+			padding: theme.spacing.xs,
 		},
 		serverPanel: {
 			padding: theme.spacing.md,

@@ -10,7 +10,7 @@ jest.mock('@/contexts/ThemeContext', () => {
 describe('SearchBar', () => {
 	it('shows the value and the default placeholder', () => {
 		render(<SearchBar value="daft" onChangeText={jest.fn()} />);
-		expect(screen.getByPlaceholderText('Search...').props.value).toBe('daft');
+		expect(screen.getByPlaceholderText('Rechercher…').props.value).toBe('daft');
 	});
 
 	it('uses a custom placeholder', () => {
@@ -22,8 +22,33 @@ describe('SearchBar', () => {
 		const onChangeText = jest.fn();
 		render(<SearchBar value="" onChangeText={onChangeText} />);
 
-		fireEvent.changeText(screen.getByPlaceholderText('Search...'), 'punk');
+		fireEvent.changeText(screen.getByPlaceholderText('Rechercher…'), 'punk');
 
 		expect(onChangeText).toHaveBeenCalledWith('punk');
+	});
+});
+
+describe('SearchBar clear and loading (#307)', () => {
+	it('has no clear button while the field is empty', () => {
+		render(<SearchBar value="" onChangeText={jest.fn()} />);
+		expect(screen.queryByLabelText('Effacer la recherche')).toBeNull();
+	});
+
+	it('clears the field through onChangeText', () => {
+		const onChangeText = jest.fn();
+		render(<SearchBar value="punk" onChangeText={onChangeText} />);
+
+		fireEvent.press(screen.getByLabelText('Effacer la recherche'));
+
+		expect(onChangeText).toHaveBeenCalledWith('');
+	});
+
+	it('shows a spinner only while loading', () => {
+		const { rerender } = render(<SearchBar value="punk" onChangeText={jest.fn()} />);
+		expect(screen.queryByTestId('search-bar-loading')).toBeNull();
+
+		rerender(<SearchBar value="punk" onChangeText={jest.fn()} loading />);
+
+		expect(screen.getByTestId('search-bar-loading')).toBeTruthy();
 	});
 });

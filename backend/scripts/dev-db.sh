@@ -29,10 +29,10 @@ SMTP_PORT=54425
 MAIL_UI_PORT=54424
 STUDIO_PORT=54423
 
-# supabase-js needs Postgres, PostgREST, Auth and Kong (as in test-db.sh); Mailpit
-# catches the backend's emails (web UI on $MAIL_UI_PORT); Studio, with
-# postgres-meta, is the dashboard (on $STUDIO_PORT).
-EXCLUDED=storage-api,imgproxy,realtime,edge-runtime,logflare,vector,supavisor
+# supabase-js needs Postgres, PostgREST, Auth, Storage (profile photos, #351)
+# and Kong (as in test-db.sh); Mailpit catches the backend's emails (web UI on
+# $MAIL_UI_PORT); Studio, with postgres-meta, is the dashboard (on $STUDIO_PORT).
+EXCLUDED=imgproxy,realtime,edge-runtime,logflare,vector,supavisor
 
 # Migrations already applied, one row per file name. Outside `public`, so
 # PostgREST never exposes it and the generated types never list it.

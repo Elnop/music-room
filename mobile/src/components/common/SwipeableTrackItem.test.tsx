@@ -17,7 +17,7 @@ describe('SwipeableTrackItem', () => {
 		render(<SwipeableTrackItem track={track} onDelete={onDelete} />);
 		// Ionicons loads its font asynchronously and re-renders once it is ready.
 		await act(async () => {});
-		expect(screen.queryByLabelText('Reorder track')).toBeNull();
+		expect(screen.queryByLabelText('Réordonner')).toBeNull();
 	});
 
 	it('hides the drag handle when disabled', async () => {
@@ -26,7 +26,37 @@ describe('SwipeableTrackItem', () => {
 		);
 		// Ionicons loads its font asynchronously and re-renders once it is ready.
 		await act(async () => {});
-		expect(screen.queryByLabelText('Reorder track')).toBeNull();
+		expect(screen.queryByLabelText('Réordonner')).toBeNull();
+	});
+
+	it('opens the quick actions on a long press or the ⋯ button, even for a viewer', async () => {
+		const onShowActions = jest.fn();
+		render(
+			<SwipeableTrackItem
+				track={track}
+				onDelete={onDelete}
+				onShowActions={onShowActions}
+				disabled
+			/>
+		);
+		await act(async () => {});
+		fireEvent(screen.getByText('Song'), 'longPress');
+		fireEvent.press(screen.getByLabelText('Actions'));
+		expect(onShowActions).toHaveBeenCalledTimes(2);
+	});
+
+	it('names the row after the track for a screen reader', async () => {
+		render(<SwipeableTrackItem track={track} onDelete={onDelete} onShowActions={jest.fn()} />);
+		await act(async () => {});
+		expect(screen.getByLabelText('Song, Artist').props.accessibilityHint).toBe(
+			'Appui long pour les actions du titre'
+		);
+	});
+
+	it('shows no ⋯ button without onShowActions', async () => {
+		render(<SwipeableTrackItem track={track} onDelete={onDelete} />);
+		await act(async () => {});
+		expect(screen.queryByLabelText('Actions')).toBeNull();
 	});
 
 	it('starts the drag when the handle is pressed', async () => {
@@ -34,7 +64,7 @@ describe('SwipeableTrackItem', () => {
 		render(<SwipeableTrackItem track={track} onDelete={onDelete} onDragStart={onDragStart} />);
 		// Ionicons loads its font asynchronously and re-renders once it is ready.
 		await act(async () => {});
-		fireEvent(screen.getByLabelText('Reorder track'), 'pressIn');
+		fireEvent(screen.getByLabelText('Réordonner'), 'pressIn');
 		expect(onDragStart).toHaveBeenCalledTimes(1);
 	});
 
@@ -46,14 +76,14 @@ describe('SwipeableTrackItem', () => {
 		const swipeable = screen.UNSAFE_getByType(Swipeable);
 		expect(swipeable.props.enabled).toBe(true);
 		expect(swipeable.props.renderRightActions).toBeUndefined();
-		expect(screen.getByLabelText('Ajouter à la file de lecture')).toBeTruthy();
+		expect(screen.getByLabelText("Ajouter à la file d'attente")).toBeTruthy();
 		expect(screen.queryByText('Supprimer')).toBeNull();
 	});
 
 	it('keeps the delete action for an editor', async () => {
 		render(<SwipeableTrackItem track={track} onDelete={onDelete} onAddToQueue={jest.fn()} />);
 		await act(async () => {});
-		expect(screen.getByLabelText('Ajouter à la file de lecture')).toBeTruthy();
+		expect(screen.getByLabelText("Ajouter à la file d'attente")).toBeTruthy();
 		fireEvent.press(screen.getByText('Supprimer'));
 		expect(onDelete).toHaveBeenCalledWith('t1');
 	});
@@ -77,5 +107,20 @@ describe('SwipeableTrackItem', () => {
 		render(<SwipeableTrackItem track={track} onDelete={onDelete} disabled />);
 		await act(async () => {});
 		expect(screen.UNSAFE_getByType(Swipeable).props.enabled).toBe(false);
+	});
+
+	it('highlights the track playing now with a speaker icon (#307)', async () => {
+		render(<SwipeableTrackItem track={track} onDelete={onDelete} isCurrent />);
+		await act(async () => {});
+		expect(screen.getByLabelText('Song, Artist').props.accessibilityState).toEqual({
+			selected: true,
+		});
+		expect(screen.getByLabelText('En cours de lecture')).toBeTruthy();
+	});
+
+	it('shows no speaker icon on another track', async () => {
+		render(<SwipeableTrackItem track={track} onDelete={onDelete} />);
+		await act(async () => {});
+		expect(screen.queryByLabelText('En cours de lecture')).toBeNull();
 	});
 });

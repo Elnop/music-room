@@ -90,7 +90,13 @@ Slower (+50-200ms latency), works across any network
    - Exposes backend API (port 3000) via public tunnel
    - Automatically configured CORS for tunnel URLs
 
-3. **Shared Volume**: Docker volume for URL communication
+3. **Supabase auth through the backend tunnel** (`SUPABASE_MODE=local`, the default; #251)
+   - ngrok's free plan has one dev domain, so a second endpoint for the local Supabase stack is rejected (ERR_NGROK_334)
+   - The backend, started with `TUNNEL_MODE=true` and `SUPABASE_MODE=local` in development, forwards `/supabase/auth/v1/*` to the stack (`backend/src/shared/dev/supabase-auth-proxy.ts`); any other path under `/supabase` gets a 404, a stopped stack a 502 `SUPABASE_UNREACHABLE`
+   - The app uses `<backend tunnel>/supabase` as `EXPO_PUBLIC_SUPABASE_URL` (it uses Supabase for auth only)
+   - With `SUPABASE_MODE=hosted make dev-tunnel` the app keeps the hosted project of `mobile/.env`
+
+4. **Shared Volume**: Docker volume for URL communication
    - Backend writes the tunnel URL to `/tmp/shared/backend-tunnel-url.txt` (Docker volume `tunnel-info`, mounted at `/tmp/shared` in both containers)
    - `make dev-tunnel-build-apk` reads it to point the APK at the backend tunnel
 
@@ -267,6 +273,17 @@ docker exec zumik-mobile cat .env.development.local
 curl "$(docker exec zumik-backend cat /tmp/shared/backend-tunnel-url.txt)/health"
 ```
 
+#### App Can't Sign In (SUPABASE_MODE=local)
+
+```bash
+# The app should use <backend tunnel>/supabase
+docker exec zumik-mobile cat .env.development.local
+
+# The local stack must answer through the backend (502 SUPABASE_UNREACHABLE: run make supabase-up)
+curl -H "apikey: $(sed -n 's/^SUPABASE_ANON_KEY=//p' backend/.env.supabase.local)" \
+  "$(docker exec zumik-backend cat /tmp/shared/backend-tunnel-url.txt)/supabase/auth/v1/health"
+```
+
 ## Performance Considerations
 
 ### Latency Comparison
@@ -313,21 +330,23 @@ curl "$(docker exec zumik-backend cat /tmp/shared/backend-tunnel-url.txt)/health
 
 There is no compose file: `make dev-tunnel` calls `docker_up_tunnel` in `make/helpers/docker.mk`, which runs plain `docker run` commands on the `zumik-network` network (details in [SECURITY.md](SECURITY.md)):
 
+- In `SUPABASE_MODE=local` (default), `make supabase-up` runs first: the tunnel backend reads `backend/.env.supabase.local`, and the mobile container gets only `SUPABASE_MODE` and the anon key, read from that file by the make recipe.
 - `zumik-redis`: same as LAN mode (`start_redis`).
-- `zumik-backend` (`start_backend_tunnel`): runs `sh scripts/start-with-tunnel.sh` instead of `npm run dev`, with `TUNNEL_MODE=true`, publishes port 3000 and 4040 (ngrok web interface), and mounts the `tunnel-info` volume at `/tmp/shared`.
-- `zumik-mobile` (`start_mobile_tunnel`, recreated on every `make dev-tunnel`): runs `sh scripts/start-expo-tunnel.sh`, which waits until the backend tunnel URL in `/tmp/shared` answers `/health` (the backend script deletes the previous run's file first), writes it to `mobile/.env.development.local` (`EXPO_PUBLIC_API_URL`, and `wss://` for `EXPO_PUBLIC_WS_URL`), then starts `npx expo start --host tunnel`. Unlike LAN mode it sets neither `REACT_NATIVE_PACKAGER_HOSTNAME` nor `EXPO_DEVTOOLS_LISTEN_ADDRESS`, which would replace the tunnel URL in the manifest.
+- `zumik-backend` (`start_backend_tunnel`): runs `sh scripts/start-with-tunnel.sh` instead of `npm run dev`, with `TUNNEL_MODE=true`, publishes port 3000 and 4040 (ngrok web interface), and mounts the `tunnel-info` volume at `/tmp/shared`. In `SUPABASE_MODE=local` it gets the same dev-stack variables as `make dev-docker` (`--env-file backend/.env.supabase.local`, `SUPABASE_URL` and `SMTP_HOST` on `host.docker.internal`), so its `/supabase/auth/v1` proxy reaches the stack.
+- `zumik-mobile` (`start_mobile_tunnel`, recreated on every `make dev-tunnel`): runs `sh scripts/start-expo-tunnel.sh`, which waits until the backend tunnel URL in `/tmp/shared` answers `/health` (the backend script deletes the previous run's file first), writes it to `mobile/.env.development.local` (`EXPO_PUBLIC_API_URL`, and `wss://` for `EXPO_PUBLIC_WS_URL`), then, in `SUPABASE_MODE=local`, waits until `<backend tunnel>/supabase/auth/v1/health` answers (60 s, like the backend wait) and adds `EXPO_PUBLIC_SUPABASE_URL=<backend tunnel>/supabase` and the stack's anon key (passed as `SUPABASE_ANON_KEY`; never the service key), then starts `npx expo start --host tunnel`. Unlike LAN mode it sets neither `REACT_NATIVE_PACKAGER_HOSTNAME` nor `EXPO_DEVTOOLS_LISTEN_ADDRESS`, which would replace the tunnel URL in the manifest.
 
-Each container carries a `zumik.mode` label (`lan` or `tunnel`): `make dev-tunnel` recreates a backend or mobile container left running by `make dev-docker`, and the other way round.
+Each container carries a `zumik.mode` label (`lan` or `tunnel`): `make dev-tunnel` recreates a backend or mobile container left running by `make dev-docker`, and the other way round. A tunnel backend started in the other Supabase mode (label `zumik.supabase`) is recreated too.
 
 ### Environment Variables
 
 **Backend (Auto-set by script):**
 - `TUNNEL_URL`: ngrok public URL (e.g., https://abc123.ngrok-free.app)
-- `TUNNEL_MODE=true`: Indicates tunnel mode is active
+- `TUNNEL_MODE=true`: Indicates tunnel mode is active; with `NODE_ENV=development` and `SUPABASE_MODE=local` (also passed by make) it mounts the `/supabase/auth/v1` proxy to `SUPABASE_URL`
 
 **Mobile (Auto-set by script):**
 - `EXPO_PUBLIC_API_URL`: Backend tunnel URL
 - `EXPO_PUBLIC_WS_URL`: Backend WebSocket tunnel URL (wss://)
+- `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY` (`SUPABASE_MODE=local` only): `<backend tunnel>/supabase` and the local stack's anon key
 - `TUNNEL_MODE=true`: Indicates tunnel mode is active
 
 ## Security Considerations
@@ -340,6 +359,7 @@ Tunnel mode is for **development only**. Never use in production:
 - Free tier has no authentication
 - Tunnel URLs can be discovered/brute-forced
 - No rate limiting beyond ngrok's limits
+- With the local Supabase stack, its auth API is reachable through `<backend tunnel>/supabase/auth/v1` (nothing else of the stack is forwarded)
 
 ### Best Practices
 

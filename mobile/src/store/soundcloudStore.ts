@@ -9,10 +9,19 @@ interface SoundCloudState {
 	totalResults: number;
 
 	// Actions
-	search: (query: string, limit?: number) => Promise<void>;
+	/** `keepResultsOnError`: a failed search (e.g. a pull-refresh) keeps the shown results. */
+	search: (
+		query: string,
+		limit?: number,
+		options?: { keepResultsOnError?: boolean }
+	) => Promise<void>;
 	clearSearch: () => void;
 	clearError: () => void;
 }
+
+// Number of the latest search: an answer to an older one, overtaken or cleared
+// since, is dropped (#349).
+let latestSearch = 0;
 
 export const useSoundCloudStore = create<SoundCloudState>(set => ({
 	searchResults: [],
@@ -20,9 +29,10 @@ export const useSoundCloudStore = create<SoundCloudState>(set => ({
 	error: null,
 	totalResults: 0,
 
-	search: async (query: string, limit = 20) => {
+	search: async (query: string, limit = 20, options = {}) => {
+		const searchId = ++latestSearch;
 		if (!query.trim()) {
-			set({ searchResults: [], totalResults: 0 });
+			set({ searchResults: [], totalResults: 0, isSearching: false });
 			return;
 		}
 
@@ -37,6 +47,7 @@ export const useSoundCloudStore = create<SoundCloudState>(set => ({
 			const data = await apiRequest<SoundCloudSearchResult>(
 				`/api/soundcloud/search?${params.toString()}`
 			);
+			if (searchId !== latestSearch) return;
 
 			set({
 				searchResults: data.collection || [],
@@ -44,19 +55,22 @@ export const useSoundCloudStore = create<SoundCloudState>(set => ({
 				isSearching: false,
 			});
 		} catch (error) {
+			if (searchId !== latestSearch) return;
 			set({
-				error: error instanceof Error ? error.message : 'Search failed',
+				error: error instanceof Error ? error.message : 'La recherche a échoué',
 				isSearching: false,
-				searchResults: [],
+				...(options.keepResultsOnError ? {} : { searchResults: [] }),
 			});
 		}
 	},
 
 	clearSearch: () => {
+		latestSearch++;
 		set({
 			searchResults: [],
 			totalResults: 0,
 			error: null,
+			isSearching: false,
 		});
 	},
 

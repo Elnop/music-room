@@ -451,7 +451,7 @@ describe('controlErrorMessage', () => {
 			"Cet appareil n'est plus en ligne"
 		);
 		expect(controlErrorMessage({ code: 'OTHER', message: 'Server says no' })).toBe(
-			'Server says no'
+			'La commande a échoué, réessayez'
 		);
 	});
 });

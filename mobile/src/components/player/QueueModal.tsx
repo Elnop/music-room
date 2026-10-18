@@ -3,15 +3,17 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import Toast from 'react-native-toast-message';
 import { useTheme } from '@/contexts/ThemeContext';
+import { AppToast } from '@/components/common/AppToast';
 import type { Theme } from '@/themes/types';
 import { useActiveQueue, useQueueStore } from '@/store/queueStore';
 import { afterItemIdForDrop } from '@/store/moveTarget';
 import { ReorderableList } from '@/components/common/ReorderableList';
 import { EmptyState } from '@/components/common/EmptyState';
 import { QueueItemRow } from '@/components/player/QueueItemRow';
-import type { QueueItem } from '@/types/queue.types';
+import { TrackActionsSheet } from '@/components/track/TrackActionsSheet';
+import { toTrackInput } from '@/utils/trackInput';
+import type { AddQueueItemBody, QueueItem } from '@/types/queue.types';
 
 interface QueueModalProps {
 	visible: boolean;
@@ -35,6 +37,8 @@ export function QueueModal({ visible, onClose }: QueueModalProps) {
 	const removeItem = useQueueStore(state => state.removeItem);
 	const moveItem = useQueueStore(state => state.moveItem);
 	const [isMoving, setIsMoving] = React.useState(false);
+	const [actionTrack, setActionTrack] = React.useState<AddQueueItemBody | null>(null);
+	const showActions = (item: QueueItem) => setActionTrack(toTrackInput(item.track));
 
 	// Stable per store state: the list keeps a dropped order only while `upcoming` is unchanged.
 	const { current, upcoming } = React.useMemo(() => {
@@ -63,7 +67,13 @@ export function QueueModal({ visible, onClose }: QueueModalProps) {
 	const header = current ? (
 		<View>
 			<Text style={styles.sectionLabel}>En cours de lecture</Text>
-			<QueueItemRow item={current} isCurrent onPlay={handlePlay} onRemove={removeItem} />
+			<QueueItemRow
+				item={current}
+				isCurrent
+				onPlay={handlePlay}
+				onRemove={removeItem}
+				onShowActions={showActions}
+			/>
 			<Text style={styles.sectionLabel}>À suivre</Text>
 		</View>
 	) : null;
@@ -88,6 +98,8 @@ export function QueueModal({ visible, onClose }: QueueModalProps) {
 						onPress={onClose}
 						style={styles.closeButton}
 						activeOpacity={0.7}
+						hitSlop={4}
+						accessibilityRole="button"
 						accessibilityLabel="Fermer la file d'attente"
 					>
 						<Ionicons name="chevron-down" size={24} color={theme.colors.text} />
@@ -110,12 +122,15 @@ export function QueueModal({ visible, onClose }: QueueModalProps) {
 							onRemove={removeItem}
 							onDragStart={isMoving ? undefined : drag}
 							isDragActive={isActive}
+							onShowActions={showActions}
 						/>
 					)}
 				/>
 
+				<TrackActionsSheet track={actionTrack} onClose={() => setActionTrack(null)} />
+
 				{/* The app root's toast sits behind native modals: queue errors show here. */}
-				<Toast />
+				<AppToast />
 			</GestureHandlerRootView>
 		</Modal>
 	);

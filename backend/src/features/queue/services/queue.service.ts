@@ -1,5 +1,5 @@
 import { logger } from '@/shared/utils/logger.js';
-import { upsertTrack, type TrackUpsertInput } from '@/shared/utils/track-upsert.js';
+import type { TrackUpsertInput } from '@/shared/utils/track-upsert.js';
 import { realtime } from '@/realtime/index.js';
 import {
 	canViewPlaylist,
@@ -10,9 +10,9 @@ import {
 	resolvePlaybackDevice,
 } from '@/features/queue/permissions/queue.permissions.js';
 import { sendPlayCommand } from '@/features/queue/utils/queue-play-command.js';
+import { addTrackToQueue } from '@/features/queue/utils/queue-add.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import {
-	addQueueItemRpc,
 	getQueueRpc,
 	moveQueueItemRpc,
 	playPlaylistRpc,
@@ -34,11 +34,16 @@ export class QueueService {
 		return getQueueRpc(ownerId);
 	}
 
-	async addItem(actorId: string, ownerId: string, track: TrackUpsertInput): Promise<QueueState> {
+	/** Appends the track, or with `next` places it after the current item (#316); publishes once. */
+	async addItem(
+		actorId: string,
+		ownerId: string,
+		track: TrackUpsertInput,
+		options: { next?: boolean } = {}
+	): Promise<QueueState> {
 		await assertCanManageQueue(actorId, ownerId);
-		// previewUrl is a stream URL: never persisted from a queue add.
-		const trackRow = await upsertTrack({ ...track, previewUrl: undefined });
-		return this.publish(actorId, ownerId, 'add', await addQueueItemRpc(ownerId, trackRow.id));
+		const { state, operation } = await addTrackToQueue(ownerId, track, options.next);
+		return this.publish(actorId, ownerId, operation, state);
 	}
 
 	async removeItem(actorId: string, ownerId: string, itemId: string): Promise<QueueState> {
@@ -53,12 +58,8 @@ export class QueueService {
 		afterItemId: string | null
 	): Promise<QueueState> {
 		await assertCanManageQueue(actorId, ownerId);
-		return this.publish(
-			actorId,
-			ownerId,
-			'move',
-			await moveQueueItemRpc(ownerId, itemId, afterItemId)
-		);
+		const state = await moveQueueItemRpc(ownerId, itemId, afterItemId);
+		return this.publish(actorId, ownerId, 'move', state);
 	}
 
 	async playItem(

@@ -12,6 +12,9 @@ jest.mock('@services/oauth', () => ({
 	signInWithFacebook: jest.fn(),
 }));
 
+// The system media controls (#309) are covered by MediaSessionBridge.test.tsx.
+jest.mock('@/components/player/MediaSessionBridge', () => ({ MediaSessionBridge: () => null }));
+
 jest.mock('expo-audio', () => ({
 	useAudioPlayer: jest.fn(),
 	useAudioPlayerStatus: jest.fn(),

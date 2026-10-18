@@ -6,6 +6,7 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	ActivityIndicator,
+	Keyboard,
 } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
@@ -13,6 +14,7 @@ import { useAuthStore } from '@/store/authStore';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '@/navigation/AuthNavigator';
 import { showError, showSuccess } from '@utils/toast';
+import { CODE_INPUT_MAX_LENGTH, fillCodeDigits } from '@utils/codeDigits';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'EmailVerification'>;
 
@@ -38,16 +40,14 @@ export function EmailVerificationScreen({ route, navigation }: Props) {
 	}, [cooldown]);
 
 	const handleCodeChange = (text: string, index: number) => {
-		// Only allow digits
-		if (text && !/^\d$/.test(text)) return;
+		const result = fillCodeDigits(code, index, text);
+		if (!result) return;
 
-		const newCode = [...code];
-		newCode[index] = text;
+		const newCode = result.code;
 		setCode(newCode);
 
-		// Auto-focus next input
-		if (text && index < 5) {
-			inputRefs.current[index + 1]?.focus();
+		if (result.focusIndex !== null) {
+			inputRefs.current[result.focusIndex]?.focus();
 		}
 
 		// Auto-submit when all digits entered
@@ -67,11 +67,12 @@ export function EmailVerificationScreen({ route, navigation }: Props) {
 		const finalCode = verificationCode || code.join('');
 
 		if (finalCode.length !== 6) {
-			setCodeError('Please enter all 6 digits');
+			setCodeError('Saisissez les 6 chiffres');
 			return;
 		}
 
 		setCodeError(null);
+		Keyboard.dismiss();
 		try {
 			await verifyEmail(userId, finalCode);
 			// Navigation handled by authStore (user will be logged in)
@@ -101,9 +102,9 @@ export function EmailVerificationScreen({ route, navigation }: Props) {
 		<View style={styles.container}>
 			<View style={styles.content}>
 				{/* Header */}
-				<Text style={styles.title}>Verify Your Email</Text>
+				<Text style={styles.title}>Vérifiez votre email</Text>
 				<Text style={styles.subtitle}>
-					We sent a 6-digit code to{'\n'}
+					Nous avons envoyé un code à 6 chiffres à{'\n'}
 					<Text style={styles.emailHighlight}>{email}</Text>
 				</Text>
 
@@ -120,7 +121,9 @@ export function EmailVerificationScreen({ route, navigation }: Props) {
 							onChangeText={text => handleCodeChange(text, index)}
 							onKeyPress={({ nativeEvent: { key } }) => handleKeyPress(key, index)}
 							keyboardType="number-pad"
-							maxLength={1}
+							maxLength={CODE_INPUT_MAX_LENGTH}
+							autoComplete={index === 0 ? 'sms-otp' : 'off'}
+							textContentType={index === 0 ? 'oneTimeCode' : 'none'}
 							selectTextOnFocus
 							autoFocus={index === 0}
 						/>
@@ -140,13 +143,13 @@ export function EmailVerificationScreen({ route, navigation }: Props) {
 					{isLoading ? (
 						<ActivityIndicator color={theme.colors.background} />
 					) : (
-						<Text style={styles.buttonText}>Verify Email</Text>
+						<Text style={styles.buttonText}>Vérifier</Text>
 					)}
 				</TouchableOpacity>
 
 				{/* Resend Code */}
 				<View style={styles.resendContainer}>
-					<Text style={styles.resendText}>Didn't receive the code? </Text>
+					<Text style={styles.resendText}>Code non reçu ? </Text>
 					<TouchableOpacity onPress={handleResend} disabled={isResending || cooldown > 0}>
 						<Text
 							style={[
@@ -154,14 +157,18 @@ export function EmailVerificationScreen({ route, navigation }: Props) {
 								(isResending || cooldown > 0) && styles.resendLinkDisabled,
 							]}
 						>
-							{cooldown > 0 ? `Resend in ${cooldown}s` : isResending ? 'Sending...' : 'Resend Code'}
+							{cooldown > 0
+								? `Renvoyer dans ${cooldown} s`
+								: isResending
+									? 'Envoi…'
+									: 'Renvoyer le code'}
 						</Text>
 					</TouchableOpacity>
 				</View>
 
 				{/* Back to Login */}
 				<TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Login')}>
-					<Text style={styles.backText}>Back to Login</Text>
+					<Text style={styles.backText}>Retour à la connexion</Text>
 				</TouchableOpacity>
 			</View>
 		</View>

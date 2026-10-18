@@ -1,6 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { View, FlatList, StyleSheet, RefreshControl } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
 import type { Theme } from '@/themes/types';
@@ -8,10 +7,14 @@ import { useSoundCloudStore } from '@store/soundcloudStore';
 import { useQueueStore } from '@store/queueStore';
 import { toTrackInput } from '@utils/trackInput';
 import { SoundCloudTrackItem } from '@screens/search/components/SoundCloudTrackItem';
-import { PlaylistSelectorModal } from '@screens/search/components/PlaylistSelectorModal';
-import { LoadingSpinner } from '@components/common/LoadingSpinner';
+import { TrackActionsSheet } from '@components/track/TrackActionsSheet';
+import { SkeletonList, TrackRowSkeleton } from '@components/common/Skeleton';
+import { EmptyState } from '@components/common/EmptyState';
+import { SearchBar } from '@components/common/SearchBar';
+import { showError } from '@utils/toast';
 import debounce from 'lodash/debounce';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
+import type { AddQueueItemBody } from '@/types/queue.types';
 
 export function SoundCloudSearchScreen() {
 	const { theme } = useTheme();
@@ -19,8 +22,9 @@ export function SoundCloudSearchScreen() {
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
 	const [searchQuery, setSearchQuery] = useState('');
-	const [selectedTrack, setSelectedTrack] = useState<SoundCloudTrack | null>(null);
-	const [showPlaylistModal, setShowPlaylistModal] = useState(false);
+	// A typed query waiting for its debounce counts as loading (#307).
+	const [isPending, setIsPending] = useState(false);
+	const [actionTrack, setActionTrack] = useState<AddQueueItemBody | null>(null);
 
 	const { searchResults, isSearching, error, search, clearSearch, clearError } =
 		useSoundCloudStore();
@@ -31,65 +35,86 @@ export function SoundCloudSearchScreen() {
 	const debouncedSearch = useMemo(
 		() =>
 			debounce((query: string) => {
+				setIsPending(false);
 				search(query);
 			}, 500),
 		[search]
 	);
 
+	useEffect(() => () => debouncedSearch.cancel(), [debouncedSearch]);
+
+	// A failed search is a toast (#318); the store keeps its own (English) text.
+	// `error` stays set until the next search so the list says the search failed.
+	useEffect(() => {
+		if (error) showError('La recherche SoundCloud a échoué. Réessayez.');
+	}, [error]);
+
 	const handleSearchChange = (text: string) => {
 		setSearchQuery(text);
+		clearError();
 		if (text.trim()) {
+			setIsPending(true);
 			debouncedSearch(text);
 		} else {
+			debouncedSearch.cancel();
+			setIsPending(false);
 			clearSearch();
 		}
 	};
+
+	const isLoading = isSearching || isPending;
+
+	// Pull to refresh reruns the current query; with no query there is nothing to fetch.
+	const [isRefreshing, setIsRefreshing] = useState(false);
+	const handleRefresh = useCallback(async () => {
+		if (!searchQuery.trim()) return;
+		debouncedSearch.cancel();
+		setIsPending(false);
+		setIsRefreshing(true);
+		clearError();
+		try {
+			await search(searchQuery, undefined, { keepResultsOnError: true });
+		} finally {
+			setIsRefreshing(false);
+		}
+	}, [searchQuery, debouncedSearch, search, clearError]);
 
 	// On the phone, or on the remote device in remote mode (#297).
 	const handlePlay = (track: SoundCloudTrack) => {
 		void playListTrack(track);
 	};
 
-	const handleAddToPlaylist = (track: SoundCloudTrack) => {
-		setSelectedTrack(track);
-		setShowPlaylistModal(true);
-	};
-
 	return (
 		<View style={styles.container}>
 			<View style={styles.header}>
-				<TextInput
-					style={styles.searchInput}
-					placeholder="Rechercher sur SoundCloud..."
-					placeholderTextColor={theme.colors.textSecondary}
+				<SearchBar
 					value={searchQuery}
 					onChangeText={handleSearchChange}
-					autoCapitalize="none"
-					autoCorrect={false}
+					placeholder="Rechercher sur SoundCloud..."
+					loading={isLoading && !isRefreshing}
 				/>
 			</View>
 
-			{error && (
-				<View style={styles.errorContainer}>
-					<Text style={styles.errorText}>{error}</Text>
-					<TouchableOpacity onPress={clearError}>
-						<Text style={styles.dismissText}>Dismiss</Text>
-					</TouchableOpacity>
-				</View>
-			)}
-
-			{isSearching && searchResults.length === 0 ? (
-				<LoadingSpinner size="large" />
+			{isLoading && !isRefreshing && searchResults.length === 0 ? (
+				<SkeletonList count={8} row={TrackRowSkeleton} />
 			) : (
 				<FlatList
 					data={searchResults}
+					refreshControl={
+						<RefreshControl
+							refreshing={isRefreshing}
+							onRefresh={handleRefresh}
+							tintColor={theme.colors.primary}
+							colors={[theme.colors.primary]}
+						/>
+					}
 					keyExtractor={item => item.id.toString()}
 					renderItem={({ item }) => (
 						<SoundCloudTrackItem
 							track={item}
 							onPlay={handlePlay}
 							onAddToQueue={track => addToQueue(toTrackInput(track))}
-							onAddToPlaylist={handleAddToPlaylist}
+							onShowActions={track => setActionTrack(toTrackInput(track))}
 						/>
 					)}
 					contentContainerStyle={{
@@ -97,31 +122,27 @@ export function SoundCloudSearchScreen() {
 						flexGrow: 1,
 					}}
 					ListEmptyComponent={
-						searchQuery && !isSearching ? (
-							<Text style={styles.emptyText}>Aucun titre trouvé</Text>
-						) : !searchQuery ? (
-							<View style={styles.emptyState}>
-								<Ionicons
-									name="musical-notes-outline"
-									size={64}
-									color={theme.colors.textSecondary}
-									style={styles.emptyIcon}
-								/>
-								<Text style={styles.emptyText}>Rechercher sur SoundCloud</Text>
-								<Text style={styles.emptySubtext}>
-									Trouvez des titres à ajouter à vos playlists
-								</Text>
-							</View>
-						) : null
+						isLoading ? null : error && searchQuery.trim() ? (
+							<EmptyState
+								icon="cloud-offline-outline"
+								message="La recherche a échoué"
+								action={{ label: 'Réessayer', onPress: () => search(searchQuery) }}
+							/>
+						) : (
+							<EmptyState
+								icon="musical-notes-outline"
+								message={
+									searchQuery
+										? 'Aucun titre trouvé'
+										: 'Recherchez sur SoundCloud des titres à écouter ou à ajouter à vos playlists'
+								}
+							/>
+						)
 					}
 				/>
 			)}
 
-			<PlaylistSelectorModal
-				visible={showPlaylistModal}
-				track={selectedTrack}
-				onClose={() => setShowPlaylistModal(false)}
-			/>
+			<TrackActionsSheet track={actionTrack} onClose={() => setActionTrack(null)} />
 		</View>
 	);
 }
@@ -136,55 +157,5 @@ const createStyles = (theme: Theme) =>
 			paddingHorizontal: theme.spacing.lg,
 			paddingTop: theme.spacing.xs,
 			paddingBottom: theme.spacing.md,
-		},
-		searchInput: {
-			backgroundColor: theme.colors.surfaceAlt,
-			borderRadius: 8,
-			paddingVertical: 12,
-			paddingHorizontal: theme.spacing.md,
-			fontSize: 16,
-			color: theme.colors.text,
-		},
-		errorContainer: {
-			backgroundColor: theme.colors.error + '20',
-			padding: theme.spacing.md,
-			marginHorizontal: theme.spacing.lg,
-			borderRadius: theme.borders.small,
-			flexDirection: 'row',
-			justifyContent: 'space-between',
-			alignItems: 'center',
-			marginBottom: theme.spacing.sm,
-		},
-		errorText: {
-			color: theme.colors.error,
-			fontSize: 14,
-			flex: 1,
-		},
-		dismissText: {
-			color: theme.colors.error,
-			fontWeight: theme.typography.weights.semibold,
-			fontSize: 14,
-		},
-		emptyState: {
-			alignItems: 'center',
-			justifyContent: 'center',
-			paddingTop: theme.spacing.xxl * 2,
-			paddingHorizontal: theme.spacing.xl,
-		},
-		emptyIcon: {
-			marginBottom: theme.spacing.lg,
-			opacity: 0.6,
-		},
-		emptyText: {
-			textAlign: 'center',
-			color: theme.colors.textSecondary,
-			fontSize: 18,
-			fontWeight: theme.typography.weights.semibold,
-			marginBottom: theme.spacing.sm,
-		},
-		emptySubtext: {
-			textAlign: 'center',
-			color: theme.colors.textSecondary,
-			fontSize: 14,
 		},
 	});

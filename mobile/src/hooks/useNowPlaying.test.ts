@@ -19,7 +19,7 @@ jest.mock('@/store/socketStore', () => ({
 }));
 
 jest.mock('@/contexts/PlayerContext', () => ({
-	usePlayer: () => ({ player: { seekTo: mockSeekTo } }),
+	usePlayer: () => ({ player: {}, seekTo: mockSeekTo }),
 }));
 
 jest.mock('@/hooks/usePlayerProgress', () => ({
@@ -103,7 +103,13 @@ beforeEach(() => {
 	useAuthStore.setState({ user: { id: 'me' } as UserProfile, isAuthenticated: true });
 	useConnectStore.setState({ target: { kind: 'local' }, remoteStatus: null });
 	useQueueStore.getState().reset();
-	usePlayerStore.setState({ currentTrack: null, playbackState: 'idle', queueItemId: null });
+	usePlayerStore.setState({
+		currentTrack: null,
+		playbackState: 'idle',
+		queueItemId: null,
+		needsStreamLoad: false,
+		startPositionMs: null,
+	});
 });
 
 afterEach(() => {
@@ -143,6 +149,40 @@ describe('useNowPlaying local', () => {
 		act(() => result.current.previous());
 		expect(mockSeekTo).toHaveBeenCalledWith(0);
 		expect(api.previous).not.toHaveBeenCalled();
+	});
+});
+
+describe('useNowPlaying restored track (#312)', () => {
+	beforeEach(() => {
+		usePlayerStore.getState().restoreTrack(localTrack, null, 30_000);
+	});
+
+	it('shows the saved position and the track length, with no player loaded', () => {
+		const { result } = renderHook(() => useNowPlaying());
+
+		expect(result.current).toMatchObject({
+			track: { id: 7 },
+			isPlaying: false,
+			canToggle: true,
+			positionMs: 30_000,
+			durationMs: 1000,
+		});
+	});
+
+	it('loads the stream on toggle', () => {
+		const { result } = renderHook(() => useNowPlaying());
+		act(() => result.current.toggle());
+
+		const state = usePlayerStore.getState();
+		expect(state.playbackState).toBe('loading');
+		expect(state.startPositionMs).toBe(30_000);
+		expect(state.needsStreamLoad).toBe(false);
+	});
+
+	it('restarts from the saved position on previous', () => {
+		const { result } = renderHook(() => useNowPlaying());
+		act(() => result.current.previous());
+		expect(mockSeekTo).toHaveBeenCalledWith(0);
 	});
 });
 

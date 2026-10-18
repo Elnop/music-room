@@ -1,6 +1,6 @@
 import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { act, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { EmptyState } from '@/components/common/EmptyState';
 
 jest.mock('@/contexts/ThemeContext', () => {
@@ -22,5 +22,19 @@ describe('EmptyState', () => {
 		const icons = screen.UNSAFE_queryAllByType(Ionicons);
 		expect(icons).toHaveLength(1);
 		expect(icons[0].props.name).toBe('musical-notes');
+	});
+
+	it('has no button without an action', () => {
+		render(<EmptyState message="Rien ici" />);
+		expect(screen.queryByRole('button')).toBeNull();
+	});
+
+	it('renders the action as a button that calls onPress', () => {
+		const onPress = jest.fn();
+		render(
+			<EmptyState message="Aucune playlist" action={{ label: 'Créer une playlist', onPress }} />
+		);
+		fireEvent.press(screen.getByRole('button', { name: 'Créer une playlist' }));
+		expect(onPress).toHaveBeenCalledTimes(1);
 	});
 });

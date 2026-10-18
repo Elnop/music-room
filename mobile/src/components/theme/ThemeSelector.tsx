@@ -12,8 +12,8 @@ const AVAILABLE_THEMES: Array<{
 	icon: keyof typeof Ionicons.glyphMap;
 }> = [
 	{ name: 'original', displayName: 'Original', primaryColor: '#EA3E7A', icon: 'musical-notes' },
-	{ name: 'royalBlue', displayName: 'Royal Blue', primaryColor: '#1E3A8A', icon: 'sparkles' },
-	{ name: 'christmas', displayName: 'Christmas', primaryColor: '#DC2626', icon: 'snow' },
+	{ name: 'royalBlue', displayName: 'Bleu royal', primaryColor: '#1E3A8A', icon: 'sparkles' },
+	{ name: 'christmas', displayName: 'Noël', primaryColor: '#DC2626', icon: 'snow' },
 	{ name: 'pastelLime', displayName: 'Lime', primaryColor: '#84CC16', icon: 'leaf' },
 ];
 

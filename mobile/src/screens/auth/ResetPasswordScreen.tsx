@@ -16,6 +16,7 @@ import { Input } from '@components/common/Input';
 import { Button } from '@components/common/Button';
 import { useTheme } from '@contexts/ThemeContext';
 import { showError, showSuccess, showInfo } from '@utils/toast';
+import { CODE_INPUT_MAX_LENGTH, fillCodeDigits } from '@utils/codeDigits';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'ResetPassword'>;
 
@@ -62,16 +63,12 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
 
 	// Handle code input change
 	const handleCodeChange = (index: number, value: string) => {
-		// Only allow digits
-		if (value && !/^\d$/.test(value)) return;
+		const result = fillCodeDigits(code, index, value);
+		if (!result) return;
 
-		const newCode = [...code];
-		newCode[index] = value;
-		setCode(newCode);
-
-		// Auto-advance to next input
-		if (value && index < 5) {
-			inputRefs.current[index + 1]?.focus();
+		setCode(result.code);
+		if (result.focusIndex !== null) {
+			inputRefs.current[result.focusIndex]?.focus();
 		}
 	};
 
@@ -85,27 +82,27 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
 	// Validate password
 	const validatePassword = (): boolean => {
 		if (!newPassword) {
-			setPasswordError('Password is required');
+			setPasswordError('Le mot de passe est requis');
 			return false;
 		}
 		if (newPassword.length < 8) {
-			setPasswordError('Password must be at least 8 characters');
+			setPasswordError('Le mot de passe doit contenir au moins 8 caractères');
 			return false;
 		}
 		if (!/[A-Z]/.test(newPassword)) {
-			setPasswordError('Password must contain at least one uppercase letter');
+			setPasswordError('Le mot de passe doit contenir au moins une majuscule');
 			return false;
 		}
 		if (!/[a-z]/.test(newPassword)) {
-			setPasswordError('Password must contain at least one lowercase letter');
+			setPasswordError('Le mot de passe doit contenir au moins une minuscule');
 			return false;
 		}
 		if (!/[0-9]/.test(newPassword)) {
-			setPasswordError('Password must contain at least one digit');
+			setPasswordError('Le mot de passe doit contenir au moins un chiffre');
 			return false;
 		}
 		if (newPassword !== confirmPassword) {
-			setPasswordError('Passwords do not match');
+			setPasswordError('Les mots de passe ne correspondent pas');
 			return false;
 		}
 		setPasswordError(null);
@@ -117,7 +114,7 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
 		const codeString = code.join('');
 
 		if (codeString.length !== 6) {
-			setCodeError('Please enter the 6-digit code.');
+			setCodeError('Saisissez le code à 6 chiffres.');
 			return;
 		}
 
@@ -169,13 +166,9 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
 			<ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
 				{/* Header */}
 				<View style={styles.header}>
-					<TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-						<Text style={[styles.backText, { color: theme.colors.primary }]}>← Back</Text>
-					</TouchableOpacity>
-
-					<Text style={[styles.title, { color: theme.colors.text }]}>Reset Password</Text>
+					<Text style={[styles.title, { color: theme.colors.text }]}>Nouveau mot de passe</Text>
 					<Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
-						Enter the 6-digit code sent to{'\n'}
+						Saisissez le code à 6 chiffres envoyé à{'\n'}
 						<Text style={{ fontWeight: '600' }}>{email}</Text>
 					</Text>
 				</View>
@@ -200,7 +193,9 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
 							onChangeText={value => handleCodeChange(index, value)}
 							onKeyPress={({ nativeEvent: { key } }) => handleKeyPress(index, key)}
 							keyboardType="number-pad"
-							maxLength={1}
+							maxLength={CODE_INPUT_MAX_LENGTH}
+							autoComplete={index === 0 ? 'sms-otp' : 'off'}
+							textContentType={index === 0 ? 'oneTimeCode' : 'none'}
 							selectTextOnFocus
 							editable={!isLoading}
 						/>
@@ -210,13 +205,13 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
 				{/* Password Inputs */}
 				<View style={styles.passwordSection}>
 					<Input
-						label="New Password"
+						label="Nouveau mot de passe"
 						value={newPassword}
 						onChangeText={text => {
 							setNewPassword(text);
 							setPasswordError(null);
 						}}
-						placeholder="Enter new password"
+						placeholder="Saisissez le nouveau mot de passe"
 						secureTextEntry
 						autoCapitalize="none"
 						error={passwordError ?? undefined}
@@ -224,13 +219,13 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
 					/>
 
 					<Input
-						label="Confirm Password"
+						label="Confirmation"
 						value={confirmPassword}
 						onChangeText={text => {
 							setConfirmPassword(text);
 							setPasswordError(null);
 						}}
-						placeholder="Re-enter new password"
+						placeholder="Saisissez-le à nouveau"
 						secureTextEntry
 						autoCapitalize="none"
 						editable={!isLoading}
@@ -239,19 +234,19 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
 					{/* Password Requirements */}
 					<View style={styles.requirements}>
 						<Text style={[styles.requirementText, { color: theme.colors.textSecondary }]}>
-							Password must contain:
+							Le mot de passe doit contenir :
 						</Text>
 						<Text style={[styles.requirementText, { color: theme.colors.textSecondary }]}>
-							• At least 8 characters
+							• Au moins 8 caractères
 						</Text>
 						<Text style={[styles.requirementText, { color: theme.colors.textSecondary }]}>
-							• One uppercase letter (A-Z)
+							• Une majuscule (A-Z)
 						</Text>
 						<Text style={[styles.requirementText, { color: theme.colors.textSecondary }]}>
-							• One lowercase letter (a-z)
+							• Une minuscule (a-z)
 						</Text>
 						<Text style={[styles.requirementText, { color: theme.colors.textSecondary }]}>
-							• One digit (0-9)
+							• Un chiffre (0-9)
 						</Text>
 					</View>
 				</View>
@@ -265,7 +260,7 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
 
 				{/* Submit Button */}
 				<Button
-					title="Reset Password"
+					title="Réinitialiser le mot de passe"
 					onPress={handleResetPassword}
 					loading={isLoading}
 					disabled={isLoading || code.some(d => !d) || !newPassword || !confirmPassword}
@@ -275,15 +270,17 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
 				{/* Resend Code */}
 				<View style={styles.resendContainer}>
 					<Text style={[styles.resendText, { color: theme.colors.textSecondary }]}>
-						Didn't receive the code?{' '}
+						Code non reçu ?{' '}
 					</Text>
 					{canResend ? (
 						<TouchableOpacity onPress={handleResendCode} disabled={isLoading}>
-							<Text style={[styles.resendLink, { color: theme.colors.primary }]}>Resend Code</Text>
+							<Text style={[styles.resendLink, { color: theme.colors.primary }]}>
+								Renvoyer le code
+							</Text>
 						</TouchableOpacity>
 					) : (
 						<Text style={[styles.resendCooldown, { color: theme.colors.textSecondary }]}>
-							Resend in {cooldownSeconds}s
+							Renvoyer dans {cooldownSeconds} s
 						</Text>
 					)}
 				</View>
@@ -304,13 +301,6 @@ const styles = StyleSheet.create({
 	},
 	header: {
 		marginBottom: 32,
-	},
-	backButton: {
-		marginBottom: 20,
-	},
-	backText: {
-		fontSize: 16,
-		fontWeight: '600',
 	},
 	title: {
 		fontSize: 32,

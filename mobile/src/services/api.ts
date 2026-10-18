@@ -109,8 +109,10 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
 	const url = `${getBackendUrl()}${endpoint}`;
 
 	const makeRequest = async (authToken?: string): Promise<Response> => {
+		// A FormData body gets its multipart Content-Type (with the boundary) from fetch.
+		const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
 		const headers: Record<string, string> = {
-			'Content-Type': 'application/json',
+			...(isFormData ? {} : { 'Content-Type': 'application/json' }),
 			...getClientHeaders(),
 			...(options.headers as Record<string, string>),
 		};
@@ -158,7 +160,7 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
 			const refreshSuccess = await refreshAccessToken();
 
 			if (!refreshSuccess) {
-				throw new ApiError('Session expired. Please login again.', 'SESSION_EXPIRED');
+				throw new ApiError('Session expirée, reconnectez-vous.', 'SESSION_EXPIRED');
 			}
 
 			const newAccessToken = getAccessToken();
@@ -177,7 +179,7 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
 			throw new ApiError(error.message, 'NETWORK_ERROR');
 		}
 
-		throw new ApiError('Unknown error occurred', 'UNKNOWN_ERROR');
+		throw new ApiError('Erreur inconnue', 'UNKNOWN_ERROR');
 	}
 }
 
@@ -228,7 +230,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
 	try {
 		data = await response.json();
 	} catch (parseError) {
-		throw new ApiError('Invalid JSON response from server', 'PARSE_ERROR', parseError);
+		throw new ApiError('Réponse invalide du serveur', 'PARSE_ERROR', parseError);
 	}
 
 	if (!data.success || data.error) {
@@ -240,7 +242,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
 	}
 
 	if (!data.data) {
-		throw new ApiError('No data in response', 'NO_DATA');
+		throw new ApiError('Réponse du serveur vide', 'NO_DATA');
 	}
 
 	return data.data;

@@ -9,7 +9,8 @@
 
 - `main` is the deploy branch: never commit, push or open a PR to `main`. Branch from `develop`.
 - One branch per GitHub issue, named `<issue-number>-<slug>`, PR into `develop`. Commits follow Conventional Commits.
-- Before starting an issue, assign yourself on it; never work an issue assigned to someone else. When work starts, label it `in-progress` and move its card on the "Music Room – Validation" board to `In Progress` (set its `Area` field). The rest is automatic once the PR carries `Closes #<n>`: opening it switches the label to `review` (`.github/workflows/issue-status.yml`) and the card to `Review`; merging into `develop` closes the issue, drops the label and moves the card to `Done`.
+- Before starting an issue, assign yourself on it; never work an issue assigned to someone else. When work starts, label it `in-progress` and move its card on the "Music Room – Validation" board to `In Progress` (set its `Area` field). The rest is automatic once the PR body carries `Closes #<n>` (`.github/workflows/issue-status.yml` parses it, since GitHub links issues only for PRs into `main`): opening it switches the label to `review` and, when the `PROJECT_TOKEN` secret is set, the card to `Review`; merging into `develop` closes the issue, drops the label and moves the card to `Done`.
+- The repository's default branch is `main`: always pass `--base develop` to `gh pr create`.
 - Never implement Music Track Vote (IV.2.1); the project delivers Playlist Editor and Music Control Delegation.
 - Never commit credentials or API keys; they go in `backend/.env` and `mobile/.env`, with placeholders in `.env.example`.
 - Never commit installed dependencies; everything installs from manifests via `make install`. `backend/` and `mobile/` lockfiles are committed: change dependencies with `npm install <pkg>` and commit the lockfile with it.

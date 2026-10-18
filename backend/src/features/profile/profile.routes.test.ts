@@ -87,12 +87,17 @@ const db = vi.hoisted(() => {
 
 	const from = vi.fn((table: string) => new FakeQuery(table));
 	const getUserById = vi.fn();
+	const remove = vi.fn((_paths: string[]) => Promise.resolve({ data: [], error: null }));
 
-	return { results, calls, from, getUserById };
+	return { results, calls, from, getUserById, remove };
 });
 
 vi.mock('@/shared/config/supabase.js', () => {
-	const client = { from: db.from, auth: { admin: { getUserById: db.getUserById } } };
+	const client = {
+		from: db.from,
+		auth: { admin: { getUserById: db.getUserById } },
+		storage: { from: () => ({ remove: db.remove }) },
+	};
 	return { supabase: client, supabaseAdmin: client };
 });
 
@@ -237,6 +242,7 @@ beforeEach(() => {
 	db.results.clear();
 	db.calls.length = 0;
 	db.from.mockClear();
+	db.remove.mockClear();
 	db.getUserById
 		.mockReset()
 		.mockImplementation((id: string) =>
@@ -465,6 +471,38 @@ describe('PATCH /api/profile', () => {
 			updated_at: expect.any(String) as unknown,
 		});
 		expect(callsOn('user_profiles', 'eq').map(c => c.args)).toContainEqual(['id', ALICE]);
+	});
+
+	// #351: no orphaned file of ours once the avatar changes through PATCH
+	it('deletes our previous stored photo when avatarUrl changes', async () => {
+		const ownName = '3f2a1b0c-aaaa-4bbb-8ccc-ddddeeeeffff.jpg';
+		const ownUrl = `http://supabase.test.invalid/storage/v1/object/public/avatars/${ALICE}/${ownName}`;
+		setResult('user_profiles', 'select', { ...profileRow(ALICE), avatar_url: ownUrl });
+		setResult('user_profiles', 'update', {
+			...profileRow(ALICE),
+			avatar_url: 'https://cdn.zumik.test/new.png',
+		});
+
+		const res = await api('PATCH', '/', {
+			user: ALICE,
+			body: { avatarUrl: 'https://cdn.zumik.test/new.png' },
+		});
+
+		expect(res.status).toBe(200);
+		await vi.waitFor(() => expect(db.remove).toHaveBeenCalledWith([`${ALICE}/${ownName}`]));
+	});
+
+	it('leaves an external previous avatar and skips Storage without avatarUrl', async () => {
+		setResult('user_profiles', 'select', profileRow(ALICE));
+		setResult('user_profiles', 'update', {
+			...profileRow(ALICE),
+			avatar_url: 'https://cdn.zumik.test/new.png',
+		});
+
+		await api('PATCH', '/', { user: ALICE, body: { avatarUrl: 'https://cdn.zumik.test/new.png' } });
+		await api('PATCH', '/', { user: ALICE, body: { bio: 'x' } });
+
+		expect(db.remove).not.toHaveBeenCalled();
 	});
 });
 

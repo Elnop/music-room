@@ -39,8 +39,9 @@ export interface QueueState {
 }
 
 /**
- * Body of `POST /api/queue/items`: the backend `addQueueItemSchema`, i.e. a
- * playlist add's track without `previewUrl` (stream URLs are never stored).
+ * Body of `POST /api/queue/items`: the backend `addQueueItemBodySchema`, i.e. a
+ * playlist add's track without `previewUrl` (stream URLs are never stored),
+ * plus `next` (#316) to place it right after the current item instead of last.
  */
 export interface AddQueueItemBody {
 	trackUri: string;
@@ -49,6 +50,7 @@ export interface AddQueueItemBody {
 	album?: string;
 	albumArt?: string;
 	durationMs: number;
+	next?: boolean;
 }
 
 /** 409 codes of `POST /api/queue/next` and `/previous`. */

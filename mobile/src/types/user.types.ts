@@ -55,10 +55,10 @@ export const GENRE_INFO: Record<MusicGenre, { label: string; icon: string; color
 	hiphop: { label: 'Hip-Hop', icon: '🎤', color: '#9B59B6' },
 	rnb: { label: 'R&B', icon: '💜', color: '#E91E63' },
 	jazz: { label: 'Jazz', icon: '🎷', color: '#F39C12' },
-	classical: { label: 'Classical', icon: '🎻', color: '#3498DB' },
-	electronic: { label: 'Electronic', icon: '🎧', color: '#00BCD4' },
+	classical: { label: 'Classique', icon: '🎻', color: '#3498DB' },
+	electronic: { label: 'Électro', icon: '🎧', color: '#00BCD4' },
 	country: { label: 'Country', icon: '🤠', color: '#8D6E63' },
-	latin: { label: 'Latin', icon: '💃', color: '#FF5722' },
+	latin: { label: 'Latino', icon: '💃', color: '#FF5722' },
 	metal: { label: 'Metal', icon: '🤘', color: '#607D8B' },
 };
 
@@ -141,6 +141,13 @@ export interface UpdateProfileData {
 }
 
 /**
+ * Answer of PUT and DELETE /api/profile/avatar: the new photo URL, null once removed
+ */
+export interface AvatarResponse {
+	avatarUrl: string | null;
+}
+
+/**
  * Profile with privacy-filtered fields
  * Fields are undefined if hidden by privacy, present (even if empty) if visible
  */
@@ -163,8 +170,8 @@ export interface FilteredProfile {
  */
 export const VISIBILITY_LABELS: Record<VisibilityLevel, string> = {
 	public: 'Public',
-	friends_only: 'Friends Only',
-	private: 'Private',
+	friends_only: 'Amis seulement',
+	private: 'Privé',
 };
 
 /**

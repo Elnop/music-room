@@ -15,7 +15,11 @@ import {
 	playlistRoomPayloadSchema,
 	revalidatePlaylistRoom,
 } from '@/realtime/playlist-room.js';
-import type { PlaylistUpdatedPayload } from '@/features/playlists/playlist.types.js';
+import type {
+	PlaylistDeletedPayload,
+	PlaylistDetailsPayload,
+	PlaylistUpdatedPayload,
+} from '@/features/playlists/playlist.types.js';
 import type { QueueState } from '@/features/queue/queue.types.js';
 import { controlAccessService } from '@/features/music-control/services/control-access.service.js';
 import type {
@@ -576,6 +580,54 @@ class RealtimeService {
 	}
 
 	/**
+	 * Notify all clients watching a playlist of its new metadata (name,
+	 * description, visibility, edit mode) after an update (#342)
+	 */
+	notifyPlaylistDetails(payload: PlaylistDetailsPayload): void {
+		const { playlistId } = payload;
+		if (!this.io) {
+			socketLogger.event('playlist:details', 'N/A', {
+				level: 'warn',
+				playlistId,
+				action: 'not_initialized',
+			});
+			return;
+		}
+
+		this.io.to(`playlist:${playlistId}`).emit('playlist:details', payload);
+
+		socketLogger.broadcast('playlist_details', {
+			playlistId,
+			room: `playlist:${playlistId}`,
+			action: 'broadcasted',
+		});
+	}
+
+	/**
+	 * Tell all clients watching a playlist that it was deleted (#342). Must run
+	 * before revalidatePlaylistRoom evicts them from the room.
+	 */
+	notifyPlaylistDeleted(payload: PlaylistDeletedPayload): void {
+		const { playlistId } = payload;
+		if (!this.io) {
+			socketLogger.event('playlist:deleted', 'N/A', {
+				level: 'warn',
+				playlistId,
+				action: 'not_initialized',
+			});
+			return;
+		}
+
+		this.io.to(`playlist:${playlistId}`).emit('playlist:deleted', payload);
+
+		socketLogger.broadcast('playlist_deleted', {
+			playlistId,
+			room: `playlist:${playlistId}`,
+			action: 'broadcasted',
+		});
+	}
+
+	/**
 	 * Send a user's whole play queue after any change to it (#273): to all of
 	 * their devices (`user:<id>`) and to the delegates watching them
 	 * (`listening:<id>`, #294). One emit, so a socket in both rooms gets it once.
@@ -684,6 +736,22 @@ class RealtimeService {
 		const userDevices = this.listeningStatuses.get(userId);
 		const devices = userDevices ? Array.from(userDevices.values()) : [];
 		return { ownerId: userId, devices };
+	}
+
+	/**
+	 * Give a connected device the name its owner just chose (#352): its socket
+	 * data and its listening status take it at once, and the owner's listeners
+	 * get the status again. No-op when offline.
+	 */
+	setDeviceName(userId: string, deviceId: string, deviceName: string): void {
+		const socketId = this.deviceToSocket.get(`${userId}:${deviceId}`);
+		const socket = socketId ? this.io?.sockets.sockets.get(socketId) : undefined;
+		if (socket) socket.data.device = { ...socket.data.device, deviceName };
+
+		const status = this.listeningStatuses.get(userId)?.get(deviceId);
+		if (!status) return;
+		status.device = { ...status.device, deviceName };
+		this.broadcastUserListeningStatus(userId);
 	}
 
 	/** Whether a device of userId has a connected socket (#294). */

@@ -21,10 +21,6 @@ jest.mock('@/contexts/ThemeContext', () => {
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-jest.mock('@/contexts/PlayerContext', () => ({
-	usePlayerHeight: () => 0,
-}));
-
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );

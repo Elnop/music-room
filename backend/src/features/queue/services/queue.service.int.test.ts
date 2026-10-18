@@ -160,6 +160,44 @@ describe('read and add', () => {
 	});
 });
 
+describe('add next (#316)', () => {
+	it('places the new item right after the current one', async () => {
+		const [a, b, c] = await addItems(3);
+		await queue.playItem(userId, userId, a);
+		const track = dto();
+		const state = await queue.addItem(userId, userId, track, { next: true });
+
+		expect(state.currentItemId).toBe(a);
+		expect(ids(state)[0]).toBe(a);
+		expect(state.items[1].track.trackUri).toBe(track.trackUri);
+		expect(ids(state).slice(2)).toEqual([b, c]);
+		expectRanked(state);
+		expect(await queue.getQueue(userId, userId)).toEqual(state);
+	});
+
+	it('places the new item at the top when nothing is current', async () => {
+		const [a, b] = await addItems(2);
+		const track = dto();
+		const state = await queue.addItem(userId, userId, track, { next: true });
+
+		expect(state.currentItemId).toBeNull();
+		expect(state.items[0].track.trackUri).toBe(track.trackUri);
+		expect(ids(state).slice(1)).toEqual([a, b]);
+		expectRanked(state);
+	});
+
+	it('adds a track already queued as a second item', async () => {
+		const [a] = await addItems(2);
+		await queue.playItem(userId, userId, a);
+		const track = dto();
+		const state = await queue.addItem(userId, userId, track, { next: true });
+		const again = await queue.addItem(userId, userId, track, { next: true });
+		expect(again.items).toHaveLength(4);
+		expect(again.items[1].track.trackUri).toBe(state.items[1].track.trackUri);
+		expect(again.items[1].id).not.toBe(state.items[1].id);
+	});
+});
+
 describe('remove', () => {
 	it('removes an upcoming or a history item', async () => {
 		const [a, b, c, d] = await addItems(4);

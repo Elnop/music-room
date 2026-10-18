@@ -49,8 +49,9 @@ export const deviceService = {
 			await AsyncStorage.setItem(DEVICE_ID_KEY, deviceId);
 		}
 
-		const deviceName = Device.deviceName || `${Platform.OS} Device`;
-		const model = Device.modelName || 'Unknown';
+		const deviceName =
+			Device.deviceName || (Platform.OS === 'ios' ? 'Appareil iOS' : 'Appareil Android');
+		const model = Device.modelName || 'Modèle inconnu';
 
 		return {
 			deviceId,

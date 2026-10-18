@@ -12,8 +12,10 @@ import { friendsApi, type FollowStatus } from '@/services/friendsApi';
 import { playlistApi } from '@/api/playlistApi';
 import { controlErrorMessage, useFriendListening } from '@/hooks/useMusicControl';
 import { showError } from '@utils/toast';
+import { EmptyState } from '@/components/common/EmptyState';
 import { Avatar } from '@/components/common/Avatar';
 import { Button } from '@/components/common/Button';
+import { ShareLinkButton } from '@/components/common/ShareLinkButton';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { PlaylistCard } from '@/components/playlist/PlaylistCard';
 import { GenreChip } from '@/components/profile/GenreChip';
@@ -22,6 +24,7 @@ import type { Playlist } from '@/types/playlist.types';
 import type { FilteredProfile } from '@/types/user.types';
 import type { MusicGenre } from '@/types/user.types';
 import type { FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
+import { userLink } from '@/navigation/linking';
 
 type Props = NativeStackScreenProps<FriendsStackParamList, 'UserProfile'>;
 
@@ -73,7 +76,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
 				setPlaylists(playlistsData);
 			} catch (error) {
 				console.error('[UserProfileScreen] Load profile failed:', error);
-				setError('Failed to load profile');
+				setError('Impossible de charger le profil');
 			} finally {
 				setIsLoading(false);
 			}
@@ -106,14 +109,14 @@ export function UserProfileScreen({ route, navigation }: Props) {
 	};
 
 	if (isLoading) {
-		return <LoadingSpinner fullScreen message="Loading profile..." />;
+		return <LoadingSpinner fullScreen message="Chargement du profil…" />;
 	}
 
 	if (error || !profile) {
 		return (
 			<View style={styles.container}>
 				<View style={styles.errorContainer}>
-					<Text style={styles.errorText}>{error || 'Profile not found'}</Text>
+					<Text style={styles.errorText}>{error || 'Profil introuvable'}</Text>
 				</View>
 			</View>
 		);
@@ -122,7 +125,6 @@ export function UserProfileScreen({ route, navigation }: Props) {
 	const isFriend = followStatus?.isFriend ?? false;
 
 	// Privacy logic: undefined = hidden by privacy, value present = visible (even if empty)
-	const isAvatarHidden = filteredProfile?.avatarUrl === undefined;
 	const isBioHidden = filteredProfile?.bio === undefined;
 	const isMusicPrefsHidden = filteredProfile?.musicPreferences === undefined;
 
@@ -139,27 +141,22 @@ export function UserProfileScreen({ route, navigation }: Props) {
 			>
 				<View style={styles.header}>
 					<View style={styles.topRow}>
-						{isAvatarHidden ? (
-							<View style={styles.hiddenAvatar}>
-								<Ionicons name="lock-closed" size={32} color={theme.colors.textSecondary} />
-							</View>
-						) : (
-							<Avatar
-								size="lg"
-								name={profile.displayName || profile.username}
-								uri={filteredProfile?.avatarUrl}
-							/>
-						)}
+						{/* A hidden or missing avatar falls back to initials, as in every user list. */}
+						<Avatar
+							size="lg"
+							name={profile.displayName || profile.username}
+							uri={filteredProfile?.avatarUrl}
+						/>
 
 						{followStatus && (
 							<View style={styles.statsContainer}>
 								<View style={styles.statItem}>
 									<Text style={styles.statNumber}>{followStatus.followersCount}</Text>
-									<Text style={styles.statLabel}>Followers</Text>
+									<Text style={styles.statLabel}>Abonnés</Text>
 								</View>
 								<View style={styles.statItem}>
 									<Text style={styles.statNumber}>{followStatus.followingCount}</Text>
-									<Text style={styles.statLabel}>Following</Text>
+									<Text style={styles.statLabel}>Abonnements</Text>
 								</View>
 							</View>
 						)}
@@ -178,11 +175,17 @@ export function UserProfileScreen({ route, navigation }: Props) {
 							)}
 							{followStatus?.isFollowedBy && (
 								<View style={styles.followsYouBadge}>
-									<Text style={styles.followsYouText}>Follows you</Text>
+									<Text style={styles.followsYouText}>Vous suit</Text>
 								</View>
 							)}
 						</View>
 						{profile.displayName && <Text style={styles.displayName}>{profile.displayName}</Text>}
+						{/* Friends are mutual follows: say how to get there from a one-way follow. */}
+						{followStatus?.isFollowedBy && !followStatus.isFollowing && (
+							<Text style={styles.followBackHint}>
+								Suivez cet utilisateur en retour pour devenir amis.
+							</Text>
+						)}
 					</View>
 
 					{/* Bio - with privacy check */}
@@ -195,7 +198,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
 								style={styles.hiddenIcon}
 							/>
 							<Text style={styles.hiddenText}>
-								{isFriend ? 'Private bio' : 'Visible only to friends'}
+								{isFriend ? 'Bio privée' : 'Visible uniquement par ses amis'}
 							</Text>
 						</View>
 					) : filteredProfile?.bio ? (
@@ -216,7 +219,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
 							{followStatus.isFriend ? (
 								<>
 									<View style={styles.friendBadge}>
-										<Text style={styles.friendBadgeText}>Friends</Text>
+										<Text style={styles.friendBadgeText}>Amis</Text>
 									</View>
 									<Button
 										variant="outline"
@@ -224,7 +227,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
 										loading={isFollowLoading}
 										style={styles.actionButton}
 									>
-										Following
+										Abonné
 									</Button>
 								</>
 							) : followStatus.isFollowing ? (
@@ -234,7 +237,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
 									loading={isFollowLoading}
 									style={styles.fullWidthButton}
 								>
-									Following
+									Abonné
 								</Button>
 							) : (
 								<Button
@@ -243,11 +246,17 @@ export function UserProfileScreen({ route, navigation }: Props) {
 									loading={isFollowLoading}
 									style={styles.fullWidthButton}
 								>
-									Follow
+									Suivre
 								</Button>
 							)}
 						</View>
 					)}
+
+					<ShareLinkButton
+						url={userLink(userId)}
+						title={profile.displayName || profile.username}
+						style={styles.shareButton}
+					/>
 
 					{/* Écoute en cours - affiche seulement si un track est en cours */}
 					{canControlMusic &&
@@ -270,7 +279,11 @@ export function UserProfileScreen({ route, navigation }: Props) {
 				<View style={styles.playlistsSection}>
 					<Text style={styles.sectionTitle}>Playlists</Text>
 					{playlists.length === 0 ? (
-						<Text style={styles.emptyPlaylists}>No playlist</Text>
+						<EmptyState
+							icon="musical-notes-outline"
+							style={styles.emptyPlaylists}
+							message="Aucune playlist à afficher"
+						/>
 					) : (
 						playlists.map(playlist => (
 							<PlaylistCard
@@ -288,8 +301,8 @@ export function UserProfileScreen({ route, navigation }: Props) {
 
 				<View style={styles.infoSection}>
 					<Text style={styles.infoText}>
-						Member since{' '}
-						{new Date(profile.createdAt).toLocaleDateString('en-US', {
+						Membre depuis{' '}
+						{new Date(profile.createdAt).toLocaleDateString('fr-FR', {
 							month: 'long',
 							year: 'numeric',
 						})}
@@ -302,6 +315,10 @@ export function UserProfileScreen({ route, navigation }: Props) {
 
 const createStyles = (theme: Theme) =>
 	StyleSheet.create({
+		shareButton: {
+			alignSelf: 'flex-start',
+			marginTop: theme.spacing.md,
+		},
 		container: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -399,6 +416,11 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.textSecondary,
 			marginTop: 2,
 		},
+		followBackHint: {
+			fontSize: 13,
+			color: theme.colors.textSecondary,
+			marginTop: theme.spacing.xs,
+		},
 		bio: {
 			fontSize: 14,
 			color: theme.colors.text,
@@ -418,16 +440,6 @@ const createStyles = (theme: Theme) =>
 			fontSize: 14,
 			color: theme.colors.textSecondary,
 			fontStyle: 'italic',
-		},
-		hiddenAvatar: {
-			width: 80,
-			height: 80,
-			borderRadius: 40,
-			backgroundColor: theme.colors.surface,
-			justifyContent: 'center',
-			alignItems: 'center',
-			borderWidth: 1,
-			borderColor: theme.colors.border,
 		},
 		genresInline: {
 			flexDirection: 'row',
@@ -471,11 +483,8 @@ const createStyles = (theme: Theme) =>
 			paddingHorizontal: theme.spacing.md,
 		},
 		emptyPlaylists: {
-			fontSize: 14,
-			color: theme.colors.textSecondary,
-			textAlign: 'center',
-			paddingVertical: theme.spacing.lg,
-			paddingHorizontal: theme.spacing.md,
+			flex: 0,
+			padding: theme.spacing.lg,
 		},
 		infoSection: {
 			paddingHorizontal: theme.spacing.lg,

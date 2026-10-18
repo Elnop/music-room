@@ -7,6 +7,7 @@ import {
 	TouchableOpacity,
 	RefreshControl,
 	Pressable,
+	Alert,
 } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -50,19 +51,41 @@ export function ProfileScreen() {
 		navigation.navigate('EditProfile');
 	}, [navigation]);
 
-	// Configure settings button in native header
+	const handleSettings = useCallback(() => {
+		navigation.navigate('Settings');
+	}, [navigation]);
+
+	// Edit-profile and settings buttons in the native header
 	useLayoutEffect(() => {
+		const buttonStyle = {
+			width: 36,
+			height: 36,
+			alignItems: 'center',
+			justifyContent: 'center',
+		} as const;
 		navigation.setOptions({
 			headerRight: () => (
-				<Pressable
-					onPress={handleEditProfile}
-					style={{ width: 36, height: 36, alignItems: 'center', justifyContent: 'center' }}
-				>
-					<Ionicons name="settings-outline" size={24} color={theme.colors.text} />
-				</Pressable>
+				<View style={{ flexDirection: 'row' }}>
+					<Pressable
+						onPress={handleEditProfile}
+						accessibilityRole="button"
+						accessibilityLabel="Modifier le profil"
+						style={buttonStyle}
+					>
+						<Ionicons name="create-outline" size={24} color={theme.colors.text} />
+					</Pressable>
+					<Pressable
+						onPress={handleSettings}
+						accessibilityRole="button"
+						accessibilityLabel="Réglages"
+						style={buttonStyle}
+					>
+						<Ionicons name="settings-outline" size={24} color={theme.colors.text} />
+					</Pressable>
+				</View>
 			),
 		});
-	}, [navigation, handleEditProfile, theme.colors.text]);
+	}, [navigation, handleEditProfile, handleSettings, theme.colors.text]);
 
 	// Load profile data (music preferences + stats)
 	const loadProfileData = useCallback(async () => {
@@ -119,10 +142,17 @@ export function ProfileScreen() {
 		}
 	};
 
+	const confirmLogout = () => {
+		Alert.alert('Se déconnecter ?', 'Vous devrez vous reconnecter pour utiliser Zumik.', [
+			{ text: 'Annuler', style: 'cancel' },
+			{ text: 'Se déconnecter', style: 'destructive', onPress: handleLogout },
+		]);
+	};
+
 	if (!user) {
 		return (
 			<View style={styles.container}>
-				<Text style={styles.errorText}>No user data available</Text>
+				<Text style={styles.errorText}>Aucune donnée utilisateur</Text>
 			</View>
 		);
 	}
@@ -159,21 +189,21 @@ export function ProfileScreen() {
 					<View style={styles.statsRow}>
 						<View style={styles.statItem}>
 							<Text style={styles.statValue}>{stats?.followersCount ?? 0}</Text>
-							<Text style={styles.statLabel}>Followers</Text>
+							<Text style={styles.statLabel}>Abonnés</Text>
 						</View>
 						<View style={styles.statDivider} />
 						<View style={styles.statItem}>
 							<Text style={styles.statValue}>{stats?.followingCount ?? 0}</Text>
-							<Text style={styles.statLabel}>Following</Text>
+							<Text style={styles.statLabel}>Abonnements</Text>
 						</View>
 					</View>
 				</View>
 
 				{/* Music Preferences Section */}
 				<ProfileSection
-					title="Music preferences"
+					title="Préférences musicales"
 					rightAction={{
-						label: 'Edit',
+						label: 'Modifier',
 						onPress: handleMusicPreferences,
 					}}
 				>
@@ -191,8 +221,8 @@ export function ProfileScreen() {
 								color={theme.colors.textSecondary}
 								style={styles.emptyStateIcon}
 							/>
-							<Text style={styles.emptyStateText}>Add your favorite genres</Text>
-							<Text style={styles.emptyStateHint}>Tap to select up to 5 genres</Text>
+							<Text style={styles.emptyStateText}>Ajoutez vos genres préférés</Text>
+							<Text style={styles.emptyStateHint}>Touchez pour en choisir jusqu'à 5</Text>
 						</TouchableOpacity>
 					)}
 				</ProfileSection>
@@ -207,16 +237,16 @@ export function ProfileScreen() {
 					<View style={styles.divider} />
 
 					<View style={styles.infoItem}>
-						<Text style={styles.infoLabel}>Username</Text>
+						<Text style={styles.infoLabel}>Nom d'utilisateur</Text>
 						<Text style={styles.infoValue}>@{user.username}</Text>
 					</View>
 
 					<View style={styles.divider} />
 
 					<View style={styles.infoItem}>
-						<Text style={styles.infoLabel}>Member since</Text>
+						<Text style={styles.infoLabel}>Membre depuis</Text>
 						<Text style={styles.infoValue}>
-							{new Date(user.createdAt).toLocaleDateString('en-US', {
+							{new Date(user.createdAt).toLocaleDateString('fr-FR', {
 								month: 'long',
 								year: 'numeric',
 							})}
@@ -225,7 +255,7 @@ export function ProfileScreen() {
 				</ProfileSection>
 
 				{/* Theme Section */}
-				<ProfileSection title="Theme">
+				<ProfileSection title="Thème">
 					<ThemeSelector />
 				</ProfileSection>
 
@@ -236,8 +266,8 @@ export function ProfileScreen() {
 							<Ionicons name="lock-closed" size={20} color={theme.colors.primary} />
 						</View>
 						<View style={styles.privacyTextContainer}>
-							<Text style={styles.privacyTitle}>Privacy</Text>
-							<Text style={styles.privacySubtitle}>Manage who can see your information</Text>
+							<Text style={styles.privacyTitle}>Confidentialité</Text>
+							<Text style={styles.privacySubtitle}>Gérez qui peut voir vos informations</Text>
 						</View>
 						<Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
 					</TouchableOpacity>
@@ -250,8 +280,10 @@ export function ProfileScreen() {
 							<Ionicons name="link" size={20} color={theme.colors.primary} />
 						</View>
 						<View style={styles.privacyTextContainer}>
-							<Text style={styles.privacyTitle}>Linked accounts</Text>
-							<Text style={styles.privacySubtitle}>Add or remove Google and Facebook sign-in</Text>
+							<Text style={styles.privacyTitle}>Comptes liés</Text>
+							<Text style={styles.privacySubtitle}>
+								Ajoutez ou retirez la connexion Google et Facebook
+							</Text>
 						</View>
 						<Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
 					</TouchableOpacity>
@@ -275,9 +307,13 @@ export function ProfileScreen() {
 
 				{/* Logout Button */}
 				<View style={styles.logoutSection}>
-					<TouchableOpacity style={styles.logoutButton} onPress={handleLogout} disabled={isLoading}>
+					<TouchableOpacity
+						style={styles.logoutButton}
+						onPress={confirmLogout}
+						disabled={isLoading}
+					>
 						<Ionicons name="log-out-outline" size={20} color="#DC2626" />
-						<Text style={styles.logoutText}>Logout</Text>
+						<Text style={styles.logoutText}>Se déconnecter</Text>
 					</TouchableOpacity>
 				</View>
 

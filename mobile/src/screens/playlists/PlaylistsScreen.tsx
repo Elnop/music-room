@@ -13,7 +13,9 @@ import { friendsApi, type FriendProfile } from '@/services/friendsApi';
 import { PlaylistGridCard } from '@components/playlist/PlaylistGridCard';
 import { FriendPlaylistSection } from '@components/playlist/FriendPlaylistSection';
 import { EmptyState } from '@components/common/EmptyState';
-import { LoadingSpinner } from '@components/common/LoadingSpinner';
+import { PlaylistCardSkeleton, SkeletonBlock, SkeletonList } from '@components/common/Skeleton';
+import { showError } from '@utils/toast';
+import { apiErrorMessage } from '@utils/apiErrorMessage';
 import type { Playlist } from '@/types/playlist.types';
 
 type PlaylistStackParamList = {
@@ -27,6 +29,11 @@ type PlaylistsScreenNavigationProp = NativeStackNavigationProp<PlaylistStackPara
 
 interface PlaylistsScreenProps {
 	navigation: PlaylistsScreenNavigationProp;
+}
+
+// Same width as the cards of FriendPlaylistSection's carousel.
+function FriendCardSkeleton() {
+	return <PlaylistCardSkeleton width={140} />;
 }
 
 interface FriendPlaylistData {
@@ -140,17 +147,47 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
 	const handleRefresh = async () => {
 		if (user) {
 			setIsRefreshing(true);
-			await Promise.all([fetchPlaylists(user.id), loadFriendsPlaylists(), loadPublicPlaylists()]);
-			setIsRefreshing(false);
+			try {
+				await Promise.all([fetchPlaylists(user.id), loadFriendsPlaylists(), loadPublicPlaylists()]);
+			} catch (error) {
+				console.error('[PlaylistsScreen] Refresh failed:', error);
+				showError(apiErrorMessage(error, 'Impossible de rafraîchir les playlists'));
+			} finally {
+				setIsRefreshing(false);
+			}
 		}
 	};
+
+	// The friends tab lives in the parent tab navigator.
+	const handleFindFriends = useCallback(() => {
+		navigation.getParent()?.navigate('FriendsTab');
+	}, [navigation]);
 
 	const handlePlaylistPress = (id: string) => {
 		navigation.navigate('PlaylistDetail', { id });
 	};
 
 	if (isLoading && playlists.length === 0) {
-		return <LoadingSpinner fullScreen message="Chargement..." />;
+		return (
+			<View style={styles.container}>
+				<SkeletonList
+					count={4}
+					row={PlaylistCardSkeleton}
+					style={[styles.list, styles.myPlaylistsGrid]}
+					header={
+						<View style={styles.skeletonHeader}>
+							<SkeletonBlock width={180} height={18} style={styles.skeletonTitle} />
+							<View style={[styles.friendsSkeleton, styles.skeletonCarousel]}>
+								<FriendCardSkeleton />
+								<FriendCardSkeleton />
+								<FriendCardSkeleton />
+							</View>
+							<SkeletonBlock width={140} height={18} style={styles.skeletonTitle} />
+						</View>
+					}
+				/>
+			</View>
+		);
 	}
 
 	const renderHeader = () => (
@@ -175,13 +212,12 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
 				</View>
 
 				{isFriendsLoading && friendsPlaylists.length === 0 ? (
-					<View style={styles.loadingContainer}>
-						<LoadingSpinner message="" />
-					</View>
+					<SkeletonList count={3} row={FriendCardSkeleton} style={styles.friendsSkeleton} />
 				) : (
 					<FriendPlaylistSection
 						friendsPlaylists={friendsPlaylists}
 						onPlaylistPress={handlePlaylistPress}
+						onFindFriends={handleFindFriends}
 					/>
 				)}
 			</View>
@@ -229,6 +265,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
 						<EmptyState
 							icon="musical-notes-outline"
 							message="Aucune playlist pour l'instant. Créez votre première playlist !"
+							action={{ label: 'Créer une playlist', onPress: handleCreatePress }}
 						/>
 					))}
 			</View>
@@ -267,9 +304,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
 
 				{isPublicPlaylistsOpen &&
 					(isPublicLoading && publicPlaylists.length === 0 ? (
-						<View style={styles.loadingContainer}>
-							<LoadingSpinner message="" />
-						</View>
+						<SkeletonList count={4} row={PlaylistCardSkeleton} style={styles.publicPlaylistsGrid} />
 					) : publicPlaylists.length > 0 ? (
 						<View style={styles.publicPlaylistsGrid}>
 							{publicPlaylists.map(playlist => (
@@ -282,9 +317,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
 							))}
 						</View>
 					) : (
-						<View style={styles.emptyPublicContainer}>
-							<Text style={styles.emptyPublicText}>Aucune playlist publique disponible</Text>
-						</View>
+						<EmptyState icon="globe-outline" message="Aucune playlist publique disponible" />
 					))}
 			</View>
 		</View>
@@ -304,6 +337,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
 						refreshing={isRefreshing}
 						onRefresh={handleRefresh}
 						tintColor={theme.colors.primary}
+						colors={[theme.colors.primary]}
 					/>
 				}
 				showsVerticalScrollIndicator={false}
@@ -356,9 +390,22 @@ const createStyles = (theme: Theme) =>
 		sectionSpacer: {
 			height: theme.spacing.md,
 		},
-		loadingContainer: {
-			paddingVertical: theme.spacing.xl,
-			alignItems: 'center',
+		// Friends section then "Vos playlists" title, above the grid's cards.
+		skeletonHeader: {
+			width: '100%',
+		},
+		skeletonTitle: {
+			marginBottom: theme.spacing.md,
+		},
+		skeletonCarousel: {
+			paddingHorizontal: 0,
+			marginBottom: theme.spacing.md * 2 + theme.spacing.sm,
+		},
+		friendsSkeleton: {
+			flexDirection: 'row',
+			overflow: 'hidden',
+			paddingHorizontal: theme.spacing.md,
+			gap: 12,
 		},
 		myPlaylistsGrid: {
 			flexDirection: 'row',
@@ -371,15 +418,5 @@ const createStyles = (theme: Theme) =>
 			flexWrap: 'wrap',
 			paddingHorizontal: theme.spacing.md,
 			gap: 16,
-		},
-		emptyPublicContainer: {
-			paddingVertical: theme.spacing.lg,
-			paddingHorizontal: theme.spacing.md,
-			alignItems: 'center',
-		},
-		emptyPublicText: {
-			fontSize: theme.typography.sizes.sm,
-			color: theme.colors.textSecondary,
-			fontStyle: 'italic',
 		},
 	});

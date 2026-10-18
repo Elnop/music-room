@@ -1,16 +1,10 @@
 import React, { useState } from 'react';
-import {
-	View,
-	Text,
-	StyleSheet,
-	ScrollView,
-	KeyboardAvoidingView,
-	Platform,
-	Switch,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { ThemedSwitch } from '@components/common/ThemedSwitch';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RouteProp } from '@react-navigation/native';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
@@ -20,18 +14,20 @@ import { Button } from '@components/common/Button';
 import { Input } from '@components/common/Input';
 import { playlistFormSchema, type PlaylistFormInput } from '@utils/validators';
 import type { EditMode } from '@/types/playlist.types';
-import { showError } from '@utils/toast';
+import { showError, showSuccess } from '@utils/toast';
+import { apiErrorMessage } from '@utils/apiErrorMessage';
 
-// Playlist field limits
+// Playlist field limits (the backend allows 100 and 500)
 const PLAYLIST_LIMITS = {
-	NAME_MAX: 20,
-	DESCRIPTION_MAX: 70,
+	NAME_MAX: 50,
+	DESCRIPTION_MAX: 500,
 };
 
 type PlaylistStackParamList = {
 	Playlists: undefined;
 	PlaylistDetail: { id: string };
-	CreatePlaylist: undefined;
+	/** With a playlistId, the form edits that playlist's name and description (#342). */
+	CreatePlaylist: { playlistId?: string } | undefined;
 	SearchTracks: { playlistId: string };
 };
 
@@ -40,16 +36,30 @@ type CreatePlaylistScreenNavigationProp = NativeStackNavigationProp<
 	'CreatePlaylist'
 >;
 
+type CreatePlaylistScreenRouteProp = RouteProp<PlaylistStackParamList, 'CreatePlaylist'>;
+
 interface CreatePlaylistScreenProps {
 	navigation: CreatePlaylistScreenNavigationProp;
+	route: CreatePlaylistScreenRouteProp;
 }
 
-export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) {
+export function CreatePlaylistScreen({ navigation, route }: CreatePlaylistScreenProps) {
 	const { theme } = useTheme();
 	const playerHeight = usePlayerHeight();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 	const { user } = useAuthStore();
-	const { createPlaylist, isLoading } = usePlaylistStore();
+	const { createPlaylist, updatePlaylist, currentPlaylist, playlists } = usePlaylistStore();
+
+	const editedId = route.params?.playlistId;
+	const isEditing = editedId !== undefined;
+	// The playlist being edited, as shown on the screen it was opened from.
+	const edited = React.useMemo(
+		() =>
+			currentPlaylist?.id === editedId ? currentPlaylist : playlists.find(p => p.id === editedId),
+		// Prefill once: later store changes must not reset what the user typed.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[editedId]
+	);
 
 	const [isPrivate, setIsPrivate] = useState(false);
 	const [isEditRestricted, setIsEditRestricted] = useState(false);
@@ -57,16 +67,32 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
 	const {
 		control,
 		handleSubmit,
-		formState: { errors },
+		formState: { errors, isSubmitting },
 	} = useForm<PlaylistFormInput>({
 		resolver: zodResolver(playlistFormSchema),
 		defaultValues: {
-			name: '',
-			description: '',
+			name: edited?.name ?? '',
+			description: edited?.description ?? '',
 		},
 	});
 
+	const onSubmitEdit = async (id: string, data: PlaylistFormInput) => {
+		try {
+			await updatePlaylist(id, { name: data.name, description: data.description ?? '' });
+			showSuccess('Playlist modifiée');
+			navigation.goBack();
+		} catch (error) {
+			console.error('[CreatePlaylistScreen] Update playlist failed:', error);
+			showError(apiErrorMessage(error, 'Impossible de modifier la playlist'));
+		}
+	};
+
 	const onSubmit = async (data: PlaylistFormInput) => {
+		if (editedId !== undefined) {
+			await onSubmitEdit(editedId, data);
+			return;
+		}
+
 		if (!user) {
 			showError('Connexion requise pour créer une playlist');
 			return;
@@ -76,15 +102,16 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
 		const editMode: EditMode = isEditRestricted ? 'restricted' : 'open';
 
 		try {
-			await createPlaylist(user.id, {
+			const created = await createPlaylist(user.id, {
 				...data,
 				visibility,
 				editMode,
 			});
-			navigation.goBack();
+			// Open the new playlist in place of the form (#342).
+			navigation.replace('PlaylistDetail', { id: created.id });
 		} catch (error) {
 			console.error('[CreatePlaylistScreen] Create playlist failed:', error);
-			showError('Impossible de créer la playlist');
+			showError(apiErrorMessage(error, 'Impossible de créer la playlist'));
 		}
 	};
 
@@ -109,10 +136,10 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
 								render={({ field: { onChange, value } }) => (
 									<View>
 										<Input
-											label="Playlist name"
+											label="Nom de la playlist"
 											value={value}
 											onChangeText={text => onChange(text.slice(0, PLAYLIST_LIMITS.NAME_MAX))}
-											placeholder="My awesome playlist"
+											placeholder="Ma super playlist"
 											error={errors.name?.message}
 											autoFocus
 											maxLength={PLAYLIST_LIMITS.NAME_MAX}
@@ -130,12 +157,12 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
 								render={({ field: { onChange, value } }) => (
 									<View>
 										<Input
-											label="Description (Optional)"
+											label="Description (facultative)"
 											value={value || ''}
 											onChangeText={text =>
 												onChange(text.slice(0, PLAYLIST_LIMITS.DESCRIPTION_MAX))
 											}
-											placeholder="Describe your playlist..."
+											placeholder="Décrivez votre playlist…"
 											error={errors.description?.message}
 											multiline
 											numberOfLines={3}
@@ -148,46 +175,41 @@ export function CreatePlaylistScreen({ navigation }: CreatePlaylistScreenProps) 
 								)}
 							/>
 
-							<View style={styles.toggleSection}>
-								<View style={styles.toggleRow}>
-									<View style={styles.toggleInfo}>
-										<Text style={styles.toggleLabel}>Private playlist</Text>
-										<Text style={styles.toggleDescription}>
-											{isPrivate ? 'Visible only to invited people' : 'Visible to all users'}
-										</Text>
+							{/* Visibility and edit rights are changed on « Visibilité et droits ». */}
+							{!isEditing && (
+								<>
+									<View style={styles.toggleSection}>
+										<View style={styles.toggleRow}>
+											<View style={styles.toggleInfo}>
+												<Text style={styles.toggleLabel}>Playlist privée</Text>
+												<Text style={styles.toggleDescription}>
+													{isPrivate ? 'Visible uniquement par les invités' : 'Visible par tous'}
+												</Text>
+											</View>
+											<ThemedSwitch value={isPrivate} onValueChange={setIsPrivate} />
+										</View>
 									</View>
-									<Switch
-										value={isPrivate}
-										onValueChange={setIsPrivate}
-										trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
-										thumbColor={theme.colors.surface}
-									/>
-								</View>
-							</View>
 
-							<View style={styles.toggleSection}>
-								<View style={styles.toggleRow}>
-									<View style={styles.toggleInfo}>
-										<Text style={styles.toggleLabel}>Restricted editing</Text>
-										<Text style={styles.toggleDescription}>
-											{isEditRestricted
-												? 'Only authorized people can edit'
-												: 'Everyone can add/remove tracks'}
-										</Text>
+									<View style={styles.toggleSection}>
+										<View style={styles.toggleRow}>
+											<View style={styles.toggleInfo}>
+												<Text style={styles.toggleLabel}>Modification restreinte</Text>
+												<Text style={styles.toggleDescription}>
+													{isEditRestricted
+														? 'Seules les personnes autorisées peuvent la modifier'
+														: 'Tout le monde peut ajouter ou retirer des titres'}
+												</Text>
+											</View>
+											<ThemedSwitch value={isEditRestricted} onValueChange={setIsEditRestricted} />
+										</View>
 									</View>
-									<Switch
-										value={isEditRestricted}
-										onValueChange={setIsEditRestricted}
-										trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
-										thumbColor={theme.colors.surface}
-									/>
-								</View>
-							</View>
+								</>
+							)}
 
 							<Button
-								title="Create playlist"
+								title={isEditing ? 'Enregistrer' : 'Créer la playlist'}
 								onPress={handleSubmit(onSubmit)}
-								loading={isLoading}
+								loading={isSubmitting}
 								fullWidth
 								variant="primary"
 							/>

@@ -250,6 +250,73 @@ describe('Socket.io handshake authentication', () => {
 		await expect(command).resolves.toEqual({ action: 'pause', fromUserId: bob.id });
 	});
 
+	it("carries the owner's chosen name instead of the handshake one (#352)", async () => {
+		const device = deviceFields();
+		await connected(connect({ token: alice.token, ...device }));
+		const { error } = await supabaseAdmin
+			.from('devices')
+			.update({ custom_name: 'Salon' })
+			.eq('user_id', alice.id)
+			.eq('device_id', device.deviceId);
+		if (error) throw error;
+
+		const socket = connect({ token: alice.token, ...device });
+		await connected(socket);
+
+		const server = await serverSocket(socket.id);
+		expect(server.data.device.deviceName).toBe('Salon');
+		const { data } = await supabaseAdmin
+			.from('devices')
+			.select('device_name, custom_name')
+			.eq('user_id', alice.id)
+			.eq('device_id', device.deviceId)
+			.single();
+		expect(data).toEqual({ device_name: device.deviceName, custom_name: 'Salon' });
+	});
+
+	it('gives a live socket the new name on rename (#352)', async () => {
+		const device = deviceFields();
+		const socket = connect({ token: alice.token, ...device });
+		await connected(socket);
+
+		realtime.setDeviceName(alice.id, device.deviceId, 'Cuisine');
+
+		const server = await serverSocket(socket.id);
+		expect(server.data.device.deviceName).toBe('Cuisine');
+	});
+
+	it("sends the renamed device's status to listeners at once (#352)", async () => {
+		const device = deviceFields();
+		const owner = connect({ token: alice.token, ...device });
+		const watcher = connect({ token: bob.token, ...deviceFields() });
+		await Promise.all([connected(owner), connected(watcher)]);
+
+		const initial = nextEvent<UserListeningStatus>(watcher, 'listening:status');
+		watcher.emit('listening:subscribe', alice.id);
+		await initial;
+
+		// A paused device: no further listening:update would carry the name.
+		const stored = nextEvent<UserListeningStatus>(watcher, 'listening:status', status =>
+			status.devices.some(d => d.device.deviceId === device.deviceId)
+		);
+		owner.emit('listening:update', { track: null, isPlaying: false });
+		await stored;
+
+		const renamed = nextEvent<UserListeningStatus>(watcher, 'listening:status', status =>
+			status.devices.some(d => d.device.deviceName === 'Cuisine')
+		);
+		realtime.setDeviceName(alice.id, device.deviceId, 'Cuisine');
+
+		const status = await renamed;
+		expect(status.ownerId).toBe(alice.id);
+		expect(status.devices.find(d => d.device.deviceId === device.deviceId)?.device).toEqual({
+			deviceId: device.deviceId,
+			deviceName: 'Cuisine',
+			platform: device.platform,
+			model: device.model,
+		});
+	});
+
 	it('refuses a handshake without token with NO_TOKEN', async () => {
 		await expect(refused(connect({}))).resolves.toBe('NO_TOKEN');
 		await expect(refused(connect({ ...deviceFields() }))).resolves.toBe('NO_TOKEN');

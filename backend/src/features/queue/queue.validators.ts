@@ -7,6 +7,14 @@ import { addTrackSchema } from '@/features/playlists/playlist.validators.js';
  */
 export const addQueueItemSchema = addTrackSchema.omit({ previewUrl: true });
 
+/**
+ * Body of POST /api/queue/items: the track, plus `next` to place it right
+ * after the current item (at the top when nothing is current) instead of last.
+ */
+export const addQueueItemBodySchema = addQueueItemSchema.extend({
+	next: z.boolean().optional(),
+});
+
 /** Path segment of /api/users/:userId/queue routes. */
 export const queueOwnerParamsSchema = z.object({
 	userId: z.uuid('Invalid user ID format').optional(),
@@ -57,5 +65,6 @@ export const transferSchema = z.object({
 });
 
 export type AddQueueItemInput = z.infer<typeof addQueueItemSchema>;
+export type AddQueueItemBodyInput = z.infer<typeof addQueueItemBodySchema>;
 export type MoveQueueItemInput = z.infer<typeof moveQueueItemSchema>;
 export type TransferInput = z.infer<typeof transferSchema>;

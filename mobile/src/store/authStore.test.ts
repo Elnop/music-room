@@ -389,7 +389,7 @@ describe('login', () => {
 
 		expect(calledUrls()).toHaveLength(1);
 		expect(calledUrls()[0]).toMatch(/\/api\/auth\/login$/);
-		expect(useAuthStore.getState().error).toBe('Invalid email or password');
+		expect(useAuthStore.getState().error).toBe('Email ou mot de passe incorrect');
 		expect(mockSupabaseAuth.signInWithPassword).not.toHaveBeenCalled();
 		await expectSignedOutAndNothingStored();
 	});
@@ -474,7 +474,7 @@ describe('loginWithGoogle', () => {
 		await expectSignedOutAndNothingStored();
 	});
 
-	it('shows the backend message and stores nothing when the backend refuses the token', async () => {
+	it('shows a French message and stores nothing when the backend refuses the token', async () => {
 		jest.mocked(signInWithGoogle).mockResolvedValue('google-id-token');
 		fetchMock.mockResolvedValue(
 			jsonResponse(400, {
@@ -485,7 +485,7 @@ describe('loginWithGoogle', () => {
 
 		await expect(useAuthStore.getState().loginWithGoogle()).resolves.toBeUndefined();
 
-		expect(useAuthStore.getState().error).toBe('Invalid Google token');
+		expect(useAuthStore.getState().error).toBe('La connexion avec Google a échoué. Réessayez.');
 		expect(mockSupabaseAuth.setSession).not.toHaveBeenCalled();
 		await expectSignedOutAndNothingStored();
 	});
@@ -523,7 +523,7 @@ describe('loginWithFacebook', () => {
 		await expectSignedOutAndNothingStored();
 	});
 
-	it('shows the backend message and stores nothing when the backend refuses the token', async () => {
+	it('shows a French message and stores nothing when the backend refuses the token', async () => {
 		jest.mocked(signInWithFacebook).mockResolvedValue('facebook-access-token');
 		fetchMock.mockResolvedValue(
 			jsonResponse(400, {
@@ -534,7 +534,7 @@ describe('loginWithFacebook', () => {
 
 		await expect(useAuthStore.getState().loginWithFacebook()).resolves.toBeUndefined();
 
-		expect(useAuthStore.getState().error).toBe('Invalid Facebook token');
+		expect(useAuthStore.getState().error).toBe('La connexion avec Facebook a échoué. Réessayez.');
 		await expectSignedOutAndNothingStored();
 		expect(mockSupabaseAuth.setSession).not.toHaveBeenCalled();
 	});
@@ -613,5 +613,25 @@ describe('session persistence', () => {
 		await useAuthStore.getState().loadFromStorage();
 
 		expectAuthenticated();
+	});
+});
+
+describe('setAvatarUrl (#351)', () => {
+	const URL = 'https://x.supabase.co/storage/v1/object/public/avatars/user-a/new.jpg';
+
+	it('sets the new avatar on the user and persists it', async () => {
+		await useAuthStore.getState().setAvatarUrl(URL);
+
+		expect(useAuthStore.getState().user?.avatarUrl).toBe(URL);
+		const stored = JSON.parse((await AsyncStorage.getItem('@zumik/auth_user')) ?? '{}');
+		expect(stored.avatarUrl).toBe(URL);
+	});
+
+	it('clears the avatar after a removal', async () => {
+		await useAuthStore.getState().setAvatarUrl(URL);
+		await useAuthStore.getState().setAvatarUrl(null);
+
+		expect(useAuthStore.getState().user?.avatarUrl).toBeUndefined();
+		expect(useAuthStore.getState().user?.username).toBe('alice');
 	});
 });

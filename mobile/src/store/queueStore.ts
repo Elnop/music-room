@@ -7,6 +7,8 @@ import { useConnectStore, useActiveOwnerId } from '@/store/connectStore';
 import { trackToSoundCloud } from '@utils/trackToSoundCloud';
 import { toTrackInput } from '@utils/trackInput';
 import { showError, showInfo, showSuccess } from '@utils/toast';
+import { hapticSuccess } from '@utils/haptics';
+import { apiErrorMessage } from '@/utils/apiErrorMessage';
 import type { AddQueueItemBody, QueueState, QueueStepResult } from '@/types/queue.types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import {
@@ -63,6 +65,11 @@ interface QueueStoreState {
 	 * true once added. Never changes what is playing.
 	 */
 	addItem: (track: AddQueueItemBody) => Promise<boolean>;
+	/**
+	 * Insert a track right after the current item (at the top when nothing is
+	 * current) in one call, and toast the outcome (#316). Never changes what is playing.
+	 */
+	playNext: (track: AddQueueItemBody) => Promise<boolean>;
 	/** Make an item current and play it (on this device, or on the remote one). */
 	playItem: (itemId: string) => Promise<QueueStepOutcome>;
 	/**
@@ -282,12 +289,25 @@ export const useQueueStore = create<QueueStoreState>((set, get) => {
 			const added = await mutate(
 				call => queueApi.addItem(track, call),
 				'Add',
-				error =>
-					error instanceof Error && error.message
-						? error.message
-						: "Impossible d'ajouter à la file de lecture"
+				error => apiErrorMessage(error, "Impossible d'ajouter à la file d'attente")
 			);
-			if (added) showSuccess('Ajouté à la file de lecture');
+			if (added) {
+				showSuccess("Ajouté à la file d'attente");
+				hapticSuccess();
+			}
+			return added;
+		},
+
+		playNext: async track => {
+			const added = await mutate(
+				call => queueApi.addItem({ ...track, next: true }, call),
+				'Play next',
+				error => apiErrorMessage(error, "Impossible d'ajouter ce titre")
+			);
+			if (added) {
+				showSuccess('Lira ensuite');
+				hapticSuccess();
+			}
 			return added;
 		},
 

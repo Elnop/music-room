@@ -42,6 +42,7 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
 	const {
 		control,
 		handleSubmit,
+		getValues,
 		formState: { errors },
 	} = useForm<LoginInput>({
 		resolver: zodResolver(loginSchema),
@@ -159,10 +160,10 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
 								name="password"
 								render={({ field: { onChange, value } }) => (
 									<Input
-										label="Password"
+										label="Mot de passe"
 										value={value}
 										onChangeText={onChange}
-										placeholder="Enter your password"
+										placeholder="Saisissez votre mot de passe"
 										error={errors.password?.message}
 										secureTextEntry
 										autoCapitalize="none"
@@ -171,7 +172,7 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
 							/>
 
 							<Button
-								title="Sign In"
+								title="Se connecter"
 								onPress={handleSubmit(onSubmit)}
 								loading={isLoading}
 								fullWidth
@@ -180,16 +181,18 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
 
 							{/* Forgot Password Link */}
 							<TouchableOpacity
-								onPress={() => navigation.navigate('ForgotPassword')}
+								onPress={() =>
+									navigation.navigate('ForgotPassword', { email: getValues('email').trim() })
+								}
 								style={styles.forgotPasswordButton}
 							>
-								<Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+								<Text style={styles.forgotPasswordText}>Mot de passe oublié ?</Text>
 							</TouchableOpacity>
 
 							{/* Divider */}
 							<View style={styles.divider}>
 								<View style={styles.dividerLine} />
-								<Text style={styles.dividerText}>OR</Text>
+								<Text style={styles.dividerText}>OU</Text>
 								<View style={styles.dividerLine} />
 							</View>
 
@@ -200,7 +203,7 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
 								disabled={isLoading}
 							>
 								<Text style={styles.googleIcon}>G</Text>
-								<Text style={styles.googleButtonText}>Continue with Google</Text>
+								<Text style={styles.googleButtonText}>Continuer avec Google</Text>
 							</TouchableOpacity>
 
 							{/* Facebook Sign-In Button */}
@@ -210,14 +213,14 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
 								disabled={isLoading}
 							>
 								<Text style={styles.facebookIcon}>f</Text>
-								<Text style={styles.facebookButtonText}>Continue with Facebook</Text>
+								<Text style={styles.facebookButtonText}>Continuer avec Facebook</Text>
 							</TouchableOpacity>
 						</View>
 
 						<View style={styles.footer}>
-							<Text style={styles.footerText}>Don't have an account? </Text>
+							<Text style={styles.footerText}>Pas encore de compte ? </Text>
 							<Text style={styles.footerLink} onPress={() => navigation.navigate('Register')}>
-								Sign up
+								S'inscrire
 							</Text>
 						</View>
 					</View>

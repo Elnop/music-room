@@ -3,6 +3,7 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'rea
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Avatar } from '@/components/common/Avatar';
+import { EmptyState } from '@/components/common/EmptyState';
 import type { Theme } from '@themes/types';
 import type { Playlist } from '@/types/playlist.types';
 import type { FriendProfile } from '@/services/friendsApi';
@@ -18,19 +19,18 @@ interface FriendPlaylistSectionProps {
 	friendsPlaylists: FriendPlaylistData[];
 	onPlaylistPress: (playlistId: string) => void;
 	onFriendPress?: (friendId: string) => void;
+	/** Leads to the friends tab from the empty state */
+	onFindFriends?: () => void;
 }
 
 export function FriendPlaylistSection({
 	friendsPlaylists,
 	onPlaylistPress,
 	onFriendPress,
+	onFindFriends,
 }: FriendPlaylistSectionProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
-
-	if (friendsPlaylists.length === 0) {
-		return null;
-	}
 
 	// Flatten pour un scroll horizontal continu avec les infos de l'ami
 	const allPlaylists = friendsPlaylists.flatMap(fp =>
@@ -42,12 +42,11 @@ export function FriendPlaylistSection({
 
 	if (allPlaylists.length === 0) {
 		return (
-			<View style={styles.emptyContainer}>
-				<View style={styles.emptyIconContainer}>
-					<Ionicons name="people-outline" size={32} color={theme.colors.textSecondary} />
-				</View>
-				<Text style={styles.emptyText}>Vos amis n'ont pas encore de playlists publiques</Text>
-			</View>
+			<EmptyState
+				icon="people-outline"
+				message="Aucune playlist de vos amis pour l'instant. Vos amis sont les personnes que vous suivez et qui vous suivent en retour."
+				action={onFindFriends ? { label: 'Trouver des amis', onPress: onFindFriends } : undefined}
+			/>
 		);
 	}
 
@@ -173,24 +172,5 @@ const createStyles = (theme: Theme) =>
 		friendName: {
 			fontSize: theme.typography.sizes.xs,
 			color: theme.colors.textSecondary,
-		},
-		emptyContainer: {
-			alignItems: 'center',
-			paddingVertical: theme.spacing.xl,
-			paddingHorizontal: theme.spacing.lg,
-		},
-		emptyIconContainer: {
-			width: 64,
-			height: 64,
-			borderRadius: 32,
-			backgroundColor: theme.colors.surfaceAlt,
-			justifyContent: 'center',
-			alignItems: 'center',
-			marginBottom: theme.spacing.md,
-		},
-		emptyText: {
-			fontSize: theme.typography.sizes.sm,
-			color: theme.colors.textSecondary,
-			textAlign: 'center',
 		},
 	});

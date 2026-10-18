@@ -1,20 +1,24 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { QueueSwipe } from '@/components/common/QueueSwipe';
+import { Artwork } from '@/components/common/Artwork';
+import { PreviewBadge } from '@/components/track/PreviewBadge';
+import { isPreviewOnly } from '@/utils/soundcloudPreview';
+import { TrackActionsButton } from '@/components/track/TrackActionsButton';
 import type { Theme } from '@/themes/types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
 interface Props {
 	track: SoundCloudTrack;
 	onPlay: (track: SoundCloudTrack) => void;
-	onAddToPlaylist: (track: SoundCloudTrack) => void;
 	/** A right swipe adds the track to the play queue. */
 	onAddToQueue: (track: SoundCloudTrack) => void;
+	/** A long press or the ⋯ button opens the track's quick actions (#316). */
+	onShowActions: (track: SoundCloudTrack) => void;
 }
 
-export function SoundCloudTrackItem({ track, onPlay, onAddToPlaylist, onAddToQueue }: Props) {
+export function SoundCloudTrackItem({ track, onPlay, onAddToQueue, onShowActions }: Props) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
@@ -24,31 +28,30 @@ export function SoundCloudTrackItem({ track, onPlay, onAddToPlaylist, onAddToQue
 		return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 	};
 
-	const artworkUrl = track.artwork_url || track.user.avatar_url || 'https://via.placeholder.com/50';
+	const artworkUrl = track.artwork_url || track.user.avatar_url;
 
 	return (
 		<QueueSwipe onAddToQueue={() => onAddToQueue(track)}>
-			<TouchableOpacity style={styles.container} onPress={() => onPlay(track)} activeOpacity={0.6}>
-				<Image source={{ uri: artworkUrl }} style={styles.artwork} />
+			<TouchableOpacity
+				style={styles.container}
+				onPress={() => onPlay(track)}
+				onLongPress={() => onShowActions(track)}
+				activeOpacity={0.6}
+			>
+				<Artwork uri={artworkUrl} size={48} style={styles.artwork} />
 				<View style={styles.info}>
 					<Text style={styles.title} numberOfLines={1}>
 						{track.title}
 					</Text>
-					<Text style={styles.artist} numberOfLines={1}>
-						{track.user.username}
-					</Text>
+					<View style={styles.subtitle}>
+						{isPreviewOnly(track) && <PreviewBadge />}
+						<Text style={styles.artist} numberOfLines={1}>
+							{track.user.username}
+						</Text>
+					</View>
 				</View>
 				<Text style={styles.duration}>{formatDuration(track.duration)}</Text>
-				<TouchableOpacity
-					style={styles.addButton}
-					onPress={e => {
-						e.stopPropagation();
-						onAddToPlaylist(track);
-					}}
-					hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-				>
-					<Ionicons name="add" size={24} color={theme.colors.primary} />
-				</TouchableOpacity>
+				<TrackActionsButton onPress={() => onShowActions(track)} />
 			</TouchableOpacity>
 		</QueueSwipe>
 	);
@@ -65,14 +68,18 @@ const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.background,
 		},
 		artwork: {
-			width: 48,
-			height: 48,
 			borderRadius: 4,
-			backgroundColor: theme.colors.surfaceAlt,
 		},
 		info: {
 			flex: 1,
 			marginLeft: theme.spacing.md,
+			// Keeps a long title off the duration (#307).
+			marginRight: theme.spacing.sm,
+		},
+		subtitle: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			gap: theme.spacing.xs,
 		},
 		title: {
 			fontSize: theme.typography.sizes.md,
@@ -81,19 +88,14 @@ const createStyles = (theme: Theme) =>
 			marginBottom: 2,
 		},
 		artist: {
+			flexShrink: 1,
 			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.textSecondary,
 		},
 		duration: {
+			flexShrink: 0,
 			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.textSecondary,
 			marginRight: theme.spacing.sm,
-		},
-		addButton: {
-			width: 40,
-			height: 40,
-			borderRadius: 20,
-			alignItems: 'center',
-			justifyContent: 'center',
 		},
 	});

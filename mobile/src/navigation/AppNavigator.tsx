@@ -7,17 +7,21 @@
 
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import type { NavigatorScreenParams } from '@react-navigation/native';
 import { View, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@/themes/types';
 
 // Import feature stacks
-import { PlaylistsNavigator } from '@/navigation/stacks/PlaylistsStack';
+import {
+	PlaylistsNavigator,
+	type PlaylistStackParamList,
+} from '@/navigation/stacks/PlaylistsStack';
 import { ProfileNavigator } from '@/navigation/stacks/ProfileStack';
 import { SearchNavigator } from '@/navigation/stacks/SearchStack';
-import { FriendsNavigator } from '@/navigation/stacks/FriendsStack';
+import { FriendsNavigator, type FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
 
 // Player components
 import { MiniPlayer } from '@/components/player/MiniPlayer';
@@ -26,12 +30,15 @@ import { PlayerErrorToast } from '@/components/player/PlayerErrorToast';
 import { PlayerProvider } from '@/contexts/PlayerContext';
 import { useQueueSync } from '@/hooks/useQueueSync';
 import { useRemoteTarget } from '@/hooks/useRemoteTarget';
+import { useConnectionStatus } from '@/hooks/useConnectionStatus';
+import { ConnectionBanner } from '@/components/common/ConnectionBanner';
 
 // Tab navigation types
+// Playlists and Friends take nested params: zumik:// share links open their screens (#321).
 export type AppTabsParamList = {
-	PlaylistsTab: undefined;
+	PlaylistsTab: NavigatorScreenParams<PlaylistStackParamList> | undefined;
 	SearchTab: undefined;
-	FriendsTab: undefined;
+	FriendsTab: NavigatorScreenParams<FriendsStackParamList> | undefined;
 	ProfileTab: undefined;
 };
 
@@ -60,56 +67,75 @@ export function AppNavigator() {
 	const styles = React.useMemo(() => createStyles(theme, insets.bottom), [theme, insets.bottom]);
 	useQueueSync();
 	useRemoteTarget();
+	const connectionStatus = useConnectionStatus();
+	// While the banner covers the status bar, the screens below it must not add
+	// the status bar inset again (react-navigation headers read this context).
+	const navigatorInsets = React.useMemo(
+		() => (connectionStatus ? { ...insets, top: 0 } : insets),
+		[connectionStatus, insets]
+	);
 
 	return (
 		<PlayerProvider>
 			<View style={styles.container}>
-				<Tab.Navigator
-					screenOptions={({ route }) => ({
-						tabBarActiveTintColor: theme.colors.primary,
-						tabBarInactiveTintColor: theme.colors.textSecondary,
-						tabBarStyle: styles.tabBar,
-						tabBarShowLabel: false,
-						headerStyle: {
-							backgroundColor: theme.colors.background,
-						},
-						headerTintColor: theme.colors.text,
-						headerShadowVisible: false,
-						headerTitleStyle: {
-							fontWeight: theme.typography.weights.bold,
-						},
-						tabBarIcon: ({ focused, color }) => {
-							const icons = TAB_ICONS[route.name];
-							const iconName = focused ? icons.active : icons.inactive;
-							return (
-								<View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
-									<Ionicons name={iconName} size={22} color={focused ? '#FFFFFF' : color} />
-								</View>
-							);
-						},
-					})}
-				>
-					<Tab.Screen
-						name="PlaylistsTab"
-						component={PlaylistsNavigator}
-						options={{ title: 'Playlists', headerShown: false }}
-					/>
-					<Tab.Screen
-						name="SearchTab"
-						component={SearchNavigator}
-						options={{ title: 'Search', headerShown: false }}
-					/>
-					<Tab.Screen
-						name="FriendsTab"
-						component={FriendsNavigator}
-						options={{ title: 'Friends', headerShown: false }}
-					/>
-					<Tab.Screen
-						name="ProfileTab"
-						component={ProfileNavigator}
-						options={{ title: 'Profile', headerShown: false }}
-					/>
-				</Tab.Navigator>
+				<ConnectionBanner status={connectionStatus} topInset={insets.top} />
+
+				<SafeAreaInsetsContext.Provider value={navigatorInsets}>
+					<Tab.Navigator
+						screenOptions={({ route }) => ({
+							tabBarActiveTintColor: theme.colors.primary,
+							tabBarInactiveTintColor: theme.colors.textSecondary,
+							tabBarStyle: styles.tabBar,
+							tabBarLabelStyle: styles.tabLabel,
+							headerStyle: {
+								backgroundColor: theme.colors.background,
+							},
+							headerTintColor: theme.colors.text,
+							headerShadowVisible: false,
+							headerTitleStyle: {
+								fontWeight: theme.typography.weights.bold,
+							},
+							tabBarIcon: ({ focused, color }) => {
+								const icons = TAB_ICONS[route.name];
+								const iconName = focused ? icons.active : icons.inactive;
+								return (
+									<View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
+										<Ionicons name={iconName} size={20} color={focused ? '#FFFFFF' : color} />
+									</View>
+								);
+							},
+						})}
+					>
+						<Tab.Screen
+							name="PlaylistsTab"
+							component={PlaylistsNavigator}
+							options={{
+								title: 'Playlists',
+								tabBarAccessibilityLabel: 'Playlists',
+								headerShown: false,
+							}}
+						/>
+						<Tab.Screen
+							name="SearchTab"
+							component={SearchNavigator}
+							options={{
+								title: 'Recherche',
+								tabBarAccessibilityLabel: 'Recherche',
+								headerShown: false,
+							}}
+						/>
+						<Tab.Screen
+							name="FriendsTab"
+							component={FriendsNavigator}
+							options={{ title: 'Amis', tabBarAccessibilityLabel: 'Amis', headerShown: false }}
+						/>
+						<Tab.Screen
+							name="ProfileTab"
+							component={ProfileNavigator}
+							options={{ title: 'Profil', tabBarAccessibilityLabel: 'Profil', headerShown: false }}
+						/>
+					</Tab.Navigator>
+				</SafeAreaInsetsContext.Provider>
 
 				{/* Mini Player - appears above tab bar */}
 				<MiniPlayer />
@@ -138,11 +164,15 @@ const createStyles = (theme: Theme, bottomInset: number) =>
 			elevation: 0,
 		},
 		iconContainer: {
-			width: 44,
-			height: 44,
-			borderRadius: 22,
+			width: 56,
+			height: 30,
+			borderRadius: 15,
 			justifyContent: 'center',
 			alignItems: 'center',
+		},
+		tabLabel: {
+			fontSize: 11,
+			marginTop: 2,
 		},
 		iconContainerActive: {
 			backgroundColor: theme.colors.primary,

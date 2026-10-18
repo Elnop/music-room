@@ -1,6 +1,7 @@
 import { useQueueStore } from '@/store/queueStore';
 import {
 	EMPTY_QUEUE,
+	nextItem,
 	previousAction,
 	selectHasNext,
 	selectHasPrevious,
@@ -14,6 +15,7 @@ import type { UserProfile } from '@/types/user.types';
 import { queueApi } from '@/services/queueApi';
 import { ApiError } from '@/services/api';
 import { showError, showInfo, showSuccess } from '@utils/toast';
+import { hapticSuccess } from '@utils/haptics';
 import type { QueueItem, QueueState, QueueStepResult } from '@/types/queue.types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
@@ -47,6 +49,8 @@ jest.mock('@/services/queueApi', () => ({
 		transfer: jest.fn(),
 	},
 }));
+
+jest.mock('@utils/haptics', () => ({ hapticSuccess: jest.fn() }));
 
 jest.mock('@utils/toast', () => ({
 	showSuccess: jest.fn(),
@@ -280,6 +284,13 @@ describe('queueStore selectors and list taps', () => {
 		expect(selectHasPrevious(queue('c'))).toBe(true);
 	});
 
+	it('picks the item after the current one, or the first with nothing current', () => {
+		expect(nextItem(queue(null))?.id).toBe('a');
+		expect(nextItem(queue('a'))?.id).toBe('b');
+		expect(nextItem(queue('c'))).toBeUndefined();
+		expect(nextItem(queue(null, []))).toBeUndefined();
+	});
+
 	it('a list tap plays at once and leaves the queue alone', () => {
 		store().applyState(queue('a'));
 		usePlayerStore.getState().playTrack(listTrack);
@@ -317,21 +328,57 @@ describe('queueStore addItem', () => {
 		expect(api.addItem).toHaveBeenCalledWith(body, {});
 		expect(mine().items.map(i => i.id)).toEqual(['a', 'n']);
 		expect(mine().currentItemId).toBe('a');
-		expect(showSuccess).toHaveBeenCalledWith('Ajouté à la file de lecture');
+		expect(showSuccess).toHaveBeenCalledWith("Ajouté à la file d'attente");
+		expect(hapticSuccess).toHaveBeenCalledTimes(1);
 		expect(player().loadCounter).toBe(before);
 		expect(player().currentTrack).toBe(listTrack);
 		expect(player().queueItemId).toBeNull();
 	});
 
-	it('keeps the state and toasts the API message on failure', async () => {
+	it('keeps the state and toasts a French message on failure', async () => {
 		store().applyState(queue('a', ['a']));
 		api.addItem.mockRejectedValue(new ApiError('Queue is full', 'QUEUE_FULL'));
 
 		await expect(store().addItem(body)).resolves.toBe(false);
 
 		expect(mine().items.map(i => i.id)).toEqual(['a']);
-		expect(showError).toHaveBeenCalledWith('Queue is full');
+		expect(showError).toHaveBeenCalledWith("Impossible d'ajouter à la file d'attente");
 		expect(showSuccess).not.toHaveBeenCalled();
+		expect(hapticSuccess).not.toHaveBeenCalled();
+	});
+});
+
+describe('queueStore playNext', () => {
+	const body = {
+		trackUri: 'https://soundcloud.com/artist/new',
+		title: 'New',
+		artist: 'Artist',
+		durationMs: 1000,
+	};
+
+	it('sends next: true, applies the returned state and toasts', async () => {
+		store().applyState(queue('a', ['a', 'b']));
+		api.addItem.mockResolvedValue(queue('a', ['a', 'n', 'b']));
+
+		await expect(store().playNext(body)).resolves.toBe(true);
+
+		expect(api.addItem).toHaveBeenCalledWith({ ...body, next: true }, {});
+		expect(mine().items.map(i => i.id)).toEqual(['a', 'n', 'b']);
+		expect(mine().currentItemId).toBe('a');
+		expect(showSuccess).toHaveBeenCalledWith('Lira ensuite');
+		expect(hapticSuccess).toHaveBeenCalledTimes(1);
+	});
+
+	it('keeps the state and toasts an error on failure', async () => {
+		store().applyState(queue('a', ['a']));
+		api.addItem.mockRejectedValue(new ApiError('Queue is full', 'QUEUE_FULL'));
+
+		await expect(store().playNext(body)).resolves.toBe(false);
+
+		expect(mine().items.map(i => i.id)).toEqual(['a']);
+		expect(showError).toHaveBeenCalledWith("Impossible d'ajouter ce titre");
+		expect(showSuccess).not.toHaveBeenCalled();
+		expect(hapticSuccess).not.toHaveBeenCalled();
 	});
 });
 

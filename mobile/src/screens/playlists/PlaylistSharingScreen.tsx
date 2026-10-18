@@ -1,13 +1,8 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import {
-	View,
-	Text,
-	FlatList,
-	StyleSheet,
-	TouchableOpacity,
-	Switch,
-	ScrollView,
-} from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { ThemedSwitch } from '@components/common/ThemedSwitch';
+import { apiErrorMessage } from '@utils/apiErrorMessage';
+import { EmptyState } from '@components/common/EmptyState';
 import { showError, showWarning, showSuccess } from '@utils/toast';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useFocusEffect } from '@react-navigation/native';
@@ -108,7 +103,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 			await fetchPlaylistById(playlistId);
 		} catch (error) {
 			console.error('[PlaylistSharing] Failed to fetch playlist:', error);
-			showError('Impossible de charger la playlist');
+			showError(apiErrorMessage(error, 'Impossible de charger la playlist'));
 			setIsLoading(false);
 			loadingRef.current = false;
 			return;
@@ -241,7 +236,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 			}
 		} catch (err) {
 			setMembers(prev => prev.filter(m => m.id !== user.id));
-			showError(err instanceof Error ? err.message : "Impossible d'ajouter l'utilisateur");
+			showError(apiErrorMessage(err, "Impossible d'ajouter l'utilisateur"));
 		} finally {
 			setProcessingUserId(null);
 		}
@@ -276,7 +271,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 		} catch (error) {
 			console.error('[PlaylistSharing] Remove failed:', error);
 			setMembers(originalMembers);
-			showError("Impossible de retirer l'utilisateur");
+			showError(apiErrorMessage(error, "Impossible de retirer l'utilisateur"));
 		} finally {
 			setProcessingUserId(null);
 		}
@@ -289,7 +284,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 
 		// If switching to public, warn about removing access restrictions
 		if (isPrivate) {
-			showWarning('Playlist public : visible par tous');
+			showWarning('Playlist publique : visible par tous');
 		}
 		await performVisibilityUpdate(newVisibility);
 	};
@@ -301,7 +296,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 			await fetchPlaylistById(playlistId);
 		} catch (error) {
 			console.error('[PlaylistSharing] Failed to update visibility:', error);
-			showError('Impossible de changer la visibilité');
+			showError(apiErrorMessage(error, 'Impossible de changer la visibilité'));
 		} finally {
 			setIsUpdatingSettings(false);
 		}
@@ -329,7 +324,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 			await fetchPlaylistById(playlistId);
 		} catch (error) {
 			console.error('[PlaylistSharing] Failed to update edit mode:', error);
-			showError('Impossible de changer le mode édition');
+			showError(apiErrorMessage(error, 'Impossible de changer le mode édition'));
 		} finally {
 			setIsUpdatingSettings(false);
 		}
@@ -360,7 +355,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 		} catch (error) {
 			console.error('[PlaylistSharing] Toggle failed:', error);
 			setMembers(originalMembers);
-			showError('Impossible de changer les permissions');
+			showError(apiErrorMessage(error, 'Impossible de changer les permissions'));
 		} finally {
 			setProcessingUserId(null);
 		}
@@ -404,7 +399,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 
 	const renderSettingsSection = () => (
 		<View style={styles.settingsSection}>
-			<Text style={styles.settingsSectionTitle}>Settings</Text>
+			<Text style={styles.settingsSectionTitle}>Paramètres</Text>
 
 			{/* Visibility Toggle */}
 			<View style={styles.settingItem}>
@@ -417,21 +412,18 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 						/>
 					</View>
 					<View style={styles.settingTextContainer}>
-						<Text style={styles.settingLabel}>Visibility</Text>
+						<Text style={styles.settingLabel}>Visibilité</Text>
 						<Text style={styles.settingDescription}>
-							{isPrivate ? 'Private - Only invited people can see' : 'Public - Visible to everyone'}
+							{isPrivate
+								? 'Privée : visible uniquement par les invités'
+								: 'Publique : visible par tous'}
 						</Text>
 					</View>
 				</View>
 				{isUpdatingSettings ? (
 					<LoadingSpinner size="small" />
 				) : (
-					<Switch
-						value={isPrivate}
-						onValueChange={handleToggleVisibility}
-						trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
-						thumbColor={theme.colors.surface}
-					/>
+					<ThemedSwitch value={isPrivate} onValueChange={handleToggleVisibility} />
 				)}
 			</View>
 
@@ -446,23 +438,18 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 						/>
 					</View>
 					<View style={styles.settingTextContainer}>
-						<Text style={styles.settingLabel}>Edit mode</Text>
+						<Text style={styles.settingLabel}>Mode de modification</Text>
 						<Text style={styles.settingDescription}>
 							{isEditRestricted
-								? 'Restricted - Only editors can modify'
-								: 'Open - Everyone can modify'}
+								? 'Restreint : seuls les éditeurs peuvent modifier'
+								: 'Ouvert : tout le monde peut modifier'}
 						</Text>
 					</View>
 				</View>
 				{isUpdatingSettings ? (
 					<LoadingSpinner size="small" />
 				) : (
-					<Switch
-						value={isEditRestricted}
-						onValueChange={handleToggleEditMode}
-						trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
-						thumbColor={theme.colors.surface}
-					/>
+					<ThemedSwitch value={isEditRestricted} onValueChange={handleToggleEditMode} />
 				)}
 			</View>
 		</View>
@@ -472,9 +459,9 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 		<View style={styles.infoCard}>
 			<Ionicons name="information-circle" size={28} color={theme.colors.primary} />
 			<View style={styles.infoContent}>
-				<Text style={styles.infoTitle}>Open playlist</Text>
+				<Text style={styles.infoTitle}>Playlist ouverte</Text>
 				<Text style={styles.infoText}>
-					This playlist is public and everyone can add or remove tracks.
+					Cette playlist est publique : tout le monde peut ajouter ou retirer des titres.
 				</Text>
 			</View>
 		</View>
@@ -483,48 +470,49 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 	const getHeaderContent = () => {
 		if (isPrivate && isEditRestricted) {
 			return {
-				title: 'Access and editing',
-				subtitle: 'Manage who can see this playlist and who can edit it.',
+				title: 'Accès et modification',
+				subtitle: 'Gérez qui peut voir cette playlist et qui peut la modifier.',
 			};
 		}
 		if (isPrivate && !isEditRestricted) {
 			return {
-				title: 'Access',
-				subtitle: 'Manage who can see and edit this private playlist. All guests can edit.',
+				title: 'Accès',
+				subtitle:
+					'Gérez qui peut voir et modifier cette playlist privée. Tous les invités peuvent la modifier.',
 			};
 		}
 		if (!isPrivate && isEditRestricted) {
 			return {
-				title: 'Editors',
-				subtitle: 'Manage who can edit this public playlist.',
+				title: 'Éditeurs',
+				subtitle: 'Gérez qui peut modifier cette playlist publique.',
 			};
 		}
 		// public + open
 		return {
-			title: 'Sharing',
-			subtitle: 'This playlist is open to everyone.',
+			title: 'Playlist ouverte à tous',
+			subtitle: 'Cette playlist est ouverte à tous.',
 		};
 	};
 
 	const getSectionTitle = () => {
 		if (isPrivate && isEditRestricted) {
-			return `People with access (${members.length})`;
+			return `Personnes ayant accès (${members.length})`;
 		}
 		if (isPrivate && !isEditRestricted) {
-			return `Guests (${members.length})`;
+			return `Invités (${members.length})`;
 		}
-		return `Editors (${members.length})`;
+		return `Éditeurs (${members.length})`;
 	};
 
 	const getEmptyMessage = () => {
 		if (isPrivate) {
-			return 'No one has access to this playlist';
+			return "Personne n'a encore accès à cette playlist";
 		}
-		return 'No editor added';
+		return 'Aucun éditeur ajouté';
 	};
 
 	if (isLoading) {
-		return <LoadingSpinner fullScreen message="Loading..." />;
+		return <LoadingSpinner fullScreen message="Chargement…" />;
 	}
 
 	const headerContent = getHeaderContent();
@@ -553,14 +541,14 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 						<SearchBar
 							value={searchQuery}
 							onChangeText={handleSearchChange}
-							placeholder="Search for a user..."
+							placeholder="Rechercher un utilisateur…"
 							style={styles.searchBar}
 						/>
 					)}
 
 					{searchQuery.trim() && !isInfoOnly && (
 						<View style={styles.searchResults}>
-							<Text style={styles.sectionTitle}>Results</Text>
+							<Text style={styles.sectionTitle}>Résultats</Text>
 							{isSearching ? (
 								<LoadingSpinner size="small" />
 							) : searchResults.length > 0 ? (
@@ -572,7 +560,11 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 									scrollEnabled={false}
 								/>
 							) : (
-								<Text style={styles.noResults}>No user found</Text>
+								<EmptyState
+									icon="search-outline"
+									style={styles.noResults}
+									message="Aucun utilisateur trouvé"
+								/>
 							)}
 						</View>
 					)}
@@ -591,7 +583,13 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 									extraData={processingUserId}
 								/>
 							) : (
-								!isInfoOnly && <Text style={styles.noMembers}>{getEmptyMessage()}</Text>
+								!isInfoOnly && (
+									<EmptyState
+										icon="people-outline"
+										style={styles.noMembers}
+										message={getEmptyMessage()}
+									/>
+								)
 							)}
 						</View>
 					)}
@@ -728,10 +726,8 @@ const createStyles = (theme: Theme) =>
 			maxHeight: 200,
 		},
 		noResults: {
-			color: theme.colors.textSecondary,
-			fontSize: theme.typography.sizes.sm,
-			textAlign: 'center',
-			paddingVertical: theme.spacing.md,
+			flex: 0,
+			padding: theme.spacing.md,
 		},
 		userItem: {
 			flexDirection: 'row',
@@ -822,9 +818,7 @@ const createStyles = (theme: Theme) =>
 			flex: 1,
 		},
 		noMembers: {
-			color: theme.colors.textSecondary,
-			fontSize: theme.typography.sizes.sm,
-			textAlign: 'center',
-			paddingVertical: theme.spacing.xl,
+			flex: 0,
+			padding: theme.spacing.lg,
 		},
 	});

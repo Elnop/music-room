@@ -9,12 +9,24 @@ import type { AddTrackDTO, CreatePlaylistDTO } from '@/features/playlists/playli
 // live in PostgREST and Postgres, so they are only checked here. The permission
 // matrix itself is unit-tested in permissions/playlist.permissions.test.ts.
 
-const { notifyPlaylistUpdate, revalidatePlaylistRoom } = vi.hoisted(() => ({
+const {
+	notifyPlaylistUpdate,
+	notifyPlaylistDetails,
+	notifyPlaylistDeleted,
+	revalidatePlaylistRoom,
+} = vi.hoisted(() => ({
 	notifyPlaylistUpdate: vi.fn(),
+	notifyPlaylistDetails: vi.fn(),
+	notifyPlaylistDeleted: vi.fn(),
 	revalidatePlaylistRoom: vi.fn(),
 }));
 vi.mock('@/realtime/index.js', () => ({
-	realtime: { notifyPlaylistUpdate, revalidatePlaylistRoom },
+	realtime: {
+		notifyPlaylistUpdate,
+		notifyPlaylistDetails,
+		notifyPlaylistDeleted,
+		revalidatePlaylistRoom,
+	},
 }));
 
 const { PlaylistService } = await import('@/features/playlists/playlist.service.js');
@@ -110,6 +122,8 @@ beforeAll(async () => {
 
 beforeEach(() => {
 	notifyPlaylistUpdate.mockClear();
+	notifyPlaylistDetails.mockClear();
+	notifyPlaylistDeleted.mockClear();
 	revalidatePlaylistRoom.mockClear();
 });
 
@@ -151,10 +165,18 @@ describe('PlaylistService CRUD', () => {
 		expect(error).toMatchObject({ statusCode: 404, code: 'PLAYLIST_NOT_FOUND' });
 	});
 
-	it('lets the owner update the metadata and revalidates the room', async () => {
+	it('lets the owner update the metadata, broadcasts it and revalidates the room', async () => {
 		const id = await createShared('public', 'open');
 		const updated = await playlists.updatePlaylist(id, ownerId, {
 			name: 'renamed',
+			description: 'new description',
+			visibility: 'private',
+			editMode: 'restricted',
+		});
+		expect(notifyPlaylistDetails).toHaveBeenCalledExactlyOnceWith({
+			playlistId: id,
+			name: 'renamed',
+			description: 'new description',
 			visibility: 'private',
 			editMode: 'restricted',
 		});
@@ -184,9 +206,11 @@ describe('PlaylistService CRUD', () => {
 
 		expect(await row(id)).toEqual(before);
 		expect(revalidatePlaylistRoom).not.toHaveBeenCalled();
+		expect(notifyPlaylistDetails).not.toHaveBeenCalled();
+		expect(notifyPlaylistDeleted).not.toHaveBeenCalled();
 	});
 
-	it('deletes the playlist and its tracks for the owner and revalidates the room', async () => {
+	it('deletes the playlist and its tracks, tells the room, then revalidates it', async () => {
 		const id = await createShared('public', 'open');
 		await tracks.addTrack(id, ownerId, dto(0));
 		expect(await trackRows(id)).toHaveLength(1);
@@ -196,6 +220,11 @@ describe('PlaylistService CRUD', () => {
 		expect(await row(id)).toBeNull();
 		expect(await trackRows(id)).toEqual([]);
 		expect(revalidatePlaylistRoom).toHaveBeenCalledWith(id);
+		expect(notifyPlaylistDeleted).toHaveBeenCalledExactlyOnceWith({ playlistId: id });
+		// The broadcast must reach the room before its sockets are evicted.
+		expect(notifyPlaylistDeleted.mock.invocationCallOrder[0]).toBeLessThan(
+			revalidatePlaylistRoom.mock.invocationCallOrder[0]
+		);
 	});
 });
 

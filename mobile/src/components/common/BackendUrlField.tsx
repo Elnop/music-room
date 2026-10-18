@@ -46,7 +46,7 @@ export function BackendUrlField() {
 		setError(undefined);
 		setDraft(result.url);
 		setCurrentUrl(result.url);
-		showSuccess(`Backend address set to ${result.url}`);
+		showSuccess(`Adresse du serveur : ${result.url}`);
 	};
 
 	const handleReset = async () => {
@@ -56,13 +56,13 @@ export function BackendUrlField() {
 		setError(undefined);
 		setDraft(url);
 		setCurrentUrl(url);
-		showSuccess('Backend address reset to default');
+		showSuccess('Adresse du serveur par défaut rétablie');
 	};
 
 	return (
 		<View>
 			<Input
-				label="Backend address"
+				label="Adresse du serveur"
 				value={draft}
 				onChangeText={text => {
 					setDraft(text);
@@ -76,17 +76,17 @@ export function BackendUrlField() {
 				onSubmitEditing={handleSave}
 				returnKeyType="done"
 			/>
-			<Text style={styles.current}>Current: {currentUrl}</Text>
+			<Text style={styles.current}>Actuelle : {currentUrl}</Text>
 			<View style={styles.actions}>
 				<Button
-					title="Save"
+					title="Enregistrer"
 					onPress={handleSave}
 					loading={isSaving}
 					disabled={draft.trim() === currentUrl}
 					style={styles.action}
 				/>
 				<Button
-					title="Reset to default"
+					title="Rétablir par défaut"
 					onPress={handleReset}
 					variant="outline"
 					disabled={isSaving || currentUrl === DEFAULT_BACKEND_URL}

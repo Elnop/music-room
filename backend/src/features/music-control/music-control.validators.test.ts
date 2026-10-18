@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
 	deviceLicenseParamsSchema,
+	renameDeviceSchema,
 	userDevicesParamsSchema,
 } from '@/features/music-control/music-control.validators.js';
 
@@ -44,5 +45,29 @@ describe('userDevicesParamsSchema', () => {
 	it('rejects a malformed userId', () => {
 		expect(userDevicesParamsSchema.safeParse({ userId: 'not-a-uuid' }).success).toBe(false);
 		expect(userDevicesParamsSchema.safeParse({}).success).toBe(false);
+	});
+});
+
+describe('renameDeviceSchema (#352)', () => {
+	it('trims the name', () => {
+		expect(renameDeviceSchema.parse({ name: '  Salon ' })).toEqual({ name: 'Salon' });
+	});
+
+	it('accepts null to go back to the system name', () => {
+		expect(renameDeviceSchema.parse({ name: null })).toEqual({ name: null });
+	});
+
+	it('accepts 40 characters after trimming', () => {
+		expect(renameDeviceSchema.safeParse({ name: ` ${'x'.repeat(40)} ` }).success).toBe(true);
+	});
+
+	it.each([
+		['an empty name', { name: '' }],
+		['a name of spaces only', { name: '   ' }],
+		['a name of 41 characters', { name: 'x'.repeat(41) }],
+		['a missing name', {}],
+		['a non-string name', { name: 42 }],
+	])('rejects %s', (_label, body) => {
+		expect(renameDeviceSchema.safeParse(body).success).toBe(false);
 	});
 });

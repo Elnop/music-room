@@ -66,11 +66,14 @@ function remoteDurationMs(queue: OwnerQueue, trackId: number | undefined): numbe
  * nothing and cannot seek.
  */
 export function useNowPlaying(): NowPlaying {
-	const { player } = usePlayer();
+	const { player, seekTo } = usePlayer();
 	const { currentTime, duration } = usePlayerProgress();
 	const currentTrack = usePlayerStore(state => state.currentTrack);
 	const playbackState = usePlayerStore(state => state.playbackState);
 	const queueItemId = usePlayerStore(state => state.queueItemId);
+	// A restored track has no player loaded: its position and length come from the store (#312).
+	const needsStreamLoad = usePlayerStore(state => state.needsStreamLoad);
+	const restoredPositionMs = usePlayerStore(state => state.startPositionMs ?? 0);
 	const target = useConnectStore(state => state.target);
 	const remoteStatus = useConnectStore(state => state.remoteStatus);
 	const userId = useAuthStore(state => state.user?.id ?? null);
@@ -104,16 +107,16 @@ export function useNowPlaying(): NowPlaying {
 	);
 
 	const localHasPrevious = selectHasPrevious(queue) && queueItemId !== null;
+	const localPositionMs = needsStreamLoad ? restoredPositionMs : currentTime * 1000;
 
 	const localPrevious = useCallback(() => {
 		if (!player) return;
-		if (previousAction(currentTime, localHasPrevious) === 'restart') {
-			player.seekTo(0);
-			usePlayerStore.getState().markSeek();
+		if (previousAction(localPositionMs / 1000, localHasPrevious) === 'restart') {
+			seekTo(0);
 		} else {
 			void queuePrevious();
 		}
-	}, [player, currentTime, localHasPrevious, queuePrevious]);
+	}, [player, seekTo, localPositionMs, localHasPrevious, queuePrevious]);
 
 	const next = useCallback(() => {
 		void queueNext();
@@ -173,8 +176,8 @@ export function useNowPlaying(): NowPlaying {
 		isPlaying,
 		isLoading: playbackState === 'loading',
 		canToggle,
-		positionMs: currentTime * 1000,
-		durationMs: duration * 1000,
+		positionMs: localPositionMs,
+		durationMs: needsStreamLoad && currentTrack ? currentTrack.duration : duration * 1000,
 		deviceLabel: null,
 		toggle,
 		next,

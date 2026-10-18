@@ -1,4 +1,5 @@
 import React from 'react';
+import { ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { act, render, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import { useAuthStore } from '@store/authStore';
@@ -44,8 +45,10 @@ jest.mock('@/contexts/ThemeContext', () => {
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-jest.mock('@components/common/LoadingSpinner', () => ({
-	LoadingSpinner: () => null,
+const mockNavigate = jest.fn();
+jest.mock('@react-navigation/native', () => ({
+	...jest.requireActual('@react-navigation/native'),
+	useNavigation: () => ({ navigate: mockNavigate }),
 }));
 
 const fetchMock = jest.fn();
@@ -94,11 +97,17 @@ function device(
 const phone = device('device-1', 'Phone', [alice]);
 const tablet = device('device-2', 'Tablet');
 
-function requests(): { url: string; method: string; authorization?: string }[] {
+function requests(): {
+	url: string;
+	method: string;
+	authorization?: string;
+	body?: unknown;
+}[] {
 	return fetchMock.mock.calls.map(([url, init]) => ({
 		url: url as string,
 		method: (init as RequestInit).method ?? 'GET',
 		authorization: ((init as RequestInit).headers as Record<string, string>)?.Authorization,
+		body: (init as RequestInit).body ? JSON.parse((init as RequestInit).body as string) : undefined,
 	}));
 }
 
@@ -121,7 +130,20 @@ async function renderLoaded(
 	getFriends.mockResolvedValue(friends);
 	getPermissions.mockResolvedValue(allDevicesIds);
 	render(<MyDevicesScreen />);
-	await screen.findByText('Mes appareils', {}, FIRST_RENDER);
+	await screen.findByText(
+		'Choisissez quels amis peuvent contrôler la musique de chaque appareil',
+		{},
+		FIRST_RENDER
+	);
+	await waitFor(() => expect(screen.queryByTestId('skeleton-list')).toBeNull(), FIRST_RENDER);
+}
+
+/** Pulls the list down, as the user would to refresh it. */
+async function pullToRefresh(): Promise<void> {
+	const { refreshControl } = screen.UNSAFE_getByType(ScrollView).props;
+	await act(async () => {
+		await refreshControl.props.onRefresh();
+	});
 }
 
 beforeEach(async () => {
@@ -179,8 +201,18 @@ describe('MyDevicesScreen', () => {
 		render(<MyDevicesScreen />);
 
 		await screen.findByText('Impossible de charger vos appareils', {}, FIRST_RENDER);
-		expect(showError).toHaveBeenCalledWith('Server exploded');
+		expect(showError).toHaveBeenCalledWith(
+			'Le serveur a rencontré un problème. Réessayez plus tard.'
+		);
 		expect(screen.queryByTestId('device-device-1')).toBeNull();
+	});
+
+	it('hides the model when it repeats the device name', async () => {
+		await renderLoaded([device('device-3', 'Pixel 8'), tablet], [alice]);
+
+		expect(screen.getByTestId('device-device-3')).not.toHaveTextContent(/Pixel 8 ·/);
+		expect(screen.getByTestId('device-device-3')).toHaveTextContent(/Vu le/);
+		expect(screen.getByTestId('device-device-2')).toHaveTextContent(/Pixel 8 ·/);
 	});
 
 	it('shows an empty state when I have no device', async () => {
@@ -194,7 +226,11 @@ describe('MyDevicesScreen', () => {
 		await renderLoaded([tablet], []);
 
 		expect(screen.getByTestId('device-device-2')).toHaveTextContent(/Aucun ami/);
+		expect(screen.getByTestId('device-device-2')).toHaveTextContent(/vous suivent en retour/);
 		expect(screen.queryByLabelText(/sur Tablet/)).toBeNull();
+
+		fireEvent.press(screen.getByRole('button', { name: 'Trouver des amis' }));
+		expect(mockNavigate).toHaveBeenCalledWith('FriendsTab');
 	});
 
 	it('grants a friend one device and keeps the switch on', async () => {
@@ -210,13 +246,17 @@ describe('MyDevicesScreen', () => {
 		expect(toggle('Bob sur Phone').props.value).toBe(false);
 	});
 
-	it('puts the switch back off and shows the backend message when granting fails', async () => {
+	it('puts the switch back off and shows a French message when granting fails', async () => {
 		await renderLoaded([phone, tablet], [alice, bob]);
 		fetchMock.mockResolvedValueOnce(fail(400, 'NOT_FRIENDS', 'You can only license friends'));
 
 		fireEvent(toggle('Bob sur Tablet'), 'valueChange', true);
 
-		await waitFor(() => expect(showError).toHaveBeenCalledWith('You can only license friends'));
+		await waitFor(() =>
+			expect(showError).toHaveBeenCalledWith(
+				"Seuls vos amis peuvent recevoir l'accès à vos appareils"
+			)
+		);
 		expect(toggle('Bob sur Tablet').props.value).toBe(false);
 		expect(toggle('Bob sur Tablet')).toBeEnabled();
 		expect(showSuccess).not.toHaveBeenCalled();
@@ -234,13 +274,13 @@ describe('MyDevicesScreen', () => {
 		expect(toggle('alice sur Phone').props.value).toBe(false);
 	});
 
-	it('puts the switch back on and shows the backend message when revoking fails', async () => {
+	it('puts the switch back on and shows a French message when revoking fails', async () => {
 		await renderLoaded([phone, tablet], [alice, bob]);
 		fetchMock.mockResolvedValueOnce(fail(404, 'DEVICE_NOT_FOUND', 'Device not found'));
 
 		fireEvent(toggle('alice sur Phone'), 'valueChange', false);
 
-		await waitFor(() => expect(showError).toHaveBeenCalledWith('Device not found'));
+		await waitFor(() => expect(showError).toHaveBeenCalledWith("Cet appareil n'existe plus"));
 		expect(toggle('alice sur Phone').props.value).toBe(true);
 	});
 
@@ -294,5 +334,127 @@ describe('MyDevicesScreen', () => {
 
 		expect(screen.getByTestId('device-device-1')).not.toHaveTextContent(/Cet appareil/);
 		expect(toggle('alice sur Phone').props.value).toBe(true);
+	});
+
+	it('shows skeletons, not a spinner, while the first load runs', async () => {
+		fetchMock.mockReturnValueOnce(new Promise(() => undefined));
+		getFriends.mockResolvedValue([alice]);
+		getPermissions.mockResolvedValue([]);
+
+		render(<MyDevicesScreen />);
+
+		expect(await screen.findByLabelText('Chargement', {}, FIRST_RENDER)).toBeTruthy();
+		expect(screen.queryByTestId('device-device-1')).toBeNull();
+	});
+
+	it('reloads devices, friends and permissions in place when pulled down', async () => {
+		await renderLoaded([phone], [alice]);
+		fetchMock.mockResolvedValueOnce(ok({ devices: [phone, tablet] }));
+		getFriends.mockResolvedValue([alice, bob]);
+
+		await pullToRefresh();
+
+		expect(getFriends).toHaveBeenCalledTimes(2);
+		expect(getPermissions).toHaveBeenCalledTimes(2);
+		expect(screen.getByTestId('device-device-2')).toBeTruthy();
+		expect(toggle('Bob sur Tablet').props.value).toBe(false);
+		expect(screen.queryByTestId('skeleton-list')).toBeNull();
+		expect(screen.UNSAFE_getByType(ScrollView).props.refreshControl.props.refreshing).toBe(false);
+	});
+
+	it('keeps the list and shows a toast when a refresh fails', async () => {
+		await renderLoaded([phone], [alice]);
+		fetchMock.mockResolvedValueOnce(fail(500, 'INTERNAL_ERROR', 'Server exploded'));
+
+		await pullToRefresh();
+
+		expect(showError).toHaveBeenCalledTimes(1);
+		expect(screen.getByTestId('device-device-1')).toBeTruthy();
+		expect(screen.queryByText('Impossible de charger vos appareils')).toBeNull();
+		expect(screen.UNSAFE_getByType(ScrollView).props.refreshControl.props.refreshing).toBe(false);
+	});
+	describe('rename (#352)', () => {
+		const renamed = { ...tablet, deviceName: 'Salon' };
+
+		async function openRename(name = 'Tablet'): Promise<void> {
+			fireEvent.press(screen.getByLabelText(`Renommer l'appareil ${name}`));
+			await screen.findByText("Renommer l'appareil");
+		}
+
+		it('opens the form with the current name', async () => {
+			await renderLoaded([phone, tablet], [alice]);
+
+			await openRename();
+
+			expect(screen.getByDisplayValue('Tablet')).toBeTruthy();
+		});
+
+		it('saves the trimmed name, reloads the list and shows a toast', async () => {
+			await renderLoaded([phone, tablet], [alice]);
+			await openRename();
+			fetchMock.mockResolvedValueOnce(ok({ device: renamed }));
+			fetchMock.mockResolvedValueOnce(ok({ devices: [phone, renamed] }));
+
+			fireEvent.changeText(screen.getByDisplayValue('Tablet'), '  Salon ');
+			fireEvent.press(screen.getByText('Enregistrer'));
+
+			await waitFor(() => expect(showSuccess).toHaveBeenCalledWith('Appareil renommé'));
+			expect(requests()[1]).toMatchObject({
+				method: 'PATCH',
+				authorization: 'Bearer access',
+				body: { name: 'Salon' },
+			});
+			expect(requests()[1].url).toMatch(/\/api\/music-control\/devices\/device-2$/);
+			await waitFor(() => expect(screen.getByTestId('device-device-2')).toHaveTextContent(/Salon/));
+			expect(screen.queryByText("Renommer l'appareil")).toBeNull();
+		});
+
+		it("goes back to the system name with « Nom d'origine »", async () => {
+			await renderLoaded([phone, renamed], [alice]);
+			await openRename('Salon');
+			fetchMock.mockResolvedValueOnce(ok({ device: tablet }));
+			fetchMock.mockResolvedValueOnce(ok({ devices: [phone, tablet] }));
+
+			fireEvent.press(screen.getByText("Nom d'origine"));
+
+			await waitFor(() => expect(showSuccess).toHaveBeenCalledWith('Appareil renommé'));
+			expect(requests()[1]).toMatchObject({ method: 'PATCH', body: { name: null } });
+			await waitFor(() =>
+				expect(screen.getByTestId('device-device-2')).toHaveTextContent(/Tablet/)
+			);
+		});
+
+		it('refuses an empty name without calling the server', async () => {
+			await renderLoaded([phone, tablet], [alice]);
+			await openRename();
+
+			fireEvent.changeText(screen.getByDisplayValue('Tablet'), '   ');
+			fireEvent.press(screen.getByText('Enregistrer'));
+
+			expect(await screen.findByText('Saisissez un nom')).toBeTruthy();
+			expect(fetchMock).toHaveBeenCalledTimes(1);
+		});
+
+		it('keeps the form open and shows a French toast when the device is gone', async () => {
+			await renderLoaded([phone, tablet], [alice]);
+			await openRename();
+			fetchMock.mockResolvedValueOnce(fail(404, 'DEVICE_NOT_FOUND', 'Device not found'));
+
+			fireEvent.press(screen.getByText('Enregistrer'));
+
+			await waitFor(() => expect(showError).toHaveBeenCalledWith("Cet appareil n'existe plus"));
+			expect(screen.getByText("Renommer l'appareil")).toBeTruthy();
+			expect(showSuccess).not.toHaveBeenCalled();
+		});
+
+		it('closes the form with « Annuler » without calling the server', async () => {
+			await renderLoaded([phone, tablet], [alice]);
+			await openRename();
+
+			fireEvent.press(screen.getByText('Annuler'));
+
+			await waitFor(() => expect(screen.queryByText("Renommer l'appareil")).toBeNull());
+			expect(fetchMock).toHaveBeenCalledTimes(1);
+		});
 	});
 });
