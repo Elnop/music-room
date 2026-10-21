@@ -1,0 +1,27 @@
+{
+  "src/realtime/index.ts": {
+    "no-restricted-syntax": {
+      "count": 1
+    }
+  },
+  "src/shared/config/env.ts": {
+    "no-restricted-globals": {
+      "count": 2
+    }
+  },
+  "src/shared/utils/logger.ts": {
+    "no-restricted-globals": {
+      "count": 4
+    }
+  },
+  "src/test/perf-fixtures.ts": {
+    "no-restricted-globals": {
+      "count": 4
+    }
+  },
+  "src/test/perf-socket.ts": {
+    "no-restricted-globals": {
+      "count": 8
+    }
+  }
+}

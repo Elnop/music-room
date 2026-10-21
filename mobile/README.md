@@ -99,7 +99,7 @@ Depuis la racine : `make dev-docker` (Docker), `make dev-local` (émulateur Andr
 
 ### Qualité de Code
 
-- `npm run check` - Vérifier types TypeScript + ESLint (rapide)
+- `npm run check` - Tous les garde-fous en parallèle (types, lint, code mort, dépendances, duplication, motifs, secrets, tests), lancé aussi en pre-commit : voir `.agents/rules/guardrails.md`
 - `npm run fix` - Formater et corriger automatiquement tout
 - `npm run check-all` - Vérification complète (types + lint + format)
 - `npm run lint` - Linter le code

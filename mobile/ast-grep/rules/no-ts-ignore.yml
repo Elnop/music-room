@@ -1,0 +1,21 @@
+# One document per language: ast-grep parses .ts and .tsx with different grammars.
+id: no-ts-ignore
+language: TypeScript
+severity: error
+message: "@ts-ignore and @ts-nocheck hide type errors; fix the type or use @ts-expect-error with a reason. See .agents/rules/guardrails.md#no-ts-ignore"
+rule:
+  kind: comment
+  regex: "@ts-(ignore|nocheck)"
+files:
+  - src/**/*.ts
+---
+id: no-ts-ignore-tsx
+language: Tsx
+severity: error
+message: "@ts-ignore and @ts-nocheck hide type errors; fix the type or use @ts-expect-error with a reason. See .agents/rules/guardrails.md#no-ts-ignore"
+rule:
+  kind: comment
+  regex: "@ts-(ignore|nocheck)"
+files:
+  - src/**/*.tsx
+  - App.tsx
