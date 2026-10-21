@@ -25,6 +25,7 @@ import type { FilteredProfile } from '@/types/user.types';
 import type { MusicGenre } from '@/types/user.types';
 import type { FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
 import { userLink } from '@/navigation/linking';
+import { logger } from '@/utils/logger';
 
 type Props = NativeStackScreenProps<FriendsStackParamList, 'UserProfile'>;
 
@@ -75,7 +76,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
 				setFollowStatus(statusData);
 				setPlaylists(playlistsData);
 			} catch (error) {
-				console.error('[UserProfileScreen] Load profile failed:', error);
+				logger.error('[UserProfileScreen] Load profile failed:', error);
 				setError('Impossible de charger le profil');
 			} finally {
 				setIsLoading(false);
@@ -98,7 +99,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
 				setFollowStatus(result.status);
 			}
 		} catch (err) {
-			console.error('[UserProfile] Follow toggle failed', {
+			logger.error('[UserProfile] Follow toggle failed', {
 				error: err,
 				userId,
 				isFollowing: followStatus?.isFollowing,

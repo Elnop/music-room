@@ -17,6 +17,7 @@ import {
 	selectQueue,
 	type OwnerQueue,
 } from '@/store/queueSelectors';
+import { logger } from '@/utils/logger';
 
 /**
  * Outcome of a step: the new current item plays, the queue has no current
@@ -166,7 +167,7 @@ export const useQueueStore = create<QueueStoreState>((set, get) => {
 		try {
 			result = await request(scope.call);
 		} catch (error) {
-			console.error(`[queueStore] ${label} failed:`, error);
+			logger.error(`[queueStore] ${label} failed:`, error);
 			if (!handleRemoteRefusal(scope, error) && errorMessage) {
 				showError(typeof errorMessage === 'function' ? errorMessage(error) : errorMessage);
 			}
@@ -209,7 +210,7 @@ export const useQueueStore = create<QueueStoreState>((set, get) => {
 			get().applyState(await request(scope.call));
 			return true;
 		} catch (error) {
-			console.error(`[queueStore] ${label} failed:`, error);
+			logger.error(`[queueStore] ${label} failed:`, error);
 			if (!handleRemoteRefusal(scope, error)) {
 				showError(typeof errorMessage === 'function' ? errorMessage(error) : errorMessage);
 			}
@@ -226,7 +227,7 @@ export const useQueueStore = create<QueueStoreState>((set, get) => {
 			try {
 				get().applyState(await queueApi.getQueue(ownerId && ownerId !== me ? { ownerId } : {}));
 			} catch (error) {
-				console.error('[queueStore] Load failed:', error);
+				logger.error('[queueStore] Load failed:', error);
 			}
 		},
 
@@ -367,7 +368,7 @@ export const useQueueStore = create<QueueStoreState>((set, get) => {
 				});
 				if (result.queue) get().applyState(result.queue);
 			} catch (error) {
-				console.error('[queueStore] Play list track on remote device failed:', error);
+				logger.error('[queueStore] Play list track on remote device failed:', error);
 				if (!handleRemoteRefusal(scope, error)) showError('Impossible de lire ce titre');
 			}
 		},

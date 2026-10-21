@@ -20,6 +20,11 @@ import { chmod, mkdir, writeFile } from 'node:fs/promises';
 import { z } from 'zod';
 import { createSignInClient, supabaseAdmin } from '@/shared/config/supabase.js';
 
+// CLI progress and report lines, not application logs: written to the
+// terminal directly (see .agents/rules/logging.md#no-console).
+const print = (line: string) => process.stdout.write(`${line}\n`);
+const printError = (line: string) => process.stderr.write(`${line}\n`);
+
 const PLAYLIST_NAME = 'perf-shared';
 const DEVICE_ID = 'perf-device-0';
 /** Prefix of the track URIs the track-edit scenario adds (tests/performance/scenarios). */
@@ -207,7 +212,7 @@ async function signIn(user: Omit<PerfUser, 'token'>): Promise<PerfUser> {
 }
 
 async function main(): Promise<void> {
-	console.log(`Preparing ${userCount} perf users...`);
+	print(`Preparing ${userCount} perf users...`);
 	const indexes = Array.from({ length: userCount }, (_, i) => i);
 	const created = await inBatches(indexes, upsertUser);
 
@@ -219,7 +224,7 @@ async function main(): Promise<void> {
 	);
 	const sharedPlaylistId = await upsertSharedPlaylist(owner.id);
 
-	console.log('Signing the perf users in...');
+	print('Signing the perf users in...');
 	const users = await inBatches(created, signIn);
 
 	await mkdir(fixturesDir, { recursive: true });
@@ -234,15 +239,13 @@ async function main(): Promise<void> {
 	const env = { sharedPlaylistId, ownerId: owner.id, deviceId: DEVICE_ID, userCount };
 	await writeFile(new URL('env.json', fixturesDir), `${JSON.stringify(env, null, 2)}\n`);
 
-	console.log(`Fixtures written to tests/performance/fixtures/ (playlist ${sharedPlaylistId})`);
+	print(`Fixtures written to tests/performance/fixtures/ (playlist ${sharedPlaylistId})`);
 }
 
 main().then(
 	() => process.exit(0),
 	(error: unknown) => {
-		console.error(
-			`Perf fixtures failed: ${error instanceof Error ? error.message : String(error)}`
-		);
+		printError(`Perf fixtures failed: ${error instanceof Error ? error.message : String(error)}`);
 		process.exit(1);
 	}
 );

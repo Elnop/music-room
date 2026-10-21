@@ -4,7 +4,7 @@ import { createServer } from 'http';
 import swaggerUi from 'swagger-ui-express';
 import { env } from '@/shared/config/env.js';
 import { logger } from '@/shared/utils/logger.js';
-import { errorHandler } from '@/shared/middleware/error-handler.js';
+import { AppError, errorHandler } from '@/shared/middleware/error-handler.js';
 import { actionLoggerMiddleware } from '@/shared/middleware/action-logger.middleware.js';
 import { routes } from '@/shared/config/routes.js';
 import { realtime } from '@/realtime/index.js';
@@ -77,17 +77,12 @@ routes.forEach(({ path, router }) => {
 	app.use(path, router);
 });
 
-app.use((req, res) => {
-	res.status(404).json({
-		success: false,
-		error: {
-			message: 'Route not found',
-			code: 'NOT_FOUND',
-		},
-		meta: {
-			timestamp: new Date().toISOString(),
-		},
-	});
+app.use((req, _res, next) => {
+	next(
+		new AppError(404, 'Route not found', 'NOT_FOUND', undefined, {
+			why: `No route matches ${req.method} ${req.path}`,
+		})
+	);
 });
 
 app.use(errorHandler);

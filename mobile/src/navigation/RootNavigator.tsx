@@ -16,6 +16,7 @@ import { isDarkBackground } from '@components/common/ConnectionBanner';
 import { supabase } from '@/lib/supabase';
 import { useMusicControlEmitter } from '@hooks/useMusicControl';
 import { loadBackendUrl } from '@/services/backendUrl';
+import { logger } from '@/utils/logger';
 
 export function RootNavigator() {
 	const isAuthenticated = useAuthStore(state => state.isAuthenticated);
@@ -65,7 +66,7 @@ export function RootNavigator() {
 				}
 			})
 			.catch((error: Error) => {
-				console.error('Failed to load auth state:', error);
+				logger.error('Failed to load auth state:', error);
 			})
 			.finally(() => {
 				setIsReady(true);

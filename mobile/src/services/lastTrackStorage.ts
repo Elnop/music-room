@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { z } from 'zod';
 import type { QueueTrack } from '@/types/queue.types';
+import { logger } from '@/utils/logger';
 
 /**
  * The track the player held when the app was last used, per user (#312). Stored
@@ -35,7 +36,7 @@ async function save(userId: string, entry: LastTrackEntry): Promise<void> {
 	try {
 		await AsyncStorage.setItem(keyFor(userId), JSON.stringify(parsed.data));
 	} catch (error) {
-		console.warn('[lastTrackStorage] Save failed', error);
+		logger.warn('[lastTrackStorage] Save failed', error);
 	}
 }
 
@@ -43,7 +44,7 @@ async function clear(userId: string): Promise<void> {
 	try {
 		await AsyncStorage.removeItem(keyFor(userId));
 	} catch (error) {
-		console.warn('[lastTrackStorage] Clear failed', error);
+		logger.warn('[lastTrackStorage] Clear failed', error);
 	}
 }
 
@@ -53,7 +54,7 @@ async function load(userId: string): Promise<LastTrackEntry | null> {
 	try {
 		raw = await AsyncStorage.getItem(keyFor(userId));
 	} catch (error) {
-		console.warn('[lastTrackStorage] Load failed', error);
+		logger.warn('[lastTrackStorage] Load failed', error);
 		await clear(userId);
 		return null;
 	}

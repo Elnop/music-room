@@ -5,6 +5,7 @@ import {
 } from '@react-native-google-signin/google-signin';
 import { LoginManager, AccessToken, Settings } from 'react-native-fbsdk-next';
 import Constants from 'expo-constants';
+import { logger } from '@/utils/logger';
 
 // Type guard to check if an unknown response has idToken
 function hasIdToken(
@@ -54,7 +55,7 @@ const WEB_CLIENT_ID =
 	process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 
 if (!WEB_CLIENT_ID) {
-	console.warn('EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID is not defined. Google login will not work.');
+	logger.warn('EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID is not defined. Google login will not work.');
 }
 
 const FACEBOOK_APP_ID =
@@ -62,7 +63,7 @@ const FACEBOOK_APP_ID =
 	process.env.EXPO_PUBLIC_FACEBOOK_APP_ID;
 
 if (!FACEBOOK_APP_ID) {
-	console.warn('EXPO_PUBLIC_FACEBOOK_APP_ID is not defined. Facebook login will not work.');
+	logger.warn('EXPO_PUBLIC_FACEBOOK_APP_ID is not defined. Facebook login will not work.');
 }
 
 /**
@@ -115,14 +116,14 @@ export const signInWithGoogle = async (): Promise<string> => {
 			throw new Error('Google Play Services not available');
 		} else {
 			if (__DEV__) {
-				console.error('[OAuth] Google Sign-In failed:', {
+				logger.error('[OAuth] Google Sign-In failed:', {
 					errorCode: googleError.code,
 					errorMessage: googleError.message,
 					errorType: error?.constructor?.name,
 					fullError: error,
 				});
 			} else {
-				console.error('[OAuth] Google Sign-In failed:', {
+				logger.error('[OAuth] Google Sign-In failed:', {
 					errorCode: googleError.code,
 					errorMessage: googleError.message,
 				});
@@ -178,13 +179,13 @@ export const signInWithFacebook = async (): Promise<string> => {
 		}
 
 		if (__DEV__) {
-			console.error('[OAuth] Facebook Sign-In failed:', {
+			logger.error('[OAuth] Facebook Sign-In failed:', {
 				errorMessage: fbError.message,
 				errorType: error?.constructor?.name,
 				fullError: error,
 			});
 		} else {
-			console.error('[OAuth] Facebook Sign-In failed:', {
+			logger.error('[OAuth] Facebook Sign-In failed:', {
 				errorMessage: fbError.message,
 			});
 		}

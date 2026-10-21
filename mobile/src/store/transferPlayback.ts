@@ -13,6 +13,7 @@ import { hapticSuccess } from '@utils/haptics';
 import { apiErrorMessage } from '@utils/apiErrorMessage';
 import type { DevicePickerOwner } from '@/types/device.types';
 import type { AddQueueItemBody, QueueTrack, TransferRequest } from '@/types/queue.types';
+import { logger } from '@/utils/logger';
 
 /** What plays now and where it is, as the transfer route takes it; null when nothing plays. */
 interface Playback {
@@ -128,7 +129,7 @@ export async function transferTo(owner: DevicePickerOwner, deviceId: string): Pr
 		if (result.queue) useQueueStore.getState().applyState(result.queue);
 		return true;
 	} catch (error) {
-		console.error('[transferPlayback] Transfer failed:', error);
+		logger.error('[transferPlayback] Transfer failed:', error);
 		showError(apiErrorMessage(error, 'Impossible de transférer la lecture'));
 		return false;
 	}

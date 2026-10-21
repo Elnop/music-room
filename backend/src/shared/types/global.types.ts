@@ -47,6 +47,10 @@ export interface ApiResponse<T = unknown> {
 		message: string;
 		code?: string;
 		details?: unknown;
+		/** Technical reason; sent in development and test only. */
+		why?: string;
+		/** Hint to fix it; sent in development and test only. */
+		fix?: string;
 	};
 	meta?: {
 		timestamp: string;

@@ -30,6 +30,7 @@ import { ReorderableList } from '@components/common/ReorderableList';
 import { EmptyState } from '@components/common/EmptyState';
 import { SkeletonBlock, SkeletonList, TrackRowSkeleton } from '@components/common/Skeleton';
 import { Button } from '@components/common/Button';
+import { logger } from '@/utils/logger';
 
 type PlaylistStackParamList = {
 	Playlists: undefined;
@@ -161,7 +162,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 			navigation.popToTop();
 		} catch (error) {
 			deletingRef.current = false;
-			console.error('[PlaylistDetailScreen] Delete playlist failed:', error);
+			logger.error('[PlaylistDetailScreen] Delete playlist failed:', error);
 			showError(apiErrorMessage(error, 'Impossible de supprimer la playlist'));
 		}
 	};
@@ -217,7 +218,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 			await removeTrack(id, trackId);
 			showSuccess('Titre supprimé');
 		} catch (error) {
-			console.error('[PlaylistDetailScreen] Remove track failed:', error);
+			logger.error('[PlaylistDetailScreen] Remove track failed:', error);
 			showError(apiErrorMessage(error, 'Impossible de supprimer le titre'));
 		}
 	};
@@ -232,7 +233,7 @@ export function PlaylistDetailScreen({ navigation, route }: PlaylistDetailScreen
 		} catch (error) {
 			// Conflicts are reported through conflictMessage once the playlist is reloaded.
 			if (!(error instanceof ApiError && CONFLICT_CODES.includes(error.code))) {
-				console.error('[PlaylistDetailScreen] Move track failed:', error);
+				logger.error('[PlaylistDetailScreen] Move track failed:', error);
 				showError(apiErrorMessage(error, 'Impossible de déplacer le titre'));
 			}
 			throw error;

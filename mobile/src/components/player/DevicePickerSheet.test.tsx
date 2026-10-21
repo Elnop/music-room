@@ -11,6 +11,7 @@ import { ApiError } from '@/services/api';
 import { showError } from '@utils/toast';
 import type { DevicePickerResponse } from '@/types/device.types';
 import type { UserProfile } from '@/types/user.types';
+import { logger } from '@/utils/logger';
 
 jest.mock('@/lib/supabase', () => ({
 	supabase: { auth: { signOut: jest.fn(), setSession: jest.fn() } },
@@ -112,7 +113,7 @@ const renderSheet = async () => {
 
 beforeEach(() => {
 	jest.clearAllMocks();
-	jest.spyOn(console, 'error').mockImplementation(() => undefined);
+	jest.spyOn(logger, 'error').mockImplementation(() => undefined);
 	useAuthStore.setState({ user: { id: 'me' } as UserProfile, isAuthenticated: true });
 	useQueueStore.getState().reset();
 	useConnectStore.setState({

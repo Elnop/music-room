@@ -23,6 +23,7 @@ import { loginSchema, LoginInput } from '@utils/validators';
 import { useAuthStore } from '@/store/authStore';
 import { ApiError } from '@services/api';
 import { showError, showWarning } from '@utils/toast';
+import { logger } from '@/utils/logger';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Logo = require('@/assets/logo/logo.png');
@@ -75,7 +76,7 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
 			await login(data.email, data.password);
 			// Navigation handled by RootNavigator based on auth state
 		} catch (error) {
-			console.error('[LoginScreen] Login error:', error);
+			logger.error('[LoginScreen] Login error:', error);
 
 			// Check if error is EMAIL_NOT_VERIFIED
 			if (error instanceof ApiError && error.code === 'EMAIL_NOT_VERIFIED') {
@@ -104,7 +105,7 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
 			await loginWithGoogle();
 			// Navigation handled by RootNavigator based on auth state
 		} catch (error) {
-			console.error('[LoginScreen] Google login error:', error);
+			logger.error('[LoginScreen] Google login error:', error);
 			// Error shown via alert (from auth store)
 		}
 	};
@@ -114,7 +115,7 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
 			await loginWithFacebook();
 			// Navigation handled by RootNavigator based on auth state
 		} catch (error) {
-			console.error('[LoginScreen] Facebook login error:', error);
+			logger.error('[LoginScreen] Facebook login error:', error);
 			// Error shown via alert (from auth store)
 		}
 	};

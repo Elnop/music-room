@@ -122,7 +122,7 @@ describe('account lockout and IP blacklist (#206)', () => {
 	const login = (email: string, password: string) => post('login', { email, password });
 
 	const error = (body: Record<string, unknown>) =>
-		body.error as { code: string; lockedUntil?: string; remainingTime?: number };
+		body.error as { code: string; details?: { lockedUntil?: string; remainingTime?: number } };
 
 	it('locks the account after the threshold and refuses even the right password', async () => {
 		const email = await createVerifiedUser();
@@ -139,8 +139,8 @@ describe('account lockout and IP blacklist (#206)', () => {
 
 		expect(status).toBe(429);
 		expect(error(body).code).toBe('ACCOUNT_LOCKED');
-		expect(new Date(error(body).lockedUntil ?? '').getTime()).toBeGreaterThan(Date.now());
-		expect(error(body).remainingTime).toBeGreaterThan(0);
+		expect(new Date(error(body).details?.lockedUntil ?? '').getTime()).toBeGreaterThan(Date.now());
+		expect(error(body).details?.remainingTime).toBeGreaterThan(0);
 		expect(body.data).toBeUndefined();
 		expect(JSON.stringify(body)).not.toMatch(/accessToken|refreshToken/);
 	});

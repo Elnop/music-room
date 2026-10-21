@@ -6,6 +6,7 @@ import {
 } from '@/hooks/useMusicControl';
 import { setPositionReader } from '@/store/playerStore';
 import { musicControlApi } from '@/services/musicControlApi';
+import { logger } from '@/utils/logger';
 
 const mockSocket = {
 	connected: true,
@@ -83,7 +84,7 @@ const mockGetControllable = musicControlApi.getControllableDevices as jest.Mock;
 beforeEach(() => {
 	jest.clearAllMocks();
 	jest.useFakeTimers();
-	jest.spyOn(console, 'error').mockImplementation(() => undefined);
+	jest.spyOn(logger, 'error').mockImplementation(() => undefined);
 });
 
 afterEach(() => {
@@ -382,7 +383,7 @@ describe('useFriendListening', () => {
 
 		expect(emitted('listening:subscribe')).toHaveLength(0);
 		expect(result.current.canControl).toBe(false);
-		expect(console.error).toHaveBeenCalled();
+		expect(logger.error).toHaveBeenCalled();
 		unmount();
 	});
 

@@ -9,6 +9,7 @@ import { friendsApi, type FriendProfile } from '@/services/friendsApi';
 import { showError, showSuccess } from '@utils/toast';
 import type { UserDeviceWithLicenses } from '@/types/device.types';
 import { MyDevicesScreen } from '@/screens/profile/MyDevicesScreen';
+import { logger } from '@/utils/logger';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -147,8 +148,8 @@ async function pullToRefresh(): Promise<void> {
 }
 
 beforeEach(async () => {
-	jest.spyOn(console, 'warn').mockImplementation(() => undefined);
-	jest.spyOn(console, 'error').mockImplementation(() => undefined);
+	jest.spyOn(logger, 'warn').mockImplementation(() => undefined);
+	jest.spyOn(logger, 'error').mockImplementation(() => undefined);
 	globalThis.fetch = fetchMock as unknown as typeof fetch;
 	fetchMock.mockReset();
 	mockGetDeviceInfo.mockReset();

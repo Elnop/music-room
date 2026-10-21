@@ -18,6 +18,7 @@ import { deviceService } from '@/services/deviceService';
 import { useConnectStore } from '@/store/connectStore';
 import { transferTo } from '@/store/transferPlayback';
 import type { DevicePickerOwner } from '@/types/device.types';
+import { logger } from '@/utils/logger';
 
 interface DevicePickerSheetProps {
 	visible: boolean;
@@ -73,7 +74,7 @@ export function DevicePickerSheet({ visible, onClose }: DevicePickerSheetProps) 
 				if (!cancelled) setLoaded({ owners: picker.owners, phoneId: info.deviceId });
 			})
 			.catch(error => {
-				console.error('[DevicePickerSheet] Loading devices failed:', error);
+				logger.error('[DevicePickerSheet] Loading devices failed:', error);
 				if (!cancelled) setLoadError(true);
 			})
 			.finally(() => {

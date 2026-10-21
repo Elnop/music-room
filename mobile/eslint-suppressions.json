@@ -44,16 +44,6 @@
       "count": 1
     }
   },
-  "src/components/common/ErrorBoundary.test.tsx": {
-    "no-restricted-globals": {
-      "count": 1
-    }
-  },
-  "src/components/common/ErrorBoundary.tsx": {
-    "no-restricted-globals": {
-      "count": 1
-    }
-  },
   "src/components/common/FormError.tsx": {
     "no-restricted-imports": {
       "count": 1
@@ -80,17 +70,11 @@
     }
   },
   "src/components/common/ShareLinkButton.test.tsx": {
-    "no-restricted-globals": {
-      "count": 1
-    },
     "no-restricted-imports": {
       "count": 1
     }
   },
   "src/components/common/ShareLinkButton.tsx": {
-    "no-restricted-globals": {
-      "count": 1
-    },
     "no-restricted-imports": {
       "count": 2
     }
@@ -116,20 +100,7 @@
     }
   },
   "src/components/player/DevicePickerSheet.test.tsx": {
-    "no-restricted-globals": {
-      "count": 1
-    },
     "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/components/player/DevicePickerSheet.tsx": {
-    "no-restricted-globals": {
-      "count": 1
-    }
-  },
-  "src/components/player/MediaSessionBridge.tsx": {
-    "no-restricted-globals": {
       "count": 1
     }
   },
@@ -214,16 +185,8 @@
     }
   },
   "src/components/track/TrackActionsSheet.test.tsx": {
-    "no-restricted-globals": {
-      "count": 1
-    },
     "no-restricted-imports": {
       "count": 1
-    }
-  },
-  "src/components/track/TrackActionsSheet.tsx": {
-    "no-restricted-globals": {
-      "count": 3
     }
   },
   "src/constants/index.ts": {
@@ -237,17 +200,11 @@
     }
   },
   "src/contexts/PlayerContext.tsx": {
-    "no-restricted-globals": {
-      "count": 5
-    },
     "no-restricted-imports": {
       "count": 1
     }
   },
   "src/contexts/ThemeContext.tsx": {
-    "no-restricted-globals": {
-      "count": 2
-    },
     "no-restricted-imports": {
       "count": 4
     }
@@ -272,15 +229,7 @@
       "count": 2
     }
   },
-  "src/hooks/useMusicControl.test.ts": {
-    "no-restricted-globals": {
-      "count": 2
-    }
-  },
   "src/hooks/useMusicControl.ts": {
-    "no-restricted-globals": {
-      "count": 3
-    },
     "no-restricted-imports": {
       "count": 6
     }
@@ -301,17 +250,11 @@
     }
   },
   "src/hooks/useRemoteTarget.test.ts": {
-    "no-restricted-globals": {
-      "count": 1
-    },
     "no-restricted-imports": {
       "count": 1
     }
   },
   "src/hooks/useRemoteTarget.ts": {
-    "no-restricted-globals": {
-      "count": 2
-    },
     "no-restricted-imports": {
       "count": 5
     }
@@ -322,16 +265,8 @@
     }
   },
   "src/navigation/RootNavigator.tsx": {
-    "no-restricted-globals": {
-      "count": 1
-    },
     "no-restricted-imports": {
       "count": 3
-    }
-  },
-  "src/navigation/linking.ts": {
-    "no-restricted-globals": {
-      "count": 1
     }
   },
   "src/screens/auth/EmailVerificationScreen.tsx": {
@@ -345,17 +280,11 @@
     }
   },
   "src/screens/auth/LoginScreen.tsx": {
-    "no-restricted-globals": {
-      "count": 3
-    },
     "no-restricted-imports": {
       "count": 7
     }
   },
   "src/screens/auth/RegisterScreen.tsx": {
-    "no-restricted-globals": {
-      "count": 3
-    },
     "no-restricted-imports": {
       "count": 6
     }
@@ -371,65 +300,41 @@
     }
   },
   "src/screens/friends/FriendsScreen.tsx": {
-    "no-restricted-globals": {
-      "count": 4
-    },
     "no-restricted-imports": {
       "count": 4
     }
   },
   "src/screens/friends/UserProfileScreen.tsx": {
-    "no-restricted-globals": {
-      "count": 2
-    },
     "no-restricted-imports": {
       "count": 2
     }
   },
   "src/screens/playlists/CreatePlaylistScreen.test.tsx": {
-    "no-restricted-globals": {
-      "count": 1
-    },
     "no-restricted-imports": {
       "count": 1
     }
   },
   "src/screens/playlists/CreatePlaylistScreen.tsx": {
-    "no-restricted-globals": {
-      "count": 2
-    },
     "no-restricted-imports": {
       "count": 9
     }
   },
   "src/screens/playlists/PlaylistDetailScreen.test.tsx": {
-    "no-restricted-globals": {
-      "count": 1
-    },
     "no-restricted-imports": {
       "count": 1
     }
   },
   "src/screens/playlists/PlaylistDetailScreen.tsx": {
-    "no-restricted-globals": {
-      "count": 3
-    },
     "no-restricted-imports": {
       "count": 20
     }
   },
   "src/screens/playlists/PlaylistSharingScreen.tsx": {
-    "no-restricted-globals": {
-      "count": 7
-    },
     "no-restricted-imports": {
       "count": 13
     }
   },
   "src/screens/playlists/PlaylistsScreen.tsx": {
-    "no-restricted-globals": {
-      "count": 3
-    },
     "no-restricted-imports": {
       "count": 10
     }
@@ -450,9 +355,6 @@
     }
   },
   "src/screens/profile/LinkedAccountsScreen.test.tsx": {
-    "no-restricted-globals": {
-      "count": 2
-    },
     "no-restricted-imports": {
       "count": 3
     }
@@ -468,9 +370,6 @@
     }
   },
   "src/screens/profile/MyDevicesScreen.test.tsx": {
-    "no-restricted-globals": {
-      "count": 2
-    },
     "no-restricted-imports": {
       "count": 2
     }
@@ -491,9 +390,6 @@
     }
   },
   "src/screens/profile/ProfileScreen.tsx": {
-    "no-restricted-globals": {
-      "count": 1
-    },
     "no-restricted-imports": {
       "count": 5
     }
@@ -514,29 +410,13 @@
     }
   },
   "src/services/backendUrl.test.ts": {
-    "no-restricted-globals": {
-      "count": 1
-    },
     "no-restricted-imports": {
       "count": 1
     }
   },
   "src/services/backendUrl.ts": {
-    "no-restricted-globals": {
-      "count": 3
-    },
     "no-restricted-imports": {
       "count": 1
-    }
-  },
-  "src/services/lastTrackStorage.test.ts": {
-    "no-restricted-globals": {
-      "count": 1
-    }
-  },
-  "src/services/lastTrackStorage.ts": {
-    "no-restricted-globals": {
-      "count": 3
     }
   },
   "src/services/musicControlApi.ts": {
@@ -545,30 +425,16 @@
     }
   },
   "src/services/oauth.test.ts": {
-    "no-restricted-globals": {
-      "count": 1
-    },
     "no-restricted-imports": {
       "count": 1
     }
   },
-  "src/services/oauth.ts": {
-    "no-restricted-globals": {
-      "count": 6
-    }
-  },
   "src/store/authStore.test.ts": {
-    "no-restricted-globals": {
-      "count": 3
-    },
     "no-restricted-imports": {
       "count": 3
     }
   },
   "src/store/authStore.ts": {
-    "no-restricted-globals": {
-      "count": 15
-    },
     "no-restricted-imports": {
       "count": 4
     }
@@ -594,49 +460,31 @@
     }
   },
   "src/store/queueStore.test.ts": {
-    "no-restricted-globals": {
-      "count": 2
-    },
     "no-restricted-imports": {
       "count": 2
     }
   },
   "src/store/queueStore.ts": {
-    "no-restricted-globals": {
-      "count": 4
-    },
     "no-restricted-imports": {
       "count": 5
     }
   },
   "src/store/socketStore.test.ts": {
-    "no-restricted-globals": {
-      "count": 4
-    },
     "no-restricted-imports": {
       "count": 1
     }
   },
   "src/store/socketStore.ts": {
-    "no-restricted-globals": {
-      "count": 7
-    },
     "no-restricted-imports": {
       "count": 1
     }
   },
   "src/store/transferPlayback.test.ts": {
-    "no-restricted-globals": {
-      "count": 1
-    },
     "no-restricted-imports": {
       "count": 3
     }
   },
   "src/store/transferPlayback.ts": {
-    "no-restricted-globals": {
-      "count": 1
-    },
     "no-restricted-imports": {
       "count": 7
     }
@@ -672,9 +520,6 @@
     }
   },
   "src/utils/haptics.test.ts": {
-    "no-restricted-globals": {
-      "count": 1
-    },
     "no-restricted-imports": {
       "count": 1
     }

@@ -4,6 +4,7 @@ import { useAuthStore } from '@store/authStore';
 import { useSocketStore } from '@store/socketStore';
 import { resetBackendUrl } from '@/services/backendUrl';
 import { signInWithFacebook, signInWithGoogle } from '@services/oauth';
+import { logger } from '@/utils/logger';
 
 const mockSupabaseAuth = {
 	signInWithPassword: jest.fn(),
@@ -81,8 +82,8 @@ function calledUrls(): string[] {
 }
 
 beforeEach(async () => {
-	jest.spyOn(console, 'warn').mockImplementation(() => undefined);
-	jest.spyOn(console, 'error').mockImplementation(() => undefined);
+	jest.spyOn(logger, 'warn').mockImplementation(() => undefined);
+	jest.spyOn(logger, 'error').mockImplementation(() => undefined);
 	globalThis.fetch = fetchMock as unknown as typeof fetch;
 	fetchMock.mockReset();
 	jest.mocked(signInWithGoogle).mockReset();
@@ -598,7 +599,7 @@ describe('session persistence', () => {
 		await useAuthStore.getState().loadFromStorage();
 
 		await expectSignedOutAndNothingStored();
-		expect(console.error).toHaveBeenCalledWith(
+		expect(logger.error).toHaveBeenCalledWith(
 			'Failed to load auth state from storage:',
 			expect.anything()
 		);

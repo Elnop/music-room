@@ -6,6 +6,7 @@ import { resetBackendUrl } from '@/services/backendUrl';
 import { signInWithGoogle, signInWithFacebook } from '@services/oauth';
 import { showError, showSuccess } from '@utils/toast';
 import { LinkedAccountsScreen } from '@/screens/profile/LinkedAccountsScreen';
+import { logger } from '@/utils/logger';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -85,8 +86,8 @@ async function renderLoaded(): Promise<void> {
 }
 
 beforeEach(async () => {
-	jest.spyOn(console, 'warn').mockImplementation(() => undefined);
-	jest.spyOn(console, 'error').mockImplementation(() => undefined);
+	jest.spyOn(logger, 'warn').mockImplementation(() => undefined);
+	jest.spyOn(logger, 'error').mockImplementation(() => undefined);
 	globalThis.fetch = fetchMock as unknown as typeof fetch;
 	fetchMock.mockReset();
 	mockedGoogle.mockReset();

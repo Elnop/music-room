@@ -69,6 +69,44 @@ describe('apiRequest backend address', () => {
 		expect(error).toBeInstanceOf(ApiError);
 		expect(error).toMatchObject({ status: 404, code: 'STREAM_NOT_FOUND' });
 	});
+
+	it('reads the details, why and fix of the backend error format', async () => {
+		fetchMock.mockResolvedValue(
+			jsonResponse(429, {
+				success: false,
+				error: {
+					message: 'Too many requests. Please try again later.',
+					code: 'RATE_LIMIT_EXCEEDED',
+					details: { retryAfter: '2026-01-01T00:00:00.000Z' },
+					why: 'Rate limit reached',
+					fix: 'Wait for retryAfter',
+				},
+				meta: { timestamp: '2026-01-01T00:00:00.000Z' },
+			})
+		);
+
+		const error = await apiRequest('/api/auth/login').catch((e: unknown) => e);
+
+		expect(error).toMatchObject({
+			message: 'Too many requests. Please try again later.',
+			code: 'RATE_LIMIT_EXCEEDED',
+			status: 429,
+			details: { retryAfter: '2026-01-01T00:00:00.000Z' },
+			why: 'Rate limit reached',
+			fix: 'Wait for retryAfter',
+		});
+	});
+
+	it('keeps the HTTP status when a 2xx body reports a failure', async () => {
+		fetchMock.mockResolvedValue(
+			jsonResponse(200, { success: false, error: { message: 'Nope', code: 'SOME_CODE' } })
+		);
+
+		const error = await apiRequest('/api/playlists').catch((e: unknown) => e);
+
+		expect(error).toBeInstanceOf(ApiError);
+		expect(error).toMatchObject({ status: 200, code: 'SOME_CODE', message: 'Nope' });
+	});
 });
 
 describe('apiRequest body type (#351)', () => {

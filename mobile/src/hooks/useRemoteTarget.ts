@@ -8,6 +8,7 @@ import { acquireListening, releaseListening } from '@/services/listeningRooms';
 import { showError } from '@utils/toast';
 import type { UserListeningStatus } from '@/types/listening.types';
 import type { ControlRevokedPayload } from '@/types/device.types';
+import { logger } from '@/utils/logger';
 
 /**
  * Follows the device the phone drives in remote mode (#297). Mounted once in
@@ -59,7 +60,7 @@ export function useRemoteTarget() {
 
 		// listening:error names no owner: this hook subscribes to one owner at a time.
 		const handleListeningError = (err: { code: string; message: string }) => {
-			console.error('[RemoteTarget] Listening error:', err);
+			logger.error('[RemoteTarget] Listening error:', err);
 			if (err.code === 'NOT_AUTHORIZED') setLocal('Accès refusé à cet appareil');
 		};
 
@@ -67,7 +68,7 @@ export function useRemoteTarget() {
 		const handleControlError = (err: ControlError) => {
 			if (!useConnectStore.getState().controlPending) return;
 			setControlPending(false);
-			console.error('[RemoteTarget] Control error:', err);
+			logger.error('[RemoteTarget] Control error:', err);
 			showError(controlErrorMessage(err));
 		};
 

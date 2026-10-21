@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { RedisRateLimitStore } from '@/features/auth/utils/redis-rate-limit-store.js';
 import { rateLimitConfig } from '@/shared/config/rate-limit.config.js';
 import { logger } from '@/shared/utils/logger.js';
+import { AppError, sendError } from '@/shared/middleware/error-handler.js';
 import type { AuthenticatedRequest } from '@/shared/types/global.types.js';
 
 // Helper function to get IP address (handles both IPv4 and IPv6)
@@ -11,6 +12,25 @@ const getClientIp = (req: Request): string => {
 	// This properly handles X-Forwarded-For headers
 	return req.ip || req.socket.remoteAddress || 'unknown';
 };
+
+/** 429 RATE_LIMIT_EXCEEDED, with the window's reset time in `details.retryAfter`. */
+function sendRateLimited(req: Request, res: Response, message: string): void {
+	const retryAfter = new Date(req.rateLimit?.resetTime?.getTime() || 0).toISOString();
+	sendError(
+		req,
+		res,
+		new AppError(
+			429,
+			message,
+			'RATE_LIMIT_EXCEEDED',
+			{ retryAfter },
+			{
+				why: `Rate limit of ${req.rateLimit?.limit} requests per window reached`,
+				fix: 'Wait for retryAfter, or raise the RATE_LIMIT_* variables in backend/.env',
+			}
+		)
+	);
+}
 
 /**
  * Base rate limiter configuration
@@ -28,19 +48,7 @@ const baseRateLimitConfig = {
 			userAgent: req.get('user-agent'),
 		});
 
-		res.status(429).json({
-			success: false,
-			error: {
-				message: 'Too many requests. Please try again later.',
-				code: 'RATE_LIMIT_EXCEEDED',
-				retryAfter: new Date(
-					Date.now() + (req.rateLimit?.resetTime?.getTime() || 0) - Date.now()
-				).toISOString(),
-			},
-			meta: {
-				timestamp: new Date().toISOString(),
-			},
-		});
+		sendRateLimited(req, res, 'Too many requests. Please try again later.');
 	},
 	skip: (req: Request) => {
 		// Disabled mode: skip every request, no store is touched
@@ -97,19 +105,7 @@ export const loginRateLimiter = rateLimit({
 			remainingAttempts: 0,
 		});
 
-		res.status(429).json({
-			success: false,
-			error: {
-				message: 'Too many login attempts. Please try again later.',
-				code: 'RATE_LIMIT_EXCEEDED',
-				retryAfter: new Date(
-					Date.now() + (req.rateLimit?.resetTime?.getTime() || 0) - Date.now()
-				).toISOString(),
-			},
-			meta: {
-				timestamp: new Date().toISOString(),
-			},
-		});
+		sendRateLimited(req, res, 'Too many login attempts. Please try again later.');
 	},
 });
 
@@ -133,19 +129,7 @@ export const registerRateLimiter = rateLimit({
 			userAgent: req.get('user-agent'),
 		});
 
-		res.status(429).json({
-			success: false,
-			error: {
-				message: 'Too many registration attempts. Please try again later.',
-				code: 'RATE_LIMIT_EXCEEDED',
-				retryAfter: new Date(
-					Date.now() + (req.rateLimit?.resetTime?.getTime() || 0) - Date.now()
-				).toISOString(),
-			},
-			meta: {
-				timestamp: new Date().toISOString(),
-			},
-		});
+		sendRateLimited(req, res, 'Too many registration attempts. Please try again later.');
 	},
 });
 
@@ -172,19 +156,7 @@ export const oauthRateLimiter = rateLimit({
 			userAgent: req.get('user-agent'),
 		});
 
-		res.status(429).json({
-			success: false,
-			error: {
-				message: `Too many ${provider} login attempts. Please try again later.`,
-				code: 'RATE_LIMIT_EXCEEDED',
-				retryAfter: new Date(
-					Date.now() + (req.rateLimit?.resetTime?.getTime() || 0) - Date.now()
-				).toISOString(),
-			},
-			meta: {
-				timestamp: new Date().toISOString(),
-			},
-		});
+		sendRateLimited(req, res, `Too many ${provider} login attempts. Please try again later.`);
 	},
 });
 
@@ -208,19 +180,7 @@ export const globalAuthRateLimiter = rateLimit({
 			userAgent: req.get('user-agent'),
 		});
 
-		res.status(429).json({
-			success: false,
-			error: {
-				message: 'Too many authentication requests. Please try again later.',
-				code: 'RATE_LIMIT_EXCEEDED',
-				retryAfter: new Date(
-					Date.now() + (req.rateLimit?.resetTime?.getTime() || 0) - Date.now()
-				).toISOString(),
-			},
-			meta: {
-				timestamp: new Date().toISOString(),
-			},
-		});
+		sendRateLimited(req, res, 'Too many authentication requests. Please try again later.');
 	},
 });
 
@@ -244,19 +204,7 @@ export const soundcloudRateLimiter = rateLimit({
 			ip: req.ip,
 		});
 
-		res.status(429).json({
-			success: false,
-			error: {
-				message: 'Too many SoundCloud requests. Please try again later.',
-				code: 'RATE_LIMIT_EXCEEDED',
-				retryAfter: new Date(
-					Date.now() + (req.rateLimit?.resetTime?.getTime() || 0) - Date.now()
-				).toISOString(),
-			},
-			meta: {
-				timestamp: new Date().toISOString(),
-			},
-		});
+		sendRateLimited(req, res, 'Too many SoundCloud requests. Please try again later.');
 	},
 });
 
@@ -280,18 +228,6 @@ export const avatarRateLimiter = rateLimit({
 			ip: req.ip,
 		});
 
-		res.status(429).json({
-			success: false,
-			error: {
-				message: 'Too many profile photo changes. Please try again later.',
-				code: 'RATE_LIMIT_EXCEEDED',
-				retryAfter: new Date(
-					Date.now() + (req.rateLimit?.resetTime?.getTime() || 0) - Date.now()
-				).toISOString(),
-			},
-			meta: {
-				timestamp: new Date().toISOString(),
-			},
-		});
+		sendRateLimited(req, res, 'Too many profile photo changes. Please try again later.');
 	},
 });

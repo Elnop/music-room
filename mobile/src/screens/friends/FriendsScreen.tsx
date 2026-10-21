@@ -21,6 +21,7 @@ import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { SkeletonList, UserRowSkeleton } from '@/components/common/Skeleton';
 import type { UserProfile } from '@/types/user.types';
 import type { FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
+import { logger } from '@/utils/logger';
 
 type NavigationProp = NativeStackNavigationProp<FriendsStackParamList, 'Friends'>;
 
@@ -64,7 +65,7 @@ export function FriendsScreen() {
 					setActiveTab('search');
 				}
 			} catch (err) {
-				console.error('[FriendsScreen] Failed to load friends:', err);
+				logger.error('[FriendsScreen] Failed to load friends:', err);
 			} finally {
 				setIsLoading(false);
 			}
@@ -77,7 +78,7 @@ export function FriendsScreen() {
 			const allowedUserIds = await musicControlApi.getMyPermissions();
 			setControlPermissions(new Set(allowedUserIds));
 		} catch (err) {
-			console.error('[FriendsScreen] Failed to load permissions:', err);
+			logger.error('[FriendsScreen] Failed to load permissions:', err);
 		}
 	}, []);
 
@@ -96,7 +97,7 @@ export function FriendsScreen() {
 				setControlPermissions(prev => new Set(prev).add(friendId));
 			}
 		} catch (err) {
-			console.error('[FriendsScreen] Failed to toggle control:', err);
+			logger.error('[FriendsScreen] Failed to toggle control:', err);
 			showError(apiErrorMessage(err, 'Impossible de modifier les permissions'));
 		} finally {
 			setTogglingUserId(null);
@@ -131,7 +132,7 @@ export function FriendsScreen() {
 				const results = await profileApi.searchUsers(accessToken, query);
 				setSearchResults(results);
 			} catch (error) {
-				console.error('[FriendsScreen] User search failed:', error);
+				logger.error('[FriendsScreen] User search failed:', error);
 				showError(apiErrorMessage(error, 'La recherche a échoué'));
 				if (!isRefresh) {
 					setSearchResults([]);

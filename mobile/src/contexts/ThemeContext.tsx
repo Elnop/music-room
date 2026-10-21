@@ -6,6 +6,7 @@ import { pastelLimeTheme } from '@themes/pastelLime.theme';
 import { originalTheme } from '@themes/original.theme';
 import type { ThemeName, ThemeContextValue } from '@/themes/types';
 import type { Theme } from '@/themes/types';
+import { logger } from '@/utils/logger';
 
 const THEME_STORAGE_KEY = '@zumik/theme_preference';
 
@@ -36,7 +37,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 					setThemeName(savedTheme as ThemeName);
 				}
 			} catch (error) {
-				console.error('Failed to load theme:', error);
+				logger.warn('Failed to load theme:', error);
 			} finally {
 				setIsLoaded(true);
 			}
@@ -50,7 +51,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 			setThemeName(name);
 			await AsyncStorage.setItem(THEME_STORAGE_KEY, name);
 		} catch (error) {
-			console.error('Failed to save theme:', error);
+			logger.warn('Failed to save theme:', error);
 		}
 	};
 

@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { lastTrackStorage, type LastTrackEntry } from '@/services/lastTrackStorage';
+import { logger } from '@/utils/logger';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -22,7 +23,7 @@ const KEY = 'zumik:lastTrack:me';
 
 beforeEach(async () => {
 	await AsyncStorage.clear();
-	jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+	jest.spyOn(logger, 'warn').mockImplementation(() => undefined);
 });
 
 afterEach(() => {

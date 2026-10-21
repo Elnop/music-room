@@ -1,5 +1,6 @@
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { signInWithGoogle } from '@services/oauth';
+import { logger } from '@/utils/logger';
 
 jest.mock('expo-constants', () => ({
 	expoConfig: {
@@ -37,7 +38,7 @@ jest.mock('react-native-fbsdk-next', () => ({
 const signIn = GoogleSignin.signIn as jest.Mock;
 
 beforeEach(() => {
-	jest.spyOn(console, 'error').mockImplementation(() => undefined);
+	jest.spyOn(logger, 'error').mockImplementation(() => undefined);
 	(GoogleSignin.hasPlayServices as jest.Mock).mockResolvedValue(true);
 	signIn.mockReset();
 });

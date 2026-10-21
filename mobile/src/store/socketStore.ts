@@ -3,6 +3,7 @@ import { io, Socket } from 'socket.io-client';
 import { useAuthStore } from '@store/authStore';
 import { deviceService, getAppVersion } from '@/services/deviceService';
 import { getBackendUrl, onBackendUrlChange } from '@/services/backendUrl';
+import { logger } from '@/utils/logger';
 
 /**
  * Handshake refusal codes sent by the server as the `connect_error` message
@@ -42,7 +43,7 @@ async function buildHandshake(): Promise<Record<string, string>> {
 		const device = await deviceService.getDeviceInfo();
 		return { token, ...device, appVersion };
 	} catch (error) {
-		console.error('[Socket] Could not read device info for the handshake:', error);
+		logger.error('[Socket] Could not read device info for the handshake:', error);
 		return { token, deviceId: '', deviceName: '', platform: '', model: '', appVersion };
 	}
 }
@@ -143,11 +144,11 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 					socket.connect();
 					return;
 				}
-				console.error('[Socket] Token refresh failed, staying disconnected');
+				logger.error('[Socket] Token refresh failed, staying disconnected');
 				stop();
 				return;
 			}
-			console.error('[Socket] Handshake refused, staying disconnected:', code);
+			logger.error('[Socket] Handshake refused, staying disconnected:', code);
 			stop();
 		};
 
@@ -172,13 +173,13 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 		});
 
 		socket.on('connect_error', error => {
-			console.error('[Socket] ❌ Connection error:', error.message);
+			logger.error('[Socket] ❌ Connection error:', error.message);
 			if (HANDSHAKE_CODES.includes(error.message)) {
 				void handleRefusal(error.message);
 				return;
 			}
 			const transport = socket.io?.engine?.transport?.name ?? 'unknown';
-			console.error('[Socket] Error details:', {
+			logger.error('[Socket] Error details:', {
 				url: socketUrl,
 				transport,
 			});
@@ -193,11 +194,11 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 		});
 
 		manager.on('reconnect_error', error => {
-			console.error('[Socket] ❌ Reconnect error:', error.message);
+			logger.error('[Socket] ❌ Reconnect error:', error.message);
 		});
 
 		manager.on('reconnect_failed', () => {
-			console.error('[Socket] ❌ Reconnect failed after all attempts');
+			logger.error('[Socket] ❌ Reconnect failed after all attempts');
 			if (get().socket === socket) set({ isConnected: false, status: 'failed' });
 		});
 

@@ -3,6 +3,7 @@ import { Share } from 'react-native';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { ShareLinkButton } from '@/components/common/ShareLinkButton';
 import { showError, showSuccess } from '@utils/toast';
+import { logger } from '@/utils/logger';
 
 jest.mock('@/contexts/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@themes/original.theme');
@@ -45,7 +46,7 @@ describe('ShareLinkButton', () => {
 
 	it('says so when the share sheet fails', async () => {
 		jest.spyOn(Share, 'share').mockRejectedValue(new Error('no activity'));
-		jest.spyOn(console, 'error').mockImplementation(() => {});
+		jest.spyOn(logger, 'error').mockImplementation(() => {});
 		render(<ShareLinkButton url={LINK} />);
 
 		fireEvent.press(screen.getByText('Partager'));

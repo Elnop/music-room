@@ -9,6 +9,7 @@ import { ApiError } from '@/services/api';
 import { showError, showSuccess } from '@utils/toast';
 import type { Playlist } from '@/types/playlist.types';
 import type { UserProfile } from '@/types/user.types';
+import { logger } from '@/utils/logger';
 
 jest.mock('@/lib/supabase', () => ({
 	supabase: { auth: { signOut: jest.fn(), setSession: jest.fn() } },
@@ -78,7 +79,7 @@ const fetchPlaylists = jest.fn();
 
 beforeEach(() => {
 	jest.clearAllMocks();
-	jest.spyOn(console, 'error').mockImplementation(() => undefined);
+	jest.spyOn(logger, 'error').mockImplementation(() => undefined);
 	useAuthStore.setState({ user: { id: 'me' } as UserProfile, isAuthenticated: true });
 	useQueueStore.setState({ playNext, addItem });
 	usePlaylistStore.setState({ playlists, addTrack, fetchPlaylists });

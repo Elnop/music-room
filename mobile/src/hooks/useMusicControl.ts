@@ -10,6 +10,7 @@ import { acquireListening, releaseListening } from '@/services/listeningRooms';
 import { queueTrackToSoundCloud, trackToSoundCloud } from '@utils/trackToSoundCloud';
 import type { DeviceCommand } from '@/types/queue.types';
 import type { ListeningStatus, UserListeningStatus } from '@/types/listening.types';
+import { logger } from '@/utils/logger';
 
 /** control:command received by this device: play / pause, or a queue playback (#294, #295). */
 type ControlCommand = DeviceCommand | { action: 'play'; fromUserId: string };
@@ -194,7 +195,7 @@ export function useFriendListening(targetUserId: string | null) {
 				}
 			})
 			.catch(err => {
-				console.error('[MusicControl] Load controllable devices failed:', err);
+				logger.error('[MusicControl] Load controllable devices failed:', err);
 				if (!cancelled) setControllable({ userId: targetUserId, allDevices: false, ids: [] });
 			});
 
@@ -211,7 +212,7 @@ export function useFriendListening(targetUserId: string | null) {
 		};
 
 		const handleControlError = (err: ControlError) => {
-			console.error('[MusicControl] Control error:', err);
+			logger.error('[MusicControl] Control error:', err);
 			setControlError({ code: err.code, message: err.message });
 			if (err.code === 'NOT_AUTHORIZED') reloadControllable();
 		};
@@ -252,7 +253,7 @@ export function useFriendListening(targetUserId: string | null) {
 		};
 
 		const handleError = (err: { message: string; code: string }) => {
-			console.error('[MusicControl] Error:', err);
+			logger.error('[MusicControl] Error:', err);
 			setError(err.message);
 			setIsLoading(false);
 		};

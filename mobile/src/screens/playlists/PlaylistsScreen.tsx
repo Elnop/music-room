@@ -17,6 +17,7 @@ import { PlaylistCardSkeleton, SkeletonBlock, SkeletonList } from '@components/c
 import { showError } from '@utils/toast';
 import { apiErrorMessage } from '@utils/apiErrorMessage';
 import type { Playlist } from '@/types/playlist.types';
+import { logger } from '@/utils/logger';
 
 type PlaylistStackParamList = {
 	Playlists: undefined;
@@ -110,7 +111,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
 			// Filtrer les amis sans playlists
 			setFriendsPlaylists(friendsPlaylistsData.filter(fp => fp.playlists.length > 0));
 		} catch (error) {
-			console.error('[PlaylistsScreen] Failed to load friends playlists:', error);
+			logger.error('[PlaylistsScreen] Failed to load friends playlists:', error);
 		} finally {
 			setIsFriendsLoading(false);
 		}
@@ -126,7 +127,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
 			const fetchedPlaylists = await playlistApi.fetchPublicPlaylists();
 			setPublicPlaylists(fetchedPlaylists);
 		} catch (error) {
-			console.error('[PlaylistsScreen] Failed to load public playlists:', error);
+			logger.error('[PlaylistsScreen] Failed to load public playlists:', error);
 		} finally {
 			setIsPublicLoading(false);
 		}
@@ -150,7 +151,7 @@ export function PlaylistsScreen({ navigation }: PlaylistsScreenProps) {
 			try {
 				await Promise.all([fetchPlaylists(user.id), loadFriendsPlaylists(), loadPublicPlaylists()]);
 			} catch (error) {
-				console.error('[PlaylistsScreen] Refresh failed:', error);
+				logger.error('[PlaylistsScreen] Refresh failed:', error);
 				showError(apiErrorMessage(error, 'Impossible de rafraîchir les playlists'));
 			} finally {
 				setIsRefreshing(false);

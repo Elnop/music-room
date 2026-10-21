@@ -15,6 +15,7 @@ import {
 } from '@react-navigation/native';
 import type { LinkingOptions, NavigationContainerRef } from '@react-navigation/native';
 import type { AppTabsParamList } from '@/navigation/AppNavigator';
+import { logger } from '@/utils/logger';
 
 const LINK_PREFIX = 'zumik://';
 
@@ -97,7 +98,7 @@ export function openPendingLink(navigation: NavigationContainerRef<AppTabsParamL
 		else navigation.resetRoot(state);
 		return true;
 	} catch (error) {
-		console.warn('[linking] Could not open the pending link:', error);
+		logger.warn('[linking] Could not open the pending link:', error);
 		return false;
 	}
 }

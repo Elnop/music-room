@@ -16,6 +16,7 @@ import { playlistFormSchema, type PlaylistFormInput } from '@utils/validators';
 import type { EditMode } from '@/types/playlist.types';
 import { showError, showSuccess } from '@utils/toast';
 import { apiErrorMessage } from '@utils/apiErrorMessage';
+import { logger } from '@/utils/logger';
 
 // Playlist field limits (the backend allows 100 and 500)
 const PLAYLIST_LIMITS = {
@@ -82,7 +83,7 @@ export function CreatePlaylistScreen({ navigation, route }: CreatePlaylistScreen
 			showSuccess('Playlist modifiée');
 			navigation.goBack();
 		} catch (error) {
-			console.error('[CreatePlaylistScreen] Update playlist failed:', error);
+			logger.error('[CreatePlaylistScreen] Update playlist failed:', error);
 			showError(apiErrorMessage(error, 'Impossible de modifier la playlist'));
 		}
 	};
@@ -110,7 +111,7 @@ export function CreatePlaylistScreen({ navigation, route }: CreatePlaylistScreen
 			// Open the new playlist in place of the form (#342).
 			navigation.replace('PlaylistDetail', { id: created.id });
 		} catch (error) {
-			console.error('[CreatePlaylistScreen] Create playlist failed:', error);
+			logger.error('[CreatePlaylistScreen] Create playlist failed:', error);
 			showError(apiErrorMessage(error, 'Impossible de créer la playlist'));
 		}
 	};

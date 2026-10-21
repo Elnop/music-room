@@ -9,6 +9,7 @@ import { signInWithGoogle, signInWithFacebook } from '@services/oauth';
 import { lastTrackStorage } from '@services/lastTrackStorage';
 import { usePlayerStore } from '@/store/playerStore';
 import { apiErrorMessage } from '@/utils/apiErrorMessage';
+import { logger } from '@/utils/logger';
 
 // AsyncStorage keys
 const STORAGE_KEYS = {
@@ -276,7 +277,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 			try {
 				await authApi.logout(accessToken);
 			} catch (error) {
-				console.warn('Backend logout failed, continuing with local logout', error);
+				logger.warn('Backend logout failed, continuing with local logout', error);
 			}
 		}
 
@@ -316,7 +317,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 			});
 		} catch (error) {
 			if (__DEV__) {
-				console.error('[AuthStore] loginWithGoogle failed:', {
+				logger.error('[AuthStore] loginWithGoogle failed:', {
 					errorType: error?.constructor?.name,
 					isApiError: error instanceof ApiError,
 					errorMessage: error instanceof Error ? error.message : 'Unknown error',
@@ -325,7 +326,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 					fullError: error,
 				});
 			} else {
-				console.error('[AuthStore] loginWithGoogle failed:', {
+				logger.error('[AuthStore] loginWithGoogle failed:', {
 					errorType: error?.constructor?.name,
 					isApiError: error instanceof ApiError,
 					errorMessage: error instanceof Error ? error.message : 'Unknown error',
@@ -390,7 +391,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 			});
 		} catch (error) {
 			if (__DEV__) {
-				console.error('[AuthStore] loginWithFacebook failed:', {
+				logger.error('[AuthStore] loginWithFacebook failed:', {
 					errorType: error?.constructor?.name,
 					isApiError: error instanceof ApiError,
 					errorMessage: error instanceof Error ? error.message : 'Unknown error',
@@ -399,7 +400,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 					fullError: error,
 				});
 			} else {
-				console.error('[AuthStore] loginWithFacebook failed:', {
+				logger.error('[AuthStore] loginWithFacebook failed:', {
 					errorType: error?.constructor?.name,
 					isApiError: error instanceof ApiError,
 					errorMessage: error instanceof Error ? error.message : 'Unknown error',
@@ -465,7 +466,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 				});
 			}
 		} catch (error) {
-			console.error('Failed to load auth state from storage:', error);
+			logger.error('Failed to load auth state from storage:', error);
 			await get().clearStorage();
 		}
 	},
@@ -487,7 +488,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 				]);
 			}
 		} catch (error) {
-			console.error('Failed to save auth state to storage:', error);
+			logger.error('Failed to save auth state to storage:', error);
 		}
 	},
 
@@ -504,7 +505,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 				AsyncStorage.removeItem(STORAGE_KEYS.TOKEN_EXPIRES_AT),
 			]);
 		} catch (error) {
-			console.error('Failed to clear auth storage:', error);
+			logger.error('Failed to clear auth storage:', error);
 		}
 	},
 
@@ -521,7 +522,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 			const response = await authApi.getLinkedProviders(accessToken);
 			set({ linkedProviders: response.providers });
 		} catch (error) {
-			console.error('Failed to fetch linked providers:', error);
+			logger.error('Failed to fetch linked providers:', error);
 			throw error;
 		}
 	},
@@ -599,7 +600,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 						resolve(true);
 					} else if (attempts >= maxAttempts) {
 						clearInterval(checkInterval);
-						console.error('[AuthStore] Refresh timeout - forcing reset');
+						logger.error('[AuthStore] Refresh timeout - forcing reset');
 						set({ isRefreshing: false });
 						resolve(false);
 					}
@@ -609,7 +610,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
 		if (!refreshToken) {
 			// Locally, not through logout(): its backend call would refresh again.
-			console.error('[AuthStore] No refresh token available, ending the session locally');
+			logger.warn('[AuthStore] No refresh token available, ending the session locally');
 			await endSessionLocally();
 			return false;
 		}
@@ -641,7 +642,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
 			return true;
 		} catch (error) {
-			console.error('[AuthStore] Token refresh failed:', {
+			logger.error('[AuthStore] Token refresh failed:', {
 				error,
 				errorMessage: error instanceof Error ? error.message : 'Unknown error',
 				errorType: error?.constructor?.name,
@@ -652,14 +653,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 			// isRefreshing is reset with the cleared session, so waiting callers
 			// never retry with the stale token.
 			if (error instanceof ApiError && error.status === 401) {
-				console.warn('[AuthStore] Refresh token refused, ending the session locally');
+				logger.warn('[AuthStore] Refresh token refused, ending the session locally');
 				await endSessionLocally();
 				return false;
 			}
 
 			set({ isRefreshing: false });
 
-			console.warn('[AuthStore] Keeping the session after a refresh failure; will retry later');
+			logger.warn('[AuthStore] Keeping the session after a refresh failure; will retry later');
 			return false;
 		}
 	},
@@ -697,7 +698,7 @@ async function endSessionLocally(): Promise<void> {
 	try {
 		await supabase.auth.signOut({ scope: 'local' });
 	} catch (error) {
-		console.warn('[AuthStore] Supabase local sign-out failed', error);
+		logger.warn('[AuthStore] Supabase local sign-out failed', error);
 	}
 
 	useAuthStore.setState({

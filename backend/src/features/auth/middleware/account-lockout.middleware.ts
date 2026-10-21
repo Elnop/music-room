@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { bruteForceService } from '@/shared/services/brute-force.service.js';
 import { logger } from '@/shared/utils/logger.js';
+import { AppError, sendError } from '@/shared/middleware/error-handler.js';
 
 /**
  * Account Lockout Middleware
@@ -38,19 +39,20 @@ export async function checkAccountLockout(
 				failedAttempts: lockStatus.failedAttempts,
 			});
 
-			res.status(429).json({
-				success: false,
-				error: {
-					message:
-						'Account temporarily locked due to too many failed login attempts. Please try again later.',
-					code: 'ACCOUNT_LOCKED',
-					lockedUntil: lockStatus.lockedUntil?.toISOString(),
-					remainingTime: lockStatus.remainingSeconds,
-				},
-				meta: {
-					timestamp: new Date().toISOString(),
-				},
-			});
+			sendError(
+				req,
+				res,
+				new AppError(
+					429,
+					'Account temporarily locked due to too many failed login attempts. Please try again later.',
+					'ACCOUNT_LOCKED',
+					{
+						lockedUntil: lockStatus.lockedUntil?.toISOString(),
+						remainingTime: lockStatus.remainingSeconds,
+					},
+					{ why: `${lockStatus.failedAttempts} failed login attempts for this email and IP` }
+				)
+			);
 			return;
 		}
 
@@ -107,16 +109,17 @@ export async function checkIPBlacklist(
 				userAgent: req.get('user-agent'),
 			});
 
-			res.status(403).json({
-				success: false,
-				error: {
-					message: 'Access temporarily restricted due to suspicious activity from this IP address.',
-					code: 'IP_BLOCKED',
-				},
-				meta: {
-					timestamp: new Date().toISOString(),
-				},
-			});
+			sendError(
+				req,
+				res,
+				new AppError(
+					403,
+					'Access temporarily restricted due to suspicious activity from this IP address.',
+					'IP_BLOCKED',
+					undefined,
+					{ why: `IP ${ip} is blacklisted by the brute-force service` }
+				)
+			);
 			return;
 		}
 
