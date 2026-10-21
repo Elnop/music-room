@@ -1,6 +1,7 @@
 import { io } from 'socket.io-client';
 import { DEVICE_RETRY_DELAY_MS, DEVICE_RETRY_MAX, useSocketStore } from '@store/socketStore';
 import { DEFAULT_BACKEND_URL, resetBackendUrl, setBackendUrl } from '@/services/backendUrl';
+import { logger } from '@/utils/logger';
 
 type Handler = (...args: unknown[]) => void;
 
@@ -100,7 +101,7 @@ function readHandshake(): Promise<object> {
 const flush = () => new Promise<void>(resolve => setImmediate(resolve));
 
 beforeEach(async () => {
-	jest.spyOn(console, 'error').mockImplementation(() => undefined);
+	jest.spyOn(logger, 'error').mockImplementation(() => undefined);
 	useSocketStore.setState({ socket: null, isConnected: false, status: 'idle' });
 	await resetBackendUrl();
 	jest.clearAllMocks();
@@ -166,7 +167,7 @@ describe('socketStore connect_error', () => {
 		expect(socket.connect).toHaveBeenCalledTimes(1);
 		expect(socket.disconnect).toHaveBeenCalled();
 		expect(useSocketStore.getState().socket).toBeNull();
-		expect(console.error).toHaveBeenCalledWith(
+		expect(logger.error).toHaveBeenCalledWith(
 			'[Socket] Handshake refused, staying disconnected:',
 			'INVALID_TOKEN'
 		);
@@ -182,7 +183,7 @@ describe('socketStore connect_error', () => {
 			expect(socket.connect).not.toHaveBeenCalled();
 			expect(socket.disconnect).toHaveBeenCalled();
 			expect(useSocketStore.getState().socket).toBeNull();
-			expect(console.error).toHaveBeenCalledWith(
+			expect(logger.error).toHaveBeenCalledWith(
 				'[Socket] Handshake refused, staying disconnected:',
 				code
 			);
@@ -226,7 +227,7 @@ describe('socketStore DEVICE_REGISTRATION_FAILED', () => {
 		expect(socket.connect).toHaveBeenCalledTimes(DEVICE_RETRY_MAX);
 		expect(socket.disconnect).toHaveBeenCalled();
 		expect(useSocketStore.getState().socket).toBeNull();
-		expect(console.error).toHaveBeenCalledWith(
+		expect(logger.error).toHaveBeenCalledWith(
 			'[Socket] Handshake refused, staying disconnected:',
 			'DEVICE_REGISTRATION_FAILED'
 		);

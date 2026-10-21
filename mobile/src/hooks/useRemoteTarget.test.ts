@@ -5,6 +5,7 @@ import { useAuthStore } from '@/store/authStore';
 import { showError, showInfo } from '@utils/toast';
 import type { ListeningStatus, UserListeningStatus } from '@/types/listening.types';
 import type { UserProfile } from '@/types/user.types';
+import { logger } from '@/utils/logger';
 
 const mockSocket = {
 	connected: true,
@@ -68,7 +69,7 @@ const connect = () => useConnectStore.getState();
 
 beforeEach(() => {
 	jest.clearAllMocks();
-	jest.spyOn(console, 'error').mockImplementation(() => undefined);
+	jest.spyOn(logger, 'error').mockImplementation(() => undefined);
 	useAuthStore.setState({ user: { id: 'me' } as UserProfile, isAuthenticated: true });
 	useConnectStore.setState({
 		target: { kind: 'local' },

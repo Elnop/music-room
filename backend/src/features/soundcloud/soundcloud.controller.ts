@@ -7,6 +7,7 @@ import {
 	soundcloudTrackParamsSchema,
 } from '@/features/soundcloud/soundcloud.validators.js';
 import { logger } from '@/shared/utils/logger.js';
+import { AppError } from '@/shared/middleware/error-handler.js';
 
 const soundcloudService = new SoundCloudService();
 
@@ -78,13 +79,8 @@ export class SoundCloudController {
 
 			if (!rawUrl) {
 				logger.warn('[SoundCloud] Missing track URL in request');
-				return res.status(400).json({
-					success: false,
-					error: {
-						message: 'Track URL is required',
-						code: 'MISSING_TRACK_URL',
-					},
-					meta: { timestamp: new Date().toISOString() },
+				throw new AppError(400, 'Track URL is required', 'MISSING_TRACK_URL', undefined, {
+					fix: 'Pass the SoundCloud permalink in the url query parameter',
 				});
 			}
 

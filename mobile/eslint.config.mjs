@@ -156,6 +156,20 @@ export default [
     },
   },
 
+  // The logger is the only code that writes to the console. The ErrorBoundary
+  // test mutes React's own log of the caught error.
+  // See .agents/rules/logging.md#no-console
+  {
+    files: [
+      'src/utils/logger.ts',
+      'src/utils/logger.test.ts',
+      'src/components/common/ErrorBoundary.test.tsx',
+    ],
+    rules: {
+      'no-restricted-globals': 'off',
+    },
+  },
+
   // No index.ts: import the source file.
   {
     files: ['src/**/index.{ts,tsx}'],

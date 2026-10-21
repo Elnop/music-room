@@ -20,6 +20,7 @@ import { Avatar } from '@components/common/Avatar';
 import { SwipeableUserItem } from '@components/common/SwipeableUserItem';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
 import type { UserProfile } from '@/types/user.types';
+import { logger } from '@/utils/logger';
 
 type PlaylistStackParamList = {
 	Playlists: undefined;
@@ -102,7 +103,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 		try {
 			await fetchPlaylistById(playlistId);
 		} catch (error) {
-			console.error('[PlaylistSharing] Failed to fetch playlist:', error);
+			logger.error('[PlaylistSharing] Failed to fetch playlist:', error);
 			showError(apiErrorMessage(error, 'Impossible de charger la playlist'));
 			setIsLoading(false);
 			loadingRef.current = false;
@@ -151,7 +152,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 
 			setMembers(allMembers);
 		} catch (error) {
-			console.error('[PlaylistSharing] Failed to load members:', error);
+			logger.error('[PlaylistSharing] Failed to load members:', error);
 		} finally {
 			setIsLoading(false);
 			loadingRef.current = false;
@@ -188,7 +189,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 				});
 				setSearchResults(filteredResults);
 			} catch (error) {
-				console.error('[PlaylistSharing] Search failed:', error);
+				logger.error('[PlaylistSharing] Search failed:', error);
 				setSearchResults([]);
 			} finally {
 				setIsSearching(false);
@@ -269,7 +270,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 			}
 			showSuccess('Utilisateur retiré');
 		} catch (error) {
-			console.error('[PlaylistSharing] Remove failed:', error);
+			logger.error('[PlaylistSharing] Remove failed:', error);
 			setMembers(originalMembers);
 			showError(apiErrorMessage(error, "Impossible de retirer l'utilisateur"));
 		} finally {
@@ -295,7 +296,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 			await updatePlaylist(playlistId, { visibility: newVisibility });
 			await fetchPlaylistById(playlistId);
 		} catch (error) {
-			console.error('[PlaylistSharing] Failed to update visibility:', error);
+			logger.error('[PlaylistSharing] Failed to update visibility:', error);
 			showError(apiErrorMessage(error, 'Impossible de changer la visibilité'));
 		} finally {
 			setIsUpdatingSettings(false);
@@ -323,7 +324,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 			await updatePlaylist(playlistId, { editMode: newEditMode });
 			await fetchPlaylistById(playlistId);
 		} catch (error) {
-			console.error('[PlaylistSharing] Failed to update edit mode:', error);
+			logger.error('[PlaylistSharing] Failed to update edit mode:', error);
 			showError(apiErrorMessage(error, 'Impossible de changer le mode édition'));
 		} finally {
 			setIsUpdatingSettings(false);
@@ -353,7 +354,7 @@ export function PlaylistSharingScreen({ route }: PlaylistSharingScreenProps) {
 				await playlistApi.addCollaborator(playlistId, userId);
 			}
 		} catch (error) {
-			console.error('[PlaylistSharing] Toggle failed:', error);
+			logger.error('[PlaylistSharing] Toggle failed:', error);
 			setMembers(originalMembers);
 			showError(apiErrorMessage(error, 'Impossible de changer les permissions'));
 		} finally {

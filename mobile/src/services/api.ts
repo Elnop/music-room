@@ -16,6 +16,10 @@ interface ApiResponse<T> {
 		message: string;
 		code: string;
 		details?: unknown;
+		/** Technical reason; sent by the backend in development and test only. */
+		why?: string;
+		/** Hint to fix it; sent by the backend in development and test only. */
+		fix?: string;
 	};
 	meta: {
 		timestamp: string;
@@ -37,21 +41,38 @@ interface AuthResponse {
 	message?: string;
 }
 
+/** Developer context of an API error, sent by the backend in development and test only. */
+interface ApiErrorDebug {
+	why?: string;
+	fix?: string;
+}
+
 /**
- * API Error class
+ * API Error class: the backend error format `{ message, code, details?, why?, fix? }`
+ * plus the HTTP status. `message` is safe to show; `why` and `fix` are for logs.
  */
 export class ApiError extends Error {
 	code: string;
 	details?: unknown;
-	/** HTTP status when the server answered with an error status */
+	/** HTTP status of the response, when there was one */
 	status?: number;
+	why?: string;
+	fix?: string;
 
-	constructor(message: string, code: string, details?: unknown, status?: number) {
+	constructor(
+		message: string,
+		code: string,
+		details?: unknown,
+		status?: number,
+		debug: ApiErrorDebug = {}
+	) {
 		super(message);
 		this.name = 'ApiError';
 		this.code = code;
 		this.details = details;
 		this.status = status;
+		this.why = debug.why;
+		this.fix = debug.fix;
 	}
 }
 
@@ -142,7 +163,7 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
 			const refreshSuccess = await refreshAccessToken();
 
 			if (!refreshSuccess) {
-				throw new ApiError('Session expirée, reconnectez-vous.', 'SESSION_EXPIRED');
+				throw new ApiError('Session expirée, reconnectez-vous.', 'SESSION_EXPIRED', undefined, 401);
 			}
 
 			const newAccessToken = getAccessToken();
@@ -191,12 +212,14 @@ async function handleResponse<T>(response: Response): Promise<T> {
 		let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
 		let errorCode = `HTTP_${response.status}`;
 		let errorDetails: unknown = undefined;
+		let debug: ApiErrorDebug = {};
 
 		try {
 			const errorData = await response.json();
 			errorMessage = errorData.error?.message || errorData.message || errorMessage;
 			errorCode = errorData.error?.code || errorCode;
 			errorDetails = errorData.error?.details;
+			debug = { why: errorData.error?.why, fix: errorData.error?.fix };
 		} catch {
 			try {
 				const errorText = await response.text();
@@ -205,26 +228,28 @@ async function handleResponse<T>(response: Response): Promise<T> {
 				// Ignore text parsing errors
 			}
 		}
-		throw new ApiError(errorMessage, errorCode, errorDetails, response.status);
+		throw new ApiError(errorMessage, errorCode, errorDetails, response.status, debug);
 	}
 
 	let data: ApiResponse<T>;
 	try {
 		data = await response.json();
 	} catch (parseError) {
-		throw new ApiError('Réponse invalide du serveur', 'PARSE_ERROR', parseError);
+		throw new ApiError('Réponse invalide du serveur', 'PARSE_ERROR', parseError, response.status);
 	}
 
 	if (!data.success || data.error) {
 		throw new ApiError(
 			data.error?.message || 'API request failed',
 			data.error?.code || 'UNKNOWN_ERROR',
-			data.error?.details
+			data.error?.details,
+			response.status,
+			{ why: data.error?.why, fix: data.error?.fix }
 		);
 	}
 
 	if (!data.data) {
-		throw new ApiError('Réponse du serveur vide', 'NO_DATA');
+		throw new ApiError('Réponse du serveur vide', 'NO_DATA', undefined, response.status);
 	}
 
 	return data.data;

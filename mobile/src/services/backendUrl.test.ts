@@ -10,6 +10,7 @@ import {
 	resetBackendUrl,
 	setBackendUrl,
 } from '@/services/backendUrl';
+import { logger } from '@/utils/logger';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -19,7 +20,8 @@ const STORAGE_KEY = 'zumik.backendUrl';
 const storage = AsyncStorage as jest.Mocked<typeof AsyncStorage>;
 
 beforeEach(async () => {
-	jest.spyOn(console, 'error').mockImplementation(() => undefined);
+	jest.spyOn(logger, 'warn').mockImplementation(() => undefined);
+	jest.spyOn(logger, 'error').mockImplementation(() => undefined);
 	await resetBackendUrl();
 	await AsyncStorage.clear();
 	jest.clearAllMocks();

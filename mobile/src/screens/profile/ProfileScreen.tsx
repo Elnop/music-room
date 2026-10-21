@@ -23,6 +23,7 @@ import { Avatar } from '@components/common/Avatar';
 import { ProfileSection } from '@components/profile/ProfileSection';
 import { GenreChip } from '@components/profile/GenreChip';
 import { ThemeSelector } from '@components/theme/ThemeSelector';
+import { logger } from '@/utils/logger';
 
 type ProfileStackParamList = {
 	Profile: undefined;
@@ -138,7 +139,7 @@ export function ProfileScreen() {
 		try {
 			await logout();
 		} catch (error) {
-			console.error('[ProfileScreen] Logout failed:', error);
+			logger.error('[ProfileScreen] Logout failed:', error);
 		}
 	};
 

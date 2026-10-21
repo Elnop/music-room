@@ -1,7 +1,8 @@
 import http, { type IncomingHttpHeaders, type OutgoingHttpHeaders } from 'node:http';
 import https from 'node:https';
-import type { Express, RequestHandler, Response } from 'express';
+import type { Express, Request, RequestHandler, Response } from 'express';
 import { logger } from '@/shared/utils/logger.js';
+import { AppError, sendError } from '@/shared/middleware/error-handler.js';
 
 /**
  * Dev-only reverse proxy for `make dev-tunnel` with the local Supabase stack
@@ -48,17 +49,18 @@ function authTarget(url: string): string | null {
 	return `${pathname}${parsed.search}`;
 }
 
-function sendUnreachable(res: Response): void {
-	res.status(502).json({
-		success: false,
-		error: {
-			message: 'Local Supabase stack unreachable',
-			code: 'SUPABASE_UNREACHABLE',
-		},
-		meta: {
-			timestamp: new Date().toISOString(),
-		},
-	});
+// Upstream answers (errors included) are piped through untouched: they carry
+// Supabase's own body, which the app's Supabase client reads. Only the proxy's
+// own failure uses the API error format.
+function sendUnreachable(req: Request, res: Response, error: Error): void {
+	sendError(
+		req,
+		res,
+		new AppError(502, 'Local Supabase stack unreachable', 'SUPABASE_UNREACHABLE', undefined, {
+			why: error.message,
+			fix: 'Start the local stack with make supabase-up',
+		})
+	);
 }
 
 export function createSupabaseAuthProxy(
@@ -111,7 +113,7 @@ export function createSupabaseAuthProxy(
 				error: error.message,
 			});
 			if (res.headersSent) res.destroy();
-			else sendUnreachable(res);
+			else sendUnreachable(req, res, error);
 		});
 
 		// Client gone before the upstream answered: drop the upstream request.

@@ -55,6 +55,19 @@ export default tseslint.config(
     },
   },
   {
+    // The logger is the only code that writes to the console, plus env.ts,
+    // which reports a failed validation before the logger can exist (the
+    // logger imports env). See .agents/rules/logging.md#no-console
+    files: [
+      'src/shared/utils/logger.ts',
+      'src/shared/utils/logger.test.ts',
+      'src/shared/config/env.ts',
+    ],
+    rules: {
+      'no-restricted-globals': 'off',
+    },
+  },
+  {
     // No index.ts: import the source file. See .agents/rules/structure.md
     files: ['src/**/index.ts'],
     rules: {

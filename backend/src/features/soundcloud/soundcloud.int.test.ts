@@ -131,8 +131,12 @@ describe('SoundCloud routes: auth, per-user rate limit, validation', () => {
 			headers: token ? { Authorization: `Bearer ${token}` } : {},
 		});
 
-	async function errorOf(res: globalThis.Response): Promise<{ code: string; retryAfter?: string }> {
-		const body = (await res.json()) as { error: { code: string; retryAfter?: string } };
+	async function errorOf(
+		res: globalThis.Response
+	): Promise<{ code: string; details?: { retryAfter?: string } }> {
+		const body = (await res.json()) as {
+			error: { code: string; details?: { retryAfter?: string } };
+		};
 		return body.error;
 	}
 
@@ -255,7 +259,7 @@ describe('SoundCloud routes: auth, per-user rate limit, validation', () => {
 		expect(blocked.status).toBe(429);
 		const error = await errorOf(blocked);
 		expect(error.code).toBe('RATE_LIMIT_EXCEEDED');
-		expect(new Date(error.retryAfter ?? 0).getTime()).toBeGreaterThan(Date.now());
+		expect(new Date(error.details?.retryAfter ?? 0).getTime()).toBeGreaterThan(Date.now());
 		expect(service.getStreamUrl).not.toHaveBeenCalled();
 
 		const other = await get('/search?q=lofi', bob.token);

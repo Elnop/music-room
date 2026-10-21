@@ -11,6 +11,7 @@ import { apiErrorMessage } from '@/utils/apiErrorMessage';
 import type { StreamUrlResponse } from '@/types/soundcloud.types';
 import { MediaSessionBridge } from '@/components/player/MediaSessionBridge';
 import { useLastTrackPersistence } from '@/hooks/useLastTrackPersistence';
+import { logger } from '@/utils/logger';
 
 // Play in silent mode and in the background. iOS uses `doNotMix` so that it
 // resumes the player after a call (`shouldResume`, #310); Android ducks others.
@@ -20,7 +21,7 @@ setAudioModeAsync({
 	interruptionMode: 'doNotMix',
 	interruptionModeAndroid: 'duckOthers',
 }).catch(err => {
-	console.warn('[PlayerContext] Failed to set audio mode:', err);
+	logger.warn('[PlayerContext] Failed to set audio mode:', err);
 });
 
 // Timeouts - be aggressive!
@@ -374,16 +375,16 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
 				// apiRequest wraps the abort in an ApiError, so read the signal itself
 				if (controller.signal.aborted) {
-					console.error('🔴 [PlayerProvider] Fetch timeout!');
+					logger.error('🔴 [PlayerProvider] Fetch timeout!');
 					setTrackUnavailableError('Chargement trop long, réessayez');
 				} else if (err instanceof ApiError && err.status === 404) {
 					// Track not available
 					setTrackUnavailableError("Ce titre n'est plus disponible");
-				} else if (err instanceof ApiError && err.status !== undefined) {
-					console.error('🔴 [PlayerProvider] Server error details:', err.message);
+				} else if (err instanceof ApiError && err.status !== undefined && err.status >= 400) {
+					logger.error('🔴 [PlayerProvider] Server error details:', err.message);
 					setTrackUnavailableError(apiErrorMessage(err, 'Impossible de charger ce titre'));
 				} else {
-					console.error('🔴 [PlayerProvider] Error:', err instanceof Error ? err.message : err);
+					logger.error('🔴 [PlayerProvider] Error:', err instanceof Error ? err.message : err);
 					setTrackUnavailableError(apiErrorMessage(err, 'Erreur de chargement du titre'));
 				}
 			}
@@ -428,7 +429,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 						// Re-send the listening status with the new position (#295).
 						.then(() => usePlayerStore.getState().markSeek())
 						.catch(err => {
-							console.warn('[PlayerContext] Start position seek failed:', err);
+							logger.warn('[PlayerContext] Start position seek failed:', err);
 						});
 				}
 				// A stream renewed while paused reloads paused (#313).

@@ -23,6 +23,7 @@ import { showError, showSuccess } from '@/utils/toast';
 import type { AddQueueItemBody } from '@/types/queue.types';
 import type { Playlist } from '@/types/playlist.types';
 import type { Track } from '@/types/track.types';
+import { logger } from '@/utils/logger';
 
 interface TrackActionsSheetProps {
 	/** The track to act on (see `toTrackInput`); null hides the sheet. */
@@ -71,7 +72,7 @@ export function TrackActionsSheet({ track, onClose }: TrackActionsSheetProps) {
 		if (!userId) return;
 		setLoadingPlaylists(true);
 		fetchPlaylists(userId)
-			.catch(error => console.error('[TrackActionsSheet] Loading playlists failed:', error))
+			.catch(error => logger.error('[TrackActionsSheet] Loading playlists failed:', error))
 			.finally(() => setLoadingPlaylists(false));
 	};
 
@@ -89,7 +90,7 @@ export function TrackActionsSheet({ track, onClose }: TrackActionsSheetProps) {
 				await addTrack(playlist.id, body as Track);
 				showSuccess(`Ajouté à « ${playlist.name} »`);
 			} catch (error) {
-				console.error('[TrackActionsSheet] Add to playlist failed:', error);
+				logger.error('[TrackActionsSheet] Add to playlist failed:', error);
 				showError(apiErrorMessage(error, "Impossible d'ajouter le titre à la playlist"));
 			}
 		});
@@ -101,7 +102,7 @@ export function TrackActionsSheet({ track, onClose }: TrackActionsSheetProps) {
 			try {
 				await Share.share({ message: body.trackUri, url: body.trackUri, title: body.title });
 			} catch (error) {
-				console.error('[TrackActionsSheet] Share failed:', error);
+				logger.error('[TrackActionsSheet] Share failed:', error);
 				showError('Impossible de partager ce titre');
 			}
 		});

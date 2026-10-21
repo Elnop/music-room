@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react-nativ
 import { CreatePlaylistScreen } from '@/screens/playlists/CreatePlaylistScreen';
 import { ApiError } from '@/services/api';
 import { showError, showSuccess } from '@utils/toast';
+import { logger } from '@/utils/logger';
 
 const mockCreatePlaylist = jest.fn();
 const mockUpdatePlaylist = jest.fn();
@@ -64,7 +65,7 @@ const renderScreen = (params?: { playlistId?: string }) =>
 
 beforeEach(() => {
 	jest.clearAllMocks();
-	jest.spyOn(console, 'error').mockImplementation(() => undefined);
+	jest.spyOn(logger, 'error').mockImplementation(() => undefined);
 });
 
 afterEach(() => {

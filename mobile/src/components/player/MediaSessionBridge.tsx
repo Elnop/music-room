@@ -13,6 +13,7 @@ import {
 import { usePlayer } from '@/contexts/PlayerContext';
 import { useNowPlaying, type NowPlaying } from '@/hooks/useNowPlaying';
 import { largeArtwork } from '@/utils/artwork';
+import { logger } from '@/utils/logger';
 
 /** A position this far from where the system extrapolates it is a jump (seek, restart, renewal). */
 const POSITION_JUMP_MS = 2000;
@@ -20,7 +21,7 @@ const POSITION_JUMP_MS = 2000;
 /** Native calls can fail (session gone, validation); the system controls are best effort. */
 function safely(call: Promise<void>): void {
 	call.catch(err => {
-		if (__DEV__) console.warn('[MediaSessionBridge] Media control call failed:', err);
+		logger.debug('[MediaSessionBridge] Media control call failed:', err);
 	});
 }
 

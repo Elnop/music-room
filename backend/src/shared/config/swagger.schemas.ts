@@ -35,7 +35,7 @@ export const commonSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 					code: { type: 'string' },
 					details: {
 						description:
-							'VALIDATION_ERROR: one entry per invalid field. Other codes: free-form context, when present',
+							'VALIDATION_ERROR: one entry per invalid field. RATE_LIMIT_EXCEEDED: `{ retryAfter }`, when the window ends. ACCOUNT_LOCKED: `{ lockedUntil, remainingTime }` (seconds). Other codes: free-form context, when present',
 						anyOf: [
 							{
 								type: 'array',
@@ -52,23 +52,29 @@ export const commonSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
 									},
 								},
 							},
+							{
+								type: 'object',
+								description: 'RATE_LIMIT_EXCEEDED',
+								properties: { retryAfter: { type: 'string', format: 'date-time' } },
+							},
+							{
+								type: 'object',
+								description: 'ACCOUNT_LOCKED',
+								properties: {
+									lockedUntil: { type: 'string', format: 'date-time' },
+									remainingTime: { type: 'integer', example: 900 },
+								},
+							},
 							{ description: 'Any JSON value (AppError details)' },
 						],
 					},
-					retryAfter: {
+					why: {
 						type: 'string',
-						format: 'date-time',
-						description: 'RATE_LIMIT_EXCEEDED only: when the rate-limit window ends',
+						description: 'Technical reason, for developers. Sent only in development and test',
 					},
-					lockedUntil: {
+					fix: {
 						type: 'string',
-						format: 'date-time',
-						description: 'ACCOUNT_LOCKED only: when the lockout ends',
-					},
-					remainingTime: {
-						type: 'integer',
-						description: 'ACCOUNT_LOCKED only: seconds until the lockout ends',
-						example: 900,
+						description: 'Hint to fix the error, for developers. Sent only in development and test',
 					},
 				},
 			},

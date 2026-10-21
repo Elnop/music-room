@@ -13,6 +13,7 @@ import type { ListeningStatus } from '@/types/listening.types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import type { UserProfile } from '@/types/user.types';
 import { hashStringToNumber } from '@utils/trackToSoundCloud';
+import { logger } from '@/utils/logger';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -128,7 +129,7 @@ const stop = jest.fn();
 
 beforeEach(() => {
 	jest.clearAllMocks();
-	jest.spyOn(console, 'error').mockImplementation(() => undefined);
+	jest.spyOn(logger, 'error').mockImplementation(() => undefined);
 	useAuthStore.setState({ user: { id: 'me' } as UserProfile, isAuthenticated: true });
 	useQueueStore.getState().reset();
 	useConnectStore.setState({

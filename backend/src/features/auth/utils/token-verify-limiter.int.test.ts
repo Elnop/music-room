@@ -175,9 +175,11 @@ describe('token verification limit per IP', () => {
 		// Blocked for every token, valid or not.
 		const valid = await call('/protected', validToken);
 		expect(valid.status).toBe(429);
-		const body = (await valid.json()) as { error: { code: string; retryAfter: string } };
+		const body = (await valid.json()) as {
+			error: { code: string; details: { retryAfter: string } };
+		};
 		expect(body.error.code).toBe('RATE_LIMIT_EXCEEDED');
-		expect(new Date(body.error.retryAfter).getTime()).toBeGreaterThan(Date.now());
+		expect(new Date(body.error.details.retryAfter).getTime()).toBeGreaterThan(Date.now());
 
 		expect(getUser).not.toHaveBeenCalled();
 		// Refusals are not counted.

@@ -1,5 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import { hapticSelection, hapticSuccess, hapticTap } from '@utils/haptics';
+import { logger } from '@/utils/logger';
 
 jest.mock('expo-haptics', () => ({
 	impactAsync: jest.fn(() => Promise.resolve()),
@@ -34,7 +35,7 @@ describe('haptics', () => {
 	});
 
 	it('swallows a rejection from a device without a vibrator', async () => {
-		const error = jest.spyOn(console, 'error').mockImplementation(() => {});
+		const error = jest.spyOn(logger, 'error').mockImplementation(() => {});
 		(Haptics.impactAsync as jest.Mock).mockReturnValueOnce(
 			Promise.reject(new Error('no vibrator'))
 		);

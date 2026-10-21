@@ -83,7 +83,8 @@ describe('authMiddleware', () => {
 
 		expect(res.statusCode).toBe(429);
 		expect(res.body).toMatchObject({ success: false, error: { code: 'RATE_LIMIT_EXCEEDED' } });
-		const { retryAfter } = (res.body as { error: { retryAfter: string } }).error;
+		const { retryAfter } = (res.body as { error: { details: { retryAfter: string } } }).error
+			.details;
 		expect(new Date(retryAfter).getTime()).toBeGreaterThanOrEqual(before + 60_000);
 		expect(next).not.toHaveBeenCalled();
 	});

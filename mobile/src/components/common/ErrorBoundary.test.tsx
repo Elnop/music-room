@@ -2,6 +2,7 @@ import React from 'react';
 import { Text } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
+import { logger } from '@/utils/logger';
 
 let shouldThrow = false;
 
@@ -30,7 +31,9 @@ describe('ErrorBoundary', () => {
 	});
 
 	it('shows the fallback with the message and recovers on Try Again', () => {
-		jest.spyOn(console, 'error').mockImplementation(() => undefined);
+		jest.spyOn(logger, 'error').mockImplementation(() => undefined);
+		// Mutes React's own log of the caught error, not app logging.
+		const reactLog = jest.spyOn(console, 'error').mockImplementation(() => {});
 		shouldThrow = true;
 
 		render(
@@ -48,5 +51,6 @@ describe('ErrorBoundary', () => {
 
 		expect(screen.getByText('Child content')).toBeTruthy();
 		expect(screen.queryByText("Une erreur s'est produite")).toBeNull();
+		reactLog.mockRestore();
 	});
 });

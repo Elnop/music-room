@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_CONFIG } from '@constants';
+import { logger } from '@/utils/logger';
 
 /**
  * Runtime backend address (story 6.3). Defaults to the build-time
@@ -64,7 +65,7 @@ export async function loadBackendUrl(): Promise<string> {
 		const url = stored ? normalize(stored) : null;
 		update(url ?? DEFAULT_BACKEND_URL);
 	} catch (error) {
-		console.error('[BackendUrl] Could not read the stored address, using the default:', error);
+		logger.warn('[BackendUrl] Could not read the stored address, using the default:', error);
 		update(DEFAULT_BACKEND_URL);
 	}
 	return currentUrl;
@@ -81,7 +82,7 @@ export async function setBackendUrl(input: string): Promise<{ url: string } | { 
 	try {
 		await AsyncStorage.setItem(STORAGE_KEY, url);
 	} catch (error) {
-		console.error('[BackendUrl] Could not persist the address:', error);
+		logger.error('[BackendUrl] Could not persist the address:', error);
 	}
 	update(url);
 	return { url };
@@ -92,7 +93,7 @@ export async function resetBackendUrl(): Promise<string> {
 	try {
 		await AsyncStorage.removeItem(STORAGE_KEY);
 	} catch (error) {
-		console.error('[BackendUrl] Could not clear the stored address:', error);
+		logger.error('[BackendUrl] Could not clear the stored address:', error);
 	}
 	update(DEFAULT_BACKEND_URL);
 	return currentUrl;

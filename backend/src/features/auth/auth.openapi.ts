@@ -149,7 +149,7 @@ export const authPaths: OpenAPIV3.PathsObject = {
 										error: {
 											message: 'Too many login attempts. Please try again later.',
 											code: 'RATE_LIMIT_EXCEEDED',
-											retryAfter: '2025-01-15T11:00:00.000Z',
+											details: { retryAfter: '2025-01-15T11:00:00.000Z' },
 										},
 										meta: { timestamp: '2025-01-15T10:45:00.000Z' },
 									},
@@ -162,8 +162,7 @@ export const authPaths: OpenAPIV3.PathsObject = {
 											message:
 												'Account temporarily locked due to too many failed login attempts. Please try again later.',
 											code: 'ACCOUNT_LOCKED',
-											lockedUntil: '2025-01-15T11:00:00.000Z',
-											remainingTime: 900,
+											details: { lockedUntil: '2025-01-15T11:00:00.000Z', remainingTime: 900 },
 										},
 										meta: { timestamp: '2025-01-15T10:45:00.000Z' },
 									},

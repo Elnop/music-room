@@ -101,6 +101,7 @@ const parseEnv = (): Env => {
 	const result = envSchema.safeParse(process.env);
 
 	if (!result.success) {
+		// The logger reads env, so it cannot exist yet: console is allowed here.
 		console.error('Invalid environment variables:');
 		console.error(result.error.format());
 		process.exit(1);

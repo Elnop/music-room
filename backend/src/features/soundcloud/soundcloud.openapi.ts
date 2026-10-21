@@ -9,7 +9,7 @@ const protectedResponses: OpenAPIV3.ResponsesObject = {
 	'401': { $ref: '#/components/responses/UnauthorizedError' },
 	'429': {
 		description:
-			'RATE_LIMIT_EXCEEDED: too many SoundCloud requests from this user in the window (default 120 per minute), or, before authentication, too many failed token verifications from this IP (#160); `error.retryAfter` gives the end of the window',
+			'RATE_LIMIT_EXCEEDED: too many SoundCloud requests from this user in the window (default 120 per minute), or, before authentication, too many failed token verifications from this IP (#160); `error.details.retryAfter` gives the end of the window',
 		content: {
 			'application/json': {
 				schema: { $ref: '#/components/schemas/ErrorResponse' },
@@ -18,7 +18,7 @@ const protectedResponses: OpenAPIV3.ResponsesObject = {
 					error: {
 						message: 'Too many SoundCloud requests. Please try again later.',
 						code: 'RATE_LIMIT_EXCEEDED',
-						retryAfter: '2025-01-15T10:31:00.000Z',
+						details: { retryAfter: '2025-01-15T10:31:00.000Z' },
 					},
 					meta: { timestamp: '2025-01-15T10:30:00.000Z' },
 				},

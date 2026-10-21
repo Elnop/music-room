@@ -316,17 +316,11 @@ export class AuthController {
 
 			// Validate provider
 			if (!['google', 'facebook'].includes(provider)) {
-				const response: ApiResponse = {
-					success: false,
-					error: {
-						code: 'INVALID_PROVIDER',
-						message: "Invalid provider. Must be 'google' or 'facebook'",
-					},
-					meta: {
-						timestamp: new Date().toISOString(),
-					},
-				};
-				return res.status(400).json(response);
+				throw new AppError(
+					400,
+					"Invalid provider. Must be 'google' or 'facebook'",
+					'INVALID_PROVIDER'
+				);
 			}
 
 			await authService.unlinkProvider(authReq.user.id, provider);

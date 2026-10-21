@@ -21,6 +21,7 @@ import { FormError } from '@components/common/FormError';
 import { registerSchema, RegisterInput } from '@utils/validators';
 import { useAuthStore } from '@/store/authStore';
 import { showError } from '@utils/toast';
+import { logger } from '@/utils/logger';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Logo = require('@/assets/logo/logo.png');
@@ -77,7 +78,7 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
 				});
 			}
 		} catch (error) {
-			console.error('[RegisterScreen] Register error:', error);
+			logger.error('[RegisterScreen] Register error:', error);
 		}
 	};
 
@@ -85,7 +86,7 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
 		try {
 			await loginWithGoogle();
 		} catch (error) {
-			console.error('[RegisterScreen] Google login error:', error);
+			logger.error('[RegisterScreen] Google login error:', error);
 		}
 	};
 
@@ -93,7 +94,7 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
 		try {
 			await loginWithFacebook();
 		} catch (error) {
-			console.error('[RegisterScreen] Facebook login error:', error);
+			logger.error('[RegisterScreen] Facebook login error:', error);
 		}
 	};
 

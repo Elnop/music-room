@@ -4,6 +4,7 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-
 import { PlaylistDetailScreen } from '@/screens/playlists/PlaylistDetailScreen';
 import { ApiError } from '@/services/api';
 import { showError, showInfo, showSuccess } from '@utils/toast';
+import { logger } from '@/utils/logger';
 
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
 
@@ -388,7 +389,7 @@ describe('PlaylistDetailScreen owner actions (#342)', () => {
 	});
 
 	it('stays on the playlist with a toast when the deletion fails', async () => {
-		jest.spyOn(console, 'error').mockImplementation(() => undefined);
+		jest.spyOn(logger, 'error').mockImplementation(() => undefined);
 		mockDeletePlaylist.mockRejectedValue(new ApiError('Boom', 'INTERNAL', undefined, 500));
 		const view = renderScreen();
 		pressAction(view, 'Supprimer');

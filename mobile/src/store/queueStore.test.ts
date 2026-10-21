@@ -18,6 +18,7 @@ import { showError, showInfo, showSuccess } from '@utils/toast';
 import { hapticSuccess } from '@utils/haptics';
 import type { QueueItem, QueueState, QueueStepResult } from '@/types/queue.types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
+import { logger } from '@/utils/logger';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -110,7 +111,7 @@ const player = () => usePlayerStore.getState();
 
 beforeEach(() => {
 	jest.resetAllMocks();
-	jest.spyOn(console, 'error').mockImplementation(() => undefined);
+	jest.spyOn(logger, 'error').mockImplementation(() => undefined);
 	usePlayerStore.setState(initialPlayer, true);
 	useAuthStore.setState({ user: { id: 'owner' } as UserProfile });
 	useConnectStore.setState({ target: { kind: 'local' }, remoteStatus: null });
@@ -135,7 +136,7 @@ describe('queueStore load and events', () => {
 		api.getQueue.mockRejectedValue(new ApiError('down', 'NETWORK_ERROR'));
 		await store().load();
 		expect(mine().currentItemId).toBe('b');
-		expect(console.error).toHaveBeenCalled();
+		expect(logger.error).toHaveBeenCalled();
 	});
 
 	it('replaces the store with a queue:updated payload without touching audio', () => {

@@ -11,6 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@themes/types';
 import { showError } from '@utils/toast';
+import { logger } from '@/utils/logger';
 
 interface ShareLinkButtonProps {
 	/** The zumik:// link to share. */
@@ -33,7 +34,7 @@ export function ShareLinkButton({ url, title, style }: ShareLinkButtonProps) {
 		try {
 			await Share.share({ message: title ? `${title}\n${url}` : url, title });
 		} catch (error) {
-			console.error('[ShareLinkButton] Share failed:', error);
+			logger.error('[ShareLinkButton] Share failed:', error);
 			showError('Impossible de partager ce lien');
 		}
 	};
