@@ -7,7 +7,7 @@
 //
 // Usage: node ../tools/guardrails/docker-scan.mjs <semgrep|secrets> <backend|mobile>
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -63,13 +63,17 @@ let status = 1;
 try {
   const files = spawnSync('git', ['ls-files', '-z', '-co', '--exclude-standard', project], {
     cwd: root,
-    encoding: 'buffer',
-    maxBuffer: 64 * 1024 * 1024,
+        maxBuffer: 64 * 1024 * 1024,
   });
   if (files.status !== 0) throw new Error(files.stderr.toString());
+  // ls-files still lists tracked files deleted from disk; tar would fail on them.
+  const present = files.stdout
+    .toString()
+    .split('\0')
+    .filter((path) => path !== '' && existsSync(join(root, path)));
   const pack = spawnSync('tar', ['--null', '-T', '-', '-cf', '-'], {
     cwd: root,
-    input: files.stdout,
+    input: present.map((path) => `${path}\0`).join(''),
     maxBuffer: 1024 * 1024 * 1024,
   });
   const unpack = spawnSync('tar', ['-xf', '-', '-C', scanDir], {

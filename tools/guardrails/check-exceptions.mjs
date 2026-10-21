@@ -4,10 +4,12 @@
 // their entries, and nothing may add one. See
 // .agents/rules/guardrails.md#exception-lists.
 //
-// Each list is compared, per rule, with the same file at the fork point from
-// develop (merge-base of HEAD and $GUARDRAILS_BASE, default origin/develop)
-// and with HEAD, so both a branch and uncommitted changes are caught. A file
-// that does not exist in a reference yet is not compared with it.
+// Each list is compared with the same file at the fork point from develop
+// (merge-base of HEAD and $GUARDRAILS_BASE, default origin/develop) and with
+// HEAD, so both a branch and uncommitted changes are caught. A file that does
+// not exist in a reference yet is not compared with it. Inline escapes
+// (eslint-disable, nosemgrep, ast-grep-ignore, jscpd:ignore-start) may not
+// grow in any file under <project>/src/; a new file starts at 0.
 //
 // Usage: node tools/guardrails/check-exceptions.mjs [backend] [mobile]
 import { execFileSync } from 'node:child_process';
@@ -26,9 +28,11 @@ for (const project of projects) {
   }
 }
 
-// --- counters: file content -> { "<rule> <metric>": number } ---------------
+// --- readers: file content -> { counts?: { key: number }, entries?: Set } ---
+// `counts` may not grow per key. Every string of `entries` must already exist
+// in the reference, so an entry can be neither added nor widened.
 
-function countEslint(text) {
+function readEslint(text) {
   const counts = {};
   for (const rules of Object.values(JSON.parse(text))) {
     for (const [rule, { count }] of Object.entries(rules)) {
@@ -36,25 +40,28 @@ function countEslint(text) {
       counts[`${rule} (occurrences)`] = (counts[`${rule} (occurrences)`] ?? 0) + count;
     }
   }
-  return counts;
+  return { counts };
 }
 
-function countDepcruise(text) {
+function readDepcruise(text) {
   const counts = {};
   for (const violation of JSON.parse(text)) {
     const rule = violation.rule?.name ?? 'unknown';
     counts[rule] = (counts[rule] ?? 0) + 1;
   }
-  return counts;
+  return { counts };
 }
 
-function countJscpd(text) {
-  return { 'ignore globs': (JSON.parse(text).ignore ?? []).length };
+function readJscpd(text) {
+  return { entries: new Set((JSON.parse(text).ignore ?? []).map((glob) => `ignore ${glob}`)) };
 }
 
-// Counts the `exclude:` entries of each rule in tools/semgrep/rules.yml.
-function countSemgrep(text) {
-  const counts = {};
+const unquote = (value) => value.trim().replace(/^(['"])(.*)\1$/, '$2');
+
+// The `exclude` paths of each rule in tools/semgrep/rules.yml, block style
+// (`- path`) or flow style (`exclude: [a, b]`).
+function readSemgrep(text) {
+  const entries = new Set();
   let rule = null;
   let excludeIndent = -1;
   for (const line of text.split('\n')) {
@@ -68,35 +75,55 @@ function countSemgrep(text) {
       continue;
     }
     if (excludeIndent >= 0 && indent > excludeIndent && /^\s*- /.test(content)) {
-      counts[`${rule} excludes`] = (counts[`${rule} excludes`] ?? 0) + 1;
+      entries.add(`${rule} exclude ${unquote(content.replace(/^\s*- /, ''))}`);
+      continue;
+    }
+    const flow = content.match(/^\s*exclude:\s*\[(.*)\]\s*$/);
+    if (flow) {
+      for (const path of flow[1].split(',').filter((p) => p.trim() !== '')) {
+        entries.add(`${rule} exclude ${unquote(path)}`);
+      }
+      excludeIndent = -1;
       continue;
     }
     excludeIndent = /^\s*exclude:\s*$/.test(content) ? indent : -1;
   }
-  return counts;
+  return { entries };
 }
 
-// Counts the allowlists of .gitleaks.toml and the values they hold.
-function countGitleaks(text) {
+// Every string value of the allowlist and [extend] sections of .gitleaks.toml
+// (paths, regexes, stopwords, disabledRules, descriptions...), in any TOML
+// string syntax.
+function readGitleaks(text) {
+  const entries = new Set();
   const code = text
     .split('\n')
     .filter((line) => !/^\s*#/.test(line))
     .join('\n');
-  return {
-    allowlists: (code.match(/^\s*\[\[allowlists\]\]/gm) ?? []).length,
-    'allowlist values': (code.match(/'''[\s\S]*?'''/g) ?? []).length,
-  };
+  const headers = [...code.matchAll(/^\s*\[\[?\s*([^\]]+?)\s*\]\]?\s*$/gm)];
+  headers.forEach((header, i) => {
+    const section = header[1];
+    if (!/allowlist|extend/i.test(section)) return;
+    const body = code.slice(header.index + header[0].length, headers[i + 1]?.index ?? code.length);
+    const strings =
+      body.match(/'''[\s\S]*?'''|"""[\s\S]*?"""|"(?:[^"\\\n]|\\.)*"|'[^'\n]*'/g) ?? [];
+    for (const value of strings) entries.add(`[${section}] ${value}`);
+  });
+  return { entries };
 }
 
 const lists = [
   ...projects.flatMap((project) => [
-    { path: `${project}/eslint-suppressions.json`, count: countEslint },
-    { path: `${project}/.dependency-cruiser-known-violations.json`, count: countDepcruise },
-    { path: `${project}/.jscpd.json`, count: countJscpd },
+    { path: `${project}/eslint-suppressions.json`, read: readEslint },
+    { path: `${project}/.dependency-cruiser-known-violations.json`, read: readDepcruise },
+    { path: `${project}/.jscpd.json`, read: readJscpd },
   ]),
-  { path: 'tools/semgrep/rules.yml', count: countSemgrep },
-  { path: '.gitleaks.toml', count: countGitleaks },
+  { path: 'tools/semgrep/rules.yml', read: readSemgrep },
+  { path: '.gitleaks.toml', read: readGitleaks },
 ];
+
+// Inline escapes that bypass the lists, counted per file under <project>/src/.
+const DIRECTIVES = 'eslint-disable|nosemgrep|ast-grep-ignore|jscpd:ignore-start';
 
 // --- references --------------------------------------------------------------
 
@@ -139,7 +166,7 @@ for (const list of lists) {
   }
   let current;
   try {
-    current = list.count(readFileSync(file, 'utf8'));
+    current = list.read(readFileSync(file, 'utf8'));
   } catch (error) {
     growths.push(`${list.path}: cannot be read (${error.message})`);
     continue;
@@ -149,14 +176,49 @@ for (const list of lists) {
     if (before === null) continue;
     let previous;
     try {
-      previous = list.count(before);
+      previous = list.read(before);
     } catch {
       continue;
     }
-    for (const [key, value] of Object.entries(current)) {
-      const was = previous[key] ?? 0;
+    for (const [key, value] of Object.entries(current.counts ?? {})) {
+      const was = previous.counts?.[key] ?? 0;
       if (value > was) {
         growths.push(`${list.path}: ${key} grew from ${was} to ${value} (vs ${reference.label})`);
+      }
+    }
+    for (const entry of current.entries ?? []) {
+      if (!previous.entries?.has(entry)) {
+        growths.push(`${list.path}: new or changed entry ${entry} (vs ${reference.label})`);
+      }
+    }
+  }
+}
+
+// `git grep -c` prints `[<rev>:]<path>:<count>` for each matching file.
+// Without a revision, it reads the working tree, untracked files included.
+function countDirectives(project, rev) {
+  const target = rev ? [rev] : [];
+  const options = rev ? [] : ['--untracked'];
+  const output =
+    git('grep', '-c', ...options, '-E', DIRECTIVES, ...target, '--', `${project}/src`) ?? '';
+  const counts = {};
+  for (const line of output.split('\n')) {
+    const match = line.match(/^(?:[0-9a-f]{40}:)?(.+):(\d+)$/);
+    if (match) counts[match[1]] = Number(match[2]);
+  }
+  return counts;
+}
+
+for (const project of projects) {
+  const current = countDirectives(project);
+  for (const reference of references) {
+    const previous = countDirectives(project, reference.rev);
+    for (const [path, count] of Object.entries(current)) {
+      const was = previous[path] ?? 0;
+      if (count > was) {
+        growths.push(
+          `${path}: inline escapes (${DIRECTIVES.replaceAll('|', ', ')}) grew from ${was} to ${count} (vs ${reference.label})`
+        );
       }
     }
   }
@@ -170,4 +232,6 @@ if (growths.length > 0) {
   );
   process.exit(1);
 }
-console.log(`exception lists did not grow (${lists.length} files, vs ${references.map((r) => r.label).join(' and ') || 'nothing'})`);
+console.log(
+  `exception lists did not grow (${lists.length} files and inline escapes, vs ${references.map((r) => r.label).join(' and ') || 'nothing'})`
+);

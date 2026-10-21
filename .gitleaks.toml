@@ -1,4 +1,4 @@
-# gitleaks configuration, used by `npm run check` (tools/guardrails/secrets.mjs)
+# gitleaks configuration, used by `npm run check` (tools/guardrails/docker-scan.mjs)
 # through the pinned gitleaks Docker image. It extends the default rules.
 # Allowlists are append-only exceptions: add one only for a value that is
 # public by design, with a comment saying why. See

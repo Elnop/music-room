@@ -4,7 +4,7 @@ Read before changing a guardrail, an exception list, or when `npm run check` fai
 
 ## what-check-runs
 
-`npm run check` in `backend/` or `mobile/` runs every check in parallel (`tools/guardrails/run-checks.mjs`) and prints `<check> OK`, or `FAILED` with the first 20 lines of the failure. Run one check alone with `npm run check:<name>` (`type-check` and `test` are the usual scripts).
+`npm run check` in `backend/` or `mobile/` runs every check in parallel (`tools/guardrails/run-checks.mjs`) and prints `<check> OK`, or `FAILED` with the last 30 lines of the failure. Run one check alone with `npm run check:<name>` (`type-check` and `test` are the usual scripts).
 
 | Check | Tool | Config | What fails |
 | --- | --- | --- | --- |
@@ -39,7 +39,11 @@ An exception list only shrinks. `check:exceptions` counts the entries of each li
 - dependency-cruiser: `npx depcruise <targets of check:deps> --config .dependency-cruiser.cjs --output-type baseline --output-to .dependency-cruiser-known-violations.json`.
 - jscpd, semgrep, gitleaks: delete the entries by hand.
 
-Never add an entry to make new code pass: fix the code. A jscpd `ignore` entry hides the whole file, so code copied from an ignored file is not caught; that gap closes as the list empties. Every list must be empty (permanent entries aside) at the end of epic #362.
+For jscpd `ignore`, semgrep `exclude` and every string of the `.gitleaks.toml` allowlist and `[extend]` sections, the comparison is by value: every entry must already exist on `develop`, so an entry can be neither added nor widened (such as `**/src/store/authStore.ts` turned into `**/src/**`).
+
+Inline escapes count too: `check:exceptions` counts `eslint-disable`, `nosemgrep`, `ast-grep-ignore` and `jscpd:ignore-start` per file under the project's `src/`, and fails when a file has more than on `develop` (a new file starts at 0).
+
+Never add an entry or an inline escape to make new code pass: fix the code. A jscpd `ignore` entry hides the whole file, so code copied from an ignored file is not caught; that gap closes as the list empties. Every list must be empty (permanent entries aside) at the end of epic #362.
 
 ## pre-commit
 

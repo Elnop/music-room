@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Runs the given npm scripts of the current project in parallel and prints
-// `<check> OK`, or `<check> FAILED` followed by the first lines of its output.
+// `<check> OK`, or `<check> FAILED` followed by the last lines of its output
+// (where test runners and linters put the cause and the summary).
 // Exits non-zero when any check fails. Used by `npm run check` in backend/ and
 // mobile/; see .agents/rules/guardrails.md.
 //
@@ -8,7 +9,7 @@
 // A script named `check:<name>` is reported as `<name>`.
 import { spawn } from 'node:child_process';
 
-const MAX_LINES = 20;
+const MAX_LINES = 30;
 const scripts = process.argv.slice(2);
 
 if (scripts.length === 0) {
@@ -52,9 +53,9 @@ const results = await Promise.all(
         .replace(ANSI, '')
         .split('\n')
         .filter((line) => line.trim() !== '');
-      const shown = lines.slice(0, MAX_LINES).map((line) => `    ${line}`);
+      const shown = lines.slice(-MAX_LINES).map((line) => `    ${line}`);
       if (lines.length > MAX_LINES) {
-        shown.push(`    ... ${lines.length - MAX_LINES} more lines: run \`npm run ${script}\``);
+        shown.unshift(`    ... ${lines.length - MAX_LINES} earlier lines: run \`npm run ${script}\``);
       }
       shown.push(`    See ${DOCS} (${name(script)})`);
       console.log(`${label}  FAILED  (${result.seconds}s)\n${shown.join('\n')}`);

@@ -1,5 +1,5 @@
 # Pattern rules shared by backend/ and mobile/, run by `npm run check` through
-# the pinned semgrep Docker image (tools/guardrails/semgrep.sh). Paths are
+# the pinned semgrep Docker image (tools/guardrails/docker-scan.mjs). Paths are
 # relative to the repository root. Each message points to the rule's section
 # in .agents/rules/guardrails.md. Rules are append-only: never weaken one, and
 # only remove entries from an `exclude` list.
