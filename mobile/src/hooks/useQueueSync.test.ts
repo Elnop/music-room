@@ -51,7 +51,6 @@ function setup() {
 beforeEach(() => {
 	jest.clearAllMocks();
 	mockTarget = { kind: 'local' };
-	jest.spyOn(console, 'log').mockImplementation(() => undefined);
 });
 
 afterEach(() => {

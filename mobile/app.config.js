@@ -68,7 +68,6 @@ module.exports = {
 			favicon: './assets/favicon.png',
 		},
 		plugins: [
-			'expo-secure-store',
 			[
 				'expo-build-properties',
 				{

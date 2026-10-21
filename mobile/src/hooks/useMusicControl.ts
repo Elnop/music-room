@@ -42,8 +42,6 @@ export function useMusicControlEmitter() {
 	useEffect(() => {
 		deviceService.getDeviceInfo().then(info => {
 			setDeviceInfo(info);
-			if (__DEV__)
-				console.log('[MusicControl] Device info loaded:', info.deviceName, info.deviceId);
 		});
 	}, []);
 
@@ -67,14 +65,6 @@ export function useMusicControlEmitter() {
 			};
 
 			socket.emit('listening:update', status);
-			if (__DEV__)
-				console.log(
-					'[MusicControl] Emitted listening status:',
-					status.track?.title,
-					status.isPlaying,
-					'from',
-					deviceInfo.deviceName
-				);
 		};
 
 		const timer = setTimeout(emitStatus, 200);
@@ -86,8 +76,6 @@ export function useMusicControlEmitter() {
 		if (!socket || !isConnected) return;
 
 		const handleControlCommand = (data: ControlCommand) => {
-			if (__DEV__) console.log('[MusicControl] Received control command:', data);
-
 			switch (data.action) {
 				case 'play':
 					resume();
@@ -219,7 +207,6 @@ export function useFriendListening(targetUserId: string | null) {
 		if (!socket || !isConnected || !targetUserId) return;
 
 		const handlePermissionChanged = (data: PermissionChangedEvent) => {
-			if (__DEV__) console.log('[MusicControl] Permission changed:', data);
 			if (data.ownerId === targetUserId) reloadControllable();
 		};
 
@@ -255,12 +242,9 @@ export function useFriendListening(targetUserId: string | null) {
 			// Shared with the remote target (useRemoteTarget): counted, not emitted directly.
 			acquireListening(socket, targetUserId);
 			subscribed = true;
-			if (__DEV__) console.log('[MusicControl] Subscribed to listening status of:', targetUserId);
 		}, 200);
 
 		const handleStatus = (status: UserListeningStatus) => {
-			if (__DEV__)
-				console.log('[MusicControl] Received listening status:', status.devices.length, 'devices');
 			if (status.ownerId === targetUserId) {
 				setStatuses(status.devices);
 				setIsLoading(false);
@@ -282,7 +266,6 @@ export function useFriendListening(targetUserId: string | null) {
 			socket.off('listening:error', handleError);
 			if (subscribed) {
 				releaseListening(socket, targetUserId);
-				if (__DEV__) console.log('[MusicControl] Unsubscribed from:', targetUserId);
 			}
 		};
 	}, [socket, isConnected, targetUserId, canControl]);
@@ -300,12 +283,10 @@ export function useFriendListening(targetUserId: string | null) {
 		(targetDeviceId: string, action: 'play' | 'pause') => {
 			if (!socket || !isConnected || !targetUserId) return;
 			if (!isControllable(targetDeviceId)) {
-				if (__DEV__) console.log('[MusicControl] Device not controllable:', targetDeviceId);
 				return;
 			}
 
 			socket.emit('control:action', { targetUserId, targetDeviceId, action });
-			if (__DEV__) console.log(`[MusicControl] Sent ${action} command to device:`, targetDeviceId);
 		},
 		[socket, isConnected, targetUserId, isControllable]
 	);

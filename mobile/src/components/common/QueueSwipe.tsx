@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { Theme } from '@/themes/types';
 
-export const QUEUE_ACTION_WIDTH = 100;
+const QUEUE_ACTION_WIDTH = 100;
 
 interface QueueSwipeProps {
 	children: React.ReactNode;

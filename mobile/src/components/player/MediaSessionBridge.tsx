@@ -15,7 +15,7 @@ import { useNowPlaying, type NowPlaying } from '@/hooks/useNowPlaying';
 import { largeArtwork } from '@/utils/artwork';
 
 /** A position this far from where the system extrapolates it is a jump (seek, restart, renewal). */
-export const POSITION_JUMP_MS = 2000;
+const POSITION_JUMP_MS = 2000;
 
 /** Native calls can fail (session gone, validation); the system controls are best effort. */
 function safely(call: Promise<void>): void {
@@ -25,17 +25,13 @@ function safely(call: Promise<void>): void {
 }
 
 /** A play / pause the app may not follow is re-sent after this delay (#309). */
-export const STATE_RESYNC_MS = 1000;
+const STATE_RESYNC_MS = 1000;
 
 /**
  * Commands the system controls offer: no seek in remote mode (#297), next only
  * when a next item exists, previous in remote mode only when the app allows it.
  */
-export function mediaCapabilities(
-	isRemote: boolean,
-	hasNext: boolean,
-	hasPrevious: boolean
-): Command[] {
+function mediaCapabilities(isRemote: boolean, hasNext: boolean, hasPrevious: boolean): Command[] {
 	const capabilities = [Command.PLAY, Command.PAUSE];
 	if (!isRemote || hasPrevious) capabilities.push(Command.PREVIOUS_TRACK);
 	if (hasNext) capabilities.push(Command.NEXT_TRACK);

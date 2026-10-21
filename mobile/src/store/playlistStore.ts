@@ -80,7 +80,6 @@ interface PlaylistState {
 	// Error handling
 	clearError: () => void;
 	clearConflictMessage: () => void;
-	clearCurrentPlaylist: () => void;
 }
 
 /**
@@ -455,12 +454,5 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 	 */
 	clearConflictMessage: () => {
 		set({ conflictMessage: null });
-	},
-
-	/**
-	 * Clear current playlist
-	 */
-	clearCurrentPlaylist: () => {
-		set({ currentPlaylist: null, conflictMessage: null });
 	},
 }));

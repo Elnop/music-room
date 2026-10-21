@@ -5,7 +5,7 @@ import { showError } from '@utils/toast';
 import { apiErrorMessage } from '@utils/apiErrorMessage';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import debounce from 'lodash/debounce';
+import { debounce } from '@/utils/debounce';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import { usePlayerHeight } from '@/contexts/PlayerContext';

@@ -11,7 +11,7 @@ export function isStreamStale(expiresAt: number | null, now: number = Date.now()
 	return expiresAt !== null && expiresAt - now < STREAM_RENEW_MARGIN_MS;
 }
 
-export interface PrefetchedStream {
+interface PrefetchedStream {
 	/** Queue item the URL was fetched for. */
 	queueItemId: string;
 	/** SoundCloud permalink of that item's track. */

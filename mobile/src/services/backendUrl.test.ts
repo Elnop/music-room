@@ -19,7 +19,6 @@ const STORAGE_KEY = 'zumik.backendUrl';
 const storage = AsyncStorage as jest.Mocked<typeof AsyncStorage>;
 
 beforeEach(async () => {
-	jest.spyOn(console, 'log').mockImplementation(() => undefined);
 	jest.spyOn(console, 'error').mockImplementation(() => undefined);
 	await resetBackendUrl();
 	await AsyncStorage.clear();

@@ -30,7 +30,7 @@ const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const DISMISS_THRESHOLD = SCREEN_HEIGHT * 0.2; // 20% de l'écran pour fermer
 const ARTWORK_SIZE = width * 0.75;
 /** Seek step of the slider's screen-reader increment / decrement actions, in seconds. */
-export const SEEK_STEP_S = 10;
+const SEEK_STEP_S = 10;
 /** Header buttons are 40×40: this slop brings their tap target to 48×48. */
 const HEADER_HIT_SLOP = { top: 4, bottom: 4, left: 4, right: 4 };
 

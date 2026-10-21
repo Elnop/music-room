@@ -28,27 +28,21 @@ const FETCH_TIMEOUT_MS = 8000; // 8 seconds max for API call
 const PLAYER_LOAD_TIMEOUT_MS = 10000; // 10 seconds max for player to load
 
 // A renewed stream that played this long past its start position is healthy again (#313)
-export const RENEWAL_HEALTHY_MS = 30 * 1000;
+const RENEWAL_HEALTHY_MS = 30 * 1000;
 
 // The next queue item's stream URL is fetched this many seconds before the track end (#314)
-export const PREFETCH_WINDOW_S = 20;
+const PREFETCH_WINDOW_S = 20;
 
 /**
  * Fetch the stream URL of the track at `permalink`, with its expiry (epoch ms,
- * null when unknown). Throws when the server sends no URL. `purpose` only labels the dev log.
+ * null when unknown). Throws when the server sends no URL.
  */
 async function fetchStreamUrl(
 	permalink: string,
-	signal: AbortSignal,
-	purpose: 'load' | 'prefetch'
+	signal: AbortSignal
 ): Promise<{ streamUrl: string; expiresAt: number | null }> {
 	// Use query param instead of path param to avoid Cloudflare WAF blocking URLs in paths
 	const streamEndpoint = `/api/soundcloud/stream?url=${encodeURIComponent(permalink)}`;
-	if (__DEV__)
-		console.log(`🌐 [PlayerProvider] Fetching stream URL (${purpose}):`, {
-			endpoint: streamEndpoint.substring(0, 100) + '...',
-			trackUrl: permalink,
-		});
 	const data = await apiRequest<Partial<StreamUrlResponse>>(streamEndpoint, { signal });
 	if (!data.streamUrl) throw new Error('Stream not available');
 	const expiresAt = data.expiresAt ? Date.parse(data.expiresAt) : NaN;
@@ -94,7 +88,6 @@ function QueueAutoAdvance({ player }: { player: ReturnType<typeof useAudioPlayer
 		if (!risingEdge || !isPlaying || finishedLoadRef.current === loadCounter) return;
 		if (useConnectStore.getState().target.kind !== 'local') return;
 		finishedLoadRef.current = loadCounter;
-		if (__DEV__) console.log('🎵 [PlayerProvider] Track finished, playing next queue item');
 		useQueueStore.getState().next();
 	}, [didJustFinish, isPlaying, loadCounter]);
 
@@ -155,18 +148,15 @@ function NextTrackPrefetcher({ player }: { player: ReturnType<typeof useAudioPla
 		if (nextKey === null || nextId === null || nextPermalink === null) return;
 		if (requestedKeyRef.current === nextKey) return;
 		requestedKeyRef.current = nextKey;
-		if (__DEV__) console.log('🎵 [NextTrackPrefetcher] Prefetching the next stream URL');
 
 		const controller = new AbortController();
 		const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-		fetchStreamUrl(nextPermalink, controller.signal, 'prefetch')
+		fetchStreamUrl(nextPermalink, controller.signal)
 			.then(({ streamUrl, expiresAt }) => {
 				if (nextKeyRef.current !== nextKey || !playsLocally()) return;
 				streamPrefetch.set({ queueItemId: nextId, permalink: nextPermalink, streamUrl, expiresAt });
 			})
-			.catch(err => {
-				if (__DEV__) console.log('🟠 [NextTrackPrefetcher] Prefetch failed:', err);
-			})
+			.catch(() => undefined)
 			.finally(() => clearTimeout(timeoutId));
 	}, [isLocal, isPlaying, inWindow, stepping, nextKey, nextId, nextPermalink]);
 
@@ -217,10 +207,8 @@ function StreamWatchdog({ player }: { player: ReturnType<typeof useAudioPlayer> 
 
 		const { streamRenewed, renewStream, setTrackUnavailableError } = usePlayerStore.getState();
 		if (streamRenewed) {
-			if (__DEV__) console.log('🔴 [StreamWatchdog] Failed again after a renewal');
 			setTrackUnavailableError('Impossible de charger ce titre');
 		} else {
-			if (__DEV__) console.log('🟠 [StreamWatchdog] Player failed mid-track, renewing stream');
 			renewStream(lastPositionMsRef.current, true, true);
 		}
 	}, [statusId, player, playerState, isLoaded, currentTime, isPlaying]);
@@ -261,11 +249,9 @@ function AudioInterruptionSync({ player }: { player: ReturnType<typeof useAudioP
 
 		const { playbackState, pausedBySystem, pauseBySystem, resume } = usePlayerStore.getState();
 		if (!nativePlaying && playbackState === 'playing') {
-			if (__DEV__) console.log('🟠 [AudioInterruptionSync] Paused by the system');
 			pauseBySystem();
 		} else if (nativePlaying && playbackState === 'paused') {
 			if (pausedBySystem) {
-				if (__DEV__) console.log('🟢 [AudioInterruptionSync] Resumed by the system');
 				resume();
 			} else {
 				// The user paused during the interruption: it stays paused.
@@ -316,9 +302,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 		const previousId = previousTrackIdRef.current;
 
 		if (currentId !== previousId) {
-			if (__DEV__)
-				console.log('🎵 [PlayerProvider] Track changed:', { from: previousId, to: currentId });
-
 			// Reset flags
 			hasTriedToPlayRef.current = false;
 
@@ -334,7 +317,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
 			// STOP THE OLD PLAYER IMMEDIATELY
 			if (player?.playing) {
-				if (__DEV__) console.log('🔴 [PlayerProvider] STOPPING old player immediately');
 				player.pause();
 			}
 
@@ -345,7 +327,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 	// Load stream with timeout
 	useEffect(() => {
 		if (!currentTrack) {
-			if (__DEV__) console.log('🎵 [PlayerProvider] No track, clearing stream');
 			setStreamUrl(null);
 			return;
 		}
@@ -358,20 +339,12 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 		async function loadStream() {
 			if (!currentTrack) return;
 
-			if (__DEV__)
-				console.log('🎵 [PlayerProvider] Loading stream for track:', {
-					id: currentTrack.id,
-					title: currentTrack.title,
-					loadCounter: thisLoadCounter,
-				});
-
 			// The next queue item's URL fetched before the previous track ended (#314).
 			const prefetched = streamPrefetch.take(
 				usePlayerStore.getState().queueItemId,
 				currentTrack.permalink_url
 			);
 			if (prefetched) {
-				if (__DEV__) console.log('🟢 [PlayerProvider] Using the prefetched stream URL');
 				setStreamUrl(prefetched.streamUrl, prefetched.expiresAt);
 				return;
 			}
@@ -383,18 +356,15 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 			try {
 				const { streamUrl: url, expiresAt } = await fetchStreamUrl(
 					currentTrack.permalink_url,
-					controller.signal,
-					'load'
+					controller.signal
 				);
 				clearTimeout(timeoutId);
 
 				// Check if this request is still relevant
 				if (currentLoadCounterRef.current !== thisLoadCounter) {
-					if (__DEV__) console.log('🎵 [PlayerProvider] Stale response, ignoring');
 					return;
 				}
 
-				if (__DEV__) console.log('🟢 [PlayerProvider] Stream URL obtained');
 				setStreamUrl(url, expiresAt);
 			} catch (err) {
 				clearTimeout(timeoutId);
@@ -441,8 +411,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 		const thisLoadCounter = currentLoadCounterRef.current;
 		hasTriedToPlayRef.current = false;
 
-		if (__DEV__) console.log('🎵 [PlayerProvider] Starting auto-play polling...');
-
 		// Function to check and play
 		const checkAndPlay = () => {
 			// Check if still relevant
@@ -451,12 +419,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 			}
 
 			if (player.isLoaded && player.duration > 0) {
-				if (__DEV__)
-					console.log('🟢 [PlayerProvider] Player ready! Starting playback...', {
-						isLoaded: player.isLoaded,
-						duration: player.duration,
-					});
-
 				hasTriedToPlayRef.current = true;
 				// A transferred playback resumes where the other device was (#297).
 				const { startPositionMs } = usePlayerStore.getState();
@@ -503,8 +465,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 			if (currentLoadCounterRef.current !== thisLoadCounter) return;
 
 			if (!hasTriedToPlayRef.current) {
-				if (__DEV__) console.log('🔴 [PlayerProvider] TIMEOUT - player never loaded!');
-
 				// Cleanup
 				if (pollingIntervalRef.current) {
 					clearInterval(pollingIntervalRef.current);
@@ -543,14 +503,11 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 			const { streamExpiresAt, renewStream } = usePlayerStore.getState();
 			// Resuming on an expiring URL: reload at the paused position instead (#313).
 			if (isStreamStale(streamExpiresAt) && playsLocally()) {
-				if (__DEV__) console.log('🟠 [PlayerProvider] Stream URL expiring, renewing on resume');
 				renewStream(player.currentTime * 1000, true);
 				return;
 			}
-			if (__DEV__) console.log('🎵 [PlayerProvider] Resuming playback');
 			player.play();
 		} else if (playbackState === 'paused' && player.playing) {
-			if (__DEV__) console.log('🎵 [PlayerProvider] Pausing playback');
 			player.pause();
 		}
 	}, [player, playbackState]);

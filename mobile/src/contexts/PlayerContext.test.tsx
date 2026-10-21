@@ -208,7 +208,6 @@ beforeEach(() => {
 	useAuthStore.setState(initialAuthState, true);
 	streamPrefetch.clear();
 	useConnectStore.getState().setLocal();
-	jest.spyOn(console, 'log').mockImplementation(() => undefined);
 });
 
 afterEach(() => {

@@ -10,7 +10,7 @@ import LibReorderableList, {
 } from 'react-native-reorderable-list';
 import { hapticSelection } from '@utils/haptics';
 
-export interface ReorderableRenderItemInfo<T> {
+interface ReorderableRenderItemInfo<T> {
 	item: T;
 	index: number;
 	/** Starts dragging this row; call it from a handle's onPressIn. */

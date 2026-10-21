@@ -6,7 +6,7 @@ import { prepareAvatar } from '@/utils/avatarImage';
 import { apiErrorMessage } from '@/utils/apiErrorMessage';
 import { showError, showSuccess } from '@/utils/toast';
 
-export type AvatarSource = 'library' | 'camera';
+type AvatarSource = 'library' | 'camera';
 
 const PICKER_OPTIONS: ImagePicker.ImagePickerOptions = {
 	mediaTypes: ['images'],

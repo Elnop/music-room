@@ -17,7 +17,7 @@ import { MyDevicesScreen } from '@/screens/profile/MyDevicesScreen';
 import { MusicPreferencesScreen } from '@/screens/profile/MusicPreferencesScreen';
 import { SettingsScreen } from '@/screens/settings/SettingsScreen';
 
-export type ProfileStackParamList = {
+type ProfileStackParamList = {
 	Profile: undefined;
 	EditProfile: undefined;
 	PrivacySettings: undefined;

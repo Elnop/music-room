@@ -22,7 +22,6 @@ function jsonResponse(status: number, body: object): Response {
 }
 
 beforeEach(async () => {
-	jest.spyOn(console, 'log').mockImplementation(() => undefined);
 	globalThis.fetch = fetchMock as unknown as typeof fetch;
 	fetchMock.mockReset();
 	fetchMock.mockResolvedValue(jsonResponse(200, { success: true, data: { ok: true } }));

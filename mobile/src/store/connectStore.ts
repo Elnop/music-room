@@ -5,7 +5,7 @@ import { showInfo } from '@utils/toast';
 import type { ListeningStatus } from '@/types/listening.types';
 
 /** A device of mine or of a friend that this phone drives as a remote (#297). */
-export interface RemoteTarget {
+interface RemoteTarget {
 	kind: 'remote';
 	ownerId: string;
 	deviceId: string;

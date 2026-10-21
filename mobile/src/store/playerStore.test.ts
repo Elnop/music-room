@@ -29,7 +29,6 @@ const withState = (playbackState: PlaybackState) => usePlayerStore.setState({ pl
 
 beforeEach(() => {
 	usePlayerStore.setState(initialState, true);
-	jest.spyOn(console, 'log').mockImplementation(() => undefined);
 });
 
 afterEach(() => {

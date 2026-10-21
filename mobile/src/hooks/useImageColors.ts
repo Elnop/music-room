@@ -20,7 +20,7 @@ export const hexToRgba = (hex: string, alpha: number): string => {
 };
 
 /** WCAG 2.x relative luminance of an sRGB colour (channels 0–255). */
-export const relativeLuminance = ([r, g, b]: Rgb): number => {
+const relativeLuminance = ([r, g, b]: Rgb): number => {
 	const lin = (c: number) => {
 		const v = c / 255;
 		return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
@@ -55,7 +55,7 @@ const BLACK: Rgb = [0, 0, 0];
 const SECONDARY_MIN_ALPHA = 0.7;
 const SECONDARY_ALPHA_STEP = 0.05;
 
-export interface AdaptivePalette {
+interface AdaptivePalette {
 	text: string;
 	textSecondary: string;
 	buttonBg: string;
@@ -171,10 +171,7 @@ export function useImageColors(imageUrl: string | null | undefined, fallbackColo
 				}
 
 				setDominantColor(extractedColor);
-			} catch (error) {
-				if (__DEV__) {
-					console.log('[useImageColors] Failed to extract colors:', error);
-				}
+			} catch {
 				if (isMounted) setDominantColor(null);
 			} finally {
 				if (isMounted) setIsLoading(false);

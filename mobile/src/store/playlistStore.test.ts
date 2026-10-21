@@ -55,7 +55,6 @@ const order = () => state().currentPlaylist!.tracks.map(t => t.id);
 
 beforeEach(() => {
 	jest.resetAllMocks();
-	jest.spyOn(console, 'log').mockImplementation(() => undefined);
 	usePlaylistStore.setState({
 		playlists: [],
 		currentPlaylist: start(),
@@ -261,7 +260,7 @@ describe('add and remove', () => {
 		const answer = deferred<{ tracksVersion: number }>();
 		api.removeTrack.mockReturnValue(answer.promise);
 		const removing = state().removeTrack('p', 'B');
-		state().clearCurrentPlaylist();
+		usePlaylistStore.setState({ currentPlaylist: null });
 		answer.resolve(Promise.reject(new Error('nope')) as never);
 		await expect(removing).rejects.toThrow('nope');
 		expect(api.fetchPlaylistById).not.toHaveBeenCalled();
@@ -405,7 +404,7 @@ describe('playlistStore.moveTrack after leaving the playlist', () => {
 			state().moveTrack('p', 'B', null),
 		]);
 		await Promise.resolve();
-		state().clearCurrentPlaylist();
+		usePlaylistStore.setState({ currentPlaylist: null });
 		first.resolve({ trackId: 'C', rank: 'c', tracksVersion: 11, rebalanced: false });
 
 		await expect(moves).resolves.toEqual(['moved', 'skipped']);
@@ -426,12 +425,6 @@ describe('playlistStore.moveTrack after leaving the playlist', () => {
 		expect(state().conflictMessage).toBeNull();
 		expect(state().currentPlaylist!.id).toBe('q');
 		expect(state().pendingMoves).toBe(0);
-	});
-
-	it('clears the conflict message with the current playlist', () => {
-		usePlaylistStore.setState({ conflictMessage: CONFLICT_MESSAGE });
-		state().clearCurrentPlaylist();
-		expect(state().conflictMessage).toBeNull();
 	});
 });
 

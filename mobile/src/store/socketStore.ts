@@ -93,17 +93,14 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 		const existingSocket = get().socket;
 
 		if (existingSocket?.connected) {
-			if (__DEV__) console.log('[Socket] Already connected:', existingSocket.id);
 			return;
 		}
 
 		if (existingSocket) {
-			if (__DEV__) console.log('[Socket] Socket exists but not connected, reconnecting...');
 			existingSocket.disconnect();
 		}
 
 		const socketUrl = getBackendUrl();
-		if (__DEV__) console.log('[Socket] Connecting to:', socketUrl);
 
 		const socket = io(socketUrl, {
 			transports: ['websocket', 'polling'],
@@ -132,11 +129,6 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 		const handleRefusal = async (code: string) => {
 			if (code === DEVICE_REGISTRATION_FAILED && deviceRetries < DEVICE_RETRY_MAX) {
 				deviceRetries += 1;
-				if (__DEV__) {
-					console.log(
-						`[Socket] Device registration failed, retry ${deviceRetries}/${DEVICE_RETRY_MAX} in ${DEVICE_RETRY_DELAY_MS} ms`
-					);
-				}
 				setTimeout(() => {
 					if (get().socket !== socket || socket.connected) return;
 					socket.connect();
@@ -145,7 +137,6 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 			}
 			if (code === INVALID_TOKEN && !hasRefreshed) {
 				hasRefreshed = true;
-				if (__DEV__) console.log('[Socket] Token refused, refreshing it once');
 				const refreshed = await useAuthStore.getState().refreshAccessToken();
 				if (get().socket !== socket) return;
 				if (refreshed) {
@@ -161,14 +152,12 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 		};
 
 		socket.on('connect', () => {
-			if (__DEV__) console.log('[Socket] ✅ Connected successfully:', socket.id);
 			hasRefreshed = false;
 			deviceRetries = 0;
 			if (get().socket === socket) set({ isConnected: true, status: 'connected' });
 		});
 
 		socket.on('disconnect', reason => {
-			if (__DEV__) console.log('[Socket] ❌ Disconnected:', reason);
 			if (get().socket !== socket) return;
 			if (reason === 'io client disconnect') {
 				// Our own disconnect()/connect() set the status themselves.
@@ -199,12 +188,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 		// socket.io, never on the socket itself.
 		const manager = socket.io;
 
-		manager.on('reconnect', attemptNumber => {
-			if (__DEV__) console.log('[Socket] 🔄 Reconnected after', attemptNumber, 'attempts');
-		});
-
-		manager.on('reconnect_attempt', attemptNumber => {
-			if (__DEV__) console.log('[Socket] 🔄 Reconnect attempt', attemptNumber);
+		manager.on('reconnect_attempt', () => {
 			if (get().socket === socket) set({ status: 'reconnecting' });
 		});
 
@@ -227,7 +211,6 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 		const { socket } = get();
 
 		if (socket) {
-			if (__DEV__) console.log('[Socket] Disconnecting...');
 			socket.disconnect();
 		}
 		set({ socket: null, isConnected: false, status: 'idle' });
@@ -238,7 +221,6 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 	 * is not connected. The status reads 'reconnecting' meanwhile.
 	 */
 	retry: () => {
-		if (__DEV__) console.log('[Socket] Retrying the connection');
 		get().connect();
 		// A retry follows a lost connection: keep the banner on « Reconnexion… »
 		// until the new socket connects (a first connect() stays 'connecting').
@@ -263,7 +245,6 @@ useAuthStore.subscribe((state, previous) => {
 onBackendUrlChange(() => {
 	const { socket, connect, disconnect } = useSocketStore.getState();
 	if (!socket) return;
-	if (__DEV__) console.log('[Socket] Backend address changed, reconnecting');
 	disconnect();
 	connect();
 });

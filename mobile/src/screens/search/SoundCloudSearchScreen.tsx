@@ -12,7 +12,7 @@ import { SkeletonList, TrackRowSkeleton } from '@components/common/Skeleton';
 import { EmptyState } from '@components/common/EmptyState';
 import { SearchBar } from '@components/common/SearchBar';
 import { showError } from '@utils/toast';
-import debounce from 'lodash/debounce';
+import { debounce } from '@/utils/debounce';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import type { AddQueueItemBody } from '@/types/queue.types';
 

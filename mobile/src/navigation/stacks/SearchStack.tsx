@@ -11,7 +11,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '@/contexts/ThemeContext';
 import { SoundCloudSearchScreen } from '@/screens/search/SoundCloudSearchScreen';
 
-export type SearchStackParamList = {
+type SearchStackParamList = {
 	Search: undefined;
 };
 

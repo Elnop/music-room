@@ -13,7 +13,7 @@ export type VisibilityLevel = 'public' | 'friends_only' | 'private';
 /**
  * Ionicons glyph name type
  */
-export type IoniconsName = keyof typeof Ionicons.glyphMap;
+type IoniconsName = keyof typeof Ionicons.glyphMap;
 
 /**
  * Music genre options (10 total, user can select max 5)
@@ -118,7 +118,7 @@ export interface UpdateMusicPreferencesData {
 // User Types
 // =====================================================
 
-export interface User {
+interface User {
 	id: string;
 	email: string;
 	username: string;

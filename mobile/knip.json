@@ -1,0 +1,11 @@
+{
+	"$schema": "https://unpkg.com/knip@5/schema.json",
+	"entry": ["babel.config.js", "plugins/withDebugKeystore.js", "plugins/withMedia3Version.js"],
+	"ignoreDependencies": [
+		"@expo/ngrok",
+		"babel-plugin-module-resolver",
+		"babel-preset-expo",
+		"expo-updates"
+	],
+	"ignoreBinaries": ["expo-doctor"]
+}

@@ -18,11 +18,11 @@ import { hapticTap } from '@utils/haptics';
 import { Artwork } from '@/components/common/Artwork';
 
 /** Horizontal swipe distance that changes the track (#311). */
-export const SWIPE_TRACK_THRESHOLD = 80;
+const SWIPE_TRACK_THRESHOLD = 80;
 /** A flick this fast (px/s) changes the track or opens the modal from a shorter swipe. */
-export const SWIPE_FLICK_VELOCITY = 800;
+const SWIPE_FLICK_VELOCITY = 800;
 /** Upward swipe distance that opens the player modal (#311). */
-export const SWIPE_OPEN_THRESHOLD = 40;
+const SWIPE_OPEN_THRESHOLD = 40;
 
 export function MiniPlayer() {
 	const { theme } = useTheme();

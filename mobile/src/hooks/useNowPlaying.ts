@@ -47,7 +47,7 @@ export interface NowPlaying {
 }
 
 /** Refresh rate of the estimated remote progress. */
-export const REMOTE_TICK_MS = 1000;
+const REMOTE_TICK_MS = 1000;
 
 /** Duration of the owner's current queue item when it is the track the device plays. */
 function remoteDurationMs(queue: OwnerQueue, trackId: number | undefined): number | null {

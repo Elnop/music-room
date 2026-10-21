@@ -72,7 +72,6 @@ beforeEach(async () => {
 	position = 0;
 	appStateListener = null;
 	setPositionReader(() => position);
-	jest.spyOn(console, 'log').mockImplementation(() => undefined);
 	jest.spyOn(AppState, 'addEventListener').mockImplementation((_type, listener) => {
 		appStateListener = listener as (state: AppStateStatus) => void;
 		return { remove: jest.fn() } as unknown as ReturnType<typeof AppState.addEventListener>;

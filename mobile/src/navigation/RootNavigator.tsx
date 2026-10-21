@@ -61,7 +61,6 @@ export function RootNavigator() {
 					useAuthStore.getState();
 
 				if (isAuthenticated && isTokenExpiringSoon()) {
-					console.log('[RootNavigator] Token expired/expiring, refreshing...');
 					await refreshAccessToken();
 				}
 			})
@@ -91,8 +90,6 @@ export function RootNavigator() {
 		const {
 			data: { subscription },
 		} = supabase.auth.onAuthStateChange(async (event, session) => {
-			if (__DEV__) console.log('Supabase auth event:', event);
-
 			if (event === 'SIGNED_OUT') {
 				useAuthStore.setState({
 					user: null,
