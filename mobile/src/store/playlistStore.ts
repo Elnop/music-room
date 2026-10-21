@@ -78,7 +78,6 @@ interface PlaylistState {
 	applyPlaylistEvent: (event: PlaylistUpdatedEvent) => 'applied' | 'ignored' | 'reload';
 
 	// Error handling
-	clearError: () => void;
 	clearConflictMessage: () => void;
 }
 
@@ -440,13 +439,6 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 		newCache.set(next.id, next);
 		set({ currentPlaylist: next, playlistsCache: newCache });
 		return 'applied';
-	},
-
-	/**
-	 * Clear error message
-	 */
-	clearError: () => {
-		set({ error: null });
 	},
 
 	/**

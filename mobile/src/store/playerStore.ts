@@ -64,8 +64,6 @@ interface PlayerState {
 	// Actions
 	/** Set the stream URL and, when known, its expiry (epoch ms). */
 	setStreamUrl: (url: string | null, expiresAt?: number | null) => void;
-	setLoading: (loading: boolean) => void;
-	setError: (error: string | null) => void;
 	setTrackUnavailableError: (message: string) => void;
 	clearError: () => void;
 	setPlaybackReady: () => void;
@@ -134,22 +132,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 
 	setStreamUrl: (url, expiresAt = null) => {
 		set({ streamUrl: url, streamExpiresAt: url ? expiresAt : null });
-	},
-
-	setLoading: loading => {
-		set(state => ({
-			loading,
-			playbackState: loading && state.playbackState === 'idle' ? 'loading' : state.playbackState,
-		}));
-	},
-
-	setError: error => {
-		set({
-			error,
-			loading: false,
-			playbackState: error ? 'idle' : get().playbackState,
-			pendingTrackId: error ? null : get().pendingTrackId,
-		});
 	},
 
 	setTrackUnavailableError: message => {
