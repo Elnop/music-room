@@ -54,7 +54,7 @@ const sb = vi.hoisted(() => {
 
 vi.mock('@/shared/config/supabase.js', () => {
 	const client = { from: sb.from, storage: sb.storage };
-	return { supabase: client, supabaseAdmin: client };
+	return { supabaseAdmin: client };
 });
 
 vi.mock('@/shared/utils/logger.js', () => ({

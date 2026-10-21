@@ -1,4 +1,4 @@
-import { supabase } from '@/shared/config/supabase.js';
+import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { Tables } from '@/shared/types/supabase.generated.js';
@@ -20,7 +20,7 @@ export class MusicPreferencesService {
 		try {
 			logger.info('Fetching music preferences', { userId });
 
-			const { data, error } = await supabase
+			const { data, error } = await supabaseAdmin
 				.from('music_preferences')
 				.select('*')
 				.eq('user_id', userId)
@@ -64,7 +64,7 @@ export class MusicPreferencesService {
 				updated_at: new Date().toISOString(),
 			};
 
-			const { data: updatedData, error } = await supabase
+			const { data: updatedData, error } = await supabaseAdmin
 				.from('music_preferences')
 				.update(updateData)
 				.eq('user_id', userId)
@@ -107,7 +107,7 @@ export class MusicPreferencesService {
 				genres: genres,
 			};
 
-			const { data, error } = await supabase
+			const { data, error } = await supabaseAdmin
 				.from('music_preferences')
 				.insert(insertData)
 				.select('*')

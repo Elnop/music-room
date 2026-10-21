@@ -98,7 +98,7 @@ vi.mock('@/shared/config/supabase.js', () => {
 		auth: { admin: { getUserById: db.getUserById } },
 		storage: { from: () => ({ remove: db.remove }) },
 	};
-	return { supabase: client, supabaseAdmin: client };
+	return { supabaseAdmin: client };
 });
 
 vi.mock('@/shared/utils/logger.js', () => ({

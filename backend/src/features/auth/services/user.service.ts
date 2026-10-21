@@ -1,4 +1,4 @@
-import { supabase, createSignInClient } from '@/shared/config/supabase.js';
+import { supabaseAdmin, createSignInClient } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { UserProfile, UserProfileRow } from '@/features/auth/auth.types.js';
@@ -15,7 +15,7 @@ export class UserService {
 	 */
 	private static async createSessionForOAuthUser(email: string): Promise<Session> {
 		try {
-			const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
+			const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
 				type: 'magiclink',
 				email,
 			});
@@ -99,7 +99,7 @@ export class UserService {
 				});
 			}
 
-			const { data: existingOAuth } = await supabase
+			const { data: existingOAuth } = await supabaseAdmin
 				.from('user_profiles')
 				.select('*')
 				.eq(providerColumn, providerId)
@@ -107,7 +107,7 @@ export class UserService {
 
 			if (existingOAuth) {
 				if (!existingOAuth.email_verified) {
-					await supabase
+					await supabaseAdmin
 						.from('user_profiles')
 						.update({ email_verified: true })
 						.eq('id', existingOAuth.id);
@@ -115,7 +115,7 @@ export class UserService {
 
 				// The provider may have been linked with another email: open the
 				// session for the account's own auth email, not the network's.
-				const { data: authUser, error: authUserError } = await supabase.auth.admin.getUserById(
+				const { data: authUser, error: authUserError } = await supabaseAdmin.auth.admin.getUserById(
 					existingOAuth.id
 				);
 				const accountEmail = authUser?.user?.email;
@@ -152,7 +152,7 @@ export class UserService {
 				const perPage = 100;
 
 				while (!existingUser) {
-					const { data: pageData, error: listError } = await supabase.auth.admin.listUsers({
+					const { data: pageData, error: listError } = await supabaseAdmin.auth.admin.listUsers({
 						page,
 						perPage,
 					});
@@ -179,7 +179,7 @@ export class UserService {
 			}
 
 			if (existingUser) {
-				const { data: existingProfile } = await supabase
+				const { data: existingProfile } = await supabaseAdmin
 					.from('user_profiles')
 					.select('*')
 					.eq('id', existingUser.id)
@@ -209,7 +209,7 @@ export class UserService {
 							? profile.picture
 							: (profile.picture?.data?.url ?? existingProfile.avatar_url);
 
-					const { error: updateError } = await supabase
+					const { error: updateError } = await supabaseAdmin
 						.from('user_profiles')
 						.update({
 							...providerIdField(provider, providerId),
@@ -243,11 +243,9 @@ export class UserService {
 				}
 			}
 
-			const username = await generateUniqueUsername(
-				profile.name || effectiveEmail.split('@')[0]
-			);
+			const username = await generateUniqueUsername(profile.name || effectiveEmail.split('@')[0]);
 
-			const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+			const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
 				email: effectiveEmail,
 				email_confirm: true,
 				user_metadata: {
@@ -272,7 +270,7 @@ export class UserService {
 						? profile.picture
 						: (profile.picture?.data?.url ?? null);
 
-				const { data: userProfile, error: profileError } = await supabase
+				const { data: userProfile, error: profileError } = await supabaseAdmin
 					.from('user_profiles')
 					.insert({
 						id: authData.user.id,
@@ -289,14 +287,14 @@ export class UserService {
 
 				if (profileError) {
 					if (profileError.code === '23505') {
-						await supabase.auth.admin.deleteUser(authData.user.id);
+						await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
 						return this.createOAuthUser(provider, providerId, email, profile);
 					}
 
 					logger.error('Failed to create user profile', {
 						error: profileError,
 					});
-					await supabase.auth.admin.deleteUser(authData.user.id);
+					await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
 					throw new AppError(500, 'Failed to create profile', 'PROFILE_CREATION_FAILED');
 				}
 
@@ -320,7 +318,7 @@ export class UserService {
 					session,
 				};
 			} catch (error) {
-				await supabase.auth.admin.deleteUser(authData.user.id);
+				await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
 				throw error;
 			}
 		} catch (error) {

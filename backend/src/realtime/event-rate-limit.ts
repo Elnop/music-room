@@ -12,15 +12,15 @@
  * client hits them.
  */
 
-export interface EventLimit {
+interface EventLimit {
 	max: number;
 	windowMs: number;
 }
 
-export const DEFAULT_EVENT_LIMIT: EventLimit = { max: 30, windowMs: 10_000 };
+const DEFAULT_EVENT_LIMIT: EventLimit = { max: 30, windowMs: 10_000 };
 
 /** Every event the app sends has its own counter; any other name shares the default one. */
-export const EVENT_LIMITS: Readonly<Record<string, EventLimit>> = {
+const EVENT_LIMITS: Readonly<Record<string, EventLimit>> = {
 	'listening:update': { max: 20, windowMs: 10_000 },
 	'listening:subscribe': DEFAULT_EVENT_LIMIT,
 	'listening:unsubscribe': DEFAULT_EVENT_LIMIT,
@@ -53,7 +53,7 @@ export function rateLimitedErrorFor(
 }
 
 /** `allowed`, or refused: `limited` the first time in a window, `still-limited` after. */
-export type LimitDecision = 'allowed' | 'limited' | 'still-limited';
+type LimitDecision = 'allowed' | 'limited' | 'still-limited';
 
 export class SocketEventLimiter {
 	private windows = new Map<string, { start: number; count: number }>();

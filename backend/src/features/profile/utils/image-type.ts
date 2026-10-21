@@ -3,7 +3,7 @@
  * The client's declared MIME type and file name are never trusted (#351).
  */
 
-export interface ImageType {
+interface ImageType {
 	mime: 'image/jpeg' | 'image/png' | 'image/webp';
 	ext: 'jpg' | 'png' | 'webp';
 }

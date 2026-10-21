@@ -1,4 +1,4 @@
-import { supabase, createSignInClient } from '@/shared/config/supabase.js';
+import { supabaseAdmin, createSignInClient } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import { formatAuthResponse, getUserProfile } from '@/features/auth/utils/auth.helpers.js';
@@ -73,7 +73,7 @@ export class AuthService {
 				throw new AppError(401, 'Invalid email or password', 'INVALID_CREDENTIALS');
 			}
 
-			const { data: profile, error: profileError } = await supabase
+			const { data: profile, error: profileError } = await supabaseAdmin
 				.from('user_profiles')
 				.select('*, email_verified, google_id, facebook_id')
 				.eq('id', authData.user.id)

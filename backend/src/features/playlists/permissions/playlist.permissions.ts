@@ -97,28 +97,6 @@ export async function checkEditPermission(
 }
 
 /**
- * Fetch playlist with owner check
- */
-export async function getPlaylistWithOwnerCheck(
-	playlistId: string
-): Promise<{ owner_id: string; collaborator_ids: string[] }> {
-	const { data: playlist, error } = await supabaseAdmin
-		.from('playlists')
-		.select('owner_id, collaborator_ids')
-		.eq('id', playlistId)
-		.single();
-
-	if (error || !playlist) {
-		throw new AppError(404, 'Playlist not found', 'PLAYLIST_NOT_FOUND');
-	}
-
-	return {
-		owner_id: playlist.owner_id,
-		collaborator_ids: playlist.collaborator_ids ?? [],
-	};
-}
-
-/**
  * Fetch full playlist for permission checks
  */
 export async function getPlaylistForPermissionCheck(playlistId: string): Promise<PlaylistRow> {

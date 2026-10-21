@@ -18,7 +18,7 @@ import musicControlRoutes from '@/features/music-control/music-control.routes.js
 import queueRoutes from '@/features/queue/queue.routes.js';
 import queueTransferRoutes from '@/features/queue/queue-transfer.routes.js';
 
-export interface RouteConfig {
+interface RouteConfig {
 	/** API path prefix (e.g., "/api/auth") */
 	path: string;
 	/** Express router for this feature */

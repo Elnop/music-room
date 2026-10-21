@@ -1,8 +1,8 @@
-import { supabase } from '@/shared/config/supabase.js';
+import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { USERNAME_MIN_LENGTH, usernameBase, withSuffix } from '@/features/auth/utils/username.js';
 
 async function isTaken(username: string): Promise<boolean> {
-	const { data } = await supabase
+	const { data } = await supabaseAdmin
 		.from('user_profiles')
 		.select('username')
 		.eq('username', username)

@@ -32,8 +32,7 @@ export interface PlaylistRoomError {
 	message: string;
 }
 
-export type PlaylistJoinResult =
-	{ ok: true; playlistId: string } | ({ ok: false } & PlaylistRoomError);
+type PlaylistJoinResult = { ok: true; playlistId: string } | ({ ok: false } & PlaylistRoomError);
 
 const MESSAGES: Record<PlaylistRoomErrorCode, string> = {
 	INVALID_PAYLOAD: 'playlist:join expects a playlist id (UUID)',
@@ -46,7 +45,7 @@ export function playlistRoom(playlistId: string): string {
 	return `playlist:${playlistId}`;
 }
 
-export function playlistRoomError(
+function playlistRoomError(
 	playlistId: string | null,
 	code: PlaylistRoomErrorCode
 ): PlaylistRoomError {

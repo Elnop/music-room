@@ -36,7 +36,7 @@ const ownerOf = (req: Request) => queueOwnerParamsSchema.parse(req.params).userI
 /**
  * Play queue controller: every route answers the full queue state of its owner, the caller or `:userId` (#294).
  */
-export class QueueController {
+class QueueController {
 	/** GET /api/queue */
 	async getQueue(req: Request, res: Response, next: NextFunction) {
 		try {

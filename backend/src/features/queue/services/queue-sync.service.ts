@@ -5,7 +5,7 @@ import { realtime } from '@/realtime/index.js';
 import { getQueueRpc } from '@/features/queue/utils/queue-rpc.js';
 
 /** The playlist change to mirror in the queues: one function of migration 023 each. */
-export type PlaylistTrackChange = 'added' | 'removed' | 'moved';
+type PlaylistTrackChange = 'added' | 'removed' | 'moved';
 
 const SYNC_FUNCTIONS = {
 	added: 'queue_sync_track_added',
@@ -21,7 +21,7 @@ const affectedUsersSchema = z.array(z.uuid());
  * new queue as `queue:updated`. Runs after the playlist operation succeeded:
  * every error is logged and swallowed, never thrown back to the caller.
  */
-export class QueueSyncService {
+class QueueSyncService {
 	async syncPlaylistChange(
 		change: PlaylistTrackChange,
 		playlistId: string,

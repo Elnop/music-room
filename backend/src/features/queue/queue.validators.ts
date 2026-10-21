@@ -64,7 +64,4 @@ export const transferSchema = z.object({
 		.optional(),
 });
 
-export type AddQueueItemInput = z.infer<typeof addQueueItemSchema>;
-export type AddQueueItemBodyInput = z.infer<typeof addQueueItemBodySchema>;
-export type MoveQueueItemInput = z.infer<typeof moveQueueItemSchema>;
 export type TransferInput = z.infer<typeof transferSchema>;

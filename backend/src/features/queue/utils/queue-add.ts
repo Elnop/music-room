@@ -3,7 +3,7 @@ import { upsertTrack, type TrackUpsertInput } from '@/shared/utils/track-upsert.
 import { addQueueItemRpc, moveQueueItemRpc } from '@/features/queue/utils/queue-rpc.js';
 import type { QueueState } from '@/features/queue/queue.types.js';
 
-export interface QueueAddResult {
+interface QueueAddResult {
 	state: QueueState;
 	/** 'add-next' once the new item was moved after the current one, else 'add'. */
 	operation: 'add' | 'add-next';

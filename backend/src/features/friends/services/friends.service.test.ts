@@ -5,7 +5,6 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 const { from } = vi.hoisted(() => ({ from: vi.fn() }));
 
 vi.mock('@/shared/config/supabase.js', () => ({
-	supabase: { from },
 	supabaseAdmin: { from },
 }));
 

@@ -30,7 +30,6 @@ const {
 }));
 
 vi.mock('@/shared/config/supabase.js', () => ({
-	supabase: { from, auth: { admin: { createUser, deleteUser } } },
 	supabaseAdmin: { from, auth: { admin: { createUser, deleteUser } } },
 	createSignInClient: () => ({ auth: { signInWithPassword } }),
 }));

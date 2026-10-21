@@ -1,4 +1,4 @@
-import { supabase } from '@/shared/config/supabase.js';
+import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import { verificationConfig } from '@/features/mail/mail.config.js';
@@ -27,7 +27,7 @@ export class RegistrationService {
 			const existingUserId = await findAuthUserIdByEmail(data.email);
 
 			if (existingUserId) {
-				const { data: profile } = await supabase
+				const { data: profile } = await supabaseAdmin
 					.from('user_profiles')
 					.select('email_verified')
 					.eq('id', existingUserId)
@@ -39,9 +39,9 @@ export class RegistrationService {
 						oldUserId: existingUserId,
 					});
 
-					await supabase.from('user_profiles').delete().eq('id', existingUserId);
+					await supabaseAdmin.from('user_profiles').delete().eq('id', existingUserId);
 
-					await supabase.auth.admin.deleteUser(existingUserId);
+					await supabaseAdmin.auth.admin.deleteUser(existingUserId);
 
 					logger.info('Old unverified account deleted successfully', {
 						email: data.email,
@@ -51,7 +51,7 @@ export class RegistrationService {
 				}
 			}
 
-			const { data: existingProfile } = await supabase
+			const { data: existingProfile } = await supabaseAdmin
 				.from('user_profiles')
 				.select('username')
 				.eq('username', data.username)
@@ -61,7 +61,7 @@ export class RegistrationService {
 				throw new AppError(409, 'Username already taken', 'USERNAME_TAKEN');
 			}
 
-			const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+			const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
 				email: data.email,
 				password: data.password,
 				email_confirm: !verificationConfig.enabled,
@@ -76,7 +76,7 @@ export class RegistrationService {
 				throw new AppError(400, 'Failed to create user - no user returned', 'AUTH_ERROR');
 			}
 
-			const { error: profileError } = await supabase.from('user_profiles').insert({
+			const { error: profileError } = await supabaseAdmin.from('user_profiles').insert({
 				id: authData.user.id,
 				username: data.username,
 				display_name: data.displayName,
@@ -85,7 +85,7 @@ export class RegistrationService {
 
 			if (profileError) {
 				logger.error('Failed to create user profile', { error: profileError });
-				await supabase.auth.admin.deleteUser(authData.user.id);
+				await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
 				throw new AppError(500, 'Failed to create user profile', 'PROFILE_ERROR');
 			}
 
@@ -131,8 +131,8 @@ export class RegistrationService {
 			await verificationService.sendVerificationEmail(email, code);
 		} catch (error) {
 			logger.error('Verification email failed, removing the new account', { userId, error });
-			await supabase.from('user_profiles').delete().eq('id', userId);
-			await supabase.auth.admin.deleteUser(userId);
+			await supabaseAdmin.from('user_profiles').delete().eq('id', userId);
+			await supabaseAdmin.auth.admin.deleteUser(userId);
 			throw new AppError(
 				503,
 				'Could not send the verification email, please try again later',

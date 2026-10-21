@@ -9,8 +9,6 @@ export const soundcloudSearchSchema = z.object({
 	offset: z.coerce.number().int().min(0).default(0),
 });
 
-export type SoundCloudSearchInput = z.infer<typeof soundcloudSearchSchema>;
-
 const SOUNDCLOUD_HOSTS = new Set([
 	'soundcloud.com',
 	'www.soundcloud.com',
@@ -22,7 +20,7 @@ const SOUNDCLOUD_HOSTS = new Set([
  * A SoundCloud track URL on soundcloud.com (also www. and m.) or
  * `https://on.soundcloud.com/...`, with a path.
  */
-export const soundcloudUrlSchema = z
+const soundcloudUrlSchema = z
 	.string()
 	.max(2048, 'URL too long')
 	.refine(value => {
@@ -42,7 +40,7 @@ export const soundcloudUrlSchema = z
 	}, 'Must be a https SoundCloud URL (soundcloud.com, www., m. or on.)');
 
 /** A numeric SoundCloud track id. */
-export const soundcloudTrackIdSchema = z.string().regex(/^\d{1,20}$/, 'Must be a numeric track id');
+const soundcloudTrackIdSchema = z.string().regex(/^\d{1,20}$/, 'Must be a numeric track id');
 
 /**
  * Params of GET /api/soundcloud/track/:urlOrId

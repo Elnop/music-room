@@ -13,8 +13,3 @@ import { z } from 'zod';
 export function routeParam(req: Request, name: string): string {
 	return z.object({ [name]: z.string().min(1) }).parse(req.params)[name];
 }
-
-/** Parameter of a route that is also mounted without it. */
-export function optionalRouteParam(req: Request, name: string): string | undefined {
-	return z.object({ [name]: z.string().optional() }).parse(req.params)[name];
-}

@@ -1,4 +1,4 @@
-import { supabase } from '@/shared/config/supabase.js';
+import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { OAuthProvider, LinkedProvidersResponse } from '@/features/auth/auth.types.js';
@@ -75,7 +75,7 @@ export class ProviderLinkService {
 	): Promise<LinkedProvidersResponse> {
 		const providerId = await this.verifyProviderId(provider, token);
 
-		const { data: profile, error } = await supabase
+		const { data: profile, error } = await supabaseAdmin
 			.from('user_profiles')
 			.select('google_id, facebook_id')
 			.eq('id', userId)
@@ -100,7 +100,7 @@ export class ProviderLinkService {
 
 		// Only write while the column is still empty, so a concurrent link of
 		// another account by the same user cannot be overwritten.
-		const { data: updated, error: updateError } = await supabase
+		const { data: updated, error: updateError } = await supabaseAdmin
 			.from('user_profiles')
 			.update({
 				...providerIdField(provider, providerId),
@@ -120,7 +120,7 @@ export class ProviderLinkService {
 		}
 
 		if (!updated?.length) {
-			const { data: current } = await supabase
+			const { data: current } = await supabaseAdmin
 				.from('user_profiles')
 				.select('google_id, facebook_id')
 				.eq('id', userId)

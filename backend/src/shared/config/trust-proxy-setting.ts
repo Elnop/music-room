@@ -7,7 +7,7 @@ import proxyaddr from 'proxy-addr';
  * addresses, subnets and names (`loopback`, `linklocal`, `uniquelocal`)
  * separated by commas. No env import: env.ts validates with these.
  */
-export type TrustProxySetting = boolean | number | string;
+type TrustProxySetting = boolean | number | string;
 
 export function parseTrustProxy(value: string): TrustProxySetting {
 	const trimmed = value.trim().toLowerCase();

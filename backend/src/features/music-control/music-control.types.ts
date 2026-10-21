@@ -41,32 +41,10 @@ export interface UserListeningStatus {
 	devices: ListeningStatus[];
 }
 
-export interface MusicControlPermission {
-	ownerId: string; // The user who grants permission (following_id in follows)
-	allowedUserId: string; // The user who can control (follower_id in follows)
-	canControl: boolean;
-}
-
 export interface ControlActionPayload {
 	targetUserId: string;
 	targetDeviceId: string;
 	action: 'play' | 'pause';
-}
-
-export interface GrantControlResponse {
-	success: boolean;
-	allowedUserId: string;
-}
-
-export interface RevokeControlResponse {
-	success: boolean;
-	allowedUserId: string;
-}
-
-export interface PermissionChangePayload {
-	ownerId: string;
-	targetUserId: string;
-	canControl: boolean;
 }
 
 /**

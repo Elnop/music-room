@@ -38,7 +38,3 @@ export const renameDeviceSchema = z.object({
 export const userDevicesParamsSchema = z.object({
 	userId: z.uuid('userId must be a UUID'),
 });
-
-export type DeviceLicenseParams = z.infer<typeof deviceLicenseParamsSchema>;
-export type RenameDeviceBody = z.infer<typeof renameDeviceSchema>;
-export type UserDevicesParams = z.infer<typeof userDevicesParamsSchema>;
