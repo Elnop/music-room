@@ -139,7 +139,7 @@ Les seuils viennent de `backend/src/shared/config/rate-limit.config.ts` (variabl
 
 **Menace.** Un utilisateur authentifié lit ou modifie les playlists, appareils, profils ou réglages d'un autre en changeant un identifiant dans la requête.
 
-**Protection.** Le backend parle à Supabase avec la clé service (`supabaseAdmin` et son alias `supabase`, `backend/src/shared/config/supabase.ts`), qui **ignore la RLS** : toutes les features (`auth`, `friends`, `music-control`, `playlists`, `profile`, `realtime`) l'utilisent. L'isolation est donc dans le code :
+**Protection.** Le backend parle à Supabase avec la clé service (`supabaseAdmin`, `backend/src/shared/config/supabase.ts`), qui **ignore la RLS** : toutes les features (`auth`, `friends`, `music-control`, `playlists`, `profile`, `realtime`) l'utilisent. L'isolation est donc dans le code :
 - Toutes les routes de `playlists`, `profile`, `friends`, `music-control`, `soundcloud` passent par `authMiddleware` (`router.use(authMiddleware)` dans chaque `*.routes.ts`) ; l'identité vient du token (`req.user.id`), jamais du corps.
 - Playlists : `canViewPlaylist`, `canEditPlaylist`, `checkOwnership`, `checkEditPermission` dans `backend/src/features/playlists/permissions/playlist.permissions.ts`.
 - Contrôle musical : `ControlAccessService` (M11) ; un appareil n'est licencié que par son propriétaire (`findOwnedDevice` dans `DeviceLicenseService.grant`).

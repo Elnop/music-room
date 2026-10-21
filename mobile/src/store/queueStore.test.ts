@@ -110,7 +110,6 @@ const player = () => usePlayerStore.getState();
 
 beforeEach(() => {
 	jest.resetAllMocks();
-	jest.spyOn(console, 'log').mockImplementation(() => undefined);
 	jest.spyOn(console, 'error').mockImplementation(() => undefined);
 	usePlayerStore.setState(initialPlayer, true);
 	useAuthStore.setState({ user: { id: 'owner' } as UserProfile });

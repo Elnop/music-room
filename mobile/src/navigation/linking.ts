@@ -16,7 +16,7 @@ import {
 import type { LinkingOptions, NavigationContainerRef } from '@react-navigation/native';
 import type { AppTabsParamList } from '@/navigation/AppNavigator';
 
-export const LINK_PREFIX = 'zumik://';
+const LINK_PREFIX = 'zumik://';
 
 const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
 const SHARE_PATH = new RegExp(`^/?(playlist|user)/${UUID}/?(\\?.*)?$`, 'i');

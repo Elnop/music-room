@@ -16,7 +16,7 @@ import {
 import { EmailVerificationService } from '@/features/auth/services/email-verification.service.js';
 import { PasswordResetService } from '@/features/auth/services/password-reset.service.js';
 import { PasswordResetCooldownService } from '@/features/auth/services/password-reset-cooldown.service.js';
-import { supabase, createSignInClient } from '@/shared/config/supabase.js';
+import { supabaseAdmin, createSignInClient } from '@/shared/config/supabase.js';
 import type { ApiResponse } from '@/shared/types/global.types.js';
 import type { AuthenticatedRequest } from '@/shared/types/global.types.js';
 import { logger } from '@/shared/utils/logger.js';
@@ -396,7 +396,7 @@ export class AuthController {
 			await verificationService.verifyCode(validated.userId, validated.code, ip);
 
 			// Fetch user email for session creation
-			const { data: profile, error: profileError } = await supabase
+			const { data: profile, error: profileError } = await supabaseAdmin
 				.from('user_profiles')
 				.select('*, id')
 				.eq('id', validated.userId)
@@ -407,7 +407,7 @@ export class AuthController {
 			}
 
 			// Get user from Supabase Auth
-			const { data: authUser, error: authError } = await supabase.auth.admin.getUserById(
+			const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.getUserById(
 				validated.userId
 			);
 
@@ -416,7 +416,7 @@ export class AuthController {
 			}
 
 			// Generate session using Admin Magic Link API
-			const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
+			const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
 				type: 'magiclink',
 				email: authUser.user.email!,
 			});
@@ -543,7 +543,7 @@ export class AuthController {
 		userId: string,
 		claimedEmail: string
 	): Promise<string | null> {
-		const { data: authUser, error: authError } = await supabase.auth.admin.getUserById(userId);
+		const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.getUserById(userId);
 		if (authError) {
 			if (authError.status === 404) {
 				logger.info('Resend verification: no such account', { userId });
@@ -558,7 +558,7 @@ export class AuthController {
 			return null;
 		}
 
-		const { data: profile, error: profileError } = await supabase
+		const { data: profile, error: profileError } = await supabaseAdmin
 			.from('user_profiles')
 			.select('email_verified')
 			.eq('id', userId)

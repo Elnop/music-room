@@ -47,8 +47,3 @@ export function createSignInClient() {
 		},
 	});
 }
-
-/**
- * Default export for convenience (admin client)
- */
-export const supabase = supabaseAdmin;

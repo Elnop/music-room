@@ -1,4 +1,4 @@
-import { supabase } from '@/shared/config/supabase.js';
+import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import { fetchSingle } from '@/shared/utils/database.helpers.js';
@@ -24,7 +24,7 @@ export class PrivacyService {
 		try {
 			logger.info('Fetching privacy settings', { userId, requesterId });
 
-			const { data, error } = await supabase
+			const { data, error } = await supabaseAdmin
 				.from('profile_privacy')
 				.select('*')
 				.eq('user_id', userId)
@@ -91,7 +91,7 @@ export class PrivacyService {
 				updateData.music_preferences_visibility = data.musicPreferencesVisibility;
 			}
 
-			const { data: updatedData, error } = await supabase
+			const { data: updatedData, error } = await supabaseAdmin
 				.from('profile_privacy')
 				.update(updateData)
 				.eq('user_id', userId)
@@ -132,7 +132,7 @@ export class PrivacyService {
 				music_preferences_visibility: initialData?.musicPreferencesVisibility || 'public',
 			};
 
-			const { data, error } = await supabase
+			const { data, error } = await supabaseAdmin
 				.from('profile_privacy')
 				.insert(insertData)
 				.select('*')
@@ -189,7 +189,7 @@ export class PrivacyService {
 				favorite_artist: string | null;
 				created_at: string | null;
 			}>(
-				supabase,
+				supabaseAdmin,
 				'user_profiles',
 				{ id: targetUserId },
 				'*',
@@ -207,7 +207,7 @@ export class PrivacyService {
 			}
 
 			// Get music preferences
-			const { data: musicPrefsData } = await supabase
+			const { data: musicPrefsData } = await supabaseAdmin
 				.from('music_preferences')
 				.select('genres')
 				.eq('user_id', targetUserId)
@@ -216,7 +216,7 @@ export class PrivacyService {
 			// Get email if own profile or visible
 			let email: string | null = null;
 			if (isOwnProfile || this.isFieldVisible(privacy.emailVisibility, isOwnProfile, isFriend)) {
-				const { data: userData } = await supabase.auth.admin.getUserById(targetUserId);
+				const { data: userData } = await supabaseAdmin.auth.admin.getUserById(targetUserId);
 				email = userData?.user?.email || null;
 			}
 
@@ -261,7 +261,7 @@ export class PrivacyService {
 	 */
 	private async checkFriendship(userId1: string, userId2: string): Promise<boolean> {
 		try {
-			const { data: follows } = await supabase
+			const { data: follows } = await supabaseAdmin
 				.from('follows')
 				.select('follower_id, following_id')
 				.in('follower_id', [userId1, userId2])

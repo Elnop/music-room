@@ -89,15 +89,6 @@ export const playlistApi = {
 	 * Add track to playlist
 	 */
 	async addTrack(playlistId: string, track: Track): Promise<AddTrackResult> {
-		if (__DEV__)
-			console.log('🎵 [PlaylistApi] Sending add track request', {
-				playlistId,
-				trackUri: track.trackUri,
-				title: track.title,
-				albumArt: track.albumArt ? 'present' : 'undefined',
-				previewUrl: track.previewUrl ? 'present' : 'undefined',
-			});
-
 		const result = await apiRequest<AddTrackResult>(`/api/playlists/${playlistId}/tracks`, {
 			method: 'POST',
 			body: JSON.stringify({
@@ -111,7 +102,6 @@ export const playlistApi = {
 			}),
 		});
 
-		if (__DEV__) console.log('🟢 [PlaylistApi] Track added successfully');
 		return result;
 	},
 

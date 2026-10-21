@@ -150,15 +150,15 @@ mobile/src/
 │   └── settings/       # Settings
 ├── components/
 │   ├── common/         # Button, Card, Input, Avatar, SearchBar, ErrorBoundary, items swipeables...
-│   ├── playlist/       # TrackItem, PlaylistCard, PlaylistGridCard, PlaylistHeader, AddTrackButton...
+│   ├── playlist/       # PlaylistCard, PlaylistGridCard, PlaylistHeader, PlayPlaylistButton...
 │   ├── player/         # MiniPlayer, PlayerModal, PlayerErrorToast
 │   ├── profile/        # GenreSelector, VisibilityToggle, NowPlayingInline...
-│   ├── music-control/  # DeviceListeningCard
+│   ├── music-control/  # RenameDeviceModal
 │   └── theme/          # ThemeSelector
 ├── navigation/         # RootNavigator, AuthNavigator, AppNavigator (onglets) + stacks/
 ├── store/              # Zustand : authStore, playlistStore, playerStore, socketStore, soundcloudStore
 ├── contexts/           # ThemeContext, PlayerContext
-├── hooks/              # useMusicControl, usePlaylistSocket, usePlayerSync, usePlayerProgress, useImageColors
+├── hooks/              # useMusicControl, usePlaylistSocket, usePlayerProgress, useImageColors
 ├── api/                # playlistApi.ts
 ├── services/           # api.ts (client HTTP de base), profileApi, friendsApi, musicControlApi, privacyApi, oauth, deviceService
 ├── lib/                # supabase.ts

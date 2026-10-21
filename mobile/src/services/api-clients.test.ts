@@ -33,7 +33,6 @@ function jsonResponse(body: object, status = 200): Response {
 }
 
 beforeEach(async () => {
-	jest.spyOn(console, 'log').mockImplementation(() => undefined);
 	globalThis.fetch = fetchMock as unknown as typeof fetch;
 	fetchMock.mockReset();
 	await resetBackendUrl();

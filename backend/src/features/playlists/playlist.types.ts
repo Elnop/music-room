@@ -2,24 +2,16 @@
  * Playlist DTOs and Types
  */
 
-import type { Tables, TablesInsert, TablesUpdate } from '@/shared/types/supabase.generated.js';
+import type { Tables, TablesUpdate } from '@/shared/types/supabase.generated.js';
 
 export type EditMode = 'open' | 'restricted';
 
 // Database types (now using Supabase generated types)
 export type PlaylistRow = Tables<'playlists'>;
 export type TrackRow = Tables<'tracks'>;
-export type PlaylistTrackRow = Tables<'playlist_tracks'>;
-
-// Insert types for creating new records
-export type PlaylistInsert = TablesInsert<'playlists'>;
-export type TrackInsert = TablesInsert<'tracks'>;
-export type PlaylistTrackInsert = TablesInsert<'playlist_tracks'>;
 
 // Update types for updating records
 export type PlaylistUpdate = TablesUpdate<'playlists'>;
-export type TrackUpdate = TablesUpdate<'tracks'>;
-export type PlaylistTrackUpdate = TablesUpdate<'playlist_tracks'>;
 
 // DTOs for API requests
 export interface CreatePlaylistDTO {
@@ -44,14 +36,6 @@ export interface AddTrackDTO {
 	albumArt?: string;
 	durationMs: number;
 	previewUrl?: string;
-}
-
-export interface AddCollaboratorDTO {
-	userId: string;
-}
-
-export interface AddViewerDTO {
-	userId: string;
 }
 
 // Response types (camelCase for client)

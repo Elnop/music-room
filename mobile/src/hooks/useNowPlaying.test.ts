@@ -98,7 +98,6 @@ const remoteStatus = (overrides: Partial<ListeningStatus> = {}): ListeningStatus
 beforeEach(() => {
 	jest.clearAllMocks();
 	jest.useFakeTimers({ now: NOW });
-	jest.spyOn(console, 'log').mockImplementation(() => undefined);
 	mockProgress = { currentTime: 0, duration: 0, progress: 0 };
 	useAuthStore.setState({ user: { id: 'me' } as UserProfile, isAuthenticated: true });
 	useConnectStore.setState({ target: { kind: 'local' }, remoteStatus: null });

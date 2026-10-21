@@ -15,7 +15,7 @@ const { getUser, signOut, isRevoked, revoke, refreshSession, fetchUserProfile } 
 );
 
 vi.mock('@/shared/config/supabase.js', () => ({
-	supabase: { auth: { getUser, admin: { signOut } } },
+	supabaseAdmin: { auth: { getUser, admin: { signOut } } },
 	createSignInClient: () => ({ auth: { refreshSession } }),
 }));
 

@@ -68,7 +68,6 @@ const connect = () => useConnectStore.getState();
 
 beforeEach(() => {
 	jest.clearAllMocks();
-	jest.spyOn(console, 'log').mockImplementation(() => undefined);
 	jest.spyOn(console, 'error').mockImplementation(() => undefined);
 	useAuthStore.setState({ user: { id: 'me' } as UserProfile, isAuthenticated: true });
 	useConnectStore.setState({

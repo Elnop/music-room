@@ -41,7 +41,6 @@ interface AuthState {
 	loginWithGoogle: () => Promise<void>;
 	loginWithFacebook: () => Promise<void>;
 	logout: () => Promise<void>;
-	updateProfile: (data: Partial<UserProfile>) => Promise<void>;
 	/** New avatar URL after an upload, null after a removal (#351) */
 	setAvatarUrl: (avatarUrl: string | null) => Promise<void>;
 
@@ -441,42 +440,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 	},
 
 	/**
-	 * Update user profile
-	 * Note: This is a placeholder for future implementation
-	 */
-	updateProfile: async (data: Partial<UserProfile>) => {
-		const { user } = get();
-		if (!user) {
-			throw new Error('No user logged in');
-		}
-
-		set({ isLoading: true, error: null });
-
-		try {
-			// TODO: Implement backend API call for profile update
-			const updatedUser: UserProfile = {
-				...user,
-				...data,
-				updatedAt: new Date().toISOString(),
-			};
-
-			set({
-				user: updatedUser,
-				isLoading: false,
-			});
-
-			await get().saveToStorage();
-		} catch (error) {
-			const errorMessage = apiErrorMessage(error, 'La mise à jour du profil a échoué');
-			set({
-				error: errorMessage,
-				isLoading: false,
-			});
-			throw error;
-		}
-	},
-
-	/**
 	 * Load auth state from AsyncStorage
 	 */
 	loadFromStorage: async () => {
@@ -626,7 +589,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 		const { refreshToken, isRefreshing } = get();
 
 		if (isRefreshing) {
-			console.log('[AuthStore] Refresh already in progress, waiting...');
 			return new Promise<boolean>(resolve => {
 				let attempts = 0;
 				const maxAttempts = 50;
@@ -634,7 +596,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 					attempts++;
 					if (!get().isRefreshing) {
 						clearInterval(checkInterval);
-						console.log('[AuthStore] Refresh completed, continuing...');
 						resolve(true);
 					} else if (attempts >= maxAttempts) {
 						clearInterval(checkInterval);
@@ -656,14 +617,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 		set({ isRefreshing: true });
 
 		try {
-			console.log('[AuthStore] Refreshing access token...', {
-				refreshTokenLength: refreshToken.length,
-				refreshTokenStart: refreshToken.substring(0, 20) + '...',
-			});
-
 			const response = await authApi.refreshToken(refreshToken);
-
-			console.log('[AuthStore] Refresh API call successful, updating state...');
 
 			if (!response.session) {
 				throw new Error('Token refresh did not return a session');
@@ -685,7 +639,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 				refresh_token: response.session.refreshToken,
 			});
 
-			console.log('[AuthStore] Token refreshed successfully');
 			return true;
 		} catch (error) {
 			console.error('[AuthStore] Token refresh failed:', {

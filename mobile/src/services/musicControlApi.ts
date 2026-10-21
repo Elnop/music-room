@@ -11,16 +11,16 @@ import type {
 	UserDeviceWithLicenses,
 } from '@/types/device.types';
 
-export interface MusicControlPermissionsResponse {
+interface MusicControlPermissionsResponse {
 	allowedUserIds: string[];
 }
 
-export interface CanControlResponse {
+interface CanControlResponse {
 	canControl: boolean;
 	targetUserId: string;
 }
 
-export interface ControlActionResponse {
+interface ControlActionResponse {
 	success: boolean;
 	allowedUserId: string;
 }

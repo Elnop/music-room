@@ -18,7 +18,7 @@ import { logger } from '@/shared/utils/logger.js';
  * @param transport - Transport type (websocket, polling)
  * @param metadata - Additional metadata
  */
-export function connectionLog(
+function connectionLog(
 	socketId: string,
 	transport: string,
 	metadata?: Record<string, unknown>
@@ -36,11 +36,7 @@ export function connectionLog(
  * @param reason - Disconnect reason
  * @param metadata - Additional metadata
  */
-export function disconnectLog(
-	socketId: string,
-	reason: string,
-	metadata?: Record<string, unknown>
-): void {
+function disconnectLog(socketId: string, reason: string, metadata?: Record<string, unknown>): void {
 	logger.info('[Socket] disconnect', {
 		socketId,
 		reason,
@@ -55,7 +51,7 @@ export function disconnectLog(
  * @param socketId - Socket ID
  * @param metadata - Additional metadata
  */
-export function authLog(
+function authLog(
 	action: string,
 	userId: string,
 	socketId: string,
@@ -74,11 +70,7 @@ export function authLog(
  * @param socketId - Socket ID
  * @param metadata - Event metadata
  */
-export function eventLog(
-	eventName: string,
-	socketId: string,
-	metadata?: Record<string, unknown>
-): void {
+function eventLog(eventName: string, socketId: string, metadata?: Record<string, unknown>): void {
 	const level = metadata?.level === 'warn' ? 'warn' : 'info';
 	const cleanedMeta = { ...metadata };
 	delete cleanedMeta.level;
@@ -99,7 +91,7 @@ export function eventLog(
 /**
  * Client identity set on `socket.data` by the handshake (see realtime/socket-auth.ts)
  */
-export interface SocketClientContext {
+interface SocketClientContext {
 	userId: string;
 	device: { deviceId: string; platform: string; model: string };
 	appVersion: string;
@@ -125,11 +117,7 @@ export function loggableEventName(eventName: unknown): string {
  * @param eventName - Incoming event name, as sent by the client
  * @param client - Identity from socket.data
  */
-export function incomingLog(
-	socketId: string,
-	eventName: unknown,
-	client: SocketClientContext
-): void {
+function incomingLog(socketId: string, eventName: unknown, client: SocketClientContext): void {
 	logger.info(`[Socket] in:${loggableEventName(eventName)}`, {
 		socketId,
 		userId: client.userId,
@@ -146,7 +134,7 @@ export function incomingLog(
  * @param error - Error object
  * @param metadata - Additional metadata
  */
-export function errorLog(socketId: string, error: Error, metadata?: Record<string, unknown>): void {
+function errorLog(socketId: string, error: Error, metadata?: Record<string, unknown>): void {
 	logger.error(`[Socket] error`, {
 		socketId,
 		error: error.message,
@@ -160,7 +148,7 @@ export function errorLog(socketId: string, error: Error, metadata?: Record<strin
  * @param message - Initialization message
  * @param metadata - Additional metadata
  */
-export function initLog(message: string, metadata?: Record<string, unknown>): void {
+function initLog(message: string, metadata?: Record<string, unknown>): void {
 	logger.info(`[Socket] ${message}`, metadata);
 }
 
@@ -169,7 +157,7 @@ export function initLog(message: string, metadata?: Record<string, unknown>): vo
  * @param eventType - Type of broadcast (device_status, permissions, etc.)
  * @param metadata - Broadcast metadata
  */
-export function broadcastLog(eventType: string, metadata: Record<string, unknown>): void {
+function broadcastLog(eventType: string, metadata: Record<string, unknown>): void {
 	logger.info(`[Socket] broadcast:${eventType}`, metadata);
 }
 

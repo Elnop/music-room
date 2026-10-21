@@ -18,7 +18,7 @@ import type { SupabaseUser } from '@/features/auth/auth.types.js';
  * Disabled with RATE_LIMIT_ENABLED=false; whitelisted IPs are never counted.
  */
 
-export const TOKEN_LIMIT_PREFIX = 'rl:auth:token:';
+const TOKEN_LIMIT_PREFIX = 'rl:auth:token:';
 
 /** Verification failures that count against the IP; a 503 does not. */
 const COUNTED_CODES = new Set(['INVALID_TOKEN', 'TOKEN_REVOKED']);

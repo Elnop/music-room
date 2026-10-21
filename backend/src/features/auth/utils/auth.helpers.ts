@@ -1,4 +1,4 @@
-import { supabase } from '@/shared/config/supabase.js';
+import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { AuthResponse, OAuthProvider, UserProfile } from '@/features/auth/auth.types.js';
@@ -59,7 +59,7 @@ export async function fetchUserProfile(userId: string): Promise<{
 	created_at: string;
 	updated_at: string;
 }> {
-	const { data: profile, error: profileError } = await supabase
+	const { data: profile, error: profileError } = await supabaseAdmin
 		.from('user_profiles')
 		.select('username, display_name, avatar_url, bio, created_at, updated_at')
 		.eq('id', userId)
@@ -88,13 +88,13 @@ export async function fetchUserProfile(userId: string): Promise<{
  */
 export async function getUserProfile(userId: string): Promise<UserProfile> {
 	try {
-		const { data: user, error: userError } = await supabase.auth.admin.getUserById(userId);
+		const { data: user, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);
 
 		if (userError || !user.user) {
 			throw new AppError(404, 'User not found', 'USER_NOT_FOUND');
 		}
 
-		const { data: profile, error: profileError } = await supabase
+		const { data: profile, error: profileError } = await supabaseAdmin
 			.from('user_profiles')
 			.select('*')
 			.eq('id', userId)

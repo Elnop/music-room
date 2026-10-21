@@ -14,7 +14,7 @@ export const CACHE_TTL = {
 /** Lifetime of a SoundCloud stream URL, in seconds */
 export const STREAM_URL_LIFETIME_S = 1800;
 
-export interface CacheEntry<T> {
+interface CacheEntry<T> {
 	data: T;
 	expiry: number;
 }

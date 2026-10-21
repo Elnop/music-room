@@ -1,5 +1,5 @@
 import { isAuthApiError, isAuthError } from '@supabase/supabase-js';
-import { supabase, createSignInClient } from '@/shared/config/supabase.js';
+import { supabaseAdmin, createSignInClient } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import type { SupabaseUser, AuthResponse } from '@/features/auth/auth.types.js';
 import { formatAuthResponse, fetchUserProfile } from '@/features/auth/utils/auth.helpers.js';
@@ -23,7 +23,7 @@ export class SessionService {
 			const {
 				data: { user },
 				error,
-			} = await supabase.auth.getUser(token);
+			} = await supabaseAdmin.auth.getUser(token);
 
 			if (error || !user) {
 				throw new AppError(401, 'Invalid or expired token', 'INVALID_TOKEN');
@@ -92,7 +92,7 @@ export class SessionService {
 
 		let failure: string | undefined;
 		try {
-			const { error } = await supabase.auth.admin.signOut(token, 'local');
+			const { error } = await supabaseAdmin.auth.admin.signOut(token, 'local');
 			if (error) failure = error.message;
 		} catch (error) {
 			failure = error instanceof Error ? error.message : 'Unknown error';

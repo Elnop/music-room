@@ -20,9 +20,9 @@ const moveResultSchema = z.object({
 	rebalanced: z.boolean(),
 });
 
-export type AddTrackRpcResult = z.infer<typeof addResultSchema>;
-export type RemoveTrackRpcResult = z.infer<typeof removeResultSchema>;
-export type MoveTrackRpcResult = z.infer<typeof moveResultSchema>;
+type AddTrackRpcResult = z.infer<typeof addResultSchema>;
+type RemoveTrackRpcResult = z.infer<typeof removeResultSchema>;
+type MoveTrackRpcResult = z.infer<typeof moveResultSchema>;
 
 type Operation = 'add' | 'remove' | 'move';
 

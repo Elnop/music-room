@@ -10,7 +10,7 @@ import type { LockoutStatus, IPReputationStatus } from '@/shared/types/rate-limi
  * Architecture decision: Redis required for production.
  * Can be disabled in development via ACCOUNT_LOCKOUT_ENABLED=false.
  */
-export class BruteForceProtectionService {
+class BruteForceProtectionService {
 	/**
 	 * Record a failed login attempt for an email+IP combination
 	 * @returns Current lockout status

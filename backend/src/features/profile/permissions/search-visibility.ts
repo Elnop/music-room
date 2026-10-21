@@ -1,9 +1,9 @@
-import { supabase } from '@/shared/config/supabase.js';
+import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { PrivacyService } from '@/features/profile/services/privacy.service.js';
 import type { VisibilityLevel } from '@/features/profile/profile.types.js';
 
-export interface SearchFieldVisibility {
+interface SearchFieldVisibility {
 	avatar: boolean;
 	bio: boolean;
 }
@@ -29,19 +29,19 @@ export async function getSearchFieldVisibility(
 	if (profileIds.length === 0) return visibility;
 
 	const [privacy, following, followers] = await Promise.all([
-		supabase
+		supabaseAdmin
 			.from('profile_privacy')
 			.select('user_id, avatar_visibility, bio_visibility')
 			.in('user_id', profileIds),
 		viewerId
-			? supabase
+			? supabaseAdmin
 					.from('follows')
 					.select('following_id')
 					.eq('follower_id', viewerId)
 					.in('following_id', profileIds)
 			: NO_FOLLOWS,
 		viewerId
-			? supabase
+			? supabaseAdmin
 					.from('follows')
 					.select('follower_id')
 					.eq('following_id', viewerId)

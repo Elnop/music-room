@@ -54,7 +54,6 @@ export function useQueueSync() {
 
 		const handleQueueUpdated = (state: QueueState) => {
 			if (state.ownerId !== userIdRef.current && state.ownerId !== remoteOwnerId()) return;
-			if (__DEV__) console.log('[Socket] Queue updated', state.ownerId, state.currentItemId);
 			applyState(state);
 		};
 

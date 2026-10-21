@@ -3,7 +3,7 @@ import { logger } from '@/shared/utils/logger.js';
 import { failQuery } from '@/features/music-control/utils/device.helpers.js';
 
 /** What controllerId may control among ownerId's devices */
-export interface ControlAccess {
+interface ControlAccess {
 	/** controllerId and ownerId follow each other */
 	isFriend: boolean;
 	/** The owner's "all my devices" switch is on for the controller */
@@ -79,7 +79,11 @@ export class ControlAccessService {
 	}
 
 	/** Whether controllerId may control ownerId's device. Fails closed. */
-	async canControlDevice(controllerId: string, ownerId: string, deviceId: string): Promise<boolean> {
+	async canControlDevice(
+		controllerId: string,
+		ownerId: string,
+		deviceId: string
+	): Promise<boolean> {
 		const access = await this.safeAccess(controllerId, ownerId);
 		return access.allDevices || access.licensedDeviceIds.includes(deviceId);
 	}

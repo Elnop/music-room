@@ -29,16 +29,14 @@ jest.mock('@react-native-google-signin/google-signin', () => {
 });
 
 jest.mock('react-native-fbsdk-next', () => ({
-	LoginManager: { logInWithPermissions: jest.fn(), logOut: jest.fn() },
+	LoginManager: { logInWithPermissions: jest.fn() },
 	AccessToken: { getCurrentAccessToken: jest.fn() },
-	AuthenticationToken: { getAuthenticationTokenIOS: jest.fn() },
 	Settings: { setAppID: jest.fn(), initializeSDK: jest.fn() },
 }));
 
 const signIn = GoogleSignin.signIn as jest.Mock;
 
 beforeEach(() => {
-	jest.spyOn(console, 'log').mockImplementation(() => undefined);
 	jest.spyOn(console, 'error').mockImplementation(() => undefined);
 	(GoogleSignin.hasPlayServices as jest.Mock).mockResolvedValue(true);
 	signIn.mockReset();

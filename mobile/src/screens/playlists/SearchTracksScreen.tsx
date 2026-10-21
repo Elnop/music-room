@@ -14,7 +14,7 @@ import { AddableTrackRow } from '@components/track/AddableTrackRow';
 import { toTrackInput } from '@utils/trackInput';
 import { EmptyState } from '@components/common/EmptyState';
 import { SkeletonList, TrackRowSkeleton } from '@components/common/Skeleton';
-import debounce from 'lodash/debounce';
+import { debounce } from '@/utils/debounce';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import type { Track } from '@/types/track.types';
 import type { AddQueueItemBody } from '@/types/queue.types';

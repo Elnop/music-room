@@ -78,9 +78,7 @@ interface PlaylistState {
 	applyPlaylistEvent: (event: PlaylistUpdatedEvent) => 'applied' | 'ignored' | 'reload';
 
 	// Error handling
-	clearError: () => void;
 	clearConflictMessage: () => void;
-	clearCurrentPlaylist: () => void;
 }
 
 /**
@@ -444,23 +442,9 @@ export const usePlaylistStore = create<PlaylistState>((set, get) => ({
 	},
 
 	/**
-	 * Clear error message
-	 */
-	clearError: () => {
-		set({ error: null });
-	},
-
-	/**
 	 * Clear the conflict message once shown
 	 */
 	clearConflictMessage: () => {
 		set({ conflictMessage: null });
-	},
-
-	/**
-	 * Clear current playlist
-	 */
-	clearCurrentPlaylist: () => {
-		set({ currentPlaylist: null, conflictMessage: null });
 	},
 }));

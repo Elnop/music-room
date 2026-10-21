@@ -29,7 +29,6 @@ const withState = (playbackState: PlaybackState) => usePlayerStore.setState({ pl
 
 beforeEach(() => {
 	usePlayerStore.setState(initialState, true);
-	jest.spyOn(console, 'log').mockImplementation(() => undefined);
 });
 
 afterEach(() => {
@@ -187,50 +186,9 @@ describe('playerStore state machine', () => {
 			expect(usePlayerStore.getState().playbackState).toBe(from);
 		}
 	);
-
-	it('setLoading(true) moves idle to loading', () => {
-		usePlayerStore.getState().setLoading(true);
-		expect(usePlayerStore.getState().loading).toBe(true);
-		expect(usePlayerStore.getState().playbackState).toBe('loading');
-	});
-
-	it('setLoading only changes the flag outside idle', () => {
-		withState('playing');
-		usePlayerStore.getState().setLoading(true);
-		expect(usePlayerStore.getState().loading).toBe(true);
-		expect(usePlayerStore.getState().playbackState).toBe('playing');
-
-		usePlayerStore.getState().setLoading(false);
-		expect(usePlayerStore.getState().loading).toBe(false);
-		expect(usePlayerStore.getState().playbackState).toBe('playing');
-	});
 });
 
 describe('playerStore errors and stop', () => {
-	it('setError resets to idle and clears the pending track', () => {
-		usePlayerStore.getState().playTrack(makeTrack(5));
-
-		usePlayerStore.getState().setError('Stream failed');
-
-		const state = usePlayerStore.getState();
-		expect(state.error).toBe('Stream failed');
-		expect(state.loading).toBe(false);
-		expect(state.playbackState).toBe('idle');
-		expect(state.pendingTrackId).toBeNull();
-	});
-
-	it('setError(null) keeps playback state and pending track', () => {
-		usePlayerStore.getState().playTrack(makeTrack(5));
-
-		usePlayerStore.getState().setError(null);
-
-		const state = usePlayerStore.getState();
-		expect(state.error).toBeNull();
-		expect(state.loading).toBe(false);
-		expect(state.playbackState).toBe('loading');
-		expect(state.pendingTrackId).toBe(5);
-	});
-
 	it('setTrackUnavailableError clears the track and stream', () => {
 		usePlayerStore.getState().playTrack(makeTrack(6));
 		usePlayerStore.getState().setStreamUrl('https://stream/6');

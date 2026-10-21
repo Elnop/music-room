@@ -3,8 +3,7 @@ import {
 	isCancelledResponse,
 	statusCodes,
 } from '@react-native-google-signin/google-signin';
-import { LoginManager, AccessToken, AuthenticationToken, Settings } from 'react-native-fbsdk-next';
-import { Platform } from 'react-native';
+import { LoginManager, AccessToken, Settings } from 'react-native-fbsdk-next';
 import Constants from 'expo-constants';
 
 // Type guard to check if an unknown response has idToken
@@ -101,12 +100,6 @@ export const signInWithGoogle = async (): Promise<string> => {
 		}
 		const idToken = extractIdToken(userInfo);
 
-		if (__DEV__) {
-			console.log('[OAuth] Google Sign-In successful');
-		}
-
-		if (__DEV__) console.log('[OAuth] ID token received successfully');
-
 		return idToken;
 	} catch (error: unknown) {
 		const googleError = error as { code?: string; message?: string };
@@ -140,29 +133,6 @@ export const signInWithGoogle = async (): Promise<string> => {
 };
 
 /**
- * Sign out from Google (optional, for complete logout)
- */
-export const signOutGoogle = async (): Promise<void> => {
-	try {
-		await GoogleSignin.signOut();
-	} catch (error) {
-		console.error('Error signing out from Google:', error);
-	}
-};
-
-/**
- * Check if user is already signed in to Google
- */
-export const isSignedIn = async (): Promise<boolean> => {
-	try {
-		const currentUser = await GoogleSignin.getCurrentUser();
-		return currentUser !== null;
-	} catch {
-		return false;
-	}
-};
-
-/**
  * Initialize Facebook SDK
  * Must be called before using any Facebook Login features
  */
@@ -192,34 +162,12 @@ export const signInWithFacebook = async (): Promise<string> => {
 			throw new Error('SIGN_IN_CANCELLED');
 		}
 
-		let accessToken: string | null = null;
-
-		if (Platform.OS === 'ios') {
-			// iOS: Try to get AuthenticationToken (Limited Login)
-			// Note: Limited Login tokens cannot be used with Graph API
-			// So we also try to get the regular AccessToken
-			const authToken = await AuthenticationToken.getAuthenticationTokenIOS();
-			const accessTokenData = await AccessToken.getCurrentAccessToken();
-
-			accessToken = accessTokenData?.accessToken || null;
-
-			if (__DEV__) {
-				console.log('[OAuth] Facebook iOS tokens:', {
-					hasAuthToken: !!authToken,
-					hasAccessToken: !!accessToken,
-				});
-			}
-		} else {
-			// Android: Get AccessToken (standard flow)
-			const accessTokenData = await AccessToken.getCurrentAccessToken();
-			accessToken = accessTokenData?.accessToken || null;
-		}
+		const accessTokenData = await AccessToken.getCurrentAccessToken();
+		const accessToken = accessTokenData?.accessToken || null;
 
 		if (!accessToken) {
 			throw new Error('No access token received from Facebook Login. Please try again.');
 		}
-
-		if (__DEV__) console.log('[OAuth] Facebook access token received successfully');
 
 		return accessToken;
 	} catch (error: unknown) {
@@ -243,24 +191,4 @@ export const signInWithFacebook = async (): Promise<string> => {
 
 		throw error;
 	}
-};
-
-/**
- * Sign out from Facebook (optional, for complete logout)
- */
-export const signOutFacebook = async (): Promise<void> => {
-	try {
-		await LoginManager.logOut();
-		if (__DEV__) console.log('[OAuth] Facebook sign-out successful');
-	} catch (error) {
-		console.error('Error signing out from Facebook:', error);
-	}
-};
-
-/**
- * Check if user is already signed in to Facebook
- */
-export const isSignedInFacebook = async (): Promise<boolean> => {
-	const accessToken = await AccessToken.getCurrentAccessToken();
-	return accessToken !== null;
 };

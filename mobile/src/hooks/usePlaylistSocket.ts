@@ -40,7 +40,6 @@ export function usePlaylistSocket(playlistId: string) {
 		}
 
 		socket.emit('playlist:join', playlistId);
-		if (__DEV__) console.log(`[Socket] Joined playlist room: ${playlistId}`);
 		if (joinedRef.current === playlistId) {
 			fetchPlaylistById(playlistId).catch(() => undefined);
 		}
@@ -48,8 +47,6 @@ export function usePlaylistSocket(playlistId: string) {
 
 		const handlePlaylistUpdate = (data: PlaylistUpdatedEvent) => {
 			if (data.playlistId !== playlistId) return;
-
-			if (__DEV__) console.log(`[Socket] Playlist updated: ${data.event}`, data);
 
 			if (applyPlaylistEvent(data) === 'reload') {
 				fetchPlaylistById(playlistId).catch(() => undefined);
@@ -78,7 +75,6 @@ export function usePlaylistSocket(playlistId: string) {
 			if (socket.connected) {
 				socket.emit('playlist:leave', playlistId);
 			}
-			if (__DEV__) console.log(`[Socket] Left playlist room: ${playlistId}`);
 		};
 	}, [
 		socket,

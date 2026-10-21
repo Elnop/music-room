@@ -83,7 +83,6 @@ const mockGetControllable = musicControlApi.getControllableDevices as jest.Mock;
 beforeEach(() => {
 	jest.clearAllMocks();
 	jest.useFakeTimers();
-	jest.spyOn(console, 'log').mockImplementation(() => undefined);
 	jest.spyOn(console, 'error').mockImplementation(() => undefined);
 });
 

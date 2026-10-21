@@ -46,7 +46,7 @@ function isValidUuid(id: string): boolean {
 /**
  * Music Control Controller
  */
-export class MusicControlController {
+class MusicControlController {
 	/**
 	 * GET /api/music-control/permissions
 	 * Get list of users that I have granted control to

@@ -43,7 +43,7 @@ import { clientIp } from '@/shared/config/trust-proxy.js';
  * is ignored. The token is checked once, at the handshake.
  */
 
-export const handshakeAuthSchema = z.object({
+const handshakeAuthSchema = z.object({
 	token: z.string().min(1),
 	deviceId: z.string().min(1).max(128),
 	deviceName: z.string(),
@@ -52,8 +52,6 @@ export const handshakeAuthSchema = z.object({
 	appVersion: z.string(),
 });
 
-export type HandshakeAuth = z.infer<typeof handshakeAuthSchema>;
-
 export interface SocketData {
 	userId: string;
 	email: string;
@@ -61,7 +59,7 @@ export interface SocketData {
 	appVersion: string;
 }
 
-export type SocketAuthErrorCode =
+type SocketAuthErrorCode =
 	| 'NO_TOKEN'
 	| 'INVALID_HANDSHAKE'
 	| 'INVALID_TOKEN'

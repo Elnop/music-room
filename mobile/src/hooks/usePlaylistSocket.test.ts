@@ -62,7 +62,6 @@ function handlerFor<T>(event: string): (data: T) => void {
 
 beforeEach(() => {
 	jest.clearAllMocks();
-	jest.spyOn(console, 'log').mockImplementation(() => undefined);
 	mockPlaylistState.fetchPlaylistById.mockResolvedValue(undefined);
 });
 

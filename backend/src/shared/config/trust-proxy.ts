@@ -5,7 +5,7 @@ import { env } from '@/shared/config/env.js';
 import { compileTrust, parseTrustProxy } from '@/shared/config/trust-proxy-setting.js';
 
 /** TRUST_PROXY, already validated by env.ts (see trust-proxy-setting.ts). */
-export const trustProxy = parseTrustProxy(env.TRUST_PROXY);
+const trustProxy = parseTrustProxy(env.TRUST_PROXY);
 const trust = compileTrust(trustProxy);
 
 /** Apply the setting to an Express app: req.ip then follows it. */

@@ -38,7 +38,7 @@ const NGROK_DOMAINS = ['ngrok-free.app', 'ngrok-free.dev', 'ngrok.app', 'ngrok.d
  * Any ngrok account can get such a subdomain, so this only narrows the dev
  * rule; the project's own tunnel is also allowed exactly through TUNNEL_URL.
  */
-export function isNgrokOrigin(origin: string): boolean {
+function isNgrokOrigin(origin: string): boolean {
 	let url: URL;
 	try {
 		url = new URL(origin);

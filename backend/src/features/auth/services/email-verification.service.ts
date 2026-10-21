@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { supabase } from '@/shared/config/supabase.js';
+import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import { sendVerificationEmail } from '@/features/mail/mail.service.js';
@@ -38,7 +38,7 @@ export class EmailVerificationService {
 	async storeVerificationCode(userId: string, code: string): Promise<void> {
 		const expiresAt = new Date(Date.now() + this.CODE_EXPIRY_MINUTES * 60 * 1000);
 
-		const { error } = await supabase
+		const { error } = await supabaseAdmin
 			.from('user_profiles')
 			.update({
 				verification_code: code,
@@ -77,7 +77,7 @@ export class EmailVerificationService {
 		});
 
 		// Fetch stored code from database
-		const { data: profile, error } = await supabase
+		const { data: profile, error } = await supabaseAdmin
 			.from('user_profiles')
 			.select('verification_code, verification_code_expires_at, email_verified')
 			.eq('id', userId)
@@ -123,7 +123,7 @@ export class EmailVerificationService {
 		}
 
 		// Mark as verified and clear code
-		const { error: updateError } = await supabase
+		const { error: updateError } = await supabaseAdmin
 			.from('user_profiles')
 			.update({
 				email_verified: true,

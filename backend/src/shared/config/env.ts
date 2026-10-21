@@ -95,7 +95,7 @@ const envSchema = z.object({
 	EMAIL_VERIFICATION_MAX_RESENDS_PER_HOUR: z.string().default('3'),
 });
 
-export type Env = z.infer<typeof envSchema>;
+type Env = z.infer<typeof envSchema>;
 
 const parseEnv = (): Env => {
 	const result = envSchema.safeParse(process.env);

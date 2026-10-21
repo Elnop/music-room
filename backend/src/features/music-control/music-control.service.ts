@@ -10,7 +10,7 @@ const friendsService = new FriendsService();
  * Music Control Service
  * Manages music control permissions between friends
  */
-export class MusicControlService {
+class MusicControlService {
 	/**
 	 * Grant music control permission to a friend
 	 * Only works if both users are mutual friends

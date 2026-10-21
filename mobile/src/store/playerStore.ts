@@ -64,8 +64,6 @@ interface PlayerState {
 	// Actions
 	/** Set the stream URL and, when known, its expiry (epoch ms). */
 	setStreamUrl: (url: string | null, expiresAt?: number | null) => void;
-	setLoading: (loading: boolean) => void;
-	setError: (error: string | null) => void;
 	setTrackUnavailableError: (message: string) => void;
 	clearError: () => void;
 	setPlaybackReady: () => void;
@@ -136,24 +134,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 		set({ streamUrl: url, streamExpiresAt: url ? expiresAt : null });
 	},
 
-	setLoading: loading => {
-		set(state => ({
-			loading,
-			playbackState: loading && state.playbackState === 'idle' ? 'loading' : state.playbackState,
-		}));
-	},
-
-	setError: error => {
-		set({
-			error,
-			loading: false,
-			playbackState: error ? 'idle' : get().playbackState,
-			pendingTrackId: error ? null : get().pendingTrackId,
-		});
-	},
-
 	setTrackUnavailableError: message => {
-		if (__DEV__) console.log('🔴 [playerStore] Track unavailable:', message);
 		set({
 			error: message,
 			currentTrack: null,
@@ -176,7 +157,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 	setPlaybackReady: () => {
 		const state = get();
 		if (state.playbackState === 'loading') {
-			if (__DEV__) console.log('🎵 [playerStore] Stream ready, transitioning to ready state');
 			set({
 				// A stream renewed while paused comes back paused, so play resumes it (#313).
 				playbackState: state.resumeAfterLoad ? 'ready' : 'paused',
@@ -193,7 +173,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 			state.playbackState === 'ready' ||
 			state.playbackState === 'paused'
 		) {
-			if (__DEV__) console.log('🎵 [playerStore] Transitioning to playing state');
 			set({
 				playbackState: 'playing',
 				isPlaying: true,
@@ -204,14 +183,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 	},
 
 	playTrack: (track, queueItemId = null, startPositionMs = null) => {
-		if (__DEV__)
-			console.log('🎵 [playerStore] playTrack called:', {
-				id: track.id,
-				title: track.title,
-				queueItemId,
-				startPositionMs,
-			});
-
 		set(state => ({
 			currentTrack: track,
 			queueItemId,
@@ -239,7 +210,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 	renewStream: (positionMs, keepPlaying, afterFailure = false) => {
 		const { currentTrack } = get();
 		if (!currentTrack) return;
-		if (__DEV__) console.log('🎵 [playerStore] Renewing stream URL:', { positionMs, keepPlaying });
 
 		set(state => ({
 			startPositionMs: Number.isFinite(positionMs) && positionMs > 0 ? positionMs : null,
@@ -259,8 +229,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 	},
 
 	restoreTrack: (track, queueItemId, positionMs) => {
-		if (__DEV__)
-			console.log('🎵 [playerStore] Restoring last track:', { id: track.id, positionMs });
 		// loadCounter is left as is: the stream is fetched on play, not now.
 		set({
 			currentTrack: track,
@@ -300,7 +268,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 	pause: () => {
 		const state = get();
 		if (state.playbackState === 'playing') {
-			if (__DEV__) console.log('🎵 [playerStore] Pausing playback');
 			set({
 				playbackState: 'paused',
 				isPlaying: false,
@@ -314,7 +281,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 
 	pauseBySystem: () => {
 		if (get().playbackState === 'playing') {
-			if (__DEV__) console.log('🎵 [playerStore] Paused by the system');
 			set({
 				playbackState: 'paused',
 				isPlaying: false,
@@ -327,7 +293,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 		const state = get();
 		if (loadRestored(state)) return;
 		if (state.playbackState === 'paused') {
-			if (__DEV__) console.log('🎵 [playerStore] Resuming playback');
 			set({
 				playbackState: 'playing',
 				isPlaying: true,
@@ -337,7 +302,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 	},
 
 	stop: () => {
-		if (__DEV__) console.log('🎵 [playerStore] Stopping playback');
 		set({
 			currentTrack: null,
 			queueItemId: null,

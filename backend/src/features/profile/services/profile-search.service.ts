@@ -1,4 +1,4 @@
-import { supabase } from '@/shared/config/supabase.js';
+import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import { ilikeContains } from '@/shared/utils/postgrest-filter.js';
@@ -17,7 +17,7 @@ export class ProfileSearchService {
 			// Search by username or display_name using ilike (case-insensitive);
 			// the query is matched literally, never read as filter syntax (#236)
 			const pattern = ilikeContains(query);
-			let queryBuilder = supabase
+			let queryBuilder = supabaseAdmin
 				.from('user_profiles')
 				.select('id, username, display_name, avatar_url, bio, favorite_artist, created_at')
 				.or(`username.ilike.${pattern},display_name.ilike.${pattern}`)

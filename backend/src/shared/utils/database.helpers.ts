@@ -49,64 +49,6 @@ export async function fetchSingle<T>(
 }
 
 /**
- * Fetch multiple records from database
- * Returns empty array if none found
- */
-export async function fetchMany<T>(
-	client: SupabaseClient,
-	table: string,
-	filter?: Record<string, DbFilterValue>,
-	select = '*',
-	orderBy?: { column: string; ascending?: boolean }
-): Promise<T[]> {
-	let query = client.from(table).select(select);
-
-	// Apply filters if provided
-	if (filter) {
-		for (const [key, value] of Object.entries(filter)) {
-			query = query.eq(key, value);
-		}
-	}
-
-	// Apply ordering if provided
-	if (orderBy) {
-		query = query.order(orderBy.column, {
-			ascending: orderBy.ascending ?? true,
-		});
-	}
-
-	const { data, error } = await query;
-
-	if (error) {
-		logger.error(`Failed to fetch records from ${table}`, { error, filter });
-		throw new AppError(500, 'Failed to fetch records', 'FETCH_ERROR');
-	}
-
-	return (data as T[]) || [];
-}
-
-/**
- * Insert a single record into database
- */
-export async function insertOne<T>(
-	client: SupabaseClient,
-	table: string,
-	data: DbRecord,
-	select = '*',
-	errorMessage = 'Failed to insert record',
-	errorCode = 'INSERT_ERROR'
-): Promise<T> {
-	const { data: inserted, error } = await client.from(table).insert(data).select(select).single();
-
-	if (error || !inserted) {
-		logger.error(`Failed to insert into ${table}`, { error, data });
-		throw new AppError(500, errorMessage, errorCode);
-	}
-
-	return inserted as T;
-}
-
-/**
  * Update a single record in database
  */
 export async function updateOne<T>(
@@ -158,29 +100,4 @@ export async function deleteRecords(
 		logger.error(`Failed to delete from ${table}`, { error, filter });
 		throw new AppError(500, errorMessage, errorCode);
 	}
-}
-
-/**
- * Check if record exists
- */
-export async function recordExists(
-	client: SupabaseClient,
-	table: string,
-	filter: Record<string, DbFilterValue>
-): Promise<boolean> {
-	let query = client.from(table).select('id', { count: 'exact', head: true });
-
-	// Apply filters
-	for (const [key, value] of Object.entries(filter)) {
-		query = query.eq(key, value);
-	}
-
-	const { error, count } = await query;
-
-	if (error) {
-		logger.error(`Failed to check existence in ${table}`, { error, filter });
-		return false;
-	}
-
-	return (count ?? 0) > 0;
 }

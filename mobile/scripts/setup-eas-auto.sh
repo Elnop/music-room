@@ -46,7 +46,7 @@ else
 fi
 
 # Check if project is initialized
-if [ ! -f app.json ] || ! grep -q "projectId" app.json 2>/dev/null; then
+if [ ! -f app.config.js ] || ! grep -q "projectId" app.config.js 2>/dev/null; then
   echo "→ Initializing EAS project..."
   npx eas init --non-interactive || echo "⚠️  Init may have failed, continuing..."
 else

@@ -1,4 +1,3 @@
-import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import type { LoginInput, RegisterInput } from '@utils/validators';
@@ -26,7 +25,7 @@ interface ApiResponse<T> {
 /**
  * Auth response from backend
  */
-export interface AuthResponse {
+interface AuthResponse {
 	user: UserProfile;
 	session?: {
 		accessToken: string;
@@ -68,19 +67,6 @@ function getClientHeaders(): Record<string, string> {
 		'X-App-Version': appVersion,
 	};
 
-	if (__DEV__) {
-		console.log('[API] Client headers:', {
-			platform: Platform.OS,
-			deviceModelName: Device.modelName,
-			deviceName: Device.deviceName,
-			expoConfigVersion: Constants.expoConfig?.version,
-			manifestVersion: Constants.manifest?.version,
-			manifest2Version: Constants.manifest2?.extra?.expoClient?.version,
-			finalAppVersion: appVersion,
-			headers,
-		});
-	}
-
 	return headers;
 }
 
@@ -89,7 +75,7 @@ function getClientHeaders(): Record<string, string> {
  * store here would be circular, and a dynamic `import()` makes Metro load a
  * separate bundle whose HMR registration reloads the app in development.
  */
-export interface AuthSession {
+interface AuthSession {
 	getAccessToken: () => string | null;
 	isTokenExpiringSoon: () => boolean;
 	refreshAccessToken: () => Promise<boolean>;
@@ -129,7 +115,6 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
 
 	try {
 		if (endpoint === '/api/auth/refresh') {
-			console.log('[API] Skipping interceptor for /refresh endpoint');
 			const response = await makeRequest();
 			return handleResponse<T>(response);
 		}
@@ -143,7 +128,6 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
 		const accessToken = getAccessToken();
 
 		if (accessToken && isTokenExpiringSoon()) {
-			console.log('[API] Token expiring soon, proactively refreshing...');
 			await refreshAccessToken();
 
 			const response = await makeRequest(getAccessToken() || undefined);
@@ -155,8 +139,6 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
 		// Refresh only when a session exists: signed out (e.g. a wrong password
 		// at login), the 401 is the backend's answer, not an expired token (#235).
 		if (response.status === 401 && accessToken) {
-			console.log('[API] Received 401, attempting token refresh...');
-
 			const refreshSuccess = await refreshAccessToken();
 
 			if (!refreshSuccess) {

@@ -1,10 +1,10 @@
-export const CODE_LENGTH = 6;
+const CODE_LENGTH = 6;
 
 /** Native length cap of a code box: well above CODE_LENGTH so a paste with
  * spaces or newlines reaches fillCodeDigits whole. */
 export const CODE_INPUT_MAX_LENGTH = 32;
 
-export interface CodeFillResult {
+interface CodeFillResult {
 	code: string[];
 	/** Box to focus next, or null to leave focus where it is. */
 	focusIndex: number | null;

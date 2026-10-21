@@ -46,7 +46,6 @@ export function normalize(input: string): string | null {
 function update(url: string): void {
 	if (url === currentUrl) return;
 	currentUrl = url;
-	if (__DEV__) console.log('[BackendUrl] Now using:', url);
 	listeners.forEach(listener => listener(url));
 }
 

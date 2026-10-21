@@ -3,10 +3,10 @@ import multer from 'multer';
 import { AppError } from '@/shared/middleware/error-handler.js';
 
 /** Largest profile photo accepted, also the `avatars` bucket's limit (migration 027). */
-export const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
+const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
 
 /** Multipart field that carries the photo. */
-export const AVATAR_FIELD = 'avatar';
+const AVATAR_FIELD = 'avatar';
 
 const upload = multer({
 	storage: multer.memoryStorage(),

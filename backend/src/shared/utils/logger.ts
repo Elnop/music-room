@@ -10,14 +10,7 @@ type LogLevel = 'info' | 'warn' | 'error' | 'debug';
  * Can be primitives, objects, arrays, or errors
  */
 type LogMetadata =
-	| string
-	| number
-	| boolean
-	| null
-	| undefined
-	| Error
-	| Record<string, unknown>
-	| unknown[];
+	string | number | boolean | null | undefined | Error | Record<string, unknown> | unknown[];
 
 /**
  * Get the project root directory (backend/)

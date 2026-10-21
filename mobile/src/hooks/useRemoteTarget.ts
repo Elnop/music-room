@@ -84,7 +84,6 @@ export function useRemoteTarget() {
 		socket.on('control:success', handleControlSuccess);
 		// Shared with the friend profile (useFriendListening): counted, not emitted directly.
 		acquireListening(socket, ownerId);
-		if (__DEV__) console.log('[RemoteTarget] Subscribed to listening status of:', ownerId);
 
 		return () => {
 			socket.off('listening:status', handleStatus);

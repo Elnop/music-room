@@ -44,8 +44,6 @@ export type AppTabsParamList = {
 
 // Re-export stack param lists for type safety
 export type { PlaylistStackParamList } from '@/navigation/stacks/PlaylistsStack';
-export type { ProfileStackParamList } from '@/navigation/stacks/ProfileStack';
-export type { SearchStackParamList } from '@/navigation/stacks/SearchStack';
 export type { FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
 
 const Tab = createBottomTabNavigator<AppTabsParamList>();

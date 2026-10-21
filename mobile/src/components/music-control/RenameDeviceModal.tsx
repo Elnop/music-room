@@ -14,7 +14,7 @@ import { Input } from '@components/common/Input';
 import { Button } from '@components/common/Button';
 
 /** Same bounds as the backend (PATCH /api/music-control/devices/:deviceId). */
-export const DEVICE_NAME_MAX_LENGTH = 40;
+const DEVICE_NAME_MAX_LENGTH = 40;
 
 interface RenameDeviceModalProps {
 	/** Name shown now; the field starts with it. Null hides the modal. */

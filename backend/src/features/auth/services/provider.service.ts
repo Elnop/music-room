@@ -1,4 +1,4 @@
-import { supabase } from '@/shared/config/supabase.js';
+import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { OAuthProvider, LinkedProvidersResponse } from '@/features/auth/auth.types.js';
@@ -15,7 +15,7 @@ export class ProviderService {
 	 * @returns List of linked providers with metadata
 	 */
 	static async getLinkedProviders(userId: string): Promise<LinkedProvidersResponse> {
-		const { data: profile, error } = await supabase
+		const { data: profile, error } = await supabaseAdmin
 			.from('user_profiles')
 			.select('has_password, google_id, facebook_id, created_at')
 			.eq('id', userId)
@@ -70,7 +70,7 @@ export class ProviderService {
 	 * @param provider - Provider to unlink ('google' or 'facebook')
 	 */
 	static async unlinkProvider(userId: string, provider: OAuthProvider): Promise<void> {
-		const { data: profile, error } = await supabase
+		const { data: profile, error } = await supabaseAdmin
 			.from('user_profiles')
 			.select('has_password, google_id, facebook_id')
 			.eq('id', userId)
@@ -111,7 +111,7 @@ export class ProviderService {
 			throw new AppError(404, `${provider} is not linked to this account`, 'PROVIDER_NOT_LINKED');
 		}
 
-		const { error: updateError } = await supabase
+		const { error: updateError } = await supabaseAdmin
 			.from('user_profiles')
 			.update({
 				...providerIdField(provider, null),
@@ -143,7 +143,7 @@ export class ProviderService {
 	static async isProviderLinked(provider: OAuthProvider, providerId: string): Promise<boolean> {
 		const providerColumn = `${provider}_id`;
 
-		const { data } = await supabase
+		const { data } = await supabaseAdmin
 			.from('user_profiles')
 			.select('id')
 			.eq(providerColumn, providerId)

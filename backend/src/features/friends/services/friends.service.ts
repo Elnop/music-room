@@ -1,4 +1,4 @@
-import { supabase } from '@/shared/config/supabase.js';
+import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import { deleteRecords } from '@/shared/utils/database.helpers.js';
@@ -13,23 +13,23 @@ export class FriendsService {
 		try {
 			const [followingResult, followedByResult, followersCountResult, followingCountResult] =
 				await Promise.all([
-					supabase
+					supabaseAdmin
 						.from('follows')
 						.select('follower_id')
 						.eq('follower_id', currentUserId)
 						.eq('following_id', targetUserId)
 						.maybeSingle(),
-					supabase
+					supabaseAdmin
 						.from('follows')
 						.select('follower_id')
 						.eq('follower_id', targetUserId)
 						.eq('following_id', currentUserId)
 						.maybeSingle(),
-					supabase
+					supabaseAdmin
 						.from('follows')
 						.select('*', { count: 'exact', head: true })
 						.eq('following_id', targetUserId),
-					supabase
+					supabaseAdmin
 						.from('follows')
 						.select('*', { count: 'exact', head: true })
 						.eq('follower_id', targetUserId),
@@ -72,11 +72,11 @@ export class FriendsService {
 	async getMyStats(userId: string): Promise<{ followersCount: number; followingCount: number }> {
 		try {
 			const [followersCountResult, followingCountResult] = await Promise.all([
-				supabase
+				supabaseAdmin
 					.from('follows')
 					.select('*', { count: 'exact', head: true })
 					.eq('following_id', userId),
-				supabase
+				supabaseAdmin
 					.from('follows')
 					.select('*', { count: 'exact', head: true })
 					.eq('follower_id', userId),
@@ -102,7 +102,7 @@ export class FriendsService {
 				throw new AppError(400, 'Cannot follow yourself', 'SELF_FOLLOW_ERROR');
 			}
 
-			const { data: targetUser, error: userError } = await supabase
+			const { data: targetUser, error: userError } = await supabaseAdmin
 				.from('user_profiles')
 				.select('id')
 				.eq('id', targetUserId)
@@ -112,7 +112,7 @@ export class FriendsService {
 				throw new AppError(404, 'User not found', 'USER_NOT_FOUND');
 			}
 
-			const { error: insertError } = await supabase.from('follows').insert({
+			const { error: insertError } = await supabaseAdmin.from('follows').insert({
 				follower_id: currentUserId,
 				following_id: targetUserId,
 			});
@@ -145,7 +145,7 @@ export class FriendsService {
 	async unfollowUser(currentUserId: string, targetUserId: string): Promise<FollowActionResponse> {
 		try {
 			await deleteRecords(
-				supabase,
+				supabaseAdmin,
 				'follows',
 				{ follower_id: currentUserId, following_id: targetUserId },
 				'Failed to unfollow user',
@@ -182,7 +182,7 @@ export class FriendsService {
 	> {
 		try {
 			// Get users I follow
-			const { data: following, error: followingError } = await supabase
+			const { data: following, error: followingError } = await supabaseAdmin
 				.from('follows')
 				.select('following_id')
 				.eq('follower_id', userId);
@@ -198,7 +198,7 @@ export class FriendsService {
 
 			const followingIds = following.map(f => f.following_id);
 
-			const { data: mutualFollows, error: mutualError } = await supabase
+			const { data: mutualFollows, error: mutualError } = await supabaseAdmin
 				.from('follows')
 				.select('follower_id')
 				.eq('following_id', userId)
@@ -215,7 +215,7 @@ export class FriendsService {
 
 			const mutualIds = mutualFollows.map(f => f.follower_id);
 
-			const { data: profiles, error: profilesError } = await supabase
+			const { data: profiles, error: profilesError } = await supabaseAdmin
 				.from('user_profiles')
 				.select('id, username, display_name, avatar_url')
 				.in('id', mutualIds);

@@ -1,4 +1,4 @@
-import { supabase } from '@/shared/config/supabase.js';
+import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import { fetchSingle, updateOne } from '@/shared/utils/database.helpers.js';
@@ -36,7 +36,7 @@ export class ProfileService {
 			// Previous avatar, to delete our stored photo once replaced (#351)
 			let previousAvatarUrl: string | null = null;
 			if (data.avatarUrl !== undefined) {
-				const { data: current } = await supabase
+				const { data: current } = await supabaseAdmin
 					.from('user_profiles')
 					.select('avatar_url')
 					.eq('id', userId)
@@ -46,7 +46,7 @@ export class ProfileService {
 
 			// Update user_profiles table
 			const profileData = await updateOne<UserProfileRow>(
-				supabase,
+				supabaseAdmin,
 				'user_profiles',
 				{ id: userId },
 				updateData,
@@ -60,7 +60,8 @@ export class ProfileService {
 			}
 
 			// Get user email from auth.users
-			const { data: userData, error: userError } = await supabase.auth.admin.getUserById(userId);
+			const { data: userData, error: userError } =
+				await supabaseAdmin.auth.admin.getUserById(userId);
 
 			if (userError || !userData.user) {
 				logger.error('Failed to fetch user data', { userId, error: userError });
@@ -96,7 +97,7 @@ export class ProfileService {
 
 			// Get profile from user_profiles
 			const profileData = await fetchSingle<UserProfileRow>(
-				supabase,
+				supabaseAdmin,
 				'user_profiles',
 				{ id: userId },
 				'*',
@@ -105,7 +106,8 @@ export class ProfileService {
 			);
 
 			// Get user email from auth.users
-			const { data: userData, error: userError } = await supabase.auth.admin.getUserById(userId);
+			const { data: userData, error: userError } =
+				await supabaseAdmin.auth.admin.getUserById(userId);
 
 			if (userError || !userData.user) {
 				logger.error('User not found', { userId, error: userError });

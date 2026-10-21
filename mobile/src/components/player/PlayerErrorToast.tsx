@@ -20,8 +20,6 @@ export function PlayerErrorToast() {
 		if (shouldShow && !hasShownRef.current) {
 			hasShownRef.current = true;
 
-			if (__DEV__) console.log('🔔 [Toast] Showing toast for error:', error);
-
 			showError(error || "Cette musique n'est plus disponible");
 			clearError();
 		} else if (!shouldShow) {

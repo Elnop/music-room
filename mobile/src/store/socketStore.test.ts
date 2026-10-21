@@ -100,7 +100,6 @@ function readHandshake(): Promise<object> {
 const flush = () => new Promise<void>(resolve => setImmediate(resolve));
 
 beforeEach(async () => {
-	jest.spyOn(console, 'log').mockImplementation(() => undefined);
 	jest.spyOn(console, 'error').mockImplementation(() => undefined);
 	useSocketStore.setState({ socket: null, isConnected: false, status: 'idle' });
 	await resetBackendUrl();
@@ -301,7 +300,7 @@ describe('socketStore status', () => {
 	it('listens to the reconnect events on the Manager, not the socket', () => {
 		const managerEvents = socket.io.on.mock.calls.map(([event]) => event);
 		const socketEvents = socket.on.mock.calls.map(([event]) => event);
-		for (const event of ['reconnect', 'reconnect_attempt', 'reconnect_error', 'reconnect_failed']) {
+		for (const event of ['reconnect_attempt', 'reconnect_error', 'reconnect_failed']) {
 			expect(managerEvents).toContain(event);
 			expect(socketEvents).not.toContain(event);
 		}

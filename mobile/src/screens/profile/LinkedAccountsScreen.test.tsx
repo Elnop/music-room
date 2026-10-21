@@ -85,7 +85,6 @@ async function renderLoaded(): Promise<void> {
 }
 
 beforeEach(async () => {
-	jest.spyOn(console, 'log').mockImplementation(() => undefined);
 	jest.spyOn(console, 'warn').mockImplementation(() => undefined);
 	jest.spyOn(console, 'error').mockImplementation(() => undefined);
 	globalThis.fetch = fetchMock as unknown as typeof fetch;

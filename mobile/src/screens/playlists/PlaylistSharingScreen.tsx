@@ -6,7 +6,7 @@ import { EmptyState } from '@components/common/EmptyState';
 import { showError, showWarning, showSuccess } from '@utils/toast';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useFocusEffect } from '@react-navigation/native';
-import debounce from 'lodash/debounce';
+import { debounce } from '@/utils/debounce';
 import { Ionicons } from '@expo/vector-icons';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useTheme } from '@/contexts/ThemeContext';

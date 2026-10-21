@@ -17,7 +17,7 @@ vi.hoisted(() => {
 
 const { connectRedis, disconnectRedis, isRedisConnected, redisClient } =
 	await import('@/shared/config/redis.js');
-const { supabase, supabaseAdmin, supabaseAnon } = await import('@/shared/config/supabase.js');
+const { supabaseAdmin, supabaseAnon } = await import('@/shared/config/supabase.js');
 const { authMiddleware, optionalAuthMiddleware } =
 	await import('@/features/auth/auth.middleware.js');
 const { rateLimitConfig } = await import('@/shared/config/rate-limit.config.js');
@@ -42,7 +42,7 @@ describe('token verification limit per IP', () => {
 	let baseUrl: string;
 	let userId: string;
 	let validToken: string;
-	const getUser = vi.spyOn(supabase.auth, 'getUser');
+	const getUser = vi.spyOn(supabaseAdmin.auth, 'getUser');
 	const clients: ClientSocket[] = [];
 
 	beforeAll(async () => {

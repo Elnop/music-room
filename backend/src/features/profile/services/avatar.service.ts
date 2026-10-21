@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { supabase } from '@/shared/config/supabase.js';
+import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import { detectImageType } from '@/features/profile/utils/image-type.js';
@@ -37,7 +37,7 @@ export function ownedAvatarPath(url: string | null | undefined, userId: string):
 
 /** Best effort: a leftover file must not fail a change already saved. */
 async function removeObject(path: string, userId: string): Promise<void> {
-	const { error } = await supabase.storage.from(AVATAR_BUCKET).remove([path]);
+	const { error } = await supabaseAdmin.storage.from(AVATAR_BUCKET).remove([path]);
 	if (error) {
 		logger.warn('Failed to delete an avatar file', { userId, path, error: error.message });
 	}
@@ -79,7 +79,7 @@ export class AvatarService {
 
 		const previousUrl = await this.currentAvatarUrl(userId);
 		const path = `${userId}/${randomUUID()}.${type.ext}`;
-		const bucket = supabase.storage.from(AVATAR_BUCKET);
+		const bucket = supabaseAdmin.storage.from(AVATAR_BUCKET);
 
 		const { error: uploadError } = await bucket.upload(path, file, {
 			contentType: type.mime,
@@ -121,7 +121,7 @@ export class AvatarService {
 	}
 
 	private async currentAvatarUrl(userId: string): Promise<string | null> {
-		const { data, error } = await supabase
+		const { data, error } = await supabaseAdmin
 			.from('user_profiles')
 			.select('avatar_url')
 			.eq('id', userId)
@@ -133,7 +133,7 @@ export class AvatarService {
 	}
 
 	private async setAvatarUrl(userId: string, avatarUrl: string | null): Promise<void> {
-		const { error } = await supabase
+		const { error } = await supabaseAdmin
 			.from('user_profiles')
 			.update({ avatar_url: avatarUrl, updated_at: new Date().toISOString() })
 			.eq('id', userId);
