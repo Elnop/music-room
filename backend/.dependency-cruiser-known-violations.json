@@ -1,0 +1,1059 @@
+[
+  {
+    "type": "dependency",
+    "from": "src/features/auth/auth-flow.int.test.ts",
+    "to": "src/features/mail/mail.service.ts",
+    "unresolvedTo": "@/features/mail/mail.service.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "dynamic-import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/auth/auth.service.test.ts",
+    "to": "src/features/mail/mail.config.ts",
+    "unresolvedTo": "@/features/mail/mail.config.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "type-import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/auth/services/email-verification.int.test.ts",
+    "to": "src/features/mail/mail.config.ts",
+    "unresolvedTo": "@/features/mail/mail.config.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "dynamic-import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/auth/services/email-verification.int.test.ts",
+    "to": "src/features/mail/mail.service.ts",
+    "unresolvedTo": "@/features/mail/mail.service.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "dynamic-import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/auth/services/email-verification.service.ts",
+    "to": "src/features/mail/mail.config.ts",
+    "unresolvedTo": "@/features/mail/mail.config.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/auth/services/email-verification.service.ts",
+    "to": "src/features/mail/mail.service.ts",
+    "unresolvedTo": "@/features/mail/mail.service.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/auth/services/password-reset-oauth.int.test.ts",
+    "to": "src/features/mail/mail.service.ts",
+    "unresolvedTo": "@/features/mail/mail.service.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "dynamic-import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/auth/services/password-reset-resend.int.test.ts",
+    "to": "src/features/mail/mail.service.ts",
+    "unresolvedTo": "@/features/mail/mail.service.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "dynamic-import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/auth/services/password-reset-sessions.int.test.ts",
+    "to": "src/features/mail/mail.service.ts",
+    "unresolvedTo": "@/features/mail/mail.service.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "dynamic-import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/auth/services/password-reset.service.ts",
+    "to": "src/features/mail/mail.service.ts",
+    "unresolvedTo": "@/features/mail/mail.service.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/auth/services/registration.service.ts",
+    "to": "src/features/mail/mail.config.ts",
+    "unresolvedTo": "@/features/mail/mail.config.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/auth/utils/find-auth-user.int.test.ts",
+    "to": "src/features/mail/mail.service.ts",
+    "unresolvedTo": "@/features/mail/mail.service.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "dynamic-import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/friends/friends.routes.ts",
+    "to": "src/features/auth/auth.middleware.ts",
+    "unresolvedTo": "@/features/auth/auth.middleware.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/music-control/music-control.routes.ts",
+    "to": "src/features/auth/auth.middleware.ts",
+    "unresolvedTo": "@/features/auth/auth.middleware.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/music-control/music-control.service.ts",
+    "to": "src/features/friends/services/friends.service.ts",
+    "unresolvedTo": "@/features/friends/services/friends.service.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/music-control/music-control.types.ts",
+    "to": "src/features/queue/queue.types.ts",
+    "unresolvedTo": "@/features/queue/queue.types.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "type-only",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/music-control/services/controllable-devices.service.ts",
+    "to": "src/features/friends/services/friends.service.ts",
+    "unresolvedTo": "@/features/friends/services/friends.service.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/music-control/services/device-license.service.ts",
+    "to": "src/features/friends/services/friends.service.ts",
+    "unresolvedTo": "@/features/friends/services/friends.service.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/music-control/services/device-license.service.ts",
+    "to": "src/features/friends/utils/listening-access.ts",
+    "unresolvedTo": "@/features/friends/utils/listening-access.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/playlists/playlist.routes.ts",
+    "to": "src/features/auth/auth.middleware.ts",
+    "unresolvedTo": "@/features/auth/auth.middleware.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/playlists/services/playlist-track.service.ts",
+    "to": "src/features/queue/services/queue-sync.service.ts",
+    "unresolvedTo": "@/features/queue/services/queue-sync.service.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/profile/profile.routes.ts",
+    "to": "src/features/auth/auth.middleware.ts",
+    "unresolvedTo": "@/features/auth/auth.middleware.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/profile/profile.routes.ts",
+    "to": "src/features/auth/middleware/rate-limit.middleware.ts",
+    "unresolvedTo": "@/features/auth/middleware/rate-limit.middleware.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/queue/permissions/queue.permissions.ts",
+    "to": "src/features/music-control/services/control-access.service.ts",
+    "unresolvedTo": "@/features/music-control/services/control-access.service.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/queue/queue-transfer.routes.ts",
+    "to": "src/features/auth/auth.middleware.ts",
+    "unresolvedTo": "@/features/auth/auth.middleware.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/queue/queue.routes.ts",
+    "to": "src/features/auth/auth.middleware.ts",
+    "unresolvedTo": "@/features/auth/auth.middleware.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/queue/queue.validators.ts",
+    "to": "src/features/playlists/playlist.validators.ts",
+    "unresolvedTo": "@/features/playlists/playlist.validators.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/queue/services/queue-delegation.int.test.ts",
+    "to": "src/features/playlists/playlist.service.ts",
+    "unresolvedTo": "@/features/playlists/playlist.service.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/queue/services/queue-sync.int.test.ts",
+    "to": "src/features/playlists/playlist.service.ts",
+    "unresolvedTo": "@/features/playlists/playlist.service.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "dynamic-import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/queue/services/queue-sync.int.test.ts",
+    "to": "src/features/playlists/services/playlist-track.service.ts",
+    "unresolvedTo": "@/features/playlists/services/playlist-track.service.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "dynamic-import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/queue/services/queue-transfer.service.ts",
+    "to": "src/features/music-control/music-control.types.ts",
+    "unresolvedTo": "@/features/music-control/music-control.types.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "type-only",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/queue/services/queue-transfer.service.ts",
+    "to": "src/features/music-control/services/control-access.service.ts",
+    "unresolvedTo": "@/features/music-control/services/control-access.service.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/queue/services/queue.service.int.test.ts",
+    "to": "src/features/playlists/playlist.service.ts",
+    "unresolvedTo": "@/features/playlists/playlist.service.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/queue/services/queue.service.int.test.ts",
+    "to": "src/features/playlists/services/playlist-track.service.ts",
+    "unresolvedTo": "@/features/playlists/services/playlist-track.service.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/queue/services/queue.service.ts",
+    "to": "src/features/playlists/permissions/playlist.permissions.ts",
+    "unresolvedTo": "@/features/playlists/permissions/playlist.permissions.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/queue/utils/queue-play-command.ts",
+    "to": "src/features/music-control/music-control.types.ts",
+    "unresolvedTo": "@/features/music-control/music-control.types.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "type-only",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/soundcloud/soundcloud.int.test.ts",
+    "to": "src/features/auth/middleware/rate-limit.middleware.ts",
+    "unresolvedTo": "@/features/auth/middleware/rate-limit.middleware.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "dynamic-import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/soundcloud/soundcloud.routes.ts",
+    "to": "src/features/auth/auth.middleware.ts",
+    "unresolvedTo": "@/features/auth/auth.middleware.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/soundcloud/soundcloud.routes.ts",
+    "to": "src/features/auth/middleware/rate-limit.middleware.ts",
+    "unresolvedTo": "@/features/auth/middleware/rate-limit.middleware.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/auth/services/email-verification.int.test.ts",
+    "to": "src/features/auth/auth.routes.ts",
+    "unresolvedTo": "@/features/auth/auth.routes.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "dynamic-import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "services-not-to-controller"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/auth/services/password-reset-attempts.int.test.ts",
+    "to": "src/features/auth/auth.routes.ts",
+    "unresolvedTo": "@/features/auth/auth.routes.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "dynamic-import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "services-not-to-controller"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/auth/services/password-reset-oauth.int.test.ts",
+    "to": "src/features/auth/auth.routes.ts",
+    "unresolvedTo": "@/features/auth/auth.routes.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "dynamic-import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "services-not-to-controller"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/auth/services/password-reset-resend.int.test.ts",
+    "to": "src/features/auth/auth.routes.ts",
+    "unresolvedTo": "@/features/auth/auth.routes.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "dynamic-import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "services-not-to-controller"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/auth/services/password-reset-sessions.int.test.ts",
+    "to": "src/features/auth/auth.routes.ts",
+    "unresolvedTo": "@/features/auth/auth.routes.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "dynamic-import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "services-not-to-controller"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/profile/services/avatar.int.test.ts",
+    "to": "src/features/profile/profile.routes.ts",
+    "unresolvedTo": "@/features/profile/profile.routes.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "dynamic-import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "services-not-to-controller"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/shared/config/routes.ts",
+    "to": "src/features/auth/auth.routes.ts",
+    "unresolvedTo": "@/features/auth/auth.routes.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "shared-not-to-features"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/shared/config/routes.ts",
+    "to": "src/features/friends/friends.routes.ts",
+    "unresolvedTo": "@/features/friends/friends.routes.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "shared-not-to-features"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/shared/config/routes.ts",
+    "to": "src/features/music-control/music-control.routes.ts",
+    "unresolvedTo": "@/features/music-control/music-control.routes.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "shared-not-to-features"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/shared/config/routes.ts",
+    "to": "src/features/playlists/playlist.routes.ts",
+    "unresolvedTo": "@/features/playlists/playlist.routes.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "shared-not-to-features"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/shared/config/routes.ts",
+    "to": "src/features/profile/profile.routes.ts",
+    "unresolvedTo": "@/features/profile/profile.routes.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "shared-not-to-features"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/shared/config/routes.ts",
+    "to": "src/features/queue/queue-transfer.routes.ts",
+    "unresolvedTo": "@/features/queue/queue-transfer.routes.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "shared-not-to-features"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/shared/config/routes.ts",
+    "to": "src/features/queue/queue.routes.ts",
+    "unresolvedTo": "@/features/queue/queue.routes.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "shared-not-to-features"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/shared/config/routes.ts",
+    "to": "src/features/soundcloud/soundcloud.routes.ts",
+    "unresolvedTo": "@/features/soundcloud/soundcloud.routes.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "shared-not-to-features"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/shared/config/swagger.config.ts",
+    "to": "src/features/auth/auth.openapi.ts",
+    "unresolvedTo": "@/features/auth/auth.openapi.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "shared-not-to-features"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/shared/config/swagger.config.ts",
+    "to": "src/features/friends/friends.openapi.ts",
+    "unresolvedTo": "@/features/friends/friends.openapi.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "shared-not-to-features"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/shared/config/swagger.config.ts",
+    "to": "src/features/music-control/music-control.openapi.ts",
+    "unresolvedTo": "@/features/music-control/music-control.openapi.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "shared-not-to-features"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/shared/config/swagger.config.ts",
+    "to": "src/features/playlists/playlist.openapi.ts",
+    "unresolvedTo": "@/features/playlists/playlist.openapi.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "shared-not-to-features"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/shared/config/swagger.config.ts",
+    "to": "src/features/profile/profile.openapi.ts",
+    "unresolvedTo": "@/features/profile/profile.openapi.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "shared-not-to-features"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/shared/config/swagger.config.ts",
+    "to": "src/features/queue/queue.openapi.ts",
+    "unresolvedTo": "@/features/queue/queue.openapi.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "shared-not-to-features"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/shared/config/swagger.config.ts",
+    "to": "src/features/soundcloud/soundcloud.openapi.ts",
+    "unresolvedTo": "@/features/soundcloud/soundcloud.openapi.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "shared-not-to-features"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/shared/config/trust-proxy.int.test.ts",
+    "to": "src/features/auth/auth.middleware.ts",
+    "unresolvedTo": "@/features/auth/auth.middleware.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "dynamic-import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "shared-not-to-features"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/shared/config/trust-proxy.int.test.ts",
+    "to": "src/realtime/index.ts",
+    "unresolvedTo": "@/realtime/index.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "dynamic-import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "shared-not-to-features"
+    }
+  }
+]

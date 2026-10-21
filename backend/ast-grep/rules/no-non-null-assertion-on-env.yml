@@ -1,0 +1,11 @@
+id: no-non-null-assertion-on-env
+language: TypeScript
+severity: error
+message: process.env.X! skips validation; read the variable from src/shared/config/env.ts. See .agents/rules/guardrails.md#no-non-null-assertion-on-env
+rule:
+  pattern: process.env.$NAME!
+files:
+  - src/**/*.ts
+ignores:
+  - src/shared/config/env.ts
+  - src/**/*.test.ts

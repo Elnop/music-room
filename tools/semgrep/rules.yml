@@ -1,0 +1,88 @@
+# Pattern rules shared by backend/ and mobile/, run by `npm run check` through
+# the pinned semgrep Docker image (tools/guardrails/docker-scan.mjs). Paths are
+# relative to the repository root. Each message points to the rule's section
+# in .agents/rules/guardrails.md. Rules are append-only: never weaken one, and
+# only remove entries from an `exclude` list.
+rules:
+  - id: no-eval
+    languages: [typescript]
+    severity: ERROR
+    message: >-
+      eval() and new Function() run arbitrary code. See
+      .agents/rules/guardrails.md#no-eval
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: new Function(...)
+    paths:
+      include:
+        - /backend/src/
+        - /mobile/src/
+        - /mobile/App.tsx
+
+  - id: no-async-useeffect
+    languages: [typescript]
+    severity: ERROR
+    message: >-
+      A useEffect callback must not be async (it would return a Promise);
+      define an async function inside and call it. See
+      .agents/rules/guardrails.md#no-async-useeffect
+    # semgrep ignores the `async` keyword in an arrow pattern, so the
+    # callback's source text is matched instead.
+    patterns:
+      - pattern-either:
+          - pattern: useEffect($CALLBACK, ...)
+          - pattern: React.useEffect($CALLBACK, ...)
+      - metavariable-regex:
+          metavariable: $CALLBACK
+          regex: ^async\b
+    paths:
+      include:
+        - /mobile/src/
+        - /mobile/App.tsx
+
+  - id: no-fetch-outside-api-client
+    languages: [typescript]
+    severity: ERROR
+    message: >-
+      HTTP calls go through mobile/src/services/api.ts, which sends the
+      X-Platform, X-Device-Model and X-App-Version headers. See
+      .agents/rules/guardrails.md#no-fetch-outside-api-client
+    pattern-either:
+      - pattern: fetch(...)
+      - pattern: globalThis.fetch(...)
+      - pattern: window.fetch(...)
+    paths:
+      include:
+        - /mobile/src/
+        - /mobile/App.tsx
+      exclude:
+        - /mobile/src/services/api.ts
+        - "*.test.ts"
+        - "*.test.tsx"
+
+  - id: no-asyncstorage-outside-storage
+    languages: [typescript]
+    severity: ERROR
+    message: >-
+      AsyncStorage is used only in storage modules; go through one of them.
+      See .agents/rules/guardrails.md#no-asyncstorage-outside-storage
+    pattern-either:
+      - pattern: import $X from '@react-native-async-storage/async-storage'
+      - pattern: import { $...X } from '@react-native-async-storage/async-storage'
+    paths:
+      include:
+        - /mobile/src/
+        - /mobile/App.tsx
+      exclude:
+        # Storage modules: AsyncStorage belongs here.
+        - /mobile/src/services/lastTrackStorage.ts
+        - /mobile/src/services/backendUrl.ts
+        - "*.test.ts"
+        - "*.test.tsx"
+        # Known exceptions: remove each line once the file goes through a
+        # storage module. This list only shrinks.
+        - /mobile/src/store/authStore.ts
+        - /mobile/src/contexts/ThemeContext.tsx
+        - /mobile/src/navigation/RootNavigator.tsx
+        - /mobile/src/lib/supabase.ts
+        - /mobile/src/services/deviceService.ts

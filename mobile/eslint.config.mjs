@@ -6,6 +6,21 @@ import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import prettierPlugin from 'eslint-plugin-prettier';
 import prettierConfig from 'eslint-config-prettier';
 
+// Aliases from babel.config.js and tsconfig.json other than @/, kept only
+// until the files that use them migrate.
+const LEGACY_ALIASES = [
+  '@api',
+  '@components',
+  '@contexts',
+  '@screens',
+  '@services',
+  '@store',
+  '@hooks',
+  '@utils',
+  '@themes',
+  '@constants',
+];
+
 export default [
   // Ignore patterns (replaces .eslintignore)
   {
@@ -30,12 +45,12 @@ export default [
   // TypeScript config - exclude config files
   ...tseslint.configs.recommended.map(config => ({
     ...config,
-    ignores: ['babel.config.js', 'plugins/**/*.js'],
+    ignores: ['babel.config.js', 'plugins/**/*.js', '*.cjs'],
   })),
 
   // Special configuration for CommonJS config files (babel, plugins)
   {
-    files: ['babel.config.js', 'plugins/**/*.js'],
+    files: ['babel.config.js', 'plugins/**/*.js', '*.cjs'],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'commonjs',
@@ -56,7 +71,7 @@ export default [
   // Main configuration for TypeScript and React files
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
-    ignores: ['babel.config.js', 'plugins/**/*.js'],
+    ignores: ['babel.config.js', 'plugins/**/*.js', '*.cjs'],
     plugins: {
       react: reactPlugin,
       'react-hooks': reactHooksPlugin,
@@ -109,8 +124,50 @@ export default [
       'react-hooks/immutability': 'warn',
       'react-hooks/set-state-in-effect': 'warn',
 
-      // Console rules - allow console.log in development (__DEV__ wrapped)
-      'no-console': ['warn', { allow: ['log', 'warn', 'error'] }],
+      // No console.* at all. Not the core `no-console`: its message cannot
+      // point to the rule's doc.
+      'no-restricted-globals': [
+        'error',
+        {
+          name: 'console',
+          message:
+            'No direct console.* call; use the project logger. See .agents/rules/logging.md#no-console',
+        },
+      ],
+
+      // Imports that leave the current folder go through @/.
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['../*'],
+              message:
+                'Use the @/ alias instead of a relative parent import (../). See .agents/rules/architecture.md#no-parent-imports',
+            },
+            {
+              group: LEGACY_ALIASES.flatMap(alias => [alias, `${alias}/*`]),
+              message:
+                'Only the @/ alias is allowed (@/components/..., not @components/...). See .agents/rules/architecture.md#no-legacy-aliases',
+            },
+          ],
+        },
+      ],
+    },
+  },
+
+  // No index.ts: import the source file.
+  {
+    files: ['src/**/index.{ts,tsx}'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'Program',
+          message:
+            'Files named index.ts are forbidden; name the file after what it holds and import it directly. See .agents/rules/structure.md#no-index-files',
+        },
+      ],
     },
   },
 
