@@ -2,7 +2,7 @@
 
 How the backend and the mobile app are tested. Every epic follows this document; change it through a PR, not per feature.
 
-Subject requirement: IV.8 (tests for each layer). Goal (CAP-3): `make test` runs backend and mobile tests covering the critical paths of each layer, and exits non-zero when one fails. There is no coverage threshold.
+Subject requirement: IV.8 (tests for each layer). Goal (CAP-3): `make test` runs backend and mobile tests covering the critical paths of each layer, and exits non-zero when one fails. No coverage threshold is enforced, but coverage must not drop below the floor measured before epic #362 (see [Coverage](#coverage)).
 
 ## Frameworks
 
@@ -83,6 +83,17 @@ npx jest src/utils/formatters.test.ts                 # one file
 npx jest -t "formatDuration"                          # tests whose name matches
 ```
 
+`npm run check` in `backend/` or `mobile/` runs the unit tests together with every other guardrail (type-check, lint, knip, dependency-cruiser, jscpd, semgrep, ast-grep, gitleaks, exception lists); the pre-commit hook runs it on the projects a commit touches. What each check does and how to fix a failure: `.agents/rules/guardrails.md`.
+
+## Coverage
+
+`npm run test:coverage` (backend: `vitest run --coverage`, v8; mobile: `jest --coverage`) measures every source file of `src/` (mobile: plus `App.tsx`), tests and generated types excluded, and writes `coverage/` (git-ignored). Floor measured at the start of epic #362 (2026-10-22), which no story may go below:
+
+| | Lines | Branches | Functions | Statements |
+| --- | --- | --- | --- | --- |
+| Backend | 36.29% | 32.08% | 38.38% | 36.32% |
+| Mobile | 69.06% | 65.04% | 68.02% | 69.38% |
+
 
 ## Load tests (HTTP and real time)
 
@@ -115,8 +126,9 @@ The backend's global auth limiter (20 `/api/auth` requests per 15 minutes per IP
 | `lint` | `npm run lint` | backend, mobile |
 | `type-check` | `npm run type-check` | backend, mobile |
 | `test` | `npm test` | backend, mobile |
+| `check` | `npm run check`: every guardrail, including lint, type-check and test again (`.agents/rules/guardrails.md`). Runs on `ubuntu-24.04` because semgrep and gitleaks are Docker images, and checks out the full history so the exception lists can be compared with `origin/develop`. | backend, mobile |
 | `test-int` | `scripts/test-db.sh up` (Supabase stack + Redis), then `npm run test:int`. The stack's Docker images are cached between runs (`actions/cache`, keyed on the Supabase CLI and Postgres versions and the Redis image): ECR Public's anonymous quota is shared by every runner. A PR reuses the cache saved on `develop` (GitHub scopes caches by branch), so a new image set reaches other PRs once it is on `develop`. | backend |
 
 A failing job marks the pull request red. Lint warnings do not fail it; errors do.
 
-`lint`, `type-check` and `test` run on `ubuntu-slim` (1 vCPU container, 15-minute cap, no Docker); `test-int` needs Docker for the Supabase stack and runs on `ubuntu-24.04`. Actions are pinned to commit SHAs and bumped by Dependabot (`.github/dependabot.yml`).
+`lint`, `type-check` and `test` run on `ubuntu-slim` (1 vCPU container, 15-minute cap, no Docker); `test-int` and `check` need Docker and run on `ubuntu-24.04`. Actions are pinned to commit SHAs and bumped by Dependabot (`.github/dependabot.yml`).
