@@ -13,7 +13,7 @@
 - The repository's default branch is `main`: always pass `--base develop` to `gh pr create`.
 - Never implement Music Track Vote (IV.2.1); the project delivers Playlist Editor and Music Control Delegation.
 - Never commit credentials or API keys; they go in `backend/.env` and `mobile/.env`, with placeholders in `.env.example`.
-- Never commit installed dependencies; everything installs from manifests via `make install`. `backend/` and `mobile/` lockfiles are committed: change dependencies with `npm install <pkg>` and commit the lockfile with it.
+- Never commit installed dependencies; everything installs from manifests via `make install`. `backend/` and `mobile/` lockfiles are committed: change dependencies with `npm install <pkg>` and commit the lockfile with it. Write lockfiles with npm 10 (the CI's, bundled with Node 22): a lockfile from npm 11 makes `npm ci` fail there; run `npx -y npm@10 install --package-lock-only` after the change.
 - An SDK must not do the core work the subject asks for; implement it in project code.
 - Never hand-edit `backend/src/shared/types/supabase.generated.ts`; run `make generate-types`.
 
