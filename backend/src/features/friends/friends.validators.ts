@@ -1,13 +1,17 @@
 import { z } from 'zod';
 
-/**
- * Friends schemas. The routes read `:userId` with `routeParam` (any non-empty
- * segment); the schemas below document the API in /api-docs.
- */
+/** Friends schemas: path parameters, and the responses documented in /api-docs. */
 
-/** Path segment of the /status, /follow routes: the other user. */
+/**
+ * Path segment of the /status, /follow routes: the other user, in any input
+ * form of the Postgres `uuid` type (hyphens optional after any group of 4 hex
+ * digits, optional braces), since the lookup used to accept them all.
+ */
 export const friendUserParamsSchema = z.object({
-	userId: z.uuid().meta({ param: { description: 'ID of the other user' } }),
+	userId: z
+		.string()
+		.regex(/^(\{[0-9a-fA-F]{4}(-?[0-9a-fA-F]{4}){7}\}|[0-9a-fA-F]{4}(-?[0-9a-fA-F]{4}){7})$/)
+		.meta({ format: 'uuid', param: { description: 'ID of the other user' } }),
 });
 
 /** A mutual friend (GET /api/friends); displayName and avatarUrl are absent when unset. */

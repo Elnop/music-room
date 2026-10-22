@@ -1,29 +1,12 @@
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
-import { FriendsService } from '@/features/friends/services/friends.service.js';
+import { failUnexpected } from '@/shared/utils/fail-unexpected.js';
+import * as followStatusService from '@/features/friends/services/follow-status.service.js';
 import { realtime } from '@/realtime/index.js';
 
 // The "all my devices" switch (`follows(friend → owner).can_control_music`):
 // the owner lets a mutual friend control all of their devices.
-
-const friendsService = new FriendsService();
-
-/** Runs `work`; an error that is not an AppError is logged and answered as a 500 `code`. */
-async function failUnexpected(
-	work: () => Promise<void>,
-	log: string,
-	message: string,
-	code: string
-): Promise<void> {
-	try {
-		await work();
-	} catch (error) {
-		if (error instanceof AppError) throw error;
-		logger.error(log, { error });
-		throw new AppError(500, message, code);
-	}
-}
 
 /** Sets the switch on `follows(allowedUserId → ownerId)`; `.select()` returns the rows updated. */
 function setControl(ownerId: string, allowedUserId: string, canControl: boolean) {
@@ -42,7 +25,7 @@ function setControl(ownerId: string, allowedUserId: string, canControl: boolean)
 export function grantControl(ownerId: string, allowedUserId: string): Promise<void> {
 	return failUnexpected(
 		async () => {
-			const followStatus = await friendsService.getFollowStatus(ownerId, allowedUserId);
+			const followStatus = await followStatusService.getFollowStatus(ownerId, allowedUserId);
 			if (!followStatus.isFriend) {
 				throw new AppError(400, 'You can only grant control to mutual friends', 'NOT_FRIENDS');
 			}

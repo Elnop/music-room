@@ -8,7 +8,7 @@ import { connectRedis, disconnectRedis, isRedisConnected } from '@/shared/config
 import * as controlSwitchService from '@/features/music-control/services/control-switch.service.js';
 import * as controlAccessService from '@/features/music-control/services/control-access.service.js';
 import * as deviceLicenseService from '@/features/music-control/services/device-license.service.js';
-import { FriendsService } from '@/features/friends/services/friends.service.js';
+import * as followService from '@/features/friends/services/follow.service.js';
 import type { UserListeningStatus } from '@/features/music-control/music-control.types.js';
 import { realtime } from '@/realtime/index.js';
 
@@ -472,7 +472,7 @@ describe('Listening and control access', () => {
 			const [bobSocket, daveSocket] = await Promise.all([connect(bob), connect(dave)]);
 			await Promise.all([subscribe(bobSocket, alice.id), subscribe(daveSocket, alice.id)]);
 
-			await new FriendsService().unfollowUser(bob.id, alice.id);
+			await followService.unfollowUser(bob.id, alice.id);
 			expect(await inListeningRoom(bobSocket, alice.id)).toBe(false);
 			expect(await inListeningRoom(daveSocket, alice.id)).toBe(true);
 
@@ -587,7 +587,7 @@ describe('Listening and control access', () => {
 			const { bobSocket } = await bobLicensedOnA();
 			await subscribe(bobSocket, alice.id);
 
-			await new FriendsService().unfollowUser(alice.id, bob.id);
+			await followService.unfollowUser(alice.id, bob.id);
 			expect(await inListeningRoom(bobSocket, alice.id)).toBe(false);
 		});
 

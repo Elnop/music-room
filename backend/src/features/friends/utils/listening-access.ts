@@ -5,8 +5,7 @@ import { logger } from '@/shared/utils/logger.js';
  * from the owner's listening room when none is left (see
  * realtime.revalidateListeningAccess). Imported lazily so that loading the
  * friends feature does not load the Socket.io server, and so that no import
- * cycle forms if realtime/index.ts ever imports a service that builds a
- * FriendsService at load time. Never throws: eviction must not fail the
+ * cycle forms if realtime/index.ts ever imports a friends service. Never throws: eviction must not fail the
  * unfollow or the revoke.
  */
 export async function revalidateListeningAccess(

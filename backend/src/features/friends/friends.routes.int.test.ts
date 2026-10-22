@@ -220,6 +220,29 @@ describe('Friends routes (/api/friends)', () => {
 		expect(await followRows(a.id, unknownId)).toBe(0);
 	});
 
+	it('answers a malformed id as the database lookup always did', async () => {
+		const routes: Array<['GET' | 'POST' | 'DELETE', string, number, string]> = [
+			['GET', '/status/not-a-uuid', 500, 'FOLLOW_STATUS_ERROR'],
+			['POST', '/follow/not-a-uuid', 404, 'USER_NOT_FOUND'],
+			['DELETE', '/follow/not-a-uuid', 500, 'UNFOLLOW_ERROR'],
+		];
+		for (const [method, path, expected, code] of routes) {
+			const { status, body } = await call(method, path, a);
+			expect(status, `${method} ${path}`).toBe(expected);
+			expect(body.error?.code, `${method} ${path}`).toBe(code);
+		}
+	});
+
+	it('accepts every input form of the Postgres uuid type, as the lookup always did', async () => {
+		await follow(a, b);
+
+		for (const id of [b.id.replaceAll('-', ''), `{${b.id}}`]) {
+			const { status, body } = await call('GET', `/status/${id}`, a);
+			expect(status, id).toBe(200);
+			expect(body.data, id).toMatchObject({ isFollowing: true, followersCount: 1 });
+		}
+	});
+
 	it('unfollowing ends the friendship on both sides', async () => {
 		await follow(a, b);
 		await follow(b, a);

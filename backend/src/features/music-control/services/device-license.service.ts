@@ -1,7 +1,7 @@
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
-import { FriendsService } from '@/features/friends/services/friends.service.js';
+import * as followStatusService from '@/features/friends/services/follow-status.service.js';
 import { notifyListeningAccessChange } from '@/features/friends/utils/listening-access.js';
 import * as controlAccessService from '@/features/music-control/services/control-access.service.js';
 import type {
@@ -19,8 +19,6 @@ import {
 // Per-device music control licenses (`device_control_licenses`): the owner of
 // a device lets a mutual friend control it.
 
-const friendsService = new FriendsService();
-
 /**
  * Licenses granteeId on the owner's device. Idempotent: an existing license
  * keeps its first `created_at`.
@@ -35,7 +33,7 @@ export async function grant(
 	}
 	await findOwnedDevice(ownerId, deviceId);
 
-	const { isFriend } = await friendsService.getFollowStatus(ownerId, granteeId);
+	const { isFriend } = await followStatusService.getFollowStatus(ownerId, granteeId);
 	if (!isFriend) {
 		throw new AppError(400, 'You can only grant control to mutual friends', 'NOT_FRIENDS');
 	}
