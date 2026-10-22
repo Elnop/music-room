@@ -3,7 +3,7 @@ import { musicGenreSchema, visibilityLevelSchema } from '@/features/profile/prof
 
 /**
  * Response bodies of the /api/profile routes, for the OpenAPI document.
- * Mirrors the response interfaces of profile.types.ts; optional fields are
+ * profile.types.ts infers its response types from them; optional fields are
  * absent when unset or, for another user's profile, hidden by their privacy.
  */
 

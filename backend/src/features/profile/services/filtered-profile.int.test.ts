@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
-import { PrivacyService } from '@/features/profile/services/privacy.service.js';
+import * as filteredProfileService from '@/features/profile/services/filtered-profile.service.js';
 
 // Reads tables and a trigger created by backend/migrations (011) through the
 // real supabase-js client, against the local Supabase stack.
@@ -58,8 +58,7 @@ describe('profile creation (migrations 001 + 011)', () => {
 
 // getFilteredProfile hides fields by visibility and friendship (threat model L9,
 // #206), against profiles, privacy rows and follows in the local Supabase stack.
-describe('PrivacyService.getFilteredProfile', () => {
-	const privacy = new PrivacyService();
+describe('filteredProfileService.getFilteredProfile', () => {
 	const userIds: string[] = [];
 	const emails = new Map<string, string>();
 	let target: string;
@@ -129,7 +128,7 @@ describe('PrivacyService.getFilteredProfile', () => {
 	});
 
 	it('shows a stranger only the public fields', async () => {
-		const profile = await privacy.getFilteredProfile(stranger, target);
+		const profile = await filteredProfileService.getFilteredProfile(stranger, target);
 
 		expect(profile).toMatchObject({ id: target, isOwnProfile: false, isFriend: false });
 		expect(profile).not.toHaveProperty('bio');
@@ -139,7 +138,7 @@ describe('PrivacyService.getFilteredProfile', () => {
 	});
 
 	it('shows a mutual follower the friends_only fields but not the private ones', async () => {
-		const profile = await privacy.getFilteredProfile(friend, target);
+		const profile = await filteredProfileService.getFilteredProfile(friend, target);
 
 		expect(profile).toMatchObject({ isOwnProfile: false, isFriend: true, bio: 'target bio' });
 		expect(profile).not.toHaveProperty('avatarUrl');
@@ -148,7 +147,7 @@ describe('PrivacyService.getFilteredProfile', () => {
 	});
 
 	it('treats a one-way follower as a stranger', async () => {
-		const profile = await privacy.getFilteredProfile(oneWay, target);
+		const profile = await filteredProfileService.getFilteredProfile(oneWay, target);
 
 		expect(profile.isFriend).toBe(false);
 		expect(profile).not.toHaveProperty('bio');
@@ -157,7 +156,7 @@ describe('PrivacyService.getFilteredProfile', () => {
 	});
 
 	it('shows the owner every field, email included', async () => {
-		const profile = await privacy.getFilteredProfile(target, target);
+		const profile = await filteredProfileService.getFilteredProfile(target, target);
 
 		expect(profile).toMatchObject({
 			isOwnProfile: true,

@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { MAX_GENRES } from '@/features/profile/profile.types.js';
 
 // =====================================================
 // Visibility Level Enum
@@ -9,7 +8,8 @@ export const visibilityLevelSchema = z.enum(['public', 'friends_only', 'private'
 // =====================================================
 // Music Genre Enum
 // =====================================================
-export const musicGenreSchema = z.enum([
+/** Every genre a user can pick (10), of which at most MAX_GENRES. */
+export const MUSIC_GENRES = [
 	'pop',
 	'rock',
 	'hiphop',
@@ -20,7 +20,11 @@ export const musicGenreSchema = z.enum([
 	'country',
 	'latin',
 	'metal',
-]);
+] as const;
+
+export const MAX_GENRES = 5;
+
+export const musicGenreSchema = z.enum(MUSIC_GENRES);
 
 // =====================================================
 // Profile Validators
@@ -90,10 +94,6 @@ export const updateMusicPreferencesSchema = z.object({
 });
 
 // =====================================================
-// Type Exports
-// =====================================================
-
-// =====================================================
 // Avatar Validators
 // =====================================================
 
@@ -108,3 +108,11 @@ export const avatarFileSchema = z.object(
 	},
 	{ error: 'A photo is required in the multipart field "avatar"' }
 );
+
+// =====================================================
+// Request input types
+// =====================================================
+
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+export type UpdatePrivacyInput = z.infer<typeof updatePrivacySchema>;
+export type UpdateMusicPreferencesInput = z.infer<typeof updateMusicPreferencesSchema>;

@@ -1,174 +1,45 @@
 /**
- * Profile Feature Types
+ * Response and domain types of the profile feature. Request inputs are
+ * inferred from the Zod schemas in profile.validators.ts.
  */
 
-import type { Enums } from '@/shared/types/supabase.generated.js';
+import type { z } from 'zod';
+import type { Enums, Tables } from '@/shared/types/supabase.generated.js';
+import type { musicGenreSchema } from '@/features/profile/profile.validators.js';
+import type {
+	avatarResponseSchema,
+	filteredProfileSchema,
+	musicPreferencesSchema,
+	ownProfileSchema,
+	privacySettingsSchema,
+	publicProfileSchema,
+} from '@/features/profile/profile-responses.validators.js';
 
-// =====================================================
-// Visibility Types
-// =====================================================
-
-/**
- * Visibility level for profile fields
- * Aligned with Supabase enum: visibility_level
- */
+/** Visibility level of a profile field (Supabase enum `visibility_level`). */
 export type VisibilityLevel = Enums<'visibility_level'>;
 
-/**
- * Music genre options (10 total, user can select max 5)
- */
-export type MusicGenre =
-	| 'pop'
-	| 'rock'
-	| 'hiphop'
-	| 'rnb'
-	| 'jazz'
-	| 'classical'
-	| 'electronic'
-	| 'country'
-	| 'latin'
-	| 'metal';
+export type MusicGenre = z.infer<typeof musicGenreSchema>;
+
+// Database rows (generated Supabase types)
+export type UserProfileRow = Tables<'user_profiles'>;
+
+// Response bodies, inferred from the schemas the OpenAPI document uses.
+
+/** GET and PATCH /api/profile: the caller's own profile. */
+export type OwnProfile = z.infer<typeof ownProfileSchema>;
+
+/** A found profile (GET /api/profile/search), without email. */
+export type PublicProfile = z.infer<typeof publicProfileSchema>;
 
 /**
- * All available music genres
+ * GET /api/profile/:userId. A field hidden by privacy is undefined, a visible
+ * one is present (even if empty).
  */
-export const MUSIC_GENRES: MusicGenre[] = [
-	'pop',
-	'rock',
-	'hiphop',
-	'rnb',
-	'jazz',
-	'classical',
-	'electronic',
-	'country',
-	'latin',
-	'metal',
-];
+export type FilteredProfile = z.infer<typeof filteredProfileSchema>;
 
-/**
- * Maximum number of genres a user can select
- */
-export const MAX_GENRES = 5;
+export type ProfilePrivacy = z.infer<typeof privacySettingsSchema>;
 
-// =====================================================
-// Privacy Types
-// =====================================================
+export type MusicPreferences = z.infer<typeof musicPreferencesSchema>;
 
-/**
- * Profile privacy settings
- */
-export interface ProfilePrivacy {
-	userId: string;
-	emailVisibility: VisibilityLevel;
-	bioVisibility: VisibilityLevel;
-	avatarVisibility: VisibilityLevel;
-	musicPreferencesVisibility: VisibilityLevel;
-	createdAt: string;
-	updatedAt: string;
-}
-
-/**
- * DTO for updating privacy settings
- */
-export interface UpdatePrivacyDTO {
-	emailVisibility?: VisibilityLevel;
-	bioVisibility?: VisibilityLevel;
-	avatarVisibility?: VisibilityLevel;
-	musicPreferencesVisibility?: VisibilityLevel;
-}
-
-// =====================================================
-// Music Preferences Types
-// =====================================================
-
-/**
- * User's music preferences
- */
-export interface MusicPreferences {
-	userId: string;
-	genres: MusicGenre[];
-	updatedAt: string;
-}
-
-/**
- * DTO for updating music preferences
- */
-export interface UpdateMusicPreferencesDTO {
-	genres: MusicGenre[];
-}
-
-// =====================================================
-// Profile Types
-// =====================================================
-
-/**
- * DTO for updating user profile
- */
-export interface UpdateProfileDTO {
-	displayName?: string;
-	bio?: string;
-	avatarUrl?: string;
-	favoriteArtist?: string;
-}
-
-/**
- * Profile update response
- */
-export interface ProfileUpdateResponse {
-	id: string;
-	email: string;
-	username: string;
-	displayName?: string;
-	avatarUrl?: string;
-	bio?: string;
-	favoriteArtist?: string;
-	createdAt: string;
-	updatedAt: string;
-}
-
-/**
- * Public profile (for search results, no email)
- */
-export interface PublicProfile {
-	id: string;
-	username: string;
-	displayName?: string;
-	avatarUrl?: string;
-	bio?: string;
-	favoriteArtist?: string;
-	musicPreferences?: MusicGenre[];
-	createdAt: string;
-}
-
-/**
- * Extended profile with privacy-filtered fields
- * Fields are undefined if hidden by privacy, present (even if empty) if visible
- */
-export interface FilteredProfile {
-	id: string;
-	username: string;
-	displayName?: string;
-	avatarUrl?: string; // undefined if hidden by privacy
-	bio?: string; // undefined if hidden by privacy
-	email?: string | null; // undefined if hidden by privacy
-	favoriteArtist?: string;
-	musicPreferences?: MusicGenre[]; // undefined if hidden by privacy
-	createdAt: string;
-	// Viewer context
-	isOwnProfile: boolean;
-	isFriend: boolean;
-}
-
-// Database row types: Use Tables<'table_name'> from @/shared/types/supabase.generated.js
-// Example: type ProfilePrivacyRow = Tables<'profile_privacy'>
-
-// =====================================================
-// Avatar Types
-// =====================================================
-
-/**
- * Answer of PUT and DELETE /api/profile/avatar: the new avatar URL, null once removed.
- */
-export interface AvatarResponse {
-	avatarUrl: string | null;
-}
+/** PUT and DELETE /api/profile/avatar: the new avatar URL, null once removed. */
+export type AvatarResponse = z.infer<typeof avatarResponseSchema>;

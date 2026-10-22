@@ -1,6 +1,6 @@
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
-import { PrivacyService } from '@/features/profile/services/privacy.service.js';
+import { isFieldVisible } from '@/features/profile/permissions/field-visibility.js';
 import type { VisibilityLevel } from '@/features/profile/profile.types.js';
 
 interface SearchFieldVisibility {
@@ -8,10 +8,8 @@ interface SearchFieldVisibility {
 	bio: boolean;
 }
 
-// Same defaults as PrivacyService.mapRowToPrivacy for a profile without a row
+// Same defaults as privacy-settings.service mapRowToPrivacy for a profile without a row
 const DEFAULT_VISIBILITY: VisibilityLevel = 'public';
-
-const privacyService = new PrivacyService();
 
 const NO_FOLLOWS = { data: [], error: null };
 
@@ -49,7 +47,7 @@ export async function getSearchFieldVisibility(
 			: NO_FOLLOWS,
 	]);
 	// Fail closed without privacy rows; a failed follows lookup means "not a
-	// friend", as in PrivacyService.checkFriendship
+	// friend", as in filtered-profile.service checkFriendship
 	if (privacy.error) {
 		throw new AppError(500, 'Failed to search users', 'SEARCH_ERROR');
 	}
@@ -68,16 +66,8 @@ export async function getSearchFieldVisibility(
 		const row = rows.get(id);
 		const isFriend = friends.has(id);
 		visibility.set(id, {
-			avatar: privacyService.isFieldVisible(
-				row?.avatar_visibility ?? DEFAULT_VISIBILITY,
-				false,
-				isFriend
-			),
-			bio: privacyService.isFieldVisible(
-				row?.bio_visibility ?? DEFAULT_VISIBILITY,
-				false,
-				isFriend
-			),
+			avatar: isFieldVisible(row?.avatar_visibility ?? DEFAULT_VISIBILITY, false, isFriend),
+			bio: isFieldVisible(row?.bio_visibility ?? DEFAULT_VISIBILITY, false, isFriend),
 		});
 	}
 	return visibility;
