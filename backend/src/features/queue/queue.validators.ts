@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { addTrackSchema } from '@/features/playlists/playlist.validators.js';
+import { addTrackSchema } from '@/shared/utils/track-upsert.js';
 
 /**
  * Body of POST /api/queue/items: a playlist add's track without `previewUrl`,

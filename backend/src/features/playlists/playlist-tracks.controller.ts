@@ -1,10 +1,7 @@
 import type { Request, Response } from 'express';
 import * as playlistTrackService from '@/features/playlists/services/playlist-track.service.js';
-import {
-	addTrackSchema,
-	moveTrackSchema,
-	trackIdParamSchema,
-} from '@/features/playlists/playlist.validators.js';
+import { moveTrackSchema, trackIdParamSchema } from '@/features/playlists/playlist.validators.js';
+import { addTrackSchema } from '@/shared/utils/track-upsert.js';
 import type { AuthenticatedRequest } from '@/shared/types/global.types.js';
 import { routeParam } from '@/shared/utils/route-params.js';
 import { sendSuccess } from '@/shared/utils/send-success.js';

@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
-import { QueueService } from '@/features/queue/services/queue.service.js';
-import { QueueTransferService } from '@/features/queue/services/queue-transfer.service.js';
+import * as queue from '@/features/queue/services/queue.service.js';
+import * as transfer from '@/features/queue/services/queue-transfer.service.js';
 import { realtime } from '@/realtime/index.js';
 
 // #295: transfer playback to a device of mine or of a friend. Checks come before any change.
@@ -10,8 +10,6 @@ import { realtime } from '@/realtime/index.js';
 // the realtime singleton.
 
 const URI_PREFIX = `https://soundcloud.com/int-queue-transfer/${randomUUID()}`;
-const queue = new QueueService();
-const transfer = new QueueTransferService();
 const users: string[] = [];
 let trackCount = 0;
 let me: string;

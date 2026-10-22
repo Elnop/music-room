@@ -1,18 +1,40 @@
+import { z } from 'zod';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { Tables } from '@/shared/types/supabase.generated.js';
 
-/** Track metadata a client sends to add a track to a playlist or the queue. */
-export interface TrackUpsertInput {
-	trackUri: string; // SoundCloud permalink URL, never a stream URL
-	title: string;
-	artist: string;
-	album?: string;
-	albumArt?: string;
-	durationMs: number;
-	previewUrl?: string;
-}
+/**
+ * Body of a track add to a playlist or the queue: the track's metadata.
+ * `trackUri` is the SoundCloud permalink URL, never a stream URL.
+ */
+export const addTrackSchema = z.object({
+	trackUri: z.string().min(1).max(500), // Universal track URI (SoundCloud permalink, etc.)
+	title: z.string().min(1).max(200),
+	artist: z.string().min(1).max(200),
+	// Album is optional - SoundCloud and other services may not have album info
+	album: z
+		.string()
+		.max(200)
+		.optional()
+		.transform(val => (val === '' ? undefined : val)),
+	// Accept empty string or valid URL, transform empty string to undefined
+	albumArt: z
+		.string()
+		.optional()
+		.transform(val => (val === '' ? undefined : val))
+		.pipe(z.url().optional()),
+	durationMs: z.number().int().positive(),
+	// Accept empty string or valid URL, transform empty string to undefined
+	previewUrl: z
+		.string()
+		.optional()
+		.transform(val => (val === '' ? undefined : val))
+		.pipe(z.url().optional()),
+});
+
+/** The track as upsertTrack takes it: a parsed body, or one with fields left out. */
+export type TrackUpsertInput = z.input<typeof addTrackSchema>;
 
 /**
  * Inserts the track, or refreshes its metadata when its `track_uri` is

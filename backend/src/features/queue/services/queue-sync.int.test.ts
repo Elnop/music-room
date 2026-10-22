@@ -13,12 +13,11 @@ vi.mock('@/realtime/index.js', () => ({
 	realtime: { notifyQueueUpdate, notifyPlaylistUpdate: vi.fn(), revalidatePlaylistRoom: vi.fn() },
 }));
 
-const { QueueService } = await import('@/features/queue/services/queue.service.js');
+const queue = await import('@/features/queue/services/queue.service.js');
 const playlists = await import('@/features/playlists/services/playlist.service.js');
 const playlistTracks = await import('@/features/playlists/services/playlist-track.service.js');
 
 const URI_PREFIX = `https://soundcloud.com/int-queue-sync/${randomUUID()}`;
-const queue = new QueueService();
 const users: string[] = [];
 let trackCount = 0;
 let ownerId: string;

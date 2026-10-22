@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
-import { QueueService } from '@/features/queue/services/queue.service.js';
+import * as queue from '@/features/queue/services/queue.service.js';
 import * as playlistService from '@/features/playlists/services/playlist.service.js';
 import { realtime } from '@/realtime/index.js';
 
@@ -11,7 +11,6 @@ import { realtime } from '@/realtime/index.js';
 // the realtime singleton.
 
 const URI_PREFIX = `https://soundcloud.com/int-queue-delegation/${randomUUID()}`;
-const queue = new QueueService();
 const users: string[] = [];
 let trackCount = 0;
 let owner: string;

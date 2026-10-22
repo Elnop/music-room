@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
-import { QueueService } from '@/features/queue/services/queue.service.js';
+import * as queue from '@/features/queue/services/queue.service.js';
 import { playPlaylistRpc } from '@/features/queue/utils/queue-rpc.js';
 import * as playlists from '@/features/playlists/services/playlist.service.js';
 import * as playlistTracks from '@/features/playlists/services/playlist-track.service.js';
@@ -12,7 +12,6 @@ import type { QueueState } from '@/features/queue/queue.types.js';
 // history trim and rank rebalance. No Socket.io server runs here: notifyQueueUpdate is a no-op.
 
 const URI_PREFIX = `https://soundcloud.com/int-queue/${randomUUID()}`;
-const queue = new QueueService();
 const users: string[] = [];
 let userId: string;
 let trackCount = 0;

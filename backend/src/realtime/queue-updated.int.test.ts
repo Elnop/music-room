@@ -5,7 +5,7 @@ import { io as ioClient, type Socket as ClientSocket } from 'socket.io-client';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { supabaseAdmin, supabaseAnon } from '@/shared/config/supabase.js';
 import { connectRedis, disconnectRedis, isRedisConnected } from '@/shared/config/redis.js';
-import { QueueService } from '@/features/queue/services/queue.service.js';
+import * as queue from '@/features/queue/services/queue.service.js';
 import * as playlistService from '@/features/playlists/services/playlist.service.js';
 import * as playlistTrackService from '@/features/playlists/services/playlist-track.service.js';
 import { realtime } from '@/realtime/index.js';
@@ -47,7 +47,6 @@ async function createUser(): Promise<TestUser> {
 }
 
 describe('queue:updated broadcast', () => {
-	const queue = new QueueService();
 	let httpServer: HTTPServer;
 	let url: string;
 	let owner: TestUser;
