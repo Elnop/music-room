@@ -67,11 +67,27 @@ function readJscpd(text) {
 const unquote = (value) => value.trim().replace(/^(['"])(.*)\1$/, '$2');
 
 // The `exclude` paths of each rule in tools/semgrep/rules.yml, block style
-// (`- path`) or flow style (`exclude: [a, b]`).
+// (`- path`) or flow style (`exclude: [a, b]`), and each rule's
+// `metadata.allowed-paths`: file-name conventions that are part of the rule's
+// definition (guardrails.md#exception-lists). An exclude entry that its rule
+// declares there is not counted as an exception, but only for a suffix glob
+// `*<Suffix>.<ext>` (Suffix a capitalised word of 4 letters or more, such as
+// `*Storage.ts`), read directly under the rule's `metadata:`. Any other
+// `allowed-paths` value is ignored, so its exclude entry stays an exception.
+// The `allowed` set is compared with the reference like the entries.
+const ALLOWED_PATH = /^\*[A-Z][a-z]{3,}\.[a-z]+$/;
+
 function readSemgrep(text) {
-  const entries = new Set();
+  const excludes = [];
+  const allowed = new Set();
   let rule = null;
-  let excludeIndent = -1;
+  let ruleKeyIndent = -1;
+  let metadataIndent = -1;
+  let list = null;
+  let listIndent = -1;
+  const addAllowed = (path) => {
+    if (ALLOWED_PATH.test(path)) allowed.add(`${rule} ${path}`);
+  };
   for (const line of text.split('\n')) {
     const content = line.replace(/\s+#.*$/, '');
     if (/^\s*(#.*)?$/.test(content)) continue;
@@ -79,24 +95,45 @@ function readSemgrep(text) {
     const id = content.match(/^\s*- id:\s*(\S+)/);
     if (id) {
       rule = id[1];
-      excludeIndent = -1;
+      ruleKeyIndent = indent + 2;
+      metadataIndent = -1;
+      list = null;
       continue;
     }
-    if (excludeIndent >= 0 && indent > excludeIndent && /^\s*- /.test(content)) {
-      entries.add(`${rule} exclude ${unquote(content.replace(/^\s*- /, ''))}`);
+    if (list && indent > listIndent && /^\s*- /.test(content)) {
+      const path = unquote(content.replace(/^\s*- /, ''));
+      if (list === 'exclude') excludes.push([rule, path]);
+      else addAllowed(path);
       continue;
     }
-    const flow = content.match(/^\s*exclude:\s*\[(.*)\]\s*$/);
-    if (flow) {
-      for (const path of flow[1].split(',').filter((p) => p.trim() !== '')) {
-        entries.add(`${rule} exclude ${unquote(path)}`);
-      }
-      excludeIndent = -1;
+    list = null;
+    if (metadataIndent >= 0 && indent <= metadataIndent) metadataIndent = -1;
+    if (indent === ruleKeyIndent && /^\s*metadata:\s*$/.test(content)) {
+      metadataIndent = indent;
       continue;
     }
-    excludeIndent = /^\s*exclude:\s*$/.test(content) ? indent : -1;
+    const key = content.match(/^\s*(exclude|allowed-paths):\s*(\[(.*)\])?\s*$/);
+    if (!key) continue;
+    // allowed-paths counts only as a direct child of the rule's metadata.
+    if (key[1] === 'allowed-paths' && !(metadataIndent >= 0 && indent === metadataIndent + 2)) {
+      continue;
+    }
+    if (key[2] === undefined) {
+      list = key[1];
+      listIndent = indent;
+      continue;
+    }
+    for (const raw of key[3].split(',').filter((p) => p.trim() !== '')) {
+      const path = unquote(raw);
+      if (key[1] === 'exclude') excludes.push([rule, path]);
+      else addAllowed(path);
+    }
   }
-  return { entries };
+  const entries = new Set();
+  for (const [ruleId, path] of excludes) {
+    if (!allowed.has(`${ruleId} ${path}`)) entries.add(`${ruleId} exclude ${path}`);
+  }
+  return { entries, allowed };
 }
 
 // Every string value of the allowlist and [extend] sections of .gitleaks.toml
@@ -224,6 +261,14 @@ for (const list of lists) {
     for (const entry of current.entries ?? []) {
       if (!previousEntries.has(entry)) {
         growths.push(`${list.path}: new or changed entry ${entry} (vs ${reference.label})`);
+      }
+    }
+    // A rule's allowed-paths may grow only through new-rule-baselines.json.
+    for (const entry of current.allowed ?? []) {
+      const [rule, glob] = entry.split(' ');
+      const baselined = newRuleBaselines.allowedPaths?.[rule]?.includes(glob);
+      if (!previous.allowed?.has(entry) && !baselined) {
+        growths.push(`${list.path}: new allowed-paths ${entry} (vs ${reference.label})`);
       }
     }
   }

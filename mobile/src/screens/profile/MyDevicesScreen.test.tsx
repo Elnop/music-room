@@ -2,7 +2,7 @@ import React from 'react';
 import { ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { act, render, screen, fireEvent, waitFor } from '@testing-library/react-native';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { resetBackendUrl } from '@/shared/services/backendUrl';
 import { musicControlApi } from '@/services/musicControlApi';
 import { friendsApi, type FriendProfile } from '@/services/friendsApi';
@@ -17,11 +17,6 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 
 jest.mock('@/contexts/PlayerContext', () => ({
 	usePlayerHeight: () => 0,
-}));
-
-jest.mock('@/services/oauth', () => ({
-	signInWithGoogle: jest.fn(),
-	signInWithFacebook: jest.fn(),
 }));
 
 const mockGetDeviceInfo = jest.fn();

@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useMemo, useState } from 'react';
 import { useSocketStore } from '@/shared/stores/socketStore';
 import { usePlayerStore, readPositionMs } from '@/store/playerStore';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { useQueueStore } from '@/store/queueStore';
 import { useConnectStore } from '@/store/connectStore';
 import { deviceService, type DeviceInfo } from '@/services/deviceService';

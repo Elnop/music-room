@@ -2,7 +2,7 @@ import { transferTo } from './transferPlayback';
 import { useConnectStore } from './connectStore';
 import { usePlayerStore, setPositionReader } from './playerStore';
 import { useQueueStore } from './queueStore';
-import { useAuthStore } from './authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { queueApi } from '@/services/queueApi';
 import { ApiError } from '@/shared/services/api';
 import { showError } from '@/shared/utils/toast';
@@ -19,10 +19,6 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/services/oauth', () => ({
-	signInWithGoogle: jest.fn(),
-	signInWithFacebook: jest.fn(),
-}));
 
 jest.mock('@/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',

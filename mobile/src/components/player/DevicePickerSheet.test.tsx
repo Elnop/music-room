@@ -4,7 +4,7 @@ import { DevicePickerSheet } from './DevicePickerSheet';
 import { useConnectStore } from '@/store/connectStore';
 import { usePlayerStore } from '@/store/playerStore';
 import { useQueueStore } from '@/store/queueStore';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { musicControlApi } from '@/services/musicControlApi';
 import { queueApi } from '@/services/queueApi';
 import { ApiError } from '@/shared/services/api';
@@ -13,10 +13,6 @@ import type { DevicePickerResponse } from '@/types/device.types';
 import type { UserProfile } from '@/types/user.types';
 import { logger } from '@/shared/utils/logger';
 
-jest.mock('@/services/oauth', () => ({
-	signInWithGoogle: jest.fn(),
-	signInWithFacebook: jest.fn(),
-}));
 
 jest.mock('@/shared/theme/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');

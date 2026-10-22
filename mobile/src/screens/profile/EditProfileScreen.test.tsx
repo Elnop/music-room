@@ -27,7 +27,7 @@ jest.mock('@react-navigation/native', () => ({
 	useNavigation: () => ({ goBack: jest.fn() }),
 }));
 
-jest.mock('@/store/authStore', () => {
+jest.mock('@/features/auth/stores/authStore', () => {
 	const useAuthStore = () => mockAuth;
 	useAuthStore.setState = jest.fn();
 	return { useAuthStore };

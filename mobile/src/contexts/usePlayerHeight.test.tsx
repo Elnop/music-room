@@ -3,10 +3,6 @@ import { MINI_PLAYER_HEIGHT, usePlayerHeight } from './PlayerContext';
 import { usePlayerStore } from '@/store/playerStore';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
-jest.mock('@/services/oauth', () => ({
-	signInWithGoogle: jest.fn(),
-	signInWithFacebook: jest.fn(),
-}));
 
 // The system media controls (#309) are covered by MediaSessionBridge.test.tsx.
 jest.mock('@/components/player/MediaSessionBridge', () => ({ MediaSessionBridge: () => null }));

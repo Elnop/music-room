@@ -6,7 +6,7 @@ import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import type { ProfilePrivacy, VisibilityLevel } from '@/types/user.types';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { privacyApi } from '@/services/privacyApi';
 import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 import { Button } from '@/shared/components/ui/Button';

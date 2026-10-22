@@ -14,7 +14,7 @@ import type { Theme } from '@/shared/theme/types';
 import { CONFLICT_CODES, usePlaylistStore } from '@/store/playlistStore';
 import { afterRankForDrop } from '@/store/moveTarget';
 import { ApiError } from '@/shared/services/api';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { useActiveQueue, useQueueStore } from '@/store/queueStore';
 import { usePlayerStore } from '@/store/playerStore';
 import { selectPlaysPlaylist } from '@/store/queueSelectors';

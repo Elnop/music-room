@@ -4,7 +4,7 @@ import { PlayerModal } from './PlayerModal';
 import { usePlayerStore } from '@/store/playerStore';
 import { useConnectStore } from '@/store/connectStore';
 import { useQueueStore } from '@/store/queueStore';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { hashStringToNumber } from '@/shared/utils/trackToSoundCloud';
 import type { UserProfile } from '@/types/user.types';
 import { useImageColors } from '@/hooks/useImageColors';
@@ -23,10 +23,6 @@ jest.mock('@/shared/utils/haptics', () => ({
 const mockSeekTo = jest.fn();
 const mockProgress = { progress: 0, currentTime: 0, duration: 0 };
 
-jest.mock('@/services/oauth', () => ({
-	signInWithGoogle: jest.fn(),
-	signInWithFacebook: jest.fn(),
-}));
 
 jest.mock('@/shared/theme/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');

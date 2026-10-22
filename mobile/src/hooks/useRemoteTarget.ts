@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useSocketStore } from '@/shared/stores/socketStore';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { useConnectStore } from '@/store/connectStore';
 import { useQueueStore } from '@/store/queueStore';
 import { controlErrorMessage, type ControlError } from './useMusicControl';

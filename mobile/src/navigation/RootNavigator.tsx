@@ -9,7 +9,7 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import { AuthNavigator } from './AuthNavigator';
 import { AppNavigator, type AppTabsParamList } from './AppNavigator';
 import { createLinking, openPendingLink } from './linking';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { useSocketStore } from '@/shared/stores/socketStore';
 import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
 import { isDarkBackground } from '@/shared/components/feedback/ConnectionBanner';

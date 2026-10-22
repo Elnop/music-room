@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { profileApi } from '@/services/profileApi';
 import { prepareAvatar } from '@/utils/avatarImage';
 import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';

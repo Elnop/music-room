@@ -1,5 +1,5 @@
 import { activeOwnerId, useConnectStore } from './connectStore';
-import { useAuthStore } from './authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { usePlayerStore } from './playerStore';
 import { showInfo } from '@/shared/utils/toast';
 import type { ListeningStatus } from '@/types/listening.types';
@@ -10,10 +10,6 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/services/oauth', () => ({
-	signInWithGoogle: jest.fn(),
-	signInWithFacebook: jest.fn(),
-}));
 
 jest.mock('@/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',

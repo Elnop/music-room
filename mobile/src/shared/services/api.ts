@@ -1,10 +1,8 @@
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
-import type { LoginInput, RegisterInput } from '@/shared/utils/validators';
-import type { UserProfile } from '@/types/user.types';
-import type { LinkedProvidersResponse, OAuthProvider } from '@/types/auth.types';
 import { getAppVersion } from '@/services/deviceService';
 import { getBackendUrl } from './backendUrl';
+import { getAuthSession, getSession } from './authSession';
 
 /**
  * Standard API Response format (matches backend)
@@ -24,21 +22,6 @@ interface ApiResponse<T> {
 	meta: {
 		timestamp: string;
 	};
-}
-
-/**
- * Auth response from backend
- */
-interface AuthResponse {
-	user: UserProfile;
-	session?: {
-		accessToken: string;
-		refreshToken: string;
-		expiresIn: number;
-		expiresAt: number;
-	};
-	requiresVerification?: boolean;
-	message?: string;
 }
 
 /** Developer context of an API error, sent by the backend in development and test only. */
@@ -92,23 +75,6 @@ function getClientHeaders(): Record<string, string> {
 }
 
 /**
- * Session hooks the auth store registers at load time. A static import of the
- * store here would be circular, and a dynamic `import()` makes Metro load a
- * separate bundle whose HMR registration reloads the app in development.
- */
-interface AuthSession {
-	getAccessToken: () => string | null;
-	isTokenExpiringSoon: () => boolean;
-	refreshAccessToken: () => Promise<boolean>;
-}
-
-let authSession: AuthSession | null = null;
-
-export function registerAuthSession(session: AuthSession): void {
-	authSession = session;
-}
-
-/**
  * Make API request with automatic token refresh on 401.
  * The backend address is read at call time (services/backendUrl.ts).
  */
@@ -140,12 +106,14 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
 			return handleResponse<T>(response);
 		}
 
+		const authSession = getAuthSession();
 		if (!authSession) {
 			const response = await makeRequest();
 			return handleResponse<T>(response);
 		}
 
-		const { getAccessToken, isTokenExpiringSoon, refreshAccessToken } = authSession;
+		const { isTokenExpiringSoon, refreshAccessToken } = authSession;
+		const getAccessToken = () => getSession().accessToken;
 		const accessToken = getAccessToken();
 
 		if (accessToken && isTokenExpiringSoon()) {
@@ -254,203 +222,3 @@ async function handleResponse<T>(response: Response): Promise<T> {
 
 	return data.data;
 }
-
-/**
- * Auth API
- */
-export const authApi = {
-	/**
-	 * Register new user
-	 */
-	async register(data: RegisterInput): Promise<AuthResponse> {
-		return apiRequest<AuthResponse>('/api/auth/register', {
-			method: 'POST',
-			body: JSON.stringify({
-				email: data.email,
-				password: data.password,
-				username: data.username,
-				displayName: data.displayName,
-			}),
-		});
-	},
-
-	/**
-	 * Login user
-	 */
-	async login(data: LoginInput): Promise<AuthResponse> {
-		return apiRequest<AuthResponse>('/api/auth/login', {
-			method: 'POST',
-			body: JSON.stringify({
-				email: data.email,
-				password: data.password,
-			}),
-		});
-	},
-
-	/**
-	 * Get current user profile
-	 */
-	async getMe(accessToken: string): Promise<UserProfile> {
-		return apiRequest<UserProfile>('/api/auth/me', {
-			method: 'GET',
-			headers: {
-				Authorization: `Bearer ${accessToken}`,
-			},
-		});
-	},
-
-	/**
-	 * Refresh access token
-	 */
-	async refreshToken(refreshToken: string): Promise<AuthResponse> {
-		return apiRequest<AuthResponse>('/api/auth/refresh', {
-			method: 'POST',
-			body: JSON.stringify({
-				refreshToken,
-			}),
-		});
-	},
-
-	/**
-	 * Logout user
-	 */
-	async logout(accessToken: string): Promise<void> {
-		await apiRequest<void>('/api/auth/logout', {
-			method: 'POST',
-			headers: {
-				Authorization: `Bearer ${accessToken}`,
-			},
-		});
-	},
-
-	/**
-	 * Login with Google OAuth
-	 */
-	async loginWithGoogle(idToken: string): Promise<AuthResponse> {
-		return apiRequest<AuthResponse>('/api/auth/google', {
-			method: 'POST',
-			body: JSON.stringify({
-				idToken,
-			}),
-		});
-	},
-
-	/**
-	 * Login with Facebook OAuth
-	 */
-	async loginWithFacebook(accessToken: string): Promise<AuthResponse> {
-		return apiRequest<AuthResponse>('/api/auth/facebook', {
-			method: 'POST',
-			body: JSON.stringify({
-				accessToken,
-			}),
-		});
-	},
-
-	/**
-	 * Get linked authentication providers
-	 */
-	async getLinkedProviders(accessToken: string): Promise<LinkedProvidersResponse> {
-		return apiRequest('/api/auth/providers', {
-			method: 'GET',
-			headers: {
-				Authorization: `Bearer ${accessToken}`,
-			},
-		});
-	},
-
-	/**
-	 * Unlink an OAuth provider
-	 */
-	async unlinkProvider(accessToken: string, provider: OAuthProvider): Promise<{ message: string }> {
-		return apiRequest(`/api/auth/providers/${provider}`, {
-			method: 'DELETE',
-			headers: {
-				Authorization: `Bearer ${accessToken}`,
-			},
-		});
-	},
-
-	/**
-	 * Link a Google (ID token) or Facebook (access token) account to the signed-in user
-	 */
-	async linkProvider(
-		accessToken: string,
-		provider: OAuthProvider,
-		token: string
-	): Promise<LinkedProvidersResponse> {
-		const body = provider === 'google' ? { idToken: token } : { accessToken: token };
-		return apiRequest<LinkedProvidersResponse>(`/api/auth/providers/${provider}/link`, {
-			method: 'POST',
-			headers: {
-				Authorization: `Bearer ${accessToken}`,
-			},
-			body: JSON.stringify(body),
-		});
-	},
-
-	/**
-	 * Verify email with 6-digit code
-	 */
-	async verifyEmail(userId: string, code: string): Promise<AuthResponse> {
-		return apiRequest<AuthResponse>('/api/auth/verify-email', {
-			method: 'POST',
-			body: JSON.stringify({
-				userId,
-				code,
-			}),
-		});
-	},
-
-	/**
-	 * Resend verification code
-	 */
-	async resendVerificationCode(userId: string, email: string): Promise<{ message: string }> {
-		return apiRequest('/api/auth/resend-verification', {
-			method: 'POST',
-			body: JSON.stringify({
-				userId,
-				email,
-			}),
-		});
-	},
-
-	/**
-	 * Request password reset (send email with code)
-	 */
-	async forgotPassword(email: string): Promise<{ message: string }> {
-		return apiRequest('/api/auth/forgot-password', {
-			method: 'POST',
-			body: JSON.stringify({ email }),
-		});
-	},
-
-	/**
-	 * Reset password with code
-	 */
-	async resetPassword(
-		email: string,
-		code: string,
-		newPassword: string
-	): Promise<{ message: string }> {
-		return apiRequest('/api/auth/reset-password', {
-			method: 'POST',
-			body: JSON.stringify({
-				email,
-				code,
-				newPassword,
-			}),
-		});
-	},
-
-	/**
-	 * Check if user can resend reset code
-	 */
-	async canResendResetCode(
-		email: string
-	): Promise<{ canResend: boolean; remainingSeconds: number }> {
-		return apiRequest(`/api/auth/reset-password/can-resend?email=${encodeURIComponent(email)}`, {
-			method: 'GET',
-		});
-	},
-};

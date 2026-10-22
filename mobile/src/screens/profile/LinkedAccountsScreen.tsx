@@ -4,8 +4,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
-import type { LinkedProvider, OAuthProvider } from '@/types/auth.types';
-import { useAuthStore } from '@/store/authStore';
+import type { LinkedProvider, OAuthProvider } from '@/features/auth/types';
+import {
+	useLinkedProviders,
+	useLinkProvider,
+	useUnlinkProvider,
+} from '@/features/auth/hooks/useLinkedProviders';
 import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
 import { showError, showSuccess } from '@/shared/utils/toast';
 import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
@@ -37,31 +41,21 @@ export function LinkedAccountsScreen() {
 	const { theme } = useTheme();
 	const playerHeight = usePlayerHeight();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
-	const linkedProviders = useAuthStore(state => state.linkedProviders);
-	const fetchLinkedProviders = useAuthStore(state => state.fetchLinkedProviders);
-	const linkProvider = useAuthStore(state => state.linkProvider);
-	const unlinkProvider = useAuthStore(state => state.unlinkProvider);
+	const providersQuery = useLinkedProviders();
+	const linkedProviders = providersQuery.data;
+	const linkProvider = useLinkProvider().mutateAsync;
+	const unlinkProvider = useUnlinkProvider().mutateAsync;
 
-	const [isLoading, setIsLoading] = useState(true);
-	const [loadFailed, setLoadFailed] = useState(false);
 	const [pending, setPending] = useState<OAuthProvider | null>(null);
 
+	// Only a failure of a fetch made since this visit: a cached error is not replayed.
+	const { error: loadError, errorUpdatedAt, isFetchedAfterMount } = providersQuery;
 	useEffect(() => {
-		const load = async () => {
-			try {
-				setIsLoading(true);
-				await fetchLinkedProviders();
-				setLoadFailed(false);
-			} catch (error) {
-				setLoadFailed(true);
-				showError(apiErrorMessage(error, 'Impossible de charger les comptes liés'));
-			} finally {
-				setIsLoading(false);
-			}
-		};
-
-		load();
-	}, [fetchLinkedProviders]);
+		if (loadError && isFetchedAfterMount) {
+			showError(apiErrorMessage(loadError, 'Impossible de charger les comptes liés'));
+		}
+		// errorUpdatedAt changes with each failure, even with an equal error.
+	}, [loadError, errorUpdatedAt, isFetchedAfterMount]);
 
 	const handleLink = useCallback(
 		async (provider: OAuthProvider) => {
@@ -99,11 +93,12 @@ export function LinkedAccountsScreen() {
 		[unlinkProvider]
 	);
 
-	if (isLoading) {
+	if (providersQuery.isLoading) {
 		return <LoadingSpinner fullScreen message="Chargement…" />;
 	}
 
-	if (loadFailed || !linkedProviders) {
+	// A failed refetch keeps the list on screen; the error screen needs no data.
+	if (!linkedProviders) {
 		return (
 			<View style={styles.container}>
 				<View style={styles.errorContainer}>

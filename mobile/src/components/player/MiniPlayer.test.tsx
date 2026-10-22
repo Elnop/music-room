@@ -3,7 +3,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { MiniPlayer } from './MiniPlayer';
 import { usePlayerStore } from '@/store/playerStore';
 import { useConnectStore } from '@/store/connectStore';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import type { UserProfile } from '@/types/user.types';
 import { queueApi } from '@/services/queueApi';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
@@ -15,10 +15,6 @@ jest.mock('@/shared/utils/haptics', () => ({
 	hapticSuccess: jest.fn(),
 }));
 
-jest.mock('@/services/oauth', () => ({
-	signInWithGoogle: jest.fn(),
-	signInWithFacebook: jest.fn(),
-}));
 
 jest.mock('@/shared/theme/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');

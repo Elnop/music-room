@@ -21,7 +21,7 @@ jest.mock('@react-navigation/native', () => ({
 	useFocusEffect: jest.fn(),
 }));
 
-jest.mock('@/store/authStore', () => {
+jest.mock('@/features/auth/stores/authStore', () => {
 	const state = {
 		user: { id: 'me', displayName: 'Bob', email: 'bob@example.com', createdAt: '2026-10-01' },
 		logout: () => mockLogout(),

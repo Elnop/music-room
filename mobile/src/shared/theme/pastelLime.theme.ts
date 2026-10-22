@@ -1,5 +1,10 @@
 import { SPACING } from '@/shared/constants/app';
-import { NEOBRUTALISM_BORDERS, NEOBRUTALISM_SHADOWS, NEOBRUTALISM_TYPOGRAPHY } from './tokens';
+import {
+	FIXED_COLORS,
+	NEOBRUTALISM_BORDERS,
+	NEOBRUTALISM_SHADOWS,
+	NEOBRUTALISM_TYPOGRAPHY,
+} from './tokens';
 import type { Theme } from './types';
 
 export const pastelLimeTheme: Theme = {
@@ -32,6 +37,8 @@ export const pastelLimeTheme: Theme = {
 		success: '#10B981',
 		warning: '#F59E0B',
 		info: '#3B82F6',
+
+		...FIXED_COLORS,
 	},
 
 	borders: NEOBRUTALISM_BORDERS,

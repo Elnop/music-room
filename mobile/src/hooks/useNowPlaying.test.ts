@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react-native';
 import { useNowPlaying } from './useNowPlaying';
 import { useConnectStore } from '@/store/connectStore';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { usePlayerStore } from '@/store/playerStore';
 import { useQueueStore } from '@/store/queueStore';
 import { queueApi } from '@/services/queueApi';
@@ -30,10 +30,6 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/services/oauth', () => ({
-	signInWithGoogle: jest.fn(),
-	signInWithFacebook: jest.fn(),
-}));
 
 jest.mock('@/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',

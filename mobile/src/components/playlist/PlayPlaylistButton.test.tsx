@@ -3,14 +3,10 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { PlayPlaylistButton } from './PlayPlaylistButton';
 import { usePlayerStore } from '@/store/playerStore';
 import { useQueueStore } from '@/store/queueStore';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import type { QueueItem } from '@/types/queue.types';
 import type { UserProfile } from '@/types/user.types';
 
-jest.mock('@/services/oauth', () => ({
-	signInWithGoogle: jest.fn(),
-	signInWithFacebook: jest.fn(),
-}));
 
 jest.mock('@/shared/theme/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');

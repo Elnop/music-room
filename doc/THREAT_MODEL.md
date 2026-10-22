@@ -107,18 +107,18 @@ Les seuils viennent de `backend/src/shared/config/rate-limit.config.ts` (variabl
 - `POST /api/auth/logout` met le hash SHA-256 de l'access token dans une liste de révocation Redis jusqu'à son `exp` (`revoke`, `backend/src/features/auth/services/token-revocation.service.ts`), puis termine la session Supabase avec `signOut(token, 'local')`, ce qui invalide le refresh token (`logout`, `backend/src/features/auth/services/session.service.ts`). Les autres appareils de l'utilisateur restent connectés.
 - Chaque requête vérifie la liste de révocation avant Supabase (`verifyToken`, `session.service.ts`) ; sans Redis, `503 REVOCATION_UNAVAILABLE`, jamais une acceptation.
 - `POST /api/auth/refresh` répond 401 à un refresh token refusé et 503 si Supabase est indisponible (#126) : l'app ne déconnecte pas l'utilisateur pour une panne.
-- Mobile : `endSessionLocally` (`mobile/src/store/authStore.ts`) efface la session même si l'appel backend échoue.
+- Mobile : `endSessionLocally` (`mobile/src/features/auth/stores/sessionActions.ts`) efface la session même si l'appel backend échoue.
 
 **Tests.**
 - `backend/src/features/auth/services/logout.int.test.ts` : « rejects the old access token and the old refresh token », « keeps the same user's other session signed in ».
 - `backend/src/features/auth/services/session.service.test.ts` : « rejects a revoked token with 401 TOKEN_REVOKED without calling Supabase », « keeps the 503 REVOCATION_UNAVAILABLE from the denylist check », cas 401 / 503 de `refreshToken`.
 - `backend/src/features/auth/services/token-revocation.service.test.ts` : « stores a SHA-256 hash of the token, never the token ».
 - `backend/src/features/auth/auth.middleware.test.ts` : « answers 401 TOKEN_REVOKED for a token revoked by a logout ».
-- `mobile/src/store/authStore.test.ts` : « still ends the session when the backend logout fails ».
+- `mobile/src/features/auth/stores/authStore.test.ts` : « still ends the session when the backend logout fails ».
 
 **Risques acceptés.**
 - Un token volé reste valable jusqu'à sa révocation ou son expiration (durée de vie fixée par Supabase Auth). Il n'y a pas de liaison du token à l'appareil.
-- Les tokens sont stockés dans AsyncStorage (`mobile/src/store/authStore.ts`, `mobile/src/lib/supabase.ts`), non chiffré. Raison : il faut un téléphone rooté ou un accès physique ; `expo-secure-store` serait l'amélioration.
+- Les tokens sont stockés dans AsyncStorage (`mobile/src/features/auth/services/sessionStorage.ts`), non chiffré. Raison : il faut un téléphone rooté ou un accès physique ; `expo-secure-store` serait l'amélioration.
 - En `make dev-docker` et `make dev-local`, l'app parle au backend en `http://` et `ws://` sur le réseau local (`DEV_API_URL` dans `make/config.mk`) : tokens en clair sur le Wi-Fi. `make dev-tunnel` passe par HTTPS (ngrok). Raison : environnement de développement, pas de déploiement de production.
 
 ## M6. Token révoqué alors qu'une socket est déjà ouverte
@@ -131,7 +131,7 @@ Les seuils viennent de `backend/src/shared/config/rate-limit.config.ts` (variabl
 
 **Tests.**
 - `backend/src/realtime/socket-auth.int.test.ts` : « refuses a token revoked by logout with INVALID_TOKEN (#71) ».
-- `mobile/src/store/authStore.test.ts` : « revokes the session on the backend, disconnects the socket and clears the session ».
+- `mobile/src/features/auth/stores/authStore.test.ts` : « revokes the session on the backend, disconnects the socket and clears the session ».
 
 **Risque accepté.** Le token n'est vérifié qu'au handshake (documenté dans `backend/README.md`). Un client malveillant qui garde sa socket ouverte après le logout, ou au-delà de l'expiration de son token, reste connecté jusqu'à ce qu'il se déconnecte ou que le serveur redémarre. #70 couvre l'app, pas un client modifié. Raison : seule l'app officielle se déconnecte d'elle-même ; revérifier le token à chaque événement, ou déconnecter les sockets de l'utilisateur au logout, serait le correctif (L6). Les droits sur les rooms restent revérifiés à chaque changement (M10), donc une telle socket ne gagne pas d'accès.
 

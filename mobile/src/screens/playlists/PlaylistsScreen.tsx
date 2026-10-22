@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
 import type { Theme } from '@/shared/theme/types';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { usePlaylistStore } from '@/store/playlistStore';
 import { playlistApi } from '@/api/playlistApi';
 import { friendsApi, type FriendProfile } from '@/services/friendsApi';

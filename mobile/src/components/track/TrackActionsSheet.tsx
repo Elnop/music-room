@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { usePlaylistStore } from '@/store/playlistStore';
 import { useQueueStore } from '@/store/queueStore';
 import { canEditPlaylist } from '@/utils/playlistPermissions';

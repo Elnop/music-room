@@ -8,6 +8,7 @@ function startsWith(key: readonly unknown[], prefix: readonly unknown[]): boolea
 describe('queryKeys', () => {
 	it('nests every key of a domain under its `all` prefix', () => {
 		const keys = [
+			[queryKeys.auth.all, queryKeys.auth.providers('u1')],
 			[queryKeys.playlists.all, queryKeys.playlists.list()],
 			[queryKeys.playlists.all, queryKeys.playlists.detail('p1')],
 			[queryKeys.queue.all, queryKeys.queue.room('r1')],

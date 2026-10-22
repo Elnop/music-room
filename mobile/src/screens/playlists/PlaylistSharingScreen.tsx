@@ -11,7 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { usePlaylistStore } from '@/store/playlistStore';
 import { profileApi } from '@/services/profileApi';
 import { playlistApi, ViewerProfile } from '@/api/playlistApi';

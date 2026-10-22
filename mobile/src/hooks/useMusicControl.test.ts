@@ -29,7 +29,7 @@ jest.mock('@/shared/stores/socketStore', () => ({
 		selector(mockSocketState),
 }));
 
-jest.mock('@/store/authStore', () => ({
+jest.mock('@/features/auth/stores/authStore', () => ({
 	useAuthStore: Object.assign(
 		(selector: (state: typeof mockAuthState) => unknown) => selector(mockAuthState),
 		{ getState: () => mockAuthState }

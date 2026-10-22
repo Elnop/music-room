@@ -2,7 +2,7 @@ import React from 'react';
 import { Share } from 'react-native';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { TrackActionsSheet } from './TrackActionsSheet';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { usePlaylistStore } from '@/store/playlistStore';
 import { useQueueStore } from '@/store/queueStore';
 import { ApiError } from '@/shared/services/api';
@@ -11,10 +11,6 @@ import type { Playlist } from '@/types/playlist.types';
 import type { UserProfile } from '@/types/user.types';
 import { logger } from '@/shared/utils/logger';
 
-jest.mock('@/services/oauth', () => ({
-	signInWithGoogle: jest.fn(),
-	signInWithFacebook: jest.fn(),
-}));
 
 jest.mock('@/shared/theme/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');

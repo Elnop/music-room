@@ -36,6 +36,15 @@ export interface ThemeColors {
 	success: string;
 	warning: string;
 	info: string;
+
+	// Fixed across themes (FIXED_COLORS in tokens.ts)
+	divider: string;
+	googleSurface: string;
+	googleBorder: string;
+	googleMark: string;
+	googleText: string;
+	facebook: string;
+	onFacebook: string;
 }
 
 export interface Theme {

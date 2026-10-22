@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { io, Socket } from 'socket.io-client';
-import { useAuthStore } from '@/store/authStore';
 import { deviceService, getAppVersion } from '@/services/deviceService';
 import { getBackendUrl, onBackendUrlChange } from '@/shared/services/backendUrl';
+import { getAuthSession, getSession, onSessionEnd } from '@/shared/services/authSession';
 import { logger } from '@/shared/utils/logger';
 
 /**
@@ -33,11 +33,11 @@ export const DEVICE_RETRY_MAX = 3;
 
 /**
  * Builds the Socket.io handshake `auth` payload. Called on every connection
- * attempt, so the token is always the one currently in the auth store.
- * The auth store is read lazily (never at import time) to avoid an import cycle.
+ * attempt, so the token is always the one of the current session
+ * (shared/services/authSession.ts, registered by the auth store).
  */
 async function buildHandshake(): Promise<Record<string, string>> {
-	const token = useAuthStore.getState().accessToken ?? '';
+	const token = getSession().accessToken ?? '';
 	const appVersion = getAppVersion();
 	try {
 		const device = await deviceService.getDeviceInfo();
@@ -138,7 +138,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 			}
 			if (code === INVALID_TOKEN && !hasRefreshed) {
 				hasRefreshed = true;
-				const refreshed = await useAuthStore.getState().refreshAccessToken();
+				const refreshed = (await getAuthSession()?.refreshAccessToken()) ?? false;
 				if (get().socket !== socket) return;
 				if (refreshed) {
 					socket.connect();
@@ -233,10 +233,8 @@ export const useSocketStore = create<SocketState>((set, get) => ({
  * Every end of session (logout, refused refresh) closes the socket, so no
  * connection authenticated with the old token outlives it.
  */
-useAuthStore.subscribe((state, previous) => {
-	if (previous.isAuthenticated && !state.isAuthenticated) {
-		useSocketStore.getState().disconnect();
-	}
+onSessionEnd(() => {
+	useSocketStore.getState().disconnect();
 });
 
 /**
