@@ -1,8 +1,20 @@
 /**
- * Music Control Types
+ * Response and domain types of music control. The device responses are
+ * inferred from music-control-responses.validators.ts; request inputs are
+ * inferred in music-control.validators.ts.
  */
 
+import type { z } from 'zod';
 import type { QueueItem, QueueTrack } from '@/features/queue/queue.types.js';
+import type {
+	controllableDeviceSchema,
+	controllableDevicesSchema,
+	deviceLicenseSchema,
+	devicePickerSchema,
+	deviceSchema,
+	deviceWithLicensesSchema,
+	grantDeviceLicenseResponseSchema,
+} from '@/features/music-control/music-control-responses.validators.js';
 
 /**
  * Device information for multi-device support
@@ -47,79 +59,26 @@ export interface ControlActionPayload {
 	action: 'play' | 'pause';
 }
 
-/**
- * A device the user has connected from (`devices` row, camelCase)
- */
-export interface Device {
-	deviceId: string;
-	deviceName: string;
-	platform: string;
-	model: string;
-	lastSeenAt: string;
-}
+/** A device the user has connected from (`devices` row, camelCase) */
+export type Device = z.infer<typeof deviceSchema>;
 
-/**
- * A friend licensed to control one device
- */
-export interface DeviceLicense {
-	user: {
-		id: string;
-		username: string;
-		displayName: string | null;
-		avatarUrl: string | null;
-	};
-	grantedAt: string;
-}
+/** A friend licensed to control one device */
+export type DeviceLicense = z.infer<typeof deviceLicenseSchema>;
 
-/** PATCH /api/music-control/devices/:deviceId */
-export interface RenameDeviceResponse {
-	device: Device;
-}
+export type DeviceWithLicenses = z.infer<typeof deviceWithLicensesSchema>;
 
-export interface DeviceWithLicenses extends Device {
-	licenses: DeviceLicense[];
-}
-
-export type DeviceAccess = 'all-devices' | 'license';
-
-export interface ControllableDevice extends Device {
-	access: DeviceAccess;
-}
-
-/** GET /api/music-control/devices */
-export interface MyDevicesResponse {
-	devices: DeviceWithLicenses[];
-}
-
-/** POST /api/music-control/devices/:deviceId/licenses/:userId */
-export interface GrantDeviceLicenseResponse {
-	deviceId: string;
-	license: DeviceLicense;
-}
-
-/** DELETE /api/music-control/devices/:deviceId/licenses/:userId */
-export interface RevokeDeviceLicenseResponse {
-	message: string;
-}
+export type ControllableDevice = z.infer<typeof controllableDeviceSchema>;
 
 /** GET /api/music-control/users/:userId/devices */
-export interface ControllableDevicesResponse {
-	allDevices: boolean;
-	devices: ControllableDevice[];
-}
+export type ControllableDevicesResponse = z.infer<typeof controllableDevicesSchema>;
 
-/** GET /api/music-control/controllable-devices (#295) */
-export interface DevicePickerOwner {
-	ownerId: string;
-	username: string;
-	isSelf: boolean;
-	devices: Array<ControllableDevice & { online: boolean }>;
-}
+/** GET /api/music-control/controllable-devices (#295): me first, then friends with at least one controllable device, by username */
+export type DevicePickerResponse = z.infer<typeof devicePickerSchema>;
 
-export interface DevicePickerResponse {
-	/** Me first, then friends with at least one controllable device, by username */
-	owners: DevicePickerOwner[];
-}
+export type DevicePickerOwner = DevicePickerResponse['owners'][number];
+
+/** POST /api/music-control/devices/:deviceId/licenses/:userId */
+export type GrantDeviceLicenseResponse = z.infer<typeof grantDeviceLicenseResponseSchema>;
 
 /**
  * control:command sent by the server to the owner's device chosen by a

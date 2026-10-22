@@ -1,13 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
-import { ControllableDevicesService } from '@/features/music-control/services/controllable-devices.service.js';
+import * as service from '@/features/music-control/services/controllable-devices.service.js';
 import { realtime } from '@/realtime/index.js';
 
 // #295: the devices I can play on, mine then friends'. Presence is stubbed on
 // the realtime singleton (no Socket.io server here).
 
-const service = new ControllableDevicesService();
 const users: string[] = [];
 const names = new Map<string, string>();
 let me: string;

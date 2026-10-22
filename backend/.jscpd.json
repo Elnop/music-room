@@ -20,7 +20,6 @@
     "**/src/shared/types/supabase.generated.ts",
     "**/src/features/auth/middleware/rate-limit.middleware.ts",
     "**/src/features/friends/friends.controller.ts",
-    "**/src/features/music-control/music-control.controller.ts",
     "**/src/realtime/index.ts"
   ]
 }

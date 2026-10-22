@@ -1,5 +1,6 @@
 import type { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import { registerDeviceOpenapi } from '@/features/music-control/music-control-devices.openapi.js';
+import { registerLicenseOpenapi } from '@/features/music-control/music-control-licenses.openapi.js';
 import {
 	canControlSchema,
 	controlPermissionsSchema,
@@ -83,4 +84,5 @@ export function registerMusicControlOpenapi(registry: OpenAPIRegistry): void {
 	});
 
 	registerDeviceOpenapi(registry);
+	registerLicenseOpenapi(registry);
 }

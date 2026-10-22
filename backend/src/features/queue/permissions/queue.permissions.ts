@@ -1,4 +1,4 @@
-import { controlAccessService } from '@/features/music-control/services/control-access.service.js';
+import * as controlAccessService from '@/features/music-control/services/control-access.service.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { realtime } from '@/realtime/index.js';
 

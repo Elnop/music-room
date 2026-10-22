@@ -3,7 +3,7 @@ import { deviceIdSchema } from '@/features/music-control/music-control.validator
 
 /**
  * Response bodies of the /api/music-control routes, for the OpenAPI document.
- * Mirrors the response interfaces of music-control.types.ts.
+ * music-control.types.ts infers the response types from them.
  */
 
 /** GET /api/music-control/permissions: the friends you let control all your devices. */

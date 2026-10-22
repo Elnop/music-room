@@ -5,12 +5,21 @@ import { io as ioClient, type Socket as ClientSocket } from 'socket.io-client';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseAdmin, supabaseAnon } from '@/shared/config/supabase.js';
 import { connectRedis, disconnectRedis, isRedisConnected } from '@/shared/config/redis.js';
-import { musicControlService } from '@/features/music-control/music-control.service.js';
-import { controlAccessService } from '@/features/music-control/services/control-access.service.js';
-import { deviceLicenseService } from '@/features/music-control/services/device-license.service.js';
+import * as controlSwitchService from '@/features/music-control/services/control-switch.service.js';
+import * as controlAccessService from '@/features/music-control/services/control-access.service.js';
+import * as deviceLicenseService from '@/features/music-control/services/device-license.service.js';
 import { FriendsService } from '@/features/friends/services/friends.service.js';
 import type { UserListeningStatus } from '@/features/music-control/music-control.types.js';
 import { realtime } from '@/realtime/index.js';
+
+// The real access checks, each wrapped so a test can tell whether any ran.
+vi.mock('@/features/music-control/services/control-access.service.js', async importOriginal => {
+	const actual =
+		await importOriginal<
+			typeof import('@/features/music-control/services/control-access.service.js')
+		>();
+	return Object.fromEntries(Object.entries(actual).map(([name, fn]) => [name, vi.fn(fn)]));
+});
 
 // Access to listening status and music control (music-control-access.ts,
 // realtime/index.ts) against a real Socket.io server and the local Supabase
@@ -314,13 +323,14 @@ describe('Listening and control access', () => {
 			['null', null],
 			['an object', { targetUserId: randomUUID() }],
 		])('refuses a payload that is %s with INVALID_PAYLOAD, before any lookup', async (_l, p) => {
-			const canControl = vi.spyOn(controlAccessService, 'getAccess');
+			const lookups = Object.values(controlAccessService).map(fn => vi.mocked(fn));
+			for (const lookup of lookups) lookup.mockClear();
 			const socket = await connect(bob);
 
 			const refusal = nextEvent<SocketError>(socket, 'listening:error');
 			socket.emit('listening:subscribe', p);
 			await expect(refusal).resolves.toMatchObject({ code: 'INVALID_PAYLOAD' });
-			expect(canControl).not.toHaveBeenCalled();
+			for (const lookup of lookups) expect(lookup).not.toHaveBeenCalled();
 			const sockets = await realtime.getIO()!.fetchSockets();
 			const rooms = [...(sockets.find(s => s.id === socket.id)?.rooms ?? [])];
 			expect(rooms.some(r => r.startsWith('listening:'))).toBe(false);
@@ -438,7 +448,7 @@ describe('Listening and control access', () => {
 			]);
 
 			const changed = nextEvent(bobPhone, 'permission:changed');
-			await musicControlService.revokeControl(alice.id, bob.id);
+			await controlSwitchService.revokeControl(alice.id, bob.id);
 			await expect(changed).resolves.toEqual({
 				ownerId: alice.id,
 				targetUserId: bob.id,
@@ -519,7 +529,7 @@ describe('Listening and control access', () => {
 		it('refuses B once the switch is cut, and still reaches the licensed A', async () => {
 			const { deviceA, deviceB, aliceB, bobSocket } = await bobLicensedOnA();
 			await setBobSwitch(true);
-			await musicControlService.revokeControl(alice.id, bob.id);
+			await controlSwitchService.revokeControl(alice.id, bob.id);
 			const commandsB = record<ControlCommand>(aliceB, 'control:command');
 
 			const refused = await control(bobSocket, deviceB);
@@ -569,7 +579,7 @@ describe('Listening and control access', () => {
 			const bobSocket = await connect(bob);
 			await subscribe(bobSocket, alice.id);
 
-			await musicControlService.revokeControl(alice.id, bob.id);
+			await controlSwitchService.revokeControl(alice.id, bob.id);
 			expect(await inListeningRoom(bobSocket, alice.id)).toBe(false);
 		});
 
@@ -625,7 +635,7 @@ describe('Listening and control access', () => {
 			await setBobSwitch(true);
 			await subscribe(bobSocket, alice.id);
 
-			await musicControlService.revokeControl(alice.id, bob.id);
+			await controlSwitchService.revokeControl(alice.id, bob.id);
 			expect(await inListeningRoom(bobSocket, alice.id)).toBe(true);
 		});
 	});
