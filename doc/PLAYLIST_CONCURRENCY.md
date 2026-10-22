@@ -87,7 +87,7 @@ A client:
 - applies an event whose version is exactly one above, unless `rebalanced` is true;
 - reloads the playlist when it skipped a version or when `rebalanced` is true.
 
-All clients therefore end on the server's order. The HTTP contract (move endpoint, add and remove results, `tracksVersion` on the fetch, `rank` on each track) is in `backend/src/features/playlists/playlist.openapi.ts`.
+All clients therefore end on the server's order. The HTTP contract (move endpoint, add and remove results, `tracksVersion` on the fetch, `rank` on each track) is in `backend/src/features/playlists/playlist-tracks.openapi.ts` (schemas in `playlist.validators.ts` and `playlist-responses.validators.ts`).
 
 **Moves from one client go one at a time.** A user who taps twice quickly would otherwise send the second move with the version from before the first, and get a `409` against themselves. The mobile store (`mobile/src/store/playlistStore.ts`, `moveTrack`) queues moves: each is sent only after the previous one answered, with the version from that answer. The playlist screen moves a track one row with up / down buttons, shown to users who can edit and disabled at the list edges and while a move is pending; `afterRank` is the rank of the track two rows above (`null` for the second row) to go up, or of the next track to go down (`mobile/src/store/moveTarget.ts`).
 

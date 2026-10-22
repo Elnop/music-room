@@ -19,7 +19,7 @@
 
 ## Where things are
 
-- API routers are mounted in `backend/src/shared/config/routes.ts`; each feature documents its endpoints in `features/<name>/<name>.openapi.ts` (Swagger UI: http://localhost:3000/api-docs). A new endpoint without its OpenAPI entry is unfinished.
+- API routers are mounted in `backend/src/shared/config/routes.ts`; each feature documents its endpoints in `features/<name>/<name>.openapi.ts` (Swagger UI: http://localhost:3000/api-docs), which registers its routes with `@asteasolutions/zod-to-openapi`: request and response schemas are Zod schemas from `<name>*.validators.ts` (e.g. `playlist.validators.ts`, `playlist-responses.validators.ts`), never hand-written OpenAPI. A new endpoint without its OpenAPI entry is unfinished.
 - Socket.io events: server in `backend/src/realtime/index.ts`, client in `mobile/src/store/socketStore.ts` and `mobile/src/hooks/`. Read event names there; never assume them.
 - Migrations: `backend/migrations/NNN_*.sql`, created with `cd backend && make migrate-create name=<name>`. `make supabase-up` applies the new ones to the local dev stack (default `SUPABASE_MODE=local`); on the hosted project they are applied by hand in the Supabase dashboard.
 - Email sending: `backend/src/features/mail/mail.service.ts`. In local mode emails go to the dev stack's Mailpit (http://localhost:54424), not Gmail.

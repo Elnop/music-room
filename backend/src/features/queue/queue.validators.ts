@@ -31,12 +31,16 @@ export const queuePlaybackSchema = z
 
 /** Path segment of /api/queue/items/:itemId routes. */
 export const queueItemParamsSchema = z.object({
-	itemId: z.uuid('Invalid queue item ID format'),
+	itemId: z
+		.uuid('Invalid queue item ID format')
+		.meta({ param: { description: 'Id of an item of your queue' } }),
 });
 
 /** Path segment of POST /api/queue/playlists/:playlistId/play. */
 export const queuePlaylistParamsSchema = z.object({
-	playlistId: z.uuid('Invalid playlist ID format'),
+	playlistId: z
+		.uuid('Invalid playlist ID format')
+		.meta({ param: { description: 'Id of a playlist you can view' } }),
 });
 
 /** Body of POST /api/queue/items/:itemId/move; null = right after the current item. */
@@ -65,3 +69,52 @@ export const transferSchema = z.object({
 });
 
 export type TransferInput = z.infer<typeof transferSchema>;
+
+/** Track metadata of a queue item. */
+export const queueTrackSchema = z.object({
+	trackUri: z.string().meta({
+		description: 'SoundCloud permalink URL (never a stream URL)',
+		example: 'https://soundcloud.com/artist/track',
+	}),
+	title: z.string(),
+	artist: z.string(),
+	album: z.string().nullable(),
+	albumArt: z.url().nullable(),
+	durationMs: z.int(),
+});
+
+export const queueItemSchema = z.object({
+	id: z.uuid(),
+	rank: z.string().meta({ description: 'Sort key (base-62 fraction); items come sorted by it' }),
+	track: queueTrackSchema,
+	sourcePlaylistId: z.uuid().nullable(),
+	blockId: z
+		.uuid()
+		.nullable()
+		.meta({ description: 'Items queued together from one playlist share a block' }),
+	blockDetached: z
+		.boolean()
+		.meta({ description: 'True once you removed or moved an item of the block' }),
+});
+
+/** The whole queue: every queue route answers it, and `queue:updated` carries it. */
+export const queueStateSchema = z
+	.object({
+		ownerId: z.uuid(),
+		version: z.int().min(0).meta({ example: 12 }),
+		currentItemId: z.uuid().nullable(),
+		items: z.array(queueItemSchema),
+	})
+	.meta({
+		description:
+			'Items in rank order. Items before the current one are history, those after it upcoming; with `currentItemId` null every item is upcoming. `version` grows with every change: a client drops a state whose version is not above the one it holds. Also the payload of the `queue:updated` socket event.',
+	});
+
+/** Answer of POST /api/queue/transfer. */
+export const transferResultSchema = z.object({
+	ownerId: z.uuid(),
+	deviceId: z.string(),
+	queue: queueStateSchema
+		.nullable()
+		.meta({ description: "The friend's new queue; null when the target is one of your devices" }),
+});

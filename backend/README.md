@@ -103,9 +103,9 @@ Zumik provides interactive OpenAPI 3.0 documentation via Swagger UI.
 
 ### Features
 
-- **45 documented endpoints** across 6 features (Auth, Playlists, Profile, SoundCloud, Friends, Music Control)
+- **Every endpoint documented** across 7 features (Auth, Playlists, Profile, SoundCloud, Friends, Music Control, Queue)
 - **Interactive testing** - Try endpoints directly from the browser
-- **Request/Response examples** for all endpoints
+- **Request and response schemas** generated from the Zod validators
 - **Schema validation** with detailed parameter descriptions
 - **Authentication support** - Built-in JWT Bearer token authorization
 
@@ -120,16 +120,13 @@ Zumik provides interactive OpenAPI 3.0 documentation via Swagger UI.
 
 ### Documentation Architecture
 
-Documentation is organized by feature with separate OpenAPI files:
+The document is generated from the Zod schemas with `@asteasolutions/zod-to-openapi`; nothing is written by hand in OpenAPI form:
 
-- `features/auth/auth.openapi.ts` - 9 auth endpoints (register, login, OAuth, providers)
-- `features/playlists/playlist.openapi.ts` - 14 playlist endpoints (CRUD, tracks, collaborators)
-- `features/profile/profile.openapi.ts` - 9 profile endpoints (update, search, privacy, music preferences)
-- `features/soundcloud/soundcloud.openapi.ts` - 4 SoundCloud endpoints (search, track details, stream)
-- `features/friends/friends.openapi.ts` - 5 friends endpoints (follow, unfollow, stats)
-- `features/music-control/music-control.openapi.ts` - 4 music control endpoints (grant/revoke permissions)
+- Request schemas are the validators the controllers parse with (`features/<name>/<name>.validators.ts`); response schemas sit next to them (or in `<name>-responses.validators.ts` for a big feature).
+- Each `features/<name>/<name>.openapi.ts` exports `register<Name>Openapi(registry)`, which registers the routes (method, path, tags, summary, request, responses); a big feature splits them by subject (e.g. `playlist-tracks.openapi.ts`).
+- `shared/config/swagger.schemas.ts` (success envelope, body and parameter helpers) and `shared/config/swagger.errors.ts` (`ErrorResponse`, shared error responses) are the building blocks; `shared/config/swagger.config.ts` calls every feature and generates the document.
 
-All specifications are merged in `shared/config/swagger.config.ts`.
+`src/shared/config/openapi-coverage.test.ts` fails when a mounted route is not documented, or a documented one is not mounted.
 
 ### Export & Validation
 
@@ -317,7 +314,7 @@ make redis-shell
 
 ### Interactive Swagger UI
 
-The backend exposes **45 REST endpoints** across 6 features with **interactive documentation** via Swagger UI.
+The backend exposes **78 REST endpoints** across 7 features with **interactive documentation** via Swagger UI.
 
 **Access Swagger UI**:
 
@@ -394,7 +391,7 @@ features/<name>/
 ├── <name>.validators.ts       # Schémas Zod
 ├── <name>.controller.ts       # Handlers Express
 ├── <name>.routes.ts           # Router Express
-└── <name>.openapi.ts          # Documentation Swagger des endpoints
+└── <name>.openapi.ts          # Enregistrement OpenAPI des routes, à partir des schémas Zod
 ```
 
 Ajouter une feature : types → validators → service → controller → routes → openapi, puis monter le router dans `src/shared/config/routes.ts`.
