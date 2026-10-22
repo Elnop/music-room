@@ -13,7 +13,6 @@ import type { DevicePickerResponse } from '@/types/device.types';
 import type { UserProfile } from '@/types/user.types';
 import { logger } from '@/shared/utils/logger';
 
-
 jest.mock('@/shared/theme/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };

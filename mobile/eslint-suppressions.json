@@ -1,192 +1,192 @@
 {
-  "src/components/music-control/RenameDeviceModal.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 1
-    },
-    "guardrails/ui-primitives": {
-      "count": 1
-    }
-  },
-  "src/components/player/DevicePickerSheet.tsx": {
-    "guardrails/ui-primitives": {
-      "count": 1
-    }
-  },
-  "src/components/player/QueueItemRow.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 4
-    },
-    "guardrails/ui-primitives": {
-      "count": 2
-    }
-  },
-  "src/components/player/QueueModal.tsx": {
-    "guardrails/ui-primitives": {
-      "count": 1
-    }
-  },
-  "src/components/profile/GenreChip.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 1
-    },
-    "guardrails/ui-primitives": {
-      "count": 1
-    }
-  },
-  "src/components/profile/GenreSelector.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 1
-    }
-  },
-  "src/components/profile/NowPlayingInline.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 1
-    },
-    "guardrails/ui-primitives": {
-      "count": 1
-    }
-  },
-  "src/components/profile/ProfileSection.tsx": {
-    "guardrails/ui-primitives": {
-      "count": 1
-    }
-  },
-  "src/components/profile/VisibilityToggle.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 2
-    },
-    "guardrails/ui-primitives": {
-      "count": 1
-    }
-  },
-  "src/hooks/useAvatarPicker.ts": {
-    "guardrails/zustand-selector": {
-      "count": 1
-    }
-  },
-  "src/navigation/AppNavigator.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 1
-    }
-  },
-  "src/screens/friends/FriendsScreen.tsx": {
-    "guardrails/ui-primitives": {
-      "count": 1
-    },
-    "guardrails/zustand-selector": {
-      "count": 1
-    }
-  },
-  "src/screens/friends/UserProfileScreen.tsx": {
-    "guardrails/zustand-selector": {
-      "count": 1
-    }
-  },
-  "src/screens/profile/EditProfileScreen.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 2
-    },
-    "guardrails/zustand-selector": {
-      "count": 1
-    }
-  },
-  "src/screens/profile/LinkedAccountsScreen.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 1
-    },
-    "guardrails/ui-primitives": {
-      "count": 1
-    }
-  },
-  "src/screens/profile/MusicPreferencesScreen.tsx": {
-    "guardrails/zustand-selector": {
-      "count": 1
-    }
-  },
-  "src/screens/profile/MyDevicesScreen.tsx": {
-    "guardrails/ui-primitives": {
-      "count": 1
-    }
-  },
-  "src/screens/profile/PrivacySettingsScreen.tsx": {
-    "guardrails/zustand-selector": {
-      "count": 1
-    }
-  },
-  "src/screens/profile/ProfileScreen.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 3
-    },
-    "guardrails/ui-primitives": {
-      "count": 2
-    },
-    "guardrails/zustand-selector": {
-      "count": 1
-    }
-  },
-  "src/screens/search/SoundCloudSearchScreen.tsx": {
-    "guardrails/zustand-selector": {
-      "count": 1
-    }
-  },
-  "src/screens/search/components/SoundCloudTrackItem.tsx": {
-    "guardrails/ui-primitives": {
-      "count": 1
-    }
-  },
-  "src/shared/components/feedback/ConnectionBanner.test.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 15
-    }
-  },
-  "src/shared/components/feedback/ConnectionBanner.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 2
-    }
-  },
-  "src/shared/components/feedback/EmptyState.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 1
-    }
-  },
-  "src/shared/components/feedback/ErrorBoundary.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 10
-    }
-  },
-  "src/shared/components/lists/QueueSwipe.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 2
-    }
-  },
-  "src/shared/components/lists/SwipeableTrackItem.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 4
-    }
-  },
-  "src/shared/components/lists/SwipeableUserItem.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 3
-    }
-  },
-  "src/shared/components/theme/ThemeSelector.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 7
-    }
-  },
-  "src/shared/components/ui/Button.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 3
-    }
-  },
-  "src/shared/components/ui/ThemedSwitch.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 1
-    }
-  },
-  "src/types/user.types.ts": {
-    "guardrails/theme-tokens": {
-      "count": 10
-    }
-  }
+	"src/components/music-control/RenameDeviceModal.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 1
+		},
+		"guardrails/ui-primitives": {
+			"count": 1
+		}
+	},
+	"src/components/player/DevicePickerSheet.tsx": {
+		"guardrails/ui-primitives": {
+			"count": 1
+		}
+	},
+	"src/components/player/QueueItemRow.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 4
+		},
+		"guardrails/ui-primitives": {
+			"count": 2
+		}
+	},
+	"src/components/player/QueueModal.tsx": {
+		"guardrails/ui-primitives": {
+			"count": 1
+		}
+	},
+	"src/components/profile/GenreChip.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 1
+		},
+		"guardrails/ui-primitives": {
+			"count": 1
+		}
+	},
+	"src/components/profile/GenreSelector.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 1
+		}
+	},
+	"src/components/profile/NowPlayingInline.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 1
+		},
+		"guardrails/ui-primitives": {
+			"count": 1
+		}
+	},
+	"src/components/profile/ProfileSection.tsx": {
+		"guardrails/ui-primitives": {
+			"count": 1
+		}
+	},
+	"src/components/profile/VisibilityToggle.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 2
+		},
+		"guardrails/ui-primitives": {
+			"count": 1
+		}
+	},
+	"src/hooks/useAvatarPicker.ts": {
+		"guardrails/zustand-selector": {
+			"count": 1
+		}
+	},
+	"src/navigation/AppNavigator.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 1
+		}
+	},
+	"src/screens/friends/FriendsScreen.tsx": {
+		"guardrails/ui-primitives": {
+			"count": 1
+		},
+		"guardrails/zustand-selector": {
+			"count": 1
+		}
+	},
+	"src/screens/friends/UserProfileScreen.tsx": {
+		"guardrails/zustand-selector": {
+			"count": 1
+		}
+	},
+	"src/screens/profile/EditProfileScreen.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 2
+		},
+		"guardrails/zustand-selector": {
+			"count": 1
+		}
+	},
+	"src/screens/profile/LinkedAccountsScreen.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 1
+		},
+		"guardrails/ui-primitives": {
+			"count": 1
+		}
+	},
+	"src/screens/profile/MusicPreferencesScreen.tsx": {
+		"guardrails/zustand-selector": {
+			"count": 1
+		}
+	},
+	"src/screens/profile/MyDevicesScreen.tsx": {
+		"guardrails/ui-primitives": {
+			"count": 1
+		}
+	},
+	"src/screens/profile/PrivacySettingsScreen.tsx": {
+		"guardrails/zustand-selector": {
+			"count": 1
+		}
+	},
+	"src/screens/profile/ProfileScreen.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 3
+		},
+		"guardrails/ui-primitives": {
+			"count": 2
+		},
+		"guardrails/zustand-selector": {
+			"count": 1
+		}
+	},
+	"src/screens/search/SoundCloudSearchScreen.tsx": {
+		"guardrails/zustand-selector": {
+			"count": 1
+		}
+	},
+	"src/screens/search/components/SoundCloudTrackItem.tsx": {
+		"guardrails/ui-primitives": {
+			"count": 1
+		}
+	},
+	"src/shared/components/feedback/ConnectionBanner.test.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 15
+		}
+	},
+	"src/shared/components/feedback/ConnectionBanner.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 2
+		}
+	},
+	"src/shared/components/feedback/EmptyState.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 1
+		}
+	},
+	"src/shared/components/feedback/ErrorBoundary.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 10
+		}
+	},
+	"src/shared/components/lists/QueueSwipe.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 2
+		}
+	},
+	"src/shared/components/lists/SwipeableTrackItem.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 4
+		}
+	},
+	"src/shared/components/lists/SwipeableUserItem.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 3
+		}
+	},
+	"src/shared/components/theme/ThemeSelector.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 7
+		}
+	},
+	"src/shared/components/ui/Button.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 3
+		}
+	},
+	"src/shared/components/ui/ThemedSwitch.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 1
+		}
+	},
+	"src/types/user.types.ts": {
+		"guardrails/theme-tokens": {
+			"count": 10
+		}
+	}
 }

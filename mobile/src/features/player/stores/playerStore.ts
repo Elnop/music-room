@@ -40,7 +40,11 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 
 	setPlaybackPlaying: () => {
 		const s = get();
-		if (s.playbackState === 'loading' || s.playbackState === 'ready' || s.playbackState === 'paused') {
+		if (
+			s.playbackState === 'loading' ||
+			s.playbackState === 'ready' ||
+			s.playbackState === 'paused'
+		) {
 			set({ playbackState: 'playing', isPlaying: true, loading: false, pendingTrackId: null });
 		}
 	},

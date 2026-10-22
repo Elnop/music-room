@@ -1,10 +1,5 @@
 import { Gesture } from 'react-native-gesture-handler';
-import {
-	runOnJS,
-	useAnimatedStyle,
-	useSharedValue,
-	withSpring,
-} from 'react-native-reanimated';
+import { runOnJS, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { useNowPlaying, type NowPlayingTrack } from '@/features/player/hooks/useNowPlaying';
 import { RESTART_THRESHOLD_S } from '@/store/queueSelectors';

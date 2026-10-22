@@ -28,7 +28,9 @@ export function PlayerModalView({ modal, gestures }: PlayerModalViewProps) {
 		>
 			<GestureHandlerRootView style={modal.styles.container}>
 				<GestureDetector gesture={gestures.panGesture}>
-					<Animated.View style={[modal.styles.container, modal.styles.modalContent, gestures.animatedStyle]}>
+					<Animated.View
+						style={[modal.styles.container, modal.styles.modalContent, gestures.animatedStyle]}
+					>
 						<LinearGradient
 							colors={modal.gradientColors}
 							style={StyleSheet.absoluteFill}

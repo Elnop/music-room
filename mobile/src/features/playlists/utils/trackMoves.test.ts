@@ -56,6 +56,7 @@ function open() {
 		queryKey: key,
 		queryFn: () => loadPlaylist(client, 'p'),
 		staleTime: Infinity,
+		gcTime: Infinity,
 		retry: false,
 	});
 	unsubscribe = observer.subscribe(() => undefined);

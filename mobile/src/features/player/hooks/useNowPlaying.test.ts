@@ -103,7 +103,11 @@ beforeEach(() => {
 	jest.clearAllMocks();
 	jest.useFakeTimers({ now: NOW });
 	mockProgress = { currentTime: 0, duration: 0, progress: 0 };
-	testSessionStore.setState({ user: { id: 'me' } as UserProfile, accessToken: 'test-token', isAuthenticated: true });
+	testSessionStore.setState({
+		user: { id: 'me' } as UserProfile,
+		accessToken: 'test-token',
+		isAuthenticated: true,
+	});
 	useConnectStore.setState({ target: { kind: 'local' }, remoteStatus: null });
 	useQueueStore.getState().reset();
 	usePlayerStore.setState({

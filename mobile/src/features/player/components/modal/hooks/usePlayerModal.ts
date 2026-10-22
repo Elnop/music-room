@@ -75,7 +75,12 @@ export function usePlayerModal() {
 
 	const gradientColors: [string, string, string, string] = adaptive
 		? adaptive.gradient
-		: [theme.colors.background, theme.colors.background, theme.colors.background, theme.colors.background];
+		: [
+				theme.colors.background,
+				theme.colors.background,
+				theme.colors.background,
+				theme.colors.background,
+			];
 
 	const handlePlayPause = () => {
 		if (!nowPlaying.canToggle) return;
@@ -90,13 +95,15 @@ export function usePlayerModal() {
 
 	const handleSliderAction = (actionName: string) => {
 		if (duration === null) return;
-		const step = actionName === 'increment' ? SEEK_STEP_S : actionName === 'decrement' ? -SEEK_STEP_S : 0;
+		const step =
+			actionName === 'increment' ? SEEK_STEP_S : actionName === 'decrement' ? -SEEK_STEP_S : 0;
 		if (step === 0) return;
 		handleSeek(Math.min(duration, Math.max(0, currentTime + step)));
 	};
 
 	const canGoPrevious =
-		nowPlaying.canToggle && (nowPlaying.hasPrevious || (!nowPlaying.isRemote && currentTime > RESTART_THRESHOLD_S));
+		nowPlaying.canToggle &&
+		(nowPlaying.hasPrevious || (!nowPlaying.isRemote && currentTime > RESTART_THRESHOLD_S));
 	const canGoNext = nowPlaying.track !== null && nowPlaying.hasNext;
 
 	const handlePrevious = () => {

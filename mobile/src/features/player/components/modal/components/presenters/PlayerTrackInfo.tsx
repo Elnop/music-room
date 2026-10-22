@@ -32,12 +32,7 @@ export function PlayerTrackInfo({
 			<View style={styles.artworkWrapper}>
 				<View style={styles.artworkShadow}>
 					{track ? (
-						<Artwork
-							uri={artworkUrl}
-							size={ARTWORK_SIZE}
-							style={styles.artwork}
-							iconSize={64}
-						/>
+						<Artwork uri={artworkUrl} size={ARTWORK_SIZE} style={styles.artwork} iconSize={64} />
 					) : (
 						<View style={[styles.artwork, styles.emptyArtwork]}>
 							<Ionicons name="musical-notes" size={64} color={colors.textSecondary} />

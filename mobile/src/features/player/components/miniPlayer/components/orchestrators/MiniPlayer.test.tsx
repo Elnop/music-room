@@ -80,7 +80,11 @@ describe('MiniPlayer', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
 		usePlayerStore.setState({ currentTrack: null, playbackState: 'idle', isModalOpen: false });
-		testSessionStore.setState({ user: { id: 'me' } as UserProfile, accessToken: 'test-token', isAuthenticated: true });
+		testSessionStore.setState({
+			user: { id: 'me' } as UserProfile,
+			accessToken: 'test-token',
+			isAuthenticated: true,
+		});
 		useConnectStore.setState({ target: { kind: 'local' }, remoteStatus: null });
 	});
 

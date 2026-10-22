@@ -3,7 +3,6 @@ import { MINI_PLAYER_HEIGHT, usePlayerHeight } from './PlayerContext';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
-
 // The system media controls (#309) are covered by MediaSessionBridge.test.tsx.
 jest.mock(
 	'@/features/player/components/mediaSession/components/orchestrators/MediaSessionBridge',

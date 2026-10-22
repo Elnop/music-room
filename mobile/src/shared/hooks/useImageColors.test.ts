@@ -26,7 +26,9 @@ describe('useImageColors', () => {
 			primary: EXTRACTED_COLOR,
 		});
 
-		const { result } = renderHook(() => useImageColors('https://example.com/art.jpg', FALLBACK_COLOR));
+		const { result } = renderHook(() =>
+			useImageColors('https://example.com/art.jpg', FALLBACK_COLOR)
+		);
 
 		await waitFor(() => {
 			expect(result.current.dominantColor).toBe(EXTRACTED_COLOR);

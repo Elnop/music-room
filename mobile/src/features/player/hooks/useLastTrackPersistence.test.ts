@@ -9,7 +9,11 @@ import {
 } from './useLastTrackPersistence';
 import { lastTrackStorage, type LastTrackEntry } from '@/shared/services/lastTrackStorage';
 import { usePlayerStore, setPositionReader } from '@/features/player/stores/playerStore';
-import { registerAuthSession, notifySessionEnd, type SessionView } from '@/shared/services/authSession';
+import {
+	registerAuthSession,
+	notifySessionEnd,
+	type SessionView,
+} from '@/shared/services/authSession';
 import { useConnectStore } from '@/store/connectStore';
 import { queueTrackToSoundCloud } from '@/shared/utils/trackToSoundCloud';
 import type { UserProfile } from '@/types/user.types';
@@ -89,7 +93,11 @@ beforeEach(async () => {
 	});
 	usePlayerStore.setState(initialPlayerState, true);
 	useConnectStore.getState().setLocal();
-	testSessionStore.setState({ user: { id: 'me' } as UserProfile, accessToken: 'test-token', isAuthenticated: true });
+	testSessionStore.setState({
+		user: { id: 'me' } as UserProfile,
+		accessToken: 'test-token',
+		isAuthenticated: true,
+	});
 });
 
 afterEach(() => {
