@@ -8,7 +8,7 @@ import { ownedAvatarPath } from '@/features/profile/services/avatar.service.js';
 
 /**
  * PUT and DELETE /api/profile/avatar (#351) with the real router, multer,
- * controller and AvatarService. Supabase (the `user_profiles` row and the
+ * controllers and avatar.service. Supabase (the `user_profiles` row and the
  * `avatars` bucket), the auth middleware, the rate limiter and the logger are
  * faked. The limiter's 429 and the real Storage are covered by avatar.int.test.ts.
  */

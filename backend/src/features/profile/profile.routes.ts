@@ -1,124 +1,32 @@
 import { Router } from 'express';
+import * as profile from '@/features/profile/profile.controller.js';
+import * as avatar from '@/features/profile/profile-avatar.controller.js';
+import * as settings from '@/features/profile/profile-settings.controller.js';
 import { authMiddleware } from '@/features/auth/auth.middleware.js';
 import { avatarRateLimiter } from '@/features/auth/middleware/rate-limit.middleware.js';
-import { ProfileController } from '@/features/profile/profile.controller.js';
 import { avatarUpload } from '@/features/profile/utils/avatar-upload.js';
 
+// Endpoints are documented in profile*.openapi.ts.
 const router = Router();
-const controller = new ProfileController();
 
-/**
- * All profile routes require authentication
- */
+// Every profile route requires authentication.
 router.use(authMiddleware);
 
-// =====================================================
-// Profile Routes
-// =====================================================
+router.patch('/', profile.updateProfile);
+router.get('/', profile.getOwnProfile);
+router.get('/search', profile.searchUsers);
 
-/**
- * @route   PATCH /api/profile
- * @desc    Update current user's profile
- * @access  Private
- */
-router.patch('/', (req, res, next) => controller.updateProfile(req, res, next));
+router.get('/privacy', settings.getPrivacySettings);
+router.put('/privacy', settings.updatePrivacySettings);
+router.get('/music-preferences', settings.getMusicPreferences);
+router.put('/music-preferences', settings.updateMusicPreferences);
+router.get('/music-preferences/genres', settings.getAvailableGenres);
 
-/**
- * @route   GET /api/profile
- * @desc    Get current user's profile
- * @access  Private
- */
-router.get('/', (req, res, next) => controller.getOwnProfile(req, res, next));
+// Avatar changes are rate-limited per user.
+router.put('/avatar', avatarRateLimiter, avatarUpload, avatar.uploadAvatar);
+router.delete('/avatar', avatarRateLimiter, avatar.removeAvatar);
 
-/**
- * @route   GET /api/profile/search
- * @desc    Search users by username or display name
- * @access  Private
- * @query   q - Search query (required)
- * @query   limit - Max results (default: 20, max: 50)
- */
-router.get('/search', (req, res, next) => controller.searchUsers(req, res, next));
-
-// =====================================================
-// Privacy Routes
-// =====================================================
-
-/**
- * @route   GET /api/profile/privacy
- * @desc    Get current user's privacy settings
- * @access  Private
- */
-router.get('/privacy', (req, res, next) => controller.getPrivacySettings(req, res, next));
-
-/**
- * @route   PUT /api/profile/privacy
- * @desc    Update current user's privacy settings
- * @access  Private
- */
-router.put('/privacy', (req, res, next) => controller.updatePrivacySettings(req, res, next));
-
-// =====================================================
-// Music Preferences Routes
-// =====================================================
-
-/**
- * @route   GET /api/profile/music-preferences
- * @desc    Get current user's music preferences
- * @access  Private
- */
-router.get('/music-preferences', (req, res, next) =>
-	controller.getMusicPreferences(req, res, next)
-);
-
-/**
- * @route   PUT /api/profile/music-preferences
- * @desc    Update current user's music preferences (max 5 genres)
- * @access  Private
- */
-router.put('/music-preferences', (req, res, next) =>
-	controller.updateMusicPreferences(req, res, next)
-);
-
-/**
- * @route   GET /api/profile/music-preferences/genres
- * @desc    Get all available music genres
- * @access  Private
- */
-router.get('/music-preferences/genres', (req, res, next) =>
-	controller.getAvailableGenres(req, res, next)
-);
-
-// =====================================================
-// Avatar Routes
-// =====================================================
-
-/**
- * @route   PUT /api/profile/avatar
- * @desc    Upload a new profile photo (multipart field `avatar`, JPEG/PNG/WebP, max 2 MB)
- * @access  Private, rate-limited per user
- */
-router.put('/avatar', avatarRateLimiter, avatarUpload, (req, res, next) =>
-	controller.uploadAvatar(req, res, next)
-);
-
-/**
- * @route   DELETE /api/profile/avatar
- * @desc    Remove the profile photo
- * @access  Private, rate-limited per user
- */
-router.delete('/avatar', avatarRateLimiter, (req, res, next) =>
-	controller.removeAvatar(req, res, next)
-);
-
-// =====================================================
-// User Profile Routes (by ID)
-// =====================================================
-
-/**
- * @route   GET /api/profile/:userId
- * @desc    Get user profile by ID (filtered by privacy settings)
- * @access  Private
- */
-router.get('/:userId', (req, res, next) => controller.getProfile(req, res, next));
+// Last, so it never shadows the paths above.
+router.get('/:userId', profile.getProfile);
 
 export default router;

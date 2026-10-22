@@ -735,23 +735,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/features/profile/services/avatar.int.test.ts",
-    "to": "src/features/profile/profile.routes.ts",
-    "unresolvedTo": "@/features/profile/profile.routes.js",
-    "dependencyTypes": [
-      "aliased",
-      "aliased-tsconfig",
-      "aliased-tsconfig-paths",
-      "local",
-      "dynamic-import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "services-not-to-controller"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/shared/config/routes.ts",
     "to": "src/features/auth/auth.routes.ts",
     "unresolvedTo": "@/features/auth/auth.routes.js",

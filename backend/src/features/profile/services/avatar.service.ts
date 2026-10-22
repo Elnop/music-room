@@ -66,80 +66,78 @@ export async function deleteReplacedAvatar(
 	}
 }
 
-export class AvatarService {
-	/**
-	 * Stores a new profile photo and makes it the user's avatar. The previous
-	 * photo is deleted when it was stored here; an external one is left alone.
-	 */
-	async uploadAvatar(userId: string, file: Buffer): Promise<AvatarResponse> {
-		const type = detectImageType(file);
-		if (!type) {
-			throw new AppError(400, 'The file is not a JPEG, PNG or WebP image', 'INVALID_IMAGE');
-		}
+async function currentAvatarUrl(userId: string): Promise<string | null> {
+	const { data, error } = await supabaseAdmin
+		.from('user_profiles')
+		.select('avatar_url')
+		.eq('id', userId)
+		.single();
+	if (error || !data) {
+		throw new AppError(404, 'Profile not found', 'PROFILE_NOT_FOUND');
+	}
+	return data.avatar_url;
+}
 
-		const previousUrl = await this.currentAvatarUrl(userId);
-		const path = `${userId}/${randomUUID()}.${type.ext}`;
-		const bucket = supabaseAdmin.storage.from(AVATAR_BUCKET);
+async function setAvatarUrl(userId: string, avatarUrl: string | null): Promise<void> {
+	const { error } = await supabaseAdmin
+		.from('user_profiles')
+		.update({ avatar_url: avatarUrl, updated_at: new Date().toISOString() })
+		.eq('id', userId);
+	if (error) {
+		logger.error('Failed to save avatar_url', { userId, error: error.message });
+		throw new AppError(500, 'Failed to update the profile photo', 'PROFILE_UPDATE_ERROR');
+	}
+}
 
-		const { error: uploadError } = await bucket.upload(path, file, {
-			contentType: type.mime,
-			cacheControl: '31536000',
-			upsert: false,
-		});
-		if (uploadError) {
-			logger.error('Avatar upload to Storage failed', { userId, error: uploadError.message });
-			throw new AppError(500, 'Failed to store the photo', 'AVATAR_UPLOAD_ERROR');
-		}
-
-		const avatarUrl = bucket.getPublicUrl(path).data.publicUrl;
-
-		try {
-			await this.setAvatarUrl(userId, avatarUrl);
-		} catch (error) {
-			// The new file is not referenced anywhere: remove it.
-			await removeObject(path, userId);
-			throw error;
-		}
-
-		const previousPath = ownedAvatarPath(previousUrl, userId);
-		if (previousPath && previousPath !== path) await removeObject(previousPath, userId);
-
-		logger.info('Avatar updated', { userId, path });
-		return { avatarUrl };
+/**
+ * Stores a new profile photo and makes it the user's avatar. The previous
+ * photo is deleted when it was stored here; an external one is left alone.
+ */
+export async function uploadAvatar(userId: string, file: Buffer): Promise<AvatarResponse> {
+	const type = detectImageType(file);
+	if (!type) {
+		throw new AppError(400, 'The file is not a JPEG, PNG or WebP image', 'INVALID_IMAGE');
 	}
 
-	/** Clears the user's avatar and deletes the photo when it was stored here. */
-	async removeAvatar(userId: string): Promise<AvatarResponse> {
-		const previousUrl = await this.currentAvatarUrl(userId);
-		await this.setAvatarUrl(userId, null);
+	const previousUrl = await currentAvatarUrl(userId);
+	const path = `${userId}/${randomUUID()}.${type.ext}`;
+	const bucket = supabaseAdmin.storage.from(AVATAR_BUCKET);
 
-		const previousPath = ownedAvatarPath(previousUrl, userId);
-		if (previousPath) await removeObject(previousPath, userId);
-
-		logger.info('Avatar removed', { userId });
-		return { avatarUrl: null };
+	const { error: uploadError } = await bucket.upload(path, file, {
+		contentType: type.mime,
+		cacheControl: '31536000',
+		upsert: false,
+	});
+	if (uploadError) {
+		logger.error('Avatar upload to Storage failed', { userId, error: uploadError.message });
+		throw new AppError(500, 'Failed to store the photo', 'AVATAR_UPLOAD_ERROR');
 	}
 
-	private async currentAvatarUrl(userId: string): Promise<string | null> {
-		const { data, error } = await supabaseAdmin
-			.from('user_profiles')
-			.select('avatar_url')
-			.eq('id', userId)
-			.single();
-		if (error || !data) {
-			throw new AppError(404, 'Profile not found', 'PROFILE_NOT_FOUND');
-		}
-		return data.avatar_url;
+	const avatarUrl = bucket.getPublicUrl(path).data.publicUrl;
+
+	try {
+		await setAvatarUrl(userId, avatarUrl);
+	} catch (error) {
+		// The new file is not referenced anywhere: remove it.
+		await removeObject(path, userId);
+		throw error;
 	}
 
-	private async setAvatarUrl(userId: string, avatarUrl: string | null): Promise<void> {
-		const { error } = await supabaseAdmin
-			.from('user_profiles')
-			.update({ avatar_url: avatarUrl, updated_at: new Date().toISOString() })
-			.eq('id', userId);
-		if (error) {
-			logger.error('Failed to save avatar_url', { userId, error: error.message });
-			throw new AppError(500, 'Failed to update the profile photo', 'PROFILE_UPDATE_ERROR');
-		}
-	}
+	const previousPath = ownedAvatarPath(previousUrl, userId);
+	if (previousPath && previousPath !== path) await removeObject(previousPath, userId);
+
+	logger.info('Avatar updated', { userId, path });
+	return { avatarUrl };
+}
+
+/** Clears the user's avatar and deletes the photo when it was stored here. */
+export async function removeAvatar(userId: string): Promise<AvatarResponse> {
+	const previousUrl = await currentAvatarUrl(userId);
+	await setAvatarUrl(userId, null);
+
+	const previousPath = ownedAvatarPath(previousUrl, userId);
+	if (previousPath) await removeObject(previousPath, userId);
+
+	logger.info('Avatar removed', { userId });
+	return { avatarUrl: null };
 }

@@ -4,7 +4,7 @@ import express, { type NextFunction, type Request, type Response } from 'express
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import profileRoutes from '@/features/profile/profile.routes.js';
 import { errorHandler } from '@/shared/middleware/error-handler.js';
-import { MUSIC_GENRES } from '@/features/profile/profile.types.js';
+import { MUSIC_GENRES } from '@/features/profile/profile.validators.js';
 
 /**
  * Route-level tests for /api/profile. The real controller, validators and
@@ -754,6 +754,132 @@ describe('music preferences', () => {
 		expect(res.status).toBe(200);
 		expect(res.body.data.genres).toEqual([...MUSIC_GENRES]);
 		expect(db.from).not.toHaveBeenCalled();
+	});
+});
+
+// =====================================================
+// Missing rows and failures
+// =====================================================
+
+const NO_ROW = { code: 'PGRST116', message: 'No rows found' };
+const DB_DOWN = { code: '08006', message: 'connection failure' };
+
+/** The next Supabase call throws, as an unexpected client error would. */
+function throwOnNextQuery() {
+	db.from.mockImplementationOnce(() => {
+		throw new Error('client exploded');
+	});
+}
+
+describe('music preferences without a row or with a failing database', () => {
+	it('GET creates the empty preferences on first read', async () => {
+		setResult('music_preferences', 'select', null, NO_ROW);
+		setResult('music_preferences', 'insert', { user_id: ALICE, genres: [], updated_at: null });
+
+		const res = await api('GET', '/music-preferences', { user: ALICE });
+
+		expect(res.status).toBe(200);
+		expect(res.body.data).toMatchObject({ userId: ALICE, genres: [] });
+		expect(callsOn('music_preferences', 'insert')[0]?.args[0]).toEqual({
+			user_id: ALICE,
+			genres: [],
+		});
+	});
+
+	it('GET drops stored genres that are no longer known', async () => {
+		setResult('music_preferences', 'select', {
+			user_id: ALICE,
+			genres: ['rock', 'disco'],
+			updated_at: '2026-01-01T00:00:00.000Z',
+		});
+
+		const res = await api('GET', '/music-preferences', { user: ALICE });
+
+		expect(res.body.data).toMatchObject({ genres: ['rock'] });
+	});
+
+	it('PUT inserts the genres when no row exists', async () => {
+		setResult('music_preferences', 'update', null, NO_ROW);
+		setResult('music_preferences', 'insert', {
+			user_id: ALICE,
+			genres: ['pop'],
+			updated_at: '2026-01-03T00:00:00.000Z',
+		});
+
+		const res = await api('PUT', '/music-preferences', { user: ALICE, body: { genres: ['pop'] } });
+
+		expect(res.status).toBe(200);
+		expect(res.body.data).toMatchObject({ genres: ['pop'] });
+		expect(callsOn('music_preferences', 'insert')[0]?.args[0]).toEqual({
+			user_id: ALICE,
+			genres: ['pop'],
+		});
+	});
+
+	it.each([
+		['GET', 'select', 'MUSIC_PREFS_FETCH_ERROR', undefined],
+		['PUT', 'update', 'MUSIC_PREFS_UPDATE_ERROR', { genres: ['pop'] }],
+	] as const)('%s with a failing %s answers 500 %s', async (method, op, code, body) => {
+		setResult('music_preferences', op, null, DB_DOWN);
+
+		const res = await api(method, '/music-preferences', { user: ALICE, body });
+
+		expect(res.status).toBe(500);
+		expect(res.body.error?.code).toBe(code);
+	});
+
+	it('PUT answers 500 MUSIC_PREFS_CREATE_ERROR when the missing row cannot be created', async () => {
+		setResult('music_preferences', 'update', null, NO_ROW);
+		setResult('music_preferences', 'insert', null, DB_DOWN);
+
+		const res = await api('PUT', '/music-preferences', { user: ALICE, body: { genres: ['pop'] } });
+
+		expect(res.status).toBe(500);
+		expect(res.body.error?.code).toBe('MUSIC_PREFS_CREATE_ERROR');
+	});
+});
+
+describe('privacy settings with a failing database', () => {
+	it.each([
+		['GET', 'select', 'PRIVACY_FETCH_ERROR', undefined],
+		['PUT', 'update', 'PRIVACY_UPDATE_ERROR', { bioVisibility: 'private' }],
+	] as const)('%s with a failing %s answers 500 %s', async (method, op, code, body) => {
+		setResult('profile_privacy', op, null, DB_DOWN);
+
+		const res = await api(method, '/privacy', { user: ALICE, body });
+
+		expect(res.status).toBe(500);
+		expect(res.body.error?.code).toBe(code);
+	});
+
+	it('PUT answers 500 PRIVACY_CREATE_ERROR when the missing row cannot be created', async () => {
+		setResult('profile_privacy', 'update', null, NO_ROW);
+		setResult('profile_privacy', 'insert', null, DB_DOWN);
+
+		const res = await api('PUT', '/privacy', { user: ALICE, body: { bioVisibility: 'private' } });
+
+		expect(res.status).toBe(500);
+		expect(res.body.error?.code).toBe('PRIVACY_CREATE_ERROR');
+	});
+});
+
+describe("unexpected errors keep the endpoint's error code", () => {
+	it.each([
+		['GET', '/', 'PROFILE_FETCH_ERROR', undefined],
+		['PATCH', '/', 'PROFILE_UPDATE_ERROR', { bio: 'new bio' }],
+		['GET', `/${BOB}`, 'PROFILE_FETCH_ERROR', undefined],
+		['GET', '/search?q=al', 'SEARCH_ERROR', undefined],
+		['GET', '/privacy', 'PRIVACY_FETCH_ERROR', undefined],
+		['PUT', '/privacy', 'PRIVACY_UPDATE_ERROR', { bioVisibility: 'private' }],
+		['GET', '/music-preferences', 'MUSIC_PREFS_FETCH_ERROR', undefined],
+		['PUT', '/music-preferences', 'MUSIC_PREFS_UPDATE_ERROR', { genres: ['pop'] }],
+	])('%s %s answers 500 %s', async (method, path, code, body) => {
+		throwOnNextQuery();
+
+		const res = await api(method, path, { user: ALICE, body });
+
+		expect(res.status).toBe(500);
+		expect(res.body.error?.code).toBe(code);
 	});
 });
 
