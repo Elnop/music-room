@@ -9,8 +9,10 @@ import type { QueueState } from '@/features/queue/queue.types.js';
 // playlist-track.service, as the API does; queue:updated is captured on a mock.
 
 const { notifyQueueUpdate } = vi.hoisted(() => ({ notifyQueueUpdate: vi.fn() }));
-vi.mock('@/realtime/index.js', () => ({
-	realtime: { notifyQueueUpdate, notifyPlaylistUpdate: vi.fn(), revalidatePlaylistRoom: vi.fn() },
+vi.mock('@/realtime/emitters/queue.emitters.js', () => ({ notifyQueueUpdate }));
+vi.mock('@/realtime/emitters/playlist.emitters.js', () => ({
+	notifyPlaylistUpdate: vi.fn(),
+	revalidatePlaylistRoom: vi.fn(),
 }));
 
 const queue = await import('@/features/queue/services/queue.service.js');

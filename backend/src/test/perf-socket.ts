@@ -19,7 +19,7 @@
  * one action per ~2 s, far under the per-socket limits of
  * shared/security/socket-event-limit.ts, so the run measures the server, not the limiter.
  *
- * Event names and payloads: realtime/index.ts, realtime/socket-auth.ts.
+ * Event names and payloads: realtime/handlers/, realtime/emitters/, realtime/socket-auth.ts.
  *
  * Run from backend/: `npx tsx src/test/perf-socket.ts --out <file.json>`.
  * Exits non-zero only when no client could connect (or the fixtures are missing).

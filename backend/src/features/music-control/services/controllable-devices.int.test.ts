@@ -2,10 +2,15 @@ import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import * as service from '@/features/music-control/services/controllable-devices.service.js';
-import { realtime } from '@/realtime/index.js';
+import * as realtime from '@/realtime/emitters/control.emitters.js';
+
+vi.mock('@/realtime/emitters/control.emitters.js', async importOriginal => ({
+	...(await importOriginal<typeof import('@/realtime/emitters/control.emitters.js')>()),
+	isDeviceOnline: vi.fn(),
+}));
 
 // #295: the devices I can play on, mine then friends'. Presence is stubbed on
-// the realtime singleton (no Socket.io server here).
+// the realtime control emitters (no Socket.io server here).
 
 const users: string[] = [];
 const names = new Map<string, string>();
@@ -14,7 +19,7 @@ let friend: string;
 let other: string;
 let stranger: string;
 const online = new Set<string>();
-vi.spyOn(realtime, 'isDeviceOnline').mockImplementation((userId, deviceId) =>
+vi.mocked(realtime.isDeviceOnline).mockImplementation((userId, deviceId) =>
 	online.has(`${userId}:${deviceId}`)
 );
 

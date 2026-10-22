@@ -1,7 +1,7 @@
 import type { Router } from 'express';
 import { describe, expect, it } from 'vitest';
-import { routes } from '@/shared/config/routes.js';
-import { swaggerSpec } from '@/shared/config/swagger.config.js';
+import { routes } from '@/app/routes.js';
+import { swaggerSpec } from '@/app/openapi.js';
 
 /**
  * Every route mounted through the registry must have its OpenAPI entry, and

@@ -3,7 +3,7 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import { failUnexpected } from '@/shared/utils/fail-unexpected.js';
 import * as followStatusService from '@/features/friends/services/follow-status.service.js';
-import { realtime } from '@/realtime/index.js';
+import * as realtime from '@/realtime/emitters/control.emitters.js';
 
 // The "all my devices" switch (`follows(friend → owner).can_control_music`):
 // the owner lets a mutual friend control all of their devices.

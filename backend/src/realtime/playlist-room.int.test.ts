@@ -8,7 +8,9 @@ import { connectRedis, disconnectRedis, isRedisConnected } from '@/shared/config
 import * as viewerService from '@/features/playlists/services/viewer.service.js';
 import * as collaboratorService from '@/features/playlists/services/collaborator.service.js';
 import * as playlistUpdateService from '@/features/playlists/services/playlist-update.service.js';
-import { realtime } from '@/realtime/index.js';
+import * as socketServer from '@/realtime/socket-server.js';
+import { getIO } from '@/realtime/state.js';
+import * as realtime from '@/realtime/emitters/playlist.emitters.js';
 import type { PlaylistRoomError } from '@/realtime/playlist-room.js';
 import type { PlaylistUpdatedPayload } from '@/features/playlists/playlist.types.js';
 
@@ -119,7 +121,7 @@ describe('Playlist room access control', () => {
 	}
 
 	async function inRoom(socket: ClientSocket, playlistId: string): Promise<boolean> {
-		const sockets = await realtime.getIO()!.fetchSockets();
+		const sockets = await getIO()!.fetchSockets();
 		const found = sockets.find(s => s.id === socket.id);
 		return found?.rooms.has(`playlist:${playlistId}`) ?? false;
 	}
@@ -150,7 +152,7 @@ describe('Playlist room access control', () => {
 		outsider = await createUser();
 
 		httpServer = createServer();
-		realtime.initialize(httpServer);
+		socketServer.initialize(httpServer);
 		await new Promise<void>(resolve => httpServer.listen(0, '127.0.0.1', () => resolve()));
 		const { port } = httpServer.address() as AddressInfo;
 		url = `http://127.0.0.1:${port}`;
@@ -161,7 +163,7 @@ describe('Playlist room access control', () => {
 	});
 
 	afterAll(async () => {
-		await realtime.getIO()?.close();
+		await getIO()?.close();
 		if (playlistIds.length) await supabaseAdmin.from('playlists').delete().in('id', playlistIds);
 		for (const user of [owner, viewer, outsider]) {
 			if (user) await supabaseAdmin.auth.admin.deleteUser(user.id);

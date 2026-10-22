@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import type { AuthenticatedRequest } from '@/shared/types/global.types.js';
 import { sendSuccess } from '@/shared/utils/send-success.js';
-import { realtime } from '@/realtime/index.js';
+import * as realtime from '@/realtime/emitters/control.emitters.js';
 import * as deviceService from '@/features/music-control/services/device.service.js';
 import * as controllableDevicesService from '@/features/music-control/services/controllable-devices.service.js';
 import {

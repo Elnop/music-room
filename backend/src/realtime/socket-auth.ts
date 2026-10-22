@@ -35,9 +35,9 @@ import { clientIp } from '@/shared/config/trust-proxy.js';
  * deviceId, `last_seen_at` refreshed) before the connection is accepted, and
  * `socket.data` holds `{ userId, email, device, appVersion }`, where
  * `device.deviceName` is the name the owner gave the device when set, else
- * the handshake `deviceName` (#352). The
- * identity comes only from the verified token: any `userId` sent by the client
- * is ignored. The token is checked once, at the handshake.
+ * the handshake `deviceName` (#352). The identity comes only from the
+ * verified token: any `userId` sent by the client is ignored. The token is
+ * checked once, at the handshake.
  */
 
 const handshakeAuthSchema = z.object({
@@ -134,12 +134,7 @@ export async function authenticateSocket(
 		return;
 	}
 
-	socket.data = {
-		userId: user.id,
-		email: user.email,
-		device,
-		appVersion,
-	};
+	socket.data = { userId: user.id, email: user.email, device, appVersion };
 
 	socketLogger.auth('handshake', user.id, socket.id, {
 		deviceId,

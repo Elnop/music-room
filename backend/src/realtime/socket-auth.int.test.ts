@@ -12,8 +12,10 @@ import {
 } from '@/shared/config/redis.js';
 import { logger } from '@/shared/utils/logger.js';
 import * as sessionService from '@/features/auth/services/session.service.js';
-import type { UserListeningStatus } from '@/features/music-control/music-control.types.js';
-import { realtime } from '@/realtime/index.js';
+import type { UserListeningStatus } from '@/realtime/listening.types.js';
+import * as socketServer from '@/realtime/socket-server.js';
+import { getIO } from '@/realtime/state.js';
+import * as realtime from '@/realtime/emitters/control.emitters.js';
 
 // Socket.io handshake authentication (socket-auth.ts) against a real server
 // on a random port and real users/tokens from the local Supabase stack.
@@ -120,7 +122,7 @@ describe('Socket.io handshake authentication', () => {
 	}
 
 	async function serverSocket(clientId: string | undefined) {
-		const sockets = await realtime.getIO()!.fetchSockets();
+		const sockets = await getIO()!.fetchSockets();
 		const found = sockets.find(s => s.id === clientId);
 		if (!found) throw new Error('server socket not found');
 		return found;
@@ -147,7 +149,7 @@ describe('Socket.io handshake authentication', () => {
 		if (error) throw error;
 
 		httpServer = createServer();
-		realtime.initialize(httpServer);
+		socketServer.initialize(httpServer);
 		await new Promise<void>(resolve => httpServer.listen(0, '127.0.0.1', () => resolve()));
 		const { port } = httpServer.address() as AddressInfo;
 		url = `http://127.0.0.1:${port}`;
@@ -158,7 +160,7 @@ describe('Socket.io handshake authentication', () => {
 	});
 
 	afterAll(async () => {
-		await realtime.getIO()?.close();
+		await getIO()?.close();
 		// Cascades to user_profiles and follows.
 		if (alice) await supabaseAdmin.auth.admin.deleteUser(alice.id);
 		if (bob) await supabaseAdmin.auth.admin.deleteUser(bob.id);
@@ -236,7 +238,7 @@ describe('Socket.io handshake authentication', () => {
 		const firstId = first.id;
 		first.disconnect();
 		await vi.waitFor(async () => {
-			const sockets = await realtime.getIO()!.fetchSockets();
+			const sockets = await getIO()!.fetchSockets();
 			expect(sockets.some(s => s.id === firstId)).toBe(false);
 		});
 

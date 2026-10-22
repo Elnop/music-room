@@ -3,7 +3,7 @@ import { upsertTrack, type TrackUpsertInput } from '@/shared/utils/track-upsert.
 import { checkEditPermission } from '@/features/playlists/permissions/playlist.permissions.js';
 import { formatTrackResponse } from '@/features/playlists/utils/playlist.helpers.js';
 import { addTrackRpc, moveTrackRpc, removeTrackRpc } from '@/features/playlists/utils/track-rpc.js';
-import { realtime } from '@/realtime/index.js';
+import * as realtime from '@/realtime/emitters/playlist.emitters.js';
 import * as queueSyncService from '@/features/queue/services/queue-sync.service.js';
 import type {
 	AddTrackResult,

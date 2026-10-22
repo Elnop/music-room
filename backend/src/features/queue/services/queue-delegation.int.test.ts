@@ -3,12 +3,22 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import * as queue from '@/features/queue/services/queue.service.js';
 import * as playlistService from '@/features/playlists/services/playlist.service.js';
-import { realtime } from '@/realtime/index.js';
+import * as realtimeControl from '@/realtime/emitters/control.emitters.js';
+import * as realtimeQueue from '@/realtime/emitters/queue.emitters.js';
+
+vi.mock('@/realtime/emitters/control.emitters.js', async importOriginal => ({
+	...(await importOriginal<typeof import('@/realtime/emitters/control.emitters.js')>()),
+	isDeviceOnline: vi.fn(),
+}));
+vi.mock('@/realtime/emitters/queue.emitters.js', async importOriginal => ({
+	...(await importOriginal<typeof import('@/realtime/emitters/queue.emitters.js')>()),
+	sendDeviceCommand: vi.fn(),
+}));
 
 // #294: a friend who controls at least one device of the owner manages the
 // owner's queue; playback actions target a device the friend controls, online.
 // No Socket.io server runs here: device presence and commands are stubbed on
-// the realtime singleton.
+// the realtime emitter modules.
 
 const URI_PREFIX = `https://soundcloud.com/int-queue-delegation/${randomUUID()}`;
 const users: string[] = [];
@@ -45,8 +55,8 @@ const dto = () => {
 };
 
 const online = new Set<string>();
-const sendDeviceCommand = vi.spyOn(realtime, 'sendDeviceCommand').mockReturnValue(true);
-vi.spyOn(realtime, 'isDeviceOnline').mockImplementation((userId, deviceId) =>
+const sendDeviceCommand = vi.mocked(realtimeQueue.sendDeviceCommand).mockReturnValue(true);
+vi.mocked(realtimeControl.isDeviceOnline).mockImplementation((userId, deviceId) =>
 	online.has(`${userId}:${deviceId}`)
 );
 

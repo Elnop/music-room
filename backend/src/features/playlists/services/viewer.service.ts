@@ -3,7 +3,7 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import { fetchSingle } from '@/shared/utils/database.helpers.js';
 import { checkOwnership } from '@/features/playlists/permissions/playlist.permissions.js';
-import { realtime } from '@/realtime/index.js';
+import * as realtime from '@/realtime/emitters/playlist.emitters.js';
 
 // Playlist viewers (read access to a private playlist); owner only.
 

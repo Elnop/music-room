@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { logger } from '@/shared/utils/logger.js';
-import { realtime } from '@/realtime/index.js';
+import * as realtime from '@/realtime/emitters/queue.emitters.js';
 import { getQueueRpc } from '@/features/queue/utils/queue-rpc.js';
 
 /** The playlist change to mirror in the queues: one function of migration 023 each. */

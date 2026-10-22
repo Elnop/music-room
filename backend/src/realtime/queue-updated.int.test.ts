@@ -8,7 +8,10 @@ import { connectRedis, disconnectRedis, isRedisConnected } from '@/shared/config
 import * as queue from '@/features/queue/services/queue.service.js';
 import * as playlistService from '@/features/playlists/services/playlist.service.js';
 import * as playlistTrackService from '@/features/playlists/services/playlist-track.service.js';
-import { realtime } from '@/realtime/index.js';
+import * as socketServer from '@/realtime/socket-server.js';
+import { getIO } from '@/realtime/state.js';
+import * as realtime from '@/realtime/emitters/queue.emitters.js';
+import * as realtimeControl from '@/realtime/emitters/control.emitters.js';
 import type { QueueState } from '@/features/queue/queue.types.js';
 
 // queue:updated (#273, #277): every queue mutation sends the full state to all the
@@ -114,7 +117,7 @@ describe('queue:updated broadcast', () => {
 		other = await createUser();
 
 		httpServer = createServer();
-		realtime.initialize(httpServer);
+		socketServer.initialize(httpServer);
 		await new Promise<void>(resolve => httpServer.listen(0, '127.0.0.1', () => resolve()));
 		const { port } = httpServer.address() as AddressInfo;
 		url = `http://127.0.0.1:${port}`;
@@ -133,7 +136,7 @@ describe('queue:updated broadcast', () => {
 	});
 
 	afterAll(async () => {
-		await realtime.getIO()?.close();
+		await getIO()?.close();
 		for (const user of [owner, other]) {
 			if (user) await supabaseAdmin.auth.admin.deleteUser(user.id); // cascades to queues
 		}
@@ -189,7 +192,7 @@ describe('queue:updated broadcast', () => {
 				.update({ can_control_music: false })
 				.eq('follower_id', other.id)
 				.eq('following_id', owner.id);
-			await realtime.revalidateListeningAccess(other.id, owner.id);
+			await realtimeControl.revalidateListeningAccess(other.id, owner.id);
 			expect(await revoked).toEqual({ ownerId: owner.id });
 			const received = record(otherSocket);
 			await queue.addItem(owner.id, owner.id, dto());

@@ -29,6 +29,14 @@ module.exports = {
       to: { path: '^src/(features|realtime)/' },
     },
     {
+      name: 'app-only-from-server',
+      severity: 'error',
+      comment:
+        'src/app/ is the composition root (routes registry, OpenAPI document): it may import features and shared, and only src/server.ts imports it. See .agents/rules/architecture.md#layers',
+      from: { path: '^src/', pathNot: ['^src/server\\.ts$', '^src/app/'] },
+      to: { path: '^src/app/' },
+    },
+    {
       name: 'services-not-to-controller',
       severity: 'error',
       comment:

@@ -6,7 +6,7 @@ Read before adding an import that crosses folders, a feature, or a module in `sh
 
 Dependencies point one way. Enforced by dependency-cruiser (`.dependency-cruiser.cjs` in each project).
 
-- Backend: `routes -> controller -> services -> shared`. `src/shared/` never imports `src/features/` or `src/realtime/` (rule `shared-not-to-features`). Inside a feature, `services/` never imports a `*.controller.ts` or `*.routes.ts` file (rule `services-not-to-controller`).
+- Backend: `routes -> controller -> services -> shared`. `src/shared/` never imports `src/features/` or `src/realtime/` (rule `shared-not-to-features`). `src/app/` is the composition root (the routes registry `app/routes.ts` and the OpenAPI document `app/openapi.ts`): it may import features and shared, and only `src/server.ts` imports it (rule `app-only-from-server`). Inside a feature, `services/` never imports a `*.controller.ts` or `*.routes.ts` file (rule `services-not-to-controller`).
 - Mobile, target layout (#377): `src/shared/` never imports `src/features/` or `src/navigation/` (rule `shared-not-to-features`), and `src/features/` never imports `src/navigation/` (rule `features-not-to-navigation`). These rules match nothing until those folders exist.
 
 Fix: move the code the lower layer needs down into it (usually `shared/`), or pass it in as a parameter.

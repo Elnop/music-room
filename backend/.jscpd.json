@@ -17,7 +17,6 @@
   "ignore": [
     "**/*.test.ts",
     "**/src/test/**",
-    "**/src/shared/types/supabase.generated.ts",
-    "**/src/realtime/index.ts"
+    "**/src/shared/types/supabase.generated.ts"
   ]
 }

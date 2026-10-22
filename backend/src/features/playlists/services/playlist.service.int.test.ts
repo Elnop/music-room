@@ -21,13 +21,11 @@ const {
 	notifyPlaylistDeleted: vi.fn(),
 	revalidatePlaylistRoom: vi.fn(),
 }));
-vi.mock('@/realtime/index.js', () => ({
-	realtime: {
-		notifyPlaylistUpdate,
-		notifyPlaylistDetails,
-		notifyPlaylistDeleted,
-		revalidatePlaylistRoom,
-	},
+vi.mock('@/realtime/emitters/playlist.emitters.js', () => ({
+	notifyPlaylistUpdate,
+	notifyPlaylistDetails,
+	notifyPlaylistDeleted,
+	revalidatePlaylistRoom,
 }));
 
 const playlists = await import('@/features/playlists/services/playlist.service.js');

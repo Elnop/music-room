@@ -6,10 +6,10 @@ import { env } from '@/shared/config/env.js';
 import { logger } from '@/shared/utils/logger.js';
 import { AppError, errorHandler } from '@/shared/middleware/error-handler.js';
 import { actionLoggerMiddleware } from '@/shared/middleware/action-logger.middleware.js';
-import { routes } from '@/shared/config/routes.js';
-import { realtime } from '@/realtime/index.js';
+import { routes } from '@/app/routes.js';
+import * as socketServer from '@/realtime/socket-server.js';
 import { connectRedis, disconnectRedis, checkRedisHealth } from '@/shared/config/redis.js';
-import { swaggerSpec, swaggerUiOptions } from '@/shared/config/swagger.config.js';
+import { swaggerSpec, swaggerUiOptions } from '@/app/openapi.js';
 import { isOriginAllowed } from '@/shared/config/cors.config.js';
 import { configureTrustProxy } from '@/shared/config/trust-proxy.js';
 import { mountSupabaseAuthProxy } from '@/shared/dev/supabase-auth-proxy.js';
@@ -26,7 +26,7 @@ if (mountSupabaseAuthProxy(app, env)) {
 }
 const httpServer = createServer(app);
 
-realtime.initialize(httpServer);
+socketServer.initialize(httpServer);
 
 connectRedis().catch(error => {
 	logger.error('Failed to initialize Redis', {
