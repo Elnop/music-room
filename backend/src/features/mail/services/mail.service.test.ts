@@ -17,7 +17,7 @@ vi.mock('nodemailer', () => ({
 	default: { createTransport },
 }));
 
-type MailService = typeof import('@/features/mail/mail.service.js');
+type MailService = typeof import('@/features/mail/services/mail.service.js');
 type MailConfig = typeof import('@/features/mail/mail.config.js');
 
 const TO = 'listener@example.com';
@@ -36,7 +36,7 @@ describe('mail.service', () => {
 		vi.resetModules();
 		sendMail.mockReset().mockResolvedValue({ messageId: 'test' });
 		createTransport.mockReset().mockReturnValue({ sendMail });
-		mail = await import('@/features/mail/mail.service.js');
+		mail = await import('@/features/mail/services/mail.service.js');
 		config = await import('@/features/mail/mail.config.js');
 	});
 
@@ -57,7 +57,7 @@ describe('mail.service', () => {
 		vi.stubEnv('SMTP_PORT', '2525');
 		vi.resetModules();
 		try {
-			mail = await import('@/features/mail/mail.service.js');
+			mail = await import('@/features/mail/services/mail.service.js');
 			config = await import('@/features/mail/mail.config.js');
 			await mail.sendVerificationEmail(TO, CODE, 15);
 

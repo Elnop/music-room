@@ -1,82 +1,32 @@
 /**
- * SoundCloud Feature Types
- * Using soundcloud.ts package for API access
+ * Response and domain types of the soundcloud feature. Request inputs are
+ * inferred from the Zod schemas in soundcloud.validators.ts.
  */
 
-/**
- * SoundCloud Client Interface (from soundcloud.ts package)
- */
+import type { z } from 'zod';
+import type {
+	soundcloudSearchResultSchema,
+	soundcloudStreamResultSchema,
+	soundcloudTrackSchema,
+} from '@/features/soundcloud/soundcloud.validators.js';
+
+/** The soundcloud.ts client: the part of it the feature calls. */
 export interface SoundCloudClient {
 	tracks: {
 		search: (query: { q: string; limit?: number; offset?: number }) => Promise<unknown>;
 		get: (urlOrId: string) => Promise<unknown>;
 		getStreamUrl: (track: unknown) => Promise<string>;
 	};
-}
-
-/**
- * SoundCloud Track from API
- */
-export interface SoundCloudTrack {
-	id: number;
-	title: string;
-	description: string | null;
-	duration: number; // milliseconds
-	genre: string | null;
-	artwork_url: string | null;
-	permalink_url: string;
-	user: {
-		id: number;
-		username: string;
-		avatar_url: string | null;
-		permalink_url: string;
-	};
-	stream_url?: string;
-	streamable?: boolean;
-	playable: boolean;
-	/** SoundCloud's access policy, e.g. 'ALLOW', or 'SNIP' for a 30-second preview. */
-	policy?: string;
-	media?: {
-		transcodings: Array<{
-			url: string;
-			preset: string;
-			/** True when this stream is only the 30-second preview. */
-			snipped?: boolean;
-			format: {
-				protocol: string;
-				mime_type: string;
-			};
-		}>;
+	util?: {
+		streamLink: (trackUrl: string, protocol: 'hls' | 'progressive') => Promise<string>;
 	};
 }
 
-/**
- * SoundCloud Search Response
- */
-export interface SoundCloudSearchResult {
-	collection: SoundCloudTrack[];
-	total_results?: number;
-	next_href?: string | null;
-}
+/** A track as SoundCloud's API returns it. */
+export type SoundCloudTrack = z.infer<typeof soundcloudTrackSchema>;
 
-/**
- * SoundCloud Search Query DTO
- */
-export interface SoundCloudSearchQuery {
-	q: string; // search query
-	limit?: number; // results per page (default: 20)
-	offset?: number; // pagination offset
-}
+/** One page of search results, playable tracks only. */
+export type SoundCloudSearchResult = z.infer<typeof soundcloudSearchResultSchema>;
 
-/**
- * Internal Track format (for adding to playlists)
- */
-export interface TrackDTO {
-	title: string;
-	artist: string;
-	album?: string; // Optional - SoundCloud doesn't have albums
-	albumArt: string;
-	durationMs: number;
-	trackUri: string; // SoundCloud permalink_url
-	previewUrl: string; // Stream URL (fetched separately)
-}
+/** A stream URL and the moment it expires (ISO 8601). */
+export type StreamUrlResult = z.infer<typeof soundcloudStreamResultSchema>;

@@ -12,7 +12,7 @@ vi.hoisted(() => {
 });
 
 // Never send real mail; read the codes from the mock instead.
-vi.mock('@/features/mail/mail.service.js', () => ({
+vi.mock('@/features/mail/services/mail.service.js', () => ({
 	sendVerificationEmail: vi.fn().mockResolvedValue(undefined),
 	sendPasswordResetEmail: vi.fn().mockResolvedValue(undefined),
 }));
@@ -21,7 +21,7 @@ const { connectRedis, disconnectRedis, isRedisConnected, redisClient } =
 	await import('@/shared/config/redis.js');
 const { supabaseAdmin } = await import('@/shared/config/supabase.js');
 const { sendVerificationEmail, sendPasswordResetEmail } =
-	await import('@/features/mail/mail.service.js');
+	await import('@/features/mail/services/mail.service.js');
 const { default: authRouter } = await import('@/features/auth/auth.routes.js');
 const { errorHandler } = await import('@/shared/middleware/error-handler.js');
 

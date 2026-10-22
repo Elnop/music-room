@@ -1,22 +1,12 @@
-import nodemailer from 'nodemailer';
-import { transportConfig, senderConfig } from '@/features/mail/mail.config.js';
-import { logger } from '@/shared/utils/logger.js';
-
 /**
- * Simple email service with inline templates
- *
- * Sends transactional emails via Gmail SMTP (Mailpit in local development).
- * No classes, no registry pattern - just direct functions.
+ * Mail templates: subject, HTML and plain-text bodies of each transactional
+ * email. Sending is in services/mail.service.ts.
  */
 
-// Singleton transporter (lazy initialization)
-let transporter: nodemailer.Transporter;
-
-function getTransporter(): nodemailer.Transporter {
-	if (!transporter) {
-		transporter = nodemailer.createTransport(transportConfig);
-	}
-	return transporter;
+export interface MailContent {
+	subject: string;
+	html: string;
+	text: string;
 }
 
 /**
@@ -43,18 +33,8 @@ function wrapInBaseHtml(content: string, title: string): string {
 </html>`;
 }
 
-/**
- * Send email verification code
- *
- * @param email - Recipient email address
- * @param code - 6-digit verification code
- * @param expiresInMinutes - Code expiration time
- */
-export async function sendVerificationEmail(
-	email: string,
-	code: string,
-	expiresInMinutes: number
-): Promise<void> {
+/** Email verification code. */
+export function verificationEmail(code: string, expiresInMinutes: number): MailContent {
 	const html = wrapInBaseHtml(
 		`
     <h1 style="color: #ffffff; font-size: 28px; font-weight: bold; margin: 0 0 24px 0;">
@@ -93,29 +73,11 @@ For your security, never share this code with anyone.
 ---
 This email was sent from Zumik`;
 
-	await getTransporter().sendMail({
-		from: `${senderConfig.name} <${senderConfig.email}>`,
-		to: email,
-		subject: '🎵 Verify Your Zumik Account',
-		html,
-		text,
-	});
-
-	logger.info('Verification email sent', { to: email });
+	return { subject: '🎵 Verify Your Zumik Account', html, text };
 }
 
-/**
- * Send password reset code
- *
- * @param email - Recipient email address
- * @param code - 6-digit reset code
- * @param expiresInMinutes - Code expiration time
- */
-export async function sendPasswordResetEmail(
-	email: string,
-	code: string,
-	expiresInMinutes: number
-): Promise<void> {
+/** Password reset code. */
+export function passwordResetEmail(code: string, expiresInMinutes: number): MailContent {
 	const html = wrapInBaseHtml(
 		`
     <h1 style="color: #ffffff; font-size: 28px; font-weight: bold; margin: 0 0 24px 0;">
@@ -165,13 +127,5 @@ Your password will remain unchanged.
 ---
 This email was sent from Zumik`;
 
-	await getTransporter().sendMail({
-		from: `${senderConfig.name} <${senderConfig.email}>`,
-		to: email,
-		subject: '🔐 Reset Your Zumik Password',
-		html,
-		text,
-	});
-
-	logger.info('Password reset email sent', { to: email });
+	return { subject: '🔐 Reset Your Zumik Password', html, text };
 }

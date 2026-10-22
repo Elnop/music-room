@@ -12,18 +12,18 @@ vi.hoisted(() => {
 	process.env.RATE_LIMIT_SOUNDCLOUD_WINDOW_MS = '60000';
 });
 
-// SoundCloud is never called: the service is replaced.
+// SoundCloud is never called: the services are replaced.
 const service = vi.hoisted(() => ({
 	searchTracks: vi.fn(),
 	getTrack: vi.fn(),
 	getStreamUrl: vi.fn(),
 }));
-vi.mock('@/features/soundcloud/soundcloud.service.js', () => ({
-	SoundCloudService: class {
-		searchTracks = service.searchTracks;
-		getTrack = service.getTrack;
-		getStreamUrl = service.getStreamUrl;
-	},
+vi.mock('@/features/soundcloud/services/soundcloud-search.service.js', () => ({
+	searchTracks: service.searchTracks,
+	getTrack: service.getTrack,
+}));
+vi.mock('@/features/soundcloud/services/soundcloud-stream.service.js', () => ({
+	getStreamUrl: service.getStreamUrl,
 }));
 
 const { connectRedis, disconnectRedis, isRedisConnected, redisClient } =

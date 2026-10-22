@@ -2,8 +2,8 @@
   {
     "type": "dependency",
     "from": "src/features/auth/auth-flow.int.test.ts",
-    "to": "src/features/mail/mail.service.ts",
-    "unresolvedTo": "@/features/mail/mail.service.js",
+    "to": "src/features/mail/services/mail.service.ts",
+    "unresolvedTo": "@/features/mail/services/mail.service.js",
     "dependencyTypes": [
       "aliased",
       "aliased-tsconfig",
@@ -36,8 +36,8 @@
   {
     "type": "dependency",
     "from": "src/features/auth/services/email-verification.int.test.ts",
-    "to": "src/features/mail/mail.service.ts",
-    "unresolvedTo": "@/features/mail/mail.service.js",
+    "to": "src/features/mail/services/mail.service.ts",
+    "unresolvedTo": "@/features/mail/services/mail.service.js",
     "dependencyTypes": [
       "aliased",
       "aliased-tsconfig",
@@ -70,8 +70,8 @@
   {
     "type": "dependency",
     "from": "src/features/auth/services/email-verification.service.ts",
-    "to": "src/features/mail/mail.service.ts",
-    "unresolvedTo": "@/features/mail/mail.service.js",
+    "to": "src/features/mail/services/mail.service.ts",
+    "unresolvedTo": "@/features/mail/services/mail.service.js",
     "dependencyTypes": [
       "aliased",
       "aliased-tsconfig",
@@ -87,8 +87,8 @@
   {
     "type": "dependency",
     "from": "src/features/auth/services/password-reset-oauth.int.test.ts",
-    "to": "src/features/mail/mail.service.ts",
-    "unresolvedTo": "@/features/mail/mail.service.js",
+    "to": "src/features/mail/services/mail.service.ts",
+    "unresolvedTo": "@/features/mail/services/mail.service.js",
     "dependencyTypes": [
       "aliased",
       "aliased-tsconfig",
@@ -104,8 +104,8 @@
   {
     "type": "dependency",
     "from": "src/features/auth/services/password-reset-resend.int.test.ts",
-    "to": "src/features/mail/mail.service.ts",
-    "unresolvedTo": "@/features/mail/mail.service.js",
+    "to": "src/features/mail/services/mail.service.ts",
+    "unresolvedTo": "@/features/mail/services/mail.service.js",
     "dependencyTypes": [
       "aliased",
       "aliased-tsconfig",
@@ -121,8 +121,8 @@
   {
     "type": "dependency",
     "from": "src/features/auth/services/password-reset-sessions.int.test.ts",
-    "to": "src/features/mail/mail.service.ts",
-    "unresolvedTo": "@/features/mail/mail.service.js",
+    "to": "src/features/mail/services/mail.service.ts",
+    "unresolvedTo": "@/features/mail/services/mail.service.js",
     "dependencyTypes": [
       "aliased",
       "aliased-tsconfig",
@@ -138,8 +138,8 @@
   {
     "type": "dependency",
     "from": "src/features/auth/services/password-reset.service.ts",
-    "to": "src/features/mail/mail.service.ts",
-    "unresolvedTo": "@/features/mail/mail.service.js",
+    "to": "src/features/mail/services/mail.service.ts",
+    "unresolvedTo": "@/features/mail/services/mail.service.js",
     "dependencyTypes": [
       "aliased",
       "aliased-tsconfig",
@@ -172,8 +172,8 @@
   {
     "type": "dependency",
     "from": "src/features/auth/utils/find-auth-user.int.test.ts",
-    "to": "src/features/mail/mail.service.ts",
-    "unresolvedTo": "@/features/mail/mail.service.js",
+    "to": "src/features/mail/services/mail.service.ts",
+    "unresolvedTo": "@/features/mail/services/mail.service.js",
     "dependencyTypes": [
       "aliased",
       "aliased-tsconfig",
