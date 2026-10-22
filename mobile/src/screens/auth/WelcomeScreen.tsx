@@ -14,10 +14,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useTheme } from '@/contexts/ThemeContext';
-import type { Theme } from '@themes/types';
-import { Button } from '@components/common/Button';
-import { BackendUrlField } from '@components/common/BackendUrlField';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import type { Theme } from '@/shared/theme/types';
+import { Button } from '@/shared/components/ui/Button';
+import { BackendUrlField } from '@/shared/components/form/BackendUrlField';
 import logo from '@/assets/logo/logo.png';
 import appIcon from '@/assets/logo/app-icon.png';
 

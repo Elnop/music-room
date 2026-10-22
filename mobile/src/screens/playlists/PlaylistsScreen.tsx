@@ -3,21 +3,21 @@ import { View, Text, FlatList, StyleSheet, RefreshControl, Pressable } from 'rea
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/shared/theme/ThemeContext';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
-import type { Theme } from '@themes/types';
-import { useAuthStore } from '@store/authStore';
-import { usePlaylistStore } from '@store/playlistStore';
-import { playlistApi } from '@api/playlistApi';
+import type { Theme } from '@/shared/theme/types';
+import { useAuthStore } from '@/store/authStore';
+import { usePlaylistStore } from '@/store/playlistStore';
+import { playlistApi } from '@/api/playlistApi';
 import { friendsApi, type FriendProfile } from '@/services/friendsApi';
-import { PlaylistGridCard } from '@components/playlist/PlaylistGridCard';
-import { FriendPlaylistSection } from '@components/playlist/FriendPlaylistSection';
-import { EmptyState } from '@components/common/EmptyState';
-import { PlaylistCardSkeleton, SkeletonBlock, SkeletonList } from '@components/common/Skeleton';
-import { showError } from '@utils/toast';
-import { apiErrorMessage } from '@utils/apiErrorMessage';
+import { PlaylistGridCard } from '@/components/playlist/PlaylistGridCard';
+import { FriendPlaylistSection } from '@/components/playlist/FriendPlaylistSection';
+import { EmptyState } from '@/shared/components/feedback/EmptyState';
+import { PlaylistCardSkeleton, SkeletonBlock, SkeletonList } from '@/shared/components/ui/Skeleton';
+import { showError } from '@/shared/utils/toast';
+import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 import type { Playlist } from '@/types/playlist.types';
-import { logger } from '@/utils/logger';
+import { logger } from '@/shared/utils/logger';
 
 type PlaylistStackParamList = {
 	Playlists: undefined;

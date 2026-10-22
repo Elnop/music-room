@@ -1,7 +1,7 @@
 import { create } from 'zustand';
-import { useAuthStore } from '@store/authStore';
-import { usePlayerStore } from '@/store/playerStore';
-import { showInfo } from '@utils/toast';
+import { useAuthStore } from './authStore';
+import { usePlayerStore } from './playerStore';
+import { showInfo } from '@/shared/utils/toast';
 import type { ListeningStatus } from '@/types/listening.types';
 
 /** A device of mine or of a friend that this phone drives as a remote (#297). */

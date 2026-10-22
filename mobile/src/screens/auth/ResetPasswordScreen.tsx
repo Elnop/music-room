@@ -11,12 +11,12 @@ import {
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '@/navigation/AuthNavigator';
-import { useAuthStore } from '@store/authStore';
-import { Input } from '@components/common/Input';
-import { Button } from '@components/common/Button';
-import { useTheme } from '@contexts/ThemeContext';
-import { showError, showSuccess, showInfo } from '@utils/toast';
-import { CODE_INPUT_MAX_LENGTH, fillCodeDigits } from '@utils/codeDigits';
+import { useAuthStore } from '@/store/authStore';
+import { Input } from '@/shared/components/ui/Input';
+import { Button } from '@/shared/components/ui/Button';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import { showError, showSuccess, showInfo } from '@/shared/utils/toast';
+import { CODE_INPUT_MAX_LENGTH, fillCodeDigits } from '@/utils/codeDigits';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'ResetPassword'>;
 

@@ -7,7 +7,7 @@ Application mobile React Native pour Zumik - Partage de musique collaboratif.
 - **Framework**: React Native 0.81+ avec Expo SDK 54
 - **Language**: TypeScript (strict mode)
 - **Navigation**: React Navigation v7
-- **State Management**: Zustand v5
+- **State Management**: Zustand v5 (état client) et TanStack Query v5 (données serveur, en place depuis #377, adoptée feature par feature)
 - **HTTP Client**: Axios
 - **Auth**: API du backend (`/api/auth/*`) ; l'app n'embarque aucun client Supabase
 - **Realtime**: Socket.io-client v4.8.1
@@ -37,7 +37,7 @@ npm install
 
 `make dev-docker` et `make dev-local` imposent `EXPO_PUBLIC_API_URL=http://<IP locale>:3000` et `EXPO_PUBLIC_WS_URL=ws://<IP locale>:3000` (variables `DEV_API_URL` et `DEV_WS_URL` de `make/config.mk`), quelle que soit la valeur dans `.env`. `make dev-tunnel` utilise l'URL du tunnel ngrok. Les valeurs de `.env` ne servent que pour un `npx expo start` lancé à la main.
 
-L'app ne parle jamais à Supabase : connexion, inscription, vérification d'e-mail, réinitialisation du mot de passe, rafraîchissement et déconnexion passent par l'API du backend (`src/services/api.ts`), qui les journalise. La session (tokens du backend) vit dans `src/store/authStore.ts`, persistée dans AsyncStorage ; elle est rafraîchie par `/api/auth/refresh` (avant une requête si le token expire bientôt, au démarrage, et après un 401), et un refresh refusé (401) ramène à l'écran de connexion en vidant le stockage.
+L'app ne parle jamais à Supabase : connexion, inscription, vérification d'e-mail, réinitialisation du mot de passe, rafraîchissement et déconnexion passent par l'API du backend (`src/shared/services/api.ts`), qui les journalise. La session (tokens du backend) vit dans `src/store/authStore.ts`, persistée dans AsyncStorage ; elle est rafraîchie par `/api/auth/refresh` (avant une requête si le token expire bientôt, au démarrage, et après un 401), et un refresh refusé (401) ramène à l'écran de connexion en vidant le stockage.
 
 ```env
 # Backend API (ignoré par make dev-docker, dev-local et dev-tunnel)
@@ -134,33 +134,39 @@ Pour débuter, voici les 5 commandes que vous utiliserez le plus :
 
 ## Architecture
 
+Cible de l'epic #362 : `src/shared/`, `src/providers/`, `src/navigation/` et `src/features/<feature>/`. Le socle est en place (#377) ; les dossiers historiques (`screens/`, `components/<feature>/`, `store/`, `hooks/`, `contexts/`, `services/`, `api/`, `utils/`) migrent dans `features/` une feature à la fois (#378–#385).
+
 ```
 mobile/src/
-├── screens/            # Écrans par feature
-│   ├── auth/           # Welcome, Login, Register, EmailVerification, ForgotPassword, ResetPassword
-│   ├── playlists/      # Playlists, PlaylistDetail, CreatePlaylist, SearchTracks, PlaylistSharing
-│   ├── friends/        # Friends, UserProfile
-│   ├── profile/        # Profile, EditProfile, PrivacySettings, MusicPreferences
-│   ├── search/         # SoundCloudSearch (+ components/)
-│   └── settings/       # Settings
-├── components/
-│   ├── common/         # Button, Card, Input, Avatar, SearchBar, ErrorBoundary, items swipeables...
-│   ├── playlist/       # PlaylistCard, PlaylistGridCard, PlaylistHeader, PlayPlaylistButton...
-│   ├── player/         # MiniPlayer, PlayerModal, PlayerErrorToast
-│   ├── profile/        # GenreSelector, VisibilityToggle, NowPlayingInline...
-│   ├── music-control/  # RenameDeviceModal
-│   └── theme/          # ThemeSelector
-├── navigation/         # RootNavigator, AuthNavigator, AppNavigator (onglets) + stacks/
-├── store/              # Zustand : authStore, playlistStore, playerStore, socketStore, soundcloudStore
-├── contexts/           # ThemeContext, PlayerContext
-├── hooks/              # useMusicControl, usePlaylistSocket, usePlayerProgress, useImageColors
-├── api/                # playlistApi.ts
-├── services/           # api.ts (client HTTP de base), profileApi, friendsApi, musicControlApi, privacyApi, oauth, deviceService
-├── themes/             # Thèmes (original, royalBlue, pastelLime, christmas) + tokens
-├── types/              # Types alignés sur les réponses du backend
-├── utils/              # validators (Zod), formatters, toast
-├── constants/          # Config API, constantes
-└── config/             # toastConfig
+├── shared/                 # Code commun à toutes les features ; n'importe ni features/ ni navigation/
+│   ├── components/
+│   │   ├── ui/             # Primitives : Pressable, Button, Input, Card, Skeleton, ThemedSwitch, LoadingSpinner
+│   │   ├── feedback/       # AppToast, ConnectionBanner, EmptyState, ErrorBoundary, FormError
+│   │   ├── form/           # SearchBar, BackendUrlField
+│   │   ├── lists/          # ReorderableList, SwipeableTrackItem, SwipeableUserItem, QueueSwipe
+│   │   ├── media/          # Artwork, Avatar
+│   │   ├── sharing/        # ShareLinkButton
+│   │   └── theme/          # ThemeSelector, ThemedSystemUI
+│   ├── services/           # api.ts (client HTTP), backendUrl, lastTrackStorage
+│   ├── query/              # TanStack Query : queryClient (profils STALE), keys (fabrique de clés), socketCache
+│   ├── stores/             # socketStore (connexion Socket.io)
+│   ├── hooks/              # useConnectionStatus
+│   ├── theme/              # ThemeContext, thèmes (original, royalBlue, pastelLime, christmas), tokens
+│   ├── constants/app.ts    # Config API, espacements
+│   └── utils/              # logger, validators (Zod), toast, haptics, apiErrorMessage, debounce...
+├── providers/              # AppProviders : gestes, ErrorBoundary, QueryClient, thème, safe area
+├── navigation/             # RootNavigator, AuthNavigator, AppNavigator (onglets) + stacks/
+├── features/               # (à venir, #378–#385) une feature par dossier
+│
+│   Dossiers historiques, vidés par les stories de migration :
+├── screens/                # Écrans par feature (auth, playlists, friends, profile, search, settings)
+├── components/             # Composants par feature (playlist, player, profile, music-control, track)
+├── store/                  # Stores Zustand des features (auth, playlist, player, queue, connect...)
+├── contexts/               # PlayerContext
+├── hooks/                  # useMusicControl, usePlaylistSocket, usePlayerProgress, useImageColors...
+├── api/ · services/        # Clients HTTP des features (playlistApi, profileApi, friendsApi...), oauth, deviceService
+├── utils/                  # Utilitaires d'une seule feature (playlistPermissions, remotePosition, codeDigits, avatarImage)
+└── types/                  # Types alignés sur les réponses du backend
 ```
 
 ## Navigation
@@ -175,31 +181,28 @@ mobile/src/
 
 ## État, temps réel et lecture
 
-- **Appels HTTP** : toujours via `services/api.ts`, qui ajoute le token et les headers `X-Platform`, `X-Device-Model`, `X-App-Version` logués par le backend.
-- **Temps réel** : `socketStore` gère la connexion Socket.io ; `usePlaylistSocket` rejoint la room d'une playlist et réagit à `playlist:updated` ; `useMusicControl` gère l'écoute des amis et les commandes de contrôle délégué.
+- **Appels HTTP** : toujours via `shared/services/api.ts`, qui ajoute le token et les headers `X-Platform`, `X-Device-Model`, `X-App-Version` logués par le backend.
+- **Données serveur** : TanStack Query (`AppProviders` fournit le client). Une clé de requête se construit avec `queryKeys` (`shared/query/keys.ts`), la fraîcheur se choisit parmi les profils `STALE` (`shared/query/queryClient.ts`), et un événement Socket.io met le cache à jour (`setQueryData`) ou l'invalide via `useSocketCache` (`shared/query/socketCache.ts`). Zustand ne garde que l'état client. Règles : `.agents/rules/state.md`.
+- **Temps réel** : `shared/stores/socketStore.ts` gère la connexion Socket.io ; `usePlaylistSocket` rejoint la room d'une playlist et réagit à `playlist:updated` ; `useMusicControl` gère l'écoute des amis et les commandes de contrôle délégué.
 - **Lecture audio** : expo-audio lit le stream HLS SoundCloud ; `PlayerContext` gère le cycle de vie du lecteur, `playerStore` l'état (track courante, play/pause, modal), `MiniPlayer` et `PlayerModal` l'affichage.
 - **OAuth** : `services/oauth.ts` (Google Sign-In, Facebook SDK). Le token obtenu est vérifié par le backend (`/api/auth/google`, `/api/auth/facebook`). Modules natifs : comme le reste de l'app, il faut le build de debug, pas Expo Go.
 - **Signature Android** : `plugins/withDebugKeystore.js` remplace pendant `expo prebuild` le keystore de debug du template Expo (partagé par toutes les apps Expo) par `keystores/debug.keystore`. Son SHA-1 `5D:26:8F:52:F7:A8:2D:71:3A:D9:68:BF:60:6A:79:BB:85:AA:71:C0` est celui à enregistrer, avec le package `com.zumik.app`, dans le client OAuth Android du projet Google Cloud qui contient `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`. Sinon Google Sign-In renvoie `DEVELOPER_ERROR`.
 
 ## Développement
 
-### Path Aliases
+### Imports
 
-Le projet utilise des alias de chemin pour des imports propres :
+Un seul alias, `@/` (vers `src/`), pour tout import qui sort du dossier courant ; jamais de `../` (ESLint) :
 
 ```typescript
-// Au lieu de
-import { Button } from '../../../components/common/Button';
-
-// Utiliser
-import { Button } from '@components/common/Button';
+import { Button } from '@/shared/components/ui/Button';
 ```
 
-Alias disponibles (voir `tsconfig.json`) : `@/*`, `@api`, `@components`, `@screens`, `@services`, `@store`, `@hooks`, `@utils`, `@constants`, `@contexts`, `@themes`
+### Primitives et thème
 
-### Thème
+Tout élément pressable passe par `Pressable` ou `Button` de `@/shared/components/ui/` : opacité au toucher commune, retour haptique en option (`haptic`), rôle `button` par défaut et `accessibilityLabel` obligatoire. `TouchableOpacity` et `Pressable` de `react-native` sont interdits ailleurs (ESLint `guardrails/ui-primitives`). Les gestes (swipe, drag & drop) restent sur `react-native-gesture-handler`.
 
-Plusieurs thèmes sont disponibles dans `src/themes/` (original, royalBlue, pastelLime, christmas), sélectionnables via `ThemeSelector`. Les tokens communs sont dans `src/themes/tokens.ts`.
+Quatre thèmes vivent dans `src/shared/theme/` (original, royalBlue, pastelLime, christmas), sélectionnables via `ThemeSelector` ; les tokens communs sont dans `src/shared/theme/tokens.ts`. Aucune couleur en dur hors de `src/shared/theme/` (ESLint `guardrails/theme-tokens`) : lire `theme.colors.*`.
 
 ### Hot Reload
 
@@ -210,7 +213,7 @@ Expo supporte le Hot Reload : modifiez n'importe quel fichier et l'app se met à
 Les types, validateurs et versions sont alignés avec le backend :
 
 - **Types TypeScript** (`src/types/`) correspondent aux schémas backend
-- **Validateurs Zod** (`src/utils/validators.ts`) utilisent les mêmes règles
+- **Validateurs Zod** (`src/shared/utils/validators.ts`) utilisent les mêmes règles
 - **Versions** : Socket.io, Zod identiques au backend
 
 ## Tests

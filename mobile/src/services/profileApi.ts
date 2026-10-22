@@ -5,7 +5,7 @@ import type {
 	AvatarResponse,
 } from '@/types/user.types';
 
-import { authRequest } from '@/services/api';
+import { authRequest } from '@/shared/services/api';
 
 /**
  * Profile API

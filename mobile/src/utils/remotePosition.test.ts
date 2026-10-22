@@ -1,4 +1,4 @@
-import { estimatePositionMs } from '@utils/remotePosition';
+import { estimatePositionMs } from './remotePosition';
 
 const NOW = Date.parse('2026-10-15T12:00:00Z');
 

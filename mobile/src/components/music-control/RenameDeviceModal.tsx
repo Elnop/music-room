@@ -8,10 +8,10 @@ import {
 	KeyboardAvoidingView,
 	Platform,
 } from 'react-native';
-import { useTheme } from '@/contexts/ThemeContext';
-import type { Theme } from '@themes/types';
-import { Input } from '@components/common/Input';
-import { Button } from '@components/common/Button';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import type { Theme } from '@/shared/theme/types';
+import { Input } from '@/shared/components/ui/Input';
+import { Button } from '@/shared/components/ui/Button';
 
 /** Same bounds as the backend (PATCH /api/music-control/devices/:deviceId). */
 const DEVICE_NAME_MAX_LENGTH = 40;

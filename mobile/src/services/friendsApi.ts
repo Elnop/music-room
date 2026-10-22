@@ -1,4 +1,4 @@
-import { authRequest } from '@/services/api';
+import { authRequest } from '@/shared/services/api';
 
 export interface FollowStatus {
 	isFollowing: boolean;

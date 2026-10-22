@@ -1,27 +1,27 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { MiniPlayer } from '@/components/player/MiniPlayer';
+import { MiniPlayer } from './MiniPlayer';
 import { usePlayerStore } from '@/store/playerStore';
 import { useConnectStore } from '@/store/connectStore';
 import { useAuthStore } from '@/store/authStore';
 import type { UserProfile } from '@/types/user.types';
 import { queueApi } from '@/services/queueApi';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
-import { hapticTap } from '@/utils/haptics';
+import { hapticTap } from '@/shared/utils/haptics';
 
-jest.mock('@/utils/haptics', () => ({
+jest.mock('@/shared/utils/haptics', () => ({
 	hapticTap: jest.fn(),
 	hapticSelection: jest.fn(),
 	hapticSuccess: jest.fn(),
 }));
 
-jest.mock('@services/oauth', () => ({
+jest.mock('@/services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
 	signInWithFacebook: jest.fn(),
 }));
 
-jest.mock('@/contexts/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@themes/original.theme');
+jest.mock('@/shared/theme/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

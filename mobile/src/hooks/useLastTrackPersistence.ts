@@ -3,9 +3,9 @@ import { AppState } from 'react-native';
 import { usePlayerStore, readPositionMs } from '@/store/playerStore';
 import { useAuthStore } from '@/store/authStore';
 import { useConnectStore } from '@/store/connectStore';
-import { lastTrackStorage, type LastTrackEntry } from '@/services/lastTrackStorage';
-import { queueTrackToSoundCloud } from '@utils/trackToSoundCloud';
-import { toTrackInput } from '@utils/trackInput';
+import { lastTrackStorage, type LastTrackEntry } from '@/shared/services/lastTrackStorage';
+import { queueTrackToSoundCloud } from '@/shared/utils/trackToSoundCloud';
+import { toTrackInput } from '@/shared/utils/trackInput';
 
 /** How often the position is saved while a track plays. */
 export const LAST_TRACK_SAVE_INTERVAL_MS = 10_000;

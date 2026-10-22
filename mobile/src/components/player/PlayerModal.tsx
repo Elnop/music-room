@@ -12,19 +12,19 @@ import Animated, {
 	runOnJS,
 	Easing,
 } from 'react-native-reanimated';
-import { useTheme } from '@/contexts/ThemeContext';
-import type { Theme } from '@/themes/types';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import type { Theme } from '@/shared/theme/types';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { usePlayerStore } from '@/store/playerStore';
 import { RESTART_THRESHOLD_S } from '@/store/queueSelectors';
 import { useNowPlaying } from '@/hooks/useNowPlaying';
-import { hapticTap } from '@utils/haptics';
+import { hapticTap } from '@/shared/utils/haptics';
 import { useImageColors, getAdaptiveColors } from '@/hooks/useImageColors';
-import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { QueueModal } from '@/components/player/QueueModal';
-import { DevicePickerSheet } from '@/components/player/DevicePickerSheet';
-import { largeArtwork } from '@/utils/artwork';
-import { Artwork } from '@/components/common/Artwork';
+import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
+import { QueueModal } from './QueueModal';
+import { DevicePickerSheet } from './DevicePickerSheet';
+import { largeArtwork } from '@/shared/utils/artwork';
+import { Artwork } from '@/shared/components/media/Artwork';
 
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const DISMISS_THRESHOLD = SCREEN_HEIGHT * 0.2; // 20% de l'écran pour fermer

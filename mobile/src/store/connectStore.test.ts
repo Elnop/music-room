@@ -1,7 +1,7 @@
-import { activeOwnerId, useConnectStore } from '@/store/connectStore';
-import { useAuthStore } from '@/store/authStore';
-import { usePlayerStore } from '@/store/playerStore';
-import { showInfo } from '@utils/toast';
+import { activeOwnerId, useConnectStore } from './connectStore';
+import { useAuthStore } from './authStore';
+import { usePlayerStore } from './playerStore';
+import { showInfo } from '@/shared/utils/toast';
 import type { ListeningStatus } from '@/types/listening.types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import type { UserProfile } from '@/types/user.types';
@@ -10,7 +10,7 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@services/oauth', () => ({
+jest.mock('@/services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
 	signInWithFacebook: jest.fn(),
 }));
@@ -19,7 +19,7 @@ jest.mock('@/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 
-jest.mock('@utils/toast', () => ({
+jest.mock('@/shared/utils/toast', () => ({
 	showInfo: jest.fn(),
 	showError: jest.fn(),
 	showSuccess: jest.fn(),

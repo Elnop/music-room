@@ -1,19 +1,19 @@
 import { queueApi } from '@/services/queueApi';
 import { deviceService } from '@/services/deviceService';
-import { useAuthStore } from '@store/authStore';
-import { useConnectStore } from '@/store/connectStore';
-import { readPositionMs, usePlayerStore } from '@/store/playerStore';
-import { useQueueStore } from '@/store/queueStore';
-import { selectQueue } from '@/store/queueSelectors';
-import { estimatePositionMs } from '@utils/remotePosition';
-import { toTrackInput } from '@utils/trackInput';
-import { hashStringToNumber } from '@utils/trackToSoundCloud';
-import { showError } from '@utils/toast';
-import { hapticSuccess } from '@utils/haptics';
-import { apiErrorMessage } from '@utils/apiErrorMessage';
+import { useAuthStore } from './authStore';
+import { useConnectStore } from './connectStore';
+import { readPositionMs, usePlayerStore } from './playerStore';
+import { useQueueStore } from './queueStore';
+import { selectQueue } from './queueSelectors';
+import { estimatePositionMs } from '@/utils/remotePosition';
+import { toTrackInput } from '@/shared/utils/trackInput';
+import { hashStringToNumber } from '@/shared/utils/trackToSoundCloud';
+import { showError } from '@/shared/utils/toast';
+import { hapticSuccess } from '@/shared/utils/haptics';
+import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 import type { DevicePickerOwner } from '@/types/device.types';
 import type { AddQueueItemBody, QueueTrack, TransferRequest } from '@/types/queue.types';
-import { logger } from '@/utils/logger';
+import { logger } from '@/shared/utils/logger';
 
 /** What plays now and where it is, as the transfer route takes it; null when nothing plays. */
 interface Playback {

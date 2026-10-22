@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Avatar } from '@components/common/Avatar';
-import { ShareLinkButton } from '@components/common/ShareLinkButton';
-import { PlayPlaylistButton } from '@components/playlist/PlayPlaylistButton';
+import { Avatar } from '@/shared/components/media/Avatar';
+import { ShareLinkButton } from '@/shared/components/sharing/ShareLinkButton';
+import { PlayPlaylistButton } from './PlayPlaylistButton';
 import { playlistLink } from '@/navigation/linking';
-import { useTheme } from '@/contexts/ThemeContext';
-import type { Theme } from '@themes/types';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import type { Theme } from '@/shared/theme/types';
 import type { PlaylistWithTracks } from '@/types/playlist.types';
 
 interface PlaylistHeaderProps {

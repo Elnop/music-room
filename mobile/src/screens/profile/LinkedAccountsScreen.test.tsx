@@ -1,12 +1,12 @@
 import React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
-import { useAuthStore } from '@store/authStore';
-import { resetBackendUrl } from '@/services/backendUrl';
-import { signInWithGoogle, signInWithFacebook } from '@services/oauth';
-import { showError, showSuccess } from '@utils/toast';
-import { LinkedAccountsScreen } from '@/screens/profile/LinkedAccountsScreen';
-import { logger } from '@/utils/logger';
+import { useAuthStore } from '@/store/authStore';
+import { resetBackendUrl } from '@/shared/services/backendUrl';
+import { signInWithGoogle, signInWithFacebook } from '@/services/oauth';
+import { showError, showSuccess } from '@/shared/utils/toast';
+import { LinkedAccountsScreen } from './LinkedAccountsScreen';
+import { logger } from '@/shared/utils/logger';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -16,7 +16,7 @@ jest.mock('@/contexts/PlayerContext', () => ({
 	usePlayerHeight: () => 0,
 }));
 
-jest.mock('@services/oauth', () => ({
+jest.mock('@/services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
 	signInWithFacebook: jest.fn(),
 }));
@@ -27,17 +27,17 @@ jest.mock('@/services/deviceService', () => ({
 
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
 
-jest.mock('@utils/toast', () => ({
+jest.mock('@/shared/utils/toast', () => ({
 	showError: jest.fn(),
 	showSuccess: jest.fn(),
 }));
 
-jest.mock('@/contexts/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@themes/original.theme');
+jest.mock('@/shared/theme/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-jest.mock('@components/common/LoadingSpinner', () => ({
+jest.mock('@/shared/components/ui/LoadingSpinner', () => ({
 	LoadingSpinner: () => null,
 }));
 

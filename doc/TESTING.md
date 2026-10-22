@@ -42,7 +42,7 @@ Unit tests are the default. Write an integration test only for behavior that liv
 | Mail (`features/mail/services/mail.service.ts`) | Mock the service and assert the call (recipient, template). | Mocked as well; no email is ever sent. |
 | Google / Facebook sign-in | Mock the token verification (`google-auth-library`, Graph API call). | Mocked as well. |
 
-Mobile tests never reach the network. `mobile/src/services/api.ts`, the socket store and Expo modules are mocked; the jest-expo preset covers the native ones.
+Mobile tests never reach the network. `mobile/src/shared/services/api.ts`, the socket store and Expo modules are mocked; the jest-expo preset covers the native ones.
 
 ## Integration database: local Supabase stack
 
@@ -79,7 +79,7 @@ npx vitest run -t "canViewPlaylist"                   # tests whose name matches
 
 # mobile/
 npm test                                              # all tests
-npx jest src/utils/formatters.test.ts                 # one file
+npx jest src/shared/utils/formatters.test.ts                 # one file
 npx jest -t "formatDuration"                          # tests whose name matches
 ```
 

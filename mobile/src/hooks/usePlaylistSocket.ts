@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { useSocketStore } from '@store/socketStore';
-import { usePlaylistStore } from '@store/playlistStore';
+import { useSocketStore } from '@/shared/stores/socketStore';
+import { usePlaylistStore } from '@/store/playlistStore';
 import type {
 	PlaylistDeletedEvent,
 	PlaylistDetailsEvent,

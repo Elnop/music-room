@@ -1,20 +1,20 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { PlayerModal } from '@/components/player/PlayerModal';
+import { PlayerModal } from './PlayerModal';
 import { usePlayerStore } from '@/store/playerStore';
 import { useConnectStore } from '@/store/connectStore';
 import { useQueueStore } from '@/store/queueStore';
 import { useAuthStore } from '@/store/authStore';
-import { hashStringToNumber } from '@utils/trackToSoundCloud';
+import { hashStringToNumber } from '@/shared/utils/trackToSoundCloud';
 import type { UserProfile } from '@/types/user.types';
 import { useImageColors } from '@/hooks/useImageColors';
 import { fireGestureHandler, getByGestureTestId } from 'react-native-gesture-handler/jest-utils';
 import { State } from 'react-native-gesture-handler';
 import type { PanGesture } from 'react-native-gesture-handler';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
-import { hapticTap } from '@/utils/haptics';
+import { hapticTap } from '@/shared/utils/haptics';
 
-jest.mock('@/utils/haptics', () => ({
+jest.mock('@/shared/utils/haptics', () => ({
 	hapticTap: jest.fn(),
 	hapticSelection: jest.fn(),
 	hapticSuccess: jest.fn(),
@@ -23,13 +23,13 @@ jest.mock('@/utils/haptics', () => ({
 const mockSeekTo = jest.fn();
 const mockProgress = { progress: 0, currentTime: 0, duration: 0 };
 
-jest.mock('@services/oauth', () => ({
+jest.mock('@/services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
 	signInWithFacebook: jest.fn(),
 }));
 
-jest.mock('@/contexts/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@themes/original.theme');
+jest.mock('@/shared/theme/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

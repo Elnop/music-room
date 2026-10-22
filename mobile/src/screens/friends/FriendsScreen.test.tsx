@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react-native';
-import { FriendsScreen } from '@/screens/friends/FriendsScreen';
+import { FriendsScreen } from './FriendsScreen';
 import { friendsApi } from '@/services/friendsApi';
 
-jest.mock('@/contexts/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@themes/original.theme');
+jest.mock('@/shared/theme/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
@@ -16,11 +16,11 @@ jest.mock('@/store/authStore', () => ({
 	useAuthStore: () => ({ accessToken: 'token' }),
 }));
 
-jest.mock('@utils/apiErrorMessage', () => ({
+jest.mock('@/shared/utils/apiErrorMessage', () => ({
 	apiErrorMessage: (_error: unknown, fallback: string) => fallback,
 }));
 
-jest.mock('@utils/toast', () => ({
+jest.mock('@/shared/utils/toast', () => ({
 	showError: jest.fn(),
 }));
 

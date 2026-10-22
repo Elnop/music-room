@@ -5,17 +5,17 @@ import {
 	NavigationContainer,
 	useNavigationContainerRef,
 } from '@react-navigation/native';
-import { useTheme } from '@/contexts/ThemeContext';
-import { AuthNavigator } from '@/navigation/AuthNavigator';
-import { AppNavigator, type AppTabsParamList } from '@/navigation/AppNavigator';
-import { createLinking, openPendingLink } from '@/navigation/linking';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import { AuthNavigator } from './AuthNavigator';
+import { AppNavigator, type AppTabsParamList } from './AppNavigator';
+import { createLinking, openPendingLink } from './linking';
 import { useAuthStore } from '@/store/authStore';
-import { useSocketStore } from '@/store/socketStore';
-import { LoadingSpinner } from '@components/common/LoadingSpinner';
-import { isDarkBackground } from '@components/common/ConnectionBanner';
-import { useMusicControlEmitter } from '@hooks/useMusicControl';
-import { loadBackendUrl } from '@/services/backendUrl';
-import { logger } from '@/utils/logger';
+import { useSocketStore } from '@/shared/stores/socketStore';
+import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
+import { isDarkBackground } from '@/shared/components/feedback/ConnectionBanner';
+import { useMusicControlEmitter } from '@/hooks/useMusicControl';
+import { loadBackendUrl } from '@/shared/services/backendUrl';
+import { logger } from '@/shared/utils/logger';
 
 export function RootNavigator() {
 	const isAuthenticated = useAuthStore(state => state.isAuthenticated);

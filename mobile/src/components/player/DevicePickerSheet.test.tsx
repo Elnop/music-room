@@ -1,25 +1,25 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import { DevicePickerSheet } from '@/components/player/DevicePickerSheet';
+import { DevicePickerSheet } from './DevicePickerSheet';
 import { useConnectStore } from '@/store/connectStore';
 import { usePlayerStore } from '@/store/playerStore';
 import { useQueueStore } from '@/store/queueStore';
 import { useAuthStore } from '@/store/authStore';
 import { musicControlApi } from '@/services/musicControlApi';
 import { queueApi } from '@/services/queueApi';
-import { ApiError } from '@/services/api';
-import { showError } from '@utils/toast';
+import { ApiError } from '@/shared/services/api';
+import { showError } from '@/shared/utils/toast';
 import type { DevicePickerResponse } from '@/types/device.types';
 import type { UserProfile } from '@/types/user.types';
-import { logger } from '@/utils/logger';
+import { logger } from '@/shared/utils/logger';
 
-jest.mock('@services/oauth', () => ({
+jest.mock('@/services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
 	signInWithFacebook: jest.fn(),
 }));
 
-jest.mock('@/contexts/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@themes/original.theme');
+jest.mock('@/shared/theme/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
@@ -48,7 +48,7 @@ jest.mock('@/contexts/PlayerContext', () => ({
 	usePlayer: () => ({ player: null, error: null }),
 }));
 
-jest.mock('@utils/toast', () => ({
+jest.mock('@/shared/utils/toast', () => ({
 	showSuccess: jest.fn(),
 	showError: jest.fn(),
 	showInfo: jest.fn(),

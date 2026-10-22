@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { usePlayerStore } from '@/store/playerStore';
-import { showError } from '@utils/toast';
+import { showError } from '@/shared/utils/toast';
 
 /**
  * Component that shows a Toast when a track is unavailable (404)

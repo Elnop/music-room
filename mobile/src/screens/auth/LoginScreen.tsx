@@ -14,16 +14,16 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useIsFocused } from '@react-navigation/native';
 import type { AuthStackParamList } from '@/navigation/AuthNavigator';
-import { useTheme } from '@/contexts/ThemeContext';
-import type { Theme } from '@themes/types';
-import { Button } from '@components/common/Button';
-import { Input } from '@components/common/Input';
-import { FormError } from '@components/common/FormError';
-import { loginSchema, LoginInput } from '@utils/validators';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import type { Theme } from '@/shared/theme/types';
+import { Button } from '@/shared/components/ui/Button';
+import { Input } from '@/shared/components/ui/Input';
+import { FormError } from '@/shared/components/feedback/FormError';
+import { loginSchema, LoginInput } from '@/shared/utils/validators';
 import { useAuthStore } from '@/store/authStore';
-import { ApiError } from '@services/api';
-import { showError, showWarning } from '@utils/toast';
-import { logger } from '@/utils/logger';
+import { ApiError } from '@/shared/services/api';
+import { showError, showWarning } from '@/shared/utils/toast';
+import { logger } from '@/shared/utils/logger';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Logo = require('@/assets/logo/logo.png');

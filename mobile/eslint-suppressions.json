@@ -1,547 +1,368 @@
 {
-  "App.tsx": {
-    "no-restricted-imports": {
-      "count": 2
-    }
-  },
-  "src/api/playlistApi.ts": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/components/common/AppToast.test.tsx": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/components/common/Avatar.tsx": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/components/common/BackendUrlField.tsx": {
-    "no-restricted-imports": {
-      "count": 4
-    }
-  },
-  "src/components/common/Button.tsx": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/components/common/Card.tsx": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/components/common/ConnectionBanner.tsx": {
-    "no-restricted-imports": {
-      "count": 2
-    }
-  },
-  "src/components/common/EmptyState.tsx": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/components/common/FormError.tsx": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/components/common/Input.tsx": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/components/common/LoadingSpinner.tsx": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/components/common/ReorderableList.tsx": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/components/common/SearchBar.tsx": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/components/common/ShareLinkButton.test.tsx": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/components/common/ShareLinkButton.tsx": {
-    "no-restricted-imports": {
-      "count": 2
-    }
-  },
-  "src/components/common/Skeleton.tsx": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/components/common/SwipeableUserItem.tsx": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/components/common/ThemedSystemUI.tsx": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
   "src/components/music-control/RenameDeviceModal.tsx": {
-    "no-restricted-imports": {
-      "count": 3
+    "guardrails/theme-tokens": {
+      "count": 1
+    },
+    "guardrails/ui-primitives": {
+      "count": 1
     }
   },
-  "src/components/player/DevicePickerSheet.test.tsx": {
-    "no-restricted-imports": {
+  "src/components/player/DevicePickerSheet.tsx": {
+    "guardrails/ui-primitives": {
       "count": 1
     }
   },
   "src/components/player/MiniPlayer.tsx": {
-    "no-restricted-imports": {
+    "guardrails/theme-tokens": {
       "count": 2
-    }
-  },
-  "src/components/player/PlayerErrorToast.tsx": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/components/player/PlayerModal.test.tsx": {
-    "no-restricted-imports": {
+    },
+    "guardrails/ui-primitives": {
       "count": 1
     }
   },
   "src/components/player/PlayerModal.tsx": {
-    "no-restricted-imports": {
+    "guardrails/theme-tokens": {
+      "count": 5
+    },
+    "guardrails/ui-primitives": {
+      "count": 1
+    }
+  },
+  "src/components/player/QueueItemRow.tsx": {
+    "guardrails/theme-tokens": {
+      "count": 4
+    },
+    "guardrails/ui-primitives": {
+      "count": 2
+    }
+  },
+  "src/components/player/QueueModal.tsx": {
+    "guardrails/ui-primitives": {
       "count": 1
     }
   },
   "src/components/playlist/FriendPlaylistSection.tsx": {
-    "no-restricted-imports": {
+    "guardrails/ui-primitives": {
       "count": 1
     }
   },
   "src/components/playlist/PlayPlaylistButton.tsx": {
-    "no-restricted-imports": {
-      "count": 5
+    "guardrails/ui-primitives": {
+      "count": 1
+    }
+  },
+  "src/components/playlist/PlaylistActionsSheet.tsx": {
+    "guardrails/theme-tokens": {
+      "count": 1
+    },
+    "guardrails/ui-primitives": {
+      "count": 2
     }
   },
   "src/components/playlist/PlaylistCard.tsx": {
-    "no-restricted-imports": {
+    "guardrails/ui-primitives": {
       "count": 1
     }
   },
   "src/components/playlist/PlaylistGridCard.tsx": {
-    "no-restricted-imports": {
+    "guardrails/ui-primitives": {
       "count": 1
     }
   },
   "src/components/playlist/PlaylistHeader.tsx": {
-    "no-restricted-imports": {
-      "count": 4
+    "guardrails/theme-tokens": {
+      "count": 1
+    },
+    "guardrails/ui-primitives": {
+      "count": 1
     }
   },
   "src/components/profile/GenreChip.tsx": {
-    "no-restricted-imports": {
+    "guardrails/theme-tokens": {
+      "count": 1
+    },
+    "guardrails/ui-primitives": {
       "count": 1
     }
   },
   "src/components/profile/GenreSelector.tsx": {
-    "no-restricted-imports": {
-      "count": 2
+    "guardrails/theme-tokens": {
+      "count": 1
     }
   },
   "src/components/profile/NowPlayingInline.tsx": {
-    "no-restricted-imports": {
+    "guardrails/theme-tokens": {
+      "count": 1
+    },
+    "guardrails/ui-primitives": {
       "count": 1
     }
   },
   "src/components/profile/ProfileSection.tsx": {
-    "no-restricted-imports": {
+    "guardrails/ui-primitives": {
       "count": 1
     }
   },
   "src/components/profile/VisibilityToggle.tsx": {
-    "no-restricted-imports": {
+    "guardrails/theme-tokens": {
+      "count": 2
+    },
+    "guardrails/ui-primitives": {
       "count": 1
     }
   },
   "src/components/track/AddableTrackRow.tsx": {
-    "no-restricted-imports": {
-      "count": 6
-    }
-  },
-  "src/components/track/PreviewBadge.tsx": {
-    "no-restricted-imports": {
+    "guardrails/theme-tokens": {
+      "count": 1
+    },
+    "guardrails/ui-primitives": {
       "count": 1
     }
   },
-  "src/components/track/TrackActionsSheet.test.tsx": {
-    "no-restricted-imports": {
+  "src/components/track/TrackActionsButton.tsx": {
+    "guardrails/ui-primitives": {
       "count": 1
     }
   },
-  "src/constants/index.ts": {
-    "no-restricted-syntax": {
+  "src/components/track/TrackActionsSheet.tsx": {
+    "guardrails/theme-tokens": {
       "count": 1
-    }
-  },
-  "src/contexts/PlayerContext.test.tsx": {
-    "no-restricted-imports": {
-      "count": 1
+    },
+    "guardrails/ui-primitives": {
+      "count": 2
     }
   },
   "src/contexts/PlayerContext.tsx": {
-    "no-restricted-imports": {
+    "guardrails/zustand-selector": {
       "count": 1
     }
   },
-  "src/contexts/ThemeContext.tsx": {
-    "no-restricted-imports": {
-      "count": 4
-    }
-  },
-  "src/hooks/useConnectionStatus.test.ts": {
-    "no-restricted-imports": {
+  "src/hooks/useAvatarPicker.ts": {
+    "guardrails/zustand-selector": {
       "count": 1
     }
   },
-  "src/hooks/useConnectionStatus.ts": {
-    "no-restricted-imports": {
+  "src/hooks/useImageColors.test.ts": {
+    "guardrails/theme-tokens": {
+      "count": 22
+    }
+  },
+  "src/hooks/useImageColors.ts": {
+    "guardrails/theme-tokens": {
+      "count": 9
+    }
+  },
+  "src/navigation/AppNavigator.tsx": {
+    "guardrails/theme-tokens": {
       "count": 1
-    }
-  },
-  "src/hooks/useLastTrackPersistence.test.ts": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/hooks/useLastTrackPersistence.ts": {
-    "no-restricted-imports": {
-      "count": 2
-    }
-  },
-  "src/hooks/useMusicControl.ts": {
-    "no-restricted-imports": {
-      "count": 6
-    }
-  },
-  "src/hooks/useNowPlaying.ts": {
-    "no-restricted-imports": {
-      "count": 2
-    }
-  },
-  "src/hooks/usePlaylistSocket.ts": {
-    "no-restricted-imports": {
-      "count": 2
-    }
-  },
-  "src/hooks/useQueueSync.ts": {
-    "no-restricted-imports": {
-      "count": 4
-    }
-  },
-  "src/hooks/useRemoteTarget.test.ts": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/hooks/useRemoteTarget.ts": {
-    "no-restricted-imports": {
-      "count": 5
-    }
-  },
-  "src/navigation/AuthNavigator.tsx": {
-    "no-restricted-imports": {
-      "count": 6
-    }
-  },
-  "src/navigation/RootNavigator.tsx": {
-    "no-restricted-imports": {
-      "count": 3
     }
   },
   "src/screens/auth/EmailVerificationScreen.tsx": {
-    "no-restricted-imports": {
-      "count": 3
+    "guardrails/ui-primitives": {
+      "count": 1
+    },
+    "guardrails/zustand-selector": {
+      "count": 1
     }
   },
   "src/screens/auth/ForgotPasswordScreen.tsx": {
-    "no-restricted-imports": {
-      "count": 4
+    "guardrails/ui-primitives": {
+      "count": 1
+    },
+    "guardrails/zustand-selector": {
+      "count": 1
     }
   },
   "src/screens/auth/LoginScreen.tsx": {
-    "no-restricted-imports": {
-      "count": 7
+    "guardrails/theme-tokens": {
+      "count": 9
+    },
+    "guardrails/ui-primitives": {
+      "count": 1
+    },
+    "guardrails/zustand-selector": {
+      "count": 1
     }
   },
   "src/screens/auth/RegisterScreen.tsx": {
-    "no-restricted-imports": {
-      "count": 6
+    "guardrails/theme-tokens": {
+      "count": 9
+    },
+    "guardrails/ui-primitives": {
+      "count": 1
+    },
+    "guardrails/zustand-selector": {
+      "count": 1
     }
   },
   "src/screens/auth/ResetPasswordScreen.tsx": {
-    "no-restricted-imports": {
-      "count": 6
+    "guardrails/ui-primitives": {
+      "count": 1
+    },
+    "guardrails/zustand-selector": {
+      "count": 1
     }
   },
   "src/screens/auth/WelcomeScreen.tsx": {
-    "no-restricted-imports": {
-      "count": 3
+    "guardrails/ui-primitives": {
+      "count": 1
     }
   },
   "src/screens/friends/FriendsScreen.tsx": {
-    "no-restricted-imports": {
-      "count": 4
+    "guardrails/ui-primitives": {
+      "count": 1
+    },
+    "guardrails/zustand-selector": {
+      "count": 1
     }
   },
   "src/screens/friends/UserProfileScreen.tsx": {
-    "no-restricted-imports": {
-      "count": 2
-    }
-  },
-  "src/screens/playlists/CreatePlaylistScreen.test.tsx": {
-    "no-restricted-imports": {
+    "guardrails/zustand-selector": {
       "count": 1
     }
   },
   "src/screens/playlists/CreatePlaylistScreen.tsx": {
-    "no-restricted-imports": {
-      "count": 9
-    }
-  },
-  "src/screens/playlists/PlaylistDetailScreen.test.tsx": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/screens/playlists/PlaylistDetailScreen.tsx": {
-    "no-restricted-imports": {
-      "count": 20
-    }
-  },
-  "src/screens/playlists/PlaylistSharingScreen.tsx": {
-    "no-restricted-imports": {
-      "count": 13
-    }
-  },
-  "src/screens/playlists/PlaylistsScreen.tsx": {
-    "no-restricted-imports": {
-      "count": 10
-    }
-  },
-  "src/screens/playlists/SearchTracksScreen.test.tsx": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/screens/playlists/SearchTracksScreen.tsx": {
-    "no-restricted-imports": {
-      "count": 12
-    }
-  },
-  "src/screens/profile/EditProfileScreen.tsx": {
-    "no-restricted-imports": {
-      "count": 7
-    }
-  },
-  "src/screens/profile/LinkedAccountsScreen.test.tsx": {
-    "no-restricted-imports": {
-      "count": 3
-    }
-  },
-  "src/screens/profile/LinkedAccountsScreen.tsx": {
-    "no-restricted-imports": {
-      "count": 4
-    }
-  },
-  "src/screens/profile/MusicPreferencesScreen.tsx": {
-    "no-restricted-imports": {
-      "count": 6
-    }
-  },
-  "src/screens/profile/MyDevicesScreen.test.tsx": {
-    "no-restricted-imports": {
+    "guardrails/zustand-selector": {
       "count": 2
     }
   },
-  "src/screens/profile/MyDevicesScreen.tsx": {
-    "no-restricted-imports": {
-      "count": 8
+  "src/screens/playlists/PlaylistDetailScreen.tsx": {
+    "guardrails/ui-primitives": {
+      "count": 1
+    },
+    "guardrails/zustand-selector": {
+      "count": 2
     }
   },
-  "src/screens/profile/PrivacySettingsScreen.test.tsx": {
-    "no-restricted-imports": {
+  "src/screens/playlists/PlaylistSharingScreen.tsx": {
+    "guardrails/theme-tokens": {
+      "count": 1
+    },
+    "guardrails/ui-primitives": {
+      "count": 1
+    },
+    "guardrails/zustand-selector": {
+      "count": 3
+    }
+  },
+  "src/screens/playlists/PlaylistsScreen.tsx": {
+    "guardrails/ui-primitives": {
+      "count": 1
+    },
+    "guardrails/zustand-selector": {
+      "count": 2
+    }
+  },
+  "src/screens/playlists/SearchTracksScreen.tsx": {
+    "guardrails/zustand-selector": {
+      "count": 1
+    }
+  },
+  "src/screens/profile/EditProfileScreen.tsx": {
+    "guardrails/theme-tokens": {
+      "count": 2
+    },
+    "guardrails/zustand-selector": {
+      "count": 1
+    }
+  },
+  "src/screens/profile/LinkedAccountsScreen.tsx": {
+    "guardrails/theme-tokens": {
+      "count": 1
+    },
+    "guardrails/ui-primitives": {
+      "count": 1
+    }
+  },
+  "src/screens/profile/MusicPreferencesScreen.tsx": {
+    "guardrails/zustand-selector": {
+      "count": 1
+    }
+  },
+  "src/screens/profile/MyDevicesScreen.tsx": {
+    "guardrails/ui-primitives": {
       "count": 1
     }
   },
   "src/screens/profile/PrivacySettingsScreen.tsx": {
-    "no-restricted-imports": {
-      "count": 6
+    "guardrails/zustand-selector": {
+      "count": 1
     }
   },
   "src/screens/profile/ProfileScreen.tsx": {
-    "no-restricted-imports": {
-      "count": 5
+    "guardrails/theme-tokens": {
+      "count": 3
+    },
+    "guardrails/ui-primitives": {
+      "count": 2
+    },
+    "guardrails/zustand-selector": {
+      "count": 1
     }
   },
   "src/screens/search/SoundCloudSearchScreen.tsx": {
-    "no-restricted-imports": {
-      "count": 9
-    }
-  },
-  "src/screens/settings/SettingsScreen.tsx": {
-    "no-restricted-imports": {
-      "count": 3
-    }
-  },
-  "src/services/api.ts": {
-    "no-restricted-imports": {
+    "guardrails/zustand-selector": {
       "count": 1
     }
   },
-  "src/services/backendUrl.test.ts": {
-    "no-restricted-imports": {
+  "src/screens/search/components/SoundCloudTrackItem.tsx": {
+    "guardrails/ui-primitives": {
       "count": 1
     }
   },
-  "src/services/backendUrl.ts": {
-    "no-restricted-imports": {
+  "src/shared/components/feedback/ConnectionBanner.test.tsx": {
+    "guardrails/theme-tokens": {
+      "count": 15
+    }
+  },
+  "src/shared/components/feedback/ConnectionBanner.tsx": {
+    "guardrails/theme-tokens": {
+      "count": 2
+    }
+  },
+  "src/shared/components/feedback/EmptyState.tsx": {
+    "guardrails/theme-tokens": {
       "count": 1
     }
   },
-  "src/services/musicControlApi.ts": {
-    "no-restricted-imports": {
-      "count": 1
+  "src/shared/components/feedback/ErrorBoundary.tsx": {
+    "guardrails/theme-tokens": {
+      "count": 10
     }
   },
-  "src/services/oauth.test.ts": {
-    "no-restricted-imports": {
-      "count": 1
+  "src/shared/components/lists/QueueSwipe.tsx": {
+    "guardrails/theme-tokens": {
+      "count": 2
     }
   },
-  "src/store/authStore.test.ts": {
-    "no-restricted-imports": {
-      "count": 3
-    }
-  },
-  "src/store/authStore.ts": {
-    "no-restricted-imports": {
+  "src/shared/components/lists/SwipeableTrackItem.tsx": {
+    "guardrails/theme-tokens": {
       "count": 4
     }
   },
-  "src/store/connectStore.test.ts": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/store/connectStore.ts": {
-    "no-restricted-imports": {
-      "count": 2
-    }
-  },
-  "src/store/playlistStore.test.ts": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/store/playlistStore.ts": {
-    "no-restricted-imports": {
-      "count": 2
-    }
-  },
-  "src/store/queueStore.test.ts": {
-    "no-restricted-imports": {
-      "count": 2
-    }
-  },
-  "src/store/queueStore.ts": {
-    "no-restricted-imports": {
-      "count": 5
-    }
-  },
-  "src/store/socketStore.test.ts": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/store/socketStore.ts": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/store/transferPlayback.test.ts": {
-    "no-restricted-imports": {
+  "src/shared/components/lists/SwipeableUserItem.tsx": {
+    "guardrails/theme-tokens": {
       "count": 3
     }
   },
-  "src/store/transferPlayback.ts": {
-    "no-restricted-imports": {
+  "src/shared/components/theme/ThemeSelector.tsx": {
+    "guardrails/theme-tokens": {
       "count": 7
     }
   },
-  "src/themes/christmas.theme.ts": {
-    "no-restricted-imports": {
-      "count": 2
+  "src/shared/components/ui/Button.tsx": {
+    "guardrails/theme-tokens": {
+      "count": 3
     }
   },
-  "src/themes/original.theme.ts": {
-    "no-restricted-imports": {
+  "src/shared/components/ui/ThemedSwitch.tsx": {
+    "guardrails/theme-tokens": {
       "count": 1
     }
   },
-  "src/themes/pastelLime.theme.ts": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/themes/royalBlue.theme.ts": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/themes/types.ts": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/utils/formatters.test.ts": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/utils/haptics.test.ts": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/utils/remotePosition.test.ts": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/utils/soundcloudPreview.test.ts": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/utils/trackInput.test.ts": {
-    "no-restricted-imports": {
-      "count": 1
-    }
-  },
-  "src/utils/validators.test.ts": {
-    "no-restricted-imports": {
-      "count": 1
+  "src/types/user.types.ts": {
+    "guardrails/theme-tokens": {
+      "count": 10
     }
   }
 }

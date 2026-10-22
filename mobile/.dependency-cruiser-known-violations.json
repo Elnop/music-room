@@ -66,6 +66,13 @@
         ]
       },
       {
+        "name": "src/hooks/usePlayerProgress.ts",
+        "dependencyTypes": [
+          "local",
+          "import"
+        ]
+      },
+      {
         "name": "src/contexts/PlayerContext.tsx",
         "dependencyTypes": [
           "aliased",
@@ -117,9 +124,6 @@
       {
         "name": "src/navigation/AppNavigator.tsx",
         "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
           "local",
           "type-only",
           "import"
@@ -160,8 +164,8 @@
   {
     "type": "cycle",
     "from": "src/hooks/useNowPlaying.ts",
-    "to": "src/hooks/usePlayerProgress.ts",
-    "unresolvedTo": "@/hooks/usePlayerProgress",
+    "to": "src/contexts/PlayerContext.tsx",
+    "unresolvedTo": "@/contexts/PlayerContext",
     "dependencyTypes": [
       "aliased",
       "aliased-tsconfig",
@@ -174,16 +178,6 @@
       "name": "no-circular"
     },
     "cycle": [
-      {
-        "name": "src/hooks/usePlayerProgress.ts",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      },
       {
         "name": "src/contexts/PlayerContext.tsx",
         "dependencyTypes": [
@@ -276,9 +270,6 @@
       {
         "name": "src/navigation/AppNavigator.tsx",
         "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
           "local",
           "type-only",
           "import"
@@ -340,7 +331,7 @@
     "type": "cycle",
     "from": "src/navigation/AuthNavigator.tsx",
     "to": "src/screens/auth/EmailVerificationScreen.tsx",
-    "unresolvedTo": "@screens/auth/EmailVerificationScreen",
+    "unresolvedTo": "@/screens/auth/EmailVerificationScreen",
     "dependencyTypes": [
       "aliased",
       "aliased-tsconfig",
@@ -380,7 +371,7 @@
     "type": "cycle",
     "from": "src/navigation/AuthNavigator.tsx",
     "to": "src/screens/auth/ForgotPasswordScreen.tsx",
-    "unresolvedTo": "@screens/auth/ForgotPasswordScreen",
+    "unresolvedTo": "@/screens/auth/ForgotPasswordScreen",
     "dependencyTypes": [
       "aliased",
       "aliased-tsconfig",
@@ -420,7 +411,7 @@
     "type": "cycle",
     "from": "src/navigation/AuthNavigator.tsx",
     "to": "src/screens/auth/LoginScreen.tsx",
-    "unresolvedTo": "@screens/auth/LoginScreen",
+    "unresolvedTo": "@/screens/auth/LoginScreen",
     "dependencyTypes": [
       "aliased",
       "aliased-tsconfig",
@@ -460,7 +451,7 @@
     "type": "cycle",
     "from": "src/navigation/AuthNavigator.tsx",
     "to": "src/screens/auth/ResetPasswordScreen.tsx",
-    "unresolvedTo": "@screens/auth/ResetPasswordScreen",
+    "unresolvedTo": "@/screens/auth/ResetPasswordScreen",
     "dependencyTypes": [
       "aliased",
       "aliased-tsconfig",
@@ -500,11 +491,8 @@
     "type": "cycle",
     "from": "src/navigation/linking.ts",
     "to": "src/navigation/AppNavigator.tsx",
-    "unresolvedTo": "@/navigation/AppNavigator",
+    "unresolvedTo": "./AppNavigator",
     "dependencyTypes": [
-      "aliased",
-      "aliased-tsconfig",
-      "aliased-tsconfig-paths",
       "local",
       "type-only",
       "import"
@@ -517,9 +505,6 @@
       {
         "name": "src/navigation/AppNavigator.tsx",
         "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
           "local",
           "type-only",
           "import"
@@ -636,5 +621,73 @@
         ]
       }
     ]
+  },
+  {
+    "type": "dependency",
+    "from": "src/shared/components/lists/SwipeableTrackItem.tsx",
+    "to": "src/components/track/TrackActionsButton.tsx",
+    "unresolvedTo": "@/components/track/TrackActionsButton",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "shared-not-to-legacy"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/shared/services/api.ts",
+    "to": "src/services/deviceService.ts",
+    "unresolvedTo": "@/services/deviceService",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "shared-not-to-legacy"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/shared/stores/socketStore.ts",
+    "to": "src/services/deviceService.ts",
+    "unresolvedTo": "@/services/deviceService",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "shared-not-to-legacy"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/shared/stores/socketStore.ts",
+    "to": "src/store/authStore.ts",
+    "unresolvedTo": "@/store/authStore",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "shared-not-to-legacy"
+    }
   }
 ]

@@ -1,13 +1,13 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/contexts/ThemeContext';
-import type { Theme } from '@themes/types';
-import { QueueSwipe } from '@components/common/QueueSwipe';
-import { Artwork } from '@components/common/Artwork';
-import { PreviewBadge } from '@components/track/PreviewBadge';
-import { TrackActionsButton } from '@components/track/TrackActionsButton';
-import { isPreviewOnly } from '@utils/soundcloudPreview';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import type { Theme } from '@/shared/theme/types';
+import { QueueSwipe } from '@/shared/components/lists/QueueSwipe';
+import { Artwork } from '@/shared/components/media/Artwork';
+import { PreviewBadge } from './PreviewBadge';
+import { TrackActionsButton } from './TrackActionsButton';
+import { isPreviewOnly } from '@/shared/utils/soundcloudPreview';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
 interface AddableTrackRowProps {

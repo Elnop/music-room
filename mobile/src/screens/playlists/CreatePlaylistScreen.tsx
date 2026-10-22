@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import { ThemedSwitch } from '@components/common/ThemedSwitch';
+import { ThemedSwitch } from '@/shared/components/ui/ThemedSwitch';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
-import { useTheme } from '@/contexts/ThemeContext';
-import type { Theme } from '@themes/types';
-import { useAuthStore } from '@store/authStore';
-import { usePlaylistStore } from '@store/playlistStore';
-import { Button } from '@components/common/Button';
-import { Input } from '@components/common/Input';
-import { playlistFormSchema, type PlaylistFormInput } from '@utils/validators';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import type { Theme } from '@/shared/theme/types';
+import { useAuthStore } from '@/store/authStore';
+import { usePlaylistStore } from '@/store/playlistStore';
+import { Button } from '@/shared/components/ui/Button';
+import { Input } from '@/shared/components/ui/Input';
+import { playlistFormSchema, type PlaylistFormInput } from '@/shared/utils/validators';
 import type { EditMode } from '@/types/playlist.types';
-import { showError, showSuccess } from '@utils/toast';
-import { apiErrorMessage } from '@utils/apiErrorMessage';
-import { logger } from '@/utils/logger';
+import { showError, showSuccess } from '@/shared/utils/toast';
+import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
+import { logger } from '@/shared/utils/logger';
 
 // Playlist field limits (the backend allows 100 and 500)
 const PLAYLIST_LIMITS = {

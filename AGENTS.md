@@ -20,7 +20,7 @@
 ## Where things are
 
 - API routers are mounted in `backend/src/app/routes.ts` and the OpenAPI document is assembled in `backend/src/app/openapi.ts` (`src/app/` is the composition root: only `server.ts` imports it, and `shared/` never imports a feature); each feature documents its endpoints in `features/<name>/<name>.openapi.ts` (Swagger UI: http://localhost:3000/api-docs), which registers its routes with `@asteasolutions/zod-to-openapi`: request and response schemas are Zod schemas from `<name>*.validators.ts` (e.g. `playlist.validators.ts`, `playlist-responses.validators.ts`), never hand-written OpenAPI. A new endpoint without its OpenAPI entry is unfinished.
-- Socket.io events: server in `backend/src/realtime/` (`socket-server.ts` bootstrap, one handler per domain in `handlers/`, what features emit in `emitters/`), client in `mobile/src/store/socketStore.ts` and `mobile/src/hooks/`. Read event names there; never assume them.
+- Socket.io events: server in `backend/src/realtime/` (`socket-server.ts` bootstrap, one handler per domain in `handlers/`, what features emit in `emitters/`), client in `mobile/src/shared/stores/socketStore.ts` and `mobile/src/hooks/` (a query is kept in sync through `mobile/src/shared/query/socketCache.ts`). Read event names there; never assume them.
 - Migrations: `backend/migrations/NNN_*.sql`, created with `cd backend && make migrate-create name=<name>`. `make supabase-up` applies the new ones to the local dev stack (default `SUPABASE_MODE=local`); on the hosted project they are applied by hand in the Supabase dashboard.
 - Email sending: `backend/src/features/mail/services/mail.service.ts` (templates in `mail/utils/mail-templates.ts`). In local mode emails go to the dev stack's Mailpit (http://localhost:54424), not Gmail.
 
@@ -41,6 +41,7 @@ Each rule `check` enforces has a section in `.agents/rules/`, and its error mess
 | Adding an import across folders, a feature, or a module in `shared/` | `.agents/rules/architecture.md` |
 | Creating a file or a folder | `.agents/rules/structure.md` |
 | Logging anything | `.agents/rules/logging.md` |
+| Mobile: fetching server data, or adding or reading a Zustand store | `.agents/rules/state.md` |
 | `npm run check` fails, or touching a guardrail or an exception list | `.agents/rules/guardrails.md` |
 
 Rules are append-only: never disable, weaken or switch a rule to `warn`, and never add an entry to an exception list (`eslint-suppressions.json`, `.dependency-cruiser-known-violations.json`, `.jscpd.json` `ignore`, semgrep `exclude`, `.gitleaks.toml` allowlists) to let code through; fix the code. Exception lists only shrink (`check:exceptions` compares them with `develop`). A new rule lands with its `.agents/rules` section.
@@ -54,7 +55,8 @@ Rules are append-only: never disable, weaken or switch a rule to `warn`, and nev
 - Validate every request input with a Zod schema; no `any`.
 - `tracks.track_uri` stores the SoundCloud permalink URL. Stream URLs are fetched on demand and expire after 30 minutes; never persist them.
 - A change to a backend response shape must be mirrored in `mobile/src/types/`.
-- Mobile HTTP calls go through `mobile/src/services/api.ts`, which sends `X-Platform`, `X-Device-Model` and `X-App-Version`; the backend logs them (subject IV.6), so never call `fetch` around it.
+- Mobile layout: `src/shared/` (UI primitives in `shared/components/ui/`, API client, query setup, cross-cutting stores, theme), `src/providers/`, `src/navigation/`, and `src/features/<feature>/` as features migrate (#378–#385); see `.agents/rules/structure.md#placement`. Touchables are `Pressable`/`Button` from `@/shared/components/ui/`, colours come from the theme, and a Zustand hook always takes a selector.
+- Mobile HTTP calls go through `mobile/src/shared/services/api.ts`, which sends `X-Platform`, `X-Device-Model` and `X-App-Version`; the backend logs them (subject IV.6), so never call `fetch` around it.
 - CORS origins come from `ALLOWED_ORIGINS` in `backend/.env`; add a client's origin there instead of loosening CORS in code.
 
 <!-- /bmad:context -->

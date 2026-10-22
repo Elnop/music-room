@@ -2,14 +2,14 @@ import React from 'react';
 import { Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { act, render, screen } from '@testing-library/react-native';
-import { RootNavigator } from '@/navigation/RootNavigator';
+import { RootNavigator } from './RootNavigator';
 import { useAuthStore } from '@/store/authStore';
-import { clearPendingLink } from '@/navigation/linking';
-import { logger } from '@/utils/logger';
+import { clearPendingLink } from './linking';
+import { logger } from '@/shared/utils/logger';
 
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
 
-jest.mock('@services/oauth', () => ({
+jest.mock('@/services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
 	signInWithFacebook: jest.fn(),
 }));
@@ -22,31 +22,31 @@ jest.mock('@/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 
-jest.mock('@/contexts/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@themes/original.theme');
+jest.mock('@/shared/theme/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-jest.mock('@/services/backendUrl', () => ({
+jest.mock('@/shared/services/backendUrl', () => ({
 	loadBackendUrl: () => Promise.resolve(),
 	getBackendUrl: () => 'http://backend.test',
 }));
 
-jest.mock('@/store/socketStore', () => {
+jest.mock('@/shared/stores/socketStore', () => {
 	const state = { connect: jest.fn(), disconnect: jest.fn() };
 	return { useSocketStore: (select: (s: typeof state) => unknown) => select(state) };
 });
 
-jest.mock('@hooks/useMusicControl', () => ({
+jest.mock('@/hooks/useMusicControl', () => ({
 	useMusicControlEmitter: jest.fn(),
 }));
 
-jest.mock('@components/common/LoadingSpinner', () => ({
+jest.mock('@/shared/components/ui/LoadingSpinner', () => ({
 	LoadingSpinner: () => null,
 }));
 
 // The real tab and stack layout, with screens that only print their params.
-jest.mock('@/navigation/AppNavigator', () => {
+jest.mock('./AppNavigator', () => {
 	const { Text } = jest.requireActual('react-native');
 	const { createNativeStackNavigator } = jest.requireActual('@react-navigation/native-stack');
 	const { createBottomTabNavigator } = jest.requireActual('@react-navigation/bottom-tabs');
@@ -82,7 +82,7 @@ jest.mock('@/navigation/AppNavigator', () => {
 	};
 });
 
-jest.mock('@/navigation/AuthNavigator', () => {
+jest.mock('./AuthNavigator', () => {
 	const { Text } = jest.requireActual('react-native');
 	return { AuthNavigator: () => <Text>sign-in</Text> };
 });

@@ -11,8 +11,8 @@ import type { NavigatorScreenParams } from '@react-navigation/native';
 import { View, StyleSheet } from 'react-native';
 import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/contexts/ThemeContext';
-import type { Theme } from '@/themes/types';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import type { Theme } from '@/shared/theme/types';
 
 // Import feature stacks
 import {
@@ -30,8 +30,8 @@ import { PlayerErrorToast } from '@/components/player/PlayerErrorToast';
 import { PlayerProvider } from '@/contexts/PlayerContext';
 import { useQueueSync } from '@/hooks/useQueueSync';
 import { useRemoteTarget } from '@/hooks/useRemoteTarget';
-import { useConnectionStatus } from '@/hooks/useConnectionStatus';
-import { ConnectionBanner } from '@/components/common/ConnectionBanner';
+import { useConnectionStatus } from '@/shared/hooks/useConnectionStatus';
+import { ConnectionBanner } from '@/shared/components/feedback/ConnectionBanner';
 
 // Tab navigation types
 // Playlists and Friends take nested params: zumik:// share links open their screens (#321).

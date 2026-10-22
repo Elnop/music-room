@@ -1,10 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Socket } from 'socket.io-client';
-import { useAuthStore } from '@store/authStore';
-import { useSocketStore } from '@store/socketStore';
-import { getBackendUrl, resetBackendUrl } from '@/services/backendUrl';
-import { signInWithFacebook, signInWithGoogle } from '@services/oauth';
-import { logger } from '@/utils/logger';
+import { useAuthStore } from './authStore';
+import { useSocketStore } from '@/shared/stores/socketStore';
+import { getBackendUrl, resetBackendUrl } from '@/shared/services/backendUrl';
+import { signInWithFacebook, signInWithGoogle } from '@/services/oauth';
+import { logger } from '@/shared/utils/logger';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -19,7 +19,7 @@ jest.mock(
 	{ virtual: true }
 );
 
-jest.mock('@services/oauth', () => ({
+jest.mock('@/services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
 	signInWithFacebook: jest.fn(),
 }));

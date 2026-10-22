@@ -7,7 +7,13 @@ Read before creating a file or a folder. Every rule here is checked by `npm run 
 Where a file goes is set by the target layout in `docs/superpowers/specs/2026-10-21-clean-codebase-refactor-design.md` and summarized in `AGENTS.md`:
 
 - Backend: `src/features/<name>/` holds `<name>.routes.ts`, `<name>.controller.ts`, `<name>.validators.ts`, `<name>.types.ts`, `<name>.openapi.ts`, logic in `services/`, authorization in `permissions/`, helpers in `utils/`. Cross-cutting code (config, middleware, security, types) goes in `src/shared/`; the Socket.io server in `src/realtime/` (`socket-server.ts`, `handlers/`, `emitters/`); the composition root (routes registry, OpenAPI document) in `src/app/`.
-- Mobile: `src/features/<feature>/` (components, hooks, services, stores of one feature), `src/shared/` (UI primitives, API client, query setup, cross-cutting stores, theme), `src/navigation/`, `src/providers/`. The current folders (`components/`, `screens/`, `store/`…) move there story by story.
+- Mobile: `src/features/<feature>/` (components, hooks, services, stores of one feature), `src/shared/`, `src/navigation/`, `src/providers/` (`AppProviders.tsx`, the providers `App.tsx` wraps the app in). The legacy folders (`components/<feature>/`, `screens/`, `store/`, `hooks/`, `contexts/`, `services/`, `api/`, `utils/`) move into `features/` story by story (#378–#385); add nothing new to them. `src/shared/` holds what several features use:
+  - `components/ui/`: the primitives ([ui-primitives](#ui-primitives)): `Pressable`, `Button`, `Input`, `Card`, `Skeleton`, `ThemedSwitch`, `LoadingSpinner`;
+  - `components/<subject>/`: shared blocks by subject (`feedback/`, `form/`, `lists/`, `media/`, `sharing/`, `theme/`);
+  - `services/`: the API client `api.ts`, `backendUrl.ts`, storage modules;
+  - `query/`: TanStack Query setup ([state.md](state.md));
+  - `stores/`: cross-cutting Zustand stores (`socketStore.ts`);
+  - `hooks/`, `utils/` (with the `logger`), `constants/`, `theme/` (theme context, themes and tokens).
 - Tests sit next to the file they test.
 
 ## no-index-files
@@ -26,3 +32,17 @@ The shape of a backend feature once migrated (epic #362; `src/features/auth/` is
 - **Routes pass the handlers directly**, `router.post('/login', loginRateLimiter, checkAccountLockout, session.login)`, with the controller imported as a namespace. No arrow wrapper and no `@route` JSDoc: the OpenAPI files document the endpoints.
 - **Files stay at 150 lines or less** (tests excepted): split a service by use case rather than grow it.
 - **Request input types come from the validators** (`export type LoginInput = z.infer<typeof loginSchema>` in `<name>.validators.ts`); `<name>.types.ts` keeps response and domain types, inferred from the response schemas when one exists. No DTO interface that repeats a schema.
+
+## ui-primitives
+
+Mobile: every touchable element is a `Pressable` or a `Button` from `src/shared/components/ui/` (ESLint `guardrails/ui-primitives`). `TouchableOpacity`, and `Pressable` from `react-native`, are imported or used (`RN.Pressable`) only in `src/shared/components/ui/`, tests included.
+
+- `Pressable` fixes the press opacity (`PRESSED_OPACITY`), sets the `button` role unless told otherwise, fires an optional haptic (`haptic="tap" | "selection" | "success"`, through `@/shared/utils/haptics`) and requires an `accessibilityLabel` in its type, so no control is silent for a screen reader.
+- `Button` is built on it; its label (`title` or the text children) is its accessibility label unless one is given.
+- Gestures (swipe, drag and drop, the mini-player) stay on `react-native-gesture-handler`.
+- A `Text` primitive is not written yet: it comes with the first feature that needs themed typography (#378–#385).
+
+## theme-tokens
+
+Mobile: no colour literal outside `src/shared/theme/` (ESLint `guardrails/theme-tokens`): no hex string (`'#FFF'`), no `rgb(`/`rgba(`/`hsl(` string, and no named colour (`'white'`) as a colour prop or style key; a template literal that starts as a colour (`` `rgba(${r}, …)` ``) counts too. Read the colour from the theme: `const { theme } = useTheme()`, then `theme.colors.primary`. A colour every theme lacks is added to `ThemeColors` (`src/shared/theme/types.ts`) and to the four themes. `'transparent'` is allowed. Tests are covered too.
+

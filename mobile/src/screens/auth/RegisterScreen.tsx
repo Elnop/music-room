@@ -13,15 +13,15 @@ import { useForm, Controller } from 'react-hook-form';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useTheme } from '@/contexts/ThemeContext';
-import type { Theme } from '@themes/types';
-import { Button } from '@components/common/Button';
-import { Input } from '@components/common/Input';
-import { FormError } from '@components/common/FormError';
-import { registerSchema, RegisterInput } from '@utils/validators';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import type { Theme } from '@/shared/theme/types';
+import { Button } from '@/shared/components/ui/Button';
+import { Input } from '@/shared/components/ui/Input';
+import { FormError } from '@/shared/components/feedback/FormError';
+import { registerSchema, RegisterInput } from '@/shared/utils/validators';
 import { useAuthStore } from '@/store/authStore';
-import { showError } from '@utils/toast';
-import { logger } from '@/utils/logger';
+import { showError } from '@/shared/utils/toast';
+import { logger } from '@/shared/utils/logger';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Logo = require('@/assets/logo/logo.png');

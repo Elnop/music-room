@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
-import { useSocketStore } from '@store/socketStore';
-import { useQueueStore } from '@store/queueStore';
-import { useAuthStore } from '@store/authStore';
-import { useConnectStore } from '@store/connectStore';
+import { useSocketStore } from '@/shared/stores/socketStore';
+import { useQueueStore } from '@/store/queueStore';
+import { useAuthStore } from '@/store/authStore';
+import { useConnectStore } from '@/store/connectStore';
 import type { QueueState } from '@/types/queue.types';
 
 /** The remote owner while the phone drives another user's device, else null. */

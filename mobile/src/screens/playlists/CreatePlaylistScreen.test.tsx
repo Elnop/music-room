@@ -1,9 +1,9 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import { CreatePlaylistScreen } from '@/screens/playlists/CreatePlaylistScreen';
-import { ApiError } from '@/services/api';
-import { showError, showSuccess } from '@utils/toast';
-import { logger } from '@/utils/logger';
+import { CreatePlaylistScreen } from './CreatePlaylistScreen';
+import { ApiError } from '@/shared/services/api';
+import { showError, showSuccess } from '@/shared/utils/toast';
+import { logger } from '@/shared/utils/logger';
 
 const mockCreatePlaylist = jest.fn();
 const mockUpdatePlaylist = jest.fn();
@@ -23,8 +23,8 @@ jest.mock('@/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 
-jest.mock('@/contexts/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@themes/original.theme');
+jest.mock('@/shared/theme/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
@@ -32,11 +32,11 @@ jest.mock('@/contexts/PlayerContext', () => ({
 	usePlayerHeight: () => 0,
 }));
 
-jest.mock('@store/authStore', () => ({
+jest.mock('@/store/authStore', () => ({
 	useAuthStore: () => ({ user: { id: 'me' } }),
 }));
 
-jest.mock('@store/playlistStore', () => ({
+jest.mock('@/store/playlistStore', () => ({
 	usePlaylistStore: () => ({
 		createPlaylist: mockCreatePlaylist,
 		updatePlaylist: mockUpdatePlaylist,
@@ -45,7 +45,7 @@ jest.mock('@store/playlistStore', () => ({
 	}),
 }));
 
-jest.mock('@utils/toast', () => ({
+jest.mock('@/shared/utils/toast', () => ({
 	showSuccess: jest.fn(),
 	showError: jest.fn(),
 	showInfo: jest.fn(),

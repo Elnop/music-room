@@ -3,7 +3,7 @@ import {
 	readPositionMs,
 	setPositionReader,
 	type PlaybackState,
-} from '@/store/playerStore';
+} from './playerStore';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
 const initialState = usePlayerStore.getState();

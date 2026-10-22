@@ -1,4 +1,4 @@
-import { acquireListening, releaseListening } from '@/services/listeningRooms';
+import { acquireListening, releaseListening } from './listeningRooms';
 
 const makeSocket = () => ({ connected: true, emit: jest.fn() });
 

@@ -1,7 +1,7 @@
-import { playlistApi } from '@/api/playlistApi';
-import { apiRequest } from '@/services/api';
+import { playlistApi } from './playlistApi';
+import { apiRequest } from '@/shared/services/api';
 
-jest.mock('@/services/api', () => ({ apiRequest: jest.fn() }));
+jest.mock('@/shared/services/api', () => ({ apiRequest: jest.fn() }));
 
 const request = apiRequest as jest.MockedFunction<typeof apiRequest>;
 

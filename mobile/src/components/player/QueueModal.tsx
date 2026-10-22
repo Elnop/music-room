@@ -3,16 +3,16 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/contexts/ThemeContext';
-import { AppToast } from '@/components/common/AppToast';
-import type { Theme } from '@/themes/types';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import { AppToast } from '@/shared/components/feedback/AppToast';
+import type { Theme } from '@/shared/theme/types';
 import { useActiveQueue, useQueueStore } from '@/store/queueStore';
 import { afterItemIdForDrop } from '@/store/moveTarget';
-import { ReorderableList } from '@/components/common/ReorderableList';
-import { EmptyState } from '@/components/common/EmptyState';
-import { QueueItemRow } from '@/components/player/QueueItemRow';
+import { ReorderableList } from '@/shared/components/lists/ReorderableList';
+import { EmptyState } from '@/shared/components/feedback/EmptyState';
+import { QueueItemRow } from './QueueItemRow';
 import { TrackActionsSheet } from '@/components/track/TrackActionsSheet';
-import { toTrackInput } from '@/utils/trackInput';
+import { toTrackInput } from '@/shared/utils/trackInput';
 import type { AddQueueItemBody, QueueItem } from '@/types/queue.types';
 
 interface QueueModalProps {

@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react-native';
-import { usePlaylistSocket } from '@/hooks/usePlaylistSocket';
+import { usePlaylistSocket } from './usePlaylistSocket';
 import type {
 	PlaylistDeletedEvent,
 	PlaylistDetailsEvent,
@@ -22,12 +22,12 @@ const mockPlaylistState = {
 	removePlaylist: jest.fn(),
 };
 
-jest.mock('@store/socketStore', () => ({
+jest.mock('@/shared/stores/socketStore', () => ({
 	useSocketStore: (selector: (state: typeof mockSocketState) => unknown) =>
 		selector(mockSocketState),
 }));
 
-jest.mock('@store/playlistStore', () => ({
+jest.mock('@/store/playlistStore', () => ({
 	usePlaylistStore: (selector: (state: typeof mockPlaylistState) => unknown) =>
 		selector(mockPlaylistState),
 }));

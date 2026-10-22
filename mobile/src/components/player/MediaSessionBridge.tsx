@@ -12,8 +12,8 @@ import {
 } from 'expo-media-control';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { useNowPlaying, type NowPlaying } from '@/hooks/useNowPlaying';
-import { largeArtwork } from '@/utils/artwork';
-import { logger } from '@/utils/logger';
+import { largeArtwork } from '@/shared/utils/artwork';
+import { logger } from '@/shared/utils/logger';
 
 /** A position this far from where the system extrapolates it is a jump (seek, restart, renewal). */
 const POSITION_JUMP_MS = 2000;

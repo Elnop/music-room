@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react-native';
-import { useQueueSync } from '@/hooks/useQueueSync';
+import { useQueueSync } from './useQueueSync';
 import type { QueueState } from '@/types/queue.types';
 
 const mockSocket = {
@@ -20,20 +20,20 @@ let mockTarget: { kind: 'local' } | { kind: 'remote'; ownerId: string; deviceId:
 	kind: 'local',
 };
 
-jest.mock('@store/socketStore', () => ({
+jest.mock('@/shared/stores/socketStore', () => ({
 	useSocketStore: (selector: (state: typeof mockSocketState) => unknown) =>
 		selector(mockSocketState),
 }));
 
-jest.mock('@store/queueStore', () => ({
+jest.mock('@/store/queueStore', () => ({
 	useQueueStore: (selector: (state: typeof mockQueueState) => unknown) => selector(mockQueueState),
 }));
 
-jest.mock('@store/connectStore', () => ({
+jest.mock('@/store/connectStore', () => ({
 	useConnectStore: { getState: () => ({ target: mockTarget }) },
 }));
 
-jest.mock('@store/authStore', () => ({
+jest.mock('@/store/authStore', () => ({
 	useAuthStore: (selector: (state: typeof mockAuthState) => unknown) => selector(mockAuthState),
 }));
 

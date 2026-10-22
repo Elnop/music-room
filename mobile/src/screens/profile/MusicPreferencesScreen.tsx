@@ -3,17 +3,17 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
-import { useTheme } from '@/contexts/ThemeContext';
-import type { Theme } from '@themes/types';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import type { Theme } from '@/shared/theme/types';
 import type { MusicGenre } from '@/types/user.types';
 import { MAX_GENRES } from '@/types/user.types';
 import { useAuthStore } from '@/store/authStore';
 import { privacyApi } from '@/services/privacyApi';
-import { apiErrorMessage } from '@utils/apiErrorMessage';
-import { Button } from '@components/common/Button';
-import { LoadingSpinner } from '@components/common/LoadingSpinner';
-import { GenreSelector } from '@components/profile/GenreSelector';
-import { showError } from '@utils/toast';
+import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
+import { Button } from '@/shared/components/ui/Button';
+import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
+import { GenreSelector } from '@/components/profile/GenreSelector';
+import { showError } from '@/shared/utils/toast';
 
 export function MusicPreferencesScreen() {
 	const { theme } = useTheme();

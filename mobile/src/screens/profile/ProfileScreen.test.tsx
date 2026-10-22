@@ -1,14 +1,14 @@
 import React, { type ReactElement } from 'react';
 import { Alert } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { ProfileScreen } from '@/screens/profile/ProfileScreen';
+import { ProfileScreen } from './ProfileScreen';
 
 const mockLogout = jest.fn();
 const mockNavigate = jest.fn();
 const mockSetOptions = jest.fn();
 
-jest.mock('@/contexts/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@themes/original.theme');
+jest.mock('@/shared/theme/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
@@ -36,7 +36,7 @@ jest.mock('@/store/authStore', () => {
 
 jest.mock('@/services/privacyApi', () => ({ privacyApi: {} }));
 jest.mock('@/services/friendsApi', () => ({ friendsApi: {} }));
-jest.mock('@components/theme/ThemeSelector', () => ({ ThemeSelector: () => null }));
+jest.mock('@/shared/components/theme/ThemeSelector', () => ({ ThemeSelector: () => null }));
 
 type AlertButtons = Parameters<typeof Alert.alert>[2];
 

@@ -1,13 +1,13 @@
 import React from 'react';
 import { Share } from 'react-native';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import { UserProfileScreen } from '@/screens/friends/UserProfileScreen';
+import { UserProfileScreen } from './UserProfileScreen';
 import { friendsApi } from '@/services/friendsApi';
 
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
 
-jest.mock('@/contexts/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@themes/original.theme');
+jest.mock('@/shared/theme/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
@@ -19,7 +19,7 @@ jest.mock('@/store/authStore', () => ({
 	useAuthStore: () => ({ accessToken: 'token' }),
 }));
 
-jest.mock('@utils/toast', () => ({
+jest.mock('@/shared/utils/toast', () => ({
 	showSuccess: jest.fn(),
 	showError: jest.fn(),
 	showInfo: jest.fn(),

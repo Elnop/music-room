@@ -2,13 +2,13 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
-import { useTheme } from '@/contexts/ThemeContext';
-import type { Theme } from '@themes/types';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import type { Theme } from '@/shared/theme/types';
 import type { LinkedProvider, OAuthProvider } from '@/types/auth.types';
 import { useAuthStore } from '@/store/authStore';
-import { LoadingSpinner } from '@components/common/LoadingSpinner';
-import { showError, showSuccess } from '@utils/toast';
-import { apiErrorMessage } from '@utils/apiErrorMessage';
+import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
+import { showError, showSuccess } from '@/shared/utils/toast';
+import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 
 type MethodType = LinkedProvider['type'];
 

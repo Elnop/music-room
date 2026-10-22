@@ -41,6 +41,8 @@ An exception list only shrinks. `check:exceptions` counts the entries of each li
 
 For jscpd `ignore`, semgrep `exclude` and every string of the `.gitleaks.toml` allowlist and `[extend]` sections, the comparison is by value: every entry must already exist on `develop`, so an entry can be neither added nor widened (such as `**/src/store/authStore.ts` turned into `**/src/**`).
 
+Two changes are not growth. A file moved with git (a rename) keeps its entries and inline escapes under its new path: update the path in the list, nothing else. A new rule lands with exceptions only through the versioned allowlist `tools/guardrails/new-rule-baselines.json` (`{ "<project>": { "<rule id>": <max entries> } }`): a rule listed there, with no entry in the reference list, may record up to that many entries (ESLint: occurrences; dependency-cruiser: violations), and `check:exceptions` prints `new rule, baseline accepted`. Adding the rule to the allowlist, with today's count, is part of the ticket that creates the rule. Once the list is on `develop`, the rule only shrinks like any other; a rule not in the allowlist (a renamed one included) starts at 0. The rename logic is in `tools/guardrails/renames.mjs`, tested by `node --test tools/guardrails/renames.test.mjs`.
+
 Inline escapes count too: `check:exceptions` counts `eslint-disable`, `nosemgrep`, `ast-grep-ignore` and `jscpd:ignore-start` per file under the project's `src/`, and fails when a file has more than on `develop` (a new file starts at 0).
 
 Never add an entry or an inline escape to make new code pass: fix the code. A jscpd `ignore` entry hides the whole file, so code copied from an ignored file is not caught; that gap closes as the list empties. Every list must be empty (permanent entries aside) at the end of epic #362.
@@ -66,11 +68,11 @@ semgrep, mobile: a `useEffect` callback is never `async`. React expects it to re
 
 ## no-fetch-outside-api-client
 
-semgrep, mobile: `fetch(` appears only in `src/services/api.ts`. The API client adds the `X-Platform`, `X-Device-Model` and `X-App-Version` headers the backend logs (subject IV.6). Call the backend through it.
+semgrep, mobile: `fetch(` appears only in `src/shared/services/api.ts`. The API client adds the `X-Platform`, `X-Device-Model` and `X-App-Version` headers the backend logs (subject IV.6). Call the backend through it.
 
 ## no-asyncstorage-outside-storage
 
-semgrep, mobile: `@react-native-async-storage/async-storage` is imported only by storage modules (today `src/services/lastTrackStorage.ts` and `src/services/backendUrl.ts`) and tests. Other code calls a storage module, so keys and formats live in one place. The other files importing it today are listed in the rule's `exclude` and leave it as they migrate.
+semgrep, mobile: `@react-native-async-storage/async-storage` is imported only by storage modules (today `src/shared/services/lastTrackStorage.ts` and `src/shared/services/backendUrl.ts`) and tests. Other code calls a storage module, so keys and formats live in one place. The other files importing it today are listed in the rule's `exclude` and leave it as they migrate.
 
 ## no-non-null-assertion-on-env
 

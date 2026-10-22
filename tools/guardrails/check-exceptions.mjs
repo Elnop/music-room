@@ -11,11 +11,19 @@
 // (eslint-disable, nosemgrep, ast-grep-ignore, jscpd:ignore-start) may not
 // grow in any file under <project>/src/; a new file starts at 0.
 //
+// Two changes are not growth:
+// - a moved file (git rename) keeps its entries and inline escapes under its
+//   new path;
+// - a new rule listed in tools/guardrails/new-rule-baselines.json, with no
+//   entry in the reference, may land with up to the recorded number of
+//   entries (guardrails.md#exception-lists). Any other rule only shrinks.
+//
 // Usage: node tools/guardrails/check-exceptions.mjs [backend] [mobile]
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { followRenames, parseRenames } from './renames.mjs';
 
 const root = resolve(fileURLToPath(import.meta.url), '../../..');
 const args = process.argv.slice(2);
@@ -114,9 +122,9 @@ function readGitleaks(text) {
 
 const lists = [
   ...projects.flatMap((project) => [
-    { path: `${project}/eslint-suppressions.json`, read: readEslint },
-    { path: `${project}/.dependency-cruiser-known-violations.json`, read: readDepcruise },
-    { path: `${project}/.jscpd.json`, read: readJscpd },
+    { project, path: `${project}/eslint-suppressions.json`, read: readEslint },
+    { project, path: `${project}/.dependency-cruiser-known-violations.json`, read: readDepcruise },
+    { project, path: `${project}/.jscpd.json`, read: readJscpd },
   ]),
   { path: 'tools/semgrep/rules.yml', read: readSemgrep },
   { path: '.gitleaks.toml', read: readGitleaks },
@@ -155,7 +163,24 @@ if (forkPoint) {
 const head = git('rev-parse', 'HEAD')?.trim();
 if (head && head !== forkPoint) references.push({ label: 'HEAD', rev: head });
 
+// --- moves and new rules -----------------------------------------------------
+
+// Files renamed between a reference and the working tree: [old, new] paths
+// from the repository root.
+const renamesSince = (rev) => parseRenames(git('diff', '--name-status', '-M', '-z', rev, '--') ?? '');
+
+// The rule a count key belongs to: `guardrails/x (files)` -> `guardrails/x`.
+const ruleOf = (key) => key.replace(/ \((files|occurrences)\)$/, '');
+
+// New rules allowed to land with exceptions: { project: { rule: max entries } }.
+// Adding a rule here is part of the ticket that creates the rule.
+const newRuleBaselines = JSON.parse(
+  readFileSync(join(root, 'tools/guardrails/new-rule-baselines.json'), 'utf8')
+);
+
 // --- comparison --------------------------------------------------------------
+
+const newRules = new Set();
 
 const growths = [];
 for (const list of lists) {
@@ -180,14 +205,24 @@ for (const list of lists) {
     } catch {
       continue;
     }
+    const renames = renamesSince(reference.rev);
+    const previousEntries = new Set(
+      [...(previous.entries ?? [])].map((entry) => followRenames(entry, renames, list.project))
+    );
     for (const [key, value] of Object.entries(current.counts ?? {})) {
       const was = previous.counts?.[key] ?? 0;
+      const rule = ruleOf(key);
+      const max = newRuleBaselines[list.project]?.[rule];
+      if (!(key in (previous.counts ?? {})) && max !== undefined && value <= max) {
+        newRules.add(`${list.path}: ${rule} (vs ${reference.label})`);
+        continue;
+      }
       if (value > was) {
         growths.push(`${list.path}: ${key} grew from ${was} to ${value} (vs ${reference.label})`);
       }
     }
     for (const entry of current.entries ?? []) {
-      if (!previous.entries?.has(entry)) {
+      if (!previousEntries.has(entry)) {
         growths.push(`${list.path}: new or changed entry ${entry} (vs ${reference.label})`);
       }
     }
@@ -212,7 +247,11 @@ function countDirectives(project, rev) {
 for (const project of projects) {
   const current = countDirectives(project);
   for (const reference of references) {
-    const previous = countDirectives(project, reference.rev);
+    const previous = {};
+    const renames = new Map(renamesSince(reference.rev));
+    for (const [path, count] of Object.entries(countDirectives(project, reference.rev))) {
+      previous[renames.get(path) ?? path] = count;
+    }
     for (const [path, count] of Object.entries(current)) {
       const was = previous[path] ?? 0;
       if (count > was) {
@@ -232,6 +271,7 @@ if (growths.length > 0) {
   );
   process.exit(1);
 }
+for (const rule of newRules) console.log(`new rule, baseline accepted: ${rule}`);
 console.log(
   `exception lists did not grow (${lists.length} files and inline escapes, vs ${references.map((r) => r.label).join(' and ') || 'nothing'})`
 );

@@ -1,6 +1,6 @@
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import { signInWithGoogle } from '@services/oauth';
-import { logger } from '@/utils/logger';
+import { signInWithGoogle } from './oauth';
+import { logger } from '@/shared/utils/logger';
 
 jest.mock('expo-constants', () => ({
 	expoConfig: {

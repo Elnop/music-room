@@ -1,12 +1,8 @@
 import { act, renderHook } from '@testing-library/react-native';
-import {
-	controlErrorMessage,
-	useFriendListening,
-	useMusicControlEmitter,
-} from '@/hooks/useMusicControl';
+import { controlErrorMessage, useFriendListening, useMusicControlEmitter } from './useMusicControl';
 import { setPositionReader } from '@/store/playerStore';
 import { musicControlApi } from '@/services/musicControlApi';
-import { logger } from '@/utils/logger';
+import { logger } from '@/shared/utils/logger';
 
 const mockSocket = {
 	connected: true,
@@ -28,27 +24,27 @@ const mockPlayerState = {
 const mockSetCurrentItem = jest.fn();
 const mockSetLocal = jest.fn();
 
-jest.mock('@store/socketStore', () => ({
+jest.mock('@/shared/stores/socketStore', () => ({
 	useSocketStore: (selector: (state: typeof mockSocketState) => unknown) =>
 		selector(mockSocketState),
 }));
 
-jest.mock('@store/authStore', () => ({
+jest.mock('@/store/authStore', () => ({
 	useAuthStore: Object.assign(
 		(selector: (state: typeof mockAuthState) => unknown) => selector(mockAuthState),
 		{ getState: () => mockAuthState }
 	),
 }));
 
-jest.mock('@store/queueStore', () => ({
+jest.mock('@/store/queueStore', () => ({
 	useQueueStore: { getState: () => ({ setCurrentItem: mockSetCurrentItem }) },
 }));
 
-jest.mock('@store/connectStore', () => ({
+jest.mock('@/store/connectStore', () => ({
 	useConnectStore: { getState: () => ({ setLocal: mockSetLocal }) },
 }));
 
-jest.mock('@store/playerStore', () => {
+jest.mock('@/store/playerStore', () => {
 	let reader: (() => number) | null = null;
 	return {
 		usePlayerStore: Object.assign(

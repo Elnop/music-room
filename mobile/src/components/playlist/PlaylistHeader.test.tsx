@@ -1,22 +1,22 @@
 import React from 'react';
 import { Share } from 'react-native';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import { PlaylistHeader } from '@/components/playlist/PlaylistHeader';
+import { PlaylistHeader } from './PlaylistHeader';
 import type { PlaylistWithTracks } from '@/types/playlist.types';
 import type { UserProfile } from '@/types/user.types';
 
-jest.mock('@/contexts/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@themes/original.theme');
+jest.mock('@/shared/theme/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-jest.mock('@utils/toast', () => ({
+jest.mock('@/shared/utils/toast', () => ({
 	showSuccess: jest.fn(),
 	showError: jest.fn(),
 	showInfo: jest.fn(),
 }));
 
-jest.mock('@components/playlist/PlayPlaylistButton', () => ({
+jest.mock('./PlayPlaylistButton', () => ({
 	PlayPlaylistButton: () => null,
 }));
 

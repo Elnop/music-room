@@ -1,23 +1,18 @@
 import { create } from 'zustand';
-import { ApiError } from '@/services/api';
+import { ApiError } from '@/shared/services/api';
 import { queueApi, type QueueCallTarget } from '@/services/queueApi';
-import { usePlayerStore } from '@/store/playerStore';
-import { useAuthStore } from '@store/authStore';
-import { useConnectStore, useActiveOwnerId } from '@/store/connectStore';
-import { trackToSoundCloud } from '@utils/trackToSoundCloud';
-import { toTrackInput } from '@utils/trackInput';
-import { showError, showInfo, showSuccess } from '@utils/toast';
-import { hapticSuccess } from '@utils/haptics';
-import { apiErrorMessage } from '@/utils/apiErrorMessage';
+import { usePlayerStore } from './playerStore';
+import { useAuthStore } from './authStore';
+import { useConnectStore, useActiveOwnerId } from './connectStore';
+import { trackToSoundCloud } from '@/shared/utils/trackToSoundCloud';
+import { toTrackInput } from '@/shared/utils/trackInput';
+import { showError, showInfo, showSuccess } from '@/shared/utils/toast';
+import { hapticSuccess } from '@/shared/utils/haptics';
+import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 import type { AddQueueItemBody, QueueState, QueueStepResult } from '@/types/queue.types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
-import {
-	currentItem,
-	playPlaylistError,
-	selectQueue,
-	type OwnerQueue,
-} from '@/store/queueSelectors';
-import { logger } from '@/utils/logger';
+import { currentItem, playPlaylistError, selectQueue, type OwnerQueue } from './queueSelectors';
+import { logger } from '@/shared/utils/logger';
 
 /**
  * Outcome of a step: the new current item plays, the queue has no current
