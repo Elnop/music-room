@@ -6,7 +6,7 @@ import {
 	verifyTokenLimited,
 } from '@/features/auth/utils/token-verify-limiter.js';
 import type { DeviceInfo } from '@/features/music-control/music-control.types.js';
-import { DeviceService } from '@/features/music-control/services/device.service.js';
+import * as deviceService from '@/features/music-control/services/device.service.js';
 import { socketLogger } from '@/shared/middleware/socket-logger.middleware.js';
 import { clientIp } from '@/shared/config/trust-proxy.js';
 
@@ -74,8 +74,6 @@ export type AppSocketServer = Server<
 >;
 export type AppSocket = Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, SocketData>;
 
-const deviceService = new DeviceService();
-
 function refuse(
 	socket: AppSocket,
 	next: (err?: ExtendedError) => void,
@@ -134,7 +132,7 @@ export async function authenticateSocket(
 		// to show, the owner's custom one when set (#352).
 		device.deviceName = await deviceService.recordConnection(user.id, device);
 	} catch {
-		// DeviceService has already logged the database error.
+		// device.service has already logged the database error.
 		refuse(socket, next, 'DEVICE_REGISTRATION_FAILED');
 		return;
 	}

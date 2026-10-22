@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { DeviceService } from '@/features/music-control/services/device.service.js';
+import * as service from '@/features/music-control/services/device.service.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 
 const { from, upsert, single, update, maybeSingle, eq, select } = vi.hoisted(() => {
@@ -41,9 +41,7 @@ const device = {
 	model: 'Pixel 8',
 };
 
-describe('DeviceService.recordConnection', () => {
-	const service = new DeviceService();
-
+describe('device.service recordConnection', () => {
 	beforeEach(() => {
 		from.mockClear();
 		upsert.mockClear();
@@ -109,8 +107,7 @@ describe('DeviceService.recordConnection', () => {
 	});
 });
 
-describe('DeviceService.renameDevice (#352)', () => {
-	const service = new DeviceService();
+describe('device.service renameDevice (#352)', () => {
 	const row = {
 		device_id: 'device-1',
 		device_name: 'sdk_gphone64_x86_64',

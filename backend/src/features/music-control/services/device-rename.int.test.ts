@@ -1,16 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
-import { DeviceService } from '@/features/music-control/services/device.service.js';
-import { DeviceLicenseService } from '@/features/music-control/services/device-license.service.js';
-import { ControllableDevicesService } from '@/features/music-control/services/controllable-devices.service.js';
+import * as deviceService from '@/features/music-control/services/device.service.js';
+import * as licenseService from '@/features/music-control/services/device-license.service.js';
+import * as pickerService from '@/features/music-control/services/controllable-devices.service.js';
 
 // Renaming a device (#352) against the local Supabase stack: devices.custom_name
 // (026) is shown in place of the system name and survives reconnections.
-
-const deviceService = new DeviceService();
-const licenseService = new DeviceLicenseService();
-const pickerService = new ControllableDevicesService();
 
 const SYSTEM_NAME = 'sdk_gphone64_x86_64';
 

@@ -222,23 +222,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/features/music-control/music-control.service.ts",
-    "to": "src/features/friends/services/friends.service.ts",
-    "unresolvedTo": "@/features/friends/services/friends.service.js",
-    "dependencyTypes": [
-      "aliased",
-      "aliased-tsconfig",
-      "aliased-tsconfig-paths",
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "no-cross-feature-imports"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/features/music-control/music-control.types.ts",
     "to": "src/features/queue/queue.types.ts",
     "unresolvedTo": "@/features/queue/queue.types.js",
@@ -248,6 +231,23 @@
       "aliased-tsconfig-paths",
       "local",
       "type-only",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "no-cross-feature-imports"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/music-control/services/control-switch.service.ts",
+    "to": "src/features/friends/services/friends.service.ts",
+    "unresolvedTo": "@/features/friends/services/friends.service.js",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
       "import"
     ],
     "rule": {

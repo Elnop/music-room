@@ -18,7 +18,7 @@ vi.mock('@/features/queue/permissions/queue.permissions.js', () => ({
 	resolvePlaybackDevice: m.resolvePlaybackDevice,
 }));
 vi.mock('@/features/music-control/services/control-access.service.js', () => ({
-	controlAccessService: { canControlDevice: m.canControlDevice },
+	canControlDevice: m.canControlDevice,
 }));
 vi.mock('@/features/queue/utils/queue-rpc.js', () => ({
 	getQueueRpc: m.getQueueRpc,

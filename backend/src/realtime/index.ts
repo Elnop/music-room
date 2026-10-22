@@ -21,7 +21,7 @@ import type {
 	PlaylistUpdatedPayload,
 } from '@/features/playlists/playlist.types.js';
 import type { QueueState } from '@/features/queue/queue.types.js';
-import { controlAccessService } from '@/features/music-control/services/control-access.service.js';
+import * as controlAccessService from '@/features/music-control/services/control-access.service.js';
 import type {
 	DeviceCommand,
 	ListeningStatus,

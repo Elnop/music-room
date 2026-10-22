@@ -2,7 +2,7 @@ import { logger } from '@/shared/utils/logger.js';
 import { upsertTrack } from '@/shared/utils/track-upsert.js';
 import { realtime } from '@/realtime/index.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
-import { controlAccessService } from '@/features/music-control/services/control-access.service.js';
+import * as controlAccessService from '@/features/music-control/services/control-access.service.js';
 import type { DeviceCommand } from '@/features/music-control/music-control.types.js';
 import { resolvePlaybackDevice } from '@/features/queue/permissions/queue.permissions.js';
 import {

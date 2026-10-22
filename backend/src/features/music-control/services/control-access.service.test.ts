@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ControlAccessService } from '@/features/music-control/services/control-access.service.js';
+import * as service from '@/features/music-control/services/control-access.service.js';
 
 type Result = { data: unknown; error: { message: string; code?: string } | null };
 
@@ -35,9 +35,7 @@ vi.mock('@/shared/utils/logger.js', () => ({
 const ok = (data: unknown): Result => ({ data, error: null });
 const dbError: Result = { data: null, error: { message: 'connection reset', code: '08006' } };
 
-describe('ControlAccessService', () => {
-	const service = new ControlAccessService();
-
+describe('control-access.service', () => {
 	beforeEach(() => {
 		from.mockClear();
 		logError.mockClear();
