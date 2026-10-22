@@ -39,11 +39,6 @@
     "**/src/navigation/stacks/PlaylistsStack.tsx",
     "**/src/navigation/stacks/ProfileStack.tsx",
     "**/src/navigation/stacks/SearchStack.tsx",
-    "**/src/screens/auth/EmailVerificationScreen.tsx",
-    "**/src/screens/auth/ForgotPasswordScreen.tsx",
-    "**/src/screens/auth/LoginScreen.tsx",
-    "**/src/screens/auth/RegisterScreen.tsx",
-    "**/src/screens/auth/ResetPasswordScreen.tsx",
     "**/src/screens/friends/FriendsScreen.tsx",
     "**/src/screens/friends/UserProfileScreen.tsx",
     "**/src/screens/playlists/CreatePlaylistScreen.tsx",
@@ -57,7 +52,6 @@
     "**/src/screens/profile/ProfileScreen.tsx",
     "**/src/screens/search/SoundCloudSearchScreen.tsx",
     "**/src/screens/search/components/SoundCloudTrackItem.tsx",
-    "**/src/store/authStore.ts",
     "**/src/types/assets.d.ts"
   ]
 }

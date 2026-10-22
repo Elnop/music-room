@@ -9,7 +9,7 @@ import {
 } from './queueSelectors';
 import { usePlayerStore } from './playerStore';
 import { deferred } from '@/test/deferred';
-import { useAuthStore } from './authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { useConnectStore } from './connectStore';
 import type { UserProfile } from '@/types/user.types';
 import { queueApi } from '@/services/queueApi';
@@ -24,10 +24,6 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/services/oauth', () => ({
-	signInWithGoogle: jest.fn(),
-	signInWithFacebook: jest.fn(),
-}));
 
 jest.mock('@/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',

@@ -30,7 +30,7 @@ The rules block from day one; the violations that existed when a rule arrived ar
 | ESLint | `<project>/eslint-suppressions.json` (native bulk suppressions) | a (file, rule) pair, with its count |
 | dependency-cruiser | `<project>/.dependency-cruiser-known-violations.json` | a violation |
 | jscpd | the `ignore` globs of `<project>/.jscpd.json` | a glob (the first globs, tests and generated files, are permanent) |
-| semgrep | the `exclude` lists of `tools/semgrep/rules.yml` | a path (storage modules and `api.ts` are permanent) |
+| semgrep | the `exclude` lists of `tools/semgrep/rules.yml` | a path (`backendUrl.ts`, `api.ts` and the test globs are permanent; a rule's `metadata.allowed-paths` globs are its definition, not exceptions) |
 | gitleaks | the `[[allowlists]]` of `.gitleaks.toml` | an allowed value or path, public by design |
 
 An exception list only shrinks. `check:exceptions` counts the entries of each list per rule and fails when a count is higher than at the fork point from `origin/develop` or than at `HEAD`. A story that cleans files then shrinks the list:
@@ -40,6 +40,8 @@ An exception list only shrinks. `check:exceptions` counts the entries of each li
 - jscpd, semgrep, gitleaks: delete the entries by hand.
 
 For jscpd `ignore`, semgrep `exclude` and every string of the `.gitleaks.toml` allowlist and `[extend]` sections, the comparison is by value: every entry must already exist on `develop`, so an entry can be neither added nor widened (such as `**/src/store/authStore.ts` turned into `**/src/**`).
+
+A semgrep rule whose scope is a naming convention declares it in `metadata.allowed-paths` and repeats each glob in `paths.exclude`, since semgrep reads only `paths`. `check:exceptions` does not count an exclude entry that the same rule declares there, under these constraints: `allowed-paths` is read only directly under the rule's `metadata:`; only a suffix glob `*<Suffix>.<ext>` qualifies, Suffix being a capitalised word of 4 letters or more (`*Storage.ts`; not `*.ts`, not a file name), and any other value leaves its exclude entry counted as an exception; and each rule's `allowed-paths` is compared with the reference like an exception list, so a new glob fails unless it is recorded for that rule under `allowedPaths` in `tools/guardrails/new-rule-baselines.json`. Such a glob allows every file whose name ends that way, existing or future. Adding one changes the rule and takes a dedicated ticket ([append-only-rules](#append-only-rules)).
 
 Two changes are not growth. A file moved with git (a rename) keeps its entries and inline escapes under its new path: update the path in the list, nothing else. A new rule lands with exceptions only through the versioned allowlist `tools/guardrails/new-rule-baselines.json` (`{ "<project>": { "<rule id>": <max entries> } }`): a rule listed there, with no entry in the reference list, may record up to that many entries (ESLint: occurrences; dependency-cruiser: violations), and `check:exceptions` prints `new rule, baseline accepted`. Adding the rule to the allowlist, with today's count, is part of the ticket that creates the rule. Once the list is on `develop`, the rule only shrinks like any other; a rule not in the allowlist (a renamed one included) starts at 0. The rename logic is in `tools/guardrails/renames.mjs`, tested by `node --test tools/guardrails/renames.test.mjs`.
 
@@ -72,7 +74,7 @@ semgrep, mobile: `fetch(` appears only in `src/shared/services/api.ts`. The API 
 
 ## no-asyncstorage-outside-storage
 
-semgrep, mobile: `@react-native-async-storage/async-storage` is imported only by storage modules (today `src/shared/services/lastTrackStorage.ts` and `src/shared/services/backendUrl.ts`) and tests. Other code calls a storage module, so keys and formats live in one place. The other files importing it today are listed in the rule's `exclude` and leave it as they migrate.
+semgrep, mobile: `@react-native-async-storage/async-storage` is imported only by storage modules and tests. A storage module is named `<thing>Storage.ts` (`src/shared/services/lastTrackStorage.ts`, `src/features/auth/services/sessionStorage.ts`): the rule allows that name through `metadata.allowed-paths` (see [exception-lists](#exception-lists)). `src/shared/services/backendUrl.ts`, a storage module named before the convention, keeps its own exclude. Other code calls a storage module, so keys and formats live in one place. The other files importing it today are listed in the rule's `exclude` and leave it as they migrate.
 
 ## no-non-null-assertion-on-env
 

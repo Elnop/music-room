@@ -36,7 +36,7 @@ jest.mock('@/services/profileApi', () => ({
 }));
 
 const mockSetAvatarUrl = jest.fn();
-jest.mock('@/store/authStore', () => ({
+jest.mock('@/features/auth/stores/authStore', () => ({
 	useAuthStore: () => ({ accessToken: 'token', setAvatarUrl: mockSetAvatarUrl }),
 }));
 

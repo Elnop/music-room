@@ -57,3 +57,18 @@ export const NEOBRUTALISM_TYPOGRAPHY = {
 		xxxl: 32,
 	},
 } as const;
+
+/**
+ * Colours that do not change with the theme: the sign-in providers' brand
+ * colours (their buttons keep the providers' guidelines) and the divider of the
+ * sign-in screens. Every theme spreads them into its colours.
+ */
+export const FIXED_COLORS = {
+	divider: '#3E3E3E',
+	googleSurface: '#FFFFFF',
+	googleBorder: '#DADCE0',
+	googleMark: '#4285F4',
+	googleText: '#3C4043',
+	facebook: '#1877F2',
+	onFacebook: '#FFFFFF',
+} as const;

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AppState } from 'react-native';
 import { usePlayerStore, readPositionMs } from '@/store/playerStore';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { useConnectStore } from '@/store/connectStore';
 import { lastTrackStorage, type LastTrackEntry } from '@/shared/services/lastTrackStorage';
 import { queueTrackToSoundCloud } from '@/shared/utils/trackToSoundCloud';

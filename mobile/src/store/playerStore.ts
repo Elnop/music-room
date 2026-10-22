@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
+import { onSessionEnd } from '@/shared/services/authSession';
 
 /**
  * Playback states for the player state machine
@@ -330,3 +331,12 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 		set(state => ({ seekCount: state.seekCount + 1 }));
 	},
 }));
+
+/**
+ * Every end of session empties the player (#312): a next user must not inherit
+ * the track, which would skip their restore and be saved under their key. The
+ * user is already null here, so the player no longer saves for anyone.
+ */
+onSessionEnd(() => {
+	usePlayerStore.getState().stop();
+});

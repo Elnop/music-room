@@ -157,57 +157,6 @@
       "count": 1
     }
   },
-  "src/screens/auth/EmailVerificationScreen.tsx": {
-    "guardrails/ui-primitives": {
-      "count": 1
-    },
-    "guardrails/zustand-selector": {
-      "count": 1
-    }
-  },
-  "src/screens/auth/ForgotPasswordScreen.tsx": {
-    "guardrails/ui-primitives": {
-      "count": 1
-    },
-    "guardrails/zustand-selector": {
-      "count": 1
-    }
-  },
-  "src/screens/auth/LoginScreen.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 9
-    },
-    "guardrails/ui-primitives": {
-      "count": 1
-    },
-    "guardrails/zustand-selector": {
-      "count": 1
-    }
-  },
-  "src/screens/auth/RegisterScreen.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 9
-    },
-    "guardrails/ui-primitives": {
-      "count": 1
-    },
-    "guardrails/zustand-selector": {
-      "count": 1
-    }
-  },
-  "src/screens/auth/ResetPasswordScreen.tsx": {
-    "guardrails/ui-primitives": {
-      "count": 1
-    },
-    "guardrails/zustand-selector": {
-      "count": 1
-    }
-  },
-  "src/screens/auth/WelcomeScreen.tsx": {
-    "guardrails/ui-primitives": {
-      "count": 1
-    }
-  },
   "src/screens/friends/FriendsScreen.tsx": {
     "guardrails/ui-primitives": {
       "count": 1

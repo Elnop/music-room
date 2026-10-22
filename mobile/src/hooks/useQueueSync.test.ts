@@ -33,7 +33,7 @@ jest.mock('@/store/connectStore', () => ({
 	useConnectStore: { getState: () => ({ target: mockTarget }) },
 }));
 
-jest.mock('@/store/authStore', () => ({
+jest.mock('@/features/auth/stores/authStore', () => ({
 	useAuthStore: (selector: (state: typeof mockAuthState) => unknown) => selector(mockAuthState),
 }));
 

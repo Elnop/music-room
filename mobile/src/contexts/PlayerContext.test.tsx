@@ -4,7 +4,7 @@ import { PlayerProvider, usePlayer } from './PlayerContext';
 import { readPositionMs, usePlayerStore } from '@/store/playerStore';
 import { useConnectStore } from '@/store/connectStore';
 import { useQueueStore } from '@/store/queueStore';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { streamPrefetch } from '@/store/streamPrefetch';
 import { apiRequest } from '@/shared/services/api';
 import { trackToSoundCloud } from '@/shared/utils/trackToSoundCloud';
@@ -96,13 +96,8 @@ jest.mock('@/shared/services/api', () => {
 			this.status = status;
 		}
 	}
-	return { ApiError, apiRequest: jest.fn(), registerAuthSession: jest.fn() };
+	return { ApiError, apiRequest: jest.fn() };
 });
-
-jest.mock('@/services/oauth', () => ({
-	signInWithGoogle: jest.fn(),
-	signInWithFacebook: jest.fn(),
-}));
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')

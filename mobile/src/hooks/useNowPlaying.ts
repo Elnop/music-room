@@ -3,7 +3,7 @@ import { usePlayer } from '@/contexts/PlayerContext';
 import { usePlayerProgress } from './usePlayerProgress';
 import { usePlayerStore } from '@/store/playerStore';
 import { useConnectStore } from '@/store/connectStore';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { useSocketStore } from '@/shared/stores/socketStore';
 import { useActiveQueue, useQueueStore } from '@/store/queueStore';
 import {

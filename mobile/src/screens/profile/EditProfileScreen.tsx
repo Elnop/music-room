@@ -19,7 +19,7 @@ import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import type { UpdateProfileData } from '@/types/user.types';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { profileApi } from '@/services/profileApi';
 import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 import { Button } from '@/shared/components/ui/Button';

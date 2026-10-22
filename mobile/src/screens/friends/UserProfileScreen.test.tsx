@@ -15,7 +15,7 @@ jest.mock('@/contexts/PlayerContext', () => ({
 	usePlayerHeight: () => 0,
 }));
 
-jest.mock('@/store/authStore', () => ({
+jest.mock('@/features/auth/stores/authStore', () => ({
 	useAuthStore: () => ({ accessToken: 'token' }),
 }));
 

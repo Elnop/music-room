@@ -37,7 +37,7 @@ npm install
 
 `make dev-docker` et `make dev-local` imposent `EXPO_PUBLIC_API_URL=http://<IP locale>:3000` et `EXPO_PUBLIC_WS_URL=ws://<IP locale>:3000` (variables `DEV_API_URL` et `DEV_WS_URL` de `make/config.mk`), quelle que soit la valeur dans `.env`. `make dev-tunnel` utilise l'URL du tunnel ngrok. Les valeurs de `.env` ne servent que pour un `npx expo start` lancé à la main.
 
-L'app ne parle jamais à Supabase : connexion, inscription, vérification d'e-mail, réinitialisation du mot de passe, rafraîchissement et déconnexion passent par l'API du backend (`src/shared/services/api.ts`), qui les journalise. La session (tokens du backend) vit dans `src/store/authStore.ts`, persistée dans AsyncStorage ; elle est rafraîchie par `/api/auth/refresh` (avant une requête si le token expire bientôt, au démarrage, et après un 401), et un refresh refusé (401) ramène à l'écran de connexion en vidant le stockage.
+L'app ne parle jamais à Supabase : connexion, inscription, vérification d'e-mail, réinitialisation du mot de passe, rafraîchissement et déconnexion passent par l'API du backend (appels de `src/features/auth/services/`, via le client `src/shared/services/api.ts`), qui les journalise. La session (tokens du backend) vit dans `src/features/auth/stores/authStore.ts`, persistée dans AsyncStorage par `features/auth/services/sessionStorage.ts` ; elle est rafraîchie par `/api/auth/refresh` (avant une requête si le token expire bientôt, au démarrage, et après un 401), et un refresh refusé (401) ramène à l'écran de connexion en vidant le stockage.
 
 ```env
 # Backend API (ignoré par make dev-docker, dev-local et dev-tunnel)
@@ -147,32 +147,40 @@ mobile/src/
 │   │   ├── media/          # Artwork, Avatar
 │   │   ├── sharing/        # ShareLinkButton
 │   │   └── theme/          # ThemeSelector, ThemedSystemUI
-│   ├── services/           # api.ts (client HTTP), backendUrl, lastTrackStorage
+│   ├── services/           # api.ts (client HTTP), authSession (contrat de session), backendUrl, lastTrackStorage
 │   ├── query/              # TanStack Query : queryClient (profils STALE), keys (fabrique de clés), socketCache
 │   ├── stores/             # socketStore (connexion Socket.io)
 │   ├── hooks/              # useConnectionStatus
 │   ├── theme/              # ThemeContext, thèmes (original, royalBlue, pastelLime, christmas), tokens
 │   ├── constants/app.ts    # Config API, espacements
-│   └── utils/              # logger, validators (Zod), toast, haptics, apiErrorMessage, debounce...
+│   └── utils/              # logger, validators (Zod, playlists), toast, haptics, apiErrorMessage, debounce...
 ├── providers/              # AppProviders : gestes, ErrorBoundary, QueryClient, thème, safe area
 ├── navigation/             # RootNavigator, AuthNavigator, AppNavigator (onglets) + stacks/
-├── features/               # (à venir, #378–#385) une feature par dossier
+├── features/               # Une feature par dossier (#378–#385)
+│   └── auth/               # Connexion, inscription, code e-mail, mot de passe oublié, comptes liés
+│       ├── <sujet>/        # welcome, login, register, emailVerification, forgotPassword, resetPassword,
+│       │                   # code, form, social : components/{orchestrators,presenters} + hooks/
+│       ├── hooks/          # Requêtes et mutations TanStack (comptes liés, connexion, mot de passe)
+│       ├── services/       # authApi, passwordApi, providersApi, signIn, googleSignIn, facebookSignIn, sessionStorage
+│       ├── stores/         # authStore (session) et ses actions
+│       ├── utils/          # codeDigits, passwordRules
+│       └── types.ts · validators.ts
 │
 │   Dossiers historiques, vidés par les stories de migration :
-├── screens/                # Écrans par feature (auth, playlists, friends, profile, search, settings)
+├── screens/                # Écrans par feature (playlists, friends, profile, search, settings)
 ├── components/             # Composants par feature (playlist, player, profile, music-control, track)
-├── store/                  # Stores Zustand des features (auth, playlist, player, queue, connect...)
+├── store/                  # Stores Zustand des features (playlist, player, queue, connect...)
 ├── contexts/               # PlayerContext
 ├── hooks/                  # useMusicControl, usePlaylistSocket, usePlayerProgress, useImageColors...
-├── api/ · services/        # Clients HTTP des features (playlistApi, profileApi, friendsApi...), oauth, deviceService
-├── utils/                  # Utilitaires d'une seule feature (playlistPermissions, remotePosition, codeDigits, avatarImage)
+├── api/ · services/        # Clients HTTP des features (playlistApi, profileApi, friendsApi...), deviceService
+├── utils/                  # Utilitaires d'une seule feature (playlistPermissions, remotePosition, avatarImage)
 └── types/                  # Types alignés sur les réponses du backend
 ```
 
 ## Navigation
 
-- **RootNavigator** bascule entre `AuthNavigator` et `AppNavigator` selon l'état d'auth (persisté par `authStore`).
-- **AuthNavigator** : Welcome, Login, Register, EmailVerification, ForgotPassword, ResetPassword.
+- **RootNavigator** bascule entre `AuthNavigator` et `AppNavigator` selon l'état d'auth (persisté par `features/auth/stores/authStore.ts`).
+- **AuthNavigator** : Welcome, Login, Register, EmailVerification, ForgotPassword, ResetPassword ; chaque écran est l'orchestrator de `features/auth/<sujet>/`.
 - **AppNavigator** (onglets) :
   - Playlists → Playlists, PlaylistDetail, CreatePlaylist, SearchTracks, PlaylistSharing
   - Search → Search
@@ -183,9 +191,10 @@ mobile/src/
 
 - **Appels HTTP** : toujours via `shared/services/api.ts`, qui ajoute le token et les headers `X-Platform`, `X-Device-Model`, `X-App-Version` logués par le backend.
 - **Données serveur** : TanStack Query (`AppProviders` fournit le client). Une clé de requête se construit avec `queryKeys` (`shared/query/keys.ts`), la fraîcheur se choisit parmi les profils `STALE` (`shared/query/queryClient.ts`), et un événement Socket.io met le cache à jour (`setQueryData`) ou l'invalide via `useSocketCache` (`shared/query/socketCache.ts`). Zustand ne garde que l'état client. Règles : `.agents/rules/state.md`.
+- **Session et couche partagée** : `shared/` n'importe pas l'auth ; le store de session s'enregistre dans `shared/services/authSession.ts` (token, refresh) et y annonce chaque fin de session (`onSessionEnd`), sur laquelle le socket se ferme et le lecteur se vide.
 - **Temps réel** : `shared/stores/socketStore.ts` gère la connexion Socket.io ; `usePlaylistSocket` rejoint la room d'une playlist et réagit à `playlist:updated` ; `useMusicControl` gère l'écoute des amis et les commandes de contrôle délégué.
 - **Lecture audio** : expo-audio lit le stream HLS SoundCloud ; `PlayerContext` gère le cycle de vie du lecteur, `playerStore` l'état (track courante, play/pause, modal), `MiniPlayer` et `PlayerModal` l'affichage.
-- **OAuth** : `services/oauth.ts` (Google Sign-In, Facebook SDK). Le token obtenu est vérifié par le backend (`/api/auth/google`, `/api/auth/facebook`). Modules natifs : comme le reste de l'app, il faut le build de debug, pas Expo Go.
+- **OAuth** : `features/auth/services/googleSignIn.ts` et `facebookSignIn.ts` (Google Sign-In, Facebook SDK). Le token obtenu est vérifié par le backend (`/api/auth/google`, `/api/auth/facebook`). Modules natifs : comme le reste de l'app, il faut le build de debug, pas Expo Go.
 - **Signature Android** : `plugins/withDebugKeystore.js` remplace pendant `expo prebuild` le keystore de debug du template Expo (partagé par toutes les apps Expo) par `keystores/debug.keystore`. Son SHA-1 `5D:26:8F:52:F7:A8:2D:71:3A:D9:68:BF:60:6A:79:BB:85:AA:71:C0` est celui à enregistrer, avec le package `com.zumik.app`, dans le client OAuth Android du projet Google Cloud qui contient `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`. Sinon Google Sign-In renvoie `DEVELOPER_ERROR`.
 
 ## Développement
@@ -213,7 +222,7 @@ Expo supporte le Hot Reload : modifiez n'importe quel fichier et l'app se met à
 Les types, validateurs et versions sont alignés avec le backend :
 
 - **Types TypeScript** (`src/types/`) correspondent aux schémas backend
-- **Validateurs Zod** (`src/shared/utils/validators.ts`) utilisent les mêmes règles
+- **Validateurs Zod** (`src/shared/utils/validators.ts`, `src/features/auth/validators.ts`) utilisent les mêmes règles
 - **Versions** : Socket.io, Zod identiques au backend
 
 ## Tests

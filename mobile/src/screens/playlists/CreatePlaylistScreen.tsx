@@ -8,7 +8,7 @@ import type { RouteProp } from '@react-navigation/native';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { usePlaylistStore } from '@/store/playlistStore';
 import { Button } from '@/shared/components/ui/Button';
 import { Input } from '@/shared/components/ui/Input';

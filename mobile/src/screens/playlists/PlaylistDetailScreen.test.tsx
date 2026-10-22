@@ -58,7 +58,7 @@ jest.mock('@/hooks/usePlaylistSocket', () => ({
 	usePlaylistSocket: () => ({ deleted: mockDeleted }),
 }));
 
-jest.mock('@/store/authStore', () => ({
+jest.mock('@/features/auth/stores/authStore', () => ({
 	useAuthStore: () => ({ user: { id: 'me' } }),
 }));
 

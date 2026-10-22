@@ -1,6 +1,6 @@
 import { queueApi } from '@/services/queueApi';
 import { deviceService } from '@/services/deviceService';
-import { useAuthStore } from './authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { useConnectStore } from './connectStore';
 import { readPositionMs, usePlayerStore } from './playerStore';
 import { useQueueStore } from './queueStore';

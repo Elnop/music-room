@@ -8,7 +8,7 @@ import { usePlayerHeight } from '@/contexts/PlayerContext';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import type { UserDeviceWithLicenses } from '@/types/device.types';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { musicControlApi } from '@/services/musicControlApi';
 import { friendsApi, type FriendProfile } from '@/services/friendsApi';
 import { deviceService } from '@/services/deviceService';

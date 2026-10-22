@@ -10,7 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
 import type { Theme } from '@/shared/theme/types';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { profileApi } from '@/services/profileApi';
 import { friendsApi, FriendProfile } from '@/services/friendsApi';
 import { musicControlApi } from '@/services/musicControlApi';

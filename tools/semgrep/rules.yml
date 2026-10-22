@@ -69,18 +69,29 @@ rules:
     pattern-either:
       - pattern: import $X from '@react-native-async-storage/async-storage'
       - pattern: import { $...X } from '@react-native-async-storage/async-storage'
+    # Part of the rule's definition, not an exception: a storage module is
+    # named <thing>Storage.ts, and AsyncStorage belongs there. Semgrep reads
+    # only `paths`, so each `allowed-paths` glob is repeated in `exclude`;
+    # check-exceptions.mjs does not count an exclude entry declared here, and
+    # only for a suffix glob `*<Suffix>.<ext>` (Suffix a capitalised word of
+    # 4+ letters). A new allowed-paths entry fails unless it is recorded for
+    # this rule under `allowedPaths` in tools/guardrails/new-rule-baselines.json;
+    # it changes the rule and takes a dedicated ticket
+    # (guardrails.md#append-only-rules).
+    metadata:
+      allowed-paths:
+        - "*Storage.ts"
     paths:
       include:
         - /mobile/src/
         - /mobile/App.tsx
       exclude:
-        # Storage modules: AsyncStorage belongs here.
-        - /mobile/src/shared/services/lastTrackStorage.ts
+        - "*Storage.ts"
+        # A storage module named before the convention.
         - /mobile/src/shared/services/backendUrl.ts
         - "*.test.ts"
         - "*.test.tsx"
         # Known exceptions: remove each line once the file goes through a
         # storage module. This list only shrinks.
-        - /mobile/src/store/authStore.ts
         - /mobile/src/shared/theme/ThemeContext.tsx
         - /mobile/src/services/deviceService.ts

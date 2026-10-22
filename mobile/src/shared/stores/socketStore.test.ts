@@ -2,6 +2,12 @@ import { io } from 'socket.io-client';
 import { DEVICE_RETRY_DELAY_MS, DEVICE_RETRY_MAX, useSocketStore } from './socketStore';
 import { DEFAULT_BACKEND_URL, resetBackendUrl, setBackendUrl } from '@/shared/services/backendUrl';
 import { logger } from '@/shared/utils/logger';
+import { createStore } from 'zustand';
+import {
+	notifySessionEnd,
+	registerAuthSession,
+	type SessionView,
+} from '@/shared/services/authSession';
 
 type Handler = (...args: unknown[]) => void;
 
@@ -74,9 +80,16 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/store/authStore', () => ({
-	useAuthStore: { getState: () => mockAuthState, subscribe: jest.fn() },
-}));
+// The session the auth store registers in the app (shared/services/authSession.ts).
+registerAuthSession({
+	// Reads the token at each call, like the auth store.
+	store: {
+		...createStore<SessionView>(() => ({ user: null, accessToken: null, isAuthenticated: true })),
+		getState: () => ({ user: null, accessToken: mockAuthState.accessToken, isAuthenticated: true }),
+	},
+	isTokenExpiringSoon: () => false,
+	refreshAccessToken: () => mockAuthState.refreshAccessToken(),
+});
 
 jest.mock('@/services/deviceService', () => ({
 	deviceService: { getDeviceInfo: jest.fn(() => Promise.resolve(mockDevice)) },
@@ -388,5 +401,14 @@ describe('socketStore retry', () => {
 
 		expect(ioMock).toHaveBeenCalledTimes(1);
 		expect(useSocketStore.getState().status).toBe('connected');
+	});
+});
+
+describe('end of session', () => {
+	it('closes the socket when the session ends', () => {
+		notifySessionEnd();
+
+		expect(socket.disconnect).toHaveBeenCalled();
+		expect(useSocketStore.getState()).toMatchObject({ socket: null, status: 'idle' });
 	});
 });

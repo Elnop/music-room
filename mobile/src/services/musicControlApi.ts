@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { apiRequest } from '@/shared/services/api';
 import type {
 	ControllableDevicesResponse,

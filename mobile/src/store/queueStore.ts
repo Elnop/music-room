@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { ApiError } from '@/shared/services/api';
 import { queueApi, type QueueCallTarget } from '@/services/queueApi';
 import { usePlayerStore } from './playerStore';
-import { useAuthStore } from './authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { useConnectStore, useActiveOwnerId } from './connectStore';
 import { trackToSoundCloud } from '@/shared/utils/trackToSoundCloud';
 import { toTrackInput } from '@/shared/utils/trackInput';

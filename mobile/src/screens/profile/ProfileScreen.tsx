@@ -15,7 +15,7 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
 import type { Theme } from '@/shared/theme/types';
 import type { MusicGenre, MusicPreferences } from '@/types/user.types';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { privacyApi } from '@/services/privacyApi';
 import { friendsApi, type MyStats } from '@/services/friendsApi';
 import { Ionicons } from '@expo/vector-icons';

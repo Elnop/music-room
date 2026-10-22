@@ -1,22 +1,14 @@
 import React from 'react';
 import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { WelcomeScreen } from '@/screens/auth/WelcomeScreen';
-import { LoginScreen } from '@/screens/auth/LoginScreen';
-import { RegisterScreen } from '@/screens/auth/RegisterScreen';
-import { EmailVerificationScreen } from '@/screens/auth/EmailVerificationScreen';
-import { ForgotPasswordScreen } from '@/screens/auth/ForgotPasswordScreen';
-import { ResetPasswordScreen } from '@/screens/auth/ResetPasswordScreen';
+import type { AuthStackParamList } from '@/features/auth/types';
+import { WelcomeOrchestrator } from '@/features/auth/welcome/components/orchestrators/WelcomeOrchestrator';
+import { LoginOrchestrator } from '@/features/auth/login/components/orchestrators/LoginOrchestrator';
+import { RegisterOrchestrator } from '@/features/auth/register/components/orchestrators/RegisterOrchestrator';
+import { EmailVerificationOrchestrator } from '@/features/auth/emailVerification/components/orchestrators/EmailVerificationOrchestrator';
+import { ForgotPasswordOrchestrator } from '@/features/auth/forgotPassword/components/orchestrators/ForgotPasswordOrchestrator';
+import { ResetPasswordOrchestrator } from '@/features/auth/resetPassword/components/orchestrators/ResetPasswordOrchestrator';
 import { useTheme } from '@/shared/theme/ThemeContext';
-
-export type AuthStackParamList = {
-	Welcome: undefined;
-	Login: undefined;
-	Register: undefined;
-	EmailVerification: { userId: string; email: string };
-	ForgotPassword: { email?: string } | undefined;
-	ResetPassword: { email: string };
-};
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 
@@ -41,22 +33,26 @@ export function AuthNavigator() {
 				headerTitle: '',
 			}}
 		>
-			<Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
-			<Stack.Screen name="Login" component={LoginScreen} />
-			<Stack.Screen name="Register" component={RegisterScreen} />
+			<Stack.Screen
+				name="Welcome"
+				component={WelcomeOrchestrator}
+				options={{ headerShown: false }}
+			/>
+			<Stack.Screen name="Login" component={LoginOrchestrator} />
+			<Stack.Screen name="Register" component={RegisterOrchestrator} />
 			<Stack.Screen
 				name="EmailVerification"
-				component={EmailVerificationScreen}
+				component={EmailVerificationOrchestrator}
 				options={{ title: "Vérification de l'email" }}
 			/>
 			<Stack.Screen
 				name="ForgotPassword"
-				component={ForgotPasswordScreen}
+				component={ForgotPasswordOrchestrator}
 				options={{ title: 'Mot de passe oublié' }}
 			/>
 			<Stack.Screen
 				name="ResetPassword"
-				component={ResetPasswordScreen}
+				component={ResetPasswordOrchestrator}
 				options={{ title: 'Nouveau mot de passe' }}
 			/>
 		</Stack.Navigator>

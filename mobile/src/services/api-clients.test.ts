@@ -3,7 +3,8 @@ import { profileApi } from './profileApi';
 import { privacyApi } from './privacyApi';
 import { musicControlApi } from './musicControlApi';
 import { resetBackendUrl } from '@/shared/services/backendUrl';
-import { registerAuthSession } from '@/shared/services/api';
+import { createStore } from 'zustand';
+import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
 
 // Every API module goes through apiRequest, so the backend gets the client
 // headers it logs (subject IV.6), a token, and the refresh on 401 (#174).
@@ -16,7 +17,7 @@ jest.mock('./deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 
-jest.mock('@/store/authStore', () => ({
+jest.mock('@/features/auth/stores/authStore', () => ({
 	useAuthStore: { getState: () => ({ accessToken: 'store-token' }) },
 }));
 
@@ -86,7 +87,14 @@ describe('with a signed-in session', () => {
 		sessionToken = 'session-token';
 		refreshAccessToken.mockClear();
 		registerAuthSession({
-			getAccessToken: () => sessionToken,
+			store: {
+				...createStore<SessionView>(() => ({
+					user: null,
+					accessToken: null,
+					isAuthenticated: true,
+				})),
+				getState: () => ({ user: null, accessToken: sessionToken, isAuthenticated: true }),
+			},
 			isTokenExpiringSoon: () => false,
 			refreshAccessToken,
 		});

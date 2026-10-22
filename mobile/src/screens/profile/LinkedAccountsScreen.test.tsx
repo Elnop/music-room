@@ -1,12 +1,16 @@
 import React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
-import { useAuthStore } from '@/store/authStore';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createQueryClient } from '@/shared/query/queryClient';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { resetBackendUrl } from '@/shared/services/backendUrl';
-import { signInWithGoogle, signInWithFacebook } from '@/services/oauth';
+import { signInWithGoogle } from '@/features/auth/services/googleSignIn';
+import { signInWithFacebook } from '@/features/auth/services/facebookSignIn';
 import { showError, showSuccess } from '@/shared/utils/toast';
 import { LinkedAccountsScreen } from './LinkedAccountsScreen';
 import { logger } from '@/shared/utils/logger';
+import type { UserProfile } from '@/types/user.types';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -16,10 +20,8 @@ jest.mock('@/contexts/PlayerContext', () => ({
 	usePlayerHeight: () => 0,
 }));
 
-jest.mock('@/services/oauth', () => ({
-	signInWithGoogle: jest.fn(),
-	signInWithFacebook: jest.fn(),
-}));
+jest.mock('@/features/auth/services/googleSignIn', () => ({ signInWithGoogle: jest.fn() }));
+jest.mock('@/features/auth/services/facebookSignIn', () => ({ signInWithFacebook: jest.fn() }));
 
 jest.mock('@/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
@@ -76,8 +78,23 @@ const FIRST_RENDER = { timeout: 15_000 };
 // Above FIRST_RENDER: the whole test must outlive a slow first render.
 jest.setTimeout(20_000);
 
+let queryClient: QueryClient;
+
+/**
+ * Renders with the app's own client defaults (createQueryClient). Pass the
+ * client of an earlier render to revisit the screen with its cache.
+ */
+function renderScreen(client: QueryClient = createQueryClient()) {
+	queryClient = client;
+	return render(
+		<QueryClientProvider client={client}>
+			<LinkedAccountsScreen />
+		</QueryClientProvider>
+	);
+}
+
 async function renderLoaded(): Promise<void> {
-	render(<LinkedAccountsScreen />);
+	renderScreen();
 	await screen.findByTestId('linked-account-password', {}, FIRST_RENDER);
 }
 
@@ -93,17 +110,18 @@ beforeEach(async () => {
 	await AsyncStorage.clear();
 	await resetBackendUrl();
 	useAuthStore.setState({
+		user: { id: 'me' } as UserProfile,
 		accessToken: 'access',
 		refreshToken: 'refresh',
 		tokenExpiresAt: Date.now() + 3600_000,
 		isAuthenticated: true,
 		isRefreshing: false,
 		isLoading: false,
-		linkedProviders: null,
 	});
 });
 
 afterEach(() => {
+	queryClient?.clear();
 	jest.restoreAllMocks();
 });
 
@@ -124,7 +142,7 @@ describe('LinkedAccountsScreen', () => {
 	it('shows an error toast and no rows when loading fails', async () => {
 		fetchMock.mockResolvedValueOnce(fail(500, 'INTERNAL_ERROR', 'Server exploded'));
 
-		render(<LinkedAccountsScreen />);
+		renderScreen();
 
 		await screen.findByText('Impossible de charger les comptes liés', {}, FIRST_RENDER);
 		expect(showError).toHaveBeenCalledWith(
@@ -180,7 +198,6 @@ describe('LinkedAccountsScreen', () => {
 		expect(fetchMock).toHaveBeenCalledTimes(1);
 		expect(showError).not.toHaveBeenCalled();
 		expect(showSuccess).not.toHaveBeenCalled();
-		expect(useAuthStore.getState().error).toBeNull();
 	});
 
 	it.each([
@@ -251,5 +268,68 @@ describe('LinkedAccountsScreen', () => {
 		finishSignIn('google-id-token');
 		await screen.findByLabelText('Délier Google');
 		expect(screen.getByLabelText('Lier Facebook')).toBeEnabled();
+	});
+
+	it('refetches on every visit, showing the cached list meanwhile', async () => {
+		fetchMock
+			.mockResolvedValueOnce(ok({ providers: [password] }))
+			.mockResolvedValueOnce(ok({ providers: [password, google] }));
+		const first = renderScreen();
+		await screen.findByTestId('linked-account-password', {}, FIRST_RENDER);
+		first.unmount();
+
+		renderScreen(queryClient);
+
+		expect(screen.getByLabelText('Lier Google')).toBeTruthy();
+		await screen.findByLabelText('Délier Google');
+		expect(fetchMock).toHaveBeenCalledTimes(2);
+	});
+
+	it('shows one toast per failed fetch, without retry, and never replays it', async () => {
+		fetchMock
+			.mockResolvedValueOnce(fail(500, 'INTERNAL_ERROR', 'Server exploded'))
+			.mockResolvedValueOnce(ok({ providers: [password] }));
+		const first = renderScreen();
+		await screen.findByText('Impossible de charger les comptes liés', {}, FIRST_RENDER);
+		expect(fetchMock).toHaveBeenCalledTimes(1);
+		expect(showError).toHaveBeenCalledTimes(1);
+		first.unmount();
+
+		renderScreen(queryClient);
+
+		await screen.findByTestId('linked-account-password');
+		expect(showError).toHaveBeenCalledTimes(1);
+	});
+
+	it('keeps the list when a refetch fails on a revisit', async () => {
+		fetchMock
+			.mockResolvedValueOnce(ok({ providers: [password, google] }))
+			.mockResolvedValueOnce(fail(500, 'INTERNAL_ERROR', 'Server exploded'));
+		const first = renderScreen();
+		await screen.findByLabelText('Délier Google', {}, FIRST_RENDER);
+		first.unmount();
+
+		renderScreen(queryClient);
+
+		await waitFor(() => expect(showError).toHaveBeenCalledTimes(1));
+		expect(screen.getByLabelText('Délier Google')).toBeTruthy();
+	});
+
+	it('reports the unlink as failed when the refetch after it fails', async () => {
+		fetchMock
+			.mockResolvedValueOnce(ok({ providers: [password, google] }))
+			.mockResolvedValueOnce(ok({ message: 'google unlinked successfully' }))
+			.mockRejectedValueOnce(new TypeError('Network request failed'));
+
+		await renderLoaded();
+		fireEvent.press(screen.getByLabelText('Délier Google'));
+
+		await waitFor(() =>
+			expect(showError).toHaveBeenCalledWith(
+				'Impossible de joindre le serveur. Vérifiez votre connexion.'
+			)
+		);
+		expect(showSuccess).not.toHaveBeenCalled();
+		expect(fetchMock).toHaveBeenCalledTimes(3);
 	});
 });
