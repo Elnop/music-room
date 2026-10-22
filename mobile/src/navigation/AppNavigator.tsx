@@ -15,10 +15,9 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 
 // Import feature stacks
-import {
-	PlaylistsNavigator,
-	type PlaylistStackParamList,
-} from '@/navigation/stacks/PlaylistsStack';
+import { PlaylistsNavigator } from '@/navigation/stacks/PlaylistsStack';
+import type { PlaylistStackParamList } from '@/features/playlists/types';
+import { registerPlayback } from '@/navigation/playbackBridge';
 import { ProfileNavigator } from '@/navigation/stacks/ProfileStack';
 import { SearchNavigator } from '@/navigation/stacks/SearchStack';
 import { FriendsNavigator, type FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
@@ -43,10 +42,12 @@ export type AppTabsParamList = {
 };
 
 // Re-export stack param lists for type safety
-export type { PlaylistStackParamList } from '@/navigation/stacks/PlaylistsStack';
 export type { FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
 
 const Tab = createBottomTabNavigator<AppTabsParamList>();
+
+// Before any screen renders: the playlists feature plays through it.
+registerPlayback();
 
 // Icon mapping for tabs
 const TAB_ICONS: Record<

@@ -68,8 +68,8 @@ jest.mock('@/services/friendsApi', () => ({
 	},
 }));
 
-jest.mock('@/api/playlistApi', () => ({
-	playlistApi: { fetchUserPublicPlaylists: jest.fn(() => Promise.resolve([])) },
+jest.mock('@/features/playlists/services/playlistApi', () => ({
+	fetchUserPublicPlaylists: jest.fn(() => Promise.resolve([])),
 }));
 
 type Props = React.ComponentProps<typeof UserProfileScreen>;

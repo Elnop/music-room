@@ -12,8 +12,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { FriendsScreen } from '@/screens/friends/FriendsScreen';
 import { UserProfileScreen } from '@/screens/friends/UserProfileScreen';
-import { PlaylistDetailScreen } from '@/screens/playlists/PlaylistDetailScreen';
-import { SearchTracksScreen } from '@/screens/playlists/SearchTracksScreen';
+import { PlaylistDetailOrchestrator } from '@/features/playlists/detail/components/orchestrators/PlaylistDetailOrchestrator';
+import { SearchTracksOrchestrator } from '@/features/playlists/searchTracks/components/orchestrators/SearchTracksOrchestrator';
 
 export type FriendsStackParamList = {
 	Friends: undefined;
@@ -51,12 +51,12 @@ export function FriendsNavigator() {
 			/>
 			<FriendsStack.Screen
 				name="PlaylistDetail"
-				component={PlaylistDetailScreen}
+				component={PlaylistDetailOrchestrator}
 				options={{ headerShown: false }}
 			/>
 			<FriendsStack.Screen
 				name="SearchTracks"
-				component={SearchTracksScreen}
+				component={SearchTracksOrchestrator}
 				options={{ title: 'Ajouter des musiques' }}
 			/>
 		</FriendsStack.Navigator>

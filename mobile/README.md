@@ -147,33 +147,41 @@ mobile/src/
 │   │   ├── media/          # Artwork, Avatar
 │   │   ├── sharing/        # ShareLinkButton
 │   │   └── theme/          # ThemeSelector, ThemedSystemUI
-│   ├── services/           # api.ts (client HTTP), authSession (contrat de session), backendUrl, lastTrackStorage
+│   ├── services/           # api.ts (client HTTP), authSession (contrat de session), playbackBridge
+│   │                       # (contrat de lecture), backendUrl, lastTrackStorage
 │   ├── query/              # TanStack Query : queryClient (profils STALE), keys (fabrique de clés), socketCache
 │   ├── stores/             # socketStore (connexion Socket.io)
-│   ├── hooks/              # useConnectionStatus
+│   ├── hooks/              # useConnectionStatus, useImageColors
 │   ├── theme/              # ThemeContext, thèmes (original, royalBlue, pastelLime, christmas), tokens
 │   ├── constants/app.ts    # Config API, espacements
-│   └── utils/              # logger, validators (Zod, playlists), toast, haptics, apiErrorMessage, debounce...
+│   └── utils/              # logger, toast, haptics, apiErrorMessage, debounce, moveTarget, shareLinks...
 ├── providers/              # AppProviders : gestes, ErrorBoundary, QueryClient, thème, safe area
 ├── navigation/             # RootNavigator, AuthNavigator, AppNavigator (onglets) + stacks/
 ├── features/               # Une feature par dossier (#378–#385)
-│   └── auth/               # Connexion, inscription, code e-mail, mot de passe oublié, comptes liés
-│       ├── <sujet>/        # welcome, login, register, emailVerification, forgotPassword, resetPassword,
-│       │                   # code, form, social : components/{orchestrators,presenters} + hooks/
-│       ├── hooks/          # Requêtes et mutations TanStack (comptes liés, connexion, mot de passe)
-│       ├── services/       # authApi, passwordApi, providersApi, signIn, googleSignIn, facebookSignIn, sessionStorage
-│       ├── stores/         # authStore (session) et ses actions
-│       ├── utils/          # codeDigits, passwordRules
+│   ├── auth/               # Connexion, inscription, code e-mail, mot de passe oublié, comptes liés
+│   │   ├── <sujet>/        # welcome, login, register, emailVerification, forgotPassword, resetPassword,
+│   │   │                   # code, form, social : components/{orchestrators,presenters} + hooks/
+│   │   ├── hooks/          # Requêtes et mutations TanStack (comptes liés, connexion, mot de passe)
+│   │   ├── services/       # authApi, passwordApi, providersApi, signIn, googleSignIn, facebookSignIn, sessionStorage
+│   │   ├── stores/         # authStore (session) et ses actions
+│   │   ├── utils/          # codeDigits, passwordRules
+│   │   └── types.ts · validators.ts
+│   └── playlists/          # Listes, détail, création/édition, ajout de titres, visibilité et droits
+│       ├── <sujet>/        # list, detail, form, searchTracks, sharing, trackActions, actionSheet, header
+│       ├── hooks/          # Requêtes et mutations TanStack, room Socket.io (usePlaylistRoom)
+│       ├── services/       # playlistApi, tracksApi, membersApi, usersApi, trackSearchApi
+│       ├── stores/         # pendingMovesStore (déplacements en cours)
+│       ├── utils/          # Cache (playlistCache, trackEdits, trackMoves), playlistSync, règles socket, droits
 │       └── types.ts · validators.ts
 │
 │   Dossiers historiques, vidés par les stories de migration :
-├── screens/                # Écrans par feature (playlists, friends, profile, search, settings)
-├── components/             # Composants par feature (playlist, player, profile, music-control, track)
-├── store/                  # Stores Zustand des features (playlist, player, queue, connect...)
+├── screens/                # Écrans par feature (friends, profile, search, settings)
+├── components/             # Composants par feature (player, profile, music-control)
+├── store/                  # Stores Zustand des features (player, queue, connect...)
 ├── contexts/               # PlayerContext
-├── hooks/                  # useMusicControl, usePlaylistSocket, usePlayerProgress, useImageColors...
-├── api/ · services/        # Clients HTTP des features (playlistApi, profileApi, friendsApi...), deviceService
-├── utils/                  # Utilitaires d'une seule feature (playlistPermissions, remotePosition, avatarImage)
+├── hooks/                  # useMusicControl, usePlayerProgress, useNowPlaying...
+├── services/               # Clients HTTP des features (profileApi, friendsApi...), deviceService
+├── utils/                  # Utilitaires d'une seule feature (remotePosition, avatarImage)
 └── types/                  # Types alignés sur les réponses du backend
 ```
 
@@ -182,7 +190,7 @@ mobile/src/
 - **RootNavigator** bascule entre `AuthNavigator` et `AppNavigator` selon l'état d'auth (persisté par `features/auth/stores/authStore.ts`).
 - **AuthNavigator** : Welcome, Login, Register, EmailVerification, ForgotPassword, ResetPassword ; chaque écran est l'orchestrator de `features/auth/<sujet>/`.
 - **AppNavigator** (onglets) :
-  - Playlists → Playlists, PlaylistDetail, CreatePlaylist, SearchTracks, PlaylistSharing
+  - Playlists → Playlists, PlaylistDetail, CreatePlaylist, SearchTracks, PlaylistSharing (les orchestrators de `features/playlists/<sujet>/`)
   - Search → Search
   - Friends → Friends, UserProfile, PlaylistDetail, SearchTracks
   - Profile → Profile, EditProfile, PrivacySettings, MusicPreferences, Settings
@@ -192,7 +200,8 @@ mobile/src/
 - **Appels HTTP** : toujours via `shared/services/api.ts`, qui ajoute le token et les headers `X-Platform`, `X-Device-Model`, `X-App-Version` logués par le backend.
 - **Données serveur** : TanStack Query (`AppProviders` fournit le client). Une clé de requête se construit avec `queryKeys` (`shared/query/keys.ts`), la fraîcheur se choisit parmi les profils `STALE` (`shared/query/queryClient.ts`), et un événement Socket.io met le cache à jour (`setQueryData`) ou l'invalide via `useSocketCache` (`shared/query/socketCache.ts`). Zustand ne garde que l'état client. Règles : `.agents/rules/state.md`.
 - **Session et couche partagée** : `shared/` n'importe pas l'auth ; le store de session s'enregistre dans `shared/services/authSession.ts` (token, refresh) et y annonce chaque fin de session (`onSessionEnd`), sur laquelle le socket se ferme et le lecteur se vide.
-- **Temps réel** : `shared/stores/socketStore.ts` gère la connexion Socket.io ; `usePlaylistSocket` rejoint la room d'une playlist et réagit à `playlist:updated` ; `useMusicControl` gère l'écoute des amis et les commandes de contrôle délégué.
+- **Temps réel** : `shared/stores/socketStore.ts` gère la connexion Socket.io ; `features/playlists/hooks/usePlaylistRoom.ts` rejoint la room d'une playlist, dont les événements mettent le cache à jour (`utils/playlistSocketRules.ts`) ; `useMusicControl` gère l'écoute des amis et les commandes de contrôle délégué.
+- **Contrat de lecture** : les playlists lancent et affichent la lecture via `shared/services/playbackBridge.ts`, que `navigation/playbackBridge.ts` branche sur `playerStore` et `queueStore` au chargement d'`AppNavigator` ; aucune feature n'importe le lecteur ni la file.
 - **Lecture audio** : expo-audio lit le stream HLS SoundCloud ; `PlayerContext` gère le cycle de vie du lecteur, `playerStore` l'état (track courante, play/pause, modal), `MiniPlayer` et `PlayerModal` l'affichage.
 - **OAuth** : `features/auth/services/googleSignIn.ts` et `facebookSignIn.ts` (Google Sign-In, Facebook SDK). Le token obtenu est vérifié par le backend (`/api/auth/google`, `/api/auth/facebook`). Modules natifs : comme le reste de l'app, il faut le build de debug, pas Expo Go.
 - **Signature Android** : `plugins/withDebugKeystore.js` remplace pendant `expo prebuild` le keystore de debug du template Expo (partagé par toutes les apps Expo) par `keystores/debug.keystore`. Son SHA-1 `5D:26:8F:52:F7:A8:2D:71:3A:D9:68:BF:60:6A:79:BB:85:AA:71:C0` est celui à enregistrer, avec le package `com.zumik.app`, dans le client OAuth Android du projet Google Cloud qui contient `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`. Sinon Google Sign-In renvoie `DEVELOPER_ERROR`.
@@ -221,8 +230,8 @@ Expo supporte le Hot Reload : modifiez n'importe quel fichier et l'app se met à
 
 Les types, validateurs et versions sont alignés avec le backend :
 
-- **Types TypeScript** (`src/types/`) correspondent aux schémas backend
-- **Validateurs Zod** (`src/shared/utils/validators.ts`, `src/features/auth/validators.ts`) utilisent les mêmes règles
+- **Types TypeScript** (`src/types/`, `src/features/<feature>/types.ts`) correspondent aux schémas backend
+- **Validateurs Zod** (`src/features/playlists/validators.ts`, `src/features/auth/validators.ts`) utilisent les mêmes règles
 - **Versions** : Socket.io, Zod identiques au backend
 
 ## Tests

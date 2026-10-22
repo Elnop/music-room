@@ -19,7 +19,7 @@ import { usePlayerStore } from '@/store/playerStore';
 import { RESTART_THRESHOLD_S } from '@/store/queueSelectors';
 import { useNowPlaying } from '@/hooks/useNowPlaying';
 import { hapticTap } from '@/shared/utils/haptics';
-import { useImageColors, getAdaptiveColors } from '@/hooks/useImageColors';
+import { useImageColors, getAdaptiveColors } from '@/shared/hooks/useImageColors';
 import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
 import { QueueModal } from './QueueModal';
 import { DevicePickerSheet } from './DevicePickerSheet';

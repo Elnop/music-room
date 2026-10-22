@@ -1,3 +1,5 @@
+import type { AddQueueItemBody } from '@/shared/types/playback';
+
 /**
  * Play queue types, mirroring backend `features/queue/queue.types.ts` (#273).
  * One queue per user, shared by all of their devices.
@@ -36,21 +38,6 @@ export interface QueueState {
 	version: number;
 	currentItemId: string | null;
 	items: QueueItem[];
-}
-
-/**
- * Body of `POST /api/queue/items`: the backend `addQueueItemBodySchema`, i.e. a
- * playlist add's track without `previewUrl` (stream URLs are never stored),
- * plus `next` (#316) to place it right after the current item instead of last.
- */
-export interface AddQueueItemBody {
-	trackUri: string;
-	title: string;
-	artist: string;
-	album?: string;
-	albumArt?: string;
-	durationMs: number;
-	next?: boolean;
 }
 
 /** 409 codes of `POST /api/queue/next` and `/previous`. */

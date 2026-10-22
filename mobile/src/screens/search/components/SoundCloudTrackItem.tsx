@@ -3,9 +3,9 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { QueueSwipe } from '@/shared/components/lists/QueueSwipe';
 import { Artwork } from '@/shared/components/media/Artwork';
-import { PreviewBadge } from '@/components/track/PreviewBadge';
+import { PreviewBadge } from '@/shared/components/media/PreviewBadge';
 import { isPreviewOnly } from '@/shared/utils/soundcloudPreview';
-import { TrackActionsButton } from '@/components/track/TrackActionsButton';
+import { TrackActionsButton } from '@/shared/components/lists/TrackActionsButton';
 import type { Theme } from '@/shared/theme/types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 

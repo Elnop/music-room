@@ -1,12 +1,12 @@
 import { ApiError, apiRequest } from '@/shared/services/api';
 import type {
-	AddQueueItemBody,
 	QueueState,
 	QueueStepBoundary,
 	QueueStepResult,
 	TransferRequest,
 	TransferResult,
 } from '@/types/queue.types';
+import type { AddQueueItemBody } from '@/shared/types/playback';
 
 /**
  * Whose queue a call acts on and which device plays (#297). `ownerId` is

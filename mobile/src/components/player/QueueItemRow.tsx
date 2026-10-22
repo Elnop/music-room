@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, Pressable } from 'reac
 import { Swipeable } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
-import { TrackActionsButton } from '@/components/track/TrackActionsButton';
+import { TrackActionsButton } from '@/shared/components/lists/TrackActionsButton';
 import type { Theme } from '@/shared/theme/types';
 import type { QueueItem } from '@/types/queue.types';
 

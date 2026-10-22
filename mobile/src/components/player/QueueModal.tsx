@@ -7,13 +7,14 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import { AppToast } from '@/shared/components/feedback/AppToast';
 import type { Theme } from '@/shared/theme/types';
 import { useActiveQueue, useQueueStore } from '@/store/queueStore';
-import { afterItemIdForDrop } from '@/store/moveTarget';
+import { afterItemIdForDrop } from '@/shared/utils/moveTarget';
 import { ReorderableList } from '@/shared/components/lists/ReorderableList';
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { QueueItemRow } from './QueueItemRow';
-import { TrackActionsSheet } from '@/components/track/TrackActionsSheet';
+import { TrackActionsSheet } from '@/features/playlists/trackActions/components/orchestrators/TrackActionsSheet';
 import { toTrackInput } from '@/shared/utils/trackInput';
-import type { AddQueueItemBody, QueueItem } from '@/types/queue.types';
+import type { QueueItem } from '@/types/queue.types';
+import type { AddQueueItemBody } from '@/shared/types/playback';
 
 interface QueueModalProps {
 	visible: boolean;

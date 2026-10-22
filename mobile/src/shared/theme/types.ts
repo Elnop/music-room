@@ -45,6 +45,9 @@ export interface ThemeColors {
 	googleText: string;
 	facebook: string;
 	onFacebook: string;
+	onColor: string;
+	backdrop: string;
+	shadow: string;
 }
 
 export interface Theme {
