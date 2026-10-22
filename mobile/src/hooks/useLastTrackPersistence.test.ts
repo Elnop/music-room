@@ -5,19 +5,19 @@ import {
 	LAST_TRACK_PLAY_SAVE_DELAY_MS,
 	LAST_TRACK_SAVE_INTERVAL_MS,
 	useLastTrackPersistence,
-} from '@/hooks/useLastTrackPersistence';
-import { lastTrackStorage, type LastTrackEntry } from '@/services/lastTrackStorage';
+} from './useLastTrackPersistence';
+import { lastTrackStorage, type LastTrackEntry } from '@/shared/services/lastTrackStorage';
 import { usePlayerStore, setPositionReader } from '@/store/playerStore';
 import { useAuthStore } from '@/store/authStore';
 import { useConnectStore } from '@/store/connectStore';
-import { queueTrackToSoundCloud } from '@utils/trackToSoundCloud';
+import { queueTrackToSoundCloud } from '@/shared/utils/trackToSoundCloud';
 import type { UserProfile } from '@/types/user.types';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@services/oauth', () => ({
+jest.mock('@/services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
 	signInWithFacebook: jest.fn(),
 }));

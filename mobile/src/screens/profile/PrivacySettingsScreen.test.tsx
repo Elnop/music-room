@@ -1,12 +1,12 @@
 import React from 'react';
 import { Alert } from 'react-native';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import { PrivacySettingsScreen } from '@/screens/profile/PrivacySettingsScreen';
+import { PrivacySettingsScreen } from './PrivacySettingsScreen';
 import { privacyApi } from '@/services/privacyApi';
-import { showError } from '@utils/toast';
+import { showError } from '@/shared/utils/toast';
 
-jest.mock('@/contexts/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@themes/original.theme');
+jest.mock('@/shared/theme/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
@@ -18,11 +18,11 @@ jest.mock('@/store/authStore', () => ({
 	useAuthStore: () => ({ accessToken: 'token' }),
 }));
 
-jest.mock('@utils/apiErrorMessage', () => ({
+jest.mock('@/shared/utils/apiErrorMessage', () => ({
 	apiErrorMessage: (_error: unknown, fallback: string) => fallback,
 }));
 
-jest.mock('@utils/toast', () => ({
+jest.mock('@/shared/utils/toast', () => ({
 	showError: jest.fn(),
 }));
 

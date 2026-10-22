@@ -2,13 +2,13 @@ import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { UserProfile } from '@/types/user.types';
 import type { LinkedProvider, OAuthProvider } from '@/types/auth.types';
-import type { RegisterInput } from '@utils/validators';
-import { authApi, ApiError, registerAuthSession } from '@services/api';
-import { signInWithGoogle, signInWithFacebook } from '@services/oauth';
-import { lastTrackStorage } from '@services/lastTrackStorage';
-import { usePlayerStore } from '@/store/playerStore';
-import { apiErrorMessage } from '@/utils/apiErrorMessage';
-import { logger } from '@/utils/logger';
+import type { RegisterInput } from '@/shared/utils/validators';
+import { authApi, ApiError, registerAuthSession } from '@/shared/services/api';
+import { signInWithGoogle, signInWithFacebook } from '@/services/oauth';
+import { lastTrackStorage } from '@/shared/services/lastTrackStorage';
+import { usePlayerStore } from './playerStore';
+import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
+import { logger } from '@/shared/utils/logger';
 
 // AsyncStorage keys
 const STORAGE_KEYS = {

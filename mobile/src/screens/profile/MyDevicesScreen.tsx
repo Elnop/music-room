@@ -1,23 +1,23 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
-import { ThemedSwitch } from '@components/common/ThemedSwitch';
+import { ThemedSwitch } from '@/shared/components/ui/ThemedSwitch';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, type NavigationProp } from '@react-navigation/native';
 import type { AppTabsParamList } from '@/navigation/AppNavigator';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
-import { useTheme } from '@/contexts/ThemeContext';
-import type { Theme } from '@themes/types';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import type { Theme } from '@/shared/theme/types';
 import type { UserDeviceWithLicenses } from '@/types/device.types';
 import { useAuthStore } from '@/store/authStore';
 import { musicControlApi } from '@/services/musicControlApi';
 import { friendsApi, type FriendProfile } from '@/services/friendsApi';
 import { deviceService } from '@/services/deviceService';
-import { SkeletonBlock, SkeletonList } from '@components/common/Skeleton';
-import { Avatar } from '@components/common/Avatar';
-import { showError, showSuccess } from '@utils/toast';
-import { apiErrorMessage } from '@utils/apiErrorMessage';
-import { EmptyState } from '@components/common/EmptyState';
-import { RenameDeviceModal } from '@components/music-control/RenameDeviceModal';
+import { SkeletonBlock, SkeletonList } from '@/shared/components/ui/Skeleton';
+import { Avatar } from '@/shared/components/media/Avatar';
+import { showError, showSuccess } from '@/shared/utils/toast';
+import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
+import { EmptyState } from '@/shared/components/feedback/EmptyState';
+import { RenameDeviceModal } from '@/components/music-control/RenameDeviceModal';
 
 const LOAD_ERROR = 'Impossible de charger vos appareils';
 

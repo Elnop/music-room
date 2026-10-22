@@ -1,8 +1,8 @@
-import { useSoundCloudStore } from '@/store/soundcloudStore';
-import { apiRequest } from '@/services/api';
+import { useSoundCloudStore } from './soundcloudStore';
+import { apiRequest } from '@/shared/services/api';
 import type { SoundCloudSearchResult, SoundCloudTrack } from '@/types/soundcloud.types';
 
-jest.mock('@/services/api', () => ({ apiRequest: jest.fn() }));
+jest.mock('@/shared/services/api', () => ({ apiRequest: jest.fn() }));
 
 const request = apiRequest as jest.MockedFunction<typeof apiRequest>;
 

@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Pressable, Modal, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/contexts/ThemeContext';
-import type { Theme } from '@/themes/types';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import type { Theme } from '@/shared/theme/types';
 
 interface PlaylistActionsSheetProps {
 	visible: boolean;

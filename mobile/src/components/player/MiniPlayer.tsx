@@ -9,13 +9,13 @@ import Animated, {
 	useSharedValue,
 	withSpring,
 } from 'react-native-reanimated';
-import { useTheme } from '@/contexts/ThemeContext';
-import type { Theme } from '@themes/types';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import type { Theme } from '@/shared/theme/types';
 import { usePlayerStore } from '@/store/playerStore';
 import { useNowPlaying, type NowPlayingTrack } from '@/hooks/useNowPlaying';
 import { RESTART_THRESHOLD_S } from '@/store/queueSelectors';
-import { hapticTap } from '@utils/haptics';
-import { Artwork } from '@/components/common/Artwork';
+import { hapticTap } from '@/shared/utils/haptics';
+import { Artwork } from '@/shared/components/media/Artwork';
 
 /** Horizontal swipe distance that changes the track (#311). */
 const SWIPE_TRACK_THRESHOLD = 80;

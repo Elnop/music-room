@@ -1,19 +1,19 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { PlayPlaylistButton } from '@/components/playlist/PlayPlaylistButton';
+import { PlayPlaylistButton } from './PlayPlaylistButton';
 import { usePlayerStore } from '@/store/playerStore';
 import { useQueueStore } from '@/store/queueStore';
 import { useAuthStore } from '@/store/authStore';
 import type { QueueItem } from '@/types/queue.types';
 import type { UserProfile } from '@/types/user.types';
 
-jest.mock('@services/oauth', () => ({
+jest.mock('@/services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
 	signInWithFacebook: jest.fn(),
 }));
 
-jest.mock('@/contexts/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@themes/original.theme');
+jest.mock('@/shared/theme/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
@@ -25,7 +25,7 @@ jest.mock('@/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 
-jest.mock('@utils/toast', () => ({
+jest.mock('@/shared/utils/toast', () => ({
 	showSuccess: jest.fn(),
 	showError: jest.fn(),
 	showInfo: jest.fn(),

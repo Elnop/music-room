@@ -1,23 +1,23 @@
 import React from 'react';
 import { Share } from 'react-native';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import { TrackActionsSheet } from '@/components/track/TrackActionsSheet';
+import { TrackActionsSheet } from './TrackActionsSheet';
 import { useAuthStore } from '@/store/authStore';
 import { usePlaylistStore } from '@/store/playlistStore';
 import { useQueueStore } from '@/store/queueStore';
-import { ApiError } from '@/services/api';
-import { showError, showSuccess } from '@utils/toast';
+import { ApiError } from '@/shared/services/api';
+import { showError, showSuccess } from '@/shared/utils/toast';
 import type { Playlist } from '@/types/playlist.types';
 import type { UserProfile } from '@/types/user.types';
-import { logger } from '@/utils/logger';
+import { logger } from '@/shared/utils/logger';
 
-jest.mock('@services/oauth', () => ({
+jest.mock('@/services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
 	signInWithFacebook: jest.fn(),
 }));
 
-jest.mock('@/contexts/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@themes/original.theme');
+jest.mock('@/shared/theme/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
@@ -33,7 +33,7 @@ jest.mock('@/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 
-jest.mock('@utils/toast', () => ({
+jest.mock('@/shared/utils/toast', () => ({
 	showSuccess: jest.fn(),
 	showError: jest.fn(),
 	showInfo: jest.fn(),

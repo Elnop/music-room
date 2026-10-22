@@ -1,9 +1,9 @@
 import { act, renderHook } from '@testing-library/react-native';
-import { MINI_PLAYER_HEIGHT, usePlayerHeight } from '@/contexts/PlayerContext';
+import { MINI_PLAYER_HEIGHT, usePlayerHeight } from './PlayerContext';
 import { usePlayerStore } from '@/store/playerStore';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
-jest.mock('@services/oauth', () => ({
+jest.mock('@/services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
 	signInWithFacebook: jest.fn(),
 }));

@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { usePlayer } from '@/contexts/PlayerContext';
-import { usePlayerProgress } from '@/hooks/usePlayerProgress';
+import { usePlayerProgress } from './usePlayerProgress';
 import { usePlayerStore } from '@/store/playerStore';
 import { useConnectStore } from '@/store/connectStore';
 import { useAuthStore } from '@/store/authStore';
-import { useSocketStore } from '@/store/socketStore';
+import { useSocketStore } from '@/shared/stores/socketStore';
 import { useActiveQueue, useQueueStore } from '@/store/queueStore';
 import {
 	previousAction,
@@ -12,8 +12,8 @@ import {
 	selectHasPrevious,
 	type OwnerQueue,
 } from '@/store/queueSelectors';
-import { hashStringToNumber } from '@utils/trackToSoundCloud';
-import { estimatePositionMs } from '@utils/remotePosition';
+import { hashStringToNumber } from '@/shared/utils/trackToSoundCloud';
+import { estimatePositionMs } from '@/utils/remotePosition';
 
 /** What the player shows of a track, wherever it plays. */
 export interface NowPlayingTrack {

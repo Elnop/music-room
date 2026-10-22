@@ -10,15 +10,15 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/contexts/ThemeContext';
-import { AppToast } from '@/components/common/AppToast';
-import type { Theme } from '@/themes/types';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import { AppToast } from '@/shared/components/feedback/AppToast';
+import type { Theme } from '@/shared/theme/types';
 import { musicControlApi } from '@/services/musicControlApi';
 import { deviceService } from '@/services/deviceService';
 import { useConnectStore } from '@/store/connectStore';
 import { transferTo } from '@/store/transferPlayback';
 import type { DevicePickerOwner } from '@/types/device.types';
-import { logger } from '@/utils/logger';
+import { logger } from '@/shared/utils/logger';
 
 interface DevicePickerSheetProps {
 	visible: boolean;

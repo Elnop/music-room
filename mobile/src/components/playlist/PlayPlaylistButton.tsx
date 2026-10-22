@@ -1,12 +1,12 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/contexts/ThemeContext';
-import { usePlayerStore } from '@store/playerStore';
-import { useActiveQueue, useQueueStore } from '@store/queueStore';
-import { selectPlaysPlaylist } from '@store/queueSelectors';
-import { showInfo } from '@utils/toast';
-import type { Theme } from '@themes/types';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import { usePlayerStore } from '@/store/playerStore';
+import { useActiveQueue, useQueueStore } from '@/store/queueStore';
+import { selectPlaysPlaylist } from '@/store/queueSelectors';
+import { showInfo } from '@/shared/utils/toast';
+import type { Theme } from '@/shared/theme/types';
 
 /** Diameter of the round button. */
 const BUTTON_SIZE = 44;

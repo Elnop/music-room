@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react-native';
-import { useAvatarPicker } from '@/hooks/useAvatarPicker';
-import { ApiError } from '@/services/api';
+import { useAvatarPicker } from './useAvatarPicker';
+import { ApiError } from '@/shared/services/api';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -42,7 +42,7 @@ jest.mock('@/store/authStore', () => ({
 
 const mockShowError = jest.fn();
 const mockShowSuccess = jest.fn();
-jest.mock('@/utils/toast', () => ({
+jest.mock('@/shared/utils/toast', () => ({
 	showError: (message: string) => mockShowError(message),
 	showSuccess: (message: string) => mockShowSuccess(message),
 }));

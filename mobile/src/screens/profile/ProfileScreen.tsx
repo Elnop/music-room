@@ -11,19 +11,19 @@ import {
 } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/shared/theme/ThemeContext';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
-import type { Theme } from '@themes/types';
+import type { Theme } from '@/shared/theme/types';
 import type { MusicGenre, MusicPreferences } from '@/types/user.types';
 import { useAuthStore } from '@/store/authStore';
 import { privacyApi } from '@/services/privacyApi';
 import { friendsApi, type MyStats } from '@/services/friendsApi';
 import { Ionicons } from '@expo/vector-icons';
-import { Avatar } from '@components/common/Avatar';
-import { ProfileSection } from '@components/profile/ProfileSection';
-import { GenreChip } from '@components/profile/GenreChip';
-import { ThemeSelector } from '@components/theme/ThemeSelector';
-import { logger } from '@/utils/logger';
+import { Avatar } from '@/shared/components/media/Avatar';
+import { ProfileSection } from '@/components/profile/ProfileSection';
+import { GenreChip } from '@/components/profile/GenreChip';
+import { ThemeSelector } from '@/shared/components/theme/ThemeSelector';
+import { logger } from '@/shared/utils/logger';
 
 type ProfileStackParamList = {
 	Profile: undefined;

@@ -6,10 +6,10 @@ import type {
 	PlaylistWithTracks,
 } from '@/types/playlist.types';
 import type { Track } from '@/types/track.types';
-import type { PlaylistInput } from '@utils/validators';
-import { playlistApi } from '@api/playlistApi';
-import { ApiError } from '@/services/api';
-import { applyPlaylistEvent as applyEvent, sortByRank } from '@/store/playlistSync';
+import type { PlaylistInput } from '@/shared/utils/validators';
+import { playlistApi } from '@/api/playlistApi';
+import { ApiError } from '@/shared/services/api';
+import { applyPlaylistEvent as applyEvent, sortByRank } from './playlistSync';
 
 /** Refusals of a move that mean the track changed under us: reload and tell the user. */
 export const CONFLICT_CODES = [

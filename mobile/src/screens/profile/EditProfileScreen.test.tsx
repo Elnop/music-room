@@ -1,7 +1,7 @@
 import React from 'react';
 import { Alert } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { EditProfileScreen } from '@/screens/profile/EditProfileScreen';
+import { EditProfileScreen } from './EditProfileScreen';
 
 const mockPickAndUpload = jest.fn();
 const mockRemove = jest.fn();
@@ -16,8 +16,8 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 );
 jest.mock('@/services/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
 
-jest.mock('@/contexts/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@themes/original.theme');
+jest.mock('@/shared/theme/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

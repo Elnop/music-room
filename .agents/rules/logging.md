@@ -7,9 +7,9 @@ Read before logging anything or answering an error. Every rule here is checked b
 No direct `console.*` call, in backend or mobile (ESLint `no-restricted-globals` on `console`; the core `no-console` rule cannot point to this section). Log through the project logger:
 
 - Backend: `logger` from `@/shared/utils/logger.js`.
-- Mobile: `logger` from `@/utils/logger`.
+- Mobile: `logger` from `@/shared/utils/logger`.
 
-Only the logger files (and their tests) may touch `console`, through an ESLint override in `eslint.config.*`. The other override is `backend/src/shared/config/env.ts`, which reports a failed environment validation before the logger can exist (the logger reads `env`). A command-line script that prints a report (`backend/src/test/perf-*.ts`) writes to `process.stdout`/`process.stderr`: that output is the result of the script, not a log. In tests, spy on or mock the logger, never `console`. The one exception is `mobile/src/components/common/ErrorBoundary.test.tsx`, which mutes `console.error` in its throwing test to silence React's own log of the caught error (not app logging) and restores it after.
+Only the logger files (and their tests) may touch `console`, through an ESLint override in `eslint.config.*`. The other override is `backend/src/shared/config/env.ts`, which reports a failed environment validation before the logger can exist (the logger reads `env`). A command-line script that prints a report (`backend/src/test/perf-*.ts`) writes to `process.stdout`/`process.stderr`: that output is the result of the script, not a log. In tests, spy on or mock the logger, never `console`. The one exception is `mobile/src/shared/components/feedback/ErrorBoundary.test.tsx`, which mutes `console.error` in its throwing test to silence React's own log of the caught error (not app logging) and restores it after.
 
 ## levels
 
@@ -46,4 +46,4 @@ Every error response of the API has one shape, built in `backend/src/shared/midd
 
 To answer an error, throw or `next()` an `AppError(status, message, code, details?, { why?, fix? })`; `errorHandler` turns it, a `ZodError` or any other exception (500 `INTERNAL_ERROR`) into that shape and logs it (`warn` below 500, `error` with the stack from 500). A middleware that answers by itself (a rate-limiter handler, `authMiddleware`) calls `sendError(req, res, appError)`, which logs and answers the same way. Never write `res.status(4xx).json(...)` by hand.
 
-On the mobile, `ApiError` (`src/services/api.ts`) reads that format: `message`, `code`, `details`, `why`, `fix`, and the HTTP `status` on every path. Show the user `apiErrorMessage(error, fallback)` (`src/utils/apiErrorMessage.ts`), never `why` or `fix`.
+On the mobile, `ApiError` (`src/shared/services/api.ts`) reads that format: `message`, `code`, `details`, `why`, `fix`, and the HTTP `status` on every path. Show the user `apiErrorMessage(error, fallback)` (`src/shared/utils/apiErrorMessage.ts`), never `why` or `fix`.

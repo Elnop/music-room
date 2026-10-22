@@ -1,4 +1,4 @@
-import { afterItemIdForDrop, afterRankForDrop } from '@/store/moveTarget';
+import { afterItemIdForDrop, afterRankForDrop } from './moveTarget';
 import type { TrackInPlaylist } from '@/types/track.types';
 import type { QueueItem } from '@/types/queue.types';
 

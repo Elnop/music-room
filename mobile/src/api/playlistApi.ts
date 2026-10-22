@@ -1,4 +1,4 @@
-import { apiRequest } from '@/services/api';
+import { apiRequest } from '@/shared/services/api';
 import type {
 	AddTrackResult,
 	MoveTrackResult,
@@ -7,7 +7,7 @@ import type {
 	RemoveTrackResult,
 } from '@/types/playlist.types';
 import type { Track } from '@/types/track.types';
-import type { PlaylistInput } from '@utils/validators';
+import type { PlaylistInput } from '@/shared/utils/validators';
 
 // Viewer profile type for API responses
 export interface ViewerProfile {

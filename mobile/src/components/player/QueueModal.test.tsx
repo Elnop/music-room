@@ -1,19 +1,19 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { QueueModal } from '@/components/player/QueueModal';
+import { QueueModal } from './QueueModal';
 import { useQueueStore } from '@/store/queueStore';
 import { useAuthStore } from '@/store/authStore';
 import { useConnectStore } from '@/store/connectStore';
 import type { UserProfile } from '@/types/user.types';
 import type { QueueItem, QueueState } from '@/types/queue.types';
 
-jest.mock('@services/oauth', () => ({
+jest.mock('@/services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
 	signInWithFacebook: jest.fn(),
 }));
 
-jest.mock('@/contexts/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@themes/original.theme');
+jest.mock('@/shared/theme/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

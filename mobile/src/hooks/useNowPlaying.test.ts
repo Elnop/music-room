@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react-native';
-import { useNowPlaying } from '@/hooks/useNowPlaying';
+import { useNowPlaying } from './useNowPlaying';
 import { useConnectStore } from '@/store/connectStore';
 import { useAuthStore } from '@/store/authStore';
 import { usePlayerStore } from '@/store/playerStore';
@@ -14,7 +14,7 @@ const mockSocket = { connected: true, on: jest.fn(), off: jest.fn(), emit: jest.
 const mockSeekTo = jest.fn();
 let mockProgress = { currentTime: 0, duration: 0, progress: 0 };
 
-jest.mock('@/store/socketStore', () => ({
+jest.mock('@/shared/stores/socketStore', () => ({
 	useSocketStore: { getState: () => ({ socket: mockSocket }) },
 }));
 
@@ -22,7 +22,7 @@ jest.mock('@/contexts/PlayerContext', () => ({
 	usePlayer: () => ({ player: {}, seekTo: mockSeekTo }),
 }));
 
-jest.mock('@/hooks/usePlayerProgress', () => ({
+jest.mock('./usePlayerProgress', () => ({
 	usePlayerProgress: () => mockProgress,
 }));
 
@@ -30,7 +30,7 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@services/oauth', () => ({
+jest.mock('@/services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
 	signInWithFacebook: jest.fn(),
 }));
@@ -43,7 +43,7 @@ jest.mock('@/services/queueApi', () => ({
 	queueApi: { next: jest.fn(), previous: jest.fn() },
 }));
 
-jest.mock('@utils/toast', () => ({
+jest.mock('@/shared/utils/toast', () => ({
 	showInfo: jest.fn(),
 	showError: jest.fn(),
 	showSuccess: jest.fn(),
@@ -188,7 +188,7 @@ describe('useNowPlaying remote', () => {
 		});
 
 	it("shows the device's track, estimated progress and the queue item's duration", () => {
-		const { hashStringToNumber } = jest.requireActual('@utils/trackToSoundCloud');
+		const { hashStringToNumber } = jest.requireActual('@/shared/utils/trackToSoundCloud');
 		goRemote('friend', 'Léa');
 		useQueueStore.getState().applyState({
 			ownerId: 'friend',

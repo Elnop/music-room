@@ -1,4 +1,4 @@
-import { fillCodeDigits } from '@/utils/codeDigits';
+import { fillCodeDigits } from './codeDigits';
 
 const empty = ['', '', '', '', '', ''];
 

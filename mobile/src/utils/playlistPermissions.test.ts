@@ -1,4 +1,4 @@
-import { canEditPlaylist, type PlaylistEditFields } from '@/utils/playlistPermissions';
+import { canEditPlaylist, type PlaylistEditFields } from './playlistPermissions';
 
 const playlist = (overrides: Partial<PlaylistEditFields> = {}): PlaylistEditFields => ({
 	ownerId: 'owner',

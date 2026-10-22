@@ -1,6 +1,6 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { SoundCloudSearchScreen } from '@/screens/search/SoundCloudSearchScreen';
+import { SoundCloudSearchScreen } from './SoundCloudSearchScreen';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
 const mockSearch = jest.fn();
@@ -10,7 +10,7 @@ const mockState: {
 	error: string | null;
 } = { searchResults: [], isSearching: false, error: null };
 
-jest.mock('@store/soundcloudStore', () => ({
+jest.mock('@/store/soundcloudStore', () => ({
 	useSoundCloudStore: () => ({
 		...mockState,
 		search: mockSearch,
@@ -27,8 +27,8 @@ jest.mock('@/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 
-jest.mock('@/contexts/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@themes/original.theme');
+jest.mock('@/shared/theme/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
@@ -36,16 +36,16 @@ jest.mock('@/contexts/PlayerContext', () => ({
 	usePlayerHeight: () => 0,
 }));
 
-jest.mock('@store/queueStore', () => ({
+jest.mock('@/store/queueStore', () => ({
 	useQueueStore: (select: (s: object) => unknown) =>
 		select({ playListTrack: jest.fn(), addItem: jest.fn() }),
 }));
 
-jest.mock('@components/track/TrackActionsSheet', () => ({
+jest.mock('@/components/track/TrackActionsSheet', () => ({
 	TrackActionsSheet: () => null,
 }));
 
-jest.mock('@utils/toast', () => ({
+jest.mock('@/shared/utils/toast', () => ({
 	showError: jest.fn(),
 }));
 

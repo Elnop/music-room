@@ -9,7 +9,7 @@
 import React from 'react';
 import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/shared/theme/ThemeContext';
 import { FriendsScreen } from '@/screens/friends/FriendsScreen';
 import { UserProfileScreen } from '@/screens/friends/UserProfileScreen';
 import { PlaylistDetailScreen } from '@/screens/playlists/PlaylistDetailScreen';

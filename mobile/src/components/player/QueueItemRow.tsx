@@ -2,9 +2,9 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Pressable } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/shared/theme/ThemeContext';
 import { TrackActionsButton } from '@/components/track/TrackActionsButton';
-import type { Theme } from '@/themes/types';
+import type { Theme } from '@/shared/theme/types';
 import type { QueueItem } from '@/types/queue.types';
 
 interface QueueItemRowProps {

@@ -4,14 +4,14 @@ import { usePlayerStore, setPositionReader } from '@/store/playerStore';
 import { useActiveQueue, useQueueStore } from '@/store/queueStore';
 import { nextItem } from '@/store/queueSelectors';
 import { isStreamStale, streamPrefetch } from '@/store/streamPrefetch';
-import { trackToSoundCloud } from '@utils/trackToSoundCloud';
+import { trackToSoundCloud } from '@/shared/utils/trackToSoundCloud';
 import { useConnectStore } from '@/store/connectStore';
-import { ApiError, apiRequest } from '@/services/api';
-import { apiErrorMessage } from '@/utils/apiErrorMessage';
+import { ApiError, apiRequest } from '@/shared/services/api';
+import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 import type { StreamUrlResponse } from '@/types/soundcloud.types';
 import { MediaSessionBridge } from '@/components/player/MediaSessionBridge';
 import { useLastTrackPersistence } from '@/hooks/useLastTrackPersistence';
-import { logger } from '@/utils/logger';
+import { logger } from '@/shared/utils/logger';
 
 // Play in silent mode and in the background. iOS uses `doNotMix` so that it
 // resumes the player after a call (`shouldResume`, #310); Android ducks others.

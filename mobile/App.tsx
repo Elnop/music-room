@@ -1,12 +1,9 @@
 import React, { useEffect } from 'react';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { ThemeProvider } from '@contexts/ThemeContext';
+import { AppProviders } from '@/providers/AppProviders';
 import { RootNavigator } from '@/navigation/RootNavigator';
-import { ErrorBoundary } from '@/components/common/ErrorBoundary';
-import { AppToast } from '@/components/common/AppToast';
-import { ThemedSystemUI } from '@/components/common/ThemedSystemUI';
-import { configureGoogleSignIn, initializeFacebookSDK } from '@services/oauth';
+import { AppToast } from '@/shared/components/feedback/AppToast';
+import { ThemedSystemUI } from '@/shared/components/theme/ThemedSystemUI';
+import { configureGoogleSignIn, initializeFacebookSDK } from '@/services/oauth';
 
 export default function App() {
 	// Configure OAuth providers on app start
@@ -16,16 +13,10 @@ export default function App() {
 	}, []);
 
 	return (
-		<GestureHandlerRootView style={{ flex: 1 }}>
-			<ErrorBoundary>
-				<ThemeProvider>
-					<SafeAreaProvider>
-						<RootNavigator />
-						<ThemedSystemUI />
-						<AppToast />
-					</SafeAreaProvider>
-				</ThemeProvider>
-			</ErrorBoundary>
-		</GestureHandlerRootView>
+		<AppProviders>
+			<RootNavigator />
+			<ThemedSystemUI />
+			<AppToast />
+		</AppProviders>
 	);
 }

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { SoundCloudSearchResult, SoundCloudTrack } from '@/types/soundcloud.types';
-import { apiRequest } from '@/services/api';
+import { apiRequest } from '@/shared/services/api';
 
 interface SoundCloudState {
 	searchResults: SoundCloudTrack[];

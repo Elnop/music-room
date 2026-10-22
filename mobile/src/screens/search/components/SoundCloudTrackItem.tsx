@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useTheme } from '@/contexts/ThemeContext';
-import { QueueSwipe } from '@/components/common/QueueSwipe';
-import { Artwork } from '@/components/common/Artwork';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import { QueueSwipe } from '@/shared/components/lists/QueueSwipe';
+import { Artwork } from '@/shared/components/media/Artwork';
 import { PreviewBadge } from '@/components/track/PreviewBadge';
-import { isPreviewOnly } from '@/utils/soundcloudPreview';
+import { isPreviewOnly } from '@/shared/utils/soundcloudPreview';
 import { TrackActionsButton } from '@/components/track/TrackActionsButton';
-import type { Theme } from '@/themes/types';
+import type { Theme } from '@/shared/theme/types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
 interface Props {

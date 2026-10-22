@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import { act, render } from '@testing-library/react-native';
-import { PlayerProvider, usePlayer } from '@/contexts/PlayerContext';
+import { PlayerProvider, usePlayer } from './PlayerContext';
 import { readPositionMs, usePlayerStore } from '@/store/playerStore';
 import { useConnectStore } from '@/store/connectStore';
 import { useQueueStore } from '@/store/queueStore';
 import { useAuthStore } from '@/store/authStore';
 import { streamPrefetch } from '@/store/streamPrefetch';
-import { apiRequest } from '@/services/api';
-import { trackToSoundCloud } from '@utils/trackToSoundCloud';
+import { apiRequest } from '@/shared/services/api';
+import { trackToSoundCloud } from '@/shared/utils/trackToSoundCloud';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import type { QueueItem } from '@/types/queue.types';
 import type { UserProfile } from '@/types/user.types';
@@ -83,7 +83,7 @@ jest.mock('expo-audio', () => ({
 	setAudioModeAsync: jest.fn(() => Promise.resolve()),
 }));
 
-jest.mock('@/services/api', () => {
+jest.mock('@/shared/services/api', () => {
 	class ApiError extends Error {
 		code: string;
 		details?: unknown;
@@ -99,7 +99,7 @@ jest.mock('@/services/api', () => {
 	return { ApiError, apiRequest: jest.fn(), registerAuthSession: jest.fn() };
 });
 
-jest.mock('@services/oauth', () => ({
+jest.mock('@/services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
 	signInWithFacebook: jest.fn(),
 }));
@@ -113,7 +113,7 @@ jest.mock('@/services/deviceService', () => ({
 }));
 
 const mockApiRequest = apiRequest as jest.Mock;
-const { ApiError: MockApiError } = jest.requireMock('@/services/api') as {
+const { ApiError: MockApiError } = jest.requireMock('@/shared/services/api') as {
 	ApiError: new (message: string, code: string, details?: unknown, status?: number) => Error;
 };
 

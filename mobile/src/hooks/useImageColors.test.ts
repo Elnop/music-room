@@ -4,7 +4,7 @@ import {
 	getAdaptiveColors,
 	GRADIENT_ALPHAS,
 	MIN_TEXT_CONTRAST,
-} from '@/hooks/useImageColors';
+} from './useImageColors';
 
 jest.mock('react-native-image-colors', () => ({ getColors: jest.fn() }));
 

@@ -1,4 +1,4 @@
-import { applyPlaylistEvent, sortByRank } from '@/store/playlistSync';
+import { applyPlaylistEvent, sortByRank } from './playlistSync';
 import type { PlaylistWithTracks } from '@/types/playlist.types';
 import type { TrackInPlaylist } from '@/types/track.types';
 

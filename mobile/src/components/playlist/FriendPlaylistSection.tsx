@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/contexts/ThemeContext';
-import { Avatar } from '@/components/common/Avatar';
-import { EmptyState } from '@/components/common/EmptyState';
-import type { Theme } from '@themes/types';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import { Avatar } from '@/shared/components/media/Avatar';
+import { EmptyState } from '@/shared/components/feedback/EmptyState';
+import type { Theme } from '@/shared/theme/types';
 import type { Playlist } from '@/types/playlist.types';
 import type { FriendProfile } from '@/services/friendsApi';
 

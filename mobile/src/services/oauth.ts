@@ -5,7 +5,7 @@ import {
 } from '@react-native-google-signin/google-signin';
 import { LoginManager, AccessToken, Settings } from 'react-native-fbsdk-next';
 import Constants from 'expo-constants';
-import { logger } from '@/utils/logger';
+import { logger } from '@/shared/utils/logger';
 
 // Type guard to check if an unknown response has idToken
 function hasIdToken(

@@ -1,4 +1,4 @@
-import { ApiError } from '@/services/api';
+import { ApiError } from '@/shared/services/api';
 import type { QueueItem, QueueState } from '@/types/queue.types';
 
 /** Past this many seconds played, "previous" restarts the track instead. */

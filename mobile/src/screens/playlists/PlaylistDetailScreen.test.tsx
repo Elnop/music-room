@@ -1,10 +1,10 @@
 import React from 'react';
 import { Alert, Platform } from 'react-native';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import { PlaylistDetailScreen } from '@/screens/playlists/PlaylistDetailScreen';
-import { ApiError } from '@/services/api';
-import { showError, showInfo, showSuccess } from '@utils/toast';
-import { logger } from '@/utils/logger';
+import { PlaylistDetailScreen } from './PlaylistDetailScreen';
+import { ApiError } from '@/shared/services/api';
+import { showError, showInfo, showSuccess } from '@/shared/utils/toast';
+import { logger } from '@/shared/utils/logger';
 
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
 
@@ -31,8 +31,8 @@ jest.mock('@/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 
-jest.mock('@/contexts/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@themes/original.theme');
+jest.mock('@/shared/theme/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
@@ -54,20 +54,20 @@ jest.mock('@/hooks/useImageColors', () => ({
 	hexToRgba: () => '',
 }));
 
-jest.mock('@hooks/usePlaylistSocket', () => ({
+jest.mock('@/hooks/usePlaylistSocket', () => ({
 	usePlaylistSocket: () => ({ deleted: mockDeleted }),
 }));
 
-jest.mock('@store/authStore', () => ({
+jest.mock('@/store/authStore', () => ({
 	useAuthStore: () => ({ user: { id: 'me' } }),
 }));
 
-jest.mock('@store/queueStore', () => ({
+jest.mock('@/store/queueStore', () => ({
 	useQueueStore: (select: (s: { addItem: jest.Mock }) => unknown) => select({ addItem: jest.fn() }),
 	useActiveQueue: () => ({ currentItemId: null, items: mockQueueItems, version: 1 }),
 }));
 
-jest.mock('@store/playerStore', () => ({
+jest.mock('@/store/playerStore', () => ({
 	usePlayerStore: (select: (s: typeof mockPlayer) => unknown) => select(mockPlayer),
 }));
 
@@ -103,7 +103,7 @@ jest.mock('react-native-reorderable-list', () => {
 	};
 });
 
-jest.mock('@components/common/SwipeableTrackItem', () => {
+jest.mock('@/shared/components/lists/SwipeableTrackItem', () => {
 	const { Text } = jest.requireActual('react-native');
 	return {
 		SwipeableTrackItem: ({
@@ -116,7 +116,7 @@ jest.mock('@components/common/SwipeableTrackItem', () => {
 	};
 });
 
-jest.mock('@store/playlistStore', () => ({
+jest.mock('@/store/playlistStore', () => ({
 	CONFLICT_CODES: [],
 	usePlaylistStore: () => ({
 		currentPlaylist: mockCurrentPlaylist,
@@ -131,15 +131,15 @@ jest.mock('@store/playlistStore', () => ({
 	}),
 }));
 
-jest.mock('@components/playlist/PlaylistHeader', () => ({
+jest.mock('@/components/playlist/PlaylistHeader', () => ({
 	PlaylistHeader: () => null,
 }));
 
-jest.mock('@components/track/TrackActionsSheet', () => ({
+jest.mock('@/components/track/TrackActionsSheet', () => ({
 	TrackActionsSheet: () => null,
 }));
 
-jest.mock('@utils/toast', () => ({
+jest.mock('@/shared/utils/toast', () => ({
 	showSuccess: jest.fn(),
 	showError: jest.fn(),
 	showInfo: jest.fn(),

@@ -1,4 +1,4 @@
-import { useQueueStore } from '@/store/queueStore';
+import { useQueueStore } from './queueStore';
 import {
 	EMPTY_QUEUE,
 	nextItem,
@@ -6,25 +6,25 @@ import {
 	selectHasNext,
 	selectHasPrevious,
 	selectPlaysPlaylist,
-} from '@/store/queueSelectors';
-import { usePlayerStore } from '@/store/playerStore';
+} from './queueSelectors';
+import { usePlayerStore } from './playerStore';
 import { deferred } from '@/test/deferred';
-import { useAuthStore } from '@/store/authStore';
-import { useConnectStore } from '@/store/connectStore';
+import { useAuthStore } from './authStore';
+import { useConnectStore } from './connectStore';
 import type { UserProfile } from '@/types/user.types';
 import { queueApi } from '@/services/queueApi';
-import { ApiError } from '@/services/api';
-import { showError, showInfo, showSuccess } from '@utils/toast';
-import { hapticSuccess } from '@utils/haptics';
+import { ApiError } from '@/shared/services/api';
+import { showError, showInfo, showSuccess } from '@/shared/utils/toast';
+import { hapticSuccess } from '@/shared/utils/haptics';
 import type { QueueItem, QueueState, QueueStepResult } from '@/types/queue.types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
-import { logger } from '@/utils/logger';
+import { logger } from '@/shared/utils/logger';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@services/oauth', () => ({
+jest.mock('@/services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
 	signInWithFacebook: jest.fn(),
 }));
@@ -47,9 +47,9 @@ jest.mock('@/services/queueApi', () => ({
 	},
 }));
 
-jest.mock('@utils/haptics', () => ({ hapticSuccess: jest.fn() }));
+jest.mock('@/shared/utils/haptics', () => ({ hapticSuccess: jest.fn() }));
 
-jest.mock('@utils/toast', () => ({
+jest.mock('@/shared/utils/toast', () => ({
 	showSuccess: jest.fn(),
 	showError: jest.fn(),
 	showInfo: jest.fn(),

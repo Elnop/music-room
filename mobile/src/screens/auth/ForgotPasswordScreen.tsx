@@ -10,10 +10,10 @@ import {
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '@/navigation/AuthNavigator';
-import { useAuthStore } from '@store/authStore';
-import { Input } from '@components/common/Input';
-import { Button } from '@components/common/Button';
-import { useTheme } from '@contexts/ThemeContext';
+import { useAuthStore } from '@/store/authStore';
+import { Input } from '@/shared/components/ui/Input';
+import { Button } from '@/shared/components/ui/Button';
+import { useTheme } from '@/shared/theme/ThemeContext';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'ForgotPassword'>;
 

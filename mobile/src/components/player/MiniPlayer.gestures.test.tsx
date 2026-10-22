@@ -3,12 +3,12 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { State } from 'react-native-gesture-handler';
 import type { PanGesture } from 'react-native-gesture-handler';
 import { fireGestureHandler, getByGestureTestId } from 'react-native-gesture-handler/jest-utils';
-import { MiniPlayer } from '@/components/player/MiniPlayer';
+import { MiniPlayer } from './MiniPlayer';
 import { usePlayerStore } from '@/store/playerStore';
 import type { NowPlaying } from '@/hooks/useNowPlaying';
-import { hapticTap } from '@/utils/haptics';
+import { hapticTap } from '@/shared/utils/haptics';
 
-jest.mock('@/utils/haptics', () => ({
+jest.mock('@/shared/utils/haptics', () => ({
 	hapticTap: jest.fn(),
 	hapticSelection: jest.fn(),
 	hapticSuccess: jest.fn(),
@@ -18,7 +18,7 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@services/oauth', () => ({
+jest.mock('@/services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
 	signInWithFacebook: jest.fn(),
 }));
@@ -27,8 +27,8 @@ jest.mock('@/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 
-jest.mock('@/contexts/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@themes/original.theme');
+jest.mock('@/shared/theme/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

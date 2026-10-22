@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
-import { useTheme } from '@/contexts/ThemeContext';
-import { ThemeSelector } from '@components/theme/ThemeSelector';
-import { BackendUrlField } from '@components/common/BackendUrlField';
-import type { Theme } from '@themes/types';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import { ThemeSelector } from '@/shared/components/theme/ThemeSelector';
+import { BackendUrlField } from '@/shared/components/form/BackendUrlField';
+import type { Theme } from '@/shared/theme/types';
 
 export function SettingsScreen() {
 	const { theme } = useTheme();

@@ -1,6 +1,6 @@
-import { CONFLICT_MESSAGE, usePlaylistStore } from '@/store/playlistStore';
-import { playlistApi } from '@api/playlistApi';
-import { ApiError } from '@/services/api';
+import { CONFLICT_MESSAGE, usePlaylistStore } from './playlistStore';
+import { playlistApi } from '@/api/playlistApi';
+import { ApiError } from '@/shared/services/api';
 import { deferred } from '@/test/deferred';
 import type { Playlist, PlaylistUpdatedEvent, PlaylistWithTracks } from '@/types/playlist.types';
 import type { Track, TrackInPlaylist } from '@/types/track.types';
@@ -13,7 +13,7 @@ jest.mock('@/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 
-jest.mock('@api/playlistApi', () => ({
+jest.mock('@/api/playlistApi', () => ({
 	playlistApi: {
 		fetchPlaylists: jest.fn(),
 		fetchPlaylistById: jest.fn(),

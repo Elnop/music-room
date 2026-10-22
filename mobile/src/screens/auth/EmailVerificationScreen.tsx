@@ -8,13 +8,13 @@ import {
 	ActivityIndicator,
 	Keyboard,
 } from 'react-native';
-import { useTheme } from '@/contexts/ThemeContext';
-import type { Theme } from '@themes/types';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import type { Theme } from '@/shared/theme/types';
 import { useAuthStore } from '@/store/authStore';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '@/navigation/AuthNavigator';
-import { showError, showSuccess } from '@utils/toast';
-import { CODE_INPUT_MAX_LENGTH, fillCodeDigits } from '@utils/codeDigits';
+import { showError, showSuccess } from '@/shared/utils/toast';
+import { CODE_INPUT_MAX_LENGTH, fillCodeDigits } from '@/utils/codeDigits';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'EmailVerification'>;
 

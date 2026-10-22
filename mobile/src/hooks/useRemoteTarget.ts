@@ -1,14 +1,14 @@
 import { useEffect } from 'react';
-import { useSocketStore } from '@store/socketStore';
-import { useAuthStore } from '@store/authStore';
-import { useConnectStore } from '@store/connectStore';
-import { useQueueStore } from '@store/queueStore';
-import { controlErrorMessage, type ControlError } from '@/hooks/useMusicControl';
+import { useSocketStore } from '@/shared/stores/socketStore';
+import { useAuthStore } from '@/store/authStore';
+import { useConnectStore } from '@/store/connectStore';
+import { useQueueStore } from '@/store/queueStore';
+import { controlErrorMessage, type ControlError } from './useMusicControl';
 import { acquireListening, releaseListening } from '@/services/listeningRooms';
-import { showError } from '@utils/toast';
+import { showError } from '@/shared/utils/toast';
 import type { UserListeningStatus } from '@/types/listening.types';
 import type { ControlRevokedPayload } from '@/types/device.types';
-import { logger } from '@/utils/logger';
+import { logger } from '@/shared/utils/logger';
 
 /**
  * Follows the device the phone drives in remote mode (#297). Mounted once in

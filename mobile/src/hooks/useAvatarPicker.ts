@@ -3,8 +3,8 @@ import * as ImagePicker from 'expo-image-picker';
 import { useAuthStore } from '@/store/authStore';
 import { profileApi } from '@/services/profileApi';
 import { prepareAvatar } from '@/utils/avatarImage';
-import { apiErrorMessage } from '@/utils/apiErrorMessage';
-import { showError, showSuccess } from '@/utils/toast';
+import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
+import { showError, showSuccess } from '@/shared/utils/toast';
 
 type AvatarSource = 'library' | 'camera';
 

@@ -1,11 +1,11 @@
 import { act, renderHook } from '@testing-library/react-native';
-import { useRemoteTarget } from '@/hooks/useRemoteTarget';
+import { useRemoteTarget } from './useRemoteTarget';
 import { useConnectStore } from '@/store/connectStore';
 import { useAuthStore } from '@/store/authStore';
-import { showError, showInfo } from '@utils/toast';
+import { showError, showInfo } from '@/shared/utils/toast';
 import type { ListeningStatus, UserListeningStatus } from '@/types/listening.types';
 import type { UserProfile } from '@/types/user.types';
-import { logger } from '@/utils/logger';
+import { logger } from '@/shared/utils/logger';
 
 const mockSocket = {
 	connected: true,
@@ -17,12 +17,12 @@ const mockSocketState = { socket: mockSocket, isConnected: true };
 const mockLoad = jest.fn();
 const mockForget = jest.fn();
 
-jest.mock('@store/socketStore', () => ({
+jest.mock('@/shared/stores/socketStore', () => ({
 	useSocketStore: (selector: (state: typeof mockSocketState) => unknown) =>
 		selector(mockSocketState),
 }));
 
-jest.mock('@store/queueStore', () => ({
+jest.mock('@/store/queueStore', () => ({
 	useQueueStore: { getState: () => ({ load: mockLoad, forget: mockForget }) },
 }));
 
@@ -30,7 +30,7 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@services/oauth', () => ({
+jest.mock('@/services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
 	signInWithFacebook: jest.fn(),
 }));
@@ -40,7 +40,7 @@ jest.mock('@/services/deviceService', () => ({
 	deviceService: { getDeviceInfo: jest.fn() },
 }));
 
-jest.mock('@utils/toast', () => ({
+jest.mock('@/shared/utils/toast', () => ({
 	showInfo: jest.fn(),
 	showError: jest.fn(),
 	showSuccess: jest.fn(),

@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { SearchTracksScreen } from '@/screens/playlists/SearchTracksScreen';
-import { showError } from '@utils/toast';
+import { SearchTracksScreen } from './SearchTracksScreen';
+import { showError } from '@/shared/utils/toast';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
 const mockAddTrack = jest.fn();
@@ -23,8 +23,8 @@ jest.mock('@/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 
-jest.mock('@/contexts/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@themes/original.theme');
+jest.mock('@/shared/theme/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
@@ -32,7 +32,7 @@ jest.mock('@/contexts/PlayerContext', () => ({
 	usePlayerHeight: () => 0,
 }));
 
-jest.mock('@store/playlistStore', () => ({
+jest.mock('@/store/playlistStore', () => ({
 	usePlaylistStore: (select: (s: object) => unknown) =>
 		select({ addTrack: mockAddTrack, currentPlaylist: null }),
 }));
@@ -42,7 +42,7 @@ const mockSearch = jest.fn();
 const mockClearSearch = jest.fn();
 let mockHasResults = true;
 
-jest.mock('@store/soundcloudStore', () => ({
+jest.mock('@/store/soundcloudStore', () => ({
 	useSoundCloudStore: () => ({
 		searchResults: mockHasResults ? [mockResult()] : [],
 		isSearching: false,
@@ -56,15 +56,15 @@ function mockResult() {
 	return result;
 }
 
-jest.mock('@store/queueStore', () => ({
+jest.mock('@/store/queueStore', () => ({
 	useQueueStore: (select: (s: { addItem: jest.Mock }) => unknown) => select({ addItem: jest.fn() }),
 }));
 
-jest.mock('@components/track/TrackActionsSheet', () => ({
+jest.mock('@/components/track/TrackActionsSheet', () => ({
 	TrackActionsSheet: () => null,
 }));
 
-jest.mock('@utils/toast', () => ({
+jest.mock('@/shared/utils/toast', () => ({
 	showSuccess: jest.fn(),
 	showError: jest.fn(),
 	showInfo: jest.fn(),

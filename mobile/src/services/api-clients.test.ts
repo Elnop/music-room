@@ -1,9 +1,9 @@
-import { friendsApi } from '@/services/friendsApi';
-import { profileApi } from '@/services/profileApi';
-import { privacyApi } from '@/services/privacyApi';
-import { musicControlApi } from '@/services/musicControlApi';
-import { resetBackendUrl } from '@/services/backendUrl';
-import { registerAuthSession } from '@/services/api';
+import { friendsApi } from './friendsApi';
+import { profileApi } from './profileApi';
+import { privacyApi } from './privacyApi';
+import { musicControlApi } from './musicControlApi';
+import { resetBackendUrl } from '@/shared/services/backendUrl';
+import { registerAuthSession } from '@/shared/services/api';
 
 // Every API module goes through apiRequest, so the backend gets the client
 // headers it logs (subject IV.6), a token, and the refresh on 401 (#174).
@@ -12,7 +12,7 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/services/deviceService', () => ({
+jest.mock('./deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 

@@ -16,18 +16,18 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { usePlayerHeight } from '@/contexts/PlayerContext';
-import { useTheme } from '@/contexts/ThemeContext';
-import type { Theme } from '@themes/types';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import type { Theme } from '@/shared/theme/types';
 import type { UpdateProfileData } from '@/types/user.types';
 import { useAuthStore } from '@/store/authStore';
 import { profileApi } from '@/services/profileApi';
-import { apiErrorMessage } from '@utils/apiErrorMessage';
-import { Button } from '@components/common/Button';
-import { Input } from '@components/common/Input';
-import { FormError } from '@components/common/FormError';
-import { Avatar } from '@components/common/Avatar';
+import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
+import { Button } from '@/shared/components/ui/Button';
+import { Input } from '@/shared/components/ui/Input';
+import { FormError } from '@/shared/components/feedback/FormError';
+import { Avatar } from '@/shared/components/media/Avatar';
 import { useAvatarPicker } from '@/hooks/useAvatarPicker';
-import { showError } from '@utils/toast';
+import { showError } from '@/shared/utils/toast';
 
 // Profile field limits (aligned with backend)
 const PROFILE_LIMITS = {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { act, render } from '@testing-library/react-native';
-import { MediaSessionBridge } from '@/components/player/MediaSessionBridge';
+import { MediaSessionBridge } from './MediaSessionBridge';
 import type { NowPlaying } from '@/hooks/useNowPlaying';
 import type { MediaControlEvent } from 'expo-media-control';
 

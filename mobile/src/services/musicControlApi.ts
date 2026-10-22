@@ -1,5 +1,5 @@
 import { useAuthStore } from '@/store/authStore';
-import { apiRequest } from '@services/api';
+import { apiRequest } from '@/shared/services/api';
 import type {
 	ControllableDevicesResponse,
 	DevicePickerResponse,

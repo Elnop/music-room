@@ -1,25 +1,25 @@
-import { transferTo } from '@/store/transferPlayback';
-import { useConnectStore } from '@/store/connectStore';
-import { usePlayerStore, setPositionReader } from '@/store/playerStore';
-import { useQueueStore } from '@/store/queueStore';
-import { useAuthStore } from '@/store/authStore';
+import { transferTo } from './transferPlayback';
+import { useConnectStore } from './connectStore';
+import { usePlayerStore, setPositionReader } from './playerStore';
+import { useQueueStore } from './queueStore';
+import { useAuthStore } from './authStore';
 import { queueApi } from '@/services/queueApi';
-import { ApiError } from '@/services/api';
-import { showError } from '@utils/toast';
-import { hapticSuccess } from '@utils/haptics';
+import { ApiError } from '@/shared/services/api';
+import { showError } from '@/shared/utils/toast';
+import { hapticSuccess } from '@/shared/utils/haptics';
 import type { DevicePickerOwner } from '@/types/device.types';
 import type { QueueItem, QueueState } from '@/types/queue.types';
 import type { ListeningStatus } from '@/types/listening.types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import type { UserProfile } from '@/types/user.types';
-import { hashStringToNumber } from '@utils/trackToSoundCloud';
-import { logger } from '@/utils/logger';
+import { hashStringToNumber } from '@/shared/utils/trackToSoundCloud';
+import { logger } from '@/shared/utils/logger';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@services/oauth', () => ({
+jest.mock('@/services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
 	signInWithFacebook: jest.fn(),
 }));
@@ -33,9 +33,9 @@ jest.mock('@/services/queueApi', () => ({
 	queueApi: { getQueue: jest.fn(), transfer: jest.fn() },
 }));
 
-jest.mock('@utils/haptics', () => ({ hapticSuccess: jest.fn() }));
+jest.mock('@/shared/utils/haptics', () => ({ hapticSuccess: jest.fn() }));
 
-jest.mock('@utils/toast', () => ({
+jest.mock('@/shared/utils/toast', () => ({
 	showSuccess: jest.fn(),
 	showError: jest.fn(),
 	showInfo: jest.fn(),

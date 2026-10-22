@@ -14,8 +14,8 @@ import {
 	getStateFromPath as defaultGetStateFromPath,
 } from '@react-navigation/native';
 import type { LinkingOptions, NavigationContainerRef } from '@react-navigation/native';
-import type { AppTabsParamList } from '@/navigation/AppNavigator';
-import { logger } from '@/utils/logger';
+import type { AppTabsParamList } from './AppNavigator';
+import { logger } from '@/shared/utils/logger';
 
 const LINK_PREFIX = 'zumik://';
 

@@ -127,7 +127,7 @@ Les seuils viennent de `backend/src/shared/config/rate-limit.config.ts` (variabl
 
 **Protection.**
 - Au handshake, un token révoqué est refusé (`authenticateSocket` passe par `verifyToken` de `session.service.ts`) : #71.
-- L'app ferme sa socket à chaque fin de session : abonnement `useAuthStore.subscribe` dans `mobile/src/store/socketStore.ts` (#70).
+- L'app ferme sa socket à chaque fin de session : abonnement `useAuthStore.subscribe` dans `mobile/src/shared/stores/socketStore.ts` (#70).
 
 **Tests.**
 - `backend/src/realtime/socket-auth.int.test.ts` : « refuses a token revoked by logout with INVALID_TOKEN (#71) ».

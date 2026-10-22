@@ -1,16 +1,16 @@
 import { useEffect, useCallback, useMemo, useState } from 'react';
-import { useSocketStore } from '@store/socketStore';
-import { usePlayerStore, readPositionMs } from '@store/playerStore';
-import { useAuthStore } from '@store/authStore';
-import { useQueueStore } from '@store/queueStore';
-import { useConnectStore } from '@store/connectStore';
+import { useSocketStore } from '@/shared/stores/socketStore';
+import { usePlayerStore, readPositionMs } from '@/store/playerStore';
+import { useAuthStore } from '@/store/authStore';
+import { useQueueStore } from '@/store/queueStore';
+import { useConnectStore } from '@/store/connectStore';
 import { deviceService, type DeviceInfo } from '@/services/deviceService';
 import { musicControlApi } from '@/services/musicControlApi';
 import { acquireListening, releaseListening } from '@/services/listeningRooms';
-import { queueTrackToSoundCloud, trackToSoundCloud } from '@utils/trackToSoundCloud';
+import { queueTrackToSoundCloud, trackToSoundCloud } from '@/shared/utils/trackToSoundCloud';
 import type { DeviceCommand } from '@/types/queue.types';
 import type { ListeningStatus, UserListeningStatus } from '@/types/listening.types';
-import { logger } from '@/utils/logger';
+import { logger } from '@/shared/utils/logger';
 
 /** control:command received by this device: play / pause, or a queue playback (#294, #295). */
 type ControlCommand = DeviceCommand | { action: 'play'; fromUserId: string };

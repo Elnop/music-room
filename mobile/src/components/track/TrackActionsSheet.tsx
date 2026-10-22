@@ -12,18 +12,18 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/contexts/ThemeContext';
-import type { Theme } from '@/themes/types';
-import { apiErrorMessage } from '@/utils/apiErrorMessage';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import type { Theme } from '@/shared/theme/types';
+import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 import { useAuthStore } from '@/store/authStore';
 import { usePlaylistStore } from '@/store/playlistStore';
 import { useQueueStore } from '@/store/queueStore';
 import { canEditPlaylist } from '@/utils/playlistPermissions';
-import { showError, showSuccess } from '@/utils/toast';
+import { showError, showSuccess } from '@/shared/utils/toast';
 import type { AddQueueItemBody } from '@/types/queue.types';
 import type { Playlist } from '@/types/playlist.types';
 import type { Track } from '@/types/track.types';
-import { logger } from '@/utils/logger';
+import { logger } from '@/shared/utils/logger';
 
 interface TrackActionsSheetProps {
 	/** The track to act on (see `toTrackInput`); null hides the sheet. */

@@ -8,7 +8,7 @@
 import React from 'react';
 import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/shared/theme/ThemeContext';
 import { ProfileScreen } from '@/screens/profile/ProfileScreen';
 import { EditProfileScreen } from '@/screens/profile/EditProfileScreen';
 import { PrivacySettingsScreen } from '@/screens/profile/PrivacySettingsScreen';

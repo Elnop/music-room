@@ -1,4 +1,4 @@
-import { STREAM_RENEW_MARGIN_MS, isStreamStale, streamPrefetch } from '@/store/streamPrefetch';
+import { STREAM_RENEW_MARGIN_MS, isStreamStale, streamPrefetch } from './streamPrefetch';
 
 const NOW = 1_000_000_000;
 const MINUTE_MS = 60 * 1000;

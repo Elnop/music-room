@@ -1,4 +1,4 @@
-import { prepareAvatar, AVATAR_SIZE } from '@/utils/avatarImage';
+import { prepareAvatar, AVATAR_SIZE } from './avatarImage';
 
 const mockContext = {
 	crop: jest.fn(),

@@ -1,10 +1,10 @@
 import React from 'react';
 import { Modal, Platform } from 'react-native';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { PlaylistActionsSheet } from '@/components/playlist/PlaylistActionsSheet';
+import { PlaylistActionsSheet } from './PlaylistActionsSheet';
 
-jest.mock('@/contexts/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@themes/original.theme');
+jest.mock('@/shared/theme/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

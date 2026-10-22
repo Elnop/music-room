@@ -1,7 +1,7 @@
 // dependency-cruiser: layer direction, no cross-feature import, no cycle.
 // Each rule's `comment` points to its section in .agents/rules/architecture.md.
-// The features/, shared/ and navigation/ rules describe the target layout and
-// match nothing until #377 creates those folders. Known violations live in
+// The features/ rules describe the target layout and match nothing until the
+// first feature migrates (#378). Known violations live in
 // .dependency-cruiser-known-violations.json and may only shrink (see
 // .agents/rules/guardrails.md).
 /** @type {import('dependency-cruiser').IConfiguration} */
@@ -29,6 +29,14 @@ module.exports = {
         'src/shared/ must not import src/features/ or src/navigation/. See .agents/rules/architecture.md#layers',
       from: { path: '^src/shared/' },
       to: { path: '^src/(features|navigation)/' },
+    },
+    {
+      name: 'shared-not-to-legacy',
+      severity: 'error',
+      comment:
+        'src/shared/ must not import the legacy folders that #378-#385 migrate into src/features/ (store, screens, hooks, contexts, services, api, utils, components). See .agents/rules/architecture.md#layers',
+      from: { path: '^src/shared/' },
+      to: { path: '^src/(store|screens|hooks|contexts|services|api|utils|components)/' },
     },
     {
       name: 'features-not-to-navigation',
