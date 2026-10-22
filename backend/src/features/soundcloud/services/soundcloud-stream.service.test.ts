@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { SoundCloudStreamService } from '@/features/soundcloud/services/soundcloud-stream.service.js';
+import * as streamService from '@/features/soundcloud/services/soundcloud-stream.service.js';
+import * as cache from '@/features/soundcloud/utils/soundcloud-cache.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import type { SoundCloudClient } from '@/features/soundcloud/soundcloud.types.js';
 
@@ -15,12 +16,13 @@ const EXPIRES_AT = new Date(T0.getTime() + THIRTY_MINUTES_MS).toISOString();
 
 const withExpiry = (streamUrl: string) => ({ streamUrl, expiresAt: EXPIRES_AT });
 
-const tracks: SoundCloudClient['tracks'] = {
-	search: vi.fn<SoundCloudClient['tracks']['search']>(),
-	get: vi.fn<SoundCloudClient['tracks']['get']>(),
-	getStreamUrl: vi.fn<SoundCloudClient['tracks']['getStreamUrl']>(),
-};
-const streamLink = vi.fn<StreamLink>();
+const { client, streamLink } = vi.hoisted(() => {
+	const streamLink = vi.fn<(trackUrl: string, protocol: 'hls' | 'progressive') => Promise<string>>();
+	const client: Pick<SoundCloudClient, 'util'> = { util: { streamLink } };
+	return { client, streamLink };
+});
+
+vi.mock('@/features/soundcloud/utils/soundcloud-client.js', () => ({ soundcloud: client }));
 
 function linkFor(urls: { hls?: string | Error; progressive?: string | Error }): StreamLink {
 	return (_trackUrl, protocol) => {
@@ -35,14 +37,13 @@ async function expectAppError(promise: Promise<unknown>, statusCode: number, cod
 	expect(error).toMatchObject({ statusCode, code });
 }
 
-describe('SoundCloudStreamService', () => {
-	let service: SoundCloudStreamService;
-
+describe('soundcloud-stream.service', () => {
 	beforeEach(() => {
 		streamLink.mockReset();
+		client.util = { streamLink };
+		cache.clear();
 		vi.useFakeTimers();
 		vi.setSystemTime(T0);
-		service = new SoundCloudStreamService({ tracks, util: { streamLink } });
 	});
 
 	afterEach(() => {
@@ -52,7 +53,7 @@ describe('SoundCloudStreamService', () => {
 	it('returns the HLS URL without asking for progressive', async () => {
 		streamLink.mockImplementation(linkFor({ hls: HLS_URL, progressive: PROGRESSIVE_URL }));
 
-		expect(await service.getStreamUrl(TRACK_URL)).toEqual(withExpiry(HLS_URL));
+		expect(await streamService.getStreamUrl(TRACK_URL)).toEqual(withExpiry(HLS_URL));
 		expect(streamLink).toHaveBeenCalledTimes(1);
 		expect(streamLink).toHaveBeenCalledWith(TRACK_URL, 'hls');
 	});
@@ -60,7 +61,7 @@ describe('SoundCloudStreamService', () => {
 	it('falls back to progressive when HLS is empty', async () => {
 		streamLink.mockImplementation(linkFor({ hls: '', progressive: PROGRESSIVE_URL }));
 
-		expect(await service.getStreamUrl(TRACK_URL)).toEqual(withExpiry(PROGRESSIVE_URL));
+		expect(await streamService.getStreamUrl(TRACK_URL)).toEqual(withExpiry(PROGRESSIVE_URL));
 		expect(streamLink).toHaveBeenNthCalledWith(1, TRACK_URL, 'hls');
 		expect(streamLink).toHaveBeenNthCalledWith(2, TRACK_URL, 'progressive');
 	});
@@ -70,16 +71,16 @@ describe('SoundCloudStreamService', () => {
 			linkFor({ hls: new Error('no hls'), progressive: PROGRESSIVE_URL })
 		);
 
-		expect(await service.getStreamUrl(TRACK_URL)).toEqual(withExpiry(PROGRESSIVE_URL));
+		expect(await streamService.getStreamUrl(TRACK_URL)).toEqual(withExpiry(PROGRESSIVE_URL));
 	});
 
 	it('throws a 404 STREAM_NOT_FOUND when no protocol yields a URL, and caches nothing', async () => {
 		streamLink.mockImplementation(linkFor({ hls: '', progressive: new Error('gone') }));
 
-		await expectAppError(service.getStreamUrl(TRACK_URL), 404, 'STREAM_NOT_FOUND');
+		await expectAppError(streamService.getStreamUrl(TRACK_URL), 404, 'STREAM_NOT_FOUND');
 		expect(streamLink).toHaveBeenCalledTimes(2);
 
-		await expectAppError(service.getStreamUrl(TRACK_URL), 404, 'STREAM_NOT_FOUND');
+		await expectAppError(streamService.getStreamUrl(TRACK_URL), 404, 'STREAM_NOT_FOUND');
 		expect(streamLink).toHaveBeenCalledTimes(4);
 	});
 
@@ -89,12 +90,12 @@ describe('SoundCloudStreamService', () => {
 	])('throws a 404 STREAM_NOT_FOUND when %s', async (_label, links) => {
 		streamLink.mockImplementation(linkFor(links));
 
-		await expectAppError(service.getStreamUrl(TRACK_URL), 404, 'STREAM_NOT_FOUND');
+		await expectAppError(streamService.getStreamUrl(TRACK_URL), 404, 'STREAM_NOT_FOUND');
 	});
 
 	it('throws a 500 API_ERROR when the client has no util', async () => {
-		const bare = new SoundCloudStreamService({ tracks });
-		await expectAppError(bare.getStreamUrl(TRACK_URL), 500, 'API_ERROR');
+		client.util = undefined;
+		await expectAppError(streamService.getStreamUrl(TRACK_URL), 500, 'API_ERROR');
 	});
 
 	describe.each([
@@ -111,33 +112,33 @@ describe('SoundCloudStreamService', () => {
 		});
 
 		it('serves a cached URL on the next call', async () => {
-			expect(await service.getStreamUrl(TRACK_URL)).toEqual(withExpiry(expected));
-			expect(await service.getStreamUrl(TRACK_URL)).toEqual(withExpiry(expected));
+			expect(await streamService.getStreamUrl(TRACK_URL)).toEqual(withExpiry(expected));
+			expect(await streamService.getStreamUrl(TRACK_URL)).toEqual(withExpiry(expected));
 			expect(streamLink).toHaveBeenCalledTimes(callsPerFetch);
 		});
 
 		it('keeps the original expiresAt on a cached URL', async () => {
-			await service.getStreamUrl(TRACK_URL);
+			await streamService.getStreamUrl(TRACK_URL);
 			vi.setSystemTime(T0.getTime() + TWENTY_MINUTES_MS - 1);
 
-			expect(await service.getStreamUrl(TRACK_URL)).toEqual(withExpiry(expected));
+			expect(await streamService.getStreamUrl(TRACK_URL)).toEqual(withExpiry(expected));
 			expect(streamLink).toHaveBeenCalledTimes(callsPerFetch);
 		});
 
 		it('still serves the cached URL at exactly 20 minutes', async () => {
-			await service.getStreamUrl(TRACK_URL);
+			await streamService.getStreamUrl(TRACK_URL);
 			vi.setSystemTime(T0.getTime() + TWENTY_MINUTES_MS);
 
-			expect(await service.getStreamUrl(TRACK_URL)).toEqual(withExpiry(expected));
+			expect(await streamService.getStreamUrl(TRACK_URL)).toEqual(withExpiry(expected));
 			expect(streamLink).toHaveBeenCalledTimes(callsPerFetch);
 		});
 
 		it('refetches the URL 1 ms after 20 minutes, with a new expiresAt', async () => {
-			await service.getStreamUrl(TRACK_URL);
+			await streamService.getStreamUrl(TRACK_URL);
 			const refetchAt = T0.getTime() + TWENTY_MINUTES_MS + 1;
 			vi.setSystemTime(refetchAt);
 
-			expect(await service.getStreamUrl(TRACK_URL)).toEqual({
+			expect(await streamService.getStreamUrl(TRACK_URL)).toEqual({
 				streamUrl: expected,
 				expiresAt: new Date(refetchAt + THIRTY_MINUTES_MS).toISOString(),
 			});

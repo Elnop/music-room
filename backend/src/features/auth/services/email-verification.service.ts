@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
-import { sendVerificationEmail } from '@/features/mail/mail.service.js';
+import * as mailService from '@/features/mail/services/mail.service.js';
 import { RateLimiterService } from '@/shared/services/rate-limiter.service.js';
 import { verificationConfig } from '@/features/mail/mail.config.js';
 
@@ -34,7 +34,7 @@ export async function generateAndStore(userId: string): Promise<string> {
 
 /** Mail the verification code. */
 export async function sendCode(email: string, code: string): Promise<void> {
-	await sendVerificationEmail(email, code, verificationConfig.expiryMinutes);
+	await mailService.sendVerificationEmail(email, code, verificationConfig.expiryMinutes);
 }
 
 /** Check the code (attempts limit, expiry) and mark the email verified. */

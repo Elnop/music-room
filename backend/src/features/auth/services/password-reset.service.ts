@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
-import { sendPasswordResetEmail } from '@/features/mail/mail.service.js';
+import * as mailService from '@/features/mail/services/mail.service.js';
 import { RateLimiterService } from '@/shared/services/rate-limiter.service.js';
 import { PasswordResetCooldownService } from '@/features/auth/services/password-reset-cooldown.service.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
@@ -52,7 +52,7 @@ export async function requestPasswordReset(email: string, ip: string): Promise<v
 	const code = crypto.randomInt(100000, 999999).toString();
 	await storeResetCode(userId, code);
 
-	await sendPasswordResetEmail(email, code, CODE_EXPIRY_MINUTES);
+	await mailService.sendPasswordResetEmail(email, code, CODE_EXPIRY_MINUTES);
 
 	logger.info('Password reset email sent', { email, userId });
 }

@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { SoundCloudSearchService } from '@/features/soundcloud/services/soundcloud-search.service.js';
+import * as searchService from '@/features/soundcloud/services/soundcloud-search.service.js';
+import * as cache from '@/features/soundcloud/utils/soundcloud-cache.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import type { SoundCloudClient, SoundCloudTrack } from '@/features/soundcloud/soundcloud.types.js';
 
@@ -23,10 +24,14 @@ function track(overrides: Partial<SoundCloudTrack> = {}): SoundCloudTrack {
 	};
 }
 
-const search = vi.fn<SoundCloudClient['tracks']['search']>();
-const get = vi.fn<SoundCloudClient['tracks']['get']>();
-const getStreamUrl = vi.fn<SoundCloudClient['tracks']['getStreamUrl']>();
-const client: SoundCloudClient = { tracks: { search, get, getStreamUrl } };
+const { search, get } = vi.hoisted(() => ({
+	search: vi.fn<SoundCloudClient['tracks']['search']>(),
+	get: vi.fn<SoundCloudClient['tracks']['get']>(),
+}));
+
+vi.mock('@/features/soundcloud/utils/soundcloud-client.js', () => ({
+	soundcloud: { tracks: { search, get, getStreamUrl: vi.fn() } },
+}));
 
 async function expectAppError(promise: Promise<unknown>, statusCode: number, code: string) {
 	const error: unknown = await promise.catch((e: unknown) => e);
@@ -34,14 +39,11 @@ async function expectAppError(promise: Promise<unknown>, statusCode: number, cod
 	expect(error).toMatchObject({ statusCode, code });
 }
 
-describe('SoundCloudSearchService', () => {
-	let service: SoundCloudSearchService;
-
+describe('soundcloud-search.service', () => {
 	beforeEach(() => {
 		search.mockReset();
 		get.mockReset();
-		getStreamUrl.mockReset();
-		service = new SoundCloudSearchService(client);
+		cache.clear();
 	});
 
 	describe('searchTracks', () => {
@@ -67,7 +69,7 @@ describe('SoundCloudSearchService', () => {
 				next_href: 'https://api.test/next',
 			});
 
-			const result = await service.searchTracks({ q: 'lofi', limit: 20, offset: 0 });
+			const result = await searchService.searchTracks({ q: 'lofi', limit: 20, offset: 0 });
 
 			expect(search).toHaveBeenCalledWith({ q: 'lofi', limit: 20, offset: 0 });
 			expect(result.collection.map(t => t.id)).toEqual([1, 2]);
@@ -77,26 +79,26 @@ describe('SoundCloudSearchService', () => {
 
 		it('returns an empty collection when the client returns none', async () => {
 			search.mockResolvedValue({});
-			const result = await service.searchTracks({ q: 'none', limit: 5, offset: 0 });
+			const result = await searchService.searchTracks({ q: 'none', limit: 5, offset: 0 });
 			expect(result.collection).toEqual([]);
 		});
 
 		it('caches by q, limit and offset', async () => {
 			search.mockResolvedValue({ collection: [track({ streamable: true })] });
 
-			const first = await service.searchTracks({ q: 'lofi', limit: 20, offset: 0 });
-			const second = await service.searchTracks({ q: 'lofi', limit: 20, offset: 0 });
+			const first = await searchService.searchTracks({ q: 'lofi', limit: 20, offset: 0 });
+			const second = await searchService.searchTracks({ q: 'lofi', limit: 20, offset: 0 });
 			expect(second).toEqual(first);
 			expect(search).toHaveBeenCalledTimes(1);
 
-			await service.searchTracks({ q: 'lofi', limit: 20, offset: 20 });
+			await searchService.searchTracks({ q: 'lofi', limit: 20, offset: 20 });
 			expect(search).toHaveBeenCalledTimes(2);
 		});
 
 		it('throws a 500 SOUNDCLOUD_ERROR when the client rejects', async () => {
 			search.mockRejectedValue(new Error('rate limited'));
 			await expectAppError(
-				service.searchTracks({ q: 'lofi', limit: 20, offset: 0 }),
+				searchService.searchTracks({ q: 'lofi', limit: 20, offset: 0 }),
 				500,
 				'SOUNDCLOUD_ERROR'
 			);
@@ -108,37 +110,15 @@ describe('SoundCloudSearchService', () => {
 			const t = track();
 			get.mockResolvedValue(t);
 
-			expect(await service.getTrack('https://soundcloud.com/artist/song')).toEqual(t);
-			expect(await service.getTrack('https://soundcloud.com/artist/song')).toEqual(t);
+			expect(await searchService.getTrack('https://soundcloud.com/artist/song')).toEqual(t);
+			expect(await searchService.getTrack('https://soundcloud.com/artist/song')).toEqual(t);
 			expect(get).toHaveBeenCalledTimes(1);
 			expect(get).toHaveBeenCalledWith('https://soundcloud.com/artist/song');
 		});
 
 		it('throws a 404 TRACK_NOT_FOUND when the client rejects', async () => {
 			get.mockRejectedValue(new Error('404'));
-			await expectAppError(service.getTrack('123'), 404, 'TRACK_NOT_FOUND');
-		});
-	});
-
-	describe('convertToTrackDTO', () => {
-		it('maps the permalink to trackUri and leaves previewUrl empty', () => {
-			expect(service.convertToTrackDTO(track())).toEqual({
-				title: 'Song',
-				artist: 'artist',
-				album: undefined,
-				albumArt: 'https://img.test/art.jpg',
-				durationMs: 180000,
-				trackUri: 'https://soundcloud.com/artist/song',
-				previewUrl: '',
-			});
-		});
-
-		it('falls back to the user avatar, then to an empty string', () => {
-			const noArt = track({ artwork_url: null });
-			expect(service.convertToTrackDTO(noArt).albumArt).toBe('https://img.test/avatar.jpg');
-
-			const noImage = track({ artwork_url: null, user: { ...noArt.user, avatar_url: null } });
-			expect(service.convertToTrackDTO(noImage).albumArt).toBe('');
+			await expectAppError(searchService.getTrack('123'), 404, 'TRACK_NOT_FOUND');
 		});
 	});
 });
