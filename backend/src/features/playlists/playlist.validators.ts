@@ -33,31 +33,6 @@ export const updatePlaylistSchema = z.object({
 	editMode: z.enum(['open', 'restricted']).optional(),
 });
 
-export const addTrackSchema = z.object({
-	trackUri: z.string().min(1).max(500), // Universal track URI (SoundCloud permalink, etc.)
-	title: z.string().min(1).max(200),
-	artist: z.string().min(1).max(200),
-	// Album is optional - SoundCloud and other services may not have album info
-	album: z
-		.string()
-		.max(200)
-		.optional()
-		.transform(val => (val === '' ? undefined : val)),
-	// Accept empty string or valid URL, transform empty string to undefined
-	albumArt: z
-		.string()
-		.optional()
-		.transform(val => (val === '' ? undefined : val))
-		.pipe(z.url().optional()),
-	durationMs: z.number().int().positive(),
-	// Accept empty string or valid URL, transform empty string to undefined
-	previewUrl: z
-		.string()
-		.optional()
-		.transform(val => (val === '' ? undefined : val))
-		.pipe(z.url().optional()),
-});
-
 // A rank is a base-62 fraction that never ends with '0' (doc/PLAYLIST_CONCURRENCY.md).
 export const rankSchema = z
 	.string()

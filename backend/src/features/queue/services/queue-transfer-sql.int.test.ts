@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
-import { QueueService } from '@/features/queue/services/queue.service.js';
+import * as queue from '@/features/queue/services/queue.service.js';
 import {
 	insertBlockRpc,
 	trackIdsFromRpc,
@@ -13,7 +13,6 @@ import type { QueueItem, QueueState } from '@/features/queue/queue.types.js';
 // the track lists read from a queue and the block insertion that follows them.
 
 const URI_PREFIX = `https://soundcloud.com/int-transfer/${randomUUID()}`;
-const queue = new QueueService();
 const users: string[] = [];
 let userId: string;
 let otherUser: string;

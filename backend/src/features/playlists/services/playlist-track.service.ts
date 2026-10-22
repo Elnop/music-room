@@ -4,7 +4,7 @@ import { checkEditPermission } from '@/features/playlists/permissions/playlist.p
 import { formatTrackResponse } from '@/features/playlists/utils/playlist.helpers.js';
 import { addTrackRpc, moveTrackRpc, removeTrackRpc } from '@/features/playlists/utils/track-rpc.js';
 import { realtime } from '@/realtime/index.js';
-import { queueSyncService } from '@/features/queue/services/queue-sync.service.js';
+import * as queueSyncService from '@/features/queue/services/queue-sync.service.js';
 import type {
 	AddTrackResult,
 	MoveTrackResult,

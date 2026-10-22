@@ -427,23 +427,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/features/queue/queue.validators.ts",
-    "to": "src/features/playlists/playlist.validators.ts",
-    "unresolvedTo": "@/features/playlists/playlist.validators.js",
-    "dependencyTypes": [
-      "aliased",
-      "aliased-tsconfig",
-      "aliased-tsconfig-paths",
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "no-cross-feature-imports"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/features/queue/services/queue-delegation.int.test.ts",
     "to": "src/features/playlists/services/playlist.service.ts",
     "unresolvedTo": "@/features/playlists/services/playlist.service.js",

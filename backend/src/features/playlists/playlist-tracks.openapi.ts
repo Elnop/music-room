@@ -6,11 +6,11 @@ import {
 	removeTrackResultSchema,
 } from '@/features/playlists/playlist-responses.validators.js';
 import {
-	addTrackSchema,
 	moveTrackSchema,
 	playlistIdParamSchema,
 	trackIdParamSchema,
 } from '@/features/playlists/playlist.validators.js';
+import { addTrackSchema } from '@/shared/utils/track-upsert.js';
 import {
 	bearerAuth,
 	describeParams,
