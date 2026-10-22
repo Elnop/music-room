@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { AuthService } from '@/features/auth/auth.service.js';
+import * as service from '@/features/auth/services/registration.service.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 
 const {
@@ -37,23 +37,13 @@ vi.mock('@/shared/config/supabase.js', () => ({
 vi.mock('@/features/auth/utils/find-auth-user.js', () => ({ findAuthUserIdByEmail }));
 
 vi.mock('@/features/auth/services/email-verification.service.js', () => ({
-	EmailVerificationService: class {
-		generateAndStore = generateAndStore;
-		sendVerificationEmail = sendVerificationEmail;
-	},
+	generateAndStore,
+	sendCode: sendVerificationEmail,
 }));
 
-// EMAIL_VERIFICATION_ENABLED, switched per test (#253)
-vi.mock('@/features/mail/mail.config.js', async importOriginal => {
-	const original = await importOriginal<typeof import('@/features/mail/mail.config.js')>();
-	return {
-		...original,
-		verificationConfig: Object.assign(verification, {
-			...original.verificationConfig,
-			enabled: true,
-		}),
-	};
-});
+// EMAIL_VERIFICATION_ENABLED, switched per test (#253); the only setting
+// registration reads (the code is mailed by the mocked email-verification).
+vi.mock('@/features/mail/mail.config.js', () => ({ verificationConfig: verification }));
 
 vi.mock('@/shared/utils/logger.js', () => ({
 	logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() },
@@ -103,8 +93,6 @@ const registration = {
 	displayName: 'New User',
 };
 
-const credentials = { email: 'user@example.com', password: 'Password1' };
-const authUser = { id: 'user-1', email: credentials.email };
 const authSession = {
 	access_token: 'access-token',
 	refresh_token: 'refresh-token',
@@ -112,9 +100,7 @@ const authSession = {
 	expires_at: 1_700_000_000,
 };
 
-describe('AuthService', () => {
-	const service = new AuthService();
-
+describe('registration.service', () => {
 	beforeEach(() => {
 		from.mockReset().mockImplementation(builder);
 		selectSingle.mockReset().mockResolvedValue(NOT_FOUND);
@@ -249,113 +235,6 @@ describe('AuthService', () => {
 			expect(error).toMatchObject({ statusCode: 500, code: 'PROFILE_ERROR' });
 			expect(deleteUser).toHaveBeenCalledWith('new-id');
 			expect(sendVerificationEmail).not.toHaveBeenCalled();
-		});
-	});
-
-	describe('login', () => {
-		const signedIn = () =>
-			signInWithPassword.mockResolvedValue({
-				data: { user: authUser, session: authSession },
-				error: null,
-			});
-		const withProfile = (profile: Record<string, unknown>) =>
-			selectSingle.mockResolvedValue({
-				data: {
-					username: 'user',
-					display_name: null,
-					avatar_url: null,
-					bio: null,
-					created_at: null,
-					updated_at: null,
-					google_id: null,
-					facebook_id: null,
-					...profile,
-				},
-				error: null,
-			});
-
-		it('answers 403 EMAIL_NOT_VERIFIED with the user id and email for an unverified account', async () => {
-			signedIn();
-			withProfile({ email_verified: false });
-
-			const error = await caught(service.login(credentials));
-
-			expect(error).toBeInstanceOf(AppError);
-			expect(error).toMatchObject({
-				statusCode: 403,
-				code: 'EMAIL_NOT_VERIFIED',
-				details: { userId: authUser.id, email: authUser.email },
-			});
-		});
-
-		it('signs in an unverified account linked to Google', async () => {
-			signedIn();
-			withProfile({ email_verified: false, google_id: 'google-123' });
-
-			const result = await service.login(credentials);
-
-			expect(result.session?.accessToken).toBe('access-token');
-		});
-
-		it('returns the user and a session for a verified account', async () => {
-			signedIn();
-			withProfile({ email_verified: true });
-
-			const result = await service.login(credentials);
-
-			expect(result.user).toMatchObject({
-				id: authUser.id,
-				email: authUser.email,
-				username: 'user',
-			});
-			expect(result.session).toMatchObject({
-				accessToken: 'access-token',
-				refreshToken: 'refresh-token',
-			});
-			expect(selectSingle).toHaveBeenCalledWith(
-				'user_profiles',
-				expect.any(String),
-				'id',
-				authUser.id
-			);
-		});
-
-		it('answers 401 INVALID_CREDENTIALS when Supabase refuses the password', async () => {
-			signInWithPassword.mockResolvedValue({
-				data: { user: null, session: null },
-				error: { message: 'Invalid login credentials' },
-			});
-
-			const error = await caught(service.login(credentials));
-
-			expect(error).toMatchObject({ statusCode: 401, code: 'INVALID_CREDENTIALS' });
-			expect(from).not.toHaveBeenCalled();
-		});
-
-		it('answers 403 EMAIL_NOT_VERIFIED when Supabase reports the email unconfirmed (#243)', async () => {
-			signInWithPassword.mockResolvedValue({
-				data: { user: null, session: null },
-				error: { code: 'email_not_confirmed', message: 'Email not confirmed' },
-			});
-			findAuthUserIdByEmail.mockResolvedValue('unconfirmed-id');
-
-			const error = await caught(service.login(credentials));
-
-			expect(error).toMatchObject({
-				statusCode: 403,
-				code: 'EMAIL_NOT_VERIFIED',
-				details: { userId: 'unconfirmed-id', email: credentials.email },
-			});
-			expect(from).not.toHaveBeenCalled();
-		});
-
-		it('answers 404 PROFILE_NOT_FOUND when the profile cannot be read', async () => {
-			signedIn();
-			selectSingle.mockResolvedValue(NOT_FOUND);
-
-			const error = await caught(service.login(credentials));
-
-			expect(error).toMatchObject({ statusCode: 404, code: 'PROFILE_NOT_FOUND' });
 		});
 	});
 });

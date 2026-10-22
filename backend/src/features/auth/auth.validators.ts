@@ -28,6 +28,9 @@ export const loginSchema = z.object({
 	password: z.string().min(1, 'Password is required').meta({ format: 'password' }),
 });
 
+export type RegisterInput = z.infer<typeof registerSchema>;
+export type LoginInput = z.infer<typeof loginSchema>;
+
 export const refreshTokenSchema = z.object({
 	refreshToken: z.string().min(1, 'Refresh token is required'),
 });
@@ -81,7 +84,7 @@ export const resetPasswordSchema = z.object({
 		.meta({ format: 'password' }),
 });
 
-// Response bodies, for the OpenAPI document (mirror auth.types.ts).
+// Response bodies, for the OpenAPI document; auth.types.ts infers its response types from them.
 
 export const userProfileSchema = z.object({
 	id: z.uuid(),

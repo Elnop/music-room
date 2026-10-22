@@ -84,6 +84,7 @@ export default tseslint.config(
   {
     ignores: [
       'dist/**',
+      'coverage/**', // vitest --coverage output
       'node_modules/**',
       '*.js',
       '*.mjs',

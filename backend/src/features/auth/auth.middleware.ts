@@ -1,19 +1,12 @@
 import type { Request, Response, NextFunction } from 'express';
-import { AuthService } from '@/features/auth/auth.service.js';
+import * as sessionService from '@/features/auth/services/session.service.js';
 import type { AuthenticatedRequest } from '@/shared/types/global.types.js';
 import { AppError, sendError } from '@/shared/middleware/error-handler.js';
 import {
 	TokenVerifyLimitError,
 	verifyTokenLimited,
 } from '@/features/auth/utils/token-verify-limiter.js';
-
-const authService = new AuthService();
-const verify = (token: string) => authService.verifyToken(token);
-
-// Same client IP as the rate limiters (rate-limit.middleware.ts).
-function clientIp(req: Request): string {
-	return req.ip || req.socket?.remoteAddress || 'unknown';
-}
+import { requestIp } from '@/features/auth/utils/request-ip.js';
 
 /**
  * Authentication middleware
@@ -52,7 +45,7 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
 		}
 
 		// Verify token with Supabase, unless this IP failed too often (429)
-		const user = await verifyTokenLimited(token, clientIp(req), verify);
+		const user = await verifyTokenLimited(token, requestIp(req), sessionService.verifyToken);
 
 		// Attach user to request
 		(req as AuthenticatedRequest).user = user;
@@ -107,7 +100,7 @@ export async function optionalAuthMiddleware(req: Request, res: Response, next: 
 		}
 
 		// A blocked IP continues anonymously, without calling Supabase.
-		const user = await verifyTokenLimited(token, clientIp(req), verify);
+		const user = await verifyTokenLimited(token, requestIp(req), sessionService.verifyToken);
 		(req as AuthenticatedRequest).user = user;
 
 		next();

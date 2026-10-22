@@ -1,16 +1,16 @@
 import { randomUUID } from 'node:crypto';
 import { afterAll, describe, expect, it, vi } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
-import { AuthService } from '@/features/auth/auth.service.js';
+import * as loginService from '@/features/auth/services/login.service.js';
+import * as sessionService from '@/features/auth/services/session.service.js';
+import * as oauthLoginService from '@/features/auth/services/oauth-login.service.js';
 
 // Token verification calls Google and Facebook: always mocked (doc/TESTING.md).
 const { verifyGoogleToken } = vi.hoisted(() => ({ verifyGoogleToken: vi.fn() }));
 
 vi.mock('@/features/auth/services/oauth.service.js', () => ({
-	OAuthService: {
-		verifyGoogleToken,
-		verifyFacebookToken: vi.fn(),
-	},
+	verifyGoogleToken,
+	verifyFacebookToken: vi.fn(),
 }));
 
 const PASSWORD = 'integration-test-password';
@@ -64,13 +64,12 @@ describe('supabaseAdmin after a user sign-in (local Supabase stack)', () => {
 	it('keeps writing as service role after a password login and a refresh', async () => {
 		const user = await createUser();
 		const other = await createUser();
-		const auth = new AuthService();
 
-		const login = await auth.login({ email: user.email, password: PASSWORD });
+		const login = await loginService.login({ email: user.email, password: PASSWORD });
 		expect(login.user.id).toBe(user.id);
 		await expectAdminWriteOn(other.id);
 
-		const refreshed = await auth.refreshToken(login.session!.refreshToken);
+		const refreshed = await sessionService.refreshToken(login.session!.refreshToken);
 		expect(refreshed.user.id).toBe(user.id);
 		await expectAdminWriteOn(other.id);
 	});
@@ -86,7 +85,7 @@ describe('supabaseAdmin after a user sign-in (local Supabase stack)', () => {
 			name: 'Google User',
 		});
 
-		const login = await new AuthService().loginWithGoogle('google-token');
+		const login = await oauthLoginService.loginWithGoogle('google-token');
 
 		expect(login.user.id).toBe(user.id);
 		await expectAdminWriteOn(other.id);

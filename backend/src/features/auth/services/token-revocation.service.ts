@@ -14,35 +14,30 @@ const MIN_TTL_SECONDS = 1;
  * Fail-closed: without a ready Redis, both operations throw 503
  * REVOCATION_UNAVAILABLE. No in-memory fallback.
  */
-export class TokenRevocationService {
-	/**
-	 * Add a token to the denylist until its `exp`.
-	 */
-	async revoke(token: string): Promise<void> {
-		this.ensureRedis('revoke');
-		try {
-			await redisClient.setex(keyFor(token), ttlFor(token), '1');
-		} catch (error) {
-			throw unavailable('revoke', error);
-		}
-	}
 
-	/**
-	 * Whether a token was revoked by a logout.
-	 */
-	async isRevoked(token: string): Promise<boolean> {
-		this.ensureRedis('check');
-		try {
-			return (await redisClient.exists(keyFor(token))) === 1;
-		} catch (error) {
-			throw unavailable('check', error);
-		}
+/** Add a token to the denylist until its `exp`. */
+export async function revoke(token: string): Promise<void> {
+	ensureRedis('revoke');
+	try {
+		await redisClient.setex(keyFor(token), ttlFor(token), '1');
+	} catch (error) {
+		throw unavailable('revoke', error);
 	}
+}
 
-	private ensureRedis(operation: string): void {
-		if (!isRedisConnected()) {
-			throw unavailable(operation, new Error('Redis not connected'));
-		}
+/** Whether a token was revoked by a logout. */
+export async function isRevoked(token: string): Promise<boolean> {
+	ensureRedis('check');
+	try {
+		return (await redisClient.exists(keyFor(token))) === 1;
+	} catch (error) {
+		throw unavailable('check', error);
+	}
+}
+
+function ensureRedis(operation: string): void {
+	if (!isRedisConnected()) {
+		throw unavailable(operation, new Error('Redis not connected'));
 	}
 }
 
@@ -82,5 +77,3 @@ function unavailable(operation: string, error: unknown): AppError {
 	});
 	return new AppError(503, 'Session revocation is unavailable', 'REVOCATION_UNAVAILABLE');
 }
-
-export const tokenRevocationService = new TokenRevocationService();

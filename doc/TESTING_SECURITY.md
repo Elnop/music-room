@@ -1196,7 +1196,7 @@ Backend files implementing security features:
 
 - **Authentication**:
   - `backend/src/features/auth/auth.middleware.ts` - JWT verification
-  - `backend/src/features/auth/auth.service.ts` - Login/register logic
+  - `backend/src/features/auth/services/login.service.ts`, `registration.service.ts` - Login/register logic
   - `backend/src/features/auth/services/session.service.ts` - Session management
 
 - **Authorization**:

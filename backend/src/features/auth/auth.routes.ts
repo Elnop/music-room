@@ -1,5 +1,8 @@
 import { Router } from 'express';
-import { AuthController } from '@/features/auth/auth.controller.js';
+import * as session from '@/features/auth/auth.controller.js';
+import * as oauth from '@/features/auth/auth-oauth.controller.js';
+import * as email from '@/features/auth/auth-email.controller.js';
+import * as password from '@/features/auth/auth-password.controller.js';
 import { authMiddleware } from '@/features/auth/auth.middleware.js';
 import {
 	loginRateLimiter,
@@ -12,144 +15,30 @@ import {
 	checkIPBlacklist,
 } from '@/features/auth/middleware/account-lockout.middleware.js';
 
+// Endpoints are documented in auth*.openapi.ts.
 const router = Router();
-const authController = new AuthController();
 
-// Apply IP blacklist check to ALL auth routes (first line of defense)
+// Every auth route: IP blacklist first, then the global rate limiter (safety net).
 router.use(checkIPBlacklist);
-
-// Apply global rate limiter to ALL auth routes (safety net)
 router.use(globalAuthRateLimiter);
 
-/**
- * @route   POST /api/auth/register
- * @desc    Register a new user
- * @access  Public
- */
-router.post('/register', registerRateLimiter, (req, res, next) =>
-	authController.register(req, res, next)
-);
+router.post('/register', registerRateLimiter, session.register);
+router.post('/login', loginRateLimiter, checkAccountLockout, session.login);
+router.post('/refresh', loginRateLimiter, session.refreshToken);
+router.get('/me', authMiddleware, session.me);
+router.post('/logout', authMiddleware, session.logout);
 
-/**
- * @route   POST /api/auth/login
- * @desc    Login user with email and password
- * @access  Public
- */
-router.post('/login', loginRateLimiter, checkAccountLockout, (req, res, next) =>
-	authController.login(req, res, next)
-);
+router.post('/google', oauthRateLimiter, oauth.googleLogin);
+router.post('/facebook', oauthRateLimiter, oauth.facebookLogin);
+router.get('/providers', authMiddleware, oauth.getLinkedProviders);
+router.delete('/providers/:provider', authMiddleware, oauth.unlinkProvider);
+router.post('/providers/:provider/link', authMiddleware, oauthRateLimiter, oauth.linkProvider);
 
-/**
- * @route   POST /api/auth/refresh
- * @desc    Refresh access token using refresh token
- * @access  Public (no auth middleware - uses refresh token)
- */
-router.post('/refresh', loginRateLimiter, (req, res, next) =>
-	authController.refreshToken(req, res, next)
-);
+router.post('/verify-email', loginRateLimiter, email.verifyEmail);
+router.post('/resend-verification', registerRateLimiter, email.resendVerification);
 
-/**
- * @route   GET /api/auth/me
- * @desc    Get current authenticated user profile
- * @access  Private (requires authentication)
- */
-router.get('/me', authMiddleware, (req, res, next) => authController.me(req, res, next));
-
-/**
- * @route   POST /api/auth/logout
- * @desc    Logout current user
- * @access  Private (requires authentication)
- */
-router.post('/logout', authMiddleware, (req, res, next) => authController.logout(req, res, next));
-
-/**
- * @route   POST /api/auth/google
- * @desc    Login with Google OAuth
- * @access  Public
- */
-router.post('/google', oauthRateLimiter, (req, res, next) =>
-	authController.googleLogin(req, res, next)
-);
-
-/**
- * @route   POST /api/auth/facebook
- * @desc    Login with Facebook OAuth
- * @access  Public
- */
-router.post('/facebook', oauthRateLimiter, (req, res, next) =>
-	authController.facebookLogin(req, res, next)
-);
-
-/**
- * @route   GET /api/auth/providers
- * @desc    Get list of linked authentication providers
- * @access  Private (requires authentication)
- */
-router.get('/providers', authMiddleware, (req, res, next) =>
-	authController.getLinkedProviders(req, res, next)
-);
-
-/**
- * @route   DELETE /api/auth/providers/:provider
- * @desc    Unlink an OAuth provider from the account
- * @access  Private (requires authentication)
- */
-router.delete('/providers/:provider', authMiddleware, (req, res, next) =>
-	authController.unlinkProvider(req, res, next)
-);
-
-/**
- * @route   POST /api/auth/providers/:provider/link
- * @desc    Link a Google or Facebook account to the account
- * @access  Private (requires authentication)
- */
-router.post('/providers/:provider/link', authMiddleware, oauthRateLimiter, (req, res, next) =>
-	authController.linkProvider(req, res, next)
-);
-
-/**
- * @route   POST /api/auth/verify-email
- * @desc    Verify email with 6-digit code
- * @access  Public
- */
-router.post('/verify-email', loginRateLimiter, (req, res, next) =>
-	authController.verifyEmail(req, res, next)
-);
-
-/**
- * @route   POST /api/auth/resend-verification
- * @desc    Resend email verification code
- * @access  Public
- */
-router.post('/resend-verification', registerRateLimiter, (req, res, next) =>
-	authController.resendVerification(req, res, next)
-);
-
-/**
- * @route   POST /api/auth/forgot-password
- * @desc    Request password reset (send email with code)
- * @access  Public
- */
-router.post('/forgot-password', globalAuthRateLimiter, (req, res, next) =>
-	authController.forgotPassword(req, res, next)
-);
-
-/**
- * @route   POST /api/auth/reset-password
- * @desc    Reset password with code and new password
- * @access  Public
- */
-router.post('/reset-password', globalAuthRateLimiter, (req, res, next) =>
-	authController.resetPassword(req, res, next)
-);
-
-/**
- * @route   GET /api/auth/reset-password/can-resend
- * @desc    Check if user can resend reset code (cooldown check)
- * @access  Public
- */
-router.get('/reset-password/can-resend', globalAuthRateLimiter, (req, res, next) =>
-	authController.canResendResetCode(req, res, next)
-);
+router.post('/forgot-password', globalAuthRateLimiter, password.forgotPassword);
+router.post('/reset-password', globalAuthRateLimiter, password.resetPassword);
+router.get('/reset-password/can-resend', globalAuthRateLimiter, password.canResendResetCode);
 
 export default router;

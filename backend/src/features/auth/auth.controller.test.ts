@@ -1,106 +1,143 @@
-import type { NextFunction, Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { AuthController } from '@/features/auth/auth.controller.js';
-import { AppError, errorHandler } from '@/shared/middleware/error-handler.js';
+import { ZodError } from 'zod';
+import { login, logout, me, refreshToken, register } from '@/features/auth/auth.controller.js';
+import { AppError } from '@/shared/middleware/error-handler.js';
+import { mockResponse } from '@/test/mock-response.js';
 
-const { linkProvider, logout } = vi.hoisted(() => ({ linkProvider: vi.fn(), logout: vi.fn() }));
+const mocks = vi.hoisted(() => ({
+	register: vi.fn(),
+	login: vi.fn(),
+	logout: vi.fn(),
+	refreshToken: vi.fn(),
+	getUserProfile: vi.fn(),
+	resetFailedAttempts: vi.fn(),
+	recordFailedAttempt: vi.fn(),
+	recordIPActivity: vi.fn(),
+}));
 
-vi.mock('@/features/auth/auth.service.js', () => ({
-	AuthService: class {
-		linkProvider = linkProvider;
-		logout = logout;
+vi.mock('@/features/auth/services/registration.service.js', () => ({ register: mocks.register }));
+vi.mock('@/features/auth/services/login.service.js', () => ({ login: mocks.login }));
+vi.mock('@/features/auth/services/session.service.js', () => ({
+	logout: mocks.logout,
+	refreshToken: mocks.refreshToken,
+}));
+vi.mock('@/features/auth/utils/auth.helpers.js', () => ({ getUserProfile: mocks.getUserProfile }));
+vi.mock('@/shared/services/brute-force.service.js', () => ({
+	bruteForceService: {
+		resetFailedAttempts: mocks.resetFailedAttempts,
+		recordFailedAttempt: mocks.recordFailedAttempt,
+		recordIPActivity: mocks.recordIPActivity,
 	},
 }));
 
-function mockResponse() {
-	const res = {
-		statusCode: 200,
-		body: undefined as unknown,
-		status(code: number) {
-			res.statusCode = code;
-			return res;
-		},
-		json(body: unknown) {
-			res.body = body;
-			return res;
-		},
-	};
-	return res;
+const result = { user: { id: 'user-a' }, session: { accessToken: 'access' } };
+
+function request(fields: Record<string, unknown>): Request {
+	return { ip: '10.0.0.1', headers: {}, ...fields } as unknown as Request;
 }
 
-describe('AuthController.linkProvider', () => {
-	beforeEach(() => {
-		linkProvider.mockReset();
-	});
+beforeEach(() => {
+	for (const mock of Object.values(mocks)) mock.mockReset();
+	mocks.recordFailedAttempt.mockResolvedValue({ failedAttempts: 1, remainingAttempts: 4 });
+});
 
-	it('answers 400 VALIDATION_ERROR when /google/link gets a Facebook body', async () => {
-		const req = {
-			params: { provider: 'google' },
-			body: { accessToken: 'facebook-token' },
-			user: { id: 'user-a' },
-			path: '/providers/google/link',
-			method: 'POST',
-		} as unknown as Request;
+describe('auth.controller register', () => {
+	it('answers 201 with the registration result', async () => {
+		mocks.register.mockResolvedValue(result);
+		const body = { email: 'a@example.com', password: 'Password1', username: 'alice' };
 		const res = mockResponse();
-		const next = vi.fn();
 
-		await new AuthController().linkProvider(req, res as unknown as Response, next as NextFunction);
+		await register(request({ body }), res as unknown as Response);
 
-		expect(linkProvider).not.toHaveBeenCalled();
-		expect(next).toHaveBeenCalledTimes(1);
-
-		const [error] = next.mock.calls[0] as [Error];
-		errorHandler(error, req, res as unknown as Response, vi.fn());
-
-		expect(res.statusCode).toBe(400);
-		expect(res.body).toMatchObject({ success: false, error: { code: 'VALIDATION_ERROR' } });
+		expect(mocks.register).toHaveBeenCalledWith(body);
+		expect(res.statusCode).toBe(201);
+		expect(res.body).toMatchObject({ success: true, data: result });
 	});
 });
 
-describe('AuthController.logout', () => {
-	beforeEach(() => {
-		logout.mockReset();
+describe('auth.controller login', () => {
+	const body = { email: 'a@example.com', password: 'secret' };
+
+	it('resets the failed attempts on success', async () => {
+		mocks.login.mockResolvedValue(result);
+		const res = mockResponse();
+
+		await login(request({ body }), res as unknown as Response);
+
+		expect(mocks.resetFailedAttempts).toHaveBeenCalledWith('a@example.com', '10.0.0.1');
+		expect(mocks.recordFailedAttempt).not.toHaveBeenCalled();
+		expect(res.body).toMatchObject({ success: true, data: result });
 	});
 
-	function logoutRequest() {
-		return {
-			headers: { authorization: 'Bearer access-token' },
-			user: { id: 'user-a' },
-			path: '/logout',
-			method: 'POST',
-		} as unknown as Request;
-	}
+	it('records a failed attempt and rethrows the error', async () => {
+		const failure = new AppError(401, 'Invalid email or password', 'INVALID_CREDENTIALS');
+		mocks.login.mockRejectedValue(failure);
 
-	it('passes the bearer token and user id to the service and answers 200', async () => {
-		logout.mockResolvedValue(undefined);
-		const res = mockResponse();
-		const next = vi.fn();
-
-		await new AuthController().logout(
-			logoutRequest(),
-			res as unknown as Response,
-			next as NextFunction
+		await expect(login(request({ body }), mockResponse() as unknown as Response)).rejects.toBe(
+			failure
 		);
 
-		expect(logout).toHaveBeenCalledWith('access-token', 'user-a');
-		expect(next).not.toHaveBeenCalled();
+		expect(mocks.recordFailedAttempt).toHaveBeenCalledWith('a@example.com', '10.0.0.1');
+		expect(mocks.recordIPActivity).toHaveBeenCalledWith('10.0.0.1');
+		expect(mocks.resetFailedAttempts).not.toHaveBeenCalled();
+	});
+
+	it('counts an invalid body as a failed attempt too', async () => {
+		const error = await login(
+			request({ body: { password: 'x' } }),
+			mockResponse() as unknown as Response
+		).catch((e: unknown) => e);
+
+		expect(error).toBeInstanceOf(ZodError);
+		expect(mocks.recordFailedAttempt).toHaveBeenCalledWith('unknown', '10.0.0.1');
+		expect(mocks.login).not.toHaveBeenCalled();
+	});
+});
+
+describe('auth.controller logout', () => {
+	const logoutRequest = () =>
+		request({ headers: { authorization: 'Bearer access-token' }, user: { id: 'user-a' } });
+
+	it('passes the bearer token and user id to the service and answers 200', async () => {
+		mocks.logout.mockResolvedValue(undefined);
+		const res = mockResponse();
+
+		await logout(logoutRequest(), res as unknown as Response);
+
+		expect(mocks.logout).toHaveBeenCalledWith('access-token', 'user-a');
 		expect(res.statusCode).toBe(200);
 		expect(res.body).toMatchObject({ success: true });
 	});
 
-	it('forwards an AppError from the service to next', async () => {
+	it('lets an AppError from the service through', async () => {
 		const failure = new AppError(500, 'Session could not be ended', 'LOGOUT_FAILED');
-		logout.mockRejectedValue(failure);
+		mocks.logout.mockRejectedValue(failure);
 		const res = mockResponse();
-		const next = vi.fn();
 
-		await new AuthController().logout(
-			logoutRequest(),
-			res as unknown as Response,
-			next as NextFunction
-		);
-
-		expect(next).toHaveBeenCalledWith(failure);
+		await expect(logout(logoutRequest(), res as unknown as Response)).rejects.toBe(failure);
 		expect(res.body).toBeUndefined();
+	});
+});
+
+describe('auth.controller refreshToken and me', () => {
+	it('refreshes the session with the body refresh token', async () => {
+		mocks.refreshToken.mockResolvedValue(result);
+		const res = mockResponse();
+
+		await refreshToken(request({ body: { refreshToken: 'refresh' } }), res as unknown as Response);
+
+		expect(mocks.refreshToken).toHaveBeenCalledWith('refresh');
+		expect(res.body).toMatchObject({ success: true, data: result });
+	});
+
+	it('answers the profile of the signed-in user', async () => {
+		mocks.getUserProfile.mockResolvedValue({ id: 'user-a' });
+		const res = mockResponse();
+
+		await me(request({ user: { id: 'user-a' } }), res as unknown as Response);
+
+		expect(mocks.getUserProfile).toHaveBeenCalledWith('user-a');
+		expect(res.body).toMatchObject({ data: { user: { id: 'user-a' } } });
 	});
 });
