@@ -12,7 +12,7 @@ import {
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTheme } from '@/shared/theme/ThemeContext';
-import { usePlayerHeight } from '@/contexts/PlayerContext';
+import { usePlayerHeight } from '@/features/player/context/PlayerContext';
 import type { Theme } from '@/shared/theme/types';
 import type { MusicGenre, MusicPreferences } from '@/types/user.types';
 import { useAuthStore } from '@/features/auth/stores/authStore';

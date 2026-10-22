@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
-import { usePlayerHeight } from '@/contexts/PlayerContext';
+import { usePlayerHeight } from '@/features/player/context/PlayerContext';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { ThemeSelector } from '@/shared/components/theme/ThemeSelector';
 import { BackendUrlField } from '@/shared/components/form/BackendUrlField';

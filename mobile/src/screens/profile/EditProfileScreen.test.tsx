@@ -21,7 +21,7 @@ jest.mock('@/shared/theme/ThemeContext', () => {
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-jest.mock('@/contexts/PlayerContext', () => ({ usePlayerHeight: () => 0 }));
+jest.mock('@/features/player/context/PlayerContext', () => ({ usePlayerHeight: () => 0 }));
 
 jest.mock('@react-navigation/native', () => ({
 	useNavigation: () => ({ goBack: jest.fn() }),

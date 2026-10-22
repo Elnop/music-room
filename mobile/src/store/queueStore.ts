@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { ApiError } from '@/shared/services/api';
 import { queueApi, type QueueCallTarget } from '@/services/queueApi';
-import { usePlayerStore } from './playerStore';
-import { useAuthStore } from '@/features/auth/stores/authStore';
+import { usePlayerStore } from '@/features/player/stores/playerStore';
+import { getSession } from '@/shared/services/authSession';
 import { useConnectStore, useActiveOwnerId } from './connectStore';
 import { trackToSoundCloud } from '@/shared/utils/trackToSoundCloud';
 import { toTrackInput } from '@/shared/utils/trackInput';
@@ -104,7 +104,7 @@ interface ActionScope {
 
 const actionScope = (): ActionScope => {
 	const { target } = useConnectStore.getState();
-	const me = useAuthStore.getState().user?.id ?? null;
+	const me = getSession().user?.id ?? null;
 	if (target.kind === 'local') return { ownerId: me, remote: false, call: {} };
 	return {
 		ownerId: target.ownerId,
@@ -219,7 +219,7 @@ export const useQueueStore = create<QueueStoreState>((set, get) => {
 		loaded: false,
 
 		load: async ownerId => {
-			const me = useAuthStore.getState().user?.id;
+			const me = getSession().user?.id;
 			try {
 				get().applyState(await queueApi.getQueue(ownerId && ownerId !== me ? { ownerId } : {}));
 			} catch (error) {
@@ -230,7 +230,7 @@ export const useQueueStore = create<QueueStoreState>((set, get) => {
 		applyState: state => {
 			// Only my queue and the remote owner's are kept: a late answer after
 			// forget() or a logout must not bring another owner's queue back.
-			const me = useAuthStore.getState().user?.id;
+			const me = getSession().user?.id;
 			const { target } = useConnectStore.getState();
 			const remoteOwner = target.kind === 'remote' ? target.ownerId : null;
 			if (state.ownerId !== me && state.ownerId !== remoteOwner) return;

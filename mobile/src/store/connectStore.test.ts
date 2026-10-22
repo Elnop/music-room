@@ -1,6 +1,6 @@
 import { activeOwnerId, useConnectStore } from './connectStore';
 import { useAuthStore } from '@/features/auth/stores/authStore';
-import { usePlayerStore } from './playerStore';
+import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { showInfo } from '@/shared/utils/toast';
 import type { ListeningStatus } from '@/types/listening.types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';

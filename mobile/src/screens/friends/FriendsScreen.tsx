@@ -8,7 +8,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { debounce } from '@/shared/utils/debounce';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
-import { usePlayerHeight } from '@/contexts/PlayerContext';
+import { usePlayerHeight } from '@/features/player/context/PlayerContext';
 import type { Theme } from '@/shared/theme/types';
 import { useAuthStore } from '@/features/auth/stores/authStore';
 import { profileApi } from '@/services/profileApi';

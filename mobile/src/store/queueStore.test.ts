@@ -7,7 +7,7 @@ import {
 	selectHasPrevious,
 	selectPlaysPlaylist,
 } from './queueSelectors';
-import { usePlayerStore } from './playerStore';
+import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { deferred } from '@/test/deferred';
 import { useAuthStore } from '@/features/auth/stores/authStore';
 import { useConnectStore } from './connectStore';

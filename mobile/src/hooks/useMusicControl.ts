@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useMemo, useState } from 'react';
 import { useSocketStore } from '@/shared/stores/socketStore';
-import { usePlayerStore, readPositionMs } from '@/store/playerStore';
+import { usePlayerStore, readPositionMs } from '@/features/player/stores/playerStore';
 import { useAuthStore } from '@/features/auth/stores/authStore';
 import { useQueueStore } from '@/store/queueStore';
 import { useConnectStore } from '@/store/connectStore';

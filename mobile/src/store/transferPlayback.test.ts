@@ -1,6 +1,6 @@
 import { transferTo } from './transferPlayback';
 import { useConnectStore } from './connectStore';
-import { usePlayerStore, setPositionReader } from './playerStore';
+import { usePlayerStore, setPositionReader } from '@/features/player/stores/playerStore';
 import { useQueueStore } from './queueStore';
 import { useAuthStore } from '@/features/auth/stores/authStore';
 import { queueApi } from '@/services/queueApi';

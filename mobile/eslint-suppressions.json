@@ -12,22 +12,6 @@
       "count": 1
     }
   },
-  "src/components/player/MiniPlayer.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 2
-    },
-    "guardrails/ui-primitives": {
-      "count": 1
-    }
-  },
-  "src/components/player/PlayerModal.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 5
-    },
-    "guardrails/ui-primitives": {
-      "count": 1
-    }
-  },
   "src/components/player/QueueItemRow.tsx": {
     "guardrails/theme-tokens": {
       "count": 4
@@ -72,11 +56,6 @@
       "count": 2
     },
     "guardrails/ui-primitives": {
-      "count": 1
-    }
-  },
-  "src/contexts/PlayerContext.tsx": {
-    "guardrails/zustand-selector": {
       "count": 1
     }
   },
@@ -203,16 +182,6 @@
   "src/shared/components/ui/ThemedSwitch.tsx": {
     "guardrails/theme-tokens": {
       "count": 1
-    }
-  },
-  "src/shared/hooks/useImageColors.test.ts": {
-    "guardrails/theme-tokens": {
-      "count": 22
-    }
-  },
-  "src/shared/hooks/useImageColors.ts": {
-    "guardrails/theme-tokens": {
-      "count": 9
     }
   },
   "src/types/user.types.ts": {
