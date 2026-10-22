@@ -4,12 +4,12 @@ import { MAX_GENRES } from '@/features/profile/profile.types.js';
 // =====================================================
 // Visibility Level Enum
 // =====================================================
-const visibilityLevelSchema = z.enum(['public', 'friends_only', 'private']);
+export const visibilityLevelSchema = z.enum(['public', 'friends_only', 'private']);
 
 // =====================================================
 // Music Genre Enum
 // =====================================================
-const musicGenreSchema = z.enum([
+export const musicGenreSchema = z.enum([
 	'pop',
 	'rock',
 	'hiphop',

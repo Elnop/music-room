@@ -83,3 +83,12 @@ export const addViewerSchema = z.object({
 });
 
 export type MoveTrackInput = z.infer<typeof moveTrackSchema>;
+
+// Path segments read with `routeParam` (any non-empty value), documented as UUIDs.
+export const playlistIdParamSchema = z.object({
+	id: z.uuid().meta({ param: { description: 'Playlist ID' } }),
+});
+
+export const playlistMemberParamsSchema = playlistIdParamSchema.extend({
+	userId: z.uuid().meta({ param: { description: 'ID of the collaborator or viewer' } }),
+});

@@ -1,612 +1,140 @@
-import { OpenAPIV3 } from 'openapi-types';
+import type { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
+import { z } from 'zod';
+import { registerProfileSettingsOpenapi } from '@/features/profile/profile-settings.openapi.js';
+import {
+	avatarResponseSchema,
+	filteredProfileSchema,
+	ownProfileSchema,
+	publicProfileSchema,
+} from '@/features/profile/profile-responses.validators.js';
+import { searchUsersSchema, updateProfileSchema } from '@/features/profile/profile.validators.js';
+import {
+	bearerAuth,
+	describeParams,
+	jsonBody,
+	nameSchemas,
+	ok,
+	param,
+} from '@/shared/config/swagger.schemas.js';
+import { fail, shared } from '@/shared/config/swagger.errors.js';
 
-/**
- * OpenAPI paths for Profile feature
- */
-export const profilePaths: OpenAPIV3.PathsObject = {
-	'/api/profile': {
-		get: {
-			tags: ['Profile'],
-			summary: "Get current user's profile",
-			operationId: 'getOwnProfile',
-			security: [{ bearerAuth: [] }],
-			responses: {
-				'200': {
-					description: 'Profile retrieved',
-					content: {
-						'application/json': {
-							schema: {
-								allOf: [
-									{ $ref: '#/components/schemas/SuccessResponse' },
-									{
-										type: 'object',
-										properties: {
-											data: { $ref: '#/components/schemas/UserProfile' },
-										},
-									},
-								],
-							},
-						},
-					},
-				},
-				'401': { $ref: '#/components/responses/UnauthorizedError' },
-			},
-		},
-		patch: {
-			tags: ['Profile'],
-			summary: "Update current user's profile",
-			operationId: 'updateProfile',
-			security: [{ bearerAuth: [] }],
-			requestBody: {
-				required: true,
-				content: {
-					'application/json': {
-						schema: { $ref: '#/components/schemas/UpdateProfileRequest' },
-						example: {
-							username: 'newusername',
-							displayName: 'John Doe Updated',
-							bio: 'Music enthusiast and playlist curator',
-							avatarUrl: 'https://example.com/avatar.jpg',
-						},
-					},
-				},
-			},
-			responses: {
-				'200': {
-					description: 'Profile updated',
-					content: {
-						'application/json': {
-							schema: {
-								allOf: [
-									{ $ref: '#/components/schemas/SuccessResponse' },
-									{
-										type: 'object',
-										properties: {
-											data: { $ref: '#/components/schemas/UserProfile' },
-										},
-									},
-								],
-							},
-						},
-					},
-				},
-				'400': { $ref: '#/components/responses/ValidationError' },
-				'401': { $ref: '#/components/responses/UnauthorizedError' },
-			},
-		},
-	},
+/** Registers the /api/profile routes. */
+export function registerProfileOpenapi(registry: OpenAPIRegistry): void {
+	const common = { tags: ['Profile'], security: bearerAuth };
+	const unauthorized = shared('UnauthorizedError');
+	const validation = shared('ValidationError');
+	const limited = { 429: shared('RateLimitError'), 503: shared('RateLimitUnavailable') };
+	nameSchemas({
+		OwnProfile: ownProfileSchema,
+		SearchProfile: publicProfileSchema,
+		FilteredProfile: filteredProfileSchema,
+		UpdateProfileRequest: updateProfileSchema,
+	});
 
-	'/api/profile/search': {
-		get: {
-			tags: ['Profile'],
-			summary: 'Search users by username or display name',
-			description:
-				"Excludes the requester. Each result's avatarUrl and bio follow that profile's privacy settings for the requester (absent when hidden), as on GET /api/profile/{userId}.",
-			operationId: 'searchUsers',
-			security: [{ bearerAuth: [] }],
-			parameters: [
-				{
-					in: 'query',
-					name: 'q',
-					required: true,
-					schema: { type: 'string', minLength: 1 },
-					description: 'Search query',
-				},
-				{
-					in: 'query',
-					name: 'limit',
-					schema: { type: 'integer', minimum: 1, maximum: 50, default: 20 },
-					description: 'Maximum number of results',
-				},
-			],
-			responses: {
-				'200': {
-					description: 'Search results',
-					content: {
-						'application/json': {
-							schema: {
-								allOf: [
-									{ $ref: '#/components/schemas/SuccessResponse' },
-									{
-										type: 'object',
-										properties: {
-											data: {
-												type: 'array',
-												items: { $ref: '#/components/schemas/SearchProfile' },
-											},
-										},
-									},
-								],
-							},
-						},
-					},
-				},
-				'400': { $ref: '#/components/responses/ValidationError' },
-				'401': { $ref: '#/components/responses/UnauthorizedError' },
-			},
-		},
-	},
+	registry.registerPath({
+		...common,
+		method: 'get',
+		path: '/api/profile',
+		summary: "Get current user's profile",
+		operationId: 'getOwnProfile',
+		responses: { 200: ok('Profile retrieved', ownProfileSchema), 401: unauthorized },
+	});
 
-	'/api/profile/privacy': {
-		get: {
-			tags: ['Profile'],
-			summary: "Get current user's privacy settings",
-			operationId: 'getPrivacySettings',
-			security: [{ bearerAuth: [] }],
-			responses: {
-				'200': {
-					description: 'Privacy settings retrieved',
-					content: {
-						'application/json': {
-							schema: {
-								allOf: [
-									{ $ref: '#/components/schemas/SuccessResponse' },
-									{
-										type: 'object',
-										properties: {
-											data: { $ref: '#/components/schemas/PrivacySettings' },
-										},
-									},
-								],
-							},
-						},
-					},
-				},
-				'401': { $ref: '#/components/responses/UnauthorizedError' },
-			},
-		},
-		put: {
-			tags: ['Profile'],
-			summary: "Update current user's privacy settings",
-			operationId: 'updatePrivacySettings',
-			security: [{ bearerAuth: [] }],
-			requestBody: {
-				required: true,
-				content: {
-					'application/json': {
-						schema: { $ref: '#/components/schemas/UpdatePrivacySettingsRequest' },
-						example: {
-							bioVisibility: 'friends_only',
-							emailVisibility: 'private',
-						},
-					},
-				},
-			},
-			responses: {
-				'200': {
-					description: 'Privacy settings updated',
-					content: {
-						'application/json': {
-							schema: {
-								allOf: [
-									{ $ref: '#/components/schemas/SuccessResponse' },
-									{
-										type: 'object',
-										properties: {
-											data: { $ref: '#/components/schemas/PrivacySettings' },
-										},
-									},
-								],
-							},
-						},
-					},
-				},
-				'400': { $ref: '#/components/responses/ValidationError' },
-				'401': { $ref: '#/components/responses/UnauthorizedError' },
-			},
-		},
-	},
+	registry.registerPath({
+		...common,
+		method: 'patch',
+		path: '/api/profile',
+		summary: "Update current user's profile",
+		operationId: 'updateProfile',
+		request: { body: jsonBody(updateProfileSchema) },
+		responses: { 200: ok('Profile updated', ownProfileSchema), 400: validation, 401: unauthorized },
+	});
 
-	'/api/profile/music-preferences': {
-		get: {
-			tags: ['Profile'],
-			summary: "Get current user's music preferences",
-			operationId: 'getMusicPreferences',
-			security: [{ bearerAuth: [] }],
-			responses: {
-				'200': {
-					description: 'Music preferences retrieved',
-					content: {
-						'application/json': {
-							schema: {
-								allOf: [
-									{ $ref: '#/components/schemas/SuccessResponse' },
-									{
-										type: 'object',
-										properties: {
-											data: { $ref: '#/components/schemas/MusicPreferences' },
-										},
-									},
-								],
-							},
-						},
-					},
-				},
-				'401': { $ref: '#/components/responses/UnauthorizedError' },
-			},
+	registry.registerPath({
+		...common,
+		method: 'get',
+		path: '/api/profile/search',
+		summary: 'Search users by username or display name',
+		description:
+			"Excludes the requester. Each result's avatarUrl and bio follow that profile's privacy settings for the requester (absent when hidden), as on GET /api/profile/{userId}.",
+		operationId: 'searchUsers',
+		request: {
+			query: describeParams(searchUsersSchema, {
+				q: 'Search query',
+				limit: 'Maximum number of results',
+			}),
 		},
-		put: {
-			tags: ['Profile'],
-			summary: "Update current user's music preferences",
-			description: 'Set favorite genres (maximum 5)',
-			operationId: 'updateMusicPreferences',
-			security: [{ bearerAuth: [] }],
-			requestBody: {
-				required: true,
-				content: {
-					'application/json': {
-						schema: { $ref: '#/components/schemas/UpdateMusicPreferencesRequest' },
-						example: {
-							favoriteGenres: ['electronic', 'hip-hop', 'jazz'],
-						},
-					},
-				},
-			},
-			responses: {
-				'200': {
-					description: 'Music preferences updated',
-					content: {
-						'application/json': {
-							schema: {
-								allOf: [
-									{ $ref: '#/components/schemas/SuccessResponse' },
-									{
-										type: 'object',
-										properties: {
-											data: { $ref: '#/components/schemas/MusicPreferences' },
-										},
-									},
-								],
-							},
-						},
-					},
-				},
-				'400': { $ref: '#/components/responses/ValidationError' },
-				'401': { $ref: '#/components/responses/UnauthorizedError' },
-			},
+		responses: {
+			200: ok('Search results', z.array(publicProfileSchema)),
+			400: validation,
+			401: unauthorized,
 		},
-	},
+	});
 
-	'/api/profile/music-preferences/genres': {
-		get: {
-			tags: ['Profile'],
-			summary: 'Get all available music genres',
-			operationId: 'getAvailableGenres',
-			security: [{ bearerAuth: [] }],
-			responses: {
-				'200': {
-					description: 'List of genres',
-					content: {
-						'application/json': {
-							schema: {
-								allOf: [
-									{ $ref: '#/components/schemas/SuccessResponse' },
-									{
-										type: 'object',
-										properties: {
-											data: {
-												type: 'object',
-												properties: {
-													genres: {
-														type: 'array',
-														items: { type: 'string' },
-														example: ['rock', 'pop', 'electronic', 'hip-hop', 'jazz', 'classical'],
-													},
-												},
-											},
-										},
-									},
-								],
-							},
-						},
-					},
-				},
-				'401': { $ref: '#/components/responses/UnauthorizedError' },
-			},
-		},
-	},
-
-	'/api/profile/avatar': {
-		put: {
-			tags: ['Profile'],
-			summary: 'Upload a new profile photo',
-			description:
-				"Multipart upload of the photo in the `avatar` field: JPEG, PNG or WebP, at most 2 MB. The type is read from the file's bytes; the declared MIME type is ignored. The file is stored in the public `avatars` Storage bucket under a random name and becomes `avatarUrl`; the previous photo is deleted when it was stored there (a Google or Facebook picture is left alone). Who sees the URL still depends on `avatar_visibility`. Rate-limited per user (10 changes per hour by default, shared with DELETE).",
-			operationId: 'uploadAvatar',
-			security: [{ bearerAuth: [] }],
-			requestBody: {
+	registry.registerPath({
+		...common,
+		method: 'put',
+		path: '/api/profile/avatar',
+		summary: 'Upload a new profile photo',
+		description:
+			"Multipart upload of the photo in the `avatar` field: JPEG, PNG or WebP, at most 2 MB. The type is read from the file's bytes; the declared MIME type is ignored. The file is stored in the public `avatars` Storage bucket under a random name and becomes `avatarUrl`; the previous photo is deleted when it was stored there (a Google or Facebook picture is left alone). Who sees the URL still depends on `avatar_visibility`. Rate-limited per user (10 changes per hour by default, shared with DELETE).",
+		operationId: 'uploadAvatar',
+		request: {
+			body: {
 				required: true,
 				content: {
 					'multipart/form-data': {
-						schema: {
-							type: 'object',
-							required: ['avatar'],
-							properties: {
-								avatar: {
-									type: 'string',
-									format: 'binary',
-									description: 'JPEG, PNG or WebP image, at most 2 MB',
-								},
-							},
-						},
+						schema: z.object({
+							avatar: z.string().meta({
+								format: 'binary',
+								description: 'JPEG, PNG or WebP image, at most 2 MB',
+							}),
+						}),
 					},
 				},
-			},
-			responses: {
-				'200': {
-					description: 'Photo stored; `avatarUrl` is its public URL',
-					content: {
-						'application/json': {
-							schema: {
-								allOf: [
-									{ $ref: '#/components/schemas/SuccessResponse' },
-									{
-										type: 'object',
-										properties: {
-											data: {
-												type: 'object',
-												required: ['avatarUrl'],
-												properties: {
-													avatarUrl: {
-														type: 'string',
-														format: 'uri',
-														example:
-															'https://xyz.supabase.co/storage/v1/object/public/avatars/0b5c…/3f2a….jpg',
-													},
-												},
-											},
-										},
-									},
-								],
-							},
-						},
-					},
-				},
-				'400': {
-					description:
-						'INVALID_IMAGE: not a JPEG, PNG or WebP file. VALIDATION_ERROR: no `avatar` file. INVALID_UPLOAD: malformed multipart body',
-					content: {
-						'application/json': {
-							schema: { $ref: '#/components/schemas/ErrorResponse' },
-							example: {
-								success: false,
-								error: {
-									message: 'The file is not a JPEG, PNG or WebP image',
-									code: 'INVALID_IMAGE',
-								},
-								meta: { timestamp: '2026-10-17T10:30:00.000Z' },
-							},
-						},
-					},
-				},
-				'401': { $ref: '#/components/responses/UnauthorizedError' },
-				'413': {
-					description: 'FILE_TOO_LARGE: the photo is over 2 MB; nothing is stored',
-					content: {
-						'application/json': {
-							schema: { $ref: '#/components/schemas/ErrorResponse' },
-						},
-					},
-				},
-				'429': { $ref: '#/components/responses/RateLimitError' },
-				'503': { $ref: '#/components/responses/RateLimitUnavailable' },
 			},
 		},
-		delete: {
-			tags: ['Profile'],
-			summary: 'Remove the profile photo',
-			description:
-				'Sets `avatarUrl` to null (the app shows initials) and deletes the photo when it was stored in the `avatars` bucket. Rate-limited per user, shared with PUT.',
-			operationId: 'removeAvatar',
-			security: [{ bearerAuth: [] }],
-			responses: {
-				'200': {
-					description: 'Photo removed',
-					content: {
-						'application/json': {
-							schema: {
-								allOf: [
-									{ $ref: '#/components/schemas/SuccessResponse' },
-									{
-										type: 'object',
-										properties: {
-											data: {
-												type: 'object',
-												required: ['avatarUrl'],
-												properties: {
-													avatarUrl: { type: 'string', nullable: true, example: null },
-												},
-											},
-										},
-									},
-								],
-							},
-						},
-					},
-				},
-				'401': { $ref: '#/components/responses/UnauthorizedError' },
-				'429': { $ref: '#/components/responses/RateLimitError' },
-				'503': { $ref: '#/components/responses/RateLimitUnavailable' },
-			},
+		responses: {
+			200: ok('Photo stored; `avatarUrl` is its public URL', avatarResponseSchema),
+			400: fail(
+				'INVALID_IMAGE: not a JPEG, PNG or WebP file. VALIDATION_ERROR: no `avatar` file. INVALID_UPLOAD: malformed multipart body',
+				['INVALID_IMAGE', 'The file is not a JPEG, PNG or WebP image']
+			),
+			401: unauthorized,
+			413: fail('FILE_TOO_LARGE: the photo is over 2 MB; nothing is stored', [
+				'FILE_TOO_LARGE',
+				'The photo must not exceed 2 MB',
+			]),
+			...limited,
 		},
-	},
+	});
 
-	'/api/profile/{userId}': {
-		get: {
-			tags: ['Profile'],
-			summary: 'Get user profile by ID',
-			description:
-				'Returns user profile filtered by privacy settings. Only visible fields are returned.',
-			operationId: 'getProfileById',
-			security: [{ bearerAuth: [] }],
-			parameters: [
-				{
-					in: 'path',
-					name: 'userId',
-					required: true,
-					schema: { type: 'string', format: 'uuid' },
-					description: 'User ID',
-				},
-			],
-			responses: {
-				'200': {
-					description: 'User profile retrieved',
-					content: {
-						'application/json': {
-							schema: {
-								allOf: [
-									{ $ref: '#/components/schemas/SuccessResponse' },
-									{
-										type: 'object',
-										properties: {
-											data: { $ref: '#/components/schemas/UserProfile' },
-										},
-									},
-								],
-							},
-						},
-					},
-				},
-				'401': { $ref: '#/components/responses/UnauthorizedError' },
-				'404': { $ref: '#/components/responses/NotFoundError' },
-			},
-		},
-	},
-};
-
-/**
- * Schemas specific to Profile
- */
-export const profileSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
-	SearchProfile: {
-		type: 'object',
+	registry.registerPath({
+		...common,
+		method: 'delete',
+		path: '/api/profile/avatar',
+		summary: 'Remove the profile photo',
 		description:
-			'A found profile; avatarUrl and bio are absent when its privacy settings hide them',
-		required: ['id', 'username', 'createdAt'],
-		properties: {
-			id: { type: 'string', format: 'uuid' },
-			username: { type: 'string' },
-			displayName: { type: 'string' },
-			avatarUrl: { type: 'string', format: 'uri' },
-			bio: { type: 'string' },
-			favoriteArtist: { type: 'string' },
-			createdAt: { type: 'string', format: 'date-time' },
-		},
-	},
-	UpdateProfileRequest: {
-		type: 'object',
-		properties: {
-			username: {
-				type: 'string',
-				minLength: 3,
-				maxLength: 20,
-				pattern: '^[a-zA-Z0-9_]+$',
-				description: 'Alphanumeric and underscores only',
-			},
-			displayName: {
-				type: 'string',
-				maxLength: 50,
-			},
-			bio: {
-				type: 'string',
-				maxLength: 500,
-			},
-			avatarUrl: {
-				type: 'string',
-				format: 'uri',
-			},
-		},
-	},
+			'Sets `avatarUrl` to null (the app shows initials) and deletes the photo when it was stored in the `avatars` bucket. Rate-limited per user, shared with PUT.',
+		operationId: 'removeAvatar',
+		responses: { 200: ok('Photo removed', avatarResponseSchema), 401: unauthorized, ...limited },
+	});
 
-	PrivacySettings: {
-		type: 'object',
+	registry.registerPath({
+		...common,
+		method: 'get',
+		path: '/api/profile/{userId}',
+		summary: 'Get user profile by ID',
 		description:
-			'Visibility of each profile field: public (everyone), friends_only (mutual follows), private (only you)',
-		properties: {
-			userId: { type: 'string', format: 'uuid' },
-			emailVisibility: {
-				type: 'string',
-				enum: ['public', 'friends_only', 'private'],
-				description: 'Who can see your email',
-			},
-			bioVisibility: {
-				type: 'string',
-				enum: ['public', 'friends_only', 'private'],
-				description: 'Who can see your bio',
-			},
-			avatarVisibility: {
-				type: 'string',
-				enum: ['public', 'friends_only', 'private'],
-				description: 'Who can see your avatar',
-			},
-			musicPreferencesVisibility: {
-				type: 'string',
-				enum: ['public', 'friends_only', 'private'],
-				description: 'Who can see your music preferences',
-			},
-			createdAt: { type: 'string', format: 'date-time' },
-			updatedAt: { type: 'string', format: 'date-time' },
+			'Returns user profile filtered by privacy settings. Only visible fields are returned.',
+		operationId: 'getProfileById',
+		request: { params: z.object({ userId: param(z.uuid(), 'User ID') }) },
+		responses: {
+			200: ok('User profile retrieved', filteredProfileSchema),
+			401: unauthorized,
+			404: shared('NotFoundError'),
 		},
-		required: [
-			'userId',
-			'emailVisibility',
-			'bioVisibility',
-			'avatarVisibility',
-			'musicPreferencesVisibility',
-			'createdAt',
-			'updatedAt',
-		],
-	},
+	});
 
-	UpdatePrivacySettingsRequest: {
-		type: 'object',
-		description: 'Fields to change; omitted fields keep their value, unknown fields are ignored',
-		properties: {
-			emailVisibility: {
-				type: 'string',
-				enum: ['public', 'friends_only', 'private'],
-				description: 'Who can see your email',
-			},
-			bioVisibility: {
-				type: 'string',
-				enum: ['public', 'friends_only', 'private'],
-				description: 'Who can see your bio',
-			},
-			avatarVisibility: {
-				type: 'string',
-				enum: ['public', 'friends_only', 'private'],
-				description: 'Who can see your avatar',
-			},
-			musicPreferencesVisibility: {
-				type: 'string',
-				enum: ['public', 'friends_only', 'private'],
-				description: 'Who can see your music preferences',
-			},
-		},
-	},
-
-	MusicPreferences: {
-		type: 'object',
-		properties: {
-			favoriteGenres: {
-				type: 'array',
-				maxItems: 5,
-				items: { type: 'string' },
-				description: 'User favorite genres (max 5)',
-			},
-		},
-	},
-
-	UpdateMusicPreferencesRequest: {
-		type: 'object',
-		required: ['favoriteGenres'],
-		properties: {
-			favoriteGenres: {
-				type: 'array',
-				maxItems: 5,
-				items: { type: 'string' },
-				description: 'Array of genre names (max 5)',
-			},
-		},
-	},
-};
+	registerProfileSettingsOpenapi(registry);
+}
