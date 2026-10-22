@@ -96,73 +96,6 @@
   },
   {
     "type": "cycle",
-    "from": "src/components/playlist/PlaylistHeader.tsx",
-    "to": "src/navigation/linking.ts",
-    "unresolvedTo": "@/navigation/linking",
-    "dependencyTypes": [
-      "aliased",
-      "aliased-tsconfig",
-      "aliased-tsconfig-paths",
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "no-circular"
-    },
-    "cycle": [
-      {
-        "name": "src/navigation/linking.ts",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/navigation/AppNavigator.tsx",
-        "dependencyTypes": [
-          "local",
-          "type-only",
-          "import"
-        ]
-      },
-      {
-        "name": "src/navigation/stacks/FriendsStack.tsx",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/screens/playlists/PlaylistDetailScreen.tsx",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/components/playlist/PlaylistHeader.tsx",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      }
-    ]
-  },
-  {
-    "type": "cycle",
     "from": "src/hooks/useNowPlaying.ts",
     "to": "src/contexts/PlayerContext.tsx",
     "unresolvedTo": "@/contexts/PlayerContext",
@@ -213,73 +146,6 @@
   {
     "type": "cycle",
     "from": "src/navigation/AppNavigator.tsx",
-    "to": "src/navigation/stacks/PlaylistsStack.tsx",
-    "unresolvedTo": "@/navigation/stacks/PlaylistsStack",
-    "dependencyTypes": [
-      "aliased",
-      "aliased-tsconfig",
-      "aliased-tsconfig-paths",
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "no-circular"
-    },
-    "cycle": [
-      {
-        "name": "src/navigation/stacks/PlaylistsStack.tsx",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/screens/playlists/PlaylistDetailScreen.tsx",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/components/playlist/PlaylistHeader.tsx",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/navigation/linking.ts",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/navigation/AppNavigator.tsx",
-        "dependencyTypes": [
-          "local",
-          "type-only",
-          "import"
-        ]
-      }
-    ]
-  },
-  {
-    "type": "cycle",
-    "from": "src/navigation/AppNavigator.tsx",
     "to": "src/navigation/stacks/ProfileStack.tsx",
     "unresolvedTo": "@/navigation/stacks/ProfileStack",
     "dependencyTypes": [
@@ -322,61 +188,6 @@
           "aliased-tsconfig-paths",
           "local",
           "type-only",
-          "import"
-        ]
-      }
-    ]
-  },
-  {
-    "type": "cycle",
-    "from": "src/navigation/linking.ts",
-    "to": "src/navigation/AppNavigator.tsx",
-    "unresolvedTo": "./AppNavigator",
-    "dependencyTypes": [
-      "local",
-      "type-only",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "no-circular"
-    },
-    "cycle": [
-      {
-        "name": "src/navigation/AppNavigator.tsx",
-        "dependencyTypes": [
-          "local",
-          "type-only",
-          "import"
-        ]
-      },
-      {
-        "name": "src/navigation/stacks/FriendsStack.tsx",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/screens/friends/UserProfileScreen.tsx",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/navigation/linking.ts",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
           "import"
         ]
       }
@@ -461,23 +272,6 @@
         ]
       }
     ]
-  },
-  {
-    "type": "dependency",
-    "from": "src/shared/components/lists/SwipeableTrackItem.tsx",
-    "to": "src/components/track/TrackActionsButton.tsx",
-    "unresolvedTo": "@/components/track/TrackActionsButton",
-    "dependencyTypes": [
-      "aliased",
-      "aliased-tsconfig",
-      "aliased-tsconfig-paths",
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "shared-not-to-legacy"
-    }
   },
   {
     "type": "dependency",

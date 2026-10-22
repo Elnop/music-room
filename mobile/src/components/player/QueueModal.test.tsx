@@ -7,6 +7,10 @@ import { useConnectStore } from '@/store/connectStore';
 import type { UserProfile } from '@/types/user.types';
 import type { QueueItem, QueueState } from '@/types/queue.types';
 
+// The sheet reads the playlists through TanStack Query; these tests do not open it.
+jest.mock('@/features/playlists/trackActions/components/orchestrators/TrackActionsSheet', () => ({
+	TrackActionsSheet: () => null,
+}));
 
 jest.mock('@/shared/theme/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');

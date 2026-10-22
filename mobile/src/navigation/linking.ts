@@ -16,15 +16,10 @@ import {
 import type { LinkingOptions, NavigationContainerRef } from '@react-navigation/native';
 import type { AppTabsParamList } from './AppNavigator';
 import { logger } from '@/shared/utils/logger';
-
-const LINK_PREFIX = 'zumik://';
+import { LINK_PREFIX } from '@/shared/utils/shareLinks';
 
 const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
 const SHARE_PATH = new RegExp(`^/?(playlist|user)/${UUID}/?(\\?.*)?$`, 'i');
-
-export const playlistLink = (id: string): string => `${LINK_PREFIX}playlist/${id}`;
-
-export const userLink = (id: string): string => `${LINK_PREFIX}user/${id}`;
 
 /** A link received while signed out, opened once the app navigator is mounted. */
 let pendingPath: string | null = null;

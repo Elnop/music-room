@@ -73,7 +73,7 @@ The playlist is at version 10. Alice and Bob both display version 10; track E ha
 
 ## Broadcast and convergence
 
-After each operation the backend emits `playlist:updated` to the `playlist:<id>` room. The payload is a per-operation delta carrying the new `tracksVersion` (types `PlaylistUpdatedPayload` in `backend/src/features/playlists/playlist.types.ts` and `PlaylistUpdatedEvent` in `mobile/src/types/playlist.types.ts`):
+After each operation the backend emits `playlist:updated` to the `playlist:<id>` room. The payload is a per-operation delta carrying the new `tracksVersion` (types `PlaylistUpdatedPayload` in `backend/src/features/playlists/playlist.types.ts` and `PlaylistUpdatedEvent` in `mobile/src/features/playlists/types.ts`):
 
 ```ts
 { playlistId, tracksVersion, rebalanced, event: 'track_added', track }    // track carries rank, addedBy, addedAt
@@ -89,13 +89,13 @@ A client:
 
 All clients therefore end on the server's order. The HTTP contract (move endpoint, add and remove results, `tracksVersion` on the fetch, `rank` on each track) is in `backend/src/features/playlists/playlist-tracks.openapi.ts` (schemas in `playlist.validators.ts` and `playlist-responses.validators.ts`).
 
-**Moves from one client go one at a time.** A user who taps twice quickly would otherwise send the second move with the version from before the first, and get a `409` against themselves. The mobile store (`mobile/src/store/playlistStore.ts`, `moveTrack`) queues moves: each is sent only after the previous one answered, with the version from that answer. The playlist screen moves a track one row with up / down buttons, shown to users who can edit and disabled at the list edges and while a move is pending; `afterRank` is the rank of the track two rows above (`null` for the second row) to go up, or of the next track to go down (`mobile/src/store/moveTarget.ts`).
+**Moves from one client go one at a time.** A user who reorders quickly would otherwise send the second move with the version from before the first, and get a `409` against themselves. The mobile app (`mobile/src/features/playlists/utils/trackMoves.ts`, `moveTrack`) queues moves: each is sent only after the previous one answered, with the version from that answer. The playlist screen lets users who can edit drag a track to a new position; `afterRank` is the rank of the track it lands after, or `null` when dropped at the top (`mobile/src/shared/utils/moveTarget.ts`).
 
-**Own operations.** The answer to an add, remove or move carries the new `tracksVersion`; the store applies it like an event, so the echo of that operation on the socket arrives with a version already displayed and is ignored. The store never reorders before the answer: the order changes when the answer or the event arrives. Only a remove hides the track at once, and a reload brings it back if the remove fails.
+**Own operations.** The answer to an add, remove or move carries the new `tracksVersion`; the app applies it to the cached playlist like an event, so the echo of that operation on the socket arrives with a version already displayed and is ignored. The app never reorders before the answer: the order changes when the answer or the event arrives. Only a remove hides the track at once, and a reload brings it back if the remove fails.
 
-**On a `409`** (`TRACK_MOVED_CONCURRENTLY`, `TRACK_NOT_IN_PLAYLIST` or `PLAYLIST_REBALANCED`), the mobile store reloads the playlist and the screen tells the user "This track was changed by someone else".
+**On a `409`** (`TRACK_MOVED_CONCURRENTLY`, `TRACK_NOT_IN_PLAYLIST` or `PLAYLIST_REBALANCED`), the mobile app reloads the playlist and the screen tells the user "This track was changed by someone else".
 
-The pure rules (sort by rank, apply an event → new playlist, ignore or reload) are in `mobile/src/store/playlistSync.ts`; `mobile/src/hooks/usePlaylistSocket.ts` passes each event to the store and reloads when it answers `reload`.
+The pure rules (sort by rank, apply an event → new playlist, ignore or reload) are in `mobile/src/features/playlists/utils/playlistSync.ts`. The playlist lives in the TanStack Query cache: `utils/playlistSocketRules.ts` applies each `playlist:updated` delta to it and invalidates (reloads) the playlist on `reload`, and `hooks/usePlaylistRoom.ts` joins the room and reloads after a reconnect.
 
 ## Tests
 
@@ -106,11 +106,12 @@ Concurrency is tested on the integration Postgres (story 1.10, see `doc/TESTING.
 | `backend/src/features/playlists/services/track-ranks.int.test.ts` | `rank_between` and rank ordering |
 | `backend/src/features/playlists/services/track-operations.int.test.ts` | add, remove, move, concurrency, rebalancing |
 | `backend/src/realtime/playlist-updated.int.test.ts` | the `playlist:updated` deltas |
-| `mobile/src/store/playlistSync.test.ts` | sort by rank, event application (apply, ignore, reload) |
-| `mobile/src/store/moveTarget.test.ts` | `afterRank` for up / down and the list edges |
-| `mobile/src/store/playlistStore.test.ts` | move queue, `409` reload and message, events, loading, CRUD, add and remove |
-| `mobile/src/hooks/usePlaylistSocket.test.ts` | events through the store, reload |
-| `mobile/src/api/playlistApi.test.ts` | move request, collaborators and viewers |
+| `mobile/src/features/playlists/utils/playlistSync.test.ts` | sort by rank, event application (apply, ignore, reload) |
+| `mobile/src/shared/utils/moveTarget.test.ts` | `afterRank` for up / down and the list edges |
+| `mobile/src/features/playlists/utils/trackMoves.test.ts` | move queue, `409` reload, loading, add and remove |
+| `mobile/src/features/playlists/utils/playlistSocketRules.test.ts` | events applied to the cache, reload |
+| `mobile/src/features/playlists/detail/components/orchestrators/PlaylistDetailOrchestrator.test.tsx` | the screen: room, deletion, `409` message, moves |
+| `mobile/src/features/playlists/services/*.test.ts` | move request, collaborators and viewers |
 
 ## Alternatives not chosen
 

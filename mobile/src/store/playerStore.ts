@@ -1,16 +1,7 @@
 import { create } from 'zustand';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import { onSessionEnd } from '@/shared/services/authSession';
-
-/**
- * Playback states for the player state machine
- * - idle: No track loaded
- * - loading: Track selected, stream being fetched
- * - ready: Stream loaded, ready to play (transitions to playing automatically)
- * - playing: Audio is playing
- * - paused: Audio is paused
- */
-export type PlaybackState = 'idle' | 'loading' | 'ready' | 'playing' | 'paused';
+import type { PlaybackState } from '@/shared/types/playback';
 
 let positionReader: (() => number) | null = null;
 

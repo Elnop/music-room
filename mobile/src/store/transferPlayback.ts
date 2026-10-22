@@ -12,7 +12,8 @@ import { showError } from '@/shared/utils/toast';
 import { hapticSuccess } from '@/shared/utils/haptics';
 import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 import type { DevicePickerOwner } from '@/types/device.types';
-import type { AddQueueItemBody, QueueTrack, TransferRequest } from '@/types/queue.types';
+import type { QueueTrack, TransferRequest } from '@/types/queue.types';
+import type { AddQueueItemBody } from '@/shared/types/playback';
 import { logger } from '@/shared/utils/logger';
 
 /** What plays now and where it is, as the transfer route takes it; null when nothing plays. */

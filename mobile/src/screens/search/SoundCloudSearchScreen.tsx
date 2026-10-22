@@ -7,14 +7,14 @@ import { useSoundCloudStore } from '@/store/soundcloudStore';
 import { useQueueStore } from '@/store/queueStore';
 import { toTrackInput } from '@/shared/utils/trackInput';
 import { SoundCloudTrackItem } from '@/screens/search/components/SoundCloudTrackItem';
-import { TrackActionsSheet } from '@/components/track/TrackActionsSheet';
+import { TrackActionsSheet } from '@/features/playlists/trackActions/components/orchestrators/TrackActionsSheet';
 import { SkeletonList, TrackRowSkeleton } from '@/shared/components/ui/Skeleton';
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { SearchBar } from '@/shared/components/form/SearchBar';
 import { showError } from '@/shared/utils/toast';
 import { debounce } from '@/shared/utils/debounce';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
-import type { AddQueueItemBody } from '@/types/queue.types';
+import type { AddQueueItemBody } from '@/shared/types/playback';
 
 export function SoundCloudSearchScreen() {
 	const { theme } = useTheme();

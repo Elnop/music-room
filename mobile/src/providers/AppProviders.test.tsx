@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { AppProviders } from './AppProviders';
 import { createQueryClient } from '@/shared/query/queryClient';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import { notifySessionEnd } from '@/shared/services/authSession';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -50,5 +51,24 @@ describe('AppProviders', () => {
 		);
 
 		expect(onClient.mock.calls[0][0]).toBeDefined();
+	});
+
+	it('clears the whole query cache when the session ends', () => {
+		const client = createQueryClient();
+		client.setQueryData(['playlists', 'friends'], [{ id: 'p1' }]);
+		const { unmount } = render(
+			<AppProviders queryClient={client}>
+				<Text>app</Text>
+			</AppProviders>
+		);
+
+		notifySessionEnd();
+		expect(client.getQueryData(['playlists', 'friends'])).toBeUndefined();
+
+		client.setQueryData(['playlists', 'friends'], [{ id: 'p2' }]);
+		unmount();
+		notifySessionEnd();
+		expect(client.getQueryData(['playlists', 'friends'])).toEqual([{ id: 'p2' }]);
+		client.clear();
 	});
 });

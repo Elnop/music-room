@@ -4,7 +4,7 @@ import { Pressable } from '@/shared/components/ui/Pressable';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { QueueSwipe } from './QueueSwipe';
-import { TrackActionsButton } from '@/components/track/TrackActionsButton';
+import { TrackActionsButton } from './TrackActionsButton';
 import type { Theme } from '@/shared/theme/types';
 import type { Track } from '@/types/track.types';
 

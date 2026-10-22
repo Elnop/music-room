@@ -41,7 +41,7 @@ jest.mock('@/store/queueStore', () => ({
 		select({ playListTrack: jest.fn(), addItem: jest.fn() }),
 }));
 
-jest.mock('@/components/track/TrackActionsSheet', () => ({
+jest.mock('@/features/playlists/trackActions/components/orchestrators/TrackActionsSheet', () => ({
 	TrackActionsSheet: () => null,
 }));
 

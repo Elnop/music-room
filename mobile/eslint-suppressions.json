@@ -41,42 +41,6 @@
       "count": 1
     }
   },
-  "src/components/playlist/FriendPlaylistSection.tsx": {
-    "guardrails/ui-primitives": {
-      "count": 1
-    }
-  },
-  "src/components/playlist/PlayPlaylistButton.tsx": {
-    "guardrails/ui-primitives": {
-      "count": 1
-    }
-  },
-  "src/components/playlist/PlaylistActionsSheet.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 1
-    },
-    "guardrails/ui-primitives": {
-      "count": 2
-    }
-  },
-  "src/components/playlist/PlaylistCard.tsx": {
-    "guardrails/ui-primitives": {
-      "count": 1
-    }
-  },
-  "src/components/playlist/PlaylistGridCard.tsx": {
-    "guardrails/ui-primitives": {
-      "count": 1
-    }
-  },
-  "src/components/playlist/PlaylistHeader.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 1
-    },
-    "guardrails/ui-primitives": {
-      "count": 1
-    }
-  },
   "src/components/profile/GenreChip.tsx": {
     "guardrails/theme-tokens": {
       "count": 1
@@ -111,27 +75,6 @@
       "count": 1
     }
   },
-  "src/components/track/AddableTrackRow.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 1
-    },
-    "guardrails/ui-primitives": {
-      "count": 1
-    }
-  },
-  "src/components/track/TrackActionsButton.tsx": {
-    "guardrails/ui-primitives": {
-      "count": 1
-    }
-  },
-  "src/components/track/TrackActionsSheet.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 1
-    },
-    "guardrails/ui-primitives": {
-      "count": 2
-    }
-  },
   "src/contexts/PlayerContext.tsx": {
     "guardrails/zustand-selector": {
       "count": 1
@@ -140,16 +83,6 @@
   "src/hooks/useAvatarPicker.ts": {
     "guardrails/zustand-selector": {
       "count": 1
-    }
-  },
-  "src/hooks/useImageColors.test.ts": {
-    "guardrails/theme-tokens": {
-      "count": 22
-    }
-  },
-  "src/hooks/useImageColors.ts": {
-    "guardrails/theme-tokens": {
-      "count": 9
     }
   },
   "src/navigation/AppNavigator.tsx": {
@@ -166,43 +99,6 @@
     }
   },
   "src/screens/friends/UserProfileScreen.tsx": {
-    "guardrails/zustand-selector": {
-      "count": 1
-    }
-  },
-  "src/screens/playlists/CreatePlaylistScreen.tsx": {
-    "guardrails/zustand-selector": {
-      "count": 2
-    }
-  },
-  "src/screens/playlists/PlaylistDetailScreen.tsx": {
-    "guardrails/ui-primitives": {
-      "count": 1
-    },
-    "guardrails/zustand-selector": {
-      "count": 2
-    }
-  },
-  "src/screens/playlists/PlaylistSharingScreen.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 1
-    },
-    "guardrails/ui-primitives": {
-      "count": 1
-    },
-    "guardrails/zustand-selector": {
-      "count": 3
-    }
-  },
-  "src/screens/playlists/PlaylistsScreen.tsx": {
-    "guardrails/ui-primitives": {
-      "count": 1
-    },
-    "guardrails/zustand-selector": {
-      "count": 2
-    }
-  },
-  "src/screens/playlists/SearchTracksScreen.tsx": {
     "guardrails/zustand-selector": {
       "count": 1
     }
@@ -307,6 +203,16 @@
   "src/shared/components/ui/ThemedSwitch.tsx": {
     "guardrails/theme-tokens": {
       "count": 1
+    }
+  },
+  "src/shared/hooks/useImageColors.test.ts": {
+    "guardrails/theme-tokens": {
+      "count": 22
+    }
+  },
+  "src/shared/hooks/useImageColors.ts": {
+    "guardrails/theme-tokens": {
+      "count": 9
     }
   },
   "src/types/user.types.ts": {

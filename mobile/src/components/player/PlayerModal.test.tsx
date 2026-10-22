@@ -7,7 +7,7 @@ import { useQueueStore } from '@/store/queueStore';
 import { useAuthStore } from '@/features/auth/stores/authStore';
 import { hashStringToNumber } from '@/shared/utils/trackToSoundCloud';
 import type { UserProfile } from '@/types/user.types';
-import { useImageColors } from '@/hooks/useImageColors';
+import { useImageColors } from '@/shared/hooks/useImageColors';
 import { fireGestureHandler, getByGestureTestId } from 'react-native-gesture-handler/jest-utils';
 import { State } from 'react-native-gesture-handler';
 import type { PanGesture } from 'react-native-gesture-handler';
@@ -23,6 +23,10 @@ jest.mock('@/shared/utils/haptics', () => ({
 const mockSeekTo = jest.fn();
 const mockProgress = { progress: 0, currentTime: 0, duration: 0 };
 
+// The sheet reads the playlists through TanStack Query; these tests do not open it.
+jest.mock('@/features/playlists/trackActions/components/orchestrators/TrackActionsSheet', () => ({
+	TrackActionsSheet: () => null,
+}));
 
 jest.mock('@/shared/theme/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
@@ -92,7 +96,7 @@ jest.mock('@/hooks/usePlayerProgress', () => ({
 	usePlayerProgress: () => mockProgress,
 }));
 
-jest.mock('@/hooks/useImageColors', () => ({
+jest.mock('@/shared/hooks/useImageColors', () => ({
 	useImageColors: jest.fn(() => ({ dominantColor: null })),
 	hexToRgba: (color: string) => color,
 	getAdaptiveColors: () => null,

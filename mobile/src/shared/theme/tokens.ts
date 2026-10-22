@@ -60,8 +60,9 @@ export const NEOBRUTALISM_TYPOGRAPHY = {
 
 /**
  * Colours that do not change with the theme: the sign-in providers' brand
- * colours (their buttons keep the providers' guidelines) and the divider of the
- * sign-in screens. Every theme spreads them into its colours.
+ * colours (their buttons keep the providers' guidelines), the divider of the
+ * sign-in screens, and the backdrop, shadow and on-colour ink of every theme.
+ * Every theme spreads them into its colours.
  */
 export const FIXED_COLORS = {
 	divider: '#3E3E3E',
@@ -71,4 +72,9 @@ export const FIXED_COLORS = {
 	googleText: '#3C4043',
 	facebook: '#1877F2',
 	onFacebook: '#FFFFFF',
+	/** Text and icons drawn on a coloured fill (primary, success). */
+	onColor: '#FFFFFF',
+	/** The dimmed backdrop behind a bottom sheet. */
+	backdrop: 'rgba(0, 0, 0, 0.5)',
+	shadow: '#000000',
 } as const;

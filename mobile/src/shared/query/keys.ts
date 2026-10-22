@@ -14,6 +14,11 @@ export const queryKeys = {
 		all: ['playlists'] as const,
 		list: () => [...queryKeys.playlists.all, 'list'] as const,
 		detail: (playlistId: string) => [...queryKeys.playlists.all, 'detail', playlistId] as const,
+		public: () => [...queryKeys.playlists.all, 'public'] as const,
+		/** The public playlists of the user's friends. */
+		friends: () => [...queryKeys.playlists.all, 'friends'] as const,
+		/** Collaborators and viewers of a playlist. */
+		members: (playlistId: string) => [...queryKeys.playlists.all, 'members', playlistId] as const,
 	},
 	queue: {
 		all: ['queue'] as const,
