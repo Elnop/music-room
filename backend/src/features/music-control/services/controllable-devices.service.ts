@@ -1,5 +1,5 @@
 import { supabaseAdmin } from '@/shared/config/supabase.js';
-import { FriendsService } from '@/features/friends/services/friends.service.js';
+import * as mutualFriendsService from '@/features/friends/services/mutual-friends.service.js';
 import * as deviceLicenseService from '@/features/music-control/services/device-license.service.js';
 import {
 	failQuery,
@@ -11,8 +11,6 @@ import type {
 	DevicePickerOwner,
 	DevicePickerResponse,
 } from '@/features/music-control/music-control.types.js';
-
-const friendsService = new FriendsService();
 
 async function fetchUsername(userId: string): Promise<string> {
 	const { data, error } = await supabaseAdmin
@@ -37,7 +35,7 @@ export async function list(viewerId: string): Promise<DevicePickerResponse> {
 	const [username, myRows, friends] = await Promise.all([
 		fetchUsername(viewerId),
 		listOwnerDevices(viewerId),
-		friendsService.getMutualFriends(viewerId),
+		mutualFriendsService.getMutualFriends(viewerId),
 	]);
 
 	const self: DevicePickerOwner = {

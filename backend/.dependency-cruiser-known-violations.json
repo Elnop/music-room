@@ -241,8 +241,8 @@
   {
     "type": "dependency",
     "from": "src/features/music-control/services/control-switch.service.ts",
-    "to": "src/features/friends/services/friends.service.ts",
-    "unresolvedTo": "@/features/friends/services/friends.service.js",
+    "to": "src/features/friends/services/follow-status.service.ts",
+    "unresolvedTo": "@/features/friends/services/follow-status.service.js",
     "dependencyTypes": [
       "aliased",
       "aliased-tsconfig",
@@ -258,8 +258,8 @@
   {
     "type": "dependency",
     "from": "src/features/music-control/services/controllable-devices.service.ts",
-    "to": "src/features/friends/services/friends.service.ts",
-    "unresolvedTo": "@/features/friends/services/friends.service.js",
+    "to": "src/features/friends/services/mutual-friends.service.ts",
+    "unresolvedTo": "@/features/friends/services/mutual-friends.service.js",
     "dependencyTypes": [
       "aliased",
       "aliased-tsconfig",
@@ -275,8 +275,8 @@
   {
     "type": "dependency",
     "from": "src/features/music-control/services/device-license.service.ts",
-    "to": "src/features/friends/services/friends.service.ts",
-    "unresolvedTo": "@/features/friends/services/friends.service.js",
+    "to": "src/features/friends/services/follow-status.service.ts",
+    "unresolvedTo": "@/features/friends/services/follow-status.service.js",
     "dependencyTypes": [
       "aliased",
       "aliased-tsconfig",

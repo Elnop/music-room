@@ -27,10 +27,8 @@ vi.mock('@/shared/config/supabase.js', () => ({ supabaseAdmin: { from: m.from } 
 vi.mock('@/shared/utils/logger.js', () => ({
 	logger: { info: vi.fn(), warn: m.warn, error: m.error, debug: vi.fn() },
 }));
-vi.mock('@/features/friends/services/friends.service.js', () => ({
-	FriendsService: class {
-		getFollowStatus = m.getFollowStatus;
-	},
+vi.mock('@/features/friends/services/follow-status.service.js', () => ({
+	getFollowStatus: m.getFollowStatus,
 }));
 vi.mock('@/realtime/index.js', () => ({
 	realtime: { notifyPermissionChange: m.notifyPermissionChange },
