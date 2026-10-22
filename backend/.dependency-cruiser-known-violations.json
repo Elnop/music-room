@@ -445,8 +445,8 @@
   {
     "type": "dependency",
     "from": "src/features/queue/services/queue-delegation.int.test.ts",
-    "to": "src/features/playlists/playlist.service.ts",
-    "unresolvedTo": "@/features/playlists/playlist.service.js",
+    "to": "src/features/playlists/services/playlist.service.ts",
+    "unresolvedTo": "@/features/playlists/services/playlist.service.js",
     "dependencyTypes": [
       "aliased",
       "aliased-tsconfig",
@@ -462,8 +462,8 @@
   {
     "type": "dependency",
     "from": "src/features/queue/services/queue-sync.int.test.ts",
-    "to": "src/features/playlists/playlist.service.ts",
-    "unresolvedTo": "@/features/playlists/playlist.service.js",
+    "to": "src/features/playlists/services/playlist-track.service.ts",
+    "unresolvedTo": "@/features/playlists/services/playlist-track.service.js",
     "dependencyTypes": [
       "aliased",
       "aliased-tsconfig",
@@ -479,8 +479,8 @@
   {
     "type": "dependency",
     "from": "src/features/queue/services/queue-sync.int.test.ts",
-    "to": "src/features/playlists/services/playlist-track.service.ts",
-    "unresolvedTo": "@/features/playlists/services/playlist-track.service.js",
+    "to": "src/features/playlists/services/playlist.service.ts",
+    "unresolvedTo": "@/features/playlists/services/playlist.service.js",
     "dependencyTypes": [
       "aliased",
       "aliased-tsconfig",
@@ -531,8 +531,8 @@
   {
     "type": "dependency",
     "from": "src/features/queue/services/queue.service.int.test.ts",
-    "to": "src/features/playlists/playlist.service.ts",
-    "unresolvedTo": "@/features/playlists/playlist.service.js",
+    "to": "src/features/playlists/services/playlist-track.service.ts",
+    "unresolvedTo": "@/features/playlists/services/playlist-track.service.js",
     "dependencyTypes": [
       "aliased",
       "aliased-tsconfig",
@@ -548,8 +548,8 @@
   {
     "type": "dependency",
     "from": "src/features/queue/services/queue.service.int.test.ts",
-    "to": "src/features/playlists/services/playlist-track.service.ts",
-    "unresolvedTo": "@/features/playlists/services/playlist-track.service.js",
+    "to": "src/features/playlists/services/playlist.service.ts",
+    "unresolvedTo": "@/features/playlists/services/playlist.service.js",
     "dependencyTypes": [
       "aliased",
       "aliased-tsconfig",

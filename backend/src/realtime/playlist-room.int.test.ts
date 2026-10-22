@@ -5,9 +5,9 @@ import { io as ioClient, type Socket as ClientSocket } from 'socket.io-client';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { supabaseAdmin, supabaseAnon } from '@/shared/config/supabase.js';
 import { connectRedis, disconnectRedis, isRedisConnected } from '@/shared/config/redis.js';
-import { ViewerService } from '@/features/playlists/services/viewer.service.js';
-import { CollaboratorService } from '@/features/playlists/services/collaborator.service.js';
-import { PlaylistService } from '@/features/playlists/playlist.service.js';
+import * as viewerService from '@/features/playlists/services/viewer.service.js';
+import * as collaboratorService from '@/features/playlists/services/collaborator.service.js';
+import * as playlistUpdateService from '@/features/playlists/services/playlist-update.service.js';
 import { realtime } from '@/realtime/index.js';
 import type { PlaylistRoomError } from '@/realtime/playlist-room.js';
 import type { PlaylistUpdatedPayload } from '@/features/playlists/playlist.types.js';
@@ -234,7 +234,7 @@ describe('Playlist room access control', () => {
 		await join(viewerSocket, playlistId);
 
 		const eviction = nextEvent<PlaylistRoomError>(viewerSocket, 'playlist:error');
-		await new ViewerService().removeViewer(playlistId, owner.id, viewer.id);
+		await viewerService.removeViewer(playlistId, owner.id, viewer.id);
 		await expect(eviction).resolves.toMatchObject({
 			playlistId,
 			code: 'PLAYLIST_ACCESS_DENIED',
@@ -259,7 +259,7 @@ describe('Playlist room access control', () => {
 		await join(collaboratorSocket, playlistId);
 
 		const eviction = nextEvent<PlaylistRoomError>(collaboratorSocket, 'playlist:error');
-		await new CollaboratorService().removeCollaborator(playlistId, owner.id, outsider.id);
+		await collaboratorService.removeCollaborator(playlistId, owner.id, outsider.id);
 		await expect(eviction).resolves.toMatchObject({
 			playlistId,
 			code: 'PLAYLIST_ACCESS_DENIED',
@@ -307,7 +307,7 @@ describe('Playlist room access control', () => {
 		await join(outsiderSocket, playlistId);
 
 		const eviction = nextEvent<PlaylistRoomError>(outsiderSocket, 'playlist:error');
-		await new PlaylistService().updatePlaylist(playlistId, owner.id, { visibility: 'private' });
+		await playlistUpdateService.updatePlaylist(playlistId, owner.id, { visibility: 'private' });
 		await expect(eviction).resolves.toMatchObject({
 			playlistId,
 			code: 'PLAYLIST_ACCESS_DENIED',
@@ -326,7 +326,7 @@ describe('Playlist room access control', () => {
 		const evictions = [ownerSocket, viewerSocket].map(s =>
 			nextEvent<PlaylistRoomError>(s, 'playlist:error')
 		);
-		await new PlaylistService().deletePlaylist(playlistId, owner.id);
+		await playlistUpdateService.deletePlaylist(playlistId, owner.id);
 		for (const eviction of evictions) {
 			await expect(eviction).resolves.toMatchObject({ playlistId, code: 'PLAYLIST_NOT_FOUND' });
 		}

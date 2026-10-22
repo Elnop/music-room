@@ -131,11 +131,11 @@ curl -X POST http://localhost:3000/api/playlists/$PLAYLIST_ID/tracks \
 
 **Actual Implementation:**
 
-- Playlist endpoints verify ownership via `checkPlaylistOwnership` middleware
-- Edit permissions checked via `checkPlaylistEditPermission` for collaborators
+- Playlist services verify ownership via `checkOwnership`
+- Edit permissions checked via `checkEditPermission` (owner, collaborators, and anyone who can view in open mode)
 - Files:
-  - `backend/src/features/playlists/permissions/playlist.permissions.ts`
-  - `backend/src/features/playlists/playlist.controller.ts`
+  - `backend/src/features/playlists/permissions/playlist.permissions.ts` (`checkOwnership`, `checkEditPermission`)
+  - `backend/src/features/playlists/services/`: `playlist-update.service.ts`, `collaborator.service.ts`, `viewer.service.ts` and `viewer-list.service.ts` call `checkOwnership`; `playlist-track.service.ts` calls `checkEditPermission`
 
 ### Use Case 3: User Cannot See Private Profiles
 
@@ -646,7 +646,7 @@ curl -X POST http://localhost:3000/api/playlists/PLAYLIST_ID/tracks \
 
 **Implementation:**
 
-- All playlist actions logged in `playlist.controller.ts`
+- All playlist actions logged in the playlist services (`backend/src/features/playlists/services/`)
 - Includes user ID, action type, and mobile metadata
 
 ### Use Case 3: Security Events Logged

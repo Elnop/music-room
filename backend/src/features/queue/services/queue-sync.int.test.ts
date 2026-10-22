@@ -6,7 +6,7 @@ import type { QueueState } from '@/features/queue/queue.types.js';
 
 // Playlist -> queue sync of migration 023 (#278) against the local Supabase
 // stack: every row of the plan's I/O matrix. Playlist changes go through
-// PlaylistTrackService, as the API does; queue:updated is captured on a mock.
+// playlist-track.service, as the API does; queue:updated is captured on a mock.
 
 const { notifyQueueUpdate } = vi.hoisted(() => ({ notifyQueueUpdate: vi.fn() }));
 vi.mock('@/realtime/index.js', () => ({
@@ -14,14 +14,11 @@ vi.mock('@/realtime/index.js', () => ({
 }));
 
 const { QueueService } = await import('@/features/queue/services/queue.service.js');
-const { PlaylistService } = await import('@/features/playlists/playlist.service.js');
-const { PlaylistTrackService } =
-	await import('@/features/playlists/services/playlist-track.service.js');
+const playlists = await import('@/features/playlists/services/playlist.service.js');
+const playlistTracks = await import('@/features/playlists/services/playlist-track.service.js');
 
 const URI_PREFIX = `https://soundcloud.com/int-queue-sync/${randomUUID()}`;
 const queue = new QueueService();
-const playlists = new PlaylistService();
-const playlistTracks = new PlaylistTrackService();
 const users: string[] = [];
 let trackCount = 0;
 let ownerId: string;

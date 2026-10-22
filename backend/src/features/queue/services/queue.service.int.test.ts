@@ -3,8 +3,8 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { QueueService } from '@/features/queue/services/queue.service.js';
 import { playPlaylistRpc } from '@/features/queue/utils/queue-rpc.js';
-import { PlaylistService } from '@/features/playlists/playlist.service.js';
-import { PlaylistTrackService } from '@/features/playlists/services/playlist-track.service.js';
+import * as playlists from '@/features/playlists/services/playlist.service.js';
+import * as playlistTracks from '@/features/playlists/services/playlist-track.service.js';
 import type { QueueState } from '@/features/queue/queue.types.js';
 
 // The play queue of migrations 021 and 022 against the local Supabase stack
@@ -388,8 +388,6 @@ describe('rank rebalance', () => {
 });
 
 describe('play a playlist', () => {
-	const playlists = new PlaylistService();
-	const playlistTracks = new PlaylistTrackService();
 	let ownerId: string;
 
 	beforeEach(async () => {
@@ -506,7 +504,7 @@ describe('play a playlist', () => {
 		await addItems(1);
 		const before = await queue.getQueue(userId, userId);
 		const playlist = await createPlaylist(1);
-		await playlists.deletePlaylist(playlist.id, ownerId);
+		await supabaseAdmin.from('playlists').delete().eq('id', playlist.id);
 
 		await expect(playPlaylistRpc(userId, playlist.id)).rejects.toMatchObject({
 			statusCode: 404,

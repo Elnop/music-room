@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { QueueService } from '@/features/queue/services/queue.service.js';
-import { PlaylistService } from '@/features/playlists/playlist.service.js';
+import * as playlistService from '@/features/playlists/services/playlist.service.js';
 import { realtime } from '@/realtime/index.js';
 
 // #294: a friend who controls at least one device of the owner manages the
@@ -188,7 +188,7 @@ describe('playback by a delegate', () => {
 	it("checks the playlist's visibility for the delegate, not the owner", async () => {
 		await befriend(true);
 		online.add(`${owner}:tv`);
-		const playlist = await new PlaylistService().createPlaylist(owner, {
+		const playlist = await playlistService.createPlaylist(owner, {
 			name: 'Private',
 			visibility: 'private',
 		});

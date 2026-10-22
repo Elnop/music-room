@@ -206,7 +206,7 @@ Avant 017, `anon` et `authenticated` avaient les privilèges de table par défau
 **Menace.** Un viewer ou collaborateur retiré, un ami qui n'est plus ami, ou un contrôleur dont la licence est retirée reste dans `playlist:<id>` ou `listening:<ownerId>` et continue de recevoir les événements.
 
 **Protection.**
-- Playlists : après le retrait d'un viewer (`viewer.service.ts`) ou d'un collaborateur (`collaborator.service.ts`), une mise à jour (visibilité) ou une suppression (`playlist.service.ts`), `realtime.revalidatePlaylistRoom` refait `canViewPlaylist` pour chaque socket de la room et évince celles qui ont perdu l'accès (`revalidatePlaylistRoom`, `backend/src/realtime/playlist-room.ts`). Les `join` / `leave` d'une socket sont traités dans l'ordre d'arrivée.
+- Playlists : après le retrait d'un viewer (`viewer.service.ts`) ou d'un collaborateur (`collaborator.service.ts`), une mise à jour (visibilité) ou une suppression (`playlist-update.service.ts`), `realtime.revalidatePlaylistRoom` refait `canViewPlaylist` pour chaque socket de la room et évince celles qui ont perdu l'accès (`revalidatePlaylistRoom`, `backend/src/realtime/playlist-room.ts`). Les `join` / `leave` d'une socket sont traités dans l'ordre d'arrivée.
 - Écoute : après le retrait de l'interrupteur ou d'une licence (`realtime.notifyPermissionChange`) et après un `unfollowUser` (`friends.service.ts`, `backend/src/features/friends/utils/listening-access.ts`), `revalidateListeningAccess` sort les sockets du contrôleur de `listening:<ownerId>` s'il ne lui reste aucun appareil ; une erreur évince (fail closed). `listening:subscribe` revérifie l'accès après avoir rejoint la room. Les `subscribe` / `unsubscribe` d'une socket sont traités dans l'ordre d'arrivée (#159).
 
 **Tests.**

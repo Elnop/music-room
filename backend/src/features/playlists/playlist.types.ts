@@ -1,112 +1,34 @@
 /**
- * Playlist DTOs and Types
+ * Response and domain types of the playlists feature. Request inputs are
+ * inferred from the Zod schemas in playlist.validators.ts.
  */
 
+import type { z } from 'zod';
 import type { Tables, TablesUpdate } from '@/shared/types/supabase.generated.js';
+import type {
+	addTrackResultSchema,
+	moveTrackResultSchema,
+	playlistMemberSchema,
+	playlistSchema,
+	playlistTrackSchema,
+	playlistWithTracksSchema,
+	removeTrackResultSchema,
+} from '@/features/playlists/playlist-responses.validators.js';
 
-export type EditMode = 'open' | 'restricted';
-
-// Database types (now using Supabase generated types)
+// Database rows (generated Supabase types)
 export type PlaylistRow = Tables<'playlists'>;
 export type TrackRow = Tables<'tracks'>;
-
-// Update types for updating records
 export type PlaylistUpdate = TablesUpdate<'playlists'>;
 
-// DTOs for API requests
-export interface CreatePlaylistDTO {
-	name: string;
-	description?: string;
-	visibility?: 'public' | 'private';
-	editMode?: EditMode;
-}
-
-export interface UpdatePlaylistDTO {
-	name?: string;
-	description?: string;
-	visibility?: 'public' | 'private';
-	editMode?: EditMode;
-}
-
-export interface AddTrackDTO {
-	trackUri: string; // Universal track identifier from any music service
-	title: string;
-	artist: string;
-	album?: string; // Optional - not all services have album info
-	albumArt?: string;
-	durationMs: number;
-	previewUrl?: string;
-}
-
-// Response types (camelCase for client)
-export interface TrackResponse {
-	id: string;
-	trackUri: string; // Universal track identifier from any music service
-	title: string;
-	artist: string;
-	album?: string; // Optional - not all services have album info
-	albumArt?: string;
-	durationMs: number;
-	previewUrl?: string;
-	createdAt: string;
-	updatedAt: string;
-}
-
-export interface PlaylistOwner {
-	id: string;
-	username: string;
-	displayName?: string;
-	avatarUrl?: string;
-}
-
-export interface PlaylistResponse {
-	id: string;
-	name: string;
-	description?: string;
-	coverUrl?: string;
-	firstTrackCover?: string;
-	ownerId: string;
-	owner?: PlaylistOwner;
-	collaboratorIds: string[];
-	viewerIds: string[];
-	visibility: 'public' | 'private';
-	editMode: EditMode;
-	trackCount: number;
-	createdAt: string;
-	updatedAt: string;
-}
-
-export interface PlaylistWithTracksResponse extends PlaylistResponse {
-	/** Ordered by rank. */
-	tracks: TrackInPlaylistResponse[];
-	owner: PlaylistOwner;
-	/** Incremented by every add, remove and move; sent back as expectedVersion. */
-	tracksVersion: number;
-}
-
-export interface TrackInPlaylistResponse extends TrackResponse {
-	/** Sort key: tracks are ordered by rank, compared byte by byte. */
-	rank: string;
-	addedBy: string | null;
-	addedAt: string;
-}
-
-export interface AddTrackResult {
-	track: TrackInPlaylistResponse;
-	tracksVersion: number;
-	rebalanced: boolean;
-}
-
-export interface RemoveTrackResult {
-	tracksVersion: number;
-}
-
-export interface MoveTrackResult {
-	trackId: string;
-	rank: string;
-	tracksVersion: number;
-	rebalanced: boolean;
-}
+// Response bodies, inferred from the schemas the OpenAPI document uses.
+export type PlaylistOwner = z.infer<typeof playlistMemberSchema>;
+export type PlaylistResponse = z.infer<typeof playlistSchema>;
+export type TrackInPlaylistResponse = z.infer<typeof playlistTrackSchema>;
+export type TrackResponse = Omit<TrackInPlaylistResponse, 'rank' | 'addedBy' | 'addedAt'>;
+export type PlaylistWithTracksResponse = z.infer<typeof playlistWithTracksSchema>;
+export type AddTrackResult = z.infer<typeof addTrackResultSchema>;
+export type RemoveTrackResult = z.infer<typeof removeTrackResultSchema>;
+export type MoveTrackResult = z.infer<typeof moveTrackResultSchema>;
 
 interface PlaylistUpdateBase {
 	playlistId: string;
