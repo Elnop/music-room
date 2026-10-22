@@ -18,23 +18,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/features/auth/auth.service.test.ts",
-    "to": "src/features/mail/mail.config.ts",
-    "unresolvedTo": "@/features/mail/mail.config.js",
-    "dependencyTypes": [
-      "aliased",
-      "aliased-tsconfig",
-      "aliased-tsconfig-paths",
-      "local",
-      "type-import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "no-cross-feature-imports"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/features/auth/services/email-verification.int.test.ts",
     "to": "src/features/mail/mail.config.ts",
     "unresolvedTo": "@/features/mail/mail.config.js",

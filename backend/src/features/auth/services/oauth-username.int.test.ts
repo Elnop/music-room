@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { afterAll, describe, expect, it } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
-import { UserService } from '@/features/auth/services/user.service.js';
+import { createOAuthUser } from '@/features/auth/services/oauth-user.service.js';
 
 // A Google/Facebook name longer than user_profiles.username allows (20
 // characters) still creates the account, against the local Supabase stack.
@@ -9,7 +9,7 @@ import { UserService } from '@/features/auth/services/user.service.js';
 const createdUserIds: string[] = [];
 
 async function createGoogleUser(name: string): Promise<string> {
-	const { userProfile } = await UserService.createOAuthUser(
+	const { userProfile } = await createOAuthUser(
 		'google',
 		`google-${randomUUID()}`,
 		`int-${randomUUID()}@example.com`,

@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { afterAll, describe, expect, it } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
-import { UserService } from '@/features/auth/services/user.service.js';
+import * as oauthUserService from '@/features/auth/services/oauth-user.service.js';
 
 // Migration 019 (#196) run again on rows as they were before #189, against the
 // local Supabase stack. scripts/test-db.sh already applied it once on an empty
@@ -86,7 +86,7 @@ async function createPasswordUser(): Promise<string> {
 
 /** A Google or Facebook sign-up with has_password true. */
 async function createOAuthUser(provider: 'google' | 'facebook'): Promise<string> {
-	const { userProfile } = await UserService.createOAuthUser(
+	const { userProfile } = await oauthUserService.createOAuthUser(
 		provider,
 		`${provider}-${randomUUID()}`,
 		`int-${randomUUID()}@example.com`,

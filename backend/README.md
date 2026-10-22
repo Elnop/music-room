@@ -438,7 +438,7 @@ Toute connexion est authentifiée au handshake par `src/realtime/socket-auth.ts`
 
 | Champ | Contenu |
 | --- | --- |
-| `token` | access token Supabase (JWT), vérifié par `SessionService.verifyToken` |
+| `token` | access token Supabase (JWT), vérifié par `verifyToken` (`services/session.service.ts`) |
 | `deviceId` | identifiant stable de l'appareil (1 à 128 caractères) |
 | `deviceName` | nom de l'appareil |
 | `platform` | plateforme (`ios`, `android`, ...) |

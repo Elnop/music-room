@@ -33,7 +33,7 @@ Conteneurs et images Docker : [SECURITY.md](SECURITY.md). Comment tester à la m
 1. `checkIPBlacklist` (`backend/src/features/auth/middleware/account-lockout.middleware.ts`) sur toutes les routes `/api/auth/*` : une IP en liste noire reçoit `403 IP_BLOCKED`. Une IP y entre après `IP_BLACKLIST_THRESHOLD` (50) échecs de login ou d'OAuth en 15 min, pour 24 h (`recordIPActivity` dans `backend/src/shared/services/brute-force.service.ts`). Avec les valeurs par défaut, ce seuil n'est jamais atteint : le limiteur global (point 2) arrête l'IP à 20 requêtes par 15 min.
 2. `globalAuthRateLimiter` (`backend/src/features/auth/middleware/rate-limit.middleware.ts`) : 20 requêtes par IP et 15 min sur `/api/auth/*`.
 3. `loginRateLimiter` : 5 échecs par couple email + IP et 15 min (`skipSuccessfulRequests`).
-4. `checkAccountLockout` : après 5 échecs pour un couple email + IP (`recordFailedAttempt`, appelé par `AuthController.login` dans `backend/src/features/auth/auth.controller.ts`), le couple est verrouillé 15 min, 1 h à partir de 8 échecs, 24 h à partir de 10 (`lockAccount`). `429 ACCOUNT_LOCKED`.
+4. `checkAccountLockout` : après 5 échecs pour un couple email + IP (`recordFailedAttempt`, appelé par le handler `login` de `backend/src/features/auth/auth.controller.ts`), le couple est verrouillé 15 min, 1 h à partir de 8 échecs, 24 h à partir de 10 (`lockAccount`). `429 ACCOUNT_LOCKED`.
 
 Effet réel avec les valeurs par défaut : ce sont les limiteurs qui agissent. Au 5e échec, `loginRateLimiter` atteint sa limite et le couple est verrouillé 15 min ; la requête suivante reçoit `429 RATE_LIMIT_EXCEEDED` de `loginRateLimiter`, placé avant `checkAccountLockout`, donc `ACCOUNT_LOCKED` n'est jamais renvoyé. Comme aucun nouvel échec n'est compté pendant ce temps et que le compteur expire après 15 min, les paliers à 8 et 10 échecs ne sont jamais atteints. La liste noire et les paliers hauts ne servent que si l'on relève les seuils des limiteurs.
 
@@ -55,8 +55,8 @@ Les seuils viennent de `backend/src/shared/config/rate-limit.config.ts` (variabl
 
 **Protection.**
 - Code tiré par `crypto.randomInt`, comparé par `crypto.timingSafeEqual`, format validé par Zod (`auth.validators.ts`).
-- Vérification d'email : `EMAIL_VERIFICATION_MAX_ATTEMPTS` essais par `userId` + IP sur la durée de vie du code (`EmailVerificationService.verifyCode`, `backend/src/features/auth/services/email-verification.service.ts`) ; la route a aussi `loginRateLimiter`, dont la clé est email + IP ; le corps n'ayant pas d'email, c'est 5 échecs par IP et 15 min.
-- Reset : 5 essais par email + IP et 15 min (`PasswordResetService.resetPassword`, `backend/src/features/auth/services/password-reset.service.ts`), plus `globalAuthRateLimiter`.
+- Vérification d'email : `EMAIL_VERIFICATION_MAX_ATTEMPTS` essais par `userId` + IP sur la durée de vie du code (`verifyCode`, `backend/src/features/auth/services/email-verification.service.ts`) ; la route a aussi `loginRateLimiter`, dont la clé est email + IP ; le corps n'ayant pas d'email, c'est 5 échecs par IP et 15 min.
+- Reset : 5 essais par email + IP et 15 min (`resetPassword`, `backend/src/features/auth/services/password-reset.service.ts`), plus `globalAuthRateLimiter`.
 - Les deux compteurs passent par `RateLimiterService` (`backend/src/shared/services/rate-limiter.service.ts`), qui répond 503 sans Redis.
 
 **Tests.** `email-verification.int.test.ts` : « refuses a wrong code with INVALID_CODE ». **Aucun test** ne vérifie le nombre maximal d'essais, ni pour la vérification ni pour le reset (L9).
@@ -104,8 +104,8 @@ Les seuils viennent de `backend/src/shared/config/rate-limit.config.ts` (variabl
 **Menace.** Un tiers obtient l'access token ou le refresh token d'un utilisateur et agit en son nom.
 
 **Protection.**
-- `POST /api/auth/logout` met le hash SHA-256 de l'access token dans une liste de révocation Redis jusqu'à son `exp` (`TokenRevocationService.revoke`, `backend/src/features/auth/services/token-revocation.service.ts`), puis termine la session Supabase avec `signOut(token, 'local')`, ce qui invalide le refresh token (`SessionService.logout`, `backend/src/features/auth/services/session.service.ts`). Les autres appareils de l'utilisateur restent connectés.
-- Chaque requête vérifie la liste de révocation avant Supabase (`SessionService.verifyToken`) ; sans Redis, `503 REVOCATION_UNAVAILABLE`, jamais une acceptation.
+- `POST /api/auth/logout` met le hash SHA-256 de l'access token dans une liste de révocation Redis jusqu'à son `exp` (`revoke`, `backend/src/features/auth/services/token-revocation.service.ts`), puis termine la session Supabase avec `signOut(token, 'local')`, ce qui invalide le refresh token (`logout`, `backend/src/features/auth/services/session.service.ts`). Les autres appareils de l'utilisateur restent connectés.
+- Chaque requête vérifie la liste de révocation avant Supabase (`verifyToken`, `session.service.ts`) ; sans Redis, `503 REVOCATION_UNAVAILABLE`, jamais une acceptation.
 - `POST /api/auth/refresh` répond 401 à un refresh token refusé et 503 si Supabase est indisponible (#126) : l'app ne déconnecte pas l'utilisateur pour une panne.
 - Mobile : `endSessionLocally` (`mobile/src/store/authStore.ts`) efface la session même si l'appel backend échoue.
 
@@ -126,7 +126,7 @@ Les seuils viennent de `backend/src/shared/config/rate-limit.config.ts` (variabl
 **Menace.** Après un logout (ou l'expiration du token), une socket ouverte avant continue de recevoir les événements (`playlist:updated`, `listening:status`, `control:command`) et d'en envoyer.
 
 **Protection.**
-- Au handshake, un token révoqué est refusé (`authenticateSocket` passe par `SessionService.verifyToken`) : #71.
+- Au handshake, un token révoqué est refusé (`authenticateSocket` passe par `verifyToken` de `session.service.ts`) : #71.
 - L'app ferme sa socket à chaque fin de session : abonnement `useAuthStore.subscribe` dans `mobile/src/store/socketStore.ts` (#70).
 
 **Tests.**
@@ -264,7 +264,7 @@ Trouvées en écrivant ce document. L1 à L3 ont été corrigées par #201, L4 p
 | L2 | Haute, corrigé (#201) | La politique UPDATE de `user_profiles` autorise toutes les colonnes de sa propre ligne : un utilisateur peut se mettre `email_verified = true` sans code. La politique INSERT de `follows` ne contrôle pas `can_control_music` : un contrôleur peut supprimer puis recréer sa ligne `follows` vers le propriétaire avec `can_control_music = true` et, si le propriétaire le suit, contrôler tous ses appareils. | `001_initial_schema.sql`, `007_follows.sql`, `009_music_control.sql` | #201 |
 | L3 | Haute, corrigé (#201) | `tracks` n'a pas de RLS : lecture, modification et suppression par la clé anon. `music_preferences` et `follows` sont lisibles par tous, sans les réglages de confidentialité. | `003_playlist_persistence.sql`, `011_profile_privacy_and_preferences.sql`, `007_follows.sql` | #201 |
 | L4 | Moyenne, corrigé (#173) | Toutes les limites anti-bruteforce sont par IP (M1, M2) ; derrière un proxy, tous les clients avaient la même IP. `TRUST_PROXY` règle quels proxies peuvent fixer `X-Forwarded-For`, pour HTTP et la socket. | `backend/src/shared/config/trust-proxy.ts` | #173 |
-| L5 | Moyenne, non reproduite (#203) | Un reset de mot de passe ne terminerait pas les sessions ouvertes. Vérifié sur GoTrue v2.197.0 (local et hébergé) : Supabase Auth supprime toutes les sessions du compte quand l'admin change le mot de passe ; un test d'intégration verrouille ce comportement sur la stack locale. | `PasswordResetService.resetPassword` | #203 |
+| L5 | Moyenne, non reproduite (#203) | Un reset de mot de passe ne terminerait pas les sessions ouvertes. Vérifié sur GoTrue v2.197.0 (local et hébergé) : Supabase Auth supprime toutes les sessions du compte quand l'admin change le mot de passe ; un test d'intégration verrouille ce comportement sur la stack locale. | `resetPassword` (`backend/src/features/auth/services/password-reset.service.ts`) | #203 |
 | L6 | Moyenne | Une socket ouverte survit au logout et à l'expiration du token (M6). | `backend/src/realtime/socket-auth.ts` | risque accepté (M6) |
 | L7 | Basse, corrigé (#204) | Pas de limite de débit par événement socket ni de longueur max sur `listening:update` (M9). Limite par socket et par événement, chaînes bornées par Zod. | `backend/src/realtime/event-rate-limit.ts`, `backend/src/realtime/music-control-access.ts` | #204 |
 | L8 | Basse (dev), corrigé (#205) | Redis était publié sur le port 6379 de toutes les interfaces de l'hôte, sans mot de passe : quelqu'un sur le même réseau pouvait effacer les verrous, la liste noire et la liste de révocation. Publié sur `127.0.0.1` seulement ; reste sans mot de passe pour les processus de l'hôte et les conteneurs du réseau Docker. | `make/helpers/docker.mk` (`start_redis`), voir [SECURITY.md](SECURITY.md) | #205 |

@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { createServer, type Server as HTTPServer } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { io as ioClient, type Socket as ClientSocket } from 'socket.io-client';
@@ -11,7 +11,7 @@ import {
 	redisClient,
 } from '@/shared/config/redis.js';
 import { logger } from '@/shared/utils/logger.js';
-import { SessionService } from '@/features/auth/services/session.service.js';
+import * as sessionService from '@/features/auth/services/session.service.js';
 import type { UserListeningStatus } from '@/features/music-control/music-control.types.js';
 import { realtime } from '@/realtime/index.js';
 
@@ -351,18 +351,23 @@ describe('Socket.io handshake authentication', () => {
 		try {
 			await connected(connect({ token: carol.token, ...deviceFields() }));
 
-			await new SessionService().logout(carol.token, carol.id);
+			await sessionService.logout(carol.token, carol.id);
 
 			// logout also ends the Supabase session, and the handshake maps every
-			// verification failure to INVALID_TOKEN: check the denylist refused it.
-			const verify = vi.spyOn(SessionService.prototype, 'verifyToken');
+			// verification failure to INVALID_TOKEN (503 REVOCATION_UNAVAILABLE too):
+			// check the handshake's own denylist lookup found the token revoked,
+			// with Redis healthy, and Supabase was never asked.
+			expect(isRedisConnected()).toBe(true);
+			const revokedKey = `auth:revoked:${createHash('sha256').update(carol.token).digest('hex')}`;
+			const exists = vi.spyOn(redisClient, 'exists');
+			const getUser = vi.spyOn(supabaseAdmin.auth, 'getUser');
 			await expect(refused(connect({ token: carol.token, ...deviceFields() }))).resolves.toBe(
 				'INVALID_TOKEN'
 			);
-			expect(verify).toHaveBeenCalledWith(carol.token);
-			await expect(verify.mock.results[0].value).rejects.toMatchObject({
-				code: 'TOKEN_REVOKED',
-			});
+			expect(exists).toHaveBeenCalledTimes(1);
+			expect(exists).toHaveBeenCalledWith(revokedKey);
+			await expect(exists.mock.results[0].value).resolves.toBe(1);
+			expect(getUser).not.toHaveBeenCalled();
 		} finally {
 			vi.restoreAllMocks();
 			await supabaseAdmin.auth.admin.deleteUser(carol.id);

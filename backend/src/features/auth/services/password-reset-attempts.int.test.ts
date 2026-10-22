@@ -22,7 +22,7 @@ const { connectRedis, disconnectRedis, isRedisConnected, redisClient } =
 const { supabaseAdmin } = await import('@/shared/config/supabase.js');
 const { default: authRouter } = await import('@/features/auth/auth.routes.js');
 const { errorHandler } = await import('@/shared/middleware/error-handler.js');
-const { AuthService } = await import('@/features/auth/auth.service.js');
+const loginService = await import('@/features/auth/services/login.service.js');
 
 // The password reset code has a max attempts limit that runs before the code
 // check (threat model L9, #206), through HTTP on the real auth router against
@@ -31,7 +31,7 @@ const { AuthService } = await import('@/features/auth/auth.service.js');
 const PASSWORD = 'Old-password-206';
 const NEW_PASSWORD = 'New-password-206';
 const RESET_CODE = '482913';
-const MAX_ATTEMPTS = 5; // PasswordResetService.MAX_RESET_ATTEMPTS
+const MAX_ATTEMPTS = 5; // MAX_RESET_ATTEMPTS in password-reset.service.ts
 
 describe('password reset code attempts limit (#206)', () => {
 	let httpServer: Server;
@@ -110,7 +110,7 @@ describe('password reset code attempts limit (#206)', () => {
 			.single();
 		if (error) throw error;
 		expect(data.password_reset_code).toBe(RESET_CODE);
-		const { user } = await new AuthService().login({ email, password: PASSWORD });
+		const { user } = await loginService.login({ email, password: PASSWORD });
 		expect(user.id).toBe(userId);
 	});
 });

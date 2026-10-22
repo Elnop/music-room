@@ -1,30 +1,22 @@
 /**
- * Data Transfer Objects (DTOs) for authentication
+ * Response and domain types of the auth feature. Request inputs are inferred
+ * from the Zod schemas in auth.validators.ts.
  */
 
+import type { z } from 'zod';
 import type { Tables, TablesUpdate } from '@/shared/types/supabase.generated.js';
+import type {
+	authResultSchema,
+	linkedProvidersSchema,
+	providerParamSchema,
+	userProfileSchema,
+} from '@/features/auth/auth.validators.js';
 
-// Database types (now using Supabase generated types)
+// user_profiles rows (generated Supabase types)
 export type UserProfileRow = Tables<'user_profiles'>;
 export type UserProfileUpdate = TablesUpdate<'user_profiles'>;
 
-export interface RegisterDTO {
-	email: string;
-	password: string;
-	username: string;
-	displayName?: string;
-}
-
-export interface LoginDTO {
-	email: string;
-	password: string;
-}
-
-/**
- * OAuth Provider Types
- */
-
-export type OAuthProvider = 'google' | 'facebook';
+export type OAuthProvider = z.infer<typeof providerParamSchema>['provider'];
 
 export interface GoogleTokenPayload {
 	sub: string; // Google user ID
@@ -43,48 +35,10 @@ export interface FacebookTokenPayload {
 	picture?: string;
 }
 
-/**
- * Response types
- */
-
-export interface UserProfile {
-	id: string;
-	email: string;
-	username: string;
-	displayName?: string;
-	avatarUrl?: string;
-	bio?: string;
-	createdAt: string;
-	updatedAt: string;
-	connectedProviders?: {
-		hasPassword: boolean;
-		hasGoogle: boolean;
-		hasFacebook: boolean;
-	};
-}
-
-export interface AuthResponse {
-	user: UserProfile;
-	session?: {
-		accessToken: string;
-		refreshToken: string;
-		expiresIn: number;
-		expiresAt: number;
-	};
-	requiresVerification?: boolean;
-	message?: string;
-}
-
-/**
- * Linked Providers Response
- */
-export interface LinkedProvidersResponse {
-	providers: {
-		type: 'password' | OAuthProvider;
-		connectedAt: string;
-		isPrimary: boolean;
-	}[];
-}
+// Response bodies, inferred from the schemas the OpenAPI document uses.
+export type UserProfile = z.infer<typeof userProfileSchema>;
+export type AuthResponse = z.infer<typeof authResultSchema>;
+export type LinkedProvidersResponse = z.infer<typeof linkedProvidersSchema>;
 
 /**
  * Supabase Auth User (minimal type for type safety)
@@ -94,14 +48,3 @@ export interface SupabaseUser {
 	email: string;
 	role?: string;
 }
-
-// ============================================
-// Supabase Admin Auth API Types
-// ============================================
-
-// ============================================
-// Password Reset Types
-// ============================================
-
-// DbUserProfile has been replaced by UserProfileRow (from generated types)
-// Use UserProfileRow for database operations instead

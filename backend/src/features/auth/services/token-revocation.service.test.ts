@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { TokenRevocationService } from '@/features/auth/services/token-revocation.service.js';
+import * as service from '@/features/auth/services/token-revocation.service.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 
 const { setex, exists, isRedisConnected } = vi.hoisted(() => ({
@@ -31,9 +31,7 @@ async function expectUnavailable(promise: Promise<unknown>): Promise<void> {
 	expect(error).toMatchObject({ statusCode: 503, code: 'REVOCATION_UNAVAILABLE' });
 }
 
-describe('TokenRevocationService', () => {
-	const service = new TokenRevocationService();
-
+describe('token-revocation.service', () => {
 	beforeEach(() => {
 		setex.mockReset().mockResolvedValue('OK');
 		exists.mockReset();

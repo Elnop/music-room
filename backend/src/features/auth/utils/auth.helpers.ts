@@ -1,8 +1,18 @@
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
-import type { AuthResponse, OAuthProvider, UserProfile } from '@/features/auth/auth.types.js';
+import type {
+	AuthResponse,
+	OAuthProvider,
+	UserProfile,
+	UserProfileRow,
+} from '@/features/auth/auth.types.js';
 import type { User, Session } from '@supabase/supabase-js';
+
+type ProfileFields = Pick<
+	UserProfileRow,
+	'id' | 'username' | 'display_name' | 'avatar_url' | 'bio' | 'created_at' | 'updated_at'
+>;
 
 /**
  * user_profiles column holding the provider's user ID, as a typed object to
@@ -13,6 +23,30 @@ export function providerIdField(
 	providerId: string | null
 ): { google_id: string | null } | { facebook_id: string | null } {
 	return provider === 'google' ? { google_id: providerId } : { facebook_id: providerId };
+}
+
+/** A user_profiles row and the account's email as the API's user object. */
+export function toUserProfile(row: ProfileFields, email: string): UserProfile {
+	return {
+		id: row.id,
+		email,
+		username: row.username,
+		displayName: row.display_name ?? undefined,
+		avatarUrl: row.avatar_url ?? undefined,
+		bio: row.bio ?? undefined,
+		createdAt: row.created_at ?? new Date().toISOString(),
+		updatedAt: row.updated_at ?? new Date().toISOString(),
+	};
+}
+
+/** A session opened by a magic link (OAuth sign-in, email verification) as the API's session. */
+export function toSessionBody(session: Session): NonNullable<AuthResponse['session']> {
+	return {
+		accessToken: session.access_token,
+		refreshToken: session.refresh_token,
+		expiresIn: session.expires_in || 3600,
+		expiresAt: session.expires_at || 0,
+	};
 }
 
 /**
@@ -104,16 +138,7 @@ export async function getUserProfile(userId: string): Promise<UserProfile> {
 			throw new AppError(404, 'User profile not found', 'PROFILE_NOT_FOUND');
 		}
 
-		return {
-			id: user.user.id,
-			email: user.user.email ?? '',
-			username: profile.username,
-			displayName: profile.display_name ?? undefined,
-			avatarUrl: profile.avatar_url ?? undefined,
-			bio: profile.bio ?? undefined,
-			createdAt: profile.created_at ?? new Date().toISOString(),
-			updatedAt: profile.updated_at ?? new Date().toISOString(),
-		};
+		return toUserProfile({ ...profile, id: user.user.id }, user.user.email ?? '');
 	} catch (error) {
 		if (error instanceof AppError) throw error;
 		throw new AppError(500, 'Failed to get user profile', 'PROFILE_ERROR');

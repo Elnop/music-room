@@ -18,10 +18,8 @@ vi.mock('@/features/mail/mail.service.js', () => ({
 
 // Token verification calls Google and Facebook: always mocked (doc/TESTING.md).
 vi.mock('@/features/auth/services/oauth.service.js', () => ({
-	OAuthService: {
-		verifyGoogleToken: vi.fn(),
-		verifyFacebookToken: vi.fn(),
-	},
+	verifyGoogleToken: vi.fn(),
+	verifyFacebookToken: vi.fn(),
 }));
 
 const { connectRedis, disconnectRedis, isRedisConnected, redisClient } =
@@ -30,7 +28,8 @@ const { supabaseAdmin } = await import('@/shared/config/supabase.js');
 const { default: authRouter } = await import('@/features/auth/auth.routes.js');
 const { errorHandler } = await import('@/shared/middleware/error-handler.js');
 const { sendPasswordResetEmail } = await import('@/features/mail/mail.service.js');
-const { AuthService } = await import('@/features/auth/auth.service.js');
+const loginService = await import('@/features/auth/services/login.service.js');
+const registrationService = await import('@/features/auth/services/registration.service.js');
 const { findAuthUserIdByEmail } = await import('@/features/auth/utils/find-auth-user.js');
 
 // The account is found past the first page of auth.admin.listUsers() (50 users)
@@ -135,13 +134,13 @@ describe('auth user lookup by email past the first listUsers() page (#194)', () 
 		});
 		expect(reset.status).toBe(200);
 
-		const { session } = await new AuthService().login({ email, password: NEW_PASSWORD });
+		const { session } = await loginService.login({ email, password: NEW_PASSWORD });
 		expect(session?.accessToken).toEqual(expect.any(String));
 	});
 
 	it('refuses a sign-up with the email of a verified account, whatever its case', async () => {
 		await expect(
-			new AuthService().register({
+			registrationService.register({
 				email: email.toUpperCase(),
 				password: 'Another-password-194',
 				username: `int_dup_${randomUUID().slice(0, 8)}`,

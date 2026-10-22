@@ -22,7 +22,7 @@ const { supabaseAdmin, supabaseAnon } = await import('@/shared/config/supabase.j
 const { default: authRouter } = await import('@/features/auth/auth.routes.js');
 const { errorHandler } = await import('@/shared/middleware/error-handler.js');
 const { sendPasswordResetEmail } = await import('@/features/mail/mail.service.js');
-const { UserService } = await import('@/features/auth/services/user.service.js');
+const { createOAuthUser } = await import('@/features/auth/services/oauth-user.service.js');
 
 // A Google/Facebook-only account (has_password false) can reset its password,
 // which adds email/password sign-in to it (#189), through HTTP on the real auth
@@ -43,14 +43,9 @@ describe('password reset for a Google/Facebook-only account (#189)', () => {
 
 		// A real Google sign-up, as the app creates it (no password).
 		email = `int-${randomUUID()}@example.com`;
-		const { userProfile } = await UserService.createOAuthUser(
-			'google',
-			`google-${randomUUID()}`,
-			email,
-			{
-				name: 'OAuth Only',
-			}
-		);
+		const { userProfile } = await createOAuthUser('google', `google-${randomUUID()}`, email, {
+			name: 'OAuth Only',
+		});
 		userId = userProfile.id;
 
 		const app = express();

@@ -1,6 +1,6 @@
 import type { DefaultEventsMap, ExtendedError, Server, Socket } from 'socket.io';
 import { z } from 'zod';
-import { SessionService } from '@/features/auth/services/session.service.js';
+import * as sessionService from '@/features/auth/services/session.service.js';
 import {
 	TokenVerifyLimitError,
 	verifyTokenLimited,
@@ -16,7 +16,7 @@ import { clientIp } from '@/shared/config/trust-proxy.js';
  * Contract — the client passes these fields in `io(url, { auth: { ... } })`,
  * all required strings:
  *
- *   token       Supabase access token (JWT), verified with SessionService.verifyToken
+ *   token       Supabase access token (JWT), verified with session.service.ts verifyToken
  *   deviceId    stable id of the device (1 to 128 characters, devices.device_id)
  *   deviceName  human-readable device name
  *   platform    ios | android | web ...
@@ -74,7 +74,6 @@ export type AppSocketServer = Server<
 >;
 export type AppSocket = Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, SocketData>;
 
-const sessionService = new SessionService();
 const deviceService = new DeviceService();
 
 function refuse(
