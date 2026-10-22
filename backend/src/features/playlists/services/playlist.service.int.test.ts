@@ -2,7 +2,8 @@ import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
-import type { AddTrackDTO, CreatePlaylistDTO } from '@/features/playlists/playlist.types.js';
+import type { TrackUpsertInput } from '@/shared/utils/track-upsert.js';
+import type { CreatePlaylistInput } from '@/features/playlists/playlist.validators.js';
 
 // Playlist CRUD, lists and member management against the local Supabase stack.
 // The list filters (`or`, `cs` on arrays), array updates and the delete cascade
@@ -29,17 +30,13 @@ vi.mock('@/realtime/index.js', () => ({
 	},
 }));
 
-const { PlaylistService } = await import('@/features/playlists/playlist.service.js');
-const { CollaboratorService } =
-	await import('@/features/playlists/services/collaborator.service.js');
-const { ViewerService } = await import('@/features/playlists/services/viewer.service.js');
-const { PlaylistTrackService } =
-	await import('@/features/playlists/services/playlist-track.service.js');
-
-const playlists = new PlaylistService();
-const collaborators = new CollaboratorService();
-const viewers = new ViewerService();
-const tracks = new PlaylistTrackService();
+const playlists = await import('@/features/playlists/services/playlist.service.js');
+const listing = await import('@/features/playlists/services/playlist-listing.service.js');
+const updates = await import('@/features/playlists/services/playlist-update.service.js');
+const collaborators = await import('@/features/playlists/services/collaborator.service.js');
+const viewers = await import('@/features/playlists/services/viewer.service.js');
+const viewerList = await import('@/features/playlists/services/viewer-list.service.js');
+const tracks = await import('@/features/playlists/services/playlist-track.service.js');
 const URI_PREFIX = `https://soundcloud.com/int-playlist/${randomUUID()}`;
 
 let ownerId: string;
@@ -48,7 +45,7 @@ let viewerId: string;
 let strangerId: string;
 let otherOwnerId: string;
 
-const dto = (i: number): AddTrackDTO => ({
+const dto = (i: number): TrackUpsertInput => ({
 	trackUri: `${URI_PREFIX}/${i}`,
 	title: `T${i}`,
 	artist: 'A',
@@ -134,9 +131,9 @@ afterAll(async () => {
 	}
 });
 
-describe('PlaylistService CRUD', () => {
+describe('playlist CRUD', () => {
 	it('creates a public, open, empty playlist by default', async () => {
-		const input: CreatePlaylistDTO = { name: `int-${randomUUID()}` };
+		const input: CreatePlaylistInput = { name: `int-${randomUUID()}` };
 		const created = await playlists.createPlaylist(ownerId, input);
 		expect(created).toMatchObject({
 			name: input.name,
@@ -167,7 +164,7 @@ describe('PlaylistService CRUD', () => {
 
 	it('lets the owner update the metadata, broadcasts it and revalidates the room', async () => {
 		const id = await createShared('public', 'open');
-		const updated = await playlists.updatePlaylist(id, ownerId, {
+		const updated = await updates.updatePlaylist(id, ownerId, {
 			name: 'renamed',
 			description: 'new description',
 			visibility: 'private',
@@ -197,11 +194,9 @@ describe('PlaylistService CRUD', () => {
 		const id = await createShared('public', 'open');
 		const before = await row(id);
 
-		const update = await rejection(
-			playlists.updatePlaylist(id, collaboratorId, { name: 'hijack' })
-		);
+		const update = await rejection(updates.updatePlaylist(id, collaboratorId, { name: 'hijack' }));
 		expect(update).toMatchObject({ statusCode: 403, code: 'PLAYLIST_ACCESS_DENIED' });
-		const remove = await rejection(playlists.deletePlaylist(id, collaboratorId));
+		const remove = await rejection(updates.deletePlaylist(id, collaboratorId));
 		expect(remove).toMatchObject({ statusCode: 403, code: 'PLAYLIST_ACCESS_DENIED' });
 
 		expect(await row(id)).toEqual(before);
@@ -215,7 +210,7 @@ describe('PlaylistService CRUD', () => {
 		await tracks.addTrack(id, ownerId, dto(0));
 		expect(await trackRows(id)).toHaveLength(1);
 
-		await playlists.deletePlaylist(id, ownerId);
+		await updates.deletePlaylist(id, ownerId);
 
 		expect(await row(id)).toBeNull();
 		expect(await trackRows(id)).toEqual([]);
@@ -228,14 +223,14 @@ describe('PlaylistService CRUD', () => {
 	});
 });
 
-describe('PlaylistService lists', () => {
+describe('playlist lists', () => {
 	it('getUserPlaylists includes the playlist for owner, collaborator and viewer only', async () => {
 		const id = await createShared('private', 'restricted');
 		for (const user of [ownerId, collaboratorId, viewerId]) {
-			const ids = (await playlists.getUserPlaylists(user)).map(p => p.id);
+			const ids = (await listing.getUserPlaylists(user)).map(p => p.id);
 			expect(ids, user).toContain(id);
 		}
-		const strangerIds = (await playlists.getUserPlaylists(strangerId)).map(p => p.id);
+		const strangerIds = (await listing.getUserPlaylists(strangerId)).map(p => p.id);
 		expect(strangerIds).not.toContain(id);
 	});
 
@@ -247,7 +242,7 @@ describe('PlaylistService lists', () => {
 		});
 		const other = await playlists.createPlaylist(otherOwnerId, { name: `int-${randomUUID()}` });
 
-		const ids = (await playlists.getPublicPlaylists(ownerId)).map(p => p.id);
+		const ids = (await listing.getPublicPlaylists(ownerId)).map(p => p.id);
 		expect(ids).toContain(other.id);
 		expect(ids).not.toContain(own.id);
 		expect(ids).not.toContain(otherPrivate.id);
@@ -258,18 +253,18 @@ describe('PlaylistService lists', () => {
 		const publicPlaylist = await playlists.createPlaylist(ownerId, { name: `int-${randomUUID()}` });
 
 		for (const user of [collaboratorId, viewerId]) {
-			const ids = (await playlists.getPlaylistsByUser(ownerId, user)).map(p => p.id);
+			const ids = (await listing.getPlaylistsByUser(ownerId, user)).map(p => p.id);
 			expect(ids, user).toEqual(expect.arrayContaining([privateId, publicPlaylist.id]));
 		}
 		for (const user of [strangerId, undefined]) {
-			const ids = (await playlists.getPlaylistsByUser(ownerId, user)).map(p => p.id);
+			const ids = (await listing.getPlaylistsByUser(ownerId, user)).map(p => p.id);
 			expect(ids, String(user)).toContain(publicPlaylist.id);
 			expect(ids, String(user)).not.toContain(privateId);
 		}
 	});
 });
 
-describe('CollaboratorService', () => {
+describe('collaborator.service', () => {
 	it('adds a collaborator, refuses a second add with 409, then removes it', async () => {
 		const { id } = await playlists.createPlaylist(ownerId, { name: `int-${randomUUID()}` });
 		await collaborators.addCollaborator(id, ownerId, collaboratorId);
@@ -301,7 +296,7 @@ describe('CollaboratorService', () => {
 	});
 });
 
-describe('ViewerService', () => {
+describe('viewer services', () => {
 	it('refuses the owner with 400, a collaborator and a second add with 409', async () => {
 		const id = await createShared('private', 'restricted');
 
@@ -317,14 +312,14 @@ describe('ViewerService', () => {
 
 	it('lists viewers with their profile, then removes one', async () => {
 		const id = await createShared('private', 'restricted');
-		await expect(viewers.getViewers(id, ownerId)).resolves.toEqual([
+		await expect(viewerList.getViewers(id, ownerId)).resolves.toEqual([
 			expect.objectContaining({ id: viewerId, username: `int_${viewerId.slice(0, 8)}` }),
 		]);
 
 		await viewers.removeViewer(id, ownerId, viewerId);
 		expect((await row(id))?.viewer_ids).toEqual([]);
 		expect(revalidatePlaylistRoom).toHaveBeenCalledWith(id);
-		await expect(viewers.getViewers(id, ownerId)).resolves.toEqual([]);
+		await expect(viewerList.getViewers(id, ownerId)).resolves.toEqual([]);
 	});
 
 	it('refuses viewer management by a non-owner with 403', async () => {
@@ -332,7 +327,7 @@ describe('ViewerService', () => {
 		const add = await rejection(viewers.addViewer(id, collaboratorId, strangerId));
 		expect(add).toMatchObject({ statusCode: 403, code: 'PLAYLIST_ACCESS_DENIED' });
 		expect((await row(id))?.viewer_ids).toEqual([viewerId]);
-		const list = await rejection(viewers.getViewers(id, viewerId));
+		const list = await rejection(viewerList.getViewers(id, viewerId));
 		expect(list).toMatchObject({ statusCode: 403, code: 'PLAYLIST_ACCESS_DENIED' });
 	});
 });
@@ -348,7 +343,7 @@ describe('viewer edit rights (CAP-3)', () => {
 			expect(await trackRows(id)).toEqual([]);
 			expect(notifyPlaylistUpdate).not.toHaveBeenCalled();
 
-			await playlists.updatePlaylist(id, ownerId, { editMode: 'open' });
+			await updates.updatePlaylist(id, ownerId, { editMode: 'open' });
 			const { track } = await tracks.addTrack(id, viewerId, dto(1));
 			expect(await trackRows(id)).toEqual([{ track_id: track.id }]);
 		}

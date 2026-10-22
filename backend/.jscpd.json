@@ -21,8 +21,6 @@
     "**/src/features/auth/middleware/rate-limit.middleware.ts",
     "**/src/features/friends/friends.controller.ts",
     "**/src/features/music-control/music-control.controller.ts",
-    "**/src/features/playlists/playlist.controller.ts",
-    "**/src/features/playlists/playlist.service.ts",
     "**/src/features/profile/profile.controller.ts",
     "**/src/features/profile/services/music-preferences.service.ts",
     "**/src/features/profile/services/privacy.service.ts",

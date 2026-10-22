@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 /**
  * Response bodies of the /api/playlists routes, for the OpenAPI document.
- * Mirrors the response interfaces of playlist.types.ts.
+ * playlist.types.ts infers the response types from them.
  */
 
 /** A playlist member; displayName and avatarUrl are absent when the profile has none. */

@@ -6,8 +6,8 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from
 import { supabaseAdmin, supabaseAnon } from '@/shared/config/supabase.js';
 import { connectRedis, disconnectRedis, isRedisConnected } from '@/shared/config/redis.js';
 import { QueueService } from '@/features/queue/services/queue.service.js';
-import { PlaylistService } from '@/features/playlists/playlist.service.js';
-import { PlaylistTrackService } from '@/features/playlists/services/playlist-track.service.js';
+import * as playlistService from '@/features/playlists/services/playlist.service.js';
+import * as playlistTrackService from '@/features/playlists/services/playlist-track.service.js';
 import { realtime } from '@/realtime/index.js';
 import type { QueueState } from '@/features/queue/queue.types.js';
 
@@ -287,12 +287,10 @@ describe('queue:updated broadcast', () => {
 	});
 
 	it('sends the block of a played playlist to both devices, and nothing for an empty one', async () => {
-		const playlists = new PlaylistService();
-		const playlistTracks = new PlaylistTrackService();
 		const otherUpdates = record(otherSocket);
-		const { id } = await playlists.createPlaylist(owner.id, { name: 'int-play' });
-		await playlistTracks.addTrack(id, owner.id, dto());
-		await playlistTracks.addTrack(id, owner.id, dto());
+		const { id } = await playlistService.createPlaylist(owner.id, { name: 'int-play' });
+		await playlistTrackService.addTrack(id, owner.id, dto());
+		await playlistTrackService.addTrack(id, owner.id, dto());
 
 		const received = bothReceive();
 		const state = await queue.playPlaylist(owner.id, owner.id, id);
@@ -301,7 +299,7 @@ describe('queue:updated broadcast', () => {
 		expect(block).toHaveLength(2);
 		expect(state.currentItemId).toBe(block[0].id);
 
-		const { id: emptyId } = await playlists.createPlaylist(owner.id, { name: 'int-empty' });
+		const { id: emptyId } = await playlistService.createPlaylist(owner.id, { name: 'int-empty' });
 		await settle();
 		const phoneUpdates = record(phone);
 		await expect(queue.playPlaylist(owner.id, owner.id, emptyId)).rejects.toMatchObject({

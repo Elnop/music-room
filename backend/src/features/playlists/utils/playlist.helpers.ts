@@ -50,3 +50,23 @@ export function formatTrackResponse(row: TrackRow): TrackResponse {
 		updatedAt: row.updated_at ?? new Date().toISOString(),
 	};
 }
+
+/** The user_profiles columns a playlist member (owner, viewer) is built from. */
+export const OWNER_COLUMNS = 'id, username, display_name, avatar_url';
+
+interface OwnerProfile {
+	id: string;
+	username: string;
+	display_name: string | null;
+	avatar_url: string | null;
+}
+
+/** A member's profile row to its response; null fields become undefined. */
+export function toOwner(profile: OwnerProfile): PlaylistOwner {
+	return {
+		id: profile.id,
+		username: profile.username,
+		displayName: profile.display_name ?? undefined,
+		avatarUrl: profile.avatar_url ?? undefined,
+	};
+}
