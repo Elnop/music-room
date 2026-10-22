@@ -359,23 +359,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/features/profile/profile.routes.ts",
-    "to": "src/features/auth/middleware/rate-limit.middleware.ts",
-    "unresolvedTo": "@/features/auth/middleware/rate-limit.middleware.js",
-    "dependencyTypes": [
-      "aliased",
-      "aliased-tsconfig",
-      "aliased-tsconfig-paths",
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "no-cross-feature-imports"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/features/queue/permissions/queue.permissions.ts",
     "to": "src/features/music-control/services/control-access.service.ts",
     "unresolvedTo": "@/features/music-control/services/control-access.service.js",
@@ -582,43 +565,9 @@
   },
   {
     "type": "dependency",
-    "from": "src/features/soundcloud/soundcloud.int.test.ts",
-    "to": "src/features/auth/middleware/rate-limit.middleware.ts",
-    "unresolvedTo": "@/features/auth/middleware/rate-limit.middleware.js",
-    "dependencyTypes": [
-      "aliased",
-      "aliased-tsconfig",
-      "aliased-tsconfig-paths",
-      "local",
-      "dynamic-import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "no-cross-feature-imports"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/features/soundcloud/soundcloud.routes.ts",
     "to": "src/features/auth/auth.middleware.ts",
     "unresolvedTo": "@/features/auth/auth.middleware.js",
-    "dependencyTypes": [
-      "aliased",
-      "aliased-tsconfig",
-      "aliased-tsconfig-paths",
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "no-cross-feature-imports"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/features/soundcloud/soundcloud.routes.ts",
-    "to": "src/features/auth/middleware/rate-limit.middleware.ts",
-    "unresolvedTo": "@/features/auth/middleware/rate-limit.middleware.js",
     "dependencyTypes": [
       "aliased",
       "aliased-tsconfig",

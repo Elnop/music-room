@@ -1,6 +1,8 @@
 /**
  * Per-socket, per-event rate limit (#204). Each socket gets its own counters,
- * in memory, dropped with the socket: a fixed window per event name. Over the
+ * in memory, dropped with the socket: a fixed window per event name. In memory
+ * by design, not as a fallback: the counters belong to one connection, which
+ * lives on one backend instance. Over the
  * limit, the event is not handled and the client gets `RATE_LIMITED` on the
  * event's own error channel (`listening:error`, `playlist:error`,
  * `control:error`, by the prefix before `:`). Only the first refusal of a
@@ -55,33 +57,32 @@ export function rateLimitedErrorFor(
 /** `allowed`, or refused: `limited` the first time in a window, `still-limited` after. */
 type LimitDecision = 'allowed' | 'limited' | 'still-limited';
 
-export class SocketEventLimiter {
-	private windows = new Map<string, { start: number; count: number }>();
+/**
+ * A new limiter for one socket: count one `eventName` event and decide. Events
+ * without their own limit share one counter, so random event names cannot
+ * grow the map.
+ */
+export function createSocketEventLimiter(
+	limits: Readonly<Record<string, EventLimit>> = EVENT_LIMITS,
+	fallback: EventLimit = DEFAULT_EVENT_LIMIT,
+	now: () => number = Date.now
+): (eventName: string) => LimitDecision {
+	const windows = new Map<string, { start: number; count: number }>();
 
-	constructor(
-		private readonly limits: Readonly<Record<string, EventLimit>> = EVENT_LIMITS,
-		private readonly fallback: EventLimit = DEFAULT_EVENT_LIMIT,
-		private readonly now: () => number = Date.now
-	) {}
-
-	/**
-	 * Count one `eventName` event. Events without their own limit share one
-	 * counter, so random event names cannot grow the map.
-	 */
-	check(eventName: string): LimitDecision {
-		const own = Object.hasOwn(this.limits, eventName);
+	return eventName => {
+		const own = Object.hasOwn(limits, eventName);
 		const key = own ? eventName : '*';
-		const { max, windowMs } = own ? this.limits[eventName] : this.fallback;
-		const now = this.now();
-		const window = this.windows.get(key);
+		const { max, windowMs } = own ? limits[eventName] : fallback;
+		const time = now();
+		const window = windows.get(key);
 
-		if (!window || now - window.start >= windowMs) {
-			this.windows.set(key, { start: now, count: 1 });
+		if (!window || time - window.start >= windowMs) {
+			windows.set(key, { start: time, count: 1 });
 			return 'allowed';
 		}
 
 		window.count += 1;
 		if (window.count <= max) return 'allowed';
 		return window.count === max + 1 ? 'limited' : 'still-limited';
-	}
+	};
 }

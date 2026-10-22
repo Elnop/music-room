@@ -1,10 +1,7 @@
 import type { DefaultEventsMap, ExtendedError, Server, Socket } from 'socket.io';
 import { z } from 'zod';
 import * as sessionService from '@/features/auth/services/session.service.js';
-import {
-	TokenVerifyLimitError,
-	verifyTokenLimited,
-} from '@/features/auth/utils/token-verify-limiter.js';
+import { TokenVerifyLimitError, verifyTokenLimited } from '@/shared/security/token-verify-limit.js';
 import type { DeviceInfo } from '@/features/music-control/music-control.types.js';
 import * as deviceService from '@/features/music-control/services/device.service.js';
 import { socketLogger } from '@/shared/middleware/socket-logger.middleware.js';

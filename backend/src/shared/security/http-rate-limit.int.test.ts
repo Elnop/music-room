@@ -12,7 +12,7 @@ vi.hoisted(() => {
 
 const { connectRedis, disconnectRedis, isRedisConnected, redisClient } =
 	await import('@/shared/config/redis.js');
-const { loginRateLimiter } = await import('@/features/auth/middleware/rate-limit.middleware.js');
+const { loginRateLimiter } = await import('@/shared/security/http-rate-limit.js');
 const { rateLimitConfig } = await import('@/shared/config/rate-limit.config.js');
 const { errorHandler } = await import('@/shared/middleware/error-handler.js');
 

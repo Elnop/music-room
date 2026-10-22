@@ -54,7 +54,6 @@
 		"multer": "^2.4.0",
 		"nodemailer": "^7.0.12",
 		"proxy-addr": "^2.0.8",
-		"rate-limit-redis": "^4.3.1",
 		"socket.io": "^4.8.1",
 		"soundcloud.ts": "^0.7.1",
 		"swagger-ui-express": "^5.0.1",

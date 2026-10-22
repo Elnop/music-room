@@ -20,6 +20,9 @@ Redis is used as a distributed cache system for:
 - **Rate limiting** (request throttling)
 - **Brute force protection** (account lockout after failed login attempts)
 - **IP reputation tracking** (suspicious IP monitoring and blacklisting)
+- **Token revocation** (logout denylist, `features/auth/services/token-revocation.service.ts`)
+
+All the anti-abuse code lives in one backend module, `backend/src/shared/security/`, and reaches Redis through one API, `counter.ts` (see [The anti-abuse module](#the-anti-abuse-module)).
 
 Zumik uses Redis 7-alpine in a Docker container with automatic health checks and data persistence.
 
@@ -31,10 +34,24 @@ Prevents abuse by limiting the number of requests per time window:
 
 | Endpoint | Limit | Window | Key Pattern |
 |----------|-------|--------|-------------|
-| Login | 5 attempts | 15 minutes | `rl:auth:login:{email}:{ip}` |
-| Register | 3 registrations | 1 hour | `rl:auth:register:{ip}` |
-| OAuth | 10 attempts | 15 minutes | `rl:auth:oauth:{provider}:{ip}` |
-| Global Auth | 20 requests | 15 minutes | `rl:auth:global:{ip}` |
+| Login (failed attempts only) | 5 attempts | 15 minutes | `rl:auth:login:login:{email}:{ip}` |
+| Register, resend verification | 3 requests | 1 hour | `rl:auth:register:register:{ip}` |
+| OAuth | 10 attempts | 15 minutes | `rl:auth:oauth:oauth:{provider}:{ip}` |
+| Global Auth (every `/api/auth/*`) | 20 requests | 15 minutes | `rl:auth:global:auth:global:{ip}` |
+| SoundCloud, per user | 120 requests | 1 minute | `rl:soundcloud:soundcloud:{userId}` |
+| Avatar, per user | 10 changes | 1 hour | `rl:profile:avatar:avatar:{userId}` |
+| Failed token verifications | 20 failures | 15 minutes | `rl:auth:token:{ip}` |
+
+The key is the limiter's store prefix (`rl:<store>:`) followed by its own key, hence the repeated segment (`login:login`). Past the limit: 429 `RATE_LIMIT_EXCEEDED` with `details.retryAfter`, and the `RateLimit-*` and `Retry-After` headers for the express-rate-limit limiters.
+
+Attempt counters on codes and resends (429 past the limit):
+
+| Action | Limit | Window | Key Pattern |
+|--------|-------|--------|-------------|
+| Email verification code | `maxAttempts` (mail config) | code lifetime | `email_verify_attempts:{userId}:{ip}` |
+| Verification resend cooldown / count | 1 / `maxResends` | cooldown / 1 hour | `email_resend:{userId}:{ip}`, `email_resend_count:{userId}:{ip}` |
+| Password reset code | 5 attempts | 15 minutes | `password_reset_attempts:{email}:{ip}` |
+| Forgot-password requests / cooldown | 3 / 1 | 1 hour / 60 s | `password_reset_request:{email}:{ip}`, `password_reset_resend:{email}:{ip}` |
 
 ### 2. Account Lockout (Brute Force Protection)
 
@@ -121,14 +138,33 @@ make redis-clean
 - **Volume**: `redis-data` (persistent storage)
 - **Health Check**: `redis-cli PING` every 10 seconds
 
+### The anti-abuse module
+
+`backend/src/shared/security/`, one module of functions:
+
+| File | Role |
+|------|------|
+| `counter.ts` | The only Redis path of the limiters: `hit` (one hit in a fixed window, atomic Lua script: a key without expiry starts a new window), `peek`, `release` (decrement only while the key exists), `clear`, `setFlag` / `readFlag` (locks, blacklist) |
+| `http-rate-limit.ts`, `rate-limit-store.ts` | The express-rate-limit middlewares and their store on `counter.ts` |
+| `attempt-limit.ts`, `password-reset-limit.ts` | Attempt counters (codes, resends, forgot-password) |
+| `account-lockout.ts`, `ip-reputation.ts`, `account-lockout.middleware.ts`, `fail-open.ts` | Account lockout and IP blacklist, and their middlewares (`checkAccountLockout`, `checkIPBlacklist`) |
+| `token-verify-limit.ts` | Failed token verifications per IP (HTTP auth and socket handshake) |
+| `socket-event-limit.ts` | Per-socket, per-event limit: in memory by design, the counters belong to one connection on one instance (not a fallback) |
+| `request-ip.ts` | The client IP the limiters see (`req.ip`, which follows `TRUST_PROXY`) |
+
+The limits come from `backend/src/shared/config/rate-limit.config.ts` (environment variables below). Only the token revocation denylist (`token-revocation.service.ts`) talks to `redisClient` outside this module.
+
 ### Redis Keys Used
 
 #### Rate Limiting Keys
 ```
-rl:auth:login:{email}:{ip}       # Login attempt counter
-rl:auth:register:{ip}            # Registration counter
-rl:auth:oauth:{provider}:{ip}    # OAuth attempt counter
-rl:auth:global:{ip}              # Global auth counter
+rl:auth:login:login:{email}:{ip}       # Login attempt counter
+rl:auth:register:register:{ip}         # Registration counter
+rl:auth:oauth:oauth:{provider}:{ip}    # OAuth attempt counter
+rl:auth:global:auth:global:{ip}        # Global auth counter
+rl:soundcloud:soundcloud:{userId}      # SoundCloud requests
+rl:profile:avatar:avatar:{userId}      # Profile photo changes
+rl:auth:token:{ip}                     # Failed token verifications
 ```
 
 #### Brute Force Protection Keys
@@ -142,12 +178,16 @@ ip_blacklist:{ip}                # IP blacklist flag (TTL: 24h)
 ### Architecture Decision: No In-Memory Fallback
 
 **Rate limiting** (`RATE_LIMIT_ENABLED=true`, the default):
-- Each limiter has a Redis store (`features/auth/utils/redis-rate-limit-store.ts`), created lazily on first use once Redis is ready, so the startup order does not matter
+- Each express-rate-limit limiter has its own store (`shared/security/rate-limit-store.ts`) on the shared counter; it sends nothing before the first request, so the startup order does not matter
 - No command is sent while Redis is not ready
 - Redis unavailable → fail closed: the request answers 503 `RATE_LIMIT_UNAVAILABLE`; it is never counted in memory and never let through unlimited
 - Redis back → limiting resumes on Redis, without restarting the backend
 
-**Account lockout** with Redis unavailable: disabled (logged as warning).
+**Attempt counters** (`attempt-limit.ts`) with Redis unavailable: 503 `REDIS_UNAVAILABLE` (fail closed).
+
+**Token verification limit** (`token-verify-limit.ts`) with Redis unavailable: neither blocks nor counts; authentication itself answers 503 `REVOCATION_UNAVAILABLE`.
+
+**Account lockout and IP blacklist** with Redis unavailable: disabled (logged), fail open (`fail-open.ts`).
 
 **Development mode** (Redis optional for these protections):
 - Set `RATE_LIMIT_ENABLED=false` and `ACCOUNT_LOCKOUT_ENABLED=false`
@@ -420,7 +460,7 @@ docker run -d --name zumik-redis \
 
 2. **Do not publish the port**: leave out `-p` (as above) so Redis is reachable only from containers on `zumik-network`, which reach it as `zumik-redis` (`REDIS_HOST`). If the host itself needs it, publish on loopback only: `-p 127.0.0.1:6379:6379`.
 
-3. **Limit memory usage**: `--maxmemory 256mb`. Use `--maxmemory-policy noeviction`: Redis holds rate-limit counters, account lockouts, the IP blacklist and the token revocation list, all with a TTL, so an LRU policy would evict security state first. With `noeviction` a full Redis refuses writes instead: the rate limiters and logout (revocation) answer 503 (fail closed), while lockouts and the IP blacklist stop counting new failures (`brute-force.service.ts` fails open, an accepted risk in [THREAT_MODEL.md](THREAT_MODEL.md)); existing entries stay enforced. Watch memory (`INFO memory`) rather than relying on eviction.
+3. **Limit memory usage**: `--maxmemory 256mb`. Use `--maxmemory-policy noeviction`: Redis holds rate-limit counters, account lockouts, the IP blacklist and the token revocation list, all with a TTL, so an LRU policy would evict security state first. With `noeviction` a full Redis refuses writes instead: the rate limiters and logout (revocation) answer 503 (fail closed), while lockouts and the IP blacklist stop counting new failures (`shared/security/fail-open.ts`, an accepted risk in [THREAT_MODEL.md](THREAT_MODEL.md)); existing entries stay enforced. Watch memory (`INFO memory`) rather than relying on eviction.
 
 ### Data Persistence
 
@@ -467,7 +507,6 @@ Access at http://localhost:8001 and connect to `zumik-redis:6379`.
 - **Official Redis Documentation**: https://redis.io/documentation
 - **Redis CLI Commands**: https://redis.io/commands
 - **express-rate-limit**: https://github.com/express-rate-limit/express-rate-limit
-- **rate-limit-redis**: https://github.com/wyattjoh/rate-limit-redis
 - **ioredis (Node.js client)**: https://github.com/redis/ioredis
 
 ## See Also
@@ -476,7 +515,7 @@ Access at http://localhost:8001 and connect to `zumik-redis:6379`.
 - [GETTING_STARTED.md](./GETTING_STARTED.md) - Getting started guide
 - [SECURITY.md](./SECURITY.md) - Security guide
 - Backend: `backend/src/shared/config/redis.ts` - Redis configuration
-- Backend: `backend/src/features/auth/services/brute-force.service.ts` - Protection logic
+- Backend: `backend/src/shared/security/` - Anti-abuse module (rate limiting, lockout, IP reputation)
 
 ---
 

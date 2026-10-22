@@ -22,7 +22,7 @@ backend/
 │   ├── shared/
 │   │   ├── config/         # env, Supabase, Redis, Swagger, rate limits, montage des routes (routes.ts)
 │   │   ├── middleware/     # error handler, action logger (HTTP + socket)
-│   │   ├── services/       # rate limiter, anti-bruteforce (Redis)
+│   │   ├── security/       # anti-abus : rate limiting, lockout, réputation IP, limites de token et d'événements socket
 │   │   ├── types/          # Types globaux + supabase.generated.ts (généré : make generate-types)
 │   │   └── utils/          # logger, database.helpers.ts
 │   └── server.ts           # Point d'entrée Express + Socket.io
@@ -191,7 +191,7 @@ RATE_LIMIT_TOKEN_MAX=20
 RATE_LIMIT_SOUNDCLOUD_WINDOW_MS=60000  # requêtes /api/soundcloud par utilisateur
 RATE_LIMIT_SOUNDCLOUD_MAX=120
 
-# Account Lockout (brute-force.service.ts)
+# Account Lockout (shared/security/account-lockout.ts)
 ACCOUNT_LOCKOUT_ENABLED=true
 ACCOUNT_LOCKOUT_THRESHOLD=5
 ACCOUNT_LOCKOUT_DURATION_SOFT=900     # 15 min
@@ -215,10 +215,12 @@ RATE_LIMIT_WHITELIST_IPS=
 
 - `src/shared/config/redis.ts` - Client Redis (ioredis) avec auto-reconnect
 - `src/shared/config/rate-limit.config.ts` - Configuration centralisée
-- `src/features/auth/middleware/rate-limit.middleware.ts` - Middlewares rate limiting
-- `src/features/auth/middleware/account-lockout.middleware.ts` - Vérification lockout
-- `src/features/auth/utils/token-verify-limiter.ts` - Limite des échecs de vérification de token par IP
-- `src/features/auth/services/brute-force.service.ts` - Logique métier protection
+- `src/shared/security/counter.ts` - Seul accès Redis des limiteurs (compteurs à fenêtre fixe et drapeaux, scripts Lua atomiques)
+- `src/shared/security/http-rate-limit.ts` et `rate-limit-store.ts` - Middlewares express-rate-limit et leur store Redis
+- `src/shared/security/attempt-limit.ts` et `password-reset-limit.ts` - Compteurs d'essais (codes de vérification et de reset, renvois)
+- `src/shared/security/account-lockout.ts`, `ip-reputation.ts` et `account-lockout.middleware.ts` - Verrouillage de compte et liste noire d'IP
+- `src/shared/security/token-verify-limit.ts` - Limite des échecs de vérification de token par IP
+- `src/shared/security/socket-event-limit.ts` - Limite par socket et par événement (en mémoire, par connexion)
 
 #### Clés Redis utilisées
 
@@ -481,7 +483,7 @@ L'accès est revérifié quand il peut se perdre : après le retrait d'un viewer
 
 Les erreurs ont la forme `{ message, code }` : `INVALID_PAYLOAD` (payload invalide), `NOT_AUTHORIZED` (pas le droit de contrôle), `DEVICE_OFFLINE` (`control:action` vers un appareil non connecté), `RATE_LIMITED` (débit dépassé).
 
-**Débit (#204)** : chaque socket a un compteur par événement, en mémoire, sur une fenêtre fixe de 10 s : 20 `listening:update` ou `control:action`, 30 pour chacun des autres événements de l'app, un compteur commun pour tout autre nom (`src/realtime/event-rate-limit.ts`). Au-delà, l'événement n'est pas traité et la socket reçoit `RATE_LIMITED` sur `listening:error`, `playlist:error` ou `control:error` selon l'événement. Le compteur est par socket : une autre connexion du même utilisateur a le sien.
+**Débit (#204)** : chaque socket a un compteur par événement, en mémoire, sur une fenêtre fixe de 10 s : 20 `listening:update` ou `control:action`, 30 pour chacun des autres événements de l'app, un compteur commun pour tout autre nom (`src/shared/security/socket-event-limit.ts`). Au-delà, l'événement n'est pas traité et la socket reçoit `RATE_LIMITED` sur `listening:error`, `playlist:error` ou `control:error` selon l'événement. Le compteur est par socket : une autre connexion du même utilisateur a le sien.
 
 **File de lecture (#294).** `queue:updated` (la file entière) part vers `user:<id>` et `listening:<id>` du propriétaire : ses appareils et les délégués qui l'écoutent reçoivent le même état (une seule émission, une socket dans les deux rooms le reçoit une fois). Les amis qui contrôlent au moins un appareil du propriétaire gèrent sa file par les routes `/api/users/:userId/queue/...` (les mêmes que `/api/queue/...`, voir Swagger) ; une action qui change ce qui joue (jouer un morceau, suivant, précédent, jouer une playlist) cible un appareil (`deviceId`, obligatoire pour un délégué, qui doit le contrôler et qu'il faut en ligne, sinon rien ne change). Le serveur envoie alors à cet appareil `control:command` `{ action: 'play-item', fromUserId, item, positionMs, version }`. Quand un contrôleur perd son dernier appareil contrôlable, ses sockets reçoivent `control:revoked` `{ ownerId }`.
 

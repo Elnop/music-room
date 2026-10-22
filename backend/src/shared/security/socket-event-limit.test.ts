@@ -2,16 +2,16 @@ import { describe, expect, it } from 'vitest';
 import {
 	RATE_LIMITED,
 	rateLimitedErrorFor,
-	SocketEventLimiter,
-} from '@/realtime/event-rate-limit.js';
+	createSocketEventLimiter,
+} from '@/shared/security/socket-event-limit.js';
 
-describe('SocketEventLimiter', () => {
+describe('createSocketEventLimiter', () => {
 	const limits = { 'a:x': { max: 2, windowMs: 1000 }, 'b:y': { max: 2, windowMs: 1000 } };
 
 	function limiter() {
 		let now = 0;
-		const instance = new SocketEventLimiter(limits, { max: 1, windowMs: 1000 }, () => now);
-		return { instance, advance: (ms: number) => (now += ms) };
+		const check = createSocketEventLimiter(limits, { max: 1, windowMs: 1000 }, () => now);
+		return { instance: { check }, advance: (ms: number) => (now += ms) };
 	}
 
 	it('refuses past the limit, says limited once, then allows again in the next window', () => {

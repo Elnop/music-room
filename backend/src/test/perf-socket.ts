@@ -17,7 +17,7 @@
  * the sender and to `control:command` at perf_0. Events not received within
  * TIMEOUT_MS are counted as timeouts, not as samples. Each client sends at most
  * one action per ~2 s, far under the per-socket limits of
- * realtime/event-rate-limit.ts, so the run measures the server, not the limiter.
+ * shared/security/socket-event-limit.ts, so the run measures the server, not the limiter.
  *
  * Event names and payloads: realtime/index.ts, realtime/socket-auth.ts.
  *

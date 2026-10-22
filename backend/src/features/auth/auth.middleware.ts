@@ -2,11 +2,8 @@ import type { Request, Response, NextFunction } from 'express';
 import * as sessionService from '@/features/auth/services/session.service.js';
 import type { AuthenticatedRequest } from '@/shared/types/global.types.js';
 import { AppError, sendError } from '@/shared/middleware/error-handler.js';
-import {
-	TokenVerifyLimitError,
-	verifyTokenLimited,
-} from '@/features/auth/utils/token-verify-limiter.js';
-import { requestIp } from '@/features/auth/utils/request-ip.js';
+import { TokenVerifyLimitError, verifyTokenLimited } from '@/shared/security/token-verify-limit.js';
+import { requestIp } from '@/shared/security/request-ip.js';
 
 /**
  * Authentication middleware

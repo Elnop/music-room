@@ -1,15 +1,12 @@
 import crypto from 'crypto';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import * as mailService from '@/features/mail/services/mail.service.js';
-import { RateLimiterService } from '@/shared/services/rate-limiter.service.js';
-import { PasswordResetCooldownService } from '@/features/auth/services/password-reset-cooldown.service.js';
+import * as attemptLimit from '@/shared/security/attempt-limit.js';
+import * as passwordResetLimit from '@/shared/security/password-reset-limit.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import { findAuthUserIdByEmail } from '@/features/auth/utils/find-auth-user.js';
 import type { UserProfileUpdate } from '@/features/auth/auth.types.js';
-
-const rateLimiter = new RateLimiterService();
-const cooldown = new PasswordResetCooldownService();
 
 const CODE_EXPIRY_MINUTES = 15;
 const MAX_RESET_ATTEMPTS = 5;
@@ -35,7 +32,7 @@ async function storeResetCode(userId: string, code: string): Promise<void> {
 
 export async function requestPasswordReset(email: string, ip: string): Promise<void> {
 	// Hourly limit and resend cooldown, whether the email exists or not (#187).
-	await cooldown.consumeRequest(email, ip);
+	await passwordResetLimit.consumeRequest(email, ip);
 
 	const userId = await findAuthUserIdByEmail(email);
 
@@ -65,7 +62,7 @@ export async function resetPassword(
 ): Promise<void> {
 	// Normalized: the lookup ignores case, so must the attempts limit.
 	const attemptsKey = `password_reset_attempts:${email.trim().toLowerCase()}:${ip}`;
-	await rateLimiter.incrementAndCheck(attemptsKey, {
+	await attemptLimit.incrementAndCheck(attemptsKey, {
 		maxAttempts: MAX_RESET_ATTEMPTS,
 		windowSeconds: 15 * 60,
 	});
@@ -141,7 +138,7 @@ export async function resetPassword(
 		throw new AppError(500, 'Failed to update password', 'PASSWORD_UPDATE_ERROR');
 	}
 
-	await rateLimiter.reset(attemptsKey);
+	await attemptLimit.reset(attemptsKey);
 
 	logger.info('Password reset successful', { userId: userId });
 }

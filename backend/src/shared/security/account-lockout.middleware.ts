@@ -1,26 +1,23 @@
 import { Request, Response, NextFunction } from 'express';
-import { bruteForceService } from '@/shared/services/brute-force.service.js';
 import { logger } from '@/shared/utils/logger.js';
 import { AppError, sendError } from '@/shared/middleware/error-handler.js';
+import * as accountLockout from '@/shared/security/account-lockout.js';
+import * as ipReputation from '@/shared/security/ip-reputation.js';
+import { requestIp } from '@/shared/security/request-ip.js';
 
 /**
  * Account Lockout Middleware
  * Checks if an account is locked before allowing login attempts
  * Should be applied to the login endpoint AFTER rate limiting
  */
-interface LockoutWarning {
-	remainingAttempts: number;
-	failedAttempts: number;
-}
 
 export async function checkAccountLockout(
 	req: Request,
 	res: Response,
 	next: NextFunction
 ): Promise<void> {
-	const body = req.body as { email?: string };
-	const email = body.email;
-	const ip = req.ip || req.socket.remoteAddress || 'unknown';
+	const email = (req.body as { email?: string } | undefined)?.email;
+	const ip = requestIp(req);
 
 	if (!email) {
 		// Email is required - let validation handle this
@@ -29,7 +26,7 @@ export async function checkAccountLockout(
 
 	try {
 		// Check if account is currently locked
-		const lockStatus = await bruteForceService.checkLockout(email, ip);
+		const lockStatus = await accountLockout.checkLockout(email, ip);
 
 		if (lockStatus.isLocked) {
 			logger.warn('Login attempt on locked account', {
@@ -58,12 +55,6 @@ export async function checkAccountLockout(
 
 		// Check if approaching lockout threshold (3+ failed attempts)
 		if (lockStatus.failedAttempts >= 3) {
-			// Attach warning to request for use in controller
-			(req as Request & { lockoutWarning?: LockoutWarning }).lockoutWarning = {
-				remainingAttempts: lockStatus.remainingAttempts ?? 0,
-				failedAttempts: lockStatus.failedAttempts,
-			};
-
 			logger.info('User approaching lockout threshold', {
 				email,
 				ip,
@@ -97,10 +88,10 @@ export async function checkIPBlacklist(
 	res: Response,
 	next: NextFunction
 ): Promise<void> {
-	const ip = req.ip || req.socket.remoteAddress || 'unknown';
+	const ip = requestIp(req);
 
 	try {
-		const isBlacklisted = await bruteForceService.isIPBlacklisted(ip);
+		const isBlacklisted = await ipReputation.isIPBlacklisted(ip);
 
 		if (isBlacklisted) {
 			logger.error('Request from blacklisted IP', {

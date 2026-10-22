@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import { verifyEmailSchema, resendVerificationSchema } from '@/features/auth/auth.validators.js';
 import * as verifyEmailService from '@/features/auth/services/verify-email.service.js';
 import * as verificationResendService from '@/features/auth/services/verification-resend.service.js';
-import { requestIp } from '@/features/auth/utils/request-ip.js';
+import { requestIp } from '@/shared/security/request-ip.js';
 import { logger } from '@/shared/utils/logger.js';
 import { sendSuccess } from '@/shared/utils/send-success.js';
 

@@ -1,8 +1,7 @@
-import { redisClient, isRedisConnected } from '@/shared/config/redis.js';
 import { rateLimitConfig } from '@/shared/config/rate-limit.config.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
-import type { SupabaseUser } from '@/features/auth/auth.types.js';
+import * as counter from '@/shared/security/counter.js';
 
 /**
  * Limit on failed access token verifications per client IP (#160).
@@ -43,26 +42,13 @@ function keyFor(ip: string): string {
 function isSkipped(ip: string): boolean {
 	if (!rateLimitConfig.enabled) return true;
 	if (rateLimitConfig.whitelist.includes(ip)) return true;
-	return !isRedisConnected();
+	return !counter.isReady();
 }
-
-/** DECR only while the key exists: never recreate an expired key without TTL. */
-const RELEASE_SCRIPT =
-	"if redis.call('EXISTS', KEYS[1]) == 1 then return redis.call('DECR', KEYS[1]) end return 0";
 
 function logRedisError(operation: string, ip: string, error: unknown): void {
 	logger.error(`Token verification limiter could not ${operation}`, {
 		ip,
 		error: error instanceof Error ? error.message : 'Unknown error',
-	});
-}
-
-/** ioredis `exec()` reports command errors per pair instead of throwing. */
-function resultsOf(results: [Error | null, unknown][] | null): unknown[] {
-	if (!results) throw new Error('Transaction aborted');
-	return results.map(([error, value]) => {
-		if (error) throw error;
-		return value;
 	});
 }
 
@@ -73,26 +59,14 @@ interface Reservation {
 
 /**
  * Reserve a slot for one verification before calling Supabase, so a parallel
- * burst cannot pass the limit: INCR, the window expiry set when the key is
- * created, atomically. Null when the limiter is skipped or Redis fails.
+ * burst cannot pass the limit: one atomic hit on the counter, the window
+ * starting with the first. Null when the limiter is skipped or Redis fails.
  */
 export async function reserve(ip: string): Promise<Reservation | null> {
 	if (isSkipped(ip)) return null;
 	try {
-		const key = keyFor(ip);
-		const [, count, ttl] = resultsOf(
-			await redisClient
-				.multi()
-				.set(key, '0', 'PX', rateLimitConfig.token.windowMs, 'NX')
-				.incr(key)
-				.pttl(key)
-				.exec()
-		);
-		const ttlMs = Number(ttl);
-		return {
-			count: Number(count),
-			ttlMs: ttlMs > 0 ? ttlMs : rateLimitConfig.token.windowMs,
-		};
+		const { count, ttlMs } = await counter.hit(keyFor(ip), rateLimitConfig.token.windowMs);
+		return { count, ttlMs: ttlMs > 0 ? ttlMs : rateLimitConfig.token.windowMs };
 	} catch (error) {
 		logRedisError('reserve a slot', ip, error);
 		return null;
@@ -103,7 +77,7 @@ export async function reserve(ip: string): Promise<Reservation | null> {
 export async function release(ip: string): Promise<void> {
 	if (isSkipped(ip)) return;
 	try {
-		await redisClient.eval(RELEASE_SCRIPT, 1, keyFor(ip));
+		await counter.release(keyFor(ip));
 	} catch (error) {
 		logRedisError('release a slot', ip, error);
 	}
@@ -117,11 +91,11 @@ export async function release(ip: string): Promise<void> {
  * Side effect: more than `max` simultaneous verifications from one IP get a
  * transient refusal.
  */
-export async function verifyTokenLimited(
+export async function verifyTokenLimited<User>(
 	token: string,
 	ip: string,
-	verify: (token: string) => Promise<SupabaseUser>
-): Promise<SupabaseUser> {
+	verify: (token: string) => Promise<User>
+): Promise<User> {
 	const reservation = await reserve(ip);
 	if (reservation && reservation.count > rateLimitConfig.token.max) {
 		await release(ip);
