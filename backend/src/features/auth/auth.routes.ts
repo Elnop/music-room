@@ -9,11 +9,11 @@ import {
 	registerRateLimiter,
 	oauthRateLimiter,
 	globalAuthRateLimiter,
-} from '@/features/auth/middleware/rate-limit.middleware.js';
+} from '@/shared/security/http-rate-limit.js';
 import {
 	checkAccountLockout,
 	checkIPBlacklist,
-} from '@/features/auth/middleware/account-lockout.middleware.js';
+} from '@/shared/security/account-lockout.middleware.js';
 
 // Endpoints are documented in auth*.openapi.ts.
 const router = Router();

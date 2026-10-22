@@ -5,7 +5,7 @@ import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { socketLogger } from '@/shared/middleware/socket-logger.middleware.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { AppSocketServer } from '@/realtime/socket-auth.js';
-import { RATE_LIMITED } from '@/realtime/event-rate-limit.js';
+import { RATE_LIMITED } from '@/shared/security/socket-event-limit.js';
 
 /**
  * Access control for the `playlist:<id>` rooms (subject IV.6, CAP-1).

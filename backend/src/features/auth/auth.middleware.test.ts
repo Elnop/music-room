@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { authMiddleware } from '@/features/auth/auth.middleware.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
-import { TokenVerifyLimitError } from '@/features/auth/utils/token-verify-limiter.js';
+import { TokenVerifyLimitError } from '@/shared/security/token-verify-limit.js';
 import { mockResponse } from '@/test/mock-response.js';
 
 const { verifyToken } = vi.hoisted(() => ({ verifyToken: vi.fn() }));

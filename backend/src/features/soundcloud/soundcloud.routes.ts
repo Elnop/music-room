@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authMiddleware } from '@/features/auth/auth.middleware.js';
-import { soundcloudRateLimiter } from '@/features/auth/middleware/rate-limit.middleware.js';
+import { soundcloudRateLimiter } from '@/shared/security/http-rate-limit.js';
 import * as soundcloud from '@/features/soundcloud/soundcloud.controller.js';
 
 // Endpoints are documented in soundcloud.openapi.ts.

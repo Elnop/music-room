@@ -17,11 +17,7 @@ vi.mock('@/features/auth/services/password-reset.service.js', () => ({
 	requestPasswordReset: requestReset,
 	resetPassword: reset,
 }));
-vi.mock('@/features/auth/services/password-reset-cooldown.service.js', () => ({
-	PasswordResetCooldownService: class {
-		status = status;
-	},
-}));
+vi.mock('@/shared/security/password-reset-limit.js', () => ({ status }));
 
 function request(fields: Record<string, unknown>): Request {
 	return { ip: '10.0.0.1', ...fields } as unknown as Request;

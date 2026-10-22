@@ -2,10 +2,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 
-const { multi, evalScript, isRedisConnected, config } = vi.hoisted(() => ({
-	multi: vi.fn(),
-	evalScript: vi.fn(),
-	isRedisConnected: vi.fn(),
+const {
+	hit,
+	release: releaseHit,
+	isReady,
+	config,
+} = vi.hoisted(() => ({
+	hit: vi.fn(),
+	release: vi.fn(),
+	isReady: vi.fn(),
 	config: {
 		enabled: true,
 		whitelist: [] as string[],
@@ -13,15 +18,12 @@ const { multi, evalScript, isRedisConnected, config } = vi.hoisted(() => ({
 	},
 }));
 
-vi.mock('@/shared/config/redis.js', () => ({
-	redisClient: { multi, eval: evalScript },
-	isRedisConnected,
-}));
+vi.mock('@/shared/security/counter.js', () => ({ hit, release: releaseHit, isReady }));
 
 vi.mock('@/shared/config/rate-limit.config.js', () => ({ rateLimitConfig: config }));
 
 const { reserve, release, verifyTokenLimited, TokenVerifyLimitError } =
-	await import('@/features/auth/utils/token-verify-limiter.js');
+	await import('@/shared/security/token-verify-limit.js');
 
 const IP = '203.0.113.7';
 const KEY = `rl:auth:token:${IP}`;
@@ -32,78 +34,50 @@ interface State {
 	ttl: number;
 }
 
-type Pair = [Error | null, unknown];
-
 /**
- * In-memory stand-in for the commands the limiter sends: MULTI with SET NX PX,
- * INCR and PTTL, and the release script (DECR only when the key exists).
+ * In-memory stand-in for the shared counter (counter.ts): a hit starts the
+ * window when the key is missing, release decrements only an existing key.
  */
-function fakeRedis(state: State) {
-	const transactions: unknown[][][] = [];
-	multi.mockImplementation(() => {
-		const commands: unknown[][] = [];
-		const tx = {
-			set: (...args: unknown[]) => (commands.push(['set', ...args]), tx),
-			incr: (key: string) => (commands.push(['incr', key]), tx),
-			pttl: (key: string) => (commands.push(['pttl', key]), tx),
-			exec: () =>
-				Promise.resolve(
-					commands.map(([command, , , , px]): Pair => {
-						if (command === 'set') {
-							if (state.count !== null) return [null, null];
-							state.count = 0;
-							state.ttl = px as number;
-							return [null, 'OK'];
-						}
-						if (command === 'incr') {
-							state.count = (state.count ?? 0) + 1;
-							return [null, state.count];
-						}
-						return [null, state.count === null ? -2 : state.ttl];
-					})
-				),
-		};
-		transactions.push(commands);
-		return tx;
+function fakeCounter(state: State) {
+	hit.mockImplementation((_key: string, windowMs: number) => {
+		if (state.count === null) {
+			state.count = 1;
+			state.ttl = windowMs;
+			return Promise.resolve({ count: 1, ttlMs: windowMs });
+		}
+		state.count += 1;
+		return Promise.resolve({ count: state.count, ttlMs: state.ttl });
 	});
-	evalScript.mockImplementation(() => {
-		if (state.count === null) return Promise.resolve(0);
-		state.count -= 1;
-		return Promise.resolve(state.count);
+	releaseHit.mockImplementation(() => {
+		if (state.count !== null) state.count -= 1;
+		return Promise.resolve();
 	});
-	return transactions;
 }
 
 const invalid = () => new AppError(401, 'Invalid or expired token', 'INVALID_TOKEN');
 
 describe('token verification limiter', () => {
 	let state: State;
-	let transactions: unknown[][][];
 
 	beforeEach(() => {
-		multi.mockReset();
-		evalScript.mockReset();
-		isRedisConnected.mockReset().mockReturnValue(true);
+		hit.mockReset();
+		releaseHit.mockReset();
+		isReady.mockReset().mockReturnValue(true);
 		config.enabled = true;
 		config.whitelist = [];
 		state = { count: null, ttl: -2 };
-		transactions = fakeRedis(state);
+		fakeCounter(state);
 	});
 
-	it('reserves under rl:auth:token: with the window as expiry, atomically', async () => {
+	it('reserves under rl:auth:token: with the window as expiry, in one hit', async () => {
 		await expect(reserve(IP)).resolves.toEqual({ count: 1, ttlMs: 60_000 });
 
-		expect(transactions).toEqual([
-			[
-				['set', KEY, '0', 'PX', 60_000, 'NX'],
-				['incr', KEY],
-				['pttl', KEY],
-			],
-		]);
+		expect(hit).toHaveBeenCalledTimes(1);
+		expect(hit).toHaveBeenCalledWith(KEY, 60_000);
 		expect(state).toEqual({ count: 1, ttl: 60_000 });
 
 		await release(IP);
-		expect(evalScript).toHaveBeenCalledWith(expect.stringContaining('EXISTS'), 1, KEY);
+		expect(releaseHit).toHaveBeenCalledWith(KEY);
 		expect(state.count).toBe(0);
 	});
 
@@ -195,15 +169,15 @@ describe('token verification limiter', () => {
 	});
 
 	it('sends nothing to Redis while it is not ready: neither blocks nor counts', async () => {
-		isRedisConnected.mockReturnValue(false);
+		isReady.mockReturnValue(false);
 		const failure = invalid();
 		const verify = vi.fn().mockRejectedValue(failure);
 
 		await expect(verifyTokenLimited('bad', IP, verify)).rejects.toBe(failure);
 		await expect(reserve(IP)).resolves.toBeNull();
 		await release(IP);
-		expect(multi).not.toHaveBeenCalled();
-		expect(evalScript).not.toHaveBeenCalled();
+		expect(hit).not.toHaveBeenCalled();
+		expect(releaseHit).not.toHaveBeenCalled();
 	});
 
 	it('sends nothing to Redis when disabled', async () => {
@@ -213,7 +187,7 @@ describe('token verification limiter', () => {
 		await expect(verifyTokenLimited('bad', IP, verify)).rejects.toMatchObject({
 			code: 'INVALID_TOKEN',
 		});
-		expect(multi).not.toHaveBeenCalled();
+		expect(hit).not.toHaveBeenCalled();
 	});
 
 	it('never blocks nor counts a whitelisted IP', async () => {
@@ -225,47 +199,22 @@ describe('token verification limiter', () => {
 			code: 'INVALID_TOKEN',
 		});
 		expect(verify).toHaveBeenCalledTimes(1);
-		expect(multi).not.toHaveBeenCalled();
+		expect(hit).not.toHaveBeenCalled();
 	});
 
 	it('lets the verification through when Redis throws', async () => {
-		multi.mockImplementation(() => {
-			throw new Error('Connection is closed.');
-		});
-		evalScript.mockRejectedValue(new Error('Connection is closed.'));
-		const verify = vi.fn().mockResolvedValue(USER);
-
-		await expect(verifyTokenLimited('good', IP, verify)).resolves.toEqual(USER);
-		await expect(release(IP)).resolves.toBeUndefined();
-	});
-
-	it('treats a per-command error in exec() as a Redis error', async () => {
 		const error = vi.spyOn(logger, 'error').mockImplementation(() => logger);
-		state.count = 100;
-		multi.mockImplementation(() => {
-			const tx = {
-				set: () => tx,
-				incr: () => tx,
-				pttl: () => tx,
-				exec: () =>
-					Promise.resolve([
-						[null, null],
-						[new Error('WRONGTYPE'), null],
-						[null, 1000],
-					]),
-			};
-			return tx;
-		});
+		hit.mockRejectedValue(new Error('Connection is closed.'));
+		releaseHit.mockRejectedValue(new Error('Connection is closed.'));
 		const verify = vi.fn().mockResolvedValue(USER);
 
 		await expect(reserve(IP)).resolves.toBeNull();
 		await expect(verifyTokenLimited('good', IP, verify)).resolves.toEqual(USER);
+		await expect(release(IP)).resolves.toBeUndefined();
 		expect(error).toHaveBeenCalledWith(
 			'Token verification limiter could not reserve a slot',
-			expect.objectContaining({ error: 'WRONGTYPE' })
+			expect.objectContaining({ error: 'Connection is closed.' })
 		);
-		// No reservation: nothing to release.
-		expect(evalScript).not.toHaveBeenCalled();
 		error.mockRestore();
 	});
 });

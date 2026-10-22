@@ -3,12 +3,10 @@ import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import * as mailService from '@/features/mail/services/mail.service.js';
-import { RateLimiterService } from '@/shared/services/rate-limiter.service.js';
+import * as attemptLimit from '@/shared/security/attempt-limit.js';
 import { verificationConfig } from '@/features/mail/mail.config.js';
 
 /** Email verification codes: generation, storage, sending, checking and resend limits. */
-
-const rateLimiter = new RateLimiterService();
 
 /** Generate a 6-digit code, store it with its expiry and return it. */
 export async function generateAndStore(userId: string): Promise<string> {
@@ -41,7 +39,7 @@ export async function sendCode(email: string, code: string): Promise<void> {
 export async function verifyCode(userId: string, code: string, ip: string): Promise<void> {
 	const attemptsKey = `email_verify_attempts:${userId}:${ip}`;
 
-	await rateLimiter.incrementAndCheck(attemptsKey, {
+	await attemptLimit.incrementAndCheck(attemptsKey, {
 		maxAttempts: verificationConfig.maxAttempts,
 		windowSeconds: verificationConfig.expiryMinutes * 60,
 	});
@@ -100,7 +98,7 @@ export async function verifyCode(userId: string, code: string, ip: string): Prom
 		throw new AppError(500, 'Verification failed', 'VERIFICATION_ERROR');
 	}
 
-	await rateLimiter.reset(attemptsKey);
+	await attemptLimit.reset(attemptsKey);
 
 	logger.info('Email verified successfully', { userId });
 }
@@ -114,7 +112,7 @@ export async function consumeResend(userId: string, ip: string): Promise<void> {
 	const cooldownKey = `email_resend:${userId}:${ip}`;
 	const countKey = `email_resend_count:${userId}:${ip}`;
 
-	const { canProceed, remainingSeconds } = await rateLimiter.checkLimit(cooldownKey, cooldown);
+	const { canProceed, remainingSeconds } = await attemptLimit.checkLimit(cooldownKey, cooldown);
 	if (!canProceed) {
 		throw new AppError(
 			429,
@@ -122,7 +120,7 @@ export async function consumeResend(userId: string, ip: string): Promise<void> {
 			'RESEND_COOLDOWN'
 		);
 	}
-	if ((await rateLimiter.getAttempts(countKey)) >= verificationConfig.maxResends) {
+	if ((await attemptLimit.getAttempts(countKey)) >= verificationConfig.maxResends) {
 		throw new AppError(
 			429,
 			'Too many resend attempts. Please try again later.',
@@ -130,8 +128,8 @@ export async function consumeResend(userId: string, ip: string): Promise<void> {
 		);
 	}
 
-	await rateLimiter.increment(cooldownKey, cooldown);
-	await rateLimiter.increment(countKey, {
+	await attemptLimit.increment(cooldownKey, cooldown);
+	await attemptLimit.increment(countKey, {
 		maxAttempts: verificationConfig.maxResends,
 		windowSeconds: 3600,
 	});

@@ -219,7 +219,7 @@ make redis-shell
 
 **Implementation:**
 
-- Service: `backend/src/features/auth/services/brute-force.service.ts`
+- Service: `backend/src/shared/security/account-lockout.ts`
 - Progressive lockout:
   - Soft Lock (5-7 attempts): 15 minutes
   - Hard Lock (8-10 attempts): 1 hour
@@ -269,8 +269,8 @@ make redis-shell
 **Implementation:**
 
 - Config: `backend/src/shared/config/rate-limit.config.ts`
-- Middleware: `backend/src/features/auth/middleware/rate-limit.middleware.ts`
-- Uses `express-rate-limit` + `rate-limit-redis` for distributed rate limiting
+- Middleware: `backend/src/shared/security/http-rate-limit.ts`
+- Uses `express-rate-limit` with a Redis store on the shared counter (`backend/src/shared/security/rate-limit-store.ts`)
 
 ### Use Case 3: IP Blacklist After Persistent Attacks
 
@@ -317,7 +317,7 @@ make redis-shell
 
 **Implementation:**
 
-- IP reputation tracking in `brute-force.service.ts`
+- IP reputation tracking in `backend/src/shared/security/ip-reputation.ts`
 - Thresholds:
   - 10 failures: Throttle to 2 req/min (1 hour)
   - 20 failures: Block auth endpoints (4 hours)
@@ -696,7 +696,7 @@ done
 
 **Implementation:**
 
-- Security logging in `brute-force.service.ts` and `auth.middleware.ts`
+- Security logging in `account-lockout.ts`, `ip-reputation.ts` and `auth.middleware.ts`
 - Log levels: WARN (security events), ERROR (critical failures)
 
 ## Security Test Automation
@@ -1034,7 +1034,7 @@ RATE_LIMIT_AUTH_MAX=20
 - Use Redis to track failed login attempts per email+IP
 - Lock account after threshold (5 attempts)
 - Progressive lockout durations (15min → 1h → 24h)
-- Implementation: `backend/src/features/auth/services/brute-force.service.ts`
+- Implementation: `backend/src/shared/security/account-lockout.ts` and `ip-reputation.ts`
 
 ### Issue 4: Missing Request Logging
 
@@ -1189,10 +1189,10 @@ Backend files implementing security features:
 
 - **Rate Limiting**:
   - `backend/src/shared/config/rate-limit.config.ts` - Rate limit configuration
-  - `backend/src/features/auth/middleware/rate-limit.middleware.ts` - Rate limit middlewares
+  - `backend/src/shared/security/http-rate-limit.ts` - Rate limit middlewares
 
 - **Brute Force Protection**:
-  - `backend/src/features/auth/services/brute-force.service.ts` - Account lockout and IP tracking
+  - `backend/src/shared/security/account-lockout.ts` and `ip-reputation.ts` - Account lockout and IP tracking
 
 - **Authentication**:
   - `backend/src/features/auth/auth.middleware.ts` - JWT verification

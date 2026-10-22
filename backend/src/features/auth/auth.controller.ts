@@ -8,11 +8,12 @@ import * as registrationService from '@/features/auth/services/registration.serv
 import * as loginService from '@/features/auth/services/login.service.js';
 import * as sessionService from '@/features/auth/services/session.service.js';
 import { getUserProfile } from '@/features/auth/utils/auth.helpers.js';
-import { requestIp } from '@/features/auth/utils/request-ip.js';
+import { requestIp } from '@/shared/security/request-ip.js';
 import type { AuthenticatedRequest } from '@/shared/types/global.types.js';
 import { logger } from '@/shared/utils/logger.js';
 import { sendSuccess } from '@/shared/utils/send-success.js';
-import { bruteForceService } from '@/shared/services/brute-force.service.js';
+import * as accountLockout from '@/shared/security/account-lockout.js';
+import * as ipReputation from '@/shared/security/ip-reputation.js';
 
 // Session handlers: register, login, refresh, me, logout. Errors reach the
 // shared error handler (Express 5 forwards rejected promises).
@@ -27,7 +28,7 @@ export async function register(req: Request, res: Response) {
 
 /**
  * POST /api/auth/login. Every failure, a validation error included, counts
- * toward the account lockout (account-lockout.middleware.ts); a success resets it.
+ * toward the account lockout (shared/security/account-lockout.middleware.ts); a success resets it.
  */
 export async function login(req: Request, res: Response) {
 	const body = req.body as { email?: string } | undefined;
@@ -39,13 +40,13 @@ export async function login(req: Request, res: Response) {
 		logger.info('Login request received', { email: validated.email, ip });
 
 		const result = await loginService.login(validated);
-		await bruteForceService.resetFailedAttempts(email, ip);
+		await accountLockout.resetFailedAttempts(email, ip);
 
 		logger.info('Login successful', { userId: result.user.id, ip });
 		sendSuccess(res, result);
 	} catch (error) {
-		const lockStatus = await bruteForceService.recordFailedAttempt(email, ip);
-		await bruteForceService.recordIPActivity(ip);
+		const lockStatus = await accountLockout.recordFailedAttempt(email, ip);
+		await ipReputation.recordIPActivity(ip);
 
 		logger.warn('Login failed', {
 			error: error instanceof Error ? error.message : 'Unknown error',

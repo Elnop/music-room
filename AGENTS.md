@@ -49,7 +49,7 @@ Rules are append-only: never disable, weaken or switch a rule to `warn`, and nev
 
 - Never add a file named `index.ts` under `src/`, in backend or mobile (no barrels); import the source file. Imports leaving the current folder use `@/`, never `../` (mobile: no other alias either). No direct `console.*`.
 - Backend imports go through `@/features/...`, `@/shared/...` or `@/realtime/...` (Socket.io server), always with a `.js` extension.
-- Backend: protect routes with `authMiddleware` from `@/features/auth/auth.middleware.js`; rate-limit sensitive routes with `features/auth/middleware/rate-limit.middleware.ts` (Redis-backed, no in-memory fallback).
+- Backend: protect routes with `authMiddleware` from `@/features/auth/auth.middleware.js`; rate-limit sensitive routes with `shared/security/http-rate-limit.ts`; every anti-abuse limiter lives in `shared/security/` and reaches Redis only through `shared/security/counter.ts` (no in-memory fallback).
 - Backend feature layout: `features/<name>/` holds `<name>.types.ts`, `<name>.validators.ts` (Zod), `<name>.controller.ts`, `<name>.routes.ts`, `<name>.openapi.ts`, logic in `services/`, authorization in `permissions/`, helpers in `utils/`. Services are function modules imported as namespaces, handlers have no `try/catch`, files stay under 150 lines: see `.agents/rules/structure.md#backend-feature` (reference: `features/auth/`).
 - Validate every request input with a Zod schema; no `any`.
 - `tracks.track_uri` stores the SoundCloud permalink URL. Stream URLs are fetched on demand and expire after 30 minutes; never persist them.

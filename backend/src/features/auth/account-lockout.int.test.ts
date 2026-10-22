@@ -6,7 +6,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 
 // Before env.ts is parsed: lockout and limiting on, a low IP blacklist threshold,
 // loopback whitelisted so the express-rate-limit limiters (not under test) skip.
-// The whitelist does not reach bruteForceService.
+// The whitelist does not reach account-lockout.ts nor ip-reputation.ts.
 vi.hoisted(() => {
 	process.env.RATE_LIMIT_ENABLED = 'true';
 	process.env.ACCOUNT_LOCKOUT_ENABLED = 'true';
@@ -64,7 +64,7 @@ async function deleteKeys(pattern: string): Promise<void> {
 	if (keys.length > 0) await redisClient.del(...keys);
 }
 
-// Every key bruteForceService writes for these emails and for loopback.
+// Every key the lockout and IP reputation write for these emails and for loopback.
 async function clearBruteForceKeys(): Promise<void> {
 	for (const email of usedEmails) {
 		await deleteKeys(`failed_login:${email}:*`);
@@ -157,6 +157,15 @@ describe('account lockout and IP blacklist (#206)', () => {
 
 		expect(status).toBe(200);
 		expect(await redisClient.keys(`failed_login:${email}:*`)).toHaveLength(0);
+	});
+
+	it('sends a bodyless login to validation (400), not a 500', async () => {
+		usedEmails.push('unknown');
+		const res = await fetch(`${baseUrl}/api/auth/login`, { method: 'POST' });
+		const body = (await res.json()) as Record<string, unknown>;
+
+		expect(res.status).toBe(400);
+		expect(error(body).code).toBe('VALIDATION_ERROR');
 	});
 
 	it('blacklists the IP after the threshold and refuses every auth request from it', async () => {

@@ -35,7 +35,7 @@ import type { AppSocketServer } from '@/realtime/socket-auth.js';
  * A malformed payload (including a listening:update with a title or artist
  * over 300 characters) is answered on `listening:error` / `control:error`
  * with `{ message, code: 'INVALID_PAYLOAD' }`, before any lookup. Every event
- * is also rate-limited per socket (event-rate-limit.ts, `RATE_LIMITED`).
+ * is also rate-limited per socket (shared/security/socket-event-limit.ts, `RATE_LIMITED`).
  */
 
 export const listeningTargetSchema = z.uuid();

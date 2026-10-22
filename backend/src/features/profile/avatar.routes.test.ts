@@ -61,7 +61,7 @@ vi.mock('@/shared/utils/logger.js', () => ({
 	logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() },
 }));
 
-vi.mock('@/features/auth/middleware/rate-limit.middleware.js', () => ({
+vi.mock('@/shared/security/http-rate-limit.js', () => ({
 	avatarRateLimiter: (_req: Request, _res: Response, next: NextFunction) => next(),
 }));
 

@@ -64,7 +64,7 @@ describe('email/password auth flow (#75)', () => {
 					`failed_login:${e}:*`,
 					`account_locked:${e}:*`,
 				]);
-				// Failed logins also count per IP (brute-force.service.ts).
+				// Failed logins also count per IP (shared/security/ip-reputation.ts).
 				patterns.push('ip_failed_logins:*127.0.0.1', 'ip_failed_logins:::1');
 				patterns.push(...userIds.map(id => `email_*${id}*`));
 				for (const pattern of patterns) {

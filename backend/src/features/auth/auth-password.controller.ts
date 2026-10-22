@@ -5,14 +5,12 @@ import {
 	canResendResetCodeQuerySchema,
 } from '@/features/auth/auth.validators.js';
 import * as passwordResetService from '@/features/auth/services/password-reset.service.js';
-import { PasswordResetCooldownService } from '@/features/auth/services/password-reset-cooldown.service.js';
-import { requestIp } from '@/features/auth/utils/request-ip.js';
+import * as passwordResetLimit from '@/shared/security/password-reset-limit.js';
+import { requestIp } from '@/shared/security/request-ip.js';
 import { logger } from '@/shared/utils/logger.js';
 import { sendSuccess } from '@/shared/utils/send-success.js';
 
 // Password reset: request a code, reset with it, check the resend cooldown.
-
-const resetCooldown = new PasswordResetCooldownService();
 
 /** POST /api/auth/forgot-password. Same answer whether the email exists or not. */
 export async function forgotPassword(req: Request, res: Response) {
@@ -44,5 +42,5 @@ export async function canResendResetCode(req: Request, res: Response) {
 	const ip = requestIp(req);
 
 	logger.info('Check resend reset code', { email, ip });
-	sendSuccess(res, await resetCooldown.status(email, ip));
+	sendSuccess(res, await passwordResetLimit.status(email, ip));
 }

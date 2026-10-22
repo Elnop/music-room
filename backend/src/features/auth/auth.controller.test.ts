@@ -23,12 +23,12 @@ vi.mock('@/features/auth/services/session.service.js', () => ({
 	refreshToken: mocks.refreshToken,
 }));
 vi.mock('@/features/auth/utils/auth.helpers.js', () => ({ getUserProfile: mocks.getUserProfile }));
-vi.mock('@/shared/services/brute-force.service.js', () => ({
-	bruteForceService: {
-		resetFailedAttempts: mocks.resetFailedAttempts,
-		recordFailedAttempt: mocks.recordFailedAttempt,
-		recordIPActivity: mocks.recordIPActivity,
-	},
+vi.mock('@/shared/security/account-lockout.js', () => ({
+	resetFailedAttempts: mocks.resetFailedAttempts,
+	recordFailedAttempt: mocks.recordFailedAttempt,
+}));
+vi.mock('@/shared/security/ip-reputation.js', () => ({
+	recordIPActivity: mocks.recordIPActivity,
 }));
 
 const result = { user: { id: 'user-a' }, session: { accessToken: 'access' } };

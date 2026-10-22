@@ -8,7 +8,10 @@ import {
 	type AppSocketServer,
 } from '@/realtime/socket-auth.js';
 import { LatestThrottle } from '@/realtime/latest-throttle.js';
-import { rateLimitedErrorFor, SocketEventLimiter } from '@/realtime/event-rate-limit.js';
+import {
+	createSocketEventLimiter,
+	rateLimitedErrorFor,
+} from '@/shared/security/socket-event-limit.js';
 import {
 	authorizePlaylistJoin,
 	playlistRoom,
@@ -116,12 +119,12 @@ class RealtimeService {
 			// Every incoming event, including those added later, is logged with
 			// the handshake's platform, device and app version (subject IV.6),
 			// then counted against the socket's per-event limit (#204).
-			const limiter = new SocketEventLimiter();
+			const checkEvent = createSocketEventLimiter();
 			socket.use(([eventName]: unknown[], next) => {
 				socketLogger.incoming(socket.id, eventName, socket.data);
 
 				const name = typeof eventName === 'string' ? eventName : '';
-				const decision = limiter.check(name);
+				const decision = checkEvent(name);
 				if (decision === 'allowed') {
 					next();
 					return;
