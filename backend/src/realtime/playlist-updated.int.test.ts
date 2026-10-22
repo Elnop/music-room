@@ -8,7 +8,8 @@ import { connectRedis, disconnectRedis, isRedisConnected } from '@/shared/config
 import * as tracks from '@/features/playlists/services/playlist-track.service.js';
 import * as playlistService from '@/features/playlists/services/playlist.service.js';
 import * as playlistUpdateService from '@/features/playlists/services/playlist-update.service.js';
-import { realtime } from '@/realtime/index.js';
+import * as socketServer from '@/realtime/socket-server.js';
+import { getIO } from '@/realtime/state.js';
 import type {
 	PlaylistDeletedPayload,
 	PlaylistDetailsPayload,
@@ -96,7 +97,7 @@ describe('playlist:updated broadcast', () => {
 	}
 
 	async function inRoom(socket: ClientSocket): Promise<boolean> {
-		const sockets = await realtime.getIO()!.fetchSockets();
+		const sockets = await getIO()!.fetchSockets();
 		return sockets.find(s => s.id === socket.id)?.rooms.has(`playlist:${playlistId}`) ?? false;
 	}
 
@@ -133,7 +134,7 @@ describe('playlist:updated broadcast', () => {
 		outsider = await createUser();
 
 		httpServer = createServer();
-		realtime.initialize(httpServer);
+		socketServer.initialize(httpServer);
 		await new Promise<void>(resolve => httpServer.listen(0, '127.0.0.1', () => resolve()));
 		const { port } = httpServer.address() as AddressInfo;
 		url = `http://127.0.0.1:${port}`;
@@ -168,7 +169,7 @@ describe('playlist:updated broadcast', () => {
 	});
 
 	afterAll(async () => {
-		await realtime.getIO()?.close();
+		await getIO()?.close();
 		await supabaseAdmin.from('tracks').delete().like('track_uri', `${URI_PREFIX}/%`);
 		for (const user of [owner, viewer, outsider]) {
 			if (user) await supabaseAdmin.auth.admin.deleteUser(user.id); // cascades to playlists

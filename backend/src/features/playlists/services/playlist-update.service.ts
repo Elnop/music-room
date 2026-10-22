@@ -3,7 +3,7 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import { checkOwnership } from '@/features/playlists/permissions/playlist.permissions.js';
 import { formatPlaylistResponse } from '@/features/playlists/utils/playlist.helpers.js';
-import { realtime } from '@/realtime/index.js';
+import * as realtime from '@/realtime/emitters/playlist.emitters.js';
 import type { UpdatePlaylistInput } from '@/features/playlists/playlist.validators.js';
 import type { PlaylistResponse, PlaylistUpdate } from '@/features/playlists/playlist.types.js';
 

@@ -1,7 +1,2 @@
 {
-  "src/realtime/index.ts": {
-    "no-restricted-syntax": {
-      "count": 1
-    }
-  }
 }

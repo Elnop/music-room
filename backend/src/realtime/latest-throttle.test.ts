@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { LatestThrottle } from '@/realtime/latest-throttle.js';
+import { createLatestThrottle, type LatestThrottle } from '@/realtime/latest-throttle.js';
 
 const WINDOW_MS = 1000;
 
@@ -12,7 +12,7 @@ describe('LatestThrottle', () => {
 
 	beforeEach(() => {
 		vi.useFakeTimers();
-		throttle = new LatestThrottle(WINDOW_MS);
+		throttle = createLatestThrottle(WINDOW_MS);
 		calls = [];
 	});
 

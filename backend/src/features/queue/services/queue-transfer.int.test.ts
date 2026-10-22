@@ -3,11 +3,22 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import * as queue from '@/features/queue/services/queue.service.js';
 import * as transfer from '@/features/queue/services/queue-transfer.service.js';
-import { realtime } from '@/realtime/index.js';
+import * as realtimeControl from '@/realtime/emitters/control.emitters.js';
+import * as realtimeQueue from '@/realtime/emitters/queue.emitters.js';
+
+vi.mock('@/realtime/emitters/control.emitters.js', async importOriginal => ({
+	...(await importOriginal<typeof import('@/realtime/emitters/control.emitters.js')>()),
+	isDeviceOnline: vi.fn(),
+}));
+vi.mock('@/realtime/emitters/queue.emitters.js', async importOriginal => ({
+	...(await importOriginal<typeof import('@/realtime/emitters/queue.emitters.js')>()),
+	sendDeviceCommand: vi.fn(),
+	notifyQueueUpdate: vi.fn(),
+}));
 
 // #295: transfer playback to a device of mine or of a friend. Checks come before any change.
 // No Socket.io server runs here: device presence and commands are stubbed on
-// the realtime singleton.
+// the realtime emitter modules.
 
 const URI_PREFIX = `https://soundcloud.com/int-queue-transfer/${randomUUID()}`;
 const users: string[] = [];
@@ -44,9 +55,9 @@ const dto = () => {
 };
 
 const online = new Set<string>();
-const sendDeviceCommand = vi.spyOn(realtime, 'sendDeviceCommand').mockReturnValue(true);
-const notifyQueueUpdate = vi.spyOn(realtime, 'notifyQueueUpdate').mockReturnValue(undefined);
-vi.spyOn(realtime, 'isDeviceOnline').mockImplementation((userId, deviceId) =>
+const sendDeviceCommand = vi.mocked(realtimeQueue.sendDeviceCommand).mockReturnValue(true);
+const notifyQueueUpdate = vi.mocked(realtimeQueue.notifyQueueUpdate).mockReturnValue(undefined);
+vi.mocked(realtimeControl.isDeviceOnline).mockImplementation((userId, deviceId) =>
 	online.has(`${userId}:${deviceId}`)
 );
 

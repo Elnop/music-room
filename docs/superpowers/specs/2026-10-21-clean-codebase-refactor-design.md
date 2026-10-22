@@ -60,9 +60,11 @@ C'est une priorité, sans échéance : on va jusqu'au bout plutôt que de s'arr�
 ```
 backend/src/
 ├── server.ts
+├── app/                      <- racine de composition (#375) : routes.ts, openapi.ts ; seul server.ts l'importe
 ├── realtime/
-│   ├── index.ts              <- création du serveur, auth, branchement des handlers
-│   └── handlers/             <- un fichier par domaine : playlist, listening, control…
+│   ├── socket-server.ts      <- création du serveur, auth, branchement des handlers (pas d'index.ts)
+│   ├── handlers/             <- un fichier par domaine : playlist, listening, control
+│   └── emitters/             <- notify* / sendDeviceCommand, importés par les features
 ├── features/<name>/
 │   ├── <name>.routes.ts
 │   ├── <name>.openapi.ts     <- enregistrement OpenAPI à partir des schémas Zod

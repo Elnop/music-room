@@ -3,7 +3,7 @@ import type {
 	ControlActionPayload,
 	ControlRevokedPayload,
 	ListeningStatus,
-} from '@/features/music-control/music-control.types.js';
+} from '@/realtime/listening.types.js';
 import { socketLogger } from '@/shared/middleware/socket-logger.middleware.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { AppSocketServer } from '@/realtime/socket-auth.js';

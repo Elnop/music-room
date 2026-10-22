@@ -10,8 +10,9 @@ import type { TrackUpsertInput } from '@/shared/utils/track-upsert.js';
 // permissions, added_by, result shapes, error mapping and concurrent calls.
 
 const { notifyPlaylistUpdate } = vi.hoisted(() => ({ notifyPlaylistUpdate: vi.fn() }));
-vi.mock('@/realtime/index.js', () => ({
-	realtime: { notifyPlaylistUpdate, revalidatePlaylistRoom: vi.fn() },
+vi.mock('@/realtime/emitters/playlist.emitters.js', () => ({
+	notifyPlaylistUpdate,
+	revalidatePlaylistRoom: vi.fn(),
 }));
 
 const service = await import('@/features/playlists/services/playlist-track.service.js');

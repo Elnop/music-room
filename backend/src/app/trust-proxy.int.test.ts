@@ -19,7 +19,8 @@ const { connectRedis, disconnectRedis, isRedisConnected, redisClient } =
 	await import('@/shared/config/redis.js');
 const { authMiddleware } = await import('@/features/auth/auth.middleware.js');
 const { configureTrustProxy } = await import('@/shared/config/trust-proxy.js');
-const { realtime } = await import('@/realtime/index.js');
+const socketServer = await import('@/realtime/socket-server.js');
+const { getIO } = await import('@/realtime/state.js');
 
 // With a trusted proxy (#173), clients behind it are counted apart by their
 // X-Forwarded-For, over HTTP and on the Socket.io handshake, against the test
@@ -50,7 +51,7 @@ describe('client IP behind a trusted proxy (TRUST_PROXY=loopback)', () => {
 			res.json({ ok: true });
 		});
 		httpServer = createServer(app);
-		realtime.initialize(httpServer);
+		socketServer.initialize(httpServer);
 		await new Promise<void>(resolve => httpServer.listen(0, '127.0.0.1', () => resolve()));
 		baseUrl = `http://127.0.0.1:${(httpServer.address() as AddressInfo).port}`;
 	});
@@ -64,7 +65,7 @@ describe('client IP behind a trusted proxy (TRUST_PROXY=loopback)', () => {
 	afterAll(async () => {
 		try {
 			if (isRedisConnected()) await clearKeys();
-			await realtime.getIO()?.close();
+			await getIO()?.close();
 		} finally {
 			await disconnectRedis();
 		}

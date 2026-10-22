@@ -27,8 +27,9 @@ vi.mock('@/features/queue/utils/queue-rpc.js', () => ({
 	upcomingTrackIdsRpc: m.upcomingTrackIdsRpc,
 }));
 vi.mock('@/shared/utils/track-upsert.js', () => ({ upsertTrack: m.upsertTrack }));
-vi.mock('@/realtime/index.js', () => ({
-	realtime: { notifyQueueUpdate: m.notifyQueueUpdate, sendDeviceCommand: m.sendDeviceCommand },
+vi.mock('@/realtime/emitters/queue.emitters.js', () => ({
+	notifyQueueUpdate: m.notifyQueueUpdate,
+	sendDeviceCommand: m.sendDeviceCommand,
 }));
 vi.mock('@/shared/utils/logger.js', () => ({ logger: { info: vi.fn(), warn: vi.fn() } }));
 

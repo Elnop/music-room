@@ -30,8 +30,8 @@ vi.mock('@/shared/utils/logger.js', () => ({
 vi.mock('@/features/friends/services/follow-status.service.js', () => ({
 	getFollowStatus: m.getFollowStatus,
 }));
-vi.mock('@/realtime/index.js', () => ({
-	realtime: { notifyPermissionChange: m.notifyPermissionChange },
+vi.mock('@/realtime/emitters/control.emitters.js', () => ({
+	notifyPermissionChange: m.notifyPermissionChange,
 }));
 
 const ok = (data: unknown): Result => ({ data, error: null });

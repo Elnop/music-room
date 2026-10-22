@@ -1,6 +1,6 @@
 import { logger } from '@/shared/utils/logger.js';
 import type { TrackUpsertInput } from '@/shared/utils/track-upsert.js';
-import { realtime } from '@/realtime/index.js';
+import * as realtime from '@/realtime/emitters/queue.emitters.js';
 import {
 	canViewPlaylist,
 	getPlaylistForPermissionCheck,

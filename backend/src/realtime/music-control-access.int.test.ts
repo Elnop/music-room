@@ -9,8 +9,9 @@ import * as controlSwitchService from '@/features/music-control/services/control
 import * as controlAccessService from '@/features/music-control/services/control-access.service.js';
 import * as deviceLicenseService from '@/features/music-control/services/device-license.service.js';
 import * as followService from '@/features/friends/services/follow.service.js';
-import type { UserListeningStatus } from '@/features/music-control/music-control.types.js';
-import { realtime } from '@/realtime/index.js';
+import type { UserListeningStatus } from '@/realtime/listening.types.js';
+import * as socketServer from '@/realtime/socket-server.js';
+import { getIO } from '@/realtime/state.js';
 
 // The real access checks, each wrapped so a test can tell whether any ran.
 vi.mock('@/features/music-control/services/control-access.service.js', async importOriginal => {
@@ -22,7 +23,7 @@ vi.mock('@/features/music-control/services/control-access.service.js', async imp
 });
 
 // Access to listening status and music control (music-control-access.ts,
-// realtime/index.ts) against a real Socket.io server and the local Supabase
+// realtime/handlers/) against a real Socket.io server and the local Supabase
 // stack. Alice owns the music; Bob and Dave are her mutual friends with her
 // "all my devices" switch on; Erin is a mutual friend without switch or
 // license; Carol does not follow her. Per-device licenses are added per test.
@@ -118,7 +119,7 @@ describe('Listening and control access', () => {
 	}
 
 	async function inListeningRoom(socket: ClientSocket, ownerId: string): Promise<boolean> {
-		const sockets = await realtime.getIO()!.fetchSockets();
+		const sockets = await getIO()!.fetchSockets();
 		const found = sockets.find(s => s.id === socket.id);
 		return found?.rooms.has(`listening:${ownerId}`) ?? false;
 	}
@@ -217,7 +218,7 @@ describe('Listening and control access', () => {
 		]);
 
 		httpServer = createServer();
-		realtime.initialize(httpServer);
+		socketServer.initialize(httpServer);
 		await new Promise<void>(resolve => httpServer.listen(0, '127.0.0.1', () => resolve()));
 		const { port } = httpServer.address() as AddressInfo;
 		url = `http://127.0.0.1:${port}`;
@@ -232,11 +233,11 @@ describe('Listening and control access', () => {
 		while (clients.length) clients.pop()?.disconnect();
 		// Let the server drop the sockets so their disconnect broadcasts do not
 		// reach the next test.
-		await vi.waitFor(async () => expect(await realtime.getIO()!.fetchSockets()).toHaveLength(0));
+		await vi.waitFor(async () => expect(await getIO()!.fetchSockets()).toHaveLength(0));
 	});
 
 	afterAll(async () => {
-		await realtime.getIO()?.close();
+		await getIO()?.close();
 		const users = [alice, bob, carol, dave, erin].filter(Boolean);
 		if (users.length) {
 			await supabaseAdmin
@@ -331,7 +332,7 @@ describe('Listening and control access', () => {
 			socket.emit('listening:subscribe', p);
 			await expect(refusal).resolves.toMatchObject({ code: 'INVALID_PAYLOAD' });
 			for (const lookup of lookups) expect(lookup).not.toHaveBeenCalled();
-			const sockets = await realtime.getIO()!.fetchSockets();
+			const sockets = await getIO()!.fetchSockets();
 			const rooms = [...(sockets.find(s => s.id === socket.id)?.rooms ?? [])];
 			expect(rooms.some(r => r.startsWith('listening:'))).toBe(false);
 		});

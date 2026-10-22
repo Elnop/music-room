@@ -3,6 +3,13 @@ interface KeyState {
 	pending: (() => void) | null;
 }
 
+export interface LatestThrottle {
+	/** Run `run` now if the key's window is closed, else keep it as the key's latest call. */
+	submit(key: string, run: () => void): void;
+	/** Drop the key's pending call, timer and window. */
+	cancel(key: string): void;
+}
+
 /**
  * Leading + trailing throttle keyed by string.
  *
@@ -11,39 +18,37 @@ interface KeyState {
  * runs when the window ends and opens a new window. A key therefore runs at
  * most once per window and always ends on its latest call.
  */
-export class LatestThrottle {
-	private states = new Map<string, KeyState>();
+export function createLatestThrottle(windowMs: number): LatestThrottle {
+	const states = new Map<string, KeyState>();
 
-	constructor(private readonly windowMs: number) {}
-
-	submit(key: string, run: () => void): void {
-		const state = this.states.get(key);
-		if (state) {
-			state.pending = run;
-			return;
-		}
-		this.openWindow(key);
-		run();
+	function openWindow(key: string): void {
+		const timer = setTimeout(() => closeWindow(key), windowMs);
+		states.set(key, { timer, pending: null });
 	}
 
-	/** Drop the key's pending call, timer and window. */
-	cancel(key: string): void {
-		const state = this.states.get(key);
-		if (!state) return;
-		clearTimeout(state.timer);
-		this.states.delete(key);
-	}
-
-	private openWindow(key: string): void {
-		const timer = setTimeout(() => this.closeWindow(key), this.windowMs);
-		this.states.set(key, { timer, pending: null });
-	}
-
-	private closeWindow(key: string): void {
-		const state = this.states.get(key);
-		this.states.delete(key);
+	function closeWindow(key: string): void {
+		const state = states.get(key);
+		states.delete(key);
 		if (!state?.pending) return;
-		this.openWindow(key);
+		openWindow(key);
 		state.pending();
 	}
+
+	return {
+		submit(key, run) {
+			const state = states.get(key);
+			if (state) {
+				state.pending = run;
+				return;
+			}
+			openWindow(key);
+			run();
+		},
+		cancel(key) {
+			const state = states.get(key);
+			if (!state) return;
+			clearTimeout(state.timer);
+			states.delete(key);
+		},
+	};
 }

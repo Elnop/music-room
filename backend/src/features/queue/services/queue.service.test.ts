@@ -26,7 +26,9 @@ vi.mock('@/features/queue/utils/queue-play-command.js', () => ({
 	sendPlayCommand: m.sendPlayCommand,
 }));
 vi.mock('@/features/queue/utils/queue-add.js', () => ({ addTrackToQueue: m.addTrackToQueue }));
-vi.mock('@/realtime/index.js', () => ({ realtime: { notifyQueueUpdate: m.notifyQueueUpdate } }));
+vi.mock('@/realtime/emitters/queue.emitters.js', () => ({
+	notifyQueueUpdate: m.notifyQueueUpdate,
+}));
 vi.mock('@/features/playlists/permissions/playlist.permissions.js', () => ({
 	getPlaylistForPermissionCheck: m.getPlaylistForPermissionCheck,
 	canViewPlaylist: m.canViewPlaylist,

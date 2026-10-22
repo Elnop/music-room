@@ -21,7 +21,8 @@ const { supabaseAdmin, supabaseAnon } = await import('@/shared/config/supabase.j
 const { authMiddleware, optionalAuthMiddleware } =
 	await import('@/features/auth/auth.middleware.js');
 const { rateLimitConfig } = await import('@/shared/config/rate-limit.config.js');
-const { realtime } = await import('@/realtime/index.js');
+const socketServer = await import('@/realtime/socket-server.js');
+const { getIO } = await import('@/realtime/state.js');
 const { configureTrustProxy } = await import('@/shared/config/trust-proxy.js');
 
 // Failed token verifications limited per IP (#160), against the test Redis and
@@ -81,7 +82,7 @@ describe('token verification limit per IP', () => {
 		});
 
 		httpServer = createServer(app);
-		realtime.initialize(httpServer);
+		socketServer.initialize(httpServer);
 		await new Promise<void>(resolve => httpServer.listen(0, '127.0.0.1', () => resolve()));
 		const { port } = httpServer.address() as AddressInfo;
 		baseUrl = `http://127.0.0.1:${port}`;
@@ -99,7 +100,7 @@ describe('token verification limit per IP', () => {
 	afterAll(async () => {
 		try {
 			if (isRedisConnected()) await clearKeys();
-			await realtime.getIO()?.close();
+			await getIO()?.close();
 			if (userId) await supabaseAdmin.auth.admin.deleteUser(userId);
 		} finally {
 			getUser.mockRestore();

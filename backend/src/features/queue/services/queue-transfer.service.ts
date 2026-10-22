@@ -1,6 +1,6 @@
 import { logger } from '@/shared/utils/logger.js';
 import { upsertTrack } from '@/shared/utils/track-upsert.js';
-import { realtime } from '@/realtime/index.js';
+import * as realtime from '@/realtime/emitters/queue.emitters.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import * as controlAccessService from '@/features/music-control/services/control-access.service.js';
 import type { DeviceCommand } from '@/features/music-control/music-control.types.js';

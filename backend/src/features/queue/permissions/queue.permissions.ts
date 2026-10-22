@@ -1,6 +1,6 @@
 import * as controlAccessService from '@/features/music-control/services/control-access.service.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
-import { realtime } from '@/realtime/index.js';
+import * as realtime from '@/realtime/emitters/control.emitters.js';
 
 /**
  * Who may act on a play queue (#294, subject IV.2.2). The owner, and any friend

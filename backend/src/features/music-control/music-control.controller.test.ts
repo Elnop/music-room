@@ -39,7 +39,7 @@ vi.mock('@/features/music-control/services/device-license.service.js', () => ({
 	revoke: svc.revoke,
 	listControllable: svc.listControllable,
 }));
-vi.mock('@/realtime/index.js', () => ({ realtime: { setDeviceName: svc.setDeviceName } }));
+vi.mock('@/realtime/emitters/control.emitters.js', () => ({ setDeviceName: svc.setDeviceName }));
 
 const ME = '11111111-1111-4111-8111-111111111111';
 const FRIEND = '22222222-2222-4222-8222-222222222222';

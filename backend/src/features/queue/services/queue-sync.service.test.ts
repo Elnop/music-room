@@ -10,7 +10,9 @@ const m = vi.hoisted(() => ({
 }));
 vi.mock('@/shared/config/supabase.js', () => ({ supabaseAdmin: { rpc: m.rpc } }));
 vi.mock('@/features/queue/utils/queue-rpc.js', () => ({ getQueueRpc: m.getQueueRpc }));
-vi.mock('@/realtime/index.js', () => ({ realtime: { notifyQueueUpdate: m.notifyQueueUpdate } }));
+vi.mock('@/realtime/emitters/queue.emitters.js', () => ({
+	notifyQueueUpdate: m.notifyQueueUpdate,
+}));
 vi.mock('@/shared/utils/logger.js', () => ({ logger: { info: vi.fn(), error: m.error } }));
 
 const U1 = '11111111-1111-4111-8111-111111111111';

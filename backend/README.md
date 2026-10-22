@@ -9,6 +9,7 @@ Ce projet utilise une **architecture feature-first** (colocation par feature) :
 ```
 backend/
 ├── src/
+│   ├── app/                # Racine de composition : montage des routes (routes.ts), document OpenAPI (openapi.ts)
 │   ├── features/
 │   │   ├── auth/           # Inscription, login, refresh, OAuth Google/Facebook, vérif email, reset password
 │   │   ├── friends/        # Follow / unfollow, statut, stats
@@ -17,10 +18,13 @@ backend/
 │   │   ├── playlists/      # Playlists, tracks, collaborateurs, viewers
 │   │   ├── profile/        # Profil, confidentialité, préférences musicales
 │   │   └── soundcloud/     # Recherche, détails de track, URLs de stream
-│   ├── realtime/
-│   │   └── index.ts        # Serveur Socket.io (playlists, écoute, contrôle)
+│   ├── realtime/           # Serveur Socket.io
+│   │   ├── socket-server.ts  # Création du serveur, origine, auth, limites, branchement des handlers
+│   │   ├── handlers/       # Un handler par domaine : playlist, listening, control
+│   │   ├── emitters/       # Ce que les features appellent : notify*, sendDeviceCommand, revalidate*, isDeviceOnline
+│   │   └── state.ts        # État du module : serveur, appareils connectés, statuts d'écoute
 │   ├── shared/
-│   │   ├── config/         # env, Supabase, Redis, Swagger, rate limits, montage des routes (routes.ts)
+│   │   ├── config/         # env, Supabase, Redis, briques Swagger, rate limits ; n'importe aucune feature
 │   │   ├── middleware/     # error handler, action logger (HTTP + socket)
 │   │   ├── security/       # anti-abus : rate limiting, lockout, réputation IP, limites de token et d'événements socket
 │   │   ├── types/          # Types globaux + supabase.generated.ts (généré : make generate-types)
@@ -124,9 +128,9 @@ The document is generated from the Zod schemas with `@asteasolutions/zod-to-open
 
 - Request schemas are the validators the controllers parse with (`features/<name>/<name>.validators.ts`); response schemas sit next to them (or in `<name>-responses.validators.ts` for a big feature).
 - Each `features/<name>/<name>.openapi.ts` exports `register<Name>Openapi(registry)`, which registers the routes (method, path, tags, summary, request, responses); a big feature splits them by subject (e.g. `playlist-tracks.openapi.ts`).
-- `shared/config/swagger.schemas.ts` (success envelope, body and parameter helpers) and `shared/config/swagger.errors.ts` (`ErrorResponse`, shared error responses) are the building blocks; `shared/config/swagger.config.ts` calls every feature and generates the document.
+- `shared/config/swagger.schemas.ts` (success envelope, body and parameter helpers) and `shared/config/swagger.errors.ts` (`ErrorResponse`, shared error responses) are the building blocks; `app/openapi.ts` calls every feature and generates the document.
 
-`src/shared/config/openapi-coverage.test.ts` fails when a mounted route is not documented, or a documented one is not mounted.
+`src/app/openapi-coverage.test.ts` fails when a mounted route is not documented, or a documented one is not mounted.
 
 ### Export & Validation
 
@@ -396,7 +400,7 @@ features/<name>/
 └── <name>.openapi.ts          # Enregistrement OpenAPI des routes, à partir des schémas Zod
 ```
 
-Ajouter une feature : types → validators → service → controller → routes → openapi, puis monter le router dans `src/shared/config/routes.ts`.
+Ajouter une feature : types → validators → service → controller → routes → openapi, puis monter le router dans `src/app/routes.ts` et appeler son `register<Name>Openapi` dans `src/app/openapi.ts`.
 
 ## 🗄️ Base de données
 
@@ -412,7 +416,7 @@ Tables Supabase utilisées par le backend :
 
 ## 🛣️ Endpoints
 
-Montés dans `src/shared/config/routes.ts`, documentés dans Swagger (`/api-docs`) :
+Montés dans `src/app/routes.ts`, documentés dans Swagger (`/api-docs`) :
 
 | Préfixe | Endpoints |
 |---|---|
@@ -432,7 +436,7 @@ Montés dans `src/shared/config/routes.ts`, documentés dans Swagger (`/api-docs
 
 ## ⚡ Temps réel (Socket.io)
 
-Serveur : `src/realtime/index.ts`.
+Serveur : `src/realtime/socket-server.ts` (création, origine, auth, limite par événement), un handler par domaine dans `src/realtime/handlers/` (`playlist`, `listening`, `control`). Les features émettent par `src/realtime/emitters/` (`playlist`, `queue`, `control`), importés en namespace : `import * as realtime from '@/realtime/emitters/queue.emitters.js'`.
 
 ### Authentification du handshake
 

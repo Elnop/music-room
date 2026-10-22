@@ -1,5 +1,5 @@
 import { logger } from '@/shared/utils/logger.js';
-import { realtime } from '@/realtime/index.js';
+import * as realtime from '@/realtime/emitters/queue.emitters.js';
 import type { QueuePlayCommand } from '@/features/music-control/music-control.types.js';
 import type { QueueState } from '@/features/queue/queue.types.js';
 

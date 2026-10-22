@@ -1,8 +1,8 @@
 import { OpenAPIRegistry, OpenApiGeneratorV3 } from '@asteasolutions/zod-to-openapi';
 import swaggerUi from 'swagger-ui-express';
-import { env } from './env.js';
-import { registerErrorComponents } from './swagger.errors.js';
-import { healthSchema } from './swagger.schemas.js';
+import { env } from '@/shared/config/env.js';
+import { registerErrorComponents } from '@/shared/config/swagger.errors.js';
+import { healthSchema } from '@/shared/config/swagger.schemas.js';
 import { registerAuthOpenapi } from '@/features/auth/auth.openapi.js';
 import { registerPlaylistOpenapi } from '@/features/playlists/playlist.openapi.js';
 import { registerProfileOpenapi } from '@/features/profile/profile.openapi.js';
