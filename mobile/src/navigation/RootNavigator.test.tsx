@@ -1,21 +1,13 @@
 import React from 'react';
 import { Linking } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { act, render, screen } from '@testing-library/react-native';
 import { RootNavigator } from '@/navigation/RootNavigator';
 import { useAuthStore } from '@/store/authStore';
 import { clearPendingLink } from '@/navigation/linking';
+import { logger } from '@/utils/logger';
 
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
-
-jest.mock('@/lib/supabase', () => ({
-	supabase: {
-		auth: {
-			signOut: jest.fn(),
-			setSession: jest.fn(),
-			onAuthStateChange: () => ({ data: { subscription: { unsubscribe: jest.fn() } } }),
-		},
-	},
-}));
 
 jest.mock('@services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
@@ -37,6 +29,7 @@ jest.mock('@/contexts/ThemeContext', () => {
 
 jest.mock('@/services/backendUrl', () => ({
 	loadBackendUrl: () => Promise.resolve(),
+	getBackendUrl: () => 'http://backend.test',
 }));
 
 jest.mock('@/store/socketStore', () => {
@@ -105,6 +98,9 @@ jest.mock('react-native-safe-area-context', () => {
 	};
 });
 
+// The store's own actions, before a test replaces them with stubs.
+const { loadFromStorage, isTokenExpiringSoon } = useAuthStore.getState();
+
 const signIn = () =>
 	act(() => {
 		useAuthStore.setState({ isAuthenticated: true });
@@ -158,5 +154,137 @@ describe('RootNavigator share links', () => {
 	it('ignores a malformed link and starts normally', async () => {
 		await renderWithUrl('zumik://playlist/abc', true);
 		expect(await screen.findByText('playlists {}')).toBeTruthy();
+	});
+});
+
+describe('RootNavigator session restore', () => {
+	const fetchMock = jest.fn();
+	const user = {
+		id: 'user-a',
+		email: 'a@example.com',
+		username: 'alice',
+		createdAt: '2025-01-01T00:00:00Z',
+		updatedAt: '2025-01-01T00:00:00Z',
+	};
+
+	function jsonResponse(status: number, body: object): Response {
+		return {
+			ok: status >= 200 && status < 300,
+			status,
+			statusText: '',
+			json: () => Promise.resolve(body),
+			text: () => Promise.resolve(JSON.stringify(body)),
+		} as unknown as Response;
+	}
+
+	/** A session saved by a previous run, its access token expired a minute ago. */
+	async function storeExpiredSession(): Promise<void> {
+		await AsyncStorage.multiSet([
+			['@zumik/auth_user', JSON.stringify(user)],
+			['@zumik/access_token', 'stored-access'],
+			['@zumik/refresh_token', 'stored-refresh'],
+			['@zumik/is_authenticated', 'true'],
+			['@zumik/token_expires_at', String(Date.now() - 60_000)],
+		]);
+	}
+
+	async function renderColdStart(): Promise<void> {
+		jest.spyOn(Linking, 'getInitialURL').mockResolvedValue(null as unknown as string);
+		useAuthStore.setState({
+			user: null,
+			accessToken: null,
+			refreshToken: null,
+			tokenExpiresAt: null,
+			isAuthenticated: false,
+			isRefreshing: false,
+			loadFromStorage,
+			isTokenExpiringSoon,
+		});
+		render(<RootNavigator />);
+		await act(async () => {});
+	}
+
+	const realFetch = globalThis.fetch;
+
+	afterEach(() => {
+		globalThis.fetch = realFetch;
+		// Linking.getInitialURL and the logger spies
+		jest.restoreAllMocks();
+		useAuthStore.setState({
+			user: null,
+			accessToken: null,
+			refreshToken: null,
+			tokenExpiresAt: null,
+			isAuthenticated: false,
+			isRefreshing: false,
+			loadFromStorage,
+			isTokenExpiringSoon,
+		});
+	});
+
+	beforeEach(async () => {
+		jest.spyOn(logger, 'warn').mockImplementation(() => undefined);
+		jest.spyOn(logger, 'error').mockImplementation(() => undefined);
+		globalThis.fetch = fetchMock as unknown as typeof fetch;
+		fetchMock.mockReset();
+		await AsyncStorage.clear();
+		await storeExpiredSession();
+	});
+
+	it('refreshes an expired stored session through the backend and opens the app', async () => {
+		const expiresAt = Math.floor(Date.now() / 1000) + 3600;
+		fetchMock.mockResolvedValue(
+			jsonResponse(200, {
+				success: true,
+				data: {
+					user,
+					session: {
+						accessToken: 'new-access',
+						refreshToken: 'new-refresh',
+						expiresIn: 3600,
+						expiresAt,
+					},
+				},
+			})
+		);
+
+		await renderColdStart();
+
+		expect(await screen.findByText('playlists {}')).toBeTruthy();
+		expect(fetchMock).toHaveBeenCalledTimes(1);
+		const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+		expect(url).toBe('http://backend.test/api/auth/refresh');
+		expect(JSON.parse(init.body as string)).toEqual({ refreshToken: 'stored-refresh' });
+		expect(useAuthStore.getState()).toMatchObject({
+			accessToken: 'new-access',
+			refreshToken: 'new-refresh',
+			tokenExpiresAt: expiresAt * 1000,
+			isAuthenticated: true,
+		});
+		expect(await AsyncStorage.getItem('@zumik/access_token')).toBe('new-access');
+	});
+
+	it('lands on sign-in with storage cleared when the backend refuses the refresh', async () => {
+		fetchMock.mockResolvedValue(
+			jsonResponse(401, {
+				success: false,
+				error: { message: 'Invalid or expired refresh token', code: 'INVALID_REFRESH_TOKEN' },
+			})
+		);
+
+		await renderColdStart();
+
+		expect(await screen.findByText('sign-in')).toBeTruthy();
+		expect(fetchMock).toHaveBeenCalledTimes(1);
+		expect(fetchMock.mock.calls[0][0]).toBe('http://backend.test/api/auth/refresh');
+		expect(useAuthStore.getState()).toMatchObject({
+			user: null,
+			accessToken: null,
+			refreshToken: null,
+			isAuthenticated: false,
+		});
+		expect(await AsyncStorage.getItem('@zumik/access_token')).toBeNull();
+		expect(await AsyncStorage.getItem('@zumik/refresh_token')).toBeNull();
+		expect(await AsyncStorage.getItem('@zumik/is_authenticated')).toBeNull();
 	});
 });

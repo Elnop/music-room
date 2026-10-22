@@ -15,10 +15,6 @@ jest.mock('@/utils/haptics', () => ({
 	hapticSuccess: jest.fn(),
 }));
 
-jest.mock('@/lib/supabase', () => ({
-	supabase: { auth: { signOut: jest.fn(), setSession: jest.fn() } },
-}));
-
 jest.mock('@services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
 	signInWithFacebook: jest.fn(),

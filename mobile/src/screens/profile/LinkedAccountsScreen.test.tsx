@@ -16,10 +16,6 @@ jest.mock('@/contexts/PlayerContext', () => ({
 	usePlayerHeight: () => 0,
 }));
 
-jest.mock('@/lib/supabase', () => ({
-	supabase: { auth: { signOut: jest.fn(), setSession: jest.fn() } },
-}));
-
 jest.mock('@services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
 	signInWithFacebook: jest.fn(),

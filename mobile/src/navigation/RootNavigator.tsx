@@ -13,7 +13,6 @@ import { useAuthStore } from '@/store/authStore';
 import { useSocketStore } from '@/store/socketStore';
 import { LoadingSpinner } from '@components/common/LoadingSpinner';
 import { isDarkBackground } from '@components/common/ConnectionBanner';
-import { supabase } from '@/lib/supabase';
 import { useMusicControlEmitter } from '@hooks/useMusicControl';
 import { loadBackendUrl } from '@/services/backendUrl';
 import { logger } from '@/utils/logger';
@@ -85,43 +84,6 @@ export function RootNavigator() {
 	useEffect(() => {
 		if (isAuthenticated) openPendingLink(navigationRef);
 	}, [isAuthenticated, navigationRef]);
-
-	useEffect(() => {
-		// Listen for auth state changes from Supabase
-		const {
-			data: { subscription },
-		} = supabase.auth.onAuthStateChange(async (event, session) => {
-			if (event === 'SIGNED_OUT') {
-				useAuthStore.setState({
-					user: null,
-					accessToken: null,
-					refreshToken: null,
-					tokenExpiresAt: null,
-					isAuthenticated: false,
-					isLoading: false,
-					error: null,
-				});
-				await useAuthStore.getState().clearStorage();
-			} else if (event === 'TOKEN_REFRESHED') {
-				// Token was refreshed, update the access token
-				if (session?.access_token) {
-					const { user, accessToken } = useAuthStore.getState();
-					if (user && accessToken !== session.access_token) {
-						// Update token in store
-						useAuthStore.setState({
-							accessToken: session.access_token,
-							refreshToken: session.refresh_token,
-							tokenExpiresAt: session.expires_at ? session.expires_at * 1000 : null,
-						});
-					}
-				}
-			}
-		});
-
-		return () => {
-			subscription.unsubscribe();
-		};
-	}, []);
 
 	// Show loading screen while checking auth state
 	if (!isReady) {

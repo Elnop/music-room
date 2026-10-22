@@ -4,7 +4,6 @@ import type { UserProfile } from '@/types/user.types';
 import type { LinkedProvider, OAuthProvider } from '@/types/auth.types';
 import type { RegisterInput } from '@utils/validators';
 import { authApi, ApiError, registerAuthSession } from '@services/api';
-import { supabase } from '@/lib/supabase';
 import { signInWithGoogle, signInWithFacebook } from '@services/oauth';
 import { lastTrackStorage } from '@services/lastTrackStorage';
 import { usePlayerStore } from '@/store/playerStore';
@@ -19,6 +18,12 @@ const STORAGE_KEYS = {
 	IS_AUTHENTICATED: '@zumik/is_authenticated',
 	TOKEN_EXPIRES_AT: '@zumik/token_expires_at',
 } as const;
+
+/** The refresh request in flight, shared by concurrent callers. */
+let inFlightRefresh: Promise<boolean> | null = null;
+
+/** Session key of the auth SDK the app used before #376 (`sb-<project ref>-auth-token`). */
+const LEGACY_SDK_SESSION_KEY = /^sb-.+-auth-token$/;
 
 /**
  * Auth State Interface
@@ -74,7 +79,7 @@ interface AuthState {
 
 /**
  * Auth Store
- * Manages authentication state with Supabase and backend API
+ * Manages the session; every auth action goes through the backend API
  */
 export const useAuthStore = create<AuthState>((set, get) => ({
 	// Initial state
@@ -96,11 +101,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
 		try {
 			const response = await authApi.login({ email, password });
-
-			await supabase.auth.signInWithPassword({
-				email,
-				password,
-			});
 
 			if (response.session) {
 				set({
@@ -310,11 +310,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 			});
 
 			await get().saveToStorage();
-
-			await supabase.auth.setSession({
-				access_token: response.session.accessToken,
-				refresh_token: response.session.refreshToken,
-			});
 		} catch (error) {
 			if (__DEV__) {
 				logger.error('[AuthStore] loginWithGoogle failed:', {
@@ -384,11 +379,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 			});
 
 			await get().saveToStorage();
-
-			await supabase.auth.setSession({
-				access_token: response.session.accessToken,
-				refresh_token: response.session.refreshToken,
-			});
 		} catch (error) {
 			if (__DEV__) {
 				logger.error('[AuthStore] loginWithFacebook failed:', {
@@ -445,6 +435,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 	 */
 	loadFromStorage: async () => {
 		try {
+			await removeLegacySdkSession();
 			const [userJson, accessToken, refreshToken, isAuthJson, expiresAtStr] = await Promise.all([
 				AsyncStorage.getItem(STORAGE_KEYS.AUTH_USER),
 				AsyncStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN),
@@ -503,6 +494,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 				AsyncStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN),
 				AsyncStorage.removeItem(STORAGE_KEYS.IS_AUTHENTICATED),
 				AsyncStorage.removeItem(STORAGE_KEYS.TOKEN_EXPIRES_AT),
+				removeLegacySdkSession(),
 			]);
 		} catch (error) {
 			logger.error('Failed to clear auth storage:', error);
@@ -587,26 +579,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 	 * Refresh access token using refresh token
 	 */
 	refreshAccessToken: async () => {
-		const { refreshToken, isRefreshing } = get();
+		const { refreshToken } = get();
 
-		if (isRefreshing) {
-			return new Promise<boolean>(resolve => {
-				let attempts = 0;
-				const maxAttempts = 50;
-				const checkInterval = setInterval(() => {
-					attempts++;
-					if (!get().isRefreshing) {
-						clearInterval(checkInterval);
-						resolve(true);
-					} else if (attempts >= maxAttempts) {
-						clearInterval(checkInterval);
-						logger.error('[AuthStore] Refresh timeout - forcing reset');
-						set({ isRefreshing: false });
-						resolve(false);
-					}
-				}, 100);
-			});
-		}
+		// Concurrent callers share the request in flight and get its outcome.
+		if (inFlightRefresh) return inFlightRefresh;
 
 		if (!refreshToken) {
 			// Locally, not through logout(): its backend call would refresh again.
@@ -617,52 +593,52 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
 		set({ isRefreshing: true });
 
-		try {
-			const response = await authApi.refreshToken(refreshToken);
+		inFlightRefresh = (async (): Promise<boolean> => {
+			try {
+				const response = await authApi.refreshToken(refreshToken);
 
-			if (!response.session) {
-				throw new Error('Token refresh did not return a session');
-			}
+				if (!response.session) {
+					throw new Error('Token refresh did not return a session');
+				}
 
-			set({
-				user: response.user,
-				accessToken: response.session.accessToken,
-				refreshToken: response.session.refreshToken,
-				tokenExpiresAt: response.session.expiresAt * 1000,
-				isAuthenticated: true,
-				isRefreshing: false,
-			});
+				set({
+					user: response.user,
+					accessToken: response.session.accessToken,
+					refreshToken: response.session.refreshToken,
+					tokenExpiresAt: response.session.expiresAt * 1000,
+					isAuthenticated: true,
+					isRefreshing: false,
+				});
 
-			await get().saveToStorage();
+				await get().saveToStorage();
 
-			await supabase.auth.setSession({
-				access_token: response.session.accessToken,
-				refresh_token: response.session.refreshToken,
-			});
+				return true;
+			} catch (error) {
+				logger.error('[AuthStore] Token refresh failed:', {
+					error,
+					errorMessage: error instanceof Error ? error.message : 'Unknown error',
+					errorType: error?.constructor?.name,
+				});
 
-			return true;
-		} catch (error) {
-			logger.error('[AuthStore] Token refresh failed:', {
-				error,
-				errorMessage: error instanceof Error ? error.message : 'Unknown error',
-				errorType: error?.constructor?.name,
-			});
+				// Only a 401 from the refresh call means the backend refused the
+				// refresh token; anything else (network, 5xx, 503, 429) is an outage.
+				// Callers waiting on this refresh get the same false, so none
+				// retries with the stale token.
+				if (error instanceof ApiError && error.status === 401) {
+					logger.warn('[AuthStore] Refresh token refused, ending the session locally');
+					await endSessionLocally();
+					return false;
+				}
 
-			// Only a 401 from the refresh call means the backend refused the
-			// refresh token; anything else (network, 5xx, 503, 429) is an outage.
-			// isRefreshing is reset with the cleared session, so waiting callers
-			// never retry with the stale token.
-			if (error instanceof ApiError && error.status === 401) {
-				logger.warn('[AuthStore] Refresh token refused, ending the session locally');
-				await endSessionLocally();
+				set({ isRefreshing: false });
+
+				logger.warn('[AuthStore] Keeping the session after a refresh failure; will retry later');
 				return false;
 			}
-
-			set({ isRefreshing: false });
-
-			logger.warn('[AuthStore] Keeping the session after a refresh failure; will retry later');
-			return false;
-		}
+		})().finally(() => {
+			inFlightRefresh = null;
+		});
+		return inFlightRefresh;
 	},
 
 	/**
@@ -687,20 +663,23 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 }));
 
 /**
+ * Builds before #376 also kept the auth SDK's session (access and refresh
+ * token) in AsyncStorage; nothing reads or revokes it any more, so drop it.
+ */
+async function removeLegacySdkSession(): Promise<void> {
+	const keys = await AsyncStorage.getAllKeys();
+	const legacy = keys.filter(key => LEGACY_SDK_SESSION_KEY.test(key));
+	if (legacy.length > 0) await AsyncStorage.multiRemove(legacy);
+}
+
+/**
  * End the session on the device only, without calling the backend: for a
  * refused refresh, `authApi.logout` goes through `apiRequest`, whose proactive
- * refresh would call `refreshAccessToken` again. Scope 'local' keeps the
- * user's other devices signed in, like the backend logout.
+ * refresh would call `refreshAccessToken` again.
  * RootNavigator shows the auth screens once `isAuthenticated` is false, and
  * socketStore disconnects.
  */
 async function endSessionLocally(): Promise<void> {
-	try {
-		await supabase.auth.signOut({ scope: 'local' });
-	} catch (error) {
-		logger.warn('[AuthStore] Supabase local sign-out failed', error);
-	}
-
 	useAuthStore.setState({
 		user: null,
 		accessToken: null,

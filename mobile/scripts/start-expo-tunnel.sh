@@ -77,62 +77,6 @@ if [ -z "$BACKEND_TUNNEL_URL" ]; then
   exit 1
 fi
 
-# SUPABASE_MODE=local (#251): the phone reaches the local stack's auth API
-# through the backend tunnel, which forwards /supabase/auth/v1/* to it (one
-# ngrok endpoint on the free plan). Hosted mode keeps mobile/.env's project.
-if [ "$SUPABASE_MODE" = "local" ]; then
-  SUPABASE_PROXY_URL="$BACKEND_TUNNEL_URL/supabase"
-
-  if [ -z "$SUPABASE_ANON_KEY" ]; then
-    echo ""
-    echo "❌ ERROR: SUPABASE_ANON_KEY not set in local Supabase mode"
-    echo "   Start the dev stack first: make supabase-up (writes backend/.env.supabase.local)"
-    echo "   Or use the hosted project: SUPABASE_MODE=hosted make dev-tunnel"
-    echo ""
-    exit 1
-  fi
-
-  echo "→ Waiting for the local Supabase stack through the backend tunnel..."
-  SUPABASE_READY=false
-  ATTEMPT=0
-  while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
-    if node -e '
-      fetch(process.argv[1] + "/auth/v1/health", {
-        headers: { apikey: process.argv[2], "ngrok-skip-browser-warning": "1" },
-      }).then(r => process.exit(r.ok ? 0 : 1), () => process.exit(1));
-    ' "$SUPABASE_PROXY_URL" "$SUPABASE_ANON_KEY"; then
-      SUPABASE_READY=true
-      break
-    fi
-
-    ATTEMPT=$((ATTEMPT + 1))
-    if [ $ATTEMPT -lt $MAX_ATTEMPTS ]; then
-      echo "   Waiting for Supabase... (attempt $ATTEMPT/$MAX_ATTEMPTS)"
-      sleep 5
-    fi
-  done
-
-  if [ "$SUPABASE_READY" != "true" ]; then
-    echo ""
-    echo "❌ ERROR: local Supabase stack not reachable at $SUPABASE_PROXY_URL after 60 seconds"
-    echo ""
-    echo "Possible causes:"
-    echo "  1. Dev stack stopped (check: make supabase-status, start: make supabase-up)"
-    echo "  2. Backend not started with TUNNEL_MODE=true in development (check: docker logs zumik-backend)"
-    echo ""
-    exit 1
-  fi
-  echo "✓ Local Supabase reachable: $SUPABASE_PROXY_URL"
-
-  # Exported too: mobile/.env's hosted values are already in the container's
-  # environment, which Expo would otherwise prefer over the .env files.
-  export EXPO_PUBLIC_SUPABASE_URL="$SUPABASE_PROXY_URL"
-  export EXPO_PUBLIC_SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY"
-  printf '%s\n' \
-    "EXPO_PUBLIC_SUPABASE_URL=$EXPO_PUBLIC_SUPABASE_URL" \
-    "EXPO_PUBLIC_SUPABASE_ANON_KEY=$EXPO_PUBLIC_SUPABASE_ANON_KEY" >> .env.development.local
-fi
-
 echo "=========================================="
 echo "Starting Expo Metro bundler with tunnel..."
 echo "=========================================="

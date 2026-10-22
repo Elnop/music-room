@@ -7,10 +7,6 @@ import { useConnectStore } from '@/store/connectStore';
 import type { UserProfile } from '@/types/user.types';
 import type { QueueItem, QueueState } from '@/types/queue.types';
 
-jest.mock('@/lib/supabase', () => ({
-	supabase: { auth: { signOut: jest.fn(), setSession: jest.fn() } },
-}));
-
 jest.mock('@services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
 	signInWithFacebook: jest.fn(),

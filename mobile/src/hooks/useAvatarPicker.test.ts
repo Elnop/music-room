@@ -48,7 +48,7 @@ jest.mock('@/utils/toast', () => ({
 }));
 
 const ASSET = { uri: 'file:///picked.jpg', width: 900, height: 900 };
-const NEW_URL = 'https://x.supabase.co/storage/v1/object/public/avatars/me/new.jpg';
+const NEW_URL = 'https://cdn.example.com/avatars/me/new.jpg';
 
 beforeEach(() => {
 	jest.clearAllMocks();

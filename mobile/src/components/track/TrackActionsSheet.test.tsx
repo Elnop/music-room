@@ -11,10 +11,6 @@ import type { Playlist } from '@/types/playlist.types';
 import type { UserProfile } from '@/types/user.types';
 import { logger } from '@/utils/logger';
 
-jest.mock('@/lib/supabase', () => ({
-	supabase: { auth: { signOut: jest.fn(), setSession: jest.fn() } },
-}));
-
 jest.mock('@services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
 	signInWithFacebook: jest.fn(),

@@ -2,28 +2,22 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Socket } from 'socket.io-client';
 import { useAuthStore } from '@store/authStore';
 import { useSocketStore } from '@store/socketStore';
-import { resetBackendUrl } from '@/services/backendUrl';
+import { getBackendUrl, resetBackendUrl } from '@/services/backendUrl';
 import { signInWithFacebook, signInWithGoogle } from '@services/oauth';
 import { logger } from '@/utils/logger';
-
-const mockSupabaseAuth = {
-	signInWithPassword: jest.fn(),
-	signOut: jest.fn(),
-	setSession: jest.fn(),
-};
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-// Getter: the factory runs before this module's constants are initialised.
-jest.mock('@/lib/supabase', () => ({
-	supabase: {
-		get auth() {
-			return mockSupabaseAuth;
-		},
+// Every auth flow goes through the backend: loading the Supabase SDK fails the test.
+jest.mock(
+	'@supabase/supabase-js',
+	() => {
+		throw new Error('supabase must not load');
 	},
-}));
+	{ virtual: true }
+);
 
 jest.mock('@services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
@@ -88,9 +82,6 @@ beforeEach(async () => {
 	fetchMock.mockReset();
 	jest.mocked(signInWithGoogle).mockReset();
 	jest.mocked(signInWithFacebook).mockReset();
-	mockSupabaseAuth.signInWithPassword.mockReset().mockResolvedValue({ data: {}, error: null });
-	mockSupabaseAuth.signOut.mockReset().mockResolvedValue({ error: null });
-	mockSupabaseAuth.setSession.mockReset().mockResolvedValue({ data: {}, error: null });
 	await AsyncStorage.clear();
 	await resetBackendUrl();
 	await signedIn();
@@ -123,7 +114,6 @@ describe('refreshAccessToken', () => {
 		expect(await AsyncStorage.getItem('@zumik/access_token')).toBeNull();
 		expect(await AsyncStorage.getItem('@zumik/refresh_token')).toBeNull();
 		expect(await AsyncStorage.getItem('@zumik/is_authenticated')).toBeNull();
-		expect(mockSupabaseAuth.signOut).toHaveBeenCalledWith({ scope: 'local' });
 		expect(calledUrls()).toHaveLength(1);
 		expect(calledUrls()[0]).toMatch(/\/api\/auth\/refresh$/);
 		expect(calledUrls().some(url => url.endsWith('/api/auth/logout'))).toBe(false);
@@ -147,7 +137,6 @@ describe('refreshAccessToken', () => {
 			isRefreshing: false,
 		});
 		expect(await AsyncStorage.getItem('@zumik/refresh_token')).toBe('old-refresh');
-		expect(mockSupabaseAuth.signOut).not.toHaveBeenCalled();
 	});
 
 	it('ends the session locally without any request when there is no refresh token', async () => {
@@ -162,7 +151,6 @@ describe('refreshAccessToken', () => {
 			isAuthenticated: false,
 		});
 		expect(await AsyncStorage.getItem('@zumik/access_token')).toBeNull();
-		expect(mockSupabaseAuth.signOut).toHaveBeenCalledWith({ scope: 'local' });
 		expect(fetchMock).not.toHaveBeenCalled();
 	});
 
@@ -177,7 +165,6 @@ describe('refreshAccessToken', () => {
 			isAuthenticated: true,
 		});
 		expect(await AsyncStorage.getItem('@zumik/access_token')).toBe('old-access');
-		expect(mockSupabaseAuth.signOut).not.toHaveBeenCalled();
 	});
 
 	it('stores the new tokens on success', async () => {
@@ -206,10 +193,6 @@ describe('refreshAccessToken', () => {
 			isAuthenticated: true,
 		});
 		expect(await AsyncStorage.getItem('@zumik/refresh_token')).toBe('new-refresh');
-		expect(mockSupabaseAuth.setSession).toHaveBeenCalledWith({
-			access_token: 'new-access',
-			refresh_token: 'new-refresh',
-		});
 	});
 });
 
@@ -234,7 +217,6 @@ describe('logout', () => {
 		expect(await AsyncStorage.getItem('@zumik/access_token')).toBeNull();
 		expect(await AsyncStorage.getItem('@zumik/refresh_token')).toBeNull();
 		expect(await AsyncStorage.getItem('@zumik/is_authenticated')).toBeNull();
-		expect(mockSupabaseAuth.signOut).toHaveBeenCalledWith({ scope: 'local' });
 		expect(socketDisconnect).toHaveBeenCalledTimes(1);
 		expect(useSocketStore.getState()).toMatchObject({ socket: null, isConnected: false });
 	}
@@ -253,15 +235,6 @@ describe('logout', () => {
 
 	it('still ends the session when the backend logout fails', async () => {
 		fetchMock.mockRejectedValue(new TypeError('Network request failed'));
-
-		await useAuthStore.getState().logout();
-
-		await expectSignedOut();
-	});
-
-	it('still ends the session when the Supabase sign-out throws', async () => {
-		fetchMock.mockResolvedValue(jsonResponse(200, { success: true, data: {} }));
-		mockSupabaseAuth.signOut.mockRejectedValue(new Error('storage unavailable'));
 
 		await useAuthStore.getState().logout();
 
@@ -366,10 +339,6 @@ describe('login', () => {
 		expect(url).toMatch(/\/api\/auth\/login$/);
 		expect(init.method).toBe('POST');
 		expect(body).toEqual({ email: 'a@example.com', password: 'Secret1!' });
-		expect(mockSupabaseAuth.signInWithPassword).toHaveBeenCalledWith({
-			email: 'a@example.com',
-			password: 'Secret1!',
-		});
 		expectAuthenticated();
 		await expectPersisted();
 	});
@@ -390,7 +359,6 @@ describe('login', () => {
 		expect(calledUrls()).toHaveLength(1);
 		expect(calledUrls()[0]).toMatch(/\/api\/auth\/login$/);
 		expect(useAuthStore.getState().error).toBe('Email ou mot de passe incorrect');
-		expect(mockSupabaseAuth.signInWithPassword).not.toHaveBeenCalled();
 		await expectSignedOutAndNothingStored();
 	});
 });
@@ -440,6 +408,17 @@ describe('register', () => {
 		expectAuthenticated();
 		await expectPersisted();
 	});
+
+	it('calls only the backend register endpoint', async () => {
+		fetchMock.mockResolvedValue(
+			jsonResponse(201, { success: true, data: { user, session, requiresVerification: false } })
+		);
+
+		await useAuthStore.getState().register(input);
+
+		expect(calledUrls()).toHaveLength(1);
+		expect(calledUrls()[0]).toBe(`${getBackendUrl()}/api/auth/register`);
+	});
 });
 
 describe('loginWithGoogle', () => {
@@ -458,10 +437,6 @@ describe('loginWithGoogle', () => {
 		expect(body).toEqual({ idToken: 'google-id-token' });
 		expectAuthenticated();
 		await expectPersisted();
-		expect(mockSupabaseAuth.setSession).toHaveBeenCalledWith({
-			access_token: 'new-access',
-			refresh_token: 'new-refresh',
-		});
 	});
 
 	it('stays signed out without error or request when the user cancels', async () => {
@@ -486,7 +461,6 @@ describe('loginWithGoogle', () => {
 		await expect(useAuthStore.getState().loginWithGoogle()).resolves.toBeUndefined();
 
 		expect(useAuthStore.getState().error).toBe('La connexion avec Google a échoué. Réessayez.');
-		expect(mockSupabaseAuth.setSession).not.toHaveBeenCalled();
 		await expectSignedOutAndNothingStored();
 	});
 });
@@ -507,10 +481,6 @@ describe('loginWithFacebook', () => {
 		expect(body).toEqual({ accessToken: 'facebook-access-token' });
 		expectAuthenticated();
 		await expectPersisted();
-		expect(mockSupabaseAuth.setSession).toHaveBeenCalledWith({
-			access_token: 'new-access',
-			refresh_token: 'new-refresh',
-		});
 	});
 
 	it('stays signed out without error or request when the user cancels', async () => {
@@ -536,7 +506,110 @@ describe('loginWithFacebook', () => {
 
 		expect(useAuthStore.getState().error).toBe('La connexion avec Facebook a échoué. Réessayez.');
 		await expectSignedOutAndNothingStored();
-		expect(mockSupabaseAuth.setSession).not.toHaveBeenCalled();
+	});
+});
+
+describe('verifyEmail', () => {
+	beforeEach(signedOut);
+
+	it('exchanges the code for a persisted session through the backend', async () => {
+		fetchMock.mockResolvedValue(authResponse());
+
+		await useAuthStore.getState().verifyEmail('user-a', '123456');
+
+		const { url, init, body } = requestAt();
+		expect(fetchMock).toHaveBeenCalledTimes(1);
+		expect(url).toMatch(/\/api\/auth\/verify-email$/);
+		expect(init.method).toBe('POST');
+		expect(body).toEqual({ userId: 'user-a', code: '123456' });
+		expectAuthenticated();
+		await expectPersisted();
+	});
+});
+
+describe('password reset', () => {
+	beforeEach(signedOut);
+
+	it('requests the code, then resets the password, through the backend only', async () => {
+		fetchMock.mockResolvedValue(jsonResponse(200, { success: true, data: { message: 'ok' } }));
+
+		await useAuthStore.getState().forgotPassword('a@example.com');
+		await useAuthStore.getState().resetPassword('a@example.com', '123456', 'NewSecret1!');
+
+		expect(calledUrls()).toHaveLength(2);
+		expect(requestAt(0).url).toMatch(/\/api\/auth\/forgot-password$/);
+		expect(requestAt(0).body).toEqual({ email: 'a@example.com' });
+		expect(requestAt(1).url).toMatch(/\/api\/auth\/reset-password$/);
+		expect(requestAt(1).body).toEqual({
+			email: 'a@example.com',
+			code: '123456',
+			newPassword: 'NewSecret1!',
+		});
+		// A reset does not sign in: the user logs in with the new password.
+		await expectSignedOutAndNothingStored();
+	});
+});
+
+describe('refresh during use', () => {
+	it('shares one backend refresh between concurrent callers', async () => {
+		fetchMock.mockResolvedValue(authResponse());
+
+		const results = await Promise.all([
+			useAuthStore.getState().refreshAccessToken(),
+			useAuthStore.getState().refreshAccessToken(),
+		]);
+
+		expect(results).toEqual([true, true]);
+		expect(calledUrls()).toHaveLength(1);
+		expect(calledUrls()[0]).toMatch(/\/api\/auth\/refresh$/);
+		expectAuthenticated();
+		await expectPersisted();
+	});
+
+	it('gives every concurrent caller false and clears the session when the refresh is refused', async () => {
+		fetchMock.mockResolvedValue(
+			jsonResponse(401, {
+				success: false,
+				error: { message: 'Invalid or expired refresh token', code: 'INVALID_REFRESH_TOKEN' },
+			})
+		);
+
+		const results = await Promise.all([
+			useAuthStore.getState().refreshAccessToken(),
+			useAuthStore.getState().refreshAccessToken(),
+		]);
+
+		expect(results).toEqual([false, false]);
+		expect(calledUrls()).toHaveLength(1);
+		await expectSignedOutAndNothingStored();
+	});
+});
+
+describe('legacy SDK session (before #376)', () => {
+	const LEGACY_KEY = 'sb-abcdefgh-auth-token';
+
+	it('removes it at startup and keeps the backend session', async () => {
+		await AsyncStorage.setItem(LEGACY_KEY, '{"access_token":"a","refresh_token":"r"}');
+		await AsyncStorage.setItem('@zumik/theme', 'dark');
+		resetMemory();
+
+		await useAuthStore.getState().loadFromStorage();
+
+		expect(await AsyncStorage.getItem(LEGACY_KEY)).toBeNull();
+		expect(await AsyncStorage.getItem('@zumik/theme')).toBe('dark');
+		expect(useAuthStore.getState()).toMatchObject({
+			accessToken: 'old-access',
+			isAuthenticated: true,
+		});
+	});
+
+	it('removes it with the session', async () => {
+		await AsyncStorage.setItem(LEGACY_KEY, '{"access_token":"a","refresh_token":"r"}');
+
+		await useAuthStore.getState().clearStorage();
+
+		expect(await AsyncStorage.getItem(LEGACY_KEY)).toBeNull();
+		expect(await AsyncStorage.getItem(KEYS.access)).toBeNull();
 	});
 });
 
@@ -617,7 +690,7 @@ describe('session persistence', () => {
 });
 
 describe('setAvatarUrl (#351)', () => {
-	const URL = 'https://x.supabase.co/storage/v1/object/public/avatars/user-a/new.jpg';
+	const URL = 'https://cdn.example.com/avatars/user-a/new.jpg';
 
 	it('sets the new avatar on the user and persists it', async () => {
 		await useAuthStore.getState().setAvatarUrl(URL);

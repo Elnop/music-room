@@ -17,7 +17,7 @@ Conteneurs et images Docker : [SECURITY.md](SECURITY.md). Comment tester à la m
 | M5 | Vol de session (token volé) | Logout révoque access et refresh token, testé. Risques acceptés : durée de vie du token, stockage en clair sur le téléphone, HTTP en clair en dev. |
 | M6 | Token révoqué alors qu'une socket est déjà ouverte | **Risque accepté** : le token n'est vérifié qu'au handshake. L'app ferme sa socket (#70, testé). |
 | M7 | Accès aux données d'un autre utilisateur par l'API | Contrôles dans le code (clé service), testés pour playlists et contrôle musical. Filtre de confidentialité du profil non testé. Routes SoundCloud authentifiées et limitées par utilisateur (L10 corrigée, #208). |
-| M8 | Accès direct à Supabase avec la clé anon embarquée dans l'app | Corrigé par #201 (migration 017) : `anon` et `authenticated` n'ont plus aucun privilège sur les tables de `public` ; testé. |
+| M8 | Accès direct à Supabase avec la clé anon | Corrigé par #201 (migration 017) : `anon` et `authenticated` n'ont plus aucun privilège sur les tables de `public` ; testé. L'app n'embarque plus la clé depuis #376. |
 | M9 | Abus du temps réel (origine, identité forgée, payloads, flood) | Origine, handshake et payloads contrôlés et testés ; en dev, toute origine sur un sous-domaine ngrok passe, y compris le tunnel d'un attaquant (L11 réduite, #209). Limite de débit par socket et par événement, chaînes de `listening:update` bornées (L7 corrigée, #204). |
 | M10 | Accès conservé dans une room après son retrait | Revérification et éviction, testées. |
 | M11 | Contrôle musical d'un appareil non autorisé | Règle par appareil, fail closed, testée. |
@@ -156,7 +156,7 @@ Les seuils viennent de `backend/src/shared/config/rate-limit.config.ts` (variabl
 
 ## M8. Accès direct à Supabase avec la clé anon
 
-**Menace.** L'app contient `EXPO_PUBLIC_SUPABASE_URL` et `EXPO_PUBLIC_SUPABASE_ANON_KEY` (`mobile/src/lib/supabase.ts`) ; n'importe qui peut les extraire de l'APK et appeler PostgREST directement, anonymement ou avec son propre token. Seules la RLS et les privilèges SQL protègent alors les tables.
+**Menace.** Quiconque connaît l'URL et la clé anon du projet Supabase peut appeler PostgREST directement, anonymement ou avec son propre token. Seules la RLS et les privilèges SQL protègent alors les tables. Jusqu'à #376, l'app les embarquait (`EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`) et on pouvait les extraire de l'APK ; depuis, elle ne parle qu'au backend et ne les contient plus, mais la clé anon reste une valeur publique par conception.
 
 **Protection.** Depuis la migration `backend/migrations/017_revoke_direct_table_access.sql` (#201), `anon` et `authenticated` n'ont plus aucun privilège sur les tables, séquences et fonctions de `public` (y compris pour les objets créés ensuite par `postgres`) : toute requête PostgREST directe répond `42501`. Seul le backend, avec la clé service, accède aux tables.
 
