@@ -4,7 +4,7 @@ npm-debug.log
 yarn-error.log
 yarn.lock
 
-# Environment files: none goes into the image (.env.test holds local Supabase keys)
+# Environment files: none goes into the image (they hold OAuth and EAS credentials)
 .env*
 
 # Expo

@@ -24,10 +24,6 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/lib/supabase', () => ({
-	supabase: { auth: { signOut: jest.fn(), setSession: jest.fn() } },
-}));
-
 jest.mock('@services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
 	signInWithFacebook: jest.fn(),

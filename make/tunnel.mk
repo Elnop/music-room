@@ -5,7 +5,7 @@
 
 .PHONY: dev-tunnel qr-tunnel tunnel-info tunnel-setup
 
-dev-tunnel: ## Start all services in tunnel mode (different WiFi networks; local Supabase stack through the backend tunnel)
+dev-tunnel: ## Start all services in tunnel mode (different WiFi networks)
 	$(call print_header,Starting Zumik (TUNNEL MODE))
 	$(call check_eas_configured)
 	$(call blank_line)
@@ -33,8 +33,6 @@ qr-tunnel: ## Show the tunnel URLs and the Metro host to enter in the debug buil
 	$(call print_subsection,🌐 Backend Tunnel URL)
 	@docker exec $(BACKEND_CONTAINER) cat $(SHARED_TUNNEL_FILE) 2>/dev/null || echo "$(RED)$(ICON_ERROR) Backend tunnel not available$(NC)"
 	$(call blank_line)
-	$(call display_supabase_tunnel_url)
-	$(call blank_line)
 	$(call print_subsection,🔍 ngrok Web Interface)
 	@echo "   $(NGROK_UI_URL) (view traffic, connections)"
 	$(call blank_line)
@@ -50,7 +48,6 @@ tunnel-info: ## Display detailed tunnel connection info
 	$(call print_subsection,Backend Tunnel)
 	@docker exec $(BACKEND_CONTAINER) cat $(SHARED_TUNNEL_FILE) 2>/dev/null || echo "$(RED)$(ICON_ERROR) Not running$(NC)"
 	$(call blank_line)
-	$(call display_supabase_tunnel_url)
 	$(call print_subsection,ngrok Web UI)
 	@echo "   $(NGROK_UI_URL)"
 	$(call print_info,Inspect HTTP traffic\, connections\, tunnel status)

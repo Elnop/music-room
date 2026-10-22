@@ -45,7 +45,7 @@ Ce qui sert vraiment : `make` construit seulement `--target development` (`build
 - `-e NODE_ENV=development` : dans ce mode, le backend accepte aussi les origines `exp://` et les sous-domaines https des domaines ngrok (`isOriginAllowed` / `isNgrokOrigin`, `backend/src/shared/config/cors.config.ts`, #209). Un sous-domaine ngrok s'obtient avec un compte gratuit : c'est un risque de dev accepté (L11 dans [THREAT_MODEL.md](THREAT_MODEL.md)).
 - `-p 3000:3000` sur toutes les interfaces de l'hôte (nécessaire : le téléphone appelle l'IP de l'hôte sur le réseau local, en HTTP).
 - `--restart unless-stopped`.
-- Mode tunnel (`start_backend_tunnel`, `make dev-tunnel`) : en plus `-p 4040:4040` (interface web de ngrok, sur toutes les interfaces), `TUNNEL_MODE=true`, commande `sh scripts/start-with-tunnel.sh`. En `SUPABASE_MODE=local`, mêmes `--env-file backend/.env.supabase.local`, `SUPABASE_URL`/`SMTP_HOST` sur `host.docker.internal` que `start_backend`, et le backend relaie `/supabase/auth/v1/*` vers la stack locale (#251, `backend/src/shared/dev/supabase-auth-proxy.ts`) : l'API auth de la stack (inscription, connexion, refresh) est alors joignable par quiconque connaît l'URL ngrok, avec la clé anon de démo. Le relais refuse tout chemin hors `/auth/v1` (les segments `..` sont résolus avant le contrôle), donc PostgREST, storage et Studio restent fermés ; il n'existe qu'avec `TUNNEL_MODE=true`, `SUPABASE_MODE=local` (passé par make) et `NODE_ENV=development`. Le conteneur mobile reçoit seulement `SUPABASE_MODE` et la clé anon, jamais la clé service.
+- Mode tunnel (`start_backend_tunnel`, `make dev-tunnel`) : en plus `-p 4040:4040` (interface web de ngrok, sur toutes les interfaces), commande `sh scripts/start-with-tunnel.sh`. En `SUPABASE_MODE=local`, mêmes `--env-file backend/.env.supabase.local`, `SUPABASE_URL`/`SMTP_HOST` sur `host.docker.internal` que `start_backend`. Seul le backend est exposé sur le tunnel : la stack Supabase locale n'y est pas relayée (le relais `/supabase/auth/v1` de #251 a été retiré avec #376), et le conteneur mobile ne reçoit aucune valeur Supabase.
 
 ## Mobile (`mobile/Dockerfile`)
 
@@ -64,7 +64,7 @@ Une seule étape, `node:22-bookworm-slim`, serveur de développement Expo (pas d
 
 ### Conteneur `zumik-mobile` (`start_mobile`)
 
-- `-p 8081:8081 -p 19000:19000 -p 19001:19001 -p 19002:19002` sur toutes les interfaces de l'hôte : Metro sert le bundle JavaScript de l'app à quiconque atteint l'hôte. Ce bundle contient les variables `EXPO_PUBLIC_*`, dont l'URL et la clé anon Supabase ; elles sont publiques par nature (elles sont aussi dans l'APK), c'est la RLS qui doit protéger la base ([THREAT_MODEL.md](THREAT_MODEL.md#m8-accès-direct-à-supabase-avec-la-clé-anon)).
+- `-p 8081:8081 -p 19000:19000 -p 19001:19001 -p 19002:19002` sur toutes les interfaces de l'hôte : Metro sert le bundle JavaScript de l'app à quiconque atteint l'hôte. Ce bundle contient les variables `EXPO_PUBLIC_*` (URL du backend, identifiants OAuth publics) ; elles sont publiques par nature (elles sont aussi dans l'APK). Il ne contient plus aucune valeur Supabase depuis #376 ([THREAT_MODEL.md](THREAT_MODEL.md#m8-accès-direct-à-supabase-avec-la-clé-anon)).
 - `-v mobile/:/app`, volumes anonymes `/app/node_modules` et `/app/.expo`, `-v tunnel-info:/tmp/shared`.
 - `--env-file mobile/.env` (pas dans l'image), plus `REACT_NATIVE_PACKAGER_HOSTNAME=<IP de l'hôte>`, `EXPO_PUBLIC_API_URL` et `EXPO_PUBLIC_WS_URL` (`http://` et `ws://` vers l'IP de l'hôte, port 3000).
 - `--restart unless-stopped`, `-it`.

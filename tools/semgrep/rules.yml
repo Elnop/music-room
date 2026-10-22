@@ -83,6 +83,4 @@ rules:
         # storage module. This list only shrinks.
         - /mobile/src/store/authStore.ts
         - /mobile/src/contexts/ThemeContext.tsx
-        - /mobile/src/navigation/RootNavigator.tsx
-        - /mobile/src/lib/supabase.ts
         - /mobile/src/services/deviceService.ts

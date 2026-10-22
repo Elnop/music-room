@@ -23,10 +23,6 @@ jest.mock('@/utils/haptics', () => ({
 const mockSeekTo = jest.fn();
 const mockProgress = { progress: 0, currentTime: 0, duration: 0 };
 
-jest.mock('@/lib/supabase', () => ({
-	supabase: { auth: { signOut: jest.fn(), setSession: jest.fn() } },
-}));
-
 jest.mock('@services/oauth', () => ({
 	signInWithGoogle: jest.fn(),
 	signInWithFacebook: jest.fn(),

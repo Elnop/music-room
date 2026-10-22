@@ -9,7 +9,7 @@ Application mobile React Native pour Zumik - Partage de musique collaboratif.
 - **Navigation**: React Navigation v7
 - **State Management**: Zustand v5
 - **HTTP Client**: Axios
-- **Auth**: Supabase Auth v2.84.0
+- **Auth**: API du backend (`/api/auth/*`) ; l'app n'embarque aucun client Supabase
 - **Realtime**: Socket.io-client v4.8.1
 - **Validation**: Zod v3.25.76
 - **Forms**: React Hook Form v7
@@ -18,7 +18,6 @@ Application mobile React Native pour Zumik - Partage de musique collaboratif.
 
 - Node.js 18+
 - Backend Zumik running sur `http://localhost:3000`
-- Compte Supabase configuré (optionnel pour débuter)
 - Expo CLI: `npm install -g expo-cli` (optionnel, `npx` fonctionne)
 - SDK Android (Android Studio), ou Xcode sur macOS, pour construire le build de debug
 
@@ -38,16 +37,12 @@ npm install
 
 `make dev-docker` et `make dev-local` imposent `EXPO_PUBLIC_API_URL=http://<IP locale>:3000` et `EXPO_PUBLIC_WS_URL=ws://<IP locale>:3000` (variables `DEV_API_URL` et `DEV_WS_URL` de `make/config.mk`), quelle que soit la valeur dans `.env`. `make dev-tunnel` utilise l'URL du tunnel ngrok. Les valeurs de `.env` ne servent que pour un `npx expo start` lancé à la main.
 
-Avec `SUPABASE_MODE=local` (le défaut, voir `backend/README.md`), `make dev-docker`, `make dev-local`, `make expo-android` et `make expo-clear` écrivent aussi `EXPO_PUBLIC_SUPABASE_URL=http://<IP locale>:54421` et `EXPO_PUBLIC_SUPABASE_ANON_KEY` (stack Supabase locale) dans `.env.development.local`, qui l'emporte sur `.env` : Expo le préfère à `.env` pour Metro lancé sur l'hôte, et `make dev-docker` le passe au conteneur mobile en dernier `--env-file` (Expo ne remplace jamais une variable déjà dans l'environnement). `expo-android` et `expo-clear` ne démarrent pas la stack : lancez `make supabase-up` avant si `backend/.env.supabase.local` manque. Avec `SUPABASE_MODE=hosted`, ce sont les valeurs Supabase de `.env` qui servent.
+L'app ne parle jamais à Supabase : connexion, inscription, vérification d'e-mail, réinitialisation du mot de passe, rafraîchissement et déconnexion passent par l'API du backend (`src/services/api.ts`), qui les journalise. La session (tokens du backend) vit dans `src/store/authStore.ts`, persistée dans AsyncStorage ; elle est rafraîchie par `/api/auth/refresh` (avant une requête si le token expire bientôt, au démarrage, et après un 401), et un refresh refusé (401) ramène à l'écran de connexion en vidant le stockage.
 
 ```env
 # Backend API (ignoré par make dev-docker, dev-local et dev-tunnel)
 EXPO_PUBLIC_API_URL=http://localhost:3000
 EXPO_PUBLIC_WS_URL=ws://localhost:3000
-
-# Supabase (ignoré en SUPABASE_MODE=local : make écrit la stack locale)
-EXPO_PUBLIC_SUPABASE_URL=
-EXPO_PUBLIC_SUPABASE_ANON_KEY=
 
 # SoundCloud (Phase ultérieure)
 EXPO_PUBLIC_SOUNDCLOUD_CLIENT_ID=
@@ -121,7 +116,7 @@ Depuis la racine : `make dev-docker` (Docker), `make dev-local` (émulateur Andr
 - `npm run prebuild` - Générer les dossiers natifs Android/iOS
 - `npm run build:local` - Build Android local (nécessite Android Studio)
 
-L'APK de production (backend `https://zumik.cluzhub.com`) est construit par `.github/workflows/release-apk.yml` à chaque push sur `main` et publié dans les [GitHub Releases](https://github.com/Elnop/music-room/releases/latest). Il lit `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`, `EXPO_PUBLIC_FACEBOOK_APP_ID` et `EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN` dans les secrets Actions du repo. Lancé à la main (`gh workflow run release-apk.yml --ref <branche>`) hors de `main`, il dépose l'APK en artefact du run sans créer de release.
+L'APK de production (backend `https://zumik.cluzhub.com`) est construit par `.github/workflows/release-apk.yml` à chaque push sur `main` et publié dans les [GitHub Releases](https://github.com/Elnop/music-room/releases/latest). Il lit `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`, `EXPO_PUBLIC_FACEBOOK_APP_ID` et `EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN` dans les secrets Actions du repo. Lancé à la main (`gh workflow run release-apk.yml --ref <branche>`) hors de `main`, il dépose l'APK en artefact du run sans créer de release.
 
 ### Backend
 
@@ -161,7 +156,6 @@ mobile/src/
 ├── hooks/              # useMusicControl, usePlaylistSocket, usePlayerProgress, useImageColors
 ├── api/                # playlistApi.ts
 ├── services/           # api.ts (client HTTP de base), profileApi, friendsApi, musicControlApi, privacyApi, oauth, deviceService
-├── lib/                # supabase.ts
 ├── themes/             # Thèmes (original, royalBlue, pastelLime, christmas) + tokens
 ├── types/              # Types alignés sur les réponses du backend
 ├── utils/              # validators (Zod), formatters, toast
@@ -217,7 +211,7 @@ Les types, validateurs et versions sont alignés avec le backend :
 
 - **Types TypeScript** (`src/types/`) correspondent aux schémas backend
 - **Validateurs Zod** (`src/utils/validators.ts`) utilisent les mêmes règles
-- **Versions** : Supabase, Socket.io, Zod identiques au backend
+- **Versions** : Socket.io, Zod identiques au backend
 
 ## Tests
 
