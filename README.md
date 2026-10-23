@@ -1,12 +1,20 @@
 # Zumik
 
-A collaborative music listening platform built with React Native, Node.js, and music streaming integration.
+Zumik is a collaborative music app for Android and iOS, built for the 42 project "Music Room". Friends edit playlists together in real time, hand each other control of their music device by device, and move what is playing from one phone to another. Music comes from SoundCloud.
 
-## Quick Links
+- **Collaborative playlists**: public or private, open to everyone or to invited collaborators; concurrent edits stay consistent.
+- **Music control delegation**: let a friend play and pause your music on one device, or on all of them.
+- **Play queue and Connect**: one queue shared by your devices and your delegates; send playback to any device you control.
+- **Accounts**: email and password, Google or Facebook, linked accounts, a profile with per-field privacy, friends.
 
-- **[API Documentation](http://localhost:3000/api-docs)** - Interactive Swagger UI
-- **[Backend](./backend/README.md)** / **[Mobile](./mobile/README.md)** - Architecture and commands
-- **Project tracking** - GitHub Issues (epics and stories), planning in `_bmad-output/`
+The app is a remote control of an Express/TypeScript API backed by Supabase (PostgreSQL), Redis and Socket.io.
+
+## Documentation
+
+- **[doc/README.md](doc/README.md)**: the documentation index (architecture, features, security, development).
+- **[doc/subject/coverage.md](doc/subject/coverage.md)**: how each requirement of the subject is met.
+- **[backend/README.md](backend/README.md)** and **[mobile/README.md](mobile/README.md)**: each project's structure and commands.
+- **[Swagger UI](http://localhost:3000/api-docs)**: the API reference, once the backend runs.
 
 ## Quick Start
 
@@ -41,115 +49,37 @@ The app runs only as the native debug build (`com.zumik.app`). It does not start
 
 "Unable to load script" means the app cannot reach Metro: check that Metro runs and the address above, then tap **RELOAD**.
 
-## Code Formatting
+To try the app with ready-made data, `make supabase-reset` loads the [demo accounts](doc/development/demo-accounts.md).
 
-This project uses **tabs** for indentation (visually displayed as 2 spaces).
-
-**Editor Configuration:**
-- A `.editorconfig` file is provided at the root - most modern editors will read it automatically
-- Configure your editor: Set **tab width = 2** for proper visual alignment
-- VS Code: Install the "EditorConfig" extension for automatic configuration
-
-**Before Committing:**
-```bash
-# Format code automatically
-make format
-
-# Or format individually
-cd backend && npm run format
-cd mobile && npm run format
-```
-
-**Working with Feature Branches:**
-- If you have an existing feature branch, you may encounter merge conflicts due to the indentation change
-- Use these git options to handle whitespace-only changes:
-  ```bash
-  git merge main -X ignore-all-space
-  # OR
-  git rebase main --ignore-whitespace
-  ```
-
-## Features
-
-- 🎵 **Collaborative Playlists** - Create, share, and manage music playlists with friends
-- 🎧 **SoundCloud Integration** - Search, stream, and play music with full audio controls
-- 👥 **Friends System** - Follow users, build your network, view mutual friends
-- 🎮 **Music Control Delegation** - Grant friends permission to control your playback
-- 👤 **User Profiles** - Customizable profiles with avatars and bios
-- 🔐 **Authentication** - Secure JWT-based auth with Supabase
-- 📱 **Cross-platform Mobile App** - iOS + Android support via React Native & Expo
-- ⚡ **Real-time Sync** - Socket.io for live playlist updates and music control
-- 🎚️ **Advanced Playlist Features** - Edit modes (open/restricted), viewers, collaborators
-- 🐳 **Docker Development** - Containerized environment (official Node 22 images, see [doc/SECURITY.md](doc/SECURITY.md))
+The latest release APK is in the [GitHub Releases](https://github.com/Elnop/music-room/releases/latest).
 
 ## Tech Stack
 
-### Backend
+| | |
+|---|---|
+| **Backend** | Node.js 22, Express 5, TypeScript, Zod, Socket.io 4 |
+| **Data** | Supabase (PostgreSQL, Auth, Storage), Redis 7 |
+| **Mobile** | React Native 0.81, Expo SDK 54, React Navigation 7, TanStack Query 5, Zustand 5, expo-audio |
+| **Music** | SoundCloud API |
+| **Tooling** | Docker (`docker run` from the make targets), ngrok tunnel, GitHub Actions |
 
-- **Runtime**: Node.js 22 + TypeScript
-- **Framework**: Express.js
-- **Real-time**: Socket.io for WebSocket communication
-- **Database**: PostgreSQL via Supabase
-- **Auth**: Supabase Auth with JWT tokens
-- **Cache & Rate Limiting**: Redis 7-alpine
-- **Validation**: Zod schemas
-- **Music**: SoundCloud API via `soundcloud.ts` package
+Why these choices: [doc/decisions.md](doc/decisions.md).
 
-### Mobile
-
-- **Framework**: React Native 0.81 + Expo SDK 54
-- **Language**: TypeScript
-- **State Management**: TanStack Query v5 (server data & cache) + Zustand v5 (client state)
-- **Navigation**: React Navigation 7 (stack-based)
-- **Audio**: expo-audio for HLS AAC streaming
-- **Real-time**: Socket.io client
-- **Forms**: React Hook Form + Zod validation
-- **Styling**: StyleSheet + Theme Tokens (zero color literals)
-
-### Infrastructure
-
-- **Containers**: started with `docker run` by the make targets (`make/helpers/docker.mk`)
-- **Images**: official `node:22-alpine` (backend) and `node:22-bookworm-slim` (mobile); see [doc/SECURITY.md](doc/SECURITY.md)
-- **Development**: Hot reload for backend + Expo Metro bundler
-- **Tunnel Mode**: Ngrok integration for cross-network development
-
-## Documentation
-
-### Main Guides
-
-| Document | Purpose |
-|----------|---------|
-| [Swagger UI](http://localhost:3000/api-docs) | **Interactive API documentation** |
-| [Technical Choices](./doc/TECH_CHOICES.md) | **Architecture & technology justifications (alternatives, rejections)** |
-| [Testing Strategy](./doc/TESTING.md) | **Test suites, single-test commands, coverage floors** |
-| [AGENTS.md](./AGENTS.md) | Rules for AI agents (branches, policy, conventions) |
-
-### Specialized Guides
-
-- [Tunnel Mode](./doc/TUNNEL_MODE.md) - Cross-network development (different WiFi)
-- [Redis Setup](./doc/REDIS.md) - Cache and rate limiting configuration
-- [Security](./doc/SECURITY.md) - What the Docker images and containers actually do (base images, users, ports)
-- [Threat Model](./doc/THREAT_MODEL.md) - Hazards, their protections and tests, accepted risks (subject IV.6)
-- [Testing Security](./doc/TESTING_SECURITY.md) - Subject IV.6 compliance
-- [Playlist Concurrency](./doc/PLAYLIST_CONCURRENCY.md) - Concurrent track edits (subject IV.2.3)
-
-### Architecture
-
-- **Backend**: [backend/README.md](./backend/README.md) - Node.js + Express + Supabase
-- **Mobile**: [mobile/README.md](./mobile/README.md) - React Native + Expo
-
-## Team workflow
+## Contributing
 
 - Work is tracked in GitHub Issues and on the [Music Room – Validation board](https://github.com/users/Elnop/projects/1): one epic per subject section, small stories labelled `area: backend` / `area: mobile`.
 - **Assign yourself** on an issue before starting it, and never take an issue assigned to someone else.
 - **Keep its state current**: label `in-progress` when you start, `review` when the PR is open (with `Closes #<n>`), closed when merged; move the board card to match (`Todo` → `In Progress` → `Review` → `Done`).
 - Branch `<issue-number>-<slug>` from `develop`, PR into `develop`. `main` is the deploy branch.
+- `npm run check` must pass in `backend/` and `mobile/` (the pre-commit hook and the CI run it): see [quality-and-ci.md](doc/development/quality-and-ci.md).
+- The code uses **tabs** for indentation (shown as 2 spaces); `.editorconfig` sets it for most editors. `make format` formats both projects.
+- Rules for AI agents working on the repository: [AGENTS.md](AGENTS.md).
 
 ## Troubleshooting
 
 **Mobile can't reach the backend**
 1. Check the backend: `make ps` or `curl http://localhost:3000/health`
-2. On a physical device, set `http://YOUR_LOCAL_IP:3000` in `mobile/.env` and use the same Wi-Fi (or `make dev-tunnel`)
+2. On a physical device, set `http://YOUR_LOCAL_IP:3000` in `mobile/.env` and use the same Wi-Fi (or `make dev-tunnel`), or change the backend address in the app's settings
 3. Check `ALLOWED_ORIGINS` in `backend/.env`
 
 **Docker issues**: `make clean`, then `make install` and `make dev-docker`
@@ -162,7 +92,7 @@ cd mobile && npm run format
 
 ## Links
 
-- [GitHub](https://github.com/Elnop/zumik/issues)
+- [GitHub Issues](https://github.com/Elnop/music-room/issues)
 - [Supabase](https://supabase.com/dashboard/project/vkhspkuureoostyupsrx)
 - [Expo](https://expo.dev/)
 - [Ngrok](https://dashboard.ngrok.com/get-started/your-authtoken)

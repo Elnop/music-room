@@ -172,3 +172,25 @@ Each decision is weighed against the alternatives considered, with the technical
 - **Alternatives rejected**:
   - *Manual code review only*: fallible, slow, and unable to keep the criteria constant across dozens of successive PRs.
   - *Permanent suppressions (lax `eslint-disable`)*: slowly turns quality rules into wishful thinking.
+
+---
+
+## 3. Smaller decisions taken during development
+
+One line each, with the issue that holds the discussion. Decisions that shape a feature are explained in its document under [features/](features/).
+
+- **Scope of the subject** (2026-10-05): deliver Playlist Editor and Music Control Delegation, not Music Track Vote; bonuses are out of scope until the mandatory part is perfect. See [subject/coverage.md](subject/coverage.md).
+- **Track concurrency** (2026-10-06, #86): fractional ranks, one Postgres function per operation under a playlist lock, `409` only when the same track moved. See [features/playlist-concurrency.md](features/playlist-concurrency.md).
+- **Device licenses** (2026-10-05, #77): the "all my devices" switch is kept next to the per-device licenses. See [features/control-delegation.md](features/control-delegation.md).
+- **Queue access for delegates** (2026-10-14, #294): control of one device is enough to manage the owner's queue; no second rights system. See [features/queue-and-connect.md](features/queue-and-connect.md).
+- **Integration tests on a local Supabase stack** (2026-10-05, #48): not a bare Postgres, because supabase-js goes through PostgREST and Auth and the migrations use `auth.uid()` and `auth.users`.
+- **Local Supabase stack by default in development** (#128): `SUPABASE_MODE=local`, a persistent `music-room-dev` stack, so no one needs the hosted project's keys to work.
+- **Node 22** everywhere (`.nvmrc`, Dockerfiles, CI), changed together through a ticket (#48).
+- **Rate limiters always on Redis, fail closed** (#120): a limiter never counts in memory, whatever the startup order.
+- **Throwaway Supabase client for sign-ins** (#136): the shared admin client keeps its service role after a user signs in.
+- **No Supabase in the app** (#376): every auth call goes through the backend, which logs it; the anon key gives no table access anyway (#201).
+- **Password reset for Google/Facebook-only accounts is allowed** (2026-10-10, #189): it adds email and password sign-in to the account.
+- **System media controls with `expo-media-control`** (2026-10-15, #309), chosen over expo-audio's own controls (needs a later SDK), react-native-track-player, react-native-audio-api and a homemade module: a thin library that only shows the controls and forwards their events.
+- **Expired stream URLs are renewed by the player** (#313): the backend returns `expiresAt`; the app renews before play or seek, and once after a failure, at the same position. Stream URLs are never stored.
+- **One language in the app: French** (#341), formal register; the repository (code, docs, commits) is in English.
+- **Release APK built by GitHub Actions on every push to `main`** (#264), signed with the committed debug keystore and published as a GitHub Release.
