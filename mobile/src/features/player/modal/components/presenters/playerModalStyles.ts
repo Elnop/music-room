@@ -5,6 +5,8 @@ export const { width: WINDOW_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('wi
 export const DISMISS_THRESHOLD = SCREEN_HEIGHT * 0.2;
 // Capped by the height too, so a short screen still fits the bottom row above the navigation bar.
 export const ARTWORK_SIZE = Math.min(WINDOW_WIDTH * 0.75, SCREEN_HEIGHT * 0.36);
+/** From one artwork of the carousel to the next: the neighbours' edges peek out on both sides. */
+export const ARTWORK_STEP = ARTWORK_SIZE + 16;
 export const SEEK_STEP_S = 10;
 export const HEADER_HIT_SLOP = { top: 4, bottom: 4, left: 4, right: 4 };
 
@@ -74,6 +76,7 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 			borderRadius: 12,
 			backgroundColor: theme.colors.surfaceAlt,
 		},
+		neighbourArtwork: { position: 'absolute', top: 0 },
 		emptyArtwork: {
 			alignItems: 'center',
 			justifyContent: 'center',

@@ -6,9 +6,8 @@ import { useMiniPlayerLayoutStore } from '@/features/player/stores/miniPlayerLay
 import { useNowPlaying, type NowPlayingTrack } from '@/features/player/hooks/useNowPlaying';
 import { RESTART_THRESHOLD_S } from '@/shared/utils/queueNavigation';
 import { hapticTap } from '@/shared/utils/haptics';
+import { SWIPE_FLICK_VELOCITY, trackSwipeDirection } from '@/features/player/utils/trackSwipe';
 
-const SWIPE_TRACK_THRESHOLD = 80;
-const SWIPE_FLICK_VELOCITY = 800;
 const SWIPE_OPEN_THRESHOLD = 40;
 
 export interface MiniPlayerData {
@@ -82,15 +81,12 @@ export function useMiniPlayer(): MiniPlayerData {
 		})
 		.onEnd(event => {
 			const horizontal = Math.abs(event.translationX) > Math.abs(event.translationY);
-			const toLeft =
-				event.translationX < -SWIPE_TRACK_THRESHOLD || event.velocityX < -SWIPE_FLICK_VELOCITY;
-			const toRight =
-				event.translationX > SWIPE_TRACK_THRESHOLD || event.velocityX > SWIPE_FLICK_VELOCITY;
+			const direction = trackSwipeDirection(event);
 			const up =
 				event.translationY < -SWIPE_OPEN_THRESHOLD || event.velocityY < -SWIPE_FLICK_VELOCITY;
-			if (horizontal && toLeft && canGoNext) {
+			if (direction === 'next' && canGoNext) {
 				runOnJS(handleNext)();
-			} else if (horizontal && toRight && canGoPrevious) {
+			} else if (direction === 'previous' && canGoPrevious) {
 				runOnJS(handlePrevious)();
 			} else if (!horizontal && up) {
 				runOnJS(setModalOpen)(true);

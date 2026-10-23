@@ -6,20 +6,23 @@ import Animated from 'react-native-reanimated';
 import { getPlayerModal } from '@/shared/services/playerModalsBridge';
 import { PlayerHeader } from './PlayerHeader';
 import { PlayerTrackInfo } from './PlayerTrackInfo';
+import { PlayerArtworkCarousel } from './PlayerArtworkCarousel';
 import { PlayerProgressSlider } from './PlayerProgressSlider';
 import { PlayerControls } from './PlayerControls';
 import { PlayerBottomBar } from './PlayerBottomBar';
 import type { usePlayerModal } from '@/features/player/modal/hooks/usePlayerModal';
 import type { usePlayerModalGestures } from '@/features/player/modal/hooks/usePlayerModalGestures';
 import type { SeekPosition } from '@/features/player/modal/hooks/useSeekPosition';
+import type { ArtworkCarousel } from '@/features/player/modal/hooks/useArtworkCarousel';
 
 interface PlayerModalViewProps {
 	modal: ReturnType<typeof usePlayerModal>;
 	gestures: ReturnType<typeof usePlayerModalGestures>;
 	seek: SeekPosition;
+	carousel: ArtworkCarousel;
 }
 
-export function PlayerModalView({ modal, gestures, seek }: PlayerModalViewProps) {
+export function PlayerModalView({ modal, gestures, seek, carousel }: PlayerModalViewProps) {
 	const QueueModal = getPlayerModal('QueueModal');
 	const DevicePickerSheet = getPlayerModal('DevicePickerSheet');
 
@@ -46,10 +49,22 @@ export function PlayerModalView({ modal, gestures, seek }: PlayerModalViewProps)
 						<PlayerHeader styles={modal.styles} colors={modal.colors} onClose={modal.closeModal} />
 
 						<View style={modal.styles.mainContent}>
+							<GestureDetector gesture={carousel.panGesture}>
+								<View>
+									<PlayerArtworkCarousel
+										styles={modal.styles}
+										carousel={carousel}
+										hasTrack={modal.track !== null}
+										artworkUrl={modal.artworkUrl}
+										emptyIconColor={modal.colors.textSecondary}
+									/>
+								</View>
+							</GestureDetector>
+
 							<PlayerTrackInfo
 								styles={modal.styles}
 								track={modal.track}
-								artworkUrl={modal.artworkUrl}
+								infoStyle={carousel.infoStyle}
 								error={modal.error}
 								isRemote={modal.isRemote}
 								colors={modal.colors}
