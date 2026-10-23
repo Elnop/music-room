@@ -1,23 +1,24 @@
 import React from 'react';
 import { Share } from 'react-native';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import { UserProfileScreen } from './UserProfileScreen';
-import { friendsApi } from '@/services/friendsApi';
+import { fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { friendsApi } from '@/features/friends/services/friendsApi';
+import { renderWithClient } from '@/test/renderWithClient';
+import { signIn } from '@/test/session';
+import '@/test/playback';
+import { UserProfileOrchestrator } from './UserProfileOrchestrator';
 
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
+
+jest.mock('@react-native-async-storage/async-storage', () =>
+	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
+);
+jest.mock('@/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
+jest.mock('socket.io-client', () => ({ io: jest.fn() }));
 
 jest.mock('@/shared/theme/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
-
-jest.mock('@/features/player/context/PlayerContext', () => ({
-	usePlayerHeight: () => 0,
-}));
-
-jest.mock('@/features/auth/stores/authStore', () => ({
-	useAuthStore: () => ({ accessToken: 'token' }),
-}));
 
 jest.mock('@/shared/utils/toast', () => ({
 	showSuccess: jest.fn(),
@@ -46,16 +47,9 @@ const profile = {
 	isFriend: false,
 };
 
-jest.mock('@/services/profileApi', () => ({
-	profileApi: { getUserProfile: jest.fn(() => Promise.resolve(profile)) },
-}));
-
-jest.mock('@/services/privacyApi', () => ({
-	privacyApi: { getFilteredProfile: jest.fn(() => Promise.resolve(profile)) },
-}));
-
-jest.mock('@/services/friendsApi', () => ({
+jest.mock('@/features/friends/services/friendsApi', () => ({
 	friendsApi: {
+		getProfile: jest.fn(() => Promise.resolve(profile)),
 		getFollowStatus: jest.fn(() =>
 			Promise.resolve({
 				isFollowing: false,
@@ -65,24 +59,38 @@ jest.mock('@/services/friendsApi', () => ({
 				followingCount: 0,
 			})
 		),
+		getUserPublicPlaylists: jest.fn(() => Promise.resolve([])),
+		followUser: jest.fn(() =>
+			Promise.resolve({
+				success: true,
+				status: {
+					isFollowing: true,
+					isFollowedBy: false,
+					isFriend: false,
+					followersCount: 1,
+					followingCount: 0,
+				},
+			})
+		),
+		unfollowUser: jest.fn(() =>
+			Promise.resolve({
+				success: true,
+				status: {
+					isFollowing: false,
+					isFollowedBy: false,
+					isFriend: false,
+					followersCount: 0,
+					followingCount: 0,
+				},
+			})
+		),
 	},
 }));
-
-jest.mock('@/features/playlists/services/playlistApi', () => ({
-	fetchUserPublicPlaylists: jest.fn(() => Promise.resolve([])),
-}));
-
-type Props = React.ComponentProps<typeof UserProfileScreen>;
 
 const FOLLOW_BACK_HINT = 'Suivez cet utilisateur en retour pour devenir amis.';
 
 function renderScreen() {
-	return render(
-		<UserProfileScreen
-			route={{ key: 'k', name: 'UserProfile', params: { userId: ID } } as Props['route']}
-			navigation={{ navigate: jest.fn() } as unknown as Props['navigation']}
-		/>
-	);
+	return renderWithClient(<UserProfileOrchestrator userId={ID} />);
 }
 
 function mockFollowStatus(isFollowing: boolean, isFollowedBy: boolean) {
@@ -95,15 +103,15 @@ function mockFollowStatus(isFollowing: boolean, isFollowedBy: boolean) {
 	});
 }
 
-describe('UserProfileScreen', () => {
+describe('UserProfileOrchestrator', () => {
+	beforeEach(() => {
+		jest.clearAllMocks();
+		signIn('me');
+	});
+
 	it('shares the zumik:// link of the profile', async () => {
 		const share = jest.spyOn(Share, 'share').mockResolvedValue({ action: Share.sharedAction });
-		render(
-			<UserProfileScreen
-				route={{ key: 'k', name: 'UserProfile', params: { userId: ID } } as Props['route']}
-				navigation={{ navigate: jest.fn() } as unknown as Props['navigation']}
-			/>
-		);
+		renderScreen();
 
 		fireEvent.press(await screen.findByRole('button', { name: 'Partager' }));
 
@@ -137,5 +145,38 @@ describe('UserProfileScreen', () => {
 		renderScreen();
 
 		expect(await screen.findByText('Membre depuis janvier 2026')).toBeTruthy();
+	});
+
+	it('allows following and unfollowing the user', async () => {
+		mockFollowStatus(false, false);
+		renderScreen();
+
+		const followBtn = await screen.findByRole('button', { name: 'Suivre' });
+		fireEvent.press(followBtn);
+
+		await waitFor(() => {
+			expect(friendsApi.followUser).toHaveBeenCalledWith(ID);
+		});
+	});
+
+	it('renders user public playlists and handles click', async () => {
+		const playlist = {
+			id: 'p1',
+			name: 'Rock Classics',
+			trackCount: 12,
+			visibility: 'public' as const,
+		};
+		jest.mocked(friendsApi.getUserPublicPlaylists).mockResolvedValueOnce([playlist]);
+
+		const onNavigateToPlaylist = jest.fn();
+		renderWithClient(
+			<UserProfileOrchestrator userId={ID} onNavigateToPlaylist={onNavigateToPlaylist} />
+		);
+
+		expect(await screen.findByText('Rock Classics')).toBeTruthy();
+		expect(screen.getByText('12 titres • alice')).toBeTruthy();
+
+		fireEvent.press(screen.getByText('Rock Classics'));
+		expect(onNavigateToPlaylist).toHaveBeenCalledWith('p1');
 	});
 });

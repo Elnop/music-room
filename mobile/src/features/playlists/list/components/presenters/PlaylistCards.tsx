@@ -12,35 +12,6 @@ const GRID_CARD_WIDTH = (Dimensions.get('window').width - 48 - 8) / 2;
 const coverOf = (playlist: Playlist) => playlist.coverUrl || playlist.firstTrackCover;
 const tracksLabel = (count: number) => `${count} ${count === 1 ? 'titre' : 'titres'}`;
 
-interface PlaylistCardProps {
-	playlist: Playlist;
-	trackCount: number;
-	ownerName: string;
-	onPress: () => void;
-}
-
-/** A playlist as a list row: cover, name, private badge, track count and owner. */
-export function PlaylistCard({ playlist, trackCount, ownerName, onPress }: PlaylistCardProps) {
-	const { styles } = useThemedStyles(createStyles);
-
-	return (
-		<Pressable style={styles.row} onPress={onPress} accessibilityLabel={playlist.name}>
-			<Artwork uri={coverOf(playlist)} size={48} iconSize={24} style={styles.rowCover} />
-			<View style={styles.rowInfo}>
-				<View style={styles.nameRow}>
-					<Text style={styles.rowName} numberOfLines={1}>
-						{playlist.name}
-					</Text>
-					{playlist.visibility === 'private' && <PrivateBadge labelled style={styles.rowBadge} />}
-				</View>
-				<Text style={styles.meta} numberOfLines={1}>
-					{tracksLabel(trackCount)} • {ownerName}
-				</Text>
-			</View>
-		</Pressable>
-	);
-}
-
 interface PlaylistGridCardProps {
 	playlist: Playlist;
 	onPress: () => void;
@@ -78,22 +49,6 @@ export function PlaylistGridCard({ playlist, onPress, showOwner }: PlaylistGridC
 
 const createStyles = (theme: Theme) =>
 	StyleSheet.create({
-		row: {
-			flexDirection: 'row',
-			alignItems: 'center',
-			paddingVertical: 8,
-			paddingHorizontal: theme.spacing.md,
-		},
-		rowCover: { borderRadius: 4 },
-		rowInfo: { flex: 1, marginLeft: theme.spacing.md },
-		nameRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 2 },
-		rowName: {
-			fontSize: theme.typography.sizes.md,
-			fontWeight: theme.typography.weights.medium,
-			color: theme.colors.text,
-			flexShrink: 1,
-		},
-		rowBadge: { paddingVertical: 2, marginLeft: 8 },
 		meta: { fontSize: theme.typography.sizes.sm, color: theme.colors.textSecondary },
 		tile: { width: GRID_CARD_WIDTH, marginBottom: theme.spacing.lg },
 		tileCover: { borderRadius: 8 },

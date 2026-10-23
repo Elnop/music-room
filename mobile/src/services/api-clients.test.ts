@@ -1,4 +1,4 @@
-import { friendsApi } from './friendsApi';
+import { friendsApi } from '@/features/friends/services/friendsApi';
 import { profileApi } from './profileApi';
 import { privacyApi } from './privacyApi';
 import { musicControlApi } from './musicControlApi';

@@ -32,6 +32,9 @@ export const queryKeys = {
 		all: ['friends'] as const,
 		list: () => [...queryKeys.friends.all, 'list'] as const,
 		search: (query: string) => [...queryKeys.friends.all, 'search', query] as const,
+		status: (userId: string) => [...queryKeys.friends.all, 'status', userId] as const,
+		stats: () => [...queryKeys.friends.all, 'stats'] as const,
+		permissions: () => [...queryKeys.friends.all, 'permissions'] as const,
 	},
 	profile: {
 		all: ['profile'] as const,

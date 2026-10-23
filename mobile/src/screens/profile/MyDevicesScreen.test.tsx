@@ -5,7 +5,8 @@ import { act, render, screen, fireEvent, waitFor } from '@testing-library/react-
 import { useAuthStore } from '@/features/auth/stores/authStore';
 import { resetBackendUrl } from '@/shared/services/backendUrl';
 import { musicControlApi } from '@/services/musicControlApi';
-import { friendsApi, type FriendProfile } from '@/services/friendsApi';
+import { friendsApi } from '@/features/friends/services/friendsApi';
+import type { FriendProfile } from '@/features/friends/types';
 import { showError, showSuccess } from '@/shared/utils/toast';
 import type { UserDeviceWithLicenses } from '@/types/device.types';
 import { MyDevicesScreen } from './MyDevicesScreen';

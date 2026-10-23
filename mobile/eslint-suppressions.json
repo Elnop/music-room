@@ -51,19 +51,6 @@
       "count": 1
     }
   },
-  "src/screens/friends/FriendsScreen.tsx": {
-    "guardrails/ui-primitives": {
-      "count": 1
-    },
-    "guardrails/zustand-selector": {
-      "count": 1
-    }
-  },
-  "src/screens/friends/UserProfileScreen.tsx": {
-    "guardrails/zustand-selector": {
-      "count": 1
-    }
-  },
   "src/screens/profile/EditProfileScreen.tsx": {
     "guardrails/theme-tokens": {
       "count": 2

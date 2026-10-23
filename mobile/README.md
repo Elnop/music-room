@@ -166,21 +166,34 @@ mobile/src/
 │   │   ├── stores/         # authStore (session) et ses actions
 │   │   ├── utils/          # codeDigits, passwordRules
 │   │   └── types.ts · validators.ts
-│   └── playlists/          # Listes, détail, création/édition, ajout de titres, visibilité et droits
-│       ├── <sujet>/        # list, detail, form, searchTracks, sharing, trackActions, actionSheet, header
-│       ├── hooks/          # Requêtes et mutations TanStack, room Socket.io (usePlaylistRoom)
-│       ├── services/       # playlistApi, tracksApi, membersApi, usersApi, trackSearchApi
-│       ├── stores/         # pendingMovesStore (déplacements en cours)
-│       ├── utils/          # Cache (playlistCache, trackEdits, trackMoves), playlistSync, règles socket, droits
-│       └── types.ts · validators.ts
+│   ├── playlists/          # Listes, détail, création/édition, ajout de titres, visibilité et droits
+│   │   ├── <sujet>/        # list, detail, form, searchTracks, sharing, trackActions, actionSheet, header
+│   │   ├── hooks/          # Requêtes et mutations TanStack, room Socket.io (usePlaylistRoom)
+│   │   ├── services/       # playlistApi, tracksApi, membersApi, usersApi, trackSearchApi
+│   │   ├── stores/         # pendingMovesStore (déplacements en cours)
+│   │   ├── utils/          # Cache (playlistCache, trackEdits, trackMoves), playlistSync, règles socket, droits
+│   │   └── types.ts · validators.ts
+│   ├── queue/              # File d'attente locale/room, synchronisation et Connect (#381)
+│   │   ├── queue/          # components/{orchestrators,presenters} + hooks/
+│   │   ├── connect/        # components/{orchestrators,presenters} + hooks/
+│   │   ├── hooks/          # useQueueSync, useRemoteTarget
+│   │   ├── services/       # transferPlayback
+│   │   ├── stores/         # queueStore, connectStore
+│   │   └── types.ts
+│   └── friends/            # Liste d'amis, recherche d'utilisateurs, profil ami et permissions (#382)
+│       ├── friendsList/    # components/{orchestrators,presenters} + hooks/
+│       ├── userProfile/    # components/{orchestrators,presenters} + hooks/
+│       ├── hooks/          # useFriendsQueries, useFriendsMutations
+│       ├── services/       # friendsApi
+│       └── types.ts
 │
 │   Dossiers historiques, vidés par les stories de migration :
-├── screens/                # Écrans par feature (friends, profile, search, settings)
+├── screens/                # Écrans par feature (profile, search, settings)
 ├── components/             # Composants par feature (player, profile, music-control)
-├── store/                  # Stores Zustand des features (player, queue, connect...)
+├── store/                  # Stores Zustand des features (player, soundcloudStore...)
 ├── contexts/               # PlayerContext
 ├── hooks/                  # useMusicControl, usePlayerProgress, useNowPlaying...
-├── services/               # Clients HTTP des features (profileApi, friendsApi...), deviceService
+├── services/               # Clients HTTP des features (profileApi, privacyApi...), deviceService
 ├── utils/                  # Utilitaires d'une seule feature (remotePosition, avatarImage)
 └── types/                  # Types alignés sur les réponses du backend
 ```

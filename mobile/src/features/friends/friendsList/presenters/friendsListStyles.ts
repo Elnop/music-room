@@ -1,0 +1,100 @@
+import { StyleSheet } from 'react-native';
+import type { Theme } from '@/shared/theme/types';
+
+export const createFriendsListStyles = (theme: Theme) =>
+	StyleSheet.create({
+		container: {
+			flex: 1,
+			backgroundColor: theme.colors.background,
+		},
+		header: {
+			paddingHorizontal: theme.spacing.lg,
+			paddingTop: theme.spacing.xs,
+			paddingBottom: theme.spacing.sm,
+		},
+		tabsContainer: {
+			flexDirection: 'row',
+			backgroundColor: theme.colors.surface,
+			borderRadius: 12,
+			padding: 4,
+			marginBottom: theme.spacing.md,
+			...theme.shadows.small,
+		},
+		tab: {
+			flex: 1,
+			paddingVertical: theme.spacing.sm,
+			borderRadius: theme.spacing.xs,
+			alignItems: 'center',
+		},
+		tabActive: {
+			backgroundColor: theme.colors.primary,
+		},
+		tabText: {
+			fontSize: theme.typography.sizes.sm,
+			fontWeight: theme.typography.weights.medium,
+			color: theme.colors.textSecondary,
+		},
+		tabTextActive: {
+			color: theme.colors.surface,
+			fontWeight: theme.typography.weights.semibold,
+		},
+		searchBar: {
+			marginBottom: theme.spacing.sm,
+		},
+		listContent: {
+			paddingBottom: theme.spacing.xl,
+		},
+		userItem: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			paddingVertical: 8,
+			paddingHorizontal: theme.spacing.md,
+		},
+		userItemProcessing: {
+			opacity: 0.7,
+		},
+		userInfo: {
+			flex: 1,
+			marginLeft: theme.spacing.md,
+		},
+		username: {
+			fontSize: theme.typography.sizes.md,
+			fontWeight: theme.typography.weights.semibold,
+			color: theme.colors.text,
+		},
+		displayName: {
+			fontSize: theme.typography.sizes.sm,
+			color: theme.colors.textSecondary,
+			marginTop: 2,
+		},
+		controlRow: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			marginTop: 4,
+		},
+		controlIcon: {
+			marginRight: 4,
+		},
+		controlText: {
+			fontSize: theme.typography.sizes.xs,
+			color: theme.colors.textSecondary,
+		},
+		controlTextActive: {
+			color: theme.colors.primary,
+			fontWeight: theme.typography.weights.medium,
+		},
+		controlToggle: {
+			alignItems: 'center',
+			justifyContent: 'center',
+			marginRight: theme.spacing.sm,
+		},
+		switchPlaceholder: {
+			width: 51,
+			height: 31,
+			justifyContent: 'center',
+			alignItems: 'center',
+		},
+		emptyState: {
+			paddingTop: theme.spacing.xxl,
+		},
+	});

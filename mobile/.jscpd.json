@@ -23,8 +23,6 @@
 		"**/src/navigation/stacks/PlaylistsStack.tsx",
 		"**/src/navigation/stacks/ProfileStack.tsx",
 		"**/src/navigation/stacks/SearchStack.tsx",
-		"**/src/screens/friends/FriendsScreen.tsx",
-		"**/src/screens/friends/UserProfileScreen.tsx",
 		"**/src/screens/profile/EditProfileScreen.tsx",
 		"**/src/screens/profile/LinkedAccountsScreen.tsx",
 		"**/src/screens/profile/MusicPreferencesScreen.tsx",
