@@ -1,7 +1,7 @@
 import React, { type ReactElement } from 'react';
 import { Alert } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { ProfileOrchestrator } from './orchestrators/ProfileOrchestrator';
+import { ProfileOrchestrator } from './components/orchestrators/ProfileOrchestrator';
 
 const mockLogout = jest.fn();
 const mockNavigate = jest.fn();

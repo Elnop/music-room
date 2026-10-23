@@ -167,15 +167,23 @@ ruleTester.run('component-role-directory', componentRoleDirectory, {
 	valid: [
 		{
 			code: 'export function MyView() { return <div>test</div>; }',
-			filename: '/app/mobile/src/features/foo/presenters/MyView.tsx',
+			filename: '/app/mobile/src/features/foo/bar/components/presenters/MyView.tsx',
 		},
 		{
 			code: 'export function MyOrch() { return <MyView />; }',
-			filename: '/app/mobile/src/features/foo/orchestrators/MyOrch.tsx',
+			filename: '/app/mobile/src/features/foo/bar/components/orchestrators/MyOrch.tsx',
 		},
 		{
-			code: 'export function MyContext() { return <Context.Provider value={{}} />; }',
-			filename: '/app/mobile/src/features/foo/context/MyContext.tsx',
+			code: 'export function MyProvider() { return <Context.Provider value={{}} />; }',
+			filename: '/app/mobile/src/features/foo/context/MyProvider.tsx',
+		},
+		{
+			code: 'export function useX() { return 1; }',
+			filename: '/app/mobile/src/features/foo/bar/hooks/useX.ts',
+		},
+		{
+			code: 'it("renders", () => { render(<MyView />); });',
+			filename: '/app/mobile/src/features/foo/bar/MyScreen.test.tsx',
 		},
 		{
 			code: 'export function Button() { return <Pressable />; }',
@@ -184,8 +192,38 @@ ruleTester.run('component-role-directory', componentRoleDirectory, {
 	],
 	invalid: [
 		{
-			code: 'export function RogueComponent() { return <div>Rogue</div>; }',
-			filename: '/app/mobile/src/features/foo/components/RogueComponent.tsx',
+			code: 'export function MyView() { return <div>test</div>; }',
+			filename: '/app/mobile/src/features/foo/bar/presenters/MyView.tsx',
+			errors: [{ messageId: 'componentOutsideRoleDir' }],
+		},
+		{
+			code: 'export function MyOrch() { return <MyView />; }',
+			filename: '/app/mobile/src/features/foo/bar/orchestrators/MyOrch.tsx',
+			errors: [{ messageId: 'componentOutsideRoleDir' }],
+		},
+		{
+			code: 'export function MyView() { return <div>test</div>; }',
+			filename: '/app/mobile/src/features/foo/components/bar/components/presenters/MyView.tsx',
+			errors: [{ messageId: 'componentOutsideRoleDir' }],
+		},
+		{
+			code: 'export function MyView() { return <div>test</div>; }',
+			filename: '/app/mobile/src/features/foo/components/presenters/MyView.tsx',
+			errors: [{ messageId: 'componentOutsideRoleDir' }],
+		},
+		{
+			code: 'export function MyView() { return <div>test</div>; }',
+			filename: '/app/mobile/src/features/foo/components/components/presenters/MyView.tsx',
+			errors: [{ messageId: 'componentOutsideRoleDir' }],
+		},
+		{
+			code: 'export function MyProvider() { return <Context.Provider value={{}} />; }',
+			filename: '/app/mobile/src/features/foo/bar/context/MyProvider.tsx',
+			errors: [{ messageId: 'componentOutsideRoleDir' }],
+		},
+		{
+			code: 'export function RogueComponent() { return <><div>Rogue</div></>; }',
+			filename: '/app/mobile/src/features/foo/bar/components/RogueComponent.tsx',
 			errors: [{ messageId: 'componentOutsideRoleDir' }],
 		},
 		{

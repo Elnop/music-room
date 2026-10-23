@@ -7,7 +7,19 @@ Read before creating a file or a folder. Every rule here is checked by `npm run 
 Where a file goes is set by the target layout in `docs/superpowers/specs/2026-10-21-clean-codebase-refactor-design.md` and summarized in `AGENTS.md`:
 
 - Backend: `src/features/<name>/` holds `<name>.routes.ts`, `<name>.controller.ts`, `<name>.validators.ts`, `<name>.types.ts`, `<name>.openapi.ts`, logic in `services/`, authorization in `permissions/`, helpers in `utils/`. Cross-cutting code (config, middleware, security, types) goes in `src/shared/`; the Socket.io server in `src/realtime/` (`socket-server.ts`, `handlers/`, `emitters/`); the composition root (routes registry, OpenAPI document) in `src/app/`.
-- Mobile: `src/features/<feature>/` (components, hooks, services, stores of one feature), `src/shared/`, `src/navigation/`, `src/providers/` (`AppProviders.tsx`, the providers `App.tsx` wraps the app in). The legacy folders (`components/<feature>/`, `screens/`, `store/`, `hooks/`, `contexts/`, `services/`, `api/`, `utils/`) move into `features/` story by story (#378–#385); add nothing new to them. `src/shared/` holds what several features use:
+- Mobile: `src/features/<feature>/` (components, hooks, services, stores of one feature), `src/shared/`, `src/navigation/`, `src/providers/` (`AppProviders.tsx`, the providers `App.tsx` wraps the app in). The legacy folders (`components/<feature>/`, `screens/`, `store/`, `hooks/`, `contexts/`, `services/`, `api/`, `utils/`) move into `features/` story by story (#378–#385); add nothing new to them. Every feature has the same layout (ESLint `components/component-role-directory`, see [components.md](components.md#component-role-directory)); a subject folder always exists, even for a single-subject feature, `*Styles.ts` files sit with their presenters, and tests sit next to their file:
+
+  ```
+  features/<feature>/
+  ├── hooks/ services/ stores/ utils/ constants.ts types.ts validators.ts …   (shared by subjects)
+  ├── context/                                                                 (React providers)
+  └── <subject>/
+      ├── components/orchestrators/
+      ├── components/presenters/
+      └── hooks/
+  ```
+
+  `src/shared/` holds what several features use:
   - `components/ui/`: the primitives ([ui-primitives](#ui-primitives)): `Pressable`, `Button`, `Input`, `Card`, `Skeleton`, `ThemedSwitch`, `LoadingSpinner`;
   - `components/<subject>/`: shared blocks by subject (`feedback/`, `form/`, `lists/`, `media/`, `sharing/`, `theme/`);
   - `services/`: the API client `api.ts`, `backendUrl.ts`, storage modules;

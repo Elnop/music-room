@@ -1,7 +1,7 @@
 import React from 'react';
 import { Alert } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { EditProfileOrchestrator } from './orchestrators/EditProfileOrchestrator';
+import { EditProfileOrchestrator } from './components/orchestrators/EditProfileOrchestrator';
 
 const mockPickAndUpload = jest.fn();
 const mockRemove = jest.fn();

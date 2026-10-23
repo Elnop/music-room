@@ -134,7 +134,7 @@ Pour débuter, voici les 5 commandes que vous utiliserez le plus :
 
 ## Architecture
 
-Issue de l'epic #362 : `src/shared/`, `src/providers/`, `src/navigation/` et `src/features/<feature>/`. Toutes les features ont été entièrement migrées (#378–#385) selon le pattern orchestrators / presenters / hooks, et l'ensemble des règles de composants est garanti par le plugin ESLint sans aucune exception.
+Issue de l'epic #362 : `src/shared/`, `src/providers/`, `src/navigation/` et `src/features/<feature>/`. Toutes les features ont été entièrement migrées (#378–#385) selon le pattern orchestrators / presenters / hooks, et l'ensemble des règles de composants est garanti par le plugin ESLint sans aucune exception. Chaque feature a une seule arborescence : ce que ses sujets partagent (`hooks/`, `services/`, `stores/`, `utils/`, `types.ts`…) à sa racine, ses providers React dans `context/`, et un dossier par sujet, même s'il n'y en a qu'un, qui contient `components/orchestrators/`, `components/presenters/` et `hooks/`.
 
 ```
 mobile/src/
@@ -174,8 +174,8 @@ mobile/src/
 │   │   ├── utils/          # Cache (playlistCache, trackEdits, trackMoves), playlistSync, règles socket, droits
 │   │   └── types.ts · validators.ts
 │   ├── queue/              # File d'attente locale/room, synchronisation et Connect (#381)
-│   │   ├── queue/          # components/{orchestrators,presenters} + hooks/
-│   │   ├── connect/        # components/{orchestrators,presenters} + hooks/
+│   │   ├── queueModal/     # components/{orchestrators,presenters} + hooks/
+│   │   ├── devicePicker/   # components/{orchestrators,presenters} + hooks/
 │   │   ├── hooks/          # useQueueSync, useRemoteTarget
 │   │   ├── services/       # transferPlayback
 │   │   ├── stores/         # queueStore, connectStore
@@ -192,7 +192,7 @@ mobile/src/
 │   │   ├── services/       # musicControlApi
 │   │   └── types.ts
 │   └── search/             # Recherche de titres SoundCloud (#385)
-│       ├── searchScreen/   # orchestrators/ + presenters/ + hooks/
+│       ├── searchScreen/   # components/{orchestrators,presenters} + hooks/
 │       ├── hooks/          # useSoundCloudSearch (TanStack Query)
 │       ├── services/       # searchApi
 │       └── types.ts
@@ -208,9 +208,9 @@ mobile/src/
 - **AuthNavigator** : Welcome, Login, Register, EmailVerification, ForgotPassword, ResetPassword ; chaque écran est l'orchestrator de `features/auth/<sujet>/`.
 - **AppNavigator** (onglets) :
   - Playlists → Playlists, PlaylistDetail, CreatePlaylist, SearchTracks, PlaylistSharing (les orchestrators de `features/playlists/<sujet>/`)
-  - Search → Search (l'orchestrator de `features/search/searchScreen/orchestrators`)
+  - Search → Search (l'orchestrator de `features/search/searchScreen/components/orchestrators`)
   - Friends → Friends, UserProfile, PlaylistDetail, SearchTracks
-  - Profile → Profile, EditProfile, PrivacySettings, MusicPreferences, LinkedAccounts, MyDevices, Settings (les orchestrators de `features/profile/<sujet>/` et `features/music-control/myDevices/orchestrators`)
+  - Profile → Profile, EditProfile, PrivacySettings, MusicPreferences, LinkedAccounts, MyDevices, Settings (les orchestrators de `features/profile/<sujet>/` et `features/music-control/myDevices/components/orchestrators`)
 
 ## État, temps réel et lecture
 
@@ -247,7 +247,7 @@ Les rôles de composants sont validés automatiquement sans exception (#386, doc
 - **`components/presenter-pure`** : un presenter est une vue pure (props en entrée, JSX en sortie) : ni état (`useState`), ni effet (`useEffect`), ni store Zustand, ni requête TanStack, ni appel réseau direct.
 - **`components/hook-no-jsx`** : un hook ne contient aucun élément JSX ni fragment (logique pure).
 - **`components/one-component-per-file`** : au plus un composant React par fichier source.
-- **`components/component-role-directory`** : tout composant d'une feature réside dans un sous-dossier de rôle (`orchestrators/` ou `presenters/`).
+- **`components/component-role-directory`** : tout composant d'une feature réside dans `features/<feature>/<sujet>/components/orchestrators/` ou `.../components/presenters/`, un provider React dans `features/<feature>/context/`.
 - **`components/orchestrator-no-fetch`** : un orchestrator délègue les appels réseau aux hooks TanStack Query ou de service, sans `fetch` direct.
 
 ### Hot Reload

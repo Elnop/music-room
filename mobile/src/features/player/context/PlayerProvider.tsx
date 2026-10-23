@@ -8,7 +8,7 @@ import { useNextTrackPrefetch } from '@/features/player/hooks/useNextTrackPrefet
 import { useAudioInterruption } from '@/features/player/hooks/useAudioInterruption';
 import { configureAudioMode } from '@/features/player/services/audioMode';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
-import { MediaSessionBridge } from '@/features/player/components/mediaSession/components/orchestrators/MediaSessionBridge';
+import { MediaSessionBridge } from '@/features/player/mediaSession/components/orchestrators/MediaSessionBridge';
 
 configureAudioMode();
 

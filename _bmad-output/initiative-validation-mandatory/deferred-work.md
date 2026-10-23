@@ -66,3 +66,6 @@
 - source_plan: `_bmad-output/initiative-validation-mandatory/plan-gh-342-edit-delete-playlist.md`
   summary: Split `backend/src/features/playlists/playlist.service.ts` (~490 lines) into smaller services, per the ~150-line guideline of AGENTS.md.
   evidence: The file was already ~480 lines before #342; the review of #342 flagged that it keeps growing.
+- source_plan: `_bmad-output/initiative-validation-mandatory/plan-gh-414-feature-layout.md`
+  summary: Le schéma de `.agents/rules/structure.md#placement` omet le dossier `utils/` au niveau d'un sujet, qui existe (`features/music-control/myDevices/utils/`) et que `mobile/README.md` mentionne.
+  evidence: Les deux docs se contredisent sur la présence de `utils/` dans un sujet ; relevé par la revue quick de #414.

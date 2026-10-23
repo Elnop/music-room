@@ -2,7 +2,7 @@ import React from 'react';
 import { Alert } from 'react-native';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { PrivacySettingsOrchestrator } from './orchestrators/PrivacySettingsOrchestrator';
+import { PrivacySettingsOrchestrator } from './components/orchestrators/PrivacySettingsOrchestrator';
 import { privacyApi } from '@/features/profile/services/privacyApi';
 import { showError } from '@/shared/utils/toast';
 

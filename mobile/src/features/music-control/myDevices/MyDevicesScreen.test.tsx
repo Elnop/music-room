@@ -10,7 +10,7 @@ import * as friendsBridge from '@/shared/services/friendsBridge';
 import type { FriendUserSummary } from '@/shared/services/friendsBridge';
 import { showError, showSuccess } from '@/shared/utils/toast';
 import type { UserDeviceWithLicenses } from '@/features/music-control/types';
-import { MyDevicesOrchestrator } from './orchestrators/MyDevicesOrchestrator';
+import { MyDevicesOrchestrator } from './components/orchestrators/MyDevicesOrchestrator';
 import { logger } from '@/shared/utils/logger';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
