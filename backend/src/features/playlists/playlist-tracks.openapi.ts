@@ -20,7 +20,7 @@ import {
 } from '@/shared/config/swagger.schemas.js';
 import { fail, shared } from '@/shared/config/swagger.errors.js';
 
-/** Registers the /api/playlists/{id}/tracks routes (doc/PLAYLIST_CONCURRENCY.md). */
+/** Registers the /api/playlists/{id}/tracks routes (doc/features/playlist-concurrency.md). */
 export function registerPlaylistTracksOpenapi(registry: OpenAPIRegistry): void {
 	const common = { tags: ['Tracks'], security: bearerAuth };
 	const trackParams = (description: string) =>
@@ -43,7 +43,7 @@ export function registerPlaylistTracksOpenapi(registry: OpenAPIRegistry): void {
 		path: '/api/playlists/{id}/tracks',
 		summary: 'Add track to playlist',
 		description:
-			'Appends a track at the end of the playlist and increments tracksVersion. Never refused because of concurrency. Owner and collaborators with edit permission can add tracks. See doc/PLAYLIST_CONCURRENCY.md.',
+			'Appends a track at the end of the playlist and increments tracksVersion. Never refused because of concurrency. Owner and collaborators with edit permission can add tracks. See doc/features/playlist-concurrency.md.',
 		operationId: 'addTrack',
 		request: { params: playlistIdParamSchema, body: jsonBody(addTrackSchema) },
 		responses: {
@@ -84,7 +84,7 @@ export function registerPlaylistTracksOpenapi(registry: OpenAPIRegistry): void {
 		path: '/api/playlists/{id}/tracks/{trackId}/move',
 		summary: 'Move a track',
 		description:
-			'Places the track right after afterRank. Refused with 409 only when this same track moved or was removed since expectedVersion, or when the playlist ranks were rebalanced since then. See doc/PLAYLIST_CONCURRENCY.md.',
+			'Places the track right after afterRank. Refused with 409 only when this same track moved or was removed since expectedVersion, or when the playlist ranks were rebalanced since then. See doc/features/playlist-concurrency.md.',
 		operationId: 'moveTrack',
 		request: {
 			params: trackParams('Track ID to move'),

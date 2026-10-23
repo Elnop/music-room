@@ -33,7 +33,7 @@ export const updatePlaylistSchema = z.object({
 	editMode: z.enum(['open', 'restricted']).optional(),
 });
 
-// A rank is a base-62 fraction that never ends with '0' (doc/PLAYLIST_CONCURRENCY.md).
+// A rank is a base-62 fraction that never ends with '0' (doc/features/playlist-concurrency.md).
 export const rankSchema = z
 	.string()
 	.max(128)

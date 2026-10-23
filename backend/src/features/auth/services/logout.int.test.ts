@@ -5,7 +5,7 @@ import { connectRedis, disconnectRedis, isRedisConnected } from '@/shared/config
 import * as loginService from '@/features/auth/services/login.service.js';
 import * as sessionService from '@/features/auth/services/session.service.js';
 
-// Token verification calls Google and Facebook: always mocked (doc/TESTING.md).
+// Token verification calls Google and Facebook: always mocked (doc/development/testing.md).
 vi.mock('@/features/auth/services/oauth.service.js', () => ({
 	verifyGoogleToken: vi.fn(),
 	verifyFacebookToken: vi.fn(),

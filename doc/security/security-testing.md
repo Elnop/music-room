@@ -1211,7 +1211,7 @@ Backend files implementing security features:
 
 ### Subject Requirements
 
-Refer to `doc/en.subject.pdf` section **IV.6 Securing** for full security requirements:
+Refer to `doc/subject/en.subject.pdf` section **IV.6 Securing** for full security requirements:
 
 1. User data isolation and protection
 2. Malicious behavior prevention (bruteforce, session theft)

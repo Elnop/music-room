@@ -7,7 +7,7 @@ import { redisClient, isRedisConnected } from '@/shared/config/redis.js';
  * Nothing here checks readiness or catches errors: each limiter decides what
  * Redis being down means for it (fail closed with a 503, or fail open), with
  * `isReady()` before a call and its own try/catch around it. There is no
- * in-memory fallback (doc/REDIS.md, "No In-Memory Fallback").
+ * in-memory fallback (doc/architecture/redis.md, "No In-Memory Fallback").
  */
 
 export interface CounterState {

@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 
-// Unit tests only (see doc/TESTING.md): no external service, no secret.
+// Unit tests only (see doc/development/testing.md): no external service, no secret.
 export default defineConfig({
 	resolve: {
 		alias: {
@@ -15,7 +15,7 @@ export default defineConfig({
 		setupFiles: ['src/test/setup-env.ts'],
 		restoreMocks: true,
 		// `npm run test:coverage`: every source file counts, not only those a
-		// test imports. The floor is recorded on epic #362 (doc/TESTING.md).
+		// test imports. The floor is recorded on epic #362 (doc/development/testing.md).
 		coverage: {
 			provider: 'v8',
 			include: ['src/**/*.ts'],

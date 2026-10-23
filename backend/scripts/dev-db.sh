@@ -99,11 +99,11 @@ apply_migrations() {
 	echo "$count migration(s) applied"
 }
 
-# Demo accounts, friends and playlists (doc/DEMO_ACCOUNTS.md), in one
+# Demo accounts, friends and playlists (doc/development/demo-accounts.md), in one
 # transaction: a failing seed leaves the freshly migrated database empty.
 load_seed() {
 	psql_db -1 -f - <"$SEED_FILE" >/dev/null || fail "Demo data failed: $SEED_FILE (nothing from it was loaded)"
-	echo "Loaded the demo data (doc/DEMO_ACCOUNTS.md)"
+	echo "Loaded the demo data (doc/development/demo-accounts.md)"
 }
 
 write_env_file() {

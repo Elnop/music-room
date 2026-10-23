@@ -2,7 +2,7 @@
 # Every virtual user takes a row of fixtures/users.csv and uses its pre-issued
 # token (no sign-in): it adds a uniquely named track, moves it to the first
 # place and deletes it. A 409 on the move is expected under contention: another
-# user changed the playlist since the add (doc/PLAYLIST_CONCURRENCY.md).
+# user changed the playlist since the add (doc/features/playlist-concurrency.md).
 # The target comes from `--target`; sharedPlaylistId from fixtures/env.json.
 config:
   phases:

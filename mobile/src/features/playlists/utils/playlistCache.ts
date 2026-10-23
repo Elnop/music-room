@@ -10,7 +10,7 @@ import { applyPlaylistEvent, sortByRank } from './playlistSync';
 
 // The playlist data lives in the query cache: the user's list
 // (queryKeys.playlists.list) and one detail per playlist. These helpers read and
-// patch it in the order doc/PLAYLIST_CONCURRENCY.md describes.
+// patch it in the order doc/features/playlist-concurrency.md describes.
 
 const detailKey = queryKeys.playlists.detail;
 

@@ -49,7 +49,7 @@ function emitToPlaylistRoom(
 
 /**
  * Notify all clients watching a playlist of one track operation and the
- * version it produced (doc/PLAYLIST_CONCURRENCY.md, "Broadcast and convergence")
+ * version it produced (doc/features/playlist-concurrency.md, "Broadcast and convergence")
  */
 export function notifyPlaylistUpdate(payload: PlaylistUpdatedPayload): void {
 	const { event, tracksVersion } = payload;

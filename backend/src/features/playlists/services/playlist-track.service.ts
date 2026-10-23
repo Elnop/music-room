@@ -14,7 +14,7 @@ import type {
 import type { MoveTrackInput } from '@/features/playlists/playlist.validators.js';
 
 // Adds, removes and moves tracks through the atomic operations of migration 016.
-// See doc/PLAYLIST_CONCURRENCY.md. Each change is then mirrored in the queue
+// See doc/features/playlist-concurrency.md. Each change is then mirrored in the queue
 // blocks of the playlist (#278); a sync failure never fails the operation.
 
 /** In 'open' edit mode, the adder is not recorded (added_by = null). */

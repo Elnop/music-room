@@ -29,7 +29,7 @@ export function removeTrack(playlistId: string, trackId: string): Promise<Remove
 
 /**
  * Moves a track right after `afterRank` (null = top), checked against the
- * version the client displays. See doc/PLAYLIST_CONCURRENCY.md, "Move".
+ * version the client displays. See doc/features/playlist-concurrency.md, "Move".
  */
 export function moveTrack(
 	playlistId: string,

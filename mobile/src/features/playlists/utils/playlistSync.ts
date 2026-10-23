@@ -1,7 +1,7 @@
 import type { PlaylistUpdatedEvent, PlaylistWithTracks } from '@/features/playlists/types';
 import type { TrackInPlaylist } from '@/types/track.types';
 
-// Applies the server's track events in version order (doc/PLAYLIST_CONCURRENCY.md,
+// Applies the server's track events in version order (doc/features/playlist-concurrency.md,
 // "Broadcast and convergence"). Ranks compare byte by byte, like the server.
 
 export function sortByRank(tracks: TrackInPlaylist[]): TrackInPlaylist[] {

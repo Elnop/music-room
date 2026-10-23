@@ -5,7 +5,7 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import type { TrackUpsertInput } from '@/shared/utils/track-upsert.js';
 
 // The playlist track service and the playlist fetch on top of migration 016, against the
-// local Supabase stack (doc/PLAYLIST_CONCURRENCY.md). The RPCs themselves are
+// local Supabase stack (doc/features/playlist-concurrency.md). The RPCs themselves are
 // covered by track-operations.int.test.ts; this file checks the service layer:
 // permissions, added_by, result shapes, error mapping and concurrent calls.
 

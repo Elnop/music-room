@@ -1,6 +1,6 @@
 -- =====================================================
 -- 016: fractional ranks and versions for playlist tracks
--- Design: doc/PLAYLIST_CONCURRENCY.md
+-- Design: doc/features/playlist-concurrency.md
 -- =====================================================
 
 -- Rank keys are base-62 fractions in (0, 1), written with the digits below in
@@ -155,7 +155,7 @@ DROP POLICY IF EXISTS "playlist_tracks_delete_policy" ON public.playlist_tracks;
 
 DROP FUNCTION IF EXISTS public.get_next_playlist_position(uuid);
 
-COMMENT ON COLUMN public.playlist_tracks.rank IS 'Sort key: base-62 fraction, compared byte by byte (doc/PLAYLIST_CONCURRENCY.md)';
+COMMENT ON COLUMN public.playlist_tracks.rank IS 'Sort key: base-62 fraction, compared byte by byte (doc/features/playlist-concurrency.md)';
 COMMENT ON COLUMN public.playlist_tracks.moved_at_version IS 'tracks_version at which this track was last added or moved';
 COMMENT ON COLUMN public.playlists.tracks_version IS 'Incremented by every add, remove and move of a track';
 COMMENT ON COLUMN public.playlists.ranks_rebalanced_at_version IS 'tracks_version of the last rebalance: older ranks are void';
@@ -281,7 +281,7 @@ DECLARE
 BEGIN
   v := public.playlist_lock(p_playlist_id) + 1;
 
-  -- Checks in the order of the contract (doc/PLAYLIST_CONCURRENCY.md, Move).
+  -- Checks in the order of the contract (doc/features/playlist-concurrency.md, Move).
   SELECT moved_at_version INTO track_moved_at
   FROM public.playlist_tracks WHERE playlist_id = p_playlist_id AND track_id = p_track_id;
   IF NOT FOUND THEN
