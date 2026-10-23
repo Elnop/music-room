@@ -73,12 +73,13 @@ export async function playItem(
 	return play(actorId, ownerId, 'play', state, device);
 }
 
-/** Copies the playlist's tracks as a new block right after the current item and plays the first. */
+/** Copies the playlist's tracks as a new block right after the current item and plays `startTrackId`, or the first. */
 export async function playPlaylist(
 	actorId: string,
 	ownerId: string,
 	playlistId: string,
-	deviceId?: string
+	deviceId?: string,
+	startTrackId?: string
 ): Promise<QueueState> {
 	const device = await playbackDevice(actorId, ownerId, deviceId);
 	// The actor chooses the playlist: its visibility is checked for them.
@@ -86,7 +87,7 @@ export async function playPlaylist(
 	if (!canViewPlaylist(playlist, actorId)) {
 		throw new AppError(403, 'Access denied', 'PLAYLIST_ACCESS_DENIED');
 	}
-	const state = await playPlaylistRpc(ownerId, playlistId);
+	const state = await playPlaylistRpc(ownerId, playlistId, startTrackId);
 	return play(actorId, ownerId, 'play-playlist', state, device);
 }
 

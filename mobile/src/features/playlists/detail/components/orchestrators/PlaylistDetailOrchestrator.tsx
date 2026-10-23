@@ -74,6 +74,8 @@ export function PlaylistDetailOrchestrator({ navigation, route }: PlaylistDetail
 				isRefreshing={screen.isRefreshing}
 				onRefresh={screen.refresh}
 				bottomPadding={screen.bottomPadding}
+				onPlayTrack={play.playFrom}
+				pendingTrackId={play.pendingTrackId}
 				header={
 					<PlaylistHeader
 						playlist={playlist}

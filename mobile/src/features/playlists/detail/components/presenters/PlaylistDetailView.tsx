@@ -18,6 +18,8 @@ interface PlaylistDetailViewProps {
 	isRefreshing: boolean;
 	onRefresh: () => void;
 	bottomPadding: number;
+	onPlayTrack: (track: { id: string; trackUri: string }) => void;
+	pendingTrackId: string | null;
 }
 
 export function PlaylistDetailView({
@@ -28,6 +30,8 @@ export function PlaylistDetailView({
 	isRefreshing,
 	onRefresh,
 	bottomPadding,
+	onPlayTrack,
+	pendingTrackId,
 }: PlaylistDetailViewProps) {
 	const { theme } = useTheme();
 	const insets = useSafeAreaInsets();
@@ -58,6 +62,8 @@ export function PlaylistDetailView({
 						onDragStart={canEdit ? drag : undefined}
 						isDragActive={isActive}
 						isCurrent={currentUri !== null && item.trackUri === currentUri}
+						onPress={() => onPlayTrack(item)}
+						isPending={pendingTrackId === item.id}
 					/>
 				)}
 				ListHeaderComponent={header}

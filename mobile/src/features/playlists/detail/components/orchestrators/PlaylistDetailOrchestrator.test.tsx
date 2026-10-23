@@ -82,11 +82,15 @@ jest.mock('@/shared/components/lists/SwipeableTrackItem', () => {
 		SwipeableTrackItem: (props: {
 			track: { title: string };
 			isCurrent: boolean;
+			isPending: boolean;
 			onDelete: () => void;
 			onAddToQueue: () => void;
+			onPress: () => void;
 		}) => (
 			<>
-				<MockText>{`${props.track.title}${props.isCurrent ? ' (current)' : ''}`}</MockText>
+				<MockText onPress={props.onPress}>
+					{`${props.track.title}${props.isCurrent ? ' (current)' : ''}${props.isPending ? ' (pending)' : ''}`}
+				</MockText>
 				<MockText onPress={props.onDelete}>{`Supprimer ${props.track.title}`}</MockText>
 				<MockText onPress={props.onAddToQueue}>{`File ${props.track.title}`}</MockText>
 			</>
@@ -249,6 +253,27 @@ describe('PlaylistDetailOrchestrator tracks (#307)', () => {
 		expect(mockList.dragEnabled).toBe(false);
 		fireEvent.press(screen.getByText('Supprimer Song'));
 		expect(showError).toHaveBeenCalledWith('Vous ne pouvez pas éditer cette playlist');
+	});
+
+	it('plays the playlist from the tapped track, with feedback on the row while it starts', async () => {
+		let settle: (outcome: string) => void = () => undefined;
+		testPlayback.playPlaylist.mockReturnValueOnce(new Promise(resolve => (settle = resolve)));
+		await renderScreen({ tracks });
+
+		fireEvent.press(screen.getByText('Other'));
+		fireEvent.press(screen.getByText('Other (pending)'));
+
+		expect(testPlayback.playPlaylist).toHaveBeenCalledTimes(1);
+		expect(testPlayback.playPlaylist).toHaveBeenCalledWith(ID, 'Other');
+		await act(async () => settle('played'));
+		expect(screen.getByText('Other')).toBeTruthy();
+	});
+
+	it('does not restart the track already playing when it is tapped', async () => {
+		testPlayback.playing = { playingUri: URI, state: 'playing' };
+		await renderScreen({ tracks });
+		fireEvent.press(screen.getByText('Song (current)'));
+		expect(testPlayback.playPlaylist).not.toHaveBeenCalled();
 	});
 
 	it('adds a row to the queue through the playback contract', async () => {

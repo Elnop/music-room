@@ -39,6 +39,7 @@ const ERRORS: Record<string, { status: number; message: string }> = {
 	QUEUE_START: { status: 409, message: 'No previous item in the queue' },
 	PLAYLIST_NOT_FOUND: { status: 404, message: 'Playlist not found' },
 	PLAYLIST_EMPTY: { status: 409, message: 'The playlist has no track to play' },
+	PLAYLIST_TRACK_NOT_FOUND: { status: 404, message: 'Track not found in the playlist' },
 	QUEUE_BLOCK_EMPTY: { status: 409, message: 'Nothing to transfer' },
 };
 
@@ -113,10 +114,18 @@ export function stepQueueRpc(userId: string, direction: QueueStepDirection): Pro
 	);
 }
 
-export function playPlaylistRpc(userId: string, playlistId: string): Promise<QueueState> {
+export function playPlaylistRpc(
+	userId: string,
+	playlistId: string,
+	startTrackId?: string
+): Promise<QueueState> {
 	return call(
 		'play-playlist',
-		supabaseAdmin.rpc('queue_play_playlist', { p_user: userId, p_playlist_id: playlistId })
+		supabaseAdmin.rpc('queue_play_playlist', {
+			p_user: userId,
+			p_playlist_id: playlistId,
+			...(startTrackId ? { p_start_track_id: startTrackId } : {}),
+		})
 	);
 }
 

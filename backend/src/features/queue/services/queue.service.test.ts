@@ -132,7 +132,18 @@ describe('queue.service', () => {
 		m.canViewPlaylist.mockReturnValue(true);
 
 		await expect(queueService.playPlaylist('me', 'owner', 'p', 'tv')).resolves.toBe(STATE);
-		expect(m.playPlaylistRpc).toHaveBeenCalledWith('owner', 'p');
+		expect(m.playPlaylistRpc).toHaveBeenCalledWith('owner', 'p', undefined);
 		expect(m.sendPlayCommand).toHaveBeenCalledWith('me', 'owner', 'tv', STATE);
+	});
+
+	it('playPlaylist starts on the chosen track', async () => {
+		m.resolvePlaybackDevice.mockResolvedValue(null);
+		m.getPlaylistForPermissionCheck.mockResolvedValue({ id: 'p' });
+		m.canViewPlaylist.mockReturnValue(true);
+
+		await expect(queueService.playPlaylist('me', 'me', 'p', undefined, 'row-3')).resolves.toBe(
+			STATE
+		);
+		expect(m.playPlaylistRpc).toHaveBeenCalledWith('me', 'p', 'row-3');
 	});
 });

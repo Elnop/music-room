@@ -112,7 +112,7 @@ describe('SwipeableTrackItem', () => {
 	it('highlights the track playing now with a speaker icon (#307)', async () => {
 		render(<SwipeableTrackItem track={track} onDelete={onDelete} isCurrent />);
 		await act(async () => {});
-		expect(screen.getByLabelText('Song, Artist').props.accessibilityState).toEqual({
+		expect(screen.getByLabelText('Song, Artist').props.accessibilityState).toMatchObject({
 			selected: true,
 		});
 		expect(screen.getByLabelText('En cours de lecture')).toBeTruthy();
@@ -122,5 +122,31 @@ describe('SwipeableTrackItem', () => {
 		render(<SwipeableTrackItem track={track} onDelete={onDelete} />);
 		await act(async () => {});
 		expect(screen.queryByLabelText('En cours de lecture')).toBeNull();
+	});
+
+	it('calls onPress on a tap and still opens the actions on a long press', async () => {
+		const onPress = jest.fn();
+		const onShowActions = jest.fn();
+		render(
+			<SwipeableTrackItem
+				track={track}
+				onDelete={onDelete}
+				onPress={onPress}
+				onShowActions={onShowActions}
+				onDragStart={jest.fn()}
+			/>
+		);
+		await act(async () => {});
+		fireEvent.press(screen.getByText('Song'));
+		fireEvent(screen.getByText('Song'), 'longPress');
+		expect(onPress).toHaveBeenCalledTimes(1);
+		expect(onShowActions).toHaveBeenCalledTimes(1);
+		expect(screen.getByLabelText('Réordonner')).toBeTruthy();
+	});
+
+	it('shows a spinner while the tap starts playing', async () => {
+		render(<SwipeableTrackItem track={track} onDelete={onDelete} onPress={jest.fn()} isPending />);
+		await act(async () => {});
+		expect(screen.getByLabelText('Lancement')).toBeTruthy();
 	});
 });

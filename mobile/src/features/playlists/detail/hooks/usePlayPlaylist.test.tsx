@@ -36,7 +36,7 @@ describe('PlayPlaylistButton (#277)', () => {
 	it('plays the playlist through the queue when nothing of it plays', async () => {
 		await renderButton();
 		await act(async () => fireEvent.press(screen.getByLabelText('Lire la playlist')));
-		expect(playPlaylist).toHaveBeenCalledWith('p1');
+		expect(playPlaylist).toHaveBeenCalledWith('p1', undefined);
 	});
 
 	it('shows Pause while an item of this playlist plays, and pauses', async () => {
