@@ -4,7 +4,7 @@ import { useSession } from '@/shared/services/authSession';
 import { useConnectStore } from '@/features/queue/stores/connectStore';
 import { useQueueStore } from '@/features/queue/stores/queueStore';
 import { controlErrorMessage, type ControlError } from '@/shared/utils/controlError';
-import { acquireListening, releaseListening } from '@/services/listeningRooms';
+import { acquireListening, releaseListening } from '@/shared/services/listeningRooms';
 import { showError } from '@/shared/utils/toast';
 import type { UserListeningStatus } from '@/types/listening.types';
 import type { ControlRevokedPayload } from '@/types/device.types';

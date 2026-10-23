@@ -16,7 +16,7 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 );
 jest.mock('@/features/auth/services/googleSignIn', () => ({ signInWithGoogle: jest.fn() }));
 jest.mock('@/features/auth/services/facebookSignIn', () => ({ signInWithFacebook: jest.fn() }));
-jest.mock('@/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
+jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('react-native-safe-area-context', () => ({
 	useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));

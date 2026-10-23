@@ -1,8 +1,8 @@
 import React from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/shared/theme/ThemeContext';
-import { musicControlApi } from '@/services/musicControlApi';
-import { deviceService } from '@/services/deviceService';
+import { getDevicePicker } from '@/shared/services/musicControlBridge';
+import { deviceService } from '@/shared/services/deviceService';
 import { useConnectStore } from '@/features/queue/stores/connectStore';
 import { transferTo } from '@/features/queue/services/transferPlayback';
 import { logger } from '@/shared/utils/logger';
@@ -41,7 +41,7 @@ export function useDevicePicker(visible: boolean, onClose: () => void) {
 	React.useEffect(() => {
 		if (!visible) return;
 		let cancelled = false;
-		Promise.all([musicControlApi.getDevicePicker(), deviceService.getDeviceInfo()])
+		Promise.all([getDevicePicker(), deviceService.getDeviceInfo()])
 			.then(([picker, info]) => {
 				if (!cancelled) setLoaded({ owners: picker.owners, phoneId: info.deviceId });
 			})

@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { usePlayerHeight } from '@/shared/services/playbackBridge';
-import { controlErrorMessage, useFriendListening } from '@/hooks/useMusicControl';
+import { useFriendListening } from '@/shared/services/musicControlBridge';
+import { controlErrorMessage } from '@/shared/utils/controlError';
 import { showError } from '@/shared/utils/toast';
 import { logger } from '@/shared/utils/logger';
 import {

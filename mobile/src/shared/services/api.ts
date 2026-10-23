@@ -1,6 +1,6 @@
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
-import { getAppVersion } from '@/services/deviceService';
+import { getAppVersion } from './deviceService';
 import { getBackendUrl } from './backendUrl';
 import { getAuthSession, getSession } from './authSession';
 

@@ -32,7 +32,7 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/services/deviceService', () => ({
+jest.mock('@/shared/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 	deviceService: { getDeviceInfo: jest.fn() },
 }));
@@ -197,7 +197,9 @@ describe('useRemoteTarget', () => {
 	});
 
 	it('shares the listening room with another holder', () => {
-		const { acquireListening, releaseListening } = jest.requireActual('@/services/listeningRooms');
+		const { acquireListening, releaseListening } = jest.requireActual(
+			'@/shared/services/listeningRooms'
+		);
 		acquireListening(mockSocket, 'friend'); // the friend profile
 		mockSocket.emit.mockClear();
 		renderHook(() => useRemoteTarget());

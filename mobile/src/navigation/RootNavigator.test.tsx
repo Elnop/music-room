@@ -13,7 +13,7 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/services/deviceService', () => ({
+jest.mock('@/shared/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 
@@ -32,7 +32,7 @@ jest.mock('@/shared/stores/socketStore', () => {
 	return { useSocketStore: (select: (s: typeof state) => unknown) => select(state) };
 });
 
-jest.mock('@/hooks/useMusicControl', () => ({
+jest.mock('@/features/music-control/hooks/useMusicControlEmitter', () => ({
 	useMusicControlEmitter: jest.fn(),
 }));
 

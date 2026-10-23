@@ -11,7 +11,7 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 jest.mock('@/features/player/context/PlayerContext', () => ({ usePlayerHeight: () => 64 }));
-jest.mock('@/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
+jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 
 const item = { id: 'q1', sourcePlaylistId: 'p1' } as QueueItem;
 const URI = 'https://soundcloud.com/a/song';

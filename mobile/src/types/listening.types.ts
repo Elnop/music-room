@@ -1,4 +1,4 @@
-import type { DeviceInfo } from '@/services/deviceService';
+import type { DeviceInfo } from '@/shared/services/deviceService';
 
 /**
  * Listening status of one device, as `listening:status` carries it

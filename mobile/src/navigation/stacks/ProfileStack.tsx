@@ -15,7 +15,7 @@ import { PrivacySettingsOrchestrator } from '@/features/profile/privacySettings/
 import { LinkedAccountsOrchestrator } from '@/features/profile/linkedAccounts/orchestrators/LinkedAccountsOrchestrator';
 import { MusicPreferencesOrchestrator } from '@/features/profile/musicPreferences/orchestrators/MusicPreferencesOrchestrator';
 import { SettingsOrchestrator } from '@/features/profile/settings/orchestrators/SettingsOrchestrator';
-import { MyDevicesScreen } from '@/screens/profile/MyDevicesScreen';
+import { MyDevicesOrchestrator } from '@/features/music-control/myDevices/orchestrators/MyDevicesOrchestrator';
 import type { ProfileStackParamList } from '@/features/profile/types';
 
 const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
@@ -61,7 +61,7 @@ export function ProfileNavigator() {
 			/>
 			<ProfileStack.Screen
 				name="MyDevices"
-				component={MyDevicesScreen}
+				component={MyDevicesOrchestrator}
 				options={{ title: 'Mes appareils' }}
 			/>
 			<ProfileStack.Screen

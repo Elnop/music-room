@@ -94,4 +94,3 @@ rules:
         # Known exceptions: remove each line once the file goes through a
         # storage module. This list only shrinks.
         - /mobile/src/shared/theme/ThemeContext.tsx
-        - /mobile/src/services/deviceService.ts

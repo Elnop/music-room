@@ -1,5 +1,5 @@
 import { queueApi } from '@/features/queue/services/queueApi';
-import { deviceService } from '@/services/deviceService';
+import { deviceService } from '@/shared/services/deviceService';
 import { getSession } from '@/shared/services/authSession';
 import { useConnectStore } from '@/features/queue/stores/connectStore';
 import { getPlayback } from '@/shared/services/playbackBridge';
