@@ -58,7 +58,9 @@ jobs:
 
   test:
     name: test
-    runs-on: ubuntu-slim # 1 vCPU container runner, no Docker; 15 min cap
+    # Full VM: the mobile suite took 450-570 s on ubuntu-slim's single vCPU,
+    # at the edge of the 10 min cap (#419); check runs it in about 90 s here.
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     strategy:
       fail-fast: false
