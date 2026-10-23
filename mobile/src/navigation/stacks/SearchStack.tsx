@@ -9,7 +9,7 @@ import React from 'react';
 import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '@/shared/theme/ThemeContext';
-import { SoundCloudSearchScreen } from '@/screens/search/SoundCloudSearchScreen';
+import { SearchOrchestrator } from '@/features/search/searchScreen/orchestrators/SearchOrchestrator';
 
 type SearchStackParamList = {
 	Search: undefined;
@@ -38,7 +38,7 @@ export function SearchNavigator() {
 		>
 			<SearchStack.Screen
 				name="Search"
-				component={SoundCloudSearchScreen}
+				component={SearchOrchestrator}
 				options={{ title: 'Recherche' }}
 			/>
 		</SearchStack.Navigator>

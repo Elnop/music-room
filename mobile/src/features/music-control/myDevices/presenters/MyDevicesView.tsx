@@ -76,7 +76,10 @@ export function MyDevicesView({
 		<View style={styles.root}>
 			<ScrollView
 				style={styles.scrollArea}
-				contentContainerStyle={[styles.scrollContent, { paddingBottom: playerHeight + theme.spacing.xl }]}
+				contentContainerStyle={[
+					styles.scrollContent,
+					{ paddingBottom: playerHeight + theme.spacing.xl },
+				]}
 				refreshControl={refreshControl}
 			>
 				<MyDevicesHeader />

@@ -8,8 +8,6 @@ import type {
 	UserDevice,
 	UserDeviceWithLicenses,
 } from '@/types/device.types';
-import type { ListeningStatus } from '@/types/listening.types';
-import type { ControlError } from '@/shared/utils/controlError';
 
 export type {
 	ControllableDevicesResponse,

@@ -20,8 +20,6 @@
 		"**/src/navigation/stacks/PlaylistsStack.tsx",
 		"**/src/navigation/stacks/ProfileStack.tsx",
 		"**/src/navigation/stacks/SearchStack.tsx",
-		"**/src/screens/search/SoundCloudSearchScreen.tsx",
-		"**/src/screens/search/components/SoundCloudTrackItem.tsx",
 		"**/src/types/assets.d.ts"
 	]
 }
