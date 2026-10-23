@@ -19,7 +19,7 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 );
 jest.mock('@/features/auth/services/googleSignIn', () => ({ signInWithGoogle: jest.fn() }));
 jest.mock('@/features/auth/services/facebookSignIn', () => ({ signInWithFacebook: jest.fn() }));
-jest.mock('@/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
+jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
 jest.mock('@/shared/utils/toast', () => ({ showError: jest.fn(), showWarning: jest.fn() }));
 let mockFocused = true;

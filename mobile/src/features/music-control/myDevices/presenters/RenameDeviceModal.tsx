@@ -1,17 +1,10 @@
 import React, { useState } from 'react';
-import {
-	View,
-	Text,
-	StyleSheet,
-	Modal,
-	Pressable,
-	KeyboardAvoidingView,
-	Platform,
-} from 'react-native';
+import { View, Text, StyleSheet, Modal, KeyboardAvoidingView, Platform } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { Input } from '@/shared/components/ui/Input';
 import { Button } from '@/shared/components/ui/Button';
+import { Pressable } from '@/shared/components/ui/Pressable';
 
 /** Same bounds as the backend (PATCH /api/music-control/devices/:deviceId). */
 const DEVICE_NAME_MAX_LENGTH = 40;
@@ -124,7 +117,7 @@ const createStyles = (theme: Theme) =>
 			flex: 1,
 			justifyContent: 'center',
 			padding: theme.spacing.lg,
-			backgroundColor: 'rgba(0, 0, 0, 0.5)',
+			backgroundColor: theme.colors.backdrop,
 		},
 		dialog: {
 			backgroundColor: theme.colors.background,

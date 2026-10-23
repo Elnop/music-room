@@ -1,11 +1,9 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
-
-const DEVICE_ID_KEY = '@zumik_device_id';
+import { deviceStorage } from './deviceStorage';
 
 /**
  * App version sent to the backend (HTTP `X-App-Version` header and the
@@ -13,9 +11,9 @@ const DEVICE_ID_KEY = '@zumik_device_id';
  */
 export function getAppVersion(): string {
 	return (
-		Constants.expoConfig?.version ||
-		Constants.manifest?.version ||
-		Constants.manifest2?.extra?.expoClient?.version ||
+		Constants?.expoConfig?.version ||
+		Constants?.manifest?.version ||
+		Constants?.manifest2?.extra?.expoClient?.version ||
 		'1.0.0'
 	);
 }
@@ -34,7 +32,7 @@ export interface DeviceInfo {
  * Device Service
  * Provides unique device identification for multi-device support
  *
- * The deviceId is persisted in AsyncStorage to remain consistent
+ * The deviceId is persisted in deviceStorage to remain consistent
  * across app restarts. Each physical device gets a unique ID.
  */
 export const deviceService = {
@@ -43,10 +41,10 @@ export const deviceService = {
 	 * Creates a new ID if one doesn't exist
 	 */
 	async getDeviceInfo(): Promise<DeviceInfo> {
-		let deviceId = await AsyncStorage.getItem(DEVICE_ID_KEY);
+		let deviceId = await deviceStorage.getDeviceId();
 		if (!deviceId) {
 			deviceId = uuidv4();
-			await AsyncStorage.setItem(DEVICE_ID_KEY, deviceId);
+			await deviceStorage.setDeviceId(deviceId);
 		}
 
 		const deviceName =
@@ -65,6 +63,6 @@ export const deviceService = {
 	 * Clear the device ID (useful for testing or resetting)
 	 */
 	async clearDeviceId(): Promise<void> {
-		await AsyncStorage.removeItem(DEVICE_ID_KEY);
+		await deviceStorage.clearDeviceId();
 	},
 };

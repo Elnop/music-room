@@ -91,7 +91,7 @@ registerAuthSession({
 	refreshAccessToken: () => mockAuthState.refreshAccessToken(),
 });
 
-jest.mock('@/services/deviceService', () => ({
+jest.mock('@/shared/services/deviceService', () => ({
 	deviceService: { getDeviceInfo: jest.fn(() => Promise.resolve(mockDevice)) },
 	getAppVersion: () => '1.2.3',
 }));

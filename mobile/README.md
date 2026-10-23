@@ -180,11 +180,16 @@ mobile/src/
 │   │   ├── services/       # transferPlayback
 │   │   ├── stores/         # queueStore, connectStore
 │   │   └── types.ts
-│   └── friends/            # Liste d'amis, recherche d'utilisateurs, profil ami et permissions (#382)
-│       ├── friendsList/    # components/{orchestrators,presenters} + hooks/
-│       ├── userProfile/    # components/{orchestrators,presenters} + hooks/
-│       ├── hooks/          # useFriendsQueries, useFriendsMutations
-│       ├── services/       # friendsApi
+│   ├── friends/            # Liste d'amis, recherche d'utilisateurs, profil ami et permissions (#382)
+│   │   ├── friendsList/    # components/{orchestrators,presenters} + hooks/
+│   │   ├── userProfile/    # components/{orchestrators,presenters} + hooks/
+│   │   ├── hooks/          # useFriendsQueries, useFriendsMutations
+│   │   ├── services/       # friendsApi
+│   │   └── types.ts
+│   └── music-control/      # Contrôle délégué, gestion des appareils, permissions d'écoute (#384)
+│       ├── myDevices/      # components/{orchestrators,presenters} + hooks/ + utils/
+│       ├── hooks/          # useMusicControl, useFriendListening, useControllableDevices...
+│       ├── services/       # musicControlApi
 │       └── types.ts
 │
 │   Dossiers historiques, vidés par les stories de migration :
@@ -206,7 +211,7 @@ mobile/src/
   - Playlists → Playlists, PlaylistDetail, CreatePlaylist, SearchTracks, PlaylistSharing (les orchestrators de `features/playlists/<sujet>/`)
   - Search → Search
   - Friends → Friends, UserProfile, PlaylistDetail, SearchTracks
-  - Profile → Profile, EditProfile, PrivacySettings, MusicPreferences, LinkedAccounts, Settings (les orchestrators de `features/profile/<sujet>/`)
+  - Profile → Profile, EditProfile, PrivacySettings, MusicPreferences, LinkedAccounts, MyDevices, Settings (les orchestrators de `features/profile/<sujet>/` et `features/music-control/myDevices/orchestrators`)
 
 ## État, temps réel et lecture
 

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { io, Socket } from 'socket.io-client';
-import { deviceService, getAppVersion } from '@/services/deviceService';
+import { deviceService, getAppVersion } from '@/shared/services/deviceService';
 import { getBackendUrl, onBackendUrlChange } from '@/shared/services/backendUrl';
 import { getAuthSession, getSession, onSessionEnd } from '@/shared/services/authSession';
 import { logger } from '@/shared/utils/logger';

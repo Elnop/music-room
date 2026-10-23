@@ -2,26 +2,27 @@ import React from 'react';
 import { ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { act, render, screen, fireEvent, waitFor } from '@testing-library/react-native';
-import { useAuthStore } from '@/features/auth/stores/authStore';
+import { createStore, type StoreApi } from 'zustand';
+import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
 import { resetBackendUrl } from '@/shared/services/backendUrl';
-import { musicControlApi } from '@/services/musicControlApi';
-import { friendsApi } from '@/features/friends/services/friendsApi';
-import type { FriendProfile } from '@/features/friends/types';
+import { musicControlApi } from '@/features/music-control/services/musicControlApi';
+import * as friendsBridge from '@/shared/services/friendsBridge';
+import type { FriendUserSummary } from '@/shared/services/friendsBridge';
 import { showError, showSuccess } from '@/shared/utils/toast';
-import type { UserDeviceWithLicenses } from '@/types/device.types';
-import { MyDevicesScreen } from './MyDevicesScreen';
+import type { UserDeviceWithLicenses } from '@/features/music-control/types';
+import { MyDevicesOrchestrator } from './orchestrators/MyDevicesOrchestrator';
 import { logger } from '@/shared/utils/logger';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/features/player/context/PlayerContext', () => ({
+jest.mock('@/shared/services/playbackBridge', () => ({
 	usePlayerHeight: () => 0,
 }));
 
 const mockGetDeviceInfo = jest.fn();
-jest.mock('@/services/deviceService', () => ({
+jest.mock('@/shared/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 	deviceService: { getDeviceInfo: () => mockGetDeviceInfo() },
 }));
@@ -60,14 +61,14 @@ const ok = (data: object) => jsonResponse(200, { success: true, data });
 const fail = (status: number, code: string, message: string) =>
 	jsonResponse(status, { success: false, error: { code, message } });
 
-const alice: FriendProfile = { id: 'user-a', username: 'alice' };
-const bob: FriendProfile = { id: 'user-b', username: 'bob', displayName: 'Bob' };
-const carol: FriendProfile = { id: 'user-c', username: 'carol' };
+const alice: FriendUserSummary = { id: 'user-a', username: 'alice' };
+const bob: FriendUserSummary = { id: 'user-b', username: 'bob', displayName: 'Bob' };
+const carol: FriendUserSummary = { id: 'user-c', username: 'carol' };
 
 function device(
 	deviceId: string,
 	deviceName: string,
-	licensed: FriendProfile[] = []
+	licensed: FriendUserSummary[] = []
 ): UserDeviceWithLicenses {
 	return {
 		deviceId,
@@ -106,23 +107,22 @@ function requests(): {
 
 const toggle = (label: string) => screen.getByLabelText(label);
 
-// Generous timeout: the first render transforms lazily-required modules on a cold cache (CI).
 const FIRST_RENDER = { timeout: 15_000 };
-// Above FIRST_RENDER: the whole test must outlive a slow first render.
 jest.setTimeout(20_000);
 
 let getPermissions: jest.SpyInstance;
 let getFriends: jest.SpyInstance;
+let sessionStore: StoreApi<SessionView>;
 
 async function renderLoaded(
 	devices: UserDeviceWithLicenses[],
-	friends: FriendProfile[],
+	friends: FriendUserSummary[],
 	allDevicesIds: string[] = []
 ): Promise<void> {
 	fetchMock.mockResolvedValueOnce(ok({ devices }));
 	getFriends.mockResolvedValue(friends);
 	getPermissions.mockResolvedValue(allDevicesIds);
-	render(<MyDevicesScreen />);
+	render(<MyDevicesOrchestrator />);
 	await screen.findByText(
 		'Choisissez quels amis peuvent contrôler la musique de chaque appareil',
 		{},
@@ -131,7 +131,6 @@ async function renderLoaded(
 	await waitFor(() => expect(screen.queryByTestId('skeleton-list')).toBeNull(), FIRST_RENDER);
 }
 
-/** Pulls the list down, as the user would to refresh it. */
 async function pullToRefresh(): Promise<void> {
 	const { refreshControl } = screen.UNSAFE_getByType(ScrollView).props;
 	await act(async () => {
@@ -147,18 +146,21 @@ beforeEach(async () => {
 	mockGetDeviceInfo.mockReset();
 	mockGetDeviceInfo.mockResolvedValue({ deviceId: 'device-1' });
 	getPermissions = jest.spyOn(musicControlApi, 'getMyPermissions');
-	getFriends = jest.spyOn(friendsApi, 'getFriends');
+	getFriends = jest.spyOn(friendsBridge, 'getFriends');
 	(showError as jest.Mock).mockReset();
 	(showSuccess as jest.Mock).mockReset();
 	await AsyncStorage.clear();
 	await resetBackendUrl();
-	useAuthStore.setState({
+
+	sessionStore = createStore<SessionView>(() => ({
+		user: null,
 		accessToken: 'access',
-		refreshToken: 'refresh',
-		tokenExpiresAt: Date.now() + 3600_000,
 		isAuthenticated: true,
-		isRefreshing: false,
-		isLoading: false,
+	}));
+	registerAuthSession({
+		store: sessionStore,
+		isTokenExpiringSoon: () => false,
+		refreshAccessToken: async () => true,
 	});
 });
 
@@ -190,7 +192,7 @@ describe('MyDevicesScreen', () => {
 		getFriends.mockResolvedValue([alice]);
 		getPermissions.mockResolvedValue([]);
 
-		render(<MyDevicesScreen />);
+		render(<MyDevicesOrchestrator />);
 
 		await screen.findByText('Impossible de charger vos appareils', {}, FIRST_RENDER);
 		expect(showError).toHaveBeenCalledWith(
@@ -311,7 +313,7 @@ describe('MyDevicesScreen', () => {
 		await renderLoaded([phone, tablet], [alice]);
 
 		act(() => {
-			useAuthStore.setState({ accessToken: 'refreshed' });
+			sessionStore.setState({ accessToken: 'refreshed' });
 		});
 
 		expect(screen.getByTestId('device-device-1')).toBeTruthy();
@@ -333,7 +335,7 @@ describe('MyDevicesScreen', () => {
 		getFriends.mockResolvedValue([alice]);
 		getPermissions.mockResolvedValue([]);
 
-		render(<MyDevicesScreen />);
+		render(<MyDevicesOrchestrator />);
 
 		expect(await screen.findByLabelText('Chargement', {}, FIRST_RENDER)).toBeTruthy();
 		expect(screen.queryByTestId('device-device-1')).toBeNull();
@@ -365,6 +367,7 @@ describe('MyDevicesScreen', () => {
 		expect(screen.queryByText('Impossible de charger vos appareils')).toBeNull();
 		expect(screen.UNSAFE_getByType(ScrollView).props.refreshControl.props.refreshing).toBe(false);
 	});
+
 	describe('rename (#352)', () => {
 		const renamed = { ...tablet, deviceName: 'Salon' };
 

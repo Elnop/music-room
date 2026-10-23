@@ -17,7 +17,7 @@ jest.mock('react-native-gesture-handler', () => ({
 jest.mock('react-native-safe-area-context', () => ({
 	SafeAreaProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
-jest.mock('@/services/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
+jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
 
 function Probe({ onClient }: { onClient: (client: unknown) => void }) {
 	onClient(useQueryClient());

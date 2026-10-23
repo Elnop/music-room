@@ -1,7 +1,6 @@
 import { act, renderHook } from '@testing-library/react-native';
 import { controlErrorMessage, useFriendListening, useMusicControlEmitter } from './useMusicControl';
-import { setPositionReader } from '@/features/player/stores/playerStore';
-import { musicControlApi } from '@/services/musicControlApi';
+import { musicControlApi } from '@/features/music-control/services/musicControlApi';
 import { logger } from '@/shared/utils/logger';
 
 const mockSocket = {
@@ -12,53 +11,51 @@ const mockSocket = {
 };
 
 const mockSocketState = { socket: mockSocket, isConnected: true };
-const mockAuthState = { user: { id: 'user-1' } };
+const mockAuthState = { user: { id: 'user-1' }, accessToken: 'token', isAuthenticated: true };
 const mockPlayerState = {
 	currentTrack: null,
 	isPlaying: true,
 	seekCount: 0,
-	pause: jest.fn(),
-	resume: jest.fn(),
-	playTrack: jest.fn(),
 };
+const mockPause = jest.fn();
+const mockResume = jest.fn();
+const mockPlayTrack = jest.fn();
 const mockSetCurrentItem = jest.fn();
 const mockSetLocal = jest.fn();
+
+let mockReader: (() => number) | null = null;
+const setPositionReader = (r: (() => number) | null) => {
+	mockReader = r;
+};
 
 jest.mock('@/shared/stores/socketStore', () => ({
 	useSocketStore: (selector: (state: typeof mockSocketState) => unknown) =>
 		selector(mockSocketState),
 }));
 
-jest.mock('@/features/auth/stores/authStore', () => ({
-	useAuthStore: Object.assign(
-		(selector: (state: typeof mockAuthState) => unknown) => selector(mockAuthState),
-		{ getState: () => mockAuthState }
-	),
+jest.mock('@/shared/services/authSession', () => ({
+	useSession: (selector: (state: typeof mockAuthState) => unknown) => selector(mockAuthState),
+	getSession: () => mockAuthState,
 }));
 
-jest.mock('@/features/queue/stores/queueStore', () => ({
-	useQueueStore: { getState: () => ({ setCurrentItem: mockSetCurrentItem }) },
+jest.mock('@/shared/services/playbackBridge', () => ({
+	usePlaybackEmitterState: () => mockPlayerState,
+	readPlaybackPositionMs: () => (mockReader ? mockReader() : null),
+	getPlayback: () => ({
+		pause: mockPause,
+		resume: mockResume,
+		playTrack: mockPlayTrack,
+		setCurrentQueueItem: mockSetCurrentItem,
+	}),
 }));
 
-jest.mock('@/features/queue/stores/connectStore', () => ({
-	useConnectStore: { getState: () => ({ setLocal: mockSetLocal }) },
+jest.mock('@/shared/services/connectBridge', () => ({
+	getConnectBridge: () => ({
+		setLocal: mockSetLocal,
+	}),
 }));
 
-jest.mock('@/features/player/stores/playerStore', () => {
-	let reader: (() => number) | null = null;
-	return {
-		usePlayerStore: Object.assign(
-			(selector: (state: typeof mockPlayerState) => unknown) => selector(mockPlayerState),
-			{ getState: () => mockPlayerState }
-		),
-		setPositionReader: (r: (() => number) | null) => {
-			reader = r;
-		},
-		readPositionMs: () => (reader ? reader() : null),
-	};
-});
-
-jest.mock('@/services/deviceService', () => ({
+jest.mock('@/shared/services/deviceService', () => ({
 	deviceService: {
 		getDeviceInfo: jest.fn(() =>
 			Promise.resolve({
@@ -71,7 +68,7 @@ jest.mock('@/services/deviceService', () => ({
 	},
 }));
 
-jest.mock('@/services/musicControlApi', () => ({
+jest.mock('../services/musicControlApi', () => ({
 	musicControlApi: { getControllableDevices: jest.fn() },
 }));
 
@@ -190,7 +187,6 @@ describe('useMusicControlEmitter control:command', () => {
 		durationMs: 200_000,
 	};
 
-	/** Render the emitter and return its control:command handler. */
 	const commandHandler = async () => {
 		const rendered = renderHook(() => useMusicControlEmitter());
 		await act(async () => {
@@ -212,7 +208,7 @@ describe('useMusicControlEmitter control:command', () => {
 		};
 		handle({ action: 'play-item', fromUserId: 'friend', item, positionMs: 42_000, version: 7 });
 
-		expect(mockPlayerState.playTrack).toHaveBeenCalledWith(
+		expect(mockPlayTrack).toHaveBeenCalledWith(
 			expect.objectContaining({ title: 'Song', permalink_url: queueTrack.trackUri }),
 			'item-1',
 			42_000
@@ -226,9 +222,9 @@ describe('useMusicControlEmitter control:command', () => {
 		const { handle, unmount } = await commandHandler();
 		handle({ action: 'play-track', fromUserId: 'friend', track: queueTrack, positionMs: 5000 });
 
-		expect(mockPlayerState.playTrack).toHaveBeenCalledWith(
+		expect(mockPlayTrack).toHaveBeenCalledWith(
 			expect.objectContaining({ title: 'Song' }),
-			null,
+			undefined,
 			5000
 		);
 		expect(mockSetCurrentItem).not.toHaveBeenCalled();
@@ -240,8 +236,8 @@ describe('useMusicControlEmitter control:command', () => {
 		const { handle, unmount } = await commandHandler();
 		handle({ action: 'pause', fromUserId: 'friend' });
 		handle({ action: 'play', fromUserId: 'friend' });
-		expect(mockPlayerState.pause).toHaveBeenCalled();
-		expect(mockPlayerState.resume).toHaveBeenCalled();
+		expect(mockPause).toHaveBeenCalled();
+		expect(mockResume).toHaveBeenCalled();
 		expect(mockSetLocal).not.toHaveBeenCalled();
 		unmount();
 	});
@@ -263,6 +259,7 @@ const status = (deviceId: string) => ({
 	device: { deviceId, deviceName: deviceId, platform: 'android', model: 'Pixel' },
 	track: { id: 1, title: 'Song', artist: 'Artist', artworkUrl: null },
 	isPlaying: true,
+	positionMs: 0,
 	updatedAt: '2026-10-09T00:00:00Z',
 });
 
@@ -271,7 +268,6 @@ const controllable = (ids: string[], allDevices = false) => ({
 	devices: ids.map(device),
 });
 
-/** Last handler registered on the socket for an event */
 const handler = (event: string) => {
 	const calls = mockSocket.on.mock.calls.filter(call => call[0] === event);
 	return calls[calls.length - 1]?.[1] as (data: unknown) => void;
@@ -279,7 +275,6 @@ const handler = (event: string) => {
 
 const emitted = (event: string) => mockSocket.emit.mock.calls.filter(call => call[0] === event);
 
-/** Renders the hook, lets the list load and the subscribe timer fire */
 async function renderFriend() {
 	const hook = renderHook(() => useFriendListening(FRIEND));
 	await act(async () => {

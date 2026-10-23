@@ -1,7 +1,7 @@
 import { friendsApi } from '@/features/friends/services/friendsApi';
 import { profileApi } from '@/features/profile/services/profileApi';
 import { privacyApi } from '@/features/profile/services/privacyApi';
-import { musicControlApi } from './musicControlApi';
+import { musicControlApi } from '@/features/music-control/services/musicControlApi';
 import { resetBackendUrl } from '@/shared/services/backendUrl';
 import { createStore } from 'zustand';
 import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
@@ -13,12 +13,8 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('./deviceService', () => ({
+jest.mock('@/shared/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
-}));
-
-jest.mock('@/features/auth/stores/authStore', () => ({
-	useAuthStore: { getState: () => ({ accessToken: 'store-token' }) },
 }));
 
 const fetchMock = jest.fn();
@@ -60,9 +56,9 @@ it.each([
 	],
 	[
 		'musicControlApi',
-		() => musicControlApi.getMyPermissions(),
+		() => musicControlApi.getMyPermissions('caller-token'),
 		{ allowedUserIds: [] },
-		'store-token',
+		'caller-token',
 	],
 ])('%s sends the client headers and the token', async (_name, call, data, token) => {
 	fetchMock.mockResolvedValue(jsonResponse({ success: true, data }));

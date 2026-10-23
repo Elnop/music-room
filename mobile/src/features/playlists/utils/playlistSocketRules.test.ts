@@ -7,7 +7,7 @@ import { PLAYLIST_SOCKET_RULES } from './playlistSocketRules';
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
-jest.mock('@/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
+jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 
 const client = createQueryClient();
 const detail = queryKeys.playlists.detail('p1');

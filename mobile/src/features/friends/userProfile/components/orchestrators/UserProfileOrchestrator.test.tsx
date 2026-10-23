@@ -12,7 +12,7 @@ const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
-jest.mock('@/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
+jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
 
 jest.mock('@/shared/theme/ThemeContext', () => {
@@ -26,8 +26,7 @@ jest.mock('@/shared/utils/toast', () => ({
 	showInfo: jest.fn(),
 }));
 
-jest.mock('@/hooks/useMusicControl', () => ({
-	controlErrorMessage: jest.fn(),
+jest.mock('@/shared/services/musicControlBridge', () => ({
 	useFriendListening: () => ({
 		devices: [],
 		canControl: false,
@@ -36,6 +35,10 @@ jest.mock('@/hooks/useMusicControl', () => ({
 		isLoading: false,
 		controlError: null,
 	}),
+}));
+
+jest.mock('@/shared/utils/controlError', () => ({
+	controlErrorMessage: jest.fn(),
 }));
 
 const profile = {

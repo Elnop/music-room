@@ -7,7 +7,7 @@ import { useQueueStore } from '@/features/queue/stores/queueStore';
 import { queueApi } from '@/features/queue/services/queueApi';
 import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
 import { registerPlaybackBridge } from '@/shared/services/playbackBridge';
-import { musicControlApi } from '@/services/musicControlApi';
+import { getDevicePicker } from '@/shared/services/musicControlBridge';
 import { ApiError } from '@/shared/services/api';
 import { showError } from '@/shared/utils/toast';
 import type { DevicePickerResponse } from '@/types/device.types';
@@ -28,13 +28,13 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/services/deviceService', () => ({
+jest.mock('@/shared/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 	deviceService: { getDeviceInfo: jest.fn(async () => ({ deviceId: 'phone' })) },
 }));
 
-jest.mock('@/services/musicControlApi', () => ({
-	musicControlApi: { getDevicePicker: jest.fn() },
+jest.mock('@/shared/services/musicControlBridge', () => ({
+	getDevicePicker: jest.fn(),
 }));
 
 jest.mock('@/features/queue/services/queueApi', () => ({
@@ -47,7 +47,7 @@ jest.mock('@/shared/utils/toast', () => ({
 	showInfo: jest.fn(),
 }));
 
-const getDevicePicker = musicControlApi.getDevicePicker as jest.Mock;
+const mockGetDevicePicker = jest.mocked(getDevicePicker);
 const transfer = queueApi.transfer as jest.Mock;
 
 const device = (deviceId: string, deviceName: string, online = true) => ({
@@ -151,7 +151,7 @@ beforeEach(() => {
 	});
 	testPlayerState.currentTrack = soundCloudTrack;
 	testPlayerState.queueItemId = 'i1';
-	getDevicePicker.mockResolvedValue(picker);
+	mockGetDevicePicker.mockResolvedValue(picker);
 	transfer.mockResolvedValue({ ownerId: 'me', deviceId: 'pc', queue: null });
 });
 
@@ -226,17 +226,17 @@ describe('DevicePickerSheet', () => {
 		const view = render(<DevicePickerSheet visible onClose={onClose} />);
 		await screen.findByText('Mon PC');
 		view.rerender(<DevicePickerSheet visible={false} onClose={onClose} />);
-		getDevicePicker.mockReturnValueOnce(new Promise(() => undefined));
+		mockGetDevicePicker.mockReturnValueOnce(new Promise(() => undefined));
 		view.rerender(<DevicePickerSheet visible onClose={onClose} />);
 		expect(screen.getByTestId('picker-loading')).toBeTruthy();
 		expect(screen.queryByText('Mon PC')).toBeNull();
 	});
 
 	it('offers a retry when the list fails to load', async () => {
-		getDevicePicker.mockRejectedValueOnce(new Error('network'));
+		mockGetDevicePicker.mockRejectedValueOnce(new Error('network'));
 		render(<DevicePickerSheet visible onClose={onClose} />);
 		fireEvent.press(await screen.findByText('Réessayer'));
 		expect(await screen.findByText('Mon PC')).toBeTruthy();
-		expect(getDevicePicker).toHaveBeenCalledTimes(2);
+		expect(mockGetDevicePicker).toHaveBeenCalledTimes(2);
 	});
 });

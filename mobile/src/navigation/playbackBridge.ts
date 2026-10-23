@@ -2,6 +2,8 @@ import { registerPlaybackBridge } from '@/shared/services/playbackBridge';
 import { registerConnectBridge } from '@/shared/services/connectBridge';
 import { registerPlayerModals } from '@/shared/services/playerModalsBridge';
 import { registerTrackActionsSheet } from '@/shared/services/trackActionsBridge';
+import { registerFriendsBridge } from '@/shared/services/friendsBridge';
+import { friendsApi } from '@/features/friends/services/friendsApi';
 import { usePlayerHeight } from '@/features/player/context/PlayerContext';
 import { readPositionMs, usePlayerStore } from '@/features/player/stores/playerStore';
 import { useConnectStore } from '@/features/queue/stores/connectStore';
@@ -30,6 +32,12 @@ export function registerPlayback(): void {
 		},
 		usePlayerHeight,
 		useActiveQueue,
+		usePlaybackEmitterState: () => {
+			const currentTrack = usePlayerStore(state => state.currentTrack);
+			const isPlaying = usePlayerStore(state => state.isPlaying);
+			const seekCount = usePlayerStore(state => state.seekCount);
+			return { currentTrack, isPlaying, seekCount };
+		},
 		addToQueue: track => useQueueStore.getState().addItem(track),
 		playNext: track => useQueueStore.getState().playNext(track),
 		playPlaylist: playlistId => useQueueStore.getState().playPlaylist(playlistId),
@@ -50,6 +58,10 @@ export function registerPlayback(): void {
 				positionMs: readPositionMs() ?? 0,
 			};
 		},
+		readPositionMs,
+		setCurrentQueueItem: (userId, itemId, version) => {
+			useQueueStore.getState().setCurrentItem(userId, itemId, version);
+		},
 	});
 
 	registerConnectBridge({
@@ -68,4 +80,8 @@ export function registerPlayback(): void {
 	});
 
 	registerTrackActionsSheet(TrackActionsSheet);
+
+	registerFriendsBridge({
+		getFriends: token => friendsApi.getFriends(token),
+	});
 }

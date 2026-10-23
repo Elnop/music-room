@@ -5,11 +5,7 @@ import { Text, View } from 'react-native';
 import { registerPlayerModals } from '@/shared/services/playerModalsBridge';
 import { PlayerModal } from './PlayerModal';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
-import {
-	registerPlaybackBridge,
-	getPlayback,
-	type OwnerQueue,
-} from '@/shared/services/playbackBridge';
+import { registerPlaybackBridge, type OwnerQueue } from '@/shared/services/playbackBridge';
 import { registerConnectBridge, type ConnectSnapshot } from '@/shared/services/connectBridge';
 import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
 import { hashStringToNumber } from '@/shared/utils/trackToSoundCloud';
@@ -48,34 +44,32 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/services/deviceService', () => ({
+jest.mock('@/shared/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 	deviceService: { getDeviceInfo: jest.fn(async () => ({ deviceId: 'phone' })) },
 }));
 
-jest.mock('@/services/musicControlApi', () => ({
-	musicControlApi: {
-		getDevicePicker: jest.fn(async () => ({
-			owners: [
-				{
-					ownerId: 'me',
-					username: 'moi',
-					isSelf: true,
-					devices: [
-						{
-							deviceId: 'phone',
-							deviceName: 'Mon téléphone',
-							platform: 'android',
-							model: 'Pixel',
-							lastSeenAt: '2026-10-15T00:00:00Z',
-							access: 'all-devices',
-							online: true,
-						},
-					],
-				},
-			],
-		})),
-	},
+jest.mock('@/shared/services/musicControlBridge', () => ({
+	getDevicePicker: jest.fn(async () => ({
+		owners: [
+			{
+				ownerId: 'me',
+				username: 'moi',
+				isSelf: true,
+				devices: [
+					{
+						deviceId: 'phone',
+						deviceName: 'Mon téléphone',
+						platform: 'android',
+						model: 'Pixel',
+						lastSeenAt: '2026-10-15T00:00:00Z',
+						access: 'all-devices',
+						online: true,
+					},
+				],
+			},
+		],
+	})),
 }));
 
 jest.mock('@/features/player/context/PlayerContext', () => ({

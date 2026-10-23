@@ -1,19 +1,6 @@
 {
-  "src/components/music-control/RenameDeviceModal.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 1
-    },
-    "guardrails/ui-primitives": {
-      "count": 1
-    }
-  },
   "src/navigation/AppNavigator.tsx": {
     "guardrails/theme-tokens": {
-      "count": 1
-    }
-  },
-  "src/screens/profile/MyDevicesScreen.tsx": {
-    "guardrails/ui-primitives": {
       "count": 1
     }
   },
