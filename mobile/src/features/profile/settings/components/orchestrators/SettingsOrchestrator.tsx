@@ -3,7 +3,7 @@ import { useSettingsScreen } from '@/features/profile/settings/hooks/useSettings
 import { SettingsView } from '@/features/profile/settings/components/presenters/SettingsView';
 
 export function SettingsOrchestrator() {
-	const { theme, playerHeight } = useSettingsScreen();
+	const { theme, bottomPadding } = useSettingsScreen();
 
-	return <SettingsView theme={theme} playerHeight={playerHeight} />;
+	return <SettingsView theme={theme} bottomPadding={bottomPadding} />;
 }

@@ -5,7 +5,7 @@ import {
 	useUnlinkProvider,
 	type OAuthProvider,
 } from '@/shared/services/linkedAccountsBridge';
-import { usePlayerHeight } from '@/shared/services/playbackBridge';
+import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 import { showError, showSuccess } from '@/shared/utils/toast';
@@ -21,7 +21,7 @@ function isCancelled(error: unknown): boolean {
 
 export function useLinkedAccountsScreen() {
 	const { theme } = useTheme();
-	const playerHeight = usePlayerHeight();
+	const bottomPadding = useBottomPadding();
 	const providersQuery = useLinkedProviders();
 	const linkedProviders = providersQuery.data;
 	const linkProvider = useLinkProvider().mutateAsync;
@@ -74,7 +74,7 @@ export function useLinkedAccountsScreen() {
 
 	return {
 		theme,
-		playerHeight,
+		bottomPadding,
 		isLoading: providersQuery.isLoading,
 		linkedProviders,
 		pending,

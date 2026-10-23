@@ -17,7 +17,7 @@ interface PlaylistDetailViewProps {
 	gradient: readonly [string, string, ...string[]];
 	isRefreshing: boolean;
 	onRefresh: () => void;
-	playerHeight: number;
+	bottomPadding: number;
 }
 
 export function PlaylistDetailView({
@@ -27,7 +27,7 @@ export function PlaylistDetailView({
 	gradient,
 	isRefreshing,
 	onRefresh,
-	playerHeight,
+	bottomPadding,
 }: PlaylistDetailViewProps) {
 	const { theme } = useTheme();
 	const insets = useSafeAreaInsets();
@@ -62,7 +62,7 @@ export function PlaylistDetailView({
 				)}
 				ListHeaderComponent={header}
 				// The last track scrolls clear of the mini player.
-				contentContainerStyle={[styles.list, { paddingBottom: playerHeight + theme.spacing.md }]}
+				contentContainerStyle={[styles.list, { paddingBottom: bottomPadding }]}
 				ListEmptyComponent={
 					<EmptyState
 						icon="musical-notes-outline"

@@ -1,4 +1,4 @@
-import { usePlayerHeight } from '@/shared/services/playbackBridge';
+import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
 import { useCachedPlaylist } from '@/features/playlists/hooks/usePlaylistQueries';
 import { useRefetchOnFocus } from '@/features/playlists/hooks/useRefetchOnFocus';
 import type { UserSummary } from '@/features/playlists/types';
@@ -16,7 +16,7 @@ export interface PlaylistSharing {
 	userSearch: UserSearch;
 	addUser: (user: UserSummary) => void;
 	removeUser: (userId: string) => Promise<void>;
-	playerHeight: number;
+	bottomPadding: number;
 }
 
 export function usePlaylistSharing(id: string): PlaylistSharing {
@@ -45,6 +45,6 @@ export function usePlaylistSharing(id: string): PlaylistSharing {
 			members.add(user, mode.isPrivate, !mode.isEditRestricted);
 		},
 		removeUser: userId => members.remove(userId, mode.isPrivate),
-		playerHeight: usePlayerHeight(),
+		bottomPadding: useBottomPadding(),
 	};
 }

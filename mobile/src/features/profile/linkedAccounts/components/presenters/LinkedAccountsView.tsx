@@ -23,7 +23,7 @@ const METHODS: MethodRow[] = [
 
 interface LinkedAccountsViewProps {
 	theme: Theme;
-	playerHeight: number;
+	bottomPadding: number;
 	isLoading: boolean;
 	linkedProviders?: LinkedProvider[];
 	pending: OAuthProvider | null;
@@ -32,7 +32,7 @@ interface LinkedAccountsViewProps {
 }
 
 export function LinkedAccountsView({
-	playerHeight,
+	bottomPadding,
 	isLoading,
 	linkedProviders,
 	pending,
@@ -45,7 +45,7 @@ export function LinkedAccountsView({
 	return (
 		<ProfileScreenLayout
 			subtitle="Choisissez comment vous connecter à Zumik"
-			playerHeight={playerHeight}
+			bottomPadding={bottomPadding}
 			isLoading={isLoading}
 			errorMessage={!linkedProviders ? 'Impossible de charger les comptes liés' : null}
 		>

@@ -6,7 +6,7 @@ import { ProfileView } from '@/features/profile/profileScreen/components/present
 export function ProfileOrchestrator() {
 	const {
 		theme,
-		playerHeight,
+		bottomPadding,
 		user,
 		navigation,
 		stats,
@@ -35,7 +35,7 @@ export function ProfileOrchestrator() {
 	return (
 		<ProfileView
 			theme={theme}
-			playerHeight={playerHeight}
+			bottomPadding={bottomPadding}
 			user={user}
 			stats={stats}
 			genres={genres}

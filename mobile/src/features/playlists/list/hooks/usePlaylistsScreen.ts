@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSession } from '@/shared/services/authSession';
-import { usePlayerHeight } from '@/shared/services/playbackBridge';
+import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
 import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 import { logger } from '@/shared/utils/logger';
 import { showError } from '@/shared/utils/toast';
@@ -33,12 +33,12 @@ export interface PlaylistsScreen {
 	createPlaylist: () => void;
 	findFriends: () => void;
 	/** Space left under the list for the mini player. */
-	playerHeight: number;
+	bottomPadding: number;
 }
 
 export function usePlaylistsScreen(navigation: Navigation): PlaylistsScreen {
 	const userId = useSession(session => session.user?.id);
-	const playerHeight = usePlayerHeight();
+	const bottomPadding = useBottomPadding();
 	const mine = usePlaylists();
 	const friends = useFriendsPlaylists();
 	const publics = usePublicPlaylists();
@@ -95,6 +95,6 @@ export function usePlaylistsScreen(navigation: Navigation): PlaylistsScreen {
 		createPlaylist,
 		// The friends tab lives in the parent tab navigator.
 		findFriends: () => navigation.getParent()?.navigate('FriendsTab'),
-		playerHeight,
+		bottomPadding,
 	};
 }

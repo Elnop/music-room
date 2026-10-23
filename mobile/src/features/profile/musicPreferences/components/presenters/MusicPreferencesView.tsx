@@ -10,7 +10,7 @@ import { MAX_GENRES } from '@/types/user.types';
 
 interface MusicPreferencesViewProps {
 	theme: Theme;
-	playerHeight: number;
+	bottomPadding: number;
 	isLoading: boolean;
 	isSaving: boolean;
 	selectedGenres: MusicGenre[];
@@ -20,7 +20,7 @@ interface MusicPreferencesViewProps {
 }
 
 export function MusicPreferencesView({
-	playerHeight,
+	bottomPadding,
 	isLoading,
 	isSaving,
 	selectedGenres,
@@ -34,7 +34,7 @@ export function MusicPreferencesView({
 	return (
 		<ProfileScreenLayout
 			subtitle={`Quels genres aimez-vous ? Choisissez-en jusqu'à ${MAX_GENRES}.`}
-			playerHeight={playerHeight}
+			bottomPadding={bottomPadding}
 			isLoading={isLoading}
 		>
 			<View style={styles.selectorContainer}>

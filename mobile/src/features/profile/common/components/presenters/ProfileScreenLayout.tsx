@@ -6,7 +6,7 @@ import type { Theme } from '@/shared/theme/types';
 
 interface ProfileScreenLayoutProps {
 	subtitle?: string;
-	playerHeight: number;
+	bottomPadding: number;
 	isLoading?: boolean;
 	errorMessage?: string | null;
 	children?: React.ReactNode;
@@ -14,7 +14,7 @@ interface ProfileScreenLayoutProps {
 
 export function ProfileScreenLayout({
 	subtitle,
-	playerHeight,
+	bottomPadding,
 	isLoading,
 	errorMessage,
 	children,
@@ -40,7 +40,7 @@ export function ProfileScreenLayout({
 		<View style={styles.container}>
 			<ScrollView
 				style={styles.scrollView}
-				contentContainerStyle={[styles.content, { paddingBottom: playerHeight + theme.spacing.xl }]}
+				contentContainerStyle={[styles.content, { paddingBottom: bottomPadding }]}
 			>
 				{subtitle && (
 					<View style={styles.header}>

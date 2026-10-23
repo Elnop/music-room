@@ -23,6 +23,7 @@ import { useQueueSync } from '@/features/queue/hooks/useQueueSync';
 import { useRemoteTarget } from '@/features/queue/hooks/useRemoteTarget';
 import { useConnectionStatus } from '@/shared/hooks/useConnectionStatus';
 import { ConnectionBanner } from '@/shared/components/feedback/ConnectionBanner';
+import { TAB_BAR_HEIGHT } from '@/shared/constants/layout';
 
 // Playlists and Friends take nested params: zumik:// share links open their screens.
 export type AppTabsParamList = {
@@ -89,7 +90,11 @@ export function AppNavigator() {
 								const iconName = focused ? icons.active : icons.inactive;
 								return (
 									<View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
-										<Ionicons name={iconName} size={20} color={focused ? theme.colors.onColor : color} />
+										<Ionicons
+											name={iconName}
+											size={20}
+											color={focused ? theme.colors.onColor : color}
+										/>
 									</View>
 								);
 							},
@@ -140,7 +145,7 @@ const createStyles = (theme: Theme, bottomInset: number) =>
 			flex: 1,
 		},
 		tabBar: {
-			height: 70 + bottomInset,
+			height: TAB_BAR_HEIGHT + bottomInset,
 			paddingTop: 10,
 			paddingBottom: bottomInset + 10,
 			backgroundColor: theme.colors.background,

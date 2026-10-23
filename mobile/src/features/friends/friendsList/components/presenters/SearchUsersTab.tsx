@@ -17,7 +17,7 @@ interface SearchUsersTabProps {
 	onRefresh: () => void;
 	onRetry: () => void;
 	onSelectUser: (userId: string) => void;
-	playerHeight: number;
+	bottomPadding: number;
 }
 
 export function SearchUsersTab({
@@ -29,7 +29,7 @@ export function SearchUsersTab({
 	onRefresh,
 	onRetry,
 	onSelectUser,
-	playerHeight,
+	bottomPadding,
 }: SearchUsersTabProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createFriendsListStyles(theme), [theme]);
@@ -50,10 +50,7 @@ export function SearchUsersTab({
 			}
 			keyExtractor={item => item.id}
 			renderItem={({ item }) => <SearchResultItemRow user={item} onPress={onSelectUser} />}
-			contentContainerStyle={[
-				styles.listContent,
-				{ paddingBottom: playerHeight + theme.spacing.xl },
-			]}
+			contentContainerStyle={[styles.listContent, { paddingBottom: bottomPadding }]}
 			ListEmptyComponent={
 				searchFailed && searchQuery.trim() ? (
 					<EmptyState

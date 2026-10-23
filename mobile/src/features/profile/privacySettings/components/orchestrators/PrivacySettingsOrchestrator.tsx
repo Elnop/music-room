@@ -5,7 +5,7 @@ import { PrivacySettingsView } from '@/features/profile/privacySettings/componen
 export function PrivacySettingsOrchestrator() {
 	const {
 		theme,
-		playerHeight,
+		bottomPadding,
 		isLoading,
 		isSaving,
 		privacy,
@@ -17,7 +17,7 @@ export function PrivacySettingsOrchestrator() {
 	return (
 		<PrivacySettingsView
 			theme={theme}
-			playerHeight={playerHeight}
+			bottomPadding={bottomPadding}
 			isLoading={isLoading}
 			isSaving={isSaving}
 			privacy={privacy}

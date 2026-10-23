@@ -9,11 +9,11 @@ import { ToggleCard } from './ToggleCard';
 
 interface PlaylistFormViewProps {
 	form: PlaylistForm;
-	playerHeight: number;
+	bottomPadding: number;
 }
 
 /** Name and description; visibility and edit rights on creation only. */
-export function PlaylistFormView({ form, playerHeight }: PlaylistFormViewProps) {
+export function PlaylistFormView({ form, bottomPadding }: PlaylistFormViewProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
 
 	return (
@@ -23,10 +23,7 @@ export function PlaylistFormView({ form, playerHeight }: PlaylistFormViewProps) 
 				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 			>
 				<ScrollView
-					contentContainerStyle={[
-						styles.scroll,
-						{ paddingBottom: playerHeight + theme.spacing.xl },
-					]}
+					contentContainerStyle={[styles.scroll, { paddingBottom: bottomPadding }]}
 					keyboardShouldPersistTaps="handled"
 				>
 					<View style={styles.body}>

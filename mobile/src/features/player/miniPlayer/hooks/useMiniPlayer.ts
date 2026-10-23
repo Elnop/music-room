@@ -1,6 +1,8 @@
+import type { LayoutChangeEvent } from 'react-native';
 import { Gesture } from 'react-native-gesture-handler';
 import { runOnJS, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
+import { useMiniPlayerLayoutStore } from '@/features/player/stores/miniPlayerLayoutStore';
 import { useNowPlaying, type NowPlayingTrack } from '@/features/player/hooks/useNowPlaying';
 import { RESTART_THRESHOLD_S } from '@/shared/utils/queueNavigation';
 import { hapticTap } from '@/shared/utils/haptics';
@@ -23,11 +25,13 @@ export interface MiniPlayerData {
 	onNext: () => void;
 	infoStyle: ReturnType<typeof useAnimatedStyle>;
 	panGesture: ReturnType<typeof Gesture.Pan>;
+	onLayout: (event: LayoutChangeEvent) => void;
 }
 
 export function useMiniPlayer(): MiniPlayerData {
 	const toggleModal = usePlayerStore(state => state.toggleModal);
 	const setModalOpen = usePlayerStore(state => state.setModalOpen);
+	const setHeight = useMiniPlayerLayoutStore(state => state.setHeight);
 	const {
 		isRemote,
 		track,
@@ -118,5 +122,6 @@ export function useMiniPlayer(): MiniPlayerData {
 		onNext: handleNext,
 		infoStyle,
 		panGesture,
+		onLayout: event => setHeight(event.nativeEvent.layout.height),
 	};
 }

@@ -3,13 +3,13 @@ import { useLinkedAccountsScreen } from '@/features/profile/linkedAccounts/hooks
 import { LinkedAccountsView } from '@/features/profile/linkedAccounts/components/presenters/LinkedAccountsView';
 
 export function LinkedAccountsOrchestrator() {
-	const { theme, playerHeight, isLoading, linkedProviders, pending, handleLink, handleUnlink } =
+	const { theme, bottomPadding, isLoading, linkedProviders, pending, handleLink, handleUnlink } =
 		useLinkedAccountsScreen();
 
 	return (
 		<LinkedAccountsView
 			theme={theme}
-			playerHeight={playerHeight}
+			bottomPadding={bottomPadding}
 			isLoading={isLoading}
 			linkedProviders={linkedProviders}
 			pending={pending}

@@ -11,7 +11,7 @@ export function SearchOrchestrator() {
 		isError,
 		searchResults,
 		actionTrack,
-		playerHeight,
+		bottomPadding,
 		handleSearchChange,
 		handleRefresh,
 		handleRetry,
@@ -30,7 +30,7 @@ export function SearchOrchestrator() {
 			isError={isError}
 			searchResults={searchResults}
 			actionTrack={actionTrack}
-			playerHeight={playerHeight}
+			bottomPadding={bottomPadding}
 			onSearchChange={handleSearchChange}
 			onRefresh={handleRefresh}
 			onRetry={handleRetry}

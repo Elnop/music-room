@@ -9,7 +9,7 @@ import type { ProfilePrivacy, VisibilityLevel } from '@/types/user.types';
 
 interface PrivacySettingsViewProps {
 	theme: Theme;
-	playerHeight: number;
+	bottomPadding: number;
 	isLoading: boolean;
 	isSaving: boolean;
 	privacy: ProfilePrivacy | null;
@@ -19,7 +19,7 @@ interface PrivacySettingsViewProps {
 }
 
 export function PrivacySettingsView({
-	playerHeight,
+	bottomPadding,
 	isLoading,
 	isSaving,
 	privacy,
@@ -33,7 +33,7 @@ export function PrivacySettingsView({
 	return (
 		<ProfileScreenLayout
 			subtitle="Choisissez qui peut voir vos informations"
-			playerHeight={playerHeight}
+			bottomPadding={bottomPadding}
 			isLoading={isLoading}
 			errorMessage={!privacy ? 'Impossible de charger les paramètres' : null}
 		>

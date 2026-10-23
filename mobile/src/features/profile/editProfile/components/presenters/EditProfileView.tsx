@@ -11,7 +11,7 @@ import type { UserProfile } from '@/types/user.types';
 
 interface EditProfileViewProps {
 	theme: Theme;
-	playerHeight: number;
+	bottomPadding: number;
 	user: UserProfile | null;
 	error: string | null;
 	isUploading: boolean;
@@ -26,7 +26,7 @@ interface EditProfileViewProps {
 
 export function EditProfileView({
 	theme,
-	playerHeight,
+	bottomPadding,
 	user,
 	error,
 	isUploading,
@@ -49,10 +49,7 @@ export function EditProfileView({
 			>
 				<ScrollView
 					style={styles.scrollView}
-					contentContainerStyle={[
-						styles.contentContainer,
-						{ paddingBottom: playerHeight + theme.spacing.xl },
-					]}
+					contentContainerStyle={[styles.contentContainer, { paddingBottom: bottomPadding }]}
 					keyboardShouldPersistTaps="handled"
 				>
 					<Text style={styles.subtitle}>Mettez à jour vos informations</Text>

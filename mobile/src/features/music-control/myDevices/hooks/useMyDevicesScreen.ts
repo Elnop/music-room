@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigation, type NavigationProp } from '@react-navigation/native';
-import { usePlayerHeight } from '@/shared/services/playbackBridge';
+import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
 import { getSession } from '@/shared/services/authSession';
 import { musicControlApi } from '@/features/music-control/services/musicControlApi';
 import { getFriends, type FriendUserSummary } from '@/shared/services/friendsBridge';
@@ -19,7 +19,7 @@ const LOAD_ERROR = 'Impossible de charger vos appareils';
 
 export function useMyDevicesScreen() {
 	const navigation = useNavigation<NavigationProp<{ FriendsTab: undefined }>>();
-	const playerHeight = usePlayerHeight();
+	const bottomPadding = useBottomPadding();
 
 	const [isLoading, setIsLoading] = useState(true);
 	const [loadFailed, setLoadFailed] = useState(false);
@@ -123,7 +123,7 @@ export function useMyDevicesScreen() {
 		isLoading,
 		loadFailed,
 		isRefreshing,
-		playerHeight,
+		bottomPadding,
 		devices,
 		friends,
 		allDevicesIds,
