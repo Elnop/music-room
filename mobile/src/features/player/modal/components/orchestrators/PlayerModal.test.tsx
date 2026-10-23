@@ -145,6 +145,7 @@ let testConnectState: ConnectSnapshot = {
 };
 
 let mockNext = jest.fn(async () => 'played' as const);
+const mockPrevious = jest.fn(async () => 'played' as const);
 
 registerPlaybackBridge({
 	usePlaylistPlayback: () => ({ playingUri: null, state: null }),
@@ -154,7 +155,7 @@ registerPlaybackBridge({
 	playNext: jest.fn(async () => true),
 	playPlaylist: jest.fn(async () => 'ok'),
 	next: () => mockNext(),
-	previous: jest.fn(async () => 'played'),
+	previous: () => mockPrevious(),
 	playListTrack: jest.fn(async () => undefined),
 	playTrack: jest.fn(),
 	pause: jest.fn(),
@@ -601,5 +602,112 @@ describe('PlayerModal in remote mode', () => {
 		testConnectState.remoteStatus = status(1);
 		render(<PlayerModal />);
 		expect(screen.queryByTestId('seek-slider', { includeHiddenElements: true })).toBeNull();
+	});
+});
+
+describe('PlayerModal artwork swipe', () => {
+	const track: SoundCloudTrack = {
+		id: 8,
+		title: 'Middle',
+		description: null,
+		duration: 200_000,
+		genre: null,
+		artwork_url: null,
+		permalink_url: 'https://soundcloud.com/artist/middle',
+		user: { id: 1, username: 'x', avatar_url: null, permalink_url: '' },
+		playable: true,
+	};
+	const queueItem = (id: string) => ({
+		id,
+		track: {
+			trackUri: `https://soundcloud.com/artist/${id}`,
+			title: id,
+			artist: 'A',
+			album: null,
+			albumArt: `https://i1.sndcdn.com/${id}-large.jpg`,
+			durationMs: 200_000,
+		},
+		rank: id,
+		sourcePlaylistId: null,
+		blockId: null,
+		blockDetached: false,
+	});
+	const swipe = (translationX: number, velocityX = 0) =>
+		act(() =>
+			fireGestureHandler<PanGesture>(getByGestureTestId('player-artwork-pan'), [
+				{ state: State.BEGAN, translationX: 0, translationY: 0 },
+				{ state: State.ACTIVE, translationX: translationX / 2, translationY: 0 },
+				{ state: State.END, translationX, translationY: 0, velocityX },
+			])
+		);
+	const artworks = () =>
+		screen.getAllByTestId('artwork-image').map(image => image.props.source.uri);
+
+	beforeEach(() => {
+		jest.clearAllMocks();
+		testConnectState = { target: { kind: 'local' }, remoteStatus: null, controlPending: false };
+		testQueue = { currentItemId: 'b', version: 1, items: ['a', 'b', 'c'].map(queueItem) };
+		usePlayerStore.setState({ currentTrack: track, playbackState: 'playing', isModalOpen: true });
+		Object.assign(mockProgress, { currentTime: 30, duration: 200 });
+	});
+
+	afterAll(() => {
+		Object.assign(mockProgress, { currentTime: 0, duration: 0 });
+	});
+
+	it('shows the previous and next artworks on both sides', () => {
+		render(<PlayerModal />);
+		expect(artworks()).toEqual([
+			'https://i1.sndcdn.com/a-t500x500.jpg',
+			'https://i1.sndcdn.com/c-t500x500.jpg',
+		]);
+	});
+
+	it('goes to the next track on a left swipe past the threshold', () => {
+		render(<PlayerModal />);
+		swipe(-120);
+		expect(mockNext).toHaveBeenCalledTimes(1);
+		expect(mockPrevious).not.toHaveBeenCalled();
+	});
+
+	it('goes to the previous item on a right swipe, even 30 s into the track', () => {
+		render(<PlayerModal />);
+		swipe(120);
+		expect(mockPrevious).toHaveBeenCalledTimes(1);
+		expect(mockSeekTo).not.toHaveBeenCalled();
+	});
+
+	it('changes track on a quick flick', () => {
+		render(<PlayerModal />);
+		swipe(-30, -1200);
+		expect(mockNext).toHaveBeenCalledTimes(1);
+	});
+
+	it('stays on the track under the threshold', () => {
+		render(<PlayerModal />);
+		swipe(-40);
+		swipe(40);
+		expect(mockNext).not.toHaveBeenCalled();
+		expect(mockPrevious).not.toHaveBeenCalled();
+	});
+
+	it('stays on the track without a neighbour on that side', () => {
+		testQueue = { currentItemId: 'c', version: 1, items: ['b', 'c'].map(queueItem) };
+		render(<PlayerModal />);
+		swipe(-120);
+		expect(mockNext).not.toHaveBeenCalled();
+		expect(artworks()).toEqual(['https://i1.sndcdn.com/b-t500x500.jpg']);
+	});
+
+	// fireGestureHandler skips activation rules: check them on the gesture itself.
+	it('starts on a horizontal drag and gives way to the vertical dismiss', () => {
+		render(<PlayerModal />);
+		const { config } = getByGestureTestId('player-artwork-pan') as PanGesture;
+		expect(config).toMatchObject({
+			activeOffsetXStart: -15,
+			activeOffsetXEnd: 15,
+			failOffsetYStart: -10,
+			failOffsetYEnd: 10,
+		});
 	});
 });

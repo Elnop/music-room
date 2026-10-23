@@ -24,6 +24,11 @@ export const currentItem = (state: QueueItemsView): QueueItem | undefined =>
 export const nextItem = (state: QueueItemsView): QueueItem | undefined =>
 	state.items[currentIndex(state) + 1];
 
+export const previousItem = (state: QueueItemsView): QueueItem | undefined => {
+	const index = currentIndex(state);
+	return index > 0 ? state.items[index - 1] : undefined;
+};
+
 /** With nothing current, every item is upcoming. */
 export const selectHasNext = (state: QueueItemsView): boolean =>
 	currentIndex(state) < state.items.length - 1;
