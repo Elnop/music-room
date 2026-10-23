@@ -2,7 +2,7 @@ import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { DevicePickerSheet } from './DevicePickerSheet';
 import { useConnectStore } from '@/store/connectStore';
-import { usePlayerStore } from '@/store/playerStore';
+import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { useQueueStore } from '@/store/queueStore';
 import { useAuthStore } from '@/features/auth/stores/authStore';
 import { musicControlApi } from '@/services/musicControlApi';
@@ -12,7 +12,6 @@ import { showError } from '@/shared/utils/toast';
 import type { DevicePickerResponse } from '@/types/device.types';
 import type { UserProfile } from '@/types/user.types';
 import { logger } from '@/shared/utils/logger';
-
 
 jest.mock('@/shared/theme/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
@@ -40,7 +39,7 @@ jest.mock('@/services/queueApi', () => ({
 	queueApi: { getQueue: jest.fn(), transfer: jest.fn() },
 }));
 
-jest.mock('@/contexts/PlayerContext', () => ({
+jest.mock('@/features/player/context/PlayerContext', () => ({
 	usePlayer: () => ({ player: null, error: null }),
 }));
 

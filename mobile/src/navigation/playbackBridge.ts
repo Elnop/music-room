@@ -1,6 +1,6 @@
 import { registerPlaybackBridge } from '@/shared/services/playbackBridge';
-import { usePlayerHeight } from '@/contexts/PlayerContext';
-import { usePlayerStore } from '@/store/playerStore';
+import { usePlayerHeight } from '@/features/player/context/PlayerContext';
+import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { useActiveQueue, useQueueStore } from '@/store/queueStore';
 import { selectPlaysPlaylist } from '@/store/queueSelectors';
 

@@ -1,310 +1,136 @@
 [
-  {
-    "type": "cycle",
-    "from": "src/components/player/MediaSessionBridge.tsx",
-    "to": "src/contexts/PlayerContext.tsx",
-    "unresolvedTo": "@/contexts/PlayerContext",
-    "dependencyTypes": [
-      "aliased",
-      "aliased-tsconfig",
-      "aliased-tsconfig-paths",
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "no-circular"
-    },
-    "cycle": [
-      {
-        "name": "src/contexts/PlayerContext.tsx",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/components/player/MediaSessionBridge.tsx",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      }
-    ]
-  },
-  {
-    "type": "cycle",
-    "from": "src/components/player/MediaSessionBridge.tsx",
-    "to": "src/hooks/useNowPlaying.ts",
-    "unresolvedTo": "@/hooks/useNowPlaying",
-    "dependencyTypes": [
-      "aliased",
-      "aliased-tsconfig",
-      "aliased-tsconfig-paths",
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "no-circular"
-    },
-    "cycle": [
-      {
-        "name": "src/hooks/useNowPlaying.ts",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/hooks/usePlayerProgress.ts",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/contexts/PlayerContext.tsx",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/components/player/MediaSessionBridge.tsx",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      }
-    ]
-  },
-  {
-    "type": "cycle",
-    "from": "src/hooks/useNowPlaying.ts",
-    "to": "src/contexts/PlayerContext.tsx",
-    "unresolvedTo": "@/contexts/PlayerContext",
-    "dependencyTypes": [
-      "aliased",
-      "aliased-tsconfig",
-      "aliased-tsconfig-paths",
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "no-circular"
-    },
-    "cycle": [
-      {
-        "name": "src/contexts/PlayerContext.tsx",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/components/player/MediaSessionBridge.tsx",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/hooks/useNowPlaying.ts",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      }
-    ]
-  },
-  {
-    "type": "cycle",
-    "from": "src/navigation/AppNavigator.tsx",
-    "to": "src/navigation/stacks/ProfileStack.tsx",
-    "unresolvedTo": "@/navigation/stacks/ProfileStack",
-    "dependencyTypes": [
-      "aliased",
-      "aliased-tsconfig",
-      "aliased-tsconfig-paths",
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "no-circular"
-    },
-    "cycle": [
-      {
-        "name": "src/navigation/stacks/ProfileStack.tsx",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/screens/profile/MyDevicesScreen.tsx",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/navigation/AppNavigator.tsx",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "type-only",
-          "import"
-        ]
-      }
-    ]
-  },
-  {
-    "type": "cycle",
-    "from": "src/navigation/stacks/FriendsStack.tsx",
-    "to": "src/screens/friends/FriendsScreen.tsx",
-    "unresolvedTo": "@/screens/friends/FriendsScreen",
-    "dependencyTypes": [
-      "aliased",
-      "aliased-tsconfig",
-      "aliased-tsconfig-paths",
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "no-circular"
-    },
-    "cycle": [
-      {
-        "name": "src/screens/friends/FriendsScreen.tsx",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/navigation/stacks/FriendsStack.tsx",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "type-only",
-          "import"
-        ]
-      }
-    ]
-  },
-  {
-    "type": "cycle",
-    "from": "src/navigation/stacks/FriendsStack.tsx",
-    "to": "src/screens/friends/UserProfileScreen.tsx",
-    "unresolvedTo": "@/screens/friends/UserProfileScreen",
-    "dependencyTypes": [
-      "aliased",
-      "aliased-tsconfig",
-      "aliased-tsconfig-paths",
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "no-circular"
-    },
-    "cycle": [
-      {
-        "name": "src/screens/friends/UserProfileScreen.tsx",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/navigation/stacks/FriendsStack.tsx",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "type-only",
-          "import"
-        ]
-      }
-    ]
-  },
-  {
-    "type": "dependency",
-    "from": "src/shared/services/api.ts",
-    "to": "src/services/deviceService.ts",
-    "unresolvedTo": "@/services/deviceService",
-    "dependencyTypes": [
-      "aliased",
-      "aliased-tsconfig",
-      "aliased-tsconfig-paths",
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "shared-not-to-legacy"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/shared/stores/socketStore.ts",
-    "to": "src/services/deviceService.ts",
-    "unresolvedTo": "@/services/deviceService",
-    "dependencyTypes": [
-      "aliased",
-      "aliased-tsconfig",
-      "aliased-tsconfig-paths",
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "shared-not-to-legacy"
-    }
-  }
+	{
+		"type": "cycle",
+		"from": "src/navigation/AppNavigator.tsx",
+		"to": "src/navigation/stacks/ProfileStack.tsx",
+		"unresolvedTo": "@/navigation/stacks/ProfileStack",
+		"dependencyTypes": ["aliased", "aliased-tsconfig", "aliased-tsconfig-paths", "local", "import"],
+		"rule": {
+			"severity": "error",
+			"name": "no-circular"
+		},
+		"cycle": [
+			{
+				"name": "src/navigation/stacks/ProfileStack.tsx",
+				"dependencyTypes": [
+					"aliased",
+					"aliased-tsconfig",
+					"aliased-tsconfig-paths",
+					"local",
+					"import"
+				]
+			},
+			{
+				"name": "src/screens/profile/MyDevicesScreen.tsx",
+				"dependencyTypes": [
+					"aliased",
+					"aliased-tsconfig",
+					"aliased-tsconfig-paths",
+					"local",
+					"import"
+				]
+			},
+			{
+				"name": "src/navigation/AppNavigator.tsx",
+				"dependencyTypes": [
+					"aliased",
+					"aliased-tsconfig",
+					"aliased-tsconfig-paths",
+					"local",
+					"type-only",
+					"import"
+				]
+			}
+		]
+	},
+	{
+		"type": "cycle",
+		"from": "src/navigation/stacks/FriendsStack.tsx",
+		"to": "src/screens/friends/FriendsScreen.tsx",
+		"unresolvedTo": "@/screens/friends/FriendsScreen",
+		"dependencyTypes": ["aliased", "aliased-tsconfig", "aliased-tsconfig-paths", "local", "import"],
+		"rule": {
+			"severity": "error",
+			"name": "no-circular"
+		},
+		"cycle": [
+			{
+				"name": "src/screens/friends/FriendsScreen.tsx",
+				"dependencyTypes": [
+					"aliased",
+					"aliased-tsconfig",
+					"aliased-tsconfig-paths",
+					"local",
+					"import"
+				]
+			},
+			{
+				"name": "src/navigation/stacks/FriendsStack.tsx",
+				"dependencyTypes": [
+					"aliased",
+					"aliased-tsconfig",
+					"aliased-tsconfig-paths",
+					"local",
+					"type-only",
+					"import"
+				]
+			}
+		]
+	},
+	{
+		"type": "cycle",
+		"from": "src/navigation/stacks/FriendsStack.tsx",
+		"to": "src/screens/friends/UserProfileScreen.tsx",
+		"unresolvedTo": "@/screens/friends/UserProfileScreen",
+		"dependencyTypes": ["aliased", "aliased-tsconfig", "aliased-tsconfig-paths", "local", "import"],
+		"rule": {
+			"severity": "error",
+			"name": "no-circular"
+		},
+		"cycle": [
+			{
+				"name": "src/screens/friends/UserProfileScreen.tsx",
+				"dependencyTypes": [
+					"aliased",
+					"aliased-tsconfig",
+					"aliased-tsconfig-paths",
+					"local",
+					"import"
+				]
+			},
+			{
+				"name": "src/navigation/stacks/FriendsStack.tsx",
+				"dependencyTypes": [
+					"aliased",
+					"aliased-tsconfig",
+					"aliased-tsconfig-paths",
+					"local",
+					"type-only",
+					"import"
+				]
+			}
+		]
+	},
+	{
+		"type": "dependency",
+		"from": "src/shared/services/api.ts",
+		"to": "src/services/deviceService.ts",
+		"unresolvedTo": "@/services/deviceService",
+		"dependencyTypes": ["aliased", "aliased-tsconfig", "aliased-tsconfig-paths", "local", "import"],
+		"rule": {
+			"severity": "error",
+			"name": "shared-not-to-legacy"
+		}
+	},
+	{
+		"type": "dependency",
+		"from": "src/shared/stores/socketStore.ts",
+		"to": "src/services/deviceService.ts",
+		"unresolvedTo": "@/services/deviceService",
+		"dependencyTypes": ["aliased", "aliased-tsconfig", "aliased-tsconfig-paths", "local", "import"],
+		"rule": {
+			"severity": "error",
+			"name": "shared-not-to-legacy"
+		}
+	}
 ]

@@ -16,7 +16,7 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/contexts/PlayerContext', () => ({
+jest.mock('@/features/player/context/PlayerContext', () => ({
 	usePlayerHeight: () => 0,
 }));
 

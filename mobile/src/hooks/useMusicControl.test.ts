@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react-native';
 import { controlErrorMessage, useFriendListening, useMusicControlEmitter } from './useMusicControl';
-import { setPositionReader } from '@/store/playerStore';
+import { setPositionReader } from '@/features/player/stores/playerStore';
 import { musicControlApi } from '@/services/musicControlApi';
 import { logger } from '@/shared/utils/logger';
 
@@ -44,7 +44,7 @@ jest.mock('@/store/connectStore', () => ({
 	useConnectStore: { getState: () => ({ setLocal: mockSetLocal }) },
 }));
 
-jest.mock('@/store/playerStore', () => {
+jest.mock('@/features/player/stores/playerStore', () => {
 	let reader: (() => number) | null = null;
 	return {
 		usePlayerStore: Object.assign(

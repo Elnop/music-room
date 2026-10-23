@@ -12,7 +12,7 @@ jest.mock('@/shared/theme/ThemeContext', () => {
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-jest.mock('@/contexts/PlayerContext', () => ({
+jest.mock('@/features/player/context/PlayerContext', () => ({
 	usePlayerHeight: () => 0,
 }));
 

@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { View, FlatList, StyleSheet, RefreshControl } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
-import { usePlayerHeight } from '@/contexts/PlayerContext';
+import { usePlayerHeight } from '@/features/player/context/PlayerContext';
 import type { Theme } from '@/shared/theme/types';
 import { useSoundCloudStore } from '@/store/soundcloudStore';
 import { useQueueStore } from '@/store/queueStore';

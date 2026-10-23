@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { usePlayerHeight } from '@/contexts/PlayerContext';
+import { usePlayerHeight } from '@/features/player/context/PlayerContext';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import type { LinkedProvider, OAuthProvider } from '@/features/auth/types';

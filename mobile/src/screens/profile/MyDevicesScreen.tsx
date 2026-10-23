@@ -4,7 +4,7 @@ import { ThemedSwitch } from '@/shared/components/ui/ThemedSwitch';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, type NavigationProp } from '@react-navigation/native';
 import type { AppTabsParamList } from '@/navigation/AppNavigator';
-import { usePlayerHeight } from '@/contexts/PlayerContext';
+import { usePlayerHeight } from '@/features/player/context/PlayerContext';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import type { UserDeviceWithLicenses } from '@/types/device.types';

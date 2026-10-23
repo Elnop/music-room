@@ -15,7 +15,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { usePlayerHeight } from '@/contexts/PlayerContext';
+import { usePlayerHeight } from '@/features/player/context/PlayerContext';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import type { UpdateProfileData } from '@/types/user.types';

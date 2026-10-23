@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
-import { usePlayerHeight } from '@/contexts/PlayerContext';
+import { usePlayerHeight } from '@/features/player/context/PlayerContext';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { useAuthStore } from '@/features/auth/stores/authStore';

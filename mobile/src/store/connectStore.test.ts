@@ -1,6 +1,6 @@
 import { activeOwnerId, useConnectStore } from './connectStore';
 import { useAuthStore } from '@/features/auth/stores/authStore';
-import { usePlayerStore } from './playerStore';
+import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { showInfo } from '@/shared/utils/toast';
 import type { ListeningStatus } from '@/types/listening.types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
@@ -9,7 +9,6 @@ import type { UserProfile } from '@/types/user.types';
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
-
 
 jest.mock('@/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',

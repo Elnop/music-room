@@ -23,10 +23,10 @@ import { SearchNavigator } from '@/navigation/stacks/SearchStack';
 import { FriendsNavigator, type FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
 
 // Player components
-import { MiniPlayer } from '@/components/player/MiniPlayer';
-import { PlayerModal } from '@/components/player/PlayerModal';
-import { PlayerErrorToast } from '@/components/player/PlayerErrorToast';
-import { PlayerProvider } from '@/contexts/PlayerContext';
+import { MiniPlayer } from '@/features/player/components/miniPlayer/components/orchestrators/MiniPlayer';
+import { PlayerModal } from '@/features/player/components/modal/components/orchestrators/PlayerModal';
+import { PlayerErrorToast } from '@/features/player/components/feedback/PlayerErrorToast';
+import { PlayerProvider } from '@/features/player/context/PlayerProvider';
 import { useQueueSync } from '@/hooks/useQueueSync';
 import { useRemoteTarget } from '@/hooks/useRemoteTarget';
 import { useConnectionStatus } from '@/shared/hooks/useConnectionStatus';

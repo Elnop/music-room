@@ -7,7 +7,7 @@ import {
 	selectHasPrevious,
 	selectPlaysPlaylist,
 } from './queueSelectors';
-import { usePlayerStore } from './playerStore';
+import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { deferred } from '@/test/deferred';
 import { useAuthStore } from '@/features/auth/stores/authStore';
 import { useConnectStore } from './connectStore';
@@ -23,7 +23,6 @@ import { logger } from '@/shared/utils/logger';
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
-
 
 jest.mock('@/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',

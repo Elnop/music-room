@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { useAuthStore } from '@/features/auth/stores/authStore';
-import { usePlayerStore } from './playerStore';
+import { getSession, useSession, onSessionEnd } from '@/shared/services/authSession';
+import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { showInfo } from '@/shared/utils/toast';
 import type { ListeningStatus } from '@/types/listening.types';
 
@@ -81,7 +81,7 @@ export const useConnectStore = create<ConnectState>((set, get) => ({
 /** The owner whose queue the player shows and acts on: the remote owner, else me. */
 export function activeOwnerId(): string | null {
 	const { target } = useConnectStore.getState();
-	return target.kind === 'remote' ? target.ownerId : (useAuthStore.getState().user?.id ?? null);
+	return target.kind === 'remote' ? target.ownerId : (getSession().user?.id ?? null);
 }
 
 /** Reactive `activeOwnerId`. */
@@ -89,13 +89,11 @@ export function useActiveOwnerId(): string | null {
 	const remoteOwnerId = useConnectStore(state =>
 		state.target.kind === 'remote' ? state.target.ownerId : null
 	);
-	const userId = useAuthStore(state => state.user?.id ?? null);
+	const userId = useSession(state => state?.user?.id ?? null);
 	return remoteOwnerId ?? userId;
 }
 
 /** Every end of session drops the remote target. */
-useAuthStore.subscribe((state, previous) => {
-	if (previous.isAuthenticated && !state.isAuthenticated) {
-		useConnectStore.setState({ target: LOCAL, remoteStatus: null, controlPending: false });
-	}
+onSessionEnd(() => {
+	useConnectStore.setState({ target: LOCAL, remoteStatus: null, controlPending: false });
 });
