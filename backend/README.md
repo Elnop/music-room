@@ -291,7 +291,7 @@ Server: `src/realtime/socket-server.ts` (creation, origin, auth, per-event limit
 
 ### Handshake authentication
 
-Every connection is authenticated at the handshake by `src/realtime/socket-auth.ts` (an `io.use` middleware), which documents the contract. The client passes six required strings in `io(url, { auth: { ... } })`:
+Every connection is authenticated at the handshake by `src/realtime/socket-auth.ts` (an `io.use` middleware). The client passes six required strings in `io(url, { auth: { ... } })`:
 
 | Field | Content |
 | --- | --- |
