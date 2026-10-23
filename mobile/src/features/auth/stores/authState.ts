@@ -28,6 +28,8 @@ export interface SessionActions {
 	loadFromStorage: () => Promise<void>;
 	/** New avatar URL after an upload, null after a removal (#351). */
 	setAvatarUrl: (avatarUrl: string | null) => Promise<void>;
+	/** Updates the user profile in state and storage. */
+	setUser: (user: UserProfile) => Promise<void>;
 }
 
 export type AuthState = SessionState & SessionActions;

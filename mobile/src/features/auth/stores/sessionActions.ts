@@ -83,5 +83,10 @@ export function createSessionActions(set: SetAuthState, get: GetAuthState): Sess
 			set({ user: { ...user, avatarUrl: avatarUrl ?? undefined } });
 			await persist();
 		},
+
+		setUser: async user => {
+			set({ user });
+			await persist();
+		},
 	};
 }

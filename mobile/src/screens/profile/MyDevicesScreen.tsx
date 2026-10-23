@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity } 
 import { ThemedSwitch } from '@/shared/components/ui/ThemedSwitch';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, type NavigationProp } from '@react-navigation/native';
-import type { AppTabsParamList } from '@/navigation/AppNavigator';
 import { usePlayerHeight } from '@/features/player/context/PlayerContext';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
@@ -87,7 +86,7 @@ function DeviceCardSkeleton() {
 
 export function MyDevicesScreen() {
 	const { theme } = useTheme();
-	const navigation = useNavigation<NavigationProp<AppTabsParamList>>();
+	const navigation = useNavigation<NavigationProp<{ FriendsTab: undefined }>>();
 	const playerHeight = usePlayerHeight();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 

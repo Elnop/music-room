@@ -1,55 +1,5 @@
 [
   {
-    "type": "cycle",
-    "from": "src/navigation/AppNavigator.tsx",
-    "to": "src/navigation/stacks/ProfileStack.tsx",
-    "unresolvedTo": "@/navigation/stacks/ProfileStack",
-    "dependencyTypes": [
-      "aliased",
-      "aliased-tsconfig",
-      "aliased-tsconfig-paths",
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "no-circular"
-    },
-    "cycle": [
-      {
-        "name": "src/navigation/stacks/ProfileStack.tsx",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/screens/profile/MyDevicesScreen.tsx",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/navigation/AppNavigator.tsx",
-        "dependencyTypes": [
-          "aliased",
-          "aliased-tsconfig",
-          "aliased-tsconfig-paths",
-          "local",
-          "type-only",
-          "import"
-        ]
-      }
-    ]
-  },
-  {
     "type": "dependency",
     "from": "src/shared/services/api.ts",
     "to": "src/services/deviceService.ts",

@@ -1,13 +1,8 @@
 import type { UserProfile } from '@/types/user.types';
+import type { LinkedProvider, OAuthProvider } from '@/shared/services/linkedAccountsBridge';
 
 // Mirrors the backend response types (backend/src/features/auth/auth.types.ts).
-export type OAuthProvider = 'google' | 'facebook';
-
-export interface LinkedProvider {
-	type: 'password' | OAuthProvider;
-	connectedAt: string;
-	isPrimary: boolean;
-}
+export type { LinkedProvider, OAuthProvider };
 
 export interface LinkedProvidersResponse {
 	providers: LinkedProvider[];

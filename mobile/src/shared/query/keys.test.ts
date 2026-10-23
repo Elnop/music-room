@@ -23,6 +23,8 @@ describe('queryKeys', () => {
 			[queryKeys.friends.all, queryKeys.friends.permissions()],
 			[queryKeys.profile.all, queryKeys.profile.me()],
 			[queryKeys.profile.all, queryKeys.profile.user('u1')],
+			[queryKeys.profile.all, queryKeys.profile.privacy()],
+			[queryKeys.profile.all, queryKeys.profile.musicPreferences()],
 			[queryKeys.devices.all, queryKeys.devices.list()],
 			[queryKeys.devices.all, queryKeys.devices.picker()],
 			[queryKeys.search.all, queryKeys.search.tracks('daft')],

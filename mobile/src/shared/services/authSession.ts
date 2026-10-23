@@ -21,6 +21,9 @@ interface AuthSession {
 	store: StoreApi<SessionView>;
 	isTokenExpiringSoon: () => boolean;
 	refreshAccessToken: () => Promise<boolean>;
+	logout?: () => Promise<void>;
+	setAvatarUrl?: (url: string | null) => Promise<void>;
+	setUser?: (user: UserProfile) => void | Promise<void>;
 }
 
 /** Signed out until the auth store registers: before that, nothing is read. */
@@ -52,6 +55,21 @@ export function getSession(): SessionView {
 /** One value of the session, re-rendering when it changes: `useSession(s => s.user?.id)`. */
 export function useSession<T>(selector: (session: SessionView) => T): T {
 	return useStore(sessionStore(), selector);
+}
+
+/** Logs out the current session. */
+export async function logout(): Promise<void> {
+	await authSession?.logout?.();
+}
+
+/** Updates avatar url in the registered session store. */
+export async function setAvatarUrl(url: string | null): Promise<void> {
+	await authSession?.setAvatarUrl?.(url);
+}
+
+/** Updates current user in the registered session store. */
+export async function setUser(user: UserProfile): Promise<void> {
+	await authSession?.setUser?.(user);
 }
 
 /**
