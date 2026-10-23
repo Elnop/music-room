@@ -23,6 +23,10 @@ export const queryKeys = {
 	queue: {
 		all: ['queue'] as const,
 		room: (roomId: string) => [...queryKeys.queue.all, 'room', roomId] as const,
+		detail: (ownerId?: string | null) =>
+			ownerId
+				? ([...queryKeys.queue.all, 'owner', ownerId] as const)
+				: ([...queryKeys.queue.all, 'me'] as const),
 	},
 	friends: {
 		all: ['friends'] as const,
@@ -37,6 +41,7 @@ export const queryKeys = {
 	devices: {
 		all: ['devices'] as const,
 		list: () => [...queryKeys.devices.all, 'list'] as const,
+		picker: () => [...queryKeys.devices.all, 'picker'] as const,
 	},
 	search: {
 		all: ['search'] as const,

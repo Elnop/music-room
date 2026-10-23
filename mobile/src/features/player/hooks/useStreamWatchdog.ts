@@ -1,11 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { useAudioPlayerStatus, type useAudioPlayer } from 'expo-audio';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
-import { useConnectStore } from '@/store/connectStore';
+import { isLocalTarget } from '@/shared/services/connectBridge';
 import { RENEWAL_HEALTHY_MS } from '@/features/player/constants';
 
 function playsLocally(): boolean {
-	return useConnectStore.getState().target.kind === 'local';
+	return isLocalTarget();
 }
 
 /**

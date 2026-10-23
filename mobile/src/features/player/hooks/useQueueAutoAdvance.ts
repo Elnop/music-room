@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { useAudioPlayerStatus, type useAudioPlayer } from 'expo-audio';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
-import { useConnectStore } from '@/store/connectStore';
-import { useQueueStore } from '@/store/queueStore';
+import { isLocalTarget } from '@/shared/services/connectBridge';
+import { getPlayback } from '@/shared/services/playbackBridge';
 
 /**
  * Plays the next queue item when a track ends (#274), once per loaded track;
@@ -20,8 +20,8 @@ export function useQueueAutoAdvance(player: ReturnType<typeof useAudioPlayer>): 
 		const risingEdge = didJustFinish && !wasFinishedRef.current;
 		wasFinishedRef.current = didJustFinish;
 		if (!risingEdge || !isPlaying || finishedLoadRef.current === loadCounter) return;
-		if (useConnectStore.getState().target.kind !== 'local') return;
+		if (!isLocalTarget()) return;
 		finishedLoadRef.current = loadCounter;
-		useQueueStore.getState().next();
+		getPlayback().next();
 	}, [didJustFinish, isPlaying, loadCounter]);
 }

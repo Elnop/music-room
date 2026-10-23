@@ -1,11 +1,18 @@
 const bridge = {
 	usePlaylistPlayback: () => ({ playingUri: null, state: null }),
 	usePlayerHeight: () => 64,
+	useActiveQueue: () => ({ currentItemId: null, items: [], version: 0 }),
 	addToQueue: () => Promise.resolve(true),
 	playNext: () => Promise.resolve(true),
 	playPlaylist: () => Promise.resolve('played'),
+	next: () => Promise.resolve('played' as const),
+	previous: () => Promise.resolve('played' as const),
+	playListTrack: () => Promise.resolve(),
+	playTrack: () => undefined,
 	pause: () => undefined,
 	resume: () => undefined,
+	stop: () => undefined,
+	getPlayerState: () => ({ currentTrack: null, queueItemId: null, loadCounter: 0, positionMs: 0 }),
 };
 
 describe('playbackBridge', () => {

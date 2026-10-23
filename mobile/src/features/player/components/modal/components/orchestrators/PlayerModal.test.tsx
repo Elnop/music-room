@@ -1,10 +1,16 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { createStore } from 'zustand';
+import { Text, View } from 'react-native';
+import { registerPlayerModals } from '@/shared/services/playerModalsBridge';
 import { PlayerModal } from './PlayerModal';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
-import { useConnectStore } from '@/store/connectStore';
-import { useQueueStore } from '@/store/queueStore';
+import {
+	registerPlaybackBridge,
+	getPlayback,
+	type OwnerQueue,
+} from '@/shared/services/playbackBridge';
+import { registerConnectBridge, type ConnectSnapshot } from '@/shared/services/connectBridge';
 import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
 import { hashStringToNumber } from '@/shared/utils/trackToSoundCloud';
 import type { UserProfile } from '@/types/user.types';
@@ -23,11 +29,6 @@ jest.mock('@/shared/utils/haptics', () => ({
 
 const mockSeekTo = jest.fn();
 const mockProgress = { progress: 0, currentTime: 0, duration: 0 };
-
-// The sheet reads the playlists through TanStack Query; these tests do not open it.
-jest.mock('@/features/playlists/trackActions/components/orchestrators/TrackActionsSheet', () => ({
-	TrackActionsSheet: () => null,
-}));
 
 jest.mock('@/shared/theme/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
@@ -74,18 +75,6 @@ jest.mock('@/services/musicControlApi', () => ({
 				},
 			],
 		})),
-	},
-}));
-
-jest.mock('@/services/queueApi', () => ({
-	queueApi: {
-		getQueue: jest.fn(),
-		next: jest.fn(),
-		previous: jest.fn(),
-		playItem: jest.fn(),
-		moveItem: jest.fn(),
-		removeItem: jest.fn(),
-		transfer: jest.fn(),
 	},
 }));
 
@@ -149,10 +138,70 @@ registerAuthSession({
 	refreshAccessToken: async () => true,
 });
 
+let testQueue: OwnerQueue = {
+	currentItemId: null,
+	items: [],
+	version: 0,
+};
+
+let testConnectState: ConnectSnapshot = {
+	target: { kind: 'local' },
+	remoteStatus: null,
+	controlPending: false,
+};
+
+let mockNext = jest.fn(async () => 'played' as const);
+
+registerPlaybackBridge({
+	usePlaylistPlayback: () => ({ playingUri: null, state: null }),
+	usePlayerHeight: () => 0,
+	useActiveQueue: () => testQueue,
+	addToQueue: jest.fn(async () => true),
+	playNext: jest.fn(async () => true),
+	playPlaylist: jest.fn(async () => 'ok'),
+	next: () => mockNext(),
+	previous: jest.fn(async () => 'played'),
+	playListTrack: jest.fn(async () => undefined),
+	playTrack: jest.fn(),
+	pause: jest.fn(),
+	resume: jest.fn(),
+	stop: jest.fn(),
+	getPlayerState: () => ({ currentTrack: null, queueItemId: null, loadCounter: 0, positionMs: 0 }),
+});
+
+registerConnectBridge({
+	useConnect: selector => selector(testConnectState),
+	useIsLocal: () => testConnectState.target.kind === 'local',
+	getConnectState: () => testConnectState,
+	setRemoteStatus: status => {
+		testConnectState.remoteStatus = status;
+	},
+	setControlPending: pending => {
+		testConnectState.controlPending = pending;
+	},
+	setLocal: () => {
+		testConnectState.target = { kind: 'local' };
+	},
+	setRemote: target => {
+		testConnectState.target = { kind: 'remote', ...target };
+	},
+});
+
 describe('PlayerModal without a track', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
-		useConnectStore.setState({ target: { kind: 'local' }, remoteStatus: null });
+		registerPlayerModals({
+			QueueModal: ({ visible }) => (visible ? <Text>File d'attente</Text> : null),
+			DevicePickerSheet: ({ visible }) =>
+				visible ? (
+					<View>
+						<Text>Choisir un appareil</Text>
+						<Text>Mon téléphone</Text>
+					</View>
+				) : null,
+		});
+		testConnectState = { target: { kind: 'local' }, remoteStatus: null, controlPending: false };
+		testQueue = { currentItemId: null, items: [], version: 0 };
 		usePlayerStore.setState({ currentTrack: null, playbackState: 'idle', isModalOpen: true });
 	});
 
@@ -209,7 +258,18 @@ describe('PlayerModal swipe down', () => {
 
 	beforeEach(() => {
 		jest.clearAllMocks();
-		useConnectStore.setState({ target: { kind: 'local' }, remoteStatus: null });
+		registerPlayerModals({
+			QueueModal: ({ visible }) => (visible ? <Text>File d'attente</Text> : null),
+			DevicePickerSheet: ({ visible }) =>
+				visible ? (
+					<View>
+						<Text>Choisir un appareil</Text>
+						<Text>Mon téléphone</Text>
+					</View>
+				) : null,
+		});
+		testConnectState = { target: { kind: 'local' }, remoteStatus: null, controlPending: false };
+		testQueue = { currentItemId: null, items: [], version: 0 };
 		usePlayerStore.setState({ currentTrack: null, playbackState: 'idle', isModalOpen: true });
 	});
 
@@ -265,7 +325,18 @@ describe('PlayerModal slider for a screen reader', () => {
 
 	beforeEach(() => {
 		jest.clearAllMocks();
-		useConnectStore.setState({ target: { kind: 'local' }, remoteStatus: null });
+		registerPlayerModals({
+			QueueModal: ({ visible }) => (visible ? <Text>File d'attente</Text> : null),
+			DevicePickerSheet: ({ visible }) =>
+				visible ? (
+					<View>
+						<Text>Choisir un appareil</Text>
+						<Text>Mon téléphone</Text>
+					</View>
+				) : null,
+		});
+		testConnectState = { target: { kind: 'local' }, remoteStatus: null, controlPending: false };
+		testQueue = { currentItemId: null, items: [], version: 0 };
 		usePlayerStore.setState({ currentTrack: track, playbackState: 'playing', isModalOpen: true });
 		Object.assign(mockProgress, { currentTime: 30, duration: 200 });
 	});
@@ -309,33 +380,7 @@ describe('PlayerModal slider for a screen reader', () => {
 	it('does not seek in remote mode', () => {
 		const trackUri = 'https://soundcloud.com/artist/remote';
 		testSessionStore.setState({ user: { id: 'me' } as UserProfile });
-		useConnectStore.setState({
-			target: { kind: 'remote', ownerId: 'friend', deviceId: 'tablet', ownerUsername: 'Léa' },
-		});
-		useQueueStore.getState().reset();
-		useQueueStore.getState().applyState({
-			ownerId: 'friend',
-			version: 1,
-			currentItemId: 'r',
-			items: [
-				{
-					id: 'r',
-					rank: 'r',
-					track: {
-						trackUri,
-						title: 'Remote song',
-						artist: 'Léa',
-						album: null,
-						albumArt: null,
-						durationMs: 180_000,
-					},
-					sourcePlaylistId: null,
-					blockId: null,
-					blockDetached: false,
-				},
-			],
-		});
-		useConnectStore.setState({
+		testConnectState = {
 			target: { kind: 'remote', ownerId: 'friend', deviceId: 'tablet', ownerUsername: 'Léa' },
 			remoteStatus: {
 				ownerId: 'friend',
@@ -350,7 +395,29 @@ describe('PlayerModal slider for a screen reader', () => {
 				positionMs: 30_000,
 				updatedAt: new Date().toISOString(),
 			},
-		});
+			controlPending: false,
+		};
+		testQueue = {
+			currentItemId: 'r',
+			version: 1,
+			items: [
+				{
+					id: 'r',
+					track: {
+						trackUri,
+						title: 'Remote song',
+						artist: 'Léa',
+						album: null,
+						albumArt: null,
+						durationMs: 180_000,
+					},
+					rank: '0',
+					sourcePlaylistId: null,
+					blockId: null,
+					blockDetached: false,
+				},
+			],
+		};
 		render(<PlayerModal />);
 		expect(seekControl().props.accessibilityState).toMatchObject({
 			disabled: true,
@@ -376,8 +443,8 @@ describe('PlayerModal haptics', () => {
 
 	beforeEach(() => {
 		jest.clearAllMocks();
-		useQueueStore.getState().reset();
-		useConnectStore.setState({ target: { kind: 'local' }, remoteStatus: null });
+		testQueue = { currentItemId: null, items: [], version: 0 };
+		testConnectState = { target: { kind: 'local' }, remoteStatus: null, controlPending: false };
 		usePlayerStore.setState({
 			currentTrack: track,
 			playbackState: 'playing',
@@ -407,17 +474,13 @@ describe('PlayerModal haptics', () => {
 	});
 
 	it('taps once on an enabled next', () => {
-		const next = jest.fn();
-		const realNext = useQueueStore.getState().next;
+		mockNext = jest.fn(async () => 'played' as const);
 		testSessionStore.setState({ user: { id: 'me' } as UserProfile });
-		useQueueStore.setState({ next });
-		useQueueStore.getState().applyState({
-			ownerId: 'me',
+		testQueue = {
 			version: 1,
 			currentItemId: 'a',
-			items: ['a', 'b'].map(id => ({
+			items: ['a', 'b'].map((id, index) => ({
 				id,
-				rank: id,
 				track: {
 					trackUri: `https://soundcloud.com/artist/${id}`,
 					title: id,
@@ -426,15 +489,15 @@ describe('PlayerModal haptics', () => {
 					albumArt: null,
 					durationMs: 180_000,
 				},
+				rank: String(index),
 				sourcePlaylistId: null,
 				blockId: null,
 				blockDetached: false,
 			})),
-		});
+		};
 		render(<PlayerModal />);
 		fireEvent.press(screen.getByLabelText('Piste suivante'));
-		useQueueStore.setState({ next: realNext });
-		expect(next).toHaveBeenCalledTimes(1);
+		expect(mockNext).toHaveBeenCalledTimes(1);
 		expect(hapticTap).toHaveBeenCalledTimes(1);
 	});
 
@@ -467,22 +530,22 @@ describe('PlayerModal in remote mode', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
 		testSessionStore.setState({ user: { id: 'me' } as UserProfile });
-		useQueueStore.getState().reset();
+		testQueue = { currentItemId: null, items: [], version: 0 };
 		usePlayerStore.setState({ currentTrack: null, playbackState: 'idle', isModalOpen: true });
-		useConnectStore.setState({
+		testConnectState = {
 			target: { kind: 'remote', ownerId: 'friend', deviceId: 'tablet', ownerUsername: 'Léa' },
-		});
+			remoteStatus: null,
+			controlPending: false,
+		};
 	});
 
 	it("shows the device's track with a read-only seek bar", () => {
-		useQueueStore.getState().applyState({
-			ownerId: 'friend',
+		testQueue = {
 			version: 1,
 			currentItemId: 'b',
 			items: [
 				{
 					id: 'b',
-					rank: 'b',
 					track: {
 						trackUri,
 						title: 'Remote song',
@@ -491,13 +554,14 @@ describe('PlayerModal in remote mode', () => {
 						albumArt: null,
 						durationMs: 180_000,
 					},
+					rank: '0',
 					sourcePlaylistId: null,
 					blockId: null,
 					blockDetached: false,
 				},
 			],
-		});
-		useConnectStore.setState({ remoteStatus: status(hashStringToNumber(trackUri)) });
+		};
+		testConnectState.remoteStatus = status(hashStringToNumber(trackUri));
 		render(<PlayerModal />);
 
 		expect(screen.getByText('Remote song')).toBeTruthy();
@@ -510,7 +574,7 @@ describe('PlayerModal in remote mode', () => {
 	});
 
 	it('hides the progress bar when the duration is unknown', () => {
-		useConnectStore.setState({ remoteStatus: status(1) });
+		testConnectState.remoteStatus = status(1);
 		render(<PlayerModal />);
 		expect(screen.queryByTestId('seek-slider', { includeHiddenElements: true })).toBeNull();
 	});

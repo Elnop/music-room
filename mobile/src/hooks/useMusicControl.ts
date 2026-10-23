@@ -2,8 +2,8 @@ import { useEffect, useCallback, useMemo, useState } from 'react';
 import { useSocketStore } from '@/shared/stores/socketStore';
 import { usePlayerStore, readPositionMs } from '@/features/player/stores/playerStore';
 import { useAuthStore } from '@/features/auth/stores/authStore';
-import { useQueueStore } from '@/store/queueStore';
-import { useConnectStore } from '@/store/connectStore';
+import { useQueueStore } from '@/features/queue/stores/queueStore';
+import { useConnectStore } from '@/features/queue/stores/connectStore';
 import { deviceService, type DeviceInfo } from '@/services/deviceService';
 import { musicControlApi } from '@/services/musicControlApi';
 import { acquireListening, releaseListening } from '@/services/listeningRooms';
@@ -121,24 +121,9 @@ interface FriendDeviceStatus extends ListeningStatus {
 /**
  * Last `control:error` received from the server for a remote command
  */
-export interface ControlError {
-	code: string;
-	message: string;
-}
+import { controlErrorMessage, type ControlError } from '@/shared/utils/controlError';
 
-/**
- * Text to show the user for a `control:error`
- */
-export function controlErrorMessage(err: ControlError): string {
-	switch (err.code) {
-		case 'NOT_AUTHORIZED':
-			return 'Vous ne pouvez pas contrôler cet appareil';
-		case 'DEVICE_OFFLINE':
-			return "Cet appareil n'est plus en ligne";
-		default:
-			return 'La commande a échoué, réessayez';
-	}
-}
+export { controlErrorMessage };
 
 interface ControllableIds {
 	userId: string;

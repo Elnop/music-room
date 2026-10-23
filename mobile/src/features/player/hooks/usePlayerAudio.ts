@@ -1,12 +1,12 @@
 import { useCallback, useEffect } from 'react';
 import { useAudioPlayer } from 'expo-audio';
 import { usePlayerStore, setPositionReader } from '@/features/player/stores/playerStore';
-import { useConnectStore } from '@/store/connectStore';
+import { isLocalTarget } from '@/shared/services/connectBridge';
 import { isStreamStale } from '@/features/player/services/streamPrefetch';
 import { useStreamLoader } from './useStreamLoader';
 import { useAudioPlaybackSync } from './useAudioPlaybackSync';
 
-const playsLocally = () => useConnectStore.getState().target.kind === 'local';
+const playsLocally = () => isLocalTarget();
 
 interface PlayerAudio {
 	player: ReturnType<typeof useAudioPlayer>;

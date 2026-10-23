@@ -1,16 +1,16 @@
 import { useEffect, useRef } from 'react';
 import { useAudioPlayerStatus, type useAudioPlayer } from 'expo-audio';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
-import { useConnectStore } from '@/store/connectStore';
-import { useActiveQueue } from '@/store/queueStore';
-import { nextItem } from '@/store/queueSelectors';
+import { isLocalTarget, useIsLocalTarget } from '@/shared/services/connectBridge';
+import { useActiveQueue } from '@/shared/services/playbackBridge';
+import { nextItem } from '@/shared/utils/queueNavigation';
 import { streamPrefetch } from '@/features/player/services/streamPrefetch';
 import { fetchStreamUrl } from '@/features/player/services/streamApi';
 import { trackToSoundCloud } from '@/shared/utils/trackToSoundCloud';
 import { FETCH_TIMEOUT_MS, PREFETCH_WINDOW_S } from '@/features/player/constants';
 
 function playsLocally(): boolean {
-	return useConnectStore.getState().target.kind === 'local';
+	return isLocalTarget();
 }
 
 /**
@@ -20,7 +20,7 @@ function playsLocally(): boolean {
 export function useNextTrackPrefetch(player: ReturnType<typeof useAudioPlayer>): void {
 	const status = useAudioPlayerStatus(player);
 	const isPlaying = usePlayerStore(state => state.playbackState === 'playing');
-	const isLocal = useConnectStore(state => state.target.kind === 'local');
+	const isLocal = useIsLocalTarget();
 	const queue = useActiveQueue();
 	const queueCurrentId = queue.currentItemId;
 	const next = nextItem(queue);

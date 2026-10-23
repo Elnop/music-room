@@ -8,7 +8,7 @@ import { useImageColors } from '@/shared/hooks/useImageColors';
 import { getAdaptiveColors, hexToRgba } from '@/shared/theme/adaptivePalette';
 import { largeArtwork } from '@/shared/utils/artwork';
 import { hapticTap } from '@/shared/utils/haptics';
-import { RESTART_THRESHOLD_S } from '@/store/queueSelectors';
+import { RESTART_THRESHOLD_S } from '@/shared/utils/queueNavigation';
 import {
 	createStyles,
 	SEEK_STEP_S,
