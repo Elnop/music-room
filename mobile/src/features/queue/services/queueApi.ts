@@ -75,10 +75,19 @@ export const queueApi = {
 		});
 	},
 
-	playPlaylist(playlistId: string, target: QueueCallTarget = {}): Promise<QueueState> {
+	/** `startTrackId`: the track of the playlist to start on; the first one without it. */
+	playPlaylist(
+		playlistId: string,
+		target: QueueCallTarget = {},
+		startTrackId?: string
+	): Promise<QueueState> {
+		const body = {
+			...(target.deviceId ? { deviceId: target.deviceId } : {}),
+			...(startTrackId ? { startTrackId } : {}),
+		};
 		return apiRequest<QueueState>(
 			`${base(target)}/playlists/${encodeURIComponent(playlistId)}/play`,
-			{ method: 'POST', ...deviceBody(target) }
+			{ method: 'POST', ...(Object.keys(body).length ? { body: JSON.stringify(body) } : {}) }
 		);
 	},
 

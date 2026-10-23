@@ -603,11 +603,22 @@ describe('queueStore playPlaylist', () => {
 
 		await expect(store().playPlaylist('p1')).resolves.toBe('played');
 
-		expect(api.playPlaylist).toHaveBeenCalledWith('p1', {});
+		expect(api.playPlaylist).toHaveBeenCalledWith('p1', {}, undefined);
 		expect(mine().currentItemId).toBe('p-1');
 		expect(player().queueItemId).toBe('p-1');
 		expect(player().currentTrack?.title).toBe('Title p-1');
 		expect(player().playbackState).toBe('loading');
+	});
+
+	it('plays the block from the chosen track', async () => {
+		store().applyState(queue('a'));
+		api.playPlaylist.mockResolvedValue(withBlock('p-2', ['p-1', 'p-2']));
+
+		await expect(store().playPlaylist('p1', 't2')).resolves.toBe('played');
+
+		expect(api.playPlaylist).toHaveBeenCalledWith('p1', {}, 't2');
+		expect(mine().currentItemId).toBe('p-2');
+		expect(player().queueItemId).toBe('p-2');
 	});
 
 	it.each([

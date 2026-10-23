@@ -523,7 +523,10 @@ export type Database = {
 				Returns: Json;
 			};
 			queue_play_item: { Args: { p_item_id: string; p_user: string }; Returns: Json };
-			queue_play_playlist: { Args: { p_playlist_id: string; p_user: string }; Returns: Json };
+			queue_play_playlist: {
+				Args: { p_playlist_id: string; p_start_track_id?: string; p_user: string };
+				Returns: Json;
+			};
 			queue_rank_after: {
 				Args: { p_after: string; p_exclude: string; p_user: string };
 				Returns: string;

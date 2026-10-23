@@ -2,6 +2,7 @@ import type { ResponseConfig, RouteConfig } from '@asteasolutions/zod-to-openapi
 import {
 	queueItemParamsSchema,
 	queuePlaybackSchema,
+	queuePlayPlaylistSchema,
 	queuePlaylistParamsSchema,
 	queueStateSchema,
 } from '@/features/queue/queue.validators.js';
@@ -54,19 +55,27 @@ const playPlaylist: RouteConfig = {
 	path: '/api/queue/playlists/{playlistId}/play',
 	summary: 'Play a playlist through the queue',
 	description:
-		"Copies the playlist's tracks, in playlist order, into your queue as a new block (one new `blockId`, `sourcePlaylistId` = the playlist) placed right after the current item, or at the top when nothing is current, and makes the block's first item current. The item that was playing becomes history; the upcoming items follow the block. Playing the same playlist again adds a second, separate block. History beyond the 50 most recent items is dropped.",
+		"Copies the playlist's tracks, in playlist order, into your queue as a new block (one new `blockId`, `sourcePlaylistId` = the playlist) placed right after the current item, or at the top when nothing is current, and makes the block's first item current, or the item of `startTrackId` (the `id` of one of the playlist's tracks): the tracks before it stay in the block as history. The item that was playing becomes history; the upcoming items follow the block. Playing the same playlist again adds a second, separate block. History beyond the 50 most recent items is dropped.",
 	operationId: 'queuePlayPlaylist',
-	request: { params: queuePlaylistParamsSchema, body: playbackBody },
+	request: {
+		params: queuePlaylistParamsSchema,
+		body: jsonBody(
+			queuePlayPlaylistSchema,
+			{ deviceId: 'living-room-tv', startTrackId: '7d3f1c2a-5b6e-4f80-9a1b-2c3d4e5f6a7b' },
+			false
+		),
+	},
 	responses: {
 		...answers,
 		403: fail('You cannot view the playlist (`PLAYLIST_ACCESS_DENIED`)', [
 			'PLAYLIST_ACCESS_DENIED',
 			'Access denied',
 		]),
-		404: fail('No playlist has this id (`PLAYLIST_NOT_FOUND`)', [
-			'PLAYLIST_NOT_FOUND',
-			'Playlist not found',
-		]),
+		404: fail(
+			'No playlist has this id (`PLAYLIST_NOT_FOUND`), or `startTrackId` is not a track of it (`PLAYLIST_TRACK_NOT_FOUND`)',
+			['PLAYLIST_NOT_FOUND', 'Playlist not found'],
+			['PLAYLIST_TRACK_NOT_FOUND', 'Track not found in the playlist']
+		),
 		409: orOffline(
 			fail('The playlist has no track (`PLAYLIST_EMPTY`); the queue is unchanged', [
 				'PLAYLIST_EMPTY',

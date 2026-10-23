@@ -9,6 +9,7 @@ import {
 	queueItemParamsSchema,
 	queueOwnerParamsSchema,
 	queuePlaybackSchema,
+	queuePlayPlaylistSchema,
 	queuePlaylistParamsSchema,
 	transferSchema,
 } from '@/features/queue/queue.validators.js';
@@ -51,10 +52,10 @@ export async function playItem(req: Request, res: Response) {
 
 export async function playPlaylist(req: Request, res: Response) {
 	const { playlistId } = queuePlaylistParamsSchema.parse(req.params);
-	const { deviceId } = queuePlaybackSchema.parse(req.body);
+	const { deviceId, startTrackId } = queuePlayPlaylistSchema.parse(req.body);
 	sendSuccess(
 		res,
-		await queueService.playPlaylist(actorOf(req), ownerOf(req), playlistId, deviceId)
+		await queueService.playPlaylist(actorOf(req), ownerOf(req), playlistId, deviceId, startTrackId)
 	);
 }
 

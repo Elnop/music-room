@@ -110,7 +110,27 @@ describe('queue.controller', () => {
 			body: { deviceId: 'tv' },
 		});
 
-		expect(svc.playPlaylist).toHaveBeenCalledWith(ME, OWNER, PLAYLIST, 'tv');
+		expect(svc.playPlaylist).toHaveBeenCalledWith(ME, OWNER, PLAYLIST, 'tv', undefined);
+	});
+
+	it('playPlaylist passes the starting track', async () => {
+		const startTrackId = '7d3f1c2a-5b6e-4f80-9a1b-2c3d4e5f6a7b';
+		await call(controller.playPlaylist, {
+			params: { playlistId: PLAYLIST },
+			body: { startTrackId },
+		});
+
+		expect(svc.playPlaylist).toHaveBeenCalledWith(ME, ME, PLAYLIST, undefined, startTrackId);
+	});
+
+	it('playPlaylist rejects a malformed starting track', async () => {
+		await expect(
+			call(controller.playPlaylist, {
+				params: { playlistId: PLAYLIST },
+				body: { startTrackId: 'third' },
+			})
+		).rejects.toBeInstanceOf(ZodError);
+		expect(svc.playPlaylist).not.toHaveBeenCalled();
 	});
 
 	it.each([

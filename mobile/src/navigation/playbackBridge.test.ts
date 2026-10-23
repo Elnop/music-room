@@ -57,12 +57,12 @@ describe('registerPlayback', () => {
 		const playback = getPlayback();
 		await playback.addToQueue(track);
 		await playback.playNext(track);
-		await playback.playPlaylist('p1');
+		await playback.playPlaylist('p1', 't3');
 		playback.pause();
 		playback.resume();
 		expect(addItem).toHaveBeenCalledWith(track);
 		expect(playNext).toHaveBeenCalledWith(track);
-		expect(playPlaylist).toHaveBeenCalledWith('p1');
+		expect(playPlaylist).toHaveBeenCalledWith('p1', 't3');
 		expect(pause).toHaveBeenCalled();
 		expect(resume).toHaveBeenCalled();
 		expect(renderHook(() => playback.usePlayerHeight()).result.current).toBeGreaterThan(0);

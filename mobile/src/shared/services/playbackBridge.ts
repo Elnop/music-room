@@ -40,7 +40,7 @@ interface PlaybackBridge {
 	usePlaybackEmitterState?: () => PlaybackEmitterSnapshot;
 	addToQueue: (track: AddQueueItemBody) => Promise<boolean>;
 	playNext: (track: AddQueueItemBody) => Promise<boolean>;
-	playPlaylist: (playlistId: string) => Promise<string>;
+	playPlaylist: (playlistId: string, startTrackId?: string) => Promise<string>;
 	next: () => Promise<QueueStepOutcome>;
 	previous: () => Promise<QueueStepOutcome>;
 	playListTrack: (track: SoundCloudTrack) => Promise<void>;
