@@ -3,8 +3,8 @@ import { act, render } from '@testing-library/react-native';
 import { PlayerProvider } from './PlayerProvider';
 import { usePlayer } from './PlayerContext';
 import { readPositionMs, usePlayerStore } from '@/features/player/stores/playerStore';
-import { useConnectStore } from '@/store/connectStore';
-import { useQueueStore } from '@/store/queueStore';
+import { registerConnectBridge, type ConnectSnapshot } from '@/shared/services/connectBridge';
+import { registerPlaybackBridge, type OwnerQueue } from '@/shared/services/playbackBridge';
 import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
 import { createStore } from 'zustand';
 import { streamPrefetch } from '@/features/player/services/streamPrefetch';
@@ -154,8 +154,56 @@ registerAuthSession({
 	refreshAccessToken: async () => true,
 });
 
+let testQueue: OwnerQueue = {
+	currentItemId: null,
+	items: [],
+	version: 0,
+};
+
+let testConnectState: ConnectSnapshot = {
+	target: { kind: 'local' },
+	remoteStatus: null,
+	controlPending: false,
+};
+
+let mockNext = jest.fn(async () => 'played' as const);
+
+registerPlaybackBridge({
+	usePlaylistPlayback: () => ({ playingUri: null, state: null }),
+	usePlayerHeight: () => 0,
+	useActiveQueue: () => testQueue,
+	addToQueue: jest.fn(async () => true),
+	playNext: jest.fn(async () => true),
+	playPlaylist: jest.fn(async () => 'ok'),
+	next: (...args) => mockNext(...args),
+	previous: jest.fn(async () => 'played'),
+	playListTrack: jest.fn(async () => undefined),
+	playTrack: jest.fn(),
+	pause: jest.fn(),
+	resume: jest.fn(),
+	stop: jest.fn(),
+	getPlayerState: () => ({ currentTrack: null, queueItemId: null, loadCounter: 0, positionMs: 0 }),
+});
+
+registerConnectBridge({
+	useConnect: selector => selector(testConnectState),
+	useIsLocal: () => testConnectState.target.kind === 'local',
+	getConnectState: () => testConnectState,
+	setRemoteStatus: status => {
+		testConnectState.remoteStatus = status;
+	},
+	setControlPending: pending => {
+		testConnectState.controlPending = pending;
+	},
+	setLocal: () => {
+		testConnectState.target = { kind: 'local' };
+	},
+	setRemote: target => {
+		testConnectState.target = { kind: 'remote', ...target };
+	},
+});
+
 const initialPlayerState = usePlayerStore.getState();
-const initialQueueState = useQueueStore.getState();
 const initialAuthState = testSessionStore.getState();
 
 /** Next stream responses, in order. */
@@ -212,10 +260,11 @@ beforeEach(() => {
 	mockApiRequest.mockReset();
 	seekRef = null;
 	usePlayerStore.setState(initialPlayerState, true);
-	useQueueStore.setState(initialQueueState, true);
+	testQueue = { currentItemId: null, items: [], version: 0 };
 	testSessionStore.setState(initialAuthState, true);
 	streamPrefetch.clear();
-	useConnectStore.getState().setLocal();
+	testConnectState = { target: { kind: 'local' }, remoteStatus: null, controlPending: false };
+	mockNext = jest.fn(async () => 'played' as const);
 });
 
 afterEach(() => {
@@ -441,11 +490,13 @@ describe('PlayerProvider stream renewal (#313)', () => {
 	it('does not renew in remote mode', async () => {
 		await startPlaying(inMinutes(1));
 		act(() => usePlayerStore.getState().pause());
-		act(() =>
-			useConnectStore.setState({
-				target: { kind: 'remote', ownerId: 'o', deviceId: 'd', ownerUsername: null },
-			} as never)
-		);
+		act(() => {
+			testConnectState = {
+				target: { kind: 'remote', ownerId: 'o', deviceId: 'd' },
+				remoteStatus: null,
+				controlPending: false,
+			};
+		});
 
 		await act(async () => seekRef?.(90));
 
@@ -532,8 +583,8 @@ describe('PlayerProvider audio interruptions (#310)', () => {
 		const { view, u1 } = await playingNatively();
 		answerStreams({ streamUrl: 'u2', expiresAt: inMinutes(30) });
 		// Auto-advance (#274) is QueueAutoAdvance's: keep it out of the way.
-		const next = jest.fn();
-		useQueueStore.setState({ next } as never);
+		const next = jest.fn(async () => 'played' as const);
+		mockNext = next;
 
 		await nativeSets(view, u1, false, extra);
 
@@ -571,11 +622,13 @@ describe('PlayerProvider audio interruptions (#310)', () => {
 
 	it('does not mirror a stop in remote mode', async () => {
 		const { view, u1 } = await playingNatively();
-		act(() =>
-			useConnectStore.setState({
-				target: { kind: 'remote', ownerId: 'o', deviceId: 'd', ownerUsername: null },
-			} as never)
-		);
+		act(() => {
+			testConnectState = {
+				target: { kind: 'remote', ownerId: 'o', deviceId: 'd' },
+				remoteStatus: null,
+				controlPending: false,
+			};
+		});
 
 		await nativeSets(view, u1, false);
 
@@ -678,9 +731,9 @@ describe('PlayerProvider next track prefetch (#314)', () => {
 
 	/** My queue, as the player reads it. */
 	function setQueue(currentItemId: string | null, items: QueueItem[]) {
-		act(() =>
-			useQueueStore.setState({ queues: { me: { currentItemId, items, version: 1 } } } as never)
-		);
+		act(() => {
+			testQueue = { currentItemId, items, version: 1 };
+		});
 	}
 
 	/** Play `item` of the queue `items` on a stream named after it. */
@@ -743,11 +796,13 @@ describe('PlayerProvider next track prefetch (#314)', () => {
 
 	it('does not prefetch in remote mode', async () => {
 		const { view, player } = await playQueueItem(A, [A, B]);
-		act(() =>
-			useConnectStore.setState({
-				target: { kind: 'remote', ownerId: 'me', deviceId: 'd', ownerUsername: null },
-			} as never)
-		);
+		act(() => {
+			testConnectState = {
+				target: { kind: 'remote', ownerId: 'me', deviceId: 'd' },
+				remoteStatus: null,
+				controlPending: false,
+			};
+		});
 
 		await reach(view, player, 190);
 

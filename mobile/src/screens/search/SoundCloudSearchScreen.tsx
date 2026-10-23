@@ -4,7 +4,7 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import { usePlayerHeight } from '@/features/player/context/PlayerContext';
 import type { Theme } from '@/shared/theme/types';
 import { useSoundCloudStore } from '@/store/soundcloudStore';
-import { useQueueStore } from '@/store/queueStore';
+import { useQueueStore } from '@/features/queue/stores/queueStore';
 import { toTrackInput } from '@/shared/utils/trackInput';
 import { SoundCloudTrackItem } from '@/screens/search/components/SoundCloudTrackItem';
 import { TrackActionsSheet } from '@/features/playlists/trackActions/components/orchestrators/TrackActionsSheet';

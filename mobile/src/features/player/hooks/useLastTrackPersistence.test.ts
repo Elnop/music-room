@@ -14,7 +14,7 @@ import {
 	notifySessionEnd,
 	type SessionView,
 } from '@/shared/services/authSession';
-import { useConnectStore } from '@/store/connectStore';
+import { registerConnectBridge, type ConnectSnapshot } from '@/shared/services/connectBridge';
 import { queueTrackToSoundCloud } from '@/shared/utils/trackToSoundCloud';
 import type { UserProfile } from '@/types/user.types';
 
@@ -80,6 +80,30 @@ async function mount() {
 	return view;
 }
 
+let testConnectState: ConnectSnapshot = {
+	target: { kind: 'local' },
+	remoteStatus: null,
+	controlPending: false,
+};
+
+registerConnectBridge({
+	useConnect: selector => selector(testConnectState),
+	useIsLocal: () => testConnectState.target.kind === 'local',
+	getConnectState: () => testConnectState,
+	setRemoteStatus: status => {
+		testConnectState.remoteStatus = status;
+	},
+	setControlPending: pending => {
+		testConnectState.controlPending = pending;
+	},
+	setLocal: () => {
+		testConnectState.target = { kind: 'local' };
+	},
+	setRemote: target => {
+		testConnectState.target = { kind: 'remote', ...target };
+	},
+});
+
 const stored = () => lastTrackStorage.load('me');
 
 beforeEach(async () => {
@@ -92,7 +116,7 @@ beforeEach(async () => {
 		return { remove: jest.fn() } as unknown as ReturnType<typeof AppState.addEventListener>;
 	});
 	usePlayerStore.setState(initialPlayerState, true);
-	useConnectStore.getState().setLocal();
+	testConnectState = { target: { kind: 'local' }, remoteStatus: null, controlPending: false };
 	testSessionStore.setState({
 		user: { id: 'me' } as UserProfile,
 		accessToken: 'test-token',
@@ -134,7 +158,11 @@ describe('useLastTrackPersistence restore', () => {
 
 	it('does not restore in remote mode', async () => {
 		await lastTrackStorage.save('me', saved);
-		useConnectStore.setState({ target: { kind: 'remote', ownerId: 'me', deviceId: 'tablet' } });
+		testConnectState = {
+			target: { kind: 'remote', ownerId: 'me', deviceId: 'tablet' },
+			remoteStatus: null,
+			controlPending: false,
+		};
 		await mount();
 		expect(usePlayerStore.getState().currentTrack).toBeNull();
 	});
@@ -275,7 +303,11 @@ describe('useLastTrackPersistence save', () => {
 	});
 
 	it('saves nothing in remote mode', async () => {
-		useConnectStore.setState({ target: { kind: 'remote', ownerId: 'me', deviceId: 'tablet' } });
+		testConnectState = {
+			target: { kind: 'remote', ownerId: 'me', deviceId: 'tablet' },
+			remoteStatus: null,
+			controlPending: false,
+		};
 		await mount();
 		act(() => usePlayerStore.getState().playTrack(other, null));
 		await flush();

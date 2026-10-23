@@ -1,60 +1,76 @@
 import { logger } from '@/shared/utils/logger';
-import type { AddQueueItemBody, PlaybackState } from '@/shared/types/playback';
+import type {
+	AddQueueItemBody,
+	OwnerQueue,
+	PlaybackState,
+	QueueStepOutcome,
+} from '@/shared/types/playback';
+import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
-/**
- * The playback contract between the player and queue (not migrated yet, #380
- * and #381) and the features that start or show playback. The navigation layer
- * registers the implementation once (`navigation/playbackBridge.ts`); features
- * call it here, so none imports the player or the queue
- * (architecture.md#no-cross-feature-imports).
- */
+export type { OwnerQueue } from '@/shared/types/playback';
 
-/** What this device plays from one playlist's queue block (#307). */
 export interface PlaylistPlayback {
-	/** SoundCloud permalink of the track playing from this playlist, else null. */
 	playingUri: string | null;
-	/** The player's state while it plays an item of this playlist, else null. */
 	state: PlaybackState | null;
 }
 
+interface PlayerSnapshot {
+	currentTrack: SoundCloudTrack | null;
+	queueItemId: string | null;
+	loadCounter: number;
+	positionMs: number;
+}
+
+const EMPTY_QUEUE: OwnerQueue = Object.freeze({
+	currentItemId: null,
+	items: [],
+	version: 0,
+});
+
 interface PlaybackBridge {
-	/** A React hook: re-renders when the playback of `playlistId` changes. */
 	usePlaylistPlayback: (playlistId: string) => PlaylistPlayback;
-	/** Bottom space the mini player takes over a screen. */
 	usePlayerHeight: () => number;
-	/** Adds a track at the end of the active queue; the queue toasts the outcome. */
+	useActiveQueue: () => OwnerQueue;
 	addToQueue: (track: AddQueueItemBody) => Promise<boolean>;
-	/** Adds a track right after the current one. */
 	playNext: (track: AddQueueItemBody) => Promise<boolean>;
-	/** Queues a playlist as a block and plays it; 'ignored' while another action runs. */
 	playPlaylist: (playlistId: string) => Promise<string>;
+	next: () => Promise<QueueStepOutcome>;
+	previous: () => Promise<QueueStepOutcome>;
+	playListTrack: (track: SoundCloudTrack) => Promise<void>;
+	playTrack: (track: SoundCloudTrack, queueItemId?: string, startPositionMs?: number) => void;
 	pause: () => void;
 	resume: () => void;
+	stop: () => void;
+	getPlayerState: () => PlayerSnapshot;
 }
 
 const NOT_REGISTERED = '[playbackBridge] Used before navigation/playbackBridge.ts registered it';
 const unavailable = () => Promise.reject(new Error(NOT_REGISTERED));
 
-/** A release build used before registration: nothing plays, every action fails. */
 const unregistered: PlaybackBridge = {
 	usePlaylistPlayback: () => ({ playingUri: null, state: null }),
 	usePlayerHeight: () => 0,
+	useActiveQueue: () => EMPTY_QUEUE,
 	addToQueue: unavailable,
 	playNext: unavailable,
 	playPlaylist: unavailable,
+	next: unavailable,
+	previous: unavailable,
+	playListTrack: unavailable,
+	playTrack: () => undefined,
 	pause: () => undefined,
 	resume: () => undefined,
+	stop: () => undefined,
+	getPlayerState: () => ({ currentTrack: null, queueItemId: null, loadCounter: 0, positionMs: 0 }),
 };
 
 let bridge: PlaybackBridge | null = null;
 
-/** Registered once, before the first render: the hooks must not change afterwards. */
 export function registerPlaybackBridge(implementation: PlaybackBridge): void {
 	if (bridge) throw new Error('[playbackBridge] Already registered');
 	bridge = implementation;
 }
 
-/** The registered playback actions, outside React. Fails loudly before registration. */
 export function getPlayback(): PlaybackBridge {
 	if (bridge) return bridge;
 	logger.error(NOT_REGISTERED);
@@ -68,4 +84,8 @@ export function usePlaylistPlayback(playlistId: string): PlaylistPlayback {
 
 export function usePlayerHeight(): number {
 	return getPlayback().usePlayerHeight();
+}
+
+export function useActiveQueue(): OwnerQueue {
+	return getPlayback().useActiveQueue();
 }

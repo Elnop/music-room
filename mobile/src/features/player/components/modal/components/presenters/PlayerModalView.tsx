@@ -3,8 +3,7 @@ import { View, StyleSheet, Modal } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
-import { QueueModal } from '@/components/player/QueueModal';
-import { DevicePickerSheet } from '@/components/player/DevicePickerSheet';
+import { getPlayerModal } from '@/shared/services/playerModalsBridge';
 import { PlayerHeader } from './PlayerHeader';
 import { PlayerTrackInfo } from './PlayerTrackInfo';
 import { PlayerProgressSlider } from './PlayerProgressSlider';
@@ -18,6 +17,9 @@ interface PlayerModalViewProps {
 }
 
 export function PlayerModalView({ modal, gestures }: PlayerModalViewProps) {
+	const QueueModal = getPlayerModal('QueueModal');
+	const DevicePickerSheet = getPlayerModal('DevicePickerSheet');
+
 	return (
 		<Modal
 			visible={modal.isModalOpen}
@@ -87,14 +89,16 @@ export function PlayerModalView({ modal, gestures }: PlayerModalViewProps) {
 					</Animated.View>
 				</GestureDetector>
 
-				<QueueModal
-					visible={modal.isModalOpen && modal.isQueueOpen}
-					onClose={() => modal.setQueueOpen(false)}
-				/>
-				<DevicePickerSheet
-					visible={modal.isModalOpen && modal.isDevicesOpen}
-					onClose={() => modal.setDevicesOpen(false)}
-				/>
+				{QueueModal &&
+					React.createElement(QueueModal, {
+						visible: modal.isModalOpen && modal.isQueueOpen,
+						onClose: () => modal.setQueueOpen(false),
+					})}
+				{DevicePickerSheet &&
+					React.createElement(DevicePickerSheet, {
+						visible: modal.isModalOpen && modal.isDevicesOpen,
+						onClose: () => modal.setDevicesOpen(false),
+					})}
 			</GestureHandlerRootView>
 		</Modal>
 	);

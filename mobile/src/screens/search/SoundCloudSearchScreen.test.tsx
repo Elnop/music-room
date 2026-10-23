@@ -36,7 +36,7 @@ jest.mock('@/features/player/context/PlayerContext', () => ({
 	usePlayerHeight: () => 0,
 }));
 
-jest.mock('@/store/queueStore', () => ({
+jest.mock('@/features/queue/stores/queueStore', () => ({
 	useQueueStore: (select: (s: object) => unknown) =>
 		select({ playListTrack: jest.fn(), addItem: jest.fn() }),
 }));

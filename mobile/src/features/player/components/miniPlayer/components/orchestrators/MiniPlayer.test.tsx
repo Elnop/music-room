@@ -3,10 +3,10 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { createStore } from 'zustand';
 import { MiniPlayer } from './MiniPlayer';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
-import { useConnectStore } from '@/store/connectStore';
 import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
+import { registerConnectBridge, type ConnectSnapshot } from '@/shared/services/connectBridge';
+import { registerPlaybackBridge } from '@/shared/services/playbackBridge';
 import type { UserProfile } from '@/types/user.types';
-import { queueApi } from '@/services/queueApi';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import { hapticTap } from '@/shared/utils/haptics';
 
@@ -31,17 +31,6 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 
 jest.mock('@/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
-}));
-
-jest.mock('@/services/queueApi', () => ({
-	queueApi: {
-		getQueue: jest.fn(),
-		next: jest.fn(),
-		previous: jest.fn(),
-		playItem: jest.fn(),
-		moveItem: jest.fn(),
-		removeItem: jest.fn(),
-	},
 }));
 
 jest.mock('@/features/player/context/PlayerContext', () => ({
@@ -76,6 +65,49 @@ registerAuthSession({
 	refreshAccessToken: async () => true,
 });
 
+let testConnectState: ConnectSnapshot = {
+	target: { kind: 'local' },
+	remoteStatus: null,
+	controlPending: false,
+};
+
+const mockNext = jest.fn(async () => 'played' as const);
+
+registerPlaybackBridge({
+	usePlaylistPlayback: () => ({ playingUri: null, state: null }),
+	usePlayerHeight: () => 0,
+	useActiveQueue: () => ({ currentItemId: null, items: [], version: 0 }),
+	addToQueue: jest.fn(async () => true),
+	playNext: jest.fn(async () => true),
+	playPlaylist: jest.fn(async () => 'played'),
+	next: mockNext,
+	previous: jest.fn(async () => 'played'),
+	playListTrack: jest.fn(async () => undefined),
+	playTrack: jest.fn(),
+	pause: jest.fn(),
+	resume: jest.fn(),
+	stop: jest.fn(),
+	getPlayerState: () => ({ currentTrack: null, queueItemId: null, loadCounter: 0, positionMs: 0 }),
+});
+
+registerConnectBridge({
+	useConnect: selector => selector(testConnectState),
+	useIsLocal: () => testConnectState.target.kind === 'local',
+	getConnectState: () => testConnectState,
+	setRemoteStatus: status => {
+		testConnectState.remoteStatus = status;
+	},
+	setControlPending: pending => {
+		testConnectState.controlPending = pending;
+	},
+	setLocal: () => {
+		testConnectState.target = { kind: 'local' };
+	},
+	setRemote: target => {
+		testConnectState.target = { kind: 'remote', ...target };
+	},
+});
+
 describe('MiniPlayer', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
@@ -85,7 +117,7 @@ describe('MiniPlayer', () => {
 			accessToken: 'test-token',
 			isAuthenticated: true,
 		});
-		useConnectStore.setState({ target: { kind: 'local' }, remoteStatus: null });
+		testConnectState = { target: { kind: 'local' }, remoteStatus: null, controlPending: false };
 	});
 
 	it('shows "Rien en lecture" without a track and opens the modal on tap', () => {
@@ -105,7 +137,7 @@ describe('MiniPlayer', () => {
 		fireEvent.press(screen.getByLabelText('Lecture'));
 		fireEvent.press(screen.getByLabelText('Piste suivante'));
 		expect(resume).not.toHaveBeenCalled();
-		expect(queueApi.next).not.toHaveBeenCalled();
+		expect(mockNext).not.toHaveBeenCalled();
 		expect(hapticTap).not.toHaveBeenCalled();
 	});
 
@@ -137,10 +169,11 @@ describe('MiniPlayer', () => {
 		});
 
 		it("shows the friend's device track and « Sur Tablette de Léa »", () => {
-			useConnectStore.setState({
+			testConnectState = {
 				target: { kind: 'remote', ownerId: 'friend', deviceId: 'tablet', ownerUsername: 'Léa' },
 				remoteStatus: remoteStatus('friend'),
-			});
+				controlPending: false,
+			};
 			render(<MiniPlayer />);
 			expect(screen.getByText('Sur la tablette')).toBeTruthy();
 			expect(screen.getByText('Sur Tablette de Léa')).toBeTruthy();
@@ -148,10 +181,11 @@ describe('MiniPlayer', () => {
 		});
 
 		it('shows « Sur Tablette » for one of my devices', () => {
-			useConnectStore.setState({
+			testConnectState = {
 				target: { kind: 'remote', ownerId: 'me', deviceId: 'tablet' },
 				remoteStatus: remoteStatus('me'),
-			});
+				controlPending: false,
+			};
 			render(<MiniPlayer />);
 			expect(screen.getByText('Sur Tablette')).toBeTruthy();
 		});

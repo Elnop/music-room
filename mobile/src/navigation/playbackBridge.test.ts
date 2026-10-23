@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react-native';
 import { getPlayback, usePlaylistPlayback } from '@/shared/services/playbackBridge';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
-import { useQueueStore } from '@/store/queueStore';
+import { useQueueStore } from '@/features/queue/stores/queueStore';
 import { useAuthStore } from '@/features/auth/stores/authStore';
 import type { QueueItem } from '@/types/queue.types';
 import type { UserProfile } from '@/types/user.types';

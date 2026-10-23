@@ -36,11 +36,11 @@ jest.mock('@/features/auth/stores/authStore', () => ({
 	),
 }));
 
-jest.mock('@/store/queueStore', () => ({
+jest.mock('@/features/queue/stores/queueStore', () => ({
 	useQueueStore: { getState: () => ({ setCurrentItem: mockSetCurrentItem }) },
 }));
 
-jest.mock('@/store/connectStore', () => ({
+jest.mock('@/features/queue/stores/connectStore', () => ({
 	useConnectStore: { getState: () => ({ setLocal: mockSetLocal }) },
 }));
 

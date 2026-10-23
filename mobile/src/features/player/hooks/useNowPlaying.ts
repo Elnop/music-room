@@ -2,8 +2,8 @@ import { useCallback, useMemo } from 'react';
 import { usePlayer } from '@/features/player/context/PlayerContext';
 import { usePlayerProgress } from './usePlayerProgress';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
-import { useActiveQueue, useQueueStore } from '@/store/queueStore';
-import { previousAction, selectHasNext, selectHasPrevious } from '@/store/queueSelectors';
+import { useActiveQueue, getPlayback } from '@/shared/services/playbackBridge';
+import { previousAction, selectHasNext, selectHasPrevious } from '@/shared/utils/queueNavigation';
 import { useRemoteNowPlaying } from './useRemoteNowPlaying';
 
 import type { NowPlaying, NowPlayingTrack } from '@/features/player/types';
@@ -23,8 +23,8 @@ export function useNowPlaying(): NowPlaying {
 	const needsStreamLoad = usePlayerStore(state => state.needsStreamLoad);
 	const restoredPositionMs = usePlayerStore(state => state.startPositionMs ?? 0);
 	const queue = useActiveQueue();
-	const queueNext = useQueueStore(state => state.next);
-	const queuePrevious = useQueueStore(state => state.previous);
+	const queueNext = useCallback(() => getPlayback().next(), []);
+	const queuePrevious = useCallback(() => getPlayback().previous(), []);
 
 	const localTrack = useMemo<NowPlayingTrack | null>(
 		() =>

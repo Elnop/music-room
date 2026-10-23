@@ -27,8 +27,8 @@ import { MiniPlayer } from '@/features/player/components/miniPlayer/components/o
 import { PlayerModal } from '@/features/player/components/modal/components/orchestrators/PlayerModal';
 import { PlayerErrorToast } from '@/features/player/components/feedback/PlayerErrorToast';
 import { PlayerProvider } from '@/features/player/context/PlayerProvider';
-import { useQueueSync } from '@/hooks/useQueueSync';
-import { useRemoteTarget } from '@/hooks/useRemoteTarget';
+import { useQueueSync } from '@/features/queue/hooks/useQueueSync';
+import { useRemoteTarget } from '@/features/queue/hooks/useRemoteTarget';
 import { useConnectionStatus } from '@/shared/hooks/useConnectionStatus';
 import { ConnectionBanner } from '@/shared/components/feedback/ConnectionBanner';
 

@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useConnectStore } from '@/store/connectStore';
+import { useConnectStoreSelector, setControlPending } from '@/shared/services/connectBridge';
 import { useSession } from '@/shared/services/authSession';
 import { useSocketStore } from '@/shared/stores/socketStore';
-import { useActiveQueue, useQueueStore } from '@/store/queueStore';
-import { selectHasNext, selectHasPrevious, type OwnerQueue } from '@/store/queueSelectors';
+import { useActiveQueue, getPlayback, type OwnerQueue } from '@/shared/services/playbackBridge';
+import { selectHasNext, selectHasPrevious } from '@/shared/utils/queueNavigation';
 import { hashStringToNumber } from '@/shared/utils/trackToSoundCloud';
-import { estimatePositionMs } from '@/features/player/utils/remotePosition';
+import { estimatePositionMs } from '@/shared/utils/remotePosition';
 import type { NowPlaying } from '@/features/player/types';
 
 const REMOTE_TICK_MS = 1000;
@@ -19,12 +19,12 @@ function remoteDurationMs(queue: OwnerQueue, trackId: number | undefined): numbe
 }
 
 export function useRemoteNowPlaying(): NowPlaying | null {
-	const target = useConnectStore(state => state.target);
-	const remoteStatus = useConnectStore(state => state.remoteStatus);
+	const target = useConnectStoreSelector(state => state.target);
+	const remoteStatus = useConnectStoreSelector(state => state.remoteStatus);
 	const userId = useSession(session => session?.user?.id ?? null);
 	const queue = useActiveQueue();
-	const queueNext = useQueueStore(state => state.next);
-	const queuePrevious = useQueueStore(state => state.previous);
+	const queueNext = () => getPlayback().next();
+	const queuePrevious = () => getPlayback().previous();
 
 	const isRemote = target.kind === 'remote';
 	const remotePlaying = isRemote && (remoteStatus?.isPlaying ?? false);
@@ -50,7 +50,7 @@ export function useRemoteNowPlaying(): NowPlaying | null {
 		if (!track) return;
 		const socket = useSocketStore.getState().socket;
 		if (!socket) return;
-		useConnectStore.getState().setControlPending(true);
+		setControlPending(true);
 		socket.emit('control:action', {
 			targetUserId: target.ownerId,
 			targetDeviceId: target.deviceId,

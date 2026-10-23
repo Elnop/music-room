@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { AppState } from 'react-native';
 import { usePlayerStore, readPositionMs } from '@/features/player/stores/playerStore';
 import { useSession } from '@/shared/services/authSession';
-import { useConnectStore } from '@/store/connectStore';
+import { isLocalTarget, useIsLocalTarget } from '@/shared/services/connectBridge';
 import { lastTrackStorage, type LastTrackEntry } from '@/shared/services/lastTrackStorage';
 import { queueTrackToSoundCloud } from '@/shared/utils/trackToSoundCloud';
 import { toTrackInput } from '@/shared/utils/trackInput';
@@ -10,7 +10,7 @@ import { toTrackInput } from '@/shared/utils/trackInput';
 export const LAST_TRACK_SAVE_INTERVAL_MS = 10_000;
 export const LAST_TRACK_PLAY_SAVE_DELAY_MS = 2000;
 
-const isLocal = () => useConnectStore.getState().target.kind === 'local';
+const isLocal = () => isLocalTarget();
 
 function snapshot(): LastTrackEntry | null {
 	const { currentTrack, queueItemId, playbackState, startPositionMs, needsStreamLoad } =
@@ -49,7 +49,7 @@ function persist(userId: string): void {
  */
 export function useLastTrackPersistence(): void {
 	const userId = useSession(session => session?.user?.id ?? null);
-	const local = useConnectStore(state => state.target.kind === 'local');
+	const local = useIsLocalTarget();
 	const currentTrack = usePlayerStore(state => state.currentTrack);
 	const playbackState = usePlayerStore(state => state.playbackState);
 	const restoredStartMs = usePlayerStore(state =>

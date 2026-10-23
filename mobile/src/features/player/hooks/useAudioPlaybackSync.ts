@@ -1,12 +1,12 @@
 import { useEffect, useRef } from 'react';
 import type { useAudioPlayer } from 'expo-audio';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
-import { useConnectStore } from '@/store/connectStore';
+import { isLocalTarget } from '@/shared/services/connectBridge';
 import { isStreamStale } from '@/features/player/services/streamPrefetch';
 import { logger } from '@/shared/utils/logger';
 import { PLAYER_LOAD_TIMEOUT_MS } from '@/features/player/constants';
 
-const playsLocally = () => useConnectStore.getState().target.kind === 'local';
+const playsLocally = () => isLocalTarget();
 
 function clearTimers(
 	pollRef: React.MutableRefObject<ReturnType<typeof setInterval> | null>,

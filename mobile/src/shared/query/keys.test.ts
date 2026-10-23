@@ -15,11 +15,13 @@ describe('queryKeys', () => {
 			[queryKeys.playlists.all, queryKeys.playlists.friends()],
 			[queryKeys.playlists.all, queryKeys.playlists.members('p1')],
 			[queryKeys.queue.all, queryKeys.queue.room('r1')],
+			[queryKeys.queue.all, queryKeys.queue.detail('me')],
 			[queryKeys.friends.all, queryKeys.friends.list()],
 			[queryKeys.friends.all, queryKeys.friends.search('al')],
 			[queryKeys.profile.all, queryKeys.profile.me()],
 			[queryKeys.profile.all, queryKeys.profile.user('u1')],
 			[queryKeys.devices.all, queryKeys.devices.list()],
+			[queryKeys.devices.all, queryKeys.devices.picker()],
 			[queryKeys.search.all, queryKeys.search.tracks('daft')],
 		] as const;
 

@@ -1,11 +1,10 @@
 import { act, renderHook } from '@testing-library/react-native';
 import { createStore } from 'zustand';
 import { useNowPlaying } from './useNowPlaying';
-import { useConnectStore } from '@/store/connectStore';
 import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
-import { useQueueStore } from '@/store/queueStore';
-import { queueApi } from '@/services/queueApi';
+import { registerConnectBridge, type ConnectSnapshot } from '@/shared/services/connectBridge';
+import { registerPlaybackBridge, type OwnerQueue } from '@/shared/services/playbackBridge';
 import type { ListeningStatus } from '@/types/listening.types';
 import type { QueueItem } from '@/types/queue.types';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
@@ -34,18 +33,6 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 jest.mock('@/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
-
-jest.mock('@/services/queueApi', () => ({
-	queueApi: { next: jest.fn(), previous: jest.fn() },
-}));
-
-jest.mock('@/shared/utils/toast', () => ({
-	showInfo: jest.fn(),
-	showError: jest.fn(),
-	showSuccess: jest.fn(),
-}));
-
-const api = queueApi as jest.Mocked<typeof queueApi>;
 
 const localTrack: SoundCloudTrack = {
 	id: 7,
@@ -99,6 +86,56 @@ registerAuthSession({
 	refreshAccessToken: async () => true,
 });
 
+let testQueue: OwnerQueue = {
+	currentItemId: null,
+	items: [],
+	version: 0,
+};
+
+let testConnectState: ConnectSnapshot = {
+	target: { kind: 'local' },
+	remoteStatus: null,
+	controlPending: false,
+};
+
+const mockNext = jest.fn(async () => 'played' as const);
+const mockPrevious = jest.fn(async () => 'played' as const);
+
+registerPlaybackBridge({
+	usePlaylistPlayback: () => ({ playingUri: null, state: null }),
+	usePlayerHeight: () => 0,
+	useActiveQueue: () => testQueue,
+	addToQueue: jest.fn(async () => true),
+	playNext: jest.fn(async () => true),
+	playPlaylist: jest.fn(async () => 'ok'),
+	next: mockNext,
+	previous: mockPrevious,
+	playListTrack: jest.fn(async () => undefined),
+	playTrack: jest.fn(),
+	pause: jest.fn(),
+	resume: jest.fn(),
+	stop: jest.fn(),
+	getPlayerState: () => ({ currentTrack: null, queueItemId: null, loadCounter: 0, positionMs: 0 }),
+});
+
+registerConnectBridge({
+	useConnect: selector => selector(testConnectState),
+	useIsLocal: () => testConnectState.target.kind === 'local',
+	getConnectState: () => testConnectState,
+	setRemoteStatus: status => {
+		testConnectState.remoteStatus = status;
+	},
+	setControlPending: pending => {
+		testConnectState.controlPending = pending;
+	},
+	setLocal: () => {
+		testConnectState.target = { kind: 'local' };
+	},
+	setRemote: target => {
+		testConnectState.target = { kind: 'remote', ...target };
+	},
+});
+
 beforeEach(() => {
 	jest.clearAllMocks();
 	jest.useFakeTimers({ now: NOW });
@@ -108,8 +145,8 @@ beforeEach(() => {
 		accessToken: 'test-token',
 		isAuthenticated: true,
 	});
-	useConnectStore.setState({ target: { kind: 'local' }, remoteStatus: null });
-	useQueueStore.getState().reset();
+	testConnectState = { target: { kind: 'local' }, remoteStatus: null, controlPending: false };
+	testQueue = { currentItemId: null, items: [], version: 0 };
 	usePlayerStore.setState({
 		currentTrack: null,
 		playbackState: 'idle',
@@ -155,7 +192,7 @@ describe('useNowPlaying local', () => {
 		const { result } = renderHook(() => useNowPlaying());
 		act(() => result.current.previous());
 		expect(mockSeekTo).toHaveBeenCalledWith(0);
-		expect(api.previous).not.toHaveBeenCalled();
+		expect(mockPrevious).not.toHaveBeenCalled();
 	});
 });
 
@@ -194,20 +231,22 @@ describe('useNowPlaying restored track (#312)', () => {
 });
 
 describe('useNowPlaying remote', () => {
-	const goRemote = (ownerId = 'friend', ownerUsername?: string) =>
-		useConnectStore.setState({
+	const goRemote = (ownerId = 'friend', ownerUsername?: string) => {
+		testConnectState = {
 			target: { kind: 'remote', ownerId, deviceId: 'tablet', ownerUsername },
-		});
+			remoteStatus: null,
+			controlPending: false,
+		};
+	};
 
 	it("shows the device's track, estimated progress and the queue item's duration", () => {
 		const { hashStringToNumber } = jest.requireActual('@/shared/utils/trackToSoundCloud');
 		goRemote('friend', 'Léa');
-		useQueueStore.getState().applyState({
-			ownerId: 'friend',
+		testQueue = {
 			version: 1,
 			currentItemId: 'b',
 			items: [item('a'), item('b'), item('c')],
-		});
+		};
 		const status = remoteStatus({
 			track: {
 				id: hashStringToNumber(item('b').track.trackUri),
@@ -216,7 +255,7 @@ describe('useNowPlaying remote', () => {
 				artworkUrl: null,
 			},
 		});
-		useConnectStore.setState({ remoteStatus: status });
+		testConnectState.remoteStatus = status;
 		// Local audio is ignored in remote mode.
 		usePlayerStore.setState({ currentTrack: localTrack, playbackState: 'playing' });
 
@@ -239,8 +278,8 @@ describe('useNowPlaying remote', () => {
 
 	it('has no duration for a track off the queue', () => {
 		goRemote();
-		useConnectStore.setState({
-			remoteStatus: remoteStatus({ track: { id: 1, title: 'X', artist: 'Y', artworkUrl: null } }),
+		testConnectState.remoteStatus = remoteStatus({
+			track: { id: 1, title: 'X', artist: 'Y', artworkUrl: null },
 		});
 		const { result } = renderHook(() => useNowPlaying());
 		expect(result.current.durationMs).toBeNull();
@@ -248,14 +287,14 @@ describe('useNowPlaying remote', () => {
 
 	it('names my own device without my username', () => {
 		goRemote('me', 'Moi');
-		useConnectStore.setState({ remoteStatus: remoteStatus({ ownerId: 'me' }) });
+		testConnectState.remoteStatus = remoteStatus({ ownerId: 'me' });
 		const { result } = renderHook(() => useNowPlaying());
 		expect(result.current.deviceLabel).toBe('Tablette');
 	});
 
 	it('sends play/pause as control:action', () => {
 		goRemote();
-		useConnectStore.setState({ remoteStatus: remoteStatus() });
+		testConnectState.remoteStatus = remoteStatus();
 		const { result } = renderHook(() => useNowPlaying());
 		act(() => result.current.toggle());
 		expect(mockSocket.emit).toHaveBeenCalledWith('control:action', {
@@ -268,11 +307,10 @@ describe('useNowPlaying remote', () => {
 	it('steps the remote queue with its device and never restarts locally', async () => {
 		goRemote();
 		mockProgress = { currentTime: 10, duration: 120, progress: 8 };
-		useConnectStore.setState({ remoteStatus: remoteStatus() });
-		api.previous.mockResolvedValue({ ok: false, code: 'QUEUE_START' });
+		testConnectState.remoteStatus = remoteStatus();
 		const { result } = renderHook(() => useNowPlaying());
 		await act(async () => result.current.previous());
-		expect(api.previous).toHaveBeenCalledWith({ ownerId: 'friend', deviceId: 'tablet' });
+		expect(mockPrevious).toHaveBeenCalledTimes(1);
 		expect(mockSeekTo).not.toHaveBeenCalled();
 	});
 });
