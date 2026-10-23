@@ -12,6 +12,8 @@ interface FriendsListViewProps {
 	activeTab: 'friends' | 'search';
 	friends: FriendProfile[];
 	isLoadingFriends: boolean;
+	friendsFailed: boolean;
+	onRetryFriends: () => void;
 	isRefreshingFriends: boolean;
 	onRefreshFriends: () => void;
 	searchQuery: string;
@@ -35,6 +37,8 @@ export function FriendsListView({
 	activeTab,
 	friends,
 	isLoadingFriends,
+	friendsFailed,
+	onRetryFriends,
 	isRefreshingFriends,
 	onRefreshFriends,
 	searchQuery,
@@ -55,7 +59,6 @@ export function FriendsListView({
 }: FriendsListViewProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createFriendsListStyles(theme), [theme]);
-	const showSearch = activeTab === 'search' || (!hasFriends && !isLoadingFriends);
 
 	return (
 		<View style={styles.container}>
@@ -82,7 +85,7 @@ export function FriendsListView({
 						</Pressable>
 					</View>
 				)}
-				{showSearch && (
+				{activeTab === 'search' && (
 					<SearchBar
 						value={searchQuery}
 						onChangeText={onSearchChange}
@@ -96,6 +99,8 @@ export function FriendsListView({
 				<FriendsListTab
 					friends={friends}
 					isLoading={isLoadingFriends}
+					loadFailed={friendsFailed}
+					onRetry={onRetryFriends}
 					isRefreshing={isRefreshingFriends}
 					onRefresh={onRefreshFriends}
 					canControl={canControl}

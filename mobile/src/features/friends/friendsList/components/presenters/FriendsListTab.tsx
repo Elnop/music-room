@@ -11,6 +11,8 @@ import { createFriendsListStyles } from './friendsListStyles';
 interface FriendsListTabProps {
 	friends: FriendProfile[];
 	isLoading: boolean;
+	loadFailed: boolean;
+	onRetry: () => void;
 	isRefreshing: boolean;
 	onRefresh: () => void;
 	canControl: (friendId: string) => boolean;
@@ -24,6 +26,8 @@ interface FriendsListTabProps {
 export function FriendsListTab({
 	friends,
 	isLoading,
+	loadFailed,
+	onRetry,
 	isRefreshing,
 	onRefresh,
 	canControl,
@@ -66,15 +70,24 @@ export function FriendsListTab({
 				{ paddingBottom: playerHeight + theme.spacing.xl },
 			]}
 			ListEmptyComponent={
-				<EmptyState
-					style={styles.emptyState}
-					icon="people-outline"
-					message="Aucun ami pour l'instant. Suivez des utilisateurs qui vous suivent en retour pour devenir amis."
-					action={{
-						label: 'Rechercher des utilisateurs',
-						onPress: onGoToSearch,
-					}}
-				/>
+				loadFailed ? (
+					<EmptyState
+						style={styles.emptyState}
+						icon="cloud-offline-outline"
+						message="Impossible de charger vos amis"
+						action={{ label: 'Réessayer', onPress: onRetry }}
+					/>
+				) : (
+					<EmptyState
+						style={styles.emptyState}
+						icon="people-outline"
+						message="Aucun ami pour l'instant. Suivez des utilisateurs qui vous suivent en retour pour devenir amis."
+						action={{
+							label: 'Rechercher des utilisateurs',
+							onPress: onGoToSearch,
+						}}
+					/>
+				)
 			}
 		/>
 	);
