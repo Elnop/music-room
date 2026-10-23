@@ -26,7 +26,7 @@ export function QueueSwipe({ children, onAddToQueue, renderRightActions }: Queue
 
 	const renderLeftActions = () => (
 		<View style={styles.queueAction} accessible accessibilityLabel="Ajouter à la file d'attente">
-			<Ionicons name="list" size={24} color="#FFFFFF" />
+			<Ionicons name="list" size={24} color={theme.colors.onColor} />
 			<Text style={styles.queueText}>À la file</Text>
 		</View>
 	);
@@ -63,7 +63,7 @@ const createStyles = (theme: Theme) =>
 			height: '100%',
 		},
 		queueText: {
-			color: '#FFFFFF',
+			color: theme.colors.onColor,
 			fontSize: 12,
 			fontWeight: '600',
 			marginTop: 4,

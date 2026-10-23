@@ -7,8 +7,8 @@ Application mobile React Native pour Zumik - Partage de musique collaboratif.
 - **Framework**: React Native 0.81+ avec Expo SDK 54
 - **Language**: TypeScript (strict mode)
 - **Navigation**: React Navigation v7
-- **State Management**: Zustand v5 (état client) et TanStack Query v5 (données serveur, en place depuis #377, adoptée feature par feature)
-- **HTTP Client**: Axios
+- **State Management**: TanStack Query v5 (données serveur, cache, invalidation) et Zustand v5 (état client local : session, préférences, UI, lecteur)
+- **HTTP Client**: Client API partagé (`src/shared/services/api.ts`) basé sur `fetch` avec injection automatique des en-têtes de télémétrie (`X-Platform`, `X-Device-Model`, `X-App-Version`) et rafraîchissement transparent de token
 - **Auth**: API du backend (`/api/auth/*`) ; l'app n'embarque aucun client Supabase
 - **Realtime**: Socket.io-client v4.8.1
 - **Validation**: Zod v3.25.76
@@ -134,7 +134,7 @@ Pour débuter, voici les 5 commandes que vous utiliserez le plus :
 
 ## Architecture
 
-Cible de l'epic #362 : `src/shared/`, `src/providers/`, `src/navigation/` et `src/features/<feature>/`. Le socle est en place (#377) ; les dossiers historiques (`screens/`, `components/<feature>/`, `store/`, `hooks/`, `contexts/`, `services/`, `api/`, `utils/`) migrent dans `features/` une feature à la fois (#378–#385).
+Issue de l'epic #362 : `src/shared/`, `src/providers/`, `src/navigation/` et `src/features/<feature>/`. Toutes les features ont été entièrement migrées (#378–#385) selon le pattern orchestrators / presenters / hooks, et l'ensemble des règles de composants est garanti par le plugin ESLint sans aucune exception.
 
 ```
 mobile/src/
@@ -264,7 +264,13 @@ Les types, validateurs et versions sont alignés avec le backend :
 
 ## Tests
 
-À venir dans une phase ultérieure.
+Les tests unitaires et de composants s'exécutent avec Jest-Expo, et les règles du plugin ESLint avec `node:test` :
+
+```bash
+npm test                # Exécute les tests de règles ESLint puis la suite Jest
+npm test -- <path>      # Exécuter une suite de tests ciblée
+npm run test:coverage   # Rapport de couverture Jest (au-dessus du plancher de #364 : 69.06% lignes)
+```
 
 ## Documentation
 

@@ -44,7 +44,7 @@ export function SwipeableTrackItem({
 			onPress={() => onDelete(track.id)}
 			accessibilityLabel={`Supprimer ${track.title}`}
 		>
-			<Ionicons name="trash-outline" size={24} color="#FFFFFF" />
+			<Ionicons name="trash-outline" size={24} color={theme.colors.onColor} />
 			<Text style={styles.deleteText}>Supprimer</Text>
 		</Pressable>
 	);
@@ -174,7 +174,7 @@ const createStyles = (theme: Theme) =>
 		},
 		trackContainerActive: {
 			elevation: 6,
-			shadowColor: '#000000',
+			shadowColor: theme.colors.shadow,
 			shadowOpacity: 0.25,
 			shadowRadius: 6,
 			shadowOffset: { width: 0, height: 3 },
@@ -184,14 +184,14 @@ const createStyles = (theme: Theme) =>
 			padding: theme.spacing.xs,
 		},
 		deleteButton: {
-			backgroundColor: '#FF6B6B',
+			backgroundColor: theme.colors.error,
 			justifyContent: 'center',
 			alignItems: 'center',
 			width: 100,
 			height: '100%',
 		},
 		deleteText: {
-			color: '#FFFFFF',
+			color: theme.colors.onColor,
 			fontSize: 12,
 			fontWeight: '600',
 			marginTop: 4,

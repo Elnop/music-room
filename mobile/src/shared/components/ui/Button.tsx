@@ -53,7 +53,7 @@ export function Button({
 		isDisabled && styles.disabledText,
 	].filter(Boolean);
 
-	const spinnerColor = variant === 'primary' ? '#FFFFFF' : theme.colors.primary;
+	const spinnerColor = variant === 'primary' ? theme.colors.onColor : theme.colors.primary;
 
 	return (
 		<Pressable
@@ -103,7 +103,7 @@ const createStyles = (theme: Theme) =>
 		outline: {
 			backgroundColor: 'transparent',
 			borderWidth: 1,
-			borderColor: '#FFFFFF',
+			borderColor: theme.colors.onColor,
 		},
 
 		text: {
@@ -111,7 +111,7 @@ const createStyles = (theme: Theme) =>
 			fontWeight: '600',
 		},
 		primaryText: {
-			color: '#FFFFFF',
+			color: theme.colors.onColor,
 		},
 		secondaryText: {
 			color: theme.colors.text,

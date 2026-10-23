@@ -1,6 +1,11 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { ConnectionBanner, textColorOn } from './ConnectionBanner';
+import { FIXED_COLORS } from '@/shared/theme/tokens';
+import { christmasTheme } from '@/shared/theme/christmas.theme';
+import { originalTheme } from '@/shared/theme/original.theme';
+import { pastelLimeTheme } from '@/shared/theme/pastelLime.theme';
+import { royalBlueTheme } from '@/shared/theme/royalBlue.theme';
 
 const mockSocketState = { retry: jest.fn() };
 
@@ -53,22 +58,22 @@ describe('ConnectionBanner', () => {
 
 	it('picks a readable text color on the background', () => {
 		render(<ConnectionBanner status="failed" topInset={0} />);
-		// Default theme error #EF4444: white would be 3.8:1, dark text is 5:1.
-		expect(screen.getByText('Connexion perdue')).toHaveStyle({ color: '#111111' });
+		// Default theme error: white would be 3.8:1, dark text is 5:1.
+		expect(screen.getByText('Connexion perdue')).toHaveStyle({ color: FIXED_COLORS.inkDark });
 	});
 });
 
 describe('textColorOn', () => {
 	it.each([
 		// error colors of the themes
-		['#DC2626', '#FFFFFF'],
-		['#EF4444', '#111111'],
-		['#B91C1C', '#FFFFFF'],
+		[pastelLimeTheme.colors.error, FIXED_COLORS.inkLight],
+		[originalTheme.colors.error, FIXED_COLORS.inkDark],
+		[christmasTheme.colors.error, FIXED_COLORS.inkLight],
 		// warning colors of the themes
-		['#F59E0B', '#111111'],
-		['#EA580C', '#111111'],
-		['#FBBF24', '#111111'],
-		['#D97706', '#111111'],
+		[pastelLimeTheme.colors.warning, FIXED_COLORS.inkDark],
+		[royalBlueTheme.colors.warning, FIXED_COLORS.inkDark],
+		[originalTheme.colors.warning, FIXED_COLORS.inkDark],
+		[christmasTheme.colors.warning, FIXED_COLORS.inkDark],
 	])('uses %s → %s (at least 4.5:1)', (background, text) => {
 		expect(textColorOn(background)).toBe(text);
 	});

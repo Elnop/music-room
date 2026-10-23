@@ -74,7 +74,27 @@ export const FIXED_COLORS = {
 	onFacebook: '#FFFFFF',
 	/** Text and icons drawn on a coloured fill (primary, success). */
 	onColor: '#FFFFFF',
+	/** High-contrast dark ink for light backgrounds (#315). */
+	inkDark: '#111111',
+	/** High-contrast light ink for dark backgrounds (#315). */
+	inkLight: '#FFFFFF',
 	/** The dimmed backdrop behind a bottom sheet. */
 	backdrop: 'rgba(0, 0, 0, 0.5)',
 	shadow: '#000000',
+} as const;
+
+/**
+ * Music genre badge colours, kept consistent across themes.
+ */
+export const GENRE_COLORS = {
+	pop: '#FF6B9D',
+	rock: '#E74C3C',
+	hiphop: '#9B59B6',
+	rnb: '#E91E63',
+	jazz: '#F39C12',
+	classical: '#3498DB',
+	electronic: '#00BCD4',
+	country: '#8D6E63',
+	latin: '#FF5722',
+	metal: '#607D8B',
 } as const;

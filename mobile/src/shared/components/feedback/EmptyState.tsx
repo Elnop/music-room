@@ -66,6 +66,6 @@ const createStyles = (theme: Theme) =>
 		actionText: {
 			fontSize: theme.typography.sizes.lg,
 			fontWeight: theme.typography.weights.semibold,
-			color: '#FFFFFF',
+			color: theme.colors.onColor,
 		},
 	});
