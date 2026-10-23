@@ -10,7 +10,7 @@ export interface Track {
 	previewUrl?: string;
 }
 
-// Track in a playlist, ordered by rank (doc/PLAYLIST_CONCURRENCY.md)
+// Track in a playlist, ordered by rank (doc/features/playlist-concurrency.md)
 // Mirrors backend TrackInPlaylistResponse (extends TrackResponse).
 export interface TrackInPlaylist extends Track {
 	createdAt: string;

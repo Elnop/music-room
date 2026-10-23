@@ -5,7 +5,7 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import { linkProvider } from '@/features/auth/services/provider-link.service.js';
 import * as oauthLoginService from '@/features/auth/services/oauth-login.service.js';
 
-// Token verification calls Google and Facebook: always mocked (doc/TESTING.md).
+// Token verification calls Google and Facebook: always mocked (doc/development/testing.md).
 const { verifyGoogleToken, isProviderLinked } = vi.hoisted(() => ({
 	verifyGoogleToken: vi.fn(),
 	isProviderLinked: vi.fn(),

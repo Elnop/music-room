@@ -5,7 +5,7 @@ import { logger } from '@/shared/utils/logger.js';
 import type { MoveTrackInput } from '@/features/playlists/playlist.validators.js';
 
 // Calls the track operations of migration 016 and turns their errors into
-// API errors (doc/PLAYLIST_CONCURRENCY.md, "Operations").
+// API errors (doc/features/playlist-concurrency.md, "Operations").
 
 const addResultSchema = z.object({
 	rank: z.string(),

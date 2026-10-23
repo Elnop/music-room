@@ -16,7 +16,7 @@ import type {
 	PlaylistUpdatedPayload,
 } from '@/features/playlists/playlist.types.js';
 
-// The versioned playlist:updated delta (#90, doc/PLAYLIST_CONCURRENCY.md,
+// The versioned playlist:updated delta (#90, doc/features/playlist-concurrency.md,
 // "Broadcast and convergence") emitted by real track operations to clients of
 // a real Socket.io server, against the local Supabase stack.
 

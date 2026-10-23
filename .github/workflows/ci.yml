@@ -134,7 +134,7 @@ jobs:
       - if: steps.images.outputs.cache-matched-key != ''
         run: zstd -dc ~/docker-images/images.tar.zst | docker load -q
       # Local Supabase stack (Docker) with backend/migrations applied, plus a Redis
-      # container on a free port (session revocation); see doc/TESTING.md.
+      # container on a free port (session revocation); see doc/development/testing.md.
       - run: sh scripts/test-db.sh up
       - if: steps.images.outputs.cache-hit != 'true'
         run: |

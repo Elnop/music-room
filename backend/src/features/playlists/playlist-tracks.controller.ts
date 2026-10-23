@@ -6,7 +6,7 @@ import type { AuthenticatedRequest } from '@/shared/types/global.types.js';
 import { routeParam } from '@/shared/utils/route-params.js';
 import { sendSuccess } from '@/shared/utils/send-success.js';
 
-// Playlist tracks: add, remove, move (doc/PLAYLIST_CONCURRENCY.md).
+// Playlist tracks: add, remove, move (doc/features/playlist-concurrency.md).
 
 /** POST /api/playlists/:id/tracks */
 export async function addTrack(req: Request, res: Response) {

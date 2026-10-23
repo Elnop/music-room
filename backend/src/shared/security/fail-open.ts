@@ -6,7 +6,7 @@ import * as counter from '@/shared/security/counter.js';
  * How account lockout and IP reputation run a Redis operation: skipped when
  * ACCOUNT_LOCKOUT_ENABLED=false, and fail open (a safe default, logged) while
  * Redis is not ready or when a command fails. An accepted risk: the login
- * rate limiter, which runs first, fails closed (doc/THREAT_MODEL.md).
+ * rate limiter, which runs first, fails closed (doc/security/threat-model.md).
  */
 interface FailOpenOptions<T> {
 	/** Debug log when lockout is disabled. */

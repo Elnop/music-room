@@ -3,7 +3,7 @@
 -- =====================================================
 -- Loaded by scripts/dev-db.sh reset after the migrations, in one transaction.
 -- Never applied to the hosted project. Accounts and what each one shows:
--- doc/DEMO_ACCOUNTS.md (keep it in sync).
+-- doc/development/demo-accounts.md (keep it in sync).
 
 -- Users: auth.users + auth.identities, as GoTrue writes them for an email
 -- sign-up with a confirmed address. GoTrue reads the token columns as strings,

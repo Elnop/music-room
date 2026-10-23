@@ -5,7 +5,7 @@ import * as loginService from '@/features/auth/services/login.service.js';
 import * as sessionService from '@/features/auth/services/session.service.js';
 import * as oauthLoginService from '@/features/auth/services/oauth-login.service.js';
 
-// Token verification calls Google and Facebook: always mocked (doc/TESTING.md).
+// Token verification calls Google and Facebook: always mocked (doc/development/testing.md).
 const { verifyGoogleToken } = vi.hoisted(() => ({ verifyGoogleToken: vi.fn() }));
 
 vi.mock('@/features/auth/services/oauth.service.js', () => ({

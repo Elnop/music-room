@@ -18,7 +18,7 @@ const detailsPatch = (details: PlaylistDetailsEvent) => ({
 });
 
 /**
- * What the playlist events do to the cache (#342, doc/PLAYLIST_CONCURRENCY.md).
+ * What the playlist events do to the cache (#342, doc/features/playlist-concurrency.md).
  * A track delta applies in version order; a skipped version or a rebalance
  * invalidates the playlist, which reloads it. Details patch the metadata only.
  */
