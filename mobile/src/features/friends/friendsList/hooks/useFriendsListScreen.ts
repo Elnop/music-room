@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { usePlayerHeight } from '@/shared/services/playbackBridge';
+import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
 import { showError } from '@/shared/utils/toast';
 import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 import { logger } from '@/shared/utils/logger';
@@ -9,7 +9,7 @@ import { useToggleControlMutation } from '@/features/friends/hooks/useFriendsMut
 import { useDebouncedUserSearch } from './useDebouncedUserSearch';
 
 export function useFriendsListScreen(onNavigateToProfile: (userId: string) => void) {
-	const playerHeight = usePlayerHeight();
+	const bottomPadding = useBottomPadding();
 	const {
 		data: friends = [],
 		isPending: isLoadingFriends,
@@ -83,6 +83,6 @@ export function useFriendsListScreen(onNavigateToProfile: (userId: string) => vo
 		onToggleControl: handleToggleControl,
 		onSelectUser: onNavigateToProfile,
 		onTabChange: setActiveTab,
-		playerHeight,
+		bottomPadding,
 	};
 }

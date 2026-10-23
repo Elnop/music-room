@@ -2,13 +2,14 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import { debounce } from '@/shared/utils/debounce';
 import { showError } from '@/shared/utils/toast';
 import { toTrackInput } from '@/shared/utils/trackInput';
-import { getPlayback, usePlayerHeight } from '@/shared/services/playbackBridge';
+import { getPlayback } from '@/shared/services/playbackBridge';
+import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
 import { useSoundCloudSearch } from '@/features/search/hooks/useSoundCloudSearch';
 import type { SoundCloudTrack } from '@/features/search/types';
 import type { AddQueueItemBody } from '@/shared/types/playback';
 
 export function useSoundCloudSearchScreen() {
-	const playerHeight = usePlayerHeight();
+	const bottomPadding = useBottomPadding();
 
 	const [searchQuery, setSearchQuery] = useState('');
 	const [debouncedQuery, setDebouncedQuery] = useState('');
@@ -91,7 +92,7 @@ export function useSoundCloudSearchScreen() {
 		isError,
 		searchResults,
 		actionTrack,
-		playerHeight,
+		bottomPadding,
 		handleSearchChange,
 		handleRefresh,
 		handleRetry: handleRefresh,

@@ -73,7 +73,7 @@ export function PlaylistDetailOrchestrator({ navigation, route }: PlaylistDetail
 				gradient={gradient}
 				isRefreshing={screen.isRefreshing}
 				onRefresh={screen.refresh}
-				playerHeight={screen.playerHeight}
+				bottomPadding={screen.bottomPadding}
 				header={
 					<PlaylistHeader
 						playlist={playlist}

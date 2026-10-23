@@ -10,10 +10,10 @@ import { AddableTrackRow } from './AddableTrackRow';
 
 interface SearchTracksViewProps {
 	screen: SearchTracks;
-	playerHeight: number;
+	bottomPadding: number;
 }
 
-export function SearchTracksView({ screen, playerHeight }: SearchTracksViewProps) {
+export function SearchTracksView({ screen, bottomPadding }: SearchTracksViewProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
 	const typed = screen.search.text.trim() !== '';
 
@@ -44,7 +44,7 @@ export function SearchTracksView({ screen, playerHeight }: SearchTracksViewProps
 							onShowActions={screen.showActions}
 						/>
 					)}
-					contentContainerStyle={[styles.list, { paddingBottom: playerHeight + theme.spacing.xl }]}
+					contentContainerStyle={[styles.list, { paddingBottom: bottomPadding }]}
 					showsVerticalScrollIndicator={false}
 					ListEmptyComponent={
 						typed && screen.isLoading ? null : (

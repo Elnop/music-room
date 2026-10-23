@@ -6,17 +6,17 @@ import type { Theme } from '@/shared/theme/types';
 
 interface SettingsViewProps {
 	theme: Theme;
-	playerHeight: number;
+	bottomPadding: number;
 }
 
-export function SettingsView({ theme, playerHeight }: SettingsViewProps) {
+export function SettingsView({ theme, bottomPadding }: SettingsViewProps) {
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
 	return (
 		<ScrollView
 			style={styles.container}
 			keyboardShouldPersistTaps="handled"
-			contentContainerStyle={{ paddingBottom: playerHeight + theme.spacing.xl }}
+			contentContainerStyle={{ paddingBottom: bottomPadding }}
 		>
 			<View style={styles.section}>
 				<Text style={styles.sectionTitle}>Thème</Text>

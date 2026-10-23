@@ -30,10 +30,7 @@ export function SharingView({ sharing }: { sharing: PlaylistSharing }) {
 		<View style={styles.container}>
 			<ScrollView
 				style={styles.container}
-				contentContainerStyle={[
-					styles.scroll,
-					{ paddingBottom: sharing.playerHeight + theme.spacing.xl },
-				]}
+				contentContainerStyle={[styles.scroll, { paddingBottom: sharing.bottomPadding }]}
 			>
 				<View style={styles.header}>
 					<Text style={styles.title}>{header.title}</Text>

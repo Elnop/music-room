@@ -3,6 +3,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { createStore } from 'zustand';
 import { MiniPlayer } from './MiniPlayer';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
+import { useMiniPlayerLayoutStore } from '@/features/player/stores/miniPlayerLayoutStore';
 import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
 import { registerConnectBridge, type ConnectSnapshot } from '@/shared/services/connectBridge';
 import { registerPlaybackBridge } from '@/shared/services/playbackBridge';
@@ -126,6 +127,14 @@ describe('MiniPlayer', () => {
 		expect(screen.getByText('Choisissez un titre pour commencer')).toBeTruthy();
 		fireEvent.press(screen.getByText('Rien en lecture'));
 		expect(usePlayerStore.getState().isModalOpen).toBe(true);
+	});
+
+	it('publishes its measured height for the screens to clear it', () => {
+		render(<MiniPlayer />);
+		fireEvent(screen.getByLabelText('Mini-lecteur'), 'layout', {
+			nativeEvent: { layout: { x: 0, y: 0, width: 360, height: 96 } },
+		});
+		expect(useMiniPlayerLayoutStore.getState().height).toBe(96);
 	});
 
 	it('disables play and next without a track', () => {

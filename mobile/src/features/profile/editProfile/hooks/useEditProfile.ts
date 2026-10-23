@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useAvatarPicker } from '@/features/profile/hooks/useAvatarPicker';
 import { useUpdateProfileMutation } from '@/features/profile/hooks/useProfileMutations';
 import { updateProfileSchema, type UpdateProfileInput } from '@/features/profile/types';
-import { usePlayerHeight } from '@/shared/services/playbackBridge';
+import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
 import { useSession } from '@/shared/services/authSession';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
@@ -15,7 +15,7 @@ import type { UpdateProfileData } from '@/types/user.types';
 
 export function useEditProfile() {
 	const { theme } = useTheme();
-	const playerHeight = usePlayerHeight();
+	const bottomPadding = useBottomPadding();
 	const navigation = useNavigation();
 	const user = useSession(s => s.user);
 
@@ -83,7 +83,7 @@ export function useEditProfile() {
 
 	return {
 		theme,
-		playerHeight,
+		bottomPadding,
 		user,
 		error,
 		isUploading,

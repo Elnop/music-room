@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { usePlayerHeight } from '@/shared/services/playbackBridge';
+import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
 import { useFriendListening } from '@/shared/services/musicControlBridge';
 import { controlErrorMessage } from '@/shared/utils/controlError';
 import { showError } from '@/shared/utils/toast';
@@ -12,7 +12,7 @@ import {
 import { useFollowMutation } from '@/features/friends/hooks/useFriendsMutations';
 
 export function useUserProfileScreen(userId: string) {
-	const playerHeight = usePlayerHeight();
+	const bottomPadding = useBottomPadding();
 	const {
 		data: profile,
 		isLoading: isProfileLoading,
@@ -75,6 +75,6 @@ export function useUserProfileScreen(userId: string) {
 		isListeningLoading,
 		onRemotePlay: remotePlay,
 		onRemotePause: remotePause,
-		playerHeight,
+		bottomPadding,
 	};
 }

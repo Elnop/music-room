@@ -5,7 +5,7 @@ import { MusicPreferencesView } from '@/features/profile/musicPreferences/compon
 export function MusicPreferencesOrchestrator() {
 	const {
 		theme,
-		playerHeight,
+		bottomPadding,
 		isLoading,
 		isSaving,
 		selectedGenres,
@@ -17,7 +17,7 @@ export function MusicPreferencesOrchestrator() {
 	return (
 		<MusicPreferencesView
 			theme={theme}
-			playerHeight={playerHeight}
+			bottomPadding={bottomPadding}
 			isLoading={isLoading}
 			isSaving={isSaving}
 			selectedGenres={selectedGenres}

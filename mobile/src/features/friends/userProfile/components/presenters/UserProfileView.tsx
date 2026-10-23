@@ -24,7 +24,7 @@ interface UserProfileViewProps {
 	onRemotePlay: (deviceId: string) => void;
 	onRemotePause: (deviceId: string) => void;
 	onSelectPlaylist: (playlistId: string) => void;
-	playerHeight: number;
+	bottomPadding: number;
 }
 
 export function UserProfileView({
@@ -40,7 +40,7 @@ export function UserProfileView({
 	onRemotePlay,
 	onRemotePause,
 	onSelectPlaylist,
-	playerHeight,
+	bottomPadding,
 }: UserProfileViewProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createUserProfileStyles(theme), [theme]);
@@ -54,10 +54,7 @@ export function UserProfileView({
 		<View style={styles.container}>
 			<ScrollView
 				style={styles.scrollView}
-				contentContainerStyle={[
-					styles.contentContainer,
-					{ paddingBottom: playerHeight + theme.spacing.xl },
-				]}
+				contentContainerStyle={[styles.contentContainer, { paddingBottom: bottomPadding }]}
 			>
 				<UserProfileHeader
 					userId={userId}

@@ -14,7 +14,7 @@ interface MyDevicesViewProps {
 	isLoading: boolean;
 	loadFailed: boolean;
 	isRefreshing: boolean;
-	playerHeight: number;
+	bottomPadding: number;
 	devices: UserDeviceWithLicenses[];
 	friends: FriendUserSummary[];
 	allDevicesIds: Set<string>;
@@ -32,7 +32,7 @@ export function MyDevicesView({
 	isLoading,
 	loadFailed,
 	isRefreshing,
-	playerHeight,
+	bottomPadding,
 	devices,
 	friends,
 	allDevicesIds,
@@ -69,10 +69,7 @@ export function MyDevicesView({
 		<View style={styles.root}>
 			<ScrollView
 				style={styles.scrollArea}
-				contentContainerStyle={[
-					styles.scrollContent,
-					{ paddingBottom: playerHeight + theme.spacing.xl },
-				]}
+				contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomPadding }]}
 				refreshControl={refreshControl}
 			>
 				<MyDevicesHeader />

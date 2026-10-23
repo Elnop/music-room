@@ -3,7 +3,7 @@ import { Alert } from 'react-native';
 import { useNavigation, usePreventRemove } from '@react-navigation/native';
 import { useProfilePrivacy } from '@/features/profile/hooks/useProfileQueries';
 import { useUpdatePrivacyMutation } from '@/features/profile/hooks/useProfileMutations';
-import { usePlayerHeight } from '@/shared/services/playbackBridge';
+import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 import { showError } from '@/shared/utils/toast';
@@ -11,7 +11,7 @@ import type { ProfilePrivacy, VisibilityLevel } from '@/types/user.types';
 
 export function usePrivacySettingsScreen() {
 	const { theme } = useTheme();
-	const playerHeight = usePlayerHeight();
+	const bottomPadding = useBottomPadding();
 	const navigation = useNavigation();
 
 	const privacyQuery = useProfilePrivacy();
@@ -90,7 +90,7 @@ export function usePrivacySettingsScreen() {
 
 	return {
 		theme,
-		playerHeight,
+		bottomPadding,
 		isLoading: privacyQuery.isLoading,
 		isSaving: updateMutation.isPending,
 		privacy,

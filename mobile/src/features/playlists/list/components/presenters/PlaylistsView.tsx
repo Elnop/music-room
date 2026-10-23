@@ -105,10 +105,7 @@ export function PlaylistsView({ screen }: { screen: PlaylistsScreen }) {
 				ListHeaderComponent={header}
 				ListFooterComponent={footer}
 				renderItem={() => null}
-				contentContainerStyle={[
-					styles.list,
-					{ paddingBottom: screen.playerHeight + theme.spacing.xl },
-				]}
+				contentContainerStyle={[styles.list, { paddingBottom: screen.bottomPadding }]}
 				refreshControl={
 					<RefreshControl
 						refreshing={screen.isRefreshing}

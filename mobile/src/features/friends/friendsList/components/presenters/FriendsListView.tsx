@@ -30,7 +30,7 @@ interface FriendsListViewProps {
 	onToggleControl: (friendId: string, current: boolean) => void;
 	onSelectUser: (userId: string) => void;
 	onTabChange: (tab: 'friends' | 'search') => void;
-	playerHeight: number;
+	bottomPadding: number;
 }
 
 export function FriendsListView({
@@ -55,7 +55,7 @@ export function FriendsListView({
 	onToggleControl,
 	onSelectUser,
 	onTabChange,
-	playerHeight,
+	bottomPadding,
 }: FriendsListViewProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createFriendsListStyles(theme), [theme]);
@@ -108,7 +108,7 @@ export function FriendsListView({
 					onToggleControl={onToggleControl}
 					onSelectUser={onSelectUser}
 					onGoToSearch={() => onTabChange('search')}
-					playerHeight={playerHeight}
+					bottomPadding={bottomPadding}
 				/>
 			) : (
 				<SearchUsersTab
@@ -120,7 +120,7 @@ export function FriendsListView({
 					onRefresh={onRefreshSearch}
 					onRetry={onRetrySearch}
 					onSelectUser={onSelectUser}
-					playerHeight={playerHeight}
+					bottomPadding={bottomPadding}
 				/>
 			)}
 		</View>

@@ -10,7 +10,7 @@ import type { MusicGenre, UserProfile } from '@/types/user.types';
 
 interface ProfileViewProps {
 	theme: Theme;
-	playerHeight: number;
+	bottomPadding: number;
 	user: UserProfile | null;
 	stats?: UserStats | null;
 	genres: MusicGenre[];
@@ -27,7 +27,7 @@ interface ProfileViewProps {
 
 export function ProfileView({
 	theme,
-	playerHeight,
+	bottomPadding,
 	user,
 	stats,
 	genres,
@@ -55,10 +55,7 @@ export function ProfileView({
 		<View style={styles.screenWrapper}>
 			<ScrollView
 				style={styles.profileScroll}
-				contentContainerStyle={[
-					styles.contentContainer,
-					{ paddingBottom: playerHeight + theme.spacing.xl },
-				]}
+				contentContainerStyle={[styles.contentContainer, { paddingBottom: bottomPadding }]}
 				refreshControl={
 					<RefreshControl
 						refreshing={isRefreshing}

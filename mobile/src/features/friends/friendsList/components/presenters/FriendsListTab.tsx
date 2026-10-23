@@ -20,7 +20,7 @@ interface FriendsListTabProps {
 	onToggleControl: (friendId: string, current: boolean) => void;
 	onSelectUser: (userId: string) => void;
 	onGoToSearch: () => void;
-	playerHeight: number;
+	bottomPadding: number;
 }
 
 export function FriendsListTab({
@@ -35,7 +35,7 @@ export function FriendsListTab({
 	onToggleControl,
 	onSelectUser,
 	onGoToSearch,
-	playerHeight,
+	bottomPadding,
 }: FriendsListTabProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createFriendsListStyles(theme), [theme]);
@@ -65,10 +65,7 @@ export function FriendsListTab({
 					onToggleControl={onToggleControl}
 				/>
 			)}
-			contentContainerStyle={[
-				styles.listContent,
-				{ paddingBottom: playerHeight + theme.spacing.xl },
-			]}
+			contentContainerStyle={[styles.listContent, { paddingBottom: bottomPadding }]}
 			ListEmptyComponent={
 				loadFailed ? (
 					<EmptyState
