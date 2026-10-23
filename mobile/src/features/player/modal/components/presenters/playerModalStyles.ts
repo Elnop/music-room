@@ -3,7 +3,8 @@ import type { Theme } from '@/shared/theme/types';
 
 export const { width: WINDOW_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 export const DISMISS_THRESHOLD = SCREEN_HEIGHT * 0.2;
-export const ARTWORK_SIZE = WINDOW_WIDTH * 0.75;
+// Capped by the height too, so a short screen still fits the bottom row above the navigation bar.
+export const ARTWORK_SIZE = Math.min(WINDOW_WIDTH * 0.75, SCREEN_HEIGHT * 0.36);
 export const SEEK_STEP_S = 10;
 export const HEADER_HIT_SLOP = { top: 4, bottom: 4, left: 4, right: 4 };
 
@@ -15,8 +16,6 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 		swipeIndicator: { alignItems: 'center', marginBottom: 8 },
 		swipeBar: { width: 40, height: 5, borderRadius: 3, opacity: 0.5 },
 		closeButton: { position: 'absolute', top: insets.top + 16, left: 20, zIndex: 10 },
-		queueButton: { position: 'absolute', top: insets.top + 16, right: 20, zIndex: 10 },
-		devicesButton: { position: 'absolute', top: insets.top + 16, right: 68, zIndex: 10 },
 		headerButton: {
 			width: 40,
 			height: 40,
@@ -31,15 +30,29 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 			marginTop: 8,
 		},
 		deviceText: {
+			flexShrink: 1,
 			fontSize: 13,
 			fontWeight: '600',
-			marginTop: 4,
-			paddingHorizontal: 112,
 		},
+		// Content sits low, within thumb reach; the header keeps only the close chevron.
 		mainContent: {
 			flex: 1,
-			justifyContent: 'center',
-			paddingBottom: 20,
+			justifyContent: 'flex-end',
+			paddingBottom: 8,
+		},
+		bottomBar: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			justifyContent: 'space-between',
+			gap: 16,
+			paddingHorizontal: 24,
+			marginTop: 24,
+		},
+		deviceGroup: {
+			flex: 1,
+			flexDirection: 'row',
+			alignItems: 'center',
+			gap: 8,
 		},
 		bottomSpacer: {
 			height: insets.bottom + 20,
