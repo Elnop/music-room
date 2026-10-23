@@ -133,4 +133,4 @@ The backend's global auth limiter (20 `/api/auth` requests per 15 minutes per IP
 
 A failing job marks the pull request red. Lint warnings do not fail it; errors do.
 
-`lint`, `type-check` and `test` run on `ubuntu-slim` (1 vCPU container, 15-minute cap, no Docker); `test-int` and `check` need Docker and run on `ubuntu-24.04`. Actions are pinned to commit SHAs and bumped by Dependabot (`.github/dependabot.yml`).
+`lint` and `type-check` run on `ubuntu-slim` (1 vCPU container, 15-minute cap, no Docker); `test-int` and `check` need Docker and run on `ubuntu-24.04`, and so does `test`, whose mobile suite took 450–570 s on a single vCPU, at the edge of its 10-minute cap (#419). Actions are pinned to commit SHAs and bumped by Dependabot (`.github/dependabot.yml`).
