@@ -1,5 +1,7 @@
 # Multi-stage Dockerfile for Zumik Backend
-FROM node:22-alpine AS base
+# Debian slim (glibc), like mobile/Dockerfile: @ast-grep/cli, a dev dependency,
+# ships no musl binary, so npm install fails on Alpine.
+FROM node:22-bookworm-slim AS base
 
 WORKDIR /app
 
@@ -9,9 +11,8 @@ COPY package*.json ./
 # Development stage (for docker-compose dev mode)
 FROM base AS development
 
-# Update npm to latest version and install dependencies
-RUN npm install -g npm@11.7.0 && \
-    npm install --include=dev
+# The image's npm 10 installs exactly the committed lockfile
+RUN npm ci --include=dev
 
 # Copy source code (will be mounted as volume in dev mode)
 COPY . .
@@ -23,16 +24,14 @@ CMD ["npm", "run", "dev"]
 # Builder stage (for production build)
 FROM base AS builder
 
-# Update npm and install dependencies for build
-RUN npm install -g npm@11.7.0 && \
-    npm install --include=dev
+RUN npm ci --include=dev
 
 # Copy source and build
 COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:22-alpine AS production
+FROM node:22-bookworm-slim AS production
 
 WORKDIR /app
 
@@ -45,8 +44,8 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 
 # Create non-root user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001 && \
+RUN groupadd --system --gid 1001 nodejs && \
+    useradd --system --uid 1001 --gid nodejs --no-create-home nodejs && \
     chown -R nodejs:nodejs /app
 
 USER nodejs
