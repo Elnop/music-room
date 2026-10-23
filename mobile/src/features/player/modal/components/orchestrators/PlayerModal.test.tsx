@@ -220,6 +220,15 @@ describe('PlayerModal without a track', () => {
 		expect(usePlayerStore.getState().isModalOpen).toBe(false);
 	});
 
+	it('puts the devices and queue buttons in a row under the playback controls', () => {
+		render(<PlayerModal />);
+		const tree = JSON.stringify(screen.toJSON());
+		const at = (label: string) => tree.indexOf(`"accessibilityLabel":"${label}"`);
+		expect(at('Fermer le lecteur')).toBeLessThan(at('Piste suivante'));
+		expect(at('Piste suivante')).toBeLessThan(at("Choisir l'appareil"));
+		expect(at("Choisir l'appareil")).toBeLessThan(at("File d'attente"));
+	});
+
 	it('keeps the queue button working', () => {
 		render(<PlayerModal />);
 		fireEvent.press(screen.getByLabelText("File d'attente"));

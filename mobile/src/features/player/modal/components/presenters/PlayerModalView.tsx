@@ -8,6 +8,7 @@ import { PlayerHeader } from './PlayerHeader';
 import { PlayerTrackInfo } from './PlayerTrackInfo';
 import { PlayerProgressSlider } from './PlayerProgressSlider';
 import { PlayerControls } from './PlayerControls';
+import { PlayerBottomBar } from './PlayerBottomBar';
 import type { usePlayerModal } from '@/features/player/modal/hooks/usePlayerModal';
 import type { usePlayerModalGestures } from '@/features/player/modal/hooks/usePlayerModalGestures';
 import type { SeekPosition } from '@/features/player/modal/hooks/useSeekPosition';
@@ -42,14 +43,7 @@ export function PlayerModalView({ modal, gestures, seek }: PlayerModalViewProps)
 							end={{ x: 0.5, y: 1 }}
 						/>
 
-						<PlayerHeader
-							styles={modal.styles}
-							colors={modal.colors}
-							deviceLabel={modal.deviceLabel}
-							onClose={modal.closeModal}
-							onOpenDevices={() => modal.setDevicesOpen(true)}
-							onOpenQueue={() => modal.setQueueOpen(true)}
-						/>
+						<PlayerHeader styles={modal.styles} colors={modal.colors} onClose={modal.closeModal} />
 
 						<View style={modal.styles.mainContent}>
 							<PlayerTrackInfo
@@ -87,6 +81,14 @@ export function PlayerModalView({ modal, gestures, seek }: PlayerModalViewProps)
 								onPrevious={modal.handlePrevious}
 								onPlayPause={modal.handlePlayPause}
 								onNext={modal.handleNext}
+							/>
+
+							<PlayerBottomBar
+								styles={modal.styles}
+								colors={modal.colors}
+								deviceLabel={modal.deviceLabel}
+								onOpenDevices={() => modal.setDevicesOpen(true)}
+								onOpenQueue={() => modal.setQueueOpen(true)}
 							/>
 						</View>
 
