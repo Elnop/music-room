@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { Button } from '@/shared/components/ui/Button';
 import { ShareLinkButton } from '@/shared/components/sharing/ShareLinkButton';
-import { NowPlayingInline } from '@/components/profile/NowPlayingInline';
+import { NowPlayingInline } from '@/shared/components/media/NowPlayingInline';
 import { userLink } from '@/shared/utils/shareLinks';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { UserProfileHeaderProps } from '@/features/friends/types';

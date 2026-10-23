@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Avatar } from '@/shared/components/media/Avatar';
-import { GenreChip } from '@/components/profile/GenreChip';
+import { GenreChip } from '@/shared/components/ui/GenreChip';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { FilteredProfile, FollowStatus, MusicGenre } from '@/features/friends/types';
 import { createUserProfileHeaderStyles } from './userProfileHeaderStyles';

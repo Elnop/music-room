@@ -1,6 +1,6 @@
 import { friendsApi } from '@/features/friends/services/friendsApi';
-import { profileApi } from './profileApi';
-import { privacyApi } from './privacyApi';
+import { profileApi } from '@/features/profile/services/profileApi';
+import { privacyApi } from '@/features/profile/services/privacyApi';
 import { musicControlApi } from './musicControlApi';
 import { resetBackendUrl } from '@/shared/services/backendUrl';
 import { createStore } from 'zustand';

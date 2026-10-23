@@ -206,7 +206,7 @@ mobile/src/
   - Playlists → Playlists, PlaylistDetail, CreatePlaylist, SearchTracks, PlaylistSharing (les orchestrators de `features/playlists/<sujet>/`)
   - Search → Search
   - Friends → Friends, UserProfile, PlaylistDetail, SearchTracks
-  - Profile → Profile, EditProfile, PrivacySettings, MusicPreferences, Settings
+  - Profile → Profile, EditProfile, PrivacySettings, MusicPreferences, LinkedAccounts, Settings (les orchestrators de `features/profile/<sujet>/`)
 
 ## État, temps réel et lecture
 

@@ -40,6 +40,8 @@ export const queryKeys = {
 		all: ['profile'] as const,
 		me: () => [...queryKeys.profile.all, 'me'] as const,
 		user: (userId: string) => [...queryKeys.profile.all, 'user', userId] as const,
+		privacy: () => [...queryKeys.profile.all, 'privacy'] as const,
+		musicPreferences: () => [...queryKeys.profile.all, 'musicPreferences'] as const,
 	},
 	devices: {
 		all: ['devices'] as const,

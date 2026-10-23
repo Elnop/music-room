@@ -6,6 +6,7 @@ import * as providersApi from '@/features/auth/services/providersApi';
 import { signInWithGoogle } from '@/features/auth/services/googleSignIn';
 import { signInWithFacebook } from '@/features/auth/services/facebookSignIn';
 import type { LinkedProvidersResponse, OAuthProvider } from '@/features/auth/types';
+import { registerLinkedAccountsBridge } from '@/shared/services/linkedAccountsBridge';
 
 /** The access token of the session; the screens using these hooks are signed in. */
 function accessToken(): string {
@@ -23,7 +24,7 @@ function useProvidersKey() {
  * The sign-in methods linked to the signed-in account (profile, linked
  * accounts): fetched on every visit, without retry, like the screen always did.
  */
-export function useLinkedProviders() {
+function useLinkedProviders() {
 	const queryKey = useProvidersKey();
 	const signedIn = useAuthStore(state => state.accessToken !== null);
 	return useQuery({
@@ -42,7 +43,7 @@ export function useLinkedProviders() {
  * backend, whose answer replaces the cached list. A cancelled sign-in rejects
  * with Error('SIGN_IN_CANCELLED') before any request.
  */
-export function useLinkProvider() {
+function useLinkProvider() {
 	const queryKey = useProvidersKey();
 	const queryClient = useQueryClient();
 	return useMutation({
@@ -58,7 +59,7 @@ export function useLinkProvider() {
  * Unlinks a provider, then refetches the list before resolving: a failed
  * refetch fails the unlink, as the screen reports it.
  */
-export function useUnlinkProvider() {
+function useUnlinkProvider() {
 	const queryKey = useProvidersKey();
 	const queryClient = useQueryClient();
 	return useMutation({
@@ -68,3 +69,9 @@ export function useUnlinkProvider() {
 		},
 	});
 }
+
+registerLinkedAccountsBridge({
+	useLinkedProviders,
+	useLinkProvider,
+	useUnlinkProvider,
+});
