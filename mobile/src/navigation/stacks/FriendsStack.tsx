@@ -10,17 +10,13 @@ import React from 'react';
 import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '@/shared/theme/ThemeContext';
-import { FriendsScreen } from '@/screens/friends/FriendsScreen';
-import { UserProfileScreen } from '@/screens/friends/UserProfileScreen';
+import { FriendsOrchestrator } from '@/features/friends/friendsList/components/orchestrators/FriendsOrchestrator';
+import { UserProfileOrchestrator } from '@/features/friends/userProfile/components/orchestrators/UserProfileOrchestrator';
 import { PlaylistDetailOrchestrator } from '@/features/playlists/detail/components/orchestrators/PlaylistDetailOrchestrator';
 import { SearchTracksOrchestrator } from '@/features/playlists/searchTracks/components/orchestrators/SearchTracksOrchestrator';
+import type { FriendsStackParamList } from '@/features/friends/types';
 
-export type FriendsStackParamList = {
-	Friends: undefined;
-	UserProfile: { userId: string };
-	PlaylistDetail: { id: string };
-	SearchTracks: { playlistId: string };
-};
+export type { FriendsStackParamList };
 
 const FriendsStack = createNativeStackNavigator<FriendsStackParamList>();
 
@@ -43,10 +39,14 @@ export function FriendsNavigator() {
 				headerTitleAlign: 'center',
 			}}
 		>
-			<FriendsStack.Screen name="Friends" component={FriendsScreen} options={{ title: 'Amis' }} />
+			<FriendsStack.Screen
+				name="Friends"
+				component={FriendsOrchestrator}
+				options={{ title: 'Amis' }}
+			/>
 			<FriendsStack.Screen
 				name="UserProfile"
-				component={UserProfileScreen}
+				component={UserProfileOrchestrator}
 				options={{ title: '' }}
 			/>
 			<FriendsStack.Screen

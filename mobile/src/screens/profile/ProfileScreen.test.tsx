@@ -35,7 +35,7 @@ jest.mock('@/features/auth/stores/authStore', () => {
 });
 
 jest.mock('@/services/privacyApi', () => ({ privacyApi: {} }));
-jest.mock('@/services/friendsApi', () => ({ friendsApi: {} }));
+jest.mock('@/features/friends/services/friendsApi', () => ({ friendsApi: {} }));
 jest.mock('@/shared/components/theme/ThemeSelector', () => ({ ThemeSelector: () => null }));
 
 type AlertButtons = Parameters<typeof Alert.alert>[2];
