@@ -9,8 +9,8 @@ import { readPositionMs, usePlayerStore } from '@/features/player/stores/playerS
 import { useConnectStore } from '@/features/queue/stores/connectStore';
 import { useActiveQueue, useQueueStore } from '@/features/queue/stores/queueStore';
 import { selectPlaysPlaylist } from '@/features/queue/utils/queueSelectors';
-import { QueueModal } from '@/features/queue/components/queueModal/components/orchestrators/QueueModal';
-import { DevicePickerSheet } from '@/features/queue/components/devicePicker/components/orchestrators/DevicePickerSheet';
+import { QueueModal } from '@/features/queue/queueModal/components/orchestrators/QueueModal';
+import { DevicePickerSheet } from '@/features/queue/devicePicker/components/orchestrators/DevicePickerSheet';
 import { TrackActionsSheet } from '@/features/playlists/trackActions/components/orchestrators/TrackActionsSheet';
 
 /**

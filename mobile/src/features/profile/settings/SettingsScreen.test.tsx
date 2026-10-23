@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react-native';
-import { SettingsOrchestrator } from './orchestrators/SettingsOrchestrator';
+import { SettingsOrchestrator } from './components/orchestrators/SettingsOrchestrator';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')

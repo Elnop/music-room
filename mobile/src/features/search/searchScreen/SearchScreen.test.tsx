@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { SearchOrchestrator } from './orchestrators/SearchOrchestrator';
+import { SearchOrchestrator } from './components/orchestrators/SearchOrchestrator';
 import { searchApi } from '@/features/search/services/searchApi';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 

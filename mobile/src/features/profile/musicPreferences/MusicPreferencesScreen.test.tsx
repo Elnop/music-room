@@ -1,7 +1,7 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MusicPreferencesOrchestrator } from './orchestrators/MusicPreferencesOrchestrator';
+import { MusicPreferencesOrchestrator } from './components/orchestrators/MusicPreferencesOrchestrator';
 import { privacyApi } from '@/features/profile/services/privacyApi';
 import type { MusicGenre } from '@/types/user.types';
 

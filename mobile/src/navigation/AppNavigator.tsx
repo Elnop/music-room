@@ -24,9 +24,9 @@ import { SearchNavigator } from '@/navigation/stacks/SearchStack';
 import { FriendsNavigator, type FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
 
 // Player components
-import { MiniPlayer } from '@/features/player/components/miniPlayer/components/orchestrators/MiniPlayer';
-import { PlayerModal } from '@/features/player/components/modal/components/orchestrators/PlayerModal';
-import { PlayerErrorToast } from '@/features/player/components/modal/components/orchestrators/PlayerErrorToast';
+import { MiniPlayer } from '@/features/player/miniPlayer/components/orchestrators/MiniPlayer';
+import { PlayerModal } from '@/features/player/modal/components/orchestrators/PlayerModal';
+import { PlayerErrorToast } from '@/features/player/modal/components/orchestrators/PlayerErrorToast';
 import { PlayerProvider } from '@/features/player/context/PlayerProvider';
 import { useQueueSync } from '@/features/queue/hooks/useQueueSync';
 import { useRemoteTarget } from '@/features/queue/hooks/useRemoteTarget';

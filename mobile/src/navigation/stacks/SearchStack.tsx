@@ -9,7 +9,7 @@ import React from 'react';
 import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '@/shared/theme/ThemeContext';
-import { SearchOrchestrator } from '@/features/search/searchScreen/orchestrators/SearchOrchestrator';
+import { SearchOrchestrator } from '@/features/search/searchScreen/components/orchestrators/SearchOrchestrator';
 
 type SearchStackParamList = {
 	Search: undefined;

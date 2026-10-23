@@ -70,10 +70,9 @@ function mockPlayerFor(url: string): MockPlayer {
 }
 
 // The system media controls (#309) are covered by MediaSessionBridge.test.tsx.
-jest.mock(
-	'@/features/player/components/mediaSession/components/orchestrators/MediaSessionBridge',
-	() => ({ MediaSessionBridge: () => null })
-);
+jest.mock('@/features/player/mediaSession/components/orchestrators/MediaSessionBridge', () => ({
+	MediaSessionBridge: () => null,
+}));
 
 jest.mock('expo-audio', () => ({
 	useAudioPlayer: (url: string) => mockPlayerFor(url),

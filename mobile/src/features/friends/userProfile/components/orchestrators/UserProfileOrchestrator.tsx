@@ -5,8 +5,8 @@ import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { FriendsStackParamList } from '@/features/friends/types';
 import { useUserProfileScreen } from '@/features/friends/userProfile/hooks/useUserProfileScreen';
-import { UserProfileView } from '@/features/friends/userProfile/presenters/UserProfileView';
-import { createUserProfileStyles } from '@/features/friends/userProfile/presenters/userProfileStyles';
+import { UserProfileView } from '@/features/friends/userProfile/components/presenters/UserProfileView';
+import { createUserProfileStyles } from '@/features/friends/userProfile/components/presenters/userProfileStyles';
 
 type UserProfileOrchestratorProps = Partial<
 	NativeStackScreenProps<FriendsStackParamList, 'UserProfile'>

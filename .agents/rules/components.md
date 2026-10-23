@@ -2,7 +2,7 @@
 
 Read before authoring or editing React components, orchestrators, presenters, hooks, or screens in `mobile/`. Every rule here is checked by `npm run check` (ESLint plugin `components`); the error message links to its section. Rules are append-only: see [guardrails.md](guardrails.md#append-only-rules).
 
-The component architecture follows the VibeAppTemplate and bedrock principles:
+The component architecture:
 - **Screens / Navigation** (`src/navigation/`): define navigation stacks and routes; screens only mount orchestrators.
 - **Orchestrators** (`features/<feature>/<subject>/components/orchestrators/`): connect hooks and stores, manage high-level presentation decisions, and select presenters.
 - **Presenters** (`features/<feature>/<subject>/components/presenters/`): pure presentation components; props in, JSX out; no state, no effects, no stores, no queries.
@@ -59,12 +59,13 @@ Each component file in `src/**` must declare at most one React component.
 
 In `src/features/**`, every React component must reside within a designated role directory.
 
-- **Allowed directories**:
-  - `orchestrators/` (or `components/orchestrators/`)
-  - `presenters/` (or `components/presenters/`)
-  - `context/` (for React Context Providers)
-- **Forbidden**: Creating standalone component files directly under feature roots or arbitrary folders like `features/<name>/components/` or `features/<name>/feedback/`.
-- **Fix**: Move the component into its appropriate `orchestrators/` or `presenters/` folder, or convert non-rendering helper components into hooks.
+- **Allowed paths** (one layout for every feature, see [structure.md](structure.md#placement)):
+  - `features/<feature>/<subject>/components/orchestrators/<File>.tsx`
+  - `features/<feature>/<subject>/components/presenters/<File>.tsx`
+  - `features/<feature>/context/<File>.tsx` (React Context Providers)
+- **Forbidden**: any other place, such as a role folder without `components/` (`features/<feature>/<subject>/presenters/`), a role folder without a subject folder (`features/<feature>/components/presenters/`), a doubled `components/` (`features/<feature>/components/<subject>/components/presenters/`), a nested role folder, or an arbitrary folder (`features/<feature>/<subject>/components/`, `features/<feature>/feedback/`). A feature with a single subject still has its subject folder.
+- **Not concerned**: files without JSX, tests (`*.test.*`), files outside `src/features/`.
+- **Fix**: Move the component into its subject's `components/orchestrators/` or `components/presenters/` folder, or convert non-rendering helper components into hooks.
 
 ---
 

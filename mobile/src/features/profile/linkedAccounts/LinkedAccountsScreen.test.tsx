@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
-import { LinkedAccountsOrchestrator } from './orchestrators/LinkedAccountsOrchestrator';
+import { LinkedAccountsOrchestrator } from './components/orchestrators/LinkedAccountsOrchestrator';
 import {
 	registerLinkedAccountsBridge,
 	type LinkedProvider,
