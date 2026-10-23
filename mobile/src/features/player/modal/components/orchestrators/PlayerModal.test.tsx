@@ -351,6 +351,27 @@ describe('PlayerModal slider for a screen reader', () => {
 		});
 	});
 
+	const slider = () => screen.getByTestId('seek-slider', { includeHiddenElements: true });
+
+	it('follows the finger while sliding, then holds the released position', () => {
+		render(<PlayerModal />);
+		act(() => slider().props.onSlidingStart(30));
+		act(() => slider().props.onValueChange(120));
+		expect(slider().props.value).toBe(120);
+		expect(screen.getByText('2:00')).toBeTruthy();
+
+		act(() => slider().props.onSlidingComplete(120));
+		expect(mockSeekTo).toHaveBeenCalledWith(120);
+		// The player still reports 0:30: the thumb must not jump back.
+		expect(slider().props.value).toBe(120);
+	});
+
+	it('keeps the dismiss pan off the seek bar', () => {
+		render(<PlayerModal />);
+		const pan = getByGestureTestId('player-modal-pan') as PanGesture;
+		expect(pan.config.requireToFail).toContain(getByGestureTestId('player-seek-native'));
+	});
+
 	it('seeks 10 s forward on increment', () => {
 		render(<PlayerModal />);
 		action('increment');

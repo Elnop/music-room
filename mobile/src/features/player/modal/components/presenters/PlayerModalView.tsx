@@ -10,13 +10,15 @@ import { PlayerProgressSlider } from './PlayerProgressSlider';
 import { PlayerControls } from './PlayerControls';
 import type { usePlayerModal } from '@/features/player/modal/hooks/usePlayerModal';
 import type { usePlayerModalGestures } from '@/features/player/modal/hooks/usePlayerModalGestures';
+import type { SeekPosition } from '@/features/player/modal/hooks/useSeekPosition';
 
 interface PlayerModalViewProps {
 	modal: ReturnType<typeof usePlayerModal>;
 	gestures: ReturnType<typeof usePlayerModalGestures>;
+	seek: SeekPosition;
 }
 
-export function PlayerModalView({ modal, gestures }: PlayerModalViewProps) {
+export function PlayerModalView({ modal, gestures, seek }: PlayerModalViewProps) {
 	const QueueModal = getPlayerModal('QueueModal');
 	const DevicePickerSheet = getPlayerModal('DevicePickerSheet');
 
@@ -59,16 +61,19 @@ export function PlayerModalView({ modal, gestures }: PlayerModalViewProps) {
 								colors={modal.colors}
 							/>
 
-							<PlayerProgressSlider
-								styles={modal.styles}
-								colors={modal.colors}
-								currentTime={modal.currentTime}
-								duration={modal.duration}
-								hasTrack={modal.track !== null}
-								disabled={modal.sliderDisabled}
-								onSeek={modal.handleSeek}
-								onSliderAction={modal.handleSliderAction}
-							/>
+							<GestureDetector gesture={gestures.sliderGesture}>
+								<View>
+									<PlayerProgressSlider
+										styles={modal.styles}
+										colors={modal.colors}
+										seek={seek}
+										duration={modal.duration}
+										hasTrack={modal.track !== null}
+										disabled={modal.sliderDisabled}
+										onSliderAction={modal.handleSliderAction}
+									/>
+								</View>
+							</GestureDetector>
 
 							<PlayerControls
 								styles={modal.styles}
