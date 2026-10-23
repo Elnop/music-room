@@ -4,6 +4,10 @@ import { Pressable } from '@/shared/components/ui/Pressable';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme, ThemeName } from '@/shared/theme/types';
+import { originalTheme } from '@/shared/theme/original.theme';
+import { royalBlueTheme } from '@/shared/theme/royalBlue.theme';
+import { christmasTheme } from '@/shared/theme/christmas.theme';
+import { pastelLimeTheme } from '@/shared/theme/pastelLime.theme';
 
 // Theme metadata for selector
 const AVAILABLE_THEMES: Array<{
@@ -12,10 +16,10 @@ const AVAILABLE_THEMES: Array<{
 	primaryColor: string;
 	icon: keyof typeof Ionicons.glyphMap;
 }> = [
-	{ name: 'original', displayName: 'Original', primaryColor: '#EA3E7A', icon: 'musical-notes' },
-	{ name: 'royalBlue', displayName: 'Bleu royal', primaryColor: '#1E3A8A', icon: 'sparkles' },
-	{ name: 'christmas', displayName: 'Noël', primaryColor: '#DC2626', icon: 'snow' },
-	{ name: 'pastelLime', displayName: 'Lime', primaryColor: '#84CC16', icon: 'leaf' },
+	{ name: 'original', displayName: 'Original', primaryColor: originalTheme.colors.primary, icon: 'musical-notes' },
+	{ name: 'royalBlue', displayName: 'Bleu royal', primaryColor: royalBlueTheme.colors.primary, icon: 'sparkles' },
+	{ name: 'christmas', displayName: 'Noël', primaryColor: christmasTheme.colors.primary, icon: 'snow' },
+	{ name: 'pastelLime', displayName: 'Lime', primaryColor: pastelLimeTheme.colors.primary, icon: 'leaf' },
 ];
 
 export function ThemeSelector() {
@@ -42,7 +46,7 @@ export function ThemeSelector() {
 						<Ionicons
 							name={themeOption.icon}
 							size={24}
-							color={isSelected ? '#FFFFFF' : themeOption.primaryColor}
+							color={isSelected ? theme.colors.onColor : themeOption.primaryColor}
 							style={styles.themeIcon}
 						/>
 						<Text style={[styles.themeName, isSelected && styles.themeNameSelected]}>
@@ -50,7 +54,7 @@ export function ThemeSelector() {
 						</Text>
 						{isSelected && (
 							<View style={styles.checkmarkContainer}>
-								<Ionicons name="checkmark" size={12} color="#FFFFFF" />
+								<Ionicons name="checkmark" size={12} color={theme.colors.onColor} />
 							</View>
 						)}
 					</Pressable>
@@ -90,7 +94,7 @@ const createStyles = (theme: Theme) =>
 			textAlign: 'center',
 		},
 		themeNameSelected: {
-			color: '#FFFFFF',
+			color: theme.colors.onColor,
 			fontWeight: theme.typography.weights.bold,
 		},
 		checkmarkContainer: {

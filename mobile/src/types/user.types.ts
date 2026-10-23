@@ -1,5 +1,6 @@
 // User Types (aligned with backend)
 import type { Ionicons } from '@expo/vector-icons';
+import { GENRE_COLORS } from '@/shared/theme/tokens';
 
 // =====================================================
 // Visibility Types
@@ -50,16 +51,16 @@ export const MUSIC_GENRES: MusicGenre[] = [
  * Genre display information with emojis and colors
  */
 export const GENRE_INFO: Record<MusicGenre, { label: string; icon: string; color: string }> = {
-	pop: { label: 'Pop', icon: '🎵', color: '#FF6B9D' },
-	rock: { label: 'Rock', icon: '🎸', color: '#E74C3C' },
-	hiphop: { label: 'Hip-Hop', icon: '🎤', color: '#9B59B6' },
-	rnb: { label: 'R&B', icon: '💜', color: '#E91E63' },
-	jazz: { label: 'Jazz', icon: '🎷', color: '#F39C12' },
-	classical: { label: 'Classique', icon: '🎻', color: '#3498DB' },
-	electronic: { label: 'Électro', icon: '🎧', color: '#00BCD4' },
-	country: { label: 'Country', icon: '🤠', color: '#8D6E63' },
-	latin: { label: 'Latino', icon: '💃', color: '#FF5722' },
-	metal: { label: 'Metal', icon: '🤘', color: '#607D8B' },
+	pop: { label: 'Pop', icon: '🎵', color: GENRE_COLORS.pop },
+	rock: { label: 'Rock', icon: '🎸', color: GENRE_COLORS.rock },
+	hiphop: { label: 'Hip-Hop', icon: '🎤', color: GENRE_COLORS.hiphop },
+	rnb: { label: 'R&B', icon: '💜', color: GENRE_COLORS.rnb },
+	jazz: { label: 'Jazz', icon: '🎷', color: GENRE_COLORS.jazz },
+	classical: { label: 'Classique', icon: '🎻', color: GENRE_COLORS.classical },
+	electronic: { label: 'Électro', icon: '🎧', color: GENRE_COLORS.electronic },
+	country: { label: 'Country', icon: '🤠', color: GENRE_COLORS.country },
+	latin: { label: 'Latino', icon: '💃', color: GENRE_COLORS.latin },
+	metal: { label: 'Metal', icon: '🤘', color: GENRE_COLORS.metal },
 };
 
 /**

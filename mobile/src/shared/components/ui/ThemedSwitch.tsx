@@ -14,7 +14,7 @@ export function ThemedSwitch(props: ThemedSwitchProps) {
 		<Switch
 			{...props}
 			trackColor={{ false: theme.colors.borderLight, true: theme.colors.primary }}
-			thumbColor="#FFFFFF"
+			thumbColor={theme.colors.onColor}
 			ios_backgroundColor={theme.colors.borderLight}
 		/>
 	);

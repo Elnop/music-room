@@ -6,6 +6,7 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import { useSocketStore } from '@/shared/stores/socketStore';
 import type { ConnectionStatus } from '@/shared/hooks/useConnectionStatus';
 import type { Theme } from '@/shared/theme/types';
+import { FIXED_COLORS } from '@/shared/theme/tokens';
 
 interface ConnectionBannerProps {
 	/** From useConnectionStatus(); null renders nothing. */
@@ -26,8 +27,8 @@ const ICONS: Record<NonNullable<ConnectionStatus>, keyof typeof Ionicons.glyphMa
 	failed: 'alert-circle-outline',
 };
 
-const DARK_TEXT = '#111111';
-const LIGHT_TEXT = '#FFFFFF';
+const DARK_TEXT = FIXED_COLORS.inkDark;
+const LIGHT_TEXT = FIXED_COLORS.inkLight;
 
 /** WCAG relative luminance of a #RRGGBB color. */
 function luminance(hex: string): number {

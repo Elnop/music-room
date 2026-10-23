@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { logger } from '@/shared/utils/logger';
+import { originalTheme } from '@/shared/theme/original.theme';
 
 interface Props {
 	children: React.ReactNode;
@@ -96,17 +97,17 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		padding: 20,
-		backgroundColor: '#121212',
+		backgroundColor: originalTheme.colors.background,
 	},
 	title: {
 		fontSize: 24,
 		fontWeight: 'bold',
-		color: '#E63946',
+		color: originalTheme.colors.error,
 		marginBottom: 16,
 	},
 	error: {
 		fontSize: 16,
-		color: '#FFFFFF',
+		color: originalTheme.colors.text,
 		marginBottom: 16,
 		textAlign: 'center',
 	},
@@ -115,34 +116,34 @@ const styles = StyleSheet.create({
 		maxHeight: 300,
 		marginBottom: 16,
 		padding: 12,
-		backgroundColor: '#282828',
+		backgroundColor: originalTheme.colors.surface,
 		borderRadius: 8,
 		borderWidth: 2,
-		borderColor: '#404040',
+		borderColor: originalTheme.colors.borderLight,
 	},
 	stackTitle: {
 		fontSize: 14,
 		fontWeight: 'bold',
-		color: '#1DB954',
+		color: originalTheme.colors.success,
 		marginBottom: 8,
 	},
 	stack: {
 		fontSize: 12,
-		color: '#B3B3B3',
+		color: originalTheme.colors.textSecondary,
 		fontFamily: 'monospace',
 	},
 	button: {
-		backgroundColor: '#1DB954',
+		backgroundColor: originalTheme.colors.primary,
 		paddingVertical: 12,
 		paddingHorizontal: 24,
 		borderRadius: 8,
 		borderWidth: 2,
-		borderColor: '#000000',
+		borderColor: originalTheme.colors.shadow,
 		marginTop: 16,
 	},
 	buttonText: {
 		fontSize: 16,
 		fontWeight: 'bold',
-		color: '#FFFFFF',
+		color: originalTheme.colors.onColor,
 	},
 });

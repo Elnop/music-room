@@ -101,7 +101,7 @@ export function AppNavigator() {
 								const iconName = focused ? icons.active : icons.inactive;
 								return (
 									<View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
-										<Ionicons name={iconName} size={20} color={focused ? '#FFFFFF' : color} />
+										<Ionicons name={iconName} size={20} color={focused ? theme.colors.onColor : color} />
 									</View>
 								);
 							},

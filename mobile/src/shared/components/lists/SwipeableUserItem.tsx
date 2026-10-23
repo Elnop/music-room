@@ -29,7 +29,7 @@ export function SwipeableUserItem({ user, role, onRemove }: SwipeableUserItemPro
 				onPress={() => onRemove(user.id)}
 				accessibilityLabel="Retirer"
 			>
-				<Ionicons name="person-remove-outline" size={24} color="#FFFFFF" />
+				<Ionicons name="person-remove-outline" size={24} color={theme.colors.onColor} />
 				<Text style={styles.removeText}>Retirer</Text>
 			</Pressable>
 		);
@@ -108,14 +108,14 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.text,
 		},
 		removeButton: {
-			backgroundColor: '#FF6B6B',
+			backgroundColor: theme.colors.error,
 			justifyContent: 'center',
 			alignItems: 'center',
 			width: 100,
 			height: '100%',
 		},
 		removeText: {
-			color: '#FFFFFF',
+			color: theme.colors.onColor,
 			fontSize: 12,
 			fontWeight: '600',
 			marginTop: 4,

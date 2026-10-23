@@ -99,11 +99,12 @@ cd mobile && npm run format
 
 - **Framework**: React Native 0.81 + Expo SDK 54
 - **Language**: TypeScript
-- **State Management**: Zustand stores + React Context
+- **State Management**: TanStack Query v5 (server data & cache) + Zustand v5 (client state)
 - **Navigation**: React Navigation 7 (stack-based)
 - **Audio**: expo-audio for HLS AAC streaming
 - **Real-time**: Socket.io client
 - **Forms**: React Hook Form + Zod validation
+- **Styling**: StyleSheet + Theme Tokens (zero color literals)
 
 ### Infrastructure
 
@@ -119,6 +120,8 @@ cd mobile && npm run format
 | Document | Purpose |
 |----------|---------|
 | [Swagger UI](http://localhost:3000/api-docs) | **Interactive API documentation** |
+| [Technical Choices](./doc/TECH_CHOICES.md) | **Architecture & technology justifications (alternatives, rejections)** |
+| [Testing Strategy](./doc/TESTING.md) | **Test suites, single-test commands, coverage floors** |
 | [AGENTS.md](./AGENTS.md) | Rules for AI agents (branches, policy, conventions) |
 
 ### Specialized Guides
