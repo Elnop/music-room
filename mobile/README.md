@@ -186,20 +186,19 @@ mobile/src/
 │   │   ├── hooks/          # useFriendsQueries, useFriendsMutations
 │   │   ├── services/       # friendsApi
 │   │   └── types.ts
-│   └── music-control/      # Contrôle délégué, gestion des appareils, permissions d'écoute (#384)
-│       ├── myDevices/      # components/{orchestrators,presenters} + hooks/ + utils/
-│       ├── hooks/          # useMusicControl, useFriendListening, useControllableDevices...
-│       ├── services/       # musicControlApi
+│   ├── music-control/      # Contrôle délégué, gestion des appareils, permissions d'écoute (#384)
+│   │   ├── myDevices/      # components/{orchestrators,presenters} + hooks/ + utils/
+│   │   ├── hooks/          # useMusicControl, useFriendListening, useControllableDevices...
+│   │   ├── services/       # musicControlApi
+│   │   └── types.ts
+│   └── search/             # Recherche de titres SoundCloud (#385)
+│       ├── searchScreen/   # orchestrators/ + presenters/ + hooks/
+│       ├── hooks/          # useSoundCloudSearch (TanStack Query)
+│       ├── services/       # searchApi
 │       └── types.ts
 │
 │   Dossiers historiques, vidés par les stories de migration :
-├── screens/                # Écrans par feature (profile, search, settings)
-├── components/             # Composants par feature (player, profile, music-control)
-├── store/                  # Stores Zustand des features (player, soundcloudStore...)
-├── contexts/               # PlayerContext
-├── hooks/                  # useMusicControl, usePlayerProgress, useNowPlaying...
-├── services/               # Clients HTTP des features (profileApi, privacyApi...), deviceService
-├── utils/                  # Utilitaires d'une seule feature (remotePosition, avatarImage)
+├── services/               # Clients d'API testés (api-clients.test.ts)
 └── types/                  # Types alignés sur les réponses du backend
 ```
 
@@ -209,7 +208,7 @@ mobile/src/
 - **AuthNavigator** : Welcome, Login, Register, EmailVerification, ForgotPassword, ResetPassword ; chaque écran est l'orchestrator de `features/auth/<sujet>/`.
 - **AppNavigator** (onglets) :
   - Playlists → Playlists, PlaylistDetail, CreatePlaylist, SearchTracks, PlaylistSharing (les orchestrators de `features/playlists/<sujet>/`)
-  - Search → Search
+  - Search → Search (l'orchestrator de `features/search/searchScreen/orchestrators`)
   - Friends → Friends, UserProfile, PlaylistDetail, SearchTracks
   - Profile → Profile, EditProfile, PrivacySettings, MusicPreferences, LinkedAccounts, MyDevices, Settings (les orchestrators de `features/profile/<sujet>/` et `features/music-control/myDevices/orchestrators`)
 

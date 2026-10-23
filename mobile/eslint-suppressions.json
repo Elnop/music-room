@@ -4,16 +4,6 @@
       "count": 1
     }
   },
-  "src/screens/search/SoundCloudSearchScreen.tsx": {
-    "guardrails/zustand-selector": {
-      "count": 1
-    }
-  },
-  "src/screens/search/components/SoundCloudTrackItem.tsx": {
-    "guardrails/ui-primitives": {
-      "count": 1
-    }
-  },
   "src/shared/components/feedback/ConnectionBanner.test.tsx": {
     "guardrails/theme-tokens": {
       "count": 15

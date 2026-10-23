@@ -1,15 +1,17 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import { Pressable } from '@/shared/components/ui/Pressable';
 import { QueueSwipe } from '@/shared/components/lists/QueueSwipe';
 import { Artwork } from '@/shared/components/media/Artwork';
 import { PreviewBadge } from '@/shared/components/media/PreviewBadge';
 import { isPreviewOnly } from '@/shared/utils/soundcloudPreview';
 import { TrackActionsButton } from '@/shared/components/lists/TrackActionsButton';
+import { formatDuration } from '@/shared/utils/formatters';
 import type { Theme } from '@/shared/theme/types';
-import type { SoundCloudTrack } from '@/types/soundcloud.types';
+import type { SoundCloudTrack } from '@/features/search/types';
 
-interface Props {
+interface SoundCloudTrackItemProps {
 	track: SoundCloudTrack;
 	onPlay: (track: SoundCloudTrack) => void;
 	/** A right swipe adds the track to the play queue. */
@@ -18,25 +20,25 @@ interface Props {
 	onShowActions: (track: SoundCloudTrack) => void;
 }
 
-export function SoundCloudTrackItem({ track, onPlay, onAddToQueue, onShowActions }: Props) {
+export function SoundCloudTrackItem({
+	track,
+	onPlay,
+	onAddToQueue,
+	onShowActions,
+}: SoundCloudTrackItemProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
-
-	const formatDuration = (ms: number) => {
-		const minutes = Math.floor(ms / 60000);
-		const seconds = Math.floor((ms % 60000) / 1000);
-		return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-	};
 
 	const artworkUrl = track.artwork_url || track.user.avatar_url;
 
 	return (
 		<QueueSwipe onAddToQueue={() => onAddToQueue(track)}>
-			<TouchableOpacity
+			<Pressable
 				style={styles.container}
 				onPress={() => onPlay(track)}
 				onLongPress={() => onShowActions(track)}
-				activeOpacity={0.6}
+				accessibilityRole="button"
+				accessibilityLabel={`Écouter ${track.title} par ${track.user.username}`}
 			>
 				<Artwork uri={artworkUrl} size={48} style={styles.artwork} />
 				<View style={styles.info}>
@@ -52,7 +54,7 @@ export function SoundCloudTrackItem({ track, onPlay, onAddToQueue, onShowActions
 				</View>
 				<Text style={styles.duration}>{formatDuration(track.duration)}</Text>
 				<TrackActionsButton onPress={() => onShowActions(track)} />
-			</TouchableOpacity>
+			</Pressable>
 		</QueueSwipe>
 	);
 }
@@ -64,7 +66,6 @@ const createStyles = (theme: Theme) =>
 			alignItems: 'center',
 			paddingVertical: 8,
 			paddingHorizontal: theme.spacing.md,
-			// Opaque so the queue panel stays hidden behind the row until swiped.
 			backgroundColor: theme.colors.background,
 		},
 		artwork: {
@@ -73,7 +74,6 @@ const createStyles = (theme: Theme) =>
 		info: {
 			flex: 1,
 			marginLeft: theme.spacing.md,
-			// Keeps a long title off the duration (#307).
 			marginRight: theme.spacing.sm,
 		},
 		subtitle: {
