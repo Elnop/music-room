@@ -327,7 +327,7 @@ docker logs zumik-backend 2>&1 | grep /api/auth
 
 ### How `make dev-tunnel` starts the containers
 
-There is no compose file: `make dev-tunnel` calls `docker_up_tunnel` in `make/helpers/docker.mk`, which runs plain `docker run` commands on the `zumik-network` network (details in [SECURITY.md](SECURITY.md)):
+There is no compose file: `make dev-tunnel` calls `docker_up_tunnel` in `make/helpers/docker.mk`, which runs plain `docker run` commands on the `zumik-network` network (details in [containers.md](../security/containers.md)):
 
 - In `SUPABASE_MODE=local` (default), `make supabase-up` runs first: the tunnel backend reads `backend/.env.supabase.local`; the mobile container gets no Supabase value.
 - `zumik-redis`: same as LAN mode (`start_redis`).

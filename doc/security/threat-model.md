@@ -1,274 +1,273 @@
-# Modèle de menaces - Zumik
+# Threat model - Zumik
 
-Ce document liste les menaces prises en compte pour l'API (`backend/`), le temps réel (Socket.io) et l'app mobile (`mobile/`), exigence IV.6 du sujet (« plan malicious behaviors (bruteforce of your API, session theft, etc.) »). Pour chaque menace : ce qui la bloque, le code qui le fait, le test qui le prouve, ou bien **risque accepté** avec la raison. Les trous trouvés en écrivant ce document sont dans [Lacunes ouvertes](#lacunes-ouvertes) ; ils ne sont pas corrigés ici et deviennent des tickets.
+This document lists the threats considered for the API (`backend/`), real time (Socket.io) and the mobile app (`mobile/`), subject requirement IV.6 ("plan malicious behaviors (bruteforce of your API, session theft, etc.)"). For each threat: what blocks it, the code that does it, the test that proves it, or else **accepted risk** with the reason. The holes found while writing this document are in [Open gaps](#open-gaps); they are not fixed here and become tickets.
 
-Conteneurs et images Docker : [SECURITY.md](SECURITY.md). Comment tester à la main : [TESTING_SECURITY.md](TESTING_SECURITY.md). Clés Redis : [REDIS.md](REDIS.md).
+Docker containers and images: [containers.md](containers.md). How to test by hand: [security-testing.md](security-testing.md). Redis keys: [redis.md](../architecture/redis.md).
 
-État relevé sur `develop` au commit `8477871`. Chemins relatifs à la racine du dépôt ; `int.test` = test d'intégration (Supabase local + Redis, voir [TESTING.md](TESTING.md)).
+State recorded on `develop` at commit `8477871`. Paths are relative to the repository root; `int.test` = integration test (local Supabase + Redis, see [testing.md](../development/testing.md)).
 
-## Vue d'ensemble
+## Overview
 
-| # | Menace | Couverture |
-|---|--------|------------|
-| M1 | Bruteforce du mot de passe | Limiteurs Redis + verrouillage + liste noire d'IP. Seul le limiteur de login est testé. |
-| M2 | Bruteforce des codes à 6 chiffres (vérification d'email, reset) | Compteur d'essais par compte et IP. Non testé. Risque accepté pour une attaque répartie sur beaucoup d'IP. |
-| M3 | Prise de compte et énumération par la vérification d'email et le reset (#188, #187, #189, #194, #196) | Corrigé et testé. |
-| M4 | Bruteforce et rejeu de tokens (#160) | Limite des échecs de vérification par IP, testée. |
-| M5 | Vol de session (token volé) | Logout révoque access et refresh token, testé. Risques acceptés : durée de vie du token, stockage en clair sur le téléphone, HTTP en clair en dev. |
-| M6 | Token révoqué alors qu'une socket est déjà ouverte | **Risque accepté** : le token n'est vérifié qu'au handshake. L'app ferme sa socket (#70, testé). |
-| M7 | Accès aux données d'un autre utilisateur par l'API | Contrôles dans le code (clé service), testés pour playlists et contrôle musical. Filtre de confidentialité du profil non testé. Routes SoundCloud authentifiées et limitées par utilisateur (L10 corrigée, #208). |
-| M8 | Accès direct à Supabase avec la clé anon | Corrigé par #201 (migration 017) : `anon` et `authenticated` n'ont plus aucun privilège sur les tables de `public` ; testé. L'app n'embarque plus la clé depuis #376. |
-| M9 | Abus du temps réel (origine, identité forgée, payloads, flood) | Origine, handshake et payloads contrôlés et testés ; en dev, toute origine sur un sous-domaine ngrok passe, y compris le tunnel d'un attaquant (L11 réduite, #209). Limite de débit par socket et par événement, chaînes de `listening:update` bornées (L7 corrigée, #204). |
-| M10 | Accès conservé dans une room après son retrait | Revérification et éviction, testées. |
-| M11 | Contrôle musical d'un appareil non autorisé | Règle par appareil, fail closed, testée. |
-| M12 | Éditions concurrentes de playlist | Verrou par playlist + versions, testé. |
-| M13 | Redis indisponible | Limiteurs et révocation fail closed (503), testés. Verrouillage et liste noire fail open. |
+| # | Threat | Coverage |
+|---|--------|----------|
+| M1 | Password bruteforce | Redis limiters + lockout + IP blacklist. Only the login limiter is tested. |
+| M2 | Bruteforce of 6-digit codes (email verification, reset) | Attempt counter per account and IP. Not tested. Accepted risk for an attack spread over many IPs. |
+| M3 | Account takeover and enumeration through email verification and reset (#188, #187, #189, #194, #196) | Fixed and tested. |
+| M4 | Token bruteforce and replay (#160) | Limit on verification failures per IP, tested. |
+| M5 | Session theft (stolen token) | Logout revokes the access and refresh tokens, tested. Accepted risks: token lifetime, plaintext storage on the phone, plain HTTP in dev. |
+| M6 | Token revoked while a socket is already open | **Accepted risk**: the token is checked at the handshake only. The app closes its socket (#70, tested). |
+| M7 | Access to another user's data through the API | Checks in code (service key), tested for playlists and music control. Profile privacy filter not tested. SoundCloud routes authenticated and rate-limited per user (L10 fixed, #208). |
+| M8 | Direct Supabase access with the anon key | Fixed by #201 (migration 017): `anon` and `authenticated` no longer have any privilege on `public` tables; tested. The app no longer ships the key since #376. |
+| M9 | Real-time abuse (origin, forged identity, payloads, flood) | Origin, handshake and payloads checked and tested; in dev, any origin on an ngrok subdomain passes, including an attacker's tunnel (L11 reduced, #209). Rate limit per socket and per event, `listening:update` strings bounded (L7 fixed, #204). |
+| M10 | Room access kept after it is withdrawn | Re-check and eviction, tested. |
+| M11 | Music control of an unauthorized device | Per-device rule, fail closed, tested. |
+| M12 | Concurrent playlist edits | Per-playlist lock + versions, tested. |
+| M13 | Redis unavailable | Limiters and revocation fail closed (503), tested. Lockout and blacklist fail open. |
 
-## M1. Bruteforce du mot de passe
+## M1. Password bruteforce
 
-**Menace.** Un attaquant essaie des mots de passe sur `POST /api/auth/login`, sur un compte ou sur beaucoup.
+**Threat.** An attacker tries passwords on `POST /api/auth/login`, on one account or on many.
 
-**Protection.** Dans l'ordre des middlewares de `backend/src/features/auth/auth.routes.ts` :
+**Protection.** In the middleware order of `backend/src/features/auth/auth.routes.ts`:
 
-1. `checkIPBlacklist` (`backend/src/shared/security/account-lockout.middleware.ts`) sur toutes les routes `/api/auth/*` : une IP en liste noire reçoit `403 IP_BLOCKED`. Une IP y entre après `IP_BLACKLIST_THRESHOLD` (50) échecs de login ou d'OAuth en 15 min, pour 24 h (`recordIPActivity` dans `backend/src/shared/security/ip-reputation.ts`). Avec les valeurs par défaut, ce seuil n'est jamais atteint : le limiteur global (point 2) arrête l'IP à 20 requêtes par 15 min.
-2. `globalAuthRateLimiter` (`backend/src/shared/security/http-rate-limit.ts`) : 20 requêtes par IP et 15 min sur `/api/auth/*`.
-3. `loginRateLimiter` : 5 échecs par couple email + IP et 15 min (`skipSuccessfulRequests`).
-4. `checkAccountLockout` : après 5 échecs pour un couple email + IP (`recordFailedAttempt`, appelé par le handler `login` de `backend/src/features/auth/auth.controller.ts`), le couple est verrouillé 15 min, 1 h à partir de 8 échecs, 24 h à partir de 10 (`lockAccount`). `429 ACCOUNT_LOCKED`.
+1. `checkIPBlacklist` (`backend/src/shared/security/account-lockout.middleware.ts`) on every `/api/auth/*` route: a blacklisted IP gets `403 IP_BLOCKED`. An IP is blacklisted after `IP_BLACKLIST_THRESHOLD` (50) login or OAuth failures in 15 min, for 24 h (`recordIPActivity` in `backend/src/shared/security/ip-reputation.ts`). With the default values this threshold is never reached: the global limiter (point 2) stops the IP at 20 requests per 15 min.
+2. `globalAuthRateLimiter` (`backend/src/shared/security/http-rate-limit.ts`): 20 requests per IP and 15 min on `/api/auth/*`.
+3. `loginRateLimiter`: 5 failures per email + IP pair and 15 min (`skipSuccessfulRequests`).
+4. `checkAccountLockout`: after 5 failures for an email + IP pair (`recordFailedAttempt`, called by the `login` handler in `backend/src/features/auth/auth.controller.ts`), the pair is locked for 15 min, 1 h from 8 failures, 24 h from 10 (`lockAccount`). `429 ACCOUNT_LOCKED`.
 
-Effet réel avec les valeurs par défaut : ce sont les limiteurs qui agissent. Au 5e échec, `loginRateLimiter` atteint sa limite et le couple est verrouillé 15 min ; la requête suivante reçoit `429 RATE_LIMIT_EXCEEDED` de `loginRateLimiter`, placé avant `checkAccountLockout`, donc `ACCOUNT_LOCKED` n'est jamais renvoyé. Comme aucun nouvel échec n'est compté pendant ce temps et que le compteur expire après 15 min, les paliers à 8 et 10 échecs ne sont jamais atteints. La liste noire et les paliers hauts ne servent que si l'on relève les seuils des limiteurs.
+Actual effect with the default values: the limiters do the work. At the 5th failure, `loginRateLimiter` reaches its limit and the pair is locked for 15 min; the next request gets `429 RATE_LIMIT_EXCEEDED` from `loginRateLimiter`, which sits before `checkAccountLockout`, so `ACCOUNT_LOCKED` is never returned. Since no new failure is counted meanwhile and the counter expires after 15 min, the 8- and 10-failure tiers are never reached. The blacklist and the higher tiers only matter if the limiter thresholds are raised.
 
-Les seuils viennent de `backend/src/shared/config/rate-limit.config.ts` (variables d'environnement, valeurs par défaut citées ici). Les compteurs sont dans Redis, tous par `backend/src/shared/security/counter.ts` (store `express-rate-limit` : `backend/src/shared/security/rate-limit-store.ts`).
+The thresholds come from `backend/src/shared/config/rate-limit.config.ts` (environment variables, default values quoted here). The counters are in Redis, all through `backend/src/shared/security/counter.ts` (`express-rate-limit` store: `backend/src/shared/security/rate-limit-store.ts`).
 
 **Tests.**
-- `backend/src/features/auth/middleware/rate-limit.int.test.ts` : « stores failed attempts under rl:auth:login: and answers 429 past the limit ».
-- `backend/src/shared/security/rate-limit-store.test.ts` : le store échoue fermé (503) sans Redis.
-- `backend/src/features/auth/account-lockout.int.test.ts` : verrouillage de compte et liste noire d'IP par le routeur auth (#206).
+- `backend/src/features/auth/middleware/rate-limit.int.test.ts`: "stores failed attempts under rl:auth:login: and answers 429 past the limit".
+- `backend/src/shared/security/rate-limit-store.test.ts`: the store fails closed (503) without Redis.
+- `backend/src/features/auth/account-lockout.int.test.ts`: account lockout and IP blacklist through the auth router (#206).
 
-**Risques acceptés.**
-- Tous les compteurs sont par IP ou par email + IP. Une attaque répartie sur beaucoup d'IP n'est pas bornée par compte. Raison : un verrou par compte seul permettrait à n'importe qui de bloquer le compte d'un autre.
-- L'IP du client derrière un proxy dépend de `TRUST_PROXY` (#173), lu par Express (`req.ip`) et par le handshake Socket.io. Vide par défaut : `X-Forwarded-For` est ignoré (un client ne choisit pas son IP), mais tous les clients d'un même proxy partagent une IP. Le régler sur un déploiement derrière un proxy, seulement si tout le trafic passe par lui (`backend/README.md`). Tests : `backend/src/app/trust-proxy.int.test.ts`, et « ignores a client-sent X-Forwarded-For without TRUST_PROXY (#173) » dans `token-verify-limit.int.test.ts`.
-- `RATE_LIMIT_ENABLED=false` et `ACCOUNT_LOCKOUT_ENABLED=false` coupent ces protections ; c'est un réglage de dev, à laisser actif ailleurs.
+**Accepted risks.**
+- Every counter is per IP or per email + IP. An attack spread over many IPs is not bounded per account. Reason: a per-account lock alone would let anyone lock someone else's account.
+- The client IP behind a proxy depends on `TRUST_PROXY` (#173), read by Express (`req.ip`) and by the Socket.io handshake. Empty by default: `X-Forwarded-For` is ignored (a client does not choose its IP), but every client of the same proxy shares one IP. Set it on a deployment behind a proxy, only if all traffic goes through it (`backend/README.md`). Tests: `backend/src/app/trust-proxy.int.test.ts`, and "ignores a client-sent X-Forwarded-For without TRUST_PROXY (#173)" in `token-verify-limit.int.test.ts`.
+- `RATE_LIMIT_ENABLED=false` and `ACCOUNT_LOCKOUT_ENABLED=false` turn these protections off; it is a dev setting, keep them on elsewhere.
 
-## M2. Bruteforce des codes à 6 chiffres
+## M2. Bruteforce of 6-digit codes
 
-**Menace.** Deviner le code de vérification d'email (`POST /api/auth/verify-email`, il ouvre une session) ou le code de reset (`POST /api/auth/reset-password`, il change le mot de passe). `crypto.randomInt(100000, 999999)` donne 899 999 codes possibles (la borne haute est exclue), valables 15 min.
+**Threat.** Guess the email verification code (`POST /api/auth/verify-email`, it opens a session) or the reset code (`POST /api/auth/reset-password`, it changes the password). `crypto.randomInt(100000, 999999)` gives 899,999 possible codes (the upper bound is excluded), valid for 15 min.
 
 **Protection.**
-- Code tiré par `crypto.randomInt`, comparé par `crypto.timingSafeEqual`, format validé par Zod (`auth.validators.ts`).
-- Vérification d'email : `EMAIL_VERIFICATION_MAX_ATTEMPTS` essais par `userId` + IP sur la durée de vie du code (`verifyCode`, `backend/src/features/auth/services/email-verification.service.ts`) ; la route a aussi `loginRateLimiter`, dont la clé est email + IP ; le corps n'ayant pas d'email, c'est 5 échecs par IP et 15 min.
-- Reset : 5 essais par email + IP et 15 min (`resetPassword`, `backend/src/features/auth/services/password-reset.service.ts`), plus `globalAuthRateLimiter`.
-- Les deux compteurs passent par `attempt-limit.ts` (`backend/src/shared/security/attempt-limit.ts`), qui répond 503 sans Redis.
+- Code drawn by `crypto.randomInt`, compared with `crypto.timingSafeEqual`, format validated by Zod (`auth.validators.ts`).
+- Email verification: `EMAIL_VERIFICATION_MAX_ATTEMPTS` attempts per `userId` + IP over the code's lifetime (`verifyCode`, `backend/src/features/auth/services/email-verification.service.ts`); the route also has `loginRateLimiter`, keyed on email + IP; since the body has no email, that is 5 failures per IP and 15 min.
+- Reset: 5 attempts per email + IP and 15 min (`resetPassword`, `backend/src/features/auth/services/password-reset.service.ts`), plus `globalAuthRateLimiter`.
+- Both counters go through `attempt-limit.ts` (`backend/src/shared/security/attempt-limit.ts`), which answers 503 without Redis.
 
-**Tests.** `email-verification.int.test.ts` : « refuses a wrong code with INVALID_CODE ». **Aucun test** ne vérifie le nombre maximal d'essais, ni pour la vérification ni pour le reset (L9).
+**Tests.** `email-verification.int.test.ts`: "refuses a wrong code with INVALID_CODE". **No test** checks the maximum number of attempts, neither for verification nor for reset (L9).
 
-**Risque accepté.** Comme M1, tous les compteurs sont par IP, aucun par compte : avec N adresses IP, un attaquant a environ 5 × N essais par code de reset pendant ses 15 min de validité, soit une chance d'environ 5 × N / 899 999 par code. La limite de 3 demandes de code par heure (`PasswordResetCooldownService`) a la même clé email + IP : elle passe aussi à 3 × N et ne borne pas une attaque répartie. Même chose pour la vérification d'email (essais par `userId` + IP). Raison : même arbitrage que M1 ; une limite par compte laisserait n'importe qui bloquer le reset ou la vérification d'un autre. L'attaque demande un grand nombre d'IP.
+**Accepted risk.** As for M1, every counter is per IP, none per account: with N IP addresses an attacker gets about 5 × N attempts per reset code during its 15 min of validity, i.e. a chance of about 5 × N / 899,999 per code. The limit of 3 code requests per hour (`PasswordResetCooldownService`) has the same email + IP key: it also becomes 3 × N and does not bound a distributed attack. Same for email verification (attempts per `userId` + IP). Reason: same trade-off as M1; a per-account limit would let anyone block someone else's reset or verification. The attack needs a large number of IPs.
 
-## M3. Prise de compte et énumération par la vérification d'email et le reset
+## M3. Account takeover and enumeration through email verification and reset
 
-**Menace.** Obtenir une session sur le compte d'un autre, ou savoir si un email a un compte.
-
-**Protection.**
-- `verifyCode` refuse un compte déjà vérifié (`400 ALREADY_VERIFIED`) : plus de session délivrée sans code valide (#188).
-- `resendVerification` (`auth.controller.ts`) envoie le code à l'email du compte, jamais à celui du corps, et seulement si l'email du corps correspond (`resolveVerificationRecipient`). Même réponse dans tous les cas, cooldown compté avant toute recherche : un 429 ne trahit pas un compte existant (#188).
-- `forgotPassword` répond toujours « If this email exists… » ; le quota horaire et le cooldown sont consommés que l'email existe ou non (`PasswordResetCooldownService.consumeRequest`, #187). `GET /reset-password/can-resend` donne la même réponse pour un email inconnu.
-- Un compte Google/Facebook sans mot de passe peut recevoir un code et en définir un (#189) : il faut quand même lire la boîte mail.
-- `has_password` est faux sur les comptes créés par Google/Facebook avant #189 (migration 019, #196) : `LAST_PROVIDER` ne compte plus un mot de passe inexistant.
-- Un reset termine toutes les sessions du compte : Supabase Auth (GoTrue v2.197.0, même version en local et sur le projet hébergé) les supprime quand `auth.admin.updateUserById` change le mot de passe. Les access et refresh tokens émis avant le reset sont refusés aussitôt (L5, #203). Le test ne tourne que sur la stack locale : une montée de version de GoTrue est à revérifier.
-- Le reset et l'inscription trouvent le compte par `find_auth_user_id_by_email` (migration 018, clé service uniquement), sans tenir compte de la casse et quel que soit le nombre de comptes ; le compteur d'essais du code de reset est par email en minuscules, donc commun à toutes les casses (#194).
-
-**Tests.**
-- `backend/src/features/auth/services/email-verification.int.test.ts` : « refuses a verified account with ALREADY_VERIFIED and returns no session », « sends nothing when the body email is not the account email », « answers 429 RESEND_COOLDOWN on a second call even when the email does not match », « sends nothing for an unknown user ».
-- `backend/src/features/auth/services/password-reset-resend.int.test.ts` : « reports the same cooldown for an email with no account (no enumeration) ».
-- `backend/src/features/auth/services/password-reset-oauth.int.test.ts` : « sends a code, resets, records the password and allows password sign-in ».
-- `backend/src/features/auth/services/has-password-backfill.int.test.ts` : « sets false on Google and Facebook sign-ups made before #189 », « keeps password accounts and later sign-ups that set a password ».
-- `backend/src/features/auth/services/password-reset-sessions.int.test.ts` : « refuses the access and refresh tokens issued before the reset ».
-- `backend/src/features/auth/utils/find-auth-user.int.test.ts` : « sends a reset code and resets the password, whatever the case of the email », « refuses a sign-up with the email of a verified account, whatever its case », « counts reset attempts once per account across case variants of the email ».
-
-**Ouvert.**
-- Les codes sont stockés en clair dans `user_profiles` ; ils étaient lisibles avec la clé anon (L1), ils ne le sont plus depuis #201.
-
-## M4. Bruteforce et rejeu de tokens
-
-**Menace.** Envoyer des tokens forgés, expirés ou révoqués en boucle sur les routes protégées ou au handshake Socket.io, pour en trouver un valide ou saturer Supabase Auth.
-
-**Protection.** `verifyTokenLimited` (`backend/src/shared/security/token-verify-limit.ts`, #160), utilisé par `authMiddleware`, `optionalAuthMiddleware` (`backend/src/features/auth/auth.middleware.ts`) et `authenticateSocket` (`backend/src/realtime/socket-auth.ts`) : les échecs `INVALID_TOKEN` et `TOKEN_REVOKED` sont comptés par IP (20 par 15 min par défaut). Au-delà, l'IP reçoit `429` (HTTP) ou `TOO_MANY_ATTEMPTS` (socket) sans appel à Supabase. Détail dans `backend/README.md`.
-
-**Tests.**
-- `backend/src/features/auth/token-verify-limit.int.test.ts` : « counts failures with an expiry, then answers 429 without calling getUser », « refuses the socket handshake with TOO_MANY_ATTEMPTS without calling getUser ».
-- `backend/src/shared/security/token-verify-limit.test.ts` : « lets at most max of a parallel burst of invalid tokens reach verify ».
-
-**Risque accepté.** Sans Redis, ce limiteur ne bloque ni ne compte ; `verifyToken` répond déjà 503 dans ce cas (M13). IP derrière un proxy : `TRUST_PROXY` (#173).
-
-## M5. Vol de session
-
-**Menace.** Un tiers obtient l'access token ou le refresh token d'un utilisateur et agit en son nom.
+**Threat.** Get a session on someone else's account, or learn whether an email has an account.
 
 **Protection.**
-- `POST /api/auth/logout` met le hash SHA-256 de l'access token dans une liste de révocation Redis jusqu'à son `exp` (`revoke`, `backend/src/features/auth/services/token-revocation.service.ts`), puis termine la session Supabase avec `signOut(token, 'local')`, ce qui invalide le refresh token (`logout`, `backend/src/features/auth/services/session.service.ts`). Les autres appareils de l'utilisateur restent connectés.
-- Chaque requête vérifie la liste de révocation avant Supabase (`verifyToken`, `session.service.ts`) ; sans Redis, `503 REVOCATION_UNAVAILABLE`, jamais une acceptation.
-- `POST /api/auth/refresh` répond 401 à un refresh token refusé et 503 si Supabase est indisponible (#126) : l'app ne déconnecte pas l'utilisateur pour une panne.
-- Mobile : `endSessionLocally` (`mobile/src/features/auth/stores/sessionActions.ts`) efface la session même si l'appel backend échoue.
+- `verifyCode` refuses an already verified account (`400 ALREADY_VERIFIED`): no session is issued without a valid code any more (#188).
+- `resendVerification` (`auth.controller.ts`) sends the code to the account's email, never to the one in the body, and only if the body email matches (`resolveVerificationRecipient`). Same answer in every case, cooldown counted before any lookup: a 429 does not reveal an existing account (#188).
+- `forgotPassword` always answers "If this email exists…"; the hourly quota and the cooldown are consumed whether the email exists or not (`PasswordResetCooldownService.consumeRequest`, #187). `GET /reset-password/can-resend` gives the same answer for an unknown email.
+- A Google/Facebook account without a password can receive a code and set one (#189): reading the mailbox is still required.
+- `has_password` is false on accounts created through Google/Facebook before #189 (migration 019, #196): `LAST_PROVIDER` no longer counts a password that does not exist.
+- A reset ends every session of the account: Supabase Auth (GoTrue v2.197.0, same version locally and on the hosted project) deletes them when `auth.admin.updateUserById` changes the password. Access and refresh tokens issued before the reset are refused immediately (L5, #203). The test runs on the local stack only: a GoTrue upgrade must be re-checked.
+- Reset and sign-up find the account through `find_auth_user_id_by_email` (migration 018, service key only), case-insensitively and whatever the number of accounts; the reset code attempt counter is keyed on the lowercased email, so it is shared by every case variant (#194).
 
 **Tests.**
-- `backend/src/features/auth/services/logout.int.test.ts` : « rejects the old access token and the old refresh token », « keeps the same user's other session signed in ».
-- `backend/src/features/auth/services/session.service.test.ts` : « rejects a revoked token with 401 TOKEN_REVOKED without calling Supabase », « keeps the 503 REVOCATION_UNAVAILABLE from the denylist check », cas 401 / 503 de `refreshToken`.
-- `backend/src/features/auth/services/token-revocation.service.test.ts` : « stores a SHA-256 hash of the token, never the token ».
-- `backend/src/features/auth/auth.middleware.test.ts` : « answers 401 TOKEN_REVOKED for a token revoked by a logout ».
-- `mobile/src/features/auth/stores/authStore.test.ts` : « still ends the session when the backend logout fails ».
+- `backend/src/features/auth/services/email-verification.int.test.ts`: "refuses a verified account with ALREADY_VERIFIED and returns no session", "sends nothing when the body email is not the account email", "answers 429 RESEND_COOLDOWN on a second call even when the email does not match", "sends nothing for an unknown user".
+- `backend/src/features/auth/services/password-reset-resend.int.test.ts`: "reports the same cooldown for an email with no account (no enumeration)".
+- `backend/src/features/auth/services/password-reset-oauth.int.test.ts`: "sends a code, resets, records the password and allows password sign-in".
+- `backend/src/features/auth/services/has-password-backfill.int.test.ts`: "sets false on Google and Facebook sign-ups made before #189", "keeps password accounts and later sign-ups that set a password".
+- `backend/src/features/auth/services/password-reset-sessions.int.test.ts`: "refuses the access and refresh tokens issued before the reset".
+- `backend/src/features/auth/utils/find-auth-user.int.test.ts`: "sends a reset code and resets the password, whatever the case of the email", "refuses a sign-up with the email of a verified account, whatever its case", "counts reset attempts once per account across case variants of the email".
 
-**Risques acceptés.**
-- Un token volé reste valable jusqu'à sa révocation ou son expiration (durée de vie fixée par Supabase Auth). Il n'y a pas de liaison du token à l'appareil.
-- Les tokens sont stockés dans AsyncStorage (`mobile/src/features/auth/services/sessionStorage.ts`), non chiffré. Raison : il faut un téléphone rooté ou un accès physique ; `expo-secure-store` serait l'amélioration.
-- En `make dev-docker` et `make dev-local`, l'app parle au backend en `http://` et `ws://` sur le réseau local (`DEV_API_URL` dans `make/config.mk`) : tokens en clair sur le Wi-Fi. `make dev-tunnel` passe par HTTPS (ngrok). Raison : environnement de développement, pas de déploiement de production.
+**Open.**
+- Codes are stored in plaintext in `user_profiles`; they were readable with the anon key (L1), they no longer are since #201.
 
-## M6. Token révoqué alors qu'une socket est déjà ouverte
+## M4. Token bruteforce and replay
 
-**Menace.** Après un logout (ou l'expiration du token), une socket ouverte avant continue de recevoir les événements (`playlist:updated`, `listening:status`, `control:command`) et d'en envoyer.
+**Threat.** Send forged, expired or revoked tokens in a loop to protected routes or to the Socket.io handshake, to find a valid one or to saturate Supabase Auth.
+
+**Protection.** `verifyTokenLimited` (`backend/src/shared/security/token-verify-limit.ts`, #160), used by `authMiddleware`, `optionalAuthMiddleware` (`backend/src/features/auth/auth.middleware.ts`) and `authenticateSocket` (`backend/src/realtime/socket-auth.ts`): `INVALID_TOKEN` and `TOKEN_REVOKED` failures are counted per IP (20 per 15 min by default). Beyond that, the IP gets `429` (HTTP) or `TOO_MANY_ATTEMPTS` (socket) without any call to Supabase. Details in `backend/README.md`.
+
+**Tests.**
+- `backend/src/features/auth/token-verify-limit.int.test.ts`: "counts failures with an expiry, then answers 429 without calling getUser", "refuses the socket handshake with TOO_MANY_ATTEMPTS without calling getUser".
+- `backend/src/shared/security/token-verify-limit.test.ts`: "lets at most max of a parallel burst of invalid tokens reach verify".
+
+**Accepted risk.** Without Redis this limiter neither blocks nor counts; `verifyToken` already answers 503 in that case (M13). IP behind a proxy: `TRUST_PROXY` (#173).
+
+## M5. Session theft
+
+**Threat.** A third party obtains a user's access token or refresh token and acts on their behalf.
 
 **Protection.**
-- Au handshake, un token révoqué est refusé (`authenticateSocket` passe par `verifyToken` de `session.service.ts`) : #71.
-- L'app ferme sa socket à chaque fin de session : abonnement `useAuthStore.subscribe` dans `mobile/src/shared/stores/socketStore.ts` (#70).
+- `POST /api/auth/logout` puts the SHA-256 hash of the access token in a Redis revocation list until its `exp` (`revoke`, `backend/src/features/auth/services/token-revocation.service.ts`), then ends the Supabase session with `signOut(token, 'local')`, which invalidates the refresh token (`logout`, `backend/src/features/auth/services/session.service.ts`). The user's other devices stay signed in.
+- Every request checks the revocation list before Supabase (`verifyToken`, `session.service.ts`); without Redis, `503 REVOCATION_UNAVAILABLE`, never an acceptance.
+- `POST /api/auth/refresh` answers 401 to a refused refresh token and 503 if Supabase is unavailable (#126): the app does not sign the user out because of an outage.
+- Mobile: `endSessionLocally` (`mobile/src/features/auth/stores/sessionActions.ts`) clears the session even if the backend call fails.
 
 **Tests.**
-- `backend/src/realtime/socket-auth.int.test.ts` : « refuses a token revoked by logout with INVALID_TOKEN (#71) ».
-- `mobile/src/features/auth/stores/authStore.test.ts` : « revokes the session on the backend, disconnects the socket and clears the session ».
+- `backend/src/features/auth/services/logout.int.test.ts`: "rejects the old access token and the old refresh token", "keeps the same user's other session signed in".
+- `backend/src/features/auth/services/session.service.test.ts`: "rejects a revoked token with 401 TOKEN_REVOKED without calling Supabase", "keeps the 503 REVOCATION_UNAVAILABLE from the denylist check", 401 / 503 cases of `refreshToken`.
+- `backend/src/features/auth/services/token-revocation.service.test.ts`: "stores a SHA-256 hash of the token, never the token".
+- `backend/src/features/auth/auth.middleware.test.ts`: "answers 401 TOKEN_REVOKED for a token revoked by a logout".
+- `mobile/src/features/auth/stores/authStore.test.ts`: "still ends the session when the backend logout fails".
 
-**Risque accepté.** Le token n'est vérifié qu'au handshake (documenté dans `backend/README.md`). Un client malveillant qui garde sa socket ouverte après le logout, ou au-delà de l'expiration de son token, reste connecté jusqu'à ce qu'il se déconnecte ou que le serveur redémarre. #70 couvre l'app, pas un client modifié. Raison : seule l'app officielle se déconnecte d'elle-même ; revérifier le token à chaque événement, ou déconnecter les sockets de l'utilisateur au logout, serait le correctif (L6). Les droits sur les rooms restent revérifiés à chaque changement (M10), donc une telle socket ne gagne pas d'accès.
+**Accepted risks.**
+- A stolen token stays valid until it is revoked or expires (lifetime set by Supabase Auth). The token is not bound to the device.
+- Tokens are stored in AsyncStorage (`mobile/src/features/auth/services/sessionStorage.ts`), unencrypted. Reason: it needs a rooted phone or physical access; `expo-secure-store` would be the improvement.
+- In `make dev-docker` and `make dev-local`, the app talks to the backend over `http://` and `ws://` on the local network (`DEV_API_URL` in `make/config.mk`): tokens in clear text on the Wi-Fi. `make dev-tunnel` goes through HTTPS (ngrok). Reason: development environment, no production deployment.
 
-## M7. Accès aux données d'un autre utilisateur par l'API
+## M6. Token revoked while a socket is already open
 
-**Menace.** Un utilisateur authentifié lit ou modifie les playlists, appareils, profils ou réglages d'un autre en changeant un identifiant dans la requête.
+**Threat.** After a logout (or token expiry), a socket opened before keeps receiving events (`playlist:updated`, `listening:status`, `control:command`) and sending them.
 
-**Protection.** Le backend parle à Supabase avec la clé service (`supabaseAdmin`, `backend/src/shared/config/supabase.ts`), qui **ignore la RLS** : toutes les features (`auth`, `friends`, `music-control`, `playlists`, `profile`, `realtime`) l'utilisent. L'isolation est donc dans le code :
-- Toutes les routes de `playlists`, `profile`, `friends`, `music-control`, `soundcloud` passent par `authMiddleware` (`router.use(authMiddleware)` dans chaque `*.routes.ts`) ; l'identité vient du token (`req.user.id`), jamais du corps.
-- Playlists : `canViewPlaylist`, `canEditPlaylist`, `checkOwnership`, `checkEditPermission` dans `backend/src/features/playlists/permissions/playlist.permissions.ts`.
-- Contrôle musical : `ControlAccessService` (M11) ; un appareil n'est licencié que par son propriétaire (`findOwnedDevice` dans `DeviceLicenseService.grant`).
-- Profil d'un autre utilisateur : `getFilteredProfile` (`backend/src/features/profile/services/filtered-profile.service.ts`) applique ses réglages de confidentialité.
-- Les entrées des routes authentifiées sont validées par Zod (`*.validators.ts`).
-- Routes SoundCloud (`backend/src/features/soundcloud/soundcloud.routes.ts`, `GET /api/soundcloud/search`, `/track/:urlOrId`, `/stream`, `/stream/:trackUrl`), corrigé par #208 (L10) : `authMiddleware` puis `soundcloudRateLimiter` (`backend/src/shared/security/http-rate-limit.ts`), compté dans Redis par utilisateur (120 requêtes par minute par défaut, `RATE_LIMIT_SOUNDCLOUD_MAX` / `RATE_LIMIT_SOUNDCLOUD_WINDOW_MS`), `429 RATE_LIMIT_EXCEEDED` au-delà, `503` sans Redis (`REVOCATION_UNAVAILABLE` de l'auth, qui passe en premier). Toutes les entrées passent par Zod (`soundcloud.validators.ts`) : `track/:urlOrId` n'accepte qu'un id numérique ou une URL https sur `soundcloud.com`, `www.soundcloud.com`, `m.soundcloud.com` ou `on.soundcloud.com`, `stream` qu'une telle URL (`400 VALIDATION_ERROR` sinon, sans appel à SoundCloud). Le backend ne sert donc plus de proxy ouvert vers SoundCloud.
+**Protection.**
+- At the handshake, a revoked token is refused (`authenticateSocket` goes through `verifyToken` in `session.service.ts`): #71.
+- The app closes its socket at every session end: `useAuthStore.subscribe` subscription in `mobile/src/shared/stores/socketStore.ts` (#70).
+
+**Tests.**
+- `backend/src/realtime/socket-auth.int.test.ts`: "refuses a token revoked by logout with INVALID_TOKEN (#71)".
+- `mobile/src/features/auth/stores/authStore.test.ts`: "revokes the session on the backend, disconnects the socket and clears the session".
+
+**Accepted risk.** The token is checked at the handshake only (documented in `backend/README.md`). A malicious client that keeps its socket open after logout, or past its token's expiry, stays connected until it disconnects or the server restarts. #70 covers the app, not a modified client. Reason: only the official app disconnects by itself; re-checking the token on every event, or disconnecting the user's sockets at logout, would be the fix (L6). Room rights are still re-checked on every change (M10), so such a socket gains no access.
+
+## M7. Access to another user's data through the API
+
+**Threat.** An authenticated user reads or modifies someone else's playlists, devices, profile or settings by changing an identifier in the request.
+
+**Protection.** The backend talks to Supabase with the service key (`supabaseAdmin`, `backend/src/shared/config/supabase.ts`), which **bypasses RLS**: every feature (`auth`, `friends`, `music-control`, `playlists`, `profile`, `realtime`) uses it. Isolation is therefore in the code:
+- Every route of `playlists`, `profile`, `friends`, `music-control`, `soundcloud` goes through `authMiddleware` (`router.use(authMiddleware)` in each `*.routes.ts`); identity comes from the token (`req.user.id`), never from the body.
+- Playlists: `canViewPlaylist`, `canEditPlaylist`, `checkOwnership`, `checkEditPermission` in `backend/src/features/playlists/permissions/playlist.permissions.ts`.
+- Music control: `ControlAccessService` (M11); a device can only be licensed by its owner (`findOwnedDevice` in `DeviceLicenseService.grant`).
+- Another user's profile: `getFilteredProfile` (`backend/src/features/profile/services/filtered-profile.service.ts`) applies their privacy settings.
+- Inputs of authenticated routes are validated by Zod (`*.validators.ts`).
+- SoundCloud routes (`backend/src/features/soundcloud/soundcloud.routes.ts`, `GET /api/soundcloud/search`, `/track/:urlOrId`, `/stream`, `/stream/:trackUrl`), fixed by #208 (L10): `authMiddleware` then `soundcloudRateLimiter` (`backend/src/shared/security/http-rate-limit.ts`), counted in Redis per user (120 requests per minute by default, `RATE_LIMIT_SOUNDCLOUD_MAX` / `RATE_LIMIT_SOUNDCLOUD_WINDOW_MS`), `429 RATE_LIMIT_EXCEEDED` beyond, `503` without Redis (`REVOCATION_UNAVAILABLE` from auth, which runs first). Every input goes through Zod (`soundcloud.validators.ts`): `track/:urlOrId` only accepts a numeric id or an https URL on `soundcloud.com`, `www.soundcloud.com`, `m.soundcloud.com` or `on.soundcloud.com`, `stream` only such a URL (`400 VALIDATION_ERROR` otherwise, without calling SoundCloud). The backend is therefore no longer an open proxy to SoundCloud.
 
 **Tests.**
 - `backend/src/features/playlists/permissions/playlist.permissions.test.ts` (`canViewPlaylist`, `canEditPlaylist`, `checkEditPermission`).
-- `backend/src/features/playlists/services/playlist-track.int.test.ts` : « refuses every operation to a user without the edit right ».
-- `backend/src/features/music-control/services/device-license.int.test.ts` : « refuses a grant on another user's device or an unknown device », « refuses a revoke on another user's device and leaves its license untouched ».
-- `backend/src/features/soundcloud/soundcloud.int.test.ts` : « answers 401 without a token on every route, without calling SoundCloud », « answers 400 VALIDATION_ERROR for a stream url that is not a SoundCloud URL », « answers 429 past the per-user limit, in Redis, without affecting another user », « fails closed with 503 RATE_LIMIT_UNAVAILABLE while Redis is down ».
-- **Aucun test** pour `getFilteredProfile` ni pour les routes profil (prévu par #98) (L9).
+- `backend/src/features/playlists/services/playlist-track.int.test.ts`: "refuses every operation to a user without the edit right".
+- `backend/src/features/music-control/services/device-license.int.test.ts`: "refuses a grant on another user's device or an unknown device", "refuses a revoke on another user's device and leaves its license untouched".
+- `backend/src/features/soundcloud/soundcloud.int.test.ts`: "answers 401 without a token on every route, without calling SoundCloud", "answers 400 VALIDATION_ERROR for a stream url that is not a SoundCloud URL", "answers 429 past the per-user limit, in Redis, without affecting another user", "fails closed with 503 RATE_LIMIT_UNAVAILABLE while Redis is down".
+- **No test** for `getFilteredProfile` nor for the profile routes (planned by #98) (L9).
 
-## M8. Accès direct à Supabase avec la clé anon
+## M8. Direct Supabase access with the anon key
 
-**Menace.** Quiconque connaît l'URL et la clé anon du projet Supabase peut appeler PostgREST directement, anonymement ou avec son propre token. Seules la RLS et les privilèges SQL protègent alors les tables. Jusqu'à #376, l'app les embarquait (`EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`) et on pouvait les extraire de l'APK ; depuis, elle ne parle qu'au backend et ne les contient plus, mais la clé anon reste une valeur publique par conception.
+**Threat.** Anyone who knows the URL and the anon key of the Supabase project can call PostgREST directly, anonymously or with their own token. Only RLS and SQL privileges then protect the tables. Until #376 the app shipped them (`EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`) and they could be extracted from the APK; since then it only talks to the backend and no longer contains them, but the anon key remains a public value by design.
 
-**Protection.** Depuis la migration `backend/migrations/017_revoke_direct_table_access.sql` (#201), `anon` et `authenticated` n'ont plus aucun privilège sur les tables, séquences et fonctions de `public` (y compris pour les objets créés ensuite par `postgres`) : toute requête PostgREST directe répond `42501`. Seul le backend, avec la clé service, accède aux tables.
+**Protection.** Since migration `backend/migrations/017_revoke_direct_table_access.sql` (#201), `anon` and `authenticated` have no privilege at all on the tables, sequences and functions of `public` (including objects later created by `postgres`): any direct PostgREST request answers `42501`. Only the backend, with the service key, reaches the tables.
 
-**Politiques RLS, désormais seconde barrière.** Elles ne s'appliquent qu'à ces accès directs, jamais au backend (clé service). État avant 017, dans `backend/migrations/*.sql` :
+**RLS policies, now a second barrier.** They only apply to these direct accesses, never to the backend (service key). State before 017, in `backend/migrations/*.sql`:
 
-| Table | RLS | Lecture | Écriture |
-|-------|-----|---------|----------|
-| `user_profiles` | oui (001) | **tout le monde** (`USING (true)`) | la ligne de l'utilisateur, **toutes colonnes** |
-| `playlists` | oui (003) | publique, propriétaire ou collaborateur | propriétaire |
-| `playlist_tracks` | oui (003, 016) | comme `playlists` | aucune politique depuis 016 : écriture refusée |
-| `tracks` | **non** | **tout le monde** | **tout le monde** |
-| `follows` | oui (007) | tout le monde | insert / delete par le `follower_id` |
-| `profile_privacy` | oui (011) | soi | soi |
-| `music_preferences` | oui (011) | tout le monde (ignore la confidentialité) | soi |
-| `devices`, `device_control_licenses` | oui (015) | soi / propriétaire ou bénéficiaire | soi / propriétaire |
-| fonctions `rank_*`, `playlist_*` | — | `EXECUTE` retiré à `anon` et `authenticated` (016) | idem |
+| Table | RLS | Read | Write |
+|-------|-----|------|-------|
+| `user_profiles` | yes (001) | **everyone** (`USING (true)`) | the user's own row, **all columns** |
+| `playlists` | yes (003) | public, owner or collaborator | owner |
+| `playlist_tracks` | yes (003, 016) | as `playlists` | no policy since 016: write refused |
+| `tracks` | **no** | **everyone** | **everyone** |
+| `follows` | yes (007) | everyone | insert / delete by the `follower_id` |
+| `profile_privacy` | yes (011) | self | self |
+| `music_preferences` | yes (011) | everyone (ignores privacy) | self |
+| `devices`, `device_control_licenses` | yes (015) | self / owner or grantee | self / owner |
+| `rank_*`, `playlist_*` functions | — | `EXECUTE` revoked from `anon` and `authenticated` (016) | same |
 
-Avant 017, `anon` et `authenticated` avaient les privilèges de table par défaut de Supabase : une requête anonyme lisait `password_reset_code` (L1). La migration a été appliquée sur le projet hébergé.
+Before 017, `anon` and `authenticated` had Supabase's default table privileges: an anonymous request read `password_reset_code` (L1). The migration was applied to the hosted project.
 
 **Tests.**
-- `backend/src/shared/config/supabase-direct-access.int.test.ts` : lecture anonyme de `user_profiles`, `follows`, `tracks`, `music_preferences`, `playlists` refusée ; un utilisateur connecté ne peut ni lire les codes, ni se marquer vérifié, ni se donner `can_control_music` ; écriture anonyme de `tracks` refusée ; la clé service lit toujours.
-- `backend/src/features/playlists/services/track-operations.int.test.ts` : « refuses every 016 function to the anon key with a permission error », « refuses direct inserts and deletes on playlist_tracks to the playlist owner ».
+- `backend/src/shared/config/supabase-direct-access.int.test.ts`: anonymous reads of `user_profiles`, `follows`, `tracks`, `music_preferences`, `playlists` refused; a signed-in user can neither read the codes, mark themselves verified, nor give themselves `can_control_music`; anonymous write to `tracks` refused; the service key still reads.
+- `backend/src/features/playlists/services/track-operations.int.test.ts`: "refuses every 016 function to the anon key with a permission error", "refuses direct inserts and deletes on playlist_tracks to the playlist owner".
 
-**Lacunes.** L1, L2, L3 ci-dessous, corrigées par #201.
+**Gaps.** L1, L2, L3 below, fixed by #201.
 
-## M9. Abus du temps réel
+## M9. Real-time abuse
 
-**Menace.** Se connecter depuis un site web tiers, se faire passer pour un autre utilisateur ou un autre appareil, envoyer des payloads malformés ou inonder le serveur d'événements.
+**Threat.** Connect from a third-party website, impersonate another user or another device, send malformed payloads or flood the server with events.
 
 **Protection.**
-- Origine : `allowRequest` et `cors` dans `initialize` (`backend/src/realtime/socket-server.ts`) appliquent `isOriginAllowed` / `isSameOrigin` (`backend/src/shared/config/cors.config.ts`, `ALLOWED_ORIGINS`, #137). Une connexion sans en-tête `Origin` (app native) est acceptée : la règle d'origine ne protège que des navigateurs, l'authentification fait le reste. En `NODE_ENV=development`, `isOriginAllowed` accepte aussi les origines `exp://` et les sous-domaines https des domaines ngrok (`isNgrokOrigin` : `ngrok-free.app`, `ngrok-free.dev`, `ngrok.app`, `ngrok.dev`, `ngrok.io`), comparés sur le nom d'hôte parsé : `https://ngrok.attacker.example` est refusé (#209). Reste ouvert : n'importe qui peut obtenir un sous-domaine ngrok gratuit, donc une page servie par le tunnel d'un attaquant passe encore (le tunnel du projet est aussi autorisé exactement par `TUNNEL_URL`). Le backend lancé par `make` tourne toujours en `development` ([SECURITY.md](SECURITY.md)) ; l'authentification par token reste exigée.
-- Handshake : token obligatoire et vérifié, champs validés par Zod (`handshakeAuthSchema`), appareil enregistré en base avant acceptation (`authenticateSocket`, `backend/src/realtime/socket-auth.ts`). L'identité (`socket.data.userId`) vient du token seul.
-- Événements : `playlist:join` / `leave` (UUID), `listening:subscribe` / `unsubscribe` (UUID), `control:action` (`controlActionSchema`, champs inconnus retirés) validés avant toute lecture en base (`backend/src/realtime/playlist-room.ts`, `backend/src/realtime/music-control-access.ts`) ; `listening:update` validé par `listeningUpdateSchema` (titre et artiste ≤ 300 caractères, URL ≤ 2048, `positionMs` entier ≥ 0 optionnel (#295), sinon `INVALID_PAYLOAD`, #204) et limité à une application par seconde et par appareil (`createLatestThrottle`, `backend/src/realtime/latest-throttle.ts`, #151). L'appareil vient du handshake, jamais du payload.
-- Débit (#204) : chaque socket a un compteur en mémoire par événement (fenêtre fixe de 10 s : 20 `listening:update` ou `control:action`, 30 pour les autres événements de l'app, un compteur commun pour tout autre nom). Au-delà, l'événement n'est pas traité et le client reçoit `RATE_LIMITED` sur `listening:error` / `playlist:error` / `control:error` (`backend/src/shared/security/socket-event-limit.ts`). Le refus est loggé en warning une fois par fenêtre, avec un nom d'événement filtré (`loggableEventName`) ; la ligne d'événement entrant (subject IV.6) reste écrite pour chaque événement, refusés compris : la limite protège les handlers et la base, pas le volume de logs.
-- Chaque événement entrant est loggé avec plateforme, appareil et version (subject IV.6).
+- Origin: `allowRequest` and `cors` in `initialize` (`backend/src/realtime/socket-server.ts`) apply `isOriginAllowed` / `isSameOrigin` (`backend/src/shared/config/cors.config.ts`, `ALLOWED_ORIGINS`, #137). A connection without an `Origin` header (native app) is accepted: the origin rule only protects against browsers, authentication does the rest. With `NODE_ENV=development`, `isOriginAllowed` also accepts `exp://` origins and https subdomains of the ngrok domains (`isNgrokOrigin`: `ngrok-free.app`, `ngrok-free.dev`, `ngrok.app`, `ngrok.dev`, `ngrok.io`), compared on the parsed host name: `https://ngrok.attacker.example` is refused (#209). Still open: anyone can get a free ngrok subdomain, so a page served by an attacker's tunnel still passes (the project's tunnel is also allowed exactly through `TUNNEL_URL`). The backend started by `make` always runs in `development` ([containers.md](containers.md)); token authentication is still required.
+- Handshake: token required and verified, fields validated by Zod (`handshakeAuthSchema`), device registered in the database before acceptance (`authenticateSocket`, `backend/src/realtime/socket-auth.ts`). Identity (`socket.data.userId`) comes from the token alone.
+- Events: `playlist:join` / `leave` (UUID), `listening:subscribe` / `unsubscribe` (UUID), `control:action` (`controlActionSchema`, unknown fields stripped) validated before any database read (`backend/src/realtime/playlist-room.ts`, `backend/src/realtime/music-control-access.ts`); `listening:update` validated by `listeningUpdateSchema` (title and artist ≤ 300 characters, URL ≤ 2048, optional integer `positionMs` ≥ 0 (#295), otherwise `INVALID_PAYLOAD`, #204) and limited to one application per second and per device (`createLatestThrottle`, `backend/src/realtime/latest-throttle.ts`, #151). The device comes from the handshake, never from the payload.
+- Rate (#204): each socket has an in-memory counter per event (fixed 10 s window: 20 `listening:update` or `control:action`, 30 for the app's other events, one shared counter for any other name). Beyond that, the event is not handled and the client gets `RATE_LIMITED` on `listening:error` / `playlist:error` / `control:error` (`backend/src/shared/security/socket-event-limit.ts`). The refusal is logged as a warning once per window, with a filtered event name (`loggableEventName`); the incoming-event log line (subject IV.6) is still written for every event, refused ones included: the limit protects the handlers and the database, not the log volume.
+- Every incoming event is logged with platform, device and version (subject IV.6).
 
 **Tests.**
-- `backend/src/realtime/socket-origin.int.test.ts` : « refuses a %s connection from an origin outside ALLOWED_ORIGINS », « accepts a connection without Origin header ».
-- `backend/src/shared/config/cors.config.test.ts` : « allows %s », « refuses %s » (ngrok look-alikes, http, bare domain).
-- `backend/src/realtime/socket-auth.int.test.ts` : « refuses a handshake without token with NO_TOKEN », « refuses a missing or non-string device field with INVALID_HANDSHAKE », « ignores a forged userId in the handshake », « stores listening:update with the handshake device, not the payload one », « keeps the latest listening:update of a burst (#151) », « answers INVALID_PAYLOAD to a listening:update with a title too long (#204) », « refuses events past the per-socket limit with RATE_LIMITED (#204) ».
-- `backend/src/realtime/music-control-access.int.test.ts` : « refuses Carol even when the payload claims to come from Bob », « ignores a forged sender field from an allowed controller », « answers malformed payloads with INVALID_PAYLOAD and keeps serving the socket ».
+- `backend/src/realtime/socket-origin.int.test.ts`: "refuses a %s connection from an origin outside ALLOWED_ORIGINS", "accepts a connection without Origin header".
+- `backend/src/shared/config/cors.config.test.ts`: "allows %s", "refuses %s" (ngrok look-alikes, http, bare domain).
+- `backend/src/realtime/socket-auth.int.test.ts`: "refuses a handshake without token with NO_TOKEN", "refuses a missing or non-string device field with INVALID_HANDSHAKE", "ignores a forged userId in the handshake", "stores listening:update with the handshake device, not the payload one", "keeps the latest listening:update of a burst (#151)", "answers INVALID_PAYLOAD to a listening:update with a title too long (#204)", "refuses events past the per-socket limit with RATE_LIMITED (#204)".
+- `backend/src/realtime/music-control-access.int.test.ts`: "refuses Carol even when the payload claims to come from Bob", "ignores a forged sender field from an allowed controller", "answers malformed payloads with INVALID_PAYLOAD and keeps serving the socket".
 
-**Risque accepté.** La limite est par socket : un utilisateur qui ouvre beaucoup de connexions multiplie son débit (pas de limite sur le nombre de connexions d'un utilisateur ; chaque handshake passe quand même par la vérification du token, #160). Un `listening:unsubscribe` ou `playlist:leave` refusé pour débit laisse la socket dans la room jusqu'au suivant ; seul un client qui inonde peut le provoquer.
+**Accepted risk.** The limit is per socket: a user who opens many connections multiplies their rate (no limit on the number of connections per user; each handshake still goes through token verification, #160). A `listening:unsubscribe` or `playlist:leave` refused for rate leaves the socket in the room until the next one; only a flooding client can cause it.
 
-## M10. Accès conservé dans une room après son retrait
+## M10. Room access kept after it is withdrawn
 
-**Menace.** Un viewer ou collaborateur retiré, un ami qui n'est plus ami, ou un contrôleur dont la licence est retirée reste dans `playlist:<id>` ou `listening:<ownerId>` et continue de recevoir les événements.
+**Threat.** A removed viewer or collaborator, a friend who is no longer a friend, or a controller whose license was withdrawn stays in `playlist:<id>` or `listening:<ownerId>` and keeps receiving events.
 
 **Protection.**
-- Playlists : après le retrait d'un viewer (`viewer.service.ts`) ou d'un collaborateur (`collaborator.service.ts`), une mise à jour (visibilité) ou une suppression (`playlist-update.service.ts`), `revalidatePlaylistRoom` (`backend/src/realtime/emitters/playlist.emitters.ts`) refait `canViewPlaylist` pour chaque socket de la room et évince celles qui ont perdu l'accès (`revalidatePlaylistRoom`, `backend/src/realtime/playlist-room.ts`). Les `join` / `leave` d'une socket sont traités dans l'ordre d'arrivée.
-- Écoute : après le retrait de l'interrupteur ou d'une licence (`notifyPermissionChange`, `backend/src/realtime/emitters/control.emitters.ts`) et après un `unfollowUser` (`friends.service.ts`, `backend/src/features/friends/utils/listening-access.ts`), `revalidateListeningAccess` sort les sockets du contrôleur de `listening:<ownerId>` s'il ne lui reste aucun appareil ; une erreur évince (fail closed). `listening:subscribe` revérifie l'accès après avoir rejoint la room. Les `subscribe` / `unsubscribe` d'une socket sont traités dans l'ordre d'arrivée (#159).
+- Playlists: after a viewer (`viewer.service.ts`) or collaborator (`collaborator.service.ts`) is removed, after an update (visibility) or a deletion (`playlist-update.service.ts`), `revalidatePlaylistRoom` (`backend/src/realtime/emitters/playlist.emitters.ts`) re-runs `canViewPlaylist` for each socket in the room and evicts those that lost access (`revalidatePlaylistRoom`, `backend/src/realtime/playlist-room.ts`). A socket's `join` / `leave` are handled in arrival order.
+- Listening: after the switch or a license is withdrawn (`notifyPermissionChange`, `backend/src/realtime/emitters/control.emitters.ts`) and after an `unfollowUser` (`friends.service.ts`, `backend/src/features/friends/utils/listening-access.ts`), `revalidateListeningAccess` removes the controller's sockets from `listening:<ownerId>` if they have no device left; an error evicts (fail closed). `listening:subscribe` re-checks access after joining the room. A socket's `subscribe` / `unsubscribe` are handled in arrival order (#159).
 
 **Tests.**
-- `backend/src/realtime/playlist-room.int.test.ts` : « evicts a viewer removed while in the room », « evicts a collaborator removed while in the room », « evicts the outsider when a public playlist becomes private », « evicts everyone when the playlist is deleted », « handles join then leave in order: the socket ends outside the room ».
-- `backend/src/realtime/music-control-access.int.test.ts` : « removes Bob's sockets when Alice revokes his control », « removes Bob's sockets when he unfollows Alice », « evicts Bob when Alice revokes his last license », « keeps Bob subscribed when the switch is cut but a license remains », « handles subscribe then unsubscribe in order: the socket ends outside the room (#159) ».
-- `backend/src/realtime/playlist-room.test.ts` : « evicts nobody when the lookup fails ».
+- `backend/src/realtime/playlist-room.int.test.ts`: "evicts a viewer removed while in the room", "evicts a collaborator removed while in the room", "evicts the outsider when a public playlist becomes private", "evicts everyone when the playlist is deleted", "handles join then leave in order: the socket ends outside the room".
+- `backend/src/realtime/music-control-access.int.test.ts`: "removes Bob's sockets when Alice revokes his control", "removes Bob's sockets when he unfollows Alice", "evicts Bob when Alice revokes his last license", "keeps Bob subscribed when the switch is cut but a license remains", "handles subscribe then unsubscribe in order: the socket ends outside the room (#159)".
+- `backend/src/realtime/playlist-room.test.ts`: "evicts nobody when the lookup fails".
 
-**Risques acceptés.**
-- `revalidatePlaylistRoom` n'évince personne si la lecture de la playlist échoue (fail open, choisi pour ne pas expulser les membres d'une playlist qui existe encore ; test ci-dessus). La revérification est lancée sans attendre (fire-and-forget) : quelques événements peuvent partir entre le changement et l'éviction.
+**Accepted risks.**
+- `revalidatePlaylistRoom` evicts nobody if reading the playlist fails (fail open, chosen so as not to expel the members of a playlist that still exists; test above). The re-check is started without waiting (fire-and-forget): a few events may go out between the change and the eviction.
 
-## M11. Contrôle musical d'un appareil non autorisé
+## M11. Music control of an unauthorized device
 
-**Menace.** Envoyer `play` / `pause` à un appareil qu'on n'a pas le droit de contrôler, ou voir le statut d'écoute d'un utilisateur sans accès.
+**Threat.** Send `play` / `pause` to a device one has no right to control, or see the listening status of a user without access.
 
-**Protection.** `ControlAccessService` (`backend/src/features/music-control/services/control-access.service.ts`) : il faut être amis mutuels, et que le propriétaire ait ouvert l'interrupteur « tous mes appareils » (`follows.can_control_music`) ou donné une licence sur cet appareil (`device_control_licenses`, `DeviceLicenseService`, `backend/src/features/music-control/services/device-license.service.ts`). Le propriétaire passe toujours sur ses propres appareils. Toute erreur de base répond « pas d'accès » (`safeAccess`). `control:action` vérifie l'accès avant de regarder si l'appareil est en ligne : un refusé n'apprend rien sur les appareils. Le bénéficiaire est prévenu des octrois et retraits de licence par `permission:changed` (#183).
+**Protection.** `ControlAccessService` (`backend/src/features/music-control/services/control-access.service.ts`): the two users must be mutual friends, and the owner must have turned on the "all my devices" switch (`follows.can_control_music`) or granted a license on that device (`device_control_licenses`, `DeviceLicenseService`, `backend/src/features/music-control/services/device-license.service.ts`). The owner always passes on their own devices. Any database error answers "no access" (`safeAccess`). `control:action` checks access before looking at whether the device is online: a refused caller learns nothing about the devices. The grantee is told about license grants and withdrawals by `permission:changed` (#183).
 
-**Surface `/api/users/:userId/queue` (#294).** Un ami gère la file de lecture du propriétaire (ajout, retrait, déplacement, lecture) s'il est le propriétaire ou contrôle au moins un de ses appareils (`assertCanManageQueue`, sinon `403 QUEUE_ACCESS_DENIED`). Une action de lecture (jouer un morceau ou une playlist, suivant, précédent) exige en plus un `deviceId` : une licence sur cet appareil (ou l'interrupteur) et l'appareil en ligne, vérifiés avant toute modification de la file (`resolvePlaybackDevice`, sinon `403` ou `409 DEVICE_OFFLINE`). Le délégué perdant son dernier appareil contrôlable reçoit `control:revoked` et sort de `listening:<ownerId>`, qui porte aussi `queue:updated`.
+**`/api/users/:userId/queue` surface (#294).** A friend manages the owner's play queue (add, remove, move, play) if they are the owner or control at least one of the owner's devices (`assertCanManageQueue`, otherwise `403 QUEUE_ACCESS_DENIED`). A playback action (play a track or a playlist, next, previous) also requires a `deviceId`: a license on that device (or the switch) and the device online, checked before any change to the queue (`resolvePlaybackDevice`, otherwise `403` or `409 DEVICE_OFFLINE`). A delegate losing their last controllable device gets `control:revoked` and leaves `listening:<ownerId>`, which also carries `queue:updated`.
 
-**Surface `POST /api/queue/transfer` (#295).** Elle part toujours de l'appelant (pas de montage sous `/api/users/:userId/queue`). Trois contrôles, tous avant la moindre modification : la cible (licence ou propriétaire, appareil en ligne : `403` ou `409 DEVICE_OFFLINE`), la `source` éventuelle (`canControlDevice`, sinon `403 QUEUE_ACCESS_DENIED`) et l'item joué, qui doit être dans la file de l'appelant (`404 QUEUE_ITEM_NOT_FOUND`) : on ne peut ni lire ni copier la file d'un autre. Le transfert ne modifie que la file de la cible, par un bloc inséré après son morceau courant ; `pause` n'est envoyé qu'à un appareil que l'appelant contrôle.
+**`POST /api/queue/transfer` surface (#295).** It always starts from the caller (not mounted under `/api/users/:userId/queue`). Three checks, all before any change: the target (license or owner, device online: `403` or `409 DEVICE_OFFLINE`), the optional `source` (`canControlDevice`, otherwise `403 QUEUE_ACCESS_DENIED`) and the played item, which must be in the caller's queue (`404 QUEUE_ITEM_NOT_FOUND`): one can neither read nor copy someone else's queue. The transfer only changes the target's queue, with a block inserted after its current track; `pause` is only sent to a device the caller controls.
 
 **Tests.**
-- `backend/src/features/music-control/services/control-access.service.test.ts` : « allows the licensed device only, between mutual friends with the switch off », « refuses a stale switch when the owner does not follow back », « refuses when the client throws ».
-- `backend/src/realtime/music-control-access.int.test.ts` (bloc « per-device access (story 4.5) ») : « delivers to the licensed device only, until B is licensed or the switch is on », « refuses B once the switch is cut, and still reaches the licensed A », « tells Bob when Alice revokes a license, with whether access remains (#183) ».
-- `backend/src/features/music-control/services/device-license.int.test.ts` : « refuses a grant to a non-friend (one-way follow or none) ».
+- `backend/src/features/music-control/services/control-access.service.test.ts`: "allows the licensed device only, between mutual friends with the switch off", "refuses a stale switch when the owner does not follow back", "refuses when the client throws".
+- `backend/src/realtime/music-control-access.int.test.ts` ("per-device access (story 4.5)" block): "delivers to the licensed device only, until B is licensed or the switch is on", "refuses B once the switch is cut, and still reaches the licensed A", "tells Bob when Alice revokes a license, with whether access remains (#183)".
+- `backend/src/features/music-control/services/device-license.int.test.ts`: "refuses a grant to a non-friend (one-way follow or none)".
 
-**Lacune corrigée.** Par accès direct à Supabase, un contrôleur pouvait se donner l'interrupteur lui-même (L2) ; fermé par #201.
+**Fixed gap.** Through direct Supabase access, a controller could give themselves the switch (L2); closed by #201.
 
-## M12. Éditions concurrentes de playlist
+## M12. Concurrent playlist edits
 
-**Menace.** Deux éditeurs modifient la même playlist en même temps : pistes perdues, dupliquées, ordre différent selon les clients.
+**Threat.** Two editors change the same playlist at the same time: lost or duplicated tracks, a different order depending on the client.
 
-**Protection.** Décrite dans [PLAYLIST_CONCURRENCY.md](PLAYLIST_CONCURRENCY.md) : chaque opération est une fonction Postgres (migration 016) qui verrouille la ligne de la playlist ; rangs fractionnaires ; `tracks_version` et `moved_at_version` ; un déplacement basé sur une version périmée de la même piste reçoit `409`. L'écriture directe de `playlist_tracks` est fermée (M8).
+**Protection.** Described in [playlist-concurrency.md](../features/playlist-concurrency.md): each operation is a Postgres function (migration 016) that locks the playlist row; fractional ranks; `tracks_version` and `moved_at_version`; a move based on a stale version of the same track gets `409`. Direct writes to `playlist_tracks` are closed (M8).
 
-**Tests.** Ceux listés dans [PLAYLIST_CONCURRENCY.md](PLAYLIST_CONCURRENCY.md#tests), dont `backend/src/features/playlists/services/track-operations.int.test.ts` : « lets exactly one of N concurrent moves of the same track win », « keeps every invariant under a burst of concurrent moves, adds and removes ».
+**Tests.** Those listed in [playlist-concurrency.md](../features/playlist-concurrency.md#tests), including `backend/src/features/playlists/services/track-operations.int.test.ts`: "lets exactly one of N concurrent moves of the same track win", "keeps every invariant under a burst of concurrent moves, adds and removes".
 
-**Risque accepté.** Les listes `viewer_ids` et `collaborator_ids` sont modifiées en lecture puis écriture, sans verrou (`viewer.service.ts`, `collaborator.service.ts`) : deux changements simultanés du propriétaire peuvent en perdre un. Seul le propriétaire les modifie, l'effet est visible et se corrige en recommençant.
+**Accepted risk.** The `viewer_ids` and `collaborator_ids` lists are changed by read-then-write, without a lock (`viewer.service.ts`, `collaborator.service.ts`): two simultaneous changes by the owner may lose one. Only the owner changes them, the effect is visible and is fixed by doing it again.
 
-## M13. Redis indisponible
+## M13. Redis unavailable
 
-**Menace.** Faire tomber ou saturer Redis pour désactiver les limites et la révocation.
+**Threat.** Take Redis down or saturate it to disable the limits and the revocation.
 
-**Protection.** Fail closed : les limiteurs `express-rate-limit` répondent `503 RATE_LIMIT_UNAVAILABLE` (`rate-limit-store.ts`), `attempt-limit.ts` répond `503 REDIS_UNAVAILABLE`, la révocation répond `503 REVOCATION_UNAVAILABLE`, donc aucune route protégée n'accepte de token sans Redis. Choix documenté dans [REDIS.md](REDIS.md) (« No In-Memory Fallback »).
+**Protection.** Fail closed: the `express-rate-limit` limiters answer `503 RATE_LIMIT_UNAVAILABLE` (`rate-limit-store.ts`), `attempt-limit.ts` answers `503 REDIS_UNAVAILABLE`, revocation answers `503 REVOCATION_UNAVAILABLE`, so no protected route accepts a token without Redis. Choice documented in [redis.md](../architecture/redis.md) ("No In-Memory Fallback").
 
-**Tests.** `rate-limit-store.test.ts` : « throws 503 and sends nothing while Redis is not ready », « fails closed again when Redis drops, then resumes » ; `token-revocation.service.test.ts` : « throws 503 REVOCATION_UNAVAILABLE when Redis is not ready » ; `auth.middleware.test.ts` : « answers 503 REVOCATION_UNAVAILABLE when the denylist cannot be checked ».
+**Tests.** `rate-limit-store.test.ts`: "throws 503 and sends nothing while Redis is not ready", "fails closed again when Redis drops, then resumes"; `token-revocation.service.test.ts`: "throws 503 REVOCATION_UNAVAILABLE when Redis is not ready"; `auth.middleware.test.ts`: "answers 503 REVOCATION_UNAVAILABLE when the denylist cannot be checked".
 
-**Risque accepté.** `checkAccountLockout`, `checkIPBlacklist`, `account-lockout.ts` et `ip-reputation.ts` (`backend/src/shared/security/fail-open.ts`) laissent passer en cas d'erreur Redis (fail open). Le limiteur de login, placé avant, échoue fermé, donc une panne Redis complète bloque le login au lieu de l'ouvrir ; seule une erreur ponctuelle sur une commande Redis laisse passer une tentative. En dev, Redis est sans mot de passe mais publié sur `127.0.0.1` seulement (L8, #205).
+**Accepted risk.** `checkAccountLockout`, `checkIPBlacklist`, `account-lockout.ts` and `ip-reputation.ts` (`backend/src/shared/security/fail-open.ts`) let requests through on a Redis error (fail open). The login limiter, placed before them, fails closed, so a complete Redis outage blocks login instead of opening it; only a one-off error on a Redis command lets an attempt through. In dev, Redis has no password but is published on `127.0.0.1` only (L8, #205).
 
-## Lacunes ouvertes
+## Open gaps
 
-Trouvées en écrivant ce document. L1 à L3 ont été corrigées par #201, L4 par #173, L7 par #204, L8 par #205, L10 par #208, L11 réduite par #209 (risque restant accepté), L5 n'était pas reproductible (#203) ; les autres ont chacune leur ticket, sauf L6, risque accepté.
+Found while writing this document. L1 to L3 were fixed by #201, L4 by #173, L7 by #204, L8 by #205, L10 by #208, L11 reduced by #209 (remaining risk accepted), L5 was not reproducible (#203); the others each have their ticket, except L6, an accepted risk.
 
-| # | Gravité | Lacune | Où | Suivi |
-|---|---------|--------|-----|-------|
-| L1 | **Critique**, corrigé (#201) | `user_profiles` est lisible par tous (`USING (true)`), y compris `password_reset_code` et `verification_code`. Avec la clé anon de l'APK : demander un reset pour la victime (`forgot-password`), lire le code, changer son mot de passe. Prise de compte sans accès à la boîte mail. Expose aussi tous les profils sans filtre de confidentialité. | `backend/migrations/001_initial_schema.sql`, `013_email_verification.sql`, `014_password_reset.sql` | #201 |
-| L2 | Haute, corrigé (#201) | La politique UPDATE de `user_profiles` autorise toutes les colonnes de sa propre ligne : un utilisateur peut se mettre `email_verified = true` sans code. La politique INSERT de `follows` ne contrôle pas `can_control_music` : un contrôleur peut supprimer puis recréer sa ligne `follows` vers le propriétaire avec `can_control_music = true` et, si le propriétaire le suit, contrôler tous ses appareils. | `001_initial_schema.sql`, `007_follows.sql`, `009_music_control.sql` | #201 |
-| L3 | Haute, corrigé (#201) | `tracks` n'a pas de RLS : lecture, modification et suppression par la clé anon. `music_preferences` et `follows` sont lisibles par tous, sans les réglages de confidentialité. | `003_playlist_persistence.sql`, `011_profile_privacy_and_preferences.sql`, `007_follows.sql` | #201 |
-| L4 | Moyenne, corrigé (#173) | Toutes les limites anti-bruteforce sont par IP (M1, M2) ; derrière un proxy, tous les clients avaient la même IP. `TRUST_PROXY` règle quels proxies peuvent fixer `X-Forwarded-For`, pour HTTP et la socket. | `backend/src/shared/config/trust-proxy.ts` | #173 |
-| L5 | Moyenne, non reproduite (#203) | Un reset de mot de passe ne terminerait pas les sessions ouvertes. Vérifié sur GoTrue v2.197.0 (local et hébergé) : Supabase Auth supprime toutes les sessions du compte quand l'admin change le mot de passe ; un test d'intégration verrouille ce comportement sur la stack locale. | `resetPassword` (`backend/src/features/auth/services/password-reset.service.ts`) | #203 |
-| L6 | Moyenne | Une socket ouverte survit au logout et à l'expiration du token (M6). | `backend/src/realtime/socket-auth.ts` | risque accepté (M6) |
-| L7 | Basse, corrigé (#204) | Pas de limite de débit par événement socket ni de longueur max sur `listening:update` (M9). Limite par socket et par événement, chaînes bornées par Zod. | `backend/src/shared/security/socket-event-limit.ts`, `backend/src/realtime/music-control-access.ts` | #204 |
-| L8 | Basse (dev), corrigé (#205) | Redis était publié sur le port 6379 de toutes les interfaces de l'hôte, sans mot de passe : quelqu'un sur le même réseau pouvait effacer les verrous, la liste noire et la liste de révocation. Publié sur `127.0.0.1` seulement ; reste sans mot de passe pour les processus de l'hôte et les conteneurs du réseau Docker. | `make/helpers/docker.mk` (`start_redis`), voir [SECURITY.md](SECURITY.md) | #205 |
-| L9 | Tests | Verrouillage de compte et liste noire d'IP testés par `backend/src/features/auth/account-lockout.int.test.ts` (routeur auth réel : verrouillage au seuil même avec le bon mot de passe, remise à zéro après un login réussi, liste noire d'IP au seuil et `403 IP_BLOCKED` sur toutes les routes auth). Reste sans test : le nombre max d'essais des codes de vérification et de reset, `getFilteredProfile`. | `backend/src/features/auth/account-lockout.int.test.ts` | #206 |
-| L10 | Moyenne, corrigé (#208) | Routes SoundCloud publiques, sans rate limit, et sans validation Zod sauf `search` : proxy ouvert vers SoundCloud (M7). | `backend/src/features/soundcloud/soundcloud.routes.ts` | #208 |
-| L11 | Moyenne (dev), réduite (#209) | En développement, toute origine contenant « ngrok » était acceptée par le CORS HTTP et socket ; seuls les sous-domaines https des domaines ngrok le sont maintenant, sur le nom d'hôte parsé. Risque accepté : un sous-domaine ngrok s'obtient avec un compte gratuit, donc le tunnel d'un attaquant passe encore ; l'authentification par token reste exigée (M9). | `backend/src/shared/config/cors.config.ts` (`isOriginAllowed`) | #209 |
-
+| # | Severity | Gap | Where | Tracking |
+|---|----------|-----|-------|----------|
+| L1 | **Critical**, fixed (#201) | `user_profiles` is readable by everyone (`USING (true)`), including `password_reset_code` and `verification_code`. With the APK's anon key: request a reset for the victim (`forgot-password`), read the code, change their password. Account takeover without access to the mailbox. Also exposes every profile without the privacy filter. | `backend/migrations/001_initial_schema.sql`, `013_email_verification.sql`, `014_password_reset.sql` | #201 |
+| L2 | High, fixed (#201) | The UPDATE policy of `user_profiles` allows every column of one's own row: a user can set `email_verified = true` without a code. The INSERT policy of `follows` does not check `can_control_music`: a controller can delete then recreate their `follows` row towards the owner with `can_control_music = true` and, if the owner follows them, control all their devices. | `001_initial_schema.sql`, `007_follows.sql`, `009_music_control.sql` | #201 |
+| L3 | High, fixed (#201) | `tracks` has no RLS: read, update and delete with the anon key. `music_preferences` and `follows` are readable by everyone, without the privacy settings. | `003_playlist_persistence.sql`, `011_profile_privacy_and_preferences.sql`, `007_follows.sql` | #201 |
+| L4 | Medium, fixed (#173) | Every anti-bruteforce limit is per IP (M1, M2); behind a proxy, every client had the same IP. `TRUST_PROXY` sets which proxies may set `X-Forwarded-For`, for HTTP and the socket. | `backend/src/shared/config/trust-proxy.ts` | #173 |
+| L5 | Medium, not reproduced (#203) | A password reset would not end open sessions. Checked on GoTrue v2.197.0 (local and hosted): Supabase Auth deletes every session of the account when the admin changes the password; an integration test locks this behavior on the local stack. | `resetPassword` (`backend/src/features/auth/services/password-reset.service.ts`) | #203 |
+| L6 | Medium | An open socket survives logout and token expiry (M6). | `backend/src/realtime/socket-auth.ts` | accepted risk (M6) |
+| L7 | Low, fixed (#204) | No rate limit per socket event and no max length on `listening:update` (M9). Limit per socket and per event, strings bounded by Zod. | `backend/src/shared/security/socket-event-limit.ts`, `backend/src/realtime/music-control-access.ts` | #204 |
+| L8 | Low (dev), fixed (#205) | Redis was published on port 6379 of every host interface, without a password: someone on the same network could clear the locks, the blacklist and the revocation list. Published on `127.0.0.1` only; still without a password for host processes and containers on the Docker network. | `make/helpers/docker.mk` (`start_redis`), see [containers.md](containers.md) | #205 |
+| L9 | Tests | Account lockout and IP blacklist tested by `backend/src/features/auth/account-lockout.int.test.ts` (real auth router: lockout at the threshold even with the right password, reset after a successful login, IP blacklist at the threshold and `403 IP_BLOCKED` on every auth route). Still untested: the max number of attempts for the verification and reset codes, `getFilteredProfile`. | `backend/src/features/auth/account-lockout.int.test.ts` | #206 |
+| L10 | Medium, fixed (#208) | SoundCloud routes public, without rate limit, and without Zod validation except `search`: open proxy to SoundCloud (M7). | `backend/src/features/soundcloud/soundcloud.routes.ts` | #208 |
+| L11 | Medium (dev), reduced (#209) | In development, any origin containing "ngrok" was accepted by HTTP and socket CORS; only https subdomains of the ngrok domains are now, on the parsed host name. Accepted risk: an ngrok subdomain comes with a free account, so an attacker's tunnel still passes; token authentication is still required (M9). | `backend/src/shared/config/cors.config.ts` (`isOriginAllowed`) | #209 |

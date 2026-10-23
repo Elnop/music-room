@@ -37,15 +37,15 @@ Requirements for security testing:
 
 ### Subject Requirements (IV.6 Securing)
 
-From `doc/en.subject.pdf`:
+From `doc/subject/en.subject.pdf`:
 
-1. **Protection des données utilisateurs**: "An authenticated user on your solution must have access to their data, but not to other users' data."
+1. **User data protection**: "An authenticated user on your solution must have access to their data, but not to other users' data."
 
-2. **Prévention des comportements malicieux**: "You must plan malicious behaviors (bruteforce of your API, session theft, etc.)"
+2. **Malicious behavior prevention**: "You must plan malicious behaviors (bruteforce of your API, session theft, etc.)"
 
-3. **Mécanismes de protection**: "You must implement mechanisms to protect your users"
+3. **Protection mechanisms**: "You must implement mechanisms to protect your users"
 
-4. **Logging backend**: "Any action on the mobile application must generate logs on the back-end."
+4. **Backend logging**: "Any action on the mobile application must generate logs on the back-end."
    - Platform (Android, iOS, etc.)
    - Device (iPhone 6G, iPad Air, Samsung Edge, etc.)
    - Application Version
@@ -1178,10 +1178,10 @@ make redis-shell
 
 ### Documentation References
 
-- **[REDIS.md](./REDIS.md)** - Complete Redis configuration, commands, and troubleshooting
-- **[SECURITY.md](./SECURITY.md)** - General security guide and best practices
-- **[backend/API_DOCUMENTATION.md](../backend/API_DOCUMENTATION.md)** - Complete API endpoint reference
-- **[doc/en.subject.pdf](./en.subject.pdf)** - Original project requirements (section IV.6)
+- **[redis.md](../architecture/redis.md)** - Complete Redis configuration, commands, and troubleshooting
+- **[threat-model.md](threat-model.md)** - Threats, protections and accepted risks
+- **Swagger UI** (http://localhost:3000/api-docs) - Complete API endpoint reference
+- **[en.subject.pdf](../subject/en.subject.pdf)** - Original project requirements (section IV.6)
 
 ### Implementation References
 

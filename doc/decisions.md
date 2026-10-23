@@ -1,174 +1,174 @@
-# Choix Techniques et Justifications Architecturales
+# Technical choices and architectural decisions
 
-Ce document consigne et justifie l'ensemble des choix technologiques et architecturaux du projet **Music Room** (Zumik), conformément aux exigences du sujet 42 (v5.3) et aux décisions d'ingénierie de l'epic de refactorisation globale (#362, alimentant l'issue #97).
+This document records and justifies the technology and architecture choices of the **Music Room** project (Zumik), against the requirements of the 42 subject (v5.3) and the engineering decisions of the global refactoring epic (#362, feeding issue #97).
 
-Chaque décision est confrontée à des alternatives identifiées, en explicitant les raisons techniques de leur rejet.
-
----
-
-## 1. Choix de la Stack Centrale (Socle Technique)
-
-### 1.1 Environnement et Langage : Node.js (v22 LTS), Express & TypeScript
-
-- **Décision retenue** : Node.js 22 LTS, framework HTTP Express, langage TypeScript en mode strict (`noImplicitAny`, validation stricte des types).
-- **Justification** :
-  - **Maturité et prévisibilité** : Express dispose d'un écosystème mature, stable et sans magie, parfaitement adapté à une architecture modulaire en couches.
-  - **Homogénéité TypeScript** : Utiliser TypeScript à la fois sur le backend et sur l'application mobile permet une cohérence sémantique totale, un partage des types de domaine et une détection immédiate des régressions de contrat à la compilation.
-  - **Adéquation avec Node 22** : Support natif des modules ES, performances optimisées du moteur V8 et compatibilité avec l'ensemble des conteneurs de la CI.
-- **Alternatives étudiées et rejetées** :
-  - *NestJS* : Rejeté pour sa complexité accidentelle (inversion de contrôle lourde, surabondance de décorateurs et de métadonnées, abstraction excessive masquant le fonctionnement HTTP sous-jacent et rigidifiant les tests).
-  - *Fastify* : Rejeté en raison de son écosystème de middlewares moins universel et de frictions d'intégration avec l'adaptateur Socket.io et les middlewares de sécurité standard.
-  - *Go ou Python (FastAPI)* : Rejetés car introduisant une rupture de pile technologique avec l'application mobile (React Native), empêchant la mutualisation des compétences et l'unification des garde-fous.
+Each decision is weighed against the alternatives considered, with the technical reasons they were rejected.
 
 ---
 
-### 1.2 Base de Données et Identité : Supabase (PostgreSQL, Auth & Row Level Security)
+## 1. Core stack
 
-- **Décision retenue** : PostgreSQL managé via Supabase, migrations SQL versionnées et séquentielles (`backend/migrations/NNN_*.sql`), client officiel `@supabase/supabase-js` strictement réservé au backend (gestion administrative et vérification de session).
-- **Justification** :
-  - **Richesse relationnelle** : PostgreSQL garantit l'intégrité relationnelle et transactionnelle (ACID) indispensable pour les playlists, l'ordonnancement des pistes, les permissions de collaboration et les relations d'amitié.
-  - **Authentification robuste** : Supabase Auth gère de façon sécurisée le hachage des mots de passe, les flux OAuth (Google, Facebook) et la gestion des tokens JWT.
-  - **Environnement local et CI reproductible** : Possibilité de faire tourner la stack complète Supabase en local via Docker (`scripts/test-db.sh`, `make supabase-up`), rendant les tests d'intégration 100% autonomes et déconnectés d'Internet.
-- **Alternatives étudiées et rejetées** :
-  - *PostgreSQL nu auto-hébergé* : Rejeté car nécessitant de recréer manuellement toute la couche de gestion d'utilisateurs, de sessions OAuth et d'infrastructure d'administration.
-  - *Firebase / Google Cloud Firestore* : Rejeté car modèle NoSQL inadapté aux contraintes de tri strict, de transactions complexes et de relations n-à-n du sujet (amitiés, droits sur playlists), en plus du verrouillage propriétaire (vendor lock-in).
-  - *MongoDB* : Rejeté pour l'absence de garanties d'intégrité référentielle native et le surcoût de modélisation pour des structures fortement relationnelles.
+### 1.1 Runtime and language: Node.js (v22 LTS), Express and TypeScript
 
----
-
-### 1.3 Gestion d'État Distribué, Cache et Anti-Abus : Redis
-
-- **Décision retenue** : Redis 7 via le client `ioredis`, dédié à l'état temps réel, aux limitations de débit (rate limiting), à la révocation des tokens JWT et à la synchronisation concurrente des files de lecture.
-- **Justification** :
-  - **Performances en mémoire sub-milliseconde** : Traitement instantané des compteurs anti-abus et des verrous de concurrence.
-  - **Opérations atomiques multi-clés** : Les pipelines et scripts Redis garantissent que l'incrémentation des fenêtres glissantes et les modifications d'état s'exécutent de façon strictement atomique sans race conditions.
-  - **Aucun repli en mémoire** : Conforme aux exigences du sujet et de l'architecture distribuée : en cas d'indisponibilité Redis, le service échoue de façon contrôlée sans dégrader la sécurité par un fallback in-memory localisé à un seul conteneur.
-- **Alternatives étudiées et rejetées** :
-  - *Memcached* : Rejeté en raison de son absence de structures de données riches (hashes, sets ordonnés), de mécanismes atomiques avancés et d'expiration fine.
-  - *RabbitMQ / Apache Kafka* : Rejetés car conçus pour le streaming et le message queuing persistant à très grande échelle ; disproportionnés et inadaptés aux besoins de compteurs éphémères et de stockage de session clé-valeur.
-  - *État en mémoire du processus Node.js* : Formellement interdit : rendrait le backend incapable de passer à l'échelle (scale-out) et provoquerait une perte d'état et des failles de sécurité lors des redémarrages de pods/conteneurs.
+- **Decision**: Node.js 22 LTS, the Express HTTP framework, TypeScript in strict mode (`noImplicitAny`, strict type checking).
+- **Why**:
+  - **Maturity and predictability**: Express has a mature, stable ecosystem without magic, well suited to a modular, layered architecture.
+  - **One language**: TypeScript on both the backend and the mobile app gives one vocabulary, shared domain types, and contract regressions caught at compile time.
+  - **Node 22**: native ES modules, an optimized V8 engine, and compatibility with every CI container.
+- **Alternatives rejected**:
+  - *NestJS*: accidental complexity (heavy inversion of control, decorators and metadata everywhere, an abstraction that hides HTTP and makes tests rigid).
+  - *Fastify*: a less universal middleware ecosystem and friction with the Socket.io adapter and the standard security middlewares.
+  - *Go or Python (FastAPI)*: a second stack next to the mobile app (React Native), so skills and guardrails could not be shared.
 
 ---
 
-### 1.4 Communication Temps Réel : Socket.io
+### 1.2 Database and identity: Supabase (PostgreSQL, Auth and Row Level Security)
 
-- **Décision retenue** : Socket.io (WebSocket avec secours HTTP long-polling), authentification par JWT lors du handshake, découpage événementiel par domaine (`listening`, `playlist`, `control`).
-- **Justification** :
-  - **Gestion native des salles (rooms)** : Permet d'isoler les diffusions aux seuls membres d'une playlist collaborative ou aux participants d'une session d'écoute.
-  - **Résilience réseau sur mobile** : Gestion native des reconnexions transparentes, du backoff exponentiel et des buffers d'événements lors des transitions réseau (Wi-Fi ↔ 4G/5G).
-  - **Accusés de réception (acknowledgements)** : Confirmation bidirectionnelle immédiate des actions (ex. délégation de contrôle de lecture, ajout à la file).
-- **Alternatives étudiées et rejetées** :
-  - *WebSockets natifs (bibliothèque `ws`)* : Rejetés car nécessitant de réimplémenter entièrement la gestion des rooms, le heartbeat, les mécanismes de reconnexion, le fallback transport et la sérialisation d'événements.
-  - *Server-Sent Events (SSE)* : Rejetés car unidirectionnels (serveur vers client uniquement) ; inaptes à supporter les commandes de télécommande musicale émises par le mobile vers le serveur.
-  - *HTTP Long-Polling brut* : Rejeté en raison de la latence excessive, de l'overhead d'en-têtes HTTP à chaque requête et de l'inadéquation avec une synchronisation audio fine.
-
----
-
-### 1.5 Framework Mobile : Expo React Native (Build Natif Android)
-
-- **Décision retenue** : Expo SDK 52 / React Native 0.76 compilé sous forme de build natif Android (`npx expo run:android`), sans passer par Expo Go.
-- **Justification** :
-  - **Accès natif complet et performances** : La compilation native permet d'intégrer les modules natifs requis par le sujet (Google Sign-In natif, Facebook SDK, extraction de palettes de couleurs d'artwork `react-native-image-colors`).
-  - **Outillage Expo moderne** : Gestion unifiée des assets, de la configuration (`app.json`), des plugins de configuration (`plugins/`) et de la génération des manifests Android sans les lourdeurs de maintenance manuelle des projets Gradle.
-- **Alternatives étudiées et rejetées** :
-  - *Expo Go* : Rejeté car techniquement incapable de faire tourner l'application : les bibliothèques d'authentification tierces et d'analyse d'images nécessitent du code natif personnalisé absent du client Expo Go précompilé.
-  - *Bare React Native (sans Expo)* : Rejeté en raison de la complexité inutile de gestion des versions de dépendances natives et des scripts de build manuels sans gain de fonctionnalité.
-  - *Flutter (Dart)* : Rejeté pour maintenir l'homogénéité TypeScript dans toute la codebase, permettant le partage des interfaces de réponse API et des règles d'ingénierie communes.
-  - *Développement natif pur (Kotlin/Swift)* : Rejeté en raison du coût de développement et de maintenance doublé pour une équipe restreinte, sans valeur ajoutée pour une application de streaming/télécommande musicale.
+- **Decision**: PostgreSQL managed by Supabase, versioned sequential SQL migrations (`backend/migrations/NNN_*.sql`), the official `@supabase/supabase-js` client used by the backend only (administration and session verification).
+- **Why**:
+  - **Relational model**: PostgreSQL guarantees the relational and transactional integrity (ACID) that playlists, track ordering, collaboration rights and friendships need.
+  - **Solid authentication**: Supabase Auth handles password hashing, OAuth flows (Google, Facebook) and JWT tokens securely.
+  - **Reproducible local and CI environment**: the whole Supabase stack runs locally in Docker (`scripts/test-db.sh`, `make supabase-up`), so integration tests are self-contained and need no Internet.
+- **Alternatives rejected**:
+  - *Self-hosted bare PostgreSQL*: the whole user, OAuth session and administration layer would have to be rebuilt by hand.
+  - *Firebase / Google Cloud Firestore*: a NoSQL model unsuited to strict ordering, complex transactions and the subject's many-to-many relations (friendships, playlist rights), plus vendor lock-in.
+  - *MongoDB*: no native referential integrity, and extra modelling cost for strongly relational data.
 
 ---
 
-### 1.6 Protocole d'Échange : REST & JSON
+### 1.3 Distributed state, cache and anti-abuse: Redis
 
-- **Décision retenue** : Architecture RESTful, payloads au format JSON, utilisation stricte des codes de statut HTTP standardisés (200, 201, 204, 400, 401, 403, 404, 409, 429, 500) et enveloppe d'erreur unifiée (`ApiError` / `AppError`).
-- **Justification** :
-  - **Interopérabilité universelle** : Tout client HTTP ou outil d'inspection (Postman, curl, Swagger UI) interagit directement avec l'API.
-  - **Mise en cache et contrôle réseau** : Les middlewares de rate limiting et d'authentification s'appliquent naturellement par méthode et URI.
-- **Alternatives étudiées et rejetées** :
-  - *GraphQL* : Rejeté en raison de la complexité de mise en cache HTTP standard, de l'absence de rate limiting granulaire par endpoint, de la vulnérabilité aux requêtes récursives complexes (DoS) et de l'inutilité de la sélection de champs pour le volume de données du projet.
-  - *gRPC / Protobuf* : Rejeté car les charges utiles binaires rendent l'inspection manuelle difficile et s'intègrent mal avec Swagger UI, requis pour la démonstration et l'évaluation du sujet.
-  - *tRPC* : Rejeté pour préserver l'indépendance stricte du backend en tant qu'API publique documentée via OpenAPI, consommable par n'importe quel client externe.
-
----
-
-## 2. Choix d'Ingénierie de l'Epic de Refactorisation (#362)
-
-### 2.1 Gestion des Données Serveur Côté Mobile : TanStack Query (React Query)
-
-- **Décision retenue** : TanStack Query v5 pour l'ensemble des données issues du réseau (requêtes, mutations, cache, déduplication, états `isPending`/`isError`). Zustand est strictement cantonné à l'état client local éphémère (session utilisateur, réglages UI, état du lecteur).
-- **Justification** :
-  - **Séparation nette de l'état serveur vs état client** : Les données distantes sont asynchrones, sujettes à expiration et partagées ; les mélanger dans un store client global engendre des bugs d'invalidation et des états obsolètes.
-  - **Synchronisation fine avec Socket.io** : Via l'utilitaire `socketCache.ts`, les événements temps réel mettent à jour chirurgicalement le cache (`queryClient.setQueryData`) ou invalident les requêtes de façon atomique.
-- **Alternatives étudiées et rejetées** :
-  - *Zustand pour tout* : Rejeté car oblige à réécrire manuellement la gestion des états de chargement, les tentatives de rejeu (retries), la déduplication des requêtes simultanées et le garbage collection du cache mémoire.
-  - *Redux Toolkit (RTK Query)* : Rejeté pour son surpoids conceptuel, son boilerplate verbeux et son couplage rigide à un dispatcher global.
-  - *SWR* : Rejeté car son modèle de mutation et de gestion des profils de cache est moins puissant et moins extensible que TanStack Query (notamment pour l'intégration avec Socket.io).
+- **Decision**: Redis 7 through the `ioredis` client, dedicated to real-time state, rate limiting, JWT revocation and concurrent synchronization of the play queues.
+- **Why**:
+  - **Sub-millisecond in-memory operations**: anti-abuse counters and concurrency locks are handled instantly.
+  - **Atomic operations**: Redis pipelines and scripts make window counters and state changes strictly atomic, without race conditions.
+  - **No in-memory fallback**: when Redis is unavailable, the service fails in a controlled way instead of weakening security with a fallback local to a single container.
+- **Alternatives rejected**:
+  - *Memcached*: no rich data structures (hashes, sorted sets), no advanced atomic operations, coarse expiry.
+  - *RabbitMQ / Apache Kafka*: built for large-scale streaming and persistent queues; out of proportion for short-lived counters and key-value session data.
+  - *In-process Node.js memory*: ruled out: the backend could not scale out, and state would be lost (with security holes) whenever a container restarts.
 
 ---
 
-### 2.2 Styles et Conception Visuelle : StyleSheet & Tokens de Thème
+### 1.4 Real time: Socket.io
 
-- **Décision retenue** : `StyleSheet.create` de React Native combiné à des tokens stricts (`theme.colors.*`, `theme.typography.*`, `theme.spacing.*`) définis dans `src/shared/theme/`, imposés par la règle ESLint `guardrails/theme-tokens`.
-- **Justification** :
-  - **Dynamisme multi-thèmes** : L'application supporte 4 thèmes complets basculables instantanément sans redémarrage.
-  - **Performance native** : `StyleSheet` garantit l'envoi direct des styles au pont natif sans recalcul CSS à l'exécution.
-  - **Zéro valeur magique** : Règle bloquante interdisant les couleurs brutes codées en dur hors des fichiers de définition de thème.
-- **Alternatives étudiées et rejetées** :
-  - *NativeWind (Tailwind CSS pour React Native)* : Rejeté en raison de son incompatibilité avec un basculement dynamique et fluide de thèmes complets à chaud sans recompilation des classes utilitaires.
-  - *Styled-components / Emotion* : Rejeté en raison de l'empreinte mémoire élevée et du ralentissement des rendus consécutif à l'injection dynamique d'arbres de styles CSS-in-JS.
-  - *Styles inline libres* : Rejeté car source d'incohérences graphiques majeures et de fuites de performances (nouvel objet alloué à chaque re-render).
-
----
-
-### 2.3 Navigation Mobile : React Navigation v7
-
-- **Décision retenue** : React Navigation avec typage strict TypeScript (`RootStackParamList`, `NavigationProp`), organisation hiérarchique en stacks par domaine fonctionnel et liaisons d'écrans limitées à des orchestrateurs.
-- **Justification** :
-  - **Contrôle précis du cycle de vie** : Gestion fine des transitions, de l'état d'animation et de l'historique de navigation sur Android.
-  - **Découplage navigation / présentation** : Un écran n'importe qu'un composant orchestrator, garantissant que la navigation reste un simple aiguilleur sans logique métier directe.
-- **Alternatives étudiées et rejetées** :
-  - *Expo Router* : Rejeté car impose une arborescence basée sur les fichiers (`app/`) qui entre en conflit direct avec le découpage par feature-slice (`src/features/<feature>/<subject>`), en plus d'introduire des comportements implicites difficiles à maîtriser dans des flux d'authentification conditionnels stricts.
+- **Decision**: Socket.io (WebSocket with HTTP long-polling fallback), JWT authentication at the handshake, events split by domain (`listening`, `playlist`, `control`).
+- **Why**:
+  - **Built-in rooms**: broadcasts reach only the members of a collaborative playlist or the participants of a listening session.
+  - **Mobile network resilience**: transparent reconnection, exponential backoff and event buffering during network changes (Wi-Fi ↔ 4G/5G).
+  - **Acknowledgements**: immediate two-way confirmation of actions (e.g. playback control delegation, adding to the queue).
+- **Alternatives rejected**:
+  - *Raw WebSockets (`ws` library)*: rooms, heartbeat, reconnection, transport fallback and event serialization would all have to be rewritten.
+  - *Server-Sent Events (SSE)*: one-way (server to client only); cannot carry the remote-control commands the phone sends to the server.
+  - *Plain HTTP long-polling*: too much latency and header overhead per request for fine audio synchronization.
 
 ---
 
-### 2.4 Documentation OpenAPI Backend Générée depuis les Schémas Zod
+### 1.5 Mobile framework: Expo React Native (native Android build)
 
-- **Décision retenue** : Schémas Zod uniques pour la validation d'entrée HTTP et l'inférence des types TypeScript (`z.infer`), couplés à `@asteasolutions/zod-to-openapi` pour la génération automatique de la documentation Swagger UI (`/api-docs`).
-- **Justification** :
-  - **Source unique de vérité (Single Source of Truth)** : Impossible d'avoir une divergence entre le validateur d'exécution (Zod), les types TypeScript de compilation et la documentation OpenAPI exposée aux consommateurs.
-  - **Conformité stricte au sujet** : Le sujet v5.3 valide explicitement une documentation OpenAPI auto-générée si elle décrit fidèlement méthodes, paramètres et codes de réponse.
-- **Alternatives étudiées et rejetées** :
-  - *Spécification OpenAPI / Swagger écrite manuellement (YAML/JSON)* : Rejetée en raison du risque inévitable de désynchronisation rapide avec l'implémentation lors des évolutions du code.
-  - *tsoa ou décorateurs NestJS* : Rejetés car ils imposent une écriture orientée objet avec classes et décorateurs TypeScript expérimentaux, contraire à la règle de modularité en fonctions pures.
-
----
-
-### 2.5 Architecture Interne Backend : Modules de Fonctions Pures
-
-- **Décision retenue** : Abandon complet des classes instanciées en singleton au profit de modules TypeScript exportant des fonctions pures (`services/<nom>.service.ts`), importés sous forme de namespaces (`import * as authService from ...`).
-- **Justification** :
-  - **Lisibilité et testabilité** : Les fonctions pures prennent leurs dépendances en paramètres ou font appel à des utilitaires partagés sans état interne caché, simplifiant drastiquement les mocks dans Vitest.
-  - **Tree-shaking et légèreté** : Élimination du boilerplate des constructeurs et des conteneurs d'injection de dépendance inutiles.
-- **Alternatives étudiées et rejetées** :
-  - *Classes avec injection de dépendance (type Inversify / Nest)* : Rejeté car complexifie le code sans aucun bénéfice tangible pour une application de cette taille.
+- **Decision**: Expo SDK 52 / React Native 0.76 compiled as a native Android build (`npx expo run:android`), never through Expo Go.
+- **Why**:
+  - **Full native access**: the native build includes the native modules the app needs (native Google Sign-In, Facebook SDK, artwork palette extraction with `react-native-image-colors`).
+  - **Modern Expo tooling**: assets, configuration (`app.json`), config plugins (`plugins/`) and Android manifest generation handled in one place, without maintaining Gradle projects by hand.
+- **Alternatives rejected**:
+  - *Expo Go*: cannot run the app: the third-party authentication and image analysis libraries need custom native code that the prebuilt Expo Go client does not have.
+  - *Bare React Native (without Expo)*: needless complexity in native dependency versions and manual build scripts, with no functional gain.
+  - *Flutter (Dart)*: rejected to keep TypeScript across the whole codebase, sharing API response interfaces and engineering rules.
+  - *Pure native (Kotlin/Swift)*: double the development and maintenance cost for a small team, with no added value for a music streaming and remote-control app.
 
 ---
 
-### 2.6 Garde-fous et Qualité Intransigeante (`npm run check`)
+### 1.6 Protocol: REST and JSON
 
-- **Décision retenue** : Commande `npm run check` unifiée dans chaque projet (backend et mobile), exécutée en pre-commit via Husky et dans la CI GitHub Actions, articulée autour de 10 vérificateurs parallèles :
-  1. `type-check` (`tsc --noEmit`) : Vérification stricte des types.
-  2. `lint` (ESLint 9 Flat Config + plugin maison `components`) : Respect des rôles de composants, interdiction de `console.*`, imports relatifs parents interdits (`@/` obligatoire), un seul composant par fichier.
-  3. `check:dead-code` (`knip`) : Détection et élimination du code mort (fichiers, exports, types et dépendances orphelines).
-  4. `check:deps` (`dependency-cruiser`) : Interdiction des cycles, validation des couches logiques et étanchéité inter-features.
-  5. `check:duplication` (`jscpd`) : Contrôle strict de la duplication de code (seuil 0 clone toléré).
-  6. `check:semgrep` & `check:ast-grep` : Détection de motifs anti-patterns (interdiction des appels directs à `fetch` ou d'accès à AsyncStorage hors modules autorisés).
-  7. `check:secrets` (`gitleaks` via Docker) : Blocage absolu de toute fuite de token, clé API ou secret.
-  8. `test` (Vitest backend, Jest-Expo mobile) : Exécution de l'intégralité des suites de tests unitaires et d'intégration.
-  9. `check:exceptions` : Vérification que les listes d'exceptions n'augmentent jamais et tendent vers zéro.
-- **Justification** :
-  - **Politique append-only** : Aucune règle ne peut être désactivée ou passée en "warning" pour faire passer du code.
-  - **Autonomie de l'équipe et des agents IA** : Les garde-fous fournissent un retour immédiat et univoque sur toute tentative de régression architecturale.
-- **Alternatives étudiées et rejetées** :
-  - *Vérification manuelle en revue de code seule* : Rejetée car faillible, chronophage et incapable d'assurer la constance des critères sur des dizaines de PRs successives.
-  - *Tolérance de suppressions permanentes (eslint-disable laxistes)* : Rejetée car transforme progressivement les règles de qualité en vœux pieux.
+- **Decision**: a RESTful architecture, JSON payloads, strict use of standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 409, 429, 500) and a single error envelope (`ApiError` / `AppError`).
+- **Why**:
+  - **Universal interoperability**: any HTTP client or inspection tool (Postman, curl, Swagger UI) talks to the API directly.
+  - **Network control**: rate limiting and authentication middlewares apply naturally per method and URI.
+- **Alternatives rejected**:
+  - *GraphQL*: harder standard HTTP caching, no fine per-endpoint rate limiting, exposure to complex recursive queries (DoS), and field selection is useless at this project's data volume.
+  - *gRPC / Protobuf*: binary payloads are hard to inspect by hand and fit poorly with Swagger UI, which the subject's demo and evaluation need.
+  - *tRPC*: rejected to keep the backend an independent public API documented with OpenAPI, usable by any external client.
+
+---
+
+## 2. Engineering choices of the refactoring epic (#362)
+
+### 2.1 Server data on mobile: TanStack Query (React Query)
+
+- **Decision**: TanStack Query v5 for all data that comes from the network (queries, mutations, cache, deduplication, `isPending`/`isError` states). Zustand is limited to short-lived local client state (user session, UI settings, player state).
+- **Why**:
+  - **Server state kept apart from client state**: remote data is asynchronous, expires and is shared; mixing it into a global client store breeds invalidation bugs and stale state.
+  - **Precise synchronization with Socket.io**: through `socketCache.ts`, real-time events update the cache surgically (`queryClient.setQueryData`) or invalidate queries atomically.
+- **Alternatives rejected**:
+  - *Zustand for everything*: loading states, retries, deduplication of concurrent requests and cache garbage collection would all have to be written by hand.
+  - *Redux Toolkit (RTK Query)*: conceptually heavy, verbose boilerplate, rigid coupling to a global dispatcher.
+  - *SWR*: its mutation and cache model is less powerful and less extensible than TanStack Query's (especially for the Socket.io integration).
+
+---
+
+### 2.2 Styling: StyleSheet and theme tokens
+
+- **Decision**: React Native `StyleSheet.create` with strict tokens (`theme.colors.*`, `theme.typography.*`, `theme.spacing.*`) defined in `src/shared/theme/`, enforced by the ESLint rule `guardrails/theme-tokens`.
+- **Why**:
+  - **Several themes**: the app has 4 complete themes, switchable instantly without a restart.
+  - **Native performance**: `StyleSheet` hands styles straight to the native side with no CSS computation at runtime.
+  - **No magic values**: a blocking rule forbids raw hard-coded colors outside the theme definition files.
+- **Alternatives rejected**:
+  - *NativeWind (Tailwind CSS for React Native)*: does not handle switching complete themes on the fly without recompiling the utility classes.
+  - *styled-components / Emotion*: high memory footprint and slower renders caused by injecting CSS-in-JS style trees at runtime.
+  - *Free inline styles*: a source of visual inconsistencies and wasted renders (a new object allocated on every render).
+
+---
+
+### 2.3 Mobile navigation: React Navigation v7
+
+- **Decision**: React Navigation with strict TypeScript typing (`RootStackParamList`, `NavigationProp`), stacks organized by feature, and screens bound only to orchestrators.
+- **Why**:
+  - **Precise lifecycle control**: fine control over transitions, animation state and navigation history on Android.
+  - **Navigation decoupled from presentation**: a screen imports only an orchestrator component, so navigation stays a simple router with no business logic.
+- **Alternatives rejected**:
+  - *Expo Router*: imposes a file-based tree (`app/`) that conflicts with the feature-slice layout (`src/features/<feature>/<subject>`), and adds implicit behaviors that are hard to control in strict conditional authentication flows.
+
+---
+
+### 2.4 Backend OpenAPI documentation generated from Zod schemas
+
+- **Decision**: one Zod schema per input, used for HTTP input validation and TypeScript type inference (`z.infer`), together with `@asteasolutions/zod-to-openapi` to generate the Swagger UI documentation (`/api-docs`).
+- **Why**:
+  - **Single source of truth**: the runtime validator (Zod), the compile-time TypeScript types and the published OpenAPI documentation cannot drift apart.
+  - **Subject compliance**: subject v5.3 explicitly accepts generated OpenAPI documentation as long as it accurately describes methods, parameters and response codes.
+- **Alternatives rejected**:
+  - *Hand-written OpenAPI / Swagger (YAML/JSON)*: inevitably drifts from the implementation as the code evolves.
+  - *tsoa or NestJS decorators*: impose object-oriented code with classes and experimental TypeScript decorators, against the rule of modules made of plain functions.
+
+---
+
+### 2.5 Backend internals: function modules
+
+- **Decision**: no more singleton class instances; TypeScript modules exporting plain functions (`services/<name>.service.ts`), imported as namespaces (`import * as authService from ...`).
+- **Why**:
+  - **Readability and testability**: functions take their dependencies as parameters or call shared utilities, with no hidden internal state, which makes mocks in Vitest much simpler.
+  - **Less code**: no constructor boilerplate and no needless dependency-injection containers.
+- **Alternatives rejected**:
+  - *Classes with dependency injection (Inversify / Nest style)*: more complex code with no tangible benefit for an application of this size.
+
+---
+
+### 2.6 Guardrails (`npm run check`)
+
+- **Decision**: one `npm run check` command in each project (backend and mobile), run at pre-commit by Husky and in GitHub Actions CI, built on these parallel checkers:
+  1. `type-check` (`tsc --noEmit`): strict type checking.
+  2. `lint` (ESLint 9 flat config + the in-house `components` plugin): component roles, no `console.*`, no parent relative imports (`@/` required), one component per file.
+  3. `check:dead-code` (`knip`): finds and removes dead code (orphan files, exports, types and dependencies).
+  4. `check:deps` (`dependency-cruiser`): no cycles, logical layers respected, features kept apart.
+  5. `check:duplication` (`jscpd`): strict duplication control (zero clones tolerated).
+  6. `check:semgrep` and `check:ast-grep`: anti-pattern detection (e.g. no direct `fetch` call or AsyncStorage access outside the allowed modules).
+  7. `check:secrets` (`gitleaks` through Docker): blocks any leaked token, API key or secret.
+  8. `test` (Vitest on the backend, jest-expo on mobile): runs every unit and integration test suite.
+  9. `check:exceptions`: checks that the exception lists never grow and trend towards zero.
+- **Why**:
+  - **Append-only policy**: no rule can be disabled or switched to "warning" to let code through.
+  - **Autonomy for the team and for AI agents**: the guardrails give immediate, unambiguous feedback on any architectural regression.
+- **Alternatives rejected**:
+  - *Manual code review only*: fallible, slow, and unable to keep the criteria constant across dozens of successive PRs.
+  - *Permanent suppressions (lax `eslint-disable`)*: slowly turns quality rules into wishful thinking.

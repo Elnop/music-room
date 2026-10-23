@@ -438,7 +438,7 @@ CLIENT LIST         # List connected clients
 
 ## Redis in Production
 
-There is no compose file: in development, `start_redis` (`make/helpers/docker.mk`) runs Redis with `docker run`, published on `127.0.0.1` only and without a password (see [SECURITY.md](SECURITY.md)). For a deployed instance, start from the same command:
+There is no compose file: in development, `start_redis` (`make/helpers/docker.mk`) runs Redis with `docker run`, published on `127.0.0.1` only and without a password (see [containers.md](../security/containers.md)). For a deployed instance, start from the same command:
 
 ```bash
 docker run -d --name zumik-redis \
@@ -460,7 +460,7 @@ docker run -d --name zumik-redis \
 
 2. **Do not publish the port**: leave out `-p` (as above) so Redis is reachable only from containers on `zumik-network`, which reach it as `zumik-redis` (`REDIS_HOST`). If the host itself needs it, publish on loopback only: `-p 127.0.0.1:6379:6379`.
 
-3. **Limit memory usage**: `--maxmemory 256mb`. Use `--maxmemory-policy noeviction`: Redis holds rate-limit counters, account lockouts, the IP blacklist and the token revocation list, all with a TTL, so an LRU policy would evict security state first. With `noeviction` a full Redis refuses writes instead: the rate limiters and logout (revocation) answer 503 (fail closed), while lockouts and the IP blacklist stop counting new failures (`shared/security/fail-open.ts`, an accepted risk in [THREAT_MODEL.md](THREAT_MODEL.md)); existing entries stay enforced. Watch memory (`INFO memory`) rather than relying on eviction.
+3. **Limit memory usage**: `--maxmemory 256mb`. Use `--maxmemory-policy noeviction`: Redis holds rate-limit counters, account lockouts, the IP blacklist and the token revocation list, all with a TTL, so an LRU policy would evict security state first. With `noeviction` a full Redis refuses writes instead: the rate limiters and logout (revocation) answer 503 (fail closed), while lockouts and the IP blacklist stop counting new failures (`shared/security/fail-open.ts`, an accepted risk in [threat-model.md](../security/threat-model.md)); existing entries stay enforced. Watch memory (`INFO memory`) rather than relying on eviction.
 
 ### Data Persistence
 
@@ -511,9 +511,8 @@ Access at http://localhost:8001 and connect to `zumik-redis:6379`.
 
 ## See Also
 
-- [DOCKER.md](./DOCKER.md) - Complete Docker guide
-- [GETTING_STARTED.md](./GETTING_STARTED.md) - Getting started guide
-- [SECURITY.md](./SECURITY.md) - Security guide
+- [containers.md](../security/containers.md) - Containers, including Redis
+- [threat-model.md](../security/threat-model.md) - What the anti-abuse counters protect against
 - Backend: `backend/src/shared/config/redis.ts` - Redis configuration
 - Backend: `backend/src/shared/security/` - Anti-abuse module (rate limiting, lockout, IP reputation)
 

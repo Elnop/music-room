@@ -99,7 +99,7 @@ The pure rules (sort by rank, apply an event → new playlist, ignore or reload)
 
 ## Tests
 
-Concurrency is tested on the integration Postgres (story 1.10, see `doc/TESTING.md`), with separate connections running operations at the same time. Every test checks the invariants: each track appears once, ranks are unique, `added_by` is unchanged by moves, and the final order is the same for every client. Cases: concurrent moves of different tracks (all apply), concurrent moves of the same track (one applies, the others get `409`), moves concurrent with adds and removes, and a long run of moves into one gap (rebalancing).
+Concurrency is tested on the integration Postgres (story 1.10, see [testing.md](../development/testing.md)), with separate connections running operations at the same time. Every test checks the invariants: each track appears once, ranks are unique, `added_by` is unchanged by moves, and the final order is the same for every client. Cases: concurrent moves of different tracks (all apply), concurrent moves of the same track (one applies, the others get `409`), moves concurrent with adds and removes, and a long run of moves into one gap (rebalancing).
 
 | File | Covers |
 |---|---|
