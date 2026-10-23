@@ -12,7 +12,7 @@ The repository has no `docker-compose.yml`. Containers are started by `docker ru
 
 | Image | Base | Version |
 |-------|------|---------|
-| `backend/Dockerfile` | `node:22-alpine` | tag, no digest: the Node and Alpine patch level follows the tag's latest build |
+| `backend/Dockerfile` | `node:22-bookworm-slim` | tag, no digest: the Node and Debian patch level follows the tag's latest build |
 | `mobile/Dockerfile` | `node:22-bookworm-slim` | same |
 | `mobile/Dockerfile.android-build` | `node:22-bookworm` | same |
 | Redis (no Dockerfile) | `redis:7-alpine` (`REDIS_IMAGE`) | same |
@@ -25,10 +25,10 @@ Four stages:
 
 | Stage | Base | Content | User |
 |-------|------|---------|------|
-| `base` | `node:22-alpine` | `WORKDIR /app`, copy of `package*.json` | root |
-| `development` | `base` | `npm install -g npm@11.7.0`, `npm install --include=dev`, copy of the code, `EXPOSE 3000`, `CMD ["npm", "run", "dev"]` | **root** (no `USER`) |
+| `base` | `node:22-bookworm-slim` (glibc: `@ast-grep/cli` has no musl binary) | `WORKDIR /app`, copy of `package*.json` | root |
+| `development` | `base` | `npm ci --include=dev` with the image's npm 10, copy of the code, `EXPOSE 3000`, `CMD ["npm", "run", "dev"]` | **root** (no `USER`) |
 | `builder` | `base` | same installs, copy of the code, `npm run build` | root (build stage) |
-| `production` | `node:22-alpine` | copies `package*.json`, `node_modules` and `dist` from `builder`; creates the `nodejs` group and user (uid/gid 1001); `chown -R nodejs:nodejs /app`; `EXPOSE 3000`; `CMD ["node", "dist/server.js"]` | `nodejs` (1001) |
+| `production` | `node:22-bookworm-slim` | copies `package*.json`, `node_modules` and `dist` from `builder`; creates the `nodejs` group and user (uid/gid 1001); `chown -R nodejs:nodejs /app`; `EXPOSE 3000`; `CMD ["node", "dist/server.js"]` | `nodejs` (1001) |
 
 What is actually used: `make` only builds `--target development` (`build_backend_image`). The `production` stage is built by no `make` command and not by CI. If it is used:
 - `node_modules` comes from `builder`, installed with `--include=dev` and without `npm prune`: dev dependencies are in the image;
