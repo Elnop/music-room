@@ -1,15 +1,5 @@
-// Device Types
-export interface Device {
-	id: string;
-	user_id: string;
-	name: string;
-	type: string;
-	created_at: string;
-}
+// Mirrors backend features/music-control/music-control.types.ts
 
-// Music control devices (backend: features/music-control/music-control.types.ts)
-
-/** A device the user has connected from */
 export interface UserDevice {
 	deviceId: string;
 	deviceName: string;
@@ -33,7 +23,7 @@ export interface UserDeviceWithLicenses extends UserDevice {
 	licenses: DeviceLicense[];
 }
 
-export type DeviceAccess = 'all-devices' | 'license';
+type DeviceAccess = 'all-devices' | 'license';
 
 export interface ControllableDevice extends UserDevice {
 	access: DeviceAccess;
@@ -55,7 +45,7 @@ export interface RevokeDeviceLicenseResponse {
 	message: string;
 }
 
-/** PATCH /api/music-control/devices/:deviceId (#352) */
+/** PATCH /api/music-control/devices/:deviceId */
 export interface RenameDeviceResponse {
 	device: UserDevice;
 }
@@ -66,7 +56,7 @@ export interface ControllableDevicesResponse {
 	devices: ControllableDevice[];
 }
 
-/** GET /api/music-control/controllable-devices (#295) */
+/** GET /api/music-control/controllable-devices */
 export interface DevicePickerOwner {
 	ownerId: string;
 	username: string;

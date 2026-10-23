@@ -1,161 +1,63 @@
-import { OpenAPIV3 } from 'openapi-types';
+import {
+	zodToOpenAPIRegistry,
+	type ResponseConfig,
+	type ZodRequestBody,
+} from '@asteasolutions/zod-to-openapi';
+import { z } from 'zod';
 
-/**
- * Common reusable OpenAPI schemas
- * Referenced via $ref in all features
- */
-export const commonSchemas: OpenAPIV3.ComponentsObject['schemas'] = {
-	// Responses standards
-	SuccessResponse: {
-		type: 'object',
-		required: ['success', 'data', 'meta'],
-		properties: {
-			success: { type: 'boolean', example: true },
-			data: { type: 'object', description: 'Response payload' },
-			meta: {
-				type: 'object',
-				properties: {
-					timestamp: { type: 'string', format: 'date-time' },
-					requestId: { type: 'string', format: 'uuid' },
-				},
-			},
-		},
-	},
+const metaSchema = z.object({ timestamp: z.iso.datetime() });
 
-	ErrorResponse: {
-		type: 'object',
-		required: ['success', 'error', 'meta'],
-		properties: {
-			success: { type: 'boolean', example: false },
-			error: {
-				type: 'object',
-				required: ['message', 'code'],
-				properties: {
-					message: { type: 'string' },
-					code: { type: 'string' },
-					details: {
-						description:
-							'VALIDATION_ERROR: one entry per invalid field. Other codes: free-form context, when present',
-						anyOf: [
-							{
-								type: 'array',
-								items: {
-									type: 'object',
-									required: ['path', 'message'],
-									properties: {
-										path: {
-											type: 'string',
-											description: 'Dot-joined path of the invalid field',
-											example: 'email',
-										},
-										message: { type: 'string', example: 'Invalid email' },
-									},
-								},
-							},
-							{ description: 'Any JSON value (AppError details)' },
-						],
-					},
-					retryAfter: {
-						type: 'string',
-						format: 'date-time',
-						description: 'RATE_LIMIT_EXCEEDED only: when the rate-limit window ends',
-					},
-					lockedUntil: {
-						type: 'string',
-						format: 'date-time',
-						description: 'ACCOUNT_LOCKED only: when the lockout ends',
-					},
-					remainingTime: {
-						type: 'integer',
-						description: 'ACCOUNT_LOCKED only: seconds until the lockout ends',
-						example: 900,
-					},
-				},
-			},
-			meta: {
-				type: 'object',
-				properties: {
-					timestamp: { type: 'string', format: 'date-time' },
-				},
-			},
-		},
-	},
-};
+/** `{ success: true, data, meta }`. */
+function successEnvelope<T extends z.ZodType>(data: T) {
+	return z.object({ success: z.literal(true), data, meta: metaSchema });
+}
 
-export const commonResponses: OpenAPIV3.ComponentsObject['responses'] = {
-	UnauthorizedError: {
-		description: 'Authentication token missing or invalid',
-		content: {
-			'application/json': {
-				schema: { $ref: '#/components/schemas/ErrorResponse' },
-				example: {
-					success: false,
-					error: { message: 'Unauthorized', code: 'UNAUTHORIZED' },
-					meta: { timestamp: '2025-01-15T10:30:00.000Z' },
-				},
-			},
-		},
-	},
+export function ok(description: string, data: z.ZodType): ResponseConfig {
+	return { description, content: { 'application/json': { schema: successEnvelope(data) } } };
+}
 
-	ValidationError: {
-		description: 'Request validation failed',
-		content: {
-			'application/json': {
-				schema: { $ref: '#/components/schemas/ErrorResponse' },
-				example: {
-					success: false,
-					error: {
-						message: 'Validation error',
-						code: 'VALIDATION_ERROR',
-						details: [{ path: 'email', message: 'Invalid email' }],
-					},
-					meta: { timestamp: '2025-01-15T10:30:00.000Z' },
-				},
-			},
-		},
-	},
+export function okMessage(description: string, message: string): ResponseConfig {
+	return ok(description, z.object({ message: z.string().meta({ example: message }) }));
+}
 
-	ForbiddenError: {
-		description: 'Insufficient permissions',
-		content: {
-			'application/json': {
-				schema: { $ref: '#/components/schemas/ErrorResponse' },
-			},
-		},
-	},
+export function jsonBody(schema: z.ZodType, example?: unknown, required = true): ZodRequestBody {
+	return {
+		required,
+		content: { 'application/json': { schema, ...(example !== undefined && { example }) } },
+	};
+}
 
-	NotFoundError: {
-		description: 'Resource not found',
-		content: {
-			'application/json': {
-				schema: { $ref: '#/components/schemas/ErrorResponse' },
-			},
-		},
-	},
+/** Swagger UI shows the description next to the parameter. */
+export function param<T extends z.ZodType>(schema: T, description: string): T {
+	return schema.meta({ param: { description } });
+}
 
-	RateLimitError: {
-		description: 'Too many requests',
-		content: {
-			'application/json': {
-				schema: { $ref: '#/components/schemas/ErrorResponse' },
-			},
-		},
-	},
+export function describeParams<S extends Record<string, z.ZodType>>(
+	schema: z.ZodObject<S>,
+	descriptions: Partial<Record<keyof S & string, string>>
+): z.ZodObject {
+	const shape: Record<string, z.ZodType> = { ...schema.shape };
+	for (const [name, description] of Object.entries(descriptions)) {
+		if (description) shape[name] = param(schema.shape[name], description);
+	}
+	return z.object(shape);
+}
 
-	RateLimitUnavailable: {
-		description:
-			'RATE_LIMIT_UNAVAILABLE: Redis is not ready, so the rate limiter cannot count the request (fails closed)',
-		content: {
-			'application/json': {
-				schema: { $ref: '#/components/schemas/ErrorResponse' },
-				example: {
-					success: false,
-					error: {
-						message: 'Rate limiting is unavailable',
-						code: 'RATE_LIMIT_UNAVAILABLE',
-					},
-				},
-			},
-		},
-	},
-};
+/** Same as `registry.register`, which needs Zod extended before any schema exists (validators load first). */
+export function nameSchemas(schemas: Record<string, z.ZodType>): void {
+	for (const [refId, schema] of Object.entries(schemas)) {
+		const current = zodToOpenAPIRegistry.get(schema);
+		zodToOpenAPIRegistry.add(schema, { ...current, _internal: { ...current?._internal, refId } });
+	}
+}
+
+/** Mounted in server.ts. */
+export const healthSchema = z.object({
+	status: z.literal('ok'),
+	timestamp: z.iso.datetime(),
+	uptime: z.number().meta({ description: 'Seconds since the process started' }),
+	environment: z.string(),
+	services: z.object({ redis: z.enum(['connected', 'disconnected']) }),
+});
+
+export const bearerAuth = [{ bearerAuth: [] }];

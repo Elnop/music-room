@@ -1,21 +1,19 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { CACHE_TTL, SoundCloudCache } from '@/features/soundcloud/utils/soundcloud-cache.js';
+import * as cache from '@/features/soundcloud/utils/soundcloud-cache.js';
 
 const T0 = new Date('2026-01-01T00:00:00.000Z');
 
 describe('CACHE_TTL', () => {
 	it('keeps stream URLs at most 30 minutes', () => {
-		expect(CACHE_TTL.STREAM * 1000).toBeLessThanOrEqual(30 * 60 * 1000);
+		expect(cache.CACHE_TTL.STREAM * 1000).toBeLessThanOrEqual(30 * 60 * 1000);
 	});
 });
 
-describe('SoundCloudCache', () => {
-	let cache: SoundCloudCache;
-
+describe('soundcloud-cache', () => {
 	beforeEach(() => {
 		vi.useFakeTimers();
 		vi.setSystemTime(T0);
-		cache = new SoundCloudCache();
+		cache.clear();
 	});
 
 	afterEach(() => {

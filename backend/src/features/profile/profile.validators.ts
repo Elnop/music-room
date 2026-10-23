@@ -1,15 +1,8 @@
 import { z } from 'zod';
-import { MAX_GENRES } from '@/features/profile/profile.types.js';
 
-// =====================================================
-// Visibility Level Enum
-// =====================================================
-const visibilityLevelSchema = z.enum(['public', 'friends_only', 'private']);
+export const visibilityLevelSchema = z.enum(['public', 'friends_only', 'private']);
 
-// =====================================================
-// Music Genre Enum
-// =====================================================
-const musicGenreSchema = z.enum([
+export const MUSIC_GENRES = [
 	'pop',
 	'rock',
 	'hiphop',
@@ -20,21 +13,17 @@ const musicGenreSchema = z.enum([
 	'country',
 	'latin',
 	'metal',
-]);
+] as const;
 
-// =====================================================
-// Profile Validators
-// =====================================================
+export const MAX_GENRES = 5;
 
-// Profile field limits
-export const PROFILE_LIMITS = {
+export const musicGenreSchema = z.enum(MUSIC_GENRES);
+
+const PROFILE_LIMITS = {
 	DISPLAY_NAME_MAX: 15,
 	BIO_MAX: 300,
 };
 
-/**
- * Validation schema for updating user profile
- */
 export const updateProfileSchema = z.object({
 	displayName: z
 		.string()
@@ -53,21 +42,11 @@ export const updateProfileSchema = z.object({
 	avatarUrl: z.url('Avatar URL must be a valid URL').optional(),
 });
 
-/**
- * Validation schema for searching users
- */
 export const searchUsersSchema = z.object({
 	q: z.string().min(1, 'Search query is required').max(100),
 	limit: z.coerce.number().min(1).max(50).default(20),
 });
 
-// =====================================================
-// Privacy Validators
-// =====================================================
-
-/**
- * Validation schema for updating privacy settings
- */
 export const updatePrivacySchema = z.object({
 	emailVisibility: visibilityLevelSchema.optional(),
 	bioVisibility: visibilityLevelSchema.optional(),
@@ -75,13 +54,6 @@ export const updatePrivacySchema = z.object({
 	musicPreferencesVisibility: visibilityLevelSchema.optional(),
 });
 
-// =====================================================
-// Music Preferences Validators
-// =====================================================
-
-/**
- * Validation schema for updating music preferences
- */
 export const updateMusicPreferencesSchema = z.object({
 	genres: z
 		.array(musicGenreSchema)
@@ -89,23 +61,7 @@ export const updateMusicPreferencesSchema = z.object({
 		.refine(genres => new Set(genres).size === genres.length, 'Duplicate genres are not allowed'),
 });
 
-// =====================================================
-// Type Exports
-// =====================================================
-
-export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
-export type SearchUsersInput = z.infer<typeof searchUsersSchema>;
-export type UpdatePrivacyInput = z.infer<typeof updatePrivacySchema>;
-export type UpdateMusicPreferencesInput = z.infer<typeof updateMusicPreferencesSchema>;
-
-// =====================================================
-// Avatar Validators
-// =====================================================
-
-/**
- * The file multer read from the `avatar` field (PUT /api/profile/avatar).
- * Size is capped by multer; the type is checked from the bytes, not here.
- */
+/** Size is capped by multer; the type is checked from the bytes, not here. */
 export const avatarFileSchema = z.object(
 	{
 		buffer: z.instanceof(Buffer),
@@ -113,3 +69,7 @@ export const avatarFileSchema = z.object(
 	},
 	{ error: 'A photo is required in the multipart field "avatar"' }
 );
+
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+export type UpdatePrivacyInput = z.infer<typeof updatePrivacySchema>;
+export type UpdateMusicPreferencesInput = z.infer<typeof updateMusicPreferencesSchema>;

@@ -1,9 +1,5 @@
 import { z } from 'zod';
 
-/**
- * Playlist validation schemas using Zod
- */
-
 export const createPlaylistSchema = z.object({
 	name: z
 		.string()
@@ -33,32 +29,7 @@ export const updatePlaylistSchema = z.object({
 	editMode: z.enum(['open', 'restricted']).optional(),
 });
 
-export const addTrackSchema = z.object({
-	trackUri: z.string().min(1).max(500), // Universal track URI (SoundCloud permalink, etc.)
-	title: z.string().min(1).max(200),
-	artist: z.string().min(1).max(200),
-	// Album is optional - SoundCloud and other services may not have album info
-	album: z
-		.string()
-		.max(200)
-		.optional()
-		.transform(val => (val === '' ? undefined : val)),
-	// Accept empty string or valid URL, transform empty string to undefined
-	albumArt: z
-		.string()
-		.optional()
-		.transform(val => (val === '' ? undefined : val))
-		.pipe(z.url().optional()),
-	durationMs: z.number().int().positive(),
-	// Accept empty string or valid URL, transform empty string to undefined
-	previewUrl: z
-		.string()
-		.optional()
-		.transform(val => (val === '' ? undefined : val))
-		.pipe(z.url().optional()),
-});
-
-// A rank is a base-62 fraction that never ends with '0' (doc/PLAYLIST_CONCURRENCY.md).
+// A rank is a base-62 fraction that never ends with '0' (doc/features/playlist-concurrency.md).
 export const rankSchema = z
 	.string()
 	.max(128)
@@ -82,9 +53,17 @@ export const addViewerSchema = z.object({
 	userId: z.uuid('Invalid user ID format'),
 });
 
-export type CreatePlaylistInput = z.infer<typeof createPlaylistSchema>;
+// Path segments read with `routeParam` (any non-empty value), documented as UUIDs.
+export const playlistIdParamSchema = z.object({
+	id: z.uuid().meta({ param: { description: 'Playlist ID' } }),
+});
+
+export const playlistMemberParamsSchema = playlistIdParamSchema.extend({
+	userId: z.uuid().meta({ param: { description: 'ID of the collaborator or viewer' } }),
+});
+
+// Request inputs. CreatePlaylistInput is the schema's input: visibility and
+// editMode may be omitted, the service applies the same defaults.
+export type CreatePlaylistInput = z.input<typeof createPlaylistSchema>;
 export type UpdatePlaylistInput = z.infer<typeof updatePlaylistSchema>;
-export type AddTrackInput = z.infer<typeof addTrackSchema>;
 export type MoveTrackInput = z.infer<typeof moveTrackSchema>;
-export type AddCollaboratorInput = z.infer<typeof addCollaboratorSchema>;
-export type AddViewerInput = z.infer<typeof addViewerSchema>;

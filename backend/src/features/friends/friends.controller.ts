@@ -1,112 +1,46 @@
-import type { Request, Response, NextFunction } from 'express';
-import { FriendsService } from '@/features/friends/services/friends.service.js';
+import type { Request, Response } from 'express';
 import type { AuthenticatedRequest } from '@/shared/types/global.types.js';
-import type { ApiResponse } from '@/shared/types/global.types.js';
-import { routeParam } from '@/shared/utils/route-params.js';
+import { AppError } from '@/shared/middleware/error-handler.js';
+import { sendSuccess } from '@/shared/utils/send-success.js';
+import * as followStatusService from '@/features/friends/services/follow-status.service.js';
+import * as followService from '@/features/friends/services/follow.service.js';
+import * as mutualFriendsService from '@/features/friends/services/mutual-friends.service.js';
+import { friendUserParamsSchema } from '@/features/friends/friends.validators.js';
 
-const friendsService = new FriendsService();
+const userOf = (req: Request) => (req as AuthenticatedRequest).user.id;
 
-export class FriendsController {
-	async getFollowStatus(req: Request, res: Response, next: NextFunction) {
-		try {
-			const authReq = req as AuthenticatedRequest;
-			const userId = routeParam(req, 'userId');
+/** A malformed `:userId` is answered with `invalid`, as the database lookup did before validation existed. */
+function targetOf(req: Request, invalid: () => AppError): string {
+	const parsed = friendUserParamsSchema.safeParse(req.params);
+	if (!parsed.success) throw invalid();
+	return parsed.data.userId;
+}
 
-			const status = await friendsService.getFollowStatus(authReq.user.id, userId);
+export async function getMutualFriends(req: Request, res: Response) {
+	sendSuccess(res, await mutualFriendsService.getMutualFriends(userOf(req)));
+}
 
-			const response: ApiResponse = {
-				success: true,
-				data: status,
-				meta: {
-					timestamp: new Date().toISOString(),
-				},
-			};
+export async function getMyStats(req: Request, res: Response) {
+	sendSuccess(res, await followStatusService.getMyStats(userOf(req)));
+}
 
-			res.status(200).json(response);
-		} catch (error) {
-			next(error);
-		}
-	}
+export async function getFollowStatus(req: Request, res: Response) {
+	const userId = targetOf(
+		req,
+		() => new AppError(500, 'Failed to get follow status', 'FOLLOW_STATUS_ERROR')
+	);
+	sendSuccess(res, await followStatusService.getFollowStatus(userOf(req), userId));
+}
 
-	async followUser(req: Request, res: Response, next: NextFunction) {
-		try {
-			const authReq = req as AuthenticatedRequest;
-			const userId = routeParam(req, 'userId');
+export async function followUser(req: Request, res: Response) {
+	const userId = targetOf(req, () => new AppError(404, 'User not found', 'USER_NOT_FOUND'));
+	sendSuccess(res, await followService.followUser(userOf(req), userId));
+}
 
-			const result = await friendsService.followUser(authReq.user.id, userId);
-
-			const response: ApiResponse = {
-				success: true,
-				data: result,
-				meta: {
-					timestamp: new Date().toISOString(),
-				},
-			};
-
-			res.status(200).json(response);
-		} catch (error) {
-			next(error);
-		}
-	}
-
-	async unfollowUser(req: Request, res: Response, next: NextFunction) {
-		try {
-			const authReq = req as AuthenticatedRequest;
-			const userId = routeParam(req, 'userId');
-
-			const result = await friendsService.unfollowUser(authReq.user.id, userId);
-
-			const response: ApiResponse = {
-				success: true,
-				data: result,
-				meta: {
-					timestamp: new Date().toISOString(),
-				},
-			};
-
-			res.status(200).json(response);
-		} catch (error) {
-			next(error);
-		}
-	}
-
-	async getMutualFriends(req: Request, res: Response, next: NextFunction) {
-		try {
-			const authReq = req as AuthenticatedRequest;
-
-			const friends = await friendsService.getMutualFriends(authReq.user.id);
-
-			const response: ApiResponse = {
-				success: true,
-				data: friends,
-				meta: {
-					timestamp: new Date().toISOString(),
-				},
-			};
-
-			res.status(200).json(response);
-		} catch (error) {
-			next(error);
-		}
-	}
-
-	async getMyStats(req: Request, res: Response, next: NextFunction) {
-		try {
-			const authReq = req as AuthenticatedRequest;
-
-			const stats = await friendsService.getMyStats(authReq.user.id);
-
-			const response: ApiResponse = {
-				success: true,
-				data: stats,
-				meta: {
-					timestamp: new Date().toISOString(),
-				},
-			};
-
-			res.status(200).json(response);
-		} catch (error) {
-			next(error);
-		}
-	}
+export async function unfollowUser(req: Request, res: Response) {
+	const userId = targetOf(
+		req,
+		() => new AppError(500, 'Failed to unfollow user', 'UNFOLLOW_ERROR')
+	);
+	sendSuccess(res, await followService.unfollowUser(userOf(req), userId));
 }

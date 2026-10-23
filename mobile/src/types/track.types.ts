@@ -1,17 +1,15 @@
-// Track Types (Mock-friendly structure)
 export interface Track {
 	id: string;
 	title: string;
 	artist: string;
-	album?: string; // Optional - SoundCloud and other services may not have albums
+	album?: string;
 	albumArt?: string; // Omitted by the API when the track has no artwork
-	durationMs: number; // milliseconds
-	trackUri: string; // Universal track identifier (SoundCloud permalink, etc.)
+	durationMs: number;
+	trackUri: string; // SoundCloud permalink URL
 	previewUrl?: string;
 }
 
-// Track in a playlist, ordered by rank (doc/PLAYLIST_CONCURRENCY.md)
-// Mirrors backend TrackInPlaylistResponse (extends TrackResponse).
+// Mirrors backend TrackInPlaylistResponse; ordering by rank: doc/features/playlist-concurrency.md
 export interface TrackInPlaylist extends Track {
 	createdAt: string;
 	updatedAt: string;

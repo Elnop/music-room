@@ -2,24 +2,20 @@ import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
-import type { AddTrackDTO } from '@/features/playlists/playlist.types.js';
+import type { TrackUpsertInput } from '@/shared/utils/track-upsert.js';
 
-// PlaylistTrackService and the playlist fetch on top of migration 016, against the
-// local Supabase stack (doc/PLAYLIST_CONCURRENCY.md). The RPCs themselves are
-// covered by track-operations.int.test.ts; this file checks the service layer:
+// Service layer on top of migration 016 (the RPCs are covered by track-operations.int.test.ts):
 // permissions, added_by, result shapes, error mapping and concurrent calls.
 
 const { notifyPlaylistUpdate } = vi.hoisted(() => ({ notifyPlaylistUpdate: vi.fn() }));
-vi.mock('@/realtime/index.js', () => ({
-	realtime: { notifyPlaylistUpdate, revalidatePlaylistRoom: vi.fn() },
+vi.mock('@/realtime/emitters/playlist.emitters.js', () => ({
+	notifyPlaylistUpdate,
+	revalidatePlaylistRoom: vi.fn(),
 }));
 
-const { PlaylistTrackService } =
-	await import('@/features/playlists/services/playlist-track.service.js');
-const { PlaylistService } = await import('@/features/playlists/playlist.service.js');
+const service = await import('@/features/playlists/services/playlist-track.service.js');
+const playlists = await import('@/features/playlists/services/playlist.service.js');
 
-const service = new PlaylistTrackService();
-const playlists = new PlaylistService();
 const URI_PREFIX = `https://soundcloud.com/int-service/${randomUUID()}`;
 
 let ownerId: string;
@@ -27,7 +23,7 @@ let strangerId: string;
 let playlistId: string;
 let trackIds: string[];
 
-const dto = (i: number): AddTrackDTO => ({
+const dto = (i: number): TrackUpsertInput => ({
 	trackUri: `${URI_PREFIX}/${i}`,
 	title: `T${i}`,
 	artist: 'A',
@@ -99,7 +95,7 @@ afterAll(async () => {
 	}
 });
 
-describe('PlaylistTrackService on atomic operations', () => {
+describe('playlist-track.service on atomic operations', () => {
 	it('adds a track and returns it with its rank, adder and the new version', async () => {
 		const result = await service.addTrack(playlistId, ownerId, dto(4));
 		expect(result).toMatchObject({

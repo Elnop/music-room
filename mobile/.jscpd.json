@@ -1,0 +1,25 @@
+{
+	"path": ["src"],
+	"format": ["typescript", "tsx"],
+	"minLines": 5,
+	"minTokens": 50,
+	"threshold": 0,
+	"exitCode": 1,
+	"reporters": ["console"],
+	"gitignore": true,
+	"absolute": false,
+	"ignore": [
+		"**/*.test.ts",
+		"**/*.test.tsx",
+		"**/__tests__/**",
+		"**/__mocks__/**",
+		"**/src/assets.d.ts",
+		"**/src/shared/components/ui/Skeleton.tsx",
+		"**/src/navigation/AuthNavigator.tsx",
+		"**/src/navigation/stacks/FriendsStack.tsx",
+		"**/src/navigation/stacks/PlaylistsStack.tsx",
+		"**/src/navigation/stacks/ProfileStack.tsx",
+		"**/src/navigation/stacks/SearchStack.tsx",
+		"**/src/types/assets.d.ts"
+	]
+}

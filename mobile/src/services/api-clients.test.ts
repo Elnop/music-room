@@ -1,23 +1,20 @@
-import { friendsApi } from '@/services/friendsApi';
-import { profileApi } from '@/services/profileApi';
-import { privacyApi } from '@/services/privacyApi';
-import { musicControlApi } from '@/services/musicControlApi';
-import { resetBackendUrl } from '@/services/backendUrl';
-import { registerAuthSession } from '@/services/api';
+import { friendsApi } from '@/features/friends/services/friendsApi';
+import { profileApi } from '@/features/profile/services/profileApi';
+import { privacyApi } from '@/features/profile/services/privacyApi';
+import { musicControlApi } from '@/features/music-control/services/musicControlApi';
+import { resetBackendUrl } from '@/shared/services/backendUrl';
+import { createStore } from 'zustand';
+import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
 
 // Every API module goes through apiRequest, so the backend gets the client
-// headers it logs (subject IV.6), a token, and the refresh on 401 (#174).
+// headers it logs, a token, and the refresh on 401.
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/services/deviceService', () => ({
+jest.mock('@/shared/services/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
-}));
-
-jest.mock('@/store/authStore', () => ({
-	useAuthStore: { getState: () => ({ accessToken: 'store-token' }) },
 }));
 
 const fetchMock = jest.fn();
@@ -33,7 +30,6 @@ function jsonResponse(body: object, status = 200): Response {
 }
 
 beforeEach(async () => {
-	jest.spyOn(console, 'log').mockImplementation(() => undefined);
 	globalThis.fetch = fetchMock as unknown as typeof fetch;
 	fetchMock.mockReset();
 	await resetBackendUrl();
@@ -60,9 +56,9 @@ it.each([
 	],
 	[
 		'musicControlApi',
-		() => musicControlApi.getMyPermissions(),
+		() => musicControlApi.getMyPermissions('caller-token'),
 		{ allowedUserIds: [] },
-		'store-token',
+		'caller-token',
 	],
 ])('%s sends the client headers and the token', async (_name, call, data, token) => {
 	fetchMock.mockResolvedValue(jsonResponse({ success: true, data }));
@@ -87,7 +83,14 @@ describe('with a signed-in session', () => {
 		sessionToken = 'session-token';
 		refreshAccessToken.mockClear();
 		registerAuthSession({
-			getAccessToken: () => sessionToken,
+			store: {
+				...createStore<SessionView>(() => ({
+					user: null,
+					accessToken: null,
+					isAuthenticated: true,
+				})),
+				getState: () => ({ user: null, accessToken: sessionToken, isAuthenticated: true }),
+			},
 			isTokenExpiringSoon: () => false,
 			refreshAccessToken,
 		});

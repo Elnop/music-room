@@ -1,12 +1,9 @@
 import { logger } from '@/shared/utils/logger.js';
-import { realtime } from '@/realtime/index.js';
+import * as realtime from '@/realtime/emitters/queue.emitters.js';
 import type { QueuePlayCommand } from '@/features/music-control/music-control.types.js';
 import type { QueueState } from '@/features/queue/queue.types.js';
 
-/**
- * Tells the owner's device to play the queue's current item (#294). The device
- * was online when checked; if it left since, the command is dropped and logged.
- */
+/** If the device left since it was checked, the command is dropped and logged. */
 export function sendPlayCommand(
 	actorId: string,
 	ownerId: string,

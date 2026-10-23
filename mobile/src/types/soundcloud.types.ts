@@ -1,4 +1,3 @@
-// SoundCloud Types
 export interface SoundCloudTrack {
 	id: number;
 	title: string;

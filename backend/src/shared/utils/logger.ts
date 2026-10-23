@@ -3,113 +3,60 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// The only backend code allowed to touch `console`. Every entry is a JSON line in backend/logs/app.log;
+// the console gets readable text in development and the same JSON line elsewhere.
+
 type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 
-/**
- * Metadata that can be logged alongside messages
- * Can be primitives, objects, arrays, or errors
- */
 type LogMetadata =
-	| string
-	| number
-	| boolean
-	| null
-	| undefined
-	| Error
-	| Record<string, unknown>
-	| unknown[];
+	string | number | boolean | null | undefined | Error | Record<string, unknown> | unknown[];
 
-/**
- * Get the project root directory (backend/)
- */
-function getProjectRoot(): string {
-	const __filename = fileURLToPath(import.meta.url);
-	const __dirname = path.dirname(__filename);
-	// From backend/src/shared/utils/ → backend/
-	return path.resolve(__dirname, '../../../');
+// From backend/src/shared/utils/ to backend/logs/
+const logsDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../logs');
+const logFilePath = path.join(logsDir, 'app.log');
+
+if (!fs.existsSync(logsDir)) {
+	try {
+		fs.mkdirSync(logsDir, { recursive: true });
+	} catch (error) {
+		// The file sink is best effort: never block startup on it.
+		console.error('Failed to create logs directory:', error);
+	}
 }
 
-/**
- * Ensure logs directory exists
- */
-function ensureLogDirectory(): string {
-	const projectRoot = getProjectRoot();
-	const logsDir = path.join(projectRoot, 'logs');
-
-	if (!fs.existsSync(logsDir)) {
-		try {
-			fs.mkdirSync(logsDir, { recursive: true });
-		} catch (error) {
-			// Silently fail if unable to create directory
-			console.error('Failed to create logs directory:', error);
-		}
-	}
-
-	return logsDir;
-}
-
-class Logger {
-	private logsDir: string;
-	private logFilePath: string;
-
-	constructor() {
-		this.logsDir = ensureLogDirectory();
-		this.logFilePath = path.join(this.logsDir, 'app.log');
-	}
-
-	/**
-	 * Write log entry to file
-	 */
-	private writeToFile(logEntry: Record<string, unknown>): void {
-		try {
-			const logLine = JSON.stringify(logEntry) + '\n';
-			fs.appendFileSync(this.logFilePath, logLine, 'utf8');
-		} catch (error) {
-			// Silently fail - don't block the application if file write fails
-			// Only log to console in development
-			if (env.NODE_ENV === 'development') {
-				console.error('Failed to write to log file:', error);
-			}
-		}
-	}
-	private log(level: LogLevel, message: string, meta?: LogMetadata) {
-		const timestamp = new Date().toISOString();
-		const logEntry = {
-			timestamp,
-			level,
-			message,
-			...(meta && { meta }),
-		};
-
-		// Write to file (always, in both dev and prod)
-		this.writeToFile(logEntry);
-
-		// Console output
+function writeToFile(logEntry: Record<string, unknown>): void {
+	try {
+		fs.appendFileSync(logFilePath, JSON.stringify(logEntry) + '\n', 'utf8');
+	} catch (error) {
+		// Never block the application on a failed file write; say so in development.
 		if (env.NODE_ENV === 'development') {
-			console.log(`[${level.toUpperCase()}] ${message}`, meta || '');
-		} else {
-			// Production: JSON to stdout (for Docker logs)
-			console.log(JSON.stringify(logEntry));
-		}
-	}
-
-	info(message: string, meta?: LogMetadata) {
-		this.log('info', message, meta);
-	}
-
-	warn(message: string, meta?: LogMetadata) {
-		this.log('warn', message, meta);
-	}
-
-	error(message: string, meta?: LogMetadata) {
-		this.log('error', message, meta);
-	}
-
-	debug(message: string, meta?: LogMetadata) {
-		if (env.NODE_ENV === 'development') {
-			this.log('debug', message, meta);
+			console.error('Failed to write to log file:', error);
 		}
 	}
 }
 
-export const logger = new Logger();
+function log(level: LogLevel, message: string, meta?: LogMetadata): void {
+	const logEntry = {
+		timestamp: new Date().toISOString(),
+		level,
+		message,
+		...(meta && { meta }),
+	};
+
+	writeToFile(logEntry);
+
+	if (env.NODE_ENV === 'development') {
+		console.log(`[${level.toUpperCase()}] ${message}`, meta || '');
+	} else {
+		console.log(JSON.stringify(logEntry));
+	}
+}
+
+export const logger = {
+	info: (message: string, meta?: LogMetadata) => log('info', message, meta),
+	warn: (message: string, meta?: LogMetadata) => log('warn', message, meta),
+	error: (message: string, meta?: LogMetadata) => log('error', message, meta),
+	debug: (message: string, meta?: LogMetadata) => {
+		if (env.NODE_ENV === 'development') log('debug', message, meta);
+	},
+};

@@ -36,6 +36,9 @@ FROM node:22-alpine AS production
 
 WORKDIR /app
 
+# Hides error `why`/`fix` from responses and silences debug logs
+ENV NODE_ENV=production
+
 # Copy only what's needed
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules

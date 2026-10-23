@@ -1,0 +1,17 @@
+# Runs `npm run check` in each project the commit touches (backend/, mobile/).
+# Shared guardrail files (tools/, .gitleaks.toml) touch both. A failing check
+# blocks the commit. See .agents/rules/guardrails.md#pre-commit.
+staged=$(git diff --cached --name-only --diff-filter=ACMRD)
+
+projects=""
+if printf '%s\n' "$staged" | grep -qE '^(backend/|tools/|\.gitleaks\.toml$)'; then
+  projects="backend"
+fi
+if printf '%s\n' "$staged" | grep -qE '^(mobile/|tools/|\.gitleaks\.toml$)'; then
+  projects="$projects mobile"
+fi
+
+for project in $projects; do
+  echo "pre-commit: npm run check in $project/"
+  (cd "$project" && npm run --silent check) || exit 1
+done

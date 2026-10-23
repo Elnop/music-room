@@ -1,0 +1,7 @@
+{
+	"$schema": "https://unpkg.com/knip@5/schema.json",
+	"entry": ["src/test/perf-*.ts"],
+	"project": ["src/**/*.ts"],
+	"ignore": ["src/shared/types/supabase.generated.ts"],
+	"ignoreDependencies": ["supabase"]
+}

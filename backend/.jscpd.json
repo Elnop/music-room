@@ -1,0 +1,22 @@
+{
+  "path": [
+    "src"
+  ],
+  "format": [
+    "typescript"
+  ],
+  "minLines": 5,
+  "minTokens": 50,
+  "threshold": 0,
+  "exitCode": 1,
+  "reporters": [
+    "console"
+  ],
+  "gitignore": true,
+  "absolute": false,
+  "ignore": [
+    "**/*.test.ts",
+    "**/src/test/**",
+    "**/src/shared/types/supabase.generated.ts"
+  ]
+}

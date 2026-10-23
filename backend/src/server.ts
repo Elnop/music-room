@@ -4,29 +4,20 @@ import { createServer } from 'http';
 import swaggerUi from 'swagger-ui-express';
 import { env } from '@/shared/config/env.js';
 import { logger } from '@/shared/utils/logger.js';
-import { errorHandler } from '@/shared/middleware/error-handler.js';
+import { AppError, errorHandler } from '@/shared/middleware/error-handler.js';
 import { actionLoggerMiddleware } from '@/shared/middleware/action-logger.middleware.js';
-import { routes } from '@/shared/config/routes.js';
-import { realtime } from '@/realtime/index.js';
+import { routes } from '@/app/routes.js';
+import * as socketServer from '@/realtime/socket-server.js';
 import { connectRedis, disconnectRedis, checkRedisHealth } from '@/shared/config/redis.js';
-import { swaggerSpec, swaggerUiOptions } from '@/shared/config/swagger.config.js';
+import { swaggerSpec, swaggerUiOptions } from '@/app/openapi.js';
 import { isOriginAllowed } from '@/shared/config/cors.config.js';
 import { configureTrustProxy } from '@/shared/config/trust-proxy.js';
-import { mountSupabaseAuthProxy } from '@/shared/dev/supabase-auth-proxy.js';
 
 const app = express();
 configureTrustProxy(app);
-// make dev-tunnel with the local Supabase stack (#251): before CORS and the
-// body parsers, so the raw auth request is streamed to the stack.
-if (mountSupabaseAuthProxy(app, env)) {
-	logger.info('Supabase auth proxy enabled', {
-		path: '/supabase/auth/v1',
-		upstream: env.SUPABASE_URL,
-	});
-}
 const httpServer = createServer(app);
 
-realtime.initialize(httpServer);
+socketServer.initialize(httpServer);
 
 connectRedis().catch(error => {
 	logger.error('Failed to initialize Redis', {
@@ -77,17 +68,12 @@ routes.forEach(({ path, router }) => {
 	app.use(path, router);
 });
 
-app.use((req, res) => {
-	res.status(404).json({
-		success: false,
-		error: {
-			message: 'Route not found',
-			code: 'NOT_FOUND',
-		},
-		meta: {
-			timestamp: new Date().toISOString(),
-		},
-	});
+app.use((req, _res, next) => {
+	next(
+		new AppError(404, 'Route not found', 'NOT_FOUND', undefined, {
+			why: `No route matches ${req.method} ${req.path}`,
+		})
+	);
 });
 
 app.use(errorHandler);

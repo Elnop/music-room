@@ -5,18 +5,18 @@ import { io as ioClient, type Socket as ClientSocket } from 'socket.io-client';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseAdmin, supabaseAnon } from '@/shared/config/supabase.js';
 import { connectRedis, disconnectRedis, isRedisConnected } from '@/shared/config/redis.js';
-import { PlaylistTrackService } from '@/features/playlists/services/playlist-track.service.js';
-import { PlaylistService } from '@/features/playlists/playlist.service.js';
-import { realtime } from '@/realtime/index.js';
+import * as tracks from '@/features/playlists/services/playlist-track.service.js';
+import * as playlistService from '@/features/playlists/services/playlist.service.js';
+import * as playlistUpdateService from '@/features/playlists/services/playlist-update.service.js';
+import * as socketServer from '@/realtime/socket-server.js';
+import { getIO } from '@/realtime/state.js';
 import type {
 	PlaylistDeletedPayload,
 	PlaylistDetailsPayload,
 	PlaylistUpdatedPayload,
 } from '@/features/playlists/playlist.types.js';
 
-// The versioned playlist:updated delta (#90, doc/PLAYLIST_CONCURRENCY.md,
-// "Broadcast and convergence") emitted by real track operations to clients of
-// a real Socket.io server, against the local Supabase stack.
+// See doc/features/playlist-concurrency.md, "Broadcast and convergence".
 
 interface TestUser {
 	id: string;
@@ -50,8 +50,6 @@ async function createUser(): Promise<TestUser> {
 }
 
 describe('playlist:updated broadcast', () => {
-	const tracks = new PlaylistTrackService();
-	const playlists = new PlaylistService();
 	let httpServer: HTTPServer;
 	let url: string;
 	let owner: TestUser;
@@ -97,7 +95,7 @@ describe('playlist:updated broadcast', () => {
 	}
 
 	async function inRoom(socket: ClientSocket): Promise<boolean> {
-		const sockets = await realtime.getIO()!.fetchSockets();
+		const sockets = await getIO()!.fetchSockets();
 		return sockets.find(s => s.id === socket.id)?.rooms.has(`playlist:${playlistId}`) ?? false;
 	}
 
@@ -106,14 +104,12 @@ describe('playlist:updated broadcast', () => {
 		await vi.waitFor(async () => expect(await inRoom(socket)).toBe(true));
 	}
 
-	/** Collect every playlist:updated a socket receives. */
 	function record(socket: ClientSocket): PlaylistUpdatedPayload[] {
 		const received: PlaylistUpdatedPayload[] = [];
 		socket.on('playlist:updated', (payload: PlaylistUpdatedPayload) => received.push(payload));
 		return received;
 	}
 
-	/** The next playlist:updated received by both room members. */
 	function bothReceive(): Promise<PlaylistUpdatedPayload[]> {
 		return Promise.all(
 			[ownerSocket, viewerSocket].map(
@@ -134,7 +130,7 @@ describe('playlist:updated broadcast', () => {
 		outsider = await createUser();
 
 		httpServer = createServer();
-		realtime.initialize(httpServer);
+		socketServer.initialize(httpServer);
 		await new Promise<void>(resolve => httpServer.listen(0, '127.0.0.1', () => resolve()));
 		const { port } = httpServer.address() as AddressInfo;
 		url = `http://127.0.0.1:${port}`;
@@ -169,7 +165,7 @@ describe('playlist:updated broadcast', () => {
 	});
 
 	afterAll(async () => {
-		await realtime.getIO()?.close();
+		await getIO()?.close();
 		await supabaseAdmin.from('tracks').delete().like('track_uri', `${URI_PREFIX}/%`);
 		for (const user of [owner, viewer, outsider]) {
 			if (user) await supabaseAdmin.auth.admin.deleteUser(user.id); // cascades to playlists
@@ -227,7 +223,7 @@ describe('playlist:updated broadcast', () => {
 		const [ownerEvent, viewerEvent] = await received;
 		expect(viewerEvent).toEqual(ownerEvent);
 
-		const fetched = await playlists.getPlaylistById(playlistId, owner.id);
+		const fetched = await playlistService.getPlaylistById(playlistId, owner.id);
 		const moved = fetched.tracks.find(t => t.id === second.track.id);
 		expect(ownerEvent).toEqual({
 			playlistId,
@@ -266,7 +262,7 @@ describe('playlist:updated broadcast', () => {
 				s => new Promise<PlaylistDetailsPayload>(resolve => s.once('playlist:details', resolve))
 			)
 		);
-		await playlists.updatePlaylist(playlistId, owner.id, {
+		await playlistUpdateService.updatePlaylist(playlistId, owner.id, {
 			name: 'Les tubes du Crabe Croustillant',
 			description: 'desc',
 		});
@@ -287,7 +283,7 @@ describe('playlist:updated broadcast', () => {
 				s => new Promise<PlaylistDeletedPayload>(resolve => s.once('playlist:deleted', resolve))
 			)
 		);
-		await playlists.deletePlaylist(playlistId, owner.id);
+		await playlistUpdateService.deletePlaylist(playlistId, owner.id);
 
 		expect(await received).toEqual([{ playlistId }, { playlistId }]);
 		await vi.waitFor(async () => expect(await inRoom(viewerSocket)).toBe(false));

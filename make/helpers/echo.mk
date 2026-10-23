@@ -162,23 +162,8 @@ define display_tunnel_urls
 	$(call print_arrow,Backend tunnel URL:)
 	@docker exec $(BACKEND_CONTAINER) cat $(SHARED_TUNNEL_FILE) 2>/dev/null || echo "   $(YELLOW)Initializing...$(NC)"
 	$(call blank_line)
-	$(call display_supabase_tunnel_url)
-	$(call blank_line)
 	$(call print_subsection,🔍 ngrok Web Interface)
 	$(call print_bullet,Backend ngrok: $(NGROK_UI_URL))
-endef
-
-# When the running backend was started in SUPABASE_MODE=local (label
-# zumik.supabase, not this invocation's mode), the URL the app uses for the dev Supabase stack in
-# tunnel mode: the backend tunnel's /supabase, forwarded to the stack's auth
-# API (#251). Nothing in hosted mode.
-# Usage: $(call display_supabase_tunnel_url)
-define display_supabase_tunnel_url
-	@if [ "$(call container_supabase_mode,$(BACKEND_CONTAINER))" = "local" ]; then \
-		echo "$(YELLOW)$(ICON_ARROW) Supabase URL (local stack - auth only):$(NC)"; \
-		url=$$(docker exec $(BACKEND_CONTAINER) cat $(SHARED_TUNNEL_FILE) 2>/dev/null | tr -d '\r\n'); \
-		if [ -n "$$url" ]; then echo "$$url/supabase"; else echo "   $(YELLOW)Initializing...$(NC)"; fi; \
-	fi
 endef
 
 # Display numbered next steps

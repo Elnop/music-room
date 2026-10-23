@@ -12,7 +12,7 @@ vi.hoisted(() => {
 });
 
 // Never send real mail; read the codes from the mock instead.
-vi.mock('@/features/mail/mail.service.js', () => ({
+vi.mock('@/features/mail/services/mail.service.js', () => ({
 	sendVerificationEmail: vi.fn().mockResolvedValue(undefined),
 	sendPasswordResetEmail: vi.fn().mockResolvedValue(undefined),
 }));
@@ -21,12 +21,12 @@ const { connectRedis, disconnectRedis, isRedisConnected, redisClient } =
 	await import('@/shared/config/redis.js');
 const { supabaseAdmin } = await import('@/shared/config/supabase.js');
 const { sendVerificationEmail, sendPasswordResetEmail } =
-	await import('@/features/mail/mail.service.js');
+	await import('@/features/mail/services/mail.service.js');
 const { default: authRouter } = await import('@/features/auth/auth.routes.js');
 const { errorHandler } = await import('@/shared/middleware/error-handler.js');
 
-// The email/password journey end to end (#75), through HTTP on the real auth
-// router against the local Supabase stack and test Redis.
+// The email/password journey end to end, through HTTP on the real auth router against the local
+// Supabase stack and test Redis.
 
 const PASSWORD = 'Flow-password-75';
 const NEW_PASSWORD = 'Flow-renewed-75';
@@ -64,7 +64,7 @@ describe('email/password auth flow (#75)', () => {
 					`failed_login:${e}:*`,
 					`account_locked:${e}:*`,
 				]);
-				// Failed logins also count per IP (brute-force.service.ts).
+				// Failed logins also count per IP (shared/security/ip-reputation.ts).
 				patterns.push('ip_failed_logins:*127.0.0.1', 'ip_failed_logins:::1');
 				patterns.push(...userIds.map(id => `email_*${id}*`));
 				for (const pattern of patterns) {
@@ -129,8 +129,8 @@ describe('email/password auth flow (#75)', () => {
 		expect(data.requiresVerification).toBe(true);
 		expect(accessToken(registered.body)).toBeUndefined();
 
-		// The auth user stays unconfirmed until the code is verified; the right
-		// password gets 403 EMAIL_NOT_VERIFIED with what the app needs to resend (#243).
+		// The auth user stays unconfirmed until the code is verified; the right password gets
+		// 403 EMAIL_NOT_VERIFIED with what the app needs to resend.
 		const wrongPassword = await post('login', { email, password: `${PASSWORD}-wrong` });
 		expect(wrongPassword.status).toBe(401);
 		expect(errorCode(wrongPassword.body)).toBe('INVALID_CREDENTIALS');

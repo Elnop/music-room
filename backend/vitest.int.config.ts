@@ -1,8 +1,7 @@
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 
-// Integration tests (see doc/TESTING.md): local Supabase stack started by
-// `make test-int` (scripts/test-db.sh up), which writes .env.test.
+// Needs the local Supabase stack started by `make test-int`, which writes .env.test.
 export default defineConfig({
 	resolve: {
 		alias: {

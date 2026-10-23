@@ -1,18 +1,15 @@
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
-import { QueueService } from '@/features/queue/services/queue.service.js';
+import * as queue from '@/features/queue/services/queue.service.js';
 import { playPlaylistRpc } from '@/features/queue/utils/queue-rpc.js';
-import { PlaylistService } from '@/features/playlists/playlist.service.js';
-import { PlaylistTrackService } from '@/features/playlists/services/playlist-track.service.js';
+import * as playlists from '@/features/playlists/services/playlist.service.js';
+import * as playlistTracks from '@/features/playlists/services/playlist-track.service.js';
 import type { QueueState } from '@/features/queue/queue.types.js';
 
-// The play queue of migrations 021 and 022 against the local Supabase stack
-// (#273, #277): every row of the plans' I/O matrices, block detachment,
-// history trim and rank rebalance. No Socket.io server runs here: notifyQueueUpdate is a no-op.
+// No Socket.io server runs here: notifyQueueUpdate is a no-op.
 
 const URI_PREFIX = `https://soundcloud.com/int-queue/${randomUUID()}`;
-const queue = new QueueService();
 const users: string[] = [];
 let userId: string;
 let trackCount = 0;
@@ -38,7 +35,6 @@ const dto = () => {
 	};
 };
 
-/** Adds n tracks and returns the item ids in queue order. */
 async function addItems(n: number, user = userId): Promise<string[]> {
 	let state: QueueState = { ownerId: user, version: 0, currentItemId: null, items: [] };
 	for (let i = 0; i < n; i++) state = await queue.addItem(user, user, dto());
@@ -388,8 +384,6 @@ describe('rank rebalance', () => {
 });
 
 describe('play a playlist', () => {
-	const playlists = new PlaylistService();
-	const playlistTracks = new PlaylistTrackService();
 	let ownerId: string;
 
 	beforeEach(async () => {
@@ -498,7 +492,6 @@ describe('play a playlist', () => {
 		});
 		expect(await queue.getQueue(userId, userId)).toEqual(before);
 
-		// The owner can play their own private playlist.
 		expect(uris(await queue.playPlaylist(ownerId, ownerId, playlist.id))).toEqual(playlist.uris);
 	});
 
@@ -506,7 +499,7 @@ describe('play a playlist', () => {
 		await addItems(1);
 		const before = await queue.getQueue(userId, userId);
 		const playlist = await createPlaylist(1);
-		await playlists.deletePlaylist(playlist.id, ownerId);
+		await supabaseAdmin.from('playlists').delete().eq('id', playlist.id);
 
 		await expect(playPlaylistRpc(userId, playlist.id)).rejects.toMatchObject({
 			statusCode: 404,

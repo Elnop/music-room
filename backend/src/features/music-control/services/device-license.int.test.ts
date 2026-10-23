@@ -1,14 +1,11 @@
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
-import { DeviceService } from '@/features/music-control/services/device.service.js';
-import { DeviceLicenseService } from '@/features/music-control/services/device-license.service.js';
+import * as deviceService from '@/features/music-control/services/device.service.js';
+import * as licenseService from '@/features/music-control/services/device-license.service.js';
 
 // Per-device licenses (story 4.4) against the local Supabase stack: devices
 // and device_control_licenses (015), follows (mutual friendship).
-
-const deviceService = new DeviceService();
-const licenseService = new DeviceLicenseService();
 
 async function createUser(): Promise<string> {
 	const { data, error } = await supabaseAdmin.auth.admin.createUser({

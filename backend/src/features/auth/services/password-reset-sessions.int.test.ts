@@ -11,17 +11,15 @@ vi.hoisted(() => {
 });
 
 // Never send real mail; capture the code instead.
-vi.mock('@/features/mail/mail.service.js', () => ({
+vi.mock('@/features/mail/services/mail.service.js', () => ({
 	sendVerificationEmail: vi.fn().mockResolvedValue(undefined),
 	sendPasswordResetEmail: vi.fn().mockResolvedValue(undefined),
 }));
 
-// Token verification calls Google and Facebook: always mocked (doc/TESTING.md).
+// Token verification calls Google and Facebook: always mocked (doc/development/testing.md).
 vi.mock('@/features/auth/services/oauth.service.js', () => ({
-	OAuthService: {
-		verifyGoogleToken: vi.fn(),
-		verifyFacebookToken: vi.fn(),
-	},
+	verifyGoogleToken: vi.fn(),
+	verifyFacebookToken: vi.fn(),
 }));
 
 const { connectRedis, disconnectRedis, isRedisConnected, redisClient } =
@@ -29,11 +27,12 @@ const { connectRedis, disconnectRedis, isRedisConnected, redisClient } =
 const { supabaseAdmin } = await import('@/shared/config/supabase.js');
 const { default: authRouter } = await import('@/features/auth/auth.routes.js');
 const { errorHandler } = await import('@/shared/middleware/error-handler.js');
-const { sendPasswordResetEmail } = await import('@/features/mail/mail.service.js');
-const { AuthService } = await import('@/features/auth/auth.service.js');
+const { sendPasswordResetEmail } = await import('@/features/mail/services/mail.service.js');
+const loginService = await import('@/features/auth/services/login.service.js');
+const sessionService = await import('@/features/auth/services/session.service.js');
 
-// A password reset ends every open session of the account (#203), through HTTP
-// on the real auth router against the local Supabase stack and test Redis.
+// A password reset ends every open session of the account, through HTTP on the real auth
+// router against the local Supabase stack and test Redis.
 
 const OLD_PASSWORD = 'Old-password-203';
 const NEW_PASSWORD = 'New-password-203';
@@ -44,7 +43,6 @@ describe('password reset ends open sessions (#203)', () => {
 	let baseUrl: string;
 	let userId: string;
 	let email: string;
-	const auth = new AuthService();
 
 	beforeAll(async () => {
 		await connectRedis();
@@ -97,7 +95,7 @@ describe('password reset ends open sessions (#203)', () => {
 
 	it('refuses the access and refresh tokens issued before the reset', async () => {
 		const login = async (password: string) => {
-			const { session } = await auth.login({ email, password });
+			const { session } = await loginService.login({ email, password });
 			if (!session) throw new Error('login returned no session');
 			return session;
 		};
@@ -110,10 +108,10 @@ describe('password reset ends open sessions (#203)', () => {
 		expect(reset.status).toBe(200);
 
 		for (const session of [first, second]) {
-			await expect(auth.verifyToken(session.accessToken)).rejects.toMatchObject({
+			await expect(sessionService.verifyToken(session.accessToken)).rejects.toMatchObject({
 				statusCode: 401,
 			});
-			await expect(auth.refreshToken(session.refreshToken)).rejects.toMatchObject({
+			await expect(sessionService.refreshToken(session.refreshToken)).rejects.toMatchObject({
 				statusCode: 401,
 				code: 'INVALID_REFRESH_TOKEN',
 			});
@@ -121,7 +119,7 @@ describe('password reset ends open sessions (#203)', () => {
 
 		// A new sign-in with the new password still works.
 		const fresh = await login(NEW_PASSWORD);
-		const refreshed = await auth.refreshToken(fresh.refreshToken);
+		const refreshed = await sessionService.refreshToken(fresh.refreshToken);
 		expect(refreshed.user.id).toBe(userId);
 	});
 });

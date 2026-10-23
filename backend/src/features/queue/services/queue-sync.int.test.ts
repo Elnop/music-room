@@ -4,24 +4,20 @@ import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { QueueState } from '@/features/queue/queue.types.js';
 
-// Playlist -> queue sync of migration 023 (#278) against the local Supabase
-// stack: every row of the plan's I/O matrix. Playlist changes go through
-// PlaylistTrackService, as the API does; queue:updated is captured on a mock.
+// Playlist changes go through playlist-track.service, as the API does; queue:updated is captured on a mock.
 
 const { notifyQueueUpdate } = vi.hoisted(() => ({ notifyQueueUpdate: vi.fn() }));
-vi.mock('@/realtime/index.js', () => ({
-	realtime: { notifyQueueUpdate, notifyPlaylistUpdate: vi.fn(), revalidatePlaylistRoom: vi.fn() },
+vi.mock('@/realtime/emitters/queue.emitters.js', () => ({ notifyQueueUpdate }));
+vi.mock('@/realtime/emitters/playlist.emitters.js', () => ({
+	notifyPlaylistUpdate: vi.fn(),
+	revalidatePlaylistRoom: vi.fn(),
 }));
 
-const { QueueService } = await import('@/features/queue/services/queue.service.js');
-const { PlaylistService } = await import('@/features/playlists/playlist.service.js');
-const { PlaylistTrackService } =
-	await import('@/features/playlists/services/playlist-track.service.js');
+const queue = await import('@/features/queue/services/queue.service.js');
+const playlists = await import('@/features/playlists/services/playlist.service.js');
+const playlistTracks = await import('@/features/playlists/services/playlist-track.service.js');
 
 const URI_PREFIX = `https://soundcloud.com/int-queue-sync/${randomUUID()}`;
-const queue = new QueueService();
-const playlists = new PlaylistService();
-const playlistTracks = new PlaylistTrackService();
 const users: string[] = [];
 let trackCount = 0;
 let ownerId: string;
@@ -62,7 +58,6 @@ async function addTrack(playlistId: string, track = dto()): Promise<Track> {
 	return { id: added.id, uri: track.trackUri };
 }
 
-/** A public playlist of n tracks owned by ownerId. */
 async function createPlaylist(n: number): Promise<{ id: string; tracks: Track[] }> {
 	const { id } = await playlists.createPlaylist(ownerId, {
 		name: 'int-sync',
@@ -103,7 +98,6 @@ async function setRank(itemId: string, rank: string) {
 	if (error) throw error;
 }
 
-/** Track URIs of each block of the queue, in queue order. */
 function blocksOf(state: QueueState): string[][] {
 	const blocks = new Map<string, string[]>();
 	for (const item of state.items) {

@@ -1,8 +1,8 @@
-import { supabase } from '@/shared/config/supabase.js';
+import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { USERNAME_MIN_LENGTH, usernameBase, withSuffix } from '@/features/auth/utils/username.js';
 
 async function isTaken(username: string): Promise<boolean> {
-	const { data } = await supabase
+	const { data } = await supabaseAdmin
 		.from('user_profiles')
 		.select('username')
 		.eq('username', username)
@@ -10,12 +10,7 @@ async function isTaken(username: string): Promise<boolean> {
 	return Boolean(data);
 }
 
-/**
- * Generate unique username from base name
- * @param baseName - Base name to generate username from (e.g., "John Doe")
- * @returns Unique username (e.g., "johndoe" or "johndoe1"), at most
- * USERNAME_MAX_LENGTH characters: the base is cut to leave room for a suffix
- */
+/** The base is cut so the result, suffix included, fits USERNAME_MAX_LENGTH. */
 export async function generateUniqueUsername(baseName: string): Promise<string> {
 	let username = usernameBase(baseName);
 

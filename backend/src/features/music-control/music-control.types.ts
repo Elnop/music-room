@@ -1,8 +1,14 @@
-/**
- * Music Control Types
- */
-
+import type { z } from 'zod';
 import type { QueueItem, QueueTrack } from '@/features/queue/queue.types.js';
+import type {
+	controllableDeviceSchema,
+	controllableDevicesSchema,
+	deviceLicenseSchema,
+	devicePickerSchema,
+	deviceSchema,
+	deviceWithLicensesSchema,
+	grantDeviceLicenseResponseSchema,
+} from '@/features/music-control/music-control-responses.validators.js';
 
 /**
  * Device information for multi-device support
@@ -14,139 +20,27 @@ export interface DeviceInfo {
 	model: string;
 }
 
-/**
- * Listening status for a single device
- */
-export interface ListeningStatus {
-	ownerId: string;
-	device: DeviceInfo;
-	track: {
-		id: number;
-		title: string;
-		artist: string;
-		artworkUrl: string | null;
-	} | null;
-	isPlaying: boolean;
-	/** Playback position when the status was sent, in ms; null from older clients (#295). */
-	positionMs: number | null;
-	updatedAt: string;
-}
+/** A device the user has connected from (`devices` row, camelCase) */
+export type Device = z.infer<typeof deviceSchema>;
 
-/**
- * Aggregated listening status for a user (all devices)
- * Used for broadcasting to subscribers
- */
-export interface UserListeningStatus {
-	ownerId: string;
-	devices: ListeningStatus[];
-}
+/** A friend licensed to control one device */
+export type DeviceLicense = z.infer<typeof deviceLicenseSchema>;
 
-export interface MusicControlPermission {
-	ownerId: string; // The user who grants permission (following_id in follows)
-	allowedUserId: string; // The user who can control (follower_id in follows)
-	canControl: boolean;
-}
+export type DeviceWithLicenses = z.infer<typeof deviceWithLicensesSchema>;
 
-export interface ControlActionPayload {
-	targetUserId: string;
-	targetDeviceId: string;
-	action: 'play' | 'pause';
-}
-
-export interface GrantControlResponse {
-	success: boolean;
-	allowedUserId: string;
-}
-
-export interface RevokeControlResponse {
-	success: boolean;
-	allowedUserId: string;
-}
-
-export interface PermissionChangePayload {
-	ownerId: string;
-	targetUserId: string;
-	canControl: boolean;
-}
-
-/**
- * A device the user has connected from (`devices` row, camelCase)
- */
-export interface Device {
-	deviceId: string;
-	deviceName: string;
-	platform: string;
-	model: string;
-	lastSeenAt: string;
-}
-
-/**
- * A friend licensed to control one device
- */
-export interface DeviceLicense {
-	user: {
-		id: string;
-		username: string;
-		displayName: string | null;
-		avatarUrl: string | null;
-	};
-	grantedAt: string;
-}
-
-/** PATCH /api/music-control/devices/:deviceId */
-export interface RenameDeviceResponse {
-	device: Device;
-}
-
-export interface DeviceWithLicenses extends Device {
-	licenses: DeviceLicense[];
-}
-
-export type DeviceAccess = 'all-devices' | 'license';
-
-export interface ControllableDevice extends Device {
-	access: DeviceAccess;
-}
-
-/** GET /api/music-control/devices */
-export interface MyDevicesResponse {
-	devices: DeviceWithLicenses[];
-}
-
-/** POST /api/music-control/devices/:deviceId/licenses/:userId */
-export interface GrantDeviceLicenseResponse {
-	deviceId: string;
-	license: DeviceLicense;
-}
-
-/** DELETE /api/music-control/devices/:deviceId/licenses/:userId */
-export interface RevokeDeviceLicenseResponse {
-	message: string;
-}
+export type ControllableDevice = z.infer<typeof controllableDeviceSchema>;
 
 /** GET /api/music-control/users/:userId/devices */
-export interface ControllableDevicesResponse {
-	allDevices: boolean;
-	devices: ControllableDevice[];
-}
+export type ControllableDevicesResponse = z.infer<typeof controllableDevicesSchema>;
 
-/** GET /api/music-control/controllable-devices (#295) */
-export interface DevicePickerOwner {
-	ownerId: string;
-	username: string;
-	isSelf: boolean;
-	devices: Array<ControllableDevice & { online: boolean }>;
-}
+/** Me first, then friends with at least one controllable device, by username. */
+export type DevicePickerResponse = z.infer<typeof devicePickerSchema>;
 
-export interface DevicePickerResponse {
-	/** Me first, then friends with at least one controllable device, by username */
-	owners: DevicePickerOwner[];
-}
+export type DevicePickerOwner = DevicePickerResponse['owners'][number];
 
-/**
- * control:command sent by the server to the owner's device chosen by a
- * playback action on the queue (#294): play `item` from `positionMs`.
- */
+export type GrantDeviceLicenseResponse = z.infer<typeof grantDeviceLicenseResponseSchema>;
+
+/** Sent to the owner's device chosen by a queue playback action. */
 export interface QueuePlayCommand {
 	action: 'play-item';
 	fromUserId: string;
@@ -156,7 +50,6 @@ export interface QueuePlayCommand {
 	version: number;
 }
 
-/** control:command: play `track` from `positionMs` (playback transfer, #295). */
 export interface QueueTrackCommand {
 	action: 'play-track';
 	fromUserId: string;
@@ -164,15 +57,9 @@ export interface QueueTrackCommand {
 	positionMs: number;
 }
 
-/** control:command: pause the device (playback transfer, #295). */
 export interface DevicePauseCommand {
 	action: 'pause';
 	fromUserId: string;
 }
 
 export type DeviceCommand = QueuePlayCommand | QueueTrackCommand | DevicePauseCommand;
-
-/** control:revoked: the receiver no longer controls any of ownerId's devices. */
-export interface ControlRevokedPayload {
-	ownerId: string;
-}

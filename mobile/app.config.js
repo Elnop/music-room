@@ -8,8 +8,7 @@ module.exports = {
 		orientation: 'portrait',
 		icon: './src/assets/logo/app-icon.png',
 		userInterfaceStyle: 'dark',
-		// Window background before the first render, applied by expo-system-ui:
-		// without it Android shows a white screen. The original theme's background;
+		// Window background before the first render (expo-system-ui), else Android shows white;
 		// ThemedSystemUI then follows the active theme.
 		backgroundColor: '#0D0D0D',
 		newArchEnabled: true,
@@ -22,7 +21,6 @@ module.exports = {
 		ios: {
 			supportsTablet: true,
 			bundleIdentifier: 'com.zumik.app',
-			// associatedDomains: ['applinks:zumik.app'], // Requires paid Apple Developer account
 			infoPlist: {
 				UIBackgroundModes: ['audio'],
 			},
@@ -50,7 +48,7 @@ module.exports = {
 							scheme: 'zumik',
 							host: 'auth',
 						},
-						// Share links (#321): zumik://playlist/<id>, zumik://user/<id>
+						// Share links: zumik://playlist/<id>, zumik://user/<id>
 						{
 							scheme: 'zumik',
 							host: 'playlist',
@@ -68,7 +66,6 @@ module.exports = {
 			favicon: './assets/favicon.png',
 		},
 		plugins: [
-			'expo-secure-store',
 			[
 				'expo-build-properties',
 				{

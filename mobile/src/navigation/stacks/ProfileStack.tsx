@@ -1,31 +1,15 @@
-/**
- * Profile Feature Navigation Stack
- *
- * Architecture:
- * - Toutes les pages utilisent le header natif avec effet liquid glass sur iOS
- */
-
 import React from 'react';
 import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useTheme } from '@/contexts/ThemeContext';
-import { ProfileScreen } from '@/screens/profile/ProfileScreen';
-import { EditProfileScreen } from '@/screens/profile/EditProfileScreen';
-import { PrivacySettingsScreen } from '@/screens/profile/PrivacySettingsScreen';
-import { LinkedAccountsScreen } from '@/screens/profile/LinkedAccountsScreen';
-import { MyDevicesScreen } from '@/screens/profile/MyDevicesScreen';
-import { MusicPreferencesScreen } from '@/screens/profile/MusicPreferencesScreen';
-import { SettingsScreen } from '@/screens/settings/SettingsScreen';
-
-export type ProfileStackParamList = {
-	Profile: undefined;
-	EditProfile: undefined;
-	PrivacySettings: undefined;
-	LinkedAccounts: undefined;
-	MyDevices: undefined;
-	MusicPreferences: undefined;
-	Settings: undefined;
-};
+import { useTheme } from '@/shared/theme/ThemeContext';
+import { ProfileOrchestrator } from '@/features/profile/profileScreen/components/orchestrators/ProfileOrchestrator';
+import { EditProfileOrchestrator } from '@/features/profile/editProfile/components/orchestrators/EditProfileOrchestrator';
+import { PrivacySettingsOrchestrator } from '@/features/profile/privacySettings/components/orchestrators/PrivacySettingsOrchestrator';
+import { LinkedAccountsOrchestrator } from '@/features/profile/linkedAccounts/components/orchestrators/LinkedAccountsOrchestrator';
+import { MusicPreferencesOrchestrator } from '@/features/profile/musicPreferences/components/orchestrators/MusicPreferencesOrchestrator';
+import { SettingsOrchestrator } from '@/features/profile/settings/components/orchestrators/SettingsOrchestrator';
+import { MyDevicesOrchestrator } from '@/features/music-control/myDevices/components/orchestrators/MyDevicesOrchestrator';
+import type { ProfileStackParamList } from '@/features/profile/types';
 
 const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 
@@ -35,7 +19,6 @@ export function ProfileNavigator() {
 	return (
 		<ProfileStack.Navigator
 			screenOptions={{
-				// Header opaque avec effet blur natif sur iOS
 				headerStyle: {
 					backgroundColor: theme.colors.background,
 				},
@@ -50,37 +33,37 @@ export function ProfileNavigator() {
 		>
 			<ProfileStack.Screen
 				name="Profile"
-				component={ProfileScreen}
+				component={ProfileOrchestrator}
 				options={{ title: 'Mon Profil' }}
 			/>
 			<ProfileStack.Screen
 				name="EditProfile"
-				component={EditProfileScreen}
+				component={EditProfileOrchestrator}
 				options={{ title: 'Éditer le profil' }}
 			/>
 			<ProfileStack.Screen
 				name="PrivacySettings"
-				component={PrivacySettingsScreen}
+				component={PrivacySettingsOrchestrator}
 				options={{ title: 'Confidentialité' }}
 			/>
 			<ProfileStack.Screen
 				name="LinkedAccounts"
-				component={LinkedAccountsScreen}
+				component={LinkedAccountsOrchestrator}
 				options={{ title: 'Comptes liés' }}
 			/>
 			<ProfileStack.Screen
 				name="MyDevices"
-				component={MyDevicesScreen}
+				component={MyDevicesOrchestrator}
 				options={{ title: 'Mes appareils' }}
 			/>
 			<ProfileStack.Screen
 				name="MusicPreferences"
-				component={MusicPreferencesScreen}
+				component={MusicPreferencesOrchestrator}
 				options={{ title: 'Préférences musicales' }}
 			/>
 			<ProfileStack.Screen
 				name="Settings"
-				component={SettingsScreen}
+				component={SettingsOrchestrator}
 				options={{ title: 'Réglages' }}
 			/>
 		</ProfileStack.Navigator>

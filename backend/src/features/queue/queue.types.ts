@@ -1,47 +1,21 @@
-/**
- * Play queue types (#273): one queue per user, shared by all of their devices.
- */
+import type { z } from 'zod';
+import type {
+	queueItemSchema,
+	queueStateSchema,
+	queueTrackSchema,
+	transferResultSchema,
+} from '@/features/queue/queue.validators.js';
 
-/** Track metadata of a queue item; `trackUri` is the SoundCloud permalink. */
-export interface QueueTrack {
-	trackUri: string;
-	title: string;
-	artist: string;
-	album: string | null;
-	albumArt: string | null;
-	durationMs: number;
-}
+/** `trackUri` is the SoundCloud permalink. */
+export type QueueTrack = z.infer<typeof queueTrackSchema>;
 
-export interface QueueItem {
-	id: string;
-	rank: string;
-	track: QueueTrack;
-	sourcePlaylistId: string | null;
-	/** Items queued together from one playlist share a block. */
-	blockId: string | null;
-	/** True once the user removed or moved an item of the block. */
-	blockDetached: boolean;
-}
+/** Items queued together from one playlist share a block; `blockDetached` once one was removed or moved. */
+export type QueueItem = z.infer<typeof queueItemSchema>;
 
-/**
- * The whole queue, items in rank order. Items ranked before the current one
- * are history, those after it upcoming; with `currentItemId` null every item
- * is upcoming. Every endpoint returns it, and `queue:updated` carries it.
- */
-export interface QueueState {
-	/** The user whose queue this is. */
-	ownerId: string;
-	/** Grows with every change of the queue; a client drops a state not newer than its own (#285). */
-	version: number;
-	currentItemId: string | null;
-	items: QueueItem[];
-}
+/** Items before the current one are history; a client drops a state whose `version` is not newer than its own. */
+export type QueueState = z.infer<typeof queueStateSchema>;
 
 export type QueueStepDirection = 'next' | 'previous';
 
-/** Answer of POST /api/queue/transfer (#295); `queue` is the target's new queue when it changed, else null. */
-export interface TransferResult {
-	ownerId: string;
-	deviceId: string;
-	queue: QueueState | null;
-}
+/** `queue` is the target's new queue when it changed, else null. */
+export type TransferResult = z.infer<typeof transferResultSchema>;

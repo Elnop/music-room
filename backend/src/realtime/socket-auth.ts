@@ -1,49 +1,16 @@
 import type { DefaultEventsMap, ExtendedError, Server, Socket } from 'socket.io';
 import { z } from 'zod';
-import { SessionService } from '@/features/auth/services/session.service.js';
-import {
-	TokenVerifyLimitError,
-	verifyTokenLimited,
-} from '@/features/auth/utils/token-verify-limiter.js';
+import * as sessionService from '@/features/auth/services/session.service.js';
+import { TokenVerifyLimitError, verifyTokenLimited } from '@/shared/security/token-verify-limit.js';
 import type { DeviceInfo } from '@/features/music-control/music-control.types.js';
-import { DeviceService } from '@/features/music-control/services/device.service.js';
+import * as deviceService from '@/features/music-control/services/device.service.js';
 import { socketLogger } from '@/shared/middleware/socket-logger.middleware.js';
 import { clientIp } from '@/shared/config/trust-proxy.js';
 
-/**
- * Socket.io handshake authentication (subject IV.6, CAP-1).
- *
- * Contract — the client passes these fields in `io(url, { auth: { ... } })`,
- * all required strings:
- *
- *   token       Supabase access token (JWT), verified with SessionService.verifyToken
- *   deviceId    stable id of the device (1 to 128 characters, devices.device_id)
- *   deviceName  human-readable device name
- *   platform    ios | android | web ...
- *   model       device model
- *   appVersion  app version
- *
- * The connection is refused with a `connect_error` whose `message` is one of:
- *
- *   NO_TOKEN           `auth` is empty or has no `token`
- *   INVALID_HANDSHAKE  a field is missing or not a string
- *   INVALID_TOKEN      the token is invalid or expired
- *   TOO_MANY_ATTEMPTS  too many failed token verifications from this IP
- *                      (RATE_LIMIT_TOKEN_*): refused without verifying the
- *                      token until the window ends; refreshing does not help
- *   DEVICE_REGISTRATION_FAILED  the device could not be recorded in `devices`;
- *                      Socket.io does not retry a refusal, so the client retries
- *
- * On success the device is recorded in `devices` (one row per user and
- * deviceId, `last_seen_at` refreshed) before the connection is accepted, and
- * `socket.data` holds `{ userId, email, device, appVersion }`, where
- * `device.deviceName` is the name the owner gave the device when set, else
- * the handshake `deviceName` (#352). The
- * identity comes only from the verified token: any `userId` sent by the client
- * is ignored. The token is checked once, at the handshake.
- */
+// Identity comes only from the verified token, checked once at the handshake. Socket.io does not
+// retry a refusal, so the client retries DEVICE_REGISTRATION_FAILED itself.
 
-export const handshakeAuthSchema = z.object({
+const handshakeAuthSchema = z.object({
 	token: z.string().min(1),
 	deviceId: z.string().min(1).max(128),
 	deviceName: z.string(),
@@ -52,8 +19,6 @@ export const handshakeAuthSchema = z.object({
 	appVersion: z.string(),
 });
 
-export type HandshakeAuth = z.infer<typeof handshakeAuthSchema>;
-
 export interface SocketData {
 	userId: string;
 	email: string;
@@ -61,7 +26,7 @@ export interface SocketData {
 	appVersion: string;
 }
 
-export type SocketAuthErrorCode =
+type SocketAuthErrorCode =
 	| 'NO_TOKEN'
 	| 'INVALID_HANDSHAKE'
 	| 'INVALID_TOKEN'
@@ -76,9 +41,6 @@ export type AppSocketServer = Server<
 >;
 export type AppSocket = Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, SocketData>;
 
-const sessionService = new SessionService();
-const deviceService = new DeviceService();
-
 function refuse(
 	socket: AppSocket,
 	next: (err?: ExtendedError) => void,
@@ -92,10 +54,6 @@ function refuse(
 	next(new Error(code));
 }
 
-/**
- * Socket.io middleware (`io.use(authenticateSocket)`): validates the handshake,
- * verifies the token and fills `socket.data`, or refuses the connection.
- */
 export async function authenticateSocket(
 	socket: AppSocket,
 	next: (err?: ExtendedError) => void
@@ -134,20 +92,15 @@ export async function authenticateSocket(
 	const device: DeviceInfo = { deviceId, deviceName, platform, model };
 	try {
 		// The stored device keeps the system name; the socket carries the name
-		// to show, the owner's custom one when set (#352).
+		// to show, the owner's custom one when set.
 		device.deviceName = await deviceService.recordConnection(user.id, device);
 	} catch {
-		// DeviceService has already logged the database error.
+		// device.service has already logged the database error.
 		refuse(socket, next, 'DEVICE_REGISTRATION_FAILED');
 		return;
 	}
 
-	socket.data = {
-		userId: user.id,
-		email: user.email,
-		device,
-		appVersion,
-	};
+	socket.data = { userId: user.id, email: user.email, device, appVersion };
 
 	socketLogger.auth('handshake', user.id, socket.id, {
 		deviceId,

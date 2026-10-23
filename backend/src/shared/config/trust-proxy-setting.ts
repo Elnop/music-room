@@ -1,13 +1,7 @@
 import proxyaddr from 'proxy-addr';
 
-/**
- * Which proxies in front of the backend are trusted to set X-Forwarded-For
- * (#173), as Express's `trust proxy` reads it: false (default: the socket's
- * peer is the client, X-Forwarded-For is ignored), true, a hop count, or
- * addresses, subnets and names (`loopback`, `linklocal`, `uniquelocal`)
- * separated by commas. No env import: env.ts validates with these.
- */
-export type TrustProxySetting = boolean | number | string;
+/** Express `trust proxy` format; default false (X-Forwarded-For ignored). No env import: env.ts validates with these. */
+type TrustProxySetting = boolean | number | string;
 
 export function parseTrustProxy(value: string): TrustProxySetting {
 	const trimmed = value.trim().toLowerCase();

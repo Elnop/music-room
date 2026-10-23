@@ -1,40 +1,30 @@
-/**
- * Main App Navigator
- *
- * This file orchestrates the bottom tab navigation for authenticated users.
- * Individual feature stacks are defined in navigation/stacks/ to avoid merge conflicts.
- */
-
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import type { NavigatorScreenParams } from '@react-navigation/native';
 import { View, StyleSheet } from 'react-native';
 import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/contexts/ThemeContext';
-import type { Theme } from '@/themes/types';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import type { Theme } from '@/shared/theme/types';
 
-// Import feature stacks
-import {
-	PlaylistsNavigator,
-	type PlaylistStackParamList,
-} from '@/navigation/stacks/PlaylistsStack';
+import { PlaylistsNavigator } from '@/navigation/stacks/PlaylistsStack';
+import type { PlaylistStackParamList } from '@/features/playlists/types';
+import { registerPlayback } from '@/navigation/playbackBridge';
+import { registerMusicControl } from '@/navigation/musicControlBridge';
 import { ProfileNavigator } from '@/navigation/stacks/ProfileStack';
 import { SearchNavigator } from '@/navigation/stacks/SearchStack';
 import { FriendsNavigator, type FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
 
-// Player components
-import { MiniPlayer } from '@/components/player/MiniPlayer';
-import { PlayerModal } from '@/components/player/PlayerModal';
-import { PlayerErrorToast } from '@/components/player/PlayerErrorToast';
-import { PlayerProvider } from '@/contexts/PlayerContext';
-import { useQueueSync } from '@/hooks/useQueueSync';
-import { useRemoteTarget } from '@/hooks/useRemoteTarget';
-import { useConnectionStatus } from '@/hooks/useConnectionStatus';
-import { ConnectionBanner } from '@/components/common/ConnectionBanner';
+import { MiniPlayer } from '@/features/player/miniPlayer/components/orchestrators/MiniPlayer';
+import { PlayerModal } from '@/features/player/modal/components/orchestrators/PlayerModal';
+import { PlayerErrorToast } from '@/features/player/modal/components/orchestrators/PlayerErrorToast';
+import { PlayerProvider } from '@/features/player/context/PlayerProvider';
+import { useQueueSync } from '@/features/queue/hooks/useQueueSync';
+import { useRemoteTarget } from '@/features/queue/hooks/useRemoteTarget';
+import { useConnectionStatus } from '@/shared/hooks/useConnectionStatus';
+import { ConnectionBanner } from '@/shared/components/feedback/ConnectionBanner';
 
-// Tab navigation types
-// Playlists and Friends take nested params: zumik:// share links open their screens (#321).
+// Playlists and Friends take nested params: zumik:// share links open their screens.
 export type AppTabsParamList = {
 	PlaylistsTab: NavigatorScreenParams<PlaylistStackParamList> | undefined;
 	SearchTab: undefined;
@@ -42,15 +32,14 @@ export type AppTabsParamList = {
 	ProfileTab: undefined;
 };
 
-// Re-export stack param lists for type safety
-export type { PlaylistStackParamList } from '@/navigation/stacks/PlaylistsStack';
-export type { ProfileStackParamList } from '@/navigation/stacks/ProfileStack';
-export type { SearchStackParamList } from '@/navigation/stacks/SearchStack';
 export type { FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
 
 const Tab = createBottomTabNavigator<AppTabsParamList>();
 
-// Icon mapping for tabs
+// Before any screen renders: the playlists feature plays through it.
+registerPlayback();
+registerMusicControl();
+
 const TAB_ICONS: Record<
 	string,
 	{ active: keyof typeof Ionicons.glyphMap; inactive: keyof typeof Ionicons.glyphMap }
@@ -100,7 +89,7 @@ export function AppNavigator() {
 								const iconName = focused ? icons.active : icons.inactive;
 								return (
 									<View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
-										<Ionicons name={iconName} size={20} color={focused ? '#FFFFFF' : color} />
+										<Ionicons name={iconName} size={20} color={focused ? theme.colors.onColor : color} />
 									</View>
 								);
 							},
@@ -137,13 +126,8 @@ export function AppNavigator() {
 					</Tab.Navigator>
 				</SafeAreaInsetsContext.Provider>
 
-				{/* Mini Player - appears above tab bar */}
 				<MiniPlayer />
-
-				{/* Full Player Modal */}
 				<PlayerModal />
-
-				{/* Error Toast - appears center screen when track is unavailable */}
 				<PlayerErrorToast />
 			</View>
 		</PlayerProvider>

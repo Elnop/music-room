@@ -40,7 +40,7 @@ ALTER TABLE public.play_queues
 
 COMMENT ON TABLE public.play_queues IS 'One play queue per user; written only by the queue_* functions';
 COMMENT ON TABLE public.play_queue_items IS 'Queue items in rank order; written only by the queue_* functions';
-COMMENT ON COLUMN public.play_queue_items.rank IS 'Sort key: base-62 fraction, compared byte by byte (doc/PLAYLIST_CONCURRENCY.md)';
+COMMENT ON COLUMN public.play_queue_items.rank IS 'Sort key: base-62 fraction, compared byte by byte (doc/features/playlist-concurrency.md)';
 COMMENT ON COLUMN public.play_queue_items.block_id IS 'Items queued together from one playlist share a block';
 COMMENT ON COLUMN public.play_queue_items.block_detached IS 'Set on the whole block once the user removes or moves one of its items';
 

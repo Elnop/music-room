@@ -1,29 +1,17 @@
-/**
- * zumik:// share links (GitHub #321).
- *
- * - zumik://playlist/<uuid> opens the playlist detail (Playlists tab).
- * - zumik://user/<uuid> opens a user's profile (Friends tab).
- *
- * Any other path, or an id that is not a UUID, is ignored. A link received while
- * signed out is kept as the pending link and opened after sign-in, because the
- * app navigator is not mounted yet (see RootNavigator).
- */
+// Only zumik://playlist/<uuid> and zumik://user/<uuid> are handled. A link received signed out
+// is kept pending until sign-in, since the app navigator is not mounted yet.
 
 import {
 	getActionFromState,
 	getStateFromPath as defaultGetStateFromPath,
 } from '@react-navigation/native';
 import type { LinkingOptions, NavigationContainerRef } from '@react-navigation/native';
-import type { AppTabsParamList } from '@/navigation/AppNavigator';
-
-export const LINK_PREFIX = 'zumik://';
+import type { AppTabsParamList } from './AppNavigator';
+import { logger } from '@/shared/utils/logger';
+import { LINK_PREFIX } from '@/shared/utils/shareLinks';
 
 const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
 const SHARE_PATH = new RegExp(`^/?(playlist|user)/${UUID}/?(\\?.*)?$`, 'i');
-
-export const playlistLink = (id: string): string => `${LINK_PREFIX}playlist/${id}`;
-
-export const userLink = (id: string): string => `${LINK_PREFIX}user/${id}`;
 
 /** A link received while signed out, opened once the app navigator is mounted. */
 let pendingPath: string | null = null;
@@ -60,11 +48,7 @@ export function stateFromSharePath(path: string, options: Options = linkingConfi
 	return defaultGetStateFromPath(path, options);
 }
 
-/**
- * The NavigationContainer's linking options. `isSignedIn` is read for each link:
- * signed out, the link is stored as pending instead of being applied to the
- * auth screens.
- */
+/** `isSignedIn` is read per link: signed out, the link is stored as pending, not applied to the auth screens. */
 export function createLinking(isSignedIn: () => boolean): LinkingOptions<AppTabsParamList> {
 	return {
 		prefixes: [LINK_PREFIX],
@@ -81,10 +65,7 @@ export function createLinking(isSignedIn: () => boolean): LinkingOptions<AppTabs
 	};
 }
 
-/**
- * Opens the link kept while signed out, once the app navigator is mounted.
- * Returns true when a link was opened.
- */
+/** Call once the app navigator is mounted; returns true when a link was opened. */
 export function openPendingLink(navigation: NavigationContainerRef<AppTabsParamList>): boolean {
 	if (!navigation.isReady()) return false;
 	const path = takePendingLink();
@@ -97,7 +78,7 @@ export function openPendingLink(navigation: NavigationContainerRef<AppTabsParamL
 		else navigation.resetRoot(state);
 		return true;
 	} catch (error) {
-		console.warn('[linking] Could not open the pending link:', error);
+		logger.warn('[linking] Could not open the pending link:', error);
 		return false;
 	}
 }

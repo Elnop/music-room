@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
-import { QueueService } from '@/features/queue/services/queue.service.js';
+import * as queue from '@/features/queue/services/queue.service.js';
 import {
 	insertBlockRpc,
 	trackIdsFromRpc,
@@ -9,11 +9,7 @@ import {
 } from '@/features/queue/utils/queue-rpc.js';
 import type { QueueItem, QueueState } from '@/features/queue/queue.types.js';
 
-// The transfer functions of migration 025 against the local Supabase stack (#295):
-// the track lists read from a queue and the block insertion that follows them.
-
 const URI_PREFIX = `https://soundcloud.com/int-transfer/${randomUUID()}`;
-const queue = new QueueService();
 const users: string[] = [];
 let userId: string;
 let otherUser: string;
@@ -40,20 +36,17 @@ const dto = () => {
 	};
 };
 
-/** Adds n tracks and returns the item ids in queue order. */
 async function addItems(n: number, user = userId): Promise<string[]> {
 	let state: QueueState = { ownerId: user, version: 0, currentItemId: null, items: [] };
 	for (let i = 0; i < n; i++) state = await queue.addItem(user, user, dto());
 	return state.items.map(item => item.id);
 }
 
-/** Adds n tracks to a user's queue and returns the resulting state. */
 async function addItemsTo(user: string, n: number): Promise<QueueState> {
 	await addItems(n, user);
 	return queue.getQueue(user, user);
 }
 
-/** The tracks.id of each item, in the items' order. */
 async function trackIdsOf(items: QueueItem[]): Promise<string[]> {
 	const uris = items.map(item => item.track.trackUri);
 	const { data, error } = await supabaseAdmin

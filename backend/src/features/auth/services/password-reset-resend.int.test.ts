@@ -12,7 +12,7 @@ vi.hoisted(() => {
 });
 
 // Never send real mail.
-vi.mock('@/features/mail/mail.service.js', () => ({
+vi.mock('@/features/mail/services/mail.service.js', () => ({
 	sendVerificationEmail: vi.fn().mockResolvedValue(undefined),
 	sendPasswordResetEmail: vi.fn().mockResolvedValue(undefined),
 }));
@@ -22,11 +22,10 @@ const { connectRedis, disconnectRedis, isRedisConnected, redisClient } =
 const { supabaseAdmin } = await import('@/shared/config/supabase.js');
 const { default: authRouter } = await import('@/features/auth/auth.routes.js');
 const { errorHandler } = await import('@/shared/middleware/error-handler.js');
-const { sendPasswordResetEmail } = await import('@/features/mail/mail.service.js');
+const { sendPasswordResetEmail } = await import('@/features/mail/services/mail.service.js');
 
-// GET /api/auth/reset-password/can-resend validates its query and reports the
-// cooldown each forgot-password request starts (#187), through HTTP on the real
-// auth router against the local Supabase stack and test Redis.
+// can-resend validates its query and reports the cooldown each forgot-password starts, through
+// HTTP on the real auth router against the local Supabase stack and test Redis.
 
 const COOLDOWN_SECONDS = 60;
 const createdUserIds: string[] = [];

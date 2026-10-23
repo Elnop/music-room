@@ -12,31 +12,27 @@ vi.hoisted(() => {
 	process.env.RATE_LIMIT_SOUNDCLOUD_WINDOW_MS = '60000';
 });
 
-// SoundCloud is never called: the service is replaced.
+// SoundCloud is never called: the services are replaced.
 const service = vi.hoisted(() => ({
 	searchTracks: vi.fn(),
 	getTrack: vi.fn(),
 	getStreamUrl: vi.fn(),
 }));
-vi.mock('@/features/soundcloud/soundcloud.service.js', () => ({
-	SoundCloudService: class {
-		searchTracks = service.searchTracks;
-		getTrack = service.getTrack;
-		getStreamUrl = service.getStreamUrl;
-	},
+vi.mock('@/features/soundcloud/services/soundcloud-search.service.js', () => ({
+	searchTracks: service.searchTracks,
+	getTrack: service.getTrack,
+}));
+vi.mock('@/features/soundcloud/services/soundcloud-stream.service.js', () => ({
+	getStreamUrl: service.getStreamUrl,
 }));
 
 const { connectRedis, disconnectRedis, isRedisConnected, redisClient } =
 	await import('@/shared/config/redis.js');
 const { supabaseAdmin, supabaseAnon } = await import('@/shared/config/supabase.js');
 const { default: soundcloudRoutes } = await import('@/features/soundcloud/soundcloud.routes.js');
-const { soundcloudRateLimiter } =
-	await import('@/features/auth/middleware/rate-limit.middleware.js');
+const { soundcloudRateLimiter } = await import('@/shared/security/http-rate-limit.js');
 const { rateLimitConfig } = await import('@/shared/config/rate-limit.config.js');
 const { errorHandler } = await import('@/shared/middleware/error-handler.js');
-
-// SoundCloud routes (#208): authMiddleware, a per-user Redis limiter and Zod on
-// every input, against the test Redis and the local Supabase stack.
 
 const KEY_PATTERN = 'rl:soundcloud:*';
 const PASSWORD = 'integration-test-password';
@@ -131,8 +127,12 @@ describe('SoundCloud routes: auth, per-user rate limit, validation', () => {
 			headers: token ? { Authorization: `Bearer ${token}` } : {},
 		});
 
-	async function errorOf(res: globalThis.Response): Promise<{ code: string; retryAfter?: string }> {
-		const body = (await res.json()) as { error: { code: string; retryAfter?: string } };
+	async function errorOf(
+		res: globalThis.Response
+	): Promise<{ code: string; details?: { retryAfter?: string } }> {
+		const body = (await res.json()) as {
+			error: { code: string; details?: { retryAfter?: string } };
+		};
 		return body.error;
 	}
 
@@ -255,7 +255,7 @@ describe('SoundCloud routes: auth, per-user rate limit, validation', () => {
 		expect(blocked.status).toBe(429);
 		const error = await errorOf(blocked);
 		expect(error.code).toBe('RATE_LIMIT_EXCEEDED');
-		expect(new Date(error.retryAfter ?? 0).getTime()).toBeGreaterThan(Date.now());
+		expect(new Date(error.details?.retryAfter ?? 0).getTime()).toBeGreaterThan(Date.now());
 		expect(service.getStreamUrl).not.toHaveBeenCalled();
 
 		const other = await get('/search?q=lofi', bob.token);

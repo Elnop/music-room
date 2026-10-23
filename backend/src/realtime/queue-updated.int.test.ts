@@ -5,15 +5,16 @@ import { io as ioClient, type Socket as ClientSocket } from 'socket.io-client';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { supabaseAdmin, supabaseAnon } from '@/shared/config/supabase.js';
 import { connectRedis, disconnectRedis, isRedisConnected } from '@/shared/config/redis.js';
-import { QueueService } from '@/features/queue/services/queue.service.js';
-import { PlaylistService } from '@/features/playlists/playlist.service.js';
-import { PlaylistTrackService } from '@/features/playlists/services/playlist-track.service.js';
-import { realtime } from '@/realtime/index.js';
+import * as queue from '@/features/queue/services/queue.service.js';
+import * as playlistService from '@/features/playlists/services/playlist.service.js';
+import * as playlistTrackService from '@/features/playlists/services/playlist-track.service.js';
+import * as socketServer from '@/realtime/socket-server.js';
+import { getIO } from '@/realtime/state.js';
+import * as realtime from '@/realtime/emitters/queue.emitters.js';
+import * as realtimeControl from '@/realtime/emitters/control.emitters.js';
 import type { QueueState } from '@/features/queue/queue.types.js';
 
-// queue:updated (#273, #277): every queue mutation sends the full state to all the
-// sockets of its user (room user:<id>) and to no one else, through a real
-// Socket.io server against the local Supabase stack.
+// Every queue mutation sends the full state to all the sockets of its user and to no one else.
 
 interface TestUser {
 	id: string;
@@ -47,7 +48,6 @@ async function createUser(): Promise<TestUser> {
 }
 
 describe('queue:updated broadcast', () => {
-	const queue = new QueueService();
 	let httpServer: HTTPServer;
 	let url: string;
 	let owner: TestUser;
@@ -90,14 +90,12 @@ describe('queue:updated broadcast', () => {
 		return socket;
 	}
 
-	/** Collect every queue:updated a socket receives. */
 	function record(socket: ClientSocket): QueueState[] {
 		const received: QueueState[] = [];
 		socket.on('queue:updated', (state: QueueState) => received.push(state));
 		return received;
 	}
 
-	/** The next queue:updated received by both devices of the owner. */
 	function bothReceive(): Promise<QueueState[]> {
 		return Promise.all(
 			[phone, tablet].map(s => new Promise<QueueState>(resolve => s.once('queue:updated', resolve)))
@@ -115,7 +113,7 @@ describe('queue:updated broadcast', () => {
 		other = await createUser();
 
 		httpServer = createServer();
-		realtime.initialize(httpServer);
+		socketServer.initialize(httpServer);
 		await new Promise<void>(resolve => httpServer.listen(0, '127.0.0.1', () => resolve()));
 		const { port } = httpServer.address() as AddressInfo;
 		url = `http://127.0.0.1:${port}`;
@@ -134,7 +132,7 @@ describe('queue:updated broadcast', () => {
 	});
 
 	afterAll(async () => {
-		await realtime.getIO()?.close();
+		await getIO()?.close();
 		for (const user of [owner, other]) {
 			if (user) await supabaseAdmin.auth.admin.deleteUser(user.id); // cascades to queues
 		}
@@ -190,7 +188,7 @@ describe('queue:updated broadcast', () => {
 				.update({ can_control_music: false })
 				.eq('follower_id', other.id)
 				.eq('following_id', owner.id);
-			await realtime.revalidateListeningAccess(other.id, owner.id);
+			await realtimeControl.revalidateListeningAccess(other.id, owner.id);
 			expect(await revoked).toEqual({ ownerId: owner.id });
 			const received = record(otherSocket);
 			await queue.addItem(owner.id, owner.id, dto());
@@ -287,12 +285,10 @@ describe('queue:updated broadcast', () => {
 	});
 
 	it('sends the block of a played playlist to both devices, and nothing for an empty one', async () => {
-		const playlists = new PlaylistService();
-		const playlistTracks = new PlaylistTrackService();
 		const otherUpdates = record(otherSocket);
-		const { id } = await playlists.createPlaylist(owner.id, { name: 'int-play' });
-		await playlistTracks.addTrack(id, owner.id, dto());
-		await playlistTracks.addTrack(id, owner.id, dto());
+		const { id } = await playlistService.createPlaylist(owner.id, { name: 'int-play' });
+		await playlistTrackService.addTrack(id, owner.id, dto());
+		await playlistTrackService.addTrack(id, owner.id, dto());
 
 		const received = bothReceive();
 		const state = await queue.playPlaylist(owner.id, owner.id, id);
@@ -301,7 +297,7 @@ describe('queue:updated broadcast', () => {
 		expect(block).toHaveLength(2);
 		expect(state.currentItemId).toBe(block[0].id);
 
-		const { id: emptyId } = await playlists.createPlaylist(owner.id, { name: 'int-empty' });
+		const { id: emptyId } = await playlistService.createPlaylist(owner.id, { name: 'int-empty' });
 		await settle();
 		const phoneUpdates = record(phone);
 		await expect(queue.playPlaylist(owner.id, owner.id, emptyId)).rejects.toMatchObject({

@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Local Supabase stack and Redis for backend integration tests (see doc/TESTING.md).
+# Local Supabase stack and Redis for backend integration tests (see doc/development/testing.md).
 #
 #   scripts/test-db.sh up     start the stack, reset the database, apply
 #                             migrations/*.sql in order, start a Redis

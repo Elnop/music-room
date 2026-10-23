@@ -1,17 +1,24 @@
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
-import { QueueService } from '@/features/queue/services/queue.service.js';
-import { PlaylistService } from '@/features/playlists/playlist.service.js';
-import { realtime } from '@/realtime/index.js';
+import * as queue from '@/features/queue/services/queue.service.js';
+import * as playlistService from '@/features/playlists/services/playlist.service.js';
+import * as realtimeControl from '@/realtime/emitters/control.emitters.js';
+import * as realtimeQueue from '@/realtime/emitters/queue.emitters.js';
 
-// #294: a friend who controls at least one device of the owner manages the
-// owner's queue; playback actions target a device the friend controls, online.
+vi.mock('@/realtime/emitters/control.emitters.js', async importOriginal => ({
+	...(await importOriginal<typeof import('@/realtime/emitters/control.emitters.js')>()),
+	isDeviceOnline: vi.fn(),
+}));
+vi.mock('@/realtime/emitters/queue.emitters.js', async importOriginal => ({
+	...(await importOriginal<typeof import('@/realtime/emitters/queue.emitters.js')>()),
+	sendDeviceCommand: vi.fn(),
+}));
+
 // No Socket.io server runs here: device presence and commands are stubbed on
-// the realtime singleton.
+// the realtime emitter modules.
 
 const URI_PREFIX = `https://soundcloud.com/int-queue-delegation/${randomUUID()}`;
-const queue = new QueueService();
 const users: string[] = [];
 let trackCount = 0;
 let owner: string;
@@ -46,8 +53,8 @@ const dto = () => {
 };
 
 const online = new Set<string>();
-const sendDeviceCommand = vi.spyOn(realtime, 'sendDeviceCommand').mockReturnValue(true);
-vi.spyOn(realtime, 'isDeviceOnline').mockImplementation((userId, deviceId) =>
+const sendDeviceCommand = vi.mocked(realtimeQueue.sendDeviceCommand).mockReturnValue(true);
+vi.mocked(realtimeControl.isDeviceOnline).mockImplementation((userId, deviceId) =>
 	online.has(`${userId}:${deviceId}`)
 );
 
@@ -188,7 +195,7 @@ describe('playback by a delegate', () => {
 	it("checks the playlist's visibility for the delegate, not the owner", async () => {
 		await befriend(true);
 		online.add(`${owner}:tv`);
-		const playlist = await new PlaylistService().createPlaylist(owner, {
+		const playlist = await playlistService.createPlaylist(owner, {
 			name: 'Private',
 			visibility: 'private',
 		});

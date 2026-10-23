@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthApiError, AuthRetryableFetchError } from '@supabase/supabase-js';
-import { SessionService } from '@/features/auth/services/session.service.js';
+import * as service from '@/features/auth/services/session.service.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 
 const { getUser, signOut, isRevoked, revoke, refreshSession, fetchUserProfile } = vi.hoisted(
@@ -15,7 +15,7 @@ const { getUser, signOut, isRevoked, revoke, refreshSession, fetchUserProfile } 
 );
 
 vi.mock('@/shared/config/supabase.js', () => ({
-	supabase: { auth: { getUser, admin: { signOut } } },
+	supabaseAdmin: { auth: { getUser, admin: { signOut } } },
 	createSignInClient: () => ({ auth: { refreshSession } }),
 }));
 
@@ -29,7 +29,8 @@ vi.mock('@/shared/utils/logger.js', () => ({
 }));
 
 vi.mock('@/features/auth/services/token-revocation.service.js', () => ({
-	tokenRevocationService: { isRevoked, revoke },
+	isRevoked,
+	revoke,
 }));
 
 async function caught(promise: Promise<unknown>): Promise<unknown> {
@@ -41,9 +42,7 @@ async function caught(promise: Promise<unknown>): Promise<unknown> {
 	);
 }
 
-describe('SessionService', () => {
-	const service = new SessionService();
-
+describe('session.service', () => {
 	beforeEach(() => {
 		getUser.mockReset();
 		signOut.mockReset();

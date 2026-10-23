@@ -1,26 +1,28 @@
 # Zumik - Mobile App
 
-Application mobile React Native pour Zumik - Partage de musique collaboratif.
+React Native app of Zumik, a collaborative music listening app. It is a remote control of the backend: every piece of data goes through the API.
 
-## Stack Technique
+How it fits with the rest of the system: [doc/architecture/overview.md](../doc/architecture/overview.md). Full documentation index: [doc/README.md](../doc/README.md).
 
-- **Framework**: React Native 0.81+ avec Expo SDK 54
+## Tech stack
+
+- **Framework**: React Native 0.81 with Expo SDK 54
 - **Language**: TypeScript (strict mode)
 - **Navigation**: React Navigation v7
-- **State Management**: Zustand v5
-- **HTTP Client**: Axios
-- **Auth**: Supabase Auth v2.84.0
-- **Realtime**: Socket.io-client v4.8.1
-- **Validation**: Zod v3.25.76
+- **State**: TanStack Query v5 (server data, cache, invalidation) and Zustand v5 (local client state: session, preferences, UI, player)
+- **HTTP client**: shared API client (`src/shared/services/api.ts`) on top of `fetch`, which adds the telemetry headers (`X-Platform`, `X-Device-Model`, `X-App-Version`) and refreshes the token transparently
+- **Auth**: the backend API (`/api/auth/*`); the app ships no Supabase client
+- **Real time**: socket.io-client v4.8
+- **Validation**: Zod v4
 - **Forms**: React Hook Form v7
 
-## Prérequis
+The app's interface is in French only (#341).
 
-- Node.js 18+
-- Backend Zumik running sur `http://localhost:3000`
-- Compte Supabase configuré (optionnel pour débuter)
-- Expo CLI: `npm install -g expo-cli` (optionnel, `npx` fonctionne)
-- SDK Android (Android Studio), ou Xcode sur macOS, pour construire le build de debug
+## Requirements
+
+- Node.js 22 (`.nvmrc`)
+- The Zumik backend running on `http://localhost:3000`
+- Android SDK (Android Studio), or Xcode on macOS, to build the debug build
 
 ## Installation
 
@@ -28,220 +30,270 @@ Application mobile React Native pour Zumik - Partage de musique collaboratif.
 npm install
 ```
 
+From the repository root, `make install` installs both projects.
+
 ## Configuration
 
-1. Copier `.env.example` vers `.env`
-2. Remplir les variables d'environnement avec les valeurs du backend
-3. Vérifier que le backend est lancé sur port 3000
+1. Copy `.env.example` to `.env`.
+2. Fill in the environment variables with the backend's values.
+3. Check that the backend runs on port 3000.
 
-### Variables d'environnement
+### Environment variables
 
-`make dev-docker` et `make dev-local` imposent `EXPO_PUBLIC_API_URL=http://<IP locale>:3000` et `EXPO_PUBLIC_WS_URL=ws://<IP locale>:3000` (variables `DEV_API_URL` et `DEV_WS_URL` de `make/config.mk`), quelle que soit la valeur dans `.env`. `make dev-tunnel` utilise l'URL du tunnel ngrok. Les valeurs de `.env` ne servent que pour un `npx expo start` lancé à la main.
+`make dev-docker` and `make dev-local` force `EXPO_PUBLIC_API_URL=http://<local IP>:3000` and `EXPO_PUBLIC_WS_URL=ws://<local IP>:3000` (variables `DEV_API_URL` and `DEV_WS_URL` in `make/config.mk`), whatever the value in `.env`. `make dev-tunnel` uses the ngrok tunnel URL. The values in `.env` are only used by an `npx expo start` run by hand. A tester can also change the backend address inside the app, without rebuilding (`BackendUrlField`, `shared/services/backendUrl.ts`).
 
-Avec `SUPABASE_MODE=local` (le défaut, voir `backend/README.md`), `make dev-docker`, `make dev-local`, `make expo-android` et `make expo-clear` écrivent aussi `EXPO_PUBLIC_SUPABASE_URL=http://<IP locale>:54421` et `EXPO_PUBLIC_SUPABASE_ANON_KEY` (stack Supabase locale) dans `.env.development.local`, qui l'emporte sur `.env` : Expo le préfère à `.env` pour Metro lancé sur l'hôte, et `make dev-docker` le passe au conteneur mobile en dernier `--env-file` (Expo ne remplace jamais une variable déjà dans l'environnement). `expo-android` et `expo-clear` ne démarrent pas la stack : lancez `make supabase-up` avant si `backend/.env.supabase.local` manque. Avec `SUPABASE_MODE=hosted`, ce sont les valeurs Supabase de `.env` qui servent.
+The app never talks to Supabase: sign-in, sign-up, email verification, password reset, refresh and logout all go through the backend API (calls in `src/features/auth/services/`, through the `src/shared/services/api.ts` client), which logs them. The session (backend tokens) lives in `src/features/auth/stores/authStore.ts`, persisted in AsyncStorage by `features/auth/services/sessionStorage.ts`; it is refreshed through `/api/auth/refresh` (before a request when the token expires soon, at startup, and after a 401), and a refused refresh (401) clears the storage and goes back to the sign-in screen.
 
 ```env
-# Backend API (ignoré par make dev-docker, dev-local et dev-tunnel)
+# Backend API (ignored by make dev-docker, dev-local and dev-tunnel)
 EXPO_PUBLIC_API_URL=http://localhost:3000
 EXPO_PUBLIC_WS_URL=ws://localhost:3000
 
-# Supabase (ignoré en SUPABASE_MODE=local : make écrit la stack locale)
-EXPO_PUBLIC_SUPABASE_URL=
-EXPO_PUBLIC_SUPABASE_ANON_KEY=
-
-# SoundCloud (Phase ultérieure)
+# SoundCloud (later phase)
 EXPO_PUBLIC_SOUNDCLOUD_CLIENT_ID=
 ```
 
-## Démarrage
+## Running the app
 
-L'app tourne uniquement en build natif de debug (`com.zumik.app`). Elle ne démarre pas dans Expo Go, à qui manquent ses modules natifs (Google Sign-In, Facebook SDK, couleurs d'image) : ne pas l'utiliser.
+The app runs only as a native debug build (`com.zumik.app`). It does not start in Expo Go, which lacks its native modules (Google Sign-In, Facebook SDK, image colors): do not use it.
 
-### 1. Installer le build de debug (une fois)
+### 1. Install the debug build (once)
 
 ```bash
-# Android (SDK Android requis) : build et installation sur l'émulateur ou le téléphone USB branché
-npx expo run:android --no-bundler   # --device pour choisir l'appareil ; --no-bundler : pas de second Metro sur 8081
+# Android (Android SDK required): build and install on the emulator or the USB phone
+npx expo run:android --no-bundler   # --device to pick the device; --no-bundler: no second Metro on 8081
 
-# iOS (macOS uniquement)
+# iOS (macOS only)
 npx expo run:ios
 ```
 
-Le build charge ensuite le JS depuis Metro : il suffit de le réinstaller quand le code natif ou les dépendances natives changent. `make open-app` le copie sur les autres émulateurs lancés.
+The build then loads its JavaScript from Metro: reinstall it only when native code or native dependencies change. `make open-app` copies it to the other running emulators.
 
-### 2. Lancer Metro
+### 2. Start Metro
 
-Depuis la racine : `make dev-docker` (Docker), `make dev-local` (émulateur Android Studio) ou `make dev-tunnel` (téléphone sur un autre réseau). Sans make : `npm start` dans `mobile/`.
+From the root: `make dev-docker` (Docker), `make dev-local` (Android Studio emulator) or `make dev-tunnel` (phone on another network). Without make: `npm start` in `mobile/`.
 
-### 3. Connecter l'app à Metro
+### 3. Point the app at Metro
 
-`make qr` (ou `make qr-tunnel`) affiche ces étapes avec les bonnes adresses.
+`make qr` (or `make qr-tunnel`) prints these steps with the right addresses.
 
-- **Émulateur** : automatique, il joint Metro sur `10.0.2.2:8081` ; `make open-app` lance l'app.
-- **Téléphone en USB** : `adb reverse tcp:8081 tcp:8081`, puis ouvrir Zumik.
-- **Téléphone sur le même WiFi** : secouer le téléphone, menu de dev › **Change Bundle Location** › `<HOST_IP>:8081` (adresse donnée par `make info`).
-- **Téléphone sur un autre réseau** (`make dev-tunnel`) : même menu, saisir l'hôte du tunnel Expo affiché par `make qr-tunnel` (`xxxx-8081.exp.direct:80`).
+- **Emulator**: automatic, it reaches Metro on `10.0.2.2:8081`; `make open-app` launches the app.
+- **Phone over USB**: `adb reverse tcp:8081 tcp:8081`, then open Zumik.
+- **Phone on the same Wi-Fi**: shake the phone, dev menu › **Change Bundle Location** › `<HOST_IP>:8081` (address given by `make info`).
+- **Phone on another network** (`make dev-tunnel`): same menu, enter the Expo tunnel host shown by `make qr-tunnel` (`xxxx-8081.exp.direct:80`). Details: [tunnel-mode.md](../doc/development/tunnel-mode.md).
 
-« Unable to load script » : l'app ne joint pas Metro. Vérifier que Metro tourne et l'adresse saisie, puis toucher **RELOAD**.
+"Unable to load script": the app cannot reach Metro. Check that Metro runs and the address you entered, then tap **RELOAD**.
 
-## Scripts Disponibles
+## Scripts
 
-### Démarrage Expo
+### Expo
 
-- `npm start` - Mode normal (défaut)
-- `npm run start:lan` - Mode LAN (téléphone sur le même WiFi)
-- `npm run start:tunnel` - Mode tunnel (fonctionne avec WiFi différents)
-- `npm run start:clear` - Démarrer avec cache effacé
-- `npm run start:lan-clear` - Mode LAN + cache effacé
-- `npm run android` - Build de debug et lancement sur émulateur/appareil Android (`expo run:android`)
-- `npm run ios` - Build de debug et lancement sur simulateur iOS (macOS uniquement)
-- `npm run web` - Lancer dans le navigateur
+- `npm start` - Normal mode (default)
+- `npm run start:lan` - LAN mode (phone on the same Wi-Fi)
+- `npm run start:tunnel` - Tunnel mode (works across different networks)
+- `npm run start:clear` - Start with a cleared cache
+- `npm run start:lan-clear` - LAN mode + cleared cache
+- `npm run android` - Debug build and launch on an Android emulator/device (`expo run:android`)
+- `npm run ios` - Debug build and launch on the iOS simulator (macOS only)
+- `npm run web` - Launch in the browser
 
-### Qualité de Code
+### Code quality
 
-- `npm run check` - Vérifier types TypeScript + ESLint (rapide)
-- `npm run fix` - Formater et corriger automatiquement tout
-- `npm run check-all` - Vérification complète (types + lint + format)
-- `npm run lint` - Linter le code
-- `npm run lint:fix` - Corriger les erreurs ESLint
-- `npm run format` - Formater avec Prettier
-- `npm run type-check` - Vérifier les types TypeScript uniquement
+- `npm run check` - Every guardrail in parallel (types, lint, dead code, dependencies, duplication, patterns, secrets, tests), also run at pre-commit: see [quality-and-ci.md](../doc/development/quality-and-ci.md)
+- `npm run fix` - Format and fix everything automatically
+- `npm run check-all` - Full check (types + lint + format)
+- `npm run lint` - Lint the code
+- `npm run lint:fix` - Fix ESLint errors
+- `npm run format` - Format with Prettier
+- `npm run type-check` - Check the TypeScript types only
 
-### Maintenance & Diagnostic
+### Maintenance and diagnosis
 
-- `npm run clean:cache` - Nettoyer le cache Expo (rapide, ~5 secondes)
-- `npm run clean:full` - Nettoyage complet + réinstallation
-- `npm run clean` - Nettoyer et réinstaller (alias de clean:full)
-- `npm run reset` - Nettoyer le cache et redémarrer Expo
-- `npm run doctor` - Diagnostiquer les problèmes de configuration Expo
-- `npm run update` - Vérifier si les dépendances sont à jour
+- `npm run clean:cache` - Clear the Expo cache (fast, ~5 seconds)
+- `npm run clean:full` - Full clean + reinstall
+- `npm run clean` - Clean and reinstall (alias of clean:full)
+- `npm run reset` - Clear the cache and restart Expo
+- `npm run doctor` - Diagnose Expo configuration problems
+- `npm run update` - Check whether dependencies are up to date
 
-### Build & Production
+### Build and release
 
-- `npm run prebuild` - Générer les dossiers natifs Android/iOS
-- `npm run build:local` - Build Android local (nécessite Android Studio)
+- `npm run prebuild` - Generate the native Android/iOS folders
+- `npm run build:local` - Local Android build (needs Android Studio)
 
-L'APK de production (backend `https://zumik.cluzhub.com`) est construit par `.github/workflows/release-apk.yml` à chaque push sur `main` et publié dans les [GitHub Releases](https://github.com/Elnop/music-room/releases/latest). Il lit `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`, `EXPO_PUBLIC_FACEBOOK_APP_ID` et `EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN` dans les secrets Actions du repo. Lancé à la main (`gh workflow run release-apk.yml --ref <branche>`) hors de `main`, il dépose l'APK en artefact du run sans créer de release.
+The production APK (backend `https://zumik.cluzhub.com`) is built by `.github/workflows/release-apk.yml` on every push to `main` and published in the [GitHub Releases](https://github.com/Elnop/music-room/releases/latest). It reads `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`, `EXPO_PUBLIC_FACEBOOK_APP_ID` and `EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN` from the repository's Actions secrets. Run by hand (`gh workflow run release-apk.yml --ref <branch>`) outside `main`, it uploads the APK as a run artifact without creating a release.
 
 ### Backend
 
-- `npm run dev:backend` - Lancer le backend depuis le dossier mobile
+- `npm run dev:backend` - Start the backend from the mobile folder
 
-## Commandes les Plus Utiles
+## Most useful commands
 
-Pour débuter, voici les 5 commandes que vous utiliserez le plus :
-
-1. **`npm run android`** - Installer le build de debug (il lance aussi son propre Metro : l'arrêter, ou utiliser `npx expo run:android --no-bundler`), puis `make dev-docker` pour Metro
-2. **`npm run fix`** - Corriger automatiquement le code
-3. **`npm run check`** - Vérifier avant un commit
-4. **`npm run reset`** - Résoudre les bugs étranges
-5. **`npm run doctor`** - Diagnostiquer les problèmes
+1. **`npm run android`** - Install the debug build (it also starts its own Metro: stop it, or use `npx expo run:android --no-bundler`), then `make dev-docker` for Metro
+2. **`npm run fix`** - Fix the code automatically
+3. **`npm run check`** - Check before a commit
+4. **`npm run reset`** - Solve strange bugs
+5. **`npm run doctor`** - Diagnose problems
 
 ## Architecture
 
+From epic #362: `src/shared/`, `src/providers/`, `src/navigation/` and `src/features/<feature>/`. Every feature was fully migrated (#378–#385) to the orchestrators / presenters / hooks pattern, and every component rule is enforced by the ESLint plugin without any exception. Each feature has one layout: what its subjects share (`hooks/`, `services/`, `stores/`, `utils/`, `types.ts`…) at its root, its React providers in `context/`, and one folder per subject, even when there is only one, holding `components/orchestrators/`, `components/presenters/`, `hooks/` and, when needed, `utils/`. More in [code-layout.md](../doc/architecture/code-layout.md).
+
 ```
 mobile/src/
-├── screens/            # Écrans par feature
-│   ├── auth/           # Welcome, Login, Register, EmailVerification, ForgotPassword, ResetPassword
-│   ├── playlists/      # Playlists, PlaylistDetail, CreatePlaylist, SearchTracks, PlaylistSharing
-│   ├── friends/        # Friends, UserProfile
-│   ├── profile/        # Profile, EditProfile, PrivacySettings, MusicPreferences
-│   ├── search/         # SoundCloudSearch (+ components/)
-│   └── settings/       # Settings
-├── components/
-│   ├── common/         # Button, Card, Input, Avatar, SearchBar, ErrorBoundary, items swipeables...
-│   ├── playlist/       # TrackItem, PlaylistCard, PlaylistGridCard, PlaylistHeader, AddTrackButton...
-│   ├── player/         # MiniPlayer, PlayerModal, PlayerErrorToast
-│   ├── profile/        # GenreSelector, VisibilityToggle, NowPlayingInline...
-│   ├── music-control/  # DeviceListeningCard
-│   └── theme/          # ThemeSelector
-├── navigation/         # RootNavigator, AuthNavigator, AppNavigator (onglets) + stacks/
-├── store/              # Zustand : authStore, playlistStore, playerStore, socketStore, soundcloudStore
-├── contexts/           # ThemeContext, PlayerContext
-├── hooks/              # useMusicControl, usePlaylistSocket, usePlayerSync, usePlayerProgress, useImageColors
-├── api/                # playlistApi.ts
-├── services/           # api.ts (client HTTP de base), profileApi, friendsApi, musicControlApi, privacyApi, oauth, deviceService
-├── lib/                # supabase.ts
-├── themes/             # Thèmes (original, royalBlue, pastelLime, christmas) + tokens
-├── types/              # Types alignés sur les réponses du backend
-├── utils/              # validators (Zod), formatters, toast
-├── constants/          # Config API, constantes
-└── config/             # toastConfig
+├── shared/                 # Code common to every feature; imports neither features/ nor navigation/
+│   ├── components/
+│   │   ├── ui/             # Primitives: Pressable, Button, Input, Card, Skeleton, ThemedSwitch, LoadingSpinner
+│   │   ├── feedback/       # AppToast, ConnectionBanner, EmptyState, ErrorBoundary, FormError
+│   │   ├── form/           # SearchBar, BackendUrlField
+│   │   ├── lists/          # ReorderableList, SwipeableTrackItem, SwipeableUserItem, QueueSwipe
+│   │   ├── media/          # Artwork, Avatar
+│   │   ├── sharing/        # ShareLinkButton
+│   │   └── theme/          # ThemeSelector, ThemedSystemUI
+│   ├── services/           # api.ts (HTTP client), authSession (session contract), playbackBridge
+│   │                       # (playback contract), backendUrl, lastTrackStorage
+│   ├── query/              # TanStack Query: queryClient (STALE profiles), keys (key factory), socketCache
+│   ├── stores/             # socketStore (Socket.io connection)
+│   ├── hooks/              # useConnectionStatus, useImageColors
+│   ├── theme/              # ThemeContext, themes (original, royalBlue, pastelLime, christmas), tokens
+│   ├── constants/app.ts    # API config, spacing
+│   └── utils/              # logger, toast, haptics, apiErrorMessage, debounce, moveTarget, shareLinks...
+├── providers/              # AppProviders: gestures, ErrorBoundary, QueryClient, theme, safe area
+├── navigation/             # RootNavigator, AuthNavigator, AppNavigator (tabs) + stacks/
+├── features/               # One feature per folder (#378–#385)
+│   ├── auth/               # Sign-in, sign-up, email code, forgotten password, linked accounts
+│   │   ├── <subject>/      # welcome, login, register, emailVerification, forgotPassword, resetPassword,
+│   │   │                   # code, form, social: components/{orchestrators,presenters} + hooks/
+│   │   ├── hooks/          # TanStack queries and mutations (linked accounts, sign-in, password)
+│   │   ├── services/       # authApi, passwordApi, providersApi, signIn, googleSignIn, facebookSignIn, sessionStorage
+│   │   ├── stores/         # authStore (session) and its actions
+│   │   ├── utils/          # codeDigits, passwordRules
+│   │   └── types.ts · validators.ts
+│   ├── playlists/          # Lists, detail, create/edit, adding tracks, visibility and rights
+│   │   ├── <subject>/      # list, detail, form, searchTracks, sharing, trackActions, actionSheet, header
+│   │   ├── hooks/          # TanStack queries and mutations, Socket.io room (usePlaylistRoom)
+│   │   ├── services/       # playlistApi, tracksApi, membersApi, usersApi, trackSearchApi
+│   │   ├── stores/         # pendingMovesStore (moves in flight)
+│   │   ├── utils/          # Cache (playlistCache, trackEdits, trackMoves), playlistSync, socket rules, rights
+│   │   └── types.ts · validators.ts
+│   ├── player/             # Audio playback, mini player, player modal, system media controls (#380)
+│   │   ├── miniPlayer/ · modal/ · mediaSession/   # components/{orchestrators,presenters} + hooks/
+│   │   ├── context/        # PlayerContext (player lifecycle)
+│   │   ├── hooks/ · services/ · stores/           # playerStore
+│   │   └── constants.ts · types.ts
+│   ├── queue/              # Play queue, synchronization and Connect (#381)
+│   │   ├── queueModal/     # components/{orchestrators,presenters} + hooks/
+│   │   ├── devicePicker/   # components/{orchestrators,presenters} + hooks/
+│   │   ├── hooks/          # useQueueSync, useRemoteTarget
+│   │   ├── services/       # transferPlayback
+│   │   ├── stores/         # queueStore, connectStore
+│   │   └── types.ts
+│   ├── friends/            # Friends list, user search, friend profile and permissions (#382)
+│   │   ├── friendsList/    # components/{orchestrators,presenters} + hooks/
+│   │   ├── userProfile/    # components/{orchestrators,presenters} + hooks/
+│   │   ├── hooks/          # useFriendsQueries, useFriendsMutations
+│   │   ├── services/       # friendsApi
+│   │   └── types.ts
+│   ├── profile/            # Profile, edit, privacy, music preferences, linked accounts, settings (#383)
+│   │   ├── profileScreen/ · editProfile/ · privacySettings/ · musicPreferences/ · linkedAccounts/ · settings/ · common/
+│   │   ├── hooks/ · services/ · utils/
+│   │   └── types.ts
+│   ├── music-control/      # Delegated control, device management, listening permissions (#384)
+│   │   ├── myDevices/      # components/{orchestrators,presenters} + hooks/ + utils/
+│   │   ├── hooks/          # useMusicControl, useFriendListening, useControllableDevices...
+│   │   ├── services/       # musicControlApi
+│   │   └── types.ts
+│   └── search/             # SoundCloud track search (#385)
+│       ├── searchScreen/   # components/{orchestrators,presenters} + hooks/
+│       ├── hooks/          # useSoundCloudSearch (TanStack Query)
+│       ├── services/       # searchApi
+│       └── types.ts
+├── services/               # api-clients.test.ts (tests of the API clients)
+└── types/                  # Types matching the backend's responses
 ```
 
 ## Navigation
 
-- **RootNavigator** bascule entre `AuthNavigator` et `AppNavigator` selon l'état d'auth (persisté par `authStore`).
-- **AuthNavigator** : Welcome, Login, Register, EmailVerification, ForgotPassword, ResetPassword.
-- **AppNavigator** (onglets) :
-  - Playlists → Playlists, PlaylistDetail, CreatePlaylist, SearchTracks, PlaylistSharing
-  - Search → Search
+- **RootNavigator** switches between `AuthNavigator` and `AppNavigator` depending on the auth state (persisted by `features/auth/stores/authStore.ts`).
+- **AuthNavigator**: Welcome, Login, Register, EmailVerification, ForgotPassword, ResetPassword; each screen is the orchestrator of `features/auth/<subject>/`.
+- **AppNavigator** (tabs):
+  - Playlists → Playlists, PlaylistDetail, CreatePlaylist, SearchTracks, PlaylistSharing (the orchestrators of `features/playlists/<subject>/`)
+  - Search → Search (the orchestrator of `features/search/searchScreen/components/orchestrators`)
   - Friends → Friends, UserProfile, PlaylistDetail, SearchTracks
-  - Profile → Profile, EditProfile, PrivacySettings, MusicPreferences, Settings
+  - Profile → Profile, EditProfile, PrivacySettings, MusicPreferences, LinkedAccounts, MyDevices, Settings (the orchestrators of `features/profile/<subject>/` and `features/music-control/myDevices/components/orchestrators`)
 
-## État, temps réel et lecture
+## State, real time and playback
 
-- **Appels HTTP** : toujours via `services/api.ts`, qui ajoute le token et les headers `X-Platform`, `X-Device-Model`, `X-App-Version` logués par le backend.
-- **Temps réel** : `socketStore` gère la connexion Socket.io ; `usePlaylistSocket` rejoint la room d'une playlist et réagit à `playlist:updated` ; `useMusicControl` gère l'écoute des amis et les commandes de contrôle délégué.
-- **Lecture audio** : expo-audio lit le stream HLS SoundCloud ; `PlayerContext` gère le cycle de vie du lecteur, `playerStore` l'état (track courante, play/pause, modal), `MiniPlayer` et `PlayerModal` l'affichage.
-- **OAuth** : `services/oauth.ts` (Google Sign-In, Facebook SDK). Le token obtenu est vérifié par le backend (`/api/auth/google`, `/api/auth/facebook`). Modules natifs : comme le reste de l'app, il faut le build de debug, pas Expo Go.
-- **Signature Android** : `plugins/withDebugKeystore.js` remplace pendant `expo prebuild` le keystore de debug du template Expo (partagé par toutes les apps Expo) par `keystores/debug.keystore`. Son SHA-1 `5D:26:8F:52:F7:A8:2D:71:3A:D9:68:BF:60:6A:79:BB:85:AA:71:C0` est celui à enregistrer, avec le package `com.zumik.app`, dans le client OAuth Android du projet Google Cloud qui contient `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`. Sinon Google Sign-In renvoie `DEVELOPER_ERROR`.
+- **HTTP calls**: always through `shared/services/api.ts`, which adds the token and the `X-Platform`, `X-Device-Model`, `X-App-Version` headers the backend logs.
+- **Server data**: TanStack Query (`AppProviders` provides the client). A query key is built with `queryKeys` (`shared/query/keys.ts`), freshness is chosen among the `STALE` profiles (`shared/query/queryClient.ts`), and a Socket.io event updates the cache (`setQueryData`) or invalidates it through `useSocketCache` (`shared/query/socketCache.ts`). Zustand only keeps client state. Rules: `.agents/rules/state.md`.
+- **Session and shared layer**: `shared/` does not import auth; the session store registers itself in `shared/services/authSession.ts` (token, refresh) and announces each session end there (`onSessionEnd`), on which the socket closes and the player empties.
+- **Real time**: `shared/stores/socketStore.ts` manages the Socket.io connection; `features/playlists/hooks/usePlaylistRoom.ts` joins a playlist's room, whose events update the cache (`utils/playlistSocketRules.ts`); `useMusicControl` handles friends' listening and delegated control commands.
+- **Playback contract**: playlists start and display playback through `shared/services/playbackBridge.ts`, which `navigation/playbackBridge.ts` wires to `playerStore` and `queueStore` when `AppNavigator` loads; no feature imports the player or the queue.
+- **Audio playback**: expo-audio plays the SoundCloud HLS stream; `PlayerContext` manages the player's lifecycle, `playerStore` its state (current track, play/pause, modal), `MiniPlayer` and `PlayerModal` the display.
+- **OAuth**: `features/auth/services/googleSignIn.ts` and `facebookSignIn.ts` (Google Sign-In, Facebook SDK). The token obtained is verified by the backend (`/api/auth/google`, `/api/auth/facebook`). Native modules: like the rest of the app, this needs the debug build, not Expo Go.
+- **Android signing**: `plugins/withDebugKeystore.js` replaces, during `expo prebuild`, the Expo template's debug keystore (shared by every Expo app) with `keystores/debug.keystore`. Its SHA-1 `5D:26:8F:52:F7:A8:2D:71:3A:D9:68:BF:60:6A:79:BB:85:AA:71:C0` is the one to register, with the `com.zumik.app` package, in the Android OAuth client of the Google Cloud project that holds `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`. Otherwise Google Sign-In returns `DEVELOPER_ERROR`.
 
-## Développement
+## Development
 
-### Path Aliases
+### Imports
 
-Le projet utilise des alias de chemin pour des imports propres :
+A single alias, `@/` (to `src/`), for every import that leaves the current folder; never `../` (ESLint):
 
 ```typescript
-// Au lieu de
-import { Button } from '../../../components/common/Button';
-
-// Utiliser
-import { Button } from '@components/common/Button';
+import { Button } from '@/shared/components/ui/Button';
 ```
 
-Alias disponibles (voir `tsconfig.json`) : `@/*`, `@api`, `@components`, `@screens`, `@services`, `@store`, `@hooks`, `@utils`, `@constants`, `@contexts`, `@themes`
+### Primitives and theme
 
-### Thème
+Every pressable element goes through `Pressable` or `Button` from `@/shared/components/ui/`: one press opacity, optional haptic feedback (`haptic`), `button` role by default and a required `accessibilityLabel`. `TouchableOpacity` and `Pressable` from `react-native` are forbidden elsewhere (ESLint `guardrails/ui-primitives`). Gestures (swipe, drag and drop) stay on `react-native-gesture-handler`.
 
-Plusieurs thèmes sont disponibles dans `src/themes/` (original, royalBlue, pastelLime, christmas), sélectionnables via `ThemeSelector`. Les tokens communs sont dans `src/themes/tokens.ts`.
+Four themes live in `src/shared/theme/` (original, royalBlue, pastelLime, christmas), selectable through `ThemeSelector`; the shared tokens are in `src/shared/theme/tokens.ts`. No hard-coded color outside `src/shared/theme/` (ESLint `guardrails/theme-tokens`): read `theme.colors.*`.
 
-### Hot Reload
+### Component roles (in-house ESLint plugin)
 
-Expo supporte le Hot Reload : modifiez n'importe quel fichier et l'app se met à jour automatiquement en 1-2 secondes.
+Component roles are checked automatically, without exception (#386, documentation: `.agents/rules/components.md`):
 
-## Alignement Backend
+- **`components/screen-orchestrator-only`**: a navigation screen only imports orchestrators from `features/`, never presenters.
+- **`components/presenter-pure`**: a presenter is a pure view (props in, JSX out): no state (`useState`), no effect (`useEffect`), no Zustand store, no TanStack query, no direct network call.
+- **`components/hook-no-jsx`**: a hook contains no JSX element or fragment (logic only).
+- **`components/one-component-per-file`**: at most one React component per source file.
+- **`components/component-role-directory`**: every component of a feature lives in `features/<feature>/<subject>/components/orchestrators/` or `.../components/presenters/`, a React provider in `features/<feature>/context/`.
+- **`components/orchestrator-no-fetch`**: an orchestrator leaves network calls to TanStack Query or service hooks, with no direct `fetch`.
 
-Les types, validateurs et versions sont alignés avec le backend :
+### Hot reload
 
-- **Types TypeScript** (`src/types/`) correspondent aux schémas backend
-- **Validateurs Zod** (`src/utils/validators.ts`) utilisent les mêmes règles
-- **Versions** : Supabase, Socket.io, Zod identiques au backend
+Expo supports hot reload: change any file and the app updates within 1-2 seconds.
+
+## Alignment with the backend
+
+Types, validators and versions match the backend:
+
+- **TypeScript types** (`src/types/`, `src/features/<feature>/types.ts`) match the backend's schemas.
+- **Zod validators** (`src/features/playlists/validators.ts`, `src/features/auth/validators.ts`) use the same rules.
+- **Versions**: Socket.io and Zod are the same as the backend's.
 
 ## Tests
 
-À venir dans une phase ultérieure.
+Unit and component tests run with jest-expo, and the ESLint plugin's rules with `node:test`:
+
+```bash
+npm test                # Runs the ESLint rule tests then the Jest suite
+npm test -- <path>      # Run one test suite
+npm run test:coverage   # Jest coverage report (above the #364 floor: 69.06% lines)
+```
+
+Strategy and mocks: [testing.md](../doc/development/testing.md).
 
 ## Documentation
 
-- [Documentation complète du projet](../README.md)
-- [Documentation backend](../backend/README.md)
-- [Expo Documentation](https://docs.expo.dev)
+- [Project README](../README.md) and [documentation index](../doc/README.md)
+- [Backend documentation](../backend/README.md)
+- [Expo documentation](https://docs.expo.dev)
 - [React Navigation](https://reactnavigation.org)
 
-## Prochaines Étapes
+## Remaining work
 
-Le reste à faire est suivi dans les GitHub Issues du repo (epics et stories BMAD).
-
-## Support
-
-En cas de problème :
-
-1. Lire le message d'erreur complet
-2. Vérifier que le backend est lancé (localhost:3000)
-3. Vérifier les variables d'environnement (.env)
-4. Consulter la documentation Expo
+Tracked in the repository's GitHub Issues.
 
 ## License
 

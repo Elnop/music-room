@@ -1,0 +1,31 @@
+import type { Request, Response } from 'express';
+import type { AuthenticatedRequest } from '@/shared/types/global.types.js';
+import { sendSuccess } from '@/shared/utils/send-success.js';
+import * as realtime from '@/realtime/emitters/control.emitters.js';
+import * as deviceService from '@/features/music-control/services/device.service.js';
+import * as controllableDevicesService from '@/features/music-control/services/controllable-devices.service.js';
+import {
+	deviceParamsSchema,
+	renameDeviceSchema,
+} from '@/features/music-control/music-control.validators.js';
+
+const userOf = (req: Request) => (req as AuthenticatedRequest).user.id;
+
+export async function getMyDevices(req: Request, res: Response) {
+	sendSuccess(res, { devices: await deviceService.listMyDevices(userOf(req)) });
+}
+
+/** `name: null` restores the system name; a connected socket of that device takes the new name at once. */
+export async function renameDevice(req: Request, res: Response) {
+	const ownerId = userOf(req);
+	const { deviceId } = deviceParamsSchema.parse(req.params);
+	const { name } = renameDeviceSchema.parse(req.body);
+	const device = await deviceService.renameDevice(ownerId, deviceId, name);
+	realtime.setDeviceName(ownerId, deviceId, device.deviceName);
+	sendSuccess(res, { device });
+}
+
+/** Mine first, then my friends'. */
+export async function getDevicePicker(req: Request, res: Response) {
+	sendSuccess(res, await controllableDevicesService.list(userOf(req)));
+}

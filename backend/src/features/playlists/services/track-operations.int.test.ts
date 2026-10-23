@@ -3,10 +3,8 @@ import { createClient, type PostgrestError, type SupabaseClient } from '@supabas
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { createSignInClient, supabaseAdmin } from '@/shared/config/supabase.js';
 
-// Concurrent playlist edits (subject IV.2.3) against the local Supabase stack, migration 016.
-// Each rpc() is its own HTTP request, so Promise.all runs real concurrent transactions.
-// Functions and the new columns are reached untyped: the generated types only know
-// them after 016 is applied on the hosted project and `make generate-types` runs.
+// Concurrent playlist edits: each rpc() is its own HTTP request, so Promise.all runs real
+// concurrent transactions. Untyped: the generated types only know migration 016 once applied.
 
 interface Row {
 	track_id: string;

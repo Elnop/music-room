@@ -79,7 +79,7 @@ setup: ## Initial setup (install + create .env)
 	@echo "$(BLUE)Next steps:$(NC)"
 ifeq ($(SUPABASE_MODE),local)
 	@echo "1. From the repository root: make supabase-up (local stack and migrations, no hosted keys needed)"
-	@echo "2. Optional: make supabase-reset loads the demo accounts (doc/DEMO_ACCOUNTS.md)"
+	@echo "2. Optional: make supabase-reset loads the demo accounts (doc/development/demo-accounts.md)"
 	@echo "3. From the repository root: make dev"
 else
 	@echo "1. Edit .env and add your hosted Supabase credentials (SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_KEY)"

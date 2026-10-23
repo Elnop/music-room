@@ -1,14 +1,13 @@
 import type { NavigationContainerRef } from '@react-navigation/native';
-import type { AppTabsParamList } from '@/navigation/AppNavigator';
+import type { AppTabsParamList } from './AppNavigator';
 import {
 	clearPendingLink,
 	createLinking,
 	openPendingLink,
-	playlistLink,
 	stateFromSharePath,
 	takePendingLink,
-	userLink,
-} from '@/navigation/linking';
+} from './linking';
+import { playlistLink, userLink } from '@/shared/utils/shareLinks';
 
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
 

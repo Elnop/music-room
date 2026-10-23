@@ -12,7 +12,7 @@ vi.hoisted(() => {
 });
 
 // Never send real mail; capture the recipient and the code instead.
-vi.mock('@/features/mail/mail.service.js', () => ({
+vi.mock('@/features/mail/services/mail.service.js', () => ({
 	sendVerificationEmail: vi.fn().mockResolvedValue(undefined),
 	sendPasswordResetEmail: vi.fn().mockResolvedValue(undefined),
 }));
@@ -20,14 +20,14 @@ vi.mock('@/features/mail/mail.service.js', () => ({
 const { connectRedis, disconnectRedis, isRedisConnected, redisClient } =
 	await import('@/shared/config/redis.js');
 const { supabaseAdmin } = await import('@/shared/config/supabase.js');
-const { sendVerificationEmail } = await import('@/features/mail/mail.service.js');
+const { sendVerificationEmail } = await import('@/features/mail/services/mail.service.js');
 const { default: authRouter } = await import('@/features/auth/auth.routes.js');
 const { errorHandler } = await import('@/shared/middleware/error-handler.js');
 const { logger } = await import('@/shared/utils/logger.js');
 const { verificationConfig } = await import('@/features/mail/mail.config.js');
 
-// verify-email and resend-verification cannot hand out an account (#188), through
-// HTTP on the real auth router against the local Supabase stack and test Redis.
+// verify-email and resend-verification cannot hand out an account, through HTTP on the real
+// auth router against the local Supabase stack and test Redis.
 
 const PASSWORD = 'integration-test-password';
 const SENT_MESSAGE = 'Verification code sent. Please check your email.';

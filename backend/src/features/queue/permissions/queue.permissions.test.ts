@@ -11,11 +11,12 @@ const { canControlAnyDevice, canControlDevice, isDeviceOnline } = vi.hoisted(() 
 }));
 
 vi.mock('@/features/music-control/services/control-access.service.js', () => ({
-	controlAccessService: { canControlAnyDevice, canControlDevice },
+	canControlAnyDevice,
+	canControlDevice,
 }));
 
-vi.mock('@/realtime/index.js', () => ({
-	realtime: { isDeviceOnline },
+vi.mock('@/realtime/emitters/control.emitters.js', () => ({
+	isDeviceOnline,
 }));
 
 beforeEach(() => {

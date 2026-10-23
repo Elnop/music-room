@@ -5,15 +5,14 @@ import { io as ioClient, type Socket as ClientSocket } from 'socket.io-client';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { supabaseAdmin, supabaseAnon } from '@/shared/config/supabase.js';
 import { connectRedis, disconnectRedis, isRedisConnected } from '@/shared/config/redis.js';
-import { ViewerService } from '@/features/playlists/services/viewer.service.js';
-import { CollaboratorService } from '@/features/playlists/services/collaborator.service.js';
-import { PlaylistService } from '@/features/playlists/playlist.service.js';
-import { realtime } from '@/realtime/index.js';
+import * as viewerService from '@/features/playlists/services/viewer.service.js';
+import * as collaboratorService from '@/features/playlists/services/collaborator.service.js';
+import * as playlistUpdateService from '@/features/playlists/services/playlist-update.service.js';
+import * as socketServer from '@/realtime/socket-server.js';
+import { getIO } from '@/realtime/state.js';
+import * as realtime from '@/realtime/emitters/playlist.emitters.js';
 import type { PlaylistRoomError } from '@/realtime/playlist-room.js';
 import type { PlaylistUpdatedPayload } from '@/features/playlists/playlist.types.js';
-
-// Access control of the playlist:<id> rooms (playlist-room.ts) against a real
-// Socket.io server and the local Supabase stack.
 
 interface TestUser {
 	id: string;
@@ -54,7 +53,7 @@ async function createUser(): Promise<TestUser> {
 		.insert({ id, username: `int_${id.slice(0, 8)}` });
 	if (profileError) throw profileError;
 
-	// Sign in with the anon client, never the admin one (#136).
+	// Sign in with the anon client, never the admin one.
 	const { data: session, error: signInError } = await supabaseAnon.auth.signInWithPassword({
 		email,
 		password: PASSWORD,
@@ -119,18 +118,16 @@ describe('Playlist room access control', () => {
 	}
 
 	async function inRoom(socket: ClientSocket, playlistId: string): Promise<boolean> {
-		const sockets = await realtime.getIO()!.fetchSockets();
+		const sockets = await getIO()!.fetchSockets();
 		const found = sockets.find(s => s.id === socket.id);
 		return found?.rooms.has(`playlist:${playlistId}`) ?? false;
 	}
 
-	/** Emit playlist:join and wait until the server put the socket in the room. */
 	async function join(socket: ClientSocket, playlistId: string): Promise<void> {
 		socket.emit('playlist:join', playlistId);
 		await vi.waitFor(async () => expect(await inRoom(socket, playlistId)).toBe(true));
 	}
 
-	/** Collect every playlist:updated a socket receives. */
 	function record(socket: ClientSocket): PlaylistUpdated[] {
 		const received: PlaylistUpdated[] = [];
 		socket.on('playlist:updated', (payload: PlaylistUpdated) => received.push(payload));
@@ -150,7 +147,7 @@ describe('Playlist room access control', () => {
 		outsider = await createUser();
 
 		httpServer = createServer();
-		realtime.initialize(httpServer);
+		socketServer.initialize(httpServer);
 		await new Promise<void>(resolve => httpServer.listen(0, '127.0.0.1', () => resolve()));
 		const { port } = httpServer.address() as AddressInfo;
 		url = `http://127.0.0.1:${port}`;
@@ -161,7 +158,7 @@ describe('Playlist room access control', () => {
 	});
 
 	afterAll(async () => {
-		await realtime.getIO()?.close();
+		await getIO()?.close();
 		if (playlistIds.length) await supabaseAdmin.from('playlists').delete().in('id', playlistIds);
 		for (const user of [owner, viewer, outsider]) {
 			if (user) await supabaseAdmin.auth.admin.deleteUser(user.id);
@@ -234,7 +231,7 @@ describe('Playlist room access control', () => {
 		await join(viewerSocket, playlistId);
 
 		const eviction = nextEvent<PlaylistRoomError>(viewerSocket, 'playlist:error');
-		await new ViewerService().removeViewer(playlistId, owner.id, viewer.id);
+		await viewerService.removeViewer(playlistId, owner.id, viewer.id);
 		await expect(eviction).resolves.toMatchObject({
 			playlistId,
 			code: 'PLAYLIST_ACCESS_DENIED',
@@ -259,7 +256,7 @@ describe('Playlist room access control', () => {
 		await join(collaboratorSocket, playlistId);
 
 		const eviction = nextEvent<PlaylistRoomError>(collaboratorSocket, 'playlist:error');
-		await new CollaboratorService().removeCollaborator(playlistId, owner.id, outsider.id);
+		await collaboratorService.removeCollaborator(playlistId, owner.id, outsider.id);
 		await expect(eviction).resolves.toMatchObject({
 			playlistId,
 			code: 'PLAYLIST_ACCESS_DENIED',
@@ -307,7 +304,7 @@ describe('Playlist room access control', () => {
 		await join(outsiderSocket, playlistId);
 
 		const eviction = nextEvent<PlaylistRoomError>(outsiderSocket, 'playlist:error');
-		await new PlaylistService().updatePlaylist(playlistId, owner.id, { visibility: 'private' });
+		await playlistUpdateService.updatePlaylist(playlistId, owner.id, { visibility: 'private' });
 		await expect(eviction).resolves.toMatchObject({
 			playlistId,
 			code: 'PLAYLIST_ACCESS_DENIED',
@@ -326,7 +323,7 @@ describe('Playlist room access control', () => {
 		const evictions = [ownerSocket, viewerSocket].map(s =>
 			nextEvent<PlaylistRoomError>(s, 'playlist:error')
 		);
-		await new PlaylistService().deletePlaylist(playlistId, owner.id);
+		await playlistUpdateService.deletePlaylist(playlistId, owner.id);
 		for (const eviction of evictions) {
 			await expect(eviction).resolves.toMatchObject({ playlistId, code: 'PLAYLIST_NOT_FOUND' });
 		}

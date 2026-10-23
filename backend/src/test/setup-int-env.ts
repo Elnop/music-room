@@ -1,13 +1,6 @@
-/**
- * Environment for integration tests.
- *
- * Loads .env.test, written by `scripts/test-db.sh up` with the local Supabase
- * stack's URL and keys and the test Redis container's host and port, before
- * any module reads `@/shared/config/env.js`.
- * It overrides the shell environment, and env.ts's own dotenv call never
- * overrides what is set here, so the hosted project's keys in backend/.env
- * cannot be picked up.
- */
+// Loads .env.test (written by `scripts/test-db.sh up`) before any module reads env.ts, overriding the
+// shell, so the hosted project's keys in backend/.env cannot be picked up.
+
 import { existsSync } from 'node:fs';
 import { config } from 'dotenv';
 

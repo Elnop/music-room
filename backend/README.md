@@ -1,516 +1,363 @@
 # Zumik Backend
 
-Backend pour l'application Zumik - Plateforme collaborative d'écoute musicale avec streaming intégré.
+Backend of Zumik, a collaborative music listening app with integrated streaming: an Express/TypeScript API on Supabase, Redis and Socket.io.
 
-## 🏗️ Architecture
+How it fits with the rest of the system: [doc/architecture/overview.md](../doc/architecture/overview.md). Full documentation index: [doc/README.md](../doc/README.md).
 
-Ce projet utilise une **architecture feature-first** (colocation par feature) :
+## Architecture
+
+The code is organized **feature first** (everything about a feature lives in its folder):
 
 ```
 backend/
 ├── src/
+│   ├── app/                # Composition root: route mounting (routes.ts), OpenAPI document (openapi.ts)
 │   ├── features/
-│   │   ├── auth/           # Inscription, login, refresh, OAuth Google/Facebook, vérif email, reset password
-│   │   ├── friends/        # Follow / unfollow, statut, stats
-│   │   ├── mail/           # Emails transactionnels (Gmail SMTP ou Mailpit en dev, nodemailer)
-│   │   ├── music-control/  # Délégation du contrôle de lecture à des amis
-│   │   ├── playlists/      # Playlists, tracks, collaborateurs, viewers
-│   │   ├── profile/        # Profil, confidentialité, préférences musicales
-│   │   └── soundcloud/     # Recherche, détails de track, URLs de stream
-│   ├── realtime/
-│   │   └── index.ts        # Serveur Socket.io (playlists, écoute, contrôle)
+│   │   ├── auth/           # Sign-up, login, refresh, Google/Facebook OAuth, email verification, password reset
+│   │   ├── friends/        # Follow / unfollow, status, stats
+│   │   ├── mail/           # Transactional emails (Gmail SMTP, or Mailpit in dev, through nodemailer)
+│   │   ├── music-control/  # Devices, per-device licenses, playback control delegation to friends
+│   │   ├── playlists/      # Playlists, tracks, collaborators, viewers
+│   │   ├── profile/        # Profile, privacy, music preferences, avatar
+│   │   ├── queue/          # Play queue, delegated queue access, playback transfer
+│   │   └── soundcloud/     # Search, track details, stream URLs
+│   ├── realtime/           # Socket.io server
+│   │   ├── socket-server.ts  # Server creation, origin, auth, limits, handler wiring
+│   │   ├── handlers/       # One handler per domain: playlist, listening, control
+│   │   ├── emitters/       # What features call: notify*, sendDeviceCommand, revalidate*, isDeviceOnline
+│   │   └── state.ts        # Module state: server, connected devices, listening statuses
 │   ├── shared/
-│   │   ├── config/         # env, Supabase, Redis, Swagger, rate limits, montage des routes (routes.ts)
+│   │   ├── config/         # env, Supabase, Redis, Swagger building blocks, rate limits; imports no feature
 │   │   ├── middleware/     # error handler, action logger (HTTP + socket)
-│   │   ├── services/       # rate limiter, anti-bruteforce (Redis)
-│   │   ├── types/          # Types globaux + supabase.generated.ts (généré : make generate-types)
+│   │   ├── security/       # anti-abuse: rate limiting, lockout, IP reputation, token and socket event limits
+│   │   ├── types/          # Global types + supabase.generated.ts (generated: make generate-types)
 │   │   └── utils/          # logger, database.helpers.ts
-│   └── server.ts           # Point d'entrée Express + Socket.io
-├── migrations/             # Migrations SQL (stack locale : make supabase-up ; hébergé : à la main dans le dashboard)
-├── scripts/dev-db.sh       # Stack Supabase locale de dev (make supabase-up/down/reset)
-└── supabase-dev/           # Config CLI de la stack de dev (music-room-dev, ports 544xx)
+│   └── server.ts           # Express + Socket.io entry point
+├── migrations/             # SQL migrations (local stack: make supabase-up; hosted: by hand in the dashboard)
+├── scripts/dev-db.sh       # Local Supabase dev stack (make supabase-up/down/reset)
+└── supabase-dev/           # CLI config of the dev stack (music-room-dev, ports 544xx)
 ```
 
-## 🚀 Quick Start
+The layout and the rules that enforce it: [doc/architecture/code-layout.md](../doc/architecture/code-layout.md).
 
-### 1. Setup initial
+## Quick start
+
+### 1. Initial setup
 
 ```bash
 make setup
 ```
 
-Cette commande va :
+This installs the npm dependencies and creates `.env` from `.env.example`.
 
-- Installer les dépendances npm
-- Créer le fichier `.env` depuis `.env.example`
+### 2. Supabase: local stack (default) or hosted project
 
-### 2. Supabase : stack locale (par défaut) ou projet hébergé
+`SUPABASE_MODE` (a make variable, `local` by default) chooses the database used by `make dev-docker`, `make dev-local` and `make generate-types`. Any value other than `local` or `hosted` stops make before it starts anything.
 
-`SUPABASE_MODE` (variable make, `local` par défaut) choisit la base utilisée par `make dev-docker`, `make dev-local` et `make generate-types`. Toute autre valeur que `local` ou `hosted` arrête make avant de lancer quoi que ce soit.
+**`SUPABASE_MODE=local` (default)**: a local Supabase stack, `music-room-dev`, which keeps its data. No hosted key is needed: `.env` can stay a copy of `.env.example`.
 
-**`SUPABASE_MODE=local` (par défaut)** : une stack Supabase locale, `music-room-dev`, qui garde ses données. Aucune clé hébergée n'est nécessaire : `.env` peut rester la copie de `.env.example`.
-
-| Commande | Effet |
+| Command | Effect |
 | --- | --- |
-| `make supabase-up` | Démarre la stack (Postgres, PostgREST, Auth, Storage, Kong, Mailpit, Studio), applique les fichiers de `migrations/` pas encore appliqués, écrit `.env.supabase.local` |
-| `make supabase-down` | Arrête la stack ; les données restent |
-| `make supabase-reset` | Vide la base, réapplique toutes les migrations et charge les données de démo (comptes Bob l'éponge, amis, playlists : `doc/DEMO_ACCOUNTS.md`) |
-| `make logs-supabase` | Suit les logs de la stack (préfixes `[SB-DB]`, `[SB-AUTH]`, `[SB-REST]`, `[SB-KONG]`, `[SB-MAIL]`, `[SB-STUDIO]`, `[SB-META]`) ; `make logs` les inclut en mode local |
+| `make supabase-up` | Starts the stack (Postgres, PostgREST, Auth, Storage, Kong, Mailpit, Studio), applies the files of `migrations/` not applied yet, writes `.env.supabase.local` |
+| `make supabase-down` | Stops the stack; data is kept |
+| `make supabase-reset` | Empties the database, reapplies every migration and loads the demo data (accounts, friends, playlists: [demo-accounts.md](../doc/development/demo-accounts.md)) |
+| `make logs-supabase` | Follows the stack's logs (prefixes `[SB-DB]`, `[SB-AUTH]`, `[SB-REST]`, `[SB-KONG]`, `[SB-MAIL]`, `[SB-STUDIO]`, `[SB-META]`); `make logs` includes them in local mode |
 
-- Script : `scripts/dev-db.sh` ; config CLI : `supabase-dev/supabase/config.toml` (workdir séparé de `supabase/`, qui sert à la stack de test `music-room-test`).
-- Storage (photos de profil, #351) : une stack de dev lancée avant son ajout tourne sans `storage-api`, que `make supabase-up` ne démarre pas sur une stack déjà lancée. Une fois après cette mise à jour, lancez `make supabase-down` puis `make supabase-up` ; sinon les uploads échouent et la migration 027 peut échouer. Sur le projet hébergé, Storage doit être activé avant d'appliquer `027_avatars_bucket.sql`.
-- Ports 544xx : API `http://127.0.0.1:54421`, Postgres `127.0.0.1:54422`, Studio (dashboard) `http://127.0.0.1:54423`, Mailpit `http://127.0.0.1:54424` (interface web) et `54425` (SMTP). La stack de test (554xx) et `make test-int` n'y touchent pas.
-- Migrations suivies dans `zumik_dev.applied_migrations` (hors `public`) : chaque fichier tourne dans une transaction avec sa ligne de suivi ; un fichier en échec est nommé et rien n'en reste. Pas de `db reset` dans `supabase-up`.
-- `.env.supabase.local` (git-ignoré, clés locales de démo) contient `SUPABASE_URL=http://<IP LAN>:54421`, les clés anon et service, et `SMTP_HOST`/`SMTP_PORT` (Mailpit). `make dev-docker` le passe au conteneur backend en second `--env-file` (il l'emporte sur `.env` ; seuls `SUPABASE_URL` et `SMTP_HOST` sont remplacés, voir plus bas) et écrit l'URL et la clé anon dans `mobile/.env.development.local` (`EXPO_PUBLIC_SUPABASE_*`). `make dev-local`, `make backend-local` et `make perf-fixtures` exportent les mêmes valeurs avec `localhost`. Les cibles qui lancent le backend ou écrivent dans la base (`dev-docker`, `dev-local`, `backend-docker`, `backend-local`, `perf-fixtures`, `generate-types`) lancent d'abord `supabase-up` ; `expo-android` et `expo-clear` (Metro seul) reprennent les clés de `.env.supabase.local` sans démarrer la stack.
-- `make containers-restart` arrête puis relance aussi la stack (`supabase-down` puis `supabase-up`, données gardées). `make down` l'arrête aussi (données gardées) ; `make clean-docker` et `make clean` l'arrêtent et suppriment ses données.
-- Un conteneur backend ou mobile lancé dans l'autre mode (label `zumik.supabase`) est recréé par `make dev-docker`.
-- `make generate-types` applique d'abord les migrations (`supabase-up`), génère les types depuis la stack locale (sans login ni project ID), les formate avec Prettier et signale tout écart avec le fichier commité.
-- `make dev-tunnel` (#251) : un téléphone sur un autre réseau ne joint pas la stack, et le plan gratuit de ngrok n'offre qu'un endpoint, celui du backend. Lancé avec `TUNNEL_MODE=true`, `SUPABASE_MODE=local` et `NODE_ENV=development`, le backend relaie donc `/supabase/auth/v1/*` vers la stack (`src/shared/dev/supabase-auth-proxy.ts`, `node:http`, corps et réponse en flux, monté avant CORS et les parsers ; 502 `SUPABASE_UNREACHABLE` si elle est arrêtée). Seul `/auth/v1` passe : ni PostgREST, ni storage, ni Studio ne sont exposés sur le tunnel public. `make dev-tunnel` lance `supabase-up`, donne au backend les mêmes variables que `dev-docker`, et `scripts/start-expo-tunnel.sh` (mobile) écrit `EXPO_PUBLIC_SUPABASE_URL=<tunnel backend>/supabase` et la clé anon dans `mobile/.env.development.local` (jamais la clé service). `make qr-tunnel` affiche cette URL. `SUPABASE_MODE=hosted make dev-tunnel` garde le projet de `mobile/.env`.
-- Google et Facebook : `config.toml` déclare `[auth.external.google]` et `[auth.external.facebook]` avec `GOOGLE_CLIENT_ID`, `FACEBOOK_APP_ID` et `FACEBOOK_APP_SECRET` lus dans `.env`. Le flux actuel ne s'en sert pas : `oauth.service.ts` vérifie lui-même les tokens et crée les comptes via `auth.admin`. Il marche en local tant que ces variables sont renseignées (build de développement requis).
-- Chaque développeur part d'une base vide ; les données du projet hébergé ne sont pas copiées. `make supabase-reset` y met les données de démo (`supabase-dev/seed.sql`).
-- Emails : en mode local, le backend envoie ses emails (code de vérification, reset du mot de passe) au Mailpit de la stack au lieu de Gmail, sans identifiants. Ils s'affichent sur http://localhost:54424 ; rien ne part vers de vraies adresses. `GMAIL_USER` reste l'expéditeur affiché. En mode hosted, `SMTP_HOST` n'est pas défini et Gmail sert.
-- Sécurité : la stack écoute sur toutes les interfaces (54421 pour l'API, 54422 pour Postgres, 54423 pour Studio, 54424 et 54425 pour Mailpit), car le téléphone la joint par l'IP LAN et la CLI Supabase (2.119) ne permet pas de choisir l'adresse d'écoute. Le login Postgres `postgres`/`postgres` et la clé service-role de démo sont publics : n'importe qui sur le même réseau peut lire et modifier la base, et lire les codes reçus dans Mailpit. Elle ne doit contenir que des données de dev locales.
-- `make dev-docker` donne au conteneur backend `SUPABASE_URL=http://host.docker.internal:54421` et `SMTP_HOST=host.docker.internal` (passerelle de l'hôte), qui reste valide quand l'IP LAN change ; le fichier mobile garde l'IP LAN.
+- Script: `scripts/dev-db.sh`; CLI config: `supabase-dev/supabase/config.toml` (a workdir separate from `supabase/`, which serves the `music-room-test` test stack).
+- Storage (profile pictures, #351): a dev stack started before Storage was added runs without `storage-api`, which `make supabase-up` does not start on a stack already running. Once after this update, run `make supabase-down` then `make supabase-up`; otherwise uploads fail and migration 027 may fail. On the hosted project, Storage must be enabled before applying `027_avatars_bucket.sql`.
+- Ports 544xx: API `http://127.0.0.1:54421`, Postgres `127.0.0.1:54422`, Studio (dashboard) `http://127.0.0.1:54423`, Mailpit `http://127.0.0.1:54424` (web UI) and `54425` (SMTP). The test stack (554xx) and `make test-int` do not touch them.
+- Migrations are tracked in `zumik_dev.applied_migrations` (outside `public`): each file runs in a transaction with its tracking row; a failing file is named and nothing of it remains. No `db reset` in `supabase-up`.
+- `.env.supabase.local` (git-ignored, local demo keys) contains `SUPABASE_URL=http://<LAN IP>:54421`, the anon and service keys, and `SMTP_HOST`/`SMTP_PORT` (Mailpit). `make dev-docker` passes it to the backend container as a second `--env-file` (it overrides `.env`; only `SUPABASE_URL` and `SMTP_HOST` are replaced, see below). The mobile app receives none of it: it only talks to the backend (#376). `make dev-local`, `make backend-local` and `make perf-fixtures` export the same values with `localhost`. The targets that start the backend or write to the database (`dev-docker`, `dev-local`, `backend-docker`, `backend-local`, `perf-fixtures`, `generate-types`) run `supabase-up` first. `expo-android` and `expo-clear` (Metro only) do not start the stack.
+- `make containers-restart` also stops and restarts the stack (`supabase-down` then `supabase-up`, data kept). `make down` stops it too (data kept); `make clean-docker` and `make clean` stop it and delete its data.
+- A backend container started in the other mode (label `zumik.supabase`) is recreated by `make dev-docker`.
+- `make generate-types` applies the migrations first (`supabase-up`), generates the types from the local stack (no login or project ID), formats them with Prettier and reports any difference with the committed file.
+- `make dev-tunnel`: `supabase-up` first, then the backend with the same variables as `dev-docker`. The phone only needs the backend's tunnel: the app goes through the API for all authentication (#376), so the `/supabase/auth/v1` relay of #251 was removed.
+- Google and Facebook: `config.toml` declares `[auth.external.google]` and `[auth.external.facebook]` with `GOOGLE_CLIENT_ID`, `FACEBOOK_APP_ID` and `FACEBOOK_APP_SECRET` read from `.env`. The current flow does not use them: `oauth.service.ts` verifies the tokens itself and creates accounts through `auth.admin`. It works locally as long as these variables are set (development build required).
+- Every developer starts from an empty database; the hosted project's data is not copied. `make supabase-reset` loads the demo data (`supabase-dev/seed.sql`).
+- Emails: in local mode, the backend sends its emails (verification code, password reset) to the stack's Mailpit instead of Gmail, without credentials. They show up on http://localhost:54424; nothing goes to real addresses. `GMAIL_USER` stays the displayed sender. In hosted mode, `SMTP_HOST` is not set and Gmail is used.
+- Security: the stack listens on every interface (54421 for the API, 54422 for Postgres, 54423 for Studio, 54424 and 54425 for Mailpit), because the phone reaches it through the LAN IP and the Supabase CLI (2.119) cannot choose the listening address. The Postgres login `postgres`/`postgres` and the demo service-role key are public: anyone on the same network can read and change the database, and read the codes received in Mailpit. It must only hold local dev data.
+- `make dev-docker` gives the backend container `SUPABASE_URL=http://host.docker.internal:54421` and `SMTP_HOST=host.docker.internal` (the host gateway), which stays valid when the LAN IP changes; the mobile file keeps the LAN IP.
 
-**`SUPABASE_MODE=hosted`** : le comportement d'avant, avec le projet dont l'URL et les clés sont dans `.env`. Aucune stack locale n'est lancée.
+**`SUPABASE_MODE=hosted`**: the project whose URL and keys are in `.env`. No local stack is started.
 
-1. Créez un compte sur [supabase.com](https://supabase.com) et un projet "zumik"
-2. Récupérez `SUPABASE_URL`, `SUPABASE_ANON_KEY` et `SUPABASE_SERVICE_KEY` dans Dashboard → Settings → API, et `SUPABASE_PROJECT_ID` dans l'URL du dashboard
-3. Ajoutez-les dans `.env`, puis lancez par exemple `SUPABASE_MODE=hosted make dev-docker`
+1. Create an account on [supabase.com](https://supabase.com) and a "zumik" project.
+2. Get `SUPABASE_URL`, `SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_KEY` in Dashboard → Settings → API, and `SUPABASE_PROJECT_ID` from the dashboard URL.
+3. Add them to `.env`, then run for example `SUPABASE_MODE=hosted make dev-docker`.
 
-### 3. Migrations SQL
+### 3. SQL migrations
 
-- Nouvelle migration : `make migrate-create name=<nom>` crée `migrations/NNN_<nom>.sql` avec le préfixe suivant le plus grand existant (les fichiers s'appliquent dans l'ordre de leur nom).
-- Mode local : `make supabase-up` applique les nouveaux fichiers de `migrations/`.
-- Projet hébergé : appliquez chaque nouveau fichier à la main (Dashboard → SQL Editor).
+- New migration: `make migrate-create name=<name>` creates `migrations/NNN_<name>.sql` with the prefix after the largest existing one (files are applied in name order).
+- Local mode: `make supabase-up` applies the new files of `migrations/`.
+- Hosted project: apply each new file by hand (Dashboard → SQL Editor).
 
-### 4. Lancer le serveur
+### 4. Start the server
 
 ```bash
 make dev
 ```
 
-Le serveur démarre sur `http://localhost:3000`
+The server starts on `http://localhost:3000`.
 
-## 📚 API Documentation
+## Commands
 
-Zumik provides interactive OpenAPI 3.0 documentation via Swagger UI.
+```bash
+make help          # Quick start and categories (make emulator, make docker…)
+make install       # Install the dependencies
+make dev           # Start in development mode
+make build         # Build for production
+make start         # Start in production
+make type-check    # Check the TypeScript types
+make clean         # Remove build artifacts
+```
 
-### Accessing Documentation
+`npm run check` runs every guardrail (see [quality-and-ci.md](../doc/development/quality-and-ci.md)); tests are described in [testing.md](../doc/development/testing.md).
+
+## API documentation
+
+Interactive OpenAPI 3 documentation through Swagger UI:
 
 - **Swagger UI:** http://localhost:3000/api-docs
-- **OpenAPI Spec (JSON):** http://localhost:3000/api-docs.json
+- **OpenAPI spec (JSON):** http://localhost:3000/api-docs.json
 
-### Features
+To try an endpoint: register or log in to get a token, click "Authorize" in Swagger UI, paste the token, then use "Try it out".
 
-- **45 documented endpoints** across 6 features (Auth, Playlists, Profile, SoundCloud, Friends, Music Control)
-- **Interactive testing** - Try endpoints directly from the browser
-- **Request/Response examples** for all endpoints
-- **Schema validation** with detailed parameter descriptions
-- **Authentication support** - Built-in JWT Bearer token authorization
+The document is generated from the Zod schemas with `@asteasolutions/zod-to-openapi`; nothing is written by hand in OpenAPI form:
 
-### Usage
+- Request schemas are the validators the controllers parse with (`features/<name>/<name>.validators.ts`); response schemas sit next to them (or in `<name>-responses.validators.ts` for a big feature).
+- Each `features/<name>/<name>.openapi.ts` exports `register<Name>Openapi(registry)`, which registers the routes (method, path, tags, summary, request, responses); a big feature splits them by subject (e.g. `playlist-tracks.openapi.ts`).
+- `shared/config/swagger.schemas.ts` (success envelope, body and parameter helpers) and `shared/config/swagger.errors.ts` (`ErrorResponse`, shared error responses) are the building blocks; `app/openapi.ts` calls every feature and generates the document.
 
-1. Start backend: `make dev`
-2. Open http://localhost:3000/api-docs
-3. Register or login to get JWT token
-4. Click "Authorize" button in Swagger UI
-5. Paste token: `Bearer <your_token>`
-6. Test endpoints with "Try it out"
-
-### Documentation Architecture
-
-Documentation is organized by feature with separate OpenAPI files:
-
-- `features/auth/auth.openapi.ts` - 9 auth endpoints (register, login, OAuth, providers)
-- `features/playlists/playlist.openapi.ts` - 14 playlist endpoints (CRUD, tracks, collaborators)
-- `features/profile/profile.openapi.ts` - 9 profile endpoints (update, search, privacy, music preferences)
-- `features/soundcloud/soundcloud.openapi.ts` - 4 SoundCloud endpoints (search, track details, stream)
-- `features/friends/friends.openapi.ts` - 5 friends endpoints (follow, unfollow, stats)
-- `features/music-control/music-control.openapi.ts` - 4 music control endpoints (grant/revoke permissions)
-
-All specifications are merged in `shared/config/swagger.config.ts`.
-
-### Export & Validation
+`src/app/openapi-coverage.test.ts` fails when a mounted route is not documented, or a documented one is not mounted.
 
 ```bash
-# Export OpenAPI spec to JSON file
-npm run swagger:export
-
-# Validate OpenAPI spec
-npm run swagger:validate
-
-# Serve documentation with Redoc
-npm run swagger:serve
+npm run swagger:export     # Export the OpenAPI spec to a JSON file (importable in Postman)
+npm run swagger:validate   # Validate the OpenAPI spec
+npm run swagger:serve      # Serve the documentation with Redoc
 ```
 
-### Import to Postman
-
-1. Run `npm run swagger:export`
-2. Import generated `openapi.json` in Postman
-3. All endpoints, schemas, and examples will be available
-
-**Satisfies project subject (IV.4):** ✅ API documentation with methods, inputs, outputs
-
-## 📝 Commandes disponibles
+### Quick examples
 
 ```bash
-make help          # Démarrage rapide et catégories (make emulator, make docker…)
-make install       # Installer les dépendances
-make dev           # Lancer en mode développement
-make build         # Build pour production
-make start         # Lancer en production
-make type-check    # Vérifier les types TypeScript
-make clean         # Nettoyer les artifacts
+# Register
+curl -X POST http://localhost:3000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","password":"Test1234","username":"john_doe"}'
+
+# Login
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","password":"Test1234"}'
+
+# Current user
+curl http://localhost:3000/api/auth/me \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
-## 🔴 Redis Integration
+## Endpoints
 
-Zumik utilise Redis pour le rate limiting et la protection brute force.
+Mounted in `src/app/routes.ts`, documented in Swagger (`/api-docs`):
 
-### Configuration
+| Prefix | Endpoints |
+|---|---|
+| `/api/auth` | register, login, refresh, logout, me, Google/Facebook OAuth, providers (list, link, unlink), verify-email, resend-verification, forgot-password, reset-password |
+| `/api/profile` | profile (get, patch), search, privacy, music-preferences (+ genres), avatar, another user's profile |
+| `/api/playlists` | CRUD, public, per user, tracks (add, remove, move `POST /:id/tracks/:trackId/move`), collaborators, viewers |
+| `/api/friends` | list, stats, status, follow / unfollow |
+| `/api/music-control` | permissions (list, grant, revoke), can-control, devices (list, rename), per-device licenses, controllable devices, a user's devices |
+| `/api/queue` | the caller's play queue: state, add, remove, move, play an item, play a playlist, next, previous |
+| `/api/users/:userId/queue` | the same routes on a friend's queue, for a delegate |
+| `/api/queue/transfer` | move playback to another device |
+| `/api/soundcloud` | search, track, stream |
+| `/health` | server and Redis health (no auth) |
 
-Redis se configure via les variables d'environnement dans `.env`:
+**Invalid token limit (#160)**: every protected route (`authMiddleware`) and every Socket.io handshake verifies the token with Supabase. Failures (`INVALID_TOKEN`, `TOKEN_REVOKED`) are counted per IP in Redis (`rl:auth:token:{ip}`, fixed window `RATE_LIMIT_TOKEN_WINDOW_MS`, 15 min by default). At `RATE_LIMIT_TOKEN_MAX` failures (20 by default), the IP is refused without calling Supabase until the end of the window, for any token, valid or not: every protected route then answers `429 RATE_LIMIT_EXCEEDED` (with `error.details.retryAfter`), a route with optional auth (`optionalAuthMiddleware`) goes on anonymously, and the handshake is refused with `TOO_MANY_ATTEMPTS`. Successful verifications are never counted. Same switch and same whitelist as the other limiters (`RATE_LIMIT_ENABLED`, `RATE_LIMIT_WHITELIST_IPS`); Redis not ready: the limit neither blocks nor counts, and `verifyToken` already answers 503. Each verification reserves a slot before calling Supabase (given back on success or on an uncounted failure): beyond `RATE_LIMIT_TOKEN_MAX` simultaneous verifications from one IP, the next ones get a transient 429.
+
+**Shared IP**: this limit covers every protected route and the socket, per IP. Behind a shared IP (ngrok tunnel, reverse proxy without `TRUST_PROXY`, NAT of a shared network), one client's failures block every client of that IP, protected routes and socket included, until the end of the window. Add the IP to `RATE_LIMIT_WHITELIST_IPS` or configure `TRUST_PROXY` if needed.
+
+**Client IP behind a proxy (`TRUST_PROXY`, #173)**: every per-IP limit (auth, tokens, lockout, blacklist) reads `req.ip`, and the Socket.io handshake the same IP (`clientIp`, `src/shared/config/trust-proxy.ts`). By default (`TRUST_PROXY` empty), it is the connection's address and `X-Forwarded-For` is ignored: a client cannot choose its IP. Behind a reverse proxy or a tunnel that adds `X-Forwarded-For`, set the number of proxies (`TRUST_PROXY=1`) or their addresses (`loopback`, `uniquelocal`, IPs, subnets, comma-separated), with Express's `trust proxy` syntax. Only if every request goes through that proxy: otherwise a client reaching the backend directly can forge its IP.
+
+## Redis
+
+Redis holds the rate limiting and bruteforce protection state, the token revocation list and the real-time throttles. Configuration in `.env`:
 
 ```bash
-# Connexion
-REDIS_HOST=redis          # "redis" en Docker, "localhost" en local
+# Connection
+REDIS_HOST=redis          # "redis" in Docker, "localhost" locally
 REDIS_PORT=6379
-REDIS_PASSWORD=           # Optionnel
+REDIS_PASSWORD=           # Optional
 REDIS_DB=0
 
-# Rate Limiting (express-rate-limit)
+# Rate limiting (express-rate-limit)
 RATE_LIMIT_ENABLED=true
 RATE_LIMIT_LOGIN_WINDOW_MS=900000     # 15 minutes
 RATE_LIMIT_LOGIN_MAX=5
-RATE_LIMIT_REGISTER_WINDOW_MS=3600000 # 1 heure
+RATE_LIMIT_REGISTER_WINDOW_MS=3600000 # 1 hour
 RATE_LIMIT_REGISTER_MAX=3
 RATE_LIMIT_OAUTH_WINDOW_MS=900000
 RATE_LIMIT_OAUTH_MAX=10
 RATE_LIMIT_AUTH_WINDOW_MS=900000
 RATE_LIMIT_AUTH_MAX=20
-RATE_LIMIT_TOKEN_WINDOW_MS=900000     # échecs de vérification de token par IP
+RATE_LIMIT_TOKEN_WINDOW_MS=900000     # token verification failures per IP
 RATE_LIMIT_TOKEN_MAX=20
-RATE_LIMIT_SOUNDCLOUD_WINDOW_MS=60000  # requêtes /api/soundcloud par utilisateur
+RATE_LIMIT_SOUNDCLOUD_WINDOW_MS=60000  # /api/soundcloud requests per user
 RATE_LIMIT_SOUNDCLOUD_MAX=120
 
-# Account Lockout (brute-force.service.ts)
+# Account lockout (shared/security/account-lockout.ts)
 ACCOUNT_LOCKOUT_ENABLED=true
 ACCOUNT_LOCKOUT_THRESHOLD=5
 ACCOUNT_LOCKOUT_DURATION_SOFT=900     # 15 min
-ACCOUNT_LOCKOUT_DURATION_HARD=3600    # 1 heure
-ACCOUNT_LOCKOUT_DURATION_SEVERE=86400 # 24 heures
+ACCOUNT_LOCKOUT_DURATION_HARD=3600    # 1 hour
+ACCOUNT_LOCKOUT_DURATION_SEVERE=86400 # 24 hours
 
-# IP Reputation
+# IP reputation
 IP_THROTTLE_THRESHOLD=10
 IP_BLOCK_THRESHOLD=20
 IP_BLACKLIST_THRESHOLD=50
 
-# Whitelist IP (séparées par virgules)
+# Whitelisted IPs (comma-separated)
 RATE_LIMIT_WHITELIST_IPS=
 ```
 
-**Note**: `RATE_LIMIT_FALLBACK_MEMORY` supprimée. Voir "Mode développement sans Redis" ci-dessous.
+Key files:
 
-### Architecture Redis
+- `src/shared/config/redis.ts` - Redis client (ioredis) with auto-reconnect
+- `src/shared/config/rate-limit.config.ts` - Central configuration
+- `src/shared/security/counter.ts` - The limiters' only access to Redis (fixed-window counters and flags, atomic Lua scripts)
+- `src/shared/security/http-rate-limit.ts` and `rate-limit-store.ts` - express-rate-limit middlewares and their Redis store
+- `src/shared/security/attempt-limit.ts` and `password-reset-limit.ts` - Attempt counters (verification and reset codes, resends)
+- `src/shared/security/account-lockout.ts`, `ip-reputation.ts` and `account-lockout.middleware.ts` - Account lockout and IP blacklist
+- `src/shared/security/token-verify-limit.ts` - Token verification failure limit per IP
+- `src/shared/security/socket-event-limit.ts` - Per-socket, per-event limit (in memory, per connection)
 
-#### Fichiers clés
-
-- `src/shared/config/redis.ts` - Client Redis (ioredis) avec auto-reconnect
-- `src/shared/config/rate-limit.config.ts` - Configuration centralisée
-- `src/features/auth/middleware/rate-limit.middleware.ts` - Middlewares rate limiting
-- `src/features/auth/middleware/account-lockout.middleware.ts` - Vérification lockout
-- `src/features/auth/utils/token-verify-limiter.ts` - Limite des échecs de vérification de token par IP
-- `src/features/auth/services/brute-force.service.ts` - Logique métier protection
-
-#### Clés Redis utilisées
-
-**Rate Limiting:**
-
-```
-rl:auth:login:{email}:{ip}       # Compteur login
-rl:auth:register:{ip}            # Compteur register
-rl:auth:oauth:{provider}:{ip}    # Compteur OAuth
-rl:auth:global:{ip}              # Compteur global
-rl:auth:token:{ip}               # Échecs de vérification de token (TTL = fenêtre)
-```
-
-**Brute Force Protection:**
-
-```
-failed_login:{email}:{ip}        # Compteur échecs (TTL 15min)
-account_locked:{email}:{ip}      # Verrouillage (TTL dynamique)
-ip_failed_logins:{ip}            # Compteur échecs IP (TTL 15min)
-ip_blacklist:{ip}                # Blacklist IP (TTL 24h)
-```
-
-### Décision d'architecture : Pas de fallback in-memory
-
-**Mode production** (Redis requis):
-- Redis indisponible → Backend log erreurs mais continue
-- Rate limiting désactivé (log ERROR)
-- Account lockout désactivé (log WARNING)
-
-**Mode développement** (Redis optionnel):
-- `RATE_LIMIT_ENABLED=false` et `ACCOUNT_LOCKOUT_ENABLED=false`
-- Toutes les protections bypassed
-- Redis non requis
-
-**Pourquoi pas de fallback ?**
-Un fallback in-memory crée des vulnérabilités en multi-instance (load balancer) car chaque instance a son propre état. Redis-only garantit une protection cohérente.
-
-**Mode développement sans Redis:**
+**No in-memory fallback.** Nothing is ever counted in memory: an in-memory fallback would give each backend instance its own state behind a load balancer. Without Redis, the rate limiters and the revocation fail closed (503), while the lockout and the blacklist let requests through (the login limiter before them still fails closed). Details and the accepted risks: [threat-model.md](../doc/security/threat-model.md#m13-redis-unavailable). For local development without Redis, set `RATE_LIMIT_ENABLED=false` and `ACCOUNT_LOCKOUT_ENABLED=false` in `backend/.env`: this turns every protection off.
 
 ```bash
-# backend/.env
-RATE_LIMIT_ENABLED=false
-ACCOUNT_LOCKOUT_ENABLED=false
+make redis-start    # Start Redis
+make redis-health   # Check the connection
+make redis-shell    # Inspect the data (e.g. KEYS rl:*)
+make redis-info     # Statistics
 ```
 
-Ceci désactive **complètement** toutes les protections de sécurité pour permettre le développement local sans Redis
+Every key, threshold and command: [redis.md](../doc/architecture/redis.md).
 
-### Commandes utiles
+## Tech stack
 
-```bash
-# Démarrer Redis
-make redis-start
+- **Runtime**: Node.js 22 (`Dockerfile`, `.nvmrc`)
+- **Framework**: Express 5 + TypeScript 5
+- **Database / auth**: Supabase (PostgreSQL + Supabase Auth, JWT)
+- **Cache / rate limiting**: Redis (ioredis), no in-memory fallback
+- **Validation**: Zod 4
+- **Real time**: Socket.io 4
+- **Email**: nodemailer (Gmail SMTP; the local Supabase stack's Mailpit in dev)
 
-# Vérifier la connexion
-make redis-health
+Why these choices: [decisions.md](../doc/decisions.md).
 
-# Inspecter les données
-make redis-shell
+## Feature structure
 
-# Voir les statistiques
-make redis-info
-```
-
-Voir [doc/REDIS.md](../doc/REDIS.md) pour la documentation complète.
-
-### Testing en local
-
-Pour tester le rate limiting localement:
-
-```bash
-# 1. Démarrer Redis
-make redis-start
-
-# 2. Démarrer backend
-npm run dev
-
-# 3. Tester avec curl (6+ requêtes)
-for i in {1..6}; do
-  curl -X POST http://localhost:3000/api/auth/login \
-    -H "Content-Type: application/json" \
-    -d '{"email":"test@test.com","password":"wrong"}' \
-    -v 2>&1 | grep "HTTP/"
-done
-# La 6ème devrait retourner 429 (Rate Limit Exceeded)
-
-# 4. Inspecter Redis
-make redis-shell
-> KEYS rl:*
-> GET rl:auth:login:test@test.com:127.0.0.1
-```
-
-## 🔐 API Documentation
-
-### Interactive Swagger UI
-
-The backend exposes **45 REST endpoints** across 6 features with **interactive documentation** via Swagger UI.
-
-**Access Swagger UI**:
-
-```bash
-# 1. Start backend
-make dev-docker    # or make backend-local
-
-# 2. Open browser
-http://localhost:3000/api-docs
-```
-
-**Features**:
-
-- Interactive endpoint testing with authentication
-- Request/response schemas with examples
-- Real-time validation
-- JWT token management
-
-**Endpoints by feature**:
-
-- **Auth**: 7 endpoints (register, login, OAuth Google/Facebook, providers)
-- **Playlists**: 13 endpoints (CRUD, tracks, collaborators, viewers)
-- **Profile**: 4 endpoints (get, update, search users)
-- **Friends**: 4 endpoints (follow, unfollow, list, check status)
-- **Music Control**: 4 endpoints (grant, revoke, check permissions)
-- **SoundCloud**: 3 endpoints (search, track details, stream URLs)
-
-### Exemples rapides
-
-**Register**
-
-```bash
-curl -X POST http://localhost:3000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","password":"Test1234","username":"john_doe"}'
-```
-
-**Login**
-
-```bash
-curl -X POST http://localhost:3000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","password":"Test1234"}'
-```
-
-**Get Current User**
-
-```bash
-curl http://localhost:3000/api/auth/me \
-  -H "Authorization: Bearer YOUR_TOKEN_HERE"
-```
-
-## 🛠️ Stack Technique
-
-- **Runtime**: Node.js 20 (`Dockerfile`)
-- **Framework**: Express 4 + TypeScript 5
-- **Database / Auth**: Supabase (PostgreSQL + Supabase Auth, JWT)
-- **Cache / rate limiting**: Redis (ioredis), sans fallback in-memory
-- **Validation**: Zod
-- **Temps réel**: Socket.io 4
-- **Email**: nodemailer (Gmail SMTP ; Mailpit de la stack Supabase locale en dev)
-
-## 📂 Structure d'une Feature
-
-Chaque feature suit cette structure (pas de fichier `index.ts` : on importe directement le fichier source, via `@/features/...`, `@/shared/...` ou `@/realtime/...`, avec l'extension `.js`) :
+Each feature follows this structure (no `index.ts` file: import the source file directly, through `@/features/...`, `@/shared/...` or `@/realtime/...`, with the `.js` extension):
 
 ```
 features/<name>/
-├── services/                  # Logique métier, découpée par responsabilité (~150 lignes max par service)
-├── permissions/               # Contrôles d'autorisation (si besoin)
-├── utils/                     # Helpers et formatters
-├── middleware/                # Middleware spécifiques (si besoin)
-├── <name>.types.ts            # Types TypeScript
-├── <name>.validators.ts       # Schémas Zod
-├── <name>.controller.ts       # Handlers Express
-├── <name>.routes.ts           # Router Express
-└── <name>.openapi.ts          # Documentation Swagger des endpoints
+├── services/                  # Business logic, split by responsibility (~150 lines max per file)
+├── permissions/               # Authorization checks (when needed)
+├── utils/                     # Helpers and formatters
+├── middleware/                # Feature-specific middleware (when needed)
+├── <name>.types.ts            # TypeScript types
+├── <name>.validators.ts       # Zod schemas
+├── <name>.controller.ts       # Express handlers
+├── <name>.routes.ts           # Express router
+└── <name>.openapi.ts          # OpenAPI registration of the routes, from the Zod schemas
 ```
 
-Ajouter une feature : types → validators → service → controller → routes → openapi, puis monter le router dans `src/shared/config/routes.ts`.
+Adding a feature: types → validators → service → controller → routes → openapi, then mount the router in `src/app/routes.ts` and call its `register<Name>Openapi` in `src/app/openapi.ts`.
 
-## 🗄️ Base de données
+## Database
 
-Tables Supabase utilisées par le backend :
+Supabase tables used by the backend (schema in `migrations/`):
 
-- `user_profiles` : profil (username, display_name, avatar_url, bio, google_id, facebook_id)
-- `profile_privacy` : visibilité par champ du profil (email, bio, avatar, préférences musicales) : `public`, `friends_only` ou `private`
-- `music_preferences` : genres préférés (5 max)
-- `playlists` : métadonnées (owner_id, visibility `public` / `private`, edit_mode `open` / `restricted`)
-- `playlist_tracks` : tracks d'une playlist (position, added_by)
-- `tracks` : données universelles d'un morceau ; `track_uri` contient le permalink SoundCloud
-- `follows` : relations de follow, avec `can_control_music` pour la délégation
+- `user_profiles`: profile (username, display_name, avatar_url, bio, google_id, facebook_id)
+- `profile_privacy`: per-field profile visibility (email, bio, avatar, music preferences): `public`, `friends_only` or `private`
+- `music_preferences`: favorite genres (5 max)
+- `playlists`: metadata (owner_id, visibility `public` / `private`, edit_mode `open` / `restricted`, `tracks_version`)
+- `playlist_tracks`: a playlist's tracks (fractional `rank`, `added_by`, `moved_at_version`; see [playlist-concurrency.md](../doc/features/playlist-concurrency.md))
+- `tracks`: universal track data; `track_uri` holds the SoundCloud permalink
+- `follows`: follow relations, with `can_control_music` (the "all my devices" switch) for delegation
+- `devices`, `device_control_licenses`: a user's devices and the per-device control licenses
+- `play_queues`, `play_queue_items`: each user's play queue (versioned; see [queue-and-connect.md](../doc/features/queue-and-connect.md))
 
-## 🛣️ Endpoints
+## Real time (Socket.io)
 
-Montés dans `src/shared/config/routes.ts`, documentés dans Swagger (`/api-docs`) :
+Server: `src/realtime/socket-server.ts` (creation, origin, auth, per-event limit), one handler per domain in `src/realtime/handlers/` (`playlist`, `listening`, `control`). Features emit through `src/realtime/emitters/` (`playlist`, `queue`, `control`), imported as namespaces: `import * as realtime from '@/realtime/emitters/queue.emitters.js'`.
 
-| Préfixe | Endpoints |
-|---|---|
-| `/api/auth` | register, login, refresh, logout, me, OAuth google/facebook, providers (liste, unlink), verify-email, resend-verification, forgot-password, reset-password |
-| `/api/profile` | profil (get, patch), search, privacy, music-preferences (+ genres), profil d'un autre user |
-| `/api/playlists` | CRUD, publiques, par user, tracks (ajout, retrait, move `POST /:id/tracks/:trackId/move`), collaborateurs, viewers |
-| `/api/friends` | liste, stats, statut, follow / unfollow |
-| `/api/music-control` | permissions (liste, grant, revoke), can-control |
-| `/api/soundcloud` | search, track, stream |
-| `/health` | santé du serveur et de Redis (sans auth) |
+### Handshake authentication
 
-**Limite des tokens invalides (#160)** : chaque route protégée (`authMiddleware`) et chaque handshake Socket.io vérifie le token auprès de Supabase. Les échecs (`INVALID_TOKEN`, `TOKEN_REVOKED`) sont comptés par IP dans Redis (`rl:auth:token:{ip}`, fenêtre fixe `RATE_LIMIT_TOKEN_WINDOW_MS`, 15 min par défaut). À `RATE_LIMIT_TOKEN_MAX` échecs (20 par défaut), l'IP est refusée sans appel à Supabase jusqu'à la fin de la fenêtre, pour tout token, valide ou non : toute route protégée répond alors `429 RATE_LIMIT_EXCEEDED` (avec `retryAfter`), une route à auth optionnelle (`optionalAuthMiddleware`) continue en anonyme, et le handshake est refusé avec `TOO_MANY_ATTEMPTS`. Les vérifications réussies ne sont jamais comptées. Même interrupteur et même whitelist que les autres limiteurs (`RATE_LIMIT_ENABLED`, `RATE_LIMIT_WHITELIST_IPS`) ; Redis non prêt : la limite ne bloque ni ne compte, et `verifyToken` répond déjà 503. Chaque vérification réserve un créneau avant d'appeler Supabase (rendu en cas de succès ou d'échec non compté) : au-delà de `RATE_LIMIT_TOKEN_MAX` vérifications simultanées depuis une IP, les suivantes reçoivent un 429 passager.
+Every connection is authenticated at the handshake by `src/realtime/socket-auth.ts` (an `io.use` middleware). The client passes six required strings in `io(url, { auth: { ... } })`:
 
-**IP partagée** : cette limite couvre toutes les routes protégées et la socket, par IP. Derrière une IP partagée (tunnel ngrok, reverse proxy sans `TRUST_PROXY`, NAT d'un réseau commun), les échecs d'un seul client bloquent tous les clients de cette IP, routes protégées et socket comprises, jusqu'à la fin de la fenêtre. Ajouter l'IP à `RATE_LIMIT_WHITELIST_IPS` ou configurer `TRUST_PROXY` si besoin.
-
-**IP du client derrière un proxy (`TRUST_PROXY`, #173)** : toutes les limites par IP (auth, tokens, verrouillage, liste noire) lisent `req.ip`, et le handshake Socket.io la même IP (`clientIp`, `src/shared/config/trust-proxy.ts`). Par défaut (`TRUST_PROXY` vide), c'est l'adresse de la connexion et `X-Forwarded-For` est ignoré : un client ne peut pas choisir son IP. Derrière un reverse proxy ou un tunnel qui ajoute `X-Forwarded-For`, mettre le nombre de proxies (`TRUST_PROXY=1`) ou leurs adresses (`loopback`, `uniquelocal`, IP, sous-réseaux, séparés par des virgules), avec la syntaxe de `trust proxy` d'Express. Seulement si toutes les requêtes passent par ce proxy : sinon un client joignant le backend en direct peut forger son IP.
-
-## ⚡ Temps réel (Socket.io)
-
-Serveur : `src/realtime/index.ts`.
-
-### Authentification du handshake
-
-Toute connexion est authentifiée au handshake par `src/realtime/socket-auth.ts` (middleware `io.use`), qui documente le contrat. Le client passe dans `io(url, { auth: { ... } })` six chaînes obligatoires :
-
-| Champ | Contenu |
+| Field | Content |
 | --- | --- |
-| `token` | access token Supabase (JWT), vérifié par `SessionService.verifyToken` |
-| `deviceId` | identifiant stable de l'appareil (1 à 128 caractères) |
-| `deviceName` | nom de l'appareil |
-| `platform` | plateforme (`ios`, `android`, ...) |
-| `model` | modèle de l'appareil |
-| `appVersion` | version de l'app |
+| `token` | Supabase access token (JWT), verified by `verifyToken` (`services/session.service.ts`) |
+| `deviceId` | stable device identifier (1 to 128 characters) |
+| `deviceName` | device name |
+| `platform` | platform (`ios`, `android`, ...) |
+| `model` | device model |
+| `appVersion` | app version |
 
-Refus : `connect_error` dont le `message` vaut `NO_TOKEN` (pas de `token`), `INVALID_HANDSHAKE` (champ manquant ou pas une chaîne), `INVALID_TOKEN` (token invalide ou expiré), `TOO_MANY_ATTEMPTS` (trop d'échecs de vérification de token depuis cette IP, voir la limite des tokens invalides ci-dessus ; rafraîchir le token n'y change rien) ou `DEVICE_REGISTRATION_FAILED` (l'appareil n'a pas pu être enregistré ; Socket.io ne relance pas un refus, c'est le client qui réessaie). Accepté : l'appareil est enregistré dans `devices` avant l'acceptation (une ligne par utilisateur et `deviceId`, `last_seen_at` rafraîchi) et `socket.data` contient `{ userId, email, device, appVersion }`, l'identité venant uniquement du token ; l'appareil est enregistré pour le contrôle et la socket rejoint `user:<id>`. Le token n'est vérifié qu'à la connexion. `listening:update` prend l'appareil du handshake, jamais celui du payload.
+Refusal: a `connect_error` whose `message` is `NO_TOKEN` (no `token`), `INVALID_HANDSHAKE` (missing field or not a string), `INVALID_TOKEN` (invalid or expired token), `TOO_MANY_ATTEMPTS` (too many token verification failures from this IP, see the invalid token limit above; refreshing the token does not help) or `DEVICE_REGISTRATION_FAILED` (the device could not be registered; Socket.io does not retry a refusal, the client does). Accepted: the device is registered in `devices` before acceptance (one row per user and `deviceId`, `last_seen_at` refreshed) and `socket.data` contains `{ userId, email, device, appVersion }`, identity coming from the token only; the device is registered for control and the socket joins `user:<id>`. The token is only checked at connection time. `listening:update` takes the device from the handshake, never from the payload.
 
 ### Events
 
-- **Client → serveur** : `playlist:join`, `playlist:leave`, `listening:subscribe`, `listening:unsubscribe`, `listening:update`, `control:action`
-- **Serveur → client** : `playlist:updated`, `playlist:details`, `playlist:deleted`, `playlist:error`, `listening:status`, `listening:error`, `permission:changed`, `control:command`, `control:success`, `control:error`, `control:revoked`, `queue:updated`
+- **Client → server**: `playlist:join`, `playlist:leave`, `listening:subscribe`, `listening:unsubscribe`, `listening:update`, `control:action`
+- **Server → client**: `playlist:updated`, `playlist:details`, `playlist:deleted`, `playlist:error`, `listening:status`, `listening:error`, `permission:changed`, `control:command`, `control:success`, `control:error`, `control:revoked`, `queue:updated`
 
-Les clients d'une playlist rejoignent la room `playlist:<id>` et reçoivent `playlist:updated` à chaque modification.
+A playlist's clients join the `playlist:<id>` room and receive `playlist:updated` on every change.
 
-- `playlist:details` `{ playlistId, name, description?, visibility, editMode }` : envoyé à `playlist:<id>` après chaque `PATCH /api/playlists/:id` réussi (nom, description, visibilité ou mode d'édition), avant la revérification des accès. N'a pas de version : le dernier reçu remplace les métadonnées affichées. Ne touche pas aux morceaux ni à `tracksVersion`.
-- `playlist:deleted` `{ playlistId }` : envoyé à `playlist:<id>` après la suppression de la playlist par son propriétaire, avant que ses sockets ne soient retirées de la room (elles reçoivent ensuite `playlist:error` `PLAYLIST_NOT_FOUND`).
+- `playlist:details` `{ playlistId, name, description?, visibility, editMode }`: sent to `playlist:<id>` after each successful `PATCH /api/playlists/:id` (name, description, visibility or edit mode), before access is re-checked. It has no version: the last one received replaces the displayed metadata. It does not touch the tracks nor `tracksVersion`.
+- `playlist:deleted` `{ playlistId }`: sent to `playlist:<id>` after the owner deletes the playlist, before its sockets are removed from the room (they then receive `playlist:error` `PLAYLIST_NOT_FOUND`).
 
-`playlist:join <id>` n'ajoute la socket à la room que si son utilisateur (`socket.data.userId`) peut voir la playlist (`canViewPlaylist` : publique, ou propriétaire / viewer / collaborateur), contrôle fait dans `src/realtime/playlist-room.ts`. Sinon la socket reçoit `playlist:error` `{ playlistId, code, message }` :
+`playlist:join <id>` only adds the socket to the room if its user (`socket.data.userId`) can see the playlist (`canViewPlaylist`: public, or owner / viewer / collaborator), checked in `src/realtime/playlist-room.ts`. Otherwise the socket receives `playlist:error` `{ playlistId, code, message }`:
 
-| `code` | Cas |
+| `code` | Case |
 | --- | --- |
-| `INVALID_PAYLOAD` | l'id n'est pas une chaîne UUID (`playlistId` vaut `null` si ce n'est pas une chaîne) |
-| `PLAYLIST_NOT_FOUND` | playlist inconnue (ou lecture en base échouée), ou supprimée pendant que la socket était dans la room |
-| `PLAYLIST_ACCESS_DENIED` | l'utilisateur ne peut pas voir la playlist, ou a perdu l'accès |
-| `RATE_LIMITED` | trop de `playlist:join` / `playlist:leave` sur cette socket (voir Débit ci-dessous ; `playlistId` vaut `null`) |
+| `INVALID_PAYLOAD` | the id is not a UUID string (`playlistId` is `null` if it is not a string) |
+| `PLAYLIST_NOT_FOUND` | unknown playlist (or failed database read), or deleted while the socket was in the room |
+| `PLAYLIST_ACCESS_DENIED` | the user cannot see the playlist, or lost access |
+| `RATE_LIMITED` | too many `playlist:join` / `playlist:leave` on this socket (see Rate below; `playlistId` is `null`) |
 
-L'accès est revérifié quand il peut se perdre : après le retrait d'un viewer ou d'un collaborateur, une mise à jour de la playlist (visibilité) ou sa suppression, les sockets de `playlist:<id>` sans accès quittent la room et reçoivent `playlist:error`. Un échec de cette revérification est seulement loggé.
+Access is re-checked when it can be lost: after a viewer or collaborator is removed, after a playlist update (visibility) or its deletion, the sockets of `playlist:<id>` without access leave the room and receive `playlist:error`. A failure of this re-check is only logged.
 
-#### Écoute et contrôle
+#### Listening and control
 
-`listening:subscribe <ownerId>` et `control:action` ne passent que si l'utilisateur de la socket et le propriétaire sont amis mutuels et que le propriétaire lui a ouvert l'interrupteur « tous mes appareils » (`follows.can_control_music`) ou une licence sur l'appareil (`device_control_licenses`) : sur l'appareil ciblé pour `control:action`, sur au moins un appareil pour `listening:subscribe`, qui montre alors le statut de tous les appareils du propriétaire (règle dans `features/music-control/services/control-access.service.ts` ; une erreur de base refuse). L'identité vient toujours de la socket : les champs en trop du payload (`fromUserId`, `controllerId`...) sont ignorés et `control:command.fromUserId` est l'utilisateur de la socket. Le propriétaire est aussi autorisé sur ses propres appareils (`listening:subscribe` sur soi-même, `control:action` vers l'un d'eux), sans interrupteur ni licence. Payloads validés par Zod dans `src/realtime/music-control-access.ts`, avant toute lecture en base :
+`listening:subscribe <ownerId>` and `control:action` only pass if the socket's user and the owner are mutual friends and the owner has turned on the "all my devices" switch for them (`follows.can_control_music`) or granted a license on the device (`device_control_licenses`): on the targeted device for `control:action`, on at least one device for `listening:subscribe`, which then shows the status of all the owner's devices (rule in `features/music-control/services/control-access.service.ts`; a database error refuses). Identity always comes from the socket: extra payload fields (`fromUserId`, `controllerId`...) are ignored and `control:command.fromUserId` is the socket's user. The owner is also allowed on their own devices (`listening:subscribe` on themselves, `control:action` to one of them), without switch or license. Payloads are validated by Zod in `src/realtime/music-control-access.ts`, before any database read:
 
-| Event | Payload | Erreur |
+| Event | Payload | Error |
 | --- | --- | --- |
-| `listening:subscribe` | id utilisateur (UUID) | `listening:error` |
-| `listening:unsubscribe` | id utilisateur (UUID) | aucune pour un payload invalide (ignoré) ; `listening:error` `RATE_LIMITED` au-delà du débit |
+| `listening:subscribe` | user id (UUID) | `listening:error` |
+| `listening:unsubscribe` | user id (UUID) | none for an invalid payload (ignored); `listening:error` `RATE_LIMITED` past the rate |
 | `listening:update` | `{ track: { id: number, title: string (≤ 300), artist: string (≤ 300), artworkUrl: string (≤ 2048) \| null } \| null, isPlaying: boolean }` | `listening:error` |
 | `control:action` | `{ targetUserId: UUID, targetDeviceId: string (1-128), action: 'play' \| 'pause' }` | `control:error` |
 
-Les erreurs ont la forme `{ message, code }` : `INVALID_PAYLOAD` (payload invalide), `NOT_AUTHORIZED` (pas le droit de contrôle), `DEVICE_OFFLINE` (`control:action` vers un appareil non connecté), `RATE_LIMITED` (débit dépassé).
+Errors have the shape `{ message, code }`: `INVALID_PAYLOAD` (invalid payload), `NOT_AUTHORIZED` (no control right), `DEVICE_OFFLINE` (`control:action` to a device that is not connected), `RATE_LIMITED` (rate exceeded).
 
-**Débit (#204)** : chaque socket a un compteur par événement, en mémoire, sur une fenêtre fixe de 10 s : 20 `listening:update` ou `control:action`, 30 pour chacun des autres événements de l'app, un compteur commun pour tout autre nom (`src/realtime/event-rate-limit.ts`). Au-delà, l'événement n'est pas traité et la socket reçoit `RATE_LIMITED` sur `listening:error`, `playlist:error` ou `control:error` selon l'événement. Le compteur est par socket : une autre connexion du même utilisateur a le sien.
+**Rate (#204)**: each socket has an in-memory counter per event, over a fixed 10 s window: 20 `listening:update` or `control:action`, 30 for each of the app's other events, one shared counter for any other name (`src/shared/security/socket-event-limit.ts`). Beyond that, the event is not handled and the socket receives `RATE_LIMITED` on `listening:error`, `playlist:error` or `control:error` depending on the event. The counter is per socket: another connection of the same user has its own.
 
-**File de lecture (#294).** `queue:updated` (la file entière) part vers `user:<id>` et `listening:<id>` du propriétaire : ses appareils et les délégués qui l'écoutent reçoivent le même état (une seule émission, une socket dans les deux rooms le reçoit une fois). Les amis qui contrôlent au moins un appareil du propriétaire gèrent sa file par les routes `/api/users/:userId/queue/...` (les mêmes que `/api/queue/...`, voir Swagger) ; une action qui change ce qui joue (jouer un morceau, suivant, précédent, jouer une playlist) cible un appareil (`deviceId`, obligatoire pour un délégué, qui doit le contrôler et qu'il faut en ligne, sinon rien ne change). Le serveur envoie alors à cet appareil `control:command` `{ action: 'play-item', fromUserId, item, positionMs, version }`. Quand un contrôleur perd son dernier appareil contrôlable, ses sockets reçoivent `control:revoked` `{ ownerId }`.
+**Play queue (#294).** `queue:updated` (the whole queue) goes to the owner's `user:<id>` and `listening:<id>`: their devices and the delegates listening to them receive the same state (a single emission; a socket in both rooms receives it once). Friends who control at least one of the owner's devices manage the queue through the `/api/users/:userId/queue/...` routes (the same as `/api/queue/...`, see Swagger); an action that changes what plays (play a track, next, previous, play a playlist) targets a device (`deviceId`, required for a delegate, who must control it, and it must be online, otherwise nothing changes). The server then sends that device `control:command` `{ action: 'play-item', fromUserId, item, positionMs, version }`. When a controller loses their last controllable device, their sockets receive `control:revoked` `{ ownerId }`.
 
-**Transfert de lecture (#295).** `listening:update` accepte un `positionMs` optionnel (entier ≥ 0, sinon le statut porte `positionMs: null`). `POST /api/queue/transfer` (pas de version sous `/api/users/:userId/queue`) déplace la lecture vers un appareil de l'appelant ou d'un ami : `{ targetUserId, targetDeviceId, positionMs, playing: { queueItemId } ou { track }, source? }`. Avant toute modification, le serveur vérifie la licence et la présence en ligne de la cible (`403` ou `409 DEVICE_OFFLINE`), le contrôle de `source` (`403`) et que l'item est dans la file de l'appelant (`404`). Vers un ami, le morceau et ce qui le suit sont insérés en bloc après son morceau courant (`queue:updated`). La cible reçoit `control:command` `play-item` ou, pour un morceau hors file, `play-track` `{ action, fromUserId, track, positionMs }` ; `source` reçoit ensuite `pause` `{ action, fromUserId }`. La réponse est `{ ownerId, deviceId, queue }`, `queue` valant la nouvelle file de l'ami ou `null`.
+**Playback transfer (#295).** `listening:update` accepts an optional `positionMs` (integer ≥ 0, otherwise the status carries `positionMs: null`). `POST /api/queue/transfer` (no version under `/api/users/:userId/queue`) moves playback to a device of the caller or of a friend: `{ targetUserId, targetDeviceId, positionMs, playing: { queueItemId } or { track }, source? }`. Before any change, the server checks the target's license and online presence (`403` or `409 DEVICE_OFFLINE`), control of `source` (`403`) and that the item is in the caller's queue (`404`). To a friend, the track and what follows it are inserted as a block after their current track (`queue:updated`). The target receives `control:command` `play-item` or, for a track outside the queue, `play-track` `{ action, fromUserId, track, positionMs }`; `source` then receives `pause` `{ action, fromUserId }`. The response is `{ ownerId, deviceId, queue }`, `queue` being the friend's new queue or `null`.
 
-`GET /api/music-control/controllable-devices` liste les appareils où l'appelant peut jouer : les siens d'abord (`isSelf`), puis ceux des amis mutuels qui l'autorisent (interrupteur ou licence), triés par `username`, chacun avec `online` ; un ami sans appareil autorisé et un non-ami n'apparaissent jamais.
+`GET /api/music-control/controllable-devices` lists the devices where the caller can play: their own first (`isSelf`), then those of mutual friends who allow them (switch or license), sorted by `username`, each with `online`; a friend without an allowed device and a non-friend never appear.
 
-Le contrôleur reçoit `permission:changed` (`{ ownerId, targetUserId, canControl }`) quand l'interrupteur change (`grantControl` / `revokeControl`) et quand une licence d'appareil lui est accordée ou retirée ; pour une licence, `canControl` dit s'il lui reste au moins un appareil contrôlable, et l'app recharge alors sa liste d'appareils contrôlables.
+The controller receives `permission:changed` (`{ ownerId, targetUserId, canControl }`) when the switch changes (`grantControl` / `revokeControl`) and when a device license is granted or withdrawn; for a license, `canControl` says whether at least one controllable device remains, and the app then reloads its list of controllable devices.
 
-Quand l'accès peut se perdre, il est revérifié : après le retrait de l'interrupteur, le retrait d'une licence, ou un `unfollowUser` dans un sens ou dans l'autre. Les sockets du contrôleur ne quittent `listening:<ownerId>`, et ne reçoivent plus `listening:status`, que s'il ne lui reste aucun appareil contrôlable. Un échec de cette éviction est seulement loggé et ne fait jamais échouer la requête HTTP.
+When access can be lost, it is re-checked: after the switch is turned off, a license is withdrawn, or an `unfollowUser` in either direction. The controller's sockets only leave `listening:<ownerId>`, and stop receiving `listening:status`, when no controllable device remains. A failure of this eviction is only logged and never fails the HTTP request.
 
-## 🎵 SoundCloud
+## SoundCloud
 
-- Cache des résultats : recherche et détails de track 1 h, URLs de stream 30 min (`features/soundcloud/utils/soundcloud-cache.ts`)
-- Seuls les morceaux lisibles en streaming sont renvoyés
-- L'URL de stream est récupérée à la demande et expire : ne jamais la stocker en base
-- Routes authentifiées (`authMiddleware`) et limitées par utilisateur dans Redis (`rl:soundcloud:`, 120 requêtes par minute par défaut, `RATE_LIMIT_SOUNDCLOUD_MAX` / `RATE_LIMIT_SOUNDCLOUD_WINDOW_MS`) : `429 RATE_LIMIT_EXCEEDED` au-delà, `503` sans Redis (`REVOCATION_UNAVAILABLE` de l'auth, qui passe en premier) (#208)
-- `track/:urlOrId` accepte un id numérique ou une URL https sur `soundcloud.com`, `www.soundcloud.com`, `m.soundcloud.com` ou `on.soundcloud.com` ; `stream` n'accepte qu'une telle URL : sinon `400 VALIDATION_ERROR`, sans appel à SoundCloud
+- Result cache: search and track details 1 h, stream URLs 30 min (`features/soundcloud/utils/soundcloud-cache.ts`).
+- Only tracks that can be streamed are returned.
+- The stream URL is fetched on demand and expires: never store it in the database.
+- Routes authenticated (`authMiddleware`) and rate-limited per user in Redis (`rl:soundcloud:`, 120 requests per minute by default, `RATE_LIMIT_SOUNDCLOUD_MAX` / `RATE_LIMIT_SOUNDCLOUD_WINDOW_MS`): `429 RATE_LIMIT_EXCEEDED` beyond, `503` without Redis (`REVOCATION_UNAVAILABLE` from auth, which runs first) (#208).
+- `track/:urlOrId` accepts a numeric id or an https URL on `soundcloud.com`, `www.soundcloud.com`, `m.soundcloud.com` or `on.soundcloud.com`; `stream` only accepts such a URL: otherwise `400 VALIDATION_ERROR`, without calling SoundCloud.
 
-## 🔄 Prochaines étapes
+## Remaining work
 
-Le reste à faire est suivi dans les GitHub Issues du repo (epics et stories BMAD).
-
-## 📖 Documentation
-
-- [Supabase Docs](https://supabase.com/docs)
-- [Express.js](https://expressjs.com/)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Zod](https://zod.dev/)
+Tracked in the repository's GitHub Issues.

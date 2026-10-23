@@ -1,7 +1,6 @@
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 
-// Unit tests only (see doc/TESTING.md): no external service, no secret.
 export default defineConfig({
 	resolve: {
 		alias: {
@@ -14,5 +13,11 @@ export default defineConfig({
 		exclude: ['src/**/*.int.test.ts', 'node_modules/**', 'dist/**'],
 		setupFiles: ['src/test/setup-env.ts'],
 		restoreMocks: true,
+		// Coverage counts every source file, not only those a test imports.
+		coverage: {
+			provider: 'v8',
+			include: ['src/**/*.ts'],
+			exclude: ['src/**/*.test.ts', 'src/test/**', 'src/shared/types/supabase.generated.ts'],
+		},
 	},
 });

@@ -2,31 +2,12 @@ import type { NextFunction, Request, Response } from 'express';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { authMiddleware } from '@/features/auth/auth.middleware.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
-import { TokenVerifyLimitError } from '@/features/auth/utils/token-verify-limiter.js';
+import { TokenVerifyLimitError } from '@/shared/security/token-verify-limit.js';
+import { mockResponse } from '@/test/mock-response.js';
 
 const { verifyToken } = vi.hoisted(() => ({ verifyToken: vi.fn() }));
 
-vi.mock('@/features/auth/auth.service.js', () => ({
-	AuthService: class {
-		verifyToken = verifyToken;
-	},
-}));
-
-function mockResponse() {
-	const res = {
-		statusCode: 200,
-		body: undefined as unknown,
-		status(code: number) {
-			res.statusCode = code;
-			return res;
-		},
-		json(body: unknown) {
-			res.body = body;
-			return res;
-		},
-	};
-	return res;
-}
+vi.mock('@/features/auth/services/session.service.js', () => ({ verifyToken }));
 
 async function run() {
 	const req = { headers: { authorization: 'Bearer some-token' } } as unknown as Request;
@@ -83,7 +64,8 @@ describe('authMiddleware', () => {
 
 		expect(res.statusCode).toBe(429);
 		expect(res.body).toMatchObject({ success: false, error: { code: 'RATE_LIMIT_EXCEEDED' } });
-		const { retryAfter } = (res.body as { error: { retryAfter: string } }).error;
+		const { retryAfter } = (res.body as { error: { details: { retryAfter: string } } }).error
+			.details;
 		expect(new Date(retryAfter).getTime()).toBeGreaterThanOrEqual(before + 60_000);
 		expect(next).not.toHaveBeenCalled();
 	});

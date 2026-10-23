@@ -5,9 +5,8 @@ import { env } from '@/shared/config/env.js';
 import { createSignInClient, supabaseAdmin, supabaseAnon } from '@/shared/config/supabase.js';
 import type { Database } from '@/shared/types/supabase.generated.js';
 
-// The anon key ships in the app: neither it nor a signed-in user's token may
-// read or write the public tables directly through PostgREST (#201). Only the
-// backend's service key does, against the local Supabase stack.
+// The anon key ships in the app: neither it nor a user's token may read or write
+// the public tables directly through PostgREST; only the backend's service key does.
 
 const TABLES = ['user_profiles', 'follows', 'tracks', 'music_preferences', 'playlists'] as const;
 const PASSWORD = 'integration-test-password';

@@ -4,8 +4,7 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { MoveTrackInput } from '@/features/playlists/playlist.validators.js';
 
-// Calls the track operations of migration 016 and turns their errors into
-// API errors (doc/PLAYLIST_CONCURRENCY.md, "Operations").
+// Turns the errors of the migration 016 track operations into API errors.
 
 const addResultSchema = z.object({
 	rank: z.string(),
@@ -20,9 +19,9 @@ const moveResultSchema = z.object({
 	rebalanced: z.boolean(),
 });
 
-export type AddTrackRpcResult = z.infer<typeof addResultSchema>;
-export type RemoveTrackRpcResult = z.infer<typeof removeResultSchema>;
-export type MoveTrackRpcResult = z.infer<typeof moveResultSchema>;
+type AddTrackRpcResult = z.infer<typeof addResultSchema>;
+type RemoveTrackRpcResult = z.infer<typeof removeResultSchema>;
+type MoveTrackRpcResult = z.infer<typeof moveResultSchema>;
 
 type Operation = 'add' | 'remove' | 'move';
 

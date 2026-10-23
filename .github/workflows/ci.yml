@@ -58,7 +58,9 @@ jobs:
 
   test:
     name: test
-    runs-on: ubuntu-slim # 1 vCPU container runner, no Docker; 15 min cap
+    # Full VM: the mobile suite took 450-570 s on ubuntu-slim's single vCPU,
+    # at the edge of the 10 min cap (#419); check runs it in about 90 s here.
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     strategy:
       fail-fast: false
@@ -76,6 +78,33 @@ jobs:
           cache-dependency-path: ${{ matrix.package }}/package-lock.json
       - run: npm ci
       - run: npm test
+
+  # Every guardrail at once (see .agents/rules/guardrails.md). It repeats lint,
+  # type-check and test on purpose, so the jobs above keep reporting on their
+  # own. Full VM: semgrep and gitleaks run from Docker images.
+  check:
+    name: check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [backend, mobile]
+    defaults:
+      run:
+        working-directory: ${{ matrix.package }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The exception lists are compared with origin/develop.
+          fetch-depth: 0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: ${{ matrix.package }}/package-lock.json
+      - run: npm ci
+      - run: npm run check
 
   test-int:
     name: test-int
@@ -105,7 +134,7 @@ jobs:
       - if: steps.images.outputs.cache-matched-key != ''
         run: zstd -dc ~/docker-images/images.tar.zst | docker load -q
       # Local Supabase stack (Docker) with backend/migrations applied, plus a Redis
-      # container on a free port (session revocation); see doc/TESTING.md.
+      # container on a free port (session revocation); see doc/development/testing.md.
       - run: sh scripts/test-db.sh up
       - if: steps.images.outputs.cache-hit != 'true'
         run: |

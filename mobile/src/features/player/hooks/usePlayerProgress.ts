@@ -1,0 +1,31 @@
+import { useState, useEffect } from 'react';
+import { usePlayer } from '@/features/player/context/PlayerContext';
+
+interface PlayerProgress {
+	currentTime: number;
+	duration: number;
+	progress: number;
+}
+
+export function usePlayerProgress(): PlayerProgress {
+	const { player } = usePlayer();
+	const [currentTime, setCurrentTime] = useState(0);
+	const [duration, setDuration] = useState(0);
+
+	useEffect(() => {
+		if (!player) return;
+
+		const interval = setInterval(() => {
+			setCurrentTime(player.currentTime);
+			setDuration(player.duration);
+		}, 100);
+
+		return () => clearInterval(interval);
+	}, [player, player?.isLoaded, player?.playing]);
+
+	return {
+		currentTime,
+		duration,
+		progress: duration > 0 ? (currentTime / duration) * 100 : 0,
+	};
+}

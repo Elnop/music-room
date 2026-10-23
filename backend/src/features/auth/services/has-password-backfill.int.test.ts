@@ -3,11 +3,10 @@ import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { afterAll, describe, expect, it } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
-import { UserService } from '@/features/auth/services/user.service.js';
+import * as oauthUserService from '@/features/auth/services/oauth-user.service.js';
 
-// Migration 019 (#196) run again on rows as they were before #189, against the
-// local Supabase stack. scripts/test-db.sh already applied it once on an empty
-// database; it is safe to run more than once.
+// Migration 019 run again on rows from before has_password tracking, against the local Supabase stack.
+// scripts/test-db.sh already applied it once on an empty database; it is safe to rerun.
 
 // Database container started by scripts/test-db.sh (SUPABASE_PROJECT_ID there).
 const DB_CONTAINER = 'supabase_db_music-room-test';
@@ -15,7 +14,7 @@ const MIGRATION = new URL(
 	'../../../../migrations/019_oauth_has_password_backfill.sql',
 	import.meta.url
 );
-// Before the migration's cutoff (#189 merged into develop).
+// Before the migration's cutoff.
 const BEFORE_189 = '2026-09-01 00:00:00+00';
 
 const createdUserIds: string[] = [];
@@ -86,7 +85,7 @@ async function createPasswordUser(): Promise<string> {
 
 /** A Google or Facebook sign-up with has_password true. */
 async function createOAuthUser(provider: 'google' | 'facebook'): Promise<string> {
-	const { userProfile } = await UserService.createOAuthUser(
+	const { userProfile } = await oauthUserService.createOAuthUser(
 		provider,
 		`${provider}-${randomUUID()}`,
 		`int-${randomUUID()}@example.com`,
@@ -123,7 +122,7 @@ describe('migration 019: has_password backfill (#196)', () => {
 		// An email sign-up that linked Google afterwards.
 		const linked = await createPasswordUser();
 		await updateProfile(linked, { google_id: `google-${randomUUID()}` });
-		// Signed up after #189 (has_password false), then set a password by reset.
+		// Signed up after the cutoff (has_password false), then set a password by reset.
 		const resetAfter189 = await createOAuthUser('google');
 
 		psql(readFileSync(MIGRATION));

@@ -1,13 +1,11 @@
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
-import { ProfileSearchService } from '@/features/profile/services/profile-search.service.js';
+import * as profileSearchService from '@/features/profile/services/profile-search.service.js';
 
-// searchUsers against the local stack: the query is matched literally, never
-// read as PostgREST filter syntax (#236), and avatar and bio follow each found
-// profile's privacy settings for the viewer (#247).
+// searchUsers against the local stack: the query is matched literally, never read as PostgREST
+// filter syntax, and avatar and bio follow each found profile's privacy for the viewer.
 
-const service = new ProfileSearchService();
 const tag = randomUUID().slice(0, 8);
 const userIds: string[] = [];
 let targetId: string;
@@ -37,32 +35,32 @@ afterAll(async () => {
 	for (const id of userIds) await supabaseAdmin.auth.admin.deleteUser(id);
 });
 
-describe('ProfileSearchService.searchUsers (#236)', () => {
+describe('profileSearchService.searchUsers (#236)', () => {
 	it('finds users whose name contains the query', async () => {
-		const ids = (await service.searchUsers(`s${tag}`)).map(p => p.id);
+		const ids = (await profileSearchService.searchUsers(`s${tag}`)).map(p => p.id);
 		expect(ids).toEqual(expect.arrayContaining([targetId, otherId]));
 	});
 
 	it('does not let a comma add a filter condition', async () => {
-		const results = await service.searchUsers(`zzz${tag},id.eq.${otherId}`);
+		const results = await profileSearchService.searchUsers(`zzz${tag},id.eq.${otherId}`);
 		expect(results.map(p => p.id)).not.toContain(otherId);
 	});
 
 	it('answers without error for parentheses and quotes', async () => {
-		await expect(service.searchUsers(`${tag})`)).resolves.toEqual([]);
-		await expect(service.searchUsers(`${tag}"x`)).resolves.toEqual([]);
+		await expect(profileSearchService.searchUsers(`${tag})`)).resolves.toEqual([]);
+		await expect(profileSearchService.searchUsers(`${tag}"x`)).resolves.toEqual([]);
 	});
 
 	it('matches LIKE wildcards literally', async () => {
-		const ids = (await service.searchUsers(`s${tag}_50%_off`)).map(p => p.id);
+		const ids = (await profileSearchService.searchUsers(`s${tag}_50%_off`)).map(p => p.id);
 		expect(ids).toEqual([targetId]);
-		expect(await service.searchUsers(`s${tag}%plain`)).toEqual([]);
+		expect(await profileSearchService.searchUsers(`s${tag}%plain`)).toEqual([]);
 		// * is not "anything": it stands for exactly one character
-		expect(await service.searchUsers(`s${tag}*lain`)).toEqual([]);
+		expect(await profileSearchService.searchUsers(`s${tag}*lain`)).toEqual([]);
 	});
 });
 
-describe('ProfileSearchService.searchUsers privacy (#247)', () => {
+describe('profileSearchService.searchUsers privacy (#247)', () => {
 	let privateId: string;
 	let strangerId: string;
 	let friendId: string;
@@ -90,14 +88,14 @@ describe('ProfileSearchService.searchUsers privacy (#247)', () => {
 	});
 
 	it('hides a friends_only bio and a private avatar from a non-friend', async () => {
-		const [found] = await service.searchUsers(`p${tag}_target`, 20, strangerId);
+		const [found] = await profileSearchService.searchUsers(`p${tag}_target`, 20, strangerId);
 		expect(found).toMatchObject({ id: privateId });
 		expect(found.bio).toBeUndefined();
 		expect(found.avatarUrl).toBeUndefined();
 	});
 
 	it('shows the friends_only bio to a mutual friend, never the private avatar', async () => {
-		const [found] = await service.searchUsers(`p${tag}_target`, 20, friendId);
+		const [found] = await profileSearchService.searchUsers(`p${tag}_target`, 20, friendId);
 		expect(found.bio).toBe('secret bio');
 		expect(found.avatarUrl).toBeUndefined();
 	});

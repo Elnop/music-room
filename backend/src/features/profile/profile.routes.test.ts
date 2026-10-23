@@ -4,14 +4,10 @@ import express, { type NextFunction, type Request, type Response } from 'express
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import profileRoutes from '@/features/profile/profile.routes.js';
 import { errorHandler } from '@/shared/middleware/error-handler.js';
-import { MUSIC_GENRES } from '@/features/profile/profile.types.js';
+import { MUSIC_GENRES } from '@/features/profile/profile.validators.js';
 
-/**
- * Route-level tests for /api/profile. The real controller, validators and
- * services run; only the Supabase client, the auth middleware and the logger
- * are mocked. The fake client answers per table and operation, and records
- * every builder call so a test can check what was queried.
- */
+// Only Supabase, the auth middleware and the logger are mocked; the fake client
+// answers per table and operation and records every builder call.
 
 type Op = 'select' | 'update' | 'insert';
 interface FakeResult {
@@ -98,7 +94,7 @@ vi.mock('@/shared/config/supabase.js', () => {
 		auth: { admin: { getUserById: db.getUserById } },
 		storage: { from: () => ({ remove: db.remove }) },
 	};
-	return { supabase: client, supabaseAdmin: client };
+	return { supabaseAdmin: client };
 });
 
 vi.mock('@/shared/utils/logger.js', () => ({
@@ -121,10 +117,6 @@ vi.mock('@/features/auth/auth.middleware.js', () => ({
 		next();
 	},
 }));
-
-// =====================================================
-// Fixtures and helpers
-// =====================================================
 
 const ALICE = 'user-a';
 const BOB = 'user-b';
@@ -250,10 +242,6 @@ beforeEach(() => {
 		);
 });
 
-// =====================================================
-// Authentication
-// =====================================================
-
 describe('authentication', () => {
 	it.each([
 		['GET', '/'],
@@ -272,10 +260,6 @@ describe('authentication', () => {
 		expect(db.from).not.toHaveBeenCalled();
 	});
 });
-
-// =====================================================
-// GET /api/profile/:userId (privacy filtering)
-// =====================================================
 
 describe('GET /api/profile/:userId', () => {
 	it('shows every public field to a third party who is not a friend', async () => {
@@ -424,10 +408,6 @@ describe('GET /api/profile/:userId', () => {
 	});
 });
 
-// =====================================================
-// Own profile
-// =====================================================
-
 describe('GET /api/profile', () => {
 	it('returns the own profile with the auth email', async () => {
 		setResult('user_profiles', 'select', profileRow(ALICE));
@@ -473,7 +453,6 @@ describe('PATCH /api/profile', () => {
 		expect(callsOn('user_profiles', 'eq').map(c => c.args)).toContainEqual(['id', ALICE]);
 	});
 
-	// #351: no orphaned file of ours once the avatar changes through PATCH
 	it('deletes our previous stored photo when avatarUrl changes', async () => {
 		const ownName = '3f2a1b0c-aaaa-4bbb-8ccc-ddddeeeeffff.jpg';
 		const ownUrl = `http://supabase.test.invalid/storage/v1/object/public/avatars/${ALICE}/${ownName}`;
@@ -506,10 +485,6 @@ describe('PATCH /api/profile', () => {
 	});
 });
 
-// =====================================================
-// Search
-// =====================================================
-
 describe('GET /api/profile/search', () => {
 	it('excludes the requester, passes the limit and maps the rows', async () => {
 		setResult('user_profiles', 'select', [profileRow(ALICE)]);
@@ -527,7 +502,7 @@ describe('GET /api/profile/search', () => {
 		expect(callsOn('user_profiles', 'or')).toHaveLength(1);
 	});
 
-	// Avatar and bio follow the found profile's privacy settings, as on GET /:userId (#247)
+	// Avatar and bio follow the found profile's privacy settings, as on GET /:userId.
 	it.each([
 		['public', [], true],
 		['friends_only', [], false],
@@ -619,10 +594,6 @@ describe('GET /api/profile/search', () => {
 	});
 });
 
-// =====================================================
-// Privacy settings
-// =====================================================
-
 describe('GET /api/profile/privacy', () => {
 	it('returns the stored settings in camelCase', async () => {
 		setResult(
@@ -644,9 +615,7 @@ describe('GET /api/profile/privacy', () => {
 		expect(callsOn('profile_privacy', 'eq')[0]?.args).toEqual(['user_id', ALICE]);
 	});
 
-	// The controller calls getPrivacySettings(userId) without a requesterId, so a
-	// missing row is answered with the defaults and nothing is inserted (the
-	// insert branch is only reached from PUT).
+	// Without a requesterId a missing row gets the defaults; only PUT inserts.
 	it('answers the default settings when the requester has no row', async () => {
 		setResult('profile_privacy', 'select', null, { code: 'PGRST116', message: 'No rows found' });
 
@@ -711,10 +680,6 @@ describe('PUT /api/profile/privacy', () => {
 	});
 });
 
-// =====================================================
-// Music preferences
-// =====================================================
-
 describe('music preferences', () => {
 	it('GET returns the stored genres', async () => {
 		setResult('music_preferences', 'select', {
@@ -757,9 +722,127 @@ describe('music preferences', () => {
 	});
 });
 
-// =====================================================
-// Validation
-// =====================================================
+const NO_ROW = { code: 'PGRST116', message: 'No rows found' };
+const DB_DOWN = { code: '08006', message: 'connection failure' };
+
+/** The next Supabase call throws, as an unexpected client error would. */
+function throwOnNextQuery() {
+	db.from.mockImplementationOnce(() => {
+		throw new Error('client exploded');
+	});
+}
+
+describe('music preferences without a row or with a failing database', () => {
+	it('GET creates the empty preferences on first read', async () => {
+		setResult('music_preferences', 'select', null, NO_ROW);
+		setResult('music_preferences', 'insert', { user_id: ALICE, genres: [], updated_at: null });
+
+		const res = await api('GET', '/music-preferences', { user: ALICE });
+
+		expect(res.status).toBe(200);
+		expect(res.body.data).toMatchObject({ userId: ALICE, genres: [] });
+		expect(callsOn('music_preferences', 'insert')[0]?.args[0]).toEqual({
+			user_id: ALICE,
+			genres: [],
+		});
+	});
+
+	it('GET drops stored genres that are no longer known', async () => {
+		setResult('music_preferences', 'select', {
+			user_id: ALICE,
+			genres: ['rock', 'disco'],
+			updated_at: '2026-01-01T00:00:00.000Z',
+		});
+
+		const res = await api('GET', '/music-preferences', { user: ALICE });
+
+		expect(res.body.data).toMatchObject({ genres: ['rock'] });
+	});
+
+	it('PUT inserts the genres when no row exists', async () => {
+		setResult('music_preferences', 'update', null, NO_ROW);
+		setResult('music_preferences', 'insert', {
+			user_id: ALICE,
+			genres: ['pop'],
+			updated_at: '2026-01-03T00:00:00.000Z',
+		});
+
+		const res = await api('PUT', '/music-preferences', { user: ALICE, body: { genres: ['pop'] } });
+
+		expect(res.status).toBe(200);
+		expect(res.body.data).toMatchObject({ genres: ['pop'] });
+		expect(callsOn('music_preferences', 'insert')[0]?.args[0]).toEqual({
+			user_id: ALICE,
+			genres: ['pop'],
+		});
+	});
+
+	it.each([
+		['GET', 'select', 'MUSIC_PREFS_FETCH_ERROR', undefined],
+		['PUT', 'update', 'MUSIC_PREFS_UPDATE_ERROR', { genres: ['pop'] }],
+	] as const)('%s with a failing %s answers 500 %s', async (method, op, code, body) => {
+		setResult('music_preferences', op, null, DB_DOWN);
+
+		const res = await api(method, '/music-preferences', { user: ALICE, body });
+
+		expect(res.status).toBe(500);
+		expect(res.body.error?.code).toBe(code);
+	});
+
+	it('PUT answers 500 MUSIC_PREFS_CREATE_ERROR when the missing row cannot be created', async () => {
+		setResult('music_preferences', 'update', null, NO_ROW);
+		setResult('music_preferences', 'insert', null, DB_DOWN);
+
+		const res = await api('PUT', '/music-preferences', { user: ALICE, body: { genres: ['pop'] } });
+
+		expect(res.status).toBe(500);
+		expect(res.body.error?.code).toBe('MUSIC_PREFS_CREATE_ERROR');
+	});
+});
+
+describe('privacy settings with a failing database', () => {
+	it.each([
+		['GET', 'select', 'PRIVACY_FETCH_ERROR', undefined],
+		['PUT', 'update', 'PRIVACY_UPDATE_ERROR', { bioVisibility: 'private' }],
+	] as const)('%s with a failing %s answers 500 %s', async (method, op, code, body) => {
+		setResult('profile_privacy', op, null, DB_DOWN);
+
+		const res = await api(method, '/privacy', { user: ALICE, body });
+
+		expect(res.status).toBe(500);
+		expect(res.body.error?.code).toBe(code);
+	});
+
+	it('PUT answers 500 PRIVACY_CREATE_ERROR when the missing row cannot be created', async () => {
+		setResult('profile_privacy', 'update', null, NO_ROW);
+		setResult('profile_privacy', 'insert', null, DB_DOWN);
+
+		const res = await api('PUT', '/privacy', { user: ALICE, body: { bioVisibility: 'private' } });
+
+		expect(res.status).toBe(500);
+		expect(res.body.error?.code).toBe('PRIVACY_CREATE_ERROR');
+	});
+});
+
+describe("unexpected errors keep the endpoint's error code", () => {
+	it.each([
+		['GET', '/', 'PROFILE_FETCH_ERROR', undefined],
+		['PATCH', '/', 'PROFILE_UPDATE_ERROR', { bio: 'new bio' }],
+		['GET', `/${BOB}`, 'PROFILE_FETCH_ERROR', undefined],
+		['GET', '/search?q=al', 'SEARCH_ERROR', undefined],
+		['GET', '/privacy', 'PRIVACY_FETCH_ERROR', undefined],
+		['PUT', '/privacy', 'PRIVACY_UPDATE_ERROR', { bioVisibility: 'private' }],
+		['GET', '/music-preferences', 'MUSIC_PREFS_FETCH_ERROR', undefined],
+		['PUT', '/music-preferences', 'MUSIC_PREFS_UPDATE_ERROR', { genres: ['pop'] }],
+	])('%s %s answers 500 %s', async (method, path, code, body) => {
+		throwOnNextQuery();
+
+		const res = await api(method, path, { user: ALICE, body });
+
+		expect(res.status).toBe(500);
+		expect(res.body.error?.code).toBe(code);
+	});
+});
 
 describe('validation', () => {
 	it.each([
