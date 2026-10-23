@@ -39,6 +39,10 @@ jest.mock('@/features/profile/hooks/useProfileQueries', () => ({
 	useUserStats: () => ({ data: { followersCount: 0, followingCount: 0 }, refetch: jest.fn() }),
 }));
 
+jest.mock('@/shared/services/deviceService', () => ({
+	getBuildLabel: () => 'Zumik 1.0.0 (build 42 · a1b2c3d)',
+}));
+
 jest.mock('@/shared/components/theme/ThemeSelector', () => ({ ThemeSelector: () => null }));
 
 type AlertButtons = Parameters<typeof Alert.alert>[2];
@@ -100,5 +104,12 @@ describe('ProfileScreen header', () => {
 		renderHeader();
 		fireEvent.press(screen.getByRole('button', { name: 'Réglages' }));
 		expect(mockNavigate).toHaveBeenCalledWith('Settings');
+	});
+});
+
+describe('ProfileScreen build label', () => {
+	it('shows the installed build at the bottom of the profile', () => {
+		render(<ProfileOrchestrator />);
+		expect(screen.getByText('Zumik 1.0.0 (build 42 · a1b2c3d)')).toBeTruthy();
 	});
 });

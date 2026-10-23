@@ -6,6 +6,7 @@ import { useUserMusicPreferences, useUserStats } from '@/features/profile/hooks/
 import type { ProfileStackParamList } from '@/features/profile/types';
 import { usePlayerHeight } from '@/shared/services/playbackBridge';
 import { logout, useSession } from '@/shared/services/authSession';
+import { getBuildLabel } from '@/shared/services/deviceService';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { logger } from '@/shared/utils/logger';
 
@@ -76,6 +77,7 @@ export function useProfileScreen() {
 		genres: preferencesQuery.data?.genres || [],
 		isRefreshing,
 		isLoading: isLoggingOut,
+		buildLabel: getBuildLabel(),
 		handleRefresh,
 		handleEditProfile,
 		handleSettings,

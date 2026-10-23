@@ -19,6 +19,26 @@ export function getAppVersion(): string {
 }
 
 /**
+ * Label of the installed build, e.g. `Zumik 1.0.0 (build 42 · a1b2c3d)`.
+ * release-apk.yml sets the build number (the release tag's) and the short
+ * commit SHA before bundling; a local build has neither and reads `dev`.
+ */
+export function formatBuildLabel(version: string, buildNumber?: string, commit?: string): string {
+	if (!buildNumber) return `Zumik ${version} (dev)`;
+	return commit
+		? `Zumik ${version} (build ${buildNumber} · ${commit})`
+		: `Zumik ${version} (build ${buildNumber})`;
+}
+
+export function getBuildLabel(): string {
+	return formatBuildLabel(
+		getAppVersion(),
+		process.env.EXPO_PUBLIC_BUILD_NUMBER,
+		process.env.EXPO_PUBLIC_COMMIT_SHA
+	);
+}
+
+/**
  * Device information for multi-device music control
  */
 export interface DeviceInfo {

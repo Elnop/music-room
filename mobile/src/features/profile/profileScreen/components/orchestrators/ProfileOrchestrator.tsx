@@ -13,6 +13,7 @@ export function ProfileOrchestrator() {
 		genres,
 		isRefreshing,
 		isLoading,
+		buildLabel,
 		handleRefresh,
 		handleEditProfile,
 		handleSettings,
@@ -40,6 +41,7 @@ export function ProfileOrchestrator() {
 			genres={genres}
 			isRefreshing={isRefreshing}
 			isLoading={isLoading}
+			buildLabel={buildLabel}
 			onRefresh={handleRefresh}
 			onMusicPreferences={handleMusicPreferences}
 			onPrivacySettings={handlePrivacySettings}
