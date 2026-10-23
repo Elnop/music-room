@@ -3,11 +3,7 @@ import { z } from 'zod';
 import type { QueueTrack } from '@/types/queue.types';
 import { logger } from '@/shared/utils/logger';
 
-/**
- * The track the player held when the app was last used, per user (#312). Stored
- * on the device: no stream URL (they expire) and no token, only what rebuilds a
- * paused player at start-up.
- */
+/** Per user, on device: no stream URL (they expire) and no token, only what rebuilds a paused player. */
 export interface LastTrackEntry {
 	track: QueueTrack;
 	queueItemId: string | null;

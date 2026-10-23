@@ -12,7 +12,7 @@ export function useSoundCloudSearchScreen() {
 
 	const [searchQuery, setSearchQuery] = useState('');
 	const [debouncedQuery, setDebouncedQuery] = useState('');
-	// A typed query waiting for its debounce counts as loading (#307).
+	// A typed query waiting for its debounce counts as loading.
 	const [isPending, setIsPending] = useState(false);
 	const [isRefreshing, setIsRefreshing] = useState(false);
 	const [actionTrack, setActionTrack] = useState<AddQueueItemBody | null>(null);

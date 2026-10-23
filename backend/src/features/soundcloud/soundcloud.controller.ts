@@ -11,22 +11,17 @@ import { logger } from '@/shared/utils/logger.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { sendSuccess } from '@/shared/utils/send-success.js';
 
-/** GET /api/soundcloud/search?q=&limit=&offset= */
 export async function search(req: Request, res: Response) {
 	const query = soundcloudSearchSchema.parse(req.query);
 	sendSuccess(res, await searchService.searchTracks(query));
 }
 
-/** GET /api/soundcloud/track/:urlOrId */
 export async function getTrack(req: Request, res: Response) {
 	const { urlOrId } = soundcloudTrackParamsSchema.parse(req.params);
 	sendSuccess(res, await searchService.getTrack(urlOrId));
 }
 
-/**
- * GET /api/soundcloud/stream?url=<trackUrl>, and the legacy
- * /stream/:trackUrl (a URL in the path is blocked by Cloudflare's WAF).
- */
+/** Also serves the legacy /stream/:trackUrl (a URL in the path is blocked by Cloudflare's WAF). */
 export async function getStreamUrl(req: Request, res: Response) {
 	const { query, params } = soundcloudStreamRawSchema.parse({
 		query: req.query,

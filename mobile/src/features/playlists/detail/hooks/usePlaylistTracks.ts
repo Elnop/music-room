@@ -20,7 +20,7 @@ export interface PlaylistTracks {
 	canEdit: boolean;
 	/** Drag is off while a move is on its way. */
 	isMoving: boolean;
-	/** Permalink of the track playing from this playlist's queue block (#307), else null. */
+	/** Permalink of the track playing from this playlist's queue block, else null. */
 	currentUri: string | null;
 	/** The track whose quick actions are open. */
 	actionTrack: AddQueueItemBody | null;
@@ -32,7 +32,6 @@ export interface PlaylistTracks {
 	reorder: (from: number, to: number) => Promise<void>;
 }
 
-/** The tracks of an open playlist: highlight, quick actions, swipe to delete, drag to move. */
 export function usePlaylistTracks(
 	id: string,
 	playlist: PlaylistWithTracks | undefined

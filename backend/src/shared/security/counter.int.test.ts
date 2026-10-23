@@ -5,8 +5,6 @@ const { connectRedis, disconnectRedis, isRedisConnected, redisClient } =
 	await import('@/shared/config/redis.js');
 const counter = await import('@/shared/security/counter.js');
 
-// The shared counter's scripts against the test Redis (scripts/test-db.sh).
-
 const prefix = `int:counter:${randomUUID()}:`;
 
 describe('shared counter (test Redis)', () => {

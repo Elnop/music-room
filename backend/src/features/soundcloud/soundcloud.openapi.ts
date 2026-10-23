@@ -20,11 +20,7 @@ import { fail, shared } from '@/shared/config/swagger.errors.js';
 const SOUNDCLOUD_URL_RULE =
 	'an https URL on `soundcloud.com`, `www.soundcloud.com`, `m.soundcloud.com` or `on.soundcloud.com`';
 
-/**
- * Responses of every SoundCloud route: authenticated, then rate limited per
- * user (RATE_LIMIT_SOUNDCLOUD_MAX per RATE_LIMIT_SOUNDCLOUD_WINDOW_MS, default
- * 120 per minute), Redis only.
- */
+/** Every route is authenticated, then rate limited per user (default 120 per minute), Redis only. */
 const protectedResponses: RouteConfig['responses'] = {
 	401: shared('UnauthorizedError'),
 	429: fail(
@@ -61,7 +57,6 @@ const streamResponses: RouteConfig['responses'] = {
 	...protectedResponses,
 };
 
-/** Registers the /api/soundcloud routes; every one requires a bearer token. */
 export function registerSoundcloudOpenapi(registry: OpenAPIRegistry): void {
 	const common = { method: 'get' as const, tags: ['SoundCloud'], security: bearerAuth };
 	const ruled = 'Requires authentication; rate limited per user.';

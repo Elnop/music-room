@@ -3,7 +3,7 @@ import { Text, StyleSheet } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 
-/** Marks a track SoundCloud only serves as a 30-second preview (#307). */
+/** Marks a track SoundCloud only serves as a 30-second preview. */
 export function PreviewBadge() {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);

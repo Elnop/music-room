@@ -7,7 +7,7 @@ import { isFieldVisible } from '@/features/profile/permissions/field-visibility.
 import { parseGenres } from '@/features/profile/utils/music-genres.js';
 import type { FilteredProfile, UserProfileRow } from '@/features/profile/profile.types.js';
 
-/** Whether two users follow each other; false when the lookup fails. */
+/** Mutual follows; false when the lookup fails. */
 async function checkFriendship(userId1: string, userId2: string): Promise<boolean> {
 	try {
 		const { data: follows } = await supabaseAdmin
@@ -31,7 +31,6 @@ async function checkFriendship(userId1: string, userId2: string): Promise<boolea
 	}
 }
 
-/** A profile with the fields its privacy settings hide from the viewer left out. */
 export async function getFilteredProfile(
 	viewerId: string | null,
 	targetUserId: string

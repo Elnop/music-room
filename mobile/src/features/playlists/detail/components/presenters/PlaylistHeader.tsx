@@ -21,7 +21,6 @@ interface PlaylistHeaderProps {
 	onAddTrack: () => void;
 }
 
-/** The top of a playlist: cover, name, description, owner, share link and « Ajouter un titre ». */
 export function PlaylistHeader({ playlist, playButton, canEdit, onAddTrack }: PlaylistHeaderProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
 	const trackCount = playlist.tracks.length;

@@ -1,7 +1,5 @@
-// Rule: component-role-directory
-// In features, every component lives at features/<feature>/<subject>/components/(orchestrators|presenters)/,
-// or is a React provider at features/<feature>/context/.
-// See .agents/rules/components.md#component-role-directory
+// Components live in features/<feature>/<subject>/components/(orchestrators|presenters)/, React providers in
+// features/<feature>/context/. See .agents/rules/components.md#component-role-directory
 
 const FEATURES_SEGMENT = 'src/features/';
 

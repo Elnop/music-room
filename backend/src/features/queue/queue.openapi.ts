@@ -15,13 +15,8 @@ import {
 import { bearerAuth, jsonBody, nameSchemas, ok } from '@/shared/config/swagger.schemas.js';
 import { fail, shared } from '@/shared/config/swagger.errors.js';
 
-// Play queue (#273, #277): one queue per user, synced across their devices.
-// Every endpoint answers the full QueueState and sends it as `queue:updated`
-// to the owner's sockets (room `user:<id>`) and to the sockets listening to
-// them (room `listening:<id>`). Under /api/users/{userId}/queue a friend who
-// controls one of the owner's devices manages the owner's queue (#294); a
-// playback action with a `deviceId` also sends `control:command play-item` to
-// that device of the owner.
+// Every endpoint sends the new state as `queue:updated` to rooms `user:<id>` and `listening:<id>`;
+// a playback action with a `deviceId` also sends `control:command play-item` to that device.
 
 const ownerParams = z.object({
 	userId: queueOwnerParamsSchema.shape.userId.unwrap().meta({
@@ -39,7 +34,7 @@ const deviceIdRequired = fail(
 	['DEVICE_ID_REQUIRED', 'A delegate must name the device to play on']
 );
 
-/** The same operation under /api/users/{userId}/queue, for a delegate (#294). */
+/** The same operation under /api/users/{userId}/queue, for a friend who controls one of the owner's devices. */
 function delegated(route: RouteConfig): RouteConfig {
 	const own403 = route.responses[403] as ResponseConfig | undefined;
 	const params = route.request?.params as z.ZodObject | undefined;

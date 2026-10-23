@@ -28,18 +28,12 @@ if (!WEB_CLIENT_ID) {
 	logger.warn('EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID is not defined. Google login will not work.');
 }
 
-/**
- * Configures the Google Sign-In SDK; called once at app start. The web client
- * ID gives an ID token on Android and iOS alike.
- */
+/** Called once at app start; the web client ID gives an ID token on Android and iOS alike. */
 export function configureGoogleSignIn(): void {
 	GoogleSignin.configure({ webClientId: WEB_CLIENT_ID, offlineAccess: false });
 }
 
-/**
- * Native Google sign-in. Resolves the ID token (JWT) to send to the backend;
- * rejects with Error(SIGN_IN_CANCELLED) when the user cancels.
- */
+/** Rejects with Error(SIGN_IN_CANCELLED) when the user cancels. */
 export async function signInWithGoogle(): Promise<string> {
 	if (!WEB_CLIENT_ID) {
 		throw new Error(

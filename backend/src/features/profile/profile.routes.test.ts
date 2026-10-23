@@ -6,12 +6,8 @@ import profileRoutes from '@/features/profile/profile.routes.js';
 import { errorHandler } from '@/shared/middleware/error-handler.js';
 import { MUSIC_GENRES } from '@/features/profile/profile.validators.js';
 
-/**
- * Route-level tests for /api/profile. The real controller, validators and
- * services run; only the Supabase client, the auth middleware and the logger
- * are mocked. The fake client answers per table and operation, and records
- * every builder call so a test can check what was queried.
- */
+// Only Supabase, the auth middleware and the logger are mocked; the fake client
+// answers per table and operation and records every builder call.
 
 type Op = 'select' | 'update' | 'insert';
 interface FakeResult {
@@ -121,10 +117,6 @@ vi.mock('@/features/auth/auth.middleware.js', () => ({
 		next();
 	},
 }));
-
-// =====================================================
-// Fixtures and helpers
-// =====================================================
 
 const ALICE = 'user-a';
 const BOB = 'user-b';
@@ -250,10 +242,6 @@ beforeEach(() => {
 		);
 });
 
-// =====================================================
-// Authentication
-// =====================================================
-
 describe('authentication', () => {
 	it.each([
 		['GET', '/'],
@@ -272,10 +260,6 @@ describe('authentication', () => {
 		expect(db.from).not.toHaveBeenCalled();
 	});
 });
-
-// =====================================================
-// GET /api/profile/:userId (privacy filtering)
-// =====================================================
 
 describe('GET /api/profile/:userId', () => {
 	it('shows every public field to a third party who is not a friend', async () => {
@@ -424,10 +408,6 @@ describe('GET /api/profile/:userId', () => {
 	});
 });
 
-// =====================================================
-// Own profile
-// =====================================================
-
 describe('GET /api/profile', () => {
 	it('returns the own profile with the auth email', async () => {
 		setResult('user_profiles', 'select', profileRow(ALICE));
@@ -473,7 +453,6 @@ describe('PATCH /api/profile', () => {
 		expect(callsOn('user_profiles', 'eq').map(c => c.args)).toContainEqual(['id', ALICE]);
 	});
 
-	// #351: no orphaned file of ours once the avatar changes through PATCH
 	it('deletes our previous stored photo when avatarUrl changes', async () => {
 		const ownName = '3f2a1b0c-aaaa-4bbb-8ccc-ddddeeeeffff.jpg';
 		const ownUrl = `http://supabase.test.invalid/storage/v1/object/public/avatars/${ALICE}/${ownName}`;
@@ -506,10 +485,6 @@ describe('PATCH /api/profile', () => {
 	});
 });
 
-// =====================================================
-// Search
-// =====================================================
-
 describe('GET /api/profile/search', () => {
 	it('excludes the requester, passes the limit and maps the rows', async () => {
 		setResult('user_profiles', 'select', [profileRow(ALICE)]);
@@ -527,7 +502,7 @@ describe('GET /api/profile/search', () => {
 		expect(callsOn('user_profiles', 'or')).toHaveLength(1);
 	});
 
-	// Avatar and bio follow the found profile's privacy settings, as on GET /:userId (#247)
+	// Avatar and bio follow the found profile's privacy settings, as on GET /:userId.
 	it.each([
 		['public', [], true],
 		['friends_only', [], false],
@@ -619,10 +594,6 @@ describe('GET /api/profile/search', () => {
 	});
 });
 
-// =====================================================
-// Privacy settings
-// =====================================================
-
 describe('GET /api/profile/privacy', () => {
 	it('returns the stored settings in camelCase', async () => {
 		setResult(
@@ -644,9 +615,7 @@ describe('GET /api/profile/privacy', () => {
 		expect(callsOn('profile_privacy', 'eq')[0]?.args).toEqual(['user_id', ALICE]);
 	});
 
-	// The controller calls getPrivacySettings(userId) without a requesterId, so a
-	// missing row is answered with the defaults and nothing is inserted (the
-	// insert branch is only reached from PUT).
+	// Without a requesterId a missing row gets the defaults; only PUT inserts.
 	it('answers the default settings when the requester has no row', async () => {
 		setResult('profile_privacy', 'select', null, { code: 'PGRST116', message: 'No rows found' });
 
@@ -711,10 +680,6 @@ describe('PUT /api/profile/privacy', () => {
 	});
 });
 
-// =====================================================
-// Music preferences
-// =====================================================
-
 describe('music preferences', () => {
 	it('GET returns the stored genres', async () => {
 		setResult('music_preferences', 'select', {
@@ -756,10 +721,6 @@ describe('music preferences', () => {
 		expect(db.from).not.toHaveBeenCalled();
 	});
 });
-
-// =====================================================
-// Missing rows and failures
-// =====================================================
 
 const NO_ROW = { code: 'PGRST116', message: 'No rows found' };
 const DB_DOWN = { code: '08006', message: 'connection failure' };
@@ -882,10 +843,6 @@ describe("unexpected errors keep the endpoint's error code", () => {
 		expect(res.body.error?.code).toBe(code);
 	});
 });
-
-// =====================================================
-// Validation
-// =====================================================
 
 describe('validation', () => {
 	it.each([

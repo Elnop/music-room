@@ -7,17 +7,10 @@ import type { AuthenticatedRequest } from '@/shared/types/global.types.js';
 import { createRateLimitStore } from '@/shared/security/rate-limit-store.js';
 import { requestIp } from '@/shared/security/request-ip.js';
 
-/**
- * HTTP rate limiters (express-rate-limit), counted in Redis per limiter under
- * `rl:<store>:` (rate-limit-store.ts): fail closed with 503
- * RATE_LIMIT_UNAVAILABLE while Redis is down, never in memory. Past the limit:
- * 429 RATE_LIMIT_EXCEEDED with `details.retryAfter`, plus the `RateLimit-*`
- * and `Retry-After` headers. Skipped entirely when RATE_LIMIT_ENABLED=false
- * (no store used) and for the IPs of RATE_LIMIT_WHITELIST_IPS.
- */
-
+// Fail closed with 503 RATE_LIMIT_UNAVAILABLE while Redis is down, never in memory.
+// Skipped when RATE_LIMIT_ENABLED=false and for RATE_LIMIT_WHITELIST_IPS.
 interface LimiterSpec {
-	/** Store name: Redis keys are `rl:<store>:<key>`. */
+	/** Redis keys are `rl:<store>:<key>`. */
 	store: string;
 	limits: { windowMs: number; max: number };
 	key: (req: Request) => string;
@@ -27,7 +20,6 @@ interface LimiterSpec {
 	skipSuccessfulRequests?: boolean;
 }
 
-/** 429 RATE_LIMIT_EXCEEDED, with the window's reset time in `details.retryAfter`. */
 function sendRateLimited(req: Request, res: Response, message: string): void {
 	const retryAfter = new Date(req.rateLimit?.resetTime?.getTime() || 0).toISOString();
 	sendError(
@@ -82,7 +74,7 @@ const signInFields = (req: Request) => ({
 });
 const perUserFields = (req: Request) => ({ endpoint: req.path, userId: userIdOf(req), ip: req.ip });
 
-/** Login: failed attempts only, per email and IP (5 per 15 minutes by default). */
+/** Failed attempts only, per email and IP. */
 export const loginRateLimiter = createLimiter({
 	store: 'auth:login',
 	limits: rateLimitConfig.login,
@@ -93,7 +85,7 @@ export const loginRateLimiter = createLimiter({
 	logFields: req => ({ ...signInFields(req), remainingAttempts: 0 }),
 });
 
-/** Registration, per IP (3 per hour by default). */
+/** Per IP. */
 export const registerRateLimiter = createLimiter({
 	store: 'auth:register',
 	limits: rateLimitConfig.register,
@@ -103,7 +95,7 @@ export const registerRateLimiter = createLimiter({
 	logFields: signInFields,
 });
 
-/** Google and Facebook sign-in, per provider and IP (10 per 15 minutes by default). */
+/** Per provider and IP. */
 export const oauthRateLimiter = createLimiter({
 	store: 'auth:oauth',
 	limits: rateLimitConfig.oauth,
@@ -118,7 +110,7 @@ export const oauthRateLimiter = createLimiter({
 	}),
 });
 
-/** Safety net on every /api/auth/* route, per IP (20 per 15 minutes by default). */
+/** Safety net on every /api/auth/* route, per IP. */
 export const globalAuthRateLimiter = createLimiter({
 	store: 'auth:global',
 	limits: rateLimitConfig.global,
@@ -128,7 +120,7 @@ export const globalAuthRateLimiter = createLimiter({
 	logFields: req => ({ endpoint: req.path, ip: req.ip, userAgent: req.get('user-agent') }),
 });
 
-/** /api/soundcloud/*, per signed-in user (120 per minute by default); after authMiddleware. */
+/** Per signed-in user; after authMiddleware. */
 export const soundcloudRateLimiter = createLimiter({
 	store: 'soundcloud',
 	limits: rateLimitConfig.soundcloud,
@@ -138,7 +130,7 @@ export const soundcloudRateLimiter = createLimiter({
 	logFields: perUserFields,
 });
 
-/** Profile photo upload and removal, per signed-in user (10 per hour by default); after authMiddleware. */
+/** Per signed-in user; after authMiddleware. */
 export const avatarRateLimiter = createLimiter({
 	store: 'profile:avatar',
 	limits: rateLimitConfig.avatar,

@@ -8,7 +8,6 @@ import { initializeFacebookSDK } from '@/features/auth/services/facebookSignIn';
 import '@/features/auth/hooks/useLinkedProviders';
 
 export default function App() {
-	// Configure OAuth providers on app start
 	useEffect(() => {
 		configureGoogleSignIn();
 		initializeFacebookSDK();

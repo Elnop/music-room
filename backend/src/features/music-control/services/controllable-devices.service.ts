@@ -24,7 +24,7 @@ async function fetchUsername(userId: string): Promise<string> {
 	return data.username;
 }
 
-/** The devices a user can play on, mine then friends' (#295 device picker). */
+/** Mine first, then friends'. */
 export async function list(viewerId: string): Promise<DevicePickerResponse> {
 	// Lazy: loading realtime here at import time would close a cycle
 	// realtime -> music-control -> realtime.

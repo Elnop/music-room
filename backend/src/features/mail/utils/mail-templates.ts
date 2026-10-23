@@ -1,17 +1,9 @@
-/**
- * Mail templates: subject, HTML and plain-text bodies of each transactional
- * email. Sending is in services/mail.service.ts.
- */
-
 export interface MailContent {
 	subject: string;
 	html: string;
 	text: string;
 }
 
-/**
- * HTML base wrapper for all emails
- */
 function wrapInBaseHtml(content: string, title: string): string {
 	return `<!DOCTYPE html>
 <html>
@@ -33,7 +25,6 @@ function wrapInBaseHtml(content: string, title: string): string {
 </html>`;
 }
 
-/** Email verification code. */
 export function verificationEmail(code: string, expiresInMinutes: number): MailContent {
 	const html = wrapInBaseHtml(
 		`
@@ -76,7 +67,6 @@ This email was sent from Zumik`;
 	return { subject: '🎵 Verify Your Zumik Account', html, text };
 }
 
-/** Password reset code. */
 export function passwordResetEmail(code: string, expiresInMinutes: number): MailContent {
 	const html = wrapInBaseHtml(
 		`

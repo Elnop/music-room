@@ -8,16 +8,12 @@ import type {
 } from '@/features/playlists/types';
 import { applyPlaylistEvent, sortByRank } from './playlistSync';
 
-// The playlist data lives in the query cache: the user's list
-// (queryKeys.playlists.list) and one detail per playlist. These helpers read and
+// The user's list and one detail per playlist live in the query cache; these helpers
 // patch it in the order doc/features/playlist-concurrency.md describes.
 
 const detailKey = queryKeys.playlists.detail;
 
-/**
- * Fetches a playlist sorted by rank. A newer track list applied by an event
- * while the request was in flight is kept.
- */
+/** A newer track list applied by an event while the request was in flight is kept. */
 export async function loadPlaylist(client: QueryClient, id: string): Promise<PlaylistWithTracks> {
 	const fetched = await playlistApi.fetchPlaylistById(id);
 	const shown = client.getQueryData<PlaylistWithTracks>(detailKey(id));
@@ -99,14 +95,12 @@ export function patchPlaylist(client: QueryClient, id: string, patch: PlaylistPa
 	);
 }
 
-/** Puts a created playlist at the top of the user's list. */
 export function prependPlaylist(client: QueryClient, playlist: Playlist): void {
 	client.setQueryData<Playlist[]>(queryKeys.playlists.list(), list =>
 		list ? [playlist, ...list] : list
 	);
 }
 
-/** Drops a deleted playlist from the user's list. */
 export function dropFromList(client: QueryClient, id: string): void {
 	client.setQueryData<Playlist[]>(queryKeys.playlists.list(), list =>
 		list?.filter(playlist => playlist.id !== id)

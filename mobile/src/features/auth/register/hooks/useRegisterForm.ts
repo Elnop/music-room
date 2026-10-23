@@ -18,10 +18,7 @@ interface RegisterForm {
 	goToLogin: () => void;
 }
 
-/**
- * The sign-up form. An account that must verify its email goes to the code
- * screen; one signed in at once is shown the app by RootNavigator.
- */
+/** An account that must verify its email goes to the code screen; RootNavigator shows the app otherwise. */
 export function useRegisterForm(
 	navigation: NativeStackNavigationProp<AuthStackParamList, 'Register'>
 ): RegisterForm {

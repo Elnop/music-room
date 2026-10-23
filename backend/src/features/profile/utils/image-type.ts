@@ -1,7 +1,4 @@
-/**
- * Image type of an uploaded file, read from its first bytes (magic bytes).
- * The client's declared MIME type and file name are never trusted (#351).
- */
+/** The client's declared MIME type and file name are never trusted: the type comes from the magic bytes. */
 
 interface ImageType {
 	mime: 'image/jpeg' | 'image/png' | 'image/webp';
@@ -19,7 +16,6 @@ function startsWith(buffer: Buffer, bytes: number[], offset = 0): boolean {
 	return bytes.every((byte, i) => buffer[offset + i] === byte);
 }
 
-/** JPEG, PNG or WebP from the file's signature; null for anything else. */
 export function detectImageType(buffer: Buffer): ImageType | null {
 	if (startsWith(buffer, [0xff, 0xd8, 0xff])) return JPEG;
 	if (startsWith(buffer, PNG_SIGNATURE)) return PNG;

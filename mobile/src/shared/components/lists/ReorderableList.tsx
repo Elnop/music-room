@@ -32,10 +32,7 @@ interface ReorderableListProps<T> extends PassThroughProps<T> {
 	data: T[];
 	keyExtractor: (item: T, index: number) => string;
 	renderItem: (info: ReorderableRenderItemInfo<T>) => React.ReactElement | null;
-	/**
-	 * Called once per drop that changes the position. Once a returned promise
-	 * settles, the rows show the order of `data` again.
-	 */
+	/** Once a returned promise settles, the rows show the order of `data` again. */
 	onReorder: (from: number, to: number) => void | Promise<unknown>;
 	dragEnabled?: boolean;
 }
@@ -53,11 +50,7 @@ function Cell<T>({ item, index, renderItem }: CellProps<T>) {
 	return renderItem({ item, index, drag, isActive });
 }
 
-/**
- * FlatList whose rows can be dragged into a new order. A drag starts only when
- * a row calls `drag`, so the list still scrolls and rows can still swipe. The
- * dropped order stays on screen until `data` changes or `onReorder` settles.
- */
+/** A drag starts only when a row calls `drag`, so the list still scrolls and rows can still swipe. */
 export function ReorderableList<T>({
 	data,
 	keyExtractor,

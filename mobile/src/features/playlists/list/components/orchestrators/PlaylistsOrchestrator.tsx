@@ -7,7 +7,6 @@ import { HeaderIconButton } from '@/features/playlists/header/components/present
 
 type PlaylistsOrchestratorProps = NativeStackScreenProps<PlaylistStackParamList, 'Playlists'>;
 
-/** The Playlists screen, with its « + » in the native header. */
 export function PlaylistsOrchestrator({ navigation }: PlaylistsOrchestratorProps) {
 	const screen = usePlaylistsScreen(navigation);
 	const { createPlaylist } = screen;

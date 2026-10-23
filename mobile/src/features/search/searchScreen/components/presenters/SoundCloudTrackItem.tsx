@@ -16,7 +16,7 @@ interface SoundCloudTrackItemProps {
 	onPlay: (track: SoundCloudTrack) => void;
 	/** A right swipe adds the track to the play queue. */
 	onAddToQueue: (track: SoundCloudTrack) => void;
-	/** A long press or the ⋯ button opens the track's quick actions (#316). */
+	/** A long press or the ⋯ button opens the track's quick actions. */
 	onShowActions: (track: SoundCloudTrack) => void;
 }
 

@@ -4,7 +4,7 @@ export interface PlayerContextValue {
 	player: ReturnType<typeof useAudioPlayer>;
 	loading: boolean;
 	error: string | null;
-	/** Seek the current track; renews an expiring stream URL by reloading at `seconds` (#313). */
+	/** Renews an expiring stream URL by reloading at `seconds`. */
 	seekTo: (seconds: number) => void;
 }
 

@@ -18,7 +18,6 @@ export function AuthNavigator() {
 	return (
 		<Stack.Navigator
 			screenOptions={{
-				// Header opaque avec effet blur natif sur iOS
 				headerStyle: {
 					backgroundColor: theme.colors.background,
 				},
@@ -29,7 +28,7 @@ export function AuthNavigator() {
 					fontWeight: theme.typography.weights.bold,
 				},
 				headerTitleAlign: 'center',
-				// Pas de titre dans le header (on a le logo)
+				// No title: the screens show the logo
 				headerTitle: '',
 			}}
 		>

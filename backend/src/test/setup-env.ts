@@ -1,11 +1,5 @@
-/**
- * Placeholder environment for unit tests.
- *
- * `@/shared/config/env.js` validates process.env at import and exits on a
- * missing variable. These values satisfy the schema without pointing at any
- * real service; dotenv never overrides a variable that is already set, so a
- * local backend/.env cannot leak real keys into unit tests.
- */
+// Placeholders that satisfy env.ts's schema without pointing at any real service; dotenv never
+// overrides a set variable, so a local backend/.env cannot leak real keys into unit tests.
 const placeholders: Record<string, string> = {
 	NODE_ENV: 'test',
 	SUPABASE_URL: 'http://supabase.test.invalid',

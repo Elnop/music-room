@@ -15,8 +15,6 @@ vi.mock('@/realtime/emitters/queue.emitters.js', async importOriginal => ({
 	sendDeviceCommand: vi.fn(),
 }));
 
-// #294: a friend who controls at least one device of the owner manages the
-// owner's queue; playback actions target a device the friend controls, online.
 // No Socket.io server runs here: device presence and commands are stubbed on
 // the realtime emitter modules.
 

@@ -4,11 +4,7 @@ const pathOf = (url: string) => url.replace(/^[a-z]+:\/\/[^/]+/i, '');
 /** Answers a request: a fixed response, or one built from the JSON body sent. */
 type Route = Response | ((body: unknown) => Response | Promise<Response>);
 
-/**
- * Replaces `globalThis.fetch` with a mock that answers `"<METHOD> <path>"`
- * (path with its query string) from `routes`; any other request fails the test.
- * Routes can be changed later through the returned object.
- */
+/** Mocks `globalThis.fetch` to answer `"<METHOD> <path?query>"` from `routes`; any other request fails the test. */
 export function mockFetchRoutes(routes: Record<string, Route>) {
 	const fetchMock = jest.fn(async (url: string, init?: RequestInit) => {
 		const key = `${init?.method ?? 'GET'} ${pathOf(url)}`;

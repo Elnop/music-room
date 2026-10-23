@@ -7,8 +7,6 @@ import * as realtime from '@/realtime/emitters/playlist.emitters.js';
 import type { UpdatePlaylistInput } from '@/features/playlists/playlist.validators.js';
 import type { PlaylistResponse, PlaylistUpdate } from '@/features/playlists/playlist.types.js';
 
-// Updates and deletes a playlist (owner only), then tells its room.
-
 export async function updatePlaylist(
 	playlistId: string,
 	userId: string,
@@ -69,7 +67,6 @@ export async function deletePlaylist(playlistId: string, userId: string): Promis
 		// Tell the room first: the revalidation below evicts every socket from it.
 		realtime.notifyPlaylistDeleted({ playlistId });
 
-		// Evict every socket from the deleted playlist's room (fire-and-forget).
 		void realtime.revalidatePlaylistRoom(playlistId);
 
 		logger.info('Playlist deleted', { playlistId, userId });

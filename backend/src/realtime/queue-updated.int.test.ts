@@ -14,9 +14,7 @@ import * as realtime from '@/realtime/emitters/queue.emitters.js';
 import * as realtimeControl from '@/realtime/emitters/control.emitters.js';
 import type { QueueState } from '@/features/queue/queue.types.js';
 
-// queue:updated (#273, #277): every queue mutation sends the full state to all the
-// sockets of its user (room user:<id>) and to no one else, through a real
-// Socket.io server against the local Supabase stack.
+// Every queue mutation sends the full state to all the sockets of its user and to no one else.
 
 interface TestUser {
 	id: string;
@@ -92,14 +90,12 @@ describe('queue:updated broadcast', () => {
 		return socket;
 	}
 
-	/** Collect every queue:updated a socket receives. */
 	function record(socket: ClientSocket): QueueState[] {
 		const received: QueueState[] = [];
 		socket.on('queue:updated', (state: QueueState) => received.push(state));
 		return received;
 	}
 
-	/** The next queue:updated received by both devices of the owner. */
 	function bothReceive(): Promise<QueueState[]> {
 		return Promise.all(
 			[phone, tablet].map(s => new Promise<QueueState>(resolve => s.once('queue:updated', resolve)))

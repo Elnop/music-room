@@ -6,11 +6,7 @@ export type PlaylistEditFields = Pick<
 	'ownerId' | 'collaboratorIds' | 'viewerIds' | 'visibility' | 'editMode'
 >;
 
-/**
- * Whether `userId` may add, remove or move tracks: the owner, a collaborator,
- * or anyone who can see an `editMode: 'open'` playlist (public, or one they
- * were invited to view). Mirrors the backend's edit check.
- */
+/** Owner, collaborator, or anyone who can see an `editMode: 'open'` playlist; mirrors the backend's edit check. */
 export function canEditPlaylist(
 	userId: string | null | undefined,
 	playlist: PlaylistEditFields | null | undefined

@@ -25,9 +25,8 @@ const socketServer = await import('@/realtime/socket-server.js');
 const { getIO } = await import('@/realtime/state.js');
 const { configureTrustProxy } = await import('@/shared/config/trust-proxy.js');
 
-// Failed token verifications limited per IP (#160), against the test Redis and
-// the local Supabase stack: HTTP through authMiddleware / optionalAuthMiddleware
-// on a throwaway app, and the Socket.io handshake.
+// Failed token verifications limited per IP: HTTP through authMiddleware / optionalAuthMiddleware
+// on a throwaway app, and the Socket.io handshake, against test Redis and local Supabase.
 
 const KEY_PATTERN = 'rl:auth:token:*';
 const PASSWORD = 'integration-test-password';

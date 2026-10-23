@@ -10,7 +10,6 @@ type PlaylistFormOrchestratorProps = NativeStackScreenProps<
 	'CreatePlaylist'
 >;
 
-/** The « Nouvelle Playlist » form, or « Modifier la playlist » with a playlistId (#342). */
 export function PlaylistFormOrchestrator({ navigation, route }: PlaylistFormOrchestratorProps) {
 	const form = usePlaylistForm(navigation, route.params?.playlistId);
 	const playerHeight = usePlayerHeight();

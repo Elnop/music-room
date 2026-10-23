@@ -69,7 +69,7 @@ function mockPlayerFor(url: string): MockPlayer {
 	return player;
 }
 
-// The system media controls (#309) are covered by MediaSessionBridge.test.tsx.
+// The system media controls are covered by MediaSessionBridge.test.tsx.
 jest.mock('@/features/player/mediaSession/components/orchestrators/MediaSessionBridge', () => ({
 	MediaSessionBridge: () => null,
 }));
@@ -205,7 +205,6 @@ registerConnectBridge({
 const initialPlayerState = usePlayerStore.getState();
 const initialAuthState = testSessionStore.getState();
 
-/** Next stream responses, in order. */
 function answerStreams(...urls: { streamUrl: string; expiresAt: string }[]) {
 	for (const data of urls) mockApiRequest.mockResolvedValueOnce(data);
 }
@@ -229,7 +228,6 @@ function setStatus(player: MockPlayer, status: Partial<MockStatus>) {
 	});
 }
 
-/** Re-render so the mocked statuses reach the provider. */
 async function rerender(view: ReturnType<typeof render>) {
 	await act(async () =>
 		view.rerender(
@@ -240,7 +238,6 @@ async function rerender(view: ReturnType<typeof render>) {
 	);
 }
 
-/** Render the provider and play `track` on the stream `u1`. */
 async function startPlaying(expiresAt: string) {
 	answerStreams({ streamUrl: 'u1', expiresAt });
 	const view = render(
@@ -505,7 +502,6 @@ describe('PlayerProvider stream renewal (#313)', () => {
 });
 
 describe('PlayerProvider audio interruptions (#310)', () => {
-	/** Start playing on u1 and report the native player as playing. */
 	async function playingNatively() {
 		const view = await startPlaying(inMinutes(30));
 		const u1 = mockPlayerFor('u1');
@@ -514,7 +510,6 @@ describe('PlayerProvider audio interruptions (#310)', () => {
 		return { view, u1 };
 	}
 
-	/** The system pauses or resumes the player behind the app's back. */
 	async function nativeSets(
 		view: ReturnType<typeof render>,
 		player: MockPlayer,
@@ -581,7 +576,7 @@ describe('PlayerProvider audio interruptions (#310)', () => {
 	])('does not mirror a stop %s', async (_label, extra) => {
 		const { view, u1 } = await playingNatively();
 		answerStreams({ streamUrl: 'u2', expiresAt: inMinutes(30) });
-		// Auto-advance (#274) is QueueAutoAdvance's: keep it out of the way.
+		// Auto-advance belongs to QueueAutoAdvance: keep it out of the way.
 		const next = jest.fn(async () => 'played' as const);
 		mockNext = next;
 
@@ -728,14 +723,12 @@ describe('PlayerProvider next track prefetch (#314)', () => {
 	const C = queueItem('qc', 'c');
 	const D = queueItem('qd', 'd');
 
-	/** My queue, as the player reads it. */
 	function setQueue(currentItemId: string | null, items: QueueItem[]) {
 		act(() => {
 			testQueue = { currentItemId, items, version: 1 };
 		});
 	}
 
-	/** Play `item` of the queue `items` on a stream named after it. */
 	async function playQueueItem(item: QueueItem, items: QueueItem[]) {
 		answerStreams({ streamUrl: `u-${item.id}`, expiresAt: inMinutes(30) });
 		setQueue(item.id, items);
@@ -749,7 +742,6 @@ describe('PlayerProvider next track prefetch (#314)', () => {
 		return { view, player: mockPlayerFor(`u-${item.id}`) };
 	}
 
-	/** The playing track reaches `currentTime` seconds of its 200. */
 	async function reach(view: ReturnType<typeof render>, player: MockPlayer, currentTime: number) {
 		setStatus(player, { currentTime, duration: 200, playing: true });
 		await rerender(view);

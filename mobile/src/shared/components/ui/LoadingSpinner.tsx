@@ -23,15 +23,12 @@ export function LoadingSpinner({
 	const { theme } = useTheme();
 	const styles = useMemo(() => createStyles(theme), [theme]);
 
-	// Animation values - created once and memoized
 	const rotateAnim = useMemo(() => new Animated.Value(0), []);
 	const scaleAnim = useMemo(() => new Animated.Value(1), []);
 
-	// Calculate logo size based on prop
 	const logoSize = size === 'small' ? 28 : 64;
 
 	useEffect(() => {
-		// Rotation animation - continuous spin
 		const rotateAnimation = Animated.loop(
 			Animated.timing(rotateAnim, {
 				toValue: 1,
@@ -41,7 +38,6 @@ export function LoadingSpinner({
 			})
 		);
 
-		// Pulse animation - subtle scale up/down
 		const pulseAnimation = Animated.loop(
 			Animated.sequence([
 				Animated.timing(scaleAnim, {
@@ -59,7 +55,6 @@ export function LoadingSpinner({
 			])
 		);
 
-		// Start both animations
 		rotateAnimation.start();
 		pulseAnimation.start();
 
@@ -69,13 +64,11 @@ export function LoadingSpinner({
 		};
 	}, [rotateAnim, scaleAnim]);
 
-	// Interpolate rotation
 	const spin = rotateAnim.interpolate({
 		inputRange: [0, 1],
 		outputRange: ['0deg', '360deg'],
 	});
 
-	// Simple spinner variant
 	if (variant === 'spinner') {
 		return (
 			<View style={[styles.container, fullScreen && styles.fullScreen]}>
@@ -88,7 +81,6 @@ export function LoadingSpinner({
 		);
 	}
 
-	// Logo variant (default)
 	return (
 		<View style={[styles.container, fullScreen && styles.fullScreen]}>
 			<Animated.View

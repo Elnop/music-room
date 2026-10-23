@@ -6,10 +6,7 @@ import { formatAuthResponse, fetchUserProfile } from '@/features/auth/utils/auth
 import * as tokenRevocation from '@/features/auth/services/token-revocation.service.js';
 import { logger } from '@/shared/utils/logger.js';
 
-/**
- * Verify JWT token and return user.
- * Tokens revoked by a logout are rejected before Supabase is called.
- */
+/** Tokens revoked by a logout are rejected before Supabase is called. */
 export async function verifyToken(token: string): Promise<SupabaseUser> {
 	try {
 		if (await tokenRevocation.isRevoked(token)) {
@@ -36,12 +33,7 @@ export async function verifyToken(token: string): Promise<SupabaseUser> {
 	}
 }
 
-/**
- * Refresh access token using refresh token.
- * 401 INVALID_REFRESH_TOKEN only when Supabase Auth refuses the token (4xx);
- * an outage (unreachable, 5xx, unexpected throw) answers 503 AUTH_UNAVAILABLE
- * so the client keeps its session and retries later.
- */
+/** 401 only when Supabase Auth refuses the token; an outage is 503 so the client keeps its session. */
 export async function refreshToken(refreshToken: string): Promise<AuthResponse> {
 	try {
 		const { data, error } = await createSignInClient().auth.refreshSession({
@@ -77,12 +69,7 @@ export async function refreshToken(refreshToken: string): Promise<AuthResponse> 
 	}
 }
 
-/**
- * End the session the access token belongs to: denylist the token until it
- * expires, then revoke the Supabase session (scope 'local': only this
- * session, so its refresh token can no longer mint tokens; other devices
- * stay signed in). The denylist entry is written even if Supabase fails.
- */
+/** Denylist first (even if Supabase then fails), then revoke with scope 'local': other devices stay signed in. */
 export async function logout(token: string, userId: string): Promise<void> {
 	await tokenRevocation.revoke(token);
 
@@ -104,10 +91,7 @@ export async function logout(token: string, userId: string): Promise<void> {
 	}
 }
 
-/**
- * Supabase Auth explicitly refused the refresh token: a 4xx other than
- * 408 (timeout) and 429 (rate limit), which say nothing about the token.
- */
+/** A 4xx other than 408 (timeout) and 429 (rate limit), which say nothing about the token. */
 function isRefusal(error: unknown): boolean {
 	return (
 		isAuthApiError(error) &&

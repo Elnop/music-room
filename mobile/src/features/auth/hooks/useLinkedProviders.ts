@@ -8,7 +8,7 @@ import { signInWithFacebook } from '@/features/auth/services/facebookSignIn';
 import type { LinkedProvidersResponse, OAuthProvider } from '@/features/auth/types';
 import { registerLinkedAccountsBridge } from '@/shared/services/linkedAccountsBridge';
 
-/** The access token of the session; the screens using these hooks are signed in. */
+/** The screens using these hooks are signed in. */
 function accessToken(): string {
 	const token = useAuthStore.getState().accessToken;
 	if (!token) throw new Error('No access token available');
@@ -20,10 +20,7 @@ function useProvidersKey() {
 	return queryKeys.auth.providers(userId);
 }
 
-/**
- * The sign-in methods linked to the signed-in account (profile, linked
- * accounts): fetched on every visit, without retry, like the screen always did.
- */
+/** Fetched on every visit, without retry. */
 function useLinkedProviders() {
 	const queryKey = useProvidersKey();
 	const signedIn = useAuthStore(state => state.accessToken !== null);
@@ -38,11 +35,7 @@ function useLinkedProviders() {
 	});
 }
 
-/**
- * Links a Google or Facebook account: native sign-in, then its token to the
- * backend, whose answer replaces the cached list. A cancelled sign-in rejects
- * with Error('SIGN_IN_CANCELLED') before any request.
- */
+/** A cancelled native sign-in rejects with Error('SIGN_IN_CANCELLED') before any request. */
 function useLinkProvider() {
 	const queryKey = useProvidersKey();
 	const queryClient = useQueryClient();
@@ -55,10 +48,7 @@ function useLinkProvider() {
 	});
 }
 
-/**
- * Unlinks a provider, then refetches the list before resolving: a failed
- * refetch fails the unlink, as the screen reports it.
- */
+/** Refetches before resolving: a failed refetch fails the unlink. */
 function useUnlinkProvider() {
 	const queryKey = useProvidersKey();
 	const queryClient = useQueryClient();

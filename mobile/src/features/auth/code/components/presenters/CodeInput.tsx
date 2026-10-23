@@ -8,13 +8,12 @@ interface CodeInputProps {
 	onChangeDigit: (index: number, text: string) => void;
 	onKeyPress: (index: number, key: string) => void;
 	containerStyle: StyleProp<ViewStyle>;
-	/** Style of a box, by whether it holds a digit. */
 	boxStyle: (filled: boolean) => StyleProp<TextStyle>;
 	autoFocus?: boolean;
 	editable?: boolean;
 }
 
-/** Six one-digit boxes; the first one accepts a pasted or autofilled code. */
+/** The first box accepts a pasted or autofilled code. */
 export function CodeInput({
 	digits,
 	setBoxRef,

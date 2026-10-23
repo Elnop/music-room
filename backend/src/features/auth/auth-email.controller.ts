@@ -6,9 +6,6 @@ import { requestIp } from '@/shared/security/request-ip.js';
 import { logger } from '@/shared/utils/logger.js';
 import { sendSuccess } from '@/shared/utils/send-success.js';
 
-// Email verification: check the emailed code, resend it.
-
-/** POST /api/auth/verify-email: verify the code and sign the user in. */
 export async function verifyEmail(req: Request, res: Response) {
 	const { userId, code } = verifyEmailSchema.parse(req.body);
 	const ip = requestIp(req);
@@ -17,10 +14,7 @@ export async function verifyEmail(req: Request, res: Response) {
 	sendSuccess(res, await verifyEmailService.verifyEmail(userId, code, ip));
 }
 
-/**
- * POST /api/auth/resend-verification. Same answer whether or not a code was
- * sent: no account enumeration (#188).
- */
+/** Same answer whether or not a code was sent: no account enumeration. */
 export async function resendVerification(req: Request, res: Response) {
 	const { userId, email } = resendVerificationSchema.parse(req.body);
 	const ip = requestIp(req);

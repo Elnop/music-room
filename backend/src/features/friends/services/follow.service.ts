@@ -7,10 +7,7 @@ import * as followStatusService from '@/features/friends/services/follow-status.
 import { revalidateListeningAccess } from '@/features/friends/utils/listening-access.js';
 import type { FollowActionResponse } from '@/features/friends/friends.types.js';
 
-/**
- * The caller follows `targetUserId` (400 SELF_FOLLOW_ERROR on themselves,
- * 404 USER_NOT_FOUND for an unknown user). Following twice is a no-op.
- */
+/** 400 SELF_FOLLOW_ERROR on oneself, 404 USER_NOT_FOUND for an unknown user; following twice is a no-op. */
 export function followUser(
 	currentUserId: string,
 	targetUserId: string
@@ -50,7 +47,7 @@ export function followUser(
 	);
 }
 
-/** The caller stops following `targetUserId`; not following is a no-op. */
+/** Not following is a no-op. */
 export function unfollowUser(
 	currentUserId: string,
 	targetUserId: string

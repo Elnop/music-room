@@ -7,7 +7,6 @@ import { providerIdField, toUserProfile } from '@/features/auth/utils/auth.helpe
 import * as usernameService from '@/features/auth/services/username.service.js';
 import * as magicLinkSession from '@/features/auth/services/magic-link-session.service.js';
 
-/** Profile data the provider gives. */
 export interface OAuthProfile {
 	name: string;
 	picture?: string | { data: { url: string } };
@@ -18,19 +17,13 @@ export interface OAuthUser {
 	session: Session;
 }
 
-/** Avatar URL of the provider profile, or null. */
 export function avatarOf(profile: OAuthProfile): string | null {
 	return typeof profile.picture === 'string'
 		? profile.picture
 		: (profile.picture?.data?.url ?? null);
 }
 
-/**
- * Create a verified account without a password for a provider sign-in and
- * open its session. Returns null when the generated username was taken by
- * a concurrent sign-up (23505): the new auth user is removed and the caller
- * starts over.
- */
+/** Null when a concurrent sign-up took the generated username (23505): the auth user is removed, the caller retries. */
 export async function createOAuthAccount(
 	provider: OAuthProvider,
 	providerId: string,
@@ -70,7 +63,7 @@ export async function createOAuthAccount(
 				avatar_url: avatarOf(profile),
 				...providerIdField(provider, providerId),
 				email_verified: true,
-				// Signed up with Google or Facebook: no password until one is set (#189).
+				// Signed up with Google or Facebook: no password until one is set.
 				has_password: false,
 			})
 			.select()

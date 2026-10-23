@@ -34,9 +34,6 @@ const { soundcloudRateLimiter } = await import('@/shared/security/http-rate-limi
 const { rateLimitConfig } = await import('@/shared/config/rate-limit.config.js');
 const { errorHandler } = await import('@/shared/middleware/error-handler.js');
 
-// SoundCloud routes (#208): authMiddleware, a per-user Redis limiter and Zod on
-// every input, against the test Redis and the local Supabase stack.
-
 const KEY_PATTERN = 'rl:soundcloud:*';
 const PASSWORD = 'integration-test-password';
 const MAX = 8;

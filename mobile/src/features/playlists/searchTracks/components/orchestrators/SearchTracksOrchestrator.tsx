@@ -8,7 +8,6 @@ import { TrackActionsSheet } from '@/features/playlists/trackActions/components/
 
 type SearchTracksOrchestratorProps = NativeStackScreenProps<PlaylistStackParamList, 'SearchTracks'>;
 
-/** « Ajouter des titres » to a playlist. */
 export function SearchTracksOrchestrator({ route }: SearchTracksOrchestratorProps) {
 	const screen = useSearchTracks(route.params.playlistId);
 	const playerHeight = usePlayerHeight();

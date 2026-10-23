@@ -2,11 +2,9 @@ import { Router } from 'express';
 import * as queue from '@/features/queue/queue.controller.js';
 import { authMiddleware } from '@/features/auth/auth.middleware.js';
 
-// Endpoints are documented in queue*.openapi.ts.
 const router = Router({ mergeParams: true });
 
-// All routes require authentication; they act on the caller's queue, or on
-// `:userId`'s when mounted under /api/users/:userId/queue (#294).
+// Acts on the caller's queue, or on `:userId`'s when mounted under /api/users/:userId/queue.
 router.use(authMiddleware);
 
 router.get('/', queue.getQueue);

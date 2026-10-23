@@ -67,7 +67,7 @@ export async function grant(
 	}
 
 	logger.info('Device license granted', context);
-	// The grantee's open profile of the owner reloads its controllable devices (#183).
+	// The grantee's open profile of the owner reloads its controllable devices.
 	await notifyListeningAccessChange(granteeId, ownerId, true);
 	return { deviceId, license: { user, grantedAt: license.created_at } };
 }
@@ -97,17 +97,12 @@ export async function revoke(ownerId: string, deviceId: string, granteeId: strin
 	if (!count) return;
 
 	logger.info('Device license revoked', { ownerId, deviceId, granteeId });
-	// Tell the grantee (#183); evicts it from the owner's listening room when it
-	// has lost its last controllable device.
+	// Evicts the grantee from the owner's listening room once it has no controllable device left.
 	const stillAllowed = await controlAccessService.canControlAnyDevice(granteeId, ownerId);
 	await notifyListeningAccessChange(granteeId, ownerId, stillAllowed);
 }
 
-/**
- * Devices of ownerId that viewerId may control, on the shared rule of
- * control-access.service.ts. Not mutual friends answers the empty shape
- * before any device query, so nothing about ownerId leaks.
- */
+// Non-friends get the empty shape before any device query, so nothing about ownerId leaks.
 export async function listControllable(
 	viewerId: string,
 	ownerId: string

@@ -13,7 +13,6 @@ const redisDown = (counter: string) =>
 		`Redis is not ready. RATE_LIMIT_UNAVAILABLE: the route rate limiter cannot count the request. REDIS_UNAVAILABLE: the per-email ${counter} counter cannot be updated`
 	);
 
-/** Registers the password reset routes of /api/auth. */
 export function registerAuthPasswordOpenapi(registry: OpenAPIRegistry): void {
 	const tags = ['Authentication'];
 	const invalidEmail = [

@@ -20,7 +20,6 @@ export interface CodeInput {
 	reset: () => void;
 }
 
-/** State and focus of the six boxes of a verification or reset code. */
 export function useCodeInput(): CodeInput {
 	const [digits, setDigits] = useState<string[]>(EMPTY_CODE);
 	const boxes = useRef<(TextInput | null)[]>([]);

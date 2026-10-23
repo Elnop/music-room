@@ -4,7 +4,7 @@ import { MediaSessionBridge } from './MediaSessionBridge';
 import type { NowPlaying } from '@/features/player/types';
 import type { MediaControlEvent } from 'expo-media-control';
 
-// No native module under Jest: the library is replaced by spies (#309).
+// No native module under Jest: the library is replaced by spies.
 const mockListeners: ((event: MediaControlEvent) => void)[] = [];
 const mockRemoveListener = jest.fn();
 jest.mock('expo-media-control', () => ({

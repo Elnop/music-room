@@ -2,7 +2,6 @@ import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import type { PlaybackState } from '@/shared/types/playback';
 
 export interface PlayerState {
-	// Track and stream info
 	currentTrack: SoundCloudTrack | null;
 	streamUrl: string | null;
 	pendingTrackId: number | null;
@@ -15,19 +14,16 @@ export interface PlayerState {
 	pausedBySystem: boolean;
 	needsStreamLoad: boolean;
 
-	// State machine
 	playbackState: PlaybackState;
 
-	// Legacy compatibility (derived from playbackState)
+	// Derived from playbackState, kept for legacy callers
 	isPlaying: boolean;
 	loading: boolean;
 	error: string | null;
 
-	// UI state
 	isModalOpen: boolean;
 	seekCount: number;
 
-	// Actions
 	setStreamUrl: (url: string | null, expiresAt?: number | null) => void;
 	setTrackUnavailableError: (message: string) => void;
 	clearError: () => void;

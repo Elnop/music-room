@@ -18,7 +18,6 @@ interface FriendPlaylistCarouselProps {
 	onFindFriends: () => void;
 }
 
-/** The friends' public playlists in one horizontal carousel, each with its owner's avatar. */
 export function FriendPlaylistCarousel({
 	friendsPlaylists,
 	onPlaylistPress,

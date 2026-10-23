@@ -32,8 +32,8 @@ const loginService = await import('@/features/auth/services/login.service.js');
 const registrationService = await import('@/features/auth/services/registration.service.js');
 const { findAuthUserIdByEmail } = await import('@/features/auth/utils/find-auth-user.js');
 
-// The account is found past the first page of auth.admin.listUsers() (50 users)
-// and whatever the case of the email (#194), against the local Supabase stack.
+// The account is found past the first listUsers() page (50 users) and whatever the case of the
+// email, against the local Supabase stack.
 
 // More than one listUsers() page (50 users).
 const FILLER_USERS = 51;

@@ -4,16 +4,7 @@ import type { DeviceCommand } from '@/features/music-control/music-control.types
 import { listeningRoom } from '@/realtime/music-control-access.js';
 import { deviceKey, deviceToSocket, getIO } from '@/realtime/state.js';
 
-/**
- * What the queue feature sends: the queue state to its owner's devices and
- * delegates, and playback commands to one device.
- */
-
-/**
- * Send a user's whole play queue after any change to it (#273): to all of
- * their devices (`user:<id>`) and to the delegates watching them
- * (`listening:<id>`, #294). One emit, so a socket in both rooms gets it once.
- */
+/** One emit to `user:<id>` and `listening:<id>`, so a socket in both rooms gets it once. */
 export function notifyQueueUpdate(userId: string, state: QueueState): void {
 	const io = getIO();
 	if (!io) {
@@ -37,10 +28,7 @@ export function notifyQueueUpdate(userId: string, state: QueueState): void {
 	});
 }
 
-/**
- * Send one control command to one of ownerId's devices (#294, #295). False
- * when the device has no socket any more.
- */
+/** False when the device has no socket any more. */
 export function sendDeviceCommand(
 	ownerId: string,
 	deviceId: string,

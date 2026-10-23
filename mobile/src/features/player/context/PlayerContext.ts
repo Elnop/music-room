@@ -13,10 +13,7 @@ export function usePlayer(): PlayerContextValue {
 	return context;
 }
 
-/**
- * Height of the MiniPlayer for bottom padding: always MINI_PLAYER_HEIGHT,
- * since the mini-player is always shown (#296).
- */
+/** Constant: the mini-player is always shown. */
 export function usePlayerHeight(): number {
 	return MINI_PLAYER_HEIGHT;
 }

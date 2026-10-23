@@ -10,11 +10,7 @@ interface CodeFillResult {
 	focusIndex: number | null;
 }
 
-/**
- * Applies a box's new text to a 6-digit code: one typed digit, a paste or a
- * keyboard autofill. Digits spread from `index` onwards; anything else is
- * dropped. Returns null when the change must be ignored.
- */
+/** Digits spread from `index` onwards, anything else is dropped; null means ignore the change. */
 export function fillCodeDigits(
 	code: readonly string[],
 	index: number,

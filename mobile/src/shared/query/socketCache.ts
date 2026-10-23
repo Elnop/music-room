@@ -3,23 +3,17 @@ import { useQueryClient, type QueryClient, type QueryKey } from '@tanstack/react
 import type { Socket } from 'socket.io-client';
 import { useSocketStore } from '@/shared/stores/socketStore';
 
-/** What one Socket.io event does to the query cache. */
 export interface SocketCacheRule<Payload, Data> {
-	/** Socket.io event name, as emitted by backend/src/realtime/. */
+	/** As emitted by backend/src/realtime/. */
 	event: string;
-	/** The query the payload belongs to, built with queryKeys; null ignores it. */
+	/** Built with queryKeys; null ignores the payload. */
 	queryKey: (payload: Payload) => QueryKey | null;
-	/**
-	 * Patches the cached data with the payload. Without it, or when it returns
-	 * undefined (the payload cannot be applied, e.g. a stale version), or when
-	 * nothing is cached yet, the query is invalidated and refetched instead.
-	 */
+	/** Without it, when it returns undefined (e.g. stale version) or with nothing cached, the query is refetched. */
 	update?: (current: Data, payload: Payload) => Data | undefined;
 }
 
 type SocketCacheResult = 'updated' | 'invalidated' | 'ignored';
 
-/** Applies one event payload to the cache, following its rule. */
 export function applySocketEvent<Payload, Data>(
 	client: QueryClient,
 	rule: SocketCacheRule<Payload, Data>,
@@ -44,10 +38,7 @@ interface SocketCacheBinding {
 	apply: (client: QueryClient, payload: unknown) => SocketCacheResult;
 }
 
-/**
- * Types a rule against its payload and cached data. Socket.io payloads are
- * untyped at runtime: the payload type is the backend's contract for the event.
- */
+/** Socket.io payloads are untyped at runtime: the payload type is the backend's contract for the event. */
 export function socketCacheRule<Payload, Data>(
 	rule: SocketCacheRule<Payload, Data>
 ): SocketCacheBinding {
@@ -57,7 +48,6 @@ export function socketCacheRule<Payload, Data>(
 	};
 }
 
-/** Listens to every binding's event on the socket; returns the cleanup. */
 export function bindSocketCache(
 	socket: Socket,
 	client: QueryClient,
@@ -75,10 +65,7 @@ export function bindSocketCache(
 	};
 }
 
-/**
- * Keeps the query cache in sync with Socket.io events while mounted, on the
- * current socket. Pass a stable `bindings` array (module constant or useMemo).
- */
+/** Pass a stable `bindings` array (module constant or useMemo). */
 export function useSocketCache(bindings: readonly SocketCacheBinding[]): void {
 	const socket = useSocketStore(state => state.socket);
 	const client = useQueryClient();

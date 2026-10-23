@@ -8,18 +8,13 @@ import { showError } from '@/shared/utils/toast';
 import { logger } from '@/shared/utils/logger';
 
 interface ShareLinkButtonProps {
-	/** The zumik:// link to share. */
 	url: string;
 	/** Shown above the link in the message (playlist or user name). */
 	title?: string;
 	style?: StyleProp<ViewStyle>;
 }
 
-/**
- * « Partager »: opens the system share sheet with a zumik:// link.
- * No success toast: the sheet is the feedback, and Android reports a dismissal
- * as sharedAction (#316).
- */
+/** No success toast: the sheet is the feedback, and Android reports a dismissal as sharedAction. */
 export function ShareLinkButton({ url, title, style }: ShareLinkButtonProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);

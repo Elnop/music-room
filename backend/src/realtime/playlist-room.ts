@@ -7,20 +7,6 @@ import { logger } from '@/shared/utils/logger.js';
 import type { AppSocketServer } from '@/realtime/socket-auth.js';
 import { RATE_LIMITED } from '@/shared/security/socket-event-limit.js';
 
-/**
- * Access control for the `playlist:<id>` rooms (subject IV.6, CAP-1).
- *
- * `playlist:join` takes a bare playlist id (UUID string). A socket joins the
- * room only if its user (`socket.data.userId`) can view the playlist
- * (`canViewPlaylist`). Otherwise it receives `playlist:error`:
- *
- *   { playlistId: string | null, code: PlaylistRoomErrorCode, message: string }
- *
- *   INVALID_PAYLOAD         the id is not a UUID string (`playlistId` null when not a string)
- *   PLAYLIST_NOT_FOUND      no such playlist (or the lookup failed), or it was deleted
- *   PLAYLIST_ACCESS_DENIED  the user cannot view it, or lost access while in the room
- */
-
 export const playlistRoomPayloadSchema = z.uuid();
 
 export type PlaylistRoomErrorCode =
@@ -55,10 +41,7 @@ function playlistRoomError(
 type PlaylistLookup =
 	{ status: 'found'; playlist: PlaylistRow } | { status: 'not_found' } | { status: 'error' };
 
-/**
- * Load a playlist for a room check, telling a missing row apart from a failed
- * lookup (logged).
- */
+/** Tells a missing row apart from a failed lookup (logged). */
 async function loadPlaylist(playlistId: string): Promise<PlaylistLookup> {
 	try {
 		const { data, error } = await supabaseAdmin
@@ -77,9 +60,6 @@ async function loadPlaylist(playlistId: string): Promise<PlaylistLookup> {
 	}
 }
 
-/**
- * Decide whether `userId` may join the room of `playlistId` (raw payload).
- */
 export async function authorizePlaylistJoin(
 	playlistId: unknown,
 	userId: string
@@ -102,12 +82,7 @@ export async function authorizePlaylistJoin(
 	return { ok: true, playlistId: id };
 }
 
-/**
- * Re-check every socket in `playlist:<id>` after access may have been lost
- * (member removed, visibility changed, playlist deleted). Sockets without
- * access leave the room and receive `playlist:error`; all of them when the
- * playlist is gone, none when the lookup failed. Never throws.
- */
+/** Sockets without access leave and get `playlist:error`; none leave when the lookup failed. Never throws. */
 export async function revalidatePlaylistRoom(
 	io: AppSocketServer,
 	playlistId: string

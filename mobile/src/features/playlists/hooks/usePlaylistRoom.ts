@@ -7,16 +7,11 @@ import type { PlaylistDeletedEvent } from '@/features/playlists/types';
 import { PLAYLIST_SOCKET_RULES } from '@/features/playlists/utils/playlistSocketRules';
 
 interface PlaylistRoom {
-	/** The playlist was deleted by its owner while on screen (#342). */
+	/** The playlist was deleted by its owner while on screen. */
 	deleted: boolean;
 }
 
-/**
- * Real-time updates of an open playlist: joins its room while mounted, and lets
- * the playlist events patch the cache (utils/playlistSocketRules.ts).
- * Re-joining after a reconnect reloads the playlist, since events sent while
- * disconnected are lost; the first join relies on the screen's own load.
- */
+/** Re-joining after a reconnect reloads the playlist: events sent while disconnected are lost. */
 export function usePlaylistRoom(playlistId: string): PlaylistRoom {
 	const socket = useSocketStore(state => state.socket);
 	const isConnected = useSocketStore(state => state.isConnected);

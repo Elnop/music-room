@@ -2,33 +2,22 @@ import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { logger } from '@/shared/utils/logger.js';
 import { failQuery } from '@/features/music-control/utils/device.helpers.js';
 
-// Per-device music control rule (subject IV.2.2), shared by the realtime
-// events and `GET /users/{userId}/devices`: the controller and the owner are
-// mutual friends, and either the owner's "all my devices" switch
-// (`follows(controller → owner).can_control_music`) is on, or the controller
-// holds a license on the device (`device_control_licenses`), or the
-// controller is the owner (#294), who controls all of their devices.
+// Control rule: mutual friends, plus the owner's "all my devices" switch or a license on the device.
+// The owner controls all of their devices. Shared by the realtime events and GET /users/{userId}/devices.
 
-/** What controllerId may control among ownerId's devices */
 interface ControlAccess {
-	/** controllerId and ownerId follow each other */
+	/** Mutual follows */
 	isFriend: boolean;
-	/** The owner's "all my devices" switch is on for the controller */
 	allDevices: boolean;
-	/** Devices the controller holds a license on (empty when not friends) */
+	/** Empty when not friends */
 	licensedDeviceIds: string[];
 }
 
 const NO_ACCESS: ControlAccess = { isFriend: false, allDevices: false, licensedDeviceIds: [] };
 
-/** The owner controls every one of their own devices (#294). */
 const SELF_ACCESS: ControlAccess = { isFriend: false, allDevices: true, licensedDeviceIds: [] };
 
-/**
- * Resolves the controller's access to the owner's devices. Not mutual
- * friends answers no access whatever the switch or licenses say. Throws
- * a 500 DEVICE_FETCH_ERROR on a query error.
- */
+/** Not mutual friends means no access whatever the switch or licenses; throws 500 DEVICE_FETCH_ERROR on a query error. */
 export async function getAccess(controllerId: string, ownerId: string): Promise<ControlAccess> {
 	if (controllerId === ownerId) return SELF_ACCESS;
 
@@ -76,7 +65,7 @@ export async function getAccess(controllerId: string, ownerId: string): Promise<
 	};
 }
 
-/** getAccess, with any error logged and answered as no access */
+/** Errors are logged and answered as no access. */
 async function safeAccess(controllerId: string, ownerId: string): Promise<ControlAccess> {
 	try {
 		return await getAccess(controllerId, ownerId);
@@ -86,7 +75,7 @@ async function safeAccess(controllerId: string, ownerId: string): Promise<Contro
 	}
 }
 
-/** Whether controllerId may control ownerId's device. Fails closed. */
+/** Fails closed. */
 export async function canControlDevice(
 	controllerId: string,
 	ownerId: string,
@@ -96,7 +85,7 @@ export async function canControlDevice(
 	return access.allDevices || access.licensedDeviceIds.includes(deviceId);
 }
 
-/** Whether controllerId may control at least one of ownerId's devices. Fails closed. */
+/** Fails closed. */
 export async function canControlAnyDevice(controllerId: string, ownerId: string): Promise<boolean> {
 	const access = await safeAccess(controllerId, ownerId);
 	return access.allDevices || access.licensedDeviceIds.length > 0;

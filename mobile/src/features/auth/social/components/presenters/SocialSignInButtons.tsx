@@ -10,7 +10,6 @@ interface SocialSignInButtonsProps {
 	disabled: boolean;
 }
 
-/** « OU », then the Google and Facebook buttons in their brand colours. */
 export function SocialSignInButtons({ onGoogle, onFacebook, disabled }: SocialSignInButtonsProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);

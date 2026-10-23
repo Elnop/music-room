@@ -15,11 +15,7 @@ interface QueueSwipeProps {
 	renderRightActions?: () => React.ReactNode;
 }
 
-/**
- * Track row swipe (#275): a right swipe reveals a queue panel, adds the track
- * to the queue once fully open and springs the row back. A left swipe shows
- * `renderRightActions` when given. A release before the threshold sends nothing.
- */
+/** A right swipe adds to the queue once fully open, then springs back; a release before the threshold sends nothing. */
 export function QueueSwipe({ children, onAddToQueue, renderRightActions }: QueueSwipeProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);

@@ -5,10 +5,8 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import type { TrackUpsertInput } from '@/shared/utils/track-upsert.js';
 import type { CreatePlaylistInput } from '@/features/playlists/playlist.validators.js';
 
-// Playlist CRUD, lists and member management against the local Supabase stack.
-// The list filters (`or`, `cs` on arrays), array updates and the delete cascade
-// live in PostgREST and Postgres, so they are only checked here. The permission
-// matrix itself is unit-tested in permissions/playlist.permissions.test.ts.
+// List filters (`or`, `cs` on arrays), array updates and the delete cascade live in PostgREST
+// and Postgres, so only this test checks them; the permission matrix is unit-tested.
 
 const {
 	notifyPlaylistUpdate,

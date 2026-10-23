@@ -11,7 +11,6 @@ import {
 import { bearerAuth, describeParams, ok, okMessage } from '@/shared/config/swagger.schemas.js';
 import { fail, shared } from '@/shared/config/swagger.errors.js';
 
-/** Registers the per-device license routes of /api/music-control (story 4.4, #294). */
 export function registerLicenseOpenapi(registry: OpenAPIRegistry): void {
 	const common = { tags: ['Music Control'], security: bearerAuth };
 	const unauthorized = shared('UnauthorizedError');

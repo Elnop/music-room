@@ -1,11 +1,7 @@
 import { z } from 'zod';
 import { musicGenreSchema, visibilityLevelSchema } from '@/features/profile/profile.validators.js';
 
-/**
- * Response bodies of the /api/profile routes, for the OpenAPI document.
- * profile.types.ts infers its response types from them; optional fields are
- * absent when unset or, for another user's profile, hidden by their privacy.
- */
+/** Optional fields are absent when unset or, on another user's profile, hidden by their privacy. */
 
 const profileBase = z.object({
 	id: z.uuid(),
@@ -17,16 +13,14 @@ const profileBase = z.object({
 	createdAt: z.iso.datetime(),
 });
 
-/** GET and PATCH /api/profile: the caller's own profile. */
 export const ownProfileSchema = profileBase.extend({
 	email: z.email(),
 	updatedAt: z.iso.datetime(),
 });
 
-/** A found profile (GET /api/profile/search). */
 export const publicProfileSchema = profileBase;
 
-/** GET /api/profile/:userId: only the fields the owner's privacy settings let the caller see. */
+/** Only the fields the owner's privacy settings let the caller see. */
 export const filteredProfileSchema = profileBase.extend({
 	musicPreferences: z.array(musicGenreSchema).optional(),
 	email: z.email().nullable().optional(),
@@ -37,7 +31,7 @@ export const filteredProfileSchema = profileBase.extend({
 const visibility = (field: string) =>
 	visibilityLevelSchema.meta({ description: `Who can see your ${field}` });
 
-/** Visibility of each profile field: public (everyone), friends_only (mutual follows), private (only you). */
+/** public: everyone, friends_only: mutual follows, private: only the owner. */
 export const privacySettingsSchema = z.object({
 	userId: z.uuid(),
 	emailVisibility: visibility('email'),
@@ -54,10 +48,9 @@ export const musicPreferencesSchema = z.object({
 	updatedAt: z.iso.datetime(),
 });
 
-/** GET /api/profile/music-preferences/genres: every genre a user can pick. */
 export const genresSchema = z.object({ genres: z.array(musicGenreSchema) });
 
-/** PUT and DELETE /api/profile/avatar: the new avatar URL, null once removed. */
+/** Null once the avatar is removed. */
 export const avatarResponseSchema = z.object({
 	avatarUrl: z.url().nullable().meta({
 		example: 'https://xyz.supabase.co/storage/v1/object/public/avatars/0b5c…/3f2a….jpg',

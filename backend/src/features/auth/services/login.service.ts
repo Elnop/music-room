@@ -6,10 +6,7 @@ import { findAuthUserIdByEmail } from '@/features/auth/utils/find-auth-user.js';
 import type { AuthResponse } from '@/features/auth/auth.types.js';
 import type { LoginInput } from '@/features/auth/auth.validators.js';
 
-/**
- * Sign in with email and password. 403 EMAIL_NOT_VERIFIED for an account
- * still waiting for its emailed code (OAuth-linked accounts excepted).
- */
+/** 403 EMAIL_NOT_VERIFIED for an account still waiting for its emailed code (OAuth-linked ones excepted). */
 export async function login(data: LoginInput): Promise<AuthResponse> {
 	try {
 		logger.info('User login attempt', { email: data.email });
@@ -21,10 +18,8 @@ export async function login(data: LoginInput): Promise<AuthResponse> {
 			}
 		);
 
-		// register creates the auth user unconfirmed until the email code is
-		// verified. Supabase checks the password first and answers
-		// email_not_confirmed only to the right one, so this 403 reveals
-		// nothing about which emails have an account (#243).
+		// Supabase checks the password first and answers email_not_confirmed only to the right one,
+		// so this 403 reveals nothing about which emails have an account.
 		if (authError?.code === 'email_not_confirmed') {
 			const userId = await findAuthUserIdByEmail(data.email);
 			logger.warn('Login blocked - email not verified', { userId, email: data.email });

@@ -16,7 +16,6 @@ import {
 } from '@/shared/config/swagger.schemas.js';
 import { fail, shared } from '@/shared/config/swagger.errors.js';
 
-/** Registers the OAuth routes of /api/auth: Google, Facebook, linked providers. */
 export function registerAuthOauthOpenapi(registry: OpenAPIRegistry): void {
 	const tags = ['Authentication', 'OAuth'];
 	const signIn = {

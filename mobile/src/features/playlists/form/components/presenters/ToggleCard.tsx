@@ -12,7 +12,6 @@ interface ToggleCardProps {
 	onValueChange: (value: boolean) => void;
 }
 
-/** A setting of the new playlist: its label, what it means now, and a switch. */
 export function ToggleCard({ label, description, value, onValueChange }: ToggleCardProps) {
 	const { styles } = useThemedStyles(createStyles);
 

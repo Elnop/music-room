@@ -3,8 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import * as filteredProfileService from '@/features/profile/services/filtered-profile.service.js';
 
-// Reads tables and a trigger created by backend/migrations (011) through the
-// real supabase-js client, against the local Supabase stack.
+// Runs against the local Supabase stack, with the tables and trigger of migration 011.
 describe('profile creation (migrations 001 + 011)', () => {
 	let userId: string;
 
@@ -56,8 +55,7 @@ describe('profile creation (migrations 001 + 011)', () => {
 	});
 });
 
-// getFilteredProfile hides fields by visibility and friendship (threat model L9,
-// #206), against profiles, privacy rows and follows in the local Supabase stack.
+// getFilteredProfile hides fields by visibility and friendship (threat model L9).
 describe('filteredProfileService.getFilteredProfile', () => {
 	const userIds: string[] = [];
 	const emails = new Map<string, string>();

@@ -17,7 +17,6 @@ interface SettingRowProps {
 	busy: boolean;
 }
 
-/** One switch of the playlist's settings, with its icon and what it means now. */
 export function SettingRow({ icon, label, description, value, onToggle, busy }: SettingRowProps) {
 	const { styles: shared } = useThemedStyles(createSharingStyles);
 	const { styles, theme } = useThemedStyles(createStyles);

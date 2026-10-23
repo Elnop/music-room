@@ -11,7 +11,7 @@ if (!FACEBOOK_APP_ID) {
 	logger.warn('EXPO_PUBLIC_FACEBOOK_APP_ID is not defined. Facebook login will not work.');
 }
 
-/** Initializes the Facebook SDK; called once at app start. */
+/** Called once at app start. */
 export function initializeFacebookSDK(): void {
 	if (FACEBOOK_APP_ID) {
 		Settings.setAppID(FACEBOOK_APP_ID);
@@ -19,10 +19,7 @@ export function initializeFacebookSDK(): void {
 	}
 }
 
-/**
- * Native Facebook login. Resolves the access token to send to the backend;
- * rejects with Error(SIGN_IN_CANCELLED) when the user cancels.
- */
+/** Rejects with Error(SIGN_IN_CANCELLED) when the user cancels. */
 export async function signInWithFacebook(): Promise<string> {
 	try {
 		if (!FACEBOOK_APP_ID) {

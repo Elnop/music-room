@@ -25,11 +25,7 @@ interface LoginForm {
 	goToRegister: () => void;
 }
 
-/**
- * The email and password form. A failure shows a toast while the screen is
- * focused (mutate callbacks never run after it unmounted); an account whose email
- * is not verified is sent to the code screen instead.
- */
+/** Failures toast only while the screen is focused; an unverified account goes to the code screen. */
 export function useLoginForm(
 	navigation: NativeStackNavigationProp<AuthStackParamList, 'Login'>
 ): LoginForm {

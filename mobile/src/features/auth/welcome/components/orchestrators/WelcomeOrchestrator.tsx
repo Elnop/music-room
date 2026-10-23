@@ -6,7 +6,6 @@ import { WelcomeView } from '@/features/auth/welcome/components/presenters/Welco
 
 type WelcomeOrchestratorProps = NativeStackScreenProps<AuthStackParamList, 'Welcome'>;
 
-/** The first screen when signed out. */
 export function WelcomeOrchestrator({ navigation }: WelcomeOrchestratorProps) {
 	const icons = useFloatingIcons();
 	const [showServer, setShowServer] = useState(false);

@@ -2,23 +2,15 @@ import { rateLimitConfig } from '@/shared/config/rate-limit.config.js';
 import { logger } from '@/shared/utils/logger.js';
 import * as counter from '@/shared/security/counter.js';
 
-/**
- * How account lockout and IP reputation run a Redis operation: skipped when
- * ACCOUNT_LOCKOUT_ENABLED=false, and fail open (a safe default, logged) while
- * Redis is not ready or when a command fails. An accepted risk: the login
- * rate limiter, which runs first, fails closed (doc/security/threat-model.md).
- */
+/** Accepted risk: fails open, but the login rate limiter that runs first fails closed (doc/security/threat-model.md). */
 interface FailOpenOptions<T> {
-	/** Debug log when lockout is disabled. */
 	disabled: string;
-	/** Log while Redis is not ready, at `unavailableLevel` (warn by default). */
+	/** Logged at `unavailableLevel` (warn by default). */
 	unavailable: string;
 	unavailableLevel?: 'warn' | 'error';
-	/** Error log when a command fails. */
 	failed: string;
-	/** Result when disabled (defaults to `fallback`). */
+	/** Defaults to `fallback`. */
 	whenDisabled?: T;
-	/** Result while Redis is not ready or after an error. */
 	fallback: T;
 }
 

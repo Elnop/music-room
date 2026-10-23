@@ -6,7 +6,6 @@ interface Countdown {
 	start: (seconds: number) => void;
 }
 
-/** A countdown of whole seconds, such as the wait before a new code may be sent. */
 export function useCountdown(): Countdown {
 	const [seconds, setSeconds] = useState(0);
 

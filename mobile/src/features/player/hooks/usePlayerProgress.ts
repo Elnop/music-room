@@ -7,10 +7,6 @@ interface PlayerProgress {
 	progress: number;
 }
 
-/**
- * Tracks the player's current time and duration in real-time.
- * Updates every 100ms for smooth progress bar updates.
- */
 export function usePlayerProgress(): PlayerProgress {
 	const { player } = usePlayer();
 	const [currentTime, setCurrentTime] = useState(0);

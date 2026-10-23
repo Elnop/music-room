@@ -31,8 +31,8 @@ const { sendPasswordResetEmail } = await import('@/features/mail/services/mail.s
 const loginService = await import('@/features/auth/services/login.service.js');
 const sessionService = await import('@/features/auth/services/session.service.js');
 
-// A password reset ends every open session of the account (#203), through HTTP
-// on the real auth router against the local Supabase stack and test Redis.
+// A password reset ends every open session of the account, through HTTP on the real auth
+// router against the local Supabase stack and test Redis.
 
 const OLD_PASSWORD = 'Old-password-203';
 const NEW_PASSWORD = 'New-password-203';

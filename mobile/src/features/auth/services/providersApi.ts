@@ -7,7 +7,6 @@ import type {
 
 const bearer = (accessToken: string) => ({ Authorization: `Bearer ${accessToken}` });
 
-/** The sign-in methods linked to the signed-in account. */
 export function getLinkedProviders(accessToken: string): Promise<LinkedProvidersResponse> {
 	return apiRequest('/api/auth/providers', { method: 'GET', headers: bearer(accessToken) });
 }

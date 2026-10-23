@@ -4,9 +4,6 @@ import { getAppVersion } from './deviceService';
 import { getBackendUrl } from './backendUrl';
 import { getAuthSession, getSession } from './authSession';
 
-/**
- * Standard API Response format (matches backend)
- */
 interface ApiResponse<T> {
 	success: boolean;
 	data?: T;
@@ -30,14 +27,10 @@ interface ApiErrorDebug {
 	fix?: string;
 }
 
-/**
- * API Error class: the backend error format `{ message, code, details?, why?, fix? }`
- * plus the HTTP status. `message` is safe to show; `why` and `fix` are for logs.
- */
+/** `message` is safe to show; `why` and `fix` are for logs. */
 export class ApiError extends Error {
 	code: string;
 	details?: unknown;
-	/** HTTP status of the response, when there was one */
 	status?: number;
 	why?: string;
 	fix?: string;
@@ -59,9 +52,7 @@ export class ApiError extends Error {
 	}
 }
 
-/**
- * Get client metadata headers for action logging
- */
+/** The backend logs these with every action. */
 function getClientHeaders(): Record<string, string> {
 	const appVersion = getAppVersion();
 
@@ -74,10 +65,7 @@ function getClientHeaders(): Record<string, string> {
 	return headers;
 }
 
-/**
- * Make API request with automatic token refresh on 401.
- * The backend address is read at call time (services/backendUrl.ts).
- */
+/** Refreshes the token on a 401; reads the backend address at call time. */
 export async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
 	const url = `${getBackendUrl()}${endpoint}`;
 
@@ -126,7 +114,7 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
 		const response = await makeRequest(accessToken || undefined);
 
 		// Refresh only when a session exists: signed out (e.g. a wrong password
-		// at login), the 401 is the backend's answer, not an expired token (#235).
+		// at login), the 401 is the backend's answer, not an expired token.
 		if (response.status === 401 && accessToken) {
 			const refreshSuccess = await refreshAccessToken();
 
@@ -154,10 +142,7 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
 	}
 }
 
-/**
- * apiRequest with the given access token, for callers that pass it explicitly.
- * The registered session's token, when there is one, takes precedence.
- */
+/** The registered session's token, when there is one, takes precedence. */
 export function authRequest<T>(
 	endpoint: string,
 	accessToken: string,
@@ -172,9 +157,6 @@ export function authRequest<T>(
 	});
 }
 
-/**
- * Handle response parsing and errors
- */
 async function handleResponse<T>(response: Response): Promise<T> {
 	if (!response.ok) {
 		let errorMessage = `HTTP ${response.status}: ${response.statusText}`;

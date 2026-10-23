@@ -1,7 +1,6 @@
 import { StyleSheet } from 'react-native';
 import type { Theme } from '@/shared/theme/types';
 
-/** Styles shared by the blocks of « Visibilité et droits ». */
 export const createSharingStyles = (theme: Theme) =>
 	StyleSheet.create({
 		sectionTitle: {

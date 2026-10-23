@@ -1,12 +1,5 @@
 import Toast from 'react-native-toast-message';
 
-/**
- * Toast utility wrapper for Zumik
- * Provides consistent toast notifications across the app
- * Position: top (as requested)
- * Auto-dismiss: 3-4 seconds depending on type
- */
-
 export const showSuccess = (message: string, duration = 3000) => {
 	Toast.show({
 		type: 'success',

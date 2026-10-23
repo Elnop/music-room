@@ -1,10 +1,3 @@
-/**
- * Profile Feature Navigation Stack
- *
- * Architecture:
- * - Toutes les pages utilisent le header natif avec effet liquid glass sur iOS
- */
-
 import React from 'react';
 import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -26,7 +19,6 @@ export function ProfileNavigator() {
 	return (
 		<ProfileStack.Navigator
 			screenOptions={{
-				// Header opaque avec effet blur natif sur iOS
 				headerStyle: {
 					backgroundColor: theme.colors.background,
 				},

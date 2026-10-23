@@ -10,7 +10,6 @@ import {
 import { bearerAuth, describeParams, nameSchemas, ok } from '@/shared/config/swagger.schemas.js';
 import { fail, shared } from '@/shared/config/swagger.errors.js';
 
-/** Registers the /api/friends routes. */
 export function registerFriendsOpenapi(registry: OpenAPIRegistry): void {
 	const common = { tags: ['Friends'], security: bearerAuth };
 	const unauthorized = shared('UnauthorizedError');

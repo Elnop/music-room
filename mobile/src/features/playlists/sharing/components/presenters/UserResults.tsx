@@ -18,7 +18,6 @@ interface UserResultsProps {
 	onAdd: (user: UserSummary) => void;
 }
 
-/** The users found by the search, each added with one tap. */
 export function UserResults({ results, isSearching, busy, onAdd }: UserResultsProps) {
 	const { styles: shared } = useThemedStyles(createSharingStyles);
 	const { styles, theme } = useThemedStyles(createStyles);

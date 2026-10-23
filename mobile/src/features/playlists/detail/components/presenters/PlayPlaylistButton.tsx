@@ -6,13 +6,9 @@ import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { PlayPlaylist } from '@/features/playlists/detail/hooks/usePlayPlaylist';
 
-/** Diameter of the round button. */
 const BUTTON_SIZE = 44;
 
-/**
- * Play/Pause button of a playlist (#277), in its header next to the track
- * count, so it scrolls with the list and never covers a row (#307).
- */
+/** In the header, so it scrolls with the list and never covers a row. */
 export function PlayPlaylistButton({ play }: { play: PlayPlaylist }) {
 	const { styles, theme } = useThemedStyles(createStyles);
 

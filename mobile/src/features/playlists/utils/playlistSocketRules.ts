@@ -17,11 +17,7 @@ const detailsPatch = (details: PlaylistDetailsEvent) => ({
 	editMode: details.editMode,
 });
 
-/**
- * What the playlist events do to the cache (#342, doc/features/playlist-concurrency.md).
- * A track delta applies in version order; a skipped version or a rebalance
- * invalidates the playlist, which reloads it. Details patch the metadata only.
- */
+/** Track deltas apply in version order; a gap or a rebalance reloads the playlist (doc/features/playlist-concurrency.md). */
 export const PLAYLIST_SOCKET_RULES = [
 	socketCacheRule<PlaylistUpdatedEvent, PlaylistWithTracks>({
 		event: 'playlist:updated',

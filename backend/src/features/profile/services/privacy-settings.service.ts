@@ -7,7 +7,7 @@ import type { ProfilePrivacy } from '@/features/profile/profile.types.js';
 
 type ProfilePrivacyRow = Tables<'profile_privacy'>;
 
-/** Map database row to ProfilePrivacy, with the defaults for missing values. */
+/** Missing values fall back to the defaults. */
 function mapRowToPrivacy(row: ProfilePrivacyRow): ProfilePrivacy {
 	return {
 		userId: row.user_id,
@@ -20,7 +20,7 @@ function mapRowToPrivacy(row: ProfilePrivacyRow): ProfilePrivacy {
 	};
 }
 
-/** Default privacy settings, without creating them in the database. */
+/** The defaults, not stored in the database. */
 function defaultPrivacySettings(userId: string): ProfilePrivacy {
 	return {
 		userId,
@@ -33,7 +33,7 @@ function defaultPrivacySettings(userId: string): ProfilePrivacy {
 	};
 }
 
-/** Creates the user's privacy row, from the defaults overridden by initialData. */
+/** initialData overrides the defaults. */
 async function createDefaultSettings(
 	userId: string,
 	initialData?: UpdatePrivacyInput
@@ -66,10 +66,7 @@ async function createDefaultSettings(
 	}
 }
 
-/**
- * Privacy settings of `userId`. Without a row, the defaults: stored when the
- * requester is the user themselves, only returned for anyone else.
- */
+/** Without a row, the defaults are stored only when the requester is the user themselves. */
 export async function getPrivacySettings(
 	userId: string,
 	requesterId?: string
@@ -100,7 +97,7 @@ export async function getPrivacySettings(
 	}
 }
 
-/** Updates the given visibilities, creating the row when missing. */
+/** Creates the row when missing. */
 export async function updatePrivacySettings(
 	userId: string,
 	data: UpdatePrivacyInput
@@ -124,7 +121,6 @@ export async function updatePrivacySettings(
 			.single();
 
 		if (error) {
-			// No row yet: create it with the given settings
 			if (error.code === 'PGRST116') return await createDefaultSettings(userId, data);
 			logger.error('Failed to update privacy settings', { error });
 			throw new AppError(500, 'Failed to update privacy settings', 'PRIVACY_UPDATE_ERROR');

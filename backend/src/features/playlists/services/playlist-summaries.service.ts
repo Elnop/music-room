@@ -7,8 +7,7 @@ import type {
 	PlaylistRow,
 } from '@/features/playlists/playlist.types.js';
 
-// Loads the playlist cards of the list endpoints: track count, first cover
-// and owner of each playlist. Errors are thrown as is; the caller maps them.
+// Errors are thrown as is; the caller maps them.
 
 /** Track count and album art of the first track by rank, per playlist. */
 export async function fetchTrackStats(playlistIds: string[]): Promise<TrackStats> {
@@ -42,7 +41,6 @@ export async function fetchTrackStats(playlistIds: string[]): Promise<TrackStats
 	return { counts, firstCovers };
 }
 
-/** Profiles of the owners of these playlists, by id. */
 async function fetchOwners(playlists: PlaylistRow[]): Promise<Record<string, PlaylistOwner>> {
 	const ownerIds = [...new Set(playlists.map(p => p.owner_id))];
 	const { data: owners, error } = await supabaseAdmin
@@ -57,7 +55,6 @@ async function fetchOwners(playlists: PlaylistRow[]): Promise<Record<string, Pla
 	return byId;
 }
 
-/** The cards of these playlists, each with its own owner's profile. */
 export async function summarizeWithOwners(playlists: PlaylistRow[]): Promise<PlaylistResponse[]> {
 	if (playlists.length === 0) return [];
 	const stats = await fetchTrackStats(playlists.map(p => p.id));

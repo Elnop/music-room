@@ -1,9 +1,5 @@
-/**
- * Query-key factory: every TanStack query key is built here, one entry per
- * domain, so a hook and the socket bridge that invalidates it agree on the
- * key. Keys nest: `queryKeys.playlists.all` is a prefix of every playlist key,
- * so invalidating it refreshes all of them.
- */
+// Every query key is built here so a hook and the socket bridge that invalidates it agree.
+// Keys nest: invalidating `queryKeys.playlists.all` refreshes every playlist key.
 export const queryKeys = {
 	auth: {
 		all: ['auth'] as const,

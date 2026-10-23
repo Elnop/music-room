@@ -1,9 +1,5 @@
 import { z } from 'zod';
 
-/**
- * Playlist validation schemas using Zod
- */
-
 export const createPlaylistSchema = z.object({
 	name: z
 		.string()

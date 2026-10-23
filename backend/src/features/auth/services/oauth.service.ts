@@ -17,7 +17,7 @@ if (!FACEBOOK_APP_ID || !FACEBOOK_APP_SECRET) {
 
 const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
-/** Verify a Google Sign-In ID token; 400 when Google has not verified the email. */
+/** 400 when Google has not verified the email. */
 export async function verifyGoogleToken(idToken: string): Promise<GoogleTokenPayload> {
 	try {
 		const ticket = await googleClient.verifyIdToken({
@@ -63,7 +63,7 @@ export async function verifyGoogleToken(idToken: string): Promise<GoogleTokenPay
 	}
 }
 
-/** Verify a Facebook Login access token for this app and read the profile (email optional). */
+/** Checks the token was issued for this app; the profile email is optional. */
 export async function verifyFacebookToken(accessToken: string): Promise<FacebookTokenPayload> {
 	try {
 		const debugUrl = `https://graph.facebook.com/v21.0/debug_token?input_token=${accessToken}&access_token=${FACEBOOK_APP_ID}|${FACEBOOK_APP_SECRET}`;
@@ -126,7 +126,7 @@ export async function verifyFacebookToken(accessToken: string): Promise<Facebook
 
 		return {
 			id: profileData.id,
-			email: profileData.email, // May be undefined
+			email: profileData.email,
 			name: profileData.name,
 			picture: profileData.picture?.data?.url,
 		};

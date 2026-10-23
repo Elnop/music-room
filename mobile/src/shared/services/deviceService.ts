@@ -5,10 +5,7 @@ import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 import { deviceStorage } from './deviceStorage';
 
-/**
- * App version sent to the backend (HTTP `X-App-Version` header and the
- * Socket.io handshake). Single source for both.
- */
+/** Single source for the `X-App-Version` header and the Socket.io handshake. */
 export function getAppVersion(): string {
 	return (
 		Constants?.expoConfig?.version ||
@@ -18,11 +15,8 @@ export function getAppVersion(): string {
 	);
 }
 
-/**
- * Label of the installed build, e.g. `Zumik 1.0.0 (build 42 · a1b2c3d)`.
- * release-apk.yml sets the build number (the release tag's) and the short
- * commit SHA before bundling; a local build has neither and reads `dev`.
- */
+// e.g. `Zumik 1.0.0 (build 42 · a1b2c3d)`: release-apk.yml sets the build number and
+// commit SHA before bundling; a local build has neither and reads `dev`.
 export function formatBuildLabel(version: string, buildNumber?: string, commit?: string): string {
 	if (!buildNumber) return `Zumik ${version} (dev)`;
 	return commit
@@ -38,9 +32,6 @@ export function getBuildLabel(): string {
 	);
 }
 
-/**
- * Device information for multi-device music control
- */
 export interface DeviceInfo {
 	deviceId: string;
 	deviceName: string;
@@ -48,18 +39,8 @@ export interface DeviceInfo {
 	model: string;
 }
 
-/**
- * Device Service
- * Provides unique device identification for multi-device support
- *
- * The deviceId is persisted in deviceStorage to remain consistent
- * across app restarts. Each physical device gets a unique ID.
- */
+/** The deviceId persists in deviceStorage so it stays the same across app restarts. */
 export const deviceService = {
-	/**
-	 * Get device information including a persistent device ID
-	 * Creates a new ID if one doesn't exist
-	 */
 	async getDeviceInfo(): Promise<DeviceInfo> {
 		let deviceId = await deviceStorage.getDeviceId();
 		if (!deviceId) {
@@ -79,9 +60,6 @@ export const deviceService = {
 		};
 	},
 
-	/**
-	 * Clear the device ID (useful for testing or resetting)
-	 */
 	async clearDeviceId(): Promise<void> {
 		await deviceStorage.clearDeviceId();
 	},

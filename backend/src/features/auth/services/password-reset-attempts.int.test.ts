@@ -24,8 +24,7 @@ const { default: authRouter } = await import('@/features/auth/auth.routes.js');
 const { errorHandler } = await import('@/shared/middleware/error-handler.js');
 const loginService = await import('@/features/auth/services/login.service.js');
 
-// The password reset code has a max attempts limit that runs before the code
-// check (threat model L9, #206), through HTTP on the real auth router against
+// The attempts limit runs before the code check, through HTTP on the real auth router against
 // the local Supabase stack and test Redis.
 
 const PASSWORD = 'Old-password-206';

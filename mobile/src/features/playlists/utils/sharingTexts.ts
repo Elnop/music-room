@@ -1,13 +1,5 @@
-/**
- * What « Visibilité et droits » manages, by visibility and edit mode:
- *
- * | visibility | editMode   | Managed                                     |
- * |------------|------------|---------------------------------------------|
- * | public     | open       | Info only - everyone can edit               |
- * | public     | restricted | Editors (collaborators)                     |
- * | private    | open       | Access (viewers, who can also edit)         |
- * | private    | restricted | Access (viewers) and editors (collaborators) |
- */
+// The sharing screen manages: public/open nothing, public/restricted editors,
+// private/open viewers (who can also edit), private/restricted viewers and editors.
 export interface SharingMode {
 	isPrivate: boolean;
 	isEditRestricted: boolean;

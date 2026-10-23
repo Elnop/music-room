@@ -18,7 +18,6 @@ import {
 } from '@/shared/config/swagger.schemas.js';
 import { shared } from '@/shared/config/swagger.errors.js';
 
-/** Registers the /api/profile routes. */
 export function registerProfileOpenapi(registry: OpenAPIRegistry): void {
 	const common = { tags: ['Profile'], security: bearerAuth };
 	const unauthorized = shared('UnauthorizedError');

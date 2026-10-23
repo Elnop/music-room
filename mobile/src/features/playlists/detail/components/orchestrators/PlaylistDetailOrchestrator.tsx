@@ -25,7 +25,6 @@ type PlaylistDetailOrchestratorProps = NativeStackScreenProps<
 	'PlaylistDetail'
 >;
 
-/** The playlist screen: its tracks, live updates, and the owner's actions. */
 export function PlaylistDetailOrchestrator({ navigation, route }: PlaylistDetailOrchestratorProps) {
 	const screen = usePlaylistDetailScreen(navigation, route.params.id);
 	const { id, playlist } = screen;
@@ -37,10 +36,8 @@ export function PlaylistDetailOrchestrator({ navigation, route }: PlaylistDetail
 	const isOwner = !!userId && playlist?.ownerId === userId;
 	const { openSheet } = owner;
 
-	// headerRight is always set and keeps the same view, empty for a non-owner:
-	// isOwner turns false while the playlist reloads, and adding or removing the
-	// native header subview while the screen re-attaches on Android crashes with
-	// "The specified child already has a parent" (#343).
+	// headerRight stays set (empty for a non-owner): adding or removing the native header
+	// subview while the screen re-attaches crashes Android ("child already has a parent").
 	React.useLayoutEffect(() => {
 		navigation.setOptions({
 			headerTransparent: true,

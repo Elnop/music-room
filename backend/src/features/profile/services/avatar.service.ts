@@ -5,19 +5,14 @@ import { logger } from '@/shared/utils/logger.js';
 import { detectImageType } from '@/features/profile/utils/image-type.js';
 import type { AvatarResponse } from '@/features/profile/profile.types.js';
 
-/** Public Storage bucket created by migration 027. */
+/** Public bucket, created by migration 027. */
 export const AVATAR_BUCKET = 'avatars';
 
 const PUBLIC_PATH_PREFIX = `/storage/v1/object/public/${AVATAR_BUCKET}/`;
 const OBJECT_NAME = /^[0-9a-f-]{36}\.(jpg|png|webp)$/;
 
-/**
- * Object path in the `avatars` bucket when `url` is a photo this backend
- * stored for `userId` (`<userId>/<uuid>.<ext>`), null otherwise: a Google or
- * Facebook picture, someone else's folder, any other URL. Only that path is
- * ever deleted. The host is not compared, since the local stack is reached
- * under several addresses; the folder restricts deletion to the user's files.
- */
+// Only paths this backend stored for userId are ever deleted. The host is not compared, as the local
+// stack has several addresses: the `<userId>/` folder restricts deletion to the user's files.
 export function ownedAvatarPath(url: string | null | undefined, userId: string): string | null {
 	if (!url) return null;
 
@@ -43,10 +38,7 @@ async function removeObject(path: string, userId: string): Promise<void> {
 	}
 }
 
-/**
- * Deletes the photo at `previousUrl` when it is ours (see ownedAvatarPath) and
- * no longer the avatar (`currentUrl`). Never throws.
- */
+/** Deletes the photo at previousUrl when it is ours and no longer the avatar. Never throws. */
 export async function deleteReplacedAvatar(
 	previousUrl: string | null | undefined,
 	currentUrl: string | null | undefined,
@@ -89,10 +81,7 @@ async function setAvatarUrl(userId: string, avatarUrl: string | null): Promise<v
 	}
 }
 
-/**
- * Stores a new profile photo and makes it the user's avatar. The previous
- * photo is deleted when it was stored here; an external one is left alone.
- */
+/** The previous photo is deleted when it was stored here; an external one is left alone. */
 export async function uploadAvatar(userId: string, file: Buffer): Promise<AvatarResponse> {
 	const type = detectImageType(file);
 	if (!type) {
@@ -130,7 +119,7 @@ export async function uploadAvatar(userId: string, file: Buffer): Promise<Avatar
 	return { avatarUrl };
 }
 
-/** Clears the user's avatar and deletes the photo when it was stored here. */
+/** Also deletes the photo when it was stored here. */
 export async function removeAvatar(userId: string): Promise<AvatarResponse> {
 	const previousUrl = await currentAvatarUrl(userId);
 	await setAvatarUrl(userId, null);

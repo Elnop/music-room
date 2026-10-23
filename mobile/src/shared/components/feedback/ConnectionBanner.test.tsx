@@ -65,11 +65,9 @@ describe('ConnectionBanner', () => {
 
 describe('textColorOn', () => {
 	it.each([
-		// error colors of the themes
 		[pastelLimeTheme.colors.error, FIXED_COLORS.inkLight],
 		[originalTheme.colors.error, FIXED_COLORS.inkDark],
 		[christmasTheme.colors.error, FIXED_COLORS.inkLight],
-		// warning colors of the themes
 		[pastelLimeTheme.colors.warning, FIXED_COLORS.inkDark],
 		[royalBlueTheme.colors.warning, FIXED_COLORS.inkDark],
 		[originalTheme.colors.warning, FIXED_COLORS.inkDark],

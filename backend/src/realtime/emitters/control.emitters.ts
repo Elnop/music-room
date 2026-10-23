@@ -4,17 +4,7 @@ import { leaveListeningRoom } from '@/realtime/music-control-access.js';
 import { broadcastUserListeningStatus } from '@/realtime/listening-status.js';
 import { deviceKey, deviceToSocket, getIO, listeningStatuses } from '@/realtime/state.js';
 
-/**
- * What the music-control and friends features ask of the Socket.io server:
- * device presence and names, and the effects of a control access change.
- */
-
-/**
- * Re-check `controllerId`'s access to `ownerId`'s devices after a change
- * (switch or license revoked, unfollow) and make its sockets leave
- * `listening:<ownerId>` only when no device is left. A failed check
- * evicts (fail closed). Never throws; no-op before initialize.
- */
+/** Leaves `listening:<ownerId>` only when no device is left; a failed check evicts (fail closed). Never throws. */
 export async function revalidateListeningAccess(
 	controllerId: string,
 	ownerId: string
@@ -25,10 +15,6 @@ export async function revalidateListeningAccess(
 	leaveListeningRoom(io, controllerId, ownerId);
 }
 
-/**
- * Notify a user that their music control permission has changed
- * Called when someone grants or revokes control to them
- */
 export async function notifyPermissionChange(
 	targetUserId: string,
 	ownerId: string,
@@ -55,11 +41,7 @@ export async function notifyPermissionChange(
 	});
 }
 
-/**
- * Give a connected device the name its owner just chose (#352): its socket
- * data and its listening status take it at once, and the owner's listeners
- * get the status again. No-op when offline.
- */
+/** Its socket data and listening status take the name at once; no-op when offline. */
 export function setDeviceName(userId: string, deviceId: string, deviceName: string): void {
 	const socketId = deviceToSocket.get(deviceKey(userId, deviceId));
 	const socket = socketId ? getIO()?.sockets.sockets.get(socketId) : undefined;
@@ -71,7 +53,6 @@ export function setDeviceName(userId: string, deviceId: string, deviceName: stri
 	broadcastUserListeningStatus(userId);
 }
 
-/** Whether a device of userId has a connected socket (#294). */
 export function isDeviceOnline(userId: string, deviceId: string): boolean {
 	return deviceToSocket.has(deviceKey(userId, deviceId));
 }

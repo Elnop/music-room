@@ -11,7 +11,6 @@ import {
 import { bearerAuth, jsonBody, nameSchemas, ok } from '@/shared/config/swagger.schemas.js';
 import { shared } from '@/shared/config/swagger.errors.js';
 
-/** Registers the privacy and music preference routes of /api/profile. */
 export function registerProfileSettingsOpenapi(registry: OpenAPIRegistry): void {
 	const common = { tags: ['Profile'], security: bearerAuth };
 	const unauthorized = shared('UnauthorizedError');

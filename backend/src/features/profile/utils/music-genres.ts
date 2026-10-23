@@ -7,7 +7,7 @@ function isMusicGenre(genre: string): genre is MusicGenre {
 	return GENRES.includes(genre);
 }
 
-/** The known genres of a stored `genres` column; anything else is dropped. */
+/** Unknown values of a stored `genres` column are dropped. */
 export function parseGenres(genres: string[] | null | undefined): MusicGenre[] {
 	if (!genres || !Array.isArray(genres)) return [];
 	return genres.filter(isMusicGenre);

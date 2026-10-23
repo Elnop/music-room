@@ -15,9 +15,7 @@ import { logger } from '@/shared/utils/logger.js';
 import { sendSuccess } from '@/shared/utils/send-success.js';
 import * as ipReputation from '@/shared/security/ip-reputation.js';
 
-// Google and Facebook sign-in, and the providers linked to an account.
-
-/** Runs an OAuth sign-in; a failure counts toward the IP reputation. */
+/** A failure counts toward the IP reputation. */
 async function oauthLogin(req: Request, res: Response, signIn: () => Promise<unknown>) {
 	const ip = requestIp(req);
 	try {
@@ -29,27 +27,23 @@ async function oauthLogin(req: Request, res: Response, signIn: () => Promise<unk
 	}
 }
 
-/** POST /api/auth/google */
 export async function googleLogin(req: Request, res: Response) {
 	await oauthLogin(req, res, () =>
 		oauthLoginService.loginWithGoogle(googleLoginSchema.parse(req.body).idToken)
 	);
 }
 
-/** POST /api/auth/facebook */
 export async function facebookLogin(req: Request, res: Response) {
 	await oauthLogin(req, res, () =>
 		oauthLoginService.loginWithFacebook(facebookLoginSchema.parse(req.body).accessToken)
 	);
 }
 
-/** GET /api/auth/providers */
 export async function getLinkedProviders(req: Request, res: Response) {
 	const userId = (req as AuthenticatedRequest).user.id;
 	sendSuccess(res, await providerService.getLinkedProviders(userId));
 }
 
-/** DELETE /api/auth/providers/:provider */
 export async function unlinkProvider(req: Request, res: Response) {
 	const userId = (req as AuthenticatedRequest).user.id;
 	const provider = req.params.provider as OAuthProvider;
@@ -63,7 +57,6 @@ export async function unlinkProvider(req: Request, res: Response) {
 	sendSuccess(res, { message: `${provider} unlinked successfully` });
 }
 
-/** POST /api/auth/providers/:provider/link */
 export async function linkProvider(req: Request, res: Response) {
 	const userId = (req as AuthenticatedRequest).user.id;
 	const { provider } = providerParamSchema.parse(req.params);

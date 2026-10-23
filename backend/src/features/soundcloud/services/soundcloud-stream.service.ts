@@ -6,12 +6,7 @@ import type { StreamUrlResult } from '@/features/soundcloud/soundcloud.types.js'
 
 type Protocol = 'hls' | 'progressive';
 
-/**
- * Stream URL of a track, through soundcloud.ts `util.streamLink()` (which handles
- * transcoding): HLS first, progressive when HLS is not available. Fetched on
- * demand, never persisted. `expiresAt` is when SoundCloud's URL expires; a cached
- * result keeps its original one.
- */
+// HLS first, else progressive. Never persisted; a cached result keeps its original `expiresAt`.
 export async function getStreamUrl(trackUrl: string): Promise<StreamUrlResult> {
 	const cacheKey = `stream:${trackUrl}`;
 	const cached = cache.get<StreamUrlResult>(cacheKey);

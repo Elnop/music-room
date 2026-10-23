@@ -14,10 +14,7 @@ type ProfileFields = Pick<
 	'id' | 'username' | 'display_name' | 'avatar_url' | 'bio' | 'created_at' | 'updated_at'
 >;
 
-/**
- * user_profiles column holding the provider's user ID, as a typed object to
- * spread into an insert or update (a computed `${provider}_id` key is untyped).
- */
+/** Typed object to spread into an insert or update: a computed `${provider}_id` key is untyped. */
 export function providerIdField(
 	provider: OAuthProvider,
 	providerId: string | null
@@ -49,9 +46,6 @@ export function toSessionBody(session: Session): NonNullable<AuthResponse['sessi
 	};
 }
 
-/**
- * Format auth response with user and session data
- */
 export function formatAuthResponse(
 	user: User,
 	session: Session,
@@ -82,9 +76,6 @@ export function formatAuthResponse(
 	};
 }
 
-/**
- * Fetch user profile from database
- */
 export async function fetchUserProfile(userId: string): Promise<{
 	username: string;
 	display_name?: string;
@@ -117,9 +108,6 @@ export async function fetchUserProfile(userId: string): Promise<{
 	};
 }
 
-/**
- * Get complete user profile by ID (auth + profile)
- */
 export async function getUserProfile(userId: string): Promise<UserProfile> {
 	try {
 		const { data: user, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);

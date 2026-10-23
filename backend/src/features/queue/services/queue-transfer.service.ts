@@ -14,11 +14,7 @@ import {
 import type { TransferInput } from '@/features/queue/queue.validators.js';
 import type { QueueItem, TransferResult } from '@/features/queue/queue.types.js';
 
-/**
- * Moves playback to a device of the actor or of a friend (#295). Every check
- * comes before any change: target device (license, online), source device
- * (control), and the played item (in the actor's own queue).
- */
+/** Every check comes before any change: target device (license, online), source device, played item. */
 export async function transfer(actorId: string, input: TransferInput): Promise<TransferResult> {
 	const { targetUserId: ownerId, targetDeviceId: deviceId, playing, positionMs } = input;
 	await resolvePlaybackDevice(actorId, ownerId, deviceId);

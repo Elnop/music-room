@@ -8,10 +8,7 @@ interface DeferredSheetAction {
 	onDismiss: () => void;
 }
 
-/**
- * Closes a sheet before its action runs. On iOS the action waits for the
- * Modal's onDismiss: an Alert raised while the Modal still slides out may be dropped.
- */
+/** On iOS the action waits for onDismiss: an Alert raised while the Modal slides out may be dropped. */
 export function useDeferredSheetAction(onClose: () => void): DeferredSheetAction {
 	const pendingRef = useRef<(() => void) | null>(null);
 

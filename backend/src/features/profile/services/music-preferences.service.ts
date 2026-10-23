@@ -38,7 +38,6 @@ function validateGenres(genres: MusicGenre[]): void {
 	}
 }
 
-/** Creates the user's music preferences row, empty unless genres are given. */
 async function createDefaultPreferences(
 	userId: string,
 	genres: MusicGenre[] = []
@@ -65,7 +64,7 @@ async function createDefaultPreferences(
 	}
 }
 
-/** The user's music preferences, created empty on first read. */
+/** Created empty on first read. */
 export async function getMusicPreferences(userId: string): Promise<MusicPreferences> {
 	try {
 		logger.info('Fetching music preferences', { userId });
@@ -77,7 +76,6 @@ export async function getMusicPreferences(userId: string): Promise<MusicPreferen
 			.single();
 
 		if (error) {
-			// No row yet: create the default, empty one
 			if (error.code === 'PGRST116') return await createDefaultPreferences(userId);
 			logger.error('Failed to fetch music preferences', { error });
 			throw new AppError(500, 'Failed to fetch music preferences', 'MUSIC_PREFS_FETCH_ERROR');
@@ -91,7 +89,7 @@ export async function getMusicPreferences(userId: string): Promise<MusicPreferen
 	}
 }
 
-/** Replaces the user's genres, creating the row when missing. */
+/** Creates the row when missing. */
 export async function updateMusicPreferences(
 	userId: string,
 	data: UpdateMusicPreferencesInput
@@ -109,7 +107,6 @@ export async function updateMusicPreferences(
 			.single();
 
 		if (error) {
-			// No row yet: create it with the given genres
 			if (error.code === 'PGRST116') return await createDefaultPreferences(userId, data.genres);
 			logger.error('Failed to update music preferences', { error });
 			throw new AppError(500, 'Failed to update music preferences', 'MUSIC_PREFS_UPDATE_ERROR');
@@ -124,7 +121,6 @@ export async function updateMusicPreferences(
 	}
 }
 
-/** Every genre a user can pick. */
 export function getAvailableGenres(): MusicGenre[] {
 	return [...MUSIC_GENRES];
 }

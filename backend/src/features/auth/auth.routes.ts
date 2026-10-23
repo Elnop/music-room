@@ -15,10 +15,9 @@ import {
 	checkIPBlacklist,
 } from '@/shared/security/account-lockout.middleware.js';
 
-// Endpoints are documented in auth*.openapi.ts.
 const router = Router();
 
-// Every auth route: IP blacklist first, then the global rate limiter (safety net).
+// IP blacklist first, then the global rate limiter as a safety net.
 router.use(checkIPBlacklist);
 router.use(globalAuthRateLimiter);
 

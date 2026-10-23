@@ -4,8 +4,7 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { QueueState, QueueStepDirection } from '@/features/queue/queue.types.js';
 
-// Calls the queue functions of migrations 021, 022 and 025, which all return the full queue
-// state, and turns their RAISE EXCEPTION codes into API errors.
+// Turns the RAISE EXCEPTION codes of the queue SQL functions into API errors.
 
 const queueStateSchema: z.ZodType<QueueState> = z.object({
 	ownerId: z.uuid(),

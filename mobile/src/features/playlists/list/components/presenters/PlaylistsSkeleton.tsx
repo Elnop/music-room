@@ -6,7 +6,6 @@ import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { FriendCardSkeleton } from './FriendCardSkeleton';
 import { createListStyles } from './listStyles';
 
-/** The playlists screen before its first answer: friends' carousel, then the grid. */
 export function PlaylistsSkeleton() {
 	const { styles: list } = useThemedStyles(createListStyles);
 	const { styles } = useThemedStyles(createStyles);

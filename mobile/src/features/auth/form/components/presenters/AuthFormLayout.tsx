@@ -13,9 +13,7 @@ import type { Theme } from '@/shared/theme/types';
 import logo from '@/assets/logo/logo.png';
 
 interface AuthFormLayoutProps {
-	/** Side of the square logo above the form. */
 	logoSize: number;
-	/** Extra room under the content (safe area). */
 	bottomInset?: number;
 	footerText: string;
 	footerLink: string;
@@ -23,7 +21,6 @@ interface AuthFormLayoutProps {
 	children: React.ReactNode;
 }
 
-/** The login and register layout: logo, the form, then a link to the other screen. */
 export function AuthFormLayout({
 	logoSize,
 	bottomInset,

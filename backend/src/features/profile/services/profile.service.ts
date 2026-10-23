@@ -6,7 +6,7 @@ import { deleteReplacedAvatar } from '@/features/profile/services/avatar.service
 import type { UpdateProfileInput } from '@/features/profile/profile.validators.js';
 import type { OwnProfile, UserProfileRow } from '@/features/profile/profile.types.js';
 
-/** The profile row with the account's email (auth.users); 404 USER_NOT_FOUND without one. */
+/** Joins the account's email (auth.users); 404 USER_NOT_FOUND without one. */
 async function withEmail(
 	profileData: UserProfileRow,
 	userId: string,
@@ -32,19 +32,17 @@ async function withEmail(
 	};
 }
 
-/** Updates the given fields of the caller's profile. */
 export async function updateProfile(userId: string, data: UpdateProfileInput): Promise<OwnProfile> {
 	try {
 		logger.info('Updating user profile', { userId, data });
 
-		// Build update object with only provided fields
 		const updateData: Record<string, string | undefined> = {};
 		if (data.displayName !== undefined) updateData.display_name = data.displayName;
 		if (data.bio !== undefined) updateData.bio = data.bio;
 		if (data.avatarUrl !== undefined) updateData.avatar_url = data.avatarUrl;
 		updateData.updated_at = new Date().toISOString();
 
-		// Previous avatar, to delete our stored photo once replaced (#351)
+		// Previous avatar, to delete our stored photo once replaced
 		let previousAvatarUrl: string | null = null;
 		if (data.avatarUrl !== undefined) {
 			const { data: current } = await supabaseAdmin
@@ -79,7 +77,6 @@ export async function updateProfile(userId: string, data: UpdateProfileInput): P
 	}
 }
 
-/** The caller's own profile, with email. */
 export async function getProfile(userId: string): Promise<OwnProfile> {
 	try {
 		logger.info('Fetching user profile', { userId });

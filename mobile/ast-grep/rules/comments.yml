@@ -1,0 +1,46 @@
+# One document per language: ast-grep parses .ts and .tsx with different grammars.
+id: no-ref-in-comment
+language: TypeScript
+severity: error
+message: "Issue (#123) and subject (IV.x) references do not belong in comments; state the reason itself. See .agents/rules/comments.md#no-ref-in-comment"
+rule:
+  kind: comment
+  regex: '(^|[\s(\[,/])#[1-9][0-9]{0,3}\b|\b(II|III|IV|V|VI|VII)\.[0-9]'
+files:
+  - src/**/*.ts
+ignores:
+  - src/shared/types/supabase.generated.ts
+---
+id: comment-max-lines
+language: TypeScript
+severity: error
+message: "Block comment longer than two lines of text; keep the one constraint the reader needs. See .agents/rules/comments.md#comment-max-lines"
+rule:
+  kind: comment
+  regex: '^/\*[^\n]*(\n[^\n]*){4,}'
+files:
+  - src/**/*.ts
+ignores:
+  - src/shared/types/supabase.generated.ts
+---
+id: no-ref-in-comment-tsx
+language: Tsx
+severity: error
+message: "Issue (#123) and subject (IV.x) references do not belong in comments; state the reason itself. See .agents/rules/comments.md#no-ref-in-comment"
+rule:
+  kind: comment
+  regex: '(^|[\s(\[,/])#[1-9][0-9]{0,3}\b|\b(II|III|IV|V|VI|VII)\.[0-9]'
+files:
+  - src/**/*.tsx
+  - App.tsx
+---
+id: comment-max-lines-tsx
+language: Tsx
+severity: error
+message: "Block comment longer than two lines of text; keep the one constraint the reader needs. See .agents/rules/comments.md#comment-max-lines"
+rule:
+  kind: comment
+  regex: '^/\*[^\n]*(\n[^\n]*){4,}'
+files:
+  - src/**/*.tsx
+  - App.tsx

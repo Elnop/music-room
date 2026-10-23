@@ -16,7 +16,6 @@ interface ActionSheetRowProps {
 	chevron?: boolean;
 }
 
-/** One action of an `ActionSheet`. */
 export function ActionSheetRow({
 	icon,
 	label,

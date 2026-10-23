@@ -1,15 +1,9 @@
 import { createStore, useStore, type StoreApi } from 'zustand';
 import type { UserProfile } from '@/types/user.types';
 
-/**
- * The session contract between the auth feature and the rest of the app. The
- * auth store registers itself here when it loads; the API client, the socket
- * and every other feature read the session and ask for a refresh through it,
- * so nothing outside `features/auth/` imports the feature
- * (architecture.md#layers, #no-cross-feature-imports).
- */
+// The auth store registers itself here, so nothing outside `features/auth/` imports the feature
+// (.agents/rules/architecture.md#layers).
 
-/** What any feature may read of the session. */
 export interface SessionView {
 	user: UserProfile | null;
 	accessToken: string | null;
@@ -40,7 +34,6 @@ export function registerAuthSession(session: AuthSession): void {
 	authSession = session;
 }
 
-/** The registered session, or null before the auth store has loaded. */
 export function getAuthSession(): AuthSession | null {
 	return authSession;
 }
@@ -57,25 +50,19 @@ export function useSession<T>(selector: (session: SessionView) => T): T {
 	return useStore(sessionStore(), selector);
 }
 
-/** Logs out the current session. */
 export async function logout(): Promise<void> {
 	await authSession?.logout?.();
 }
 
-/** Updates avatar url in the registered session store. */
 export async function setAvatarUrl(url: string | null): Promise<void> {
 	await authSession?.setAvatarUrl?.(url);
 }
 
-/** Updates current user in the registered session store. */
 export async function setUser(user: UserProfile): Promise<void> {
 	await authSession?.setUser?.(user);
 }
 
-/**
- * Runs `listener` at every end of session (logout, refused refresh); returns
- * the unsubscribe function.
- */
+/** Runs at every end of session: logout or refused refresh. */
 export function onSessionEnd(listener: () => void): () => void {
 	sessionEndListeners.add(listener);
 	return () => sessionEndListeners.delete(listener);

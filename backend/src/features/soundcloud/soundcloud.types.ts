@@ -1,8 +1,3 @@
-/**
- * Response and domain types of the soundcloud feature. Request inputs are
- * inferred from the Zod schemas in soundcloud.validators.ts.
- */
-
 import type { z } from 'zod';
 import type {
 	soundcloudSearchResultSchema,
@@ -10,7 +5,7 @@ import type {
 	soundcloudTrackSchema,
 } from '@/features/soundcloud/soundcloud.validators.js';
 
-/** The soundcloud.ts client: the part of it the feature calls. */
+/** The part of the soundcloud.ts client the feature calls. */
 export interface SoundCloudClient {
 	tracks: {
 		search: (query: { q: string; limit?: number; offset?: number }) => Promise<unknown>;
@@ -22,11 +17,10 @@ export interface SoundCloudClient {
 	};
 }
 
-/** A track as SoundCloud's API returns it. */
 export type SoundCloudTrack = z.infer<typeof soundcloudTrackSchema>;
 
-/** One page of search results, playable tracks only. */
+/** Playable tracks only. */
 export type SoundCloudSearchResult = z.infer<typeof soundcloudSearchResultSchema>;
 
-/** A stream URL and the moment it expires (ISO 8601). */
+/** The expiry is ISO 8601. */
 export type StreamUrlResult = z.infer<typeof soundcloudStreamResultSchema>;

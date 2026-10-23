@@ -29,11 +29,7 @@ export interface TrackActions {
 	share: () => void;
 }
 
-/**
- * The quick actions on a track (#316). Each action closes the sheet first, so
- * its toast shows on the screen underneath. Queue actions go through the
- * playback contract, which toasts their outcome.
- */
+/** Each action closes the sheet first so its toast shows on the screen underneath. */
 export function useTrackActions(track: AddQueueItemBody | null, onClose: () => void): TrackActions {
 	const userId = useSession(session => session.user?.id);
 	const [shown, setShown] = useState(track);

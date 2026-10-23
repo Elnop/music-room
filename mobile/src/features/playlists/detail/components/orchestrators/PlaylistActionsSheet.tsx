@@ -12,10 +12,6 @@ interface PlaylistActionsSheetProps {
 	onDelete: () => void;
 }
 
-/**
- * The owner's actions on their playlist (#342): edit its name and description,
- * open « Visibilité et droits », delete it. The sheet closes before the action runs.
- */
 export function PlaylistActionsSheet({
 	visible,
 	playlistName,

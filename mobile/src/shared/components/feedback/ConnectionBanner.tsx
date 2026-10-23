@@ -56,10 +56,7 @@ export function isDarkBackground(background: string): boolean {
 	return textColorOn(background) === LIGHT_TEXT;
 }
 
-/**
- * Discreet top banner telling the user the app is offline or reconnecting
- * (#315). « Réessayer » restarts the socket once the Manager gave up.
- */
+/** « Réessayer » restarts the socket once the Manager gave up. */
 export function ConnectionBanner({ status, topInset }: ConnectionBannerProps) {
 	const { theme } = useTheme();
 	const retry = useSocketStore(state => state.retry);

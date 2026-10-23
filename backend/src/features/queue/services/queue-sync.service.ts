@@ -4,7 +4,6 @@ import { logger } from '@/shared/utils/logger.js';
 import * as realtime from '@/realtime/emitters/queue.emitters.js';
 import { getQueueRpc } from '@/features/queue/utils/queue-rpc.js';
 
-/** The playlist change to mirror in the queues: one function of migration 023 each. */
 type PlaylistTrackChange = 'added' | 'removed' | 'moved';
 
 const SYNC_FUNCTIONS = {
@@ -15,12 +14,7 @@ const SYNC_FUNCTIONS = {
 
 const affectedUsersSchema = z.array(z.uuid());
 
-/**
- * Applies a playlist track change to the non-detached queue blocks of that
- * playlist, in every user's queue (#278), then sends each affected user their
- * new queue as `queue:updated`. Runs after the playlist operation succeeded:
- * every error is logged and swallowed, never thrown back to the caller.
- */
+/** Runs after the playlist operation succeeded: every error is logged and swallowed, never thrown. */
 export async function syncPlaylistChange(
 	change: PlaylistTrackChange,
 	playlistId: string,

@@ -27,9 +27,8 @@ describe('OAuth username generation', () => {
 	});
 
 	it('cuts a long name to 20 characters, and keeps the suffix of a taken one', async () => {
-		// Unique per run: the integration database keeps rows between runs. The
-		// base ends with a letter: a random '1' there would make it equal to its
-		// own "1" suffix, so the second user would get "2".
+		// Unique per run: the database keeps rows. The base ends with a letter: a trailing '1' would
+		// equal its own "1" suffix, so the second user would get "2".
 		const id = randomUUID().replace(/-/g, '');
 		const name = `Longnamefortest ${id.slice(0, 4)}x ${id.slice(4, 10)}`;
 		const base = name

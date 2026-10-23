@@ -5,10 +5,6 @@ import { AppError, sendError } from '@/shared/middleware/error-handler.js';
 import { TokenVerifyLimitError, verifyTokenLimited } from '@/shared/security/token-verify-limit.js';
 import { requestIp } from '@/shared/security/request-ip.js';
 
-/**
- * Authentication middleware
- * Verifies JWT token from Authorization header and attaches user to request
- */
 export async function authMiddleware(req: Request, res: Response, next: NextFunction) {
 	try {
 		const authHeader = req.headers.authorization;
@@ -41,10 +37,9 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
 			return sendError(req, res, new AppError(401, 'No token provided', 'NO_TOKEN'));
 		}
 
-		// Verify token with Supabase, unless this IP failed too often (429)
+		// Supabase is not called once this IP failed too often (429).
 		const user = await verifyTokenLimited(token, requestIp(req), sessionService.verifyToken);
 
-		// Attach user to request
 		(req as AuthenticatedRequest).user = user;
 
 		next();
@@ -77,11 +72,6 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
 	}
 }
 
-/**
- * Optional authentication middleware
- * Similar to authMiddleware but doesn't fail if no token is provided
- * Useful for endpoints that work differently for authenticated/unauthenticated users
- */
 export async function optionalAuthMiddleware(req: Request, res: Response, next: NextFunction) {
 	try {
 		const authHeader = req.headers.authorization;
@@ -102,7 +92,7 @@ export async function optionalAuthMiddleware(req: Request, res: Response, next: 
 
 		next();
 	} catch {
-		// Don't fail, just continue without user
+		// An invalid token continues anonymously too.
 		next();
 	}
 }

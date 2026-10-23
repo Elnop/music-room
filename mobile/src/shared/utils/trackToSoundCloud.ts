@@ -50,10 +50,7 @@ export function queueTrackToSoundCloud(track: QueueTrack): SoundCloudTrack {
 	});
 }
 
-/**
- * Turn a stored track (playlist) or a queue item into the player's
- * `SoundCloudTrack`. The stream URL is fetched later from `permalink_url`.
- */
+/** The stream URL is fetched later from `permalink_url`. */
 export function trackToSoundCloud(track: Track): SoundCloudTrack;
 export function trackToSoundCloud(item: QueueItem): SoundCloudTrack;
 export function trackToSoundCloud(input: Track | QueueItem): SoundCloudTrack {

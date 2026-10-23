@@ -9,27 +9,21 @@ import { friendUserParamsSchema } from '@/features/friends/friends.validators.js
 
 const userOf = (req: Request) => (req as AuthenticatedRequest).user.id;
 
-/**
- * The `:userId` segment. A malformed id is answered with `invalid`, the
- * error the database lookup gave it before the routes validated it.
- */
+/** A malformed `:userId` is answered with `invalid`, as the database lookup did before validation existed. */
 function targetOf(req: Request, invalid: () => AppError): string {
 	const parsed = friendUserParamsSchema.safeParse(req.params);
 	if (!parsed.success) throw invalid();
 	return parsed.data.userId;
 }
 
-/** GET /api/friends */
 export async function getMutualFriends(req: Request, res: Response) {
 	sendSuccess(res, await mutualFriendsService.getMutualFriends(userOf(req)));
 }
 
-/** GET /api/friends/stats/me */
 export async function getMyStats(req: Request, res: Response) {
 	sendSuccess(res, await followStatusService.getMyStats(userOf(req)));
 }
 
-/** GET /api/friends/status/:userId */
 export async function getFollowStatus(req: Request, res: Response) {
 	const userId = targetOf(
 		req,
@@ -38,13 +32,11 @@ export async function getFollowStatus(req: Request, res: Response) {
 	sendSuccess(res, await followStatusService.getFollowStatus(userOf(req), userId));
 }
 
-/** POST /api/friends/follow/:userId */
 export async function followUser(req: Request, res: Response) {
 	const userId = targetOf(req, () => new AppError(404, 'User not found', 'USER_NOT_FOUND'));
 	sendSuccess(res, await followService.followUser(userOf(req), userId));
 }
 
-/** DELETE /api/friends/follow/:userId */
 export async function unfollowUser(req: Request, res: Response) {
 	const userId = targetOf(
 		req,

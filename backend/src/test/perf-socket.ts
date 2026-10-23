@@ -1,45 +1,21 @@
-/**
- * Real-time load scenario (`make perf-test`, subject IV.7).
- *
- * Reads the fixtures written by perf-fixtures.ts (tests/performance/fixtures/
- * users.csv and env.json; no sign-in), then:
- * - connects perf_0 on its licensed device `perf-device-0` (control target);
- * - connects PERF_SOCKET_CLIENTS clients (default: the fixture user count),
- *   users taken round-robin, one deviceId `perf-socket-<k>` per client;
- * - every client joins the shared playlist room `perf-shared`;
- * - for PERF_SOCKET_DURATION seconds (default 30), every ~2 s with jitter, each
- *   client either adds a uniquely named track over HTTP then deletes it, or
- *   (users other than perf_0) sends `control:action` to perf_0's device.
- *
- * Measured, on the clock of this process: connect time; edit latency from the
- * HTTP send to the `playlist:updated` carrying that track, for every client in
- * the room (fan-out); control latency from the emit to `control:success` at
- * the sender and to `control:command` at perf_0. Events not received within
- * TIMEOUT_MS are counted as timeouts, not as samples. Each client sends at most
- * one action per ~2 s, far under the per-socket limits of
- * shared/security/socket-event-limit.ts, so the run measures the server, not the limiter.
- *
- * Event names and payloads: realtime/handlers/, realtime/emitters/, realtime/socket-auth.ts.
- *
- * Run from backend/: `npx tsx src/test/perf-socket.ts --out <file.json>`.
- * Exits non-zero only when no client could connect (or the fixtures are missing).
- */
+// Real-time load scenario (`make perf-test`), on the fixtures written by perf-fixtures.ts. Run from
+// backend/: `npx tsx src/test/perf-socket.ts --out <file.json>`; exits non-zero only when no client connects.
+
 import { readFile, writeFile } from 'node:fs/promises';
 import { io as ioClient, type Socket } from 'socket.io-client';
 import { z } from 'zod';
 
-// CLI progress and report lines, not application logs: written to the
-// terminal directly (see .agents/rules/logging.md#no-console).
+// CLI output, not application logs: written to the terminal directly.
 const print = (line: string) => process.stdout.write(`${line}\n`);
 const printError = (line: string) => process.stderr.write(`${line}\n`);
 
-/** Track URIs under this prefix are cleaned by perf-fixtures.ts on every run. */
+/** Cleaned by perf-fixtures.ts on every run. */
 const PERF_TRACK_URI_PREFIX = 'https://soundcloud.com/zumik-perf/';
 const TIMEOUT_MS = 5_000;
 const INTERVAL_MS = 2_000;
 const JITTER_MS = 500;
 const CONNECT_BATCH = 20;
-/** Time left to the playlist:join handlers (no ack) before the load starts. */
+/** playlist:join has no ack: time left to its handlers before the load starts. */
 const JOIN_SETTLE_MS = 1_000;
 
 const fixturesDir = new URL('../../../tests/performance/fixtures/', import.meta.url);
@@ -62,7 +38,7 @@ interface Client {
 	user: FixtureUser;
 	socket: Socket;
 	joined: boolean;
-	/** control:action sent by this socket, oldest first, waiting for control:success. */
+	/** Oldest first, waiting for control:success. */
 	pendingSuccess: ControlRecord[];
 }
 
@@ -78,7 +54,7 @@ interface PendingEdit {
 	sentAt: number;
 	expected: Set<number>;
 	received: Set<number>;
-	/** Deliveries received within TIMEOUT_MS of sentAt (the sampled ones). */
+	/** The sampled ones. */
 	onTime: number;
 	settle: () => void;
 }
@@ -91,9 +67,6 @@ interface Summary {
 	p99: number | null;
 	max: number | null;
 }
-
-// ---------------------------------------------------------------------------
-// Settings and fixtures
 
 function parseOut(argv: string[]): string {
 	const i = argv.indexOf('--out');
@@ -118,9 +91,6 @@ async function readFixtures(): Promise<{ users: FixtureUser[]; env: z.infer<type
 	const raw: unknown = JSON.parse(await readFile(new URL('env.json', fixturesDir), 'utf8'));
 	return { users, env: envSchema.parse(raw) };
 }
-
-// ---------------------------------------------------------------------------
-// Metrics
 
 const samples = {
 	connect: [] as number[],
@@ -159,9 +129,6 @@ function summarize(values: number[]): Summary {
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 const errorCode = (payload: unknown) =>
 	payload && typeof payload === 'object' && 'code' in payload ? String(payload.code) : 'UNKNOWN';
-
-// ---------------------------------------------------------------------------
-// Connections
 
 function connectSocket(
 	target: string,
@@ -220,9 +187,6 @@ async function connectClients(
 	return clients;
 }
 
-// ---------------------------------------------------------------------------
-// Scenario
-
 interface Context {
 	target: string;
 	playlistId: string;
@@ -230,7 +194,7 @@ interface Context {
 	deviceId: string;
 	clients: Client[];
 	pendingEdits: Map<string, PendingEdit>;
-	/** control:action by sender user id, oldest first, waiting for control:command at perf_0. */
+	/** By sender user id, oldest first, waiting for control:command at perf_0. */
 	pendingCommands: Map<string, ControlRecord[]>;
 }
 
@@ -260,7 +224,6 @@ async function http(
 	}
 }
 
-/** Add a track over HTTP, wait for its broadcast in every joined client, delete it. */
 async function edit(ctx: Context, client: Client): Promise<void> {
 	const uri = `${PERF_TRACK_URI_PREFIX}socket-${crypto.randomUUID()}`;
 	const expected = new Set(
@@ -314,7 +277,6 @@ async function edit(ctx: Context, client: Client): Promise<void> {
 	}
 }
 
-/** Send play or pause to perf_0's device and wait for control:success and control:command. */
 async function control(ctx: Context, client: Client): Promise<void> {
 	let settle = () => {};
 	const done = new Promise<void>(resolve => (settle = resolve));
@@ -423,8 +385,6 @@ async function runClient(ctx: Context, client: Client, endAt: number): Promise<v
 		if (wait > 0) await sleep(Math.min(wait, Math.max(0, endAt - Date.now())));
 	}
 }
-
-// ---------------------------------------------------------------------------
 
 async function main(): Promise<number> {
 	const out = parseOut(process.argv.slice(2));

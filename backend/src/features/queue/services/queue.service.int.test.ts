@@ -7,9 +7,7 @@ import * as playlists from '@/features/playlists/services/playlist.service.js';
 import * as playlistTracks from '@/features/playlists/services/playlist-track.service.js';
 import type { QueueState } from '@/features/queue/queue.types.js';
 
-// The play queue of migrations 021 and 022 against the local Supabase stack
-// (#273, #277): every row of the plans' I/O matrices, block detachment,
-// history trim and rank rebalance. No Socket.io server runs here: notifyQueueUpdate is a no-op.
+// No Socket.io server runs here: notifyQueueUpdate is a no-op.
 
 const URI_PREFIX = `https://soundcloud.com/int-queue/${randomUUID()}`;
 const users: string[] = [];
@@ -37,7 +35,6 @@ const dto = () => {
 	};
 };
 
-/** Adds n tracks and returns the item ids in queue order. */
 async function addItems(n: number, user = userId): Promise<string[]> {
 	let state: QueueState = { ownerId: user, version: 0, currentItemId: null, items: [] };
 	for (let i = 0; i < n; i++) state = await queue.addItem(user, user, dto());
@@ -495,7 +492,6 @@ describe('play a playlist', () => {
 		});
 		expect(await queue.getQueue(userId, userId)).toEqual(before);
 
-		// The owner can play their own private playlist.
 		expect(uris(await queue.playPlaylist(ownerId, ownerId, playlist.id))).toEqual(playlist.uris);
 	});
 

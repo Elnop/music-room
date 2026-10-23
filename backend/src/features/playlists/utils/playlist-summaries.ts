@@ -5,9 +5,6 @@ import type {
 	PlaylistRow,
 } from '@/features/playlists/playlist.types.js';
 
-// Pure mapping of the playlist cards of the list endpoints; the data comes
-// from services/playlist-summaries.service.ts.
-
 export interface TrackStats {
 	counts: Record<string, number>;
 	firstCovers: Record<string, string>;

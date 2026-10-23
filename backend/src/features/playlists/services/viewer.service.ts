@@ -5,8 +5,6 @@ import { fetchSingle } from '@/shared/utils/database.helpers.js';
 import { checkOwnership } from '@/features/playlists/permissions/playlist.permissions.js';
 import * as realtime from '@/realtime/emitters/playlist.emitters.js';
 
-// Playlist viewers (read access to a private playlist); owner only.
-
 /** Adds a viewer; the owner and collaborators cannot be added. */
 export async function addViewer(
 	playlistId: string,
@@ -94,7 +92,6 @@ export async function removeViewer(
 
 		if (updateError) throw updateError;
 
-		// Evict the removed viewer from the playlist room (fire-and-forget).
 		void realtime.revalidatePlaylistRoom(playlistId);
 
 		logger.info('Viewer removed from playlist', { playlistId, userId, viewerId });

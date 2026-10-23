@@ -3,7 +3,6 @@ import * as trackEdits from '@/features/playlists/utils/trackEdits';
 import { moveTrack } from '@/features/playlists/utils/trackMoves';
 import type { AddQueueItemBody } from '@/shared/types/playback';
 
-/** Adds a track to a playlist: `mutateAsync({ playlistId, track })`. */
 export function useAddTrack() {
 	const client = useQueryClient();
 	return useMutation({
@@ -12,7 +11,7 @@ export function useAddTrack() {
 	});
 }
 
-/** Removes a track at once from the screen: `mutateAsync({ playlistId, trackId })`. */
+/** Optimistic: the track leaves the screen before the answer. */
 export function useRemoveTrack() {
 	const client = useQueryClient();
 	return useMutation({

@@ -5,10 +5,7 @@ import { ilikeContains } from '@/shared/utils/postgrest-filter.js';
 import { getSearchFieldVisibility } from '@/features/profile/permissions/search-visibility.js';
 import type { PublicProfile } from '@/features/profile/profile.types.js';
 
-/**
- * Search users by username or display name. Avatar and bio follow each
- * profile's privacy settings for the viewer, as on GET /:userId (#247).
- */
+/** Avatar and bio follow each profile's privacy settings for the viewer, as on GET /:userId. */
 export async function searchUsers(
 	query: string,
 	limit = 20,
@@ -17,8 +14,7 @@ export async function searchUsers(
 	try {
 		logger.info('Searching users', { query, limit, viewerId });
 
-		// Search by username or display_name using ilike (case-insensitive);
-		// the query is matched literally, never read as filter syntax (#236)
+		// The query is matched literally, never read as filter syntax
 		const pattern = ilikeContains(query);
 		let queryBuilder = supabaseAdmin
 			.from('user_profiles')
@@ -26,7 +22,6 @@ export async function searchUsers(
 			.or(`username.ilike.${pattern},display_name.ilike.${pattern}`)
 			.limit(limit);
 
-		// Exclude current user from results
 		if (viewerId) {
 			queryBuilder = queryBuilder.neq('id', viewerId);
 		}

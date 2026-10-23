@@ -3,12 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { routes } from '@/app/routes.js';
 import { swaggerSpec } from '@/app/openapi.js';
 
-/**
- * Every route mounted through the registry must have its OpenAPI entry, and
- * every documented /api operation must match a mounted route (AGENTS.md: a new
- * endpoint without its OpenAPI entry is unfinished). Routes mounted directly in
- * server.ts (/health, /api-docs) are outside the registry and not walked.
- */
+/** Every registry route needs an OpenAPI entry and vice versa; routes mounted in server.ts are not walked. */
 
 const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace'] as const;
 
@@ -18,16 +13,12 @@ interface RouteLayer {
 	route?: { path: string | string[]; methods: Record<string, boolean> };
 }
 
-/**
- * Express 5 keeps a `router.use('/sub', subRouter)` mount path only inside a
- * compiled matcher, so a nested router cannot be walked reliably: report it
- * instead of silently skipping its endpoints. Plain middleware is skipped.
- */
+/** Express 5 hides a nested router's mount path in a compiled matcher, so report it instead of skipping it. */
 function isRouterLayer(layer: RouteLayer): boolean {
 	return !layer.route && Array.isArray(layer.handle?.stack);
 }
 
-/** Express `:param` segments become OpenAPI `{param}`; trailing slash dropped. */
+/** Express `:param` becomes OpenAPI `{param}`; trailing slash dropped. */
 function toOpenApiPath(prefix: string, routePath: string): string {
 	const joined = `${prefix}${routePath === '/' ? '' : routePath}`;
 	return joined.replace(/:([A-Za-z0-9_]+)/g, '{$1}');

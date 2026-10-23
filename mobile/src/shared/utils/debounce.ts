@@ -3,10 +3,6 @@ interface Debounced<A extends unknown[]> {
 	cancel: () => void;
 }
 
-/**
- * Delays `fn` until `waitMs` have passed without a new call, then runs it once
- * with the last arguments. `cancel()` drops the pending call.
- */
 export function debounce<A extends unknown[]>(
 	fn: (...args: A) => void,
 	waitMs: number

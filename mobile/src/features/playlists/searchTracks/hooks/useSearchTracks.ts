@@ -16,7 +16,7 @@ import type { SoundCloudTrack } from '@/types/soundcloud.types';
 export interface SearchTracks {
 	search: DebouncedText;
 	results: SoundCloudTrack[];
-	/** A search runs, or a typed query waits for its delay (#307). */
+	/** A search runs, or a typed query waits for its delay. */
 	isLoading: boolean;
 	isAdded: (track: SoundCloudTrack) => boolean;
 	add: (track: SoundCloudTrack) => void;
@@ -26,7 +26,6 @@ export interface SearchTracks {
 	closeActions: () => void;
 }
 
-/** Searches SoundCloud and adds results to the playlist, each checked at once (#307). */
 export function useSearchTracks(playlistId: string): SearchTracks {
 	const search = useDebouncedText();
 	const query = search.settled.trim();

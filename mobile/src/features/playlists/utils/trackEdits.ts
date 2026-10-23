@@ -21,10 +21,7 @@ export async function addTrack(
 	});
 }
 
-/**
- * Removes a track from the screen at once; the answer only advances the
- * version. A refusal brings the track back from the server, then rethrows.
- */
+/** Optimistic: the answer only advances the version; a refusal reloads the track from the server, then rethrows. */
 export async function removeTrack(
 	client: QueryClient,
 	playlistId: string,

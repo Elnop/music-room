@@ -20,7 +20,6 @@ export interface Playlist {
 	updatedAt: string;
 }
 
-// Playlist with full track data and owner info
 export interface PlaylistWithTracks extends Omit<Playlist, 'trackCount'> {
 	/** Ordered by rank. */
 	tracks: TrackInPlaylist[];
@@ -61,7 +60,7 @@ export type PlaylistUpdatedEvent = PlaylistUpdateBase &
 		| { event: 'track_moved'; trackId: string; rank: string }
 	);
 
-/** Payload of the `playlist:details` socket event: the playlist's metadata after an update. */
+/** Payload of the `playlist:details` socket event. */
 export interface PlaylistDetailsEvent {
 	playlistId: string;
 	name: string;
@@ -98,7 +97,7 @@ export interface FriendPlaylists {
 export type PlaylistStackParamList = {
 	Playlists: undefined;
 	PlaylistDetail: { id: string };
-	/** With a playlistId, the form edits that playlist (#342). */
+	/** With a playlistId, the form edits that playlist. */
 	CreatePlaylist: { playlistId?: string } | undefined;
 	SearchTracks: { playlistId: string };
 	PlaylistSharing: { playlistId: string };

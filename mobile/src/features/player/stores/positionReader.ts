@@ -1,9 +1,6 @@
 let positionReader: (() => number) | null = null;
 
-/**
- * Registers how to read the playback position in ms. PlayerProvider owns the audio
- * player but listening status is emitted outside it, so the position goes through here (#295).
- */
+/** PlayerProvider owns the audio player but listening status is emitted outside it, so the position goes through here. */
 export function setPositionReader(reader: (() => number) | null): void {
 	positionReader = reader;
 }

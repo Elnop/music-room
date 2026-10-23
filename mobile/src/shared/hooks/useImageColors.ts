@@ -4,9 +4,6 @@ import { getColors } from 'react-native-image-colors';
 
 export { hexToRgba } from '@/shared/theme/adaptivePalette';
 
-/**
- * Hook to extract dominant color from an image URL
- */
 export function useImageColors(imageUrl: string | null | undefined, fallbackColor: string) {
 	const [dominantColor, setDominantColor] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(false);

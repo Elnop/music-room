@@ -5,9 +5,6 @@ import * as deviceService from '@/features/music-control/services/device.service
 import * as licenseService from '@/features/music-control/services/device-license.service.js';
 import * as pickerService from '@/features/music-control/services/controllable-devices.service.js';
 
-// Renaming a device (#352) against the local Supabase stack: devices.custom_name
-// (026) is shown in place of the system name and survives reconnections.
-
 const SYSTEM_NAME = 'sdk_gphone64_x86_64';
 
 async function createUser(): Promise<string> {

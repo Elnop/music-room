@@ -1,10 +1,5 @@
 import { z } from 'zod';
 
-/**
- * Response bodies of the /api/playlists routes, for the OpenAPI document.
- * playlist.types.ts infers the response types from them.
- */
-
 /** A playlist member; displayName and avatarUrl are absent when the profile has none. */
 export const playlistMemberSchema = z.object({
 	id: z.uuid(),
@@ -16,7 +11,6 @@ export const playlistMemberSchema = z.object({
 const visibilitySchema = z.enum(['public', 'private']);
 const editModeSchema = z.enum(['open', 'restricted']);
 
-/** A playlist without its tracks. */
 export const playlistSchema = z.object({
 	id: z.uuid(),
 	name: z.string(),
@@ -69,7 +63,6 @@ export const playlistListSchema = z.object({ playlists: z.array(playlistSchema) 
 
 export const playlistBodySchema = z.object({ playlist: playlistSchema });
 
-/** GET /api/playlists/:id: the playlist with its tracks, ordered by rank. */
 export const playlistWithTracksSchema = playlistSchema.extend({
 	owner: playlistMemberSchema,
 	tracks: z.array(playlistTrackSchema),

@@ -19,7 +19,6 @@ export interface PlaylistSharing {
 	playerHeight: number;
 }
 
-/** « Visibilité et droits »: who sees the playlist, who edits it, and its two switches. */
 export function usePlaylistSharing(id: string): PlaylistSharing {
 	const playlist = useCachedPlaylist(id);
 	const members = useSharingMembers(id);

@@ -3,11 +3,7 @@ import type { AddQueueItemBody } from '@/shared/types/playback';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import type { Track } from '@/types/track.types';
 
-/**
- * Turn a SoundCloud search result, a stored track or a queue item's track into
- * the body of a track add (playlist or queue). `previewUrl` is never sent:
- * stream URLs expire.
- */
+/** `previewUrl` is never sent: stream URLs expire. */
 export function toTrackInput(track: SoundCloudTrack | Track | QueueTrack): AddQueueItemBody {
 	if ('permalink_url' in track) {
 		return {

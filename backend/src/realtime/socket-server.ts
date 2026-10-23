@@ -17,18 +17,7 @@ import { registerListeningHandlers } from '@/realtime/handlers/listening.handler
 import { registerControlHandlers } from '@/realtime/handlers/control.handler.js';
 import { setIO } from '@/realtime/state.js';
 
-/**
- * Socket.io server bootstrap: origin check, handshake authentication, the
- * per-event log and rate limit, then the device registry and one handler
- * module per domain (playlist, listening, control). Features reach the
- * server through the modules in `realtime/emitters/`.
- */
-
-/**
- * Every incoming event, including those added later, is logged with the
- * handshake's platform, device and app version (subject IV.6), then counted
- * against the socket's per-event limit (#204).
- */
+/** Applies to every incoming event, including those added later. */
 function limitEvents(socket: AppSocket): void {
 	const checkEvent = createSocketEventLimiter();
 	socket.use(([eventName]: unknown[], next) => {
@@ -81,9 +70,6 @@ function onConnection(socket: AppSocket): void {
 	});
 }
 
-/**
- * Initialize Socket.io server
- */
 export function initialize(httpServer: HTTPServer): void {
 	socketLogger.init('initializing', { cors: 'ALLOWED_ORIGINS' });
 
@@ -115,7 +101,6 @@ export function initialize(httpServer: HTTPServer): void {
 	});
 	setIO(io);
 
-	// Every connection must carry a valid token (see socket-auth.ts).
 	io.use((socket, next) => {
 		authenticateSocket(socket, next).catch(() => next(new Error('INVALID_TOKEN')));
 	});

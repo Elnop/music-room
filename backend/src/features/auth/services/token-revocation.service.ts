@@ -6,16 +6,8 @@ import { logger } from '@/shared/utils/logger.js';
 const KEY_PREFIX = 'auth:revoked:';
 const MIN_TTL_SECONDS = 1;
 
-/**
- * Denylist of access tokens revoked by a logout, kept in Redis until each
- * token's own expiry. Stores a SHA-256 hash, never the token itself, so the
- * denylist is not a store of usable credentials.
- *
- * Fail-closed: without a ready Redis, both operations throw 503
- * REVOCATION_UNAVAILABLE. No in-memory fallback.
- */
+/** Stores SHA-256 hashes, never usable tokens. Fail-closed: without Redis, 503 REVOCATION_UNAVAILABLE. */
 
-/** Add a token to the denylist until its `exp`. */
 export async function revoke(token: string): Promise<void> {
 	ensureRedis('revoke');
 	try {
@@ -25,7 +17,6 @@ export async function revoke(token: string): Promise<void> {
 	}
 }
 
-/** Whether a token was revoked by a logout. */
 export async function isRevoked(token: string): Promise<boolean> {
 	ensureRedis('check');
 	try {
@@ -45,11 +36,7 @@ function keyFor(token: string): string {
 	return KEY_PREFIX + createHash('sha256').update(token).digest('hex');
 }
 
-/**
- * Remaining lifetime of the token in seconds, read from the JWT `exp`
- * (base64url payload). The token was already verified by authMiddleware, so
- * no signature check here. At least MIN_TTL_SECONDS.
- */
+/** No signature check: authMiddleware already verified the token. At least MIN_TTL_SECONDS. */
 function ttlFor(token: string): number {
 	const exp = readExp(token);
 	if (exp === undefined) return MIN_TTL_SECONDS;

@@ -5,26 +5,17 @@ import { listeningRoom, type ListeningUpdatePayload } from '@/realtime/music-con
 import type { ListeningStatus, UserListeningStatus } from '@/realtime/listening.types.js';
 import { getIO, listeningStatuses } from '@/realtime/state.js';
 
-/**
- * The listening status of every connected device, and its broadcast to the
- * owner's `listening:<ownerId>` room.
- */
-
 const LISTENING_UPDATE_THROTTLE_MS = 1000;
 
-/** Leading + trailing throttle of listening:update, per device (#151). */
+/** Leading + trailing throttle of listening:update, per device. */
 export const listeningUpdateThrottle = createLatestThrottle(LISTENING_UPDATE_THROTTLE_MS);
 
-/** Listening status of all of a user's devices. */
 export function getUserListeningStatus(userId: string): UserListeningStatus {
 	const userDevices = listeningStatuses.get(userId);
 	const devices = userDevices ? Array.from(userDevices.values()) : [];
 	return { ownerId: userId, devices };
 }
 
-/**
- * Broadcast all devices' listening status for a user
- */
 export function broadcastUserListeningStatus(userId: string): void {
 	const io = getIO();
 	if (!io) return;
@@ -46,9 +37,6 @@ export function broadcastUserListeningStatus(userId: string): void {
 	io.to(room).emit('listening:status', userStatus);
 }
 
-/**
- * Store a device's listening status and broadcast it to the user's subscribers.
- */
 export function applyListeningUpdate(
 	socket: AppSocket,
 	userId: string,

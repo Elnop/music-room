@@ -1,6 +1,6 @@
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 
-/** Side of the square JPEG sent as a profile photo (#351). */
+/** Side of the square JPEG sent as a profile photo. */
 export const AVATAR_SIZE = 512;
 const AVATAR_QUALITY = 0.8;
 
@@ -10,10 +10,7 @@ interface PickedImage {
 	height: number;
 }
 
-/**
- * The picked image as a 512×512 JPEG, cropped to its centred square first in
- * case the picker's square crop was skipped. Returns the local file's URI.
- */
+/** Cropped to its centred square first, in case the picker's crop was skipped; returns the local URI. */
 export async function prepareAvatar({ uri, width, height }: PickedImage): Promise<string> {
 	const context = ImageManipulator.manipulate(uri);
 

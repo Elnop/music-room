@@ -2,7 +2,6 @@ import { apiRequest } from '@/shared/services/api';
 import type { LoginInput, RegisterInput } from '@/features/auth/validators';
 import type { AuthResponse, MessageResponse } from '@/features/auth/types';
 
-/** POST a JSON body to an auth endpoint. */
 function post<T>(endpoint: string, body: object, headers?: Record<string, string>): Promise<T> {
 	return apiRequest<T>(endpoint, { method: 'POST', headers, body: JSON.stringify(body) });
 }
@@ -35,7 +34,6 @@ export function loginWithFacebook(accessToken: string): Promise<AuthResponse> {
 	return post('/api/auth/facebook', { accessToken });
 }
 
-/** Exchanges the 6-digit code sent at registration for a session. */
 export function verifyEmail(userId: string, code: string): Promise<AuthResponse> {
 	return post('/api/auth/verify-email', { userId, code });
 }

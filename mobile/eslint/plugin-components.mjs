@@ -1,4 +1,3 @@
-// ESLint Plugin: components
 // Enforces component roles (screens, orchestrators, presenters, hooks) across the mobile app.
 // See .agents/rules/components.md
 

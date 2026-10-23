@@ -4,13 +4,7 @@ import { rateLimitConfig } from '@/shared/config/rate-limit.config.js';
 import * as counter from '@/shared/security/counter.js';
 import type { RateLimitConfig, RateLimitResult } from '@/shared/security/security.types.js';
 
-/**
- * Attempt counters for one action (a code check, a resend), keyed by the
- * caller: at most `maxAttempts` in a window of `windowSeconds`.
- *
- * Fail closed: while Redis is not ready, counting or checking answers 503
- * REDIS_UNAVAILABLE. Disabled with RATE_LIMIT_ENABLED=false (nothing counts).
- */
+// Fail closed: while Redis is not ready, counting or checking answers 503 REDIS_UNAVAILABLE.
 
 function requireRedis(key: string): void {
 	if (!counter.isReady()) {
@@ -19,7 +13,6 @@ function requireRedis(key: string): void {
 	}
 }
 
-/** Whether one more attempt is allowed, without counting it. */
 export async function checkLimit(key: string, config: RateLimitConfig): Promise<RateLimitResult> {
 	if (!rateLimitConfig.enabled) {
 		logger.debug('Rate limiting disabled (development mode)', { key });
@@ -34,7 +27,7 @@ export async function checkLimit(key: string, config: RateLimitConfig): Promise<
 	return { canProceed: true, attempts };
 }
 
-/** Count one attempt, without throwing past the limit. */
+/** Does not throw past the limit. */
 export async function increment(key: string, config: RateLimitConfig): Promise<RateLimitResult> {
 	if (!rateLimitConfig.enabled) {
 		logger.debug('Rate limiting disabled (development mode)', { key });
@@ -50,7 +43,6 @@ export async function increment(key: string, config: RateLimitConfig): Promise<R
 	};
 }
 
-/** Count one attempt: 429 RATE_LIMIT_EXCEEDED past the limit. */
 export async function incrementAndCheck(
 	key: string,
 	config: RateLimitConfig
@@ -69,7 +61,7 @@ export async function incrementAndCheck(
 	return result;
 }
 
-/** Forget the attempts of a key (after a success). Skipped while Redis is down. */
+/** Skipped while Redis is down. */
 export async function reset(key: string): Promise<void> {
 	if (!rateLimitConfig.enabled) {
 		logger.debug('Rate limiting disabled - skip reset', { key });
@@ -84,7 +76,7 @@ export async function reset(key: string): Promise<void> {
 	logger.info('Rate limit reset', { key });
 }
 
-/** Attempts counted so far; 0 while Redis is down. */
+/** 0 while Redis is down. */
 export async function getAttempts(key: string): Promise<number> {
 	if (!rateLimitConfig.enabled) return 0;
 	if (!counter.isReady()) {

@@ -22,7 +22,6 @@ import {
 import { jsonBody, nameSchemas, ok } from '@/shared/config/swagger.schemas.js';
 import { fail, shared } from '@/shared/config/swagger.errors.js';
 
-/** Registers the /api/auth routes. */
 export function registerAuthOpenapi(registry: OpenAPIRegistry): void {
 	const tags = ['Authentication'];
 	const unavailable = shared('RateLimitUnavailable');

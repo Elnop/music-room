@@ -1,27 +1,18 @@
 import { z } from 'zod';
 import { deviceIdSchema } from '@/features/music-control/music-control.validators.js';
 
-/**
- * Response bodies of the /api/music-control routes, for the OpenAPI document.
- * music-control.types.ts infers the response types from them.
- */
-
-/** GET /api/music-control/permissions: the friends you let control all your devices. */
 export const controlPermissionsSchema = z.object({ allowedUserIds: z.array(z.uuid()) });
 
-/** POST and DELETE /api/music-control/permissions/:userId */
 export const controlSwitchResultSchema = z.object({
 	success: z.literal(true),
 	allowedUserId: z.uuid(),
 });
 
-/** GET /api/music-control/can-control/:userId */
 export const canControlSchema = z.object({
 	canControl: z.boolean().meta({ description: 'True if you can control this user music' }),
 	targetUserId: z.uuid(),
 });
 
-/** A device the user has connected from. */
 export const deviceSchema = z.object({
 	deviceId: deviceIdSchema.meta({ description: 'Stable id generated and persisted by the app' }),
 	deviceName: z.string().meta({
@@ -59,13 +50,10 @@ export const deviceWithLicensesSchema = deviceSchema.extend({
 		.meta({ description: 'Friends licensed to control this device' }),
 });
 
-/** GET /api/music-control/devices */
 export const myDevicesSchema = z.object({ devices: z.array(deviceWithLicensesSchema) });
 
-/** PATCH /api/music-control/devices/:deviceId */
 export const renameDeviceResponseSchema = z.object({ device: deviceSchema });
 
-/** GET /api/music-control/users/:userId/devices */
 export const controllableDevicesSchema = z.object({
 	allDevices: z.boolean().meta({
 		description:
@@ -74,7 +62,7 @@ export const controllableDevicesSchema = z.object({
 	devices: z.array(controllableDeviceSchema),
 });
 
-/** GET /api/music-control/controllable-devices: me first, then friends by username. */
+/** Me first, then friends by username. */
 export const devicePickerSchema = z.object({
 	owners: z.array(
 		z.object({
@@ -86,7 +74,6 @@ export const devicePickerSchema = z.object({
 	),
 });
 
-/** POST /api/music-control/devices/:deviceId/licenses/:userId */
 export const grantDeviceLicenseResponseSchema = z.object({
 	deviceId: deviceIdSchema,
 	license: deviceLicenseSchema,

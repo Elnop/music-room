@@ -4,7 +4,6 @@ import { avatarResponseSchema } from '@/features/profile/profile-responses.valid
 import { bearerAuth, ok } from '@/shared/config/swagger.schemas.js';
 import { fail, shared } from '@/shared/config/swagger.errors.js';
 
-/** Registers the profile photo routes of /api/profile. */
 export function registerProfileAvatarOpenapi(registry: OpenAPIRegistry): void {
 	const common = { tags: ['Profile'], security: bearerAuth };
 	const unauthorized = shared('UnauthorizedError');

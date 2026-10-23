@@ -20,10 +20,7 @@ interface AddableTrackRowProps {
 	onShowActions: (track: SoundCloudTrack) => void;
 }
 
-/**
- * A search result with its « + » (#307). Memoized: adding one track redraws
- * that row only, so its check shows at once.
- */
+/** Memoized: adding one track redraws that row only, so its check shows at once. */
 export const AddableTrackRow = React.memo(function AddableTrackRow({
 	track,
 	isAdded,
@@ -95,7 +92,7 @@ const createStyles = (theme: Theme) =>
 		},
 		trackInfo: {
 			flex: 1,
-			// Keeps a long title off the buttons (#307).
+			// Keeps a long title off the buttons.
 			marginRight: theme.spacing.sm,
 		},
 		trackMeta: {
