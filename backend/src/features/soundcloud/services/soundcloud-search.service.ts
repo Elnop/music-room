@@ -8,7 +8,7 @@ import type {
 	SoundCloudTrack,
 } from '@/features/soundcloud/soundcloud.types.js';
 
-/** Search SoundCloud tracks; keeps the playable ones only. */
+/** Keeps playable tracks only. */
 export async function searchTracks(query: SoundCloudSearchInput): Promise<SoundCloudSearchResult> {
 	const cacheKey = `search:${query.q}:${query.limit}:${query.offset}`;
 
@@ -34,7 +34,6 @@ export async function searchTracks(query: SoundCloudSearchInput): Promise<SoundC
 			next_href?: string;
 		};
 
-		// Filter only playable/streamable tracks
 		const playableTracks = (results.collection || []).filter(track => {
 			const hasStreamUrl =
 				track.streamable || (track.media?.transcodings && track.media.transcodings.length > 0);
@@ -62,7 +61,7 @@ export async function searchTracks(query: SoundCloudSearchInput): Promise<SoundC
 	}
 }
 
-/** A track by permalink URL or numeric id. */
+/** Accepts a permalink URL or a numeric id. */
 export async function getTrack(urlOrId: string): Promise<SoundCloudTrack> {
 	const cacheKey = `track:${urlOrId}`;
 	const cached = cache.get<SoundCloudTrack>(cacheKey);

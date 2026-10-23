@@ -13,12 +13,11 @@ interface EmptyStateAction {
 interface EmptyStateProps {
 	message: string;
 	icon?: keyof typeof Ionicons.glyphMap;
-	/** A button under the message, leading out of the empty state (#318). */
+	/** A button under the message, leading out of the empty state. */
 	action?: EmptyStateAction;
 	style?: StyleProp<ViewStyle>;
 }
 
-/** What an empty list shows instead of a blank area (#318). */
 export function EmptyState({ message, icon, action, style }: EmptyStateProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);

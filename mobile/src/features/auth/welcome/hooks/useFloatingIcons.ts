@@ -20,7 +20,6 @@ export interface FloatingIconMotion {
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-/** The four app icons floating behind the welcome screen. */
 const ICONS: FloatingIconSpec[] = [
 	{ size: 80, top: 60, left: 20, delay: 0, duration: 1200, rotateDirection: 1, floatRange: 35 },
 	{
@@ -61,7 +60,6 @@ const timing = (value: Animated.Value, toValue: number, duration: number, delay 
 		useNativeDriver: true,
 	});
 
-/** Starts the loops of one icon: float up and down, spin, pulse. */
 function startLoops(
 	spec: FloatingIconSpec,
 	float: Animated.Value,
@@ -90,7 +88,6 @@ function startLoops(
 	Animated.loop(Animated.sequence([pulse(1.15), pulse(1)])).start();
 }
 
-/** The motion of each floating icon, its loops started on mount. */
 export function useFloatingIcons(): FloatingIconMotion[] {
 	const values = useMemo(
 		() =>

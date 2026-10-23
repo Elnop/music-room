@@ -1,35 +1,20 @@
-/**
- * Fixtures for the HTTP load tests (`make perf-fixtures`, `make perf-test`).
- *
- * Creates or refreshes PERF_USERS users (default 20) in the Supabase project of
- * backend/.env (shell variables win, so the local stack works too):
- * - auth users `perf-<i>@zumik.test` with a new random password on every run,
- *   and verified profiles `perf_<i>`;
- * - perf_0 and every other user follow each other (friends);
- * - a device of perf_0 and a control licence on it for every friend; the
- *   devices `perf-socket-<k>` the socket scenario (perf-socket.ts) left are removed;
- * - one public, open playlist `perf-shared` owned by perf_0, emptied of the
- *   tracks a previous run left behind.
- * Then signs every user in and writes tests/performance/fixtures/users.csv
- * (email,password,token,userId) and fixtures/env.json, both git-ignored.
- *
- * Run from backend/: `npx tsx src/test/perf-fixtures.ts`.
- */
+// Fixtures for the HTTP load tests (`make perf-fixtures`): writes tests/performance/fixtures/users.csv
+// and env.json, both git-ignored. Run from backend/: `npx tsx src/test/perf-fixtures.ts`.
+
 import { randomBytes } from 'node:crypto';
 import { chmod, mkdir, writeFile } from 'node:fs/promises';
 import { z } from 'zod';
 import { createSignInClient, supabaseAdmin } from '@/shared/config/supabase.js';
 
-// CLI progress and report lines, not application logs: written to the
-// terminal directly (see .agents/rules/logging.md#no-console).
+// CLI output, not application logs: written to the terminal directly.
 const print = (line: string) => process.stdout.write(`${line}\n`);
 const printError = (line: string) => process.stderr.write(`${line}\n`);
 
 const PLAYLIST_NAME = 'perf-shared';
 const DEVICE_ID = 'perf-device-0';
-/** Prefix of the track URIs the track-edit scenario adds (tests/performance/scenarios). */
+/** Added by the track-edit scenario (tests/performance/scenarios). */
 const PERF_TRACK_URI_PREFIX = 'https://soundcloud.com/zumik-perf/';
-/** Prefix of the device ids the socket scenario connects with (perf-socket.ts). */
+/** Connected by the socket scenario (perf-socket.ts). */
 const PERF_SOCKET_DEVICE_PREFIX = 'perf-socket-';
 const BATCH_SIZE = 5;
 
@@ -54,7 +39,7 @@ function fail(step: string, error: { message: string }): never {
 	throw new Error(`${step}: ${error.message}`);
 }
 
-/** Runs fn on every item, BATCH_SIZE at a time, keeping the order. */
+/** BATCH_SIZE at a time, keeping the order. */
 async function inBatches<T, R>(items: T[], fn: (item: T) => Promise<R>): Promise<R[]> {
 	const results: R[] = [];
 	for (let i = 0; i < items.length; i += BATCH_SIZE) {
@@ -63,7 +48,6 @@ async function inBatches<T, R>(items: T[], fn: (item: T) => Promise<R>): Promise
 	return results;
 }
 
-/** Creates the auth user or resets its password; returns its id. */
 async function upsertAuthUser(email: string, password: string): Promise<string> {
 	const { data: existingId, error: findError } = await supabaseAdmin.rpc(
 		'find_auth_user_id_by_email',
@@ -109,7 +93,6 @@ async function upsertUser(index: number): Promise<Omit<PerfUser, 'token'>> {
 	return { index, email, password, id };
 }
 
-/** Removes the devices the socket scenario recorded for the perf users. */
 async function deleteSocketDevices(userIds: string[]): Promise<void> {
 	const { error } = await supabaseAdmin
 		.from('devices')
@@ -152,7 +135,7 @@ async function linkFriendsAndDevice(ownerId: string, friendIds: string[]): Promi
 	if (licenceError) fail('device licences', licenceError);
 }
 
-/** Finds or creates perf-shared, public and open, and removes leftover perf tracks. */
+/** Public and open; leftover perf tracks are removed. */
 async function upsertSharedPlaylist(ownerId: string): Promise<string> {
 	const { data: found, error: findError } = await supabaseAdmin
 		.from('playlists')

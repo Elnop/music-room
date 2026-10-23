@@ -1,7 +1,4 @@
-/**
- * Types of the playback contract (`shared/services/playbackBridge.ts`), shared
- * by the player, the queue and the features that start playback.
- */
+/** Types of the playback contract (`shared/services/playbackBridge.ts`). */
 
 /** Track metadata of a queue item; `trackUri` is the SoundCloud permalink. */
 export interface QueueTrack {
@@ -35,27 +32,14 @@ export interface AddQueueItemBody {
 	next?: boolean;
 }
 
-/**
- * Playback states of the player state machine
- * - idle: No track loaded
- * - loading: Track selected, stream being fetched
- * - ready: Stream loaded, ready to play (transitions to playing automatically)
- * - playing: Audio is playing
- * - paused: Audio is paused
- */
+/** `ready` moves on to `playing` by itself. */
 export type PlaybackState = 'idle' | 'loading' | 'ready' | 'playing' | 'paused';
 
-/** One owner's queue as the store holds it. */
 export interface OwnerQueue {
 	currentItemId: string | null;
 	items: QueueItem[];
-	/** Version of the state held (#285). */
 	version: number;
 }
 
-/**
- * Outcome of a step: the new current item plays, the queue has no current
- * item left (playback stopped when asked), at a queue boundary, failed, or
- * ignored because another step was still pending.
- */
+/** `stopped`: no current item left; `ignored`: another step was still pending. */
 export type QueueStepOutcome = 'played' | 'stopped' | 'boundary' | 'error' | 'ignored';

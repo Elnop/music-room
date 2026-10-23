@@ -5,11 +5,7 @@ import * as accountLockout from '@/shared/security/account-lockout.js';
 import * as ipReputation from '@/shared/security/ip-reputation.js';
 import { requestIp } from '@/shared/security/request-ip.js';
 
-/**
- * Account Lockout Middleware
- * Checks if an account is locked before allowing login attempts
- * Should be applied to the login endpoint AFTER rate limiting
- */
+// Apply to the login endpoint after rate limiting.
 
 export async function checkAccountLockout(
 	req: Request,
@@ -20,12 +16,11 @@ export async function checkAccountLockout(
 	const ip = requestIp(req);
 
 	if (!email) {
-		// Email is required - let validation handle this
+		// Let validation report the missing email.
 		return next();
 	}
 
 	try {
-		// Check if account is currently locked
 		const lockStatus = await accountLockout.checkLockout(email, ip);
 
 		if (lockStatus.isLocked) {
@@ -53,7 +48,6 @@ export async function checkAccountLockout(
 			return;
 		}
 
-		// Check if approaching lockout threshold (3+ failed attempts)
 		if (lockStatus.failedAttempts >= 3) {
 			logger.info('User approaching lockout threshold', {
 				email,
@@ -63,7 +57,6 @@ export async function checkAccountLockout(
 			});
 		}
 
-		// Account not locked, proceed to login handler
 		next();
 	} catch (error) {
 		logger.error('Error in account lockout middleware', {
@@ -72,17 +65,11 @@ export async function checkAccountLockout(
 			ip,
 		});
 
-		// On error, allow login attempt to proceed
-		// The failure will be recorded in the controller
+		// On error, let the attempt proceed: the controller records the failure.
 		next();
 	}
 }
 
-/**
- * IP Blacklist Middleware
- * Checks if an IP is blacklisted before allowing any auth requests
- * Can be applied globally to all auth routes or specific endpoints
- */
 export async function checkIPBlacklist(
 	req: Request,
 	res: Response,
@@ -121,7 +108,6 @@ export async function checkIPBlacklist(
 			ip,
 		});
 
-		// On error, allow request to proceed
 		next();
 	}
 }

@@ -22,9 +22,7 @@ export function afterRankForDrop(
 	return index == null ? index : tracks[index].rank;
 }
 
-// afterItemId for dropping the upcoming queue item at `from` onto index `to`:
-// the id of the upcoming item it will sit after, null for right after the
-// current item (the top of the upcoming list), undefined when nothing moves.
+// null: right after the current item; undefined: nothing moves.
 export function afterItemIdForDrop(
 	upcoming: QueueItem[],
 	from: number,

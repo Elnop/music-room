@@ -16,7 +16,6 @@ vi.mock('@/realtime/emitters/queue.emitters.js', async importOriginal => ({
 	notifyQueueUpdate: vi.fn(),
 }));
 
-// #295: transfer playback to a device of mine or of a friend. Checks come before any change.
 // No Socket.io server runs here: device presence and commands are stubbed on
 // the realtime emitter modules.
 
@@ -103,7 +102,6 @@ afterAll(async () => {
 	vi.restoreAllMocks();
 });
 
-/** Plays an item of my queue and returns the queue. */
 async function playingQueue(count: number, currentIndex: number) {
 	let state = await queue.getQueue(me, me);
 	for (let i = 0; i < count; i++) state = await queue.addItem(me, me, dto());

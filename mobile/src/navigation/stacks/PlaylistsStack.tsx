@@ -1,11 +1,3 @@
-/**
- * Playlists Feature Navigation Stack
- *
- * Architecture:
- * - Toutes les pages utilisent le header natif avec effet liquid glass sur iOS
- * - Pages avec gradient: header transparent (headerTransparent: true)
- */
-
 import React from 'react';
 import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -25,7 +17,6 @@ export function PlaylistsNavigator() {
 	return (
 		<PlaylistStack.Navigator
 			screenOptions={{
-				// Header opaque avec effet blur natif sur iOS
 				headerStyle: {
 					backgroundColor: theme.colors.background,
 				},

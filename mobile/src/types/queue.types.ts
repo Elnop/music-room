@@ -2,20 +2,12 @@ import type { AddQueueItemBody, QueueItem, QueueTrack } from '@/shared/types/pla
 
 export type { AddQueueItemBody, QueueItem, QueueTrack };
 
-/**
- * Play queue types, mirroring backend `features/queue/queue.types.ts` (#273).
- * One queue per user, shared by all of their devices.
- */
+// Mirrors backend `features/queue/queue.types.ts`. One queue per user, shared by all of their devices.
 
-/**
- * The whole queue, items in rank order. Items ranked before the current one
- * are history, those after it upcoming; with `currentItemId` null every item
- * is upcoming. Every queue endpoint returns it, and `queue:updated` carries it.
- */
+/** Items before the current one are history, after it upcoming; all upcoming when `currentItemId` is null. */
 export interface QueueState {
-	/** The user whose queue this is. */
 	ownerId: string;
-	/** Grows with every change of the queue; the store drops a state not newer than its own (#285). */
+	/** Grows with every change of the queue; the store drops a state not newer than its own. */
 	version: number;
 	currentItemId: string | null;
 	items: QueueItem[];
@@ -28,11 +20,8 @@ export type QueueStepBoundary = 'QUEUE_END' | 'QUEUE_START';
 export type QueueStepResult =
 	{ ok: true; state: QueueState } | { ok: false; code: QueueStepBoundary };
 
-/**
- * Body of `POST /api/queue/transfer` (#295): move what plays to another device.
- * `playing.queueItemId` is an item of my own queue; `playing.track` is for what a
- * friend's device plays. `source` is the remote device that plays now, to be paused.
- */
+// `playing.queueItemId` is an item of my own queue, `playing.track` what a friend's device plays;
+// `source` is the remote device playing now, to be paused.
 export interface TransferRequest {
 	targetUserId: string;
 	targetDeviceId: string;
@@ -48,7 +37,7 @@ export interface TransferResult {
 	queue: QueueState | null;
 }
 
-/** control:command: play `item` from `positionMs` on the device (queue playback, #294). */
+/** control:command: play `item` from `positionMs` on the device. */
 export interface QueuePlayCommand {
 	action: 'play-item';
 	fromUserId: string;
@@ -58,7 +47,7 @@ export interface QueuePlayCommand {
 	version: number;
 }
 
-/** control:command: play `track` from `positionMs` (playback transfer, #295). */
+/** control:command: play `track` from `positionMs` (playback transfer). */
 export interface QueueTrackCommand {
 	action: 'play-track';
 	fromUserId: string;
@@ -66,7 +55,7 @@ export interface QueueTrackCommand {
 	positionMs: number;
 }
 
-/** control:command: pause the device (playback transfer, #295). */
+/** control:command: pause the device (playback transfer). */
 export interface DevicePauseCommand {
 	action: 'pause';
 	fromUserId: string;

@@ -36,7 +36,6 @@ export interface PlaylistsScreen {
 	playerHeight: number;
 }
 
-/** The playlists screen: the friends' playlists, mine, then the public ones. */
 export function usePlaylistsScreen(navigation: Navigation): PlaylistsScreen {
 	const userId = useSession(session => session.user?.id);
 	const playerHeight = usePlayerHeight();

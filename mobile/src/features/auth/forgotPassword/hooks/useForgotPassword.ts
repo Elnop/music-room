@@ -17,7 +17,6 @@ export interface ForgotPassword {
 	goToLogin: () => void;
 }
 
-/** Asks for the reset code, then opens the new password screen. */
 export function useForgotPassword(
 	initialEmail: string,
 	navigation: NativeStackNavigationProp<AuthStackParamList, 'ForgotPassword'>

@@ -6,7 +6,7 @@ import { ResetPasswordView } from '@/features/auth/resetPassword/components/pres
 
 type ResetPasswordOrchestratorProps = NativeStackScreenProps<AuthStackParamList, 'ResetPassword'>;
 
-/** The new password screen, reached with the email the code was sent to. */
+/** Reached with the email the code was sent to. */
 export function ResetPasswordOrchestrator({ route, navigation }: ResetPasswordOrchestratorProps) {
 	const { email } = route.params;
 	const form = useResetPassword(email, navigation);

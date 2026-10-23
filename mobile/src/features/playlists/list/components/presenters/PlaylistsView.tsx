@@ -15,7 +15,6 @@ import { SectionHeader } from './SectionHeader';
 const countAll = (screen: PlaylistsScreen) =>
 	screen.friendsPlaylists.reduce((total, entry) => total + entry.playlists.length, 0);
 
-/** The playlists screen: friends' carousel, my playlists, then the public ones. */
 export function PlaylistsView({ screen }: { screen: PlaylistsScreen }) {
 	const { styles: styles, theme } = useThemedStyles(createListStyles);
 

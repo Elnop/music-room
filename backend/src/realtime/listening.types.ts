@@ -1,12 +1,5 @@
 import type { DeviceInfo } from '@/features/music-control/music-control.types.js';
 
-/**
- * Payloads of the listening and control Socket.io events (music-control-access.ts).
- */
-
-/**
- * Listening status for a single device
- */
 export interface ListeningStatus {
 	ownerId: string;
 	device: DeviceInfo;
@@ -17,15 +10,11 @@ export interface ListeningStatus {
 		artworkUrl: string | null;
 	} | null;
 	isPlaying: boolean;
-	/** Playback position when the status was sent, in ms; null from older clients (#295). */
+	/** Playback position when the status was sent, in ms; null from older clients. */
 	positionMs: number | null;
 	updatedAt: string;
 }
 
-/**
- * Aggregated listening status for a user (all devices)
- * Used for broadcasting to subscribers
- */
 export interface UserListeningStatus {
 	ownerId: string;
 	devices: ListeningStatus[];

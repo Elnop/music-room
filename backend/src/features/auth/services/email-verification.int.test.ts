@@ -26,8 +26,8 @@ const { errorHandler } = await import('@/shared/middleware/error-handler.js');
 const { logger } = await import('@/shared/utils/logger.js');
 const { verificationConfig } = await import('@/features/mail/mail.config.js');
 
-// verify-email and resend-verification cannot hand out an account (#188), through
-// HTTP on the real auth router against the local Supabase stack and test Redis.
+// verify-email and resend-verification cannot hand out an account, through HTTP on the real
+// auth router against the local Supabase stack and test Redis.
 
 const PASSWORD = 'integration-test-password';
 const SENT_MESSAGE = 'Verification code sent. Please check your email.';

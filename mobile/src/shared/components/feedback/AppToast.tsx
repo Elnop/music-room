@@ -16,11 +16,7 @@ function buildConfig(theme: Theme): ToastConfig {
 	};
 }
 
-/**
- * The app's toast host (#318), themed from `useTheme()`. Mount it inside
- * `ThemeProvider`; native modals mount their own since the root one sits
- * behind them. Toasts are shown through `utils/toast.ts`.
- */
+/** Mount inside `ThemeProvider`; native modals mount their own since the root one sits behind them. */
 export function AppToast() {
 	const { theme } = useTheme();
 	const config = React.useMemo(() => buildConfig(theme), [theme]);

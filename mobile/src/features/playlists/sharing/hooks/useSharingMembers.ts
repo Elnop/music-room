@@ -19,10 +19,7 @@ const toMember = (user: UserSummary, canEdit: boolean): PlaylistMember => ({
 	canEdit,
 });
 
-/**
- * Reloads the playlist (its failure fails the query), then lists its editors
- * and viewers; a failure of that second part only leaves the list empty.
- */
+/** The playlist reload fails the query; a failed member listing only leaves the list empty. */
 async function loadMembers(client: QueryClient, id: string): Promise<PlaylistMember[]> {
 	const playlist = await refreshPlaylist(client, id);
 	try {
@@ -55,7 +52,7 @@ export function useSharingMembers(id: string): SharingMembers {
 	const client = useQueryClient();
 	const signedIn = useSession(session => session.isAuthenticated);
 	const key = queryKeys.playlists.members(id);
-	// Reloaded with a spinner on every visit, as the screen always did.
+	// Reloaded with a spinner on every visit.
 	const query = useQuery({
 		queryKey: key,
 		queryFn: () => loadMembers(client, id),

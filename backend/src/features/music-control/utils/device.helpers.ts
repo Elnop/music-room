@@ -14,7 +14,7 @@ type DeviceRow = Pick<
 
 type LicenseUser = DeviceLicense['user'];
 
-/** The API's `deviceName` is the name to show: the owner's, else the system's (#352). */
+/** `deviceName` is the owner's custom name, else the system name. */
 export function toDevice(row: DeviceRow): Device {
 	return {
 		deviceId: row.device_id,

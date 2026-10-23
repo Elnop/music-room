@@ -18,7 +18,6 @@ const deviceOffline = fail(
 	['DEVICE_OFFLINE', 'Target device is not online']
 );
 
-/** A playback route's own 409, extended with the device-offline one. */
 const orOffline = (own: ResponseConfig): ResponseConfig => ({
 	...own,
 	description: `${own.description}; ${deviceOffline.description}`,
@@ -30,10 +29,9 @@ export const base = {
 	security: bearerAuth,
 };
 
-/** Optional body of the four playback routes: the owner's device that must play. */
+/** The owner's device that must play. */
 const playbackBody = jsonBody(queuePlaybackSchema, { deviceId: 'living-room-tv' }, false);
 
-/** Responses of every route: the full queue after the operation. */
 export const answers = {
 	200: ok('The full queue after the operation', queueStateSchema),
 	400: shared('ValidationError'),
@@ -110,5 +108,5 @@ const previous: RouteConfig = {
 	},
 };
 
-/** The routes whose body names the device that plays: a delegate must send it. */
+/** A delegate must send the device that plays. */
 export const playbackRoutes = [playItem, playPlaylist, next, previous];

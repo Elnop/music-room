@@ -9,12 +9,7 @@ interface ProviderSignIn {
 	isPending: boolean;
 }
 
-/**
- * Google or Facebook sign-in from the login and register screens. A cancel
- * reports nothing; any other failure its French message to `onFailure` (the
- * screen's toast), never after the screen unmounted. RootNavigator shows the
- * app once the session opens.
- */
+/** A cancel reports nothing; other failures reach `onFailure`, never after unmount. */
 export function useProviderSignIn(onFailure: (message: string) => void): ProviderSignIn {
 	const mutation = useMutation({ mutationFn: signInWithProvider });
 	return {

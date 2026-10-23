@@ -7,10 +7,6 @@ import {
 } from '@/realtime/playlist-room.js';
 import { createSocketQueue } from '@/realtime/socket-queue.js';
 
-/**
- * Join `playlist:<id>` if the user can view the playlist, else emit
- * `playlist:error` (see playlist-room.ts).
- */
 async function joinPlaylistRoom(socket: AppSocket, payload: unknown): Promise<void> {
 	const { userId } = socket.data;
 	const result = await authorizePlaylistJoin(payload, userId);
@@ -38,9 +34,6 @@ async function joinPlaylistRoom(socket: AppSocket, payload: unknown): Promise<vo
 	});
 }
 
-/**
- * Playlist event handlers: playlist:join, playlist:leave
- */
 export function registerPlaylistHandlers(socket: AppSocket): void {
 	// join awaits a DB lookup while leave does not: run this socket's
 	// join/leave events one after another, in arrival order, so a quick

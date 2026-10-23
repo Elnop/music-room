@@ -86,11 +86,9 @@ describe('FriendsOrchestrator', () => {
 		expect(screen.getByText('Bob')).toBeTruthy();
 		expect(screen.getByText('Mes amis (1)')).toBeTruthy();
 
-		// Press friend row
 		fireEvent.press(screen.getByText('bob'));
 		expect(onNavigate).toHaveBeenCalledWith('f1');
 
-		// Toggle switch
 		const toggleSwitch = screen.getByRole('switch');
 		fireEvent(toggleSwitch, 'valueChange', true);
 		await waitFor(() => {

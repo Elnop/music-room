@@ -13,7 +13,6 @@ import { FloatingIcon } from './FloatingIcon';
 
 interface WelcomeViewProps {
 	icons: FloatingIconMotion[];
-	/** The backend address field is open. */
 	showServer: boolean;
 	onToggleServer: () => void;
 	onStart: () => void;

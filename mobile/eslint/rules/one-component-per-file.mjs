@@ -1,5 +1,3 @@
-// Rule: one-component-per-file
-// Each file must declare at most one React component.
 // See .agents/rules/components.md#one-component-per-file
 
 export default {
@@ -19,14 +17,11 @@ export default {
 		const rawPath = context.filename ?? context.getFilename?.() ?? '';
 		const filename = rawPath.replace(/\\/g, '/');
 
-		// Only check component files, not tests or non-tsx files
 		if (filename.includes('.test.') || (!filename.endsWith('.tsx') && !filename.endsWith('.jsx'))) {
 			return {};
 		}
 
-		// Function scope stack to track currently active functions
 		const functionStack = [];
-		// Map of component node -> { name, hasJsx: boolean }
 		const candidates = new Map();
 
 		function isPascalCase(name) {
@@ -46,7 +41,7 @@ export default {
 		}
 
 		function recordJsx() {
-			// Mark all enclosing PascalCase functions as having JSX
+			// JSX belongs to the nearest enclosing PascalCase function only
 			for (let i = functionStack.length - 1; i >= 0; i--) {
 				const item = functionStack[i];
 				if (item.name && isPascalCase(item.name)) {
@@ -94,7 +89,6 @@ export default {
 				if (components.length <= 1) return;
 
 				const allNames = components.map(c => c.name).join(', ');
-				// Report every component after the first one
 				for (let i = 1; i < components.length; i++) {
 					const comp = components[i];
 					context.report({

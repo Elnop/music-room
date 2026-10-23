@@ -34,7 +34,7 @@ export function useProfileScreen() {
 		try {
 			await Promise.all([preferencesQuery.refetch(), statsQuery.refetch()]);
 		} catch {
-			// Silently fail - data is optional and errors during logout are expected
+			// Data is optional, and errors during logout are expected.
 		}
 	}, [preferencesQuery, statsQuery]);
 

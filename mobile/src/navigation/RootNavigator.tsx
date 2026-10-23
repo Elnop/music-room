@@ -47,16 +47,13 @@ export function RootNavigator() {
 	const connectSocket = useSocketStore(state => state.connect);
 	const disconnectSocket = useSocketStore(state => state.disconnect);
 
-	// Emit listening status and handle remote control commands
 	useMusicControlEmitter();
 
 	useEffect(() => {
-		// Load the backend address, then the auth state, from AsyncStorage on app
-		// start; the address must be known before the first request (token refresh)
+		// The backend address must be known before the first request (token refresh)
 		loadBackendUrl()
 			.then(() => loadFromStorage())
 			.then(async () => {
-				// After loading, check if token needs refresh
 				const { isAuthenticated, isTokenExpiringSoon, refreshAccessToken } =
 					useAuthStore.getState();
 
@@ -85,7 +82,6 @@ export function RootNavigator() {
 		if (isAuthenticated) openPendingLink(navigationRef);
 	}, [isAuthenticated, navigationRef]);
 
-	// Show loading screen while checking auth state
 	if (!isReady) {
 		return <LoadingSpinner fullScreen message="Chargement…" />;
 	}

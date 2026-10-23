@@ -13,7 +13,6 @@ interface SearchTracksViewProps {
 	playerHeight: number;
 }
 
-/** « Ajouter des titres »: a SoundCloud search whose results add to the playlist. */
 export function SearchTracksView({ screen, playerHeight }: SearchTracksViewProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
 	const typed = screen.search.text.trim() !== '';

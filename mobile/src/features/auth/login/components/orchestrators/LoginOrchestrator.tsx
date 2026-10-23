@@ -7,7 +7,6 @@ import { LoginView } from '@/features/auth/login/components/presenters/LoginView
 
 type LoginOrchestratorProps = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
-/** The Login screen. */
 export function LoginOrchestrator({ navigation }: LoginOrchestratorProps) {
 	const form = useLoginForm(navigation);
 	const provider = useProviderSignIn(form.reportError);

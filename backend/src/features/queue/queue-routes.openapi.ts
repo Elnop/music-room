@@ -13,7 +13,7 @@ import {
 import { jsonBody } from '@/shared/config/swagger.schemas.js';
 import { fail } from '@/shared/config/swagger.errors.js';
 
-/** The routes of the caller's queue, mirrored under /api/users/{userId}/queue. */
+/** Mirrored under /api/users/{userId}/queue. */
 export const queueRoutes: RouteConfig[] = [
 	{
 		...base,

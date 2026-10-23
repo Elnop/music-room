@@ -34,10 +34,7 @@ interface State {
 	ttl: number;
 }
 
-/**
- * In-memory stand-in for the shared counter (counter.ts): a hit starts the
- * window when the key is missing, release decrements only an existing key.
- */
+/** In-memory stand-in for counter.ts: release decrements only an existing key. */
 function fakeCounter(state: State) {
 	hit.mockImplementation((_key: string, windowMs: number) => {
 		if (state.count === null) {

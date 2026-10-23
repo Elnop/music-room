@@ -1,5 +1,3 @@
-// Rule: presenter-pure
-// Presenters must be pure UI: no state, effects, stores, queries or raw fetch.
 // See .agents/rules/components.md#presenter-pure
 
 const FORBIDDEN_STATE_OR_EFFECT_HOOKS = new Set([

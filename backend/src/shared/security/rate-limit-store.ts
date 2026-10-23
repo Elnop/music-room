@@ -8,21 +8,8 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import * as counter from '@/shared/security/counter.js';
 
-/**
- * express-rate-limit store on the shared counter (counter.ts), one per
- * limiter, keys `rl:<name>:<key>`.
- *
- * The limiters are built when their module is imported, usually before
- * `connectRedis()` has finished; the store only reads `windowMs` at init and
- * sends nothing until a request comes, so the startup order does not matter.
- *
- * Fail closed, never in memory: while Redis is not ready, `get`, `increment`
- * and `resetKey` throw a 503 RATE_LIMIT_UNAVAILABLE without sending a command,
- * which express-rate-limit forwards to the error handler (`passOnStoreError`
- * stays false); a Redis command error gives the same 503. `decrement` runs
- * after the response, outside any error handler, so it only logs: throwing
- * there would be an unhandled rejection.
- */
+// Limiters are built before connectRedis() finishes: the store sends nothing until a request comes.
+// `decrement` runs after the response, outside any error handler, so it only logs instead of throwing.
 
 export type RateLimitStore = Store & { readonly prefix: string; readonly localKeys: false };
 

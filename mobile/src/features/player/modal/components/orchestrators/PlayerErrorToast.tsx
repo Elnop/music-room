@@ -2,9 +2,6 @@ import { useEffect, useRef } from 'react';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { showError } from '@/shared/utils/toast';
 
-/**
- * Shows a toast when a track is unavailable (404).
- */
 export function PlayerErrorToast(): null {
 	const error = usePlayerStore(state => state.error);
 	const currentTrack = usePlayerStore(state => state.currentTrack);

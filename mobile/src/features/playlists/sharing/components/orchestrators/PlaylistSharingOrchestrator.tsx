@@ -9,7 +9,6 @@ type PlaylistSharingOrchestratorProps = NativeStackScreenProps<
 	'PlaylistSharing'
 >;
 
-/** The « Visibilité et droits » screen of a playlist's owner. */
 export function PlaylistSharingOrchestrator({ route }: PlaylistSharingOrchestratorProps) {
 	const sharing = usePlaylistSharing(route.params.playlistId);
 	return <SharingView sharing={sharing} />;

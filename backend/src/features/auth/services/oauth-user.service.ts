@@ -8,12 +8,7 @@ import * as magicLinkSession from '@/features/auth/services/magic-link-session.s
 import * as oauthSignupService from '@/features/auth/services/oauth-signup.service.js';
 import type { OAuthProfile, OAuthUser } from '@/features/auth/services/oauth-signup.service.js';
 
-/**
- * Sign in with Google or Facebook: the account already linked to this
- * provider id, else the account with the same email (linked on the way),
- * else a new account. Without an email (Facebook permission denied), a
- * synthetic one is used.
- */
+/** Provider id first, then the same email (linked on the way), else a new account; no email gets a synthetic one. */
 export async function createOAuthUser(
 	provider: OAuthProvider,
 	providerId: string,
@@ -65,10 +60,7 @@ export async function createOAuthUser(
 	}
 }
 
-/**
- * The provider may have been linked with another email: open the session
- * for the account's own auth email, not the network's.
- */
+/** The provider may be linked under another email: open the session for the account's own auth email. */
 async function signInLinkedAccount(account: UserProfileRow): Promise<OAuthUser> {
 	if (!account.email_verified) {
 		await supabaseAdmin.from('user_profiles').update({ email_verified: true }).eq('id', account.id);

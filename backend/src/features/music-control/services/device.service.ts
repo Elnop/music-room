@@ -18,15 +18,7 @@ import {
 // Persists the devices a user connects from (`devices`, one row per
 // `(user_id, device_id)`).
 
-/**
- * Records an authenticated connection: inserts the device or refreshes its
- * name, platform, model and `last_seen_at`. `created_at` is left out of the
- * payload so an existing row keeps it, and so is `custom_name` (#352): the
- * name the owner chose survives every reconnection.
- *
- * @returns the name to show: the owner's `custom_name` when set, else the
- *   system name sent at the handshake
- */
+// `created_at` and `custom_name` stay out of the upsert so reconnections keep them.
 export async function recordConnection(userId: string, device: DeviceInfo): Promise<string> {
 	const { data, error } = await supabaseAdmin
 		.from('devices')
@@ -56,11 +48,7 @@ export async function recordConnection(userId: string, device: DeviceInfo): Prom
 	return data.custom_name ?? device.deviceName;
 }
 
-/**
- * Sets the name the owner gives one of their devices (#352); `null` goes
- * back to the system name. Throws 404 DEVICE_NOT_FOUND when deviceId is not
- * one of the owner's devices (unknown or someone else's).
- */
+/** `null` goes back to the system name; 404 when the device is not the owner's. */
 export async function renameDevice(
 	ownerId: string,
 	deviceId: string,
@@ -81,11 +69,7 @@ export async function renameDevice(
 	return toDevice(data);
 }
 
-/**
- * The owner's devices, most recently seen first, each with the friends
- * licensed to control it (oldest grant first). A license whose grantee is no
- * longer a mutual friend is still listed so the owner can revoke it.
- */
+// Licenses of former friends stay listed so the owner can revoke them.
 export async function listMyDevices(ownerId: string): Promise<DeviceWithLicenses[]> {
 	const [devices, licensesResult] = await Promise.all([
 		listOwnerDevices(ownerId),

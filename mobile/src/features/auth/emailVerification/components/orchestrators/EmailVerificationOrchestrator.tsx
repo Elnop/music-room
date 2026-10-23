@@ -9,7 +9,6 @@ type EmailVerificationOrchestratorProps = NativeStackScreenProps<
 	'EmailVerification'
 >;
 
-/** The code screen after a registration. */
 export function EmailVerificationOrchestrator({
 	route,
 	navigation,

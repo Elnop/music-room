@@ -6,9 +6,6 @@ const parseHex = (hex: string): Rgb | null => {
 	return [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)];
 };
 
-/**
- * Convert hex to rgba with opacity
- */
 export const hexToRgba = (hex: string, alpha: number): string => {
 	const rgb = parseHex(hex);
 	if (!rgb) return `rgba(0, 0, 0, ${alpha})`;
@@ -62,10 +59,7 @@ interface AdaptivePalette {
 	gradient: [string, string, string, string];
 }
 
-/**
- * Opacities from the bottom stop to the top one, every 0.05: between stops the
- * gradient blends linearly, and luminance along that blend is not always monotonic.
- */
+/** Every 0.05, not only the stops: luminance along the linear blend between stops is not always monotonic. */
 const gradientSamples = (): number[] => {
 	const low = Math.min(...GRADIENT_ALPHAS);
 	const high = Math.max(...GRADIENT_ALPHAS);
@@ -78,13 +72,7 @@ const gradientSamples = (): number[] => {
 const worstContrast = (fg: Rgb, backgrounds: Rgb[]) =>
 	Math.min(...backgrounds.map(bg => contrastRatio(fg, bg)));
 
-/**
- * Colours for content drawn over the player gradient: the dominant artwork colour
- * at `GRADIENT_ALPHAS` over the theme background `base`. Text is black or white,
- * whichever keeps the best contrast on every stop; when neither reaches WCAG AA,
- * the gradient becomes opaque, where one of them always does (≥ 4.58:1).
- * Returns null when a colour is not `#RRGGBB`.
- */
+/** Text is black or white by worst-stop contrast; below WCAG AA the gradient turns opaque, where one always passes. */
 export const getAdaptiveColors = (dominantColor: string, base: string): AdaptivePalette | null => {
 	const dominant = parseHex(dominantColor);
 	const baseRgb = parseHex(base);

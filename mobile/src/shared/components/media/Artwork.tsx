@@ -12,10 +12,7 @@ interface ArtworkProps {
 	iconSize?: number;
 }
 
-/**
- * A track's cover, or a local placeholder (note icon) when it has none (#307):
- * never a remote placeholder service.
- */
+/** Without a cover, a local placeholder: never a remote placeholder service. */
 export function Artwork({ uri, size, style, iconSize }: ArtworkProps) {
 	const { theme } = useTheme();
 

@@ -11,7 +11,6 @@ interface LoadFailureProps {
 	onRetry: () => void;
 }
 
-/** The playlist could not be loaded (#321). */
 export function LoadFailure({ notFound, onRetry }: LoadFailureProps) {
 	const { styles } = useThemedStyles(createStyles);
 

@@ -4,13 +4,7 @@ import * as counter from '@/shared/security/counter.js';
 import { failOpen } from '@/shared/security/fail-open.js';
 import type { IPReputationStatus } from '@/shared/security/security.types.js';
 
-/**
- * IP reputation: failed logins (password and OAuth) per IP, across accounts,
- * over 15 minutes. The throttle and block thresholds are logged; from the
- * blacklist threshold on, the IP is blacklisted for 24 hours and every
- * /api/auth/* request from it is refused (checkIPBlacklist). Fails open
- * (fail-open.ts).
- */
+// Failed logins per IP across accounts; past the blacklist threshold every /api/auth/* request is refused. Fails open.
 
 const FAILED_WINDOW_MS = 15 * 60 * 1000;
 const BLACKLIST_SECONDS = 24 * 60 * 60;
@@ -34,7 +28,6 @@ async function blacklistIP(ip: string, durationSeconds: number): Promise<void> {
 	}
 }
 
-/** Count a failed login from this IP; blacklists it from the threshold on. */
 export async function recordIPActivity(ip: string): Promise<IPReputationStatus> {
 	return failOpen<IPReputationStatus>(
 		{
@@ -67,7 +60,6 @@ export async function recordIPActivity(ip: string): Promise<IPReputationStatus> 
 	);
 }
 
-/** Whether this IP is blacklisted. */
 export async function isIPBlacklisted(ip: string): Promise<boolean> {
 	return failOpen(
 		{

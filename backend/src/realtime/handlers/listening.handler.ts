@@ -16,10 +16,6 @@ import {
 import { createSocketQueue } from '@/realtime/socket-queue.js';
 import { deviceKey, socketToDevice } from '@/realtime/state.js';
 
-/**
- * Join `listening:<target>` if the user can control at least one of the
- * target's devices, then send the current status; else emit `listening:error`.
- */
 async function subscribeToListening(socket: AppSocket, payload: unknown): Promise<void> {
 	const parsed = listeningTargetSchema.safeParse(payload);
 	if (!parsed.success) {
@@ -76,10 +72,6 @@ async function subscribeToListening(socket: AppSocket, payload: unknown): Promis
 	});
 }
 
-/**
- * Listening event handlers: listening:update, listening:subscribe,
- * listening:unsubscribe (multi-device)
- */
 export function registerListeningHandlers(socket: AppSocket): void {
 	socket.on('listening:update', (payload: unknown) => {
 		const parsed = listeningUpdateSchema.safeParse(payload);
@@ -104,7 +96,7 @@ export function registerListeningHandlers(socket: AppSocket): void {
 
 		const { userId, deviceId } = socketInfo;
 		// Leading + trailing: the first update applies now, the latest one
-		// received during the window applies when it ends (#151).
+		// received during the window applies when it ends.
 		listeningUpdateThrottle.submit(deviceKey(userId, deviceId), () =>
 			applyListeningUpdate(socket, userId, deviceId, data)
 		);
@@ -112,7 +104,7 @@ export function registerListeningHandlers(socket: AppSocket): void {
 
 	// subscribe awaits access checks while unsubscribe does not: same
 	// ordering as playlist join/leave, so a quick subscribe(X) +
-	// unsubscribe(X) never ends with the socket in the room (#159).
+	// unsubscribe(X) never ends with the socket in the room.
 	const enqueue = createSocketQueue(socket, 'listening_room_task_failed');
 
 	socket.on('listening:subscribe', (payload: unknown) => {

@@ -9,7 +9,6 @@ import { SIGNED_OUT, type GetAuthState, type SessionActions, type SetAuthState }
 
 const EXPIRY_MARGIN_MS = 5 * 60 * 1000;
 
-/** The session actions of the auth store, bound to its `set` and `get`. */
 export function createSessionActions(set: SetAuthState, get: GetAuthState): SessionActions {
 	const persist = async (): Promise<void> => {
 		const { user, accessToken, refreshToken, tokenExpiresAt, isAuthenticated } = get();
@@ -28,12 +27,7 @@ export function createSessionActions(set: SetAuthState, get: GetAuthState): Sess
 		});
 	};
 
-	/**
-	 * Ends the session on the device only, without calling the backend: for a
-	 * refused refresh, `authApi.logout` goes through `apiRequest`, whose
-	 * proactive refresh would call `refreshAccessToken` again. RootNavigator
-	 * shows the auth screens once `isAuthenticated` is false.
-	 */
+	/** Device only: `authApi.logout` would refresh through `apiRequest` and call `refreshAccessToken` again. */
 	const endSessionLocally = async (): Promise<void> => {
 		set(SIGNED_OUT);
 		await storedSession.clear();
@@ -56,7 +50,7 @@ export function createSessionActions(set: SetAuthState, get: GetAuthState): Sess
 				}
 			}
 			await endSessionLocally();
-			// After the session ends, so the player no longer saves it for this user (#312).
+			// After the session ends, so the player no longer saves it for this user.
 			if (user) await lastTrackStorage.clear(user.id);
 		},
 

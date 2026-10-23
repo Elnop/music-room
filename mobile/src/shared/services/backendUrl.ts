@@ -2,20 +2,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_CONFIG } from '@/shared/constants/app';
 import { logger } from '@/shared/utils/logger';
 
-/**
- * Runtime backend address (story 6.3). Defaults to the build-time
- * `EXPO_PUBLIC_API_URL` and can be changed from the app without a rebuild.
- * Every HTTP client and the socket read it at call time through getBackendUrl().
- */
+// Changeable from the app without a rebuild: every HTTP client and the socket read it at call time.
 
 const STORAGE_KEY = 'zumik.backendUrl';
 
-/**
- * scheme :// authority, then only slashes. The authority holds no path, query,
- * fragment or credentials; it is split into host and port below. A parse by
- * hand because React Native's URL polyfill does not implement `hostname`,
- * `search` or `hash`.
- */
+/** Parsed by hand: React Native's URL polyfill does not implement `hostname`, `search` or `hash`. */
 const URL_PARTS = /^(https?):\/\/([^/?#@\s]*)\/*$/i;
 const AUTHORITY = /^(\[[0-9a-f:.]+\]|[a-z0-9-]+(?:\.[a-z0-9-]+)*)(?::(\d{1,5}))?$/i;
 
@@ -29,11 +20,7 @@ type Listener = (url: string) => void;
 let currentUrl = DEFAULT_BACKEND_URL;
 const listeners = new Set<Listener>();
 
-/**
- * Trims whitespace and trailing slashes; returns null unless the input is an
- * http(s) URL with a non-empty hostname, an optional port and nothing else
- * (no credentials, path, query or fragment).
- */
+/** Null unless an http(s) URL with a hostname and an optional port only (no credentials, path, query or fragment). */
 export function normalize(input: string): string | null {
 	const parts = URL_PARTS.exec(input.trim());
 	if (!parts) return null;
@@ -50,15 +37,11 @@ function update(url: string): void {
 	listeners.forEach(listener => listener(url));
 }
 
-/** Current backend address (synchronous). */
 export function getBackendUrl(): string {
 	return currentUrl;
 }
 
-/**
- * Loads the persisted address. Called once at app start; a missing, invalid or
- * unreadable value leaves the build-time default.
- */
+/** A missing, invalid or unreadable value leaves the build-time default. */
 export async function loadBackendUrl(): Promise<string> {
 	try {
 		const stored = await AsyncStorage.getItem(STORAGE_KEY);
@@ -71,10 +54,7 @@ export async function loadBackendUrl(): Promise<string> {
 	return currentUrl;
 }
 
-/**
- * Validates, normalizes, persists and applies a new address.
- * Returns an error message for invalid input (the current address is kept).
- */
+/** Returns an error message for invalid input, keeping the current address. */
 export async function setBackendUrl(input: string): Promise<{ url: string } | { error: string }> {
 	const url = normalize(input);
 	if (!url) return { error: INVALID_BACKEND_URL_MESSAGE };
@@ -99,7 +79,6 @@ export async function resetBackendUrl(): Promise<string> {
 	return currentUrl;
 }
 
-/** Subscribes to address changes; returns the unsubscribe function. */
 export function onBackendUrlChange(listener: Listener): () => void {
 	listeners.add(listener);
 	return () => {

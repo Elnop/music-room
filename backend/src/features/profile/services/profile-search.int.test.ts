@@ -3,9 +3,8 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import * as profileSearchService from '@/features/profile/services/profile-search.service.js';
 
-// searchUsers against the local stack: the query is matched literally, never
-// read as PostgREST filter syntax (#236), and avatar and bio follow each found
-// profile's privacy settings for the viewer (#247).
+// searchUsers against the local stack: the query is matched literally, never read as PostgREST
+// filter syntax, and avatar and bio follow each found profile's privacy for the viewer.
 
 const tag = randomUUID().slice(0, 8);
 const userIds: string[] = [];

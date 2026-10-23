@@ -1,4 +1,3 @@
-// Time Formatters
 export const formatDuration = (ms: number): string => {
 	const totalSeconds = Math.floor(ms / 1000);
 	const minutes = Math.floor(totalSeconds / 60);
@@ -33,7 +32,6 @@ export const formatRelativeTime = (date: string | Date): string => {
 	return formatDate(date);
 };
 
-// String Formatters
 export const truncateText = (text: string, maxLength: number): string => {
 	if (text.length <= maxLength) return text;
 	return text.slice(0, maxLength) + '...';

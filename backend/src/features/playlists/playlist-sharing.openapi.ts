@@ -18,7 +18,6 @@ import {
 } from '@/shared/config/swagger.schemas.js';
 import { shared } from '@/shared/config/swagger.errors.js';
 
-/** Registers the collaborator and viewer routes of /api/playlists; owner only. */
 export function registerPlaylistSharingOpenapi(registry: OpenAPIRegistry): void {
 	const common = { tags: ['Collaborators'], security: bearerAuth };
 	nameSchemas({

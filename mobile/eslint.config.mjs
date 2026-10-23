@@ -8,8 +8,8 @@ import prettierConfig from 'eslint-config-prettier';
 import { builtinRules } from 'eslint/use-at-your-own-risk';
 import componentsPlugin from './eslint/plugin-components.mjs';
 
-// Aliases removed by #377: @/ is the only one left (babel.config.js,
-// tsconfig.json). Still banned so they cannot come back.
+// Removed aliases, still banned so they cannot come back: @/ is the only one left
+// (babel.config.js, tsconfig.json).
 const LEGACY_ALIASES = [
   '@api',
   '@components',
@@ -49,9 +49,8 @@ const NAMED_COLORS = [
   'whitesmoke', 'yellow', 'yellowgreen',
 ];
 
-// Project rules built on the core no-restricted-syntax: each one gets its own
-// name, so its exceptions are counted apart in eslint-suppressions.json.
-// See .agents/rules/guardrails.md#append-only-rules
+// Each no-restricted-syntax rule gets its own name, so its exceptions are counted apart in
+// eslint-suppressions.json. See .agents/rules/guardrails.md#append-only-rules
 const restrictedSyntax = builtinRules.get('no-restricted-syntax');
 const guardrailsPlugin = {
   rules: {
@@ -62,7 +61,6 @@ const guardrailsPlugin = {
 };
 
 export default [
-  // Ignore patterns (replaces .eslintignore)
   {
     ignores: [
       '**/node_modules/**',
@@ -79,16 +77,13 @@ export default [
     ],
   },
 
-  // Base recommended configs
   js.configs.recommended,
 
-  // TypeScript config - exclude config files
   ...tseslint.configs.recommended.map(config => ({
     ...config,
     ignores: ['babel.config.js', 'plugins/**/*.js', '*.cjs'],
   })),
 
-  // Special configuration for CommonJS config files (babel, plugins)
   {
     files: ['babel.config.js', 'plugins/**/*.js', '*.cjs'],
     languageOptions: {
@@ -99,7 +94,7 @@ export default [
       },
     },
     rules: {
-      '@typescript-eslint/no-require-imports': 'off', // Allow require() in config files
+      '@typescript-eslint/no-require-imports': 'off',
       'no-unused-vars': ['warn', {
         argsIgnorePattern: '^_',
         varsIgnorePattern: '^_',
@@ -108,7 +103,6 @@ export default [
     },
   },
 
-  // Main configuration for TypeScript and React files
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
     ignores: ['babel.config.js', 'plugins/**/*.js', '*.cjs'],
@@ -138,10 +132,8 @@ export default [
       },
     },
     rules: {
-      // Prettier integration
       'prettier/prettier': 'warn',
 
-      // TypeScript rules
       '@typescript-eslint/no-unused-vars': [
         'warn',
         {
@@ -151,16 +143,13 @@ export default [
         },
       ],
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-require-imports': 'error', // Disallow require() in source files
+      '@typescript-eslint/no-require-imports': 'error',
 
-      // React rules
       'react/react-in-jsx-scope': 'off', // Not needed with React 17+
       'react/prop-types': 'off', // Using TypeScript for prop validation
       ...reactHooksPlugin.configs.recommended.rules,
-      // React Compiler rules from eslint-plugin-react-hooks 7.1, kept visible
-      // as warnings: `immutability` flags Reanimated shared values
-      // (`sv.value = x`) by design, and the `set-state-in-effect` cases are
-      // realtime hooks to refactor with device testing, not blindly.
+      // React Compiler rules kept as warnings: `immutability` flags Reanimated shared values by design,
+      // and the `set-state-in-effect` cases are realtime hooks to refactor with device testing.
       'react-hooks/immutability': 'warn',
       'react-hooks/set-state-in-effect': 'warn',
 
@@ -196,8 +185,7 @@ export default [
     },
   },
 
-  // The logger is the only code that writes to the console. The ErrorBoundary
-  // test mutes React's own log of the caught error.
+  // Only the logger writes to the console; the ErrorBoundary test mutes React's log of the caught error.
   // See .agents/rules/logging.md#no-console
   {
     files: [
@@ -225,7 +213,7 @@ export default [
     },
   },
 
-  // Project guardrails (#377), on the app code and its tests.
+  // Project guardrails, on the app code and its tests.
   {
     files: ['src/**/*.{ts,tsx}', 'App.tsx'],
     plugins: {

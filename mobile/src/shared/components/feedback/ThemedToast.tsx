@@ -20,11 +20,7 @@ interface ThemedToastProps {
 	theme: Theme;
 }
 
-/**
- * One toast: the theme's surface with an accent bar and icon in the theme's
- * state colour, the text in the theme's text colour so it stays readable
- * whatever the state colour.
- */
+/** Text in the theme's text colour, not the state colour, so it stays readable. */
 export function ThemedToast({ kind, params, theme }: ThemedToastProps) {
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 	const color = theme.colors[kind];

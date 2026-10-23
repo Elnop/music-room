@@ -17,9 +17,6 @@ import * as socketServer from '@/realtime/socket-server.js';
 import { getIO } from '@/realtime/state.js';
 import * as realtime from '@/realtime/emitters/control.emitters.js';
 
-// Socket.io handshake authentication (socket-auth.ts) against a real server
-// on a random port and real users/tokens from the local Supabase stack.
-
 interface TestUser {
 	id: string;
 	token: string;
@@ -42,7 +39,7 @@ async function createUser(): Promise<TestUser> {
 		.insert({ id, username: `int_${id.slice(0, 8)}` });
 	if (profileError) throw profileError;
 
-	// Sign in with the anon client, never the admin one (#136).
+	// Sign in with the anon client, never the admin one.
 	const { data: session, error: signInError } = await supabaseAnon.auth.signInWithPassword({
 		email,
 		password: PASSWORD,
@@ -132,7 +129,7 @@ describe('Socket.io handshake authentication', () => {
 		// verifyToken checks the logout denylist and fails closed without Redis.
 		await connectRedis();
 		if (!isRedisConnected()) throw new Error('Redis from scripts/test-db.sh is not reachable');
-		// Invalid-token handshakes below count against 127.0.0.1 (#160): start
+		// Invalid-token handshakes below count against 127.0.0.1: start
 		// from a clean counter so repeated runs never reach the limit.
 		const tokenKeys = await redisClient.keys('rl:auth:token:*');
 		if (tokenKeys.length > 0) await redisClient.del(...tokenKeys);
@@ -355,10 +352,8 @@ describe('Socket.io handshake authentication', () => {
 
 			await sessionService.logout(carol.token, carol.id);
 
-			// logout also ends the Supabase session, and the handshake maps every
-			// verification failure to INVALID_TOKEN (503 REVOCATION_UNAVAILABLE too):
-			// check the handshake's own denylist lookup found the token revoked,
-			// with Redis healthy, and Supabase was never asked.
+			// The handshake maps every verification failure to INVALID_TOKEN: check its own
+			// denylist lookup found the token revoked, and Supabase was never asked.
 			expect(isRedisConnected()).toBe(true);
 			const revokedKey = `auth:revoked:${createHash('sha256').update(carol.token).digest('hex')}`;
 			const exists = vi.spyOn(redisClient, 'exists');

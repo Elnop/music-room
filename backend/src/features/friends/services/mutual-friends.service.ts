@@ -4,7 +4,6 @@ import { logger } from '@/shared/utils/logger.js';
 import { failUnexpected } from '@/shared/utils/fail-unexpected.js';
 import type { Friend } from '@/features/friends/friends.types.js';
 
-/** Logs a failed step and answers 500 FRIENDS_ERROR. */
 function friendsError(log: string, error: unknown): AppError {
 	logger.error(log, { error });
 	return new AppError(500, 'Failed to get friends', 'FRIENDS_ERROR');

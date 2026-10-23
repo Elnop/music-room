@@ -2,11 +2,6 @@ import type { Request, Response, NextFunction } from 'express';
 import { logger } from '@/shared/utils/logger.js';
 import type { AuthenticatedRequest } from '@/shared/types/global.types.js';
 
-/**
- * Action logging middleware
- * Extracts client metadata (platform, device, version) from headers
- * and logs all API requests automatically
- */
 export function actionLoggerMiddleware(req: Request, res: Response, next: NextFunction): void {
 	const startTime = Date.now();
 

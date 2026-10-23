@@ -2,10 +2,8 @@ import { Router } from 'express';
 import { authMiddleware } from '@/features/auth/auth.middleware.js';
 import * as friends from '@/features/friends/friends.controller.js';
 
-// Endpoints are documented in friends.openapi.ts.
 const router = Router();
 
-// All routes require authentication
 router.use(authMiddleware);
 
 router.get('/', friends.getMutualFriends);

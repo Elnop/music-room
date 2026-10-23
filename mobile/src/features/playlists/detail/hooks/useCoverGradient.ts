@@ -4,7 +4,6 @@ import type { PlaylistWithTracks } from '@/features/playlists/types';
 
 type GradientColors = readonly [string, string, ...string[]];
 
-/** The background gradient of a playlist, from the dominant colour of its cover. */
 export function useCoverGradient(playlist: PlaylistWithTracks | undefined): GradientColors {
 	const { theme } = useTheme();
 	const coverUrl = playlist?.coverUrl || playlist?.tracks[0]?.albumArt;

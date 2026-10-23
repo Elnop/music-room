@@ -3,10 +3,7 @@ import { useAudioPlayerStatus, type useAudioPlayer } from 'expo-audio';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { isLocalTarget } from '@/shared/services/connectBridge';
 
-/**
- * Mirrors into the store the pauses and resumes the system makes on the player
- * behind the app's back (#310): calls or unplugged headsets.
- */
+/** Mirrors into the store the pauses and resumes the system makes behind the app's back (calls, unplugged headsets). */
 export function useAudioInterruption(player: ReturnType<typeof useAudioPlayer>): void {
 	const status = useAudioPlayerStatus(player);
 	const lastRef = useRef<{ id: number; playing: boolean } | null>(null);

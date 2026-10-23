@@ -17,7 +17,6 @@ const CODE_MESSAGES: Record<string, string> = {
 	INVALID_PROVIDER_TOKEN: 'La connexion au service a échoué, réessayez',
 	LAST_PROVIDER: 'Impossible de retirer votre dernière méthode de connexion',
 	PROVIDER_NOT_LINKED: "Ce compte n'est pas lié à votre profil",
-	// Authentication (#341)
 	INVALID_CREDENTIALS: 'Email ou mot de passe incorrect',
 	EMAIL_ALREADY_EXISTS: 'Cet email est déjà utilisé',
 	USERNAME_TAKEN: "Ce nom d'utilisateur est déjà pris",
@@ -37,17 +36,11 @@ const CODE_MESSAGES: Record<string, string> = {
 	ACCOUNT_LOCKED: 'Compte temporairement bloqué après trop de tentatives. Réessayez plus tard.',
 	IP_BLOCKED: 'Accès temporairement restreint. Réessayez plus tard.',
 	AUTH_UNAVAILABLE: "Le service d'authentification est indisponible. Réessayez plus tard.",
-	// Profile photo (#351)
 	INVALID_IMAGE: "Ce fichier n'est pas une image JPEG, PNG ou WebP",
 	FILE_TOO_LARGE: 'La photo ne doit pas dépasser 2 Mo',
 };
 
-/**
- * A readable French message for any error thrown by an API call (#318): known
- * `ApiError` codes and statuses get their own text, anything else the
- * caller's French `fallback`. Never returns the server's or fetch's raw
- * (English) message.
- */
+/** Never returns the server's or fetch's raw (English) message: unknown errors get the caller's `fallback`. */
 export function apiErrorMessage(error: unknown, fallback: string): string {
 	if (!(error instanceof ApiError)) return fallback;
 

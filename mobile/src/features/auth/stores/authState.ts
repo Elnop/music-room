@@ -2,7 +2,7 @@ import type { StoreApi } from 'zustand';
 import type { UserProfile } from '@/types/user.types';
 import type { AuthSessionTokens } from '@/features/auth/types';
 
-/** The session: client state of the auth feature (state.md#server-vs-client-state). */
+/** Client state (state.md#server-vs-client-state). */
 export interface SessionState {
 	user: UserProfile | null;
 	accessToken: string | null;
@@ -10,7 +10,6 @@ export interface SessionState {
 	/** Milliseconds since the epoch. */
 	tokenExpiresAt: number | null;
 	isAuthenticated: boolean;
-	/** A logout is running. */
 	isLoading: boolean;
 	isRefreshing: boolean;
 }
@@ -26,7 +25,7 @@ export interface SessionActions {
 	isTokenExpiringSoon: () => boolean;
 	/** Restores the session stored on the device, at app start. */
 	loadFromStorage: () => Promise<void>;
-	/** New avatar URL after an upload, null after a removal (#351). */
+	/** New avatar URL after an upload, null after a removal. */
 	setAvatarUrl: (avatarUrl: string | null) => Promise<void>;
 	/** Updates the user profile in state and storage. */
 	setUser: (user: UserProfile) => Promise<void>;

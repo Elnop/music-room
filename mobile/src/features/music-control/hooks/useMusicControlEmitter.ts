@@ -13,10 +13,7 @@ import type { DeviceCommand } from '@/types/queue.types';
 
 type ControlCommand = DeviceCommand | { action: 'play'; fromUserId: string };
 
-/**
- * Hook to manage music control - emits listening status and receives remote commands
- * Should be used at app root level (e.g., in RootNavigator)
- */
+/** Use once, at the app root (RootNavigator). */
 export function useMusicControlEmitter() {
 	const socket = useSocketStore(state => state.socket);
 	const isConnected = useSocketStore(state => state.isConnected);

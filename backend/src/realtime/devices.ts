@@ -7,15 +7,7 @@ import {
 } from '@/realtime/listening-status.js';
 import { deviceKey, deviceToSocket, socketToDevice } from '@/realtime/state.js';
 
-/**
- * Registry of the connected devices: which device each socket is, and the
- * current socket of each device.
- */
-
-/**
- * Register the handshake device for control and join the user's room.
- * Identity comes from socket.data, filled by authenticateSocket.
- */
+/** Identity comes from socket.data, filled by authenticateSocket. */
 export function registerDevice(socket: AppSocket): void {
 	const { userId, device } = socket.data;
 
@@ -31,9 +23,6 @@ export function registerDevice(socket: AppSocket): void {
 	});
 }
 
-/**
- * Handle socket disconnect - cleanup only the disconnected device
- */
 export function handleDisconnect(socket: AppSocket): void {
 	const socketInfo = socketToDevice.get(socket.id);
 	if (socketInfo) {

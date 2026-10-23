@@ -9,12 +9,7 @@ interface QueueAddResult {
 	operation: 'add' | 'add-next';
 }
 
-/**
- * Appends the track to ownerId's queue; with `next`, then moves the new item
- * right after the current one (at the top when nothing is current, #316).
- * Add and move are two RPCs: when the move is refused (another device changed
- * the queue in between), the item stays appended and the add's state is kept.
- */
+/** Add and move are two RPCs: when the move is refused, the item stays appended and the add's state is kept. */
 export async function addTrackToQueue(
 	ownerId: string,
 	track: TrackUpsertInput,

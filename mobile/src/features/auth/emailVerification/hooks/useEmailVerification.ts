@@ -27,10 +27,7 @@ export interface EmailVerification {
 	codeError: string | null;
 }
 
-/**
- * The 6-digit code sent at registration: a valid code opens the session
- * (RootNavigator then shows the app); a wrong one empties the boxes.
- */
+/** A valid code opens the session; a wrong one empties the boxes. */
 export function useEmailVerification(userId: string, email: string): EmailVerification {
 	const code = useCodeInput();
 	const cooldown = useCountdown();

@@ -6,10 +6,8 @@ import { authMiddleware } from '@/features/auth/auth.middleware.js';
 import { avatarRateLimiter } from '@/shared/security/http-rate-limit.js';
 import { avatarUpload } from '@/features/profile/utils/avatar-upload.js';
 
-// Endpoints are documented in profile*.openapi.ts.
 const router = Router();
 
-// Every profile route requires authentication.
 router.use(authMiddleware);
 
 router.patch('/', profile.updateProfile);
@@ -22,7 +20,6 @@ router.get('/music-preferences', settings.getMusicPreferences);
 router.put('/music-preferences', settings.updateMusicPreferences);
 router.get('/music-preferences/genres', settings.getAvailableGenres);
 
-// Avatar changes are rate-limited per user.
 router.put('/avatar', avatarRateLimiter, avatarUpload, avatar.uploadAvatar);
 router.delete('/avatar', avatarRateLimiter, avatar.removeAvatar);
 

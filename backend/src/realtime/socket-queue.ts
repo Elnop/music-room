@@ -1,10 +1,7 @@
 import { socketLogger } from '@/shared/middleware/socket-logger.middleware.js';
 import type { AppSocket } from '@/realtime/socket-auth.js';
 
-/**
- * Run a socket's tasks one after another, in arrival order. A failed task
- * is logged under `failureAction` and does not stop the next ones.
- */
+/** A failed task is logged under `failureAction` and does not stop the next ones. */
 export function createSocketQueue(socket: AppSocket, failureAction: string) {
 	let queue: Promise<void> = Promise.resolve();
 	return (task: () => Promise<void> | void) => {

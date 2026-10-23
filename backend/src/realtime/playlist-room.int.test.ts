@@ -14,9 +14,6 @@ import * as realtime from '@/realtime/emitters/playlist.emitters.js';
 import type { PlaylistRoomError } from '@/realtime/playlist-room.js';
 import type { PlaylistUpdatedPayload } from '@/features/playlists/playlist.types.js';
 
-// Access control of the playlist:<id> rooms (playlist-room.ts) against a real
-// Socket.io server and the local Supabase stack.
-
 interface TestUser {
 	id: string;
 	token: string;
@@ -56,7 +53,7 @@ async function createUser(): Promise<TestUser> {
 		.insert({ id, username: `int_${id.slice(0, 8)}` });
 	if (profileError) throw profileError;
 
-	// Sign in with the anon client, never the admin one (#136).
+	// Sign in with the anon client, never the admin one.
 	const { data: session, error: signInError } = await supabaseAnon.auth.signInWithPassword({
 		email,
 		password: PASSWORD,
@@ -126,13 +123,11 @@ describe('Playlist room access control', () => {
 		return found?.rooms.has(`playlist:${playlistId}`) ?? false;
 	}
 
-	/** Emit playlist:join and wait until the server put the socket in the room. */
 	async function join(socket: ClientSocket, playlistId: string): Promise<void> {
 		socket.emit('playlist:join', playlistId);
 		await vi.waitFor(async () => expect(await inRoom(socket, playlistId)).toBe(true));
 	}
 
-	/** Collect every playlist:updated a socket receives. */
 	function record(socket: ClientSocket): PlaylistUpdated[] {
 		const received: PlaylistUpdated[] = [];
 		socket.on('playlist:updated', (payload: PlaylistUpdated) => received.push(payload));

@@ -10,7 +10,6 @@ interface PrivateBadgeProps {
 	style?: StyleProp<ViewStyle>;
 }
 
-/** The lock of a private playlist. */
 export function PrivateBadge({ labelled = false, style }: PrivateBadgeProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
 	return (

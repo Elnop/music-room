@@ -10,7 +10,6 @@ const LINES = [
 	'• Un chiffre (0-9)',
 ];
 
-/** The rules of a new password (utils/passwordRules.ts). */
 export function PasswordRequirements() {
 	const { theme } = useTheme();
 

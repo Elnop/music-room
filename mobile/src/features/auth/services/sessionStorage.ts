@@ -2,10 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { UserProfile } from '@/types/user.types';
 import { logger } from '@/shared/utils/logger';
 
-/**
- * The signed-in session kept on the device between launches: the storage
- * module of the auth store (guardrails.md#no-asyncstorage-outside-storage).
- */
+/** Storage module of the auth store (guardrails.md#no-asyncstorage-outside-storage). */
 interface StoredSession {
 	user: UserProfile;
 	accessToken: string;
@@ -22,23 +19,17 @@ const KEYS = {
 	tokenExpiresAt: '@zumik/token_expires_at',
 } as const;
 
-/** Session key of the auth SDK the app used before #376 (`sb-<project ref>-auth-token`). */
+/** Session key of the auth SDK older builds used (`sb-<project ref>-auth-token`). */
 const LEGACY_SDK_SESSION_KEY = /^sb-.+-auth-token$/;
 
-/**
- * Builds before #376 also kept the auth SDK's session (access and refresh
- * token) in AsyncStorage; nothing reads or revokes it any more, so drop it.
- */
+/** Older builds also kept the auth SDK's session in AsyncStorage; nothing reads or revokes it any more. */
 async function removeLegacySdkSession(): Promise<void> {
 	const keys = await AsyncStorage.getAllKeys();
 	const legacy = keys.filter(key => LEGACY_SDK_SESSION_KEY.test(key));
 	if (legacy.length > 0) await AsyncStorage.multiRemove(legacy);
 }
 
-/**
- * The stored session, or null when there is none. Throws when it cannot be
- * read (a corrupt user): the caller clears it.
- */
+/** Null when there is none; throws when unreadable (a corrupt user): the caller clears it. */
 async function load(): Promise<StoredSession | null> {
 	await removeLegacySdkSession();
 	const [userJson, accessToken, refreshToken, isAuthenticated, expiresAt] = await Promise.all([

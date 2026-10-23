@@ -8,7 +8,7 @@ import { signInWithGoogle } from './googleSignIn';
 import { signInWithFacebook } from './facebookSignIn';
 import { isSignInCancelled } from './signInCancelled';
 
-/** Opens the session the backend returned; RootNavigator then shows the app. */
+/** RootNavigator then shows the app. */
 async function open(response: AuthResponse): Promise<void> {
 	if (!response.session) throw new Error('The backend did not return a session');
 	await useAuthStore.getState().startSession(response.user, response.session);
@@ -37,7 +37,6 @@ export async function verifyEmail(userId: string, code: string): Promise<void> {
 const NATIVE_SIGN_IN = { google: signInWithGoogle, facebook: signInWithFacebook };
 const BACKEND_SIGN_IN = { google: authApi.loginWithGoogle, facebook: authApi.loginWithFacebook };
 
-/** Native Google or Facebook sign-in, then the backend session for its token. */
 export async function signInWithProvider(provider: OAuthProvider): Promise<void> {
 	try {
 		const token = await NATIVE_SIGN_IN[provider]();

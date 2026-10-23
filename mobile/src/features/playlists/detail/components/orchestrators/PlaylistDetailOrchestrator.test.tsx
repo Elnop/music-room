@@ -163,8 +163,8 @@ afterEach(() => {
 	jest.restoreAllMocks();
 });
 
-// #343: adding or removing the native header subview while the screen
-// re-attaches crashes on Android, so headerRight never goes undefined.
+// Adding or removing the native header subview while the screen re-attaches
+// crashes on Android, so headerRight never goes undefined.
 describe('PlaylistDetailOrchestrator header button', () => {
 	it('keeps headerRight set, without the options button, while the playlist loads', () => {
 		routes.routes[`GET /api/playlists/${ID}`] = () => new Promise(() => undefined);

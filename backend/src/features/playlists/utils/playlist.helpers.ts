@@ -6,9 +6,6 @@ import type {
 	TrackResponse,
 } from '@/features/playlists/playlist.types.js';
 
-/**
- * Format playlist row to response object
- */
 export function formatPlaylistResponse(
 	row: PlaylistRow,
 	trackCount: number,
@@ -33,9 +30,6 @@ export function formatPlaylistResponse(
 	};
 }
 
-/**
- * Format track row to response object
- */
 export function formatTrackResponse(row: TrackRow): TrackResponse {
 	return {
 		id: row.id,
@@ -61,7 +55,6 @@ interface OwnerProfile {
 	avatar_url: string | null;
 }
 
-/** A member's profile row to its response; null fields become undefined. */
 export function toOwner(profile: OwnerProfile): PlaylistOwner {
 	return {
 		id: profile.id,

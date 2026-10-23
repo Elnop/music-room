@@ -1,14 +1,6 @@
 import { logger } from '@/shared/utils/logger.js';
 
-/**
- * Re-check controllerId's access to ownerId's devices and evict its sockets
- * from the owner's listening room when none is left (see
- * realtime/emitters/control.emitters.ts revalidateListeningAccess). Imported
- * lazily so that loading the friends feature does not load the Socket.io
- * modules, and so that no import cycle forms if realtime/ ever imports a
- * friends service. Never throws: eviction must not fail the unfollow or the
- * revoke.
- */
+/** Lazy import keeps Socket.io out of the friends feature and avoids a cycle; never throws, so eviction cannot fail the unfollow. */
 export async function revalidateListeningAccess(
 	controllerId: string,
 	ownerId: string
@@ -21,13 +13,7 @@ export async function revalidateListeningAccess(
 	}
 }
 
-/**
- * Tell controllerId that its access to ownerId's devices changed
- * (`permission:changed`, `canControl` = whether at least one device remains
- * controllable) and, when none remains, evict it from the owner's listening
- * room (see control.emitters.ts notifyPermissionChange). Lazy import and never throws,
- * like revalidateListeningAccess.
- */
+/** Emits `permission:changed` to controllerId and evicts it once no owner device stays controllable; same lazy import, never throws. */
 export async function notifyListeningAccessChange(
 	controllerId: string,
 	ownerId: string,

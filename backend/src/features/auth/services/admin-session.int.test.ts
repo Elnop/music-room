@@ -39,11 +39,7 @@ async function createUser(googleId?: string): Promise<{ id: string; email: strin
 	return { id, email };
 }
 
-/**
- * Writes another user's profile through supabaseAdmin. Under RLS as a signed-in
- * user, user_profiles_update_policy (auth.uid() = id) matches no row and
- * PostgREST answers without error, so the test counts the updated rows.
- */
+/** Under RLS another user's update matches no row and PostgREST returns no error: count the rows. */
 async function expectAdminWriteOn(userId: string): Promise<void> {
 	const bio = `bio-${randomUUID()}`;
 	const { data, error } = await supabaseAdmin

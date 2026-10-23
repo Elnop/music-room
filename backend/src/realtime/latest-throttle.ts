@@ -10,14 +10,7 @@ export interface LatestThrottle {
 	cancel(key: string): void;
 }
 
-/**
- * Leading + trailing throttle keyed by string.
- *
- * The first call for a key runs at once and opens a window of `windowMs`.
- * Calls received while the window is open replace each other; the latest one
- * runs when the window ends and opens a new window. A key therefore runs at
- * most once per window and always ends on its latest call.
- */
+/** Leading + trailing throttle: a key runs at most once per `windowMs` and always ends on its latest call. */
 export function createLatestThrottle(windowMs: number): LatestThrottle {
 	const states = new Map<string, KeyState>();
 

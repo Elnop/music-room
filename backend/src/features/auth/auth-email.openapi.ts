@@ -7,7 +7,6 @@ import {
 import { jsonBody, ok, okMessage } from '@/shared/config/swagger.schemas.js';
 import { fail } from '@/shared/config/swagger.errors.js';
 
-/** Registers the email verification routes of /api/auth. */
 export function registerAuthEmailOpenapi(registry: OpenAPIRegistry): void {
 	const tags = ['Authentication'];
 

@@ -13,10 +13,6 @@ import {
 	setBackendUrl,
 } from '@/shared/services/backendUrl';
 
-/**
- * Edits the backend address used by the API clients and the socket
- * (services/backendUrl.ts). Used in Settings and on the Welcome screen.
- */
 export function BackendUrlField() {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);

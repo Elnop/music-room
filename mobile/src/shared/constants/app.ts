@@ -1,4 +1,3 @@
-// API Configuration (backend: http://localhost:3000)
 // BASE_URL is only the build-time default: requests read the runtime address
 // from services/backendUrl.ts.
 export const API_CONFIG = {
@@ -7,7 +6,6 @@ export const API_CONFIG = {
 	TIMEOUT: 10000,
 } as const;
 
-// Spacing System
 export const SPACING = {
 	xs: 4,
 	sm: 8,

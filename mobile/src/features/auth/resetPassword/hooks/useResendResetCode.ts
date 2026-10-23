@@ -12,10 +12,7 @@ interface ResendResetCode {
 	cooldown: number;
 }
 
-/**
- * « Renvoyer le code » of the new password screen: asks the backend whether a
- * code may be sent now, then sends it through `forgotPassword`.
- */
+/** Asks the backend whether a code may be sent now, then sends it through `forgotPassword`. */
 export function useResendResetCode(
 	email: string,
 	forgotPassword: ReturnType<typeof useForgotPasswordMutation>,

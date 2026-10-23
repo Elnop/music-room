@@ -166,7 +166,7 @@ describe('login', () => {
 			})
 		);
 
-		// Signed out, the 401 is the backend's answer, not an expired session (#235).
+		// Signed out, the 401 is the backend's answer, not an expired session.
 		await expect(login({ email: 'a@example.com', password: 'wrong' })).rejects.toThrow(
 			'Invalid email or password'
 		);

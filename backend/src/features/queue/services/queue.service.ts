@@ -22,17 +22,15 @@ import {
 } from '@/features/queue/utils/queue-rpc.js';
 import type { QueueState, QueueStepDirection } from '@/features/queue/queue.types.js';
 
-// The play queue of ownerId, read or changed by its owner or a delegate
-// (#294), mutated only through the functions of migration 021 (serialized per
-// owner). Every mutation sends the new state to all of the owner's devices as
-// `queue:updated`; playback actions also tell the chosen device to play.
+// Mutated only through the SQL functions (serialized per owner); every mutation sends
+// `queue:updated` to all of the owner's devices.
 
 export async function getQueue(actorId: string, ownerId: string): Promise<QueueState> {
 	await assertCanManageQueue(actorId, ownerId);
 	return getQueueRpc(ownerId);
 }
 
-/** Appends the track, or with `next` places it after the current item (#316); publishes once. */
+/** With `next`, places the track after the current item; publishes once. */
 export async function addItem(
 	actorId: string,
 	ownerId: string,
@@ -75,10 +73,7 @@ export async function playItem(
 	return play(actorId, ownerId, 'play', state, device);
 }
 
-/**
- * Copies the playlist's tracks into the queue as a new block right after
- * the current item and plays its first item (#277).
- */
+/** Copies the playlist's tracks as a new block right after the current item and plays the first. */
 export async function playPlaylist(
 	actorId: string,
 	ownerId: string,
@@ -86,7 +81,7 @@ export async function playPlaylist(
 	deviceId?: string
 ): Promise<QueueState> {
 	const device = await playbackDevice(actorId, ownerId, deviceId);
-	// The actor chooses the playlist: its visibility is checked for them (#294).
+	// The actor chooses the playlist: its visibility is checked for them.
 	const playlist = await getPlaylistForPermissionCheck(playlistId);
 	if (!canViewPlaylist(playlist, actorId)) {
 		throw new AppError(403, 'Access denied', 'PLAYLIST_ACCESS_DENIED');
@@ -116,7 +111,6 @@ async function playbackDevice(
 	return resolvePlaybackDevice(actorId, ownerId, deviceId);
 }
 
-/** Publishes the state, then tells the target device to play its current item. */
 function play(
 	actorId: string,
 	ownerId: string,

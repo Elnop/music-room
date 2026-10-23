@@ -1,14 +1,11 @@
 import type { PrefetchedStream } from '@/features/player/types';
 
-/**
- * Stream URL of the queue's next item, fetched ahead of the track end (#314).
- * Held in memory only: stream URLs expire and are never persisted.
- */
+// Next queue item's stream URL, held in memory only: stream URLs expire and are never persisted.
 
-// A stream URL this close to its expiry is renewed before play or seek (#313)
+// A stream URL this close to its expiry is renewed before play or seek.
 export const STREAM_RENEW_MARGIN_MS = 2 * 60 * 1000;
 
-/** Whether a stream URL expiring at `expiresAt` (epoch ms) must be renewed before use. */
+/** `expiresAt` is epoch ms. */
 export function isStreamStale(expiresAt: number | null, now: number = Date.now()): boolean {
 	return expiresAt !== null && expiresAt - now < STREAM_RENEW_MARGIN_MS;
 }
@@ -16,7 +13,6 @@ export function isStreamStale(expiresAt: number | null, now: number = Date.now()
 let held: PrefetchedStream | null = null;
 
 export const streamPrefetch = {
-	/** The entry held, if any. */
 	peek(): PrefetchedStream | null {
 		return held;
 	},
@@ -25,11 +21,7 @@ export const streamPrefetch = {
 		held = entry;
 	},
 
-	/**
-	 * The held URL for this queue item and track, consumed. Null when the entry
-	 * is for another item or track (the entry is kept), or when it is about to
-	 * expire (the entry is dropped).
-	 */
+	/** Consumes the entry; null (entry kept) for another item or track, null (entry dropped) when about to expire. */
 	take(
 		queueItemId: string | null,
 		permalink: string,

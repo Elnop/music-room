@@ -49,11 +49,7 @@ async function sendMove(
 	}
 }
 
-/**
- * Moves a track right after `afterRank` (null = top), queued behind the
- * previous move. Resolves 'skipped' (nothing sent) once the playlist is no
- * longer on screen; rejects with the ApiError, after a reload on a conflict.
- */
+/** Queued behind the previous move; resolves 'skipped' once off screen, rejects with the ApiError after a reload on a conflict. */
 export function moveTrack(
 	client: QueryClient,
 	playlistId: string,

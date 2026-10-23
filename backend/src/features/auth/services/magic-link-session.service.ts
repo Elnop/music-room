@@ -24,11 +24,7 @@ function fail([message, code]: Failure, context: Record<string, unknown>): AppEr
 	return new AppError(500, message, code);
 }
 
-/**
- * Open a Supabase session for `email` through the Admin magic link API,
- * without touching the account's password: safe for every kind of account.
- * For OAuth, an unexpected failure is a 500 OAUTH_SESSION_ERROR.
- */
+/** Uses the Admin magic link API, leaving the password untouched: safe for every kind of account. */
 export async function createMagicLinkSession(
 	email: string,
 	caller: keyof typeof FAILURES

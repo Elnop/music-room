@@ -8,9 +8,7 @@ function playsLocally(): boolean {
 	return isLocalTarget();
 }
 
-/**
- * Renews the stream once when the player fails mid-track (#313).
- */
+/** Renews the stream once when the player fails mid-track. */
 export function useStreamWatchdog(player: ReturnType<typeof useAudioPlayer>): void {
 	const status = useAudioPlayerStatus(player);
 	const isPlaying = usePlayerStore(state => state.playbackState === 'playing');

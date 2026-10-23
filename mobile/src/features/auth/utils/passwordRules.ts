@@ -1,7 +1,4 @@
-/**
- * The first rule a new password breaks, as a French message, or null when the
- * password is accepted and confirmed.
- */
+/** The first rule a new password breaks, as a French message; null once accepted and confirmed. */
 export function newPasswordError(password: string, confirmation: string): string | null {
 	if (!password) return 'Le mot de passe est requis';
 	if (password.length < 8) return 'Le mot de passe doit contenir au moins 8 caractères';

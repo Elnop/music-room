@@ -4,10 +4,8 @@ import * as tracks from '@/features/playlists/playlist-tracks.controller.js';
 import * as sharing from '@/features/playlists/playlist-sharing.controller.js';
 import { authMiddleware } from '@/features/auth/auth.middleware.js';
 
-// Endpoints are documented in playlist*.openapi.ts.
 const router = Router();
 
-// All routes require authentication
 router.use(authMiddleware);
 
 router.get('/', playlists.getUserPlaylists);

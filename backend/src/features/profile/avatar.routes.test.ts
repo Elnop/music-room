@@ -6,12 +6,8 @@ import profileRoutes from '@/features/profile/profile.routes.js';
 import { errorHandler } from '@/shared/middleware/error-handler.js';
 import { ownedAvatarPath } from '@/features/profile/services/avatar.service.js';
 
-/**
- * PUT and DELETE /api/profile/avatar (#351) with the real router, multer,
- * controllers and avatar.service. Supabase (the `user_profiles` row and the
- * `avatars` bucket), the auth middleware, the rate limiter and the logger are
- * faked. The limiter's 429 and the real Storage are covered by avatar.int.test.ts.
- */
+// Real router, multer, controllers and avatar.service; Supabase, auth, limiter and logger are faked.
+// The limiter's 429 and the real Storage are covered by avatar.int.test.ts.
 
 const ME = '0b5c6d7e-1111-4222-8333-444455556666';
 const OTHER = '9f8e7d6c-1111-4222-8333-444455556666';

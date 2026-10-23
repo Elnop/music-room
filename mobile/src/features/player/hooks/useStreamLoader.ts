@@ -7,9 +7,6 @@ import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 import { logger } from '@/shared/utils/logger';
 import { FETCH_TIMEOUT_MS } from '@/features/player/constants';
 
-/**
- * Loads the stream URL for the current track with timeout and prefetch support.
- */
 export function useStreamLoader(): void {
 	const currentTrack = usePlayerStore(state => state.currentTrack);
 	const loadCounter = usePlayerStore(state => state.loadCounter);
@@ -27,7 +24,7 @@ export function useStreamLoader(): void {
 			return;
 		}
 
-		// A restored track loads its stream on play, not at start-up (#312).
+		// A restored track loads its stream on play, not at start-up.
 		if (usePlayerStore.getState().needsStreamLoad) return;
 
 		const thisLoadCounter = loadCounter;

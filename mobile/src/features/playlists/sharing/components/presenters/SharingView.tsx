@@ -16,7 +16,6 @@ import { SettingRow } from './SettingRow';
 import { createSharingStyles } from './sharingStyles';
 import { UserResults } from './UserResults';
 
-/** « Visibilité et droits »: the two switches, then who may see or edit the playlist. */
 export function SharingView({ sharing }: { sharing: PlaylistSharing }) {
 	const { styles: shared } = useThemedStyles(createSharingStyles);
 	const { styles, theme } = useThemedStyles(createStyles);

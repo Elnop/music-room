@@ -15,10 +15,8 @@ import { sendSuccess } from '@/shared/utils/send-success.js';
 import * as accountLockout from '@/shared/security/account-lockout.js';
 import * as ipReputation from '@/shared/security/ip-reputation.js';
 
-// Session handlers: register, login, refresh, me, logout. Errors reach the
-// shared error handler (Express 5 forwards rejected promises).
+// No try/catch: Express 5 forwards rejected promises to the shared error handler.
 
-/** POST /api/auth/register */
 export async function register(req: Request, res: Response) {
 	const validated = registerSchema.parse(req.body);
 	const result = await registrationService.register(validated);
@@ -26,10 +24,7 @@ export async function register(req: Request, res: Response) {
 	sendSuccess(res, result, 201);
 }
 
-/**
- * POST /api/auth/login. Every failure, a validation error included, counts
- * toward the account lockout (shared/security/account-lockout.middleware.ts); a success resets it.
- */
+/** Every failure, a validation error included, counts toward the account lockout; a success resets it. */
 export async function login(req: Request, res: Response) {
 	const body = req.body as { email?: string } | undefined;
 	const email = body?.email || 'unknown';
@@ -59,13 +54,11 @@ export async function login(req: Request, res: Response) {
 	}
 }
 
-/** GET /api/auth/me */
 export async function me(req: Request, res: Response) {
 	const profile = await getUserProfile((req as AuthenticatedRequest).user.id);
 	sendSuccess(res, { user: profile });
 }
 
-/** POST /api/auth/logout: revoke the access token and end its session. */
 export async function logout(req: Request, res: Response) {
 	const userId = (req as AuthenticatedRequest).user.id;
 	// authMiddleware already checked the header is "Bearer <token>".
@@ -77,7 +70,6 @@ export async function logout(req: Request, res: Response) {
 	sendSuccess(res, { message: 'Logged out successfully' });
 }
 
-/** POST /api/auth/refresh */
 export async function refreshToken(req: Request, res: Response) {
 	const validated = refreshTokenSchema.parse(req.body);
 	const result = await sessionService.refreshToken(validated.refreshToken);

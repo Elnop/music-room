@@ -9,8 +9,7 @@ vi.mock('@/realtime/emitters/control.emitters.js', async importOriginal => ({
 	isDeviceOnline: vi.fn(),
 }));
 
-// #295: the devices I can play on, mine then friends'. Presence is stubbed on
-// the realtime control emitters (no Socket.io server here).
+// Presence is stubbed on the realtime emitters: no Socket.io server here.
 
 const users: string[] = [];
 const names = new Map<string, string>();

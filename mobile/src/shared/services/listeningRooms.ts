@@ -7,12 +7,8 @@ interface ListeningSocket {
 /** Holders per owner, per socket: a new connection (new socket) starts from zero. */
 const holders = new WeakMap<ListeningSocket, Map<string, number>>();
 
-/**
- * Join `listening:<ownerId>` for one holder (#297). The server keeps a single
- * room membership per socket and `listening:unsubscribe` leaves it outright,
- * so the friend profile and the remote target share it through this count:
- * `listening:subscribe` goes out on the first holder only.
- */
+// The server keeps one membership per socket and `listening:unsubscribe` leaves it outright,
+// so the friend profile and the remote target share it through this count.
 export function acquireListening(socket: ListeningSocket, ownerId: string): void {
 	let counts = holders.get(socket);
 	if (!counts) {
@@ -24,10 +20,7 @@ export function acquireListening(socket: ListeningSocket, ownerId: string): void
 	if (count === 0) socket.emit('listening:subscribe', ownerId);
 }
 
-/**
- * Release one holder; `listening:unsubscribe` goes out when the last one
- * leaves, if the socket is still connected (a disconnect already left the room).
- */
+/** Skips the unsubscribe when disconnected: a disconnect already left the room. */
 export function releaseListening(socket: ListeningSocket, ownerId: string): void {
 	const counts = holders.get(socket);
 	const count = counts?.get(ownerId) ?? 0;

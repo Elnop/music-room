@@ -3,19 +3,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-/**
- * The backend logger, and the only backend code allowed to touch `console`
- * (see .agents/rules/logging.md). Every entry is a JSON line in
- * `backend/logs/app.log`; the console gets readable text in development and
- * the same JSON line elsewhere (Docker logs). `debug` is development only.
- */
+// The only backend code allowed to touch `console`. Every entry is a JSON line in backend/logs/app.log;
+// the console gets readable text in development and the same JSON line elsewhere.
 
 type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 
-/**
- * Metadata that can be logged alongside messages
- * Can be primitives, objects, arrays, or errors
- */
 type LogMetadata =
 	string | number | boolean | null | undefined | Error | Record<string, unknown> | unknown[];
 

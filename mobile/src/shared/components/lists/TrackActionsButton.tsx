@@ -9,7 +9,7 @@ interface TrackActionsButtonProps {
 	onPress: () => void;
 }
 
-/** The ⋯ button of a track row (#316); a long press on the row does the same. */
+/** A long press on the row does the same. */
 export function TrackActionsButton({ onPress }: TrackActionsButtonProps) {
 	const { theme } = useTheme();
 	return (

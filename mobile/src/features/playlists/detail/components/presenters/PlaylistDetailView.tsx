@@ -20,7 +20,6 @@ interface PlaylistDetailViewProps {
 	playerHeight: number;
 }
 
-/** A playlist over the gradient of its cover: header, then its tracks to swipe and drag. */
 export function PlaylistDetailView({
 	playlist,
 	tracks,

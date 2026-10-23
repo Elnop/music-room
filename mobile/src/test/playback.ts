@@ -2,10 +2,7 @@ import { registerPlaybackBridge, type PlaylistPlayback } from '@/shared/services
 import type { AddQueueItemBody } from '@/shared/types/playback';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
-/**
- * A playback contract for tests, registered once when this module loads (once
- * per test file): each test sets `testPlayback.playing` and the mocks it needs.
- */
+/** Registered once per test file, at load; each test sets `testPlayback.playing` and the mocks it needs. */
 export const testPlayback = {
 	playing: { playingUri: null, state: null } as PlaylistPlayback,
 	addToQueue: jest.fn((_track: AddQueueItemBody) => Promise.resolve(true)),

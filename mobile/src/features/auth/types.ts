@@ -16,7 +16,6 @@ export interface AuthSessionTokens {
 	expiresAt: number;
 }
 
-/** The answer of every endpoint that may open a session (AuthResponse). */
 export interface AuthResponse {
 	user: UserProfile;
 	session?: AuthSessionTokens;
@@ -33,11 +32,9 @@ export interface ResendStatus {
 	remainingSeconds: number;
 }
 
-/** What a registration leads to: the code screen, or a signed-in session. */
 export type RegisterResult =
 	{ requiresVerification: true; userId: string; email: string } | { requiresVerification: false };
 
-/** Screens of the signed-out stack (navigation/AuthNavigator.tsx). */
 export type AuthStackParamList = {
 	Welcome: undefined;
 	Login: undefined;

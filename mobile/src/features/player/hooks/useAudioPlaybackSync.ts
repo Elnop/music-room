@@ -43,7 +43,6 @@ export function useAudioPlaybackSync(player: ReturnType<typeof useAudioPlayer>):
 
 	useEffect(() => () => clearTimers(pollingIntervalRef, loadTimeoutRef), []);
 
-	// Stop old player and clean up on track change
 	useEffect(() => {
 		const currentId = currentTrack?.id ?? null;
 		if (currentId !== previousTrackIdRef.current) {
@@ -54,7 +53,6 @@ export function useAudioPlaybackSync(player: ReturnType<typeof useAudioPlayer>):
 		}
 	}, [currentTrack?.id, player]);
 
-	// Auto-play when player becomes loaded
 	useEffect(() => {
 		clearTimers(pollingIntervalRef, loadTimeoutRef);
 		if (!streamUrl || !player || playbackState !== 'loading') return;
@@ -110,7 +108,6 @@ export function useAudioPlaybackSync(player: ReturnType<typeof useAudioPlayer>):
 		setTrackUnavailableError,
 	]);
 
-	// Sync pause and resume
 	useEffect(() => {
 		if (!player || !player.isLoaded) return;
 		if (playbackState === 'playing' && !player.playing) {

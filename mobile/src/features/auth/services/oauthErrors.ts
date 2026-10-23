@@ -24,7 +24,6 @@ const FALLBACKS: Record<OAuthProvider, string> = {
 	facebook: 'La connexion avec Facebook a échoué. Réessayez.',
 };
 
-/** The French message shown when a Google or Facebook sign-in fails. */
 export function oauthErrorMessage(provider: OAuthProvider, error: unknown): string {
 	const fallback = FALLBACKS[provider];
 	if (error instanceof ApiError) return apiErrorMessage(error, fallback);

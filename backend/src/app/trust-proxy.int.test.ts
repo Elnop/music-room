@@ -22,10 +22,8 @@ const { configureTrustProxy } = await import('@/shared/config/trust-proxy.js');
 const socketServer = await import('@/realtime/socket-server.js');
 const { getIO } = await import('@/realtime/state.js');
 
-// With a trusted proxy (#173), clients behind it are counted apart by their
-// X-Forwarded-For, over HTTP and on the Socket.io handshake, against the test
-// Redis and the local Supabase stack. The token limit (#160) is the witness.
-
+// Behind a trusted proxy, clients are counted apart by X-Forwarded-For over HTTP and the
+// Socket.io handshake; the token limit is the witness.
 const KEY_PATTERN = 'rl:auth:token:*';
 const MAX = 3;
 const CLIENT_A = '203.0.113.1';

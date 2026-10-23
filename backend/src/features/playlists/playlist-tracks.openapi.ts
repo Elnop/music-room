@@ -20,7 +20,6 @@ import {
 } from '@/shared/config/swagger.schemas.js';
 import { fail, shared } from '@/shared/config/swagger.errors.js';
 
-/** Registers the /api/playlists/{id}/tracks routes (doc/features/playlist-concurrency.md). */
 export function registerPlaylistTracksOpenapi(registry: OpenAPIRegistry): void {
 	const common = { tags: ['Tracks'], security: bearerAuth };
 	const trackParams = (description: string) =>

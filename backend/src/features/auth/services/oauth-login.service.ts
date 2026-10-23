@@ -10,7 +10,6 @@ function toAuthResponse({ userProfile, session }: OAuthUser): AuthResponse {
 	return { user: userProfile, session: toSessionBody(session) };
 }
 
-/** Sign in with a Google ID token from the mobile app. */
 export async function loginWithGoogle(idToken: string): Promise<AuthResponse> {
 	try {
 		logger.info('Google OAuth login attempt');
@@ -33,7 +32,6 @@ export async function loginWithGoogle(idToken: string): Promise<AuthResponse> {
 	}
 }
 
-/** Sign in with a Facebook access token from the mobile app. */
 export async function loginWithFacebook(accessToken: string): Promise<AuthResponse> {
 	try {
 		logger.info('Facebook OAuth login attempt');

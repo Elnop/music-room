@@ -2,12 +2,7 @@ import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { logger } from '@/shared/utils/logger.js';
 import * as emailVerification from '@/features/auth/services/email-verification.service.js';
 
-/**
- * Resend a verification code to `claimedEmail` for `userId`. The cooldown is
- * checked and counted first, on every path, and the answer never tells whether
- * a code was sent: a matching email must not be told apart by a 429 that other
- * emails never get (#188).
- */
+/** The cooldown counts on every path and the answer never says whether a code was sent (no enumeration). */
 export async function resendCode(userId: string, claimedEmail: string, ip: string): Promise<void> {
 	await emailVerification.consumeResend(userId, ip);
 
@@ -21,11 +16,7 @@ export async function resendCode(userId: string, claimedEmail: string, ip: strin
 	logger.info('Verification code resent', { userId });
 }
 
-/**
- * Auth email of an unverified account whose address matches `claimedEmail`
- * (case-insensitive), or null when no code may be sent. Fails closed: any
- * lookup error returns null.
- */
+/** Case-insensitive match on an unverified account; fails closed: a lookup error returns null. */
 async function resolveRecipient(userId: string, claimedEmail: string): Promise<string | null> {
 	const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.getUserById(userId);
 	if (authError) {

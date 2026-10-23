@@ -4,11 +4,7 @@ import * as SystemUI from 'expo-system-ui';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { isDarkBackground } from '@/shared/components/feedback/ConnectionBanner';
 
-/**
- * Status bar icons and native window background that follow the active theme:
- * dark icons on the light themes, light ones on the dark theme, and no white
- * window showing between screens or before the first render.
- */
+/** Follows the theme so no white window shows between screens or before the first render. */
 export function ThemedSystemUI() {
 	const { theme } = useTheme();
 	const background = theme.colors.background;

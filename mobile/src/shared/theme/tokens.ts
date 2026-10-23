@@ -1,20 +1,15 @@
-// Minimalist Design Tokens
-
 export const NEOBRUTALISM_BORDERS = {
-	// Border widths - minimalist style (no visible borders)
 	thin: 0,
 	medium: 0,
 	thick: 1,
 	extraThick: 1,
 
-	// Border radius
 	none: 0,
 	small: 8,
 	round: 9999,
 } as const;
 
 export const NEOBRUTALISM_SHADOWS = {
-	// Subtle shadows with blur
 	small: {
 		shadowColor: '#000000',
 		shadowOffset: { width: 0, height: 2 },
@@ -58,12 +53,7 @@ export const NEOBRUTALISM_TYPOGRAPHY = {
 	},
 } as const;
 
-/**
- * Colours that do not change with the theme: the sign-in providers' brand
- * colours (their buttons keep the providers' guidelines), the divider of the
- * sign-in screens, and the backdrop, shadow and on-colour ink of every theme.
- * Every theme spreads them into its colours.
- */
+/** Every theme spreads these into its colours; the providers' brand colours follow their guidelines. */
 export const FIXED_COLORS = {
 	divider: '#3E3E3E',
 	googleSurface: '#FFFFFF',
@@ -74,18 +64,16 @@ export const FIXED_COLORS = {
 	onFacebook: '#FFFFFF',
 	/** Text and icons drawn on a coloured fill (primary, success). */
 	onColor: '#FFFFFF',
-	/** High-contrast dark ink for light backgrounds (#315). */
+	/** High-contrast dark ink for light backgrounds. */
 	inkDark: '#111111',
-	/** High-contrast light ink for dark backgrounds (#315). */
+	/** High-contrast light ink for dark backgrounds. */
 	inkLight: '#FFFFFF',
 	/** The dimmed backdrop behind a bottom sheet. */
 	backdrop: 'rgba(0, 0, 0, 0.5)',
 	shadow: '#000000',
 } as const;
 
-/**
- * Music genre badge colours, kept consistent across themes.
- */
+/** Kept the same across themes. */
 export const GENRE_COLORS = {
 	pop: '#FF6B9D',
 	rock: '#E74C3C',

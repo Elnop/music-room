@@ -9,7 +9,6 @@ import { royalBlueTheme } from '@/shared/theme/royalBlue.theme';
 import { christmasTheme } from '@/shared/theme/christmas.theme';
 import { pastelLimeTheme } from '@/shared/theme/pastelLime.theme';
 
-// Theme metadata for selector
 const AVAILABLE_THEMES: Array<{
 	name: ThemeName;
 	displayName: string;

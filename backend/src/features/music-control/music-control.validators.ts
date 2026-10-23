@@ -25,10 +25,7 @@ export const deviceParamsSchema = z.object({
 	deviceId: deviceIdParam,
 });
 
-/**
- * PATCH /devices/:deviceId body: the name to show, trimmed, 1 to 40
- * characters; null goes back to the system name (#352).
- */
+/** null goes back to the system name. */
 export const renameDeviceSchema = z.object({
 	name: z
 		.string()

@@ -2,24 +2,11 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 
-/**
- * Shared database helper functions to reduce code duplication
- */
-
-/**
- * Database filter value types
- */
 type DbFilterValue = string | number | boolean | null;
 
-/**
- * Database record type for inserts/updates
- */
 type DbRecord = Record<string, DbFilterValue | DbFilterValue[] | undefined>;
 
-/**
- * Fetch a single record from database
- * Throws AppError if not found or on error
- */
+/** Throws AppError if not found or on error. */
 export async function fetchSingle<T>(
 	client: SupabaseClient,
 	table: string,
@@ -30,7 +17,6 @@ export async function fetchSingle<T>(
 ): Promise<T> {
 	let query = client.from(table).select(select);
 
-	// Apply filters
 	for (const [key, value] of Object.entries(filter)) {
 		query = query.eq(key, value);
 	}
@@ -48,9 +34,6 @@ export async function fetchSingle<T>(
 	return data as T;
 }
 
-/**
- * Update a single record in database
- */
 export async function updateOne<T>(
 	client: SupabaseClient,
 	table: string,
@@ -62,7 +45,6 @@ export async function updateOne<T>(
 ): Promise<T> {
 	let query = client.from(table).update(data);
 
-	// Apply filters
 	for (const [key, value] of Object.entries(filter)) {
 		query = query.eq(key, value);
 	}
@@ -77,9 +59,6 @@ export async function updateOne<T>(
 	return updated as T;
 }
 
-/**
- * Delete records from database
- */
 export async function deleteRecords(
 	client: SupabaseClient,
 	table: string,
@@ -89,7 +68,6 @@ export async function deleteRecords(
 ): Promise<void> {
 	let query = client.from(table).delete();
 
-	// Apply filters
 	for (const [key, value] of Object.entries(filter)) {
 		query = query.eq(key, value);
 	}

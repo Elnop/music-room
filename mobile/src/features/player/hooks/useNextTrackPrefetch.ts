@@ -13,10 +13,7 @@ function playsLocally(): boolean {
 	return isLocalTarget();
 }
 
-/**
- * Fetches the stream URL of the queue's next item in the last PREFETCH_WINDOW_S
- * seconds of a track played locally (#314).
- */
+/** Only for a track played locally, in its last PREFETCH_WINDOW_S seconds. */
 export function useNextTrackPrefetch(player: ReturnType<typeof useAudioPlayer>): void {
 	const status = useAudioPlayerStatus(player);
 	const isPlaying = usePlayerStore(state => state.playbackState === 'playing');

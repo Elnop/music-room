@@ -9,10 +9,7 @@ import {
 } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
 
-/**
- * Whether the OS asks to reduce motion; follows the setting while mounted.
- * `null` until the first answer, so nothing moves before it is known.
- */
+/** `null` until the first answer, so nothing moves before it is known. */
 function useReduceMotion(): boolean | null {
 	const [reduceMotion, setReduceMotion] = useState<boolean | null>(null);
 
@@ -42,7 +39,7 @@ interface SkeletonBlockProps {
 	style?: StyleProp<ViewStyle>;
 }
 
-/** A placeholder shape that pulses, or stays still when reduce motion is on (#317). */
+/** Stays still when reduce motion is on. */
 export function SkeletonBlock({
 	width = '100%',
 	height = 16,

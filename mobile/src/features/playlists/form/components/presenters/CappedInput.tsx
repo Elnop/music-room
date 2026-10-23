@@ -13,7 +13,6 @@ interface CappedInputProps {
 	multiline?: boolean;
 }
 
-/** An input with its character count under it (« 12/50 »). */
 export function CappedInput({ field, label, placeholder, autoFocus, multiline }: CappedInputProps) {
 	const { styles } = useThemedStyles(createStyles);
 

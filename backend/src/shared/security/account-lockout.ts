@@ -4,11 +4,7 @@ import * as counter from '@/shared/security/counter.js';
 import { failOpen } from '@/shared/security/fail-open.js';
 import type { LockoutStatus } from '@/shared/security/security.types.js';
 
-/**
- * Account lockout per email and IP: failed logins are counted over 15 minutes;
- * from the threshold on, the pair is locked for a time that grows with the
- * count (soft, hard, severe). Fails open (fail-open.ts).
- */
+// The lock duration grows with the failed attempt count (soft, hard, severe). Fails open.
 
 const FAILED_WINDOW_MS = 15 * 60 * 1000;
 
@@ -26,7 +22,6 @@ const disabledStatus: LockoutStatus = {
 	remainingAttempts: Infinity,
 };
 
-/** Lock with a duration that grows with the number of failed attempts. */
 async function lockAccount(email: string, ip: string, attempts: number): Promise<LockoutStatus> {
 	const { durationSevere, durationHard, durationSoft } = rateLimitConfig.lockout;
 	const [lockDuration, severity] =
@@ -59,7 +54,6 @@ async function lockAccount(email: string, ip: string, attempts: number): Promise
 	return { isLocked: true, lockedUntil, remainingSeconds: lockDuration, failedAttempts: attempts };
 }
 
-/** Count a failed login for this email and IP; locks from the threshold on. */
 export async function recordFailedAttempt(email: string, ip: string): Promise<LockoutStatus> {
 	return failOpen(
 		{
@@ -82,7 +76,7 @@ export async function recordFailedAttempt(email: string, ip: string): Promise<Lo
 	);
 }
 
-/** Clear the failed attempts and the lock (after a successful login). */
+/** After a successful login. */
 export async function resetFailedAttempts(email: string, ip: string): Promise<void> {
 	await failOpen(
 		{
@@ -104,7 +98,6 @@ export async function resetFailedAttempts(email: string, ip: string): Promise<vo
 	);
 }
 
-/** Whether this email and IP are locked, with the time left and the failed attempts. */
 export async function checkLockout(email: string, ip: string): Promise<LockoutStatus> {
 	return failOpen(
 		{

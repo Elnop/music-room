@@ -24,9 +24,8 @@ const { errorHandler } = await import('@/shared/middleware/error-handler.js');
 const { sendPasswordResetEmail } = await import('@/features/mail/services/mail.service.js');
 const { createOAuthUser } = await import('@/features/auth/services/oauth-user.service.js');
 
-// A Google/Facebook-only account (has_password false) can reset its password,
-// which adds email/password sign-in to it (#189), through HTTP on the real auth
-// router against the local Supabase stack and test Redis.
+// A Google/Facebook-only account (has_password false) can reset its password, which adds
+// email/password sign-in, through HTTP on the real auth router against local Supabase and test Redis.
 
 const NEW_PASSWORD = 'New-password-189';
 const sendMail = vi.mocked(sendPasswordResetEmail);

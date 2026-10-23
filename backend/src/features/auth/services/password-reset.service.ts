@@ -31,7 +31,7 @@ async function storeResetCode(userId: string, code: string): Promise<void> {
 }
 
 export async function requestPasswordReset(email: string, ip: string): Promise<void> {
-	// Hourly limit and resend cooldown, whether the email exists or not (#187).
+	// Hourly limit and resend cooldown, whether the email exists or not.
 	await passwordResetLimit.consumeRequest(email, ip);
 
 	const userId = await findAuthUserIdByEmail(email);
@@ -45,7 +45,7 @@ export async function requestPasswordReset(email: string, ip: string): Promise<v
 	}
 
 	// An account without a password (Google or Facebook only) also gets a code:
-	// resetting adds email/password sign-in to it (#189).
+	// resetting adds email/password sign-in to it.
 	const code = crypto.randomInt(100000, 999999).toString();
 	await storeResetCode(userId, code);
 
@@ -101,9 +101,8 @@ export async function resetPassword(
 		throw new AppError(400, 'Invalid reset code', 'INVALID_RESET_CODE');
 	}
 
-	// Supabase Auth deletes every session of the account when an admin sets its
-	// password, so stolen access and refresh tokens stop working (#203, tested
-	// in password-reset-sessions.int.test.ts).
+	// Supabase Auth deletes every session when an admin sets the password, so stolen tokens stop
+	// working (tested in password-reset-sessions.int.test.ts).
 	const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
 		password: newPassword,
 	});
@@ -116,7 +115,7 @@ export async function resetPassword(
 		throw new AppError(500, 'Failed to update password', 'PASSWORD_UPDATE_ERROR');
 	}
 
-	// The account now has a password, even if it was Google or Facebook only (#189).
+	// The account now has a password, even if it was Google or Facebook only.
 	const clearData: UserProfileUpdate = {
 		password_reset_code: null,
 		password_reset_code_expires_at: null,

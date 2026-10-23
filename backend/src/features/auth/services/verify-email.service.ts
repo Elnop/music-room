@@ -6,10 +6,6 @@ import { toSessionBody, toUserProfile } from '@/features/auth/utils/auth.helpers
 import * as emailVerification from '@/features/auth/services/email-verification.service.js';
 import * as magicLinkSession from '@/features/auth/services/magic-link-session.service.js';
 
-/**
- * Check the emailed code, mark the account verified and sign it in:
- * the user and a new session.
- */
 export async function verifyEmail(
 	userId: string,
 	code: string,

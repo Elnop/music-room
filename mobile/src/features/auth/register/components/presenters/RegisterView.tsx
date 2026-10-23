@@ -14,7 +14,6 @@ interface RegisterViewProps {
 	password: FieldBinding;
 	/** Any sign-up or sign-in is running: the buttons wait. */
 	isLoading: boolean;
-	/** Bottom safe-area inset. */
 	bottomInset: number;
 	onSubmit: () => void;
 	onLogin: () => void;

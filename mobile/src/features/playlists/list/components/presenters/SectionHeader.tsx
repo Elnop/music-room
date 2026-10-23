@@ -15,7 +15,6 @@ interface SectionHeaderProps {
 	onToggle?: () => void;
 }
 
-/** The title row of a section of the playlists screen. */
 export function SectionHeader({ icon, title, count, open, onToggle }: SectionHeaderProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
 

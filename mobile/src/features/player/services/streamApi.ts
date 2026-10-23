@@ -2,10 +2,7 @@ import { apiRequest } from '@/shared/services/api';
 import type { StreamUrlResponse } from '@/types/soundcloud.types';
 import type { StreamFetchResult } from '@/features/player/types';
 
-/**
- * Fetch the stream URL of the track at `permalink`, with its expiry (epoch ms,
- * null when unknown). Throws when the server sends no URL.
- */
+/** Expiry is epoch ms, null when unknown. Throws when the server sends no URL. */
 export async function fetchStreamUrl(
 	permalink: string,
 	signal: AbortSignal

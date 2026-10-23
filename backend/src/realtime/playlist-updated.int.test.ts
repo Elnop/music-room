@@ -16,9 +16,7 @@ import type {
 	PlaylistUpdatedPayload,
 } from '@/features/playlists/playlist.types.js';
 
-// The versioned playlist:updated delta (#90, doc/features/playlist-concurrency.md,
-// "Broadcast and convergence") emitted by real track operations to clients of
-// a real Socket.io server, against the local Supabase stack.
+// See doc/features/playlist-concurrency.md, "Broadcast and convergence".
 
 interface TestUser {
 	id: string;
@@ -106,14 +104,12 @@ describe('playlist:updated broadcast', () => {
 		await vi.waitFor(async () => expect(await inRoom(socket)).toBe(true));
 	}
 
-	/** Collect every playlist:updated a socket receives. */
 	function record(socket: ClientSocket): PlaylistUpdatedPayload[] {
 		const received: PlaylistUpdatedPayload[] = [];
 		socket.on('playlist:updated', (payload: PlaylistUpdatedPayload) => received.push(payload));
 		return received;
 	}
 
-	/** The next playlist:updated received by both room members. */
 	function bothReceive(): Promise<PlaylistUpdatedPayload[]> {
 		return Promise.all(
 			[ownerSocket, viewerSocket].map(

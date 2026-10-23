@@ -9,11 +9,7 @@ interface TrackActionsSheetProps {
 	onClose: () => void;
 }
 
-/**
- * Quick actions on a track (#316), the same sheet on every track list: play
- * next, add to the queue, add to a playlist I can edit, share the SoundCloud
- * link (the system share sheet, no toast).
- */
+/** The same sheet on every track list; sharing opens the system share sheet, no toast. */
 export function TrackActionsSheet({ track, onClose }: TrackActionsSheetProps) {
 	const actions = useTrackActions(track, onClose);
 	return <TrackActionsView actions={actions} onClose={onClose} />;

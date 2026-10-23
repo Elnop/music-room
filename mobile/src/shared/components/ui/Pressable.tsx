@@ -26,11 +26,7 @@ interface PressableProps extends Omit<NativePressableProps, 'style' | 'accessibi
 	haptic?: keyof typeof HAPTICS;
 }
 
-/**
- * The app's only touchable primitive: fixed press opacity, optional haptic
- * feedback and a `button` role unless told otherwise. Gestures (swipe, drag)
- * stay on react-native-gesture-handler.
- */
+/** The app's only touchable primitive; gestures (swipe, drag) stay on react-native-gesture-handler. */
 export function Pressable({
 	style,
 	haptic,

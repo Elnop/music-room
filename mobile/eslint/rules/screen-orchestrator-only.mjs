@@ -1,5 +1,3 @@
-// Rule: screen-orchestrator-only
-// A screen or navigation stack/navigator must only import orchestrators from features, never presenters.
 // See .agents/rules/components.md#screen-orchestrator-only
 
 export default {
@@ -40,7 +38,6 @@ export default {
 
 				if (!isFeatureImport) return;
 
-				// Presenters are never allowed in navigation or screens
 				if (source.includes('/presenters/')) {
 					context.report({
 						node,

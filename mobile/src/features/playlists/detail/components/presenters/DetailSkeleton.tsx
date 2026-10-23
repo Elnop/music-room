@@ -6,7 +6,6 @@ import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { createDetailStyles } from './detailStyles';
 
-/** The playlist screen while it loads: cover, title, then track rows. */
 export function DetailSkeleton() {
 	const insets = useSafeAreaInsets();
 	const { styles, theme } = useThemedStyles(createStyles);

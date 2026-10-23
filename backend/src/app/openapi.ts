@@ -11,11 +11,6 @@ import { registerFriendsOpenapi } from '@/features/friends/friends.openapi.js';
 import { registerMusicControlOpenapi } from '@/features/music-control/music-control.openapi.js';
 import { registerQueueOpenapi } from '@/features/queue/queue.openapi.js';
 
-/**
- * The OpenAPI document, generated from the Zod schemas each feature registers
- * in its `<name>.openapi.ts` (served at /api-docs and /api-docs.json).
- */
-
 const registry = new OpenAPIRegistry();
 
 registry.registerComponent('securitySchemes', 'bearerAuth', {

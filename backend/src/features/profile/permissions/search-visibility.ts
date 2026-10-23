@@ -13,12 +13,7 @@ const DEFAULT_VISIBILITY: VisibilityLevel = 'public';
 
 const NO_FOLLOWS = { data: [], error: null };
 
-/**
- * Which privacy-controlled fields of each found profile the viewer may see,
- * with the rules of GET /api/profile/:userId (#247). Three queries for the
- * whole result page: privacy rows, then the follows in each direction
- * (friends = mutual follows). Without a viewer, nobody is a friend.
- */
+/** Rules of GET /api/profile/:userId, in three queries for the whole page; without a viewer, nobody is a friend. */
 export async function getSearchFieldVisibility(
 	viewerId: string | undefined,
 	profileIds: string[]

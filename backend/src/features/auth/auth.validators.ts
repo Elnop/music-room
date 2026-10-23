@@ -1,10 +1,6 @@
 import { z } from 'zod';
 import { USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH } from '@/features/auth/utils/username.js';
 
-/**
- * Validation schemas using Zod
- */
-
 export const registerSchema = z.object({
 	email: z.email('Invalid email address'),
 	password: z
@@ -116,7 +112,6 @@ export const authResultSchema = z.object({
 	message: z.string().optional(),
 });
 
-/** POST /api/auth/verify-email: the user is signed in. */
 export const verifyEmailResultSchema = z.object({
 	user: userProfileSchema,
 	session: sessionSchema,

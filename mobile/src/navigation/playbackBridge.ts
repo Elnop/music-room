@@ -13,11 +13,7 @@ import { QueueModal } from '@/features/queue/queueModal/components/orchestrators
 import { DevicePickerSheet } from '@/features/queue/devicePicker/components/orchestrators/DevicePickerSheet';
 import { TrackActionsSheet } from '@/features/playlists/trackActions/components/orchestrators/TrackActionsSheet';
 
-/**
- * Plugs the player and the queue into the playback contract of `shared/`, so
- * the playlists feature reaches them without importing them. AppNavigator calls
- * it once, at load, before anything renders.
- */
+/** Lets playlists reach the player and queue without importing them; called once, before anything renders. */
 export function registerPlayback(): void {
 	registerPlaybackBridge({
 		usePlaylistPlayback: playlistId => {

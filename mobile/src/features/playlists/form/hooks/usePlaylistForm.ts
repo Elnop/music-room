@@ -20,7 +20,6 @@ const PLAYLIST_LIMITS = { NAME_MAX: 50, DESCRIPTION_MAX: 500 } as const;
 
 type Navigation = NativeStackNavigationProp<PlaylistStackParamList, 'CreatePlaylist'>;
 
-/** A text field capped at `max` characters. */
 export interface CappedField {
 	value: string;
 	onChangeText: (text: string) => void;
@@ -54,10 +53,6 @@ export interface PlaylistForm {
 	isSubmitting: boolean;
 }
 
-/**
- * Creates a playlist, then opens it in place of the form; with a playlistId,
- * edits that playlist's name and description, then goes back (#342).
- */
 export function usePlaylistForm(
 	navigation: Navigation,
 	editedId: string | undefined
@@ -105,7 +100,6 @@ export function usePlaylistForm(
 				visibility: isPrivate ? 'private' : 'public',
 				editMode: isEditRestricted ? 'restricted' : 'open',
 			});
-			// Open the new playlist in place of the form (#342).
 			navigation.replace('PlaylistDetail', { id: created.id });
 		} catch (error) {
 			logger.error('[CreatePlaylistScreen] Create playlist failed:', error);

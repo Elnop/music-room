@@ -1,11 +1,6 @@
 import type { OpenAPIRegistry, ResponseConfig } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 
-/**
- * The error side of the OpenAPI document: the `ErrorResponse` envelope built by
- * `shared/middleware/error-handler.ts`, and the shared error responses.
- */
-
 // A doc-only date: `z.iso.datetime()` would print its whole regex in ErrorResponse.
 const dateTime = z.string().meta({ format: 'date-time' });
 
@@ -37,7 +32,7 @@ const debugOnly = (what: string) =>
 		.optional()
 		.meta({ description: `${what}, for developers. Sent only in development and test` });
 
-/** Every error body: `{ success: false, error, meta }`. */
+/** `{ success: false, error, meta }`. */
 const errorResponseSchema = z.object({
 	success: z.literal(false),
 	error: z.object({
@@ -50,12 +45,10 @@ const errorResponseSchema = z.object({
 	meta: z.object({ timestamp: dateTime }),
 });
 
-/** Every error response points to the one `ErrorResponse` component. */
 const ERROR_RESPONSE = { $ref: '#/components/schemas/ErrorResponse' };
 
 type ErrorExample = [code: string, message: string, details?: unknown];
 
-/** `example`, or named `examples`, of error bodies. */
 function errorExamples(examples: ErrorExample[]) {
 	const values = examples.map(([code, message, details]) => ({
 		success: false,
@@ -69,7 +62,7 @@ function errorExamples(examples: ErrorExample[]) {
 	};
 }
 
-/** An error response, with one example body per `[code, message, details?]`. */
+/** One example body per `[code, message, details?]`. */
 export function fail(description: string, ...examples: ErrorExample[]): ResponseConfig {
 	return {
 		description,
@@ -100,12 +93,10 @@ const SHARED_RESPONSES: Record<SharedResponse, [description: string, ...ErrorExa
 	],
 };
 
-/** A reference to a shared response of `components.responses`. */
 export function shared(name: SharedResponse) {
 	return { $ref: `#/components/responses/${name}` };
 }
 
-/** Registers the `ErrorResponse` schema and the shared responses. */
 export function registerErrorComponents(registry: OpenAPIRegistry): void {
 	type SchemaComponent = Parameters<typeof registry.registerComponent<'schemas'>>[2];
 	const errorResponse = z.toJSONSchema(errorResponseSchema, {

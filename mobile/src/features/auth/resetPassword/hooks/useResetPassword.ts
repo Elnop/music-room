@@ -22,9 +22,7 @@ export interface ResetPassword {
 	changeConfirmation: (text: string) => void;
 	passwordError: string | null;
 	submit: () => void;
-	/** A reset or a resend is running. */
 	isLoading: boolean;
-	/** The failure of the last reset or resend. */
 	error: string | null;
 	resend: () => void;
 	/** Seconds before the code may be sent again; 0 when it may. */

@@ -4,7 +4,6 @@ import { logger } from '@/shared/utils/logger.js';
 import { failUnexpected } from '@/shared/utils/fail-unexpected.js';
 import type { FollowStatus, FriendStats } from '@/features/friends/friends.types.js';
 
-/** Whether `followerId` follows `followingId`: the row, or null. */
 function followRow(followerId: string, followingId: string) {
 	return supabaseAdmin
 		.from('follows')
@@ -14,7 +13,6 @@ function followRow(followerId: string, followingId: string) {
 		.maybeSingle();
 }
 
-/** Number of `follows` rows whose `column` is `userId`. */
 function countFollows(column: 'follower_id' | 'following_id', userId: string) {
 	return supabaseAdmin
 		.from('follows')
@@ -22,7 +20,6 @@ function countFollows(column: 'follower_id' | 'following_id', userId: string) {
 		.eq(column, userId);
 }
 
-/** The follow relation between the caller and `targetUserId`, with the target's counts. */
 export function getFollowStatus(
 	currentUserId: string,
 	targetUserId: string
@@ -61,7 +58,6 @@ export function getFollowStatus(
 	);
 }
 
-/** The caller's own follower and following counts. */
 export function getMyStats(userId: string): Promise<FriendStats> {
 	return failUnexpected(
 		async () => {

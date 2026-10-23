@@ -19,7 +19,6 @@ interface PlaylistGridCardProps {
 	showOwner?: boolean;
 }
 
-/** A playlist as a square card of the two-column grid. */
 export function PlaylistGridCard({ playlist, onPress, showOwner }: PlaylistGridCardProps) {
 	const { styles } = useThemedStyles(createStyles);
 	const owner = showOwner ? playlist.owner : undefined;

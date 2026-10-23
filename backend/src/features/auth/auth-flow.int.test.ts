@@ -25,8 +25,8 @@ const { sendVerificationEmail, sendPasswordResetEmail } =
 const { default: authRouter } = await import('@/features/auth/auth.routes.js');
 const { errorHandler } = await import('@/shared/middleware/error-handler.js');
 
-// The email/password journey end to end (#75), through HTTP on the real auth
-// router against the local Supabase stack and test Redis.
+// The email/password journey end to end, through HTTP on the real auth router against the local
+// Supabase stack and test Redis.
 
 const PASSWORD = 'Flow-password-75';
 const NEW_PASSWORD = 'Flow-renewed-75';
@@ -129,8 +129,8 @@ describe('email/password auth flow (#75)', () => {
 		expect(data.requiresVerification).toBe(true);
 		expect(accessToken(registered.body)).toBeUndefined();
 
-		// The auth user stays unconfirmed until the code is verified; the right
-		// password gets 403 EMAIL_NOT_VERIFIED with what the app needs to resend (#243).
+		// The auth user stays unconfirmed until the code is verified; the right password gets
+		// 403 EMAIL_NOT_VERIFIED with what the app needs to resend.
 		const wrongPassword = await post('login', { email, password: `${PASSWORD}-wrong` });
 		expect(wrongPassword.status).toBe(401);
 		expect(errorCode(wrongPassword.body)).toBe('INVALID_CREDENTIALS');

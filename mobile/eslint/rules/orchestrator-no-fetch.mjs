@@ -1,5 +1,3 @@
-// Rule: orchestrator-no-fetch
-// Orchestrators must not perform direct network calls; delegate to TanStack Query hooks or service hooks.
 // See .agents/rules/components.md#orchestrator-no-fetch
 
 const FORBIDDEN_NETWORK_CALLS = new Set(['fetch', 'apiRequest']);

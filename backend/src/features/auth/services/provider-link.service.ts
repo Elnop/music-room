@@ -11,14 +11,9 @@ const PROVIDER_LABEL: Record<OAuthProvider, string> = {
 	facebook: 'Facebook',
 };
 
-// Links a Google or Facebook account to a signed-in user, whatever the
-// email of the social account (CAP-6).
+// The social account's email need not match the signed-in user's.
 
-/**
- * Verify the provider token and return the provider's user id.
- * A rejected token is a 400, not a 401, so the client does not take it
- * for an expired session.
- */
+/** A rejected token is a 400, not a 401, so the client does not take it for an expired session. */
 async function verifyProviderId(provider: OAuthProvider, token: string): Promise<string> {
 	try {
 		const providerId =
@@ -59,13 +54,6 @@ function alreadySet(provider: OAuthProvider): AppError {
 	);
 }
 
-/**
- * Link a provider account to a user
- * @param userId - Signed-in user ID
- * @param provider - 'google' or 'facebook'
- * @param token - Google ID token or Facebook access token
- * @returns Every provider linked to the user afterwards
- */
 export async function linkProvider(
 	userId: string,
 	provider: OAuthProvider,

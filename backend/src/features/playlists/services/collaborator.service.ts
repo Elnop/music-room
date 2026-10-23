@@ -5,8 +5,6 @@ import { fetchSingle } from '@/shared/utils/database.helpers.js';
 import { checkOwnership } from '@/features/playlists/permissions/playlist.permissions.js';
 import * as realtime from '@/realtime/emitters/playlist.emitters.js';
 
-// Playlist collaborators (edit access in restricted mode); owner only.
-
 export async function addCollaborator(
 	playlistId: string,
 	userId: string,
@@ -78,7 +76,6 @@ export async function removeCollaborator(
 
 		if (updateError) throw updateError;
 
-		// Evict the removed collaborator from the playlist room (fire-and-forget).
 		void realtime.revalidatePlaylistRoom(playlistId);
 
 		logger.info('Collaborator removed from playlist', { playlistId, userId, collaboratorId });

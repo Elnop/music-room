@@ -22,11 +22,8 @@ vi.mock('@/features/music-control/services/control-access.service.js', async imp
 	return Object.fromEntries(Object.entries(actual).map(([name, fn]) => [name, vi.fn(fn)]));
 });
 
-// Access to listening status and music control (music-control-access.ts,
-// realtime/handlers/) against a real Socket.io server and the local Supabase
-// stack. Alice owns the music; Bob and Dave are her mutual friends with her
-// "all my devices" switch on; Erin is a mutual friend without switch or
-// license; Carol does not follow her. Per-device licenses are added per test.
+// Alice owns the music; Bob and Dave are mutual friends with her "all my devices" switch on;
+// Erin is a mutual friend without switch or license; Carol does not follow her.
 
 interface TestUser {
 	id: string;
@@ -66,7 +63,7 @@ async function createUser(): Promise<TestUser> {
 		.insert({ id, username: `int_${id.slice(0, 8)}` });
 	if (profileError) throw profileError;
 
-	// Sign in with the anon client, never the admin one (#136).
+	// Sign in with the anon client, never the admin one.
 	const { data: session, error: signInError } = await supabaseAnon.auth.signInWithPassword({
 		email,
 		password: PASSWORD,
@@ -111,7 +108,6 @@ describe('Listening and control access', () => {
 		return new Promise(resolve => socket.once(event, (payload: T) => resolve(payload)));
 	}
 
-	/** Collect every payload of `event` a socket receives. */
 	function record<T>(socket: ClientSocket, event: string): T[] {
 		const received: T[] = [];
 		socket.on(event, (payload: T) => received.push(payload));
@@ -124,14 +120,13 @@ describe('Listening and control access', () => {
 		return found?.rooms.has(`listening:${ownerId}`) ?? false;
 	}
 
-	/** Subscribe to the owner's listening status and wait for the first status. */
 	async function subscribe(socket: ClientSocket, ownerId: string): Promise<UserListeningStatus> {
 		const status = nextEvent<UserListeningStatus>(socket, 'listening:status');
 		socket.emit('listening:subscribe', ownerId);
 		return status;
 	}
 
-	/** Publish a listening update from a new device of Alice's (not throttled). */
+	/** From a new device of Alice's, so not throttled. */
 	async function publishAliceStatus(positionMs?: number): Promise<string> {
 		const deviceId = `dev-${randomUUID()}`;
 		const device = await connect(alice, deviceId);
@@ -160,7 +155,6 @@ describe('Listening and control access', () => {
 		if (error) throw error;
 	}
 
-	/** Set Alice's "all my devices" switch for Bob. */
 	async function setBobSwitch(on: boolean): Promise<void> {
 		const { error } = await supabaseAdmin
 			.from('follows')
@@ -170,7 +164,7 @@ describe('Listening and control access', () => {
 		if (error) throw error;
 	}
 
-	/** License Bob on Alice's device (the device row exists once it connected). */
+	/** The device row exists once the device connected. */
 	async function licenseBob(deviceId: string): Promise<void> {
 		const { error } = await supabaseAdmin
 			.from('device_control_licenses')
@@ -178,7 +172,7 @@ describe('Listening and control access', () => {
 		if (error) throw error;
 	}
 
-	/** Alice stops following Bob: Bob's switch row stays, but they are no longer friends. */
+	/** Bob's switch row stays, but they are no longer friends. */
 	async function aliceDropsBob(): Promise<void> {
 		const { error } = await supabaseAdmin
 			.from('follows')
@@ -188,7 +182,6 @@ describe('Listening and control access', () => {
 		if (error) throw error;
 	}
 
-	/** Send a control action and wait for its success or error. */
 	async function control(
 		socket: ClientSocket,
 		targetDeviceId: string
@@ -487,7 +480,6 @@ describe('Listening and control access', () => {
 	});
 
 	describe('per-device access (story 4.5)', () => {
-		/** Connect Alice's devices A and B, then Bob, with his switch off and a license on A. */
 		async function bobLicensedOnA() {
 			const [deviceA, deviceB] = [`dev-${randomUUID()}`, `dev-${randomUUID()}`];
 			const [aliceA, aliceB, bobSocket] = await Promise.all([

@@ -16,7 +16,6 @@ interface OwnerActions {
 	remove: () => void;
 }
 
-/** The owner's actions on their playlist (#342), from the header's ⋯ button. */
 export function useOwnerActions(
 	navigation: DetailNavigation,
 	screen: PlaylistDetailScreen

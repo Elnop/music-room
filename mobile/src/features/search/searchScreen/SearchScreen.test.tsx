@@ -158,7 +158,6 @@ describe('SearchScreen preview badge and actions', () => {
 		expect(await screen.findByText('La recherche a échoué', {}, { timeout: 2500 })).toBeTruthy();
 		expect(screen.getByText('Réessayer')).toBeTruthy();
 
-		// Press retry
 		mockSearchTracks.mockResolvedValueOnce([track({ id: 99, title: 'Recovered' })]);
 		fireEvent.press(screen.getByText('Réessayer'));
 

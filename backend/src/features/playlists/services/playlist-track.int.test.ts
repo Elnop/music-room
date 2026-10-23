@@ -4,9 +4,7 @@ import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import type { TrackUpsertInput } from '@/shared/utils/track-upsert.js';
 
-// The playlist track service and the playlist fetch on top of migration 016, against the
-// local Supabase stack (doc/features/playlist-concurrency.md). The RPCs themselves are
-// covered by track-operations.int.test.ts; this file checks the service layer:
+// Service layer on top of migration 016 (the RPCs are covered by track-operations.int.test.ts):
 // permissions, added_by, result shapes, error mapping and concurrent calls.
 
 const { notifyPlaylistUpdate } = vi.hoisted(() => ({ notifyPlaylistUpdate: vi.fn() }));

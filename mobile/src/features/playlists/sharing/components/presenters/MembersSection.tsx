@@ -16,7 +16,6 @@ interface MembersSectionProps {
 	onRemove: (userId: string) => Promise<void>;
 }
 
-/** The people given access or edit rights. */
 export function MembersSection({ title, members, emptyMessage, onRemove }: MembersSectionProps) {
 	const { styles: shared } = useThemedStyles(createSharingStyles);
 	const { styles } = useThemedStyles(createStyles);

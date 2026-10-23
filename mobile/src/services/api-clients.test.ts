@@ -7,7 +7,7 @@ import { createStore } from 'zustand';
 import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
 
 // Every API module goes through apiRequest, so the backend gets the client
-// headers it logs (subject IV.6), a token, and the refresh on 401 (#174).
+// headers it logs, a token, and the refresh on 401.
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')

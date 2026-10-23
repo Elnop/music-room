@@ -1,18 +1,5 @@
-/**
- * Per-socket, per-event rate limit (#204). Each socket gets its own counters,
- * in memory, dropped with the socket: a fixed window per event name. In memory
- * by design, not as a fallback: the counters belong to one connection, which
- * lives on one backend instance. Over the
- * limit, the event is not handled and the client gets `RATE_LIMITED` on the
- * event's own error channel (`listening:error`, `playlist:error`,
- * `control:error`, by the prefix before `:`). Only the first refusal of a
- * window logs a warning; the incoming-event line (subject IV.6) is still
- * written for every event.
- *
- * The limits sit far above what the app sends (one listening:update per track
- * or play/pause change, one subscribe/join per screen), so only a flooding
- * client hits them.
- */
+// In memory by design, not as a fallback: the counters belong to one connection, on one backend instance.
+// Only the first refusal of a window logs a warning.
 
 interface EventLimit {
 	max: number;
@@ -21,7 +8,7 @@ interface EventLimit {
 
 const DEFAULT_EVENT_LIMIT: EventLimit = { max: 30, windowMs: 10_000 };
 
-/** Every event the app sends has its own counter; any other name shares the default one. */
+/** Any other event name shares the default counter. */
 const EVENT_LIMITS: Readonly<Record<string, EventLimit>> = {
 	'listening:update': { max: 20, windowMs: 10_000 },
 	'listening:subscribe': DEFAULT_EVENT_LIMIT,
@@ -36,11 +23,7 @@ export const RATE_LIMITED = {
 	code: 'RATE_LIMITED',
 } as const;
 
-/**
- * The error to send for a refused event, on the event's own error channel and
- * in that channel's shape (`playlist:error` carries `playlistId`); none for
- * other event names.
- */
+/** `playlist:error` carries `playlistId`; none for other event names. */
 export function rateLimitedErrorFor(
 	eventName: string
 ): { event: string; payload: Record<string, unknown> } | null {
@@ -54,14 +37,9 @@ export function rateLimitedErrorFor(
 	return null;
 }
 
-/** `allowed`, or refused: `limited` the first time in a window, `still-limited` after. */
 type LimitDecision = 'allowed' | 'limited' | 'still-limited';
 
-/**
- * A new limiter for one socket: count one `eventName` event and decide. Events
- * without their own limit share one counter, so random event names cannot
- * grow the map.
- */
+/** Events without their own limit share one counter, so random event names cannot grow the map. */
 export function createSocketEventLimiter(
 	limits: Readonly<Record<string, EventLimit>> = EVENT_LIMITS,
 	fallback: EventLimit = DEFAULT_EVENT_LIMIT,

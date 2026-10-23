@@ -43,10 +43,7 @@ function persist(userId: string): void {
 	else void lastTrackStorage.clear(userId);
 }
 
-/**
- * Keeps the player's last track across app restarts (#312), on device and
- * per user. At start-up the saved track comes back paused, without a stream.
- */
+/** Keeps the last track across restarts, per device and user; it comes back paused, without a stream. */
 export function useLastTrackPersistence(): void {
 	const userId = useSession(session => session?.user?.id ?? null);
 	const local = useIsLocalTarget();

@@ -17,13 +17,11 @@ export async function fetchPublicPlaylists(): Promise<Playlist[]> {
 	return data.playlists;
 }
 
-/** The public playlists of one user. */
 export async function fetchUserPublicPlaylists(userId: string): Promise<Playlist[]> {
 	const data = await apiRequest<{ playlists: Playlist[] }>(`/api/playlists/user/${userId}`);
 	return data.playlists;
 }
 
-/** A playlist with its tracks and its owner. */
 export async function fetchPlaylistById(id: string): Promise<PlaylistWithTracks> {
 	const data = await apiRequest<{ playlist: PlaylistWithTracks }>(`/api/playlists/${id}`);
 	return data.playlist;

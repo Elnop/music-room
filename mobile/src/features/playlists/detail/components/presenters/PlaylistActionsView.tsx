@@ -13,10 +13,6 @@ interface PlaylistActionsViewProps {
 	onDelete: () => void;
 }
 
-/**
- * The owner's actions on their playlist: edit name/description,
- * open « Visibilité et droits », delete it. Pure presenter: props in, JSX out.
- */
 export function PlaylistActionsView({
 	visible,
 	playlistName,

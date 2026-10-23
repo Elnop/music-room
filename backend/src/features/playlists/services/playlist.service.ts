@@ -14,8 +14,6 @@ import type {
 	PlaylistWithTracksResponse,
 } from '@/features/playlists/playlist.types.js';
 
-// Creates a playlist and reads one with its tracks.
-
 /** The playlist with its tracks ordered by rank; 403 when the user cannot view it. */
 export async function getPlaylistById(
 	playlistId: string,
@@ -74,7 +72,6 @@ export async function getPlaylistById(
 	}
 }
 
-/** Defaults: visibility 'public', editMode 'open' (everyone can edit). */
 export async function createPlaylist(
 	userId: string,
 	data: CreatePlaylistInput

@@ -27,11 +27,7 @@ export interface PlaylistDetailScreen {
 	playerHeight: number;
 }
 
-/**
- * The playlist on screen: loaded on each visit, kept live by its room, and
- * left with a message when its owner deletes it (#342). A share link may point
- * to a private or deleted playlist (#321): a 403 or 404 is « not found ».
- */
+/** A share link may point to a private or deleted playlist: a 403 or 404 is « not found ». */
 export function usePlaylistDetailScreen(
 	navigation: DetailNavigation,
 	id: string

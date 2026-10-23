@@ -4,9 +4,8 @@ import type { AddressInfo } from 'node:net';
 import express from 'express';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Before env.ts is parsed: lockout and limiting on, a low IP blacklist threshold,
-// loopback whitelisted so the express-rate-limit limiters (not under test) skip.
-// The whitelist does not reach account-lockout.ts nor ip-reputation.ts.
+// Set before env.ts is parsed: lockout on, a low IP blacklist threshold, loopback whitelisted so the
+// express-rate-limit limiters skip (account-lockout.ts and ip-reputation.ts ignore the whitelist).
 vi.hoisted(() => {
 	process.env.RATE_LIMIT_ENABLED = 'true';
 	process.env.ACCOUNT_LOCKOUT_ENABLED = 'true';
@@ -28,8 +27,7 @@ const { rateLimitConfig } = await import('@/shared/config/rate-limit.config.js')
 const { default: authRouter } = await import('@/features/auth/auth.routes.js');
 const { errorHandler } = await import('@/shared/middleware/error-handler.js');
 
-// Account lockout and IP blacklist (threat model L9, #206), through HTTP on the
-// real auth router against the local Supabase stack and test Redis.
+// Through HTTP on the real auth router, against the local Supabase stack and test Redis.
 
 const PASSWORD = 'integration-test-password';
 const WRONG_PASSWORD = 'wrong-password';

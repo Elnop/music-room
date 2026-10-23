@@ -6,16 +6,11 @@ import type { ApiResponse } from '@/shared/types/global.types.js';
 
 /** Technical context of an error: logged always, sent in development and test only. */
 interface AppErrorOptions {
-	/** Technical reason, for a developer. */
 	why?: string;
-	/** Hint to fix it, for a developer. */
 	fix?: string;
 }
 
-/**
- * Custom application error class. `message` is shown to the user; `why` and
- * `fix` are for developers (see .agents/rules/logging.md#error-format).
- */
+/** `message` is shown to the user; `why` and `fix` are for developers. */
 export class AppError extends Error {
 	public why?: string;
 	public fix?: string;
@@ -35,7 +30,6 @@ export class AppError extends Error {
 	}
 }
 
-/** The one error body of the API: `{ success: false, error, meta }`. */
 function buildErrorResponse(err: AppError): ApiResponse {
 	// Fail closed: only development and test get why/fix in the response.
 	const exposeDebug = env.NODE_ENV === 'development' || env.NODE_ENV === 'test';
@@ -52,11 +46,7 @@ function buildErrorResponse(err: AppError): ApiResponse {
 	};
 }
 
-/**
- * Logs an error and answers with the shared format. For middlewares that answer
- * themselves (rate limiter handlers, auth); everything else calls
- * `next(new AppError(...))` and reaches `errorHandler`.
- */
+/** For middlewares that answer themselves (rate limiters, auth); everything else goes through `errorHandler`. */
 export function sendError(req: Request, res: Response, err: AppError, cause?: Error): void {
 	const entry = {
 		status: err.statusCode,
@@ -74,7 +64,6 @@ export function sendError(req: Request, res: Response, err: AppError, cause?: Er
 	res.status(err.statusCode).json(buildErrorResponse(err));
 }
 
-/** Any thrown value as an AppError with today's status, code and message. */
 function toAppError(err: Error): AppError {
 	if (err instanceof AppError) return err;
 	if (err instanceof ZodError) {
@@ -95,9 +84,6 @@ function toAppError(err: Error): AppError {
 	});
 }
 
-/**
- * Global error handler middleware
- */
 export function errorHandler(err: Error, req: Request, res: Response, _next: NextFunction) {
 	sendError(req, res, toAppError(err), err);
 }

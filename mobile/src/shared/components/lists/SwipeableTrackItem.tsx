@@ -19,7 +19,7 @@ interface SwipeableTrackItemProps {
 	onDragStart?: () => void;
 	/** Raises the row while it is being dragged. */
 	isDragActive?: boolean;
-	/** A long press or the ⋯ button opens the track's quick actions (#316). */
+	/** A long press or the ⋯ button opens the track's quick actions. */
 	onShowActions?: () => void;
 	/** The track playing now from this playlist: highlighted like the queue's current item. */
 	isCurrent?: boolean;

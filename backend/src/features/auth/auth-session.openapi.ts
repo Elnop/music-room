@@ -7,7 +7,6 @@ import {
 import { bearerAuth, jsonBody, ok, okMessage } from '@/shared/config/swagger.schemas.js';
 import { fail, shared } from '@/shared/config/swagger.errors.js';
 
-/** Registers the session routes of /api/auth: refresh, me, logout. */
 export function registerAuthSessionOpenapi(registry: OpenAPIRegistry): void {
 	const tags = ['Authentication'];
 	const unavailable = shared('RateLimitUnavailable');

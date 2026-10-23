@@ -9,10 +9,6 @@ import {
 } from '@/features/playlists/services/playlist-summaries.service.js';
 import type { PlaylistResponse } from '@/features/playlists/playlist.types.js';
 
-// The playlist lists: the user's own, another user's profile, the public ones.
-// Any failure answers a 500 PLAYLIST_FETCH_ERROR.
-
-/** Playlists the user owns, collaborates on or views. */
 export async function getUserPlaylists(userId: string): Promise<PlaylistResponse[]> {
 	try {
 		const { data: playlists, error } = await supabaseAdmin
@@ -29,10 +25,7 @@ export async function getUserPlaylists(userId: string): Promise<PlaylistResponse
 	}
 }
 
-/**
- * Playlists of a user's profile: the public ones, plus the private ones the
- * current user is invited to.
- */
+/** Public playlists of a user, plus the private ones the current user is invited to. */
 export async function getPlaylistsByUser(
 	targetUserId: string,
 	currentUserId?: string
@@ -71,7 +64,6 @@ export async function getPlaylistsByUser(
 	}
 }
 
-/** The 50 latest public playlists of other users. */
 export async function getPublicPlaylists(currentUserId: string): Promise<PlaylistResponse[]> {
 	try {
 		const { data: playlists, error } = await supabaseAdmin

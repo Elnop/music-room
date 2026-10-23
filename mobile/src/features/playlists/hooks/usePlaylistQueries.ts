@@ -11,7 +11,6 @@ import type { FriendPlaylists, PlaylistWithTracks } from '@/features/playlists/t
 // once: the queries refetch on mount and do not retry.
 const ON_EVERY_VISIT = { staleTime: STALE.none, retry: false } as const;
 
-/** The signed-in user's playlists. */
 export function usePlaylists(enabled = true) {
 	const signedIn = useSession(session => session.isAuthenticated);
 	return useQuery({

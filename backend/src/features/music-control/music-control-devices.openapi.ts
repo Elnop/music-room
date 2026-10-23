@@ -20,7 +20,6 @@ export const deviceNotFound = fail(
 	['DEVICE_NOT_FOUND', 'Device not found']
 );
 
-/** Registers the device routes of /api/music-control (#294, #295, #352). */
 export function registerDeviceOpenapi(registry: OpenAPIRegistry): void {
 	const common = { tags: ['Music Control'], security: bearerAuth };
 	const unauthorized = shared('UnauthorizedError');

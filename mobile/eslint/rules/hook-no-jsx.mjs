@@ -1,5 +1,3 @@
-// Rule: hook-no-jsx
-// Hooks must contain logic only and zero JSX elements.
 // See .agents/rules/components.md#hook-no-jsx
 
 export default {

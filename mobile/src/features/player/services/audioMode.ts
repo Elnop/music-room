@@ -1,10 +1,7 @@
 import { setAudioModeAsync } from 'expo-audio';
 import { logger } from '@/shared/utils/logger';
 
-/**
- * Configure global audio mode: play in silent mode and in background.
- * iOS uses `doNotMix` so that it resumes after a call (#310); Android ducks others.
- */
+/** `doNotMix` lets iOS resume after a call; Android ducks others. */
 export function configureAudioMode(): void {
 	setAudioModeAsync({
 		playsInSilentMode: true,

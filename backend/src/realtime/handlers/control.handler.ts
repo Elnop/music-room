@@ -4,10 +4,6 @@ import type { AppSocket } from '@/realtime/socket-auth.js';
 import { controlActionSchema, INVALID_CONTROL_PAYLOAD } from '@/realtime/music-control-access.js';
 import { deviceKey, deviceToSocket, getIO, socketToDevice } from '@/realtime/state.js';
 
-/**
- * Music control handler: control:action, a play or pause sent by a
- * controller to one of the target user's devices.
- */
 export function registerControlHandlers(socket: AppSocket): void {
 	socket.on('control:action', async (payload: unknown) => {
 		const startTime = Date.now();

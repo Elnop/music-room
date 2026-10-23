@@ -2,7 +2,6 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
 
-/** A failure of the last request, in a tinted box. */
 export function ErrorBox({ message }: { message: string }) {
 	const { theme } = useTheme();
 

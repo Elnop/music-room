@@ -3,9 +3,6 @@ export interface ControlError {
 	message: string;
 }
 
-/**
- * Text to show the user for a `control:error`
- */
 export function controlErrorMessage(err: ControlError): string {
 	switch (err.code) {
 		case 'NOT_AUTHORIZED':

@@ -1,8 +1,3 @@
-/**
- * Response and domain types of the playlists feature. Request inputs are
- * inferred from the Zod schemas in playlist.validators.ts.
- */
-
 import type { z } from 'zod';
 import type { Tables, TablesUpdate } from '@/shared/types/supabase.generated.js';
 import type {
@@ -15,12 +10,10 @@ import type {
 	removeTrackResultSchema,
 } from '@/features/playlists/playlist-responses.validators.js';
 
-// Database rows (generated Supabase types)
 export type PlaylistRow = Tables<'playlists'>;
 export type TrackRow = Tables<'tracks'>;
 export type PlaylistUpdate = TablesUpdate<'playlists'>;
 
-// Response bodies, inferred from the schemas the OpenAPI document uses.
 export type PlaylistOwner = z.infer<typeof playlistMemberSchema>;
 export type PlaylistResponse = z.infer<typeof playlistSchema>;
 export type TrackInPlaylistResponse = z.infer<typeof playlistTrackSchema>;

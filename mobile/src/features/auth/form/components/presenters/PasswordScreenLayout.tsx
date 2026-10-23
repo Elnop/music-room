@@ -5,12 +5,10 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 interface PasswordScreenLayoutProps {
 	title: string;
 	subtitle: React.ReactNode;
-	/** Room between the header and the form. */
 	headerSpacing: number;
 	children: React.ReactNode;
 }
 
-/** The forgotten and new password layout: a large title, its explanation, then the form. */
 export function PasswordScreenLayout({
 	title,
 	subtitle,

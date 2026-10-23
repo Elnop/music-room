@@ -8,11 +8,7 @@ export interface PlayPlaylist {
 	press: () => void;
 }
 
-/**
- * Play/Pause of a playlist (#277). Play queues the playlist as a block and
- * plays its first track; while this device plays an item queued from it, the
- * button pauses and resumes the audio without any request.
- */
+/** While this device plays an item queued from the playlist, the button pauses and resumes without any request. */
 export function usePlayPlaylist(playlistId: string): PlayPlaylist {
 	const { state } = usePlaylistPlayback(playlistId);
 	const [pending, setPending] = useState(false);

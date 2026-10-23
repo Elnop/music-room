@@ -1,11 +1,6 @@
 import { z } from 'zod';
 import { logger } from '@/shared/utils/logger.js';
 
-/**
- * Socket Logger Middleware
- * Provides structured logging helpers for Socket.io events.
- */
-
 function connectionLog(
 	socketId: string,
 	transport: string,
@@ -39,7 +34,7 @@ function eventLog(eventName: string, socketId: string, metadata?: Record<string,
 	}
 }
 
-/** Client identity set on `socket.data` by handshake (realtime/socket-auth.ts) */
+/** Set on `socket.data` by the handshake (realtime/socket-auth.ts). */
 interface SocketClientContext {
 	userId: string;
 	device: { deviceId: string; platform: string; model: string };
@@ -49,15 +44,12 @@ interface SocketClientContext {
 const eventNameSchema = z.string().regex(/^[\w:.-]{1,64}$/);
 const INVALID_EVENT_NAME = '<invalid-event-name>';
 
-/** Safe event name: kept only when matching pattern to avoid huge strings. */
+/** Kept only when matching the pattern, to avoid huge strings. */
 export function loggableEventName(eventName: unknown): string {
 	const name = eventNameSchema.safeParse(eventName);
 	return name.success ? name.data : INVALID_EVENT_NAME;
 }
 
-/**
- * Log every incoming socket event with client telemetry (subject IV.6).
- */
 function incomingLog(socketId: string, eventName: unknown, client: SocketClientContext): void {
 	logger.info(`[Socket] in:${loggableEventName(eventName)}`, {
 		socketId,
@@ -86,7 +78,6 @@ function broadcastLog(eventType: string, metadata: Record<string, unknown>): voi
 	logger.info(`[Socket] broadcast:${eventType}`, metadata);
 }
 
-/** Exported namespace for structured socket logging */
 export const socketLogger = {
 	connection: connectionLog,
 	disconnect: disconnectLog,

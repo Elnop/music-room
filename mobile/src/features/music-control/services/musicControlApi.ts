@@ -21,10 +21,6 @@ function req<T>(path: string, token?: string, options: RequestInit = {}): Promis
 	return apiRequest<T>(path, options);
 }
 
-/**
- * Music Control API
- * Manages music control permissions between friends
- */
 export const musicControlApi = {
 	async getMyPermissions(token?: string): Promise<string[]> {
 		const data = await req<MusicControlPermissionsResponse>(

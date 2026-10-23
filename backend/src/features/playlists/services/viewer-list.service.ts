@@ -6,7 +6,6 @@ import { checkOwnership } from '@/features/playlists/permissions/playlist.permis
 import { OWNER_COLUMNS, toOwner } from '@/features/playlists/utils/playlist.helpers.js';
 import type { PlaylistOwner } from '@/features/playlists/playlist.types.js';
 
-/** The viewers of a playlist with their profile; owner only. */
 export async function getViewers(playlistId: string, userId: string): Promise<PlaylistOwner[]> {
 	try {
 		await checkOwnership(playlistId, userId);

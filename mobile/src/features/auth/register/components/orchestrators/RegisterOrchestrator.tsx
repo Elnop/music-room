@@ -9,7 +9,6 @@ import { RegisterView } from '@/features/auth/register/components/presenters/Reg
 
 type RegisterOrchestratorProps = NativeStackScreenProps<AuthStackParamList, 'Register'>;
 
-/** The Register screen. */
 export function RegisterOrchestrator({ navigation }: RegisterOrchestratorProps) {
 	const form = useRegisterForm(navigation);
 	const provider = useProviderSignIn(showError);

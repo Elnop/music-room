@@ -1,9 +1,3 @@
-/**
- * Response and domain types of music control. The device responses are
- * inferred from music-control-responses.validators.ts; request inputs are
- * inferred in music-control.validators.ts.
- */
-
 import type { z } from 'zod';
 import type { QueueItem, QueueTrack } from '@/features/queue/queue.types.js';
 import type {
@@ -39,18 +33,14 @@ export type ControllableDevice = z.infer<typeof controllableDeviceSchema>;
 /** GET /api/music-control/users/:userId/devices */
 export type ControllableDevicesResponse = z.infer<typeof controllableDevicesSchema>;
 
-/** GET /api/music-control/controllable-devices (#295): me first, then friends with at least one controllable device, by username */
+/** Me first, then friends with at least one controllable device, by username. */
 export type DevicePickerResponse = z.infer<typeof devicePickerSchema>;
 
 export type DevicePickerOwner = DevicePickerResponse['owners'][number];
 
-/** POST /api/music-control/devices/:deviceId/licenses/:userId */
 export type GrantDeviceLicenseResponse = z.infer<typeof grantDeviceLicenseResponseSchema>;
 
-/**
- * control:command sent by the server to the owner's device chosen by a
- * playback action on the queue (#294): play `item` from `positionMs`.
- */
+/** Sent to the owner's device chosen by a queue playback action. */
 export interface QueuePlayCommand {
 	action: 'play-item';
 	fromUserId: string;
@@ -60,7 +50,6 @@ export interface QueuePlayCommand {
 	version: number;
 }
 
-/** control:command: play `track` from `positionMs` (playback transfer, #295). */
 export interface QueueTrackCommand {
 	action: 'play-track';
 	fromUserId: string;
@@ -68,7 +57,6 @@ export interface QueueTrackCommand {
 	positionMs: number;
 }
 
-/** control:command: pause the device (playback transfer, #295). */
 export interface DevicePauseCommand {
 	action: 'pause';
 	fromUserId: string;
