@@ -6,6 +6,7 @@ import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import prettierPlugin from 'eslint-plugin-prettier';
 import prettierConfig from 'eslint-config-prettier';
 import { builtinRules } from 'eslint/use-at-your-own-risk';
+import componentsPlugin from './eslint/plugin-components.mjs';
 
 // Aliases removed by #377: @/ is the only one left (babel.config.js,
 // tsconfig.json). Still banned so they cannot come back.
@@ -227,7 +228,10 @@ export default [
   // Project guardrails (#377), on the app code and its tests.
   {
     files: ['src/**/*.{ts,tsx}', 'App.tsx'],
-    plugins: { guardrails: guardrailsPlugin },
+    plugins: {
+      guardrails: guardrailsPlugin,
+      components: componentsPlugin,
+    },
     rules: {
       'guardrails/ui-primitives': [
         'error',
@@ -277,6 +281,12 @@ export default [
             'Call a Zustand store hook with a selector (useXStore(state => state.x)), never without: it re-renders on every change of the store. See .agents/rules/state.md#zustand-selectors',
         },
       ],
+      'components/screen-orchestrator-only': 'error',
+      'components/presenter-pure': 'error',
+      'components/hook-no-jsx': 'error',
+      'components/one-component-per-file': 'error',
+      'components/component-role-directory': 'error',
+      'components/orchestrator-no-fetch': 'error',
     },
   },
   {

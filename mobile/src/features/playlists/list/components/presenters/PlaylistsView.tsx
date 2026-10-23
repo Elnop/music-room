@@ -8,7 +8,8 @@ import type { PlaylistsScreen } from '@/features/playlists/list/hooks/usePlaylis
 import { FriendPlaylistCarousel } from './FriendPlaylistCarousel';
 import { createListStyles } from './listStyles';
 import { PlaylistGridCard } from './PlaylistCards';
-import { FriendCardSkeleton, PlaylistsSkeleton } from './PlaylistsSkeleton';
+import { FriendCardSkeleton } from './FriendCardSkeleton';
+import { PlaylistsSkeleton } from './PlaylistsSkeleton';
 import { SectionHeader } from './SectionHeader';
 
 const countAll = (screen: PlaylistsScreen) =>

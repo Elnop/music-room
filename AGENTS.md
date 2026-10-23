@@ -42,6 +42,7 @@ Each rule `check` enforces has a section in `.agents/rules/`, and its error mess
 | Creating a file or a folder | `.agents/rules/structure.md` |
 | Logging anything | `.agents/rules/logging.md` |
 | Mobile: fetching server data, or adding or reading a Zustand store | `.agents/rules/state.md` |
+| Authoring or editing mobile components, orchestrators, presenters, or hooks | `.agents/rules/components.md` |
 | `npm run check` fails, or touching a guardrail or an exception list | `.agents/rules/guardrails.md` |
 
 Rules are append-only: never disable, weaken or switch a rule to `warn`, and never add an entry to an exception list (`eslint-suppressions.json`, `.dependency-cruiser-known-violations.json`, `.jscpd.json` `ignore`, semgrep `exclude`, `.gitleaks.toml` allowlists) to let code through; fix the code. Exception lists only shrink (`check:exceptions` compares them with `develop`). A new rule lands with its `.agents/rules` section.

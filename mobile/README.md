@@ -239,6 +239,17 @@ Tout élément pressable passe par `Pressable` ou `Button` de `@/shared/componen
 
 Quatre thèmes vivent dans `src/shared/theme/` (original, royalBlue, pastelLime, christmas), sélectionnables via `ThemeSelector` ; les tokens communs sont dans `src/shared/theme/tokens.ts`. Aucune couleur en dur hors de `src/shared/theme/` (ESLint `guardrails/theme-tokens`) : lire `theme.colors.*`.
 
+### Rôles des composants (plugin ESLint maison)
+
+Les rôles de composants sont validés automatiquement sans exception (#386, documentation : `.agents/rules/components.md`) :
+
+- **`components/screen-orchestrator-only`** : un écran de navigation n'importe que des orchestrators depuis `features/`, jamais de presenters.
+- **`components/presenter-pure`** : un presenter est une vue pure (props en entrée, JSX en sortie) : ni état (`useState`), ni effet (`useEffect`), ni store Zustand, ni requête TanStack, ni appel réseau direct.
+- **`components/hook-no-jsx`** : un hook ne contient aucun élément JSX ni fragment (logique pure).
+- **`components/one-component-per-file`** : au plus un composant React par fichier source.
+- **`components/component-role-directory`** : tout composant d'une feature réside dans un sous-dossier de rôle (`orchestrators/` ou `presenters/`).
+- **`components/orchestrator-no-fetch`** : un orchestrator délègue les appels réseau aux hooks TanStack Query ou de service, sans `fetch` direct.
+
 ### Hot Reload
 
 Expo supporte le Hot Reload : modifiez n'importe quel fichier et l'app se met à jour automatiquement en 1-2 secondes.

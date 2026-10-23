@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react-native';
-import { RenameDeviceModal } from './RenameDeviceModal';
+import { RenameDeviceModal } from '@/features/music-control/myDevices/orchestrators/RenameDeviceModal';
 
 jest.mock('@/shared/theme/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');

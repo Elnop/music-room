@@ -1,62 +1,62 @@
 {
-  "src/navigation/AppNavigator.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 1
-    }
-  },
-  "src/shared/components/feedback/ConnectionBanner.test.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 15
-    }
-  },
-  "src/shared/components/feedback/ConnectionBanner.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 2
-    }
-  },
-  "src/shared/components/feedback/EmptyState.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 1
-    }
-  },
-  "src/shared/components/feedback/ErrorBoundary.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 10
-    }
-  },
-  "src/shared/components/lists/QueueSwipe.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 2
-    }
-  },
-  "src/shared/components/lists/SwipeableTrackItem.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 4
-    }
-  },
-  "src/shared/components/lists/SwipeableUserItem.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 3
-    }
-  },
-  "src/shared/components/theme/ThemeSelector.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 7
-    }
-  },
-  "src/shared/components/ui/Button.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 3
-    }
-  },
-  "src/shared/components/ui/ThemedSwitch.tsx": {
-    "guardrails/theme-tokens": {
-      "count": 1
-    }
-  },
-  "src/types/user.types.ts": {
-    "guardrails/theme-tokens": {
-      "count": 10
-    }
-  }
+	"src/navigation/AppNavigator.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 1
+		}
+	},
+	"src/shared/components/feedback/ConnectionBanner.test.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 15
+		}
+	},
+	"src/shared/components/feedback/ConnectionBanner.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 2
+		}
+	},
+	"src/shared/components/feedback/EmptyState.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 1
+		}
+	},
+	"src/shared/components/feedback/ErrorBoundary.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 10
+		}
+	},
+	"src/shared/components/lists/QueueSwipe.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 2
+		}
+	},
+	"src/shared/components/lists/SwipeableTrackItem.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 4
+		}
+	},
+	"src/shared/components/lists/SwipeableUserItem.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 3
+		}
+	},
+	"src/shared/components/theme/ThemeSelector.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 7
+		}
+	},
+	"src/shared/components/ui/Button.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 3
+		}
+	},
+	"src/shared/components/ui/ThemedSwitch.tsx": {
+		"guardrails/theme-tokens": {
+			"count": 1
+		}
+	},
+	"src/types/user.types.ts": {
+		"guardrails/theme-tokens": {
+			"count": 10
+		}
+	}
 }

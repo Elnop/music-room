@@ -3,13 +3,8 @@ import { StyleSheet, View } from 'react-native';
 import { PlaylistCardSkeleton, SkeletonBlock, SkeletonList } from '@/shared/components/ui/Skeleton';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
-import { FRIEND_CARD_WIDTH } from './FriendPlaylistCarousel';
+import { FriendCardSkeleton } from './FriendCardSkeleton';
 import { createListStyles } from './listStyles';
-
-/** A card of the friends' carousel while it loads. */
-export function FriendCardSkeleton() {
-	return <PlaylistCardSkeleton width={FRIEND_CARD_WIDTH} />;
-}
 
 /** The playlists screen before its first answer: friends' carousel, then the grid. */
 export function PlaylistsSkeleton() {
