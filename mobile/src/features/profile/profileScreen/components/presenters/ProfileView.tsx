@@ -16,6 +16,7 @@ interface ProfileViewProps {
 	genres: MusicGenre[];
 	isRefreshing: boolean;
 	isLoading: boolean;
+	buildLabel: string;
 	onRefresh: () => void;
 	onMusicPreferences: () => void;
 	onPrivacySettings: () => void;
@@ -32,6 +33,7 @@ export function ProfileView({
 	genres,
 	isRefreshing,
 	isLoading,
+	buildLabel,
 	onRefresh,
 	onMusicPreferences,
 	onPrivacySettings,
@@ -78,6 +80,8 @@ export function ProfileView({
 					onMyDevices={onMyDevices}
 					onConfirmLogout={onConfirmLogout}
 				/>
+
+				<Text style={styles.buildLabel}>{buildLabel}</Text>
 			</ScrollView>
 		</View>
 	);
@@ -94,6 +98,12 @@ const createStyles = (theme: Theme) =>
 		},
 		contentContainer: {
 			paddingBottom: theme.spacing.xl,
+		},
+		buildLabel: {
+			fontSize: 12,
+			color: theme.colors.textSecondary,
+			textAlign: 'center',
+			marginTop: theme.spacing.lg,
 		},
 		errorText: {
 			fontSize: 16,

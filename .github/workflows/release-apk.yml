@@ -51,6 +51,17 @@ jobs:
           exit "${missing:-0}"
 
       - run: npm ci
+
+      # Metro inlines EXPO_PUBLIC_* while bundling: set before prebuild so the
+      # app shows the release's build number and commit (#361).
+      - name: Stamp the build
+        run: |
+          build="$GITHUB_RUN_NUMBER"
+          # A re-run keeps the run number: give it its own tag
+          if [ "$GITHUB_RUN_ATTEMPT" -gt 1 ]; then build="$build.$GITHUB_RUN_ATTEMPT"; fi
+          echo "EXPO_PUBLIC_BUILD_NUMBER=$build" >> "$GITHUB_ENV"
+          echo "EXPO_PUBLIC_COMMIT_SHA=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+
       - run: npx expo prebuild --clean --platform android
       # Release is signed with signingConfigs.debug: keystores/debug.keystore
       # (plugins/withDebugKeystore.js), whose SHA-1 is registered with Google.
@@ -62,9 +73,7 @@ jobs:
         id: name
         run: |
           version=$(node -p "require('./app.config.js').expo.version")
-          tag="v${version}-build.${GITHUB_RUN_NUMBER}"
-          # A re-run keeps the run number: give it its own tag
-          if [ "$GITHUB_RUN_ATTEMPT" -gt 1 ]; then tag="$tag.$GITHUB_RUN_ATTEMPT"; fi
+          tag="v${version}-build.${EXPO_PUBLIC_BUILD_NUMBER}"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
           mv android/app/build/outputs/apk/release/app-release.apk "zumik-$tag.apk"
@@ -78,7 +87,7 @@ jobs:
         run: |
           gh release create "$TAG" "zumik-$TAG.apk" \
             --target "$GITHUB_SHA" \
-            --title "Zumik $VERSION (build $GITHUB_RUN_NUMBER)" \
+            --title "Zumik $VERSION (build $EXPO_PUBLIC_BUILD_NUMBER)" \
             --generate-notes \
             --latest
 
