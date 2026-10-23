@@ -35,6 +35,8 @@ jest.mock('@/shared/utils/toast', () => ({ showError: jest.fn() }));
 
 type Props = NativeStackScreenProps<PlaylistStackParamList, 'Playlists'>;
 
+const ME = { id: 'me', username: 'me', displayName: 'Moi' };
+
 const playlist = (id: string, overrides: Partial<Playlist> = {}): Playlist => ({
 	id,
 	name: id,
@@ -78,7 +80,10 @@ beforeEach(async () => {
 	signIn('me');
 	routes = mockFetchRoutes({
 		'GET /api/playlists': ok({
-			playlists: [playlist('Mine'), playlist('Shared', { ownerId: 'bob', visibility: 'private' })],
+			playlists: [
+				playlist('Mine', { owner: ME }),
+				playlist('Shared', { ownerId: 'bob', visibility: 'private' }),
+			],
 		}),
 		'GET /api/playlists/public': ok({
 			playlists: [playlist('Open', { ownerId: 'bob', owner: { id: 'bob', username: 'bob' } })],
@@ -113,16 +118,27 @@ describe('PlaylistsOrchestrator', () => {
 	it("shows the friends' playlists, mine only, and the public ones", async () => {
 		await renderScreen();
 		expect(screen.getByText('Fred mix')).toBeTruthy();
-		expect(screen.getByText('par fred')).toBeTruthy();
 		expect(screen.getByText('Mine')).toBeTruthy();
 		expect(screen.queryByText('Shared')).toBeNull();
-		expect(screen.getByText('par bob')).toBeTruthy();
+		expect(screen.getByText('Open')).toBeTruthy();
+	});
+
+	it('shows every owner as an avatar badge, named only for a screen reader', async () => {
+		await renderScreen();
+		expect(screen.queryByText(/^par /)).toBeNull();
+		expect(screen.getByLabelText('Fred mix, par fred')).toBeTruthy();
+		expect(screen.getByLabelText('Mine, par Moi')).toBeTruthy();
+		expect(screen.getByLabelText('Open, par bob')).toBeTruthy();
+		// Initials without a photo: one badge per card.
+		for (const initials of ['FR', 'MO', 'BO']) {
+			expect(screen.getByText(initials, { includeHiddenElements: true })).toBeTruthy();
+		}
 	});
 
 	it('opens a playlist, the form from the header, and the friends tab', async () => {
 		routes.routes['GET /api/friends'] = ok([]);
 		await renderScreen();
-		fireEvent.press(screen.getByLabelText('Mine'));
+		fireEvent.press(screen.getByLabelText('Mine, par Moi'));
 		expect(navigation.navigate).toHaveBeenCalledWith('PlaylistDetail', { id: 'Mine' });
 		fireEvent.press(screen.getByText('Trouver des amis'));
 		expect(parentNavigate).toHaveBeenCalledWith('FriendsTab');

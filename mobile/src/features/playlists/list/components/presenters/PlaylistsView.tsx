@@ -20,14 +20,13 @@ export function PlaylistsView({ screen }: { screen: PlaylistsScreen }) {
 
 	if (screen.isInitialLoading) return <PlaylistsSkeleton />;
 
-	const grid = (playlists: Playlist[], showOwner = false) => (
+	const grid = (playlists: Playlist[]) => (
 		<View style={styles.grid}>
 			{playlists.map(playlist => (
 				<PlaylistGridCard
 					key={playlist.id}
 					playlist={playlist}
 					onPress={() => screen.openPlaylist(playlist.id)}
-					showOwner={showOwner}
 				/>
 			))}
 		</View>
@@ -89,7 +88,7 @@ export function PlaylistsView({ screen }: { screen: PlaylistsScreen }) {
 					(screen.publicLoading && screen.publicPlaylists.length === 0 ? (
 						<SkeletonList count={4} row={PlaylistCardSkeleton} style={styles.grid} />
 					) : screen.publicPlaylists.length > 0 ? (
-						grid(screen.publicPlaylists, true)
+						grid(screen.publicPlaylists)
 					) : (
 						<EmptyState icon="globe-outline" message="Aucune playlist publique disponible" />
 					))}

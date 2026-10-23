@@ -5,26 +5,29 @@ import { Pressable } from '@/shared/components/ui/Pressable';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { Playlist } from '@/features/playlists/types';
+import { playlistCardLabel, tracksLabel } from '@/features/playlists/list/utils/playlistLabels';
+import { OwnerAvatarBadge } from './OwnerAvatarBadge';
 import { PrivateBadge } from './PrivateBadge';
 
 const GRID_CARD_WIDTH = (Dimensions.get('window').width - 48 - 8) / 2;
 
 const coverOf = (playlist: Playlist) => playlist.coverUrl || playlist.firstTrackCover;
-const tracksLabel = (count: number) => `${count} ${count === 1 ? 'titre' : 'titres'}`;
 
 interface PlaylistGridCardProps {
 	playlist: Playlist;
 	onPress: () => void;
-	/** « par <owner> » instead of the track count. */
-	showOwner?: boolean;
 }
 
-export function PlaylistGridCard({ playlist, onPress, showOwner }: PlaylistGridCardProps) {
+export function PlaylistGridCard({ playlist, onPress }: PlaylistGridCardProps) {
 	const { styles } = useThemedStyles(createStyles);
-	const owner = showOwner ? playlist.owner : undefined;
+	const { owner } = playlist;
 
 	return (
-		<Pressable style={styles.tile} onPress={onPress} accessibilityLabel={playlist.name}>
+		<Pressable
+			style={styles.tile}
+			onPress={onPress}
+			accessibilityLabel={playlistCardLabel(playlist.name, owner)}
+		>
 			<View>
 				<Artwork
 					uri={coverOf(playlist)}
@@ -33,13 +36,14 @@ export function PlaylistGridCard({ playlist, onPress, showOwner }: PlaylistGridC
 					style={styles.tileCover}
 				/>
 				{playlist.visibility === 'private' && <PrivateBadge style={styles.tileBadge} />}
+				{owner && <OwnerAvatarBadge owner={owner} />}
 			</View>
 			<View style={styles.tileInfo}>
 				<Text style={styles.tileName} numberOfLines={1}>
 					{playlist.name}
 				</Text>
 				<Text style={styles.meta} numberOfLines={1}>
-					{owner ? `par ${owner.displayName || owner.username}` : tracksLabel(playlist.trackCount)}
+					{tracksLabel(playlist.trackCount)}
 				</Text>
 			</View>
 		</Pressable>
