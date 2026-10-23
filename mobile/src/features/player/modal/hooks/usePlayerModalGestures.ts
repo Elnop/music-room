@@ -15,8 +15,12 @@ import {
 export function usePlayerModalGestures(isModalOpen: boolean, onClose: () => void) {
 	const translateY = useSharedValue(0);
 
+	// The seek bar's native touch: while it holds the finger, the dismiss pan cannot start.
+	const sliderGesture = Gesture.Native().withTestId('player-seek-native');
+
 	const panGesture = Gesture.Pan()
 		.withTestId('player-modal-pan')
+		.requireExternalGestureToFail(sliderGesture)
 		.activeOffsetY(10)
 		.failOffsetX([-15, 15])
 		.onUpdate(event => {
@@ -48,5 +52,5 @@ export function usePlayerModalGestures(isModalOpen: boolean, onClose: () => void
 		}
 	}, [isModalOpen, translateY]);
 
-	return { panGesture, animatedStyle };
+	return { panGesture, sliderGesture, animatedStyle };
 }
