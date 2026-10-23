@@ -38,6 +38,7 @@ Each rule `check` enforces has a section in `.agents/rules/`, and its error mess
 | Adding an import across folders, a feature, or a module in `shared/` | `.agents/rules/architecture.md` |
 | Creating a file or a folder | `.agents/rules/structure.md` |
 | Logging anything | `.agents/rules/logging.md` |
+| Writing or editing a comment | `.agents/rules/comments.md` |
 | Mobile: fetching server data, or adding or reading a Zustand store | `.agents/rules/state.md` |
 | Authoring or editing mobile components, orchestrators, presenters, or hooks | `.agents/rules/components.md` |
 | `npm run check` fails, or touching a guardrail or an exception list | `.agents/rules/guardrails.md` |
