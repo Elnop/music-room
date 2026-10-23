@@ -83,6 +83,8 @@ npx jest src/shared/utils/formatters.test.ts                 # one file
 npx jest -t "formatDuration"                          # tests whose name matches
 ```
 
+Mobile tests run with a 15 s timeout (`testTimeout` in `mobile/package.json`) instead of Jest's 5 s. On a cold transform cache (fresh clone, CI, `npx jest --clearCache`), the first test of a suite pays for Babel transforming the modules its first render loads on demand (react-native's lazy getters, UI primitives): about 2.4 s for `PlaylistSharingOrchestrator.test.tsx` alone, against 0.8 s once they are transformed and 0.05 s for the next tests. Under `npm run check`, which runs Jest alongside tsc and ESLint, that first test went past 5 s (#389). The cost cannot be removed, only moved; preloading all of react-native in a setup file would slow every suite.
+
 `npm run check` in `backend/` or `mobile/` runs the unit tests together with every other guardrail (type-check, lint, knip, dependency-cruiser, jscpd, semgrep, ast-grep, gitleaks, exception lists); the pre-commit hook runs it on the projects a commit touches. What each check does and how to fix a failure: `.agents/rules/guardrails.md`.
 
 ## Coverage

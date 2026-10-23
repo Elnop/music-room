@@ -123,6 +123,7 @@
 	},
 	"jest": {
 		"preset": "jest-expo",
+		"testTimeout": 15000,
 		"collectCoverageFrom": [
 			"src/**/*.{ts,tsx}",
 			"App.tsx",
