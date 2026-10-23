@@ -16,7 +16,8 @@ Where a file goes is set by the target layout in `docs/superpowers/specs/2026-10
   └── <subject>/
       ├── components/orchestrators/
       ├── components/presenters/
-      └── hooks/
+      ├── hooks/
+      └── utils/                                                             (optional: the subject's own helpers, no JSX)
   ```
 
   `src/shared/` holds what several features use:

@@ -134,7 +134,7 @@ Pour débuter, voici les 5 commandes que vous utiliserez le plus :
 
 ## Architecture
 
-Issue de l'epic #362 : `src/shared/`, `src/providers/`, `src/navigation/` et `src/features/<feature>/`. Toutes les features ont été entièrement migrées (#378–#385) selon le pattern orchestrators / presenters / hooks, et l'ensemble des règles de composants est garanti par le plugin ESLint sans aucune exception. Chaque feature a une seule arborescence : ce que ses sujets partagent (`hooks/`, `services/`, `stores/`, `utils/`, `types.ts`…) à sa racine, ses providers React dans `context/`, et un dossier par sujet, même s'il n'y en a qu'un, qui contient `components/orchestrators/`, `components/presenters/` et `hooks/`.
+Issue de l'epic #362 : `src/shared/`, `src/providers/`, `src/navigation/` et `src/features/<feature>/`. Toutes les features ont été entièrement migrées (#378–#385) selon le pattern orchestrators / presenters / hooks, et l'ensemble des règles de composants est garanti par le plugin ESLint sans aucune exception. Chaque feature a une seule arborescence : ce que ses sujets partagent (`hooks/`, `services/`, `stores/`, `utils/`, `types.ts`…) à sa racine, ses providers React dans `context/`, et un dossier par sujet, même s'il n'y en a qu'un, qui contient `components/orchestrators/`, `components/presenters/`, `hooks/` et, au besoin, `utils/`.
 
 ```
 mobile/src/
