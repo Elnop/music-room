@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { Text } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Artwork } from '@/shared/components/media/Artwork';
 import { TrackActionsButton } from '@/shared/components/lists/TrackActionsButton';
+import { QueueTrackDetails } from './QueueTrackDetails';
 import { createRowStyles, formatDuration } from './queueModalStyles';
 import type { QueueItem } from '@/features/queue/types';
 
@@ -17,29 +18,6 @@ interface QueueItemRowProps {
 	onDragStart?: () => void;
 	isDragActive?: boolean;
 	onShowActions?: (item: QueueItem) => void;
-}
-
-function QueueTrackDetails({
-	title,
-	artist,
-	isCurrent,
-	styles,
-}: {
-	title: string;
-	artist: string;
-	isCurrent: boolean;
-	styles: ReturnType<typeof createRowStyles>;
-}) {
-	return (
-		<View style={styles.trackInfo}>
-			<Text style={[styles.trackTitle, isCurrent && styles.trackTitleCurrent]} numberOfLines={1}>
-				{title}
-			</Text>
-			<Text style={styles.trackArtist} numberOfLines={1}>
-				{artist}
-			</Text>
-		</View>
-	);
 }
 
 export function QueueItemRow({

@@ -11,10 +11,8 @@ import { useCoverGradient } from '@/features/playlists/detail/hooks/useCoverGrad
 import { PlaylistDetailView } from '@/features/playlists/detail/components/presenters/PlaylistDetailView';
 import { PlaylistHeader } from '@/features/playlists/detail/components/presenters/PlaylistHeader';
 import { PlayPlaylistButton } from '@/features/playlists/detail/components/presenters/PlayPlaylistButton';
-import {
-	DetailSkeleton,
-	LoadFailure,
-} from '@/features/playlists/detail/components/presenters/DetailStates';
+import { DetailSkeleton } from '@/features/playlists/detail/components/presenters/DetailSkeleton';
+import { LoadFailure } from '@/features/playlists/detail/components/presenters/LoadFailure';
 import {
 	HeaderIconButton,
 	headerButtonStyles,

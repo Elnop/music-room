@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, Modal, KeyboardAvoidingView, Platform } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
@@ -6,58 +6,32 @@ import { Input } from '@/shared/components/ui/Input';
 import { Button } from '@/shared/components/ui/Button';
 import { Pressable } from '@/shared/components/ui/Pressable';
 
-/** Same bounds as the backend (PATCH /api/music-control/devices/:deviceId). */
 const DEVICE_NAME_MAX_LENGTH = 40;
 
-interface RenameDeviceModalProps {
+interface RenameDeviceModalViewProps {
 	/** Name shown now; the field starts with it. Null hides the modal. */
 	deviceName: string | null;
-	/** True while the request runs: the buttons are disabled. */
 	saving: boolean;
+	name: string;
+	error?: string;
+	onChangeName: (name: string) => void;
 	onClose: () => void;
-	/** The trimmed new name, or null to go back to the system name. */
-	onSubmit: (name: string | null) => void;
+	onSave: () => void;
+	onReset: () => void;
 }
 
-/**
- * Small form to rename one of my devices (#352): the field starts with the
- * current name; « Enregistrer » sends the trimmed name, « Nom d'origine » goes
- * back to the name the system gives.
- */
-export function RenameDeviceModal({
+export function RenameDeviceModalView({
 	deviceName,
 	saving,
+	name,
+	error,
+	onChangeName,
 	onClose,
-	onSubmit,
-}: RenameDeviceModalProps) {
+	onSave,
+	onReset,
+}: RenameDeviceModalViewProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
-	const [name, setName] = useState(deviceName ?? '');
-	const [error, setError] = useState<string | undefined>();
-
-	// Each opening starts from the device's name (state reset during render,
-	// not in an effect).
-	const [openedFor, setOpenedFor] = useState(deviceName);
-	if (deviceName !== openedFor) {
-		setOpenedFor(deviceName);
-		if (deviceName !== null) {
-			setName(deviceName);
-			setError(undefined);
-		}
-	}
-
-	const handleSave = () => {
-		const trimmed = name.trim();
-		if (trimmed.length === 0) {
-			setError('Saisissez un nom');
-			return;
-		}
-		if (trimmed.length > DEVICE_NAME_MAX_LENGTH) {
-			setError(`${DEVICE_NAME_MAX_LENGTH} caractères au maximum`);
-			return;
-		}
-		onSubmit(trimmed);
-	};
 
 	return (
 		<Modal visible={deviceName !== null} animationType="fade" transparent onRequestClose={onClose}>
@@ -71,20 +45,17 @@ export function RenameDeviceModal({
 					<Input
 						label="Nom de l'appareil"
 						value={name}
-						onChangeText={text => {
-							setName(text);
-							setError(undefined);
-						}}
+						onChangeText={onChangeName}
 						error={error}
 						maxLength={DEVICE_NAME_MAX_LENGTH}
 						autoFocus
 						returnKeyType="done"
-						onSubmitEditing={handleSave}
+						onSubmitEditing={onSave}
 						editable={!saving}
 					/>
 					<Button
 						title="Enregistrer"
-						onPress={handleSave}
+						onPress={onSave}
 						loading={saving}
 						fullWidth
 						style={styles.button}
@@ -92,7 +63,7 @@ export function RenameDeviceModal({
 					<Button
 						title="Nom d'origine"
 						variant="outline"
-						onPress={() => onSubmit(null)}
+						onPress={onReset}
 						disabled={saving}
 						fullWidth
 						style={styles.button}

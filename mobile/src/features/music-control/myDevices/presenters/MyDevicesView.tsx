@@ -6,8 +6,9 @@ import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import type { UserDeviceWithLicenses } from '@/features/music-control/types';
 import type { FriendUserSummary } from '@/shared/services/friendsBridge';
 import { DeviceCard } from './DeviceCard';
-import { RenameDeviceModal } from './RenameDeviceModal';
-import { MyDevicesHeader, MyDevicesLoadingView, MyDevicesErrorView } from './MyDevicesStates';
+import { MyDevicesHeader } from './MyDevicesHeader';
+import { MyDevicesLoadingView } from './MyDevicesLoadingView';
+import { MyDevicesErrorView } from './MyDevicesErrorView';
 
 interface MyDevicesViewProps {
 	isLoading: boolean;
@@ -20,14 +21,10 @@ interface MyDevicesViewProps {
 	currentDeviceId: string | null;
 	licensed: Set<string>;
 	pending: Set<string>;
-	renamingDevice: UserDeviceWithLicenses | null;
-	isRenameSaving: boolean;
 	pairKey: (deviceId: string, userId: string) => string;
 	onRefresh: () => void;
 	onToggle: (device: UserDeviceWithLicenses, friend: FriendUserSummary, grant: boolean) => void;
 	onOpenRename: (device: UserDeviceWithLicenses) => void;
-	onCloseRename: () => void;
-	onSubmitRename: (name: string | null) => void;
 	onNavigateFriends: () => void;
 }
 
@@ -42,14 +39,10 @@ export function MyDevicesView({
 	currentDeviceId,
 	licensed,
 	pending,
-	renamingDevice,
-	isRenameSaving,
 	pairKey,
 	onRefresh,
 	onToggle,
 	onOpenRename,
-	onCloseRename,
-	onSubmitRename,
 	onNavigateFriends,
 }: MyDevicesViewProps) {
 	const { theme } = useTheme();
@@ -108,12 +101,6 @@ export function MyDevicesView({
 					))
 				)}
 			</ScrollView>
-			<RenameDeviceModal
-				deviceName={renamingDevice?.deviceName ?? null}
-				saving={isRenameSaving}
-				onClose={onCloseRename}
-				onSubmit={onSubmitRename}
-			/>
 		</View>
 	);
 }

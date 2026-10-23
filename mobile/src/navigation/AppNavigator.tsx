@@ -26,7 +26,7 @@ import { FriendsNavigator, type FriendsStackParamList } from '@/navigation/stack
 // Player components
 import { MiniPlayer } from '@/features/player/components/miniPlayer/components/orchestrators/MiniPlayer';
 import { PlayerModal } from '@/features/player/components/modal/components/orchestrators/PlayerModal';
-import { PlayerErrorToast } from '@/features/player/components/feedback/PlayerErrorToast';
+import { PlayerErrorToast } from '@/features/player/components/modal/components/orchestrators/PlayerErrorToast';
 import { PlayerProvider } from '@/features/player/context/PlayerProvider';
 import { useQueueSync } from '@/features/queue/hooks/useQueueSync';
 import { useRemoteTarget } from '@/features/queue/hooks/useRemoteTarget';
