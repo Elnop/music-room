@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'react';
 import type { PlayerContextValue } from '@/features/player/types';
 import { MINI_PLAYER_HEIGHT } from '@/features/player/constants';
+import { useMiniPlayerLayoutStore } from '@/features/player/stores/miniPlayerLayoutStore';
 
 export { MINI_PLAYER_HEIGHT } from '@/features/player/constants';
 export const PlayerContext = createContext<PlayerContextValue | null>(null);
@@ -13,7 +14,7 @@ export function usePlayer(): PlayerContextValue {
 	return context;
 }
 
-/** Constant: the mini-player is always shown. */
+/** The mini-player is always shown: its measured height, or the estimate before its first layout. */
 export function usePlayerHeight(): number {
-	return MINI_PLAYER_HEIGHT;
+	return useMiniPlayerLayoutStore(state => state.height) ?? MINI_PLAYER_HEIGHT;
 }

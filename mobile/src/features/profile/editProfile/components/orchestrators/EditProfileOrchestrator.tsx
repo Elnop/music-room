@@ -5,7 +5,7 @@ import { EditProfileView } from '@/features/profile/editProfile/components/prese
 export function EditProfileOrchestrator() {
 	const {
 		theme,
-		playerHeight,
+		bottomPadding,
 		user,
 		error,
 		isUploading,
@@ -21,7 +21,7 @@ export function EditProfileOrchestrator() {
 	return (
 		<EditProfileView
 			theme={theme}
-			playerHeight={playerHeight}
+			bottomPadding={bottomPadding}
 			user={user}
 			error={error}
 			isUploading={isUploading}

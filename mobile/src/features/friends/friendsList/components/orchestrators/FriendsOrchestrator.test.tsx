@@ -1,5 +1,7 @@
 import React from 'react';
-import { screen, fireEvent, waitFor } from '@testing-library/react-native';
+import { act, screen, fireEvent, waitFor } from '@testing-library/react-native';
+import { createStore } from 'zustand';
+import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
 import { friendsApi } from '@/features/friends/services/friendsApi';
 import { renderWithClient } from '@/test/renderWithClient';
 import { signIn } from '@/test/session';
@@ -47,6 +49,21 @@ jest.mock('@/features/friends/services/friendsApi', () => ({
 }));
 
 const SEARCH_EMPTY = 'Commencez à taper pour trouver des utilisateurs';
+const BOB = { id: 'f1', username: 'bob', displayName: 'Bob' };
+
+function signedOutSession() {
+	const store = createStore<SessionView>(() => ({
+		user: null,
+		accessToken: null,
+		isAuthenticated: false,
+	}));
+	registerAuthSession({
+		store,
+		isTokenExpiringSoon: () => false,
+		refreshAccessToken: () => Promise.resolve(true),
+	});
+	return store;
+}
 
 describe('FriendsOrchestrator', () => {
 	beforeEach(() => {
@@ -94,5 +111,38 @@ describe('FriendsOrchestrator', () => {
 		await waitFor(() => {
 			expect(friendsApi.grantControl).toHaveBeenCalledWith('f1');
 		});
+	});
+
+	it('shows the friends once the session signs in, instead of switching to the search', async () => {
+		const session = signedOutSession();
+		jest.mocked(friendsApi.getFriends).mockResolvedValue([BOB]);
+
+		renderWithClient(<FriendsOrchestrator />);
+		act(() => {
+			session.setState({
+				user: { id: 'me', username: 'me' } as SessionView['user'],
+				accessToken: 'access',
+				isAuthenticated: true,
+			});
+		});
+
+		expect(await screen.findByText('bob')).toBeTruthy();
+		expect(screen.queryByPlaceholderText('Rechercher un utilisateur...')).toBeNull();
+	});
+
+	it('shows an error with a retry when the friends fail to load', async () => {
+		jest
+			.mocked(friendsApi.getFriends)
+			.mockRejectedValueOnce(new Error('boom'))
+			.mockResolvedValue([BOB]);
+
+		renderWithClient(<FriendsOrchestrator />);
+
+		expect(await screen.findByText('Impossible de charger vos amis')).toBeTruthy();
+		expect(screen.queryByText(SEARCH_EMPTY)).toBeNull();
+
+		fireEvent.press(screen.getByText('Réessayer'));
+
+		expect(await screen.findByText('bob')).toBeTruthy();
 	});
 });

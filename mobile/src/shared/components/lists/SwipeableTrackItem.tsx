@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
@@ -23,6 +23,10 @@ interface SwipeableTrackItemProps {
 	onShowActions?: () => void;
 	/** The track playing now from this playlist: highlighted like the queue's current item. */
 	isCurrent?: boolean;
+	/** A tap on the row; without it, the row only reacts to a long press. */
+	onPress?: () => void;
+	/** Shows a spinner while the tap's request runs. */
+	isPending?: boolean;
 }
 
 export function SwipeableTrackItem({
@@ -34,6 +38,8 @@ export function SwipeableTrackItem({
 	isDragActive = false,
 	onShowActions,
 	isCurrent = false,
+	onPress,
+	isPending = false,
 }: SwipeableTrackItemProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
@@ -55,10 +61,11 @@ export function SwipeableTrackItem({
 			renderRightActions={disabled ? undefined : renderRightActions}
 		>
 			<Pressable
+				onPress={onPress}
 				onLongPress={onShowActions}
 				accessibilityLabel={`${track.title}, ${track.artist}`}
 				accessibilityHint={onShowActions ? 'Appui long pour les actions du titre' : undefined}
-				accessibilityState={{ selected: isCurrent }}
+				accessibilityState={{ selected: isCurrent, busy: isPending }}
 				style={[
 					styles.trackContainer,
 					isCurrent && styles.trackContainerCurrent,
@@ -85,7 +92,16 @@ export function SwipeableTrackItem({
 					</Text>
 				</View>
 
-				{isCurrent && (
+				{isPending && (
+					<ActivityIndicator
+						size="small"
+						color={theme.colors.primary}
+						style={styles.playingIcon}
+						accessibilityLabel="Lancement"
+					/>
+				)}
+
+				{isCurrent && !isPending && (
 					<Ionicons
 						name="volume-high"
 						size={18}

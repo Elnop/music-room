@@ -31,7 +31,7 @@ interface QueueStoreState {
 	playItem: (itemId: string) => Promise<QueueStepOutcome>;
 	removeItem: (itemId: string) => Promise<boolean>;
 	moveItem: (itemId: string, afterItemId: string | null) => Promise<boolean>;
-	playPlaylist: (playlistId: string) => Promise<QueueStepOutcome>;
+	playPlaylist: (playlistId: string, startTrackId?: string) => Promise<QueueStepOutcome>;
 	playListTrack: (track: SoundCloudTrack) => Promise<void>;
 }
 
@@ -127,9 +127,9 @@ export const useQueueStore = create<QueueStoreState>((set, get) => ({
 			'Impossible de déplacer ce titre'
 		),
 
-	playPlaylist: playlistId =>
+	playPlaylist: (playlistId, startTrackId) =>
 		runStep(
-			asStep(call => queueApi.playPlaylist(playlistId, call)),
+			asStep(call => queueApi.playPlaylist(playlistId, call, startTrackId)),
 			'Play playlist',
 			get().applyState,
 			{ errorMessage: playPlaylistError }

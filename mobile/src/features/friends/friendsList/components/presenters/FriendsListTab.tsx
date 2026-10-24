@@ -11,6 +11,8 @@ import { createFriendsListStyles } from './friendsListStyles';
 interface FriendsListTabProps {
 	friends: FriendProfile[];
 	isLoading: boolean;
+	loadFailed: boolean;
+	onRetry: () => void;
 	isRefreshing: boolean;
 	onRefresh: () => void;
 	canControl: (friendId: string) => boolean;
@@ -18,12 +20,14 @@ interface FriendsListTabProps {
 	onToggleControl: (friendId: string, current: boolean) => void;
 	onSelectUser: (userId: string) => void;
 	onGoToSearch: () => void;
-	playerHeight: number;
+	bottomPadding: number;
 }
 
 export function FriendsListTab({
 	friends,
 	isLoading,
+	loadFailed,
+	onRetry,
 	isRefreshing,
 	onRefresh,
 	canControl,
@@ -31,7 +35,7 @@ export function FriendsListTab({
 	onToggleControl,
 	onSelectUser,
 	onGoToSearch,
-	playerHeight,
+	bottomPadding,
 }: FriendsListTabProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createFriendsListStyles(theme), [theme]);
@@ -61,20 +65,26 @@ export function FriendsListTab({
 					onToggleControl={onToggleControl}
 				/>
 			)}
-			contentContainerStyle={[
-				styles.listContent,
-				{ paddingBottom: playerHeight + theme.spacing.xl },
-			]}
+			contentContainerStyle={[styles.listContent, { paddingBottom: bottomPadding }]}
 			ListEmptyComponent={
-				<EmptyState
-					style={styles.emptyState}
-					icon="people-outline"
-					message="Aucun ami pour l'instant. Suivez des utilisateurs qui vous suivent en retour pour devenir amis."
-					action={{
-						label: 'Rechercher des utilisateurs',
-						onPress: onGoToSearch,
-					}}
-				/>
+				loadFailed ? (
+					<EmptyState
+						style={styles.emptyState}
+						icon="cloud-offline-outline"
+						message="Impossible de charger vos amis"
+						action={{ label: 'Réessayer', onPress: onRetry }}
+					/>
+				) : (
+					<EmptyState
+						style={styles.emptyState}
+						icon="people-outline"
+						message="Aucun ami pour l'instant. Suivez des utilisateurs qui vous suivent en retour pour devenir amis."
+						action={{
+							label: 'Rechercher des utilisateurs',
+							onPress: onGoToSearch,
+						}}
+					/>
+				)
 			}
 		/>
 	);

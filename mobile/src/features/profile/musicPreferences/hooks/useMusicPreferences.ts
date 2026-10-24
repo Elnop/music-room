@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { useUserMusicPreferences } from '@/features/profile/hooks/useProfileQueries';
 import { useUpdateMusicPreferencesMutation } from '@/features/profile/hooks/useProfileMutations';
-import { usePlayerHeight } from '@/shared/services/playbackBridge';
+import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 import { showError } from '@/shared/utils/toast';
@@ -11,7 +11,7 @@ import { MAX_GENRES } from '@/types/user.types';
 
 export function useMusicPreferences() {
 	const { theme } = useTheme();
-	const playerHeight = usePlayerHeight();
+	const bottomPadding = useBottomPadding();
 	const navigation = useNavigation();
 
 	const preferencesQuery = useUserMusicPreferences();
@@ -61,7 +61,7 @@ export function useMusicPreferences() {
 
 	return {
 		theme,
-		playerHeight,
+		bottomPadding,
 		isLoading: preferencesQuery.isLoading,
 		isSaving: updateMutation.isPending,
 		selectedGenres,

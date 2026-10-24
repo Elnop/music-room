@@ -32,6 +32,7 @@ export function MiniPlayerView({ data }: MiniPlayerViewProps) {
 		onTogglePlay,
 		onNext,
 		infoStyle,
+		onLayout,
 	} = data;
 
 	const remoteLine = deviceLabel ? (
@@ -43,6 +44,7 @@ export function MiniPlayerView({ data }: MiniPlayerViewProps) {
 	return (
 		<Pressable
 			style={styles.container}
+			onLayout={onLayout}
 			onPress={onToggleModal}
 			accessible={false}
 			accessibilityLabel="Mini-lecteur"

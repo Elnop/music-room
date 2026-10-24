@@ -18,7 +18,7 @@ interface SearchViewProps {
 	isError: boolean;
 	searchResults: SoundCloudTrack[];
 	actionTrack: AddQueueItemBody | null;
-	playerHeight: number;
+	bottomPadding: number;
 	onSearchChange: (text: string) => void;
 	onRefresh: () => void;
 	onRetry: () => void;
@@ -36,7 +36,7 @@ export function SearchView({
 	isError,
 	searchResults,
 	actionTrack,
-	playerHeight,
+	bottomPadding,
 	onSearchChange,
 	onRefresh,
 	onRetry,
@@ -83,7 +83,7 @@ export function SearchView({
 						/>
 					)}
 					contentContainerStyle={{
-						paddingBottom: playerHeight + theme.spacing.xxl,
+						paddingBottom: bottomPadding,
 						flexGrow: 1,
 					}}
 					ListEmptyComponent={

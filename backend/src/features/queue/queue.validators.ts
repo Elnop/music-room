@@ -13,9 +13,16 @@ export const queueOwnerParamsSchema = z.object({
 	userId: z.uuid('Invalid user ID format').optional(),
 });
 
+const playbackBodySchema = z.object({ deviceId: z.string().min(1).max(128).optional() });
+
 /** The owner's device that must play; a delegate must send it. */
-export const queuePlaybackSchema = z
-	.object({ deviceId: z.string().min(1).max(128).optional() })
+export const queuePlaybackSchema = playbackBodySchema.optional().transform(body => body ?? {});
+
+/** `startTrackId` is a track of the playlist (its `id` in the playlist's `tracks`); without it, the first plays. */
+export const queuePlayPlaylistSchema = playbackBodySchema
+	.extend({
+		startTrackId: z.uuid('Invalid playlist track ID format').optional(),
+	})
 	.optional()
 	.transform(body => body ?? {});
 

@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { usePlayerHeight } from '@/shared/services/playbackBridge';
+import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
 import { showError } from '@/shared/utils/toast';
 import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 import { logger } from '@/shared/utils/logger';
@@ -9,10 +9,12 @@ import { useToggleControlMutation } from '@/features/friends/hooks/useFriendsMut
 import { useDebouncedUserSearch } from './useDebouncedUserSearch';
 
 export function useFriendsListScreen(onNavigateToProfile: (userId: string) => void) {
-	const playerHeight = usePlayerHeight();
+	const bottomPadding = useBottomPadding();
 	const {
 		data: friends = [],
-		isLoading: isLoadingFriends,
+		isPending: isLoadingFriends,
+		isSuccess: hasLoadedFriends,
+		isError: friendsFailed,
 		refetch: refetchFriends,
 	} = useFriendsList();
 	const { data: permissions = [], refetch: refetchPermissions } = useControlPermissions();
@@ -23,13 +25,14 @@ export function useFriendsListScreen(onNavigateToProfile: (userId: string) => vo
 	const [togglingUserId, setTogglingUserId] = useState<string | null>(null);
 	const [isRefreshingFriends, setIsRefreshingFriends] = useState(false);
 
+	// Only a successful empty answer opens the search: a disabled or failed query must leave the friends tab.
 	const hasCheckedEmptyRef = useRef(false);
 	useEffect(() => {
-		if (!isLoadingFriends && friends.length === 0 && !hasCheckedEmptyRef.current) {
+		if (hasLoadedFriends && friends.length === 0 && !hasCheckedEmptyRef.current) {
 			hasCheckedEmptyRef.current = true;
 			setActiveTab('search');
 		}
-	}, [isLoadingFriends, friends.length]);
+	}, [hasLoadedFriends, friends.length]);
 
 	const handleToggleControl = useCallback(
 		async (friendId: string, currentValue: boolean) => {
@@ -69,6 +72,8 @@ export function useFriendsListScreen(onNavigateToProfile: (userId: string) => vo
 		activeTab,
 		friends,
 		isLoadingFriends,
+		friendsFailed: friendsFailed && friends.length === 0,
+		onRetryFriends: refetchFriends,
 		isRefreshingFriends,
 		onRefreshFriends: handleRefreshFriends,
 		...search,
@@ -78,6 +83,6 @@ export function useFriendsListScreen(onNavigateToProfile: (userId: string) => vo
 		onToggleControl: handleToggleControl,
 		onSelectUser: onNavigateToProfile,
 		onTabChange: setActiveTab,
-		playerHeight,
+		bottomPadding,
 	};
 }

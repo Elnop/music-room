@@ -12,6 +12,8 @@ interface FriendsListViewProps {
 	activeTab: 'friends' | 'search';
 	friends: FriendProfile[];
 	isLoadingFriends: boolean;
+	friendsFailed: boolean;
+	onRetryFriends: () => void;
 	isRefreshingFriends: boolean;
 	onRefreshFriends: () => void;
 	searchQuery: string;
@@ -28,13 +30,15 @@ interface FriendsListViewProps {
 	onToggleControl: (friendId: string, current: boolean) => void;
 	onSelectUser: (userId: string) => void;
 	onTabChange: (tab: 'friends' | 'search') => void;
-	playerHeight: number;
+	bottomPadding: number;
 }
 
 export function FriendsListView({
 	activeTab,
 	friends,
 	isLoadingFriends,
+	friendsFailed,
+	onRetryFriends,
 	isRefreshingFriends,
 	onRefreshFriends,
 	searchQuery,
@@ -51,11 +55,10 @@ export function FriendsListView({
 	onToggleControl,
 	onSelectUser,
 	onTabChange,
-	playerHeight,
+	bottomPadding,
 }: FriendsListViewProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createFriendsListStyles(theme), [theme]);
-	const showSearch = activeTab === 'search' || (!hasFriends && !isLoadingFriends);
 
 	return (
 		<View style={styles.container}>
@@ -82,7 +85,7 @@ export function FriendsListView({
 						</Pressable>
 					</View>
 				)}
-				{showSearch && (
+				{activeTab === 'search' && (
 					<SearchBar
 						value={searchQuery}
 						onChangeText={onSearchChange}
@@ -96,6 +99,8 @@ export function FriendsListView({
 				<FriendsListTab
 					friends={friends}
 					isLoading={isLoadingFriends}
+					loadFailed={friendsFailed}
+					onRetry={onRetryFriends}
 					isRefreshing={isRefreshingFriends}
 					onRefresh={onRefreshFriends}
 					canControl={canControl}
@@ -103,7 +108,7 @@ export function FriendsListView({
 					onToggleControl={onToggleControl}
 					onSelectUser={onSelectUser}
 					onGoToSearch={() => onTabChange('search')}
-					playerHeight={playerHeight}
+					bottomPadding={bottomPadding}
 				/>
 			) : (
 				<SearchUsersTab
@@ -115,7 +120,7 @@ export function FriendsListView({
 					onRefresh={onRefreshSearch}
 					onRetry={onRetrySearch}
 					onSelectUser={onSelectUser}
-					playerHeight={playerHeight}
+					bottomPadding={bottomPadding}
 				/>
 			)}
 		</View>

@@ -17,7 +17,9 @@ interface PlaylistDetailViewProps {
 	gradient: readonly [string, string, ...string[]];
 	isRefreshing: boolean;
 	onRefresh: () => void;
-	playerHeight: number;
+	bottomPadding: number;
+	onPlayTrack: (track: { id: string; trackUri: string }) => void;
+	pendingTrackId: string | null;
 }
 
 export function PlaylistDetailView({
@@ -27,7 +29,9 @@ export function PlaylistDetailView({
 	gradient,
 	isRefreshing,
 	onRefresh,
-	playerHeight,
+	bottomPadding,
+	onPlayTrack,
+	pendingTrackId,
 }: PlaylistDetailViewProps) {
 	const { theme } = useTheme();
 	const insets = useSafeAreaInsets();
@@ -58,11 +62,13 @@ export function PlaylistDetailView({
 						onDragStart={canEdit ? drag : undefined}
 						isDragActive={isActive}
 						isCurrent={currentUri !== null && item.trackUri === currentUri}
+						onPress={() => onPlayTrack(item)}
+						isPending={pendingTrackId === item.id}
 					/>
 				)}
 				ListHeaderComponent={header}
 				// The last track scrolls clear of the mini player.
-				contentContainerStyle={[styles.list, { paddingBottom: playerHeight + theme.spacing.md }]}
+				contentContainerStyle={[styles.list, { paddingBottom: bottomPadding }]}
 				ListEmptyComponent={
 					<EmptyState
 						icon="musical-notes-outline"

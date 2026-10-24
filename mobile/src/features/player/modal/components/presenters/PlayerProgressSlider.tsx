@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import Slider from '@react-native-community/slider';
+import type { SeekPosition } from '@/features/player/modal/hooks/useSeekPosition';
 import type { createStyles } from './playerModalStyles';
 
 const formatTime = (seconds: number): string => {
@@ -17,25 +18,24 @@ interface PlayerProgressSliderProps {
 		sliderBg: string;
 		textSecondary: string;
 	};
-	currentTime: number;
+	seek: SeekPosition;
 	duration: number | null;
 	hasTrack: boolean;
 	disabled: boolean;
-	onSeek: (value: number) => void;
 	onSliderAction: (actionName: string) => void;
 }
 
 export function PlayerProgressSlider({
 	styles,
 	colors,
-	currentTime,
+	seek,
 	duration,
 	hasTrack,
 	disabled,
-	onSeek,
 	onSliderAction,
 }: PlayerProgressSliderProps) {
 	if (duration === null) return null;
+	const currentTime = seek.position;
 
 	const timeText = `${formatTime(hasTrack ? currentTime : 0)} sur ${formatTime(hasTrack ? duration : 0)}`;
 
@@ -57,7 +57,9 @@ export function PlayerProgressSlider({
 					minimumValue={0}
 					maximumValue={duration || 1}
 					value={hasTrack ? currentTime : 0}
-					onSlidingComplete={onSeek}
+					onSlidingStart={seek.onSlidingStart}
+					onValueChange={seek.onValueChange}
+					onSlidingComplete={seek.onSlidingComplete}
 					minimumTrackTintColor={colors.slider}
 					maximumTrackTintColor={colors.sliderBg}
 					thumbTintColor={colors.slider}

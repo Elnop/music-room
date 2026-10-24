@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ApiError } from '@/shared/services/api';
-import { usePlayerHeight } from '@/shared/services/playbackBridge';
+import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
 import { showError, showInfo } from '@/shared/utils/toast';
 import { usePlaylistDetail } from '@/features/playlists/hooks/usePlaylistQueries';
 import { usePlaylistRoom } from '@/features/playlists/hooks/usePlaylistRoom';
@@ -24,7 +24,7 @@ export interface PlaylistDetailScreen {
 	markDeleting: (deleting: boolean) => void;
 	/** Leaves for the list after the playlist was deleted, and forgets it. */
 	leaveDeleted: () => void;
-	playerHeight: number;
+	bottomPadding: number;
 }
 
 /** A share link may point to a private or deleted playlist: a 403 or 404 is « not found ». */
@@ -33,7 +33,7 @@ export function usePlaylistDetailScreen(
 	id: string
 ): PlaylistDetailScreen {
 	const client = useQueryClient();
-	const playerHeight = usePlayerHeight();
+	const bottomPadding = useBottomPadding();
 	const { deleted } = usePlaylistRoom(id);
 	const [gone, setGone] = useState(false);
 	const deletingRef = useRef(false);
@@ -82,6 +82,6 @@ export function usePlaylistDetailScreen(
 			deletingRef.current = deleting;
 		},
 		leaveDeleted,
-		playerHeight,
+		bottomPadding,
 	};
 }

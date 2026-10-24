@@ -1,6 +1,7 @@
 import { act, renderHook } from '@testing-library/react-native';
 import { MINI_PLAYER_HEIGHT, usePlayerHeight } from './PlayerContext';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
+import { useMiniPlayerLayoutStore } from '@/features/player/stores/miniPlayerLayoutStore';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
 // The system media controls are covered by MediaSessionBridge.test.tsx.
@@ -41,5 +42,11 @@ describe('usePlayerHeight', () => {
 		expect(result.current).toBe(MINI_PLAYER_HEIGHT);
 		act(() => usePlayerStore.setState({ currentTrack: track }));
 		expect(result.current).toBe(MINI_PLAYER_HEIGHT);
+	});
+
+	it('follows the measured mini-player height', () => {
+		const { result } = renderHook(() => usePlayerHeight());
+		act(() => useMiniPlayerLayoutStore.getState().setHeight(112));
+		expect(result.current).toBe(112);
 	});
 });
