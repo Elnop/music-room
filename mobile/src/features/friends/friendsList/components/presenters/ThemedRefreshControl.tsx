@@ -1,21 +1,7 @@
 import React from 'react';
-import { RefreshControl } from 'react-native';
+import { RefreshControl, type RefreshControlProps } from 'react-native';
 
-export function ThemedRefreshControl({
-	refreshing,
-	onRefresh,
-	color,
-}: {
-	refreshing: boolean;
-	onRefresh: () => void;
-	color: string;
-}) {
-	return (
-		<RefreshControl
-			refreshing={refreshing}
-			onRefresh={onRefresh}
-			tintColor={color}
-			colors={[color]}
-		/>
-	);
+/** On Android the list is passed as `children` (and its `style`): both must reach `RefreshControl`. */
+export function ThemedRefreshControl({ color, ...props }: RefreshControlProps & { color: string }) {
+	return <RefreshControl {...props} tintColor={color} colors={[color]} />;
 }
