@@ -6,11 +6,14 @@ import { useQueueAutoAdvance } from '@/features/player/hooks/useQueueAutoAdvance
 import { useStreamWatchdog } from '@/features/player/hooks/useStreamWatchdog';
 import { useNextTrackPrefetch } from '@/features/player/hooks/useNextTrackPrefetch';
 import { useAudioInterruption } from '@/features/player/hooks/useAudioInterruption';
+import { useBackgroundKeepAlive } from '@/features/player/hooks/useBackgroundKeepAlive';
 import { configureAudioMode } from '@/features/player/services/audioMode';
+import { registerJsKeepAliveTask } from '@/features/player/services/jsKeepAlive';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { MediaSessionBridge } from '@/features/player/mediaSession/components/orchestrators/MediaSessionBridge';
 
 configureAudioMode();
+registerJsKeepAliveTask();
 
 export function PlayerProvider({ children }: { children: React.ReactNode }) {
 	const { player, seekTo } = usePlayerAudio();
@@ -22,6 +25,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 	useStreamWatchdog(player);
 	useNextTrackPrefetch(player);
 	useAudioInterruption(player);
+	useBackgroundKeepAlive();
 
 	const value = React.useMemo(
 		() => ({ player, seekTo, loading, error }),

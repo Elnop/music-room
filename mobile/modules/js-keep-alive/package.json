@@ -1,0 +1,6 @@
+{
+  "name": "js-keep-alive",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Keeps React Native's JS timers running in the background while local playback is active (Android)."
+}
