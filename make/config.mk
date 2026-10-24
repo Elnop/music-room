@@ -171,6 +171,10 @@ METRO_ADDRESS := $(HOST_IP):$(METRO_PORT)
 #   export ANDROID_HOME=$HOME/Library/Android/sdk
 #   export JAVA_HOME=/opt/homebrew/opt/openjdk@17
 
+# adb used by every target. Override it to use another one, e.g. on WSL2 the
+# Windows adb.exe, which sees USB phones: make <target> ADB=/mnt/c/.../adb.exe
+ADB ?= $(if $(ANDROID_HOME),$(ANDROID_HOME)/platform-tools/adb,adb)
+
 # ========================================
 # Redis Configuration
 # ========================================

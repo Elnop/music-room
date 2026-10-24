@@ -124,6 +124,7 @@
 	"jest": {
 		"preset": "jest-expo",
 		"testTimeout": 15000,
+		"maxWorkers": "50%",
 		"collectCoverageFrom": [
 			"src/**/*.{ts,tsx}",
 			"App.tsx",

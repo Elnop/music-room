@@ -82,6 +82,8 @@ Why these choices: [doc/decisions.md](doc/decisions.md).
 2. On a physical device, set `http://YOUR_LOCAL_IP:3000` in `mobile/.env` and use the same Wi-Fi (or `make dev-tunnel`), or change the backend address in the app's settings
 3. Check `ALLOWED_ORIGINS` in `backend/.env`
 
+**Windows / WSL2** (USB phone not seen, JDK 17 missing, machine freezing during a build): see [wsl2.md](doc/development/wsl2.md).
+
 **Docker issues**: `make clean`, then `make install` and `make dev-docker`
 
 **Type errors after a pull**: `npm install && npm run type-check` in `backend/` and `mobile/`

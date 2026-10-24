@@ -123,7 +123,7 @@ dev-tunnel-build-apk-install: ## Install APK on connected device (requires APK b
 		exit 1; \
 	fi
 	$(call print_arrow,Checking for connected devices...)
-	@DEVICES=$$(adb devices | grep -v "List" | grep "device$$" | wc -l); \
+	@DEVICES=$$($(ADB) devices | grep -v "List" | grep "device$$" | wc -l); \
 	if [ "$$DEVICES" -eq 0 ]; then \
 		echo ""; \
 		echo "$(RED)$(ICON_ERROR) No devices connected$(NC)"; \
@@ -135,7 +135,7 @@ dev-tunnel-build-apk-install: ## Install APK on connected device (requires APK b
 	echo "$(GREEN)$(ICON_SUCCESS) Found $$DEVICES device(s)$(NC)"
 	@echo ""
 	$(call print_arrow,Installing APK...)
-	@adb install -r mobile/android/app/build/outputs/apk/release/app-release.apk
+	@$(ADB) install -r mobile/android/app/build/outputs/apk/release/app-release.apk
 	$(call blank_line)
 	$(call print_header,✓ Installation Complete)
 	@echo "$(GREEN)$(ICON_SUCCESS) App installed successfully$(NC)"
@@ -165,7 +165,7 @@ dev-tunnel-build-apk-check-prereqs:
 		exit 1; \
 	fi
 	@# Check Android SDK
-	@if ! command -v adb >/dev/null 2>&1; then \
+	@if ! command -v $(ADB) >/dev/null 2>&1; then \
 		echo "$(RED)$(ICON_ERROR) Android SDK not found - adb command missing$(NC)"; \
 		echo ""; \
 		echo "$(YELLOW)$(ICON_WARNING) Install Android SDK and set ANDROID_HOME$(NC)"; \

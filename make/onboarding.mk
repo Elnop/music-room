@@ -34,12 +34,12 @@ check-setup: ## Verify development environment is correctly configured
 	echo ""; \
 	\
 	echo "$(YELLOW)$(ICON_ARROW) adb command...$(NC)"; \
-	if ! command -v adb >/dev/null 2>&1; then \
-		echo "  $(RED)$(ICON_ERROR) adb not found in PATH$(NC)"; \
-		echo "  $(YELLOW)→ Add to PATH: \$$ANDROID_HOME/platform-tools$(NC)"; \
+	if ! command -v $(ADB) >/dev/null 2>&1; then \
+		echo "  $(RED)$(ICON_ERROR) adb not found: $(ADB)$(NC)"; \
+		echo "  $(YELLOW)→ Set ANDROID_HOME, or pass ADB=<path to adb> (WSL2: doc/development/wsl2.md)$(NC)"; \
 		ERRORS=$$((ERRORS + 1)); \
 	else \
-		ADB_VERSION=$$(adb --version 2>&1 | head -1); \
+		ADB_VERSION=$$($(ADB) --version 2>&1 | head -1); \
 		echo "  $(GREEN)$(ICON_SUCCESS) adb found: $$ADB_VERSION$(NC)"; \
 	fi; \
 	echo ""; \

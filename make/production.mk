@@ -22,7 +22,7 @@ prod-build-apk-manual: ## Build production APK manually with Gradle (no EAS, dir
 	@echo "   Time: ~5-10 minutes"
 	@echo ""
 	$(call print_arrow,Checking Android SDK...)
-	@command -v adb >/dev/null 2>&1 || { \
+	@command -v $(ADB) >/dev/null 2>&1 || { \
 		$(call print_error,Android SDK not found); \
 		echo "$(YELLOW)$(ICON_WARNING) Set ANDROID_HOME and add platform-tools to PATH$(NC)"; \
 		exit 1; \
@@ -58,7 +58,7 @@ prod-install-apk: ## Install production APK on connected device via adb
 		exit 1; \
 	fi
 	$(call print_arrow,Checking for connected devices...)
-	@DEVICES=$$(adb devices | grep -v "List" | grep "device$$" | wc -l); \
+	@DEVICES=$$($(ADB) devices | grep -v "List" | grep "device$$" | wc -l); \
 	if [ "$$DEVICES" -eq 0 ]; then \
 		echo ""; \
 		echo "$(RED)$(ICON_ERROR) No devices connected$(NC)"; \
@@ -70,7 +70,7 @@ prod-install-apk: ## Install production APK on connected device via adb
 	echo "$(GREEN)$(ICON_SUCCESS) Found $$DEVICES device(s)$(NC)"
 	@echo ""
 	$(call print_arrow,Installing APK...)
-	@adb install -r mobile/android/app/build/outputs/apk/release/app-release.apk
+	@$(ADB) install -r mobile/android/app/build/outputs/apk/release/app-release.apk
 	$(call blank_line)
 	$(call print_header,✓ Installation Complete)
 	@echo "$(GREEN)$(ICON_SUCCESS) App installed successfully$(NC)"

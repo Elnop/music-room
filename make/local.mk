@@ -5,8 +5,6 @@
 
 .PHONY: dev-local expo-android expo-clear check-devices start-emulator start-emulators .boot-emulators restart-emulators restart-emulators-clean clean-emulators .stop-emulators .clear-emulator-snapshots .clear-metro-cache .cache-app-apk .open-app-when-metro open-app kill-emulator restart-emulator list-emulators open-emulator
 
-ADB := $(ANDROID_HOME)/platform-tools/adb
-
 # Rendering goes through the host GPU: software rendering (swiftshader) puts the
 # whole screen on the CPU and two emulators lag. GPU=swiftshader_indirect brings
 # it back if the window stays black.
@@ -87,18 +85,13 @@ expo-clear: ## Start Expo with cleared cache (local)
 check-devices: ## Check if Android device is connected
 	$(call print_header,Checking Connected Devices)
 	$(call print_subsection,📱 Android Devices)
-	@if docker ps --format '{{.Names}}' | grep -q zumik-$(MOBILE_SERVICE); then \
-		echo "$(BLUE)$(ICON_INFO) Using Docker container$(NC)"; \
-		$(call docker_exec,zumik-$(MOBILE_SERVICE),adb devices) 2>/dev/null || echo "$(RED)$(ICON_ERROR) No devices$(NC)"; \
+	@if command -v $(ADB) >/dev/null 2>&1; then \
+		echo "$(BLUE)$(ICON_INFO) Using $(ADB)$(NC)"; \
+		$(ADB) devices -l; \
 	else \
-		if command -v adb >/dev/null 2>&1; then \
-			echo "$(BLUE)$(ICON_INFO) Using local adb$(NC)"; \
-			adb devices; \
-		else \
-			echo "$(RED)$(ICON_ERROR) adb not found$(NC)"; \
-			echo "$(YELLOW)$(ICON_WARNING) Start Docker: make dev-docker$(NC)"; \
-			echo "$(YELLOW)$(ICON_WARNING) Or install Android SDK$(NC)"; \
-		fi; \
+		echo "$(RED)$(ICON_ERROR) adb not found: $(ADB)$(NC)"; \
+		echo "$(YELLOW)$(ICON_WARNING) Set ANDROID_HOME, or pass ADB=<path to adb> (WSL2: doc/development/wsl2.md)$(NC)"; \
+		exit 1; \
 	fi
 	$(call blank_line)
 	$(call print_subsection,💡 Tips)
@@ -114,7 +107,7 @@ start-emulator: ## Start the Android emulator and open the app, cold boot by def
 	@echo "   • Boot: $(if $(FAST),quick boot (resumes saved state),cold boot (FAST=1 to resume saved state))"
 	@echo ""
 	$(call print_arrow,Checking for running emulators...)
-	@RUNNING=$$($(ANDROID_HOME)/platform-tools/adb devices | grep emulator | wc -l); \
+	@RUNNING=$$($(ADB) devices | grep emulator | wc -l); \
 	if [ $$RUNNING -gt 0 ]; then \
 		echo "$(YELLOW)$(ICON_WARNING) Emulator already running$(NC)"; \
 		echo "$(BLUE)$(ICON_INFO) Use $(GREEN)make kill-emulator$(NC) to stop it first$(NC)"; \
@@ -334,16 +327,16 @@ restart-emulator: ## Stop the emulator and cold boot it again (AVD=name, FAST=1 
 kill-emulator: ## Stop all running Android emulators
 	$(call print_header,Stopping Android Emulators)
 	$(call print_arrow,Checking for running emulators...)
-	@RUNNING=$$($(ANDROID_HOME)/platform-tools/adb devices | grep emulator | wc -l); \
+	@RUNNING=$$($(ADB) devices | grep emulator | wc -l); \
 	if [ $$RUNNING -eq 0 ]; then \
 		echo "$(YELLOW)$(ICON_WARNING) No emulators running$(NC)"; \
 		exit 0; \
 	fi
 	$(call blank_line)
 	$(call print_arrow,Killing emulators...)
-	@$(ANDROID_HOME)/platform-tools/adb devices | grep emulator | cut -f1 | while read device; do \
+	@$(ADB) devices | grep emulator | cut -f1 | while read device; do \
 		echo "  $(YELLOW)Stopping $$device$(NC)"; \
-		$(ANDROID_HOME)/platform-tools/adb -s $$device emu kill 2>/dev/null || true; \
+		$(ADB) -s $$device emu kill 2>/dev/null || true; \
 	done
 	@sleep 2
 	$(call print_success,All emulators stopped)
@@ -382,10 +375,10 @@ open-emulator: ## Open a specific Android emulator and the app on it (interactiv
 		exit 1; \
 	fi
 	$(call print_arrow,Checking for running emulators...)
-	@RUNNING=$$($(ANDROID_HOME)/platform-tools/adb devices | grep emulator | wc -l); \
+	@RUNNING=$$($(ADB) devices | grep emulator | wc -l); \
 	if [ $$RUNNING -gt 0 ]; then \
 		echo "$(YELLOW)$(ICON_WARNING) Emulator already running$(NC)"; \
-		$(ANDROID_HOME)/platform-tools/adb devices | grep emulator | while read device rest; do \
+		$(ADB) devices | grep emulator | while read device rest; do \
 			echo "  $(GREEN)$$device$(NC) - $$rest"; \
 		done; \
 		echo ""; \
