@@ -5,6 +5,8 @@
 
 .PHONY: check-setup
 
+NODE_MAJOR := $(shell cat .nvmrc 2>/dev/null)
+
 check-setup: ## Verify development environment is correctly configured
 	$(call print_header,Environment Setup Check)
 	@ERRORS=0; \
@@ -72,11 +74,21 @@ check-setup: ## Verify development environment is correctly configured
 	echo "$(YELLOW)$(ICON_ARROW) Node.js...$(NC)"; \
 	if ! command -v node >/dev/null 2>&1; then \
 		echo "  $(RED)$(ICON_ERROR) Node.js not found$(NC)"; \
-		echo "  $(YELLOW)→ Install Node.js 18+: https://nodejs.org$(NC)"; \
+		echo "  $(YELLOW)→ Install Node.js $(NODE_MAJOR) (.nvmrc), e.g. nvm install$(NC)"; \
 		ERRORS=$$((ERRORS + 1)); \
 	else \
 		NODE_VERSION=$$(node --version); \
-		echo "  $(GREEN)$(ICON_SUCCESS) Node.js: $$NODE_VERSION$(NC)"; \
+		if [ "$${NODE_VERSION%%.*}" != "v$(NODE_MAJOR)" ]; then \
+			echo "  $(RED)$(ICON_ERROR) Node.js $$NODE_VERSION, the project needs $(NODE_MAJOR) (.nvmrc)$(NC)"; \
+			echo "  $(YELLOW)→ nvm install && nvm use$(NC)"; \
+			ERRORS=$$((ERRORS + 1)); \
+		else \
+			echo "  $(GREEN)$(ICON_SUCCESS) Node.js: $$NODE_VERSION$(NC)"; \
+		fi; \
+		NPM_VERSION=$$(npm --version 2>/dev/null); \
+		if [ "$${NPM_VERSION%%.*}" != "10" ]; then \
+			echo "  $(YELLOW)$(ICON_WARNING) npm $$NPM_VERSION: lockfiles must be written with npm 10 (npx -y npm@10 install --package-lock-only)$(NC)"; \
+		fi; \
 	fi; \
 	echo ""; \
 	\

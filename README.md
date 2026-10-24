@@ -16,6 +16,21 @@ The app is a remote control of an Express/TypeScript API backed by Supabase (Pos
 - **[backend/README.md](backend/README.md)** and **[mobile/README.md](mobile/README.md)**: each project's structure and commands.
 - **[Swagger UI](http://localhost:3000/api-docs)**: the API reference, once the backend runs.
 
+## Prerequisites
+
+Install these before `make install`; `make check-setup` checks them.
+
+| Tool | Version | Notes |
+| --- | --- | --- |
+| Node.js | 22 (`.nvmrc`) | `nvm install && nvm use`. Its npm 10 writes the lockfiles: with npm 11, run `npx -y npm@10 install --package-lock-only` after a dependency change, or `npm ci` fails in the CI. |
+| make, zsh, curl | any | The Makefiles run their recipes with `/bin/zsh` and wait for services with `curl`: `sudo apt install make zsh curl`. |
+| Docker | Engine or Docker Desktop | Redis, the local Supabase stack, and the semgrep and gitleaks checks of `npm run check`. |
+| JDK | 17 | Native Android build. `JAVA_HOME` set. |
+| Android SDK | platform 35, build-tools 35.0.0, platform-tools | Android Studio, or the command-line tools: `sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools"`. `ANDROID_HOME` set. |
+| GitHub CLI (`gh`) | any | Issues, project board and pull requests (see [Contributing](#contributing)). |
+
+On Windows, work in WSL2: [wsl2.md](doc/development/wsl2.md) covers JDK 17 on Debian 13, the Windows adb for a USB phone, and memory limits.
+
 ## Quick Start
 
 ```bash

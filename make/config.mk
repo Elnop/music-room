@@ -6,6 +6,9 @@
 # Force zsh shell (team uses zsh for environment variables and consistent behavior)
 SHELL := /bin/zsh
 .SHELLFLAGS := -c
+ifeq ($(wildcard $(SHELL)),)
+$(error zsh is required by make ($(SHELL) not found): install it, e.g. sudo apt install zsh)
+endif
 
 # Detect operating system
 UNAME_S := $(shell uname -s)
