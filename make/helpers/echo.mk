@@ -107,7 +107,7 @@ define display_metro_connect
 	$(call blank_line)
 	$(if $(filter lan,$(1)),\
 		@echo "   Emulator:      $(GREEN)make open-app$(NC) (reaches Metro on $(EMULATOR_HOST):$(METRO_PORT) by itself)"; \
-		echo "   Phone (USB):   $(GREEN)adb reverse tcp:$(METRO_PORT) tcp:$(METRO_PORT)$(NC) and open Zumik"; \
+		echo "   Phone (USB):   $(GREEN)make dev-phone$(NC) instead (forwards Metro and the backend over USB, any network)"; \
 		echo "   Phone (WiFi):  dev menu (shake) > Change Bundle Location > $(GREEN)$(METRO_ADDRESS)$(NC)")
 	$(if $(filter tunnel,$(1)),\
 		@HOST=$$(docker logs $(MOBILE_CONTAINER) 2>&1 | grep -o '[a-z0-9-]*\.exp\.direct' | tail -1); \

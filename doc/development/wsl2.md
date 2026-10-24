@@ -35,6 +35,7 @@ WSL2 does not see USB devices, and `usbipd-win` needs admin rights. The Windows 
 
    Or per command: `make check-devices ADB=/mnt/c/.../adb.exe`.
 3. Plug the phone in, unlock it, accept **Allow USB debugging**, then `make check-devices` lists it.
+4. `make dev-phone` starts the backend and Metro, forwards them over USB and opens Zumik Dev on the phone.
 
 `adb reverse` then lands on the Windows `localhost`, which WSL2 forwards to its own ports: the phone reaches Metro (8081) and the backend (3000) running in WSL. Use only this adb: a Linux `adb` server started from the SDK in WSL does not see the phone.
 

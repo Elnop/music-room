@@ -3,7 +3,7 @@
 # ==============================================================================
 # Commands for local development, useful with Android Studio emulator
 
-.PHONY: dev-local expo-android expo-clear check-devices start-emulator start-emulators .boot-emulators restart-emulators restart-emulators-clean clean-emulators .stop-emulators .clear-emulator-snapshots .clear-metro-cache .cache-app-apk .open-app-when-metro open-app kill-emulator restart-emulator list-emulators open-emulator
+.PHONY: dev-local dev-phone .phone-reverse open-phone expo-android expo-clear check-devices start-emulator start-emulators .boot-emulators restart-emulators restart-emulators-clean clean-emulators .stop-emulators .clear-emulator-snapshots .clear-metro-cache .cache-app-apk .open-app-when-metro open-app kill-emulator restart-emulator list-emulators open-emulator
 
 # Rendering goes through the host GPU: software rendering (swiftshader) puts the
 # whole screen on the CPU and two emulators lag. GPU=swiftshader_indirect brings
@@ -56,7 +56,7 @@ dev-local: .ensure-backend-deps .ensure-mobile-deps ## Start development locally
 	@sleep $(SHORT_WAIT_TIME)
 	$(call print_success,Backend started: $(BACKEND_URL))
 	$(call blank_line)
-	$(call print_arrow,Starting Metro; the Zumik debug build opens on the emulator once it is up...)
+	$(call print_arrow,Starting Metro; the Zumik debug build opens once it is up...)
 	$(call blank_line)
 	@$(MAKE) --no-print-directory .open-app-when-metro &
 	$(call expo_mobile,start --localhost --dev-client)
@@ -67,6 +67,47 @@ expo-android: ## Quick start: Start Metro and open the debug build on the Androi
 	@$(MAKE) --no-print-directory .open-app-when-metro &
 	$(call expo_mobile,start --localhost --dev-client)
 
+# Phone over USB, whatever the network: adb reverse brings the phone's
+# localhost:8081 (Metro) and :3000 (backend) to this machine, so the app calls
+# the backend on localhost instead of HOST_IP.
+dev-phone: .phone-reverse ## Start backend + Metro locally and open the Zumik Dev build on the USB phone (PHONE=serial)
+	@$(MAKE) --no-print-directory dev-local OPEN_APP=open-phone \
+		DEV_API_URL=http://localhost:$(BACKEND_PORT) DEV_WS_URL=ws://localhost:$(BACKEND_PORT)
+
+# Sets SERIAL to the USB phone: PHONE=<serial>, else the first authorized
+# device that is not an emulator.
+FIND_PHONE = SERIAL=$(or $(PHONE),$$($(ADB) devices | tr -d '\r' | awk '$$2 == "device" && $$1 !~ /^emulator/ { print $$1; exit }'))
+
+.phone-reverse:
+	@$(FIND_PHONE); \
+	if [ -z "$$SERIAL" ]; then \
+		echo "$(RED)$(ICON_ERROR) No phone found by $(ADB)$(NC)"; \
+		if $(ADB) devices | grep -q unauthorized; then \
+			echo "$(YELLOW)$(ICON_WARNING) Unlock the phone and accept \"Allow USB debugging\"$(NC)"; \
+		else \
+			echo "$(YELLOW)$(ICON_WARNING) Plug it in over USB with USB debugging on (WSL2: ADB=<Windows adb.exe>, see doc/development/wsl2.md)$(NC)"; \
+		fi; \
+		exit 1; \
+	fi; \
+	$(ADB) -s $$SERIAL reverse tcp:$(METRO_PORT) tcp:$(METRO_PORT) > /dev/null \
+		&& $(ADB) -s $$SERIAL reverse tcp:$(BACKEND_PORT) tcp:$(BACKEND_PORT) > /dev/null || exit 1; \
+	echo "$(GREEN)$(ICON_SUCCESS) $$SERIAL: Metro ($(METRO_PORT)) and backend ($(BACKEND_PORT)) forwarded over USB$(NC)"
+
+# -S restarts the app, so it loads the bundle again from Metro.
+open-phone: .phone-reverse ## Launch the Zumik Dev build on the USB phone (PHONE=serial)
+	@$(FIND_PHONE); \
+	if ! $(ADB) -s $$SERIAL shell pm path $(APP_PACKAGE) 2>/dev/null | grep -q package; then \
+		echo "$(RED)$(ICON_ERROR) Zumik Dev is not installed on $$SERIAL$(NC)"; \
+		echo "$(YELLOW)$(ICON_WARNING) Install it once: cd mobile && npx expo run:android --app-id $(APP_PACKAGE) --device --no-bundler$(NC)"; \
+		exit 1; \
+	fi; \
+	$(ADB) -s $$SERIAL shell am start -S -n $(APP_ACTIVITY) > /dev/null || exit 1; \
+	echo "$(GREEN)$(ICON_SUCCESS) $$SERIAL: Zumik Dev started$(NC)"
+
+# Target that opens the debug build once Metro is up: open-app (emulators) or
+# open-phone (set by dev-phone).
+OPEN_APP ?= open-app
+
 # Wait (up to 2 minutes) until Metro answers, then open the debug build.
 # Expo CLI's --android would open Expo Go, which cannot run the app.
 .open-app-when-metro:
@@ -75,7 +116,7 @@ expo-android: ## Quick start: Start Metro and open the debug build on the Androi
 		if [ $$i -gt 60 ]; then echo "$(YELLOW)$(ICON_WARNING) Metro did not start; run make open-app once it is up$(NC)"; exit 0; fi; \
 		sleep 2; \
 	done; \
-	$(MAKE) --no-print-directory open-app
+	$(MAKE) --no-print-directory $(OPEN_APP)
 
 expo-clear: ## Start Expo with cleared cache (local)
 	@$(call write_mobile_dev_env)
@@ -97,7 +138,7 @@ check-devices: ## Check if Android device is connected
 	$(call print_subsection,💡 Tips)
 	@echo "   • Enable USB debugging on device"
 	@echo "   • Accept USB authorization popup"
-	@echo "   • Use $(GREEN)make dev-android$(NC) to launch"
+	@echo "   • Use $(GREEN)make dev-phone$(NC) to launch on a USB phone"
 	$(call blank_line)
 
 start-emulator: ## Start the Android emulator and open the app, cold boot by default (AVD=name, FAST=1 to resume saved state)
