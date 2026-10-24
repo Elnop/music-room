@@ -71,14 +71,14 @@ The build then loads its JavaScript from Metro: reinstall it only when native co
 
 ### 2. Start Metro
 
-From the root: `make dev-docker` (Docker), `make dev-local` (Android Studio emulator) or `make dev-tunnel` (phone on another network). Without make: `npm start` in `mobile/`.
+From the root: `make dev-phone` (USB phone, any network), `make dev-docker` (Docker), `make dev-local` (Android Studio emulator) or `make dev-tunnel` (phone on another network). Without make: `npm start` in `mobile/`.
 
 ### 3. Point the app at Metro
 
 `make qr` (or `make qr-tunnel`) prints these steps with the right addresses.
 
 - **Emulator**: automatic, it reaches Metro on `10.0.2.2:8081`; `make open-app` launches the app.
-- **Phone over USB**: `adb reverse tcp:8081 tcp:8081`, then open Zumik.
+- **Phone over USB**: automatic with `make dev-phone`, which forwards Metro (8081) and the backend (3000) with `adb reverse` and points the app at `localhost` (WSL2: [wsl2.md](../doc/development/wsl2.md)). If the dev menu's bundle location was changed before, reset it to `localhost:8081`.
 - **Phone on the same Wi-Fi**: shake the phone, dev menu › **Change Bundle Location** › `<HOST_IP>:8081` (address given by `make info`).
 - **Phone on another network** (`make dev-tunnel`): same menu, enter the Expo tunnel host shown by `make qr-tunnel` (`xxxx-8081.exp.direct:80`). Details: [tunnel-mode.md](../doc/development/tunnel-mode.md).
 

@@ -62,6 +62,8 @@ docker: ## List the Docker mode commands
 local: ## List the local mode commands
 	$(HELP_SECTION) "💻 LOCAL MODE (no Docker)"
 	$(HELP_CMD) dev-local "Start backend + Metro locally (Android Studio emulator)"
+	$(HELP_CMD) dev-phone "Same on a USB phone: adb reverse for Metro and the backend, any network (PHONE=serial)"
+	$(HELP_CMD) open-phone "Open Zumik Dev on the USB phone again (after replugging it)"
 	$(HELP_CMD) expo-android "Start Metro and open the app in the emulator"
 	$(HELP_CMD) expo-clear "Start Metro with a cleared cache"
 	$(HELP_CMD) set-backend-url "Write the backend URL in mobile/.env.development.local (HOST_IP)"
