@@ -55,13 +55,13 @@ EXPO_PUBLIC_SOUNDCLOUD_CLIENT_ID=
 
 ## Running the app
 
-The app runs only as a native debug build (`com.zumik.app`). It does not start in Expo Go, which lacks its native modules (Google Sign-In, Facebook SDK, image colors): do not use it.
+The app runs only as a native debug build, "Zumik Dev" (`com.zumik.app.dev`): `plugins/withDevVariant.js` gives the debug buildType its own id and name, so it installs next to the release (`com.zumik.app`) with its own data. It does not start in Expo Go, which lacks its native modules (Google Sign-In, Facebook SDK, image colors): do not use it.
 
 ### 1. Install the debug build (once)
 
 ```bash
 # Android (Android SDK required): build and install on the emulator or the USB phone
-npx expo run:android --no-bundler   # --device to pick the device; --no-bundler: no second Metro on 8081
+npx expo run:android --app-id com.zumik.app.dev --no-bundler   # --device to pick the device; --no-bundler: no second Metro on 8081
 
 # iOS (macOS only)
 npx expo run:ios
@@ -129,7 +129,7 @@ The production APK (backend `https://zumik.cluzhub.com`) is built by `.github/wo
 
 ## Most useful commands
 
-1. **`npm run android`** - Install the debug build (it also starts its own Metro: stop it, or use `npx expo run:android --no-bundler`), then `make dev-docker` for Metro
+1. **`npm run android`** - Install the debug build (it also starts its own Metro: stop it, or use `npx expo run:android --app-id com.zumik.app.dev --no-bundler`), then `make dev-docker` for Metro
 2. **`npm run fix`** - Fix the code automatically
 3. **`npm run check`** - Check before a commit
 4. **`npm run reset`** - Solve strange bugs
@@ -230,9 +230,9 @@ mobile/src/
 - **Real time**: `shared/stores/socketStore.ts` manages the Socket.io connection; `features/playlists/hooks/usePlaylistRoom.ts` joins a playlist's room, whose events update the cache (`utils/playlistSocketRules.ts`); `useMusicControl` handles friends' listening and delegated control commands.
 - **Playback contract**: playlists start and display playback through `shared/services/playbackBridge.ts`, which `navigation/playbackBridge.ts` wires to `playerStore` and `queueStore` when `AppNavigator` loads; no feature imports the player or the queue.
 - **Audio playback**: expo-audio plays the SoundCloud HLS stream; `PlayerContext` manages the player's lifecycle, `playerStore` its state (current track, play/pause, modal), `MiniPlayer` and `PlayerModal` the display.
-- **Background playback (Android)**: React Native pauses JS timers once the app is in the background, and `fetch` resolves through `setTimeout`, so the next track's requests would wait for the app to come back. The local Expo module `modules/js-keep-alive/` runs a headless JS task while this device plays or loads a track (`features/player/hooks/useBackgroundKeepAlive.ts`), which keeps the timers firing. Native code: reinstall the debug build (`npx expo prebuild --clean -p android`, then `npx expo run:android --no-bundler`) after pulling it.
+- **Background playback (Android)**: React Native pauses JS timers once the app is in the background, and `fetch` resolves through `setTimeout`, so the next track's requests would wait for the app to come back. The local Expo module `modules/js-keep-alive/` runs a headless JS task while this device plays or loads a track (`features/player/hooks/useBackgroundKeepAlive.ts`), which keeps the timers firing. Native code: reinstall the debug build (`npx expo prebuild --clean -p android`, then `npx expo run:android --app-id com.zumik.app.dev --no-bundler`) after pulling it.
 - **OAuth**: `features/auth/services/googleSignIn.ts` and `facebookSignIn.ts` (Google Sign-In, Facebook SDK). The token obtained is verified by the backend (`/api/auth/google`, `/api/auth/facebook`). Native modules: like the rest of the app, this needs the debug build, not Expo Go.
-- **Android signing**: `plugins/withDebugKeystore.js` replaces, during `expo prebuild`, the Expo template's debug keystore (shared by every Expo app) with `keystores/debug.keystore`. Its SHA-1 `5D:26:8F:52:F7:A8:2D:71:3A:D9:68:BF:60:6A:79:BB:85:AA:71:C0` is the one to register, with the `com.zumik.app` package, in the Android OAuth client of the Google Cloud project that holds `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`. Otherwise Google Sign-In returns `DEVELOPER_ERROR`.
+- **Android signing**: `plugins/withDebugKeystore.js` replaces, during `expo prebuild`, the Expo template's debug keystore (shared by every Expo app) with `keystores/debug.keystore`. Its SHA-1 `5D:26:8F:52:F7:A8:2D:71:3A:D9:68:BF:60:6A:79:BB:85:AA:71:C0` is the one to register, with the `com.zumik.app` (release) and `com.zumik.app.dev` (debug) packages, in the Android OAuth clients of the Google Cloud project that holds `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`. Otherwise Google Sign-In returns `DEVELOPER_ERROR`.
 
 ## Development
 

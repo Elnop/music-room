@@ -242,7 +242,7 @@ check-setup: ## Verify development environment is correctly configured
 		echo ""; \
 		echo "$(BLUE)$(ICON_INFO) Next steps:$(NC)"; \
 		echo "  1. $(GREEN)make start-emulator$(NC) - Start Android emulator"; \
-		echo "  2. $(GREEN)cd mobile && npx expo run:android --no-bundler$(NC) - Build and install the debug build"; \
+		echo "  2. $(GREEN)cd mobile && npx expo run:android --app-id com.zumik.app.dev --no-bundler$(NC) - Build and install the debug build"; \
 		echo "  3. $(GREEN)make dev-local$(NC) - Start backend + Metro and open the app"; \
 		echo ""; \
 	else \

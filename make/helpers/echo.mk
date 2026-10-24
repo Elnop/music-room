@@ -118,7 +118,7 @@ define display_metro_connect
 			echo "   $(YELLOW)$(ICON_WARNING) Expo tunnel not ready yet: run $(GREEN)make qr-tunnel$(YELLOW) again in a few seconds$(NC)"; \
 		fi)
 	$(call blank_line)
-	@echo "   No debug build on the device? $(GREEN)cd mobile && npx expo run:android --no-bundler$(NC) (add $(GREEN)--device$(NC) for a phone)"
+	@echo "   No debug build on the device? $(GREEN)cd mobile && npx expo run:android --app-id com.zumik.app.dev --no-bundler$(NC) (add $(GREEN)--device$(NC) for a phone)"
 	@echo "   \"Unable to load script\": Metro is unreachable; check the address above, then tap RELOAD"
 	$(call blank_line)
 	$(call print_separator)
