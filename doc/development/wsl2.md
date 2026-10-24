@@ -73,6 +73,10 @@ org.gradle.daemon.idletimeout=600000
 
 Run one heavy job at a time: never a native build together with `npm run check`. Build only the phone's ABI: `npx expo run:android` does it on its own, a direct `./gradlew` call needs `-PreactNativeArchitectures=arm64-v8a`. `./gradlew --stop` (in `mobile/android/`) frees the daemons right away.
 
+## After `wsl --shutdown` or a Windows restart
+
+Docker Desktop restarts the local Supabase stack on its own, but its published ports can then reset every connection: the backend reports a valid login as `INVALID_CREDENTIALS`. `make supabase-up` (run by every `make dev-*`) checks that the stack's API answers and restarts the stack otherwise, data kept. The backend and Metro containers have no restart policy: they stay stopped until the next `make dev-docker`.
+
 ## Emulator (not recommended)
 
 The emulator runs in WSL2 but is slow on a modest machine: prefer the phone. It needs these libraries and the `kvm` group (log in again afterwards):

@@ -127,11 +127,30 @@ SMTP_PORT=$SMTP_PORT
 EOF
 }
 
+# After a WSL2 or Docker Desktop restart, Docker brings the stack back on its own
+# but its published ports can reset every connection (the backend then reports
+# a valid login as INVALID_CREDENTIALS). Stopping and starting it again (data
+# kept) publishes them anew.
+ensure_ports_answer() {
+	answers() { curl -s -o /dev/null --max-time 5 "http://127.0.0.1:$API_PORT/auth/v1/health"; }
+	answers && return 0
+	echo "The stack's API does not answer on port $API_PORT: restarting the stack (data kept)"
+	"$CLI" stop --workdir "$WORKDIR" >/dev/null
+	"$CLI" start --workdir "$WORKDIR" -x "$EXCLUDED" >/dev/null
+	i=0
+	until answers; do
+		i=$((i + 1))
+		[ "$i" -gt 30 ] && fail "The stack still does not answer on http://127.0.0.1:$API_PORT: restart Docker"
+		sleep 2
+	done
+}
+
 up() {
 	check_tools
 	# CLI output shown: the first run pulls the images for a few minutes.
 	load_oauth_env
 	"$CLI" start --workdir "$WORKDIR" -x "$EXCLUDED"
+	ensure_ports_answer
 	apply_migrations
 	write_env_file
 	echo "Dev Supabase ready on http://127.0.0.1:$API_PORT, dashboard on http://127.0.0.1:$STUDIO_PORT, emails on http://127.0.0.1:$MAIL_UI_PORT; wrote backend/$ENV_FILE"
@@ -146,6 +165,7 @@ reset() {
 	check_tools
 	load_oauth_env
 	"$CLI" start --workdir "$WORKDIR" -x "$EXCLUDED"
+	ensure_ports_answer
 	"$CLI" db reset --local --no-seed --workdir "$WORKDIR" >/dev/null
 	apply_migrations
 	load_seed
