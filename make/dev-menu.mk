@@ -30,7 +30,7 @@ dev: ## Show development mode options
 	@echo "$(YELLOW)$(ICON_ARROW) Recommended workflow (onboarding):$(NC)"
 	@echo ""
 	@echo "  $(GREEN)make start-emulator$(NC)     $(BLUE)→$(NC) Launch Android emulator"
-	@echo "  $(GREEN)cd mobile && npx expo run:android --no-bundler$(NC)  $(BLUE)→$(NC) Build & install the debug build (once)"
+	@echo "  $(GREEN)cd mobile && npx expo run:android --app-id com.zumik.app.dev --no-bundler$(NC)  $(BLUE)→$(NC) Build & install the debug build (once)"
 	@echo "  $(GREEN)make dev-local$(NC)          $(BLUE)→$(NC) Start backend + Metro and open the app"
 	@echo ""
 	$(call print_separator)

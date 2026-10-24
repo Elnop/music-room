@@ -23,9 +23,9 @@ make dev-tunnel
 ```
 
 ### Connect Multiple Devices
-The app runs only as the Zumik debug build (`com.zumik.app`); it does not start in Expo Go, which lacks its native modules.
+The app runs only as the Zumik Dev debug build (`com.zumik.app.dev`); it does not start in Expo Go, which lacks its native modules.
 
-1. Install the debug build once on each phone: `cd mobile && npx expo run:android --device --no-bundler` (phone over USB)
+1. Install the debug build once on each phone: `cd mobile && npx expo run:android --app-id com.zumik.app.dev --device --no-bundler` (phone over USB)
 2. Run `make qr-tunnel` to show the Metro tunnel host (`xxxx-8081.exp.direct`)
 3. On each phone: shake it, dev menu › **Change Bundle Location** › `<tunnel host>:80`, then **RELOAD**
 4. All devices connect to same backend automatically
@@ -185,7 +185,7 @@ make dev
    - Display the tunnel URLs and the Metro tunnel host
 
 3. **Connect Your Phone** (Zumik debug build, not Expo Go: the app needs its native modules):
-   - Install the debug build once: plug the phone over USB, `cd mobile && npx expo run:android --device --no-bundler`
+   - Install the debug build once: plug the phone over USB, `cd mobile && npx expo run:android --app-id com.zumik.app.dev --device --no-bundler`
    - Open Zumik, shake the phone to open the dev menu
    - Tap **Change Bundle Location**, enter the Metro tunnel host from `make qr-tunnel` followed by `:80` (e.g. `xxxx-8081.exp.direct:80`)
    - Tap **RELOAD**; "Unable to load script" means the host is wrong or the tunnel is not ready yet

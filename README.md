@@ -37,9 +37,9 @@ make stop
 
 ### Run the app
 
-The app runs only as the native debug build (`com.zumik.app`). It does not start in Expo Go, which lacks its native modules (Google and Facebook sign-in, image colors).
+The app runs only as the native debug build, "Zumik Dev" (`com.zumik.app.dev`), which installs next to the release (`com.zumik.app`, GitHub Releases) with its own data. It does not start in Expo Go, which lacks its native modules (Google and Facebook sign-in, image colors).
 
-1. **Install the debug build once**: `cd mobile && npx expo run:android --no-bundler` (Android SDK required) builds it and installs it on the running emulator or USB phone (`--device` to pick one); `--no-bundler` keeps it from starting its own Metro on 8081, which would clash with the one `make` starts. `make open-app` copies it to every other running emulator. iOS: `npx expo run:ios` on macOS.
+1. **Install the debug build once**: `cd mobile && npx expo run:android --app-id com.zumik.app.dev --no-bundler` (Android SDK required) builds it and installs it on the running emulator or USB phone (`--device` to pick one); `--no-bundler` keeps it from starting its own Metro on 8081, which would clash with the one `make` starts. `make open-app` copies it to every other running emulator. iOS: `npx expo run:ios` on macOS.
 2. **Start Metro**: `make dev-docker`, `make dev-local` (Android Studio emulator) or `make dev-tunnel` (phone on another network).
 3. **Point the app at Metro** (`make qr` / `make qr-tunnel` print these steps):
    - Emulator: automatic, it reaches Metro on `10.0.2.2:8081`; `make open-app` launches it.
@@ -88,7 +88,7 @@ Why these choices: [doc/decisions.md](doc/decisions.md).
 
 **Expo cache issues**: `cd mobile && npm run reset`
 
-**The app crashes at startup in Expo Go**: expected, it needs its native modules. Install the debug build (`cd mobile && npx expo run:android --no-bundler`), see [Run the app](#run-the-app).
+**The app crashes at startup in Expo Go**: expected, it needs its native modules. Install the debug build (`cd mobile && npx expo run:android --app-id com.zumik.app.dev --no-bundler`), see [Run the app](#run-the-app).
 
 ## Links
 

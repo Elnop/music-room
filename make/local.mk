@@ -185,12 +185,15 @@ start-emulators: ## Start two Android emulators for two-account tests and open t
 # The app runs as the Zumik debug build (Expo Go cannot load its native modules,
 # e.g. Google Sign-In). A debug build loads the JS from Metro on the host
 # (10.0.2.2:8081 from an emulator), so it runs the current branch.
-APP_PACKAGE := com.zumik.app
+# The debug build is "Zumik Dev" (mobile/plugins/withDevVariant.js), next to the
+# release; its activity keeps the namespace of the release.
+APP_PACKAGE := com.zumik.app.dev
+APP_ACTIVITY := $(APP_PACKAGE)/com.zumik.app.MainActivity
 # The host as seen from an emulator. Android reports the boot as complete
 # before its network is up: launched then, the app misses Metro and shows
 # "Unable to load script", so open-app waits until Metro answers here.
 EMULATOR_HOST := 10.0.2.2
-APP_APK_CACHE := $(HOME)/.cache/zumik/zumik-debug.apk
+APP_APK_CACHE := $(HOME)/.cache/zumik/zumik-dev-debug.apk
 
 # Copy the debug build from a running emulator into APP_APK_CACHE, once
 .cache-app-apk:
@@ -230,13 +233,13 @@ open-app: ## Launch the Zumik debug build on every running emulator, copying it 
 			$(MAKE) --no-print-directory .cache-app-apk; \
 			if [ ! -f "$(APP_APK_CACHE)" ]; then \
 				echo "$(RED)$(ICON_ERROR) Zumik is not installed on $$serial nor on any other emulator$(NC)"; \
-				echo "$(YELLOW)$(ICON_WARNING) Install a debug build once: cd mobile && npx expo run:android --no-bundler (it is then reused)$(NC)"; \
+				echo "$(YELLOW)$(ICON_WARNING) Install a debug build once: cd mobile && npx expo run:android --app-id com.zumik.app.dev --no-bundler (it is then reused)$(NC)"; \
 				exit 1; \
 			fi; \
 			echo "$(BLUE)$(ICON_INFO) Installing Zumik on $$serial...$(NC)"; \
 			$(ADB) -s $$serial install -r "$(APP_APK_CACHE)" > /dev/null || exit 1; \
 		fi; \
-		$(ADB) -s $$serial shell am start -n $(APP_PACKAGE)/.MainActivity > /dev/null 2>&1 || exit 1; \
+		$(ADB) -s $$serial shell am start -n $(APP_ACTIVITY) > /dev/null 2>&1 || exit 1; \
 		echo "$(GREEN)$(ICON_SUCCESS) $$serial: Zumik started$(NC)"; \
 	done; \
 	echo "$(BLUE)$(ICON_INFO) ⏳ Checking the app stays open (a launch right after boot can crash)...$(NC)"; \
@@ -244,7 +247,7 @@ open-app: ## Launch the Zumik debug build on every running emulator, copying it 
 	for serial in $$(echo "$$DEVICES"); do \
 		if ! $(ADB) -s $$serial shell dumpsys activity activities 2>/dev/null | grep -m1 topResumedActivity | grep -q $(APP_PACKAGE); then \
 			echo "$(YELLOW)$(ICON_WARNING) Zumik is not in the foreground on $$serial, relaunching$(NC)"; \
-			$(ADB) -s $$serial shell am start -n $(APP_PACKAGE)/.MainActivity > /dev/null 2>&1 || exit 1; \
+			$(ADB) -s $$serial shell am start -n $(APP_ACTIVITY) > /dev/null 2>&1 || exit 1; \
 		fi; \
 	done
 	$(call blank_line)
