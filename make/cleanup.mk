@@ -19,8 +19,8 @@ clean: ## Remove containers, volumes, images, and project dependencies (with con
 	if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ]; then \
 		echo "$(CYAN)Stopping and removing containers + volumes...$(RESET)"; \
 		docker stop $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true; \
-		docker rm $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true; \
-		docker volume rm $(TUNNEL_VOLUME) $(REDIS_VOLUME) 2>/dev/null || true; \
+		docker rm -v $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true; \
+		docker volume rm $(TUNNEL_VOLUME) $(REDIS_VOLUME) $(BACKEND_MODULES_VOLUME) $(MOBILE_MODULES_VOLUME) 2>/dev/null || true; \
 		echo "$(GREEN)✓ Containers and volumes removed$(RESET)"; \
 		docker rmi music-room-backend:latest music-room-mobile:latest 2>/dev/null || true; \
 		docker network rm $(DOCKER_NETWORK) 2>/dev/null || true; \
@@ -41,8 +41,8 @@ clean: ## Remove containers, volumes, images, and project dependencies (with con
 clean-docker: ## Remove Zumik Docker resources only (containers, images, volumes, network), dev Supabase stack and its data included
 	@echo "$(CYAN)Removing Zumik Docker resources...$(RESET)"
 	@docker stop $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true
-	@docker rm $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true
-	@docker volume rm $(TUNNEL_VOLUME) $(REDIS_VOLUME) 2>/dev/null || true
+	@docker rm -v $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true
+	@docker volume rm $(TUNNEL_VOLUME) $(REDIS_VOLUME) $(BACKEND_MODULES_VOLUME) $(MOBILE_MODULES_VOLUME) 2>/dev/null || true
 	@docker rmi music-room-backend:latest music-room-mobile:latest 2>/dev/null || true
 	@docker network rm $(DOCKER_NETWORK) 2>/dev/null || true
 	@$(SUPABASE_DEV_REMOVE)

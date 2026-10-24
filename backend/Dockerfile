@@ -11,8 +11,10 @@ COPY package*.json ./
 # Development stage (for docker-compose dev mode)
 FROM base AS development
 
-# The image's npm 10 installs exactly the committed lockfile
-RUN npm ci --include=dev
+# The image's npm 10 installs exactly the committed lockfile. The npm cache is
+# cleaned in the same layer, so it stays out of the image (make builds without
+# BuildKit, see make/config.mk: no cache mount).
+RUN npm ci --include=dev && npm cache clean --force
 
 # Copy source code (will be mounted as volume in dev mode)
 COPY . .
@@ -24,7 +26,7 @@ CMD ["npm", "run", "dev"]
 # Builder stage (for production build)
 FROM base AS builder
 
-RUN npm ci --include=dev
+RUN npm ci --include=dev && npm cache clean --force
 
 # Copy source and build
 COPY . .

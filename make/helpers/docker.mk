@@ -35,6 +35,19 @@ define ensure_volumes
 		docker volume create $(REDIS_VOLUME) >/dev/null 2>&1 || true
 endef
 
+# Named volume over /app/node_modules, labelled with the image it was filled
+# from. Docker copies the image's node_modules into an empty volume (several
+# seconds for the mobile one): a reused volume skips that copy, a rebuilt image
+# gets a new one. Run it after the container that mounts the volume is removed.
+# Usage: $(call node_modules_volume,<volume>,<image>); (inside a shell recipe)
+define node_modules_volume
+	IMAGE_ID=$$(docker image inspect -f '{{.Id}}' $(2)); \
+	if [ "$$(docker volume inspect -f '{{index .Labels "zumik.image"}}' $(1) 2>/dev/null)" != "$$IMAGE_ID" ]; then \
+		docker volume rm $(1) > /dev/null 2>&1; \
+		docker volume create --label zumik.image=$$IMAGE_ID $(1) > /dev/null; \
+	fi
+endef
+
 # Check if container is running
 # Usage: $(call container_running,zumik-backend)
 # Returns: "true" or "false"
@@ -137,7 +150,8 @@ define start_backend
 	else \
 		$(call build_backend_image); \
 		docker stop $(BACKEND_CONTAINER) 2>/dev/null || true; \
-		docker rm $(BACKEND_CONTAINER) 2>/dev/null || true; \
+		docker rm -v $(BACKEND_CONTAINER) 2>/dev/null || true; \
+		$(call node_modules_volume,$(BACKEND_MODULES_VOLUME),music-room-backend:latest); \
 		echo "$(BLUE)$(ICON_INFO) Starting backend...$(NC)"; \
 		docker run -d \
 			--name $(BACKEND_CONTAINER) \
@@ -146,7 +160,7 @@ define start_backend
 			--network $(DOCKER_NETWORK) \
 			-p $(BACKEND_PORT):$(BACKEND_PORT) \
 			-v $(shell pwd)/$(BACKEND_DIR):/app \
-			-v /app/node_modules \
+			-v $(BACKEND_MODULES_VOLUME):/app/node_modules \
 			-v $(TUNNEL_VOLUME):/tmp/shared \
 			--env-file $(shell pwd)/$(BACKEND_ENV) \
 			$(if $(filter local,$(SUPABASE_MODE)),--env-file $(shell pwd)/$(SUPABASE_LOCAL_ENV) \
@@ -156,7 +170,6 @@ define start_backend
 			-e NODE_ENV=development \
 			-e PORT=$(BACKEND_PORT) \
 			-e REDIS_HOST=$(REDIS_CONTAINER) \
-			--restart unless-stopped \
 			music-room-backend:latest || { \
 			echo "$(RED)$(ICON_ERROR) Failed to start backend$(NC)"; \
 			docker logs $(BACKEND_CONTAINER) 2>&1 | tail -20; \
@@ -178,7 +191,8 @@ define start_backend_tunnel
 	else \
 		$(call build_backend_image); \
 		docker stop $(BACKEND_CONTAINER) 2>/dev/null || true; \
-		docker rm $(BACKEND_CONTAINER) 2>/dev/null || true; \
+		docker rm -v $(BACKEND_CONTAINER) 2>/dev/null || true; \
+		$(call node_modules_volume,$(BACKEND_MODULES_VOLUME),music-room-backend:latest); \
 		echo "$(BLUE)$(ICON_INFO) Starting backend with tunnel...$(NC)"; \
 		docker run -d \
 			--name $(BACKEND_CONTAINER) \
@@ -188,7 +202,7 @@ define start_backend_tunnel
 			-p $(BACKEND_PORT):$(BACKEND_PORT) \
 			-p $(NGROK_PORT):$(NGROK_PORT) \
 			-v $(shell pwd)/$(BACKEND_DIR):/app \
-			-v /app/node_modules \
+			-v $(BACKEND_MODULES_VOLUME):/app/node_modules \
 			-v $(TUNNEL_VOLUME):/tmp/shared \
 			--env-file $(shell pwd)/$(BACKEND_ENV) \
 			$(if $(filter local,$(SUPABASE_MODE)),--env-file $(shell pwd)/$(SUPABASE_LOCAL_ENV) \
@@ -198,7 +212,6 @@ define start_backend_tunnel
 			-e NODE_ENV=development \
 			-e PORT=$(BACKEND_PORT) \
 			-e REDIS_HOST=$(REDIS_CONTAINER) \
-			--restart unless-stopped \
 			music-room-backend:latest sh scripts/start-with-tunnel.sh || { \
 			echo "$(RED)$(ICON_ERROR) Failed to start backend with tunnel$(NC)"; \
 			docker logs $(BACKEND_CONTAINER) 2>&1 | tail -20; \
@@ -221,7 +234,8 @@ define start_mobile
 	else \
 		$(call build_mobile_image); \
 		docker stop $(MOBILE_CONTAINER) 2>/dev/null || true; \
-		docker rm $(MOBILE_CONTAINER) 2>/dev/null || true; \
+		docker rm -v $(MOBILE_CONTAINER) 2>/dev/null || true; \
+		$(call node_modules_volume,$(MOBILE_MODULES_VOLUME),music-room-mobile:latest); \
 		echo "$(BLUE)$(ICON_INFO) Starting mobile...$(NC)"; \
 		docker run -d \
 			--name $(MOBILE_CONTAINER) \
@@ -232,7 +246,7 @@ define start_mobile
 			-p 19001:19001 \
 			-p 19002:19002 \
 			-v $(shell pwd)/$(MOBILE_DIR):/app \
-			-v /app/node_modules \
+			-v $(MOBILE_MODULES_VOLUME):/app/node_modules \
 			-v /app/.expo \
 			-v $(TUNNEL_VOLUME):/tmp/shared \
 			--env-file $(shell pwd)/$(MOBILE_ENV) \
@@ -241,7 +255,6 @@ define start_mobile
 			-e REACT_NATIVE_PACKAGER_HOSTNAME=$(HOST_IP) \
 			-e EXPO_PUBLIC_API_URL=$(DEV_API_URL) \
 			-e EXPO_PUBLIC_WS_URL=$(DEV_WS_URL) \
-			--restart unless-stopped \
 			-it \
 			music-room-mobile:latest || { \
 			echo "$(RED)$(ICON_ERROR) Failed to start mobile$(NC)"; \
@@ -265,7 +278,8 @@ define start_mobile_tunnel
 	@if true; then \
 		$(call build_mobile_image); \
 		docker stop $(MOBILE_CONTAINER) 2>/dev/null || true; \
-		docker rm $(MOBILE_CONTAINER) 2>/dev/null || true; \
+		docker rm -v $(MOBILE_CONTAINER) 2>/dev/null || true; \
+		$(call node_modules_volume,$(MOBILE_MODULES_VOLUME),music-room-mobile:latest); \
 		echo "$(BLUE)$(ICON_INFO) Starting mobile with Expo tunnel...$(NC)"; \
 		docker run -d \
 			--name $(MOBILE_CONTAINER) \
@@ -273,11 +287,10 @@ define start_mobile_tunnel
 			--network $(DOCKER_NETWORK) \
 			-p $(METRO_PORT):$(METRO_PORT) \
 			-v $(shell pwd)/$(MOBILE_DIR):/app \
-			-v /app/node_modules \
+			-v $(MOBILE_MODULES_VOLUME):/app/node_modules \
 			-v /app/.expo \
 			-v $(TUNNEL_VOLUME):/tmp/shared \
 			--env-file $(shell pwd)/$(MOBILE_ENV) \
-			--restart unless-stopped \
 			-it \
 			music-room-mobile:latest sh scripts/start-expo-tunnel.sh || { \
 			echo "$(RED)$(ICON_ERROR) Failed to start mobile with tunnel$(NC)"; \
@@ -474,7 +487,7 @@ endef
 define docker_down
 	@echo "$(BLUE)$(ICON_INFO) Stopping and removing containers...$(NC)"
 	@docker stop $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true
-	@docker rm $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true
+	@docker rm -v $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true
 	@docker network rm $(DOCKER_NETWORK) 2>/dev/null || true
 	@echo "$(GREEN)$(ICON_SUCCESS) Cleanup complete$(NC)"
 endef
@@ -484,8 +497,8 @@ endef
 define docker_down_volumes
 	@echo "$(CYAN)Stopping and removing containers + volumes...$(RESET)"
 	@docker stop $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true
-	@docker rm $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true
-	@docker volume rm $(TUNNEL_VOLUME) $(REDIS_VOLUME) 2>/dev/null || true
+	@docker rm -v $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true
+	@docker volume rm $(TUNNEL_VOLUME) $(REDIS_VOLUME) $(BACKEND_MODULES_VOLUME) $(MOBILE_MODULES_VOLUME) 2>/dev/null || true
 	@docker network rm $(DOCKER_NETWORK) 2>/dev/null || true
 	@echo "$(GREEN)$(ICON_SUCCESS) Full cleanup complete$(NC)"
 endef
@@ -495,8 +508,8 @@ endef
 define docker_down_full
 	@echo "$(RED)Full cleanup: removing all Zumik Docker resources...$(RESET)"
 	@docker stop $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true
-	@docker rm $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true
-	@docker volume rm $(TUNNEL_VOLUME) $(REDIS_VOLUME) 2>/dev/null || true
+	@docker rm -v $(BACKEND_CONTAINER) $(MOBILE_CONTAINER) $(REDIS_CONTAINER) 2>/dev/null || true
+	@docker volume rm $(TUNNEL_VOLUME) $(REDIS_VOLUME) $(BACKEND_MODULES_VOLUME) $(MOBILE_MODULES_VOLUME) 2>/dev/null || true
 	@docker network rm $(DOCKER_NETWORK) 2>/dev/null || true
 	@docker rmi music-room-backend:latest music-room-mobile:latest 2>/dev/null || true
 	@echo "$(GREEN)$(ICON_SUCCESS) Full cleanup complete$(NC)"
