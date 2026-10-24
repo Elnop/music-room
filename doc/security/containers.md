@@ -14,7 +14,7 @@ The repository has no `docker-compose.yml`. Containers are started by `docker ru
 |-------|------|---------|
 | `backend/Dockerfile` | `node:22-bookworm-slim` | tag, no digest: the Node and Debian patch level follows the tag's latest build |
 | `mobile/Dockerfile` | `node:22-bookworm-slim` | same |
-| `mobile/Dockerfile.android-build` | `node:22-bookworm` | same |
+| `mobile/Dockerfile.android-build` | `node:22-bookworm-slim` | same |
 | Redis (no Dockerfile) | `redis:7-alpine` (`REDIS_IMAGE`) | same |
 
 These are the official Docker Hub images, not Chainguard or distroless images: they contain a shell and a package manager, and their CVEs depend on the build date. No scan (Trivy, Docker Scout) runs in CI. To run one by hand: `trivy image music-room-backend:latest`.
@@ -26,7 +26,7 @@ Four stages:
 | Stage | Base | Content | User |
 |-------|------|---------|------|
 | `base` | `node:22-bookworm-slim` (glibc: `@ast-grep/cli` has no musl binary) | `WORKDIR /app`, copy of `package*.json` | root |
-| `development` | `base` | `npm ci --include=dev` with the image's npm 10, copy of the code, `EXPOSE 3000`, `CMD ["npm", "run", "dev"]` | **root** (no `USER`) |
+| `development` | `base` | `npm ci --include=dev` with the image's npm 10, then `npm cache clean --force` in the same layer (no npm cache in the image), copy of the code, `EXPOSE 3000`, `CMD ["npm", "run", "dev"]` | **root** (no `USER`) |
 | `builder` | `base` | same installs, copy of the code, `npm run build` | root (build stage) |
 | `production` | `node:22-bookworm-slim` | copies `package*.json`, `node_modules` and `dist` from `builder`; creates the `nodejs` group and user (uid/gid 1001); `chown -R nodejs:nodejs /app`; `EXPOSE 3000`; `CMD ["node", "dist/server.js"]` | `nodejs` (1001) |
 
@@ -39,25 +39,22 @@ What is actually used: `make` only builds `--target development` (`build_backend
 ### `zumik-backend` container (`start_backend`)
 
 - Image `music-room-backend:latest` (`development` stage), hence **root inside the container**.
-- `-v backend/:/app`: the host code is mounted read-write; a file created by the container on this mount belongs to root on the host. `node_modules` is an anonymous volume (`-v /app/node_modules`).
+- `-v backend/:/app`: the host code is mounted read-write; a file created by the container on this mount belongs to root on the host. `node_modules` is the named volume `music-room-backend-node-modules`, labelled `zumik.image=<image id>` and recreated when the image changes (`node_modules_volume`): it hides the host's `node_modules` and is reused across restarts instead of being copied again from the image.
 - `-v tunnel-info:/tmp/shared`: volume shared with the mobile container (tunnel URL).
 - `--env-file backend/.env`: secrets (Supabase service key, etc.) are passed as environment variables, visible through `docker inspect`. No `.env*` file is in the image (see above).
 - `-e NODE_ENV=development`: in this mode the backend also accepts `exp://` origins and https subdomains of the ngrok domains (`isOriginAllowed` / `isNgrokOrigin`, `backend/src/shared/config/cors.config.ts`, #209). An ngrok subdomain comes with a free account: an accepted dev risk (L11 in [threat-model.md](threat-model.md)).
 - `-p 3000:3000` on every host interface (required: the phone calls the host's IP on the local network, over HTTP).
-- `--restart unless-stopped`.
+- No restart policy: after a machine or Docker restart, the backend stays stopped until the next `make dev-docker`. Containers are removed with `docker rm -v`, which also drops their anonymous volumes.
 - Tunnel mode (`start_backend_tunnel`, `make dev-tunnel`): additionally `-p 4040:4040` (ngrok web interface, on every interface), command `sh scripts/start-with-tunnel.sh`. With `SUPABASE_MODE=local`, the same `--env-file backend/.env.supabase.local` and `SUPABASE_URL`/`SMTP_HOST` on `host.docker.internal` as `start_backend`. Only the backend is exposed through the tunnel: the local Supabase stack is not relayed (the `/supabase/auth/v1` relay of #251 was removed with #376), and the mobile container receives no Supabase value.
 
 ## Mobile (`mobile/Dockerfile`)
 
-A single stage, `node:22-bookworm-slim`, Expo development server (no production build):
+A single stage, `node:22-bookworm-slim`, Expo development server (no production build). No global npm package: `start-expo.sh` runs the project's own `expo`, and `@expo/ngrok` is a dependency of `mobile/package.json`.
 
 | Instruction | User |
 |-------------|------|
-| `npm install -g expo-cli @expo/ngrok` (unpinned versions) | root |
-| creation of `/tmp/shared` and `/app`, `chown node:node` | root |
-| `npm install`, copy of the code | `node` |
-| creation of `/app/.expo`, `chown` | root |
-| `chmod +x scripts/*.sh` | `node` |
+| creation of `/tmp/shared`, `/app` and `/app/.expo`, `chown node:node` | root |
+| `npm ci` (committed lockfile) then `npm cache clean --force`, copy of the code | `node` |
 | run: `CMD ["sh", "scripts/start-expo.sh"]` (`npx expo start --offline --port 8081`) | **`node`** (uid 1000 of the official image) |
 
 `EXPOSE 8081 19000 19001 19002` (Metro and Expo DevTools). `ENV EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0` and `REACT_NATIVE_PACKAGER_HOSTNAME=0.0.0.0`. `ENTRYPOINT []`. `mobile/.dockerignore` excludes every `.env*` file, `node_modules`, `android/`, `ios/`, `*.keystore`, the tests and `*.md`: no environment file is copied into the image.
@@ -65,22 +62,22 @@ A single stage, `node:22-bookworm-slim`, Expo development server (no production 
 ### `zumik-mobile` container (`start_mobile`)
 
 - `-p 8081:8081 -p 19000:19000 -p 19001:19001 -p 19002:19002` on every host interface: Metro serves the app's JavaScript bundle to anyone who reaches the host. This bundle contains the `EXPO_PUBLIC_*` variables (backend URL, public OAuth identifiers); they are public by nature (they are also in the APK). It no longer contains any Supabase value since #376 ([threat-model.md](threat-model.md#m8-direct-supabase-access-with-the-anon-key)).
-- `-v mobile/:/app`, anonymous volumes `/app/node_modules` and `/app/.expo`, `-v tunnel-info:/tmp/shared`.
+- `-v mobile/:/app`, named volume `music-room-mobile-node-modules` on `/app/node_modules` (same mechanism as the backend), anonymous volume `/app/.expo`, `-v tunnel-info:/tmp/shared`. No restart policy.
 - `--env-file mobile/.env` (not in the image), plus `REACT_NATIVE_PACKAGER_HOSTNAME=<host IP>`, `EXPO_PUBLIC_API_URL` and `EXPO_PUBLIC_WS_URL` (`http://` and `ws://` to the host IP, port 3000).
-- `--restart unless-stopped`, `-it`.
+- `-it`.
 
 ## APK build (`mobile/Dockerfile.android-build`)
 
 Build image, started by `scripts/build-apk-docker.sh` (`make build-apk-docker`), never by `make dev-*`.
 
-- Base `node:22-bookworm`. **No `USER`: everything runs as root**, installation and build alike.
-- Installs through `apt-get`: `openjdk-17-jdk`, `build-essential`, `git`, `curl`, `wget`, `unzip`, `bash`, `coreutils`.
-- `npm install -g npm@10.3.0`, then `eas-cli` (unpinned), `@expo/ngrok@^4.1.0`, `sharp-cli@^2.1.0`; Yarn through `corepack` (`yarn@stable`).
+- Base `node:22-bookworm-slim`. **No `USER`: everything runs as root**, installation and build alike.
+- Installs through `apt-get --no-install-recommends`: `openjdk-17-jdk-headless`, `build-essential`, `python3`, `git`, `curl`, `wget`, `unzip`, `ca-certificates`. No global npm package.
 - Downloads the Android tools (`commandlinetools-linux-9477386_latest.zip`, `platform-tools-latest-linux.zip`) from `dl.google.com` with `wget`, without checksum verification, and accepts the licenses (`yes | sdkmanager --licenses`).
 - Build context: the repository root. The root `.dockerignore` excludes `**/.env*`, `**/node_modules` and `.git`. Copies `mobile/` into `/app` and `scripts/` into `/scripts`.
-- `npm install --ignore-scripts && npm run postinstall || true`: a failure of this line does not stop the build.
+- `npm ci --ignore-scripts && npm run postinstall && npm cache clean --force`: a failing `patch-package` stops the build.
 - `EXPO_PUBLIC_API_URL` / `EXPO_PUBLIC_WS_URL`: `ARG` with a dummy value, replaced at `docker run` by the tunnel URL; `NODE_ENV=production`.
-- No `EXPOSE`. `CMD ["bash", "/build.sh"]`: `expo prebuild`, `scripts/generate-network-config.sh` (cleartext HTTP allowed for `localhost`, `10.0.2.2`, `127.0.0.1` and the tunnel domain), `./gradlew assembleRelease`.
+- No `EXPOSE`. `CMD ["bash", "/build.sh"]`: `expo prebuild`, `scripts/generate-network-config.sh` (cleartext HTTP allowed for `localhost`, `10.0.2.2`, `127.0.0.1` and the tunnel domain), `./gradlew assembleRelease` with `--max-workers=${GRADLE_WORKERS:-2}` (the 2 GB heap comes from the generated `gradle.properties`); `REACT_NATIVE_ARCHITECTURES` (passed by `make build-apk-docker REACT_NATIVE_ARCHITECTURES=arm64-v8a`) limits the ABIs.
+- `-v zumik-gradle-cache:/root/.gradle`: Gradle's dependencies and wrapper are kept between builds.
 - `docker run --rm -v <output>:/output`: the APK is copied into `/output` by root, so it belongs to root on the host.
 
 ## Redis (`start_redis`)

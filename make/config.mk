@@ -60,6 +60,9 @@ LOGS_TAIL ?= 100
 # Docker volumes
 TUNNEL_VOLUME := tunnel-info
 REDIS_VOLUME := redis-data
+# node_modules of the backend and mobile containers (see node_modules_volume)
+BACKEND_MODULES_VOLUME := music-room-backend-node-modules
+MOBILE_MODULES_VOLUME := music-room-mobile-node-modules
 
 # Legacy service names (for backward compatibility with existing code)
 BACKEND_SERVICE := backend
