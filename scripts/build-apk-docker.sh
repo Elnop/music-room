@@ -74,8 +74,12 @@ echo -e "${YELLOW}   This may take 5-10 minutes...${NC}"
 echo ""
 
 # Run build
+# zumik-gradle-cache: Gradle's dependencies and wrapper, kept between builds
 docker run --rm \
     -v "$OUTPUT_DIR:/output" \
+    -v zumik-gradle-cache:/root/.gradle \
+    ${REACT_NATIVE_ARCHITECTURES:+-e REACT_NATIVE_ARCHITECTURES="$REACT_NATIVE_ARCHITECTURES"} \
+    ${GRADLE_WORKERS:+-e GRADLE_WORKERS="$GRADLE_WORKERS"} \
     -e EXPO_PUBLIC_API_URL="$TUNNEL_URL" \
     -e EXPO_PUBLIC_WS_URL="$WS_URL" \
     zumik-apk-builder

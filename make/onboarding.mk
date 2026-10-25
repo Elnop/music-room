@@ -5,6 +5,8 @@
 
 .PHONY: check-setup
 
+NODE_MAJOR := $(shell cat .nvmrc 2>/dev/null)
+
 check-setup: ## Verify development environment is correctly configured
 	$(call print_header,Environment Setup Check)
 	@ERRORS=0; \
@@ -34,12 +36,12 @@ check-setup: ## Verify development environment is correctly configured
 	echo ""; \
 	\
 	echo "$(YELLOW)$(ICON_ARROW) adb command...$(NC)"; \
-	if ! command -v adb >/dev/null 2>&1; then \
-		echo "  $(RED)$(ICON_ERROR) adb not found in PATH$(NC)"; \
-		echo "  $(YELLOW)→ Add to PATH: \$$ANDROID_HOME/platform-tools$(NC)"; \
+	if ! command -v $(ADB) >/dev/null 2>&1; then \
+		echo "  $(RED)$(ICON_ERROR) adb not found: $(ADB)$(NC)"; \
+		echo "  $(YELLOW)→ Set ANDROID_HOME, or pass ADB=<path to adb> (WSL2: doc/development/wsl2.md)$(NC)"; \
 		ERRORS=$$((ERRORS + 1)); \
 	else \
-		ADB_VERSION=$$(adb --version 2>&1 | head -1); \
+		ADB_VERSION=$$($(ADB) --version 2>&1 | head -1); \
 		echo "  $(GREEN)$(ICON_SUCCESS) adb found: $$ADB_VERSION$(NC)"; \
 	fi; \
 	echo ""; \
@@ -72,11 +74,21 @@ check-setup: ## Verify development environment is correctly configured
 	echo "$(YELLOW)$(ICON_ARROW) Node.js...$(NC)"; \
 	if ! command -v node >/dev/null 2>&1; then \
 		echo "  $(RED)$(ICON_ERROR) Node.js not found$(NC)"; \
-		echo "  $(YELLOW)→ Install Node.js 18+: https://nodejs.org$(NC)"; \
+		echo "  $(YELLOW)→ Install Node.js $(NODE_MAJOR) (.nvmrc), e.g. nvm install$(NC)"; \
 		ERRORS=$$((ERRORS + 1)); \
 	else \
 		NODE_VERSION=$$(node --version); \
-		echo "  $(GREEN)$(ICON_SUCCESS) Node.js: $$NODE_VERSION$(NC)"; \
+		if [ "$${NODE_VERSION%%.*}" != "v$(NODE_MAJOR)" ]; then \
+			echo "  $(RED)$(ICON_ERROR) Node.js $$NODE_VERSION, the project needs $(NODE_MAJOR) (.nvmrc)$(NC)"; \
+			echo "  $(YELLOW)→ nvm install && nvm use$(NC)"; \
+			ERRORS=$$((ERRORS + 1)); \
+		else \
+			echo "  $(GREEN)$(ICON_SUCCESS) Node.js: $$NODE_VERSION$(NC)"; \
+		fi; \
+		NPM_VERSION=$$(npm --version 2>/dev/null); \
+		if [ "$${NPM_VERSION%%.*}" != "10" ]; then \
+			echo "  $(YELLOW)$(ICON_WARNING) npm $$NPM_VERSION: lockfiles must be written with npm 10 (npx -y npm@10 install --package-lock-only)$(NC)"; \
+		fi; \
 	fi; \
 	echo ""; \
 	\
@@ -174,7 +186,6 @@ check-setup: ## Verify development environment is correctly configured
 	echo "$(YELLOW)$(ICON_ARROW) Facebook OAuth Configuration...$(NC)"; \
 	if [ -f "$(BACKEND_ENV)" ] && [ -f "$(MOBILE_ENV)" ]; then \
 		BACKEND_FB_ID=$$(grep '^FACEBOOK_APP_ID=' $(BACKEND_ENV) | cut -d'=' -f2); \
-		BACKEND_FB_SECRET=$$(grep '^FACEBOOK_APP_SECRET=' $(BACKEND_ENV) | cut -d'=' -f2); \
 		MOBILE_FB_ID=$$(grep '^EXPO_PUBLIC_FACEBOOK_APP_ID=' $(MOBILE_ENV) | cut -d'=' -f2); \
 		MOBILE_FB_TOKEN=$$(grep '^EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN=' $(MOBILE_ENV) | cut -d'=' -f2); \
 		\
@@ -188,13 +199,6 @@ check-setup: ## Verify development environment is correctly configured
 			ERRORS=$$((ERRORS + 1)); \
 		else \
 			echo "    $(GREEN)$(ICON_SUCCESS) App ID configured: $$BACKEND_FB_ID$(NC)"; \
-		fi; \
-		\
-		if [ -z "$$BACKEND_FB_SECRET" ] || [ "$$BACKEND_FB_SECRET" = "your-facebook-app-secret" ]; then \
-			echo "    $(YELLOW)$(ICON_WARNING) Facebook App Secret not configured$(NC)"; \
-			echo "    $(YELLOW)→ Set FACEBOOK_APP_SECRET in backend/.env$(NC)"; \
-		else \
-			echo "    $(GREEN)$(ICON_SUCCESS) App Secret configured (length: $${#BACKEND_FB_SECRET})$(NC)"; \
 		fi; \
 		\
 		echo "  $(BLUE)Mobile:$(NC)"; \
@@ -242,7 +246,7 @@ check-setup: ## Verify development environment is correctly configured
 		echo ""; \
 		echo "$(BLUE)$(ICON_INFO) Next steps:$(NC)"; \
 		echo "  1. $(GREEN)make start-emulator$(NC) - Start Android emulator"; \
-		echo "  2. $(GREEN)cd mobile && npx expo run:android --no-bundler$(NC) - Build and install the debug build"; \
+		echo "  2. $(GREEN)cd mobile && npx expo run:android --app-id com.zumik.app.dev --no-bundler$(NC) - Build and install the debug build"; \
 		echo "  3. $(GREEN)make dev-local$(NC) - Start backend + Metro and open the app"; \
 		echo ""; \
 	else \

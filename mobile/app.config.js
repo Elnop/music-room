@@ -87,6 +87,7 @@ module.exports = {
 				},
 			],
 			'./plugins/withDebugKeystore.js',
+			'./plugins/withDevVariant.js',
 			'./plugins/withMedia3Version.js',
 			['expo-media-control', { enableBackgroundAudio: true, audioSessionCategory: 'playback' }],
 			[

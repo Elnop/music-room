@@ -3,9 +3,7 @@
 # ==============================================================================
 # Commands for local development, useful with Android Studio emulator
 
-.PHONY: dev-local expo-android expo-clear check-devices start-emulator start-emulators .boot-emulators restart-emulators restart-emulators-clean clean-emulators .stop-emulators .clear-emulator-snapshots .clear-metro-cache .cache-app-apk .open-app-when-metro open-app kill-emulator restart-emulator list-emulators open-emulator
-
-ADB := $(ANDROID_HOME)/platform-tools/adb
+.PHONY: dev-local dev-phone .phone-reverse open-phone expo-android expo-clear check-devices start-emulator start-emulators .boot-emulators restart-emulators restart-emulators-clean clean-emulators .stop-emulators .clear-emulator-snapshots .clear-metro-cache .cache-app-apk .open-app-when-metro open-app kill-emulator restart-emulator list-emulators open-emulator
 
 # Rendering goes through the host GPU: software rendering (swiftshader) puts the
 # whole screen on the CPU and two emulators lag. GPU=swiftshader_indirect brings
@@ -58,7 +56,7 @@ dev-local: .ensure-backend-deps .ensure-mobile-deps ## Start development locally
 	@sleep $(SHORT_WAIT_TIME)
 	$(call print_success,Backend started: $(BACKEND_URL))
 	$(call blank_line)
-	$(call print_arrow,Starting Metro; the Zumik debug build opens on the emulator once it is up...)
+	$(call print_arrow,Starting Metro; the Zumik debug build opens once it is up...)
 	$(call blank_line)
 	@$(MAKE) --no-print-directory .open-app-when-metro &
 	$(call expo_mobile,start --localhost --dev-client)
@@ -69,6 +67,47 @@ expo-android: ## Quick start: Start Metro and open the debug build on the Androi
 	@$(MAKE) --no-print-directory .open-app-when-metro &
 	$(call expo_mobile,start --localhost --dev-client)
 
+# Phone over USB, whatever the network: adb reverse brings the phone's
+# localhost:8081 (Metro) and :3000 (backend) to this machine, so the app calls
+# the backend on localhost instead of HOST_IP.
+dev-phone: .phone-reverse ## Start backend + Metro locally and open the Zumik Dev build on the USB phone (PHONE=serial)
+	@$(MAKE) --no-print-directory dev-local OPEN_APP=open-phone \
+		DEV_API_URL=http://localhost:$(BACKEND_PORT) DEV_WS_URL=ws://localhost:$(BACKEND_PORT)
+
+# Sets SERIAL to the USB phone: PHONE=<serial>, else the first authorized
+# device that is not an emulator.
+FIND_PHONE = SERIAL=$(or $(PHONE),$$($(ADB) devices | tr -d '\r' | awk '$$2 == "device" && $$1 !~ /^emulator/ { print $$1; exit }'))
+
+.phone-reverse:
+	@$(FIND_PHONE); \
+	if [ -z "$$SERIAL" ]; then \
+		echo "$(RED)$(ICON_ERROR) No phone found by $(ADB)$(NC)"; \
+		if $(ADB) devices | grep -q unauthorized; then \
+			echo "$(YELLOW)$(ICON_WARNING) Unlock the phone and accept \"Allow USB debugging\"$(NC)"; \
+		else \
+			echo "$(YELLOW)$(ICON_WARNING) Plug it in over USB with USB debugging on (WSL2: ADB=<Windows adb.exe>, see doc/development/wsl2.md)$(NC)"; \
+		fi; \
+		exit 1; \
+	fi; \
+	$(ADB) -s $$SERIAL reverse tcp:$(METRO_PORT) tcp:$(METRO_PORT) > /dev/null \
+		&& $(ADB) -s $$SERIAL reverse tcp:$(BACKEND_PORT) tcp:$(BACKEND_PORT) > /dev/null || exit 1; \
+	echo "$(GREEN)$(ICON_SUCCESS) $$SERIAL: Metro ($(METRO_PORT)) and backend ($(BACKEND_PORT)) forwarded over USB$(NC)"
+
+# -S restarts the app, so it loads the bundle again from Metro.
+open-phone: .phone-reverse ## Launch the Zumik Dev build on the USB phone (PHONE=serial)
+	@$(FIND_PHONE); \
+	if ! $(ADB) -s $$SERIAL shell pm path $(APP_PACKAGE) 2>/dev/null | grep -q package; then \
+		echo "$(RED)$(ICON_ERROR) Zumik Dev is not installed on $$SERIAL$(NC)"; \
+		echo "$(YELLOW)$(ICON_WARNING) Install it once: cd mobile && npx expo run:android --app-id $(APP_PACKAGE) --device --no-bundler$(NC)"; \
+		exit 1; \
+	fi; \
+	$(ADB) -s $$SERIAL shell am start -S -n $(APP_ACTIVITY) > /dev/null || exit 1; \
+	echo "$(GREEN)$(ICON_SUCCESS) $$SERIAL: Zumik Dev started$(NC)"
+
+# Target that opens the debug build once Metro is up: open-app (emulators) or
+# open-phone (set by dev-phone).
+OPEN_APP ?= open-app
+
 # Wait (up to 2 minutes) until Metro answers, then open the debug build.
 # Expo CLI's --android would open Expo Go, which cannot run the app.
 .open-app-when-metro:
@@ -77,7 +116,7 @@ expo-android: ## Quick start: Start Metro and open the debug build on the Androi
 		if [ $$i -gt 60 ]; then echo "$(YELLOW)$(ICON_WARNING) Metro did not start; run make open-app once it is up$(NC)"; exit 0; fi; \
 		sleep 2; \
 	done; \
-	$(MAKE) --no-print-directory open-app
+	$(MAKE) --no-print-directory $(OPEN_APP)
 
 expo-clear: ## Start Expo with cleared cache (local)
 	@$(call write_mobile_dev_env)
@@ -87,24 +126,19 @@ expo-clear: ## Start Expo with cleared cache (local)
 check-devices: ## Check if Android device is connected
 	$(call print_header,Checking Connected Devices)
 	$(call print_subsection,📱 Android Devices)
-	@if docker ps --format '{{.Names}}' | grep -q zumik-$(MOBILE_SERVICE); then \
-		echo "$(BLUE)$(ICON_INFO) Using Docker container$(NC)"; \
-		$(call docker_exec,zumik-$(MOBILE_SERVICE),adb devices) 2>/dev/null || echo "$(RED)$(ICON_ERROR) No devices$(NC)"; \
+	@if command -v $(ADB) >/dev/null 2>&1; then \
+		echo "$(BLUE)$(ICON_INFO) Using $(ADB)$(NC)"; \
+		$(ADB) devices -l; \
 	else \
-		if command -v adb >/dev/null 2>&1; then \
-			echo "$(BLUE)$(ICON_INFO) Using local adb$(NC)"; \
-			adb devices; \
-		else \
-			echo "$(RED)$(ICON_ERROR) adb not found$(NC)"; \
-			echo "$(YELLOW)$(ICON_WARNING) Start Docker: make dev-docker$(NC)"; \
-			echo "$(YELLOW)$(ICON_WARNING) Or install Android SDK$(NC)"; \
-		fi; \
+		echo "$(RED)$(ICON_ERROR) adb not found: $(ADB)$(NC)"; \
+		echo "$(YELLOW)$(ICON_WARNING) Set ANDROID_HOME, or pass ADB=<path to adb> (WSL2: doc/development/wsl2.md)$(NC)"; \
+		exit 1; \
 	fi
 	$(call blank_line)
 	$(call print_subsection,💡 Tips)
 	@echo "   • Enable USB debugging on device"
 	@echo "   • Accept USB authorization popup"
-	@echo "   • Use $(GREEN)make dev-android$(NC) to launch"
+	@echo "   • Use $(GREEN)make dev-phone$(NC) to launch on a USB phone"
 	$(call blank_line)
 
 start-emulator: ## Start the Android emulator and open the app, cold boot by default (AVD=name, FAST=1 to resume saved state)
@@ -114,7 +148,7 @@ start-emulator: ## Start the Android emulator and open the app, cold boot by def
 	@echo "   • Boot: $(if $(FAST),quick boot (resumes saved state),cold boot (FAST=1 to resume saved state))"
 	@echo ""
 	$(call print_arrow,Checking for running emulators...)
-	@RUNNING=$$($(ANDROID_HOME)/platform-tools/adb devices | grep emulator | wc -l); \
+	@RUNNING=$$($(ADB) devices | grep emulator | wc -l); \
 	if [ $$RUNNING -gt 0 ]; then \
 		echo "$(YELLOW)$(ICON_WARNING) Emulator already running$(NC)"; \
 		echo "$(BLUE)$(ICON_INFO) Use $(GREEN)make kill-emulator$(NC) to stop it first$(NC)"; \
@@ -185,12 +219,15 @@ start-emulators: ## Start two Android emulators for two-account tests and open t
 # The app runs as the Zumik debug build (Expo Go cannot load its native modules,
 # e.g. Google Sign-In). A debug build loads the JS from Metro on the host
 # (10.0.2.2:8081 from an emulator), so it runs the current branch.
-APP_PACKAGE := com.zumik.app
+# The debug build is "Zumik Dev" (mobile/plugins/withDevVariant.js), next to the
+# release; its activity keeps the namespace of the release.
+APP_PACKAGE := com.zumik.app.dev
+APP_ACTIVITY := $(APP_PACKAGE)/com.zumik.app.MainActivity
 # The host as seen from an emulator. Android reports the boot as complete
 # before its network is up: launched then, the app misses Metro and shows
 # "Unable to load script", so open-app waits until Metro answers here.
 EMULATOR_HOST := 10.0.2.2
-APP_APK_CACHE := $(HOME)/.cache/zumik/zumik-debug.apk
+APP_APK_CACHE := $(HOME)/.cache/zumik/zumik-dev-debug.apk
 
 # Copy the debug build from a running emulator into APP_APK_CACHE, once
 .cache-app-apk:
@@ -230,13 +267,13 @@ open-app: ## Launch the Zumik debug build on every running emulator, copying it 
 			$(MAKE) --no-print-directory .cache-app-apk; \
 			if [ ! -f "$(APP_APK_CACHE)" ]; then \
 				echo "$(RED)$(ICON_ERROR) Zumik is not installed on $$serial nor on any other emulator$(NC)"; \
-				echo "$(YELLOW)$(ICON_WARNING) Install a debug build once: cd mobile && npx expo run:android --no-bundler (it is then reused)$(NC)"; \
+				echo "$(YELLOW)$(ICON_WARNING) Install a debug build once: cd mobile && npx expo run:android --app-id com.zumik.app.dev --no-bundler (it is then reused)$(NC)"; \
 				exit 1; \
 			fi; \
 			echo "$(BLUE)$(ICON_INFO) Installing Zumik on $$serial...$(NC)"; \
 			$(ADB) -s $$serial install -r "$(APP_APK_CACHE)" > /dev/null || exit 1; \
 		fi; \
-		$(ADB) -s $$serial shell am start -n $(APP_PACKAGE)/.MainActivity > /dev/null 2>&1 || exit 1; \
+		$(ADB) -s $$serial shell am start -n $(APP_ACTIVITY) > /dev/null 2>&1 || exit 1; \
 		echo "$(GREEN)$(ICON_SUCCESS) $$serial: Zumik started$(NC)"; \
 	done; \
 	echo "$(BLUE)$(ICON_INFO) ⏳ Checking the app stays open (a launch right after boot can crash)...$(NC)"; \
@@ -244,7 +281,7 @@ open-app: ## Launch the Zumik debug build on every running emulator, copying it 
 	for serial in $$(echo "$$DEVICES"); do \
 		if ! $(ADB) -s $$serial shell dumpsys activity activities 2>/dev/null | grep -m1 topResumedActivity | grep -q $(APP_PACKAGE); then \
 			echo "$(YELLOW)$(ICON_WARNING) Zumik is not in the foreground on $$serial, relaunching$(NC)"; \
-			$(ADB) -s $$serial shell am start -n $(APP_PACKAGE)/.MainActivity > /dev/null 2>&1 || exit 1; \
+			$(ADB) -s $$serial shell am start -n $(APP_ACTIVITY) > /dev/null 2>&1 || exit 1; \
 		fi; \
 	done
 	$(call blank_line)
@@ -331,16 +368,16 @@ restart-emulator: ## Stop the emulator and cold boot it again (AVD=name, FAST=1 
 kill-emulator: ## Stop all running Android emulators
 	$(call print_header,Stopping Android Emulators)
 	$(call print_arrow,Checking for running emulators...)
-	@RUNNING=$$($(ANDROID_HOME)/platform-tools/adb devices | grep emulator | wc -l); \
+	@RUNNING=$$($(ADB) devices | grep emulator | wc -l); \
 	if [ $$RUNNING -eq 0 ]; then \
 		echo "$(YELLOW)$(ICON_WARNING) No emulators running$(NC)"; \
 		exit 0; \
 	fi
 	$(call blank_line)
 	$(call print_arrow,Killing emulators...)
-	@$(ANDROID_HOME)/platform-tools/adb devices | grep emulator | cut -f1 | while read device; do \
+	@$(ADB) devices | grep emulator | cut -f1 | while read device; do \
 		echo "  $(YELLOW)Stopping $$device$(NC)"; \
-		$(ANDROID_HOME)/platform-tools/adb -s $$device emu kill 2>/dev/null || true; \
+		$(ADB) -s $$device emu kill 2>/dev/null || true; \
 	done
 	@sleep 2
 	$(call print_success,All emulators stopped)
@@ -379,10 +416,10 @@ open-emulator: ## Open a specific Android emulator and the app on it (interactiv
 		exit 1; \
 	fi
 	$(call print_arrow,Checking for running emulators...)
-	@RUNNING=$$($(ANDROID_HOME)/platform-tools/adb devices | grep emulator | wc -l); \
+	@RUNNING=$$($(ADB) devices | grep emulator | wc -l); \
 	if [ $$RUNNING -gt 0 ]; then \
 		echo "$(YELLOW)$(ICON_WARNING) Emulator already running$(NC)"; \
-		$(ANDROID_HOME)/platform-tools/adb devices | grep emulator | while read device rest; do \
+		$(ADB) devices | grep emulator | while read device rest; do \
 			echo "  $(GREEN)$$device$(NC) - $$rest"; \
 		done; \
 		echo ""; \

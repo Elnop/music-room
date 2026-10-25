@@ -107,7 +107,7 @@ define display_metro_connect
 	$(call blank_line)
 	$(if $(filter lan,$(1)),\
 		@echo "   Emulator:      $(GREEN)make open-app$(NC) (reaches Metro on $(EMULATOR_HOST):$(METRO_PORT) by itself)"; \
-		echo "   Phone (USB):   $(GREEN)adb reverse tcp:$(METRO_PORT) tcp:$(METRO_PORT)$(NC) and open Zumik"; \
+		echo "   Phone (USB):   $(GREEN)make dev-phone$(NC) instead (forwards Metro and the backend over USB, any network)"; \
 		echo "   Phone (WiFi):  dev menu (shake) > Change Bundle Location > $(GREEN)$(METRO_ADDRESS)$(NC)")
 	$(if $(filter tunnel,$(1)),\
 		@HOST=$$(docker logs $(MOBILE_CONTAINER) 2>&1 | grep -o '[a-z0-9-]*\.exp\.direct' | tail -1); \
@@ -118,7 +118,7 @@ define display_metro_connect
 			echo "   $(YELLOW)$(ICON_WARNING) Expo tunnel not ready yet: run $(GREEN)make qr-tunnel$(YELLOW) again in a few seconds$(NC)"; \
 		fi)
 	$(call blank_line)
-	@echo "   No debug build on the device? $(GREEN)cd mobile && npx expo run:android --no-bundler$(NC) (add $(GREEN)--device$(NC) for a phone)"
+	@echo "   No debug build on the device? $(GREEN)cd mobile && npx expo run:android --app-id com.zumik.app.dev --no-bundler$(NC) (add $(GREEN)--device$(NC) for a phone)"
 	@echo "   \"Unable to load script\": Metro is unreachable; check the address above, then tap RELOAD"
 	$(call blank_line)
 	$(call print_separator)

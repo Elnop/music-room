@@ -34,5 +34,6 @@ Everything a human needs to understand Zumik. Start with the [project README](..
 - [development/testing.md](development/testing.md) - Test strategy, mocks, single-test commands.
 - [development/quality-and-ci.md](development/quality-and-ci.md) - `npm run check`, the pre-commit hook and the CI.
 - [development/tunnel-mode.md](development/tunnel-mode.md) - Running the app on a phone on another network.
+- [development/wsl2.md](development/wsl2.md) - Developing on Windows with WSL2: JDK 17, the Windows adb for a USB phone, memory limits.
 - [development/demo-accounts.md](development/demo-accounts.md) - The demo accounts and playlists of the local stack.
 - [../tests/performance/README.md](../tests/performance/README.md) - Load tests (`make perf-test`).

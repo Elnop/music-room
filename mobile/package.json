@@ -4,7 +4,7 @@
 	"main": "index.ts",
 	"scripts": {
 		"start": "expo start",
-		"android": "expo run:android",
+		"android": "expo run:android --app-id com.zumik.app.dev",
 		"ios": "expo run:ios",
 		"web": "expo start --web",
 		"start:lan": "expo start --lan",
@@ -36,7 +36,7 @@
 		"doctor": "npx expo-doctor",
 		"update": "npx expo install --check",
 		"prebuild": "npx expo prebuild",
-		"build:local": "npx expo run:android",
+		"build:local": "npx expo run:android --app-id com.zumik.app.dev",
 		"dev:backend": "cd ../backend && npm run dev",
 		"postinstall": "patch-package"
 	},
@@ -124,6 +124,7 @@
 	"jest": {
 		"preset": "jest-expo",
 		"testTimeout": 15000,
+		"maxWorkers": "50%",
 		"collectCoverageFrom": [
 			"src/**/*.{ts,tsx}",
 			"App.tsx",

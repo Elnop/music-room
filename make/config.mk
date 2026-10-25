@@ -6,6 +6,9 @@
 # Force zsh shell (team uses zsh for environment variables and consistent behavior)
 SHELL := /bin/zsh
 .SHELLFLAGS := -c
+ifeq ($(wildcard $(SHELL)),)
+$(error zsh is required by make ($(SHELL) not found): install it, e.g. sudo apt install zsh)
+endif
 
 # Detect operating system
 UNAME_S := $(shell uname -s)
@@ -57,6 +60,9 @@ LOGS_TAIL ?= 100
 # Docker volumes
 TUNNEL_VOLUME := tunnel-info
 REDIS_VOLUME := redis-data
+# node_modules of the backend and mobile containers (see node_modules_volume)
+BACKEND_MODULES_VOLUME := music-room-backend-node-modules
+MOBILE_MODULES_VOLUME := music-room-mobile-node-modules
 
 # Legacy service names (for backward compatibility with existing code)
 BACKEND_SERVICE := backend
@@ -170,6 +176,10 @@ METRO_ADDRESS := $(HOST_IP):$(METRO_PORT)
 # Example for macOS:
 #   export ANDROID_HOME=$HOME/Library/Android/sdk
 #   export JAVA_HOME=/opt/homebrew/opt/openjdk@17
+
+# adb used by every target. Override it to use another one, e.g. on WSL2 the
+# Windows adb.exe, which sees USB phones: make <target> ADB=/mnt/c/.../adb.exe
+ADB ?= $(if $(ANDROID_HOME),$(ANDROID_HOME)/platform-tools/adb,adb)
 
 # ========================================
 # Redis Configuration

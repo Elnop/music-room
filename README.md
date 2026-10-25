@@ -16,6 +16,21 @@ The app is a remote control of an Express/TypeScript API backed by Supabase (Pos
 - **[backend/README.md](backend/README.md)** and **[mobile/README.md](mobile/README.md)**: each project's structure and commands.
 - **[Swagger UI](http://localhost:3000/api-docs)**: the API reference, once the backend runs.
 
+## Prerequisites
+
+Install these before `make install`; `make check-setup` checks them.
+
+| Tool | Version | Notes |
+| --- | --- | --- |
+| Node.js | 22 (`.nvmrc`) | `nvm install && nvm use`. Its npm 10 writes the lockfiles: with npm 11, run `npx -y npm@10 install --package-lock-only` after a dependency change, or `npm ci` fails in the CI. |
+| make, zsh, curl | any | The Makefiles run their recipes with `/bin/zsh` and wait for services with `curl`: `sudo apt install make zsh curl`. |
+| Docker | Engine or Docker Desktop | Redis, the local Supabase stack, and the semgrep and gitleaks checks of `npm run check`. |
+| JDK | 17 | Native Android build. `JAVA_HOME` set. |
+| Android SDK | platform 35, build-tools 35.0.0, platform-tools | Android Studio, or the command-line tools: `sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools"`. `ANDROID_HOME` set. |
+| GitHub CLI (`gh`) | any | Issues, project board and pull requests (see [Contributing](#contributing)). |
+
+On Windows, work in WSL2: [wsl2.md](doc/development/wsl2.md) covers JDK 17 on Debian 13, the Windows adb for a USB phone, and memory limits.
+
 ## Quick Start
 
 ```bash
@@ -37,13 +52,13 @@ make stop
 
 ### Run the app
 
-The app runs only as the native debug build (`com.zumik.app`). It does not start in Expo Go, which lacks its native modules (Google and Facebook sign-in, image colors).
+The app runs only as the native debug build, "Zumik Dev" (`com.zumik.app.dev`), which installs next to the release (`com.zumik.app`, GitHub Releases) with its own data. It does not start in Expo Go, which lacks its native modules (Google and Facebook sign-in, image colors).
 
-1. **Install the debug build once**: `cd mobile && npx expo run:android --no-bundler` (Android SDK required) builds it and installs it on the running emulator or USB phone (`--device` to pick one); `--no-bundler` keeps it from starting its own Metro on 8081, which would clash with the one `make` starts. `make open-app` copies it to every other running emulator. iOS: `npx expo run:ios` on macOS.
-2. **Start Metro**: `make dev-docker`, `make dev-local` (Android Studio emulator) or `make dev-tunnel` (phone on another network).
+1. **Install the debug build once**: `cd mobile && npx expo run:android --app-id com.zumik.app.dev --no-bundler` (Android SDK required) builds it and installs it on the running emulator or USB phone (`--device` to pick one); `--no-bundler` keeps it from starting its own Metro on 8081, which would clash with the one `make` starts. `make open-app` copies it to every other running emulator. iOS: `npx expo run:ios` on macOS.
+2. **Start Metro**: `make dev-phone` (USB phone, any network), `make dev-docker`, `make dev-local` (Android Studio emulator) or `make dev-tunnel` (phone on another network).
 3. **Point the app at Metro** (`make qr` / `make qr-tunnel` print these steps):
    - Emulator: automatic, it reaches Metro on `10.0.2.2:8081`; `make open-app` launches it.
-   - Phone over USB: `adb reverse tcp:8081 tcp:8081`, then open Zumik.
+   - Phone over USB: automatic with `make dev-phone`: it forwards Metro (8081) and the backend (3000) with `adb reverse`, points the app at `localhost` and opens Zumik Dev (`make open-phone` opens it again, e.g. after replugging). `PHONE=<serial>` picks a phone when several are plugged in; on WSL2, pass the Windows adb (`ADB=...`, see [wsl2.md](doc/development/wsl2.md)).
    - Phone on the same Wi-Fi: shake the phone, dev menu › **Change Bundle Location** › `<HOST_IP>:8081` (`make info` shows the address).
    - Phone on another network: same menu, enter the Expo tunnel host shown by `make qr-tunnel` (`xxxx-8081.exp.direct:80`).
 
@@ -82,13 +97,15 @@ Why these choices: [doc/decisions.md](doc/decisions.md).
 2. On a physical device, set `http://YOUR_LOCAL_IP:3000` in `mobile/.env` and use the same Wi-Fi (or `make dev-tunnel`), or change the backend address in the app's settings
 3. Check `ALLOWED_ORIGINS` in `backend/.env`
 
+**Windows / WSL2** (USB phone not seen, JDK 17 missing, machine freezing during a build): see [wsl2.md](doc/development/wsl2.md).
+
 **Docker issues**: `make clean`, then `make install` and `make dev-docker`
 
 **Type errors after a pull**: `npm install && npm run type-check` in `backend/` and `mobile/`
 
 **Expo cache issues**: `cd mobile && npm run reset`
 
-**The app crashes at startup in Expo Go**: expected, it needs its native modules. Install the debug build (`cd mobile && npx expo run:android --no-bundler`), see [Run the app](#run-the-app).
+**The app crashes at startup in Expo Go**: expected, it needs its native modules. Install the debug build (`cd mobile && npx expo run:android --app-id com.zumik.app.dev --no-bundler`), see [Run the app](#run-the-app).
 
 ## Links
 
