@@ -186,7 +186,6 @@ check-setup: ## Verify development environment is correctly configured
 	echo "$(YELLOW)$(ICON_ARROW) Facebook OAuth Configuration...$(NC)"; \
 	if [ -f "$(BACKEND_ENV)" ] && [ -f "$(MOBILE_ENV)" ]; then \
 		BACKEND_FB_ID=$$(grep '^FACEBOOK_APP_ID=' $(BACKEND_ENV) | cut -d'=' -f2); \
-		BACKEND_FB_SECRET=$$(grep '^FACEBOOK_APP_SECRET=' $(BACKEND_ENV) | cut -d'=' -f2); \
 		MOBILE_FB_ID=$$(grep '^EXPO_PUBLIC_FACEBOOK_APP_ID=' $(MOBILE_ENV) | cut -d'=' -f2); \
 		MOBILE_FB_TOKEN=$$(grep '^EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN=' $(MOBILE_ENV) | cut -d'=' -f2); \
 		\
@@ -200,13 +199,6 @@ check-setup: ## Verify development environment is correctly configured
 			ERRORS=$$((ERRORS + 1)); \
 		else \
 			echo "    $(GREEN)$(ICON_SUCCESS) App ID configured: $$BACKEND_FB_ID$(NC)"; \
-		fi; \
-		\
-		if [ -z "$$BACKEND_FB_SECRET" ] || [ "$$BACKEND_FB_SECRET" = "your-facebook-app-secret" ]; then \
-			echo "    $(YELLOW)$(ICON_WARNING) Facebook App Secret not configured$(NC)"; \
-			echo "    $(YELLOW)→ Set FACEBOOK_APP_SECRET in backend/.env$(NC)"; \
-		else \
-			echo "    $(GREEN)$(ICON_SUCCESS) App Secret configured (length: $${#BACKEND_FB_SECRET})$(NC)"; \
 		fi; \
 		\
 		echo "  $(BLUE)Mobile:$(NC)"; \

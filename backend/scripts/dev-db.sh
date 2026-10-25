@@ -52,7 +52,7 @@ check_tools() {
 # The [auth.external.*] blocks of config.toml read these through env(). Only
 # these keys are read, so the rest of backend/.env never reaches a shell.
 load_oauth_env() {
-	for key in GOOGLE_CLIENT_ID FACEBOOK_APP_ID FACEBOOK_APP_SECRET; do
+	for key in GOOGLE_CLIENT_ID FACEBOOK_APP_ID; do
 		value=""
 		if [ -f .env ]; then
 			value=$(sed -n "s/^${key}=//p" .env | tail -n 1 | sed -e 's/[[:space:]]#.*$//' -e 's/[[:space:]]*$//' -e 's/^"\(.*\)"$/\1/' -e "s/^'\(.*\)'$/\1/")

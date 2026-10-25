@@ -5,14 +5,22 @@ import type { GoogleTokenPayload, FacebookTokenPayload } from '@/features/auth/a
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID;
-const FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET;
 
 if (!GOOGLE_CLIENT_ID) {
 	throw new Error('GOOGLE_CLIENT_ID environment variable is not set');
 }
 
-if (!FACEBOOK_APP_ID || !FACEBOOK_APP_SECRET) {
-	throw new Error('FACEBOOK_APP_ID and FACEBOOK_APP_SECRET environment variables must be set');
+if (!FACEBOOK_APP_ID) {
+	throw new Error('FACEBOOK_APP_ID environment variable is not set');
+}
+
+const GRAPH_API = 'https://graph.facebook.com/v21.0';
+
+function graphUrl(path: string, accessToken: string, fields?: string): string {
+	const url = new URL(`${GRAPH_API}/${path}`);
+	url.searchParams.set('access_token', accessToken);
+	if (fields) url.searchParams.set('fields', fields);
+	return url.toString();
 }
 
 const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
@@ -66,40 +74,27 @@ export async function verifyGoogleToken(idToken: string): Promise<GoogleTokenPay
 /** Checks the token was issued for this app; the profile email is optional. */
 export async function verifyFacebookToken(accessToken: string): Promise<FacebookTokenPayload> {
 	try {
-		const debugUrl = `https://graph.facebook.com/v21.0/debug_token?input_token=${accessToken}&access_token=${FACEBOOK_APP_ID}|${FACEBOOK_APP_SECRET}`;
-
-		const debugResponse = await fetch(debugUrl);
-		const debugData = (await debugResponse.json()) as {
-			data?: { is_valid?: boolean; app_id?: string; user_id?: string; error?: string };
-			error?: string;
+		// The user token alone tells which app it was issued for: no app secret needed.
+		const appResponse = await fetch(graphUrl('app', accessToken));
+		const appData = (await appResponse.json()) as {
+			id?: string;
+			error?: { message: string; type: string; code: number };
 		};
 
-		if (!debugResponse.ok || debugData.data?.error) {
-			logger.warn('Facebook token verification failed', {
-				error: debugData.data?.error || debugData.error,
-			});
+		if (!appResponse.ok || appData.error) {
+			logger.warn('Facebook token verification failed', { error: appData.error });
 			throw new AppError(401, 'Invalid Facebook token', 'INVALID_FACEBOOK_TOKEN');
 		}
 
-		if (!debugData.data?.is_valid) {
-			logger.warn('Facebook token is not valid or expired');
-			throw new AppError(401, 'Invalid or expired Facebook token', 'INVALID_TOKEN');
-		}
-
-		if (debugData.data.app_id !== FACEBOOK_APP_ID) {
+		if (appData.id !== FACEBOOK_APP_ID) {
 			logger.warn('Facebook token app_id mismatch', {
 				expected: FACEBOOK_APP_ID,
-				received: debugData.data.app_id,
+				received: appData.id,
 			});
 			throw new AppError(401, 'Token was not issued for this app', 'INVALID_TOKEN');
 		}
 
-		const userId = debugData.data.user_id;
-		if (!userId) {
-			throw new AppError(401, 'Facebook token missing user_id', 'INVALID_TOKEN');
-		}
-
-		const profileUrl = `https://graph.facebook.com/v21.0/${userId}?fields=id,name,email,picture.type(large)&access_token=${accessToken}`;
+		const profileUrl = graphUrl('me', accessToken, 'id,name,email,picture.type(large)');
 
 		const profileResponse = await fetch(profileUrl);
 		const profileData = (await profileResponse.json()) as {
