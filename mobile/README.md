@@ -35,7 +35,7 @@ From the repository root, `make install` installs both projects.
 ## Configuration
 
 1. Copy `.env.example` to `.env`.
-2. Nothing else to fill in for local development: the OAuth IDs are already in `.env.example`. Only `EXPO_TOKEN` (tunnel mode, personal) and `EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN` (Facebook sign-in, from a teammate) are missing.
+2. Nothing else to fill in for local development: the OAuth IDs are already in `.env.example`. Only `EXPO_TOKEN` (tunnel mode, personal) is missing.
 3. Check that the backend runs on port 3000.
 
 ### Environment variables
