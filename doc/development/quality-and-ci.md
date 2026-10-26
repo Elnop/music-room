@@ -6,6 +6,7 @@ Subject IV.8: an agile process, tests on each layer, and continuous integration.
 
 - Epics, stories and bugs are GitHub Issues, on the "Music Room – Validation" board (Todo → In Progress → Review → Done).
 - One branch per issue, `<issue-number>-<slug>`, from `develop`; one pull request into `develop`, with `Closes #<n>` in its body. `main` is the deploy branch and only receives releases.
+- An epic can be built on a feature branch, `<epic-number>-<slug>` from `develop`, named in its decisions (first one: #474, `474-web-client`). Its stories branch from it and open their PR into it, so `develop` only receives the finished epic, through one final PR. `.github/workflows/issue-status.yml` handles these PRs like the ones into `develop`: opening one moves its issues to `review`, merging it closes them.
 - A merged branch is deleted on GitHub (repo setting). While `develop` is ahead of `main`, `.github/workflows/release-pr.yml` keeps one release PR `develop` → `main` open and refreshes its list of merged PRs; the rest of its body is written by hand, and merging it, which deploys, stays a human decision.
 - Commits follow Conventional Commits.
 
@@ -32,7 +33,7 @@ semgrep and gitleaks run from Docker images, so Docker must be running. Details:
 ## When it runs
 
 - **Pre-commit** (husky, `.husky/pre-commit`): `npm run check` in each project the commit touches; a failure blocks the commit.
-- **CI** (`.github/workflows/ci.yml`), on every pull request to `develop`:
+- **CI** (`.github/workflows/ci.yml`), on every pull request, whatever its base (`develop`, a feature branch, the release PR into `main`), and on every push to `develop`:
   - `lint`, `type-check`, `test` and `check` for both projects;
   - `test-int`: the integration tests, on a full VM that starts the local Supabase stack and Redis (`scripts/test-db.sh`). Docker images are cached between runs (#327).
 - **Release** (`.github/workflows/release-apk.yml`): on every push to `main`, builds the release APK and publishes a GitHub Release.

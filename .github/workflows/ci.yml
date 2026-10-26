@@ -1,8 +1,8 @@
 name: CI
 
 on:
+  # Every PR, whatever its base: an epic's stories go into its feature branch.
   pull_request:
-    branches: [develop]
   push:
     branches: [develop]
 
