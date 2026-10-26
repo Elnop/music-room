@@ -6,14 +6,18 @@ type TrackAvailability = 'available' | 'unavailable' | 'unknown';
 
 interface PlayabilityFields {
 	policy?: string;
-	streamable?: boolean;
-	media?: { transcodings?: unknown[] };
+	media?: { transcodings?: { format?: { protocol?: string } }[] };
 }
+
+// The encrypted-hls protocols need a DRM license, which the app cannot get.
+const PLAYABLE_PROTOCOLS = new Set(['hls', 'progressive']);
 
 /** A SNIP track (30-second preview only) stays playable; a BLOCK one is blocked in the region. */
 export function isPlayable(track: PlayabilityFields): boolean {
 	if (track.policy === 'BLOCK') return false;
-	return Boolean(track.streamable || track.media?.transcodings?.length);
+	return (track.media?.transcodings ?? []).some(transcoding =>
+		PLAYABLE_PROTOCOLS.has(transcoding.format?.protocol ?? '')
+	);
 }
 
 /** 'unknown' when SoundCloud could not answer: the stored state is kept. */

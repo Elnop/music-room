@@ -9,7 +9,17 @@ import type {
 	SoundCloudTrack,
 } from '@/features/soundcloud/soundcloud.types.js';
 
-/** Keeps playable tracks only. */
+interface SearchPage {
+	collection?: SoundCloudTrack[];
+	total_results?: number;
+	next_href?: string;
+}
+
+// About a third of SoundCloud's results only have DRM streams: the next pages top a short one up.
+const SOUNDCLOUD_PAGE_SIZE = 50;
+const MAX_PAGES = 3;
+
+/** Keeps playable tracks only, reading up to MAX_PAGES SoundCloud pages to reach `limit`. */
 export async function searchTracks(query: SoundCloudSearchInput): Promise<SoundCloudSearchResult> {
 	const cacheKey = `search:${query.q}:${query.limit}:${query.offset}`;
 
@@ -25,30 +35,20 @@ export async function searchTracks(query: SoundCloudSearchInput): Promise<SoundC
 			limit: query.limit,
 		});
 
-		const results = (await soundcloud.tracks.search({
-			q: query.q,
-			limit: query.limit,
-			offset: query.offset,
-		})) as {
-			collection?: SoundCloudTrack[];
-			total_results?: number;
-			next_href?: string;
-		};
-
-		const playableTracks = (results.collection || []).filter(availability.isPlayable);
+		const { playable, scanned, first, last } = await collectPlayable(query);
 
 		const searchResult: SoundCloudSearchResult = {
-			collection: playableTracks,
-			total_results: results.total_results,
-			next_href: results.next_href,
+			collection: playable.slice(0, query.limit),
+			total_results: first.total_results,
+			next_href: last.next_href,
 		};
 
 		cache.set(cacheKey, searchResult, cache.CACHE_TTL.SEARCH);
 
 		logger.info('Search completed', {
 			query: query.q,
-			totalFound: results.collection?.length || 0,
-			playableCount: playableTracks.length,
+			totalFound: scanned,
+			playableCount: searchResult.collection.length,
 		});
 
 		return searchResult;
@@ -56,6 +56,30 @@ export async function searchTracks(query: SoundCloudSearchInput): Promise<SoundC
 		logger.error('SoundCloud search failed', { error, query: query.q });
 		throw new AppError(500, 'Failed to search SoundCloud', 'SOUNDCLOUD_ERROR');
 	}
+}
+
+async function collectPlayable(query: SoundCloudSearchInput) {
+	const playable: SoundCloudTrack[] = [];
+	let offset = query.offset;
+	let scanned = 0;
+	let first: SearchPage | undefined;
+	let last: SearchPage;
+	let pages = 0;
+	do {
+		last = (await soundcloud.tracks.search({
+			q: query.q,
+			limit: SOUNDCLOUD_PAGE_SIZE,
+			offset,
+		})) as SearchPage;
+		first ??= last;
+		pages += 1;
+		const collection = last.collection ?? [];
+		scanned += collection.length;
+		offset += collection.length;
+		playable.push(...collection.filter(availability.isPlayable));
+		if (collection.length === 0) break;
+	} while (playable.length < query.limit && last.next_href && pages < MAX_PAGES);
+	return { playable, scanned, first, last };
 }
 
 /** Accepts a permalink URL or a numeric id. */
