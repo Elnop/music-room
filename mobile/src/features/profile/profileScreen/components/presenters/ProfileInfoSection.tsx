@@ -1,9 +1,10 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { ProfileSection } from '@/features/profile/common/components/presenters/ProfileSection';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import type { UserProfile } from '@/types/user.types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface ProfileInfoSectionProps {
 	user: UserProfile;
@@ -63,7 +64,7 @@ const createStyles = (theme: Theme) =>
 		infoValue: {
 			fontSize: 15,
 			color: theme.colors.text,
-			fontWeight: theme.typography.weights.medium,
+			fontFamily: theme.typography.families.medium,
 		},
 		divider: {
 			height: 1,

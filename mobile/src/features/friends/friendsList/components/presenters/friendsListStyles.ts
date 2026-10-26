@@ -31,12 +31,12 @@ export const createFriendsListStyles = (theme: Theme) =>
 		},
 		tabText: {
 			fontSize: theme.typography.sizes.sm,
-			fontWeight: theme.typography.weights.medium,
+			fontFamily: theme.typography.families.medium,
 			color: theme.colors.textSecondary,
 		},
 		tabTextActive: {
 			color: theme.colors.surface,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 		},
 		searchBar: {
 			marginBottom: theme.spacing.sm,
@@ -59,7 +59,7 @@ export const createFriendsListStyles = (theme: Theme) =>
 		},
 		username: {
 			fontSize: theme.typography.sizes.md,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 		},
 		displayName: {
@@ -81,7 +81,7 @@ export const createFriendsListStyles = (theme: Theme) =>
 		},
 		controlTextActive: {
 			color: theme.colors.primary,
-			fontWeight: theme.typography.weights.medium,
+			fontFamily: theme.typography.families.medium,
 		},
 		cardHeader: {
 			flexDirection: 'row',

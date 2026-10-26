@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import { Button } from '@/shared/components/ui/Button';
 import { ShareLinkButton } from '@/shared/components/sharing/ShareLinkButton';
 import { NowPlayingInline } from '@/shared/components/media/NowPlayingInline';
@@ -8,6 +8,7 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import type { UserProfileHeaderProps } from '@/features/friends/types';
 import { createUserProfileHeaderStyles } from './userProfileHeaderStyles';
 import { createUserProfileStyles } from './userProfileStyles';
+import { Text } from '@/shared/components/ui/Text';
 
 type UserProfileActionsProps = UserProfileHeaderProps;
 

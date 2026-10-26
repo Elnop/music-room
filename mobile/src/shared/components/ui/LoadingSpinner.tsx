@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo } from 'react';
-import { View, StyleSheet, Text, Animated, Easing, Image, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Animated, Easing, Image, ActivityIndicator } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
+import { Text } from './Text';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const AppLogo = require('@/assets/logo/app-icon.png');
@@ -114,6 +115,6 @@ const createStyles = (theme: Theme) =>
 			marginTop: theme.spacing.md,
 			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.textSecondary,
-			fontWeight: theme.typography.weights.medium,
+			fontFamily: theme.typography.families.medium,
 		},
 	});

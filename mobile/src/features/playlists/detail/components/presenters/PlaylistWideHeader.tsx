@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { ShareLinkButton } from '@/shared/components/sharing/ShareLinkButton';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
@@ -8,6 +8,7 @@ import type { PlaylistWithTracks } from '@/features/playlists/types';
 import { AddTrackRow } from './AddTrackRow';
 import { PlaylistByline } from './PlaylistByline';
 import { PlaylistCover } from './PlaylistCover';
+import { Text } from '@/shared/components/ui/Text';
 
 interface PlaylistWideHeaderProps {
 	playlist: PlaylistWithTracks;
@@ -65,12 +66,12 @@ const createStyles = (theme: Theme) =>
 		details: { flex: 1, minWidth: 0 },
 		kind: {
 			fontSize: theme.typography.sizes.sm,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 		},
 		name: {
 			fontSize: 40,
-			fontWeight: theme.typography.weights.extrabold,
+			fontFamily: theme.typography.families.extrabold,
 			color: theme.colors.text,
 			marginTop: theme.spacing.xs,
 		},

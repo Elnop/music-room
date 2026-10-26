@@ -1,6 +1,7 @@
 import React from 'react';
-import { TextInput, View, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
+import { View, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
 import { CODE_INPUT_MAX_LENGTH } from '@/features/auth/utils/codeDigits';
+import { TextInput } from '@/shared/components/ui/TextInput';
 
 interface CodeInputProps {
 	digits: string[];

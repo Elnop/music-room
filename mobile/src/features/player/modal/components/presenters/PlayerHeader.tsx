@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { HEADER_HIT_SLOP, type createStyles } from './playerModalStyles';
+import { Text } from '@/shared/components/ui/Text';
 
 interface PlayerHeaderProps {
 	styles: ReturnType<typeof createStyles>;

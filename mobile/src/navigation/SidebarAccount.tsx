@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Avatar } from '@/shared/components/media/Avatar';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useSession } from '@/shared/services/authSession';
 import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface SidebarAccountProps {
 	onPress: () => void;
@@ -58,7 +59,7 @@ const createStyles = (theme: Theme, separator: string) =>
 		},
 		name: {
 			fontSize: theme.typography.sizes.md,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 		},
 		username: {

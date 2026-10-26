@@ -43,7 +43,7 @@ export const createStyles = (theme: Theme) =>
 		},
 		title: {
 			fontSize: theme.typography.sizes.md,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 		},
 		artist: {
@@ -52,7 +52,7 @@ export const createStyles = (theme: Theme) =>
 		},
 		device: {
 			fontSize: theme.typography.sizes.sm,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.primary,
 		},
 		center: {

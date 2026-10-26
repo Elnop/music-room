@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Avatar } from '@/shared/components/media/Avatar';
 import { ShareLinkButton } from '@/shared/components/sharing/ShareLinkButton';
@@ -10,6 +10,7 @@ import type { PlaylistWithTracks } from '@/features/playlists/types';
 import { headerFacts } from '@/features/playlists/detail/utils/headerFacts';
 import { AddTrackRow } from './AddTrackRow';
 import { PlaylistCover } from './PlaylistCover';
+import { Text } from '@/shared/components/ui/Text';
 
 interface PlaylistHeaderProps {
 	playlist: PlaylistWithTracks;
@@ -58,7 +59,7 @@ const createStyles = (theme: Theme) =>
 		cover: { marginBottom: theme.spacing.lg },
 		name: {
 			fontSize: theme.typography.sizes.xxl,
-			fontWeight: theme.typography.weights.bold,
+			fontFamily: theme.typography.families.bold,
 			color: theme.colors.text,
 			textAlign: 'center',
 			marginBottom: theme.spacing.sm,
@@ -69,13 +70,13 @@ const createStyles = (theme: Theme) =>
 			textAlign: 'center',
 			marginBottom: theme.spacing.md,
 			paddingHorizontal: theme.spacing.md,
-			fontWeight: theme.typography.weights.regular,
+			fontFamily: theme.typography.families.regular,
 		},
 		meta: { flexDirection: 'row', alignItems: 'center', marginTop: theme.spacing.sm },
 		owner: {
 			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.text,
-			fontWeight: theme.typography.weights.medium,
+			fontFamily: theme.typography.families.medium,
 			marginLeft: theme.spacing.sm,
 			flexShrink: 1,
 		},
@@ -95,7 +96,7 @@ const createStyles = (theme: Theme) =>
 		collaboratorsText: {
 			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.primary,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 		},
 		share: { marginTop: theme.spacing.md, marginBottom: theme.spacing.sm },
 	});

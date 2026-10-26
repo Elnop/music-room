@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { createStore } from 'zustand';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { registerPlayerModals } from '@/shared/services/playerModalsBridge';
 import { PlayerModal } from './PlayerModal';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
@@ -16,6 +16,7 @@ import { State } from 'react-native-gesture-handler';
 import type { PanGesture } from 'react-native-gesture-handler';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import { hapticTap } from '@/shared/utils/haptics';
+import { Text } from '@/shared/components/ui/Text';
 
 jest.mock('@/shared/utils/haptics', () => ({
 	hapticTap: jest.fn(),

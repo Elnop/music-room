@@ -1,5 +1,5 @@
 import React from 'react';
-import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { ProfileHeader } from '@/features/profile/profileScreen/components/presenters/ProfileHeader';
 import { ProfileInfoSection } from '@/features/profile/profileScreen/components/presenters/ProfileInfoSection';
 import { ProfileMenuItems } from '@/features/profile/profileScreen/components/presenters/ProfileMenuItems';
@@ -8,6 +8,7 @@ import type { UserStats } from '@/features/profile/types';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import type { Theme } from '@/shared/theme/types';
 import type { MusicGenre, UserProfile } from '@/types/user.types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface ProfileViewProps {
 	theme: Theme;

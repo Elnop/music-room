@@ -1,10 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { formatEventDate } from '@/features/events/utils/eventDates';
+import { Text } from '@/shared/components/ui/Text';
 
 interface DateTimeRowProps {
 	label: string;
@@ -42,7 +43,7 @@ const createStyles = (theme: Theme) =>
 		label: { fontSize: theme.typography.sizes.sm, color: theme.colors.textSecondary },
 		value: {
 			fontSize: theme.typography.sizes.lg,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 			marginTop: 2,
 		},

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Avatar } from '@/shared/components/media/Avatar';
 import { Pressable } from '@/shared/components/ui/Pressable';
@@ -7,6 +7,7 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import type { FriendProfile } from '@/features/friends/types';
 import { ControlSwitch } from './ControlSwitch';
 import { createFriendsListStyles } from './friendsListStyles';
+import { Text } from '@/shared/components/ui/Text';
 
 interface FriendCardProps {
 	friend: FriendProfile;

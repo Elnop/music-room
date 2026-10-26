@@ -1,10 +1,11 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedSwitch } from '@/shared/components/ui/ThemedSwitch';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { createBeaconCardStyles } from './beaconCardStyles';
 import type { BeaconBroadcast } from '@/features/events/detail/hooks/useBeaconBroadcast';
+import { Text } from '@/shared/components/ui/Text';
 
 function description(beacon: BeaconBroadcast): string {
 	if (!beacon.available) return "Disponible pendant l'événement";

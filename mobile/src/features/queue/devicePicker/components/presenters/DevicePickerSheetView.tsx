@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, ActivityIndicator } from 'react-native';
+import { View, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { FullScreenSheet } from '@/shared/components/layout/FullScreenSheet';
@@ -12,6 +12,7 @@ import type { Theme } from '@/shared/theme/types';
 import type { createPickerStyles } from './devicePickerStyles';
 import type { LoadedDevices } from '@/features/queue/devicePicker/hooks/useDevicePicker';
 import type { PickerDevice } from './DeviceRow';
+import { Text } from '@/shared/components/ui/Text';
 
 interface DevicePickerSheetViewProps {
 	visible: boolean;

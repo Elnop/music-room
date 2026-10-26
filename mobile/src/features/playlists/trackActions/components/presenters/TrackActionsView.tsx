@@ -1,11 +1,12 @@
 import React from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { ActionSheet } from '@/features/playlists/actionSheet/components/presenters/ActionSheet';
 import { ActionSheetRow } from '@/features/playlists/actionSheet/components/presenters/ActionSheetRow';
 import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 import type { TrackActions } from '@/features/playlists/trackActions/hooks/useTrackActions';
+import { Text } from '@/shared/components/ui/Text';
 
 interface TrackActionsViewProps {
 	actions: TrackActions;

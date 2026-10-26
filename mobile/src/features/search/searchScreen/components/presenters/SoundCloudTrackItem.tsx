@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { QueueSwipe } from '@/shared/components/lists/QueueSwipe';
@@ -10,6 +10,7 @@ import { TrackActionsButton } from '@/shared/components/lists/TrackActionsButton
 import { formatDuration } from '@/shared/utils/formatters';
 import type { Theme } from '@/shared/theme/types';
 import type { SoundCloudTrack } from '@/features/search/types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface SoundCloudTrackItemProps {
 	track: SoundCloudTrack;
@@ -83,7 +84,7 @@ const createStyles = (theme: Theme) =>
 		},
 		title: {
 			fontSize: theme.typography.sizes.md,
-			fontWeight: theme.typography.weights.medium,
+			fontFamily: theme.typography.families.medium,
 			color: theme.colors.text,
 			marginBottom: 2,
 		},

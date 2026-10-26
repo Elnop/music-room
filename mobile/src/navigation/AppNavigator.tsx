@@ -80,7 +80,7 @@ const sidebarOptions = (
 			? { fontSize: theme.typography.sizes.sm, marginTop: theme.spacing.xs }
 			: {
 					fontSize: theme.typography.sizes.md,
-					fontWeight: theme.typography.weights.semibold,
+					fontFamily: theme.typography.families.semibold,
 					marginStart: theme.spacing.md,
 				},
 	tabBarStyle: {
@@ -135,7 +135,7 @@ export function AppNavigator() {
 							headerTintColor: theme.colors.text,
 							headerShadowVisible: false,
 							headerTitleStyle: {
-								fontWeight: theme.typography.weights.bold,
+								fontFamily: theme.typography.families.bold,
 							},
 							...sidebar,
 							tabBarIcon: ({ focused, color }) => {

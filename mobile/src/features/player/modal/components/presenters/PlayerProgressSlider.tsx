@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
+import { View, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
 import Slider from '@react-native-community/slider';
 import type { SeekPosition } from '@/features/player/modal/hooks/useSeekPosition';
+import { Text } from '@/shared/components/ui/Text';
 
 const formatTime = (seconds: number): string => {
 	if (!seconds || isNaN(seconds)) return '0:00';

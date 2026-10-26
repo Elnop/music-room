@@ -1,9 +1,10 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { createSharingStyles } from './sharingStyles';
+import { Text } from '@/shared/components/ui/Text';
 
 /** A public playlist open to all: nothing to manage. */
 export function OpenPlaylistInfo() {
@@ -34,7 +35,7 @@ const createStyles = (theme: Theme) =>
 		content: { flex: 1 },
 		title: {
 			fontSize: theme.typography.sizes.md,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 			marginBottom: theme.spacing.xs,
 		},

@@ -1,11 +1,12 @@
 import React from 'react';
-import { Share, StyleSheet, Text, type StyleProp, type ViewStyle } from 'react-native';
+import { Share, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { showError } from '@/shared/utils/toast';
 import { logger } from '@/shared/utils/logger';
+import { Text } from '@/shared/components/ui/Text';
 
 interface ShareLinkButtonProps {
 	url: string;
@@ -51,7 +52,7 @@ const createStyles = (theme: Theme) =>
 		},
 		label: {
 			fontSize: theme.typography.sizes.sm,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 		},
 	});

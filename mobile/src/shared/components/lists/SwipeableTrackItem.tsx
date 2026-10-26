@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
@@ -10,6 +10,8 @@ import { TrackActionsButton } from './TrackActionsButton';
 import { TrackTableRow } from './TrackTableRow';
 import type { Theme } from '@/shared/theme/types';
 import type { Track } from '@/types/track.types';
+import { Text } from '@/shared/components/ui/Text';
+import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
 interface SwipeableTrackItemProps {
 	track: Track;
@@ -216,7 +218,7 @@ const createStyles = (theme: Theme, separator: string) =>
 		},
 		trackTitle: {
 			fontSize: 15,
-			fontWeight: '600',
+			fontFamily: FONT_FAMILIES.semibold,
 			color: theme.colors.text,
 			marginBottom: 4,
 		},
@@ -258,7 +260,7 @@ const createStyles = (theme: Theme, separator: string) =>
 		deleteText: {
 			color: theme.colors.onColor,
 			fontSize: 12,
-			fontWeight: '600',
+			fontFamily: FONT_FAMILIES.semibold,
 			marginTop: 4,
 		},
 	});

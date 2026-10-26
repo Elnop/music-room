@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
@@ -9,6 +9,7 @@ import type {
 	LinkedProvider,
 	OAuthProvider,
 } from '@/shared/services/linkedAccountsBridge';
+import { Text } from '@/shared/components/ui/Text';
 
 type MethodType = LinkedProvider['type'];
 
@@ -119,7 +120,7 @@ const createStyles = (theme: Theme) =>
 		},
 		rowTitle: {
 			fontSize: 16,
-			fontWeight: theme.typography.weights.bold,
+			fontFamily: theme.typography.families.bold,
 			color: theme.colors.text,
 		},
 		rowStatus: {
@@ -149,7 +150,7 @@ const createStyles = (theme: Theme) =>
 		},
 		actionText: {
 			fontSize: 14,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 		},
 		linkText: {
 			color: theme.colors.textInverse,

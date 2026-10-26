@@ -1,18 +1,19 @@
 import React from 'react';
-import { Text, useWindowDimensions } from 'react-native';
+import { useWindowDimensions } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { AppTabBar } from './AppTabBar';
+import { Text } from '@/shared/components/ui/Text';
 
 const mockNavigate = jest.fn();
 
 jest.mock('@/features/player/miniPlayer/components/orchestrators/MiniPlayer', () => {
-	const { Text: MockText } = jest.requireActual('react-native');
+	const { Text: MockText } = jest.requireActual('@/shared/components/ui/Text');
 	return { MiniPlayer: () => <MockText>mini-player</MockText> };
 });
 
 jest.mock('@react-navigation/bottom-tabs', () => {
-	const { Text: MockText } = jest.requireActual('react-native');
+	const { Text: MockText } = jest.requireActual('@/shared/components/ui/Text');
 	return { BottomTabBar: () => <MockText>tab-bar</MockText> };
 });
 

@@ -1,16 +1,9 @@
 import React from 'react';
-import {
-	Image,
-	KeyboardAvoidingView,
-	Platform,
-	ScrollView,
-	StyleSheet,
-	Text,
-	View,
-} from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import logo from '@/assets/logo/logo.png';
+import { Text } from '@/shared/components/ui/Text';
 
 interface AuthFormLayoutProps {
 	logoSize: number;
@@ -107,6 +100,6 @@ const createStyles = (theme: Theme) =>
 		footerLink: {
 			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.primary,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 		},
 	});

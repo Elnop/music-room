@@ -1,16 +1,10 @@
 import React from 'react';
-import {
-	View,
-	TextInput,
-	ActivityIndicator,
-	StyleSheet,
-	type StyleProp,
-	type ViewStyle,
-} from 'react-native';
+import { View, ActivityIndicator, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { Pressable } from '@/shared/components/ui/Pressable';
+import { TextInput } from '@/shared/components/ui/TextInput';
 
 interface SearchBarProps {
 	value: string;
@@ -98,7 +92,7 @@ const createStyles = (theme: Theme) =>
 			fontSize: theme.typography.sizes.md,
 			color: theme.colors.text,
 			padding: 0,
-			fontWeight: theme.typography.weights.regular,
+			fontFamily: theme.typography.families.regular,
 		},
 		trailing: {
 			marginLeft: theme.spacing.sm,

@@ -1,10 +1,12 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { CodeInput } from '@/features/auth/code/components/presenters/CodeInput';
 import type { EmailVerification } from '@/features/auth/emailVerification/hooks/useEmailVerification';
+import { Text } from '@/shared/components/ui/Text';
+import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
 interface EmailVerificationViewProps {
 	email: string;
@@ -93,7 +95,7 @@ const createStyles = (theme: Theme) =>
 		content: { flex: 1, paddingHorizontal: 24, paddingTop: 60, alignItems: 'center' },
 		title: {
 			fontSize: 28,
-			fontWeight: 'bold',
+			fontFamily: FONT_FAMILIES.bold,
 			marginBottom: 12,
 			textAlign: 'center',
 			color: theme.colors.text,
@@ -113,7 +115,7 @@ const createStyles = (theme: Theme) =>
 			borderWidth: 2,
 			borderRadius: 12,
 			fontSize: 24,
-			fontWeight: 'bold',
+			fontFamily: FONT_FAMILIES.bold,
 			textAlign: 'center',
 			backgroundColor: theme.colors.surface,
 			color: theme.colors.text,
@@ -131,11 +133,11 @@ const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.primary,
 		},
 		buttonDisabled: { opacity: 0.5 },
-		buttonText: { fontSize: 16, fontWeight: '600', color: theme.colors.background },
+		buttonText: { fontSize: 16, fontFamily: FONT_FAMILIES.semibold, color: theme.colors.background },
 		resendContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
 		resendText: { fontSize: 14, color: theme.colors.textSecondary },
-		resendLink: { fontSize: 14, fontWeight: '600', color: theme.colors.primary },
+		resendLink: { fontSize: 14, fontFamily: FONT_FAMILIES.semibold, color: theme.colors.primary },
 		resendLinkDisabled: { color: theme.colors.textSecondary },
 		backButton: { marginTop: 8 },
-		backText: { fontSize: 14, fontWeight: '600', color: theme.colors.textSecondary },
+		backText: { fontSize: 14, fontFamily: FONT_FAMILIES.semibold, color: theme.colors.textSecondary },
 	});

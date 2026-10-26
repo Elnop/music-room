@@ -16,7 +16,7 @@ export const createBeaconCardStyles = (theme: Theme) =>
 		info: { flex: 1 },
 		label: {
 			fontSize: theme.typography.sizes.lg,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 		},
 		description: {

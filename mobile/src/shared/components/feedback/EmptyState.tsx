@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
+import { View, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { Pressable } from '@/shared/components/ui/Pressable';
+import { Text } from '@/shared/components/ui/Text';
 
 interface EmptyStateAction {
 	label: string;
@@ -69,7 +70,7 @@ const createStyles = (theme: Theme) =>
 			fontSize: theme.typography.sizes.md,
 			color: theme.colors.textSecondary,
 			textAlign: 'center',
-			fontWeight: theme.typography.weights.medium,
+			fontFamily: theme.typography.families.medium,
 		},
 		action: {
 			marginTop: theme.spacing.md,
@@ -80,7 +81,7 @@ const createStyles = (theme: Theme) =>
 		},
 		actionText: {
 			fontSize: theme.typography.sizes.lg,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.onColor,
 		},
 	});

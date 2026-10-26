@@ -1,10 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { Theme } from '@/shared/theme/types';
 import { trackTableColumns as columns } from './trackTableLayout';
+import { Text } from '@/shared/components/ui/Text';
 
 /** The column titles above the rows of a track table (wide screens). */
 export function TrackTableHeader() {
@@ -46,7 +47,7 @@ const createStyles = (theme: Theme) =>
 		},
 		label: {
 			fontSize: theme.typography.sizes.sm,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.textSecondary,
 		},
 	});

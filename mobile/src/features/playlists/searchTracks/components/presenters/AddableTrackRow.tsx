@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
@@ -11,6 +11,7 @@ import { Pressable } from '@/shared/components/ui/Pressable';
 import { formatDuration } from '@/shared/utils/formatters';
 import { isPreviewOnly } from '@/shared/utils/soundcloudPreview';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface AddableTrackRowProps {
 	track: SoundCloudTrack;
@@ -102,7 +103,7 @@ const createStyles = (theme: Theme) =>
 		},
 		trackTitle: {
 			fontSize: 15,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 			marginBottom: 3,
 		},

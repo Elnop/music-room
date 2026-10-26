@@ -1,10 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { BeaconScanStatus } from '@/features/events/nearby/hooks/useBeaconScan';
+import { Text } from '@/shared/components/ui/Text';
 
 interface BeaconStatusLineProps {
 	status: BeaconScanStatus;
@@ -58,7 +59,7 @@ const createStyles = (theme: Theme) =>
 		text: { fontSize: theme.typography.sizes.sm, color: theme.colors.textSecondary },
 		link: {
 			fontSize: theme.typography.sizes.sm,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.primary,
 		},
 	});

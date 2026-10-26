@@ -6,7 +6,7 @@ export const dialogStyles = (theme: Theme): { body: ViewStyle; title: TextStyle 
 	body: { padding: theme.spacing.lg },
 	title: {
 		fontSize: theme.typography.sizes.xl,
-		fontWeight: theme.typography.weights.bold,
+		fontFamily: theme.typography.families.bold,
 		color: theme.colors.text,
 	},
 });

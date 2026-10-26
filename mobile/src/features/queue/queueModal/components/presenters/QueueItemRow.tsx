@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
@@ -10,6 +10,7 @@ import { TrackActionsButton } from '@/shared/components/lists/TrackActionsButton
 import { QueueTrackDetails } from './QueueTrackDetails';
 import { createRowStyles, formatDuration } from './queueModalStyles';
 import type { QueueItem } from '@/features/queue/types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface QueueItemRowProps {
 	item: QueueItem;

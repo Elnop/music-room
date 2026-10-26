@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SearchBar } from '@/shared/components/form/SearchBar';
 import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
 import type { Theme } from '@/shared/theme/types';
@@ -15,6 +15,7 @@ import { OpenPlaylistInfo } from './OpenPlaylistInfo';
 import { SettingRow } from './SettingRow';
 import { createSharingStyles } from './sharingStyles';
 import { UserResults } from './UserResults';
+import { Text } from '@/shared/components/ui/Text';
 
 export function SharingView({ sharing }: { sharing: PlaylistSharing }) {
 	const { styles: shared } = useThemedStyles(createSharingStyles);
@@ -112,7 +113,7 @@ const createStyles = (theme: Theme) =>
 		},
 		title: {
 			fontSize: theme.typography.sizes.xl,
-			fontWeight: theme.typography.weights.bold,
+			fontFamily: theme.typography.families.bold,
 			color: theme.colors.text,
 			marginBottom: theme.spacing.xs,
 		},

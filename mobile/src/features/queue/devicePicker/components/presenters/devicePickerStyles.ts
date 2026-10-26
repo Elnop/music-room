@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 import { sheetHeaderStyles } from '@/features/queue/utils/sheetHeaderStyles';
 import type { Theme } from '@/shared/theme/types';
+import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
 export const createPickerStyles = (
 	theme: Theme,
@@ -32,14 +33,14 @@ export const createPickerStyles = (
 		},
 		retryText: {
 			color: theme.colors.textInverse,
-			fontWeight: '600',
+			fontFamily: FONT_FAMILIES.semibold,
 		},
 		sectionLabel: {
 			paddingHorizontal: 16,
 			paddingTop: 16,
 			paddingBottom: 8,
 			fontSize: 12,
-			fontWeight: '600',
+			fontFamily: FONT_FAMILIES.semibold,
 			letterSpacing: 1,
 			textTransform: 'uppercase',
 			color: theme.colors.textSecondary,
@@ -49,7 +50,7 @@ export const createPickerStyles = (
 			paddingTop: 8,
 			paddingBottom: 4,
 			fontSize: 14,
-			fontWeight: '700',
+			fontFamily: FONT_FAMILIES.bold,
 			color: theme.colors.text,
 		},
 		emptyText: {
@@ -80,7 +81,7 @@ export const createPickerStyles = (
 		},
 		deviceName: {
 			fontSize: 16,
-			fontWeight: '600',
+			fontFamily: FONT_FAMILIES.semibold,
 			color: theme.colors.text,
 		},
 		activeText: {
@@ -92,7 +93,7 @@ export const createPickerStyles = (
 		},
 		activeBadge: {
 			fontSize: 12,
-			fontWeight: '700',
+			fontFamily: FONT_FAMILIES.bold,
 			color: theme.colors.primary,
 		},
 	});
