@@ -27,6 +27,12 @@ jest.mock('@/features/events/services/beaconAdvertiser', () => ({
 	startEventBeacon: jest.fn(() => Promise.resolve()),
 	stopEventBeacon: jest.fn(),
 }));
+let mockBroadcastAvailable = true;
+jest.mock('@/shared/constants/platform', () => ({
+	get BEACON_BROADCAST_AVAILABLE() {
+		return mockBroadcastAvailable;
+	},
+}));
 jest.mock('@/shared/utils/toast', () => ({
 	showSuccess: jest.fn(),
 	showError: jest.fn(),
@@ -54,6 +60,7 @@ async function renderDetail(waitForTitle = true) {
 
 beforeEach(async () => {
 	jest.clearAllMocks();
+	mockBroadcastAvailable = true;
 	jest.spyOn(logger, 'error').mockImplementation(() => undefined);
 	await resetBackendUrl();
 	signIn('me');
@@ -138,6 +145,18 @@ describe('EventDetailOrchestrator', () => {
 		await renderDetail();
 		expect(screen.getByText("Disponible pendant l'événement")).toBeTruthy();
 		expect(screen.getByLabelText('Diffuser la balise').props.disabled).toBe(true);
+	});
+
+	it('explains in a browser that the beacon is broadcast from the Android app', async () => {
+		mockBroadcastAvailable = false;
+		routes.routes['GET /api/events/e1'] = ok({
+			event: musicEvent({ organizer: { id: 'me', username: 'me' } }),
+		});
+		await renderDetail();
+
+		expect(screen.getByText(/Disponible depuis l'app Android/)).toBeTruthy();
+		expect(screen.queryByLabelText('Diffuser la balise')).toBeNull();
+		expect(screen.getByText('Modifier')).toBeTruthy();
 	});
 
 	it('leaves an event deleted elsewhere', async () => {

@@ -13,6 +13,7 @@ import { EventRow } from './EventRow';
 const NOTICE_ACTIONS = {
 	request: { label: 'Autoriser la localisation', handler: 'requestPermission' },
 	settings: { label: 'Ouvrir les réglages', handler: 'openSettings' },
+	retry: { label: 'Réessayer', handler: 'requestPermission' },
 } as const;
 
 export function NearbyEventsSection({ nearby }: { nearby: NearbyEvents }) {

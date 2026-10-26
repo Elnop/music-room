@@ -1,5 +1,6 @@
 import React from 'react';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { Platform } from 'react-native';
 import * as Location from 'expo-location';
 import { NearbyEventsOrchestrator } from './NearbyEventsOrchestrator';
 import { resetBackendUrl } from '@/shared/services/backendUrl';
@@ -27,6 +28,7 @@ jest.mock('@react-navigation/native', () => ({
 }));
 jest.mock('expo-location', () => ({
 	Accuracy: { Balanced: 3 },
+	PermissionStatus: { DENIED: 'denied', GRANTED: 'granted' },
 	getForegroundPermissionsAsync: jest.fn(),
 	requestForegroundPermissionsAsync: jest.fn(),
 	hasServicesEnabledAsync: jest.fn(),
@@ -151,6 +153,61 @@ describe('NearbyEventsOrchestrator', () => {
 		expect(location.requestForegroundPermissionsAsync).toHaveBeenCalled();
 		expect(location.watchPositionAsync).not.toHaveBeenCalled();
 		expect(screen.getByText('Créer un événement')).toBeTruthy();
+	});
+
+	it('explains a location refused in the browser, where asking again does nothing', async () => {
+		jest.replaceProperty(Platform, 'OS', 'web');
+		location.getForegroundPermissionsAsync.mockResolvedValueOnce({
+			status: 'undetermined',
+			canAskAgain: true,
+		} as Location.LocationPermissionResponse);
+		location.getForegroundPermissionsAsync.mockResolvedValue({
+			status: 'denied',
+			canAskAgain: true,
+		} as Location.LocationPermissionResponse);
+		location.requestForegroundPermissionsAsync.mockResolvedValue({
+			status: 'denied',
+		} as Location.LocationPermissionResponse);
+		await renderSection();
+
+		await act(async () => fireEvent.press(await screen.findByText('Autoriser la localisation')));
+		expect(await screen.findByText(/paramètres du site/)).toBeTruthy();
+		expect(screen.queryByText('Autoriser la localisation')).toBeNull();
+		expect(screen.queryByText('Ouvrir les réglages')).toBeNull();
+		expect(location.watchPositionAsync).not.toHaveBeenCalled();
+		expect(screen.getByText('Créer un événement')).toBeTruthy();
+	});
+
+	it('stops waiting for a browser that never gives a position, and searches again', async () => {
+		jest.replaceProperty(Platform, 'OS', 'web');
+		location.watchPositionAsync.mockResolvedValue({ remove });
+		jest.useFakeTimers();
+		try {
+			await renderSection();
+			await waitFor(() => expect(location.watchPositionAsync).toHaveBeenCalledTimes(1));
+			expect(screen.getByText('Recherche de votre position…')).toBeTruthy();
+
+			act(() => jest.advanceTimersByTime(15_000));
+			expect(screen.getByText(/Position introuvable/)).toBeTruthy();
+			await act(async () => fireEvent.press(screen.getByText('Réessayer')));
+			await waitFor(() => expect(location.watchPositionAsync).toHaveBeenCalledTimes(2));
+		} finally {
+			jest.useRealTimers();
+		}
+	});
+
+	it('keeps searching on Android, with no timeout', async () => {
+		location.watchPositionAsync.mockResolvedValue({ remove });
+		jest.useFakeTimers();
+		try {
+			await renderSection();
+			await waitFor(() => expect(location.watchPositionAsync).toHaveBeenCalled());
+
+			act(() => jest.advanceTimersByTime(60_000));
+			expect(screen.getByText('Recherche de votre position…')).toBeTruthy();
+		} finally {
+			jest.useRealTimers();
+		}
 	});
 
 	it('says when the GPS is off', async () => {

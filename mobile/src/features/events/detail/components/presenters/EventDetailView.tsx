@@ -13,6 +13,7 @@ import { formatEventDate, isOngoing } from '@/features/events/utils/eventDates';
 import { createEventScreenStyles } from '@/features/events/form/components/presenters/eventScreenStyles';
 import type { BeaconBroadcast } from '@/features/events/detail/hooks/useBeaconBroadcast';
 import { BeaconCard } from './BeaconCard';
+import { BeaconUnavailableCard } from './BeaconUnavailableCard';
 import { InfoRow } from './InfoRow';
 
 interface EventDetailViewProps {
@@ -76,7 +77,7 @@ export function EventDetailView({ screen, beacon, bottomPadding }: EventDetailVi
 
 			{screen.isOrganizer && (
 				<View style={styles.actions}>
-					{BEACON_BROADCAST_AVAILABLE && <BeaconCard beacon={beacon} />}
+					{BEACON_BROADCAST_AVAILABLE ? <BeaconCard beacon={beacon} /> : <BeaconUnavailableCard />}
 					<Button title="Modifier" onPress={screen.edit} variant="outline" fullWidth />
 					<Button
 						title="Supprimer"
