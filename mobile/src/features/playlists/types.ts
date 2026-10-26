@@ -71,6 +71,11 @@ export interface PlaylistDetailsEvent {
 	coverUrl?: string;
 }
 
+/** Answer of `PUT`/`DELETE /api/playlists/:id/cover`; null once removed. */
+export interface CoverResponse {
+	coverUrl: string | null;
+}
+
 /** Payload of the `playlist:tracks-availability` socket event: only the tracks that changed. */
 export interface TracksAvailabilityEvent {
 	playlistId: string;

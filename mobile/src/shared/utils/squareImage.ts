@@ -1,8 +1,8 @@
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 
-/** Side of the square JPEG sent as a profile photo. */
-export const AVATAR_SIZE = 512;
-const AVATAR_QUALITY = 0.8;
+/** Side of the square JPEG sent as a profile photo or a playlist cover. */
+export const SQUARE_IMAGE_SIZE = 512;
+const JPEG_QUALITY = 0.8;
 
 interface PickedImage {
 	uri: string;
@@ -11,7 +11,7 @@ interface PickedImage {
 }
 
 /** Cropped to its centred square first, in case the picker's crop was skipped; returns the local URI. */
-export async function prepareAvatar({ uri, width, height }: PickedImage): Promise<string> {
+export async function prepareSquareImage({ uri, width, height }: PickedImage): Promise<string> {
 	const context = ImageManipulator.manipulate(uri);
 
 	const side = Math.min(width, height);
@@ -23,9 +23,9 @@ export async function prepareAvatar({ uri, width, height }: PickedImage): Promis
 			height: side,
 		});
 	}
-	context.resize({ width: AVATAR_SIZE, height: AVATAR_SIZE });
+	context.resize({ width: SQUARE_IMAGE_SIZE, height: SQUARE_IMAGE_SIZE });
 
 	const image = await context.renderAsync();
-	const result = await image.saveAsync({ format: SaveFormat.JPEG, compress: AVATAR_QUALITY });
+	const result = await image.saveAsync({ format: SaveFormat.JPEG, compress: JPEG_QUALITY });
 	return result.uri;
 }

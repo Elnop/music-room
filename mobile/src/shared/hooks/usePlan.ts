@@ -5,12 +5,13 @@ import { useSession } from '@/shared/services/authSession';
 import { subscriptionApi } from '@/shared/services/subscriptionApi';
 import type { Plan, Subscription } from '@/shared/types/subscription';
 
-export function usePlan() {
+/** `enabled: false` skips the request on a screen that only needs the plan sometimes. */
+export function usePlan({ enabled = true }: { enabled?: boolean } = {}) {
 	const authenticated = useSession(s => s.isAuthenticated);
 	const query = useQuery({
 		queryKey: queryKeys.subscription.plan(),
 		queryFn: () => subscriptionApi.getSubscription(),
-		enabled: authenticated,
+		enabled: authenticated && enabled,
 		staleTime: STALE.short,
 	});
 	return { ...query, plan: query.data?.plan, isPremium: query.data?.plan === 'premium' };

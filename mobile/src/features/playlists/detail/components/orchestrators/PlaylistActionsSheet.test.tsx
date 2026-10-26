@@ -16,8 +16,10 @@ const onClose = jest.fn();
 const onEdit = jest.fn();
 const onSharing = jest.fn();
 const onDelete = jest.fn();
+const onChangeCover = jest.fn();
+const onRemoveCover = jest.fn();
 
-const renderSheet = (visible = true) =>
+const renderSheet = (visible = true, cover = { hasCover: false, coverLocked: false }) =>
 	render(
 		<PlaylistActionsSheet
 			visible={visible}
@@ -26,6 +28,10 @@ const renderSheet = (visible = true) =>
 			onEdit={onEdit}
 			onSharing={onSharing}
 			onDelete={onDelete}
+			hasCover={cover.hasCover}
+			coverLocked={cover.coverLocked}
+			onChangeCover={onChangeCover}
+			onRemoveCover={onRemoveCover}
 		/>
 	);
 
@@ -54,6 +60,7 @@ describe('PlaylistActionsSheet (#342)', () => {
 		['Modifier', onEdit],
 		['Visibilité et droits', onSharing],
 		['Supprimer', onDelete],
+		['Changer la cover', onChangeCover],
 	])('closes then runs « %s »', (label, action) => {
 		renderSheet();
 		fireEvent.press(screen.getByLabelText(label));
@@ -94,5 +101,18 @@ describe('PlaylistActionsSheet (#342)', () => {
 			act(() => screen.UNSAFE_getByType(Modal).props.onDismiss());
 			expect(onDelete).toHaveBeenCalledTimes(1);
 		});
+	});
+
+	it('shows the Premium lock and « Retirer la cover » only when there is a cover (#485)', () => {
+		renderSheet(true, { hasCover: false, coverLocked: true });
+		expect(screen.getByText('Réservé au Premium')).toBeTruthy();
+		expect(screen.queryByLabelText('Retirer la cover')).toBeNull();
+	});
+
+	it('closes then runs « Retirer la cover »', () => {
+		renderSheet(true, { hasCover: true, coverLocked: false });
+		fireEvent.press(screen.getByLabelText('Retirer la cover'));
+		expect(onClose).toHaveBeenCalledTimes(1);
+		expect(onRemoveCover).toHaveBeenCalledTimes(1);
 	});
 });
