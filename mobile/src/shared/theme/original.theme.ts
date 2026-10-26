@@ -9,7 +9,6 @@ import type { Theme } from './types';
 
 export const originalTheme: Theme = {
 	name: 'original',
-	displayName: 'Original',
 
 	colors: {
 		primary: '#EA3E7A',
