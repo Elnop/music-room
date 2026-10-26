@@ -1,6 +1,6 @@
 # Subject coverage
 
-How the code meets each mandatory requirement of the 42 subject "Music Room" v5.3 ([en.subject.pdf](en.subject.pdf)). The subject overrides every other document. Bonuses (chapter V) are only graded once the mandatory part is perfect, so the project only targets the mandatory part.
+How the code meets each mandatory requirement of the 42 subject "Music Room" v5.3 ([en.subject.pdf](en.subject.pdf)). The subject overrides every other document. Bonuses (chapter V) are only graded once the mandatory part is perfect, so the project targets the mandatory part first; bonus V.3 (free and paid subscription) is delivered too, see [Bonus V.3](#bonus-v3-free-and-paid-subscription).
 
 Status: ✅ done · ⏳ in progress. Each line names where to look; the linked documents give the details.
 
@@ -93,3 +93,16 @@ Details: [playlist-editor.md](../features/playlist-editor.md), [playlist-concurr
 - Work is tracked in GitHub Issues (epics and stories), one branch and one pull request per issue into `develop`.
 - Unit and integration tests on each layer (Vitest + Supertest on the backend, jest-expo on mobile), run by `make test`.
 - `npm run check` (types, lint, dead code, dependencies, duplication, patterns, secrets, tests) runs at pre-commit and in CI on every pull request; see [quality-and-ci.md](../development/quality-and-ci.md).
+
+## Bonus V.3 Free and paid subscription
+
+- Each user is on the free or the premium plan (`user_profiles.plan`); Premium unlocks a custom playlist cover. The switch is simulated, without payment: **Profile › Settings › Abonnement**. Details: [subscription.md](../features/subscription.md).
+- The access check is server-side (`assertPremium`, 403 `PREMIUM_REQUIRED`); the app only hides or locks the action.
+
+Demo scenario (#485), on a phone, with a playlist the account owns:
+
+1. Free account: open the playlist, ⋯ › **Changer la cover** shows a lock and « Réservé au Premium »; pressing it explains the Premium and offers **Paramètres**, and no upload request is sent.
+2. **Paramètres** › switch **Premium** on: the plan changes at once, no restart.
+3. Back on the playlist: ⋯ › **Changer la cover**, pick an image: the cover changes, and live on a second phone that has the playlist open.
+4. Settings › switch **Premium** off (back to free).
+5. The cover stays on the playlist; ⋯ › **Changer la cover** is locked again (the server would answer 403 `PREMIUM_REQUIRED`), while **Retirer la cover** still works and brings back the first track's artwork.

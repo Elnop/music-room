@@ -1,4 +1,5 @@
 import type {
+	PlaylistDetailsPayload,
 	PlaylistRow,
 	TrackRow,
 	PlaylistResponse,
@@ -27,6 +28,18 @@ export function formatPlaylistResponse(
 		trackCount,
 		createdAt: row.created_at ?? new Date().toISOString(),
 		updatedAt: row.updated_at ?? new Date().toISOString(),
+	};
+}
+
+/** The `playlist:details` payload: the playlist's metadata as stored in `row`. */
+export function toDetailsPayload(row: PlaylistRow): PlaylistDetailsPayload {
+	return {
+		playlistId: row.id,
+		name: row.name,
+		description: row.description ?? undefined,
+		visibility: row.visibility as 'public' | 'private',
+		editMode: row.edit_mode as 'open' | 'restricted',
+		coverUrl: row.cover_url ?? undefined,
 	};
 }
 

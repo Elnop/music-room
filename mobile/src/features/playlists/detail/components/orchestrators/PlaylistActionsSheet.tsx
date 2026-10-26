@@ -1,36 +1,25 @@
 import React from 'react';
 import { useDeferredSheetAction } from '@/features/playlists/detail/hooks/useDeferredSheetAction';
-import { PlaylistActionsView } from '@/features/playlists/detail/components/presenters/PlaylistActionsView';
+import {
+	PlaylistActionsView,
+	type PlaylistActionsViewProps,
+} from '@/features/playlists/detail/components/presenters/PlaylistActionsView';
 
-interface PlaylistActionsSheetProps {
-	visible: boolean;
-	/** Shown as the sheet's title. */
-	playlistName: string;
-	onClose: () => void;
-	onEdit: () => void;
-	onSharing: () => void;
-	onDelete: () => void;
-}
+type PlaylistActionsSheetProps = Omit<PlaylistActionsViewProps, 'onDismiss'>;
 
-export function PlaylistActionsSheet({
-	visible,
-	playlistName,
-	onClose,
-	onEdit,
-	onSharing,
-	onDelete,
-}: PlaylistActionsSheetProps) {
-	const { run, onDismiss } = useDeferredSheetAction(onClose);
+/** Each action closes the sheet first (see useDeferredSheetAction). */
+export function PlaylistActionsSheet(props: PlaylistActionsSheetProps) {
+	const { run, onDismiss } = useDeferredSheetAction(props.onClose);
 
 	return (
 		<PlaylistActionsView
-			visible={visible}
-			playlistName={playlistName}
-			onClose={onClose}
+			{...props}
 			onDismiss={onDismiss}
-			onEdit={run(onEdit)}
-			onSharing={run(onSharing)}
-			onDelete={run(onDelete)}
+			onEdit={run(props.onEdit)}
+			onSharing={run(props.onSharing)}
+			onDelete={run(props.onDelete)}
+			onChangeCover={run(props.onChangeCover)}
+			onRemoveCover={run(props.onRemoveCover)}
 		/>
 	);
 }

@@ -2,6 +2,7 @@ import type { z } from 'zod';
 import type { Tables, TablesUpdate } from '@/shared/types/supabase.generated.js';
 import type {
 	addTrackResultSchema,
+	coverResponseSchema,
 	moveTrackResultSchema,
 	playlistMemberSchema,
 	playlistSchema,
@@ -22,6 +23,7 @@ export type PlaylistWithTracksResponse = z.infer<typeof playlistWithTracksSchema
 export type AddTrackResult = z.infer<typeof addTrackResultSchema>;
 export type RemoveTrackResult = z.infer<typeof removeTrackResultSchema>;
 export type MoveTrackResult = z.infer<typeof moveTrackResultSchema>;
+export type CoverResponse = z.infer<typeof coverResponseSchema>;
 
 interface PlaylistUpdateBase {
 	playlistId: string;
@@ -45,6 +47,8 @@ export interface PlaylistDetailsPayload {
 	description?: string;
 	visibility: 'public' | 'private';
 	editMode: 'open' | 'restricted';
+	/** Absent when the playlist has no custom cover. */
+	coverUrl?: string;
 }
 
 /** Payload of the `playlist:tracks-availability` socket event: the tracks whose availability changed. */

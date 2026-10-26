@@ -22,8 +22,8 @@ jest.mock('expo-image-picker', () => ({
 }));
 
 const mockPrepareAvatar = jest.fn();
-jest.mock('@/features/profile/utils/avatarImage', () => ({
-	prepareAvatar: (asset: unknown) => mockPrepareAvatar(asset),
+jest.mock('@/shared/utils/squareImage', () => ({
+	prepareSquareImage: (asset: unknown) => mockPrepareAvatar(asset),
 }));
 
 const mockUploadAvatar = jest.fn();

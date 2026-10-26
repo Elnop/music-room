@@ -149,13 +149,13 @@ mobile/src/
 │   │   ├── lists/          # ReorderableList, SwipeableTrackItem, SwipeableUserItem, QueueSwipe
 │   │   ├── media/          # Artwork, Avatar
 │   │   ├── sharing/        # ShareLinkButton
-│   │   └── theme/          # ThemeSelector, ThemedSystemUI
+│   │   └── theme/          # ThemedSystemUI
 │   ├── services/           # api.ts (HTTP client), authSession (session contract), playbackBridge
 │   │                       # (playback contract), backendUrl, lastTrackStorage
 │   ├── query/              # TanStack Query: queryClient (STALE profiles), keys (key factory), socketCache
 │   ├── stores/             # socketStore (Socket.io connection)
-│   ├── hooks/              # useConnectionStatus, useImageColors
-│   ├── theme/              # ThemeContext, themes (original, royalBlue, pastelLime, christmas), tokens
+│   ├── hooks/              # useConnectionStatus, useImageColors, usePlan (subscription plan)
+│   ├── theme/              # ThemeContext, original theme, tokens
 │   ├── constants/app.ts    # API config, spacing
 │   └── utils/              # logger, toast, haptics, apiErrorMessage, debounce, moveTarget, shareLinks...
 ├── providers/              # AppProviders: gestures, ErrorBoundary, QueryClient, theme, safe area
@@ -248,7 +248,7 @@ import { Button } from '@/shared/components/ui/Button';
 
 Every pressable element goes through `Pressable` or `Button` from `@/shared/components/ui/`: one press opacity, optional haptic feedback (`haptic`), `button` role by default and a required `accessibilityLabel`. `TouchableOpacity` and `Pressable` from `react-native` are forbidden elsewhere (ESLint `guardrails/ui-primitives`). Gestures (swipe, drag and drop) stay on `react-native-gesture-handler`.
 
-Four themes live in `src/shared/theme/` (original, royalBlue, pastelLime, christmas), selectable through `ThemeSelector`; the shared tokens are in `src/shared/theme/tokens.ts`. No hard-coded color outside `src/shared/theme/` (ESLint `guardrails/theme-tokens`): read `theme.colors.*`.
+The app has a single theme, `original` (`src/shared/theme/original.theme.ts`), read through `useTheme()`; the shared tokens are in `src/shared/theme/tokens.ts`. No hard-coded color outside `src/shared/theme/` (ESLint `guardrails/theme-tokens`): read `theme.colors.*`.
 
 ### Component roles (in-house ESLint plugin)
 

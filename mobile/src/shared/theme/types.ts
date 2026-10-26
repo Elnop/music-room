@@ -1,7 +1,7 @@
 import { SPACING } from '@/shared/constants/app';
 import { NEOBRUTALISM_BORDERS, NEOBRUTALISM_SHADOWS, NEOBRUTALISM_TYPOGRAPHY } from './tokens';
 
-export type ThemeName = 'royalBlue' | 'christmas' | 'pastelLime' | 'original';
+export type ThemeName = 'original';
 
 export interface ThemeColors {
 	primary: string;
@@ -45,7 +45,6 @@ export interface ThemeColors {
 
 export interface Theme {
 	name: ThemeName;
-	displayName: string;
 	colors: ThemeColors;
 	borders: typeof NEOBRUTALISM_BORDERS;
 	shadows: typeof NEOBRUTALISM_SHADOWS;
@@ -55,6 +54,4 @@ export interface Theme {
 
 export interface ThemeContextValue {
 	theme: Theme;
-	themeName: ThemeName;
-	setTheme: (name: ThemeName) => void;
 }

@@ -10,6 +10,7 @@ import { registerSoundcloudOpenapi } from '@/features/soundcloud/soundcloud.open
 import { registerFriendsOpenapi } from '@/features/friends/friends.openapi.js';
 import { registerMusicControlOpenapi } from '@/features/music-control/music-control.openapi.js';
 import { registerQueueOpenapi } from '@/features/queue/queue.openapi.js';
+import { registerSubscriptionOpenapi } from '@/features/subscription/subscription.openapi.js';
 
 const registry = new OpenAPIRegistry();
 
@@ -59,6 +60,7 @@ for (const register of [
 	registerFriendsOpenapi,
 	registerMusicControlOpenapi,
 	registerQueueOpenapi,
+	registerSubscriptionOpenapi,
 ]) {
 	register(registry);
 }
@@ -92,6 +94,7 @@ export const swaggerSpec = new OpenApiGeneratorV3(registry.definitions).generate
 		{ name: 'Friends', description: 'Friends system (follow/unfollow)' },
 		{ name: 'Music Control', description: 'Music control delegation' },
 		{ name: 'Queue', description: 'Play queue synced across your devices' },
+		{ name: 'Subscription', description: 'Free or premium plan (simulated switch)' },
 	],
 });
 

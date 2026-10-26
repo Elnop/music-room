@@ -139,3 +139,23 @@ export const avatarRateLimiter = createLimiter({
 	log: 'Avatar rate limit exceeded',
 	logFields: perUserFields,
 });
+
+/** Per signed-in user; after authMiddleware. */
+export const playlistCoverRateLimiter = createLimiter({
+	store: 'playlists:cover',
+	limits: rateLimitConfig.playlistCover,
+	key: req => `cover:${userIdOf(req)}`,
+	message: () => 'Too many playlist cover changes. Please try again later.',
+	log: 'Playlist cover rate limit exceeded',
+	logFields: perUserFields,
+});
+
+/** Per signed-in user; after authMiddleware. */
+export const subscriptionRateLimiter = createLimiter({
+	store: 'subscription',
+	limits: rateLimitConfig.subscription,
+	key: req => `subscription:${userIdOf(req)}`,
+	message: () => 'Too many plan changes. Please try again later.',
+	log: 'Subscription rate limit exceeded',
+	logFields: perUserFields,
+});

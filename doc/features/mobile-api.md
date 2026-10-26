@@ -24,4 +24,4 @@ Swagger UI at `/api-docs` documents every endpoint with its method, parameters, 
 - **Server data is cached by TanStack Query**, and socket events update that cache, so screens show the server's state without polling.
 - **Changing the backend address in the app**: a field in Settings and on the Welcome screen (reachable before login) edits the address (`shared/services/backendUrl.ts`, `BackendUrlField`). It is persisted, validated, read by every module at call time, and the socket reconnects to the new address: no rebuild is needed. The default is the build-time `EXPO_PUBLIC_API_URL`.
 - **Socket.io** carries the same token at the handshake, plus the device identity; the event list is in [backend/README.md](../../backend/README.md#real-time-socketio).
-- **Build information**: the Profile screen shows `Zumik <version> (build <N> · <sha>)` for a release build, `(dev)` for a local debug build (#361).
+- **Build information**: the Profile screen and the Welcome screen (before login, #492) show `Zumik <version> (build <N> · <sha>)` for a release build, `(dev)` for a local debug build (#361).

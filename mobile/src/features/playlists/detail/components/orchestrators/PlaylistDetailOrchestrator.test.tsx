@@ -159,7 +159,9 @@ beforeEach(async () => {
 	signIn('me');
 	testPlayback.playing = { playingUri: null, state: null };
 	useSocketStore.setState({ socket: null, isConnected: false });
-	routes = mockFetchRoutes({});
+	routes = mockFetchRoutes({
+		'GET /api/subscription': () => ok({ plan: 'free', premiumFeatures: ['playlist_cover'] }),
+	});
 });
 
 afterEach(() => {
@@ -179,6 +181,7 @@ describe('PlaylistDetailOrchestrator header button', () => {
 		};
 		expect(view.getByTestId('skeleton-list')).toBeTruthy();
 		expect(renderHeaderRight().queryByLabelText('Options de la playlist')).toBeNull();
+		expect(routes.calls()).not.toContain('GET /api/subscription');
 	});
 
 	it("opens the actions sheet from the owner's ⋯", async () => {
@@ -187,6 +190,20 @@ describe('PlaylistDetailOrchestrator header button', () => {
 		openOwnerSheet();
 		expect(screen.getByLabelText('Modifier')).toBeTruthy();
 		expect(screen.getByLabelText('Supprimer')).toBeTruthy();
+	});
+
+	it('locks « Changer la cover » on the free plan and offers removal only with a cover (#485)', async () => {
+		await renderScreen();
+		await waitFor(() => expect(routes.calls()).toContain('GET /api/subscription'));
+		openOwnerSheet();
+		expect(await screen.findByText('Réservé au Premium')).toBeTruthy();
+		expect(screen.queryByLabelText('Retirer la cover')).toBeNull();
+	});
+
+	it('offers « Retirer la cover » when the playlist has one (#485)', async () => {
+		await renderScreen({ coverUrl: 'https://x/storage/v1/object/public/playlist-covers/p1/c.jpg' });
+		openOwnerSheet();
+		expect(screen.getByLabelText('Retirer la cover')).toBeTruthy();
 	});
 
 	it("keeps headerRight set, without the button, on someone else's playlist", async () => {

@@ -1,4 +1,4 @@
-import { prepareAvatar, AVATAR_SIZE } from './avatarImage';
+import { prepareSquareImage, SQUARE_IMAGE_SIZE } from './squareImage';
 
 const mockContext = {
 	crop: jest.fn(),
@@ -19,19 +19,19 @@ beforeEach(() => {
 	mockSaveAsync.mockResolvedValue({ uri: 'file:///cache/avatar-512.jpg', width: 512, height: 512 });
 });
 
-describe('prepareAvatar', () => {
+describe('prepareSquareImage', () => {
 	it('resizes a square image to a 512 px JPEG at 0.8', async () => {
-		const uri = await prepareAvatar({ uri: 'file:///picked.png', width: 1200, height: 1200 });
+		const uri = await prepareSquareImage({ uri: 'file:///picked.png', width: 1200, height: 1200 });
 
 		expect(uri).toBe('file:///cache/avatar-512.jpg');
 		expect(mockManipulate).toHaveBeenCalledWith('file:///picked.png');
 		expect(mockContext.crop).not.toHaveBeenCalled();
-		expect(mockContext.resize).toHaveBeenCalledWith({ width: AVATAR_SIZE, height: AVATAR_SIZE });
+		expect(mockContext.resize).toHaveBeenCalledWith({ width: SQUARE_IMAGE_SIZE, height: SQUARE_IMAGE_SIZE });
 		expect(mockSaveAsync).toHaveBeenCalledWith({ format: 'jpeg', compress: 0.8 });
 	});
 
 	it('crops a non-square image to its centred square first', async () => {
-		await prepareAvatar({ uri: 'file:///wide.jpg', width: 1000, height: 600 });
+		await prepareSquareImage({ uri: 'file:///wide.jpg', width: 1000, height: 600 });
 
 		expect(mockContext.crop).toHaveBeenCalledWith({
 			originX: 200,

@@ -2,10 +2,7 @@ import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { ConnectionBanner, textColorOn } from './ConnectionBanner';
 import { FIXED_COLORS } from '@/shared/theme/tokens';
-import { christmasTheme } from '@/shared/theme/christmas.theme';
 import { originalTheme } from '@/shared/theme/original.theme';
-import { pastelLimeTheme } from '@/shared/theme/pastelLime.theme';
-import { royalBlueTheme } from '@/shared/theme/royalBlue.theme';
 
 const mockSocketState = { retry: jest.fn() };
 
@@ -65,13 +62,8 @@ describe('ConnectionBanner', () => {
 
 describe('textColorOn', () => {
 	it.each([
-		[pastelLimeTheme.colors.error, FIXED_COLORS.inkLight],
 		[originalTheme.colors.error, FIXED_COLORS.inkDark],
-		[christmasTheme.colors.error, FIXED_COLORS.inkLight],
-		[pastelLimeTheme.colors.warning, FIXED_COLORS.inkDark],
-		[royalBlueTheme.colors.warning, FIXED_COLORS.inkDark],
 		[originalTheme.colors.warning, FIXED_COLORS.inkDark],
-		[christmasTheme.colors.warning, FIXED_COLORS.inkDark],
 	])('uses %s → %s (at least 4.5:1)', (background, text) => {
 		expect(textColorOn(background)).toBe(text);
 	});

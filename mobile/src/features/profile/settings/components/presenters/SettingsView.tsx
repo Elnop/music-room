@@ -1,15 +1,25 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { BackendUrlField } from '@/shared/components/form/BackendUrlField';
-import { ThemeSelector } from '@/shared/components/theme/ThemeSelector';
+import type { Plan } from '@/shared/types/subscription';
 import type { Theme } from '@/shared/theme/types';
+import { SubscriptionSection } from './SubscriptionSection';
 
 interface SettingsViewProps {
 	theme: Theme;
 	bottomPadding: number;
+	plan: Plan | undefined;
+	isChangingPlan: boolean;
+	onTogglePremium: (premium: boolean) => void;
 }
 
-export function SettingsView({ theme, bottomPadding }: SettingsViewProps) {
+export function SettingsView({
+	theme,
+	bottomPadding,
+	plan,
+	isChangingPlan,
+	onTogglePremium,
+}: SettingsViewProps) {
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
 	return (
@@ -19,8 +29,13 @@ export function SettingsView({ theme, bottomPadding }: SettingsViewProps) {
 			contentContainerStyle={{ paddingBottom: bottomPadding }}
 		>
 			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>Thème</Text>
-				<ThemeSelector />
+				<Text style={styles.sectionTitle}>Abonnement</Text>
+				<SubscriptionSection
+					theme={theme}
+					plan={plan}
+					disabled={plan === undefined || isChangingPlan}
+					onTogglePremium={onTogglePremium}
+				/>
 			</View>
 
 			<View style={styles.section}>

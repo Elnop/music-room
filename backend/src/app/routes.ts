@@ -7,6 +7,8 @@ import friendsRoutes from '@/features/friends/friends.routes.js';
 import musicControlRoutes from '@/features/music-control/music-control.routes.js';
 import queueRoutes from '@/features/queue/queue.routes.js';
 import queueTransferRoutes from '@/features/queue/queue-transfer.routes.js';
+import { createSubscriptionRouter } from '@/features/subscription/subscription.routes.js';
+import { authMiddleware } from '@/features/auth/auth.middleware.js';
 
 interface RouteConfig {
 	path: string;
@@ -59,5 +61,10 @@ export const routes: RouteConfig[] = [
 		path: '/api/users/:userId/queue',
 		router: queueRoutes,
 		description: "A friend's play queue, for a delegate who controls one of their devices",
+	},
+	{
+		path: '/api/subscription',
+		router: createSubscriptionRouter(authMiddleware),
+		description: 'Free or premium plan, switched without payment',
 	},
 ];

@@ -67,6 +67,13 @@ export interface PlaylistDetailsEvent {
 	description?: string;
 	visibility: 'public' | 'private';
 	editMode: EditMode;
+	/** Absent when the playlist has no custom cover. */
+	coverUrl?: string;
+}
+
+/** Answer of `PUT`/`DELETE /api/playlists/:id/cover`; null once removed. */
+export interface CoverResponse {
+	coverUrl: string | null;
 }
 
 /** Payload of the `playlist:tracks-availability` socket event: only the tracks that changed. */

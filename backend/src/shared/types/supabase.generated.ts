@@ -431,6 +431,8 @@ export type Database = {
 					id: string;
 					password_reset_code: string | null;
 					password_reset_code_expires_at: string | null;
+					plan: string;
+					plan_changed_at: string | null;
 					updated_at: string | null;
 					username: string;
 					verification_code: string | null;
@@ -449,6 +451,8 @@ export type Database = {
 					id: string;
 					password_reset_code?: string | null;
 					password_reset_code_expires_at?: string | null;
+					plan?: string;
+					plan_changed_at?: string | null;
 					updated_at?: string | null;
 					username: string;
 					verification_code?: string | null;
@@ -467,6 +471,8 @@ export type Database = {
 					id?: string;
 					password_reset_code?: string | null;
 					password_reset_code_expires_at?: string | null;
+					plan?: string;
+					plan_changed_at?: string | null;
 					updated_at?: string | null;
 					username?: string;
 					verification_code?: string | null;

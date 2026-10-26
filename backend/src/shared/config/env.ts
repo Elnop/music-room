@@ -34,6 +34,10 @@ const envSchema = z.object({
 	RATE_LIMIT_SOUNDCLOUD_MAX: z.coerce.number().int().positive().default(120),
 	RATE_LIMIT_AVATAR_WINDOW_MS: z.coerce.number().int().positive().default(3600000),
 	RATE_LIMIT_AVATAR_MAX: z.coerce.number().int().positive().default(10),
+	RATE_LIMIT_PLAYLIST_COVER_WINDOW_MS: z.coerce.number().int().positive().default(3600000),
+	RATE_LIMIT_PLAYLIST_COVER_MAX: z.coerce.number().int().positive().default(10),
+	RATE_LIMIT_SUBSCRIPTION_WINDOW_MS: z.coerce.number().int().positive().default(3600000),
+	RATE_LIMIT_SUBSCRIPTION_MAX: z.coerce.number().int().positive().default(20),
 
 	ACCOUNT_LOCKOUT_ENABLED: z.string().default('true'),
 	ACCOUNT_LOCKOUT_THRESHOLD: z.string().default('5'),

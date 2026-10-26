@@ -43,7 +43,6 @@ jest.mock('@/shared/services/deviceService', () => ({
 	getBuildLabel: () => 'Zumik 1.0.0 (build 42 · a1b2c3d)',
 }));
 
-jest.mock('@/shared/components/theme/ThemeSelector', () => ({ ThemeSelector: () => null }));
 
 type AlertButtons = Parameters<typeof Alert.alert>[2];
 

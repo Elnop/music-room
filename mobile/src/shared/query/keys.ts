@@ -44,6 +44,10 @@ export const queryKeys = {
 		list: () => [...queryKeys.devices.all, 'list'] as const,
 		picker: () => [...queryKeys.devices.all, 'picker'] as const,
 	},
+	subscription: {
+		all: ['subscription'] as const,
+		plan: () => [...queryKeys.subscription.all, 'plan'] as const,
+	},
 	search: {
 		all: ['search'] as const,
 		tracks: (query: string) => [...queryKeys.search.all, 'tracks', query] as const,

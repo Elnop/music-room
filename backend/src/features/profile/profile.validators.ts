@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { uploadedImageSchema } from '@/shared/storage/image-upload.js';
 
 export const visibilityLevelSchema = z.enum(['public', 'friends_only', 'private']);
 
@@ -61,14 +62,7 @@ export const updateMusicPreferencesSchema = z.object({
 		.refine(genres => new Set(genres).size === genres.length, 'Duplicate genres are not allowed'),
 });
 
-/** Size is capped by multer; the type is checked from the bytes, not here. */
-export const avatarFileSchema = z.object(
-	{
-		buffer: z.instanceof(Buffer),
-		size: z.number().int().positive('The photo is empty'),
-	},
-	{ error: 'A photo is required in the multipart field "avatar"' }
-);
+export const avatarFileSchema = uploadedImageSchema('avatar', 'photo');
 
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type UpdatePrivacyInput = z.infer<typeof updatePrivacySchema>;

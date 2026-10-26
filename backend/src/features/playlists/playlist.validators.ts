@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { uploadedImageSchema } from '@/shared/storage/image-upload.js';
 
 export const createPlaylistSchema = z.object({
 	name: z
@@ -52,6 +53,8 @@ export const addCollaboratorSchema = z.object({
 export const addViewerSchema = z.object({
 	userId: z.uuid('Invalid user ID format'),
 });
+
+export const coverFileSchema = uploadedImageSchema('cover', 'cover');
 
 // Path segments read with `routeParam` (any non-empty value), documented as UUIDs.
 export const playlistIdParamSchema = z.object({
