@@ -34,12 +34,13 @@ The web app (epic #474) signs in, signs up and links accounts with the same endp
 
 ### Console setup (by hand, once per origin)
 
-No new environment variable, in the backend or the app. Each origin the web app is served from (`http://localhost:8081` in development, `https://elnop.github.io` on GitHub Pages) is declared in both consoles:
+No new environment variable, in the backend or the app. Each origin the web app is served from (`http://localhost:8081` in development, `https://elnop.github.io` on GitHub Pages) is declared in the Google console; Meta takes the GitHub Pages domain only:
 
 1. **Google Cloud console**, APIs & Services → Credentials → the OAuth 2.0 client of type *Web application* whose ID is `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` → *Authorized JavaScript origins*: add `http://localhost`, `http://localhost:8081` and `https://elnop.github.io` (origins only: no path, no trailing slash; Google asks for both `localhost` entries when testing on a port). No redirect URI: the popup mode needs none. The change can take a few minutes to apply.
 2. **Meta for Developers**, app `EXPO_PUBLIC_FACEBOOK_APP_ID`:
-   - Settings → Basic → *App domains*: `elnop.github.io` and `localhost`; *Add platform* → *Website*, *Site URL* `https://elnop.github.io/`.
-   - Facebook Login → Settings: *Login with the JavaScript SDK* on; *Allowed Domains for the JavaScript SDK*: `https://elnop.github.io/` and `http://localhost:8081/`.
+   - Settings → Basic → *App domains*: `elnop.github.io`; *Add platform* → *Website*, *Site URL* `https://elnop.github.io/`.
+   - Facebook Login → Settings: *Login with the JavaScript SDK* on; *Allowed Domains for the JavaScript SDK*: `https://elnop.github.io/`.
+   - `localhost` is not declared: the console refuses a domain without a top-level domain ("must contain a top-level domain"). While the app is in development mode, Meta allows `localhost` without it; if a local sign-in still fails on the domain, test Facebook on the GitHub Pages build instead.
    - While the app is in development mode, only its administrators, developers and testers can log in.
 
 ## Profile and privacy
