@@ -1,8 +1,9 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface ProfileSectionProps {
 	title: string;
@@ -51,14 +52,14 @@ const createStyles = (theme: Theme) =>
 		},
 		title: {
 			fontSize: 13,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.textSecondary,
 			textTransform: 'uppercase',
 			letterSpacing: 0.5,
 		},
 		action: {
 			fontSize: 14,
-			fontWeight: theme.typography.weights.medium,
+			fontFamily: theme.typography.families.medium,
 			color: theme.colors.primary,
 		},
 		content: {

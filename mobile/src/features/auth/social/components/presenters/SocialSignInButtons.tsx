@@ -1,10 +1,12 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { GOOGLE_FORM_BUTTON } from '@/features/auth/constants';
 import type { GoogleButtonSlot } from '@/features/auth/types';
+import { Text } from '@/shared/components/ui/Text';
+import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
 interface SocialSignInButtonsProps {
 	onGoogle: () => void;
@@ -99,13 +101,13 @@ const createStyles = (theme: Theme) =>
 		},
 		googleIcon: {
 			fontSize: 20,
-			fontWeight: 'bold',
+			fontFamily: FONT_FAMILIES.bold,
 			color: theme.colors.googleMark,
 			marginRight: 12,
 		},
 		googleButtonText: {
 			fontSize: 16,
-			fontWeight: '500',
+			fontFamily: FONT_FAMILIES.medium,
 			color: theme.colors.googleText,
 		},
 		facebookButton: {
@@ -128,13 +130,13 @@ const createStyles = (theme: Theme) =>
 		},
 		facebookIcon: {
 			fontSize: 20,
-			fontWeight: 'bold',
+			fontFamily: FONT_FAMILIES.bold,
 			color: theme.colors.onFacebook,
 			marginRight: 12,
 		},
 		facebookButtonText: {
 			fontSize: 16,
-			fontWeight: '500',
+			fontFamily: FONT_FAMILIES.medium,
 			color: theme.colors.onFacebook,
 		},
 	});

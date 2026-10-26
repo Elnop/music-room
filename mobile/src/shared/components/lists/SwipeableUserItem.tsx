@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Swipeable } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,6 +7,8 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import type { Theme } from '@/shared/theme/types';
 import { Avatar } from '@/shared/components/media/Avatar';
+import { Text } from '@/shared/components/ui/Text';
+import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
 interface SwipeableUserItemProps {
 	user: {
@@ -85,7 +87,7 @@ const createStyles = (theme: Theme, separator: string) =>
 		},
 		displayName: {
 			fontSize: 15,
-			fontWeight: '600',
+			fontFamily: FONT_FAMILIES.semibold,
 			color: theme.colors.text,
 			marginBottom: 2,
 		},
@@ -106,7 +108,7 @@ const createStyles = (theme: Theme, separator: string) =>
 		},
 		roleText: {
 			fontSize: 11,
-			fontWeight: '600',
+			fontFamily: FONT_FAMILIES.semibold,
 			color: theme.colors.text,
 		},
 		removeButton: {
@@ -119,7 +121,7 @@ const createStyles = (theme: Theme, separator: string) =>
 		removeText: {
 			color: theme.colors.onColor,
 			fontSize: 12,
-			fontWeight: '600',
+			fontFamily: FONT_FAMILIES.semibold,
 			marginTop: 4,
 		},
 	});

@@ -1,7 +1,8 @@
 import React from 'react';
-import { Modal, StyleSheet, Text, useWindowDimensions } from 'react-native';
+import { Modal, StyleSheet, useWindowDimensions } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { ActionSheet } from './ActionSheet';
+import { Text } from '@/shared/components/ui/Text';
 
 jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
 	__esModule: true,

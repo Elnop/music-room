@@ -1,8 +1,8 @@
 import React from 'react';
-import { Text } from 'react-native';
 import { act, render, screen } from '@testing-library/react-native';
 import { ReorderableList } from './ReorderableList';
 import { hapticSelection } from '@/shared/utils/haptics';
+import { Text } from '@/shared/components/ui/Text';
 
 jest.mock('@/shared/utils/haptics', () => ({ hapticSelection: jest.fn() }));
 jest.mock('react-native-reanimated', () => jest.requireActual('react-native-reanimated/mock'));

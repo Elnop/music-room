@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { Avatar } from '@/shared/components/media/Avatar';
 import { Button } from '@/shared/components/ui/Button';
@@ -15,6 +15,7 @@ import type { BeaconBroadcast } from '@/features/events/detail/hooks/useBeaconBr
 import { BeaconCard } from './BeaconCard';
 import { BeaconUnavailableCard } from './BeaconUnavailableCard';
 import { InfoRow } from './InfoRow';
+import { Text } from '@/shared/components/ui/Text';
 
 interface EventDetailViewProps {
 	screen: EventDetailScreen;
@@ -98,7 +99,7 @@ const createStyles = (theme: Theme) =>
 		live: {
 			alignSelf: 'flex-start',
 			fontSize: theme.typography.sizes.sm,
-			fontWeight: theme.typography.weights.bold,
+			fontFamily: theme.typography.families.bold,
 			color: theme.colors.onColor,
 			backgroundColor: theme.colors.success,
 			paddingHorizontal: theme.spacing.sm,
@@ -108,7 +109,7 @@ const createStyles = (theme: Theme) =>
 		},
 		title: {
 			fontSize: theme.typography.sizes.xxl,
-			fontWeight: theme.typography.weights.bold,
+			fontFamily: theme.typography.families.bold,
 			color: theme.colors.text,
 		},
 		organizer: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },

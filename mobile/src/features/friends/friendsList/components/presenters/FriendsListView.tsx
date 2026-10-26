@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { SearchBar } from '@/shared/components/form/SearchBar';
 import { useTheme } from '@/shared/theme/ThemeContext';
@@ -7,6 +7,7 @@ import type { FriendProfile, UserProfile } from '@/features/friends/types';
 import { FriendsListTab } from './FriendsListTab';
 import { SearchUsersTab } from './SearchUsersTab';
 import { createFriendsListStyles } from './friendsListStyles';
+import { Text } from '@/shared/components/ui/Text';
 
 interface FriendsListViewProps {
 	activeTab: 'friends' | 'search';

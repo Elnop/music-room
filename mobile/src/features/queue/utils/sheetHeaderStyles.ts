@@ -1,4 +1,5 @@
 import type { Theme } from '@/shared/theme/types';
+import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
 export const sheetHeaderStyles = (theme: Theme, insets: { top: number }, separator: string) => ({
 	container: {
@@ -27,7 +28,7 @@ export const sheetHeaderStyles = (theme: Theme, insets: { top: number }, separat
 		marginRight: 40,
 		textAlign: 'center' as const,
 		fontSize: 18,
-		fontWeight: '700' as const,
+		fontFamily: FONT_FAMILIES.bold,
 		color: theme.colors.text,
 	},
 });

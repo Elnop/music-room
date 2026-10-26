@@ -1,6 +1,7 @@
 import { Dimensions, StyleSheet } from 'react-native';
 import { BREAKPOINTS, PLAYER_PANEL_WIDTH } from '@/shared/constants/layout';
 import type { Theme } from '@/shared/theme/types';
+import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
 export const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 export const DISMISS_THRESHOLD = SCREEN_HEIGHT * 0.2;
@@ -43,14 +44,14 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 		},
 		nowPlayingText: {
 			fontSize: 12,
-			fontWeight: '600',
+			fontFamily: FONT_FAMILIES.semibold,
 			letterSpacing: 2,
 			marginTop: 8,
 		},
 		deviceText: {
 			flexShrink: 1,
 			fontSize: 13,
-			fontWeight: '600',
+			fontFamily: FONT_FAMILIES.semibold,
 		},
 		// Content sits low, within thumb reach; the header keeps only the close chevron.
 		mainContent: {
@@ -101,13 +102,13 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 		},
 		title: {
 			fontSize: 24,
-			fontWeight: '700',
+			fontFamily: FONT_FAMILIES.bold,
 			marginBottom: 8,
 			textAlign: 'center',
 		},
 		artist: {
 			fontSize: 17,
-			fontWeight: '500',
+			fontFamily: FONT_FAMILIES.medium,
 			textAlign: 'center',
 		},
 		errorContainer: {
@@ -123,7 +124,7 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 		},
 		errorText: {
 			fontSize: 14,
-			fontWeight: '500',
+			fontFamily: FONT_FAMILIES.medium,
 		},
 		progressContainer: {
 			paddingHorizontal: 24,
@@ -131,7 +132,7 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 		},
 		slider: { width: '100%', height: 40 },
 		timeContainer: { flexDirection: 'row', justifyContent: 'space-between', marginTop: -8 },
-		timeText: { fontSize: 13, fontWeight: '500' },
+		timeText: { fontSize: 13, fontFamily: FONT_FAMILIES.medium },
 		controls: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -160,5 +161,5 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 			elevation: 8,
 		},
 		loadingContainer: { marginTop: 24, alignItems: 'center' },
-		loadingText: { fontSize: 14, fontWeight: '500' },
+		loadingText: { fontSize: 14, fontFamily: FONT_FAMILIES.medium },
 	});

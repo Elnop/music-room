@@ -1,11 +1,12 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Avatar } from '@/shared/components/media/Avatar';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { headerFacts } from '@/features/playlists/detail/utils/headerFacts';
 import type { PlaylistWithTracks } from '@/features/playlists/types';
+import { Text } from '@/shared/components/ui/Text';
 
 /** Who owns the playlist, how many tracks it has and who edits it, on one line (wide screens). */
 export function PlaylistByline({ playlist }: { playlist: PlaylistWithTracks }) {
@@ -43,7 +44,7 @@ const createStyles = (theme: Theme) =>
 		owner: {
 			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.text,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			marginLeft: theme.spacing.xs,
 			flexShrink: 1,
 		},
@@ -56,6 +57,6 @@ const createStyles = (theme: Theme) =>
 		collaborators: {
 			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.primary,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 		},
 	});

@@ -1,14 +1,16 @@
 import React from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { Button } from '@/shared/components/ui/Button';
 import { Input } from '@/shared/components/ui/Input';
 import { Pressable } from '@/shared/components/ui/Pressable';
+import { Text } from '@/shared/components/ui/Text';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { AuthFormLayout } from '@/features/auth/form/components/presenters/AuthFormLayout';
 import { SocialSignInButtons } from '@/features/auth/social/components/presenters/SocialSignInButtons';
 import type { FieldBinding } from '@/features/auth/form/hooks/useFieldBinding';
 import type { GoogleButtonSlot } from '@/features/auth/types';
+import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
 interface LoginViewProps {
 	email: FieldBinding;
@@ -97,6 +99,6 @@ const createStyles = (theme: Theme) =>
 		forgotPasswordText: {
 			fontSize: 14,
 			color: theme.colors.primary,
-			fontWeight: '600',
+			fontFamily: FONT_FAMILIES.semibold,
 		},
 	});

@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import type { Theme } from '@/shared/theme/types';
@@ -7,6 +7,7 @@ import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { GENRE_INFO } from '@/types/user.types';
 import { formatEventDate, isOngoing } from '@/features/events/utils/eventDates';
 import type { MusicEvent } from '@/features/events/types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface EventRowProps {
 	event: MusicEvent;
@@ -63,13 +64,13 @@ const createStyles = (theme: Theme) =>
 		body: { flex: 1 },
 		name: {
 			fontSize: theme.typography.sizes.lg,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 		},
 		meta: { fontSize: theme.typography.sizes.sm, color: theme.colors.textSecondary, marginTop: 2 },
 		proximity: {
 			fontSize: theme.typography.sizes.sm,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.primary,
 		},
 	});

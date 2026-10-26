@@ -1,11 +1,12 @@
 import React from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { SwipeableUserItem } from '@/shared/components/lists/SwipeableUserItem';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { PlaylistMember } from '@/features/playlists/types';
 import { createSharingStyles } from './sharingStyles';
+import { Text } from '@/shared/components/ui/Text';
 
 interface MembersSectionProps {
 	title: string;

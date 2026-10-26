@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { Pressable } from '@/shared/components/ui/Pressable';
@@ -9,6 +9,7 @@ import { PlayerProgressSlider } from '@/features/player/modal/components/present
 import type { PlayerBarData } from '@/features/player/playerBar/hooks/usePlayerBar';
 import { PlayerBarButton } from './PlayerBarButton';
 import { createStyles } from './playerBarStyles';
+import { Text } from '@/shared/components/ui/Text';
 
 interface PlayerBarViewProps {
 	data: PlayerBarData;

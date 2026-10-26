@@ -1,8 +1,9 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { ThemedSwitch } from '@/shared/components/ui/ThemedSwitch';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { Text } from '@/shared/components/ui/Text';
 
 interface ToggleCardProps {
 	label: string;
@@ -48,7 +49,7 @@ const createStyles = (theme: Theme) =>
 		},
 		label: {
 			fontSize: theme.typography.sizes.md,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 			marginBottom: theme.spacing.xs,
 		},

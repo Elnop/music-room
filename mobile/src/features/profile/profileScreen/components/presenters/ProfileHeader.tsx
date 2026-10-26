@@ -1,10 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Avatar } from '@/shared/components/media/Avatar';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import type { UserProfile } from '@/types/user.types';
 import type { UserStats } from '@/features/profile/types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface ProfileHeaderProps {
 	user: UserProfile;
@@ -55,7 +56,7 @@ const createStyles = (theme: Theme) =>
 		},
 		displayName: {
 			fontSize: 26,
-			fontWeight: theme.typography.weights.bold,
+			fontFamily: theme.typography.families.bold,
 			color: theme.colors.text,
 			marginTop: theme.spacing.xs,
 		},
@@ -82,7 +83,7 @@ const createStyles = (theme: Theme) =>
 		},
 		statValue: {
 			fontSize: 18,
-			fontWeight: theme.typography.weights.bold,
+			fontFamily: theme.typography.families.bold,
 			color: theme.colors.text,
 		},
 		statLabel: {

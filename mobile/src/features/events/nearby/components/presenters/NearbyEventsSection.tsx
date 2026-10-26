@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { RowGrid } from '@/shared/components/lists/RowGrid';
 import { SectionHeader } from '@/shared/components/lists/SectionHeader';
@@ -10,6 +10,7 @@ import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { NearbyEvents } from '@/features/events/nearby/hooks/useNearbyEvents';
 import { BeaconStatusLine } from './BeaconStatusLine';
 import { EventRow } from './EventRow';
+import { Text } from '@/shared/components/ui/Text';
 
 const NOTICE_ACTIONS = {
 	request: { label: 'Autoriser la localisation', handler: 'requestPermission' },
@@ -78,7 +79,7 @@ const createStyles = (theme: Theme) =>
 	StyleSheet.create({
 		subtitle: {
 			fontSize: theme.typography.sizes.sm,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.textSecondary,
 			paddingHorizontal: theme.spacing.md,
 			marginTop: theme.spacing.sm,

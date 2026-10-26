@@ -1,11 +1,12 @@
 import React from 'react';
-import { Modal, StyleSheet, Text, View, type AlertButton } from 'react-native';
+import { Modal, StyleSheet, View, type AlertButton } from 'react-native';
 import { CenteredDialog } from '@/shared/components/layout/CenteredDialog';
 import { dialogStyles } from '@/shared/components/layout/dialogStyles';
 import { Button } from '@/shared/components/ui/Button';
 import { useAlertStore } from '@/shared/stores/alertStore';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { Theme } from '@/shared/theme/types';
+import { Text } from '@/shared/components/ui/Text';
 
 const OK_BUTTON: AlertButton = { text: 'OK' };
 

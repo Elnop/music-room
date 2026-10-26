@@ -1,3 +1,5 @@
+import { FONT_FAMILIES } from './fonts';
+
 export const NEOBRUTALISM_BORDERS = {
 	thin: 0,
 	medium: 0,
@@ -34,14 +36,7 @@ export const NEOBRUTALISM_SHADOWS = {
 } as const;
 
 export const NEOBRUTALISM_TYPOGRAPHY = {
-	weights: {
-		regular: '400' as const,
-		medium: '500' as const,
-		semibold: '600' as const,
-		bold: '700' as const,
-		extrabold: '800' as const,
-		black: '900' as const,
-	},
+	families: FONT_FAMILIES,
 	sizes: {
 		xs: 10,
 		sm: 12,

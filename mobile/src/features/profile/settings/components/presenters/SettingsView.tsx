@@ -1,10 +1,11 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { BackendUrlField } from '@/shared/components/form/BackendUrlField';
 import { BACKEND_URL_EDITABLE } from '@/shared/constants/platform';
 import type { Plan } from '@/shared/types/subscription';
 import type { Theme } from '@/shared/theme/types';
 import { SubscriptionSection } from './SubscriptionSection';
+import { Text } from '@/shared/components/ui/Text';
 
 interface SettingsViewProps {
 	theme: Theme;
@@ -62,7 +63,7 @@ const createStyles = (theme: Theme) =>
 		},
 		sectionTitle: {
 			fontSize: theme.typography.sizes.xl,
-			fontWeight: theme.typography.weights.bold,
+			fontFamily: theme.typography.families.bold,
 			color: theme.colors.text,
 			marginBottom: theme.spacing.md,
 		},

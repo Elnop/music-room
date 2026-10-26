@@ -1,8 +1,9 @@
 import React from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { HOVERED_OPACITY, PRESSED_OPACITY, Pressable, pressableStyle } from './Pressable';
 import { hapticSelection, hapticTap } from '@/shared/utils/haptics';
+import { Text } from './Text';
 
 jest.mock('@/shared/utils/haptics', () => ({
 	hapticTap: jest.fn(),

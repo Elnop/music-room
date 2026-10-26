@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
@@ -9,6 +9,7 @@ import {
 	sameName,
 	formatLastSeen,
 } from '@/features/music-control/myDevices/utils/deviceFormatters';
+import { Text } from '@/shared/components/ui/Text';
 
 interface DeviceHeaderProps {
 	device: UserDeviceWithLicenses;
@@ -82,7 +83,7 @@ const createStyles = (theme: Theme) =>
 		},
 		deviceName: {
 			fontSize: 16,
-			fontWeight: theme.typography.weights.bold,
+			fontFamily: theme.typography.families.bold,
 			color: theme.colors.text,
 			marginRight: theme.spacing.sm,
 		},
@@ -97,7 +98,7 @@ const createStyles = (theme: Theme) =>
 		},
 		badgeText: {
 			fontSize: 12,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.primary,
 		},
 		deviceMeta: {

@@ -1,11 +1,11 @@
 import React from 'react';
-import { Text } from 'react-native';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { PlayerBar } from './PlayerBar';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { useVolumeStore } from '@/features/player/stores/volumeStore';
 import { registerPlayerModals } from '@/shared/services/playerModalsBridge';
 import type { NowPlaying } from '@/features/player/types';
+import { Text } from '@/shared/components/ui/Text';
 
 const mockSeekTo = jest.fn();
 const mockPrevious = jest.fn();

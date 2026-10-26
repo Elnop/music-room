@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Button } from '@/shared/components/ui/Button';
 import { Input } from '@/shared/components/ui/Input';
 import { useTheme } from '@/shared/theme/ThemeContext';
@@ -8,6 +8,7 @@ import { AuthFormLayout } from '@/features/auth/form/components/presenters/AuthF
 import { SocialSignInButtons } from '@/features/auth/social/components/presenters/SocialSignInButtons';
 import type { FieldBinding } from '@/features/auth/form/hooks/useFieldBinding';
 import type { GoogleButtonSlot } from '@/features/auth/types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface RegisterViewProps {
 	email: FieldBinding;

@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Avatar } from '@/shared/components/media/Avatar';
 import { GenreChip } from '@/shared/components/ui/GenreChip';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { FilteredProfile, FollowStatus, MusicGenre } from '@/features/friends/types';
 import { createUserProfileHeaderStyles } from './userProfileHeaderStyles';
+import { Text } from '@/shared/components/ui/Text';
 
 interface UserProfileInfoProps {
 	profile: FilteredProfile;

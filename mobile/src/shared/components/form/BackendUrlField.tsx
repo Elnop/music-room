@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { Input } from '@/shared/components/ui/Input';
@@ -12,6 +12,7 @@ import {
 	resetBackendUrl,
 	setBackendUrl,
 } from '@/shared/services/backendUrl';
+import { Text } from '@/shared/components/ui/Text';
 
 export function BackendUrlField() {
 	const { theme } = useTheme();

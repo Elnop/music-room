@@ -1,10 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ProfileNavigationItem } from '@/features/profile/profileScreen/components/presenters/ProfileNavigationItem';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface ProfileMenuItemsProps {
 	isLoading: boolean;
@@ -83,7 +84,7 @@ const createStyles = (theme: Theme) =>
 		},
 		logoutText: {
 			fontSize: 16,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.error,
 		},
 		footer: {

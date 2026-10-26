@@ -21,7 +21,7 @@ Where a file goes is set by the target layout in `doc/architecture/code-layout.m
   ```
 
   `src/shared/` holds what several features use:
-  - `components/ui/`: the primitives ([ui-primitives](#ui-primitives)): `Pressable`, `Button`, `Input`, `Card`, `Skeleton`, `ThemedSwitch`, `LoadingSpinner`;
+  - `components/ui/`: the primitives ([ui-primitives](#ui-primitives)): `Pressable`, `Button`, `Text`, `TextInput`, `Input`, `Card`, `Skeleton`, `ThemedSwitch`, `LoadingSpinner`;
   - `components/<subject>/`: shared blocks by subject (`feedback/`, `form/`, `lists/`, `media/`, `sharing/`, `theme/`);
   - `services/`: the API client `api.ts`, `backendUrl.ts`, storage modules;
   - `query/`: TanStack Query setup ([state.md](state.md));
@@ -53,9 +53,17 @@ Mobile: every touchable element is a `Pressable` or a `Button` from `src/shared/
 - `Pressable` fixes the press opacity (`PRESSED_OPACITY`), sets the `button` role unless told otherwise, fires an optional haptic (`haptic="tap" | "selection" | "success"`, through `@/shared/utils/haptics`) and requires an `accessibilityLabel` in its type, so no control is silent for a screen reader.
 - `Button` is built on it; its label (`title` or the text children) is its accessibility label unless one is given.
 - Gestures (swipe, drag and drop, the mini-player) stay on `react-native-gesture-handler`.
-- A `Text` primitive is not written yet: it comes with the first feature that needs themed typography (#378–#385).
+- Text goes through the `Text` and `TextInput` primitives ([text-primitives](#text-primitives)).
 
 ## theme-tokens
 
 Mobile: no colour literal outside `src/shared/theme/` (ESLint `guardrails/theme-tokens`): no hex string (`'#FFF'`), no `rgb(`/`rgba(`/`hsl(` string, and no named colour (`'white'`) as a colour prop or style key; a template literal that starts as a colour (`` `rgba(${r}, …)` ``) counts too. Read the colour from the theme: `const { theme } = useTheme()`, then `theme.colors.primary`. A colour every theme lacks is added to `ThemeColors` (`src/shared/theme/types.ts`) and to the four themes. `'transparent'` is allowed. Tests are covered too.
 
+
+## text-primitives
+
+Mobile: `Text` and `TextInput` come from `src/shared/components/ui/` (ESLint `guardrails/text-primitives`), never from `react-native`; only `ui/Text.tsx` and `ui/TextInput.tsx` import the native ones. The primitives set the regular Inter family, so a text without a style is in the brand font too; a nested `Text` keeps its parent's family. Type imports (`useRef<TextInput>`, `import type { TextInput } from 'react-native'`) stay allowed.
+
+## font-families
+
+Mobile: no `fontWeight` and no font name (`fontFamily: 'Arial'`) outside `src/shared/theme/` (ESLint `guardrails/font-families`). Each weight of Inter is its own family: Android picks a weight by family, not by `fontWeight`, and the browser fakes a bolder weight when a `fontWeight` is set on top of the family. Set `fontFamily: theme.typography.families.semibold` (or `FONT_FAMILIES.semibold` from `@/shared/theme/fonts` where no theme is at hand). A new weight is added to `FONT_FAMILIES` and `FONT_ASSETS` in `src/shared/theme/fonts.ts`, which `App.tsx` loads before the first render.

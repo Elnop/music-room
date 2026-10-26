@@ -1,8 +1,10 @@
 import React from 'react';
-import { Text, StyleSheet, ActivityIndicator, ViewStyle } from 'react-native';
+import { StyleSheet, ActivityIndicator, ViewStyle } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { Pressable } from './Pressable';
+import { Text } from './Text';
+import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline';
 
@@ -108,7 +110,7 @@ const createStyles = (theme: Theme) =>
 
 		text: {
 			fontSize: 16,
-			fontWeight: '600',
+			fontFamily: FONT_FAMILIES.semibold,
 		},
 		primaryText: {
 			color: theme.colors.onColor,

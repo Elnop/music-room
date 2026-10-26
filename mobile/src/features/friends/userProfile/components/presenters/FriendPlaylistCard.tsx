@@ -1,10 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Artwork } from '@/shared/components/media/Artwork';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import type { FriendPlaylistSummary } from '@/features/friends/types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface FriendPlaylistCardProps {
 	playlist: FriendPlaylistSummary;
@@ -51,7 +52,7 @@ const createStyles = (theme: Theme) =>
 		},
 		rowName: {
 			fontSize: theme.typography.sizes.md,
-			fontWeight: theme.typography.weights.medium,
+			fontFamily: theme.typography.families.medium,
 			color: theme.colors.text,
 			marginBottom: 2,
 		},

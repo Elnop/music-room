@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Button } from '@/shared/components/ui/Button';
 import { Input } from '@/shared/components/ui/Input';
 import { Pressable } from '@/shared/components/ui/Pressable';
@@ -7,6 +7,8 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import { PasswordScreenLayout } from '@/features/auth/form/components/presenters/PasswordScreenLayout';
 import { ErrorBox } from '@/features/auth/form/components/presenters/ErrorBox';
 import type { ForgotPassword } from '@/features/auth/forgotPassword/hooks/useForgotPassword';
+import { Text } from '@/shared/components/ui/Text';
+import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
 export function ForgotPasswordView({ form }: { form: ForgotPassword }) {
 	const { theme } = useTheme();
@@ -46,7 +48,7 @@ export function ForgotPasswordView({ form }: { form: ForgotPassword }) {
 				<Pressable onPress={form.goToLogin} accessibilityLabel="Se connecter">
 					<Text style={[styles.footerText, { color: theme.colors.textSecondary }]}>
 						Vous vous en souvenez ?{' '}
-						<Text style={{ color: theme.colors.primary, fontWeight: '600' }}>Se connecter</Text>
+						<Text style={{ color: theme.colors.primary, fontFamily: FONT_FAMILIES.semibold }}>Se connecter</Text>
 					</Text>
 				</Pressable>
 			</View>

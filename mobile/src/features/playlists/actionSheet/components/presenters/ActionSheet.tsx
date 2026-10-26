@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, StyleSheet, Text, View, type DimensionValue } from 'react-native';
+import { Modal, StyleSheet, View, type DimensionValue } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable } from '@/shared/components/ui/Pressable';
@@ -10,6 +10,8 @@ import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import type { MenuAnchor } from '@/shared/utils/menuPlacement';
+import { Text } from '@/shared/components/ui/Text';
+import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
 interface ActionSheetProps {
 	visible: boolean;
@@ -137,7 +139,7 @@ const createStyles = (theme: Theme, bottomInset: number) =>
 		},
 		title: {
 			fontSize: 17,
-			fontWeight: '700',
+			fontFamily: FONT_FAMILIES.bold,
 			color: theme.colors.text,
 		},
 		subtitle: {

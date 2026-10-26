@@ -1,8 +1,8 @@
 import React from 'react';
-import { Text } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { ErrorBoundary } from './ErrorBoundary';
 import { logger } from '@/shared/utils/logger';
+import { Text } from '@/shared/components/ui/Text';
 
 let shouldThrow = false;
 

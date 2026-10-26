@@ -1,11 +1,12 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 import { PROFILE_LIMITS, type UpdateProfileInput } from '@/features/profile/types';
 import { Input } from '@/shared/components/ui/Input';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface EditProfileFormFieldsProps {
 	control: Control<UpdateProfileInput>;

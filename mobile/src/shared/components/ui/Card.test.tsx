@@ -1,7 +1,7 @@
 import React from 'react';
-import { Text } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Card } from './Card';
+import { Text } from './Text';
 
 jest.mock('@/shared/theme/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');

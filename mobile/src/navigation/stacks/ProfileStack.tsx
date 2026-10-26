@@ -32,7 +32,7 @@ export function ProfileNavigator() {
 				headerTintColor: theme.colors.text,
 				headerShadowVisible: false,
 				headerTitleStyle: {
-					fontWeight: theme.typography.weights.bold,
+					fontFamily: theme.typography.families.bold,
 				},
 				headerTitleAlign: 'center',
 			}}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Artwork } from '@/shared/components/media/Artwork';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useGridTileWidth } from '@/shared/hooks/useGridTileWidth';
@@ -9,6 +9,7 @@ import type { Playlist } from '@/features/playlists/types';
 import { playlistCardLabel, tracksLabel } from '@/features/playlists/home/utils/playlistLabels';
 import { OwnerAvatarBadge } from './OwnerAvatarBadge';
 import { PrivateBadge } from './PrivateBadge';
+import { Text } from '@/shared/components/ui/Text';
 
 const coverOf = (playlist: Playlist) => playlist.coverUrl || playlist.firstTrackCover;
 
@@ -54,7 +55,7 @@ const createStyles = (theme: Theme) =>
 		tileInfo: { marginTop: theme.spacing.sm, paddingHorizontal: 2 },
 		tileName: {
 			fontSize: theme.typography.sizes.md,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 			marginBottom: 2,
 		},

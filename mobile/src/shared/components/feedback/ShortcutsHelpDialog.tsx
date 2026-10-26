@@ -1,11 +1,12 @@
 import React from 'react';
-import { Modal, StyleSheet, Text, View } from 'react-native';
+import { Modal, StyleSheet, View } from 'react-native';
 import { CenteredDialog } from '@/shared/components/layout/CenteredDialog';
 import { dialogStyles } from '@/shared/components/layout/dialogStyles';
 import { Button } from '@/shared/components/ui/Button';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { Theme } from '@/shared/theme/types';
 import type { KeyboardShortcut } from '@/shared/utils/keyboardShortcuts';
+import { Text } from '@/shared/components/ui/Text';
 
 interface ShortcutsHelpDialogProps {
 	visible: boolean;
@@ -66,7 +67,7 @@ const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.surfaceAlt,
 			textAlign: 'center',
 			fontSize: theme.typography.sizes.sm,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 		},
 		hint: {

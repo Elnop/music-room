@@ -1,5 +1,4 @@
 import React from 'react';
-import { Text } from 'react-native';
 import { act, fireEvent, screen } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { HomeOrchestrator } from './HomeOrchestrator';
@@ -12,6 +11,7 @@ import { mockFetchRoutes } from '@/test/fetchRoutes';
 import { fail, ok } from '@/test/fetchResponses';
 import { signIn } from '@/test/session';
 import '@/test/playback';
+import { Text } from '@/shared/components/ui/Text';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')

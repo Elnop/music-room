@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 import { sheetHeaderStyles } from '@/features/queue/utils/sheetHeaderStyles';
 import type { Theme } from '@/shared/theme/types';
+import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
 export const formatDuration = (ms: number): string => {
 	const minutes = Math.floor(ms / 60000);
@@ -24,7 +25,7 @@ export const createModalStyles = (
 			paddingTop: 16,
 			paddingBottom: 8,
 			fontSize: 12,
-			fontWeight: '600',
+			fontFamily: FONT_FAMILIES.semibold,
 			letterSpacing: 1,
 			textTransform: 'uppercase',
 			color: theme.colors.textSecondary,
@@ -69,7 +70,7 @@ export const createRowStyles = (theme: Theme, separator: string) =>
 		},
 		trackTitle: {
 			fontSize: 15,
-			fontWeight: '600',
+			fontFamily: FONT_FAMILIES.semibold,
 			color: theme.colors.text,
 			marginBottom: 4,
 		},
@@ -101,7 +102,7 @@ export const createRowStyles = (theme: Theme, separator: string) =>
 		deleteText: {
 			color: theme.colors.onColor,
 			fontSize: 12,
-			fontWeight: '600',
+			fontFamily: FONT_FAMILIES.semibold,
 			marginTop: 4,
 		},
 	});

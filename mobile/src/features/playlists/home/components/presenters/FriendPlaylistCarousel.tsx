@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { Artwork } from '@/shared/components/media/Artwork';
 import { Pressable } from '@/shared/components/ui/Pressable';
@@ -9,6 +9,7 @@ import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { FriendPlaylists } from '@/features/playlists/types';
 import { playlistCardLabel, tracksLabel } from '@/features/playlists/home/utils/playlistLabels';
 import { OwnerAvatarBadge } from './OwnerAvatarBadge';
+import { Text } from '@/shared/components/ui/Text';
 
 /** Width of a card; the playlists screen's skeleton uses it too. */
 export const FRIEND_CARD_WIDTH = 140;
@@ -99,7 +100,7 @@ const createStyles = (theme: Theme) =>
 		},
 		playlistName: {
 			fontSize: theme.typography.sizes.sm,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 			marginBottom: 2,
 		},

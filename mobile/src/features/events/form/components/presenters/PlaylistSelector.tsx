@@ -1,11 +1,12 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { PlaylistChoice } from '@/features/events/types';
 import { FieldLabel } from './FieldLabel';
+import { Text } from '@/shared/components/ui/Text';
 
 interface PlaylistSelectorProps {
 	playlists: PlaylistChoice[];

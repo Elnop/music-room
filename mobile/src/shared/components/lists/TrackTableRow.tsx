@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useHover } from '@/shared/hooks/useHover';
@@ -10,6 +10,7 @@ import { formatDuration } from '@/shared/utils/formatters';
 import type { Track } from '@/types/track.types';
 import { TrackActionsButton } from './TrackActionsButton';
 import { trackTableColumns as columns } from './trackTableLayout';
+import { Text } from '@/shared/components/ui/Text';
 
 interface TrackTableRowProps {
 	track: Track;
@@ -150,7 +151,7 @@ const createStyles = (theme: Theme, separator: string) =>
 		title: {
 			flex: 1,
 			fontSize: 15,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 		},
 		titleCurrent: { color: theme.colors.primary },

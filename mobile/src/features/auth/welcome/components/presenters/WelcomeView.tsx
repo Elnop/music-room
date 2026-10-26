@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-	Image,
-	KeyboardAvoidingView,
-	Platform,
-	ScrollView,
-	StyleSheet,
-	Text,
-	View,
-} from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '@/shared/components/ui/Button';
@@ -20,6 +12,7 @@ import type { Theme } from '@/shared/theme/types';
 import type { FloatingIconMotion } from '@/features/auth/welcome/hooks/useFloatingIcons';
 import logo from '@/assets/logo/logo.png';
 import { FloatingIcon } from './FloatingIcon';
+import { Text } from '@/shared/components/ui/Text';
 
 interface WelcomeViewProps {
 	icons: FloatingIconMotion[];

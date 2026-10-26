@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import {
 	View,
-	Text,
-	TextInput,
 	StyleSheet,
 	TextInputProps,
 	ViewStyle,
@@ -14,6 +12,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { Pressable } from './Pressable';
+import { Text } from './Text';
+import { TextInput } from './TextInput';
 
 interface InputProps extends Omit<TextInputProps, 'style'> {
 	label: string;
@@ -98,7 +98,7 @@ const createStyles = (theme: Theme) =>
 		},
 		label: {
 			fontSize: theme.typography.sizes.sm,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 			marginBottom: theme.spacing.xs,
 		},
@@ -124,7 +124,7 @@ const createStyles = (theme: Theme) =>
 			paddingHorizontal: theme.spacing.sm + 4,
 			fontSize: theme.typography.sizes.md,
 			color: theme.colors.text,
-			fontWeight: theme.typography.weights.regular,
+			fontFamily: theme.typography.families.regular,
 		},
 		inputWithIcon: {
 			paddingLeft: theme.spacing.xs,
@@ -143,7 +143,7 @@ const createStyles = (theme: Theme) =>
 		error: {
 			fontSize: theme.typography.sizes.xs,
 			color: theme.colors.error,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			marginTop: theme.spacing.xs,
 			marginLeft: theme.spacing.xs,
 		},

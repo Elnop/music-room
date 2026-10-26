@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type {
 	FilteredProfile,
@@ -10,6 +10,7 @@ import type {
 import { UserProfileHeader } from './UserProfileHeader';
 import { UserProfilePlaylists } from './UserProfilePlaylists';
 import { createUserProfileStyles } from './userProfileStyles';
+import { Text } from '@/shared/components/ui/Text';
 
 interface UserProfileViewProps {
 	userId: string;

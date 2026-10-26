@@ -37,7 +37,7 @@ export const createStyles = (theme: Theme) =>
 		},
 		title: {
 			fontSize: 14,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 			marginBottom: 2,
 		},
@@ -47,7 +47,7 @@ export const createStyles = (theme: Theme) =>
 		},
 		device: {
 			fontSize: 11,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.primary,
 		},
 		playButton: {

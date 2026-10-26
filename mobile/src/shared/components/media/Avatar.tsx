@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Image, Text, StyleSheet, type ViewStyle, type StyleProp } from 'react-native';
+import { View, Image, StyleSheet, type ViewStyle, type StyleProp } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface AvatarProps {
 	uri?: string;
@@ -83,6 +84,6 @@ const createStyles = (theme: Theme) =>
 		},
 		initials: {
 			color: theme.colors.text,
-			fontWeight: theme.typography.weights.bold,
+			fontFamily: theme.typography.families.bold,
 		},
 	});

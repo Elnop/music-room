@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable } from '@/shared/components/ui/Pressable';
@@ -14,6 +14,7 @@ import type { createModalStyles } from './queueModalStyles';
 import type { Theme } from '@/shared/theme/types';
 import type { QueueItem } from '@/features/queue/types';
 import type { AddQueueItemBody } from '@/shared/types/playback';
+import { Text } from '@/shared/components/ui/Text';
 
 interface QueueModalViewProps {
 	visible: boolean;
