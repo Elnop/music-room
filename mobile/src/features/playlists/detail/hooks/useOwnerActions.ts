@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Alert } from 'react-native';
+import { showAlert } from '@/shared/utils/alert';
 import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 import { logger } from '@/shared/utils/logger';
 import { showError, showSuccess } from '@/shared/utils/toast';
@@ -44,7 +44,7 @@ export function useOwnerActions(
 		edit: () => navigation.navigate('CreatePlaylist', { playlistId: id }),
 		sharing: () => navigation.navigate('PlaylistSharing', { playlistId: id }),
 		remove: () =>
-			Alert.alert(
+			showAlert(
 				'Supprimer la playlist ?',
 				`« ${playlist?.name ?? ''} » sera supprimée pour tous ses membres. Cette action est définitive.`,
 				[

@@ -84,6 +84,10 @@ From the root: `make dev-phone` (USB phone, any network), `make dev-docker` (Doc
 
 "Unable to load script": the app cannot reach Metro. Check that Metro runs and the address you entered, then tap **RELOAD**.
 
+### Web app
+
+`make dev-web` (backend in Docker) or `make dev-web-local` (no Docker) serves the app in a browser on `http://localhost:8081`, the web origin in the backend's `ALLOWED_ORIGINS`; it calls the backend on `http://localhost:3000` and has no backend address to pick. A service that wraps a native module has a `.web.ts` variant next to it, which Metro picks for the web bundle (`googleSignIn.web.ts`, `beaconScanner.web.ts`, `useImageColors.web.ts`, …); what the browser cannot do is hidden (`shared/constants/platform.ts`).
+
 ## Scripts
 
 ### Expo

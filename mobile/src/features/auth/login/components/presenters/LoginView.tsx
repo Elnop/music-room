@@ -7,6 +7,7 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { AuthFormLayout } from '@/features/auth/form/components/presenters/AuthFormLayout';
 import { SocialSignInButtons } from '@/features/auth/social/components/presenters/SocialSignInButtons';
+import { SOCIAL_SIGN_IN_AVAILABLE } from '@/shared/constants/platform';
 import type { FieldBinding } from '@/features/auth/form/hooks/useFieldBinding';
 
 interface LoginViewProps {
@@ -72,7 +73,9 @@ export function LoginView({
 				<Text style={styles.forgotPasswordText}>Mot de passe oublié ?</Text>
 			</Pressable>
 
-			<SocialSignInButtons onGoogle={onGoogle} onFacebook={onFacebook} disabled={isLoading} />
+			{SOCIAL_SIGN_IN_AVAILABLE && (
+				<SocialSignInButtons onGoogle={onGoogle} onFacebook={onFacebook} disabled={isLoading} />
+			)}
 		</AuthFormLayout>
 	);
 }

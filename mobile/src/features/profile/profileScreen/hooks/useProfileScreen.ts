@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Alert } from 'react-native';
+import { showAlert } from '@/shared/utils/alert';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useUserMusicPreferences, useUserStats } from '@/features/profile/hooks/useProfileQueries';
@@ -62,7 +62,7 @@ export function useProfileScreen() {
 	}, []);
 
 	const confirmLogout = useCallback(() => {
-		Alert.alert('Se déconnecter ?', 'Vous devrez vous reconnecter pour utiliser Zumik.', [
+		showAlert('Se déconnecter ?', 'Vous devrez vous reconnecter pour utiliser Zumik.', [
 			{ text: 'Annuler', style: 'cancel' },
 			{ text: 'Se déconnecter', style: 'destructive', onPress: handleLogout },
 		]);

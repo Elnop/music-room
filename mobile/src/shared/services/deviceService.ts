@@ -1,9 +1,9 @@
 import Constants from 'expo-constants';
-import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 import { deviceStorage } from './deviceStorage';
+import { getDeviceName, getModelName } from './deviceIdentity';
 
 /** Single source for the `X-App-Version` header and the Socket.io handshake. */
 export function getAppVersion(): string {
@@ -49,8 +49,8 @@ export const deviceService = {
 		}
 
 		const deviceName =
-			Device.deviceName || (Platform.OS === 'ios' ? 'Appareil iOS' : 'Appareil Android');
-		const model = Device.modelName || 'Modèle inconnu';
+			getDeviceName() || (Platform.OS === 'ios' ? 'Appareil iOS' : 'Appareil Android');
+		const model = getModelName() || 'Modèle inconnu';
 
 		return {
 			deviceId,

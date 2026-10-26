@@ -1,6 +1,6 @@
-import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import { getAppVersion } from './deviceService';
+import { getDeviceName, getModelName } from './deviceIdentity';
 import { getBackendUrl } from './backendUrl';
 import { getAuthSession, getSession } from './authSession';
 
@@ -58,7 +58,7 @@ function getClientHeaders(): Record<string, string> {
 
 	const headers = {
 		'X-Platform': Platform.OS,
-		'X-Device-Model': Device.modelName || Device.deviceName || 'Unknown Device',
+		'X-Device-Model': getModelName() || getDeviceName() || 'Unknown Device',
 		'X-App-Version': appVersion,
 	};
 
