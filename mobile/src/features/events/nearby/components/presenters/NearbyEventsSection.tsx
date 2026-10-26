@@ -8,13 +8,38 @@ import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { NearbyEvents } from '@/features/events/nearby/hooks/useNearbyEvents';
 import { EventRow } from './EventRow';
 
+const NOTICE_ACTIONS = {
+	request: { label: 'Autoriser la localisation', handler: 'requestPermission' },
+	settings: { label: 'Ouvrir les réglages', handler: 'openSettings' },
+} as const;
+
 export function NearbyEventsSection({ nearby }: { nearby: NearbyEvents }) {
 	const { styles } = useThemedStyles(createStyles);
+	const action = nearby.notice.action && NOTICE_ACTIONS[nearby.notice.action];
 
 	return (
 		<View>
-			<SectionHeader icon="location-outline" title="Événements à proximité" count={0} />
-			<EmptyState icon="radio-outline" message="Aucun événement à proximité" />
+			<SectionHeader
+				icon="location-outline"
+				title="Événements à proximité"
+				count={nearby.items.length}
+			/>
+			{nearby.items.length > 0 ? (
+				nearby.items.map(({ event, proximity }) => (
+					<EventRow
+						key={event.id}
+						event={event}
+						proximity={proximity}
+						onPress={() => nearby.openEvent(event.id)}
+					/>
+				))
+			) : (
+				<EmptyState
+					icon="radio-outline"
+					message={nearby.notice.message}
+					action={action ? { label: action.label, onPress: nearby[action.handler] } : undefined}
+				/>
+			)}
 			{nearby.mine.length > 0 && (
 				<View>
 					<Text style={styles.subtitle}>Vos événements</Text>
