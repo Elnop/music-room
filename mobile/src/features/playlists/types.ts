@@ -69,6 +69,12 @@ export interface PlaylistDetailsEvent {
 	editMode: EditMode;
 }
 
+/** Payload of the `playlist:tracks-availability` socket event: only the tracks that changed. */
+export interface TracksAvailabilityEvent {
+	playlistId: string;
+	tracks: { trackId: string; unavailable: boolean }[];
+}
+
 /** Payload of the `playlist:deleted` socket event. */
 export interface PlaylistDeletedEvent {
 	playlistId: string;

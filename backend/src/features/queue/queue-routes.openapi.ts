@@ -4,6 +4,7 @@ import {
 	base,
 	itemNotFound,
 	playbackRoutes,
+	trackUnavailable,
 } from '@/features/queue/queue-playback.openapi.js';
 import {
 	addQueueItemBodySchema,
@@ -39,7 +40,7 @@ export const queueRoutes: RouteConfig[] = [
 				})
 			),
 		},
-		responses: answers,
+		responses: { ...answers, 409: trackUnavailable },
 	},
 	{
 		...base,
@@ -47,7 +48,7 @@ export const queueRoutes: RouteConfig[] = [
 		path: '/api/queue/items/{itemId}',
 		summary: 'Remove an item from the queue',
 		description:
-			'Removing the current item acts as a skip: the next item becomes current; with no next item the queue is emptied, history included. Removing an item of a block detaches the whole block.',
+			'Removing the current item acts as a skip: the next item of an available track becomes current; with no next item the queue is emptied, history included. Removing an item of a block detaches the whole block.',
 		operationId: 'removeQueueItem',
 		request: { params: queueItemParamsSchema },
 		responses: { ...answers, 404: itemNotFound },

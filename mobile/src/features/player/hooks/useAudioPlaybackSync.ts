@@ -94,7 +94,13 @@ export function useAudioPlaybackSync(player: ReturnType<typeof useAudioPlayer>):
 			if (currentLoadCounterRef.current !== thisLoadCounter) return;
 			if (!hasTriedToPlayRef.current) {
 				clearTimers(pollingIntervalRef, loadTimeoutRef);
-				setTrackUnavailableError('Impossible de charger ce titre');
+				const { streamRenewed, renewStream, startPositionMs, resumeAfterLoad } =
+					usePlayerStore.getState();
+				if (!streamRenewed && playsLocally()) {
+					renewStream(startPositionMs ?? 0, resumeAfterLoad, true);
+				} else {
+					setTrackUnavailableError('Impossible de charger ce titre');
+				}
 			}
 		}, PLAYER_LOAD_TIMEOUT_MS);
 

@@ -2,7 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as searchService from '@/features/soundcloud/services/soundcloud-search.service.js';
 import * as cache from '@/features/soundcloud/utils/soundcloud-cache.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
-import type { SoundCloudClient, SoundCloudTrack } from '@/features/soundcloud/soundcloud.types.js';
+import type { SoundCloudClient } from '@/shared/soundcloud/soundcloud-client.js';
+import type { SoundCloudTrack } from '@/features/soundcloud/soundcloud.types.js';
 
 function track(overrides: Partial<SoundCloudTrack> = {}): SoundCloudTrack {
 	return {
@@ -29,7 +30,7 @@ const { search, get } = vi.hoisted(() => ({
 	get: vi.fn<SoundCloudClient['tracks']['get']>(),
 }));
 
-vi.mock('@/features/soundcloud/utils/soundcloud-client.js', () => ({
+vi.mock('@/shared/soundcloud/soundcloud-client.js', () => ({
 	soundcloud: { tracks: { search, get, getStreamUrl: vi.fn() } },
 }));
 

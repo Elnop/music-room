@@ -5,6 +5,7 @@ const CODE_MESSAGES: Record<string, string> = {
 	NETWORK_ERROR: 'Impossible de joindre le serveur. Vérifiez votre connexion.',
 	SESSION_EXPIRED: 'Session expirée, reconnectez-vous.',
 	TRACK_DUPLICATE: 'Ce titre est déjà dans la playlist',
+	TRACK_UNAVAILABLE: "Ce titre n'est plus disponible",
 	PLAYLIST_ACCESS_DENIED: 'Vous ne pouvez pas modifier cette playlist',
 	PLAYLIST_NOT_FOUND: "Cette playlist n'existe plus",
 	DEVICE_OFFLINE: "Cet appareil n'est plus en ligne",

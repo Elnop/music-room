@@ -3,6 +3,7 @@ import type {
 	PlaylistDeletedPayload,
 	PlaylistDetailsPayload,
 	PlaylistUpdatedPayload,
+	TracksAvailabilityPayload,
 } from '@/features/playlists/playlist.types.js';
 import {
 	playlistRoom,
@@ -12,7 +13,11 @@ import { getIO } from '@/realtime/state.js';
 
 // Each call is a no-op (logged) before socket-server.ts initialize().
 
-type PlaylistEvent = 'playlist:updated' | 'playlist:details' | 'playlist:deleted';
+type PlaylistEvent =
+	| 'playlist:updated'
+	| 'playlist:details'
+	| 'playlist:tracks-availability'
+	| 'playlist:deleted';
 
 function emitToPlaylistRoom(
 	event: PlaylistEvent,
@@ -51,6 +56,12 @@ export function notifyPlaylistUpdate(payload: PlaylistUpdatedPayload): void {
 
 export function notifyPlaylistDetails(payload: PlaylistDetailsPayload): void {
 	emitToPlaylistRoom('playlist:details', 'playlist_details', payload);
+}
+
+export function notifyTracksAvailability(payload: TracksAvailabilityPayload): void {
+	emitToPlaylistRoom('playlist:tracks-availability', 'playlist_tracks_availability', payload, {
+		changed: payload.tracks.length,
+	});
 }
 
 /** Must run before revalidatePlaylistRoom evicts the clients from the room. */

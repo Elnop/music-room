@@ -27,6 +27,8 @@ interface SwipeableTrackItemProps {
 	onPress?: () => void;
 	/** Shows a spinner while the tap's request runs. */
 	isPending?: boolean;
+	/** Greyed out, with no queue swipe nor quick actions; delete and drag still work. */
+	unavailable?: boolean;
 }
 
 export function SwipeableTrackItem({
@@ -40,9 +42,11 @@ export function SwipeableTrackItem({
 	isCurrent = false,
 	onPress,
 	isPending = false,
+	unavailable = false,
 }: SwipeableTrackItemProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
+	const actions = unavailable ? undefined : onShowActions;
 
 	const renderRightActions = () => (
 		<Pressable
@@ -57,15 +61,15 @@ export function SwipeableTrackItem({
 
 	return (
 		<QueueSwipe
-			onAddToQueue={onAddToQueue}
+			onAddToQueue={unavailable ? undefined : onAddToQueue}
 			renderRightActions={disabled ? undefined : renderRightActions}
 		>
 			<Pressable
 				onPress={onPress}
-				onLongPress={onShowActions}
-				accessibilityLabel={`${track.title}, ${track.artist}`}
-				accessibilityHint={onShowActions ? 'Appui long pour les actions du titre' : undefined}
-				accessibilityState={{ selected: isCurrent, busy: isPending }}
+				onLongPress={actions}
+				accessibilityLabel={`${track.title}, ${track.artist}${unavailable ? ', indisponible' : ''}`}
+				accessibilityHint={actions ? 'Appui long pour les actions du titre' : undefined}
+				accessibilityState={{ selected: isCurrent, busy: isPending, disabled: unavailable }}
 				style={[
 					styles.trackContainer,
 					isCurrent && styles.trackContainerCurrent,
@@ -73,14 +77,19 @@ export function SwipeableTrackItem({
 				]}
 			>
 				{track.albumArt ? (
-					<Image source={{ uri: track.albumArt }} style={styles.albumArt} />
+					<Image
+						source={{ uri: track.albumArt }}
+						style={[styles.albumArt, unavailable && styles.unavailable]}
+					/>
 				) : (
-					<View style={[styles.albumArt, styles.albumArtPlaceholder]}>
+					<View
+						style={[styles.albumArt, styles.albumArtPlaceholder, unavailable && styles.unavailable]}
+					>
 						<Ionicons name="musical-notes" size={24} color={theme.colors.textSecondary} />
 					</View>
 				)}
 
-				<View style={styles.trackInfo}>
+				<View style={[styles.trackInfo, unavailable && styles.unavailable]}>
 					<Text
 						style={[styles.trackTitle, isCurrent && styles.trackTitleCurrent]}
 						numberOfLines={1}
@@ -88,7 +97,7 @@ export function SwipeableTrackItem({
 						{track.title}
 					</Text>
 					<Text style={styles.trackArtist} numberOfLines={1}>
-						{track.artist}
+						{unavailable ? `Indisponible · ${track.artist}` : track.artist}
 					</Text>
 				</View>
 
@@ -115,7 +124,7 @@ export function SwipeableTrackItem({
 					<Text style={styles.duration}>{formatDuration(track.durationMs)}</Text>
 				)}
 
-				{onShowActions && <TrackActionsButton onPress={onShowActions} />}
+				{actions && <TrackActionsButton onPress={actions} />}
 
 				{!disabled && onDragStart && (
 					<Pressable
@@ -187,6 +196,9 @@ const createStyles = (theme: Theme) =>
 		duration: {
 			fontSize: 13,
 			color: theme.colors.textSecondary,
+		},
+		unavailable: {
+			opacity: 0.4,
 		},
 		trackContainerActive: {
 			elevation: 6,

@@ -149,4 +149,28 @@ describe('SwipeableTrackItem', () => {
 		await act(async () => {});
 		expect(screen.getByLabelText('Lancement')).toBeTruthy();
 	});
+
+	it('greys out an unavailable track: no queue swipe nor quick actions, delete kept', async () => {
+		const onShowActions = jest.fn();
+		const onPress = jest.fn();
+		render(
+			<SwipeableTrackItem
+				track={track}
+				onDelete={onDelete}
+				onAddToQueue={jest.fn()}
+				onShowActions={onShowActions}
+				onPress={onPress}
+				unavailable
+			/>
+		);
+		await act(async () => {});
+		expect(screen.getByText('Indisponible · Artist')).toBeTruthy();
+		expect(screen.queryByLabelText("Ajouter à la file d'attente")).toBeNull();
+		expect(screen.queryByLabelText('Actions')).toBeNull();
+		fireEvent(screen.getByText('Song'), 'longPress');
+		expect(onShowActions).not.toHaveBeenCalled();
+		fireEvent.press(screen.getByLabelText('Song, Artist, indisponible'));
+		expect(onPress).toHaveBeenCalledTimes(1);
+		expect(screen.getByText('Supprimer')).toBeTruthy();
+	});
 });

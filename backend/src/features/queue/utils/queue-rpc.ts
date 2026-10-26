@@ -41,6 +41,7 @@ const ERRORS: Record<string, { status: number; message: string }> = {
 	PLAYLIST_EMPTY: { status: 409, message: 'The playlist has no track to play' },
 	PLAYLIST_TRACK_NOT_FOUND: { status: 404, message: 'Track not found in the playlist' },
 	QUEUE_BLOCK_EMPTY: { status: 409, message: 'Nothing to transfer' },
+	TRACK_UNAVAILABLE: { status: 409, message: 'This track is no longer available on SoundCloud' },
 };
 
 function toAppError(operation: string, message: string): AppError {

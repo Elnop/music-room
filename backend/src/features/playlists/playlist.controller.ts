@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express';
+import * as trackAvailabilityService from '@/features/playlists/services/track-availability.service.js';
 import * as playlistService from '@/features/playlists/services/playlist.service.js';
 import * as playlistListingService from '@/features/playlists/services/playlist-listing.service.js';
 import * as playlistUpdateService from '@/features/playlists/services/playlist-update.service.js';
@@ -38,6 +39,8 @@ export async function getPlaylistById(req: Request, res: Response) {
 	const userId = (req as AuthenticatedRequest).user.id;
 	const id = routeParam(req, 'id');
 	sendSuccess(res, { playlist: await playlistService.getPlaylistById(id, userId) });
+	// After the response: changes reach the client through `playlist:tracks-availability`.
+	void trackAvailabilityService.refreshPlaylistAvailability(id);
 }
 
 export async function updatePlaylist(req: Request, res: Response) {

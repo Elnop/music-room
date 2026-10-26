@@ -47,6 +47,12 @@ export interface PlaylistDetailsPayload {
 	editMode: 'open' | 'restricted';
 }
 
+/** Payload of the `playlist:tracks-availability` socket event: the tracks whose availability changed. */
+export interface TracksAvailabilityPayload {
+	playlistId: string;
+	tracks: { trackId: string; unavailable: boolean }[];
+}
+
 /** Payload of the `playlist:deleted` socket event, sent before the room is emptied. */
 export interface PlaylistDeletedPayload {
 	playlistId: string;

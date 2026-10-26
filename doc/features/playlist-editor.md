@@ -28,7 +28,7 @@ The owner invites friends as viewers or collaborators (`/api/playlists/:id/viewe
 
 ## Real time
 
-- Opening a playlist joins the socket room `playlist:<id>`, only if the user can see it. Every change is broadcast to the room (`playlist:updated` with the new version, `playlist:details` for metadata, `playlist:deleted`), and the app applies it to its cache (`utils/playlistSocketRules.ts`), so every client converges on the server's order.
+- Opening a playlist joins the socket room `playlist:<id>`, only if the user can see it. Every change is broadcast to the room (`playlist:updated` with the new version, `playlist:details` for metadata, `playlist:tracks-availability` for tracks that became unavailable or available again, `playlist:deleted`), and the app applies it to its cache (`utils/playlistSocketRules.ts`), so every client converges on the server's order.
 - When access is withdrawn (viewer or collaborator removed, playlist made private or deleted), the sockets that lost it are evicted from the room (threat M10).
 - Metadata edits (name, description, settings) are last-write-wins.
 

@@ -1,6 +1,17 @@
 import { createRequire } from 'module';
 import { logger } from '@/shared/utils/logger.js';
-import type { SoundCloudClient } from '@/features/soundcloud/soundcloud.types.js';
+
+/** The part of the soundcloud.ts client the backend calls. */
+export interface SoundCloudClient {
+	tracks: {
+		search: (query: { q: string; limit?: number; offset?: number }) => Promise<unknown>;
+		get: (urlOrId: string) => Promise<unknown>;
+		getStreamUrl: (track: unknown) => Promise<string>;
+	};
+	util?: {
+		streamLink: (trackUrl: string, protocol: 'hls' | 'progressive') => Promise<string>;
+	};
+}
 
 type SoundCloudConstructor = new () => SoundCloudClient;
 

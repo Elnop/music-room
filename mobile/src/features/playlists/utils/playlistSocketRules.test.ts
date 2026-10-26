@@ -79,4 +79,22 @@ describe('PLAYLIST_SOCKET_RULES', () => {
 		emit('playlist:deleted', { playlistId: 'p1' });
 		expect(client.getQueryData<Playlist[]>(list)!.map(p => p.id)).toEqual(['p2']);
 	});
+
+	it('marks the tracks whose availability changed, without touching the version', () => {
+		emit('playlist:tracks-availability', {
+			playlistId: 'p1',
+			tracks: [{ trackId: 'B', unavailable: true }],
+		});
+		expect(shown().tracks.map(t => [t.id, t.unavailable])).toEqual([
+			['A', false],
+			['B', true],
+		]);
+		expect(shown().tracksVersion).toBe(10);
+
+		emit('playlist:tracks-availability', {
+			playlistId: 'p1',
+			tracks: [{ trackId: 'B', unavailable: false }],
+		});
+		expect(shown().tracks.find(t => t.id === 'B')?.unavailable).toBe(false);
+	});
 });

@@ -307,11 +307,12 @@ Refusal: a `connect_error` whose `message` is `NO_TOKEN` (no `token`), `INVALID_
 ### Events
 
 - **Client → server**: `playlist:join`, `playlist:leave`, `listening:subscribe`, `listening:unsubscribe`, `listening:update`, `control:action`
-- **Server → client**: `playlist:updated`, `playlist:details`, `playlist:deleted`, `playlist:error`, `listening:status`, `listening:error`, `permission:changed`, `control:command`, `control:success`, `control:error`, `control:revoked`, `queue:updated`
+- **Server → client**: `playlist:updated`, `playlist:details`, `playlist:tracks-availability`, `playlist:deleted`, `playlist:error`, `listening:status`, `listening:error`, `permission:changed`, `control:command`, `control:success`, `control:error`, `control:revoked`, `queue:updated`
 
 A playlist's clients join the `playlist:<id>` room and receive `playlist:updated` on every change.
 
 - `playlist:details` `{ playlistId, name, description?, visibility, editMode }`: sent to `playlist:<id>` after each successful `PATCH /api/playlists/:id` (name, description, visibility or edit mode), before access is re-checked. It has no version: the last one received replaces the displayed metadata. It does not touch the tracks nor `tracksVersion`.
+- `playlist:tracks-availability` `{ playlistId, tracks: [{ trackId, unavailable }] }`: sent to `playlist:<id>` after `GET /api/playlists/:id` rechecked on SoundCloud the tracks not checked for 24 h, with only the tracks whose availability changed. It has no version and does not touch `tracksVersion`.
 - `playlist:deleted` `{ playlistId }`: sent to `playlist:<id>` after the owner deletes the playlist, before its sockets are removed from the room (they then receive `playlist:error` `PLAYLIST_NOT_FOUND`).
 
 `playlist:join <id>` only adds the socket to the room if its user (`socket.data.userId`) can see the playlist (`canViewPlaylist`: public, or owner / viewer / collaborator), checked in `src/realtime/playlist-room.ts`. Otherwise the socket receives `playlist:error` `{ playlistId, code, message }`:
@@ -352,9 +353,10 @@ When access can be lost, it is re-checked: after the switch is turned off, a lic
 
 ## SoundCloud
 
-- Result cache: search and track details 1 h, stream URLs 30 min (`features/soundcloud/utils/soundcloud-cache.ts`).
-- Only tracks that can be streamed are returned.
+- Result cache: search and track details 1 h (`features/soundcloud/utils/soundcloud-cache.ts`). Stream URLs are never cached: a URL reused a few minutes later can already answer 403.
+- Only tracks that can be streamed are returned: not blocked in the region (`policy: BLOCK`), and streamable or transcoded (`shared/soundcloud/track-availability.ts`). A 30-second preview (`SNIP`) is kept.
 - The stream URL is fetched on demand and expires: never store it in the database.
+- **Unavailable tracks**: `tracks.unavailable_at` marks a track deleted, made private or blocked on SoundCloud. It is set when `stream` finds no stream, and rechecked in the background when a playlist is opened (tracks not checked for 24 h, `tracks.availability_checked_at`); a track available again is cleared. Playlist tracks carry `unavailable`. The queue SQL functions never queue nor play one (`409 TRACK_UNAVAILABLE`), skip it on next, previous and remove, and leave it out when a playlist is played (migration 029).
 - Routes authenticated (`authMiddleware`) and rate-limited per user in Redis (`rl:soundcloud:`, 120 requests per minute by default, `RATE_LIMIT_SOUNDCLOUD_MAX` / `RATE_LIMIT_SOUNDCLOUD_WINDOW_MS`): `429 RATE_LIMIT_EXCEEDED` beyond, `503` without Redis (`REVOCATION_UNAVAILABLE` from auth, which runs first) (#208).
 - `track/:urlOrId` accepts a numeric id or an https URL on `soundcloud.com`, `www.soundcloud.com`, `m.soundcloud.com` or `on.soundcloud.com`; `stream` only accepts such a URL: otherwise `400 VALIDATION_ERROR`, without calling SoundCloud.
 
