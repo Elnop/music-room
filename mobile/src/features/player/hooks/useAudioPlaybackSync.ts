@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import type { useAudioPlayer } from 'expo-audio';
+import type { AudioPlayer } from '@/features/player/types';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { isLocalTarget } from '@/shared/services/connectBridge';
 import { isStreamStale } from '@/features/player/services/streamPrefetch';
@@ -22,7 +22,7 @@ function clearTimers(
 	}
 }
 
-export function useAudioPlaybackSync(player: ReturnType<typeof useAudioPlayer>): void {
+export function useAudioPlaybackSync(player: AudioPlayer): void {
 	const currentTrack = usePlayerStore(state => state.currentTrack);
 	const streamUrl = usePlayerStore(state => state.streamUrl);
 	const playbackState = usePlayerStore(state => state.playbackState);

@@ -88,6 +88,8 @@ From the root: `make dev-phone` (USB phone, any network), `make dev-docker` (Doc
 
 `make dev-web` (backend in Docker) or `make dev-web-local` (no Docker) serves the app in a browser on `http://localhost:8081`, the web origin in the backend's `ALLOWED_ORIGINS`; it calls the backend on `http://localhost:3000` and has no backend address to pick. A service that wraps a native module has a `.web.ts` variant next to it, which Metro picks for the web bundle (`googleSignIn.web.ts`, `beaconScanner.web.ts`, `useImageColors.web.ts`, …); what the browser cannot do is hidden (`shared/constants/platform.ts`).
 
+The player hooks reach the audio through `features/player/services/audioPlayer.ts` (expo-audio). Its browser variant `audioPlayer.web.ts` plays the SoundCloud HLS stream in one `<audio>` element for the page: natively when the browser reads HLS (Safari), through `hls.js` otherwise, which only feeds the element; the queue, auto-advance, prefetch and the expired-URL watchdog stay the shared hooks. `useMediaSession.web.ts` drives the media keys and the browser's media notification through the Media Session API. A playback the browser refuses before any click on the page (a friend's remote command, typically) leaves the player paused, so the controller never sees it playing, and asks "Cliquer pour activer le son" (`hooks/useAutoplayPrompt.ts`).
+
 ## Scripts
 
 ### Expo

@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from 'react';
-import { useAudioPlayer } from 'expo-audio';
+import { useAudioPlayer } from '@/features/player/services/audioPlayer';
+import type { AudioPlayer } from '@/features/player/types';
 import { usePlayerStore, setPositionReader } from '@/features/player/stores/playerStore';
 import { isLocalTarget } from '@/shared/services/connectBridge';
 import { isStreamStale } from '@/features/player/services/streamPrefetch';
@@ -9,7 +10,7 @@ import { useAudioPlaybackSync } from './useAudioPlaybackSync';
 const playsLocally = () => isLocalTarget();
 
 interface PlayerAudio {
-	player: ReturnType<typeof useAudioPlayer>;
+	player: AudioPlayer;
 	seekTo: (seconds: number) => void;
 }
 
