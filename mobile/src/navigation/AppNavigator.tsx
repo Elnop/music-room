@@ -15,7 +15,7 @@ import { ProfileNavigator } from '@/navigation/stacks/ProfileStack';
 import { SearchNavigator } from '@/navigation/stacks/SearchStack';
 import { FriendsNavigator, type FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
 
-import { MiniPlayer } from '@/features/player/miniPlayer/components/orchestrators/MiniPlayer';
+import { AppTabBar } from './AppTabBar';
 import { PlayerModal } from '@/features/player/modal/components/orchestrators/PlayerModal';
 import { PlayerErrorToast } from '@/features/player/modal/components/orchestrators/PlayerErrorToast';
 import { PlayerProvider } from '@/features/player/context/PlayerProvider';
@@ -72,6 +72,7 @@ export function AppNavigator() {
 
 				<SafeAreaInsetsContext.Provider value={navigatorInsets}>
 					<Tab.Navigator
+						tabBar={props => <AppTabBar {...props} />}
 						screenOptions={({ route }) => ({
 							tabBarActiveTintColor: theme.colors.primary,
 							tabBarInactiveTintColor: theme.colors.textSecondary,
@@ -131,7 +132,6 @@ export function AppNavigator() {
 					</Tab.Navigator>
 				</SafeAreaInsetsContext.Provider>
 
-				<MiniPlayer />
 				<PlayerModal />
 				<PlayerErrorToast />
 			</View>

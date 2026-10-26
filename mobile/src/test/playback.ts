@@ -25,7 +25,6 @@ export const testPlayback = {
 
 registerPlaybackBridge({
 	usePlaylistPlayback: () => testPlayback.playing,
-	usePlayerHeight: () => 0,
 	useActiveQueue: () => ({ currentItemId: null, items: [], version: 0 }),
 	addToQueue: track => testPlayback.addToQueue(track),
 	playNext: track => testPlayback.playNext(track),

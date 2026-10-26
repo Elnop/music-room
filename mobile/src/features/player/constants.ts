@@ -1,6 +1,3 @@
-/** Content + progress bar + margins; only an estimate until the mini-player is measured. */
-export const MINI_PLAYER_HEIGHT = 75;
-
 export const FETCH_TIMEOUT_MS = 8000;
 
 export const PLAYER_LOAD_TIMEOUT_MS = 10000;

@@ -4,7 +4,6 @@ import { registerPlayerModals } from '@/shared/services/playerModalsBridge';
 import { registerTrackActionsSheet } from '@/shared/services/trackActionsBridge';
 import { registerFriendsBridge } from '@/shared/services/friendsBridge';
 import { friendsApi } from '@/features/friends/services/friendsApi';
-import { usePlayerHeight } from '@/features/player/context/PlayerContext';
 import { readPositionMs, usePlayerStore } from '@/features/player/stores/playerStore';
 import { useConnectStore } from '@/features/queue/stores/connectStore';
 import { useActiveQueue, useQueueStore } from '@/features/queue/stores/queueStore';
@@ -26,7 +25,6 @@ export function registerPlayback(): void {
 				state: fromPlaylist ? playbackState : null,
 			};
 		},
-		usePlayerHeight,
 		useActiveQueue,
 		usePlaybackEmitterState: () => {
 			const currentTrack = usePlayerStore(state => state.currentTrack);
