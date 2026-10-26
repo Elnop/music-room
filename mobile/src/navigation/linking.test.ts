@@ -120,7 +120,50 @@ describe('createLinking in a browser', () => {
 
 	it('writes the share path in the address bar', () => {
 		const linking = createLinking(() => true);
-		expect(linking.getPathFromState).toBe(sharePathFromState);
+		const state = stateFromSharePath(`playlist/${ID}`)!;
+		expect(linking.getPathFromState!(state, linking.config)).toBe(sharePathFromState(state));
+	});
+
+	describe('under a base path', () => {
+		const originalBase = process.env.EXPO_BASE_URL;
+		beforeEach(() => {
+			process.env.EXPO_BASE_URL = '/music-room/app';
+		});
+		afterEach(() => {
+			if (originalBase === undefined) delete process.env.EXPO_BASE_URL;
+			else process.env.EXPO_BASE_URL = originalBase;
+		});
+
+		it('adds the base path to the origin prefix', () => {
+			expect(createLinking(() => true).prefixes).toEqual([
+				'zumik://',
+				'http://localhost:8081/music-room/app',
+			]);
+		});
+
+		it.each(['playlist', 'user'])('opens a direct /music-room/app/%s/<id> address', kind => {
+			const linking = createLinking(() => true);
+			const state = linking.getStateFromPath!(
+				`/music-room/app/${kind}/${ID}`,
+				linking.config as Options
+			);
+			expect(state?.routes[0].name).toBe(kind === 'playlist' ? 'PlaylistsTab' : 'FriendsTab');
+		});
+
+		it('keeps the app path of a link received signed out', () => {
+			const linking = createLinking(() => false);
+			linking.getStateFromPath!(`/music-room/app/playlist/${ID}`, linking.config as Options);
+			expect(takePendingLink()).toBe(`/playlist/${ID}`);
+		});
+
+		it('writes the address under the base path', () => {
+			const linking = createLinking(() => true);
+			const state = stateFromSharePath(`user/${ID}`)!;
+			expect(linking.getPathFromState!(state, linking.config)).toBe(`/music-room/app/user/${ID}`);
+			expect(linking.getPathFromState!({ routes: [{ name: 'Login' }] }, linking.config)).toBe(
+				'/music-room/app/'
+			);
+		});
 	});
 });
 
