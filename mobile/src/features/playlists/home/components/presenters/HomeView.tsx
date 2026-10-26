@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { SectionHeader } from '@/shared/components/lists/SectionHeader';
 import { PlaylistCardSkeleton, SkeletonList } from '@/shared/components/ui/Skeleton';
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { HomeScreen } from '@/features/playlists/home/hooks/useHomeScreen';
 import { FriendPlaylistCarousel } from './FriendPlaylistCarousel';
@@ -22,6 +23,7 @@ interface HomeViewProps {
 
 export function HomeView({ screen, nearbyEvents }: HomeViewProps) {
 	const { styles } = useThemedStyles(createListStyles);
+	const { isWide } = useBreakpoint();
 
 	if (screen.isInitialLoading) return <HomeSkeleton />;
 
@@ -64,7 +66,11 @@ export function HomeView({ screen, nearbyEvents }: HomeViewProps) {
 					) : screen.publicPlaylists.length > 0 ? (
 						<PlaylistGrid playlists={screen.publicPlaylists} onOpen={screen.openPlaylist} />
 					) : (
-						<EmptyState icon="globe-outline" message="Aucune playlist publique disponible" />
+						<EmptyState
+							icon="globe-outline"
+							message="Aucune playlist publique disponible"
+							compact={isWide}
+						/>
 					))}
 			</View>
 		</View>

@@ -1,6 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useAnchoredPress } from '@/shared/hooks/useAnchoredPress';
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { useSession } from '@/shared/services/authSession';
 import type { PlaylistStackParamList } from '@/features/playlists/types';
 import { usePlaylistDetailScreen } from '@/features/playlists/detail/hooks/usePlaylistDetailScreen';
@@ -11,6 +13,7 @@ import { usePlayPlaylist } from '@/features/playlists/detail/hooks/usePlayPlayli
 import { useCoverGradient } from '@/features/playlists/detail/hooks/useCoverGradient';
 import { PlaylistDetailView } from '@/features/playlists/detail/components/presenters/PlaylistDetailView';
 import { PlaylistHeader } from '@/features/playlists/detail/components/presenters/PlaylistHeader';
+import { PlaylistWideHeader } from '@/features/playlists/detail/components/presenters/PlaylistWideHeader';
 import { PlayPlaylistButton } from '@/features/playlists/detail/components/presenters/PlayPlaylistButton';
 import { DetailSkeleton } from '@/features/playlists/detail/components/presenters/DetailSkeleton';
 import { LoadFailure } from '@/features/playlists/detail/components/presenters/LoadFailure';
@@ -36,7 +39,9 @@ export function PlaylistDetailOrchestrator({ navigation, route }: PlaylistDetail
 	const gradient = useCoverGradient(playlist);
 	const isOwner = !!userId && playlist?.ownerId === userId;
 	const cover = useCoverActions(navigation, id, isOwner);
-	const { openSheet } = owner;
+	const Header = useBreakpoint().isWide ? PlaylistWideHeader : PlaylistHeader;
+	const sheetButtonRef = React.useRef<View>(null);
+	const openSheet = useAnchoredPress(sheetButtonRef, owner.openSheet);
 
 	// headerRight stays set (empty for a non-owner): adding or removing the native header
 	// subview while the screen re-attaches crashes Android ("child already has a parent").
@@ -48,6 +53,7 @@ export function PlaylistDetailOrchestrator({ navigation, route }: PlaylistDetail
 				<View style={headerButtonStyles.button}>
 					{isOwner ? (
 						<HeaderIconButton
+							ref={sheetButtonRef}
 							icon="ellipsis-horizontal"
 							size={24}
 							onPress={openSheet}
@@ -57,7 +63,7 @@ export function PlaylistDetailOrchestrator({ navigation, route }: PlaylistDetail
 				</View>
 			),
 		});
-	}, [navigation, isOwner, openSheet]);
+	}, [navigation, isOwner, openSheet, sheetButtonRef]);
 
 	if (!playlist) {
 		return screen.failure ? (
@@ -79,7 +85,7 @@ export function PlaylistDetailOrchestrator({ navigation, route }: PlaylistDetail
 				onPlayTrack={play.playFrom}
 				pendingTrackId={play.pendingTrackId}
 				header={
-					<PlaylistHeader
+					<Header
 						playlist={playlist}
 						canEdit={tracks.canEdit}
 						onAddTrack={() => navigation.navigate('SearchTracks', { playlistId: id })}

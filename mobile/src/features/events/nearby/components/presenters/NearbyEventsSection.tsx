@@ -45,6 +45,7 @@ export function NearbyEventsSection({ nearby }: { nearby: NearbyEvents }) {
 					icon="radio-outline"
 					message={nearby.notice.message}
 					action={action ? { label: action.label, onPress: nearby[action.handler] } : undefined}
+					compact={isWide}
 				/>
 			)}
 			<BeaconStatusLine

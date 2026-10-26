@@ -2,9 +2,12 @@ import React from 'react';
 import { View } from 'react-native';
 import { ActionSheet } from '@/features/playlists/actionSheet/components/presenters/ActionSheet';
 import { ActionSheetRow } from '@/features/playlists/actionSheet/components/presenters/ActionSheetRow';
+import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 
 export interface PlaylistActionsViewProps {
 	visible: boolean;
+	/** Wide screens: the « ⋯ » button the menu drops down from. */
+	anchor: MenuAnchor | null;
 	/** Shown as the sheet's title. */
 	playlistName: string;
 	onClose: () => void;
@@ -22,6 +25,7 @@ export interface PlaylistActionsViewProps {
 
 export function PlaylistActionsView({
 	visible,
+	anchor,
 	playlistName,
 	onClose,
 	onDismiss,
@@ -34,7 +38,13 @@ export function PlaylistActionsView({
 	onRemoveCover,
 }: PlaylistActionsViewProps) {
 	return (
-		<ActionSheet visible={visible} title={playlistName} onClose={onClose} onDismiss={onDismiss}>
+		<ActionSheet
+			visible={visible}
+			title={playlistName}
+			onClose={onClose}
+			onDismiss={onDismiss}
+			anchor={anchor}
+		>
 			<View>
 				<ActionSheetRow icon="create-outline" label="Modifier" onPress={onEdit} />
 				<ActionSheetRow

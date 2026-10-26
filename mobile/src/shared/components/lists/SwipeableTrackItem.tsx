@@ -3,9 +3,11 @@ import { View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import { QueueSwipe } from './QueueSwipe';
 import { TrackActionsButton } from './TrackActionsButton';
+import { TrackTableRow } from './TrackTableRow';
 import type { Theme } from '@/shared/theme/types';
 import type { Track } from '@/types/track.types';
 
@@ -30,6 +32,8 @@ interface SwipeableTrackItemProps {
 	isPending?: boolean;
 	/** Greyed out, with no queue swipe nor quick actions; delete and drag still work. */
 	unavailable?: boolean;
+	/** Its number in the list, from 1: wide screens then lay the row out as a table row. */
+	position?: number;
 }
 
 export function SwipeableTrackItem({
@@ -44,11 +48,14 @@ export function SwipeableTrackItem({
 	onPress,
 	isPending = false,
 	unavailable = false,
+	position,
 }: SwipeableTrackItemProps) {
 	const { theme } = useTheme();
 	const separator = useSeparatorColor();
 	const styles = React.useMemo(() => createStyles(theme, separator), [theme, separator]);
 	const actions = unavailable ? undefined : onShowActions;
+	const { isWide } = useBreakpoint();
+	const dragStart = !disabled ? onDragStart : undefined;
 
 	const renderRightActions = () => (
 		<Pressable
@@ -66,88 +73,102 @@ export function SwipeableTrackItem({
 			onAddToQueue={unavailable ? undefined : onAddToQueue}
 			renderRightActions={disabled ? undefined : renderRightActions}
 		>
-			<View
-				style={[
-					styles.trackContainer,
-					isCurrent && styles.trackContainerCurrent,
-					isDragActive && styles.trackContainerActive,
-				]}
-			>
-				{/* The row's buttons sit beside its pressable area, never in it: the web nests no <button>. */}
-				<Pressable
+			{isWide && position !== undefined ? (
+				<TrackTableRow
+					track={track}
+					position={position}
+					isCurrent={isCurrent}
+					isPending={isPending}
+					unavailable={unavailable}
+					isDragActive={isDragActive}
 					onPress={onPress}
-					onLongPress={actions}
-					accessibilityLabel={`${track.title}, ${track.artist}${unavailable ? ', indisponible' : ''}`}
-					accessibilityHint={actions ? 'Appui long pour les actions du titre' : undefined}
-					accessibilityState={{ selected: isCurrent, busy: isPending, disabled: unavailable }}
-					style={styles.trackPressable}
+					onShowActions={actions}
+					onDragStart={dragStart}
+				/>
+			) : (
+				<View
+					style={[
+						styles.trackContainer,
+						isCurrent && styles.trackContainerCurrent,
+						isDragActive && styles.trackContainerActive,
+					]}
 				>
-					{track.albumArt ? (
-						<Image
-							source={{ uri: track.albumArt }}
-							style={[styles.albumArt, unavailable && styles.unavailable]}
-						/>
-					) : (
-						<View
-							style={[
-								styles.albumArt,
-								styles.albumArtPlaceholder,
-								unavailable && styles.unavailable,
-							]}
-						>
-							<Ionicons name="musical-notes" size={24} color={theme.colors.textSecondary} />
-						</View>
-					)}
-
-					<View style={[styles.trackInfo, unavailable && styles.unavailable]}>
-						<Text
-							style={[styles.trackTitle, isCurrent && styles.trackTitleCurrent]}
-							numberOfLines={1}
-						>
-							{track.title}
-						</Text>
-						<Text style={styles.trackArtist} numberOfLines={1}>
-							{unavailable ? `Indisponible · ${track.artist}` : track.artist}
-						</Text>
-					</View>
-
-					{isPending && (
-						<ActivityIndicator
-							size="small"
-							color={theme.colors.primary}
-							style={styles.playingIcon}
-							accessibilityLabel="Lancement"
-						/>
-					)}
-
-					{isCurrent && !isPending && (
-						<Ionicons
-							name="volume-high"
-							size={18}
-							color={theme.colors.primary}
-							style={styles.playingIcon}
-							accessibilityLabel="En cours de lecture"
-						/>
-					)}
-
-					{track.durationMs && (
-						<Text style={styles.duration}>{formatDuration(track.durationMs)}</Text>
-					)}
-				</Pressable>
-
-				{actions && <TrackActionsButton onPress={actions} />}
-
-				{!disabled && onDragStart && (
+					{/* The row's buttons sit beside its pressable area, never in it: the web nests no <button>. */}
 					<Pressable
-						onPressIn={onDragStart}
-						hitSlop={10}
-						style={styles.dragHandle}
-						accessibilityLabel="Réordonner"
+						onPress={onPress}
+						onLongPress={actions}
+						accessibilityLabel={`${track.title}, ${track.artist}${unavailable ? ', indisponible' : ''}`}
+						accessibilityHint={actions ? 'Appui long pour les actions du titre' : undefined}
+						accessibilityState={{ selected: isCurrent, busy: isPending, disabled: unavailable }}
+						style={styles.trackPressable}
 					>
-						<Ionicons name="reorder-three-outline" size={24} color={theme.colors.textSecondary} />
+						{track.albumArt ? (
+							<Image
+								source={{ uri: track.albumArt }}
+								style={[styles.albumArt, unavailable && styles.unavailable]}
+							/>
+						) : (
+							<View
+								style={[
+									styles.albumArt,
+									styles.albumArtPlaceholder,
+									unavailable && styles.unavailable,
+								]}
+							>
+								<Ionicons name="musical-notes" size={24} color={theme.colors.textSecondary} />
+							</View>
+						)}
+
+						<View style={[styles.trackInfo, unavailable && styles.unavailable]}>
+							<Text
+								style={[styles.trackTitle, isCurrent && styles.trackTitleCurrent]}
+								numberOfLines={1}
+							>
+								{track.title}
+							</Text>
+							<Text style={styles.trackArtist} numberOfLines={1}>
+								{unavailable ? `Indisponible · ${track.artist}` : track.artist}
+							</Text>
+						</View>
+
+						{isPending && (
+							<ActivityIndicator
+								size="small"
+								color={theme.colors.primary}
+								style={styles.playingIcon}
+								accessibilityLabel="Lancement"
+							/>
+						)}
+
+						{isCurrent && !isPending && (
+							<Ionicons
+								name="volume-high"
+								size={18}
+								color={theme.colors.primary}
+								style={styles.playingIcon}
+								accessibilityLabel="En cours de lecture"
+							/>
+						)}
+
+						{track.durationMs && (
+							<Text style={styles.duration}>{formatDuration(track.durationMs)}</Text>
+						)}
 					</Pressable>
-				)}
-			</View>
+
+					{actions && <TrackActionsButton onPress={actions} />}
+
+					{dragStart && (
+						<Pressable
+							onPressIn={dragStart}
+							hitSlop={10}
+							style={styles.dragHandle}
+							accessibilityLabel="Réordonner"
+						>
+							<Ionicons name="reorder-three-outline" size={24} color={theme.colors.textSecondary} />
+						</Pressable>
+					)}
+				</View>
+			)}
 		</QueueSwipe>
 	);
 }

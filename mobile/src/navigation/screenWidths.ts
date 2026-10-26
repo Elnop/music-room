@@ -26,3 +26,6 @@ export const SCREEN_WIDTHS: Record<string, ContentWidth> = {
 	ForgotPassword: 'form',
 	ResetPassword: 'form',
 };
+
+/** Their background spans the window, so they centre their own content at their width. */
+export const FULL_BLEED_SCREENS: ReadonlySet<string> = new Set(['PlaylistDetail']);

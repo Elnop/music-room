@@ -83,6 +83,26 @@ export const createFriendsListStyles = (theme: Theme) =>
 			color: theme.colors.primary,
 			fontWeight: theme.typography.weights.medium,
 		},
+		cardHeader: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			paddingTop: theme.spacing.sm,
+			paddingHorizontal: theme.spacing.md,
+		},
+		cardFooter: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			justifyContent: 'space-between',
+			gap: theme.spacing.sm,
+			paddingTop: theme.spacing.xs,
+			paddingBottom: theme.spacing.sm,
+			paddingHorizontal: theme.spacing.md,
+		},
+		cardFooterText: {
+			flex: 1,
+			fontSize: theme.typography.sizes.sm,
+			color: theme.colors.textSecondary,
+		},
 		controlToggle: {
 			alignItems: 'center',
 			justifyContent: 'center',
