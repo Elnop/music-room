@@ -1,4 +1,5 @@
 import React from 'react';
+import { StyleSheet } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { SocialSignInButtons } from './SocialSignInButtons';
 
@@ -36,5 +37,20 @@ describe('SocialSignInButtons', () => {
 		expect(screen.queryByLabelText('Continuer avec Google')).toBeNull();
 		expect(googleButton).toHaveBeenCalledWith(expect.anything());
 		expect(onFacebook).toHaveBeenCalledTimes(1);
+	});
+
+	it("sizes Facebook's button like Google's beside it (web)", () => {
+		render(
+			<SocialSignInButtons
+				onGoogle={jest.fn()}
+				onFacebook={jest.fn()}
+				disabled={false}
+				googleButton={jest.fn()}
+			/>
+		);
+
+		expect(
+			StyleSheet.flatten(screen.getByLabelText('Continuer avec Facebook').props.style)
+		).toMatchObject({ height: 40, maxWidth: 400, borderRadius: 4 });
 	});
 });

@@ -1,33 +1,8 @@
 import React from 'react';
 import { ContentContainer } from '@/shared/components/layout/ContentContainer';
-import type { ContentWidth } from '@/shared/constants/layout';
-
-/** Grids get the widest column, forms the narrowest; a screen not listed (Welcome) stays full width. */
-const SCREEN_WIDTHS: Record<string, ContentWidth> = {
-	Home: 'wide',
-	Playlists: 'wide',
-	Friends: 'wide',
-	Search: 'content',
-	PlaylistDetail: 'content',
-	SearchTracks: 'content',
-	PlaylistSharing: 'content',
-	EventDetail: 'content',
-	UserProfile: 'content',
-	Profile: 'content',
-	MyDevices: 'content',
-	CreatePlaylist: 'form',
-	EventForm: 'form',
-	EditProfile: 'form',
-	PrivacySettings: 'form',
-	LinkedAccounts: 'form',
-	MusicPreferences: 'form',
-	Settings: 'form',
-	Login: 'form',
-	Register: 'form',
-	EmailVerification: 'form',
-	ForgotPassword: 'form',
-	ResetPassword: 'form',
-};
+import type { NativeStackHeaderProps } from '@react-navigation/native-stack';
+import { AlignedHeader } from '@/navigation/AlignedHeader';
+import { SCREEN_WIDTHS } from '@/navigation/screenWidths';
 
 interface ScreenLayoutArgs {
 	route: { name: string };
@@ -46,3 +21,6 @@ export const screenLayout =
 			</ContentContainer>
 		);
 	};
+
+/** A navigator's `header` on wide screens: the phone keeps the native one. */
+export const screenHeader = (props: NativeStackHeaderProps) => <AlignedHeader {...props} />;

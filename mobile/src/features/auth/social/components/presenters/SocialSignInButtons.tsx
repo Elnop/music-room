@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
+import { GOOGLE_FORM_BUTTON } from '@/features/auth/constants';
 import type { GoogleButtonSlot } from '@/features/auth/types';
 
 interface SocialSignInButtonsProps {
@@ -49,7 +50,7 @@ export function SocialSignInButtons({
 			)}
 
 			<Pressable
-				style={styles.facebookButton}
+				style={[styles.facebookButton, googleButton && styles.facebookBesideGoogle]}
 				onPress={onFacebook}
 				disabled={disabled}
 				accessibilityLabel="Continuer avec Facebook"
@@ -116,6 +117,14 @@ const createStyles = (theme: Theme) =>
 			paddingVertical: 12,
 			borderWidth: 1,
 			borderColor: theme.colors.facebook,
+		},
+		facebookBesideGoogle: {
+			width: '100%',
+			maxWidth: GOOGLE_FORM_BUTTON.maxWidth,
+			height: GOOGLE_FORM_BUTTON.height,
+			alignSelf: 'center',
+			paddingVertical: 0,
+			borderRadius: GOOGLE_FORM_BUTTON.radius,
 		},
 		facebookIcon: {
 			fontSize: 20,
