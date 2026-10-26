@@ -4,9 +4,10 @@ import * as avatar from '@/features/profile/profile-avatar.controller.js';
 import * as settings from '@/features/profile/profile-settings.controller.js';
 import { authMiddleware } from '@/features/auth/auth.middleware.js';
 import { avatarRateLimiter } from '@/shared/security/http-rate-limit.js';
-import { avatarUpload } from '@/features/profile/utils/avatar-upload.js';
+import { imageUpload } from '@/shared/storage/image-upload.js';
 
 const router = Router();
+const avatarUpload = imageUpload({ field: 'avatar', label: 'photo' });
 
 router.use(authMiddleware);
 

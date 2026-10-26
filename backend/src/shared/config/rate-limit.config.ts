@@ -49,6 +49,12 @@ export const rateLimitConfig = {
 	},
 
 	// Per authenticated user.
+	playlistCover: {
+		windowMs: env.RATE_LIMIT_PLAYLIST_COVER_WINDOW_MS,
+		max: env.RATE_LIMIT_PLAYLIST_COVER_MAX,
+	},
+
+	// Per authenticated user.
 	subscription: {
 		windowMs: env.RATE_LIMIT_SUBSCRIPTION_WINDOW_MS,
 		max: env.RATE_LIMIT_SUBSCRIPTION_MAX,

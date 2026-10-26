@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { detectImageType } from '@/features/profile/utils/image-type.js';
+import { detectImageType } from '@/shared/storage/image-type.js';
 
 const bytes = (...values: number[]) => Buffer.from(values);
 

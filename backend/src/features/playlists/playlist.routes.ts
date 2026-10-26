@@ -2,9 +2,13 @@ import { Router } from 'express';
 import * as playlists from '@/features/playlists/playlist.controller.js';
 import * as tracks from '@/features/playlists/playlist-tracks.controller.js';
 import * as sharing from '@/features/playlists/playlist-sharing.controller.js';
+import * as cover from '@/features/playlists/playlist-cover.controller.js';
 import { authMiddleware } from '@/features/auth/auth.middleware.js';
+import { playlistCoverRateLimiter } from '@/shared/security/http-rate-limit.js';
+import { imageUpload } from '@/shared/storage/image-upload.js';
 
 const router = Router();
+const coverUpload = imageUpload({ field: 'cover', label: 'cover' });
 
 router.use(authMiddleware);
 
@@ -15,6 +19,9 @@ router.get('/user/:userId', playlists.getPlaylistsByUser);
 router.get('/:id', playlists.getPlaylistById);
 router.patch('/:id', playlists.updatePlaylist);
 router.delete('/:id', playlists.deletePlaylist);
+
+router.put('/:id/cover', playlistCoverRateLimiter, coverUpload, cover.uploadCover);
+router.delete('/:id/cover', playlistCoverRateLimiter, cover.removeCover);
 
 router.post('/:id/tracks', tracks.addTrack);
 router.delete('/:id/tracks/:trackId', tracks.removeTrack);

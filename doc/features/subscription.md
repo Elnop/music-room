@@ -30,6 +30,10 @@ Both need a token (401 without): `app/routes.ts` hands `authMiddleware` to `crea
 
 A feature that is Premium-only calls `assertPremium(userId)` from `@/shared/subscription/plan.js` before acting; it throws 403 `PREMIUM_REQUIRED` on the free plan. The check lives in `shared/` because several features use it and a feature never imports another one.
 
+## Custom playlist cover
+
+`PUT /api/playlists/:id/cover` (multipart field `cover`, JPEG, PNG or WebP, at most 2 MB, #483) checks that the caller owns the playlist (403 `PLAYLIST_ACCESS_DENIED`), then `assertPremium` (403 `PREMIUM_REQUIRED`). The file goes to the public `playlist-covers` bucket (migration 031) as `<playlistId>/<uuid>.<ext>`, its URL to `playlists.cover_url`, and the room receives `playlist:details` with the new `coverUrl`. `DELETE /api/playlists/:id/cover` is allowed on any plan. Replacing or removing a cover deletes the previous file, and deleting the playlist deletes its cover file (best effort). The upload pipeline (multer limits, type read from the magic bytes, storage under a random name) is shared with the profile photo in `backend/src/shared/storage/`.
+
 ## Going back to free
 
 A downgrade deletes nothing: what was created on Premium (a playlist cover) stays as it is and is still shown. The user only loses the right to create or change a Premium-only thing until they switch back.

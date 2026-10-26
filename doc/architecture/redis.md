@@ -40,6 +40,7 @@ Prevents abuse by limiting the number of requests per time window:
 | Global Auth (every `/api/auth/*`) | 20 requests | 15 minutes | `rl:auth:global:auth:global:{ip}` |
 | SoundCloud, per user | 120 requests | 1 minute | `rl:soundcloud:soundcloud:{userId}` |
 | Avatar, per user | 10 changes | 1 hour | `rl:profile:avatar:avatar:{userId}` |
+| Playlist cover, per user | 10 changes | 1 hour | `rl:playlists:cover:cover:{userId}` |
 | Plan switch, per user | 20 switches | 1 hour | `rl:subscription:subscription:{userId}` |
 | Failed token verifications | 20 failures | 15 minutes | `rl:auth:token:{ip}` |
 
@@ -165,6 +166,7 @@ rl:auth:oauth:oauth:{provider}:{ip}    # OAuth attempt counter
 rl:auth:global:auth:global:{ip}        # Global auth counter
 rl:soundcloud:soundcloud:{userId}      # SoundCloud requests
 rl:profile:avatar:avatar:{userId}      # Profile photo changes
+rl:playlists:cover:cover:{userId}      # Playlist cover changes
 rl:subscription:subscription:{userId}  # Plan switches
 rl:auth:token:{ip}                     # Failed token verifications
 ```

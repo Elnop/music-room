@@ -31,6 +31,7 @@ backend/
 │   │   ├── config/         # env, Supabase, Redis, Swagger building blocks, rate limits; imports no feature
 │   │   ├── middleware/     # error handler, action logger (HTTP + socket)
 │   │   ├── security/       # anti-abuse: rate limiting, lockout, IP reputation, token and socket event limits
+│   │   ├── storage/        # Image uploads: multer middleware, magic-byte type check, public bucket files
 │   │   ├── subscription/   # getPlan, assertPremium (403 PREMIUM_REQUIRED), used by Premium-only features
 │   │   ├── types/          # Global types + supabase.generated.ts (generated: make generate-types)
 │   │   └── utils/          # logger, database.helpers.ts
@@ -163,7 +164,7 @@ Mounted in `src/app/routes.ts`, documented in Swagger (`/api-docs`):
 |---|---|
 | `/api/auth` | register, login, refresh, logout, me, Google/Facebook OAuth, providers (list, link, unlink), verify-email, resend-verification, forgot-password, reset-password |
 | `/api/profile` | profile (get, patch), search, privacy, music-preferences (+ genres), avatar, another user's profile |
-| `/api/playlists` | CRUD, public, per user, tracks (add, remove, move `POST /:id/tracks/:trackId/move`), collaborators, viewers |
+| `/api/playlists` | CRUD, public, per user, tracks (add, remove, move `POST /:id/tracks/:trackId/move`), collaborators, viewers, custom cover (`PUT`/`DELETE /:id/cover`, Premium to upload) |
 | `/api/friends` | list, stats, status, follow / unfollow |
 | `/api/music-control` | permissions (list, grant, revoke), can-control, devices (list, rename), per-device licenses, controllable devices, a user's devices |
 | `/api/queue` | the caller's play queue: state, add, remove, move, play an item, play a playlist, next, previous |
@@ -314,7 +315,7 @@ Refusal: a `connect_error` whose `message` is `NO_TOKEN` (no `token`), `INVALID_
 
 A playlist's clients join the `playlist:<id>` room and receive `playlist:updated` on every change.
 
-- `playlist:details` `{ playlistId, name, description?, visibility, editMode }`: sent to `playlist:<id>` after each successful `PATCH /api/playlists/:id` (name, description, visibility or edit mode), before access is re-checked. It has no version: the last one received replaces the displayed metadata. It does not touch the tracks nor `tracksVersion`.
+- `playlist:details` `{ playlistId, name, description?, visibility, editMode, coverUrl? }`: sent to `playlist:<id>` after each successful `PATCH /api/playlists/:id` (name, description, visibility or edit mode), before access is re-checked, and after a cover is uploaded or removed (`PUT`/`DELETE /api/playlists/:id/cover`); an absent `coverUrl` means no custom cover. It has no version: the last one received replaces the displayed metadata. It does not touch the tracks nor `tracksVersion`.
 - `playlist:tracks-availability` `{ playlistId, tracks: [{ trackId, unavailable }] }`: sent to `playlist:<id>` after `GET /api/playlists/:id` rechecked on SoundCloud the tracks not checked for 24 h, with only the tracks whose availability changed. It has no version and does not touch `tracksVersion`.
 - `playlist:deleted` `{ playlistId }`: sent to `playlist:<id>` after the owner deletes the playlist, before its sockets are removed from the room (they then receive `playlist:error` `PLAYLIST_NOT_FOUND`).
 

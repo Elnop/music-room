@@ -1,4 +1,5 @@
 import type { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
+import { registerPlaylistCoverOpenapi } from '@/features/playlists/playlist-cover.openapi.js';
 import { registerPlaylistSharingOpenapi } from '@/features/playlists/playlist-sharing.openapi.js';
 import { registerPlaylistTracksOpenapi } from '@/features/playlists/playlist-tracks.openapi.js';
 import {
@@ -139,4 +140,5 @@ export function registerPlaylistOpenapi(registry: OpenAPIRegistry): void {
 
 	registerPlaylistTracksOpenapi(registry);
 	registerPlaylistSharingOpenapi(registry);
+	registerPlaylistCoverOpenapi(registry);
 }

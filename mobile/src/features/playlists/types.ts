@@ -67,6 +67,8 @@ export interface PlaylistDetailsEvent {
 	description?: string;
 	visibility: 'public' | 'private';
 	editMode: EditMode;
+	/** Absent when the playlist has no custom cover. */
+	coverUrl?: string;
 }
 
 /** Payload of the `playlist:tracks-availability` socket event: only the tracks that changed. */

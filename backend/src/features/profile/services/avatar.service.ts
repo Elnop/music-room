@@ -1,41 +1,19 @@
-import { randomUUID } from 'node:crypto';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
-import { detectImageType } from '@/features/profile/utils/image-type.js';
+import {
+	removeStoredImage,
+	storedImagePath,
+	storeImage,
+} from '@/shared/storage/public-image.js';
 import type { AvatarResponse } from '@/features/profile/profile.types.js';
 
 /** Public bucket, created by migration 027. */
 export const AVATAR_BUCKET = 'avatars';
 
-const PUBLIC_PATH_PREFIX = `/storage/v1/object/public/${AVATAR_BUCKET}/`;
-const OBJECT_NAME = /^[0-9a-f-]{36}\.(jpg|png|webp)$/;
-
-// Only paths this backend stored for userId are ever deleted. The host is not compared, as the local
-// stack has several addresses: the `<userId>/` folder restricts deletion to the user's files.
+/** Only paths this backend stored for userId (`<userId>/<uuid>.<ext>`) are ever deleted. */
 export function ownedAvatarPath(url: string | null | undefined, userId: string): string | null {
-	if (!url) return null;
-
-	let path: string;
-	try {
-		const { pathname } = new URL(url);
-		if (!pathname.startsWith(PUBLIC_PATH_PREFIX)) return null;
-		path = decodeURIComponent(pathname.slice(PUBLIC_PATH_PREFIX.length));
-	} catch {
-		// Not a URL, or a bad percent sequence (URIError)
-		return null;
-	}
-	const [folder, name, ...rest] = path.split('/');
-	if (folder !== userId || !name || rest.length > 0 || !OBJECT_NAME.test(name)) return null;
-	return path;
-}
-
-/** Best effort: a leftover file must not fail a change already saved. */
-async function removeObject(path: string, userId: string): Promise<void> {
-	const { error } = await supabaseAdmin.storage.from(AVATAR_BUCKET).remove([path]);
-	if (error) {
-		logger.warn('Failed to delete an avatar file', { userId, path, error: error.message });
-	}
+	return storedImagePath(url, AVATAR_BUCKET, userId);
 }
 
 /** Deletes the photo at previousUrl when it is ours and no longer the avatar. Never throws. */
@@ -46,16 +24,7 @@ export async function deleteReplacedAvatar(
 ): Promise<void> {
 	if (previousUrl === currentUrl) return;
 	const path = ownedAvatarPath(previousUrl, userId);
-	if (!path) return;
-	try {
-		await removeObject(path, userId);
-	} catch (error) {
-		logger.warn('Failed to delete an avatar file', {
-			userId,
-			path,
-			error: error instanceof Error ? error.message : String(error),
-		});
-	}
+	if (path) await removeStoredImage(AVATAR_BUCKET, path, { userId });
 }
 
 async function currentAvatarUrl(userId: string): Promise<string | null> {
@@ -83,37 +52,21 @@ async function setAvatarUrl(userId: string, avatarUrl: string | null): Promise<v
 
 /** The previous photo is deleted when it was stored here; an external one is left alone. */
 export async function uploadAvatar(userId: string, file: Buffer): Promise<AvatarResponse> {
-	const type = detectImageType(file);
-	if (!type) {
-		throw new AppError(400, 'The file is not a JPEG, PNG or WebP image', 'INVALID_IMAGE');
-	}
-
 	const previousUrl = await currentAvatarUrl(userId);
-	const path = `${userId}/${randomUUID()}.${type.ext}`;
-	const bucket = supabaseAdmin.storage.from(AVATAR_BUCKET);
-
-	const { error: uploadError } = await bucket.upload(path, file, {
-		contentType: type.mime,
-		cacheControl: '31536000',
-		upsert: false,
+	const { path, publicUrl: avatarUrl } = await storeImage(AVATAR_BUCKET, userId, file, {
+		label: 'photo',
+		code: 'AVATAR_UPLOAD_ERROR',
 	});
-	if (uploadError) {
-		logger.error('Avatar upload to Storage failed', { userId, error: uploadError.message });
-		throw new AppError(500, 'Failed to store the photo', 'AVATAR_UPLOAD_ERROR');
-	}
-
-	const avatarUrl = bucket.getPublicUrl(path).data.publicUrl;
 
 	try {
 		await setAvatarUrl(userId, avatarUrl);
 	} catch (error) {
 		// The new file is not referenced anywhere: remove it.
-		await removeObject(path, userId);
+		await removeStoredImage(AVATAR_BUCKET, path, { userId });
 		throw error;
 	}
 
-	const previousPath = ownedAvatarPath(previousUrl, userId);
-	if (previousPath && previousPath !== path) await removeObject(previousPath, userId);
+	await deleteReplacedAvatar(previousUrl, avatarUrl, userId);
 
 	logger.info('Avatar updated', { userId, path });
 	return { avatarUrl };
@@ -123,9 +76,7 @@ export async function uploadAvatar(userId: string, file: Buffer): Promise<Avatar
 export async function removeAvatar(userId: string): Promise<AvatarResponse> {
 	const previousUrl = await currentAvatarUrl(userId);
 	await setAvatarUrl(userId, null);
-
-	const previousPath = ownedAvatarPath(previousUrl, userId);
-	if (previousPath) await removeObject(previousPath, userId);
+	await deleteReplacedAvatar(previousUrl, null, userId);
 
 	logger.info('Avatar removed', { userId });
 	return { avatarUrl: null };

@@ -68,11 +68,25 @@ describe('PLAYLIST_SOCKET_RULES', () => {
 		});
 		expect(shown()).toMatchObject({ name: 'Les tubes du Crabe Croustillant', editMode: 'open' });
 		expect(shown().description).toBeUndefined();
+		expect(shown().coverUrl).toBeUndefined();
 		expect(shown().tracks).toHaveLength(2);
 		expect(client.getQueryData<Playlist[]>(list)!.map(p => p.name)).toEqual([
 			'Les tubes du Crabe Croustillant',
 			'Other',
 		]);
+	});
+
+	it('shows a new cover from the details (#483)', () => {
+		const coverUrl = 'https://x/storage/v1/object/public/playlist-covers/p1/c.jpg';
+		emit('playlist:details', {
+			playlistId: 'p1',
+			name: 'Mine',
+			visibility: 'public',
+			editMode: 'open',
+			coverUrl,
+		});
+		expect(shown().coverUrl).toBe(coverUrl);
+		expect(client.getQueryData<Playlist[]>(list)![0].coverUrl).toBe(coverUrl);
 	});
 
 	it('drops a deleted playlist from the list', () => {

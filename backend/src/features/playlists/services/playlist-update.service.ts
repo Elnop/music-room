@@ -2,7 +2,11 @@ import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import { checkOwnership } from '@/features/playlists/permissions/playlist.permissions.js';
-import { formatPlaylistResponse } from '@/features/playlists/utils/playlist.helpers.js';
+import {
+	formatPlaylistResponse,
+	toDetailsPayload,
+} from '@/features/playlists/utils/playlist.helpers.js';
+import { deleteCoverFile } from '@/features/playlists/services/playlist-cover.service.js';
 import * as realtime from '@/realtime/emitters/playlist.emitters.js';
 import type { UpdatePlaylistInput } from '@/features/playlists/playlist.validators.js';
 import type { PlaylistResponse, PlaylistUpdate } from '@/features/playlists/playlist.types.js';
@@ -36,13 +40,7 @@ export async function updatePlaylist(
 			.eq('playlist_id', playlistId);
 		const response = formatPlaylistResponse(playlist, count || 0);
 
-		realtime.notifyPlaylistDetails({
-			playlistId,
-			name: response.name,
-			description: response.description,
-			visibility: response.visibility,
-			editMode: response.editMode,
-		});
+		realtime.notifyPlaylistDetails(toDetailsPayload(playlist));
 
 		// Visibility may have changed: evict sockets that lost access (fire-and-forget).
 		void realtime.revalidatePlaylistRoom(playlistId);
@@ -60,9 +58,16 @@ export async function deletePlaylist(playlistId: string, userId: string): Promis
 	try {
 		await checkOwnership(playlistId, userId);
 
-		const { error } = await supabaseAdmin.from('playlists').delete().eq('id', playlistId);
+		const { data: deleted, error } = await supabaseAdmin
+			.from('playlists')
+			.delete()
+			.eq('id', playlistId)
+			.select('cover_url')
+			.single();
 
 		if (error) throw error;
+
+		void deleteCoverFile(deleted.cover_url, playlistId);
 
 		// Tell the room first: the revalidation below evicts every socket from it.
 		realtime.notifyPlaylistDeleted({ playlistId });
