@@ -2,13 +2,17 @@ import { Dimensions, StyleSheet } from 'react-native';
 import { BREAKPOINTS, PLAYER_PANEL_WIDTH } from '@/shared/constants/layout';
 import type { Theme } from '@/shared/theme/types';
 
-export const { width: WINDOW_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+export const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 export const DISMISS_THRESHOLD = SCREEN_HEIGHT * 0.2;
-const PLAYER_WIDTH = WINDOW_WIDTH >= BREAKPOINTS.desktop ? PLAYER_PANEL_WIDTH : WINDOW_WIDTH;
-// Capped by the height too, so a short screen still fits the bottom row above the navigation bar.
-export const ARTWORK_SIZE = Math.min(PLAYER_WIDTH * 0.75, SCREEN_HEIGHT * 0.36);
 /** From one artwork of the carousel to the next: the neighbours' edges peek out on both sides. */
-export const ARTWORK_STEP = ARTWORK_SIZE + 16;
+const ARTWORK_GAP = 16;
+
+/** Capped by the height too, so a short screen still fits the bottom row above the navigation bar. */
+export function artworkSize(windowWidth: number, windowHeight: number) {
+	const playerWidth = windowWidth >= BREAKPOINTS.desktop ? PLAYER_PANEL_WIDTH : windowWidth;
+	const size = Math.min(playerWidth * 0.75, windowHeight * 0.36);
+	return { size, step: size + ARTWORK_GAP };
+}
 export const SEEK_STEP_S = 10;
 export const HEADER_HIT_SLOP = { top: 4, bottom: 4, left: 4, right: 4 };
 
@@ -84,8 +88,6 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 			elevation: 16,
 		},
 		artwork: {
-			width: ARTWORK_SIZE,
-			height: ARTWORK_SIZE,
 			borderRadius: 12,
 			backgroundColor: theme.colors.surfaceAlt,
 		},
