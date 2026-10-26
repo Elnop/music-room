@@ -4,7 +4,7 @@ import { logger } from '@/shared/utils/logger.js';
 import { fetchSingle } from '@/shared/utils/database.helpers.js';
 import * as privacySettingsService from '@/features/profile/services/privacy-settings.service.js';
 import { isFieldVisible } from '@/features/profile/permissions/field-visibility.js';
-import { parseGenres } from '@/features/profile/utils/music-genres.js';
+import { parseGenres } from '@/shared/music/genres.js';
 import type { FilteredProfile, UserProfileRow } from '@/features/profile/profile.types.js';
 
 /** Mutual follows; false when the lookup fails. */

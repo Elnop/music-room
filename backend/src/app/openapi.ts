@@ -11,6 +11,7 @@ import { registerFriendsOpenapi } from '@/features/friends/friends.openapi.js';
 import { registerMusicControlOpenapi } from '@/features/music-control/music-control.openapi.js';
 import { registerQueueOpenapi } from '@/features/queue/queue.openapi.js';
 import { registerSubscriptionOpenapi } from '@/features/subscription/subscription.openapi.js';
+import { registerEventsOpenapi } from '@/features/events/events.openapi.js';
 
 const registry = new OpenAPIRegistry();
 
@@ -61,6 +62,7 @@ for (const register of [
 	registerMusicControlOpenapi,
 	registerQueueOpenapi,
 	registerSubscriptionOpenapi,
+	registerEventsOpenapi,
 ]) {
 	register(registry);
 }
@@ -95,6 +97,7 @@ export const swaggerSpec = new OpenApiGeneratorV3(registry.definitions).generate
 		{ name: 'Music Control', description: 'Music control delegation' },
 		{ name: 'Queue', description: 'Play queue synced across your devices' },
 		{ name: 'Subscription', description: 'Free or premium plan (simulated switch)' },
+		{ name: 'Events', description: 'Physical events shown to nearby users (proximity bonus)' },
 	],
 });
 

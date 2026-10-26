@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { musicGenreSchema, visibilityLevelSchema } from '@/features/profile/profile.validators.js';
+import { visibilityLevelSchema } from '@/features/profile/profile.validators.js';
+import { musicGenreSchema } from '@/shared/music/genres.js';
 
 /** Optional fields are absent when unset or, on another user's profile, hidden by their privacy. */
 

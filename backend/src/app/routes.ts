@@ -8,6 +8,7 @@ import musicControlRoutes from '@/features/music-control/music-control.routes.js
 import queueRoutes from '@/features/queue/queue.routes.js';
 import queueTransferRoutes from '@/features/queue/queue-transfer.routes.js';
 import { createSubscriptionRouter } from '@/features/subscription/subscription.routes.js';
+import { createEventsRouter } from '@/features/events/events.routes.js';
 import { authMiddleware } from '@/features/auth/auth.middleware.js';
 
 interface RouteConfig {
@@ -66,5 +67,10 @@ export const routes: RouteConfig[] = [
 		path: '/api/subscription',
 		router: createSubscriptionRouter(authMiddleware),
 		description: 'Free or premium plan, switched without payment',
+	},
+	{
+		path: '/api/events',
+		router: createEventsRouter(authMiddleware),
+		description: 'Physical events shown to nearby users',
 	},
 ];
