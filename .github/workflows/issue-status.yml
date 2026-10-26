@@ -1,17 +1,17 @@
 # Keeps the issue status labels (in-progress, review) in step with the work.
 # GitHub only links `Closes #n` to issues for PRs into the default branch (`main`),
-# so for PRs into develop the issue numbers are parsed from the PR body:
+# so for PRs into any other branch (develop, an epic's feature branch) the issue
+# numbers are parsed from the PR body:
 # - opening the PR moves them from `in-progress` to `review`, and their board card
 #   to `Review` when the PROJECT_TOKEN secret (classic PAT, `project` scope) is set;
-# - merging it closes them and drops both labels (the board's "Item closed" rule
-#   moves the card to `Done`).
+# - merging it, into develop or a feature branch, closes them and drops both labels
+#   (the board's "Item closed" rule moves the card to `Done`).
 # An issue closed by hand also drops both labels.
 name: Issue status
 
 on:
   pull_request:
     types: [opened, reopened, ready_for_review, edited, closed]
-    branches: [develop]
   issues:
     types: [closed]
 
@@ -85,13 +85,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
+          BASE: ${{ github.event.pull_request.base.ref }}
           BODY: ${{ github.event.pull_request.body }}
         run: |
           issues=$(printf '%s' "$BODY" | grep -oiE "$CLOSING_REGEX" | grep -oE '[0-9]+$' | sort -un || true)
           for n in $issues; do
             state=$(gh issue view "$n" --repo "$REPO" --json state -q .state) || continue
             [ "$state" = "OPEN" ] || continue
-            gh issue close "$n" --repo "$REPO" --reason completed --comment "Closed by #$PR (merged into develop)."
+            gh issue close "$n" --repo "$REPO" --reason completed --comment "Closed by #$PR (merged into $BASE)."
             labels=$(gh issue view "$n" --repo "$REPO" --json labels -q '[.labels[].name] | join(",")')
             for label in in-progress review; do
               case ",$labels," in
