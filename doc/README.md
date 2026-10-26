@@ -24,6 +24,7 @@ Everything a human needs to understand Zumik. Start with the [project README](..
 - [features/mobile-api.md](features/mobile-api.md) - The API contract, its generated documentation, and the app's API client.
 - [features/subscription.md](features/subscription.md) - Bonus V.3: the free and premium plans, the simulated switch, what a downgrade keeps.
 - [features/events.md](features/events.md) - Bonus V.2: physical events shown to nearby phones by GPS and iBeacon, privacy, permissions, two-phone demo.
+- [features/web-client.md](features/web-client.md) - Bonus V.1: the responsive web client (Expo web), its `.web.ts` variants, breakpoints, audio, sign-in, what the browser lacks, running and building, demo scenario.
 
 ## Security
 
