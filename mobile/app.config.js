@@ -96,6 +96,8 @@ module.exports = {
 				},
 			],
 			'@react-native-community/datetimepicker',
+			// No neverForLocation: Android then filters iBeacon frames out of the scan results.
+			['react-native-ble-plx', { isBackgroundEnabled: false, neverForLocation: false }],
 			'./plugins/withDebugKeystore.js',
 			'./plugins/withDevVariant.js',
 			'./plugins/withMedia3Version.js',

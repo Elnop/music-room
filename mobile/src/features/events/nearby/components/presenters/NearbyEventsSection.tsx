@@ -6,6 +6,7 @@ import { Button } from '@/shared/components/ui/Button';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { NearbyEvents } from '@/features/events/nearby/hooks/useNearbyEvents';
+import { BeaconStatusLine } from './BeaconStatusLine';
 import { EventRow } from './EventRow';
 
 const NOTICE_ACTIONS = {
@@ -40,6 +41,10 @@ export function NearbyEventsSection({ nearby }: { nearby: NearbyEvents }) {
 					action={action ? { label: action.label, onPress: nearby[action.handler] } : undefined}
 				/>
 			)}
+			<BeaconStatusLine
+				status={nearby.beaconStatus}
+				onRequestPermission={nearby.requestBeaconPermission}
+			/>
 			{nearby.mine.length > 0 && (
 				<View>
 					<Text style={styles.subtitle}>Vos événements</Text>
