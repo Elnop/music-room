@@ -1,5 +1,5 @@
 import React from 'react';
-import { act, fireEvent, screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
 import { NearbyEventsOrchestrator } from './NearbyEventsOrchestrator';
 import { resetBackendUrl } from '@/shared/services/backendUrl';
 import { logger } from '@/shared/utils/logger';
@@ -39,7 +39,7 @@ beforeEach(async () => {
 	});
 	const view = renderWithClient(<NearbyEventsOrchestrator />);
 	clear = () => view.client.clear();
-	await act(async () => {});
+	await screen.findByText('My party');
 });
 
 afterEach(() => {
