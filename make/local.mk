@@ -61,7 +61,9 @@ dev-local: .ensure-backend-deps .ensure-mobile-deps ## Start development locally
 	@$(MAKE) --no-print-directory .open-app-when-metro &
 	$(call expo_mobile,start --localhost --dev-client)
 
-# The web app in a browser on this machine, with the local backend.
+# The web app in a browser on this machine, with the local backend (reused when one already
+# answers on BACKEND_PORT). --offline: Expo CLI would otherwise call Expo's API with EXPO_TOKEN,
+# and stop when that token is invalid.
 dev-web-local: export EXPO_PUBLIC_API_URL := $(WEB_API_URL)
 dev-web-local: export EXPO_PUBLIC_WS_URL := $(WEB_WS_URL)
 dev-web-local: export REDIS_HOST := localhost
@@ -73,12 +75,17 @@ dev-web-local: .ensure-backend-deps .ensure-mobile-deps ## Start backend + the w
 	$(call print_header,Starting the Zumik Web App Locally)
 	$(call print_arrow,Starting Redis (session revocation needs it)...)
 	@$(call start_redis)
-	$(call print_arrow,Starting backend server...)
-	@cd $(BACKEND_DIR) && $(LOCAL_SUPABASE_ENV) npm run dev &
-	@sleep $(SHORT_WAIT_TIME)
-	$(call print_success,Backend started: $(BACKEND_URL))
+	@if curl -sf -o /dev/null $(BACKEND_URL)/health; then \
+		echo "$(YELLOW)$(ICON_INFO) Backend already running: $(BACKEND_URL)$(NC)"; \
+	else \
+		echo "$(YELLOW)$(ICON_ARROW) Starting backend server...$(NC)"; \
+		(cd $(BACKEND_DIR) && $(LOCAL_SUPABASE_ENV) npm run dev &); \
+		for i in $$(seq 30); do curl -sf -o /dev/null $(BACKEND_URL)/health && break; sleep 1; done; \
+		curl -sf -o /dev/null $(BACKEND_URL)/health || { echo "$(RED)$(ICON_ERROR) The backend did not answer on $(BACKEND_URL)/health$(NC)"; exit 1; }; \
+		echo "$(GREEN)$(ICON_SUCCESS) Backend started: $(BACKEND_URL)$(NC)"; \
+	fi
 	$(call print_arrow,Starting Expo web on $(METRO_URL)...)
-	$(call expo_mobile,start --web --port $(METRO_PORT))
+	$(call expo_mobile,start --web --offline --port $(METRO_PORT))
 
 expo-android: ## Quick start: Start Metro and open the debug build on the Android emulator
 	@$(call write_mobile_dev_env)
