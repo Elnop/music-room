@@ -9,12 +9,8 @@ jest.mock('@/shared/theme/ThemeContext', () => {
 	return { useTheme: () => ({ theme }) };
 });
 
-const push = (
-	buttons: Parameters<ReturnType<typeof useAlertStore.getState>['push']>[0]['buttons']
-) =>
-	act(() =>
-		useAlertStore.getState().push({ title: 'Supprimer ?', message: 'Définitif.', buttons })
-	);
+const push = (buttons: Parameters<ReturnType<typeof useAlertStore.getState>['push']>[0]['buttons']) =>
+	act(() => useAlertStore.getState().push({ title: 'Supprimer ?', message: 'Définitif.', buttons }));
 
 beforeEach(() => useAlertStore.setState({ queue: [] }));
 
