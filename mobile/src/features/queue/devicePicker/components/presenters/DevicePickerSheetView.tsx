@@ -5,6 +5,7 @@ import { Pressable } from '@/shared/components/ui/Pressable';
 import { FullScreenSheet } from '@/shared/components/layout/FullScreenSheet';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { AppToast } from '@/shared/components/feedback/AppToast';
+import { THIS_DEVICE_LABEL } from '@/shared/constants/platform';
 import { DeviceRow } from './DeviceRow';
 import type { DevicePickerOwner } from '@/types/device.types';
 import type { Theme } from '@/shared/theme/types';
@@ -87,11 +88,11 @@ export function DevicePickerSheetView({
 
 		return (
 			<ScrollView contentContainerStyle={styles.listContent}>
-				<Text style={styles.sectionLabel}>Ce téléphone</Text>
+				<Text style={styles.sectionLabel}>{THIS_DEVICE_LABEL}</Text>
 				{self && phone ? (
 					renderDevice(self, phone)
 				) : (
-					<Text style={styles.emptyText}>Ce téléphone n&apos;est pas encore enregistré</Text>
+					<Text style={styles.emptyText}>{`${THIS_DEVICE_LABEL} n'est pas encore enregistré`}</Text>
 				)}
 
 				<Text style={styles.sectionLabel}>Mes appareils</Text>
