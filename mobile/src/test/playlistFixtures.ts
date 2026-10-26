@@ -9,6 +9,7 @@ export const playlistTrack = (id: string, rank: string, trackUri = id): TrackInP
 	artist: 'Artist',
 	trackUri,
 	durationMs: 1000,
+	unavailable: false,
 	createdAt: '',
 	updatedAt: '',
 	addedBy: null,

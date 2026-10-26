@@ -62,8 +62,9 @@ export function PlaylistDetailView({
 						onDragStart={canEdit ? drag : undefined}
 						isDragActive={isActive}
 						isCurrent={currentUri !== null && item.trackUri === currentUri}
-						onPress={() => onPlayTrack(item)}
+						onPress={item.unavailable ? tracks.explainUnavailable : () => onPlayTrack(item)}
 						isPending={pendingTrackId === item.id}
+						unavailable={item.unavailable}
 					/>
 				)}
 				ListHeaderComponent={header}
