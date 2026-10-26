@@ -60,6 +60,12 @@ export const rateLimitConfig = {
 		max: env.RATE_LIMIT_SUBSCRIPTION_MAX,
 	},
 
+	// Per authenticated user, event writes only.
+	events: {
+		windowMs: env.RATE_LIMIT_EVENTS_WINDOW_MS,
+		max: env.RATE_LIMIT_EVENTS_MAX,
+	},
+
 	lockout: {
 		enabled: env.ACCOUNT_LOCKOUT_ENABLED !== 'false',
 		threshold: parseInt(env.ACCOUNT_LOCKOUT_THRESHOLD || '5'),

@@ -4,7 +4,7 @@ import express, { type NextFunction, type Request, type Response } from 'express
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import profileRoutes from '@/features/profile/profile.routes.js';
 import { errorHandler } from '@/shared/middleware/error-handler.js';
-import { MUSIC_GENRES } from '@/features/profile/profile.validators.js';
+import { MUSIC_GENRES } from '@/shared/music/genres.js';
 
 // Only Supabase, the auth middleware and the logger are mocked; the fake client
 // answers per table and operation and records every builder call.

@@ -14,6 +14,7 @@ backend/
 │   ├── app/                # Composition root: route mounting (routes.ts), OpenAPI document (openapi.ts)
 │   ├── features/
 │   │   ├── auth/           # Sign-up, login, refresh, Google/Facebook OAuth, email verification, password reset
+│   │   ├── events/         # Physical events shown to nearby users, iBeacon minor (bonus V.2)
 │   │   ├── friends/        # Follow / unfollow, status, stats
 │   │   ├── mail/           # Transactional emails (Gmail SMTP, or Mailpit in dev, through nodemailer)
 │   │   ├── music-control/  # Devices, per-device licenses, playback control delegation to friends
@@ -30,10 +31,12 @@ backend/
 │   ├── shared/
 │   │   ├── config/         # env, Supabase, Redis, Swagger building blocks, rate limits; imports no feature
 │   │   ├── middleware/     # error handler, action logger (HTTP + socket)
+│   │   ├── music/          # Music genres (profile preferences, events)
 │   │   ├── security/       # anti-abuse: rate limiting, lockout, IP reputation, token and socket event limits
 │   │   ├── storage/        # Image uploads: multer middleware, magic-byte type check, public bucket files
 │   │   ├── subscription/   # getPlan, assertPremium (403 PREMIUM_REQUIRED), used by Premium-only features
 │   │   ├── types/          # Global types + supabase.generated.ts (generated: make generate-types)
+│   │   ├── users/          # User summary schema (id, username, display name, avatar)
 │   │   └── utils/          # logger, database.helpers.ts
 │   └── server.ts           # Express + Socket.io entry point
 ├── migrations/             # SQL migrations (local stack: make supabase-up; hosted: by hand in the dashboard)
@@ -172,6 +175,7 @@ Mounted in `src/app/routes.ts`, documented in Swagger (`/api-docs`):
 | `/api/queue/transfer` | move playback to another device |
 | `/api/soundcloud` | search, track, stream |
 | `/api/subscription` | the caller's plan (get), switch free / premium (put) |
+| `/api/events` | ongoing and upcoming events (list, get), create, update and delete your own; changes broadcast as `event:created` / `event:updated` / `event:deleted` |
 | `/health` | server and Redis health (no auth) |
 
 **Invalid token limit (#160)**: every protected route (`authMiddleware`) and every Socket.io handshake verifies the token with Supabase. Failures (`INVALID_TOKEN`, `TOKEN_REVOKED`) are counted per IP in Redis (`rl:auth:token:{ip}`, fixed window `RATE_LIMIT_TOKEN_WINDOW_MS`, 15 min by default). At `RATE_LIMIT_TOKEN_MAX` failures (20 by default), the IP is refused without calling Supabase until the end of the window, for any token, valid or not: every protected route then answers `429 RATE_LIMIT_EXCEEDED` (with `error.details.retryAfter`), a route with optional auth (`optionalAuthMiddleware`) goes on anonymously, and the handshake is refused with `TOO_MANY_ATTEMPTS`. Successful verifications are never counted. Same switch and same whitelist as the other limiters (`RATE_LIMIT_ENABLED`, `RATE_LIMIT_WHITELIST_IPS`); Redis not ready: the limit neither blocks nor counts, and `verifyToken` already answers 503. Each verification reserves a slot before calling Supabase (given back on success or on an uncounted failure): beyond `RATE_LIMIT_TOKEN_MAX` simultaneous verifications from one IP, the next ones get a transient 429.
@@ -311,7 +315,7 @@ Refusal: a `connect_error` whose `message` is `NO_TOKEN` (no `token`), `INVALID_
 ### Events
 
 - **Client → server**: `playlist:join`, `playlist:leave`, `listening:subscribe`, `listening:unsubscribe`, `listening:update`, `control:action`
-- **Server → client**: `playlist:updated`, `playlist:details`, `playlist:tracks-availability`, `playlist:deleted`, `playlist:error`, `listening:status`, `listening:error`, `permission:changed`, `control:command`, `control:success`, `control:error`, `control:revoked`, `queue:updated`
+- **Server → client**: `playlist:updated`, `playlist:details`, `playlist:tracks-availability`, `playlist:deleted`, `playlist:error`, `listening:status`, `listening:error`, `permission:changed`, `control:command`, `control:success`, `control:error`, `control:revoked`, `queue:updated`, `event:created`, `event:updated`, `event:deleted`
 
 A playlist's clients join the `playlist:<id>` room and receive `playlist:updated` on every change.
 
@@ -344,6 +348,8 @@ Access is re-checked when it can be lost: after a viewer or collaborator is remo
 Errors have the shape `{ message, code }`: `INVALID_PAYLOAD` (invalid payload), `NOT_AUTHORIZED` (no control right), `DEVICE_OFFLINE` (`control:action` to a device that is not connected), `RATE_LIMITED` (rate exceeded).
 
 **Rate (#204)**: each socket has an in-memory counter per event, over a fixed 10 s window: 20 `listening:update` or `control:action`, 30 for each of the app's other events, one shared counter for any other name (`src/shared/security/socket-event-limit.ts`). Beyond that, the event is not handled and the socket receives `RATE_LIMITED` on `listening:error`, `playlist:error` or `control:error` depending on the event. The counter is per socket: another connection of the same user has its own.
+
+**Events (bonus V.2).** `event:created` and `event:updated` carry the whole event (the `GET /api/events/:id` shape) and `event:deleted` carries `{ eventId }`. Events are public, so they go to every connected socket, with no room: a phone keeps its list of nearby events current without polling. The phone never sends its position; it filters the list by distance itself.
 
 **Play queue (#294).** `queue:updated` (the whole queue) goes to the owner's `user:<id>` and `listening:<id>`: their devices and the delegates listening to them receive the same state (a single emission; a socket in both rooms receives it once). Friends who control at least one of the owner's devices manage the queue through the `/api/users/:userId/queue/...` routes (the same as `/api/queue/...`, see Swagger); an action that changes what plays (play a track, next, previous, play a playlist) targets a device (`deviceId`, required for a delegate, who must control it, and it must be online, otherwise nothing changes). The server then sends that device `control:command` `{ action: 'play-item', fromUserId, item, positionMs, version }`. When a controller loses their last controllable device, their sockets receive `control:revoked` `{ ownerId }`.
 

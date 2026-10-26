@@ -1,5 +1,23 @@
-import { MUSIC_GENRES } from '@/features/profile/profile.validators.js';
-import type { MusicGenre } from '@/features/profile/profile.types.js';
+import { z } from 'zod';
+
+export const MUSIC_GENRES = [
+	'pop',
+	'rock',
+	'hiphop',
+	'rnb',
+	'jazz',
+	'classical',
+	'electronic',
+	'country',
+	'latin',
+	'metal',
+] as const;
+
+export const MAX_GENRES = 5;
+
+export const musicGenreSchema = z.enum(MUSIC_GENRES);
+
+export type MusicGenre = z.infer<typeof musicGenreSchema>;
 
 const GENRES: readonly string[] = MUSIC_GENRES;
 

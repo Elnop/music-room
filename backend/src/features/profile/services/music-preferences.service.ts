@@ -2,10 +2,9 @@ import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { Tables } from '@/shared/types/supabase.generated.js';
-import { MAX_GENRES, MUSIC_GENRES } from '@/features/profile/profile.validators.js';
 import type { UpdateMusicPreferencesInput } from '@/features/profile/profile.validators.js';
-import type { MusicGenre, MusicPreferences } from '@/features/profile/profile.types.js';
-import { parseGenres } from '@/features/profile/utils/music-genres.js';
+import type { MusicPreferences } from '@/features/profile/profile.types.js';
+import { MAX_GENRES, MUSIC_GENRES, parseGenres, type MusicGenre } from '@/shared/music/genres.js';
 
 type MusicPreferencesRow = Tables<'music_preferences'>;
 

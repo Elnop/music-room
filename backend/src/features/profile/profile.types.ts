@@ -1,6 +1,5 @@
 import type { z } from 'zod';
 import type { Enums, Tables } from '@/shared/types/supabase.generated.js';
-import type { musicGenreSchema } from '@/features/profile/profile.validators.js';
 import type {
 	avatarResponseSchema,
 	filteredProfileSchema,
@@ -11,8 +10,6 @@ import type {
 } from '@/features/profile/profile-responses.validators.js';
 
 export type VisibilityLevel = Enums<'visibility_level'>;
-
-export type MusicGenre = z.infer<typeof musicGenreSchema>;
 
 export type UserProfileRow = Tables<'user_profiles'>;
 

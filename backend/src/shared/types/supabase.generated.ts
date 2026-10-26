@@ -80,6 +80,75 @@ export type Database = {
 					},
 				];
 			};
+			events: {
+				Row: {
+					access_info: string | null;
+					address: string;
+					beacon_minor: number;
+					created_at: string;
+					description: string | null;
+					ends_at: string;
+					genres: string[];
+					id: string;
+					latitude: number;
+					longitude: number;
+					name: string;
+					owner_id: string;
+					playlist_id: string | null;
+					starts_at: string;
+					updated_at: string;
+				};
+				Insert: {
+					access_info?: string | null;
+					address: string;
+					beacon_minor: number;
+					created_at?: string;
+					description?: string | null;
+					ends_at: string;
+					genres?: string[];
+					id?: string;
+					latitude: number;
+					longitude: number;
+					name: string;
+					owner_id: string;
+					playlist_id?: string | null;
+					starts_at: string;
+					updated_at?: string;
+				};
+				Update: {
+					access_info?: string | null;
+					address?: string;
+					beacon_minor?: number;
+					created_at?: string;
+					description?: string | null;
+					ends_at?: string;
+					genres?: string[];
+					id?: string;
+					latitude?: number;
+					longitude?: number;
+					name?: string;
+					owner_id?: string;
+					playlist_id?: string | null;
+					starts_at?: string;
+					updated_at?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'events_owner_id_fkey';
+						columns: ['owner_id'];
+						isOneToOne: false;
+						referencedRelation: 'user_profiles';
+						referencedColumns: ['id'];
+					},
+					{
+						foreignKeyName: 'events_playlist_id_fkey';
+						columns: ['playlist_id'];
+						isOneToOne: false;
+						referencedRelation: 'playlists';
+						referencedColumns: ['id'];
+					},
+				];
+			};
 			follows: {
 				Row: {
 					can_control_music: boolean | null;

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { userSummarySchema } from '@/shared/users/user-summary.js';
 
 /** Accepts every input form of the Postgres `uuid` type (optional hyphens and braces), as the lookup used to. */
 export const friendUserParamsSchema = z.object({
@@ -8,12 +9,8 @@ export const friendUserParamsSchema = z.object({
 		.meta({ format: 'uuid', param: { description: 'ID of the other user' } }),
 });
 
-/** displayName and avatarUrl are absent when unset. */
-export const friendSchema = z.object({
-	id: z.uuid(),
-	username: z.string(),
-	displayName: z.string().optional(),
-	avatarUrl: z.url().optional(),
+export const friendSchema = userSummarySchema.meta({
+	description: 'A user you follow or who follows you',
 });
 
 export const friendStatsSchema = z.object({

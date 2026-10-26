@@ -159,3 +159,13 @@ export const subscriptionRateLimiter = createLimiter({
 	log: 'Subscription rate limit exceeded',
 	logFields: perUserFields,
 });
+
+/** Writes only (create, update, delete), per signed-in user; after authMiddleware. */
+export const eventRateLimiter = createLimiter({
+	store: 'events',
+	limits: rateLimitConfig.events,
+	key: req => `events:${userIdOf(req)}`,
+	message: () => 'Too many event changes. Please try again later.',
+	log: 'Event rate limit exceeded',
+	logFields: perUserFields,
+});
