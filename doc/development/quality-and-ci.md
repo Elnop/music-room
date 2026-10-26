@@ -6,6 +6,7 @@ Subject IV.8: an agile process, tests on each layer, and continuous integration.
 
 - Epics, stories and bugs are GitHub Issues, on the "Music Room – Validation" board (Todo → In Progress → Review → Done).
 - One branch per issue, `<issue-number>-<slug>`, from `develop`; one pull request into `develop`, with `Closes #<n>` in its body. `main` is the deploy branch and only receives releases.
+- A merged branch is deleted on GitHub (repo setting). While `develop` is ahead of `main`, `.github/workflows/release-pr.yml` keeps one release PR `develop` → `main` open and refreshes its list of merged PRs; the rest of its body is written by hand, and merging it, which deploys, stays a human decision.
 - Commits follow Conventional Commits.
 
 ## `npm run check`

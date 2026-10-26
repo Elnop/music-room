@@ -1,0 +1,72 @@
+# Keeps one release PR open from develop to main while develop is ahead of it.
+# Each push to develop opens the PR when there is none, otherwise rewrites the list
+# of merged PRs between the release-pr markers and leaves the rest of the body,
+# hand-written, as is. Merging stays a human decision: main is the deploy branch.
+# Needs the repo setting "Allow GitHub Actions to create and approve pull requests".
+name: Release PR
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+concurrency:
+  group: release-pr
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  release-pr:
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    steps:
+      - name: Open or refresh the release PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          ahead=$(gh api "repos/$REPO/compare/main...develop" -q .ahead_by)
+          if [ "$ahead" = 0 ]; then
+            echo "develop is not ahead of main"
+            exit 0
+          fi
+
+          # The PRs develop brings are the merge commits main does not have yet.
+          prs=$(gh api --paginate "repos/$REPO/compare/main...develop?per_page=100" \
+            -q '.commits[].commit.message | split("\n")[0]' |
+            grep -oE '^Merge pull request #[0-9]+' | grep -oE '[0-9]+$' | sort -un || true)
+
+          {
+            echo '<!-- release-pr:start -->'
+            echo '## Pull requests'
+            echo
+            for n in $prs; do
+              gh pr view "$n" --repo "$REPO" --json number,title -q '"- #\(.number) \(.title)"'
+            done
+            [ -n "$prs" ] || echo '- (direct commits only)'
+            echo '<!-- release-pr:end -->'
+          } > section.md
+
+          pr=$(gh pr list --repo "$REPO" --base main --head develop --state open \
+            --json number -q '.[0].number')
+          if [ -z "$pr" ]; then
+            gh pr create --repo "$REPO" --base main --head develop \
+              --title "Release: $(date -u +%Y-%m-%d)" --body-file section.md
+            exit 0
+          fi
+
+          gh pr view "$pr" --repo "$REPO" --json body -q .body > body.md
+          if grep -q '<!-- release-pr:start -->' body.md; then
+            awk '
+              /<!-- release-pr:start -->/ { while ((getline line < "section.md") > 0) print line; skip = 1; next }
+              /<!-- release-pr:end -->/ { skip = 0; next }
+              !skip { print }
+            ' body.md > new-body.md
+          else
+            { cat body.md; echo; cat section.md; } > new-body.md
+          fi
+          gh pr edit "$pr" --repo "$REPO" --body-file new-body.md
+          echo "#$pr refreshed"
