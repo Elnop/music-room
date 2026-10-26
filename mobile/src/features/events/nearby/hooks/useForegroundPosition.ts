@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Linking } from 'react-native';
+import { Linking, Platform } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import { logger } from '@/shared/utils/logger';
@@ -28,6 +28,12 @@ const WATCH_OPTIONS: Location.LocationOptions = {
 	timeInterval: 10_000,
 };
 
+/** A browser does not prompt again once refused, though expo-location reports `canAskAgain`. */
+function isRefusedForGood(permission: Location.LocationPermissionResponse): boolean {
+	if (Platform.OS === 'web') return permission.status === Location.PermissionStatus.DENIED;
+	return !permission.canAskAgain;
+}
+
 /** Follows the position while the screen is shown and the app in the foreground, never in the background. */
 export function useForegroundPosition(): ForegroundPosition {
 	const isFocused = useIsFocused();
@@ -43,7 +49,7 @@ export function useForegroundPosition(): ForegroundPosition {
 		const watch = async () => {
 			const permission = await Location.getForegroundPermissionsAsync();
 			if (permission.status !== 'granted') {
-				setState({ status: permission.canAskAgain ? 'needs-permission' : 'denied' });
+				setState({ status: isRefusedForGood(permission) ? 'denied' : 'needs-permission' });
 				return;
 			}
 			if (!(await Location.hasServicesEnabledAsync())) {

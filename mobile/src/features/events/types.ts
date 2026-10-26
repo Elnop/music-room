@@ -35,6 +35,13 @@ export interface MusicEvent {
 	updatedAt: string;
 }
 
+export interface GeocodedPlace {
+	latitude: number;
+	longitude: number;
+	/** The place the geocoder matched. */
+	displayName: string;
+}
+
 export interface EventInput {
 	name: string;
 	description: string | null;

@@ -1,5 +1,10 @@
 import { apiRequest } from '@/shared/services/api';
-import type { EventInput, MusicEvent, PlaylistChoice } from '@/features/events/types';
+import type {
+	EventInput,
+	GeocodedPlace,
+	MusicEvent,
+	PlaylistChoice,
+} from '@/features/events/types';
 
 /** Ongoing and upcoming events, with their coordinates: the phone computes distances itself. */
 export async function fetchEvents(): Promise<MusicEvent[]> {
@@ -30,6 +35,14 @@ export async function updateEvent(id: string, changes: Partial<EventInput>): Pro
 
 export async function deleteEvent(id: string): Promise<void> {
 	await apiRequest(`/api/events/${id}`, { method: 'DELETE' });
+}
+
+/** Only the typed address leaves the device; null when no place matches. */
+export async function geocode(address: string): Promise<GeocodedPlace | null> {
+	const data = await apiRequest<{ location: GeocodedPlace | null }>(
+		`/api/events/geocode?q=${encodeURIComponent(address)}`
+	);
+	return data.location;
 }
 
 interface OwnPlaylist {
