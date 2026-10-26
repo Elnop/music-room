@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { Avatar } from '@/shared/components/media/Avatar';
 import { Button } from '@/shared/components/ui/Button';
+import { BEACON_BROADCAST_AVAILABLE } from '@/shared/constants/platform';
 import { GenreChip } from '@/shared/components/ui/GenreChip';
 import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
 import type { Theme } from '@/shared/theme/types';
@@ -75,7 +76,7 @@ export function EventDetailView({ screen, beacon, bottomPadding }: EventDetailVi
 
 			{screen.isOrganizer && (
 				<View style={styles.actions}>
-					<BeaconCard beacon={beacon} />
+					{BEACON_BROADCAST_AVAILABLE && <BeaconCard beacon={beacon} />}
 					<Button title="Modifier" onPress={screen.edit} variant="outline" fullWidth />
 					<Button
 						title="Supprimer"

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert } from 'react-native';
+import { showAlert } from '@/shared/utils/alert';
 import { useNavigation, usePreventRemove } from '@react-navigation/native';
 import { useProfilePrivacy } from '@/features/profile/hooks/useProfileQueries';
 import { useUpdatePrivacyMutation } from '@/features/profile/hooks/useProfileMutations';
@@ -56,7 +56,7 @@ export function usePrivacySettingsScreen() {
 			navigation.dispatch(navData.action);
 			return;
 		}
-		Alert.alert(
+		showAlert(
 			'Quitter sans enregistrer ?',
 			'Vos modifications de confidentialité seront perdues.',
 			[
