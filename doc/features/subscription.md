@@ -2,7 +2,7 @@
 
 Bonus V.3 (epic #478): each user is on a free or a premium plan and can switch from one to the other. The premium plan unlocks features the free plan lacks; the first one is a custom playlist cover (#483).
 
-Code: `backend/src/shared/subscription/plan.ts` (plan check, used by every feature that gates on Premium), `backend/src/features/subscription/` (the endpoints), migration `030_subscription_plan.sql`.
+Code: `backend/src/shared/subscription/plan.ts` (plan check, used by every feature that gates on Premium), `backend/src/features/subscription/` (the endpoints), migration `030_subscription_plan.sql`; mobile `src/shared/hooks/usePlan.ts`, `src/shared/services/subscriptionApi.ts` and the Settings screen (`features/profile/settings/`).
 
 ## The two plans
 
@@ -33,3 +33,7 @@ A feature that is Premium-only calls `assertPremium(userId)` from `@/shared/subs
 ## Going back to free
 
 A downgrade deletes nothing: what was created on Premium (a playlist cover) stays as it is and is still shown. The user only loses the right to create or change a Premium-only thing until they switch back.
+
+## In the app
+
+**Profile › Settings › Abonnement** shows the current plan and a Premium switch, with the note that no payment is asked (#484). `usePlan()` (`shared/hooks/usePlan.ts`) reads the plan; it lives in `shared/` because Settings and the playlist cover both read it. `useChangePlan()` switches it optimistically: the cached plan changes at once, so every screen reading `usePlan()` unlocks or locks the Premium feature without a restart; a failed request puts the previous plan back and Settings shows an error.

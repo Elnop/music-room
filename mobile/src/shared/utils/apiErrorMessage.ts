@@ -39,6 +39,7 @@ const CODE_MESSAGES: Record<string, string> = {
 	AUTH_UNAVAILABLE: "Le service d'authentification est indisponible. Réessayez plus tard.",
 	INVALID_IMAGE: "Ce fichier n'est pas une image JPEG, PNG ou WebP",
 	FILE_TOO_LARGE: 'La photo ne doit pas dépasser 2 Mo',
+	PREMIUM_REQUIRED: 'Cette fonction est réservée au Premium',
 };
 
 /** Never returns the server's or fetch's raw (English) message: unknown errors get the caller's `fallback`. */
