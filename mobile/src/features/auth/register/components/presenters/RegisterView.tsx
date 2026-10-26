@@ -6,8 +6,8 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { AuthFormLayout } from '@/features/auth/form/components/presenters/AuthFormLayout';
 import { SocialSignInButtons } from '@/features/auth/social/components/presenters/SocialSignInButtons';
-import { SOCIAL_SIGN_IN_AVAILABLE } from '@/shared/constants/platform';
 import type { FieldBinding } from '@/features/auth/form/hooks/useFieldBinding';
+import type { GoogleButtonSlot } from '@/features/auth/types';
 
 interface RegisterViewProps {
 	email: FieldBinding;
@@ -20,6 +20,7 @@ interface RegisterViewProps {
 	onLogin: () => void;
 	onGoogle: () => void;
 	onFacebook: () => void;
+	googleButton?: GoogleButtonSlot;
 }
 
 export function RegisterView({
@@ -32,6 +33,7 @@ export function RegisterView({
 	onLogin,
 	onGoogle,
 	onFacebook,
+	googleButton,
 }: RegisterViewProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
@@ -83,9 +85,12 @@ export function RegisterView({
 				variant="primary"
 			/>
 
-			{SOCIAL_SIGN_IN_AVAILABLE && (
-				<SocialSignInButtons onGoogle={onGoogle} onFacebook={onFacebook} disabled={isLoading} />
-			)}
+			<SocialSignInButtons
+				onGoogle={onGoogle}
+				onFacebook={onFacebook}
+				disabled={isLoading}
+				googleButton={googleButton}
+			/>
 		</AuthFormLayout>
 	);
 }

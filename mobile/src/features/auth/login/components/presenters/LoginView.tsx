@@ -7,8 +7,8 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { AuthFormLayout } from '@/features/auth/form/components/presenters/AuthFormLayout';
 import { SocialSignInButtons } from '@/features/auth/social/components/presenters/SocialSignInButtons';
-import { SOCIAL_SIGN_IN_AVAILABLE } from '@/shared/constants/platform';
 import type { FieldBinding } from '@/features/auth/form/hooks/useFieldBinding';
+import type { GoogleButtonSlot } from '@/features/auth/types';
 
 interface LoginViewProps {
 	email: FieldBinding;
@@ -20,6 +20,7 @@ interface LoginViewProps {
 	onRegister: () => void;
 	onGoogle: () => void;
 	onFacebook: () => void;
+	googleButton?: GoogleButtonSlot;
 }
 
 export function LoginView({
@@ -31,6 +32,7 @@ export function LoginView({
 	onRegister,
 	onGoogle,
 	onFacebook,
+	googleButton,
 }: LoginViewProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
@@ -75,9 +77,12 @@ export function LoginView({
 				<Text style={styles.forgotPasswordText}>Mot de passe oublié ?</Text>
 			</Pressable>
 
-			{SOCIAL_SIGN_IN_AVAILABLE && (
-				<SocialSignInButtons onGoogle={onGoogle} onFacebook={onFacebook} disabled={isLoading} />
-			)}
+			<SocialSignInButtons
+				onGoogle={onGoogle}
+				onFacebook={onFacebook}
+				disabled={isLoading}
+				googleButton={googleButton}
+			/>
 		</AuthFormLayout>
 	);
 }

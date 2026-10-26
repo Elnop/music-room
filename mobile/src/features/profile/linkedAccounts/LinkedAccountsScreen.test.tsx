@@ -43,12 +43,15 @@ let mockIsLoading = false;
 let mockError: Error | null = null;
 const mockLinkProvider = jest.fn();
 const mockUnlinkProvider = jest.fn();
+let mockGoogleButton: jest.Mock | undefined;
+let mockGoogleCredential: () => void = () => undefined;
 
 beforeEach(() => {
 	jest.clearAllMocks();
 	mockProvidersData = [password, google];
 	mockIsLoading = false;
 	mockError = null;
+	mockGoogleButton = undefined;
 
 	registerLinkedAccountsBridge({
 		useLinkedProviders: () =>
@@ -61,6 +64,10 @@ beforeEach(() => {
 			}) as never,
 		useLinkProvider: () => ({ mutateAsync: mockLinkProvider }) as never,
 		useUnlinkProvider: () => ({ mutateAsync: mockUnlinkProvider }) as never,
+		useGoogleButton: onCredential => {
+			mockGoogleCredential = onCredential;
+			return mockGoogleButton;
+		},
 	});
 });
 
@@ -143,5 +150,31 @@ describe('LinkedAccountsScreen', () => {
 			expect(mockLinkProvider).toHaveBeenCalledWith('google');
 		});
 		expect(showError).not.toHaveBeenCalled();
+	});
+
+	it("links Google from Google's own button on the web", async () => {
+		mockProvidersData = [password];
+		mockGoogleButton = jest.fn();
+		mockLinkProvider.mockResolvedValueOnce(undefined);
+
+		render(<LinkedAccountsOrchestrator />);
+
+		expect(screen.getByTestId('google-button-slot')).toBeTruthy();
+		expect(screen.queryByLabelText('Lier Google')).toBeNull();
+		expect(screen.getByLabelText('Lier Facebook')).toBeTruthy();
+		mockGoogleCredential();
+		await waitFor(() => {
+			expect(mockLinkProvider).toHaveBeenCalledWith('google');
+			expect(showSuccess).toHaveBeenCalledWith('Compte Google lié');
+		});
+	});
+
+	it('unlinks Google with the usual button on the web', () => {
+		mockGoogleButton = jest.fn();
+
+		render(<LinkedAccountsOrchestrator />);
+
+		expect(screen.getByLabelText('Délier Google')).toBeTruthy();
+		expect(screen.queryByTestId('google-button-slot')).toBeNull();
 	});
 });

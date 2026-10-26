@@ -7,7 +7,7 @@ Code: `backend/src/features/auth/`, `backend/src/features/profile/`; mobile `src
 ## Sign-up and sign-in
 
 - **Email and password**: `POST /api/auth/register` creates the account and mails a 6-digit code; `POST /api/auth/verify-email` checks it and returns the first session. Login (`POST /api/auth/login`) is refused until the email is verified. `POST /api/auth/resend-verification` sends a new code, only to the account's own email (#188).
-- **Google and Facebook**: the app runs the native sign-in (Google Sign-In, Facebook SDK) and sends the provider token to `POST /api/auth/google` or `/facebook`. The backend verifies the token itself and creates or finds the account through Supabase's admin API (`oauth.service.ts`); it does not use Supabase's OAuth flow.
+- **Google and Facebook**: the app runs the native sign-in (Google Sign-In, Facebook SDK; in the browser, their JavaScript SDKs, see [below](#google-and-facebook-in-the-browser)) and sends the provider token to `POST /api/auth/google` or `/facebook`. The backend verifies the token itself and creates or finds the account through Supabase's admin API (`oauth.service.ts`); it does not use Supabase's OAuth flow.
 - **Sessions**: the backend issues Supabase Auth tokens. The app keeps them in `authStore`, persisted in AsyncStorage, and refreshes them through `POST /api/auth/refresh`. A refresh refused by Supabase (401) ends the session; Supabase being unreachable (503) keeps it, so an outage does not sign anyone out (#126).
 - **Logout** revokes the session server-side: the access token goes to a Redis revocation list until it expires and the refresh token is invalidated (`POST /api/auth/logout`). The app always clears its session locally and closes its socket, even if the call fails (#70).
 - **The app holds no Supabase client** (#376): every auth call goes through the backend, which logs it with the device headers (subject IV.6).
@@ -24,6 +24,23 @@ A signed-in user links Google or Facebook from the "Linked accounts" screen (`fe
 - `POST /api/auth/providers/:provider/link` with the provider token stores `google_id` or `facebook_id` on the current user; an id already linked to another account is refused.
 - `GET /api/auth/providers` lists the sign-in methods; `DELETE /api/auth/providers/:provider` unlinks one. Unlinking the last method is refused.
 - `has_password` records whether email and password sign-in exists; it was backfilled to false for Google/Facebook sign-ups made before it existed (migration 019, #196).
+
+## Google and Facebook in the browser
+
+The web app (epic #474) signs in, signs up and links accounts with the same endpoints and the same tokens as the native app (#520); the backend sees no difference. The two SDKs are third-party scripts, loaded only by the screens that offer them (sign-in, sign-up, linked accounts) through `useProviderButtons.web.ts` and `features/auth/utils/loadScript.ts`.
+
+- **Google**: Google Identity Services (`googleSignIn.web.ts`) with the client `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`, the one the native app already uses, so the ID token has the audience the backend checks (`GOOGLE_CLIENT_ID`). The screen shows Google's own rendered button in place of the app's, in popup mode: it is the GIS entry point that returns an ID token every time. One Tap (`google.accounts.id.prompt`, FedCM in Chrome) is not used: once dismissed, the browser holds it back for hours, and it shows nothing in a browser signed out of Google. The button's callback stores the credential and starts the usual sign-in or link, whose `signInWithGoogle()` hands that credential over once. Closing Google's popup calls nothing back, so no error shows. If the script cannot load (content blocker, offline) or the client ID is missing, the app's own button comes back, and pressing it shows the reason.
+- **Facebook**: the JavaScript SDK (`facebookSignIn.web.ts`): `FB.init` with `EXPO_PUBLIC_FACEBOOK_APP_ID` and the Graph API version the backend calls, then `FB.login` for `public_profile,email`, which returns the access token. The SDK is preloaded when the screen mounts: `FB.login` opens a popup, which the browser blocks unless it opens right after the click. A closed popup or declined permissions reject with `SIGN_IN_CANCELLED`, as on Android, so no error shows. Facebook accepts a JavaScript SDK login only over HTTPS, `localhost` excepted.
+
+### Console setup (by hand, once per origin)
+
+No new environment variable, in the backend or the app. Each origin the web app is served from (`http://localhost:8081` in development, `https://elnop.github.io` on GitHub Pages) is declared in both consoles:
+
+1. **Google Cloud console**, APIs & Services → Credentials → the OAuth 2.0 client of type *Web application* whose ID is `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` → *Authorized JavaScript origins*: add `http://localhost`, `http://localhost:8081` and `https://elnop.github.io` (origins only: no path, no trailing slash; Google asks for both `localhost` entries when testing on a port). No redirect URI: the popup mode needs none. The change can take a few minutes to apply.
+2. **Meta for Developers**, app `EXPO_PUBLIC_FACEBOOK_APP_ID`:
+   - Settings → Basic → *App domains*: `elnop.github.io` and `localhost`; *Add platform* → *Website*, *Site URL* `https://elnop.github.io/`.
+   - Facebook Login → Settings: *Login with the JavaScript SDK* on; *Allowed Domains for the JavaScript SDK*: `https://elnop.github.io/` and `http://localhost:8081/`.
+   - While the app is in development mode, only its administrators, developers and testers can log in.
 
 ## Profile and privacy
 

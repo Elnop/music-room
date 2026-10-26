@@ -3,14 +3,22 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
+import type { GoogleButtonSlot } from '@/features/auth/types';
 
 interface SocialSignInButtonsProps {
 	onGoogle: () => void;
 	onFacebook: () => void;
 	disabled: boolean;
+	/** Web: Google's own button replaces ours. */
+	googleButton?: GoogleButtonSlot;
 }
 
-export function SocialSignInButtons({ onGoogle, onFacebook, disabled }: SocialSignInButtonsProps) {
+export function SocialSignInButtons({
+	onGoogle,
+	onFacebook,
+	disabled,
+	googleButton,
+}: SocialSignInButtonsProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
@@ -22,15 +30,23 @@ export function SocialSignInButtons({ onGoogle, onFacebook, disabled }: SocialSi
 				<View style={styles.dividerLine} />
 			</View>
 
-			<Pressable
-				style={styles.googleButton}
-				onPress={onGoogle}
-				disabled={disabled}
-				accessibilityLabel="Continuer avec Google"
-			>
-				<Text style={styles.googleIcon}>G</Text>
-				<Text style={styles.googleButtonText}>Continuer avec Google</Text>
-			</Pressable>
+			{googleButton ? (
+				<View
+					ref={googleButton}
+					style={[styles.googleSlot, disabled && styles.slotDisabled]}
+					testID="google-button-slot"
+				/>
+			) : (
+				<Pressable
+					style={styles.googleButton}
+					onPress={onGoogle}
+					disabled={disabled}
+					accessibilityLabel="Continuer avec Google"
+				>
+					<Text style={styles.googleIcon}>G</Text>
+					<Text style={styles.googleButtonText}>Continuer avec Google</Text>
+				</Pressable>
+			)}
 
 			<Pressable
 				style={styles.facebookButton}
@@ -71,6 +87,14 @@ const createStyles = (theme: Theme) =>
 			paddingVertical: 12,
 			borderWidth: 1,
 			borderColor: theme.colors.googleBorder,
+		},
+		googleSlot: {
+			alignItems: 'center',
+			minHeight: 44,
+		},
+		slotDisabled: {
+			opacity: 0.5,
+			pointerEvents: 'none',
 		},
 		googleIcon: {
 			fontSize: 20,
