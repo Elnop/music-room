@@ -10,14 +10,17 @@ import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { EventDetailScreen } from '@/features/events/detail/hooks/useEventDetailScreen';
 import { formatEventDate, isOngoing } from '@/features/events/utils/eventDates';
 import { createEventScreenStyles } from '@/features/events/form/components/presenters/eventScreenStyles';
+import type { BeaconBroadcast } from '@/features/events/detail/hooks/useBeaconBroadcast';
+import { BeaconCard } from './BeaconCard';
 import { InfoRow } from './InfoRow';
 
 interface EventDetailViewProps {
 	screen: EventDetailScreen;
+	beacon: BeaconBroadcast;
 	bottomPadding: number;
 }
 
-export function EventDetailView({ screen, bottomPadding }: EventDetailViewProps) {
+export function EventDetailView({ screen, beacon, bottomPadding }: EventDetailViewProps) {
 	const { styles: page } = useThemedStyles(createEventScreenStyles);
 	const { styles } = useThemedStyles(createStyles);
 	const { event } = screen;
@@ -72,6 +75,7 @@ export function EventDetailView({ screen, bottomPadding }: EventDetailViewProps)
 
 			{screen.isOrganizer && (
 				<View style={styles.actions}>
+					<BeaconCard beacon={beacon} />
 					<Button title="Modifier" onPress={screen.edit} variant="outline" fullWidth />
 					<Button
 						title="Supprimer"

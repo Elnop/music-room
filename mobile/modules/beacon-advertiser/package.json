@@ -1,0 +1,6 @@
+{
+  "name": "beacon-advertiser",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Broadcasts a BLE advertisement with the manufacturer data the app builds (Android); the iBeacon frame is built in TypeScript."
+}
