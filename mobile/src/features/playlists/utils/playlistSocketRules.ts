@@ -10,12 +10,13 @@ import type {
 } from '@/features/playlists/types';
 import { applyPlaylistEvent } from './playlistSync';
 
-/** Explicit fields: an absent description means it was cleared. */
+/** Explicit fields: an absent description or cover means it was cleared. */
 const detailsPatch = (details: PlaylistDetailsEvent) => ({
 	name: details.name,
 	description: details.description,
 	visibility: details.visibility,
 	editMode: details.editMode,
+	coverUrl: details.coverUrl,
 });
 
 function applyTracksAvailability(
