@@ -12,6 +12,8 @@ import { mockFetchRoutes } from '@/test/fetchRoutes';
 import { fail, ok } from '@/test/fetchResponses';
 import { signIn } from '@/test/session';
 import { musicEvent } from '@/test/eventFixtures';
+import { startEventBeacon, stopEventBeacon } from '@/features/events/services/beaconAdvertiser';
+import { useBeaconStore } from '@/features/events/stores/beaconStore';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -21,6 +23,10 @@ jest.mock('@/shared/theme/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
+jest.mock('@/features/events/services/beaconAdvertiser', () => ({
+	startEventBeacon: jest.fn(() => Promise.resolve()),
+	stopEventBeacon: jest.fn(),
+}));
 jest.mock('@/shared/utils/toast', () => ({
 	showSuccess: jest.fn(),
 	showError: jest.fn(),
@@ -60,6 +66,7 @@ beforeEach(async () => {
 });
 
 afterEach(() => {
+	useBeaconStore.getState().stop();
 	clear();
 	jest.restoreAllMocks();
 });
@@ -101,6 +108,36 @@ describe('EventDetailOrchestrator', () => {
 		await waitFor(() => expect(navigation.goBack).toHaveBeenCalled());
 		expect(showSuccess).toHaveBeenCalledWith('Événement supprimé');
 		expect(routes.calls()).toContain('DELETE /api/events/e1');
+	});
+
+	it("lets the organiser broadcast the event's beacon and stop it", async () => {
+		routes.routes['GET /api/events/e1'] = ok({
+			event: musicEvent({ organizer: { id: 'me', username: 'me' } }),
+		});
+		await renderDetail();
+		const toggle = () => screen.getByLabelText('Diffuser la balise');
+
+		await act(async () => fireEvent(toggle(), 'valueChange', true));
+		expect(startEventBeacon).toHaveBeenCalledWith(42);
+		expect(screen.getByText(/Les téléphones proches voient votre événement/)).toBeTruthy();
+
+		await act(async () => fireEvent(toggle(), 'valueChange', false));
+		expect(stopEventBeacon).toHaveBeenCalled();
+		expect(useBeaconStore.getState().status).toBe('idle');
+	});
+
+	it('offers the beacon only while the event is on', async () => {
+		const later = (hours: number) => new Date(Date.now() + hours * 3_600_000).toISOString();
+		routes.routes['GET /api/events/e1'] = ok({
+			event: musicEvent({
+				organizer: { id: 'me', username: 'me' },
+				startsAt: later(1),
+				endsAt: later(2),
+			}),
+		});
+		await renderDetail();
+		expect(screen.getByText("Disponible pendant l'événement")).toBeTruthy();
+		expect(screen.getByLabelText('Diffuser la balise').props.disabled).toBe(true);
 	});
 
 	it('leaves an event deleted elsewhere', async () => {

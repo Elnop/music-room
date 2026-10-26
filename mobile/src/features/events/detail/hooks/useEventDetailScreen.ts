@@ -8,6 +8,7 @@ import { logger } from '@/shared/utils/logger';
 import { showError, showInfo, showSuccess } from '@/shared/utils/toast';
 import { useEvent } from '@/features/events/hooks/useEventQueries';
 import { useDeleteEvent } from '@/features/events/hooks/useEventMutations';
+import { useBeaconStore } from '@/features/events/stores/beaconStore';
 import type { EventStackParamList, MusicEvent } from '@/features/events/types';
 
 type Navigation = NativeStackNavigationProp<EventStackParamList, 'EventDetail'>;
@@ -42,6 +43,7 @@ export function useEventDetailScreen(navigation: Navigation, id: string): EventD
 		deletingRef.current = true;
 		try {
 			await deleteEvent.mutateAsync(id);
+			if (useBeaconStore.getState().eventId === id) useBeaconStore.getState().stop();
 			showSuccess('Événement supprimé');
 			navigation.goBack();
 		} catch (error) {
