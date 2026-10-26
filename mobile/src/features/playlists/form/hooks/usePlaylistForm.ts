@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { useController, useForm, type Control } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { queryKeys } from '@/shared/query/keys';
+import { useCappedField, type CappedField } from '@/shared/hooks/useCappedField';
 import { useSession } from '@/shared/services/authSession';
 import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 import { logger } from '@/shared/utils/logger';
@@ -19,27 +20,6 @@ import type { Playlist, PlaylistStackParamList } from '@/features/playlists/type
 const PLAYLIST_LIMITS = { NAME_MAX: 50, DESCRIPTION_MAX: 500 } as const;
 
 type Navigation = NativeStackNavigationProp<PlaylistStackParamList, 'CreatePlaylist'>;
-
-export interface CappedField {
-	value: string;
-	onChangeText: (text: string) => void;
-	error?: string;
-	max: number;
-}
-
-function useCappedField(
-	control: Control<PlaylistFormInput>,
-	name: keyof PlaylistFormInput,
-	max: number
-): CappedField {
-	const { field, fieldState } = useController({ control, name });
-	return {
-		value: field.value ?? '',
-		onChangeText: text => field.onChange(text.slice(0, max)),
-		error: fieldState.error?.message,
-		max,
-	};
-}
 
 export interface PlaylistForm {
 	isEditing: boolean;

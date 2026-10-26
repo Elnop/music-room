@@ -204,7 +204,11 @@ mobile/src/
 │   │   ├── services/       # musicControlApi
 │   │   └── types.ts
 │   ├── events/             # Physical events near the user (bonus V.2)
-│   │   └── nearby/         # The home's "Événements à proximité" section
+│   │   ├── nearby/         # The home's "Événements à proximité" section, my events, create button
+│   │   ├── detail/ · form/ # Event page (how to get in, genres, linked playlist), create/edit form
+│   │   ├── hooks/          # TanStack queries and mutations, useEventsSync (event:* socket events)
+│   │   ├── services/       # eventsApi
+│   │   └── utils/          # eventCache, eventSocketRules, eventDates, eventLocation (expo-location), pickDateTime
 │   └── search/             # SoundCloud track search (#385)
 │       ├── searchScreen/   # components/{orchestrators,presenters} + hooks/
 │       ├── hooks/          # useSoundCloudSearch (TanStack Query)
@@ -219,7 +223,7 @@ mobile/src/
 - **RootNavigator** switches between `AuthNavigator` and `AppNavigator` depending on the auth state (persisted by `features/auth/stores/authStore.ts`).
 - **AuthNavigator**: Welcome, Login, Register, EmailVerification, ForgotPassword, ResetPassword; each screen is the orchestrator of `features/auth/<subject>/`.
 - **AppNavigator** (tabs):
-  - Home and Playlists mount the same stack (`stacks/PlaylistsStack.tsx`): Home, Playlists, PlaylistDetail, CreatePlaylist, SearchTracks, PlaylistSharing (the orchestrators of `features/playlists/<subject>/`). Home opens on `Home` (`navigation/screens/HomeScreen.tsx`: friends' and public playlists from `playlists/home`, plus the nearby events section of `features/events/`, passed in since features never import each other); Playlists opens on `Playlists` (`playlists/library`: the playlists I own or that are shared with me, and the create button). A `zumik://playlist/<id>` link opens in the Playlists tab.
+  - Home and Playlists mount the same stack (`stacks/PlaylistsStack.tsx`): Home, Playlists, PlaylistDetail, CreatePlaylist, SearchTracks, PlaylistSharing, EventDetail, EventForm (the orchestrators of `features/playlists/<subject>/`). Home opens on `Home` (`navigation/screens/HomeScreen.tsx`: friends' and public playlists from `playlists/home`, plus the nearby events section of `features/events/`, passed in since features never import each other); Playlists opens on `Playlists` (`playlists/library`: the playlists I own or that are shared with me, and the create button). A `zumik://playlist/<id>` link opens in the Playlists tab.
   - Search → Search (the orchestrator of `features/search/searchScreen/components/orchestrators`)
   - Friends → Friends, UserProfile, PlaylistDetail, SearchTracks
   - Profile → Profile, EditProfile, PrivacySettings, MusicPreferences, LinkedAccounts, MyDevices, Settings (the orchestrators of `features/profile/<subject>/` and `features/music-control/myDevices/components/orchestrators`)
@@ -233,6 +237,7 @@ mobile/src/
 - **Playback contract**: playlists start and display playback through `shared/services/playbackBridge.ts`, which `navigation/playbackBridge.ts` wires to `playerStore` and `queueStore` when `AppNavigator` loads; no feature imports the player or the queue.
 - **Audio playback**: expo-audio plays the SoundCloud HLS stream; `PlayerContext` manages the player's lifecycle, `playerStore` its state (current track, play/pause, modal), `MiniPlayer` and `PlayerModal` the display.
 - **Background playback (Android)**: React Native pauses JS timers once the app is in the background, and `fetch` resolves through `setTimeout`, so the next track's requests would wait for the app to come back. The local Expo module `modules/js-keep-alive/` runs a headless JS task while this device plays or loads a track (`features/player/hooks/useBackgroundKeepAlive.ts`), which keeps the timers firing. Native code: reinstall the debug build (`npx expo prebuild --clean -p android`, then `npx expo run:android --app-id com.zumik.app.dev --no-bundler`) after pulling it.
+- **Events and location**: `expo-location` (address to coordinates, current position) and `@react-native-community/datetimepicker` (Android date and time dialogs) are native modules: after pulling them, rebuild the debug build (`npx expo prebuild --clean -p android`, then `npx expo run:android --app-id com.zumik.app.dev --no-bundler`). The location permission is foreground only and asked when a position is needed; Android's geocoder needs it even to place a typed address. The position never leaves the phone: the backend gets the event's coordinates, never the user's.
 - **OAuth**: `features/auth/services/googleSignIn.ts` and `facebookSignIn.ts` (Google Sign-In, Facebook SDK). The token obtained is verified by the backend (`/api/auth/google`, `/api/auth/facebook`). Native modules: like the rest of the app, this needs the debug build, not Expo Go. The OAuth IDs are baked into the build (Facebook's `strings.xml`, the embedded `app.config` that `googleSignIn.ts` reads first): after changing them in `.env`, rebuild the app, or Facebook reports an invalid app ID and Google `DEVELOPER_ERROR`.
 - **Android signing**: `plugins/withDebugKeystore.js` replaces, during `expo prebuild`, the Expo template's debug keystore (shared by every Expo app) with `keystores/debug.keystore`. Its SHA-1 `5D:26:8F:52:F7:A8:2D:71:3A:D9:68:BF:60:6A:79:BB:85:AA:71:C0` is the one to register, with the `com.zumik.app` (release) and `com.zumik.app.dev` (debug) packages, in the Android OAuth clients of the Google Cloud project that holds `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` (one client per package; otherwise Google Sign-In returns `DEVELOPER_ERROR`). The Facebook app (`EXPO_PUBLIC_FACEBOOK_APP_ID`) declares both packages in its Android settings, class `com.zumik.app.MainActivity`, with the same keystore's key hash `XSaPUveoLXE62Wi/YGp5u4WqccA=`.
 

@@ -21,6 +21,7 @@ import { PlayerModal } from '@/features/player/modal/components/orchestrators/Pl
 import { PlayerErrorToast } from '@/features/player/modal/components/orchestrators/PlayerErrorToast';
 import { PlayerProvider } from '@/features/player/context/PlayerProvider';
 import { useQueueSync } from '@/features/queue/hooks/useQueueSync';
+import { useEventsSync } from '@/features/events/hooks/useEventsSync';
 import { useRemoteTarget } from '@/features/queue/hooks/useRemoteTarget';
 import { useConnectionStatus } from '@/shared/hooks/useConnectionStatus';
 import { ConnectionBanner } from '@/shared/components/feedback/ConnectionBanner';
@@ -60,6 +61,7 @@ export function AppNavigator() {
 	const insets = useSafeAreaInsets();
 	const styles = React.useMemo(() => createStyles(theme, insets.bottom), [theme, insets.bottom]);
 	useQueueSync();
+	useEventsSync();
 	useRemoteTarget();
 	const connectionStatus = useConnectionStatus();
 	// While the banner covers the status bar, the screens below it must not add

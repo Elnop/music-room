@@ -48,6 +48,15 @@ export const queryKeys = {
 		all: ['subscription'] as const,
 		plan: () => [...queryKeys.subscription.all, 'plan'] as const,
 	},
+	events: {
+		all: ['events'] as const,
+		/** Ongoing and upcoming events. */
+		list: () => [...queryKeys.events.all, 'list'] as const,
+		detail: (eventId: string) => [...queryKeys.events.all, 'detail', eventId] as const,
+		/** The public playlists of mine an event can link to. */
+		playlistChoices: (userId: string) =>
+			[...queryKeys.events.all, 'playlistChoices', userId] as const,
+	},
 	search: {
 		all: ['search'] as const,
 		tracks: (query: string) => [...queryKeys.search.all, 'tracks', query] as const,
