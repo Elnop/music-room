@@ -1,10 +1,10 @@
 import React from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { CappedInput } from '@/shared/components/form/CappedInput';
 import { Button } from '@/shared/components/ui/Button';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { PlaylistForm } from '@/features/playlists/form/hooks/usePlaylistForm';
-import { CappedInput } from './CappedInput';
 import { ToggleCard } from './ToggleCard';
 
 interface PlaylistFormViewProps {

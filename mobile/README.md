@@ -159,7 +159,7 @@ mobile/src/
 │   ├── constants/app.ts    # API config, spacing
 │   └── utils/              # logger, toast, haptics, apiErrorMessage, debounce, moveTarget, shareLinks...
 ├── providers/              # AppProviders: gestures, ErrorBoundary, QueryClient, theme, safe area
-├── navigation/             # RootNavigator, AuthNavigator, AppNavigator (tabs) + stacks/
+├── navigation/             # RootNavigator, AuthNavigator, AppNavigator (tabs) + stacks/ + screens/ (screens composing several features)
 ├── features/               # One feature per folder (#378–#385)
 │   ├── auth/               # Sign-in, sign-up, email code, forgotten password, linked accounts
 │   │   ├── <subject>/      # welcome, login, register, emailVerification, forgotPassword, resetPassword,
@@ -169,8 +169,8 @@ mobile/src/
 │   │   ├── stores/         # authStore (session) and its actions
 │   │   ├── utils/          # codeDigits, passwordRules
 │   │   └── types.ts · validators.ts
-│   ├── playlists/          # Lists, detail, create/edit, adding tracks, visibility and rights
-│   │   ├── <subject>/      # list, detail, form, searchTracks, sharing, trackActions, actionSheet, header
+│   ├── playlists/          # Home, my playlists, detail, create/edit, adding tracks, visibility and rights
+│   │   ├── <subject>/      # home, library, detail, form, searchTracks, sharing, trackActions, actionSheet, header
 │   │   ├── hooks/          # TanStack queries and mutations, Socket.io room (usePlaylistRoom)
 │   │   ├── services/       # playlistApi, tracksApi, membersApi, usersApi, trackSearchApi
 │   │   ├── stores/         # pendingMovesStore (moves in flight)
@@ -203,6 +203,13 @@ mobile/src/
 │   │   ├── hooks/          # useMusicControl, useFriendListening, useControllableDevices...
 │   │   ├── services/       # musicControlApi
 │   │   └── types.ts
+│   ├── events/             # Physical events near the user (bonus V.2)
+│   │   ├── nearby/         # The home's "Événements à proximité" section, my events, create button
+│   │   ├── detail/ · form/ # Event page (how to get in, genres, linked playlist), create/edit form
+│   │   ├── hooks/          # TanStack queries and mutations, useEventsSync (event:* socket events)
+│   │   ├── services/       # eventsApi, beaconAdvertiser (native module wrapper), beaconScanner (react-native-ble-plx)
+│   │   ├── stores/         # beaconStore (the beacon this phone broadcasts)
+│   │   └── utils/          # eventCache, eventSocketRules, eventDates, eventLocation (expo-location), pickDateTime, geo, nearbyEvents, ibeacon, beaconDistance, base64
 │   └── search/             # SoundCloud track search (#385)
 │       ├── searchScreen/   # components/{orchestrators,presenters} + hooks/
 │       ├── hooks/          # useSoundCloudSearch (TanStack Query)
@@ -217,7 +224,7 @@ mobile/src/
 - **RootNavigator** switches between `AuthNavigator` and `AppNavigator` depending on the auth state (persisted by `features/auth/stores/authStore.ts`).
 - **AuthNavigator**: Welcome, Login, Register, EmailVerification, ForgotPassword, ResetPassword; each screen is the orchestrator of `features/auth/<subject>/`.
 - **AppNavigator** (tabs):
-  - Playlists → Playlists, PlaylistDetail, CreatePlaylist, SearchTracks, PlaylistSharing (the orchestrators of `features/playlists/<subject>/`)
+  - Home and Playlists mount the same stack (`stacks/PlaylistsStack.tsx`): Home, Playlists, PlaylistDetail, CreatePlaylist, SearchTracks, PlaylistSharing, EventDetail, EventForm (the orchestrators of `features/playlists/<subject>/`). Home opens on `Home` (`navigation/screens/HomeScreen.tsx`: friends' and public playlists from `playlists/home`, plus the nearby events section of `features/events/`, passed in since features never import each other); Playlists opens on `Playlists` (`playlists/library`: the playlists I own or that are shared with me, and the create button). A `zumik://playlist/<id>` link opens in the Playlists tab.
   - Search → Search (the orchestrator of `features/search/searchScreen/components/orchestrators`)
   - Friends → Friends, UserProfile, PlaylistDetail, SearchTracks
   - Profile → Profile, EditProfile, PrivacySettings, MusicPreferences, LinkedAccounts, MyDevices, Settings (the orchestrators of `features/profile/<subject>/` and `features/music-control/myDevices/components/orchestrators`)
@@ -231,6 +238,9 @@ mobile/src/
 - **Playback contract**: playlists start and display playback through `shared/services/playbackBridge.ts`, which `navigation/playbackBridge.ts` wires to `playerStore` and `queueStore` when `AppNavigator` loads; no feature imports the player or the queue.
 - **Audio playback**: expo-audio plays the SoundCloud HLS stream; `PlayerContext` manages the player's lifecycle, `playerStore` its state (current track, play/pause, modal), `MiniPlayer` and `PlayerModal` the display.
 - **Background playback (Android)**: React Native pauses JS timers once the app is in the background, and `fetch` resolves through `setTimeout`, so the next track's requests would wait for the app to come back. The local Expo module `modules/js-keep-alive/` runs a headless JS task while this device plays or loads a track (`features/player/hooks/useBackgroundKeepAlive.ts`), which keeps the timers firing. Native code: reinstall the debug build (`npx expo prebuild --clean -p android`, then `npx expo run:android --app-id com.zumik.app.dev --no-bundler`) after pulling it.
+- **Events and location**: `expo-location` (address to coordinates, current position) and `@react-native-community/datetimepicker` (Android date and time dialogs) are native modules: after pulling them, rebuild the debug build (`npx expo prebuild --clean -p android`, then `npx expo run:android --app-id com.zumik.app.dev --no-bundler`). The location permission is foreground only and asked when a position is needed; Android's geocoder needs it even to place a typed address. The position never leaves the phone: the backend gets the event's coordinates, never the user's.
+- **Beacon broadcast (Android)**: the organiser of an ongoing event can broadcast its iBeacon frame from the event page (`features/events/stores/beaconStore.ts`, which stops it when the event ends). The frame is built in `features/events/utils/ibeacon.ts`; the local Expo module `modules/beacon-advertiser/` only advertises those bytes with `BluetoothLeAdvertiser` and declares `BLUETOOTH_ADVERTISE` (asked at activation, Android 12+). Native code: rebuild the debug build after pulling it.
+- **Beacon scan (Android)**: while the home is shown and the app in the foreground, `react-native-ble-plx` reports BLE advertisements (`features/events/services/beaconScanner.ts`); the project decodes the iBeacon frame (`utils/ibeacon.ts`), keeps Zumik's UUID only, matches the minor with `beaconMinor`, estimates the distance from the RSSI (log-distance model, smoothed, `utils/beaconDistance.ts`) and merges with the GPS (`utils/nearbyEvents.ts`: a beacon wins and shows « Tout près »). A beacon unheard for 8 s is dropped. `BLUETOOTH_SCAN` is declared **without** `neverForLocation`: with it, Android filters iBeacon frames out of the results; the scan therefore also needs the location permission and the location setting on. Native code: rebuild the debug build after pulling it.
 - **OAuth**: `features/auth/services/googleSignIn.ts` and `facebookSignIn.ts` (Google Sign-In, Facebook SDK). The token obtained is verified by the backend (`/api/auth/google`, `/api/auth/facebook`). Native modules: like the rest of the app, this needs the debug build, not Expo Go. The OAuth IDs are baked into the build (Facebook's `strings.xml`, the embedded `app.config` that `googleSignIn.ts` reads first): after changing them in `.env`, rebuild the app, or Facebook reports an invalid app ID and Google `DEVELOPER_ERROR`.
 - **Android signing**: `plugins/withDebugKeystore.js` replaces, during `expo prebuild`, the Expo template's debug keystore (shared by every Expo app) with `keystores/debug.keystore`. Its SHA-1 `5D:26:8F:52:F7:A8:2D:71:3A:D9:68:BF:60:6A:79:BB:85:AA:71:C0` is the one to register, with the `com.zumik.app` (release) and `com.zumik.app.dev` (debug) packages, in the Android OAuth clients of the Google Cloud project that holds `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` (one client per package; otherwise Google Sign-In returns `DEVELOPER_ERROR`). The Facebook app (`EXPO_PUBLIC_FACEBOOK_APP_ID`) declares both packages in its Android settings, class `com.zumik.app.MainActivity`, with the same keystore's key hash `XSaPUveoLXE62Wi/YGp5u4WqccA=`.
 

@@ -86,6 +86,18 @@ module.exports = {
 					microphonePermission: false,
 				},
 			],
+			[
+				'expo-location',
+				{
+					locationWhenInUsePermission:
+						'Zumik utilise votre position pour situer vos événements et trouver ceux qui sont proches. Elle ne quitte jamais votre téléphone.',
+					isAndroidBackgroundLocationEnabled: false,
+					isAndroidForegroundServiceEnabled: false,
+				},
+			],
+			'@react-native-community/datetimepicker',
+			// No neverForLocation: Android then filters iBeacon frames out of the scan results.
+			['react-native-ble-plx', { isBackgroundEnabled: false, neverForLocation: false }],
 			'./plugins/withDebugKeystore.js',
 			'./plugins/withDevVariant.js',
 			'./plugins/withMedia3Version.js',
