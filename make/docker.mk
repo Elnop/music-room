@@ -3,7 +3,7 @@
 # ==============================================================================
 # Commands for Docker-based development environment
 
-.PHONY: dev-docker start stop containers-restart down logs logs-backend logs-mobile logs-supabase ps build build-backend build-mobile
+.PHONY: dev-docker dev-web start stop containers-restart down logs logs-backend logs-mobile logs-supabase ps build build-backend build-mobile
 
 dev-docker: ## Start all services in Docker containers (backend + mobile)
 	$(call print_header,Starting Zumik Development Environment)
@@ -22,6 +22,21 @@ dev-docker: ## Start all services in Docker containers (backend + mobile)
 	$(call display_common_commands,lan)
 	$(call blank_line)
 	$(call print_success,Ready! Open the Zumik debug build (make open-app on an emulator))
+	$(call blank_line)
+
+dev-web: DEV_API_URL := $(WEB_API_URL)
+dev-web: DEV_WS_URL := $(WEB_WS_URL)
+dev-web: ## Start the backend in Docker and the web app on http://localhost:8081
+	$(call print_header,Starting the Zumik Web App)
+	$(SUPABASE_UP_IF_LOCAL)
+	@$(call start_redis)
+	@$(call start_backend)
+	@$(call start_mobile_web)
+	$(call wait_for,Expo,$(EXPO_WAIT_TIME))
+	$(call print_service,Backend API,$(BACKEND_URL))
+	$(call print_service,Web app,$(METRO_URL))
+	$(call blank_line)
+	$(call print_success,Ready! Open $(METRO_URL) in Chrome or Firefox (make dev-docker brings Metro back for the debug build))
 	$(call blank_line)
 
 start: ## Start existing containers (without rebuild)

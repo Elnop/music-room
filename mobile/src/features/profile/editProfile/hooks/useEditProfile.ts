@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
-import { Alert, type AlertButton } from 'react-native';
+import type { AlertButton } from 'react-native';
+import { showAlert } from '@/shared/utils/alert';
 import { useNavigation } from '@react-navigation/native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -36,7 +37,7 @@ export function useEditProfile() {
 			});
 		}
 		buttons.push({ text: 'Annuler', style: 'cancel' });
-		Alert.alert('Photo de profil', 'Choisissez une nouvelle photo.', buttons);
+		showAlert('Photo de profil', 'Choisissez une nouvelle photo.', buttons);
 	}, [pickAndUpload, remove, user?.avatarUrl]);
 
 	const {

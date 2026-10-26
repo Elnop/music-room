@@ -1,4 +1,5 @@
 import { apiRequest } from '@/shared/services/api';
+import { jpegFormData } from '@/shared/utils/jpegFormData';
 import type { CoverResponse, Playlist, PlaylistWithTracks } from '@/features/playlists/types';
 import type { PlaylistInput } from '@/features/playlists/validators';
 
@@ -52,8 +53,7 @@ export async function deletePlaylist(id: string): Promise<void> {
 
 /** Premium only: a free plan gets 403 PREMIUM_REQUIRED. `uri` is a local JPEG. */
 export async function uploadCover(id: string, uri: string): Promise<CoverResponse> {
-	const form = new FormData();
-	form.append('cover', { uri, name: 'cover.jpg', type: 'image/jpeg' } as unknown as Blob);
+	const form = await jpegFormData('cover', uri, 'cover.jpg');
 	return apiRequest<CoverResponse>(`/api/playlists/${id}/cover`, { method: 'PUT', body: form });
 }
 
