@@ -86,6 +86,16 @@ module.exports = {
 					microphonePermission: false,
 				},
 			],
+			[
+				'expo-location',
+				{
+					locationWhenInUsePermission:
+						'Zumik utilise votre position pour situer vos événements et trouver ceux qui sont proches. Elle ne quitte jamais votre téléphone.',
+					isAndroidBackgroundLocationEnabled: false,
+					isAndroidForegroundServiceEnabled: false,
+				},
+			],
+			'@react-native-community/datetimepicker',
 			'./plugins/withDebugKeystore.js',
 			'./plugins/withDevVariant.js',
 			'./plugins/withMedia3Version.js',

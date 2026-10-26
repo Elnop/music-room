@@ -1,9 +1,9 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, type TextInputProps } from 'react-native';
 import { Input } from '@/shared/components/ui/Input';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
-import type { CappedField } from '@/features/playlists/form/hooks/usePlaylistForm';
+import type { CappedField } from '@/shared/hooks/useCappedField';
 
 interface CappedInputProps {
 	field: CappedField;
@@ -11,9 +11,17 @@ interface CappedInputProps {
 	placeholder: string;
 	autoFocus?: boolean;
 	multiline?: boolean;
+	keyboardType?: TextInputProps['keyboardType'];
 }
 
-export function CappedInput({ field, label, placeholder, autoFocus, multiline }: CappedInputProps) {
+export function CappedInput({
+	field,
+	label,
+	placeholder,
+	autoFocus,
+	multiline,
+	keyboardType,
+}: CappedInputProps) {
 	const { styles } = useThemedStyles(createStyles);
 
 	return (
@@ -28,6 +36,7 @@ export function CappedInput({ field, label, placeholder, autoFocus, multiline }:
 				multiline={multiline}
 				numberOfLines={multiline ? 3 : undefined}
 				maxLength={field.max}
+				keyboardType={keyboardType}
 			/>
 			<Text style={styles.count}>
 				{field.value.length}/{field.max}
