@@ -3,7 +3,6 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ProfileNavigationItem } from '@/features/profile/profileScreen/components/presenters/ProfileNavigationItem';
 import { Pressable } from '@/shared/components/ui/Pressable';
-import { SOCIAL_SIGN_IN_AVAILABLE } from '@/shared/constants/platform';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 
@@ -34,14 +33,12 @@ export function ProfileMenuItems({
 				onPress={onPrivacySettings}
 			/>
 
-			{SOCIAL_SIGN_IN_AVAILABLE && (
-				<ProfileNavigationItem
-					title="Comptes liés"
-					subtitle="Ajoutez ou retirez la connexion Google et Facebook"
-					icon="link"
-					onPress={onLinkedAccounts}
-				/>
-			)}
+			<ProfileNavigationItem
+				title="Comptes liés"
+				subtitle="Ajoutez ou retirez la connexion Google et Facebook"
+				icon="link"
+				onPress={onLinkedAccounts}
+			/>
 
 			<ProfileNavigationItem
 				title="Mes appareils"
