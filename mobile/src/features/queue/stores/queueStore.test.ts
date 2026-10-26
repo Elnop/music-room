@@ -137,7 +137,6 @@ resetMockPlayer();
 
 registerPlaybackBridge({
 	usePlaylistPlayback: () => ({ playingUri: null, state: null }),
-	usePlayerHeight: () => 0,
 	useActiveQueue: () => EMPTY_QUEUE,
 	addToQueue: jest.fn(),
 	playNext: jest.fn(),

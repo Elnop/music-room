@@ -35,7 +35,6 @@ interface PlaybackEmitterSnapshot {
 
 interface PlaybackBridge {
 	usePlaylistPlayback: (playlistId: string) => PlaylistPlayback;
-	usePlayerHeight: () => number;
 	useActiveQueue: () => OwnerQueue;
 	usePlaybackEmitterState?: () => PlaybackEmitterSnapshot;
 	addToQueue: (track: AddQueueItemBody) => Promise<boolean>;
@@ -58,7 +57,6 @@ const unavailable = () => Promise.reject(new Error(NOT_REGISTERED));
 
 const unregistered: PlaybackBridge = {
 	usePlaylistPlayback: () => ({ playingUri: null, state: null }),
-	usePlayerHeight: () => 0,
 	useActiveQueue: () => EMPTY_QUEUE,
 	usePlaybackEmitterState: () => ({ currentTrack: null, isPlaying: false, seekCount: 0 }),
 	addToQueue: unavailable,
@@ -92,10 +90,6 @@ export function getPlayback(): PlaybackBridge {
 
 export function usePlaylistPlayback(playlistId: string): PlaylistPlayback {
 	return getPlayback().usePlaylistPlayback(playlistId);
-}
-
-export function usePlayerHeight(): number {
-	return getPlayback().usePlayerHeight();
 }
 
 export function useActiveQueue(): OwnerQueue {

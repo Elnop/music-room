@@ -65,6 +65,5 @@ describe('registerPlayback', () => {
 		expect(playPlaylist).toHaveBeenCalledWith('p1', 't3');
 		expect(pause).toHaveBeenCalled();
 		expect(resume).toHaveBeenCalled();
-		expect(renderHook(() => playback.usePlayerHeight()).result.current).toBeGreaterThan(0);
 	});
 });

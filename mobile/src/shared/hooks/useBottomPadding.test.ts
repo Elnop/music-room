@@ -7,20 +7,9 @@ jest.mock('@/shared/theme/ThemeContext', () => {
 	return { useTheme: () => ({ theme }) };
 });
 
-const mockPlayerHeight = jest.fn(() => 75);
-jest.mock('@/shared/services/playbackBridge', () => ({
-	usePlayerHeight: () => mockPlayerHeight(),
-}));
-
 describe('useBottomPadding', () => {
-	it('adds a margin above the mini-player height', () => {
+	it('is only a margin: the screens already end above the mini-player', () => {
 		const { result } = renderHook(() => useBottomPadding());
-		expect(result.current).toBe(75 + originalTheme.spacing.xl);
-	});
-
-	it('follows a taller mini-player', () => {
-		mockPlayerHeight.mockReturnValue(120);
-		const { result } = renderHook(() => useBottomPadding());
-		expect(result.current).toBe(120 + originalTheme.spacing.xl);
+		expect(result.current).toBe(originalTheme.spacing.xl);
 	});
 });
