@@ -1,21 +1,8 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { royalBlueTheme } from './royalBlue.theme';
-import { christmasTheme } from './christmas.theme';
-import { pastelLimeTheme } from './pastelLime.theme';
+import React, { createContext, useContext } from 'react';
 import { originalTheme } from './original.theme';
-import type { ThemeName, ThemeContextValue } from './types';
-import type { Theme } from './types';
-import { logger } from '@/shared/utils/logger';
+import type { ThemeContextValue } from './types';
 
-const THEME_STORAGE_KEY = '@zumik/theme_preference';
-
-const THEMES: Record<ThemeName, Theme> = {
-	royalBlue: royalBlueTheme,
-	christmas: christmasTheme,
-	pastelLime: pastelLimeTheme,
-	original: originalTheme,
-};
+const VALUE: ThemeContextValue = { theme: originalTheme };
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
@@ -24,46 +11,7 @@ interface ThemeProviderProps {
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-	const [themeName, setThemeName] = useState<ThemeName>('original');
-	const [isLoaded, setIsLoaded] = useState(false);
-
-	useEffect(() => {
-		if (isLoaded) return;
-
-		const loadTheme = async () => {
-			try {
-				const savedTheme = await AsyncStorage.getItem(THEME_STORAGE_KEY);
-				if (savedTheme && savedTheme in THEMES) {
-					setThemeName(savedTheme as ThemeName);
-				}
-			} catch (error) {
-				logger.warn('Failed to load theme:', error);
-			} finally {
-				setIsLoaded(true);
-			}
-		};
-
-		void loadTheme();
-	}, [isLoaded, setThemeName, setIsLoaded]);
-
-	const setTheme = async (name: ThemeName) => {
-		try {
-			setThemeName(name);
-			await AsyncStorage.setItem(THEME_STORAGE_KEY, name);
-		} catch (error) {
-			logger.warn('Failed to save theme:', error);
-		}
-	};
-
-	const theme = THEMES[themeName];
-
-	const value: ThemeContextValue = {
-		theme,
-		themeName,
-		setTheme,
-	};
-
-	return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+	return <ThemeContext.Provider value={VALUE}>{children}</ThemeContext.Provider>;
 }
 
 export function useTheme() {

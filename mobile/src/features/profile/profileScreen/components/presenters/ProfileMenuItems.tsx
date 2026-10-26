@@ -2,8 +2,6 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ProfileNavigationItem } from '@/features/profile/profileScreen/components/presenters/ProfileNavigationItem';
-import { ProfileSection } from '@/features/profile/common/components/presenters/ProfileSection';
-import { ThemeSelector } from '@/shared/components/theme/ThemeSelector';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
@@ -28,10 +26,6 @@ export function ProfileMenuItems({
 
 	return (
 		<>
-			<ProfileSection title="Thème">
-				<ThemeSelector />
-			</ProfileSection>
-
 			<ProfileNavigationItem
 				title="Confidentialité"
 				subtitle="Gérez qui peut voir vos informations"

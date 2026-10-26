@@ -13,19 +13,15 @@ jest.mock('@/shared/theme/ThemeContext', () => {
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-jest.mock('@/shared/components/theme/ThemeSelector', () => ({
-	ThemeSelector: () => null,
-}));
-
 jest.mock('@/shared/components/form/BackendUrlField', () => ({
 	BackendUrlField: () => null,
 }));
 
 describe('SettingsOrchestrator', () => {
-	it('renders theme and server sections', () => {
+	it('renders the server section without a theme picker', () => {
 		render(<SettingsOrchestrator />);
-		expect(screen.getByText('Thème')).toBeTruthy();
 		expect(screen.getByText('Serveur')).toBeTruthy();
+		expect(screen.queryByText('Thème')).toBeNull();
 	});
 
 	it('leaves breathing room under its last section', () => {

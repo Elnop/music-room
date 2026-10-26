@@ -1,7 +1,6 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { BackendUrlField } from '@/shared/components/form/BackendUrlField';
-import { ThemeSelector } from '@/shared/components/theme/ThemeSelector';
 import type { Theme } from '@/shared/theme/types';
 
 interface SettingsViewProps {
@@ -18,11 +17,6 @@ export function SettingsView({ theme, bottomPadding }: SettingsViewProps) {
 			keyboardShouldPersistTaps="handled"
 			contentContainerStyle={{ paddingBottom: bottomPadding }}
 		>
-			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>Thème</Text>
-				<ThemeSelector />
-			</View>
-
 			<View style={styles.section}>
 				<Text style={styles.sectionTitle}>Serveur</Text>
 				<BackendUrlField />
