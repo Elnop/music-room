@@ -10,18 +10,21 @@ import { MusicPreferencesOrchestrator } from '@/features/profile/musicPreference
 import { SettingsOrchestrator } from '@/features/profile/settings/components/orchestrators/SettingsOrchestrator';
 import { MyDevicesOrchestrator } from '@/features/music-control/myDevices/components/orchestrators/MyDevicesOrchestrator';
 import type { ProfileStackParamList } from '@/features/profile/types';
-import { screenLayout } from '@/navigation/screenLayout';
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
+import { screenHeader, screenLayout } from '@/navigation/screenLayout';
 
 const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 const layout = screenLayout(true);
 
 export function ProfileNavigator() {
 	const { theme } = useTheme();
+	const { isWide } = useBreakpoint();
 
 	return (
 		<ProfileStack.Navigator
 			screenLayout={layout}
 			screenOptions={{
+				...(isWide ? { header: screenHeader } : null),
 				headerStyle: {
 					backgroundColor: theme.colors.background,
 				},

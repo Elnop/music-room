@@ -2,6 +2,7 @@
 // reliably (One Tap is throttled after a dismissal), so a sign-in starts from a click on it.
 import Constants from 'expo-constants';
 import { loadScript } from '@/features/auth/utils/loadScript';
+import { GOOGLE_FORM_BUTTON } from '@/features/auth/constants';
 import type { GoogleButtonVariant } from '@/features/auth/types';
 
 const GIS_SCRIPT = 'https://accounts.google.com/gsi/client';
@@ -13,7 +14,7 @@ export interface GoogleButtonTarget {
 
 interface ButtonConfiguration {
 	type: 'standard';
-	theme: 'outline';
+	theme: 'outline' | 'filled_black';
 	size: 'large' | 'medium';
 	text: 'continue_with';
 	shape: 'rectangular';
@@ -73,9 +74,9 @@ async function loadIdentity(): Promise<GoogleIdentity> {
 	return identity;
 }
 
-/** The button takes 200 to 400 pixels. */
 function formWidth(target: GoogleButtonTarget): number {
-	return Math.min(400, Math.max(200, Math.round(target.offsetWidth)));
+	const { minWidth, maxWidth } = GOOGLE_FORM_BUTTON;
+	return Math.min(maxWidth, Math.max(minWidth, Math.round(target.offsetWidth)));
 }
 
 export function configureGoogleSignIn(): void {}
@@ -91,7 +92,7 @@ export async function renderGoogleButton(
 	const form = variant === 'form';
 	identity.renderButton(target, {
 		type: 'standard',
-		theme: 'outline',
+		theme: form ? 'filled_black' : 'outline',
 		size: form ? 'large' : 'medium',
 		text: 'continue_with',
 		shape: 'rectangular',

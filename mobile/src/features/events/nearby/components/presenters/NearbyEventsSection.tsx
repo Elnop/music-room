@@ -4,6 +4,7 @@ import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { RowGrid } from '@/shared/components/lists/RowGrid';
 import { SectionHeader } from '@/shared/components/lists/SectionHeader';
 import { Button } from '@/shared/components/ui/Button';
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { NearbyEvents } from '@/features/events/nearby/hooks/useNearbyEvents';
@@ -18,6 +19,7 @@ const NOTICE_ACTIONS = {
 
 export function NearbyEventsSection({ nearby }: { nearby: NearbyEvents }) {
 	const { styles } = useThemedStyles(createStyles);
+	const { isWide } = useBreakpoint();
 	const action = nearby.notice.action && NOTICE_ACTIONS[nearby.notice.action];
 
 	return (
@@ -59,12 +61,12 @@ export function NearbyEventsSection({ nearby }: { nearby: NearbyEvents }) {
 					</RowGrid>
 				</View>
 			)}
-			<View style={styles.create}>
+			<View style={[styles.create, isWide && styles.createWide]}>
 				<Button
 					title="Créer un événement"
 					variant="outline"
 					onPress={nearby.createEvent}
-					fullWidth
+					fullWidth={!isWide}
 				/>
 			</View>
 		</View>
@@ -81,4 +83,5 @@ const createStyles = (theme: Theme) =>
 			marginTop: theme.spacing.sm,
 		},
 		create: { paddingHorizontal: theme.spacing.md, marginTop: theme.spacing.sm },
+		createWide: { alignItems: 'flex-start' },
 	});
