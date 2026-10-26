@@ -57,3 +57,33 @@ export function eventBeaconFrame(beaconMinor: number): IBeaconFrame {
 		measuredPower: MEASURED_POWER,
 	};
 }
+
+const hex = (bytes: number[]) => bytes.map(byte => byte.toString(16).padStart(2, '0')).join('');
+
+function formatUuid(bytes: number[]): string {
+	const h = hex(bytes);
+	return [h.slice(0, 8), h.slice(8, 12), h.slice(12, 16), h.slice(16, 20), h.slice(20)].join('-');
+}
+
+const toSigned = (byte: number) => (byte > 127 ? byte - 256 : byte);
+
+/** Reads manufacturer data that starts with the company ID (little-endian); null when not an iBeacon. */
+export function parseIBeacon(data: number[]): IBeaconFrame | null {
+	if (data.length < 25) return null;
+	const companyId = data[0] | (data[1] << 8);
+	if (companyId !== APPLE_COMPANY_ID || data[2] !== IBEACON_TYPE || data[3] !== IBEACON_LENGTH) {
+		return null;
+	}
+	return {
+		uuid: formatUuid(data.slice(4, 20)),
+		major: (data[20] << 8) | data[21],
+		minor: (data[22] << 8) | data[23],
+		measuredPower: toSigned(data[24]),
+	};
+}
+
+/** The minor of a Zumik event beacon, or null for any other frame. */
+export function zumikBeaconMinor(frame: IBeaconFrame | null): number | null {
+	if (!frame || frame.uuid !== ZUMIK_BEACON_UUID || frame.major !== ZUMIK_BEACON_MAJOR) return null;
+	return frame.minor;
+}

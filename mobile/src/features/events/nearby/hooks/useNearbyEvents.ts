@@ -7,16 +7,10 @@ import { NEARBY_CLOCK_MS } from '@/features/events/constants';
 import { useEvents } from '@/features/events/hooks/useEventQueries';
 import { useNow } from '@/features/events/hooks/useNow';
 import { useForegroundPosition } from '@/features/events/nearby/hooks/useForegroundPosition';
+import { useBeaconScan, type BeaconScanStatus } from '@/features/events/nearby/hooks/useBeaconScan';
 import { nearbyNotice, type NearbyNotice } from '@/features/events/nearby/utils/nearbyNotice';
-import { nearbyByGps } from '@/features/events/utils/nearbyEvents';
-import { formatDistance } from '@/features/events/utils/geo';
+import { mergeNearby, type NearbyItem } from '@/features/events/utils/nearbyEvents';
 import type { EventStackParamList, MusicEvent } from '@/features/events/types';
-
-export interface NearbyItem {
-	event: MusicEvent;
-	/** "120 m", or "Tout près" for a beacon. */
-	proximity: string;
-}
 
 export interface NearbyEvents {
 	items: NearbyItem[];
@@ -28,6 +22,9 @@ export interface NearbyEvents {
 	createEvent: () => void;
 	requestPermission: () => void;
 	openSettings: () => void;
+	/** Whether Zumik beacons can be heard, besides the GPS. */
+	beaconStatus: BeaconScanStatus;
+	requestBeaconPermission: () => void;
 }
 
 export function useNearbyEvents(): NearbyEvents {
@@ -35,6 +32,7 @@ export function useNearbyEvents(): NearbyEvents {
 	const userId = useSession(session => session.user?.id);
 	const events = useEvents();
 	const position = useForegroundPosition();
+	const beacons = useBeaconScan();
 	const now = useNow(NEARBY_CLOCK_MS);
 
 	useEffect(() => {
@@ -44,14 +42,8 @@ export function useNearbyEvents(): NearbyEvents {
 	const all = events.data;
 	const located = position.state.status === 'located' ? position.state.position : null;
 	const items = useMemo(
-		() =>
-			located && all
-				? nearbyByGps(all, located, now).map(({ event, distance }) => ({
-						event,
-						proximity: formatDistance(distance),
-					}))
-				: [],
-		[all, located, now]
+		() => (all ? mergeNearby(all, beacons.sightings, located, now) : []),
+		[all, beacons.sightings, located, now]
 	);
 
 	return {
@@ -62,5 +54,7 @@ export function useNearbyEvents(): NearbyEvents {
 		createEvent: () => navigation.navigate('EventForm'),
 		requestPermission: position.requestPermission,
 		openSettings: position.openSettings,
+		beaconStatus: beacons.status,
+		requestBeaconPermission: beacons.requestPermission,
 	};
 }
