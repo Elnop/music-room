@@ -8,6 +8,7 @@ import { useNextTrackPrefetch } from '@/features/player/hooks/useNextTrackPrefet
 import { useAudioInterruption } from '@/features/player/hooks/useAudioInterruption';
 import { useBackgroundKeepAlive } from '@/features/player/hooks/useBackgroundKeepAlive';
 import { useAutoplayPrompt } from '@/features/player/hooks/useAutoplayPrompt';
+import { usePlayerVolume } from '@/features/player/hooks/usePlayerVolume';
 import { configureAudioMode } from '@/features/player/services/audioMode';
 import { registerJsKeepAliveTask } from '@/features/player/services/jsKeepAlive';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
@@ -28,6 +29,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 	useAudioInterruption(player);
 	useBackgroundKeepAlive();
 	useAutoplayPrompt(player);
+	usePlayerVolume(player);
 
 	const value = React.useMemo(
 		() => ({ player, seekTo, loading, error }),

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import { QueueSwipe } from './QueueSwipe';
 import { TrackActionsButton } from './TrackActionsButton';
 import type { Theme } from '@/shared/theme/types';
@@ -45,7 +46,8 @@ export function SwipeableTrackItem({
 	unavailable = false,
 }: SwipeableTrackItemProps) {
 	const { theme } = useTheme();
-	const styles = React.useMemo(() => createStyles(theme), [theme]);
+	const separator = useSeparatorColor();
+	const styles = React.useMemo(() => createStyles(theme, separator), [theme, separator]);
 	const actions = unavailable ? undefined : onShowActions;
 
 	const renderRightActions = () => (
@@ -64,65 +66,74 @@ export function SwipeableTrackItem({
 			onAddToQueue={unavailable ? undefined : onAddToQueue}
 			renderRightActions={disabled ? undefined : renderRightActions}
 		>
-			<Pressable
-				onPress={onPress}
-				onLongPress={actions}
-				accessibilityLabel={`${track.title}, ${track.artist}${unavailable ? ', indisponible' : ''}`}
-				accessibilityHint={actions ? 'Appui long pour les actions du titre' : undefined}
-				accessibilityState={{ selected: isCurrent, busy: isPending, disabled: unavailable }}
+			<View
 				style={[
 					styles.trackContainer,
 					isCurrent && styles.trackContainerCurrent,
 					isDragActive && styles.trackContainerActive,
 				]}
 			>
-				{track.albumArt ? (
-					<Image
-						source={{ uri: track.albumArt }}
-						style={[styles.albumArt, unavailable && styles.unavailable]}
-					/>
-				) : (
-					<View
-						style={[styles.albumArt, styles.albumArtPlaceholder, unavailable && styles.unavailable]}
-					>
-						<Ionicons name="musical-notes" size={24} color={theme.colors.textSecondary} />
+				{/* The row's buttons sit beside its pressable area, never in it: the web nests no <button>. */}
+				<Pressable
+					onPress={onPress}
+					onLongPress={actions}
+					accessibilityLabel={`${track.title}, ${track.artist}${unavailable ? ', indisponible' : ''}`}
+					accessibilityHint={actions ? 'Appui long pour les actions du titre' : undefined}
+					accessibilityState={{ selected: isCurrent, busy: isPending, disabled: unavailable }}
+					style={styles.trackPressable}
+				>
+					{track.albumArt ? (
+						<Image
+							source={{ uri: track.albumArt }}
+							style={[styles.albumArt, unavailable && styles.unavailable]}
+						/>
+					) : (
+						<View
+							style={[
+								styles.albumArt,
+								styles.albumArtPlaceholder,
+								unavailable && styles.unavailable,
+							]}
+						>
+							<Ionicons name="musical-notes" size={24} color={theme.colors.textSecondary} />
+						</View>
+					)}
+
+					<View style={[styles.trackInfo, unavailable && styles.unavailable]}>
+						<Text
+							style={[styles.trackTitle, isCurrent && styles.trackTitleCurrent]}
+							numberOfLines={1}
+						>
+							{track.title}
+						</Text>
+						<Text style={styles.trackArtist} numberOfLines={1}>
+							{unavailable ? `Indisponible · ${track.artist}` : track.artist}
+						</Text>
 					</View>
-				)}
 
-				<View style={[styles.trackInfo, unavailable && styles.unavailable]}>
-					<Text
-						style={[styles.trackTitle, isCurrent && styles.trackTitleCurrent]}
-						numberOfLines={1}
-					>
-						{track.title}
-					</Text>
-					<Text style={styles.trackArtist} numberOfLines={1}>
-						{unavailable ? `Indisponible · ${track.artist}` : track.artist}
-					</Text>
-				</View>
+					{isPending && (
+						<ActivityIndicator
+							size="small"
+							color={theme.colors.primary}
+							style={styles.playingIcon}
+							accessibilityLabel="Lancement"
+						/>
+					)}
 
-				{isPending && (
-					<ActivityIndicator
-						size="small"
-						color={theme.colors.primary}
-						style={styles.playingIcon}
-						accessibilityLabel="Lancement"
-					/>
-				)}
+					{isCurrent && !isPending && (
+						<Ionicons
+							name="volume-high"
+							size={18}
+							color={theme.colors.primary}
+							style={styles.playingIcon}
+							accessibilityLabel="En cours de lecture"
+						/>
+					)}
 
-				{isCurrent && !isPending && (
-					<Ionicons
-						name="volume-high"
-						size={18}
-						color={theme.colors.primary}
-						style={styles.playingIcon}
-						accessibilityLabel="En cours de lecture"
-					/>
-				)}
-
-				{track.durationMs && (
-					<Text style={styles.duration}>{formatDuration(track.durationMs)}</Text>
-				)}
+					{track.durationMs && (
+						<Text style={styles.duration}>{formatDuration(track.durationMs)}</Text>
+					)}
+				</Pressable>
 
 				{actions && <TrackActionsButton onPress={actions} />}
 
@@ -136,7 +147,7 @@ export function SwipeableTrackItem({
 						<Ionicons name="reorder-three-outline" size={24} color={theme.colors.textSecondary} />
 					</Pressable>
 				)}
-			</Pressable>
+			</View>
 		</QueueSwipe>
 	);
 }
@@ -147,7 +158,7 @@ const formatDuration = (ms: number): string => {
 	return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 };
 
-const createStyles = (theme: Theme) =>
+const createStyles = (theme: Theme, separator: string) =>
 	StyleSheet.create({
 		trackContainer: {
 			flexDirection: 'row',
@@ -155,7 +166,12 @@ const createStyles = (theme: Theme) =>
 			padding: 12,
 			backgroundColor: theme.colors.surface,
 			borderBottomWidth: 1,
-			borderBottomColor: theme.colors.border,
+			borderBottomColor: separator,
+		},
+		trackPressable: {
+			flex: 1,
+			flexDirection: 'row',
+			alignItems: 'center',
 		},
 		trackContainerCurrent: {
 			backgroundColor: theme.colors.surfaceAlt,

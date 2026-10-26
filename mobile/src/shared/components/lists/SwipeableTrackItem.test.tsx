@@ -1,5 +1,5 @@
 import React from 'react';
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen, within } from '@testing-library/react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import { SwipeableTrackItem } from './SwipeableTrackItem';
 import type { Track } from '@/types/track.types';
@@ -51,6 +51,22 @@ describe('SwipeableTrackItem', () => {
 		expect(screen.getByLabelText('Song, Artist').props.accessibilityHint).toBe(
 			'Appui long pour les actions du titre'
 		);
+	});
+
+	it('keeps the ⋯ button and the drag handle out of the row button', async () => {
+		render(
+			<SwipeableTrackItem
+				track={track}
+				onDelete={onDelete}
+				onShowActions={jest.fn()}
+				onDragStart={jest.fn()}
+			/>
+		);
+		await act(async () => {});
+		const row = within(screen.getByLabelText('Song, Artist'));
+		expect(row.queryByLabelText('Actions')).toBeNull();
+		expect(row.queryByLabelText('Réordonner')).toBeNull();
+		expect(screen.getByLabelText('Actions')).toBeTruthy();
 	});
 
 	it('shows no ⋯ button without onShowActions', async () => {

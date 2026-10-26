@@ -13,7 +13,6 @@ export function artworkSize(windowWidth: number, windowHeight: number) {
 	const size = Math.min(playerWidth * 0.75, windowHeight * 0.36);
 	return { size, step: size + ARTWORK_GAP };
 }
-export const SEEK_STEP_S = 10;
 export const HEADER_HIT_SLOP = { top: 4, bottom: 4, left: 4, right: 4 };
 
 export const createStyles = (theme: Theme, insets: { top: number; bottom: number }) =>
@@ -28,7 +27,7 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 			width: PLAYER_PANEL_WIDTH,
 			overflow: 'hidden',
 			borderLeftWidth: 1,
-			borderLeftColor: theme.colors.border,
+			borderLeftColor: theme.colors.borderSubtle,
 		},
 		panelBackdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: theme.colors.backdrop },
 		header: { paddingTop: insets.top + 8, alignItems: 'center', paddingBottom: 8 },

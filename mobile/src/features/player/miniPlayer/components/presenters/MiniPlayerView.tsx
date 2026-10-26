@@ -43,6 +43,7 @@ export function MiniPlayerView({ data }: MiniPlayerViewProps) {
 			style={styles.container}
 			onPress={onToggleModal}
 			accessible={false}
+			accessibilityRole="none"
 			accessibilityLabel="Mini-lecteur"
 		>
 			<View style={styles.content}>

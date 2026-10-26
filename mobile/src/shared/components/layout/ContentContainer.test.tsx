@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { render, screen } from '@testing-library/react-native';
 import { useContentWidth } from '@/shared/hooks/useContentWidth';
+import { SIDEBAR_WIDTH } from '@/shared/constants/layout';
 import { ContentContainer } from './ContentContainer';
 
 jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
@@ -52,7 +53,7 @@ describe('ContentContainer', () => {
 				<WidthProbe />
 			</ContentContainer>
 		);
-		expect(screen.getByText(String(800 - 96))).toBeTruthy();
+		expect(screen.getByText(String(800 - SIDEBAR_WIDTH.tablet))).toBeTruthy();
 	});
 
 	it('uses the whole window beside no sidebar', () => {

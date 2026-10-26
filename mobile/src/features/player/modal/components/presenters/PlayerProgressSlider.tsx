@@ -1,8 +1,7 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
 import Slider from '@react-native-community/slider';
 import type { SeekPosition } from '@/features/player/modal/hooks/useSeekPosition';
-import type { createStyles } from './playerModalStyles';
 
 const formatTime = (seconds: number): string => {
 	if (!seconds || isNaN(seconds)) return '0:00';
@@ -12,7 +11,13 @@ const formatTime = (seconds: number): string => {
 };
 
 interface PlayerProgressSliderProps {
-	styles: ReturnType<typeof createStyles>;
+	/** The full player stacks the times under the slider; the desktop player bar sets them on its sides. */
+	styles: {
+		progressContainer: StyleProp<ViewStyle>;
+		slider: StyleProp<ViewStyle>;
+		timeContainer: StyleProp<ViewStyle>;
+		timeText: StyleProp<TextStyle>;
+	};
 	colors: {
 		slider: string;
 		sliderBg: string;

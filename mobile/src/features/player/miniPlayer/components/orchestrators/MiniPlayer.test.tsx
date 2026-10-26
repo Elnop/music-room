@@ -149,6 +149,12 @@ describe('MiniPlayer', () => {
 		expect(usePlayerStore.getState().isModalOpen).toBe(true);
 	});
 
+	it('wraps its buttons in a frame that is no button, so the web nests no <button>', () => {
+		render(<MiniPlayer />);
+		const frame = screen.getByLabelText('Mini-lecteur', { includeHiddenElements: true });
+		expect(frame.props.accessibilityRole).toBe('none');
+	});
+
 	it('shows the track, then the empty state again after stop', () => {
 		usePlayerStore.setState({ currentTrack: track, playbackState: 'paused' });
 		render(<MiniPlayer />);
