@@ -40,6 +40,7 @@ export function formatTrackResponse(row: TrackRow): TrackResponse {
 		albumArt: row.album_art ?? undefined,
 		durationMs: row.duration_ms,
 		previewUrl: row.preview_url ?? undefined,
+		unavailable: row.unavailable_at !== null,
 		createdAt: row.created_at ?? new Date().toISOString(),
 		updatedAt: row.updated_at ?? new Date().toISOString(),
 	};

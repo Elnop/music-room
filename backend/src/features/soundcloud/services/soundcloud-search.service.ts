@@ -1,7 +1,8 @@
 import { logger } from '@/shared/utils/logger.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import * as cache from '@/features/soundcloud/utils/soundcloud-cache.js';
-import { soundcloud } from '@/features/soundcloud/utils/soundcloud-client.js';
+import { soundcloud } from '@/shared/soundcloud/soundcloud-client.js';
+import * as availability from '@/shared/soundcloud/track-availability.js';
 import type { SoundCloudSearchInput } from '@/features/soundcloud/soundcloud.validators.js';
 import type {
 	SoundCloudSearchResult,
@@ -34,11 +35,7 @@ export async function searchTracks(query: SoundCloudSearchInput): Promise<SoundC
 			next_href?: string;
 		};
 
-		const playableTracks = (results.collection || []).filter(track => {
-			const hasStreamUrl =
-				track.streamable || (track.media?.transcodings && track.media.transcodings.length > 0);
-			return hasStreamUrl;
-		});
+		const playableTracks = (results.collection || []).filter(availability.isPlayable);
 
 		const searchResult: SoundCloudSearchResult = {
 			collection: playableTracks,

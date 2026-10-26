@@ -1,6 +1,7 @@
 import { logger } from '@/shared/utils/logger.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
-import { soundcloud } from '@/features/soundcloud/utils/soundcloud-client.js';
+import { soundcloud } from '@/shared/soundcloud/soundcloud-client.js';
+import * as availability from '@/shared/soundcloud/track-availability.js';
 import type { StreamUrlResult } from '@/features/soundcloud/soundcloud.types.js';
 
 type Protocol = 'hls' | 'progressive';
@@ -30,6 +31,7 @@ export async function getStreamUrl(trackUrl: string): Promise<StreamUrlResult> {
 			return result;
 		}
 
+		await availability.markTrackUriUnavailable(trackUrl);
 		throw new AppError(404, 'Track stream not available', 'STREAM_NOT_FOUND');
 	} catch (error) {
 		if (error instanceof AppError) throw error;

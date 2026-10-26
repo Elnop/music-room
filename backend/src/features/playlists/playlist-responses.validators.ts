@@ -49,6 +49,9 @@ export const playlistTrackSchema = z.object({
 	albumArt: z.url().optional(),
 	durationMs: z.int(),
 	previewUrl: z.url().optional(),
+	unavailable: z.boolean().meta({
+		description: 'Deleted, private or blocked on SoundCloud: cannot be played or queued',
+	}),
 	rank: z.string().meta({
 		description: 'Sort key: tracks are ordered by rank, compared byte by byte',
 		example: 'h',

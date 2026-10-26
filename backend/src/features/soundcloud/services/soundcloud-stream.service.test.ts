@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import * as streamService from '@/features/soundcloud/services/soundcloud-stream.service.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
-import type { SoundCloudClient } from '@/features/soundcloud/soundcloud.types.js';
+import type { SoundCloudClient } from '@/shared/soundcloud/soundcloud-client.js';
 
 type StreamLink = (trackUrl: string, protocol: 'hls' | 'progressive') => Promise<string>;
 
@@ -15,12 +15,16 @@ const EXPIRES_AT = new Date(T0.getTime() + THIRTY_MINUTES_MS).toISOString();
 const withExpiry = (streamUrl: string) => ({ streamUrl, expiresAt: EXPIRES_AT });
 
 const { client, streamLink } = vi.hoisted(() => {
-	const streamLink = vi.fn<(trackUrl: string, protocol: 'hls' | 'progressive') => Promise<string>>();
+	const streamLink =
+		vi.fn<(trackUrl: string, protocol: 'hls' | 'progressive') => Promise<string>>();
 	const client: Pick<SoundCloudClient, 'util'> = { util: { streamLink } };
 	return { client, streamLink };
 });
 
-vi.mock('@/features/soundcloud/utils/soundcloud-client.js', () => ({ soundcloud: client }));
+vi.mock('@/shared/soundcloud/soundcloud-client.js', () => ({ soundcloud: client }));
+
+const markTrackUriUnavailable = vi.hoisted(() => vi.fn());
+vi.mock('@/shared/soundcloud/track-availability.js', () => ({ markTrackUriUnavailable }));
 
 function linkFor(urls: { hls?: string | Error; progressive?: string | Error }): StreamLink {
 	return (_trackUrl, protocol) => {
@@ -38,6 +42,7 @@ async function expectAppError(promise: Promise<unknown>, statusCode: number, cod
 describe('soundcloud-stream.service', () => {
 	beforeEach(() => {
 		streamLink.mockReset();
+		markTrackUriUnavailable.mockReset();
 		client.util = { streamLink };
 		vi.useFakeTimers();
 		vi.setSystemTime(T0);
@@ -71,11 +76,12 @@ describe('soundcloud-stream.service', () => {
 		expect(await streamService.getStreamUrl(TRACK_URL)).toEqual(withExpiry(PROGRESSIVE_URL));
 	});
 
-	it('throws a 404 STREAM_NOT_FOUND when no protocol yields a URL, and retries on the next call', async () => {
+	it('throws a 404 STREAM_NOT_FOUND and marks the track unavailable when no protocol yields a URL', async () => {
 		streamLink.mockImplementation(linkFor({ hls: '', progressive: new Error('gone') }));
 
 		await expectAppError(streamService.getStreamUrl(TRACK_URL), 404, 'STREAM_NOT_FOUND');
 		expect(streamLink).toHaveBeenCalledTimes(2);
+		expect(markTrackUriUnavailable).toHaveBeenCalledWith(TRACK_URL);
 
 		await expectAppError(streamService.getStreamUrl(TRACK_URL), 404, 'STREAM_NOT_FOUND');
 		expect(streamLink).toHaveBeenCalledTimes(4);
