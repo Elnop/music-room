@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import { takeUpstreamSlot } from '@/shared/security/upstream-slot.js';
+import * as geocodeCache from '@/features/events/services/geocode-cache.service.js';
 import type { GeocodedPlace } from '@/features/events/events.types.js';
 
 // Nominatim's usage policy: one request per second for the whole application, and a User-Agent
@@ -41,8 +42,8 @@ async function search(query: string): Promise<unknown> {
 	}
 }
 
-/** Null when nothing matches. Only the address is sent: never a user's position. */
-export async function geocodeAddress(address: string): Promise<GeocodedPlace | null> {
+/** A cache hit never reaches here, so it takes no upstream slot. */
+async function lookup(address: string): Promise<GeocodedPlace | null> {
 	await takeUpstreamSlot('nominatim', SLOT);
 	const parsed = nominatimResultsSchema.safeParse(await search(address));
 	if (!parsed.success) {
@@ -52,4 +53,13 @@ export async function geocodeAddress(address: string): Promise<GeocodedPlace | n
 	const [first] = parsed.data;
 	if (!first) return null;
 	return { latitude: first.lat, longitude: first.lon, displayName: first.display_name };
+}
+
+/** Null when nothing matches. Only the address is sent: never a user's position. */
+export async function geocodeAddress(address: string): Promise<GeocodedPlace | null> {
+	const cached = await geocodeCache.read(address);
+	if (cached !== undefined) return cached;
+	const place = await lookup(address);
+	await geocodeCache.write(address, place);
+	return place;
 }

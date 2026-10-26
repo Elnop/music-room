@@ -2,9 +2,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 
-const { takeUpstreamSlot } = vi.hoisted(() => ({ takeUpstreamSlot: vi.fn() }));
+const { takeUpstreamSlot, read, write } = vi.hoisted(() => ({
+	takeUpstreamSlot: vi.fn(),
+	read: vi.fn(),
+	write: vi.fn(),
+}));
 
 vi.mock('@/shared/security/upstream-slot.js', () => ({ takeUpstreamSlot }));
+vi.mock('@/features/events/services/geocode-cache.service.js', () => ({ read, write }));
 
 const { geocodeAddress } = await import('@/features/events/services/geocode.service.js');
 
@@ -20,6 +25,8 @@ function answer(body: unknown, status = 200) {
 describe('geocodeAddress', () => {
 	beforeEach(() => {
 		takeUpstreamSlot.mockReset().mockResolvedValue(undefined);
+		read.mockReset().mockResolvedValue(undefined);
+		write.mockReset().mockResolvedValue(undefined);
 		fetchMock.mockReset();
 		vi.stubGlobal('fetch', fetchMock);
 		vi.spyOn(logger, 'warn').mockImplementation(() => logger);
@@ -58,9 +65,28 @@ describe('geocodeAddress', () => {
 		expect((init.headers as Record<string, string>)['User-Agent']).toMatch(/^Zumik\//);
 	});
 
-	it('returns null when nothing matches', async () => {
+	it('returns null when nothing matches, and caches it', async () => {
 		answer([]);
 		await expect(geocodeAddress('nowhere at all')).resolves.toBeNull();
+		expect(write).toHaveBeenCalledWith('nowhere at all', null);
+	});
+
+	it('caches a match', async () => {
+		answer([MATCH]);
+		const place = await geocodeAddress(ADDRESS);
+		expect(write).toHaveBeenCalledWith(ADDRESS, place);
+	});
+
+	it.each([
+		['a place', { latitude: 48.9, longitude: 2.3, displayName: 'Paris' }],
+		['a "not found"', null],
+	])('answers %s from the cache without a slot nor Nominatim', async (_case, cached) => {
+		read.mockResolvedValue(cached);
+
+		await expect(geocodeAddress(ADDRESS)).resolves.toEqual(cached);
+		expect(takeUpstreamSlot).not.toHaveBeenCalled();
+		expect(fetchMock).not.toHaveBeenCalled();
+		expect(write).not.toHaveBeenCalled();
 	});
 
 	it('does not call Nominatim when no slot is granted', async () => {
@@ -81,5 +107,6 @@ describe('geocodeAddress', () => {
 			statusCode: 502,
 			code: 'GEOCODER_UNAVAILABLE',
 		});
+		expect(write).not.toHaveBeenCalled();
 	});
 });

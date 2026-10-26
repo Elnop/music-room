@@ -25,7 +25,7 @@ Every event is public. Any signed-in user creates one; only its creator (the org
 | `POST /api/events` | Create; 201 with the event |
 | `PATCH /api/events/:id` | Organiser only; only the fields sent change, `null` clears an optional one |
 | `DELETE /api/events/:id` | Organiser only |
-| `GET /api/events/geocode?q=` | Coordinates of a typed address, for the web app, which has no geocoder: the backend asks OpenStreetMap's Nominatim and answers `{ location: { latitude, longitude, displayName } \| null }`. Per user `RATE_LIMIT_GEOCODE_*` (60 per hour), and one Nominatim request per second for the whole backend (`shared/security/upstream-slot.ts`, a Redis key): a request waits up to 3 s for its turn, then gets 429 |
+| `GET /api/events/geocode?q=` | Coordinates of a typed address, for the web app, which has no geocoder: the backend asks OpenStreetMap's Nominatim and answers `{ location: { latitude, longitude, displayName } \| null }`. Per user `RATE_LIMIT_GEOCODE_*` (60 per hour), and one Nominatim request per second for the whole backend (`shared/security/upstream-slot.ts`, a Redis key): a request waits up to 3 s for its turn, then gets 429. Answers, « not found » included, are cached 7 days in Redis by trimmed, lowercased address (`services/geocode-cache.service.ts`), and a cached answer takes no slot |
 
 Writes are rate-limited per user (`RATE_LIMIT_EVENTS_*`, 60 per hour). Each write is broadcast to every connected socket: `event:created` and `event:updated` with the whole event, `event:deleted` with `{ eventId }`. The app applies them to its TanStack Query cache (`features/events/utils/eventSocketRules.ts`, mounted once by `useEventsSync`), so lists and pages change without a reload.
 

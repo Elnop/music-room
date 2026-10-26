@@ -3,7 +3,7 @@ import type { PositionState } from '@/features/events/nearby/hooks/useForeground
 
 export interface NearbyNotice {
 	message: string;
-	action?: 'request' | 'settings';
+	action?: 'request' | 'settings' | 'retry';
 }
 
 function privacy(): string {
@@ -37,6 +37,12 @@ export function nearbyNotice(state: PositionState): NearbyNotice {
 			return denied();
 		case 'disabled':
 			return { message: 'Activez la localisation (GPS) pour voir les événements autour de vous.' };
+		case 'timed-out':
+			return {
+				message:
+					"Position introuvable : votre navigateur n'a pas pu vous localiser. Vérifiez que la localisation de l'appareil est activée.",
+				action: 'retry',
+			};
 		case 'checking':
 		case 'waiting':
 			return { message: 'Recherche de votre position…' };

@@ -178,6 +178,38 @@ describe('NearbyEventsOrchestrator', () => {
 		expect(screen.getByText('Créer un événement')).toBeTruthy();
 	});
 
+	it('stops waiting for a browser that never gives a position, and searches again', async () => {
+		jest.replaceProperty(Platform, 'OS', 'web');
+		location.watchPositionAsync.mockResolvedValue({ remove });
+		jest.useFakeTimers();
+		try {
+			await renderSection();
+			await waitFor(() => expect(location.watchPositionAsync).toHaveBeenCalledTimes(1));
+			expect(screen.getByText('Recherche de votre position…')).toBeTruthy();
+
+			act(() => jest.advanceTimersByTime(15_000));
+			expect(screen.getByText(/Position introuvable/)).toBeTruthy();
+			await act(async () => fireEvent.press(screen.getByText('Réessayer')));
+			await waitFor(() => expect(location.watchPositionAsync).toHaveBeenCalledTimes(2));
+		} finally {
+			jest.useRealTimers();
+		}
+	});
+
+	it('keeps searching on Android, with no timeout', async () => {
+		location.watchPositionAsync.mockResolvedValue({ remove });
+		jest.useFakeTimers();
+		try {
+			await renderSection();
+			await waitFor(() => expect(location.watchPositionAsync).toHaveBeenCalled());
+
+			act(() => jest.advanceTimersByTime(60_000));
+			expect(screen.getByText('Recherche de votre position…')).toBeTruthy();
+		} finally {
+			jest.useRealTimers();
+		}
+	});
+
 	it('says when the GPS is off', async () => {
 		location.hasServicesEnabledAsync.mockResolvedValue(false);
 		await renderSection();

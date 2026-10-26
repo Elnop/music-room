@@ -12,7 +12,7 @@ export function registerEventsGeocodeOpenapi(registry: OpenAPIRegistry): void {
 		path: '/api/events/geocode',
 		summary: 'Find the coordinates of an address',
 		description:
-			"For clients without a geocoder of their own (the web app): the backend asks OpenStreetMap's Nominatim. Only the typed address is sent, never a position. Rate-limited per user (`RATE_LIMIT_GEOCODE_*`), and to one Nominatim request per second for the whole backend: a request waits up to 3 s for its turn, then gets 429.",
+			"For clients without a geocoder of their own (the web app): the backend asks OpenStreetMap's Nominatim. Only the typed address is sent, never a position. Answers, \"not found\" included, are cached for 7 days in Redis by trimmed, lowercased address; a cached answer takes no Nominatim slot. Rate-limited per user (`RATE_LIMIT_GEOCODE_*`), and to one Nominatim request per second for the whole backend: a request waits up to 3 s for its turn, then gets 429.",
 		operationId: 'geocodeAddress',
 		request: { query: geocodeQuerySchema },
 		responses: {

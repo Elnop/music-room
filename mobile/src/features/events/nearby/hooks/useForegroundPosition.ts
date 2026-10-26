@@ -14,6 +14,8 @@ export type PositionState =
 	| { status: 'denied' }
 	| { status: 'disabled' }
 	| { status: 'waiting' }
+	/** The browser gave no position in time; asking again restarts the search. */
+	| { status: 'timed-out' }
 	| { status: 'located'; position: Coordinates };
 
 interface ForegroundPosition {
@@ -27,6 +29,9 @@ const WATCH_OPTIONS: Location.LocationOptions = {
 	distanceInterval: 20,
 	timeInterval: 10_000,
 };
+
+/** A browser may never answer (no location source), and expo-location registers no error callback. */
+const WEB_POSITION_TIMEOUT_MS = 15_000;
 
 /** A browser does not prompt again once refused, though expo-location reports `canAskAgain`. */
 function isRefusedForGood(permission: Location.LocationPermissionResponse): boolean {
@@ -45,6 +50,7 @@ export function useForegroundPosition(): ForegroundPosition {
 		if (!isFocused || !appActive) return undefined;
 		let cancelled = false;
 		let subscription: Location.LocationSubscription | undefined;
+		let timeout: ReturnType<typeof setTimeout> | undefined;
 
 		const watch = async () => {
 			const permission = await Location.getForegroundPermissionsAsync();
@@ -57,6 +63,11 @@ export function useForegroundPosition(): ForegroundPosition {
 				return;
 			}
 			setState(current => (current.status === 'located' ? current : { status: 'waiting' }));
+			if (Platform.OS === 'web') {
+				timeout = setTimeout(() => {
+					setState(current => (current.status === 'located' ? current : { status: 'timed-out' }));
+				}, WEB_POSITION_TIMEOUT_MS);
+			}
 			subscription = await Location.watchPositionAsync(WATCH_OPTIONS, ({ coords }) => {
 				if (!cancelled) {
 					setState({
@@ -74,6 +85,7 @@ export function useForegroundPosition(): ForegroundPosition {
 		});
 		return () => {
 			cancelled = true;
+			if (timeout) clearTimeout(timeout);
 			subscription?.remove();
 		};
 	}, [isFocused, appActive, attempt]);

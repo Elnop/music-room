@@ -26,4 +26,11 @@ describe('nearbyNotice', () => {
 		jest.replaceProperty(Platform, 'OS', 'web');
 		expect(nearbyNotice({ status: 'needs-permission' }).action).toBe('request');
 	});
+
+	it('offers to search again when the browser gave no position in time', () => {
+		expect(nearbyNotice({ status: 'timed-out' })).toMatchObject({
+			message: expect.stringContaining('Position introuvable'),
+			action: 'retry',
+		});
+	});
 });

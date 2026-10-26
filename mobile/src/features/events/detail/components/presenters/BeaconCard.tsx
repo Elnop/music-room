@@ -1,9 +1,9 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedSwitch } from '@/shared/components/ui/ThemedSwitch';
-import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { createBeaconCardStyles } from './beaconCardStyles';
 import type { BeaconBroadcast } from '@/features/events/detail/hooks/useBeaconBroadcast';
 
 function description(beacon: BeaconBroadcast): string {
@@ -14,7 +14,7 @@ function description(beacon: BeaconBroadcast): string {
 }
 
 export function BeaconCard({ beacon }: { beacon: BeaconBroadcast }) {
-	const { styles, theme } = useThemedStyles(createStyles);
+	const { styles, theme } = useThemedStyles(createBeaconCardStyles);
 
 	return (
 		<View style={styles.card}>
@@ -36,28 +36,3 @@ export function BeaconCard({ beacon }: { beacon: BeaconBroadcast }) {
 		</View>
 	);
 }
-
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
-		card: {
-			flexDirection: 'row',
-			alignItems: 'center',
-			gap: theme.spacing.md,
-			padding: theme.spacing.md,
-			borderRadius: 12,
-			backgroundColor: theme.colors.surface,
-			borderWidth: 1,
-			borderColor: theme.colors.border,
-		},
-		info: { flex: 1 },
-		label: {
-			fontSize: theme.typography.sizes.lg,
-			fontWeight: theme.typography.weights.semibold,
-			color: theme.colors.text,
-		},
-		description: {
-			fontSize: theme.typography.sizes.sm,
-			color: theme.colors.textSecondary,
-			marginTop: 2,
-		},
-	});
