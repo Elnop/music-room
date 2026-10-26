@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ApiError } from '@/shared/services/api';
 import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
+import { useScreenTitle } from '@/shared/hooks/useScreenTitle';
 import { showError, showInfo } from '@/shared/utils/toast';
 import { usePlaylistDetail } from '@/features/playlists/hooks/usePlaylistQueries';
 import { usePlaylistRoom } from '@/features/playlists/hooks/usePlaylistRoom';
@@ -41,6 +42,7 @@ export function usePlaylistDetailScreen(
 	const [isRefreshing, setIsRefreshing] = useState(false);
 
 	const { refetch, isFetching, error, data } = detail;
+	useScreenTitle(data?.name);
 	const active = !deleted && !gone;
 	useRefetchOnFocus(
 		useCallback(() => {

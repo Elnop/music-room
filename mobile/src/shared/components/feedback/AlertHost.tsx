@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, StyleSheet, Text, View, type AlertButton } from 'react-native';
 import { CenteredDialog } from '@/shared/components/layout/CenteredDialog';
+import { dialogStyles } from '@/shared/components/layout/dialogStyles';
 import { Button } from '@/shared/components/ui/Button';
 import { useAlertStore } from '@/shared/stores/alertStore';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
@@ -49,12 +50,7 @@ export function AlertHost() {
 
 const createStyles = (theme: Theme) =>
 	StyleSheet.create({
-		body: { padding: theme.spacing.lg },
-		title: {
-			fontSize: theme.typography.sizes.xl,
-			fontWeight: theme.typography.weights.bold,
-			color: theme.colors.text,
-		},
+		...dialogStyles(theme),
 		message: {
 			marginTop: theme.spacing.sm,
 			fontSize: theme.typography.sizes.lg,

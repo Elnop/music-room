@@ -41,10 +41,14 @@ export function AuthNavigator() {
 			<Stack.Screen
 				name="Welcome"
 				component={WelcomeOrchestrator}
-				options={{ headerShown: false }}
+				options={{ title: 'Bienvenue', headerShown: false }}
 			/>
-			<Stack.Screen name="Login" component={LoginOrchestrator} />
-			<Stack.Screen name="Register" component={RegisterOrchestrator} />
+			<Stack.Screen name="Login" component={LoginOrchestrator} options={{ title: 'Connexion' }} />
+			<Stack.Screen
+				name="Register"
+				component={RegisterOrchestrator}
+				options={{ title: 'Inscription' }}
+			/>
 			<Stack.Screen
 				name="EmailVerification"
 				component={EmailVerificationOrchestrator}

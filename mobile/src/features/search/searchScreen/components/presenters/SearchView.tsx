@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, FlatList, StyleSheet, RefreshControl } from 'react-native';
+import { View, FlatList, StyleSheet, RefreshControl, type TextInput } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { SearchBar } from '@/shared/components/form/SearchBar';
 import { SkeletonList, TrackRowSkeleton } from '@/shared/components/ui/Skeleton';
@@ -11,6 +11,7 @@ import type { SoundCloudTrack } from '@/features/search/types';
 import type { AddQueueItemBody } from '@/shared/types/playback';
 
 interface SearchViewProps {
+	inputRef: React.RefObject<TextInput | null>;
 	searchQuery: string;
 	debouncedQuery: string;
 	isLoading: boolean;
@@ -29,6 +30,7 @@ interface SearchViewProps {
 }
 
 export function SearchView({
+	inputRef,
 	searchQuery,
 	debouncedQuery,
 	isLoading,
@@ -53,6 +55,7 @@ export function SearchView({
 		<View style={styles.container}>
 			<View style={styles.header}>
 				<SearchBar
+					inputRef={inputRef}
 					value={searchQuery}
 					onChangeText={onSearchChange}
 					placeholder="Rechercher sur SoundCloud..."

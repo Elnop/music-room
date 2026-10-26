@@ -4,7 +4,7 @@ import {
 	type BottomTabNavigationOptions,
 } from '@react-navigation/bottom-tabs';
 import type { NavigatorScreenParams } from '@react-navigation/native';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
@@ -33,6 +33,7 @@ import { useBreakpoint, type Breakpoint } from '@/shared/hooks/useBreakpoint';
 import { MiniPlayer } from '@/features/player/miniPlayer/components/orchestrators/MiniPlayer';
 import { PlayerBar } from '@/features/player/playerBar/components/orchestrators/PlayerBar';
 import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
+import { KeyboardShortcuts } from './KeyboardShortcuts';
 
 // Playlists and Friends take nested params: zumik:// share links open their screens;
 // Profile's let a playlist open Settings.
@@ -211,6 +212,7 @@ export function AppNavigator() {
 
 				<PlayerModal />
 				<PlayerErrorToast />
+				{Platform.OS === 'web' && <KeyboardShortcuts />}
 			</View>
 		</PlayerProvider>
 	);
