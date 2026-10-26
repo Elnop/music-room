@@ -1,5 +1,5 @@
 // Only zumik://playlist/<uuid> and zumik://user/<uuid> are handled (and the same paths of the web
-// app's origin). A link received signed out is kept pending until sign-in, since the app navigator is not mounted yet.
+// app's origin and base path). A link received signed out is kept pending until sign-in, since the app navigator is not mounted yet.
 
 import {
 	getActionFromState,
@@ -10,6 +10,7 @@ import { Platform } from 'react-native';
 import type { AppTabsParamList } from './AppNavigator';
 import { logger } from '@/shared/utils/logger';
 import { LINK_PREFIX } from '@/shared/utils/shareLinks';
+import { stripBasePath, webBasePath } from './webBasePath';
 
 const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
 const SHARE_PATH = new RegExp(`^/?(playlist|user)/${UUID}/?(\\?.*)?$`, 'i');
@@ -71,11 +72,15 @@ export function sharePathFromState(state: StateNode): string {
 	return '/';
 }
 
-/** In a browser, the address bar shows the share paths of the app's own origin. */
+/** In a browser, the address bar shows the share paths under the app's origin and base path. */
 function webLinking(): Partial<LinkingOptions<AppTabsParamList>> {
 	const origin = (globalThis as { location?: { origin?: string } }).location?.origin;
 	if (Platform.OS !== 'web' || !origin) return {};
-	return { prefixes: [LINK_PREFIX, origin], getPathFromState: sharePathFromState };
+	const base = webBasePath();
+	return {
+		prefixes: [LINK_PREFIX, `${origin}${base}`],
+		getPathFromState: state => `${base}${sharePathFromState(state)}`,
+	};
 }
 
 /** `isSignedIn` is read per link: signed out, the link is stored as pending, not applied to the auth screens. */
@@ -83,7 +88,9 @@ export function createLinking(isSignedIn: () => boolean): LinkingOptions<AppTabs
 	return {
 		prefixes: [LINK_PREFIX],
 		config: linkingConfig,
-		getStateFromPath: (path, options) => {
+		// The browser hands over its full path, base path included
+		getStateFromPath: (fullPath, options) => {
+			const path = stripBasePath(fullPath);
 			const state = stateFromSharePath(path, options);
 			if (!state) return undefined;
 			if (!isSignedIn()) {

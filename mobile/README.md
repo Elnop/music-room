@@ -129,6 +129,8 @@ The player hooks reach the audio through `features/player/services/audioPlayer.t
 
 The production APK (backend `https://zumik.cluzhub.com`) is built by `.github/workflows/release-apk.yml` on every push to `main` and published in the [GitHub Releases](https://github.com/Elnop/music-room/releases/latest). It reads `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`, `EXPO_PUBLIC_FACEBOOK_APP_ID` and `EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN` from the repository's Actions secrets. Run by hand (`gh workflow run release-apk.yml --ref <branch>`) outside `main`, it uploads the APK as a run artifact without creating a release.
 
+The web client is published at `https://elnop.github.io/music-room/app/` by `.github/workflows/pages.yml` on every push to `main` touching `site/` or `mobile/`, next to the home page and privacy policy of `site/`. It is built with `WEB_BASE_URL=/music-room/app` (`experiments.baseUrl` in `app.config.js`, unset by `make dev-web`), against the hosted backend, and reads `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` and `EXPO_PUBLIC_FACEBOOK_APP_ID` from the Actions secrets; the Facebook client token stays out of the web bundle. GitHub Pages knows none of the app's routes: `site/404.html` sends `/music-room/app/<path>` back to the app with the path in `?redirect=`, which `navigation/webBasePath.ts` puts back in the address bar before the navigation reads it, so a shared `…/app/playlist/<id>` opens. The hosted backend must list `https://elnop.github.io` in `ALLOWED_ORIGINS` (set by hand in Coolify), or the browser blocks its API and Socket.io calls.
+
 ### Backend
 
 - `npm run dev:backend` - Start the backend from the mobile folder

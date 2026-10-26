@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Zumik: page not found</title>
+		<script>
+			// GitHub Pages answers every unknown path with this page. A path of the web app
+			// (/music-room/app/playlist/<id>, ...) goes back to the app, which puts it back in the
+			// address bar (mobile/src/navigation/webBasePath.ts). Anything else is a real 404.
+			(function () {
+				var app = '/music-room/app';
+				var match = window.location.pathname.match(/^\/music-room\/app(\/.*)$/);
+				if (!match || /^\/(_expo|assets)\//.test(match[1])) return;
+				var path = match[1] + window.location.search;
+				window.location.replace(app + '/?redirect=' + encodeURIComponent(path) + window.location.hash);
+			})();
+		</script>
+		<link rel="icon" href="/music-room/logo.png" />
+		<link rel="stylesheet" href="/music-room/style.css" />
+	</head>
+	<body>
+		<main>
+			<header>
+				<img src="/music-room/logo.png" alt="Zumik logo" />
+				<h1>Page not found</h1>
+			</header>
+
+			<p>This page does not exist.</p>
+			<p><a href="/music-room/">Back to the Zumik home page</a> · <a href="/music-room/app/">Open Zumik in the browser</a></p>
+		</main>
+	</body>
+</html>

@@ -1,12 +1,13 @@
 name: Pages
 
 # Publishes site/ (home page and privacy policy, required by the Google OAuth
-# consent screen and the Play Store) to https://elnop.github.io/music-room/.
+# consent screen and the Play Store) to https://elnop.github.io/music-room/,
+# and the web build of mobile/ under https://elnop.github.io/music-room/app/.
 
 on:
   push:
     branches: [main]
-    paths: [site/**, .github/workflows/pages.yml]
+    paths: [site/**, mobile/**, .github/workflows/pages.yml]
   workflow_dispatch:
 
 concurrency:
@@ -21,16 +22,57 @@ permissions:
 jobs:
   deploy:
     name: deploy
-    runs-on: ubuntu-slim
-    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    defaults:
+      run:
+        working-directory: mobile
+    # Metro inlines EXPO_PUBLIC_* into the public bundle: only what the browser
+    # needs, so no Facebook client token. WEB_BASE_URL sets experiments.baseUrl.
+    env:
+      WEB_BASE_URL: /music-room/app
+      EXPO_PUBLIC_API_URL: https://zumik.cluzhub.com
+      EXPO_PUBLIC_WS_URL: wss://zumik.cluzhub.com
+      EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: ${{ secrets.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID }}
+      EXPO_PUBLIC_FACEBOOK_APP_ID: ${{ secrets.EXPO_PUBLIC_FACEBOOK_APP_ID }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Check secrets
+        run: |
+          for name in EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID EXPO_PUBLIC_FACEBOOK_APP_ID; do
+            if [ -z "${!name}" ]; then echo "::error::Missing repository secret $name"; missing=1; fi
+          done
+          exit "${missing:-0}"
+
+      - run: npm ci
+
+      - name: Stamp the build
+        run: |
+          echo "EXPO_PUBLIC_BUILD_NUMBER=$GITHUB_RUN_NUMBER" >> "$GITHUB_ENV"
+          echo "EXPO_PUBLIC_COMMIT_SHA=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+
+      - run: npx expo export -p web --clear --output-dir dist
+
+      # site/ at the root keeps its URLs; site/404.html sends app paths back to app/
+      - name: Assemble the site
+        working-directory: .
+        run: |
+          mkdir _site
+          cp -R site/. _site/
+          cp -R mobile/dist _site/app
+
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
-          path: site
+          path: _site
       - id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

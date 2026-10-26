@@ -6,6 +6,10 @@ import { ThemedSystemUI } from '@/shared/components/theme/ThemedSystemUI';
 import { configureGoogleSignIn } from '@/features/auth/services/googleSignIn';
 import { initializeFacebookSDK } from '@/features/auth/services/facebookSignIn';
 import '@/features/auth/hooks/useLinkedProviders';
+import { restoreRedirectedPath } from '@/navigation/webBasePath';
+
+// Before the first render: the navigation reads its initial state from the address bar
+restoreRedirectedPath();
 
 export default function App() {
 	useEffect(() => {
