@@ -8,6 +8,7 @@ import {
 	ViewStyle,
 	StyleProp,
 	TextStyle,
+	Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
@@ -20,6 +21,8 @@ interface InputProps extends Omit<TextInputProps, 'style'> {
 	leftIcon?: React.ReactNode;
 	containerStyle?: ViewStyle;
 	style?: StyleProp<TextStyle>;
+	/** Web only: Enter submits the form. Native keyboards keep their return key as it was. */
+	submitOnEnter?: () => void;
 }
 
 export function Input({
@@ -35,6 +38,7 @@ export function Input({
 	containerStyle,
 	style,
 	multiline,
+	submitOnEnter,
 	...rest
 }: InputProps) {
 	const { theme } = useTheme();
@@ -63,6 +67,9 @@ export function Input({
 					keyboardType={keyboardType}
 					multiline={multiline}
 					{...rest}
+					{...(Platform.OS === 'web' && submitOnEnter && !multiline
+						? { onSubmitEditing: submitOnEnter }
+						: undefined)}
 				/>
 				{secureTextEntry && (
 					<Pressable

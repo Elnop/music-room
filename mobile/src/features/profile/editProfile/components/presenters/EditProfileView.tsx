@@ -63,7 +63,11 @@ export function EditProfileView({
 						onOpenMenu={onOpenPhotoMenu}
 					/>
 
-					<EditProfileFormFields control={control} errors={errors} />
+					<EditProfileFormFields
+						control={control}
+						errors={errors}
+						onSubmit={isDirty && !isLoading ? onSubmit : undefined}
+					/>
 
 					<View style={styles.actions}>
 						<Button

@@ -28,6 +28,7 @@ export function ForgotPasswordView({ form }: { form: ForgotPassword }) {
 					autoComplete="email"
 					error={form.emailError ?? undefined}
 					editable={!form.isSending}
+					submitOnEnter={form.email && !form.isSending ? form.sendCode : undefined}
 				/>
 
 				{form.error && <ErrorBox message={form.error} />}

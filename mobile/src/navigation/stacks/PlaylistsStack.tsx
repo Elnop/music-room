@@ -12,8 +12,10 @@ import { PlaylistSharingOrchestrator } from '@/features/playlists/sharing/compon
 import { EventDetailOrchestrator } from '@/features/events/detail/components/orchestrators/EventDetailOrchestrator';
 import { EventFormOrchestrator } from '@/features/events/form/components/orchestrators/EventFormOrchestrator';
 import { HomeScreen } from '@/navigation/screens/HomeScreen';
+import { screenLayout } from '@/navigation/screenLayout';
 
 const PlaylistStack = createNativeStackNavigator<PlaylistStackParamList & EventStackParamList>();
+const layout = screenLayout(true);
 
 interface PlaylistsNavigatorProps {
 	/** The Home and Playlists tabs mount the same stack, each opening on its own screen. */
@@ -25,6 +27,7 @@ export function PlaylistsNavigator({ initialRouteName }: PlaylistsNavigatorProps
 
 	return (
 		<PlaylistStack.Navigator
+			screenLayout={layout}
 			initialRouteName={initialRouteName}
 			screenOptions={{
 				headerStyle: {

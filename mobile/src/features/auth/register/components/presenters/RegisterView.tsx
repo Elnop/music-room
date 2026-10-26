@@ -50,12 +50,14 @@ export function RegisterView({
 				placeholder="vous@exemple.com"
 				keyboardType="email-address"
 				autoCapitalize="none"
+				submitOnEnter={isLoading ? undefined : onSubmit}
 			/>
 			<Input
 				label="Nom d'utilisateur"
 				{...username}
 				placeholder="votre_pseudo"
 				autoCapitalize="none"
+				submitOnEnter={isLoading ? undefined : onSubmit}
 			/>
 			<Input
 				label="Mot de passe"
@@ -63,6 +65,7 @@ export function RegisterView({
 				placeholder="Choisissez un mot de passe robuste"
 				secureTextEntry
 				autoCapitalize="none"
+				submitOnEnter={isLoading ? undefined : onSubmit}
 			/>
 
 			<View style={styles.passwordHint}>

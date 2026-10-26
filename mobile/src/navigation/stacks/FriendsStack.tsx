@@ -7,16 +7,19 @@ import { UserProfileOrchestrator } from '@/features/friends/userProfile/componen
 import { PlaylistDetailOrchestrator } from '@/features/playlists/detail/components/orchestrators/PlaylistDetailOrchestrator';
 import { SearchTracksOrchestrator } from '@/features/playlists/searchTracks/components/orchestrators/SearchTracksOrchestrator';
 import type { FriendsStackParamList } from '@/features/friends/types';
+import { screenLayout } from '@/navigation/screenLayout';
 
 export type { FriendsStackParamList };
 
 const FriendsStack = createNativeStackNavigator<FriendsStackParamList>();
+const layout = screenLayout(true);
 
 export function FriendsNavigator() {
 	const { theme } = useTheme();
 
 	return (
 		<FriendsStack.Navigator
+			screenLayout={layout}
 			screenOptions={{
 				headerStyle: {
 					backgroundColor: theme.colors.background,

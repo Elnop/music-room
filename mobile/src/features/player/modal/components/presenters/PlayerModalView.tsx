@@ -4,6 +4,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { getPlayerModal } from '@/shared/services/playerModalsBridge';
+import { Pressable } from '@/shared/components/ui/Pressable';
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { PlayerHeader } from './PlayerHeader';
 import { PlayerTrackInfo } from './PlayerTrackInfo';
 import { PlayerArtworkCarousel } from './PlayerArtworkCarousel';
@@ -25,19 +27,34 @@ interface PlayerModalViewProps {
 export function PlayerModalView({ modal, gestures, seek, carousel }: PlayerModalViewProps) {
 	const QueueModal = getPlayerModal('QueueModal');
 	const DevicePickerSheet = getPlayerModal('DevicePickerSheet');
+	// On desktop the player is a panel docked to the right, over the app it leaves in view.
+	const { isDesktop } = useBreakpoint();
 
 	return (
 		<Modal
 			visible={modal.isModalOpen}
-			animationType="slide"
+			animationType={isDesktop ? 'fade' : 'slide'}
 			presentationStyle="overFullScreen"
 			transparent
 			onRequestClose={modal.closeModal}
 		>
 			<GestureHandlerRootView style={modal.styles.container}>
+				{isDesktop && (
+					<Pressable
+						style={modal.styles.panelBackdrop}
+						onPress={modal.closeModal}
+						accessibilityRole="none"
+						accessibilityLabel="Fermer le lecteur"
+					/>
+				)}
 				<GestureDetector gesture={gestures.panGesture}>
 					<Animated.View
-						style={[modal.styles.container, modal.styles.modalContent, gestures.animatedStyle]}
+						style={[
+							modal.styles.container,
+							modal.styles.modalContent,
+							isDesktop && modal.styles.panel,
+							gestures.animatedStyle,
+						]}
 					>
 						<LinearGradient
 							colors={modal.gradientColors}

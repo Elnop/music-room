@@ -3,18 +3,21 @@ import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { SearchOrchestrator } from '@/features/search/searchScreen/components/orchestrators/SearchOrchestrator';
+import { screenLayout } from '@/navigation/screenLayout';
 
 type SearchStackParamList = {
 	Search: undefined;
 };
 
 const SearchStack = createNativeStackNavigator<SearchStackParamList>();
+const layout = screenLayout(true);
 
 export function SearchNavigator() {
 	const { theme } = useTheme();
 
 	return (
 		<SearchStack.Navigator
+			screenLayout={layout}
 			screenOptions={{
 				headerStyle: {
 					backgroundColor: theme.colors.background,

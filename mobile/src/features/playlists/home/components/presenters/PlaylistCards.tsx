@@ -1,15 +1,14 @@
 import React from 'react';
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Artwork } from '@/shared/components/media/Artwork';
 import { Pressable } from '@/shared/components/ui/Pressable';
+import { useGridTileWidth } from '@/shared/hooks/useGridTileWidth';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { Playlist } from '@/features/playlists/types';
 import { playlistCardLabel, tracksLabel } from '@/features/playlists/home/utils/playlistLabels';
 import { OwnerAvatarBadge } from './OwnerAvatarBadge';
 import { PrivateBadge } from './PrivateBadge';
-
-const GRID_CARD_WIDTH = (Dimensions.get('window').width - 48 - 8) / 2;
 
 const coverOf = (playlist: Playlist) => playlist.coverUrl || playlist.firstTrackCover;
 
@@ -20,21 +19,17 @@ interface PlaylistGridCardProps {
 
 export function PlaylistGridCard({ playlist, onPress }: PlaylistGridCardProps) {
 	const { styles } = useThemedStyles(createStyles);
+	const width = useGridTileWidth();
 	const { owner } = playlist;
 
 	return (
 		<Pressable
-			style={styles.tile}
+			style={[styles.tile, { width }]}
 			onPress={onPress}
 			accessibilityLabel={playlistCardLabel(playlist.name, owner)}
 		>
 			<View>
-				<Artwork
-					uri={coverOf(playlist)}
-					size={GRID_CARD_WIDTH}
-					iconSize={32}
-					style={styles.tileCover}
-				/>
+				<Artwork uri={coverOf(playlist)} size={width} iconSize={32} style={styles.tileCover} />
 				{playlist.visibility === 'private' && <PrivateBadge style={styles.tileBadge} />}
 				{owner && <OwnerAvatarBadge owner={owner} />}
 			</View>
@@ -53,7 +48,7 @@ export function PlaylistGridCard({ playlist, onPress }: PlaylistGridCardProps) {
 const createStyles = (theme: Theme) =>
 	StyleSheet.create({
 		meta: { fontSize: theme.typography.sizes.sm, color: theme.colors.textSecondary },
-		tile: { width: GRID_CARD_WIDTH, marginBottom: theme.spacing.lg },
+		tile: { marginBottom: theme.spacing.lg },
 		tileCover: { borderRadius: 8 },
 		tileBadge: { position: 'absolute', top: 8, right: 8, paddingVertical: 3 },
 		tileInfo: { marginTop: theme.spacing.sm, paddingHorizontal: 2 },

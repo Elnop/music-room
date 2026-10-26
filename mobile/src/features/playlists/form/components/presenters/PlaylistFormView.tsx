@@ -33,6 +33,7 @@ export function PlaylistFormView({ form, bottomPadding }: PlaylistFormViewProps)
 								label="Nom de la playlist"
 								placeholder="Ma super playlist"
 								autoFocus
+								submitOnEnter={form.isSubmitting ? undefined : form.submit}
 							/>
 							<CappedInput
 								field={form.description}

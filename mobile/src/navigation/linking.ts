@@ -1,11 +1,12 @@
-// Only zumik://playlist/<uuid> and zumik://user/<uuid> are handled. A link received signed out
-// is kept pending until sign-in, since the app navigator is not mounted yet.
+// Only zumik://playlist/<uuid> and zumik://user/<uuid> are handled (and the same paths of the web
+// app's origin). A link received signed out is kept pending until sign-in, since the app navigator is not mounted yet.
 
 import {
 	getActionFromState,
 	getStateFromPath as defaultGetStateFromPath,
 } from '@react-navigation/native';
 import type { LinkingOptions, NavigationContainerRef } from '@react-navigation/native';
+import { Platform } from 'react-native';
 import type { AppTabsParamList } from './AppNavigator';
 import { logger } from '@/shared/utils/logger';
 import { LINK_PREFIX } from '@/shared/utils/shareLinks';
@@ -48,6 +49,35 @@ export function stateFromSharePath(path: string, options: Options = linkingConfi
 	return defaultGetStateFromPath(path, options);
 }
 
+interface RouteNode {
+	name: string;
+	params?: object;
+	state?: StateNode;
+}
+
+interface StateNode {
+	index?: number;
+	routes: readonly RouteNode[];
+}
+
+/** The browser path of a navigation state: a share link for a playlist or a profile, the root otherwise. */
+export function sharePathFromState(state: StateNode): string {
+	let route = state.routes[state.index ?? state.routes.length - 1];
+	while (route?.state)
+		route = route.state.routes[route.state.index ?? route.state.routes.length - 1];
+	const params = (route?.params ?? {}) as { id?: string; userId?: string };
+	if (route?.name === 'PlaylistDetail' && params.id) return `/playlist/${params.id}`;
+	if (route?.name === 'UserProfile' && params.userId) return `/user/${params.userId}`;
+	return '/';
+}
+
+/** In a browser, the address bar shows the share paths of the app's own origin. */
+function webLinking(): Partial<LinkingOptions<AppTabsParamList>> {
+	const origin = (globalThis as { location?: { origin?: string } }).location?.origin;
+	if (Platform.OS !== 'web' || !origin) return {};
+	return { prefixes: [LINK_PREFIX, origin], getPathFromState: sharePathFromState };
+}
+
 /** `isSignedIn` is read per link: signed out, the link is stored as pending, not applied to the auth screens. */
 export function createLinking(isSignedIn: () => boolean): LinkingOptions<AppTabsParamList> {
 	return {
@@ -62,6 +92,7 @@ export function createLinking(isSignedIn: () => boolean): LinkingOptions<AppTabs
 			}
 			return state;
 		},
+		...webLinking(),
 	};
 }
 

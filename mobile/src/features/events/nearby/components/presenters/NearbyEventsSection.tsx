@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
+import { RowGrid } from '@/shared/components/lists/RowGrid';
 import { SectionHeader } from '@/shared/components/lists/SectionHeader';
 import { Button } from '@/shared/components/ui/Button';
 import type { Theme } from '@/shared/theme/types';
@@ -26,14 +27,16 @@ export function NearbyEventsSection({ nearby }: { nearby: NearbyEvents }) {
 				count={nearby.items.length}
 			/>
 			{nearby.items.length > 0 ? (
-				nearby.items.map(({ event, proximity }) => (
-					<EventRow
-						key={event.id}
-						event={event}
-						proximity={proximity}
-						onPress={() => nearby.openEvent(event.id)}
-					/>
-				))
+				<RowGrid>
+					{nearby.items.map(({ event, proximity }) => (
+						<EventRow
+							key={event.id}
+							event={event}
+							proximity={proximity}
+							onPress={() => nearby.openEvent(event.id)}
+						/>
+					))}
+				</RowGrid>
 			) : (
 				<EmptyState
 					icon="radio-outline"
@@ -48,9 +51,11 @@ export function NearbyEventsSection({ nearby }: { nearby: NearbyEvents }) {
 			{nearby.mine.length > 0 && (
 				<View>
 					<Text style={styles.subtitle}>Vos événements</Text>
-					{nearby.mine.map(event => (
-						<EventRow key={event.id} event={event} onPress={() => nearby.openEvent(event.id)} />
-					))}
+					<RowGrid>
+						{nearby.mine.map(event => (
+							<EventRow key={event.id} event={event} onPress={() => nearby.openEvent(event.id)} />
+						))}
+					</RowGrid>
 				</View>
 			)}
 			<View style={styles.create}>

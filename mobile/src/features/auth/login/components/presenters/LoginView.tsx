@@ -48,6 +48,7 @@ export function LoginView({
 				placeholder="demo@zumik.com"
 				keyboardType="email-address"
 				autoCapitalize="none"
+				submitOnEnter={isLoading ? undefined : onSubmit}
 			/>
 			<Input
 				label="Mot de passe"
@@ -55,6 +56,7 @@ export function LoginView({
 				placeholder="Saisissez votre mot de passe"
 				secureTextEntry
 				autoCapitalize="none"
+				submitOnEnter={isLoading ? undefined : onSubmit}
 			/>
 
 			<Button

@@ -15,7 +15,7 @@ import { nextItem, previousItem } from '@/shared/utils/queueNavigation';
 import { largeArtwork } from '@/shared/utils/artwork';
 import { hapticTap } from '@/shared/utils/haptics';
 import { trackSwipeDirection } from '@/features/player/utils/trackSwipe';
-import { ARTWORK_STEP } from '@/features/player/modal/components/presenters/playerModalStyles';
+import { useArtworkSize } from '@/features/player/modal/hooks/useArtworkSize';
 
 /** A swipe toward a missing neighbour moves this fraction of the finger, then springs back. */
 const EDGE_RESISTANCE = 0.25;
@@ -30,11 +30,15 @@ export interface ArtworkCarousel {
 	panGesture: ReturnType<typeof Gesture.Pan>;
 	rowStyle: ReturnType<typeof useAnimatedStyle>;
 	infoStyle: ReturnType<typeof useAnimatedStyle>;
+	artworkSize: number;
+	/** From one artwork to the next. */
+	artworkStep: number;
 }
 
 /** Swiping the artwork steps through the queue: right is always the previous item, never a restart. */
 export function useArtworkCarousel(trackKey: string | number | null): ArtworkCarousel {
 	const queue = useActiveQueue();
+	const { size, step: artworkStep } = useArtworkSize();
 	const previous = trackKey === null ? undefined : previousItem(queue);
 	const next = trackKey === null ? undefined : nextItem(queue);
 	const hasPrevious = previous !== undefined;
@@ -72,10 +76,10 @@ export function useArtworkCarousel(trackKey: string | number | null): ArtworkCar
 		.onEnd(event => {
 			const direction = trackSwipeDirection(event);
 			if (direction === 'next' && hasNext) {
-				slideTo(-ARTWORK_STEP);
+				slideTo(-artworkStep);
 				runOnJS(step)('next');
 			} else if (direction === 'previous' && hasPrevious) {
-				slideTo(ARTWORK_STEP);
+				slideTo(artworkStep);
 				runOnJS(step)('previous');
 			} else {
 				translateX.value = withSpring(0);
@@ -84,7 +88,7 @@ export function useArtworkCarousel(trackKey: string | number | null): ArtworkCar
 
 	const rowStyle = useAnimatedStyle(() => ({ transform: [{ translateX: translateX.value }] }));
 	const infoStyle = useAnimatedStyle(() => ({
-		opacity: interpolate(Math.abs(translateX.value), [0, ARTWORK_STEP], [1, 0.2]),
+		opacity: interpolate(Math.abs(translateX.value), [0, artworkStep], [1, 0.2]),
 	}));
 
 	return {
@@ -95,5 +99,7 @@ export function useArtworkCarousel(trackKey: string | number | null): ArtworkCar
 		panGesture,
 		rowStyle,
 		infoStyle,
+		artworkSize: size,
+		artworkStep,
 	};
 }
