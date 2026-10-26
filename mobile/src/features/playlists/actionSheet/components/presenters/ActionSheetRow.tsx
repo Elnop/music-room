@@ -34,7 +34,7 @@ export function ActionSheetRow({
 				<Text style={[styles.label, { color }]}>{label}</Text>
 			) : (
 				<View style={styles.textBlock}>
-					<Text style={[styles.label, { color }]} numberOfLines={1}>
+					<Text style={[styles.blockLabel, { color }]} numberOfLines={1}>
 						{label}
 					</Text>
 					<Text style={styles.detail}>{detail}</Text>
@@ -61,6 +61,10 @@ const createStyles = (theme: Theme) =>
 		},
 		label: {
 			flex: 1,
+			fontSize: 16,
+		},
+		// Stacked above the detail: flex: 1 would squash it to nothing in the column.
+		blockLabel: {
 			fontSize: 16,
 		},
 		detail: {

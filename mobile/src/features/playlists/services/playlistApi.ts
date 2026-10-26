@@ -1,5 +1,5 @@
 import { apiRequest } from '@/shared/services/api';
-import type { Playlist, PlaylistWithTracks } from '@/features/playlists/types';
+import type { CoverResponse, Playlist, PlaylistWithTracks } from '@/features/playlists/types';
 import type { PlaylistInput } from '@/features/playlists/validators';
 
 // Requests go through `apiRequest`, which adds the token, the client headers the
@@ -48,4 +48,16 @@ export async function updatePlaylist(
 
 export async function deletePlaylist(id: string): Promise<void> {
 	await apiRequest(`/api/playlists/${id}`, { method: 'DELETE' });
+}
+
+/** Premium only: a free plan gets 403 PREMIUM_REQUIRED. `uri` is a local JPEG. */
+export async function uploadCover(id: string, uri: string): Promise<CoverResponse> {
+	const form = new FormData();
+	form.append('cover', { uri, name: 'cover.jpg', type: 'image/jpeg' } as unknown as Blob);
+	return apiRequest<CoverResponse>(`/api/playlists/${id}/cover`, { method: 'PUT', body: form });
+}
+
+/** Allowed on any plan, so a cover kept after a downgrade can still be removed. */
+export async function removeCover(id: string): Promise<CoverResponse> {
+	return apiRequest<CoverResponse>(`/api/playlists/${id}/cover`, { method: 'DELETE' });
 }

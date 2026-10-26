@@ -6,6 +6,7 @@ import type { PlaylistStackParamList } from '@/features/playlists/types';
 import { usePlaylistDetailScreen } from '@/features/playlists/detail/hooks/usePlaylistDetailScreen';
 import { usePlaylistTracks } from '@/features/playlists/detail/hooks/usePlaylistTracks';
 import { useOwnerActions } from '@/features/playlists/detail/hooks/useOwnerActions';
+import { useCoverActions } from '@/features/playlists/detail/hooks/useCoverActions';
 import { usePlayPlaylist } from '@/features/playlists/detail/hooks/usePlayPlaylist';
 import { useCoverGradient } from '@/features/playlists/detail/hooks/useCoverGradient';
 import { PlaylistDetailView } from '@/features/playlists/detail/components/presenters/PlaylistDetailView';
@@ -34,6 +35,7 @@ export function PlaylistDetailOrchestrator({ navigation, route }: PlaylistDetail
 	const play = usePlayPlaylist(id);
 	const gradient = useCoverGradient(playlist);
 	const isOwner = !!userId && playlist?.ownerId === userId;
+	const cover = useCoverActions(navigation, id, isOwner);
 	const { openSheet } = owner;
 
 	// headerRight stays set (empty for a non-owner): adding or removing the native header
@@ -94,6 +96,10 @@ export function PlaylistDetailOrchestrator({ navigation, route }: PlaylistDetail
 					onEdit={owner.edit}
 					onSharing={owner.sharing}
 					onDelete={owner.remove}
+					hasCover={!!playlist.coverUrl}
+					coverLocked={!cover.isPremium}
+					onChangeCover={cover.change}
+					onRemoveCover={cover.remove}
 				/>
 			)}
 		</>

@@ -34,6 +34,8 @@ A feature that is Premium-only calls `assertPremium(userId)` from `@/shared/subs
 
 `PUT /api/playlists/:id/cover` (multipart field `cover`, JPEG, PNG or WebP, at most 2 MB, #483) checks that the caller owns the playlist (403 `PLAYLIST_ACCESS_DENIED`), then `assertPremium` (403 `PREMIUM_REQUIRED`). The file goes to the public `playlist-covers` bucket (migration 031) as `<playlistId>/<uuid>.<ext>`, its URL to `playlists.cover_url`, and the room receives `playlist:details` with the new `coverUrl`. `DELETE /api/playlists/:id/cover` is allowed on any plan. Replacing or removing a cover deletes the previous file, and deleting the playlist deletes its cover file (best effort). The upload pipeline (multer limits, type read from the magic bytes, storage under a random name) is shared with the profile photo in `backend/src/shared/storage/`.
 
+In the app (#485), the owner finds **Changer la cover** and, when a cover exists, **Retirer la cover** in the playlist's ⋯ sheet (`features/playlists/detail/hooks/useCoverActions.ts`). On the free plan the action shows a lock and a dialog that leads to Settings, and no upload is sent; a 403 `PREMIUM_REQUIRED` (downgraded from another device) shows the same dialog and refetches the plan. The image goes through the same picker and 512 px square JPEG as the profile photo (`shared/utils/imagePicker.ts`, `shared/utils/squareImage.ts`).
+
 ## Going back to free
 
 A downgrade deletes nothing: what was created on Premium (a playlist cover) stays as it is and is still shown. The user only loses the right to create or change a Premium-only thing until they switch back.

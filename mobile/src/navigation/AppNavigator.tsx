@@ -9,6 +9,7 @@ import type { Theme } from '@/shared/theme/types';
 
 import { PlaylistsNavigator } from '@/navigation/stacks/PlaylistsStack';
 import type { PlaylistStackParamList } from '@/features/playlists/types';
+import type { ProfileStackParamList } from '@/features/profile/types';
 import { registerPlayback } from '@/navigation/playbackBridge';
 import { registerMusicControl } from '@/navigation/musicControlBridge';
 import { ProfileNavigator } from '@/navigation/stacks/ProfileStack';
@@ -25,12 +26,13 @@ import { useConnectionStatus } from '@/shared/hooks/useConnectionStatus';
 import { ConnectionBanner } from '@/shared/components/feedback/ConnectionBanner';
 import { TAB_BAR_HEIGHT } from '@/shared/constants/layout';
 
-// Playlists and Friends take nested params: zumik:// share links open their screens.
+// Playlists and Friends take nested params: zumik:// share links open their screens;
+// Profile's let a playlist open Settings.
 export type AppTabsParamList = {
 	PlaylistsTab: NavigatorScreenParams<PlaylistStackParamList> | undefined;
 	SearchTab: undefined;
 	FriendsTab: NavigatorScreenParams<FriendsStackParamList> | undefined;
-	ProfileTab: undefined;
+	ProfileTab: NavigatorScreenParams<ProfileStackParamList> | undefined;
 };
 
 export type { FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
