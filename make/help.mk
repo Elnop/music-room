@@ -22,6 +22,7 @@ help: ## Show the quick start commands and the help categories
 	$(HELP_CMD) install "Install all dependencies (run this first)"
 	$(HELP_CMD) dev-docker "Start the project: backend + Metro in Docker"
 	$(HELP_CMD) start-emulator "Start an emulator and open the app on it"
+	$(HELP_CMD) dev-web "Start the backend in Docker and the web app (http://localhost:8081)"
 	$(HELP_CMD) test "Run backend and mobile tests"
 	$(HELP_SECTION) "📚 COMMANDS BY CATEGORY  (make <category>)"
 	$(HELP_CMD) docker "Containers: start, stop, logs, Metro address, shells"
@@ -42,6 +43,7 @@ help: ## Show the quick start commands and the help categories
 docker: ## List the Docker mode commands
 	$(HELP_SECTION) "🐳 DOCKER MODE"
 	$(HELP_CMD) dev-docker "Build and start all services in Docker (backend + mobile)"
+	$(HELP_CMD) dev-web "Backend in Docker + the web app on http://localhost:8081"
 	$(HELP_CMD) start "Start existing containers (no rebuild)"
 	$(HELP_CMD) stop "Stop all containers"
 	$(HELP_CMD) containers-restart "Restart the containers and, in local mode, the dev Supabase stack (no rebuild)"
@@ -62,6 +64,7 @@ docker: ## List the Docker mode commands
 local: ## List the local mode commands
 	$(HELP_SECTION) "💻 LOCAL MODE (no Docker)"
 	$(HELP_CMD) dev-local "Start backend + Metro locally (Android Studio emulator)"
+	$(HELP_CMD) dev-web-local "Start backend + the web app locally and open it in the browser"
 	$(HELP_CMD) dev-phone "Same on a USB phone: adb reverse for Metro and the backend, any network (PHONE=serial)"
 	$(HELP_CMD) open-phone "Open Zumik Dev on the USB phone again (after replugging it)"
 	$(HELP_CMD) expo-android "Start Metro and open the app in the emulator"

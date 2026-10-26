@@ -1,6 +1,7 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { BackendUrlField } from '@/shared/components/form/BackendUrlField';
+import { BACKEND_URL_EDITABLE } from '@/shared/constants/platform';
 import type { Plan } from '@/shared/types/subscription';
 import type { Theme } from '@/shared/theme/types';
 import { SubscriptionSection } from './SubscriptionSection';
@@ -38,10 +39,12 @@ export function SettingsView({
 				/>
 			</View>
 
-			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>Serveur</Text>
-				<BackendUrlField />
-			</View>
+			{BACKEND_URL_EDITABLE && (
+				<View style={styles.section}>
+					<Text style={styles.sectionTitle}>Serveur</Text>
+					<BackendUrlField />
+				</View>
+			)}
 		</ScrollView>
 	);
 }

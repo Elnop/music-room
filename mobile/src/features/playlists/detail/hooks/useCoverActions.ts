@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Alert } from 'react-native';
+import { showAlert } from '@/shared/utils/alert';
 import { useQueryClient } from '@tanstack/react-query';
 import { ApiError } from '@/shared/services/api';
 import { usePlan } from '@/shared/hooks/usePlan';
@@ -33,7 +33,7 @@ export function useCoverActions(
 	const [isUploading, setIsUploading] = useState(false);
 
 	const showLocked = () =>
-		Alert.alert(
+		showAlert(
 			'Réservé au Premium',
 			"Changer la cover d'une playlist est réservé à l'offre Premium. Vous pouvez l'activer dans les paramètres.",
 			[

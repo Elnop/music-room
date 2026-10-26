@@ -1,4 +1,5 @@
 import { apiRequest, authRequest } from '@/shared/services/api';
+import { jpegFormData } from '@/shared/utils/jpegFormData';
 import type {
 	AvatarResponse,
 	FilteredProfile,
@@ -19,11 +20,9 @@ export const profileApi = {
 	},
 
 	async uploadAvatar(uri: string, accessToken?: string): Promise<AvatarResponse> {
-		const form = new FormData();
-		form.append('avatar', { uri, name: 'avatar.jpg', type: 'image/jpeg' } as unknown as Blob);
 		const init = {
 			method: 'PUT',
-			body: form,
+			body: await jpegFormData('avatar', uri, 'avatar.jpg'),
 		};
 		if (accessToken) {
 			return authRequest<AvatarResponse>('/api/profile/avatar', accessToken, init);

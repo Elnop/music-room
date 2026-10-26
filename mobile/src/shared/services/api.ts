@@ -1,6 +1,6 @@
-import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import { getAppVersion } from './deviceService';
+import { getDeviceName, getModelName } from './deviceIdentity';
 import { getBackendUrl } from './backendUrl';
 import { getAuthSession, getSession } from './authSession';
 
@@ -58,7 +58,7 @@ function getClientHeaders(): Record<string, string> {
 
 	const headers = {
 		'X-Platform': Platform.OS,
-		'X-Device-Model': Device.modelName || Device.deviceName || 'Unknown Device',
+		'X-Device-Model': getModelName() || getDeviceName() || 'Unknown Device',
 		'X-App-Version': appVersion,
 	};
 
@@ -203,4 +203,14 @@ async function handleResponse<T>(response: Response): Promise<T> {
 	}
 
 	return data.data;
+}
+
+const LOCAL_URI = /^(blob|data):/i;
+
+/** Reads a picked or manipulated image (blob: or data: URI) in the browser; refuses any network URL. */
+export async function readLocalBlob(uri: string): Promise<Blob> {
+	if (!LOCAL_URI.test(uri)) {
+		throw new Error(`readLocalBlob only reads blob: and data: URIs, got "${uri.split(':')[0]}:"`);
+	}
+	return (await fetch(uri)).blob();
 }
