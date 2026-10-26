@@ -105,8 +105,15 @@ export const soundcloudSearchResultSchema = z.object({
 	next_href: z.url().nullable().optional().meta({ description: 'URL of the next page' }),
 });
 
+export const streamProtocolSchema = z.enum(['hls', 'progressive']);
+
 export const soundcloudStreamResultSchema = z.object({
-	streamUrl: z.url().meta({ description: 'HLS AAC stream URL (expires after 30 minutes)' }),
+	streamUrl: z.url().meta({
+		description: 'Stream URL, HLS when SoundCloud has one, else progressive (expires after 30 minutes)',
+	}),
+	protocol: streamProtocolSchema.meta({
+		description: 'How the URL streams: `hls` is an HLS playlist, `progressive` a plain audio file',
+	}),
 	expiresAt: z.iso.datetime().meta({
 		description: 'When the stream URL expires; request a new one shortly before',
 	}),

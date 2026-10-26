@@ -10,7 +10,7 @@ import { createStore } from 'zustand';
 import { streamPrefetch } from '@/features/player/services/streamPrefetch';
 import { apiRequest } from '@/shared/services/api';
 import { trackToSoundCloud } from '@/shared/utils/trackToSoundCloud';
-import type { SoundCloudTrack } from '@/types/soundcloud.types';
+import type { SoundCloudTrack, StreamUrlResponse } from '@/types/soundcloud.types';
 import type { QueueItem } from '@/types/queue.types';
 import type { UserProfile } from '@/types/user.types';
 
@@ -204,7 +204,9 @@ registerConnectBridge({
 const initialPlayerState = usePlayerStore.getState();
 const initialAuthState = testSessionStore.getState();
 
-function answerStreams(...urls: { streamUrl: string; expiresAt: string }[]) {
+function answerStreams(
+	...urls: { streamUrl: string; expiresAt: string; protocol?: StreamUrlResponse['protocol'] }[]
+) {
 	for (const data of urls) mockApiRequest.mockResolvedValueOnce(data);
 }
 
@@ -276,6 +278,26 @@ describe('PlayerProvider stream renewal (#313)', () => {
 		expect(state.streamUrl).toBe('u1');
 		expect(state.streamExpiresAt).toBe(Date.parse(expiresAt));
 		expect(mockPlayerFor('u1').play).toHaveBeenCalled();
+	});
+
+	it('keeps the protocol of the stream, and of the URL that renews it', async () => {
+		answerStreams({ streamUrl: 'u1', expiresAt: inMinutes(1), protocol: 'progressive' });
+		render(
+			<PlayerProvider>
+				<SeekProbe />
+			</PlayerProvider>
+		);
+		await act(async () => usePlayerStore.getState().playTrack(track, 'q1'));
+		await flush();
+		expect(usePlayerStore.getState().streamProtocol).toBe('progressive');
+		act(() => usePlayerStore.getState().pause());
+		answerStreams({ streamUrl: 'u2', expiresAt: inMinutes(30) });
+
+		await act(async () => usePlayerStore.getState().resume());
+		await flush();
+
+		expect(usePlayerStore.getState().streamUrl).toBe('u2');
+		expect(usePlayerStore.getState().streamProtocol).toBe('hls');
 	});
 
 	it('acts on the player directly when seeking a fresh URL', async () => {
@@ -769,7 +791,7 @@ describe('PlayerProvider next track prefetch (#314)', () => {
 		await reach(view, player, 150);
 		expect(mockApiRequest).toHaveBeenCalledTimes(1);
 
-		answerStreams({ streamUrl: 'u-qb', expiresAt: inMinutes(30) });
+		answerStreams({ streamUrl: 'u-qb', expiresAt: inMinutes(30), protocol: 'progressive' });
 		await reach(view, player, 181);
 		await reach(view, player, 190);
 		expect(mockApiRequest).toHaveBeenCalledTimes(2);
@@ -779,6 +801,7 @@ describe('PlayerProvider next track prefetch (#314)', () => {
 
 		expect(mockApiRequest).toHaveBeenCalledTimes(2);
 		expect(usePlayerStore.getState().streamUrl).toBe('u-qb');
+		expect(usePlayerStore.getState().streamProtocol).toBe('progressive');
 		expect(mockPlayerFor('u-qb').play).toHaveBeenCalled();
 		expect(usePlayerStore.getState().playbackState).toBe('playing');
 		expect(streamPrefetch.peek()).toBeNull();

@@ -31,8 +31,12 @@ export interface SoundCloudSearchResult {
 	next_href?: string | null;
 }
 
-/** `data` of GET /api/soundcloud/stream: a stream URL and when it expires (ISO 8601) */
+/** `hls` is an HLS playlist, `progressive` a plain audio file */
+export type StreamProtocol = 'hls' | 'progressive';
+
+/** `data` of GET /api/soundcloud/stream: a stream URL, its protocol and when it expires (ISO 8601) */
 export interface StreamUrlResponse {
 	streamUrl: string;
+	protocol: StreamProtocol;
 	expiresAt: string;
 }

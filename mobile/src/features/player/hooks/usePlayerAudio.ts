@@ -16,7 +16,8 @@ interface PlayerAudio {
 
 export function usePlayerAudio(): PlayerAudio {
 	const streamUrl = usePlayerStore(state => state.streamUrl);
-	const player = useAudioPlayer(streamUrl || '');
+	const streamProtocol = usePlayerStore(state => state.streamProtocol);
+	const player = useAudioPlayer(streamUrl || '', streamProtocol);
 
 	useStreamLoader();
 	useAudioPlaybackSync(player);

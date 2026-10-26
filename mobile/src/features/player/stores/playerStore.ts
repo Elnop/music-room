@@ -17,8 +17,8 @@ function loadRestored(state: PlayerState): boolean {
 export const usePlayerStore = create<PlayerState>((set, get) => ({
 	...initialPlayerState,
 
-	setStreamUrl: (url, expiresAt = null) => {
-		set({ streamUrl: url, streamExpiresAt: url ? expiresAt : null });
+	setStreamUrl: (url, expiresAt = null, protocol = 'hls') => {
+		set({ streamUrl: url, streamProtocol: protocol, streamExpiresAt: url ? expiresAt : null });
 	},
 
 	setTrackUnavailableError: message => {

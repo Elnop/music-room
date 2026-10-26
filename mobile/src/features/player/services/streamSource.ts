@@ -1,15 +1,17 @@
 import Hls from 'hls.js';
+import type { StreamProtocol } from '@/types/soundcloud.types';
 import type { MediaElement } from './mediaElement';
 
 const HLS_MIME = 'application/vnd.apple.mpegurl';
 
-/** Safari plays the HLS stream itself; elsewhere hls.js feeds the element, transport only. */
+/** A progressive file and, in Safari, an HLS stream play natively; elsewhere hls.js feeds the element, transport only. */
 export function attachStream(
 	media: MediaElement,
 	url: string,
+	protocol: StreamProtocol,
 	onFatalError: () => void
 ): () => void {
-	if (media.canPlayType(HLS_MIME) !== '' || !Hls.isSupported()) {
+	if (protocol === 'progressive' || media.canPlayType(HLS_MIME) !== '' || !Hls.isSupported()) {
 		media.src = url;
 		return () => clearSource(media);
 	}

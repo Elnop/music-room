@@ -1,4 +1,5 @@
 import type { AudioPlayer, AudioPlayerStatus } from '@/features/player/types';
+import type { StreamProtocol } from '@/types/soundcloud.types';
 import { mediaElement, setMediaEventHandler, type MediaElement } from './mediaElement';
 import { attachStream } from './streamSource';
 
@@ -30,6 +31,7 @@ export class HtmlAudioPlayer implements AudioPlayer {
 
 	constructor(
 		private readonly source: string,
+		private readonly protocol: StreamProtocol,
 		private readonly events: PlaybackEvents
 	) {
 		this.status = this.readStatus();
@@ -42,7 +44,12 @@ export class HtmlAudioPlayer implements AudioPlayer {
 		detachOwner = () => this.detach();
 		setMediaEventHandler(type => this.handleMediaEvent(type));
 		this.failed = false;
-		if (this.source) this.releaseStream = attachStream(mediaElement(), this.source, this.onFatal);
+		if (this.source) this.releaseStream = attachStream(
+				mediaElement(),
+				this.source,
+				this.protocol,
+				this.onFatal
+			);
 		this.publish();
 	}
 

@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react-native';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { useAutoplayStore } from '@/features/player/stores/autoplayStore';
-import type { SoundCloudTrack } from '@/types/soundcloud.types';
+import type { SoundCloudTrack, StreamProtocol } from '@/types/soundcloud.types';
 import { FakeMediaElement, autoplayRefusal, installFakeDocument } from '@/test/fakeMediaElement';
 import { useAudioPlayer, useAudioPlayerStatus } from './audioPlayer.web';
 
@@ -42,19 +42,20 @@ const media = new FakeMediaElement();
 installFakeDocument(media);
 
 const STREAM = 'https://playback.media-streaming.soundcloud.cloud/abc/playlist.m3u8';
+const PROGRESSIVE = 'https://cf-media.sndcdn.com/abc.128.mp3';
 const track = {
 	id: 7,
 	title: 'Song',
 	permalink_url: 'https://soundcloud.com/a/song',
 } as SoundCloudTrack;
 
-function renderPlayer(source = STREAM) {
+function renderPlayer(source = STREAM, protocol: StreamProtocol = 'hls') {
 	return renderHook(
-		({ url }: { url: string }) => {
-			const player = useAudioPlayer(url);
+		({ url, kind }: { url: string; kind: StreamProtocol }) => {
+			const player = useAudioPlayer(url, kind);
 			return { player, status: useAudioPlayerStatus(player) };
 		},
-		{ initialProps: { url: source } }
+		{ initialProps: { url: source, kind: protocol } }
 	);
 }
 
@@ -89,6 +90,26 @@ describe('useAudioPlayer (web)', () => {
 		expect(media.src).toBe(STREAM);
 		unmount();
 		expect(media.src).toBe('');
+	});
+
+	it('hands a progressive file to the element without hls.js', () => {
+		const { unmount } = renderPlayer(PROGRESSIVE, 'progressive');
+
+		expect(mockHls.instances).toHaveLength(0);
+		expect(media.src).toBe(PROGRESSIVE);
+		unmount();
+		expect(media.src).toBe('');
+	});
+
+	it('switches from hls.js to the element when the next stream is progressive', () => {
+		const { rerender, unmount } = renderPlayer();
+
+		rerender({ url: PROGRESSIVE, kind: 'progressive' });
+
+		expect(mockHls.instances).toHaveLength(1);
+		expect(mockHls.instances[0].destroy).toHaveBeenCalled();
+		expect(media.src).toBe(PROGRESSIVE);
+		unmount();
 	});
 
 	it('reports load, position, and the end of the track', () => {
@@ -145,7 +166,7 @@ describe('useAudioPlayer (web)', () => {
 		act(() => media.loadStream(180));
 		await act(async () => first.play());
 
-		rerender({ url: `${STREAM}?next` });
+		rerender({ url: `${STREAM}?next`, kind: 'hls' });
 
 		expect(result.current.player.id).not.toBe(first.id);
 		expect(mockHls.instances[0].destroy).toHaveBeenCalled();
