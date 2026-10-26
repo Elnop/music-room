@@ -1,24 +1,8 @@
 import { z } from 'zod';
 import { uploadedImageSchema } from '@/shared/storage/image-upload.js';
+import { MAX_GENRES, musicGenreSchema } from '@/shared/music/genres.js';
 
 export const visibilityLevelSchema = z.enum(['public', 'friends_only', 'private']);
-
-export const MUSIC_GENRES = [
-	'pop',
-	'rock',
-	'hiphop',
-	'rnb',
-	'jazz',
-	'classical',
-	'electronic',
-	'country',
-	'latin',
-	'metal',
-] as const;
-
-export const MAX_GENRES = 5;
-
-export const musicGenreSchema = z.enum(MUSIC_GENRES);
 
 const PROFILE_LIMITS = {
 	DISPLAY_NAME_MAX: 15,
