@@ -1,9 +1,11 @@
 import type { NavigationContainerRef } from '@react-navigation/native';
+import { Platform } from 'react-native';
 import type { AppTabsParamList } from './AppNavigator';
 import {
 	clearPendingLink,
 	createLinking,
 	openPendingLink,
+	sharePathFromState,
 	stateFromSharePath,
 	takePendingLink,
 } from './linking';
@@ -87,6 +89,66 @@ describe('createLinking', () => {
 		const linking = createLinking(() => false);
 		linking.getStateFromPath!('playlist/abc', linking.config as Options);
 		expect(takePendingLink()).toBeNull();
+	});
+});
+
+describe('createLinking in a browser', () => {
+	const originalOS = Platform.OS;
+	const originalLocation = Object.getOwnPropertyDescriptor(globalThis, 'location');
+	beforeEach(() => {
+		Platform.OS = 'web';
+		Object.defineProperty(globalThis, 'location', {
+			value: { origin: 'http://localhost:8081' },
+			configurable: true,
+		});
+	});
+	afterEach(() => {
+		Platform.OS = originalOS;
+		if (originalLocation) Object.defineProperty(globalThis, 'location', originalLocation);
+		else Reflect.deleteProperty(globalThis, 'location');
+	});
+
+	it('adds the page origin to the zumik:// prefix', () => {
+		expect(createLinking(() => true).prefixes).toEqual(['zumik://', 'http://localhost:8081']);
+	});
+
+	it('opens a reloaded /playlist/<id> address', () => {
+		const linking = createLinking(() => true);
+		const state = linking.getStateFromPath!(`/playlist/${ID}`, linking.config as Options);
+		expect(state?.routes[0].name).toBe('PlaylistsTab');
+	});
+
+	it('writes the share path in the address bar', () => {
+		const linking = createLinking(() => true);
+		expect(linking.getPathFromState).toBe(sharePathFromState);
+	});
+});
+
+describe('sharePathFromState', () => {
+	const tab = (name: string, routes: { name: string; params?: object }[]) => ({
+		index: 0,
+		routes: [{ name, state: { index: routes.length - 1, routes } }],
+	});
+
+	it('is the playlist share path from any tab', () => {
+		const state = tab('HomeTab', [
+			{ name: 'Home' },
+			{ name: 'PlaylistDetail', params: { id: ID } },
+		]);
+		expect(sharePathFromState(state)).toBe(`/playlist/${ID}`);
+	});
+
+	it('is the profile share path', () => {
+		const state = tab('FriendsTab', [
+			{ name: 'Friends' },
+			{ name: 'UserProfile', params: { userId: ID } },
+		]);
+		expect(sharePathFromState(state)).toBe(`/user/${ID}`);
+	});
+
+	it('is the root for any other screen', () => {
+		expect(sharePathFromState(tab('ProfileTab', [{ name: 'Profile' }]))).toBe('/');
+		expect(sharePathFromState({ routes: [{ name: 'Login' }] })).toBe('/');
 	});
 });
 

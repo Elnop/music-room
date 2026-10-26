@@ -1,7 +1,9 @@
 import React from 'react';
-import { View, Text, Modal, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable } from '@/shared/components/ui/Pressable';
+import { FullScreenSheet } from '@/shared/components/layout/FullScreenSheet';
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { AppToast } from '@/shared/components/feedback/AppToast';
 import { DeviceRow } from './DeviceRow';
 import type { DevicePickerOwner } from '@/types/device.types';
@@ -37,6 +39,8 @@ export function DevicePickerSheetView({
 	isActive,
 	onPick,
 }: DevicePickerSheetViewProps) {
+	const { isWide } = useBreakpoint();
+
 	const renderDevice = (owner: DevicePickerOwner, device: PickerDevice) => (
 		<DeviceRow
 			key={`${owner.ownerId}:${device.deviceId}`}
@@ -112,32 +116,30 @@ export function DevicePickerSheetView({
 		);
 	};
 
-	return (
-		<Modal
-			visible={visible}
-			animationType="slide"
-			presentationStyle="overFullScreen"
-			transparent
-			onRequestClose={onClose}
-		>
-			<View style={styles.container}>
-				<View style={styles.header}>
-					<Pressable
-						onPress={onClose}
-						style={styles.closeButton}
-						hitSlop={4}
-						accessibilityRole="button"
-						accessibilityLabel="Fermer le choix d'appareil"
-					>
-						<Ionicons name="chevron-down" size={24} color={theme.colors.text} />
-					</Pressable>
-					<Text style={styles.title}>Choisir un appareil</Text>
-				</View>
-
-				{renderContent()}
-
-				<AppToast />
+	const content = (
+		<View style={styles.container}>
+			<View style={styles.header}>
+				<Pressable
+					onPress={onClose}
+					style={styles.closeButton}
+					hitSlop={4}
+					accessibilityRole="button"
+					accessibilityLabel="Fermer le choix d'appareil"
+				>
+					<Ionicons name={isWide ? 'close' : 'chevron-down'} size={24} color={theme.colors.text} />
+				</Pressable>
+				<Text style={styles.title}>Choisir un appareil</Text>
 			</View>
-		</Modal>
+
+			{renderContent()}
+
+			<AppToast />
+		</View>
+	);
+
+	return (
+		<FullScreenSheet visible={visible} onClose={onClose}>
+			{content}
+		</FullScreenSheet>
 	);
 }

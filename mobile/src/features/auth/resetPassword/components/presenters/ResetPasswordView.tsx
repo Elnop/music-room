@@ -68,6 +68,7 @@ export function ResetPasswordView({ email, form }: ResetPasswordViewProps) {
 					secureTextEntry
 					autoCapitalize="none"
 					editable={!form.isLoading}
+					submitOnEnter={canSubmit ? form.submit : undefined}
 				/>
 				<PasswordRequirements />
 			</View>

@@ -12,6 +12,7 @@ interface CappedInputProps {
 	autoFocus?: boolean;
 	multiline?: boolean;
 	keyboardType?: TextInputProps['keyboardType'];
+	submitOnEnter?: () => void;
 }
 
 export function CappedInput({
@@ -21,6 +22,7 @@ export function CappedInput({
 	autoFocus,
 	multiline,
 	keyboardType,
+	submitOnEnter,
 }: CappedInputProps) {
 	const { styles } = useThemedStyles(createStyles);
 
@@ -37,6 +39,7 @@ export function CappedInput({
 				numberOfLines={multiline ? 3 : undefined}
 				maxLength={field.max}
 				keyboardType={keyboardType}
+				submitOnEnter={submitOnEnter}
 			/>
 			<Text style={styles.count}>
 				{field.value.length}/{field.max}

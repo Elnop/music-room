@@ -1,10 +1,12 @@
 import { Dimensions, StyleSheet } from 'react-native';
+import { BREAKPOINTS, PLAYER_PANEL_WIDTH } from '@/shared/constants/layout';
 import type { Theme } from '@/shared/theme/types';
 
 export const { width: WINDOW_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 export const DISMISS_THRESHOLD = SCREEN_HEIGHT * 0.2;
+const PLAYER_WIDTH = WINDOW_WIDTH >= BREAKPOINTS.desktop ? PLAYER_PANEL_WIDTH : WINDOW_WIDTH;
 // Capped by the height too, so a short screen still fits the bottom row above the navigation bar.
-export const ARTWORK_SIZE = Math.min(WINDOW_WIDTH * 0.75, SCREEN_HEIGHT * 0.36);
+export const ARTWORK_SIZE = Math.min(PLAYER_WIDTH * 0.75, SCREEN_HEIGHT * 0.36);
 /** From one artwork of the carousel to the next: the neighbours' edges peek out on both sides. */
 export const ARTWORK_STEP = ARTWORK_SIZE + 16;
 export const SEEK_STEP_S = 10;
@@ -14,6 +16,17 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 	StyleSheet.create({
 		container: { flex: 1 },
 		modalContent: { backgroundColor: theme.colors.background },
+		panel: {
+			position: 'absolute',
+			top: 0,
+			right: 0,
+			bottom: 0,
+			width: PLAYER_PANEL_WIDTH,
+			overflow: 'hidden',
+			borderLeftWidth: 1,
+			borderLeftColor: theme.colors.border,
+		},
+		panelBackdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: theme.colors.backdrop },
 		header: { paddingTop: insets.top + 8, alignItems: 'center', paddingBottom: 8 },
 		swipeIndicator: { alignItems: 'center', marginBottom: 8 },
 		swipeBar: { width: 40, height: 5, borderRadius: 3, opacity: 0.5 },

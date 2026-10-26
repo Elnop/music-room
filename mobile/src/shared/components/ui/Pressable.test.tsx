@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { PRESSED_OPACITY, Pressable } from './Pressable';
+import { HOVERED_OPACITY, PRESSED_OPACITY, Pressable, pressableStyle } from './Pressable';
 import { hapticSelection, hapticTap } from '@/shared/utils/haptics';
 
 jest.mock('@/shared/utils/haptics', () => ({
@@ -70,5 +70,15 @@ describe('Pressable', () => {
 			/>
 		);
 		expect(style()).toMatchObject({ margin: 4, opacity: PRESSED_OPACITY });
+	});
+
+	it('lightens under the mouse pointer, unless disabled or pressed', () => {
+		const opacity = (pressed: boolean, hovered: boolean, disabled = false) =>
+			StyleSheet.flatten(pressableStyle({ margin: 4 }, { pressed, hovered }, disabled)).opacity;
+
+		expect(opacity(false, true)).toBe(HOVERED_OPACITY);
+		expect(opacity(true, true)).toBe(PRESSED_OPACITY);
+		expect(opacity(false, false)).toBeUndefined();
+		expect(opacity(false, true, true)).toBeUndefined();
 	});
 });

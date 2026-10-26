@@ -10,9 +10,11 @@ import type { Theme } from '@/shared/theme/types';
 interface EditProfileFormFieldsProps {
 	control: Control<UpdateProfileInput>;
 	errors: FieldErrors<UpdateProfileInput>;
+	/** Enter in the name field (web); undefined while saving is not possible. */
+	onSubmit?: () => void;
 }
 
-export function EditProfileFormFields({ control, errors }: EditProfileFormFieldsProps) {
+export function EditProfileFormFields({ control, errors, onSubmit }: EditProfileFormFieldsProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
@@ -32,6 +34,7 @@ export function EditProfileFormFields({ control, errors }: EditProfileFormFields
 							error={errors.displayName?.message}
 							autoCapitalize="words"
 							returnKeyType="next"
+							submitOnEnter={onSubmit}
 							maxLength={PROFILE_LIMITS.DISPLAY_NAME_MAX}
 						/>
 						<Text style={styles.charCount}>

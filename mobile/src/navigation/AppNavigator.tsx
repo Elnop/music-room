@@ -1,5 +1,8 @@
 import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {
+	createBottomTabNavigator,
+	type BottomTabNavigationOptions,
+} from '@react-navigation/bottom-tabs';
 import type { NavigatorScreenParams } from '@react-navigation/native';
 import { View, StyleSheet } from 'react-native';
 import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -25,7 +28,9 @@ import { useEventsSync } from '@/features/events/hooks/useEventsSync';
 import { useRemoteTarget } from '@/features/queue/hooks/useRemoteTarget';
 import { useConnectionStatus } from '@/shared/hooks/useConnectionStatus';
 import { ConnectionBanner } from '@/shared/components/feedback/ConnectionBanner';
-import { TAB_BAR_HEIGHT } from '@/shared/constants/layout';
+import { SIDEBAR_WIDTH, TAB_BAR_HEIGHT } from '@/shared/constants/layout';
+import { useBreakpoint, type Breakpoint } from '@/shared/hooks/useBreakpoint';
+import { MiniPlayer } from '@/features/player/miniPlayer/components/orchestrators/MiniPlayer';
 
 // Playlists and Friends take nested params: zumik:// share links open their screens;
 // Profile's let a playlist open Settings.
@@ -56,10 +61,33 @@ const TAB_ICONS: Record<
 	ProfileTab: { active: 'person', inactive: 'person-outline' },
 };
 
+/** Wide screens move the tabs to a side bar: an icon rail on a tablet, icons and labels on desktop. */
+const sidebarOptions = (
+	breakpoint: Exclude<Breakpoint, 'phone'>,
+	theme: Theme,
+	topInset: number
+): BottomTabNavigationOptions => ({
+	tabBarPosition: 'left',
+	tabBarVariant: breakpoint === 'tablet' ? 'material' : 'uikit',
+	tabBarLabelPosition: breakpoint === 'tablet' ? 'below-icon' : 'beside-icon',
+	tabBarStyle: {
+		width: SIDEBAR_WIDTH[breakpoint],
+		paddingTop: topInset + theme.spacing.lg,
+		backgroundColor: theme.colors.background,
+		borderRightWidth: 1,
+		borderRightColor: theme.colors.border,
+	},
+});
+
 export function AppNavigator() {
 	const { theme } = useTheme();
 	const insets = useSafeAreaInsets();
+	const { breakpoint } = useBreakpoint();
 	const styles = React.useMemo(() => createStyles(theme, insets.bottom), [theme, insets.bottom]);
+	const sidebar = React.useMemo(
+		() => (breakpoint === 'phone' ? null : sidebarOptions(breakpoint, theme, insets.top)),
+		[breakpoint, theme, insets.top]
+	);
 	useQueueSync();
 	useEventsSync();
 	useRemoteTarget();
@@ -92,6 +120,7 @@ export function AppNavigator() {
 							headerTitleStyle: {
 								fontWeight: theme.typography.weights.bold,
 							},
+							...sidebar,
 							tabBarIcon: ({ focused, color }) => {
 								const icons = TAB_ICONS[route.name];
 								const iconName = focused ? icons.active : icons.inactive;
@@ -149,6 +178,12 @@ export function AppNavigator() {
 					</Tab.Navigator>
 				</SafeAreaInsetsContext.Provider>
 
+				{sidebar && (
+					<View style={styles.playerBar}>
+						<MiniPlayer />
+					</View>
+				)}
+
 				<PlayerModal />
 				<PlayerErrorToast />
 			</View>
@@ -182,5 +217,11 @@ const createStyles = (theme: Theme, bottomInset: number) =>
 		},
 		iconContainerActive: {
 			backgroundColor: theme.colors.primary,
+		},
+		playerBar: {
+			paddingBottom: bottomInset,
+			borderTopWidth: 1,
+			borderTopColor: theme.colors.border,
+			backgroundColor: theme.colors.background,
 		},
 	});
