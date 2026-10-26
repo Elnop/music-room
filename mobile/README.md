@@ -154,7 +154,7 @@ mobile/src/
 │   │                       # (playback contract), backendUrl, lastTrackStorage
 │   ├── query/              # TanStack Query: queryClient (STALE profiles), keys (key factory), socketCache
 │   ├── stores/             # socketStore (Socket.io connection)
-│   ├── hooks/              # useConnectionStatus, useImageColors
+│   ├── hooks/              # useConnectionStatus, useImageColors, usePlan (subscription plan)
 │   ├── theme/              # ThemeContext, original theme, tokens
 │   ├── constants/app.ts    # API config, spacing
 │   └── utils/              # logger, toast, haptics, apiErrorMessage, debounce, moveTarget, shareLinks...
