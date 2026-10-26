@@ -42,6 +42,7 @@ Prevents abuse by limiting the number of requests per time window:
 | Avatar, per user | 10 changes | 1 hour | `rl:profile:avatar:avatar:{userId}` |
 | Playlist cover, per user | 10 changes | 1 hour | `rl:playlists:cover:cover:{userId}` |
 | Plan switch, per user | 20 switches | 1 hour | `rl:subscription:subscription:{userId}` |
+| Event writes, per user | 60 changes | 1 hour | `rl:events:events:{userId}` |
 | Failed token verifications | 20 failures | 15 minutes | `rl:auth:token:{ip}` |
 
 The key is the limiter's store prefix (`rl:<store>:`) followed by its own key, hence the repeated segment (`login:login`). Past the limit: 429 `RATE_LIMIT_EXCEEDED` with `details.retryAfter`, and the `RateLimit-*` and `Retry-After` headers for the express-rate-limit limiters.
@@ -168,6 +169,7 @@ rl:soundcloud:soundcloud:{userId}      # SoundCloud requests
 rl:profile:avatar:avatar:{userId}      # Profile photo changes
 rl:playlists:cover:cover:{userId}      # Playlist cover changes
 rl:subscription:subscription:{userId}  # Plan switches
+rl:events:events:{userId}              # Event creations, updates, deletions
 rl:auth:token:{ip}                     # Failed token verifications
 ```
 
