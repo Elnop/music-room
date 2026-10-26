@@ -9,7 +9,12 @@ describe('ThemedRefreshControl', () => {
 		const style = { flex: 1 };
 
 		render(
-			<ThemedRefreshControl refreshing={false} onRefresh={jest.fn()} color="transparent" style={style}>
+			<ThemedRefreshControl
+				refreshing={false}
+				onRefresh={jest.fn()}
+				color="transparent"
+				style={style}
+			>
 				{list}
 			</ThemedRefreshControl>
 		);

@@ -5,7 +5,7 @@ import { SkeletonList, UserRowSkeleton } from '@/shared/components/ui/Skeleton';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { FriendProfile } from '@/features/friends/types';
 import { FriendItemRow } from './FriendItemRow';
-import { ThemedRefreshControl } from './ThemedRefreshControl';
+import { ThemedRefreshControl } from '@/shared/components/lists/ThemedRefreshControl';
 import { createFriendsListStyles } from './friendsListStyles';
 
 interface FriendsListTabProps {

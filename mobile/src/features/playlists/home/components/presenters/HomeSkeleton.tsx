@@ -6,7 +6,7 @@ import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { FriendCardSkeleton } from './FriendCardSkeleton';
 import { createListStyles } from './listStyles';
 
-export function PlaylistsSkeleton() {
+export function HomeSkeleton() {
 	const { styles: list } = useThemedStyles(createListStyles);
 	const { styles } = useThemedStyles(createStyles);
 

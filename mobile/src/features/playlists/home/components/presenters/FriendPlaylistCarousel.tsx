@@ -6,7 +6,7 @@ import { Pressable } from '@/shared/components/ui/Pressable';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { FriendPlaylists } from '@/features/playlists/types';
-import { playlistCardLabel, tracksLabel } from '@/features/playlists/list/utils/playlistLabels';
+import { playlistCardLabel, tracksLabel } from '@/features/playlists/home/utils/playlistLabels';
 import { OwnerAvatarBadge } from './OwnerAvatarBadge';
 
 /** Width of a card; the playlists screen's skeleton uses it too. */

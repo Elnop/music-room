@@ -4,7 +4,7 @@ import { Avatar } from '@/shared/components/media/Avatar';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { UserSummary } from '@/features/playlists/types';
-import { ownerName } from '@/features/playlists/list/utils/playlistLabels';
+import { ownerName } from '@/features/playlists/home/utils/playlistLabels';
 
 /** The playlist's owner, in the bottom right corner of its cover; the card's label names them. */
 export function OwnerAvatarBadge({ owner }: { owner: UserSummary }) {
