@@ -1,6 +1,6 @@
 # Subject coverage
 
-How the code meets each mandatory requirement of the 42 subject "Music Room" v5.3 ([en.subject.pdf](en.subject.pdf)). The subject overrides every other document. Bonuses (chapter V) are only graded once the mandatory part is perfect, so the project targets the mandatory part first; bonus V.3 (free and paid subscription) is delivered too, see [Bonus V.3](#bonus-v3-free-and-paid-subscription).
+How the code meets each mandatory requirement of the 42 subject "Music Room" v5.3 ([en.subject.pdf](en.subject.pdf)). The subject overrides every other document. Bonuses (chapter V) are only graded once the mandatory part is perfect, so the project targets the mandatory part first; bonuses V.2 (IoT, nearby events by iBeacon) and V.3 (free and paid subscription) are delivered too, see [Bonus V.2](#bonus-v2-reflection-on-the-iot) and [Bonus V.3](#bonus-v3-free-and-paid-subscription).
 
 Status: ✅ done · ⏳ in progress. Each line names where to look; the linked documents give the details.
 
@@ -93,6 +93,21 @@ Details: [playlist-editor.md](../features/playlist-editor.md), [playlist-concurr
 - Work is tracked in GitHub Issues (epics and stories), one branch and one pull request per issue into `develop`.
 - Unit and integration tests on each layer (Vitest + Supertest on the backend, jest-expo on mobile), run by `make test`.
 - `npm run check` (types, lint, dead code, dependencies, duplication, patterns, secrets, tests) runs at pre-commit and in CI on every pull request; see [quality-and-ci.md](../development/quality-and-ci.md).
+
+## Bonus V.2 Reflection on the IoT
+
+Details: [events.md](../features/events.md). Music Track Vote's "event" is not reused (IV.2.1 is not implemented): the bonus works on a physical event, purely informative, that can link to a public playlist of the Playlist Editor.
+
+| Subject | Where |
+| --- | --- |
+| *a mechanism such as IBeacon* | The organiser's phone broadcasts an iBeacon frame (Zumik UUID, the event's minor): `mobile/src/features/events/utils/ibeacon.ts`, `mobile/modules/beacon-advertiser/`. Other phones scan and decode it in project code (`services/beaconScanner.ts`, `utils/ibeacon.ts`, `utils/beaconDistance.ts`); GPS distance as a fallback (`utils/geo.ts`) |
+| *a public event registered on your service* | `events` table (migration `032_events.sql`), `backend/src/features/events/`, `GET/POST/PATCH/DELETE /api/events`; every event is public |
+| *how to access it, the kind of music* | `accessInfo` and `genres` of the event, on its page (`features/events/detail/`), with its address, dates and linked playlist |
+| *automatically receive* | The event appears in « Événements à proximité » on **Accueil** with no action, and leaves on its own (`features/events/nearby/`, `utils/nearbyEvents.ts`); `event:*` Socket.io events keep the list current |
+
+Assumed gap: the information is received **in the foreground, on the home screen**, not as a notification in the background. Scanning and location stop when the home is not shown or the app is in the background, which spares the battery and needs no background location permission. Also, Android shows iBeacon scan results only with the location permission and the location setting on (see [events.md](../features/events.md#permissions-android)).
+
+Demo scenario: [events.md](../features/events.md#demo-with-two-phones).
 
 ## Bonus V.3 Free and paid subscription
 
