@@ -1,20 +1,14 @@
 import { logger } from '@/shared/utils/logger.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
-import * as cache from '@/features/soundcloud/utils/soundcloud-cache.js';
 import { soundcloud } from '@/features/soundcloud/utils/soundcloud-client.js';
 import type { StreamUrlResult } from '@/features/soundcloud/soundcloud.types.js';
 
 type Protocol = 'hls' | 'progressive';
 
-// HLS first, else progressive. Never persisted; a cached result keeps its original `expiresAt`.
-export async function getStreamUrl(trackUrl: string): Promise<StreamUrlResult> {
-	const cacheKey = `stream:${trackUrl}`;
-	const cached = cache.get<StreamUrlResult>(cacheKey);
-	if (cached) {
-		logger.debug('Returning cached stream URL', { trackUrl });
-		return cached;
-	}
+const STREAM_URL_LIFETIME_S = 1800;
 
+// HLS first, else progressive. Never cached: a URL reused minutes later can already answer 403.
+export async function getStreamUrl(trackUrl: string): Promise<StreamUrlResult> {
 	try {
 		logger.info('Getting stream URL', { trackUrl });
 
@@ -31,9 +25,8 @@ export async function getStreamUrl(trackUrl: string): Promise<StreamUrlResult> {
 			logger.info('Stream URL obtained', { trackUrl });
 			const result: StreamUrlResult = {
 				streamUrl,
-				expiresAt: new Date(obtainedAt + cache.STREAM_URL_LIFETIME_S * 1000).toISOString(),
+				expiresAt: new Date(obtainedAt + STREAM_URL_LIFETIME_S * 1000).toISOString(),
 			};
-			cache.set(cacheKey, result, cache.CACHE_TTL.STREAM);
 			return result;
 		}
 

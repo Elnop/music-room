@@ -3,12 +3,6 @@ import * as cache from '@/features/soundcloud/utils/soundcloud-cache.js';
 
 const T0 = new Date('2026-01-01T00:00:00.000Z');
 
-describe('CACHE_TTL', () => {
-	it('keeps stream URLs at most 30 minutes', () => {
-		expect(cache.CACHE_TTL.STREAM * 1000).toBeLessThanOrEqual(30 * 60 * 1000);
-	});
-});
-
 describe('soundcloud-cache', () => {
 	beforeEach(() => {
 		vi.useFakeTimers();
