@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { createEventSchema, updateEventSchema } from '@/features/events/events.validators.js';
+import {
+	createEventSchema,
+	geocodeQuerySchema,
+	updateEventSchema,
+} from '@/features/events/events.validators.js';
 
 const hour = 3_600_000;
 const iso = (offset: number) => new Date(Date.now() + offset).toISOString();
@@ -47,5 +51,15 @@ describe('updateEventSchema', () => {
 	it('refuses an end before the start when both are sent', () => {
 		const result = updateEventSchema.safeParse({ startsAt: iso(3 * hour), endsAt: iso(hour) });
 		expect(result.success).toBe(false);
+	});
+});
+
+describe('geocodeQuerySchema', () => {
+	it('trims the address', () => {
+		expect(geocodeQuerySchema.parse({ q: '  1 rue de Paris ' })).toEqual({ q: '1 rue de Paris' });
+	});
+
+	it.each([{}, { q: '   ' }, { q: 'x'.repeat(201) }, { q: ['a', 'b'] }])('refuses %o', query => {
+		expect(geocodeQuerySchema.safeParse(query).success).toBe(false);
 	});
 });

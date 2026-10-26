@@ -1,8 +1,13 @@
 import type { z } from 'zod';
 import type { Tables } from '@/shared/types/supabase.generated.js';
-import type { eventSchema } from '@/features/events/events-responses.validators.js';
+import type {
+	eventSchema,
+	geocodedPlaceSchema,
+} from '@/features/events/events-responses.validators.js';
 
 export type Event = z.infer<typeof eventSchema>;
+
+export type GeocodedPlace = z.infer<typeof geocodedPlaceSchema>;
 
 export type EventRow = Tables<'events'>;
 
