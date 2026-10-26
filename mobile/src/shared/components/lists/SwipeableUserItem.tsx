@@ -4,6 +4,7 @@ import { Pressable } from '@/shared/components/ui/Pressable';
 import { Swipeable } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import type { Theme } from '@/shared/theme/types';
 import { Avatar } from '@/shared/components/media/Avatar';
 
@@ -20,7 +21,8 @@ interface SwipeableUserItemProps {
 
 export function SwipeableUserItem({ user, role, onRemove }: SwipeableUserItemProps) {
 	const { theme } = useTheme();
-	const styles = React.useMemo(() => createStyles(theme), [theme]);
+	const separator = useSeparatorColor();
+	const styles = React.useMemo(() => createStyles(theme, separator), [theme, separator]);
 
 	const renderRightActions = () => {
 		return (
@@ -64,7 +66,7 @@ export function SwipeableUserItem({ user, role, onRemove }: SwipeableUserItemPro
 	);
 }
 
-const createStyles = (theme: Theme) =>
+const createStyles = (theme: Theme, separator: string) =>
 	StyleSheet.create({
 		userContainer: {
 			flexDirection: 'row',
@@ -72,7 +74,7 @@ const createStyles = (theme: Theme) =>
 			padding: 12,
 			backgroundColor: theme.colors.surface,
 			borderBottomWidth: 1,
-			borderBottomColor: theme.colors.border,
+			borderBottomColor: separator,
 		},
 		avatar: {
 			marginRight: 12,

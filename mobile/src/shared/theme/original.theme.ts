@@ -31,6 +31,7 @@ export const originalTheme: Theme = {
 
 		border: '#FFFFFF',
 		borderLight: '#404040',
+		borderSubtle: '#2E2E2E',
 
 		error: '#EF4444',
 		success: '#22C55E',

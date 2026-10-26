@@ -28,9 +28,11 @@ import { useEventsSync } from '@/features/events/hooks/useEventsSync';
 import { useRemoteTarget } from '@/features/queue/hooks/useRemoteTarget';
 import { useConnectionStatus } from '@/shared/hooks/useConnectionStatus';
 import { ConnectionBanner } from '@/shared/components/feedback/ConnectionBanner';
-import { SIDEBAR_WIDTH, TAB_BAR_HEIGHT } from '@/shared/constants/layout';
+import { TAB_BAR_HEIGHT } from '@/shared/constants/layout';
 import { useBreakpoint, type Breakpoint } from '@/shared/hooks/useBreakpoint';
 import { MiniPlayer } from '@/features/player/miniPlayer/components/orchestrators/MiniPlayer';
+import { PlayerBar } from '@/features/player/playerBar/components/orchestrators/PlayerBar';
+import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 
 // Playlists and Friends take nested params: zumik:// share links open their screens;
 // Profile's let a playlist open Settings.
@@ -61,21 +63,34 @@ const TAB_ICONS: Record<
 	ProfileTab: { active: 'person', inactive: 'person-outline' },
 };
 
-/** Wide screens move the tabs to a side bar: an icon rail on a tablet, icons and labels on desktop. */
+/** Wide screens move the tabs to a side bar framed by AppTabBar: an icon rail on a tablet, icons and labels on desktop. */
 const sidebarOptions = (
 	breakpoint: Exclude<Breakpoint, 'phone'>,
-	theme: Theme,
-	topInset: number
+	theme: Theme
 ): BottomTabNavigationOptions => ({
 	tabBarPosition: 'left',
 	tabBarVariant: breakpoint === 'tablet' ? 'material' : 'uikit',
 	tabBarLabelPosition: breakpoint === 'tablet' ? 'below-icon' : 'beside-icon',
+	// The library's defaults put a primary label on a primary fill.
+	tabBarActiveTintColor: theme.colors.text,
+	tabBarActiveBackgroundColor: theme.colors.surfaceAlt,
+	tabBarLabelStyle:
+		breakpoint === 'tablet'
+			? { fontSize: theme.typography.sizes.sm, marginTop: theme.spacing.xs }
+			: {
+					fontSize: theme.typography.sizes.md,
+					fontWeight: theme.typography.weights.semibold,
+					marginStart: theme.spacing.md,
+				},
 	tabBarStyle: {
-		width: SIDEBAR_WIDTH[breakpoint],
-		paddingTop: topInset + theme.spacing.lg,
-		backgroundColor: theme.colors.background,
-		borderRightWidth: 1,
-		borderRightColor: theme.colors.border,
+		flex: 1,
+		// Overrides the side bar's 360 px minimum width.
+		minWidth: 0,
+		paddingTop: theme.spacing.md,
+		paddingStart: breakpoint === 'tablet' ? theme.spacing.xs : theme.spacing.sm,
+		paddingEnd: breakpoint === 'tablet' ? theme.spacing.xs : theme.spacing.sm,
+		backgroundColor: 'transparent',
+		borderRightWidth: 0,
 	},
 });
 
@@ -83,10 +98,11 @@ export function AppNavigator() {
 	const { theme } = useTheme();
 	const insets = useSafeAreaInsets();
 	const { breakpoint } = useBreakpoint();
+	const separator = useSeparatorColor();
 	const styles = React.useMemo(() => createStyles(theme, insets.bottom), [theme, insets.bottom]);
 	const sidebar = React.useMemo(
-		() => (breakpoint === 'phone' ? null : sidebarOptions(breakpoint, theme, insets.top)),
-		[breakpoint, theme, insets.top]
+		() => (breakpoint === 'phone' ? null : sidebarOptions(breakpoint, theme)),
+		[breakpoint, theme]
 	);
 	useQueueSync();
 	useEventsSync();
@@ -124,6 +140,15 @@ export function AppNavigator() {
 							tabBarIcon: ({ focused, color }) => {
 								const icons = TAB_ICONS[route.name];
 								const iconName = focused ? icons.active : icons.inactive;
+								if (sidebar) {
+									return (
+										<Ionicons
+											name={iconName}
+											size={22}
+											color={focused ? theme.colors.primary : color}
+										/>
+									);
+								}
 								return (
 									<View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
 										<Ionicons
@@ -179,8 +204,8 @@ export function AppNavigator() {
 				</SafeAreaInsetsContext.Provider>
 
 				{sidebar && (
-					<View style={styles.playerBar}>
-						<MiniPlayer />
+					<View style={[styles.playerBar, { borderTopColor: separator }]}>
+						{breakpoint === 'desktop' ? <PlayerBar /> : <MiniPlayer />}
 					</View>
 				)}
 
@@ -221,7 +246,6 @@ const createStyles = (theme: Theme, bottomInset: number) =>
 		playerBar: {
 			paddingBottom: bottomInset,
 			borderTopWidth: 1,
-			borderTopColor: theme.colors.border,
 			backgroundColor: theme.colors.background,
 		},
 	});

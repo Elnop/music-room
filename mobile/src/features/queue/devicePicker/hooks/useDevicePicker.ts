@@ -9,6 +9,7 @@ import { logger } from '@/shared/utils/logger';
 import { createPickerStyles } from '@/features/queue/devicePicker/components/presenters/devicePickerStyles';
 import type { DevicePickerOwner } from '@/types/device.types';
 import type { PickerDevice } from '@/features/queue/devicePicker/components/presenters/DeviceRow';
+import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 
 export interface LoadedDevices {
 	owners: DevicePickerOwner[];
@@ -18,7 +19,11 @@ export interface LoadedDevices {
 export function useDevicePicker(visible: boolean, onClose: () => void) {
 	const { theme } = useTheme();
 	const insets = useSafeAreaInsets();
-	const styles = React.useMemo(() => createPickerStyles(theme, insets), [theme, insets]);
+	const separator = useSeparatorColor();
+	const styles = React.useMemo(
+		() => createPickerStyles(theme, insets, separator),
+		[theme, insets, separator]
+	);
 	const target = useConnectStore(state => state.target);
 
 	const [loaded, setLoaded] = React.useState<LoadedDevices | null>(null);

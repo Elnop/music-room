@@ -8,9 +8,13 @@ export const formatDuration = (ms: number): string => {
 	return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 };
 
-export const createModalStyles = (theme: Theme, insets: { top: number; bottom: number }) =>
+export const createModalStyles = (
+	theme: Theme,
+	insets: { top: number; bottom: number },
+	separator: string
+) =>
 	StyleSheet.create({
-		...sheetHeaderStyles(theme, insets),
+		...sheetHeaderStyles(theme, insets, separator),
 		listContent: {
 			flexGrow: 1,
 			paddingBottom: insets.bottom + 16,
@@ -32,7 +36,7 @@ export const createModalStyles = (theme: Theme, insets: { top: number; bottom: n
 		},
 	});
 
-export const createRowStyles = (theme: Theme) =>
+export const createRowStyles = (theme: Theme, separator: string) =>
 	StyleSheet.create({
 		row: {
 			flexDirection: 'row',
@@ -40,7 +44,12 @@ export const createRowStyles = (theme: Theme) =>
 			padding: 12,
 			backgroundColor: theme.colors.surface,
 			borderBottomWidth: 1,
-			borderBottomColor: theme.colors.border,
+			borderBottomColor: separator,
+		},
+		rowMain: {
+			flex: 1,
+			flexDirection: 'row',
+			alignItems: 'center',
 		},
 		rowCurrent: {
 			backgroundColor: theme.colors.surfaceAlt,

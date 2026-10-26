@@ -2,9 +2,13 @@ import { StyleSheet } from 'react-native';
 import { sheetHeaderStyles } from '@/features/queue/utils/sheetHeaderStyles';
 import type { Theme } from '@/shared/theme/types';
 
-export const createPickerStyles = (theme: Theme, insets: { top: number; bottom: number }) =>
+export const createPickerStyles = (
+	theme: Theme,
+	insets: { top: number; bottom: number },
+	separator: string
+) =>
 	StyleSheet.create({
-		...sheetHeaderStyles(theme, insets),
+		...sheetHeaderStyles(theme, insets, separator),
 		listContent: {
 			paddingBottom: insets.bottom + 16,
 		},

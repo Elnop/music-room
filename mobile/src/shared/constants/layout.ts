@@ -5,7 +5,7 @@ export const TAB_BAR_HEIGHT = 70;
 export const BREAKPOINTS = { tablet: 768, desktop: 1024 } as const;
 
 /** The left navigation's width on wide screens; the phone keeps the bottom tab bar. */
-export const SIDEBAR_WIDTH = { tablet: 96, desktop: 232 } as const;
+export const SIDEBAR_WIDTH = { tablet: 104, desktop: 240 } as const;
 
 /** On wide screens, a screen's content is centred at this width at most. */
 export const CONTENT_MAX_WIDTH = { form: 600, content: 960, wide: 1280 } as const;
