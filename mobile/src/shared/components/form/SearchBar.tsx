@@ -20,6 +20,7 @@ interface SearchBarProps {
 	autoFocus?: boolean;
 	/** Shows a spinner in the field while a search runs. */
 	loading?: boolean;
+	inputRef?: React.Ref<TextInput>;
 }
 
 const HIT_SLOP = { top: 10, bottom: 10, left: 10, right: 10 };
@@ -31,6 +32,7 @@ export function SearchBar({
 	style,
 	autoFocus = false,
 	loading = false,
+	inputRef,
 }: SearchBarProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
@@ -45,6 +47,7 @@ export function SearchBar({
 				testID="search-bar-icon"
 			/>
 			<TextInput
+				ref={inputRef}
 				style={styles.input}
 				value={value}
 				onChangeText={onChangeText}

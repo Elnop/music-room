@@ -9,6 +9,7 @@ import {
 	type ViewStyle,
 } from 'react-native';
 import { hapticSelection, hapticSuccess, hapticTap } from '@/shared/utils/haptics';
+import { useIconTooltip } from '@/shared/hooks/useIconTooltip';
 
 /** The opacity of every pressable element while it is held down. */
 export const PRESSED_OPACITY = 0.7;
@@ -52,6 +53,10 @@ export function Pressable({
 	disabled,
 	...rest
 }: PressableProps) {
+	// A backdrop (role none) closes its dialog anywhere; a tooltip over all of it would mislead.
+	const tooltipRef = useIconTooltip(
+		accessibilityRole === 'none' ? undefined : rest.accessibilityLabel
+	);
 	const handlePress = onPress
 		? (event: GestureResponderEvent) => {
 				if (haptic) HAPTICS[haptic]();
@@ -62,6 +67,7 @@ export function Pressable({
 	return (
 		<NativePressable
 			{...rest}
+			ref={tooltipRef}
 			disabled={disabled}
 			accessibilityRole={accessibilityRole}
 			onPress={handlePress}
