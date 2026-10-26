@@ -66,7 +66,7 @@ export function registerSoundcloudOpenapi(registry: OpenAPIRegistry): void {
 		...common,
 		path: '/api/soundcloud/search',
 		summary: 'Search SoundCloud tracks',
-		description: `${ruled} Returns list of tracks matching search query.`,
+		description: `${ruled} Returns the playable tracks matching the query (DRM-only and region-blocked ones are left out); short pages are topped up from up to 3 SoundCloud pages of 50, so \`offset\` counts SoundCloud results, not returned tracks.`,
 		operationId: 'searchSoundCloudTracks',
 		request: {
 			query: describeParams(soundcloudSearchSchema, {

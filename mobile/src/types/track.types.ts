@@ -17,4 +17,6 @@ export interface TrackInPlaylist extends Track {
 	rank: string;
 	addedBy: string | null;
 	addedAt: string;
+	/** Deleted, private or blocked on SoundCloud: never played nor queued. */
+	unavailable: boolean;
 }

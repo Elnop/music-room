@@ -6,6 +6,7 @@ import type {
 	PlaylistDetailsEvent,
 	PlaylistUpdatedEvent,
 	PlaylistWithTracks,
+	TracksAvailabilityEvent,
 } from '@/features/playlists/types';
 import { applyPlaylistEvent } from './playlistSync';
 
@@ -16,6 +17,20 @@ const detailsPatch = (details: PlaylistDetailsEvent) => ({
 	visibility: details.visibility,
 	editMode: details.editMode,
 });
+
+function applyTracksAvailability(
+	playlist: PlaylistWithTracks,
+	event: TracksAvailabilityEvent
+): PlaylistWithTracks {
+	const changes = new Map(event.tracks.map(change => [change.trackId, change.unavailable]));
+	return {
+		...playlist,
+		tracks: playlist.tracks.map(track => {
+			const unavailable = changes.get(track.id);
+			return unavailable === undefined ? track : { ...track, unavailable };
+		}),
+	};
+}
 
 /** Track deltas apply in version order; a gap or a rebalance reloads the playlist (doc/features/playlist-concurrency.md). */
 export const PLAYLIST_SOCKET_RULES = [
@@ -38,6 +53,11 @@ export const PLAYLIST_SOCKET_RULES = [
 		queryKey: () => queryKeys.playlists.list(),
 		update: (list, details) =>
 			list.map(p => (p.id === details.playlistId ? { ...p, ...detailsPatch(details) } : p)),
+	}),
+	socketCacheRule<TracksAvailabilityEvent, PlaylistWithTracks>({
+		event: 'playlist:tracks-availability',
+		queryKey: event => queryKeys.playlists.detail(event.playlistId),
+		update: (playlist, event) => applyTracksAvailability(playlist, event),
 	}),
 	socketCacheRule<PlaylistDeletedEvent, Playlist[]>({
 		event: 'playlist:deleted',

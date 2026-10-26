@@ -149,7 +149,6 @@ const mockPrevious = jest.fn(async () => 'played' as const);
 
 registerPlaybackBridge({
 	usePlaylistPlayback: () => ({ playingUri: null, state: null }),
-	usePlayerHeight: () => 0,
 	useActiveQueue: () => testQueue,
 	addToQueue: jest.fn(async () => true),
 	playNext: jest.fn(async () => true),

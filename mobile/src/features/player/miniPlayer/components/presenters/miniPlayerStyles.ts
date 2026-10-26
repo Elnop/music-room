@@ -1,15 +1,9 @@
 import { StyleSheet } from 'react-native';
-import type { EdgeInsets } from 'react-native-safe-area-context';
 import type { Theme } from '@/shared/theme/types';
-import { TAB_BAR_HEIGHT } from '@/shared/constants/layout';
 
-export const createStyles = (theme: Theme, insets: EdgeInsets) =>
+export const createStyles = (theme: Theme) =>
 	StyleSheet.create({
 		container: {
-			position: 'absolute',
-			bottom: TAB_BAR_HEIGHT + insets.bottom,
-			left: 0,
-			right: 0,
 			backgroundColor: theme.colors.background,
 		},
 		content: {

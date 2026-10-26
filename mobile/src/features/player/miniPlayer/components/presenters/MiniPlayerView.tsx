@@ -8,7 +8,6 @@ import { Pressable } from '@/shared/components/ui/Pressable';
 import { Artwork } from '@/shared/components/media/Artwork';
 import type { MiniPlayerData } from '@/features/player/miniPlayer/hooks/useMiniPlayer';
 import { createStyles } from './miniPlayerStyles';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface MiniPlayerViewProps {
 	data: MiniPlayerData;
@@ -16,8 +15,7 @@ interface MiniPlayerViewProps {
 
 export function MiniPlayerView({ data }: MiniPlayerViewProps) {
 	const { theme } = useTheme();
-	const insets = useSafeAreaInsets();
-	const styles = React.useMemo(() => createStyles(theme, insets), [theme, insets]);
+	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
 	const {
 		track,
@@ -32,7 +30,6 @@ export function MiniPlayerView({ data }: MiniPlayerViewProps) {
 		onTogglePlay,
 		onNext,
 		infoStyle,
-		onLayout,
 	} = data;
 
 	const remoteLine = deviceLabel ? (
@@ -44,7 +41,6 @@ export function MiniPlayerView({ data }: MiniPlayerViewProps) {
 	return (
 		<Pressable
 			style={styles.container}
-			onLayout={onLayout}
 			onPress={onToggleModal}
 			accessible={false}
 			accessibilityLabel="Mini-lecteur"

@@ -14,6 +14,11 @@ export const itemNotFound = fail(
 	['QUEUE_ITEM_NOT_FOUND', 'Queue item not found']
 );
 
+export const trackUnavailable = fail(
+	'The track is deleted, private or blocked on SoundCloud (`TRACK_UNAVAILABLE`); the queue is unchanged',
+	['TRACK_UNAVAILABLE', 'This track is no longer available on SoundCloud']
+);
+
 const deviceOffline = fail(
 	'The chosen device is not connected (`DEVICE_OFFLINE`); the queue is unchanged',
 	['DEVICE_OFFLINE', 'Target device is not online']
@@ -47,7 +52,11 @@ const playItem: RouteConfig = {
 		'Makes the item current; the items before it become history. History beyond the 50 most recent items is dropped. With `deviceId`, that device of the owner is told to play the item. A delegate must send `deviceId`: a device they control and that is online.',
 	operationId: 'playQueueItem',
 	request: { params: queueItemParamsSchema, body: playbackBody },
-	responses: { ...answers, 404: itemNotFound, 409: deviceOffline },
+	responses: {
+		...answers,
+		404: itemNotFound,
+		409: orOffline(trackUnavailable),
+	},
 };
 
 const playPlaylist: RouteConfig = {
@@ -55,7 +64,7 @@ const playPlaylist: RouteConfig = {
 	path: '/api/queue/playlists/{playlistId}/play',
 	summary: 'Play a playlist through the queue',
 	description:
-		"Copies the playlist's tracks, in playlist order, into your queue as a new block (one new `blockId`, `sourcePlaylistId` = the playlist) placed right after the current item, or at the top when nothing is current, and makes the block's first item current, or the item of `startTrackId` (the `id` of one of the playlist's tracks): the tracks before it stay in the block as history. The item that was playing becomes history; the upcoming items follow the block. Playing the same playlist again adds a second, separate block. History beyond the 50 most recent items is dropped.",
+		"Copies the playlist's available tracks (an unavailable one is skipped), in playlist order, into your queue as a new block (one new `blockId`, `sourcePlaylistId` = the playlist) placed right after the current item, or at the top when nothing is current, and makes the block's first item current, or the item of `startTrackId` (the `id` of one of the playlist's tracks): the tracks before it stay in the block as history. The item that was playing becomes history; the upcoming items follow the block. Playing the same playlist again adds a second, separate block. History beyond the 50 most recent items is dropped.",
 	operationId: 'queuePlayPlaylist',
 	request: {
 		params: queuePlaylistParamsSchema,
@@ -77,10 +86,11 @@ const playPlaylist: RouteConfig = {
 			['PLAYLIST_TRACK_NOT_FOUND', 'Track not found in the playlist']
 		),
 		409: orOffline(
-			fail('The playlist has no track (`PLAYLIST_EMPTY`); the queue is unchanged', [
-				'PLAYLIST_EMPTY',
-				'The playlist has no track to play',
-			])
+			fail(
+				'The playlist has no available track (`PLAYLIST_EMPTY`), or `startTrackId` is unavailable (`TRACK_UNAVAILABLE`); the queue is unchanged',
+				['PLAYLIST_EMPTY', 'The playlist has no track to play'],
+				['TRACK_UNAVAILABLE', 'This track is no longer available on SoundCloud']
+			)
 		),
 	},
 };
@@ -90,7 +100,7 @@ const next: RouteConfig = {
 	path: '/api/queue/next',
 	summary: 'Step to the next item',
 	description:
-		'The item after the current one becomes current (the first item when nothing is current). History beyond the 50 most recent items is dropped.',
+		'The next item of an available track becomes current (from the top when nothing is current). History beyond the 50 most recent items is dropped.',
 	operationId: 'queueNext',
 	request: { body: playbackBody },
 	responses: {
@@ -103,7 +113,7 @@ const previous: RouteConfig = {
 	...base,
 	path: '/api/queue/previous',
 	summary: 'Step to the previous item',
-	description: 'The item before the current one becomes current.',
+	description: 'The previous item of an available track becomes current.',
 	operationId: 'queuePrevious',
 	request: { body: playbackBody },
 	responses: {

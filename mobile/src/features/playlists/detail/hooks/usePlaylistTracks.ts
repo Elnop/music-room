@@ -5,7 +5,7 @@ import { getPlayback, usePlaylistPlayback } from '@/shared/services/playbackBrid
 import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 import { logger } from '@/shared/utils/logger';
 import { afterRankForDrop } from '@/shared/utils/moveTarget';
-import { showError, showSuccess } from '@/shared/utils/toast';
+import { showError, showInfo, showSuccess } from '@/shared/utils/toast';
 import { toTrackInput } from '@/shared/utils/trackInput';
 import { useMoveTrack, useRemoveTrack } from '@/features/playlists/hooks/useTrackEdits';
 import { usePendingMovesStore } from '@/features/playlists/stores/pendingMovesStore';
@@ -27,6 +27,8 @@ export interface PlaylistTracks {
 	showActions: (track: TrackInPlaylist) => void;
 	closeActions: () => void;
 	addToQueue: (track: TrackInPlaylist) => void;
+	/** A tap on an unavailable track, which cannot be played. */
+	explainUnavailable: () => void;
 	deleteTrack: (trackId: string) => Promise<void>;
 	/** Rejects on failure, so the list drops its local order and shows the cached one again. */
 	reorder: (from: number, to: number) => Promise<void>;
@@ -85,6 +87,7 @@ export function usePlaylistTracks(
 		showActions: track => setActionTrack(toTrackInput(track)),
 		closeActions: () => setActionTrack(null),
 		addToQueue: track => void getPlayback().addToQueue(toTrackInput(track)),
+		explainUnavailable: () => showInfo("Ce titre n'est plus disponible sur SoundCloud"),
 		deleteTrack,
 		reorder,
 	};

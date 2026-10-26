@@ -13,10 +13,6 @@ jest.mock('@/shared/theme/ThemeContext', () => {
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-jest.mock('@/shared/services/playbackBridge', () => ({
-	usePlayerHeight: () => 90,
-}));
-
 jest.mock('@/shared/components/theme/ThemeSelector', () => ({
 	ThemeSelector: () => null,
 }));
@@ -32,10 +28,10 @@ describe('SettingsOrchestrator', () => {
 		expect(screen.getByText('Serveur')).toBeTruthy();
 	});
 
-	it('scrolls its last section clear of the mini-player', () => {
+	it('leaves breathing room under its last section', () => {
 		render(<SettingsOrchestrator />);
 		expect(screen.UNSAFE_getByType(ScrollView).props.contentContainerStyle).toEqual({
-			paddingBottom: 90 + originalTheme.spacing.xl,
+			paddingBottom: originalTheme.spacing.xl,
 		});
 	});
 });

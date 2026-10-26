@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveClientClass, soundcloud } from '@/features/soundcloud/utils/soundcloud-client.js';
+import { resolveClientClass, soundcloud } from '@/shared/soundcloud/soundcloud-client.js';
 
 class Client {
 	tracks = {};

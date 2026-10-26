@@ -377,36 +377,42 @@ export type Database = {
 					album: string | null;
 					album_art: string | null;
 					artist: string;
+					availability_checked_at: string | null;
 					created_at: string | null;
 					duration_ms: number;
 					id: string;
 					preview_url: string | null;
 					title: string;
 					track_uri: string;
+					unavailable_at: string | null;
 					updated_at: string | null;
 				};
 				Insert: {
 					album?: string | null;
 					album_art?: string | null;
 					artist: string;
+					availability_checked_at?: string | null;
 					created_at?: string | null;
 					duration_ms: number;
 					id?: string;
 					preview_url?: string | null;
 					title: string;
 					track_uri: string;
+					unavailable_at?: string | null;
 					updated_at?: string | null;
 				};
 				Update: {
 					album?: string | null;
 					album_art?: string | null;
 					artist?: string;
+					availability_checked_at?: string | null;
 					created_at?: string | null;
 					duration_ms?: number;
 					id?: string;
 					preview_url?: string | null;
 					title?: string;
 					track_uri?: string;
+					unavailable_at?: string | null;
 					updated_at?: string | null;
 				};
 				Relationships: [];
@@ -556,6 +562,7 @@ export type Database = {
 			rank_between: { Args: { p_a: string; p_b: string }; Returns: string };
 			rank_max_length: { Args: Record<PropertyKey, never>; Returns: number };
 			rank_spaced: { Args: { p_count: number; p_index: number }; Returns: string };
+			track_unavailable: { Args: { p_track_id: string }; Returns: boolean };
 		};
 		Enums: {
 			visibility_level: 'public' | 'friends_only' | 'private';

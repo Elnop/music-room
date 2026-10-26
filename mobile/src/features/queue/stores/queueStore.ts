@@ -11,6 +11,7 @@ import {
 	removeItemAction,
 } from '@/features/queue/stores/queueItemActions';
 import { playPlaylistError, selectQueue } from '@/features/queue/utils/queueSelectors';
+import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 import { logger } from '@/shared/utils/logger';
 import type { OwnerQueue, QueueState, QueueStepOutcome } from '@/features/queue/types';
 import type { AddQueueItemBody } from '@/shared/types/playback';
@@ -113,7 +114,7 @@ export const useQueueStore = create<QueueStoreState>((set, get) => ({
 			'Play item',
 			get().applyState,
 			{
-				errorMessage: 'Impossible de lire ce titre',
+				errorMessage: error => apiErrorMessage(error, 'Impossible de lire ce titre'),
 			}
 		),
 

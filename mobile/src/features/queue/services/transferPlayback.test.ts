@@ -137,7 +137,6 @@ registerAuthSession({
 
 registerPlaybackBridge({
 	usePlaylistPlayback: () => ({ playingUri: null, state: null }),
-	usePlayerHeight: () => 0,
 	useActiveQueue: () => ({ currentItemId: null, items: [], version: 0 }),
 	addToQueue: jest.fn(async () => true),
 	playNext: jest.fn(async () => true),

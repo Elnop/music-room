@@ -137,7 +137,6 @@ resetMockPlayer();
 
 registerPlaybackBridge({
 	usePlaylistPlayback: () => ({ playingUri: null, state: null }),
-	usePlayerHeight: () => 0,
 	useActiveQueue: () => EMPTY_QUEUE,
 	addToQueue: jest.fn(),
 	playNext: jest.fn(),
@@ -622,7 +621,8 @@ describe('queueStore playPlaylist', () => {
 	});
 
 	it.each([
-		['PLAYLIST_EMPTY', 409, 'Cette playlist est vide'],
+		['PLAYLIST_EMPTY', 409, 'Aucun titre disponible dans cette playlist'],
+		['TRACK_UNAVAILABLE', 409, "Ce titre n'est plus disponible"],
 		['PLAYLIST_ACCESS_DENIED', 403, "Vous n'avez pas accès à cette playlist"],
 		['PLAYLIST_NOT_FOUND', 404, "Cette playlist n'existe plus"],
 		['NETWORK_ERROR', undefined, 'Impossible de lire cette playlist'],
@@ -897,7 +897,9 @@ describe('queueStore owners (#297)', () => {
 			goRemote('friend');
 			transfer.mockRejectedValue(new ApiError('down', 'NETWORK_ERROR'));
 			await store().playListTrack(listTrack);
-			expect(showError).toHaveBeenCalledWith('Impossible de lire ce titre');
+			expect(showError).toHaveBeenCalledWith(
+				'Impossible de joindre le serveur. Vérifiez votre connexion.'
+			);
 			expect(useConnectStore.getState().target.kind).toBe('remote');
 		});
 	});
