@@ -20,7 +20,8 @@ backend/
 │   │   ├── playlists/      # Playlists, tracks, collaborators, viewers
 │   │   ├── profile/        # Profile, privacy, music preferences, avatar
 │   │   ├── queue/          # Play queue, delegated queue access, playback transfer
-│   │   └── soundcloud/     # Search, track details, stream URLs
+│   │   ├── soundcloud/     # Search, track details, stream URLs
+│   │   └── subscription/   # Free or premium plan, simulated switch (bonus V.3)
 │   ├── realtime/           # Socket.io server
 │   │   ├── socket-server.ts  # Server creation, origin, auth, limits, handler wiring
 │   │   ├── handlers/       # One handler per domain: playlist, listening, control
@@ -30,6 +31,7 @@ backend/
 │   │   ├── config/         # env, Supabase, Redis, Swagger building blocks, rate limits; imports no feature
 │   │   ├── middleware/     # error handler, action logger (HTTP + socket)
 │   │   ├── security/       # anti-abuse: rate limiting, lockout, IP reputation, token and socket event limits
+│   │   ├── subscription/   # getPlan, assertPremium (403 PREMIUM_REQUIRED), used by Premium-only features
 │   │   ├── types/          # Global types + supabase.generated.ts (generated: make generate-types)
 │   │   └── utils/          # logger, database.helpers.ts
 │   └── server.ts           # Express + Socket.io entry point
@@ -168,6 +170,7 @@ Mounted in `src/app/routes.ts`, documented in Swagger (`/api-docs`):
 | `/api/users/:userId/queue` | the same routes on a friend's queue, for a delegate |
 | `/api/queue/transfer` | move playback to another device |
 | `/api/soundcloud` | search, track, stream |
+| `/api/subscription` | the caller's plan (get), switch free / premium (put) |
 | `/health` | server and Redis health (no auth) |
 
 **Invalid token limit (#160)**: every protected route (`authMiddleware`) and every Socket.io handshake verifies the token with Supabase. Failures (`INVALID_TOKEN`, `TOKEN_REVOKED`) are counted per IP in Redis (`rl:auth:token:{ip}`, fixed window `RATE_LIMIT_TOKEN_WINDOW_MS`, 15 min by default). At `RATE_LIMIT_TOKEN_MAX` failures (20 by default), the IP is refused without calling Supabase until the end of the window, for any token, valid or not: every protected route then answers `429 RATE_LIMIT_EXCEEDED` (with `error.details.retryAfter`), a route with optional auth (`optionalAuthMiddleware`) goes on anonymously, and the handshake is refused with `TOO_MANY_ATTEMPTS`. Successful verifications are never counted. Same switch and same whitelist as the other limiters (`RATE_LIMIT_ENABLED`, `RATE_LIMIT_WHITELIST_IPS`); Redis not ready: the limit neither blocks nor counts, and `verifyToken` already answers 503. Each verification reserves a slot before calling Supabase (given back on success or on an uncounted failure): beyond `RATE_LIMIT_TOKEN_MAX` simultaneous verifications from one IP, the next ones get a transient 429.

@@ -48,6 +48,12 @@ export const rateLimitConfig = {
 		max: env.RATE_LIMIT_AVATAR_MAX,
 	},
 
+	// Per authenticated user.
+	subscription: {
+		windowMs: env.RATE_LIMIT_SUBSCRIPTION_WINDOW_MS,
+		max: env.RATE_LIMIT_SUBSCRIPTION_MAX,
+	},
+
 	lockout: {
 		enabled: env.ACCOUNT_LOCKOUT_ENABLED !== 'false',
 		threshold: parseInt(env.ACCOUNT_LOCKOUT_THRESHOLD || '5'),
