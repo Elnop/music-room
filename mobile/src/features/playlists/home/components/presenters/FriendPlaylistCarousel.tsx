@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { Artwork } from '@/shared/components/media/Artwork';
 import { Pressable } from '@/shared/components/ui/Pressable';
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { FriendPlaylists } from '@/features/playlists/types';
@@ -25,6 +26,7 @@ export function FriendPlaylistCarousel({
 	onFindFriends,
 }: FriendPlaylistCarouselProps) {
 	const { styles } = useThemedStyles(createStyles);
+	const { isWide } = useBreakpoint();
 	const cards = friendsPlaylists.flatMap(({ friend, playlists }) =>
 		playlists.map(playlist => ({ friend, playlist }))
 	);
@@ -35,6 +37,7 @@ export function FriendPlaylistCarousel({
 				icon="people-outline"
 				message="Aucune playlist de vos amis pour l'instant. Vos amis sont les personnes que vous suivez et qui vous suivent en retour."
 				action={{ label: 'Trouver des amis', onPress: onFindFriends }}
+				compact={isWide}
 			/>
 		);
 	}

@@ -1,0 +1,52 @@
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
+import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import type { Theme } from '@/shared/theme/types';
+import { trackTableColumns as columns } from './trackTableLayout';
+
+/** The column titles above the rows of a track table (wide screens). */
+export function TrackTableHeader() {
+	const { styles, theme } = useThemedStyles(createStyles);
+	const separator = useSeparatorColor();
+
+	return (
+		<View style={[styles.row, { borderBottomColor: separator }]}>
+			<View style={columns.position}>
+				<Text style={styles.label}>#</Text>
+			</View>
+			<View style={columns.title}>
+				<Text style={styles.label}>Titre</Text>
+			</View>
+			<View style={columns.artist}>
+				<Text style={styles.label}>Artiste</Text>
+			</View>
+			<View style={columns.duration}>
+				<Ionicons
+					name="time-outline"
+					size={16}
+					color={theme.colors.textSecondary}
+					accessibilityLabel="Durée"
+				/>
+			</View>
+			<View style={columns.trailing} />
+		</View>
+	);
+}
+
+const createStyles = (theme: Theme) =>
+	StyleSheet.create({
+		row: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			paddingHorizontal: 12,
+			paddingVertical: theme.spacing.sm,
+			borderBottomWidth: 1,
+		},
+		label: {
+			fontSize: theme.typography.sizes.sm,
+			fontWeight: theme.typography.weights.semibold,
+			color: theme.colors.textSecondary,
+		},
+	});

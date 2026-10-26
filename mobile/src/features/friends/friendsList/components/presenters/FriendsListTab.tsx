@@ -6,6 +6,7 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { rowColumns } from '@/shared/utils/gridLayout';
 import type { FriendProfile } from '@/features/friends/types';
+import { FriendCard } from './FriendCard';
 import { FriendItemRow } from './FriendItemRow';
 import { ThemedRefreshControl } from '@/shared/components/lists/ThemedRefreshControl';
 import { createFriendsListStyles } from './friendsListStyles';
@@ -41,7 +42,8 @@ export function FriendsListTab({
 }: FriendsListTabProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createFriendsListStyles(theme), [theme]);
-	const columns = rowColumns(useBreakpoint().breakpoint);
+	// A short list spreads over the width instead of leaving empty columns.
+	const columns = Math.min(rowColumns(useBreakpoint().breakpoint), Math.max(2, friends.length));
 
 	if (isLoading && friends.length === 0) {
 		return <SkeletonList count={6} row={UserRowSkeleton} />;
@@ -62,8 +64,9 @@ export function FriendsListTab({
 			}
 			keyExtractor={item => item.id}
 			renderItem={({ item }) => {
+				const Row = columns > 1 ? FriendCard : FriendItemRow;
 				const row = (
-					<FriendItemRow
+					<Row
 						friend={item}
 						canControl={canControl(item.id)}
 						isToggling={togglingUserId === item.id}

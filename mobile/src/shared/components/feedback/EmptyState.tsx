@@ -15,17 +15,24 @@ interface EmptyStateProps {
 	icon?: keyof typeof Ionicons.glyphMap;
 	/** A button under the message, leading out of the empty state. */
 	action?: EmptyStateAction;
+	/** A section's empty state among others (wide screens): it keeps to its content's height. */
+	compact?: boolean;
 	style?: StyleProp<ViewStyle>;
 }
 
-export function EmptyState({ message, icon, action, style }: EmptyStateProps) {
+export function EmptyState({ message, icon, action, compact = false, style }: EmptyStateProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
 	return (
-		<View style={[styles.container, style]}>
+		<View style={[styles.container, compact && styles.compact, style]}>
 			{icon && (
-				<Ionicons name={icon} size={64} color={theme.colors.textSecondary} style={styles.icon} />
+				<Ionicons
+					name={icon}
+					size={compact ? 36 : 64}
+					color={theme.colors.textSecondary}
+					style={[styles.icon, compact && styles.compactIcon]}
+				/>
 			)}
 			<Text style={styles.message}>{message}</Text>
 			{action && (
@@ -44,6 +51,15 @@ const createStyles = (theme: Theme) =>
 			justifyContent: 'center',
 			alignItems: 'center',
 			padding: theme.spacing.xl,
+		},
+		// Longhands: on the web `flex: 0` also sets a zero basis, and the content would overflow.
+		compact: {
+			flexGrow: 0,
+			flexBasis: 'auto',
+			paddingVertical: theme.spacing.lg,
+		},
+		compactIcon: {
+			marginBottom: theme.spacing.sm,
 		},
 		icon: {
 			marginBottom: theme.spacing.md,

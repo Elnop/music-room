@@ -1,16 +1,15 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Artwork } from '@/shared/components/media/Artwork';
 import { Avatar } from '@/shared/components/media/Avatar';
 import { ShareLinkButton } from '@/shared/components/sharing/ShareLinkButton';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { playlistLink } from '@/shared/utils/shareLinks';
 import type { PlaylistWithTracks } from '@/features/playlists/types';
+import { headerFacts } from '@/features/playlists/detail/utils/headerFacts';
 import { AddTrackRow } from './AddTrackRow';
-
-const COVER_SIZE = 200;
+import { PlaylistCover } from './PlaylistCover';
 
 interface PlaylistHeaderProps {
 	playlist: PlaylistWithTracks;
@@ -23,20 +22,11 @@ interface PlaylistHeaderProps {
 
 export function PlaylistHeader({ playlist, playButton, canEdit, onAddTrack }: PlaylistHeaderProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
-	const trackCount = playlist.tracks.length;
-	const ownerName = playlist.owner.displayName || playlist.owner.username;
-	const collaborators = playlist.collaboratorIds.length;
+	const { trackCount, trackLabel, ownerName, collaboratorLabel } = headerFacts(playlist);
 
 	return (
 		<View style={styles.container}>
-			<View style={styles.cover}>
-				<Artwork
-					uri={playlist.coverUrl || playlist.tracks[0]?.albumArt}
-					size={COVER_SIZE}
-					iconSize={64}
-					style={styles.artwork}
-				/>
-			</View>
+			<PlaylistCover playlist={playlist} style={styles.cover} />
 			<Text style={styles.name}>{playlist.name}</Text>
 			{!!playlist.description && <Text style={styles.description}>{playlist.description}</Text>}
 			<View style={styles.meta}>
@@ -45,17 +35,13 @@ export function PlaylistHeader({ playlist, playButton, canEdit, onAddTrack }: Pl
 					{ownerName}
 				</Text>
 				<Text style={styles.separator}>•</Text>
-				<Text style={styles.trackCount}>
-					{trackCount} {trackCount === 1 ? 'titre' : 'titres'}
-				</Text>
+				<Text style={styles.trackCount}>{trackLabel}</Text>
 				{trackCount > 0 && <View style={styles.play}>{playButton}</View>}
 			</View>
-			{collaborators > 0 && (
+			{collaboratorLabel && (
 				<View style={styles.collaborators}>
 					<Ionicons name="people-outline" size={14} color={theme.colors.primary} />
-					<Text style={styles.collaboratorsText}>
-						{collaborators} {collaborators === 1 ? 'collaborateur' : 'collaborateurs'}
-					</Text>
+					<Text style={styles.collaboratorsText}>{collaboratorLabel}</Text>
 				</View>
 			)}
 
@@ -69,17 +55,7 @@ export function PlaylistHeader({ playlist, playButton, canEdit, onAddTrack }: Pl
 const createStyles = (theme: Theme) =>
 	StyleSheet.create({
 		container: { alignItems: 'center', padding: theme.spacing.lg, paddingBottom: 0 },
-		cover: {
-			borderRadius: 8,
-			backgroundColor: theme.colors.surfaceAlt,
-			marginBottom: theme.spacing.lg,
-			shadowColor: theme.colors.shadow,
-			shadowOffset: { width: 0, height: 8 },
-			shadowOpacity: 0.3,
-			shadowRadius: 12,
-			elevation: 8,
-		},
-		artwork: { borderRadius: 8 },
+		cover: { marginBottom: theme.spacing.lg },
 		name: {
 			fontSize: theme.typography.sizes.xxl,
 			fontWeight: theme.typography.weights.bold,

@@ -4,15 +4,17 @@ import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { ActionSheet } from '@/features/playlists/actionSheet/components/presenters/ActionSheet';
 import { ActionSheetRow } from '@/features/playlists/actionSheet/components/presenters/ActionSheetRow';
+import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 import type { TrackActions } from '@/features/playlists/trackActions/hooks/useTrackActions';
 
 interface TrackActionsViewProps {
 	actions: TrackActions;
+	anchor: MenuAnchor | null;
 	onClose: () => void;
 }
 
 /** The sheet of a track's quick actions, or the playlists to add it to. */
-export function TrackActionsView({ actions, onClose }: TrackActionsViewProps) {
+export function TrackActionsView({ actions, anchor, onClose }: TrackActionsViewProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
 	const onPlaylists = actions.step === 'playlists';
 
@@ -24,6 +26,7 @@ export function TrackActionsView({ actions, onClose }: TrackActionsViewProps) {
 			onBack={onPlaylists ? actions.backToActions : undefined}
 			onClose={onClose}
 			maxHeight="70%"
+			anchor={anchor}
 		>
 			{!onPlaylists ? (
 				<View>
