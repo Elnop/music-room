@@ -1,14 +1,14 @@
 import React, { useLayoutEffect } from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { PlaylistStackParamList } from '@/features/playlists/types';
-import { usePlaylistsScreen } from '@/features/playlists/list/hooks/usePlaylistsScreen';
-import { PlaylistsView } from '@/features/playlists/list/components/presenters/PlaylistsView';
+import { useLibraryScreen } from '@/features/playlists/library/hooks/useLibraryScreen';
+import { LibraryView } from '@/features/playlists/library/components/presenters/LibraryView';
 import { HeaderIconButton } from '@/features/playlists/header/components/presenters/HeaderIconButton';
 
-type PlaylistsOrchestratorProps = NativeStackScreenProps<PlaylistStackParamList, 'Playlists'>;
+type LibraryOrchestratorProps = NativeStackScreenProps<PlaylistStackParamList, 'Playlists'>;
 
-export function PlaylistsOrchestrator({ navigation }: PlaylistsOrchestratorProps) {
-	const screen = usePlaylistsScreen(navigation);
+export function LibraryOrchestrator({ navigation }: LibraryOrchestratorProps) {
+	const screen = useLibraryScreen(navigation);
 	const { createPlaylist } = screen;
 
 	useLayoutEffect(() => {
@@ -24,5 +24,5 @@ export function PlaylistsOrchestrator({ navigation }: PlaylistsOrchestratorProps
 		});
 	}, [navigation, createPlaylist]);
 
-	return <PlaylistsView screen={screen} />;
+	return <LibraryView screen={screen} />;
 }

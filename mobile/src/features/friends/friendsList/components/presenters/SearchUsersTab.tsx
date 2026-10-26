@@ -5,7 +5,7 @@ import { SkeletonList, UserRowSkeleton } from '@/shared/components/ui/Skeleton';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { UserProfile } from '@/features/friends/types';
 import { SearchResultItemRow } from './SearchResultItemRow';
-import { ThemedRefreshControl } from './ThemedRefreshControl';
+import { ThemedRefreshControl } from '@/shared/components/lists/ThemedRefreshControl';
 import { createFriendsListStyles } from './friendsListStyles';
 
 interface SearchUsersTabProps {

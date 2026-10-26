@@ -29,6 +29,7 @@ import { TAB_BAR_HEIGHT } from '@/shared/constants/layout';
 // Playlists and Friends take nested params: zumik:// share links open their screens;
 // Profile's let a playlist open Settings.
 export type AppTabsParamList = {
+	HomeTab: NavigatorScreenParams<PlaylistStackParamList> | undefined;
 	PlaylistsTab: NavigatorScreenParams<PlaylistStackParamList> | undefined;
 	SearchTab: undefined;
 	FriendsTab: NavigatorScreenParams<FriendsStackParamList> | undefined;
@@ -47,6 +48,7 @@ const TAB_ICONS: Record<
 	string,
 	{ active: keyof typeof Ionicons.glyphMap; inactive: keyof typeof Ionicons.glyphMap }
 > = {
+	HomeTab: { active: 'home', inactive: 'home-outline' },
 	PlaylistsTab: { active: 'musical-notes', inactive: 'musical-notes-outline' },
 	SearchTab: { active: 'search', inactive: 'search-outline' },
 	FriendsTab: { active: 'people', inactive: 'people-outline' },
@@ -104,14 +106,25 @@ export function AppNavigator() {
 						})}
 					>
 						<Tab.Screen
+							name="HomeTab"
+							options={{
+								title: 'Accueil',
+								tabBarAccessibilityLabel: 'Accueil',
+								headerShown: false,
+							}}
+						>
+							{() => <PlaylistsNavigator initialRouteName="Home" />}
+						</Tab.Screen>
+						<Tab.Screen
 							name="PlaylistsTab"
-							component={PlaylistsNavigator}
 							options={{
 								title: 'Playlists',
 								tabBarAccessibilityLabel: 'Playlists',
 								headerShown: false,
 							}}
-						/>
+						>
+							{() => <PlaylistsNavigator initialRouteName="Playlists" />}
+						</Tab.Screen>
 						<Tab.Screen
 							name="SearchTab"
 							component={SearchNavigator}

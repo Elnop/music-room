@@ -1,98 +1,80 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useSession } from '@/shared/services/authSession';
 import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
 import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 import { logger } from '@/shared/utils/logger';
 import { showError } from '@/shared/utils/toast';
 import {
 	useFriendsPlaylists,
-	usePlaylists,
 	usePublicPlaylists,
 } from '@/features/playlists/hooks/usePlaylistQueries';
 import { useRefetchOnFocus } from '@/features/playlists/hooks/useRefetchOnFocus';
 import type { FriendPlaylists, Playlist, PlaylistStackParamList } from '@/features/playlists/types';
 
-type Navigation = NativeStackNavigationProp<PlaylistStackParamList, 'Playlists'>;
+type Navigation = NativeStackNavigationProp<PlaylistStackParamList, 'Home'>;
 
-export interface PlaylistsScreen {
+export interface HomeScreen {
 	/** Nothing to show yet: the whole screen is a skeleton. */
 	isInitialLoading: boolean;
-	myPlaylists: Playlist[];
 	friendsPlaylists: FriendPlaylists[];
 	friendsLoading: boolean;
 	publicPlaylists: Playlist[];
 	publicLoading: boolean;
 	isRefreshing: boolean;
 	refresh: () => void;
-	myOpen: boolean;
-	toggleMy: () => void;
 	publicOpen: boolean;
 	togglePublic: () => void;
 	openPlaylist: (id: string) => void;
-	createPlaylist: () => void;
 	findFriends: () => void;
 	/** Space left under the list for the mini player. */
 	bottomPadding: number;
 }
 
-export function usePlaylistsScreen(navigation: Navigation): PlaylistsScreen {
-	const userId = useSession(session => session.user?.id);
+export function useHomeScreen(navigation: Navigation): HomeScreen {
 	const bottomPadding = useBottomPadding();
-	const mine = usePlaylists();
 	const friends = useFriendsPlaylists();
 	const publics = usePublicPlaylists();
 	const [isRefreshing, setIsRefreshing] = useState(false);
-	const [myOpen, setMyOpen] = useState(true);
 	const [publicOpen, setPublicOpen] = useState(true);
 
-	const { refetch: refetchMine } = mine;
 	const { refetch: refetchFriends } = friends;
 	const { refetch: refetchPublic } = publics;
 	useRefetchOnFocus(
 		useCallback(() => {
-			void refetchMine();
 			void refetchFriends();
 			void refetchPublic();
-		}, [refetchMine, refetchFriends, refetchPublic])
+		}, [refetchFriends, refetchPublic])
 	);
 
 	useEffect(() => {
 		if (friends.error)
-			logger.error('[PlaylistsScreen] Failed to load friends playlists:', friends.error);
+			logger.error('[HomeScreen] Failed to load friends playlists:', friends.error);
 	}, [friends.error]);
 	useEffect(() => {
-		if (publics.error)
-			logger.error('[PlaylistsScreen] Failed to load public playlists:', publics.error);
+		if (publics.error) logger.error('[HomeScreen] Failed to load public playlists:', publics.error);
 	}, [publics.error]);
 
 	const refresh = async () => {
 		setIsRefreshing(true);
-		const [result] = await Promise.all([refetchMine(), refetchFriends(), refetchPublic()]);
+		const [result] = await Promise.all([refetchPublic(), refetchFriends()]);
 		setIsRefreshing(false);
 		if (result.isError) {
-			logger.error('[PlaylistsScreen] Refresh failed:', result.error);
+			logger.error('[HomeScreen] Refresh failed:', result.error);
 			showError(apiErrorMessage(result.error, 'Impossible de rafraîchir les playlists'));
 		}
 	};
 
-	const createPlaylist = useCallback(() => navigation.navigate('CreatePlaylist'), [navigation]);
-
 	return {
-		isInitialLoading: mine.isLoading,
-		myPlaylists: (mine.data ?? []).filter(playlist => playlist.ownerId === userId),
+		isInitialLoading: friends.isLoading && publics.isLoading,
 		friendsPlaylists: friends.data ?? [],
 		friendsLoading: friends.isLoading,
 		publicPlaylists: publics.data ?? [],
 		publicLoading: publics.isLoading,
 		isRefreshing,
 		refresh: () => void refresh(),
-		myOpen,
-		toggleMy: () => setMyOpen(open => !open),
 		publicOpen,
 		togglePublic: () => setPublicOpen(open => !open),
 		openPlaylist: id => navigation.navigate('PlaylistDetail', { id }),
-		createPlaylist,
 		// The friends tab lives in the parent tab navigator.
 		findFriends: () => navigation.getParent()?.navigate('FriendsTab'),
 		bottomPadding,

@@ -3,19 +3,26 @@ import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { PlaylistStackParamList } from '@/features/playlists/types';
-import { PlaylistsOrchestrator } from '@/features/playlists/list/components/orchestrators/PlaylistsOrchestrator';
+import { LibraryOrchestrator } from '@/features/playlists/library/components/orchestrators/LibraryOrchestrator';
 import { PlaylistDetailOrchestrator } from '@/features/playlists/detail/components/orchestrators/PlaylistDetailOrchestrator';
 import { PlaylistFormOrchestrator } from '@/features/playlists/form/components/orchestrators/PlaylistFormOrchestrator';
 import { SearchTracksOrchestrator } from '@/features/playlists/searchTracks/components/orchestrators/SearchTracksOrchestrator';
 import { PlaylistSharingOrchestrator } from '@/features/playlists/sharing/components/orchestrators/PlaylistSharingOrchestrator';
+import { HomeScreen } from '@/navigation/screens/HomeScreen';
 
 const PlaylistStack = createNativeStackNavigator<PlaylistStackParamList>();
 
-export function PlaylistsNavigator() {
+interface PlaylistsNavigatorProps {
+	/** The Home and Playlists tabs mount the same stack, each opening on its own screen. */
+	initialRouteName: 'Home' | 'Playlists';
+}
+
+export function PlaylistsNavigator({ initialRouteName }: PlaylistsNavigatorProps) {
 	const { theme } = useTheme();
 
 	return (
 		<PlaylistStack.Navigator
+			initialRouteName={initialRouteName}
 			screenOptions={{
 				headerStyle: {
 					backgroundColor: theme.colors.background,
@@ -30,9 +37,10 @@ export function PlaylistsNavigator() {
 				headerLargeTitle: false,
 			}}
 		>
+			<PlaylistStack.Screen name="Home" component={HomeScreen} options={{ title: 'Accueil' }} />
 			<PlaylistStack.Screen
 				name="Playlists"
-				component={PlaylistsOrchestrator}
+				component={LibraryOrchestrator}
 				options={{ title: 'Playlists' }}
 			/>
 			<PlaylistStack.Screen

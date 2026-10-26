@@ -108,6 +108,7 @@ export interface FriendPlaylists {
 
 /** The playlist routes; the Friends stack reuses PlaylistDetail and SearchTracks. */
 export type PlaylistStackParamList = {
+	Home: undefined;
 	Playlists: undefined;
 	PlaylistDetail: { id: string };
 	/** With a playlistId, the form edits that playlist. */

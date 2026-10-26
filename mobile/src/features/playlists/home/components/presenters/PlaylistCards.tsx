@@ -5,7 +5,7 @@ import { Pressable } from '@/shared/components/ui/Pressable';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { Playlist } from '@/features/playlists/types';
-import { playlistCardLabel, tracksLabel } from '@/features/playlists/list/utils/playlistLabels';
+import { playlistCardLabel, tracksLabel } from '@/features/playlists/home/utils/playlistLabels';
 import { OwnerAvatarBadge } from './OwnerAvatarBadge';
 import { PrivateBadge } from './PrivateBadge';
 
