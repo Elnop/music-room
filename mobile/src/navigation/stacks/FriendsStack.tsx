@@ -7,7 +7,8 @@ import { UserProfileOrchestrator } from '@/features/friends/userProfile/componen
 import { PlaylistDetailOrchestrator } from '@/features/playlists/detail/components/orchestrators/PlaylistDetailOrchestrator';
 import { SearchTracksOrchestrator } from '@/features/playlists/searchTracks/components/orchestrators/SearchTracksOrchestrator';
 import type { FriendsStackParamList } from '@/features/friends/types';
-import { screenLayout } from '@/navigation/screenLayout';
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
+import { screenHeader, screenLayout } from '@/navigation/screenLayout';
 
 export type { FriendsStackParamList };
 
@@ -16,11 +17,13 @@ const layout = screenLayout(true);
 
 export function FriendsNavigator() {
 	const { theme } = useTheme();
+	const { isWide } = useBreakpoint();
 
 	return (
 		<FriendsStack.Navigator
 			screenLayout={layout}
 			screenOptions={{
+				...(isWide ? { header: screenHeader } : null),
 				headerStyle: {
 					backgroundColor: theme.colors.background,
 				},

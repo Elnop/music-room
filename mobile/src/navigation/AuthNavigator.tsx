@@ -9,18 +9,21 @@ import { EmailVerificationOrchestrator } from '@/features/auth/emailVerification
 import { ForgotPasswordOrchestrator } from '@/features/auth/forgotPassword/components/orchestrators/ForgotPasswordOrchestrator';
 import { ResetPasswordOrchestrator } from '@/features/auth/resetPassword/components/orchestrators/ResetPasswordOrchestrator';
 import { useTheme } from '@/shared/theme/ThemeContext';
-import { screenLayout } from '@/navigation/screenLayout';
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
+import { screenHeader, screenLayout } from '@/navigation/screenLayout';
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 const layout = screenLayout(false);
 
 export function AuthNavigator() {
 	const { theme } = useTheme();
+	const { isWide } = useBreakpoint();
 
 	return (
 		<Stack.Navigator
 			screenLayout={layout}
 			screenOptions={{
+				...(isWide ? { header: screenHeader } : null),
 				headerStyle: {
 					backgroundColor: theme.colors.background,
 				},

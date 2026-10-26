@@ -66,8 +66,8 @@ describe('googleSignIn (web)', () => {
 		expect(initialize).toHaveBeenCalledWith(
 			expect.objectContaining({ client_id: 'web-client-id', ux_mode: 'popup' })
 		);
-		expect(buttonConfig(0)).toMatchObject({ size: 'large', width: 400 });
-		expect(buttonConfig(1)).toMatchObject({ size: 'medium' });
+		expect(buttonConfig(0)).toMatchObject({ size: 'large', width: 400, theme: 'filled_black' });
+		expect(buttonConfig(1)).toMatchObject({ size: 'medium', theme: 'outline' });
 		expect(buttonConfig(1).width).toBeUndefined();
 	});
 

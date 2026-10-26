@@ -1,10 +1,19 @@
 import React from 'react';
-import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+	Image,
+	KeyboardAvoidingView,
+	Platform,
+	ScrollView,
+	StyleSheet,
+	Text,
+	View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '@/shared/components/ui/Button';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { BackendUrlField } from '@/shared/components/form/BackendUrlField';
+import { CONTENT_MAX_WIDTH } from '@/shared/constants/layout';
 import { BACKEND_URL_EDITABLE } from '@/shared/constants/platform';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
@@ -104,7 +113,11 @@ const createStyles = (theme: Theme) =>
 			width: 300,
 			height: 300,
 		},
+		// As wide as the sign-in form's fields on wide screens.
 		buttonContainer: {
+			width: '100%',
+			maxWidth: CONTENT_MAX_WIDTH.form - 2 * theme.spacing.lg,
+			alignSelf: 'center',
 			gap: theme.spacing.md,
 			marginBottom: theme.spacing.lg,
 		},
