@@ -16,17 +16,19 @@ beforeEach(() => {
 	vi.clearAllMocks();
 });
 
+const transcoded = (...protocols: string[]) => ({
+	media: { transcodings: protocols.map(protocol => ({ format: { protocol } })) },
+});
+
 describe('isPlayable', () => {
 	it.each([
-		['streamable', { policy: 'ALLOW', streamable: true }, true],
-		['with transcodings only', { media: { transcodings: [{}] } }, true],
-		['a 30-second preview', { policy: 'SNIP', streamable: true }, true],
-		['blocked in the region', { policy: 'BLOCK', streamable: true }, false],
-		[
-			'neither streamable nor transcoded',
-			{ streamable: false, media: { transcodings: [] } },
-			false,
-		],
+		['an HLS stream', { policy: 'MONETIZE', ...transcoded('hls') }, true],
+		['a progressive stream', transcoded('progressive'), true],
+		['a 30-second preview', { policy: 'SNIP', ...transcoded('hls', 'progressive') }, true],
+		['encrypted streams only (DRM)', transcoded('cbc-encrypted-hls', 'ctr-encrypted-hls'), false],
+		['blocked in the region', { policy: 'BLOCK', ...transcoded('hls') }, false],
+		['no transcoding', { media: { transcodings: [] } }, false],
+		['no media', {}, false],
 	])('%s', (_label, track, expected) => {
 		expect(availability.isPlayable(track)).toBe(expected);
 	});
@@ -34,13 +36,13 @@ describe('isPlayable', () => {
 
 describe('checkTrackAvailability', () => {
 	it('answers available for a playable track', async () => {
-		m.get.mockResolvedValue({ policy: 'ALLOW', streamable: true });
+		m.get.mockResolvedValue({ policy: 'ALLOW', ...transcoded('hls') });
 		await expect(availability.checkTrackAvailability(URI)).resolves.toBe('available');
 		expect(m.get).toHaveBeenCalledWith(URI);
 	});
 
 	it('answers unavailable for a blocked track', async () => {
-		m.get.mockResolvedValue({ policy: 'BLOCK', streamable: true });
+		m.get.mockResolvedValue({ policy: 'BLOCK', ...transcoded('hls') });
 		await expect(availability.checkTrackAvailability(URI)).resolves.toBe('unavailable');
 	});
 

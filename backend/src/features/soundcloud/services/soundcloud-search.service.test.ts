@@ -48,24 +48,24 @@ describe('soundcloud-search.service', () => {
 	});
 
 	describe('searchTracks', () => {
-		it('keeps only streamable or transcoded tracks and passes paging through', async () => {
-			const streamable = track({ id: 1, streamable: true });
-			const transcoded = track({
-				id: 2,
-				streamable: false,
-				media: {
-					transcodings: [
-						{
+		it('keeps only tracks with an unencrypted stream and passes paging through', async () => {
+			const withProtocols = (id: number, ...protocols: string[]) =>
+				track({
+					id,
+					streamable: true,
+					media: {
+						transcodings: protocols.map(protocol => ({
 							url: 'https://api.test/t',
-							preset: 'mp3',
-							format: { protocol: 'hls', mime_type: 'audio/mpeg' },
-						},
-					],
-				},
-			});
-			const unplayable = track({ id: 3, streamable: false, media: { transcodings: [] } });
+							preset: 'aac_160k',
+							format: { protocol, mime_type: 'audio/mp4' },
+						})),
+					},
+				});
+			const hls = withProtocols(1, 'hls');
+			const progressive = withProtocols(2, 'progressive');
+			const encrypted = withProtocols(3, 'cbc-encrypted-hls', 'ctr-encrypted-hls');
 			search.mockResolvedValue({
-				collection: [streamable, transcoded, unplayable],
+				collection: [hls, progressive, encrypted],
 				total_results: 42,
 				next_href: 'https://api.test/next',
 			});
