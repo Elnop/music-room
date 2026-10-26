@@ -204,3 +204,13 @@ async function handleResponse<T>(response: Response): Promise<T> {
 
 	return data.data;
 }
+
+const LOCAL_URI = /^(blob|data):/i;
+
+/** Reads a picked or manipulated image (blob: or data: URI) in the browser; refuses any network URL. */
+export async function readLocalBlob(uri: string): Promise<Blob> {
+	if (!LOCAL_URI.test(uri)) {
+		throw new Error(`readLocalBlob only reads blob: and data: URIs, got "${uri.split(':')[0]}:"`);
+	}
+	return (await fetch(uri)).blob();
+}
