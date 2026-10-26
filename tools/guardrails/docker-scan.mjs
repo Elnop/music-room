@@ -7,7 +7,7 @@
 //
 // Usage: node ../tools/guardrails/docker-scan.mjs <semgrep|secrets> <backend|mobile>
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdtempSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -43,17 +43,47 @@ if (spawnSync('docker', ['info'], { stdio: 'ignore' }).status !== 0) {
 }
 
 if (tool === 'semgrep') {
-  process.exit(
-    run('docker', [
+  // semgrep lists the files to scan with git. In a worktree, .git is a file pointing into the
+  // main checkout's .git, so that directory is mounted at the same path too.
+  const gitDir = spawnSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], {
+    cwd: root,
+  });
+  if (gitDir.status !== 0) {
+    console.error(`semgrep: ${gitDir.stderr.toString().trim()}`);
+    process.exit(1);
+  }
+  const commonGitDir = gitDir.stdout.toString().trim();
+  const outDir = mkdtempSync(join(tmpdir(), 'semgrep-'));
+  let status = 1;
+  try {
+    status = run('docker', [
       'run', '--rm', '--network', 'none',
       '-v', `${root}:/src:ro`, '-w', '/src',
+      ...(commonGitDir === join(root, '.git') ? [] : ['-v', `${commonGitDir}:${commonGitDir}:ro`]),
+      '-v', `${outDir}:/out`,
       SEMGREP_IMAGE,
       'semgrep', 'scan',
       '--config', 'tools/semgrep/rules.yml',
       '--error', '--metrics=off', '--disable-version-check', '--quiet',
+      '--json-output=/out/report.json',
       project,
-    ])
-  );
+    ]);
+    // semgrep exits 0 when it could not list any file: an empty scan is a failure, not a pass.
+    const report = JSON.parse(readFileSync(join(outDir, 'report.json'), 'utf8'));
+    if (status === 0 && report.paths.scanned.length === 0) {
+      console.error(
+        `semgrep: no file of ${project}/ was scanned, so no rule was checked. ` +
+          'See .agents/rules/guardrails.md#what-check-runs'
+      );
+      status = 1;
+    }
+  } catch (error) {
+    console.error(`semgrep: ${error.message}`);
+    status = 1;
+  } finally {
+    rmSync(outDir, { recursive: true, force: true });
+  }
+  process.exit(status);
 }
 
 // secrets: copy what git would commit (tracked, plus untracked files that are

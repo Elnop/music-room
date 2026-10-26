@@ -19,7 +19,7 @@ Read before changing a guardrail, an exception list, or when `npm run check` fai
 | test | Vitest / jest-expo | | a failing unit test |
 | exceptions | `tools/guardrails/check-exceptions.mjs` | | an exception list that grew ([exception-lists](#exception-lists)) |
 
-Every tool is a devDependency installed by `make install`, except semgrep and gitleaks, which run from Docker images pinned by digest in `tools/guardrails/docker-scan.mjs`: Docker must be running (it already is for `make dev-docker`). The CI job `check` runs the same command for both projects on every PR to `develop`.
+Every tool is a devDependency installed by `make install`, except semgrep and gitleaks, which run from Docker images pinned by digest in `tools/guardrails/docker-scan.mjs`: Docker must be running (it already is for `make dev-docker`). semgrep lists its files with git, so in a git worktree the script also mounts the main checkout's `.git`; a scan that reaches no file fails instead of passing. The CI job `check` runs the same command for both projects on every PR.
 
 ## exception-lists
 
