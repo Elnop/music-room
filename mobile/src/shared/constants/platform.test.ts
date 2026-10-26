@@ -14,6 +14,7 @@ describe('platform features', () => {
 		expect(loadFor('android')).toEqual({
 			BEACON_BROADCAST_AVAILABLE: true,
 			BACKEND_URL_EDITABLE: true,
+			THIS_DEVICE_LABEL: 'Ce téléphone',
 		});
 	});
 
@@ -21,6 +22,7 @@ describe('platform features', () => {
 		expect(loadFor('web')).toEqual({
 			BEACON_BROADCAST_AVAILABLE: false,
 			BACKEND_URL_EDITABLE: false,
+			THIS_DEVICE_LABEL: 'Ce navigateur',
 		});
 	});
 });
