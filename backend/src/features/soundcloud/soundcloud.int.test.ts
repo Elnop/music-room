@@ -104,6 +104,7 @@ describe('SoundCloud routes: auth, per-user rate limit, validation', () => {
 		service.getTrack.mockReset().mockResolvedValue({ id: 1, title: 'Track' });
 		service.getStreamUrl.mockReset().mockResolvedValue({
 			streamUrl: 'https://cf-hls-media.sndcdn.com/x.m3u8',
+			protocol: 'hls',
 			expiresAt: '2026-01-01T00:30:00.000Z',
 		});
 	});
@@ -177,6 +178,7 @@ describe('SoundCloud routes: auth, per-user rate limit, validation', () => {
 			success: true,
 			data: {
 				streamUrl: 'https://cf-hls-media.sndcdn.com/x.m3u8',
+				protocol: 'hls',
 				expiresAt: '2026-01-01T00:30:00.000Z',
 			},
 		});

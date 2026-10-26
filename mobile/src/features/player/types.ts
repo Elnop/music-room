@@ -1,3 +1,5 @@
+import type { StreamProtocol } from '@/types/soundcloud.types';
+
 /** What the player hooks use of an expo-audio player, which the browser player also implements. */
 export interface AudioPlayer {
 	readonly id: number;
@@ -32,6 +34,7 @@ export interface PlayerContextValue {
 
 export interface StreamFetchResult {
 	streamUrl: string;
+	protocol: StreamProtocol;
 	expiresAt: number | null;
 }
 

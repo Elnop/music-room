@@ -62,14 +62,9 @@ export function useNextTrackPrefetch(player: AudioPlayer): void {
 		const controller = new AbortController();
 		const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 		fetchStreamUrl(nextPermalink, controller.signal)
-			.then(({ streamUrl, expiresAt }) => {
+			.then(stream => {
 				if (nextKeyRef.current !== nextKey || !playsLocally()) return;
-				streamPrefetch.set({
-					queueItemId: nextId,
-					permalink: nextPermalink,
-					streamUrl,
-					expiresAt,
-				});
+				streamPrefetch.set({ ...stream, queueItemId: nextId, permalink: nextPermalink });
 			})
 			.catch(() => undefined)
 			.finally(() => clearTimeout(timeoutId));

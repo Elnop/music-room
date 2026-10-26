@@ -49,7 +49,7 @@ export async function getStreamUrl(req: Request, res: Response) {
 	const { url: trackUrl } = soundcloudStreamUrlSchema.parse({ url: rawUrl });
 	logger.info('[SoundCloud] Fetching stream URL', { trackUrl });
 
-	const { streamUrl, expiresAt } = await streamService.getStreamUrl(trackUrl);
+	const { streamUrl, protocol, expiresAt } = await streamService.getStreamUrl(trackUrl);
 
 	logger.info('[SoundCloud] Stream URL obtained successfully', {
 		trackUrl,
@@ -58,5 +58,5 @@ export async function getStreamUrl(req: Request, res: Response) {
 		expiresAt,
 	});
 
-	sendSuccess(res, { streamUrl, expiresAt });
+	sendSuccess(res, { streamUrl, protocol, expiresAt });
 }
