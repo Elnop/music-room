@@ -25,6 +25,19 @@ function track(overrides: Partial<SoundCloudTrack> = {}): SoundCloudTrack {
 	};
 }
 
+const transcoded = (...protocols: string[]) => ({
+	media: {
+		transcodings: protocols.map(protocol => ({
+			url: 'https://api.test/t',
+			preset: 'aac_160k',
+			format: { protocol, mime_type: 'audio/mp4' },
+		})),
+	},
+});
+const playable = (id: number) => track({ id, ...transcoded('hls') });
+const drmOnly = (id: number) =>
+	track({ id, ...transcoded('cbc-encrypted-hls', 'ctr-encrypted-hls') });
+
 const { search, get } = vi.hoisted(() => ({
 	search: vi.fn<SoundCloudClient['tracks']['search']>(),
 	get: vi.fn<SoundCloudClient['tracks']['get']>(),
@@ -49,33 +62,47 @@ describe('soundcloud-search.service', () => {
 
 	describe('searchTracks', () => {
 		it('keeps only tracks with an unencrypted stream and passes paging through', async () => {
-			const withProtocols = (id: number, ...protocols: string[]) =>
-				track({
-					id,
-					streamable: true,
-					media: {
-						transcodings: protocols.map(protocol => ({
-							url: 'https://api.test/t',
-							preset: 'aac_160k',
-							format: { protocol, mime_type: 'audio/mp4' },
-						})),
-					},
-				});
-			const hls = withProtocols(1, 'hls');
-			const progressive = withProtocols(2, 'progressive');
-			const encrypted = withProtocols(3, 'cbc-encrypted-hls', 'ctr-encrypted-hls');
-			search.mockResolvedValue({
-				collection: [hls, progressive, encrypted],
+			search.mockResolvedValueOnce({
+				collection: [playable(1), track({ id: 2, ...transcoded('progressive') }), drmOnly(3)],
 				total_results: 42,
-				next_href: 'https://api.test/next',
 			});
 
 			const result = await searchService.searchTracks({ q: 'lofi', limit: 20, offset: 0 });
 
-			expect(search).toHaveBeenCalledWith({ q: 'lofi', limit: 20, offset: 0 });
+			expect(search).toHaveBeenCalledTimes(1);
+			expect(search).toHaveBeenCalledWith({ q: 'lofi', limit: 50, offset: 0 });
 			expect(result.collection.map(t => t.id)).toEqual([1, 2]);
 			expect(result.total_results).toBe(42);
-			expect(result.next_href).toBe('https://api.test/next');
+		});
+
+		it('tops a short page up from the next ones, up to the limit', async () => {
+			search
+				.mockResolvedValueOnce({
+					collection: [playable(1), drmOnly(2), playable(3)],
+					total_results: 42,
+					next_href: 'https://api.test/page-2',
+				})
+				.mockResolvedValueOnce({
+					collection: [drmOnly(4), playable(5), playable(6)],
+					next_href: 'https://api.test/page-3',
+				});
+
+			const result = await searchService.searchTracks({ q: 'drake', limit: 3, offset: 10 });
+
+			expect(search).toHaveBeenNthCalledWith(1, { q: 'drake', limit: 50, offset: 10 });
+			expect(search).toHaveBeenNthCalledWith(2, { q: 'drake', limit: 50, offset: 13 });
+			expect(result.collection.map(t => t.id)).toEqual([1, 3, 5]);
+			expect(result.total_results).toBe(42);
+			expect(result.next_href).toBe('https://api.test/page-3');
+		});
+
+		it('reads at most 3 SoundCloud pages', async () => {
+			search.mockResolvedValue({ collection: [drmOnly(1)], next_href: 'https://api.test/next' });
+
+			const result = await searchService.searchTracks({ q: 'drake', limit: 20, offset: 0 });
+
+			expect(search).toHaveBeenCalledTimes(3);
+			expect(result.collection).toEqual([]);
 		});
 
 		it('returns an empty collection when the client returns none', async () => {
