@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '@/shared/components/ui/Button';
@@ -13,6 +13,7 @@ import { FloatingIcon } from './FloatingIcon';
 
 interface WelcomeViewProps {
 	icons: FloatingIconMotion[];
+	buildLabel: string;
 	showServer: boolean;
 	onToggleServer: () => void;
 	onStart: () => void;
@@ -21,6 +22,7 @@ interface WelcomeViewProps {
 
 export function WelcomeView({
 	icons,
+	buildLabel,
 	showServer,
 	onToggleServer,
 	onStart,
@@ -66,6 +68,8 @@ export function WelcomeView({
 							</View>
 						)}
 					</View>
+
+					<Text style={styles.buildLabel}>{buildLabel}</Text>
 				</ScrollView>
 			</KeyboardAvoidingView>
 		</SafeAreaView>
@@ -97,11 +101,16 @@ const createStyles = (theme: Theme) =>
 		},
 		buttonContainer: {
 			gap: theme.spacing.md,
-			marginBottom: theme.spacing.xl,
+			marginBottom: theme.spacing.lg,
 		},
 		serverToggle: {
 			alignSelf: 'center',
 			padding: theme.spacing.xs,
+		},
+		buildLabel: {
+			fontSize: 12,
+			color: theme.colors.textSecondary,
+			textAlign: 'center',
 		},
 		serverPanel: {
 			padding: theme.spacing.md,

@@ -14,6 +14,10 @@ jest.mock('@/shared/components/form/BackendUrlField', () => {
 	return { BackendUrlField: () => <Text>backend-url-field</Text> };
 });
 
+jest.mock('@/shared/services/deviceService', () => ({
+	getBuildLabel: () => 'Zumik 1.0.0 (build 42 · a1b2c3d)',
+}));
+
 type Props = NativeStackScreenProps<AuthStackParamList, 'Welcome'>;
 
 const navigate = jest.fn();
@@ -35,6 +39,11 @@ describe('WelcomeOrchestrator', () => {
 
 		expect(navigate).toHaveBeenNthCalledWith(1, 'Register');
 		expect(navigate).toHaveBeenNthCalledWith(2, 'Login');
+	});
+
+	it('shows the app build label', () => {
+		renderWelcome();
+		expect(screen.getByText('Zumik 1.0.0 (build 42 · a1b2c3d)')).toBeTruthy();
 	});
 
 	it('shows and hides the backend address field', () => {

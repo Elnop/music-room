@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '@/features/auth/types';
+import { getBuildLabel } from '@/shared/services/deviceService';
 import { useFloatingIcons } from '@/features/auth/welcome/hooks/useFloatingIcons';
 import { WelcomeView } from '@/features/auth/welcome/components/presenters/WelcomeView';
 
@@ -13,6 +14,7 @@ export function WelcomeOrchestrator({ navigation }: WelcomeOrchestratorProps) {
 	return (
 		<WelcomeView
 			icons={icons}
+			buildLabel={getBuildLabel()}
 			showServer={showServer}
 			onToggleServer={() => setShowServer(value => !value)}
 			onStart={() => navigation.navigate('Register')}
