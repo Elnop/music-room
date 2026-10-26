@@ -90,6 +90,8 @@ From the root: `make dev-phone` (USB phone, any network), `make dev-docker` (Doc
 
 The player hooks reach the audio through `features/player/services/audioPlayer.ts` (expo-audio). Its browser variant `audioPlayer.web.ts` plays the SoundCloud HLS stream in one `<audio>` element for the page: natively when the browser reads HLS (Safari), through `hls.js` otherwise, which only feeds the element; the queue, auto-advance, prefetch and the expired-URL watchdog stay the shared hooks. `useMediaSession.web.ts` drives the media keys and the browser's media notification through the Media Session API. A playback the browser refuses before any click on the page (a friend's remote command, typically) leaves the player paused, so the controller never sees it playing, and asks "Cliquer pour activer le son" (`hooks/useAutoplayPrompt.ts`).
 
+To test the responsive layout, resize the browser window (or use the browser's device toolbar) across the breakpoints of `shared/constants/layout.ts`: under 768 px the phone layout, which is Android's; from 768 px a left icon rail; from 1024 px the desktop side bar. The layout follows the window live, no reload. `npx expo export -p web --clear` builds the static site into `dist/` (`--clear`: the Metro cache can hold another checkout's paths); the backend address is the `EXPO_PUBLIC_API_URL` and `EXPO_PUBLIC_WS_URL` of the build. Everything the web client changes or lacks, and the demo scenario: [web-client.md](../doc/features/web-client.md).
+
 ## Scripts
 
 ### Expo
