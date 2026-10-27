@@ -111,9 +111,10 @@ describe('ProfileScreen header', () => {
 });
 
 describe('ProfileScreen build label', () => {
-	it('shows the installed build at the bottom of the profile', () => {
+	it('shows the installed build at the bottom of the profile, as its only version', () => {
 		render(<ProfileOrchestrator />);
 		expect(screen.getByText('Zumik 1.0.0 (build 42 · a1b2c3d)')).toBeTruthy();
+		expect(screen.queryByText('Zumik v1.0.0')).toBeNull();
 	});
 });
 
