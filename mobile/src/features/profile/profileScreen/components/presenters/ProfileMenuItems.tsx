@@ -8,7 +8,7 @@ import type { Theme } from '@/shared/theme/types';
 import { Text } from '@/shared/components/ui/Text';
 
 interface ProfileMenuItemsProps {
-	/** Wide screens: a logout without the full-width outline, and the build label is the only version shown. */
+	/** Wide screens: a logout without the full-width outline. */
 	wide?: boolean;
 	isLoading: boolean;
 	onPrivacySettings: () => void;
@@ -63,7 +63,6 @@ export function ProfileMenuItems({
 				</Pressable>
 			</View>
 
-			{!wide && <Text style={styles.footer}>Zumik v1.0.0</Text>}
 		</>
 	);
 }
@@ -102,11 +101,5 @@ const createStyles = (theme: Theme) =>
 			fontSize: 16,
 			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.error,
-		},
-		footer: {
-			textAlign: 'center',
-			fontSize: 12,
-			color: theme.colors.textSecondary,
-			marginTop: theme.spacing.xl,
 		},
 	});
