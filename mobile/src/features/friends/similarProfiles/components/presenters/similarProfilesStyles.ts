@@ -1,8 +1,12 @@
 import { StyleSheet } from 'react-native';
 import type { Theme } from '@/shared/theme/types';
 
-/** The xl avatar's size, so the cards line up with the playlist carousels. */
-export const SIMILAR_CARD_WIDTH = 128;
+const AVATAR_SIZE = 128;
+const CARD_PADDING = 12;
+const CARD_BORDER = 1;
+
+/** The xl avatar plus the card's padding and outline. */
+export const SIMILAR_CARD_WIDTH = AVATAR_SIZE + 2 * (CARD_PADDING + CARD_BORDER);
 
 export const createSimilarProfilesStyles = (theme: Theme) =>
 	StyleSheet.create({
@@ -14,6 +18,12 @@ export const createSimilarProfilesStyles = (theme: Theme) =>
 			width: SIMILAR_CARD_WIDTH,
 			marginRight: 16,
 			alignItems: 'center',
+			padding: CARD_PADDING,
+			borderWidth: CARD_BORDER,
+			borderRadius: 12,
+			// Between the page and the default avatar, so the card reads on both.
+			borderColor: theme.colors.borderLight,
+			backgroundColor: theme.colors.surface,
 		},
 		name: {
 			marginTop: theme.spacing.sm,
