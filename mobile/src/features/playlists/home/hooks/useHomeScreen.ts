@@ -17,7 +17,6 @@ export interface HomeScreen {
 	/** Nothing to show yet: the whole screen is a skeleton. */
 	isInitialLoading: boolean;
 	friendsPlaylists: FriendPlaylists[];
-	friendsLoading: boolean;
 	publicPlaylists: Playlist[];
 	publicLoading: boolean;
 	isRefreshing: boolean;
@@ -25,7 +24,6 @@ export interface HomeScreen {
 	publicOpen: boolean;
 	togglePublic: () => void;
 	openPlaylist: (id: string) => void;
-	findFriends: () => void;
 	/** Space left under the list for the mini player. */
 	bottomPadding: number;
 }
@@ -67,7 +65,6 @@ export function useHomeScreen(navigation: Navigation): HomeScreen {
 	return {
 		isInitialLoading: friends.isLoading && publics.isLoading,
 		friendsPlaylists: friends.data ?? [],
-		friendsLoading: friends.isLoading,
 		publicPlaylists: publics.data ?? [],
 		publicLoading: publics.isLoading,
 		isRefreshing,
@@ -75,8 +72,6 @@ export function useHomeScreen(navigation: Navigation): HomeScreen {
 		publicOpen,
 		togglePublic: () => setPublicOpen(open => !open),
 		openPlaylist: id => navigation.navigate('PlaylistDetail', { id }),
-		// The friends tab lives in the parent tab navigator.
-		findFriends: () => navigation.getParent()?.navigate('FriendsTab'),
 		bottomPadding,
 	};
 }

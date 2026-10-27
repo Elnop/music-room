@@ -7,6 +7,8 @@ import { Text } from './Text';
 import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline';
+/** `compact` fits a header row, next to a title. */
+type ButtonSize = 'default' | 'compact';
 
 /** The label, given either as `title` or as the text children. */
 type ButtonLabel = { title: string; children?: never } | { title?: never; children: string };
@@ -14,6 +16,7 @@ type ButtonLabel = { title: string; children?: never } | { title?: never; childr
 type ButtonProps = ButtonLabel & {
 	onPress: () => void;
 	variant?: ButtonVariant;
+	size?: ButtonSize;
 	disabled?: boolean;
 	loading?: boolean;
 	fullWidth?: boolean;
@@ -28,6 +31,7 @@ export function Button({
 	children,
 	onPress,
 	variant = 'primary',
+	size = 'default',
 	disabled = false,
 	loading = false,
 	fullWidth = false,
@@ -44,6 +48,7 @@ export function Button({
 	const containerStyle = [
 		styles.container,
 		styles[variant],
+		size === 'compact' && styles.compact,
 		fullWidth && styles.fullWidth,
 		isDisabled && styles.disabled,
 		style,
@@ -52,6 +57,7 @@ export function Button({
 	const textStyle = [
 		styles.text,
 		styles[`${variant}Text` as keyof typeof styles],
+		size === 'compact' && styles.compactText,
 		isDisabled && styles.disabledText,
 	].filter(Boolean);
 
@@ -87,6 +93,12 @@ const createStyles = (theme: Theme) =>
 			flexDirection: 'row',
 			gap: 8,
 		},
+		compact: {
+			height: 36,
+			paddingHorizontal: 14,
+			borderRadius: 10,
+			gap: 6,
+		},
 		fullWidth: {
 			width: '100%',
 		},
@@ -111,6 +123,9 @@ const createStyles = (theme: Theme) =>
 		text: {
 			fontSize: 16,
 			fontFamily: FONT_FAMILIES.semibold,
+		},
+		compactText: {
+			fontSize: 14,
 		},
 		primaryText: {
 			color: theme.colors.onColor,
