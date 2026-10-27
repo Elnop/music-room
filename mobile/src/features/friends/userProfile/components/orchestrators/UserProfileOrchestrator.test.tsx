@@ -1,5 +1,5 @@
 import React from 'react';
-import { Share } from 'react-native';
+import { Share, useWindowDimensions } from 'react-native';
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { friendsApi } from '@/features/friends/services/friendsApi';
 import { renderWithClient } from '@/test/renderWithClient';
@@ -14,6 +14,10 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 );
 jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
+jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
+	__esModule: true,
+	default: jest.fn(() => ({ width: 390, height: 844, scale: 1, fontScale: 1 })),
+}));
 
 jest.mock('@/shared/theme/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
@@ -181,5 +185,63 @@ describe('UserProfileOrchestrator', () => {
 
 		fireEvent.press(screen.getByText('Rock Classics'));
 		expect(onNavigateToPlaylist).toHaveBeenCalledWith('p1');
+	});
+});
+
+describe('UserProfileOrchestrator on wide screens', () => {
+	beforeEach(() => {
+		jest.clearAllMocks();
+		signIn('me');
+		jest
+			.mocked(useWindowDimensions)
+			.mockReturnValue({ width: 1440, height: 900, scale: 1, fontScale: 1 });
+	});
+
+	afterEach(() => {
+		jest
+			.mocked(useWindowDimensions)
+			.mockReturnValue({ width: 390, height: 844, scale: 1, fontScale: 1 });
+	});
+
+	it('offers following and sharing as buttons of its header', async () => {
+		const share = jest.spyOn(Share, 'share').mockResolvedValue({ action: Share.sharedAction });
+		renderScreen();
+
+		fireEvent.press(await screen.findByRole('button', { name: 'Suivre' }));
+		fireEvent.press(screen.getByRole('button', { name: 'Partager' }));
+
+		await waitFor(() => expect(friendsApi.followUser).toHaveBeenCalledWith(ID));
+		expect(share).toHaveBeenCalledWith({ message: `Alice\nzumik://user/${ID}`, title: 'Alice' });
+	});
+
+	it('keeps what privacy hides hidden: initials, no bio, no tastes, no email', async () => {
+		renderScreen();
+
+		expect(await screen.findByText('AL')).toBeTruthy();
+		expect(screen.getByText('Visible uniquement par ses amis')).toBeTruthy();
+		expect(screen.getByText('Visibles uniquement par ses amis')).toBeTruthy();
+		expect(screen.queryByText('Email')).toBeNull();
+		expect(screen.queryByText('Playlists')).toBeNull();
+	});
+
+	it('lays out what the user shares in sections', async () => {
+		jest.mocked(friendsApi.getProfile).mockResolvedValueOnce({
+			...profile,
+			bio: 'Hello',
+			email: 'alice@zumik.dev',
+			musicPreferences: ['rock'],
+		});
+		jest
+			.mocked(friendsApi.getUserPublicPlaylists)
+			.mockResolvedValueOnce([
+				{ id: 'p1', name: 'Rock Classics', trackCount: 1, visibility: 'public' as const },
+			]);
+		renderScreen();
+
+		expect(await screen.findByText('Hello')).toBeTruthy();
+		expect(screen.getByText('alice@zumik.dev')).toBeTruthy();
+		expect(screen.getByText('janvier 2026')).toBeTruthy();
+		expect(screen.getByText('Préférences musicales')).toBeTruthy();
+		expect(await screen.findByText('1 titre • alice')).toBeTruthy();
 	});
 });

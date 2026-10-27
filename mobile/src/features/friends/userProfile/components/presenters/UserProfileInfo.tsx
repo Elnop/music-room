@@ -1,11 +1,12 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { Avatar } from '@/shared/components/media/Avatar';
 import { GenreChip } from '@/shared/components/ui/GenreChip';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { FilteredProfile, FollowStatus, MusicGenre } from '@/features/friends/types';
 import { createUserProfileHeaderStyles } from './userProfileHeaderStyles';
+import { HiddenFieldNote } from './HiddenFieldNote';
+import { UserProfileBadges } from './UserProfileBadges';
 import { Text } from '@/shared/components/ui/Text';
 
 interface UserProfileInfoProps {
@@ -49,19 +50,11 @@ export function UserProfileInfo({
 			<View style={styles.nameSection}>
 				<View style={styles.usernameRow}>
 					<Text style={styles.username}>{profile.username}</Text>
-					{followStatus?.isFriend && canControlMusic && (
-						<View style={[styles.statusBadge, hasDevicesOnline && styles.statusBadgeOnline]}>
-							<View style={[styles.statusDot, hasDevicesOnline && styles.statusDotOnline]} />
-							<Text style={[styles.statusText, hasDevicesOnline && styles.statusTextOnline]}>
-								{hasDevicesOnline ? 'En ligne' : 'Hors ligne'}
-							</Text>
-						</View>
-					)}
-					{followStatus?.isFollowedBy && (
-						<View style={styles.followsYouBadge}>
-							<Text style={styles.followsYouText}>Vous suit</Text>
-						</View>
-					)}
+					<UserProfileBadges
+						followStatus={followStatus}
+						canControlMusic={canControlMusic}
+						hasDevicesOnline={hasDevicesOnline}
+					/>
 				</View>
 				{profile.displayName && <Text style={styles.displayName}>{profile.displayName}</Text>}
 				{followStatus?.isFollowedBy && !followStatus.isFollowing && (
@@ -72,17 +65,7 @@ export function UserProfileInfo({
 			</View>
 
 			{isBioHidden ? (
-				<View style={styles.hiddenField}>
-					<Ionicons
-						name="lock-closed"
-						size={16}
-						color={theme.colors.textSecondary}
-						style={styles.hiddenIcon}
-					/>
-					<Text style={styles.hiddenText}>
-						{isFriend ? 'Bio privée' : 'Visible uniquement par ses amis'}
-					</Text>
-				</View>
+				<HiddenFieldNote label={isFriend ? 'Bio privée' : 'Visible uniquement par ses amis'} />
 			) : profile.bio ? (
 				<Text style={styles.bio}>{profile.bio}</Text>
 			) : null}

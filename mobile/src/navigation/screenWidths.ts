@@ -38,5 +38,6 @@ export const EDGE_SCROLL_SCREENS: ReadonlySet<string> = new Set([
 	'Search',
 	'Friends',
 	'Profile',
+	'UserProfile',
 	'Settings',
 ]);

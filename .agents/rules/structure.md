@@ -22,7 +22,7 @@ Where a file goes is set by the target layout in `doc/architecture/code-layout.m
 
   `src/shared/` holds what several features use:
   - `components/ui/`: the primitives ([ui-primitives](#ui-primitives)): `Pressable`, `Button`, `Text`, `TextInput`, `Input`, `Card`, `Skeleton`, `ThemedSwitch`, `LoadingSpinner`;
-  - `components/<subject>/`: shared blocks by subject (`feedback/`, `form/`, `lists/`, `media/`, `sharing/`, `theme/`);
+  - `components/<subject>/`: shared blocks by subject (`feedback/`, `form/`, `layout/`, `lists/`, `media/`, `profile/`, `sharing/`, `theme/`);
   - `services/`: the API client `api.ts`, `backendUrl.ts`, storage modules;
   - `query/`: TanStack Query setup ([state.md](state.md));
   - `stores/`: cross-cutting Zustand stores (`socketStore.ts`);
