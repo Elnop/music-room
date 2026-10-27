@@ -75,11 +75,13 @@ describe('WelcomeOrchestrator', () => {
 		renderWelcome();
 		expect(screen.queryByText('Fonctionnalités')).toBeNull();
 
+		expect(screen.queryByText(/@/)).toBeNull();
+
 		fireEvent.press(screen.getByLabelText('Politique de confidentialité'));
 		expect(navigate).toHaveBeenCalledWith('PrivacyPolicy');
 	});
 
-	it('presents the app, its download and its contact on the web', () => {
+	it('presents the app and its download on the web, without a contact address', () => {
 		mockLandingShown = true;
 		renderWelcome();
 
@@ -87,11 +89,9 @@ describe('WelcomeOrchestrator', () => {
 		expect(screen.getByText('Music Control Delegation')).toBeTruthy();
 
 		fireEvent.press(screen.getByLabelText('Télécharger pour Android'));
-		fireEvent.press(screen.getByLabelText('leon.perrotin@gmail.com'));
 		fireEvent.press(screen.getByLabelText('Code source'));
 		expect(jest.mocked(openExternalUrl).mock.calls).toEqual([
 			['https://github.com/Elnop/music-room/releases/latest'],
-			['mailto:leon.perrotin@gmail.com'],
 			['https://github.com/Elnop/music-room'],
 		]);
 

@@ -3,12 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { Button } from '@/shared/components/ui/Button';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Text } from '@/shared/components/ui/Text';
-import {
-	CONTACT_EMAIL,
-	CONTACT_MAILTO,
-	LATEST_RELEASE_URL,
-	SOURCE_CODE_URL,
-} from '@/shared/constants/links';
+import { LATEST_RELEASE_URL, SOURCE_CODE_URL } from '@/shared/constants/links';
 import { CONTENT_MAX_WIDTH } from '@/shared/constants/layout';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
@@ -49,8 +44,8 @@ export function LandingSections({
 				))}
 			</View>
 
-			<View style={[styles.section, isWide && styles.row]}>
-				<View style={[styles.panel, isWide && styles.flex]}>
+			<View style={styles.section}>
+				<View style={styles.panel}>
 					<Text style={styles.title} accessibilityRole="header">
 						Télécharger
 					</Text>
@@ -62,19 +57,6 @@ export function LandingSections({
 						variant="outline"
 						onPress={() => onOpenLink(LATEST_RELEASE_URL)}
 					/>
-				</View>
-				<View style={[styles.panel, isWide && styles.flex]}>
-					<Text style={styles.title} accessibilityRole="header">
-						Contact
-					</Text>
-					<Text style={styles.body}>Questions ou assistance :</Text>
-					<Pressable
-						accessibilityRole="link"
-						accessibilityLabel={CONTACT_EMAIL}
-						onPress={() => onOpenLink(CONTACT_MAILTO)}
-					>
-						<Text style={styles.link}>{CONTACT_EMAIL}</Text>
-					</Pressable>
 				</View>
 			</View>
 
@@ -119,9 +101,6 @@ const createStyles = (theme: Theme) =>
 			flexDirection: 'row',
 			gap: theme.spacing.md,
 		},
-		flex: {
-			flex: 1,
-		},
 		panel: {
 			gap: theme.spacing.md,
 			padding: theme.spacing.lg,
@@ -137,11 +116,6 @@ const createStyles = (theme: Theme) =>
 			fontSize: theme.typography.sizes.md,
 			lineHeight: 20,
 			color: theme.colors.textSecondary,
-		},
-		link: {
-			fontSize: theme.typography.sizes.md,
-			fontFamily: theme.typography.families.semibold,
-			color: theme.colors.primary,
 		},
 		footer: {
 			alignItems: 'center',
