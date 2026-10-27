@@ -1,9 +1,10 @@
 import React from 'react';
-import { StyleSheet, Text, View, type TextInputProps } from 'react-native';
+import { StyleSheet, View, type TextInputProps } from 'react-native';
 import { Input } from '@/shared/components/ui/Input';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { CappedField } from '@/shared/hooks/useCappedField';
+import { Text } from '@/shared/components/ui/Text';
 
 interface CappedInputProps {
 	field: CappedField;
@@ -12,6 +13,7 @@ interface CappedInputProps {
 	autoFocus?: boolean;
 	multiline?: boolean;
 	keyboardType?: TextInputProps['keyboardType'];
+	submitOnEnter?: () => void;
 }
 
 export function CappedInput({
@@ -21,6 +23,7 @@ export function CappedInput({
 	autoFocus,
 	multiline,
 	keyboardType,
+	submitOnEnter,
 }: CappedInputProps) {
 	const { styles } = useThemedStyles(createStyles);
 
@@ -37,6 +40,7 @@ export function CappedInput({
 				numberOfLines={multiline ? 3 : undefined}
 				maxLength={field.max}
 				keyboardType={keyboardType}
+				submitOnEnter={submitOnEnter}
 			/>
 			<Text style={styles.count}>
 				{field.value.length}/{field.max}

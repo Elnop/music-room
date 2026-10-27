@@ -30,6 +30,7 @@ export function EventFormView({ form, bottomPadding }: EventFormViewProps) {
 					field={form.name}
 					label="Nom de l'événement"
 					placeholder="Soirée sur le toit"
+					submitOnEnter={form.isSubmitting ? undefined : form.submit}
 				/>
 				<CappedInput
 					field={form.description}

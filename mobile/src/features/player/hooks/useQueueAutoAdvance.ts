@@ -1,11 +1,12 @@
 import { useEffect, useRef } from 'react';
-import { useAudioPlayerStatus, type useAudioPlayer } from 'expo-audio';
+import { useAudioPlayerStatus } from '@/features/player/services/audioPlayer';
+import type { AudioPlayer } from '@/features/player/types';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { isLocalTarget } from '@/shared/services/connectBridge';
 import { getPlayback } from '@/shared/services/playbackBridge';
 
 /** Once per loaded track, local mode only: in remote mode the playing device advances itself. */
-export function useQueueAutoAdvance(player: ReturnType<typeof useAudioPlayer>): void {
+export function useQueueAutoAdvance(player: AudioPlayer): void {
 	const { didJustFinish } = useAudioPlayerStatus(player);
 	const loadCounter = usePlayerStore(state => state.loadCounter);
 	const isPlaying = usePlayerStore(state => state.playbackState === 'playing');

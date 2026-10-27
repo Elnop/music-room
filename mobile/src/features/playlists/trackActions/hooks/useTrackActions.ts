@@ -8,10 +8,15 @@ import { showError, showSuccess } from '@/shared/utils/toast';
 import { usePlaylists } from '@/features/playlists/hooks/usePlaylistQueries';
 import { useAddTrack } from '@/features/playlists/hooks/useTrackEdits';
 import { canEditPlaylist } from '@/features/playlists/utils/playlistPermissions';
+import {
+	useNewPlaylistFromTrack,
+	type NewPlaylistDraft,
+} from '@/features/playlists/trackActions/hooks/useNewPlaylistFromTrack';
 import type { Playlist } from '@/features/playlists/types';
 import type { AddQueueItemBody } from '@/shared/types/playback';
+import type { TrackActionsStart } from '@/shared/services/trackActionsBridge';
 
-type Step = 'actions' | 'playlists';
+type Step = 'actions' | 'playlists' | 'newPlaylist';
 
 export interface TrackActions {
 	visible: boolean;
@@ -25,22 +30,30 @@ export interface TrackActions {
 	addToQueue: () => void;
 	openPlaylists: () => void;
 	backToActions: () => void;
+	openNewPlaylist: () => void;
+	backToPlaylists: () => void;
+	newPlaylist: NewPlaylistDraft;
 	addToPlaylist: (playlist: Playlist) => void;
 	share: () => void;
 }
 
 /** Each action closes the sheet first so its toast shows on the screen underneath. */
-export function useTrackActions(track: AddQueueItemBody | null, onClose: () => void): TrackActions {
+export function useTrackActions(
+	track: AddQueueItemBody | null,
+	onClose: () => void,
+	start: TrackActionsStart = 'actions'
+): TrackActions {
 	const userId = useSession(session => session.user?.id);
 	const [shown, setShown] = useState(track);
-	const [step, setStep] = useState<Step>('actions');
+	const [step, setStep] = useState<Step>(start);
 	if (track && track !== shown) {
 		setShown(track);
-		setStep('actions');
+		setStep(start);
 	}
 	// Reloaded each time the playlist step opens.
 	const list = usePlaylists(step === 'playlists');
 	const addTrack = useAddTrack();
+	const newPlaylist = useNewPlaylistFromTrack(shown, onClose);
 
 	useEffect(() => {
 		if (list.error) logger.error('[TrackActionsSheet] Loading playlists failed:', list.error);
@@ -67,6 +80,12 @@ export function useTrackActions(track: AddQueueItemBody | null, onClose: () => v
 		addToQueue: () => run(body => getPlayback().addToQueue(body)),
 		openPlaylists: () => setStep('playlists'),
 		backToActions: () => setStep('actions'),
+		openNewPlaylist: () => {
+			newPlaylist.start();
+			setStep('newPlaylist');
+		},
+		backToPlaylists: () => setStep('playlists'),
+		newPlaylist,
 		addToPlaylist: playlist =>
 			run(async body => {
 				try {

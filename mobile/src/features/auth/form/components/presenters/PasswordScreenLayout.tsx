@@ -1,6 +1,8 @@
 import React from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import { Text } from '@/shared/components/ui/Text';
+import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
 interface PasswordScreenLayoutProps {
 	title: string;
@@ -45,7 +47,7 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		fontSize: 32,
-		fontWeight: 'bold',
+		fontFamily: FONT_FAMILIES.bold,
 		marginBottom: 12,
 	},
 	subtitle: {

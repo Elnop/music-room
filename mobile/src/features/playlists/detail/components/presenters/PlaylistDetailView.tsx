@@ -5,6 +5,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { ReorderableList } from '@/shared/components/lists/ReorderableList';
 import { SwipeableTrackItem } from '@/shared/components/lists/SwipeableTrackItem';
+import { TrackTableHeader } from '@/shared/components/lists/TrackTableHeader';
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { PlaylistTracks } from '@/features/playlists/detail/hooks/usePlaylistTracks';
 import type { PlaylistWithTracks } from '@/features/playlists/types';
@@ -37,6 +39,8 @@ export function PlaylistDetailView({
 	const insets = useSafeAreaInsets();
 	const styles = React.useMemo(() => createDetailStyles(theme, insets.top), [theme, insets.top]);
 	const { canEdit, currentUri } = tracks;
+	const { isWide } = useBreakpoint();
+	const tableHeader = isWide && playlist.tracks.length > 0;
 
 	return (
 		<View style={styles.container}>
@@ -52,9 +56,10 @@ export function PlaylistDetailView({
 				dragEnabled={canEdit && !tracks.isMoving}
 				// Rows re-render when the playing track changes, to move the highlight.
 				extraData={currentUri}
-				renderItem={({ item, drag, isActive }) => (
+				renderItem={({ item, index, drag, isActive }) => (
 					<SwipeableTrackItem
 						track={item}
+						position={index + 1}
 						onDelete={() => tracks.deleteTrack(item.id)}
 						disabled={!canEdit}
 						onAddToQueue={() => tracks.addToQueue(item)}
@@ -67,9 +72,22 @@ export function PlaylistDetailView({
 						unavailable={item.unavailable}
 					/>
 				)}
-				ListHeaderComponent={header}
+				ListHeaderComponent={
+					tableHeader ? (
+						<>
+							{header}
+							<TrackTableHeader />
+						</>
+					) : (
+						header
+					)
+				}
 				// The last track scrolls clear of the mini player.
-				contentContainerStyle={[styles.list, { paddingBottom: bottomPadding }]}
+				contentContainerStyle={[
+					styles.list,
+					isWide && styles.column,
+					{ paddingBottom: bottomPadding },
+				]}
 				ListEmptyComponent={
 					<EmptyState
 						icon="musical-notes-outline"

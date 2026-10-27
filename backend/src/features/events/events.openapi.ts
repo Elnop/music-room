@@ -10,6 +10,7 @@ import {
 	eventResponseSchema,
 	eventSchema,
 } from '@/features/events/events-responses.validators.js';
+import { registerEventsGeocodeOpenapi } from '@/features/events/events-geocode.openapi.js';
 import { bearerAuth, jsonBody, nameSchemas, ok } from '@/shared/config/swagger.schemas.js';
 import { fail, shared } from '@/shared/config/swagger.errors.js';
 
@@ -44,6 +45,7 @@ export function registerEventsOpenapi(registry: OpenAPIRegistry): void {
 		CreateEventRequest: createEventSchema,
 		UpdateEventRequest: updateEventSchema,
 	});
+	registerEventsGeocodeOpenapi(registry);
 
 	registry.registerPath({
 		...common,

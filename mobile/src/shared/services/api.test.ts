@@ -1,4 +1,4 @@
-import { ApiError, apiRequest } from './api';
+import { ApiError, apiRequest, readLocalBlob } from './api';
 import { resetBackendUrl, setBackendUrl } from './backendUrl';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -136,5 +136,23 @@ describe('apiRequest body type (#351)', () => {
 			'X-Platform': expect.any(String),
 			'X-App-Version': '1.2.3',
 		});
+	});
+});
+
+describe('readLocalBlob', () => {
+	it('reads a blob: or data: URI', async () => {
+		const image = { size: 3 };
+		fetchMock.mockResolvedValue({ blob: () => Promise.resolve(image) });
+
+		await expect(readLocalBlob('blob:http://localhost:8081/1')).resolves.toBe(image);
+		await expect(readLocalBlob('data:image/jpeg;base64,AAAA')).resolves.toBe(image);
+		expect(fetchMock).toHaveBeenCalledWith('blob:http://localhost:8081/1');
+	});
+
+	it('refuses a network URL without fetching it', async () => {
+		await expect(readLocalBlob('http://example.com/a.jpg')).rejects.toThrow(
+			'only reads blob: and data: URIs, got "http:"'
+		);
+		expect(fetchMock).not.toHaveBeenCalled();
 	});
 });

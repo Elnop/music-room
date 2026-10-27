@@ -3,8 +3,16 @@ import { useLinkedAccountsScreen } from '@/features/profile/linkedAccounts/hooks
 import { LinkedAccountsView } from '@/features/profile/linkedAccounts/components/presenters/LinkedAccountsView';
 
 export function LinkedAccountsOrchestrator() {
-	const { theme, bottomPadding, isLoading, linkedProviders, pending, handleLink, handleUnlink } =
-		useLinkedAccountsScreen();
+	const {
+		theme,
+		bottomPadding,
+		isLoading,
+		linkedProviders,
+		pending,
+		handleLink,
+		handleUnlink,
+		googleButton,
+	} = useLinkedAccountsScreen();
 
 	return (
 		<LinkedAccountsView
@@ -15,6 +23,7 @@ export function LinkedAccountsOrchestrator() {
 			pending={pending}
 			onLink={handleLink}
 			onUnlink={handleUnlink}
+			googleButton={googleButton}
 		/>
 	);
 }

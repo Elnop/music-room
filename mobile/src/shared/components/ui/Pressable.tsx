@@ -4,13 +4,31 @@ import {
 	StyleSheet,
 	type GestureResponderEvent,
 	type PressableProps as NativePressableProps,
+	type PressableStateCallbackType,
 	type StyleProp,
 	type ViewStyle,
 } from 'react-native';
 import { hapticSelection, hapticSuccess, hapticTap } from '@/shared/utils/haptics';
+import { useIconTooltip } from '@/shared/hooks/useIconTooltip';
 
 /** The opacity of every pressable element while it is held down. */
 export const PRESSED_OPACITY = 0.7;
+
+/** Under a mouse pointer (web); the browser already shows the hand cursor on an enabled pressable. */
+export const HOVERED_OPACITY = 0.85;
+
+/** react-native-web adds the pointer state; native platforms never set it. */
+type PressState = PressableStateCallbackType & { hovered?: boolean };
+
+export const pressableStyle = (
+	style: StyleProp<ViewStyle>,
+	{ pressed, hovered }: PressState,
+	disabled?: boolean | null
+): StyleProp<ViewStyle> => [
+	style,
+	hovered && !pressed && !disabled && styles.hovered,
+	pressed && styles.pressed,
+];
 
 const HAPTICS = {
 	tap: hapticTap,
@@ -32,8 +50,13 @@ export function Pressable({
 	haptic,
 	onPress,
 	accessibilityRole = 'button',
+	disabled,
 	...rest
 }: PressableProps) {
+	// A backdrop (role none) closes its dialog anywhere; a tooltip over all of it would mislead.
+	const tooltipRef = useIconTooltip(
+		accessibilityRole === 'none' ? undefined : rest.accessibilityLabel
+	);
 	const handlePress = onPress
 		? (event: GestureResponderEvent) => {
 				if (haptic) HAPTICS[haptic]();
@@ -44,13 +67,16 @@ export function Pressable({
 	return (
 		<NativePressable
 			{...rest}
+			ref={tooltipRef}
+			disabled={disabled}
 			accessibilityRole={accessibilityRole}
 			onPress={handlePress}
-			style={({ pressed }) => [style, pressed && styles.pressed]}
+			style={(state: PressState) => pressableStyle(style, state, disabled)}
 		/>
 	);
 }
 
 const styles = StyleSheet.create({
 	pressed: { opacity: PRESSED_OPACITY },
+	hovered: { opacity: HOVERED_OPACITY },
 });

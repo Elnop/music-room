@@ -169,3 +169,13 @@ export const eventRateLimiter = createLimiter({
 	log: 'Event rate limit exceeded',
 	logFields: perUserFields,
 });
+
+/** Address lookups, per signed-in user; after authMiddleware. */
+export const geocodeRateLimiter = createLimiter({
+	store: 'events:geocode',
+	limits: rateLimitConfig.geocode,
+	key: req => `geocode:${userIdOf(req)}`,
+	message: () => 'Too many address lookups. Please try again later.',
+	log: 'Geocode rate limit exceeded',
+	logFields: perUserFields,
+});

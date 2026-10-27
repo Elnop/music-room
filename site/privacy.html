@@ -5,6 +5,13 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>Zumik Privacy Policy</title>
 		<meta name="description" content="How Zumik collects, uses and protects your personal data." />
+		<script>
+			// The full text stays here for the robots of the Google OAuth consent screen and the Play
+			// Store; a browser running JavaScript reads it in the app, at /music-room/privacy. Through the
+			// app root (mobile/src/navigation/webBasePath.ts): GitHub Pages answers /music-room/privacy
+			// with this very file.
+			window.location.replace('/music-room/?redirect=' + encodeURIComponent('/privacy') + window.location.hash);
+		</script>
 		<link rel="icon" href="logo.png" />
 		<link rel="stylesheet" href="style.css" />
 	</head>
@@ -111,7 +118,7 @@
 			<p><a href="mailto:leon.perrotin@gmail.com">leon.perrotin@gmail.com</a></p>
 
 			<footer>
-				<a href="index.html">Home</a>
+				<a href="./">Home</a>
 			</footer>
 		</main>
 	</body>

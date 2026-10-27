@@ -4,7 +4,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { getPlayerModal } from '@/shared/services/playerModalsBridge';
+import { Pressable } from '@/shared/components/ui/Pressable';
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { PlayerHeader } from './PlayerHeader';
+import { isPlayerDialog } from './playerModalStyles';
 import { PlayerTrackInfo } from './PlayerTrackInfo';
 import { PlayerArtworkCarousel } from './PlayerArtworkCarousel';
 import { PlayerProgressSlider } from './PlayerProgressSlider';
@@ -25,19 +28,35 @@ interface PlayerModalViewProps {
 export function PlayerModalView({ modal, gestures, seek, carousel }: PlayerModalViewProps) {
 	const QueueModal = getPlayerModal('QueueModal');
 	const DevicePickerSheet = getPlayerModal('DevicePickerSheet');
+	// Desktop has the now playing panel instead; a tablet browser centres the player over the app.
+	const { isDesktop, width } = useBreakpoint();
+	const dialog = isPlayerDialog(width);
 
 	return (
 		<Modal
-			visible={modal.isModalOpen}
-			animationType="slide"
+			visible={modal.isModalOpen && !isDesktop}
+			animationType={dialog ? 'fade' : 'slide'}
 			presentationStyle="overFullScreen"
 			transparent
 			onRequestClose={modal.closeModal}
 		>
-			<GestureHandlerRootView style={modal.styles.container}>
+			<GestureHandlerRootView style={[modal.styles.container, dialog && modal.styles.dialogFrame]}>
+				{dialog && (
+					<Pressable
+						style={modal.styles.dialogBackdrop}
+						onPress={modal.closeModal}
+						accessibilityRole="none"
+						accessibilityLabel="Fermer le lecteur"
+					/>
+				)}
 				<GestureDetector gesture={gestures.panGesture}>
 					<Animated.View
-						style={[modal.styles.container, modal.styles.modalContent, gestures.animatedStyle]}
+						style={[
+							modal.styles.container,
+							modal.styles.modalContent,
+							dialog && modal.styles.dialog,
+							gestures.animatedStyle,
+						]}
 					>
 						<LinearGradient
 							colors={modal.gradientColors}
@@ -46,7 +65,12 @@ export function PlayerModalView({ modal, gestures, seek, carousel }: PlayerModal
 							end={{ x: 0.5, y: 1 }}
 						/>
 
-						<PlayerHeader styles={modal.styles} colors={modal.colors} onClose={modal.closeModal} />
+						<PlayerHeader
+							styles={modal.styles}
+							colors={modal.colors}
+							dialog={dialog}
+							onClose={modal.closeModal}
+						/>
 
 						<View style={modal.styles.mainContent}>
 							<GestureDetector gesture={carousel.panGesture}>
@@ -113,12 +137,12 @@ export function PlayerModalView({ modal, gestures, seek, carousel }: PlayerModal
 
 				{QueueModal &&
 					React.createElement(QueueModal, {
-						visible: modal.isModalOpen && modal.isQueueOpen,
+						visible: modal.isModalOpen && !isDesktop && modal.isQueueOpen,
 						onClose: () => modal.setQueueOpen(false),
 					})}
 				{DevicePickerSheet &&
 					React.createElement(DevicePickerSheet, {
-						visible: modal.isModalOpen && modal.isDevicesOpen,
+						visible: modal.isModalOpen && !isDesktop && modal.isDevicesOpen,
 						onClose: () => modal.setDevicesOpen(false),
 					})}
 			</GestureHandlerRootView>

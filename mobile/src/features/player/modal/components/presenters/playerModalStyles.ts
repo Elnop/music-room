@@ -1,19 +1,44 @@
-import { Dimensions, StyleSheet } from 'react-native';
+import { Dimensions, Platform, StyleSheet } from 'react-native';
+import { BREAKPOINTS, PLAYER_DIALOG_WIDTH } from '@/shared/constants/layout';
 import type { Theme } from '@/shared/theme/types';
+import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
-export const { width: WINDOW_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+export const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 export const DISMISS_THRESHOLD = SCREEN_HEIGHT * 0.2;
-// Capped by the height too, so a short screen still fits the bottom row above the navigation bar.
-export const ARTWORK_SIZE = Math.min(WINDOW_WIDTH * 0.75, SCREEN_HEIGHT * 0.36);
 /** From one artwork of the carousel to the next: the neighbours' edges peek out on both sides. */
-export const ARTWORK_STEP = ARTWORK_SIZE + 16;
-export const SEEK_STEP_S = 10;
+const ARTWORK_GAP = 16;
+
+/** A tablet browser shows the player as a centred dialog; Android tablets keep the full screen. */
+export function isPlayerDialog(windowWidth: number): boolean {
+	return Platform.OS === 'web' && windowWidth >= BREAKPOINTS.tablet;
+}
+
+/** Capped by the height too, so a short screen still fits the bottom row above the navigation bar. */
+export function artworkSize(windowWidth: number, windowHeight: number) {
+	const playerWidth = isPlayerDialog(windowWidth) ? PLAYER_DIALOG_WIDTH : windowWidth;
+	const size = Math.min(playerWidth * 0.75, windowHeight * 0.36);
+	return { size, step: size + ARTWORK_GAP };
+}
 export const HEADER_HIT_SLOP = { top: 4, bottom: 4, left: 4, right: 4 };
 
 export const createStyles = (theme: Theme, insets: { top: number; bottom: number }) =>
 	StyleSheet.create({
 		container: { flex: 1 },
 		modalContent: { backgroundColor: theme.colors.background },
+		dialogFrame: { alignItems: 'center', justifyContent: 'center' },
+		// Keeps its own height: the full screen's `flex: 1` would give it a basis of 0.
+		dialog: {
+			flexGrow: 0,
+			flexBasis: 'auto',
+			width: PLAYER_DIALOG_WIDTH,
+			height: '90%',
+			maxHeight: 900,
+			borderRadius: 16,
+			overflow: 'hidden',
+			borderWidth: 1,
+			borderColor: theme.colors.borderSubtle,
+		},
+		dialogBackdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: theme.colors.backdrop },
 		header: { paddingTop: insets.top + 8, alignItems: 'center', paddingBottom: 8 },
 		swipeIndicator: { alignItems: 'center', marginBottom: 8 },
 		swipeBar: { width: 40, height: 5, borderRadius: 3, opacity: 0.5 },
@@ -27,14 +52,14 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 		},
 		nowPlayingText: {
 			fontSize: 12,
-			fontWeight: '600',
+			fontFamily: FONT_FAMILIES.semibold,
 			letterSpacing: 2,
 			marginTop: 8,
 		},
 		deviceText: {
 			flexShrink: 1,
 			fontSize: 13,
-			fontWeight: '600',
+			fontFamily: FONT_FAMILIES.semibold,
 		},
 		// Content sits low, within thumb reach; the header keeps only the close chevron.
 		mainContent: {
@@ -71,8 +96,6 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 			elevation: 16,
 		},
 		artwork: {
-			width: ARTWORK_SIZE,
-			height: ARTWORK_SIZE,
 			borderRadius: 12,
 			backgroundColor: theme.colors.surfaceAlt,
 		},
@@ -87,13 +110,13 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 		},
 		title: {
 			fontSize: 24,
-			fontWeight: '700',
+			fontFamily: FONT_FAMILIES.bold,
 			marginBottom: 8,
 			textAlign: 'center',
 		},
 		artist: {
 			fontSize: 17,
-			fontWeight: '500',
+			fontFamily: FONT_FAMILIES.medium,
 			textAlign: 'center',
 		},
 		errorContainer: {
@@ -109,7 +132,7 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 		},
 		errorText: {
 			fontSize: 14,
-			fontWeight: '500',
+			fontFamily: FONT_FAMILIES.medium,
 		},
 		progressContainer: {
 			paddingHorizontal: 24,
@@ -117,7 +140,7 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 		},
 		slider: { width: '100%', height: 40 },
 		timeContainer: { flexDirection: 'row', justifyContent: 'space-between', marginTop: -8 },
-		timeText: { fontSize: 13, fontWeight: '500' },
+		timeText: { fontSize: 13, fontFamily: FONT_FAMILIES.medium },
 		controls: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -146,5 +169,5 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 			elevation: 8,
 		},
 		loadingContainer: { marginTop: 24, alignItems: 'center' },
-		loadingText: { fontSize: 14, fontWeight: '500' },
+		loadingText: { fontSize: 14, fontFamily: FONT_FAMILIES.medium },
 	});

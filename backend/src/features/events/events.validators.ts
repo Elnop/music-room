@@ -69,5 +69,12 @@ export const updateEventSchema = z
 
 export const eventIdParamSchema = z.object({ id: z.uuid() });
 
+export const geocodeQuerySchema = z.object({
+	q: eventFields.address.meta({
+		description: 'The address as typed; the only thing sent to the geocoder',
+		example: '96 boulevard Bessières, 75017 Paris',
+	}),
+});
+
 export type CreateEventInput = z.infer<typeof createEventSchema>;
 export type UpdateEventInput = z.infer<typeof updateEventSchema>;

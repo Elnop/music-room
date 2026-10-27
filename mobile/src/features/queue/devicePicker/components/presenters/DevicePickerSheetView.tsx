@@ -1,14 +1,18 @@
 import React from 'react';
-import { View, Text, Modal, ScrollView, ActivityIndicator } from 'react-native';
+import { View, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable } from '@/shared/components/ui/Pressable';
+import { FullScreenSheet } from '@/shared/components/layout/FullScreenSheet';
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { AppToast } from '@/shared/components/feedback/AppToast';
+import { THIS_DEVICE_LABEL } from '@/shared/constants/platform';
 import { DeviceRow } from './DeviceRow';
 import type { DevicePickerOwner } from '@/types/device.types';
 import type { Theme } from '@/shared/theme/types';
 import type { createPickerStyles } from './devicePickerStyles';
 import type { LoadedDevices } from '@/features/queue/devicePicker/hooks/useDevicePicker';
 import type { PickerDevice } from './DeviceRow';
+import { Text } from '@/shared/components/ui/Text';
 
 interface DevicePickerSheetViewProps {
 	visible: boolean;
@@ -37,6 +41,8 @@ export function DevicePickerSheetView({
 	isActive,
 	onPick,
 }: DevicePickerSheetViewProps) {
+	const { isWide } = useBreakpoint();
+
 	const renderDevice = (owner: DevicePickerOwner, device: PickerDevice) => (
 		<DeviceRow
 			key={`${owner.ownerId}:${device.deviceId}`}
@@ -83,11 +89,11 @@ export function DevicePickerSheetView({
 
 		return (
 			<ScrollView contentContainerStyle={styles.listContent}>
-				<Text style={styles.sectionLabel}>Ce téléphone</Text>
+				<Text style={styles.sectionLabel}>{THIS_DEVICE_LABEL}</Text>
 				{self && phone ? (
 					renderDevice(self, phone)
 				) : (
-					<Text style={styles.emptyText}>Ce téléphone n&apos;est pas encore enregistré</Text>
+					<Text style={styles.emptyText}>{`${THIS_DEVICE_LABEL} n'est pas encore enregistré`}</Text>
 				)}
 
 				<Text style={styles.sectionLabel}>Mes appareils</Text>
@@ -112,32 +118,30 @@ export function DevicePickerSheetView({
 		);
 	};
 
-	return (
-		<Modal
-			visible={visible}
-			animationType="slide"
-			presentationStyle="overFullScreen"
-			transparent
-			onRequestClose={onClose}
-		>
-			<View style={styles.container}>
-				<View style={styles.header}>
-					<Pressable
-						onPress={onClose}
-						style={styles.closeButton}
-						hitSlop={4}
-						accessibilityRole="button"
-						accessibilityLabel="Fermer le choix d'appareil"
-					>
-						<Ionicons name="chevron-down" size={24} color={theme.colors.text} />
-					</Pressable>
-					<Text style={styles.title}>Choisir un appareil</Text>
-				</View>
-
-				{renderContent()}
-
-				<AppToast />
+	const content = (
+		<View style={styles.container}>
+			<View style={styles.header}>
+				<Pressable
+					onPress={onClose}
+					style={styles.closeButton}
+					hitSlop={4}
+					accessibilityRole="button"
+					accessibilityLabel="Fermer le choix d'appareil"
+				>
+					<Ionicons name={isWide ? 'close' : 'chevron-down'} size={24} color={theme.colors.text} />
+				</Pressable>
+				<Text style={styles.title}>Choisir un appareil</Text>
 			</View>
-		</Modal>
+
+			{renderContent()}
+
+			<AppToast />
+		</View>
+	);
+
+	return (
+		<FullScreenSheet visible={visible} onClose={onClose}>
+			{content}
+		</FullScreenSheet>
 	);
 }

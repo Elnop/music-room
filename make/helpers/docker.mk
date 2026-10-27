@@ -229,7 +229,7 @@ define start_mobile
 	@$(call write_mobile_dev_env)
 	@$(call ensure_network)
 	@$(call ensure_volumes)
-	@if [ "$(call container_running,$(MOBILE_CONTAINER))" = "true" ] && [ "$(call container_mode,$(MOBILE_CONTAINER))" != "tunnel" ]; then \
+	@if [ "$(call container_running,$(MOBILE_CONTAINER))" = "true" ] && [ "$(call container_mode,$(MOBILE_CONTAINER))" = "lan" ]; then \
 		echo "$(YELLOW)$(ICON_INFO) Mobile already running$(NC)"; \
 	else \
 		$(call build_mobile_image); \
@@ -262,6 +262,43 @@ define start_mobile
 			exit 1; \
 		}; \
 		echo "$(GREEN)$(ICON_SUCCESS) Mobile started$(NC)"; \
+	fi
+endef
+
+# Start the mobile container as the web app (make dev-web): Expo web on
+# METRO_PORT, the backend on localhost since the browser runs on this machine.
+# Usage: $(call start_mobile_web)
+define start_mobile_web
+	@$(call write_mobile_dev_env)
+	@$(call ensure_network)
+	@$(call ensure_volumes)
+	@if [ "$(call container_running,$(MOBILE_CONTAINER))" = "true" ] && [ "$(call container_mode,$(MOBILE_CONTAINER))" = "web" ]; then \
+		echo "$(YELLOW)$(ICON_INFO) Web app already running$(NC)"; \
+	else \
+		$(call build_mobile_image); \
+		docker stop $(MOBILE_CONTAINER) 2>/dev/null || true; \
+		docker rm -v $(MOBILE_CONTAINER) 2>/dev/null || true; \
+		$(call node_modules_volume,$(MOBILE_MODULES_VOLUME),music-room-mobile:latest); \
+		echo "$(BLUE)$(ICON_INFO) Starting the web app...$(NC)"; \
+		docker run -d \
+			--name $(MOBILE_CONTAINER) \
+			--label zumik.mode=web \
+			--network $(DOCKER_NETWORK) \
+			-p $(METRO_PORT):$(METRO_PORT) \
+			-v $(shell pwd)/$(MOBILE_DIR):/app \
+			-v $(MOBILE_MODULES_VOLUME):/app/node_modules \
+			-v /app/.expo \
+			--env-file $(shell pwd)/$(MOBILE_ENV) \
+			--env-file $(shell pwd)/$(MOBILE_DEV_ENV) \
+			-e EXPO_PUBLIC_API_URL=$(DEV_API_URL) \
+			-e EXPO_PUBLIC_WS_URL=$(DEV_WS_URL) \
+			-it \
+			music-room-mobile:latest npx expo start --web --offline --port $(METRO_PORT) || { \
+			echo "$(RED)$(ICON_ERROR) Failed to start the web app$(NC)"; \
+			docker logs $(MOBILE_CONTAINER) 2>&1 | tail -20; \
+			exit 1; \
+		}; \
+		echo "$(GREEN)$(ICON_SUCCESS) Web app started$(NC)"; \
 	fi
 endef
 

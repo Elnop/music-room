@@ -1,5 +1,5 @@
 import React, { type ReactElement } from 'react';
-import { Alert } from 'react-native';
+import { Alert, useWindowDimensions } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { ProfileOrchestrator } from './components/orchestrators/ProfileOrchestrator';
 
@@ -39,10 +39,14 @@ jest.mock('@/features/profile/hooks/useProfileQueries', () => ({
 	useUserStats: () => ({ data: { followersCount: 0, followingCount: 0 }, refetch: jest.fn() }),
 }));
 
+jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
+	__esModule: true,
+	default: jest.fn(() => ({ width: 390, height: 844, scale: 1, fontScale: 1 })),
+}));
+
 jest.mock('@/shared/services/deviceService', () => ({
 	getBuildLabel: () => 'Zumik 1.0.0 (build 42 · a1b2c3d)',
 }));
-
 
 type AlertButtons = Parameters<typeof Alert.alert>[2];
 
@@ -110,5 +114,33 @@ describe('ProfileScreen build label', () => {
 	it('shows the installed build at the bottom of the profile', () => {
 		render(<ProfileOrchestrator />);
 		expect(screen.getByText('Zumik 1.0.0 (build 42 · a1b2c3d)')).toBeTruthy();
+	});
+});
+
+describe('ProfileScreen on wide screens', () => {
+	beforeEach(() => {
+		jest.clearAllMocks();
+		jest
+			.mocked(useWindowDimensions)
+			.mockReturnValue({ width: 1440, height: 900, scale: 1, fontScale: 1 });
+	});
+
+	afterEach(() => {
+		jest
+			.mocked(useWindowDimensions)
+			.mockReturnValue({ width: 390, height: 844, scale: 1, fontScale: 1 });
+	});
+
+	it('offers editing and settings as buttons of its own header', () => {
+		render(<ProfileOrchestrator />);
+		fireEvent.press(screen.getByRole('button', { name: 'Modifier le profil' }));
+		fireEvent.press(screen.getByRole('button', { name: 'Réglages' }));
+		expect(mockNavigate.mock.calls).toEqual([['EditProfile'], ['Settings']]);
+	});
+
+	it('shows a single version label, the build one', () => {
+		render(<ProfileOrchestrator />);
+		expect(screen.getByText('Zumik 1.0.0 (build 42 · a1b2c3d)')).toBeTruthy();
+		expect(screen.queryByText('Zumik v1.0.0')).toBeNull();
 	});
 });

@@ -5,7 +5,7 @@ export const createSharingStyles = (theme: Theme) =>
 	StyleSheet.create({
 		sectionTitle: {
 			fontSize: theme.typography.sizes.sm,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.textSecondary,
 			marginBottom: theme.spacing.sm,
 			textTransform: 'uppercase',

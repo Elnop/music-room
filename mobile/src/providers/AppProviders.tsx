@@ -3,6 +3,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StyleSheet } from 'react-native';
 import { QueryClientProvider, type QueryClient } from '@tanstack/react-query';
+import { AlertHost } from '@/shared/components/feedback/AlertHost';
 import { ErrorBoundary } from '@/shared/components/feedback/ErrorBoundary';
 import { ThemeProvider } from '@/shared/theme/ThemeContext';
 import { createQueryClient } from '@/shared/query/queryClient';
@@ -31,7 +32,10 @@ export function AppProviders({ children, queryClient }: AppProvidersProps) {
 			<ErrorBoundary>
 				<QueryClientProvider client={client}>
 					<ThemeProvider>
-						<SafeAreaProvider>{children}</SafeAreaProvider>
+						<SafeAreaProvider>
+							{children}
+							<AlertHost />
+						</SafeAreaProvider>
 					</ThemeProvider>
 				</QueryClientProvider>
 			</ErrorBoundary>

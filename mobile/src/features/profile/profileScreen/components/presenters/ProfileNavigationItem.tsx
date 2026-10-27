@@ -1,9 +1,10 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface ProfileNavigationItemProps {
 	title: string;
@@ -64,7 +65,7 @@ const createStyles = (theme: Theme) =>
 		},
 		title: {
 			fontSize: 16,
-			fontWeight: theme.typography.weights.bold,
+			fontFamily: theme.typography.families.bold,
 			color: theme.colors.text,
 		},
 		subtitle: {

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Alert } from 'react-native';
+import { showAlert } from '@/shared/utils/alert';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSession } from '@/shared/services/authSession';
 import { ApiError } from '@/shared/services/api';
@@ -64,7 +64,7 @@ export function useEventDetailScreen(navigation: Navigation, id: string): EventD
 		},
 		edit: () => navigation.navigate('EventForm', { eventId: id }),
 		remove: () =>
-			Alert.alert(
+			showAlert(
 				"Supprimer l'événement ?",
 				`« ${event?.name ?? ''} » disparaîtra pour tout le monde. Cette action est définitive.`,
 				[

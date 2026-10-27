@@ -1,13 +1,13 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Avatar } from '@/shared/components/media/Avatar';
-import { ThemedSwitch } from '@/shared/components/ui/ThemedSwitch';
-import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { FriendProfile } from '@/features/friends/types';
+import { ControlSwitch } from './ControlSwitch';
 import { createFriendsListStyles } from './friendsListStyles';
+import { Text } from '@/shared/components/ui/Text';
 
 interface FriendItemRowProps {
 	friend: FriendProfile;
@@ -53,17 +53,13 @@ export function FriendItemRow({
 				</View>
 			</View>
 			<View style={styles.controlToggle}>
-				{isToggling ? (
-					<View style={styles.switchPlaceholder}>
-						<LoadingSpinner size="small" />
-					</View>
-				) : (
-					<ThemedSwitch
-						value={canControl}
-						onValueChange={() => onToggleControl(friend.id, canControl)}
-						disabled={disabled}
-					/>
-				)}
+				<ControlSwitch
+					canControl={canControl}
+					isToggling={isToggling}
+					disabled={disabled}
+					onToggle={() => onToggleControl(friend.id, canControl)}
+					accessibilityLabel={`${friend.displayName || friend.username} peut contrôler ma musique`}
+				/>
 			</View>
 			<Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
 		</Pressable>

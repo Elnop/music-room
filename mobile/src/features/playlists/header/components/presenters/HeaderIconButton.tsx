@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
@@ -9,6 +9,8 @@ interface HeaderIconButtonProps {
 	size: number;
 	onPress: () => void;
 	accessibilityLabel: string;
+	/** For a button that opens a menu: where the menu drops down from on wide screens. */
+	ref?: React.Ref<View>;
 }
 
 /** A 36-point icon button of the native header (`headerRight`). */
@@ -17,16 +19,19 @@ export function HeaderIconButton({
 	size,
 	onPress,
 	accessibilityLabel,
+	ref,
 }: HeaderIconButtonProps) {
 	const { theme } = useTheme();
 	return (
-		<Pressable
-			onPress={onPress}
-			accessibilityLabel={accessibilityLabel}
-			style={headerButtonStyles.button}
-		>
-			<Ionicons name={icon} size={size} color={theme.colors.text} />
-		</Pressable>
+		<View ref={ref} collapsable={false}>
+			<Pressable
+				onPress={onPress}
+				accessibilityLabel={accessibilityLabel}
+				style={headerButtonStyles.button}
+			>
+				<Ionicons name={icon} size={size} color={theme.colors.text} />
+			</Pressable>
+		</View>
 	);
 }
 

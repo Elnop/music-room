@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { useAudioPlayerStatus, type useAudioPlayer } from 'expo-audio';
+import { useAudioPlayerStatus } from '@/features/player/services/audioPlayer';
+import type { AudioPlayer } from '@/features/player/types';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { isLocalTarget, useIsLocalTarget } from '@/shared/services/connectBridge';
 import { useActiveQueue } from '@/shared/services/playbackBridge';
@@ -14,7 +15,7 @@ function playsLocally(): boolean {
 }
 
 /** Only for a track played locally, in its last PREFETCH_WINDOW_S seconds. */
-export function useNextTrackPrefetch(player: ReturnType<typeof useAudioPlayer>): void {
+export function useNextTrackPrefetch(player: AudioPlayer): void {
 	const status = useAudioPlayerStatus(player);
 	const isPlaying = usePlayerStore(state => state.playbackState === 'playing');
 	const isLocal = useIsLocalTarget();
@@ -61,14 +62,9 @@ export function useNextTrackPrefetch(player: ReturnType<typeof useAudioPlayer>):
 		const controller = new AbortController();
 		const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 		fetchStreamUrl(nextPermalink, controller.signal)
-			.then(({ streamUrl, expiresAt }) => {
+			.then(stream => {
 				if (nextKeyRef.current !== nextKey || !playsLocally()) return;
-				streamPrefetch.set({
-					queueItemId: nextId,
-					permalink: nextPermalink,
-					streamUrl,
-					expiresAt,
-				});
+				streamPrefetch.set({ ...stream, queueItemId: nextId, permalink: nextPermalink });
 			})
 			.catch(() => undefined)
 			.finally(() => clearTimeout(timeoutId));

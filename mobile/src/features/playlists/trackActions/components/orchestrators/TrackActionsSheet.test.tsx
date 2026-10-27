@@ -12,6 +12,7 @@ import { mockFetchRoutes } from '@/test/fetchRoutes';
 import { fail, ok } from '@/test/fetchResponses';
 import { signIn } from '@/test/session';
 import { playlistTrack } from '@/test/playlistFixtures';
+import { queryKeys } from '@/shared/query/keys';
 
 jest.mock('@/shared/theme/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
@@ -188,5 +189,90 @@ describe('TrackActionsSheet', () => {
 		await waitFor(() => expect(Share.share).toHaveBeenCalled());
 		expect(showSuccess).not.toHaveBeenCalled();
 		expect(showError).not.toHaveBeenCalled();
+	});
+});
+
+describe('TrackActionsSheet new playlist', () => {
+	const created = playlist('new', 'Song', {
+		ownerId: 'me',
+		trackCount: 0,
+		visibility: 'public',
+		editMode: 'open',
+	});
+
+	const openForm = async () => {
+		const view = renderSheet();
+		fireEvent.press(screen.getByText('Ajouter à une playlist'));
+		fireEvent.press(screen.getByText('Nouvelle playlist'));
+		await screen.findByLabelText('Nom de la playlist');
+		return view;
+	};
+
+	beforeEach(() => {
+		let exists = false;
+		routes.routes['GET /api/playlists'] = () =>
+			ok({ playlists: exists ? [{ ...created, trackCount: 1 }, ...playlists] : playlists });
+		routes.routes['POST /api/playlists'] = () => {
+			exists = true;
+			return ok({ playlist: created });
+		};
+		routes.routes['POST /api/playlists/new/tracks'] = added;
+	});
+
+	it('is offered first, even without an editable playlist', async () => {
+		routes.routes['GET /api/playlists'] = ok({ playlists: [playlists[3]] });
+		renderSheet();
+		fireEvent.press(screen.getByText('Ajouter à une playlist'));
+		expect(screen.getByText('Nouvelle playlist')).toBeTruthy();
+		expect(await screen.findByText('Aucune playlist modifiable')).toBeTruthy();
+	});
+
+	it('creates the playlist named after the track, adds the track and lists it', async () => {
+		const { client } = await openForm();
+		expect(screen.getByDisplayValue('Song')).toBeTruthy();
+		fireEvent.press(screen.getByText('Créer et ajouter'));
+
+		await waitFor(() => expect(showSuccess).toHaveBeenCalledWith('Ajouté à « Song »'));
+		expect(onClose).toHaveBeenCalled();
+		const sent = routes.fetchMock.mock.calls.map(([, init]) => init?.body);
+		expect(routes.calls()).toContain('POST /api/playlists');
+		expect(sent).toContain(JSON.stringify({ name: 'Song' }));
+		expect(sent).toContain(JSON.stringify(track));
+		await waitFor(() =>
+			expect(client.getQueryData<Playlist[]>(queryKeys.playlists.list())?.map(p => p.id)).toContain(
+				'new'
+			)
+		);
+	});
+
+	it('refuses an empty name without a request', async () => {
+		await openForm();
+		fireEvent.changeText(screen.getByDisplayValue('Song'), '   ');
+		fireEvent.press(screen.getByText('Créer et ajouter'));
+		expect(await screen.findByText('Le nom de la playlist est requis')).toBeTruthy();
+		expect(routes.calls()).not.toContain('POST /api/playlists');
+		expect(onClose).not.toHaveBeenCalled();
+	});
+
+	it('keeps the form open with the error when the creation fails', async () => {
+		routes.routes['POST /api/playlists'] = fail(429, 'RATE_LIMIT_EXCEEDED');
+		await openForm();
+		fireEvent.press(screen.getByText('Créer et ajouter'));
+		expect(await screen.findByText('Trop de tentatives, réessayez dans un instant.')).toBeTruthy();
+		expect(onClose).not.toHaveBeenCalled();
+		expect(screen.getByLabelText('Nom de la playlist')).toBeTruthy();
+		expect(routes.calls()).not.toContain('POST /api/playlists/new/tracks');
+	});
+
+	it('says the playlist was created when the track cannot be added', async () => {
+		routes.routes['POST /api/playlists/new/tracks'] = fail(500, 'INTERNAL_ERROR');
+		await openForm();
+		fireEvent.press(screen.getByText('Créer et ajouter'));
+		await waitFor(() =>
+			expect(showError).toHaveBeenCalledWith(
+				"Playlist « Song » créée, mais le titre n'a pas pu y être ajouté"
+			)
+		);
+		expect(showSuccess).not.toHaveBeenCalled();
 	});
 });

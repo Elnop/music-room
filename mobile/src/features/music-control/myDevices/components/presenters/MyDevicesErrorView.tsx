@@ -1,7 +1,8 @@
 import React from 'react';
-import { Text, StyleSheet, ScrollView, type RefreshControlProps } from 'react-native';
+import { StyleSheet, ScrollView, type RefreshControlProps } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
+import { Text } from '@/shared/components/ui/Text';
 
 const LOAD_ERROR = 'Impossible de charger vos appareils';
 

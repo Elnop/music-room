@@ -1,6 +1,7 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import { Text } from '@/shared/components/ui/Text';
 
 export function ErrorBox({ message }: { message: string }) {
 	const { theme } = useTheme();

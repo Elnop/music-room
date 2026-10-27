@@ -2,9 +2,7 @@ import { logger } from '@/shared/utils/logger.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { soundcloud } from '@/shared/soundcloud/soundcloud-client.js';
 import * as availability from '@/shared/soundcloud/track-availability.js';
-import type { StreamUrlResult } from '@/features/soundcloud/soundcloud.types.js';
-
-type Protocol = 'hls' | 'progressive';
+import type { StreamProtocol, StreamUrlResult } from '@/features/soundcloud/soundcloud.types.js';
 
 const STREAM_URL_LIFETIME_S = 1800;
 
@@ -19,13 +17,13 @@ export async function getStreamUrl(trackUrl: string): Promise<StreamUrlResult> {
 		}
 
 		const obtainedAt = Date.now();
-		const streamUrl =
-			(await tryGetStreamUrl(trackUrl, 'hls')) ?? (await tryGetStreamUrl(trackUrl, 'progressive'));
+		const stream =
+			(await tryGetStream(trackUrl, 'hls')) ?? (await tryGetStream(trackUrl, 'progressive'));
 
-		if (streamUrl) {
-			logger.info('Stream URL obtained', { trackUrl });
+		if (stream) {
+			logger.info('Stream URL obtained', { trackUrl, protocol: stream.protocol });
 			const result: StreamUrlResult = {
-				streamUrl,
+				...stream,
 				expiresAt: new Date(obtainedAt + STREAM_URL_LIFETIME_S * 1000).toISOString(),
 			};
 			return result;
@@ -46,7 +44,10 @@ export async function getStreamUrl(trackUrl: string): Promise<StreamUrlResult> {
 }
 
 /** The stream URL for one protocol, or null when SoundCloud has none. */
-async function tryGetStreamUrl(trackUrl: string, protocol: Protocol): Promise<string | null> {
+async function tryGetStream(
+	trackUrl: string,
+	protocol: StreamProtocol
+): Promise<{ streamUrl: string; protocol: StreamProtocol } | null> {
 	try {
 		logger.debug(`Trying ${protocol} stream`, { trackUrl });
 
@@ -62,7 +63,7 @@ async function tryGetStreamUrl(trackUrl: string, protocol: Protocol): Promise<st
 			return null;
 		}
 
-		return streamUrl;
+		return { streamUrl, protocol };
 	} catch (error) {
 		logger.debug(`Failed to get ${protocol} stream`, {
 			error: error instanceof Error ? error.message : 'Unknown error',

@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface NowPlayingInlineProps {
 	track: {
@@ -111,7 +112,7 @@ const createStyles = (theme: Theme) =>
 		title: {
 			flex: 1,
 			fontSize: 13,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 		},
 		artist: {

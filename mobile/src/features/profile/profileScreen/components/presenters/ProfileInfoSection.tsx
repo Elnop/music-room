@@ -1,15 +1,17 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { ProfileSection } from '@/features/profile/common/components/presenters/ProfileSection';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import type { UserProfile } from '@/types/user.types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface ProfileInfoSectionProps {
 	user: UserProfile;
+	prominent?: boolean;
 }
 
-export function ProfileInfoSection({ user }: ProfileInfoSectionProps) {
+export function ProfileInfoSection({ user, prominent }: ProfileInfoSectionProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
@@ -25,7 +27,7 @@ export function ProfileInfoSection({ user }: ProfileInfoSectionProps) {
 	}, [user.createdAt]);
 
 	return (
-		<ProfileSection title="Information">
+		<ProfileSection title="Information" prominent={prominent}>
 			<View style={styles.infoItem}>
 				<Text style={styles.infoLabel}>Email</Text>
 				<Text style={styles.infoValue}>{user.email}</Text>
@@ -63,7 +65,7 @@ const createStyles = (theme: Theme) =>
 		infoValue: {
 			fontSize: 15,
 			color: theme.colors.text,
-			fontWeight: theme.typography.weights.medium,
+			fontFamily: theme.typography.families.medium,
 		},
 		divider: {
 			height: 1,

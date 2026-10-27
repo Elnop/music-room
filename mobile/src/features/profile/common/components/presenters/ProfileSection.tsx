@@ -1,8 +1,9 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface ProfileSectionProps {
 	title: string;
@@ -11,16 +12,23 @@ interface ProfileSectionProps {
 		label: string;
 		onPress: () => void;
 	};
+	/** Wide screens: a larger title, read as the heading of the page's section. */
+	prominent?: boolean;
 }
 
-export function ProfileSection({ title, children, rightAction }: ProfileSectionProps) {
+export function ProfileSection({
+	title,
+	children,
+	rightAction,
+	prominent = false,
+}: ProfileSectionProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
 	return (
 		<View style={styles.container}>
 			<View style={styles.header}>
-				<Text style={styles.title}>{title}</Text>
+				<Text style={prominent ? styles.prominentTitle : styles.title}>{title}</Text>
 				{rightAction && (
 					<Pressable onPress={rightAction.onPress} accessibilityLabel={rightAction.label}>
 						<Text style={styles.action}>{rightAction.label}</Text>
@@ -51,14 +59,19 @@ const createStyles = (theme: Theme) =>
 		},
 		title: {
 			fontSize: 13,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.textSecondary,
 			textTransform: 'uppercase',
 			letterSpacing: 0.5,
 		},
+		prominentTitle: {
+			fontSize: theme.typography.sizes.lg,
+			fontFamily: theme.typography.families.bold,
+			color: theme.colors.text,
+		},
 		action: {
 			fontSize: 14,
-			fontWeight: theme.typography.weights.medium,
+			fontFamily: theme.typography.families.medium,
 			color: theme.colors.primary,
 		},
 		content: {

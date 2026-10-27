@@ -1,11 +1,12 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
 import { ThemedSwitch } from '@/shared/components/ui/ThemedSwitch';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { createSharingStyles } from './sharingStyles';
+import { Text } from '@/shared/components/ui/Text';
 
 interface SettingRowProps {
 	icon: keyof typeof Ionicons.glyphMap;
@@ -66,7 +67,7 @@ const createStyles = (theme: Theme) =>
 		},
 		label: {
 			fontSize: theme.typography.sizes.md,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 		},
 		description: {

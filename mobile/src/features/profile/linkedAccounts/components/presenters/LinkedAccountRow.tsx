@@ -1,10 +1,15 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
-import type { LinkedProvider, OAuthProvider } from '@/shared/services/linkedAccountsBridge';
+import type {
+	GoogleButtonSlot,
+	LinkedProvider,
+	OAuthProvider,
+} from '@/shared/services/linkedAccountsBridge';
+import { Text } from '@/shared/components/ui/Text';
 
 type MethodType = LinkedProvider['type'];
 
@@ -23,6 +28,8 @@ interface LinkedAccountRowProps {
 	pending: OAuthProvider | null;
 	onLink: (provider: OAuthProvider) => void;
 	onUnlink: (provider: OAuthProvider) => void;
+	/** Web: linking Google starts from Google's own button. */
+	googleButton?: GoogleButtonSlot;
 }
 
 export function LinkedAccountRow({
@@ -31,6 +38,7 @@ export function LinkedAccountRow({
 	pending,
 	onLink,
 	onUnlink,
+	googleButton,
 }: LinkedAccountRowProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
@@ -44,6 +52,16 @@ export function LinkedAccountRow({
 		const label = isLinked ? 'Délier' : 'Lier';
 		const disabled = pending !== null;
 		const onPress = () => (isLinked ? onUnlink(type) : onLink(type));
+
+		if (googleButton && !isLinked && pending !== type) {
+			return (
+				<View
+					ref={googleButton}
+					style={disabled && styles.actionDisabled}
+					testID="google-button-slot"
+				/>
+			);
+		}
 
 		return (
 			<Pressable
@@ -102,7 +120,7 @@ const createStyles = (theme: Theme) =>
 		},
 		rowTitle: {
 			fontSize: 16,
-			fontWeight: theme.typography.weights.bold,
+			fontFamily: theme.typography.families.bold,
 			color: theme.colors.text,
 		},
 		rowStatus: {
@@ -128,10 +146,11 @@ const createStyles = (theme: Theme) =>
 		},
 		actionDisabled: {
 			opacity: 0.5,
+			pointerEvents: 'none',
 		},
 		actionText: {
 			fontSize: 14,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 		},
 		linkText: {
 			color: theme.colors.textInverse,

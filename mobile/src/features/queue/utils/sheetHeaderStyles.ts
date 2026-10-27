@@ -1,6 +1,7 @@
 import type { Theme } from '@/shared/theme/types';
+import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
-export const sheetHeaderStyles = (theme: Theme, insets: { top: number }) => ({
+export const sheetHeaderStyles = (theme: Theme, insets: { top: number }, separator: string) => ({
 	container: {
 		flex: 1,
 		backgroundColor: theme.colors.background,
@@ -12,7 +13,7 @@ export const sheetHeaderStyles = (theme: Theme, insets: { top: number }) => ({
 		paddingHorizontal: 16,
 		paddingVertical: 12,
 		borderBottomWidth: 1,
-		borderBottomColor: theme.colors.border,
+		borderBottomColor: separator,
 	},
 	closeButton: {
 		width: 40,
@@ -27,7 +28,7 @@ export const sheetHeaderStyles = (theme: Theme, insets: { top: number }) => ({
 		marginRight: 40,
 		textAlign: 'center' as const,
 		fontSize: 18,
-		fontWeight: '700' as const,
+		fontFamily: FONT_FAMILIES.bold,
 		color: theme.colors.text,
 	},
 });

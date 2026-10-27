@@ -1,10 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { GenreChip } from '@/shared/components/ui/GenreChip';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import type { MusicGenre } from '@/types/user.types';
 import { MAX_GENRES, MUSIC_GENRES } from '@/types/user.types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface GenreSelectorProps {
 	selectedGenres: MusicGenre[];
@@ -74,7 +75,7 @@ const createStyles = (theme: Theme) =>
 		counter: {
 			fontSize: 14,
 			color: theme.colors.primary,
-			fontWeight: theme.typography.weights.medium,
+			fontFamily: theme.typography.families.medium,
 		},
 		description: {
 			fontSize: 14,

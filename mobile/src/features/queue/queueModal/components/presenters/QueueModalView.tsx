@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Text, Modal } from 'react-native';
+import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable } from '@/shared/components/ui/Pressable';
+import { FullScreenSheet } from '@/shared/components/layout/FullScreenSheet';
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { AppToast } from '@/shared/components/feedback/AppToast';
 import { ReorderableList } from '@/shared/components/lists/ReorderableList';
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
@@ -12,6 +14,7 @@ import type { createModalStyles } from './queueModalStyles';
 import type { Theme } from '@/shared/theme/types';
 import type { QueueItem } from '@/features/queue/types';
 import type { AddQueueItemBody } from '@/shared/types/playback';
+import { Text } from '@/shared/components/ui/Text';
 
 interface QueueModalViewProps {
 	visible: boolean;
@@ -45,6 +48,7 @@ export function QueueModalView({
 	onCloseActions,
 }: QueueModalViewProps) {
 	const TrackActionsSheetComponent = getTrackActionsSheet();
+	const { isWide } = useBreakpoint();
 
 	const header = current ? (
 		<View>
@@ -66,56 +70,54 @@ export function QueueModalView({
 		<EmptyState message="La file d'attente est vide" icon="list-outline" />
 	);
 
+	const content = (
+		<GestureHandlerRootView style={styles.container}>
+			<View style={styles.header}>
+				<Pressable
+					onPress={onClose}
+					style={styles.closeButton}
+					hitSlop={4}
+					accessibilityRole="button"
+					accessibilityLabel="Fermer la file d'attente"
+				>
+					<Ionicons name={isWide ? 'close' : 'chevron-down'} size={24} color={theme.colors.text} />
+				</Pressable>
+				<Text style={styles.title}>File d&apos;attente</Text>
+			</View>
+
+			<ReorderableList<QueueItem>
+				data={upcoming}
+				keyExtractor={item => item.id}
+				onReorder={onReorder}
+				dragEnabled={!isMoving}
+				ListHeaderComponent={header}
+				ListEmptyComponent={empty}
+				contentContainerStyle={styles.listContent}
+				renderItem={({ item, drag, isActive }) => (
+					<QueueItemRow
+						item={item}
+						onPlay={onPlay}
+						onRemove={onRemove}
+						onDragStart={isMoving ? undefined : drag}
+						isDragActive={isActive}
+						onShowActions={onShowActions}
+					/>
+				)}
+			/>
+
+			{TrackActionsSheetComponent &&
+				React.createElement(TrackActionsSheetComponent, {
+					track: actionTrack,
+					onClose: onCloseActions,
+				})}
+
+			<AppToast />
+		</GestureHandlerRootView>
+	);
+
 	return (
-		<Modal
-			visible={visible}
-			animationType="slide"
-			presentationStyle="overFullScreen"
-			transparent
-			onRequestClose={onClose}
-		>
-			<GestureHandlerRootView style={styles.container}>
-				<View style={styles.header}>
-					<Pressable
-						onPress={onClose}
-						style={styles.closeButton}
-						hitSlop={4}
-						accessibilityRole="button"
-						accessibilityLabel="Fermer la file d'attente"
-					>
-						<Ionicons name="chevron-down" size={24} color={theme.colors.text} />
-					</Pressable>
-					<Text style={styles.title}>File d&apos;attente</Text>
-				</View>
-
-				<ReorderableList<QueueItem>
-					data={upcoming}
-					keyExtractor={item => item.id}
-					onReorder={onReorder}
-					dragEnabled={!isMoving}
-					ListHeaderComponent={header}
-					ListEmptyComponent={empty}
-					contentContainerStyle={styles.listContent}
-					renderItem={({ item, drag, isActive }) => (
-						<QueueItemRow
-							item={item}
-							onPlay={onPlay}
-							onRemove={onRemove}
-							onDragStart={isMoving ? undefined : drag}
-							isDragActive={isActive}
-							onShowActions={onShowActions}
-						/>
-					)}
-				/>
-
-				{TrackActionsSheetComponent &&
-					React.createElement(TrackActionsSheetComponent, {
-						track: actionTrack,
-						onClose: onCloseActions,
-					})}
-
-				<AppToast />
-			</GestureHandlerRootView>
-		</Modal>
+		<FullScreenSheet visible={visible} onClose={onClose}>
+			{content}
+		</FullScreenSheet>
 	);
 }

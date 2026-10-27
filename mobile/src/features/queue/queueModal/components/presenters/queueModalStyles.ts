@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 import { sheetHeaderStyles } from '@/features/queue/utils/sheetHeaderStyles';
 import type { Theme } from '@/shared/theme/types';
+import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
 export const formatDuration = (ms: number): string => {
 	const minutes = Math.floor(ms / 60000);
@@ -8,9 +9,13 @@ export const formatDuration = (ms: number): string => {
 	return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 };
 
-export const createModalStyles = (theme: Theme, insets: { top: number; bottom: number }) =>
+export const createModalStyles = (
+	theme: Theme,
+	insets: { top: number; bottom: number },
+	separator: string
+) =>
 	StyleSheet.create({
-		...sheetHeaderStyles(theme, insets),
+		...sheetHeaderStyles(theme, insets, separator),
 		listContent: {
 			flexGrow: 1,
 			paddingBottom: insets.bottom + 16,
@@ -20,7 +25,7 @@ export const createModalStyles = (theme: Theme, insets: { top: number; bottom: n
 			paddingTop: 16,
 			paddingBottom: 8,
 			fontSize: 12,
-			fontWeight: '600',
+			fontFamily: FONT_FAMILIES.semibold,
 			letterSpacing: 1,
 			textTransform: 'uppercase',
 			color: theme.colors.textSecondary,
@@ -32,7 +37,7 @@ export const createModalStyles = (theme: Theme, insets: { top: number; bottom: n
 		},
 	});
 
-export const createRowStyles = (theme: Theme) =>
+export const createRowStyles = (theme: Theme, separator: string) =>
 	StyleSheet.create({
 		row: {
 			flexDirection: 'row',
@@ -40,7 +45,12 @@ export const createRowStyles = (theme: Theme) =>
 			padding: 12,
 			backgroundColor: theme.colors.surface,
 			borderBottomWidth: 1,
-			borderBottomColor: theme.colors.border,
+			borderBottomColor: separator,
+		},
+		rowMain: {
+			flex: 1,
+			flexDirection: 'row',
+			alignItems: 'center',
 		},
 		rowCurrent: {
 			backgroundColor: theme.colors.surfaceAlt,
@@ -60,7 +70,7 @@ export const createRowStyles = (theme: Theme) =>
 		},
 		trackTitle: {
 			fontSize: 15,
-			fontWeight: '600',
+			fontFamily: FONT_FAMILIES.semibold,
 			color: theme.colors.text,
 			marginBottom: 4,
 		},
@@ -92,7 +102,7 @@ export const createRowStyles = (theme: Theme) =>
 		deleteText: {
 			color: theme.colors.onColor,
 			fontSize: 12,
-			fontWeight: '600',
+			fontFamily: FONT_FAMILIES.semibold,
 			marginTop: 4,
 		},
 	});

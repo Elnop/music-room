@@ -27,7 +27,7 @@ export const createUserProfileStyles = (theme: Theme) =>
 		},
 		sectionTitle: {
 			fontSize: 18,
-			fontWeight: theme.typography.weights.bold,
+			fontFamily: theme.typography.families.bold,
 			color: theme.colors.text,
 			marginBottom: theme.spacing.md,
 			paddingHorizontal: theme.spacing.md,

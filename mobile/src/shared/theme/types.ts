@@ -24,6 +24,8 @@ export interface ThemeColors {
 
 	border: string;
 	borderLight: string;
+	/** Separators of wide screens, where `border` would draw long white lines. */
+	borderSubtle: string;
 
 	error: string;
 	success: string;

@@ -1,5 +1,4 @@
 import React from 'react';
-import { Text } from 'react-native';
 import { act, fireEvent, screen } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { HomeOrchestrator } from './HomeOrchestrator';
@@ -12,6 +11,7 @@ import { mockFetchRoutes } from '@/test/fetchRoutes';
 import { fail, ok } from '@/test/fetchResponses';
 import { signIn } from '@/test/session';
 import '@/test/playback';
+import { Text } from '@/shared/components/ui/Text';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -117,6 +117,7 @@ describe('HomeOrchestrator', () => {
 	it("shows the nearby events section, the friends' playlists and the public ones", async () => {
 		await renderScreen(<Text>nearby events</Text>);
 		expect(screen.getByText('nearby events')).toBeTruthy();
+		expect(screen.getByText('Playlists de vos amis')).toBeTruthy();
 		expect(screen.getByText('Fred mix')).toBeTruthy();
 		expect(screen.getByText('Open')).toBeTruthy();
 		expect(screen.queryByText('Vos playlists')).toBeNull();
@@ -135,13 +136,38 @@ describe('HomeOrchestrator', () => {
 		}
 	});
 
-	it('opens a playlist and the friends tab', async () => {
-		routes.routes['GET /api/friends'] = ok([]);
+	it('opens a playlist', async () => {
 		await renderScreen();
 		fireEvent.press(screen.getByLabelText('Open, par bob'));
 		expect(navigation.navigate).toHaveBeenCalledWith('PlaylistDetail', { id: 'Open' });
-		fireEvent.press(screen.getByText('Trouver des amis'));
-		expect(parentNavigate).toHaveBeenCalledWith('FriendsTab');
+	});
+
+	it("hides the friends' section without a friend, or when no friend has a playlist", async () => {
+		routes.routes['GET /api/friends'] = ok([]);
+		await renderScreen();
+		expect(screen.queryByText('Playlists de vos amis')).toBeNull();
+		clear();
+
+		routes.routes['GET /api/friends'] = ok([{ id: 'f1', username: 'fred' }]);
+		routes.routes['GET /api/playlists/user/f1'] = ok({ playlists: [] });
+		await renderScreen();
+		expect(screen.queryByText('Playlists de vos amis')).toBeNull();
+	});
+
+	it("shows no friends' section while their playlists load", async () => {
+		routes.routes['GET /api/friends'] = () => new Promise(() => undefined);
+		await renderScreen();
+		expect(screen.queryByText('Playlists de vos amis')).toBeNull();
+	});
+
+	it('puts the nearby events last', async () => {
+		await renderScreen(<Text>nearby events</Text>);
+		const texts = screen.getAllByText(/./).map(node => node.props.children);
+		const order = ['Playlists de vos amis', 'Playlists publiques', 'nearby events'].map(text =>
+			texts.indexOf(text)
+		);
+		expect(order[0]).toBeGreaterThan(-1);
+		expect(order).toEqual([...order].sort((a, b) => a - b));
 	});
 
 	it('folds the public playlists', async () => {

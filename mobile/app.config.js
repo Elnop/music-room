@@ -65,6 +65,8 @@ module.exports = {
 		web: {
 			favicon: './assets/favicon.png',
 		},
+		// The GitHub Pages build serves the app under /music-room (pages.yml); dev stays at the root.
+		...(process.env.WEB_BASE_URL && { experiments: { baseUrl: process.env.WEB_BASE_URL } }),
 		plugins: [
 			[
 				'expo-build-properties',

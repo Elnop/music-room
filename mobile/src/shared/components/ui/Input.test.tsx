@@ -1,4 +1,5 @@
 import React from 'react';
+import { Platform } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Input } from './Input';
 
@@ -66,5 +67,43 @@ describe('Input', () => {
 		render(<Input label="Email" value="" onChangeText={jest.fn()} />);
 
 		expect(screen.queryByLabelText('Afficher le mot de passe')).toBeNull();
+	});
+
+	describe('submitOnEnter', () => {
+		const originalOS = Platform.OS;
+		afterEach(() => {
+			Platform.OS = originalOS;
+		});
+
+		const renderField = (props: { multiline?: boolean } = {}) => {
+			const submit = jest.fn();
+			render(
+				<Input
+					label="Name"
+					value=""
+					onChangeText={jest.fn()}
+					placeholder="Name"
+					submitOnEnter={submit}
+					{...props}
+				/>
+			);
+			fireEvent(screen.getByPlaceholderText('Name'), 'submitEditing');
+			return submit;
+		};
+
+		it('submits the form on Enter in a browser', () => {
+			Platform.OS = 'web';
+			expect(renderField()).toHaveBeenCalledTimes(1);
+		});
+
+		it('leaves the native return key as it was', () => {
+			Platform.OS = 'android';
+			expect(renderField()).not.toHaveBeenCalled();
+		});
+
+		it('never submits from a multiline field, where Enter is a new line', () => {
+			Platform.OS = 'web';
+			expect(renderField({ multiline: true })).not.toHaveBeenCalled();
+		});
 	});
 });

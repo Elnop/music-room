@@ -3,27 +3,19 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { usePlayer } from '@/features/player/context/PlayerContext';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
-import { useNowPlaying } from '@/features/player/hooks/useNowPlaying';
+import { usePlaybackControls } from '@/features/player/hooks/usePlaybackControls';
 import { useImageColors } from '@/shared/hooks/useImageColors';
 import { getAdaptiveColors, hexToRgba } from '@/shared/theme/adaptivePalette';
 import { largeArtwork } from '@/shared/utils/artwork';
-import { hapticTap } from '@/shared/utils/haptics';
-import { RESTART_THRESHOLD_S } from '@/shared/utils/queueNavigation';
-import {
-	createStyles,
-	SEEK_STEP_S,
-} from '@/features/player/modal/components/presenters/playerModalStyles';
+import { createStyles } from '@/features/player/modal/components/presenters/playerModalStyles';
 
 export function usePlayerModal() {
 	const { theme } = useTheme();
 	const insets = useSafeAreaInsets();
-	const { player, error, seekTo } = usePlayer();
+	const { error } = usePlayer();
 	const isModalOpen = usePlayerStore(state => state.isModalOpen);
 	const setModalOpen = usePlayerStore(state => state.setModalOpen);
-	const nowPlaying = useNowPlaying();
-
-	const currentTime = nowPlaying.positionMs / 1000;
-	const duration = nowPlaying.durationMs !== null ? nowPlaying.durationMs / 1000 : null;
+	const { nowPlaying, ...controls } = usePlaybackControls();
 
 	const [isQueueOpen, setQueueOpen] = useState(false);
 	const [isDevicesOpen, setDevicesOpen] = useState(false);
@@ -82,42 +74,6 @@ export function usePlayerModal() {
 				theme.colors.background,
 			];
 
-	const handlePlayPause = () => {
-		if (!nowPlaying.canToggle) return;
-		hapticTap();
-		nowPlaying.toggle();
-	};
-
-	const handleSeek = (value: number) => {
-		if (!player || nowPlaying.isRemote) return;
-		seekTo(value);
-	};
-
-	const handleSliderAction = (actionName: string) => {
-		if (duration === null) return;
-		const step =
-			actionName === 'increment' ? SEEK_STEP_S : actionName === 'decrement' ? -SEEK_STEP_S : 0;
-		if (step === 0) return;
-		handleSeek(Math.min(duration, Math.max(0, currentTime + step)));
-	};
-
-	const canGoPrevious =
-		nowPlaying.canToggle &&
-		(nowPlaying.hasPrevious || (!nowPlaying.isRemote && currentTime > RESTART_THRESHOLD_S));
-	const canGoNext = nowPlaying.track !== null && nowPlaying.hasNext;
-
-	const handlePrevious = () => {
-		if (!canGoPrevious) return;
-		hapticTap();
-		nowPlaying.previous();
-	};
-
-	const handleNext = () => {
-		if (!canGoNext) return;
-		hapticTap();
-		nowPlaying.next();
-	};
-
 	return {
 		isModalOpen,
 		closeModal: () => setModalOpen(false),
@@ -132,19 +88,9 @@ export function usePlayerModal() {
 		artworkUrl,
 		error,
 		isRemote: nowPlaying.isRemote,
-		currentTime,
-		duration,
-		sliderDisabled: nowPlaying.isRemote || nowPlaying.isLoading || !player || !nowPlaying.track,
 		isPlaying: nowPlaying.isPlaying,
 		isLoading: nowPlaying.isLoading,
 		deviceLabel: nowPlaying.deviceLabel,
-		canGoPrevious,
-		canGoNext,
-		playDisabled: nowPlaying.isLoading || !nowPlaying.track,
-		handlePlayPause,
-		handleSeek,
-		handleSliderAction,
-		handlePrevious,
-		handleNext,
+		...controls,
 	};
 }

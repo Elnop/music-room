@@ -1,9 +1,10 @@
-import type { SoundCloudTrack } from '@/types/soundcloud.types';
+import type { SoundCloudTrack, StreamProtocol } from '@/types/soundcloud.types';
 import type { PlaybackState } from '@/shared/types/playback';
 
 export interface PlayerState {
 	currentTrack: SoundCloudTrack | null;
 	streamUrl: string | null;
+	streamProtocol: StreamProtocol;
 	pendingTrackId: number | null;
 	loadCounter: number;
 	queueItemId: string | null;
@@ -24,7 +25,7 @@ export interface PlayerState {
 	isModalOpen: boolean;
 	seekCount: number;
 
-	setStreamUrl: (url: string | null, expiresAt?: number | null) => void;
+	setStreamUrl: (url: string | null, expiresAt?: number | null, protocol?: StreamProtocol) => void;
 	setTrackUnavailableError: (message: string) => void;
 	clearError: () => void;
 	setPlaybackReady: () => void;
@@ -50,6 +51,7 @@ export interface PlayerState {
 export const initialPlayerState = {
 	currentTrack: null,
 	streamUrl: null,
+	streamProtocol: 'hls' as StreamProtocol,
 	pendingTrackId: null,
 	loadCounter: 0,
 	queueItemId: null,

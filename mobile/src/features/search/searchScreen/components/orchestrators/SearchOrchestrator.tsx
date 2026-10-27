@@ -4,6 +4,7 @@ import { SearchView } from '@/features/search/searchScreen/components/presenters
 
 export function SearchOrchestrator() {
 	const {
+		inputRef,
 		searchQuery,
 		debouncedQuery,
 		isLoading,
@@ -23,6 +24,7 @@ export function SearchOrchestrator() {
 
 	return (
 		<SearchView
+			inputRef={inputRef}
 			searchQuery={searchQuery}
 			debouncedQuery={debouncedQuery}
 			isLoading={isLoading}

@@ -1,14 +1,17 @@
 import React from 'react';
-import { Text } from 'react-native';
+import { View } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import { useContextMenu } from '@/shared/hooks/useContextMenu';
+import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Artwork } from '@/shared/components/media/Artwork';
 import { TrackActionsButton } from '@/shared/components/lists/TrackActionsButton';
 import { QueueTrackDetails } from './QueueTrackDetails';
 import { createRowStyles, formatDuration } from './queueModalStyles';
 import type { QueueItem } from '@/features/queue/types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface QueueItemRowProps {
 	item: QueueItem;
@@ -30,9 +33,11 @@ export function QueueItemRow({
 	onShowActions,
 }: QueueItemRowProps) {
 	const { theme } = useTheme();
-	const styles = React.useMemo(() => createRowStyles(theme), [theme]);
+	const separator = useSeparatorColor();
+	const styles = React.useMemo(() => createRowStyles(theme, separator), [theme, separator]);
 	const swipeableRef = React.useRef<Swipeable>(null);
 	const { track } = item;
+	const contextMenu = useContextMenu(onShowActions ? () => onShowActions(item) : undefined);
 
 	const handleRemove = async () => {
 		const removed = await onRemove(item.id);
@@ -58,35 +63,41 @@ export function QueueItemRow({
 			overshootRight={false}
 			friction={2}
 		>
-			<Pressable
-				onPress={() => onPlay(item.id)}
-				onLongPress={onShowActions ? () => onShowActions(item) : undefined}
+			<View
+				{...contextMenu}
 				style={[styles.row, isCurrent && styles.rowCurrent, isDragActive && styles.rowActive]}
-				accessibilityRole="button"
-				accessibilityLabel={`Lire ${track.title}`}
-				accessibilityState={{ selected: isCurrent }}
-				testID={`queue-item-${item.id}`}
 			>
-				<Artwork uri={track.albumArt} size={50} style={styles.albumArt} />
+				{/* The row's buttons sit beside its pressable area, never in it: the web nests no <button>. */}
+				<Pressable
+					onPress={() => onPlay(item.id)}
+					onLongPress={onShowActions ? () => onShowActions(item) : undefined}
+					style={styles.rowMain}
+					accessibilityRole="button"
+					accessibilityLabel={`Lire ${track.title}`}
+					accessibilityState={{ selected: isCurrent }}
+					testID={`queue-item-${item.id}`}
+				>
+					<Artwork uri={track.albumArt} size={50} style={styles.albumArt} />
 
-				<QueueTrackDetails
-					title={track.title}
-					artist={track.artist}
-					isCurrent={isCurrent}
-					styles={styles}
-				/>
-
-				{isCurrent ? (
-					<Ionicons
-						name="volume-high"
-						size={18}
-						color={theme.colors.primary}
-						style={styles.playingIcon}
-						accessibilityLabel="En cours de lecture"
+					<QueueTrackDetails
+						title={track.title}
+						artist={track.artist}
+						isCurrent={isCurrent}
+						styles={styles}
 					/>
-				) : null}
 
-				<Text style={styles.duration}>{formatDuration(track.durationMs)}</Text>
+					{isCurrent ? (
+						<Ionicons
+							name="volume-high"
+							size={18}
+							color={theme.colors.primary}
+							style={styles.playingIcon}
+							accessibilityLabel="En cours de lecture"
+						/>
+					) : null}
+
+					<Text style={styles.duration}>{formatDuration(track.durationMs)}</Text>
+				</Pressable>
 
 				{onShowActions && <TrackActionsButton onPress={() => onShowActions(item)} />}
 
@@ -101,7 +112,7 @@ export function QueueItemRow({
 						<Ionicons name="reorder-three-outline" size={24} color={theme.colors.textSecondary} />
 					</Pressable>
 				)}
-			</Pressable>
+			</View>
 		</Swipeable>
 	);
 }

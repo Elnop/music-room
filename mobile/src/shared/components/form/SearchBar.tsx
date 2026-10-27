@@ -1,16 +1,12 @@
 import React from 'react';
-import {
-	View,
-	TextInput,
-	ActivityIndicator,
-	StyleSheet,
-	type StyleProp,
-	type ViewStyle,
-} from 'react-native';
+import { View, ActivityIndicator, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
+import { focusedFieldStyle } from '@/shared/theme/fieldFocus';
+import { useFieldFocus } from '@/shared/hooks/useFieldFocus';
 import { Pressable } from '@/shared/components/ui/Pressable';
+import { TextInput } from '@/shared/components/ui/TextInput';
 
 interface SearchBarProps {
 	value: string;
@@ -20,6 +16,7 @@ interface SearchBarProps {
 	autoFocus?: boolean;
 	/** Shows a spinner in the field while a search runs. */
 	loading?: boolean;
+	inputRef?: React.Ref<TextInput>;
 }
 
 const HIT_SLOP = { top: 10, bottom: 10, left: 10, right: 10 };
@@ -31,12 +28,14 @@ export function SearchBar({
 	style,
 	autoFocus = false,
 	loading = false,
+	inputRef,
 }: SearchBarProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
+	const { focused, focusProps } = useFieldFocus();
 
 	return (
-		<View style={[styles.container, style]}>
+		<View style={[styles.container, style, focused && focusedFieldStyle(theme.colors.primary)]}>
 			<Ionicons
 				name="search"
 				size={20}
@@ -45,6 +44,7 @@ export function SearchBar({
 				testID="search-bar-icon"
 			/>
 			<TextInput
+				ref={inputRef}
 				style={styles.input}
 				value={value}
 				onChangeText={onChangeText}
@@ -54,6 +54,7 @@ export function SearchBar({
 				autoCapitalize="none"
 				autoCorrect={false}
 				returnKeyType="search"
+				{...focusProps}
 			/>
 			{loading && (
 				<ActivityIndicator
@@ -67,7 +68,7 @@ export function SearchBar({
 				<Pressable
 					onPress={() => onChangeText('')}
 					hitSlop={HIT_SLOP}
-					style={styles.trailing}
+					style={[styles.trailing, styles.clear]}
 					accessibilityLabel="Effacer la recherche"
 				>
 					<Ionicons name="close-circle" size={20} color={theme.colors.textSecondary} />
@@ -95,9 +96,12 @@ const createStyles = (theme: Theme) =>
 			fontSize: theme.typography.sizes.md,
 			color: theme.colors.text,
 			padding: 0,
-			fontWeight: theme.typography.weights.regular,
+			fontFamily: theme.typography.families.regular,
 		},
 		trailing: {
 			marginLeft: theme.spacing.sm,
+		},
+		clear: {
+			borderRadius: 10,
 		},
 	});

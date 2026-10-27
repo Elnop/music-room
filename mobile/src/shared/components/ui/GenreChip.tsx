@@ -1,10 +1,11 @@
 import React from 'react';
-import { Text, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import type { MusicGenre } from '@/types/user.types';
 import { GENRE_INFO } from '@/types/user.types';
+import { Text } from './Text';
 
 interface GenreChipProps {
 	genre: MusicGenre;
@@ -89,11 +90,11 @@ const createStyles = (theme: Theme, size: 'sm' | 'md' | 'lg') => {
 		label: {
 			fontSize: s.fontSize,
 			color: theme.colors.text,
-			fontWeight: theme.typography.weights.medium,
+			fontFamily: theme.typography.families.medium,
 		},
 		labelSelected: {
 			color: theme.colors.onColor,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 		},
 		labelDisabled: {
 			color: theme.colors.textSecondary,

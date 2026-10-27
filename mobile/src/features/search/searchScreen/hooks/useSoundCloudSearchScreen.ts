@@ -1,15 +1,26 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import type { TextInput } from 'react-native';
 import { debounce } from '@/shared/utils/debounce';
 import { showError } from '@/shared/utils/toast';
 import { toTrackInput } from '@/shared/utils/trackInput';
 import { getPlayback } from '@/shared/services/playbackBridge';
 import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
 import { useSoundCloudSearch } from '@/features/search/hooks/useSoundCloudSearch';
+import { useSearchFocusStore } from '@/features/search/stores/searchFocusStore';
 import type { SoundCloudTrack } from '@/features/search/types';
 import type { AddQueueItemBody } from '@/shared/types/playback';
 
 export function useSoundCloudSearchScreen() {
 	const bottomPadding = useBottomPadding();
+	const inputRef = useRef<TextInput>(null);
+	const focusPending = useSearchFocusStore(state => state.pending);
+	const consumeFocus = useSearchFocusStore(state => state.consume);
+
+	useEffect(() => {
+		if (!focusPending) return;
+		inputRef.current?.focus();
+		consumeFocus();
+	}, [focusPending, consumeFocus]);
 
 	const [searchQuery, setSearchQuery] = useState('');
 	const [debouncedQuery, setDebouncedQuery] = useState('');
@@ -84,6 +95,7 @@ export function useSoundCloudSearchScreen() {
 	const isLoading = (isFetching || isPending) && Boolean(searchQuery.trim());
 
 	return {
+		inputRef,
 		searchQuery,
 		debouncedQuery,
 		isPending,

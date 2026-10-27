@@ -1,11 +1,11 @@
 import React from 'react';
-import { Text } from 'react-native';
 import { render, screen } from '@testing-library/react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { AppProviders } from './AppProviders';
 import { createQueryClient } from '@/shared/query/queryClient';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { notifySessionEnd } from '@/shared/services/authSession';
+import { Text } from '@/shared/components/ui/Text';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')

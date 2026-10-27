@@ -4,18 +4,30 @@ import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { SectionHeader } from '@/shared/components/lists/SectionHeader';
 import { PlaylistCardSkeleton, SkeletonList } from '@/shared/components/ui/Skeleton';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { useContentColumn } from '@/shared/hooks/useContentColumn';
 import type { LibraryScreen } from '@/features/playlists/library/hooks/useLibraryScreen';
+import type { Playlist } from '@/features/playlists/types';
 import { createListStyles } from '@/features/playlists/home/components/presenters/listStyles';
 import { PlaylistGrid } from '@/features/playlists/home/components/presenters/PlaylistGrid';
 import { RefreshableScroll } from '@/features/playlists/home/components/presenters/RefreshableScroll';
 
-export function LibraryView({ screen }: { screen: LibraryScreen }) {
+interface LibraryViewProps {
+	screen: LibraryScreen;
+	actionsFor?: (playlist: Playlist) => (() => void) | undefined;
+}
+
+export function LibraryView({ screen, actionsFor }: LibraryViewProps) {
 	const { styles } = useThemedStyles(createListStyles);
+	const column = useContentColumn();
 
 	if (screen.isInitialLoading) {
 		return (
 			<View style={styles.container}>
-				<SkeletonList count={4} row={PlaylistCardSkeleton} style={[styles.list, styles.grid]} />
+				<SkeletonList
+					count={4}
+					row={PlaylistCardSkeleton}
+					style={[styles.list, styles.grid, column]}
+				/>
 			</View>
 		);
 	}
@@ -29,7 +41,11 @@ export function LibraryView({ screen }: { screen: LibraryScreen }) {
 			<View style={styles.section}>
 				<SectionHeader icon="library-outline" title="Vos playlists" count={screen.owned.length} />
 				{screen.owned.length > 0 ? (
-					<PlaylistGrid playlists={screen.owned} onOpen={screen.openPlaylist} />
+					<PlaylistGrid
+						playlists={screen.owned}
+						onOpen={screen.openPlaylist}
+						actionsFor={actionsFor}
+					/>
 				) : (
 					<EmptyState
 						icon="musical-notes-outline"

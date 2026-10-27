@@ -1,5 +1,7 @@
 import React from 'react';
+import { StyleSheet, Platform } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { originalTheme } from '@/shared/theme/original.theme';
 import { SearchBar } from './SearchBar';
 
 jest.mock('@/shared/theme/ThemeContext', () => {
@@ -50,5 +52,22 @@ describe('SearchBar clear and loading (#307)', () => {
 		rerender(<SearchBar value="punk" onChangeText={jest.fn()} loading />);
 
 		expect(screen.getByTestId('search-bar-loading')).toBeTruthy();
+	});
+
+	it('frames the bar in the primary colour while the field has the focus on the web', () => {
+		jest.replaceProperty(Platform, 'OS', 'web');
+		render(<SearchBar value="" onChangeText={jest.fn()} />);
+		const input = screen.getByPlaceholderText('Rechercher…');
+		const frame = () => {
+			let node = input.parent;
+			while (node && StyleSheet.flatten(node.props.style)?.height !== 44) node = node.parent;
+			return StyleSheet.flatten(node?.props.style);
+		};
+
+		fireEvent(input, 'focus');
+		expect(frame().boxShadow).toContain(originalTheme.colors.primary);
+
+		fireEvent(input, 'blur');
+		expect(frame().boxShadow).toBeUndefined();
 	});
 });

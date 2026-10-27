@@ -18,7 +18,7 @@ export const createUserProfileHeaderStyles = (theme: Theme) =>
 		},
 		statNumber: {
 			fontSize: 20,
-			fontWeight: theme.typography.weights.bold,
+			fontFamily: theme.typography.families.bold,
 			color: theme.colors.text,
 		},
 		statLabel: {
@@ -36,7 +36,7 @@ export const createUserProfileHeaderStyles = (theme: Theme) =>
 		},
 		username: {
 			fontSize: 16,
-			fontWeight: theme.typography.weights.bold,
+			fontFamily: theme.typography.families.bold,
 			color: theme.colors.text,
 		},
 		followsYouBadge: {
@@ -50,7 +50,7 @@ export const createUserProfileHeaderStyles = (theme: Theme) =>
 		followsYouText: {
 			fontSize: 11,
 			color: theme.colors.textSecondary,
-			fontWeight: theme.typography.weights.medium,
+			fontFamily: theme.typography.families.medium,
 		},
 		statusBadge: {
 			flexDirection: 'row',
@@ -76,7 +76,7 @@ export const createUserProfileHeaderStyles = (theme: Theme) =>
 		statusText: {
 			fontSize: 11,
 			color: theme.colors.textSecondary,
-			fontWeight: theme.typography.weights.medium,
+			fontFamily: theme.typography.families.medium,
 		},
 		statusTextOnline: {
 			color: theme.colors.success,
@@ -138,7 +138,7 @@ export const createUserProfileHeaderStyles = (theme: Theme) =>
 		},
 		friendBadgeText: {
 			color: theme.colors.surface,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			fontSize: 14,
 		},
 	});

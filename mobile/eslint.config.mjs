@@ -57,6 +57,8 @@ const guardrailsPlugin = {
     'ui-primitives': restrictedSyntax,
     'theme-tokens': restrictedSyntax,
     'zustand-selector': restrictedSyntax,
+    'text-primitives': restrictedSyntax,
+    'font-families': restrictedSyntax,
   },
 };
 
@@ -269,6 +271,27 @@ export default [
             'Call a Zustand store hook with a selector (useXStore(state => state.x)), never without: it re-renders on every change of the store. See .agents/rules/state.md#zustand-selectors',
         },
       ],
+      'guardrails/text-primitives': [
+        'error',
+        {
+          selector:
+            "ImportDeclaration[source.value='react-native'][importKind='value'] > ImportSpecifier[importKind='value'][imported.name=/^(Text|TextInput)$/]",
+          message:
+            'Use Text or TextInput from @/shared/components/ui/, not from react-native: they set the brand font. See .agents/rules/structure.md#text-primitives',
+        },
+      ],
+      'guardrails/font-families': [
+        'error',
+        {
+          selector: [
+            "Property[key.name='fontWeight']",
+            "Property[key.name='fontFamily'] > Literal.value",
+            "JSXAttribute[name.name='fontFamily']",
+          ].join(', '),
+          message:
+            'No fontWeight and no font name outside src/shared/theme/; read the family from theme.typography.families (FONT_FAMILIES). See .agents/rules/structure.md#font-families',
+        },
+      ],
       'components/screen-orchestrator-only': 'error',
       'components/presenter-pure': 'error',
       'components/hook-no-jsx': 'error',
@@ -283,7 +306,11 @@ export default [
   },
   {
     files: ['src/shared/theme/**'],
-    rules: { 'guardrails/theme-tokens': 'off' },
+    rules: { 'guardrails/theme-tokens': 'off', 'guardrails/font-families': 'off' },
+  },
+  {
+    files: ['src/shared/components/ui/Text.tsx', 'src/shared/components/ui/TextInput.tsx'],
+    rules: { 'guardrails/text-primitives': 'off' },
   },
 
   // Prettier must be last to override other formatting rules

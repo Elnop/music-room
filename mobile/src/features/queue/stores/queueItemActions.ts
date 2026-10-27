@@ -85,6 +85,7 @@ export async function playListTrackAction(
 		if (result.queue) applyState(result.queue);
 	} catch (error) {
 		logger.error('[queueStore] Play list track on remote device failed:', error);
-		if (!handleRemoteRefusal(scope, error)) showError(apiErrorMessage(error, 'Impossible de lire ce titre'));
+		if (!handleRemoteRefusal(scope, error))
+			showError(apiErrorMessage(error, 'Impossible de lire ce titre'));
 	}
 }

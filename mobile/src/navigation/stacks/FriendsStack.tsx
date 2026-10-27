@@ -7,17 +7,23 @@ import { UserProfileOrchestrator } from '@/features/friends/userProfile/componen
 import { PlaylistDetailOrchestrator } from '@/features/playlists/detail/components/orchestrators/PlaylistDetailOrchestrator';
 import { SearchTracksOrchestrator } from '@/features/playlists/searchTracks/components/orchestrators/SearchTracksOrchestrator';
 import type { FriendsStackParamList } from '@/features/friends/types';
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
+import { screenHeader, screenLayout } from '@/navigation/screenLayout';
 
 export type { FriendsStackParamList };
 
 const FriendsStack = createNativeStackNavigator<FriendsStackParamList>();
+const layout = screenLayout(true);
 
 export function FriendsNavigator() {
 	const { theme } = useTheme();
+	const { isWide } = useBreakpoint();
 
 	return (
 		<FriendsStack.Navigator
+			screenLayout={layout}
 			screenOptions={{
+				...(isWide ? { header: screenHeader } : null),
 				headerStyle: {
 					backgroundColor: theme.colors.background,
 				},
@@ -25,7 +31,7 @@ export function FriendsNavigator() {
 				headerTintColor: theme.colors.text,
 				headerShadowVisible: false,
 				headerTitleStyle: {
-					fontWeight: theme.typography.weights.bold,
+					fontFamily: theme.typography.families.bold,
 				},
 				headerTitleAlign: 'center',
 			}}
@@ -38,7 +44,7 @@ export function FriendsNavigator() {
 			<FriendsStack.Screen
 				name="UserProfile"
 				component={UserProfileOrchestrator}
-				options={{ title: '' }}
+				options={{ title: '', headerTitle: '' }}
 			/>
 			<FriendsStack.Screen
 				name="PlaylistDetail"

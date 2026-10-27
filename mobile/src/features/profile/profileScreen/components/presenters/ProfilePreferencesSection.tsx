@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ProfileSection } from '@/features/profile/common/components/presenters/ProfileSection';
 import { GenreChip } from '@/shared/components/ui/GenreChip';
@@ -7,19 +7,26 @@ import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import type { MusicGenre } from '@/types/user.types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface ProfilePreferencesSectionProps {
 	genres: MusicGenre[];
 	onModify: () => void;
+	prominent?: boolean;
 }
 
-export function ProfilePreferencesSection({ genres, onModify }: ProfilePreferencesSectionProps) {
+export function ProfilePreferencesSection({
+	genres,
+	onModify,
+	prominent,
+}: ProfilePreferencesSectionProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
 	return (
 		<ProfileSection
 			title="Préférences musicales"
+			prominent={prominent}
 			rightAction={{
 				label: 'Modifier',
 				onPress: onModify,
@@ -68,7 +75,7 @@ const createStyles = (theme: Theme) =>
 		},
 		emptyStateText: {
 			fontSize: 16,
-			fontWeight: theme.typography.weights.medium,
+			fontFamily: theme.typography.families.medium,
 			color: theme.colors.text,
 		},
 		emptyStateHint: {

@@ -8,16 +8,23 @@ import { RegisterOrchestrator } from '@/features/auth/register/components/orches
 import { EmailVerificationOrchestrator } from '@/features/auth/emailVerification/components/orchestrators/EmailVerificationOrchestrator';
 import { ForgotPasswordOrchestrator } from '@/features/auth/forgotPassword/components/orchestrators/ForgotPasswordOrchestrator';
 import { ResetPasswordOrchestrator } from '@/features/auth/resetPassword/components/orchestrators/ResetPasswordOrchestrator';
+import { PrivacyPolicyOrchestrator } from '@/features/legal/privacyPolicy/components/orchestrators/PrivacyPolicyOrchestrator';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
+import { screenHeader, screenLayout } from '@/navigation/screenLayout';
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
+const layout = screenLayout(false);
 
 export function AuthNavigator() {
 	const { theme } = useTheme();
+	const { isWide } = useBreakpoint();
 
 	return (
 		<Stack.Navigator
+			screenLayout={layout}
 			screenOptions={{
+				...(isWide ? { header: screenHeader } : null),
 				headerStyle: {
 					backgroundColor: theme.colors.background,
 				},
@@ -25,7 +32,7 @@ export function AuthNavigator() {
 				headerTintColor: theme.colors.text,
 				headerShadowVisible: false,
 				headerTitleStyle: {
-					fontWeight: theme.typography.weights.bold,
+					fontFamily: theme.typography.families.bold,
 				},
 				headerTitleAlign: 'center',
 				// No title: the screens show the logo
@@ -35,10 +42,14 @@ export function AuthNavigator() {
 			<Stack.Screen
 				name="Welcome"
 				component={WelcomeOrchestrator}
-				options={{ headerShown: false }}
+				options={{ title: 'Bienvenue', headerShown: false }}
 			/>
-			<Stack.Screen name="Login" component={LoginOrchestrator} />
-			<Stack.Screen name="Register" component={RegisterOrchestrator} />
+			<Stack.Screen name="Login" component={LoginOrchestrator} options={{ title: 'Connexion' }} />
+			<Stack.Screen
+				name="Register"
+				component={RegisterOrchestrator}
+				options={{ title: 'Inscription' }}
+			/>
 			<Stack.Screen
 				name="EmailVerification"
 				component={EmailVerificationOrchestrator}
@@ -53,6 +64,14 @@ export function AuthNavigator() {
 				name="ResetPassword"
 				component={ResetPasswordOrchestrator}
 				options={{ title: 'Nouveau mot de passe' }}
+			/>
+			<Stack.Screen
+				name="PrivacyPolicy"
+				component={PrivacyPolicyOrchestrator}
+				options={{
+					title: 'Politique de confidentialité',
+					headerTitle: 'Politique de confidentialité',
+				}}
 			/>
 		</Stack.Navigator>
 	);

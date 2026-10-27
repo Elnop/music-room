@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated from 'react-native-reanimated';
 import { Artwork } from '@/shared/components/media/Artwork';
 import type { ArtworkCarousel } from '@/features/player/modal/hooks/useArtworkCarousel';
-import { ARTWORK_SIZE, ARTWORK_STEP, type createStyles } from './playerModalStyles';
+import type { createStyles } from './playerModalStyles';
 
 interface PlayerArtworkCarouselProps {
 	styles: ReturnType<typeof createStyles>;
@@ -25,20 +25,39 @@ export function PlayerArtworkCarousel({
 		<View style={styles.artworkWrapper}>
 			<Animated.View style={[styles.artworkShadow, carousel.rowStyle]}>
 				{carousel.hasPrevious && (
-					<View style={[styles.neighbourArtwork, { left: -ARTWORK_STEP }]}>
-						<Artwork uri={carousel.previousArtworkUrl} size={ARTWORK_SIZE} style={styles.artwork} />
+					<View style={[styles.neighbourArtwork, { left: -carousel.artworkStep }]}>
+						<Artwork
+							uri={carousel.previousArtworkUrl}
+							size={carousel.artworkSize}
+							style={styles.artwork}
+						/>
 					</View>
 				)}
 				{hasTrack ? (
-					<Artwork uri={artworkUrl} size={ARTWORK_SIZE} style={styles.artwork} iconSize={64} />
+					<Artwork
+						uri={artworkUrl}
+						size={carousel.artworkSize}
+						style={styles.artwork}
+						iconSize={64}
+					/>
 				) : (
-					<View style={[styles.artwork, styles.emptyArtwork]}>
+					<View
+						style={[
+							styles.artwork,
+							styles.emptyArtwork,
+							{ width: carousel.artworkSize, height: carousel.artworkSize },
+						]}
+					>
 						<Ionicons name="musical-notes" size={64} color={emptyIconColor} />
 					</View>
 				)}
 				{carousel.hasNext && (
-					<View style={[styles.neighbourArtwork, { left: ARTWORK_STEP }]}>
-						<Artwork uri={carousel.nextArtworkUrl} size={ARTWORK_SIZE} style={styles.artwork} />
+					<View style={[styles.neighbourArtwork, { left: carousel.artworkStep }]}>
+						<Artwork
+							uri={carousel.nextArtworkUrl}
+							size={carousel.artworkSize}
+							style={styles.artwork}
+						/>
 					</View>
 				)}
 			</Animated.View>

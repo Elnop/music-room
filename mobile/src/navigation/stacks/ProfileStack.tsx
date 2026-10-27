@@ -9,16 +9,23 @@ import { LinkedAccountsOrchestrator } from '@/features/profile/linkedAccounts/co
 import { MusicPreferencesOrchestrator } from '@/features/profile/musicPreferences/components/orchestrators/MusicPreferencesOrchestrator';
 import { SettingsOrchestrator } from '@/features/profile/settings/components/orchestrators/SettingsOrchestrator';
 import { MyDevicesOrchestrator } from '@/features/music-control/myDevices/components/orchestrators/MyDevicesOrchestrator';
+import { PrivacyPolicyOrchestrator } from '@/features/legal/privacyPolicy/components/orchestrators/PrivacyPolicyOrchestrator';
 import type { ProfileStackParamList } from '@/features/profile/types';
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
+import { screenHeader, screenLayout } from '@/navigation/screenLayout';
 
 const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
+const layout = screenLayout(true);
 
 export function ProfileNavigator() {
 	const { theme } = useTheme();
+	const { isWide } = useBreakpoint();
 
 	return (
 		<ProfileStack.Navigator
+			screenLayout={layout}
 			screenOptions={{
+				...(isWide ? { header: screenHeader } : null),
 				headerStyle: {
 					backgroundColor: theme.colors.background,
 				},
@@ -26,7 +33,7 @@ export function ProfileNavigator() {
 				headerTintColor: theme.colors.text,
 				headerShadowVisible: false,
 				headerTitleStyle: {
-					fontWeight: theme.typography.weights.bold,
+					fontFamily: theme.typography.families.bold,
 				},
 				headerTitleAlign: 'center',
 			}}
@@ -34,7 +41,8 @@ export function ProfileNavigator() {
 			<ProfileStack.Screen
 				name="Profile"
 				component={ProfileOrchestrator}
-				options={{ title: 'Mon Profil' }}
+				// Wide screens show the title and the header's actions in the profile's own header.
+				options={{ title: 'Mon Profil', headerShown: !isWide }}
 			/>
 			<ProfileStack.Screen
 				name="EditProfile"
@@ -65,6 +73,11 @@ export function ProfileNavigator() {
 				name="Settings"
 				component={SettingsOrchestrator}
 				options={{ title: 'Réglages' }}
+			/>
+			<ProfileStack.Screen
+				name="PrivacyPolicy"
+				component={PrivacyPolicyOrchestrator}
+				options={{ title: 'Politique de confidentialité' }}
 			/>
 		</ProfileStack.Navigator>
 	);

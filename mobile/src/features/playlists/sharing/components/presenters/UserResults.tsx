@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { Avatar } from '@/shared/components/media/Avatar';
@@ -9,6 +9,7 @@ import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { UserSummary } from '@/features/playlists/types';
 import { createSharingStyles } from './sharingStyles';
+import { Text } from '@/shared/components/ui/Text';
 
 interface UserResultsProps {
 	results: UserSummary[];
@@ -76,7 +77,7 @@ const createStyles = (theme: Theme) =>
 		},
 		username: {
 			fontSize: theme.typography.sizes.md,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 		},
 		displayName: {

@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import type { DevicePickerOwner } from '@/types/device.types';
 import type { Theme } from '@/shared/theme/types';
 import type { createPickerStyles } from './devicePickerStyles';
+import { Text } from '@/shared/components/ui/Text';
 
 export type PickerDevice = DevicePickerOwner['devices'][number];
 

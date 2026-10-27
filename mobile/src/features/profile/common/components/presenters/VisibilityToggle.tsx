@@ -1,11 +1,12 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import type { VisibilityLevel } from '@/types/user.types';
 import { VISIBILITY_ICONS, VISIBILITY_LABELS } from '@/types/user.types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface VisibilityToggleProps {
 	label: string;
@@ -63,7 +64,7 @@ const createStyles = (theme: Theme) =>
 		},
 		label: {
 			fontSize: 16,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 		},
 		description: {
@@ -93,7 +94,7 @@ const createStyles = (theme: Theme) =>
 		},
 		optionLabel: {
 			fontSize: 12,
-			fontWeight: theme.typography.weights.medium,
+			fontFamily: theme.typography.families.medium,
 			color: theme.colors.textSecondary,
 		},
 		optionLabelSelected: {
