@@ -8,10 +8,14 @@ import { showError, showSuccess } from '@/shared/utils/toast';
 import { usePlaylists } from '@/features/playlists/hooks/usePlaylistQueries';
 import { useAddTrack } from '@/features/playlists/hooks/useTrackEdits';
 import { canEditPlaylist } from '@/features/playlists/utils/playlistPermissions';
+import {
+	useNewPlaylistFromTrack,
+	type NewPlaylistDraft,
+} from '@/features/playlists/trackActions/hooks/useNewPlaylistFromTrack';
 import type { Playlist } from '@/features/playlists/types';
 import type { AddQueueItemBody } from '@/shared/types/playback';
 
-type Step = 'actions' | 'playlists';
+type Step = 'actions' | 'playlists' | 'newPlaylist';
 
 export interface TrackActions {
 	visible: boolean;
@@ -25,6 +29,9 @@ export interface TrackActions {
 	addToQueue: () => void;
 	openPlaylists: () => void;
 	backToActions: () => void;
+	openNewPlaylist: () => void;
+	backToPlaylists: () => void;
+	newPlaylist: NewPlaylistDraft;
 	addToPlaylist: (playlist: Playlist) => void;
 	share: () => void;
 }
@@ -41,6 +48,7 @@ export function useTrackActions(track: AddQueueItemBody | null, onClose: () => v
 	// Reloaded each time the playlist step opens.
 	const list = usePlaylists(step === 'playlists');
 	const addTrack = useAddTrack();
+	const newPlaylist = useNewPlaylistFromTrack(shown, onClose);
 
 	useEffect(() => {
 		if (list.error) logger.error('[TrackActionsSheet] Loading playlists failed:', list.error);
@@ -67,6 +75,12 @@ export function useTrackActions(track: AddQueueItemBody | null, onClose: () => v
 		addToQueue: () => run(body => getPlayback().addToQueue(body)),
 		openPlaylists: () => setStep('playlists'),
 		backToActions: () => setStep('actions'),
+		openNewPlaylist: () => {
+			newPlaylist.start();
+			setStep('newPlaylist');
+		},
+		backToPlaylists: () => setStep('playlists'),
+		newPlaylist,
 		addToPlaylist: playlist =>
 			run(async body => {
 				try {
