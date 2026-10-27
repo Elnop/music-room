@@ -195,7 +195,7 @@ Taken in #475; the result is described in [features/web-client.md](features/web-
 
 ### 3.2 Hosting: GitHub Pages
 
-- **Decision**: the static build is published on GitHub Pages at `https://elnop.github.io/music-room/app/`, in the same deployment as the project site (`site/`), by `.github/workflows/pages.yml` on every push to `main`. `site/404.html` sends a direct link back to the app. The app calls the hosted backend over HTTPS, whose `ALLOWED_ORIGINS` includes `https://elnop.github.io`.
+- **Decision**: the static build is published on GitHub Pages at the root of the project site, `https://elnop.github.io/music-room/` (under `/app/` until #558), by `.github/workflows/pages.yml` on every push to `main`, with the static pages of `site/` next to it (`privacy.html`, `404.html`). `site/404.html` sends a direct link back to the app, and an old `/app/` link to the same path without it. The app calls the hosted backend over HTTPS, whose `ALLOWED_ORIGINS` includes `https://elnop.github.io`.
 - **Why**:
   - **Free, HTTPS and already used**: the project site is there already; HTTPS is required by the browser's geolocation and by Facebook's JavaScript SDK outside `localhost`.
   - **Static is enough**: the web app is a client of the backend; it needs no server of its own.

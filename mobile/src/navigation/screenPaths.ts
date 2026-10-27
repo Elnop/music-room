@@ -1,5 +1,6 @@
 // One browser path per screen. A screen several stacks hold opens in its canonical tab, above the
-// screens leading to it so « back » works. Only identifiers go in a path.
+// screens leading to it so « back » works. Only identifiers go in a path. A path both sessions open
+// (`/`, `/privacy`) has one entry per session, the signed-out one without a tab.
 
 import type { InitialState } from '@react-navigation/native';
 import type { AppTabsParamList } from './AppNavigator';
@@ -46,7 +47,13 @@ const profileScreen = (screen: string, path: string): ScreenPath => ({
 
 // The email and the user id of a code screen stay out of the address: a reload opens the screen before it.
 const SCREEN_PATHS: readonly ScreenPath[] = [
+	{ screen: 'Welcome', path: '', routes: () => [{ name: 'Welcome' }] },
 	{ screen: 'Welcome', path: 'welcome', routes: () => [{ name: 'Welcome' }] },
+	{
+		screen: 'PrivacyPolicy',
+		path: 'privacy',
+		routes: () => [{ name: 'Welcome' }, { name: 'PrivacyPolicy' }],
+	},
 	{ screen: 'Login', path: 'login', routes: () => LOGIN },
 	{
 		screen: 'Register',
@@ -129,6 +136,12 @@ const SCREEN_PATHS: readonly ScreenPath[] = [
 	profileScreen('MyDevices', 'profile/devices'),
 	profileScreen('MusicPreferences', 'profile/music'),
 	profileScreen('Settings', 'settings'),
+	{
+		screen: 'PrivacyPolicy',
+		path: 'privacy',
+		tab: 'ProfileTab',
+		routes: () => [...PROFILE, { name: 'Settings' }, { name: 'PrivacyPolicy' }],
+	},
 ];
 
 /** A tab opened before its stack has a state shows its first screen. */
@@ -150,14 +163,21 @@ export interface ScreenPathMatch {
 	id: string;
 }
 
-/** The screen of an app path; the query and a trailing slash are ignored. */
-export function matchScreenPath(path: string): ScreenPathMatch | undefined {
+/**
+ * The screen of an app path; the query and a trailing slash are ignored. Given the session, the entry
+ * of that session comes first, the other one otherwise.
+ */
+export function matchScreenPath(path: string, signedIn?: boolean): ScreenPathMatch | undefined {
 	const bare = path.split(/[?#]/)[0].replace(/^\/+|\/+$/g, '');
+	let otherSession: ScreenPathMatch | undefined;
 	for (const { entry, regex } of MATCHERS) {
 		const found = regex.exec(bare);
-		if (found) return { entry, id: found[1] ?? '' };
+		if (!found) continue;
+		const match = { entry, id: found[1] ?? '' };
+		if (signedIn === undefined || Boolean(entry.tab) === signedIn) return match;
+		otherSession ??= match;
 	}
-	return undefined;
+	return otherSession;
 }
 
 export function stateFromMatch({ entry, id }: ScreenPathMatch): InitialState {

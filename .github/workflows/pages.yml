@@ -1,8 +1,9 @@
 name: Pages
 
-# Publishes site/ (home page and privacy policy, required by the Google OAuth
-# consent screen and the Play Store) to https://elnop.github.io/music-room/,
-# and the web build of mobile/ under https://elnop.github.io/music-room/app/.
+# Publishes the web build of mobile/ at https://elnop.github.io/music-room/,
+# with site/ next to it: the static privacy policy (required by the Google OAuth
+# consent screen and the Play Store) and the 404 page that sends app paths back
+# to the app.
 
 on:
   push:
@@ -33,7 +34,7 @@ jobs:
     # Metro inlines EXPO_PUBLIC_* into the public bundle: only what the browser
     # needs, so no Facebook client token. WEB_BASE_URL sets experiments.baseUrl.
     env:
-      WEB_BASE_URL: /music-room/app
+      WEB_BASE_URL: /music-room
       EXPO_PUBLIC_API_URL: https://zumik.cluzhub.com
       EXPO_PUBLIC_WS_URL: wss://zumik.cluzhub.com
       EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: ${{ secrets.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID }}
@@ -62,13 +63,15 @@ jobs:
 
       - run: npx expo export -p web --clear --output-dir dist
 
-      # site/ at the root keeps its URLs; site/404.html sends app paths back to app/
+      # The export and site/ share the root: a file in both would be overwritten
       - name: Assemble the site
         working-directory: .
         run: |
+          clash=$(cd site && find . -type f | while read -r file; do [ ! -e "../mobile/dist/$file" ] || echo "$file"; done)
+          if [ -n "$clash" ]; then echo "::error::In both site/ and the export: $clash"; exit 1; fi
           mkdir _site
+          cp -R mobile/dist/. _site/
           cp -R site/. _site/
-          cp -R mobile/dist _site/app
 
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0

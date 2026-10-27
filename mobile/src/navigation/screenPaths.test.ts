@@ -2,8 +2,8 @@ import { matchScreenPath, pathFromState, stateFromMatch } from './screenPaths';
 
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
 
-const stateOf = (path: string) => {
-	const match = matchScreenPath(path);
+const stateOf = (path: string, signedIn?: boolean) => {
+	const match = matchScreenPath(path, signedIn);
 	if (!match) throw new Error(`no screen for ${path}`);
 	return stateFromMatch(match);
 };
@@ -21,7 +21,14 @@ const outline = (state: { routes: readonly Node[] }): unknown[] =>
 
 describe('screen paths', () => {
 	it.each([
-		['/welcome', [['Welcome', null]]],
+		['/', [['Welcome', null]]],
+		[
+			'/privacy',
+			[
+				['Welcome', null],
+				['PrivacyPolicy', null],
+			],
+		],
 		[
 			'/login',
 			[
@@ -161,10 +168,24 @@ describe('screen paths', () => {
 				],
 			],
 		]),
-	] as [string, unknown[]][])(
+		[
+			'/privacy',
+			[
+				[
+					'ProfileTab',
+					[
+						['Profile', null],
+						['Settings', null],
+						['PrivacyPolicy', null],
+					],
+				],
+			],
+		],
+	] as [string, [string, unknown][]][])(
 		'%s opens its screen above its parents, and back',
 		(path, expected) => {
-			const state = stateOf(path);
+			// A signed-in screen sits in a tab
+			const state = stateOf(path, expected[0][0].endsWith('Tab'));
 			expect(outline(state as { routes: Node[] })).toEqual(expected);
 			expect(pathFromState(state as { routes: Node[] })).toBe(path);
 		}
@@ -186,6 +207,28 @@ describe('screen paths', () => {
 				],
 			})
 		).toBe(path);
+	});
+
+	it('opens the /welcome alias on the welcome screen, written /', () => {
+		const state = stateOf('/welcome', false);
+		expect(state.routes.map(route => route.name)).toEqual(['Welcome']);
+		expect(pathFromState(state)).toBe('/');
+	});
+
+	it.each([
+		['/', 'Welcome', 'Home'],
+		['/privacy', 'PrivacyPolicy', 'PrivacyPolicy'],
+	])('matches %s per session', (path, signedOut, signedIn) => {
+		const outEntry = matchScreenPath(path, false)?.entry;
+		const inEntry = matchScreenPath(path, true)?.entry;
+		expect([outEntry?.screen, outEntry?.tab]).toEqual([signedOut, undefined]);
+		expect(inEntry?.screen).toBe(signedIn);
+		expect(inEntry?.tab).toBeDefined();
+	});
+
+	it('falls back on the entry of the other session', () => {
+		expect(matchScreenPath('/settings', false)?.entry.screen).toBe('Settings');
+		expect(matchScreenPath('/login', true)?.entry.screen).toBe('Login');
 	});
 
 	it('ignores the query, a trailing slash and the case of an identifier', () => {

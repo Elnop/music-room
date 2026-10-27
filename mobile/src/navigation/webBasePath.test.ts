@@ -1,7 +1,7 @@
 import { restoreRedirectedPath, stripBasePath, webBasePath } from './webBasePath';
 
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
-const BASE = '/music-room/app';
+const BASE = '/music-room';
 
 const fakeLocation = (search: string, hash = '') => ({ pathname: `${BASE}/`, search, hash });
 const fakeHistory = () => ({ replaceState: jest.fn() });
@@ -30,7 +30,7 @@ describe('stripBasePath', () => {
 		[BASE, '/'],
 		[`${BASE}/`, '/'],
 		[`${BASE}?x=1`, '?x=1'],
-		[`/music-room/application/user/${ID}`, `/music-room/application/user/${ID}`],
+		[`/music-roomy/user/${ID}`, `/music-roomy/user/${ID}`],
 		[`/user/${ID}`, `/user/${ID}`],
 	])('maps %j to %j', (path, expected) => {
 		expect(stripBasePath(path, BASE)).toBe(expected);

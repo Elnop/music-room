@@ -6,14 +6,17 @@
 		<title>Zumik: page not found</title>
 		<script>
 			// GitHub Pages answers every unknown path with this page. A path of the web app
-			// (/music-room/app/playlist/<id>, ...) goes back to the app, which puts it back in the
-			// address bar (mobile/src/navigation/webBasePath.ts). Anything else is a real 404.
+			// (/music-room/playlist/<id>, ...) goes back to the app, which puts it back in the address bar
+			// (mobile/src/navigation/webBasePath.ts). A link from before the app moved to the root
+			// (/music-room/app/...) loses its /app. A missing static file is a real 404.
 			(function () {
-				var app = '/music-room/app';
-				var match = window.location.pathname.match(/^\/music-room\/app(\/.*)$/);
-				if (!match || /^\/(_expo|assets)\//.test(match[1])) return;
-				var path = match[1] + window.location.search;
-				window.location.replace(app + '/?redirect=' + encodeURIComponent(path) + window.location.hash);
+				var app = '/music-room';
+				var match = window.location.pathname.match(/^\/music-room(?:\/app(?=\/|$))?(\/.*)?$/);
+				if (!match) return;
+				var path = match[1] || '/';
+				if (/^\/(_expo|assets)\//.test(path) || /\.[a-z0-9]+$/i.test(path)) return;
+				var target = path + window.location.search;
+				window.location.replace(app + '/?redirect=' + encodeURIComponent(target) + window.location.hash);
 			})();
 		</script>
 		<link rel="icon" href="/music-room/logo.png" />
@@ -27,7 +30,7 @@
 			</header>
 
 			<p>This page does not exist.</p>
-			<p><a href="/music-room/">Back to the Zumik home page</a> · <a href="/music-room/app/">Open Zumik in the browser</a></p>
+			<p><a href="/music-room/">Back to Zumik</a></p>
 		</main>
 	</body>
 </html>
