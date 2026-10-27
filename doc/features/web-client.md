@@ -27,7 +27,7 @@ Each native module was already isolated in one service or hook. That file gets a
 | `features/events/utils/pickDateTime.web.ts` | The Android date and time pickers: a modal `<dialog>` with a `datetime-local` field |
 | `features/events/services/beaconScanner.web.ts` | The BLE scan: always reports « unsupported » |
 
-`shared/constants/platform.ts` hides what the browser cannot do: the beacon broadcast (`BEACON_BROADCAST_AVAILABLE`) and the backend address field (`BACKEND_URL_EDITABLE`: the web app calls the backend it was built for).
+`shared/constants/platform.ts` hides what the browser cannot do: the beacon broadcast (`BEACON_BROADCAST_AVAILABLE`). The backend address field (`BackendUrlField`) works in the browser too, on Welcome and in Settings: the address is kept in the browser's storage, and the chosen backend must list the page's origin in its `ALLOWED_ORIGINS`.
 
 ## Responsive layout
 
