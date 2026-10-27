@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { RowGrid } from '@/shared/components/lists/RowGrid';
 import { SectionHeader } from '@/shared/components/lists/SectionHeader';
@@ -19,7 +20,7 @@ const NOTICE_ACTIONS = {
 } as const;
 
 export function NearbyEventsSection({ nearby }: { nearby: NearbyEvents }) {
-	const { styles } = useThemedStyles(createStyles);
+	const { styles, theme } = useThemedStyles(createStyles);
 	const { isWide } = useBreakpoint();
 	const action = nearby.notice.action && NOTICE_ACTIONS[nearby.notice.action];
 
@@ -29,6 +30,16 @@ export function NearbyEventsSection({ nearby }: { nearby: NearbyEvents }) {
 				icon="location-outline"
 				title="Événements à proximité"
 				count={nearby.items.length}
+				action={
+					<Button
+						title="Créer"
+						variant="outline"
+						size="compact"
+						icon={<Ionicons name="add" size={18} color={theme.colors.text} />}
+						onPress={nearby.createEvent}
+						accessibilityLabel="Créer un événement"
+					/>
+				}
 			/>
 			{nearby.items.length > 0 ? (
 				<RowGrid>
@@ -63,14 +74,6 @@ export function NearbyEventsSection({ nearby }: { nearby: NearbyEvents }) {
 					</RowGrid>
 				</View>
 			)}
-			<View style={[styles.create, isWide && styles.createWide]}>
-				<Button
-					title="Créer un événement"
-					variant="outline"
-					onPress={nearby.createEvent}
-					fullWidth={!isWide}
-				/>
-			</View>
 		</View>
 	);
 }
@@ -84,6 +87,4 @@ const createStyles = (theme: Theme) =>
 			paddingHorizontal: theme.spacing.md,
 			marginTop: theme.spacing.sm,
 		},
-		create: { paddingHorizontal: theme.spacing.md, marginTop: theme.spacing.sm },
-		createWide: { alignItems: 'flex-start' },
 	});

@@ -152,7 +152,7 @@ describe('NearbyEventsOrchestrator', () => {
 		await act(async () => fireEvent.press(screen.getByText('Autoriser la localisation')));
 		expect(location.requestForegroundPermissionsAsync).toHaveBeenCalled();
 		expect(location.watchPositionAsync).not.toHaveBeenCalled();
-		expect(screen.getByText('Créer un événement')).toBeTruthy();
+		expect(screen.getByRole('button', { name: 'Créer un événement' })).toBeTruthy();
 	});
 
 	it('explains a location refused in the browser, where asking again does nothing', async () => {
@@ -175,7 +175,7 @@ describe('NearbyEventsOrchestrator', () => {
 		expect(screen.queryByText('Autoriser la localisation')).toBeNull();
 		expect(screen.queryByText('Ouvrir les réglages')).toBeNull();
 		expect(location.watchPositionAsync).not.toHaveBeenCalled();
-		expect(screen.getByText('Créer un événement')).toBeTruthy();
+		expect(screen.getByRole('button', { name: 'Créer un événement' })).toBeTruthy();
 	});
 
 	it('stops waiting for a browser that never gives a position, and searches again', async () => {
@@ -290,7 +290,7 @@ describe('NearbyEventsOrchestrator', () => {
 		await renderSection();
 		fireEvent.press(screen.getByText('My party'));
 		expect(mockNavigate).toHaveBeenCalledWith('EventDetail', { id: 'mine' });
-		fireEvent.press(screen.getByText('Créer un événement'));
+		fireEvent.press(screen.getByRole('button', { name: 'Créer un événement' }));
 		expect(mockNavigate).toHaveBeenCalledWith('EventForm');
 	});
 });
