@@ -111,7 +111,7 @@ Assumed gaps:
 - **No reverse geocoding**: « Utiliser ma position actuelle » fills the coordinates as the address, so the position never leaves the browser. A typed address is geocoded by the backend (Nominatim, cached, one request per second).
 - Session tokens are in `localStorage`, an accepted risk in [threat-model.md](../security/threat-model.md#m14-web-session-tokens-and-third-party-scripts).
 
-Demo scenario: [web-client.md](../features/web-client.md#demo-scenario).
+Demo scenario: [presentation/09-bonus-web/scenario.md](../presentation/09-bonus-web/scenario.md).
 
 ## Bonus V.2 Reflection on the IoT
 
@@ -126,17 +126,11 @@ Details: [events.md](../features/events.md). Music Track Vote's "event" is not r
 
 Assumed gap: the information is received **in the foreground, on the home screen**, not as a notification in the background. Scanning and location stop when the home is not shown or the app is in the background, which spares the battery and needs no background location permission. Also, Android shows iBeacon scan results only with the location permission and the location setting on (see [events.md](../features/events.md#permissions-android)).
 
-Demo scenario: [events.md](../features/events.md#demo-with-two-phones).
+Demo scenario: [presentation/10-bonus-iot/scenario.md](../presentation/10-bonus-iot/scenario.md).
 
 ## Bonus V.3 Free and paid subscription
 
 - Each user is on the free or the premium plan (`user_profiles.plan`); Premium unlocks a custom playlist cover. The switch is simulated, without payment: **Profile › Settings › Abonnement**. Details: [subscription.md](../features/subscription.md).
 - The access check is server-side (`assertPremium`, 403 `PREMIUM_REQUIRED`); the app only hides or locks the action.
 
-Demo scenario (#485), on a phone, with a playlist the account owns:
-
-1. Free account: open the playlist, ⋯ › **Changer la cover** shows a lock and « Réservé au Premium »; pressing it explains the Premium and offers **Paramètres**, and no upload request is sent.
-2. **Paramètres** › switch **Premium** on: the plan changes at once, no restart.
-3. Back on the playlist: ⋯ › **Changer la cover**, pick an image: the cover changes, and live on a second phone that has the playlist open.
-4. Settings › switch **Premium** off (back to free).
-5. The cover stays on the playlist; ⋯ › **Changer la cover** is locked again (the server would answer 403 `PREMIUM_REQUIRED`), while **Retirer la cover** still works and brings back the first track's artwork.
+Demo scenario: [presentation/11-bonus-subscription/scenario.md](../presentation/11-bonus-subscription/scenario.md).
