@@ -15,7 +15,7 @@ interface PlayerBarViewProps {
 	data: PlayerBarData;
 }
 
-/** The desktop player: track, transport and seek, then the queue, devices and volume, on one row. */
+/** The desktop player: track, transport and seek, then the now playing panel, queue, devices and volume, on one row. */
 export function PlayerBarView({ data }: PlayerBarViewProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
@@ -33,8 +33,9 @@ export function PlayerBarView({ data }: PlayerBarViewProps) {
 			<View style={styles.side}>
 				<Pressable
 					style={styles.trackButton}
-					onPress={data.onOpenPlayer}
-					accessibilityLabel={data.openLabel}
+					onPress={data.onTogglePanel}
+					accessibilityLabel={data.trackLabel}
+					accessibilityState={{ expanded: data.isPanelOpen }}
 				>
 					<Artwork uri={track?.artworkUrl} size={56} style={styles.artwork} iconSize={24} />
 					<View style={styles.info}>
@@ -95,6 +96,14 @@ export function PlayerBarView({ data }: PlayerBarViewProps) {
 			</View>
 
 			<View style={[styles.side, styles.sideEnd]}>
+				<PlayerBarButton
+					icon="albums-outline"
+					label={data.panelLabel}
+					onPress={data.onTogglePanel}
+					selected={data.isPanelOpen}
+					color={data.isPanelOpen ? theme.colors.primary : theme.colors.text}
+					style={styles.iconButton}
+				/>
 				<PlayerBarButton
 					icon="list"
 					label="File d'attente"

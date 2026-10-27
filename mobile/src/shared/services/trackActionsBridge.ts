@@ -1,9 +1,13 @@
 import React from 'react';
 import type { AddQueueItemBody } from '@/shared/types/playback';
 
+/** Where the sheet opens: its actions, or straight on the playlists to add the track to. */
+export type TrackActionsStart = 'actions' | 'playlists';
+
 interface TrackActionsSheetProps {
 	track: AddQueueItemBody | null;
 	onClose: () => void;
+	start?: TrackActionsStart;
 }
 
 type TrackActionsSheetComponent = React.ComponentType<TrackActionsSheetProps>;

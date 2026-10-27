@@ -14,6 +14,7 @@ import {
 } from '@/features/playlists/trackActions/hooks/useNewPlaylistFromTrack';
 import type { Playlist } from '@/features/playlists/types';
 import type { AddQueueItemBody } from '@/shared/types/playback';
+import type { TrackActionsStart } from '@/shared/services/trackActionsBridge';
 
 type Step = 'actions' | 'playlists' | 'newPlaylist';
 
@@ -37,13 +38,17 @@ export interface TrackActions {
 }
 
 /** Each action closes the sheet first so its toast shows on the screen underneath. */
-export function useTrackActions(track: AddQueueItemBody | null, onClose: () => void): TrackActions {
+export function useTrackActions(
+	track: AddQueueItemBody | null,
+	onClose: () => void,
+	start: TrackActionsStart = 'actions'
+): TrackActions {
 	const userId = useSession(session => session.user?.id);
 	const [shown, setShown] = useState(track);
-	const [step, setStep] = useState<Step>('actions');
+	const [step, setStep] = useState<Step>(start);
 	if (track && track !== shown) {
 		setShown(track);
-		setStep('actions');
+		setStep(start);
 	}
 	// Reloaded each time the playlist step opens.
 	const list = usePlaylists(step === 'playlists');

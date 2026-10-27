@@ -2,7 +2,8 @@ import React from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { render, screen } from '@testing-library/react-native';
 import { useContentWidth } from '@/shared/hooks/useContentWidth';
-import { SIDEBAR_WIDTH } from '@/shared/constants/layout';
+import { NOW_PLAYING_PANEL_WIDTH, SIDEBAR_WIDTH } from '@/shared/constants/layout';
+import { useNowPlayingPanelStore } from '@/shared/stores/nowPlayingPanelStore';
 import { ContentContainer } from './ContentContainer';
 import { Text } from '@/shared/components/ui/Text';
 
@@ -65,5 +66,19 @@ describe('ContentContainer', () => {
 			</ContentContainer>
 		);
 		expect(screen.getByText('800')).toBeTruthy();
+	});
+
+	it('leaves the open now playing panel its share of a desktop window', () => {
+		mockWidth(1440);
+		useNowPlayingPanelStore.setState({ isOpen: true });
+		render(
+			<ContentContainer width="wide" besideSidebar>
+				<WidthProbe />
+			</ContentContainer>
+		);
+		expect(
+			screen.getByText(String(1440 - SIDEBAR_WIDTH.desktop - NOW_PLAYING_PANEL_WIDTH))
+		).toBeTruthy();
+		useNowPlayingPanelStore.setState({ isOpen: false });
 	});
 });

@@ -14,5 +14,8 @@ export type ContentWidth = keyof typeof CONTENT_MAX_WIDTH;
 
 export const DIALOG_MAX_WIDTH = 560;
 
-/** The full player's panel on desktop, docked to the right of the window. */
-export const PLAYER_PANEL_WIDTH = 440;
+/** The full player's dialog on a tablet browser, centred over the app. */
+export const PLAYER_DIALOG_WIDTH = 440;
+
+/** The desktop's "En cours de lecture" panel, docked between the content and the window's right edge. */
+export const NOW_PLAYING_PANEL_WIDTH = 360;

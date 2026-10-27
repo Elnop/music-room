@@ -3,6 +3,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { PlayerBar } from './PlayerBar';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { useVolumeStore } from '@/features/player/stores/volumeStore';
+import { useNowPlayingPanelStore } from '@/shared/stores/nowPlayingPanelStore';
 import { registerPlayerModals } from '@/shared/services/playerModalsBridge';
 import type { NowPlaying } from '@/features/player/types';
 import { Text } from '@/shared/components/ui/Text';
@@ -66,6 +67,7 @@ describe('PlayerBar', () => {
 		jest.clearAllMocks();
 		mockNowPlaying = playing();
 		usePlayerStore.setState({ isModalOpen: false });
+		useNowPlayingPanelStore.setState({ isOpen: false });
 		useVolumeStore.setState({ volume: 1, muted: false });
 		registerPlayerModals({
 			QueueModal: ({ visible }) => (visible ? <Text>queue-sheet</Text> : null),
@@ -117,14 +119,22 @@ describe('PlayerBar', () => {
 		expect(volumeSlider().props.value).toBe(0.4);
 	});
 
-	it('opens the queue, the device picker and the full player', () => {
+	it('opens the queue and the device picker', () => {
 		render(<PlayerBar />);
 		fireEvent.press(screen.getByLabelText("File d'attente"));
 		expect(screen.getByText('queue-sheet')).toBeTruthy();
 		fireEvent.press(screen.getByLabelText("Choisir l'appareil"));
 		expect(screen.getByText('devices-sheet')).toBeTruthy();
-		fireEvent.press(screen.getByLabelText(/^Ouvrir le lecteur/));
-		expect(usePlayerStore.getState().isModalOpen).toBe(true);
+	});
+
+	it('shows and hides the now playing panel from the track and from its button', () => {
+		render(<PlayerBar />);
+		fireEvent.press(screen.getByLabelText(/^Afficher « En cours de lecture », Goofy Goober Rock/));
+		expect(useNowPlayingPanelStore.getState().isOpen).toBe(true);
+		expect(usePlayerStore.getState().isModalOpen).toBe(false);
+		expect(screen.getByLabelText('Masquer « En cours de lecture »')).toBeSelected();
+		fireEvent.press(screen.getByLabelText('Masquer « En cours de lecture »'));
+		expect(useNowPlayingPanelStore.getState().isOpen).toBe(false);
 	});
 
 	it('offers nothing to play without a track', () => {

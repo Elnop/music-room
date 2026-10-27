@@ -12,14 +12,21 @@ interface PlayerHeaderProps {
 		textSecondary: string;
 		buttonBg: string;
 	};
+	/** A dialog closes with ×, without the swipe handle of the phone's sheet. */
+	dialog?: boolean;
 	onClose: () => void;
 }
 
-export function PlayerHeader({ styles, colors, onClose }: PlayerHeaderProps) {
+export function PlayerHeader({ styles, colors, dialog = false, onClose }: PlayerHeaderProps) {
 	return (
 		<View style={styles.header}>
 			<View style={styles.swipeIndicator}>
-				<View style={[styles.swipeBar, { backgroundColor: colors.textSecondary }]} />
+				<View
+					style={[
+						styles.swipeBar,
+						{ backgroundColor: dialog ? 'transparent' : colors.textSecondary },
+					]}
+				/>
 			</View>
 
 			<Pressable
@@ -30,7 +37,7 @@ export function PlayerHeader({ styles, colors, onClose }: PlayerHeaderProps) {
 				accessibilityLabel="Fermer le lecteur"
 			>
 				<View style={[styles.headerButton, { backgroundColor: colors.buttonBg }]}>
-					<Ionicons name="chevron-down" size={24} color={colors.text} />
+					<Ionicons name={dialog ? 'close' : 'chevron-down'} size={24} color={colors.text} />
 				</View>
 			</Pressable>
 
