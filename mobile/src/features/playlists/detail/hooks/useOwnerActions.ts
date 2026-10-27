@@ -1,9 +1,9 @@
 import { useCallback, useState } from 'react';
-import { showAlert } from '@/shared/utils/alert';
 import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 import { logger } from '@/shared/utils/logger';
 import { showError, showSuccess } from '@/shared/utils/toast';
 import { useDeletePlaylist } from '@/features/playlists/hooks/usePlaylistMutations';
+import { confirmPlaylistDelete } from '@/features/playlists/utils/confirmPlaylistDelete';
 import type { DetailNavigation, PlaylistDetailScreen } from './usePlaylistDetailScreen';
 
 interface OwnerActions {
@@ -43,14 +43,6 @@ export function useOwnerActions(
 		closeSheet: () => setSheetVisible(false),
 		edit: () => navigation.navigate('CreatePlaylist', { playlistId: id }),
 		sharing: () => navigation.navigate('PlaylistSharing', { playlistId: id }),
-		remove: () =>
-			showAlert(
-				'Supprimer la playlist ?',
-				`« ${playlist?.name ?? ''} » sera supprimée pour tous ses membres. Cette action est définitive.`,
-				[
-					{ text: 'Annuler', style: 'cancel' },
-					{ text: 'Supprimer', style: 'destructive', onPress: () => void confirmDelete() },
-				]
-			),
+		remove: () => confirmPlaylistDelete(playlist?.name ?? '', () => void confirmDelete()),
 	};
 }

@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import { useContextMenu } from '@/shared/hooks/useContextMenu';
 import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Artwork } from '@/shared/components/media/Artwork';
@@ -36,6 +37,7 @@ export function QueueItemRow({
 	const styles = React.useMemo(() => createRowStyles(theme, separator), [theme, separator]);
 	const swipeableRef = React.useRef<Swipeable>(null);
 	const { track } = item;
+	const contextMenu = useContextMenu(onShowActions ? () => onShowActions(item) : undefined);
 
 	const handleRemove = async () => {
 		const removed = await onRemove(item.id);
@@ -61,7 +63,10 @@ export function QueueItemRow({
 			overshootRight={false}
 			friction={2}
 		>
-			<View style={[styles.row, isCurrent && styles.rowCurrent, isDragActive && styles.rowActive]}>
+			<View
+				{...contextMenu}
+				style={[styles.row, isCurrent && styles.rowCurrent, isDragActive && styles.rowActive]}
+			>
 				{/* The row's buttons sit beside its pressable area, never in it: the web nests no <button>. */}
 				<Pressable
 					onPress={() => onPlay(item.id)}

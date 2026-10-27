@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
+import { useContextMenuDismiss } from '@/shared/hooks/useContextMenu';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { Theme } from '@/shared/theme/types';
 import { menuPlacement, type MenuAnchor } from '@/shared/utils/menuPlacement';
@@ -17,9 +18,10 @@ interface AnchoredMenuProps {
 export function AnchoredMenu({ anchor, onClose, children }: AnchoredMenuProps) {
 	const { styles } = useThemedStyles(createStyles);
 	const placement = menuPlacement(anchor, useWindowDimensions(), MENU_WIDTH);
+	const contextMenu = useContextMenuDismiss(onClose);
 
 	return (
-		<View style={StyleSheet.absoluteFill}>
+		<View style={StyleSheet.absoluteFill} {...contextMenu}>
 			<Pressable
 				style={StyleSheet.absoluteFill}
 				onPress={onClose}

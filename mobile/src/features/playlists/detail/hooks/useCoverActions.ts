@@ -9,7 +9,8 @@ import { prepareSquareImage } from '@/shared/utils/squareImage';
 import { showError, showSuccess } from '@/shared/utils/toast';
 import * as playlistApi from '@/features/playlists/services/playlistApi';
 import { patchPlaylist } from '@/features/playlists/utils/playlistCache';
-import type { DetailNavigation } from './usePlaylistDetailScreen';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { PlaylistStackParamList } from '@/features/playlists/types';
 
 const PERMISSION_DENIED =
 	"Autorisez l'accès à vos photos dans les réglages pour choisir une cover.";
@@ -24,7 +25,7 @@ interface CoverActions {
 
 /** Only the owner can change the cover: the plan is fetched for them alone. */
 export function useCoverActions(
-	navigation: DetailNavigation,
+	navigation: Pick<NativeStackNavigationProp<PlaylistStackParamList>, 'getParent'>,
 	playlistId: string,
 	isOwner: boolean
 ): CoverActions {

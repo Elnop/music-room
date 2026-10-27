@@ -4,6 +4,7 @@ import { Pressable } from '@/shared/components/ui/Pressable';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
+import { useContextMenu } from '@/shared/hooks/useContextMenu';
 import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import { QueueSwipe } from './QueueSwipe';
 import { TrackActionsButton } from './TrackActionsButton';
@@ -58,6 +59,7 @@ export function SwipeableTrackItem({
 	const actions = unavailable ? undefined : onShowActions;
 	const { isWide } = useBreakpoint();
 	const dragStart = !disabled ? onDragStart : undefined;
+	const contextMenu = useContextMenu(actions);
 
 	const renderRightActions = () => (
 		<Pressable
@@ -89,6 +91,7 @@ export function SwipeableTrackItem({
 				/>
 			) : (
 				<View
+					{...contextMenu}
 					style={[
 						styles.trackContainer,
 						isCurrent && styles.trackContainerCurrent,

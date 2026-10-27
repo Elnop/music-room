@@ -3,6 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { useContextMenu } from '@/shared/hooks/useContextMenu';
 import { QueueSwipe } from '@/shared/components/lists/QueueSwipe';
 import { Artwork } from '@/shared/components/media/Artwork';
 import { PreviewBadge } from '@/shared/components/media/PreviewBadge';
@@ -30,9 +31,10 @@ export const AddableTrackRow = React.memo(function AddableTrackRow({
 	onShowActions,
 }: AddableTrackRowProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
+	const contextMenu = useContextMenu(() => onShowActions(track));
 
 	return (
-		<View style={styles.trackRow}>
+		<View style={styles.trackRow} {...contextMenu}>
 			<QueueSwipe onAddToQueue={() => onAddToQueue(track)}>
 				<Pressable
 					style={styles.trackItem}
