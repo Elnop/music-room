@@ -4,6 +4,7 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { Text } from '@/shared/components/ui/Text';
 import { sizedAvatarUri } from '@/shared/utils/avatarUri';
+import { avatarColor, avatarInitials } from '@/shared/utils/avatarInitials';
 import { AvatarPhoto } from './AvatarPhoto';
 
 interface AvatarProps {
@@ -29,21 +30,10 @@ export function Avatar({ uri, size = 'md', name, style }: AvatarProps) {
 	const [loaded, setLoaded] = React.useState<string | null>(null);
 	const [failed, setFailed] = React.useState<string | null>(null);
 	const photo = source && failed !== source ? source : undefined;
-	const fontSize = {
-		sm: theme.typography.sizes.xs,
-		md: theme.typography.sizes.md,
-		lg: theme.typography.sizes.xl,
-		xl: theme.typography.sizes.xxxl,
-	}[size];
-
-	const getInitials = (name?: string): string => {
-		if (!name) return '?';
-		const parts = name.trim().split(' ');
-		if (parts.length >= 2) {
-			return (parts[0][0] + parts[1][0]).toUpperCase();
-		}
-		return name.substring(0, 2).toUpperCase();
-	};
+	const initials = avatarInitials(name);
+	// Initials fill about 40% of the circle, the usual ratio for letter avatars.
+	const fontSize = Math.round(dimension * (initials.length > 1 ? 0.38 : 0.44));
+	const background = name?.trim() ? { backgroundColor: avatarColor(name.trim()) } : undefined;
 
 	return (
 		<View
@@ -54,11 +44,12 @@ export function Avatar({ uri, size = 'md', name, style }: AvatarProps) {
 					height: dimension,
 					borderRadius: dimension / 2,
 				},
+				background,
 				style,
 			]}
 		>
 			{/* The initials stay until the photo has loaded, and come back when it cannot. */}
-			{loaded !== photo && <Text style={[styles.initials, { fontSize }]}>{getInitials(name)}</Text>}
+			{loaded !== photo && <Text style={[styles.initials, { fontSize }]}>{initials}</Text>}
 			{photo && (
 				<AvatarPhoto
 					uri={photo}
@@ -82,7 +73,7 @@ const createStyles = (theme: Theme) =>
 			borderColor: theme.colors.border,
 		},
 		initials: {
-			color: theme.colors.text,
-			fontFamily: theme.typography.families.bold,
+			color: theme.colors.onColor,
+			fontFamily: theme.typography.families.semibold,
 		},
 	});

@@ -14,9 +14,9 @@ describe('Avatar', () => {
 		expect(screen.getByText('JD')).toBeTruthy();
 	});
 
-	it('shows the first two letters upper-cased for a single word', () => {
+	it('shows one upper-cased letter for a single word', () => {
 		render(<Avatar name="alice" />);
-		expect(screen.getByText('AL')).toBeTruthy();
+		expect(screen.getByText('A')).toBeTruthy();
 	});
 
 	it('shows a question mark without a name', () => {
