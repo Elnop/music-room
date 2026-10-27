@@ -23,7 +23,6 @@ jest.mock('@/shared/utils/openExternalUrl', () => ({ openExternalUrl: jest.fn() 
 
 let mockLandingShown = false;
 jest.mock('@/shared/constants/platform', () => ({
-	BACKEND_URL_EDITABLE: true,
 	get LANDING_SHOWN() {
 		return mockLandingShown;
 	},

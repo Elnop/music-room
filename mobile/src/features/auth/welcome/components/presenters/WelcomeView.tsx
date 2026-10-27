@@ -14,7 +14,7 @@ import { Button } from '@/shared/components/ui/Button';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { BackendUrlField } from '@/shared/components/form/BackendUrlField';
 import { CONTENT_MAX_WIDTH } from '@/shared/constants/layout';
-import { BACKEND_URL_EDITABLE, LANDING_SHOWN } from '@/shared/constants/platform';
+import { LANDING_SHOWN } from '@/shared/constants/platform';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import type { FloatingIconMotion } from '@/features/auth/welcome/hooks/useFloatingIcons';
@@ -71,28 +71,26 @@ export function WelcomeView({
 						<View style={styles.buttonContainer}>
 							<Button title="Commencer" onPress={onStart} variant="primary" fullWidth />
 							<Button title="Se connecter" onPress={onLogin} variant="outline" fullWidth />
-							{BACKEND_URL_EDITABLE && (
-								<>
-									<Pressable
-										onPress={onToggleServer}
-										accessibilityLabel="Serveur"
-										accessibilityState={{ expanded: showServer }}
-										hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-										style={styles.serverToggle}
-									>
-										<Ionicons
-											name="settings-outline"
-											size={20}
-											color={showServer ? theme.colors.primary : theme.colors.textSecondary}
-										/>
-									</Pressable>
-									{showServer && (
-										<View style={styles.serverPanel}>
-											<BackendUrlField />
-										</View>
-									)}
-								</>
-							)}
+							<>
+								<Pressable
+									onPress={onToggleServer}
+									accessibilityLabel="Serveur"
+									accessibilityState={{ expanded: showServer }}
+									hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+									style={styles.serverToggle}
+								>
+									<Ionicons
+										name="settings-outline"
+										size={20}
+										color={showServer ? theme.colors.primary : theme.colors.textSecondary}
+									/>
+								</Pressable>
+								{showServer && (
+									<View style={styles.serverPanel}>
+										<BackendUrlField />
+									</View>
+								)}
+							</>
 						</View>
 					</View>
 

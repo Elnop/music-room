@@ -13,7 +13,6 @@ describe('platform features', () => {
 	it('keeps every native feature on Android', () => {
 		expect(loadFor('android')).toEqual({
 			BEACON_BROADCAST_AVAILABLE: true,
-			BACKEND_URL_EDITABLE: true,
 			THIS_DEVICE_LABEL: 'Ce téléphone',
 			LANDING_SHOWN: false,
 		});
@@ -22,7 +21,6 @@ describe('platform features', () => {
 	it('hides what the browser cannot do', () => {
 		expect(loadFor('web')).toEqual({
 			BEACON_BROADCAST_AVAILABLE: false,
-			BACKEND_URL_EDITABLE: false,
 			THIS_DEVICE_LABEL: 'Ce navigateur',
 			LANDING_SHOWN: true,
 		});
