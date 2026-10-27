@@ -5,8 +5,7 @@ import {
 	clearPendingLink,
 	createLinking,
 	openPendingLink,
-	sharePathFromState,
-	stateFromSharePath,
+	stateFromLinkPath,
 	takePendingLink,
 } from './linking';
 import { playlistLink, userLink } from '@/shared/utils/shareLinks';
@@ -33,9 +32,9 @@ describe('share link builders', () => {
 	});
 });
 
-describe('stateFromSharePath', () => {
+describe('stateFromLinkPath outside a browser', () => {
 	it('opens the playlist detail above the playlists list', () => {
-		const state = stateFromSharePath(`playlist/${ID}`);
+		const state = stateFromLinkPath(`playlist/${ID}`);
 		expect(state?.routes[0]).toMatchObject({
 			name: 'PlaylistsTab',
 			state: {
@@ -45,7 +44,7 @@ describe('stateFromSharePath', () => {
 	});
 
 	it('opens a user profile in the friends tab', () => {
-		const state = stateFromSharePath(`user/${ID}`);
+		const state = stateFromLinkPath(`user/${ID}`);
 		expect(state?.routes[0]).toMatchObject({
 			name: 'FriendsTab',
 			state: {
@@ -61,8 +60,11 @@ describe('stateFromSharePath', () => {
 		'auth/callback?code=x',
 		'',
 		'user/',
+		'login',
+		'profile/settings',
+		`playlist/${ID}/edit`,
 	])('ignores %j', path => {
-		expect(stateFromSharePath(path)).toBeUndefined();
+		expect(stateFromLinkPath(path)).toBeUndefined();
 	});
 });
 
@@ -118,10 +120,44 @@ describe('createLinking in a browser', () => {
 		expect(state?.routes[0].name).toBe('PlaylistsTab');
 	});
 
+	it.each([
+		['/settings', 'ProfileTab'],
+		[`/event/${ID}`, 'HomeTab'],
+		['/friends', 'FriendsTab'],
+	])('opens the %s screen when signed in', (path, tab) => {
+		const linking = createLinking(() => true);
+		expect(linking.getStateFromPath!(path, linking.config as Options)?.routes[0].name).toBe(tab);
+	});
+
+	it.each(['/login', '/welcome', '/nowhere', `/playlist/${ID}/extra`])(
+		'opens the home for %s when signed in',
+		path => {
+			const linking = createLinking(() => true);
+			expect(linking.getStateFromPath!(path, linking.config as Options)).toBeUndefined();
+			expect(takePendingLink()).toBeNull();
+		}
+	);
+
+	it('opens a signed-out screen when signed out', () => {
+		const linking = createLinking(() => false);
+		const state = linking.getStateFromPath!('/register', linking.config as Options);
+		expect(state?.routes.map(route => route.name)).toEqual(['Welcome', 'Register']);
+	});
+
+	it('keeps an app screen opened signed out, but not the home', () => {
+		const linking = createLinking(() => false);
+		expect(
+			linking.getStateFromPath!('/profile/devices', linking.config as Options)
+		).toBeUndefined();
+		expect(takePendingLink()).toBe('/profile/devices');
+		linking.getStateFromPath!('/', linking.config as Options);
+		expect(takePendingLink()).toBeNull();
+	});
+
 	it('writes the share path in the address bar', () => {
 		const linking = createLinking(() => true);
-		const state = stateFromSharePath(`playlist/${ID}`)!;
-		expect(linking.getPathFromState!(state, linking.config)).toBe(sharePathFromState(state));
+		const state = stateFromLinkPath(`playlist/${ID}`)!;
+		expect(linking.getPathFromState!(state, linking.config)).toBe(`/playlist/${ID}`);
 	});
 
 	describe('under a base path', () => {
@@ -158,40 +194,12 @@ describe('createLinking in a browser', () => {
 
 		it('writes the address under the base path', () => {
 			const linking = createLinking(() => true);
-			const state = stateFromSharePath(`user/${ID}`)!;
+			const state = stateFromLinkPath(`user/${ID}`)!;
 			expect(linking.getPathFromState!(state, linking.config)).toBe(`/music-room/app/user/${ID}`);
 			expect(linking.getPathFromState!({ routes: [{ name: 'Login' }] }, linking.config)).toBe(
-				'/music-room/app/'
+				'/music-room/app/login'
 			);
 		});
-	});
-});
-
-describe('sharePathFromState', () => {
-	const tab = (name: string, routes: { name: string; params?: object }[]) => ({
-		index: 0,
-		routes: [{ name, state: { index: routes.length - 1, routes } }],
-	});
-
-	it('is the playlist share path from any tab', () => {
-		const state = tab('HomeTab', [
-			{ name: 'Home' },
-			{ name: 'PlaylistDetail', params: { id: ID } },
-		]);
-		expect(sharePathFromState(state)).toBe(`/playlist/${ID}`);
-	});
-
-	it('is the profile share path', () => {
-		const state = tab('FriendsTab', [
-			{ name: 'Friends' },
-			{ name: 'UserProfile', params: { userId: ID } },
-		]);
-		expect(sharePathFromState(state)).toBe(`/user/${ID}`);
-	});
-
-	it('is the root for any other screen', () => {
-		expect(sharePathFromState(tab('ProfileTab', [{ name: 'Profile' }]))).toBe('/');
-		expect(sharePathFromState({ routes: [{ name: 'Login' }] })).toBe('/');
 	});
 });
 
@@ -212,8 +220,9 @@ describe('openPendingLink', () => {
 				payload: expect.objectContaining({
 					name: 'PlaylistsTab',
 					params: expect.objectContaining({
-						screen: 'PlaylistDetail',
-						params: { id: ID },
+						state: expect.objectContaining({
+							routes: [{ name: 'Playlists' }, { name: 'PlaylistDetail', params: { id: ID } }],
+						}),
 					}),
 				}),
 			})
