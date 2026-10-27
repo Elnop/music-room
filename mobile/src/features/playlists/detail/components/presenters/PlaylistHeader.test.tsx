@@ -34,7 +34,7 @@ const playlist = {
 } as unknown as PlaylistWithTracks;
 
 describe('PlaylistHeader', () => {
-	it('shares the zumik:// link of the playlist', async () => {
+	it('shares the https link of the playlist', async () => {
 		const share = jest.spyOn(Share, 'share').mockResolvedValue({ action: Share.sharedAction });
 		render(
 			<PlaylistHeader
@@ -49,7 +49,7 @@ describe('PlaylistHeader', () => {
 
 		await waitFor(() =>
 			expect(share).toHaveBeenCalledWith({
-				message: `Chill\nzumik://playlist/${ID}`,
+				message: `Chill\nhttps://elnop.github.io/music-room/playlist/${ID}`,
 				title: 'Chill',
 			})
 		);
