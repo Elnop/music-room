@@ -4,6 +4,7 @@ import type {
 	FriendPlaylistSummary,
 	FriendProfile,
 	MyStats,
+	ProfileRecommendations,
 	UserProfile,
 	FilteredProfile,
 } from '@/features/friends/types';
@@ -42,6 +43,10 @@ export const friendsApi = {
 	searchUsers(query: string, limit = 20): Promise<UserProfile[]> {
 		const params = new URLSearchParams({ q: query, limit: limit.toString() });
 		return apiRequest<UserProfile[]>(`/api/profile/search?${params.toString()}`);
+	},
+
+	getRecommendations(limit = 10): Promise<ProfileRecommendations> {
+		return apiRequest<ProfileRecommendations>(`/api/profile/recommendations?limit=${limit}`);
 	},
 
 	getProfile(userId: string): Promise<FilteredProfile> {

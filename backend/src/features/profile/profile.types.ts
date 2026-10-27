@@ -7,6 +7,8 @@ import type {
 	ownProfileSchema,
 	privacySettingsSchema,
 	publicProfileSchema,
+	recommendationsSchema,
+	recommendedProfileSchema,
 } from '@/features/profile/profile-responses.validators.js';
 
 export type VisibilityLevel = Enums<'visibility_level'>;
@@ -25,3 +27,7 @@ export type ProfilePrivacy = z.infer<typeof privacySettingsSchema>;
 export type MusicPreferences = z.infer<typeof musicPreferencesSchema>;
 
 export type AvatarResponse = z.infer<typeof avatarResponseSchema>;
+
+export type RecommendedProfile = z.infer<typeof recommendedProfileSchema>;
+
+export type ProfileRecommendations = z.infer<typeof recommendationsSchema>;

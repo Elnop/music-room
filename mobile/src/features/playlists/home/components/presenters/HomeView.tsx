@@ -19,10 +19,11 @@ const countAll = (screen: HomeScreen) =>
 interface HomeViewProps {
 	screen: HomeScreen;
 	nearbyEvents?: React.ReactNode;
+	similarProfiles?: React.ReactNode;
 	actionsFor?: (playlist: Playlist) => (() => void) | undefined;
 }
 
-export function HomeView({ screen, nearbyEvents, actionsFor }: HomeViewProps) {
+export function HomeView({ screen, nearbyEvents, similarProfiles, actionsFor }: HomeViewProps) {
 	const { styles } = useThemedStyles(createListStyles);
 	const { isWide } = useBreakpoint();
 
@@ -73,6 +74,12 @@ export function HomeView({ screen, nearbyEvents, actionsFor }: HomeViewProps) {
 						/>
 					))}
 			</View>
+			{similarProfiles && (
+				<>
+					<View style={styles.sectionSpacer} />
+					<View style={styles.section}>{similarProfiles}</View>
+				</>
+			)}
 			{nearbyEvents && (
 				<>
 					<View style={styles.sectionSpacer} />

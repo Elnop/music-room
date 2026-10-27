@@ -50,6 +50,16 @@ No new environment variable, in the backend or the app. Each origin the web app 
 - **Music preferences**: up to 5 genres (`/api/profile/music-preferences`).
 - **Friends** are mutual follows (`/api/friends`). Profile search escapes its query, so it always matches literally (#236).
 
+## Similar tastes
+
+**Accueil** suggests profiles with similar music tastes, so a user meets people to build playlists with beyond their friends (#591). `GET /api/profile/recommendations?limit=` calls the SQL function `recommend_similar_profiles` (migration 033):
+
+- **Candidates**: the other users who share at least one genre with the caller, are not followed by the caller yet, and whose music preferences are **public**. A friends-only or private choice is never used, since a suggestion would reveal it; a profile without a privacy row counts as public, as everywhere else.
+- **Order**: Jaccard similarity of the two genre sets (shared genres over all the genres of both), then the number of shared genres.
+- **Response**: `hasPreferences` (false when the caller chose no genre, with an empty list) and `profiles` (`id`, `username`, `displayName`, `avatarUrl` under the avatar's privacy, `commonGenres`, `score`).
+
+In the app, the section « Profils aux goûts proches » (`features/friends/similarProfiles/`) is a carousel: a card opens the profile in the Friends tab, **Suivre** follows it and the list refreshes without it. Without genres, the section leads to **Préférences musicales**. Like the events section, it comes from another feature, so `navigation/screens/HomeScreen.tsx` passes it to the playlists' home.
+
 ## Anti-abuse
 
 Login, sign-up, OAuth and every auth route are rate-limited in Redis, with account lockout and an IP blacklist; verification and reset codes have attempt limits; invalid tokens are counted per IP (#160). Thresholds and accepted risks: [threat-model.md](../security/threat-model.md#m1-password-bruteforce). Without Redis these limiters fail closed (503).

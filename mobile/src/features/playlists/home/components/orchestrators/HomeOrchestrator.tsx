@@ -9,14 +9,25 @@ import { PlaylistCardMenu } from '@/features/playlists/cardMenu/components/orche
 type HomeOrchestratorProps = NativeStackScreenProps<PlaylistStackParamList, 'Home'> & {
 	/** The nearby events section, from another feature: the navigation layer passes it in. */
 	nearbyEvents?: React.ReactNode;
+	/** The similar tastes profiles section, from the friends feature. */
+	similarProfiles?: React.ReactNode;
 };
 
-export function HomeOrchestrator({ navigation, nearbyEvents }: HomeOrchestratorProps) {
+export function HomeOrchestrator({
+	navigation,
+	nearbyEvents,
+	similarProfiles,
+}: HomeOrchestratorProps) {
 	const screen = useHomeScreen(navigation);
 	const menu = usePlaylistCardMenu(navigation);
 	return (
 		<>
-			<HomeView screen={screen} nearbyEvents={nearbyEvents} actionsFor={menu.actionsFor} />
+			<HomeView
+				screen={screen}
+				nearbyEvents={nearbyEvents}
+				similarProfiles={similarProfiles}
+				actionsFor={menu.actionsFor}
+			/>
 			<PlaylistCardMenu menu={menu} />
 		</>
 	);
