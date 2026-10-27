@@ -30,15 +30,15 @@ export function clearPendingLink(): void {
 }
 
 /** The screen of a path this platform opens: any screen in a browser, a share link elsewhere. */
-function matchLink(path: string): ScreenPathMatch | undefined {
-	const match = matchScreenPath(path);
+function matchLink(path: string, signedIn?: boolean): ScreenPathMatch | undefined {
+	const match = matchScreenPath(path, signedIn);
 	if (!match || (Platform.OS !== 'web' && !match.entry.shared)) return undefined;
 	return match;
 }
 
-/** The navigation state of a link path, or undefined when this platform does not open it. */
+/** The navigation state of a link path once signed in, or undefined when this platform does not open it. */
 export function stateFromLinkPath(path: string) {
-	const match = matchLink(path);
+	const match = matchLink(path, true);
 	return match && stateFromMatch(match);
 }
 
@@ -60,10 +60,11 @@ export function createLinking(isSignedIn: () => boolean): LinkingOptions<AppTabs
 		// The browser hands over its full path, base path included
 		getStateFromPath: fullPath => {
 			const path = stripBasePath(fullPath);
-			const match = matchLink(path);
+			const signedIn = isSignedIn();
+			const match = matchLink(path, signedIn);
 			if (!match) return undefined;
 			const signedOutScreen = !match.entry.tab;
-			if (isSignedIn() === signedOutScreen) {
+			if (signedIn === signedOutScreen) {
 				// The home screen is where sign-in lands anyway
 				if (!signedOutScreen && match.entry.path !== '') pendingPath = path;
 				return undefined;

@@ -100,7 +100,7 @@ Details: [web-client.md](../features/web-client.md); the choice of Expo web over
 
 | Subject | Where |
 | --- | --- |
-| Service available on another platform | The same `mobile/` app built for the browser with Expo web (`react-native-web`); each native module has a `.web.ts` variant (`mobile/src/**/*.web.ts`). Static build `npx expo export -p web`, published on GitHub Pages (`https://elnop.github.io/music-room/app/`, `.github/workflows/pages.yml`) |
+| Service available on another platform | The same `mobile/` app built for the browser with Expo web (`react-native-web`); each native module has a `.web.ts` variant (`mobile/src/**/*.web.ts`). Static build `npx expo export -p web`, published on GitHub Pages (`https://elnop.github.io/music-room/`, `.github/workflows/pages.yml`) |
 | Responsive web client (phone, tablet, desktop) | `shared/hooks/useBreakpoint.ts`: phone < 768 px (the Android layout), tablet, desktop ≥ 1024 px; side navigation, centred content, grids, docked player, centred dialogs, mouse and keyboard (`shared/components/layout/`, `navigation/screenLayout.tsx`) |
 | Same service in the browser | Playlist Editor in real time, Music Control Delegation with the browser as a device (HLS player with hls.js, Media Session), Google and Facebook sign-in (GIS, Facebook JavaScript SDK), events by browser geolocation; the backend is unchanged except `GET /api/events/geocode`, and the browser sends the IV.6 headers (`X-Platform: web`) |
 

@@ -37,7 +37,7 @@ semgrep and gitleaks run from Docker images, so Docker must be running. Details:
   - `lint`, `type-check`, `test` and `check` for both projects;
   - `test-int`: the integration tests, on a full VM that starts the local Supabase stack and Redis (`scripts/test-db.sh`). Docker images are cached between runs (#327).
 - **Release** (`.github/workflows/release-apk.yml`): on every push to `main`, builds the release APK and publishes a GitHub Release.
-- **Pages** (`.github/workflows/pages.yml`): on a push to `main` touching `site/` or `mobile/`, publishes `site/` at `https://elnop.github.io/music-room/` and the web build of `mobile/` under `app/` in the same deployment.
+- **Pages** (`.github/workflows/pages.yml`): on a push to `main` touching `site/` or `mobile/`, publishes the web build of `mobile/` at `https://elnop.github.io/music-room/`, with the static pages of `site/` (`privacy.html`, `404.html`) at the same root; the job fails when a file is in both.
 
 ## Tests
 
