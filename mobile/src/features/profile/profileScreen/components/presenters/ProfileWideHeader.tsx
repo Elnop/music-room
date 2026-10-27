@@ -78,8 +78,8 @@ const createStyles = (theme: Theme) =>
 			alignItems: 'center',
 			gap: theme.spacing.lg,
 			paddingHorizontal: theme.spacing.lg,
-			paddingTop: theme.spacing.md,
-			paddingBottom: theme.spacing.md,
+			paddingTop: theme.spacing.xl,
+			paddingBottom: theme.spacing.lg,
 		},
 		details: { flex: 1, minWidth: 0 },
 		kind: {

@@ -12,16 +12,23 @@ interface ProfileSectionProps {
 		label: string;
 		onPress: () => void;
 	};
+	/** Wide screens: a larger title, read as the heading of the page's section. */
+	prominent?: boolean;
 }
 
-export function ProfileSection({ title, children, rightAction }: ProfileSectionProps) {
+export function ProfileSection({
+	title,
+	children,
+	rightAction,
+	prominent = false,
+}: ProfileSectionProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
 	return (
 		<View style={styles.container}>
 			<View style={styles.header}>
-				<Text style={styles.title}>{title}</Text>
+				<Text style={prominent ? styles.prominentTitle : styles.title}>{title}</Text>
 				{rightAction && (
 					<Pressable onPress={rightAction.onPress} accessibilityLabel={rightAction.label}>
 						<Text style={styles.action}>{rightAction.label}</Text>
@@ -56,6 +63,11 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.textSecondary,
 			textTransform: 'uppercase',
 			letterSpacing: 0.5,
+		},
+		prominentTitle: {
+			fontSize: theme.typography.sizes.lg,
+			fontFamily: theme.typography.families.bold,
+			color: theme.colors.text,
 		},
 		action: {
 			fontSize: 14,

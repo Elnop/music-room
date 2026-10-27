@@ -11,7 +11,7 @@ export const SCREEN_WIDTHS: Record<string, ContentWidth> = {
 	PlaylistSharing: 'content',
 	EventDetail: 'content',
 	UserProfile: 'content',
-	Profile: 'content',
+	Profile: 'form',
 	MyDevices: 'content',
 	CreatePlaylist: 'form',
 	EventForm: 'form',

@@ -62,9 +62,9 @@ export function ProfileView({
 	}
 
 	const preferences = (
-		<ProfilePreferencesSection genres={genres} onModify={onMusicPreferences} compact={isWide} />
+		<ProfilePreferencesSection genres={genres} onModify={onMusicPreferences} prominent={isWide} />
 	);
-	const info = <ProfileInfoSection user={user} />;
+	const info = <ProfileInfoSection user={user} prominent={isWide} />;
 	const menu = (
 		<ProfileMenuItems
 			wide={isWide}
@@ -97,13 +97,10 @@ export function ProfileView({
 							onEditProfile={onEditProfile}
 							onSettings={onSettings}
 						/>
-						<View style={styles.columns}>
-							<View style={styles.cardsColumn}>
-								{preferences}
-								{info}
-							</View>
-							<View style={styles.column}>{menu}</View>
-						</View>
+						<View style={styles.wideSection}>{preferences}</View>
+						<View style={styles.wideSection}>{info}</View>
+						<Text style={styles.wideHeading}>Compte</Text>
+						{menu}
 						<Text style={styles.buildLabel}>{buildLabel}</Text>
 					</View>
 				) : (
@@ -132,13 +129,14 @@ const createStyles = (theme: Theme) =>
 		contentContainer: {
 			paddingBottom: theme.spacing.xl,
 		},
-		columns: {
-			flexDirection: 'row',
-			alignItems: 'flex-start',
+		wideSection: { marginTop: theme.spacing.md },
+		wideHeading: {
+			fontSize: theme.typography.sizes.lg,
+			fontFamily: theme.typography.families.bold,
+			color: theme.colors.text,
+			marginHorizontal: theme.spacing.lg,
+			marginTop: theme.spacing.lg,
 		},
-		column: { flex: 1, minWidth: 0 },
-		// The menu items open with their own top margin: the cards beside them start level with them.
-		cardsColumn: { flex: 1, minWidth: 0, paddingTop: theme.spacing.md },
 		buildLabel: {
 			fontSize: 12,
 			color: theme.colors.textSecondary,

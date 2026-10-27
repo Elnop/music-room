@@ -8,7 +8,7 @@ import type { Theme } from '@/shared/theme/types';
 import { Text } from '@/shared/components/ui/Text';
 
 interface ProfileMenuItemsProps {
-	/** Wide screens: a discreet logout, and the screen's build label is the only version shown. */
+	/** Wide screens: a logout without the full-width outline, and the build label is the only version shown. */
 	wide?: boolean;
 	isLoading: boolean;
 	onPrivacySettings: () => void;
@@ -35,7 +35,6 @@ export function ProfileMenuItems({
 				subtitle="Gérez qui peut voir vos informations"
 				icon="lock-closed"
 				onPress={onPrivacySettings}
-				compact={wide}
 			/>
 
 			<ProfileNavigationItem
@@ -43,7 +42,6 @@ export function ProfileMenuItems({
 				subtitle="Ajoutez ou retirez la connexion Google et Facebook"
 				icon="link"
 				onPress={onLinkedAccounts}
-				compact={wide}
 			/>
 
 			<ProfileNavigationItem
@@ -51,7 +49,6 @@ export function ProfileMenuItems({
 				subtitle="Choisissez quels amis contrôlent chaque appareil"
 				icon="phone-portrait-outline"
 				onPress={onMyDevices}
-				compact={wide}
 			/>
 
 			<View style={wide ? styles.discreetLogoutSection : styles.logoutSection}>
@@ -79,7 +76,7 @@ const createStyles = (theme: Theme) =>
 		},
 		discreetLogoutSection: {
 			paddingHorizontal: theme.spacing.lg,
-			marginTop: theme.spacing.sm,
+			marginTop: theme.spacing.xl,
 		},
 		logoutButton: {
 			flexDirection: 'row',
