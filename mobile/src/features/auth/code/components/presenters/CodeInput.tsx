@@ -2,6 +2,8 @@ import React from 'react';
 import { View, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
 import { CODE_INPUT_MAX_LENGTH } from '@/features/auth/utils/codeDigits';
 import { TextInput } from '@/shared/components/ui/TextInput';
+import { useTheme } from '@/shared/theme/ThemeContext';
+import { focusedFieldStyle } from '@/shared/theme/fieldFocus';
 
 interface CodeInputProps {
 	digits: string[];
@@ -25,6 +27,8 @@ export function CodeInput({
 	autoFocus,
 	editable,
 }: CodeInputProps) {
+	const { theme } = useTheme();
+	const focusedStyle = focusedFieldStyle(theme.colors.primary);
 	return (
 		<View style={containerStyle}>
 			{digits.map((digit, index) => (
@@ -32,6 +36,7 @@ export function CodeInput({
 					key={index}
 					ref={setBoxRef(index)}
 					style={boxStyle(digit !== '')}
+					focusedStyle={focusedStyle}
 					value={digit}
 					onChangeText={text => onChangeDigit(index, text)}
 					onKeyPress={({ nativeEvent: { key } }) => onKeyPress(index, key)}
