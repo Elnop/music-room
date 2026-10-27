@@ -34,7 +34,7 @@ describe('Button', () => {
 
 	it('shrinks to a header row when compact', () => {
 		render(<Button title="Créer" size="compact" onPress={jest.fn()} />);
-		expect(screen.getByRole('button', { name: 'Créer' })).toHaveStyle({ height: 36 });
+		expect(screen.getByRole('button', { name: 'Créer' })).toHaveStyle({ height: 28 });
 	});
 
 	it('does not call onPress when disabled', () => {
