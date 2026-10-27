@@ -3,6 +3,8 @@ import { View, ActivityIndicator, StyleSheet, type StyleProp, type ViewStyle } f
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
+import { focusedFieldStyle } from '@/shared/theme/fieldFocus';
+import { useFieldFocus } from '@/shared/hooks/useFieldFocus';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { TextInput } from '@/shared/components/ui/TextInput';
 
@@ -30,9 +32,10 @@ export function SearchBar({
 }: SearchBarProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
+	const { focused, focusProps } = useFieldFocus();
 
 	return (
-		<View style={[styles.container, style]}>
+		<View style={[styles.container, style, focused && focusedFieldStyle(theme.colors.primary)]}>
 			<Ionicons
 				name="search"
 				size={20}
@@ -51,6 +54,7 @@ export function SearchBar({
 				autoCapitalize="none"
 				autoCorrect={false}
 				returnKeyType="search"
+				{...focusProps}
 			/>
 			{loading && (
 				<ActivityIndicator
@@ -64,7 +68,7 @@ export function SearchBar({
 				<Pressable
 					onPress={() => onChangeText('')}
 					hitSlop={HIT_SLOP}
-					style={styles.trailing}
+					style={[styles.trailing, styles.clear]}
 					accessibilityLabel="Effacer la recherche"
 				>
 					<Ionicons name="close-circle" size={20} color={theme.colors.textSecondary} />
@@ -96,5 +100,8 @@ const createStyles = (theme: Theme) =>
 		},
 		trailing: {
 			marginLeft: theme.spacing.sm,
+		},
+		clear: {
+			borderRadius: 10,
 		},
 	});
