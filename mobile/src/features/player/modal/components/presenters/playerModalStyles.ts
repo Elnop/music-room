@@ -1,5 +1,5 @@
-import { Dimensions, StyleSheet } from 'react-native';
-import { BREAKPOINTS, PLAYER_PANEL_WIDTH } from '@/shared/constants/layout';
+import { Dimensions, Platform, StyleSheet } from 'react-native';
+import { BREAKPOINTS, PLAYER_DIALOG_WIDTH } from '@/shared/constants/layout';
 import type { Theme } from '@/shared/theme/types';
 import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
@@ -8,9 +8,14 @@ export const DISMISS_THRESHOLD = SCREEN_HEIGHT * 0.2;
 /** From one artwork of the carousel to the next: the neighbours' edges peek out on both sides. */
 const ARTWORK_GAP = 16;
 
+/** A tablet browser shows the player as a centred dialog; Android tablets keep the full screen. */
+export function isPlayerDialog(windowWidth: number): boolean {
+	return Platform.OS === 'web' && windowWidth >= BREAKPOINTS.tablet;
+}
+
 /** Capped by the height too, so a short screen still fits the bottom row above the navigation bar. */
 export function artworkSize(windowWidth: number, windowHeight: number) {
-	const playerWidth = windowWidth >= BREAKPOINTS.desktop ? PLAYER_PANEL_WIDTH : windowWidth;
+	const playerWidth = isPlayerDialog(windowWidth) ? PLAYER_DIALOG_WIDTH : windowWidth;
 	const size = Math.min(playerWidth * 0.75, windowHeight * 0.36);
 	return { size, step: size + ARTWORK_GAP };
 }
@@ -20,17 +25,20 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 	StyleSheet.create({
 		container: { flex: 1 },
 		modalContent: { backgroundColor: theme.colors.background },
-		panel: {
-			position: 'absolute',
-			top: 0,
-			right: 0,
-			bottom: 0,
-			width: PLAYER_PANEL_WIDTH,
+		dialogFrame: { alignItems: 'center', justifyContent: 'center' },
+		// Keeps its own height: the full screen's `flex: 1` would give it a basis of 0.
+		dialog: {
+			flexGrow: 0,
+			flexBasis: 'auto',
+			width: PLAYER_DIALOG_WIDTH,
+			height: '90%',
+			maxHeight: 900,
+			borderRadius: 16,
 			overflow: 'hidden',
-			borderLeftWidth: 1,
-			borderLeftColor: theme.colors.borderSubtle,
+			borderWidth: 1,
+			borderColor: theme.colors.borderSubtle,
 		},
-		panelBackdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: theme.colors.backdrop },
+		dialogBackdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: theme.colors.backdrop },
 		header: { paddingTop: insets.top + 8, alignItems: 'center', paddingBottom: 8 },
 		swipeIndicator: { alignItems: 'center', marginBottom: 8 },
 		swipeBar: { width: 40, height: 5, borderRadius: 3, opacity: 0.5 },

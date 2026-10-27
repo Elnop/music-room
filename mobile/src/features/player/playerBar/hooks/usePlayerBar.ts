@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { usePlayerStore } from '@/features/player/stores/playerStore';
+import { useNowPlayingPanelStore } from '@/shared/stores/nowPlayingPanelStore';
 import { useVolumeStore } from '@/features/player/stores/volumeStore';
 import { usePlaybackControls } from '@/features/player/hooks/usePlaybackControls';
 import { useSeekPosition } from '@/features/player/modal/hooks/useSeekPosition';
-import { openPlayerLabel } from '@/features/player/utils/openPlayerLabel';
+import { trackSummary } from '@/features/player/utils/openPlayerLabel';
 
 export function usePlayerBar() {
-	const setModalOpen = usePlayerStore(state => state.setModalOpen);
+	const isPanelOpen = useNowPlayingPanelStore(state => state.isOpen);
+	const togglePanel = useNowPlayingPanelStore(state => state.toggle);
 	const volume = useVolumeStore(state => state.volume);
 	const muted = useVolumeStore(state => state.muted);
 	const setVolume = useVolumeStore(state => state.setVolume);
@@ -17,7 +18,9 @@ export function usePlayerBar() {
 	const [isDevicesOpen, setDevicesOpen] = useState(false);
 
 	const { track, deviceLabel } = nowPlaying;
-	const openLabel = openPlayerLabel(track, deviceLabel);
+	const panelLabel = isPanelOpen
+		? 'Masquer « En cours de lecture »'
+		: 'Afficher « En cours de lecture »';
 
 	return {
 		...controls,
@@ -26,14 +29,17 @@ export function usePlayerBar() {
 		isRemote: nowPlaying.isRemote,
 		isPlaying: nowPlaying.isPlaying,
 		isLoading: nowPlaying.isLoading,
-		openLabel,
+		/** The track's button says what it shows; the bar's own toggle beside the queue says less. */
+		trackLabel: [panelLabel, ...trackSummary(track, deviceLabel)].join(', '),
+		panelLabel,
+		isPanelOpen,
+		onTogglePanel: togglePanel,
 		seek,
 		/** The volume is the local player's: a remote device keeps its own. */
 		volume: muted ? 0 : volume,
 		volumeDisabled: nowPlaying.isRemote,
 		onVolumeChange: setVolume,
 		onToggleMute: toggleMute,
-		onOpenPlayer: () => setModalOpen(true),
 		isQueueOpen,
 		isDevicesOpen,
 		onOpenQueue: () => setQueueOpen(true),

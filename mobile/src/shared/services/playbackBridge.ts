@@ -42,6 +42,8 @@ interface PlaybackBridge {
 	playPlaylist: (playlistId: string, startTrackId?: string) => Promise<string>;
 	next: () => Promise<QueueStepOutcome>;
 	previous: () => Promise<QueueStepOutcome>;
+	/** Plays an item of the active queue, as the queue sheet does. */
+	playItem?: (itemId: string) => Promise<QueueStepOutcome>;
 	playListTrack: (track: SoundCloudTrack) => Promise<void>;
 	playTrack: (track: SoundCloudTrack, queueItemId?: string, startPositionMs?: number) => void;
 	pause: () => void;
@@ -64,6 +66,7 @@ const unregistered: PlaybackBridge = {
 	playPlaylist: unavailable,
 	next: unavailable,
 	previous: unavailable,
+	playItem: unavailable,
 	playListTrack: unavailable,
 	playTrack: () => undefined,
 	pause: () => undefined,
