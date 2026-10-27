@@ -29,6 +29,21 @@ export const filteredProfileSchema = profileBase.extend({
 	isFriend: z.boolean(),
 });
 
+/** avatarUrl follows the profile's privacy settings, as in search. */
+export const recommendedProfileSchema = profileBase
+	.pick({ id: true, username: true, displayName: true, avatarUrl: true })
+	.extend({
+		commonGenres: z.array(musicGenreSchema).min(1),
+		score: z.number().min(0).max(1).meta({ description: 'Jaccard similarity of the genre sets' }),
+	});
+
+export const recommendationsSchema = z.object({
+	hasPreferences: z
+		.boolean()
+		.meta({ description: 'False when the caller has chosen no genre: profiles is then empty' }),
+	profiles: z.array(recommendedProfileSchema),
+});
+
 const visibility = (field: string) =>
 	visibilityLevelSchema.meta({ description: `Who can see your ${field}` });
 

@@ -55,6 +55,7 @@ Details: [control-delegation.md](../features/control-delegation.md), [queue-and-
 ### IV.2.3 Music Playlist Editor
 
 - Real-time multi-user editing: every change is broadcast to the playlist's room (`playlist:updated`).
+- *"Collaborate with your friends or people with the same musical tastes"*: **Accueil** suggests profiles whose public music preferences overlap the user's (`GET /api/profile/recommendations`, [accounts-auth.md](../features/accounts-auth.md#similar-tastes)).
 - Public by default; a private playlist is visible only to its invited users. Editing is open to everyone by default (`edit_mode = open`), or restricted to invited collaborators.
 - The concurrency case the subject names ("several people move different tracks or the same one") is handled: fractional ranks, one Postgres function per operation under a playlist lock, versions; a move based on a stale version of the same track gets `409`, everything else applies.
 

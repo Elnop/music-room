@@ -32,6 +32,10 @@ export const searchUsersSchema = z.object({
 	limit: z.coerce.number().min(1).max(50).default(20),
 });
 
+export const recommendationsQuerySchema = z.object({
+	limit: z.coerce.number().int().min(1).max(20).default(10),
+});
+
 export const updatePrivacySchema = z.object({
 	emailVisibility: visibilityLevelSchema.optional(),
 	bioVisibility: visibilityLevelSchema.optional(),
