@@ -48,4 +48,5 @@ export type AuthStackParamList = {
 	EmailVerification: { userId: string; email: string };
 	ForgotPassword: { email?: string } | undefined;
 	ResetPassword: { email: string };
+	PrivacyPolicy: undefined;
 };

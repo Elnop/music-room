@@ -3,7 +3,8 @@ import { useSettingsScreen } from '@/features/profile/settings/hooks/useSettings
 import { SettingsView } from '@/features/profile/settings/components/presenters/SettingsView';
 
 export function SettingsOrchestrator() {
-	const { theme, bottomPadding, plan, isChangingPlan, handleTogglePremium } = useSettingsScreen();
+	const { theme, bottomPadding, plan, isChangingPlan, handleTogglePremium, openPrivacyPolicy } =
+		useSettingsScreen();
 
 	return (
 		<SettingsView
@@ -12,6 +13,7 @@ export function SettingsOrchestrator() {
 			plan={plan}
 			isChangingPlan={isChangingPlan}
 			onTogglePremium={handleTogglePremium}
+			onOpenPrivacyPolicy={openPrivacyPolicy}
 		/>
 	);
 }

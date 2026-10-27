@@ -2,6 +2,7 @@ import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '@/features/auth/types';
+import { openExternalUrl } from '@/shared/utils/openExternalUrl';
 import { WelcomeOrchestrator } from './WelcomeOrchestrator';
 
 jest.mock('@/shared/theme/ThemeContext', () => {
@@ -18,6 +19,16 @@ jest.mock('@/shared/services/deviceService', () => ({
 	getBuildLabel: () => 'Zumik 1.0.0 (build 42 · a1b2c3d)',
 }));
 
+jest.mock('@/shared/utils/openExternalUrl', () => ({ openExternalUrl: jest.fn() }));
+
+let mockLandingShown = false;
+jest.mock('@/shared/constants/platform', () => ({
+	BACKEND_URL_EDITABLE: true,
+	get LANDING_SHOWN() {
+		return mockLandingShown;
+	},
+}));
+
 type Props = NativeStackScreenProps<AuthStackParamList, 'Welcome'>;
 
 const navigate = jest.fn();
@@ -28,7 +39,10 @@ function renderWelcome() {
 	);
 }
 
-beforeEach(() => navigate.mockReset());
+beforeEach(() => {
+	jest.clearAllMocks();
+	mockLandingShown = false;
+});
 
 describe('WelcomeOrchestrator', () => {
 	it('opens the register and login screens', () => {
@@ -56,5 +70,33 @@ describe('WelcomeOrchestrator', () => {
 
 		fireEvent.press(screen.getByLabelText('Serveur'));
 		expect(screen.queryByText('backend-url-field')).toBeNull();
+	});
+
+	it('opens the privacy policy without the landing on the phone app', () => {
+		renderWelcome();
+		expect(screen.queryByText('Fonctionnalités')).toBeNull();
+
+		fireEvent.press(screen.getByLabelText('Politique de confidentialité'));
+		expect(navigate).toHaveBeenCalledWith('PrivacyPolicy');
+	});
+
+	it('presents the app, its download and its contact on the web', () => {
+		mockLandingShown = true;
+		renderWelcome();
+
+		expect(screen.getByText('Playlist Editor')).toBeTruthy();
+		expect(screen.getByText('Music Control Delegation')).toBeTruthy();
+
+		fireEvent.press(screen.getByLabelText('Télécharger pour Android'));
+		fireEvent.press(screen.getByLabelText('leon.perrotin@gmail.com'));
+		fireEvent.press(screen.getByLabelText('Code source'));
+		expect(jest.mocked(openExternalUrl).mock.calls).toEqual([
+			['https://github.com/Elnop/music-room/releases/latest'],
+			['mailto:leon.perrotin@gmail.com'],
+			['https://github.com/Elnop/music-room'],
+		]);
+
+		fireEvent.press(screen.getByLabelText('Politique de confidentialité'));
+		expect(navigate).toHaveBeenCalledWith('PrivacyPolicy');
 	});
 });

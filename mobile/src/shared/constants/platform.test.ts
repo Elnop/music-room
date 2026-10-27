@@ -15,6 +15,7 @@ describe('platform features', () => {
 			BEACON_BROADCAST_AVAILABLE: true,
 			BACKEND_URL_EDITABLE: true,
 			THIS_DEVICE_LABEL: 'Ce téléphone',
+			LANDING_SHOWN: false,
 		});
 	});
 
@@ -23,6 +24,7 @@ describe('platform features', () => {
 			BEACON_BROADCAST_AVAILABLE: false,
 			BACKEND_URL_EDITABLE: false,
 			THIS_DEVICE_LABEL: 'Ce navigateur',
+			LANDING_SHOWN: true,
 		});
 	});
 });

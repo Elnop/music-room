@@ -1,17 +1,27 @@
 import React from 'react';
-import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import {
+	Image,
+	KeyboardAvoidingView,
+	Platform,
+	ScrollView,
+	StyleSheet,
+	useWindowDimensions,
+	View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '@/shared/components/ui/Button';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { BackendUrlField } from '@/shared/components/form/BackendUrlField';
 import { CONTENT_MAX_WIDTH } from '@/shared/constants/layout';
-import { BACKEND_URL_EDITABLE } from '@/shared/constants/platform';
+import { BACKEND_URL_EDITABLE, LANDING_SHOWN } from '@/shared/constants/platform';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import type { FloatingIconMotion } from '@/features/auth/welcome/hooks/useFloatingIcons';
 import logo from '@/assets/logo/logo.png';
+import { LANDING_INTRO } from '@/features/auth/welcome/utils/landingContent';
 import { FloatingIcon } from './FloatingIcon';
+import { LandingSections } from './LandingSections';
 import { Text } from '@/shared/components/ui/Text';
 
 interface WelcomeViewProps {
@@ -21,6 +31,8 @@ interface WelcomeViewProps {
 	onToggleServer: () => void;
 	onStart: () => void;
 	onLogin: () => void;
+	onOpenPrivacyPolicy: () => void;
+	onOpenLink: (url: string) => void;
 }
 
 export function WelcomeView({
@@ -30,9 +42,14 @@ export function WelcomeView({
 	onToggleServer,
 	onStart,
 	onLogin,
+	onOpenPrivacyPolicy,
+	onOpenLink,
 }: WelcomeViewProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
+	const { height } = useWindowDimensions();
+	// The landing's first title peeks above the fold, so the page reads as scrollable.
+	const heroHeight = LANDING_SHOWN ? height - LANDING_PEEK : undefined;
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -45,43 +62,66 @@ export function WelcomeView({
 				behavior={Platform.OS === 'ios' ? 'padding' : undefined}
 			>
 				<ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-					<View style={styles.header}>
-						<Image source={logo} style={styles.logo} resizeMode="contain" />
+					<View style={[styles.hero, heroHeight !== undefined && { minHeight: heroHeight }]}>
+						<View style={styles.header}>
+							<Image source={logo} style={styles.logo} resizeMode="contain" />
+							{LANDING_SHOWN && <Text style={styles.intro}>{LANDING_INTRO}</Text>}
+						</View>
+
+						<View style={styles.buttonContainer}>
+							<Button title="Commencer" onPress={onStart} variant="primary" fullWidth />
+							<Button title="Se connecter" onPress={onLogin} variant="outline" fullWidth />
+							{BACKEND_URL_EDITABLE && (
+								<>
+									<Pressable
+										onPress={onToggleServer}
+										accessibilityLabel="Serveur"
+										accessibilityState={{ expanded: showServer }}
+										hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+										style={styles.serverToggle}
+									>
+										<Ionicons
+											name="settings-outline"
+											size={20}
+											color={showServer ? theme.colors.primary : theme.colors.textSecondary}
+										/>
+									</Pressable>
+									{showServer && (
+										<View style={styles.serverPanel}>
+											<BackendUrlField />
+										</View>
+									)}
+								</>
+							)}
+						</View>
 					</View>
 
-					<View style={styles.buttonContainer}>
-						<Button title="Commencer" onPress={onStart} variant="primary" fullWidth />
-						<Button title="Se connecter" onPress={onLogin} variant="outline" fullWidth />
-						{BACKEND_URL_EDITABLE && (
-							<>
-								<Pressable
-									onPress={onToggleServer}
-									accessibilityLabel="Serveur"
-									accessibilityState={{ expanded: showServer }}
-									hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-									style={styles.serverToggle}
-								>
-									<Ionicons
-										name="settings-outline"
-										size={20}
-										color={showServer ? theme.colors.primary : theme.colors.textSecondary}
-									/>
-								</Pressable>
-								{showServer && (
-									<View style={styles.serverPanel}>
-										<BackendUrlField />
-									</View>
-								)}
-							</>
-						)}
-					</View>
-
-					<Text style={styles.buildLabel}>{buildLabel}</Text>
+					{LANDING_SHOWN ? (
+						<LandingSections
+							buildLabel={buildLabel}
+							onOpenPrivacyPolicy={onOpenPrivacyPolicy}
+							onOpenLink={onOpenLink}
+						/>
+					) : (
+						<>
+							<Pressable
+								onPress={onOpenPrivacyPolicy}
+								accessibilityRole="link"
+								accessibilityLabel="Politique de confidentialité"
+								style={styles.privacyLink}
+							>
+								<Text style={styles.privacyLinkText}>Politique de confidentialité</Text>
+							</Pressable>
+							<Text style={styles.buildLabel}>{buildLabel}</Text>
+						</>
+					)}
 				</ScrollView>
 			</KeyboardAvoidingView>
 		</SafeAreaView>
 	);
 }
+
+const LANDING_PEEK = 96;
 
 const createStyles = (theme: Theme) =>
 	StyleSheet.create({
@@ -97,6 +137,9 @@ const createStyles = (theme: Theme) =>
 			justifyContent: 'space-between',
 			padding: theme.spacing.lg,
 		},
+		hero: {
+			flex: 1,
+		},
 		header: {
 			flex: 1,
 			justifyContent: 'center',
@@ -105,6 +148,14 @@ const createStyles = (theme: Theme) =>
 		logo: {
 			width: 300,
 			height: 300,
+		},
+		intro: {
+			maxWidth: CONTENT_MAX_WIDTH.form,
+			marginBottom: theme.spacing.xl,
+			fontSize: theme.typography.sizes.lg,
+			lineHeight: 24,
+			color: theme.colors.text,
+			textAlign: 'center',
 		},
 		// As wide as the sign-in form's fields on wide screens.
 		buttonContainer: {
@@ -117,6 +168,15 @@ const createStyles = (theme: Theme) =>
 		serverToggle: {
 			alignSelf: 'center',
 			padding: theme.spacing.xs,
+		},
+		privacyLink: {
+			alignSelf: 'center',
+			marginBottom: theme.spacing.sm,
+		},
+		privacyLinkText: {
+			fontSize: 12,
+			color: theme.colors.textSecondary,
+			textDecorationLine: 'underline',
 		},
 		buildLabel: {
 			fontSize: 12,

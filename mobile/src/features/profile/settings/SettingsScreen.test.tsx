@@ -34,6 +34,12 @@ jest.mock('@/shared/services/subscriptionApi', () => ({
 
 jest.mock('@/shared/utils/toast', () => ({ showError: jest.fn() }));
 
+const mockNavigate = jest.fn();
+jest.mock('@react-navigation/native', () => ({
+	...jest.requireActual('@react-navigation/native'),
+	useNavigation: () => ({ navigate: mockNavigate }),
+}));
+
 const FREE: Subscription = { plan: 'free', premiumFeatures: ['playlist_cover'] };
 const PREMIUM: Subscription = { ...FREE, plan: 'premium' };
 
@@ -98,5 +104,11 @@ describe('SettingsOrchestrator', () => {
 		expect(screen.UNSAFE_getByType(ScrollView).props.contentContainerStyle).toEqual({
 			paddingBottom: originalTheme.spacing.xl,
 		});
+	});
+
+	it('opens the privacy policy', () => {
+		renderSettings();
+		fireEvent.press(screen.getByLabelText('Politique de confidentialité'));
+		expect(mockNavigate).toHaveBeenCalledWith('PrivacyPolicy');
 	});
 });

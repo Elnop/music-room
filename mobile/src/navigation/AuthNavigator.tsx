@@ -8,6 +8,7 @@ import { RegisterOrchestrator } from '@/features/auth/register/components/orches
 import { EmailVerificationOrchestrator } from '@/features/auth/emailVerification/components/orchestrators/EmailVerificationOrchestrator';
 import { ForgotPasswordOrchestrator } from '@/features/auth/forgotPassword/components/orchestrators/ForgotPasswordOrchestrator';
 import { ResetPasswordOrchestrator } from '@/features/auth/resetPassword/components/orchestrators/ResetPasswordOrchestrator';
+import { PrivacyPolicyOrchestrator } from '@/features/legal/privacyPolicy/components/orchestrators/PrivacyPolicyOrchestrator';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { screenHeader, screenLayout } from '@/navigation/screenLayout';
@@ -63,6 +64,14 @@ export function AuthNavigator() {
 				name="ResetPassword"
 				component={ResetPasswordOrchestrator}
 				options={{ title: 'Nouveau mot de passe' }}
+			/>
+			<Stack.Screen
+				name="PrivacyPolicy"
+				component={PrivacyPolicyOrchestrator}
+				options={{
+					title: 'Politique de confidentialité',
+					headerTitle: 'Politique de confidentialité',
+				}}
 			/>
 		</Stack.Navigator>
 	);
