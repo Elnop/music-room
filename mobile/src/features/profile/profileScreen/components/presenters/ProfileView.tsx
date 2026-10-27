@@ -4,8 +4,10 @@ import { ProfileHeader } from '@/features/profile/profileScreen/components/prese
 import { ProfileInfoSection } from '@/features/profile/profileScreen/components/presenters/ProfileInfoSection';
 import { ProfileMenuItems } from '@/features/profile/profileScreen/components/presenters/ProfileMenuItems';
 import { ProfilePreferencesSection } from '@/features/profile/profileScreen/components/presenters/ProfilePreferencesSection';
+import { ProfileWideHeader } from '@/features/profile/profileScreen/components/presenters/ProfileWideHeader';
 import type { UserStats } from '@/features/profile/types';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
+import { useContentColumn } from '@/shared/hooks/useContentColumn';
 import type { Theme } from '@/shared/theme/types';
 import type { MusicGenre, UserProfile } from '@/types/user.types';
 import { Text } from '@/shared/components/ui/Text';
@@ -20,6 +22,8 @@ interface ProfileViewProps {
 	isLoading: boolean;
 	buildLabel: string;
 	onRefresh: () => void;
+	onEditProfile: () => void;
+	onSettings: () => void;
 	onMusicPreferences: () => void;
 	onPrivacySettings: () => void;
 	onLinkedAccounts: () => void;
@@ -37,6 +41,8 @@ export function ProfileView({
 	isLoading,
 	buildLabel,
 	onRefresh,
+	onEditProfile,
+	onSettings,
 	onMusicPreferences,
 	onPrivacySettings,
 	onLinkedAccounts,
@@ -44,7 +50,8 @@ export function ProfileView({
 	onConfirmLogout,
 }: ProfileViewProps) {
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
-	const { isDesktop } = useBreakpoint();
+	const { isWide } = useBreakpoint();
+	const column = useContentColumn();
 
 	if (!user) {
 		return (
@@ -53,6 +60,21 @@ export function ProfileView({
 			</View>
 		);
 	}
+
+	const preferences = (
+		<ProfilePreferencesSection genres={genres} onModify={onMusicPreferences} prominent={isWide} />
+	);
+	const info = <ProfileInfoSection user={user} prominent={isWide} />;
+	const menu = (
+		<ProfileMenuItems
+			wide={isWide}
+			isLoading={isLoading}
+			onPrivacySettings={onPrivacySettings}
+			onLinkedAccounts={onLinkedAccounts}
+			onMyDevices={onMyDevices}
+			onConfirmLogout={onConfirmLogout}
+		/>
+	);
 
 	return (
 		<View style={styles.screenWrapper}>
@@ -67,26 +89,29 @@ export function ProfileView({
 					/>
 				}
 			>
-				<View style={isDesktop && styles.columns}>
-					<View style={isDesktop && styles.identityColumn}>
-						<ProfileHeader user={user} stats={stats} />
-					</View>
-					<View style={isDesktop && styles.settingsColumn}>
-						<ProfilePreferencesSection genres={genres} onModify={onMusicPreferences} />
-
-						<ProfileInfoSection user={user} />
-
-						<ProfileMenuItems
-							isLoading={isLoading}
-							onPrivacySettings={onPrivacySettings}
-							onLinkedAccounts={onLinkedAccounts}
-							onMyDevices={onMyDevices}
-							onConfirmLogout={onConfirmLogout}
+				{isWide ? (
+					<View style={column}>
+						<ProfileWideHeader
+							user={user}
+							stats={stats}
+							onEditProfile={onEditProfile}
+							onSettings={onSettings}
 						/>
+						<View style={styles.wideSection}>{preferences}</View>
+						<View style={styles.wideSection}>{info}</View>
+						<Text style={styles.wideHeading}>Compte</Text>
+						{menu}
+						<Text style={styles.buildLabel}>{buildLabel}</Text>
 					</View>
-				</View>
-
-				<Text style={styles.buildLabel}>{buildLabel}</Text>
+				) : (
+					<>
+						<ProfileHeader user={user} stats={stats} />
+						{preferences}
+						{info}
+						{menu}
+						<Text style={styles.buildLabel}>{buildLabel}</Text>
+					</>
+				)}
 			</ScrollView>
 		</View>
 	);
@@ -104,13 +129,14 @@ const createStyles = (theme: Theme) =>
 		contentContainer: {
 			paddingBottom: theme.spacing.xl,
 		},
-		columns: {
-			flexDirection: 'row',
-			alignItems: 'flex-start',
-			gap: theme.spacing.lg,
+		wideSection: { marginTop: theme.spacing.md },
+		wideHeading: {
+			fontSize: theme.typography.sizes.lg,
+			fontFamily: theme.typography.families.bold,
+			color: theme.colors.text,
+			marginHorizontal: theme.spacing.lg,
+			marginTop: theme.spacing.lg,
 		},
-		identityColumn: { width: 320 },
-		settingsColumn: { flex: 1, minWidth: 0 },
 		buildLabel: {
 			fontSize: 12,
 			color: theme.colors.textSecondary,

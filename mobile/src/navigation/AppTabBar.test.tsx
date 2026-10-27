@@ -36,7 +36,13 @@ jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
 	default: jest.fn(() => ({ width: 375, height: 800, scale: 1, fontScale: 1 })),
 }));
 
-const props = { navigation: { navigate: mockNavigate } } as unknown as BottomTabBarProps;
+const propsOn = (tab: string) =>
+	({
+		navigation: { navigate: mockNavigate },
+		state: { index: 0, routes: [{ key: tab, name: tab }] },
+	}) as unknown as BottomTabBarProps;
+
+const props = propsOn('HomeTab');
 
 const setWidth = (width: number) =>
 	jest.mocked(useWindowDimensions).mockReturnValue({ width, height: 900, scale: 1, fontScale: 1 });
@@ -66,5 +72,18 @@ describe('AppTabBar', () => {
 
 		fireEvent.press(screen.getByLabelText('Profil, Bob'));
 		expect(mockNavigate).toHaveBeenCalledWith('ProfileTab');
+	});
+
+	it('shows the account as the active entry while the profile tab is open', () => {
+		setWidth(1440);
+		const { rerender } = render(<AppTabBar {...props} />);
+		expect(screen.getByLabelText('Profil, Bob')).toHaveProp('accessibilityState', {
+			selected: false,
+		});
+
+		rerender(<AppTabBar {...propsOn('ProfileTab')} />);
+		expect(screen.getByLabelText('Profil, Bob')).toHaveProp('accessibilityState', {
+			selected: true,
+		});
 	});
 });

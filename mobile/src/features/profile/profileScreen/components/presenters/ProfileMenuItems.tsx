@@ -8,6 +8,8 @@ import type { Theme } from '@/shared/theme/types';
 import { Text } from '@/shared/components/ui/Text';
 
 interface ProfileMenuItemsProps {
+	/** Wide screens: a logout without the full-width outline, and the build label is the only version shown. */
+	wide?: boolean;
 	isLoading: boolean;
 	onPrivacySettings: () => void;
 	onLinkedAccounts: () => void;
@@ -16,6 +18,7 @@ interface ProfileMenuItemsProps {
 }
 
 export function ProfileMenuItems({
+	wide = false,
 	isLoading,
 	onPrivacySettings,
 	onLinkedAccounts,
@@ -48,9 +51,9 @@ export function ProfileMenuItems({
 				onPress={onMyDevices}
 			/>
 
-			<View style={styles.logoutSection}>
+			<View style={wide ? styles.discreetLogoutSection : styles.logoutSection}>
 				<Pressable
-					style={styles.logoutButton}
+					style={wide ? styles.discreetLogoutButton : styles.logoutButton}
 					onPress={onConfirmLogout}
 					disabled={isLoading}
 					accessibilityLabel="Se déconnecter"
@@ -60,7 +63,7 @@ export function ProfileMenuItems({
 				</Pressable>
 			</View>
 
-			<Text style={styles.footer}>Zumik v1.0.0</Text>
+			{!wide && <Text style={styles.footer}>Zumik v1.0.0</Text>}
 		</>
 	);
 }
@@ -70,6 +73,10 @@ const createStyles = (theme: Theme) =>
 		logoutSection: {
 			paddingHorizontal: theme.spacing.lg,
 			marginTop: theme.spacing.lg,
+		},
+		discreetLogoutSection: {
+			paddingHorizontal: theme.spacing.lg,
+			marginTop: theme.spacing.xl,
 		},
 		logoutButton: {
 			flexDirection: 'row',
@@ -81,6 +88,15 @@ const createStyles = (theme: Theme) =>
 			borderWidth: 1,
 			borderColor: theme.colors.error,
 			backgroundColor: 'transparent',
+		},
+		discreetLogoutButton: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			alignSelf: 'flex-start',
+			gap: theme.spacing.sm,
+			paddingVertical: theme.spacing.sm,
+			paddingHorizontal: theme.spacing.md,
+			borderRadius: 12,
 		},
 		logoutText: {
 			fontSize: 16,

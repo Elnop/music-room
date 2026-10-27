@@ -46,7 +46,12 @@ export function AppTabBar(props: BottomTabBarProps) {
 				accessibilityLabel="Zumik"
 			/>
 			<BottomTabBar {...props} />
-			{isDesktop && <SidebarAccount onPress={() => props.navigation.navigate('ProfileTab')} />}
+			{isDesktop && (
+				<SidebarAccount
+					active={props.state.routes[props.state.index].name === 'ProfileTab'}
+					onPress={() => props.navigation.navigate('ProfileTab')}
+				/>
+			)}
 		</View>
 	);
 }

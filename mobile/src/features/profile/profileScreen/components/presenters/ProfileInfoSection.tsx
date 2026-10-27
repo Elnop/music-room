@@ -8,9 +8,10 @@ import { Text } from '@/shared/components/ui/Text';
 
 interface ProfileInfoSectionProps {
 	user: UserProfile;
+	prominent?: boolean;
 }
 
-export function ProfileInfoSection({ user }: ProfileInfoSectionProps) {
+export function ProfileInfoSection({ user, prominent }: ProfileInfoSectionProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
@@ -26,7 +27,7 @@ export function ProfileInfoSection({ user }: ProfileInfoSectionProps) {
 	}, [user.createdAt]);
 
 	return (
-		<ProfileSection title="Information">
+		<ProfileSection title="Information" prominent={prominent}>
 			<View style={styles.infoItem}>
 				<Text style={styles.infoLabel}>Email</Text>
 				<Text style={styles.infoValue}>{user.email}</Text>

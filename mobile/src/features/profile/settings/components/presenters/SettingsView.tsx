@@ -1,5 +1,6 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
+import { useContentColumn } from '@/shared/hooks/useContentColumn';
 import { Ionicons } from '@expo/vector-icons';
 import { BackendUrlField } from '@/shared/components/form/BackendUrlField';
 import { BACKEND_URL_EDITABLE } from '@/shared/constants/platform';
@@ -27,12 +28,13 @@ export function SettingsView({
 	onOpenPrivacyPolicy,
 }: SettingsViewProps) {
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
+	const column = useContentColumn();
 
 	return (
 		<ScrollView
 			style={styles.container}
 			keyboardShouldPersistTaps="handled"
-			contentContainerStyle={{ paddingBottom: bottomPadding }}
+			contentContainerStyle={[{ paddingBottom: bottomPadding }, column]}
 		>
 			<View style={styles.section}>
 				<Text style={styles.sectionTitle}>Abonnement</Text>
