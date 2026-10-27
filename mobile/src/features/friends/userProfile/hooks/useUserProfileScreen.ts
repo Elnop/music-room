@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
+import { useScreenTitle } from '@/shared/hooks/useScreenTitle';
 import { useFriendListening } from '@/shared/services/musicControlBridge';
 import { controlErrorMessage } from '@/shared/utils/controlError';
 import { showError } from '@/shared/utils/toast';
@@ -21,6 +22,7 @@ export function useUserProfileScreen(userId: string) {
 	const { data: followStatus, isLoading: isStatusLoading } = useFollowStatus(userId);
 	const { data: playlists = [] } = useUserPublicPlaylists(userId);
 	const followMutation = useFollowMutation();
+	useScreenTitle(profile ? profile.displayName || profile.username : undefined);
 
 	const [isFollowLoading, setIsFollowLoading] = useState(false);
 

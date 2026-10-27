@@ -5,6 +5,7 @@ import { useNowPlaying, type NowPlayingTrack } from '@/features/player/hooks/use
 import { RESTART_THRESHOLD_S } from '@/shared/utils/queueNavigation';
 import { hapticTap } from '@/shared/utils/haptics';
 import { SWIPE_FLICK_VELOCITY, trackSwipeDirection } from '@/features/player/utils/trackSwipe';
+import { openPlayerLabel } from '@/features/player/utils/openPlayerLabel';
 
 const SWIPE_OPEN_THRESHOLD = 40;
 
@@ -94,11 +95,7 @@ export function useMiniPlayer(): MiniPlayerData {
 		transform: [{ translateX: translateX.value }],
 	}));
 
-	const openLabel = [
-		'Ouvrir le lecteur',
-		...(track ? [track.title, track.artist] : ['Rien en lecture']),
-		...(deviceLabel ? [`sur ${deviceLabel}`] : []),
-	].join(', ');
+	const openLabel = openPlayerLabel(track, deviceLabel);
 
 	return {
 		track,

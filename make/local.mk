@@ -3,7 +3,7 @@
 # ==============================================================================
 # Commands for local development, useful with Android Studio emulator
 
-.PHONY: dev-local dev-phone .phone-reverse open-phone expo-android expo-clear check-devices start-emulator start-emulators .boot-emulators restart-emulators restart-emulators-clean clean-emulators .stop-emulators .clear-emulator-snapshots .clear-metro-cache .cache-app-apk .open-app-when-metro open-app kill-emulator restart-emulator list-emulators open-emulator
+.PHONY: dev-local dev-web-local dev-phone .phone-reverse open-phone expo-android expo-clear check-devices start-emulator start-emulators .boot-emulators restart-emulators restart-emulators-clean clean-emulators .stop-emulators .clear-emulator-snapshots .clear-metro-cache .cache-app-apk .open-app-when-metro open-app kill-emulator restart-emulator list-emulators open-emulator
 
 # Rendering goes through the host GPU: software rendering (swiftshader) puts the
 # whole screen on the CPU and two emulators lag. GPU=swiftshader_indirect brings
@@ -60,6 +60,32 @@ dev-local: .ensure-backend-deps .ensure-mobile-deps ## Start development locally
 	$(call blank_line)
 	@$(MAKE) --no-print-directory .open-app-when-metro &
 	$(call expo_mobile,start --localhost --dev-client)
+
+# The web app in a browser on this machine, with the local backend (reused when one already
+# answers on BACKEND_PORT). --offline: Expo CLI would otherwise call Expo's API with EXPO_TOKEN,
+# and stop when that token is invalid.
+dev-web-local: export EXPO_PUBLIC_API_URL := $(WEB_API_URL)
+dev-web-local: export EXPO_PUBLIC_WS_URL := $(WEB_WS_URL)
+dev-web-local: export REDIS_HOST := localhost
+dev-web-local: DEV_API_URL := $(WEB_API_URL)
+dev-web-local: DEV_WS_URL := $(WEB_WS_URL)
+dev-web-local: .ensure-backend-deps .ensure-mobile-deps ## Start backend + the web app locally (no Docker) and open it in the browser
+	$(SUPABASE_UP_IF_LOCAL)
+	@$(call write_mobile_dev_env)
+	$(call print_header,Starting the Zumik Web App Locally)
+	$(call print_arrow,Starting Redis (session revocation needs it)...)
+	@$(call start_redis)
+	@if curl -sf -o /dev/null $(BACKEND_URL)/health; then \
+		echo "$(YELLOW)$(ICON_INFO) Backend already running: $(BACKEND_URL)$(NC)"; \
+	else \
+		echo "$(YELLOW)$(ICON_ARROW) Starting backend server...$(NC)"; \
+		(cd $(BACKEND_DIR) && $(LOCAL_SUPABASE_ENV) npm run dev &); \
+		for i in $$(seq 30); do curl -sf -o /dev/null $(BACKEND_URL)/health && break; sleep 1; done; \
+		curl -sf -o /dev/null $(BACKEND_URL)/health || { echo "$(RED)$(ICON_ERROR) The backend did not answer on $(BACKEND_URL)/health$(NC)"; exit 1; }; \
+		echo "$(GREEN)$(ICON_SUCCESS) Backend started: $(BACKEND_URL)$(NC)"; \
+	fi
+	$(call print_arrow,Starting Expo web on $(METRO_URL)...)
+	$(call expo_mobile,start --web --offline --port $(METRO_PORT))
 
 expo-android: ## Quick start: Start Metro and open the debug build on the Android emulator
 	@$(call write_mobile_dev_env)

@@ -1,12 +1,16 @@
 import React from 'react';
-import { FlatList } from 'react-native';
+import { FlatList, View } from 'react-native';
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { SkeletonList, UserRowSkeleton } from '@/shared/components/ui/Skeleton';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
+import { rowColumns } from '@/shared/utils/gridLayout';
 import type { FriendProfile } from '@/features/friends/types';
+import { FriendCard } from './FriendCard';
 import { FriendItemRow } from './FriendItemRow';
 import { ThemedRefreshControl } from '@/shared/components/lists/ThemedRefreshControl';
 import { createFriendsListStyles } from './friendsListStyles';
+import { useContentColumn } from '@/shared/hooks/useContentColumn';
 
 interface FriendsListTabProps {
 	friends: FriendProfile[];
@@ -39,13 +43,19 @@ export function FriendsListTab({
 }: FriendsListTabProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createFriendsListStyles(theme), [theme]);
+	const column = useContentColumn();
+	// A short list spreads over the width instead of leaving empty columns.
+	const columns = Math.min(rowColumns(useBreakpoint().breakpoint), Math.max(2, friends.length));
 
 	if (isLoading && friends.length === 0) {
-		return <SkeletonList count={6} row={UserRowSkeleton} />;
+		return <SkeletonList count={6} row={UserRowSkeleton} style={column} />;
 	}
 
 	return (
 		<FlatList
+			key={columns}
+			numColumns={columns}
+			columnWrapperStyle={columns > 1 ? styles.gridRow : undefined}
 			data={friends}
 			refreshControl={
 				<ThemedRefreshControl
@@ -55,17 +65,25 @@ export function FriendsListTab({
 				/>
 			}
 			keyExtractor={item => item.id}
-			renderItem={({ item }) => (
-				<FriendItemRow
-					friend={item}
-					canControl={canControl(item.id)}
-					isToggling={togglingUserId === item.id}
-					disabled={!!togglingUserId}
-					onPress={onSelectUser}
-					onToggleControl={onToggleControl}
-				/>
-			)}
-			contentContainerStyle={[styles.listContent, { paddingBottom: bottomPadding }]}
+			renderItem={({ item }) => {
+				const Row = columns > 1 ? FriendCard : FriendItemRow;
+				const row = (
+					<Row
+						friend={item}
+						canControl={canControl(item.id)}
+						isToggling={togglingUserId === item.id}
+						disabled={!!togglingUserId}
+						onPress={onSelectUser}
+						onToggleControl={onToggleControl}
+					/>
+				);
+				return columns > 1 ? (
+					<View style={[styles.gridCell, { flex: 1 / columns }]}>{row}</View>
+				) : (
+					row
+				);
+			}}
+			contentContainerStyle={[styles.listContent, { paddingBottom: bottomPadding }, column]}
 			ListEmptyComponent={
 				loadFailed ? (
 					<EmptyState

@@ -23,6 +23,7 @@ State recorded on `develop` at commit `8477871`. Paths are relative to the repos
 | M11 | Music control of an unauthorized device | Per-device rule, fail closed, tested. |
 | M12 | Concurrent playlist edits | Per-playlist lock + versions, tested. |
 | M13 | Redis unavailable | Limiters and revocation fail closed (503), tested. Lockout and blacklist fail open. |
+| M14 | Web client: session tokens in `localStorage`, third-party sign-in scripts (bonus V.1) | **Accepted risk**: an XSS on the web app's origin reads the tokens. Reduced by React escaping, no HTML injection in the code, 1-hour access tokens, revocation at logout, and the SDKs loaded only on the sign-in screens. No Content-Security-Policy. |
 
 ## M1. Password bruteforce
 
@@ -118,7 +119,7 @@ The thresholds come from `backend/src/shared/config/rate-limit.config.ts` (envir
 
 **Accepted risks.**
 - A stolen token stays valid until it is revoked or expires (lifetime set by Supabase Auth). The token is not bound to the device.
-- Tokens are stored in AsyncStorage (`mobile/src/features/auth/services/sessionStorage.ts`), unencrypted. Reason: it needs a rooted phone or physical access; `expo-secure-store` would be the improvement.
+- Tokens are stored in AsyncStorage (`mobile/src/features/auth/services/sessionStorage.ts`), unencrypted. Reason: it needs a rooted phone or physical access; `expo-secure-store` would be the improvement. On the web, the same module writes to `localStorage`: see M14.
 - In `make dev-docker` and `make dev-local`, the app talks to the backend over `http://` and `ws://` on the local network (`DEV_API_URL` in `make/config.mk`): tokens in clear text on the Wi-Fi. `make dev-tunnel` goes through HTTPS (ngrok). Reason: development environment, no production deployment.
 
 ## M6. Token revoked while a socket is already open
@@ -253,6 +254,30 @@ Before 017, `anon` and `authenticated` had Supabase's default table privileges: 
 **Tests.** `rate-limit-store.test.ts`: "throws 503 and sends nothing while Redis is not ready", "fails closed again when Redis drops, then resumes"; `token-revocation.service.test.ts`: "throws 503 REVOCATION_UNAVAILABLE when Redis is not ready"; `auth.middleware.test.ts`: "answers 503 REVOCATION_UNAVAILABLE when the denylist cannot be checked".
 
 **Accepted risk.** `checkAccountLockout`, `checkIPBlacklist`, `account-lockout.ts` and `ip-reputation.ts` (`backend/src/shared/security/fail-open.ts`) let requests through on a Redis error (fail open). The login limiter, placed before them, fails closed, so a complete Redis outage blocks login instead of opening it; only a one-off error on a Redis command lets an attempt through. In dev, Redis has no password but is published on `127.0.0.1` only (L8, #205).
+
+## M14. Web session tokens and third-party scripts
+
+Bonus V.1, the web client ([web-client.md](../features/web-client.md)).
+
+**Threat.** On the web, the session (access token, refresh token, user) is kept by `sessionStorage.ts` through AsyncStorage, whose web backend is the origin's `localStorage`, readable by any script running on the page. A cross-site scripting (XSS) hole, or a compromised third-party script, reads both tokens and acts on the user's behalf from anywhere, the refresh token included, until a logout or its expiry.
+
+**Protection.**
+- No HTML injection: the app renders user data (playlist and track names, profiles, event texts) through React Native components, which react-native-web writes as escaped text. The code has no `dangerouslySetInnerHTML`, `innerHTML`, `eval` or `new Function`; the few DOM nodes it builds itself (`pickDateTime.web.ts`, `loadScript.ts`) set `textContent` or a fixed `src`.
+- Short access token: `jwt_expiry = 3600` (`backend/supabase/config.toml`), with refresh token rotation (`enable_refresh_token_rotation`), so each refresh replaces the refresh token.
+- Logout revokes both tokens on the backend, as on Android (M5): the access token through the Redis revocation list, the refresh token through `signOut`. A user who suspects theft signs out.
+- Third-party scripts: only Google Identity Services (`https://accounts.google.com/gsi/client`) and the Facebook SDK (`https://connect.facebook.net/en_US/sdk.js`), injected by `features/auth/utils/loadScript.ts` on the sign-in, sign-up and linked-accounts screens only (`useProviderButtons.web.ts`), never at page load. No analytics or advertising script.
+- CORS: the backend answers browsers only from `ALLOWED_ORIGINS` (M9), so another site cannot call the API with the user's tokens unless it holds them.
+
+**Tests.**
+- `mobile/src/features/auth/utils/loadScript.test.ts`: one load per URL, a failed load retried.
+- `mobile/src/features/auth/hooks/useProviderButtons.web.test.ts`: Google's button rendered by the screen, the app's button back when the script fails.
+- M5's logout tests apply unchanged (same endpoints).
+
+**Accepted risks.**
+- Tokens in `localStorage`: readable by any script of the origin. An httpOnly cookie would hide them from scripts, but the backend authenticates with a `Bearer` header from a static site on another origin (`elnop.github.io` → the API host); a cookie session would need same-site hosting, CSRF protection and a second auth path next to the native app's. Reason: a bonus client, no HTML injection point in the code, short access tokens and revocation at logout.
+- Shared origin: every GitHub Pages site of the `elnop` account is served from `https://elnop.github.io`, the web app's origin. A page published by another repository of that account runs on the same origin and can read the app's `localStorage`. Reason: those repositories belong to the same owner; a custom domain for the app would isolate it.
+- No Content-Security-Policy: GitHub Pages sets no custom headers, and no `<meta http-equiv="Content-Security-Policy">` is added to the page. A CSP in a `<meta>` tag, limiting scripts to the app and the two SDK hosts, would be the improvement.
+- Once loaded, the Google and Facebook scripts run with the page's rights and stay until the next reload: they can read `localStorage`. No Subresource Integrity is possible, since both providers serve unversioned scripts that change without notice. Reason: these are the official SDKs of the providers the user chose to sign in with; they are not loaded on any other screen.
 
 ## Open gaps
 

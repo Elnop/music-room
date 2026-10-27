@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { SearchBar } from '@/shared/components/form/SearchBar';
 import { useTheme } from '@/shared/theme/ThemeContext';
@@ -7,6 +7,8 @@ import type { FriendProfile, UserProfile } from '@/features/friends/types';
 import { FriendsListTab } from './FriendsListTab';
 import { SearchUsersTab } from './SearchUsersTab';
 import { createFriendsListStyles } from './friendsListStyles';
+import { Text } from '@/shared/components/ui/Text';
+import { useContentColumn } from '@/shared/hooks/useContentColumn';
 
 interface FriendsListViewProps {
 	activeTab: 'friends' | 'search';
@@ -59,10 +61,11 @@ export function FriendsListView({
 }: FriendsListViewProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createFriendsListStyles(theme), [theme]);
+	const column = useContentColumn();
 
 	return (
 		<View style={styles.container}>
-			<View style={styles.header}>
+			<View style={[styles.header, column]}>
 				{hasFriends && (
 					<View style={styles.tabsContainer}>
 						<Pressable

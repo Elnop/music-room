@@ -1,5 +1,5 @@
 import React from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import type { Control, FieldErrors } from 'react-hook-form';
 import { EditProfileFormFields } from '@/features/profile/editProfile/components/presenters/EditProfileFormFields';
 import { EditProfilePhoto } from '@/features/profile/editProfile/components/presenters/EditProfilePhoto';
@@ -8,6 +8,7 @@ import { FormError } from '@/shared/components/feedback/FormError';
 import { Button } from '@/shared/components/ui/Button';
 import type { Theme } from '@/shared/theme/types';
 import type { UserProfile } from '@/types/user.types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface EditProfileViewProps {
 	theme: Theme;
@@ -63,7 +64,11 @@ export function EditProfileView({
 						onOpenMenu={onOpenPhotoMenu}
 					/>
 
-					<EditProfileFormFields control={control} errors={errors} />
+					<EditProfileFormFields
+						control={control}
+						errors={errors}
+						onSubmit={isDirty && !isLoading ? onSubmit : undefined}
+					/>
 
 					<View style={styles.actions}>
 						<Button

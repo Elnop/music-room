@@ -29,3 +29,16 @@ export const eventSchema = z.object({
 export const eventResponseSchema = z.object({ event: eventSchema });
 export const eventListResponseSchema = z.object({ events: z.array(eventSchema) });
 export const eventDeletedResponseSchema = z.object({ id: z.uuid() });
+
+export const geocodedPlaceSchema = z.object({
+	latitude: z.number().meta({ example: 48.8966 }),
+	longitude: z.number().meta({ example: 2.3185 }),
+	displayName: z.string().meta({
+		description: 'The place the geocoder matched',
+		example: '96, Boulevard Bessières, Paris, Île-de-France, 75017, France',
+	}),
+});
+
+export const geocodeResponseSchema = z.object({
+	location: geocodedPlaceSchema.nullable().meta({ description: 'Null when no place matches' }),
+});

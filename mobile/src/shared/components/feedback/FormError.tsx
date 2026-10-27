@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface FormErrorProps {
 	message: string;
@@ -33,6 +34,6 @@ const createStyles = (theme: Theme) =>
 		text: {
 			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.error,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 		},
 	});

@@ -1,8 +1,9 @@
 import React from 'react';
-import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { Text } from '@/shared/components/ui/Text';
 
 interface PrivateBadgeProps {
 	/** Writes « Privée » after the lock. */
@@ -33,6 +34,6 @@ const createStyles = (theme: Theme) =>
 			fontSize: 10,
 			color: theme.colors.textSecondary,
 			marginLeft: 3,
-			fontWeight: theme.typography.weights.medium,
+			fontFamily: theme.typography.families.medium,
 		},
 	});

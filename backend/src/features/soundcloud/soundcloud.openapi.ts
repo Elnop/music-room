@@ -105,7 +105,7 @@ export function registerSoundcloudOpenapi(registry: OpenAPIRegistry): void {
 		...common,
 		path: '/api/soundcloud/stream',
 		summary: 'Get SoundCloud stream URL',
-		description: `${ruled} Returns AAC HLS stream URL for playback. The track URL goes in the query string (a URL in the path can be blocked by Cloudflare WAF); \`/api/soundcloud/stream/{trackUrl}\` is the legacy form.`,
+		description: `${ruled} Returns a stream URL for playback, HLS when SoundCloud has one, else progressive (\`protocol\` says which). The track URL goes in the query string (a URL in the path can be blocked by Cloudflare WAF); \`/api/soundcloud/stream/{trackUrl}\` is the legacy form.`,
 		operationId: 'getSoundCloudStreamUrlByQuery',
 		request: {
 			query: describeParams(soundcloudStreamUrlSchema, {
@@ -119,7 +119,7 @@ export function registerSoundcloudOpenapi(registry: OpenAPIRegistry): void {
 		...common,
 		path: '/api/soundcloud/stream/{trackUrl}',
 		summary: 'Get SoundCloud stream URL',
-		description: `${ruled} Returns AAC HLS stream URL for playback. Legacy form of \`/api/soundcloud/stream?url=\`, same validation.`,
+		description: `${ruled} Returns a stream URL for playback (HLS, else progressive, as \`protocol\` says). Legacy form of \`/api/soundcloud/stream?url=\`, same validation.`,
 		operationId: 'getSoundCloudStreamUrl',
 		request: {
 			params: z.object({

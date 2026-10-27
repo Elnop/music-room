@@ -20,6 +20,7 @@ vi.mock('@/features/soundcloud/services/soundcloud-stream.service.js', () => ({
 const TRACK_URL = 'https://soundcloud.com/artist/track';
 const STREAM = {
 	streamUrl: 'https://cf-hls-media.sndcdn.com/x.m3u8',
+	protocol: 'hls',
 	expiresAt: '2026-01-01T00:30:00.000Z',
 };
 

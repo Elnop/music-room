@@ -1,13 +1,16 @@
 import React from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { Button } from '@/shared/components/ui/Button';
 import { Input } from '@/shared/components/ui/Input';
 import { Pressable } from '@/shared/components/ui/Pressable';
+import { Text } from '@/shared/components/ui/Text';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { AuthFormLayout } from '@/features/auth/form/components/presenters/AuthFormLayout';
 import { SocialSignInButtons } from '@/features/auth/social/components/presenters/SocialSignInButtons';
 import type { FieldBinding } from '@/features/auth/form/hooks/useFieldBinding';
+import type { GoogleButtonSlot } from '@/features/auth/types';
+import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
 interface LoginViewProps {
 	email: FieldBinding;
@@ -19,6 +22,7 @@ interface LoginViewProps {
 	onRegister: () => void;
 	onGoogle: () => void;
 	onFacebook: () => void;
+	googleButton?: GoogleButtonSlot;
 }
 
 export function LoginView({
@@ -30,6 +34,7 @@ export function LoginView({
 	onRegister,
 	onGoogle,
 	onFacebook,
+	googleButton,
 }: LoginViewProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
@@ -47,6 +52,7 @@ export function LoginView({
 				placeholder="demo@zumik.com"
 				keyboardType="email-address"
 				autoCapitalize="none"
+				submitOnEnter={isLoading ? undefined : onSubmit}
 			/>
 			<Input
 				label="Mot de passe"
@@ -54,6 +60,7 @@ export function LoginView({
 				placeholder="Saisissez votre mot de passe"
 				secureTextEntry
 				autoCapitalize="none"
+				submitOnEnter={isLoading ? undefined : onSubmit}
 			/>
 
 			<Button
@@ -72,7 +79,12 @@ export function LoginView({
 				<Text style={styles.forgotPasswordText}>Mot de passe oublié ?</Text>
 			</Pressable>
 
-			<SocialSignInButtons onGoogle={onGoogle} onFacebook={onFacebook} disabled={isLoading} />
+			<SocialSignInButtons
+				onGoogle={onGoogle}
+				onFacebook={onFacebook}
+				disabled={isLoading}
+				googleButton={googleButton}
+			/>
 		</AuthFormLayout>
 	);
 }
@@ -87,6 +99,6 @@ const createStyles = (theme: Theme) =>
 		forgotPasswordText: {
 			fontSize: 14,
 			color: theme.colors.primary,
-			fontWeight: '600',
+			fontFamily: FONT_FAMILIES.semibold,
 		},
 	});

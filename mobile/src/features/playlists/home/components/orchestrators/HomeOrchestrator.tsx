@@ -3,6 +3,8 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { PlaylistStackParamList } from '@/features/playlists/types';
 import { useHomeScreen } from '@/features/playlists/home/hooks/useHomeScreen';
 import { HomeView } from '@/features/playlists/home/components/presenters/HomeView';
+import { usePlaylistCardMenu } from '@/features/playlists/cardMenu/hooks/usePlaylistCardMenu';
+import { PlaylistCardMenu } from '@/features/playlists/cardMenu/components/orchestrators/PlaylistCardMenu';
 
 type HomeOrchestratorProps = NativeStackScreenProps<PlaylistStackParamList, 'Home'> & {
 	/** The nearby events section, from another feature: the navigation layer passes it in. */
@@ -11,5 +13,11 @@ type HomeOrchestratorProps = NativeStackScreenProps<PlaylistStackParamList, 'Hom
 
 export function HomeOrchestrator({ navigation, nearbyEvents }: HomeOrchestratorProps) {
 	const screen = useHomeScreen(navigation);
-	return <HomeView screen={screen} nearbyEvents={nearbyEvents} />;
+	const menu = usePlaylistCardMenu(navigation);
+	return (
+		<>
+			<HomeView screen={screen} nearbyEvents={nearbyEvents} actionsFor={menu.actionsFor} />
+			<PlaylistCardMenu menu={menu} />
+		</>
+	);
 }

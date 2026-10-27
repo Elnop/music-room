@@ -66,6 +66,12 @@ export const rateLimitConfig = {
 		max: env.RATE_LIMIT_EVENTS_MAX,
 	},
 
+	// Per authenticated user, address lookups.
+	geocode: {
+		windowMs: env.RATE_LIMIT_GEOCODE_WINDOW_MS,
+		max: env.RATE_LIMIT_GEOCODE_MAX,
+	},
+
 	lockout: {
 		enabled: env.ACCOUNT_LOCKOUT_ENABLED !== 'false',
 		threshold: parseInt(env.ACCOUNT_LOCKOUT_THRESHOLD || '5'),

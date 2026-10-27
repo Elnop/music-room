@@ -1,16 +1,27 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
+import { GOOGLE_FORM_BUTTON } from '@/features/auth/constants';
+import type { GoogleButtonSlot } from '@/features/auth/types';
+import { Text } from '@/shared/components/ui/Text';
+import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
 interface SocialSignInButtonsProps {
 	onGoogle: () => void;
 	onFacebook: () => void;
 	disabled: boolean;
+	/** Web: Google's own button replaces ours. */
+	googleButton?: GoogleButtonSlot;
 }
 
-export function SocialSignInButtons({ onGoogle, onFacebook, disabled }: SocialSignInButtonsProps) {
+export function SocialSignInButtons({
+	onGoogle,
+	onFacebook,
+	disabled,
+	googleButton,
+}: SocialSignInButtonsProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
@@ -22,18 +33,26 @@ export function SocialSignInButtons({ onGoogle, onFacebook, disabled }: SocialSi
 				<View style={styles.dividerLine} />
 			</View>
 
-			<Pressable
-				style={styles.googleButton}
-				onPress={onGoogle}
-				disabled={disabled}
-				accessibilityLabel="Continuer avec Google"
-			>
-				<Text style={styles.googleIcon}>G</Text>
-				<Text style={styles.googleButtonText}>Continuer avec Google</Text>
-			</Pressable>
+			{googleButton ? (
+				<View
+					ref={googleButton}
+					style={[styles.googleSlot, disabled && styles.slotDisabled]}
+					testID="google-button-slot"
+				/>
+			) : (
+				<Pressable
+					style={styles.googleButton}
+					onPress={onGoogle}
+					disabled={disabled}
+					accessibilityLabel="Continuer avec Google"
+				>
+					<Text style={styles.googleIcon}>G</Text>
+					<Text style={styles.googleButtonText}>Continuer avec Google</Text>
+				</Pressable>
+			)}
 
 			<Pressable
-				style={styles.facebookButton}
+				style={[styles.facebookButton, googleButton && styles.facebookBesideGoogle]}
 				onPress={onFacebook}
 				disabled={disabled}
 				accessibilityLabel="Continuer avec Facebook"
@@ -72,15 +91,23 @@ const createStyles = (theme: Theme) =>
 			borderWidth: 1,
 			borderColor: theme.colors.googleBorder,
 		},
+		googleSlot: {
+			alignItems: 'center',
+			minHeight: 44,
+		},
+		slotDisabled: {
+			opacity: 0.5,
+			pointerEvents: 'none',
+		},
 		googleIcon: {
 			fontSize: 20,
-			fontWeight: 'bold',
+			fontFamily: FONT_FAMILIES.bold,
 			color: theme.colors.googleMark,
 			marginRight: 12,
 		},
 		googleButtonText: {
 			fontSize: 16,
-			fontWeight: '500',
+			fontFamily: FONT_FAMILIES.medium,
 			color: theme.colors.googleText,
 		},
 		facebookButton: {
@@ -93,15 +120,23 @@ const createStyles = (theme: Theme) =>
 			borderWidth: 1,
 			borderColor: theme.colors.facebook,
 		},
+		facebookBesideGoogle: {
+			width: '100%',
+			maxWidth: GOOGLE_FORM_BUTTON.maxWidth,
+			height: GOOGLE_FORM_BUTTON.height,
+			alignSelf: 'center',
+			paddingVertical: 0,
+			borderRadius: GOOGLE_FORM_BUTTON.radius,
+		},
 		facebookIcon: {
 			fontSize: 20,
-			fontWeight: 'bold',
+			fontFamily: FONT_FAMILIES.bold,
 			color: theme.colors.onFacebook,
 			marginRight: 12,
 		},
 		facebookButtonText: {
 			fontSize: 16,
-			fontWeight: '500',
+			fontFamily: FONT_FAMILIES.medium,
 			color: theme.colors.onFacebook,
 		},
 	});

@@ -1,7 +1,10 @@
 import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {
+	createBottomTabNavigator,
+	type BottomTabNavigationOptions,
+} from '@react-navigation/bottom-tabs';
 import type { NavigatorScreenParams } from '@react-navigation/native';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
@@ -26,6 +29,13 @@ import { useRemoteTarget } from '@/features/queue/hooks/useRemoteTarget';
 import { useConnectionStatus } from '@/shared/hooks/useConnectionStatus';
 import { ConnectionBanner } from '@/shared/components/feedback/ConnectionBanner';
 import { TAB_BAR_HEIGHT } from '@/shared/constants/layout';
+import { useBreakpoint, type Breakpoint } from '@/shared/hooks/useBreakpoint';
+import { MiniPlayer } from '@/features/player/miniPlayer/components/orchestrators/MiniPlayer';
+import { PlayerBar } from '@/features/player/playerBar/components/orchestrators/PlayerBar';
+import { NowPlayingPanel } from '@/features/player/nowPlayingPanel/components/orchestrators/NowPlayingPanel';
+import { useNowPlayingPanelStore } from '@/shared/stores/nowPlayingPanelStore';
+import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
+import { KeyboardShortcuts } from './KeyboardShortcuts';
 
 // Playlists and Friends take nested params: zumik:// share links open their screens;
 // Profile's let a playlist open Settings.
@@ -56,10 +66,48 @@ const TAB_ICONS: Record<
 	ProfileTab: { active: 'person', inactive: 'person-outline' },
 };
 
+/** Wide screens move the tabs to a side bar framed by AppTabBar: an icon rail on a tablet, icons and labels on desktop. */
+const sidebarOptions = (
+	breakpoint: Exclude<Breakpoint, 'phone'>,
+	theme: Theme
+): BottomTabNavigationOptions => ({
+	tabBarPosition: 'left',
+	tabBarVariant: breakpoint === 'tablet' ? 'material' : 'uikit',
+	tabBarLabelPosition: breakpoint === 'tablet' ? 'below-icon' : 'beside-icon',
+	// The library's defaults put a primary label on a primary fill.
+	tabBarActiveTintColor: theme.colors.text,
+	tabBarActiveBackgroundColor: theme.colors.surfaceAlt,
+	tabBarLabelStyle:
+		breakpoint === 'tablet'
+			? { fontSize: theme.typography.sizes.sm, marginTop: theme.spacing.xs }
+			: {
+					fontSize: theme.typography.sizes.md,
+					fontFamily: theme.typography.families.semibold,
+					marginStart: theme.spacing.md,
+				},
+	tabBarStyle: {
+		flex: 1,
+		// Overrides the side bar's 360 px minimum width.
+		minWidth: 0,
+		paddingTop: theme.spacing.md,
+		paddingStart: breakpoint === 'tablet' ? theme.spacing.xs : theme.spacing.sm,
+		paddingEnd: breakpoint === 'tablet' ? theme.spacing.xs : theme.spacing.sm,
+		backgroundColor: 'transparent',
+		borderRightWidth: 0,
+	},
+});
+
 export function AppNavigator() {
 	const { theme } = useTheme();
 	const insets = useSafeAreaInsets();
+	const { breakpoint } = useBreakpoint();
+	const panelOpen = useNowPlayingPanelStore(state => state.isOpen);
+	const separator = useSeparatorColor();
 	const styles = React.useMemo(() => createStyles(theme, insets.bottom), [theme, insets.bottom]);
+	const sidebar = React.useMemo(
+		() => (breakpoint === 'phone' ? null : sidebarOptions(breakpoint, theme)),
+		[breakpoint, theme]
+	);
 	useQueueSync();
 	useEventsSync();
 	useRemoteTarget();
@@ -76,81 +124,108 @@ export function AppNavigator() {
 			<View style={styles.container}>
 				<ConnectionBanner status={connectionStatus} topInset={insets.top} />
 
-				<SafeAreaInsetsContext.Provider value={navigatorInsets}>
-					<Tab.Navigator
-						tabBar={props => <AppTabBar {...props} />}
-						screenOptions={({ route }) => ({
-							tabBarActiveTintColor: theme.colors.primary,
-							tabBarInactiveTintColor: theme.colors.textSecondary,
-							tabBarStyle: styles.tabBar,
-							tabBarLabelStyle: styles.tabLabel,
-							headerStyle: {
-								backgroundColor: theme.colors.background,
-							},
-							headerTintColor: theme.colors.text,
-							headerShadowVisible: false,
-							headerTitleStyle: {
-								fontWeight: theme.typography.weights.bold,
-							},
-							tabBarIcon: ({ focused, color }) => {
-								const icons = TAB_ICONS[route.name];
-								const iconName = focused ? icons.active : icons.inactive;
-								return (
-									<View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
-										<Ionicons
-											name={iconName}
-											size={20}
-											color={focused ? theme.colors.onColor : color}
-										/>
-									</View>
-								);
-							},
-						})}
-					>
-						<Tab.Screen
-							name="HomeTab"
-							options={{
-								title: 'Accueil',
-								tabBarAccessibilityLabel: 'Accueil',
-								headerShown: false,
-							}}
+				{/* The same tree on every width: a resized window keeps its navigation state. */}
+				<View style={styles.body}>
+					<SafeAreaInsetsContext.Provider value={navigatorInsets}>
+						<Tab.Navigator
+							tabBar={props => <AppTabBar {...props} />}
+							screenOptions={({ route }) => ({
+								tabBarActiveTintColor: theme.colors.primary,
+								tabBarInactiveTintColor: theme.colors.textSecondary,
+								tabBarStyle: styles.tabBar,
+								tabBarLabelStyle: styles.tabLabel,
+								headerStyle: {
+									backgroundColor: theme.colors.background,
+								},
+								headerTintColor: theme.colors.text,
+								headerShadowVisible: false,
+								headerTitleStyle: {
+									fontFamily: theme.typography.families.bold,
+								},
+								...sidebar,
+								tabBarIcon: ({ focused, color }) => {
+									const icons = TAB_ICONS[route.name];
+									const iconName = focused ? icons.active : icons.inactive;
+									if (sidebar) {
+										return (
+											<Ionicons
+												name={iconName}
+												size={22}
+												color={focused ? theme.colors.primary : color}
+											/>
+										);
+									}
+									return (
+										<View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
+											<Ionicons
+												name={iconName}
+												size={20}
+												color={focused ? theme.colors.onColor : color}
+											/>
+										</View>
+									);
+								},
+							})}
 						>
-							{() => <PlaylistsNavigator initialRouteName="Home" />}
-						</Tab.Screen>
-						<Tab.Screen
-							name="PlaylistsTab"
-							options={{
-								title: 'Playlists',
-								tabBarAccessibilityLabel: 'Playlists',
-								headerShown: false,
-							}}
-						>
-							{() => <PlaylistsNavigator initialRouteName="Playlists" />}
-						</Tab.Screen>
-						<Tab.Screen
-							name="SearchTab"
-							component={SearchNavigator}
-							options={{
-								title: 'Recherche',
-								tabBarAccessibilityLabel: 'Recherche',
-								headerShown: false,
-							}}
-						/>
-						<Tab.Screen
-							name="FriendsTab"
-							component={FriendsNavigator}
-							options={{ title: 'Amis', tabBarAccessibilityLabel: 'Amis', headerShown: false }}
-						/>
-						<Tab.Screen
-							name="ProfileTab"
-							component={ProfileNavigator}
-							options={{ title: 'Profil', tabBarAccessibilityLabel: 'Profil', headerShown: false }}
-						/>
-					</Tab.Navigator>
-				</SafeAreaInsetsContext.Provider>
+							<Tab.Screen
+								name="HomeTab"
+								options={{
+									title: 'Accueil',
+									tabBarAccessibilityLabel: 'Accueil',
+									headerShown: false,
+								}}
+							>
+								{() => <PlaylistsNavigator initialRouteName="Home" />}
+							</Tab.Screen>
+							<Tab.Screen
+								name="PlaylistsTab"
+								options={{
+									title: 'Playlists',
+									tabBarAccessibilityLabel: 'Playlists',
+									headerShown: false,
+								}}
+							>
+								{() => <PlaylistsNavigator initialRouteName="Playlists" />}
+							</Tab.Screen>
+							<Tab.Screen
+								name="SearchTab"
+								component={SearchNavigator}
+								options={{
+									title: 'Recherche',
+									tabBarAccessibilityLabel: 'Recherche',
+									headerShown: false,
+								}}
+							/>
+							<Tab.Screen
+								name="FriendsTab"
+								component={FriendsNavigator}
+								options={{ title: 'Amis', tabBarAccessibilityLabel: 'Amis', headerShown: false }}
+							/>
+							<Tab.Screen
+								name="ProfileTab"
+								component={ProfileNavigator}
+								options={{
+									title: 'Profil',
+									tabBarAccessibilityLabel: 'Profil',
+									headerShown: false,
+									// The desktop side bar reaches the profile through the account at its foot.
+									...(breakpoint === 'desktop' ? { tabBarItemStyle: { display: 'none' } } : null),
+								}}
+							/>
+						</Tab.Navigator>
+					</SafeAreaInsetsContext.Provider>
+					{breakpoint === 'desktop' && panelOpen && <NowPlayingPanel />}
+				</View>
+
+				{sidebar && (
+					<View style={[styles.playerBar, { borderTopColor: separator }]}>
+						{breakpoint === 'desktop' ? <PlayerBar /> : <MiniPlayer />}
+					</View>
+				)}
 
 				<PlayerModal />
 				<PlayerErrorToast />
+				{Platform.OS === 'web' && <KeyboardShortcuts />}
 			</View>
 		</PlayerProvider>
 	);
@@ -160,6 +235,11 @@ const createStyles = (theme: Theme, bottomInset: number) =>
 	StyleSheet.create({
 		container: {
 			flex: 1,
+		},
+		// The desktop's now playing panel docks to the right of the screens, above the player bar.
+		body: {
+			flex: 1,
+			flexDirection: 'row',
 		},
 		tabBar: {
 			height: TAB_BAR_HEIGHT + bottomInset,
@@ -182,5 +262,10 @@ const createStyles = (theme: Theme, bottomInset: number) =>
 		},
 		iconContainerActive: {
 			backgroundColor: theme.colors.primary,
+		},
+		playerBar: {
+			paddingBottom: bottomInset,
+			borderTopWidth: 1,
+			backgroundColor: theme.colors.background,
 		},
 	});

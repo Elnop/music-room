@@ -1,9 +1,10 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { Text } from '@/shared/components/ui/Text';
 
 interface SectionHeaderProps {
 	icon: keyof typeof Ionicons.glyphMap;
@@ -13,16 +14,18 @@ interface SectionHeaderProps {
 	/** A section that folds: its header toggles it and shows a chevron. */
 	open?: boolean;
 	onToggle?: () => void;
+	/** A control at the end of a section that does not fold, such as a compact button; the count then follows the title. */
+	action?: React.ReactNode;
 }
 
-export function SectionHeader({ icon, title, count, open, onToggle }: SectionHeaderProps) {
+export function SectionHeader({ icon, title, count, open, onToggle, action }: SectionHeaderProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
 
 	const titleRow = (
 		<View style={styles.titleRow}>
 			<Ionicons name={icon} size={18} color={theme.colors.textSecondary} style={styles.icon} />
 			<Text style={styles.title}>{title}</Text>
-			{onToggle && count > 0 && <Text style={styles.countInline}>{count}</Text>}
+			{(onToggle || action) && count > 0 && <Text style={styles.countInline}>{count}</Text>}
 		</View>
 	);
 
@@ -30,7 +33,7 @@ export function SectionHeader({ icon, title, count, open, onToggle }: SectionHea
 		return (
 			<View style={styles.header}>
 				{titleRow}
-				{count > 0 && <Text style={styles.count}>{count}</Text>}
+				{action ?? (count > 0 && <Text style={styles.count}>{count}</Text>)}
 			</View>
 		);
 	}
@@ -65,7 +68,7 @@ const createStyles = (theme: Theme) =>
 		},
 		title: {
 			fontSize: theme.typography.sizes.md,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 		},
 		count: {

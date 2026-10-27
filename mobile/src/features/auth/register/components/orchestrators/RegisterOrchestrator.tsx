@@ -5,6 +5,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '@/features/auth/types';
 import { useRegisterForm } from '@/features/auth/register/hooks/useRegisterForm';
 import { useProviderSignIn } from '@/features/auth/social/hooks/useProviderSignIn';
+import { useProviderButtons } from '@/features/auth/hooks/useProviderButtons';
 import { RegisterView } from '@/features/auth/register/components/presenters/RegisterView';
 
 type RegisterOrchestratorProps = NativeStackScreenProps<AuthStackParamList, 'Register'>;
@@ -12,6 +13,7 @@ type RegisterOrchestratorProps = NativeStackScreenProps<AuthStackParamList, 'Reg
 export function RegisterOrchestrator({ navigation }: RegisterOrchestratorProps) {
 	const form = useRegisterForm(navigation);
 	const provider = useProviderSignIn(showError);
+	const googleButton = useProviderButtons(() => provider.signIn('google'), 'form');
 	const insets = useSafeAreaInsets();
 
 	return (
@@ -25,6 +27,7 @@ export function RegisterOrchestrator({ navigation }: RegisterOrchestratorProps) 
 			onLogin={form.goToLogin}
 			onGoogle={() => provider.signIn('google')}
 			onFacebook={() => provider.signIn('facebook')}
+			googleButton={googleButton}
 		/>
 	);
 }

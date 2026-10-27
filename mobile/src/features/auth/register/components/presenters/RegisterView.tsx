@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Button } from '@/shared/components/ui/Button';
 import { Input } from '@/shared/components/ui/Input';
 import { useTheme } from '@/shared/theme/ThemeContext';
@@ -7,6 +7,8 @@ import type { Theme } from '@/shared/theme/types';
 import { AuthFormLayout } from '@/features/auth/form/components/presenters/AuthFormLayout';
 import { SocialSignInButtons } from '@/features/auth/social/components/presenters/SocialSignInButtons';
 import type { FieldBinding } from '@/features/auth/form/hooks/useFieldBinding';
+import type { GoogleButtonSlot } from '@/features/auth/types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface RegisterViewProps {
 	email: FieldBinding;
@@ -19,6 +21,7 @@ interface RegisterViewProps {
 	onLogin: () => void;
 	onGoogle: () => void;
 	onFacebook: () => void;
+	googleButton?: GoogleButtonSlot;
 }
 
 export function RegisterView({
@@ -31,6 +34,7 @@ export function RegisterView({
 	onLogin,
 	onGoogle,
 	onFacebook,
+	googleButton,
 }: RegisterViewProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
@@ -49,12 +53,14 @@ export function RegisterView({
 				placeholder="vous@exemple.com"
 				keyboardType="email-address"
 				autoCapitalize="none"
+				submitOnEnter={isLoading ? undefined : onSubmit}
 			/>
 			<Input
 				label="Nom d'utilisateur"
 				{...username}
 				placeholder="votre_pseudo"
 				autoCapitalize="none"
+				submitOnEnter={isLoading ? undefined : onSubmit}
 			/>
 			<Input
 				label="Mot de passe"
@@ -62,6 +68,7 @@ export function RegisterView({
 				placeholder="Choisissez un mot de passe robuste"
 				secureTextEntry
 				autoCapitalize="none"
+				submitOnEnter={isLoading ? undefined : onSubmit}
 			/>
 
 			<View style={styles.passwordHint}>
@@ -79,7 +86,12 @@ export function RegisterView({
 				variant="primary"
 			/>
 
-			<SocialSignInButtons onGoogle={onGoogle} onFacebook={onFacebook} disabled={isLoading} />
+			<SocialSignInButtons
+				onGoogle={onGoogle}
+				onFacebook={onFacebook}
+				disabled={isLoading}
+				googleButton={googleButton}
+			/>
 		</AuthFormLayout>
 	);
 }

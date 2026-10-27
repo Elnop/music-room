@@ -40,6 +40,8 @@ const envSchema = z.object({
 	RATE_LIMIT_SUBSCRIPTION_MAX: z.coerce.number().int().positive().default(20),
 	RATE_LIMIT_EVENTS_WINDOW_MS: z.coerce.number().int().positive().default(3600000),
 	RATE_LIMIT_EVENTS_MAX: z.coerce.number().int().positive().default(60),
+	RATE_LIMIT_GEOCODE_WINDOW_MS: z.coerce.number().int().positive().default(3600000),
+	RATE_LIMIT_GEOCODE_MAX: z.coerce.number().int().positive().default(60),
 
 	ACCOUNT_LOCKOUT_ENABLED: z.string().default('true'),
 	ACCOUNT_LOCKOUT_THRESHOLD: z.string().default('5'),

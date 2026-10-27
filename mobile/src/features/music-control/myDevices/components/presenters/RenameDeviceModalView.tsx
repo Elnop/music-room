@@ -1,10 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, Modal, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, StyleSheet, Modal, KeyboardAvoidingView, Platform } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { Input } from '@/shared/components/ui/Input';
 import { Button } from '@/shared/components/ui/Button';
 import { Pressable } from '@/shared/components/ui/Pressable';
+import { DIALOG_MAX_WIDTH } from '@/shared/constants/layout';
+import { Text } from '@/shared/components/ui/Text';
 
 const DEVICE_NAME_MAX_LENGTH = 40;
 
@@ -91,13 +93,16 @@ const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.backdrop,
 		},
 		dialog: {
+			width: '100%',
+			maxWidth: DIALOG_MAX_WIDTH,
+			alignSelf: 'center',
 			backgroundColor: theme.colors.background,
 			borderRadius: 16,
 			padding: theme.spacing.lg,
 		},
 		title: {
 			fontSize: 18,
-			fontWeight: theme.typography.weights.bold,
+			fontFamily: theme.typography.families.bold,
 			color: theme.colors.text,
 			marginBottom: theme.spacing.md,
 		},

@@ -3,6 +3,7 @@ import {
 	useLinkedProviders,
 	useLinkProvider,
 	useUnlinkProvider,
+	useGoogleButton,
 	type OAuthProvider,
 } from '@/shared/services/linkedAccountsBridge';
 import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
@@ -72,6 +73,8 @@ export function useLinkedAccountsScreen() {
 		[unlinkProvider]
 	);
 
+	const googleButton = useGoogleButton(() => handleLink('google'), 'row');
+
 	return {
 		theme,
 		bottomPadding,
@@ -80,5 +83,6 @@ export function useLinkedAccountsScreen() {
 		pending,
 		handleLink,
 		handleUnlink,
+		googleButton,
 	};
 }

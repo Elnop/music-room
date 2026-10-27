@@ -1,8 +1,14 @@
 import type { UserProfile } from '@/types/user.types';
-import type { LinkedProvider, OAuthProvider } from '@/shared/services/linkedAccountsBridge';
+import type {
+	GoogleButtonSlot,
+	GoogleButtonVariant,
+	LinkedProvider,
+	OAuthProvider,
+} from '@/shared/services/linkedAccountsBridge';
 
 // Mirrors the backend response types (backend/src/features/auth/auth.types.ts).
 export type { LinkedProvider, OAuthProvider };
+export type { GoogleButtonSlot, GoogleButtonVariant };
 
 export interface LinkedProvidersResponse {
 	providers: LinkedProvider[];
@@ -42,4 +48,5 @@ export type AuthStackParamList = {
 	EmailVerification: { userId: string; email: string };
 	ForgotPassword: { email?: string } | undefined;
 	ResetPassword: { email: string };
+	PrivacyPolicy: undefined;
 };

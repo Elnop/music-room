@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import { createRowStyles } from './queueModalStyles';
+import { Text } from '@/shared/components/ui/Text';
 
 interface QueueTrackDetailsProps {
 	title: string;

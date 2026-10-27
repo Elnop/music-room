@@ -7,6 +7,7 @@ const entry = (expiresAt: number | null = NOW + 30 * MINUTE_MS) => ({
 	queueItemId: 'b',
 	permalink: 'https://soundcloud.com/artist/b',
 	streamUrl: 'ub',
+	protocol: 'hls' as const,
 	expiresAt,
 });
 

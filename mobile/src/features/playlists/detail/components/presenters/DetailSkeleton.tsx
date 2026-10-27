@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SkeletonBlock, SkeletonList, TrackRowSkeleton } from '@/shared/components/ui/Skeleton';
 import type { Theme } from '@/shared/theme/types';
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { createDetailStyles } from './detailStyles';
 
@@ -10,13 +11,14 @@ export function DetailSkeleton() {
 	const insets = useSafeAreaInsets();
 	const { styles, theme } = useThemedStyles(createStyles);
 	const layout = React.useMemo(() => createDetailStyles(theme, insets.top), [theme, insets.top]);
+	const { isWide } = useBreakpoint();
 
 	return (
 		<View style={layout.container}>
 			<SkeletonList
 				count={8}
 				row={TrackRowSkeleton}
-				style={layout.list}
+				style={[layout.list, isWide && layout.column]}
 				header={
 					<View style={styles.header}>
 						<SkeletonBlock width={200} height={200} radius={8} />

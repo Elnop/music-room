@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated from 'react-native-reanimated';
 import { useTheme } from '@/shared/theme/ThemeContext';
@@ -8,6 +8,7 @@ import { Pressable } from '@/shared/components/ui/Pressable';
 import { Artwork } from '@/shared/components/media/Artwork';
 import type { MiniPlayerData } from '@/features/player/miniPlayer/hooks/useMiniPlayer';
 import { createStyles } from './miniPlayerStyles';
+import { Text } from '@/shared/components/ui/Text';
 
 interface MiniPlayerViewProps {
 	data: MiniPlayerData;
@@ -43,6 +44,7 @@ export function MiniPlayerView({ data }: MiniPlayerViewProps) {
 			style={styles.container}
 			onPress={onToggleModal}
 			accessible={false}
+			accessibilityRole="none"
 			accessibilityLabel="Mini-lecteur"
 		>
 			<View style={styles.content}>

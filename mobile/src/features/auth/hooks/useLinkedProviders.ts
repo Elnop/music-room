@@ -7,6 +7,7 @@ import { signInWithGoogle } from '@/features/auth/services/googleSignIn';
 import { signInWithFacebook } from '@/features/auth/services/facebookSignIn';
 import type { LinkedProvidersResponse, OAuthProvider } from '@/features/auth/types';
 import { registerLinkedAccountsBridge } from '@/shared/services/linkedAccountsBridge';
+import { useProviderButtons } from './useProviderButtons';
 
 /** The screens using these hooks are signed in. */
 function accessToken(): string {
@@ -35,7 +36,7 @@ function useLinkedProviders() {
 	});
 }
 
-/** A cancelled native sign-in rejects with Error('SIGN_IN_CANCELLED') before any request. */
+/** A cancelled provider sign-in rejects with Error('SIGN_IN_CANCELLED') before any request. */
 function useLinkProvider() {
 	const queryKey = useProvidersKey();
 	const queryClient = useQueryClient();
@@ -64,4 +65,5 @@ registerLinkedAccountsBridge({
 	useLinkedProviders,
 	useLinkProvider,
 	useUnlinkProvider,
+	useGoogleButton: useProviderButtons,
 });

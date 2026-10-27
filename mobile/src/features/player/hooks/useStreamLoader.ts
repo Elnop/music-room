@@ -37,7 +37,7 @@ export function useStreamLoader(): void {
 				currentTrack.permalink_url
 			);
 			if (prefetched) {
-				setStreamUrl(prefetched.streamUrl, prefetched.expiresAt);
+				setStreamUrl(prefetched.streamUrl, prefetched.expiresAt, prefetched.protocol);
 				return;
 			}
 
@@ -45,13 +45,13 @@ export function useStreamLoader(): void {
 			const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
 			try {
-				const { streamUrl: url, expiresAt } = await fetchStreamUrl(
+				const { streamUrl: url, expiresAt, protocol } = await fetchStreamUrl(
 					currentTrack.permalink_url,
 					controller.signal
 				);
 				clearTimeout(timeoutId);
 				if (currentLoadCounterRef.current !== thisLoadCounter) return;
-				setStreamUrl(url, expiresAt);
+				setStreamUrl(url, expiresAt, protocol);
 			} catch (err) {
 				clearTimeout(timeoutId);
 				if (currentLoadCounterRef.current !== thisLoadCounter) return;

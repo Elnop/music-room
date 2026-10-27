@@ -7,11 +7,16 @@ import { toTrackInput } from '@/shared/utils/trackInput';
 import { createModalStyles } from '@/features/queue/queueModal/components/presenters/queueModalStyles';
 import type { QueueItem } from '@/features/queue/types';
 import type { AddQueueItemBody } from '@/shared/types/playback';
+import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 
 export function useQueueModal() {
 	const { theme } = useTheme();
 	const insets = useSafeAreaInsets();
-	const styles = React.useMemo(() => createModalStyles(theme, insets), [theme, insets]);
+	const separator = useSeparatorColor();
+	const styles = React.useMemo(
+		() => createModalStyles(theme, insets, separator),
+		[theme, insets, separator]
+	);
 
 	const { items, currentItemId } = useActiveQueue();
 	const playItem = useQueueStore(state => state.playItem);

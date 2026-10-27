@@ -5,7 +5,11 @@ import { ProfileScreenLayout } from '@/features/profile/common/components/presen
 import { LinkedAccountRow } from '@/features/profile/linkedAccounts/components/presenters/LinkedAccountRow';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
-import type { LinkedProvider, OAuthProvider } from '@/shared/services/linkedAccountsBridge';
+import type {
+	GoogleButtonSlot,
+	LinkedProvider,
+	OAuthProvider,
+} from '@/shared/services/linkedAccountsBridge';
 
 type MethodType = LinkedProvider['type'];
 
@@ -29,6 +33,7 @@ interface LinkedAccountsViewProps {
 	pending: OAuthProvider | null;
 	onLink: (provider: OAuthProvider) => void;
 	onUnlink: (provider: OAuthProvider) => void;
+	googleButton?: GoogleButtonSlot;
 }
 
 export function LinkedAccountsView({
@@ -38,6 +43,7 @@ export function LinkedAccountsView({
 	pending,
 	onLink,
 	onUnlink,
+	googleButton,
 }: LinkedAccountsViewProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
@@ -62,6 +68,7 @@ export function LinkedAccountsView({
 									pending={pending}
 									onLink={onLink}
 									onUnlink={onUnlink}
+									googleButton={method.type === 'google' ? googleButton : undefined}
 								/>
 							</View>
 						);

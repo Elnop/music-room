@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, FlatList, StyleSheet, RefreshControl } from 'react-native';
+import { View, FlatList, StyleSheet, RefreshControl, type TextInput } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { SearchBar } from '@/shared/components/form/SearchBar';
 import { SkeletonList, TrackRowSkeleton } from '@/shared/components/ui/Skeleton';
@@ -9,8 +9,10 @@ import { SoundCloudTrackItem } from './SoundCloudTrackItem';
 import type { Theme } from '@/shared/theme/types';
 import type { SoundCloudTrack } from '@/features/search/types';
 import type { AddQueueItemBody } from '@/shared/types/playback';
+import { useContentColumn } from '@/shared/hooks/useContentColumn';
 
 interface SearchViewProps {
+	inputRef: React.RefObject<TextInput | null>;
 	searchQuery: string;
 	debouncedQuery: string;
 	isLoading: boolean;
@@ -29,6 +31,7 @@ interface SearchViewProps {
 }
 
 export function SearchView({
+	inputRef,
 	searchQuery,
 	debouncedQuery,
 	isLoading,
@@ -48,11 +51,13 @@ export function SearchView({
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 	const TrackActionsSheet = getTrackActionsSheet();
+	const column = useContentColumn();
 
 	return (
 		<View style={styles.container}>
-			<View style={styles.header}>
+			<View style={[styles.header, column]}>
 				<SearchBar
+					inputRef={inputRef}
 					value={searchQuery}
 					onChangeText={onSearchChange}
 					placeholder="Rechercher sur SoundCloud..."
@@ -61,7 +66,7 @@ export function SearchView({
 			</View>
 
 			{isLoading && !isRefreshing && searchResults.length === 0 ? (
-				<SkeletonList count={8} row={TrackRowSkeleton} />
+				<SkeletonList count={8} row={TrackRowSkeleton} style={column} />
 			) : (
 				<FlatList
 					data={searchResults}
@@ -82,10 +87,7 @@ export function SearchView({
 							onShowActions={onShowActions}
 						/>
 					)}
-					contentContainerStyle={{
-						paddingBottom: bottomPadding,
-						flexGrow: 1,
-					}}
+					contentContainerStyle={[{ paddingBottom: bottomPadding, flexGrow: 1 }, column]}
 					ListEmptyComponent={
 						isLoading ? null : isError && debouncedQuery.trim() ? (
 							<EmptyState

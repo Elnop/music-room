@@ -1,26 +1,33 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Artwork } from '@/shared/components/media/Artwork';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import type { FriendPlaylistSummary } from '@/features/friends/types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface FriendPlaylistCardProps {
 	playlist: FriendPlaylistSummary;
 	ownerName: string;
 	onPress: () => void;
+	style?: StyleProp<ViewStyle>;
 }
 
 const tracksLabel = (count: number) => `${count} ${count === 1 ? 'titre' : 'titres'}`;
 
-export function FriendPlaylistCard({ playlist, ownerName, onPress }: FriendPlaylistCardProps) {
+export function FriendPlaylistCard({
+	playlist,
+	ownerName,
+	onPress,
+	style,
+}: FriendPlaylistCardProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 	const coverUri = playlist.coverUrl || playlist.firstTrackCover;
 
 	return (
-		<Pressable style={styles.row} onPress={onPress} accessibilityLabel={playlist.name}>
+		<Pressable style={[styles.row, style]} onPress={onPress} accessibilityLabel={playlist.name}>
 			<Artwork uri={coverUri} size={48} iconSize={24} style={styles.rowCover} />
 			<View style={styles.rowInfo}>
 				<Text style={styles.rowName} numberOfLines={1}>
@@ -51,7 +58,7 @@ const createStyles = (theme: Theme) =>
 		},
 		rowName: {
 			fontSize: theme.typography.sizes.md,
-			fontWeight: theme.typography.weights.medium,
+			fontFamily: theme.typography.families.medium,
 			color: theme.colors.text,
 			marginBottom: 2,
 		},

@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { FriendPlaylistSummary } from '@/features/friends/types';
 import { FriendPlaylistCard } from './FriendPlaylistCard';
 import { createUserProfileStyles } from './userProfileStyles';
+import { Text } from '@/shared/components/ui/Text';
 
 interface UserProfilePlaylistsProps {
 	playlists: FriendPlaylistSummary[];

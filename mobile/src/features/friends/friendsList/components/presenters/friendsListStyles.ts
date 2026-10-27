@@ -31,12 +31,12 @@ export const createFriendsListStyles = (theme: Theme) =>
 		},
 		tabText: {
 			fontSize: theme.typography.sizes.sm,
-			fontWeight: theme.typography.weights.medium,
+			fontFamily: theme.typography.families.medium,
 			color: theme.colors.textSecondary,
 		},
 		tabTextActive: {
 			color: theme.colors.surface,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 		},
 		searchBar: {
 			marginBottom: theme.spacing.sm,
@@ -59,7 +59,7 @@ export const createFriendsListStyles = (theme: Theme) =>
 		},
 		username: {
 			fontSize: theme.typography.sizes.md,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 		},
 		displayName: {
@@ -81,7 +81,27 @@ export const createFriendsListStyles = (theme: Theme) =>
 		},
 		controlTextActive: {
 			color: theme.colors.primary,
-			fontWeight: theme.typography.weights.medium,
+			fontFamily: theme.typography.families.medium,
+		},
+		cardHeader: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			paddingTop: theme.spacing.sm,
+			paddingHorizontal: theme.spacing.md,
+		},
+		cardFooter: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			justifyContent: 'space-between',
+			gap: theme.spacing.sm,
+			paddingTop: theme.spacing.xs,
+			paddingBottom: theme.spacing.sm,
+			paddingHorizontal: theme.spacing.md,
+		},
+		cardFooterText: {
+			flex: 1,
+			fontSize: theme.typography.sizes.sm,
+			color: theme.colors.textSecondary,
 		},
 		controlToggle: {
 			alignItems: 'center',
@@ -93,6 +113,16 @@ export const createFriendsListStyles = (theme: Theme) =>
 			height: 31,
 			justifyContent: 'center',
 			alignItems: 'center',
+		},
+		gridRow: {
+			gap: theme.spacing.sm,
+			paddingHorizontal: theme.spacing.sm,
+		},
+		// Each cell grows by 1/columns, so a last row that is not full keeps the cell width.
+		gridCell: {
+			borderRadius: 12,
+			backgroundColor: theme.colors.surface,
+			marginBottom: theme.spacing.sm,
 		},
 		emptyState: {
 			paddingTop: theme.spacing.xxl,

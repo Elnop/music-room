@@ -1,19 +1,20 @@
 import React, { useMemo } from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
+import { useGridTileWidth } from '@/shared/hooks/useGridTileWidth';
 import { SkeletonBlock } from './SkeletonBlock';
-
-// Same width as PlaylistGridCard, so the grid does not jump when cards arrive.
-const GRID_CARD_WIDTH = (Dimensions.get('window').width - 48 - 8) / 2;
 
 interface PlaylistCardSkeletonProps {
 	width?: number;
 }
 
 /** Same shape as a playlist card: square cover, name and owner lines. */
-export function PlaylistCardSkeleton({ width = GRID_CARD_WIDTH }: PlaylistCardSkeletonProps) {
+export function PlaylistCardSkeleton({ width: fixedWidth }: PlaylistCardSkeletonProps) {
 	const { theme } = useTheme();
+	// Same width as PlaylistGridCard, so the grid does not jump when cards arrive.
+	const tileWidth = useGridTileWidth();
+	const width = fixedWidth ?? tileWidth;
 	const styles = useMemo(() => createStyles(theme), [theme]);
 	return (
 		<View style={{ width }}>

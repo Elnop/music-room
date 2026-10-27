@@ -1,31 +1,45 @@
 import React from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { ActionSheet } from '@/features/playlists/actionSheet/components/presenters/ActionSheet';
 import { ActionSheetRow } from '@/features/playlists/actionSheet/components/presenters/ActionSheetRow';
+import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 import type { TrackActions } from '@/features/playlists/trackActions/hooks/useTrackActions';
+import { Text } from '@/shared/components/ui/Text';
+import { NewPlaylistForm } from '@/features/playlists/trackActions/components/presenters/NewPlaylistForm';
+
+const TITLES = { playlists: 'Ajouter à une playlist', newPlaylist: 'Nouvelle playlist' } as const;
 
 interface TrackActionsViewProps {
 	actions: TrackActions;
+	anchor: MenuAnchor | null;
 	onClose: () => void;
 }
 
 /** The sheet of a track's quick actions, or the playlists to add it to. */
-export function TrackActionsView({ actions, onClose }: TrackActionsViewProps) {
+export function TrackActionsView({ actions, anchor, onClose }: TrackActionsViewProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
-	const onPlaylists = actions.step === 'playlists';
+	const { step } = actions;
+	const onActions = step === 'actions';
 
 	return (
 		<ActionSheet
 			visible={actions.visible}
-			title={onPlaylists ? 'Ajouter à une playlist' : actions.shown?.title}
-			subtitle={onPlaylists ? undefined : (actions.shown?.artist ?? '')}
-			onBack={onPlaylists ? actions.backToActions : undefined}
+			title={onActions ? actions.shown?.title : TITLES[step]}
+			subtitle={onActions ? (actions.shown?.artist ?? '') : undefined}
+			onBack={
+				step === 'playlists'
+					? actions.backToActions
+					: step === 'newPlaylist'
+						? actions.backToPlaylists
+						: undefined
+			}
 			onClose={onClose}
 			maxHeight="70%"
+			anchor={anchor}
 		>
-			{!onPlaylists ? (
+			{onActions ? (
 				<View>
 					<ActionSheetRow
 						icon="play-forward-outline"
@@ -45,24 +59,31 @@ export function TrackActionsView({ actions, onClose }: TrackActionsViewProps) {
 					/>
 					<ActionSheetRow icon="share-outline" label="Partager" onPress={actions.share} />
 				</View>
-			) : actions.loadingPlaylists ? (
-				<View style={styles.centered}>
-					<ActivityIndicator testID="track-actions-loading" color={theme.colors.primary} />
-				</View>
-			) : actions.editable.length === 0 ? (
-				<Text style={styles.emptyText}>Aucune playlist modifiable</Text>
+			) : step === 'newPlaylist' ? (
+				<NewPlaylistForm draft={actions.newPlaylist} />
 			) : (
-				<ScrollView style={styles.list}>
-					{actions.editable.map(playlist => (
-						<ActionSheetRow
-							key={playlist.id}
-							icon="musical-notes-outline"
-							label={playlist.name}
-							detail={`${playlist.trackCount} ${playlist.trackCount === 1 ? 'titre' : 'titres'}`}
-							onPress={() => actions.addToPlaylist(playlist)}
-						/>
-					))}
-				</ScrollView>
+				<View>
+					<ActionSheetRow icon="add" label="Nouvelle playlist" onPress={actions.openNewPlaylist} />
+					{actions.loadingPlaylists ? (
+						<View style={styles.centered}>
+							<ActivityIndicator testID="track-actions-loading" color={theme.colors.primary} />
+						</View>
+					) : actions.editable.length === 0 ? (
+						<Text style={styles.emptyText}>Aucune playlist modifiable</Text>
+					) : (
+						<ScrollView style={styles.list}>
+							{actions.editable.map(playlist => (
+								<ActionSheetRow
+									key={playlist.id}
+									icon="musical-notes-outline"
+									label={playlist.name}
+									detail={`${playlist.trackCount} ${playlist.trackCount === 1 ? 'titre' : 'titres'}`}
+									onPress={() => actions.addToPlaylist(playlist)}
+								/>
+							))}
+						</ScrollView>
+					)}
+				</View>
 			)}
 		</ActionSheet>
 	);

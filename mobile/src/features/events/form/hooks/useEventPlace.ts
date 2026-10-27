@@ -3,10 +3,10 @@ import { logger } from '@/shared/utils/logger';
 import { showError } from '@/shared/utils/toast';
 import {
 	currentPlace,
-	geocodeAddress,
 	requestLocationPermission,
 	type Coordinates,
 } from '@/features/events/utils/eventLocation';
+import { geocodeAddress, geocoderNeedsLocationPermission } from '@/features/events/utils/geocoder';
 
 interface Located extends Coordinates {
 	/** The address these coordinates belong to: typing another one geocodes it again. */
@@ -21,6 +21,8 @@ export interface EventPlace {
 	resolve: (address: string) => Promise<Coordinates | null>;
 }
 
+const POSITION_PERMISSION_NEEDED =
+	"Autorisez la localisation pour utiliser votre position : Zumik ne l'envoie jamais au serveur";
 const PERMISSION_NEEDED =
 	"Autorisez la localisation pour situer l'adresse : Zumik ne l'envoie jamais au serveur";
 
@@ -39,7 +41,7 @@ export function useEventPlace(
 		setIsLocating(true);
 		try {
 			if (!(await requestLocationPermission())) {
-				showError(PERMISSION_NEEDED);
+				showError(POSITION_PERMISSION_NEEDED);
 				return;
 			}
 			const place = await currentPlace();
@@ -57,7 +59,7 @@ export function useEventPlace(
 		if (located && located.address.trim() === address.trim()) {
 			return { latitude: located.latitude, longitude: located.longitude };
 		}
-		if (!(await requestLocationPermission())) {
+		if (geocoderNeedsLocationPermission && !(await requestLocationPermission())) {
 			showError(PERMISSION_NEEDED);
 			return null;
 		}

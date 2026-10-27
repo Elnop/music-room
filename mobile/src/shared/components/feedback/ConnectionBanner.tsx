@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
@@ -7,6 +7,7 @@ import { useSocketStore } from '@/shared/stores/socketStore';
 import type { ConnectionStatus } from '@/shared/hooks/useConnectionStatus';
 import type { Theme } from '@/shared/theme/types';
 import { FIXED_COLORS } from '@/shared/theme/tokens';
+import { Text } from '@/shared/components/ui/Text';
 
 interface ConnectionBannerProps {
 	/** From useConnectionStatus(); null renders nothing. */
@@ -108,7 +109,7 @@ const createStyles = (theme: Theme, topInset: number) =>
 		},
 		text: {
 			fontSize: theme.typography.sizes.sm,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 		},
 		button: {
 			marginLeft: theme.spacing.sm,
@@ -118,6 +119,6 @@ const createStyles = (theme: Theme, topInset: number) =>
 		},
 		buttonText: {
 			fontSize: theme.typography.sizes.sm,
-			fontWeight: theme.typography.weights.bold,
+			fontFamily: theme.typography.families.bold,
 		},
 	});

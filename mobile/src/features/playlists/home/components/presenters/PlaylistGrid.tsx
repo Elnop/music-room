@@ -8,9 +8,11 @@ import { PlaylistGridCard } from './PlaylistCards';
 interface PlaylistGridProps {
 	playlists: Playlist[];
 	onOpen: (id: string) => void;
+	/** The menu of a card; none for a playlist without one. */
+	actionsFor?: (playlist: Playlist) => (() => void) | undefined;
 }
 
-export function PlaylistGrid({ playlists, onOpen }: PlaylistGridProps) {
+export function PlaylistGrid({ playlists, onOpen, actionsFor }: PlaylistGridProps) {
 	const { styles } = useThemedStyles(createListStyles);
 
 	return (
@@ -20,6 +22,7 @@ export function PlaylistGrid({ playlists, onOpen }: PlaylistGridProps) {
 					key={playlist.id}
 					playlist={playlist}
 					onPress={() => onOpen(playlist.id)}
+					onShowActions={actionsFor?.(playlist)}
 				/>
 			))}
 		</View>

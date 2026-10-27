@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { useAudioPlayerStatus, type useAudioPlayer } from 'expo-audio';
+import { useAudioPlayerStatus } from '@/features/player/services/audioPlayer';
+import type { AudioPlayer } from '@/features/player/types';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { isLocalTarget } from '@/shared/services/connectBridge';
 import { RENEWAL_HEALTHY_MS } from '@/features/player/constants';
@@ -9,7 +10,7 @@ function playsLocally(): boolean {
 }
 
 /** Renews the stream once when the player fails mid-track. */
-export function useStreamWatchdog(player: ReturnType<typeof useAudioPlayer>): void {
+export function useStreamWatchdog(player: AudioPlayer): void {
 	const status = useAudioPlayerStatus(player);
 	const isPlaying = usePlayerStore(state => state.playbackState === 'playing');
 	const loadedPlayerIdRef = useRef<number | null>(null);

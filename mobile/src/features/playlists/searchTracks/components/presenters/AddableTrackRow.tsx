@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { useContextMenu } from '@/shared/hooks/useContextMenu';
 import { QueueSwipe } from '@/shared/components/lists/QueueSwipe';
 import { Artwork } from '@/shared/components/media/Artwork';
 import { PreviewBadge } from '@/shared/components/media/PreviewBadge';
@@ -11,6 +12,7 @@ import { Pressable } from '@/shared/components/ui/Pressable';
 import { formatDuration } from '@/shared/utils/formatters';
 import { isPreviewOnly } from '@/shared/utils/soundcloudPreview';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
+import { Text } from '@/shared/components/ui/Text';
 
 interface AddableTrackRowProps {
 	track: SoundCloudTrack;
@@ -29,9 +31,10 @@ export const AddableTrackRow = React.memo(function AddableTrackRow({
 	onShowActions,
 }: AddableTrackRowProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
+	const contextMenu = useContextMenu(() => onShowActions(track));
 
 	return (
-		<View style={styles.trackRow}>
+		<View style={styles.trackRow} {...contextMenu}>
 			<QueueSwipe onAddToQueue={() => onAddToQueue(track)}>
 				<Pressable
 					style={styles.trackItem}
@@ -102,7 +105,7 @@ const createStyles = (theme: Theme) =>
 		},
 		trackTitle: {
 			fontSize: 15,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 			marginBottom: 3,
 		},

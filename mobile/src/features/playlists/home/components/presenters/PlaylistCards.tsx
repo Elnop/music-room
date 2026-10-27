@@ -1,40 +1,41 @@
 import React from 'react';
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Artwork } from '@/shared/components/media/Artwork';
 import { Pressable } from '@/shared/components/ui/Pressable';
+import { useContextMenu } from '@/shared/hooks/useContextMenu';
+import { useGridTileWidth } from '@/shared/hooks/useGridTileWidth';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { Playlist } from '@/features/playlists/types';
 import { playlistCardLabel, tracksLabel } from '@/features/playlists/home/utils/playlistLabels';
 import { OwnerAvatarBadge } from './OwnerAvatarBadge';
 import { PrivateBadge } from './PrivateBadge';
-
-const GRID_CARD_WIDTH = (Dimensions.get('window').width - 48 - 8) / 2;
+import { Text } from '@/shared/components/ui/Text';
 
 const coverOf = (playlist: Playlist) => playlist.coverUrl || playlist.firstTrackCover;
 
 interface PlaylistGridCardProps {
 	playlist: Playlist;
 	onPress: () => void;
+	/** Web: a right click or the Menu key opens the playlist's menu. */
+	onShowActions?: () => void;
 }
 
-export function PlaylistGridCard({ playlist, onPress }: PlaylistGridCardProps) {
+export function PlaylistGridCard({ playlist, onPress, onShowActions }: PlaylistGridCardProps) {
 	const { styles } = useThemedStyles(createStyles);
+	const width = useGridTileWidth();
 	const { owner } = playlist;
+	const contextMenu = useContextMenu(onShowActions);
 
 	return (
 		<Pressable
-			style={styles.tile}
+			{...contextMenu}
+			style={[styles.tile, { width }]}
 			onPress={onPress}
 			accessibilityLabel={playlistCardLabel(playlist.name, owner)}
 		>
 			<View>
-				<Artwork
-					uri={coverOf(playlist)}
-					size={GRID_CARD_WIDTH}
-					iconSize={32}
-					style={styles.tileCover}
-				/>
+				<Artwork uri={coverOf(playlist)} size={width} iconSize={32} style={styles.tileCover} />
 				{playlist.visibility === 'private' && <PrivateBadge style={styles.tileBadge} />}
 				{owner && <OwnerAvatarBadge owner={owner} />}
 			</View>
@@ -53,13 +54,13 @@ export function PlaylistGridCard({ playlist, onPress }: PlaylistGridCardProps) {
 const createStyles = (theme: Theme) =>
 	StyleSheet.create({
 		meta: { fontSize: theme.typography.sizes.sm, color: theme.colors.textSecondary },
-		tile: { width: GRID_CARD_WIDTH, marginBottom: theme.spacing.lg },
+		tile: { marginBottom: theme.spacing.lg },
 		tileCover: { borderRadius: 8 },
 		tileBadge: { position: 'absolute', top: 8, right: 8, paddingVertical: 3 },
 		tileInfo: { marginTop: theme.spacing.sm, paddingHorizontal: 2 },
 		tileName: {
 			fontSize: theme.typography.sizes.md,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 			marginBottom: 2,
 		},

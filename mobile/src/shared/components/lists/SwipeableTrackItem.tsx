@@ -1,12 +1,18 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
+import { useContextMenu } from '@/shared/hooks/useContextMenu';
+import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import { QueueSwipe } from './QueueSwipe';
 import { TrackActionsButton } from './TrackActionsButton';
+import { TrackTableRow } from './TrackTableRow';
 import type { Theme } from '@/shared/theme/types';
 import type { Track } from '@/types/track.types';
+import { Text } from '@/shared/components/ui/Text';
+import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
 interface SwipeableTrackItemProps {
 	track: Track;
@@ -29,6 +35,8 @@ interface SwipeableTrackItemProps {
 	isPending?: boolean;
 	/** Greyed out, with no queue swipe nor quick actions; delete and drag still work. */
 	unavailable?: boolean;
+	/** Its number in the list, from 1: wide screens then lay the row out as a table row. */
+	position?: number;
 }
 
 export function SwipeableTrackItem({
@@ -43,10 +51,15 @@ export function SwipeableTrackItem({
 	onPress,
 	isPending = false,
 	unavailable = false,
+	position,
 }: SwipeableTrackItemProps) {
 	const { theme } = useTheme();
-	const styles = React.useMemo(() => createStyles(theme), [theme]);
+	const separator = useSeparatorColor();
+	const styles = React.useMemo(() => createStyles(theme, separator), [theme, separator]);
 	const actions = unavailable ? undefined : onShowActions;
+	const { isWide } = useBreakpoint();
+	const dragStart = !disabled ? onDragStart : undefined;
+	const contextMenu = useContextMenu(actions);
 
 	const renderRightActions = () => (
 		<Pressable
@@ -64,79 +77,103 @@ export function SwipeableTrackItem({
 			onAddToQueue={unavailable ? undefined : onAddToQueue}
 			renderRightActions={disabled ? undefined : renderRightActions}
 		>
-			<Pressable
-				onPress={onPress}
-				onLongPress={actions}
-				accessibilityLabel={`${track.title}, ${track.artist}${unavailable ? ', indisponible' : ''}`}
-				accessibilityHint={actions ? 'Appui long pour les actions du titre' : undefined}
-				accessibilityState={{ selected: isCurrent, busy: isPending, disabled: unavailable }}
-				style={[
-					styles.trackContainer,
-					isCurrent && styles.trackContainerCurrent,
-					isDragActive && styles.trackContainerActive,
-				]}
-			>
-				{track.albumArt ? (
-					<Image
-						source={{ uri: track.albumArt }}
-						style={[styles.albumArt, unavailable && styles.unavailable]}
-					/>
-				) : (
-					<View
-						style={[styles.albumArt, styles.albumArtPlaceholder, unavailable && styles.unavailable]}
-					>
-						<Ionicons name="musical-notes" size={24} color={theme.colors.textSecondary} />
-					</View>
-				)}
-
-				<View style={[styles.trackInfo, unavailable && styles.unavailable]}>
-					<Text
-						style={[styles.trackTitle, isCurrent && styles.trackTitleCurrent]}
-						numberOfLines={1}
-					>
-						{track.title}
-					</Text>
-					<Text style={styles.trackArtist} numberOfLines={1}>
-						{unavailable ? `Indisponible · ${track.artist}` : track.artist}
-					</Text>
-				</View>
-
-				{isPending && (
-					<ActivityIndicator
-						size="small"
-						color={theme.colors.primary}
-						style={styles.playingIcon}
-						accessibilityLabel="Lancement"
-					/>
-				)}
-
-				{isCurrent && !isPending && (
-					<Ionicons
-						name="volume-high"
-						size={18}
-						color={theme.colors.primary}
-						style={styles.playingIcon}
-						accessibilityLabel="En cours de lecture"
-					/>
-				)}
-
-				{track.durationMs && (
-					<Text style={styles.duration}>{formatDuration(track.durationMs)}</Text>
-				)}
-
-				{actions && <TrackActionsButton onPress={actions} />}
-
-				{!disabled && onDragStart && (
+			{isWide && position !== undefined ? (
+				<TrackTableRow
+					track={track}
+					position={position}
+					isCurrent={isCurrent}
+					isPending={isPending}
+					unavailable={unavailable}
+					isDragActive={isDragActive}
+					onPress={onPress}
+					onShowActions={actions}
+					onDragStart={dragStart}
+				/>
+			) : (
+				<View
+					{...contextMenu}
+					style={[
+						styles.trackContainer,
+						isCurrent && styles.trackContainerCurrent,
+						isDragActive && styles.trackContainerActive,
+					]}
+				>
+					{/* The row's buttons sit beside its pressable area, never in it: the web nests no <button>. */}
 					<Pressable
-						onPressIn={onDragStart}
-						hitSlop={10}
-						style={styles.dragHandle}
-						accessibilityLabel="Réordonner"
+						onPress={onPress}
+						onLongPress={actions}
+						accessibilityLabel={`${track.title}, ${track.artist}${unavailable ? ', indisponible' : ''}`}
+						accessibilityHint={actions ? 'Appui long pour les actions du titre' : undefined}
+						accessibilityState={{ selected: isCurrent, busy: isPending, disabled: unavailable }}
+						style={styles.trackPressable}
 					>
-						<Ionicons name="reorder-three-outline" size={24} color={theme.colors.textSecondary} />
+						{track.albumArt ? (
+							<Image
+								source={{ uri: track.albumArt }}
+								style={[styles.albumArt, unavailable && styles.unavailable]}
+							/>
+						) : (
+							<View
+								style={[
+									styles.albumArt,
+									styles.albumArtPlaceholder,
+									unavailable && styles.unavailable,
+								]}
+							>
+								<Ionicons name="musical-notes" size={24} color={theme.colors.textSecondary} />
+							</View>
+						)}
+
+						<View style={[styles.trackInfo, unavailable && styles.unavailable]}>
+							<Text
+								style={[styles.trackTitle, isCurrent && styles.trackTitleCurrent]}
+								numberOfLines={1}
+							>
+								{track.title}
+							</Text>
+							<Text style={styles.trackArtist} numberOfLines={1}>
+								{unavailable ? `Indisponible · ${track.artist}` : track.artist}
+							</Text>
+						</View>
+
+						{isPending && (
+							<ActivityIndicator
+								size="small"
+								color={theme.colors.primary}
+								style={styles.playingIcon}
+								accessibilityLabel="Lancement"
+							/>
+						)}
+
+						{isCurrent && !isPending && (
+							<Ionicons
+								name="volume-high"
+								size={18}
+								color={theme.colors.primary}
+								style={styles.playingIcon}
+								accessibilityLabel="En cours de lecture"
+							/>
+						)}
+
+						{track.durationMs && (
+							<Text style={styles.duration}>{formatDuration(track.durationMs)}</Text>
+						)}
 					</Pressable>
-				)}
-			</Pressable>
+
+					{actions && <TrackActionsButton onPress={actions} />}
+
+					{dragStart && (
+						<Pressable
+							onPressIn={dragStart}
+							hitSlop={10}
+							style={styles.dragHandle}
+							accessibilityLabel="Réordonner"
+						>
+							<Ionicons name="reorder-three-outline" size={24} color={theme.colors.textSecondary} />
+						</Pressable>
+					)}
+				</View>
+			)}
 		</QueueSwipe>
 	);
 }
@@ -147,7 +184,7 @@ const formatDuration = (ms: number): string => {
 	return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 };
 
-const createStyles = (theme: Theme) =>
+const createStyles = (theme: Theme, separator: string) =>
 	StyleSheet.create({
 		trackContainer: {
 			flexDirection: 'row',
@@ -155,7 +192,12 @@ const createStyles = (theme: Theme) =>
 			padding: 12,
 			backgroundColor: theme.colors.surface,
 			borderBottomWidth: 1,
-			borderBottomColor: theme.colors.border,
+			borderBottomColor: separator,
+		},
+		trackPressable: {
+			flex: 1,
+			flexDirection: 'row',
+			alignItems: 'center',
 		},
 		trackContainerCurrent: {
 			backgroundColor: theme.colors.surfaceAlt,
@@ -179,7 +221,7 @@ const createStyles = (theme: Theme) =>
 		},
 		trackTitle: {
 			fontSize: 15,
-			fontWeight: '600',
+			fontFamily: FONT_FAMILIES.semibold,
 			color: theme.colors.text,
 			marginBottom: 4,
 		},
@@ -221,7 +263,7 @@ const createStyles = (theme: Theme) =>
 		deleteText: {
 			color: theme.colors.onColor,
 			fontSize: 12,
-			fontWeight: '600',
+			fontFamily: FONT_FAMILIES.semibold,
 			marginTop: 4,
 		},
 	});

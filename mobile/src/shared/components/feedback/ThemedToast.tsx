@@ -1,9 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { ToastConfigParams } from 'react-native-toast-message';
 import type { Theme } from '@/shared/theme/types';
 import { Pressable } from '@/shared/components/ui/Pressable';
+import { Text } from '@/shared/components/ui/Text';
+import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
 export type ToastKind = 'success' | 'error' | 'info' | 'warning';
 
@@ -70,7 +72,7 @@ const createStyles = (theme: Theme) =>
 		text1: {
 			color: theme.colors.text,
 			fontSize: 14,
-			fontWeight: '600',
+			fontFamily: FONT_FAMILIES.semibold,
 		},
 		text2: {
 			color: theme.colors.textSecondary,

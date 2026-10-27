@@ -128,6 +128,11 @@ export HOST_IP
 MOBILE_DEV_ENV := $(MOBILE_DIR)/.env.development.local
 DEV_API_URL := http://$(HOST_IP):$(BACKEND_PORT)
 DEV_WS_URL := ws://$(HOST_IP):$(BACKEND_PORT)
+# The web app (make dev-web, dev-web-local) runs in a browser on this machine:
+# it calls the backend on localhost, from METRO_URL, an origin of the backend's
+# ALLOWED_ORIGINS.
+WEB_API_URL := http://localhost:$(BACKEND_PORT)
+WEB_WS_URL := ws://localhost:$(BACKEND_PORT)
 
 # Supabase the backend and the app use in dev-docker, dev-local and
 # generate-types: local (default) is the music-room-dev stack started by

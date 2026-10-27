@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { CodeInput } from '@/features/auth/code/components/presenters/CodeInput';
 import { PasswordScreenLayout } from '@/features/auth/form/components/presenters/PasswordScreenLayout';
@@ -9,6 +9,8 @@ import { Input } from '@/shared/components/ui/Input';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import type { ResetPassword } from '@/features/auth/resetPassword/hooks/useResetPassword';
 import { PasswordRequirements } from './PasswordRequirements';
+import { Text } from '@/shared/components/ui/Text';
+import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
 interface ResetPasswordViewProps {
 	email: string;
@@ -68,6 +70,7 @@ export function ResetPasswordView({ email, form }: ResetPasswordViewProps) {
 					secureTextEntry
 					autoCapitalize="none"
 					editable={!form.isLoading}
+					submitOnEnter={canSubmit ? form.submit : undefined}
 				/>
 				<PasswordRequirements />
 			</View>
@@ -103,7 +106,7 @@ export function ResetPasswordView({ email, form }: ResetPasswordViewProps) {
 }
 
 const styles = StyleSheet.create({
-	email: { fontWeight: '600' },
+	email: { fontFamily: FONT_FAMILIES.semibold },
 	codeContainer: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 32 },
 	codeInput: {
 		width: 48,
@@ -111,7 +114,7 @@ const styles = StyleSheet.create({
 		borderRadius: 12,
 		borderWidth: 2,
 		fontSize: 24,
-		fontWeight: 'bold',
+		fontFamily: FONT_FAMILIES.bold,
 		textAlign: 'center',
 	},
 	passwordSection: { marginBottom: 16 },
@@ -123,6 +126,6 @@ const styles = StyleSheet.create({
 		marginTop: 24,
 	},
 	resendText: { fontSize: 14 },
-	resendLink: { fontSize: 14, fontWeight: '600' },
+	resendLink: { fontSize: 14, fontFamily: FONT_FAMILIES.semibold },
 	resendCooldown: { fontSize: 14, fontStyle: 'italic' },
 });

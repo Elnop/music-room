@@ -1,7 +1,8 @@
 import React from 'react';
-import { ActivityIndicator, Text } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Button } from './Button';
+import { Text } from './Text';
 
 jest.mock('@/shared/theme/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
@@ -29,6 +30,11 @@ describe('Button', () => {
 
 		rerender(<Button title="+" accessibilityLabel="Add a track" onPress={jest.fn()} />);
 		expect(screen.getByRole('button', { name: 'Add a track' })).toBeTruthy();
+	});
+
+	it('shrinks to a header row when compact', () => {
+		render(<Button title="Créer" size="compact" onPress={jest.fn()} />);
+		expect(screen.getByRole('button', { name: 'Créer' })).toHaveStyle({ height: 28 });
 	});
 
 	it('does not call onPress when disabled', () => {

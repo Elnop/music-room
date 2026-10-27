@@ -1,21 +1,27 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
+import { RowGrid } from '@/shared/components/lists/RowGrid';
 import { SectionHeader } from '@/shared/components/lists/SectionHeader';
 import { Button } from '@/shared/components/ui/Button';
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { NearbyEvents } from '@/features/events/nearby/hooks/useNearbyEvents';
 import { BeaconStatusLine } from './BeaconStatusLine';
 import { EventRow } from './EventRow';
+import { Text } from '@/shared/components/ui/Text';
 
 const NOTICE_ACTIONS = {
 	request: { label: 'Autoriser la localisation', handler: 'requestPermission' },
 	settings: { label: 'Ouvrir les réglages', handler: 'openSettings' },
+	retry: { label: 'Réessayer', handler: 'requestPermission' },
 } as const;
 
 export function NearbyEventsSection({ nearby }: { nearby: NearbyEvents }) {
-	const { styles } = useThemedStyles(createStyles);
+	const { styles, theme } = useThemedStyles(createStyles);
+	const { isWide } = useBreakpoint();
 	const action = nearby.notice.action && NOTICE_ACTIONS[nearby.notice.action];
 
 	return (
@@ -24,21 +30,34 @@ export function NearbyEventsSection({ nearby }: { nearby: NearbyEvents }) {
 				icon="location-outline"
 				title="Événements à proximité"
 				count={nearby.items.length}
+				action={
+					<Button
+						title="Créer"
+						variant="outline"
+						size="compact"
+						icon={<Ionicons name="add" size={16} color={theme.colors.text} />}
+						onPress={nearby.createEvent}
+						accessibilityLabel="Créer un événement"
+					/>
+				}
 			/>
 			{nearby.items.length > 0 ? (
-				nearby.items.map(({ event, proximity }) => (
-					<EventRow
-						key={event.id}
-						event={event}
-						proximity={proximity}
-						onPress={() => nearby.openEvent(event.id)}
-					/>
-				))
+				<RowGrid>
+					{nearby.items.map(({ event, proximity }) => (
+						<EventRow
+							key={event.id}
+							event={event}
+							proximity={proximity}
+							onPress={() => nearby.openEvent(event.id)}
+						/>
+					))}
+				</RowGrid>
 			) : (
 				<EmptyState
 					icon="radio-outline"
 					message={nearby.notice.message}
 					action={action ? { label: action.label, onPress: nearby[action.handler] } : undefined}
+					compact={isWide}
 				/>
 			)}
 			<BeaconStatusLine
@@ -48,19 +67,13 @@ export function NearbyEventsSection({ nearby }: { nearby: NearbyEvents }) {
 			{nearby.mine.length > 0 && (
 				<View>
 					<Text style={styles.subtitle}>Vos événements</Text>
-					{nearby.mine.map(event => (
-						<EventRow key={event.id} event={event} onPress={() => nearby.openEvent(event.id)} />
-					))}
+					<RowGrid>
+						{nearby.mine.map(event => (
+							<EventRow key={event.id} event={event} onPress={() => nearby.openEvent(event.id)} />
+						))}
+					</RowGrid>
 				</View>
 			)}
-			<View style={styles.create}>
-				<Button
-					title="Créer un événement"
-					variant="outline"
-					onPress={nearby.createEvent}
-					fullWidth
-				/>
-			</View>
 		</View>
 	);
 }
@@ -69,10 +82,9 @@ const createStyles = (theme: Theme) =>
 	StyleSheet.create({
 		subtitle: {
 			fontSize: theme.typography.sizes.sm,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.textSecondary,
 			paddingHorizontal: theme.spacing.md,
 			marginTop: theme.spacing.sm,
 		},
-		create: { paddingHorizontal: theme.spacing.md, marginTop: theme.spacing.sm },
 	});

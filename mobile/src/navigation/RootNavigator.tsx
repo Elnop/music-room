@@ -6,9 +6,11 @@ import {
 	useNavigationContainerRef,
 } from '@react-navigation/native';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import { NAVIGATION_FONTS } from '@/shared/theme/navigationFonts';
 import { AuthNavigator } from './AuthNavigator';
 import { AppNavigator, type AppTabsParamList } from './AppNavigator';
 import { createLinking, openPendingLink } from './linking';
+import { formatDocumentTitle } from './documentTitle';
 import { useAuthStore } from '@/features/auth/stores/authStore';
 import { useSocketStore } from '@/shared/stores/socketStore';
 import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
@@ -16,6 +18,8 @@ import { isDarkBackground } from '@/shared/components/feedback/ConnectionBanner'
 import { useMusicControlEmitter } from '@/features/music-control/hooks/useMusicControlEmitter';
 import { loadBackendUrl } from '@/shared/services/backendUrl';
 import { logger } from '@/shared/utils/logger';
+
+const DOCUMENT_TITLE = { formatter: formatDocumentTitle };
 
 export function RootNavigator() {
 	const isAuthenticated = useAuthStore(state => state.isAuthenticated);
@@ -32,6 +36,7 @@ export function RootNavigator() {
 		const base = isDarkBackground(theme.colors.background) ? DarkTheme : DefaultTheme;
 		return {
 			...base,
+			fonts: NAVIGATION_FONTS,
 			colors: {
 				...base.colors,
 				primary: theme.colors.primary,
@@ -87,7 +92,12 @@ export function RootNavigator() {
 	}
 
 	return (
-		<NavigationContainer ref={navigationRef} linking={linking} theme={navigationTheme}>
+		<NavigationContainer
+			ref={navigationRef}
+			linking={linking}
+			theme={navigationTheme}
+			documentTitle={DOCUMENT_TITLE}
+		>
 			{isAuthenticated ? <AppNavigator /> : <AuthNavigator />}
 		</NavigationContainer>
 	);

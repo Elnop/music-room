@@ -1,8 +1,9 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { Avatar } from '@/shared/components/media/Avatar';
 import { Button } from '@/shared/components/ui/Button';
+import { BEACON_BROADCAST_AVAILABLE } from '@/shared/constants/platform';
 import { GenreChip } from '@/shared/components/ui/GenreChip';
 import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
 import type { Theme } from '@/shared/theme/types';
@@ -12,7 +13,9 @@ import { formatEventDate, isOngoing } from '@/features/events/utils/eventDates';
 import { createEventScreenStyles } from '@/features/events/form/components/presenters/eventScreenStyles';
 import type { BeaconBroadcast } from '@/features/events/detail/hooks/useBeaconBroadcast';
 import { BeaconCard } from './BeaconCard';
+import { BeaconUnavailableCard } from './BeaconUnavailableCard';
 import { InfoRow } from './InfoRow';
+import { Text } from '@/shared/components/ui/Text';
 
 interface EventDetailViewProps {
 	screen: EventDetailScreen;
@@ -75,7 +78,7 @@ export function EventDetailView({ screen, beacon, bottomPadding }: EventDetailVi
 
 			{screen.isOrganizer && (
 				<View style={styles.actions}>
-					<BeaconCard beacon={beacon} />
+					{BEACON_BROADCAST_AVAILABLE ? <BeaconCard beacon={beacon} /> : <BeaconUnavailableCard />}
 					<Button title="Modifier" onPress={screen.edit} variant="outline" fullWidth />
 					<Button
 						title="Supprimer"
@@ -96,7 +99,7 @@ const createStyles = (theme: Theme) =>
 		live: {
 			alignSelf: 'flex-start',
 			fontSize: theme.typography.sizes.sm,
-			fontWeight: theme.typography.weights.bold,
+			fontFamily: theme.typography.families.bold,
 			color: theme.colors.onColor,
 			backgroundColor: theme.colors.success,
 			paddingHorizontal: theme.spacing.sm,
@@ -106,7 +109,7 @@ const createStyles = (theme: Theme) =>
 		},
 		title: {
 			fontSize: theme.typography.sizes.xxl,
-			fontWeight: theme.typography.weights.bold,
+			fontFamily: theme.typography.families.bold,
 			color: theme.colors.text,
 		},
 		organizer: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },

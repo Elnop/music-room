@@ -3,12 +3,13 @@ import { View } from 'react-native';
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { SectionHeader } from '@/shared/components/lists/SectionHeader';
 import { PlaylistCardSkeleton, SkeletonList } from '@/shared/components/ui/Skeleton';
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { HomeScreen } from '@/features/playlists/home/hooks/useHomeScreen';
+import type { Playlist } from '@/features/playlists/types';
 import { FriendPlaylistCarousel } from './FriendPlaylistCarousel';
 import { createListStyles } from './listStyles';
 import { PlaylistGrid } from './PlaylistGrid';
-import { FriendCardSkeleton } from './FriendCardSkeleton';
 import { HomeSkeleton } from './HomeSkeleton';
 import { RefreshableScroll } from './RefreshableScroll';
 
@@ -18,38 +19,35 @@ const countAll = (screen: HomeScreen) =>
 interface HomeViewProps {
 	screen: HomeScreen;
 	nearbyEvents?: React.ReactNode;
+	actionsFor?: (playlist: Playlist) => (() => void) | undefined;
 }
 
-export function HomeView({ screen, nearbyEvents }: HomeViewProps) {
+export function HomeView({ screen, nearbyEvents, actionsFor }: HomeViewProps) {
 	const { styles } = useThemedStyles(createListStyles);
+	const { isWide } = useBreakpoint();
 
 	if (screen.isInitialLoading) return <HomeSkeleton />;
+	// Hidden while loading too, so the section never shows as a bare title.
+	const friendsCount = countAll(screen);
 
 	const content = (
 		<View>
-			{nearbyEvents && (
+			{friendsCount > 0 && (
 				<>
-					<View style={styles.section}>{nearbyEvents}</View>
+					<View style={styles.section}>
+						<SectionHeader
+							icon="people-outline"
+							title="Playlists de vos amis"
+							count={friendsCount}
+						/>
+						<FriendPlaylistCarousel
+							friendsPlaylists={screen.friendsPlaylists}
+							onPlaylistPress={screen.openPlaylist}
+						/>
+					</View>
 					<View style={styles.sectionSpacer} />
 				</>
 			)}
-			<View style={styles.section}>
-				<SectionHeader
-					icon="people-outline"
-					title="Playlists de vos amis"
-					count={countAll(screen)}
-				/>
-				{screen.friendsLoading && screen.friendsPlaylists.length === 0 ? (
-					<SkeletonList count={3} row={FriendCardSkeleton} style={styles.friendsSkeleton} />
-				) : (
-					<FriendPlaylistCarousel
-						friendsPlaylists={screen.friendsPlaylists}
-						onPlaylistPress={screen.openPlaylist}
-						onFindFriends={screen.findFriends}
-					/>
-				)}
-			</View>
-			<View style={styles.sectionSpacer} />
 			<View style={styles.section}>
 				<SectionHeader
 					icon="globe-outline"
@@ -62,11 +60,25 @@ export function HomeView({ screen, nearbyEvents }: HomeViewProps) {
 					(screen.publicLoading && screen.publicPlaylists.length === 0 ? (
 						<SkeletonList count={4} row={PlaylistCardSkeleton} style={styles.grid} />
 					) : screen.publicPlaylists.length > 0 ? (
-						<PlaylistGrid playlists={screen.publicPlaylists} onOpen={screen.openPlaylist} />
+						<PlaylistGrid
+							playlists={screen.publicPlaylists}
+							onOpen={screen.openPlaylist}
+							actionsFor={actionsFor}
+						/>
 					) : (
-						<EmptyState icon="globe-outline" message="Aucune playlist publique disponible" />
+						<EmptyState
+							icon="globe-outline"
+							message="Aucune playlist publique disponible"
+							compact={isWide}
+						/>
 					))}
 			</View>
+			{nearbyEvents && (
+				<>
+					<View style={styles.sectionSpacer} />
+					<View style={styles.section}>{nearbyEvents}</View>
+				</>
+			)}
 		</View>
 	);
 

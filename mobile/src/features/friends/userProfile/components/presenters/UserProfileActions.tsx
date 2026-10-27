@@ -1,13 +1,14 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import { Button } from '@/shared/components/ui/Button';
 import { ShareLinkButton } from '@/shared/components/sharing/ShareLinkButton';
-import { NowPlayingInline } from '@/shared/components/media/NowPlayingInline';
 import { userLink } from '@/shared/utils/shareLinks';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { UserProfileHeaderProps } from '@/features/friends/types';
 import { createUserProfileHeaderStyles } from './userProfileHeaderStyles';
 import { createUserProfileStyles } from './userProfileStyles';
+import { UserProfileListening } from './UserProfileListening';
+import { Text } from '@/shared/components/ui/Text';
 
 type UserProfileActionsProps = UserProfileHeaderProps;
 
@@ -73,21 +74,13 @@ export function UserProfileActions({
 				style={styles.shareButton}
 			/>
 
-			{canControlMusic &&
-				followStatus?.isFriend &&
-				!isListeningLoading &&
-				devices
-					.filter(d => Boolean(d.track))
-					.map(deviceStatus => (
-						<NowPlayingInline
-							key={deviceStatus.device.deviceId}
-							track={deviceStatus.track!}
-							isPlaying={deviceStatus.isPlaying}
-							onPlay={() => onRemotePlay(deviceStatus.device.deviceId)}
-							onPause={() => onRemotePause(deviceStatus.device.deviceId)}
-							controllable={deviceStatus.controllable}
-						/>
-					))}
+			{canControlMusic && followStatus?.isFriend && !isListeningLoading && (
+				<UserProfileListening
+					devices={devices}
+					onRemotePlay={onRemotePlay}
+					onRemotePause={onRemotePause}
+				/>
+			)}
 		</>
 	);
 }

@@ -32,4 +32,5 @@ export type ProfileStackParamList = {
 	LinkedAccounts: undefined;
 	MyDevices: undefined;
 	MusicPreferences: undefined;
+	PrivacyPolicy: undefined;
 };

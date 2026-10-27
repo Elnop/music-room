@@ -4,12 +4,15 @@ import type { PlaylistStackParamList } from '@/features/playlists/types';
 import { useLibraryScreen } from '@/features/playlists/library/hooks/useLibraryScreen';
 import { LibraryView } from '@/features/playlists/library/components/presenters/LibraryView';
 import { HeaderIconButton } from '@/features/playlists/header/components/presenters/HeaderIconButton';
+import { usePlaylistCardMenu } from '@/features/playlists/cardMenu/hooks/usePlaylistCardMenu';
+import { PlaylistCardMenu } from '@/features/playlists/cardMenu/components/orchestrators/PlaylistCardMenu';
 
 type LibraryOrchestratorProps = NativeStackScreenProps<PlaylistStackParamList, 'Playlists'>;
 
 export function LibraryOrchestrator({ navigation }: LibraryOrchestratorProps) {
 	const screen = useLibraryScreen(navigation);
 	const { createPlaylist } = screen;
+	const menu = usePlaylistCardMenu(navigation);
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
@@ -24,5 +27,10 @@ export function LibraryOrchestrator({ navigation }: LibraryOrchestratorProps) {
 		});
 	}, [navigation, createPlaylist]);
 
-	return <LibraryView screen={screen} />;
+	return (
+		<>
+			<LibraryView screen={screen} actionsFor={menu.actionsFor} />
+			<PlaylistCardMenu menu={menu} />
+		</>
+	);
 }

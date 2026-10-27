@@ -38,6 +38,7 @@ export function registerPlayback(): void {
 			useQueueStore.getState().playPlaylist(playlistId, startTrackId),
 		next: () => useQueueStore.getState().next(),
 		previous: () => useQueueStore.getState().previous(),
+		playItem: itemId => useQueueStore.getState().playItem(itemId),
 		playListTrack: track => useQueueStore.getState().playListTrack(track),
 		playTrack: (track, queueItemId, startPositionMs) =>
 			usePlayerStore.getState().playTrack(track, queueItemId, startPositionMs),

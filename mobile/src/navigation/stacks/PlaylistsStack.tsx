@@ -12,8 +12,11 @@ import { PlaylistSharingOrchestrator } from '@/features/playlists/sharing/compon
 import { EventDetailOrchestrator } from '@/features/events/detail/components/orchestrators/EventDetailOrchestrator';
 import { EventFormOrchestrator } from '@/features/events/form/components/orchestrators/EventFormOrchestrator';
 import { HomeScreen } from '@/navigation/screens/HomeScreen';
+import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
+import { screenHeader, screenLayout } from '@/navigation/screenLayout';
 
 const PlaylistStack = createNativeStackNavigator<PlaylistStackParamList & EventStackParamList>();
+const layout = screenLayout(true);
 
 interface PlaylistsNavigatorProps {
 	/** The Home and Playlists tabs mount the same stack, each opening on its own screen. */
@@ -22,11 +25,14 @@ interface PlaylistsNavigatorProps {
 
 export function PlaylistsNavigator({ initialRouteName }: PlaylistsNavigatorProps) {
 	const { theme } = useTheme();
+	const { isWide } = useBreakpoint();
 
 	return (
 		<PlaylistStack.Navigator
+			screenLayout={layout}
 			initialRouteName={initialRouteName}
 			screenOptions={{
+				...(isWide ? { header: screenHeader } : null),
 				headerStyle: {
 					backgroundColor: theme.colors.background,
 				},
@@ -34,7 +40,7 @@ export function PlaylistsNavigator({ initialRouteName }: PlaylistsNavigatorProps
 				headerTintColor: theme.colors.text,
 				headerShadowVisible: false,
 				headerTitleStyle: {
-					fontWeight: theme.typography.weights.bold,
+					fontFamily: theme.typography.families.bold,
 				},
 				headerTitleAlign: 'center',
 				headerLargeTitle: false,

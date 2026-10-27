@@ -12,7 +12,11 @@ const T0 = new Date('2026-01-01T00:00:00.000Z');
 const THIRTY_MINUTES_MS = 30 * 60 * 1000;
 const EXPIRES_AT = new Date(T0.getTime() + THIRTY_MINUTES_MS).toISOString();
 
-const withExpiry = (streamUrl: string) => ({ streamUrl, expiresAt: EXPIRES_AT });
+const withExpiry = (streamUrl: string, protocol: 'hls' | 'progressive') => ({
+	streamUrl,
+	protocol,
+	expiresAt: EXPIRES_AT,
+});
 
 const { client, streamLink } = vi.hoisted(() => {
 	const streamLink =
@@ -55,7 +59,7 @@ describe('soundcloud-stream.service', () => {
 	it('returns the HLS URL without asking for progressive', async () => {
 		streamLink.mockImplementation(linkFor({ hls: HLS_URL, progressive: PROGRESSIVE_URL }));
 
-		expect(await streamService.getStreamUrl(TRACK_URL)).toEqual(withExpiry(HLS_URL));
+		expect(await streamService.getStreamUrl(TRACK_URL)).toEqual(withExpiry(HLS_URL, 'hls'));
 		expect(streamLink).toHaveBeenCalledTimes(1);
 		expect(streamLink).toHaveBeenCalledWith(TRACK_URL, 'hls');
 	});
@@ -63,7 +67,7 @@ describe('soundcloud-stream.service', () => {
 	it('falls back to progressive when HLS is empty', async () => {
 		streamLink.mockImplementation(linkFor({ hls: '', progressive: PROGRESSIVE_URL }));
 
-		expect(await streamService.getStreamUrl(TRACK_URL)).toEqual(withExpiry(PROGRESSIVE_URL));
+		expect(await streamService.getStreamUrl(TRACK_URL)).toEqual(withExpiry(PROGRESSIVE_URL, 'progressive'));
 		expect(streamLink).toHaveBeenNthCalledWith(1, TRACK_URL, 'hls');
 		expect(streamLink).toHaveBeenNthCalledWith(2, TRACK_URL, 'progressive');
 	});
@@ -73,7 +77,7 @@ describe('soundcloud-stream.service', () => {
 			linkFor({ hls: new Error('no hls'), progressive: PROGRESSIVE_URL })
 		);
 
-		expect(await streamService.getStreamUrl(TRACK_URL)).toEqual(withExpiry(PROGRESSIVE_URL));
+		expect(await streamService.getStreamUrl(TRACK_URL)).toEqual(withExpiry(PROGRESSIVE_URL, 'progressive'));
 	});
 
 	it('throws a 404 STREAM_NOT_FOUND and marks the track unavailable when no protocol yields a URL', async () => {
@@ -109,6 +113,7 @@ describe('soundcloud-stream.service', () => {
 
 		expect(await streamService.getStreamUrl(TRACK_URL)).toEqual({
 			streamUrl: HLS_URL,
+			protocol: 'hls',
 			expiresAt: new Date(later + THIRTY_MINUTES_MS).toISOString(),
 		});
 		expect(streamLink).toHaveBeenCalledTimes(2);

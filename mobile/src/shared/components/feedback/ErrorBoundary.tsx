@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { logger } from '@/shared/utils/logger';
 import { originalTheme } from '@/shared/theme/original.theme';
+import { Text } from '@/shared/components/ui/Text';
+import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
 interface Props {
 	children: React.ReactNode;
@@ -101,7 +103,7 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		fontSize: 24,
-		fontWeight: 'bold',
+		fontFamily: FONT_FAMILIES.bold,
 		color: originalTheme.colors.error,
 		marginBottom: 16,
 	},
@@ -123,14 +125,14 @@ const styles = StyleSheet.create({
 	},
 	stackTitle: {
 		fontSize: 14,
-		fontWeight: 'bold',
+		fontFamily: FONT_FAMILIES.bold,
 		color: originalTheme.colors.success,
 		marginBottom: 8,
 	},
 	stack: {
 		fontSize: 12,
 		color: originalTheme.colors.textSecondary,
-		fontFamily: 'monospace',
+		fontFamily: FONT_FAMILIES.mono,
 	},
 	button: {
 		backgroundColor: originalTheme.colors.primary,
@@ -143,7 +145,7 @@ const styles = StyleSheet.create({
 	},
 	buttonText: {
 		fontSize: 16,
-		fontWeight: 'bold',
+		fontFamily: FONT_FAMILIES.bold,
 		color: originalTheme.colors.onColor,
 	},
 });

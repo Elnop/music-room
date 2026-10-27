@@ -1,3 +1,6 @@
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { ProfileStackParamList } from '@/features/profile/types';
 import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
 import { useChangePlan, usePlan } from '@/shared/hooks/usePlan';
 import { useTheme } from '@/shared/theme/ThemeContext';
@@ -9,6 +12,7 @@ export function useSettingsScreen() {
 	const bottomPadding = useBottomPadding();
 	const { plan } = usePlan();
 	const changePlan = useChangePlan();
+	const navigation = useNavigation<NativeStackNavigationProp<ProfileStackParamList>>();
 
 	const handleTogglePremium = (premium: boolean) => {
 		changePlan.mutate(premium ? 'premium' : 'free', {
@@ -22,5 +26,6 @@ export function useSettingsScreen() {
 		plan,
 		isChangingPlan: changePlan.isPending,
 		handleTogglePremium,
+		openPrivacyPolicy: () => navigation.navigate('PrivacyPolicy'),
 	};
 }

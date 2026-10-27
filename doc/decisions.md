@@ -175,7 +175,51 @@ Each decision is weighed against the alternatives considered, with the technical
 
 ---
 
-## 3. Smaller decisions taken during development
+## 3. Bonus V.1: web client (epic #474)
+
+Taken in #475; the result is described in [features/web-client.md](features/web-client.md).
+
+### 3.1 Web client: Expo web on the `mobile/` code base
+
+- **Decision**: the browser app is the Expo app of `mobile/` built for the web (`react-native-web`, already a dependency). Each native module, already isolated in one service or hook, gets a `.web.ts` variant that Metro picks for the web bundle; the layout adapts above 768 px through `useBreakpoint`, and the phone layout stays the Android one.
+- **Why**:
+  - **One code base**: screens, Zustand stores, TanStack Query, the Socket.io client, the API client with its IV.6 headers and the tests are reused as they are; a feature written once works on both platforms.
+  - **Same guardrails**: `npm run check` covers the web code with no second project to keep under the rules.
+  - **Small, local changes**: the first `npx expo export -p web` already passed; the work is a dozen variants and the wide-screen layout, not a rewrite (the subject warns that web support "can require that you rewrite your client code entirely or almost entirely").
+- **Alternatives rejected**:
+  - *Next.js*: an almost complete rewrite of the screens in React DOM, a second project under the guardrails, and its main asset, server-side rendering, is useless on GitHub Pages, which serves static files only.
+  - *Vite + React*: the same rewrite and second project, without the SSR argument either way.
+  - *A separate responsive web project sharing only the types*: two clients to keep in step for every feature of the mandatory part.
+
+---
+
+### 3.2 Hosting: GitHub Pages
+
+- **Decision**: the static build is published on GitHub Pages at the root of the project site, `https://elnop.github.io/music-room/` (under `/app/` until #558), by `.github/workflows/pages.yml` on every push to `main`, with the static pages of `site/` next to it (`privacy.html`, `404.html`). `site/404.html` sends a direct link back to the app, and an old `/app/` link to the same path without it. The app calls the hosted backend over HTTPS, whose `ALLOWED_ORIGINS` includes `https://elnop.github.io`.
+- **Why**:
+  - **Free, HTTPS and already used**: the project site is there already; HTTPS is required by the browser's geolocation and by Facebook's JavaScript SDK outside `localhost`.
+  - **Static is enough**: the web app is a client of the backend; it needs no server of its own.
+  - **Same trigger as the APK**: a push to `main` publishes both clients (`release-apk.yml`, `pages.yml`).
+- **Alternatives rejected**:
+  - *Serving the build from the backend (Express static)*: couples the client's releases to the API's and adds a public static surface to the backend.
+  - *Vercel or Netlify*: one more account and set of secrets for what GitHub Pages already does.
+- **Accepted limit**: GitHub Pages sets no custom HTTP headers (no Content-Security-Policy header), see [threat-model.md](security/threat-model.md#m14-web-session-tokens-and-third-party-scripts).
+
+---
+
+### 3.3 Workflow: one feature branch for the epic
+
+- **Decision**: the epic is developed on the feature branch `474-web-client`, created from `develop`; each story branches from it and returns to it by pull request, and one final pull request `474-web-client` → `develop` closes the epic. #525 first made the CI and the issue statuses run on every pull request, feature branches included.
+- **Why**:
+  - **`develop` stays deliverable**: the bonus only counts once the mandatory part is perfect; half a web client never reaches `develop`, and the mandatory part can still be fixed and released in the meantime.
+  - **One review of the whole**: the final pull request shows the bonus at once, and can be dropped without touching the mandatory part.
+- **Alternatives rejected**:
+  - *Stories straight into `develop`*: a partly working web build in the deliverable branch for weeks.
+  - *A feature flag*: no runtime switch is needed, since the web code is only reached by the web bundle.
+
+---
+
+## 4. Smaller decisions taken during development
 
 One line each, with the issue that holds the discussion. Decisions that shape a feature are explained in its document under [features/](features/).
 

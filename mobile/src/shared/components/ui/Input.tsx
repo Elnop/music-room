@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
 import {
 	View,
-	Text,
-	TextInput,
 	StyleSheet,
 	TextInputProps,
 	ViewStyle,
 	StyleProp,
 	TextStyle,
+	Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
+import { focusedFieldStyle } from '@/shared/theme/fieldFocus';
+import { useFieldFocus } from '@/shared/hooks/useFieldFocus';
 import { Pressable } from './Pressable';
+import { Text } from './Text';
+import { TextInput } from './TextInput';
 
 interface InputProps extends Omit<TextInputProps, 'style'> {
 	label: string;
@@ -20,6 +23,8 @@ interface InputProps extends Omit<TextInputProps, 'style'> {
 	leftIcon?: React.ReactNode;
 	containerStyle?: ViewStyle;
 	style?: StyleProp<TextStyle>;
+	/** Web only: Enter submits the form. Native keyboards keep their return key as it was. */
+	submitOnEnter?: () => void;
 }
 
 export function Input({
@@ -35,16 +40,26 @@ export function Input({
 	containerStyle,
 	style,
 	multiline,
+	submitOnEnter,
+	onFocus,
+	onBlur,
 	...rest
 }: InputProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 	const [isHidden, setIsHidden] = useState(true);
+	const { focused, focusProps } = useFieldFocus({ onFocus, onBlur });
 
 	return (
 		<View style={[styles.container, containerStyle]}>
 			<Text style={styles.label}>{label}</Text>
-			<View style={[styles.inputContainer, error && styles.inputContainerError]}>
+			<View
+				style={[
+					styles.inputContainer,
+					error && styles.inputContainerError,
+					focused && focusedFieldStyle(error ? theme.colors.error : theme.colors.primary),
+				]}
+			>
 				{leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
 				<TextInput
 					style={[
@@ -63,13 +78,17 @@ export function Input({
 					keyboardType={keyboardType}
 					multiline={multiline}
 					{...rest}
+					{...focusProps}
+					{...(Platform.OS === 'web' && submitOnEnter && !multiline
+						? { onSubmitEditing: submitOnEnter }
+						: undefined)}
 				/>
 				{secureTextEntry && (
 					<Pressable
 						onPress={() => setIsHidden(hidden => !hidden)}
 						accessibilityLabel={isHidden ? 'Afficher le mot de passe' : 'Masquer le mot de passe'}
 						hitSlop={8}
-						style={styles.toggle}
+						style={[styles.toggle, Platform.OS === 'web' && styles.toggleWeb]}
 					>
 						<Ionicons
 							name={isHidden ? 'eye-outline' : 'eye-off-outline'}
@@ -91,7 +110,7 @@ const createStyles = (theme: Theme) =>
 		},
 		label: {
 			fontSize: theme.typography.sizes.sm,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 			marginBottom: theme.spacing.xs,
 		},
@@ -117,7 +136,7 @@ const createStyles = (theme: Theme) =>
 			paddingHorizontal: theme.spacing.sm + 4,
 			fontSize: theme.typography.sizes.md,
 			color: theme.colors.text,
-			fontWeight: theme.typography.weights.regular,
+			fontFamily: theme.typography.families.regular,
 		},
 		inputWithIcon: {
 			paddingLeft: theme.spacing.xs,
@@ -129,6 +148,13 @@ const createStyles = (theme: Theme) =>
 			paddingHorizontal: theme.spacing.sm + 2,
 			paddingVertical: theme.spacing.sm,
 		},
+		// The keyboard ring sits 4 px outside the button: kept inside the field's frame.
+		toggleWeb: {
+			paddingHorizontal: theme.spacing.xs,
+			paddingVertical: theme.spacing.xs,
+			marginHorizontal: theme.spacing.xs + 2,
+			borderRadius: 8,
+		},
 		multilineInput: {
 			textAlignVertical: 'top',
 			paddingTop: theme.spacing.sm + 2,
@@ -136,7 +162,7 @@ const createStyles = (theme: Theme) =>
 		error: {
 			fontSize: theme.typography.sizes.xs,
 			color: theme.colors.error,
-			fontWeight: theme.typography.weights.semibold,
+			fontFamily: theme.typography.families.semibold,
 			marginTop: theme.spacing.xs,
 			marginLeft: theme.spacing.xs,
 		},

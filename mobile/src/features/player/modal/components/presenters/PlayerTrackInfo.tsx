@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { type useAnimatedStyle } from 'react-native-reanimated';
 import type { NowPlayingTrack } from '@/features/player/types';
 import type { createStyles } from './playerModalStyles';
+import { Text } from '@/shared/components/ui/Text';
 
 interface PlayerTrackInfoProps {
 	styles: ReturnType<typeof createStyles>;

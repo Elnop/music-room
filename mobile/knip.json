@@ -1,6 +1,6 @@
 {
 	"$schema": "https://unpkg.com/knip@5/schema.json",
-	"entry": ["babel.config.js", "plugins/withDebugKeystore.js", "plugins/withDevVariant.js", "plugins/withMedia3Version.js"],
+	"entry": ["babel.config.js", "plugins/withDebugKeystore.js", "plugins/withDevVariant.js", "plugins/withMedia3Version.js", "src/**/*.web.{ts,tsx}"],
 	"ignoreDependencies": [
 		"@expo/ngrok",
 		"babel-plugin-module-resolver",

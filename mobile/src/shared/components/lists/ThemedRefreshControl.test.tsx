@@ -1,7 +1,8 @@
 import React from 'react';
-import { RefreshControl, Text } from 'react-native';
+import { RefreshControl } from 'react-native';
 import { render, screen } from '@testing-library/react-native';
 import { ThemedRefreshControl } from './ThemedRefreshControl';
+import { Text } from '@/shared/components/ui/Text';
 
 describe('ThemedRefreshControl', () => {
 	it('hands RefreshControl the list and the style Android wraps in it', () => {
