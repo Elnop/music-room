@@ -2,6 +2,8 @@
 
 ## Ce que dit le sujet
 
+> *"There are a lot of subjects. You should dispatch the different tasks between your project team members."* (II)
+
 > *"You have a lot of layers and functionalities to implement for this project, and you will have to work in a team. You should arrange yourself to show agility, to be able to question your own decisions, and to set specific one-off tests for each layer."*
 
 > *"For obvious security reasons, any credentials, API keys, env variables etc... must be saved locally in a .env file and ignored by git. Publicly stored credentials will lead you directly to a failure of the project."*

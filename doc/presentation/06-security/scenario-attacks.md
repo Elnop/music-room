@@ -37,6 +37,22 @@
 | 12 | `git check-ignore backend/.env mobile/.env` | Les deux fichiers sont ignorés | ☐ |
 | 13 | `cd backend && npm run check:secrets` | gitleaks ne trouve rien | ☐ |
 
+## Les autres menaces identifiées
+
+Le sujet demande aussi *"you must identify other hazards and explain the practicable protections"*. On les présente à partir de [threat-model.md](../../security/threat-model.md), une ligne par menace :
+
+| # | Menace à expliquer | Protection | ☐ |
+| --- | --- | --- | --- |
+| 14 | M2 : bruteforce des codes à 6 chiffres | Nombre d'essais limité par code | ☐ |
+| 15 | M3 : prise de compte ou énumération par la vérification et la réinitialisation | Réponse identique que l'email existe ou non ; une réinitialisation ferme les sessions | ☐ |
+| 16 | M6 : jeton révoqué alors qu'un socket est déjà ouvert | Jeton révoqué refusé au handshake ; l'app ferme son socket à chaque fin de session | ☐ |
+| 17 | M8 : accès direct à Supabase avec la clé anon | La base refuse la clé anon ; l'app n'a aucun client Supabase | ☐ |
+| 18 | M9 : abus temps réel (flood d'événements) | Origine contrôlée, handshake authentifié et validé, limites par socket dans Redis (`socket-event-limit.ts`) | ☐ |
+| 19 | M10 : room gardée après retrait de l'accès | Éjection immédiate de la room | ☐ |
+| 20 | M11 : contrôle d'un appareil non autorisé | Licence vérifiée sur l'appareil visé ; l'identité vient du socket | ☐ |
+| 21 | M13 : Redis indisponible | Les protections refusent (503) au lieu de laisser passer | ☐ |
+| 22 | Risques acceptés (« Open gaps ») | Jetons non chiffrés sur le téléphone, attaque répartie sur beaucoup d'IP, `http://` en dev : pourquoi c'est accepté | ☐ |
+
 **Attention** : le limiteur global compte toutes les requêtes `/api/auth/*` par IP, réussites comprises (20 par 15 min). Dérouler ce scénario en fin de démo : sinon, les connexions suivantes depuis la même IP reçoivent `429`. Redémarrer Redis remet les compteurs à zéro.
 
 Les procédures détaillées et les autres menaces sont dans [threat-model.md](../../security/threat-model.md).

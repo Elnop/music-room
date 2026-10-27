@@ -36,4 +36,6 @@
 
 ## Écarts assumés
 
+- **« Friends or people with the same musical tastes »** : on collabore avec ses amis par invitation, et avec n'importe qui sur une playlist publique ouverte (section « Playlists publiques » de l'Accueil). Les préférences musicales sont visibles sur les profils. L'app ne fait pas de rapprochement automatique par goûts.
+- **« Original radio stations »** : lancer une playlist la copie dans la file d'attente. Tant que le bloc n'est pas détaché, chaque modification de la playlist s'y répercute en direct : la playlist sert de station que les collaborateurs programment.
 - Les **métadonnées** (nom, description, réglages) suivent la règle « la dernière écriture gagne ». La gestion de la concurrence porte sur l'ordre et le contenu des titres, ce que le sujet vise.

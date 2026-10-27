@@ -1,10 +1,11 @@
 # Scénario : process, tests et CI
 
-**Prouve** : IV.8, *"show agility"*, *"question your own decisions"*, *"set specific one-off tests for each layer"* et *".env file and ignored by git"*.
+**Prouve** : II (*"dispatch the different tasks between your project team members"*), IV.8, *"show agility"*, *"question your own decisions"*, *"set specific one-off tests for each layer"* et *".env file and ignored by git"*.
 
 | # | Action | Résultat attendu | ☐ |
 | --- | --- | --- | --- |
 | 1 | Ouvrir le board GitHub « Music Room – Validation » | Des colonnes Todo → Done, des épics découpés en stories | ☐ |
+| 1b | Filtrer les issues fermées par assigné (`gh issue list --state closed --assignee <login>`) | La répartition des tâches entre les membres de l'équipe (II) | ☐ |
 | 2 | Ouvrir une PR fusionnée récente | Branche `<n>-<slug>`, `Closes #<n>`, CI verte, revue | ☐ |
 | 3 | Ouvrir [decisions.md](../../decisions.md) §2 et §4 | Des décisions revues en cours de route, avec leur raison | ☐ |
 | 4 | `make test` | Les tests backend (Vitest) et mobile (jest-expo) passent | ☐ |

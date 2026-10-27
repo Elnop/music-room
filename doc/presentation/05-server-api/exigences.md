@@ -26,10 +26,18 @@
 
 L'argumentaire complet est dans [decisions.md §1.6](../../decisions.md#16-protocol-rest-and-json). En résumé :
 
-- les ressources (playlists, titres, appareils, file d'attente) se prêtent bien à REST ;
-- les statuts HTTP portent les cas métier (`403`, `404`, `409` de concurrence) ;
-- JSON est natif côté Node et React Native, et lisible dans Swagger UI ;
-- le temps réel passe par Socket.io, à côté de l'API et non à sa place.
+- **Ce qui caractérise REST** :
+  - des ressources identifiées par des URI (`/api/playlists/:id/tracks`) ;
+  - des verbes HTTP qui portent l'action (`GET` lit, `POST` crée, `PATCH` modifie, `DELETE` supprime) ;
+  - des statuts standards qui portent le résultat (`401`, `403`, `404`, `409` de concurrence, `429`) ;
+  - pas d'état de session côté serveur : chaque requête porte son jeton.
+- **Pourquoi REST ici** : les données (playlists, titres, appareils, file d'attente) sont des ressources. Chaque route se protège et se limite séparément (middleware par méthode et URI), et n'importe quel client HTTP l'appelle (curl, Swagger UI).
+- **Ce qui caractérise JSON** : texte lisible, natif en JavaScript côté Node comme côté React Native, plus léger que XML. Il n'a pas de schéma propre ; les schémas Zod jouent ce rôle et produisent la documentation.
+- **Alternatives écartées** :
+  - GraphQL : limites de débit par endpoint impossibles, requêtes récursives coûteuses ;
+  - gRPC et Protobuf : binaire illisible à la main, mal servi par Swagger UI ;
+  - tRPC : pas une API publique documentée en OpenAPI.
+- **Le temps réel** passe par Socket.io, à côté de l'API et non à sa place.
 
 ## Où regarder
 

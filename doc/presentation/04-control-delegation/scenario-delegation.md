@@ -8,7 +8,9 @@
 | --- | --- | --- | --- |
 | 1 | Bob : **Profil › Mes appareils** | A et A2 listés, celui qu'on tient marqué « Cet appareil » ; tous les interrupteurs coupés | ☐ |
 | 2 | Bob : sous A, activer **Patrick** | La licence est accordée sur A seulement | ☐ |
-| 3 | Bob lance un titre sur A et un autre sur A2 | — | ☐ |
+| 3 | Bob : sous A2, activer **Sandy** (autre amie de Bob) | Deux amis différents, chacun sur son appareil : Patrick sur A, Sandy sur A2 | ☐ |
+| 3b | Swagger, connecté en Sandy : `GET /api/music-control/users/5b0b0000-0000-4000-8000-000000000001/devices` | Seul A2 est renvoyé, pas A | ☐ |
+| 3c | Bob lance un titre sur A et un autre sur A2 | — | ☐ |
 | 4 | Patrick : ouvrir le choix d'appareil depuis le lecteur, **Appareils de mes amis** | Seul A est contrôlable ; A2 n'apparaît pas | ☐ |
 | 5 | Patrick : choisir A, puis pause et lecture | A s'arrête puis repart ; Patrick voit le titre en cours | ☐ |
 | 6 | Bob : couper l'interrupteur de Patrick sous A | Patrick perd la main **immédiatement** : A disparaît de sa liste | ☐ |

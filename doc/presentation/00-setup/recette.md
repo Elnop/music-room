@@ -22,6 +22,12 @@
 | IV.7 | [Mesurer la charge](../07-scaling/scenario-load-test.md) | ☐ |
 | IV.8 | [Process, tests et CI](../08-quality-ci/scenario-ci.md) | ☐ |
 
+## Rendu (VI)
+
+| Sujet | Vérification | ☐ |
+| --- | --- | --- |
+| VI | La machine de référence a cloné le dépôt rendu, sur la branche rendue, sans modification locale (`git status` propre) : *"Only the work inside your repository will be evaluated during the defense."* | ☐ |
+
 ## Bonus
 
 | Sujet | Scénario | ☐ |
