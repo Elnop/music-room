@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Artwork } from '@/shared/components/media/Artwork';
 import { Pressable } from '@/shared/components/ui/Pressable';
+import { useContextMenu } from '@/shared/hooks/useContextMenu';
 import { useGridTileWidth } from '@/shared/hooks/useGridTileWidth';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
@@ -16,15 +17,19 @@ const coverOf = (playlist: Playlist) => playlist.coverUrl || playlist.firstTrack
 interface PlaylistGridCardProps {
 	playlist: Playlist;
 	onPress: () => void;
+	/** Web: a right click or the Menu key opens the playlist's menu. */
+	onShowActions?: () => void;
 }
 
-export function PlaylistGridCard({ playlist, onPress }: PlaylistGridCardProps) {
+export function PlaylistGridCard({ playlist, onPress, onShowActions }: PlaylistGridCardProps) {
 	const { styles } = useThemedStyles(createStyles);
 	const width = useGridTileWidth();
 	const { owner } = playlist;
+	const contextMenu = useContextMenu(onShowActions);
 
 	return (
 		<Pressable
+			{...contextMenu}
 			style={[styles.tile, { width }]}
 			onPress={onPress}
 			accessibilityLabel={playlistCardLabel(playlist.name, owner)}

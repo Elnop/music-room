@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import { useContextMenu } from '@/shared/hooks/useContextMenu';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { QueueSwipe } from '@/shared/components/lists/QueueSwipe';
 import { Artwork } from '@/shared/components/media/Artwork';
@@ -31,31 +32,35 @@ export function SoundCloudTrackItem({
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
 	const artworkUrl = track.artwork_url || track.user.avatar_url;
+	const contextMenu = useContextMenu(() => onShowActions(track));
 
 	return (
 		<QueueSwipe onAddToQueue={() => onAddToQueue(track)}>
-			<Pressable
-				style={styles.container}
-				onPress={() => onPlay(track)}
-				onLongPress={() => onShowActions(track)}
-				accessibilityRole="button"
-				accessibilityLabel={`Écouter ${track.title} par ${track.user.username}`}
-			>
-				<Artwork uri={artworkUrl} size={48} style={styles.artwork} />
-				<View style={styles.info}>
-					<Text style={styles.title} numberOfLines={1}>
-						{track.title}
-					</Text>
-					<View style={styles.subtitle}>
-						{isPreviewOnly(track) && <PreviewBadge />}
-						<Text style={styles.artist} numberOfLines={1}>
-							{track.user.username}
+			<View style={styles.container} {...contextMenu}>
+				{/* The row's buttons sit beside its pressable area, never in it: the web nests no <button>. */}
+				<Pressable
+					style={styles.pressable}
+					onPress={() => onPlay(track)}
+					onLongPress={() => onShowActions(track)}
+					accessibilityRole="button"
+					accessibilityLabel={`Écouter ${track.title} par ${track.user.username}`}
+				>
+					<Artwork uri={artworkUrl} size={48} style={styles.artwork} />
+					<View style={styles.info}>
+						<Text style={styles.title} numberOfLines={1}>
+							{track.title}
 						</Text>
+						<View style={styles.subtitle}>
+							{isPreviewOnly(track) && <PreviewBadge />}
+							<Text style={styles.artist} numberOfLines={1}>
+								{track.user.username}
+							</Text>
+						</View>
 					</View>
-				</View>
-				<Text style={styles.duration}>{formatDuration(track.duration)}</Text>
+					<Text style={styles.duration}>{formatDuration(track.duration)}</Text>
+				</Pressable>
 				<TrackActionsButton onPress={() => onShowActions(track)} />
-			</Pressable>
+			</View>
 		</QueueSwipe>
 	);
 }
@@ -68,6 +73,11 @@ const createStyles = (theme: Theme) =>
 			paddingVertical: 8,
 			paddingHorizontal: theme.spacing.md,
 			backgroundColor: theme.colors.background,
+		},
+		pressable: {
+			flex: 1,
+			flexDirection: 'row',
+			alignItems: 'center',
 		},
 		artwork: {
 			borderRadius: 4,

@@ -33,4 +33,11 @@ describe('useMenuAnchor', () => {
 		rerender({ visible: true });
 		expect(result.current).toBeNull();
 	});
+
+	it('takes the anchor of a menu mounted already open', () => {
+		useMenuAnchorStore.getState().setAnchor(anchor);
+		const { result } = renderHook(() => useMenuAnchor(true));
+		expect(result.current).toEqual(anchor);
+		expect(useMenuAnchorStore.getState().anchor).toBeNull();
+	});
 });

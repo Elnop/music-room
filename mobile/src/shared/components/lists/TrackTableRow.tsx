@@ -2,6 +2,7 @@ import React from 'react';
 import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable } from '@/shared/components/ui/Pressable';
+import { useContextMenu } from '@/shared/hooks/useContextMenu';
 import { useHover } from '@/shared/hooks/useHover';
 import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import { useTheme } from '@/shared/theme/ThemeContext';
@@ -42,10 +43,12 @@ export function TrackTableRow({
 	const styles = React.useMemo(() => createStyles(theme, separator), [theme, separator]);
 	const { hovered, hoverProps } = useHover();
 	const showPlay = hovered && !unavailable && !isPending && !!onPress;
+	const contextMenu = useContextMenu(onShowActions);
 
 	return (
 		<View
 			{...hoverProps}
+			{...contextMenu}
 			style={[
 				styles.row,
 				(hovered || isCurrent) && styles.rowHighlighted,

@@ -6,6 +6,7 @@ import { PlaylistCardSkeleton, SkeletonList } from '@/shared/components/ui/Skele
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { HomeScreen } from '@/features/playlists/home/hooks/useHomeScreen';
+import type { Playlist } from '@/features/playlists/types';
 import { FriendPlaylistCarousel } from './FriendPlaylistCarousel';
 import { createListStyles } from './listStyles';
 import { PlaylistGrid } from './PlaylistGrid';
@@ -18,9 +19,10 @@ const countAll = (screen: HomeScreen) =>
 interface HomeViewProps {
 	screen: HomeScreen;
 	nearbyEvents?: React.ReactNode;
+	actionsFor?: (playlist: Playlist) => (() => void) | undefined;
 }
 
-export function HomeView({ screen, nearbyEvents }: HomeViewProps) {
+export function HomeView({ screen, nearbyEvents, actionsFor }: HomeViewProps) {
 	const { styles } = useThemedStyles(createListStyles);
 	const { isWide } = useBreakpoint();
 
@@ -58,7 +60,11 @@ export function HomeView({ screen, nearbyEvents }: HomeViewProps) {
 					(screen.publicLoading && screen.publicPlaylists.length === 0 ? (
 						<SkeletonList count={4} row={PlaylistCardSkeleton} style={styles.grid} />
 					) : screen.publicPlaylists.length > 0 ? (
-						<PlaylistGrid playlists={screen.publicPlaylists} onOpen={screen.openPlaylist} />
+						<PlaylistGrid
+							playlists={screen.publicPlaylists}
+							onOpen={screen.openPlaylist}
+							actionsFor={actionsFor}
+						/>
 					) : (
 						<EmptyState
 							icon="globe-outline"

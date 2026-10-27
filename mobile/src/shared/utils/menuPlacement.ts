@@ -4,6 +4,8 @@ export interface MenuAnchor {
 	y: number;
 	width: number;
 	height: number;
+	/** A context menu (a point or the focused element): it starts at the left edge, as the browser's own. */
+	align?: 'start';
 }
 
 interface MenuPlacement {
@@ -25,7 +27,10 @@ export function menuPlacement(
 	menuWidth: number
 ): MenuPlacement {
 	const rightAligned = anchor.x + anchor.width - menuWidth;
-	const left = Math.max(MARGIN, Math.min(rightAligned, window.width - menuWidth - MARGIN));
+	// A context menu flips to the left of its point when the window ends on its right.
+	const fitsRight = anchor.x + menuWidth <= window.width - MARGIN;
+	const wanted = anchor.align === 'start' && fitsRight ? anchor.x : rightAligned;
+	const left = Math.max(MARGIN, Math.min(wanted, window.width - menuWidth - MARGIN));
 	const buttonBottom = anchor.y + anchor.height;
 	const below = window.height - buttonBottom - GAP - MARGIN;
 	const above = anchor.y - GAP - MARGIN;
