@@ -13,6 +13,7 @@
 | IV.2.3 | [Édition à plusieurs en temps réel](../03-playlist-editor/scenario-realtime.md) | ☐ |
 | IV.2.3 | [Visibilité et licence d'édition](../03-playlist-editor/scenario-rights.md) | ☐ |
 | IV.2.3 | [Le même titre déplacé par deux personnes](../03-playlist-editor/scenario-concurrency.md) | ☐ |
+| IV.2.3 | [Trouver des personnes aux goûts proches](../03-playlist-editor/scenario-similar-tastes.md) | ☐ |
 | IV.2.2 | [Licence par appareil](../04-control-delegation/scenario-delegation.md) | ☐ |
 | IV.2.2 | [File d'attente partagée et transfert de lecture](../04-control-delegation/scenario-connect.md) | ☐ |
 | IV.3, IV.4 | [Documentation de l'API](../05-server-api/scenario-swagger.md) | ☐ |

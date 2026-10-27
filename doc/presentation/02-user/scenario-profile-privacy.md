@@ -16,4 +16,6 @@
 
 **Variante sans rien régler** : avec le seed, Carlo a sa bio et ses goûts en **Amis seulement** mais aucun ami. Bob, qui le suit sans être suivi en retour, ne voit pas ces champs.
 
+**Lien avec les suggestions** : passer ses préférences musicales en **Amis seulement** ou **Privé** retire aussi le profil des « Profils aux goûts proches » des autres ([scenario-similar-tastes.md](../03-playlist-editor/scenario-similar-tastes.md)).
+
 **À dire** : le filtrage se fait **côté serveur** (`getFilteredProfile`). Un champ privé ne quitte jamais le backend, même pour un client modifié.
