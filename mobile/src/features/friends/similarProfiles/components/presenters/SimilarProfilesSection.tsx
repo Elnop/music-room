@@ -46,16 +46,10 @@ export function SimilarProfilesSection({ section }: SimilarProfilesSectionProps)
 						showsHorizontalScrollIndicator={false}
 						contentContainerStyle={styles.scrollContent}
 						decelerationRate="fast"
-						snapToInterval={SIMILAR_CARD_WIDTH + 12}
+						snapToInterval={SIMILAR_CARD_WIDTH + 16}
 					>
 						{section.profiles.map(profile => (
-							<SimilarProfileCard
-								key={profile.id}
-								profile={profile}
-								isFollowing={section.followingId === profile.id}
-								onOpen={section.openProfile}
-								onFollow={section.follow}
-							/>
+							<SimilarProfileCard key={profile.id} profile={profile} onOpen={section.openProfile} />
 						))}
 					</ScrollView>
 				);

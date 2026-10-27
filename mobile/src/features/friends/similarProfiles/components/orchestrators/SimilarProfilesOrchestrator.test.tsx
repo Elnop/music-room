@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
 import { ApiError } from '@/shared/services/api';
 import { friendsApi } from '@/features/friends/services/friendsApi';
 import type { RecommendedProfile } from '@/features/friends/types';
@@ -18,15 +18,13 @@ jest.mock('@/shared/theme/ThemeContext', () => {
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-jest.mock('@/shared/utils/toast', () => ({ showError: jest.fn(), showSuccess: jest.fn() }));
-
 const mockTabNavigate = jest.fn();
 jest.mock('@react-navigation/native', () => ({
 	useNavigation: () => ({ navigate: jest.fn(), getParent: () => ({ navigate: mockTabNavigate }) }),
 }));
 
 jest.mock('@/features/friends/services/friendsApi', () => ({
-	friendsApi: { getRecommendations: jest.fn(), followUser: jest.fn() },
+	friendsApi: { getRecommendations: jest.fn() },
 }));
 
 const PEARL: RecommendedProfile = {
@@ -65,30 +63,6 @@ describe('SimilarProfilesOrchestrator', () => {
 			params: { userId: 'u-pearl' },
 			initial: false,
 		});
-		client.clear();
-	});
-
-	it('follows a profile, then drops it from the refreshed suggestions', async () => {
-		recommendations
-			.mockResolvedValueOnce({ hasPreferences: true, profiles: [PEARL, PUFF] })
-			.mockResolvedValue({ hasPreferences: true, profiles: [PUFF] });
-		jest.mocked(friendsApi.followUser).mockResolvedValue({
-			success: true,
-			status: {
-				isFollowing: true,
-				isFollowedBy: false,
-				isFriend: false,
-				followersCount: 1,
-				followingCount: 0,
-			},
-		});
-
-		const { client } = renderWithClient(<SimilarProfilesOrchestrator />);
-
-		fireEvent.press(await screen.findByLabelText('Suivre Perle'));
-		await waitFor(() => expect(friendsApi.followUser).toHaveBeenCalledWith('u-pearl'));
-		await waitFor(() => expect(screen.queryByText('Perle')).toBeNull());
-		expect(screen.getByText('mrspuff')).toBeTruthy();
 		client.clear();
 	});
 
