@@ -130,7 +130,7 @@ describe('UserProfileOrchestrator', () => {
 	it('shows initials, not a lock, when the avatar is hidden by privacy', async () => {
 		renderScreen();
 
-		expect(await screen.findByText('AL')).toBeTruthy();
+		expect(await screen.findByText('A')).toBeTruthy();
 	});
 
 	it('explains that following back makes a friend when only they follow me', async () => {
@@ -217,7 +217,7 @@ describe('UserProfileOrchestrator on wide screens', () => {
 	it('keeps what privacy hides hidden: initials, no bio, no tastes, no email', async () => {
 		renderScreen();
 
-		expect(await screen.findByText('AL')).toBeTruthy();
+		expect(await screen.findByText('A')).toBeTruthy();
 		expect(screen.getByText('Visible uniquement par ses amis')).toBeTruthy();
 		expect(screen.getByText('Visibles uniquement par ses amis')).toBeTruthy();
 		expect(screen.queryByText('Email')).toBeNull();

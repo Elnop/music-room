@@ -17,6 +17,22 @@ export interface FriendProfile {
 	avatarUrl?: string;
 }
 
+/** A profile suggested for its shared genres; avatarUrl follows its privacy settings. */
+export interface RecommendedProfile {
+	id: string;
+	username: string;
+	displayName?: string;
+	avatarUrl?: string;
+	commonGenres: MusicGenre[];
+	score: number;
+}
+
+export interface ProfileRecommendations {
+	/** False when the user has chosen no genre: profiles is then empty. */
+	hasPreferences: boolean;
+	profiles: RecommendedProfile[];
+}
+
 export interface MyStats {
 	followersCount: number;
 	followingCount: number;

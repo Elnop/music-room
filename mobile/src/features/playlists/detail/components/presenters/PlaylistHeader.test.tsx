@@ -68,7 +68,7 @@ describe('PlaylistHeader', () => {
 			/>
 		);
 
-		expect(screen.getByText('AL')).toBeTruthy();
+		expect(screen.getByText('A')).toBeTruthy();
 		expect(screen.getByText('alice')).toBeTruthy();
 		expect(screen.queryByText('?')).toBeNull();
 	});

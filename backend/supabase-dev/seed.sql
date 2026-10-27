@@ -18,7 +18,7 @@ INSERT INTO demo_users VALUES
   ('5b0b0000-0000-4000-8000-000000000006', 'plankton', 'Plankton', 'Un jour, la formule secrète sera à moi.', '{electronic}'),
   ('5b0b0000-0000-4000-8000-000000000007', 'karen', 'Karen', 'Ordinateur et épouse de Plankton.', '{electronic,hiphop}'),
   ('5b0b0000-0000-4000-8000-000000000008', 'gary', 'Gary', 'Miaou.', '{}'),
-  ('5b0b0000-0000-4000-8000-000000000009', 'mrspuff', 'Mme Puff', 'Monitrice d''auto-école. Pas de questions sur les accidents.', '{latin}'),
+  ('5b0b0000-0000-4000-8000-000000000009', 'mrspuff', 'Mme Puff', 'Monitrice d''auto-école. Pas de questions sur les accidents.', '{latin,pop,rock}'),
   ('5b0b0000-0000-4000-8000-000000000010', 'pearl', 'Perle', 'Fille de M. Krabs et fan de boys bands.', '{pop,hiphop,rnb}');
 
 INSERT INTO auth.users (

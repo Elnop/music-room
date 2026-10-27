@@ -6,8 +6,13 @@ import {
 	filteredProfileSchema,
 	ownProfileSchema,
 	publicProfileSchema,
+	recommendationsSchema,
 } from '@/features/profile/profile-responses.validators.js';
-import { searchUsersSchema, updateProfileSchema } from '@/features/profile/profile.validators.js';
+import {
+	recommendationsQuerySchema,
+	searchUsersSchema,
+	updateProfileSchema,
+} from '@/features/profile/profile.validators.js';
 import {
 	bearerAuth,
 	describeParams,
@@ -26,6 +31,7 @@ export function registerProfileOpenapi(registry: OpenAPIRegistry): void {
 		OwnProfile: ownProfileSchema,
 		SearchProfile: publicProfileSchema,
 		FilteredProfile: filteredProfileSchema,
+		ProfileRecommendations: recommendationsSchema,
 		UpdateProfileRequest: updateProfileSchema,
 	});
 
@@ -64,6 +70,24 @@ export function registerProfileOpenapi(registry: OpenAPIRegistry): void {
 		},
 		responses: {
 			200: ok('Search results', z.array(publicProfileSchema)),
+			400: validation,
+			401: unauthorized,
+		},
+	});
+
+	registry.registerPath({
+		...common,
+		method: 'get',
+		path: '/api/profile/recommendations',
+		summary: 'Profiles with similar music tastes',
+		description:
+			"Profiles sharing at least one genre with the requester, best match first (Jaccard similarity of the genre sets, then the number of shared genres). Only profiles whose music preferences are public are suggested; the requester and the profiles they already follow are left out. Each avatarUrl follows that profile's privacy settings.",
+		operationId: 'getProfileRecommendations',
+		request: {
+			query: describeParams(recommendationsQuerySchema, { limit: 'Maximum number of profiles' }),
+		},
+		responses: {
+			200: ok('Recommended profiles', recommendationsSchema),
 			400: validation,
 			401: unauthorized,
 		},

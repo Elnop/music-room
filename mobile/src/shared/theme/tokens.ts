@@ -69,6 +69,22 @@ export const FIXED_COLORS = {
 } as const;
 
 /** Kept the same across themes. */
+/** Backgrounds of the initials avatars: white text stays above 4.5:1 on each. */
+export const AVATAR_COLORS = [
+	'#C2185B',
+	'#AD1457',
+	'#8E24AA',
+	'#5E35B1',
+	'#3949AB',
+	'#1565C0',
+	'#00838F',
+	'#00796B',
+	'#2E7D32',
+	'#BF360C',
+	'#6D4C41',
+	'#455A64',
+] as const;
+
 export const GENRE_COLORS = {
 	pop: '#FF6B9D',
 	rock: '#E74C3C',

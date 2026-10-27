@@ -247,6 +247,7 @@ describe('authentication', () => {
 		['GET', '/'],
 		['PATCH', '/'],
 		['GET', '/search?q=ali'],
+		['GET', '/recommendations'],
 		['GET', '/privacy'],
 		['PUT', '/privacy'],
 		['GET', '/music-preferences'],
@@ -852,6 +853,8 @@ describe('validation', () => {
 		['PUT', '/music-preferences', { genres: ['pop', 'rock', 'jazz', 'rnb', 'metal', 'latin'] }],
 		['PUT', '/music-preferences', { genres: ['pop', 'pop'] }],
 		['GET', '/search', undefined],
+		['GET', '/recommendations?limit=0', undefined],
+		['GET', '/recommendations?limit=21', undefined],
 	])('%s %s with %j answers 400 VALIDATION_ERROR before any query', async (method, path, body) => {
 		const res = await api(method, path, { user: ALICE, body });
 

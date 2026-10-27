@@ -637,6 +637,14 @@ export type Database = {
 			rank_between: { Args: { p_a: string; p_b: string }; Returns: string };
 			rank_max_length: { Args: Record<PropertyKey, never>; Returns: number };
 			rank_spaced: { Args: { p_count: number; p_index: number }; Returns: string };
+			recommend_similar_profiles: {
+				Args: { p_limit: number; p_user: string };
+				Returns: {
+					common_genres: string[];
+					score: number;
+					user_id: string;
+				}[];
+			};
 			track_unavailable: { Args: { p_track_id: string }; Returns: boolean };
 		};
 		Enums: {
