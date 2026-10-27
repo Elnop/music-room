@@ -8,7 +8,7 @@
 | --- | --- | --- | --- |
 | 1 | Bob : **Accueil**, section « Profils aux goûts proches » | Mme Puff en premier (Pop · Rock), puis Perle (Pop). Patrick et Sandy n'y sont pas : Bob les suit déjà | ☐ |
 | 2 | Bob : toucher la carte de Mme Puff | Son profil s'ouvre dans l'onglet Amis | ☐ |
-| 3 | Revenir sur **Accueil**, puis **Suivre** sur la carte de Mme Puff | La carte disparaît de la section : on ne suggère pas un profil déjà suivi | ☐ |
+| 3 | Sur ce profil, **Suivre**, puis revenir sur **Accueil** | Mme Puff a disparu de la section : on ne suggère pas un profil déjà suivi | ☐ |
 | 4 | Mme Puff : **Profil › Confidentialité**, Préférences musicales en **Amis seulement** | — | ☐ |
 | 5 | Un compte qui ne suit pas Mme Puff et aime la pop (Perle) : **Accueil** | Mme Puff n'est plus suggérée : ses goûts ne sont plus publics, une suggestion les révélerait | ☐ |
 | 6 | Gary (aucun genre) : **Accueil** | La section invite à choisir ses genres ; « Choisir mes genres » ouvre **Préférences musicales** | ☐ |
