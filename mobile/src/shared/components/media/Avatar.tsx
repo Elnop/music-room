@@ -6,7 +6,7 @@ import { Text } from '@/shared/components/ui/Text';
 
 interface AvatarProps {
 	uri?: string;
-	size?: 'sm' | 'md' | 'lg';
+	size?: 'sm' | 'md' | 'lg' | 'xl';
 	name?: string;
 	style?: StyleProp<ViewStyle>;
 }
@@ -15,6 +15,7 @@ const SIZE_MAP = {
 	sm: 32,
 	md: 48,
 	lg: 80,
+	xl: 160,
 };
 
 export function Avatar({ uri, size = 'md', name, style }: AvatarProps) {
@@ -22,12 +23,12 @@ export function Avatar({ uri, size = 'md', name, style }: AvatarProps) {
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
 	const dimension = SIZE_MAP[size];
-	const fontSize =
-		size === 'sm'
-			? theme.typography.sizes.xs
-			: size === 'md'
-				? theme.typography.sizes.md
-				: theme.typography.sizes.xl;
+	const fontSize = {
+		sm: theme.typography.sizes.xs,
+		md: theme.typography.sizes.md,
+		lg: theme.typography.sizes.xl,
+		xl: theme.typography.sizes.xxxl,
+	}[size];
 
 	const getInitials = (name?: string): string => {
 		if (!name) return '?';

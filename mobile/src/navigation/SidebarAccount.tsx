@@ -9,11 +9,13 @@ import type { Theme } from '@/shared/theme/types';
 import { Text } from '@/shared/components/ui/Text';
 
 interface SidebarAccountProps {
+	/** The profile tab is shown: the account takes the active tab's fill, as it replaces that tab. */
+	active: boolean;
 	onPress: () => void;
 }
 
-/** The signed-in user at the foot of the desktop side bar, a link to the profile. */
-export function SidebarAccount({ onPress }: SidebarAccountProps) {
+/** The signed-in user at the foot of the desktop side bar, its only link to the profile. */
+export function SidebarAccount({ active, onPress }: SidebarAccountProps) {
 	const { theme } = useTheme();
 	const separator = useSeparatorColor();
 	const styles = React.useMemo(() => createStyles(theme, separator), [theme, separator]);
@@ -22,36 +24,48 @@ export function SidebarAccount({ onPress }: SidebarAccountProps) {
 	const name = user.displayName || user.username;
 
 	return (
-		<Pressable
-			style={styles.container}
-			onPress={onPress}
-			accessibilityRole="link"
-			accessibilityLabel={`Profil, ${name}`}
-		>
-			<Avatar size="sm" name={name} uri={user.avatarUrl} />
-			<View style={styles.info}>
-				<Text style={styles.name} numberOfLines={1}>
-					{name}
-				</Text>
-				<Text style={styles.username} numberOfLines={1}>
-					@{user.username}
-				</Text>
-			</View>
-		</Pressable>
+		<View style={styles.container}>
+			<Pressable
+				style={[styles.account, active && styles.active]}
+				onPress={onPress}
+				// On the web a link without an address ignores Enter; a button answers Enter and Space.
+				accessibilityRole="button"
+				accessibilityLabel={`Profil, ${name}`}
+				accessibilityState={{ selected: active }}
+			>
+				<Avatar size="sm" name={name} uri={user.avatarUrl} />
+				<View style={styles.info}>
+					<Text style={styles.name} numberOfLines={1}>
+						{name}
+					</Text>
+					<Text style={styles.username} numberOfLines={1}>
+						@{user.username}
+					</Text>
+				</View>
+			</Pressable>
+		</View>
 	);
 }
 
 const createStyles = (theme: Theme, separator: string) =>
 	StyleSheet.create({
 		container: {
+			marginHorizontal: theme.spacing.sm,
+			paddingVertical: theme.spacing.sm,
+			borderTopWidth: 1,
+			borderTopColor: separator,
+		},
+		account: {
 			flexDirection: 'row',
 			alignItems: 'center',
 			gap: theme.spacing.sm,
-			marginHorizontal: theme.spacing.sm,
 			paddingHorizontal: theme.spacing.sm,
-			paddingVertical: theme.spacing.md,
-			borderTopWidth: 1,
-			borderTopColor: separator,
+			paddingVertical: theme.spacing.sm,
+			// The side bar's tab items are rounded by the same radius.
+			borderRadius: 10,
+		},
+		active: {
+			backgroundColor: theme.colors.surfaceAlt,
 		},
 		info: {
 			flex: 1,

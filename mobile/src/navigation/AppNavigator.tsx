@@ -199,7 +199,13 @@ export function AppNavigator() {
 						<Tab.Screen
 							name="ProfileTab"
 							component={ProfileNavigator}
-							options={{ title: 'Profil', tabBarAccessibilityLabel: 'Profil', headerShown: false }}
+							options={{
+								title: 'Profil',
+								tabBarAccessibilityLabel: 'Profil',
+								headerShown: false,
+								// The desktop side bar reaches the profile through the account at its foot.
+								...(breakpoint === 'desktop' ? { tabBarItemStyle: { display: 'none' } } : null),
+							}}
 						/>
 					</Tab.Navigator>
 				</SafeAreaInsetsContext.Provider>

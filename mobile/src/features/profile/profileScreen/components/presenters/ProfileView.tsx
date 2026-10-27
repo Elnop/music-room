@@ -4,6 +4,7 @@ import { ProfileHeader } from '@/features/profile/profileScreen/components/prese
 import { ProfileInfoSection } from '@/features/profile/profileScreen/components/presenters/ProfileInfoSection';
 import { ProfileMenuItems } from '@/features/profile/profileScreen/components/presenters/ProfileMenuItems';
 import { ProfilePreferencesSection } from '@/features/profile/profileScreen/components/presenters/ProfilePreferencesSection';
+import { ProfileWideHeader } from '@/features/profile/profileScreen/components/presenters/ProfileWideHeader';
 import type { UserStats } from '@/features/profile/types';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import type { Theme } from '@/shared/theme/types';
@@ -20,6 +21,8 @@ interface ProfileViewProps {
 	isLoading: boolean;
 	buildLabel: string;
 	onRefresh: () => void;
+	onEditProfile: () => void;
+	onSettings: () => void;
 	onMusicPreferences: () => void;
 	onPrivacySettings: () => void;
 	onLinkedAccounts: () => void;
@@ -37,6 +40,8 @@ export function ProfileView({
 	isLoading,
 	buildLabel,
 	onRefresh,
+	onEditProfile,
+	onSettings,
 	onMusicPreferences,
 	onPrivacySettings,
 	onLinkedAccounts,
@@ -44,7 +49,7 @@ export function ProfileView({
 	onConfirmLogout,
 }: ProfileViewProps) {
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
-	const { isDesktop } = useBreakpoint();
+	const { isWide } = useBreakpoint();
 
 	if (!user) {
 		return (
@@ -53,6 +58,19 @@ export function ProfileView({
 			</View>
 		);
 	}
+
+	const preferences = <ProfilePreferencesSection genres={genres} onModify={onMusicPreferences} />;
+	const info = <ProfileInfoSection user={user} />;
+	const menu = (
+		<ProfileMenuItems
+			wide={isWide}
+			isLoading={isLoading}
+			onPrivacySettings={onPrivacySettings}
+			onLinkedAccounts={onLinkedAccounts}
+			onMyDevices={onMyDevices}
+			onConfirmLogout={onConfirmLogout}
+		/>
+	);
 
 	return (
 		<View style={styles.screenWrapper}>
@@ -67,24 +85,30 @@ export function ProfileView({
 					/>
 				}
 			>
-				<View style={isDesktop && styles.columns}>
-					<View style={isDesktop && styles.identityColumn}>
-						<ProfileHeader user={user} stats={stats} />
-					</View>
-					<View style={isDesktop && styles.settingsColumn}>
-						<ProfilePreferencesSection genres={genres} onModify={onMusicPreferences} />
-
-						<ProfileInfoSection user={user} />
-
-						<ProfileMenuItems
-							isLoading={isLoading}
-							onPrivacySettings={onPrivacySettings}
-							onLinkedAccounts={onLinkedAccounts}
-							onMyDevices={onMyDevices}
-							onConfirmLogout={onConfirmLogout}
+				{isWide ? (
+					<>
+						<ProfileWideHeader
+							user={user}
+							stats={stats}
+							onEditProfile={onEditProfile}
+							onSettings={onSettings}
 						/>
-					</View>
-				</View>
+						<View style={styles.columns}>
+							<View style={styles.cardsColumn}>
+								{preferences}
+								{info}
+							</View>
+							<View style={styles.column}>{menu}</View>
+						</View>
+					</>
+				) : (
+					<>
+						<ProfileHeader user={user} stats={stats} />
+						{preferences}
+						{info}
+						{menu}
+					</>
+				)}
 
 				<Text style={styles.buildLabel}>{buildLabel}</Text>
 			</ScrollView>
@@ -107,10 +131,10 @@ const createStyles = (theme: Theme) =>
 		columns: {
 			flexDirection: 'row',
 			alignItems: 'flex-start',
-			gap: theme.spacing.lg,
 		},
-		identityColumn: { width: 320 },
-		settingsColumn: { flex: 1, minWidth: 0 },
+		column: { flex: 1, minWidth: 0 },
+		// The menu items open with their own top margin: the cards beside them start level with them.
+		cardsColumn: { flex: 1, minWidth: 0, paddingTop: theme.spacing.md },
 		buildLabel: {
 			fontSize: 12,
 			color: theme.colors.textSecondary,

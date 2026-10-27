@@ -43,6 +43,8 @@ export function ProfileOrchestrator() {
 			isLoading={isLoading}
 			buildLabel={buildLabel}
 			onRefresh={handleRefresh}
+			onEditProfile={handleEditProfile}
+			onSettings={handleSettings}
 			onMusicPreferences={handleMusicPreferences}
 			onPrivacySettings={handlePrivacySettings}
 			onLinkedAccounts={handleLinkedAccounts}
