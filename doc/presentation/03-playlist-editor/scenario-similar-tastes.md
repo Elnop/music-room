@@ -6,7 +6,7 @@
 
 | # | Action | Résultat attendu | ☐ |
 | --- | --- | --- | --- |
-| 1 | Bob : **Accueil**, section « Profils aux goûts proches » | Mme Puff en premier (Pop · Rock), puis Perle (Pop). Patrick et Sandy n'y sont pas : Bob les suit déjà | ☐ |
+| 1 | Bob : **Accueil**, section « Profils aux goûts proches » | Mme Puff en premier (pop et rock en commun), puis Perle (pop). Patrick et Sandy n'y sont pas : Bob les suit déjà | ☐ |
 | 2 | Bob : toucher la carte de Mme Puff | Son profil s'ouvre dans l'onglet Amis | ☐ |
 | 3 | Sur ce profil, **Suivre**, puis revenir sur **Accueil** | Mme Puff a disparu de la section : on ne suggère pas un profil déjà suivi | ☐ |
 | 4 | Mme Puff : **Profil › Confidentialité**, Préférences musicales en **Amis seulement** | — | ☐ |
