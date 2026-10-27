@@ -6,6 +6,7 @@ Everything a human needs to understand Zumik. Start with the [project README](..
 
 - [subject/en.subject.pdf](subject/en.subject.pdf) - The 42 subject "Music Room" v5.3; it overrides every other document.
 - [subject/coverage.md](subject/coverage.md) - Each mandatory requirement and where the code meets it.
+- [presentation/README.md](presentation/README.md) - The defence, in French: per part of the subject, the quoted requirement, what Zumik delivers, and step-by-step demo scenarios that double as the acceptance checklist.
 
 ## Architecture
 
@@ -23,8 +24,8 @@ Everything a human needs to understand Zumik. Start with the [project README](..
 - [features/queue-and-connect.md](features/queue-and-connect.md) - The play queue, delegated queue access, moving playback between devices.
 - [features/mobile-api.md](features/mobile-api.md) - The API contract, its generated documentation, and the app's API client.
 - [features/subscription.md](features/subscription.md) - Bonus V.3: the free and premium plans, the simulated switch, what a downgrade keeps.
-- [features/events.md](features/events.md) - Bonus V.2: physical events shown to nearby phones by GPS and iBeacon, privacy, permissions, two-phone demo.
-- [features/web-client.md](features/web-client.md) - Bonus V.1: the responsive web client (Expo web), its `.web.ts` variants, breakpoints, audio, sign-in, what the browser lacks, running and building, demo scenario.
+- [features/events.md](features/events.md) - Bonus V.2: physical events shown to nearby phones by GPS and iBeacon, privacy, permissions.
+- [features/web-client.md](features/web-client.md) - Bonus V.1: the responsive web client (Expo web), its `.web.ts` variants, breakpoints, audio, sign-in, what the browser lacks, running and building.
 
 ## Security
 

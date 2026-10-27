@@ -84,11 +84,4 @@ The native parts (`expo-location`, the date picker, `react-native-ble-plx`, `bea
 
 ## Demo with two phones
 
-Phone A is the organiser, phone B the visitor; both run the build, signed in with different accounts, Bluetooth on.
-
-1. On A, **Accueil** › « Créer un événement »: a name, an address **in another city** (so B's GPS cannot find it), how to get in (« Bâtiment C, 7e étage »), two genres, a start now and an end in two hours, and one of A's public playlists. « Créer l'événement » opens its page.
-2. On A's event page, turn « Diffuser la balise » on; allow « Appareils à proximité ». The card says the nearby phones see the event.
-3. On B, open **Accueil** (location allowed and on, as Android requires for any beacon scan; « Détecter aussi les balises Bluetooth » once). Within a few seconds, with no action, the event appears in « Événements à proximité » as « Tout près »: the beacon, since its address is hundreds of kilometres away.
-4. On B, tap it: the page shows how to get in and the genres; « Ouvrir la playlist » opens A's playlist.
-5. On A, turn « Diffuser la balise » off. On B, back on **Accueil**, the event leaves the section about 8 seconds later.
-6. Optional, GPS: on A, edit the event and use « Utiliser ma position actuelle ». With the beacon still off, B shows it with a distance (« 20 m »), then « Tout près » once the beacon is on again: it is listed once.
+The defence scenario (organiser and visitor phones) is in [presentation/10-bonus-iot/scenario.md](../presentation/10-bonus-iot/scenario.md).
