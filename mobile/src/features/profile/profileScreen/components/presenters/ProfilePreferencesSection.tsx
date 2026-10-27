@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { ProfileSection } from '@/features/profile/common/components/presenters/ProfileSection';
+import { ProfileSection } from '@/shared/components/profile/ProfileSection';
 import { GenreChip } from '@/shared/components/ui/GenreChip';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';

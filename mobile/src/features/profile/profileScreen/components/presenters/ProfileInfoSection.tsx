@@ -1,10 +1,7 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { ProfileSection } from '@/features/profile/common/components/presenters/ProfileSection';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import type { Theme } from '@/shared/theme/types';
+import { ProfileSection } from '@/shared/components/profile/ProfileSection';
+import { ProfileInfoRows, memberSinceLabel } from '@/shared/components/profile/ProfileInfoRows';
 import type { UserProfile } from '@/types/user.types';
-import { Text } from '@/shared/components/ui/Text';
 
 interface ProfileInfoSectionProps {
 	user: UserProfile;
@@ -12,63 +9,15 @@ interface ProfileInfoSectionProps {
 }
 
 export function ProfileInfoSection({ user, prominent }: ProfileInfoSectionProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createStyles(theme), [theme]);
-
-	const joinedDate = React.useMemo(() => {
-		try {
-			return new Date(user.createdAt).toLocaleDateString('fr-FR', {
-				month: 'long',
-				year: 'numeric',
-			});
-		} catch {
-			return '';
-		}
-	}, [user.createdAt]);
-
 	return (
 		<ProfileSection title="Information" prominent={prominent}>
-			<View style={styles.infoItem}>
-				<Text style={styles.infoLabel}>Email</Text>
-				<Text style={styles.infoValue}>{user.email}</Text>
-			</View>
-
-			<View style={styles.divider} />
-
-			<View style={styles.infoItem}>
-				<Text style={styles.infoLabel}>Nom d'utilisateur</Text>
-				<Text style={styles.infoValue}>@{user.username}</Text>
-			</View>
-
-			<View style={styles.divider} />
-
-			<View style={styles.infoItem}>
-				<Text style={styles.infoLabel}>Membre depuis</Text>
-				<Text style={styles.infoValue}>{joinedDate}</Text>
-			</View>
+			<ProfileInfoRows
+				rows={[
+					{ label: 'Email', value: user.email },
+					{ label: "Nom d'utilisateur", value: `@${user.username}` },
+					{ label: 'Membre depuis', value: memberSinceLabel(user.createdAt) },
+				]}
+			/>
 		</ProfileSection>
 	);
 }
-
-const createStyles = (theme: Theme) =>
-	StyleSheet.create({
-		infoItem: {
-			flexDirection: 'row',
-			justifyContent: 'space-between',
-			alignItems: 'center',
-			paddingVertical: theme.spacing.sm,
-		},
-		infoLabel: {
-			fontSize: 15,
-			color: theme.colors.textSecondary,
-		},
-		infoValue: {
-			fontSize: 15,
-			color: theme.colors.text,
-			fontFamily: theme.typography.families.medium,
-		},
-		divider: {
-			height: 1,
-			backgroundColor: theme.colors.border,
-		},
-	});
