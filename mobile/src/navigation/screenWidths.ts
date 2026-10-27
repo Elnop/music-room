@@ -25,6 +25,7 @@ export const SCREEN_WIDTHS: Record<string, ContentWidth> = {
 	EmailVerification: 'form',
 	ForgotPassword: 'form',
 	ResetPassword: 'form',
+	PrivacyPolicy: 'form',
 };
 
 /** Their background spans the window, so they centre their own content at their width. */

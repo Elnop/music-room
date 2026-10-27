@@ -9,6 +9,7 @@ import { LinkedAccountsOrchestrator } from '@/features/profile/linkedAccounts/co
 import { MusicPreferencesOrchestrator } from '@/features/profile/musicPreferences/components/orchestrators/MusicPreferencesOrchestrator';
 import { SettingsOrchestrator } from '@/features/profile/settings/components/orchestrators/SettingsOrchestrator';
 import { MyDevicesOrchestrator } from '@/features/music-control/myDevices/components/orchestrators/MyDevicesOrchestrator';
+import { PrivacyPolicyOrchestrator } from '@/features/legal/privacyPolicy/components/orchestrators/PrivacyPolicyOrchestrator';
 import type { ProfileStackParamList } from '@/features/profile/types';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { screenHeader, screenLayout } from '@/navigation/screenLayout';
@@ -71,6 +72,11 @@ export function ProfileNavigator() {
 				name="Settings"
 				component={SettingsOrchestrator}
 				options={{ title: 'Réglages' }}
+			/>
+			<ProfileStack.Screen
+				name="PrivacyPolicy"
+				component={PrivacyPolicyOrchestrator}
+				options={{ title: 'Politique de confidentialité' }}
 			/>
 		</ProfileStack.Navigator>
 	);

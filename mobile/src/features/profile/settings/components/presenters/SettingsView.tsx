@@ -1,10 +1,12 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { BackendUrlField } from '@/shared/components/form/BackendUrlField';
 import { BACKEND_URL_EDITABLE } from '@/shared/constants/platform';
 import type { Plan } from '@/shared/types/subscription';
 import type { Theme } from '@/shared/theme/types';
 import { SubscriptionSection } from './SubscriptionSection';
+import { Pressable } from '@/shared/components/ui/Pressable';
 import { Text } from '@/shared/components/ui/Text';
 
 interface SettingsViewProps {
@@ -13,6 +15,7 @@ interface SettingsViewProps {
 	plan: Plan | undefined;
 	isChangingPlan: boolean;
 	onTogglePremium: (premium: boolean) => void;
+	onOpenPrivacyPolicy: () => void;
 }
 
 export function SettingsView({
@@ -21,6 +24,7 @@ export function SettingsView({
 	plan,
 	isChangingPlan,
 	onTogglePremium,
+	onOpenPrivacyPolicy,
 }: SettingsViewProps) {
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
@@ -46,6 +50,18 @@ export function SettingsView({
 					<BackendUrlField />
 				</View>
 			)}
+
+			<View style={styles.section}>
+				<Text style={styles.sectionTitle}>À propos</Text>
+				<Pressable
+					onPress={onOpenPrivacyPolicy}
+					accessibilityLabel="Politique de confidentialité"
+					style={styles.row}
+				>
+					<Text style={styles.rowLabel}>Politique de confidentialité</Text>
+					<Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
+				</Pressable>
+			</View>
 		</ScrollView>
 	);
 }
@@ -66,5 +82,16 @@ const createStyles = (theme: Theme) =>
 			fontFamily: theme.typography.families.bold,
 			color: theme.colors.text,
 			marginBottom: theme.spacing.md,
+		},
+		row: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			justifyContent: 'space-between',
+			gap: theme.spacing.md,
+		},
+		rowLabel: {
+			fontSize: theme.typography.sizes.lg,
+			fontFamily: theme.typography.families.semibold,
+			color: theme.colors.text,
 		},
 	});
