@@ -33,4 +33,3 @@
 ## Points ouverts connus
 
 - IV.7 : machine de référence et rapport de capacité (#103, #106).
-- Recette du client web et de l'APK avant la release sur `main` (#578).

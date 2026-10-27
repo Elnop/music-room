@@ -12,7 +12,7 @@
 - **Responsive** : téléphone sous 768 px (la mise en page Android), tablette, et bureau à partir de 1024 px (barre latérale, contenu centré, grilles, lecteur ancré, souris et clavier). La mise en page change en direct quand on redimensionne la fenêtre.
 - **Le même service** : Playlist Editor en temps réel, et Control Delegation avec le navigateur comme appareil (lecture HLS, touches média). Connexion Google et Facebook, événements par géolocalisation.
 - **Backend presque inchangé** : seul `GET /api/events/geocode` a été ajouté. Le navigateur envoie `X-Platform: web`.
-- **Mise en ligne** sur GitHub Pages : `https://elnop.github.io/music-room/`.
+- **Mise en ligne** sur GitHub Pages : `https://elnop.github.io/music-room/`. La démo, elle, tourne sur la machine de référence (`make dev-web`).
 
 ## Où regarder
 

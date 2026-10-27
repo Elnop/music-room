@@ -1,10 +1,12 @@
 # Matériel
 
+La soutenance se fait sur la **machine de référence**, celle où sont mesurées les performances (IV.7). Le backend hébergé et le client GitHub Pages ne servent pas : les chiffres de charge, les logs et les données de démo doivent venir de la même machine.
+
 | Quoi | Pour | Remarque |
 | --- | --- | --- |
-| Téléphone Android A | Toutes les démos | Build debug (`cd mobile && npx expo run:android --app-id com.zumik.app.dev`) ou APK de release. Jamais Expo Go : il plante faute de modules natifs |
+| Téléphone Android A | Toutes les démos | Build debug (`cd mobile && npx expo run:android --app-id com.zumik.app.dev`), pointé sur la machine de référence. Jamais Expo Go : il plante faute de modules natifs |
 | Téléphone Android B | Temps réel, délégation, iBeacon | Un second appareil est indispensable pour montrer le temps réel. En secours, le client web (`make dev-web`) peut remplacer B partout, sauf pour la démo iBeacon (V.2) |
-| Ordinateur | Backend, Swagger UI, logs, Mailpit, client web | Docker démarré (stack Supabase locale, Redis, semgrep, gitleaks) |
+| Machine de référence | Backend, Supabase local, Redis, Swagger UI, logs, Mailpit, client web, tests de charge | La machine des mesures IV.7 : toute la soutenance tourne dessus, jamais sur la prod. Docker démarré |
 | Navigateur (Chrome) | Swagger UI, Mailpit, client web (V.1) | |
 | Câble USB ou même Wi-Fi | Joindre le backend depuis les téléphones | `make dev-tunnel` si les téléphones sont sur un autre réseau ([tunnel-mode.md](../../development/tunnel-mode.md)) |
 

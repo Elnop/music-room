@@ -9,6 +9,8 @@ Pour le détail technique, voir [subject/coverage.md](../subject/coverage.md), q
 
 ## Déroulé de la soutenance
 
+Tout se fait sur la **machine de référence**, celle des mesures IV.7 : backend, stack Supabase locale avec les comptes de démo, Redis et client web. La prod (backend hébergé, GitHub Pages) n'est pas utilisée.
+
 On présente d'abord la partie obligatoire. Le sujet le rappelle : *"The bonus part will only be assessed if the mandatory part is PERFECT."*
 
 | # | Partie | Sujet | Dossier |

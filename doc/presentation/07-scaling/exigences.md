@@ -26,4 +26,4 @@
 
 ## Écarts assumés
 
-- **Machine de référence et rapport de capacité encore ouverts** : #103 et #106. Avant la soutenance, il faut une mesure sur une machine décrite (CPU, RAM, cloud ou local) et un nombre maximal d'utilisateurs simultanés. Sans cela, l'exigence *"measure the number of users"* n'est pas remplie.
+- **Machine de référence et rapport de capacité encore ouverts** : #103 et #106. La machine de référence est celle de la soutenance : avant la correction, il faut y avoir mesuré et décrit (CPU, RAM, local) le nombre maximal d'utilisateurs simultanés. Sans cela, l'exigence *"measure the number of users"* n'est pas remplie.

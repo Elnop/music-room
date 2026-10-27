@@ -4,7 +4,7 @@
 
 **Prérequis** :
 
-- Chrome sur un ordinateur et le téléphone Android, tous deux sur le même backend : en local (`make dev-web` et le téléphone sur le backend de la même machine), ou avec l'app GitHub Pages et l'APK de release ;
+- Chrome sur un ordinateur et le téléphone Android, tous deux sur le backend de la machine de référence (`make dev-web`, client web sur http://localhost:8081) ;
 - comptes du seed ([demo-accounts.md](../../development/demo-accounts.md)) : Bob (`bob@zumik.dev`) dans le navigateur, Patrick (`patrick@zumik.dev`) sur le téléphone. Ils sont amis, et « Jellyfishing Jams » appartient à Bob avec Patrick comme collaborateur.
 
 | # | Action | Résultat attendu | ☐ |

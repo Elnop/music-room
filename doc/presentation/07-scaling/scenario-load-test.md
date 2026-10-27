@@ -10,7 +10,7 @@
 
 | # | Action | Résultat attendu | ☐ |
 | --- | --- | --- | --- |
-| 1 | Donner la machine : `nproc`, `free -h`, local ou cloud | Les caractéristiques que le sujet demande | ☐ |
+| 1 | Sur la machine de référence : `nproc`, `lscpu \| head`, `free -h` | Les caractéristiques que le sujet demande (*"CPU, RAM, Cloud or Premise"*) : la machine locale, celle-là même qui fait tourner la démo | ☐ |
 | 2 | `make perf-test` | Les fixtures sont créées (utilisateurs `perf-*`, amitiés, licence, playlist partagée), puis les scénarios HTTP et Socket.io s'exécutent | ☐ |
 | 3 | Ouvrir `tests/performance/results/<horodatage>/summary.md` | Requêtes par seconde et latences par endpoint, codes de retour, section Socket.io (connexions, latence de diffusion, latence de contrôle) | ☐ |
 | 4 | `make perf-test PERF_SOCKET_CLIENTS=60` | La latence de diffusion monte avec le nombre de clients de la room (N clients, environ N²/2 livraisons par seconde) | ☐ |

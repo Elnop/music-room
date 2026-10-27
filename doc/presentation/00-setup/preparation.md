@@ -1,6 +1,6 @@
 # Préparation
 
-À faire avant l'arrivée du correcteur, depuis un clone propre.
+À faire sur la machine de référence avant l'arrivée du correcteur, depuis un clone propre.
 
 | # | Action | Résultat attendu | ☐ |
 | --- | --- | --- | --- |
@@ -18,6 +18,6 @@
 
 `make supabase-reset` recharge les données de démo. Les comptes créés pendant la démo (inscription, Google, Facebook) disparaissent avec.
 
-## Si le backend local n'est pas disponible
+## Pas de prod
 
-Le backend hébergé (`https://zumik.cluzhub.com`) et le client web GitHub Pages (`https://elnop.github.io/music-room/`) peuvent servir. Les comptes de démo n'y existent pas : il faut créer les comptes avant la soutenance.
+Tout tourne sur la machine de référence : backend, stack Supabase locale, Redis et client web. Si le backend local ne démarre pas, on le répare avant de commencer ; le backend hébergé (prod) n'est pas un plan B, car les comptes de démo n'y existent pas et les mesures IV.7 n'y ont pas été faites.

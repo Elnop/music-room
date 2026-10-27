@@ -2,7 +2,7 @@
 
 **Prouve** : IV.5, *"the back-end's address must be configurable on the application for tests"* et *"Applications must only be "remote control" to the back-end"*.
 
-**Prérequis** : téléphone A connecté au backend local. Une seconde adresse joignable : le backend hébergé `https://zumik.cluzhub.com`, ou le même backend via son IP sur le réseau local.
+**Prérequis** : téléphone A connecté au backend local. Une seconde adresse de la machine de référence : son IP sur le réseau local (ex. `http://192.168.1.20:3000`) si le téléphone passe par `localhost` en USB, ou l'inverse. Pas l'adresse de la prod : tout reste sur la machine de référence.
 
 | # | Action | Résultat attendu | ☐ |
 | --- | --- | --- | --- |
