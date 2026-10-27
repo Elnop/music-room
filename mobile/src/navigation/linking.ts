@@ -1,19 +1,19 @@
-// Only zumik://playlist/<uuid> and zumik://user/<uuid> are handled (and the same paths of the web
-// app's origin and base path). A link received signed out is kept pending until sign-in, since the app navigator is not mounted yet.
+// Android opens only zumik://playlist/<uuid> and zumik://user/<uuid>; a browser, every screen path of
+// screenPaths.ts. A link received signed out is kept pending until sign-in, since the app navigator is not mounted yet.
 
-import {
-	getActionFromState,
-	getStateFromPath as defaultGetStateFromPath,
-} from '@react-navigation/native';
+import { getActionFromState } from '@react-navigation/native';
 import type { LinkingOptions, NavigationContainerRef } from '@react-navigation/native';
 import { Platform } from 'react-native';
 import type { AppTabsParamList } from './AppNavigator';
 import { logger } from '@/shared/utils/logger';
 import { LINK_PREFIX } from '@/shared/utils/shareLinks';
 import { stripBasePath, webBasePath } from './webBasePath';
-
-const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
-const SHARE_PATH = new RegExp(`^/?(playlist|user)/${UUID}/?(\\?.*)?$`, 'i');
+import {
+	matchScreenPath,
+	pathFromState,
+	stateFromMatch,
+	type ScreenPathMatch,
+} from './screenPaths';
 
 /** A link received while signed out, opened once the app navigator is mounted. */
 let pendingPath: string | null = null;
@@ -29,75 +29,46 @@ export function clearPendingLink(): void {
 	pendingPath = null;
 }
 
-const linkingConfig = {
-	screens: {
-		PlaylistsTab: {
-			initialRouteName: 'Playlists',
-			screens: { PlaylistDetail: 'playlist/:id' },
-		},
-		FriendsTab: {
-			initialRouteName: 'Friends',
-			screens: { UserProfile: 'user/:userId' },
-		},
-	},
-} satisfies LinkingOptions<AppTabsParamList>['config'];
-
-type Options = Parameters<typeof defaultGetStateFromPath>[1];
-
-/** The navigation state of a share link path, or undefined when it is not one. */
-export function stateFromSharePath(path: string, options: Options = linkingConfig) {
-	if (!SHARE_PATH.test(path)) return undefined;
-	return defaultGetStateFromPath(path, options);
+/** The screen of a path this platform opens: any screen in a browser, a share link elsewhere. */
+function matchLink(path: string): ScreenPathMatch | undefined {
+	const match = matchScreenPath(path);
+	if (!match || (Platform.OS !== 'web' && !match.entry.shared)) return undefined;
+	return match;
 }
 
-interface RouteNode {
-	name: string;
-	params?: object;
-	state?: StateNode;
+/** The navigation state of a link path, or undefined when this platform does not open it. */
+export function stateFromLinkPath(path: string) {
+	const match = matchLink(path);
+	return match && stateFromMatch(match);
 }
 
-interface StateNode {
-	index?: number;
-	routes: readonly RouteNode[];
-}
-
-/** The browser path of a navigation state: a share link for a playlist or a profile, the root otherwise. */
-export function sharePathFromState(state: StateNode): string {
-	let route = state.routes[state.index ?? state.routes.length - 1];
-	while (route?.state)
-		route = route.state.routes[route.state.index ?? route.state.routes.length - 1];
-	const params = (route?.params ?? {}) as { id?: string; userId?: string };
-	if (route?.name === 'PlaylistDetail' && params.id) return `/playlist/${params.id}`;
-	if (route?.name === 'UserProfile' && params.userId) return `/user/${params.userId}`;
-	return '/';
-}
-
-/** In a browser, the address bar shows the share paths under the app's origin and base path. */
+/** In a browser, the address bar shows the screen paths under the app's origin and base path. */
 function webLinking(): Partial<LinkingOptions<AppTabsParamList>> {
 	const origin = (globalThis as { location?: { origin?: string } }).location?.origin;
 	if (Platform.OS !== 'web' || !origin) return {};
 	const base = webBasePath();
 	return {
 		prefixes: [LINK_PREFIX, `${origin}${base}`],
-		getPathFromState: state => `${base}${sharePathFromState(state)}`,
+		getPathFromState: state => `${base}${pathFromState(state)}`,
 	};
 }
 
-/** `isSignedIn` is read per link: signed out, the link is stored as pending, not applied to the auth screens. */
+/** `isSignedIn` is read per link: signed out, an app screen is kept pending; signed in, a signed-out screen opens the home. */
 export function createLinking(isSignedIn: () => boolean): LinkingOptions<AppTabsParamList> {
 	return {
 		prefixes: [LINK_PREFIX],
-		config: linkingConfig,
 		// The browser hands over its full path, base path included
-		getStateFromPath: (fullPath, options) => {
+		getStateFromPath: fullPath => {
 			const path = stripBasePath(fullPath);
-			const state = stateFromSharePath(path, options);
-			if (!state) return undefined;
-			if (!isSignedIn()) {
-				pendingPath = path;
+			const match = matchLink(path);
+			if (!match) return undefined;
+			const signedOutScreen = !match.entry.tab;
+			if (isSignedIn() === signedOutScreen) {
+				// The home screen is where sign-in lands anyway
+				if (!signedOutScreen && match.entry.path !== '') pendingPath = path;
 				return undefined;
 			}
-			return state;
+			return stateFromMatch(match);
 		},
 		...webLinking(),
 	};
@@ -108,10 +79,10 @@ export function openPendingLink(navigation: NavigationContainerRef<AppTabsParamL
 	if (!navigation.isReady()) return false;
 	const path = takePendingLink();
 	if (!path) return false;
-	const state = stateFromSharePath(path);
+	const state = stateFromLinkPath(path);
 	if (!state) return false;
 	try {
-		const action = getActionFromState(state, linkingConfig);
+		const action = getActionFromState(state);
 		if (action) navigation.dispatch(action);
 		else navigation.resetRoot(state);
 		return true;

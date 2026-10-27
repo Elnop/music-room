@@ -47,7 +47,7 @@ Every adaptation keys on `isWide` (tablet or desktop), so a phone, and Android, 
 - **Dialogs**: the action sheet, the queue and the device picker become centred dialogs (`CenteredDialog`, `FullScreenSheet`), capped at 560 px.
 - **Player**: on desktop the full player is a 440 px panel docked on the right over a backdrop.
 - **Mouse and keyboard**: a `Pressable` lightens under the pointer and shows the hand cursor; Escape closes every modal; Enter submits the sign-in, sign-up, playlist, event, profile and password forms (`Input submitOnEnter`, browser only).
-- **URL**: on the web the address bar follows the screen (`/playlist/<id>`, `/user/<id>`, `navigation/linking.ts`); reloading such a URL reopens the screen, after sign-in if needed.
+- **URL**: on the web every screen has its own path (`navigation/screenPaths.ts`: `/playlists`, `/playlist/<id>/add-tracks`, `/event/<id>`, `/profile/devices`, `/login`…), and only identifiers go in it. Reloading reopens the screen in its canonical tab above its parent screens, after sign-in for an app screen; a signed-out path opened signed in, or an unknown path, opens the home. `/verify-email` and `/reset-password` keep the email out of the address and reload on the screen before them. Android still opens only `zumik://playlist/<id>` and `zumik://user/<id>`.
 
 ## Audio
 
