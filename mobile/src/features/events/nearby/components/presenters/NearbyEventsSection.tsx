@@ -35,7 +35,7 @@ export function NearbyEventsSection({ nearby }: { nearby: NearbyEvents }) {
 						title="Créer"
 						variant="outline"
 						size="compact"
-						icon={<Ionicons name="add" size={18} color={theme.colors.text} />}
+						icon={<Ionicons name="add" size={16} color={theme.colors.text} />}
 						onPress={nearby.createEvent}
 						accessibilityLabel="Créer un événement"
 					/>

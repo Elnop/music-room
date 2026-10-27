@@ -94,10 +94,10 @@ const createStyles = (theme: Theme) =>
 			gap: 8,
 		},
 		compact: {
-			height: 36,
-			paddingHorizontal: 14,
-			borderRadius: 10,
-			gap: 6,
+			height: 28,
+			paddingHorizontal: 12,
+			borderRadius: 999,
+			gap: 4,
 		},
 		fullWidth: {
 			width: '100%',
@@ -125,7 +125,7 @@ const createStyles = (theme: Theme) =>
 			fontFamily: FONT_FAMILIES.semibold,
 		},
 		compactText: {
-			fontSize: 14,
+			fontSize: 13,
 		},
 		primaryText: {
 			color: theme.colors.onColor,
