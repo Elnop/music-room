@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { CONTENT_MAX_WIDTH, SIDEBAR_WIDTH, type ContentWidth } from '@/shared/constants/layout';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
+import { ContentColumnContext } from '@/shared/hooks/useContentColumn';
 import { ContentWidthContext } from '@/shared/hooks/useContentWidth';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { Theme } from '@/shared/theme/types';
@@ -10,6 +11,8 @@ interface ContentContainerProps {
 	width: ContentWidth;
 	/** The left navigation takes its share of the window: the app's screens, not the auth ones. */
 	besideSidebar?: boolean;
+	/** The screen scrolls across the whole area and centres its own content with useContentColumn. */
+	scrollsAtEdge?: boolean;
 	children: React.ReactNode;
 }
 
@@ -17,6 +20,7 @@ interface ContentContainerProps {
 export function ContentContainer({
 	width,
 	besideSidebar = false,
+	scrollsAtEdge = false,
 	children,
 }: ContentContainerProps) {
 	const { styles } = useThemedStyles(createStyles);
@@ -29,9 +33,13 @@ export function ContentContainer({
 
 	return (
 		<ContentWidthContext.Provider value={contentWidth}>
-			<View style={styles.outer}>
-				<View style={[styles.inner, { maxWidth: CONTENT_MAX_WIDTH[width] }]}>{children}</View>
-			</View>
+			<ContentColumnContext.Provider value={scrollsAtEdge ? CONTENT_MAX_WIDTH[width] : null}>
+				<View style={styles.outer}>
+					<View style={[styles.inner, !scrollsAtEdge && { maxWidth: CONTENT_MAX_WIDTH[width] }]}>
+						{children}
+					</View>
+				</View>
+			</ContentColumnContext.Provider>
 		</ContentWidthContext.Provider>
 	);
 }

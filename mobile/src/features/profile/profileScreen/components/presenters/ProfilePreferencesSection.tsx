@@ -12,9 +12,15 @@ import { Text } from '@/shared/components/ui/Text';
 interface ProfilePreferencesSectionProps {
 	genres: MusicGenre[];
 	onModify: () => void;
+	/** Wide screens: the empty state takes a single line. */
+	compact?: boolean;
 }
 
-export function ProfilePreferencesSection({ genres, onModify }: ProfilePreferencesSectionProps) {
+export function ProfilePreferencesSection({
+	genres,
+	onModify,
+	compact = false,
+}: ProfilePreferencesSectionProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
@@ -32,6 +38,15 @@ export function ProfilePreferencesSection({ genres, onModify }: ProfilePreferenc
 						<GenreChip key={genre} genre={genre} selected size="sm" />
 					))}
 				</View>
+			) : compact ? (
+				<Pressable
+					style={styles.compactEmptyState}
+					onPress={onModify}
+					accessibilityLabel="Modifier les préférences musicales"
+				>
+					<Ionicons name="musical-notes-outline" size={18} color={theme.colors.textSecondary} />
+					<Text style={styles.compactEmptyStateText}>Ajoutez jusqu'à 5 genres préférés</Text>
+				</Pressable>
 			) : (
 				<Pressable
 					style={styles.emptyState}
@@ -62,6 +77,15 @@ const createStyles = (theme: Theme) =>
 		emptyState: {
 			alignItems: 'center',
 			paddingVertical: theme.spacing.lg,
+		},
+		compactEmptyState: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			gap: theme.spacing.sm,
+		},
+		compactEmptyStateText: {
+			fontSize: theme.typography.sizes.md,
+			color: theme.colors.textSecondary,
 		},
 		emptyStateIcon: {
 			marginBottom: theme.spacing.sm,

@@ -10,6 +10,7 @@ import { FriendCard } from './FriendCard';
 import { FriendItemRow } from './FriendItemRow';
 import { ThemedRefreshControl } from '@/shared/components/lists/ThemedRefreshControl';
 import { createFriendsListStyles } from './friendsListStyles';
+import { useContentColumn } from '@/shared/hooks/useContentColumn';
 
 interface FriendsListTabProps {
 	friends: FriendProfile[];
@@ -42,11 +43,12 @@ export function FriendsListTab({
 }: FriendsListTabProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createFriendsListStyles(theme), [theme]);
+	const column = useContentColumn();
 	// A short list spreads over the width instead of leaving empty columns.
 	const columns = Math.min(rowColumns(useBreakpoint().breakpoint), Math.max(2, friends.length));
 
 	if (isLoading && friends.length === 0) {
-		return <SkeletonList count={6} row={UserRowSkeleton} />;
+		return <SkeletonList count={6} row={UserRowSkeleton} style={column} />;
 	}
 
 	return (
@@ -81,7 +83,7 @@ export function FriendsListTab({
 					row
 				);
 			}}
-			contentContainerStyle={[styles.listContent, { paddingBottom: bottomPadding }]}
+			contentContainerStyle={[styles.listContent, { paddingBottom: bottomPadding }, column]}
 			ListEmptyComponent={
 				loadFailed ? (
 					<EmptyState

@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { render, screen } from '@testing-library/react-native';
+import { useContentColumn } from '@/shared/hooks/useContentColumn';
 import { useContentWidth } from '@/shared/hooks/useContentWidth';
 import { SIDEBAR_WIDTH } from '@/shared/constants/layout';
 import { ContentContainer } from './ContentContainer';
@@ -21,6 +22,10 @@ const mockWidth = (width: number) =>
 
 function WidthProbe() {
 	return <Text>{useContentWidth()}</Text>;
+}
+
+function ColumnProbe() {
+	return <Text>{JSON.stringify(useContentColumn())}</Text>;
 }
 
 describe('ContentContainer', () => {
@@ -65,5 +70,29 @@ describe('ContentContainer', () => {
 			</ContentContainer>
 		);
 		expect(screen.getByText('800')).toBeTruthy();
+	});
+
+	it('lets a screen scroll across the whole area and hands it the column to centre its content in', () => {
+		mockWidth(1440);
+		render(
+			<ContentContainer width="content" besideSidebar scrollsAtEdge>
+				<ColumnProbe />
+			</ContentContainer>
+		);
+		const inner = screen.UNSAFE_getAllByType(View)[1];
+		expect(StyleSheet.flatten(inner.props.style).maxWidth).toBeUndefined();
+		expect(
+			screen.getByText(JSON.stringify({ width: '100%', maxWidth: 960, alignSelf: 'center' }))
+		).toBeTruthy();
+	});
+
+	it('gives no column to a screen it caps itself', () => {
+		mockWidth(1440);
+		render(
+			<ContentContainer width="content" besideSidebar>
+				<ColumnProbe />
+			</ContentContainer>
+		);
+		expect(screen.getByText('null')).toBeTruthy();
 	});
 });

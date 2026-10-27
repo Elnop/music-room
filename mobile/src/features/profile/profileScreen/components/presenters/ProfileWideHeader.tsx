@@ -76,10 +76,10 @@ const createStyles = (theme: Theme) =>
 		container: {
 			flexDirection: 'row',
 			alignItems: 'center',
-			gap: theme.spacing.xl,
+			gap: theme.spacing.lg,
 			paddingHorizontal: theme.spacing.lg,
-			paddingTop: theme.spacing.xl,
-			paddingBottom: theme.spacing.lg,
+			paddingTop: theme.spacing.md,
+			paddingBottom: theme.spacing.md,
 		},
 		details: { flex: 1, minWidth: 0 },
 		kind: {
@@ -93,7 +93,7 @@ const createStyles = (theme: Theme) =>
 			marginTop: theme.spacing.xs,
 			color: theme.colors.text,
 			fontFamily: theme.typography.families.extrabold,
-			fontSize: 40,
+			fontSize: theme.typography.sizes.xxxl,
 		},
 		username: {
 			fontSize: theme.typography.sizes.md,
@@ -107,7 +107,7 @@ const createStyles = (theme: Theme) =>
 		stats: {
 			flexDirection: 'row',
 			gap: theme.spacing.lg,
-			marginTop: theme.spacing.md,
+			marginTop: theme.spacing.sm,
 		},
 		stat: {
 			fontSize: theme.typography.sizes.md,
@@ -120,8 +120,8 @@ const createStyles = (theme: Theme) =>
 		actions: {
 			flexDirection: 'row',
 			flexWrap: 'wrap',
-			gap: theme.spacing.md,
-			marginTop: theme.spacing.lg,
+			gap: theme.spacing.sm,
+			marginTop: theme.spacing.md,
 		},
-		action: { height: 44, paddingHorizontal: theme.spacing.lg },
+		action: { height: 40, paddingHorizontal: theme.spacing.md },
 	});

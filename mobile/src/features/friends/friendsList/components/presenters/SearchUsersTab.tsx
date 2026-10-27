@@ -2,6 +2,7 @@ import React from 'react';
 import { FlatList } from 'react-native';
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { SkeletonList, UserRowSkeleton } from '@/shared/components/ui/Skeleton';
+import { useContentColumn } from '@/shared/hooks/useContentColumn';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { UserProfile } from '@/features/friends/types';
 import { SearchResultItemRow } from './SearchResultItemRow';
@@ -33,9 +34,10 @@ export function SearchUsersTab({
 }: SearchUsersTabProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createFriendsListStyles(theme), [theme]);
+	const column = useContentColumn();
 
 	if (isSearching && !isRefreshing && searchResults.length === 0) {
-		return <SkeletonList count={6} row={UserRowSkeleton} />;
+		return <SkeletonList count={6} row={UserRowSkeleton} style={column} />;
 	}
 
 	return (
@@ -50,7 +52,7 @@ export function SearchUsersTab({
 			}
 			keyExtractor={item => item.id}
 			renderItem={({ item }) => <SearchResultItemRow user={item} onPress={onSelectUser} />}
-			contentContainerStyle={[styles.listContent, { paddingBottom: bottomPadding }]}
+			contentContainerStyle={[styles.listContent, { paddingBottom: bottomPadding }, column]}
 			ListEmptyComponent={
 				searchFailed && searchQuery.trim() ? (
 					<EmptyState

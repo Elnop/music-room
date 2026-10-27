@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Image, StyleSheet, type ViewStyle, type StyleProp } from 'react-native';
+import { View, StyleSheet, type ViewStyle, type StyleProp } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { Text } from '@/shared/components/ui/Text';
+import { sizedAvatarUri } from '@/shared/utils/avatarUri';
+import { AvatarPhoto } from './AvatarPhoto';
 
 interface AvatarProps {
 	uri?: string;
@@ -15,7 +17,7 @@ const SIZE_MAP = {
 	sm: 32,
 	md: 48,
 	lg: 80,
-	xl: 160,
+	xl: 128,
 };
 
 export function Avatar({ uri, size = 'md', name, style }: AvatarProps) {
@@ -23,6 +25,10 @@ export function Avatar({ uri, size = 'md', name, style }: AvatarProps) {
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
 	const dimension = SIZE_MAP[size];
+	const source = uri ? sizedAvatarUri(uri, dimension) : undefined;
+	const [loaded, setLoaded] = React.useState<string | null>(null);
+	const [failed, setFailed] = React.useState<string | null>(null);
+	const photo = source && failed !== source ? source : undefined;
 	const fontSize = {
 		sm: theme.typography.sizes.xs,
 		md: theme.typography.sizes.md,
@@ -51,20 +57,15 @@ export function Avatar({ uri, size = 'md', name, style }: AvatarProps) {
 				style,
 			]}
 		>
-			{uri ? (
-				<Image
-					source={{ uri }}
-					style={[
-						styles.image,
-						{
-							width: dimension,
-							height: dimension,
-							borderRadius: dimension / 2,
-						},
-					]}
+			{/* The initials stay until the photo has loaded, and come back when it cannot. */}
+			{loaded !== photo && <Text style={[styles.initials, { fontSize }]}>{getInitials(name)}</Text>}
+			{photo && (
+				<AvatarPhoto
+					uri={photo}
+					size={dimension}
+					onLoad={() => setLoaded(photo)}
+					onError={() => setFailed(photo)}
 				/>
-			) : (
-				<Text style={[styles.initials, { fontSize }]}>{getInitials(name)}</Text>
 			)}
 		</View>
 	);
@@ -79,9 +80,6 @@ const createStyles = (theme: Theme) =>
 			overflow: 'hidden',
 			borderWidth: theme.borders.medium,
 			borderColor: theme.colors.border,
-		},
-		image: {
-			resizeMode: 'cover',
 		},
 		initials: {
 			color: theme.colors.text,

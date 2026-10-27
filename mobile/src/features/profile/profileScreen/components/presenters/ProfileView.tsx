@@ -7,6 +7,7 @@ import { ProfilePreferencesSection } from '@/features/profile/profileScreen/comp
 import { ProfileWideHeader } from '@/features/profile/profileScreen/components/presenters/ProfileWideHeader';
 import type { UserStats } from '@/features/profile/types';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
+import { useContentColumn } from '@/shared/hooks/useContentColumn';
 import type { Theme } from '@/shared/theme/types';
 import type { MusicGenre, UserProfile } from '@/types/user.types';
 import { Text } from '@/shared/components/ui/Text';
@@ -50,6 +51,7 @@ export function ProfileView({
 }: ProfileViewProps) {
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 	const { isWide } = useBreakpoint();
+	const column = useContentColumn();
 
 	if (!user) {
 		return (
@@ -59,7 +61,9 @@ export function ProfileView({
 		);
 	}
 
-	const preferences = <ProfilePreferencesSection genres={genres} onModify={onMusicPreferences} />;
+	const preferences = (
+		<ProfilePreferencesSection genres={genres} onModify={onMusicPreferences} compact={isWide} />
+	);
 	const info = <ProfileInfoSection user={user} />;
 	const menu = (
 		<ProfileMenuItems
@@ -86,7 +90,7 @@ export function ProfileView({
 				}
 			>
 				{isWide ? (
-					<>
+					<View style={column}>
 						<ProfileWideHeader
 							user={user}
 							stats={stats}
@@ -100,17 +104,17 @@ export function ProfileView({
 							</View>
 							<View style={styles.column}>{menu}</View>
 						</View>
-					</>
+						<Text style={styles.buildLabel}>{buildLabel}</Text>
+					</View>
 				) : (
 					<>
 						<ProfileHeader user={user} stats={stats} />
 						{preferences}
 						{info}
 						{menu}
+						<Text style={styles.buildLabel}>{buildLabel}</Text>
 					</>
 				)}
-
-				<Text style={styles.buildLabel}>{buildLabel}</Text>
 			</ScrollView>
 		</View>
 	);

@@ -11,6 +11,8 @@ interface ProfileNavigationItemProps {
 	subtitle: string;
 	icon: keyof typeof Ionicons.glyphMap;
 	onPress: () => void;
+	/** Wide screens: a tighter card, so the whole profile fits the window. */
+	compact?: boolean;
 }
 
 export function ProfileNavigationItem({
@@ -18,13 +20,18 @@ export function ProfileNavigationItem({
 	subtitle,
 	icon,
 	onPress,
+	compact = false,
 }: ProfileNavigationItemProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
 	return (
 		<View style={styles.buttonContainer}>
-			<Pressable style={styles.menuButton} onPress={onPress} accessibilityLabel={title}>
+			<Pressable
+				style={[styles.menuButton, compact && styles.compact]}
+				onPress={onPress}
+				accessibilityLabel={title}
+			>
 				<View style={styles.iconContainer}>
 					<Ionicons name={icon} size={20} color={theme.colors.primary} />
 				</View>
@@ -50,6 +57,10 @@ const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.surface,
 			padding: theme.spacing.lg,
 			borderRadius: 16,
+		},
+		compact: {
+			paddingVertical: theme.spacing.sm + theme.spacing.xs,
+			paddingHorizontal: theme.spacing.md,
 		},
 		iconContainer: {
 			width: 40,

@@ -35,6 +35,7 @@ export function ProfileMenuItems({
 				subtitle="Gérez qui peut voir vos informations"
 				icon="lock-closed"
 				onPress={onPrivacySettings}
+				compact={wide}
 			/>
 
 			<ProfileNavigationItem
@@ -42,6 +43,7 @@ export function ProfileMenuItems({
 				subtitle="Ajoutez ou retirez la connexion Google et Facebook"
 				icon="link"
 				onPress={onLinkedAccounts}
+				compact={wide}
 			/>
 
 			<ProfileNavigationItem
@@ -49,9 +51,10 @@ export function ProfileMenuItems({
 				subtitle="Choisissez quels amis contrôlent chaque appareil"
 				icon="phone-portrait-outline"
 				onPress={onMyDevices}
+				compact={wide}
 			/>
 
-			<View style={styles.logoutSection}>
+			<View style={wide ? styles.discreetLogoutSection : styles.logoutSection}>
 				<Pressable
 					style={wide ? styles.discreetLogoutButton : styles.logoutButton}
 					onPress={onConfirmLogout}
@@ -73,6 +76,10 @@ const createStyles = (theme: Theme) =>
 		logoutSection: {
 			paddingHorizontal: theme.spacing.lg,
 			marginTop: theme.spacing.lg,
+		},
+		discreetLogoutSection: {
+			paddingHorizontal: theme.spacing.lg,
+			marginTop: theme.spacing.sm,
 		},
 		logoutButton: {
 			flexDirection: 'row',
