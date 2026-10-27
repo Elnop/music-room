@@ -208,6 +208,8 @@ export function AppNavigator() {
 									title: 'Profil',
 									tabBarAccessibilityLabel: 'Profil',
 									headerShown: false,
+									// The desktop side bar reaches the profile through the account at its foot.
+									...(breakpoint === 'desktop' ? { tabBarItemStyle: { display: 'none' } } : null),
 								}}
 							/>
 						</Tab.Navigator>

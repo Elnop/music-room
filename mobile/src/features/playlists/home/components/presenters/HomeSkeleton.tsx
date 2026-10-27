@@ -3,19 +3,21 @@ import { StyleSheet, View } from 'react-native';
 import { PlaylistCardSkeleton, SkeletonBlock, SkeletonList } from '@/shared/components/ui/Skeleton';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { useContentColumn } from '@/shared/hooks/useContentColumn';
 import { FriendCardSkeleton } from './FriendCardSkeleton';
 import { createListStyles } from './listStyles';
 
 export function HomeSkeleton() {
 	const { styles: list } = useThemedStyles(createListStyles);
 	const { styles } = useThemedStyles(createStyles);
+	const column = useContentColumn();
 
 	return (
 		<View style={list.container}>
 			<SkeletonList
 				count={4}
 				row={PlaylistCardSkeleton}
-				style={[list.list, list.grid]}
+				style={[list.list, list.grid, column]}
 				header={
 					<View style={styles.header}>
 						<SkeletonBlock width={180} height={18} style={styles.title} />

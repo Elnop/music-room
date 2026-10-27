@@ -1,5 +1,6 @@
 import React from 'react';
 import { ScrollView } from 'react-native';
+import { useContentColumn } from '@/shared/hooks/useContentColumn';
 import { ThemedRefreshControl } from '@/shared/components/lists/ThemedRefreshControl';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { createListStyles } from './listStyles';
@@ -19,11 +20,12 @@ export function RefreshableScroll({
 	children,
 }: RefreshableScrollProps) {
 	const { styles, theme } = useThemedStyles(createListStyles);
+	const column = useContentColumn();
 
 	return (
 		<ScrollView
 			style={styles.container}
-			contentContainerStyle={[styles.list, { paddingBottom: bottomPadding }]}
+			contentContainerStyle={[styles.list, { paddingBottom: bottomPadding }, column]}
 			refreshControl={
 				<ThemedRefreshControl
 					refreshing={isRefreshing}

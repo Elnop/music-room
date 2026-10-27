@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { originalTheme } from '@/shared/theme/original.theme';
@@ -101,9 +101,9 @@ describe('SettingsOrchestrator', () => {
 
 	it('leaves breathing room under its last section', () => {
 		renderSettings();
-		expect(screen.UNSAFE_getByType(ScrollView).props.contentContainerStyle).toEqual({
-			paddingBottom: originalTheme.spacing.xl,
-		});
+		expect(
+			StyleSheet.flatten(screen.UNSAFE_getByType(ScrollView).props.contentContainerStyle)
+		).toEqual({ paddingBottom: originalTheme.spacing.xl });
 	});
 
 	it('opens the privacy policy', () => {

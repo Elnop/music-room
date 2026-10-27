@@ -12,15 +12,21 @@ import { Text } from '@/shared/components/ui/Text';
 interface ProfilePreferencesSectionProps {
 	genres: MusicGenre[];
 	onModify: () => void;
+	prominent?: boolean;
 }
 
-export function ProfilePreferencesSection({ genres, onModify }: ProfilePreferencesSectionProps) {
+export function ProfilePreferencesSection({
+	genres,
+	onModify,
+	prominent,
+}: ProfilePreferencesSectionProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
 	return (
 		<ProfileSection
 			title="Préférences musicales"
+			prominent={prominent}
 			rightAction={{
 				label: 'Modifier',
 				onPress: onModify,
