@@ -116,14 +116,14 @@ describe('UserProfileOrchestrator', () => {
 		signIn('me');
 	});
 
-	it('shares the zumik:// link of the profile', async () => {
+	it('shares the https link of the profile', async () => {
 		const share = jest.spyOn(Share, 'share').mockResolvedValue({ action: Share.sharedAction });
 		renderScreen();
 
 		fireEvent.press(await screen.findByRole('button', { name: 'Partager' }));
 
 		await waitFor(() =>
-			expect(share).toHaveBeenCalledWith({ message: `Alice\nzumik://user/${ID}`, title: 'Alice' })
+			expect(share).toHaveBeenCalledWith({ message: `Alice\nhttps://elnop.github.io/music-room/user/${ID}`, title: 'Alice' })
 		);
 	});
 
@@ -211,7 +211,7 @@ describe('UserProfileOrchestrator on wide screens', () => {
 		fireEvent.press(screen.getByRole('button', { name: 'Partager' }));
 
 		await waitFor(() => expect(friendsApi.followUser).toHaveBeenCalledWith(ID));
-		expect(share).toHaveBeenCalledWith({ message: `Alice\nzumik://user/${ID}`, title: 'Alice' });
+		expect(share).toHaveBeenCalledWith({ message: `Alice\nhttps://elnop.github.io/music-room/user/${ID}`, title: 'Alice' });
 	});
 
 	it('keeps what privacy hides hidden: initials, no bio, no tastes, no email', async () => {

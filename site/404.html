@@ -9,6 +9,9 @@
 			// (/music-room/playlist/<id>, ...) goes back to the app, which puts it back in the address bar
 			// (mobile/src/navigation/webBasePath.ts). A link from before the app moved to the root
 			// (/music-room/app/...) loses its /app. A missing static file is a real 404.
+			// The app shares its playlists and profiles as https links, the only ones a messaging app
+			// makes clickable: in an Android browser, this page offers to open them in the app first.
+			var appLink = null;
 			(function () {
 				var app = '/music-room';
 				var match = window.location.pathname.match(/^\/music-room(?:\/app(?=\/|$))?(\/.*)?$/);
@@ -16,7 +19,18 @@
 				var path = match[1] || '/';
 				if (/^\/(_expo|assets)\//.test(path) || /\.[a-z0-9]+$/i.test(path)) return;
 				var target = path + window.location.search;
-				window.location.replace(app + '/?redirect=' + encodeURIComponent(target) + window.location.hash);
+				var web = app + '/?redirect=' + encodeURIComponent(target) + window.location.hash;
+				var shared = path.match(/^\/((?:playlist|user)\/[0-9a-f-]{36})\/?$/i);
+				if (!shared || !/Android/i.test(navigator.userAgent)) {
+					window.location.replace(web);
+					return;
+				}
+				// Without the app installed, Chrome follows browser_fallback_url
+				var fallback = encodeURIComponent(window.location.origin + web);
+				appLink = {
+					intent: 'intent://' + shared[1] + '#Intent;scheme=zumik;S.browser_fallback_url=' + fallback + ';end',
+					web: web,
+				};
 			})();
 		</script>
 		<link rel="icon" href="/music-room/logo.png" />
@@ -26,11 +40,28 @@
 		<main>
 			<header>
 				<img src="/music-room/logo.png" alt="Zumik logo" />
-				<h1>Page not found</h1>
+				<h1 id="title">Page not found</h1>
 			</header>
 
-			<p>This page does not exist.</p>
-			<p><a href="/music-room/">Back to Zumik</a></p>
+			<div id="not-found">
+				<p>This page does not exist.</p>
+				<p><a href="/music-room/">Back to Zumik</a></p>
+			</div>
+
+			<div id="open-app" lang="fr" hidden>
+				<p><a id="app-link" class="button" href="#">Ouvrir dans l'app Zumik</a></p>
+				<p><a id="web-link" href="/music-room/">Continuer dans le navigateur</a></p>
+			</div>
 		</main>
+		<script>
+			if (appLink) {
+				document.title = 'Zumik';
+				document.getElementById('title').textContent = 'Zumik';
+				document.getElementById('not-found').hidden = true;
+				document.getElementById('open-app').hidden = false;
+				document.getElementById('app-link').href = appLink.intent;
+				document.getElementById('web-link').href = appLink.web;
+			}
+		</script>
 	</body>
 </html>
