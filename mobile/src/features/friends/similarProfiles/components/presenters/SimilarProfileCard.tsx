@@ -5,7 +5,6 @@ import { Text } from '@/shared/components/ui/Text';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { RecommendedProfile } from '@/features/friends/types';
 import {
-	commonGenresLabel,
 	profileName,
 	similarProfileLabel,
 } from '@/features/friends/similarProfiles/utils/similarProfileLabels';
@@ -29,9 +28,6 @@ export function SimilarProfileCard({ profile, onOpen }: SimilarProfileCardProps)
 			<Avatar uri={profile.avatarUrl} name={name} size="xl" />
 			<Text style={styles.name} numberOfLines={1}>
 				{name}
-			</Text>
-			<Text style={styles.genres} numberOfLines={1}>
-				{commonGenresLabel(profile.commonGenres)}
 			</Text>
 		</Pressable>
 	);

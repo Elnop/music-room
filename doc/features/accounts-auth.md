@@ -58,7 +58,7 @@ No new environment variable, in the backend or the app. Each origin the web app 
 - **Order**: Jaccard similarity of the two genre sets (shared genres over all the genres of both), then the number of shared genres.
 - **Response**: `hasPreferences` (false when the caller chose no genre, with an empty list) and `profiles` (`id`, `username`, `displayName`, `avatarUrl` under the avatar's privacy, `commonGenres`, `score`).
 
-In the app, the section « Profils aux goûts proches » (`features/friends/similarProfiles/`) is a carousel of cards (photo, name, shared genres); a card opens the profile in the Friends tab, where the user can follow it. Following someone, from anywhere, refreshes the suggestions without them. Without genres, the section leads to **Préférences musicales**. Like the events section, it comes from another feature, so `navigation/screens/HomeScreen.tsx` passes it to the playlists' home.
+In the app, the section « Profils aux goûts proches » (`features/friends/similarProfiles/`) is a carousel of cards (photo and name; screen readers also hear the shared genres); a card opens the profile in the Friends tab, where the user can follow it. Following someone, from anywhere, refreshes the suggestions without them. Without genres, the section leads to **Préférences musicales**. Like the events section, it comes from another feature, so `navigation/screens/HomeScreen.tsx` passes it to the playlists' home.
 
 ## Anti-abuse
 

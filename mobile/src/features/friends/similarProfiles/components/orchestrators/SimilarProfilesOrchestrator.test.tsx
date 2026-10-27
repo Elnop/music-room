@@ -49,13 +49,13 @@ describe('SimilarProfilesOrchestrator', () => {
 		signIn('me');
 	});
 
-	it('lists the profiles with their shared genres and opens one in the friends tab', async () => {
+	it('lists the profiles without their genres and opens one in the friends tab', async () => {
 		recommendations.mockResolvedValue({ hasPreferences: true, profiles: [PEARL, PUFF] });
 
 		const { client } = renderWithClient(<SimilarProfilesOrchestrator />);
 
 		expect(await screen.findByText('Perle')).toBeTruthy();
-		expect(screen.getByText('Pop · R&B')).toBeTruthy();
+		expect(screen.queryByText('Pop · R&B')).toBeNull();
 		expect(screen.getByText('mrspuff')).toBeTruthy();
 		fireEvent.press(screen.getByLabelText('Perle, goûts en commun : Pop · R&B'));
 		expect(mockTabNavigate).toHaveBeenCalledWith('FriendsTab', {

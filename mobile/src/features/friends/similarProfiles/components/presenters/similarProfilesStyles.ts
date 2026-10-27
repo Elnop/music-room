@@ -28,11 +28,6 @@ export const createSimilarProfilesStyles = (theme: Theme) =>
 			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 		},
-		genres: {
-			marginTop: 2,
-			fontSize: theme.typography.sizes.xs,
-			color: theme.colors.textSecondary,
-		},
 		message: {
 			paddingHorizontal: theme.spacing.md,
 			fontSize: theme.typography.sizes.sm,
