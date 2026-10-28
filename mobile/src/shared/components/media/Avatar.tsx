@@ -42,7 +42,6 @@ export function Avatar({ uri, size = 'md', name, style }: AvatarProps) {
 				{
 					width: dimension,
 					height: dimension,
-					borderRadius: dimension / 2,
 				},
 				background,
 				style,

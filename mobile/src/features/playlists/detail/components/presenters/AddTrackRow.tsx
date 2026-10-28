@@ -33,7 +33,6 @@ const createStyles = (theme: Theme) =>
 		icon: {
 			width: 48,
 			height: 48,
-			borderRadius: 4,
 			backgroundColor: theme.colors.surfaceAlt,
 			justifyContent: 'center',
 			alignItems: 'center',

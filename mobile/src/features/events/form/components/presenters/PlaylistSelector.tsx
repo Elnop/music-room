@@ -67,7 +67,6 @@ const createStyles = (theme: Theme) =>
 			gap: theme.spacing.sm,
 			paddingVertical: theme.spacing.sm,
 			paddingHorizontal: theme.spacing.md,
-			borderRadius: 10,
 			backgroundColor: theme.colors.surface,
 		},
 		selected: { backgroundColor: theme.colors.surfaceAlt },

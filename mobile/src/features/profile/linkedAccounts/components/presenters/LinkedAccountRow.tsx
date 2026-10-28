@@ -109,7 +109,6 @@ const createStyles = (theme: Theme) =>
 		methodBadge: {
 			width: 40,
 			height: 40,
-			borderRadius: 20,
 			backgroundColor: theme.colors.primary + '15',
 			alignItems: 'center',
 			justifyContent: 'center',
@@ -131,7 +130,6 @@ const createStyles = (theme: Theme) =>
 		actionButton: {
 			paddingVertical: theme.spacing.xs,
 			paddingHorizontal: theme.spacing.md,
-			borderRadius: 12,
 			borderWidth: 1,
 			minWidth: 72,
 			alignItems: 'center',

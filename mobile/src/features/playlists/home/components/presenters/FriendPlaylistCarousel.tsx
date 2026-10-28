@@ -75,7 +75,6 @@ const createStyles = (theme: Theme) =>
 			marginRight: 12,
 		},
 		cover: {
-			borderRadius: 8,
 		},
 		cardInfo: {
 			marginTop: theme.spacing.sm,

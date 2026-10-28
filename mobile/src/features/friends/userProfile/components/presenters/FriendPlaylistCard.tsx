@@ -50,7 +50,6 @@ const createStyles = (theme: Theme) =>
 			paddingHorizontal: theme.spacing.md,
 		},
 		rowCover: {
-			borderRadius: 4,
 		},
 		rowInfo: {
 			flex: 1,

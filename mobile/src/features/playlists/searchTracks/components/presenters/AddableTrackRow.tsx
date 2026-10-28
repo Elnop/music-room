@@ -90,7 +90,6 @@ const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.background,
 		},
 		artwork: {
-			borderRadius: 8,
 			marginRight: theme.spacing.md,
 		},
 		trackInfo: {
@@ -122,7 +121,6 @@ const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.primary,
 			width: 36,
 			height: 36,
-			borderRadius: 18,
 			justifyContent: 'center',
 			alignItems: 'center',
 			marginLeft: theme.spacing.sm,

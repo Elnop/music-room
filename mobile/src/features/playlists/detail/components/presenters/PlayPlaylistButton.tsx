@@ -39,7 +39,6 @@ const createStyles = (theme: Theme) =>
 		button: {
 			width: BUTTON_SIZE,
 			height: BUTTON_SIZE,
-			borderRadius: BUTTON_SIZE / 2,
 			backgroundColor: theme.colors.primary,
 			justifyContent: 'center',
 			alignItems: 'center',

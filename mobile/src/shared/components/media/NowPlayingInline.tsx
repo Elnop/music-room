@@ -83,14 +83,12 @@ const createStyles = (theme: Theme) =>
 			flexDirection: 'row',
 			alignItems: 'center',
 			backgroundColor: theme.colors.surfaceAlt,
-			borderRadius: 10,
 			padding: theme.spacing.sm,
 			marginTop: theme.spacing.sm,
 		},
 		artwork: {
 			width: 40,
 			height: 40,
-			borderRadius: 6,
 			backgroundColor: theme.colors.surface,
 		},
 		artworkPlaceholder: {
@@ -124,7 +122,6 @@ const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.primary,
 			width: 32,
 			height: 32,
-			borderRadius: 16,
 			justifyContent: 'center',
 			alignItems: 'center',
 		},

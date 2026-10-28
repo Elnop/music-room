@@ -1,18 +1,10 @@
 import { SPACING } from '@/shared/constants/app';
-import { NEOBRUTALISM_BORDERS, NEOBRUTALISM_SHADOWS, NEOBRUTALISM_TYPOGRAPHY } from './tokens';
+import { PIXEL_BORDERS, PIXEL_SHADOWS, PIXEL_TYPOGRAPHY } from './tokens';
 
 export type ThemeName = 'original';
 
 export interface ThemeColors {
 	primary: string;
-	primaryLight: string;
-	primaryDark: string;
-
-	secondary: string;
-	secondaryLight: string;
-
-	accent: string;
-	accentAlt: string;
 
 	background: string;
 	surface: string;
@@ -24,7 +16,7 @@ export interface ThemeColors {
 
 	border: string;
 	borderLight: string;
-	/** Separators of wide screens, where `border` would draw long white lines. */
+	/** Separators of wide screens, quieter than `borderLight`. */
 	borderSubtle: string;
 
 	error: string;
@@ -48,9 +40,9 @@ export interface ThemeColors {
 export interface Theme {
 	name: ThemeName;
 	colors: ThemeColors;
-	borders: typeof NEOBRUTALISM_BORDERS;
-	shadows: typeof NEOBRUTALISM_SHADOWS;
-	typography: typeof NEOBRUTALISM_TYPOGRAPHY;
+	borders: typeof PIXEL_BORDERS;
+	shadows: typeof PIXEL_SHADOWS;
+	typography: typeof PIXEL_TYPOGRAPHY;
 	spacing: typeof SPACING;
 }
 

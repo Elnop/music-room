@@ -80,7 +80,6 @@ const createStyles = (theme: Theme) =>
 			alignItems: 'center',
 		},
 		artwork: {
-			borderRadius: 4,
 		},
 		info: {
 			flex: 1,

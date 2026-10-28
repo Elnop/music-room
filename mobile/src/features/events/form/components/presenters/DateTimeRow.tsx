@@ -35,7 +35,6 @@ const createStyles = (theme: Theme) =>
 			alignItems: 'center',
 			justifyContent: 'space-between',
 			padding: theme.spacing.md,
-			borderRadius: 12,
 			backgroundColor: theme.colors.surface,
 			borderWidth: 1,
 			borderColor: theme.colors.border,

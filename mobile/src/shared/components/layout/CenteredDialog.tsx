@@ -41,7 +41,6 @@ const createStyles = (theme: Theme) =>
 		dialog: {
 			width: '100%',
 			maxWidth: DIALOG_MAX_WIDTH,
-			borderRadius: 16,
 			overflow: 'hidden',
 			backgroundColor: theme.colors.background,
 			...theme.shadows.large,

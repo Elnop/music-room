@@ -66,7 +66,6 @@ const createStyles = (theme: Theme) =>
 		iconWrapper: {
 			width: 36,
 			height: 36,
-			borderRadius: 18,
 			alignItems: 'center',
 			justifyContent: 'center',
 			marginRight: theme.spacing.md,
@@ -92,7 +91,6 @@ const createStyles = (theme: Theme) =>
 		},
 		badge: {
 			backgroundColor: theme.colors.primary + '25',
-			borderRadius: 8,
 			paddingHorizontal: theme.spacing.sm,
 			paddingVertical: 2,
 		},

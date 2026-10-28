@@ -73,7 +73,6 @@ const createStyles = (theme: Theme) =>
 			alignItems: 'center',
 			marginTop: theme.spacing.lg,
 			backgroundColor: theme.colors.surface,
-			borderRadius: 16,
 			paddingVertical: theme.spacing.md,
 			paddingHorizontal: theme.spacing.xl,
 		},

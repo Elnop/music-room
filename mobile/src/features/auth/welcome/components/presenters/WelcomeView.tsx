@@ -184,7 +184,6 @@ const createStyles = (theme: Theme) =>
 		serverPanel: {
 			padding: theme.spacing.md,
 			backgroundColor: theme.colors.surface,
-			borderRadius: 12,
 			borderWidth: theme.borders.thin,
 			borderColor: theme.colors.border,
 		},

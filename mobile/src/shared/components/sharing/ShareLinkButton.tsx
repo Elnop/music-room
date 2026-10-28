@@ -37,7 +37,6 @@ const createStyles = (theme: Theme) =>
 			gap: theme.spacing.xs,
 			paddingVertical: theme.spacing.xs,
 			paddingHorizontal: theme.spacing.md,
-			borderRadius: 999,
 			borderWidth: 1,
 			borderColor: theme.colors.border,
 		},

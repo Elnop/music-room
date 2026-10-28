@@ -15,7 +15,6 @@ export const createFriendsListStyles = (theme: Theme) =>
 		tabsContainer: {
 			flexDirection: 'row',
 			backgroundColor: theme.colors.surface,
-			borderRadius: 12,
 			padding: 4,
 			marginBottom: theme.spacing.md,
 			...theme.shadows.small,
@@ -23,7 +22,6 @@ export const createFriendsListStyles = (theme: Theme) =>
 		tab: {
 			flex: 1,
 			paddingVertical: theme.spacing.sm,
-			borderRadius: theme.spacing.xs,
 			alignItems: 'center',
 		},
 		tabActive: {
@@ -120,7 +118,6 @@ export const createFriendsListStyles = (theme: Theme) =>
 		},
 		// Each cell grows by 1/columns, so a last row that is not full keeps the cell width.
 		gridCell: {
-			borderRadius: 12,
 			backgroundColor: theme.colors.surface,
 			marginBottom: theme.spacing.sm,
 		},

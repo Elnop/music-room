@@ -98,7 +98,6 @@ const createStyles = (theme: Theme, separator: string) =>
 		roleBadge: {
 			paddingHorizontal: 10,
 			paddingVertical: 4,
-			borderRadius: 12,
 		},
 		roleBadge_collaborator: {
 			backgroundColor: theme.colors.primary + '30',

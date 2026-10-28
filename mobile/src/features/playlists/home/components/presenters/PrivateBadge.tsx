@@ -28,7 +28,6 @@ const createStyles = (theme: Theme) =>
 			alignItems: 'center',
 			backgroundColor: theme.colors.surfaceAlt,
 			paddingHorizontal: 6,
-			borderRadius: 8,
 		},
 		label: {
 			fontSize: 10,

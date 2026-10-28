@@ -105,7 +105,6 @@ const createStyles = (theme: Theme) =>
 			gap: theme.spacing.md,
 			padding: theme.spacing.lg,
 			backgroundColor: theme.colors.surface,
-			borderRadius: 16,
 		},
 		title: {
 			fontSize: theme.typography.sizes.xl,

@@ -33,7 +33,6 @@ const createStyles = (theme: Theme) =>
 	StyleSheet.create({
 		card: {
 			backgroundColor: theme.colors.surface,
-			borderRadius: theme.spacing.sm,
 			padding: theme.spacing.md,
 			borderWidth: theme.borders.medium,
 			borderColor: theme.colors.border,

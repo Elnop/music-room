@@ -88,7 +88,6 @@ const createStyles = (theme: Theme) =>
 		addButton: {
 			width: 36,
 			height: 36,
-			borderRadius: 18,
 			backgroundColor: theme.colors.primary,
 			alignItems: 'center',
 			justifyContent: 'center',

@@ -118,12 +118,10 @@ const createStyles = (theme: Theme) =>
 			flexDirection: 'row',
 			alignItems: 'center',
 			backgroundColor: theme.colors.surface,
-			borderRadius: 12,
-			borderWidth: 1,
+			borderWidth: theme.borders.thick,
 			borderColor: theme.colors.border,
 		},
 		inputContainerError: {
-			borderWidth: 2,
 			borderColor: theme.colors.error,
 			backgroundColor: theme.colors.surface,
 		},
@@ -153,7 +151,6 @@ const createStyles = (theme: Theme) =>
 			paddingHorizontal: theme.spacing.xs,
 			paddingVertical: theme.spacing.xs,
 			marginHorizontal: theme.spacing.xs + 2,
-			borderRadius: 8,
 		},
 		multilineInput: {
 			textAlignVertical: 'top',

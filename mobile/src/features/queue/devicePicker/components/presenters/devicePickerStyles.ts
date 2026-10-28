@@ -28,7 +28,6 @@ export const createPickerStyles = (
 		retryButton: {
 			paddingHorizontal: 20,
 			paddingVertical: 10,
-			borderRadius: 20,
 			backgroundColor: theme.colors.primary,
 		},
 		retryText: {
@@ -71,7 +70,6 @@ export const createPickerStyles = (
 		iconContainer: {
 			width: 36,
 			height: 36,
-			borderRadius: 18,
 			justifyContent: 'center',
 			alignItems: 'center',
 			backgroundColor: theme.colors.surface,

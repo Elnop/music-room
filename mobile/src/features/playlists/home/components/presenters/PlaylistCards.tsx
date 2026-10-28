@@ -35,7 +35,7 @@ export function PlaylistGridCard({ playlist, onPress, onShowActions }: PlaylistG
 			accessibilityLabel={playlistCardLabel(playlist.name, owner)}
 		>
 			<View>
-				<Artwork uri={coverOf(playlist)} size={width} iconSize={32} style={styles.tileCover} />
+				<Artwork uri={coverOf(playlist)} size={width} iconSize={32} />
 				{playlist.visibility === 'private' && <PrivateBadge style={styles.tileBadge} />}
 				{owner && <OwnerAvatarBadge owner={owner} />}
 			</View>
@@ -55,7 +55,6 @@ const createStyles = (theme: Theme) =>
 	StyleSheet.create({
 		meta: { fontSize: theme.typography.sizes.sm, color: theme.colors.textSecondary },
 		tile: { marginBottom: theme.spacing.lg },
-		tileCover: { borderRadius: 8 },
 		tileBadge: { position: 'absolute', top: 8, right: 8, paddingVertical: 3 },
 		tileInfo: { marginTop: theme.spacing.sm, paddingHorizontal: 2 },
 		tileName: {

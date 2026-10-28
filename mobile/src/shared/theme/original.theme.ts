@@ -1,48 +1,36 @@
 import { SPACING } from '@/shared/constants/app';
-import {
-	FIXED_COLORS,
-	NEOBRUTALISM_BORDERS,
-	NEOBRUTALISM_SHADOWS,
-	NEOBRUTALISM_TYPOGRAPHY,
-} from './tokens';
+import { FIXED_COLORS, INK, PIXEL_BORDERS, PIXEL_SHADOWS, PIXEL_TYPOGRAPHY } from './tokens';
 import type { Theme } from './types';
 
+/** Night pixel art: violet ink ground, cream text, lime for the main action. */
 export const originalTheme: Theme = {
 	name: 'original',
 
 	colors: {
-		primary: '#EA3E7A',
-		primaryLight: '#F472B6',
-		primaryDark: '#BE185D',
+		primary: '#C5F94A',
 
-		secondary: '#FFFFFF',
-		secondaryLight: '#F5F5F5',
+		background: '#13111C',
+		surface: '#1E1A2B',
+		surfaceAlt: '#2A2440',
 
-		accent: '#FFFFFF',
-		accentAlt: '#E5E5E5',
+		text: '#FFF3DC',
+		textSecondary: '#A79DBF',
+		textInverse: INK,
 
-		background: '#0D0D0D',
-		surface: '#1A1A1A',
-		surfaceAlt: '#262626',
+		border: INK,
+		borderLight: '#3B3358',
+		borderSubtle: '#2A2440',
 
-		text: '#FFFFFF',
-		textSecondary: '#A3A3A3',
-		textInverse: '#000000',
-
-		border: '#FFFFFF',
-		borderLight: '#404040',
-		borderSubtle: '#2E2E2E',
-
-		error: '#EF4444',
-		success: '#22C55E',
-		warning: '#FBBF24',
-		info: '#EA3E7A',
+		error: '#FF5A4E',
+		success: '#7BD66B',
+		warning: '#FFC53D',
+		info: '#62D2FF',
 
 		...FIXED_COLORS,
 	},
 
-	borders: NEOBRUTALISM_BORDERS,
-	shadows: NEOBRUTALISM_SHADOWS,
-	typography: NEOBRUTALISM_TYPOGRAPHY,
+	borders: PIXEL_BORDERS,
+	shadows: PIXEL_SHADOWS,
+	typography: PIXEL_TYPOGRAPHY,
 	spacing: SPACING,
 };

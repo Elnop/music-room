@@ -76,7 +76,6 @@ const createStyles = (theme: Theme) =>
 			marginTop: theme.spacing.md,
 			paddingVertical: theme.spacing.sm + 4,
 			paddingHorizontal: theme.spacing.lg,
-			borderRadius: 12,
 			backgroundColor: theme.colors.primary,
 		},
 		actionText: {

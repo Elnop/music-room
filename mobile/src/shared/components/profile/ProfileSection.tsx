@@ -44,7 +44,6 @@ const createStyles = (theme: Theme) =>
 	StyleSheet.create({
 		container: {
 			backgroundColor: theme.colors.surface,
-			borderRadius: 16,
 			marginHorizontal: theme.spacing.lg,
 			marginBottom: theme.spacing.md,
 			overflow: 'hidden',

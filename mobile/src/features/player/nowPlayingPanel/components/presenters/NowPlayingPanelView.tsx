@@ -52,7 +52,7 @@ export function NowPlayingPanelView({ data }: NowPlayingPanelViewProps) {
 			<ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
 				{track ? (
 					<>
-						<Artwork uri={data.artworkUrl} size={PANEL_ARTWORK_SIZE} style={styles.artwork} />
+						<Artwork uri={data.artworkUrl} size={PANEL_ARTWORK_SIZE} />
 						<View style={styles.titleBlock}>
 							<Text style={styles.title} numberOfLines={2}>
 								{track.title}

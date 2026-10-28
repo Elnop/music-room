@@ -4,7 +4,9 @@ import type { Theme } from '@/shared/theme/types';
 export const createStyles = (theme: Theme) =>
 	StyleSheet.create({
 		container: {
-			backgroundColor: theme.colors.background,
+			backgroundColor: theme.colors.surfaceAlt,
+			borderTopWidth: theme.borders.thick,
+			borderColor: theme.colors.border,
 		},
 		content: {
 			flexDirection: 'row',
@@ -22,7 +24,6 @@ export const createStyles = (theme: Theme) =>
 		artwork: {
 			width: 40,
 			height: 40,
-			borderRadius: 8,
 			marginRight: theme.spacing.sm,
 			backgroundColor: theme.colors.surfaceAlt,
 		},
@@ -47,14 +48,16 @@ export const createStyles = (theme: Theme) =>
 		},
 		device: {
 			fontSize: 11,
-			fontFamily: theme.typography.families.semibold,
-			color: theme.colors.primary,
+			fontFamily: theme.typography.families.mono,
+			color: theme.colors.info,
 		},
 		playButton: {
 			width: 40,
 			height: 40,
-			borderRadius: 20,
 			backgroundColor: theme.colors.primary,
+			borderWidth: theme.borders.thick,
+			borderBottomWidth: theme.borders.thick * 3,
+			borderColor: theme.colors.border,
 			alignItems: 'center',
 			justifyContent: 'center',
 		},
@@ -72,12 +75,12 @@ export const createStyles = (theme: Theme) =>
 			opacity: 0.35,
 		},
 		progressBarContainer: {
-			height: 2,
+			height: theme.borders.thick,
 			width: '100%',
 			backgroundColor: 'transparent',
 		},
 		progressBar: {
-			height: 2,
+			height: theme.borders.thick,
 			backgroundColor: theme.colors.primary,
 		},
 	});

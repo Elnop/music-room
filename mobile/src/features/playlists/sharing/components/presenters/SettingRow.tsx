@@ -56,7 +56,6 @@ const createStyles = (theme: Theme) =>
 		iconContainer: {
 			width: 36,
 			height: 36,
-			borderRadius: 18,
 			backgroundColor: theme.colors.primary + '15',
 			alignItems: 'center',
 			justifyContent: 'center',

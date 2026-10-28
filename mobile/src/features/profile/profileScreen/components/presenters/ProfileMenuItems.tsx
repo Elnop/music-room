@@ -83,7 +83,6 @@ const createStyles = (theme: Theme) =>
 			justifyContent: 'center',
 			gap: theme.spacing.sm,
 			paddingVertical: theme.spacing.md,
-			borderRadius: 12,
 			borderWidth: 1,
 			borderColor: theme.colors.error,
 			backgroundColor: 'transparent',
@@ -95,7 +94,6 @@ const createStyles = (theme: Theme) =>
 			gap: theme.spacing.sm,
 			paddingVertical: theme.spacing.sm,
 			paddingHorizontal: theme.spacing.md,
-			borderRadius: 12,
 		},
 		logoutText: {
 			fontSize: 16,

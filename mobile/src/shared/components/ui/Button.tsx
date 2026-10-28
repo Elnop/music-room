@@ -84,10 +84,13 @@ export function Button({
 
 const createStyles = (theme: Theme) =>
 	StyleSheet.create({
+		// A keyboard key: a pixel outline whose thick bottom edge reads as depth.
 		container: {
 			height: 52,
 			paddingHorizontal: 24,
-			borderRadius: 12,
+			borderWidth: theme.borders.thick,
+			borderBottomWidth: theme.borders.thick * 3,
+			borderColor: theme.colors.border,
 			alignItems: 'center',
 			justifyContent: 'center',
 			flexDirection: 'row',
@@ -96,7 +99,7 @@ const createStyles = (theme: Theme) =>
 		compact: {
 			height: 28,
 			paddingHorizontal: 12,
-			borderRadius: 999,
+			borderBottomWidth: theme.borders.thick,
 			gap: 4,
 		},
 		fullWidth: {
@@ -110,14 +113,11 @@ const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.primary,
 		},
 		secondary: {
-			backgroundColor: theme.colors.surface,
-			borderWidth: 1,
-			borderColor: theme.colors.border,
+			backgroundColor: theme.colors.surfaceAlt,
 		},
 		outline: {
 			backgroundColor: 'transparent',
-			borderWidth: 1,
-			borderColor: theme.colors.onColor,
+			borderColor: theme.colors.text,
 		},
 
 		text: {

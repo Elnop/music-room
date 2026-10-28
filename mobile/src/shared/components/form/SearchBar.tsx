@@ -84,7 +84,6 @@ const createStyles = (theme: Theme) =>
 			flexDirection: 'row',
 			alignItems: 'center',
 			backgroundColor: theme.colors.surfaceAlt,
-			borderRadius: 8,
 			paddingHorizontal: theme.spacing.md,
 			height: 44,
 		},
@@ -102,6 +101,5 @@ const createStyles = (theme: Theme) =>
 			marginLeft: theme.spacing.sm,
 		},
 		clear: {
-			borderRadius: 10,
 		},
 	});

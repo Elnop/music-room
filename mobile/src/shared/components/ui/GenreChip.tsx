@@ -73,7 +73,6 @@ const createStyles = (theme: Theme, size: 'sm' | 'md' | 'lg') => {
 			paddingHorizontal: s.paddingH,
 			paddingVertical: s.paddingV,
 			backgroundColor: theme.colors.surface,
-			borderRadius: 20,
 			borderWidth: 1,
 			borderColor: theme.colors.border,
 		},

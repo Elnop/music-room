@@ -138,14 +138,11 @@ const createStyles = (theme: Theme, separator: string) =>
 		rowHighlighted: { backgroundColor: theme.colors.surface },
 		rowActive: {
 			backgroundColor: theme.colors.surfaceAlt,
-			shadowColor: theme.colors.shadow,
-			shadowOpacity: 0.25,
-			shadowRadius: 6,
-			shadowOffset: { width: 0, height: 3 },
+			...theme.shadows.large,
 		},
 		pressable: { flex: 1, flexDirection: 'row', alignItems: 'center' },
 		position: { fontSize: theme.typography.sizes.md, color: theme.colors.textSecondary },
-		albumArt: { width: 40, height: 40, borderRadius: 4, marginRight: 12 },
+		albumArt: { width: 40, height: 40, marginRight: 12 },
 		albumArtPlaceholder: {
 			backgroundColor: theme.colors.surfaceAlt,
 			justifyContent: 'center',

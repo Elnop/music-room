@@ -104,7 +104,6 @@ const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.success,
 			paddingHorizontal: theme.spacing.sm,
 			paddingVertical: 2,
-			borderRadius: 8,
 			overflow: 'hidden',
 		},
 		title: {

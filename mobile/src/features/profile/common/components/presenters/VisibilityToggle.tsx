@@ -75,7 +75,6 @@ const createStyles = (theme: Theme) =>
 		options: {
 			flexDirection: 'row',
 			backgroundColor: theme.colors.surface,
-			borderRadius: 12,
 			padding: 4,
 			gap: 4,
 		},
@@ -86,7 +85,6 @@ const createStyles = (theme: Theme) =>
 			justifyContent: 'center',
 			paddingVertical: 10,
 			paddingHorizontal: 8,
-			borderRadius: 8,
 			gap: 4,
 		},
 		optionSelected: {

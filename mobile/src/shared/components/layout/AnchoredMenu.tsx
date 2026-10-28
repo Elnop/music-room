@@ -40,7 +40,6 @@ const createStyles = (theme: Theme) =>
 		menu: {
 			position: 'absolute',
 			width: MENU_WIDTH,
-			borderRadius: 12,
 			borderWidth: 1,
 			borderColor: theme.colors.borderSubtle,
 			overflow: 'hidden',

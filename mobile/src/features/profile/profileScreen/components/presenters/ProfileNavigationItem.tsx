@@ -49,12 +49,10 @@ const createStyles = (theme: Theme) =>
 			alignItems: 'center',
 			backgroundColor: theme.colors.surface,
 			padding: theme.spacing.lg,
-			borderRadius: 16,
 		},
 		iconContainer: {
 			width: 40,
 			height: 40,
-			borderRadius: 20,
 			backgroundColor: theme.colors.primary + '15',
 			alignItems: 'center',
 			justifyContent: 'center',

@@ -83,7 +83,6 @@ const createStyles = (theme: Theme) =>
 	StyleSheet.create({
 		list: {
 			backgroundColor: theme.colors.surface,
-			borderRadius: 16,
 			paddingHorizontal: theme.spacing.lg,
 		},
 		divider: {

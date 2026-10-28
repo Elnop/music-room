@@ -61,7 +61,6 @@ export const createRowStyles = (theme: Theme, separator: string) =>
 			...theme.shadows.medium,
 		},
 		albumArt: {
-			borderRadius: 4,
 			marginRight: 12,
 		},
 		trackInfo: {

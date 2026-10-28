@@ -201,13 +201,10 @@ const createStyles = (theme: Theme, separator: string) =>
 		},
 		trackContainerCurrent: {
 			backgroundColor: theme.colors.surfaceAlt,
-			borderLeftWidth: 4,
-			borderLeftColor: theme.colors.primary,
 		},
 		albumArt: {
 			width: 50,
 			height: 50,
-			borderRadius: 4,
 			marginRight: 12,
 		},
 		albumArtPlaceholder: {
@@ -236,18 +233,15 @@ const createStyles = (theme: Theme, separator: string) =>
 			color: theme.colors.textSecondary,
 		},
 		duration: {
-			fontSize: 13,
+			fontSize: 11,
+			fontFamily: FONT_FAMILIES.mono,
 			color: theme.colors.textSecondary,
 		},
 		unavailable: {
 			opacity: 0.4,
 		},
 		trackContainerActive: {
-			elevation: 6,
-			shadowColor: theme.colors.shadow,
-			shadowOpacity: 0.25,
-			shadowRadius: 6,
-			shadowOffset: { width: 0, height: 3 },
+			...theme.shadows.large,
 		},
 		dragHandle: {
 			marginLeft: theme.spacing.sm,
