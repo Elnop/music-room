@@ -1,8 +1,14 @@
 import React from 'react';
-import { View, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
+import { StyleSheet, View, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
 import Slider from '@react-native-community/slider';
 import type { SeekPosition } from '@/features/player/modal/hooks/useSeekPosition';
 import { Text } from '@/shared/components/ui/Text';
+import { pixelFrame } from '@/shared/theme/pixelFrame';
+import type { Theme } from '@/shared/theme/types';
+import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+
+/** The track drawn as pixel blocks; the slider stays on top, invisible, to seek. */
+const SEGMENTS = 24;
 
 const formatTime = (seconds: number): string => {
 	if (!seconds || isNaN(seconds)) return '0:00';
@@ -40,8 +46,10 @@ export function PlayerProgressSlider({
 	disabled,
 	onSliderAction,
 }: PlayerProgressSliderProps) {
+	const { styles: pixel } = useThemedStyles(createStyles);
 	if (duration === null) return null;
 	const currentTime = seek.position;
+	const lit = hasTrack && duration ? Math.round((currentTime / duration) * SEGMENTS) : 0;
 
 	const timeText = `${formatTime(hasTrack ? currentTime : 0)} sur ${formatTime(hasTrack ? duration : 0)}`;
 
@@ -58,6 +66,14 @@ export function PlayerProgressSlider({
 					if (!disabled) onSliderAction(event.nativeEvent.actionName);
 				}}
 			>
+				<View style={pixel.segments}>
+					{Array.from({ length: SEGMENTS }, (_, i) => (
+						<View
+							key={i}
+							style={[pixel.segment, { backgroundColor: i < lit ? colors.slider : colors.sliderBg }]}
+						/>
+					))}
+				</View>
 				<Slider
 					style={styles.slider}
 					minimumValue={0}
@@ -66,9 +82,9 @@ export function PlayerProgressSlider({
 					onSlidingStart={seek.onSlidingStart}
 					onValueChange={seek.onValueChange}
 					onSlidingComplete={seek.onSlidingComplete}
-					minimumTrackTintColor={colors.slider}
-					maximumTrackTintColor={colors.sliderBg}
-					thumbTintColor={colors.slider}
+					minimumTrackTintColor="transparent"
+					maximumTrackTintColor="transparent"
+					thumbTintColor="transparent"
 					disabled={disabled}
 					importantForAccessibility="no-hide-descendants"
 				/>
@@ -84,3 +100,20 @@ export function PlayerProgressSlider({
 		</View>
 	);
 }
+
+const createStyles = (theme: Theme) =>
+	StyleSheet.create({
+		segments: {
+			...pixelFrame(theme),
+			position: 'absolute',
+			left: 0,
+			right: 0,
+			top: '50%',
+			height: 15,
+			marginTop: -7,
+			flexDirection: 'row',
+			gap: theme.borders.thick,
+			padding: theme.borders.thick,
+		},
+		segment: { flex: 1 },
+	});

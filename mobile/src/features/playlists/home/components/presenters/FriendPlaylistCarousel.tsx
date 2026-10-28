@@ -1,16 +1,14 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
-import { Artwork } from '@/shared/components/media/Artwork';
+import { ScrollView, StyleSheet } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { FriendPlaylists } from '@/features/playlists/types';
-import { playlistCardLabel, tracksLabel } from '@/features/playlists/home/utils/playlistLabels';
-import { OwnerAvatarBadge } from './OwnerAvatarBadge';
-import { Text } from '@/shared/components/ui/Text';
+import { playlistCardLabel } from '@/features/playlists/home/utils/playlistLabels';
+import { PlaylistCassette } from './PlaylistCassette';
 
 /** Width of a card; the playlists screen's skeleton uses it too. */
-export const FRIEND_CARD_WIDTH = 140;
+export const FRIEND_CARD_WIDTH = 120;
 
 interface FriendPlaylistCarouselProps {
 	friendsPlaylists: FriendPlaylists[];
@@ -32,7 +30,7 @@ export function FriendPlaylistCarousel({
 			showsHorizontalScrollIndicator={false}
 			contentContainerStyle={styles.scrollContent}
 			decelerationRate="fast"
-			snapToInterval={FRIEND_CARD_WIDTH + 12}
+			snapToInterval={FRIEND_CARD_WIDTH + 16}
 		>
 			{cards.map(({ friend, playlist }) => (
 				<Pressable
@@ -41,23 +39,7 @@ export function FriendPlaylistCarousel({
 					onPress={() => onPlaylistPress(playlist.id)}
 					accessibilityLabel={playlistCardLabel(playlist.name, friend)}
 				>
-					<View>
-						<Artwork
-							uri={playlist.coverUrl || playlist.firstTrackCover}
-							size={FRIEND_CARD_WIDTH}
-							iconSize={28}
-							style={styles.cover}
-						/>
-						<OwnerAvatarBadge owner={friend} />
-					</View>
-					<View style={styles.cardInfo}>
-						<Text style={styles.playlistName} numberOfLines={1}>
-							{playlist.name}
-						</Text>
-						<Text style={styles.trackCount} numberOfLines={1}>
-							{tracksLabel(playlist.trackCount)}
-						</Text>
-					</View>
+					<PlaylistCassette playlist={playlist} owner={friend} width={FRIEND_CARD_WIDTH} />
 				</Pressable>
 			))}
 		</ScrollView>
@@ -70,24 +52,5 @@ const createStyles = (theme: Theme) =>
 			paddingHorizontal: theme.spacing.md,
 			paddingBottom: theme.spacing.sm,
 		},
-		card: {
-			width: FRIEND_CARD_WIDTH,
-			marginRight: 12,
-		},
-		cover: {
-		},
-		cardInfo: {
-			marginTop: theme.spacing.sm,
-			paddingHorizontal: 2,
-		},
-		playlistName: {
-			fontSize: theme.typography.sizes.sm,
-			fontFamily: theme.typography.families.semibold,
-			color: theme.colors.text,
-			marginBottom: 2,
-		},
-		trackCount: {
-			fontSize: theme.typography.sizes.xs,
-			color: theme.colors.textSecondary,
-		},
+		card: { marginRight: theme.spacing.md },
 	});

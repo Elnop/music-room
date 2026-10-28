@@ -33,6 +33,12 @@ export function HomeView({ screen, nearbyEvents, similarProfiles, actionsFor }: 
 
 	const content = (
 		<View>
+			{nearbyEvents && (
+				<>
+					<View style={styles.section}>{nearbyEvents}</View>
+					<View style={styles.sectionSpacer} />
+				</>
+			)}
 			{friendsCount > 0 && (
 				<>
 					<View style={styles.section}>
@@ -78,12 +84,6 @@ export function HomeView({ screen, nearbyEvents, similarProfiles, actionsFor }: 
 				<>
 					<View style={styles.sectionSpacer} />
 					<View style={styles.section}>{similarProfiles}</View>
-				</>
-			)}
-			{nearbyEvents && (
-				<>
-					<View style={styles.sectionSpacer} />
-					<View style={styles.section}>{nearbyEvents}</View>
 				</>
 			)}
 		</View>

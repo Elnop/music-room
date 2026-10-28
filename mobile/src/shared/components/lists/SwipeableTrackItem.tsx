@@ -5,7 +5,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { useContextMenu } from '@/shared/hooks/useContextMenu';
-import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import { QueueSwipe } from './QueueSwipe';
 import { TrackActionsButton } from './TrackActionsButton';
 import { TrackTableRow } from './TrackTableRow';
@@ -13,6 +12,9 @@ import type { Theme } from '@/shared/theme/types';
 import type { Track } from '@/types/track.types';
 import { Text } from '@/shared/components/ui/Text';
 import { FONT_FAMILIES } from '@/shared/theme/fonts';
+import { pixelFrame } from '@/shared/theme/pixelFrame';
+import { formatDuration } from '@/shared/utils/formatters';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 
 interface SwipeableTrackItemProps {
 	track: Track;
@@ -54,8 +56,7 @@ export function SwipeableTrackItem({
 	position,
 }: SwipeableTrackItemProps) {
 	const { theme } = useTheme();
-	const separator = useSeparatorColor();
-	const styles = React.useMemo(() => createStyles(theme, separator), [theme, separator]);
+	const styles = React.useMemo(() => createStyles(theme), [theme]);
 	const actions = unavailable ? undefined : onShowActions;
 	const { isWide } = useBreakpoint();
 	const dragStart = !disabled ? onDragStart : undefined;
@@ -120,7 +121,7 @@ export function SwipeableTrackItem({
 									unavailable && styles.unavailable,
 								]}
 							>
-								<Ionicons name="musical-notes" size={24} color={theme.colors.textSecondary} />
+								<PixelIcon name="note" color={theme.colors.textSecondary} />
 							</View>
 						)}
 
@@ -169,7 +170,7 @@ export function SwipeableTrackItem({
 							style={styles.dragHandle}
 							accessibilityLabel="Réordonner"
 						>
-							<Ionicons name="reorder-three-outline" size={24} color={theme.colors.textSecondary} />
+							<PixelIcon name="grip" color={theme.colors.textSecondary} />
 						</Pressable>
 					)}
 				</View>
@@ -178,21 +179,16 @@ export function SwipeableTrackItem({
 	);
 }
 
-const formatDuration = (ms: number): string => {
-	const minutes = Math.floor(ms / 60000);
-	const seconds = Math.floor((ms % 60000) / 1000);
-	return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-};
-
-const createStyles = (theme: Theme, separator: string) =>
+const createStyles = (theme: Theme) =>
 	StyleSheet.create({
 		trackContainer: {
 			flexDirection: 'row',
 			alignItems: 'center',
-			padding: 12,
+			...pixelFrame(theme),
+			padding: theme.spacing.sm,
+			marginHorizontal: theme.spacing.md,
+			marginBottom: theme.spacing.md,
 			backgroundColor: theme.colors.surface,
-			borderBottomWidth: 1,
-			borderBottomColor: separator,
 		},
 		trackPressable: {
 			flex: 1,
@@ -203,8 +199,8 @@ const createStyles = (theme: Theme, separator: string) =>
 			backgroundColor: theme.colors.surfaceAlt,
 		},
 		albumArt: {
-			width: 50,
-			height: 50,
+			width: 42,
+			height: 42,
 			marginRight: 12,
 		},
 		albumArtPlaceholder: {

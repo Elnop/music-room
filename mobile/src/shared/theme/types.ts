@@ -23,6 +23,10 @@ export interface ThemeColors {
 	success: string;
 	warning: string;
 	info: string;
+	/** Friends and the other people of a playlist. */
+	people: string;
+	/** The night-green screen of the nearby events radar. */
+	radar: string;
 
 	// Fixed across themes (FIXED_COLORS in tokens.ts)
 	divider: string;

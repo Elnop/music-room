@@ -5,6 +5,7 @@ import type { Theme } from '@/shared/theme/types';
 import { Pressable } from './Pressable';
 import { Text } from './Text';
 import { FONT_FAMILIES } from '@/shared/theme/fonts';
+import { keycap } from '@/shared/theme/pixelFrame';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline';
 /** `compact` fits a header row, next to a title. */
@@ -84,13 +85,10 @@ export function Button({
 
 const createStyles = (theme: Theme) =>
 	StyleSheet.create({
-		// A keyboard key: a pixel outline whose thick bottom edge reads as depth.
 		container: {
+			...keycap(theme),
 			height: 52,
 			paddingHorizontal: 24,
-			borderWidth: theme.borders.thick,
-			borderBottomWidth: theme.borders.thick * 3,
-			borderColor: theme.colors.border,
 			alignItems: 'center',
 			justifyContent: 'center',
 			flexDirection: 'row',

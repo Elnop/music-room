@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, type ViewStyle, type StyleProp } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import { pixelFrame } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 import { Pressable } from './Pressable';
 
@@ -40,9 +41,8 @@ export function Card({
 const createStyles = (theme: Theme) =>
 	StyleSheet.create({
 		card: {
+			...pixelFrame(theme),
 			backgroundColor: theme.colors.surface,
-			borderWidth: theme.borders.thick,
-			borderColor: theme.colors.border,
 			padding: theme.spacing.md,
 		},
 		elevation: {

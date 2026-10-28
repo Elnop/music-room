@@ -6,7 +6,8 @@ import {
 import type { NavigatorScreenParams } from '@react-navigation/native';
 import { View, StyleSheet, Platform } from 'react-native';
 import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
+import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 
@@ -55,13 +56,12 @@ const Tab = createBottomTabNavigator<AppTabsParamList>();
 registerPlayback();
 registerMusicControl();
 
-// The square-cornered set, closest to pixel art; the tint alone marks the active tab.
-const TAB_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
-	HomeTab: 'home-sharp',
-	PlaylistsTab: 'musical-notes-sharp',
-	SearchTab: 'search-sharp',
-	FriendsTab: 'people-sharp',
-	ProfileTab: 'person-sharp',
+const TAB_ICONS: Record<string, PixelSpriteName> = {
+	HomeTab: 'home',
+	PlaylistsTab: 'tape',
+	SearchTab: 'search',
+	FriendsTab: 'crew',
+	ProfileTab: 'me',
 };
 
 /** Wide screens move the tabs to a side bar framed by AppTabBar: an icon rail on a tablet, icons and labels on desktop. */
@@ -142,8 +142,12 @@ export function AppNavigator() {
 									fontFamily: theme.typography.families.bold,
 								},
 								...sidebar,
-								tabBarIcon: ({ color }) => (
-									<Ionicons name={TAB_ICONS[route.name]} size={24} color={color} />
+								// A pixel square under the active tab, in its tint.
+								tabBarIcon: ({ focused, color }) => (
+									<View style={styles.tabIcon}>
+										<PixelIcon name={TAB_ICONS[route.name]} color={color} />
+										<View style={[styles.tabDot, focused && { backgroundColor: color }]} />
+									</View>
 								),
 							})}
 						>
@@ -230,6 +234,8 @@ const createStyles = (theme: Theme, bottomInset: number) =>
 			borderTopColor: theme.colors.border,
 			elevation: 0,
 		},
+		tabIcon: { alignItems: 'center', gap: theme.spacing.xs },
+		tabDot: { width: 6, height: 6 },
 		playerBar: {
 			paddingBottom: bottomInset,
 			borderTopWidth: 1,

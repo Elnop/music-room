@@ -25,6 +25,8 @@ export const originalTheme: Theme = {
 		success: '#7BD66B',
 		warning: '#FFC53D',
 		info: '#62D2FF',
+		radar: '#0C1710',
+		people: '#FF6FA5',
 
 		...FIXED_COLORS,
 	},

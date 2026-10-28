@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, ActivityIndicator } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useTheme } from '@/shared/theme/ThemeContext';
-import { FIXED_COLORS } from '@/shared/theme/tokens';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Artwork } from '@/shared/components/media/Artwork';
+import { EqualizerBars } from '@/shared/components/media/EqualizerBars';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
+import { KeyButton } from '@/shared/components/ui/KeyButton';
 import type { MiniPlayerData } from '@/features/player/miniPlayer/hooks/useMiniPlayer';
 import { createStyles } from './miniPlayerStyles';
 import { Text } from '@/shared/components/ui/Text';
@@ -34,9 +35,13 @@ export function MiniPlayerView({ data }: MiniPlayerViewProps) {
 	} = data;
 
 	const remoteLine = deviceLabel ? (
-		<Text style={styles.device} numberOfLines={1}>
-			Sur {deviceLabel}
-		</Text>
+		<View style={styles.deviceRow}>
+			<PixelIcon name="phone" size={12} color={theme.colors.info} />
+			<Text style={styles.device} numberOfLines={1}>
+				Sur {deviceLabel}
+			</Text>
+			<EqualizerBars color={theme.colors.info} bars={3} height={12} playing={isPlaying} />
+		</View>
 	) : null;
 
 	return (
@@ -47,6 +52,9 @@ export function MiniPlayerView({ data }: MiniPlayerViewProps) {
 			accessibilityRole="none"
 			accessibilityLabel="Mini-lecteur"
 		>
+			<View style={styles.progressBarContainer}>
+				<View style={[styles.progressBar, { width: `${progress}%` }]} />
+			</View>
 			<View style={styles.content}>
 				<Animated.View style={[styles.swipeArea, infoStyle]}>
 					<Pressable
@@ -58,7 +66,7 @@ export function MiniPlayerView({ data }: MiniPlayerViewProps) {
 						{!track ? (
 							<>
 								<View style={[styles.artwork, styles.emptyArtwork]}>
-									<Ionicons name="musical-notes" size={20} color={theme.colors.textSecondary} />
+									<PixelIcon name="note" color={theme.colors.textSecondary} />
 								</View>
 								<View style={styles.info}>
 									<Text style={styles.title} numberOfLines={1}>
@@ -87,29 +95,18 @@ export function MiniPlayerView({ data }: MiniPlayerViewProps) {
 					</Pressable>
 				</Animated.View>
 
-				<Pressable
-					style={[styles.playButton, !track && styles.playButtonEmpty]}
+				<KeyButton
+					icon={isPlaying ? 'pause' : 'play'}
+					tone={track ? 'primary' : 'surface'}
+					size={42}
 					onPress={onTogglePlay}
-					hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
 					disabled={playDisabled}
-					accessibilityRole="button"
+					loading={isLoading}
 					accessibilityLabel={isPlaying ? 'Pause' : 'Lecture'}
-					accessibilityState={{ disabled: playDisabled, busy: isLoading }}
-				>
-					{isLoading ? (
-						<ActivityIndicator size="small" color={FIXED_COLORS.onColor} />
-					) : (
-						<Ionicons
-							name={isPlaying ? 'pause' : 'play'}
-							size={20}
-							color={track ? FIXED_COLORS.onColor : theme.colors.textSecondary}
-							style={isPlaying ? undefined : { marginLeft: 2 }}
-						/>
-					)}
-				</Pressable>
+				/>
 
 				<Pressable
-					style={styles.nextButton}
+					style={[styles.nextButton, nextDisabled && styles.disabledIcon]}
 					onPress={onNext}
 					hitSlop={{ top: 10, bottom: 10, left: 6, right: 10 }}
 					disabled={nextDisabled}
@@ -117,17 +114,8 @@ export function MiniPlayerView({ data }: MiniPlayerViewProps) {
 					accessibilityLabel="Piste suivante"
 					accessibilityState={{ disabled: nextDisabled }}
 				>
-					<Ionicons
-						name="play-skip-forward"
-						size={22}
-						color={theme.colors.text}
-						style={nextDisabled ? styles.disabledIcon : undefined}
-					/>
+					<PixelIcon name="next" color={theme.colors.text} />
 				</Pressable>
-			</View>
-
-			<View style={styles.progressBarContainer}>
-				<View style={[styles.progressBar, { width: `${progress}%` }]} />
 			</View>
 		</Pressable>
 	);
