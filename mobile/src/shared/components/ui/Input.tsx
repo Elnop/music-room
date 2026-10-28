@@ -8,7 +8,7 @@ import {
 	TextStyle,
 	Platform,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { focusedFieldStyle } from '@/shared/theme/fieldFocus';
@@ -90,8 +90,8 @@ export function Input({
 						hitSlop={8}
 						style={[styles.toggle, Platform.OS === 'web' && styles.toggleWeb]}
 					>
-						<Ionicons
-							name={isHidden ? 'eye-outline' : 'eye-off-outline'}
+						<PixelIcon
+							name={isHidden ? 'eye' : 'eyeOff'}
 							size={20}
 							color={theme.colors.textSecondary}
 						/>
@@ -118,12 +118,10 @@ const createStyles = (theme: Theme) =>
 			flexDirection: 'row',
 			alignItems: 'center',
 			backgroundColor: theme.colors.surface,
-			borderRadius: 12,
-			borderWidth: 1,
+			borderWidth: theme.borders.thick,
 			borderColor: theme.colors.border,
 		},
 		inputContainerError: {
-			borderWidth: 2,
 			borderColor: theme.colors.error,
 			backgroundColor: theme.colors.surface,
 		},
@@ -153,7 +151,6 @@ const createStyles = (theme: Theme) =>
 			paddingHorizontal: theme.spacing.xs,
 			paddingVertical: theme.spacing.xs,
 			marginHorizontal: theme.spacing.xs + 2,
-			borderRadius: 8,
 		},
 		multilineInput: {
 			textAlignVertical: 'top',

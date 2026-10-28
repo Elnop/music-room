@@ -23,7 +23,7 @@ describe('AppToast', () => {
 			expect(screen.getByText(`Message ${type}`)).toBeTruthy();
 			const toast = screen.getByTestId(`toast-${type}`);
 			const style = StyleSheet.flatten(toast.props.style);
-			expect(style.borderLeftColor).toBe(originalTheme.colors[type]);
+			expect(style.borderColor).toBe(originalTheme.colors[type]);
 			expect(style.backgroundColor).toBe(originalTheme.colors.surface);
 			const text = StyleSheet.flatten(screen.getByText(`Message ${type}`).props.style);
 			expect(text.color).toBe(originalTheme.colors.text);

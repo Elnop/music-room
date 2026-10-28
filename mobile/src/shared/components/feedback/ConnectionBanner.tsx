@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
+import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { useSocketStore } from '@/shared/stores/socketStore';
 import type { ConnectionStatus } from '@/shared/hooks/useConnectionStatus';
@@ -22,10 +23,10 @@ const COPY: Record<NonNullable<ConnectionStatus>, string> = {
 	failed: 'Connexion perdue',
 };
 
-const ICONS: Record<NonNullable<ConnectionStatus>, keyof typeof Ionicons.glyphMap> = {
-	offline: 'cloud-offline-outline',
-	reconnecting: 'sync-outline',
-	failed: 'alert-circle-outline',
+const ICONS: Record<NonNullable<ConnectionStatus>, PixelSpriteName> = {
+	offline: 'alert',
+	reconnecting: 'sync',
+	failed: 'alert',
 };
 
 const DARK_TEXT = FIXED_COLORS.inkDark;
@@ -77,7 +78,7 @@ export function ConnectionBanner({ status, topInset }: ConnectionBannerProps) {
 			testID="connection-banner"
 		>
 			<View style={styles.row}>
-				<Ionicons name={ICONS[status]} size={16} color={color} />
+				<PixelIcon name={ICONS[status]} size={16} color={color} />
 				<Text style={[styles.text, { color }]}>{COPY[status]}</Text>
 				{failed && (
 					<Pressable

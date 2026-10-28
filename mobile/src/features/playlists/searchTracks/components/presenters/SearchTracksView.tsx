@@ -49,7 +49,7 @@ export function SearchTracksView({ screen, bottomPadding }: SearchTracksViewProp
 					ListEmptyComponent={
 						typed && screen.isLoading ? null : (
 							<EmptyState
-								icon="musical-notes-outline"
+								icon="note"
 								message={
 									typed
 										? 'Aucun titre trouvé'

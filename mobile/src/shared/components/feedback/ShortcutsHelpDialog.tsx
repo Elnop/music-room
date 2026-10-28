@@ -61,7 +61,6 @@ const createStyles = (theme: Theme) =>
 			minWidth: 32,
 			paddingHorizontal: theme.spacing.sm,
 			paddingVertical: theme.spacing.xs,
-			borderRadius: 6,
 			borderWidth: 1,
 			borderColor: theme.colors.border,
 			backgroundColor: theme.colors.surfaceAlt,

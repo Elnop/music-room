@@ -1,7 +1,6 @@
 import React from 'react';
 import { RefreshControl, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { ReorderableList } from '@/shared/components/lists/ReorderableList';
 import { SwipeableTrackItem } from '@/shared/components/lists/SwipeableTrackItem';
@@ -44,11 +43,7 @@ export function PlaylistDetailView({
 
 	return (
 		<View style={styles.container}>
-			<LinearGradient
-				colors={gradient}
-				locations={[0, 0.25, 0.5, 0.8]}
-				style={gradientStyles.background}
-			/>
+			<View style={[bandStyles.band, { backgroundColor: gradient[0] }]} />
 			<ReorderableList
 				data={playlist.tracks}
 				keyExtractor={item => item.id}
@@ -90,7 +85,7 @@ export function PlaylistDetailView({
 				]}
 				ListEmptyComponent={
 					<EmptyState
-						icon="musical-notes-outline"
+						icon="note"
 						message="Aucun titre dans cette playlist pour l'instant"
 					/>
 				}
@@ -108,12 +103,7 @@ export function PlaylistDetailView({
 	);
 }
 
-const gradientStyles = StyleSheet.create({
-	background: {
-		position: 'absolute',
-		top: 0,
-		left: 0,
-		right: 0,
-		height: 450, // The gradient covers the top of the screen
-	},
+// A flat band in the cover's colour behind the header: pixel art has no gradients.
+const bandStyles = StyleSheet.create({
+	band: { position: 'absolute', top: 0, left: 0, right: 0, height: 260 },
 });

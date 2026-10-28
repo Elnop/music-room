@@ -1,17 +1,19 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { EmptyState } from '@/shared/components/feedback/EmptyState';
-import { RowGrid } from '@/shared/components/lists/RowGrid';
-import { SectionHeader } from '@/shared/components/lists/SectionHeader';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
+import { RadarScope } from '@/shared/components/media/RadarScope';
 import { Button } from '@/shared/components/ui/Button';
-import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
+import { KeyButton } from '@/shared/components/ui/KeyButton';
+import { Pressable } from '@/shared/components/ui/Pressable';
+import { Text } from '@/shared/components/ui/Text';
+import { pixelFrame } from '@/shared/theme/pixelFrame';
+import { GENRE_COLORS } from '@/shared/theme/tokens';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { NearbyEvents } from '@/features/events/nearby/hooks/useNearbyEvents';
+import { radarSpot } from '@/features/events/nearby/utils/radarBlips';
 import { BeaconStatusLine } from './BeaconStatusLine';
 import { EventRow } from './EventRow';
-import { Text } from '@/shared/components/ui/Text';
 
 const NOTICE_ACTIONS = {
 	request: { label: 'Autoriser la localisation', handler: 'requestPermission' },
@@ -19,72 +21,151 @@ const NOTICE_ACTIONS = {
 	retry: { label: 'Réessayer', handler: 'requestPermission' },
 } as const;
 
+/** Past this point the nearest event's label opens to the left, to stay on the radar. */
+const LABEL_FLIP_LEFT = 55;
+
 export function NearbyEventsSection({ nearby }: { nearby: NearbyEvents }) {
 	const { styles, theme } = useThemedStyles(createStyles);
-	const { isWide } = useBreakpoint();
 	const action = nearby.notice.action && NOTICE_ACTIONS[nearby.notice.action];
 
 	return (
-		<View>
-			<SectionHeader
-				icon="location-outline"
-				title="Événements à proximité"
-				count={nearby.items.length}
-				action={
-					<Button
-						title="Créer"
-						variant="outline"
-						size="compact"
-						icon={<Ionicons name="add" size={16} color={theme.colors.text} />}
-						onPress={nearby.createEvent}
-						accessibilityLabel="Créer un événement"
-					/>
-				}
-			/>
-			{nearby.items.length > 0 ? (
-				<RowGrid>
-					{nearby.items.map(({ event, proximity }) => (
-						<EventRow
+		<View accessibilityLabel="Événements à proximité">
+			<RadarScope>
+				{nearby.items.map(({ event, proximity }, rank) => {
+					const spot = radarSpot(event.id, rank, nearby.items.length);
+					return (
+						<Pressable
 							key={event.id}
-							event={event}
-							proximity={proximity}
+							style={[
+								styles.blip,
+								{ left: `${spot.left}%`, top: `${spot.top}%` },
+								spot.left > LABEL_FLIP_LEFT && styles.blipFlipped,
+							]}
 							onPress={() => nearby.openEvent(event.id)}
-						/>
+							accessibilityLabel={`${event.name}, ${proximity}`}
+						>
+							<View style={[styles.dot, { backgroundColor: GENRE_COLORS[event.genres[0]] }]}>
+								<PixelIcon name={event.genres[0]} size={12} color={theme.colors.onColor} />
+							</View>
+							{rank === 0 && (
+								<View style={styles.label}>
+									<Text style={styles.labelName} numberOfLines={1}>
+										{event.name}
+									</Text>
+									<Text style={styles.labelDistance}>{proximity}</Text>
+								</View>
+							)}
+						</Pressable>
+					);
+				})}
+				{nearby.items.length === 0 && (
+					<View style={styles.notice}>
+						<Text style={styles.noticeText}>{nearby.notice.message}</Text>
+						{action && (
+							<Button
+								title={action.label}
+								size="compact"
+								variant="outline"
+								onPress={nearby[action.handler]}
+							/>
+						)}
+					</View>
+				)}
+				<View style={styles.count}>
+					<PixelIcon name="beacon" size={12} color={theme.colors.primary} />
+					<Text style={styles.countText}>{nearby.items.length}</Text>
+				</View>
+			</RadarScope>
+
+			<View style={styles.mine}>
+				<View style={styles.mineList}>
+					{nearby.mine.map(event => (
+						<EventRow key={event.id} event={event} onPress={() => nearby.openEvent(event.id)} />
 					))}
-				</RowGrid>
-			) : (
-				<EmptyState
-					icon="radio-outline"
-					message={nearby.notice.message}
-					action={action ? { label: action.label, onPress: nearby[action.handler] } : undefined}
-					compact={isWide}
+				</View>
+				<KeyButton
+					icon="plus"
+					tone="primary"
+					size={45}
+					onPress={nearby.createEvent}
+					accessibilityLabel="Créer un événement"
 				/>
-			)}
+			</View>
 			<BeaconStatusLine
 				status={nearby.beaconStatus}
 				onRequestPermission={nearby.requestBeaconPermission}
 			/>
-			{nearby.mine.length > 0 && (
-				<View>
-					<Text style={styles.subtitle}>Vos événements</Text>
-					<RowGrid>
-						{nearby.mine.map(event => (
-							<EventRow key={event.id} event={event} onPress={() => nearby.openEvent(event.id)} />
-						))}
-					</RowGrid>
-				</View>
-			)}
 		</View>
 	);
 }
 
 const createStyles = (theme: Theme) =>
 	StyleSheet.create({
-		subtitle: {
-			fontSize: theme.typography.sizes.sm,
-			fontFamily: theme.typography.families.semibold,
-			color: theme.colors.textSecondary,
-			paddingHorizontal: theme.spacing.md,
-			marginTop: theme.spacing.sm,
+		blip: {
+			position: 'absolute',
+			flexDirection: 'row',
+			alignItems: 'center',
+			gap: theme.spacing.sm,
+			marginLeft: -10,
+			marginTop: -10,
 		},
+		blipFlipped: { flexDirection: 'row-reverse', transform: [{ translateX: '-100%' }] },
+		dot: {
+			...pixelFrame(theme),
+			width: 21,
+			height: 21,
+			alignItems: 'center',
+			justifyContent: 'center',
+		},
+		label: {
+			...pixelFrame(theme),
+			maxWidth: 170,
+			backgroundColor: theme.colors.text,
+			paddingVertical: theme.spacing.xs,
+			paddingHorizontal: theme.spacing.sm,
+		},
+		labelName: {
+			fontSize: theme.typography.sizes.md,
+			fontFamily: theme.typography.families.semibold,
+			color: theme.colors.textInverse,
+		},
+		labelDistance: {
+			fontSize: theme.typography.sizes.xs,
+			fontFamily: theme.typography.families.mono,
+			color: theme.colors.textInverse,
+		},
+		notice: {
+			position: 'absolute',
+			top: theme.spacing.lg,
+			left: theme.spacing.lg,
+			right: theme.spacing.lg,
+			alignItems: 'center',
+			gap: theme.spacing.sm,
+		},
+		noticeText: {
+			fontSize: theme.typography.sizes.md,
+			color: theme.colors.text,
+			textAlign: 'center',
+		},
+		count: {
+			position: 'absolute',
+			left: theme.spacing.sm,
+			bottom: theme.spacing.sm,
+			flexDirection: 'row',
+			alignItems: 'center',
+			gap: theme.spacing.xs,
+		},
+		countText: {
+			fontSize: theme.typography.sizes.sm,
+			fontFamily: theme.typography.families.mono,
+			color: theme.colors.primary,
+		},
+		mine: {
+			flexDirection: 'row',
+			alignItems: 'flex-start',
+			gap: theme.spacing.md,
+			marginTop: theme.spacing.md,
+			marginHorizontal: theme.spacing.md,
+		},
+		mineList: { flex: 1, gap: theme.spacing.md },
 	});

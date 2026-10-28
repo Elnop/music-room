@@ -260,13 +260,13 @@ describe('PlaylistDetailOrchestrator tracks (#307)', () => {
 
 	it('offers « Ajouter un titre » to an editor, which opens the search', async () => {
 		await renderScreen();
-		fireEvent.press(screen.getByText('Ajouter un titre'));
+		fireEvent.press(screen.getByLabelText('Ajouter un titre'));
 		expect(navigation.navigate).toHaveBeenCalledWith('SearchTracks', { playlistId: ID });
 	});
 
 	it('offers neither the add row nor the drag to a viewer', async () => {
 		await renderScreen({ ownerId: 'someone-else', tracks });
-		expect(screen.queryByText('Ajouter un titre')).toBeNull();
+		expect(screen.queryByLabelText('Ajouter un titre')).toBeNull();
 		expect(mockList.dragEnabled).toBe(false);
 		fireEvent.press(screen.getByText('Supprimer Song'));
 		expect(showError).toHaveBeenCalledWith('Vous ne pouvez pas éditer cette playlist');

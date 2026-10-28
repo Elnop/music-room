@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 
@@ -20,7 +20,7 @@ export function ProfileHeaderButtons({ onEditProfile, onSettings }: ProfileHeade
 				accessibilityLabel="Modifier le profil"
 				style={styles.button}
 			>
-				<Ionicons name="create-outline" size={24} color={theme.colors.text} />
+				<PixelIcon name="pencil" size={24} color={theme.colors.text} />
 			</Pressable>
 			<Pressable
 				onPress={onSettings}
@@ -28,7 +28,7 @@ export function ProfileHeaderButtons({ onEditProfile, onSettings }: ProfileHeade
 				accessibilityLabel="Réglages"
 				style={styles.button}
 			>
-				<Ionicons name="settings-outline" size={24} color={theme.colors.text} />
+				<PixelIcon name="gear" size={24} color={theme.colors.text} />
 			</Pressable>
 		</View>
 	);

@@ -5,6 +5,7 @@ import type { Theme } from '@/shared/theme/types';
 import { Pressable } from './Pressable';
 import { Text } from './Text';
 import { FONT_FAMILIES } from '@/shared/theme/fonts';
+import { keycap } from '@/shared/theme/pixelFrame';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline';
 /** `compact` fits a header row, next to a title. */
@@ -85,9 +86,9 @@ export function Button({
 const createStyles = (theme: Theme) =>
 	StyleSheet.create({
 		container: {
+			...keycap(theme),
 			height: 52,
 			paddingHorizontal: 24,
-			borderRadius: 12,
 			alignItems: 'center',
 			justifyContent: 'center',
 			flexDirection: 'row',
@@ -96,7 +97,7 @@ const createStyles = (theme: Theme) =>
 		compact: {
 			height: 28,
 			paddingHorizontal: 12,
-			borderRadius: 999,
+			borderBottomWidth: theme.borders.thick,
 			gap: 4,
 		},
 		fullWidth: {
@@ -110,14 +111,11 @@ const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.primary,
 		},
 		secondary: {
-			backgroundColor: theme.colors.surface,
-			borderWidth: 1,
-			borderColor: theme.colors.border,
+			backgroundColor: theme.colors.surfaceAlt,
 		},
 		outline: {
 			backgroundColor: 'transparent',
-			borderWidth: 1,
-			borderColor: theme.colors.onColor,
+			borderColor: theme.colors.text,
 		},
 
 		text: {

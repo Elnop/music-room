@@ -9,6 +9,7 @@ import { PreviewBadge } from '@/shared/components/media/PreviewBadge';
 import { isPreviewOnly } from '@/shared/utils/soundcloudPreview';
 import { TrackActionsButton } from '@/shared/components/lists/TrackActionsButton';
 import { formatDuration } from '@/shared/utils/formatters';
+import { pixelRow } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 import type { SoundCloudTrack } from '@/features/search/types';
 import { Text } from '@/shared/components/ui/Text';
@@ -67,25 +68,17 @@ export function SoundCloudTrackItem({
 
 const createStyles = (theme: Theme) =>
 	StyleSheet.create({
-		container: {
-			flexDirection: 'row',
-			alignItems: 'center',
-			paddingVertical: 8,
-			paddingHorizontal: theme.spacing.md,
-			backgroundColor: theme.colors.background,
-		},
+		container: pixelRow(theme),
 		pressable: {
 			flex: 1,
 			flexDirection: 'row',
 			alignItems: 'center',
+			gap: theme.spacing.md,
 		},
 		artwork: {
-			borderRadius: 4,
 		},
 		info: {
 			flex: 1,
-			marginLeft: theme.spacing.md,
-			marginRight: theme.spacing.sm,
 		},
 		subtitle: {
 			flexDirection: 'row',

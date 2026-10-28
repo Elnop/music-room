@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { createUserProfileHeaderStyles } from './userProfileHeaderStyles';
 import { Text } from '@/shared/components/ui/Text';
@@ -12,8 +12,8 @@ export function HiddenFieldNote({ label }: { label: string }) {
 
 	return (
 		<View style={styles.hiddenField}>
-			<Ionicons
-				name="lock-closed"
+			<PixelIcon
+				name="lock"
 				size={16}
 				color={theme.colors.textSecondary}
 				style={styles.hiddenIcon}

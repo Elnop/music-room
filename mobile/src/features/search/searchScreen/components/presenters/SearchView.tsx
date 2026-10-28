@@ -91,13 +91,13 @@ export function SearchView({
 					ListEmptyComponent={
 						isLoading ? null : isError && debouncedQuery.trim() ? (
 							<EmptyState
-								icon="cloud-offline-outline"
+								icon="alert"
 								message="La recherche a échoué"
 								action={{ label: 'Réessayer', onPress: onRetry }}
 							/>
 						) : (
 							<EmptyState
-								icon="musical-notes-outline"
+								icon="note"
 								message={
 									searchQuery
 										? 'Aucun titre trouvé'

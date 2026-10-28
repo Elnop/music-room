@@ -2,7 +2,6 @@ import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { ProfileMenuItems } from './ProfileMenuItems';
 
-jest.mock('@expo/vector-icons', () => ({ Ionicons: () => null }));
 
 jest.mock('@/shared/theme/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');

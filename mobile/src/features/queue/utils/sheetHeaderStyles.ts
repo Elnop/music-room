@@ -18,7 +18,6 @@ export const sheetHeaderStyles = (theme: Theme, insets: { top: number }, separat
 	closeButton: {
 		width: 40,
 		height: 40,
-		borderRadius: 20,
 		justifyContent: 'center' as const,
 		alignItems: 'center' as const,
 		backgroundColor: theme.colors.surface,

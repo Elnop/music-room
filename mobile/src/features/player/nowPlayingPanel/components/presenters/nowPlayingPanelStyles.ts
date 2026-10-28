@@ -36,13 +36,11 @@ export const createStyles = (theme: Theme, separator: string) =>
 		iconButton: {
 			width: 36,
 			height: 36,
-			borderRadius: 18,
 			alignItems: 'center',
 			justifyContent: 'center',
 		},
 		scroll: { flex: 1 },
 		content: { paddingHorizontal: GUTTER, paddingBottom: theme.spacing.lg, gap: theme.spacing.lg },
-		artwork: { borderRadius: 8 },
 		titleBlock: { gap: theme.spacing.xs },
 		title: {
 			fontSize: theme.typography.sizes.xxl,
@@ -61,7 +59,6 @@ export const createStyles = (theme: Theme, separator: string) =>
 			gap: theme.spacing.xs,
 			paddingVertical: theme.spacing.xs,
 			paddingHorizontal: theme.spacing.md,
-			borderRadius: 999,
 			borderWidth: 1,
 			borderColor: theme.colors.border,
 		},
@@ -73,7 +70,6 @@ export const createStyles = (theme: Theme, separator: string) =>
 			color: theme.colors.text,
 		},
 		card: {
-			borderRadius: 12,
 			padding: GUTTER,
 			gap: theme.spacing.md,
 			backgroundColor: theme.colors.surface,
@@ -98,7 +94,6 @@ export const createStyles = (theme: Theme, separator: string) =>
 		deviceIcon: {
 			width: 40,
 			height: 40,
-			borderRadius: 8,
 			alignItems: 'center',
 			justifyContent: 'center',
 			backgroundColor: theme.colors.surfaceAlt,
@@ -118,7 +113,6 @@ export const createStyles = (theme: Theme, separator: string) =>
 			flexDirection: 'row',
 			alignItems: 'center',
 			gap: theme.spacing.md,
-			borderRadius: 6,
 		},
 		rowText: { flex: 1, minWidth: 0 },
 		rowTitle: {
@@ -126,7 +120,6 @@ export const createStyles = (theme: Theme, separator: string) =>
 			fontFamily: theme.typography.families.semibold,
 			color: theme.colors.text,
 		},
-		rowArtwork: { borderRadius: 4 },
 	});
 
 export type NowPlayingPanelStyles = ReturnType<typeof createStyles>;

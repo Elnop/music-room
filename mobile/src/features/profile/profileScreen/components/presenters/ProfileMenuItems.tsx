@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { ProfileNavigationItem } from '@/features/profile/profileScreen/components/presenters/ProfileNavigationItem';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
@@ -33,7 +33,7 @@ export function ProfileMenuItems({
 			<ProfileNavigationItem
 				title="Confidentialité"
 				subtitle="Gérez qui peut voir vos informations"
-				icon="lock-closed"
+				icon="lock"
 				onPress={onPrivacySettings}
 			/>
 
@@ -47,7 +47,7 @@ export function ProfileMenuItems({
 			<ProfileNavigationItem
 				title="Mes appareils"
 				subtitle="Choisissez quels amis contrôlent chaque appareil"
-				icon="phone-portrait-outline"
+				icon="phone"
 				onPress={onMyDevices}
 			/>
 
@@ -58,7 +58,7 @@ export function ProfileMenuItems({
 					disabled={isLoading}
 					accessibilityLabel="Se déconnecter"
 				>
-					<Ionicons name="log-out-outline" size={20} color={theme.colors.error} />
+					<PixelIcon name="logout" size={20} color={theme.colors.error} />
 					<Text style={styles.logoutText}>Se déconnecter</Text>
 				</Pressable>
 			</View>
@@ -83,7 +83,6 @@ const createStyles = (theme: Theme) =>
 			justifyContent: 'center',
 			gap: theme.spacing.sm,
 			paddingVertical: theme.spacing.md,
-			borderRadius: 12,
 			borderWidth: 1,
 			borderColor: theme.colors.error,
 			backgroundColor: 'transparent',
@@ -95,7 +94,6 @@ const createStyles = (theme: Theme) =>
 			gap: theme.spacing.sm,
 			paddingVertical: theme.spacing.sm,
 			paddingHorizontal: theme.spacing.md,
-			borderRadius: 12,
 		},
 		logoutText: {
 			fontSize: 16,

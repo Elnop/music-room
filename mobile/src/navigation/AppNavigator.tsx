@@ -6,7 +6,8 @@ import {
 import type { NavigatorScreenParams } from '@react-navigation/native';
 import { View, StyleSheet, Platform } from 'react-native';
 import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
+import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 
@@ -55,15 +56,12 @@ const Tab = createBottomTabNavigator<AppTabsParamList>();
 registerPlayback();
 registerMusicControl();
 
-const TAB_ICONS: Record<
-	string,
-	{ active: keyof typeof Ionicons.glyphMap; inactive: keyof typeof Ionicons.glyphMap }
-> = {
-	HomeTab: { active: 'home', inactive: 'home-outline' },
-	PlaylistsTab: { active: 'musical-notes', inactive: 'musical-notes-outline' },
-	SearchTab: { active: 'search', inactive: 'search-outline' },
-	FriendsTab: { active: 'people', inactive: 'people-outline' },
-	ProfileTab: { active: 'person', inactive: 'person-outline' },
+const TAB_ICONS: Record<string, PixelSpriteName> = {
+	HomeTab: 'home',
+	PlaylistsTab: 'tape',
+	SearchTab: 'search',
+	FriendsTab: 'crew',
+	ProfileTab: 'me',
 };
 
 /** Wide screens move the tabs to a side bar framed by AppTabBar: an icon rail on a tablet, icons and labels on desktop. */
@@ -73,6 +71,7 @@ const sidebarOptions = (
 ): BottomTabNavigationOptions => ({
 	tabBarPosition: 'left',
 	tabBarVariant: breakpoint === 'tablet' ? 'material' : 'uikit',
+	tabBarShowLabel: true,
 	tabBarLabelPosition: breakpoint === 'tablet' ? 'below-icon' : 'beside-icon',
 	// The library's defaults put a primary label on a primary fill.
 	tabBarActiveTintColor: theme.colors.text,
@@ -133,7 +132,7 @@ export function AppNavigator() {
 								tabBarActiveTintColor: theme.colors.primary,
 								tabBarInactiveTintColor: theme.colors.textSecondary,
 								tabBarStyle: styles.tabBar,
-								tabBarLabelStyle: styles.tabLabel,
+								tabBarShowLabel: false,
 								headerStyle: {
 									backgroundColor: theme.colors.background,
 								},
@@ -143,28 +142,13 @@ export function AppNavigator() {
 									fontFamily: theme.typography.families.bold,
 								},
 								...sidebar,
-								tabBarIcon: ({ focused, color }) => {
-									const icons = TAB_ICONS[route.name];
-									const iconName = focused ? icons.active : icons.inactive;
-									if (sidebar) {
-										return (
-											<Ionicons
-												name={iconName}
-												size={22}
-												color={focused ? theme.colors.primary : color}
-											/>
-										);
-									}
-									return (
-										<View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
-											<Ionicons
-												name={iconName}
-												size={20}
-												color={focused ? theme.colors.onColor : color}
-											/>
-										</View>
-									);
-								},
+								// A pixel square under the active tab, in its tint.
+								tabBarIcon: ({ focused, color }) => (
+									<View style={styles.tabIcon}>
+										<PixelIcon name={TAB_ICONS[route.name]} color={color} />
+										<View style={[styles.tabDot, focused && { backgroundColor: color }]} />
+									</View>
+								),
 							})}
 						>
 							<Tab.Screen
@@ -246,23 +230,12 @@ const createStyles = (theme: Theme, bottomInset: number) =>
 			paddingTop: 10,
 			paddingBottom: bottomInset + 10,
 			backgroundColor: theme.colors.background,
-			borderTopWidth: 0,
+			borderTopWidth: theme.borders.thick,
+			borderTopColor: theme.colors.border,
 			elevation: 0,
 		},
-		iconContainer: {
-			width: 56,
-			height: 30,
-			borderRadius: 15,
-			justifyContent: 'center',
-			alignItems: 'center',
-		},
-		tabLabel: {
-			fontSize: 11,
-			marginTop: 2,
-		},
-		iconContainerActive: {
-			backgroundColor: theme.colors.primary,
-		},
+		tabIcon: { alignItems: 'center', gap: theme.spacing.xs },
+		tabDot: { width: 6, height: 6 },
 		playerBar: {
 			paddingBottom: bottomInset,
 			borderTopWidth: 1,

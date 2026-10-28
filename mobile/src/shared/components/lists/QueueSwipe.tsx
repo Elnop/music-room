@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { Text } from '@/shared/components/ui/Text';
@@ -24,7 +24,7 @@ export function QueueSwipe({ children, onAddToQueue, renderRightActions }: Queue
 
 	const renderLeftActions = () => (
 		<View style={styles.queueAction} accessible accessibilityLabel="Ajouter à la file d'attente">
-			<Ionicons name="list" size={24} color={theme.colors.onColor} />
+			<PixelIcon name="queue" size={24} color={theme.colors.onColor} />
 			<Text style={styles.queueText}>À la file</Text>
 		</View>
 	);

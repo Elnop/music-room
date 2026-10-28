@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, ScrollView, ActivityIndicator } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { FullScreenSheet } from '@/shared/components/layout/FullScreenSheet';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
@@ -128,7 +128,7 @@ export function DevicePickerSheetView({
 					accessibilityRole="button"
 					accessibilityLabel="Fermer le choix d'appareil"
 				>
-					<Ionicons name={isWide ? 'close' : 'chevron-down'} size={24} color={theme.colors.text} />
+					<PixelIcon name={isWide ? 'close' : 'down'} size={24} color={theme.colors.text} />
 				</Pressable>
 				<Text style={styles.title}>Choisir un appareil</Text>
 			</View>

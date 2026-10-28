@@ -1,16 +1,14 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { HEADER_HIT_SLOP, type createStyles } from './playerModalStyles';
-import { Text } from '@/shared/components/ui/Text';
 
 interface PlayerHeaderProps {
 	styles: ReturnType<typeof createStyles>;
 	colors: {
 		text: string;
 		textSecondary: string;
-		buttonBg: string;
 	};
 	/** A dialog closes with ×, without the swipe handle of the phone's sheet. */
 	dialog?: boolean;
@@ -36,14 +34,15 @@ export function PlayerHeader({ styles, colors, dialog = false, onClose }: Player
 				accessibilityRole="button"
 				accessibilityLabel="Fermer le lecteur"
 			>
-				<View style={[styles.headerButton, { backgroundColor: colors.buttonBg }]}>
-					<Ionicons name={dialog ? 'close' : 'chevron-down'} size={24} color={colors.text} />
+				<View style={styles.headerButton}>
+					{dialog ? (
+						<PixelIcon name="close" size={24} color={colors.text} />
+					) : (
+						<PixelIcon name="down" color={colors.text} />
+					)}
 				</View>
 			</Pressable>
 
-			<Text style={[styles.nowPlayingText, { color: colors.textSecondary }]}>
-				EN COURS DE LECTURE
-			</Text>
 		</View>
 	);
 }

@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import { pixelFrame } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 import { focusedFieldStyle } from '@/shared/theme/fieldFocus';
 import { useFieldFocus } from '@/shared/hooks/useFieldFocus';
@@ -36,7 +37,7 @@ export function SearchBar({
 
 	return (
 		<View style={[styles.container, style, focused && focusedFieldStyle(theme.colors.primary)]}>
-			<Ionicons
+			<PixelIcon
 				name="search"
 				size={20}
 				color={theme.colors.textSecondary}
@@ -71,7 +72,7 @@ export function SearchBar({
 					style={[styles.trailing, styles.clear]}
 					accessibilityLabel="Effacer la recherche"
 				>
-					<Ionicons name="close-circle" size={20} color={theme.colors.textSecondary} />
+					<PixelIcon name="close" size={20} color={theme.colors.textSecondary} />
 				</Pressable>
 			)}
 		</View>
@@ -81,10 +82,10 @@ export function SearchBar({
 const createStyles = (theme: Theme) =>
 	StyleSheet.create({
 		container: {
+			...pixelFrame(theme),
 			flexDirection: 'row',
 			alignItems: 'center',
-			backgroundColor: theme.colors.surfaceAlt,
-			borderRadius: 8,
+			backgroundColor: theme.colors.surface,
 			paddingHorizontal: theme.spacing.md,
 			height: 44,
 		},
@@ -102,6 +103,5 @@ const createStyles = (theme: Theme) =>
 			marginLeft: theme.spacing.sm,
 		},
 		clear: {
-			borderRadius: 10,
 		},
 	});

@@ -20,7 +20,7 @@ export function UpNextRow({ item, styles, onPlay }: UpNextRowProps) {
 			onPress={() => onPlay(item.id)}
 			accessibilityLabel={`Lire ${track.title}, ${track.artist}`}
 		>
-			<Artwork uri={track.albumArt} size={UP_NEXT_ARTWORK_SIZE} style={styles.rowArtwork} />
+			<Artwork uri={track.albumArt} size={UP_NEXT_ARTWORK_SIZE} />
 			<View style={styles.rowText}>
 				<Text style={styles.rowTitle} numberOfLines={1}>
 					{track.title}

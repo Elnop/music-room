@@ -76,7 +76,7 @@ export function MyDevicesView({
 
 				{devices.length === 0 ? (
 					<EmptyState
-						icon="phone-portrait-outline"
+						icon="phone"
 						style={styles.emptyState}
 						message="Aucun appareil. Ouvrez Zumik sur un appareil pour le voir ici."
 					/>

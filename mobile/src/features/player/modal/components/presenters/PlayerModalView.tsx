@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, StyleSheet, Modal } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { getPlayerModal } from '@/shared/services/playerModalsBridge';
+import { EqualizerBars } from '@/shared/components/media/EqualizerBars';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { PlayerHeader } from './PlayerHeader';
@@ -58,12 +58,7 @@ export function PlayerModalView({ modal, gestures, seek, carousel }: PlayerModal
 							gestures.animatedStyle,
 						]}
 					>
-						<LinearGradient
-							colors={modal.gradientColors}
-							style={StyleSheet.absoluteFill}
-							start={{ x: 0.5, y: 0 }}
-							end={{ x: 0.5, y: 1 }}
-						/>
+						<View style={[StyleSheet.absoluteFill, { backgroundColor: modal.gradientColors[0] }]} />
 
 						<PlayerHeader
 							styles={modal.styles}
@@ -84,6 +79,16 @@ export function PlayerModalView({ modal, gestures, seek, carousel }: PlayerModal
 									/>
 								</View>
 							</GestureDetector>
+
+							<View style={modal.styles.equalizer}>
+								<EqualizerBars
+									color={modal.colors.slider}
+									bars={18}
+									barWidth={12}
+									height={42}
+									playing={modal.isPlaying}
+								/>
+							</View>
 
 							<PlayerTrackInfo
 								styles={modal.styles}
@@ -113,7 +118,6 @@ export function PlayerModalView({ modal, gestures, seek, carousel }: PlayerModal
 								colors={modal.colors}
 								isPlaying={modal.isPlaying}
 								isLoading={modal.isLoading}
-								hasTrack={modal.track !== null}
 								canGoPrevious={modal.canGoPrevious}
 								canGoNext={modal.canGoNext}
 								playDisabled={modal.playDisabled}
@@ -124,7 +128,6 @@ export function PlayerModalView({ modal, gestures, seek, carousel }: PlayerModal
 
 							<PlayerBottomBar
 								styles={modal.styles}
-								colors={modal.colors}
 								deviceLabel={modal.deviceLabel}
 								onOpenDevices={() => modal.setDevicesOpen(true)}
 								onOpenQueue={() => modal.setQueueOpen(true)}

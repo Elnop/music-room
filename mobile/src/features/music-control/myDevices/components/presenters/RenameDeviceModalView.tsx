@@ -97,7 +97,6 @@ const createStyles = (theme: Theme) =>
 			maxWidth: DIALOG_MAX_WIDTH,
 			alignSelf: 'center',
 			backgroundColor: theme.colors.background,
-			borderRadius: 16,
 			padding: theme.spacing.lg,
 		},
 		title: {

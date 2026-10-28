@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { ProfileSection } from '@/shared/components/profile/ProfileSection';
 import { GenreChip } from '@/shared/components/ui/GenreChip';
 import { Pressable } from '@/shared/components/ui/Pressable';
@@ -44,8 +44,8 @@ export function ProfilePreferencesSection({
 					onPress={onModify}
 					accessibilityLabel="Modifier les préférences musicales"
 				>
-					<Ionicons
-						name="musical-notes-outline"
+					<PixelIcon
+						name="note"
 						size={32}
 						color={theme.colors.textSecondary}
 						style={styles.emptyStateIcon}

@@ -1,41 +1,28 @@
 import { FONT_FAMILIES } from './fonts';
 
-export const NEOBRUTALISM_BORDERS = {
-	thin: 0,
-	medium: 0,
-	thick: 1,
-	extraThick: 1,
+/** The pixel grid: every outline, radius and shadow offset is a multiple of it. */
+export const PIXEL = 3;
 
-	none: 0,
-	small: 8,
-	round: 9999,
+/** The darkest colour of the palette: pixel outlines and hard shadows. */
+export const INK = '#07060B';
+
+/** Pixel art has square corners: `round` stays square too. */
+export const PIXEL_BORDERS = {
+	thin: PIXEL,
+	medium: PIXEL,
+	thick: PIXEL,
+	small: 0,
+	round: 0,
 } as const;
 
-export const NEOBRUTALISM_SHADOWS = {
-	small: {
-		shadowColor: '#000000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 4,
-		elevation: 2,
-	},
-	medium: {
-		shadowColor: '#000000',
-		shadowOffset: { width: 0, height: 4 },
-		shadowOpacity: 0.1,
-		shadowRadius: 8,
-		elevation: 4,
-	},
-	large: {
-		shadowColor: '#000000',
-		shadowOffset: { width: 0, height: 6 },
-		shadowOpacity: 0.12,
-		shadowRadius: 12,
-		elevation: 6,
-	},
+/** Hard shadows with no blur, dropped straight down like a pixel sprite's. */
+export const PIXEL_SHADOWS = {
+	small: { boxShadow: `0 ${PIXEL}px 0 0 ${INK}` },
+	medium: { boxShadow: `0 ${PIXEL * 2}px 0 0 ${INK}` },
+	large: { boxShadow: `0 ${PIXEL * 3}px 0 0 ${INK}` },
 } as const;
 
-export const NEOBRUTALISM_TYPOGRAPHY = {
+export const PIXEL_TYPOGRAPHY = {
 	families: FONT_FAMILIES,
 	sizes: {
 		xs: 10,
@@ -50,25 +37,24 @@ export const NEOBRUTALISM_TYPOGRAPHY = {
 
 /** Every theme spreads these into its colours; the providers' brand colours follow their guidelines. */
 export const FIXED_COLORS = {
-	divider: '#3E3E3E',
+	divider: '#3B3358',
 	googleSurface: '#FFFFFF',
 	googleBorder: '#DADCE0',
 	googleMark: '#4285F4',
 	googleText: '#3C4043',
 	facebook: '#1877F2',
 	onFacebook: '#FFFFFF',
-	/** Text and icons drawn on a coloured fill (primary, success). */
-	onColor: '#FFFFFF',
+	/** Text and icons drawn on a coloured fill (primary, success, error). */
+	onColor: INK,
 	/** High-contrast dark ink for light backgrounds. */
-	inkDark: '#111111',
+	inkDark: INK,
 	/** High-contrast light ink for dark backgrounds. */
-	inkLight: '#FFFFFF',
+	inkLight: '#FFF3DC',
 	/** The dimmed backdrop behind a bottom sheet. */
-	backdrop: 'rgba(0, 0, 0, 0.5)',
-	shadow: '#000000',
+	backdrop: 'rgba(7, 6, 11, 0.7)',
+	shadow: INK,
 } as const;
 
-/** Kept the same across themes. */
 /** Backgrounds of the initials avatars: white text stays above 4.5:1 on each. */
 export const AVATAR_COLORS = [
 	'#C2185B',
@@ -85,15 +71,16 @@ export const AVATAR_COLORS = [
 	'#455A64',
 ] as const;
 
+/** Kept the same across themes. */
 export const GENRE_COLORS = {
-	pop: '#FF6B9D',
-	rock: '#E74C3C',
-	hiphop: '#9B59B6',
-	rnb: '#E91E63',
-	jazz: '#F39C12',
-	classical: '#3498DB',
-	electronic: '#00BCD4',
-	country: '#8D6E63',
-	latin: '#FF5722',
-	metal: '#607D8B',
+	pop: '#FF6FA5',
+	rock: '#FF8A3D',
+	hiphop: '#B48CFF',
+	rnb: '#FF5E6C',
+	jazz: '#3DDBB4',
+	classical: '#F3E3C0',
+	electronic: '#5B8CFF',
+	country: '#D9A066',
+	latin: '#F7E26B',
+	metal: '#9A94A8',
 } as const;

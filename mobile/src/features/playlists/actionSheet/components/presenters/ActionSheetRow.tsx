@@ -1,13 +1,14 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
+import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Text } from '@/shared/components/ui/Text';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 
 interface ActionSheetRowProps {
-	icon: keyof typeof Ionicons.glyphMap;
+	icon: PixelSpriteName;
 	label: string;
 	onPress: () => void;
 	/** A second line under the label. */
@@ -30,7 +31,7 @@ export function ActionSheetRow({
 
 	return (
 		<Pressable style={styles.row} onPress={onPress} accessibilityLabel={label}>
-			<Ionicons name={icon} size={22} color={color} style={styles.icon} />
+			<PixelIcon name={icon} size={22} color={color} style={styles.icon} />
 			{detail === undefined ? (
 				<Text style={[styles.label, { color }]}>{label}</Text>
 			) : (
@@ -41,7 +42,7 @@ export function ActionSheetRow({
 					<Text style={styles.detail}>{detail}</Text>
 				</View>
 			)}
-			{chevron && <Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />}
+			{chevron && <PixelIcon name="right" size={20} color={theme.colors.textSecondary} />}
 		</Pressable>
 	);
 }

@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-	Image,
 	KeyboardAvoidingView,
 	Platform,
 	ScrollView,
@@ -9,7 +8,7 @@ import {
 	View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Button } from '@/shared/components/ui/Button';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { BackendUrlField } from '@/shared/components/form/BackendUrlField';
@@ -18,7 +17,7 @@ import { LANDING_SHOWN } from '@/shared/constants/platform';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import type { FloatingIconMotion } from '@/features/auth/welcome/hooks/useFloatingIcons';
-import logo from '@/assets/logo/logo.png';
+import { PixelWordmark } from '@/shared/components/media/PixelWordmark';
 import { LANDING_INTRO } from '@/features/auth/welcome/utils/landingContent';
 import { FloatingIcon } from './FloatingIcon';
 import { LandingSections } from './LandingSections';
@@ -64,7 +63,7 @@ export function WelcomeView({
 				<ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
 					<View style={[styles.hero, heroHeight !== undefined && { minHeight: heroHeight }]}>
 						<View style={styles.header}>
-							<Image source={logo} style={styles.logo} resizeMode="contain" />
+							<PixelWordmark size={48} />
 							{LANDING_SHOWN && <Text style={styles.intro}>{LANDING_INTRO}</Text>}
 						</View>
 
@@ -79,8 +78,8 @@ export function WelcomeView({
 									hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
 									style={styles.serverToggle}
 								>
-									<Ionicons
-										name="settings-outline"
+									<PixelIcon
+										name="gear"
 										size={20}
 										color={showServer ? theme.colors.primary : theme.colors.textSecondary}
 									/>
@@ -142,10 +141,7 @@ const createStyles = (theme: Theme) =>
 			flex: 1,
 			justifyContent: 'center',
 			alignItems: 'center',
-		},
-		logo: {
-			width: 300,
-			height: 300,
+			gap: theme.spacing.xl,
 		},
 		intro: {
 			maxWidth: CONTENT_MAX_WIDTH.form,
@@ -184,7 +180,6 @@ const createStyles = (theme: Theme) =>
 		serverPanel: {
 			padding: theme.spacing.md,
 			backgroundColor: theme.colors.surface,
-			borderRadius: 12,
 			borderWidth: theme.borders.thin,
 			borderColor: theme.colors.border,
 		},

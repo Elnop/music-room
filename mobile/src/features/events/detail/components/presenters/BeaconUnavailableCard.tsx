@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { createBeaconCardStyles } from './beaconCardStyles';
 import { Text } from '@/shared/components/ui/Text';
@@ -11,7 +11,7 @@ export function BeaconUnavailableCard() {
 
 	return (
 		<View style={styles.card}>
-			<Ionicons name="radio-outline" size={24} color={theme.colors.textSecondary} />
+			<PixelIcon name="beacon" size={24} color={theme.colors.textSecondary} />
 			<View style={styles.info}>
 				<Text style={styles.label}>Diffuser la balise</Text>
 				<Text style={styles.description}>

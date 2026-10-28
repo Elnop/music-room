@@ -1,9 +1,8 @@
-import type { Ionicons } from '@expo/vector-icons';
+import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
 import { GENRE_COLORS } from '@/shared/theme/tokens';
 
 export type VisibilityLevel = 'public' | 'friends_only' | 'private';
 
-type IoniconsName = keyof typeof Ionicons.glyphMap;
 
 export type MusicGenre =
 	| 'pop'
@@ -30,17 +29,17 @@ export const MUSIC_GENRES: MusicGenre[] = [
 	'metal',
 ];
 
-export const GENRE_INFO: Record<MusicGenre, { label: string; icon: string; color: string }> = {
-	pop: { label: 'Pop', icon: '🎵', color: GENRE_COLORS.pop },
-	rock: { label: 'Rock', icon: '🎸', color: GENRE_COLORS.rock },
-	hiphop: { label: 'Hip-Hop', icon: '🎤', color: GENRE_COLORS.hiphop },
-	rnb: { label: 'R&B', icon: '💜', color: GENRE_COLORS.rnb },
-	jazz: { label: 'Jazz', icon: '🎷', color: GENRE_COLORS.jazz },
-	classical: { label: 'Classique', icon: '🎻', color: GENRE_COLORS.classical },
-	electronic: { label: 'Électro', icon: '🎧', color: GENRE_COLORS.electronic },
-	country: { label: 'Country', icon: '🤠', color: GENRE_COLORS.country },
-	latin: { label: 'Latino', icon: '💃', color: GENRE_COLORS.latin },
-	metal: { label: 'Metal', icon: '🤘', color: GENRE_COLORS.metal },
+export const GENRE_INFO: Record<MusicGenre, { label: string; color: string }> = {
+	pop: { label: 'Pop', color: GENRE_COLORS.pop },
+	rock: { label: 'Rock', color: GENRE_COLORS.rock },
+	hiphop: { label: 'Hip-Hop', color: GENRE_COLORS.hiphop },
+	rnb: { label: 'R&B', color: GENRE_COLORS.rnb },
+	jazz: { label: 'Jazz', color: GENRE_COLORS.jazz },
+	classical: { label: 'Classique', color: GENRE_COLORS.classical },
+	electronic: { label: 'Électro', color: GENRE_COLORS.electronic },
+	country: { label: 'Country', color: GENRE_COLORS.country },
+	latin: { label: 'Latino', color: GENRE_COLORS.latin },
+	metal: { label: 'Metal', color: GENRE_COLORS.metal },
 };
 
 export const MAX_GENRES = 5;
@@ -120,8 +119,8 @@ export const VISIBILITY_LABELS: Record<VisibilityLevel, string> = {
 	private: 'Privé',
 };
 
-export const VISIBILITY_ICONS: Record<VisibilityLevel, IoniconsName> = {
-	public: 'globe-outline',
-	friends_only: 'people-outline',
-	private: 'lock-closed-outline',
+export const VISIBILITY_ICONS: Record<VisibilityLevel, PixelSpriteName> = {
+	public: 'globe',
+	friends_only: 'crew',
+	private: 'lock',
 };

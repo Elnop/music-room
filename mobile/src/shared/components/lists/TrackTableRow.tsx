@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useContextMenu } from '@/shared/hooks/useContextMenu';
 import { useHover } from '@/shared/hooks/useHover';
@@ -71,10 +71,10 @@ export function TrackTableRow({
 							accessibilityLabel="Lancement"
 						/>
 					) : showPlay ? (
-						<Ionicons name="play" size={16} color={theme.colors.text} />
+						<PixelIcon name="play" size={16} color={theme.colors.text} />
 					) : isCurrent ? (
-						<Ionicons
-							name="volume-high"
+						<PixelIcon
+							name="volume"
 							size={16}
 							color={theme.colors.primary}
 							accessibilityLabel="En cours de lecture"
@@ -88,7 +88,7 @@ export function TrackTableRow({
 						<Image source={{ uri: track.albumArt }} style={styles.albumArt} />
 					) : (
 						<View style={[styles.albumArt, styles.albumArtPlaceholder]}>
-							<Ionicons name="musical-notes" size={18} color={theme.colors.textSecondary} />
+							<PixelIcon name="note" size={18} color={theme.colors.textSecondary} />
 						</View>
 					)}
 					<Text style={[styles.title, isCurrent && styles.titleCurrent]} numberOfLines={1}>
@@ -116,7 +116,7 @@ export function TrackTableRow({
 						style={[styles.dragHandle, !hovered && !isDragActive && styles.dragHandleIdle]}
 						accessibilityLabel="Réordonner"
 					>
-						<Ionicons name="reorder-three-outline" size={22} color={theme.colors.textSecondary} />
+						<PixelIcon name="grip" size={22} color={theme.colors.textSecondary} />
 					</Pressable>
 				)}
 			</View>
@@ -138,14 +138,11 @@ const createStyles = (theme: Theme, separator: string) =>
 		rowHighlighted: { backgroundColor: theme.colors.surface },
 		rowActive: {
 			backgroundColor: theme.colors.surfaceAlt,
-			shadowColor: theme.colors.shadow,
-			shadowOpacity: 0.25,
-			shadowRadius: 6,
-			shadowOffset: { width: 0, height: 3 },
+			...theme.shadows.large,
 		},
 		pressable: { flex: 1, flexDirection: 'row', alignItems: 'center' },
 		position: { fontSize: theme.typography.sizes.md, color: theme.colors.textSecondary },
-		albumArt: { width: 40, height: 40, borderRadius: 4, marginRight: 12 },
+		albumArt: { width: 40, height: 40, marginRight: 12 },
 		albumArtPlaceholder: {
 			backgroundColor: theme.colors.surfaceAlt,
 			justifyContent: 'center',
