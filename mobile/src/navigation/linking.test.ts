@@ -26,9 +26,9 @@ const fakeRef = (ready = true) => {
 beforeEach(() => clearPendingLink());
 
 describe('share link builders', () => {
-	it('builds zumik:// links', () => {
-		expect(playlistLink(ID)).toBe(`zumik://playlist/${ID}`);
-		expect(userLink(ID)).toBe(`zumik://user/${ID}`);
+	it('builds https links to the web app, which messaging apps make clickable', () => {
+		expect(playlistLink(ID)).toBe(`https://elnop.github.io/music-room/playlist/${ID}`);
+		expect(userLink(ID)).toBe(`https://elnop.github.io/music-room/user/${ID}`);
 	});
 });
 

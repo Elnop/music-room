@@ -116,21 +116,21 @@ describe('UserProfileOrchestrator', () => {
 		signIn('me');
 	});
 
-	it('shares the zumik:// link of the profile', async () => {
+	it('shares the https link of the profile', async () => {
 		const share = jest.spyOn(Share, 'share').mockResolvedValue({ action: Share.sharedAction });
 		renderScreen();
 
 		fireEvent.press(await screen.findByRole('button', { name: 'Partager' }));
 
 		await waitFor(() =>
-			expect(share).toHaveBeenCalledWith({ message: `Alice\nzumik://user/${ID}`, title: 'Alice' })
+			expect(share).toHaveBeenCalledWith({ message: `Alice\nhttps://elnop.github.io/music-room/user/${ID}`, title: 'Alice' })
 		);
 	});
 
 	it('shows initials, not a lock, when the avatar is hidden by privacy', async () => {
 		renderScreen();
 
-		expect(await screen.findByText('AL')).toBeTruthy();
+		expect(await screen.findByText('A')).toBeTruthy();
 	});
 
 	it('explains that following back makes a friend when only they follow me', async () => {
@@ -211,13 +211,13 @@ describe('UserProfileOrchestrator on wide screens', () => {
 		fireEvent.press(screen.getByRole('button', { name: 'Partager' }));
 
 		await waitFor(() => expect(friendsApi.followUser).toHaveBeenCalledWith(ID));
-		expect(share).toHaveBeenCalledWith({ message: `Alice\nzumik://user/${ID}`, title: 'Alice' });
+		expect(share).toHaveBeenCalledWith({ message: `Alice\nhttps://elnop.github.io/music-room/user/${ID}`, title: 'Alice' });
 	});
 
 	it('keeps what privacy hides hidden: initials, no bio, no tastes, no email', async () => {
 		renderScreen();
 
-		expect(await screen.findByText('AL')).toBeTruthy();
+		expect(await screen.findByText('A')).toBeTruthy();
 		expect(screen.getByText('Visible uniquement par ses amis')).toBeTruthy();
 		expect(screen.getByText('Visibles uniquement par ses amis')).toBeTruthy();
 		expect(screen.queryByText('Email')).toBeNull();

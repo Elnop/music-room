@@ -20,7 +20,7 @@ Every account has the password `Password123!` and an already verified email: ema
 | `plankton@zumik.dev` | Plankton | Fully private profile, private playlist shared with Karen |
 | `karen@zumik.dev` | Karen | Plankton's friend and collaborator |
 | `gary@zumik.dev` | Gary | Follows Bob without being followed back, no music genre |
-| `mrspuff@zumik.dev` | Mme Puff | Isolated account: no friend, no playlist |
+| `mrspuff@zumik.dev` | Mme Puff | Isolated account: no friend, no playlist; shares pop and rock with Bob, so she heads his « Profils aux goûts proches » |
 | `pearl@zumik.dev` | Perle | M. Krabs's friend, added a track to his playlist |
 
 ## Friends and follows

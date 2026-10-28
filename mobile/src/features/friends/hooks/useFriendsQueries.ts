@@ -26,6 +26,15 @@ export function useControlPermissions(enabled = true) {
 	});
 }
 
+export function useSimilarProfiles(enabled = true) {
+	const signedIn = useSession(session => session.isAuthenticated);
+	return useQuery({
+		queryKey: queryKeys.friends.recommendations(),
+		queryFn: () => friendsApi.getRecommendations(),
+		enabled: signedIn && enabled,
+	});
+}
+
 export function useFollowStatus(userId: string, enabled = true) {
 	const signedIn = useSession(session => session.isAuthenticated);
 	return useQuery({

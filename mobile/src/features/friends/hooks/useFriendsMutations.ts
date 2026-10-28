@@ -35,6 +35,7 @@ export function useFollowMutation() {
 			client.setQueryData(queryKeys.friends.status(userId), data.status);
 			client.invalidateQueries({ queryKey: queryKeys.friends.list() });
 			client.invalidateQueries({ queryKey: queryKeys.friends.stats() });
+			client.invalidateQueries({ queryKey: queryKeys.friends.recommendations() });
 		},
 	});
 }

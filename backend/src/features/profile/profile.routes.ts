@@ -14,6 +14,7 @@ router.use(authMiddleware);
 router.patch('/', profile.updateProfile);
 router.get('/', profile.getOwnProfile);
 router.get('/search', profile.searchUsers);
+router.get('/recommendations', profile.getRecommendations);
 
 router.get('/privacy', settings.getPrivacySettings);
 router.put('/privacy', settings.updatePrivacySettings);
