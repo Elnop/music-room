@@ -3,8 +3,10 @@ import {
 	isCancelledResponse,
 	statusCodes,
 } from '@react-native-google-signin/google-signin';
+import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 import { logger } from '@/shared/utils/logger';
+import { googleIosClientId } from '@/features/auth/utils/googleIosClientId';
 import { SIGN_IN_CANCELLED } from './signInCancelled';
 
 const NO_ID_TOKEN = 'No ID token received from Google Sign-In. Please try again.';
@@ -28,9 +30,15 @@ if (!WEB_CLIENT_ID) {
 	logger.warn('EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID is not defined. Google login will not work.');
 }
 
+// iOS refuses to configure Google Sign-In without its own client ID and throws at app start.
+const IOS_CLIENT_ID =
+	Platform.OS === 'ios'
+		? googleIosClientId(Constants.expoConfig?.extra?.EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME)
+		: undefined;
+
 /** Called once at app start; the web client ID gives an ID token on Android and iOS alike. */
 export function configureGoogleSignIn(): void {
-	GoogleSignin.configure({ webClientId: WEB_CLIENT_ID, offlineAccess: false });
+	GoogleSignin.configure({ webClientId: WEB_CLIENT_ID, iosClientId: IOS_CLIENT_ID, offlineAccess: false });
 }
 
 /** Rejects with Error(SIGN_IN_CANCELLED) when the user cancels. */
