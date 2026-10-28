@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Text } from '@/shared/components/ui/Text';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import type { Theme } from '@/shared/theme/types';
@@ -13,7 +13,7 @@ export function AddTrackRow({ onPress }: { onPress: () => void }) {
 	return (
 		<Pressable style={styles.row} onPress={onPress} accessibilityLabel="Ajouter un titre">
 			<View style={styles.icon}>
-				<Ionicons name="add" size={24} color={theme.colors.textSecondary} />
+				<PixelIcon name="plus" size={24} color={theme.colors.textSecondary} />
 			</View>
 			<Text style={styles.text}>Ajouter un titre</Text>
 		</Pressable>

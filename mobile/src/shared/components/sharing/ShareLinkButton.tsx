@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { Pressable } from '@/shared/components/ui/Pressable';
@@ -22,7 +22,7 @@ export function ShareLinkButton({ url, title, style }: ShareLinkButtonProps) {
 
 	return (
 		<Pressable style={[styles.button, style]} onPress={handlePress} accessibilityLabel="Partager">
-			<Ionicons name="share-social-outline" size={16} color={theme.colors.text} />
+			<PixelIcon name="share" size={16} color={theme.colors.text} />
 			<Text style={styles.label}>Partager</Text>
 		</Pressable>
 	);

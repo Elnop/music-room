@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Swipeable } from 'react-native-gesture-handler';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import type { Theme } from '@/shared/theme/types';
@@ -33,7 +33,7 @@ export function SwipeableUserItem({ user, role, onRemove }: SwipeableUserItemPro
 				onPress={() => onRemove(user.id)}
 				accessibilityLabel="Retirer"
 			>
-				<Ionicons name="person-remove-outline" size={24} color={theme.colors.onColor} />
+				<PixelIcon name="userRemove" size={24} color={theme.colors.onColor} />
 				<Text style={styles.removeText}>Retirer</Text>
 			</Pressable>
 		);

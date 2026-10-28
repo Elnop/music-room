@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { sheetHeaderStyles } from '@/features/queue/utils/sheetHeaderStyles';
+import { keycap, pixelCaption, pixelRow } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
@@ -26,6 +27,7 @@ export const createPickerStyles = (
 			textAlign: 'center',
 		},
 		retryButton: {
+			...keycap(theme),
 			paddingHorizontal: 20,
 			paddingVertical: 10,
 			backgroundColor: theme.colors.primary,
@@ -38,11 +40,7 @@ export const createPickerStyles = (
 			paddingHorizontal: 16,
 			paddingTop: 16,
 			paddingBottom: 8,
-			fontSize: 12,
-			fontFamily: FONT_FAMILIES.semibold,
-			letterSpacing: 1,
-			textTransform: 'uppercase',
-			color: theme.colors.textSecondary,
+			...pixelCaption(theme),
 		},
 		ownerName: {
 			paddingHorizontal: 16,
@@ -57,13 +55,7 @@ export const createPickerStyles = (
 			paddingVertical: 8,
 			color: theme.colors.textSecondary,
 		},
-		row: {
-			flexDirection: 'row',
-			alignItems: 'center',
-			paddingHorizontal: 16,
-			paddingVertical: 12,
-			gap: 12,
-		},
+		row: pixelRow(theme),
 		offlineRow: {
 			opacity: 0.4,
 		},

@@ -1,9 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { HEADER_HIT_SLOP, type createStyles } from './playerModalStyles';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
 
 interface PlayerHeaderProps {
 	styles: ReturnType<typeof createStyles>;
@@ -37,7 +36,7 @@ export function PlayerHeader({ styles, colors, dialog = false, onClose }: Player
 			>
 				<View style={styles.headerButton}>
 					{dialog ? (
-						<Ionicons name="close-sharp" size={24} color={colors.text} />
+						<PixelIcon name="close" size={24} color={colors.text} />
 					) : (
 						<PixelIcon name="down" color={colors.text} />
 					)}

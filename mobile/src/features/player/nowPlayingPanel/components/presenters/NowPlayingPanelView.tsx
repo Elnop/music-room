@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScrollView, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import { Pressable } from '@/shared/components/ui/Pressable';
@@ -45,7 +45,7 @@ export function NowPlayingPanelView({ data }: NowPlayingPanelViewProps) {
 					nativeID={PANEL_CLOSE_ID}
 					accessibilityLabel="Fermer le panneau"
 				>
-					<Ionicons name="close" size={22} color={theme.colors.text} />
+					<PixelIcon name="close" size={22} color={theme.colors.text} />
 				</Pressable>
 			</View>
 
@@ -74,7 +74,7 @@ export function NowPlayingPanelView({ data }: NowPlayingPanelViewProps) {
 				) : (
 					<EmptyState
 						compact
-						icon="musical-notes-outline"
+						icon="note"
 						message="Rien en lecture : choisissez un titre pour commencer"
 					/>
 				)}

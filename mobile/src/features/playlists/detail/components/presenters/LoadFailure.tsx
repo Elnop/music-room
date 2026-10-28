@@ -17,11 +17,11 @@ export function LoadFailure({ notFound, onRetry }: LoadFailureProps) {
 	return (
 		<View style={styles.failure}>
 			{notFound ? (
-				<EmptyState icon="lock-closed-outline" message="Playlist introuvable ou inaccessible" />
+				<EmptyState icon="lock" message="Playlist introuvable ou inaccessible" />
 			) : (
 				<>
 					<EmptyState
-						icon="cloud-offline-outline"
+						icon="alert"
 						message="Impossible de charger la playlist"
 						style={styles.failureMessage}
 					/>

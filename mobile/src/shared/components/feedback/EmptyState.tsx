@@ -1,7 +1,9 @@
 import React from 'react';
 import { View, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
+import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import { keycap } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Text } from '@/shared/components/ui/Text';
@@ -13,7 +15,7 @@ interface EmptyStateAction {
 
 interface EmptyStateProps {
 	message: string;
-	icon?: keyof typeof Ionicons.glyphMap;
+	icon?: PixelSpriteName;
 	/** A button under the message, leading out of the empty state. */
 	action?: EmptyStateAction;
 	/** A section's empty state among others (wide screens): it keeps to its content's height. */
@@ -28,9 +30,9 @@ export function EmptyState({ message, icon, action, compact = false, style }: Em
 	return (
 		<View style={[styles.container, compact && styles.compact, style]}>
 			{icon && (
-				<Ionicons
+				<PixelIcon
 					name={icon}
-					size={compact ? 36 : 64}
+					size={compact ? 36 : 60}
 					color={theme.colors.textSecondary}
 					style={[styles.icon, compact && styles.compactIcon]}
 				/>
@@ -73,6 +75,7 @@ const createStyles = (theme: Theme) =>
 			fontFamily: theme.typography.families.medium,
 		},
 		action: {
+			...keycap(theme),
 			marginTop: theme.spacing.md,
 			paddingVertical: theme.spacing.sm + 4,
 			paddingHorizontal: theme.spacing.lg,

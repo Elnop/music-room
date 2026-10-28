@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
@@ -37,8 +37,8 @@ export function PlaylistSelector({ playlists, selectedId, onSelect }: PlaylistSe
 							accessibilityLabel={`Playlist liée : ${option.name}`}
 							haptic="selection"
 						>
-							<Ionicons
-								name={selected ? 'radio-button-on' : 'radio-button-off'}
+							<PixelIcon
+								name={selected ? 'radioOn' : 'radioOff'}
 								size={18}
 								color={selected ? theme.colors.primary : theme.colors.textSecondary}
 							/>

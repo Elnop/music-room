@@ -1,6 +1,6 @@
 import React from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { Avatar } from '@/shared/components/media/Avatar';
 import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
@@ -47,13 +47,13 @@ export function UserResults({ results, isSearching, busy, onAdd }: UserResultsPr
 								{item.displayName && <Text style={styles.displayName}>{item.displayName}</Text>}
 							</View>
 							<View style={styles.addButton}>
-								<Ionicons name="add" size={24} color={theme.colors.onColor} />
+								<PixelIcon name="plus" size={24} color={theme.colors.onColor} />
 							</View>
 						</Pressable>
 					)}
 				/>
 			) : (
-				<EmptyState icon="search-outline" style={styles.empty} message="Aucun utilisateur trouvé" />
+				<EmptyState icon="search" style={styles.empty} message="Aucun utilisateur trouvé" />
 			)}
 		</View>
 	);

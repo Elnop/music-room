@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import {
 	WideProfileHeader,
 	wideProfileActionStyle,
@@ -74,8 +74,8 @@ export function UserProfileWideHeader({
 							style={styles.action}
 							accessibilityLabel={followStatus.isFollowing ? 'Ne plus suivre' : 'Suivre'}
 							icon={
-								<Ionicons
-									name={followStatus.isFollowing ? 'checkmark' : 'person-add-outline'}
+								<PixelIcon
+									name={followStatus.isFollowing ? 'check' : 'userAdd'}
 									size={18}
 									color={followStatus.isFollowing ? theme.colors.text : theme.colors.onColor}
 								/>
@@ -88,7 +88,7 @@ export function UserProfileWideHeader({
 						variant="secondary"
 						onPress={share}
 						style={styles.action}
-						icon={<Ionicons name="share-social-outline" size={18} color={theme.colors.text} />}
+						icon={<PixelIcon name="share" size={18} color={theme.colors.text} />}
 					>
 						Partager
 					</Button>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { useContextMenu } from '@/shared/hooks/useContextMenu';
@@ -12,9 +12,8 @@ import type { Theme } from '@/shared/theme/types';
 import type { Track } from '@/types/track.types';
 import { Text } from '@/shared/components/ui/Text';
 import { FONT_FAMILIES } from '@/shared/theme/fonts';
-import { pixelFrame } from '@/shared/theme/pixelFrame';
+import { pixelRow } from '@/shared/theme/pixelFrame';
 import { formatDuration } from '@/shared/utils/formatters';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
 
 interface SwipeableTrackItemProps {
 	track: Track;
@@ -68,7 +67,7 @@ export function SwipeableTrackItem({
 			onPress={() => onDelete(track.id)}
 			accessibilityLabel={`Supprimer ${track.title}`}
 		>
-			<Ionicons name="trash-outline" size={24} color={theme.colors.onColor} />
+			<PixelIcon name="trash" size={24} color={theme.colors.onColor} />
 			<Text style={styles.deleteText}>Supprimer</Text>
 		</Pressable>
 	);
@@ -147,8 +146,8 @@ export function SwipeableTrackItem({
 						)}
 
 						{isCurrent && !isPending && (
-							<Ionicons
-								name="volume-high"
+							<PixelIcon
+								name="volume"
 								size={18}
 								color={theme.colors.primary}
 								style={styles.playingIcon}
@@ -181,19 +180,12 @@ export function SwipeableTrackItem({
 
 const createStyles = (theme: Theme) =>
 	StyleSheet.create({
-		trackContainer: {
-			flexDirection: 'row',
-			alignItems: 'center',
-			...pixelFrame(theme),
-			padding: theme.spacing.sm,
-			marginHorizontal: theme.spacing.md,
-			marginBottom: theme.spacing.md,
-			backgroundColor: theme.colors.surface,
-		},
+		trackContainer: pixelRow(theme),
 		trackPressable: {
 			flex: 1,
 			flexDirection: 'row',
 			alignItems: 'center',
+			gap: theme.spacing.md,
 		},
 		trackContainerCurrent: {
 			backgroundColor: theme.colors.surfaceAlt,
@@ -201,7 +193,6 @@ const createStyles = (theme: Theme) =>
 		albumArt: {
 			width: 42,
 			height: 42,
-			marginRight: 12,
 		},
 		albumArtPlaceholder: {
 			backgroundColor: theme.colors.border,
@@ -210,7 +201,6 @@ const createStyles = (theme: Theme) =>
 		},
 		trackInfo: {
 			flex: 1,
-			marginRight: 8,
 		},
 		trackTitle: {
 			fontSize: 15,

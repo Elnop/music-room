@@ -85,7 +85,7 @@ export function PlaylistDetailView({
 				]}
 				ListEmptyComponent={
 					<EmptyState
-						icon="musical-notes-outline"
+						icon="note"
 						message="Aucun titre dans cette playlist pour l'instant"
 					/>
 				}

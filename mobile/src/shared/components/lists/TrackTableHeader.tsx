@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { Theme } from '@/shared/theme/types';
@@ -24,8 +24,8 @@ export function TrackTableHeader() {
 				<Text style={styles.label}>Artiste</Text>
 			</View>
 			<View style={columns.duration}>
-				<Ionicons
-					name="time-outline"
+				<PixelIcon
+					name="clock"
 					size={16}
 					color={theme.colors.textSecondary}
 					accessibilityLabel="Durée"

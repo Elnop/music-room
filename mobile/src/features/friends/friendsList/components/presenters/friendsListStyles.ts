@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { pixelFrame, pixelRow } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 
 export const createFriendsListStyles = (theme: Theme) =>
@@ -13,11 +14,11 @@ export const createFriendsListStyles = (theme: Theme) =>
 			paddingBottom: theme.spacing.sm,
 		},
 		tabsContainer: {
+			...pixelFrame(theme),
 			flexDirection: 'row',
 			backgroundColor: theme.colors.surface,
-			padding: 4,
+			padding: theme.borders.thick,
 			marginBottom: theme.spacing.md,
-			...theme.shadows.small,
 		},
 		tab: {
 			flex: 1,
@@ -42,18 +43,12 @@ export const createFriendsListStyles = (theme: Theme) =>
 		listContent: {
 			paddingBottom: theme.spacing.xl,
 		},
-		userItem: {
-			flexDirection: 'row',
-			alignItems: 'center',
-			paddingVertical: 8,
-			paddingHorizontal: theme.spacing.md,
-		},
+		userItem: pixelRow(theme),
 		userItemProcessing: {
 			opacity: 0.7,
 		},
 		userInfo: {
 			flex: 1,
-			marginLeft: theme.spacing.md,
 		},
 		username: {
 			fontSize: theme.typography.sizes.md,
@@ -118,6 +113,7 @@ export const createFriendsListStyles = (theme: Theme) =>
 		},
 		// Each cell grows by 1/columns, so a last row that is not full keeps the cell width.
 		gridCell: {
+			...pixelFrame(theme),
 			backgroundColor: theme.colors.surface,
 			marginBottom: theme.spacing.sm,
 		},

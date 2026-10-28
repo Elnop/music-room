@@ -43,7 +43,7 @@ export function HomeView({ screen, nearbyEvents, similarProfiles, actionsFor }: 
 				<>
 					<View style={styles.section}>
 						<SectionHeader
-							icon="people-outline"
+							icon="crew"
 							title="Playlists de vos amis"
 							count={friendsCount}
 						/>
@@ -57,7 +57,7 @@ export function HomeView({ screen, nearbyEvents, similarProfiles, actionsFor }: 
 			)}
 			<View style={styles.section}>
 				<SectionHeader
-					icon="globe-outline"
+					icon="globe"
 					title="Playlists publiques"
 					count={screen.publicPlaylists.length}
 					open={screen.publicOpen}
@@ -74,7 +74,7 @@ export function HomeView({ screen, nearbyEvents, similarProfiles, actionsFor }: 
 						/>
 					) : (
 						<EmptyState
-							icon="globe-outline"
+							icon="globe"
 							message="Aucune playlist publique disponible"
 							compact={isWide}
 						/>

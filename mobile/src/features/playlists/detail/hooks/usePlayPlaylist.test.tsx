@@ -22,8 +22,6 @@ function Harness({ playlistId }: { playlistId: string }) {
 
 const renderButton = async (playlistId = 'p1') => {
 	render(<Harness playlistId={playlistId} />);
-	// Ionicons loads its font asynchronously and re-renders once it is ready.
-	await act(async () => {});
 };
 
 beforeEach(() => {

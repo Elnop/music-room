@@ -1,13 +1,14 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
+import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { Text } from '@/shared/components/ui/Text';
 
 interface SectionHeaderProps {
-	icon: keyof typeof Ionicons.glyphMap;
+	icon: PixelSpriteName;
 	/** Read by screen readers; on screen the icon and the count stand for it. */
 	title: string;
 	/** Shown when above 0. */
@@ -24,7 +25,7 @@ export function SectionHeader({ icon, title, count, open, onToggle, action }: Se
 
 	const label = (
 		<View style={styles.label}>
-			<Ionicons name={icon} size={18} color={theme.colors.textSecondary} />
+			<PixelIcon name={icon} size={18} color={theme.colors.textSecondary} />
 			{count > 0 && <Text style={styles.count}>{count}</Text>}
 		</View>
 	);
@@ -41,8 +42,8 @@ export function SectionHeader({ icon, title, count, open, onToggle, action }: Se
 	return (
 		<Pressable style={styles.header} onPress={onToggle} accessibilityLabel={title}>
 			{label}
-			<Ionicons
-				name={open ? 'chevron-down-sharp' : 'chevron-forward-sharp'}
+			<PixelIcon
+				name={open ? 'down' : 'right'}
 				size={20}
 				color={theme.colors.textSecondary}
 			/>

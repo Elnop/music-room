@@ -1,20 +1,29 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
-import { useTheme } from '@/shared/theme/ThemeContext';
+import { pixelFrame } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
+import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { MusicGenre } from '@/types/user.types';
 import { GENRE_INFO } from '@/types/user.types';
 import { Text } from './Text';
+
+const SIZES = {
+	sm: { padding: 6, fontSize: 12, icon: 12 },
+	md: { padding: 8, fontSize: 14, icon: 18 },
+	lg: { padding: 10, fontSize: 16, icon: 24 },
+} as const;
 
 interface GenreChipProps {
 	genre: MusicGenre;
 	selected?: boolean;
 	disabled?: boolean;
 	onPress?: () => void;
-	size?: 'sm' | 'md' | 'lg';
+	size?: keyof typeof SIZES;
 }
 
+/** A genre as a pixel tile: its sprite and its name, filled with its colour once picked. */
 export function GenreChip({
 	genre,
 	selected = false,
@@ -22,33 +31,28 @@ export function GenreChip({
 	onPress,
 	size = 'md',
 }: GenreChipProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createStyles(theme, size), [theme, size]);
-	const genreInfo = GENRE_INFO[genre];
-
-	const chipStyle = [
-		styles.chip,
-		selected && styles.chipSelected,
-		selected && { backgroundColor: genreInfo.color },
-		disabled && styles.chipDisabled,
-	];
-
-	const textStyle = [
-		styles.label,
-		selected && styles.labelSelected,
-		disabled && styles.labelDisabled,
-	];
+	const { styles, theme } = useThemedStyles(createStyles);
+	const { label, color } = GENRE_INFO[genre];
+	const ink = selected ? theme.colors.onColor : color;
+	const { padding, fontSize, icon } = SIZES[size];
 
 	const content = (
-		<View style={chipStyle}>
-			<Text style={styles.icon}>{genreInfo.icon}</Text>
-			<Text style={textStyle}>{genreInfo.label}</Text>
+		<View
+			style={[
+				styles.chip,
+				{ padding, paddingHorizontal: padding * 1.5 },
+				selected && { backgroundColor: color },
+				disabled && styles.disabled,
+			]}
+		>
+			<PixelIcon name={genre} size={icon} color={ink} />
+			<Text style={[styles.label, { fontSize }, selected && styles.labelSelected]}>{label}</Text>
 		</View>
 	);
 
 	if (onPress && !disabled) {
 		return (
-			<Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={genreInfo.label}>
+			<Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={label}>
 				{content}
 			</Pressable>
 		);
@@ -57,46 +61,16 @@ export function GenreChip({
 	return content;
 }
 
-const createStyles = (theme: Theme, size: 'sm' | 'md' | 'lg') => {
-	const sizeMap = {
-		sm: { paddingH: 10, paddingV: 6, fontSize: 12, iconSize: 14 },
-		md: { paddingH: 14, paddingV: 8, fontSize: 14, iconSize: 16 },
-		lg: { paddingH: 18, paddingV: 10, fontSize: 16, iconSize: 20 },
-	};
-
-	const s = sizeMap[size];
-
-	return StyleSheet.create({
+const createStyles = (theme: Theme) =>
+	StyleSheet.create({
 		chip: {
+			...pixelFrame(theme),
 			flexDirection: 'row',
 			alignItems: 'center',
-			paddingHorizontal: s.paddingH,
-			paddingVertical: s.paddingV,
-			backgroundColor: theme.colors.surface,
-			borderWidth: 1,
-			borderColor: theme.colors.border,
+			gap: theme.spacing.xs,
+			backgroundColor: theme.colors.surfaceAlt,
 		},
-		chipSelected: {
-			borderColor: 'transparent',
-		},
-		chipDisabled: {
-			opacity: 0.5,
-		},
-		icon: {
-			fontSize: s.iconSize,
-			marginRight: theme.spacing.xs,
-		},
-		label: {
-			fontSize: s.fontSize,
-			color: theme.colors.text,
-			fontFamily: theme.typography.families.medium,
-		},
-		labelSelected: {
-			color: theme.colors.onColor,
-			fontFamily: theme.typography.families.semibold,
-		},
-		labelDisabled: {
-			color: theme.colors.textSecondary,
-		},
+		disabled: { opacity: 0.5 },
+		label: { color: theme.colors.text, fontFamily: theme.typography.families.medium },
+		labelSelected: { color: theme.colors.onColor, fontFamily: theme.typography.families.semibold },
 	});
-};

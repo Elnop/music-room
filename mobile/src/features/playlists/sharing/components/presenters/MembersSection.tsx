@@ -45,7 +45,7 @@ export function MembersSection({ title, members, emptyMessage, onRemove }: Membe
 				/>
 			) : (
 				emptyMessage && (
-					<EmptyState icon="people-outline" style={styles.empty} message={emptyMessage} />
+					<EmptyState icon="crew" style={styles.empty} message={emptyMessage} />
 				)
 			)}
 		</View>

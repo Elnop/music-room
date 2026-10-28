@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useContextMenu } from '@/shared/hooks/useContextMenu';
 import { useHover } from '@/shared/hooks/useHover';
@@ -71,10 +71,10 @@ export function TrackTableRow({
 							accessibilityLabel="Lancement"
 						/>
 					) : showPlay ? (
-						<Ionicons name="play" size={16} color={theme.colors.text} />
+						<PixelIcon name="play" size={16} color={theme.colors.text} />
 					) : isCurrent ? (
-						<Ionicons
-							name="volume-high"
+						<PixelIcon
+							name="volume"
 							size={16}
 							color={theme.colors.primary}
 							accessibilityLabel="En cours de lecture"
@@ -88,7 +88,7 @@ export function TrackTableRow({
 						<Image source={{ uri: track.albumArt }} style={styles.albumArt} />
 					) : (
 						<View style={[styles.albumArt, styles.albumArtPlaceholder]}>
-							<Ionicons name="musical-notes" size={18} color={theme.colors.textSecondary} />
+							<PixelIcon name="note" size={18} color={theme.colors.textSecondary} />
 						</View>
 					)}
 					<Text style={[styles.title, isCurrent && styles.titleCurrent]} numberOfLines={1}>
@@ -116,7 +116,7 @@ export function TrackTableRow({
 						style={[styles.dragHandle, !hovered && !isDragActive && styles.dragHandleIdle]}
 						accessibilityLabel="Réordonner"
 					>
-						<Ionicons name="reorder-three-outline" size={22} color={theme.colors.textSecondary} />
+						<PixelIcon name="grip" size={22} color={theme.colors.textSecondary} />
 					</Pressable>
 				)}
 			</View>

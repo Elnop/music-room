@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Text } from '@/shared/components/ui/Text';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { Theme } from '@/shared/theme/types';
@@ -11,7 +11,7 @@ export function FeatureCard({ title, description, icon }: LandingFeature) {
 
 	return (
 		<View style={styles.card}>
-			<Ionicons name={icon} size={24} color={theme.colors.primary} />
+			<PixelIcon name={icon} size={24} color={theme.colors.primary} />
 			<Text style={styles.title}>{title}</Text>
 			<Text style={styles.description}>{description}</Text>
 		</View>

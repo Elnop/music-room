@@ -1,15 +1,17 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
+import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import { keycap, pixelFrame } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 import { Text } from '@/shared/components/ui/Text';
 
 interface ProfileNavigationItemProps {
 	title: string;
 	subtitle: string;
-	icon: keyof typeof Ionicons.glyphMap;
+	icon: PixelSpriteName;
 	onPress: () => void;
 }
 
@@ -26,13 +28,13 @@ export function ProfileNavigationItem({
 		<View style={styles.buttonContainer}>
 			<Pressable style={styles.menuButton} onPress={onPress} accessibilityLabel={title}>
 				<View style={styles.iconContainer}>
-					<Ionicons name={icon} size={20} color={theme.colors.primary} />
+					<PixelIcon name={icon} size={20} color={theme.colors.primary} />
 				</View>
 				<View style={styles.textContainer}>
 					<Text style={styles.title}>{title}</Text>
 					<Text style={styles.subtitle}>{subtitle}</Text>
 				</View>
-				<Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
+				<PixelIcon name="right" size={20} color={theme.colors.textSecondary} />
 			</Pressable>
 		</View>
 	);
@@ -45,15 +47,17 @@ const createStyles = (theme: Theme) =>
 			marginTop: theme.spacing.md,
 		},
 		menuButton: {
+			...keycap(theme),
 			flexDirection: 'row',
 			alignItems: 'center',
-			backgroundColor: theme.colors.surface,
-			padding: theme.spacing.lg,
+			backgroundColor: theme.colors.surfaceAlt,
+			padding: theme.spacing.md,
 		},
 		iconContainer: {
 			width: 40,
 			height: 40,
-			backgroundColor: theme.colors.primary + '15',
+			...pixelFrame(theme),
+			backgroundColor: theme.colors.background,
 			alignItems: 'center',
 			justifyContent: 'center',
 			marginRight: theme.spacing.md,

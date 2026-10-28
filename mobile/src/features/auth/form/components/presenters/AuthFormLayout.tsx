@@ -1,8 +1,8 @@
 import React from 'react';
-import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
-import logo from '@/assets/logo/logo.png';
+import { PixelWordmark } from '@/shared/components/media/PixelWordmark';
 import { Text } from '@/shared/components/ui/Text';
 
 interface AuthFormLayoutProps {
@@ -42,11 +42,7 @@ export function AuthFormLayout({
 				>
 					<View style={styles.content}>
 						<View style={styles.header}>
-							<Image
-								source={logo}
-								style={{ width: logoSize, height: logoSize }}
-								resizeMode="contain"
-							/>
+							<PixelWordmark size={Math.round(logoSize / 5)} />
 						</View>
 
 						<View style={styles.form}>{children}</View>

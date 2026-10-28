@@ -19,8 +19,6 @@ describe('Artwork', () => {
 
 	it.each([null, undefined, ''])('draws a local placeholder for %p, with no image', async uri => {
 		render(<Artwork uri={uri} size={48} />);
-		// Ionicons loads its font asynchronously and re-renders once it is ready.
-		await act(async () => {});
 		expect(screen.getByTestId('artwork-placeholder')).toBeTruthy();
 		expect(screen.UNSAFE_queryAllByType(Image)).toHaveLength(0);
 	});

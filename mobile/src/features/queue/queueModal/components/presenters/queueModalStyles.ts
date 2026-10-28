@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { sheetHeaderStyles } from '@/features/queue/utils/sheetHeaderStyles';
+import { pixelCaption, pixelRow } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
@@ -24,11 +25,7 @@ export const createModalStyles = (
 			paddingHorizontal: 16,
 			paddingTop: 16,
 			paddingBottom: 8,
-			fontSize: 12,
-			fontFamily: FONT_FAMILIES.semibold,
-			letterSpacing: 1,
-			textTransform: 'uppercase',
-			color: theme.colors.textSecondary,
+			...pixelCaption(theme),
 		},
 		nothingNext: {
 			padding: 16,
@@ -39,33 +36,21 @@ export const createModalStyles = (
 
 export const createRowStyles = (theme: Theme, separator: string) =>
 	StyleSheet.create({
-		row: {
-			flexDirection: 'row',
-			alignItems: 'center',
-			padding: 12,
-			backgroundColor: theme.colors.surface,
-			borderBottomWidth: 1,
-			borderBottomColor: separator,
-		},
+		row: pixelRow(theme),
 		rowMain: {
 			flex: 1,
 			flexDirection: 'row',
 			alignItems: 'center',
+			gap: theme.spacing.md,
 		},
 		rowCurrent: {
 			backgroundColor: theme.colors.surfaceAlt,
-			borderLeftWidth: 4,
-			borderLeftColor: theme.colors.primary,
 		},
 		rowActive: {
-			...theme.shadows.medium,
-		},
-		albumArt: {
-			marginRight: 12,
+			...theme.shadows.large,
 		},
 		trackInfo: {
 			flex: 1,
-			marginRight: 8,
 		},
 		trackTitle: {
 			fontSize: 15,

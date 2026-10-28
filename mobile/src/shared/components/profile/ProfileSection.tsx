@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import { pixelCaption, pixelFrame } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 import { Text } from '@/shared/components/ui/Text';
 
@@ -43,6 +44,7 @@ export function ProfileSection({
 const createStyles = (theme: Theme) =>
 	StyleSheet.create({
 		container: {
+			...pixelFrame(theme),
 			backgroundColor: theme.colors.surface,
 			marginHorizontal: theme.spacing.lg,
 			marginBottom: theme.spacing.md,
@@ -57,11 +59,7 @@ const createStyles = (theme: Theme) =>
 			paddingBottom: theme.spacing.sm,
 		},
 		title: {
-			fontSize: 13,
-			fontFamily: theme.typography.families.semibold,
-			color: theme.colors.textSecondary,
-			textTransform: 'uppercase',
-			letterSpacing: 0.5,
+			...pixelCaption(theme),
 		},
 		prominentTitle: {
 			fontSize: theme.typography.sizes.lg,

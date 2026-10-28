@@ -1,7 +1,9 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
+import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
 import type { ToastConfigParams } from 'react-native-toast-message';
+import { pixelFrame } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Text } from '@/shared/components/ui/Text';
@@ -9,11 +11,11 @@ import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
 export type ToastKind = 'success' | 'error' | 'info' | 'warning';
 
-const ICONS: Record<ToastKind, keyof typeof Ionicons.glyphMap> = {
-	success: 'checkmark-circle',
-	error: 'alert-circle',
-	info: 'information-circle',
-	warning: 'warning',
+const ICONS: Record<ToastKind, PixelSpriteName> = {
+	success: 'check',
+	error: 'alert',
+	info: 'info',
+	warning: 'alert',
 };
 
 interface ThemedToastProps {
@@ -34,9 +36,9 @@ export function ThemedToast({ kind, params, theme }: ThemedToastProps) {
 			accessibilityRole="alert"
 			accessibilityLabel={[params.text1, params.text2].filter(Boolean).join('. ')}
 			accessibilityLiveRegion="polite"
-			style={[styles.container, { borderLeftColor: color }]}
+			style={[styles.container, { borderColor: color }]}
 		>
-			<Ionicons name={ICONS[kind]} size={22} color={color} style={styles.icon} />
+			<PixelIcon name={ICONS[kind]} size={22} color={color} style={styles.icon} />
 			<View style={styles.texts}>
 				{params.text1 ? <Text style={styles.text1}>{params.text1}</Text> : null}
 				{params.text2 ? <Text style={styles.text2}>{params.text2}</Text> : null}
@@ -52,8 +54,8 @@ const createStyles = (theme: Theme) =>
 			alignItems: 'center',
 			width: '90%',
 			minHeight: 56,
+			...pixelFrame(theme),
 			backgroundColor: theme.colors.surface,
-			borderLeftWidth: 4,
 			paddingHorizontal: theme.spacing.md,
 			paddingVertical: theme.spacing.sm,
 			...theme.shadows.medium,

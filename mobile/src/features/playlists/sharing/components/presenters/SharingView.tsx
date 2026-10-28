@@ -42,7 +42,7 @@ export function SharingView({ sharing }: { sharing: PlaylistSharing }) {
 					<View style={styles.settings}>
 						<Text style={shared.sectionTitle}>Paramètres</Text>
 						<SettingRow
-							icon={mode.isPrivate ? 'lock-closed' : 'globe'}
+							icon={mode.isPrivate ? 'lock' : 'globe'}
 							label="Visibilité"
 							description={
 								mode.isPrivate
@@ -54,7 +54,7 @@ export function SharingView({ sharing }: { sharing: PlaylistSharing }) {
 							busy={settings.isUpdating}
 						/>
 						<SettingRow
-							icon={mode.isEditRestricted ? 'pencil' : 'create'}
+							icon={mode.isEditRestricted ? 'pencil' : 'pencil'}
 							label="Mode de modification"
 							description={
 								mode.isEditRestricted

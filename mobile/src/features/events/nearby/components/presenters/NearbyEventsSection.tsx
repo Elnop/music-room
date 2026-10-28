@@ -45,7 +45,7 @@ export function NearbyEventsSection({ nearby }: { nearby: NearbyEvents }) {
 							accessibilityLabel={`${event.name}, ${proximity}`}
 						>
 							<View style={[styles.dot, { backgroundColor: GENRE_COLORS[event.genres[0]] }]}>
-								<PixelIcon name="note" size={12} color={theme.colors.onColor} />
+								<PixelIcon name={event.genres[0]} size={12} color={theme.colors.onColor} />
 							</View>
 							{rank === 0 && (
 								<View style={styles.label}>

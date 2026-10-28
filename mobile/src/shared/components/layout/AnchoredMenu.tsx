@@ -3,6 +3,7 @@ import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useContextMenuDismiss } from '@/shared/hooks/useContextMenu';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { pixelFrame } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 import { menuPlacement, type MenuAnchor } from '@/shared/utils/menuPlacement';
 
@@ -40,8 +41,7 @@ const createStyles = (theme: Theme) =>
 		menu: {
 			position: 'absolute',
 			width: MENU_WIDTH,
-			borderWidth: 1,
-			borderColor: theme.colors.borderSubtle,
+			...pixelFrame(theme),
 			overflow: 'hidden',
 			backgroundColor: theme.colors.surface,
 			...theme.shadows.large,

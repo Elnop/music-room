@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
@@ -38,7 +38,7 @@ export function VisibilityToggle({ label, description, value, onChange }: Visibi
 							onPress={() => onChange(option)}
 							accessibilityLabel={VISIBILITY_LABELS[option]}
 						>
-							<Ionicons
+							<PixelIcon
 								name={VISIBILITY_ICONS[option]}
 								size={14}
 								color={isSelected ? theme.colors.textInverse : theme.colors.textSecondary}

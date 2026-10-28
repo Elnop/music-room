@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
@@ -27,7 +27,7 @@ export function BeaconStatusLine({ status, onRequestPermission }: BeaconStatusLi
 				onPress={onRequestPermission}
 				accessibilityLabel="Détecter aussi les balises Bluetooth"
 			>
-				<Ionicons name="bluetooth" size={16} color={theme.colors.primary} />
+				<PixelIcon name="bluetooth" size={16} color={theme.colors.primary} />
 				<Text style={styles.link}>Détecter aussi les balises Bluetooth</Text>
 			</Pressable>
 		);
@@ -37,8 +37,8 @@ export function BeaconStatusLine({ status, onRequestPermission }: BeaconStatusLi
 	if (!text) return null;
 	return (
 		<View style={styles.row}>
-			<Ionicons
-				name={status === 'scanning' ? 'radio' : 'bluetooth'}
+			<PixelIcon
+				name={status === 'scanning' ? 'beacon' : 'bluetooth'}
 				size={16}
 				color={theme.colors.textSecondary}
 			/>

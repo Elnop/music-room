@@ -1,9 +1,9 @@
-import type { Ionicons } from '@expo/vector-icons';
+import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
 
 export interface LandingFeature {
 	title: string;
 	description: string;
-	icon: keyof typeof Ionicons.glyphMap;
+	icon: PixelSpriteName;
 }
 
 export const LANDING_INTRO =
@@ -14,21 +14,21 @@ export const LANDING_FEATURES: LandingFeature[] = [
 		title: 'Playlist Editor',
 		description:
 			'Modifiez une playlist à plusieurs : chaque changement apparaît en direct pour tout le monde.',
-		icon: 'musical-notes-outline',
+		icon: 'note',
 	},
 	{
 		title: 'Music Control Delegation',
 		description: 'Laissez un ami contrôler la musique qui joue sur votre appareil.',
-		icon: 'phone-portrait-outline',
+		icon: 'phone',
 	},
 	{
 		title: 'Amis et profils',
 		description: 'Suivez vos amis et choisissez ce que chacun peut voir de votre profil.',
-		icon: 'people-outline',
+		icon: 'crew',
 	},
 	{
 		title: 'Connexion',
 		description: 'Avec une adresse email, un compte Google ou un compte Facebook.',
-		icon: 'log-in-outline',
+		icon: 'login',
 	},
 ];

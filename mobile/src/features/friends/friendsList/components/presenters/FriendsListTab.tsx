@@ -88,14 +88,14 @@ export function FriendsListTab({
 				loadFailed ? (
 					<EmptyState
 						style={styles.emptyState}
-						icon="cloud-offline-outline"
+						icon="alert"
 						message="Impossible de charger vos amis"
 						action={{ label: 'Réessayer', onPress: onRetry }}
 					/>
 				) : (
 					<EmptyState
 						style={styles.emptyState}
-						icon="people-outline"
+						icon="crew"
 						message="Aucun ami pour l'instant. Suivez des utilisateurs qui vous suivent en retour pour devenir amis."
 						action={{
 							label: 'Rechercher des utilisateurs',

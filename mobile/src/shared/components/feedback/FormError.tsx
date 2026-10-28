@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import { pixelFrame } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 import { Text } from '@/shared/components/ui/Text';
 
@@ -24,11 +25,10 @@ export function FormError({ message }: FormErrorProps) {
 const createStyles = (theme: Theme) =>
 	StyleSheet.create({
 		container: {
-			backgroundColor: theme.colors.error + '20',
-			borderLeftWidth: theme.borders.thick,
-			borderLeftColor: theme.colors.error,
+			...pixelFrame(theme),
+			borderColor: theme.colors.error,
+			backgroundColor: theme.colors.surface,
 			padding: theme.spacing.sm,
-			borderRadius: theme.borders.small,
 			marginBottom: theme.spacing.md,
 		},
 		text: {

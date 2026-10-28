@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import type { Ionicons } from '@expo/vector-icons';
+import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
 import { ProfileScreenLayout } from '@/features/profile/common/components/presenters/ProfileScreenLayout';
 import { LinkedAccountRow } from '@/features/profile/linkedAccounts/components/presenters/LinkedAccountRow';
 import { useTheme } from '@/shared/theme/ThemeContext';
@@ -16,13 +16,13 @@ type MethodType = LinkedProvider['type'];
 interface MethodRow {
 	type: MethodType;
 	label: string;
-	icon: keyof typeof Ionicons.glyphMap;
+	icon: PixelSpriteName;
 }
 
 const METHODS: MethodRow[] = [
-	{ type: 'password', label: 'Email et mot de passe', icon: 'mail-outline' },
-	{ type: 'google', label: 'Google', icon: 'logo-google' },
-	{ type: 'facebook', label: 'Facebook', icon: 'logo-facebook' },
+	{ type: 'password', label: 'Email et mot de passe', icon: 'mail' },
+	{ type: 'google', label: 'Google', icon: 'google' },
+	{ type: 'facebook', label: 'Facebook', icon: 'facebook' },
 ];
 
 interface LinkedAccountsViewProps {

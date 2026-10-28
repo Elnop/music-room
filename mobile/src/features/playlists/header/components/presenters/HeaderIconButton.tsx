@@ -1,12 +1,13 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
+import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { INK, PIXEL } from '@/shared/theme/tokens';
 
 interface HeaderIconButtonProps {
-	icon: keyof typeof Ionicons.glyphMap;
+	icon: PixelSpriteName;
 	size: number;
 	onPress: () => void;
 	accessibilityLabel: string;
@@ -34,7 +35,7 @@ export function HeaderIconButton({
 					{ backgroundColor: theme.colors.background },
 				]}
 			>
-				<Ionicons name={icon} size={size} color={theme.colors.text} />
+				<PixelIcon name={icon} size={size} color={theme.colors.text} />
 			</Pressable>
 		</View>
 	);

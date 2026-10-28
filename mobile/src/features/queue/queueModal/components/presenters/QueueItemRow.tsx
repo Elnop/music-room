@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { useContextMenu } from '@/shared/hooks/useContextMenu';
 import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
@@ -51,7 +51,7 @@ export function QueueItemRow({
 			accessibilityRole="button"
 			accessibilityLabel={`Retirer ${track.title}`}
 		>
-			<Ionicons name="trash-outline" size={24} color={theme.colors.onColor} />
+			<PixelIcon name="trash" size={24} color={theme.colors.onColor} />
 			<Text style={styles.deleteText}>Retirer</Text>
 		</Pressable>
 	);
@@ -77,7 +77,7 @@ export function QueueItemRow({
 					accessibilityState={{ selected: isCurrent }}
 					testID={`queue-item-${item.id}`}
 				>
-					<Artwork uri={track.albumArt} size={50} style={styles.albumArt} />
+					<Artwork uri={track.albumArt} size={42} />
 
 					<QueueTrackDetails
 						title={track.title}
@@ -87,8 +87,8 @@ export function QueueItemRow({
 					/>
 
 					{isCurrent ? (
-						<Ionicons
-							name="volume-high"
+						<PixelIcon
+							name="volume"
 							size={18}
 							color={theme.colors.primary}
 							style={styles.playingIcon}
@@ -109,7 +109,7 @@ export function QueueItemRow({
 						accessibilityRole="button"
 						accessibilityLabel="Réordonner"
 					>
-						<Ionicons name="reorder-three-outline" size={24} color={theme.colors.textSecondary} />
+						<PixelIcon name="grip" size={24} color={theme.colors.textSecondary} />
 					</Pressable>
 				)}
 			</View>
