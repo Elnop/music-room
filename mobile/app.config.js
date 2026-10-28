@@ -1,3 +1,8 @@
+// The Google plugin registers this scheme on iOS; the app derives its iOS client ID from it.
+const GOOGLE_IOS_URL_SCHEME =
+	process.env.EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME ||
+	'com.googleusercontent.apps.187081511514-8dc2itp857pu6qtk3bkg7l389n5bhs98';
+
 module.exports = {
 	expo: {
 		name: 'Zumik',
@@ -103,14 +108,11 @@ module.exports = {
 			'./plugins/withDebugKeystore.js',
 			'./plugins/withDevVariant.js',
 			'./plugins/withMedia3Version.js',
+			'./plugins/withPodsDeploymentTarget.js',
 			['expo-media-control', { enableBackgroundAudio: true, audioSessionCategory: 'playback' }],
 			[
 				'@react-native-google-signin/google-signin',
-				{
-					iosUrlScheme:
-						process.env.EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME ||
-						'com.googleusercontent.apps.187081511514-8dc2itp857pu6qtk3bkg7l389n5bhs98',
-				},
+				{ iosUrlScheme: GOOGLE_IOS_URL_SCHEME },
 			],
 			[
 				'react-native-fbsdk-next',
@@ -133,7 +135,7 @@ module.exports = {
 				projectId: 'your-project-id-here',
 			},
 			EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-			EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME: process.env.EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME,
+			EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME: GOOGLE_IOS_URL_SCHEME,
 			EXPO_PUBLIC_FACEBOOK_APP_ID: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID,
 			EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN: process.env.EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN,
 		},
