@@ -1,9 +1,10 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useContentColumn } from '@/shared/hooks/useContentColumn';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { BackendUrlField } from '@/shared/components/form/BackendUrlField';
 import type { Plan } from '@/shared/types/subscription';
+import { pixelFrame } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 import { SubscriptionSection } from './SubscriptionSection';
 import { Pressable } from '@/shared/components/ui/Pressable';
@@ -58,7 +59,7 @@ export function SettingsView({
 					style={styles.row}
 				>
 					<Text style={styles.rowLabel}>Politique de confidentialité</Text>
-					<Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
+					<PixelIcon name="right" size={20} color={theme.colors.textSecondary} />
 				</Pressable>
 			</View>
 		</ScrollView>
@@ -72,9 +73,11 @@ const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.background,
 		},
 		section: {
+			...pixelFrame(theme),
+			backgroundColor: theme.colors.surface,
 			padding: theme.spacing.md,
-			borderBottomWidth: theme.borders.thin,
-			borderBottomColor: theme.colors.borderLight,
+			margin: theme.spacing.md,
+			marginBottom: 0,
 		},
 		sectionTitle: {
 			fontSize: theme.typography.sizes.xl,

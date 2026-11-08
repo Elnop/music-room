@@ -111,7 +111,6 @@ const styles = StyleSheet.create({
 	codeInput: {
 		width: 48,
 		height: 56,
-		borderRadius: 12,
 		borderWidth: 2,
 		fontSize: 24,
 		fontFamily: FONT_FAMILIES.bold,

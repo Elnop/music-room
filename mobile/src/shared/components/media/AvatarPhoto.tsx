@@ -15,7 +15,7 @@ export function AvatarPhoto({ uri, size, onLoad, onError }: AvatarPhotoProps) {
 			source={{ uri }}
 			onLoad={onLoad}
 			onError={onError}
-			style={[styles.image, { width: size, height: size, borderRadius: size / 2 }]}
+			style={[styles.image, { width: size, height: size }]}
 		/>
 	);
 }

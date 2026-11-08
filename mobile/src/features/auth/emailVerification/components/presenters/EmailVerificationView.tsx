@@ -113,7 +113,6 @@ const createStyles = (theme: Theme) =>
 			width: 50,
 			height: 60,
 			borderWidth: 2,
-			borderRadius: 12,
 			fontSize: 24,
 			fontFamily: FONT_FAMILIES.bold,
 			textAlign: 'center',
@@ -126,7 +125,6 @@ const createStyles = (theme: Theme) =>
 		button: {
 			width: '100%',
 			height: 56,
-			borderRadius: 12,
 			justifyContent: 'center',
 			alignItems: 'center',
 			marginBottom: 24,

@@ -2,6 +2,7 @@ import { Dimensions, Platform, StyleSheet } from 'react-native';
 import { BREAKPOINTS, PLAYER_DIALOG_WIDTH } from '@/shared/constants/layout';
 import type { Theme } from '@/shared/theme/types';
 import { FONT_FAMILIES } from '@/shared/theme/fonts';
+import { pixelFrame } from '@/shared/theme/pixelFrame';
 
 export const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 export const DISMISS_THRESHOLD = SCREEN_HEIGHT * 0.2;
@@ -33,7 +34,6 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 			width: PLAYER_DIALOG_WIDTH,
 			height: '90%',
 			maxHeight: 900,
-			borderRadius: 16,
 			overflow: 'hidden',
 			borderWidth: 1,
 			borderColor: theme.colors.borderSubtle,
@@ -41,25 +41,22 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 		dialogBackdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: theme.colors.backdrop },
 		header: { paddingTop: insets.top + 8, alignItems: 'center', paddingBottom: 8 },
 		swipeIndicator: { alignItems: 'center', marginBottom: 8 },
-		swipeBar: { width: 40, height: 5, borderRadius: 3, opacity: 0.5 },
+		swipeBar: { width: 40, height: 5, opacity: 0.5 },
 		closeButton: { position: 'absolute', top: insets.top + 16, left: 20, zIndex: 10 },
 		headerButton: {
-			width: 40,
-			height: 40,
-			borderRadius: 20,
+			...pixelFrame(theme),
+			width: 42,
+			height: 42,
 			justifyContent: 'center',
 			alignItems: 'center',
+			backgroundColor: theme.colors.background,
 		},
-		nowPlayingText: {
-			fontSize: 12,
-			fontFamily: FONT_FAMILIES.semibold,
-			letterSpacing: 2,
-			marginTop: 8,
-		},
+		deviceKey: { flex: 1, justifyContent: 'flex-start' },
 		deviceText: {
 			flexShrink: 1,
-			fontSize: 13,
-			fontFamily: FONT_FAMILIES.semibold,
+			fontSize: 15,
+			fontFamily: FONT_FAMILIES.medium,
+			color: theme.colors.info,
 		},
 		// Content sits low, within thumb reach; the header keeps only the close chevron.
 		mainContent: {
@@ -75,28 +72,20 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 			paddingHorizontal: 24,
 			marginTop: 24,
 		},
-		deviceGroup: {
-			flex: 1,
-			flexDirection: 'row',
-			alignItems: 'center',
-			gap: 8,
-		},
 		bottomSpacer: {
 			height: insets.bottom + 20,
 		},
 		artworkWrapper: {
 			alignItems: 'center',
-			marginBottom: 32,
+			marginBottom: 12,
 		},
+		equalizer: { alignItems: 'center', marginBottom: 24 },
 		artworkShadow: {
-			shadowColor: theme.colors.shadow,
-			shadowOffset: { width: 0, height: 16 },
-			shadowOpacity: 0.3,
-			shadowRadius: 24,
-			elevation: 16,
+			borderWidth: theme.borders.thick,
+			borderColor: theme.colors.border,
+			...theme.shadows.large,
 		},
 		artwork: {
-			borderRadius: 12,
 			backgroundColor: theme.colors.surfaceAlt,
 		},
 		neighbourArtwork: { position: 'absolute', top: 0 },
@@ -113,6 +102,9 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 			fontFamily: FONT_FAMILIES.bold,
 			marginBottom: 8,
 			textAlign: 'center',
+			textShadowColor: theme.colors.shadow,
+			textShadowOffset: { width: theme.borders.thick, height: theme.borders.thick },
+			textShadowRadius: 0,
 		},
 		artist: {
 			fontSize: 17,
@@ -126,7 +118,6 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 			paddingVertical: 10,
 			paddingHorizontal: 16,
 			marginHorizontal: 32,
-			borderRadius: 12,
 			marginBottom: 16,
 			gap: 8,
 		},
@@ -140,33 +131,13 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 		},
 		slider: { width: '100%', height: 40 },
 		timeContainer: { flexDirection: 'row', justifyContent: 'space-between', marginTop: -8 },
-		timeText: { fontSize: 13, fontFamily: FONT_FAMILIES.medium },
+		timeText: { fontSize: 12, fontFamily: FONT_FAMILIES.mono },
 		controls: {
 			flexDirection: 'row',
 			alignItems: 'center',
 			justifyContent: 'center',
-			gap: 40,
+			gap: 32,
 			paddingHorizontal: 32,
-		},
-		secondaryButton: {
-			width: 56,
-			height: 56,
-			borderRadius: 28,
-			alignItems: 'center',
-			justifyContent: 'center',
-		},
-		disabledIcon: { opacity: 0.35 },
-		playButton: {
-			width: 72,
-			height: 72,
-			borderRadius: 36,
-			alignItems: 'center',
-			justifyContent: 'center',
-			shadowColor: theme.colors.shadow,
-			shadowOffset: { width: 0, height: 4 },
-			shadowOpacity: 0.2,
-			shadowRadius: 8,
-			elevation: 8,
 		},
 		loadingContainer: { marginTop: 24, alignItems: 'center' },
 		loadingText: { fontSize: 14, fontFamily: FONT_FAMILIES.medium },

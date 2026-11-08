@@ -1,27 +1,27 @@
-import { Inter_400Regular } from '@expo-google-fonts/inter/400Regular';
-import { Inter_500Medium } from '@expo-google-fonts/inter/500Medium';
-import { Inter_600SemiBold } from '@expo-google-fonts/inter/600SemiBold';
-import { Inter_700Bold } from '@expo-google-fonts/inter/700Bold';
-import { Inter_800ExtraBold } from '@expo-google-fonts/inter/800ExtraBold';
+import { PixelifySans_400Regular } from '@expo-google-fonts/pixelify-sans/400Regular';
+import { PixelifySans_500Medium } from '@expo-google-fonts/pixelify-sans/500Medium';
+import { PixelifySans_600SemiBold } from '@expo-google-fonts/pixelify-sans/600SemiBold';
+import { PixelifySans_700Bold } from '@expo-google-fonts/pixelify-sans/700Bold';
+import { Silkscreen_400Regular } from '@expo-google-fonts/silkscreen/400Regular';
 
 /**
- * One family per weight, never a fontWeight: Android picks the weight by family,
- * and the browser would fake a bolder weight on top of the family.
+ * One family per weight, never a fontWeight: Android picks the weight by family.
+ * Pixelify Sans stops at bold, so `extrabold` reuses it; Silkscreen draws numbers and code.
  */
 export const FONT_FAMILIES = {
-	regular: 'Inter_400Regular',
-	medium: 'Inter_500Medium',
-	semibold: 'Inter_600SemiBold',
-	bold: 'Inter_700Bold',
-	extrabold: 'Inter_800ExtraBold',
-	mono: 'monospace',
+	regular: 'PixelifySans_400Regular',
+	medium: 'PixelifySans_500Medium',
+	semibold: 'PixelifySans_600SemiBold',
+	bold: 'PixelifySans_700Bold',
+	extrabold: 'PixelifySans_700Bold',
+	mono: 'Silkscreen_400Regular',
 } as const;
 
 /** What `App.tsx` loads before the first render, keyed by family name. */
 export const FONT_ASSETS = {
-	[FONT_FAMILIES.regular]: Inter_400Regular,
-	[FONT_FAMILIES.medium]: Inter_500Medium,
-	[FONT_FAMILIES.semibold]: Inter_600SemiBold,
-	[FONT_FAMILIES.bold]: Inter_700Bold,
-	[FONT_FAMILIES.extrabold]: Inter_800ExtraBold,
+	[FONT_FAMILIES.regular]: PixelifySans_400Regular,
+	[FONT_FAMILIES.medium]: PixelifySans_500Medium,
+	[FONT_FAMILIES.semibold]: PixelifySans_600SemiBold,
+	[FONT_FAMILIES.bold]: PixelifySans_700Bold,
+	[FONT_FAMILIES.mono]: Silkscreen_400Regular,
 };

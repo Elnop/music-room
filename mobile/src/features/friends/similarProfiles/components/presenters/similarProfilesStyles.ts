@@ -18,7 +18,6 @@ export const createSimilarProfilesStyles = (theme: Theme) =>
 			marginRight: 16,
 			alignItems: 'center',
 			padding: CARD_PADDING,
-			borderRadius: 12,
 			// Between the page and the default avatar, so the card reads on both.
 			backgroundColor: theme.colors.surface,
 		},

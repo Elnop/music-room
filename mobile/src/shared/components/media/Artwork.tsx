@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Image, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
 
 interface ArtworkProps {
@@ -27,8 +27,8 @@ export function Artwork({ uri, size, style, iconSize }: ArtworkProps) {
 			{uri ? (
 				<Image source={{ uri }} style={styles.image} testID="artwork-image" />
 			) : (
-				<Ionicons
-					name="musical-notes"
+				<PixelIcon
+					name="note"
 					size={iconSize ?? Math.round(size * 0.4)}
 					color={theme.colors.textSecondary}
 					testID="artwork-placeholder"

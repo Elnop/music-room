@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Text } from '@/shared/components/ui/Text';
@@ -33,8 +33,8 @@ export function PanelDeviceCard({
 			</View>
 			<View style={styles.device}>
 				<View style={styles.deviceIcon}>
-					<Ionicons
-						name={isRemote ? 'phone-portrait-outline' : 'laptop-outline'}
+					<PixelIcon
+						name={isRemote ? 'phone' : 'laptop'}
 						size={20}
 						color={isRemote ? theme.colors.primary : theme.colors.text}
 					/>

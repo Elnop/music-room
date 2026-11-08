@@ -15,8 +15,6 @@ const onDelete = jest.fn().mockResolvedValue(undefined);
 describe('SwipeableTrackItem', () => {
 	it('shows no drag handle without onDragStart', async () => {
 		render(<SwipeableTrackItem track={track} onDelete={onDelete} />);
-		// Ionicons loads its font asynchronously and re-renders once it is ready.
-		await act(async () => {});
 		expect(screen.queryByLabelText('Réordonner')).toBeNull();
 	});
 
@@ -24,8 +22,6 @@ describe('SwipeableTrackItem', () => {
 		render(
 			<SwipeableTrackItem track={track} onDelete={onDelete} onDragStart={jest.fn()} disabled />
 		);
-		// Ionicons loads its font asynchronously and re-renders once it is ready.
-		await act(async () => {});
 		expect(screen.queryByLabelText('Réordonner')).toBeNull();
 	});
 
@@ -78,8 +74,6 @@ describe('SwipeableTrackItem', () => {
 	it('starts the drag when the handle is pressed', async () => {
 		const onDragStart = jest.fn();
 		render(<SwipeableTrackItem track={track} onDelete={onDelete} onDragStart={onDragStart} />);
-		// Ionicons loads its font asynchronously and re-renders once it is ready.
-		await act(async () => {});
 		fireEvent(screen.getByLabelText('Réordonner'), 'pressIn');
 		expect(onDragStart).toHaveBeenCalledTimes(1);
 	});

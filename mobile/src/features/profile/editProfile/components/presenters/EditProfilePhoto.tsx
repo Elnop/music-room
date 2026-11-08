@@ -55,7 +55,6 @@ const createStyles = (theme: Theme) =>
 			...StyleSheet.absoluteFillObject,
 			alignItems: 'center',
 			justifyContent: 'center',
-			borderRadius: 40,
 			backgroundColor: theme.colors.backdrop,
 		},
 		photoButton: {

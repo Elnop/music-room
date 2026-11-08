@@ -16,7 +16,6 @@ export function AvatarPhoto({ uri, size, onLoad, onError }: AvatarPhotoProps) {
 				inset: 0,
 				width: size,
 				height: size,
-				borderRadius: '50%',
 				objectFit: 'cover',
 			}}
 		/>

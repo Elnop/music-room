@@ -66,7 +66,7 @@ function renderLibrary() {
 
 async function renderScreen() {
 	renderLibrary();
-	await screen.findByText('Vos playlists');
+	await screen.findByLabelText('Vos playlists');
 	await act(async () => {});
 }
 
@@ -100,7 +100,7 @@ describe('LibraryOrchestrator', () => {
 	it('shows only my playlists: the ones I own and the ones shared with me', async () => {
 		await renderScreen();
 		expect(screen.getByText('Mine')).toBeTruthy();
-		expect(screen.getByText('Partagées avec vous')).toBeTruthy();
+		expect(screen.getByLabelText('Partagées avec vous')).toBeTruthy();
 		expect(screen.getByText('Shared')).toBeTruthy();
 		expect(routes.calls()).toEqual(['GET /api/playlists']);
 	});
@@ -120,7 +120,7 @@ describe('LibraryOrchestrator', () => {
 	it('offers to create a first playlist and hides the empty shared section', async () => {
 		routes.routes['GET /api/playlists'] = ok({ playlists: [] });
 		await renderScreen();
-		expect(screen.queryByText('Partagées avec vous')).toBeNull();
+		expect(screen.queryByLabelText('Partagées avec vous')).toBeNull();
 		fireEvent.press(screen.getByText('Créer une playlist'));
 		expect(navigation.navigate).toHaveBeenCalledWith('CreatePlaylist');
 	});

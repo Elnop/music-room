@@ -39,7 +39,7 @@ export function LibraryView({ screen, actionsFor }: LibraryViewProps) {
 			bottomPadding={screen.bottomPadding}
 		>
 			<View style={styles.section}>
-				<SectionHeader icon="library-outline" title="Vos playlists" count={screen.owned.length} />
+				<SectionHeader icon="tape" title="Vos playlists" count={screen.owned.length} />
 				{screen.owned.length > 0 ? (
 					<PlaylistGrid
 						playlists={screen.owned}
@@ -48,7 +48,7 @@ export function LibraryView({ screen, actionsFor }: LibraryViewProps) {
 					/>
 				) : (
 					<EmptyState
-						icon="musical-notes-outline"
+						icon="note"
 						message="Aucune playlist pour l'instant. Créez votre première playlist !"
 						action={{ label: 'Créer une playlist', onPress: screen.createPlaylist }}
 					/>
@@ -59,7 +59,7 @@ export function LibraryView({ screen, actionsFor }: LibraryViewProps) {
 					<View style={styles.sectionSpacer} />
 					<View style={styles.section}>
 						<SectionHeader
-							icon="share-social-outline"
+							icon="share"
 							title="Partagées avec vous"
 							count={screen.shared.length}
 						/>

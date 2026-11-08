@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import Animated, { type useAnimatedStyle } from 'react-native-reanimated';
 import type { NowPlayingTrack } from '@/features/player/types';
 import type { createStyles } from './playerModalStyles';
@@ -42,7 +42,7 @@ export function PlayerTrackInfo({
 
 			{error && !isRemote && (
 				<View style={[styles.errorContainer, { backgroundColor: colors.errorBg }]}>
-					<Ionicons name="warning" size={16} color={colors.error} />
+					<PixelIcon name="alert" size={16} color={colors.error} />
 					<Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>
 				</View>
 			)}

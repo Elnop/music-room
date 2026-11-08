@@ -1,22 +1,22 @@
 import React from 'react';
 import { Animated } from 'react-native';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
+import { useTheme } from '@/shared/theme/ThemeContext';
 import type { FloatingIconMotion } from '@/features/auth/welcome/hooks/useFloatingIcons';
-import appIcon from '@/assets/logo/app-icon.png';
 
 export function FloatingIcon({ spec, translateY, rotate, scale }: FloatingIconMotion) {
+	const { theme } = useTheme();
 	return (
-		<Animated.Image
-			source={appIcon}
+		<Animated.View
 			style={{
 				position: 'absolute',
-				width: spec.size,
-				height: spec.size,
 				top: spec.top,
 				left: spec.left,
 				opacity: 0.4,
 				transform: [{ translateY }, { rotate }, { scale }],
 			}}
-			resizeMode="contain"
-		/>
+		>
+			<PixelIcon name="note" size={spec.size} color={theme.colors.primary} />
+		</Animated.View>
 	);
 }

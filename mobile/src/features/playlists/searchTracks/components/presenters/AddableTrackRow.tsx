@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { useContextMenu } from '@/shared/hooks/useContextMenu';
@@ -62,8 +62,8 @@ export const AddableTrackRow = React.memo(function AddableTrackRow({
 					</View>
 					<TrackActionsButton onPress={() => onShowActions(track)} />
 					<View style={[styles.addButton, isAdded && styles.addedButton]}>
-						<Ionicons
-							name={isAdded ? 'checkmark' : 'add'}
+						<PixelIcon
+							name={isAdded ? 'check' : 'plus'}
 							size={20}
 							color={theme.colors.onColor}
 							testID={`${isAdded ? 'added' : 'add'}-${track.id}`}
@@ -90,7 +90,6 @@ const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.background,
 		},
 		artwork: {
-			borderRadius: 8,
 			marginRight: theme.spacing.md,
 		},
 		trackInfo: {
@@ -122,7 +121,6 @@ const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.primary,
 			width: 36,
 			height: 36,
-			borderRadius: 18,
 			justifyContent: 'center',
 			alignItems: 'center',
 			marginLeft: theme.spacing.sm,

@@ -16,7 +16,6 @@ export function ErrorBox({ message }: { message: string }) {
 const styles = StyleSheet.create({
 	errorBox: {
 		padding: 12,
-		borderRadius: 8,
 		marginBottom: 16,
 	},
 	errorText: {

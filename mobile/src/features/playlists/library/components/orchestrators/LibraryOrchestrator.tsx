@@ -18,7 +18,7 @@ export function LibraryOrchestrator({ navigation }: LibraryOrchestratorProps) {
 		navigation.setOptions({
 			headerRight: () => (
 				<HeaderIconButton
-					icon="add"
+					icon="plus"
 					size={28}
 					onPress={createPlaylist}
 					accessibilityLabel="Créer une playlist"

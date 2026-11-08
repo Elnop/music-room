@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useAnchoredPress } from '@/shared/hooks/useAnchoredPress';
 import { useTheme } from '@/shared/theme/ThemeContext';
@@ -18,7 +18,7 @@ export function TrackActionsButton({ onPress }: TrackActionsButtonProps) {
 	return (
 		<View ref={button} collapsable={false}>
 			<Pressable onPress={press} hitSlop={10} style={styles.button} accessibilityLabel="Actions">
-				<Ionicons name="ellipsis-horizontal" size={20} color={theme.colors.textSecondary} />
+				<PixelIcon name="more" size={20} color={theme.colors.textSecondary} />
 			</Pressable>
 		</View>
 	);

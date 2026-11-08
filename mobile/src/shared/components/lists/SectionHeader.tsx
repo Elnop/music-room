@@ -1,48 +1,49 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
+import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { Text } from '@/shared/components/ui/Text';
 
 interface SectionHeaderProps {
-	icon: keyof typeof Ionicons.glyphMap;
+	icon: PixelSpriteName;
+	/** Read by screen readers; on screen the icon and the count stand for it. */
 	title: string;
-	/** Shown when above 0: after the title, or at the end of a section that does not fold. */
+	/** Shown when above 0. */
 	count: number;
 	/** A section that folds: its header toggles it and shows a chevron. */
 	open?: boolean;
 	onToggle?: () => void;
-	/** A control at the end of a section that does not fold, such as a compact button; the count then follows the title. */
+	/** A control at the end of a section that does not fold, such as a compact button. */
 	action?: React.ReactNode;
 }
 
 export function SectionHeader({ icon, title, count, open, onToggle, action }: SectionHeaderProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
 
-	const titleRow = (
-		<View style={styles.titleRow}>
-			<Ionicons name={icon} size={18} color={theme.colors.textSecondary} style={styles.icon} />
-			<Text style={styles.title}>{title}</Text>
-			{(onToggle || action) && count > 0 && <Text style={styles.countInline}>{count}</Text>}
+	const label = (
+		<View style={styles.label}>
+			<PixelIcon name={icon} size={18} color={theme.colors.textSecondary} />
+			{count > 0 && <Text style={styles.count}>{count}</Text>}
 		</View>
 	);
 
 	if (!onToggle) {
 		return (
-			<View style={styles.header}>
-				{titleRow}
-				{action ?? (count > 0 && <Text style={styles.count}>{count}</Text>)}
+			<View style={styles.header} accessible accessibilityRole="header" accessibilityLabel={title}>
+				{label}
+				{action}
 			</View>
 		);
 	}
 
 	return (
 		<Pressable style={styles.header} onPress={onToggle} accessibilityLabel={title}>
-			{titleRow}
-			<Ionicons
-				name={open ? 'chevron-down' : 'chevron-forward'}
+			{label}
+			<PixelIcon
+				name={open ? 'down' : 'right'}
 				size={20}
 				color={theme.colors.textSecondary}
 			/>
@@ -59,25 +60,10 @@ const createStyles = (theme: Theme) =>
 			paddingHorizontal: theme.spacing.md,
 			marginBottom: theme.spacing.md,
 		},
-		titleRow: {
-			flexDirection: 'row',
-			alignItems: 'center',
-		},
-		icon: {
-			marginRight: theme.spacing.sm,
-		},
-		title: {
-			fontSize: theme.typography.sizes.md,
-			fontFamily: theme.typography.families.semibold,
-			color: theme.colors.text,
-		},
+		label: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },
 		count: {
 			fontSize: theme.typography.sizes.sm,
+			fontFamily: theme.typography.families.mono,
 			color: theme.colors.textSecondary,
-		},
-		countInline: {
-			fontSize: theme.typography.sizes.sm,
-			color: theme.colors.textSecondary,
-			marginLeft: theme.spacing.sm,
 		},
 	});

@@ -1,11 +1,10 @@
 import React from 'react';
 import { View, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { useContextMenu } from '@/shared/hooks/useContextMenu';
-import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import { QueueSwipe } from './QueueSwipe';
 import { TrackActionsButton } from './TrackActionsButton';
 import { TrackTableRow } from './TrackTableRow';
@@ -13,6 +12,8 @@ import type { Theme } from '@/shared/theme/types';
 import type { Track } from '@/types/track.types';
 import { Text } from '@/shared/components/ui/Text';
 import { FONT_FAMILIES } from '@/shared/theme/fonts';
+import { pixelRow } from '@/shared/theme/pixelFrame';
+import { formatDuration } from '@/shared/utils/formatters';
 
 interface SwipeableTrackItemProps {
 	track: Track;
@@ -54,8 +55,7 @@ export function SwipeableTrackItem({
 	position,
 }: SwipeableTrackItemProps) {
 	const { theme } = useTheme();
-	const separator = useSeparatorColor();
-	const styles = React.useMemo(() => createStyles(theme, separator), [theme, separator]);
+	const styles = React.useMemo(() => createStyles(theme), [theme]);
 	const actions = unavailable ? undefined : onShowActions;
 	const { isWide } = useBreakpoint();
 	const dragStart = !disabled ? onDragStart : undefined;
@@ -67,7 +67,7 @@ export function SwipeableTrackItem({
 			onPress={() => onDelete(track.id)}
 			accessibilityLabel={`Supprimer ${track.title}`}
 		>
-			<Ionicons name="trash-outline" size={24} color={theme.colors.onColor} />
+			<PixelIcon name="trash" size={24} color={theme.colors.onColor} />
 			<Text style={styles.deleteText}>Supprimer</Text>
 		</Pressable>
 	);
@@ -120,7 +120,7 @@ export function SwipeableTrackItem({
 									unavailable && styles.unavailable,
 								]}
 							>
-								<Ionicons name="musical-notes" size={24} color={theme.colors.textSecondary} />
+								<PixelIcon name="note" color={theme.colors.textSecondary} />
 							</View>
 						)}
 
@@ -146,8 +146,8 @@ export function SwipeableTrackItem({
 						)}
 
 						{isCurrent && !isPending && (
-							<Ionicons
-								name="volume-high"
+							<PixelIcon
+								name="volume"
 								size={18}
 								color={theme.colors.primary}
 								style={styles.playingIcon}
@@ -169,7 +169,7 @@ export function SwipeableTrackItem({
 							style={styles.dragHandle}
 							accessibilityLabel="Réordonner"
 						>
-							<Ionicons name="reorder-three-outline" size={24} color={theme.colors.textSecondary} />
+							<PixelIcon name="grip" color={theme.colors.textSecondary} />
 						</Pressable>
 					)}
 				</View>
@@ -178,37 +178,21 @@ export function SwipeableTrackItem({
 	);
 }
 
-const formatDuration = (ms: number): string => {
-	const minutes = Math.floor(ms / 60000);
-	const seconds = Math.floor((ms % 60000) / 1000);
-	return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-};
-
-const createStyles = (theme: Theme, separator: string) =>
+const createStyles = (theme: Theme) =>
 	StyleSheet.create({
-		trackContainer: {
-			flexDirection: 'row',
-			alignItems: 'center',
-			padding: 12,
-			backgroundColor: theme.colors.surface,
-			borderBottomWidth: 1,
-			borderBottomColor: separator,
-		},
+		trackContainer: pixelRow(theme),
 		trackPressable: {
 			flex: 1,
 			flexDirection: 'row',
 			alignItems: 'center',
+			gap: theme.spacing.md,
 		},
 		trackContainerCurrent: {
 			backgroundColor: theme.colors.surfaceAlt,
-			borderLeftWidth: 4,
-			borderLeftColor: theme.colors.primary,
 		},
 		albumArt: {
-			width: 50,
-			height: 50,
-			borderRadius: 4,
-			marginRight: 12,
+			width: 42,
+			height: 42,
 		},
 		albumArtPlaceholder: {
 			backgroundColor: theme.colors.border,
@@ -217,7 +201,6 @@ const createStyles = (theme: Theme, separator: string) =>
 		},
 		trackInfo: {
 			flex: 1,
-			marginRight: 8,
 		},
 		trackTitle: {
 			fontSize: 15,
@@ -236,18 +219,15 @@ const createStyles = (theme: Theme, separator: string) =>
 			color: theme.colors.textSecondary,
 		},
 		duration: {
-			fontSize: 13,
+			fontSize: 11,
+			fontFamily: FONT_FAMILIES.mono,
 			color: theme.colors.textSecondary,
 		},
 		unavailable: {
 			opacity: 0.4,
 		},
 		trackContainerActive: {
-			elevation: 6,
-			shadowColor: theme.colors.shadow,
-			shadowOpacity: 0.25,
-			shadowRadius: 6,
-			shadowOffset: { width: 0, height: 3 },
+			...theme.shadows.large,
 		},
 		dragHandle: {
 			marginLeft: theme.spacing.sm,

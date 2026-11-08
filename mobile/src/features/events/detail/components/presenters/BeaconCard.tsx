@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { ThemedSwitch } from '@/shared/components/ui/ThemedSwitch';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { createBeaconCardStyles } from './beaconCardStyles';
@@ -19,8 +19,8 @@ export function BeaconCard({ beacon }: { beacon: BeaconBroadcast }) {
 
 	return (
 		<View style={styles.card}>
-			<Ionicons
-				name={beacon.active ? 'radio' : 'radio-outline'}
+			<PixelIcon
+				name={beacon.active ? 'beacon' : 'beacon'}
 				size={24}
 				color={beacon.active ? theme.colors.primary : theme.colors.textSecondary}
 			/>

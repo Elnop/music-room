@@ -25,7 +25,6 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.warning,
 			borderWidth: 1,
 			borderColor: theme.colors.warning,
-			borderRadius: 4,
 			paddingHorizontal: 4,
 			overflow: 'hidden',
 		},

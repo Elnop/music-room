@@ -9,7 +9,7 @@ const fontOf = (testID: string) =>
 	StyleSheet.flatten(screen.getByTestId(testID).props.style)?.fontFamily;
 
 describe('Text', () => {
-	it('sets the regular Inter family on an unstyled text', () => {
+	it('sets the regular brand family on an unstyled text', () => {
 		render(<Text testID="plain">Hello</Text>);
 
 		expect(fontOf('plain')).toBe(FONT_FAMILIES.regular);
@@ -37,7 +37,7 @@ describe('Text', () => {
 });
 
 describe('TextInput', () => {
-	it('sets the regular Inter family under the given style', () => {
+	it('sets the regular brand family under the given style', () => {
 		render(<TextInput testID="input" style={{ fontSize: 18 }} />);
 
 		expect(fontOf('input')).toBe(FONT_FAMILIES.regular);

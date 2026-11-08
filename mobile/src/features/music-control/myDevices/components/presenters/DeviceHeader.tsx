@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { Pressable } from '@/shared/components/ui/Pressable';
@@ -21,12 +21,12 @@ export function DeviceHeader({ device, isCurrent, onOpenRename }: DeviceHeaderPr
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 	const lastSeen = formatLastSeen(device.lastSeenAt);
-	const icon = device.platform === 'web' ? 'desktop-outline' : 'phone-portrait-outline';
+	const icon = device.platform === 'web' ? 'laptop' : 'phone';
 
 	return (
 		<View style={styles.deviceHeader}>
 			<View style={styles.iconWrapper}>
-				<Ionicons name={icon} size={20} color={theme.colors.primary} />
+				<PixelIcon name={icon} size={20} color={theme.colors.primary} />
 			</View>
 			<View style={styles.textContainer}>
 				<View style={styles.titleRow}>
@@ -50,7 +50,7 @@ export function DeviceHeader({ device, isCurrent, onOpenRename }: DeviceHeaderPr
 				hitSlop={8}
 				style={styles.renameButton}
 			>
-				<Ionicons name="create-outline" size={20} color={theme.colors.textSecondary} />
+				<PixelIcon name="pencil" size={20} color={theme.colors.textSecondary} />
 			</Pressable>
 		</View>
 	);
@@ -66,7 +66,6 @@ const createStyles = (theme: Theme) =>
 		iconWrapper: {
 			width: 36,
 			height: 36,
-			borderRadius: 18,
 			alignItems: 'center',
 			justifyContent: 'center',
 			marginRight: theme.spacing.md,
@@ -92,7 +91,6 @@ const createStyles = (theme: Theme) =>
 		},
 		badge: {
 			backgroundColor: theme.colors.primary + '25',
-			borderRadius: 8,
 			paddingHorizontal: theme.spacing.sm,
 			paddingVertical: 2,
 		},

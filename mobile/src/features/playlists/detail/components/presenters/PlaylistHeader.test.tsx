@@ -69,7 +69,7 @@ describe('PlaylistHeader', () => {
 		);
 
 		expect(screen.getByText('A')).toBeTruthy();
-		expect(screen.getByText('alice')).toBeTruthy();
+		expect(screen.getByLabelText('alice')).toBeTruthy();
 		expect(screen.queryByText('?')).toBeNull();
 	});
 
@@ -83,12 +83,12 @@ describe('PlaylistHeader', () => {
 				onAddTrack={onAddTrack}
 			/>
 		);
-		expect(screen.queryByText('Ajouter un titre')).toBeNull();
+		expect(screen.queryByLabelText('Ajouter un titre')).toBeNull();
 
 		rerender(
 			<PlaylistHeader playlist={playlist} playButton={null} canEdit onAddTrack={onAddTrack} />
 		);
-		fireEvent.press(screen.getByText('Ajouter un titre'));
+		fireEvent.press(screen.getByLabelText('Ajouter un titre'));
 		expect(onAddTrack).toHaveBeenCalled();
 	});
 });
@@ -115,6 +115,6 @@ describe('PlaylistHeader play button', () => {
 			/>
 		);
 		expect(screen.getByText('PLAY')).toBeTruthy();
-		expect(screen.getByText('1 titre')).toBeTruthy();
+		expect(screen.getByLabelText('1 titre')).toBeTruthy();
 	});
 });

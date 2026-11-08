@@ -1,13 +1,12 @@
 import React from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { BottomTabBar, type BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MiniPlayer } from '@/features/player/miniPlayer/components/orchestrators/MiniPlayer';
-import logo from '@/assets/logo/logo.png';
-import appIcon from '@/assets/logo/app-icon.png';
+import { PixelWordmark } from '@/shared/components/media/PixelWordmark';
+import { PIXEL } from '@/shared/theme/tokens';
 import { SIDEBAR_WIDTH } from '@/shared/constants/layout';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
-import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { SidebarAccount } from './SidebarAccount';
 
@@ -16,7 +15,6 @@ export function AppTabBar(props: BottomTabBarProps) {
 	const { breakpoint, isDesktop } = useBreakpoint();
 	const { theme } = useTheme();
 	const insets = useSafeAreaInsets();
-	const separator = useSeparatorColor();
 
 	if (breakpoint === 'phone') {
 		return (
@@ -35,16 +33,13 @@ export function AppTabBar(props: BottomTabBarProps) {
 					width: SIDEBAR_WIDTH[breakpoint],
 					paddingTop: insets.top + theme.spacing.md,
 					backgroundColor: theme.colors.background,
-					borderRightColor: separator,
+					borderRightColor: theme.colors.border,
 				},
 			]}
 		>
-			<Image
-				source={isDesktop ? logo : appIcon}
-				style={isDesktop ? styles.logo : styles.icon}
-				resizeMode="contain"
-				accessibilityLabel="Zumik"
-			/>
+			<View style={styles.brand}>
+				<PixelWordmark size={isDesktop ? 24 : 12} />
+			</View>
 			<BottomTabBar {...props} />
 			{isDesktop && (
 				<SidebarAccount
@@ -58,16 +53,7 @@ export function AppTabBar(props: BottomTabBarProps) {
 
 const styles = StyleSheet.create({
 	sidebar: {
-		borderRightWidth: 1,
+		borderRightWidth: PIXEL,
 	},
-	logo: {
-		width: 96,
-		height: 96,
-		alignSelf: 'center',
-	},
-	icon: {
-		width: 48,
-		height: 48,
-		alignSelf: 'center',
-	},
+	brand: { alignItems: 'center', paddingVertical: 12 },
 });

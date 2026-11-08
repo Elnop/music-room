@@ -63,7 +63,6 @@ const createStyles = (theme: Theme) =>
 	StyleSheet.create({
 		selectorContainer: {
 			backgroundColor: theme.colors.surface,
-			borderRadius: 16,
 			marginBottom: theme.spacing.lg,
 		},
 		saveButton: {

@@ -26,7 +26,7 @@ export function UserProfilePlaylists({
 			<Text style={styles.sectionTitle}>Playlists</Text>
 			{playlists.length === 0 ? (
 				<EmptyState
-					icon="musical-notes-outline"
+					icon="note"
 					style={styles.emptyPlaylists}
 					message="Aucune playlist à afficher"
 				/>

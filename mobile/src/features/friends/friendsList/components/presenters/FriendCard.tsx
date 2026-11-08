@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Avatar } from '@/shared/components/media/Avatar';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
@@ -50,11 +50,11 @@ export function FriendCard({
 						</Text>
 					)}
 				</View>
-				<Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
+				<PixelIcon name="right" size={20} color={theme.colors.textSecondary} />
 			</Pressable>
 			<View style={styles.cardFooter}>
-				<Ionicons
-					name="musical-notes"
+				<PixelIcon
+					name="note"
 					size={14}
 					color={canControl ? theme.colors.primary : theme.colors.textSecondary}
 				/>
