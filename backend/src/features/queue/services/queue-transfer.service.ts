@@ -14,7 +14,6 @@ import {
 import type { TransferInput } from '@/features/queue/queue.validators.js';
 import type { QueueItem, TransferResult } from '@/features/queue/queue.types.js';
 
-/** Every check runs before any change. */
 export async function transfer(actorId: string, input: TransferInput): Promise<TransferResult> {
 	const { targetUserId: ownerId, targetDeviceId: deviceId, playing, positionMs } = input;
 	await resolvePlaybackDevice(actorId, ownerId, deviceId);

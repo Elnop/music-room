@@ -3,8 +3,6 @@ import { describe, expect, it } from 'vitest';
 import { routes } from '@/app/routes.js';
 import { swaggerSpec } from '@/app/openapi.js';
 
-/** Every registry route needs an OpenAPI entry and vice versa; routes mounted in server.ts are not walked. */
-
 const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace'] as const;
 
 interface RouteLayer {
@@ -13,7 +11,6 @@ interface RouteLayer {
 	route?: { path: string | string[]; methods: Record<string, boolean> };
 }
 
-/** Express 5 hides a nested router's mount path in a compiled matcher, so report it instead of skipping it. */
 function isRouterLayer(layer: RouteLayer): boolean {
 	return !layer.route && Array.isArray(layer.handle?.stack);
 }

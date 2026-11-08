@@ -45,7 +45,6 @@ function webLinking(): Partial<LinkingOptions<AppTabsParamList>> {
 	};
 }
 
-/** `isSignedIn` is read per link: an app screen opened signed out waits for sign-in. */
 export function createLinking(isSignedIn: () => boolean): LinkingOptions<AppTabsParamList> {
 	return {
 		prefixes: [LINK_PREFIX],
@@ -56,7 +55,6 @@ export function createLinking(isSignedIn: () => boolean): LinkingOptions<AppTabs
 			if (!match) return undefined;
 			const isAppScreen = Boolean(match.entry.tab);
 			if (isAppScreen !== signedIn) {
-				// Sign-in lands on the home screen anyway.
 				if (isAppScreen && match.entry.path !== '') pendingPath = path;
 				return undefined;
 			}
@@ -66,7 +64,6 @@ export function createLinking(isSignedIn: () => boolean): LinkingOptions<AppTabs
 	};
 }
 
-/** Call once the app navigator is mounted. */
 export function openPendingLink(navigation: NavigationContainerRef<AppTabsParamList>): boolean {
 	if (!navigation.isReady()) return false;
 	const path = takePendingLink();

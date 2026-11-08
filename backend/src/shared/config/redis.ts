@@ -2,14 +2,12 @@ import Redis from 'ioredis';
 import { env } from './env.js';
 import { logger } from '@/shared/utils/logger.js';
 
-/** Auth fails closed without Redis (logout denylist), so the client reconnects forever with a capped backoff. */
 const redisConfig = {
 	host: env.REDIS_HOST || 'redis',
 	port: parseInt(env.REDIS_PORT || '6379'),
 	password: env.REDIS_PASSWORD || undefined,
 	db: parseInt(env.REDIS_DB || '0'),
 	maxRetriesPerRequest: 3,
-	// Commands fail at once while disconnected instead of waiting in a queue.
 	enableOfflineQueue: false,
 	lazyConnect: true,
 	autoResubscribe: false,
@@ -68,7 +66,6 @@ export async function connectRedis(): Promise<void> {
 			error: error instanceof Error ? error.message : 'Unknown error',
 			note: 'Authenticated requests answer 503 REVOCATION_UNAVAILABLE until Redis is ready',
 		});
-		// No rethrow: the backend starts even when Redis is down.
 	}
 }
 

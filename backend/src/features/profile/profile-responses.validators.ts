@@ -2,8 +2,6 @@ import { z } from 'zod';
 import { visibilityLevelSchema } from '@/features/profile/profile.validators.js';
 import { musicGenreSchema } from '@/shared/music/genres.js';
 
-// Optional fields are absent when unset or hidden by the owner's privacy settings.
-
 const profileBase = z.object({
 	id: z.uuid(),
 	username: z.string(),
@@ -28,7 +26,6 @@ export const filteredProfileSchema = profileBase.extend({
 	isFriend: z.boolean(),
 });
 
-/** avatarUrl follows the profile's privacy settings. */
 export const recommendedProfileSchema = profileBase
 	.pick({ id: true, username: true, displayName: true, avatarUrl: true })
 	.extend({

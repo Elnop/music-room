@@ -40,7 +40,6 @@ function renderLogin() {
 	const props = { navigation: { navigate }, route: {} } as unknown as Props;
 	const view = renderWithQuery(<LoginOrchestrator {...props} />);
 	clear = () => view.client.clear();
-	/** Another screen goes on top (false) or leaves (true). */
 	const setFocused = (focused: boolean) => {
 		mockFocused = focused;
 		view.rerender(

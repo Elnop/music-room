@@ -19,7 +19,6 @@ interface BeaconScan {
 
 const NONE: ReadonlyMap<number, BeaconSighting> = new Map();
 
-/** Scans only while the screen is shown and the app in the foreground, to spare the battery. */
 export function useBeaconScan(): BeaconScan {
 	const isFocused = useIsFocused();
 	const appActive = useAppActive();

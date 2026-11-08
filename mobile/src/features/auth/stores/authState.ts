@@ -6,7 +6,6 @@ export interface SessionState {
 	user: UserProfile | null;
 	accessToken: string | null;
 	refreshToken: string | null;
-	/** Milliseconds since the epoch. */
 	tokenExpiresAt: number | null;
 	isAuthenticated: boolean;
 	isLoading: boolean;
@@ -15,11 +14,8 @@ export interface SessionState {
 
 export interface SessionActions {
 	startSession: (user: UserProfile, session: AuthSessionTokens) => Promise<void>;
-	/** Revokes the session on the backend, then ends it on the device even if that fails. */
 	logout: () => Promise<void>;
-	/** Shares one refresh between concurrent callers; false when it failed. */
 	refreshAccessToken: () => Promise<boolean>;
-	/** True when the access token expires within five minutes, or is unknown. */
 	isTokenExpiringSoon: () => boolean;
 	loadFromStorage: () => Promise<void>;
 	setAvatarUrl: (avatarUrl: string | null) => Promise<void>;

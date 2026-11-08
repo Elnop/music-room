@@ -11,7 +11,6 @@ import type { Subscription } from '@/features/subscription/subscription.types.js
 
 const { routes } = await import('@/app/routes.js');
 
-// The router as app/routes.ts mounts it (with authMiddleware), against the local stack.
 const mounted = routes.find(route => route.path === '/api/subscription')!;
 
 const PASSWORD = 'integration-test-password';
@@ -64,7 +63,6 @@ describe('Subscription routes: /api/subscription', () => {
 	}
 
 	beforeAll(async () => {
-		// verifyToken checks the logout denylist and fails closed without Redis.
 		await connectRedis();
 		if (!isRedisConnected()) throw new Error('Redis from scripts/test-db.sh is not reachable');
 
@@ -82,7 +80,7 @@ describe('Subscription routes: /api/subscription', () => {
 	afterAll(async () => {
 		await new Promise<void>(resolve => httpServer.close(() => resolve()));
 		await disconnectRedis();
-		if (user) await supabaseAdmin.auth.admin.deleteUser(user.id); // cascades
+		if (user) await supabaseAdmin.auth.admin.deleteUser(user.id);
 	});
 
 	it('puts a new account on the free plan', async () => {

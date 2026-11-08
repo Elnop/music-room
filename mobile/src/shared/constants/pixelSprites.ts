@@ -1,4 +1,3 @@
-/** 12×12 pixel icons drawn as text: `#` is a lit pixel, `.` an empty one. */
 export const PIXEL_SPRITES = {
 	play: [
 		'............',
@@ -700,7 +699,6 @@ export const PIXEL_SPRITES = {
 		'............',
 		'............',
 	],
-	// One per music genre, keyed like MusicGenre.
 	pop: [
 		'............',
 		'.....#......',

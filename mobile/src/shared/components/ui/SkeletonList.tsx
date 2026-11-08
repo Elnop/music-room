@@ -8,7 +8,6 @@ interface SkeletonListProps {
 	style?: StyleProp<ViewStyle>;
 }
 
-/** Screen readers hear « Chargement » once for the whole list, never each block. */
 export function SkeletonList({ count = 6, row: Row, header, style }: SkeletonListProps) {
 	return (
 		<View

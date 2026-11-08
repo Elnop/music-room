@@ -3,7 +3,6 @@ import type { View } from 'react-native';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { useMenuAnchorStore } from '@/shared/stores/menuAnchorStore';
 
-/** On wide screens, records where the button is before its menu opens. */
 export function useAnchoredPress(button: RefObject<View | null>, onPress: () => void): () => void {
 	const { isWide } = useBreakpoint();
 

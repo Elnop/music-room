@@ -2,7 +2,6 @@ import React from 'react';
 import { KeyButton } from '@/shared/components/ui/KeyButton';
 import type { PlayPlaylist } from '@/features/playlists/detail/hooks/usePlayPlaylist';
 
-/** In the header, so it scrolls with the list and never covers a row. */
 export function PlayPlaylistButton({ play }: { play: PlayPlaylist }) {
 	return (
 		<KeyButton

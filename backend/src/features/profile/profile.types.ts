@@ -19,7 +19,6 @@ export type OwnProfile = z.infer<typeof ownProfileSchema>;
 
 export type PublicProfile = z.infer<typeof publicProfileSchema>;
 
-/** A field hidden by privacy is undefined; a visible one is present, even if empty. */
 export type FilteredProfile = z.infer<typeof filteredProfileSchema>;
 
 export type ProfilePrivacy = z.infer<typeof privacySettingsSchema>;

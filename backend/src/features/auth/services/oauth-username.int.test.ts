@@ -24,7 +24,6 @@ describe('OAuth username generation', () => {
 	});
 
 	it('cuts a long name to 20 characters, and keeps the suffix of a taken one', async () => {
-		// Ends with a letter: a trailing '1' would equal its own "1" suffix.
 		const id = randomUUID().replace(/-/g, '');
 		const name = `Longnamefortest ${id.slice(0, 4)}x ${id.slice(4, 10)}`;
 		const base = name

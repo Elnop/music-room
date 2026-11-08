@@ -27,7 +27,6 @@ export function createSessionActions(set: SetAuthState, get: GetAuthState): Sess
 		});
 	};
 
-	/** Device only: `authApi.logout` would refresh through `apiRequest` and call `refreshAccessToken` again. */
 	const endSessionLocally = async (): Promise<void> => {
 		set(SIGNED_OUT);
 		await storedSession.clear();
@@ -50,7 +49,6 @@ export function createSessionActions(set: SetAuthState, get: GetAuthState): Sess
 				}
 			}
 			await endSessionLocally();
-			// After the session ends, so the player no longer saves it for this user.
 			if (user) await lastTrackStorage.clear(user.id);
 		},
 

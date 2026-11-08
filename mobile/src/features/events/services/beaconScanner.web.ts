@@ -1,6 +1,3 @@
-// Browser variant: a browser cannot scan Bluetooth advertisements, so the scan reports
-// "unsupported" and the nearby screen keeps to the location.
-
 interface BeaconFrame {
 	minor: number;
 	rssi: number;
@@ -9,7 +6,6 @@ interface BeaconFrame {
 
 export type ScannerState = 'on' | 'off' | 'unsupported';
 
-/** True, so the screen never offers a permission it cannot get. */
 export function requestScanPermission(): Promise<boolean> {
 	return Promise.resolve(true);
 }

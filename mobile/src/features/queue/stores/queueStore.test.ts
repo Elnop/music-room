@@ -171,7 +171,6 @@ const setAuthUser = (user: UserProfile | null) => {
 };
 
 const store = () => useQueueStore.getState();
-/** The signed-in user's queue (the test user is `owner`). */
 const mine = () => store().queues.owner ?? EMPTY_QUEUE;
 
 beforeEach(() => {
@@ -586,7 +585,6 @@ describe('queueStore moveItem', () => {
 });
 
 describe('queueStore playPlaylist', () => {
-	/** `ids` queued from playlist `p1`, after a list item `x`. */
 	const withBlock = (currentItemId: string | null, ids: string[]): QueueState => ({
 		ownerId: 'owner',
 		version: ++nextVersion,
@@ -762,9 +760,9 @@ describe('queueStore owners (#297)', () => {
 	it('applies the new account state after a late state of the old one', () => {
 		setAuthUser({ id: 'A' } as UserProfile);
 		store().applyState(ownedBy('A', 56, 'a'));
-		store().reset(); // logout of A
+		store().reset();
 		setAuthUser({ id: 'B' } as UserProfile);
-		store().applyState(ownedBy('A', 57, 'b')); // late answer
+		store().applyState(ownedBy('A', 57, 'b'));
 		store().applyState(ownedBy('B', 3, 'c'));
 		expect(store().queues.A).toBeUndefined();
 		expect(store().queues.B).toMatchObject({ version: 3, currentItemId: 'c' });
@@ -844,7 +842,6 @@ describe('queueStore owners (#297)', () => {
 		expect(mine().currentItemId).toBe('a');
 		store().setCurrentItem('owner', 'b', 4);
 		expect(mine().currentItemId).toBe('b');
-		// The queue:updated of that version still applies.
 		store().applyState(ownedBy('owner', 4, 'c'));
 		expect(mine().currentItemId).toBe('c');
 	});

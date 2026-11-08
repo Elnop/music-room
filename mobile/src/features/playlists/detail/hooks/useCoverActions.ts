@@ -22,7 +22,6 @@ interface CoverActions {
 	remove: () => void;
 }
 
-/** Only the owner can change the cover: the plan is fetched for them alone. */
 export function useCoverActions(
 	navigation: Pick<NativeStackNavigationProp<PlaylistStackParamList>, 'getParent'>,
 	playlistId: string,
@@ -54,7 +53,6 @@ export function useCoverActions(
 			showSuccess(done);
 		} catch (error) {
 			if (error instanceof ApiError && error.code === 'PREMIUM_REQUIRED') {
-				// Downgraded from another device: the cached plan is stale.
 				void refetchPlan();
 				showLocked();
 				return;

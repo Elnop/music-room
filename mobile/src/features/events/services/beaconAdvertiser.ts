@@ -6,8 +6,6 @@ import {
 	eventBeaconFrame,
 } from '@/features/events/utils/ibeacon';
 
-// The native side (local module mobile/modules/beacon-advertiser) only broadcasts the bytes it is given.
-
 type BluetoothState = 'on' | 'off' | 'unsupported';
 
 interface BeaconAdvertiserModule {
@@ -32,7 +30,6 @@ export class AdvertiseError extends Error {
 	}
 }
 
-/** Android 12+ asks for "Nearby devices" to advertise; older versions grant it at install. */
 async function requestAdvertisePermission(): Promise<boolean> {
 	if (Platform.OS !== 'android' || Number(Platform.Version) < 31) return true;
 	const result = await PermissionsAndroid.request(
@@ -47,7 +44,6 @@ async function requestAdvertisePermission(): Promise<boolean> {
 	return result === PermissionsAndroid.RESULTS.GRANTED;
 }
 
-/** Throws an AdvertiseError. */
 export async function startEventBeacon(beaconMinor: number): Promise<void> {
 	const native = nativeModule();
 	if (!native) throw new AdvertiseError('unsupported');

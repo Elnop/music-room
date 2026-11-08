@@ -23,7 +23,6 @@ export function useDebouncedText(): DebouncedText {
 		if (value.trim()) {
 			settle(value);
 		} else {
-			// Cleared: drop the results now rather than after the delay.
 			settle.cancel();
 			setSettled('');
 		}

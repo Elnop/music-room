@@ -89,7 +89,6 @@ describe('Queue routes: POST /api/queue/playlists/:playlistId/play', () => {
 	}
 
 	beforeAll(async () => {
-		// verifyToken checks the logout denylist and fails closed without Redis.
 		await connectRedis();
 		if (!isRedisConnected()) throw new Error('Redis from scripts/test-db.sh is not reachable');
 
@@ -108,7 +107,7 @@ describe('Queue routes: POST /api/queue/playlists/:playlistId/play', () => {
 	afterAll(async () => {
 		await new Promise<void>(resolve => httpServer.close(() => resolve()));
 		await disconnectRedis();
-		if (user) await supabaseAdmin.auth.admin.deleteUser(user.id); // cascades
+		if (user) await supabaseAdmin.auth.admin.deleteUser(user.id);
 		await supabaseAdmin.from('tracks').delete().like('track_uri', `${URI_PREFIX}/%`);
 	});
 

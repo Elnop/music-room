@@ -165,7 +165,7 @@ describe('playlist:updated broadcast', () => {
 		await getIO()?.close();
 		await supabaseAdmin.from('tracks').delete().like('track_uri', `${URI_PREFIX}/%`);
 		for (const user of [owner, viewer, outsider]) {
-			if (user) await supabaseAdmin.auth.admin.deleteUser(user.id); // cascades to playlists
+			if (user) await supabaseAdmin.auth.admin.deleteUser(user.id);
 		}
 		await disconnectRedis();
 	});

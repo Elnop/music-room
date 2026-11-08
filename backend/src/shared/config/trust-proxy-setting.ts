@@ -1,6 +1,5 @@
 import proxyaddr from 'proxy-addr';
 
-// No env import: env.ts validates TRUST_PROXY with these functions.
 type TrustProxySetting = boolean | number | string;
 
 export function parseTrustProxy(value: string): TrustProxySetting {
@@ -14,7 +13,6 @@ export function parseTrustProxy(value: string): TrustProxySetting {
 		.join(',');
 }
 
-/** Same rules as Express's compileTrust, so HTTP and Socket.io agree. Throws on a bad address. */
 export function compileTrust(setting: TrustProxySetting): (addr: string, hop: number) => boolean {
 	if (setting === true) return () => true;
 	if (setting === false) return () => false;

@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { addTrackSchema } from '@/shared/utils/track-upsert.js';
 
-/** `previewUrl` is a stream URL: never persisted. */
 export const addQueueItemSchema = addTrackSchema.omit({ previewUrl: true });
 
 export const addQueueItemBodySchema = addQueueItemSchema.extend({
@@ -16,7 +15,6 @@ const playbackBodySchema = z.object({ deviceId: z.string().min(1).max(128).optio
 
 export const queuePlaybackSchema = playbackBodySchema.optional().transform(body => body ?? {});
 
-/** `startTrackId` is the track's `id` in the playlist's `tracks`. */
 export const queuePlayPlaylistSchema = playbackBodySchema
 	.extend({
 		startTrackId: z.uuid('Invalid playlist track ID format').optional(),
@@ -36,14 +34,12 @@ export const queuePlaylistParamsSchema = z.object({
 		.meta({ param: { description: 'Id of a playlist you can view' } }),
 });
 
-/** `afterItemId` null: right after the current item. */
 export const moveQueueItemSchema = z.object({
 	afterItemId: z.uuid('Invalid queue item ID format').nullable(),
 });
 
 const deviceIdSchema = z.string().min(1).max(128);
 
-/** `source` is the remote device to pause. */
 export const transferSchema = z.object({
 	targetUserId: z.uuid('Invalid user ID format'),
 	targetDeviceId: deviceIdSchema,

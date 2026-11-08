@@ -53,7 +53,6 @@ export function TrackTableRow({
 				isDragActive && styles.rowActive,
 			]}
 		>
-			{/* The row's buttons sit beside its pressable area, never in it: the web nests no <button>. */}
 			<Pressable
 				onPress={onPress}
 				onLongPress={onShowActions}
@@ -110,7 +109,6 @@ export function TrackTableRow({
 					<Pressable
 						onPressIn={onDragStart}
 						hitSlop={10}
-						// Faint until the pointer is over the row, so a touch screen still shows it.
 						style={[styles.dragHandle, !hovered && !isDragActive && styles.dragHandleIdle]}
 						accessibilityLabel="Réordonner"
 					>

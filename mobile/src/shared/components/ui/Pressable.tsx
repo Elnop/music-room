@@ -13,7 +13,6 @@ import { useIconTooltip } from '@/shared/hooks/useIconTooltip';
 
 export const PRESSED_OPACITY = 0.7;
 
-/** Opacity only: the browser already shows the hand cursor on an enabled pressable. */
 export const HOVERED_OPACITY = 0.85;
 
 type PressState = PressableStateCallbackType & { hovered?: boolean };
@@ -35,7 +34,6 @@ const HAPTICS = {
 } as const;
 
 interface PressableProps extends Omit<NativePressableProps, 'style' | 'accessibilityLabel'> {
-	/** Required, so no control is silent for a screen reader. */
 	accessibilityLabel: string;
 	style?: StyleProp<ViewStyle>;
 	haptic?: keyof typeof HAPTICS;
@@ -49,7 +47,6 @@ export function Pressable({
 	disabled,
 	...rest
 }: PressableProps) {
-	// A backdrop (role none) closes its dialog anywhere; a tooltip over all of it would mislead.
 	const tooltipRef = useIconTooltip(
 		accessibilityRole === 'none' ? undefined : rest.accessibilityLabel
 	);

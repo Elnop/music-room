@@ -29,7 +29,6 @@ interface LinkedAccountRowProps {
 	pending: OAuthProvider | null;
 	onLink: (provider: OAuthProvider) => void;
 	onUnlink: (provider: OAuthProvider) => void;
-	/** Web: linking Google starts from Google's own button. */
 	googleButton?: GoogleButtonSlot;
 }
 

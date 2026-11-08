@@ -52,7 +52,6 @@ describe('profileSearchService.searchUsers (#236)', () => {
 		const ids = (await profileSearchService.searchUsers(`s${tag}_50%_off`)).map(p => p.id);
 		expect(ids).toEqual([targetId]);
 		expect(await profileSearchService.searchUsers(`s${tag}%plain`)).toEqual([]);
-		// * is not "anything": it stands for exactly one character
 		expect(await profileSearchService.searchUsers(`s${tag}*lain`)).toEqual([]);
 	});
 });

@@ -11,7 +11,6 @@ export function setIO(server: AppSocketServer): void {
 	io = server;
 }
 
-/** userId -> deviceId -> status. */
 export const listeningStatuses = new Map<string, Map<string, ListeningStatus>>();
 
 export const socketToDevice = new Map<string, { userId: string; deviceId: string }>();

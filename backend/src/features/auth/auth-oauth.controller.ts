@@ -47,7 +47,6 @@ export async function unlinkProvider(req: Request, res: Response) {
 	const userId = (req as AuthenticatedRequest).user.id;
 	const provider = req.params.provider as OAuthProvider;
 
-	// Checked by hand, not by providerParamSchema: this route answers INVALID_PROVIDER.
 	if (!['google', 'facebook'].includes(provider)) {
 		throw new AppError(400, "Invalid provider. Must be 'google' or 'facebook'", 'INVALID_PROVIDER');
 	}

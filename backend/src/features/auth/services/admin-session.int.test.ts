@@ -5,7 +5,6 @@ import * as loginService from '@/features/auth/services/login.service.js';
 import * as sessionService from '@/features/auth/services/session.service.js';
 import * as oauthLoginService from '@/features/auth/services/oauth-login.service.js';
 
-// oauth.service calls Google and Facebook.
 const { verifyGoogleToken } = vi.hoisted(() => ({ verifyGoogleToken: vi.fn() }));
 
 vi.mock('@/features/auth/services/oauth.service.js', () => ({
@@ -39,7 +38,6 @@ async function createUser(googleId?: string): Promise<{ id: string; email: strin
 	return { id, email };
 }
 
-/** Under RLS another user's update matches no row and PostgREST returns no error: count the rows. */
 async function expectAdminWriteOn(userId: string): Promise<void> {
 	const bio = `bio-${randomUUID()}`;
 	const { data, error } = await supabaseAdmin
@@ -53,7 +51,6 @@ async function expectAdminWriteOn(userId: string): Promise<void> {
 
 describe('supabaseAdmin after a user sign-in (local Supabase stack)', () => {
 	afterAll(async () => {
-		// Cascades to user_profiles.
 		for (const id of createdUserIds) await supabaseAdmin.auth.admin.deleteUser(id);
 	});
 

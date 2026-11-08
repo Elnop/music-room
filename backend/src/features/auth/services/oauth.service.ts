@@ -72,7 +72,6 @@ export async function verifyGoogleToken(idToken: string): Promise<GoogleTokenPay
 
 export async function verifyFacebookToken(accessToken: string): Promise<FacebookTokenPayload> {
 	try {
-		// The user token alone tells which app it was issued for: no app secret needed.
 		const appResponse = await fetch(graphUrl('app', accessToken));
 		const appData = (await appResponse.json()) as {
 			id?: string;

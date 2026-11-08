@@ -1,10 +1,3 @@
--- =====================================================
--- 026: device_custom_name
--- The name the owner gives one of their devices (#352). device_name stays the
--- system name, refreshed on every connection; custom_name is never touched by
--- that refresh. The API shows custom_name when set, device_name otherwise.
--- NULL means "use the system name".
--- =====================================================
 
 ALTER TABLE public.devices
   ADD COLUMN IF NOT EXISTS custom_name TEXT

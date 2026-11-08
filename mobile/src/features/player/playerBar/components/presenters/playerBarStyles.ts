@@ -3,7 +3,6 @@ import type { Theme } from '@/shared/theme/types';
 
 export const DISABLED_OPACITY = 0.35;
 
-/** Wide enough for "12:34" on each side of the progress slider. */
 const TIME_WIDTH = 44;
 
 export const createStyles = (theme: Theme) =>

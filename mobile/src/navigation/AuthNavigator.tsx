@@ -35,7 +35,6 @@ export function AuthNavigator() {
 					fontFamily: theme.typography.families.bold,
 				},
 				headerTitleAlign: 'center',
-				// No title: the screens show the logo.
 				headerTitle: '',
 			}}
 		>

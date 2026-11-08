@@ -16,7 +16,6 @@ interface CodeInputProps {
 	editable?: boolean;
 }
 
-/** The first box accepts a pasted or autofilled code. */
 export function CodeInput({
 	digits,
 	setBoxRef,

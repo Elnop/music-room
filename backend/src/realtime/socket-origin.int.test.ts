@@ -4,7 +4,6 @@ import type { AddressInfo } from 'node:net';
 import { io as ioClient, type Socket as ClientSocket } from 'socket.io-client';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
-// Set before env.ts loads (dotenv never overrides a set variable), so a local .env cannot change it.
 vi.hoisted(() => {
 	process.env.ALLOWED_ORIGINS = 'http://allowed.example';
 	process.env.NODE_ENV = 'test';

@@ -24,7 +24,7 @@ export interface GoogleTokenPayload {
 
 export interface FacebookTokenPayload {
 	id: string;
-	email?: string; // Missing when the user denies the email permission
+	email?: string;
 	name: string;
 	picture?: string;
 }

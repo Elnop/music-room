@@ -3,11 +3,9 @@ import type { OwnerQueue, QueueItem } from '@/shared/types/playback';
 interface UpNext {
 	current: QueueItem | null;
 	items: QueueItem[];
-	/** Every item after the current one, shown or not. */
 	total: number;
 }
 
-/** Without a current item the whole queue is still to come. */
 export function upNext(queue: OwnerQueue, count: number): UpNext {
 	const index =
 		queue.currentItemId === null

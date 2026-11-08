@@ -43,7 +43,6 @@ interface SocketClientContext {
 const eventNameSchema = z.string().regex(/^[\w:.-]{1,64}$/);
 const INVALID_EVENT_NAME = '<invalid-event-name>';
 
-/** A client picks the event name: refuse huge or multi-line ones that could forge log lines. */
 export function loggableEventName(eventName: unknown): string {
 	const name = eventNameSchema.safeParse(eventName);
 	return name.success ? name.data : INVALID_EVENT_NAME;

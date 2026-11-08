@@ -1,21 +1,15 @@
-// Real-time load scenario (`make perf-test`), on the fixtures written by perf-fixtures.ts. Run from
-// backend/: `npx tsx src/test/perf-socket.ts --out <file.json>`; exits non-zero only when no client connects.
-
 import { readFile, writeFile } from 'node:fs/promises';
 import { io as ioClient, type Socket } from 'socket.io-client';
 import { z } from 'zod';
 
-// CLI output, not application logs: written to the terminal directly.
 const print = (line: string) => process.stdout.write(`${line}\n`);
 const printError = (line: string) => process.stderr.write(`${line}\n`);
 
-/** Cleaned by perf-fixtures.ts on every run. */
 const PERF_TRACK_URI_PREFIX = 'https://soundcloud.com/zumik-perf/';
 const TIMEOUT_MS = 5_000;
 const INTERVAL_MS = 2_000;
 const JITTER_MS = 500;
 const CONNECT_BATCH = 20;
-/** playlist:join has no ack: time left to its handlers before the load starts. */
 const JOIN_SETTLE_MS = 1_000;
 
 const fixturesDir = new URL('../../../tests/performance/fixtures/', import.meta.url);
@@ -38,7 +32,6 @@ interface Client {
 	user: FixtureUser;
 	socket: Socket;
 	joined: boolean;
-	/** Oldest first, waiting for control:success. */
 	pendingSuccess: ControlRecord[];
 }
 
@@ -193,7 +186,6 @@ interface Context {
 	deviceId: string;
 	clients: Client[];
 	pendingEdits: Map<string, PendingEdit>;
-	/** By sender user id, oldest first, waiting for control:command at perf_0. */
 	pendingCommands: Map<string, ControlRecord[]>;
 }
 
@@ -256,7 +248,6 @@ async function edit(ctx: Context, client: Client): Promise<void> {
 	const json = (await response.json()) as { data?: { track?: { id?: string } } };
 	const trackId = json.data?.track?.id;
 
-	// The deadline runs from the send, like the samples.
 	const timer = setTimeout(settle, Math.max(0, TIMEOUT_MS - (performance.now() - pending.sentAt)));
 	if (pending.received.size >= expected.size) settle();
 	await done;
@@ -345,7 +336,6 @@ function listen(ctx: Context, target: Socket | null): void {
 			const record = client.pendingSuccess.shift();
 			if (!record) return;
 			controls.failed += 1;
-			// No command follows a refusal: drop it from perf_0's waiting list.
 			const queue = ctx.pendingCommands.get(client.user.userId);
 			const at = queue?.indexOf(record) ?? -1;
 			if (queue && at >= 0) queue.splice(at, 1);
@@ -373,7 +363,6 @@ function listen(ctx: Context, target: Socket | null): void {
 }
 
 async function runClient(ctx: Context, client: Client, endAt: number): Promise<void> {
-	// Spread the first actions over one interval.
 	await sleep(Math.random() * INTERVAL_MS);
 	const canControl = client.user.userId !== ctx.ownerId;
 	while (Date.now() < endAt && client.socket.connected) {

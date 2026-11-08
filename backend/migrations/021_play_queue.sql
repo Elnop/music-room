@@ -1,19 +1,10 @@
--- =====================================================
--- 021: play_queue
--- One play queue per user, shared by all of their devices (#272, #273).
--- Ranks reuse migration 016 (rank_after, rank_between, rank_spaced, rank_max_length).
--- =====================================================
 
--- One row per user: the item playing now and the lock that serializes the
--- user's writers (queue_lock).
 CREATE TABLE public.play_queues (
   user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   current_item_id uuid,
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 
--- Items in rank order. Items ranked before the current one are history, those
--- after it are upcoming; with no current item every item is upcoming.
 CREATE TABLE public.play_queue_items (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL REFERENCES public.play_queues(user_id) ON DELETE CASCADE,
@@ -31,7 +22,6 @@ CREATE TABLE public.play_queue_items (
 CREATE INDEX idx_play_queue_items_block ON public.play_queue_items (user_id, block_id) WHERE block_id IS NOT NULL;
 CREATE INDEX idx_play_queue_items_track ON public.play_queue_items (track_id);
 
--- The current item is one of the user's own items; deleting it clears the pointer.
 ALTER TABLE public.play_queues
   ADD CONSTRAINT play_queues_current_item_fkey
   FOREIGN KEY (current_item_id, user_id)
@@ -44,23 +34,15 @@ COMMENT ON COLUMN public.play_queue_items.rank IS 'Sort key: base-62 fraction, c
 COMMENT ON COLUMN public.play_queue_items.block_id IS 'Items queued together from one playlist share a block';
 COMMENT ON COLUMN public.play_queue_items.block_detached IS 'Set on the whole block once the user removes or moves one of its items';
 
--- No direct access with the anon key (migration 017): only service_role, through the functions.
 REVOKE ALL ON public.play_queues FROM anon, authenticated;
 REVOKE ALL ON public.play_queue_items FROM anon, authenticated;
 ALTER TABLE public.play_queues ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.play_queue_items ENABLE ROW LEVEL SECURITY;
 
--- =====================================================
--- Operations: one function per operation, serialized per user
--- =====================================================
 
--- History kept behind the current item after a step forward.
 CREATE OR REPLACE FUNCTION public.queue_history_max()
 RETURNS int LANGUAGE sql IMMUTABLE AS $$ SELECT 50 $$;
 
--- Creates the user's queue row if needed and locks it; every operation calls
--- it first, so the writers of one user run one at a time and cannot deadlock.
--- Returns the current item id.
 CREATE OR REPLACE FUNCTION public.queue_lock(p_user uuid)
 RETURNS uuid
 LANGUAGE plpgsql
@@ -74,7 +56,6 @@ BEGIN
 END;
 $$;
 
--- The full queue: { currentItemId, items } with items in rank order.
 CREATE OR REPLACE FUNCTION public.queue_state(p_user uuid)
 RETURNS jsonb
 LANGUAGE sql
@@ -105,7 +86,6 @@ AS $$
   );
 $$;
 
--- Respaces every rank of the user's queue, keeping the order. Caller holds the lock.
 CREATE OR REPLACE FUNCTION public.queue_rebalance(p_user uuid)
 RETURNS void
 LANGUAGE plpgsql
@@ -125,8 +105,6 @@ BEGIN
 END;
 $$;
 
--- Sets the current item and drops the history beyond queue_history_max().
--- Caller holds the lock.
 CREATE OR REPLACE FUNCTION public.queue_set_current(p_user uuid, p_item_id uuid)
 RETURNS void
 LANGUAGE plpgsql
@@ -152,9 +130,6 @@ BEGIN
 END;
 $$;
 
--- An item of the user's queue; raises QUEUE_ITEM_NOT_FOUND for an unknown item
--- or one of another user (no existence leak). Takes no row lock: the caller
--- must hold queue_lock.
 CREATE OR REPLACE FUNCTION public.queue_find_item(p_user uuid, p_item_id uuid)
 RETURNS public.play_queue_items
 LANGUAGE plpgsql
@@ -170,7 +145,6 @@ BEGIN
 END;
 $$;
 
--- A user mutation of one item of a block detaches the whole block.
 CREATE OR REPLACE FUNCTION public.queue_detach_block(p_user uuid, p_block_id uuid)
 RETURNS void
 LANGUAGE sql
@@ -179,7 +153,6 @@ AS $$
   WHERE p_block_id IS NOT NULL AND user_id = p_user AND block_id = p_block_id;
 $$;
 
--- Appends a track after the last item; the current item is unchanged.
 CREATE OR REPLACE FUNCTION public.queue_add_item(p_user uuid, p_track_id uuid)
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -203,8 +176,6 @@ BEGIN
 END;
 $$;
 
--- Removes an item. Removing the current item acts as a skip: the next item
--- becomes current; with none, the queue is emptied.
 CREATE OR REPLACE FUNCTION public.queue_remove_item(p_user uuid, p_item_id uuid)
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -225,13 +196,11 @@ BEGIN
     ORDER BY rank LIMIT 1;
 
     IF next_id IS NULL THEN
-      -- Nothing left to play: the item and the history go.
       UPDATE public.play_queues SET current_item_id = NULL, updated_at = now() WHERE user_id = p_user;
       DELETE FROM public.play_queue_items WHERE user_id = p_user;
       RETURN public.queue_state(p_user);
     END IF;
 
-    -- Delete first, so the history trim does not count the removed item.
     DELETE FROM public.play_queue_items WHERE id = item.id;
     PERFORM public.queue_set_current(p_user, next_id);
     RETURN public.queue_state(p_user);
@@ -243,8 +212,6 @@ BEGIN
 END;
 $$;
 
--- Moves an upcoming item right after p_after_item_id (NULL = right after the
--- current item, or the top when there is none). Both must be upcoming.
 CREATE OR REPLACE FUNCTION public.queue_move_item(p_user uuid, p_item_id uuid, p_after_item_id uuid DEFAULT NULL)
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -276,7 +243,6 @@ BEGIN
     END IF;
   END IF;
 
-  -- The first other item after the drop point; nothing else lies between.
   SELECT min(rank) INTO next_rank
   FROM public.play_queue_items
   WHERE user_id = p_user
@@ -296,7 +262,6 @@ BEGIN
 END;
 $$;
 
--- Plays any item of the queue: the items before it become history.
 CREATE OR REPLACE FUNCTION public.queue_play_item(p_user uuid, p_item_id uuid)
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -311,8 +276,6 @@ BEGIN
 END;
 $$;
 
--- Moves the current item one step: 'next' (from no current item, the first
--- item) or 'previous'. Raises QUEUE_END / QUEUE_START when there is none.
 CREATE OR REPLACE FUNCTION public.queue_step(p_user uuid, p_direction text)
 RETURNS jsonb
 LANGUAGE plpgsql

@@ -6,7 +6,6 @@ import { usePendingMovesStore } from '@/features/playlists/stores/pendingMovesSt
 import type { PlaylistWithTracks } from '@/features/playlists/types';
 import { isOnScreen, reloadIfOnScreen, settleTrackEvent } from './playlistCache';
 
-/** Refusals of a move that mean the track changed under us: reload and tell the user. */
 const CONFLICT_CODES = ['TRACK_MOVED_CONCURRENTLY', 'TRACK_NOT_IN_PLAYLIST', 'PLAYLIST_REBALANCED'];
 
 export const CONFLICT_MESSAGE = "Ce titre a été modifié par quelqu'un d'autre";
@@ -15,8 +14,6 @@ export function isMoveConflict(error: unknown): error is ApiError {
 	return error instanceof ApiError && CONFLICT_CODES.includes(error.code);
 }
 
-// Moves from this client go one at a time: each one is sent with the version the
-// previous one returned, so a quick second move is never refused against ourselves.
 let moveQueue: Promise<unknown> = Promise.resolve();
 
 async function sendMove(
@@ -49,7 +46,6 @@ async function sendMove(
 	}
 }
 
-/** Resolves 'skipped' once off screen; on a conflict, reloads then rejects with the ApiError. */
 export function moveTrack(
 	client: QueryClient,
 	playlistId: string,

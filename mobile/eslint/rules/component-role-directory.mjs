@@ -1,6 +1,3 @@
-// Components live in features/<feature>/<subject>/components/(orchestrators|presenters)/, React providers in
-// features/<feature>/context/. See .agents/rules/components.md#component-role-directory
-
 const FEATURES_SEGMENT = 'src/features/';
 
 const ALLOWED_FEATURE_PATHS = [

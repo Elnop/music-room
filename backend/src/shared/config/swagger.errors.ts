@@ -1,7 +1,6 @@
 import type { OpenAPIRegistry, ResponseConfig } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 
-// A doc-only date: `z.iso.datetime()` would print its whole regex in ErrorResponse.
 const dateTime = z.string().meta({ format: 'date-time' });
 
 const detailsSchema = z

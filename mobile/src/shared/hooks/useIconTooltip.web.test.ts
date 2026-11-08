@@ -26,7 +26,6 @@ function renderOn(element: ReturnType<typeof fakeElement>, label: string | undef
 
 describe('useIconTooltip (web)', () => {
 	it('names an icon-only button after its label', () => {
-		// U+F101: a glyph of the Ionicons font
 		const element = fakeElement('');
 		renderOn(element, 'Titre suivant');
 		expect(element.getAttribute('title')).toBe('Titre suivant');

@@ -5,7 +5,6 @@ import {
 	type ShortcutKeyEvent,
 } from '@/shared/utils/keyboardShortcuts';
 
-// The project compiles without the DOM library, so the document is typed here.
 interface BrowserKeyEvent extends ShortcutKeyEvent {
 	defaultPrevented: boolean;
 	preventDefault(): void;
@@ -19,7 +18,6 @@ interface BrowserDocument {
 
 const browser = globalThis as unknown as { document?: BrowserDocument };
 
-/** react-native-web marks the content of an open Modal. */
 const OPEN_DIALOG = '[aria-modal="true"]';
 
 export function useKeyboardShortcuts(shortcuts: readonly KeyboardShortcut[]): void {
@@ -35,7 +33,6 @@ export function useKeyboardShortcuts(shortcuts: readonly KeyboardShortcut[]): vo
 			if (event.defaultPrevented || document.querySelector(OPEN_DIALOG)) return;
 			const shortcut = matchShortcut(event, latestRef.current);
 			if (!shortcut) return;
-			// Space and the arrows would scroll the page, `/` opens the quick find of Firefox.
 			event.preventDefault();
 			shortcut.run();
 		};

@@ -9,8 +9,6 @@ vi.mock('@/realtime/emitters/control.emitters.js', async importOriginal => ({
 	isDeviceOnline: vi.fn(),
 }));
 
-// Presence is stubbed on the realtime emitters: no Socket.io server here.
-
 const users: string[] = [];
 const names = new Map<string, string>();
 let me: string;
@@ -76,7 +74,7 @@ beforeAll(async () => {
 beforeEach(async () => {
 	online.clear();
 	const all = [me, friend, other, stranger];
-	await supabaseAdmin.from('devices').delete().in('user_id', all); // cascades to licenses
+	await supabaseAdmin.from('devices').delete().in('user_id', all);
 	await supabaseAdmin.from('follows').delete().in('follower_id', all);
 });
 

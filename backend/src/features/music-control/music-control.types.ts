@@ -38,7 +38,6 @@ export interface QueuePlayCommand {
 	fromUserId: string;
 	item: QueueItem;
 	positionMs: number;
-	/** Version of the queue state that made `item` current. */
 	version: number;
 }
 

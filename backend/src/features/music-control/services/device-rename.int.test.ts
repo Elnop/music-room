@@ -39,7 +39,6 @@ async function storedRow(userId: string, deviceId: string) {
 }
 
 describe('device rename (#352)', () => {
-	// alice owns the device; bob is her mutual friend with "all my devices".
 	let alice: string;
 	let bob: string;
 	let phone: string;
@@ -60,7 +59,6 @@ describe('device rename (#352)', () => {
 	});
 
 	afterAll(async () => {
-		// Cascades to profiles, follows and devices.
 		for (const id of [alice, bob]) {
 			if (id) await supabaseAdmin.auth.admin.deleteUser(id);
 		}

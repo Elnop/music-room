@@ -4,7 +4,6 @@ import type { AddressInfo } from 'node:net';
 import express from 'express';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-// Loopback whitelisted so the route-level limiters skip these requests.
 vi.hoisted(() => {
 	process.env.RATE_LIMIT_ENABLED = 'true';
 	process.env.RATE_LIMIT_WHITELIST_IPS = '127.0.0.1,::1,::ffff:127.0.0.1';
@@ -15,7 +14,6 @@ vi.mock('@/features/mail/services/mail.service.js', () => ({
 	sendPasswordResetEmail: vi.fn().mockResolvedValue(undefined),
 }));
 
-// oauth.service calls Google and Facebook.
 vi.mock('@/features/auth/services/oauth.service.js', () => ({
 	verifyGoogleToken: vi.fn(),
 	verifyFacebookToken: vi.fn(),
@@ -75,7 +73,6 @@ describe('password reset ends open sessions (#203)', () => {
 			const keys = await redisClient.keys(`password_reset_*${email}*`);
 			if (keys.length > 0) await redisClient.del(...keys);
 			await new Promise<void>(resolve => httpServer.close(() => resolve()));
-			// Cascades to user_profiles.
 			if (userId) await supabaseAdmin.auth.admin.deleteUser(userId);
 		} finally {
 			await disconnectRedis();

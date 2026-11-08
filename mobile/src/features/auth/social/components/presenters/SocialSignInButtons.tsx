@@ -12,7 +12,6 @@ interface SocialSignInButtonsProps {
 	onGoogle: () => void;
 	onFacebook: () => void;
 	disabled: boolean;
-	/** Web: Google's own button replaces ours. */
 	googleButton?: GoogleButtonSlot;
 }
 

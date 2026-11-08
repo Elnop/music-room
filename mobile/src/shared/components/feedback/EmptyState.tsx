@@ -17,7 +17,6 @@ interface EmptyStateProps {
 	message: string;
 	icon?: PixelSpriteName;
 	action?: EmptyStateAction;
-	/** Among other sections on wide screens: keeps to its content's height. */
 	compact?: boolean;
 	style?: StyleProp<ViewStyle>;
 }
@@ -54,7 +53,6 @@ const createStyles = (theme: Theme) =>
 			alignItems: 'center',
 			padding: theme.spacing.xl,
 		},
-		// Longhands: on the web `flex: 0` also sets a zero basis, and the content would overflow.
 		compact: {
 			flexGrow: 0,
 			flexBasis: 'auto',

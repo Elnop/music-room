@@ -31,7 +31,6 @@ const deviceIdRequired = fail(
 	['DEVICE_ID_REQUIRED', 'A delegate must name the device to play on']
 );
 
-/** The route mirrored under /api/users/{userId}/queue. */
 function delegated(route: RouteConfig): RouteConfig {
 	const own403 = route.responses[403] as ResponseConfig | undefined;
 	const params = route.request?.params as z.ZodObject | undefined;

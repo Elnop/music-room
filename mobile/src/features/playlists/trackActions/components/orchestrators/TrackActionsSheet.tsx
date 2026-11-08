@@ -6,7 +6,6 @@ import type { AddQueueItemBody } from '@/shared/types/playback';
 import type { TrackActionsStart } from '@/shared/services/trackActionsBridge';
 
 interface TrackActionsSheetProps {
-	/** Null hides the sheet. */
 	track: AddQueueItemBody | null;
 	onClose: () => void;
 	start?: TrackActionsStart;

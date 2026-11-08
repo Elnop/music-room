@@ -5,8 +5,6 @@ import { env } from '@/shared/config/env.js';
 import { createSignInClient, supabaseAdmin, supabaseAnon } from '@/shared/config/supabase.js';
 import type { Database } from '@/shared/types/supabase.generated.js';
 
-// The anon key ships in the app: only the backend's service key may touch the public tables.
-
 const TABLES = ['user_profiles', 'follows', 'tracks', 'music_preferences', 'playlists'] as const;
 const PASSWORD = 'integration-test-password';
 
@@ -32,7 +30,6 @@ describe('no direct table access with the anon key (#201)', () => {
 		});
 		if (profileError) throw profileError;
 
-		// A real user to follow, so a granted insert would really succeed.
 		const { data: target, error: targetError } = await supabaseAdmin.auth.admin.createUser({
 			email: `int-${randomUUID()}@example.com`,
 			password: PASSWORD,
@@ -66,7 +63,7 @@ describe('no direct table access with the anon key (#201)', () => {
 		const { data, error } = await supabaseAnon.from(table).select('*').limit(1);
 
 		expect(data).toBeNull();
-		expect(error?.code).toBe('42501'); // insufficient_privilege
+		expect(error?.code).toBe('42501');
 	});
 
 	it('refuses reading the reset and verification codes, even of the own row', async () => {

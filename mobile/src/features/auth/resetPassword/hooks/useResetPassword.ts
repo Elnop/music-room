@@ -44,7 +44,6 @@ export function useResetPassword(
 
 	const submit = () => {
 		const fullCode = code.digits.join('');
-		// The button waits for the six digits; nothing to show here.
 		if (fullCode.length !== 6) return;
 		const invalid = newPasswordError(newPassword, confirmation);
 		setPasswordError(invalid);

@@ -11,7 +11,6 @@ interface PlaylistCardSkeletonProps {
 
 export function PlaylistCardSkeleton({ width: fixedWidth }: PlaylistCardSkeletonProps) {
 	const { theme } = useTheme();
-	// Same width as PlaylistGridCard, so the grid does not jump when cards arrive.
 	const tileWidth = useGridTileWidth();
 	const width = fixedWidth ?? tileWidth;
 	const styles = useMemo(() => createStyles(theme), [theme]);

@@ -15,7 +15,6 @@ import {
 	toDevice,
 } from '@/features/music-control/utils/device.helpers.js';
 
-// `created_at` and `custom_name` stay out of the upsert so reconnections keep them.
 export async function recordConnection(userId: string, device: DeviceInfo): Promise<string> {
 	const { data, error } = await supabaseAdmin
 		.from('devices')
@@ -65,7 +64,6 @@ export async function renameDevice(
 	return toDevice(data);
 }
 
-// Licenses of former friends stay listed so the owner can revoke them.
 export async function listMyDevices(ownerId: string): Promise<DeviceWithLicenses[]> {
 	const [devices, licensesResult] = await Promise.all([
 		listOwnerDevices(ownerId),

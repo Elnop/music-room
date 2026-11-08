@@ -32,7 +32,6 @@ export async function verifyToken(token: string): Promise<SupabaseUser> {
 	}
 }
 
-/** An outage is a 503, not a 401, so the client keeps its session. */
 export async function refreshToken(refreshToken: string): Promise<AuthResponse> {
 	try {
 		const { data, error } = await createSignInClient().auth.refreshSession({
@@ -68,7 +67,6 @@ export async function refreshToken(refreshToken: string): Promise<AuthResponse> 
 	}
 }
 
-/** Scope 'local': the user's other devices stay signed in. */
 export async function logout(token: string, userId: string): Promise<void> {
 	await tokenRevocation.revoke(token);
 
@@ -90,7 +88,6 @@ export async function logout(token: string, userId: string): Promise<void> {
 	}
 }
 
-/** 408 (timeout) and 429 (rate limit) say nothing about the token. */
 function isRefusal(error: unknown): boolean {
 	return (
 		isAuthApiError(error) &&

@@ -44,7 +44,6 @@ export function FriendsListTab({
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createFriendsListStyles(theme), [theme]);
 	const column = useContentColumn();
-	// A short list spreads over the width instead of leaving empty columns.
 	const columns = Math.min(rowColumns(useBreakpoint().breakpoint), Math.max(2, friends.length));
 
 	if (isLoading && friends.length === 0) {

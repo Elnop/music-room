@@ -5,7 +5,6 @@ import { connectRedis, disconnectRedis, isRedisConnected } from '@/shared/config
 import * as loginService from '@/features/auth/services/login.service.js';
 import * as sessionService from '@/features/auth/services/session.service.js';
 
-// oauth.service calls Google and Facebook.
 vi.mock('@/features/auth/services/oauth.service.js', () => ({
 	verifyGoogleToken: vi.fn(),
 	verifyFacebookToken: vi.fn(),
@@ -50,7 +49,6 @@ describe('logout revokes the session (local Supabase stack + Redis)', () => {
 	});
 
 	afterAll(async () => {
-		// Cascades to user_profiles.
 		for (const id of createdUserIds) await supabaseAdmin.auth.admin.deleteUser(id);
 		await disconnectRedis();
 	});

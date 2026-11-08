@@ -22,7 +22,6 @@ interface UserProfileWideSectionsProps {
 	listening?: React.ReactNode;
 }
 
-/** A field the server leaves out is hidden by privacy; null or empty means the user left it blank. */
 function infoRows(profile: FilteredProfile): ProfileInfoRow[] {
 	const rows: ProfileInfoRow[] = [{ label: "Nom d'utilisateur", value: `@${profile.username}` }];
 	if (profile.email) rows.push({ label: 'Email', value: profile.email });

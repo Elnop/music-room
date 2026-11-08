@@ -50,7 +50,6 @@ export async function createOAuthUser(
 			effectiveEmail,
 			profile
 		);
-		// null: the generated username was taken meanwhile; retry.
 		return created ?? (await createOAuthUser(provider, providerId, email, profile));
 	} catch (error) {
 		if (error instanceof AppError) throw error;
@@ -59,7 +58,6 @@ export async function createOAuthUser(
 	}
 }
 
-/** The provider may be linked under another email, so the session uses the account's own email. */
 async function signInLinkedAccount(account: UserProfileRow): Promise<OAuthUser> {
 	if (!account.email_verified) {
 		await supabaseAdmin.from('user_profiles').update({ email_verified: true }).eq('id', account.id);

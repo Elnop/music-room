@@ -1,6 +1,3 @@
-// The native picker has no web version: a modal <dialog> holds a `datetime-local` field.
-// The project types no DOM (lib esnext), hence the few element shapes below.
-
 interface DomElement {
 	textContent: string | null;
 	style: Record<string, string>;
@@ -28,13 +25,11 @@ const CONFIRM = 'confirm';
 
 const pad = (value: number) => String(value).padStart(2, '0');
 
-/** `datetime-local` takes the local time, without seconds or zone. */
 export function toLocalInputValue(date: Date): string {
 	const day = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 	return `${day}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
-/** Null for an empty or invalid value. A zoneless ISO date-time parses as local time. */
 export function fromLocalInputValue(value: string): Date | null {
 	if (!value) return null;
 	const date = new Date(value);
@@ -57,7 +52,6 @@ function button(doc: DomDocument, label: string, attributes: Record<string, stri
 	return node;
 }
 
-/** Null when the dialog is cancelled or closed with Escape. */
 export function pickDateTime(current: Date): Promise<Date | null> {
 	const doc = (globalThis as unknown as { document: DomDocument }).document;
 	const dialog = element<DomDialog>(doc, 'dialog', { 'aria-label': 'Date et heure' });

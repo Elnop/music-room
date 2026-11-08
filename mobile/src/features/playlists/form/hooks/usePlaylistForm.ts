@@ -16,7 +16,6 @@ import {
 import { playlistFormSchema, type PlaylistFormInput } from '@/features/playlists/validators';
 import type { Playlist, PlaylistStackParamList } from '@/features/playlists/types';
 
-// The backend allows 100 and 500.
 const PLAYLIST_LIMITS = { NAME_MAX: 50, DESCRIPTION_MAX: 500 } as const;
 
 type Navigation = NativeStackNavigationProp<PlaylistStackParamList, 'CreatePlaylist'>;
@@ -39,7 +38,6 @@ export function usePlaylistForm(
 ): PlaylistForm {
 	const client = useQueryClient();
 	const signedIn = useSession(session => session.user !== null);
-	// Prefilled once, from the screen it was opened from: later changes must not reset the input.
 	const [edited] = useState<Pick<Playlist, 'name' | 'description'> | undefined>(() =>
 		editedId === undefined
 			? undefined

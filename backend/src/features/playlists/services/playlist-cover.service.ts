@@ -14,7 +14,6 @@ import type { CoverResponse } from '@/features/playlists/playlist.types.js';
 
 export const COVER_BUCKET = 'playlist-covers';
 
-/** Never throws; ignores a cover not stored in this bucket for this playlist. */
 export async function deleteCoverFile(
 	coverUrl: string | null | undefined,
 	playlistId: string
@@ -74,7 +73,6 @@ export async function uploadCover(
 	return { coverUrl };
 }
 
-/** Any plan: after a downgrade the owner can still remove the cover. */
 export async function removeCover(playlistId: string, userId: string): Promise<CoverResponse> {
 	await checkOwnership(playlistId, userId);
 

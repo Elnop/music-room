@@ -39,7 +39,6 @@ export async function getPlaylistById(req: Request, res: Response) {
 	const userId = (req as AuthenticatedRequest).user.id;
 	const id = routeParam(req, 'id');
 	sendSuccess(res, { playlist: await playlistService.getPlaylistById(id, userId) });
-	// After the response: changes reach the client through `playlist:tracks-availability`.
 	void trackAvailabilityService.refreshPlaylistAvailability(id);
 }
 

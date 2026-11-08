@@ -14,7 +14,6 @@ export async function checkAccountLockout(
 	const ip = requestIp(req);
 
 	if (!email) {
-		// Let validation report the missing email.
 		return next();
 	}
 
@@ -63,7 +62,6 @@ export async function checkAccountLockout(
 			ip,
 		});
 
-		// On error, let the attempt proceed: the controller records the failure.
 		next();
 	}
 }

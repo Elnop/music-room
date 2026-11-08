@@ -7,7 +7,6 @@ import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { Pressable } from './Pressable';
 
-/** `device`: a control of where the sound plays. */
 type KeyTone = 'primary' | 'surface' | 'device';
 
 interface KeyButtonProps {
@@ -15,7 +14,6 @@ interface KeyButtonProps {
 	onPress: () => void;
 	accessibilityLabel: string;
 	tone?: KeyTone;
-	/** The side of a square key; a key with children grows to fit them. */
 	size?: number;
 	iconSize?: number;
 	disabled?: boolean;

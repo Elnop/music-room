@@ -13,7 +13,6 @@ export async function searchUsers(
 	try {
 		logger.info('Searching users', { query, limit, viewerId });
 
-		// The query is matched literally, never read as filter syntax
 		const pattern = ilikeContains(query);
 		let queryBuilder = supabaseAdmin
 			.from('user_profiles')
@@ -43,7 +42,6 @@ export async function searchUsers(
 			username: profile.username,
 			displayName: profile.display_name ?? undefined,
 			avatarUrl: visibility.get(profile.id)?.avatar ? (profile.avatar_url ?? undefined) : undefined,
-			// Visible but empty is '', as on GET /:userId
 			bio: visibility.get(profile.id)?.bio ? profile.bio || '' : undefined,
 			favoriteArtist: profile.favorite_artist ?? undefined,
 			createdAt: profile.created_at ?? new Date().toISOString(),

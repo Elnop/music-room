@@ -29,7 +29,6 @@ export function EventDetailView({ screen, beacon, bottomPadding }: EventDetailVi
 	const { event } = screen;
 
 	if (!event) {
-		// A deleted event shows the spinner while its screen closes.
 		if (!screen.failed) return <LoadingSpinner />;
 		return <EmptyState icon="alert" message="Impossible de charger l'événement" />;
 	}

@@ -10,7 +10,6 @@ export interface ListeningStatus {
 		artworkUrl: string | null;
 	} | null;
 	isPlaying: boolean;
-	/** Null from older clients. */
 	positionMs: number | null;
 	updatedAt: string;
 }
@@ -26,7 +25,6 @@ export interface ControlActionPayload {
 	action: 'play' | 'pause';
 }
 
-/** The receiver no longer controls any of ownerId's devices. */
 export interface ControlRevokedPayload {
 	ownerId: string;
 }

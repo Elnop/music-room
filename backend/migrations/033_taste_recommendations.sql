@@ -1,12 +1,3 @@
--- =====================================================
--- 033: taste_recommendations
--- Profiles whose music genres overlap the caller's, best match first:
--- Jaccard similarity of the two genre sets, then the number of shared
--- genres. Only profiles whose music preferences are public are candidates
--- (a missing privacy row means public, as in the backend), so a suggestion
--- never reveals friends-only or private tastes. The caller and the profiles
--- the caller already follows are left out.
--- =====================================================
 
 CREATE OR REPLACE FUNCTION public.recommend_similar_profiles(p_user uuid, p_limit integer)
 RETURNS TABLE (user_id uuid, common_genres text[], score double precision)

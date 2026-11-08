@@ -131,7 +131,7 @@ describe('queue:updated broadcast', () => {
 	afterAll(async () => {
 		await getIO()?.close();
 		for (const user of [owner, other]) {
-			if (user) await supabaseAdmin.auth.admin.deleteUser(user.id); // cascades to queues
+			if (user) await supabaseAdmin.auth.admin.deleteUser(user.id);
 		}
 		await supabaseAdmin.from('tracks').delete().like('track_uri', `${URI_PREFIX}/%`);
 		await disconnectRedis();

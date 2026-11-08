@@ -31,7 +31,6 @@ interface ReorderableListProps<T> extends PassThroughProps<T> {
 	data: T[];
 	keyExtractor: (item: T, index: number) => string;
 	renderItem: (info: ReorderableRenderItemInfo<T>) => React.ReactElement | null;
-	/** Once a returned promise settles, the rows show the order of `data` again. */
 	onReorder: (from: number, to: number) => void | Promise<unknown>;
 	dragEnabled?: boolean;
 }
@@ -43,7 +42,6 @@ interface CellProps<T> {
 	dragRequested: SharedValue<boolean>;
 }
 
-// The library's hooks only work inside a cell, so each row renders through this.
 function Cell<T>({ item, index, renderItem, dragRequested }: CellProps<T>) {
 	const startDrag = useReorderableDrag();
 	const isActive = useIsActive();
@@ -54,7 +52,6 @@ function Cell<T>({ item, index, renderItem, dragRequested }: CellProps<T>) {
 	return renderItem({ item, index, drag, isActive });
 }
 
-// Past this many points without a drag request, the touch is a scroll, a pull to refresh or a swipe.
 const DRAG_DECISION_SLOP = 10;
 
 export function ReorderableList<T>({
@@ -65,13 +62,11 @@ export function ReorderableList<T>({
 	dragEnabled = true,
 	...listProps
 }: ReorderableListProps<T>) {
-	// The dropped order, valid while `data` is the array it was built from.
 	const [override, setOverride] = React.useState<{ base: T[]; items: T[] } | null>(null);
 	const items = override && override.base === data ? override.items : data;
 
 	const dragRequested = useSharedValue(false);
 	const touchStart = useSharedValue({ x: 0, y: 0 });
-	// Activates only once a row asks for a drag: an eager pan steals the touch from the scroll and RefreshControl on Android.
 	const panGesture = React.useMemo(
 		() =>
 			Gesture.Pan()
@@ -111,7 +106,6 @@ export function ReorderableList<T>({
 		}
 	};
 
-	// The library calls these on the UI thread, so they must be worklets.
 	const handleDragEdge = () => {
 		'worklet';
 		runOnJS(hapticSelection)();

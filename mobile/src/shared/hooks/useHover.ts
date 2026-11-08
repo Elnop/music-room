@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 
-/** Web: touch screens report no hover between taps. */
 export function useHover() {
 	const [hovered, setHovered] = useState(false);
 	const hoverProps = useMemo(

@@ -1,5 +1,3 @@
-// See .agents/rules/components.md#one-component-per-file
-
 export default {
 	meta: {
 		type: 'problem',
@@ -41,7 +39,6 @@ export default {
 		}
 
 		function recordJsx() {
-			// JSX belongs to the nearest enclosing PascalCase function only
 			for (let i = functionStack.length - 1; i >= 0; i--) {
 				const item = functionStack[i];
 				if (item.name && isPascalCase(item.name)) {
@@ -74,7 +71,6 @@ export default {
 					node.parent?.type === 'CallExpression' &&
 					node.parent.parent?.type === 'VariableDeclarator'
 				) {
-					// React.memo(() => ...) or forwardRef(() => ...)
 					name = node.parent.parent.id?.name;
 				}
 				enterFunction(node, name);

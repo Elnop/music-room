@@ -1,15 +1,3 @@
--- =====================================================
--- 024: queue_version
--- Versions the play queue so clients can drop stale states (#285). Every
--- write that changes a queue updates its play_queues row under queue_lock
--- (updated_at or current_item_id), so a BEFORE UPDATE trigger counts them.
--- A playlist sync that changes nothing leaves the row, and the version, alone.
--- updated_at cannot serve: now() is the transaction start, not its commit.
--- Known gap: the ON DELETE cascades from deleting playlists / tracks change
--- items (source_playlist_id set to null, items deleted) without updating the
--- play_queues row, so they do not bump the version. Only the deletion of the
--- current item does, through its SET NULL on current_item_id.
--- =====================================================
 
 ALTER TABLE public.play_queues ADD COLUMN version bigint NOT NULL DEFAULT 0;
 
@@ -32,8 +20,6 @@ CREATE TRIGGER bump_play_queues_version
 
 REVOKE EXECUTE ON FUNCTION public.queue_bump_version() FROM PUBLIC, anon, authenticated;
 
--- The full queue: { ownerId, version, currentItemId, items }, items in rank
--- order. A user who never queued anything has no row: version 0.
 CREATE OR REPLACE FUNCTION public.queue_state(p_user uuid)
 RETURNS jsonb
 LANGUAGE sql

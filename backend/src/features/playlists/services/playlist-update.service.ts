@@ -42,7 +42,6 @@ export async function updatePlaylist(
 
 		realtime.notifyPlaylistDetails(toDetailsPayload(playlist));
 
-		// Visibility may have changed: evict sockets that lost access (fire-and-forget).
 		void realtime.revalidatePlaylistRoom(playlistId);
 
 		logger.info('Playlist updated', { playlistId, userId, updateData });
@@ -69,7 +68,6 @@ export async function deletePlaylist(playlistId: string, userId: string): Promis
 
 		void deleteCoverFile(deleted.cover_url, playlistId);
 
-		// Tell the room first: the revalidation below evicts every socket from it.
 		realtime.notifyPlaylistDeleted({ playlistId });
 
 		void realtime.revalidatePlaylistRoom(playlistId);

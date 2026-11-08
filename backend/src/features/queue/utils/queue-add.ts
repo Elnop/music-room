@@ -8,13 +8,11 @@ interface QueueAddResult {
 	operation: 'add' | 'add-next';
 }
 
-/** Add and move are two RPCs: when the move is refused, the item stays appended and the add's state is kept. */
 export async function addTrackToQueue(
 	ownerId: string,
 	track: TrackUpsertInput,
 	next = false
 ): Promise<QueueAddResult> {
-	// previewUrl is a stream URL: never persisted.
 	const trackRow = await upsertTrack({ ...track, previewUrl: undefined });
 	const added = await addQueueItemRpc(ownerId, trackRow.id);
 	if (!next) return { state: added, operation: 'add' };

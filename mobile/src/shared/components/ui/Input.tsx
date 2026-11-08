@@ -23,7 +23,6 @@ interface InputProps extends Omit<TextInputProps, 'style'> {
 	leftIcon?: React.ReactNode;
 	containerStyle?: ViewStyle;
 	style?: StyleProp<TextStyle>;
-	/** Web only: Enter submits; native return keys keep their behaviour. */
 	submitOnEnter?: () => void;
 }
 
@@ -136,7 +135,6 @@ const createStyles = (theme: Theme) =>
 			paddingHorizontal: theme.spacing.sm + 2,
 			paddingVertical: theme.spacing.sm,
 		},
-		// The keyboard ring sits 4 px outside the button: kept inside the field's frame.
 		toggleWeb: {
 			paddingHorizontal: theme.spacing.xs,
 			paddingVertical: theme.spacing.xs,

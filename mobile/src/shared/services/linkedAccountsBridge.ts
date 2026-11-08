@@ -6,7 +6,6 @@ export type OAuthProvider = 'google' | 'facebook';
 
 export type GoogleButtonVariant = 'form' | 'row';
 
-/** Set on the web only. */
 export type GoogleButtonSlot = RefCallback<View>;
 
 export interface LinkedProvider {

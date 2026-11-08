@@ -30,12 +30,10 @@ function ensureRedis(operation: string): void {
 	}
 }
 
-/** A hash, so Redis never holds a usable token. */
 function keyFor(token: string): string {
 	return KEY_PREFIX + createHash('sha256').update(token).digest('hex');
 }
 
-/** No signature check: authMiddleware already verified the token. */
 function ttlFor(token: string): number {
 	const exp = readExp(token);
 	if (exp === undefined) return MIN_TTL_SECONDS;

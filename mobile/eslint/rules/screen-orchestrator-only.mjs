@@ -1,5 +1,3 @@
-// See .agents/rules/components.md#screen-orchestrator-only
-
 export default {
 	meta: {
 		type: 'problem',
@@ -47,7 +45,6 @@ export default {
 					return;
 				}
 
-				// For screen component files, any component imported from features must come from orchestrators
 				if (isScreenComponent) {
 					const hasNonTypeSpecifier = node.specifiers?.some(
 						s => s.type === 'ImportSpecifier' && s.importKind !== 'type'

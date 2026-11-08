@@ -50,7 +50,6 @@ const shown = () => client.getQueryData<PlaylistWithTracks>(key)!;
 const order = () => shown().tracks.map(t => t.id);
 const pending = () => usePendingMovesStore.getState().count;
 
-/** A screen shows the playlist: an enabled observer, as usePlaylistDetail. */
 function open() {
 	const observer = new QueryObserver(client, {
 		queryKey: key,

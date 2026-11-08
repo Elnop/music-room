@@ -5,11 +5,9 @@ import { useFieldFocus } from '@/shared/hooks/useFieldFocus';
 
 const BASE_FONT = { fontFamily: FONT_FAMILIES.regular };
 
-/** Refs keep react-native's type: `useRef<TextInput>(null)`. */
 export type TextInput = NativeTextInput;
 
 type TextInputProps = React.ComponentPropsWithRef<typeof NativeTextInput> & {
-	/** Web: applied while focused, for a field that draws its own frame. */
 	focusedStyle?: StyleProp<TextStyle>;
 };
 

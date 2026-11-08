@@ -20,7 +20,6 @@ type Step = 'actions' | 'playlists' | 'newPlaylist';
 
 export interface TrackActions {
 	visible: boolean;
-	/** The last track, still rendered while the sheet slides out. */
 	shown: AddQueueItemBody | null;
 	step: Step;
 	editable: Playlist[];
@@ -36,7 +35,6 @@ export interface TrackActions {
 	share: () => void;
 }
 
-/** Each action closes the sheet first so its toast shows on the screen underneath. */
 export function useTrackActions(
 	track: AddQueueItemBody | null,
 	onClose: () => void,
@@ -49,7 +47,6 @@ export function useTrackActions(
 		setShown(track);
 		setStep(start);
 	}
-	// Reloaded each time the playlist step opens.
 	const list = usePlaylists(step === 'playlists');
 	const addTrack = useAddTrack();
 	const newPlaylist = useNewPlaylistFromTrack(shown, onClose);
@@ -95,8 +92,6 @@ export function useTrackActions(
 					showError(apiErrorMessage(error, "Impossible d'ajouter le titre à la playlist"));
 				}
 			}),
-		// No success toast: the system sheet is the feedback, and Android
-		// reports a dismissal as sharedAction.
 		share: () =>
 			run(async body => {
 				try {

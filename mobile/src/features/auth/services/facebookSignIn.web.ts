@@ -1,11 +1,9 @@
-// Browser variant: the Facebook JavaScript SDK, loaded when a screen offers Facebook.
 import Constants from 'expo-constants';
 import { logger } from '@/shared/utils/logger';
 import { loadScript } from '@/features/auth/utils/loadScript';
 import { SIGN_IN_CANCELLED } from './signInCancelled';
 
 const SDK_SCRIPT = 'https://connect.facebook.net/en_US/sdk.js';
-/** The Graph API version the backend queries. */
 const GRAPH_VERSION = 'v21.0';
 
 interface LoginResponse {
@@ -40,10 +38,8 @@ async function loadSdk(): Promise<FacebookSdk> {
 	return sdk;
 }
 
-/** The SDK loads on demand, not at app start. */
 export function initializeFacebookSDK(): void {}
 
-/** `FB.login` opens a popup, which the browser blocks unless it follows the click closely. */
 export function preloadFacebookSdk(): void {
 	loadSdk().catch((error: unknown) => {
 		logger.warn('[OAuth] Facebook SDK not loaded:', {
@@ -52,7 +48,6 @@ export function preloadFacebookSdk(): void {
 	});
 }
 
-/** Rejects with Error(SIGN_IN_CANCELLED) when the user closes the popup or declines. */
 export async function signInWithFacebook(): Promise<string> {
 	const sdk = await loadSdk();
 	const response = await new Promise<LoginResponse>(resolve =>

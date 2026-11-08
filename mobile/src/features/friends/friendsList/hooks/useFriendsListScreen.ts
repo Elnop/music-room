@@ -25,7 +25,6 @@ export function useFriendsListScreen(onNavigateToProfile: (userId: string) => vo
 	const [togglingUserId, setTogglingUserId] = useState<string | null>(null);
 	const [isRefreshingFriends, setIsRefreshingFriends] = useState(false);
 
-	// Only a successful empty answer opens the search: a disabled or failed query must leave the friends tab.
 	const hasCheckedEmptyRef = useRef(false);
 	useEffect(() => {
 		if (hasLoadedFriends && friends.length === 0 && !hasCheckedEmptyRef.current) {

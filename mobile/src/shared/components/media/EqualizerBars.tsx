@@ -2,7 +2,6 @@ import React from 'react';
 import { Animated, View } from 'react-native';
 import { useLoop } from '@/shared/hooks/useLoop';
 
-/** One bar's heights over a loop, as a share of the full height; each bar starts at another step. */
 const STEPS = [0.2, 0.8, 0.4, 1, 0.2];
 
 interface EqualizerBarsProps {

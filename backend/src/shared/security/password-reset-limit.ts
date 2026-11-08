@@ -1,7 +1,5 @@
 import * as attemptLimit from '@/shared/security/attempt-limit.js';
 
-// Both limits apply whether the email belongs to an account or not, so neither reveals which emails exist.
-
 const HOURLY = { maxAttempts: 3, windowSeconds: 60 * 60 };
 const COOLDOWN = { maxAttempts: 1, windowSeconds: 60 };
 

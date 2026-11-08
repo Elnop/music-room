@@ -16,7 +16,6 @@ export const controlActionSchema = z.object({
 	action: z.enum(['play', 'pause']),
 }) satisfies z.ZodType<ControlActionPayload>;
 
-/** A `device` field from older clients is stripped: the device comes from the handshake. */
 export const listeningUpdateSchema = z.object({
 	track: z
 		.object({

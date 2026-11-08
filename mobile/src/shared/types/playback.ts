@@ -1,4 +1,3 @@
-/** `trackUri` is the SoundCloud permalink. */
 export interface QueueTrack {
 	trackUri: string;
 	title: string;
@@ -14,7 +13,6 @@ export interface QueueItem {
 	track: QueueTrack;
 	sourcePlaylistId: string | null;
 	blockId: string | null;
-	/** True once the user removed or moved an item of the block. */
 	blockDetached: boolean;
 }
 
@@ -28,7 +26,6 @@ export interface AddQueueItemBody {
 	next?: boolean;
 }
 
-/** `ready` moves on to `playing` by itself. */
 export type PlaybackState = 'idle' | 'loading' | 'ready' | 'playing' | 'paused';
 
 export interface OwnerQueue {
@@ -37,5 +34,4 @@ export interface OwnerQueue {
 	version: number;
 }
 
-/** `stopped`: no current item left; `ignored`: another step was still pending. */
 export type QueueStepOutcome = 'played' | 'stopped' | 'boundary' | 'error' | 'ignored';

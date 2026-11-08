@@ -6,7 +6,6 @@ import type {
 	PlaylistChoice,
 } from '@/features/events/types';
 
-/** Ongoing and upcoming events, with their coordinates: the phone computes distances itself. */
 export async function fetchEvents(): Promise<MusicEvent[]> {
 	const data = await apiRequest<{ events: MusicEvent[] }>('/api/events');
 	return data.events;
@@ -37,7 +36,6 @@ export async function deleteEvent(id: string): Promise<void> {
 	await apiRequest(`/api/events/${id}`, { method: 'DELETE' });
 }
 
-/** Only the typed address leaves the device; null when no place matches. */
 export async function geocode(address: string): Promise<GeocodedPlace | null> {
 	const data = await apiRequest<{ location: GeocodedPlace | null }>(
 		`/api/events/geocode?q=${encodeURIComponent(address)}`
@@ -52,7 +50,6 @@ interface OwnPlaylist {
 	visibility: 'public' | 'private';
 }
 
-/** The backend only accepts a public playlist of the organiser. */
 export async function fetchPlaylistChoices(userId: string): Promise<PlaylistChoice[]> {
 	const data = await apiRequest<{ playlists: OwnPlaylist[] }>('/api/playlists');
 	return data.playlists

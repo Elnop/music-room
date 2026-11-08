@@ -1,6 +1,3 @@
-// Enforces component roles (screens, orchestrators, presenters, hooks) across the mobile app.
-// See .agents/rules/components.md
-
 import screenOrchestratorOnly from './rules/screen-orchestrator-only.mjs';
 import presenterPure from './rules/presenter-pure.mjs';
 import hookNoJsx from './rules/hook-no-jsx.mjs';

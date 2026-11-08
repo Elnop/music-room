@@ -4,7 +4,6 @@ import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 
 export function useMenuAnchor(visible: boolean): MenuAnchor | null {
 	const recorded = useMenuAnchorStore(state => state.anchor);
-	// A menu mounted already open (its first target just chosen) takes the anchor at once.
 	const [anchor, setAnchor] = useState<MenuAnchor | null>(visible ? recorded : null);
 	const [wasVisible, setWasVisible] = useState(visible);
 	if (visible !== wasVisible) {
@@ -12,7 +11,6 @@ export function useMenuAnchor(visible: boolean): MenuAnchor | null {
 		if (visible) setAnchor(recorded);
 	}
 
-	// Consumed, so a menu opened by a long press next is not placed under this button.
 	useEffect(() => {
 		if (visible && recorded) useMenuAnchorStore.getState().setAnchor(null);
 	}, [visible, recorded]);

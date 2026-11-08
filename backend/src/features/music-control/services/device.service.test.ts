@@ -3,10 +3,8 @@ import * as service from '@/features/music-control/services/device.service.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 
 const { from, upsert, single, update, maybeSingle, eq, select } = vi.hoisted(() => {
-	// upsert(...).select('custom_name').single()
 	const single = vi.fn();
 	const upsert = vi.fn(() => ({ select: () => ({ single }) }));
-	// update(...).eq().eq().select(...).maybeSingle()
 	const maybeSingle = vi.fn();
 	const select = vi.fn(() => ({ maybeSingle }));
 	const eq = vi.fn();

@@ -41,7 +41,6 @@ export function ProfileNavigator() {
 			<ProfileStack.Screen
 				name="Profile"
 				component={ProfileOrchestrator}
-				// Wide screens show the title and the header's actions in the profile's own header.
 				options={{ title: 'Mon Profil', headerShown: !isWide }}
 			/>
 			<ProfileStack.Screen

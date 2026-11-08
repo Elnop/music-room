@@ -1,13 +1,9 @@
-/** Apple's Bluetooth company identifier: iBeacon frames are its manufacturer-specific data. */
 export const APPLE_COMPANY_ID = 0x004c;
 
-/** Identifies Zumik's beacons: a scanner keeps only frames with this UUID. */
 export const ZUMIK_BEACON_UUID = '5a554d49-4b00-4e00-8000-6576656e7473';
 
-/** Fixed for every event: the minor alone (`beaconMinor`) tells events apart. */
 const ZUMIK_BEACON_MAJOR = 1;
 
-/** RSSI expected at one metre, in dBm: the usual calibration of a phone advertising at high power. */
 export const MEASURED_POWER = -59;
 
 const IBEACON_TYPE = 0x02;
@@ -28,7 +24,6 @@ function uuidBytes(uuid: string): number[] {
 
 const uint16 = (value: number) => [(value >> 8) & 0xff, value & 0xff];
 
-/** The 23 bytes after the company ID: type, length, UUID, major and minor (big-endian), measured power. */
 export function buildIBeaconPayload(frame: IBeaconFrame): number[] {
 	for (const [name, value] of [
 		['major', frame.major],
@@ -66,7 +61,6 @@ function formatUuid(bytes: number[]): string {
 
 const toSigned = (byte: number) => (byte > 127 ? byte - 256 : byte);
 
-/** Reads manufacturer data that starts with the company ID (little-endian); null when not an iBeacon. */
 export function parseIBeacon(data: number[]): IBeaconFrame | null {
 	if (data.length < 25) return null;
 	const companyId = data[0] | (data[1] << 8);

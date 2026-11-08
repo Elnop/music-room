@@ -14,7 +14,6 @@ const SYNC_FUNCTIONS = {
 
 const affectedUsersSchema = z.array(z.uuid());
 
-/** Never throws: the playlist operation already succeeded. */
 export async function syncPlaylistChange(
 	change: PlaylistTrackChange,
 	playlistId: string,

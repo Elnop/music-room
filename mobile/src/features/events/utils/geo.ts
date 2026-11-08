@@ -3,7 +3,6 @@ import type { Coordinates } from '@/features/events/utils/eventLocation';
 const EARTH_RADIUS_M = 6_371_000;
 const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
 
-/** Great-circle distance in metres (haversine formula). */
 export function distanceMeters(from: Coordinates, to: Coordinates): number {
 	const dLat = toRadians(to.latitude - from.latitude);
 	const dLon = toRadians(to.longitude - from.longitude);

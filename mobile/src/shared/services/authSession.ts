@@ -1,8 +1,6 @@
 import { createStore, useStore, type StoreApi } from 'zustand';
 import type { UserProfile } from '@/types/user.types';
 
-// The auth store registers itself here, so nothing outside `features/auth/` imports the feature.
-
 export interface SessionView {
 	user: UserProfile | null;
 	accessToken: string | null;
@@ -57,7 +55,6 @@ export async function setUser(user: UserProfile): Promise<void> {
 	await authSession?.setUser?.(user);
 }
 
-/** Runs on logout and on a refused refresh. */
 export function onSessionEnd(listener: () => void): () => void {
 	sessionEndListeners.add(listener);
 	return () => sessionEndListeners.delete(listener);

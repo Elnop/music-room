@@ -69,7 +69,6 @@ async function createDefaultSettings(
 	}
 }
 
-/** Without a row, the defaults are stored only when the requester is the user themselves. */
 export async function getPrivacySettings(
 	userId: string,
 	requesterId?: string

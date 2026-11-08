@@ -1,13 +1,3 @@
--- =====================================================
--- 032: events
--- Physical events (party, concert, bar) any user registers, for the
--- proximity bonus (V.2). Purely informative: no vote, no track queue.
--- Every event is public; the backend returns its coordinates and the phone
--- computes the distance, so the user's position never reaches the server.
--- beacon_minor is the minor of the iBeacon frame the organiser's phone
--- broadcasts. It is unique over every row, ended events included, so two
--- active events never share one; the backend picks a free value at random.
--- =====================================================
 
 CREATE TABLE public.events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -37,6 +27,5 @@ CREATE TRIGGER set_events_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION public.handle_updated_at();
 
--- Only the backend (service role) reads and writes events, as in 017.
 ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON public.events FROM anon, authenticated;

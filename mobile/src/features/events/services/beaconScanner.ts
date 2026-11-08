@@ -4,8 +4,6 @@ import { logger } from '@/shared/utils/logger';
 import { base64ToBytes } from '@/features/events/utils/base64';
 import { parseIBeacon, zumikBeaconMinor } from '@/features/events/utils/ibeacon';
 
-// react-native-ble-plx only reports advertisements; decoding the iBeacon frame is project code.
-
 interface BeaconFrame {
 	minor: number;
 	rssi: number;
@@ -17,7 +15,6 @@ export type ScannerState = 'on' | 'off' | 'unsupported';
 let manager: BleManager | null = null;
 const bleManager = () => (manager ??= new BleManager());
 
-/** Android drops iBeacon frames from "neverForLocation" scans: scanning needs the location permission and setting. */
 export async function requestScanPermission(): Promise<boolean> {
 	if (Platform.OS !== 'android') return false;
 	const wanted =
@@ -49,7 +46,6 @@ export function watchBluetoothState(listener: (state: ScannerState) => void): ()
 	return () => subscription.remove();
 }
 
-/** Scans until the returned function is called; only Zumik event beacons reach `onFrame`. */
 export function scanEventBeacons(onFrame: (frame: BeaconFrame) => void): () => void {
 	const ble = bleManager();
 	void ble.startDeviceScan(

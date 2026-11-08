@@ -8,12 +8,10 @@ interface SearchFieldVisibility {
 	bio: boolean;
 }
 
-// Same default as privacy-settings.service for a profile without a row.
 const DEFAULT_VISIBILITY: VisibilityLevel = 'public';
 
 const NO_FOLLOWS = { data: [], error: null };
 
-/** Three queries for the whole page; without a viewer, nobody is a friend. */
 export async function getSearchFieldVisibility(
 	viewerId: string | undefined,
 	profileIds: string[]
@@ -41,7 +39,6 @@ export async function getSearchFieldVisibility(
 					.in('follower_id', profileIds)
 			: NO_FOLLOWS,
 	]);
-	// A failed follows lookup only means "not a friend", as in filtered-profile.service.
 	if (privacy.error) {
 		throw new AppError(500, 'Failed to search users', 'SEARCH_ERROR');
 	}

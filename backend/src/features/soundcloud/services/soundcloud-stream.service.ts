@@ -6,7 +6,6 @@ import type { StreamProtocol, StreamUrlResult } from '@/features/soundcloud/soun
 
 const STREAM_URL_LIFETIME_S = 1800;
 
-// Never cached: a stream URL reused minutes later can already answer 403.
 export async function getStreamUrl(trackUrl: string): Promise<StreamUrlResult> {
 	try {
 		logger.info('Getting stream URL', { trackUrl });

@@ -4,7 +4,6 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 
 type ThemedSwitchProps = Omit<SwitchProps, 'trackColor' | 'thumbColor' | 'ios_backgroundColor'>;
 
-/** The off state stays visible on every background. */
 export function ThemedSwitch(props: ThemedSwitchProps) {
 	const { theme } = useTheme();
 	return (

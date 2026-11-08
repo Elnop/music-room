@@ -4,7 +4,6 @@ import type { AddressInfo } from 'node:net';
 import express from 'express';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-// Loopback whitelisted so the route-level limiters skip these requests.
 vi.hoisted(() => {
 	process.env.RATE_LIMIT_ENABLED = 'true';
 	process.env.RATE_LIMIT_WHITELIST_IPS = '127.0.0.1,::1,::ffff:127.0.0.1';
@@ -59,7 +58,6 @@ describe('email/password auth flow (#75)', () => {
 					`failed_login:${e}:*`,
 					`account_locked:${e}:*`,
 				]);
-				// ip-reputation also counts failed logins per IP.
 				patterns.push('ip_failed_logins:*127.0.0.1', 'ip_failed_logins:::1');
 				patterns.push(...userIds.map(id => `email_*${id}*`));
 				for (const pattern of patterns) {
@@ -68,7 +66,6 @@ describe('email/password auth flow (#75)', () => {
 				}
 			}
 			await new Promise<void>(resolve => httpServer.close(() => resolve()));
-			// Cascades to user_profiles.
 			for (const id of userIds) await supabaseAdmin.auth.admin.deleteUser(id);
 		} finally {
 			await disconnectRedis();
@@ -89,7 +86,6 @@ describe('email/password auth flow (#75)', () => {
 		(body.data as { session?: { accessToken?: string } }).session?.accessToken;
 
 	it('refuses with 403 EMAIL_NOT_VERIFIED a confirmed auth user whose profile is unverified', async () => {
-		// The state the app guard covers: Supabase lets the user sign in, the profile does not.
 		const guardEmail = `int-${randomUUID()}@example.com`;
 		emails.push(guardEmail);
 		const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
@@ -124,7 +120,6 @@ describe('email/password auth flow (#75)', () => {
 		expect(data.requiresVerification).toBe(true);
 		expect(accessToken(registered.body)).toBeUndefined();
 
-		// Unconfirmed until the code is verified: only the right password gets 403 EMAIL_NOT_VERIFIED.
 		const wrongPassword = await post('login', { email, password: `${PASSWORD}-wrong` });
 		expect(wrongPassword.status).toBe(401);
 		expect(errorCode(wrongPassword.body)).toBe('INVALID_CREDENTIALS');

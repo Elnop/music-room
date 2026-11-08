@@ -69,7 +69,6 @@ export const autoplayRefusal = () =>
 		Object.assign(new Error('play() needs a user gesture'), { name: 'NotAllowedError' })
 	);
 
-/** Call before the player module creates its element. */
 export function installFakeDocument(element: FakeMediaElement): void {
 	Object.assign(globalThis, { document: { createElement: () => element } });
 }

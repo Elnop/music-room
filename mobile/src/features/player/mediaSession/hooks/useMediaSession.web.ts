@@ -4,8 +4,6 @@ import { useNowPlaying } from '@/features/player/hooks/useNowPlaying';
 import { largeArtwork } from '@/shared/utils/artwork';
 import { logger } from '@/shared/utils/logger';
 
-// Browser variant: the Media Session API drives the media keys and the browser's media notification.
-
 type MediaAction = 'play' | 'pause' | 'previoustrack' | 'nexttrack' | 'seekto';
 type ActionHandler = ((details: { seekTime?: number }) => void) | null;
 
@@ -15,7 +13,6 @@ interface MetadataInit {
 	artwork: { src: string }[];
 }
 
-// The project compiles without the DOM library, so the Media Session API is typed here.
 interface BrowserMediaSession {
 	metadata: unknown;
 	playbackState: 'none' | 'paused' | 'playing';
@@ -97,7 +94,6 @@ export function useMediaSession(): void {
 		else session.playbackState = isPlaying ? 'playing' : 'paused';
 	}, [session, hasTrack, isPlaying]);
 
-	// Whole seconds: the browser advances the position itself while it plays.
 	const durationSeconds = durationMs && durationMs > 0 ? durationMs / 1000 : null;
 	const positionSeconds = Math.floor(Math.max(0, positionMs) / 1000);
 	useEffect(() => {

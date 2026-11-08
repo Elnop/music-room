@@ -41,7 +41,6 @@ vi.mock('@/features/auth/services/email-verification.service.js', () => ({
 	sendCode: sendVerificationEmail,
 }));
 
-// EMAIL_VERIFICATION_ENABLED is switched per test.
 vi.mock('@/features/mail/mail.config.js', () => ({ verificationConfig: verification }));
 
 vi.mock('@/shared/utils/logger.js', () => ({

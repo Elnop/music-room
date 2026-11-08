@@ -4,7 +4,6 @@ import type { AddressInfo } from 'node:net';
 import express from 'express';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-// Loopback whitelisted so the route-level limiters skip these requests.
 vi.hoisted(() => {
 	process.env.RATE_LIMIT_ENABLED = 'true';
 	process.env.RATE_LIMIT_WHITELIST_IPS = '127.0.0.1,::1,::ffff:127.0.0.1';
@@ -25,7 +24,7 @@ const loginService = await import('@/features/auth/services/login.service.js');
 const PASSWORD = 'Old-password-206';
 const NEW_PASSWORD = 'New-password-206';
 const RESET_CODE = '482913';
-const MAX_ATTEMPTS = 5; // MAX_RESET_ATTEMPTS in password-reset.service.ts
+const MAX_ATTEMPTS = 5;
 
 describe('password reset code attempts limit (#206)', () => {
 	let httpServer: Server;
@@ -72,7 +71,6 @@ describe('password reset code attempts limit (#206)', () => {
 				if (keys.length > 0) await redisClient.del(...keys);
 			}
 			if (httpServer) await new Promise<void>(resolve => httpServer.close(() => resolve()));
-			// Cascades to user_profiles.
 			if (userId) await supabaseAdmin.auth.admin.deleteUser(userId);
 		} finally {
 			await disconnectRedis();

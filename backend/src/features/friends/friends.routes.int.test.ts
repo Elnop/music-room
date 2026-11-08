@@ -8,8 +8,6 @@ import { connectRedis, disconnectRedis, isRedisConnected } from '@/shared/config
 import { errorHandler } from '@/shared/middleware/error-handler.js';
 import friendsRoutes from '@/features/friends/friends.routes.js';
 
-// Every test starts with no follows between A, B and C.
-
 interface TestUser {
 	id: string;
 	username: string;
@@ -53,7 +51,6 @@ async function createUser(): Promise<TestUser> {
 		.insert({ id, username });
 	if (profileError) throw profileError;
 
-	// Never the admin client: signing in would replace its service-role session.
 	const { data: session, error: signInError } = await supabaseAnon.auth.signInWithPassword({
 		email,
 		password: PASSWORD,
@@ -113,7 +110,6 @@ describe('Friends routes (/api/friends)', () => {
 	}
 
 	beforeAll(async () => {
-		// verifyToken checks the logout denylist and fails closed without Redis.
 		await connectRedis();
 		if (!isRedisConnected()) throw new Error('Redis from scripts/test-db.sh is not reachable');
 
@@ -271,7 +267,6 @@ describe('Friends routes (/api/friends)', () => {
 	});
 
 	it("status reports the target's own follower and following counts", async () => {
-		// B: followed by A and C, follows C.
 		await follow(a, b);
 		await follow(c, b);
 		await follow(b, c);
@@ -288,7 +283,6 @@ describe('Friends routes (/api/friends)', () => {
 	});
 
 	it("stats/me reports the caller's own counts", async () => {
-		// A: follows B and C, followed by C.
 		await follow(a, b);
 		await follow(a, c);
 		await follow(c, a);

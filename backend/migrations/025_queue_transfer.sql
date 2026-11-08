@@ -1,11 +1,3 @@
--- =====================================================
--- 025: queue_transfer
--- Transfer of playback to a friend's device (#295): the tracks the sender
--- plays (their current track, then what follows in their queue) become a new
--- block right after the friend's current item, and the block's first item
--- becomes current. The block has no source playlist, so the playlist sync of
--- migration 023 never touches it. The caller checks the device license.
--- =====================================================
 
 CREATE OR REPLACE FUNCTION public.queue_track_ids_from(p_user uuid, p_item_id uuid)
 RETURNS uuid[]
@@ -54,7 +46,6 @@ DECLARE
   first_id uuid;
   track record;
 BEGIN
-  -- Checked before the lock so that a refusal changes nothing.
   IF coalesce(array_length(p_track_ids, 1), 0) = 0 THEN
     RAISE EXCEPTION 'QUEUE_BLOCK_EMPTY';
   END IF;
@@ -65,7 +56,6 @@ BEGIN
     SELECT rank INTO prev_rank FROM public.play_queue_items WHERE id = current_id;
   END IF;
 
-  -- The first upcoming item: the block goes between the current item and it.
   SELECT min(rank) INTO next_rank
   FROM public.play_queue_items
   WHERE user_id = p_user AND (prev_rank IS NULL OR rank > prev_rank);
@@ -74,7 +64,6 @@ BEGIN
     SELECT t.track_id FROM unnest(p_track_ids) WITH ORDINALITY AS t(track_id, ordinality)
     ORDER BY t.ordinality
   LOOP
-    -- With nothing after the block, rank_after keeps the keys short.
     IF next_rank IS NULL THEN
       new_rank := public.rank_after(prev_rank);
     ELSE
@@ -86,7 +75,6 @@ BEGIN
     RETURNING id INTO item_id;
     first_id := coalesce(first_id, item_id);
 
-    -- Same rule as queue_play_playlist: rebalance as soon as a key grows too long.
     IF length(new_rank) > public.rank_max_length() THEN
       PERFORM public.queue_rebalance(p_user);
       SELECT rank INTO prev_rank FROM public.play_queue_items WHERE id = item_id;

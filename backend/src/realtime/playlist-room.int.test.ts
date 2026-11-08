@@ -26,7 +26,6 @@ interface PlaylistUpdated {
 
 const PASSWORD = 'integration-test-password';
 
-/** Any versioned delta: these tests only check who receives it. */
 function moved(playlistId: string): PlaylistUpdatedPayload {
 	return {
 		playlistId,
@@ -53,7 +52,6 @@ async function createUser(): Promise<TestUser> {
 		.insert({ id, username: `int_${id.slice(0, 8)}` });
 	if (profileError) throw profileError;
 
-	// Never the admin client: signing in would replace its service-role session.
 	const { data: session, error: signInError } = await supabaseAnon.auth.signInWithPassword({
 		email,
 		password: PASSWORD,
@@ -137,7 +135,6 @@ describe('Playlist room access control', () => {
 	const waitForStrayEvents = () => new Promise(resolve => setTimeout(resolve, 150));
 
 	beforeAll(async () => {
-		// verifyToken checks the logout denylist and fails closed without Redis.
 		await connectRedis();
 		if (!isRedisConnected()) throw new Error('Redis from scripts/test-db.sh is not reachable');
 
@@ -277,7 +274,6 @@ describe('Playlist room access control', () => {
 
 		ownerSocket.emit('playlist:join', playlistId);
 		ownerSocket.emit('playlist:leave', playlistId);
-		// Queued after the leave: once it answers, join and leave were processed.
 		const done = nextEvent<PlaylistRoomError>(ownerSocket, 'playlist:error');
 		ownerSocket.emit('playlist:join', 'not-a-uuid');
 		await expect(done).resolves.toMatchObject({ code: 'INVALID_PAYLOAD' });

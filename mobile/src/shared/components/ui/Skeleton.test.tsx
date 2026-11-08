@@ -21,7 +21,6 @@ describe('SkeletonList', () => {
 		mockReduceMotion(false);
 		render(<SkeletonList count={4} row={TrackRowSkeleton} />);
 		await act(async () => {});
-		// A track row is one artwork block and two text lines.
 		expect(screen.getAllByTestId('skeleton-block', { includeHiddenElements: true })).toHaveLength(
 			12
 		);

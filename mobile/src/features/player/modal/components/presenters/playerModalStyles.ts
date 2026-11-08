@@ -6,15 +6,12 @@ import { pixelFrame } from '@/shared/theme/pixelFrame';
 
 export const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 export const DISMISS_THRESHOLD = SCREEN_HEIGHT * 0.2;
-/** From one artwork of the carousel to the next: the neighbours' edges peek out on both sides. */
 const ARTWORK_GAP = 16;
 
-/** A tablet browser shows the player as a centred dialog; Android tablets keep the full screen. */
 export function isPlayerDialog(windowWidth: number): boolean {
 	return Platform.OS === 'web' && windowWidth >= BREAKPOINTS.tablet;
 }
 
-/** Capped by the height too, so a short screen still fits the bottom row above the navigation bar. */
 export function artworkSize(windowWidth: number, windowHeight: number) {
 	const playerWidth = isPlayerDialog(windowWidth) ? PLAYER_DIALOG_WIDTH : windowWidth;
 	const size = Math.min(playerWidth * 0.75, windowHeight * 0.36);
@@ -27,7 +24,6 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 		container: { flex: 1 },
 		modalContent: { backgroundColor: theme.colors.background },
 		dialogFrame: { alignItems: 'center', justifyContent: 'center' },
-		// Keeps its own height: the full screen's `flex: 1` would give it a basis of 0.
 		dialog: {
 			flexGrow: 0,
 			flexBasis: 'auto',
@@ -58,7 +54,6 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 			fontFamily: FONT_FAMILIES.medium,
 			color: theme.colors.info,
 		},
-		// Content sits low, within thumb reach; the header keeps only the close chevron.
 		mainContent: {
 			flex: 1,
 			justifyContent: 'flex-end',

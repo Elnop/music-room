@@ -5,7 +5,6 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import { linkProvider } from '@/features/auth/services/provider-link.service.js';
 import * as oauthLoginService from '@/features/auth/services/oauth-login.service.js';
 
-// oauth.service calls Google and Facebook.
 const { verifyGoogleToken, isProviderLinked } = vi.hoisted(() => ({
 	verifyGoogleToken: vi.fn(),
 	isProviderLinked: vi.fn(),
@@ -16,7 +15,6 @@ vi.mock('@/features/auth/services/oauth.service.js', () => ({
 	verifyFacebookToken: vi.fn(),
 }));
 
-// The real lookup, replaced once by the race test below.
 vi.mock('@/features/auth/services/provider.service.js', async importOriginal => {
 	const original =
 		await importOriginal<typeof import('@/features/auth/services/provider.service.js')>();
@@ -76,7 +74,6 @@ describe('provider-link.service linkProvider (local Supabase stack)', () => {
 	});
 
 	afterAll(async () => {
-		// Cascades to user_profiles.
 		for (const id of createdUserIds) await supabaseAdmin.auth.admin.deleteUser(id);
 	});
 
@@ -141,7 +138,6 @@ describe('provider-link.service linkProvider (local Supabase stack)', () => {
 		await createUser(sub);
 		const user = await createUser();
 		googleAccount(sub);
-		// Simulate the race: the pre-check saw the id as free.
 		isProviderLinked.mockResolvedValueOnce(false);
 
 		await expect(linkProvider(user.id, 'google', 'google-token')).rejects.toMatchObject({

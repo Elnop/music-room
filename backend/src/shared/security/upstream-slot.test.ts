@@ -9,7 +9,6 @@ const { takeUpstreamSlot } = await import('@/shared/security/upstream-slot.js');
 
 const SLOT = { intervalMs: 1000, maxWaitMs: 3000 };
 
-/** One window per key, ended by the fake clock, like counter.hit's script. */
 function fakeWindow() {
 	let count = 0;
 	let endsAt = 0;

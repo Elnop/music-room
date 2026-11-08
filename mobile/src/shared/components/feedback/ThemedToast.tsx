@@ -24,7 +24,6 @@ interface ThemedToastProps {
 	theme: Theme;
 }
 
-/** Text in the theme's text colour, not the state colour, so it stays readable. */
 export function ThemedToast({ kind, params, theme }: ThemedToastProps) {
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 	const color = theme.colors[kind];

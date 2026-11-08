@@ -1,6 +1,5 @@
 let positionReader: (() => number) | null = null;
 
-/** PlayerProvider owns the audio player but listening status is emitted outside it, so the position goes through here. */
 export function setPositionReader(reader: (() => number) | null): void {
 	positionReader = reader;
 }

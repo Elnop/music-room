@@ -3,14 +3,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// The only backend module allowed to call `console`.
-
 type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 
 type LogMetadata =
 	string | number | boolean | null | undefined | Error | Record<string, unknown> | unknown[];
 
-// From backend/src/shared/utils/ to backend/logs/
 const logsDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../logs');
 const logFilePath = path.join(logsDir, 'app.log');
 
@@ -18,7 +15,6 @@ if (!fs.existsSync(logsDir)) {
 	try {
 		fs.mkdirSync(logsDir, { recursive: true });
 	} catch (error) {
-		// The file sink is best effort: never block startup on it.
 		console.error('Failed to create logs directory:', error);
 	}
 }

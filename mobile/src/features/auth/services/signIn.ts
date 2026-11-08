@@ -8,7 +8,6 @@ import { signInWithGoogle } from './googleSignIn';
 import { signInWithFacebook } from './facebookSignIn';
 import { isSignInCancelled } from './signInCancelled';
 
-/** RootNavigator then shows the app. */
 async function open(response: AuthResponse): Promise<void> {
 	if (!response.session) throw new Error('The backend did not return a session');
 	await useAuthStore.getState().startSession(response.user, response.session);
@@ -16,7 +15,6 @@ async function open(response: AuthResponse): Promise<void> {
 
 export async function login(input: LoginInput): Promise<void> {
 	const response = await authApi.login(input);
-	// Without a session the user stays on the login screen.
 	if (response.session) await open(response);
 }
 

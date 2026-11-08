@@ -50,7 +50,6 @@ export type { FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
 
 const Tab = createBottomTabNavigator<AppTabsParamList>();
 
-// Registered before any screen renders: the playlists feature plays through them.
 registerPlayback();
 registerMusicControl();
 
@@ -70,7 +69,6 @@ const sidebarOptions = (
 	tabBarVariant: breakpoint === 'tablet' ? 'material' : 'uikit',
 	tabBarShowLabel: true,
 	tabBarLabelPosition: breakpoint === 'tablet' ? 'below-icon' : 'beside-icon',
-	// The library's defaults put a primary label on a primary fill.
 	tabBarActiveTintColor: theme.colors.text,
 	tabBarActiveBackgroundColor: theme.colors.surfaceAlt,
 	tabBarLabelStyle:
@@ -83,7 +81,6 @@ const sidebarOptions = (
 				},
 	tabBarStyle: {
 		flex: 1,
-		// Overrides the side bar's 360 px minimum width.
 		minWidth: 0,
 		paddingTop: theme.spacing.md,
 		paddingStart: breakpoint === 'tablet' ? theme.spacing.xs : theme.spacing.sm,
@@ -108,7 +105,6 @@ export function AppNavigator() {
 	useEventsSync();
 	useRemoteTarget();
 	const connectionStatus = useConnectionStatus();
-	// Under the banner, react-navigation headers must not add the status bar inset again.
 	const navigatorInsets = React.useMemo(
 		() => (connectionStatus ? { ...insets, top: 0 } : insets),
 		[connectionStatus, insets]
@@ -119,7 +115,6 @@ export function AppNavigator() {
 			<View style={styles.container}>
 				<ConnectionBanner status={connectionStatus} topInset={insets.top} />
 
-				{/* The same tree on every width: a resized window keeps its navigation state. */}
 				<View style={styles.body}>
 					<SafeAreaInsetsContext.Provider value={navigatorInsets}>
 						<Tab.Navigator
@@ -187,7 +182,6 @@ export function AppNavigator() {
 									title: 'Profil',
 									tabBarAccessibilityLabel: 'Profil',
 									headerShown: false,
-									// The desktop side bar reaches the profile through the account at its foot.
 									...(breakpoint === 'desktop' ? { tabBarItemStyle: { display: 'none' } } : null),
 								}}
 							/>

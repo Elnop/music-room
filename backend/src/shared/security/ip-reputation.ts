@@ -4,8 +4,6 @@ import * as counter from '@/shared/security/counter.js';
 import { failOpen } from '@/shared/security/fail-open.js';
 import type { IPReputationStatus } from '@/shared/security/security.types.js';
 
-// Failed logins per IP, across accounts; past the blacklist threshold every /api/auth/* request is refused.
-
 const FAILED_WINDOW_MS = 15 * 60 * 1000;
 const BLACKLIST_SECONDS = 24 * 60 * 60;
 

@@ -5,7 +5,6 @@ import * as realtime from '@/realtime/emitters/playlist.emitters.js';
 import type { TracksAvailabilityPayload } from '@/features/playlists/playlist.types.js';
 
 export const RECHECK_AFTER_MS = 24 * 60 * 60 * 1000;
-// One SoundCloud lookup per track: a few at a time keeps a long playlist under its rate limit.
 const CONCURRENCY = 4;
 
 interface StoredTrack {
@@ -15,10 +14,8 @@ interface StoredTrack {
 	availability_checked_at: string | null;
 }
 
-// Two clients opening the same playlist must not check its tracks twice.
 const checking = new Set<string>();
 
-/** Never throws: runs after the response. */
 export async function refreshPlaylistAvailability(playlistId: string): Promise<void> {
 	try {
 		const due = (await playlistTracks(playlistId)).filter(

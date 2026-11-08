@@ -65,7 +65,6 @@ export function QueueItemRow({
 				{...contextMenu}
 				style={[styles.row, isCurrent && styles.rowCurrent, isDragActive && styles.rowActive]}
 			>
-				{/* The row's buttons sit beside its pressable area, never in it: the web nests no <button>. */}
 				<Pressable
 					onPress={() => onPlay(item.id)}
 					onLongPress={onShowActions ? () => onShowActions(item) : undefined}

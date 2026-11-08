@@ -44,7 +44,6 @@ export class ErrorBoundary extends React.Component<Props, State> {
 			return (
 				<View style={styles.container}>
 					<Text style={styles.title}>Une erreur s'est produite</Text>
-					{/* The raw message is English: shown in development only. */}
 					<Text style={styles.error}>
 						{__DEV__ && error.message ? error.message : 'Une erreur inattendue est survenue.'}
 					</Text>

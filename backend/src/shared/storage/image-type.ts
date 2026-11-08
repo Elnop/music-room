@@ -1,5 +1,3 @@
-/** The client's declared MIME type and file name are never trusted: the type comes from the magic bytes. */
-
 interface ImageType {
 	mime: 'image/jpeg' | 'image/png' | 'image/webp';
 	ext: 'jpg' | 'png' | 'webp';
@@ -19,7 +17,6 @@ function startsWith(buffer: Buffer, bytes: number[], offset = 0): boolean {
 export function detectImageType(buffer: Buffer): ImageType | null {
 	if (startsWith(buffer, [0xff, 0xd8, 0xff])) return JPEG;
 	if (startsWith(buffer, PNG_SIGNATURE)) return PNG;
-	// RIFF....WEBP
 	if (
 		startsWith(buffer, [0x52, 0x49, 0x46, 0x46]) &&
 		startsWith(buffer, [0x57, 0x45, 0x42, 0x50], 8)

@@ -17,7 +17,6 @@ export async function login(data: LoginInput): Promise<AuthResponse> {
 			}
 		);
 
-		// Supabase answers email_not_confirmed only after a correct password: no account enumeration.
 		if (authError?.code === 'email_not_confirmed') {
 			const userId = await findAuthUserIdByEmail(data.email);
 			logger.warn('Login blocked - email not verified', { userId, email: data.email });

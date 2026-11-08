@@ -10,11 +10,9 @@ interface ResendResetCode {
 	cooldown: number;
 }
 
-/** Asks the backend whether a code may be sent now, then sends it through `forgotPassword`. */
 export function useResendResetCode(
 	email: string,
 	forgotPassword: ReturnType<typeof useForgotPasswordMutation>,
-	/** Called when a code is about to be sent: the last failure is dropped. */
 	onSend: () => void
 ): ResendResetCode {
 	const countdown = useCountdown();

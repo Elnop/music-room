@@ -47,7 +47,6 @@ function mockPlayerFor(url: string): MockPlayer {
 		const created: MockPlayer = {
 			id: mockNextId++,
 			url,
-			// A real stream loads as soon as the player has it; the empty source never does.
 			isLoaded: url !== '',
 			duration: url !== '' ? 200 : 0,
 			playing: false,
@@ -69,7 +68,6 @@ function mockPlayerFor(url: string): MockPlayer {
 	return player;
 }
 
-// The system media controls are covered by MediaSessionBridge.test.tsx.
 jest.mock('@/features/player/mediaSession/components/orchestrators/MediaSessionBridge', () => ({
 	MediaSessionBridge: () => null,
 }));
@@ -380,7 +378,6 @@ describe('PlayerProvider stream renewal (#313)', () => {
 		expect(usePlayerStore.getState().playbackState).toBe('playing');
 		expect(usePlayerStore.getState().error).toBeNull();
 
-		// The renewed stream fails too (iOS reports `failed`): final, no further request.
 		setStatus(u2, { playbackState: 'ready', isLoaded: true, currentTime: 31 });
 		view.rerender(
 			<PlayerProvider>
@@ -596,7 +593,6 @@ describe('PlayerProvider audio interruptions (#310)', () => {
 	])('does not mirror a stop %s', async (_label, extra) => {
 		const { view, u1 } = await playingNatively();
 		answerStreams({ streamUrl: 'u2', expiresAt: inMinutes(30) });
-		// Auto-advance belongs to QueueAutoAdvance: keep it out of the way.
 		const next = jest.fn(async () => 'played' as const);
 		mockNext = next;
 
@@ -611,7 +607,6 @@ describe('PlayerProvider audio interruptions (#310)', () => {
 		async playbackState => {
 			const view = await startPlaying(inMinutes(30));
 			const u1 = mockPlayerFor('u1');
-			// Never reported loaded, so StreamWatchdog leaves it: only this guard stops the mirror.
 			setStatus(u1, { playing: true, isLoaded: false });
 			await rerender(view);
 
@@ -625,7 +620,6 @@ describe('PlayerProvider audio interruptions (#310)', () => {
 	it('ignores a late event that no longer matches the player', async () => {
 		const { view, u1 } = await playingNatively();
 
-		// A stale `playing: false` from a fast pause/play: the player itself plays.
 		setStatus(u1, { playing: false });
 		await rerender(view);
 
@@ -768,7 +762,6 @@ describe('PlayerProvider next track prefetch (#314)', () => {
 		await flush();
 	}
 
-	/** Step to `item` as the queue does: new current item, then playTrack. */
 	async function stepTo(item: QueueItem, items: QueueItem[]) {
 		setQueue(item.id, items);
 		await act(async () => usePlayerStore.getState().playTrack(trackToSoundCloud(item), item.id));

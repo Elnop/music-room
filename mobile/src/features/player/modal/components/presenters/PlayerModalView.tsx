@@ -28,7 +28,6 @@ interface PlayerModalViewProps {
 export function PlayerModalView({ modal, gestures, seek, carousel }: PlayerModalViewProps) {
 	const QueueModal = getPlayerModal('QueueModal');
 	const DevicePickerSheet = getPlayerModal('DevicePickerSheet');
-	// Desktop has the now playing panel instead; a tablet browser centres the player over the app.
 	const { isDesktop, width } = useBreakpoint();
 	const dialog = isPlayerDialog(width);
 

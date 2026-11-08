@@ -9,7 +9,6 @@ import type { Theme } from '@/shared/theme/types';
 import { Text } from '@/shared/components/ui/Text';
 
 interface SidebarAccountProps {
-	/** The account replaces the profile tab, so it takes the active tab's fill. */
 	active: boolean;
 	onPress: () => void;
 }
@@ -27,7 +26,6 @@ export function SidebarAccount({ active, onPress }: SidebarAccountProps) {
 			<Pressable
 				style={[styles.account, active && styles.active]}
 				onPress={onPress}
-				// On the web a link without an address ignores Enter; a button answers Enter and Space.
 				accessibilityRole="button"
 				accessibilityLabel={`Profil, ${name}`}
 				accessibilityState={{ selected: active }}

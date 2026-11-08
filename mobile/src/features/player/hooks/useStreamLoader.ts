@@ -24,7 +24,6 @@ export function useStreamLoader(): void {
 			return;
 		}
 
-		// A restored track loads its stream on play, not at start-up.
 		if (usePlayerStore.getState().needsStreamLoad) return;
 
 		const thisLoadCounter = loadCounter;

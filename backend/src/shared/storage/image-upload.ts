@@ -3,7 +3,6 @@ import multer from 'multer';
 import { z } from 'zod';
 import { AppError } from '@/shared/middleware/error-handler.js';
 
-/** Also the limit of the `avatars` and `playlist-covers` buckets (migrations 027 and 031). */
 const IMAGE_MAX_BYTES = 2 * 1024 * 1024;
 
 interface ImageUploadOptions {
@@ -12,7 +11,6 @@ interface ImageUploadOptions {
 	maxBytes?: number;
 }
 
-/** The client's MIME type is ignored: the type is checked later, from the bytes. */
 export function imageUpload({ field, label, maxBytes = IMAGE_MAX_BYTES }: ImageUploadOptions) {
 	const upload = multer({
 		storage: multer.memoryStorage(),
@@ -41,7 +39,6 @@ export function imageUpload({ field, label, maxBytes = IMAGE_MAX_BYTES }: ImageU
 	};
 }
 
-/** multer caps the size and the bytes give the type: only presence is checked here. */
 export function uploadedImageSchema(field: string, label: string) {
 	return z.object(
 		{

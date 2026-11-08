@@ -9,7 +9,6 @@ interface ProviderSignIn {
 	isPending: boolean;
 }
 
-/** A cancel reports nothing; other failures reach `onFailure`, never after unmount. */
 export function useProviderSignIn(onFailure: (message: string) => void): ProviderSignIn {
 	const mutation = useMutation({ mutationFn: signInWithProvider });
 	return {

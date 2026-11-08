@@ -10,12 +10,10 @@ import type { AvatarResponse } from '@/features/profile/profile.types.js';
 
 export const AVATAR_BUCKET = 'avatars';
 
-/** Only paths this backend stored for userId are ever deleted. */
 export function ownedAvatarPath(url: string | null | undefined, userId: string): string | null {
 	return storedImagePath(url, AVATAR_BUCKET, userId);
 }
 
-/** Never throws. */
 export async function deleteReplacedAvatar(
 	previousUrl: string | null | undefined,
 	currentUrl: string | null | undefined,

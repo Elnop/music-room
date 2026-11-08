@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PlaylistRow } from '@/features/playlists/playlist.types.js';
 
-// Each supabaseAdmin.from(...) chain resolves to the next queued response.
 const { responses, from } = vi.hoisted(() => {
 	const responses: Array<{ data: unknown; error: unknown }> = [];
 	const from = vi.fn(() => {

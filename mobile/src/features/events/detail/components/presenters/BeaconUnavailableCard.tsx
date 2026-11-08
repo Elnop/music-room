@@ -5,7 +5,6 @@ import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { createBeaconCardStyles } from './beaconCardStyles';
 import { Text } from '@/shared/components/ui/Text';
 
-/** Shown instead of the card in a browser, which cannot broadcast over Bluetooth. */
 export function BeaconUnavailableCard() {
 	const { styles, theme } = useThemedStyles(createBeaconCardStyles);
 

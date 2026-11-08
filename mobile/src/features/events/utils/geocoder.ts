@@ -3,7 +3,6 @@ import type { MusicEvent } from '@/features/events/types';
 
 type Point = Pick<MusicEvent, 'latitude' | 'longitude'>;
 
-/** Android's geocoder needs the location permission, even for a typed address. */
 export const geocoderNeedsLocationPermission = true;
 
 function formatPlace(place: Location.LocationGeocodedAddress): string | null {

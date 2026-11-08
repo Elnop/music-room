@@ -4,7 +4,6 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 
 type Result = { data?: unknown; error: { message: string; code?: string } | null };
 
-// Each `from()` takes the next queued result; the builder resolves to it.
 const m = vi.hoisted(() => {
 	const results: Result[] = [];
 	const insert = vi.fn();

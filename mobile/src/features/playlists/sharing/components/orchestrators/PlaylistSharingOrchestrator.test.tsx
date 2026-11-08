@@ -32,7 +32,6 @@ jest.mock('@/shared/utils/toast', () => ({
 	showSuccess: jest.fn(),
 	showWarning: jest.fn(),
 }));
-// The swipe needs native gestures: « Retirer » is pressed directly.
 jest.mock('@/shared/components/lists/SwipeableUserItem', () => {
 	const { Text } = jest.requireActual('react-native');
 	return {

@@ -7,8 +7,6 @@ import * as usersApi from '@/features/playlists/services/usersApi';
 import { loadPlaylist } from '@/features/playlists/utils/playlistCache';
 import type { FriendPlaylists, PlaylistWithTracks } from '@/features/playlists/types';
 
-// Every playlist screen reloaded its data on each visit and showed a failure at
-// once: the queries refetch on mount and do not retry.
 const ON_EVERY_VISIT = { staleTime: STALE.none, retry: false } as const;
 
 export function usePlaylists(enabled = true) {
@@ -31,7 +29,6 @@ export function usePublicPlaylists() {
 	});
 }
 
-/** A friend whose playlists fail to load is shown without them, like one with none. */
 async function loadFriendsPlaylists(): Promise<FriendPlaylists[]> {
 	const friends = await usersApi.getFriends();
 	const all = await Promise.all(
@@ -46,7 +43,6 @@ async function loadFriendsPlaylists(): Promise<FriendPlaylists[]> {
 	return all.filter(entry => entry.playlists.length > 0);
 }
 
-/** Friends without public playlists are left out. */
 export function useFriendsPlaylists() {
 	const signedIn = useSession(session => session.isAuthenticated);
 	return useQuery({
@@ -67,7 +63,6 @@ export function usePlaylistDetail(id: string, enabled = true) {
 	});
 }
 
-/** The playlist as another screen loaded it, kept up to date, without fetching it. */
 export function useCachedPlaylist(id: string): PlaylistWithTracks | undefined {
 	const client = useQueryClient();
 	return useQuery({

@@ -23,7 +23,6 @@ export function avatarOf(profile: OAuthProfile): string | null {
 		: (profile.picture?.data?.url ?? null);
 }
 
-/** Null when a concurrent sign-up took the username: the auth user is removed and the caller retries. */
 export async function createOAuthAccount(
 	provider: OAuthProvider,
 	providerId: string,

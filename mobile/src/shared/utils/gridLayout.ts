@@ -2,7 +2,6 @@ import type { Breakpoint } from '@/shared/hooks/useBreakpoint';
 
 const GRID_PADDING = 16;
 const GRID_GAP = 16;
-/** Slack the phone grid has always kept, so two cards never wrap on a rounding error. */
 const GRID_SLACK = 8;
 const MIN_TILE_WIDTH = 180;
 

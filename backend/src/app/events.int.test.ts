@@ -18,8 +18,6 @@ const { errorHandler } = await import('@/shared/middleware/error-handler.js');
 const { authMiddleware } = await import('@/features/auth/auth.middleware.js');
 const { createEventsRouter } = await import('@/features/events/events.routes.js');
 
-// Against the local stack (scripts/test-db.sh); only the Socket.io emitters are mocked.
-
 interface TestUser {
 	id: string;
 	token: string;
@@ -137,7 +135,7 @@ describe('Event routes (/api/events)', () => {
 
 	afterAll(async () => {
 		try {
-			for (const user of users) await supabaseAdmin.auth.admin.deleteUser(user.id); // cascades
+			for (const user of users) await supabaseAdmin.auth.admin.deleteUser(user.id);
 			if (isRedisConnected()) {
 				const keys = await redisClient.keys('rl:events:*');
 				if (keys.length > 0) await redisClient.del(...keys);

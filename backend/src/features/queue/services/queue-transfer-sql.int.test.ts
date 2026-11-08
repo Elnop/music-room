@@ -63,7 +63,7 @@ async function trackIdsOf(items: QueueItem[]): Promise<string[]> {
 }
 
 beforeAll(async () => {
-	await createUser(); // warms the auth admin client
+	await createUser();
 });
 
 beforeEach(async () => {
@@ -72,7 +72,7 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
-	for (const id of users) await supabaseAdmin.auth.admin.deleteUser(id); // cascades to queues
+	for (const id of users) await supabaseAdmin.auth.admin.deleteUser(id);
 	await supabaseAdmin.from('tracks').delete().like('track_uri', `${URI_PREFIX}/%`);
 });
 

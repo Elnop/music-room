@@ -40,7 +40,6 @@ jest.mock('@/shared/components/ui/LoadingSpinner', () => ({
 	LoadingSpinner: () => null,
 }));
 
-// The real tab and stack layout, with screens that only print their params.
 jest.mock('./AppNavigator', () => {
 	const { Text } = jest.requireActual('react-native');
 	const { createNativeStackNavigator } = jest.requireActual('@react-navigation/native-stack');
@@ -93,7 +92,6 @@ jest.mock('react-native-safe-area-context', () => {
 	};
 });
 
-// The store's own actions, before a test replaces them with stubs.
 const { loadFromStorage, isTokenExpiringSoon } = useAuthStore.getState();
 
 const signIn = () =>
@@ -172,7 +170,6 @@ describe('RootNavigator session restore', () => {
 		} as unknown as Response;
 	}
 
-	/** A session saved by a previous run, its access token expired a minute ago. */
 	async function storeExpiredSession(): Promise<void> {
 		await AsyncStorage.multiSet([
 			['@zumik/auth_user', JSON.stringify(user)],

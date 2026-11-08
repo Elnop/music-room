@@ -60,7 +60,6 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
 			);
 		}
 
-		// An AppError keeps its status: a revocation outage is a 503, not a 401.
 		if (error instanceof AppError) return sendError(req, res, error);
 		const err = error as Error & { code?: string };
 		return sendError(
@@ -90,7 +89,6 @@ export async function optionalAuthMiddleware(req: Request, res: Response, next: 
 
 		next();
 	} catch {
-		// A blocked IP or an invalid token continues anonymously.
 		next();
 	}
 }

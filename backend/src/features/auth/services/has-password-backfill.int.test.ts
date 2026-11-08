@@ -5,7 +5,6 @@ import { afterAll, describe, expect, it } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import * as oauthUserService from '@/features/auth/services/oauth-user.service.js';
 
-// scripts/test-db.sh starts this container and already applied the migration once: it is rerunnable.
 const DB_CONTAINER = 'supabase_db_music-room-test';
 const MIGRATION = new URL(
 	'../../../../migrations/019_oauth_has_password_backfill.sql',
@@ -35,7 +34,6 @@ function psql(sql: string | Buffer): void {
 	);
 }
 
-/** auth.users is not reachable through PostgREST. */
 function backdate(id: string): void {
 	psql(`UPDATE auth.users SET created_at = '${BEFORE_CUTOFF}' WHERE id = '${id}';`);
 }
@@ -78,7 +76,6 @@ async function createPasswordUser(): Promise<string> {
 	return id;
 }
 
-/** has_password forced true: the state the migration repairs. */
 async function createOAuthUser(provider: 'google' | 'facebook'): Promise<string> {
 	const { userProfile } = await oauthUserService.createOAuthUser(
 		provider,
@@ -93,14 +90,12 @@ async function createOAuthUser(provider: 'google' | 'facebook'): Promise<string>
 
 describe('migration 019: has_password backfill (#196)', () => {
 	afterAll(async () => {
-		// Cascades to user_profiles.
 		for (const id of createdUserIds) await supabaseAdmin.auth.admin.deleteUser(id);
 	});
 
 	it('sets false on Google and Facebook sign-ups made before #189', async () => {
 		const google = await createOAuthUser('google');
 		const facebook = await createOAuthUser('facebook');
-		// Unlinked its only provider while has_password was wrongly true.
 		const unlinked = await createOAuthUser('google');
 		await updateProfile(unlinked, { google_id: null });
 		for (const id of [google, facebook, unlinked]) backdate(id);
@@ -114,10 +109,8 @@ describe('migration 019: has_password backfill (#196)', () => {
 
 	it('keeps password accounts and later sign-ups that set a password', async () => {
 		const password = await createPasswordUser();
-		// An email sign-up that linked Google afterwards.
 		const linked = await createPasswordUser();
 		await updateProfile(linked, { google_id: `google-${randomUUID()}` });
-		// Signed up after the cutoff (has_password false), then set a password by reset.
 		const resetAfterCutoff = await createOAuthUser('google');
 
 		psql(readFileSync(MIGRATION));

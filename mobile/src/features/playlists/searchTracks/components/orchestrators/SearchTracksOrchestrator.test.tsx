@@ -51,7 +51,6 @@ let clear: () => void = () => undefined;
 
 async function renderScreen() {
 	const client = createQueryClient();
-	// The playlist under this screen already holds `known`.
 	client.setQueryData(
 		queryKeys.playlists.detail('p1'),
 		playlistWithTracks({ tracks: [playlistTrack('k', 'a', known.permalink_url)] })

@@ -6,7 +6,6 @@ import type { Tables } from '@/shared/types/supabase.generated.js';
 
 const emptyToUndefined = (value?: string) => (value === '' ? undefined : value);
 
-/** `trackUri` is the SoundCloud permalink URL, never a stream URL. */
 export const addTrackSchema = z.object({
 	trackUri: z.string().min(1).max(500),
 	title: z.string().min(1).max(200),

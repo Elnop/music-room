@@ -9,14 +9,12 @@ import {
 import { geocodeAddress, geocoderNeedsLocationPermission } from '@/features/events/utils/geocoder';
 
 interface Located extends Coordinates {
-	/** The address these coordinates belong to: typing another one geocodes it again. */
 	address: string;
 }
 
 export interface EventPlace {
 	isLocating: boolean;
 	locateHere: () => void;
-	/** The coordinates of `address`, or null after telling the user why there are none. */
 	resolve: (address: string) => Promise<Coordinates | null>;
 }
 

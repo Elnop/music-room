@@ -49,7 +49,6 @@ const orNull = (text: string) => text.trim() || null;
 
 function useEditedEvent(eventId: string | undefined): MusicEvent | undefined {
 	const client = useQueryClient();
-	// Prefilled once: later socket updates must not reset what the user is typing.
 	const [edited] = useState(() =>
 		eventId === undefined
 			? undefined
@@ -93,7 +92,6 @@ export function useEventForm(navigation: Navigation, eventId: string | undefined
 		});
 	};
 
-	// Moving the start past the end keeps the event's length.
 	const moveStart = (date: Date) => {
 		const length = endsAt.getTime() - startsAt.getTime();
 		setStartsAt(date);

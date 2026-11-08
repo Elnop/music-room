@@ -15,8 +15,6 @@ vi.mock('@/realtime/emitters/queue.emitters.js', async importOriginal => ({
 	sendDeviceCommand: vi.fn(),
 }));
 
-// No Socket.io server runs here: device presence and commands are stubbed.
-
 const URI_PREFIX = `https://soundcloud.com/int-queue-delegation/${randomUUID()}`;
 const users: string[] = [];
 let trackCount = 0;
@@ -33,7 +31,6 @@ async function createUser(): Promise<string> {
 	if (error) throw error;
 	const id = data.user.id;
 	users.push(id);
-	// devices and follows reference user_profiles
 	const { error: profileError } = await supabaseAdmin
 		.from('user_profiles')
 		.insert({ id, username: `int_${id.slice(0, 8)}` });
@@ -89,9 +86,9 @@ beforeAll(async () => {
 beforeEach(async () => {
 	online.clear();
 	sendDeviceCommand.mockClear();
-	await supabaseAdmin.from('devices').delete().eq('user_id', owner); // cascades to licenses
+	await supabaseAdmin.from('devices').delete().eq('user_id', owner);
 	await supabaseAdmin.from('follows').delete().in('follower_id', [owner, friend, stranger]);
-	await supabaseAdmin.from('play_queues').delete().eq('user_id', owner); // cascades to items
+	await supabaseAdmin.from('play_queues').delete().eq('user_id', owner);
 });
 
 afterAll(async () => {

@@ -21,7 +21,6 @@ export interface NewPlaylistDraft {
 	submit: () => void;
 }
 
-/** A creation error shows in the sheet; once the playlist exists, errors go to a toast. */
 export function useNewPlaylistFromTrack(
 	track: AddQueueItemBody | null,
 	onClose: () => void
@@ -59,7 +58,6 @@ export function useNewPlaylistFromTrack(
 			logger.error('[TrackActionsSheet] Add to new playlist failed:', failure);
 			showError(`Playlist « ${created.name} » créée, mais le titre n'a pas pu y être ajouté`);
 		}
-		// The list holds the playlist since its creation, with no track yet.
 		void client.invalidateQueries({ queryKey: queryKeys.playlists.list() });
 	};
 

@@ -2,11 +2,9 @@ import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { logger } from '@/shared/utils/logger.js';
 import * as emailVerification from '@/features/auth/services/email-verification.service.js';
 
-/** The cooldown counts even when no code is sent: no account enumeration. */
 export async function resendCode(userId: string, claimedEmail: string, ip: string): Promise<void> {
 	await emailVerification.consumeResend(userId, ip);
 
-	// The recipient comes from the stored account, never from the request body.
 	const recipient = await resolveRecipient(userId, claimedEmail);
 	if (!recipient) return;
 

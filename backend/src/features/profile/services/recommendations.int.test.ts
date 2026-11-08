@@ -5,8 +5,6 @@ import * as recommendationsService from '@/features/profile/services/recommendat
 import type { MusicGenre } from '@/shared/music/genres.js';
 import type { VisibilityLevel } from '@/features/profile/profile.types.js';
 
-// Other test files share the database, so assertions only look at the profiles created here.
-
 const tag = randomUUID().slice(0, 8);
 const userIds: string[] = [];
 

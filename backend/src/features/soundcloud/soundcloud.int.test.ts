@@ -4,7 +4,6 @@ import type { AddressInfo } from 'node:net';
 import express, { type NextFunction, type Request, type Response } from 'express';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Set before env.ts is parsed.
 vi.hoisted(() => {
 	process.env.RATE_LIMIT_ENABLED = 'true';
 	process.env.RATE_LIMIT_WHITELIST_IPS = '';
@@ -263,9 +262,7 @@ describe('SoundCloud routes: auth, per-user rate limit, validation', () => {
 		expect(other.status).toBe(200);
 	});
 
-	// Last: it closes the Redis connection.
 	it('fails closed with 503 RATE_LIMIT_UNAVAILABLE while Redis is down', async () => {
-		// The real authMiddleware would answer 503 REVOCATION_UNAVAILABLE without Redis.
 		const app = express();
 		app.get(
 			'/limited',

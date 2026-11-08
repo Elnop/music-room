@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
 
-/** `null` until the first answer, so nothing moves before it is known. */
 function useReduceMotion(): boolean | null {
 	const [reduceMotion, setReduceMotion] = useState<boolean | null>(null);
 

@@ -9,7 +9,6 @@ interface PickedImage {
 	height: number;
 }
 
-/** Crops to the centred square again, in case the picker's crop was skipped. */
 export async function prepareSquareImage({ uri, width, height }: PickedImage): Promise<string> {
 	const context = ImageManipulator.manipulate(uri);
 

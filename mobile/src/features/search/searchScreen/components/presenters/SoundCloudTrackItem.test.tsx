@@ -11,7 +11,7 @@ jest.mock('@/shared/theme/ThemeContext', () => {
 const sampleTrack: SoundCloudTrack = {
 	id: 1,
 	title: 'Test Song',
-	duration: 125000, // 2:05
+	duration: 125000,
 	permalink_url: 'https://soundcloud.com/artist/song',
 	artwork_url: 'https://example.com/art.jpg',
 	description: null,

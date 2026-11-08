@@ -2,7 +2,6 @@ import { rateLimitConfig } from '@/shared/config/rate-limit.config.js';
 import { logger } from '@/shared/utils/logger.js';
 import * as counter from '@/shared/security/counter.js';
 
-/** Accepted risk: fails open, but the login rate limiter that runs first fails closed (doc/security/threat-model.md). */
 interface FailOpenOptions<T> {
 	disabled: string;
 	unavailable: string;

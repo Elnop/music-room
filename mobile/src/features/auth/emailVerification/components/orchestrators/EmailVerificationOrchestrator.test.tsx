@@ -62,7 +62,6 @@ afterEach(() => {
 
 const PARAMS = { userId: 'user-a', email: 'a@example.com' };
 
-/** Pastes a whole code in the first box, as an autofill does. */
 function typeCode(code: string) {
 	fireEvent.changeText(screen.getAllByDisplayValue('')[0], code);
 }

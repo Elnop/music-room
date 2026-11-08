@@ -60,7 +60,6 @@ export async function grant(
 	}
 
 	logger.info('Device license granted', context);
-	// The grantee's open profile of the owner reloads its controllable devices.
 	await notifyListeningAccessChange(granteeId, ownerId, true);
 	return { deviceId, license: { user, grantedAt: license.created_at } };
 }
@@ -89,7 +88,6 @@ export async function revoke(ownerId: string, deviceId: string, granteeId: strin
 	await notifyListeningAccessChange(granteeId, ownerId, stillAllowed);
 }
 
-// Non-friends get the empty shape before any device query, so nothing about ownerId leaks.
 export async function listControllable(
 	viewerId: string,
 	ownerId: string

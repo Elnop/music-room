@@ -10,8 +10,6 @@ import type { DeviceCommand } from '@/types/queue.types';
 import { FakeMediaElement, autoplayRefusal, installFakeDocument } from '@/test/fakeMediaElement';
 import { registerPlayback } from './playbackBridge';
 
-// The browser as a delegated device: a friend's commands drive the web player, and the status it sends back is true.
-
 jest.mock('@/features/player/services/audioPlayer', () =>
 	jest.requireActual('@/features/player/services/audioPlayer.web')
 );

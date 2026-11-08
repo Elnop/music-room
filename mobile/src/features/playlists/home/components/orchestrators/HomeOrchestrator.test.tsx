@@ -130,7 +130,6 @@ describe('HomeOrchestrator', () => {
 		expect(screen.getByLabelText('Fred mix, par fred')).toBeTruthy();
 		expect(screen.getByLabelText('Mine, par Moi')).toBeTruthy();
 		expect(screen.getByLabelText('Open, par bob')).toBeTruthy();
-		// Initials without a photo: one badge per card.
 		for (const initials of ['F', 'M', 'B']) {
 			expect(screen.getByText(initials, { includeHiddenElements: true })).toBeTruthy();
 		}

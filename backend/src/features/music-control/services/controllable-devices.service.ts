@@ -25,7 +25,6 @@ async function fetchUsername(userId: string): Promise<string> {
 }
 
 export async function list(viewerId: string): Promise<DevicePickerResponse> {
-	// Lazy: a static import would close the cycle realtime -> music-control -> realtime.
 	const realtime = await import('@/realtime/emitters/control.emitters.js');
 	const withOnline = (ownerId: string, devices: ControllableDevice[]) =>
 		devices.map(d => ({ ...d, online: realtime.isDeviceOnline(ownerId, d.deviceId) }));

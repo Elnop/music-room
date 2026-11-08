@@ -17,7 +17,6 @@ interface AppProvidersProps {
 export function AppProviders({ children, queryClient }: AppProvidersProps) {
 	const [client] = useState(() => queryClient ?? createQueryClient());
 
-	// Query keys are not per user: the next account must never see the previous one's data.
 	useEffect(() => {
 		const unsubscribe = onSessionEnd(() => client.clear());
 		return () => {

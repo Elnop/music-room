@@ -15,7 +15,6 @@ interface SearchPage {
 	next_href?: string;
 }
 
-// About a third of SoundCloud's results only have DRM streams: the next pages top a short one up.
 const SOUNDCLOUD_PAGE_SIZE = 50;
 const MAX_PAGES = 3;
 

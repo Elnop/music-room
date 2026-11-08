@@ -49,7 +49,6 @@ export function PlaylistDetailView({
 				keyExtractor={item => item.id}
 				onReorder={tracks.reorder}
 				dragEnabled={canEdit && !tracks.isMoving}
-				// Rows re-render when the playing track changes, to move the highlight.
 				extraData={currentUri}
 				renderItem={({ item, index, drag, isActive }) => (
 					<SwipeableTrackItem
@@ -99,7 +98,6 @@ export function PlaylistDetailView({
 	);
 }
 
-// A flat band in the cover's colour behind the header: pixel art has no gradients.
 const bandStyles = StyleSheet.create({
 	band: { position: 'absolute', top: 0, left: 0, right: 0, height: 260 },
 });

@@ -1,6 +1,3 @@
-// Browser only: the Google and Facebook sign-in SDKs come as third-party scripts.
-// The project types no DOM (lib esnext), hence the few element shapes below.
-
 interface DomScript {
 	src: string;
 	async: boolean;
@@ -16,7 +13,6 @@ interface DomDocument {
 
 const loads = new Map<string, Promise<void>>();
 
-/** Appends the script once per URL; a failed load is forgotten, so the next call retries. */
 export function loadScript(src: string): Promise<void> {
 	const pending = loads.get(src);
 	if (pending) return pending;
@@ -42,7 +38,6 @@ export function loadScript(src: string): Promise<void> {
 	return load;
 }
 
-/** A blocked script (content blocker, offline) fails this way. */
 export function isScriptLoadError(error: unknown): boolean {
 	return error instanceof Error && error.message.startsWith('Could not load ');
 }

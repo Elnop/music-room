@@ -26,10 +26,8 @@ export function RootNavigator() {
 	const loadFromStorage = useAuthStore(state => state.loadFromStorage);
 	const [isReady, setIsReady] = useState(false);
 	const navigationRef = useNavigationContainerRef<AppTabsParamList>();
-	// A getter: each link reads the session it arrives in.
 	const linking = useMemo(() => createLinking(() => useAuthStore.getState().isAuthenticated), []);
 
-	// react-navigation's light default would flash white behind dark screens during transitions.
 	const { theme } = useTheme();
 	const navigationTheme = useMemo(() => {
 		const base = isDarkBackground(theme.colors.background) ? DarkTheme : DefaultTheme;
@@ -54,7 +52,6 @@ export function RootNavigator() {
 	useMusicControlEmitter();
 
 	useEffect(() => {
-		// The backend address must be known before the first request (token refresh).
 		loadBackendUrl()
 			.then(() => loadFromStorage())
 			.then(async () => {

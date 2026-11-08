@@ -8,7 +8,6 @@ export interface LatestThrottle {
 	cancel(key: string): void;
 }
 
-/** Leading + trailing throttle: a key runs at most once per `windowMs` and always ends on its latest call. */
 export function createLatestThrottle(windowMs: number): LatestThrottle {
 	const states = new Map<string, KeyState>();
 

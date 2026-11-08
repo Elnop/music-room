@@ -19,7 +19,6 @@ type SoundCloudModule = SoundCloudConstructor & {
 	Soundcloud?: SoundCloudConstructor;
 };
 
-/** soundcloud.ts exports its client as `default`, as `Soundcloud` or as the module itself. */
 export function resolveClientClass(loaded: SoundCloudModule): SoundCloudConstructor {
 	const outer = loaded.default || loaded;
 	return outer.default || outer.Soundcloud || outer;
@@ -28,7 +27,6 @@ export function resolveClientClass(loaded: SoundCloudModule): SoundCloudConstruc
 const require = createRequire(import.meta.url);
 const SoundCloud = resolveClientClass(require('soundcloud.ts') as SoundCloudModule);
 
-/** The library scrapes SoundCloud's client_id from its website: no API key to configure. */
 export const soundcloud: SoundCloudClient = new SoundCloud();
 
 logger.info('SoundCloud service initialized');

@@ -4,7 +4,6 @@ import type { AddressInfo } from 'node:net';
 import express from 'express';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-// Set before env.ts is parsed.
 vi.hoisted(() => {
 	process.env.RATE_LIMIT_ENABLED = 'true';
 	process.env.RATE_LIMIT_WHITELIST_IPS = '';
@@ -17,8 +16,6 @@ const { connectRedis, disconnectRedis, isRedisConnected, redisClient } =
 const { errorHandler } = await import('@/shared/middleware/error-handler.js');
 const { default: profileRoutes } = await import('@/features/profile/profile.routes.js');
 const { AVATAR_BUCKET } = await import('@/features/profile/services/avatar.service.js');
-
-// Each test uses fresh users, so the 3-per-window limit only bites in the rate-limit test.
 
 interface TestUser {
 	id: string;

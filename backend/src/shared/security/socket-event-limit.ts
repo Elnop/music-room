@@ -1,5 +1,3 @@
-// In memory by design, not as a fallback: the counters belong to one connection, on one backend instance.
-
 interface EventLimit {
 	max: number;
 	windowMs: number;
@@ -34,10 +32,8 @@ export function rateLimitedErrorFor(
 	return null;
 }
 
-/** 'limited' marks only the first refusal of a window, so that one alone is logged. */
 type LimitDecision = 'allowed' | 'limited' | 'still-limited';
 
-/** Events without their own limit share one counter, so random event names cannot grow the map. */
 export function createSocketEventLimiter(
 	limits: Readonly<Record<string, EventLimit>> = EVENT_LIMITS,
 	fallback: EventLimit = DEFAULT_EVENT_LIMIT,

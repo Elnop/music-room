@@ -8,7 +8,6 @@ import {
 import { preloadFacebookSdk } from '@/features/auth/services/facebookSignIn.web';
 import type { GoogleButtonSlot, GoogleButtonVariant } from '@/features/auth/types';
 
-/** Loads both SDKs with the screen; without Google's button, the screen falls back to its own. */
 export function useProviderButtons(
 	onGoogleCredential: () => void,
 	variant: GoogleButtonVariant
@@ -26,7 +25,6 @@ export function useProviderButtons(
 			if (!node) return;
 			let mounted = true;
 			let release: (() => void) | undefined;
-			// react-native-web hands the DOM node to a View's ref.
 			const target = node as unknown as GoogleButtonTarget;
 			renderGoogleButton(target, variant, () => onCredential.current()).then(
 				done => {

@@ -1,11 +1,4 @@
--- =====================================================
--- 016: fractional ranks and versions for playlist tracks
--- Design: doc/features/playlist-concurrency.md
--- =====================================================
 
--- Rank keys are base-62 fractions in (0, 1), written with the digits below in
--- byte order (0-9 < A-Z < a-z), so COLLATE "C" sorts them numerically.
--- A key never ends with '0': then every key has exactly one spelling.
 
 CREATE OR REPLACE FUNCTION public.rank_between(p_a text, p_b text)
 RETURNS text
@@ -27,7 +20,6 @@ BEGIN
 
   LOOP
     IF b IS NOT NULL THEN
-      -- Skip the common prefix, reading a missing digit of a as '0'.
       n := 0;
       WHILE n < length(b)
         AND coalesce(nullif(substr(a, n + 1, 1), ''), '0') = substr(b, n + 1, 1) LOOP
@@ -45,12 +37,10 @@ BEGIN
       RETURN prefix || substr(digits, (da + db) / 2 + 1, 1);
     END IF;
 
-    -- Consecutive digits: b's first digit alone fits when b has more digits.
     IF b IS NOT NULL AND length(b) > 1 THEN
       RETURN prefix || left(b, 1);
     END IF;
 
-    -- Otherwise keep a's digit and look for room after it.
     prefix := prefix || substr(digits, da + 1, 1);
     a := substr(a, 2);
     b := NULL;
@@ -58,8 +48,6 @@ BEGIN
 END;
 $$;
 
--- Key after p_a for appends: increments the last digit, so keys grow by one
--- character every 61 appends instead of every few.
 CREATE OR REPLACE FUNCTION public.rank_after(p_a text)
 RETURNS text
 LANGUAGE plpgsql
@@ -80,8 +68,6 @@ BEGIN
 END;
 $$;
 
--- The p_index-th (1-based) of p_count evenly spaced keys, all of the same
--- width before trailing zeros are dropped.
 CREATE OR REPLACE FUNCTION public.rank_spaced(p_index bigint, p_count bigint)
 RETURNS text
 LANGUAGE plpgsql
@@ -115,9 +101,6 @@ GRANT EXECUTE ON FUNCTION public.rank_between(text, text) TO service_role;
 GRANT EXECUTE ON FUNCTION public.rank_after(text) TO service_role;
 GRANT EXECUTE ON FUNCTION public.rank_spaced(bigint, bigint) TO service_role;
 
--- =====================================================
--- Schema: ranks replace positions, versions on playlists and rows
--- =====================================================
 
 ALTER TABLE public.playlists
   ADD COLUMN tracks_version bigint NOT NULL DEFAULT 0,
@@ -127,7 +110,6 @@ ALTER TABLE public.playlist_tracks
   ADD COLUMN rank text COLLATE "C",
   ADD COLUMN moved_at_version bigint NOT NULL DEFAULT 0;
 
--- Existing tracks keep their order, evenly spaced.
 UPDATE public.playlist_tracks pt
 SET rank = public.rank_spaced(r.idx, r.cnt)
 FROM (
@@ -147,9 +129,6 @@ ALTER TABLE public.playlist_tracks DROP CONSTRAINT unique_playlist_position;
 DROP INDEX IF EXISTS public.idx_playlist_tracks_playlist;
 ALTER TABLE public.playlist_tracks DROP COLUMN position;
 
--- Track writes go only through the operation functions below, as service_role:
--- a direct insert or delete would skip the playlist lock and the version bump.
--- The select policy stays.
 DROP POLICY IF EXISTS "playlist_tracks_insert_policy" ON public.playlist_tracks;
 DROP POLICY IF EXISTS "playlist_tracks_delete_policy" ON public.playlist_tracks;
 
@@ -160,16 +139,10 @@ COMMENT ON COLUMN public.playlist_tracks.moved_at_version IS 'tracks_version at 
 COMMENT ON COLUMN public.playlists.tracks_version IS 'Incremented by every add, remove and move of a track';
 COMMENT ON COLUMN public.playlists.ranks_rebalanced_at_version IS 'tracks_version of the last rebalance: older ranks are void';
 
--- =====================================================
--- Operations: one function per operation, serialized per playlist
--- =====================================================
 
--- Rebalance threshold: a generated rank longer than this respaces the playlist.
 CREATE OR REPLACE FUNCTION public.rank_max_length()
 RETURNS int LANGUAGE sql IMMUTABLE AS $$ SELECT 64 $$;
 
--- Locks the playlist row; every operation calls it first, so writers of one
--- playlist run one at a time and cannot deadlock.
 CREATE OR REPLACE FUNCTION public.playlist_lock(p_playlist_id uuid)
 RETURNS bigint
 LANGUAGE plpgsql
@@ -185,8 +158,6 @@ BEGIN
 END;
 $$;
 
--- Respaces every rank of the playlist, keeping the order. Caller holds the lock
--- and has already set the new tracks_version.
 CREATE OR REPLACE FUNCTION public.playlist_rebalance(p_playlist_id uuid, p_version bigint)
 RETURNS void
 LANGUAGE plpgsql
@@ -281,7 +252,6 @@ DECLARE
 BEGIN
   v := public.playlist_lock(p_playlist_id) + 1;
 
-  -- Checks in the order of the contract (doc/features/playlist-concurrency.md, Move).
   SELECT moved_at_version INTO track_moved_at
   FROM public.playlist_tracks WHERE playlist_id = p_playlist_id AND track_id = p_track_id;
   IF NOT FOUND THEN
@@ -296,7 +266,6 @@ BEGIN
     RAISE EXCEPTION 'PLAYLIST_REBALANCED';
   END IF;
 
-  -- The first other track after the drop point; nothing else lies between.
   SELECT min(rank) INTO next_rank
   FROM public.playlist_tracks
   WHERE playlist_id = p_playlist_id

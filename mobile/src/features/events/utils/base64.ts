@@ -1,6 +1,5 @@
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
-/** Bytes of a standard base64 string (BLE libraries hand advertisement data over as base64). */
 export function base64ToBytes(base64: string): number[] {
 	const clean = base64.replace(/[^A-Za-z0-9+/]/g, '');
 	const bytes: number[] = [];

@@ -1,5 +1,3 @@
-// Browser variant: Google Identity Services. Only its rendered button yields an ID token
-// reliably (One Tap is throttled after a dismissal), so a sign-in starts from a click on it.
 import Constants from 'expo-constants';
 import { loadScript } from '@/features/auth/utils/loadScript';
 import { GOOGLE_FORM_BUTTON } from '@/features/auth/constants';
@@ -7,7 +5,6 @@ import type { GoogleButtonVariant } from '@/features/auth/types';
 
 const GIS_SCRIPT = 'https://accounts.google.com/gsi/client';
 
-/** The DOM node a react-native-web `View` renders. */
 export interface GoogleButtonTarget {
 	offsetWidth: number;
 }
@@ -42,7 +39,6 @@ const WEB_CLIENT_ID: string | undefined =
 
 let initialized = false;
 let pendingCredential: string | null = null;
-/** Screens stay mounted under the one on top: the clicked button, else the latest, owns a credential. */
 const rendered: Listener[] = [];
 let clicked: Listener | null = null;
 
@@ -81,7 +77,6 @@ function formWidth(target: GoogleButtonTarget): number {
 
 export function configureGoogleSignIn(): void {}
 
-/** Resolves with the release to call on unmount; `onCredential` then calls `signInWithGoogle`. */
 export async function renderGoogleButton(
 	target: GoogleButtonTarget,
 	variant: GoogleButtonVariant,
@@ -111,7 +106,6 @@ export async function renderGoogleButton(
 	};
 }
 
-/** Hands over the credential the Google button has just received; it serves once. */
 export async function signInWithGoogle(): Promise<string> {
 	const credential = pendingCredential;
 	pendingCredential = null;

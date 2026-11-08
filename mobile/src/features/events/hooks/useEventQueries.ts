@@ -15,7 +15,6 @@ export function useEvents() {
 	});
 }
 
-/** Starts from the list's copy, if any, while the detail loads. */
 export function useEvent(id: string) {
 	const client = useQueryClient();
 	return useQuery({

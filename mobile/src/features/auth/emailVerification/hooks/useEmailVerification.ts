@@ -13,19 +13,16 @@ const RESEND_COOLDOWN_S = 60;
 
 export interface EmailVerification {
 	code: CodeInput;
-	/** Applies a box's text; a complete code is verified at once. */
 	changeDigit: (index: number, text: string) => void;
 	verify: () => void;
 	isVerifying: boolean;
 	resend: () => void;
 	isResending: boolean;
 	cooldown: number;
-	/** The last verify or resend failure, or a code that is too short. */
 	error: string | null;
 	codeError: string | null;
 }
 
-/** A valid code opens the session; a wrong one empties the boxes. */
 export function useEmailVerification(userId: string, email: string): EmailVerification {
 	const code = useCodeInput();
 	const cooldown = useCountdown();

@@ -1,5 +1,3 @@
-// Mirrors backend features/music-control/music-control.types.ts.
-
 export interface UserDevice {
 	deviceId: string;
 	deviceName: string;
@@ -58,7 +56,6 @@ export interface DevicePickerOwner {
 }
 
 export interface DevicePickerResponse {
-	/** Me first, then friends by username. */
 	owners: DevicePickerOwner[];
 }
 

@@ -5,7 +5,6 @@ import { takeUpstreamSlot } from '@/shared/security/upstream-slot.js';
 import * as geocodeCache from '@/features/events/services/geocode-cache.service.js';
 import type { GeocodedPlace } from '@/features/events/events.types.js';
 
-// Nominatim's usage policy: one request per second app-wide, and an identifying User-Agent.
 const NOMINATIM_SEARCH_URL = 'https://nominatim.openstreetmap.org/search';
 const USER_AGENT = 'Zumik/1.0 (+https://github.com/Elnop/music-room)';
 const SLOT = { intervalMs: 1000, maxWaitMs: 3000 };
@@ -53,7 +52,6 @@ async function lookup(address: string): Promise<GeocodedPlace | null> {
 	return { latitude: first.lat, longitude: first.lon, displayName: first.display_name };
 }
 
-/** Only the address is sent, never the user's position. */
 export async function geocodeAddress(address: string): Promise<GeocodedPlace | null> {
 	const cached = await geocodeCache.read(address);
 	if (cached !== undefined) return cached;

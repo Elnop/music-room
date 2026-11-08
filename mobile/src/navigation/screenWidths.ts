@@ -1,6 +1,5 @@
 import type { ContentWidth } from '@/shared/constants/layout';
 
-/** A screen not listed (Welcome) stays full width. */
 export const SCREEN_WIDTHS: Record<string, ContentWidth> = {
 	Home: 'wide',
 	Playlists: 'wide',
@@ -28,10 +27,8 @@ export const SCREEN_WIDTHS: Record<string, ContentWidth> = {
 	PrivacyPolicy: 'form',
 };
 
-/** Their background spans the window, so they centre their own content at their width. */
 export const FULL_BLEED_SCREENS: ReadonlySet<string> = new Set(['PlaylistDetail']);
 
-/** The wheel works in the margins and the scroll bar sits at the window edge. */
 export const EDGE_SCROLL_SCREENS: ReadonlySet<string> = new Set([
 	'Home',
 	'Playlists',

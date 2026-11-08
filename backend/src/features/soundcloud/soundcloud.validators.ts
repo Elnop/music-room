@@ -41,7 +41,6 @@ export const soundcloudTrackParamsSchema = z.object({
 	}),
 });
 
-/** Decoded once more: the client may double-encode the URL. */
 export const soundcloudStreamUrlSchema = z.object({
 	url: z
 		.string()
@@ -61,7 +60,6 @@ export const soundcloudStreamRawSchema = z.object({
 	params: z.object({ trackUrl: z.string().optional() }),
 });
 
-/** SoundCloud's snake_case fields as is; only those the app reads are listed. */
 export const soundcloudTrackSchema = z.object({
 	id: z.int().meta({ description: 'SoundCloud track ID' }),
 	title: z.string(),

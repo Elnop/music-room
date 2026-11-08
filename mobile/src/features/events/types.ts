@@ -1,6 +1,5 @@
 import type { MusicGenre } from '@/types/user.types';
 
-/** displayName and avatarUrl are absent when unset. */
 export interface EventOrganizer {
 	id: string;
 	username: string;
@@ -14,7 +13,6 @@ export interface EventPlaylist {
 	coverUrl?: string;
 }
 
-/** A physical event (party, concert, bar); "Event" alone would shadow the DOM type. */
 export interface MusicEvent {
 	id: string;
 	name: string;
@@ -26,10 +24,8 @@ export interface MusicEvent {
 	genres: MusicGenre[];
 	startsAt: string;
 	endsAt: string;
-	/** Minor of the iBeacon frame the organiser's phone broadcasts. */
 	beaconMinor: number;
 	organizer: EventOrganizer;
-	/** Null when none, or once the playlist is no longer public. */
 	playlist: EventPlaylist | null;
 	createdAt: string;
 	updatedAt: string;
@@ -63,10 +59,8 @@ export interface EventDeletedPayload {
 	eventId: string;
 }
 
-/** The stack also holds the playlist screens. */
 export type EventStackParamList = {
 	EventDetail: { id: string };
-	/** With an eventId, the form edits that event. */
 	EventForm: { eventId?: string } | undefined;
 	PlaylistDetail: { id: string };
 };

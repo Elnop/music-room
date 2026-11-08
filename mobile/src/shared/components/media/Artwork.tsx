@@ -10,7 +10,6 @@ interface ArtworkProps {
 	iconSize?: number;
 }
 
-/** Without a cover, a local placeholder: never a remote placeholder service. */
 export function Artwork({ uri, size, style, iconSize }: ArtworkProps) {
 	const { theme } = useTheme();
 

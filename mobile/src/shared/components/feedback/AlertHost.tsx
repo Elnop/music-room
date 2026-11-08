@@ -22,7 +22,6 @@ export function AlertHost() {
 		dismiss();
 		button?.onPress?.();
 	};
-	// The backdrop and Escape act as the cancel button, when there is one.
 	const cancel = () => choose(buttons.find(button => button.style === 'cancel'));
 
 	return (

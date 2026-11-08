@@ -11,7 +11,6 @@ import { SIGN_IN_CANCELLED } from './signInCancelled';
 
 const NO_ID_TOKEN = 'No ID token received from Google Sign-In. Please try again.';
 
-/** The ID token of a sign-in response, at its root or under `data` (v13+). */
 function extractIdToken(response: unknown): string {
 	if (typeof response === 'object' && response !== null) {
 		const obj = response as Record<string, unknown>;
@@ -30,13 +29,11 @@ if (!WEB_CLIENT_ID) {
 	logger.warn('EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID is not defined. Google login will not work.');
 }
 
-// iOS refuses to configure Google Sign-In without its own client ID and throws at app start.
 const IOS_CLIENT_ID =
 	Platform.OS === 'ios'
 		? googleIosClientId(Constants.expoConfig?.extra?.EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME)
 		: undefined;
 
-/** Called once at app start; the web client ID gives an ID token on Android and iOS alike. */
 export function configureGoogleSignIn(): void {
 	GoogleSignin.configure({
 		webClientId: WEB_CLIENT_ID,
@@ -45,7 +42,6 @@ export function configureGoogleSignIn(): void {
 	});
 }
 
-/** Rejects with Error(SIGN_IN_CANCELLED) when the user cancels. */
 export async function signInWithGoogle(): Promise<string> {
 	if (!WEB_CLIENT_ID) {
 		throw new Error(
@@ -56,7 +52,6 @@ export async function signInWithGoogle(): Promise<string> {
 	try {
 		await GoogleSignin.hasPlayServices();
 		const userInfo = await GoogleSignin.signIn();
-		// v13+: a cancel resolves { type: 'cancelled' } instead of throwing
 		if (isCancelledResponse(userInfo)) throw new Error(SIGN_IN_CANCELLED);
 		return extractIdToken(userInfo);
 	} catch (error: unknown) {

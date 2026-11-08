@@ -8,9 +8,6 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import * as counter from '@/shared/security/counter.js';
 
-// Limiters are built before connectRedis() finishes: the store sends nothing until a request comes.
-// `decrement` runs after the response, outside any error handler, so it only logs instead of throwing.
-
 export type RateLimitStore = Store & { readonly prefix: string; readonly localKeys: false };
 
 function unavailable(): AppError {

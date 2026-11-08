@@ -13,7 +13,6 @@ function failure(context: string, error: unknown): AppError {
 	return new AppError(500, 'Failed to load recommendations', 'RECOMMENDATIONS_ERROR');
 }
 
-/** Ranking and privacy filtering happen in recommend_similar_profiles (migration 033). */
 export async function getRecommendations(
 	userId: string,
 	limit: number

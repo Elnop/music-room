@@ -7,7 +7,6 @@ interface NowPlayingPanelState {
 	toggle: () => void;
 }
 
-/** In `shared/`: ContentContainer reads it to give the panel its share of the window. */
 export const useNowPlayingPanelStore = create<NowPlayingPanelState>(set => ({
 	isOpen: false,
 	setOpen: isOpen => set({ isOpen }),

@@ -55,8 +55,6 @@ async function licenseRows(ownerId: string, deviceId: string, granteeId: string)
 }
 
 describe('device licenses (story 4.4)', () => {
-	// alice owns the devices; bob is her mutual friend; carol follows alice one
-	// way; dave is a mutual friend with "all my devices"; eve is unrelated.
 	let alice: string;
 	let bob: string;
 	let carol: string;
@@ -76,7 +74,7 @@ describe('device licenses (story 4.4)', () => {
 		]);
 		await follow(alice, bob);
 		await follow(bob, alice);
-		await follow(carol, alice, true); // stale switch, not mutual
+		await follow(carol, alice, true);
 		await follow(alice, dave);
 		await follow(dave, alice, true);
 
@@ -86,7 +84,6 @@ describe('device licenses (story 4.4)', () => {
 	});
 
 	afterAll(async () => {
-		// Cascades to profiles, follows, devices and licenses.
 		for (const id of [alice, bob, carol, dave, eve]) {
 			if (id) await supabaseAdmin.auth.admin.deleteUser(id);
 		}
@@ -176,7 +173,6 @@ describe('device licenses (story 4.4)', () => {
 	});
 
 	it('answers the empty shape when not mutual friends, despite a stale switch or license', async () => {
-		// carol follows alice, so the foreign key allows a license row.
 		const { error } = await supabaseAdmin
 			.from('device_control_licenses')
 			.insert({ owner_id: alice, device_id: tablet, grantee_id: carol });
@@ -191,7 +187,6 @@ describe('device licenses (story 4.4)', () => {
 			devices: [],
 		});
 
-		// The owner still sees the stale license so they can revoke it.
 		const myTablet = (await deviceService.listMyDevices(alice)).find(d => d.deviceId === tablet);
 		expect(myTablet?.licenses.map(l => l.user.id)).toEqual([carol]);
 	});

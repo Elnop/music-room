@@ -22,7 +22,6 @@ export async function register(req: Request, res: Response) {
 	sendSuccess(res, result, 201);
 }
 
-/** Any failure, even a validation error, counts toward the account lockout. */
 export async function login(req: Request, res: Response) {
 	const body = req.body as { email?: string } | undefined;
 	const email = body?.email || 'unknown';
@@ -59,7 +58,6 @@ export async function me(req: Request, res: Response) {
 
 export async function logout(req: Request, res: Response) {
 	const userId = (req as AuthenticatedRequest).user.id;
-	// authMiddleware already checked the header is "Bearer <token>".
 	const token = (req.headers.authorization ?? '').replace('Bearer ', '');
 
 	await sessionService.logout(token, userId);

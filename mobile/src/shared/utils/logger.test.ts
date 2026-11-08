@@ -1,6 +1,5 @@
 import { logger } from './logger';
 
-// __DEV__ is a global the preset defines; flip it to test both builds.
 const setDev = (value: boolean) => {
 	(globalThis as unknown as { __DEV__: boolean }).__DEV__ = value;
 };

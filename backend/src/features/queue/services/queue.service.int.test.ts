@@ -7,8 +7,6 @@ import * as playlists from '@/features/playlists/services/playlist.service.js';
 import * as playlistTracks from '@/features/playlists/services/playlist-track.service.js';
 import type { QueueState } from '@/features/queue/queue.types.js';
 
-// No Socket.io server runs here: notifyQueueUpdate is a no-op.
-
 const URI_PREFIX = `https://soundcloud.com/int-queue/${randomUUID()}`;
 const users: string[] = [];
 let userId: string;
@@ -75,7 +73,7 @@ const blockFlags = (state: QueueState, itemIds: string[]) =>
 	itemIds.map(id => state.items.find(item => item.id === id)?.blockDetached);
 
 beforeAll(async () => {
-	await createUser(); // warms the auth admin client
+	await createUser();
 });
 
 beforeEach(async () => {
@@ -83,7 +81,7 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
-	for (const id of users) await supabaseAdmin.auth.admin.deleteUser(id); // cascades to queues
+	for (const id of users) await supabaseAdmin.auth.admin.deleteUser(id);
 	await supabaseAdmin.from('tracks').delete().like('track_uri', `${URI_PREFIX}/%`);
 });
 
@@ -222,7 +220,7 @@ describe('remove', () => {
 
 	it('keeps 50 history items when the removed current item is followed', async () => {
 		const all = await addItems(52);
-		await queue.playItem(userId, userId, all[50]); // 50 items of history
+		await queue.playItem(userId, userId, all[50]);
 		const state = await queue.removeItem(userId, userId, all[50]);
 		expect(state.currentItemId).toBe(all[51]);
 		expect(ids(state)).toEqual([...all.slice(0, 50), all[51]]);
@@ -350,7 +348,7 @@ describe('play, next and previous', () => {
 
 	it('keeps only the 50 most recent history items after a step forward', async () => {
 		const all = await addItems(53);
-		await queue.playItem(userId, userId, all[50]); // 50 items of history, none dropped
+		await queue.playItem(userId, userId, all[50]);
 		expect((await queue.getQueue(userId, userId)).items).toHaveLength(53);
 
 		const state = await queue.step(userId, userId, 'next');
@@ -360,7 +358,7 @@ describe('play, next and previous', () => {
 });
 
 describe('rank rebalance', () => {
-	const longRank = 'V' + 'z'.repeat(63); // 64 characters: rank_max_length()
+	const longRank = 'V' + 'z'.repeat(63);
 
 	it('respaces the ranks when an add makes a key too long', async () => {
 		const [a, b] = await addItems(2);
@@ -374,7 +372,7 @@ describe('rank rebalance', () => {
 	it('respaces the ranks when a move makes a key too long', async () => {
 		const [a, b, c] = await addItems(3);
 		await setRank(a, '1');
-		await setRank(b, '1' + '0'.repeat(62) + '1'); // right above a: no room at 64 characters
+		await setRank(b, '1' + '0'.repeat(62) + '1');
 		const state = await queue.moveItem(userId, userId, c, a);
 		expect(ids(state)).toEqual([a, c, b]);
 		expect(state.items.every(item => item.rank.length <= 2)).toBe(true);
@@ -519,7 +517,7 @@ describe('play a playlist', () => {
 	it('respaces the ranks when the block makes a key too long, keeping the order', async () => {
 		const [x, y] = await addItems(2);
 		await setRank(x, '1');
-		await setRank(y, '1' + '0'.repeat(62) + '1'); // right above x: no room at 64 characters
+		await setRank(y, '1' + '0'.repeat(62) + '1');
 		await queue.playItem(userId, userId, x);
 		const playlist = await createPlaylist(3);
 		const state = await queue.playPlaylist(userId, userId, playlist.id);
@@ -535,8 +533,6 @@ describe('play a playlist', () => {
 		const [x, y] = await addItems(2);
 		await queue.playItem(userId, userId, x);
 		const { id } = await playlists.createPlaylist(ownerId, { name: 'int-long' });
-		// 450 tracks seeded directly: rank_between halves the gap at each one,
-		// so a key passes rank_max_length() and the queue is respaced mid-block.
 		const count = 450;
 		const tracks = Array.from({ length: count }, () => dto());
 		const { data: rows, error } = await supabaseAdmin

@@ -86,7 +86,6 @@ export function LandingSections({
 
 const createStyles = (theme: Theme) =>
 	StyleSheet.create({
-		// Centred without a background of its own: Welcome's floating icons show through.
 		sections: {
 			width: '100%',
 			maxWidth: CONTENT_MAX_WIDTH.content,

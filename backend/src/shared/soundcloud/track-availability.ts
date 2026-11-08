@@ -9,10 +9,8 @@ interface PlayabilityFields {
 	media?: { transcodings?: { format?: { protocol?: string } }[] };
 }
 
-// The encrypted-hls protocols need a DRM license, which the app cannot get.
 const PLAYABLE_PROTOCOLS = new Set(['hls', 'progressive']);
 
-/** A SNIP track (30-second preview only) stays playable; a BLOCK one is blocked in the region. */
 export function isPlayable(track: PlayabilityFields): boolean {
 	if (track.policy === 'BLOCK') return false;
 	return (track.media?.transcodings ?? []).some(transcoding =>
@@ -20,13 +18,11 @@ export function isPlayable(track: PlayabilityFields): boolean {
 	);
 }
 
-/** 'unknown' when SoundCloud could not answer: the stored state is kept. */
 export async function checkTrackAvailability(trackUri: string): Promise<TrackAvailability> {
 	try {
 		const track = (await soundcloud.tracks.get(trackUri)) as PlayabilityFields;
 		return isPlayable(track) ? 'available' : 'unavailable';
 	} catch (error) {
-		// soundcloud.ts reports an HTTP error only through this message.
 		if (error instanceof Error && error.message === 'Status code 404') return 'unavailable';
 		logger.warn('Track availability check failed', {
 			trackUri,

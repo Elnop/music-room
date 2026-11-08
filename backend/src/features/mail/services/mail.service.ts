@@ -3,7 +3,6 @@ import { transportConfig, senderConfig } from '@/features/mail/mail.config.js';
 import * as templates from '@/features/mail/utils/mail-templates.js';
 import { logger } from '@/shared/utils/logger.js';
 
-// Opens no connection until the first send.
 const transporter = nodemailer.createTransport(transportConfig);
 
 async function send(email: string, content: templates.MailContent): Promise<void> {

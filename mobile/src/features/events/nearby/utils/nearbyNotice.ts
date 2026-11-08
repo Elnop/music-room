@@ -12,7 +12,6 @@ function privacy(): string {
 		: 'Votre position reste sur votre téléphone.';
 }
 
-/** No page can open a browser's site settings: the user changes them from the address bar. */
 function denied(): NearbyNotice {
 	if (Platform.OS === 'web') {
 		return {

@@ -21,7 +21,6 @@ const NOTICE_ACTIONS = {
 	retry: { label: 'Réessayer', handler: 'requestPermission' },
 } as const;
 
-/** Past this point the nearest event's label opens to the left, to stay on the radar. */
 const LABEL_FLIP_LEFT = 55;
 
 export function NearbyEventsSection({ nearby }: { nearby: NearbyEvents }) {

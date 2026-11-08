@@ -5,18 +5,15 @@ export interface Track {
 	album?: string;
 	albumArt?: string;
 	durationMs: number;
-	trackUri: string; // SoundCloud permalink URL
+	trackUri: string;
 	previewUrl?: string;
 }
 
-// Mirrors backend TrackInPlaylistResponse.
 export interface TrackInPlaylist extends Track {
 	createdAt: string;
 	updatedAt: string;
-	/** Sort key: compare with < on strings (byte order, same as the server's COLLATE "C"). */
 	rank: string;
 	addedBy: string | null;
 	addedAt: string;
-	/** Deleted, private or blocked on SoundCloud: never played nor queued. */
 	unavailable: boolean;
 }

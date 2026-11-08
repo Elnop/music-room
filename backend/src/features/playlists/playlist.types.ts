@@ -28,7 +28,6 @@ export type CoverResponse = z.infer<typeof coverResponseSchema>;
 interface PlaylistUpdateBase {
 	playlistId: string;
 	tracksVersion: number;
-	/** Every rank changed: clients reload the playlist. */
 	rebalanced: boolean;
 }
 

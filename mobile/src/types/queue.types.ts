@@ -2,12 +2,8 @@ import type { AddQueueItemBody, QueueItem, QueueTrack } from '@/shared/types/pla
 
 export type { AddQueueItemBody, QueueItem, QueueTrack };
 
-// Mirrors backend `features/queue/queue.types.ts`.
-
-/** Items before the current one are history; all are upcoming when `currentItemId` is null. */
 export interface QueueState {
 	ownerId: string;
-	/** Grows with every change; the store drops a state not newer than its own. */
 	version: number;
 	currentItemId: string | null;
 	items: QueueItem[];
@@ -18,7 +14,6 @@ export type QueueStepBoundary = 'QUEUE_END' | 'QUEUE_START';
 export type QueueStepResult =
 	{ ok: true; state: QueueState } | { ok: false; code: QueueStepBoundary };
 
-// `queueItemId`: an item of my queue; `track`: what a friend's device plays; `source`: the device to pause.
 export interface TransferRequest {
 	targetUserId: string;
 	targetDeviceId: string;
@@ -27,7 +22,6 @@ export interface TransferRequest {
 	source?: { userId: string; deviceId: string };
 }
 
-/** `queue` is null when the target's queue did not change. */
 export interface TransferResult {
 	ownerId: string;
 	deviceId: string;

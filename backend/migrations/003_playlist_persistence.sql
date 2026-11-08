@@ -1,16 +1,6 @@
--- Zumik - Playlist Persistence
--- This migration creates playlists, tracks, and playlist_tracks tables
--- Date: 2025-12-07
 
--- =====================================================
--- Enable UUID extension
--- =====================================================
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- =====================================================
--- Tracks Table
--- =====================================================
--- Centralized track metadata (deduplicated by Spotify URI)
 CREATE TABLE IF NOT EXISTS public.tracks (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   spotify_uri TEXT UNIQUE NOT NULL,
@@ -24,15 +14,10 @@ CREATE TABLE IF NOT EXISTS public.tracks (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Indexes for tracks
 CREATE UNIQUE INDEX IF NOT EXISTS idx_tracks_spotify_uri ON public.tracks(spotify_uri);
 CREATE INDEX IF NOT EXISTS idx_tracks_title ON public.tracks(title);
 CREATE INDEX IF NOT EXISTS idx_tracks_artist ON public.tracks(artist);
 
--- =====================================================
--- Playlists Table
--- =====================================================
--- Playlist metadata and ownership
 CREATE TABLE IF NOT EXISTS public.playlists (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT NOT NULL CHECK (char_length(name) >= 1 AND char_length(name) <= 100),
@@ -45,15 +30,10 @@ CREATE TABLE IF NOT EXISTS public.playlists (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Indexes for playlists
 CREATE INDEX IF NOT EXISTS idx_playlists_owner ON public.playlists(owner_id);
 CREATE INDEX IF NOT EXISTS idx_playlists_visibility ON public.playlists(visibility);
 CREATE INDEX IF NOT EXISTS idx_playlists_created ON public.playlists(created_at DESC);
 
--- =====================================================
--- Playlist Tracks Junction Table
--- =====================================================
--- Many-to-many relationship with ordering
 CREATE TABLE IF NOT EXISTS public.playlist_tracks (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   playlist_id UUID NOT NULL REFERENCES public.playlists(id) ON DELETE CASCADE,
@@ -66,16 +46,11 @@ CREATE TABLE IF NOT EXISTS public.playlist_tracks (
   CONSTRAINT unique_playlist_track UNIQUE (playlist_id, track_id)
 );
 
--- Indexes for playlist_tracks
 CREATE INDEX IF NOT EXISTS idx_playlist_tracks_playlist ON public.playlist_tracks(playlist_id, position);
 CREATE INDEX IF NOT EXISTS idx_playlist_tracks_track ON public.playlist_tracks(track_id);
 CREATE INDEX IF NOT EXISTS idx_playlist_tracks_added_by ON public.playlist_tracks(added_by);
 
--- =====================================================
--- Row Level Security (RLS) Policies
--- =====================================================
 
--- Playlists RLS
 ALTER TABLE public.playlists ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "playlists_select_policy"
@@ -95,7 +70,6 @@ CREATE POLICY "playlists_delete_policy"
   ON public.playlists FOR DELETE
   USING (auth.uid() = owner_id);
 
--- Playlist Tracks RLS
 ALTER TABLE public.playlist_tracks ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "playlist_tracks_select_policy"
@@ -129,11 +103,7 @@ CREATE POLICY "playlist_tracks_delete_policy"
     )
   );
 
--- =====================================================
--- Helper Functions
--- =====================================================
 
--- Get next available position for playlist
 CREATE OR REPLACE FUNCTION public.get_next_playlist_position(p_playlist_id UUID)
 RETURNS INTEGER AS $$
 DECLARE
@@ -146,9 +116,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- =====================================================
--- Triggers for auto-update timestamps
--- =====================================================
 
 CREATE TRIGGER set_playlists_updated_at
   BEFORE UPDATE ON public.playlists
@@ -160,9 +127,6 @@ CREATE TRIGGER set_tracks_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION public.handle_updated_at();
 
--- =====================================================
--- Comments for documentation
--- =====================================================
 
 COMMENT ON TABLE public.playlists IS 'User-created playlists with ownership and collaboration';
 COMMENT ON TABLE public.tracks IS 'Centralized track metadata deduplicated by Spotify URI';

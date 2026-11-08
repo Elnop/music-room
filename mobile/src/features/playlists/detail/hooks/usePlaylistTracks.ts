@@ -19,7 +19,6 @@ import type { TrackInPlaylist } from '@/types/track.types';
 export interface PlaylistTracks {
 	canEdit: boolean;
 	isMoving: boolean;
-	/** Only the track playing from this playlist's queue block. */
 	currentUri: string | null;
 	actionTrack: AddQueueItemBody | null;
 	showActions: (track: TrackInPlaylist) => void;
@@ -27,7 +26,6 @@ export interface PlaylistTracks {
 	addToQueue: (track: TrackInPlaylist) => void;
 	explainUnavailable: () => void;
 	deleteTrack: (trackId: string) => Promise<void>;
-	/** Rejects on failure, so the list drops its local order and shows the cached one again. */
 	reorder: (from: number, to: number) => Promise<void>;
 }
 
@@ -69,7 +67,6 @@ export function usePlaylistTracks(
 				logger.error('[PlaylistDetailScreen] Move track failed:', error);
 				showError(apiErrorMessage(error, 'Impossible de déplacer le titre'));
 			} else if (isOnScreen(client, id)) {
-				// The playlist was reloaded; tell the user only if it is still on screen.
 				showError(CONFLICT_MESSAGE);
 			}
 			throw error;

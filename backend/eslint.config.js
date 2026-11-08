@@ -1,4 +1,3 @@
-// @ts-check
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import prettier from 'eslint-config-prettier';
@@ -23,7 +22,6 @@ export default tseslint.config(
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-floating-promises': 'error',
-      // Kept at warn until all code uses the generated Supabase types.
       '@typescript-eslint/no-unsafe-assignment': 'warn',
       '@typescript-eslint/no-unsafe-member-access': 'warn',
       '@typescript-eslint/no-unsafe-call': 'warn',
@@ -42,7 +40,6 @@ export default tseslint.config(
           ],
         },
       ],
-      // Not the core `no-console`: its message cannot link to the rule's doc.
       'no-restricted-globals': [
         'error',
         {
@@ -54,8 +51,6 @@ export default tseslint.config(
     },
   },
   {
-    // The logger is the only console writer, plus env.ts, which reports a failed
-    // validation before the logger can exist. See .agents/rules/logging.md#no-console
     files: [
       'src/shared/utils/logger.ts',
       'src/shared/utils/logger.test.ts',
@@ -66,7 +61,6 @@ export default tseslint.config(
     },
   },
   {
-    // No index.ts: import the source file. See .agents/rules/structure.md
     files: ['src/**/index.ts'],
     rules: {
       'no-restricted-syntax': [

@@ -3,7 +3,6 @@ import { GENRE_COLORS } from '@/shared/theme/tokens';
 
 export type VisibilityLevel = 'public' | 'friends_only' | 'private';
 
-
 export type MusicGenre =
 	| 'pop'
 	| 'rock'
@@ -97,7 +96,6 @@ export interface AvatarResponse {
 	avatarUrl: string | null;
 }
 
-/** Fields hidden by privacy are undefined; visible ones are present, even if empty. */
 export interface FilteredProfile {
 	id: string;
 	username: string;

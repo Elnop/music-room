@@ -1,6 +1,3 @@
-// Loads .env.test (written by `scripts/test-db.sh up`) before any module reads env.ts, overriding the
-// shell, so the hosted project's keys in backend/.env cannot be picked up.
-
 import { existsSync } from 'node:fs';
 import { config } from 'dotenv';
 

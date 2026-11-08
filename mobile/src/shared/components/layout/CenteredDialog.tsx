@@ -8,7 +8,6 @@ import type { Theme } from '@/shared/theme/types';
 
 interface CenteredDialogProps {
 	onClose: () => void;
-	/** For a full-screen sheet on the phone: its content stretches, so the dialog needs a height. */
 	fill?: boolean;
 	children: React.ReactNode;
 }

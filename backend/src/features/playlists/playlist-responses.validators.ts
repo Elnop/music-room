@@ -88,7 +88,6 @@ export const moveTrackResultSchema = z.object({
 	rebalanced: rebalancedSchema,
 });
 
-/** Null: the app falls back to the first track's artwork. */
 export const coverResponseSchema = z.object({
 	coverUrl: z.url().nullable().meta({
 		example: 'https://xyz.supabase.co/storage/v1/object/public/playlist-covers/4f1c…/9a2b….jpg',

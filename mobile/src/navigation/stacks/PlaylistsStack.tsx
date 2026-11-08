@@ -19,7 +19,6 @@ const PlaylistStack = createNativeStackNavigator<PlaylistStackParamList & EventS
 const layout = screenLayout(true);
 
 interface PlaylistsNavigatorProps {
-	/** The Home and Playlists tabs mount this same stack. */
 	initialRouteName: 'Home' | 'Playlists';
 }
 

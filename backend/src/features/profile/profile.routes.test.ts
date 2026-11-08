@@ -6,8 +6,6 @@ import profileRoutes from '@/features/profile/profile.routes.js';
 import { errorHandler } from '@/shared/middleware/error-handler.js';
 import { MUSIC_GENRES } from '@/shared/music/genres.js';
 
-// The fake Supabase client answers per table and operation and records every builder call.
-
 type Op = 'select' | 'update' | 'insert';
 interface FakeResult {
 	data: unknown;

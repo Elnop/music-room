@@ -20,13 +20,11 @@ export interface PlaylistDetailScreen {
 	retry: () => void;
 	isRefreshing: boolean;
 	refresh: () => void;
-	/** Set before this screen deletes the playlist: its own `playlist:deleted` is not news. */
 	markDeleting: (deleting: boolean) => void;
 	leaveDeleted: () => void;
 	bottomPadding: number;
 }
 
-/** A share link may point to a private or deleted playlist: a 403 or 404 is « not found ». */
 export function usePlaylistDetailScreen(
 	navigation: DetailNavigation,
 	id: string
@@ -57,7 +55,6 @@ export function usePlaylistDetailScreen(
 	useEffect(() => {
 		if (!deleted || deletingRef.current) return;
 		showInfo('Cette playlist a été supprimée');
-		// Root of its stack (opened from a link): go to the list rather than stay stuck.
 		if (navigation.canGoBack()) navigation.goBack();
 		else navigation.navigate('Playlists');
 		forgetPlaylist(client, id);

@@ -19,7 +19,6 @@ const toMember = (user: UserSummary, canEdit: boolean): PlaylistMember => ({
 	canEdit,
 });
 
-/** The playlist reload fails the query; a failed member listing only leaves the list empty. */
 async function loadMembers(client: QueryClient, id: string): Promise<PlaylistMember[]> {
 	const playlist = await refreshPlaylist(client, id);
 	try {
@@ -45,12 +44,10 @@ export interface SharingMembers {
 	remove: (userId: string, isPrivate: boolean) => Promise<void>;
 }
 
-/** Optimistic: a refused change is restored. */
 export function useSharingMembers(id: string): SharingMembers {
 	const client = useQueryClient();
 	const signedIn = useSession(session => session.isAuthenticated);
 	const key = queryKeys.playlists.members(id);
-	// Reloaded with a spinner on every visit.
 	const query = useQuery({
 		queryKey: key,
 		queryFn: () => loadMembers(client, id),
@@ -108,7 +105,6 @@ export function useSharingMembers(id: string): SharingMembers {
 			try {
 				await run(userId, async () => {
 					if (!isPrivate || member.canEdit) await membersApi.removeCollaborator(id, userId);
-					// A viewer may not exist, which is fine.
 					if (isPrivate) await membersApi.removeViewer(id, userId).catch(() => undefined);
 				});
 				showSuccess('Utilisateur retiré');

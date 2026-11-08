@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { PANEL_CLOSE_ID, PANEL_ID } from '@/features/player/constants';
 
-// The project compiles without the DOM library, so the parts of the document used here are typed.
 interface BrowserKeyEvent {
 	key: string;
 	defaultPrevented: boolean;
@@ -24,7 +23,6 @@ interface BrowserDocument {
 
 const browser = globalThis as unknown as { document?: BrowserDocument };
 
-/** Focuses the close button, closes on Escape, then gives the focus back to the opener. */
 export function usePanelFocus(onClose: () => void): void {
 	const onCloseRef = useRef(onClose);
 	useEffect(() => {

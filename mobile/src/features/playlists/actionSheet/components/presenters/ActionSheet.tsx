@@ -20,10 +20,8 @@ interface ActionSheetProps {
 	subtitle?: string;
 	onBack?: () => void;
 	onClose: () => void;
-	/** iOS: the Modal finished sliding out. */
 	onDismiss?: () => void;
 	maxHeight?: DimensionValue;
-	/** Wide screens: drops down from it; without one, a centred dialog. */
 	anchor?: MenuAnchor | null;
 	children: React.ReactNode;
 }

@@ -49,7 +49,6 @@ export async function verifyCode(userId: string, code: string, ip: string): Prom
 		throw new AppError(404, 'User not found', 'USER_NOT_FOUND');
 	}
 
-	// Refused so that a session is never minted without a valid code.
 	if (profile.email_verified) {
 		logger.warn('Verification attempt on an already verified account', { userId, ip });
 		throw new AppError(400, 'Email already verified', 'ALREADY_VERIFIED');

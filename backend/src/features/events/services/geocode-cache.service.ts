@@ -4,14 +4,11 @@ import { logger } from '@/shared/utils/logger.js';
 import { geocodedPlaceSchema } from '@/features/events/events-responses.validators.js';
 import type { GeocodedPlace } from '@/features/events/events.types.js';
 
-// Nominatim's usage policy asks for a cache. Without Redis every lookup is a miss.
-
 const KEY_PREFIX = 'geocode:';
 const TTL_SECONDS = 7 * 24 * 3600;
 
 const cachedSchema = geocodedPlaceSchema.nullable();
 
-/** Case and spacing do not change what Nominatim finds. */
 function keyFor(address: string): string {
 	const normalized = address.trim().replace(/\s+/g, ' ').toLowerCase();
 	return KEY_PREFIX + createHash('sha256').update(normalized).digest('hex');
@@ -24,7 +21,6 @@ function logFailure(operation: string, error: unknown): void {
 	});
 }
 
-/** `undefined` on a miss; `null` is a cached "not found". */
 export async function read(address: string): Promise<GeocodedPlace | null | undefined> {
 	if (!isRedisConnected()) return undefined;
 	try {

@@ -80,7 +80,6 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 );
 
 registerAuthSession({
-	// Reads the token at each call, like the auth store.
 	store: {
 		...createStore<SessionView>(() => ({ user: null, accessToken: null, isAuthenticated: true })),
 		getState: () => ({ user: null, accessToken: mockAuthState.accessToken, isAuthenticated: true }),
@@ -384,7 +383,6 @@ describe('socketStore retry', () => {
 
 		expect(oldSocket.disconnect).toHaveBeenCalled();
 		expect(ioMock).toHaveBeenCalledTimes(2);
-		// Back to « Reconnexion… » right away, not to the banner-less 'connecting'.
 		expect(useSocketStore.getState()).toMatchObject({ socket: newSocket, status: 'reconnecting' });
 
 		newSocket.trigger('connect');

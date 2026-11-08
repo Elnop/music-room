@@ -6,7 +6,6 @@ import { useSocketStore } from '@/shared/stores/socketStore';
 export interface SocketCacheRule<Payload, Data> {
 	event: string;
 	queryKey: (payload: Payload) => QueryKey | null;
-	/** Returning undefined (a stale version) refetches the query instead. */
 	update?: (current: Data, payload: Payload) => Data | undefined;
 }
 
@@ -30,13 +29,11 @@ export function applySocketEvent<Payload, Data>(
 	return 'invalidated';
 }
 
-/** A rule with its payload type erased, so rules of any type share one list. */
 interface SocketCacheBinding {
 	event: string;
 	apply: (client: QueryClient, payload: unknown) => SocketCacheResult;
 }
 
-/** The payload type is the backend's contract for the event: nothing checks it at runtime. */
 export function socketCacheRule<Payload, Data>(
 	rule: SocketCacheRule<Payload, Data>
 ): SocketCacheBinding {
@@ -63,7 +60,6 @@ export function bindSocketCache(
 	};
 }
 
-/** Pass a stable `bindings` array (module constant or useMemo). */
 export function useSocketCache(bindings: readonly SocketCacheBinding[]): void {
 	const socket = useSocketStore(state => state.socket);
 	const client = useQueryClient();

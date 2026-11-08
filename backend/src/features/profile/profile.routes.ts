@@ -25,7 +25,6 @@ router.get('/music-preferences/genres', settings.getAvailableGenres);
 router.put('/avatar', avatarRateLimiter, avatarUpload, avatar.uploadAvatar);
 router.delete('/avatar', avatarRateLimiter, avatar.removeAvatar);
 
-// Last, so it never shadows the paths above.
 router.get('/:userId', profile.getProfile);
 
 export default router;

@@ -5,7 +5,6 @@ export type PlaylistEditFields = Pick<
 	'ownerId' | 'collaboratorIds' | 'viewerIds' | 'visibility' | 'editMode'
 >;
 
-/** Mirrors the backend's edit check. */
 export function canEditPlaylist(
 	userId: string | null | undefined,
 	playlist: PlaylistEditFields | null | undefined

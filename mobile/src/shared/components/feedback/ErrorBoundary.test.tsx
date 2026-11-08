@@ -32,7 +32,6 @@ describe('ErrorBoundary', () => {
 
 	it('shows the fallback with the message and recovers on Try Again', () => {
 		jest.spyOn(logger, 'error').mockImplementation(() => undefined);
-		// Mutes React's own log of the caught error, not app logging.
 		const reactLog = jest.spyOn(console, 'error').mockImplementation(() => {});
 		shouldThrow = true;
 

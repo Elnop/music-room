@@ -88,7 +88,7 @@ beforeEach(async () => {
 afterAll(async () => {
 	await supabaseAdmin.from('tracks').delete().like('track_uri', `${URI_PREFIX}/%`);
 	for (const id of [ownerId, strangerId]) {
-		if (id) await supabaseAdmin.auth.admin.deleteUser(id); // cascades to playlists
+		if (id) await supabaseAdmin.auth.admin.deleteUser(id);
 	}
 });
 

@@ -19,13 +19,11 @@ interface ApiResponse<T> {
 	};
 }
 
-/** Sent by the backend in development and test only. */
 interface ApiErrorDebug {
 	why?: string;
 	fix?: string;
 }
 
-/** `message` is safe to show; `why` and `fix` are for logs. */
 export class ApiError extends Error {
 	code: string;
 	details?: unknown;
@@ -62,7 +60,6 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
 	const url = `${getBackendUrl()}${endpoint}`;
 
 	const makeRequest = async (authToken?: string): Promise<Response> => {
-		// fetch sets a FormData body's multipart Content-Type, boundary included.
 		const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
 		const headers: Record<string, string> = {
 			...(isFormData ? {} : { 'Content-Type': 'application/json' }),
@@ -97,7 +94,6 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
 
 		const response = await makeRequest(accessToken);
 
-		// Signed out (a wrong password at login), a 401 is the backend's answer, not an expired token.
 		if (response.status === 401 && accessToken) {
 			if (!(await refreshAccessToken())) {
 				throw new ApiError('Session expirée, reconnectez-vous.', 'SESSION_EXPIRED', undefined, 401);
@@ -119,7 +115,6 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
 	}
 }
 
-/** The registered session's token, when there is one, takes precedence. */
 export function authRequest<T>(
 	endpoint: string,
 	accessToken: string,

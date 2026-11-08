@@ -21,10 +21,8 @@ export interface Playlist {
 }
 
 export interface PlaylistWithTracks extends Omit<Playlist, 'trackCount'> {
-	/** Ordered by rank. */
 	tracks: TrackInPlaylist[];
 	owner: UserProfile;
-	/** Incremented by every add, remove and move; sent back as expectedVersion. */
 	tracksVersion: number;
 }
 
@@ -48,11 +46,9 @@ export interface MoveTrackResult {
 interface PlaylistUpdateBase {
 	playlistId: string;
 	tracksVersion: number;
-	/** Every rank of the playlist changed: reload the playlist. */
 	rebalanced: boolean;
 }
 
-/** Payload of the `playlist:updated` socket event: one delta per operation. */
 export type PlaylistUpdatedEvent = PlaylistUpdateBase &
 	(
 		| { event: 'track_added'; track: TrackInPlaylist }
@@ -66,7 +62,6 @@ export interface PlaylistDetailsEvent {
 	description?: string;
 	visibility: 'public' | 'private';
 	editMode: EditMode;
-	/** Absent when the playlist has no custom cover. */
 	coverUrl?: string;
 }
 
@@ -74,7 +69,6 @@ export interface CoverResponse {
 	coverUrl: string | null;
 }
 
-/** Payload of the `playlist:tracks-availability` socket event: only the tracks that changed. */
 export interface TracksAvailabilityEvent {
 	playlistId: string;
 	tracks: { trackId: string; unavailable: boolean }[];
@@ -100,12 +94,10 @@ export interface FriendPlaylists {
 	playlists: Playlist[];
 }
 
-/** The Friends stack reuses PlaylistDetail and SearchTracks. */
 export type PlaylistStackParamList = {
 	Home: undefined;
 	Playlists: undefined;
 	PlaylistDetail: { id: string };
-	/** With a playlistId, the form edits that playlist. */
 	CreatePlaylist: { playlistId?: string } | undefined;
 	SearchTracks: { playlistId: string };
 	PlaylistSharing: { playlistId: string };

@@ -1,13 +1,3 @@
--- =====================================================
--- 028: queue_play_playlist_from_track
--- queue_play_playlist takes an optional starting track: p_start_track_id is the
--- id of a track of the playlist (tracks.id, unique per playlist, as for the
--- other playlist track operations). The whole playlist is still copied as
--- one block, so the tracks before the starting one stay in the queue as its
--- previous items; only the item made current changes. Without it, the first
--- track plays, as before. A track that is not in the playlist raises
--- PLAYLIST_TRACK_NOT_FOUND.
--- =====================================================
 
 DROP FUNCTION IF EXISTS public.queue_play_playlist(uuid, uuid);
 
@@ -32,8 +22,6 @@ DECLARE
 BEGIN
   current_id := public.queue_lock(p_user);
 
-  -- The service checked access before the call; the playlist may have been
-  -- deleted since. The share lock keeps it (and its tracks) until commit.
   PERFORM 1 FROM public.playlists WHERE id = p_playlist_id FOR SHARE;
   IF NOT FOUND THEN
     RAISE EXCEPTION 'PLAYLIST_NOT_FOUND';
@@ -54,7 +42,6 @@ BEGIN
     SELECT rank INTO prev_rank FROM public.play_queue_items WHERE id = current_id;
   END IF;
 
-  -- The first upcoming item: the block goes between the current item and it.
   SELECT min(rank) INTO next_rank
   FROM public.play_queue_items
   WHERE user_id = p_user AND (prev_rank IS NULL OR rank > prev_rank);
@@ -64,7 +51,6 @@ BEGIN
     WHERE playlist_id = p_playlist_id
     ORDER BY rank COLLATE "C"
   LOOP
-    -- With nothing after the block, rank_after keeps the keys short.
     IF next_rank IS NULL THEN
       new_rank := public.rank_after(prev_rank);
     ELSE
@@ -79,8 +65,6 @@ BEGIN
       start_id := item_id;
     END IF;
 
-    -- Same rule as the other operations, applied as soon as a key grows too
-    -- long, so a long playlist never reaches the rank format's length limit.
     IF length(new_rank) > public.rank_max_length() THEN
       PERFORM public.queue_rebalance(p_user);
       SELECT rank INTO prev_rank FROM public.play_queue_items WHERE id = item_id;

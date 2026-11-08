@@ -63,7 +63,6 @@ const createStyles = (theme: Theme) =>
 			flex: 1,
 			fontSize: 16,
 		},
-		// Stacked above the detail: flex: 1 would squash it to nothing in the column.
 		blockLabel: {
 			fontSize: 16,
 		},

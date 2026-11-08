@@ -10,7 +10,6 @@ interface PlayerHeaderProps {
 		text: string;
 		textSecondary: string;
 	};
-	/** A dialog closes with ×, without the swipe handle of the phone's sheet. */
 	dialog?: boolean;
 	onClose: () => void;
 }

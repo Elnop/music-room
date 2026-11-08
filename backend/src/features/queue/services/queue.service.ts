@@ -22,8 +22,6 @@ import {
 } from '@/features/queue/utils/queue-rpc.js';
 import type { QueueState, QueueStepDirection } from '@/features/queue/queue.types.js';
 
-// Mutated only through the SQL functions, which serialize changes per owner.
-
 export async function getQueue(actorId: string, ownerId: string): Promise<QueueState> {
 	await assertCanManageQueue(actorId, ownerId);
 	return getQueueRpc(ownerId);
@@ -79,7 +77,6 @@ export async function playPlaylist(
 	startTrackId?: string
 ): Promise<QueueState> {
 	const device = await playbackDevice(actorId, ownerId, deviceId);
-	// The actor, not the owner, must be able to see the playlist.
 	const playlist = await getPlaylistForPermissionCheck(playlistId);
 	if (!canViewPlaylist(playlist, actorId)) {
 		throw new AppError(403, 'Access denied', 'PLAYLIST_ACCESS_DENIED');

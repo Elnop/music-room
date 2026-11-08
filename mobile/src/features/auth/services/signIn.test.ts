@@ -60,7 +60,6 @@ afterEach(() => {
 	jest.restoreAllMocks();
 });
 
-// Keys as defined in services/sessionStorage.ts.
 const KEYS = {
 	user: '@zumik/auth_user',
 	access: '@zumik/access_token',
@@ -69,7 +68,6 @@ const KEYS = {
 	expiresAt: '@zumik/token_expires_at',
 } as const;
 
-/** The in-memory state of a fresh app start; storage is left untouched. */
 function resetMemory(): void {
 	useAuthStore.setState({
 		user: null,
@@ -166,7 +164,6 @@ describe('login', () => {
 			})
 		);
 
-		// Signed out, the 401 is the backend's answer, not an expired session.
 		await expect(login({ email: 'a@example.com', password: 'wrong' })).rejects.toThrow(
 			'Invalid email or password'
 		);
@@ -360,7 +357,6 @@ describe('password reset', () => {
 			code: '123456',
 			newPassword: 'NewSecret1!',
 		});
-		// A reset does not sign in: the user logs in with the new password.
 		await expectSignedOutAndNothingStored();
 	});
 });

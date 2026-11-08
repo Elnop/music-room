@@ -9,7 +9,6 @@ import type { LinkedProvidersResponse, OAuthProvider } from '@/features/auth/typ
 import { registerLinkedAccountsBridge } from '@/shared/services/linkedAccountsBridge';
 import { useProviderButtons } from './useProviderButtons';
 
-/** The screens using these hooks are signed in. */
 function accessToken(): string {
 	const token = useAuthStore.getState().accessToken;
 	if (!token) throw new Error('No access token available');
@@ -35,7 +34,6 @@ function useLinkedProviders() {
 	});
 }
 
-/** A cancelled provider sign-in rejects with Error('SIGN_IN_CANCELLED') before any request. */
 function useLinkProvider() {
 	const queryKey = useProvidersKey();
 	const queryClient = useQueryClient();
@@ -48,7 +46,6 @@ function useLinkProvider() {
 	});
 }
 
-/** Refetches before resolving: a failed refetch fails the unlink. */
 function useUnlinkProvider() {
 	const queryKey = useProvidersKey();
 	const queryClient = useQueryClient();

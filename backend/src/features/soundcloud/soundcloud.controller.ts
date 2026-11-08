@@ -21,7 +21,6 @@ export async function getTrack(req: Request, res: Response) {
 	sendSuccess(res, await searchService.getTrack(urlOrId));
 }
 
-/** Also serves the legacy /stream/:trackUrl (a URL in the path is blocked by Cloudflare's WAF). */
 export async function getStreamUrl(req: Request, res: Response) {
 	const { query, params } = soundcloudStreamRawSchema.parse({
 		query: req.query,

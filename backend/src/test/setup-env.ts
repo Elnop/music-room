@@ -1,5 +1,3 @@
-// Placeholders that satisfy env.ts's schema without pointing at any real service; dotenv never
-// overrides a set variable, so a local backend/.env cannot leak real keys into unit tests.
 const placeholders: Record<string, string> = {
 	NODE_ENV: 'test',
 	SUPABASE_URL: 'http://supabase.test.invalid',

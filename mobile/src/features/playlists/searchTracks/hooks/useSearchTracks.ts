@@ -16,7 +16,6 @@ import type { SoundCloudTrack } from '@/types/soundcloud.types';
 export interface SearchTracks {
 	search: DebouncedText;
 	results: SoundCloudTrack[];
-	/** Also true while a typed query waits for its delay. */
 	isLoading: boolean;
 	isAdded: (track: SoundCloudTrack) => boolean;
 	add: (track: SoundCloudTrack) => void;
@@ -39,9 +38,7 @@ export function useSearchTracks(playlistId: string): SearchTracks {
 	});
 	const playlistTracks = useCachedPlaylist(playlistId)?.tracks;
 	const addTrack = useAddTrack();
-	// Tracks tapped here: checked at once, before the add call ends.
 	const [addedHere, setAddedHere] = useState<Set<string>>(new Set());
-	// Calls in flight, so a double tap faster than a render sends one call.
 	const sendingUris = useRef(new Set<string>());
 	const [actionTrack, setActionTrack] = useState<AddQueueItemBody | null>(null);
 

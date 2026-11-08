@@ -7,7 +7,6 @@ import { SimilarProfilesOrchestrator } from '@/features/friends/similarProfiles/
 
 type HomeScreenProps = NativeStackScreenProps<PlaylistStackParamList, 'Home'>;
 
-/** Features never import each other, so the events and profiles sections are passed in here. */
 export function HomeScreen(props: HomeScreenProps) {
 	return (
 		<HomeOrchestrator

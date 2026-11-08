@@ -2,7 +2,6 @@ const { withAppBuildGradle, withDangerousMod } = require('@expo/config-plugins')
 const fs = require('fs');
 const path = require('path');
 
-// Same signature as the release: a shared applicationId would make the debug build an update of it.
 const APP_ID_SUFFIX = '.dev';
 const APP_NAME = 'Zumik Dev';
 const DEBUG_BLOCK = /(buildTypes\s*\{\s*debug\s*\{)/;
@@ -24,7 +23,6 @@ function withDevApplicationId(config) {
 	});
 }
 
-// The debug source set overrides app_name from main/res; a Gradle resValue would clash with it.
 function withDevAppName(config) {
 	return withDangerousMod(config, [
 		'android',

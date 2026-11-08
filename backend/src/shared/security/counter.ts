@@ -1,14 +1,10 @@
 import { redisClient, isRedisConnected } from '@/shared/config/redis.js';
 
-// Each limiter decides what Redis being down means for it (503 or fail open); no in-memory fallback.
-
 export interface CounterState {
 	count: number;
-	/** Redis PTTL: -2 missing, -1 no expiry. */
 	ttlMs: number;
 }
 
-/** Atomic. A key without expiry restarts the window at 1; otherwise the window keeps its end. */
 const HIT_SCRIPT = `local ttl = redis.call('PTTL', KEYS[1])
 if ttl <= 0 then
 	redis.call('SET', KEYS[1], 1, 'PX', ARGV[1])
@@ -18,7 +14,6 @@ return { redis.call('INCR', KEYS[1]), ttl }`;
 
 const PEEK_SCRIPT = `return { redis.call('GET', KEYS[1]), redis.call('PTTL', KEYS[1]) }`;
 
-/** DECR only while the key exists: never recreate an expired key without expiry. */
 const RELEASE_SCRIPT =
 	"if redis.call('EXISTS', KEYS[1]) == 1 then return redis.call('DECR', KEYS[1]) end return 0";
 
@@ -31,7 +26,6 @@ export function isReady(): boolean {
 	return isRedisConnected();
 }
 
-/** Rounded like Redis' TTL command; 0 when there is none. */
 export function toSeconds(ttlMs: number): number {
 	return ttlMs > 0 ? Math.floor((ttlMs + 500) / 1000) : 0;
 }
@@ -56,7 +50,6 @@ export async function setFlag(key: string, ttlSeconds: number, value: string): P
 	await redisClient.setex(key, ttlSeconds, value);
 }
 
-/** `ttlSeconds` is -1 when the flag has no expiry. */
 export async function readFlag(key: string): Promise<{ isSet: boolean; ttlSeconds: number }> {
 	const ttlSeconds = await redisClient.ttl(key);
 	return { isSet: ttlSeconds !== -2, ttlSeconds };

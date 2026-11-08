@@ -90,7 +90,6 @@ export async function revalidatePlaylistRoom(
 		if (sockets.length === 0) return;
 
 		const lookup = await loadPlaylist(playlistId);
-		// Do not evict members of a playlist that may still exist.
 		if (lookup.status === 'error') return;
 		const playlist = lookup.status === 'found' ? lookup.playlist : null;
 

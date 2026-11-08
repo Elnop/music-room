@@ -8,7 +8,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 	...createSessionActions(set, get),
 }));
 
-/** Every end of session is announced to the shared layer: the socket disconnects and the player empties. */
 useAuthStore.subscribe((state, previous) => {
 	if (previous.isAuthenticated && !state.isAuthenticated) notifySessionEnd();
 });

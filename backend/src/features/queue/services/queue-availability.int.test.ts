@@ -4,8 +4,6 @@ import { supabaseAdmin } from '@/shared/config/supabase.js';
 import * as queue from '@/features/queue/services/queue.service.js';
 import type { QueueState } from '@/features/queue/queue.types.js';
 
-// No Socket.io server runs here: the emitters are no-ops.
-
 const URI_PREFIX = `https://soundcloud.com/int-availability/${randomUUID()}`;
 const users: string[] = [];
 let userId: string;
@@ -54,7 +52,6 @@ async function trackId(trackUri: string): Promise<string> {
 	return data.id;
 }
 
-/** Written straight to the tables: the playlist services belong to another feature. */
 async function createPlaylist(n: number): Promise<{ id: string; uris: string[] }> {
 	const { data: playlist, error } = await supabaseAdmin
 		.from('playlists')

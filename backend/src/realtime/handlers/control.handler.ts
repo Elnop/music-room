@@ -8,7 +8,6 @@ export function registerControlHandlers(socket: AppSocket): void {
 	socket.on('control:action', async (payload: unknown) => {
 		const startTime = Date.now();
 
-		// Unknown keys such as a forged fromUserId are stripped: the sender is the socket's user.
 		const parsed = controlActionSchema.safeParse(payload);
 		if (!parsed.success) {
 			socket.emit('control:error', INVALID_CONTROL_PAYLOAD);
@@ -31,7 +30,6 @@ export function registerControlHandlers(socket: AppSocket): void {
 
 		const { userId: controllerId } = socketInfo;
 
-		// Before the device lookup, so a refused controller learns nothing about online devices.
 		const canControl = await controlAccessService.canControlDevice(
 			controllerId,
 			data.targetUserId,

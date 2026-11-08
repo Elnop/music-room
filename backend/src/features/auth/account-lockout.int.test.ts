@@ -4,7 +4,6 @@ import type { AddressInfo } from 'node:net';
 import express from 'express';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Loopback whitelisted so express-rate-limit skips; the lockout and IP reputation ignore the whitelist.
 vi.hoisted(() => {
 	process.env.RATE_LIMIT_ENABLED = 'true';
 	process.env.ACCOUNT_LOCKOUT_ENABLED = 'true';
@@ -95,7 +94,6 @@ describe('account lockout and IP blacklist (#206)', () => {
 		try {
 			if (isRedisConnected()) await clearBruteForceKeys();
 			if (httpServer) await new Promise<void>(resolve => httpServer.close(() => resolve()));
-			// Cascades to user_profiles.
 			for (const id of createdUserIds) await supabaseAdmin.auth.admin.deleteUser(id);
 		} finally {
 			await disconnectRedis();
@@ -165,7 +163,6 @@ describe('account lockout and IP blacklist (#206)', () => {
 		const threshold = rateLimitConfig.ipReputation.blacklistThreshold;
 		expect(threshold).toBe(7);
 
-		// A new email each time: the per-account lockout never triggers.
 		for (let i = 0; i < threshold; i++) {
 			const stranger = `int-lockout-${randomUUID()}@example.com`;
 			usedEmails.push(stranger);

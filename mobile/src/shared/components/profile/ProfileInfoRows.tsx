@@ -27,7 +27,6 @@ export function ProfileInfoRows({ rows }: { rows: ProfileInfoRow[] }) {
 	);
 }
 
-/** "janvier 2026": the month a profile was created. */
 export function memberSinceLabel(createdAt: string): string {
 	const date = new Date(createdAt);
 	if (Number.isNaN(date.getTime())) return '';

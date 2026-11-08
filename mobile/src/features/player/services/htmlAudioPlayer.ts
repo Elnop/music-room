@@ -18,7 +18,6 @@ let nextId = 1;
 const isAutoplayRefusal = (error: unknown) =>
 	(error as { name?: unknown } | null)?.name === 'NotAllowedError';
 
-/** One player per stream URL, as expo-audio does; only the attached one drives the element. */
 export class HtmlAudioPlayer implements AudioPlayer {
 	readonly id = nextId++;
 	private releaseStream: (() => void) | null = null;

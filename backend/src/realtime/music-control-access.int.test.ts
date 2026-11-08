@@ -13,7 +13,6 @@ import type { UserListeningStatus } from '@/realtime/listening.types.js';
 import * as socketServer from '@/realtime/socket-server.js';
 import { getIO } from '@/realtime/state.js';
 
-// The real access checks, each wrapped so a test can tell whether any ran.
 vi.mock('@/features/music-control/services/control-access.service.js', async importOriginal => {
 	const actual =
 		await importOriginal<
@@ -21,9 +20,6 @@ vi.mock('@/features/music-control/services/control-access.service.js', async imp
 		>();
 	return Object.fromEntries(Object.entries(actual).map(([name, fn]) => [name, vi.fn(fn)]));
 });
-
-// Alice owns the music; Bob and Dave are mutual friends with her "all my devices" switch on;
-// Erin is a mutual friend without switch or license; Carol does not follow her.
 
 interface TestUser {
 	id: string;
@@ -63,7 +59,6 @@ async function createUser(): Promise<TestUser> {
 		.insert({ id, username: `int_${id.slice(0, 8)}` });
 	if (profileError) throw profileError;
 
-	// Never the admin client: signing in would replace its service-role session.
 	const { data: session, error: signInError } = await supabaseAnon.auth.signInWithPassword({
 		email,
 		password: PASSWORD,
@@ -126,7 +121,6 @@ describe('Listening and control access', () => {
 		return status;
 	}
 
-	/** From a new device of Alice's, so not throttled. */
 	async function publishAliceStatus(positionMs?: number): Promise<string> {
 		const deviceId = `dev-${randomUUID()}`;
 		const device = await connect(alice, deviceId);
@@ -140,7 +134,6 @@ describe('Listening and control access', () => {
 	const waitForStrayEvents = () => new Promise(resolve => setTimeout(resolve, 150));
 
 	async function setFollows(): Promise<void> {
-		// Deleting the follows also drops their licenses (015 foreign key).
 		const ids = [alice.id, bob.id, carol.id, dave.id, erin.id];
 		await supabaseAdmin.from('follows').delete().in('follower_id', ids);
 		const { error } = await supabaseAdmin.from('follows').insert([
@@ -163,7 +156,6 @@ describe('Listening and control access', () => {
 		if (error) throw error;
 	}
 
-	/** The device row exists once the device connected. */
 	async function licenseBob(deviceId: string): Promise<void> {
 		const { error } = await supabaseAdmin
 			.from('device_control_licenses')
@@ -171,7 +163,6 @@ describe('Listening and control access', () => {
 		if (error) throw error;
 	}
 
-	/** Bob's switch row stays, but they are no longer friends. */
 	async function aliceDropsBob(): Promise<void> {
 		const { error } = await supabaseAdmin
 			.from('follows')
@@ -197,7 +188,6 @@ describe('Listening and control access', () => {
 	}
 
 	beforeAll(async () => {
-		// verifyToken checks the logout denylist and fails closed without Redis.
 		await connectRedis();
 		if (!isRedisConnected()) throw new Error('Redis from scripts/test-db.sh is not reachable');
 
@@ -223,7 +213,6 @@ describe('Listening and control access', () => {
 	afterEach(async () => {
 		vi.restoreAllMocks();
 		while (clients.length) clients.pop()?.disconnect();
-		// So their disconnect broadcasts do not reach the next test.
 		await vi.waitFor(async () => expect(await getIO()!.fetchSockets()).toHaveLength(0));
 	});
 
@@ -280,7 +269,6 @@ describe('Listening and control access', () => {
 			await expect(refusal).resolves.toMatchObject({ code: 'NOT_AUTHORIZED' });
 			expect(await inListeningRoom(socket, alice.id)).toBe(false);
 
-			// Dave witnesses the broadcast; the refused user gets nothing.
 			const daveStatuses = record<UserListeningStatus>(daveSocket, 'listening:status');
 			const deviceId = await publishAliceStatus();
 			await vi.waitFor(() => expect(hasDevice(daveStatuses, deviceId)).toBe(true));
@@ -294,13 +282,11 @@ describe('Listening and control access', () => {
 
 			bobSocket.emit('listening:subscribe', alice.id);
 			bobSocket.emit('listening:unsubscribe', alice.id);
-			// Queued after the unsubscribe: once it answers, both were processed.
 			const done = nextEvent<SocketError>(bobSocket, 'listening:error');
 			bobSocket.emit('listening:subscribe', 'not-a-uuid');
 			await expect(done).resolves.toMatchObject({ code: 'INVALID_PAYLOAD' });
 			expect(await inListeningRoom(bobSocket, alice.id)).toBe(false);
 
-			// Dave witnesses the broadcast; Bob gets nothing.
 			const bobStatuses = record<UserListeningStatus>(bobSocket, 'listening:status');
 			const daveStatuses = record<UserListeningStatus>(daveSocket, 'listening:status');
 			const deviceId = await publishAliceStatus();
@@ -551,7 +537,6 @@ describe('Listening and control access', () => {
 			await subscribe(bobSocket, alice.id);
 			expect(await inListeningRoom(bobSocket, alice.id)).toBe(true);
 
-			// A device Bob holds no license on still shows in the status.
 			const statuses = record<UserListeningStatus>(bobSocket, 'listening:status');
 			const deviceId = await publishAliceStatus();
 			await vi.waitFor(() => expect(hasDevice(statuses, deviceId)).toBe(true));

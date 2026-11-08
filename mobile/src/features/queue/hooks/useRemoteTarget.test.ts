@@ -64,7 +64,6 @@ const deviceStatus = (deviceId: string): ListeningStatus => ({
 	updatedAt: '2026-10-15T00:00:00Z',
 });
 
-/** Last handler registered on the socket for an event. */
 const handler = <T>(event: string) => {
 	const calls = mockSocket.on.mock.calls.filter(call => call[0] === event);
 	return calls[calls.length - 1]?.[1] as (data: T) => void;
@@ -160,7 +159,6 @@ describe('useRemoteTarget', () => {
 		const onError = handler<{ code: string; message: string }>('control:error');
 		const offline = { code: 'DEVICE_OFFLINE', message: 'offline' };
 
-		// A device card of the friend profile, not the remote target.
 		act(() => onError(offline));
 		expect(showError).not.toHaveBeenCalled();
 
@@ -200,7 +198,7 @@ describe('useRemoteTarget', () => {
 		const { acquireListening, releaseListening } = jest.requireActual(
 			'@/shared/services/listeningRooms'
 		);
-		acquireListening(mockSocket, 'friend'); // the friend profile
+		acquireListening(mockSocket, 'friend');
 		mockSocket.emit.mockClear();
 		renderHook(() => useRemoteTarget());
 		act(() => connect().setRemote({ ownerId: 'friend', deviceId: 'tablet' }));

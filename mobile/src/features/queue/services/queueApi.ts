@@ -75,7 +75,6 @@ export const queueApi = {
 		});
 	},
 
-	/** Without `startTrackId`, playback starts on the first track. */
 	playPlaylist(
 		playlistId: string,
 		target: QueueCallTarget = {},

@@ -4,7 +4,6 @@ import type { AddressInfo } from 'node:net';
 import express from 'express';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-// Runs before env.ts reads process.env.
 vi.hoisted(() => {
 	process.env.RATE_LIMIT_ENABLED = 'true';
 	process.env.RATE_LIMIT_WHITELIST_IPS = '';
@@ -32,7 +31,6 @@ describe('login rate limiter counts in Redis (test Redis from scripts/test-db.sh
 		await connectRedis();
 		if (!isRedisConnected()) throw new Error('Redis from scripts/test-db.sh is not reachable');
 
-		// Throwaway app: every login attempt fails, so each one is counted.
 		const app = express();
 		app.use(express.json());
 		app.post('/login', loginRateLimiter, (_req, res) => {
@@ -54,7 +52,6 @@ describe('login rate limiter counts in Redis (test Redis from scripts/test-db.sh
 			}
 			if (server) await new Promise<void>(resolve => server.close(() => resolve()));
 		} finally {
-			// Always stop the reconnect loop, even when beforeAll failed.
 			await disconnectRedis();
 		}
 	});

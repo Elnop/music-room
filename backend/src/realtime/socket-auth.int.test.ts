@@ -39,7 +39,6 @@ async function createUser(): Promise<TestUser> {
 		.insert({ id, username: `int_${id.slice(0, 8)}` });
 	if (profileError) throw profileError;
 
-	// Never the admin client: signing in would replace its service-role session.
 	const { data: session, error: signInError } = await supabaseAnon.auth.signInWithPassword({
 		email,
 		password: PASSWORD,
@@ -125,10 +124,8 @@ describe('Socket.io handshake authentication', () => {
 	}
 
 	beforeAll(async () => {
-		// verifyToken checks the logout denylist and fails closed without Redis.
 		await connectRedis();
 		if (!isRedisConnected()) throw new Error('Redis from scripts/test-db.sh is not reachable');
-		// Invalid-token handshakes count against 127.0.0.1: reset so repeated runs stay under the limit.
 		const tokenKeys = await redisClient.keys('rl:auth:token:*');
 		if (tokenKeys.length > 0) await redisClient.del(...tokenKeys);
 
@@ -154,7 +151,6 @@ describe('Socket.io handshake authentication', () => {
 
 	afterAll(async () => {
 		await getIO()?.close();
-		// Cascades to user_profiles and follows.
 		if (alice) await supabaseAdmin.auth.admin.deleteUser(alice.id);
 		if (bob) await supabaseAdmin.auth.admin.deleteUser(bob.id);
 		await disconnectRedis();
@@ -184,7 +180,6 @@ describe('Socket.io handshake authentication', () => {
 		const info = vi.spyOn(logger, 'info');
 
 		try {
-			// Wait for the reply so the event has been handled (and logged).
 			const answered = nextEvent(socket, 'listening:error');
 			socket.emit('listening:subscribe', 'not-a-uuid');
 			await answered;
@@ -197,7 +192,6 @@ describe('Socket.io handshake authentication', () => {
 				deviceId: device.deviceId,
 				appVersion: device.appVersion,
 			});
-			// Event arguments are never logged.
 			expect(JSON.stringify(info.mock.calls)).not.toContain('not-a-uuid');
 		} finally {
 			info.mockRestore();
@@ -290,7 +284,6 @@ describe('Socket.io handshake authentication', () => {
 		watcher.emit('listening:subscribe', alice.id);
 		await initial;
 
-		// A paused device: no further listening:update would carry the name.
 		const stored = nextEvent<UserListeningStatus>(watcher, 'listening:status', status =>
 			status.devices.some(d => d.device.deviceId === device.deviceId)
 		);
@@ -325,7 +318,6 @@ describe('Socket.io handshake authentication', () => {
 		await expect(
 			refused(connect({ token: alice.token, ...deviceFields(), platform: 42 }))
 		).resolves.toBe('INVALID_HANDSHAKE');
-		// devices.device_id holds at most 128 characters.
 		await expect(
 			refused(connect({ token: alice.token, ...deviceFields(), deviceId: 'd'.repeat(129) }))
 		).resolves.toBe('INVALID_HANDSHAKE');
@@ -341,15 +333,12 @@ describe('Socket.io handshake authentication', () => {
 	});
 
 	it('refuses a token revoked by logout with INVALID_TOKEN (#71)', async () => {
-		// A user of its own: the shared users' tokens must stay valid.
 		const carol = await createUser();
 		try {
 			await connected(connect({ token: carol.token, ...deviceFields() }));
 
 			await sessionService.logout(carol.token, carol.id);
 
-			// The handshake maps every verification failure to INVALID_TOKEN: check its own
-			// denylist lookup found the token revoked, and Supabase was never asked.
 			expect(isRedisConnected()).toBe(true);
 			const revokedKey = `auth:revoked:${createHash('sha256').update(carol.token).digest('hex')}`;
 			const exists = vi.spyOn(redisClient, 'exists');
@@ -459,13 +448,10 @@ describe('Socket.io handshake authentication', () => {
 			device: { deviceId: spoofDeviceId, deviceName: 'x', platform: 'x', model: 'x' },
 		});
 
-		// Round-trip on the intruder's own socket so auth:register was processed
-		// before the controller asks for the device (bob cannot control a stranger).
 		const ack = nextEvent<{ code: string }>(intruder, 'listening:error');
 		intruder.emit('listening:subscribe', randomUUID());
 		await ack;
 
-		// Nothing registered: the spoofed device is unknown to control:action.
 		const error = nextEvent<{ code: string }>(controller, 'control:error');
 		controller.emit('control:action', {
 			targetUserId: alice.id,
@@ -575,17 +561,13 @@ describe('Socket.io handshake authentication', () => {
 		const socket = connect({ token: bob.token, ...deviceFields() });
 		await connected(socket);
 
-		// control:action allows 20 per 10 s: malformed payloads answer
-		// INVALID_PAYLOAD up to there, the 21st is refused before validation.
 		const codes: string[] = [];
 		socket.on('control:error', (err: { code: string }) => codes.push(err.code));
 		for (let i = 0; i < 21; i++) socket.emit('control:action', {});
 		await vi.waitFor(() => expect(codes).toHaveLength(21));
-		// The refusal can arrive before earlier answers: count, not order.
 		expect(codes.filter(code => code === 'INVALID_PAYLOAD')).toHaveLength(20);
 		expect(codes.filter(code => code === 'RATE_LIMITED')).toHaveLength(1);
 
-		// Counted per socket: another socket of the same user is not limited.
 		const other = connect({ token: bob.token, ...deviceFields() });
 		await connected(other);
 		const answer = nextEvent<{ code: string }>(other, 'control:error');
@@ -610,7 +592,6 @@ describe('Socket.io handshake authentication', () => {
 		owner.emit('listening:update', { track: null, isPlaying: true });
 		await paused;
 
-		// `isPlaying: true` is now pending; the disconnect must discard it.
 		const cleanup = nextEvent<UserListeningStatus>(
 			watcher,
 			'listening:status',

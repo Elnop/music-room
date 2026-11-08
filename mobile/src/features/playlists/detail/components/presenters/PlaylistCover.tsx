@@ -5,7 +5,6 @@ import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { PlaylistWithTracks } from '@/features/playlists/types';
 
-/** Falls back to the first track's artwork. */
 export function PlaylistCover({
 	playlist,
 	size = 200,

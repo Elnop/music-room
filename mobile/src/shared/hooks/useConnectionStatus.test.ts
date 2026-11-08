@@ -91,7 +91,6 @@ describe('useConnectionStatus', () => {
 		rerender({});
 		expect(mockSocketState.retry).toHaveBeenCalledTimes(1);
 
-		// Still failed after that retry: the user taps « Réessayer ».
 		rerender({});
 		expect(mockSocketState.retry).toHaveBeenCalledTimes(1);
 	});

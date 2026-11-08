@@ -1,12 +1,4 @@
 #!/usr/bin/env node
-// Turns the JSON reports of one run into summary.md (make perf-test): the
-// Artillery reports (<scenario>.json) and the real-time report (socket.json,
-// written by backend/src/test/perf-socket.ts, its own shape).
-// No dependency: runs with the Node of the host.
-//
-// Usage: node tests/performance/summarize.mjs <results/<timestamp> directory>
-// Run conditions come from the environment: PERF_TARGET, PERF_USERS,
-// PERF_RATE_LIMIT_ENABLED, PERF_RATE_LIMIT_WHITELIST_IPS.
 
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
@@ -26,7 +18,6 @@ const SOCKET_LOG = 'socket.log';
 const files = readdirSync(dir).filter(file => file.endsWith('.json'));
 const reports = files.filter(file => file !== SOCKET_REPORT).sort();
 const hasSocketReport = files.includes(SOCKET_REPORT);
-// perf-socket.ts crashed before writing its report.
 const socketFailed = !hasSocketReport && existsSync(join(dir, SOCKET_LOG));
 if (reports.length === 0 && !hasSocketReport && !socketFailed) {
 	console.error(`No report (*.json) in ${dir}`);

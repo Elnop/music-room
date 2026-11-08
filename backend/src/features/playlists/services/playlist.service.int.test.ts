@@ -5,8 +5,6 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import type { TrackUpsertInput } from '@/shared/utils/track-upsert.js';
 import type { CreatePlaylistInput } from '@/features/playlists/playlist.validators.js';
 
-// List filters, array updates and the delete cascade run in PostgREST and Postgres: only this test checks them.
-
 const {
 	notifyPlaylistUpdate,
 	notifyPlaylistDetails,
@@ -121,7 +119,7 @@ beforeEach(() => {
 afterAll(async () => {
 	await supabaseAdmin.from('tracks').delete().like('track_uri', `${URI_PREFIX}/%`);
 	for (const id of [ownerId, collaboratorId, viewerId, strangerId, otherOwnerId]) {
-		if (id) await supabaseAdmin.auth.admin.deleteUser(id); // cascades to playlists
+		if (id) await supabaseAdmin.auth.admin.deleteUser(id);
 	}
 });
 
@@ -210,7 +208,6 @@ describe('playlist CRUD', () => {
 		expect(await trackRows(id)).toEqual([]);
 		expect(revalidatePlaylistRoom).toHaveBeenCalledWith(id);
 		expect(notifyPlaylistDeleted).toHaveBeenCalledExactlyOnceWith({ playlistId: id });
-		// The broadcast must reach the room before its sockets are evicted.
 		expect(notifyPlaylistDeleted.mock.invocationCallOrder[0]).toBeLessThan(
 			revalidatePlaylistRoom.mock.invocationCallOrder[0]
 		);

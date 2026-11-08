@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
 
-// Runs before env.ts reads process.env.
 vi.hoisted(() => {
 	process.env.NODE_ENV = 'development';
 	process.env.ALLOWED_ORIGINS = 'http://localhost:8081';

@@ -3,8 +3,6 @@ import { createClient, type PostgrestError, type SupabaseClient } from '@supabas
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { createSignInClient, supabaseAdmin } from '@/shared/config/supabase.js';
 
-// Each rpc() is its own HTTP request, so Promise.all runs real concurrent transactions.
-
 interface Row {
 	track_id: string;
 	rank: string;
@@ -22,7 +20,6 @@ interface AddResult extends MoveResult {
 	addedAt: string;
 }
 
-// Untyped: the generated types only know these functions after `make generate-types`.
 const db = supabaseAdmin as unknown as SupabaseClient;
 const PASSWORD = 'integration-test-password';
 
@@ -148,7 +145,7 @@ beforeEach(async () => {
 
 afterAll(async () => {
 	if (trackIds.length) await supabaseAdmin.from('tracks').delete().in('id', trackIds);
-	if (ownerId) await supabaseAdmin.auth.admin.deleteUser(ownerId); // cascades to playlists
+	if (ownerId) await supabaseAdmin.auth.admin.deleteUser(ownerId);
 });
 
 describe('playlist track operations (migration 016)', () => {
@@ -271,7 +268,6 @@ describe('playlist track operations (migration 016)', () => {
 			add(trackIds[5]),
 			remove(rows[1].track_id),
 		]);
-		// Every operation applies, except the move of the removed track if the remove ran first.
 		results.forEach((result, i) => {
 			if (i === 1 && result.error !== null) expect(result.error).toBe('TRACK_NOT_IN_PLAYLIST');
 			else expect(result.error).toBeNull();
@@ -287,7 +283,6 @@ describe('playlist track operations (migration 016)', () => {
 		let v = await version();
 		let rebalanced = false;
 		let moves = 0;
-		// Each move lands between A and the previous one: the gap halves until a rebalance.
 		while (moves < 1000 && !rebalanced) {
 			const trackId = others[moves % others.length].track_id;
 			const expected = [
@@ -311,7 +306,6 @@ describe('playlist track operations (migration 016)', () => {
 		expect(Math.max(...rows.map(r => r.rank.length))).toBeLessThanOrEqual(64);
 		expect(await playlistState()).toEqual({ tracks_version: v, ranks_rebalanced_at_version: v });
 
-		// A was never moved, so only the rebalance can refuse this stale move.
 		const stale = await move(a.track_id, a.rank, v - 1);
 		expect(stale.error).toBe('PLAYLIST_REBALANCED');
 		expect(await version()).toBe(v);
@@ -362,7 +356,6 @@ describe('playlist track operations (migration 016)', () => {
 			.insert({ playlist_id: playlistId, track_id: trackIds[5], rank: 'zz', added_by: ownerId });
 		expect(insertError).not.toBeNull();
 
-		// RLS hides rows from a delete without a policy instead of raising.
 		await user.from('playlist_tracks').delete().eq('playlist_id', playlistId);
 
 		expect(ids(await order())).toEqual(trackIds.slice(0, 5));

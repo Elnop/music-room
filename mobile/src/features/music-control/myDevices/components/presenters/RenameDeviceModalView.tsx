@@ -11,7 +11,6 @@ import { Text } from '@/shared/components/ui/Text';
 const DEVICE_NAME_MAX_LENGTH = 40;
 
 interface RenameDeviceModalViewProps {
-	/** Null hides the modal. */
 	deviceName: string | null;
 	saving: boolean;
 	name: string;

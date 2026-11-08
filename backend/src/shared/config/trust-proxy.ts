@@ -11,7 +11,6 @@ export function configureTrustProxy(app: Express): void {
 	app.set('trust proxy', trustProxy);
 }
 
-/** The Socket.io handshake's client IP, computed like Express's req.ip. */
 export function clientIp(req: IncomingMessage): string {
 	return proxyaddr(req, trust);
 }

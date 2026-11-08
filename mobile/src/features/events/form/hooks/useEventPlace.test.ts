@@ -14,7 +14,6 @@ jest.mock('expo-location', () => ({
 	geocodeAsync: jest.fn(),
 }));
 jest.mock('@/features/events/services/eventsApi', () => ({ geocode: jest.fn() }));
-// The browser build resolves geocoder.web.ts.
 jest.mock('@/features/events/utils/geocoder', () =>
 	jest.requireActual('@/features/events/utils/geocoder.web')
 );

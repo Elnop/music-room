@@ -55,7 +55,6 @@ describe('ConnectionBanner', () => {
 
 	it('picks a readable text color on the background', () => {
 		render(<ConnectionBanner status="failed" topInset={0} />);
-		// Default theme error: white would be 3.8:1, dark text is 5:1.
 		expect(screen.getByText('Connexion perdue')).toHaveStyle({ color: FIXED_COLORS.inkDark });
 	});
 });

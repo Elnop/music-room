@@ -4,7 +4,6 @@ import { useSocketStore } from '@/shared/stores/socketStore';
 
 export type ConnectionStatus = 'offline' | 'reconnecting' | 'failed' | null;
 
-/** Offline wins over the socket; an undefined network field counts as online. */
 export function useConnectionStatus(): ConnectionStatus {
 	const network = useNetworkState();
 	const status = useSocketStore(state => state.status);
@@ -18,7 +17,6 @@ export function useConnectionStatus(): ConnectionStatus {
 		if (offline) offlineSinceConnectedRef.current = true;
 		else if (status === 'connected') offlineSinceConnectedRef.current = false;
 		else if (status === 'failed' && offlineSinceConnectedRef.current) {
-			// The network came back but the socket gave up: retry once, then the user taps « Réessayer ».
 			offlineSinceConnectedRef.current = false;
 			retry();
 		}

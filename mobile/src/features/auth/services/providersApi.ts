@@ -21,7 +21,6 @@ export function unlinkProvider(
 	});
 }
 
-/** Links a Google (ID token) or Facebook (access token) account to the signed-in user. */
 export function linkProvider(
 	accessToken: string,
 	provider: OAuthProvider,

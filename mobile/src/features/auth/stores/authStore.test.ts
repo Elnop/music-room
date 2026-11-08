@@ -11,7 +11,6 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-// Every auth flow goes through the backend: loading the Supabase SDK fails the test.
 jest.mock(
 	'@supabase/supabase-js',
 	() => {
@@ -142,7 +141,6 @@ describe('refreshAccessToken', () => {
 	});
 
 	it('ends the session locally without any request when there is no refresh token', async () => {
-		// Expiring access token, no refresh token (a session restored from storage).
 		useAuthStore.setState({ refreshToken: null });
 
 		await expect(useAuthStore.getState().refreshAccessToken()).resolves.toBe(false);
@@ -200,7 +198,6 @@ describe('refreshAccessToken', () => {
 
 describe('logout', () => {
 	beforeEach(() => {
-		// A valid token: apiRequest would refresh an expiring one first.
 		useAuthStore.setState({ tokenExpiresAt: Date.now() + 3_600_000 });
 		socketDisconnect.mockReset();
 		withOpenSocket();
@@ -243,7 +240,6 @@ describe('logout', () => {
 	});
 });
 
-// Keys as defined in services/sessionStorage.ts.
 const KEYS = {
 	user: '@zumik/auth_user',
 	access: '@zumik/access_token',
@@ -252,7 +248,6 @@ const KEYS = {
 	expiresAt: '@zumik/token_expires_at',
 } as const;
 
-/** The in-memory state of a fresh app start; storage is left untouched. */
 function resetMemory(): void {
 	useAuthStore.setState({
 		user: null,

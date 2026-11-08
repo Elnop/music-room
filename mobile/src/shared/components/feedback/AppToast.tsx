@@ -16,7 +16,6 @@ function buildConfig(theme: Theme): ToastConfig {
 	};
 }
 
-/** Mount inside `ThemeProvider`; native modals mount their own since the root one sits behind them. */
 export function AppToast() {
 	const { theme } = useTheme();
 	const config = React.useMemo(() => buildConfig(theme), [theme]);

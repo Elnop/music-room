@@ -2,7 +2,6 @@ import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js';
 import { describe, expect, it } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 
-// Called by name: the generated types only know these functions after `make generate-types`.
 const db = supabaseAdmin as unknown as SupabaseClient;
 
 async function call(fn: string, args: Record<string, unknown>): Promise<string> {
@@ -18,7 +17,7 @@ const spaced = (index: number, count: number) =>
 	call('rank_spaced', { p_index: index, p_count: count });
 
 const VALID = /^[0-9A-Za-z]*[1-9A-Za-z]$/;
-const below = (a: string, b: string) => a < b; // byte order, as COLLATE "C"
+const below = (a: string, b: string) => a < b;
 
 describe('rank_between (migration 016)', () => {
 	it.each([

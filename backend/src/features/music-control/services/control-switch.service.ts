@@ -5,8 +5,6 @@ import { failUnexpected } from '@/shared/utils/fail-unexpected.js';
 import * as followStatusService from '@/features/friends/services/follow-status.service.js';
 import * as realtime from '@/realtime/emitters/control.emitters.js';
 
-// The "all my devices" switch is `follows(friend → owner).can_control_music`.
-
 function setControl(ownerId: string, allowedUserId: string, canControl: boolean) {
 	return supabaseAdmin
 		.from('follows')

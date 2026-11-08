@@ -1,19 +1,3 @@
--- =====================================================
--- 029: track_availability
--- A track deleted, made private or blocked on SoundCloud is marked
--- unavailable (unavailable_at); availability_checked_at says when the backend
--- last asked SoundCloud. An unavailable track never enters a queue and is
--- never made current:
---   queue_add_item, queue_play_item -> raise TRACK_UNAVAILABLE;
---   queue_play_playlist             -> copies the available tracks only;
---                                      TRACK_UNAVAILABLE for an unavailable
---                                      starting track, PLAYLIST_EMPTY when
---                                      none is available;
---   queue_step, queue_remove_item   -> skip items of unavailable tracks
---                                      (marked after they were queued);
---   queue_insert_block              -> copies the available tracks only,
---                                      QUEUE_BLOCK_EMPTY when none is.
--- =====================================================
 
 ALTER TABLE public.tracks
   ADD COLUMN unavailable_at timestamptz,
@@ -137,8 +121,6 @@ DECLARE
 BEGIN
   current_id := public.queue_lock(p_user);
 
-  -- The service checked access before the call; the playlist may have been
-  -- deleted since. The share lock keeps it (and its tracks) until commit.
   PERFORM 1 FROM public.playlists WHERE id = p_playlist_id FOR SHARE;
   IF NOT FOUND THEN
     RAISE EXCEPTION 'PLAYLIST_NOT_FOUND';
@@ -166,7 +148,6 @@ BEGIN
     SELECT rank INTO prev_rank FROM public.play_queue_items WHERE id = current_id;
   END IF;
 
-  -- The first upcoming item: the block goes between the current item and it.
   SELECT min(rank) INTO next_rank
   FROM public.play_queue_items
   WHERE user_id = p_user AND (prev_rank IS NULL OR rank > prev_rank);
@@ -176,7 +157,6 @@ BEGIN
     WHERE playlist_id = p_playlist_id AND NOT public.track_unavailable(track_id)
     ORDER BY rank COLLATE "C"
   LOOP
-    -- With nothing after the block, rank_after keeps the keys short.
     IF next_rank IS NULL THEN
       new_rank := public.rank_after(prev_rank);
     ELSE
@@ -191,8 +171,6 @@ BEGIN
       start_id := item_id;
     END IF;
 
-    -- Same rule as the other operations, applied as soon as a key grows too
-    -- long, so a long playlist never reaches the rank format's length limit.
     IF length(new_rank) > public.rank_max_length() THEN
       PERFORM public.queue_rebalance(p_user);
       SELECT rank INTO prev_rank FROM public.play_queue_items WHERE id = item_id;
@@ -230,13 +208,11 @@ BEGIN
     ORDER BY rank LIMIT 1;
 
     IF next_id IS NULL THEN
-      -- Nothing left to play: the item and the history go.
       UPDATE public.play_queues SET current_item_id = NULL, updated_at = now() WHERE user_id = p_user;
       DELETE FROM public.play_queue_items WHERE user_id = p_user;
       RETURN public.queue_state(p_user);
     END IF;
 
-    -- Delete first, so the history trim does not count the removed item.
     DELETE FROM public.play_queue_items WHERE id = item.id;
     PERFORM public.queue_set_current(p_user, next_id);
     RETURN public.queue_state(p_user);
@@ -262,7 +238,6 @@ DECLARE
   first_id uuid;
   track record;
 BEGIN
-  -- Checked before the lock so that a refusal changes nothing.
   IF coalesce(array_length(p_track_ids, 1), 0) = 0 THEN
     RAISE EXCEPTION 'QUEUE_BLOCK_EMPTY';
   END IF;
@@ -273,7 +248,6 @@ BEGIN
     SELECT rank INTO prev_rank FROM public.play_queue_items WHERE id = current_id;
   END IF;
 
-  -- The first upcoming item: the block goes between the current item and it.
   SELECT min(rank) INTO next_rank
   FROM public.play_queue_items
   WHERE user_id = p_user AND (prev_rank IS NULL OR rank > prev_rank);
@@ -283,7 +257,6 @@ BEGIN
     WHERE NOT public.track_unavailable(t.track_id)
     ORDER BY t.ordinality
   LOOP
-    -- With nothing after the block, rank_after keeps the keys short.
     IF next_rank IS NULL THEN
       new_rank := public.rank_after(prev_rank);
     ELSE
@@ -295,7 +268,6 @@ BEGIN
     RETURNING id INTO item_id;
     first_id := coalesce(first_id, item_id);
 
-    -- Same rule as queue_play_playlist: rebalance as soon as a key grows too long.
     IF length(new_rank) > public.rank_max_length() THEN
       PERFORM public.queue_rebalance(p_user);
       SELECT rank INTO prev_rank FROM public.play_queue_items WHERE id = item_id;

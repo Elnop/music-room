@@ -2,8 +2,6 @@ import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { logger } from '@/shared/utils/logger.js';
 import { failQuery } from '@/features/music-control/utils/device.helpers.js';
 
-// Control needs mutual friends, plus the owner's "all my devices" switch or a license on the device.
-
 interface ControlAccess {
 	allDevices: boolean;
 	licensedDeviceIds: string[];

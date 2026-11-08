@@ -25,7 +25,6 @@ function answerLogin(response: LoginResponse): void {
 
 type Logger = typeof import('@/shared/utils/logger');
 
-/** A fresh module, with the logger instance it writes to. */
 function load(): FacebookWeb & Logger {
 	let module: (FacebookWeb & Logger) | undefined;
 	jest.isolateModules(() => {

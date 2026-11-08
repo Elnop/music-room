@@ -22,7 +22,6 @@ describe('profile creation (migrations 001 + 011)', () => {
 	});
 
 	afterAll(async () => {
-		// Cascades to user_profiles, profile_privacy and music_preferences.
 		if (userId) await supabaseAdmin.auth.admin.deleteUser(userId);
 	});
 
@@ -92,7 +91,6 @@ describe('filteredProfileService.getFilteredProfile', () => {
 		friend = await createProfile('friend');
 		oneWay = await createProfile('oneway');
 
-		// Rows created by the migration 011 trigger on profile insert.
 		const { error: privacyError } = await supabaseAdmin
 			.from('profile_privacy')
 			.update({
@@ -119,7 +117,6 @@ describe('filteredProfileService.getFilteredProfile', () => {
 	});
 
 	afterAll(async () => {
-		// Cascades to user_profiles, profile_privacy, music_preferences and follows.
 		for (const id of userIds) await supabaseAdmin.auth.admin.deleteUser(id);
 	});
 

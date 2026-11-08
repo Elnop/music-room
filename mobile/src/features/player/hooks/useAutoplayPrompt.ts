@@ -4,7 +4,6 @@ import { usePlayerStore } from '@/features/player/stores/playerStore';
 import type { AudioPlayer } from '@/features/player/types';
 import { showAlert } from '@/shared/utils/alert';
 
-/** Browser only: a playback started before any click on the page waits for one. Native never blocks. */
 export function useAutoplayPrompt(player: AudioPlayer): void {
 	const blocked = useAutoplayStore(state => state.blocked);
 	const playerRef = useRef(player);
@@ -23,7 +22,6 @@ export function useAutoplayPrompt(player: AudioPlayer): void {
 				{ text: 'Plus tard', style: 'cancel', onPress: () => setBlocked(false) },
 				{
 					text: 'Activer le son',
-					// play() runs inside the click: Safari unlocks sound only during the gesture itself.
 					onPress: () => {
 						playerRef.current.play();
 						setBlocked(false);

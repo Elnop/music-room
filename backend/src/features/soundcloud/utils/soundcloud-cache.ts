@@ -30,7 +30,6 @@ export function clear(): void {
 	entries.clear();
 }
 
-/** Expired entries count until read. */
 export function size(): number {
 	return entries.size;
 }

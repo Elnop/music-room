@@ -4,7 +4,6 @@ import type { MediaElement } from './mediaElement';
 
 const HLS_MIME = 'application/vnd.apple.mpegurl';
 
-/** A progressive file and, in Safari, an HLS stream play natively; elsewhere hls.js feeds the element, transport only. */
 export function attachStream(
 	media: MediaElement,
 	url: string,

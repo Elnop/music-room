@@ -14,7 +14,6 @@ export function getAppVersion(): string {
 	);
 }
 
-// release-apk.yml sets the build number and commit SHA; a local build has neither.
 export function formatBuildLabel(version: string, buildNumber?: string, commit?: string): string {
 	if (!buildNumber) return `Zumik ${version} (dev)`;
 	return commit

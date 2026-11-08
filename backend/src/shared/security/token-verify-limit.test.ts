@@ -34,7 +34,6 @@ interface State {
 	ttl: number;
 }
 
-/** In-memory stand-in for counter.ts: release decrements only an existing key. */
 function fakeCounter(state: State) {
 	hit.mockImplementation((_key: string, windowMs: number) => {
 		if (state.count === null) {
@@ -123,7 +122,6 @@ describe('token verification limiter', () => {
 			retryAfterMs: 42_000,
 		});
 		expect(verify).not.toHaveBeenCalled();
-		// The refused reservation is given back.
 		expect(state.count).toBe(3);
 	});
 
@@ -159,7 +157,6 @@ describe('token verification limiter', () => {
 		);
 		expect(verify).toHaveBeenCalledTimes(config.token.max);
 
-		// Window over: the key expired.
 		state.count = null;
 		verify.mockResolvedValue(USER);
 		await expect(verifyTokenLimited('good', IP, verify)).resolves.toEqual(USER);

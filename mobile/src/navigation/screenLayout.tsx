@@ -25,5 +25,4 @@ export const screenLayout =
 		);
 	};
 
-/** Wide screens only: the phone keeps the native header. */
 export const screenHeader = (props: NativeStackHeaderProps) => <AlignedHeader {...props} />;

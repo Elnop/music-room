@@ -5,7 +5,6 @@ import { logger } from '@/shared/utils/logger.js';
 
 type Failure = [message: string, code: string];
 
-/** Each caller keeps the error codes its endpoint already answered. */
 const FAILURES = {
 	oauth: {
 		link: ['Failed to generate session link', 'SESSION_LINK_GENERATION_FAILED'],
@@ -24,7 +23,6 @@ function fail([message, code]: Failure, context: Record<string, unknown>): AppEr
 	return new AppError(500, message, code);
 }
 
-/** A magic link leaves the password untouched, so it works for every kind of account. */
 export async function createMagicLinkSession(
 	email: string,
 	caller: keyof typeof FAILURES

@@ -23,7 +23,6 @@ interface LoginForm {
 	goToRegister: () => void;
 }
 
-/** Failures toast only while the screen is focused; an unverified account goes to the code screen. */
 export function useLoginForm(
 	navigation: NativeStackNavigationProp<AuthStackParamList, 'Login'>
 ): LoginForm {

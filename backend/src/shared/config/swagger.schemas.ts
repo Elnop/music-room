@@ -41,7 +41,6 @@ export function describeParams<S extends Record<string, z.ZodType>>(
 	return z.object(shape);
 }
 
-/** Same as `registry.register`, which needs Zod extended before any schema exists (validators load first). */
 export function nameSchemas(schemas: Record<string, z.ZodType>): void {
 	for (const [refId, schema] of Object.entries(schemas)) {
 		const current = zodToOpenAPIRegistry.get(schema);

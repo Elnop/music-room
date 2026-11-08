@@ -39,7 +39,6 @@ export async function addViewer(
 			throw new AppError(400, 'Owner cannot be added as viewer', 'OWNER_CANNOT_BE_VIEWER');
 		}
 
-		// Editors don't need viewer access.
 		if ((playlist.collaborator_ids ?? []).includes(viewerId)) {
 			throw new AppError(
 				409,

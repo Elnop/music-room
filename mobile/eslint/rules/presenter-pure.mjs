@@ -1,5 +1,3 @@
-// See .agents/rules/components.md#presenter-pure
-
 const FORBIDDEN_STATE_OR_EFFECT_HOOKS = new Set([
 	'useState',
 	'useReducer',

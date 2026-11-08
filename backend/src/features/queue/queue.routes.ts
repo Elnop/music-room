@@ -4,7 +4,6 @@ import { authMiddleware } from '@/features/auth/auth.middleware.js';
 
 const router = Router({ mergeParams: true });
 
-// Also mounted under /api/users/:userId/queue to act on that user's queue.
 router.use(authMiddleware);
 
 router.get('/', queue.getQueue);

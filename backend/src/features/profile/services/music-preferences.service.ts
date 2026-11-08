@@ -16,7 +16,6 @@ function mapRowToPreferences(row: MusicPreferencesRow): MusicPreferences {
 	};
 }
 
-/** Same rules as updateMusicPreferencesSchema, for any caller that skips it. */
 function validateGenres(genres: MusicGenre[]): void {
 	if (genres.length > MAX_GENRES) {
 		throw new AppError(400, `Maximum ${MAX_GENRES} genres allowed`, 'TOO_MANY_GENRES');
@@ -63,7 +62,6 @@ async function createDefaultPreferences(
 	}
 }
 
-/** Created empty on first read. */
 export async function getMusicPreferences(userId: string): Promise<MusicPreferences> {
 	try {
 		logger.info('Fetching music preferences', { userId });

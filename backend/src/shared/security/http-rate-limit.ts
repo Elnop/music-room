@@ -7,9 +7,7 @@ import type { AuthenticatedRequest } from '@/shared/types/global.types.js';
 import { createRateLimitStore } from '@/shared/security/rate-limit-store.js';
 import { requestIp } from '@/shared/security/request-ip.js';
 
-// Fail closed with 503 RATE_LIMIT_UNAVAILABLE while Redis is down, never in memory.
 interface LimiterSpec {
-	/** Redis keys are `rl:<store>:<key>`. */
 	store: string;
 	limits: { windowMs: number; max: number };
 	key: (req: Request) => string;
@@ -64,7 +62,6 @@ if (!rateLimitConfig.enabled) {
 }
 
 const emailOf = (req: Request) => (req.body as { email?: string } | undefined)?.email;
-// Per-user limiters run after authMiddleware, which sets req.user.
 const userIdOf = (req: Request) => (req as AuthenticatedRequest).user.id;
 const isGoogle = (req: Request) => req.path.includes('google');
 const signInFields = (req: Request) => ({
@@ -107,7 +104,6 @@ export const oauthRateLimiter = createLimiter({
 	}),
 });
 
-/** Safety net mounted on every /api/auth/* route. */
 export const globalAuthRateLimiter = createLimiter({
 	store: 'auth:global',
 	limits: rateLimitConfig.global,

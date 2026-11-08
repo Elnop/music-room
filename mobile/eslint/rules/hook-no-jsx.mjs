@@ -1,5 +1,3 @@
-// See .agents/rules/components.md#hook-no-jsx
-
 export default {
 	meta: {
 		type: 'problem',

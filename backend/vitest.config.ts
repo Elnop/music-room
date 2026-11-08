@@ -13,7 +13,6 @@ export default defineConfig({
 		exclude: ['src/**/*.int.test.ts', 'node_modules/**', 'dist/**'],
 		setupFiles: ['src/test/setup-env.ts'],
 		restoreMocks: true,
-		// Coverage counts every source file, not only those a test imports.
 		coverage: {
 			provider: 'v8',
 			include: ['src/**/*.ts'],

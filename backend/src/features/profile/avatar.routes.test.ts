@@ -6,8 +6,6 @@ import profileRoutes from '@/features/profile/profile.routes.js';
 import { errorHandler } from '@/shared/middleware/error-handler.js';
 import { ownedAvatarPath } from '@/features/profile/services/avatar.service.js';
 
-// The limiter's 429 and the real Storage are covered by avatar.int.test.ts.
-
 const ME = '0b5c6d7e-1111-4222-8333-444455556666';
 const OTHER = '9f8e7d6c-1111-4222-8333-444455556666';
 const PUBLIC_BASE = 'http://supabase.test.invalid/storage/v1/object/public/avatars/';

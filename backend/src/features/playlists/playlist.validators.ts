@@ -30,7 +30,6 @@ export const updatePlaylistSchema = z.object({
 	editMode: z.enum(['open', 'restricted']).optional(),
 });
 
-// A rank is a base-62 fraction that never ends with '0' (doc/features/playlist-concurrency.md).
 export const rankSchema = z
 	.string()
 	.max(128)
@@ -41,7 +40,6 @@ export const moveTrackSchema = z.object({
 	expectedVersion: z.number().int().nonnegative(),
 });
 
-// Path segment of /:id/tracks/:trackId routes: a non-uuid is a 400, not a failed RPC.
 export const trackIdParamSchema = z.object({
 	trackId: z.uuid('Invalid track ID format'),
 });
@@ -56,7 +54,6 @@ export const addViewerSchema = z.object({
 
 export const coverFileSchema = uploadedImageSchema('cover', 'cover');
 
-// Documents the path segment as a UUID; handlers read it with `routeParam`.
 export const playlistIdParamSchema = z.object({
 	id: z.uuid().meta({ param: { description: 'Playlist ID' } }),
 });
@@ -65,7 +62,6 @@ export const playlistMemberParamsSchema = playlistIdParamSchema.extend({
 	userId: z.uuid().meta({ param: { description: 'ID of the collaborator or viewer' } }),
 });
 
-// z.input: visibility and editMode may be omitted; the service applies the defaults.
 export type CreatePlaylistInput = z.input<typeof createPlaylistSchema>;
 export type UpdatePlaylistInput = z.infer<typeof updatePlaylistSchema>;
 export type MoveTrackInput = z.infer<typeof moveTrackSchema>;

@@ -46,7 +46,6 @@ function emitToPlaylistRoom(
 	});
 }
 
-/** See doc/features/playlist-concurrency.md, "Broadcast and convergence". */
 export function notifyPlaylistUpdate(payload: PlaylistUpdatedPayload): void {
 	const { event, tracksVersion } = payload;
 	emitToPlaylistRoom('playlist:updated', 'playlist_updated', payload, { event, tracksVersion });
@@ -62,7 +61,6 @@ export function notifyTracksAvailability(payload: TracksAvailabilityPayload): vo
 	});
 }
 
-/** Must run before revalidatePlaylistRoom evicts the clients from the room. */
 export function notifyPlaylistDeleted(payload: PlaylistDeletedPayload): void {
 	emitToPlaylistRoom('playlist:deleted', 'playlist_deleted', payload);
 }

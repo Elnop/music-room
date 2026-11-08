@@ -27,7 +27,6 @@ const envSchema = z.object({
 	RATE_LIMIT_OAUTH_MAX: z.string().default('10'),
 	RATE_LIMIT_AUTH_WINDOW_MS: z.string().default('900000'),
 	RATE_LIMIT_AUTH_MAX: z.string().default('20'),
-	// Validated: NaN or 0 would block every IP forever.
 	RATE_LIMIT_TOKEN_WINDOW_MS: z.coerce.number().int().positive().default(900000),
 	RATE_LIMIT_TOKEN_MAX: z.coerce.number().int().positive().default(20),
 	RATE_LIMIT_SOUNDCLOUD_WINDOW_MS: z.coerce.number().int().positive().default(60000),
@@ -75,7 +74,6 @@ const envSchema = z.object({
 
 	GMAIL_USER: z.email('Invalid Gmail user address'),
 	GMAIL_APP_PASSWORD: z.string().min(1, 'Gmail app password is required'),
-	// The dev stack's Mailpit: replaces Gmail when set, without TLS or auth.
 	SMTP_HOST: z.string().min(1).optional(),
 	SMTP_PORT: z.coerce.number().int().positive().default(54425),
 
@@ -92,7 +90,6 @@ const parseEnv = (): Env => {
 	const result = envSchema.safeParse(process.env);
 
 	if (!result.success) {
-		// The logger reads env, so it cannot exist yet: console is allowed here.
 		console.error('Invalid environment variables:');
 		console.error(result.error.format());
 		process.exit(1);

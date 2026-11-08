@@ -5,7 +5,6 @@ import express, { type Request } from 'express';
 import { io as ioClient, type Socket as ClientSocket } from 'socket.io-client';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Set before env.ts is parsed, whatever backend/.env says.
 vi.hoisted(() => {
 	process.env.TRUST_PROXY = '';
 	process.env.RATE_LIMIT_ENABLED = 'true';
@@ -145,7 +144,6 @@ describe('token verification limit per IP', () => {
 
 		expect(res.status).toBe(200);
 		expect(await res.json()).toEqual({ userId });
-		// The slot reserved for the verification is given back.
 		const keys = await redisClient.keys(KEY_PATTERN);
 		expect(keys).toHaveLength(1);
 		expect(Number(await redisClient.get(keys[0]))).toBe(0);
@@ -167,7 +165,6 @@ describe('token verification limit per IP', () => {
 		expect(invalid.status).toBe(429);
 		expect(await codeOf(invalid)).toBe('RATE_LIMIT_EXCEEDED');
 
-		// Blocked for every token, valid or not.
 		const valid = await call('/protected', validToken);
 		expect(valid.status).toBe(429);
 		const body = (await valid.json()) as {
@@ -177,7 +174,6 @@ describe('token verification limit per IP', () => {
 		expect(new Date(body.error.details.retryAfter).getTime()).toBeGreaterThan(Date.now());
 
 		expect(getUser).not.toHaveBeenCalled();
-		// Refusals are not counted.
 		expect(Number(await redisClient.get(keys[0]))).toBe(MAX);
 	});
 
@@ -206,7 +202,6 @@ describe('token verification limit per IP', () => {
 		await expect(handshake('garbage-more')).resolves.toBe('TOO_MANY_ATTEMPTS');
 		expect(getUser).not.toHaveBeenCalled();
 
-		// HTTP and socket share the per-IP counter.
 		const res = await call('/protected', validToken);
 		expect(res.status).toBe(429);
 	});
@@ -230,7 +225,6 @@ describe('token verification limit per IP', () => {
 			expect(res.status).toBe(401);
 		}
 
-		// Every request counted against the connection's address.
 		expect(await redisClient.keys(KEY_PATTERN)).toHaveLength(1);
 		const res = await fetch(`${baseUrl}/protected`, {
 			headers: { Authorization: 'Bearer garbage-more', 'X-Forwarded-For': '203.0.113.99' },

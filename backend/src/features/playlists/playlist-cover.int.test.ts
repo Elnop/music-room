@@ -127,7 +127,7 @@ describe('Playlist cover routes (/api/playlists/:id/cover)', () => {
 				const files = await storedFiles(playlistId);
 				if (files.length) await supabaseAdmin.storage.from(COVER_BUCKET).remove(files);
 			}
-			for (const user of users) await supabaseAdmin.auth.admin.deleteUser(user.id); // cascades
+			for (const user of users) await supabaseAdmin.auth.admin.deleteUser(user.id);
 			if (isRedisConnected()) {
 				const keys = await redisClient.keys('rl:playlists:cover:*');
 				if (keys.length > 0) await redisClient.del(...keys);

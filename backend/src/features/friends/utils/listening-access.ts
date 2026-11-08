@@ -1,7 +1,5 @@
 import { logger } from '@/shared/utils/logger.js';
 
-// Lazy imports avoid a cycle with realtime; errors are only logged so they never fail the unfollow.
-
 export async function revalidateListeningAccess(
 	controllerId: string,
 	ownerId: string

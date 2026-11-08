@@ -8,8 +8,6 @@ import prettierConfig from 'eslint-config-prettier';
 import { builtinRules } from 'eslint/use-at-your-own-risk';
 import componentsPlugin from './eslint/plugin-components.mjs';
 
-// Removed aliases, still banned so they cannot come back: @/ is the only one left
-// (babel.config.js, tsconfig.json).
 const LEGACY_ALIASES = [
   '@api',
   '@components',
@@ -23,7 +21,6 @@ const LEGACY_ALIASES = [
   '@constants',
 ];
 
-// CSS named colours (CSS Color Module Level 4), 'transparent' excepted.
 const NAMED_COLORS = [
   'aliceblue', 'antiquewhite', 'aqua', 'aquamarine', 'azure', 'beige', 'bisque', 'black',
   'blanchedalmond', 'blue', 'blueviolet', 'brown', 'burlywood', 'cadetblue', 'chartreuse',
@@ -49,8 +46,6 @@ const NAMED_COLORS = [
   'whitesmoke', 'yellow', 'yellowgreen',
 ];
 
-// Each no-restricted-syntax rule gets its own name, so its exceptions are counted apart in
-// eslint-suppressions.json. See .agents/rules/guardrails.md#append-only-rules
 const restrictedSyntax = builtinRules.get('no-restricted-syntax');
 const guardrailsPlugin = {
   rules: {
@@ -147,16 +142,12 @@ export default [
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-require-imports': 'error',
 
-      'react/react-in-jsx-scope': 'off', // Not needed with React 17+
-      'react/prop-types': 'off', // Using TypeScript for prop validation
+      'react/react-in-jsx-scope': 'off',
+      'react/prop-types': 'off',
       ...reactHooksPlugin.configs.recommended.rules,
-      // React Compiler rules kept as warnings: `immutability` flags Reanimated shared values by design,
-      // and the `set-state-in-effect` cases are realtime hooks to refactor with device testing.
       'react-hooks/immutability': 'warn',
       'react-hooks/set-state-in-effect': 'warn',
 
-      // No console.* at all. Not the core `no-console`: its message cannot
-      // point to the rule's doc.
       'no-restricted-globals': [
         'error',
         {
@@ -166,7 +157,6 @@ export default [
         },
       ],
 
-      // Imports that leave the current folder go through @/.
       'no-restricted-imports': [
         'error',
         {
@@ -187,8 +177,6 @@ export default [
     },
   },
 
-  // Only the logger writes to the console; the ErrorBoundary test mutes React's log of the caught error.
-  // See .agents/rules/logging.md#no-console
   {
     files: [
       'src/shared/utils/logger.ts',
@@ -200,7 +188,6 @@ export default [
     },
   },
 
-  // No index.ts: import the source file.
   {
     files: ['src/**/index.{ts,tsx}'],
     rules: {
@@ -215,7 +202,6 @@ export default [
     },
   },
 
-  // Project guardrails, on the app code and its tests.
   {
     files: ['src/**/*.{ts,tsx}', 'App.tsx'],
     plugins: {
@@ -228,7 +214,6 @@ export default [
         {
           selector: [
             "ImportDeclaration[source.value='react-native'] > ImportSpecifier[imported.name=/^(TouchableOpacity|Pressable)$/]",
-            // Namespace or required access: <RN.Pressable />, RN.TouchableOpacity.
             'JSXMemberExpression[property.name=/^(TouchableOpacity|Pressable)$/]',
             'MemberExpression[property.name=/^(TouchableOpacity|Pressable)$/]',
           ].join(', '),
@@ -239,7 +224,6 @@ export default [
       'guardrails/theme-tokens': [
         'error',
         {
-          // A string or the text of a template literal (`rgba(${r}, ...)`).
           selector: [
             'Literal[value=/^#([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/]',
             'Literal[value=/^(rgb|rgba|hsl|hsla)\\(/i]',
@@ -250,8 +234,6 @@ export default [
             'No colour literal outside src/shared/theme/; read the colour from the theme (theme.colors.*). See .agents/rules/structure.md#theme-tokens',
         },
         {
-          // Named colours are common words ('snow' is also an icon), so only
-          // a colour prop or style key (color, backgroundColor...) is checked.
           selector: [
             'Property[key.name=/(^c|C)olor$/] > Literal.value',
             'JSXAttribute[name.name=/(^c|C)olor$/] > Literal.value',
@@ -313,6 +295,5 @@ export default [
     rules: { 'guardrails/text-primitives': 'off' },
   },
 
-  // Prettier must be last to override other formatting rules
   prettierConfig,
 ];

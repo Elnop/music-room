@@ -14,7 +14,6 @@ function playsLocally(): boolean {
 	return isLocalTarget();
 }
 
-/** Only for a track played locally, in its last PREFETCH_WINDOW_S seconds. */
 export function useNextTrackPrefetch(player: AudioPlayer): void {
 	const status = useAudioPlayerStatus(player);
 	const isPlaying = usePlayerStore(state => state.playbackState === 'playing');

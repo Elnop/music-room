@@ -18,7 +18,6 @@ import { formatDuration } from '@/shared/utils/formatters';
 interface SwipeableTrackItemProps {
 	track: Track;
 	onDelete: (trackId: string) => Promise<void>;
-	/** A viewer who cannot edit: no delete swipe, no drag handle. */
 	disabled?: boolean;
 	onAddToQueue?: () => void;
 	onDragStart?: () => void;
@@ -89,7 +88,6 @@ export function SwipeableTrackItem({
 						isDragActive && styles.trackContainerActive,
 					]}
 				>
-					{/* The row's buttons sit beside its pressable area, never in it: the web nests no <button>. */}
 					<Pressable
 						onPress={onPress}
 						onLongPress={actions}

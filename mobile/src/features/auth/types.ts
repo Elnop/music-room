@@ -6,7 +6,6 @@ import type {
 	OAuthProvider,
 } from '@/shared/services/linkedAccountsBridge';
 
-// Mirrors the backend response types (backend/src/features/auth/auth.types.ts).
 export type { LinkedProvider, OAuthProvider };
 export type { GoogleButtonSlot, GoogleButtonVariant };
 
@@ -14,7 +13,6 @@ export interface LinkedProvidersResponse {
 	providers: LinkedProvider[];
 }
 
-/** Tokens of a backend session; `expiresAt` is in seconds. */
 export interface AuthSessionTokens {
 	accessToken: string;
 	refreshToken: string;

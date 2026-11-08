@@ -3,7 +3,6 @@ import * as followStatus from '@/features/friends/services/follow-status.service
 
 type Result = { data?: unknown; count?: number | null; error: { message: string } | null };
 
-// Each `from()` takes the next queued result; the builder resolves to it.
 const m = vi.hoisted(() => {
 	const results: Result[] = [];
 	const from = vi.fn(() => {

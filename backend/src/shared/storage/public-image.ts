@@ -4,11 +4,8 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import { detectImageType } from '@/shared/storage/image-type.js';
 
-// Images in a public bucket, written only by the backend as `<folder>/<uuid>.<ext>`.
-
 const OBJECT_NAME = /^[0-9a-f-]{36}\.(jpg|png|webp)$/;
 
-// The host is not compared, as the local stack has several addresses: the folder restricts deletion.
 export function storedImagePath(
 	url: string | null | undefined,
 	bucket: string,
@@ -23,7 +20,6 @@ export function storedImagePath(
 		if (!pathname.startsWith(prefix)) return null;
 		path = decodeURIComponent(pathname.slice(prefix.length));
 	} catch {
-		// Not a URL, or a bad percent sequence (URIError)
 		return null;
 	}
 	const [first, name, ...rest] = path.split('/');
@@ -31,7 +27,6 @@ export function storedImagePath(
 	return path;
 }
 
-/** Best effort: a leftover file must not fail a change already saved. */
 export async function removeStoredImage(
 	bucket: string,
 	path: string,

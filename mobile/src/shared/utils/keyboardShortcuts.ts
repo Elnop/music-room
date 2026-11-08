@@ -1,14 +1,11 @@
 export interface KeyboardShortcut {
 	key: string;
-	/** Only for keys Shift does not change: `?` needs Shift on most layouts. */
 	shift?: boolean;
-	/** As the help shows them. */
 	keys: string;
 	description: string;
 	run: () => void;
 }
 
-/** The project compiles without the DOM library, so the event is typed here. */
 export interface ShortcutKeyEvent {
 	key: string;
 	shiftKey: boolean;

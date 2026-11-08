@@ -44,7 +44,6 @@ async function subscribeToListening(socket: AppSocket, payload: unknown): Promis
 			code: 'NOT_AUTHORIZED',
 		});
 
-	// Access to at least one device shows the status of all of them.
 	const canControl = await controlAccessService.canControlAnyDevice(myUserId, targetUserId);
 	if (!canControl) {
 		denyListening();
@@ -54,7 +53,6 @@ async function subscribeToListening(socket: AppSocket, payload: unknown): Promis
 	const room = listeningRoom(targetUserId);
 	void socket.join(room);
 
-	// A revoke during the first check found no socket to evict: re-check once in the room.
 	if (!(await controlAccessService.canControlAnyDevice(myUserId, targetUserId))) {
 		void socket.leave(room);
 		denyListening();
@@ -99,7 +97,6 @@ export function registerListeningHandlers(socket: AppSocket): void {
 		);
 	});
 
-	// In arrival order, like playlist join/leave: subscribe awaits access checks, unsubscribe does not.
 	const enqueue = createSocketQueue(socket, 'listening_room_task_failed');
 
 	socket.on('listening:subscribe', (payload: unknown) => {

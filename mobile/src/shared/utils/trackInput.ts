@@ -3,7 +3,6 @@ import type { AddQueueItemBody } from '@/shared/types/playback';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import type { Track } from '@/types/track.types';
 
-/** `previewUrl` is never sent: stream URLs expire. */
 export function toTrackInput(track: SoundCloudTrack | Track | QueueTrack): AddQueueItemBody {
 	if ('permalink_url' in track) {
 		return {

@@ -5,7 +5,6 @@ import express from 'express';
 import { io as ioClient, type Socket as ClientSocket } from 'socket.io-client';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Runs before env.ts reads process.env.
 vi.hoisted(() => {
 	process.env.TRUST_PROXY = 'loopback';
 	process.env.RATE_LIMIT_ENABLED = 'true';
@@ -21,8 +20,6 @@ const { configureTrustProxy } = await import('@/shared/config/trust-proxy.js');
 const socketServer = await import('@/realtime/socket-server.js');
 const { getIO } = await import('@/realtime/state.js');
 
-// Behind a trusted proxy, clients are counted apart by X-Forwarded-For over HTTP and the
-// Socket.io handshake; the token limit is the witness.
 const KEY_PATTERN = 'rl:auth:token:*';
 const MAX = 3;
 const CLIENT_A = '203.0.113.1';

@@ -1,6 +1,5 @@
 import { queryKeys } from './keys';
 
-/** True when `prefix` is the start of `key`, as TanStack matches keys. */
 function startsWith(key: readonly unknown[], prefix: readonly unknown[]): boolean {
 	return prefix.every((part, index) => key[index] === part);
 }

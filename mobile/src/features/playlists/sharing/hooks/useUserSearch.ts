@@ -13,7 +13,6 @@ export interface UserSearch {
 	isSearching: boolean;
 }
 
-/** The previous results stay while the next search runs. */
 export function useUserSearch(excludedIds: string[]): UserSearch {
 	const search = useDebouncedText();
 	const signedIn = useSession(session => session.isAuthenticated);

@@ -2,9 +2,6 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import * as counter from '@/shared/security/counter.js';
 
-// One Redis key per upstream, shared by every user and backend instance: at most one call per
-// interval reaches it. Fails closed while Redis is down, since the upstream's policy comes first.
-
 const UPSTREAM_PREFIX = 'rl:upstream:';
 
 interface SlotOptions {
@@ -30,7 +27,6 @@ async function hit(key: string, intervalMs: number): Promise<counter.CounterStat
 	}
 }
 
-/** The hit that opens a new window owns the slot; the others wait for the next one. */
 export async function takeUpstreamSlot(upstream: string, options: SlotOptions): Promise<void> {
 	if (!counter.isReady()) throw unavailable();
 	const key = UPSTREAM_PREFIX + upstream;

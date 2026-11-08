@@ -17,9 +17,7 @@ import { hapticTap } from '@/shared/utils/haptics';
 import { trackSwipeDirection } from '@/features/player/utils/trackSwipe';
 import { useArtworkSize } from '@/features/player/modal/hooks/useArtworkSize';
 
-/** A swipe toward a missing neighbour moves this fraction of the finger, then springs back. */
 const EDGE_RESISTANCE = 0.25;
-/** The artwork springs back if the queue has not moved to the new track by then. */
 const SETTLE_TIMEOUT_MS = 2500;
 
 export interface ArtworkCarousel {
@@ -34,7 +32,6 @@ export interface ArtworkCarousel {
 	artworkStep: number;
 }
 
-/** Swiping the artwork steps through the queue: right is always the previous item, never a restart. */
 export function useArtworkCarousel(trackKey: string | number | null): ArtworkCarousel {
 	const queue = useActiveQueue();
 	const { size, step: artworkStep } = useArtworkSize();
@@ -44,7 +41,6 @@ export function useArtworkCarousel(trackKey: string | number | null): ArtworkCar
 	const hasNext = next !== undefined;
 	const translateX = useSharedValue(0);
 
-	// The new track's artwork now sits in the centre slot: recentre before paint, without animating.
 	useLayoutEffect(() => {
 		translateX.value = 0;
 	}, [trackKey, translateX]);
@@ -54,7 +50,6 @@ export function useArtworkCarousel(trackKey: string | number | null): ArtworkCar
 		void (direction === 'next' ? getPlayback().next() : getPlayback().previous());
 	};
 
-	/** Slides to the neighbour, then springs back unless the track change recentres it first. */
 	const slideTo = (offset: number) => {
 		'worklet';
 		translateX.value = withSequence(

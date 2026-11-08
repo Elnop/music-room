@@ -12,14 +12,12 @@ const RUNS = Object.fromEntries(
 interface PixelIconProps {
 	name: PixelSpriteName;
 	color: string;
-	/** A multiple of 12 keeps every pixel square and sharp. */
 	size?: number;
 	style?: StyleProp<ViewStyle>;
 	accessibilityLabel?: string;
 	testID?: string;
 }
 
-/** Decorative unless labelled: the control around it usually carries the label. */
 export function PixelIcon({
 	name,
 	color,

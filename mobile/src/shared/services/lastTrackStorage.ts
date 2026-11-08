@@ -3,7 +3,6 @@ import { z } from 'zod';
 import type { QueueTrack } from '@/types/queue.types';
 import { logger } from '@/shared/utils/logger';
 
-/** No stream URL (they expire) and no token: only what rebuilds a paused player. */
 export interface LastTrackEntry {
 	track: QueueTrack;
 	queueItemId: string | null;
@@ -27,7 +26,6 @@ const keyFor = (userId: string) => `zumik:lastTrack:${userId}`;
 
 async function save(userId: string, entry: LastTrackEntry): Promise<void> {
 	const parsed = entrySchema.safeParse(entry);
-	// An invalid snapshot must not leave an older track to restore.
 	if (!parsed.success) return clear(userId);
 	try {
 		await AsyncStorage.setItem(keyFor(userId), JSON.stringify(parsed.data));

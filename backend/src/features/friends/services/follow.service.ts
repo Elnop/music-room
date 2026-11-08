@@ -60,7 +60,6 @@ export function unfollowUser(
 				'UNFOLLOW_ERROR'
 			);
 
-			// Listening and control need mutual friends, which this unfollow just ended.
 			await Promise.all([
 				revalidateListeningAccess(currentUserId, targetUserId),
 				revalidateListeningAccess(targetUserId, currentUserId),

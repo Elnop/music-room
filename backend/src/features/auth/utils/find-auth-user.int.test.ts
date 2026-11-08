@@ -4,7 +4,6 @@ import type { AddressInfo } from 'node:net';
 import express from 'express';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-// Loopback whitelisted so the route-level limiters skip these requests.
 vi.hoisted(() => {
 	process.env.RATE_LIMIT_ENABLED = 'true';
 	process.env.RATE_LIMIT_WHITELIST_IPS = '127.0.0.1,::1,::ffff:127.0.0.1';
@@ -15,7 +14,6 @@ vi.mock('@/features/mail/services/mail.service.js', () => ({
 	sendPasswordResetEmail: vi.fn().mockResolvedValue(undefined),
 }));
 
-// oauth.service calls Google and Facebook.
 vi.mock('@/features/auth/services/oauth.service.js', () => ({
 	verifyGoogleToken: vi.fn(),
 	verifyFacebookToken: vi.fn(),
@@ -31,7 +29,6 @@ const loginService = await import('@/features/auth/services/login.service.js');
 const registrationService = await import('@/features/auth/services/registration.service.js');
 const { findAuthUserIdByEmail } = await import('@/features/auth/utils/find-auth-user.js');
 
-// One more than a listUsers() page.
 const FILLER_USERS = 51;
 const NEW_PASSWORD = 'New-password-194';
 const sendMail = vi.mocked(sendPasswordResetEmail);
@@ -47,7 +44,6 @@ describe('auth user lookup by email past the first listUsers() page (#194)', () 
 		await connectRedis();
 		if (!isRedisConnected()) throw new Error('Redis from scripts/test-db.sh is not reachable');
 
-		// listUsers() lists newest first: created before the fillers, it sits past the first page.
 		email = `int-${randomUUID()}@example.com`;
 		const { data, error } = await supabaseAdmin.auth.admin.createUser({
 			email,
@@ -97,7 +93,6 @@ describe('auth user lookup by email past the first listUsers() page (#194)', () 
 			const keys = await redisClient.keys(`password_reset_*${email.toLowerCase()}*`);
 			if (keys.length > 0) await redisClient.del(...keys);
 			if (httpServer) await new Promise<void>(resolve => httpServer.close(() => resolve()));
-			// Cascades to user_profiles.
 			for (const id of createdUserIds) await supabaseAdmin.auth.admin.deleteUser(id);
 		} finally {
 			await disconnectRedis();

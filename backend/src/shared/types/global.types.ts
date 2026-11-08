@@ -1,6 +1,5 @@
 import type { Request } from 'express';
 
-// Mirrors express-rate-limit's RateLimitInfo.
 interface RateLimitInfo {
 	limit: number;
 	used: number;

@@ -31,7 +31,6 @@ async function storeResetCode(userId: string, code: string): Promise<void> {
 }
 
 export async function requestPasswordReset(email: string, ip: string): Promise<void> {
-	// Counted whether the email exists or not: no account enumeration.
 	await passwordResetLimit.consumeRequest(email, ip);
 
 	const userId = await findAuthUserIdByEmail(email);
@@ -44,7 +43,6 @@ export async function requestPasswordReset(email: string, ip: string): Promise<v
 		return;
 	}
 
-	// A Google- or Facebook-only account gets a code too: resetting adds a password to it.
 	const code = crypto.randomInt(100000, 999999).toString();
 	await storeResetCode(userId, code);
 
@@ -59,7 +57,6 @@ export async function resetPassword(
 	newPassword: string,
 	ip: string
 ): Promise<void> {
-	// Normalized: the lookup ignores case, so must the attempts limit.
 	const attemptsKey = `password_reset_attempts:${email.trim().toLowerCase()}:${ip}`;
 	await attemptLimit.incrementAndCheck(attemptsKey, {
 		maxAttempts: MAX_RESET_ATTEMPTS,
@@ -98,7 +95,6 @@ export async function resetPassword(
 		throw new AppError(400, 'Invalid reset code', 'INVALID_RESET_CODE');
 	}
 
-	// Supabase deletes every session when an admin sets the password: stolen tokens stop working.
 	const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
 		password: newPassword,
 	});
@@ -127,7 +123,6 @@ export async function resetPassword(
 			userId,
 			error: clearError.message,
 		});
-		// Fail so the client retries (the code is still stored) rather than leave has_password false.
 		throw new AppError(500, 'Failed to update password', 'PASSWORD_UPDATE_ERROR');
 	}
 

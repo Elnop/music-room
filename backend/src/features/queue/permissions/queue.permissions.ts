@@ -10,7 +10,6 @@ export async function assertCanManageQueue(actorId: string, ownerId: string): Pr
 	if (!(await controlAccessService.canControlAnyDevice(actorId, ownerId))) throw accessDenied();
 }
 
-/** Null: the owner plays on the device it acts from. */
 export async function resolvePlaybackDevice(
 	actorId: string,
 	ownerId: string,

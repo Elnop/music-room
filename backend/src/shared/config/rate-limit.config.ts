@@ -23,13 +23,11 @@ export const rateLimitConfig = {
 		max: parseInt(env.RATE_LIMIT_AUTH_MAX || '20'),
 	},
 
-	// Failed token verifications per IP, over HTTP and the socket handshake.
 	token: {
 		windowMs: env.RATE_LIMIT_TOKEN_WINDOW_MS,
 		max: env.RATE_LIMIT_TOKEN_MAX,
 	},
 
-	// From here on, counted per user rather than per IP.
 	soundcloud: {
 		windowMs: env.RATE_LIMIT_SOUNDCLOUD_WINDOW_MS,
 		max: env.RATE_LIMIT_SOUNDCLOUD_MAX,
@@ -60,7 +58,6 @@ export const rateLimitConfig = {
 		max: env.RATE_LIMIT_GEOCODE_MAX,
 	},
 
-	// Lockout durations are in seconds.
 	lockout: {
 		enabled: env.ACCOUNT_LOCKOUT_ENABLED !== 'false',
 		threshold: parseInt(env.ACCOUNT_LOCKOUT_THRESHOLD || '5'),

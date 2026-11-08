@@ -43,8 +43,6 @@ export function PlaylistDetailOrchestrator({ navigation, route }: PlaylistDetail
 	const sheetButtonRef = React.useRef<View>(null);
 	const openSheet = useAnchoredPress(sheetButtonRef, owner.openSheet);
 
-	// headerRight stays set (empty for a non-owner): adding or removing the native header
-	// subview while the screen re-attaches crashes Android ("child already has a parent").
 	React.useLayoutEffect(() => {
 		navigation.setOptions({
 			headerTransparent: true,

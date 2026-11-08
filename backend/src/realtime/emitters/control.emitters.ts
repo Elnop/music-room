@@ -4,7 +4,6 @@ import { leaveListeningRoom } from '@/realtime/music-control-access.js';
 import { broadcastUserListeningStatus } from '@/realtime/listening-status.js';
 import { deviceKey, deviceToSocket, getIO, listeningStatuses } from '@/realtime/state.js';
 
-/** A failed access check evicts (fail closed). */
 export async function revalidateListeningAccess(
 	controllerId: string,
 	ownerId: string
@@ -23,7 +22,6 @@ export async function notifyPermissionChange(
 	const io = getIO();
 	if (!io) return;
 
-	// A license may still give access to some device: re-check, not leave.
 	if (!granted) await revalidateListeningAccess(targetUserId, ownerId);
 
 	io.to(`user:${targetUserId}`).emit('permission:changed', {

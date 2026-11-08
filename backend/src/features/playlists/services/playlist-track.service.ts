@@ -13,7 +13,6 @@ import type {
 } from '@/features/playlists/playlist.types.js';
 import type { MoveTrackInput } from '@/features/playlists/playlist.validators.js';
 
-/** In 'open' edit mode, the adder is not recorded (added_by = null). */
 export async function addTrack(
 	playlistId: string,
 	userId: string,
@@ -77,7 +76,6 @@ export async function removeTrack(
 	return { tracksVersion: result.tracksVersion };
 }
 
-/** `afterRank` null: top of the list. */
 export async function moveTrack(
 	playlistId: string,
 	userId: string,

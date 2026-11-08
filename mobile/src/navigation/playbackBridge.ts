@@ -12,7 +12,6 @@ import { QueueModal } from '@/features/queue/queueModal/components/orchestrators
 import { DevicePickerSheet } from '@/features/queue/devicePicker/components/orchestrators/DevicePickerSheet';
 import { TrackActionsSheet } from '@/features/playlists/trackActions/components/orchestrators/TrackActionsSheet';
 
-/** Lets playlists reach the player and queue without importing them. */
 export function registerPlayback(): void {
 	registerPlaybackBridge({
 		usePlaylistPlayback: playlistId => {

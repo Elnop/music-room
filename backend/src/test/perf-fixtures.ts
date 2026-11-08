@@ -1,20 +1,14 @@
-// Fixtures for the HTTP load tests (`make perf-fixtures`): writes tests/performance/fixtures/users.csv
-// and env.json, both git-ignored. Run from backend/: `npx tsx src/test/perf-fixtures.ts`.
-
 import { randomBytes } from 'node:crypto';
 import { chmod, mkdir, writeFile } from 'node:fs/promises';
 import { z } from 'zod';
 import { createSignInClient, supabaseAdmin } from '@/shared/config/supabase.js';
 
-// CLI output, not application logs: written to the terminal directly.
 const print = (line: string) => process.stdout.write(`${line}\n`);
 const printError = (line: string) => process.stderr.write(`${line}\n`);
 
 const PLAYLIST_NAME = 'perf-shared';
 const DEVICE_ID = 'perf-device-0';
-/** Added by the track-edit scenario (tests/performance/scenarios). */
 const PERF_TRACK_URI_PREFIX = 'https://soundcloud.com/zumik-perf/';
-/** Connected by the socket scenario (perf-socket.ts). */
 const PERF_SOCKET_DEVICE_PREFIX = 'perf-socket-';
 const BATCH_SIZE = 5;
 

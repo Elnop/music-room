@@ -3,7 +3,6 @@ import * as service from '@/features/music-control/services/control-access.servi
 
 type Result = { data: unknown; error: { message: string; code?: string } | null };
 
-/** Results served in call order: follows(controller→owner), follows(owner→controller), licenses */
 const { from, results } = vi.hoisted(() => {
 	const results: { follows: Result[]; device_control_licenses: Result[] } = {
 		follows: [],

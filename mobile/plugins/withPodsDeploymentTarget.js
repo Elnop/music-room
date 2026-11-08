@@ -1,6 +1,5 @@
 const { withPodfile } = require('@expo/config-plugins');
 
-// Xcode 27 refuses targets below 15.0, and some pods still ask for iOS 9 to 13.
 const DEPLOYMENT_TARGET = '15.1';
 const MARKER = '# Pods deployment target raised by withPodsDeploymentTarget';
 

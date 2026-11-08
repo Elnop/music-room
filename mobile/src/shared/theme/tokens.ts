@@ -1,11 +1,9 @@
 import { FONT_FAMILIES } from './fonts';
 
-/** Every outline, radius and shadow offset is a multiple of this pixel. */
 export const PIXEL = 3;
 
 export const INK = '#07060B';
 
-/** Pixel art has square corners, even `round`. */
 export const PIXEL_BORDERS = {
 	thin: PIXEL,
 	medium: PIXEL,
@@ -33,7 +31,6 @@ export const PIXEL_TYPOGRAPHY = {
 	},
 } as const;
 
-/** The providers' brand colours follow their guidelines. */
 export const FIXED_COLORS = {
 	divider: '#3B3358',
 	googleSurface: '#FFFFFF',
@@ -49,7 +46,6 @@ export const FIXED_COLORS = {
 	shadow: INK,
 } as const;
 
-/** White initials stay above 4.5:1 contrast on each. */
 export const AVATAR_COLORS = [
 	'#C2185B',
 	'#AD1457',

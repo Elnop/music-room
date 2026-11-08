@@ -29,7 +29,6 @@ export function handleDisconnect(socket: AppSocket): void {
 	const key = deviceKey(userId, deviceId);
 	socketToDevice.delete(socket.id);
 
-	// The device reconnected on a newer socket: leave its state to that socket.
 	if (deviceToSocket.get(key) !== socket.id) return;
 
 	removeDeviceStatus(userId, deviceId);

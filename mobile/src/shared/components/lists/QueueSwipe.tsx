@@ -27,7 +27,6 @@ export function QueueSwipe({ children, onAddToQueue, renderRightActions }: Queue
 	);
 
 	const handleOpen = (direction: 'left' | 'right', swipeable: Swipeable) => {
-		// 'left' = the left actions are open, i.e. the row was swiped right.
 		if (direction !== 'left') return;
 		swipeable.close();
 		onAddToQueue?.();

@@ -142,7 +142,6 @@ export function upcomingTrackIdsRpc(userId: string): Promise<string[]> {
 	);
 }
 
-/** Also makes the first inserted track current. */
 export function insertBlockRpc(userId: string, trackIds: string[]): Promise<QueueState> {
 	return call(
 		'insert-block',

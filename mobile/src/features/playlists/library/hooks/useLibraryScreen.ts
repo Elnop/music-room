@@ -14,7 +14,6 @@ type Navigation = NativeStackNavigationProp<PlaylistStackParamList, 'Playlists'>
 export interface LibraryScreen {
 	isInitialLoading: boolean;
 	owned: Playlist[];
-	/** Other users' playlists I collaborate on or view. */
 	shared: Playlist[];
 	isRefreshing: boolean;
 	refresh: () => void;

@@ -14,7 +14,6 @@ type ProfileFields = Pick<
 	'id' | 'username' | 'display_name' | 'avatar_url' | 'bio' | 'created_at' | 'updated_at'
 >;
 
-/** Typed object to spread into an insert or update: a computed `${provider}_id` key is untyped. */
 export function providerIdField(
 	provider: OAuthProvider,
 	providerId: string | null

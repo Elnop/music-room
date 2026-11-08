@@ -7,11 +7,9 @@ import type { MusicEvent } from '@/features/events/types';
 
 interface NearbyEvent {
 	event: MusicEvent;
-	/** Metres from the phone, by GPS. */
 	distance: number;
 }
 
-/** Ongoing events within the radius, nearest first. Runs on the phone: the position is never sent. */
 export function nearbyByGps(
 	events: MusicEvent[],
 	position: Coordinates,
@@ -30,7 +28,6 @@ export interface NearbyItem {
 	proximity: string;
 }
 
-/** Events heard by beacon first (nearest signal first), then by GPS; each event once. */
 export function mergeNearby(
 	events: MusicEvent[],
 	sightings: ReadonlyMap<number, BeaconSighting>,

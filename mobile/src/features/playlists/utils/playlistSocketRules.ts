@@ -10,7 +10,6 @@ import type {
 } from '@/features/playlists/types';
 import { applyPlaylistEvent } from './playlistSync';
 
-/** Explicit fields: an absent description or cover means it was cleared. */
 const detailsPatch = (details: PlaylistDetailsEvent) => ({
 	name: details.name,
 	description: details.description,
@@ -33,7 +32,6 @@ function applyTracksAvailability(
 	};
 }
 
-/** Track deltas apply in version order; a gap or a rebalance reloads the playlist (doc/features/playlist-concurrency.md). */
 export const PLAYLIST_SOCKET_RULES = [
 	socketCacheRule<PlaylistUpdatedEvent, PlaylistWithTracks>({
 		event: 'playlist:updated',

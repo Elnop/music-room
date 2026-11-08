@@ -1,5 +1,3 @@
-// See .agents/rules/components.md#orchestrator-no-fetch
-
 const FORBIDDEN_NETWORK_CALLS = new Set(['fetch', 'apiRequest']);
 
 export default {

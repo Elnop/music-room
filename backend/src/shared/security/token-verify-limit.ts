@@ -3,12 +3,8 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import * as counter from '@/shared/security/counter.js';
 
-// At the limit every token from the IP is refused, valid or not: telling them apart would need
-// the very Supabase call the limit avoids.
-
 const TOKEN_LIMIT_PREFIX = 'rl:auth:token:';
 
-/** A 503 (Supabase outage) is not the client's fault: it does not count. */
 const COUNTED_CODES = new Set(['INVALID_TOKEN', 'TOKEN_REVOKED']);
 
 export class TokenVerifyLimitError extends AppError {
@@ -44,7 +40,6 @@ interface Reservation {
 	ttlMs: number;
 }
 
-/** Taken before calling Supabase, so a parallel burst cannot pass the limit. */
 export async function reserve(ip: string): Promise<Reservation | null> {
 	if (isSkipped(ip)) return null;
 	try {
@@ -65,7 +60,6 @@ export async function release(ip: string): Promise<void> {
 	}
 }
 
-/** Every verification holds a slot while it runs: more than `max` in parallel from one IP are refused. */
 export async function verifyTokenLimited<User>(
 	token: string,
 	ip: string,

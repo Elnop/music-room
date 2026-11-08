@@ -1,4 +1,3 @@
-// The Google plugin registers this scheme on iOS; the app derives its iOS client ID from it.
 const GOOGLE_IOS_URL_SCHEME =
 	process.env.EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME ||
 	'com.googleusercontent.apps.187081511514-8dc2itp857pu6qtk3bkg7l389n5bhs98';
@@ -13,7 +12,6 @@ module.exports = {
 		orientation: 'portrait',
 		icon: './src/assets/logo/app-icon.png',
 		userInterfaceStyle: 'dark',
-		// Window background before the first render (expo-system-ui), else Android shows white.
 		backgroundColor: '#0D0D0D',
 		newArchEnabled: true,
 		splash: {
@@ -68,7 +66,6 @@ module.exports = {
 		web: {
 			favicon: './src/assets/logo/app-icon.png',
 		},
-		// The GitHub Pages build serves the app under a sub-path; dev stays at the root.
 		...(process.env.WEB_BASE_URL && { experiments: { baseUrl: process.env.WEB_BASE_URL } }),
 		plugins: [
 			[
@@ -101,7 +98,6 @@ module.exports = {
 				},
 			],
 			'@react-native-community/datetimepicker',
-			// No neverForLocation: Android then filters iBeacon frames out of the scan results.
 			['react-native-ble-plx', { isBackgroundEnabled: false, neverForLocation: false }],
 			'./plugins/withDebugKeystore.js',
 			'./plugins/withDevVariant.js',

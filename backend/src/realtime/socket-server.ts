@@ -73,8 +73,6 @@ export function initialize(httpServer: HTTPServer): void {
 	socketLogger.init('initializing', { cors: 'ALLOWED_ORIGINS' });
 
 	const io: AppSocketServer = new SocketIOServer(httpServer, {
-		// `cors` only covers polling headers; `allowRequest` also refuses a browser WebSocket.
-		// Same-origin passes: the Android app sends the backend's own address.
 		cors: {
 			origin: (origin, callback) => callback(null, isOriginAllowed(origin)),
 			methods: ['GET', 'POST'],

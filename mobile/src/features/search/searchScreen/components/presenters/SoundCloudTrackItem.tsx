@@ -36,7 +36,6 @@ export function SoundCloudTrackItem({
 	return (
 		<QueueSwipe onAddToQueue={() => onAddToQueue(track)}>
 			<View style={styles.container} {...contextMenu}>
-				{/* The row's buttons sit beside its pressable area, never in it: the web nests no <button>. */}
 				<Pressable
 					style={styles.pressable}
 					onPress={() => onPlay(track)}

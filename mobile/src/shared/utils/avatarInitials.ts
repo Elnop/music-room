@@ -1,6 +1,5 @@
 import { AVATAR_COLORS } from '@/shared/theme/tokens';
 
-/** Code points keep accents and emoji whole. */
 export function avatarInitials(name?: string): string {
 	const words = name?.trim().split(/\s+/).filter(Boolean) ?? [];
 	if (words.length === 0) return '?';

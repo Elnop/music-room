@@ -9,7 +9,6 @@ interface AppErrorOptions {
 	fix?: string;
 }
 
-/** `message` is shown to the user; `why` and `fix` are for developers. */
 export class AppError extends Error {
 	public why?: string;
 	public fix?: string;
@@ -30,7 +29,6 @@ export class AppError extends Error {
 }
 
 function buildErrorResponse(err: AppError): ApiResponse {
-	// An allowlist, so an unknown NODE_ENV hides why and fix too.
 	const exposeDebug = env.NODE_ENV === 'development' || env.NODE_ENV === 'test';
 	return {
 		success: false,
@@ -45,7 +43,6 @@ function buildErrorResponse(err: AppError): ApiResponse {
 	};
 }
 
-/** For middlewares that answer themselves (rate limiters, auth); everything else goes through `errorHandler`. */
 export function sendError(req: Request, res: Response, err: AppError, cause?: Error): void {
 	const entry = {
 		status: err.statusCode,
@@ -73,7 +70,6 @@ function toAppError(err: Error): AppError {
 			err.issues.map(e => ({ path: e.path.join('.'), message: e.message }))
 		);
 	}
-	// Supabase/PostgREST errors carry a code: answered as a 400 with it, as the API always did.
 	if ('code' in err && 'message' in err) {
 		return new AppError(400, err.message, (err as Error & { code: string }).code);
 	}

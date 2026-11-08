@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-// Aligned with the backend Zod schemas.
 export const loginSchema = z.object({
 	email: z.email("Format d'email invalide"),
 	password: z.string().min(1, 'Le mot de passe est requis'),

@@ -4,7 +4,6 @@ import type { AddressInfo } from 'node:net';
 import express from 'express';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Loopback whitelisted so the route-level limiters skip these requests.
 vi.hoisted(() => {
 	process.env.RATE_LIMIT_ENABLED = 'true';
 	process.env.RATE_LIMIT_WHITELIST_IPS = '127.0.0.1,::1,::ffff:127.0.0.1';
@@ -108,7 +107,6 @@ describe('email verification cannot take over an account (#188)', () => {
 		try {
 			if (isRedisConnected()) await clearRedisKeys();
 			await new Promise<void>(resolve => httpServer.close(() => resolve()));
-			// Cascades to user_profiles.
 			for (const id of createdUserIds) await supabaseAdmin.auth.admin.deleteUser(id);
 		} finally {
 			logInfo.mockRestore();
@@ -258,7 +256,7 @@ describe('email verification cannot take over an account (#188)', () => {
 
 		it('sends nothing for an unknown user', async () => {
 			const userId = randomUUID();
-			createdUserIds.push(userId); // only for the Redis key cleanup
+			createdUserIds.push(userId);
 			const { status, body } = await post('resend-verification', {
 				userId,
 				email: `nobody-${randomUUID()}@example.com`,

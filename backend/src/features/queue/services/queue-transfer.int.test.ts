@@ -16,8 +16,6 @@ vi.mock('@/realtime/emitters/queue.emitters.js', async importOriginal => ({
 	notifyQueueUpdate: vi.fn(),
 }));
 
-// No Socket.io server runs here: device presence and commands are stubbed.
-
 const URI_PREFIX = `https://soundcloud.com/int-queue-transfer/${randomUUID()}`;
 const users: string[] = [];
 let trackCount = 0;
@@ -34,7 +32,6 @@ async function createUser(): Promise<string> {
 	if (error) throw error;
 	const id = data.user.id;
 	users.push(id);
-	// devices and follows reference user_profiles
 	const { error: profileError } = await supabaseAdmin
 		.from('user_profiles')
 		.insert({ id, username: `int_${id.slice(0, 8)}` });
@@ -59,7 +56,6 @@ vi.mocked(realtimeControl.isDeviceOnline).mockImplementation((userId, deviceId) 
 	online.has(`${userId}:${deviceId}`)
 );
 
-/** I follow the friend, who allows me to control the licensed device only. */
 async function license(deviceId: string) {
 	const { error: followError } = await supabaseAdmin.from('follows').insert([
 		{ follower_id: me, following_id: friend },
@@ -90,9 +86,9 @@ beforeEach(async () => {
 	online.clear();
 	sendDeviceCommand.mockClear();
 	notifyQueueUpdate.mockClear();
-	await supabaseAdmin.from('devices').delete().in('user_id', [me, friend]); // cascades to licenses
+	await supabaseAdmin.from('devices').delete().in('user_id', [me, friend]);
 	await supabaseAdmin.from('follows').delete().in('follower_id', [me, friend, stranger]);
-	await supabaseAdmin.from('play_queues').delete().in('user_id', [me, friend]); // cascades to items
+	await supabaseAdmin.from('play_queues').delete().in('user_id', [me, friend]);
 });
 
 afterAll(async () => {

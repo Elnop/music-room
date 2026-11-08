@@ -5,7 +5,6 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import { isDarkBackground } from '@/shared/components/feedback/ConnectionBanner';
 import { useFocusRing } from '@/shared/hooks/useFocusRing';
 
-/** So no white window shows between screens or before the first render. */
 export function ThemedSystemUI() {
 	const { theme } = useTheme();
 	const background = theme.colors.background;
