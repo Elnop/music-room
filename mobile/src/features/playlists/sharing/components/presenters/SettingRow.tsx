@@ -15,7 +15,6 @@ interface SettingRowProps {
 	description: string;
 	value: boolean;
 	onToggle: () => void;
-	/** A change is on its way: a spinner replaces the switch. */
 	busy: boolean;
 }
 

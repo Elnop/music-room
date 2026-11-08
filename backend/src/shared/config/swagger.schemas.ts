@@ -7,7 +7,6 @@ import { z } from 'zod';
 
 const metaSchema = z.object({ timestamp: z.iso.datetime() });
 
-/** `{ success: true, data, meta }`. */
 function successEnvelope<T extends z.ZodType>(data: T) {
 	return z.object({ success: z.literal(true), data, meta: metaSchema });
 }
@@ -27,7 +26,6 @@ export function jsonBody(schema: z.ZodType, example?: unknown, required = true):
 	};
 }
 
-/** Swagger UI shows the description next to the parameter. */
 export function param<T extends z.ZodType>(schema: T, description: string): T {
 	return schema.meta({ param: { description } });
 }
@@ -51,7 +49,6 @@ export function nameSchemas(schemas: Record<string, z.ZodType>): void {
 	}
 }
 
-/** Mounted in server.ts. */
 export const healthSchema = z.object({
 	status: z.literal('ok'),
 	timestamp: z.iso.datetime(),

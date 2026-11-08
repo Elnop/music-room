@@ -13,7 +13,6 @@ export type BeaconScanStatus = 'checking' | 'needs-permission' | 'off' | 'unsupp
 
 interface BeaconScan {
 	status: BeaconScanStatus;
-	/** Heard Zumik beacons by minor. */
 	sightings: ReadonlyMap<number, BeaconSighting>;
 	requestPermission: () => void;
 }

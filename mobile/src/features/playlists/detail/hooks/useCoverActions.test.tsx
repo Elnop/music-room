@@ -42,7 +42,6 @@ function setup() {
 	return renderHook(() => useCoverActions(navigation, ID, true)).result;
 }
 
-/** The buttons of the last Alert. */
 const alertButtons = () =>
 	(jest.mocked(Alert.alert).mock.calls.at(-1)?.[2] ?? []) as {
 		text: string;

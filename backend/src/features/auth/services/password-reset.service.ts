@@ -31,7 +31,7 @@ async function storeResetCode(userId: string, code: string): Promise<void> {
 }
 
 export async function requestPasswordReset(email: string, ip: string): Promise<void> {
-	// Hourly limit and resend cooldown, whether the email exists or not.
+	// Counted whether the email exists or not: no account enumeration.
 	await passwordResetLimit.consumeRequest(email, ip);
 
 	const userId = await findAuthUserIdByEmail(email);
@@ -44,8 +44,7 @@ export async function requestPasswordReset(email: string, ip: string): Promise<v
 		return;
 	}
 
-	// An account without a password (Google or Facebook only) also gets a code:
-	// resetting adds email/password sign-in to it.
+	// A Google- or Facebook-only account gets a code too: resetting adds a password to it.
 	const code = crypto.randomInt(100000, 999999).toString();
 	await storeResetCode(userId, code);
 
@@ -84,14 +83,12 @@ export async function resetPassword(
 	}
 
 	const resetCode = profile.password_reset_code;
-	const expiresAt = profile.password_reset_code_expires_at;
 
 	if (!resetCode) {
 		throw new AppError(400, 'Invalid or expired reset code', 'INVALID_RESET_CODE');
 	}
 
-	const expirationDate = new Date(expiresAt as string);
-	if (expirationDate < new Date()) {
+	if (new Date(profile.password_reset_code_expires_at as string) < new Date()) {
 		throw new AppError(400, 'Reset code has expired', 'RESET_CODE_EXPIRED');
 	}
 
@@ -101,21 +98,19 @@ export async function resetPassword(
 		throw new AppError(400, 'Invalid reset code', 'INVALID_RESET_CODE');
 	}
 
-	// Supabase Auth deletes every session when an admin sets the password, so stolen tokens stop
-	// working (tested in password-reset-sessions.int.test.ts).
+	// Supabase deletes every session when an admin sets the password: stolen tokens stop working.
 	const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
 		password: newPassword,
 	});
 
 	if (updateError) {
 		logger.error('Failed to update password', {
-			userId: userId,
+			userId,
 			error: updateError,
 		});
 		throw new AppError(500, 'Failed to update password', 'PASSWORD_UPDATE_ERROR');
 	}
 
-	// The account now has a password, even if it was Google or Facebook only.
 	const clearData: UserProfileUpdate = {
 		password_reset_code: null,
 		password_reset_code_expires_at: null,
@@ -129,15 +124,14 @@ export async function resetPassword(
 
 	if (clearError) {
 		logger.error('Failed to clear reset code and set has_password', {
-			userId: userId,
+			userId,
 			error: clearError.message,
 		});
-		// The password is set but has_password would stay false: fail so the client
-		// retries (the code is still stored) instead of leaving the account wrong.
+		// Fail so the client retries (the code is still stored) rather than leave has_password false.
 		throw new AppError(500, 'Failed to update password', 'PASSWORD_UPDATE_ERROR');
 	}
 
 	await attemptLimit.reset(attemptsKey);
 
-	logger.info('Password reset successful', { userId: userId });
+	logger.info('Password reset successful', { userId });
 }

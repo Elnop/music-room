@@ -70,7 +70,10 @@ export function PlayerProgressSlider({
 					{Array.from({ length: SEGMENTS }, (_, i) => (
 						<View
 							key={i}
-							style={[pixel.segment, { backgroundColor: i < lit ? colors.slider : colors.sliderBg }]}
+							style={[
+								pixel.segment,
+								{ backgroundColor: i < lit ? colors.slider : colors.sliderBg },
+							]}
 						/>
 					))}
 				</View>

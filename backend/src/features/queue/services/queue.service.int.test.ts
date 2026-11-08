@@ -43,7 +43,6 @@ async function addItems(n: number, user = userId): Promise<string[]> {
 
 const ids = (state: QueueState) => state.items.map(item => item.id);
 
-// Ranks unique and in byte order, matching the item order.
 function expectRanked(state: QueueState) {
 	const ranks = state.items.map(item => item.rank);
 	expect(new Set(ranks).size).toBe(ranks.length);
@@ -391,7 +390,6 @@ describe('play a playlist', () => {
 		await createProfile(ownerId);
 	});
 
-	/** A playlist of n tracks added through the playlist services; returns its id and track URIs. */
 	async function createPlaylist(
 		n: number,
 		visibility: 'public' | 'private' = 'public'

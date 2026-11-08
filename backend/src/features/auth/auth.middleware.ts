@@ -37,7 +37,6 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
 			return sendError(req, res, new AppError(401, 'No token provided', 'NO_TOKEN'));
 		}
 
-		// Supabase is not called once this IP failed too often (429).
 		const user = await verifyTokenLimited(token, requestIp(req), sessionService.verifyToken);
 
 		(req as AuthenticatedRequest).user = user;
@@ -61,7 +60,7 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
 			);
 		}
 
-		// Keep an AppError (503 REVOCATION_UNAVAILABLE); anything else is 401.
+		// An AppError keeps its status: a revocation outage is a 503, not a 401.
 		if (error instanceof AppError) return sendError(req, res, error);
 		const err = error as Error & { code?: string };
 		return sendError(
@@ -86,13 +85,12 @@ export async function optionalAuthMiddleware(req: Request, res: Response, next: 
 			return next();
 		}
 
-		// A blocked IP continues anonymously, without calling Supabase.
 		const user = await verifyTokenLimited(token, requestIp(req), sessionService.verifyToken);
 		(req as AuthenticatedRequest).user = user;
 
 		next();
 	} catch {
-		// An invalid token continues anonymously too.
+		// A blocked IP or an invalid token continues anonymously.
 		next();
 	}
 }

@@ -9,12 +9,11 @@ import type { Theme } from '@/shared/theme/types';
 import { Text } from '@/shared/components/ui/Text';
 
 interface SidebarAccountProps {
-	/** The profile tab is shown: the account takes the active tab's fill, as it replaces that tab. */
+	/** The account replaces the profile tab, so it takes the active tab's fill. */
 	active: boolean;
 	onPress: () => void;
 }
 
-/** The signed-in user at the foot of the desktop side bar, its only link to the profile. */
 export function SidebarAccount({ active, onPress }: SidebarAccountProps) {
 	const { theme } = useTheme();
 	const separator = useSeparatorColor();
@@ -61,7 +60,6 @@ const createStyles = (theme: Theme, separator: string) =>
 			gap: theme.spacing.sm,
 			paddingHorizontal: theme.spacing.sm,
 			paddingVertical: theme.spacing.sm,
-			// The side bar's tab items are rounded by the same radius.
 		},
 		active: {
 			backgroundColor: theme.colors.surfaceAlt,

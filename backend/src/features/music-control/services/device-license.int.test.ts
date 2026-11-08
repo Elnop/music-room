@@ -4,9 +4,6 @@ import { supabaseAdmin } from '@/shared/config/supabase.js';
 import * as deviceService from '@/features/music-control/services/device.service.js';
 import * as licenseService from '@/features/music-control/services/device-license.service.js';
 
-// Per-device licenses (story 4.4) against the local Supabase stack: devices
-// and device_control_licenses (015), follows (mutual friendship).
-
 async function createUser(): Promise<string> {
 	const { data, error } = await supabaseAdmin.auth.admin.createUser({
 		email: `int-${randomUUID()}@example.com`,
@@ -179,7 +176,7 @@ describe('device licenses (story 4.4)', () => {
 	});
 
 	it('answers the empty shape when not mutual friends, despite a stale switch or license', async () => {
-		// carol follows alice, so the 015 foreign key allows a license row.
+		// carol follows alice, so the foreign key allows a license row.
 		const { error } = await supabaseAdmin
 			.from('device_control_licenses')
 			.insert({ owner_id: alice, device_id: tablet, grantee_id: carol });

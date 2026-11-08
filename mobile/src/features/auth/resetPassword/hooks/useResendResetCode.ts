@@ -3,12 +3,10 @@ import { showError, showSuccess } from '@/shared/utils/toast';
 import { useCountdown } from '@/features/auth/code/hooks/useCountdown';
 import type { useForgotPasswordMutation } from '@/features/auth/hooks/usePasswordResetMutations';
 
-/** Wait before another code may be sent, in seconds. */
 const RESEND_COOLDOWN_S = 60;
 
 interface ResendResetCode {
 	resend: () => Promise<void>;
-	/** Seconds before the code may be sent again; 0 when it may. */
 	cooldown: number;
 }
 

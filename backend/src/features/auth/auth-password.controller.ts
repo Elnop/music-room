@@ -10,7 +10,6 @@ import { requestIp } from '@/shared/security/request-ip.js';
 import { logger } from '@/shared/utils/logger.js';
 import { sendSuccess } from '@/shared/utils/send-success.js';
 
-/** Same answer whether the email exists or not. */
 export async function forgotPassword(req: Request, res: Response) {
 	const { email } = forgotPasswordSchema.parse(req.body);
 	const ip = requestIp(req);

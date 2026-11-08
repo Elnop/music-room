@@ -9,7 +9,6 @@ import { detectImageType } from '@/shared/storage/image-type.js';
 const OBJECT_NAME = /^[0-9a-f-]{36}\.(jpg|png|webp)$/;
 
 // The host is not compared, as the local stack has several addresses: the folder restricts deletion.
-/** The object path when `url` is a file this backend stored in `bucket` under `folder`, else null. */
 export function storedImagePath(
 	url: string | null | undefined,
 	bucket: string,
@@ -32,7 +31,7 @@ export function storedImagePath(
 	return path;
 }
 
-/** Best effort: a leftover file must not fail a change already saved. Never throws. */
+/** Best effort: a leftover file must not fail a change already saved. */
 export async function removeStoredImage(
 	bucket: string,
 	path: string,
@@ -51,7 +50,6 @@ export async function removeStoredImage(
 	}
 }
 
-/** Checks the type from the bytes (400 INVALID_IMAGE), then stores the file under a random name. */
 export async function storeImage(
 	bucket: string,
 	folder: string,

@@ -37,9 +37,7 @@ export interface ApiResponse<T = unknown> {
 		message: string;
 		code?: string;
 		details?: unknown;
-		/** Sent in development and test only. */
 		why?: string;
-		/** Sent in development and test only. */
 		fix?: string;
 	};
 	meta?: {

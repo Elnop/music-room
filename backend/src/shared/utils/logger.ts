@@ -3,8 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// The only backend code allowed to touch `console`. Every entry is a JSON line in backend/logs/app.log;
-// the console gets readable text in development and the same JSON line elsewhere.
+// The only backend module allowed to call `console`.
 
 type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 
@@ -28,7 +27,6 @@ function writeToFile(logEntry: Record<string, unknown>): void {
 	try {
 		fs.appendFileSync(logFilePath, JSON.stringify(logEntry) + '\n', 'utf8');
 	} catch (error) {
-		// Never block the application on a failed file write; say so in development.
 		if (env.NODE_ENV === 'development') {
 			console.error('Failed to write to log file:', error);
 		}

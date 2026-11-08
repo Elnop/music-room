@@ -12,15 +12,13 @@ import expo.modules.kotlin.exception.CodedException
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 
-// Broadcasts one non-connectable advertisement holding the manufacturer data given by JS.
-// The iBeacon frame (UUID, major, minor, measured power) is built in TypeScript.
+// The iBeacon frame is built in TypeScript: this only broadcasts it as manufacturer data.
 class BeaconAdvertiserModule : Module() {
   private var callback: AdvertiseCallback? = null
 
   override fun definition() = ModuleDefinition {
     Name("BeaconAdvertiser")
 
-    // "unsupported" (no BLE advertising on this phone), "off" (Bluetooth disabled) or "on".
     Function("getState") {
       val adapter = adapter() ?: return@Function "unsupported"
       if (!adapter.isEnabled) return@Function "off"

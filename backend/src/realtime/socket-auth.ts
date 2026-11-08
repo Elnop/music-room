@@ -7,8 +7,7 @@ import * as deviceService from '@/features/music-control/services/device.service
 import { socketLogger } from '@/shared/middleware/socket-logger.middleware.js';
 import { clientIp } from '@/shared/config/trust-proxy.js';
 
-// Identity comes only from the verified token, checked once at the handshake. Socket.io does not
-// retry a refusal, so the client retries DEVICE_REGISTRATION_FAILED itself.
+// Socket.io never retries a refused handshake: the client retries DEVICE_REGISTRATION_FAILED itself.
 
 const handshakeAuthSchema = z.object({
 	token: z.string().min(1),
@@ -91,8 +90,7 @@ export async function authenticateSocket(
 
 	const device: DeviceInfo = { deviceId, deviceName, platform, model };
 	try {
-		// The stored device keeps the system name; the socket carries the name
-		// to show, the owner's custom one when set.
+		// The stored row keeps the system name; the socket carries the custom one when set.
 		device.deviceName = await deviceService.recordConnection(user.id, device);
 	} catch {
 		// device.service has already logged the database error.

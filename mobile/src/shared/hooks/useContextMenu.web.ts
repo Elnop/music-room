@@ -3,7 +3,7 @@ import type { ContextMenuProps } from './useContextMenu';
 
 export type { ContextMenuProps } from './useContextMenu';
 
-// The project compiles without the DOM library, so the parts of the events read here are typed.
+// The project compiles without the DOM library, so the events are typed here.
 interface BrowserElement {
 	getBoundingClientRect(): { left: number; top: number; width: number; height: number };
 }
@@ -24,14 +24,12 @@ interface BrowserKeyEvent extends BrowserEvent {
 	shiftKey: boolean;
 }
 
-/** The keys of the browser's own context menu, on the element that has the focus. */
 const isMenuKey = (event: BrowserKeyEvent) =>
 	event.key === 'ContextMenu' || (event.key === 'F10' && event.shiftKey);
 
-/** No menu, no handler: the browser keeps its own menu. */
+/** No handler: the browser keeps its own menu. */
 const NONE: ContextMenuProps = {};
 
-/** The item's menu opens at the pointer, or under the focused row, instead of the browser's menu. */
 export function useContextMenu(onOpen: (() => void) | undefined): ContextMenuProps {
 	if (!onOpen) return NONE;
 
@@ -53,7 +51,6 @@ export function useContextMenu(onOpen: (() => void) | undefined): ContextMenuPro
 	};
 }
 
-/** On an open menu and its backdrop, a right click closes the menu rather than open the browser's. */
 export function useContextMenuDismiss(onClose: () => void): ContextMenuProps {
 	return {
 		onContextMenu: (event: BrowserEvent) => {

@@ -15,7 +15,6 @@ interface SearchBarProps {
 	placeholder?: string;
 	style?: StyleProp<ViewStyle>;
 	autoFocus?: boolean;
-	/** Shows a spinner in the field while a search runs. */
 	loading?: boolean;
 	inputRef?: React.Ref<TextInput>;
 }

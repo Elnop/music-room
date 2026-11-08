@@ -3,7 +3,7 @@ import * as events from '@/features/events/events.controller.js';
 import * as geocode from '@/features/events/events-geocode.controller.js';
 import { eventRateLimiter, geocodeRateLimiter } from '@/shared/security/http-rate-limit.js';
 
-/** `auth` is authMiddleware, passed in by app/routes.ts since a feature never imports another one. */
+/** Takes authMiddleware as a parameter: a feature never imports another one. */
 export function createEventsRouter(auth: RequestHandler): Router {
 	const router = Router();
 

@@ -564,7 +564,6 @@ describe('PlayerProvider audio interruptions (#310)', () => {
 		const state = usePlayerStore.getState();
 		expect(state.playbackState).toBe('playing');
 		expect(state.pausedBySystem).toBe(false);
-		// The player resumed itself at its position: no reload, no seek.
 		expect(mockApiRequest).toHaveBeenCalledTimes(1);
 		expect(u1.seekTo).not.toHaveBeenCalled();
 	});

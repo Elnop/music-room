@@ -16,7 +16,7 @@ export interface ThemeColors {
 
 	border: string;
 	borderLight: string;
-	/** Separators of wide screens, quieter than `borderLight`. */
+	/** Quieter than `borderLight`, for wide-screen separators. */
 	borderSubtle: string;
 
 	error: string;
@@ -25,10 +25,9 @@ export interface ThemeColors {
 	info: string;
 	/** Friends and the other people of a playlist. */
 	people: string;
-	/** The night-green screen of the nearby events radar. */
 	radar: string;
 
-	// Fixed across themes (FIXED_COLORS in tokens.ts)
+	// FIXED_COLORS: the same in every theme.
 	divider: string;
 	googleSurface: string;
 	googleBorder: string;

@@ -11,10 +11,8 @@ interface ActionSheetRowProps {
 	icon: PixelSpriteName;
 	label: string;
 	onPress: () => void;
-	/** A second line under the label. */
 	detail?: string;
 	destructive?: boolean;
-	/** Leads to another step of the sheet. */
 	chevron?: boolean;
 }
 

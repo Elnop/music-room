@@ -7,7 +7,6 @@ import type { FriendPlaylists } from '@/features/playlists/types';
 import { playlistCardLabel } from '@/features/playlists/home/utils/playlistLabels';
 import { PlaylistCassette } from './PlaylistCassette';
 
-/** Width of a card; the playlists screen's skeleton uses it too. */
 export const FRIEND_CARD_WIDTH = 120;
 
 interface FriendPlaylistCarouselProps {

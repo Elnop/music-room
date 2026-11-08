@@ -15,8 +15,6 @@ import { sendSuccess } from '@/shared/utils/send-success.js';
 import * as accountLockout from '@/shared/security/account-lockout.js';
 import * as ipReputation from '@/shared/security/ip-reputation.js';
 
-// No try/catch: Express 5 forwards rejected promises to the shared error handler.
-
 export async function register(req: Request, res: Response) {
 	const validated = registerSchema.parse(req.body);
 	const result = await registrationService.register(validated);
@@ -24,7 +22,7 @@ export async function register(req: Request, res: Response) {
 	sendSuccess(res, result, 201);
 }
 
-/** Every failure, a validation error included, counts toward the account lockout; a success resets it. */
+/** Any failure, even a validation error, counts toward the account lockout. */
 export async function login(req: Request, res: Response) {
 	const body = req.body as { email?: string } | undefined;
 	const email = body?.email || 'unknown';

@@ -9,7 +9,6 @@ const UPSTREAM_PREFIX = 'rl:upstream:';
 
 interface SlotOptions {
 	intervalMs: number;
-	/** How long a request may queue for a slot before getting a 429. */
 	maxWaitMs: number;
 }
 
@@ -31,7 +30,7 @@ async function hit(key: string, intervalMs: number): Promise<counter.CounterStat
 	}
 }
 
-/** Resolves once this caller owns the upstream's slot: the hit that opens a new window wins. */
+/** The hit that opens a new window owns the slot; the others wait for the next one. */
 export async function takeUpstreamSlot(upstream: string, options: SlotOptions): Promise<void> {
 	if (!counter.isReady()) throw unavailable();
 	const key = UPSTREAM_PREFIX + upstream;

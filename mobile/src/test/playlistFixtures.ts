@@ -1,7 +1,6 @@
 import type { PlaylistWithTracks } from '@/features/playlists/types';
 import type { TrackInPlaylist } from '@/types/track.types';
 
-/** A track of a playlist, ranked `rank`. */
 export const playlistTrack = (id: string, rank: string, trackUri = id): TrackInPlaylist => ({
 	id,
 	rank,
@@ -16,7 +15,6 @@ export const playlistTrack = (id: string, rank: string, trackUri = id): TrackInP
 	addedAt: '',
 });
 
-/** A playlist as `GET /api/playlists/:id` returns it. */
 export const playlistWithTracks = (
 	overrides: Partial<PlaylistWithTracks> = {}
 ): PlaylistWithTracks => ({

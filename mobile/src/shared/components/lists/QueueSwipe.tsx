@@ -11,13 +11,10 @@ const QUEUE_ACTION_WIDTH = 100;
 
 interface QueueSwipeProps {
 	children: React.ReactNode;
-	/** Called once when the row is swiped right past the threshold; shows the queue panel. */
 	onAddToQueue?: () => void;
-	/** Panel revealed by a left swipe (e.g. delete); none when omitted. */
 	renderRightActions?: () => React.ReactNode;
 }
 
-/** A right swipe adds to the queue once fully open, then springs back; a release before the threshold sends nothing. */
 export function QueueSwipe({ children, onAddToQueue, renderRightActions }: QueueSwipeProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);

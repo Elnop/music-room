@@ -297,7 +297,6 @@ describe('queueStore concurrent steps', () => {
 		expect(mine().currentItemId).toBe('b');
 		expect(player().queueItemId).toBe('b');
 
-		// The flag is cleared: a later step goes through.
 		api.next.mockResolvedValue({ ok: true, state: queue('c') });
 		await expect(store().next()).resolves.toBe('played');
 		expect(player().queueItemId).toBe('c');

@@ -15,7 +15,6 @@ interface Located extends Coordinates {
 
 export interface EventPlace {
 	isLocating: boolean;
-	/** Fills the address from the phone's position. */
 	locateHere: () => void;
 	/** The coordinates of `address`, or null after telling the user why there are none. */
 	resolve: (address: string) => Promise<Coordinates | null>;

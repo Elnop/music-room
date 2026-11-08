@@ -1,6 +1,5 @@
 import type { DeviceInfo } from '@/shared/services/deviceService';
 
-/** One device's status, as `listening:status` carries it (backend `music-control.types.ts`). */
 export interface ListeningStatus {
 	ownerId: string;
 	device: DeviceInfo;
@@ -12,7 +11,7 @@ export interface ListeningStatus {
 		artworkUrl: string | null;
 	} | null;
 	isPlaying: boolean;
-	/** Playback position when the status was sent, in ms; null from older clients. */
+	/** When the status was sent; null from older clients. */
 	positionMs: number | null;
 	updatedAt: string;
 }

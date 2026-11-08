@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { deviceStorage } from './deviceStorage';
 import { getDeviceName, getModelName } from './deviceIdentity';
 
-/** Single source for the `X-App-Version` header and the Socket.io handshake. */
 export function getAppVersion(): string {
 	return (
 		Constants?.expoConfig?.version ||
@@ -15,8 +14,7 @@ export function getAppVersion(): string {
 	);
 }
 
-// e.g. `Zumik 1.0.0 (build 42 · a1b2c3d)`: release-apk.yml sets the build number and
-// commit SHA before bundling; a local build has neither and reads `dev`.
+// release-apk.yml sets the build number and commit SHA; a local build has neither.
 export function formatBuildLabel(version: string, buildNumber?: string, commit?: string): string {
 	if (!buildNumber) return `Zumik ${version} (dev)`;
 	return commit
@@ -39,7 +37,6 @@ export interface DeviceInfo {
 	model: string;
 }
 
-/** The deviceId persists in deviceStorage so it stays the same across app restarts. */
 export const deviceService = {
 	async getDeviceInfo(): Promise<DeviceInfo> {
 		let deviceId = await deviceStorage.getDeviceId();

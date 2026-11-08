@@ -7,7 +7,6 @@ import { Text } from '@/shared/components/ui/Text';
 
 interface ToggleCardProps {
 	label: string;
-	/** What the current value means. */
 	description: string;
 	value: boolean;
 	onValueChange: (value: boolean) => void;

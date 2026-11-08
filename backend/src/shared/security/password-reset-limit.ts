@@ -13,13 +13,11 @@ function resendKey(email: string, ip: string): string {
 	return `password_reset_resend:${email.trim().toLowerCase()}:${ip}`;
 }
 
-/** 429 RATE_LIMIT_EXCEEDED past the hourly limit, then starts the resend cooldown. */
 export async function consumeRequest(email: string, ip: string): Promise<void> {
 	await attemptLimit.incrementAndCheck(requestKey(email, ip), HOURLY);
 	await attemptLimit.increment(resendKey(email, ip), COOLDOWN);
 }
 
-/** If refused, the real time left (Redis TTL) of whichever limit blocks it. */
 export async function status(
 	email: string,
 	ip: string

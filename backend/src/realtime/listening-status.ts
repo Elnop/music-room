@@ -7,7 +7,6 @@ import { getIO, listeningStatuses } from '@/realtime/state.js';
 
 const LISTENING_UPDATE_THROTTLE_MS = 1000;
 
-/** Leading + trailing throttle of listening:update, per device. */
 export const listeningUpdateThrottle = createLatestThrottle(LISTENING_UPDATE_THROTTLE_MS);
 
 export function getUserListeningStatus(userId: string): UserListeningStatus {
@@ -75,13 +74,8 @@ export function applyListeningUpdate(
 	broadcastUserListeningStatus(userId);
 }
 
-/** Forget a disconnected device's status, dropping the user when none is left. */
 export function removeDeviceStatus(userId: string, deviceId: string): void {
 	const userDevices = listeningStatuses.get(userId);
-	if (userDevices) {
-		userDevices.delete(deviceId);
-		if (userDevices.size === 0) {
-			listeningStatuses.delete(userId);
-		}
-	}
+	userDevices?.delete(deviceId);
+	if (userDevices?.size === 0) listeningStatuses.delete(userId);
 }

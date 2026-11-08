@@ -41,7 +41,6 @@ function playlistRoomError(
 type PlaylistLookup =
 	{ status: 'found'; playlist: PlaylistRow } | { status: 'not_found' } | { status: 'error' };
 
-/** Tells a missing row apart from a failed lookup (logged). */
 async function loadPlaylist(playlistId: string): Promise<PlaylistLookup> {
 	try {
 		const { data, error } = await supabaseAdmin
@@ -72,7 +71,6 @@ export async function authorizePlaylistJoin(
 
 	const id = parsed.data;
 	const lookup = await loadPlaylist(id);
-	// A failed lookup is answered as not found (the error is logged).
 	if (lookup.status !== 'found') {
 		return { ok: false, ...playlistRoomError(id, 'PLAYLIST_NOT_FOUND') };
 	}
@@ -82,7 +80,6 @@ export async function authorizePlaylistJoin(
 	return { ok: true, playlistId: id };
 }
 
-/** Sockets without access leave and get `playlist:error`; none leave when the lookup failed. Never throws. */
 export async function revalidatePlaylistRoom(
 	io: AppSocketServer,
 	playlistId: string

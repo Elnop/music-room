@@ -14,7 +14,6 @@ import type {
 	PlaylistWithTracksResponse,
 } from '@/features/playlists/playlist.types.js';
 
-/** The playlist with its tracks ordered by rank; 403 when the user cannot view it. */
 export async function getPlaylistById(
 	playlistId: string,
 	userId?: string

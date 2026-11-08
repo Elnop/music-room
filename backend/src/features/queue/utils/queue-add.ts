@@ -5,7 +5,6 @@ import type { QueueState } from '@/features/queue/queue.types.js';
 
 interface QueueAddResult {
 	state: QueueState;
-	/** 'add-next' once the new item was moved after the current one, else 'add'. */
 	operation: 'add' | 'add-next';
 }
 
@@ -15,18 +14,17 @@ export async function addTrackToQueue(
 	track: TrackUpsertInput,
 	next = false
 ): Promise<QueueAddResult> {
-	// previewUrl is a stream URL: never persisted from a queue add.
+	// previewUrl is a stream URL: never persisted.
 	const trackRow = await upsertTrack({ ...track, previewUrl: undefined });
 	const added = await addQueueItemRpc(ownerId, trackRow.id);
 	if (!next) return { state: added, operation: 'add' };
-	// The add appends: the new item is the last one.
-	const item = added.items[added.items.length - 1];
+	const appendedItem = added.items[added.items.length - 1];
 	try {
-		return { state: await moveQueueItemRpc(ownerId, item.id, null), operation: 'add-next' };
+		return { state: await moveQueueItemRpc(ownerId, appendedItem.id, null), operation: 'add-next' };
 	} catch (error) {
 		logger.warn('Queue add-next: move refused, item left at the end', {
 			ownerId,
-			itemId: item.id,
+			itemId: appendedItem.id,
 			error: error instanceof Error ? error.message : String(error),
 		});
 		return { state: added, operation: 'add' };

@@ -4,8 +4,6 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { MoveTrackInput } from '@/features/playlists/playlist.validators.js';
 
-// Turns the errors of the migration 016 track operations into API errors.
-
 const addResultSchema = z.object({
 	rank: z.string(),
 	tracksVersion: z.number().int(),

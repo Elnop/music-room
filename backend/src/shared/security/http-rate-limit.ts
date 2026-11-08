@@ -8,7 +8,6 @@ import { createRateLimitStore } from '@/shared/security/rate-limit-store.js';
 import { requestIp } from '@/shared/security/request-ip.js';
 
 // Fail closed with 503 RATE_LIMIT_UNAVAILABLE while Redis is down, never in memory.
-// Skipped when RATE_LIMIT_ENABLED=false and for RATE_LIMIT_WHITELIST_IPS.
 interface LimiterSpec {
 	/** Redis keys are `rl:<store>:<key>`. */
 	store: string;
@@ -45,8 +44,8 @@ function skip(req: Request): boolean {
 
 function createLimiter(spec: LimiterSpec) {
 	return rateLimit({
-		standardHeaders: true, // `RateLimit-*` headers
-		legacyHeaders: false, // no `X-RateLimit-*` headers
+		standardHeaders: true,
+		legacyHeaders: false,
 		windowMs: spec.limits.windowMs,
 		max: spec.limits.max,
 		skip,
@@ -65,6 +64,7 @@ if (!rateLimitConfig.enabled) {
 }
 
 const emailOf = (req: Request) => (req.body as { email?: string } | undefined)?.email;
+// Per-user limiters run after authMiddleware, which sets req.user.
 const userIdOf = (req: Request) => (req as AuthenticatedRequest).user.id;
 const isGoogle = (req: Request) => req.path.includes('google');
 const signInFields = (req: Request) => ({
@@ -74,7 +74,6 @@ const signInFields = (req: Request) => ({
 });
 const perUserFields = (req: Request) => ({ endpoint: req.path, userId: userIdOf(req), ip: req.ip });
 
-/** Failed attempts only, per email and IP. */
 export const loginRateLimiter = createLimiter({
 	store: 'auth:login',
 	limits: rateLimitConfig.login,
@@ -85,7 +84,6 @@ export const loginRateLimiter = createLimiter({
 	logFields: req => ({ ...signInFields(req), remainingAttempts: 0 }),
 });
 
-/** Per IP. */
 export const registerRateLimiter = createLimiter({
 	store: 'auth:register',
 	limits: rateLimitConfig.register,
@@ -95,7 +93,6 @@ export const registerRateLimiter = createLimiter({
 	logFields: signInFields,
 });
 
-/** Per provider and IP. */
 export const oauthRateLimiter = createLimiter({
 	store: 'auth:oauth',
 	limits: rateLimitConfig.oauth,
@@ -110,7 +107,7 @@ export const oauthRateLimiter = createLimiter({
 	}),
 });
 
-/** Safety net on every /api/auth/* route, per IP. */
+/** Safety net mounted on every /api/auth/* route. */
 export const globalAuthRateLimiter = createLimiter({
 	store: 'auth:global',
 	limits: rateLimitConfig.global,
@@ -120,7 +117,6 @@ export const globalAuthRateLimiter = createLimiter({
 	logFields: req => ({ endpoint: req.path, ip: req.ip, userAgent: req.get('user-agent') }),
 });
 
-/** Per signed-in user; after authMiddleware. */
 export const soundcloudRateLimiter = createLimiter({
 	store: 'soundcloud',
 	limits: rateLimitConfig.soundcloud,
@@ -130,7 +126,6 @@ export const soundcloudRateLimiter = createLimiter({
 	logFields: perUserFields,
 });
 
-/** Per signed-in user; after authMiddleware. */
 export const avatarRateLimiter = createLimiter({
 	store: 'profile:avatar',
 	limits: rateLimitConfig.avatar,
@@ -140,7 +135,6 @@ export const avatarRateLimiter = createLimiter({
 	logFields: perUserFields,
 });
 
-/** Per signed-in user; after authMiddleware. */
 export const playlistCoverRateLimiter = createLimiter({
 	store: 'playlists:cover',
 	limits: rateLimitConfig.playlistCover,
@@ -150,7 +144,6 @@ export const playlistCoverRateLimiter = createLimiter({
 	logFields: perUserFields,
 });
 
-/** Per signed-in user; after authMiddleware. */
 export const subscriptionRateLimiter = createLimiter({
 	store: 'subscription',
 	limits: rateLimitConfig.subscription,
@@ -160,7 +153,6 @@ export const subscriptionRateLimiter = createLimiter({
 	logFields: perUserFields,
 });
 
-/** Writes only (create, update, delete), per signed-in user; after authMiddleware. */
 export const eventRateLimiter = createLimiter({
 	store: 'events',
 	limits: rateLimitConfig.events,
@@ -170,7 +162,6 @@ export const eventRateLimiter = createLimiter({
 	logFields: perUserFields,
 });
 
-/** Address lookups, per signed-in user; after authMiddleware. */
 export const geocodeRateLimiter = createLimiter({
 	store: 'events:geocode',
 	limits: rateLimitConfig.geocode,

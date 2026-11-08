@@ -5,7 +5,6 @@ import { useSession } from '@/shared/services/authSession';
 import { subscriptionApi } from '@/shared/services/subscriptionApi';
 import type { Plan, Subscription } from '@/shared/types/subscription';
 
-/** `enabled: false` skips the request on a screen that only needs the plan sometimes. */
 export function usePlan({ enabled = true }: { enabled?: boolean } = {}) {
 	const authenticated = useSession(s => s.isAuthenticated);
 	const query = useQuery({
@@ -17,7 +16,6 @@ export function usePlan({ enabled = true }: { enabled?: boolean } = {}) {
 	return { ...query, plan: query.data?.plan, isPremium: query.data?.plan === 'premium' };
 }
 
-/** Optimistic: the cached plan changes at once and comes back on failure. */
 export function useChangePlan() {
 	const queryClient = useQueryClient();
 	const key = queryKeys.subscription.plan();

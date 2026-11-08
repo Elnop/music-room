@@ -8,7 +8,6 @@ import {
 
 type PlaylistActionsSheetProps = Omit<PlaylistActionsViewProps, 'onDismiss' | 'anchor'>;
 
-/** Each action closes the sheet first (see useDeferredSheetAction). */
 export function PlaylistActionsSheet(props: PlaylistActionsSheetProps) {
 	const { run, onDismiss } = useDeferredSheetAction(props.onClose);
 	const anchor = useMenuAnchor(props.visible);

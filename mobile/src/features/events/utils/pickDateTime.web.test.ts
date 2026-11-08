@@ -60,7 +60,6 @@ afterEach(() => {
 	delete (globalThis as { document?: unknown }).document;
 });
 
-/** Opens the picker and returns its dialog, its field, and a way to close it. */
 function open(current: Date) {
 	const picked = pickDateTime(current);
 	const [dialog] = body.children;

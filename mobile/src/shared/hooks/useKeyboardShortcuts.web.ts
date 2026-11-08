@@ -5,7 +5,7 @@ import {
 	type ShortcutKeyEvent,
 } from '@/shared/utils/keyboardShortcuts';
 
-// The project compiles without the DOM library, so the parts of the document read here are typed.
+// The project compiles without the DOM library, so the document is typed here.
 interface BrowserKeyEvent extends ShortcutKeyEvent {
 	defaultPrevented: boolean;
 	preventDefault(): void;

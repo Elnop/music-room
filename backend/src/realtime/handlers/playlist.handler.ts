@@ -35,9 +35,7 @@ async function joinPlaylistRoom(socket: AppSocket, payload: unknown): Promise<vo
 }
 
 export function registerPlaylistHandlers(socket: AppSocket): void {
-	// join awaits a DB lookup while leave does not: run this socket's
-	// join/leave events one after another, in arrival order, so a quick
-	// join(A) + leave(A) never ends with the socket in the room.
+	// In arrival order: join awaits the DB, so a quick join(A) + leave(A) could end in the room.
 	const enqueue = createSocketQueue(socket, 'playlist_room_task_failed');
 
 	socket.on('playlist:join', (payload: unknown) => {

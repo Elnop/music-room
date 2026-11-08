@@ -8,7 +8,7 @@ import { connectRedis, disconnectRedis, isRedisConnected } from '@/shared/config
 import { errorHandler } from '@/shared/middleware/error-handler.js';
 import friendsRoutes from '@/features/friends/friends.routes.js';
 
-// Real users, tokens and `follows` rows; every test starts with no follows between A, B, C.
+// Every test starts with no follows between A, B and C.
 
 interface TestUser {
 	id: string;
@@ -53,7 +53,7 @@ async function createUser(): Promise<TestUser> {
 		.insert({ id, username });
 	if (profileError) throw profileError;
 
-	// Sign in with the anon client, never the admin one.
+	// Never the admin client: signing in would replace its service-role session.
 	const { data: session, error: signInError } = await supabaseAnon.auth.signInWithPassword({
 		email,
 		password: PASSWORD,

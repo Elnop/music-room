@@ -1,6 +1,5 @@
 import type { VisibilityLevel } from '@/features/profile/profile.types.js';
 
-/** The owner sees every field. */
 export function isFieldVisible(
 	visibility: VisibilityLevel,
 	isOwnProfile: boolean,

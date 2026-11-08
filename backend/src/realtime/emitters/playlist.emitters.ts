@@ -11,8 +11,6 @@ import {
 } from '@/realtime/playlist-room.js';
 import { getIO } from '@/realtime/state.js';
 
-// Each call is a no-op (logged) before socket-server.ts initialize().
-
 type PlaylistEvent =
 	| 'playlist:updated'
 	| 'playlist:details'
@@ -69,7 +67,6 @@ export function notifyPlaylistDeleted(payload: PlaylistDeletedPayload): void {
 	emitToPlaylistRoom('playlist:deleted', 'playlist_deleted', payload);
 }
 
-/** Evicts sockets that lost access (see playlist-room.ts). Never throws; no-op before initialize. */
 export async function revalidatePlaylistRoom(playlistId: string): Promise<void> {
 	const io = getIO();
 	if (!io) return;

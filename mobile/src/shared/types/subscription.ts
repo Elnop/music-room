@@ -1,4 +1,4 @@
-/** Mirrors `GET /api/subscription` (backend `features/subscription/subscription.validators.ts`). */
+/** Mirrors backend `features/subscription/subscription.validators.ts`. */
 export type Plan = 'free' | 'premium';
 
 export type PremiumFeature = 'playlist_cover';

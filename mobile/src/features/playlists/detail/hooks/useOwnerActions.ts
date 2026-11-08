@@ -12,7 +12,6 @@ interface OwnerActions {
 	closeSheet: () => void;
 	edit: () => void;
 	sharing: () => void;
-	/** Asks for confirmation, then deletes the playlist for all its members. */
 	remove: () => void;
 }
 

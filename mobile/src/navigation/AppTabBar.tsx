@@ -10,7 +10,7 @@ import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { SidebarAccount } from './SidebarAccount';
 
-/** The phone's mini-player sits on the bottom tab bar; the side bar of wide screens leaves the player to AppNavigator. */
+/** The phone's mini-player sits on the tab bar; wide screens leave the player to AppNavigator. */
 export function AppTabBar(props: BottomTabBarProps) {
 	const { breakpoint, isDesktop } = useBreakpoint();
 	const { theme } = useTheme();

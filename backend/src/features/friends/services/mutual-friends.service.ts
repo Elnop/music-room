@@ -9,7 +9,6 @@ function friendsError(log: string, error: unknown): AppError {
 	return new AppError(500, 'Failed to get friends', 'FRIENDS_ERROR');
 }
 
-/** The users `userId` follows who follow back, with their public profile. */
 export function getMutualFriends(userId: string): Promise<Friend[]> {
 	return failUnexpected(
 		async () => {

@@ -5,8 +5,7 @@ import { env } from '@/shared/config/env.js';
 import { createSignInClient, supabaseAdmin, supabaseAnon } from '@/shared/config/supabase.js';
 import type { Database } from '@/shared/types/supabase.generated.js';
 
-// The anon key ships in the app: neither it nor a user's token may read or write
-// the public tables directly through PostgREST; only the backend's service key does.
+// The anon key ships in the app: only the backend's service key may touch the public tables.
 
 const TABLES = ['user_profiles', 'follows', 'tracks', 'music_preferences', 'playlists'] as const;
 const PASSWORD = 'integration-test-password';
@@ -46,8 +45,6 @@ describe('no direct table access with the anon key (#201)', () => {
 			.insert({ id: targetId, username: `int_${targetId.slice(0, 8)}` });
 		if (targetProfileError) throw targetProfileError;
 
-		// Never sign in on the shared anon client: it would keep the session and the
-		// "anonymous" queries below would run as this user.
 		const { data: session, error: signInError } =
 			await createSignInClient().auth.signInWithPassword({
 				email,

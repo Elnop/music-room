@@ -62,7 +62,6 @@ export const controllableDevicesSchema = z.object({
 	devices: z.array(controllableDeviceSchema),
 });
 
-/** Me first, then friends by username. */
 export const devicePickerSchema = z.object({
 	owners: z.array(
 		z.object({

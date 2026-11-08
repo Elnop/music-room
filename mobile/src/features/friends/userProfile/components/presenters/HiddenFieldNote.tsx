@@ -5,7 +5,6 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import { createUserProfileHeaderStyles } from './userProfileHeaderStyles';
 import { Text } from '@/shared/components/ui/Text';
 
-/** Stands for a field the user's privacy settings hide from me. */
 export function HiddenFieldNote({ label }: { label: string }) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createUserProfileHeaderStyles(theme), [theme]);

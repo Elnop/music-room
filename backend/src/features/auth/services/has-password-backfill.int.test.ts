@@ -5,17 +5,13 @@ import { afterAll, describe, expect, it } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 import * as oauthUserService from '@/features/auth/services/oauth-user.service.js';
 
-// Migration 019 run again on rows from before has_password tracking, against the local Supabase stack.
-// scripts/test-db.sh already applied it once on an empty database; it is safe to rerun.
-
-// Database container started by scripts/test-db.sh (SUPABASE_PROJECT_ID there).
+// scripts/test-db.sh starts this container and already applied the migration once: it is rerunnable.
 const DB_CONTAINER = 'supabase_db_music-room-test';
 const MIGRATION = new URL(
 	'../../../../migrations/019_oauth_has_password_backfill.sql',
 	import.meta.url
 );
-// Before the migration's cutoff.
-const BEFORE_189 = '2026-09-01 00:00:00+00';
+const BEFORE_CUTOFF = '2026-09-01 00:00:00+00';
 
 const createdUserIds: string[] = [];
 
@@ -41,7 +37,7 @@ function psql(sql: string | Buffer): void {
 
 /** auth.users is not reachable through PostgREST. */
 function backdate(id: string): void {
-	psql(`UPDATE auth.users SET created_at = '${BEFORE_189}' WHERE id = '${id}';`);
+	psql(`UPDATE auth.users SET created_at = '${BEFORE_CUTOFF}' WHERE id = '${id}';`);
 }
 
 async function updateProfile(
@@ -62,7 +58,6 @@ async function hasPassword(id: string): Promise<boolean | null> {
 	return data.has_password;
 }
 
-/** An email/password sign-up, as register creates it (no oauth_provider metadata). */
 async function createPasswordUser(): Promise<string> {
 	const { data, error } = await supabaseAdmin.auth.admin.createUser({
 		email: `int-${randomUUID()}@example.com`,
@@ -83,7 +78,7 @@ async function createPasswordUser(): Promise<string> {
 	return id;
 }
 
-/** A Google or Facebook sign-up with has_password true. */
+/** has_password forced true: the state the migration repairs. */
 async function createOAuthUser(provider: 'google' | 'facebook'): Promise<string> {
 	const { userProfile } = await oauthUserService.createOAuthUser(
 		provider,
@@ -123,12 +118,12 @@ describe('migration 019: has_password backfill (#196)', () => {
 		const linked = await createPasswordUser();
 		await updateProfile(linked, { google_id: `google-${randomUUID()}` });
 		// Signed up after the cutoff (has_password false), then set a password by reset.
-		const resetAfter189 = await createOAuthUser('google');
+		const resetAfterCutoff = await createOAuthUser('google');
 
 		psql(readFileSync(MIGRATION));
 
 		expect(await hasPassword(password)).toBe(true);
 		expect(await hasPassword(linked)).toBe(true);
-		expect(await hasPassword(resetAfter189)).toBe(true);
+		expect(await hasPassword(resetAfterCutoff)).toBe(true);
 	});
 });

@@ -17,7 +17,6 @@ interface PlaylistWideHeaderProps {
 	onAddTrack: () => void;
 }
 
-/** The playlist's header on wide screens: the cover beside its title, details and actions. */
 export function PlaylistWideHeader({
 	playlist,
 	playButton,

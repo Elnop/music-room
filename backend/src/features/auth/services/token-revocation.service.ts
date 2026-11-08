@@ -6,8 +6,6 @@ import { logger } from '@/shared/utils/logger.js';
 const KEY_PREFIX = 'auth:revoked:';
 const MIN_TTL_SECONDS = 1;
 
-/** Stores SHA-256 hashes, never usable tokens. Fail-closed: without Redis, 503 REVOCATION_UNAVAILABLE. */
-
 export async function revoke(token: string): Promise<void> {
 	ensureRedis('revoke');
 	try {
@@ -32,11 +30,12 @@ function ensureRedis(operation: string): void {
 	}
 }
 
+/** A hash, so Redis never holds a usable token. */
 function keyFor(token: string): string {
 	return KEY_PREFIX + createHash('sha256').update(token).digest('hex');
 }
 
-/** No signature check: authMiddleware already verified the token. At least MIN_TTL_SECONDS. */
+/** No signature check: authMiddleware already verified the token. */
 function ttlFor(token: string): number {
 	const exp = readExp(token);
 	if (exp === undefined) return MIN_TTL_SECONDS;

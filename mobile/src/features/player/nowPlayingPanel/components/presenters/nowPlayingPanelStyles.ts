@@ -5,7 +5,6 @@ import { SPACING } from '@/shared/constants/app';
 
 const GUTTER = SPACING.md;
 
-/** The cover spans the panel, inside its gutters. */
 export const PANEL_ARTWORK_SIZE = NOW_PLAYING_PANEL_WIDTH - 2 * GUTTER;
 
 export const UP_NEXT_ARTWORK_SIZE = 40;

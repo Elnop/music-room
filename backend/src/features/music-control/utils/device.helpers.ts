@@ -4,7 +4,6 @@ import { logger } from '@/shared/utils/logger.js';
 import type { Tables } from '@/shared/types/supabase.generated.js';
 import type { Device, DeviceLicense } from '@/features/music-control/music-control.types.js';
 
-/** Columns of `devices` exposed through the API */
 export const DEVICE_COLUMNS = 'device_id, device_name, custom_name, platform, model, last_seen_at';
 
 type DeviceRow = Pick<
@@ -14,7 +13,6 @@ type DeviceRow = Pick<
 
 type LicenseUser = DeviceLicense['user'];
 
-/** `deviceName` is the owner's custom name, else the system name. */
 export function toDevice(row: DeviceRow): Device {
 	return {
 		deviceId: row.device_id,
@@ -25,7 +23,6 @@ export function toDevice(row: DeviceRow): Device {
 	};
 }
 
-/** Throws 500 with `code` after logging a failed query */
 export function failQuery(
 	message: string,
 	code: string,
@@ -36,10 +33,6 @@ export function failQuery(
 	throw new AppError(500, message, code);
 }
 
-/**
- * Returns the owner's device, or throws 404 DEVICE_NOT_FOUND when deviceId is
- * not one of their devices (unknown or owned by someone else).
- */
 export async function findOwnedDevice(ownerId: string, deviceId: string): Promise<DeviceRow> {
 	const { data, error } = await supabaseAdmin
 		.from('devices')
@@ -55,7 +48,6 @@ export async function findOwnedDevice(ownerId: string, deviceId: string): Promis
 	return data;
 }
 
-/** Public profile fields of the given users, keyed by id */
 export async function fetchLicenseUsers(userIds: string[]): Promise<Map<string, LicenseUser>> {
 	const users = new Map<string, LicenseUser>();
 	if (userIds.length === 0) return users;
@@ -79,10 +71,6 @@ export async function fetchLicenseUsers(userIds: string[]): Promise<Map<string, 
 	return users;
 }
 
-/**
- * The owner's devices, most recently seen first; only those in deviceIds when
- * given.
- */
 export async function listOwnerDevices(
 	ownerId: string,
 	deviceIds?: string[]

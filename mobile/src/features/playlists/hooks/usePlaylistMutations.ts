@@ -7,7 +7,6 @@ import {
 	prependPlaylist,
 } from '@/features/playlists/utils/playlistCache';
 
-/** Creates a playlist and puts it at the top of the user's list; resolves with it. */
 export function useCreatePlaylist() {
 	const client = useQueryClient();
 	return useMutation({
@@ -21,7 +20,6 @@ interface UpdateVariables {
 	changes: Partial<PlaylistInput>;
 }
 
-/** Updates a playlist's details, visibility or edit mode, in the list and its detail. */
 export function useUpdatePlaylist() {
 	const client = useQueryClient();
 	return useMutation({
@@ -40,7 +38,6 @@ export function useUpdatePlaylist() {
 	});
 }
 
-/** Deletes a playlist and drops it from the user's list. */
 export function useDeletePlaylist() {
 	const client = useQueryClient();
 	return useMutation({

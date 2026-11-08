@@ -14,7 +14,6 @@ export interface SharingSettings {
 	toggleEditMode: () => void;
 }
 
-/** The visibility and edit-mode switches; opening a playlist up warns first. */
 export function useSharingSettings(
 	id: string,
 	mode: SharingMode,

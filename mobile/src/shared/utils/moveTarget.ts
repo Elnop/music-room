@@ -1,8 +1,7 @@
 import type { TrackInPlaylist } from '@/types/track.types';
 import type { QueueItem } from '@/types/queue.types';
 
-// Index of the row a drop from `from` onto `to` lands after: null for the top,
-// undefined when nothing moves or an index is outside the list.
+// null: lands at the top; undefined: nothing moves or an index is out of range.
 function afterIndexForDrop(length: number, from: number, to: number): number | null | undefined {
 	if (from === to) return undefined;
 	if (from < 0 || from >= length || to < 0 || to >= length) return undefined;
@@ -11,8 +10,6 @@ function afterIndexForDrop(length: number, from: number, to: number): number | n
 	return to < from ? to - 1 : to;
 }
 
-// afterRank for dropping the track at `from` onto index `to`: the rank of the
-// track it will sit after, null for the top, undefined when nothing moves.
 export function afterRankForDrop(
 	tracks: TrackInPlaylist[],
 	from: number,

@@ -5,18 +5,14 @@ import { fillCodeDigits } from '@/features/auth/utils/codeDigits';
 const EMPTY_CODE = ['', '', '', '', '', ''];
 
 export interface CodeInput {
-	/** One digit, or '', per box. */
 	digits: string[];
-	/** True once every box holds a digit. */
 	isComplete: boolean;
-	/** The ref callback of box `index`. */
 	setBoxRef: (index: number) => (input: TextInput | null) => void;
-	/** Applies a box's new text; returns the full code when it just became complete. */
+	/** Returns the full code when this change completes it. */
 	changeDigit: (index: number, text: string) => string | null;
 	/** Backspace in an empty box moves the focus to the previous one. */
 	pressKey: (index: number, key: string) => void;
 	focusFirst: () => void;
-	/** Empties every box and focuses the first one. */
 	reset: () => void;
 }
 

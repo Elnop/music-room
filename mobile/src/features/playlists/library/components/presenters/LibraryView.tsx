@@ -58,11 +58,7 @@ export function LibraryView({ screen, actionsFor }: LibraryViewProps) {
 				<>
 					<View style={styles.sectionSpacer} />
 					<View style={styles.section}>
-						<SectionHeader
-							icon="share"
-							title="Partagées avec vous"
-							count={screen.shared.length}
-						/>
+						<SectionHeader icon="share" title="Partagées avec vous" count={screen.shared.length} />
 						<PlaylistGrid playlists={screen.shared} onOpen={screen.openPlaylist} />
 					</View>
 				</>

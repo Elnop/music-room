@@ -1,6 +1,4 @@
-/** Types of the playback contract (`shared/services/playbackBridge.ts`). */
-
-/** Track metadata of a queue item; `trackUri` is the SoundCloud permalink. */
+/** `trackUri` is the SoundCloud permalink. */
 export interface QueueTrack {
 	trackUri: string;
 	title: string;
@@ -15,13 +13,11 @@ export interface QueueItem {
 	rank: string;
 	track: QueueTrack;
 	sourcePlaylistId: string | null;
-	/** Items queued together from one playlist share a block. */
 	blockId: string | null;
 	/** True once the user removed or moved an item of the block. */
 	blockDetached: boolean;
 }
 
-/** Body of a track added to the queue or to a playlist; mirrors the backend's queue input. */
 export interface AddQueueItemBody {
 	trackUri: string;
 	title: string;

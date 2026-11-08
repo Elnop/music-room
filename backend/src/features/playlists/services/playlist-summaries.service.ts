@@ -7,9 +7,6 @@ import type {
 	PlaylistRow,
 } from '@/features/playlists/playlist.types.js';
 
-// Errors are thrown as is; the caller maps them.
-
-/** Track count and album art of the first track by rank, per playlist. */
 export async function fetchTrackStats(playlistIds: string[]): Promise<TrackStats> {
 	const { data: trackCounts, error: countError } = await supabaseAdmin
 		.from('playlist_tracks')

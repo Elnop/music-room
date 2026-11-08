@@ -16,8 +16,6 @@ import type {
 	PlaylistUpdatedPayload,
 } from '@/features/playlists/playlist.types.js';
 
-// See doc/features/playlist-concurrency.md, "Broadcast and convergence".
-
 interface TestUser {
 	id: string;
 	token: string;
@@ -118,8 +116,7 @@ describe('playlist:updated broadcast', () => {
 		);
 	}
 
-	/** Leave time for a stray broadcast to arrive after the expected ones. */
-	const settle = () => new Promise(resolve => setTimeout(resolve, 150));
+	const waitForStrayEvents = () => new Promise(resolve => setTimeout(resolve, 150));
 
 	beforeAll(async () => {
 		await connectRedis();
@@ -187,13 +184,13 @@ describe('playlist:updated broadcast', () => {
 		};
 		expect(await received).toEqual([expected, expected]);
 		expect(result.track).toMatchObject({ addedBy: owner.id });
-		await settle();
+		await waitForStrayEvents();
 		expect(outsiderUpdates).toEqual([]);
 	});
 
 	it('sends the same versioned remove to every client of the room', async () => {
 		const { track } = await tracks.addTrack(playlistId, owner.id, dto());
-		await settle();
+		await waitForStrayEvents();
 
 		const received = bothReceive();
 		const result = await tracks.removeTrack(playlistId, owner.id, track.id);
@@ -211,7 +208,7 @@ describe('playlist:updated broadcast', () => {
 	it('sends the same version and rank of a move, equal to the playlist fetch', async () => {
 		const first = await tracks.addTrack(playlistId, owner.id, dto());
 		const second = await tracks.addTrack(playlistId, owner.id, dto());
-		await settle();
+		await waitForStrayEvents();
 
 		const outsiderUpdates = record(outsiderSocket);
 		const received = bothReceive();
@@ -234,7 +231,7 @@ describe('playlist:updated broadcast', () => {
 			rank: moved?.rank,
 		});
 		expect(fetched.tracks.map(t => t.id)).toEqual([second.track.id, first.track.id]);
-		await settle();
+		await waitForStrayEvents();
 		expect(outsiderUpdates).toEqual([]);
 	});
 
@@ -243,15 +240,14 @@ describe('playlist:updated broadcast', () => {
 		await tracks.addTrack(playlistId, owner.id, dto());
 		const move = { afterRank: null, expectedVersion: tracksVersion + 1 };
 		await tracks.moveTrack(playlistId, owner.id, track.id, move);
-		await settle();
+		await waitForStrayEvents();
 
 		const ownerUpdates = record(ownerSocket);
 		const viewerUpdates = record(viewerSocket);
-		// Same move again on the version before the first one: 409 TRACK_MOVED_CONCURRENTLY.
 		await expect(tracks.moveTrack(playlistId, owner.id, track.id, move)).rejects.toMatchObject({
 			statusCode: 409,
 		});
-		await settle();
+		await waitForStrayEvents();
 		expect(ownerUpdates).toEqual([]);
 		expect(viewerUpdates).toEqual([]);
 	});

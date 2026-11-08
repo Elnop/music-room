@@ -9,7 +9,6 @@ interface PickedImage {
 	height: number;
 }
 
-/** Square crop offered in the picker; `prepareSquareImage` crops again if it was skipped. */
 const PICKER_OPTIONS: ImagePicker.ImagePickerOptions = {
 	mediaTypes: ['images'],
 	allowsEditing: true,
@@ -17,7 +16,6 @@ const PICKER_OPTIONS: ImagePicker.ImagePickerOptions = {
 	quality: 1,
 };
 
-/** Asks for the permission, then opens the library or the camera; null when denied or cancelled. */
 export async function pickImage(
 	source: ImageSource,
 	deniedMessage: string

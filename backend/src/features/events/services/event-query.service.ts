@@ -4,7 +4,7 @@ import { failUnexpected } from '@/shared/utils/fail-unexpected.js';
 import { EVENT_COLUMNS, toEvent } from '@/features/events/utils/event-mapper.js';
 import type { Event, EventRowWithRelations } from '@/features/events/events.types.js';
 
-/** Ongoing and upcoming events; the phone filters them by distance itself. */
+/** The phone filters them by distance itself. */
 export function listActiveEvents(): Promise<Event[]> {
 	return failUnexpected(
 		async () => {

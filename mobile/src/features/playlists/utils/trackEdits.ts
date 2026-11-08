@@ -3,7 +3,7 @@ import { queryKeys } from '@/shared/query/keys';
 import * as tracksApi from '@/features/playlists/services/tracksApi';
 import type { PlaylistWithTracks } from '@/features/playlists/types';
 import type { AddQueueItemBody } from '@/shared/types/playback';
-import { reloadIfOpen, settleTrackEvent } from './playlistCache';
+import { reloadIfOnScreen, settleTrackEvent } from './playlistCache';
 
 /** Adds a track; the answer is applied like its own `playlist:updated` event. */
 export async function addTrack(
@@ -21,7 +21,7 @@ export async function addTrack(
 	});
 }
 
-/** Optimistic: the answer only advances the version; a refusal reloads the track from the server, then rethrows. */
+/** Optimistic: a refusal reloads the track, then rethrows. */
 export async function removeTrack(
 	client: QueryClient,
 	playlistId: string,
@@ -40,7 +40,7 @@ export async function removeTrack(
 			trackId,
 		});
 	} catch (error) {
-		await reloadIfOpen(client, playlistId);
+		await reloadIfOnScreen(client, playlistId);
 		throw error;
 	}
 }

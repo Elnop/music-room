@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_CONFIG } from '@/shared/constants/app';
 import { logger } from '@/shared/utils/logger';
 
-// Changeable from the app without a rebuild: every HTTP client and the socket read it at call time.
+// Changeable without a rebuild: every HTTP client and the socket read it at call time.
 
 const STORAGE_KEY = 'zumik.backendUrl';
 
@@ -20,7 +20,7 @@ type Listener = (url: string) => void;
 let currentUrl = DEFAULT_BACKEND_URL;
 const listeners = new Set<Listener>();
 
-/** Null unless an http(s) URL with a hostname and an optional port only (no credentials, path, query or fragment). */
+/** Null unless `http(s)://host[:port]`, with nothing else. */
 export function normalize(input: string): string | null {
 	const parts = URL_PARTS.exec(input.trim());
 	if (!parts) return null;
@@ -41,7 +41,6 @@ export function getBackendUrl(): string {
 	return currentUrl;
 }
 
-/** A missing, invalid or unreadable value leaves the build-time default. */
 export async function loadBackendUrl(): Promise<string> {
 	try {
 		const stored = await AsyncStorage.getItem(STORAGE_KEY);
@@ -54,7 +53,6 @@ export async function loadBackendUrl(): Promise<string> {
 	return currentUrl;
 }
 
-/** Returns an error message for invalid input, keeping the current address. */
 export async function setBackendUrl(input: string): Promise<{ url: string } | { error: string }> {
 	const url = normalize(input);
 	if (!url) return { error: INVALID_BACKEND_URL_MESSAGE };
@@ -68,7 +66,6 @@ export async function setBackendUrl(input: string): Promise<{ url: string } | { 
 	return { url };
 }
 
-/** Restores the build-time default and clears the stored address. */
 export async function resetBackendUrl(): Promise<string> {
 	try {
 		await AsyncStorage.removeItem(STORAGE_KEY);

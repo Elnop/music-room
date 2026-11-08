@@ -17,9 +17,7 @@ import { Text } from '@/shared/components/ui/Text';
 interface SoundCloudTrackItemProps {
 	track: SoundCloudTrack;
 	onPlay: (track: SoundCloudTrack) => void;
-	/** A right swipe adds the track to the play queue. */
 	onAddToQueue: (track: SoundCloudTrack) => void;
-	/** A long press or the ⋯ button opens the track's quick actions. */
 	onShowActions: (track: SoundCloudTrack) => void;
 }
 
@@ -75,8 +73,7 @@ const createStyles = (theme: Theme) =>
 			alignItems: 'center',
 			gap: theme.spacing.md,
 		},
-		artwork: {
-		},
+		artwork: {},
 		info: {
 			flex: 1,
 		},

@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { visibilityLevelSchema } from '@/features/profile/profile.validators.js';
 import { musicGenreSchema } from '@/shared/music/genres.js';
 
-/** Optional fields are absent when unset or, on another user's profile, hidden by their privacy. */
+// Optional fields are absent when unset or hidden by the owner's privacy settings.
 
 const profileBase = z.object({
 	id: z.uuid(),
@@ -21,7 +21,6 @@ export const ownProfileSchema = profileBase.extend({
 
 export const publicProfileSchema = profileBase;
 
-/** Only the fields the owner's privacy settings let the caller see. */
 export const filteredProfileSchema = profileBase.extend({
 	musicPreferences: z.array(musicGenreSchema).optional(),
 	email: z.email().nullable().optional(),
@@ -29,7 +28,7 @@ export const filteredProfileSchema = profileBase.extend({
 	isFriend: z.boolean(),
 });
 
-/** avatarUrl follows the profile's privacy settings, as in search. */
+/** avatarUrl follows the profile's privacy settings. */
 export const recommendedProfileSchema = profileBase
 	.pick({ id: true, username: true, displayName: true, avatarUrl: true })
 	.extend({
@@ -47,7 +46,6 @@ export const recommendationsSchema = z.object({
 const visibility = (field: string) =>
 	visibilityLevelSchema.meta({ description: `Who can see your ${field}` });
 
-/** public: everyone, friends_only: mutual follows, private: only the owner. */
 export const privacySettingsSchema = z.object({
 	userId: z.uuid(),
 	emailVisibility: visibility('email'),
@@ -66,7 +64,6 @@ export const musicPreferencesSchema = z.object({
 
 export const genresSchema = z.object({ genres: z.array(musicGenreSchema) });
 
-/** Null once the avatar is removed. */
 export const avatarResponseSchema = z.object({
 	avatarUrl: z.url().nullable().meta({
 		example: 'https://xyz.supabase.co/storage/v1/object/public/avatars/0b5c…/3f2a….jpg',

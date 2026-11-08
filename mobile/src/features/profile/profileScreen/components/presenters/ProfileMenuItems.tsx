@@ -8,7 +8,6 @@ import type { Theme } from '@/shared/theme/types';
 import { Text } from '@/shared/components/ui/Text';
 
 interface ProfileMenuItemsProps {
-	/** Wide screens: a logout without the full-width outline. */
 	wide?: boolean;
 	isLoading: boolean;
 	onPrivacySettings: () => void;
@@ -62,7 +61,6 @@ export function ProfileMenuItems({
 					<Text style={styles.logoutText}>Se déconnecter</Text>
 				</Pressable>
 			</View>
-
 		</>
 	);
 }

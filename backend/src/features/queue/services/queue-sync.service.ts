@@ -14,7 +14,7 @@ const SYNC_FUNCTIONS = {
 
 const affectedUsersSchema = z.array(z.uuid());
 
-/** Runs after the playlist operation succeeded: every error is logged and swallowed, never thrown. */
+/** Never throws: the playlist operation already succeeded. */
 export async function syncPlaylistChange(
 	change: PlaylistTrackChange,
 	playlistId: string,

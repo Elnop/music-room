@@ -3,15 +3,14 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import * as counter from '@/shared/security/counter.js';
 
-// At the limit every token from the IP is refused without calling Supabase, valid or not: telling
-// them apart would need the very call the limit avoids. Redis down: neither blocks nor counts.
+// At the limit every token from the IP is refused, valid or not: telling them apart would need
+// the very Supabase call the limit avoids.
 
 const TOKEN_LIMIT_PREFIX = 'rl:auth:token:';
 
-/** A 503 does not count. */
+/** A 503 (Supabase outage) is not the client's fault: it does not count. */
 const COUNTED_CODES = new Set(['INVALID_TOKEN', 'TOKEN_REVOKED']);
 
-/** Thrown instead of verifying when the IP has reached the limit. */
 export class TokenVerifyLimitError extends AppError {
 	constructor(public retryAfterMs: number) {
 		super(
@@ -45,7 +44,7 @@ interface Reservation {
 	ttlMs: number;
 }
 
-/** Reserved before calling Supabase so a parallel burst cannot pass the limit. Null when skipped or Redis fails. */
+/** Taken before calling Supabase, so a parallel burst cannot pass the limit. */
 export async function reserve(ip: string): Promise<Reservation | null> {
 	if (isSkipped(ip)) return null;
 	try {
@@ -57,7 +56,6 @@ export async function reserve(ip: string): Promise<Reservation | null> {
 	}
 }
 
-/** Refused, successful or not-counted verification. */
 export async function release(ip: string): Promise<void> {
 	if (isSkipped(ip)) return;
 	try {
@@ -67,7 +65,7 @@ export async function release(ip: string): Promise<void> {
 	}
 }
 
-/** A failure counted against the IP keeps its slot; more than `max` parallel verifications from one IP get a transient refusal. */
+/** Every verification holds a slot while it runs: more than `max` in parallel from one IP are refused. */
 export async function verifyTokenLimited<User>(
 	token: string,
 	ip: string,

@@ -1,4 +1,4 @@
-/** The props a list item spreads on its row so a right click or the keyboard opens its menu (web). */
+/** Web only: a right click or the menu key opens the item's menu. */
 export interface ContextMenuProps {
 	onContextMenu?: unknown;
 	onKeyDown?: unknown;
@@ -6,12 +6,11 @@ export interface ContextMenuProps {
 
 const NONE: ContextMenuProps = {};
 
-/** Native platforms have no context menu: a long press or the « ⋯ » button opens the item's menu. */
+/** Native: a long press or the « ⋯ » button opens the menu instead. */
 export function useContextMenu(_onOpen: (() => void) | undefined): ContextMenuProps {
 	return NONE;
 }
 
-/** Native platforms have no context menu to keep away from an open menu. */
 export function useContextMenuDismiss(_onClose: () => void): ContextMenuProps {
 	return NONE;
 }

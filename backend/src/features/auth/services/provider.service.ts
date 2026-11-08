@@ -4,7 +4,6 @@ import { logger } from '@/shared/utils/logger.js';
 import type { OAuthProvider, LinkedProvidersResponse } from '@/features/auth/auth.types.js';
 import { providerIdField } from '@/features/auth/utils/auth.helpers.js';
 
-/** The first one is the primary. */
 export async function getLinkedProviders(userId: string): Promise<LinkedProvidersResponse> {
 	const { data: profile, error } = await supabaseAdmin
 		.from('user_profiles')
@@ -35,7 +34,6 @@ export async function getLinkedProviders(userId: string): Promise<LinkedProvider
 	return { providers };
 }
 
-/** Refused (400 LAST_PROVIDER) when it is the last sign-in method. */
 export async function unlinkProvider(userId: string, provider: OAuthProvider): Promise<void> {
 	const { data: profile, error } = await supabaseAdmin
 		.from('user_profiles')

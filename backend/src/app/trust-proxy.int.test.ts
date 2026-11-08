@@ -5,8 +5,7 @@ import express from 'express';
 import { io as ioClient, type Socket as ClientSocket } from 'socket.io-client';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Before env.ts is parsed: the loopback proxy is trusted, limiting on, nobody
-// whitelisted, a low token limit.
+// Runs before env.ts reads process.env.
 vi.hoisted(() => {
 	process.env.TRUST_PROXY = 'loopback';
 	process.env.RATE_LIMIT_ENABLED = 'true';

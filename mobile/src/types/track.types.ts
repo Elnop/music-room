@@ -3,13 +3,13 @@ export interface Track {
 	title: string;
 	artist: string;
 	album?: string;
-	albumArt?: string; // Omitted by the API when the track has no artwork
+	albumArt?: string;
 	durationMs: number;
 	trackUri: string; // SoundCloud permalink URL
 	previewUrl?: string;
 }
 
-// Mirrors backend TrackInPlaylistResponse; ordering by rank: doc/features/playlist-concurrency.md
+// Mirrors backend TrackInPlaylistResponse.
 export interface TrackInPlaylist extends Track {
 	createdAt: string;
 	updatedAt: string;

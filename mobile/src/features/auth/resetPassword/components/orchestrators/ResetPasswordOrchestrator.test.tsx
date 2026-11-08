@@ -36,7 +36,6 @@ function renderScreen(params?: object) {
 	clear = () => client.clear();
 }
 
-/** Path and JSON body of the request `index`. */
 function request(index = 0): { url: string; body: unknown } {
 	const [url, init] = fetchMock.mock.calls[index] as [string, RequestInit];
 	return { url, body: init.body ? JSON.parse(init.body as string) : undefined };

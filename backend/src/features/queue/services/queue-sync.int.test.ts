@@ -117,7 +117,6 @@ function expectRanked(state: QueueState) {
 	for (let i = 1; i < ranks.length; i++) expect(ranks[i - 1] < ranks[i]).toBe(true);
 }
 
-/** Users that received queue:updated since the last clear. */
 const notified = () => notifyQueueUpdate.mock.calls.map(([id]) => id as string);
 
 beforeAll(async () => {
@@ -218,9 +217,8 @@ describe('add after a remove that kept the current item', () => {
 });
 
 describe('rank rebalance during a sync', () => {
-	// Blocks are synced in queue order of their first item: block A (played
-	// first, its first item now history) before block B. A's change forces a
-	// rebalance; B is then checked against the rebalanced current item.
+	// Blocks sync in queue order of their first item: A's change forces a rebalance,
+	// then B is compared with the rebalanced current item.
 
 	it('compares the next block against the rebalanced current item', async () => {
 		const playlist = await createPlaylist(3);

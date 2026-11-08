@@ -8,7 +8,6 @@ import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 const HEIGHT = 216;
 const RINGS = [60, 130, 200];
 
-/** A half-disc radar with the user at the bottom centre; the children are placed over it. */
 export function RadarScope({ children }: { children?: React.ReactNode }) {
 	const { styles } = useThemedStyles(createStyles);
 	const sweep = useLoop(true, 4000);

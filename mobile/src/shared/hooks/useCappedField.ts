@@ -7,7 +7,6 @@ export interface CappedField {
 	max: number;
 }
 
-/** A text field of a react-hook-form form, cut at `max` characters as the user types. */
 export function useCappedField<Form extends FieldValues>(
 	control: Control<Form>,
 	name: Path<Form>,

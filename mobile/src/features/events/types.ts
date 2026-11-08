@@ -38,7 +38,6 @@ export interface MusicEvent {
 export interface GeocodedPlace {
 	latitude: number;
 	longitude: number;
-	/** The place the geocoder matched. */
 	displayName: string;
 }
 
@@ -55,7 +54,6 @@ export interface EventInput {
 	playlistId: string | null;
 }
 
-/** A public playlist of mine that an event can link to. */
 export interface PlaylistChoice {
 	id: string;
 	name: string;
@@ -65,7 +63,7 @@ export interface EventDeletedPayload {
 	eventId: string;
 }
 
-/** The routes the event screens use; the stack also holds the playlist screens. */
+/** The stack also holds the playlist screens. */
 export type EventStackParamList = {
 	EventDetail: { id: string };
 	/** With an eventId, the form edits that event. */

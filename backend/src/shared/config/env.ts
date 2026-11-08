@@ -75,7 +75,7 @@ const envSchema = z.object({
 
 	GMAIL_USER: z.email('Invalid Gmail user address'),
 	GMAIL_APP_PASSWORD: z.string().min(1, 'Gmail app password is required'),
-	// Plain SMTP server used instead of Gmail when set (the dev stack's Mailpit). No TLS, no auth.
+	// The dev stack's Mailpit: replaces Gmail when set, without TLS or auth.
 	SMTP_HOST: z.string().min(1).optional(),
 	SMTP_PORT: z.coerce.number().int().positive().default(54425),
 

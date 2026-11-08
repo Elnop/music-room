@@ -1,7 +1,3 @@
-// One browser path per screen. A screen several stacks hold opens in its canonical tab, above the
-// screens leading to it so « back » works. Only identifiers go in a path. A path both sessions open
-// (`/`, `/privacy`) has one entry per session, the signed-out one without a tab.
-
 import type { InitialState } from '@react-navigation/native';
 import type { AppTabsParamList } from './AppNavigator';
 
@@ -16,15 +12,14 @@ interface StackRoute {
 
 interface ScreenPath {
 	screen: string;
-	/** `:id` stands for the identifier, read from and written to the `param` of the screen. */
 	path: string;
+	/** The screen param that `:id` in `path` stands for. */
 	param?: string;
-	/** The tab holding the screen; none for the signed-out screens. */
 	tab?: AppTab;
 	/** The stack a reload opens, bottom first. */
 	routes: (id: string) => StackRoute[];
-	/** A `zumik://` link: the only paths Android opens. */
-	shared?: true;
+	/** A `zumik://` link, the only paths Android opens. */
+	isShareLink?: true;
 }
 
 const PLAYLIST = (id: string): StackRoute[] => [
@@ -45,7 +40,7 @@ const profileScreen = (screen: string, path: string): ScreenPath => ({
 	routes: () => [...PROFILE, { name: screen }],
 });
 
-// The email and the user id of a code screen stay out of the address: a reload opens the screen before it.
+// Code screens keep the email out of the address: a reload opens the screen before them.
 const SCREEN_PATHS: readonly ScreenPath[] = [
 	{ screen: 'Welcome', path: '', routes: () => [{ name: 'Welcome' }] },
 	{ screen: 'Welcome', path: 'welcome', routes: () => [{ name: 'Welcome' }] },
@@ -90,7 +85,7 @@ const SCREEN_PATHS: readonly ScreenPath[] = [
 		param: 'id',
 		tab: 'PlaylistsTab',
 		routes: PLAYLIST,
-		shared: true,
+		isShareLink: true,
 	},
 	...(
 		[
@@ -127,7 +122,7 @@ const SCREEN_PATHS: readonly ScreenPath[] = [
 		param: 'userId',
 		tab: 'FriendsTab',
 		routes: id => [{ name: 'Friends' }, { name: 'UserProfile', params: { userId: id } }],
-		shared: true,
+		isShareLink: true,
 	},
 	{ screen: 'Profile', path: 'profile', tab: 'ProfileTab', routes: () => PROFILE },
 	profileScreen('EditProfile', 'profile/edit'),
@@ -144,7 +139,6 @@ const SCREEN_PATHS: readonly ScreenPath[] = [
 	},
 ];
 
-/** A tab opened before its stack has a state shows its first screen. */
 const TAB_SCREENS: Record<AppTab, string> = {
 	HomeTab: 'Home',
 	PlaylistsTab: 'Playlists',
@@ -163,10 +157,7 @@ export interface ScreenPathMatch {
 	id: string;
 }
 
-/**
- * The screen of an app path; the query and a trailing slash are ignored. Given the session, the entry
- * of that session comes first, the other one otherwise.
- */
+/** The entry of the given session wins over the other one's. */
 export function matchScreenPath(path: string, signedIn?: boolean): ScreenPathMatch | undefined {
 	const bare = path.split(/[?#]/)[0].replace(/^\/+|\/+$/g, '');
 	let otherSession: ScreenPathMatch | undefined;
@@ -202,7 +193,7 @@ interface NestedParams {
 	params?: object;
 }
 
-/** The focused screen, following a nested state or the `screen` param of a tab not rendered yet. */
+/** Follows a nested state, or the `screen` param of a tab not rendered yet. */
 function focusedRoute(state: StateNode): RouteNode | undefined {
 	let route = state.routes[state.index ?? state.routes.length - 1];
 	for (;;) {
@@ -215,13 +206,12 @@ function focusedRoute(state: StateNode): RouteNode | undefined {
 	}
 }
 
-/** The path of the focused screen; the root for a screen that has none. */
 export function pathFromState(state: StateNode): string {
 	const route = focusedRoute(state);
 	if (!route) return '/';
 	const name = TAB_SCREENS[route.name as AppTab] ?? route.name;
 	const params = (route.params ?? {}) as Record<string, unknown>;
-	// A form with an identifier edits it, without one it creates
+	// A form with an identifier edits it, without one it creates.
 	const candidates = SCREEN_PATHS.filter(candidate => candidate.screen === name);
 	const entry =
 		candidates.find(candidate => candidate.param && typeof params[candidate.param] === 'string') ??

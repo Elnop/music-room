@@ -1,5 +1,3 @@
-/** Request inputs are inferred from the Zod schemas in auth.validators.ts. */
-
 import type { z } from 'zod';
 import type { Tables, TablesUpdate } from '@/shared/types/supabase.generated.js';
 import type {
@@ -31,7 +29,6 @@ export interface FacebookTokenPayload {
 	picture?: string;
 }
 
-// Inferred from the schemas the OpenAPI document uses.
 export type UserProfile = z.infer<typeof userProfileSchema>;
 export type AuthResponse = z.infer<typeof authResultSchema>;
 export type LinkedProvidersResponse = z.infer<typeof linkedProvidersSchema>;

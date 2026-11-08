@@ -9,7 +9,6 @@ import { Text } from '@/shared/components/ui/Text';
 
 interface ShareLinkButtonProps {
 	url: string;
-	/** Shown above the link in the message (playlist or user name). */
 	title?: string;
 	style?: StyleProp<ViewStyle>;
 }

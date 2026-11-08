@@ -15,7 +15,6 @@ interface PlayerBarViewProps {
 	data: PlayerBarData;
 }
 
-/** The desktop player: track, transport and seek, then the now playing panel, queue, devices and volume, on one row. */
 export function PlayerBarView({ data }: PlayerBarViewProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);

@@ -53,7 +53,7 @@ async function createUser(): Promise<TestUser> {
 		.insert({ id, username: `int_${id.slice(0, 8)}` });
 	if (profileError) throw profileError;
 
-	// Sign in with the anon client, never the admin one.
+	// Never the admin client: signing in would replace its service-role session.
 	const { data: session, error: signInError } = await supabaseAnon.auth.signInWithPassword({
 		email,
 		password: PASSWORD,
@@ -134,8 +134,7 @@ describe('Playlist room access control', () => {
 		return received;
 	}
 
-	/** Leave time for a stray broadcast to arrive after the expected ones. */
-	const settle = () => new Promise(resolve => setTimeout(resolve, 150));
+	const waitForStrayEvents = () => new Promise(resolve => setTimeout(resolve, 150));
 
 	beforeAll(async () => {
 		// verifyToken checks the logout denylist and fails closed without Redis.
@@ -191,7 +190,7 @@ describe('Playlist room access control', () => {
 
 		await expect(ownerUpdate).resolves.toMatchObject({ playlistId, event: 'track_moved' });
 		await expect(viewerUpdate).resolves.toMatchObject({ playlistId, event: 'track_moved' });
-		await settle();
+		await waitForStrayEvents();
 		expect(outsiderUpdates).toEqual([]);
 	});
 
@@ -242,7 +241,7 @@ describe('Playlist room access control', () => {
 		const ownerUpdate = nextEvent<PlaylistUpdated>(ownerSocket, 'playlist:updated');
 		realtime.notifyPlaylistUpdate(moved(playlistId));
 		await expect(ownerUpdate).resolves.toMatchObject({ playlistId });
-		await settle();
+		await waitForStrayEvents();
 		expect(viewerUpdates).toEqual([]);
 	});
 
@@ -267,7 +266,7 @@ describe('Playlist room access control', () => {
 		const ownerUpdate = nextEvent<PlaylistUpdated>(ownerSocket, 'playlist:updated');
 		realtime.notifyPlaylistUpdate(moved(playlistId));
 		await expect(ownerUpdate).resolves.toMatchObject({ playlistId });
-		await settle();
+		await waitForStrayEvents();
 		expect(collaboratorUpdates).toEqual([]);
 	});
 
@@ -288,7 +287,7 @@ describe('Playlist room access control', () => {
 		const viewerUpdate = nextEvent<PlaylistUpdated>(viewerSocket, 'playlist:updated');
 		realtime.notifyPlaylistUpdate(moved(playlistId));
 		await expect(viewerUpdate).resolves.toMatchObject({ playlistId });
-		await settle();
+		await waitForStrayEvents();
 		expect(ownerUpdates).toEqual([]);
 	});
 

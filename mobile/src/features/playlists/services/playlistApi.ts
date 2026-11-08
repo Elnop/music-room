@@ -3,16 +3,11 @@ import { jpegFormData } from '@/shared/utils/jpegFormData';
 import type { CoverResponse, Playlist, PlaylistWithTracks } from '@/features/playlists/types';
 import type { PlaylistInput } from '@/features/playlists/validators';
 
-// Requests go through `apiRequest`, which adds the token, the client headers the
-// backend logs and the runtime backend address, and throws an `ApiError`.
-
-/** The signed-in user's playlists (owned, shared with them). */
 export async function fetchPlaylists(): Promise<Playlist[]> {
 	const data = await apiRequest<{ playlists: Playlist[] }>('/api/playlists');
 	return data.playlists;
 }
 
-/** Every public playlist except the user's own. */
 export async function fetchPublicPlaylists(): Promise<Playlist[]> {
 	const data = await apiRequest<{ playlists: Playlist[] }>('/api/playlists/public');
 	return data.playlists;

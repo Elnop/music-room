@@ -4,8 +4,7 @@ import type { AddressInfo } from 'node:net';
 import { io as ioClient, type Socket as ClientSocket } from 'socket.io-client';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
-// Fixed before env.ts loads (dotenv never overrides a set variable), so a local .env cannot change
-// the allowed list; a TUNNEL_URL from .env may still be added but never matches the origins below.
+// Set before env.ts loads (dotenv never overrides a set variable), so a local .env cannot change it.
 vi.hoisted(() => {
 	process.env.ALLOWED_ORIGINS = 'http://allowed.example';
 	process.env.NODE_ENV = 'test';
@@ -16,8 +15,6 @@ const { connectRedis, disconnectRedis, isRedisConnected } =
 	await import('@/shared/config/redis.js');
 const socketServer = await import('@/realtime/socket-server.js');
 const { getIO } = await import('@/realtime/state.js');
-
-// Same ALLOWED_ORIGINS rule as the HTTP API, on both transports.
 
 const PASSWORD = 'integration-test-password';
 

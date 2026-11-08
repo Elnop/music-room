@@ -13,10 +13,7 @@ const angleOf = (id: string) => {
 	return ((hash / 996) * 2 - 1) * MAX_ANGLE;
 };
 
-/**
- * The nth nearest event sits on the nth ring out from the user, at the bottom centre:
- * the distance from the centre tells the rank, not a direction.
- */
+/** The nth nearest event sits on the nth ring: the distance from the centre tells the rank, not a direction. */
 export function radarSpot(id: string, rank: number, total: number): RadarSpot {
 	const reach = (rank + 1) / (total + 1);
 	const angle = (angleOf(id) * Math.PI) / 180;

@@ -11,7 +11,6 @@ import { useLoginMutation } from '@/features/auth/hooks/useSignInMutations';
 import { useFieldBinding, type FieldBinding } from '@/features/auth/form/hooks/useFieldBinding';
 import { useFocusedErrorToast } from '@/features/auth/form/hooks/useFocusedErrorToast';
 
-/** Delay before an unverified account is sent to the code screen. */
 const REDIRECT_DELAY_MS = 1500;
 
 interface LoginForm {
@@ -19,7 +18,6 @@ interface LoginForm {
 	password: FieldBinding;
 	submit: () => void;
 	isSubmitting: boolean;
-	/** Shows an error toast once this screen is focused. */
 	reportError: (message: string) => void;
 	goToForgotPassword: () => void;
 	goToRegister: () => void;

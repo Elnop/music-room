@@ -6,7 +6,6 @@ const CAUGHT_UP_S = 1;
 const HOLD_MS = 3000;
 
 export interface SeekPosition {
-	/** What the slider and the elapsed time show. */
 	position: number;
 	onSlidingStart: (value: number) => void;
 	onValueChange: (value: number) => void;

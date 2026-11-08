@@ -34,7 +34,6 @@ function playlist(visibility: 'public' | 'private', editMode: 'open' | 'restrict
 	};
 }
 
-// Permission matrix documented in playlist.permissions.ts
 describe('canViewPlaylist', () => {
 	it.each([
 		['public', 'open', [OWNER, COLLABORATOR, VIEWER, STRANGER], []],

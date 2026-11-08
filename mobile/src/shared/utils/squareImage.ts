@@ -1,6 +1,5 @@
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 
-/** Side of the square JPEG sent as a profile photo or a playlist cover. */
 export const SQUARE_IMAGE_SIZE = 512;
 const JPEG_QUALITY = 0.8;
 
@@ -10,7 +9,7 @@ interface PickedImage {
 	height: number;
 }
 
-/** Cropped to its centred square first, in case the picker's crop was skipped; returns the local URI. */
+/** Crops to the centred square again, in case the picker's crop was skipped. */
 export async function prepareSquareImage({ uri, width, height }: PickedImage): Promise<string> {
 	const context = ImageManipulator.manipulate(uri);
 

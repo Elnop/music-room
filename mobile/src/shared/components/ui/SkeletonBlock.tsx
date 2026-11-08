@@ -39,7 +39,6 @@ interface SkeletonBlockProps {
 	style?: StyleProp<ViewStyle>;
 }
 
-/** Stays still when reduce motion is on. */
 export function SkeletonBlock({
 	width = '100%',
 	height = 16,

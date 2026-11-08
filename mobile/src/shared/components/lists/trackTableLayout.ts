@@ -6,6 +6,5 @@ export const trackTableColumns = StyleSheet.create({
 	title: { flex: 3, minWidth: 0, flexDirection: 'row', alignItems: 'center' },
 	artist: { flex: 2, minWidth: 0, paddingHorizontal: 12 },
 	duration: { width: 56, alignItems: 'flex-end' },
-	/** The ⋯ button and the drag handle. */
 	trailing: { width: 80 },
 });
