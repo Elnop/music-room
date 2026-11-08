@@ -22,7 +22,6 @@ export function providerIdField(
 	return provider === 'google' ? { google_id: providerId } : { facebook_id: providerId };
 }
 
-/** A user_profiles row and the account's email as the API's user object. */
 export function toUserProfile(row: ProfileFields, email: string): UserProfile {
 	return {
 		id: row.id,
@@ -36,7 +35,6 @@ export function toUserProfile(row: ProfileFields, email: string): UserProfile {
 	};
 }
 
-/** A session opened by a magic link (OAuth sign-in, email verification) as the API's session. */
 export function toSessionBody(session: Session): NonNullable<AuthResponse['session']> {
 	return {
 		accessToken: session.access_token,

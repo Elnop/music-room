@@ -4,8 +4,6 @@ import * as counter from '@/shared/security/counter.js';
 import { failOpen } from '@/shared/security/fail-open.js';
 import type { LockoutStatus } from '@/shared/security/security.types.js';
 
-// The lock duration grows with the failed attempt count (soft, hard, severe). Fails open.
-
 const FAILED_WINDOW_MS = 15 * 60 * 1000;
 
 const failedKey = (email: string, ip: string) => `failed_login:${email}:${ip}`;
@@ -76,7 +74,6 @@ export async function recordFailedAttempt(email: string, ip: string): Promise<Lo
 	);
 }
 
-/** After a successful login. */
 export async function resetFailedAttempts(email: string, ip: string): Promise<void> {
 	await failOpen(
 		{

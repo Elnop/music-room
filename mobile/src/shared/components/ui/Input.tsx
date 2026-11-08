@@ -23,19 +23,14 @@ interface InputProps extends Omit<TextInputProps, 'style'> {
 	leftIcon?: React.ReactNode;
 	containerStyle?: ViewStyle;
 	style?: StyleProp<TextStyle>;
-	/** Web only: Enter submits the form. Native keyboards keep their return key as it was. */
+	/** Web only: Enter submits; native return keys keep their behaviour. */
 	submitOnEnter?: () => void;
 }
 
 export function Input({
 	label,
-	value,
-	onChangeText,
-	placeholder,
 	error,
 	secureTextEntry,
-	autoCapitalize,
-	keyboardType,
 	leftIcon,
 	containerStyle,
 	style,
@@ -69,13 +64,8 @@ export function Input({
 						multiline ? styles.multilineInput : undefined,
 						style,
 					]}
-					value={value}
-					onChangeText={onChangeText}
-					placeholder={placeholder}
 					placeholderTextColor={theme.colors.textSecondary}
-					secureTextEntry={secureTextEntry ? isHidden : secureTextEntry}
-					autoCapitalize={autoCapitalize}
-					keyboardType={keyboardType}
+					secureTextEntry={secureTextEntry && isHidden}
 					multiline={multiline}
 					{...rest}
 					{...focusProps}

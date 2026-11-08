@@ -9,7 +9,6 @@ interface PlaylistCardSkeletonProps {
 	width?: number;
 }
 
-/** Same shape as a playlist card: square cover, name and owner lines. */
 export function PlaylistCardSkeleton({ width: fixedWidth }: PlaylistCardSkeletonProps) {
 	const { theme } = useTheme();
 	// Same width as PlaylistGridCard, so the grid does not jump when cards arrive.

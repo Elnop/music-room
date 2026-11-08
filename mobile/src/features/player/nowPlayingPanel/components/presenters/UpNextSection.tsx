@@ -14,7 +14,6 @@ interface UpNextSectionProps {
 	onOpenQueue: () => void;
 }
 
-/** The first items of the queue; the queue sheet reorders and removes them. */
 export function UpNextSection({ items, total, styles, onPlay, onOpenQueue }: UpNextSectionProps) {
 	return (
 		<View style={styles.card}>

@@ -11,26 +11,17 @@ interface Props {
 }
 
 interface State {
-	hasError: boolean;
 	error: Error | null;
-	errorInfo: React.ErrorInfo | null;
+	componentStack: string | null;
 }
 
+const NO_ERROR: State = { error: null, componentStack: null };
+
 export class ErrorBoundary extends React.Component<Props, State> {
-	constructor(props: Props) {
-		super(props);
-		this.state = {
-			hasError: false,
-			error: null,
-			errorInfo: null,
-		};
-	}
+	state: State = NO_ERROR;
 
 	static getDerivedStateFromError(error: Error): Partial<State> {
-		return {
-			hasError: true,
-			error,
-		};
+		return { error };
 	}
 
 	componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
@@ -40,42 +31,33 @@ export class ErrorBoundary extends React.Component<Props, State> {
 			stack: error.stack,
 			componentStack: errorInfo.componentStack,
 		});
-
-		this.setState({
-			error,
-			errorInfo,
-		});
+		this.setState({ componentStack: errorInfo.componentStack ?? null });
 	}
 
 	handleReset = () => {
-		this.setState({
-			hasError: false,
-			error: null,
-			errorInfo: null,
-		});
+		this.setState(NO_ERROR);
 	};
 
 	render() {
-		if (this.state.hasError) {
+		const { error, componentStack } = this.state;
+		if (error) {
 			return (
 				<View style={styles.container}>
 					<Text style={styles.title}>Une erreur s'est produite</Text>
 					{/* The raw message is English: shown in development only. */}
 					<Text style={styles.error}>
-						{__DEV__ && this.state.error?.message
-							? this.state.error.message
-							: 'Une erreur inattendue est survenue.'}
+						{__DEV__ && error.message ? error.message : 'Une erreur inattendue est survenue.'}
 					</Text>
-					{__DEV__ && this.state.error?.stack && (
+					{__DEV__ && error.stack && (
 						<View style={styles.stackContainer}>
 							<Text style={styles.stackTitle}>Stack Trace:</Text>
-							<Text style={styles.stack}>{this.state.error.stack}</Text>
+							<Text style={styles.stack}>{error.stack}</Text>
 						</View>
 					)}
-					{__DEV__ && this.state.errorInfo?.componentStack && (
+					{__DEV__ && componentStack && (
 						<View style={styles.stackContainer}>
 							<Text style={styles.stackTitle}>Component Stack:</Text>
-							<Text style={styles.stack}>{this.state.errorInfo.componentStack}</Text>
+							<Text style={styles.stack}>{componentStack}</Text>
 						</View>
 					)}
 					<Pressable

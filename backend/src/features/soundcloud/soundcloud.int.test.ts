@@ -4,7 +4,7 @@ import type { AddressInfo } from 'node:net';
 import express, { type NextFunction, type Request, type Response } from 'express';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Before env.ts is parsed: limiting on, nobody whitelisted, a low SoundCloud limit.
+// Set before env.ts is parsed.
 vi.hoisted(() => {
 	process.env.RATE_LIMIT_ENABLED = 'true';
 	process.env.RATE_LIMIT_WHITELIST_IPS = '';
@@ -12,7 +12,6 @@ vi.hoisted(() => {
 	process.env.RATE_LIMIT_SOUNDCLOUD_WINDOW_MS = '60000';
 });
 
-// SoundCloud is never called: the services are replaced.
 const service = vi.hoisted(() => ({
 	searchTracks: vi.fn(),
 	getTrack: vi.fn(),
@@ -266,8 +265,7 @@ describe('SoundCloud routes: auth, per-user rate limit, validation', () => {
 
 	// Last: it closes the Redis connection.
 	it('fails closed with 503 RATE_LIMIT_UNAVAILABLE while Redis is down', async () => {
-		// The limiter alone, behind a stand-in for authMiddleware (which itself
-		// answers 503 REVOCATION_UNAVAILABLE without Redis).
+		// The real authMiddleware would answer 503 REVOCATION_UNAVAILABLE without Redis.
 		const app = express();
 		app.get(
 			'/limited',

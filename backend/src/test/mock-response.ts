@@ -1,4 +1,3 @@
-/** Minimal Express response for handler unit tests: records the status and the JSON body. */
 export function mockResponse() {
 	const res = {
 		statusCode: 200,

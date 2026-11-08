@@ -2,7 +2,7 @@ import { socketLogger } from '@/shared/middleware/socket-logger.middleware.js';
 import type { Event, EventDeletedPayload } from '@/features/events/events.types.js';
 import { getIO } from '@/realtime/state.js';
 
-// Events are public: every connected client receives them. No-op (logged) before initialize().
+// Events are public: every connected client receives them.
 
 type EventBroadcast = 'event:created' | 'event:updated' | 'event:deleted';
 

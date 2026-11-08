@@ -26,18 +26,16 @@ export function SwipeableUserItem({ user, role, onRemove }: SwipeableUserItemPro
 	const separator = useSeparatorColor();
 	const styles = React.useMemo(() => createStyles(theme, separator), [theme, separator]);
 
-	const renderRightActions = () => {
-		return (
-			<Pressable
-				style={styles.removeButton}
-				onPress={() => onRemove(user.id)}
-				accessibilityLabel="Retirer"
-			>
-				<PixelIcon name="userRemove" size={24} color={theme.colors.onColor} />
-				<Text style={styles.removeText}>Retirer</Text>
-			</Pressable>
-		);
-	};
+	const renderRightActions = () => (
+		<Pressable
+			style={styles.removeButton}
+			onPress={() => onRemove(user.id)}
+			accessibilityLabel="Retirer"
+		>
+			<PixelIcon name="userRemove" size={24} color={theme.colors.onColor} />
+			<Text style={styles.removeText}>Retirer</Text>
+		</Pressable>
+	);
 
 	return (
 		<Swipeable renderRightActions={renderRightActions} overshootRight={false} friction={2}>

@@ -1,12 +1,11 @@
 import { FONT_FAMILIES } from './fonts';
 
-/** The pixel grid: every outline, radius and shadow offset is a multiple of it. */
+/** Every outline, radius and shadow offset is a multiple of this pixel. */
 export const PIXEL = 3;
 
-/** The darkest colour of the palette: pixel outlines and hard shadows. */
 export const INK = '#07060B';
 
-/** Pixel art has square corners: `round` stays square too. */
+/** Pixel art has square corners, even `round`. */
 export const PIXEL_BORDERS = {
 	thin: PIXEL,
 	medium: PIXEL,
@@ -15,7 +14,6 @@ export const PIXEL_BORDERS = {
 	round: 0,
 } as const;
 
-/** Hard shadows with no blur, dropped straight down like a pixel sprite's. */
 export const PIXEL_SHADOWS = {
 	small: { boxShadow: `0 ${PIXEL}px 0 0 ${INK}` },
 	medium: { boxShadow: `0 ${PIXEL * 2}px 0 0 ${INK}` },
@@ -35,7 +33,7 @@ export const PIXEL_TYPOGRAPHY = {
 	},
 } as const;
 
-/** Every theme spreads these into its colours; the providers' brand colours follow their guidelines. */
+/** The providers' brand colours follow their guidelines. */
 export const FIXED_COLORS = {
 	divider: '#3B3358',
 	googleSurface: '#FFFFFF',
@@ -44,18 +42,14 @@ export const FIXED_COLORS = {
 	googleText: '#3C4043',
 	facebook: '#1877F2',
 	onFacebook: '#FFFFFF',
-	/** Text and icons drawn on a coloured fill (primary, success, error). */
 	onColor: INK,
-	/** High-contrast dark ink for light backgrounds. */
 	inkDark: INK,
-	/** High-contrast light ink for dark backgrounds. */
 	inkLight: '#FFF3DC',
-	/** The dimmed backdrop behind a bottom sheet. */
 	backdrop: 'rgba(7, 6, 11, 0.7)',
 	shadow: INK,
 } as const;
 
-/** Backgrounds of the initials avatars: white text stays above 4.5:1 on each. */
+/** White initials stay above 4.5:1 contrast on each. */
 export const AVATAR_COLORS = [
 	'#C2185B',
 	'#AD1457',
@@ -71,7 +65,6 @@ export const AVATAR_COLORS = [
 	'#455A64',
 ] as const;
 
-/** Kept the same across themes. */
 export const GENRE_COLORS = {
 	pop: '#FF6FA5',
 	rock: '#FF8A3D',

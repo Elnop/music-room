@@ -8,10 +8,8 @@ import type {
 
 export type SoundCloudTrack = z.infer<typeof soundcloudTrackSchema>;
 
-/** Playable tracks only. */
 export type SoundCloudSearchResult = z.infer<typeof soundcloudSearchResultSchema>;
 
-/** The expiry is ISO 8601. */
 export type StreamUrlResult = z.infer<typeof soundcloudStreamResultSchema>;
 
 export type StreamProtocol = z.infer<typeof streamProtocolSchema>;

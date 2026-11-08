@@ -3,12 +3,11 @@ import { useRenameDeviceForm } from '@/features/music-control/myDevices/hooks/us
 import { RenameDeviceModalView } from '@/features/music-control/myDevices/components/presenters/RenameDeviceModalView';
 
 interface RenameDeviceModalProps {
-	/** Name shown now; the field starts with it. Null hides the modal. */
+	/** Null hides the modal. */
 	deviceName: string | null;
-	/** True while the request runs: the buttons are disabled. */
 	saving: boolean;
 	onClose: () => void;
-	/** The trimmed new name, or null to go back to the system name. */
+	/** Null goes back to the system name. */
 	onSubmit: (name: string | null) => void;
 }
 

@@ -12,7 +12,6 @@ export interface ForgotPassword {
 	emailError: string | null;
 	sendCode: () => void;
 	isSending: boolean;
-	/** The failure of the last request, until the next one. */
 	error: string | null;
 	goToLogin: () => void;
 }

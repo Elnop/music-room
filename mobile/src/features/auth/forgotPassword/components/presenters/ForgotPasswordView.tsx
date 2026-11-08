@@ -48,7 +48,9 @@ export function ForgotPasswordView({ form }: { form: ForgotPassword }) {
 				<Pressable onPress={form.goToLogin} accessibilityLabel="Se connecter">
 					<Text style={[styles.footerText, { color: theme.colors.textSecondary }]}>
 						Vous vous en souvenez ?{' '}
-						<Text style={{ color: theme.colors.primary, fontFamily: FONT_FAMILIES.semibold }}>Se connecter</Text>
+						<Text style={{ color: theme.colors.primary, fontFamily: FONT_FAMILIES.semibold }}>
+							Se connecter
+						</Text>
 					</Text>
 				</Pressable>
 			</View>

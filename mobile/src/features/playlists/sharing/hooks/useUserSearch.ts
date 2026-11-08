@@ -9,12 +9,11 @@ import type { UserSummary } from '@/features/playlists/types';
 
 export interface UserSearch {
 	search: DebouncedText;
-	/** Matching users, but the owner and the members already there. */
 	results: UserSummary[];
 	isSearching: boolean;
 }
 
-/** Finds the users to give access to; the previous results stay while the next search runs. */
+/** The previous results stay while the next search runs. */
 export function useUserSearch(excludedIds: string[]): UserSearch {
 	const search = useDebouncedText();
 	const signedIn = useSession(session => session.isAuthenticated);

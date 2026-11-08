@@ -6,7 +6,7 @@ import type { StreamProtocol, StreamUrlResult } from '@/features/soundcloud/soun
 
 const STREAM_URL_LIFETIME_S = 1800;
 
-// HLS first, else progressive. Never cached: a URL reused minutes later can already answer 403.
+// Never cached: a stream URL reused minutes later can already answer 403.
 export async function getStreamUrl(trackUrl: string): Promise<StreamUrlResult> {
 	try {
 		logger.info('Getting stream URL', { trackUrl });
@@ -22,11 +22,10 @@ export async function getStreamUrl(trackUrl: string): Promise<StreamUrlResult> {
 
 		if (stream) {
 			logger.info('Stream URL obtained', { trackUrl, protocol: stream.protocol });
-			const result: StreamUrlResult = {
+			return {
 				...stream,
 				expiresAt: new Date(obtainedAt + STREAM_URL_LIFETIME_S * 1000).toISOString(),
 			};
-			return result;
 		}
 
 		await availability.markTrackUriUnavailable(trackUrl);
@@ -43,7 +42,6 @@ export async function getStreamUrl(trackUrl: string): Promise<StreamUrlResult> {
 	}
 }
 
-/** The stream URL for one protocol, or null when SoundCloud has none. */
 async function tryGetStream(
 	trackUrl: string,
 	protocol: StreamProtocol
@@ -58,7 +56,7 @@ async function tryGetStream(
 
 		const streamUrl = await soundcloud.util.streamLink(trackUrl, protocol);
 
-		if (!streamUrl || typeof streamUrl !== 'string' || streamUrl.length === 0) {
+		if (typeof streamUrl !== 'string' || streamUrl === '') {
 			logger.debug(`${protocol} stream not available`, { trackUrl });
 			return null;
 		}

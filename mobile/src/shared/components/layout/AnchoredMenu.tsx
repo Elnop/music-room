@@ -15,7 +15,6 @@ interface AnchoredMenuProps {
 	children: React.ReactNode;
 }
 
-/** A sheet of the phone, shown on wide screens as a drop-down under the button that opened it. */
 export function AnchoredMenu({ anchor, onClose, children }: AnchoredMenuProps) {
 	const { styles } = useThemedStyles(createStyles);
 	const placement = menuPlacement(anchor, useWindowDimensions(), MENU_WIDTH);

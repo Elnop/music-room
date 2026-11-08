@@ -6,7 +6,6 @@ import { Pressable } from '@/shared/components/ui/Pressable';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 
-/** « Ajouter un titre », the first row under the header of a playlist an editor sees. */
 export function AddTrackRow({ onPress }: { onPress: () => void }) {
 	const { styles, theme } = useThemedStyles(createStyles);
 

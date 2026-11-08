@@ -2,9 +2,6 @@ import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import type { PlaylistRow } from '@/features/playlists/playlist.types.js';
 
-// View: public = everyone, private = owner, viewers and collaborators.
-// Edit: owner and collaborators always; in 'open' mode, anyone who can view.
-
 export function canViewPlaylist(playlist: PlaylistRow, userId: string): boolean {
 	return (
 		playlist.visibility === 'public' ||

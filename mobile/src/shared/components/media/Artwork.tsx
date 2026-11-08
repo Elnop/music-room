@@ -5,9 +5,7 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 
 interface ArtworkProps {
 	uri?: string | null;
-	/** Width and height, in points. */
 	size: number;
-	/** Applied to the square frame (radius, margins, background). */
 	style?: StyleProp<ViewStyle>;
 	iconSize?: number;
 }

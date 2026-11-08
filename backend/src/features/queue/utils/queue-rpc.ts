@@ -4,8 +4,6 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { QueueState, QueueStepDirection } from '@/features/queue/queue.types.js';
 
-// Turns the RAISE EXCEPTION codes of the queue SQL functions into API errors.
-
 const queueStateSchema: z.ZodType<QueueState> = z.object({
 	ownerId: z.uuid(),
 	version: z.number().int().nonnegative(),
@@ -130,7 +128,6 @@ export function playPlaylistRpc(
 	);
 }
 
-/** The track of the item, then those of the items that follow it, in queue order. */
 export function trackIdsFromRpc(userId: string, itemId: string): Promise<string[]> {
 	return callIds(
 		'track-ids-from',
@@ -138,7 +135,6 @@ export function trackIdsFromRpc(userId: string, itemId: string): Promise<string[
 	);
 }
 
-/** The tracks after the current item (all of them when nothing is current). */
 export function upcomingTrackIdsRpc(userId: string): Promise<string[]> {
 	return callIds(
 		'track-ids-upcoming',
@@ -146,7 +142,7 @@ export function upcomingTrackIdsRpc(userId: string): Promise<string[]> {
 	);
 }
 
-/** Inserts the tracks as one block after the current item and plays the first. */
+/** Also makes the first inserted track current. */
 export function insertBlockRpc(userId: string, trackIds: string[]): Promise<QueueState> {
 	return call(
 		'insert-block',

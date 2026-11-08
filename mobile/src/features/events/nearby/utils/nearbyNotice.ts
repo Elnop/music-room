@@ -25,7 +25,6 @@ function denied(): NearbyNotice {
 	};
 }
 
-/** What the section says when it lists nothing: why, and what the user can do. */
 export function nearbyNotice(state: PositionState): NearbyNotice {
 	switch (state.status) {
 		case 'needs-permission':

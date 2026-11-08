@@ -4,7 +4,7 @@ import { SEEK_STEP_S } from '@/features/player/constants';
 import { hapticTap } from '@/shared/utils/haptics';
 import { RESTART_THRESHOLD_S } from '@/shared/utils/queueNavigation';
 
-/** The transport of the full player and the desktop player bar: a remote device is never seeked. */
+/** A remote device is never seeked. */
 export function usePlaybackControls() {
 	const { player, seekTo } = usePlayer();
 	const nowPlaying = useNowPlaying();

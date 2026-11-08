@@ -1,6 +1,6 @@
 import { env } from '@/shared/config/env.js';
 
-/** Gmail, or the plain SMTP server SMTP_HOST names (Mailpit locally, web UI on http://localhost:54424). */
+// Locally, SMTP_HOST is Mailpit (web UI on http://localhost:54424).
 export const transportConfig = env.SMTP_HOST
 	? { host: env.SMTP_HOST, port: env.SMTP_PORT, secure: false, ignoreTLS: true }
 	: {
@@ -17,7 +17,7 @@ export const senderConfig = {
 } as const;
 
 export const verificationConfig = {
-	// "false" turns verification off: accounts are created verified, no email.
+	// Off: accounts are created verified and no email is sent.
 	enabled: env.EMAIL_VERIFICATION_ENABLED.trim().toLowerCase() !== 'false',
 	codeLength: 6,
 	expiryMinutes: parseInt(env.EMAIL_VERIFICATION_CODE_EXPIRY_MINUTES),

@@ -21,7 +21,6 @@ function useProvidersKey() {
 	return queryKeys.auth.providers(userId);
 }
 
-/** Fetched on every visit, without retry. */
 function useLinkedProviders() {
 	const queryKey = useProvidersKey();
 	const signedIn = useAuthStore(state => state.accessToken !== null);

@@ -1,7 +1,6 @@
 import { env } from '@/shared/config/env.js';
 import { logger } from '@/shared/utils/logger.js';
 
-/** `*` allows all; the tunnel URL is added when set. */
 const allowedOrigins = env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim());
 
 if (env.TUNNEL_URL) {
@@ -10,7 +9,7 @@ if (env.TUNNEL_URL) {
 	logger.info(`🌐 Tunnel CORS enabled: ${env.TUNNEL_URL}`);
 }
 
-/** No `Origin` (mobile app, server-to-server) is allowed: CORS only concerns browsers. */
+/** CORS only concerns browsers: a request without Origin (mobile app, server) passes. */
 export function isOriginAllowed(origin: string | undefined): boolean {
 	if (!origin) return true;
 
@@ -35,7 +34,7 @@ function isNgrokOrigin(origin: string): boolean {
 	return NGROK_DOMAINS.some(domain => url.hostname.endsWith(`.${domain}`));
 }
 
-/** React Native's Android WebSocket always sends an `Origin` built from the socket URL, the backend's own address. */
+/** React Native's Android WebSocket sends the backend's own address as Origin. */
 export function isSameOrigin(origin: string | undefined, host: string | undefined): boolean {
 	if (!origin || !host) return false;
 	try {

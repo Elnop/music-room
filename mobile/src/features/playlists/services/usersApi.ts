@@ -1,12 +1,11 @@
 import { apiRequest } from '@/shared/services/api';
 import type { UserSummary } from '@/features/playlists/types';
 
-/** The people the user follows and who follow them back. */
+/** Friends: the people the user follows who follow them back. */
 export function getFriends(): Promise<UserSummary[]> {
 	return apiRequest<UserSummary[]>('/api/friends', { method: 'GET' });
 }
 
-/** A user's profile, as their privacy settings show it. */
 export function getUserProfile(userId: string): Promise<UserSummary> {
 	return apiRequest<UserSummary>(`/api/profile/${userId}`, { method: 'GET' });
 }

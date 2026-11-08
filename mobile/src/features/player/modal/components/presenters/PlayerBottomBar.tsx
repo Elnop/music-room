@@ -11,8 +11,12 @@ interface PlayerBottomBarProps {
 	onOpenQueue: () => void;
 }
 
-/** Where the sound plays, and the queue: the two keys under the controls. */
-export function PlayerBottomBar({ styles, deviceLabel, onOpenDevices, onOpenQueue }: PlayerBottomBarProps) {
+export function PlayerBottomBar({
+	styles,
+	deviceLabel,
+	onOpenDevices,
+	onOpenQueue,
+}: PlayerBottomBarProps) {
 	return (
 		<View style={styles.bottomBar}>
 			<KeyButton

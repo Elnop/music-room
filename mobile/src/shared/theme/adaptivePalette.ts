@@ -12,7 +12,6 @@ export const hexToRgba = (hex: string, alpha: number): string => {
 	return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
 };
 
-/** WCAG 2.x relative luminance of an sRGB colour (channels 0–255). */
 const relativeLuminance = ([r, g, b]: Rgb): number => {
 	const lin = (c: number) => {
 		const v = c / 255;
@@ -21,14 +20,12 @@ const relativeLuminance = ([r, g, b]: Rgb): number => {
 	return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
 };
 
-/** WCAG contrast ratio between two opaque colours, from 1 to 21. */
 export const contrastRatio = (a: Rgb, b: Rgb): number => {
 	const la = relativeLuminance(a);
 	const lb = relativeLuminance(b);
 	return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
 };
 
-/** The opaque colour seen when `color` at opacity `alpha` is drawn over `base`. */
 export const compositeOver = (color: Rgb, alpha: number, base: Rgb): Rgb => [
 	color[0] * alpha + base[0] * (1 - alpha),
 	color[1] * alpha + base[1] * (1 - alpha),
@@ -38,13 +35,12 @@ export const compositeOver = (color: Rgb, alpha: number, base: Rgb): Rgb => [
 /** WCAG AA for normal text. */
 export const MIN_TEXT_CONTRAST = 4.5;
 
-/** Opacities of the player gradient stops, top to bottom, drawn over the theme background. */
 export const GRADIENT_ALPHAS = [0.95, 0.7, 0.5, 0.4] as const;
 
 const WHITE: Rgb = [255, 255, 255];
 const BLACK: Rgb = [0, 0, 0];
 
-/** Smallest secondary-text opacity tried: below it the text no longer reads as text. */
+/** Below it, secondary text no longer reads as text. */
 const SECONDARY_MIN_ALPHA = 0.7;
 const SECONDARY_ALPHA_STEP = 0.05;
 
@@ -54,12 +50,11 @@ interface AdaptivePalette {
 	buttonBg: string;
 	accent: string;
 	accentBg: string;
-	/** Icon colour over `accent` (the play button). */
 	onAccent: string;
 	gradient: [string, string, string, string];
 }
 
-/** Every 0.05, not only the stops: luminance along the linear blend between stops is not always monotonic. */
+/** Samples between the stops too: luminance along a blend is not always monotonic. */
 const gradientSamples = (): number[] => {
 	const low = Math.min(...GRADIENT_ALPHAS);
 	const high = Math.max(...GRADIENT_ALPHAS);
@@ -72,7 +67,7 @@ const gradientSamples = (): number[] => {
 const worstContrast = (fg: Rgb, backgrounds: Rgb[]) =>
 	Math.min(...backgrounds.map(bg => contrastRatio(fg, bg)));
 
-/** Text is black or white by worst-stop contrast; below WCAG AA the gradient turns opaque, where one always passes. */
+/** Below WCAG AA on the gradient, it turns opaque, where black or white always passes. */
 export const getAdaptiveColors = (dominantColor: string, base: string): AdaptivePalette | null => {
 	const dominant = parseHex(dominantColor);
 	const baseRgb = parseHex(base);
@@ -90,7 +85,6 @@ export const getAdaptiveColors = (dominantColor: string, base: string): Adaptive
 		pole = pick();
 	}
 
-	// Lowest opacity of the secondary text that keeps AA on every stop.
 	let secondaryAlpha = 1;
 	for (let a = SECONDARY_MIN_ALPHA; a < 1; a += SECONDARY_ALPHA_STEP) {
 		const rounded = Math.round(a * 100) / 100;

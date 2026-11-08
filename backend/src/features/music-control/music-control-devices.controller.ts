@@ -15,7 +15,6 @@ export async function getMyDevices(req: Request, res: Response) {
 	sendSuccess(res, { devices: await deviceService.listMyDevices(userOf(req)) });
 }
 
-/** `name: null` restores the system name; a connected socket of that device takes the new name at once. */
 export async function renameDevice(req: Request, res: Response) {
 	const ownerId = userOf(req);
 	const { deviceId } = deviceParamsSchema.parse(req.params);
@@ -25,7 +24,6 @@ export async function renameDevice(req: Request, res: Response) {
 	sendSuccess(res, { device });
 }
 
-/** Mine first, then my friends'. */
 export async function getDevicePicker(req: Request, res: Response) {
 	sendSuccess(res, await controllableDevicesService.list(userOf(req)));
 }

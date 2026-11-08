@@ -4,7 +4,7 @@ import type { AddressInfo } from 'node:net';
 import express from 'express';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-// Before env.ts is parsed: limiting on, nobody whitelisted, default login limits.
+// Runs before env.ts reads process.env.
 vi.hoisted(() => {
 	process.env.RATE_LIMIT_ENABLED = 'true';
 	process.env.RATE_LIMIT_WHITELIST_IPS = '';

@@ -4,10 +4,8 @@ import * as devices from '@/features/music-control/music-control-devices.control
 import * as licenses from '@/features/music-control/music-control-licenses.controller.js';
 import { authMiddleware } from '@/features/auth/auth.middleware.js';
 
-// Endpoints are documented in music-control*.openapi.ts.
 const router = Router();
 
-// All routes require authentication
 router.use(authMiddleware);
 
 router.get('/permissions', permissions.getMyPermissions);

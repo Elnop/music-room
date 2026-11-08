@@ -1,6 +1,5 @@
 import type { MediaElement } from '@/features/player/services/mediaElement';
 
-/** A browser audio element: `load` fires the events of a stream that loaded, `play` follows `playResult`. */
 export class FakeMediaElement implements MediaElement {
 	src = '';
 	currentTime = 0;
@@ -70,7 +69,7 @@ export const autoplayRefusal = () =>
 		Object.assign(new Error('play() needs a user gesture'), { name: 'NotAllowedError' })
 	);
 
-/** The page's document creates this element; call before the player module creates its element. */
+/** Call before the player module creates its element. */
 export function installFakeDocument(element: FakeMediaElement): void {
 	Object.assign(globalThis, { document: { createElement: () => element } });
 }

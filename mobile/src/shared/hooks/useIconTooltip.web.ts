@@ -1,7 +1,7 @@
 import { useEffect, useRef, type RefObject } from 'react';
 import type { View } from 'react-native';
 
-// The project compiles without the DOM library, so the element read here is typed.
+// The project compiles without the DOM library, so the element is typed here.
 interface TooltipElement {
 	textContent: string | null;
 	getAttribute(name: string): string | null;
@@ -12,7 +12,7 @@ interface TooltipElement {
 /** Icon fonts draw their glyphs as Private Use Area characters, which are no visible label. */
 const ICON_GLYPHS = /[-]/g;
 
-/** react-native-web drops the `title` prop, so the attribute is set on the element itself; no label, no tooltip. */
+/** react-native-web drops the `title` prop, so it is set on the element itself. */
 export function useIconTooltip(label: string | undefined): RefObject<View | null> {
 	const ref = useRef<View>(null);
 

@@ -7,33 +7,35 @@ import type { ProfilePrivacy } from '@/features/profile/profile.types.js';
 
 type ProfilePrivacyRow = Tables<'profile_privacy'>;
 
-/** Missing values fall back to the defaults. */
+const DEFAULT_VISIBILITY = {
+	emailVisibility: 'private',
+	bioVisibility: 'public',
+	avatarVisibility: 'public',
+	musicPreferencesVisibility: 'public',
+} as const;
+
 function mapRowToPrivacy(row: ProfilePrivacyRow): ProfilePrivacy {
 	return {
 		userId: row.user_id,
-		emailVisibility: row.email_visibility ?? 'private',
-		bioVisibility: row.bio_visibility ?? 'public',
-		avatarVisibility: row.avatar_visibility ?? 'public',
-		musicPreferencesVisibility: row.music_preferences_visibility ?? 'public',
+		emailVisibility: row.email_visibility ?? DEFAULT_VISIBILITY.emailVisibility,
+		bioVisibility: row.bio_visibility ?? DEFAULT_VISIBILITY.bioVisibility,
+		avatarVisibility: row.avatar_visibility ?? DEFAULT_VISIBILITY.avatarVisibility,
+		musicPreferencesVisibility:
+			row.music_preferences_visibility ?? DEFAULT_VISIBILITY.musicPreferencesVisibility,
 		createdAt: row.created_at ?? new Date().toISOString(),
 		updatedAt: row.updated_at ?? new Date().toISOString(),
 	};
 }
 
-/** The defaults, not stored in the database. */
 function defaultPrivacySettings(userId: string): ProfilePrivacy {
 	return {
 		userId,
-		emailVisibility: 'private',
-		bioVisibility: 'public',
-		avatarVisibility: 'public',
-		musicPreferencesVisibility: 'public',
+		...DEFAULT_VISIBILITY,
 		createdAt: new Date().toISOString(),
 		updatedAt: new Date().toISOString(),
 	};
 }
 
-/** initialData overrides the defaults. */
 async function createDefaultSettings(
 	userId: string,
 	initialData?: UpdatePrivacyInput
@@ -41,10 +43,11 @@ async function createDefaultSettings(
 	try {
 		const insertData: TablesInsert<'profile_privacy'> = {
 			user_id: userId,
-			email_visibility: initialData?.emailVisibility || 'private',
-			bio_visibility: initialData?.bioVisibility || 'public',
-			avatar_visibility: initialData?.avatarVisibility || 'public',
-			music_preferences_visibility: initialData?.musicPreferencesVisibility || 'public',
+			email_visibility: initialData?.emailVisibility ?? DEFAULT_VISIBILITY.emailVisibility,
+			bio_visibility: initialData?.bioVisibility ?? DEFAULT_VISIBILITY.bioVisibility,
+			avatar_visibility: initialData?.avatarVisibility ?? DEFAULT_VISIBILITY.avatarVisibility,
+			music_preferences_visibility:
+				initialData?.musicPreferencesVisibility ?? DEFAULT_VISIBILITY.musicPreferencesVisibility,
 		};
 
 		const { data, error } = await supabaseAdmin
@@ -82,7 +85,7 @@ export async function getPrivacySettings(
 
 		if (error) {
 			if (error.code === 'PGRST116') {
-				if (requesterId && requesterId === userId) return await createDefaultSettings(userId);
+				if (requesterId === userId) return await createDefaultSettings(userId);
 				return defaultPrivacySettings(userId);
 			}
 			logger.error('Failed to fetch privacy settings', { error });
@@ -97,7 +100,6 @@ export async function getPrivacySettings(
 	}
 }
 
-/** Creates the row when missing. */
 export async function updatePrivacySettings(
 	userId: string,
 	data: UpdatePrivacyInput

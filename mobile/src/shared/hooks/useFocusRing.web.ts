@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-// The project compiles without the DOM library, so the parts of the document used here are typed.
+// The project compiles without the DOM library, so the document is typed here.
 interface StyleElement {
 	id: string;
 	textContent: string | null;
@@ -15,7 +15,7 @@ interface BrowserDocument {
 const browser = globalThis as unknown as { document?: BrowserDocument };
 const STYLE_ID = 'zumik-focus-ring';
 
-/** `:focus-visible` rings the keyboard focus (Tab); a text field draws its focus on its own frame. */
+/** A text field draws its focus on its own frame. */
 const focusRingCss = (color: string) =>
 	`:focus-visible { outline: 2px solid ${color}; outline-offset: 2px; } input:focus, textarea:focus { outline: none; }`;
 

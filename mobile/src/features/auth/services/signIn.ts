@@ -20,7 +20,6 @@ export async function login(input: LoginInput): Promise<void> {
 	if (response.session) await open(response);
 }
 
-/** Registers; the account either needs its email verified or is signed in. */
 export async function register(input: RegisterInput): Promise<RegisterResult> {
 	const response = await authApi.register(input);
 	if (response.requiresVerification) {

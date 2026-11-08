@@ -4,11 +4,9 @@ import type { Socket } from 'socket.io-client';
 import { useSocketStore } from '@/shared/stores/socketStore';
 
 export interface SocketCacheRule<Payload, Data> {
-	/** As emitted by backend/src/realtime/. */
 	event: string;
-	/** Built with queryKeys; null ignores the payload. */
 	queryKey: (payload: Payload) => QueryKey | null;
-	/** Without it, when it returns undefined (e.g. stale version) or with nothing cached, the query is refetched. */
+	/** Returning undefined (a stale version) refetches the query instead. */
 	update?: (current: Data, payload: Payload) => Data | undefined;
 }
 
@@ -38,7 +36,7 @@ interface SocketCacheBinding {
 	apply: (client: QueryClient, payload: unknown) => SocketCacheResult;
 }
 
-/** Socket.io payloads are untyped at runtime: the payload type is the backend's contract for the event. */
+/** The payload type is the backend's contract for the event: nothing checks it at runtime. */
 export function socketCacheRule<Payload, Data>(
 	rule: SocketCacheRule<Payload, Data>
 ): SocketCacheBinding {

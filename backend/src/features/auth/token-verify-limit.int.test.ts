@@ -5,8 +5,7 @@ import express, { type Request } from 'express';
 import { io as ioClient, type Socket as ClientSocket } from 'socket.io-client';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Before env.ts is parsed: limiting on, nobody whitelisted, a low token limit,
-// no trusted proxy (whatever backend/.env says).
+// Set before env.ts is parsed, whatever backend/.env says.
 vi.hoisted(() => {
 	process.env.TRUST_PROXY = '';
 	process.env.RATE_LIMIT_ENABLED = 'true';
@@ -24,9 +23,6 @@ const { rateLimitConfig } = await import('@/shared/config/rate-limit.config.js')
 const socketServer = await import('@/realtime/socket-server.js');
 const { getIO } = await import('@/realtime/state.js');
 const { configureTrustProxy } = await import('@/shared/config/trust-proxy.js');
-
-// Failed token verifications limited per IP: HTTP through authMiddleware / optionalAuthMiddleware
-// on a throwaway app, and the Socket.io handshake, against test Redis and local Supabase.
 
 const KEY_PATTERN = 'rl:auth:token:*';
 const PASSWORD = 'integration-test-password';
@@ -70,7 +66,6 @@ describe('token verification limit per IP', () => {
 		validToken = session.session.access_token;
 
 		const app = express();
-		// As in server.ts; TRUST_PROXY is empty here.
 		configureTrustProxy(app);
 		const whoAmI = (req: Request) => (req as Request & { user?: { id: string } }).user?.id ?? null;
 		app.get('/protected', authMiddleware, (req, res) => {

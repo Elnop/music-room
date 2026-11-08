@@ -4,7 +4,7 @@ import { ApiError } from '@/shared/services/api';
 import * as tracksApi from '@/features/playlists/services/tracksApi';
 import { usePendingMovesStore } from '@/features/playlists/stores/pendingMovesStore';
 import type { PlaylistWithTracks } from '@/features/playlists/types';
-import { isOpen, reloadIfOpen, settleTrackEvent } from './playlistCache';
+import { isOnScreen, reloadIfOnScreen, settleTrackEvent } from './playlistCache';
 
 /** Refusals of a move that mean the track changed under us: reload and tell the user. */
 const CONFLICT_CODES = ['TRACK_MOVED_CONCURRENTLY', 'TRACK_NOT_IN_PLAYLIST', 'PLAYLIST_REBALANCED'];
@@ -26,7 +26,7 @@ async function sendMove(
 	afterRank: string | null
 ): Promise<'moved' | 'skipped'> {
 	const playlist = client.getQueryData<PlaylistWithTracks>(queryKeys.playlists.detail(playlistId));
-	if (!playlist || !isOpen(client, playlistId)) return 'skipped';
+	if (!playlist || !isOnScreen(client, playlistId)) return 'skipped';
 	try {
 		const result = await tracksApi.moveTrack(
 			playlistId,
@@ -44,12 +44,12 @@ async function sendMove(
 		});
 		return 'moved';
 	} catch (error) {
-		if (isMoveConflict(error)) await reloadIfOpen(client, playlistId);
+		if (isMoveConflict(error)) await reloadIfOnScreen(client, playlistId);
 		throw error;
 	}
 }
 
-/** Queued behind the previous move; resolves 'skipped' once off screen, rejects with the ApiError after a reload on a conflict. */
+/** Resolves 'skipped' once off screen; on a conflict, reloads then rejects with the ApiError. */
 export function moveTrack(
 	client: QueryClient,
 	playlistId: string,

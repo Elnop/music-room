@@ -7,9 +7,8 @@ import { usePlaylistCardMenu } from '@/features/playlists/cardMenu/hooks/usePlay
 import { PlaylistCardMenu } from '@/features/playlists/cardMenu/components/orchestrators/PlaylistCardMenu';
 
 type HomeOrchestratorProps = NativeStackScreenProps<PlaylistStackParamList, 'Home'> & {
-	/** The nearby events section, from another feature: the navigation layer passes it in. */
+	/** Sections of other features: the navigation layer passes them in. */
 	nearbyEvents?: React.ReactNode;
-	/** The similar tastes profiles section, from the friends feature. */
 	similarProfiles?: React.ReactNode;
 };
 

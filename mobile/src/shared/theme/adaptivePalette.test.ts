@@ -14,7 +14,6 @@ const hex = (value: string): Rgb => [
 	parseInt(value.slice(5, 7), 16),
 ];
 
-/** `rgba(r,g,b,a)` → its colour and opacity. */
 const rgba = (value: string): { rgb: Rgb; alpha: number } => {
 	const parts = /rgba\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*\)/.exec(value);
 	if (!parts) throw new Error(`not rgba: ${value}`);

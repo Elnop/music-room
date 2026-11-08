@@ -14,7 +14,7 @@ interface SearchTracksViewProps {
 }
 
 export function SearchTracksView({ screen, bottomPadding }: SearchTracksViewProps) {
-	const { styles, theme } = useThemedStyles(createStyles);
+	const { styles } = useThemedStyles(createStyles);
 	const typed = screen.search.text.trim() !== '';
 
 	return (

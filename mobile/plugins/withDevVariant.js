@@ -2,8 +2,7 @@ const { withAppBuildGradle, withDangerousMod } = require('@expo/config-plugins')
 const fs = require('fs');
 const path = require('path');
 
-// The debug build installs next to the release (GitHub Releases) instead of replacing it:
-// same signature, so a shared applicationId would make one an update of the other.
+// Same signature as the release: a shared applicationId would make the debug build an update of it.
 const APP_ID_SUFFIX = '.dev';
 const APP_NAME = 'Zumik Dev';
 const DEBUG_BLOCK = /(buildTypes\s*\{\s*debug\s*\{)/;

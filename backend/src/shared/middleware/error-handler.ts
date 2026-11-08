@@ -4,7 +4,6 @@ import { env } from '@/shared/config/env.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { ApiResponse } from '@/shared/types/global.types.js';
 
-/** Technical context of an error: logged always, sent in development and test only. */
 interface AppErrorOptions {
 	why?: string;
 	fix?: string;
@@ -31,7 +30,7 @@ export class AppError extends Error {
 }
 
 function buildErrorResponse(err: AppError): ApiResponse {
-	// Fail closed: only development and test get why/fix in the response.
+	// An allowlist, so an unknown NODE_ENV hides why and fix too.
 	const exposeDebug = env.NODE_ENV === 'development' || env.NODE_ENV === 'test';
 	return {
 		success: false,
@@ -74,9 +73,8 @@ function toAppError(err: Error): AppError {
 			err.issues.map(e => ({ path: e.path.join('.'), message: e.message }))
 		);
 	}
-	// Errors carrying a code (Supabase/PostgREST) are client errors.
+	// Supabase/PostgREST errors carry a code: answered as a 400 with it, as the API always did.
 	if ('code' in err && 'message' in err) {
-		// Passed through untouched, as the API always did.
 		return new AppError(400, err.message, (err as Error & { code: string }).code);
 	}
 	return new AppError(500, 'Internal server error', 'INTERNAL_ERROR', undefined, {

@@ -63,7 +63,7 @@ async function createUser(): Promise<TestUser> {
 		.insert({ id, username: `int_${id.slice(0, 8)}` });
 	if (profileError) throw profileError;
 
-	// Sign in with the anon client, never the admin one.
+	// Never the admin client: signing in would replace its service-role session.
 	const { data: session, error: signInError } = await supabaseAnon.auth.signInWithPassword({
 		email,
 		password: PASSWORD,
@@ -137,8 +137,7 @@ describe('Listening and control access', () => {
 	const hasDevice = (statuses: UserListeningStatus[], deviceId: string) =>
 		statuses.some(s => s.devices.some(d => d.device.deviceId === deviceId));
 
-	/** Leave time for a stray event to arrive after the expected ones. */
-	const settle = () => new Promise(resolve => setTimeout(resolve, 150));
+	const waitForStrayEvents = () => new Promise(resolve => setTimeout(resolve, 150));
 
 	async function setFollows(): Promise<void> {
 		// Deleting the follows also drops their licenses (015 foreign key).
@@ -224,8 +223,7 @@ describe('Listening and control access', () => {
 	afterEach(async () => {
 		vi.restoreAllMocks();
 		while (clients.length) clients.pop()?.disconnect();
-		// Let the server drop the sockets so their disconnect broadcasts do not
-		// reach the next test.
+		// So their disconnect broadcasts do not reach the next test.
 		await vi.waitFor(async () => expect(await getIO()!.fetchSockets()).toHaveLength(0));
 	});
 
@@ -286,7 +284,7 @@ describe('Listening and control access', () => {
 			const daveStatuses = record<UserListeningStatus>(daveSocket, 'listening:status');
 			const deviceId = await publishAliceStatus();
 			await vi.waitFor(() => expect(hasDevice(daveStatuses, deviceId)).toBe(true));
-			await settle();
+			await waitForStrayEvents();
 			expect(statuses).toEqual([]);
 		});
 
@@ -307,7 +305,7 @@ describe('Listening and control access', () => {
 			const daveStatuses = record<UserListeningStatus>(daveSocket, 'listening:status');
 			const deviceId = await publishAliceStatus();
 			await vi.waitFor(() => expect(hasDevice(daveStatuses, deviceId)).toBe(true));
-			await settle();
+			await waitForStrayEvents();
 			expect(bobStatuses).toEqual([]);
 		});
 
@@ -383,7 +381,7 @@ describe('Listening and control access', () => {
 				controllerId: bob.id,
 			});
 			await expect(refusal).resolves.toMatchObject({ code: 'NOT_AUTHORIZED' });
-			await settle();
+			await waitForStrayEvents();
 			expect(commands).toEqual([]);
 		});
 
@@ -417,7 +415,6 @@ describe('Listening and control access', () => {
 			expect(errors.every(e => e.code === 'INVALID_PAYLOAD')).toBe(true);
 			expect(commands).toEqual([]);
 
-			// No crash: a valid action still goes through.
 			const command = nextEvent<ControlCommand>(aliceDevice, 'control:command');
 			bobSocket.emit('control:action', {
 				targetUserId: alice.id,
@@ -457,7 +454,7 @@ describe('Listening and control access', () => {
 			const daveStatuses = record<UserListeningStatus>(daveSocket, 'listening:status');
 			const deviceId = await publishAliceStatus();
 			await vi.waitFor(() => expect(hasDevice(daveStatuses, deviceId)).toBe(true));
-			await settle();
+			await waitForStrayEvents();
 			expect(phoneStatuses).toEqual([]);
 			expect(tabletStatuses).toEqual([]);
 		});
@@ -474,7 +471,7 @@ describe('Listening and control access', () => {
 			const daveStatuses = record<UserListeningStatus>(daveSocket, 'listening:status');
 			const deviceId = await publishAliceStatus();
 			await vi.waitFor(() => expect(hasDevice(daveStatuses, deviceId)).toBe(true));
-			await settle();
+			await waitForStrayEvents();
 			expect(bobStatuses).toEqual([]);
 		});
 	});
@@ -502,7 +499,7 @@ describe('Listening and control access', () => {
 
 			const refused = await control(bobSocket, deviceB);
 			expect(refused).toMatchObject({ ok: false, error: { code: 'NOT_AUTHORIZED' } });
-			await settle();
+			await waitForStrayEvents();
 			expect(commandsB).toEqual([]);
 
 			await licenseBob(deviceB);
@@ -528,7 +525,7 @@ describe('Listening and control access', () => {
 			const refused = await control(bobSocket, deviceB);
 			expect(refused).toMatchObject({ ok: false, error: { code: 'NOT_AUTHORIZED' } });
 			expect(await control(bobSocket, deviceA)).toEqual({ ok: true });
-			await settle();
+			await waitForStrayEvents();
 			expect(commandsB).toEqual([]);
 		});
 
@@ -545,7 +542,7 @@ describe('Listening and control access', () => {
 			bobSocket.emit('listening:subscribe', alice.id);
 			await expect(subscribeRefusal).resolves.toMatchObject({ code: 'NOT_AUTHORIZED' });
 			expect(await inListeningRoom(bobSocket, alice.id)).toBe(false);
-			await settle();
+			await waitForStrayEvents();
 			expect(commands).toEqual([]);
 		});
 

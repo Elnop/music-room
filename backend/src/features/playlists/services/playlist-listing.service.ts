@@ -25,7 +25,6 @@ export async function getUserPlaylists(userId: string): Promise<PlaylistResponse
 	}
 }
 
-/** Public playlists of a user, plus the private ones the current user is invited to. */
 export async function getPlaylistsByUser(
 	targetUserId: string,
 	currentUserId?: string

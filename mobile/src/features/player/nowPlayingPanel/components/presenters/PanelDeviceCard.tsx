@@ -8,7 +8,6 @@ import type { NowPlayingPanelStyles } from './nowPlayingPanelStyles';
 
 interface PanelDeviceCardProps {
 	deviceLabel: string;
-	/** Another device plays, under Music Control Delegation. */
 	isRemote: boolean;
 	styles: NowPlayingPanelStyles;
 	onOpenDevices: () => void;

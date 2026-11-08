@@ -4,14 +4,12 @@ import type { AddressInfo } from 'node:net';
 import express from 'express';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-// Limiting on so the attempts limit is real; loopback whitelisted so the
-// route-level limiters (not under test here) skip these requests.
+// Loopback whitelisted so the route-level limiters skip these requests.
 vi.hoisted(() => {
 	process.env.RATE_LIMIT_ENABLED = 'true';
 	process.env.RATE_LIMIT_WHITELIST_IPS = '127.0.0.1,::1,::ffff:127.0.0.1';
 });
 
-// Never send real mail.
 vi.mock('@/features/mail/services/mail.service.js', () => ({
 	sendVerificationEmail: vi.fn().mockResolvedValue(undefined),
 	sendPasswordResetEmail: vi.fn().mockResolvedValue(undefined),
@@ -23,9 +21,6 @@ const { supabaseAdmin } = await import('@/shared/config/supabase.js');
 const { default: authRouter } = await import('@/features/auth/auth.routes.js');
 const { errorHandler } = await import('@/shared/middleware/error-handler.js');
 const loginService = await import('@/features/auth/services/login.service.js');
-
-// The attempts limit runs before the code check, through HTTP on the real auth router against
-// the local Supabase stack and test Redis.
 
 const PASSWORD = 'Old-password-206';
 const NEW_PASSWORD = 'New-password-206';
@@ -101,7 +96,6 @@ describe('password reset code attempts limit (#206)', () => {
 
 		expect(await resetPassword(RESET_CODE)).toEqual({ status: 429, code: 'RATE_LIMIT_EXCEEDED' });
 
-		// The code is still stored and the password is unchanged.
 		const { data, error } = await supabaseAdmin
 			.from('user_profiles')
 			.select('password_reset_code')

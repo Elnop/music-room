@@ -19,7 +19,6 @@ interface SearchPage {
 const SOUNDCLOUD_PAGE_SIZE = 50;
 const MAX_PAGES = 3;
 
-/** Keeps playable tracks only, reading up to MAX_PAGES SoundCloud pages to reach `limit`. */
 export async function searchTracks(query: SoundCloudSearchInput): Promise<SoundCloudSearchResult> {
 	const cacheKey = `search:${query.q}:${query.limit}:${query.offset}`;
 
@@ -82,7 +81,6 @@ async function collectPlayable(query: SoundCloudSearchInput) {
 	return { playable, scanned, first, last };
 }
 
-/** Accepts a permalink URL or a numeric id. */
 export async function getTrack(urlOrId: string): Promise<SoundCloudTrack> {
 	const cacheKey = `track:${urlOrId}`;
 	const cached = cache.get<SoundCloudTrack>(cacheKey);

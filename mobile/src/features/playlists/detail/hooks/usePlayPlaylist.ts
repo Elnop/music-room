@@ -6,12 +6,11 @@ export interface PlayPlaylist {
 	loading: boolean;
 	playing: boolean;
 	press: () => void;
-	/** The track a tap is starting the playlist from, while the request runs. */
 	pendingTrackId: string | null;
 	playFrom: (track: { id: string; trackUri: string }) => void;
 }
 
-/** While this device plays an item queued from the playlist, the button pauses and resumes without any request. */
+/** While this device plays the playlist, the button pauses and resumes without a request. */
 export function usePlayPlaylist(playlistId: string): PlayPlaylist {
 	const { playingUri, state } = usePlaylistPlayback(playlistId);
 	const [pending, setPending] = useState(false);

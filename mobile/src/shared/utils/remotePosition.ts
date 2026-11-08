@@ -1,6 +1,5 @@
 import type { ListeningStatus } from '@/types/listening.types';
 
-/** Remote progress: the sent position, plus the time elapsed since while playing. */
 export function estimatePositionMs(
 	status: Pick<ListeningStatus, 'positionMs' | 'updatedAt' | 'isPlaying'>,
 	now: number,

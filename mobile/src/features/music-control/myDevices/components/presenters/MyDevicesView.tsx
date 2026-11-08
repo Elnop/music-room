@@ -17,7 +17,7 @@ interface MyDevicesViewProps {
 	bottomPadding: number;
 	devices: UserDeviceWithLicenses[];
 	friends: FriendUserSummary[];
-	allDevicesIds: Set<string>;
+	allDevicesFriendIds: Set<string>;
 	currentDeviceId: string | null;
 	licensed: Set<string>;
 	pending: Set<string>;
@@ -35,7 +35,7 @@ export function MyDevicesView({
 	bottomPadding,
 	devices,
 	friends,
-	allDevicesIds,
+	allDevicesFriendIds,
 	currentDeviceId,
 	licensed,
 	pending,
@@ -87,7 +87,7 @@ export function MyDevicesView({
 							device={device}
 							isCurrent={device.deviceId === currentDeviceId}
 							friends={friends}
-							allDevicesIds={allDevicesIds}
+							allDevicesFriendIds={allDevicesFriendIds}
 							licensed={licensed}
 							pending={pending}
 							pairKey={pairKey}

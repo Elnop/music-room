@@ -31,7 +31,6 @@ export function formatPlaylistResponse(
 	};
 }
 
-/** The `playlist:details` payload: the playlist's metadata as stored in `row`. */
 export function toDetailsPayload(row: PlaylistRow): PlaylistDetailsPayload {
 	return {
 		playlistId: row.id,
@@ -59,7 +58,6 @@ export function formatTrackResponse(row: TrackRow): TrackResponse {
 	};
 }
 
-/** The user_profiles columns a playlist member (owner, viewer) is built from. */
 export const OWNER_COLUMNS = 'id, username, display_name, avatar_url';
 
 interface OwnerProfile {

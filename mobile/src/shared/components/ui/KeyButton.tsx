@@ -7,7 +7,7 @@ import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { Pressable } from './Pressable';
 
-/** `primary` is the screen's main action, `device` a control of where the sound plays. */
+/** `device`: a control of where the sound plays. */
 type KeyTone = 'primary' | 'surface' | 'device';
 
 interface KeyButtonProps {
@@ -20,12 +20,10 @@ interface KeyButtonProps {
 	iconSize?: number;
 	disabled?: boolean;
 	loading?: boolean;
-	/** A label or a status drawn after the icon. */
 	children?: React.ReactNode;
 	style?: StyleProp<ViewStyle>;
 }
 
-/** An icon on a keyboard key: the pixel button of every screen. */
 export function KeyButton({
 	icon,
 	onPress,

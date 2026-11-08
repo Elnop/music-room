@@ -11,12 +11,10 @@ interface SectionHeaderProps {
 	icon: PixelSpriteName;
 	/** Read by screen readers; on screen the icon and the count stand for it. */
 	title: string;
-	/** Shown when above 0. */
 	count: number;
-	/** A section that folds: its header toggles it and shows a chevron. */
 	open?: boolean;
 	onToggle?: () => void;
-	/** A control at the end of a section that does not fold, such as a compact button. */
+	/** Only for a section that does not fold. */
 	action?: React.ReactNode;
 }
 

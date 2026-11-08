@@ -2,7 +2,6 @@ import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js';
 import { describe, expect, it } from 'vitest';
 import { supabaseAdmin } from '@/shared/config/supabase.js';
 
-// SQL rank functions from migration 016, against the local Supabase stack.
 // Called by name: the generated types only know these functions after `make generate-types`.
 const db = supabaseAdmin as unknown as SupabaseClient;
 

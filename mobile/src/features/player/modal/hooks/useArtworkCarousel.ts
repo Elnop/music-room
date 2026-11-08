@@ -31,7 +31,6 @@ export interface ArtworkCarousel {
 	rowStyle: ReturnType<typeof useAnimatedStyle>;
 	infoStyle: ReturnType<typeof useAnimatedStyle>;
 	artworkSize: number;
-	/** From one artwork to the next. */
 	artworkStep: number;
 }
 

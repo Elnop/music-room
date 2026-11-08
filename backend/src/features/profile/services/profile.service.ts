@@ -6,7 +6,6 @@ import { deleteReplacedAvatar } from '@/features/profile/services/avatar.service
 import type { UpdateProfileInput } from '@/features/profile/profile.validators.js';
 import type { OwnProfile, UserProfileRow } from '@/features/profile/profile.types.js';
 
-/** Joins the account's email (auth.users); 404 USER_NOT_FOUND without one. */
 async function withEmail(
 	profileData: UserProfileRow,
 	userId: string,
@@ -42,7 +41,6 @@ export async function updateProfile(userId: string, data: UpdateProfileInput): P
 		if (data.avatarUrl !== undefined) updateData.avatar_url = data.avatarUrl;
 		updateData.updated_at = new Date().toISOString();
 
-		// Previous avatar, to delete our stored photo once replaced
 		let previousAvatarUrl: string | null = null;
 		if (data.avatarUrl !== undefined) {
 			const { data: current } = await supabaseAdmin

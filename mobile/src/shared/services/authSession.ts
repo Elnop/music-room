@@ -1,8 +1,7 @@
 import { createStore, useStore, type StoreApi } from 'zustand';
 import type { UserProfile } from '@/types/user.types';
 
-// The auth store registers itself here, so nothing outside `features/auth/` imports the feature
-// (.agents/rules/architecture.md#layers).
+// The auth store registers itself here, so nothing outside `features/auth/` imports the feature.
 
 export interface SessionView {
 	user: UserProfile | null;
@@ -11,7 +10,6 @@ export interface SessionView {
 }
 
 interface AuthSession {
-	/** The session store (the auth store, seen through `SessionView`). */
 	store: StoreApi<SessionView>;
 	isTokenExpiringSoon: () => boolean;
 	refreshAccessToken: () => Promise<boolean>;
@@ -20,7 +18,6 @@ interface AuthSession {
 	setUser?: (user: UserProfile) => void | Promise<void>;
 }
 
-/** Signed out until the auth store registers: before that, nothing is read. */
 const signedOut = createStore<SessionView>(() => ({
 	user: null,
 	accessToken: null,
@@ -40,12 +37,10 @@ export function getAuthSession(): AuthSession | null {
 
 const sessionStore = (): StoreApi<SessionView> => authSession?.store ?? signedOut;
 
-/** The session now, outside React (stores, services). */
 export function getSession(): SessionView {
 	return sessionStore().getState();
 }
 
-/** One value of the session, re-rendering when it changes: `useSession(s => s.user?.id)`. */
 export function useSession<T>(selector: (session: SessionView) => T): T {
 	return useStore(sessionStore(), selector);
 }
@@ -62,13 +57,12 @@ export async function setUser(user: UserProfile): Promise<void> {
 	await authSession?.setUser?.(user);
 }
 
-/** Runs at every end of session: logout or refused refresh. */
+/** Runs on logout and on a refused refresh. */
 export function onSessionEnd(listener: () => void): () => void {
 	sessionEndListeners.add(listener);
 	return () => sessionEndListeners.delete(listener);
 }
 
-/** Called by the auth store when a signed-in session ends. */
 export function notifySessionEnd(): void {
 	sessionEndListeners.forEach(listener => listener());
 }

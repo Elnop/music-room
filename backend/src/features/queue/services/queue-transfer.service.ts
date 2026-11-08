@@ -14,7 +14,7 @@ import {
 import type { TransferInput } from '@/features/queue/queue.validators.js';
 import type { QueueItem, TransferResult } from '@/features/queue/queue.types.js';
 
-/** Every check comes before any change: target device (license, online), source device, played item. */
+/** Every check runs before any change. */
 export async function transfer(actorId: string, input: TransferInput): Promise<TransferResult> {
 	const { targetUserId: ownerId, targetDeviceId: deviceId, playing, positionMs } = input;
 	await resolvePlaybackDevice(actorId, ownerId, deviceId);
@@ -85,7 +85,6 @@ function trackCommand(actorId: string, input: TransferInput): DeviceCommand {
 	};
 }
 
-/** The played track and what follows it in the actor's queue, as track ids. */
 async function trackIdsToInsert(actorId: string, input: TransferInput): Promise<string[]> {
 	const { playing } = input;
 	if ('queueItemId' in playing) return trackIdsFromRpc(actorId, playing.queueItemId);
@@ -93,7 +92,6 @@ async function trackIdsToInsert(actorId: string, input: TransferInput): Promise<
 	return [row.id, ...(await upcomingTrackIdsRpc(actorId))];
 }
 
-/** The device was online or controlled when checked; a command that fails to reach it is logged. */
 function send(ownerId: string, deviceId: string, command: DeviceCommand, actorId: string): void {
 	if (!realtime.sendDeviceCommand(ownerId, deviceId, command)) {
 		logger.warn('Transfer command not delivered: device went offline', {

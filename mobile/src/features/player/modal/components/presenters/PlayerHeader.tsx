@@ -42,7 +42,6 @@ export function PlayerHeader({ styles, colors, dialog = false, onClose }: Player
 					)}
 				</View>
 			</Pressable>
-
 		</View>
 	);
 }

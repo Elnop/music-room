@@ -3,7 +3,7 @@ import { z } from 'zod';
 import type { QueueTrack } from '@/types/queue.types';
 import { logger } from '@/shared/utils/logger';
 
-/** Per user, on device: no stream URL (they expire) and no token, only what rebuilds a paused player. */
+/** No stream URL (they expire) and no token: only what rebuilds a paused player. */
 export interface LastTrackEntry {
 	track: QueueTrack;
 	queueItemId: string | null;
@@ -44,7 +44,6 @@ async function clear(userId: string): Promise<void> {
 	}
 }
 
-/** The saved entry of `userId`, or null; a corrupt or unreadable entry is deleted. */
 async function load(userId: string): Promise<LastTrackEntry | null> {
 	let raw: string | null;
 	try {

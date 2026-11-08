@@ -10,8 +10,7 @@ import { Text } from '@/shared/components/ui/Text';
 
 export type PickerDevice = DevicePickerOwner['devices'][number];
 
-const deviceIcon = (platform: string): PixelSpriteName =>
-	platform === 'web' ? 'laptop' : 'phone';
+const deviceIcon = (platform: string): PixelSpriteName => (platform === 'web' ? 'laptop' : 'phone');
 
 interface DeviceRowProps {
 	owner: DevicePickerOwner;

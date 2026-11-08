@@ -5,7 +5,6 @@ import { isScriptLoadError } from '@/features/auth/utils/loadScript';
 
 const NETWORK_MESSAGE = 'Impossible de joindre le serveur. Vérifiez votre connexion.';
 
-/** Native errors with their own French text, per provider. */
 const NATIVE_MESSAGES: Record<OAuthProvider, (message: string) => string | null> = {
 	google: message => {
 		if (message === 'Google Play Services not available') {

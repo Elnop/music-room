@@ -2,7 +2,6 @@ import type { MusicEvent } from '@/features/events/types';
 
 const HOUR = 3_600_000;
 
-/** An event that started an hour ago and ends in two, organised by `bob`. */
 export function musicEvent(overrides: Partial<MusicEvent> = {}): MusicEvent {
 	const now = Date.now();
 	return {

@@ -17,7 +17,6 @@ import { registerListeningHandlers } from '@/realtime/handlers/listening.handler
 import { registerControlHandlers } from '@/realtime/handlers/control.handler.js';
 import { setIO } from '@/realtime/state.js';
 
-/** Applies to every incoming event, including those added later. */
 function limitEvents(socket: AppSocket): void {
 	const checkEvent = createSocketEventLimiter();
 	socket.use(([eventName]: unknown[], next) => {
@@ -74,10 +73,8 @@ export function initialize(httpServer: HTTPServer): void {
 	socketLogger.init('initializing', { cors: 'ALLOWED_ORIGINS' });
 
 	const io: AppSocketServer = new SocketIOServer(httpServer, {
-		// Same origin rule as the HTTP API (cors.config.ts). `cors` only covers
-		// the polling transport's headers; `allowRequest` also refuses a
-		// browser WebSocket from a disallowed origin. A same-origin request is
-		// not cross-origin: the Android app sends the backend's own address.
+		// `cors` only covers polling headers; `allowRequest` also refuses a browser WebSocket.
+		// Same-origin passes: the Android app sends the backend's own address.
 		cors: {
 			origin: (origin, callback) => callback(null, isOriginAllowed(origin)),
 			methods: ['GET', 'POST'],

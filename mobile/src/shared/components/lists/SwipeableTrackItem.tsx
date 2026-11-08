@@ -18,25 +18,16 @@ import { formatDuration } from '@/shared/utils/formatters';
 interface SwipeableTrackItemProps {
 	track: Track;
 	onDelete: (trackId: string) => Promise<void>;
-	/** True for a viewer who cannot edit: no delete swipe, no drag handle. */
+	/** A viewer who cannot edit: no delete swipe, no drag handle. */
 	disabled?: boolean;
-	/** A right swipe adds the track to the play queue, for any viewer. */
 	onAddToQueue?: () => void;
-	/** Shows the drag handle; pressing it starts a reorder drag. */
 	onDragStart?: () => void;
-	/** Raises the row while it is being dragged. */
 	isDragActive?: boolean;
-	/** A long press or the ⋯ button opens the track's quick actions. */
 	onShowActions?: () => void;
-	/** The track playing now from this playlist: highlighted like the queue's current item. */
 	isCurrent?: boolean;
-	/** A tap on the row; without it, the row only reacts to a long press. */
 	onPress?: () => void;
-	/** Shows a spinner while the tap's request runs. */
 	isPending?: boolean;
-	/** Greyed out, with no queue swipe nor quick actions; delete and drag still work. */
 	unavailable?: boolean;
-	/** Its number in the list, from 1: wide screens then lay the row out as a table row. */
 	position?: number;
 }
 
@@ -155,9 +146,9 @@ export function SwipeableTrackItem({
 							/>
 						)}
 
-						{track.durationMs && (
+						{track.durationMs ? (
 							<Text style={styles.duration}>{formatDuration(track.durationMs)}</Text>
-						)}
+						) : null}
 					</Pressable>
 
 					{actions && <TrackActionsButton onPress={actions} />}

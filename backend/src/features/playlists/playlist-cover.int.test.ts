@@ -18,8 +18,6 @@ const { errorHandler } = await import('@/shared/middleware/error-handler.js');
 const { default: playlistRoutes } = await import('@/features/playlists/playlist.routes.js');
 const { COVER_BUCKET } = await import('@/features/playlists/services/playlist-cover.service.js');
 
-// Against the local stack (Storage, test Redis); only the Socket.io emitters are mocked.
-
 interface TestUser {
 	id: string;
 	token: string;

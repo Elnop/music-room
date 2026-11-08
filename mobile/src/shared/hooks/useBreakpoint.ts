@@ -11,7 +11,7 @@ export function breakpointOf(width: number): Breakpoint {
 
 interface BreakpointInfo {
 	breakpoint: Breakpoint;
-	/** Tablet or desktop: every wide-screen adaptation keys on it, so the phone stays as it was. */
+	/** Every wide-screen adaptation keys on it, so the phone stays as it was. */
 	isWide: boolean;
 	isDesktop: boolean;
 	width: number;

@@ -4,7 +4,7 @@ import type { AddressInfo } from 'node:net';
 import express from 'express';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-// Before env.ts is parsed: limiting on, nobody whitelisted, 3 avatar changes per window.
+// Set before env.ts is parsed.
 vi.hoisted(() => {
 	process.env.RATE_LIMIT_ENABLED = 'true';
 	process.env.RATE_LIMIT_WHITELIST_IPS = '';
@@ -18,8 +18,7 @@ const { errorHandler } = await import('@/shared/middleware/error-handler.js');
 const { default: profileRoutes } = await import('@/features/profile/profile.routes.js');
 const { AVATAR_BUCKET } = await import('@/features/profile/services/avatar.service.js');
 
-// Against the local stack (Storage, test Redis). Each test uses fresh users, so the
-// 3-per-window limit only bites in the rate-limit test.
+// Each test uses fresh users, so the 3-per-window limit only bites in the rate-limit test.
 
 interface TestUser {
 	id: string;
@@ -53,7 +52,6 @@ async function createUser(): Promise<TestUser> {
 		.insert({ id, username: `inta_${id.slice(0, 8)}` });
 	if (profileError) throw profileError;
 
-	// Sign in with the anon client, never the admin one.
 	const { data: session, error: signInError } = await supabaseAnon.auth.signInWithPassword({
 		email,
 		password: PASSWORD,
@@ -224,7 +222,6 @@ describe('Avatar routes (/api/profile/avatar)', () => {
 		expect(res.body.error?.code).toBe('RATE_LIMIT_EXCEEDED');
 		expect(await storedFiles(me.id)).toHaveLength(0);
 
-		// The limit is per user.
 		const other = await createUser();
 		expect((await upload(other)).status).toBe(200);
 	});

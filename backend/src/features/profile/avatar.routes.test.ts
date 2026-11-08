@@ -6,7 +6,6 @@ import profileRoutes from '@/features/profile/profile.routes.js';
 import { errorHandler } from '@/shared/middleware/error-handler.js';
 import { ownedAvatarPath } from '@/features/profile/services/avatar.service.js';
 
-// Real router, multer, controllers and avatar.service; Supabase, auth, limiter and logger are faked.
 // The limiter's 429 and the real Storage are covered by avatar.int.test.ts.
 
 const ME = '0b5c6d7e-1111-4222-8333-444455556666';

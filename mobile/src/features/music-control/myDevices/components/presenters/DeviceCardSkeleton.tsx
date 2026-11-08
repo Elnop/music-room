@@ -4,7 +4,6 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { SkeletonBlock } from '@/shared/components/ui/Skeleton';
 
-/** Same shape as a device card: icon, name and meta lines, then friend rows. */
 export function DeviceCardSkeleton() {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);

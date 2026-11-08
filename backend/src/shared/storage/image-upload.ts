@@ -7,14 +7,12 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 const IMAGE_MAX_BYTES = 2 * 1024 * 1024;
 
 interface ImageUploadOptions {
-	/** Multipart field that carries the file. */
 	field: string;
-	/** Names the file in the 413 message ("photo", "cover"). */
 	label: string;
 	maxBytes?: number;
 }
 
-/** Multer errors become 413 FILE_TOO_LARGE or 400 INVALID_UPLOAD; the type is checked later, from the bytes. */
+/** The client's MIME type is ignored: the type is checked later, from the bytes. */
 export function imageUpload({ field, label, maxBytes = IMAGE_MAX_BYTES }: ImageUploadOptions) {
 	const upload = multer({
 		storage: multer.memoryStorage(),
@@ -43,7 +41,7 @@ export function imageUpload({ field, label, maxBytes = IMAGE_MAX_BYTES }: ImageU
 	};
 }
 
-/** Size is capped by multer; the type is checked from the bytes, not here. */
+/** multer caps the size and the bytes give the type: only presence is checked here. */
 export function uploadedImageSchema(field: string, label: string) {
 	return z.object(
 		{

@@ -38,8 +38,6 @@ import { useNowPlayingPanelStore } from '@/shared/stores/nowPlayingPanelStore';
 import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import { KeyboardShortcuts } from './KeyboardShortcuts';
 
-// Playlists and Friends take nested params: zumik:// share links open their screens;
-// Profile's let a playlist open Settings.
 export type AppTabsParamList = {
 	HomeTab: NavigatorScreenParams<PlaylistStackParamList> | undefined;
 	PlaylistsTab: NavigatorScreenParams<PlaylistStackParamList> | undefined;
@@ -52,7 +50,7 @@ export type { FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
 
 const Tab = createBottomTabNavigator<AppTabsParamList>();
 
-// Before any screen renders: the playlists feature plays through it.
+// Registered before any screen renders: the playlists feature plays through them.
 registerPlayback();
 registerMusicControl();
 
@@ -64,7 +62,6 @@ const TAB_ICONS: Record<string, PixelSpriteName> = {
 	ProfileTab: 'me',
 };
 
-/** Wide screens move the tabs to a side bar framed by AppTabBar: an icon rail on a tablet, icons and labels on desktop. */
 const sidebarOptions = (
 	breakpoint: Exclude<Breakpoint, 'phone'>,
 	theme: Theme
@@ -111,8 +108,7 @@ export function AppNavigator() {
 	useEventsSync();
 	useRemoteTarget();
 	const connectionStatus = useConnectionStatus();
-	// While the banner covers the status bar, the screens below it must not add
-	// the status bar inset again (react-navigation headers read this context).
+	// Under the banner, react-navigation headers must not add the status bar inset again.
 	const navigatorInsets = React.useMemo(
 		() => (connectionStatus ? { ...insets, top: 0 } : insets),
 		[connectionStatus, insets]
@@ -142,7 +138,6 @@ export function AppNavigator() {
 									fontFamily: theme.typography.families.bold,
 								},
 								...sidebar,
-								// A pixel square under the active tab, in its tint.
 								tabBarIcon: ({ focused, color }) => (
 									<View style={styles.tabIcon}>
 										<PixelIcon name={TAB_ICONS[route.name]} color={color} />
@@ -220,7 +215,6 @@ const createStyles = (theme: Theme, bottomInset: number) =>
 		container: {
 			flex: 1,
 		},
-		// The desktop's now playing panel docks to the right of the screens, above the player bar.
 		body: {
 			flex: 1,
 			flexDirection: 'row',

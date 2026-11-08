@@ -11,7 +11,6 @@ import {
 } from '@/features/auth/hooks/usePasswordResetMutations';
 import { useResendResetCode } from './useResendResetCode';
 
-/** Delay before the login screen, after the success toast. */
 const BACK_TO_LOGIN_DELAY_MS = 1500;
 
 export interface ResetPassword {
@@ -25,11 +24,9 @@ export interface ResetPassword {
 	isLoading: boolean;
 	error: string | null;
 	resend: () => void;
-	/** Seconds before the code may be sent again; 0 when it may. */
 	cooldown: number;
 }
 
-/** The reset code and the new password; success leads back to the login screen. */
 export function useResetPassword(
 	email: string,
 	navigation: NativeStackNavigationProp<AuthStackParamList, 'ResetPassword'>

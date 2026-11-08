@@ -1,11 +1,9 @@
 const { withPodfile } = require('@expo/config-plugins');
 
-// The app's own target (Podfile: `platform :ios, ... || '15.1'`). Xcode 27 refuses anything
-// below 15.0, and some pods still ship resource bundles that ask for iOS 9 to 13.
+// Xcode 27 refuses targets below 15.0, and some pods still ask for iOS 9 to 13.
 const DEPLOYMENT_TARGET = '15.1';
 const MARKER = '# Pods deployment target raised by withPodsDeploymentTarget';
 
-/** Raises every pod target still below the app's iOS version, after react_native_post_install. */
 function withPodsDeploymentTarget(config) {
 	return withPodfile(config, config => {
 		const contents = config.modResults.contents;

@@ -1,5 +1,4 @@
 // In memory by design, not as a fallback: the counters belong to one connection, on one backend instance.
-// Only the first refusal of a window logs a warning.
 
 interface EventLimit {
 	max: number;
@@ -8,7 +7,6 @@ interface EventLimit {
 
 const DEFAULT_EVENT_LIMIT: EventLimit = { max: 30, windowMs: 10_000 };
 
-/** Any other event name shares the default counter. */
 const EVENT_LIMITS: Readonly<Record<string, EventLimit>> = {
 	'listening:update': { max: 20, windowMs: 10_000 },
 	'listening:subscribe': DEFAULT_EVENT_LIMIT,
@@ -23,7 +21,6 @@ export const RATE_LIMITED = {
 	code: 'RATE_LIMITED',
 } as const;
 
-/** `playlist:error` carries `playlistId`; none for other event names. */
 export function rateLimitedErrorFor(
 	eventName: string
 ): { event: string; payload: Record<string, unknown> } | null {
@@ -37,6 +34,7 @@ export function rateLimitedErrorFor(
 	return null;
 }
 
+/** 'limited' marks only the first refusal of a window, so that one alone is logged. */
 type LimitDecision = 'allowed' | 'limited' | 'still-limited';
 
 /** Events without their own limit share one counter, so random event names cannot grow the map. */

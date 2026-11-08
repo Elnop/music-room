@@ -5,11 +5,9 @@ import * as counter from '@/shared/security/counter.js';
 /** Accepted risk: fails open, but the login rate limiter that runs first fails closed (doc/security/threat-model.md). */
 interface FailOpenOptions<T> {
 	disabled: string;
-	/** Logged at `unavailableLevel` (warn by default). */
 	unavailable: string;
 	unavailableLevel?: 'warn' | 'error';
 	failed: string;
-	/** Defaults to `fallback`. */
 	whenDisabled?: T;
 	fallback: T;
 }

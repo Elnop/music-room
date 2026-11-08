@@ -5,15 +5,12 @@ const SEARCH_DELAY_MS = 500;
 
 export interface DebouncedText {
 	text: string;
-	/** `text` once the user stopped typing; emptied at once when the text is cleared. */
 	settled: string;
-	/** Typed but not settled yet: counts as loading. */
 	pending: boolean;
 	change: (text: string) => void;
 	clear: () => void;
 }
 
-/** A search field whose value settles 500 ms after the last keystroke. */
 export function useDebouncedText(): DebouncedText {
 	const [text, setText] = useState('');
 	const [settled, setSettled] = useState('');

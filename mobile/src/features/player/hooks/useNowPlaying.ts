@@ -10,7 +10,6 @@ import type { NowPlaying, NowPlayingTrack } from '@/features/player/types';
 
 export type { NowPlaying, NowPlayingTrack } from '@/features/player/types';
 
-/** The single view of "what plays" for the mini-player, modal, and system controls. */
 export function useNowPlaying(): NowPlaying {
 	const remote = useRemoteNowPlaying();
 	const { player, seekTo } = usePlayer();

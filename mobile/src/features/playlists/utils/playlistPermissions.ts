@@ -1,12 +1,11 @@
 import type { Playlist } from '@/features/playlists/types';
 
-/** The playlist fields that decide who may edit its tracks. */
 export type PlaylistEditFields = Pick<
 	Playlist,
 	'ownerId' | 'collaboratorIds' | 'viewerIds' | 'visibility' | 'editMode'
 >;
 
-/** Owner, collaborator, or anyone who can see an `editMode: 'open'` playlist; mirrors the backend's edit check. */
+/** Mirrors the backend's edit check. */
 export function canEditPlaylist(
 	userId: string | null | undefined,
 	playlist: PlaylistEditFields | null | undefined

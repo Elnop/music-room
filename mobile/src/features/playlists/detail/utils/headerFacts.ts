@@ -1,7 +1,6 @@
 import { formatDuration } from '@/shared/utils/formatters';
 import type { PlaylistWithTracks } from '@/features/playlists/types';
 
-/** What both playlist headers (phone and wide screens) say about the playlist. */
 export function headerFacts(playlist: PlaylistWithTracks) {
 	const trackCount = playlist.tracks.length;
 	const collaborators = playlist.collaboratorIds.length;

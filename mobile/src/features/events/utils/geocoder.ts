@@ -13,13 +13,11 @@ function formatPlace(place: Location.LocationGeocodedAddress): string | null {
 	return text || null;
 }
 
-/** Null when not found. */
 export async function geocodeAddress(address: string): Promise<Point | null> {
 	const [result] = await Location.geocodeAsync(address);
 	return result ? { latitude: result.latitude, longitude: result.longitude } : null;
 }
 
-/** The address of a point, or null when it has none. */
 export async function placeName(point: Point): Promise<string | null> {
 	const [place] = await Location.reverseGeocodeAsync(point);
 	return (place && formatPlace(place)) ?? null;

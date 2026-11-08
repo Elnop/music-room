@@ -1,7 +1,6 @@
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 
-/** An AppError passes through; any other error is logged as `log` and answered as a 500. */
 export async function failUnexpected<T>(
 	work: () => Promise<T>,
 	log: string,

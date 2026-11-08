@@ -4,19 +4,18 @@ import type { AddressInfo } from 'node:net';
 import express from 'express';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-// Limiting on, loopback whitelisted so the route-level limiters skip these requests.
+// Loopback whitelisted so the route-level limiters skip these requests.
 vi.hoisted(() => {
 	process.env.RATE_LIMIT_ENABLED = 'true';
 	process.env.RATE_LIMIT_WHITELIST_IPS = '127.0.0.1,::1,::ffff:127.0.0.1';
 });
 
-// Never send real mail; capture the code instead.
 vi.mock('@/features/mail/services/mail.service.js', () => ({
 	sendVerificationEmail: vi.fn().mockResolvedValue(undefined),
 	sendPasswordResetEmail: vi.fn().mockResolvedValue(undefined),
 }));
 
-// Token verification calls Google and Facebook: always mocked (doc/development/testing.md).
+// oauth.service calls Google and Facebook.
 vi.mock('@/features/auth/services/oauth.service.js', () => ({
 	verifyGoogleToken: vi.fn(),
 	verifyFacebookToken: vi.fn(),
@@ -30,9 +29,6 @@ const { errorHandler } = await import('@/shared/middleware/error-handler.js');
 const { sendPasswordResetEmail } = await import('@/features/mail/services/mail.service.js');
 const loginService = await import('@/features/auth/services/login.service.js');
 const sessionService = await import('@/features/auth/services/session.service.js');
-
-// A password reset ends every open session of the account, through HTTP on the real auth
-// router against the local Supabase stack and test Redis.
 
 const OLD_PASSWORD = 'Old-password-203';
 const NEW_PASSWORD = 'New-password-203';
@@ -117,7 +113,6 @@ describe('password reset ends open sessions (#203)', () => {
 			});
 		}
 
-		// A new sign-in with the new password still works.
 		const fresh = await login(NEW_PASSWORD);
 		const refreshed = await sessionService.refreshToken(fresh.refreshToken);
 		expect(refreshed.user.id).toBe(userId);

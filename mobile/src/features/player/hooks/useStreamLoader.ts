@@ -45,10 +45,11 @@ export function useStreamLoader(): void {
 			const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
 			try {
-				const { streamUrl: url, expiresAt, protocol } = await fetchStreamUrl(
-					currentTrack.permalink_url,
-					controller.signal
-				);
+				const {
+					streamUrl: url,
+					expiresAt,
+					protocol,
+				} = await fetchStreamUrl(currentTrack.permalink_url, controller.signal);
 				clearTimeout(timeoutId);
 				if (currentLoadCounterRef.current !== thisLoadCounter) return;
 				setStreamUrl(url, expiresAt, protocol);

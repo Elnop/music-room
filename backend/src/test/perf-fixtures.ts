@@ -39,7 +39,6 @@ function fail(step: string, error: { message: string }): never {
 	throw new Error(`${step}: ${error.message}`);
 }
 
-/** BATCH_SIZE at a time, keeping the order. */
 async function inBatches<T, R>(items: T[], fn: (item: T) => Promise<R>): Promise<R[]> {
 	const results: R[] = [];
 	for (let i = 0; i < items.length; i += BATCH_SIZE) {
@@ -135,7 +134,6 @@ async function linkFriendsAndDevice(ownerId: string, friendIds: string[]): Promi
 	if (licenceError) fail('device licences', licenceError);
 }
 
-/** Public and open; leftover perf tracks are removed. */
 async function upsertSharedPlaylist(ownerId: string): Promise<string> {
 	const { data: found, error: findError } = await supabaseAdmin
 		.from('playlists')
@@ -185,7 +183,6 @@ async function upsertSharedPlaylist(ownerId: string): Promise<string> {
 }
 
 async function signIn(user: Omit<PerfUser, 'token'>): Promise<PerfUser> {
-	// One client per sign-in: a sign-in keeps its session on the client.
 	const { data, error } = await createSignInClient().auth.signInWithPassword({
 		email: user.email,
 		password: user.password,
