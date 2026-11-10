@@ -1,10 +1,15 @@
 import { StyleSheet } from 'react-native';
+import { keycap, pixelFrame } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 
 export const createStyles = (theme: Theme) =>
 	StyleSheet.create({
+		// A key floating above the tabs.
 		container: {
-			backgroundColor: theme.colors.background,
+			...keycap(theme),
+			backgroundColor: theme.colors.surfaceAlt,
+			marginHorizontal: theme.spacing.md,
+			marginBottom: theme.spacing.sm,
 		},
 		content: {
 			flexDirection: 'row',
@@ -20,9 +25,9 @@ export const createStyles = (theme: Theme) =>
 			alignItems: 'center',
 		},
 		artwork: {
+			...pixelFrame(theme),
 			width: 40,
 			height: 40,
-			borderRadius: 8,
 			marginRight: theme.spacing.sm,
 			backgroundColor: theme.colors.surfaceAlt,
 		},
@@ -45,21 +50,16 @@ export const createStyles = (theme: Theme) =>
 			fontSize: 12,
 			color: theme.colors.textSecondary,
 		},
+		deviceRow: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			gap: theme.spacing.xs,
+			marginTop: 2,
+		},
 		device: {
 			fontSize: 11,
-			fontFamily: theme.typography.families.semibold,
-			color: theme.colors.primary,
-		},
-		playButton: {
-			width: 40,
-			height: 40,
-			borderRadius: 20,
-			backgroundColor: theme.colors.primary,
-			alignItems: 'center',
-			justifyContent: 'center',
-		},
-		playButtonEmpty: {
-			backgroundColor: theme.colors.surfaceAlt,
+			fontFamily: theme.typography.families.mono,
+			color: theme.colors.info,
 		},
 		nextButton: {
 			width: 36,
@@ -72,12 +72,12 @@ export const createStyles = (theme: Theme) =>
 			opacity: 0.35,
 		},
 		progressBarContainer: {
-			height: 2,
+			height: theme.borders.thick,
 			width: '100%',
 			backgroundColor: 'transparent',
 		},
 		progressBar: {
-			height: 2,
+			height: theme.borders.thick,
 			backgroundColor: theme.colors.primary,
 		},
 	});

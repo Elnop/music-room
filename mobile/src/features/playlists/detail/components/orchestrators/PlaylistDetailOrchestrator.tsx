@@ -54,7 +54,7 @@ export function PlaylistDetailOrchestrator({ navigation, route }: PlaylistDetail
 					{isOwner ? (
 						<HeaderIconButton
 							ref={sheetButtonRef}
-							icon="ellipsis-horizontal"
+							icon="more"
 							size={24}
 							onPress={openSheet}
 							accessibilityLabel="Options de la playlist"

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Avatar } from '@/shared/components/media/Avatar';
 import { useTheme } from '@/shared/theme/ThemeContext';
@@ -41,8 +41,8 @@ export function FriendItemRow({
 				<Text style={styles.username}>{friend.username}</Text>
 				{friend.displayName && <Text style={styles.displayName}>{friend.displayName}</Text>}
 				<View style={styles.controlRow}>
-					<Ionicons
-						name="musical-notes"
+					<PixelIcon
+						name="note"
 						size={12}
 						color={canControl ? theme.colors.primary : theme.colors.textSecondary}
 						style={styles.controlIcon}
@@ -61,7 +61,7 @@ export function FriendItemRow({
 					accessibilityLabel={`${friend.displayName || friend.username} peut contrôler ma musique`}
 				/>
 			</View>
-			<Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
+			<PixelIcon name="right" size={20} color={theme.colors.textSecondary} />
 		</Pressable>
 	);
 }

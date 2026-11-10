@@ -1,18 +1,13 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Artwork } from '@/shared/components/media/Artwork';
+import { StyleSheet } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useContextMenu } from '@/shared/hooks/useContextMenu';
 import { useGridTileWidth } from '@/shared/hooks/useGridTileWidth';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { Playlist } from '@/features/playlists/types';
-import { playlistCardLabel, tracksLabel } from '@/features/playlists/home/utils/playlistLabels';
-import { OwnerAvatarBadge } from './OwnerAvatarBadge';
-import { PrivateBadge } from './PrivateBadge';
-import { Text } from '@/shared/components/ui/Text';
-
-const coverOf = (playlist: Playlist) => playlist.coverUrl || playlist.firstTrackCover;
+import { playlistCardLabel } from '@/features/playlists/home/utils/playlistLabels';
+import { PlaylistCassette } from './PlaylistCassette';
 
 interface PlaylistGridCardProps {
 	playlist: Playlist;
@@ -34,34 +29,12 @@ export function PlaylistGridCard({ playlist, onPress, onShowActions }: PlaylistG
 			onPress={onPress}
 			accessibilityLabel={playlistCardLabel(playlist.name, owner)}
 		>
-			<View>
-				<Artwork uri={coverOf(playlist)} size={width} iconSize={32} style={styles.tileCover} />
-				{playlist.visibility === 'private' && <PrivateBadge style={styles.tileBadge} />}
-				{owner && <OwnerAvatarBadge owner={owner} />}
-			</View>
-			<View style={styles.tileInfo}>
-				<Text style={styles.tileName} numberOfLines={1}>
-					{playlist.name}
-				</Text>
-				<Text style={styles.meta} numberOfLines={1}>
-					{tracksLabel(playlist.trackCount)}
-				</Text>
-			</View>
+			<PlaylistCassette playlist={playlist} owner={owner} width={width} />
 		</Pressable>
 	);
 }
 
 const createStyles = (theme: Theme) =>
 	StyleSheet.create({
-		meta: { fontSize: theme.typography.sizes.sm, color: theme.colors.textSecondary },
 		tile: { marginBottom: theme.spacing.lg },
-		tileCover: { borderRadius: 8 },
-		tileBadge: { position: 'absolute', top: 8, right: 8, paddingVertical: 3 },
-		tileInfo: { marginTop: theme.spacing.sm, paddingHorizontal: 2 },
-		tileName: {
-			fontSize: theme.typography.sizes.md,
-			fontFamily: theme.typography.families.semibold,
-			color: theme.colors.text,
-			marginBottom: 2,
-		},
 	});

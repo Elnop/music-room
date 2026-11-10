@@ -57,7 +57,7 @@ export function PlayerBarView({ data }: PlayerBarViewProps) {
 			<View style={styles.center}>
 				<View style={styles.controls}>
 					<PlayerBarButton
-						icon="play-skip-back"
+						icon="prev"
 						label="Piste précédente"
 						onPress={data.handlePrevious}
 						disabled={!data.canGoPrevious}
@@ -74,7 +74,7 @@ export function PlayerBarView({ data }: PlayerBarViewProps) {
 						style={[styles.playButton, !track && styles.playButtonEmpty]}
 					/>
 					<PlayerBarButton
-						icon="play-skip-forward"
+						icon="next"
 						label="Piste suivante"
 						onPress={data.handleNext}
 						disabled={!data.canGoNext}
@@ -97,7 +97,7 @@ export function PlayerBarView({ data }: PlayerBarViewProps) {
 
 			<View style={[styles.side, styles.sideEnd]}>
 				<PlayerBarButton
-					icon="albums-outline"
+					icon="tape"
 					label={data.panelLabel}
 					onPress={data.onTogglePanel}
 					selected={data.isPanelOpen}
@@ -105,14 +105,14 @@ export function PlayerBarView({ data }: PlayerBarViewProps) {
 					style={styles.iconButton}
 				/>
 				<PlayerBarButton
-					icon="list"
+					icon="queue"
 					label="File d'attente"
 					onPress={data.onOpenQueue}
 					color={theme.colors.text}
 					style={styles.iconButton}
 				/>
 				<PlayerBarButton
-					icon="phone-portrait-outline"
+					icon="phone"
 					label="Choisir l'appareil"
 					onPress={data.onOpenDevices}
 					selected={data.isRemote}
@@ -120,7 +120,7 @@ export function PlayerBarView({ data }: PlayerBarViewProps) {
 					style={styles.iconButton}
 				/>
 				<PlayerBarButton
-					icon={data.volume === 0 ? 'volume-mute' : 'volume-high'}
+					icon={data.volume === 0 ? 'mute' : 'volume'}
 					label={data.volume === 0 ? 'Activer le son' : 'Couper le son'}
 					onPress={data.onToggleMute}
 					disabled={data.volumeDisabled}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
+import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
@@ -22,7 +23,7 @@ interface LinkedAccountRowProps {
 	method: {
 		type: MethodType;
 		label: string;
-		icon: keyof typeof Ionicons.glyphMap;
+		icon: PixelSpriteName;
 	};
 	linked?: LinkedProvider;
 	pending: OAuthProvider | null;
@@ -86,7 +87,7 @@ export function LinkedAccountRow({
 	return (
 		<View style={styles.accountItem} testID={`linked-account-${method.type}`}>
 			<View style={styles.methodBadge}>
-				<Ionicons name={method.icon} size={20} color={theme.colors.primary} />
+				<PixelIcon name={method.icon} size={20} color={theme.colors.primary} />
 			</View>
 			<View style={styles.methodInfo}>
 				<Text style={styles.rowTitle}>{method.label}</Text>
@@ -109,7 +110,6 @@ const createStyles = (theme: Theme) =>
 		methodBadge: {
 			width: 40,
 			height: 40,
-			borderRadius: 20,
 			backgroundColor: theme.colors.primary + '15',
 			alignItems: 'center',
 			justifyContent: 'center',
@@ -131,7 +131,6 @@ const createStyles = (theme: Theme) =>
 		actionButton: {
 			paddingVertical: theme.spacing.xs,
 			paddingHorizontal: theme.spacing.md,
-			borderRadius: 12,
 			borderWidth: 1,
 			minWidth: 72,
 			alignItems: 'center',

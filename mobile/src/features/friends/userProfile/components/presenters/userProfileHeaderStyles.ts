@@ -43,7 +43,6 @@ export const createUserProfileHeaderStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.surface,
 			paddingHorizontal: theme.spacing.sm,
 			paddingVertical: 2,
-			borderRadius: 4,
 			borderWidth: 1,
 			borderColor: theme.colors.border,
 		},
@@ -58,7 +57,6 @@ export const createUserProfileHeaderStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.surface,
 			paddingHorizontal: theme.spacing.sm,
 			paddingVertical: 3,
-			borderRadius: 12,
 			gap: 4,
 		},
 		statusBadgeOnline: {
@@ -67,7 +65,6 @@ export const createUserProfileHeaderStyles = (theme: Theme) =>
 		statusDot: {
 			width: 6,
 			height: 6,
-			borderRadius: 3,
 			backgroundColor: theme.colors.textSecondary,
 		},
 		statusDotOnline: {
@@ -132,7 +129,6 @@ export const createUserProfileHeaderStyles = (theme: Theme) =>
 			flex: 1,
 			backgroundColor: theme.colors.primary,
 			paddingVertical: theme.spacing.sm,
-			borderRadius: theme.spacing.sm,
 			alignItems: 'center',
 			justifyContent: 'center',
 		},

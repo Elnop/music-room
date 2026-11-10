@@ -57,14 +57,14 @@ export function SearchUsersTab({
 				searchFailed && searchQuery.trim() ? (
 					<EmptyState
 						style={styles.emptyState}
-						icon="cloud-offline-outline"
+						icon="alert"
 						message="La recherche a échoué"
 						action={{ label: 'Réessayer', onPress: onRetry }}
 					/>
 				) : (
 					<EmptyState
 						style={styles.emptyState}
-						icon="search-outline"
+						icon="search"
 						message={
 							searchQuery
 								? 'Aucun utilisateur trouvé'

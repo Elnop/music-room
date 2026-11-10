@@ -1,8 +1,8 @@
 import type { ViewStyle } from 'react-native';
-import { hexToRgba } from './adaptivePalette';
+import { PIXEL } from './tokens';
 
-/** The frame of a focused field turns `color`, and a halo follows its radius; shadows never move the layout. */
+/** A focused field gets a second pixel outline in `color`; a shadow never moves the layout. */
 export const focusedFieldStyle = (color: string): ViewStyle => ({
 	borderColor: color,
-	boxShadow: `0 0 0 1px ${color}, 0 0 0 4px ${hexToRgba(color, 0.3)}`,
+	boxShadow: `0 0 0 ${PIXEL}px ${color}`,
 });

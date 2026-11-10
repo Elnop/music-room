@@ -1,13 +1,14 @@
 import React from 'react';
 import { Modal, StyleSheet, View, type DimensionValue } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { AnchoredMenu } from '@/shared/components/layout/AnchoredMenu';
 import { CenteredDialog } from '@/shared/components/layout/CenteredDialog';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import { pixelFrame } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 import { Text } from '@/shared/components/ui/Text';
@@ -58,7 +59,7 @@ export function ActionSheet({
 			<View style={[styles.header, { borderBottomColor: separator }]}>
 				{onBack && (
 					<Pressable onPress={onBack} style={styles.backButton} accessibilityLabel="Retour">
-						<Ionicons name="chevron-back" size={22} color={theme.colors.text} />
+						<PixelIcon name="back" size={22} color={theme.colors.text} />
 					</Pressable>
 				)}
 				<View style={styles.headerText}>
@@ -112,14 +113,12 @@ const createStyles = (theme: Theme, bottomInset: number) =>
 			backgroundColor: theme.colors.backdrop,
 		},
 		sheet: {
+			...pixelFrame(theme),
 			backgroundColor: theme.colors.background,
-			borderTopLeftRadius: 16,
-			borderTopRightRadius: 16,
 			paddingBottom: bottomInset + theme.spacing.md,
 		},
 		menuSheet: {
-			borderTopLeftRadius: 0,
-			borderTopRightRadius: 0,
+			borderWidth: 0,
 			paddingBottom: theme.spacing.xs,
 			backgroundColor: 'transparent',
 		},

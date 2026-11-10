@@ -9,7 +9,6 @@ jest.mock('@/shared/theme/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
-jest.mock('@expo/vector-icons', () => ({ Ionicons: () => null }));
 jest.mock('@/shared/components/form/BackendUrlField', () => {
 	const { Text } = jest.requireActual('react-native');
 	return { BackendUrlField: () => <Text>backend-url-field</Text> };

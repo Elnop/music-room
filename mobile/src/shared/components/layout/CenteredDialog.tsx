@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { DIALOG_MAX_WIDTH } from '@/shared/constants/layout';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { pixelFrame } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 
 interface CenteredDialogProps {
@@ -41,8 +42,8 @@ const createStyles = (theme: Theme) =>
 		dialog: {
 			width: '100%',
 			maxWidth: DIALOG_MAX_WIDTH,
-			borderRadius: 16,
 			overflow: 'hidden',
+			...pixelFrame(theme),
 			backgroundColor: theme.colors.background,
 			...theme.shadows.large,
 		},

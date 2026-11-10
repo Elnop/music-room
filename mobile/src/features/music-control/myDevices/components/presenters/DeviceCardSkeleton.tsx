@@ -36,7 +36,6 @@ const createStyles = (theme: Theme) =>
 	StyleSheet.create({
 		skeletonCard: {
 			backgroundColor: theme.colors.surface,
-			borderRadius: 16,
 			paddingHorizontal: theme.spacing.lg,
 			paddingTop: theme.spacing.md,
 			paddingBottom: theme.spacing.xs,

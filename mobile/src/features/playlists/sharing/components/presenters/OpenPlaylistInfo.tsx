@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { createSharingStyles } from './sharingStyles';
@@ -13,7 +13,7 @@ export function OpenPlaylistInfo() {
 
 	return (
 		<View style={[shared.card, styles.card]}>
-			<Ionicons name="information-circle" size={28} color={theme.colors.primary} />
+			<PixelIcon name="info" size={28} color={theme.colors.primary} />
 			<View style={styles.content}>
 				<Text style={styles.title}>Playlist ouverte</Text>
 				<Text style={styles.text}>

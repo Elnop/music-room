@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { FullScreenSheet } from '@/shared/components/layout/FullScreenSheet';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
@@ -67,7 +67,7 @@ export function QueueModalView({
 	const empty = current ? (
 		<Text style={styles.nothingNext}>Rien à suivre</Text>
 	) : (
-		<EmptyState message="La file d'attente est vide" icon="list-outline" />
+		<EmptyState message="La file d'attente est vide" icon="queue" />
 	);
 
 	const content = (
@@ -80,7 +80,7 @@ export function QueueModalView({
 					accessibilityRole="button"
 					accessibilityLabel="Fermer la file d'attente"
 				>
-					<Ionicons name={isWide ? 'close' : 'chevron-down'} size={24} color={theme.colors.text} />
+					<PixelIcon name={isWide ? 'close' : 'down'} size={24} color={theme.colors.text} />
 				</Pressable>
 				<Text style={styles.title}>File d&apos;attente</Text>
 			</View>

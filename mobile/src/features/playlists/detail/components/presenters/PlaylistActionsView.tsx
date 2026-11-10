@@ -46,26 +46,26 @@ export function PlaylistActionsView({
 			anchor={anchor}
 		>
 			<View>
-				<ActionSheetRow icon="create-outline" label="Modifier" onPress={onEdit} />
+				<ActionSheetRow icon="pencil" label="Modifier" onPress={onEdit} />
 				<ActionSheetRow
-					icon={coverLocked ? 'lock-closed' : 'image-outline'}
+					icon={coverLocked ? 'lock' : 'camera'}
 					label="Changer la cover"
 					detail={coverLocked ? 'Réservé au Premium' : undefined}
 					onPress={onChangeCover}
 				/>
 				{hasCover && (
 					<ActionSheetRow
-						icon="close-circle-outline"
+						icon="close"
 						label="Retirer la cover"
 						onPress={onRemoveCover}
 					/>
 				)}
 				<ActionSheetRow
-					icon="lock-closed-outline"
+					icon="lock"
 					label="Visibilité et droits"
 					onPress={onSharing}
 				/>
-				<ActionSheetRow icon="trash-outline" label="Supprimer" onPress={onDelete} destructive />
+				<ActionSheetRow icon="trash" label="Supprimer" onPress={onDelete} destructive />
 			</View>
 		</ActionSheet>
 	);

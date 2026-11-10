@@ -1,5 +1,5 @@
 import React from 'react';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import {
 	WideProfileHeader,
 	wideProfileActionStyle,
@@ -40,7 +40,7 @@ export function ProfileWideHeader({
 						variant="secondary"
 						onPress={onEditProfile}
 						style={actionStyle}
-						icon={<Ionicons name="create-outline" size={18} color={theme.colors.text} />}
+						icon={<PixelIcon name="pencil" size={18} color={theme.colors.text} />}
 					>
 						Modifier le profil
 					</Button>
@@ -48,7 +48,7 @@ export function ProfileWideHeader({
 						variant="secondary"
 						onPress={onSettings}
 						style={actionStyle}
-						icon={<Ionicons name="settings-outline" size={18} color={theme.colors.text} />}
+						icon={<PixelIcon name="gear" size={18} color={theme.colors.text} />}
 					>
 						Réglages
 					</Button>

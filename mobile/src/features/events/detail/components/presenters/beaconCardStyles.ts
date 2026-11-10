@@ -8,7 +8,6 @@ export const createBeaconCardStyles = (theme: Theme) =>
 			alignItems: 'center',
 			gap: theme.spacing.md,
 			padding: theme.spacing.md,
-			borderRadius: 12,
 			backgroundColor: theme.colors.surface,
 			borderWidth: 1,
 			borderColor: theme.colors.border,

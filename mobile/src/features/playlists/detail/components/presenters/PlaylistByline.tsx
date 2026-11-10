@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Avatar } from '@/shared/components/media/Avatar';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
@@ -24,7 +24,7 @@ export function PlaylistByline({ playlist }: { playlist: PlaylistWithTracks }) {
 			{collaboratorLabel && (
 				<>
 					<Text style={styles.separator}>•</Text>
-					<Ionicons name="people-outline" size={14} color={theme.colors.primary} />
+					<PixelIcon name="crew" size={14} color={theme.colors.primary} />
 					<Text style={styles.collaborators}>{collaboratorLabel}</Text>
 				</>
 			)}

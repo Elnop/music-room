@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
+import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
 import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
 import { ThemedSwitch } from '@/shared/components/ui/ThemedSwitch';
 import type { Theme } from '@/shared/theme/types';
@@ -9,7 +10,7 @@ import { createSharingStyles } from './sharingStyles';
 import { Text } from '@/shared/components/ui/Text';
 
 interface SettingRowProps {
-	icon: keyof typeof Ionicons.glyphMap;
+	icon: PixelSpriteName;
 	label: string;
 	description: string;
 	value: boolean;
@@ -26,7 +27,7 @@ export function SettingRow({ icon, label, description, value, onToggle, busy }: 
 		<View style={[shared.card, shared.row, styles.item]}>
 			<View style={styles.info}>
 				<View style={styles.iconContainer}>
-					<Ionicons name={icon} size={20} color={theme.colors.primary} />
+					<PixelIcon name={icon} size={20} color={theme.colors.primary} />
 				</View>
 				<View style={styles.text}>
 					<Text style={styles.label}>{label}</Text>
@@ -56,7 +57,6 @@ const createStyles = (theme: Theme) =>
 		iconContainer: {
 			width: 36,
 			height: 36,
-			borderRadius: 18,
 			backgroundColor: theme.colors.primary + '15',
 			alignItems: 'center',
 			justifyContent: 'center',

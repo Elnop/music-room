@@ -57,10 +57,10 @@ describe('AppTabBar', () => {
 		expect(screen.queryByLabelText('Zumik')).toBeNull();
 	});
 
-	it('frames the tablet rail with the app icon, without the mini-player nor the account', () => {
+	it('frames the tablet rail with the wordmark, without the mini-player nor the account', () => {
 		setWidth(820);
 		render(<AppTabBar {...props} />);
-		expect(texts()).toEqual(['tab-bar']);
+		expect(texts()).toEqual(['ZUMIK', 'tab-bar']);
 		expect(screen.getByLabelText('Zumik')).toBeTruthy();
 	});
 

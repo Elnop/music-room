@@ -34,7 +34,6 @@ const createStyles = (theme: Theme) =>
 		card: {
 			flex: 1,
 			justifyContent: 'center',
-			borderRadius: 12,
 			backgroundColor: theme.colors.surface,
 		},
 	});

@@ -13,7 +13,6 @@ export const createSharingStyles = (theme: Theme) =>
 		},
 		card: {
 			backgroundColor: theme.colors.surface,
-			borderRadius: theme.spacing.sm,
 			borderWidth: theme.borders.medium,
 			borderColor: theme.colors.border,
 		},

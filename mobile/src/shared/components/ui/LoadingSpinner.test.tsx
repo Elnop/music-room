@@ -1,5 +1,6 @@
 import React from 'react';
-import { ActivityIndicator, Image } from 'react-native';
+import { ActivityIndicator } from 'react-native';
+import { EqualizerBars } from '@/shared/components/media/EqualizerBars';
 import { render, screen } from '@testing-library/react-native';
 import { LoadingSpinner } from './LoadingSpinner';
 
@@ -9,16 +10,16 @@ jest.mock('@/shared/theme/ThemeContext', () => {
 });
 
 describe('LoadingSpinner', () => {
-	it('renders the logo by default', () => {
+	it('bounces the pixel equalizer by default', () => {
 		render(<LoadingSpinner />);
-		expect(screen.UNSAFE_queryAllByType(Image)).toHaveLength(1);
+		expect(screen.UNSAFE_queryAllByType(EqualizerBars)).toHaveLength(1);
 		expect(screen.UNSAFE_queryAllByType(ActivityIndicator)).toHaveLength(0);
 	});
 
 	it('renders an ActivityIndicator for the spinner variant', () => {
 		render(<LoadingSpinner variant="spinner" />);
 		expect(screen.UNSAFE_queryAllByType(ActivityIndicator)).toHaveLength(1);
-		expect(screen.UNSAFE_queryAllByType(Image)).toHaveLength(0);
+		expect(screen.UNSAFE_queryAllByType(EqualizerBars)).toHaveLength(0);
 	});
 
 	it.each(['logo', 'spinner'] as const)('shows the message with the %s variant', variant => {

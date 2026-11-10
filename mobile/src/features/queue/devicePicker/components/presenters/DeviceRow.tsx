@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, ActivityIndicator } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
+import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import type { DevicePickerOwner } from '@/types/device.types';
 import type { Theme } from '@/shared/theme/types';
@@ -9,8 +10,8 @@ import { Text } from '@/shared/components/ui/Text';
 
 export type PickerDevice = DevicePickerOwner['devices'][number];
 
-const deviceIcon = (platform: string): keyof typeof Ionicons.glyphMap =>
-	platform === 'web' ? 'desktop-outline' : 'phone-portrait-outline';
+const deviceIcon = (platform: string): PixelSpriteName =>
+	platform === 'web' ? 'laptop' : 'phone';
 
 interface DeviceRowProps {
 	owner: DevicePickerOwner;
@@ -46,7 +47,7 @@ export function DeviceRow({
 			accessibilityState={{ disabled, selected: active }}
 		>
 			<View style={styles.iconContainer}>
-				<Ionicons
+				<PixelIcon
 					name={deviceIcon(device.platform)}
 					size={20}
 					color={active ? theme.colors.primary : theme.colors.text}

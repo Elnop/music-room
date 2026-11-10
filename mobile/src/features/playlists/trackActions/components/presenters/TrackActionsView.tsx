@@ -42,28 +42,28 @@ export function TrackActionsView({ actions, anchor, onClose }: TrackActionsViewP
 			{onActions ? (
 				<View>
 					<ActionSheetRow
-						icon="play-forward-outline"
+						icon="next"
 						label="Lire ensuite"
 						onPress={actions.playNext}
 					/>
 					<ActionSheetRow
-						icon="list-outline"
+						icon="queue"
 						label="Ajouter à la file d'attente"
 						onPress={actions.addToQueue}
 					/>
 					<ActionSheetRow
-						icon="add-circle-outline"
+						icon="plus"
 						label="Ajouter à une playlist"
 						onPress={actions.openPlaylists}
 						chevron
 					/>
-					<ActionSheetRow icon="share-outline" label="Partager" onPress={actions.share} />
+					<ActionSheetRow icon="share" label="Partager" onPress={actions.share} />
 				</View>
 			) : step === 'newPlaylist' ? (
 				<NewPlaylistForm draft={actions.newPlaylist} />
 			) : (
 				<View>
-					<ActionSheetRow icon="add" label="Nouvelle playlist" onPress={actions.openNewPlaylist} />
+					<ActionSheetRow icon="plus" label="Nouvelle playlist" onPress={actions.openNewPlaylist} />
 					{actions.loadingPlaylists ? (
 						<View style={styles.centered}>
 							<ActivityIndicator testID="track-actions-loading" color={theme.colors.primary} />
@@ -75,7 +75,7 @@ export function TrackActionsView({ actions, anchor, onClose }: TrackActionsViewP
 							{actions.editable.map(playlist => (
 								<ActionSheetRow
 									key={playlist.id}
-									icon="musical-notes-outline"
+									icon="note"
 									label={playlist.name}
 									detail={`${playlist.trackCount} ${playlist.trackCount === 1 ? 'titre' : 'titres'}`}
 									onPress={() => actions.addToPlaylist(playlist)}

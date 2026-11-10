@@ -35,7 +35,6 @@ export const createStyles = (theme: Theme) =>
 			gap: theme.spacing.sm,
 		},
 		artwork: {
-			borderRadius: 6,
 		},
 		info: {
 			flexShrink: 1,
@@ -70,14 +69,12 @@ export const createStyles = (theme: Theme) =>
 		iconButton: {
 			width: 36,
 			height: 36,
-			borderRadius: 18,
 			alignItems: 'center',
 			justifyContent: 'center',
 		},
 		playButton: {
 			width: 40,
 			height: 40,
-			borderRadius: 20,
 			alignItems: 'center',
 			justifyContent: 'center',
 			backgroundColor: theme.colors.primary,

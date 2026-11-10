@@ -62,7 +62,6 @@ const createStyles = (theme: Theme, separator: string) =>
 			paddingHorizontal: theme.spacing.sm,
 			paddingVertical: theme.spacing.sm,
 			// The side bar's tab items are rounded by the same radius.
-			borderRadius: 10,
 		},
 		active: {
 			backgroundColor: theme.colors.surfaceAlt,

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import Animated from 'react-native-reanimated';
 import { Artwork } from '@/shared/components/media/Artwork';
 import type { ArtworkCarousel } from '@/features/player/modal/hooks/useArtworkCarousel';
@@ -48,7 +48,7 @@ export function PlayerArtworkCarousel({
 							{ width: carousel.artworkSize, height: carousel.artworkSize },
 						]}
 					>
-						<Ionicons name="musical-notes" size={64} color={emptyIconColor} />
+						<PixelIcon name="note" size={64} color={emptyIconColor} />
 					</View>
 				)}
 				{carousel.hasNext && (

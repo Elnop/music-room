@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { useAnchoredPress } from '@/shared/hooks/useAnchoredPress';
 import { Pressable } from '@/shared/components/ui/Pressable';
@@ -37,7 +37,7 @@ export function PanelTrackActions({
 					onPress={pressAdd}
 					accessibilityLabel="Ajouter à une playlist"
 				>
-					<Ionicons name="add-circle-outline" size={16} color={theme.colors.text} />
+					<PixelIcon name="plus" size={16} color={theme.colors.text} />
 					<Text style={styles.pillLabel}>Ajouter</Text>
 				</Pressable>
 			</View>

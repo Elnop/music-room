@@ -101,7 +101,6 @@ const createStyles = (theme: Theme) =>
 		passwordHint: {
 			backgroundColor: theme.colors.surface,
 			padding: theme.spacing.sm,
-			borderRadius: 8,
 			marginTop: -theme.spacing.xs,
 		},
 		passwordHintText: {

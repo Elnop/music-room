@@ -22,7 +22,7 @@ export function SimilarProfilesSection({ section }: SimilarProfilesSectionProps)
 			case 'error':
 				return (
 					<EmptyState
-						icon="cloud-offline-outline"
+						icon="alert"
 						message="Impossible de charger les suggestions"
 						action={{ label: 'Réessayer', onPress: section.retry }}
 						compact
@@ -31,7 +31,7 @@ export function SimilarProfilesSection({ section }: SimilarProfilesSectionProps)
 			case 'needsPreferences':
 				return (
 					<EmptyState
-						icon="musical-notes-outline"
+						icon="note"
 						message="Choisissez vos genres préférés pour découvrir des profils qui vous ressemblent"
 						action={{ label: 'Choisir mes genres', onPress: section.openPreferences }}
 						compact
@@ -59,7 +59,7 @@ export function SimilarProfilesSection({ section }: SimilarProfilesSectionProps)
 	return (
 		<View>
 			<SectionHeader
-				icon="sparkles-outline"
+				icon="note"
 				title="Profils aux goûts proches"
 				count={section.profiles.length}
 			/>

@@ -75,7 +75,7 @@ function renderHome(nearbyEvents?: React.ReactNode) {
 
 async function renderScreen(nearbyEvents?: React.ReactNode) {
 	const view = renderHome(nearbyEvents);
-	await screen.findByText('Playlists publiques');
+	await screen.findByLabelText('Playlists publiques');
 	await act(async () => {});
 	return view;
 }
@@ -117,7 +117,7 @@ describe('HomeOrchestrator', () => {
 	it("shows the nearby events section, the friends' playlists and the public ones", async () => {
 		await renderScreen(<Text>nearby events</Text>);
 		expect(screen.getByText('nearby events')).toBeTruthy();
-		expect(screen.getByText('Playlists de vos amis')).toBeTruthy();
+		expect(screen.getByLabelText('Playlists de vos amis')).toBeTruthy();
 		expect(screen.getByText('Fred mix')).toBeTruthy();
 		expect(screen.getByText('Open')).toBeTruthy();
 		expect(screen.queryByText('Vos playlists')).toBeNull();
@@ -145,29 +145,24 @@ describe('HomeOrchestrator', () => {
 	it("hides the friends' section without a friend, or when no friend has a playlist", async () => {
 		routes.routes['GET /api/friends'] = ok([]);
 		await renderScreen();
-		expect(screen.queryByText('Playlists de vos amis')).toBeNull();
+		expect(screen.queryByLabelText('Playlists de vos amis')).toBeNull();
 		clear();
 
 		routes.routes['GET /api/friends'] = ok([{ id: 'f1', username: 'fred' }]);
 		routes.routes['GET /api/playlists/user/f1'] = ok({ playlists: [] });
 		await renderScreen();
-		expect(screen.queryByText('Playlists de vos amis')).toBeNull();
+		expect(screen.queryByLabelText('Playlists de vos amis')).toBeNull();
 	});
 
 	it("shows no friends' section while their playlists load", async () => {
 		routes.routes['GET /api/friends'] = () => new Promise(() => undefined);
 		await renderScreen();
-		expect(screen.queryByText('Playlists de vos amis')).toBeNull();
+		expect(screen.queryByLabelText('Playlists de vos amis')).toBeNull();
 	});
 
-	it('puts the nearby events last', async () => {
+	it('opens on the nearby events, above the playlists', async () => {
 		await renderScreen(<Text>nearby events</Text>);
-		const texts = screen.getAllByText(/./).map(node => node.props.children);
-		const order = ['Playlists de vos amis', 'Playlists publiques', 'nearby events'].map(text =>
-			texts.indexOf(text)
-		);
-		expect(order[0]).toBeGreaterThan(-1);
-		expect(order).toEqual([...order].sort((a, b) => a - b));
+		expect(screen.getAllByText(/./)[0].props.children).toBe('nearby events');
 	});
 
 	it('folds the public playlists', async () => {

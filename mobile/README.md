@@ -63,9 +63,18 @@ The app runs only as a native debug build, "Zumik Dev" (`com.zumik.app.dev`): `p
 # Android (Android SDK required): build and install on the emulator or the USB phone
 npx expo run:android --app-id com.zumik.app.dev --no-bundler   # --device to pick the device; --no-bundler: no second Metro on 8081
 
-# iOS (macOS only)
-npx expo run:ios
+# iOS (macOS and Xcode only): build and install on a simulator
+npx expo run:ios --no-bundler   # --device "iPhone 17 Pro" to pick the simulator
 ```
+
+On Xcode 27, `expo run:ios` can stop with « Can't determine id of Simulator app » before building. Build with Xcode's own tool instead, then drag `ios/build/dd/Build/Products/Debug-iphonesimulator/Zumik.app` onto the simulator (or `xcrun simctl install booted <that path>`):
+
+```bash
+npx expo prebuild --platform ios --clean
+cd ios && xcodebuild -workspace Zumik.xcworkspace -scheme Zumik -configuration Debug -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -derivedDataPath build/dd build
+```
+
+`plugins/withPodsDeploymentTarget.js` raises the pods still aiming below iOS 15.1, which Xcode 27 refuses. Google Sign-In takes its iOS client ID from `EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME` (`app.config.js`), read from the build: rebuild after changing it.
 
 The build then loads its JavaScript from Metro: reinstall it only when native code or native dependencies change. `make open-app` copies it to the other running emulators.
 

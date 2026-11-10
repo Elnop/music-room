@@ -1,6 +1,6 @@
 import React from 'react';
-import { Ionicons } from '@expo/vector-icons';
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
+import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { EmptyState } from './EmptyState';
 
 jest.mock('@/shared/theme/ThemeContext', () => {
@@ -12,16 +12,14 @@ describe('EmptyState', () => {
 	it('shows the message without an icon by default', () => {
 		render(<EmptyState message="No playlists yet" />);
 		expect(screen.getByText('No playlists yet')).toBeTruthy();
-		expect(screen.UNSAFE_queryAllByType(Ionicons)).toHaveLength(0);
+		expect(screen.UNSAFE_queryAllByType(PixelIcon)).toHaveLength(0);
 	});
 
-	it('renders the given icon', async () => {
-		render(<EmptyState message="Nothing here" icon="musical-notes" />);
-		// Ionicons loads its font asynchronously and re-renders once it is ready.
-		await act(async () => {});
-		const icons = screen.UNSAFE_queryAllByType(Ionicons);
+	it('renders the given icon', () => {
+		render(<EmptyState message="Nothing here" icon="note" />);
+		const icons = screen.UNSAFE_queryAllByType(PixelIcon);
 		expect(icons).toHaveLength(1);
-		expect(icons[0].props.name).toBe('musical-notes');
+		expect(icons[0].props.name).toBe('note');
 	});
 
 	it('has no button without an action', () => {
