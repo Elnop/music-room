@@ -3,11 +3,10 @@
 # ==============================================================================
 # Shared configuration used across all Makefile modules
 
-# Force zsh shell (team uses zsh for environment variables and consistent behavior)
-SHELL := /bin/zsh
+SHELL := /bin/bash
 .SHELLFLAGS := -c
 ifeq ($(wildcard $(SHELL)),)
-$(error zsh is required by make ($(SHELL) not found): install it, e.g. sudo apt install zsh)
+$(error bash is required by make ($(SHELL) not found): install it, e.g. sudo apt install bash)
 endif
 
 # Detect operating system
