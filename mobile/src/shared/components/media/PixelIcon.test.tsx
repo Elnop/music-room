@@ -24,7 +24,7 @@ describe('PixelIcon', () => {
 		jest.restoreAllMocks();
 	});
 
-	it('puts every edge on a physical pixel at a size that is not a multiple of 12', () => {
+	it('puts every edge on a physical pixel at a size that is not a multiple of 24', () => {
 		render(<PixelIcon name="globe" color={INK} size={18} />);
 		const edges = runStyles().flatMap(run => [
 			run.top,

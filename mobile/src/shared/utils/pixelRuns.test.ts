@@ -10,8 +10,8 @@ describe('pixelRuns', () => {
 		]);
 	});
 
-	it.each(Object.entries(PIXEL_SPRITES))('draws %s on a 12×12 grid', (_, rows) => {
-		expect(rows).toHaveLength(12);
-		rows.forEach(row => expect(row).toMatch(/^[#.]{12}$/));
+	it.each(Object.entries(PIXEL_SPRITES))('draws %s on a 24×24 grid', (_, rows) => {
+		expect(rows).toHaveLength(24);
+		rows.forEach(row => expect(row).toMatch(/^[#.]{24}$/));
 	});
 });

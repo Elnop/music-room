@@ -3,7 +3,7 @@ import { PixelRatio, View, type StyleProp, type ViewStyle } from 'react-native';
 import { PIXEL_SPRITES, type PixelSpriteName } from '@/shared/constants/pixelSprites';
 import { pixelRuns } from '@/shared/utils/pixelRuns';
 
-const GRID = 12;
+const GRID = 24;
 
 const RUNS = Object.fromEntries(
 	Object.entries(PIXEL_SPRITES).map(([name, rows]) => [name, pixelRuns(rows)])
@@ -12,7 +12,6 @@ const RUNS = Object.fromEntries(
 interface PixelIconProps {
 	name: PixelSpriteName;
 	color: string;
-	/** A multiple of 12 keeps every pixel square and sharp. */
 	size?: number;
 	style?: StyleProp<ViewStyle>;
 	accessibilityLabel?: string;
