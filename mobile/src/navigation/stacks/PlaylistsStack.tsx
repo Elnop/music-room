@@ -14,6 +14,7 @@ import { EventFormOrchestrator } from '@/features/events/form/components/orchest
 import { HomeScreen } from '@/navigation/screens/HomeScreen';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { screenHeader, screenLayout } from '@/navigation/screenLayout';
+import { headerTitle } from '@/shared/theme/pixelFrame';
 
 const PlaylistStack = createNativeStackNavigator<PlaylistStackParamList & EventStackParamList>();
 const layout = screenLayout(true);
@@ -39,9 +40,7 @@ export function PlaylistsNavigator({ initialRouteName }: PlaylistsNavigatorProps
 				headerBlurEffect: Platform.OS === 'ios' ? 'systemMaterialDark' : undefined,
 				headerTintColor: theme.colors.text,
 				headerShadowVisible: false,
-				headerTitleStyle: {
-					fontFamily: theme.typography.families.bold,
-				},
+				headerTitleStyle: headerTitle(theme),
 				headerTitleAlign: 'center',
 				headerLargeTitle: false,
 			}}

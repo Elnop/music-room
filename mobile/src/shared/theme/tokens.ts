@@ -31,6 +31,11 @@ export const PIXEL_TYPOGRAPHY = {
 		xxl: 24,
 		xxxl: 32,
 	},
+	displayScale: {
+		title: 1.5,
+		button: 1.45,
+		initials: 1.7,
+	},
 } as const;
 
 /** The providers' brand colours follow their guidelines. */

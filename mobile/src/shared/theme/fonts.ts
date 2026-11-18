@@ -2,6 +2,7 @@ import { PixelifySans_400Regular } from '@expo-google-fonts/pixelify-sans/400Reg
 import { PixelifySans_500Medium } from '@expo-google-fonts/pixelify-sans/500Medium';
 import { PixelifySans_600SemiBold } from '@expo-google-fonts/pixelify-sans/600SemiBold';
 import { PixelifySans_700Bold } from '@expo-google-fonts/pixelify-sans/700Bold';
+import { Jersey10_400Regular } from '@expo-google-fonts/jersey-10/400Regular';
 import { Silkscreen_400Regular } from '@expo-google-fonts/silkscreen/400Regular';
 
 /** One family per weight: Android picks the weight by family. Pixelify Sans stops at bold. */
@@ -12,6 +13,7 @@ export const FONT_FAMILIES = {
 	bold: 'PixelifySans_700Bold',
 	extrabold: 'PixelifySans_700Bold',
 	mono: 'Silkscreen_400Regular',
+	display: 'Jersey10_400Regular',
 } as const;
 
 export const FONT_ASSETS = {
@@ -20,4 +22,5 @@ export const FONT_ASSETS = {
 	[FONT_FAMILIES.semibold]: PixelifySans_600SemiBold,
 	[FONT_FAMILIES.bold]: PixelifySans_700Bold,
 	[FONT_FAMILIES.mono]: Silkscreen_400Regular,
+	[FONT_FAMILIES.display]: Jersey10_400Regular,
 };

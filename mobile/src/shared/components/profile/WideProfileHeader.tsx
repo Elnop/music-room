@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, View, type ViewStyle } from 'react-native';
 import { Avatar } from '@/shared/components/media/Avatar';
 import type { Theme } from '@/shared/theme/types';
+import { displayText } from '@/shared/theme/pixelFrame';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { Text } from '@/shared/components/ui/Text';
 
@@ -91,8 +92,7 @@ const createStyles = (theme: Theme) =>
 		name: {
 			marginTop: theme.spacing.xs,
 			color: theme.colors.text,
-			fontFamily: theme.typography.families.extrabold,
-			fontSize: theme.typography.sizes.xxxl,
+			...displayText(theme, theme.typography.sizes.xxxl),
 		},
 		usernameRow: {
 			flexDirection: 'row',

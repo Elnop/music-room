@@ -4,8 +4,7 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { Pressable } from './Pressable';
 import { Text } from './Text';
-import { FONT_FAMILIES } from '@/shared/theme/fonts';
-import { keycap } from '@/shared/theme/pixelFrame';
+import { displayText, keycap } from '@/shared/theme/pixelFrame';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline';
 type ButtonSize = 'default' | 'compact';
@@ -116,11 +115,11 @@ const createStyles = (theme: Theme) =>
 		},
 
 		text: {
-			fontSize: 16,
-			fontFamily: FONT_FAMILIES.semibold,
+			...displayText(theme, 16, 'button'),
+			textTransform: 'uppercase',
 		},
 		compactText: {
-			fontSize: 13,
+			fontSize: displayText(theme, 13, 'button').fontSize,
 		},
 		primaryText: {
 			color: theme.colors.onColor,

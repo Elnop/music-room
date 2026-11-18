@@ -3,7 +3,7 @@ import { View, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
 import { useTheme } from '@/shared/theme/ThemeContext';
-import { keycap } from '@/shared/theme/pixelFrame';
+import { displayText, keycap } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Text } from '@/shared/components/ui/Text';
@@ -81,8 +81,8 @@ const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.primary,
 		},
 		actionText: {
-			fontSize: theme.typography.sizes.lg,
-			fontFamily: theme.typography.families.semibold,
+			...displayText(theme, theme.typography.sizes.lg, 'button'),
+			textTransform: 'uppercase',
 			color: theme.colors.onColor,
 		},
 	});

@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import type { Theme } from '@/shared/theme/types';
+import { displayText } from '@/shared/theme/pixelFrame';
 
 export const createUserProfileHeaderStyles = (theme: Theme) =>
 	StyleSheet.create({
@@ -17,8 +18,7 @@ export const createUserProfileHeaderStyles = (theme: Theme) =>
 			alignItems: 'center',
 		},
 		statNumber: {
-			fontSize: 20,
-			fontFamily: theme.typography.families.bold,
+			...displayText(theme, 20),
 			color: theme.colors.text,
 		},
 		statLabel: {
