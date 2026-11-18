@@ -8,7 +8,6 @@ import { findAuthUserIdByEmail } from '@/features/auth/utils/find-auth-user.js';
 import type { AuthResponse } from '@/features/auth/auth.types.js';
 import type { RegisterInput } from '@/features/auth/auth.validators.js';
 
-/** If the verification email cannot be sent, the account is removed and the call fails with 503. */
 export async function register(data: RegisterInput): Promise<AuthResponse> {
 	try {
 		logger.info('Registering new user', {
@@ -115,7 +114,6 @@ export async function register(data: RegisterInput): Promise<AuthResponse> {
 	}
 }
 
-/** On failure, removes the new account so no half-created one is left. */
 async function sendCodeOrRollback(userId: string, email: string): Promise<void> {
 	try {
 		const code = await emailVerification.generateAndStore(userId);

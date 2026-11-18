@@ -10,7 +10,6 @@ const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f
 
 const userOf = (req: Request) => (req as AuthenticatedRequest).user.id;
 
-/** 400 INVALID_USER_ID when it is not a UUID v4. */
 function friendOf(req: Request): string {
 	const userId = routeParam(req, 'userId');
 	if (!UUID_V4.test(userId)) {

@@ -8,7 +8,6 @@ import * as magicLinkSession from '@/features/auth/services/magic-link-session.s
 import * as oauthSignupService from '@/features/auth/services/oauth-signup.service.js';
 import type { OAuthProfile, OAuthUser } from '@/features/auth/services/oauth-signup.service.js';
 
-/** Provider id first, then the same email (linked on the way), else a new account; no email gets a synthetic one. */
 export async function createOAuthUser(
 	provider: OAuthProvider,
 	providerId: string,
@@ -51,7 +50,7 @@ export async function createOAuthUser(
 			effectiveEmail,
 			profile
 		);
-		// null: the generated username was taken meanwhile, start over.
+		// null: the generated username was taken meanwhile; retry.
 		return created ?? (await createOAuthUser(provider, providerId, email, profile));
 	} catch (error) {
 		if (error instanceof AppError) throw error;
@@ -60,7 +59,7 @@ export async function createOAuthUser(
 	}
 }
 
-/** The provider may be linked under another email: open the session for the account's own auth email. */
+/** The provider may be linked under another email, so the session uses the account's own email. */
 async function signInLinkedAccount(account: UserProfileRow): Promise<OAuthUser> {
 	if (!account.email_verified) {
 		await supabaseAdmin.from('user_profiles').update({ email_verified: true }).eq('id', account.id);
@@ -77,7 +76,6 @@ async function signInLinkedAccount(account: UserProfileRow): Promise<OAuthUser> 
 	return { userProfile: toUserProfile(account, accountEmail), session };
 }
 
-/** Link the provider to the account holding the same email, unless one is already linked. */
 async function linkByEmail(
 	account: UserProfileRow,
 	provider: OAuthProvider,
@@ -106,7 +104,6 @@ async function linkByEmail(
 	return { userProfile: toUserProfile(account, email), session };
 }
 
-/** Auth user with exactly this email, paging through every user. */
 async function findAuthUserByEmail(email: string): Promise<User | null> {
 	const perPage = 100;
 	for (let page = 1; ; page += 1) {

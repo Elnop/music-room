@@ -17,7 +17,6 @@ interface PanelTrackActionsProps {
 	onMoreActions: () => void;
 }
 
-/** The track's actions; both menus drop down from their button, as on the track lists. */
 export function PanelTrackActions({
 	title,
 	shareUrl,

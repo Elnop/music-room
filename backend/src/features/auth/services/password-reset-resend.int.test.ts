@@ -4,14 +4,12 @@ import type { AddressInfo } from 'node:net';
 import express from 'express';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-// Limiting on so the reset cooldown is real; loopback whitelisted so the
-// route-level limiters (not under test here) skip these requests.
+// Loopback whitelisted so the route-level limiters skip these requests.
 vi.hoisted(() => {
 	process.env.RATE_LIMIT_ENABLED = 'true';
 	process.env.RATE_LIMIT_WHITELIST_IPS = '127.0.0.1,::1,::ffff:127.0.0.1';
 });
 
-// Never send real mail.
 vi.mock('@/features/mail/services/mail.service.js', () => ({
 	sendVerificationEmail: vi.fn().mockResolvedValue(undefined),
 	sendPasswordResetEmail: vi.fn().mockResolvedValue(undefined),
@@ -23,9 +21,6 @@ const { supabaseAdmin } = await import('@/shared/config/supabase.js');
 const { default: authRouter } = await import('@/features/auth/auth.routes.js');
 const { errorHandler } = await import('@/shared/middleware/error-handler.js');
 const { sendPasswordResetEmail } = await import('@/features/mail/services/mail.service.js');
-
-// can-resend validates its query and reports the cooldown each forgot-password starts, through
-// HTTP on the real auth router against the local Supabase stack and test Redis.
 
 const COOLDOWN_SECONDS = 60;
 const createdUserIds: string[] = [];
@@ -122,7 +117,6 @@ describe('password reset resend cooldown (#187)', () => {
 
 		expect((await forgotPassword(email)).status).toBe(200);
 
-		// The account path ran: a reset code was mailed to it.
 		expect(vi.mocked(sendPasswordResetEmail)).toHaveBeenCalledWith(
 			email,
 			expect.stringMatching(/^\d{6}$/),

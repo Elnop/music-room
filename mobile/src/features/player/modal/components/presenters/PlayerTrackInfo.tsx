@@ -9,7 +9,6 @@ import { Text } from '@/shared/components/ui/Text';
 interface PlayerTrackInfoProps {
 	styles: ReturnType<typeof createStyles>;
 	track: NowPlayingTrack | null;
-	/** Fades the title while the artwork is swiped. */
 	infoStyle: ReturnType<typeof useAnimatedStyle>;
 	error: string | null;
 	isRemote: boolean;

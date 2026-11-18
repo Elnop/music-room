@@ -22,15 +22,13 @@ import {
 } from '@/features/queue/utils/queue-rpc.js';
 import type { QueueState, QueueStepDirection } from '@/features/queue/queue.types.js';
 
-// Mutated only through the SQL functions (serialized per owner); every mutation sends
-// `queue:updated` to all of the owner's devices.
+// Mutated only through the SQL functions, which serialize changes per owner.
 
 export async function getQueue(actorId: string, ownerId: string): Promise<QueueState> {
 	await assertCanManageQueue(actorId, ownerId);
 	return getQueueRpc(ownerId);
 }
 
-/** With `next`, places the track after the current item; publishes once. */
 export async function addItem(
 	actorId: string,
 	ownerId: string,
@@ -73,7 +71,6 @@ export async function playItem(
 	return play(actorId, ownerId, 'play', state, device);
 }
 
-/** Copies the playlist's tracks as a new block right after the current item and plays `startTrackId`, or the first. */
 export async function playPlaylist(
 	actorId: string,
 	ownerId: string,
@@ -82,7 +79,7 @@ export async function playPlaylist(
 	startTrackId?: string
 ): Promise<QueueState> {
 	const device = await playbackDevice(actorId, ownerId, deviceId);
-	// The actor chooses the playlist: its visibility is checked for them.
+	// The actor, not the owner, must be able to see the playlist.
 	const playlist = await getPlaylistForPermissionCheck(playlistId);
 	if (!canViewPlaylist(playlist, actorId)) {
 		throw new AppError(403, 'Access denied', 'PLAYLIST_ACCESS_DENIED');
@@ -102,7 +99,6 @@ export async function step(
 	return play(actorId, ownerId, direction, state, device);
 }
 
-/** Access to the queue, then the device that must play: both before any change. */
 async function playbackDevice(
 	actorId: string,
 	ownerId: string,

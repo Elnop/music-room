@@ -1,6 +1,5 @@
 import { ApiError } from '@/shared/services/api';
 
-/** French text for the `ApiError` codes the user can meet on an action. */
 const CODE_MESSAGES: Record<string, string> = {
 	NETWORK_ERROR: 'Impossible de joindre le serveur. Vérifiez votre connexion.',
 	SESSION_EXPIRED: 'Session expirée, reconnectez-vous.',
@@ -42,7 +41,7 @@ const CODE_MESSAGES: Record<string, string> = {
 	PREMIUM_REQUIRED: 'Cette fonction est réservée au Premium',
 };
 
-/** Never returns the server's or fetch's raw (English) message: unknown errors get the caller's `fallback`. */
+/** Never the raw English message: unknown errors get `fallback`. */
 export function apiErrorMessage(error: unknown, fallback: string): string {
 	if (!(error instanceof ApiError)) return fallback;
 

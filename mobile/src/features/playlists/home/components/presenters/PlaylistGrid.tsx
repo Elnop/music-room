@@ -8,7 +8,6 @@ import { PlaylistGridCard } from './PlaylistCards';
 interface PlaylistGridProps {
 	playlists: Playlist[];
 	onOpen: (id: string) => void;
-	/** The menu of a card; none for a playlist without one. */
 	actionsFor?: (playlist: Playlist) => (() => void) | undefined;
 }
 

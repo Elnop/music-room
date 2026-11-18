@@ -7,7 +7,6 @@ import type { PlaylistDeletedEvent } from '@/features/playlists/types';
 import { PLAYLIST_SOCKET_RULES } from '@/features/playlists/utils/playlistSocketRules';
 
 interface PlaylistRoom {
-	/** The playlist was deleted by its owner while on screen. */
 	deleted: boolean;
 }
 

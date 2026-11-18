@@ -38,16 +38,14 @@ async function loadMembers(client: QueryClient, id: string): Promise<PlaylistMem
 
 export interface SharingMembers {
 	members: PlaylistMember[];
-	/** The first load: a full-screen spinner. */
 	isLoading: boolean;
-	/** One member change at a time. */
 	busy: boolean;
 	refetch: () => void;
 	add: (user: UserSummary, asViewer: boolean, canEdit: boolean) => void;
 	remove: (userId: string, isPrivate: boolean) => Promise<void>;
 }
 
-/** The members of a playlist, changed at once on screen and restored on a refusal. */
+/** Optimistic: a refused change is restored. */
 export function useSharingMembers(id: string): SharingMembers {
 	const client = useQueryClient();
 	const signedIn = useSession(session => session.isAuthenticated);

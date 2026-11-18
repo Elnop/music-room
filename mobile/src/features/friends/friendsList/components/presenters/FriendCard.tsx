@@ -18,7 +18,6 @@ interface FriendCardProps {
 	onToggleControl: (friendId: string, currentValue: boolean) => void;
 }
 
-/** A friend on wide screens: the card opens the profile, its footer says what the switch grants. */
 export function FriendCard({
 	friend,
 	canControl,

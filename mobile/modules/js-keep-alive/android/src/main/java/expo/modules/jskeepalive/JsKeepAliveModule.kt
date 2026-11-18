@@ -8,8 +8,7 @@ import com.facebook.react.jstasks.HeadlessJsTaskContext
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 
-// React Native pauses JS timers (and so fetch, which resolves through setTimeout) once the
-// app is in the background, unless a headless JS task is running: this module runs one.
+// React Native pauses JS timers (and so fetch) in the background unless a headless JS task runs: this module runs one.
 class JsKeepAliveModule : Module() {
   private var taskId: Int? = null
 

@@ -93,7 +93,6 @@ export interface UpdateProfileData {
 	favoriteArtist?: string;
 }
 
-/** Answer of PUT and DELETE /api/profile/avatar; null once removed. */
 export interface AvatarResponse {
 	avatarUrl: string | null;
 }

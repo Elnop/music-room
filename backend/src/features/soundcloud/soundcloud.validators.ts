@@ -14,7 +14,6 @@ const SOUNDCLOUD_HOSTS = new Set([
 	'on.soundcloud.com',
 ]);
 
-/** soundcloud.com (also www. and m.) or `https://on.soundcloud.com/...`, with a path. */
 const soundcloudUrlSchema = z
 	.string()
 	.max(2048, 'URL too long')
@@ -42,7 +41,7 @@ export const soundcloudTrackParamsSchema = z.object({
 	}),
 });
 
-/** As received; it is URL-decoded once more, as the client may double-encode it. */
+/** Decoded once more: the client may double-encode the URL. */
 export const soundcloudStreamUrlSchema = z.object({
 	url: z
 		.string()
@@ -57,13 +56,12 @@ export const soundcloudStreamUrlSchema = z.object({
 		.pipe(soundcloudUrlSchema),
 });
 
-/** Before the presence check (MISSING_TRACK_URL). */
 export const soundcloudStreamRawSchema = z.object({
 	query: z.object({ url: z.string().optional() }),
 	params: z.object({ trackUrl: z.string().optional() }),
 });
 
-/** Passed through unchanged (snake_case); only the fields the app reads are listed. */
+/** SoundCloud's snake_case fields as is; only those the app reads are listed. */
 export const soundcloudTrackSchema = z.object({
 	id: z.int().meta({ description: 'SoundCloud track ID' }),
 	title: z.string(),

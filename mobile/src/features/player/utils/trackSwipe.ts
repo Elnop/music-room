@@ -8,7 +8,6 @@ interface SwipeEnd {
 	velocityX: number;
 }
 
-/** Which track a released horizontal swipe asks for; shared by the mini-player and the player modal. */
 export function trackSwipeDirection(event: SwipeEnd): 'next' | 'previous' | null {
 	'worklet';
 	if (Math.abs(event.translationX) <= Math.abs(event.translationY)) return null;

@@ -15,11 +15,10 @@ interface NowPlayingInlineProps {
 	isPlaying: boolean;
 	onPlay: () => void;
 	onPause: () => void;
-	/** False hides the play/pause button (a device I may not control). */
+	/** False for a device I may not control: no play/pause button. */
 	controllable?: boolean;
 }
 
-/** Shows a friend's listening activity on their profile. */
 export function NowPlayingInline({
 	track,
 	isPlaying,

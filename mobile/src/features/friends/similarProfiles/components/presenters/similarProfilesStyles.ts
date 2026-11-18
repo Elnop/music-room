@@ -4,7 +4,6 @@ import type { Theme } from '@/shared/theme/types';
 const AVATAR_SIZE = 128;
 const CARD_PADDING = 12;
 
-/** The xl avatar plus the card's padding. */
 export const SIMILAR_CARD_WIDTH = AVATAR_SIZE + 2 * CARD_PADDING;
 
 export const createSimilarProfilesStyles = (theme: Theme) =>

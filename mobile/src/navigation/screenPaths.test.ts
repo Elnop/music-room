@@ -184,7 +184,6 @@ describe('screen paths', () => {
 	] as [string, [string, unknown][]][])(
 		'%s opens its screen above its parents, and back',
 		(path, expected) => {
-			// A signed-in screen sits in a tab
 			const state = stateOf(path, expected[0][0].endsWith('Tab'));
 			expect(outline(state as { routes: Node[] })).toEqual(expected);
 			expect(pathFromState(state as { routes: Node[] })).toBe(path);

@@ -11,7 +11,6 @@ interface UserProfileBadgesProps {
 	hasDevicesOnline: boolean;
 }
 
-/** Beside the username: whether a friend I may control is online, and whether they follow me. */
 export function UserProfileBadges({
 	followStatus,
 	canControlMusic,

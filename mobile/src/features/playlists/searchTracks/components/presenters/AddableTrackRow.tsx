@@ -94,7 +94,6 @@ const createStyles = (theme: Theme) =>
 		},
 		trackInfo: {
 			flex: 1,
-			// Keeps a long title off the buttons.
 			marginRight: theme.spacing.sm,
 		},
 		trackMeta: {

@@ -11,9 +11,7 @@ import { Text } from '@/shared/components/ui/Text';
 interface MembersSectionProps {
 	title: string;
 	members: PlaylistMember[];
-	/** Shown when nobody is there yet; none on an open public playlist. */
 	emptyMessage: string | null;
-	/** Swipe to remove, without confirmation. */
 	onRemove: (userId: string) => Promise<void>;
 }
 
@@ -44,9 +42,7 @@ export function MembersSection({ title, members, emptyMessage, onRemove }: Membe
 					)}
 				/>
 			) : (
-				emptyMessage && (
-					<EmptyState icon="crew" style={styles.empty} message={emptyMessage} />
-				)
+				emptyMessage && <EmptyState icon="crew" style={styles.empty} message={emptyMessage} />
 			)}
 		</View>
 	);

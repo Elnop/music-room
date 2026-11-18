@@ -45,7 +45,7 @@ describe('control-access.service', () => {
 
 	it('gives the owner every one of their own devices, without any query', async () => {
 		const access = await service.getAccess('owner', 'owner');
-		expect(access).toEqual({ isFriend: false, allDevices: true, licensedDeviceIds: [] });
+		expect(access).toEqual({ allDevices: true, licensedDeviceIds: [] });
 		expect(from).not.toHaveBeenCalled();
 		expect(await service.canControlDevice('owner', 'owner', 'any-device')).toBe(true);
 		expect(await service.canControlAnyDevice('owner', 'owner')).toBe(true);

@@ -16,7 +16,6 @@ interface PlaylistCassetteProps {
 	width: number;
 }
 
-/** A playlist on the shelf: its cover, its name, then who sees it, who edits it and whose it is. */
 export function PlaylistCassette({ playlist, owner, width }: PlaylistCassetteProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
 	const ink = theme.colors.textSecondary;
@@ -24,13 +23,21 @@ export function PlaylistCassette({ playlist, owner, width }: PlaylistCassettePro
 	return (
 		<View style={{ width }}>
 			<View style={styles.cover}>
-				<Artwork uri={playlist.coverUrl || playlist.firstTrackCover} size={width - 6} iconSize={32} />
+				<Artwork
+					uri={playlist.coverUrl || playlist.firstTrackCover}
+					size={width - 6}
+					iconSize={32}
+				/>
 			</View>
 			<Text style={styles.name} numberOfLines={2}>
 				{playlist.name}
 			</Text>
 			<View style={styles.meta} importantForAccessibility="no-hide-descendants">
-				<PixelIcon name={playlist.visibility === 'public' ? 'globe' : 'eyeOff'} size={12} color={ink} />
+				<PixelIcon
+					name={playlist.visibility === 'public' ? 'globe' : 'eyeOff'}
+					size={12}
+					color={ink}
+				/>
 				<PixelIcon name={playlist.editMode === 'open' ? 'pencil' : 'lock'} size={12} color={ink} />
 				{owner && <Avatar uri={owner.avatarUrl} name={ownerName(owner)} size="sm" />}
 			</View>

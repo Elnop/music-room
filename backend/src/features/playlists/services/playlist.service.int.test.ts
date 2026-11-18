@@ -5,8 +5,7 @@ import { AppError } from '@/shared/middleware/error-handler.js';
 import type { TrackUpsertInput } from '@/shared/utils/track-upsert.js';
 import type { CreatePlaylistInput } from '@/features/playlists/playlist.validators.js';
 
-// List filters (`or`, `cs` on arrays), array updates and the delete cascade live in PostgREST
-// and Postgres, so only this test checks them; the permission matrix is unit-tested.
+// List filters, array updates and the delete cascade run in PostgREST and Postgres: only this test checks them.
 
 const {
 	notifyPlaylistUpdate,
@@ -62,7 +61,6 @@ async function createUser(): Promise<string> {
 	return data.user.id;
 }
 
-/** Playlist owned by `ownerId`, with the collaborator and the viewer added through the services. */
 async function createShared(
 	visibility: 'public' | 'private',
 	editMode: 'open' | 'restricted'

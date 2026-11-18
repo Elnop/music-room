@@ -6,11 +6,12 @@ import { AppToast } from '@/shared/components/feedback/AppToast';
 import { ThemedSystemUI } from '@/shared/components/theme/ThemedSystemUI';
 import { configureGoogleSignIn } from '@/features/auth/services/googleSignIn';
 import { initializeFacebookSDK } from '@/features/auth/services/facebookSignIn';
+// Registers the linked accounts bridge.
 import '@/features/auth/hooks/useLinkedProviders';
 import { restoreRedirectedPath } from '@/navigation/webBasePath';
 import { FONT_ASSETS } from '@/shared/theme/fonts';
 
-// Before the first render: the navigation reads its initial state from the address bar
+// Before the first render: navigation reads its initial state from the address bar.
 restoreRedirectedPath();
 
 export default function App() {
@@ -21,7 +22,7 @@ export default function App() {
 		initializeFacebookSDK();
 	}, []);
 
-	// The window background stays up until Inter is ready; a failed load falls back to the system font
+	// A failed font load falls back to the system font.
 	if (!fontsLoaded && !fontError) return null;
 
 	return (

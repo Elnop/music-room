@@ -38,7 +38,6 @@ const build = ({ id, title, artist, durationMs, trackUri, albumArt }: PlayableFi
 	playable: true,
 });
 
-/** A queue track (a queue item's, or a `play-track` command's) as the player's track. */
 export function queueTrackToSoundCloud(track: QueueTrack): SoundCloudTrack {
 	return build({
 		id: hashStringToNumber(track.trackUri),

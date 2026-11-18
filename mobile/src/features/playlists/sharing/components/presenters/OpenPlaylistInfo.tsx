@@ -6,7 +6,6 @@ import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { createSharingStyles } from './sharingStyles';
 import { Text } from '@/shared/components/ui/Text';
 
-/** A public playlist open to all: nothing to manage. */
 export function OpenPlaylistInfo() {
 	const { styles: shared } = useThemedStyles(createSharingStyles);
 	const { styles, theme } = useThemedStyles(createStyles);

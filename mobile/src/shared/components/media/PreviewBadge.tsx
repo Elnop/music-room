@@ -4,7 +4,6 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { Text } from '@/shared/components/ui/Text';
 
-/** Marks a track SoundCloud only serves as a 30-second preview. */
 export function PreviewBadge() {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);

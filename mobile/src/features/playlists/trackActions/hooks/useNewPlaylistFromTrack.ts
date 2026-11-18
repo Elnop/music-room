@@ -17,15 +17,11 @@ export interface NewPlaylistDraft {
 	setName: (name: string) => void;
 	error?: string;
 	creating: boolean;
-	/** Prefills the name with the track's title. */
 	start: () => void;
 	submit: () => void;
 }
 
-/**
- * Default settings (public, open), as the full form. The sheet closes once the playlist
- * exists: a creation error shows in it, an add error in a toast that says it was created.
- */
+/** A creation error shows in the sheet; once the playlist exists, errors go to a toast. */
 export function useNewPlaylistFromTrack(
 	track: AddQueueItemBody | null,
 	onClose: () => void

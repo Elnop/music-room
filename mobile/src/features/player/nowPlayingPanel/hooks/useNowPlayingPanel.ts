@@ -21,7 +21,6 @@ interface OpenActions {
 	start: TrackActionsStart;
 }
 
-/** What the desktop's panel shows; the transport stays in the player bar under it. */
 export function useNowPlayingPanel() {
 	const { theme } = useTheme();
 	const setOpen = useNowPlayingPanelStore(state => state.setOpen);

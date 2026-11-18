@@ -14,14 +14,11 @@ interface WideProfileHeaderProps {
 	bio?: string;
 	followersCount: number;
 	followingCount: number;
-	/** Beside the username. */
 	badges?: React.ReactNode;
-	/** Under the bio, for what the bio leaves out (a hidden field, a hint). */
 	notes?: React.ReactNode;
 	actions: React.ReactNode;
 }
 
-/** A profile's header on wide screens: the avatar beside the identity, the counts and the actions. */
 export function WideProfileHeader({
 	kind,
 	name,
@@ -68,7 +65,6 @@ export function WideProfileHeader({
 	);
 }
 
-/** The height and padding of the header's action buttons. */
 export const wideProfileActionStyle = (theme: Theme): ViewStyle => ({
 	height: 40,
 	paddingHorizontal: theme.spacing.md,

@@ -3,7 +3,6 @@ import { notifySessionEnd, registerAuthSession } from '@/shared/services/authSes
 import { createSessionActions } from './sessionActions';
 import { SIGNED_OUT, type AuthState } from './authState';
 
-/** Client state only: server data such as linked accounts is read with TanStack Query. */
 export const useAuthStore = create<AuthState>((set, get) => ({
 	...SIGNED_OUT,
 	...createSessionActions(set, get),

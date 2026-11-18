@@ -22,7 +22,6 @@ interface NowPlayingPanelViewProps {
 	data: NowPlayingPanelData;
 }
 
-/** Docked beside the content, above the player bar: what plays, its actions, the device and what comes next. */
 export function NowPlayingPanelView({ data }: NowPlayingPanelViewProps) {
 	const separator = useSeparatorColor();
 	const factory = React.useCallback((theme: Theme) => createStyles(theme, separator), [separator]);

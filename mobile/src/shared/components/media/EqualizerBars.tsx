@@ -10,7 +10,6 @@ interface EqualizerBarsProps {
 	bars?: number;
 	height?: number;
 	barWidth?: number;
-	/** The bars freeze where they are while the music is paused. */
 	playing?: boolean;
 }
 

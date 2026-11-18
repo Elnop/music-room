@@ -2,7 +2,6 @@ import { SPACING } from '@/shared/constants/app';
 import { FIXED_COLORS, INK, PIXEL_BORDERS, PIXEL_SHADOWS, PIXEL_TYPOGRAPHY } from './tokens';
 import type { Theme } from './types';
 
-/** Night pixel art: violet ink ground, cream text, lime for the main action. */
 export const originalTheme: Theme = {
 	name: 'original',
 

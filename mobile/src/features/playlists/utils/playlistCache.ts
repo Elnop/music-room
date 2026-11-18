@@ -32,8 +32,7 @@ export function refreshPlaylist(client: QueryClient, id: string): Promise<Playli
 	});
 }
 
-/** A screen shows the playlist now (an enabled query observes it). */
-export function isOpen(client: QueryClient, id: string): boolean {
+export function isOnScreen(client: QueryClient, id: string): boolean {
 	return (
 		client
 			.getQueryCache()
@@ -42,13 +41,12 @@ export function isOpen(client: QueryClient, id: string): boolean {
 	);
 }
 
-/** Reloads the playlist if it is still on screen; a failure stays in the query. */
-export async function reloadIfOpen(client: QueryClient, id: string): Promise<void> {
-	if (!isOpen(client, id)) return;
+/** A failure stays in the query. */
+export async function reloadIfOnScreen(client: QueryClient, id: string): Promise<void> {
+	if (!isOnScreen(client, id)) return;
 	await client.refetchQueries({ queryKey: detailKey(id), exact: true, type: 'active' });
 }
 
-/** Applies a track event (socket delta or our own answer) to the cached playlist. */
 function applyTrackEvent(
 	client: QueryClient,
 	event: PlaylistUpdatedEvent
@@ -67,10 +65,9 @@ export async function settleTrackEvent(
 	client: QueryClient,
 	event: PlaylistUpdatedEvent
 ): Promise<void> {
-	if (applyTrackEvent(client, event) === 'reload') await reloadIfOpen(client, event.playlistId);
+	if (applyTrackEvent(client, event) === 'reload') await reloadIfOnScreen(client, event.playlistId);
 }
 
-/** The metadata of a playlist that its edition or a `playlist:details` event changes. */
 type PlaylistPatch = Partial<
 	Pick<
 		Playlist,
@@ -85,7 +82,6 @@ type PlaylistPatch = Partial<
 	>
 >;
 
-/** Patches a playlist's metadata in the user's list and in its detail (tracks untouched). */
 export function patchPlaylist(client: QueryClient, id: string, patch: PlaylistPatch): void {
 	client.setQueryData<Playlist[]>(queryKeys.playlists.list(), list =>
 		list?.map(playlist => (playlist.id === id ? { ...playlist, ...patch } : playlist))

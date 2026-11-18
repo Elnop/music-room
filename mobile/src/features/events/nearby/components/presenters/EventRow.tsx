@@ -15,7 +15,6 @@ interface EventRowProps {
 	onPress: () => void;
 }
 
-/** One of my events, as a key: its beacon, its name, when it starts. */
 export function EventRow({ event, onPress }: EventRowProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
 	const when = isOngoing(event) ? 'En cours' : formatEventDate(event.startsAt);

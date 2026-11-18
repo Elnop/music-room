@@ -77,17 +77,13 @@ export function PlaylistDetailView({
 						header
 					)
 				}
-				// The last track scrolls clear of the mini player.
 				contentContainerStyle={[
 					styles.list,
 					isWide && styles.column,
 					{ paddingBottom: bottomPadding },
 				]}
 				ListEmptyComponent={
-					<EmptyState
-						icon="note"
-						message="Aucun titre dans cette playlist pour l'instant"
-					/>
+					<EmptyState icon="note" message="Aucun titre dans cette playlist pour l'instant" />
 				}
 				refreshControl={
 					<RefreshControl

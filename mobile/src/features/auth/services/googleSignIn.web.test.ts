@@ -25,7 +25,6 @@ const initialize = jest.fn();
 const renderButton = jest.fn();
 const target = { offsetWidth: 520 };
 
-/** The callback Google Identity Services calls with the credential. */
 function credentialCallback(): (response: { credential?: string }) => void {
 	return initialize.mock.calls[0][0].callback;
 }

@@ -8,7 +8,6 @@ interface UserProfileListeningProps {
 	onRemotePause: (deviceId: string) => void;
 }
 
-/** What a friend plays on each of their devices, with play and pause where they delegated control. */
 export function UserProfileListening({
 	devices,
 	onRemotePlay,

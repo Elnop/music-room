@@ -15,7 +15,6 @@ import { Text } from '@/shared/components/ui/Text';
 
 interface TrackTableRowProps {
 	track: Track;
-	/** Its number in the list, from 1. */
 	position: number;
 	isCurrent: boolean;
 	isPending: boolean;
@@ -26,7 +25,6 @@ interface TrackTableRowProps {
 	onDragStart?: () => void;
 }
 
-/** A track as a table row on wide screens: the pointer over it shows play and the drag handle. */
 export function TrackTableRow({
 	track,
 	position,

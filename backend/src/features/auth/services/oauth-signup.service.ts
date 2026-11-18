@@ -23,7 +23,7 @@ export function avatarOf(profile: OAuthProfile): string | null {
 		: (profile.picture?.data?.url ?? null);
 }
 
-/** Null when a concurrent sign-up took the generated username (23505): the auth user is removed, the caller retries. */
+/** Null when a concurrent sign-up took the username: the auth user is removed and the caller retries. */
 export async function createOAuthAccount(
 	provider: OAuthProvider,
 	providerId: string,
@@ -63,7 +63,6 @@ export async function createOAuthAccount(
 				avatar_url: avatarOf(profile),
 				...providerIdField(provider, providerId),
 				email_verified: true,
-				// Signed up with Google or Facebook: no password until one is set.
 				has_password: false,
 			})
 			.select()

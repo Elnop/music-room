@@ -2,7 +2,7 @@ import { createStore } from 'zustand';
 import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
 import type { UserProfile } from '@/types/user.types';
 
-/** Signs in `userId` as the auth store does, for tests outside `features/auth/` (they may not import it). */
+/** For tests outside `features/auth/`, which may not import the auth store. */
 export function signIn(userId: string): void {
 	registerAuthSession({
 		store: createStore<SessionView>(() => ({

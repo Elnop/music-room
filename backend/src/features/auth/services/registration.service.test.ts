@@ -41,8 +41,7 @@ vi.mock('@/features/auth/services/email-verification.service.js', () => ({
 	sendCode: sendVerificationEmail,
 }));
 
-// EMAIL_VERIFICATION_ENABLED, switched per test; the only setting registration reads
-// (the code is mailed by the mocked email-verification).
+// EMAIL_VERIFICATION_ENABLED is switched per test.
 vi.mock('@/features/mail/mail.config.js', () => ({ verificationConfig: verification }));
 
 vi.mock('@/shared/utils/logger.js', () => ({
@@ -58,7 +57,6 @@ async function caught(promise: Promise<unknown>): Promise<unknown> {
 	);
 }
 
-/** Mock of one supabase.from(table) chain: select/eq/single, delete/eq and insert hit the spies below. */
 function builder(table: string) {
 	let columns = '';
 	let deleting = false;

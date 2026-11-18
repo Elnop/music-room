@@ -4,8 +4,7 @@ import type { AddressInfo } from 'node:net';
 import express from 'express';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Set before env.ts is parsed: lockout on, a low IP blacklist threshold, loopback whitelisted so the
-// express-rate-limit limiters skip (account-lockout.ts and ip-reputation.ts ignore the whitelist).
+// Loopback whitelisted so express-rate-limit skips; the lockout and IP reputation ignore the whitelist.
 vi.hoisted(() => {
 	process.env.RATE_LIMIT_ENABLED = 'true';
 	process.env.ACCOUNT_LOCKOUT_ENABLED = 'true';
@@ -14,7 +13,6 @@ vi.hoisted(() => {
 	process.env.RATE_LIMIT_WHITELIST_IPS = '127.0.0.1,::1,::ffff:127.0.0.1';
 });
 
-// Never send real mail.
 vi.mock('@/features/mail/services/mail.service.js', () => ({
 	sendVerificationEmail: vi.fn().mockResolvedValue(undefined),
 	sendPasswordResetEmail: vi.fn().mockResolvedValue(undefined),
@@ -26,8 +24,6 @@ const { supabaseAdmin } = await import('@/shared/config/supabase.js');
 const { rateLimitConfig } = await import('@/shared/config/rate-limit.config.js');
 const { default: authRouter } = await import('@/features/auth/auth.routes.js');
 const { errorHandler } = await import('@/shared/middleware/error-handler.js');
-
-// Through HTTP on the real auth router, against the local Supabase stack and test Redis.
 
 const PASSWORD = 'integration-test-password';
 const WRONG_PASSWORD = 'wrong-password';
@@ -62,12 +58,10 @@ async function deleteKeys(pattern: string): Promise<void> {
 	if (keys.length > 0) await redisClient.del(...keys);
 }
 
-// Every key the lockout and IP reputation write for these emails and for loopback.
 async function clearBruteForceKeys(): Promise<void> {
 	for (const email of usedEmails) {
 		await deleteKeys(`failed_login:${email}:*`);
 		await deleteKeys(`account_locked:${email}:*`);
-		// Only written when the blacklist lets forgot-password through.
 		await deleteKeys(`password_reset_*:${email}:*`);
 	}
 	for (const ip of LOOPBACK_IPS) {

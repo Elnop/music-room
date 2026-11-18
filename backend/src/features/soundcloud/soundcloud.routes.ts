@@ -5,7 +5,7 @@ import * as soundcloud from '@/features/soundcloud/soundcloud.controller.js';
 
 const router = Router();
 
-// Fails closed. The limiter keys on req.user, so it runs after authMiddleware.
+// The limiter keys on req.user, so it runs after authMiddleware.
 router.use(authMiddleware, soundcloudRateLimiter);
 
 router.get('/search', soundcloud.search);

@@ -28,7 +28,6 @@ export function HomeView({ screen, nearbyEvents, similarProfiles, actionsFor }: 
 	const { isWide } = useBreakpoint();
 
 	if (screen.isInitialLoading) return <HomeSkeleton />;
-	// Hidden while loading too, so the section never shows as a bare title.
 	const friendsCount = countAll(screen);
 
 	const content = (
@@ -42,11 +41,7 @@ export function HomeView({ screen, nearbyEvents, similarProfiles, actionsFor }: 
 			{friendsCount > 0 && (
 				<>
 					<View style={styles.section}>
-						<SectionHeader
-							icon="crew"
-							title="Playlists de vos amis"
-							count={friendsCount}
-						/>
+						<SectionHeader icon="crew" title="Playlists de vos amis" count={friendsCount} />
 						<FriendPlaylistCarousel
 							friendsPlaylists={screen.friendsPlaylists}
 							onPlaylistPress={screen.openPlaylist}

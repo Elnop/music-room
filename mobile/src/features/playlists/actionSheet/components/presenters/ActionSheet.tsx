@@ -18,18 +18,16 @@ interface ActionSheetProps {
 	visible: boolean;
 	title?: string;
 	subtitle?: string;
-	/** Shows a back chevron before the title. */
 	onBack?: () => void;
 	onClose: () => void;
 	/** iOS: the Modal finished sliding out. */
 	onDismiss?: () => void;
 	maxHeight?: DimensionValue;
-	/** Wide screens: the button that opened it, to drop down from; without one it is a centred dialog. */
+	/** Wide screens: drops down from it; without one, a centred dialog. */
 	anchor?: MenuAnchor | null;
 	children: React.ReactNode;
 }
 
-/** A bottom sheet over a dimmed backdrop that closes it: a title, then rows. */
 export function ActionSheet({
 	visible,
 	title,

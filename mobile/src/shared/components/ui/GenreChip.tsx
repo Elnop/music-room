@@ -23,7 +23,6 @@ interface GenreChipProps {
 	size?: keyof typeof SIZES;
 }
 
-/** A genre as a pixel tile: its sprite and its name, filled with its colour once picked. */
 export function GenreChip({
 	genre,
 	selected = false,

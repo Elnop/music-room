@@ -35,7 +35,6 @@ export const base = {
 	security: bearerAuth,
 };
 
-/** The owner's device that must play. */
 const playbackBody = jsonBody(queuePlaybackSchema, { deviceId: 'living-room-tv' }, false);
 
 export const answers = {
@@ -127,5 +126,4 @@ const previous: RouteConfig = {
 	},
 };
 
-/** A delegate must send the device that plays. */
 export const playbackRoutes = [playItem, playPlaylist, next, previous];

@@ -6,7 +6,7 @@ import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 
 interface LoadFailureProps {
-	/** Private or deleted (403, 404): no retry. */
+	/** 403 or 404: no retry. */
 	notFound: boolean;
 	onRetry: () => void;
 }

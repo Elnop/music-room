@@ -39,7 +39,6 @@ export function createRateLimitStore(name: string): RateLimitStore {
 	}
 
 	return {
-		/** Keys live in Redis, shared by every backend instance. */
 		localKeys: false,
 		prefix,
 

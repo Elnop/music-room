@@ -17,7 +17,6 @@ interface TrackActionsViewProps {
 	onClose: () => void;
 }
 
-/** The sheet of a track's quick actions, or the playlists to add it to. */
 export function TrackActionsView({ actions, anchor, onClose }: TrackActionsViewProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
 	const { step } = actions;
@@ -41,11 +40,7 @@ export function TrackActionsView({ actions, anchor, onClose }: TrackActionsViewP
 		>
 			{onActions ? (
 				<View>
-					<ActionSheetRow
-						icon="next"
-						label="Lire ensuite"
-						onPress={actions.playNext}
-					/>
+					<ActionSheetRow icon="next" label="Lire ensuite" onPress={actions.playNext} />
 					<ActionSheetRow
 						icon="queue"
 						label="Ajouter à la file d'attente"

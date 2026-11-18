@@ -4,10 +4,7 @@ import { PixelifySans_600SemiBold } from '@expo-google-fonts/pixelify-sans/600Se
 import { PixelifySans_700Bold } from '@expo-google-fonts/pixelify-sans/700Bold';
 import { Silkscreen_400Regular } from '@expo-google-fonts/silkscreen/400Regular';
 
-/**
- * One family per weight, never a fontWeight: Android picks the weight by family.
- * Pixelify Sans stops at bold, so `extrabold` reuses it; Silkscreen draws numbers and code.
- */
+/** One family per weight: Android picks the weight by family. Pixelify Sans stops at bold. */
 export const FONT_FAMILIES = {
 	regular: 'PixelifySans_400Regular',
 	medium: 'PixelifySans_500Medium',
@@ -17,7 +14,6 @@ export const FONT_FAMILIES = {
 	mono: 'Silkscreen_400Regular',
 } as const;
 
-/** What `App.tsx` loads before the first render, keyed by family name. */
 export const FONT_ASSETS = {
 	[FONT_FAMILIES.regular]: PixelifySans_400Regular,
 	[FONT_FAMILIES.medium]: PixelifySans_500Medium,

@@ -13,7 +13,6 @@ interface CenteredDialogProps {
 	children: React.ReactNode;
 }
 
-/** A sheet of the phone, shown on wide screens as a dialog centred over a backdrop that closes it. */
 export function CenteredDialog({ onClose, fill = false, children }: CenteredDialogProps) {
 	const { styles } = useThemedStyles(createStyles);
 

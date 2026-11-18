@@ -6,11 +6,9 @@ import { useAnchoredPress } from '@/shared/hooks/useAnchoredPress';
 import { useTheme } from '@/shared/theme/ThemeContext';
 
 interface TrackActionsButtonProps {
-	/** Opens the track's quick actions sheet. */
 	onPress: () => void;
 }
 
-/** A long press on the row does the same. */
 export function TrackActionsButton({ onPress }: TrackActionsButtonProps) {
 	const { theme } = useTheme();
 	const button = useRef<View>(null);

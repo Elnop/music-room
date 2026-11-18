@@ -4,13 +4,12 @@ import type { AddressInfo } from 'node:net';
 import express from 'express';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-// Limiting on, loopback whitelisted so the route-level limiters skip these requests.
+// Loopback whitelisted so the route-level limiters skip these requests.
 vi.hoisted(() => {
 	process.env.RATE_LIMIT_ENABLED = 'true';
 	process.env.RATE_LIMIT_WHITELIST_IPS = '127.0.0.1,::1,::ffff:127.0.0.1';
 });
 
-// Never send real mail; capture the code instead.
 vi.mock('@/features/mail/services/mail.service.js', () => ({
 	sendVerificationEmail: vi.fn().mockResolvedValue(undefined),
 	sendPasswordResetEmail: vi.fn().mockResolvedValue(undefined),
@@ -23,9 +22,6 @@ const { default: authRouter } = await import('@/features/auth/auth.routes.js');
 const { errorHandler } = await import('@/shared/middleware/error-handler.js');
 const { sendPasswordResetEmail } = await import('@/features/mail/services/mail.service.js');
 const { createOAuthUser } = await import('@/features/auth/services/oauth-user.service.js');
-
-// A Google/Facebook-only account (has_password false) can reset its password, which adds
-// email/password sign-in, through HTTP on the real auth router against local Supabase and test Redis.
 
 const NEW_PASSWORD = 'New-password-189';
 const sendMail = vi.mocked(sendPasswordResetEmail);
@@ -40,7 +36,6 @@ describe('password reset for a Google/Facebook-only account (#189)', () => {
 		await connectRedis();
 		if (!isRedisConnected()) throw new Error('Redis from scripts/test-db.sh is not reachable');
 
-		// A real Google sign-up, as the app creates it (no password).
 		email = `int-${randomUUID()}@example.com`;
 		const { userProfile } = await createOAuthUser('google', `google-${randomUUID()}`, email, {
 			name: 'OAuth Only',

@@ -88,7 +88,6 @@ export async function getMusicPreferences(userId: string): Promise<MusicPreferen
 	}
 }
 
-/** Creates the row when missing. */
 export async function updateMusicPreferences(
 	userId: string,
 	data: UpdateMusicPreferencesInput

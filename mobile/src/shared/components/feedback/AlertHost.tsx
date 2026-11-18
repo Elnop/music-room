@@ -10,7 +10,6 @@ import { Text } from '@/shared/components/ui/Text';
 
 const OK_BUTTON: AlertButton = { text: 'OK' };
 
-/** Shows the alerts of showAlert in a browser; on native platforms the queue stays empty and it renders nothing. */
 export function AlertHost() {
 	const { styles } = useThemedStyles(createStyles);
 	const alert = useAlertStore(state => state.queue[0]);

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 
 interface Countdown {
-	/** Seconds left; 0 when the countdown is not running. */
 	seconds: number;
 	start: (seconds: number) => void;
 }

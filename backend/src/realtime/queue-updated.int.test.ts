@@ -14,8 +14,6 @@ import * as realtime from '@/realtime/emitters/queue.emitters.js';
 import * as realtimeControl from '@/realtime/emitters/control.emitters.js';
 import type { QueueState } from '@/features/queue/queue.types.js';
 
-// Every queue mutation sends the full state to all the sockets of its user and to no one else.
-
 interface TestUser {
 	id: string;
 	token: string;
@@ -102,8 +100,7 @@ describe('queue:updated broadcast', () => {
 		);
 	}
 
-	/** Leave time for a stray broadcast to arrive after the expected ones. */
-	const settle = () => new Promise(resolve => setTimeout(resolve, 150));
+	const waitForStrayEvents = () => new Promise(resolve => setTimeout(resolve, 150));
 
 	beforeAll(async () => {
 		await connectRedis();
@@ -167,7 +164,7 @@ describe('queue:updated broadcast', () => {
 			await subscribe(otherSocket, owner.id);
 			const received = record(otherSocket);
 			const state = await queue.addItem(owner.id, owner.id, dto());
-			await settle();
+			await waitForStrayEvents();
 			expect(received).toEqual([state]);
 		});
 
@@ -175,7 +172,7 @@ describe('queue:updated broadcast', () => {
 			await subscribe(phone, owner.id);
 			const received = record(phone);
 			const state = await queue.addItem(owner.id, owner.id, dto());
-			await settle();
+			await waitForStrayEvents();
 			expect(received).toEqual([state]);
 		});
 
@@ -192,7 +189,7 @@ describe('queue:updated broadcast', () => {
 			expect(await revoked).toEqual({ ownerId: owner.id });
 			const received = record(otherSocket);
 			await queue.addItem(owner.id, owner.id, dto());
-			await settle();
+			await waitForStrayEvents();
 			expect(received).toEqual([]);
 		});
 
@@ -213,7 +210,7 @@ describe('queue:updated broadcast', () => {
 			};
 			expect(realtime.sendDeviceCommand(owner.id, deviceId, command)).toBe(true);
 			expect(realtime.sendDeviceCommand(owner.id, 'offline-device', command)).toBe(false);
-			await settle();
+			await waitForStrayEvents();
 			expect(commands).toEqual([command]);
 			expect(phoneCommands).toEqual([]);
 		});
@@ -240,7 +237,7 @@ describe('queue:updated broadcast', () => {
 			const pause = { action: 'pause' as const, fromUserId: other.id };
 			expect(realtime.sendDeviceCommand(owner.id, deviceId, playTrack)).toBe(true);
 			expect(realtime.sendDeviceCommand(owner.id, deviceId, pause)).toBe(true);
-			await settle();
+			await waitForStrayEvents();
 			expect(commands).toEqual([playTrack, pause]);
 		});
 	});
@@ -252,14 +249,14 @@ describe('queue:updated broadcast', () => {
 
 		expect(await received).toEqual([state, state]);
 		expect(state.items.at(-1)?.track.trackUri).toBe(`${URI_PREFIX}/${trackCount}`);
-		await settle();
+		await waitForStrayEvents();
 		expect(otherUpdates).toEqual([]);
 	});
 
 	it('sends the state of every mutation, equal to the fetch', async () => {
 		const otherUpdates = record(otherSocket);
 		await queue.addItem(owner.id, owner.id, dto());
-		await settle();
+		await waitForStrayEvents();
 
 		let received = bothReceive();
 		await queue.step(owner.id, owner.id, 'next');
@@ -270,17 +267,17 @@ describe('queue:updated broadcast', () => {
 		await queue.removeItem(owner.id, owner.id, afterStep.currentItemId!);
 		const [afterRemove] = await received;
 		expect(afterRemove).toEqual(await queue.getQueue(owner.id, owner.id));
-		await settle();
+		await waitForStrayEvents();
 		expect(otherUpdates).toEqual([]);
 	});
 
 	it('emits nothing for a refused operation', async () => {
-		await settle();
+		await waitForStrayEvents();
 		const phoneUpdates = record(phone);
 		await expect(queue.playItem(owner.id, owner.id, randomUUID())).rejects.toMatchObject({
 			statusCode: 404,
 		});
-		await settle();
+		await waitForStrayEvents();
 		expect(phoneUpdates).toEqual([]);
 	});
 
@@ -298,13 +295,13 @@ describe('queue:updated broadcast', () => {
 		expect(state.currentItemId).toBe(block[0].id);
 
 		const { id: emptyId } = await playlistService.createPlaylist(owner.id, { name: 'int-empty' });
-		await settle();
+		await waitForStrayEvents();
 		const phoneUpdates = record(phone);
 		await expect(queue.playPlaylist(owner.id, owner.id, emptyId)).rejects.toMatchObject({
 			statusCode: 409,
 			code: 'PLAYLIST_EMPTY',
 		});
-		await settle();
+		await waitForStrayEvents();
 		expect(phoneUpdates).toEqual([]);
 		expect(otherUpdates).toEqual([]);
 	});

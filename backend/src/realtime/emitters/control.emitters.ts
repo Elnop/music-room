@@ -4,7 +4,7 @@ import { leaveListeningRoom } from '@/realtime/music-control-access.js';
 import { broadcastUserListeningStatus } from '@/realtime/listening-status.js';
 import { deviceKey, deviceToSocket, getIO, listeningStatuses } from '@/realtime/state.js';
 
-/** Leaves `listening:<ownerId>` only when no device is left; a failed check evicts (fail closed). Never throws. */
+/** A failed access check evicts (fail closed). */
 export async function revalidateListeningAccess(
 	controllerId: string,
 	ownerId: string
@@ -41,7 +41,6 @@ export async function notifyPermissionChange(
 	});
 }
 
-/** Its socket data and listening status take the name at once; no-op when offline. */
 export function setDeviceName(userId: string, deviceId: string, deviceName: string): void {
 	const socketId = deviceToSocket.get(deviceKey(userId, deviceId));
 	const socket = socketId ? getIO()?.sockets.sockets.get(socketId) : undefined;

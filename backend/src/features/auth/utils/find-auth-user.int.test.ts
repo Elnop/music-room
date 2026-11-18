@@ -4,19 +4,18 @@ import type { AddressInfo } from 'node:net';
 import express from 'express';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-// Limiting on, loopback whitelisted so the route-level limiters skip these requests.
+// Loopback whitelisted so the route-level limiters skip these requests.
 vi.hoisted(() => {
 	process.env.RATE_LIMIT_ENABLED = 'true';
 	process.env.RATE_LIMIT_WHITELIST_IPS = '127.0.0.1,::1,::ffff:127.0.0.1';
 });
 
-// Never send real mail; capture the code instead.
 vi.mock('@/features/mail/services/mail.service.js', () => ({
 	sendVerificationEmail: vi.fn().mockResolvedValue(undefined),
 	sendPasswordResetEmail: vi.fn().mockResolvedValue(undefined),
 }));
 
-// Token verification calls Google and Facebook: always mocked (doc/development/testing.md).
+// oauth.service calls Google and Facebook.
 vi.mock('@/features/auth/services/oauth.service.js', () => ({
 	verifyGoogleToken: vi.fn(),
 	verifyFacebookToken: vi.fn(),
@@ -32,10 +31,7 @@ const loginService = await import('@/features/auth/services/login.service.js');
 const registrationService = await import('@/features/auth/services/registration.service.js');
 const { findAuthUserIdByEmail } = await import('@/features/auth/utils/find-auth-user.js');
 
-// The account is found past the first listUsers() page (50 users) and whatever the case of the
-// email, against the local Supabase stack.
-
-// More than one listUsers() page (50 users).
+// One more than a listUsers() page.
 const FILLER_USERS = 51;
 const NEW_PASSWORD = 'New-password-194';
 const sendMail = vi.mocked(sendPasswordResetEmail);
@@ -51,8 +47,7 @@ describe('auth user lookup by email past the first listUsers() page (#194)', () 
 		await connectRedis();
 		if (!isRedisConnected()) throw new Error('Redis from scripts/test-db.sh is not reachable');
 
-		// listUsers() lists the newest accounts first: create this one before the
-		// fillers, so it sits past the first page.
+		// listUsers() lists newest first: created before the fillers, it sits past the first page.
 		email = `int-${randomUUID()}@example.com`;
 		const { data, error } = await supabaseAdmin.auth.admin.createUser({
 			email,

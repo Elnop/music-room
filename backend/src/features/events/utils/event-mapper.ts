@@ -1,7 +1,6 @@
 import { parseGenres } from '@/shared/music/genres.js';
 import type { Event, EventRowWithRelations } from '@/features/events/events.types.js';
 
-/** Embeds the organiser and the linked playlist through their foreign keys. */
 export const EVENT_COLUMNS =
 	'*, owner:user_profiles!events_owner_id_fkey(id, username, display_name, avatar_url), playlist:playlists(id, name, cover_url, visibility, owner_id)';
 

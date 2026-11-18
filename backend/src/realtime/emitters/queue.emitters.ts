@@ -4,7 +4,7 @@ import type { DeviceCommand } from '@/features/music-control/music-control.types
 import { listeningRoom } from '@/realtime/music-control-access.js';
 import { deviceKey, deviceToSocket, getIO } from '@/realtime/state.js';
 
-/** One emit to `user:<id>` and `listening:<id>`, so a socket in both rooms gets it once. */
+/** One emit to both rooms, so a socket in both gets it once. */
 export function notifyQueueUpdate(userId: string, state: QueueState): void {
 	const io = getIO();
 	if (!io) {
@@ -28,7 +28,6 @@ export function notifyQueueUpdate(userId: string, state: QueueState): void {
 	});
 }
 
-/** False when the device has no socket any more. */
 export function sendDeviceCommand(
 	ownerId: string,
 	deviceId: string,

@@ -11,8 +11,6 @@ const PROVIDER_LABEL: Record<OAuthProvider, string> = {
 	facebook: 'Facebook',
 };
 
-// The social account's email need not match the signed-in user's.
-
 /** A rejected token is a 400, not a 401, so the client does not take it for an expired session. */
 async function verifyProviderId(provider: OAuthProvider, token: string): Promise<string> {
 	try {
@@ -54,6 +52,7 @@ function alreadySet(provider: OAuthProvider): AppError {
 	);
 }
 
+/** The social account's email need not match the signed-in user's. */
 export async function linkProvider(
 	userId: string,
 	provider: OAuthProvider,
@@ -84,8 +83,7 @@ export async function linkProvider(
 
 	const column = provider === 'google' ? 'google_id' : 'facebook_id';
 
-	// Only write while the column is still empty, so a concurrent link of
-	// another account by the same user cannot be overwritten.
+	// Only while still empty, so a concurrent link by the same user is never overwritten.
 	const { data: updated, error: updateError } = await supabaseAdmin
 		.from('user_profiles')
 		.update({

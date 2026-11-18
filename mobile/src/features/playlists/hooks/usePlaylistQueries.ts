@@ -21,7 +21,6 @@ export function usePlaylists(enabled = true) {
 	});
 }
 
-/** Every public playlist but the user's own. */
 export function usePublicPlaylists() {
 	const signedIn = useSession(session => session.isAuthenticated);
 	return useQuery({
@@ -47,7 +46,7 @@ async function loadFriendsPlaylists(): Promise<FriendPlaylists[]> {
 	return all.filter(entry => entry.playlists.length > 0);
 }
 
-/** The public playlists of the user's friends, friends without any left out. */
+/** Friends without public playlists are left out. */
 export function useFriendsPlaylists() {
 	const signedIn = useSession(session => session.isAuthenticated);
 	return useQuery({
@@ -58,7 +57,6 @@ export function useFriendsPlaylists() {
 	});
 }
 
-/** A playlist with its tracks, in rank order. */
 export function usePlaylistDetail(id: string, enabled = true) {
 	const client = useQueryClient();
 	return useQuery({

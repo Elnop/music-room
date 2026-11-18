@@ -31,7 +31,6 @@ interface RenamedEvent {
 	version: number;
 }
 
-/** Applies a rename unless the payload is older than the cache (stale). */
 const renameRule: SocketCacheRule<RenamedEvent, Playlist> = {
 	event: 'playlist:renamed',
 	queryKey: payload => queryKeys.playlists.detail(payload.playlistId),
@@ -41,7 +40,6 @@ const renameRule: SocketCacheRule<RenamedEvent, Playlist> = {
 			: undefined,
 };
 
-/** A minimal socket: records listeners and lets the test emit. */
 function fakeSocket() {
 	const listeners = new Map<string, Set<(payload: unknown) => void>>();
 	const socket = {
@@ -61,7 +59,6 @@ function fakeSocket() {
 describe('socketCache', () => {
 	const key = queryKeys.playlists.detail('p1');
 	const clients: QueryClient[] = [];
-	/** A fresh client, cleared after the test so its cache timers stop. */
 	function createClient(): QueryClient {
 		const client = createQueryClient();
 		clients.push(client);

@@ -36,7 +36,6 @@ export async function checkTrackAvailability(trackUri: string): Promise<TrackAva
 	}
 }
 
-/** Keeps the first unavailable_at of a track that stays unavailable. */
 export async function saveTrackAvailability(
 	trackId: string,
 	unavailable: boolean,
@@ -53,7 +52,6 @@ export async function saveTrackAvailability(
 	if (error) throw error;
 }
 
-/** For a track whose stream SoundCloud no longer gives; never throws. */
 export async function markTrackUriUnavailable(trackUri: string): Promise<void> {
 	const now = new Date().toISOString();
 	const { error } = await supabaseAdmin

@@ -54,8 +54,7 @@ interface PendingEdit {
 	sentAt: number;
 	expected: Set<number>;
 	received: Set<number>;
-	/** The sampled ones. */
-	onTime: number;
+	onTimeCount: number;
 	settle: () => void;
 }
 
@@ -235,7 +234,7 @@ async function edit(ctx: Context, client: Client): Promise<void> {
 		sentAt: performance.now(),
 		expected,
 		received: new Set(),
-		onTime: 0,
+		onTimeCount: 0,
 		settle,
 	};
 	ctx.pendingEdits.set(uri, pending);
@@ -264,7 +263,7 @@ async function edit(ctx: Context, client: Client): Promise<void> {
 	clearTimeout(timer);
 	ctx.pendingEdits.delete(uri);
 	edits.deliveriesExpected += expected.size;
-	timeouts.editBroadcast += expected.size - pending.onTime;
+	timeouts.editBroadcast += expected.size - pending.onTimeCount;
 
 	if (trackId) {
 		const removed = await http(
@@ -323,7 +322,7 @@ function listen(ctx: Context, target: Socket | null): void {
 			if (latency > TIMEOUT_MS) {
 				late.editBroadcast += 1;
 			} else {
-				pending.onTime += 1;
+				pending.onTimeCount += 1;
 				edits.deliveriesReceived += 1;
 				samples.editBroadcast.push(latency);
 			}

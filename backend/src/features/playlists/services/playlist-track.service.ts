@@ -13,8 +13,6 @@ import type {
 } from '@/features/playlists/playlist.types.js';
 import type { MoveTrackInput } from '@/features/playlists/playlist.validators.js';
 
-// Each change is mirrored in the playlist's queue blocks; a sync failure never fails the operation.
-
 /** In 'open' edit mode, the adder is not recorded (added_by = null). */
 export async function addTrack(
 	playlistId: string,
@@ -79,7 +77,7 @@ export async function removeTrack(
 	return { tracksVersion: result.tracksVersion };
 }
 
-/** Moves a track right after move.afterRank (null = top of the list). */
+/** `afterRank` null: top of the list. */
 export async function moveTrack(
 	playlistId: string,
 	userId: string,

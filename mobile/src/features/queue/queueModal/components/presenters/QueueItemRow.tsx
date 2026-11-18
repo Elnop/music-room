@@ -4,7 +4,6 @@ import { Swipeable } from 'react-native-gesture-handler';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { useContextMenu } from '@/shared/hooks/useContextMenu';
-import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Artwork } from '@/shared/components/media/Artwork';
 import { TrackActionsButton } from '@/shared/components/lists/TrackActionsButton';
@@ -33,8 +32,7 @@ export function QueueItemRow({
 	onShowActions,
 }: QueueItemRowProps) {
 	const { theme } = useTheme();
-	const separator = useSeparatorColor();
-	const styles = React.useMemo(() => createRowStyles(theme, separator), [theme, separator]);
+	const styles = React.useMemo(() => createRowStyles(theme), [theme]);
 	const swipeableRef = React.useRef<Swipeable>(null);
 	const { track } = item;
 	const contextMenu = useContextMenu(onShowActions ? () => onShowActions(item) : undefined);

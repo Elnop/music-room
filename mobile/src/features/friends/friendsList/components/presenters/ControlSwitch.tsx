@@ -13,7 +13,6 @@ interface ControlSwitchProps {
 	accessibilityLabel: string;
 }
 
-/** Whether a friend may control my music; a spinner takes its place while the change is saved. */
 export function ControlSwitch({
 	canControl,
 	isToggling,

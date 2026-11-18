@@ -6,7 +6,6 @@ import type {
 } from '@/features/playlists/types';
 import type { AddQueueItemBody } from '@/shared/types/playback';
 
-/** Adds a track at the end of a playlist; the backend gives it its id and rank. */
 export function addTrack(playlistId: string, track: AddQueueItemBody): Promise<AddTrackResult> {
 	return apiRequest<AddTrackResult>(`/api/playlists/${playlistId}/tracks`, {
 		method: 'POST',

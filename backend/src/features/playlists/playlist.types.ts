@@ -28,11 +28,10 @@ export type CoverResponse = z.infer<typeof coverResponseSchema>;
 interface PlaylistUpdateBase {
 	playlistId: string;
 	tracksVersion: number;
-	/** Every rank of the playlist changed: clients reload it. */
+	/** Every rank changed: clients reload the playlist. */
 	rebalanced: boolean;
 }
 
-/** Payload of the `playlist:updated` socket event: one delta per operation. */
 export type PlaylistUpdatedPayload = PlaylistUpdateBase &
 	(
 		| { event: 'track_added'; track: TrackInPlaylistResponse }
@@ -40,24 +39,20 @@ export type PlaylistUpdatedPayload = PlaylistUpdateBase &
 		| { event: 'track_moved'; trackId: string; rank: string }
 	);
 
-/** Payload of the `playlist:details` socket event: the playlist's metadata after a PATCH. */
 export interface PlaylistDetailsPayload {
 	playlistId: string;
 	name: string;
 	description?: string;
 	visibility: 'public' | 'private';
 	editMode: 'open' | 'restricted';
-	/** Absent when the playlist has no custom cover. */
 	coverUrl?: string;
 }
 
-/** Payload of the `playlist:tracks-availability` socket event: the tracks whose availability changed. */
 export interface TracksAvailabilityPayload {
 	playlistId: string;
 	tracks: { trackId: string; unavailable: boolean }[];
 }
 
-/** Payload of the `playlist:deleted` socket event, sent before the room is emptied. */
 export interface PlaylistDeletedPayload {
 	playlistId: string;
 }

@@ -6,18 +6,14 @@ import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 
 export interface PlaylistActionsViewProps {
 	visible: boolean;
-	/** Wide screens: the « ⋯ » button the menu drops down from. */
 	anchor: MenuAnchor | null;
-	/** Shown as the sheet's title. */
 	playlistName: string;
 	onClose: () => void;
 	onDismiss: () => void;
 	onEdit: () => void;
 	onSharing: () => void;
 	onDelete: () => void;
-	/** The playlist has a custom cover: « Retirer la cover » is offered. */
 	hasCover: boolean;
-	/** Free plan: « Changer la cover » shows a lock and explains the Premium. */
 	coverLocked: boolean;
 	onChangeCover: () => void;
 	onRemoveCover: () => void;
@@ -54,17 +50,9 @@ export function PlaylistActionsView({
 					onPress={onChangeCover}
 				/>
 				{hasCover && (
-					<ActionSheetRow
-						icon="close"
-						label="Retirer la cover"
-						onPress={onRemoveCover}
-					/>
+					<ActionSheetRow icon="close" label="Retirer la cover" onPress={onRemoveCover} />
 				)}
-				<ActionSheetRow
-					icon="lock"
-					label="Visibilité et droits"
-					onPress={onSharing}
-				/>
+				<ActionSheetRow icon="lock" label="Visibilité et droits" onPress={onSharing} />
 				<ActionSheetRow icon="trash" label="Supprimer" onPress={onDelete} destructive />
 			</View>
 		</ActionSheet>

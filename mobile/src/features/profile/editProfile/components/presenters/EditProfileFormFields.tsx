@@ -11,7 +11,7 @@ import { Text } from '@/shared/components/ui/Text';
 interface EditProfileFormFieldsProps {
 	control: Control<UpdateProfileInput>;
 	errors: FieldErrors<UpdateProfileInput>;
-	/** Enter in the name field (web); undefined while saving is not possible. */
+	/** Undefined while saving is not possible. */
 	onSubmit?: () => void;
 }
 

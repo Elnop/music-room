@@ -4,14 +4,12 @@ import type { AddressInfo } from 'node:net';
 import express from 'express';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Limiting on so the service's resend cooldown is real; loopback whitelisted so
-// the route-level limiters (not under test here) skip these requests.
+// Loopback whitelisted so the route-level limiters skip these requests.
 vi.hoisted(() => {
 	process.env.RATE_LIMIT_ENABLED = 'true';
 	process.env.RATE_LIMIT_WHITELIST_IPS = '127.0.0.1,::1,::ffff:127.0.0.1';
 });
 
-// Never send real mail; capture the recipient and the code instead.
 vi.mock('@/features/mail/services/mail.service.js', () => ({
 	sendVerificationEmail: vi.fn().mockResolvedValue(undefined),
 	sendPasswordResetEmail: vi.fn().mockResolvedValue(undefined),
@@ -25,9 +23,6 @@ const { default: authRouter } = await import('@/features/auth/auth.routes.js');
 const { errorHandler } = await import('@/shared/middleware/error-handler.js');
 const { logger } = await import('@/shared/utils/logger.js');
 const { verificationConfig } = await import('@/features/mail/mail.config.js');
-
-// verify-email and resend-verification cannot hand out an account, through HTTP on the real
-// auth router against the local Supabase stack and test Redis.
 
 const PASSWORD = 'integration-test-password';
 const SENT_MESSAGE = 'Verification code sent. Please check your email.';

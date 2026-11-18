@@ -19,7 +19,7 @@ import { Text } from '@/shared/components/ui/Text';
 
 export function SharingView({ sharing }: { sharing: PlaylistSharing }) {
 	const { styles: shared } = useThemedStyles(createSharingStyles);
-	const { styles, theme } = useThemedStyles(createStyles);
+	const { styles } = useThemedStyles(createStyles);
 	const { mode, isInfoOnly, members, settings, userSearch } = sharing;
 
 	if (members.isLoading) return <LoadingSpinner fullScreen message="Chargement…" />;

@@ -12,7 +12,7 @@ export async function getSubscription(userId: string): Promise<Subscription> {
 	return toSubscription(await getPlan(userId));
 }
 
-/** Simulated: no payment, the switch takes effect at once. A downgrade deletes nothing. */
+/** Simulated: no payment. A downgrade deletes nothing. */
 export async function changePlan(userId: string, plan: Plan): Promise<Subscription> {
 	const { error } = await supabaseAdmin
 		.from('user_profiles')

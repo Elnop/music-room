@@ -12,7 +12,7 @@ interface DeviceCardProps {
 	device: UserDeviceWithLicenses;
 	isCurrent: boolean;
 	friends: FriendUserSummary[];
-	allDevicesIds: Set<string>;
+	allDevicesFriendIds: Set<string>;
 	licensed: Set<string>;
 	pending: Set<string>;
 	pairKey: (deviceId: string, userId: string) => string;
@@ -25,7 +25,7 @@ export function DeviceCard({
 	device,
 	isCurrent,
 	friends,
-	allDevicesIds,
+	allDevicesFriendIds,
 	licensed,
 	pending,
 	pairKey,
@@ -52,7 +52,7 @@ export function DeviceCard({
 			) : (
 				friends.map(friend => {
 					const key = pairKey(device.deviceId, friend.id);
-					const allDevices = allDevicesIds.has(friend.id);
+					const allDevices = allDevicesFriendIds.has(friend.id);
 					const isPending = pending.has(key);
 					const value = allDevices || licensed.has(key);
 

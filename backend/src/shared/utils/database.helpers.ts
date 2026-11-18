@@ -6,7 +6,6 @@ type DbFilterValue = string | number | boolean | null;
 
 type DbRecord = Record<string, DbFilterValue | DbFilterValue[] | undefined>;
 
-/** Throws AppError if not found or on error. */
 export async function fetchSingle<T>(
 	client: SupabaseClient,
 	table: string,

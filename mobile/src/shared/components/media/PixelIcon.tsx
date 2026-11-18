@@ -5,7 +5,6 @@ import { pixelRuns } from '@/shared/utils/pixelRuns';
 
 const GRID = 12;
 
-// Computed once: a sprite never changes at run time.
 const RUNS = Object.fromEntries(
 	Object.entries(PIXEL_SPRITES).map(([name, rows]) => [name, pixelRuns(rows)])
 ) as Record<PixelSpriteName, ReturnType<typeof pixelRuns>>;
@@ -16,7 +15,6 @@ interface PixelIconProps {
 	/** A multiple of 12 keeps every pixel square and sharp. */
 	size?: number;
 	style?: StyleProp<ViewStyle>;
-	/** An icon that alone tells a state (playing, unavailable) names it for screen readers. */
 	accessibilityLabel?: string;
 	testID?: string;
 }

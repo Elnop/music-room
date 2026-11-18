@@ -12,7 +12,7 @@ import { PlaylistCassette } from './PlaylistCassette';
 interface PlaylistGridCardProps {
 	playlist: Playlist;
 	onPress: () => void;
-	/** Web: a right click or the Menu key opens the playlist's menu. */
+	/** Web only: a right click or the Menu key. */
 	onShowActions?: () => void;
 }
 

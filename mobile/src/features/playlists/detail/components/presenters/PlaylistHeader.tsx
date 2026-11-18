@@ -15,9 +15,7 @@ import { PlaylistCover } from './PlaylistCover';
 
 interface PlaylistHeaderProps {
 	playlist: PlaylistWithTracks;
-	/** The Play/Pause button, shown next to the track count of a non-empty playlist. */
 	playButton: React.ReactNode;
-	/** An editor gets « Ajouter un titre ». */
 	canEdit: boolean;
 	onAddTrack: () => void;
 }
@@ -69,7 +67,9 @@ export function PlaylistHeader({ playlist, playButton, canEdit, onAddTrack }: Pl
 
 			<View style={styles.actions}>
 				{trackCount > 0 && playButton}
-				{canEdit && <KeyButton icon="plus" onPress={onAddTrack} accessibilityLabel="Ajouter un titre" />}
+				{canEdit && (
+					<KeyButton icon="plus" onPress={onAddTrack} accessibilityLabel="Ajouter un titre" />
+				)}
 				<ShareLinkButton url={playlistLink(playlist.id)} title={playlist.name} />
 				<Text style={styles.count} accessibilityLabel={trackLabel}>
 					{trackCount} · {duration}
@@ -93,7 +93,13 @@ const createStyles = (theme: Theme) =>
 			textShadowRadius: 0,
 		},
 		row: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },
-		badge: { ...pixelFrame(theme), width: 30, height: 30, alignItems: 'center', justifyContent: 'center' },
+		badge: {
+			...pixelFrame(theme),
+			width: 30,
+			height: 30,
+			alignItems: 'center',
+			justifyContent: 'center',
+		},
 		visibility: { backgroundColor: theme.colors.primary },
 		editing: { backgroundColor: theme.colors.people },
 		collaborators: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.xs },

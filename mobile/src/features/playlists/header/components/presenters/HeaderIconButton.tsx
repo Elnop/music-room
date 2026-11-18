@@ -11,11 +11,9 @@ interface HeaderIconButtonProps {
 	size: number;
 	onPress: () => void;
 	accessibilityLabel: string;
-	/** For a button that opens a menu: where the menu drops down from on wide screens. */
 	ref?: React.Ref<View>;
 }
 
-/** A 36-point pixel-framed icon button of the native header (`headerRight`). */
 export function HeaderIconButton({
 	icon,
 	size,

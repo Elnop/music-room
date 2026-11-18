@@ -16,7 +16,7 @@ import {
 import { playlistFormSchema, type PlaylistFormInput } from '@/features/playlists/validators';
 import type { Playlist, PlaylistStackParamList } from '@/features/playlists/types';
 
-// Playlist field limits (the backend allows 100 and 500)
+// The backend allows 100 and 500.
 const PLAYLIST_LIMITS = { NAME_MAX: 50, DESCRIPTION_MAX: 500 } as const;
 
 type Navigation = NativeStackNavigationProp<PlaylistStackParamList, 'CreatePlaylist'>;

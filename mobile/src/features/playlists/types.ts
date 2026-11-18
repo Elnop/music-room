@@ -60,7 +60,6 @@ export type PlaylistUpdatedEvent = PlaylistUpdateBase &
 		| { event: 'track_moved'; trackId: string; rank: string }
 	);
 
-/** Payload of the `playlist:details` socket event. */
 export interface PlaylistDetailsEvent {
 	playlistId: string;
 	name: string;
@@ -71,7 +70,6 @@ export interface PlaylistDetailsEvent {
 	coverUrl?: string;
 }
 
-/** Answer of `PUT`/`DELETE /api/playlists/:id/cover`; null once removed. */
 export interface CoverResponse {
 	coverUrl: string | null;
 }
@@ -82,12 +80,10 @@ export interface TracksAvailabilityEvent {
 	tracks: { trackId: string; unavailable: boolean }[];
 }
 
-/** Payload of the `playlist:deleted` socket event. */
 export interface PlaylistDeletedEvent {
 	playlistId: string;
 }
 
-/** A user as the playlist screens show them: owner, viewer, friend, search result. */
 export interface UserSummary {
 	id: string;
 	username: string;
@@ -95,18 +91,16 @@ export interface UserSummary {
 	avatarUrl?: string;
 }
 
-/** A person given access on « Visibilité et droits »; `canEdit` for a collaborator. */
 export interface PlaylistMember extends UserSummary {
 	canEdit: boolean;
 }
 
-/** A friend and their public playlists, for the carousel of the playlists screen. */
 export interface FriendPlaylists {
 	friend: UserSummary;
 	playlists: Playlist[];
 }
 
-/** The playlist routes; the Friends stack reuses PlaylistDetail and SearchTracks. */
+/** The Friends stack reuses PlaylistDetail and SearchTracks. */
 export type PlaylistStackParamList = {
 	Home: undefined;
 	Playlists: undefined;

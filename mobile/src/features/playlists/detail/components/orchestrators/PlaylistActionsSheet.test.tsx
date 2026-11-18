@@ -97,7 +97,6 @@ describe('PlaylistActionsSheet (#342)', () => {
 			act(() => screen.UNSAFE_getByType(Modal).props.onDismiss());
 			expect(onDelete).toHaveBeenCalledTimes(1);
 
-			// A later dismiss without a new choice runs nothing.
 			act(() => screen.UNSAFE_getByType(Modal).props.onDismiss());
 			expect(onDelete).toHaveBeenCalledTimes(1);
 		});

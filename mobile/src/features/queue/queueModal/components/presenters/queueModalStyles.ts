@@ -34,7 +34,7 @@ export const createModalStyles = (
 		},
 	});
 
-export const createRowStyles = (theme: Theme, separator: string) =>
+export const createRowStyles = (theme: Theme) =>
 	StyleSheet.create({
 		row: pixelRow(theme),
 		rowMain: {

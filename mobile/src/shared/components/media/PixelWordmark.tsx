@@ -5,7 +5,6 @@ import { useLoop } from '@/shared/hooks/useLoop';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 
-/** « ZUMIK » in pixel capitals, followed by a blinking text cursor. */
 export function PixelWordmark({ size = 24 }: { size?: number }) {
 	const { styles, theme } = useThemedStyles(createStyles);
 	const blink = useLoop(true, 1000).interpolate({

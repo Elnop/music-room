@@ -6,7 +6,6 @@ import { ForgotPasswordView } from '@/features/auth/forgotPassword/components/pr
 
 type ForgotPasswordOrchestratorProps = NativeStackScreenProps<AuthStackParamList, 'ForgotPassword'>;
 
-/** Prefilled with the login email. */
 export function ForgotPasswordOrchestrator({ route, navigation }: ForgotPasswordOrchestratorProps) {
 	const form = useForgotPassword(route.params?.email ?? '', navigation);
 	return <ForgotPasswordView form={form} />;

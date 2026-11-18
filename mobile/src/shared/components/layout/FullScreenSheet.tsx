@@ -9,7 +9,6 @@ interface FullScreenSheetProps {
 	children: React.ReactNode;
 }
 
-/** A sheet that covers the phone screen, and a centred dialog on wide screens; Escape closes it in a browser. */
 export function FullScreenSheet({ visible, onClose, children }: FullScreenSheetProps) {
 	const { isWide } = useBreakpoint();
 

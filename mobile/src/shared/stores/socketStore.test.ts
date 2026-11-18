@@ -19,7 +19,6 @@ interface FakeEmitter {
 
 interface FakeSocket {
 	id: string;
-	/** The Manager: emits the reconnect* events. */
 	io: FakeEmitter;
 	connected: boolean;
 	handlers: Record<string, Handler[]>;
@@ -80,7 +79,6 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-// The session the auth store registers in the app (shared/services/authSession.ts).
 registerAuthSession({
 	// Reads the token at each call, like the auth store.
 	store: {

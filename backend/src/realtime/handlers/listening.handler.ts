@@ -54,8 +54,7 @@ async function subscribeToListening(socket: AppSocket, payload: unknown): Promis
 	const room = listeningRoom(targetUserId);
 	void socket.join(room);
 
-	// A revoke or unfollow whose revalidation ran during the check above
-	// found nothing to evict: re-check now that the socket is in the room.
+	// A revoke during the first check found no socket to evict: re-check once in the room.
 	if (!(await controlAccessService.canControlAnyDevice(myUserId, targetUserId))) {
 		void socket.leave(room);
 		denyListening();
@@ -95,16 +94,12 @@ export function registerListeningHandlers(socket: AppSocket): void {
 		}
 
 		const { userId, deviceId } = socketInfo;
-		// Leading + trailing: the first update applies now, the latest one
-		// received during the window applies when it ends.
 		listeningUpdateThrottle.submit(deviceKey(userId, deviceId), () =>
 			applyListeningUpdate(socket, userId, deviceId, data)
 		);
 	});
 
-	// subscribe awaits access checks while unsubscribe does not: same
-	// ordering as playlist join/leave, so a quick subscribe(X) +
-	// unsubscribe(X) never ends with the socket in the room.
+	// In arrival order, like playlist join/leave: subscribe awaits access checks, unsubscribe does not.
 	const enqueue = createSocketQueue(socket, 'listening_room_task_failed');
 
 	socket.on('listening:subscribe', (payload: unknown) => {

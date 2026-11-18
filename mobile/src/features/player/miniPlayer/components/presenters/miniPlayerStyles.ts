@@ -4,7 +4,6 @@ import type { Theme } from '@/shared/theme/types';
 
 export const createStyles = (theme: Theme) =>
 	StyleSheet.create({
-		// A key floating above the tabs.
 		container: {
 			...keycap(theme),
 			backgroundColor: theme.colors.surfaceAlt,

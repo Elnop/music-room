@@ -32,7 +32,6 @@ const debugOnly = (what: string) =>
 		.optional()
 		.meta({ description: `${what}, for developers. Sent only in development and test` });
 
-/** `{ success: false, error, meta }`. */
 const errorResponseSchema = z.object({
 	success: z.literal(false),
 	error: z.object({
@@ -62,7 +61,6 @@ function errorExamples(examples: ErrorExample[]) {
 	};
 }
 
-/** One example body per `[code, message, details?]`. */
 export function fail(description: string, ...examples: ErrorExample[]): ResponseConfig {
 	return {
 		description,

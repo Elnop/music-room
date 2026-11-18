@@ -1,4 +1,3 @@
-/** navigation/linking.ts opens these links. */
 export const LINK_PREFIX = 'zumik://';
 
 /** Messaging apps make only http(s) links clickable: a shared link opens the web app, which offers the Android app. */

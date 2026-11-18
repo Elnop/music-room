@@ -49,8 +49,7 @@ const createStyles = (theme: Theme) =>
 			paddingVertical: 8,
 			paddingHorizontal: theme.spacing.md,
 		},
-		rowCover: {
-		},
+		rowCover: {},
 		rowInfo: {
 			flex: 1,
 			marginLeft: theme.spacing.md,

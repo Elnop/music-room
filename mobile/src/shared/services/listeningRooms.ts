@@ -1,14 +1,12 @@
-/** What the ref-count needs of a Socket.io client socket. */
 interface ListeningSocket {
 	connected: boolean;
 	emit: (event: string, ...args: unknown[]) => unknown;
 }
 
-/** Holders per owner, per socket: a new connection (new socket) starts from zero. */
+/** Per socket: a new connection starts from zero. */
 const holders = new WeakMap<ListeningSocket, Map<string, number>>();
 
-// The server keeps one membership per socket and `listening:unsubscribe` leaves it outright,
-// so the friend profile and the remote target share it through this count.
+// The server keeps one membership per socket, so the profile and the remote target share it through this count.
 export function acquireListening(socket: ListeningSocket, ownerId: string): void {
 	let counts = holders.get(socket);
 	if (!counts) {
@@ -20,7 +18,7 @@ export function acquireListening(socket: ListeningSocket, ownerId: string): void
 	if (count === 0) socket.emit('listening:subscribe', ownerId);
 }
 
-/** Skips the unsubscribe when disconnected: a disconnect already left the room. */
+/** A disconnect already left the room: no unsubscribe then. */
 export function releaseListening(socket: ListeningSocket, ownerId: string): void {
 	const counts = holders.get(socket);
 	const count = counts?.get(ownerId) ?? 0;

@@ -18,7 +18,7 @@ interface StoredTrack {
 // Two clients opening the same playlist must not check its tracks twice.
 const checking = new Set<string>();
 
-/** Rechecks the tracks not checked for RECHECK_AFTER_MS and broadcasts the changes; never throws. */
+/** Never throws: runs after the response. */
 export async function refreshPlaylistAvailability(playlistId: string): Promise<void> {
 	try {
 		const due = (await playlistTracks(playlistId)).filter(

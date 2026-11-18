@@ -11,9 +11,7 @@ import { FIXED_COLORS } from '@/shared/theme/tokens';
 import { Text } from '@/shared/components/ui/Text';
 
 interface ConnectionBannerProps {
-	/** From useConnectionStatus(); null renders nothing. */
 	status: ConnectionStatus;
-	/** Status bar height: the banner sits under it, never over it. */
 	topInset: number;
 }
 
@@ -32,7 +30,6 @@ const ICONS: Record<NonNullable<ConnectionStatus>, PixelSpriteName> = {
 const DARK_TEXT = FIXED_COLORS.inkDark;
 const LIGHT_TEXT = FIXED_COLORS.inkLight;
 
-/** WCAG relative luminance of a #RRGGBB color. */
 function luminance(hex: string): number {
 	const [r, g, b] = [1, 3, 5].map(i => {
 		const c = parseInt(hex.slice(i, i + 2), 16) / 255;
@@ -46,19 +43,16 @@ const contrast = (a: string, b: string) => {
 	return (hi + 0.05) / (lo + 0.05);
 };
 
-/** Dark or white text, whichever contrasts most with the background. */
 export function textColorOn(background: string): string {
 	return contrast(background, DARK_TEXT) >= contrast(background, LIGHT_TEXT)
 		? DARK_TEXT
 		: LIGHT_TEXT;
 }
 
-/** Whether a background needs white text and light status bar icons. */
 export function isDarkBackground(background: string): boolean {
 	return textColorOn(background) === LIGHT_TEXT;
 }
 
-/** « Réessayer » restarts the socket once the Manager gave up. */
 export function ConnectionBanner({ status, topInset }: ConnectionBannerProps) {
 	const { theme } = useTheme();
 	const retry = useSocketStore(state => state.retry);

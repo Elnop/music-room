@@ -17,10 +17,7 @@ export type ScannerState = 'on' | 'off' | 'unsupported';
 let manager: BleManager | null = null;
 const bleManager = () => (manager ??= new BleManager());
 
-/**
- * Android filters iBeacon frames out of scans declared "neverForLocation", so scanning needs
- * the location permission too, and the location setting on.
- */
+/** Android drops iBeacon frames from "neverForLocation" scans: scanning needs the location permission and setting. */
 export async function requestScanPermission(): Promise<boolean> {
 	if (Platform.OS !== 'android') return false;
 	const wanted =
@@ -43,7 +40,6 @@ export async function hasScanPermission(): Promise<boolean> {
 	return (await Promise.all(checks)).every(Boolean);
 }
 
-/** Calls `listener` with the Bluetooth state now and on every change; returns the unsubscribe. */
 export function watchBluetoothState(listener: (state: ScannerState) => void): () => void {
 	const subscription = bleManager().onStateChange(state => {
 		if (state === State.PoweredOn) listener('on');

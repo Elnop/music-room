@@ -15,7 +15,6 @@ import { logger } from '@/shared/utils/logger.js';
 import { sendSuccess } from '@/shared/utils/send-success.js';
 import * as ipReputation from '@/shared/security/ip-reputation.js';
 
-/** A failure counts toward the IP reputation. */
 async function oauthLogin(req: Request, res: Response, signIn: () => Promise<unknown>) {
 	const ip = requestIp(req);
 	try {

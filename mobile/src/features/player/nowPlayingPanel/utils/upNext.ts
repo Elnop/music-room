@@ -2,7 +2,6 @@ import type { OwnerQueue, QueueItem } from '@/shared/types/playback';
 
 interface UpNext {
 	current: QueueItem | null;
-	/** The first items after the current one. */
 	items: QueueItem[];
 	/** Every item after the current one, shown or not. */
 	total: number;

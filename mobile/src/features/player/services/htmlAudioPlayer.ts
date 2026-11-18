@@ -4,7 +4,6 @@ import { mediaElement, setMediaEventHandler, type MediaElement } from './mediaEl
 import { attachStream } from './streamSource';
 
 export interface PlaybackEvents {
-	/** The browser refused to start playback before any interaction with the page. */
 	onPlayBlocked: () => void;
 	onPlaying: () => void;
 }
@@ -44,12 +43,8 @@ export class HtmlAudioPlayer implements AudioPlayer {
 		detachOwner = () => this.detach();
 		setMediaEventHandler(type => this.handleMediaEvent(type));
 		this.failed = false;
-		if (this.source) this.releaseStream = attachStream(
-				mediaElement(),
-				this.source,
-				this.protocol,
-				this.onFatal
-			);
+		if (this.source)
+			this.releaseStream = attachStream(mediaElement(), this.source, this.protocol, this.onFatal);
 		this.publish();
 	}
 

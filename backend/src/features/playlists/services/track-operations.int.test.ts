@@ -3,8 +3,7 @@ import { createClient, type PostgrestError, type SupabaseClient } from '@supabas
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { createSignInClient, supabaseAdmin } from '@/shared/config/supabase.js';
 
-// Concurrent playlist edits: each rpc() is its own HTTP request, so Promise.all runs real
-// concurrent transactions. Untyped: the generated types only know migration 016 once applied.
+// Each rpc() is its own HTTP request, so Promise.all runs real concurrent transactions.
 
 interface Row {
 	track_id: string;
@@ -23,6 +22,7 @@ interface AddResult extends MoveResult {
 	addedAt: string;
 }
 
+// Untyped: the generated types only know these functions after `make generate-types`.
 const db = supabaseAdmin as unknown as SupabaseClient;
 const PASSWORD = 'integration-test-password';
 
@@ -94,7 +94,6 @@ async function order(): Promise<Row[]> {
 
 const ids = (rows: Row[]) => rows.map(r => r.track_id);
 
-// Each track once, ranks unique and in byte order, added_by never rewritten.
 async function expectInvariants(): Promise<Row[]> {
 	const rows = await order();
 	expect(new Set(ids(rows)).size).toBe(rows.length);
@@ -288,8 +287,7 @@ describe('playlist track operations (migration 016)', () => {
 		let v = await version();
 		let rebalanced = false;
 		let moves = 0;
-		// Drop the other tracks right after A in turn: each lands between A and the
-		// previous one, so the gap halves and ranks lengthen until a rebalance.
+		// Each move lands between A and the previous one: the gap halves until a rebalance.
 		while (moves < 1000 && !rebalanced) {
 			const trackId = others[moves % others.length].track_id;
 			const expected = [

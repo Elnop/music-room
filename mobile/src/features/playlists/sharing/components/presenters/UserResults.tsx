@@ -14,7 +14,6 @@ import { Text } from '@/shared/components/ui/Text';
 interface UserResultsProps {
 	results: UserSummary[];
 	isSearching: boolean;
-	/** A member change is on its way: adding waits. */
 	busy: boolean;
 	onAdd: (user: UserSummary) => void;
 }

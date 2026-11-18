@@ -16,7 +16,7 @@ export interface PlaylistCardMenu {
 	visible: boolean;
 	/** The last playlist, still rendered while the menu closes. */
 	playlist: Playlist | null;
-	/** Only the owner's playlists have a menu, as on the detail screen; the others keep the browser's. */
+	/** Owner's playlists only; the others keep the browser's menu. */
 	actionsFor: (playlist: Playlist) => (() => void) | undefined;
 	close: () => void;
 	edit: () => void;
@@ -27,7 +27,6 @@ export interface PlaylistCardMenu {
 	removeCover: () => void;
 }
 
-/** The detail screen's « ⋯ » menu, opened from a playlist card. */
 export function usePlaylistCardMenu(
 	navigation: Pick<NativeStackNavigationProp<PlaylistStackParamList>, 'navigate' | 'getParent'>
 ): PlaylistCardMenu {

@@ -1,9 +1,8 @@
 import { AppRegistry, Platform } from 'react-native';
 import { requireOptionalNativeModule } from 'expo';
 
-// Android pauses JS timers in the background, and fetch resolves through setTimeout: without
-// this, the next track's requests hang until the app comes back. A running headless task
-// keeps the timers going (local module mobile/modules/js-keep-alive).
+// Android pauses JS timers in the background, and fetch resolves through setTimeout:
+// a running headless task keeps them going (local module mobile/modules/js-keep-alive).
 const TASK_KEY = 'JsKeepAlive';
 
 interface JsKeepAliveModule {

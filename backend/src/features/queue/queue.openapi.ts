@@ -15,9 +15,6 @@ import {
 import { bearerAuth, jsonBody, nameSchemas, ok } from '@/shared/config/swagger.schemas.js';
 import { fail, shared } from '@/shared/config/swagger.errors.js';
 
-// Every endpoint sends the new state as `queue:updated` to rooms `user:<id>` and `listening:<id>`;
-// a playback action with a `deviceId` also sends `control:command play-item` to that device.
-
 const ownerParams = z.object({
 	userId: queueOwnerParamsSchema.shape.userId.unwrap().meta({
 		param: { description: 'Id of the queue owner; you must control at least one of their devices' },
@@ -34,7 +31,7 @@ const deviceIdRequired = fail(
 	['DEVICE_ID_REQUIRED', 'A delegate must name the device to play on']
 );
 
-/** The same operation under /api/users/{userId}/queue, for a friend who controls one of the owner's devices. */
+/** The route mirrored under /api/users/{userId}/queue. */
 function delegated(route: RouteConfig): RouteConfig {
 	const own403 = route.responses[403] as ResponseConfig | undefined;
 	const params = route.request?.params as z.ZodObject | undefined;
@@ -46,7 +43,6 @@ function delegated(route: RouteConfig): RouteConfig {
 		request: { ...route.request, params: params ? ownerParams.extend(params.shape) : ownerParams },
 		responses: {
 			...route.responses,
-			// A delegate must name the device (400) and may lack access (403).
 			...(playbackRoutes.includes(route) && { 400: deviceIdRequired }),
 			403: own403
 				? { ...own403, description: `${own403.description}; ${accessDenied.description}` }
@@ -55,7 +51,6 @@ function delegated(route: RouteConfig): RouteConfig {
 	};
 }
 
-/** Registers the /api/queue routes, their /api/users/{userId}/queue mirrors and the transfer. */
 export function registerQueueOpenapi(registry: OpenAPIRegistry): void {
 	nameSchemas({
 		QueueTrack: queueTrackSchema,
@@ -69,7 +64,6 @@ export function registerQueueOpenapi(registry: OpenAPIRegistry): void {
 	for (const route of queueRoutes) registry.registerPath(route);
 	for (const route of queueRoutes) registry.registerPath(delegated(route));
 
-	// A transfer always starts from the caller, so it has no /api/users/{userId} mirror.
 	registry.registerPath({
 		method: 'post',
 		path: '/api/queue/transfer',

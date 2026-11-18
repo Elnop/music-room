@@ -13,8 +13,7 @@ module.exports = {
 		orientation: 'portrait',
 		icon: './src/assets/logo/app-icon.png',
 		userInterfaceStyle: 'dark',
-		// Window background before the first render (expo-system-ui), else Android shows white;
-		// ThemedSystemUI then follows the active theme.
+		// Window background before the first render (expo-system-ui), else Android shows white.
 		backgroundColor: '#0D0D0D',
 		newArchEnabled: true,
 		splash: {
@@ -53,7 +52,6 @@ module.exports = {
 							scheme: 'zumik',
 							host: 'auth',
 						},
-						// Share links: zumik://playlist/<id>, zumik://user/<id>
 						{
 							scheme: 'zumik',
 							host: 'playlist',
@@ -70,7 +68,7 @@ module.exports = {
 		web: {
 			favicon: './src/assets/logo/app-icon.png',
 		},
-		// The GitHub Pages build serves the app under /music-room (pages.yml); dev stays at the root.
+		// The GitHub Pages build serves the app under a sub-path; dev stays at the root.
 		...(process.env.WEB_BASE_URL && { experiments: { baseUrl: process.env.WEB_BASE_URL } }),
 		plugins: [
 			[

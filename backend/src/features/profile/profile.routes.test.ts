@@ -6,8 +6,7 @@ import profileRoutes from '@/features/profile/profile.routes.js';
 import { errorHandler } from '@/shared/middleware/error-handler.js';
 import { MUSIC_GENRES } from '@/shared/music/genres.js';
 
-// Only Supabase, the auth middleware and the logger are mocked; the fake client
-// answers per table and operation and records every builder call.
+// The fake Supabase client answers per table and operation and records every builder call.
 
 type Op = 'select' | 'update' | 'insert';
 interface FakeResult {
@@ -178,7 +177,6 @@ const ONE_WAY = [follow(BOB, ALICE)];
 const ONE_WAY_BACK = [follow(ALICE, BOB)];
 const MUTUAL = [follow(BOB, ALICE), follow(ALICE, BOB)];
 
-/** Alice's profile seen by Bob, with the given privacy row and follows. */
 function arrangeThirdParty(privacy: ReturnType<typeof privacyRow>, follows: unknown[] = []) {
 	setResult('user_profiles', 'select', profileRow(ALICE));
 	setResult('profile_privacy', 'select', privacy);
@@ -503,7 +501,6 @@ describe('GET /api/profile/search', () => {
 		expect(callsOn('user_profiles', 'or')).toHaveLength(1);
 	});
 
-	// Avatar and bio follow the found profile's privacy settings, as on GET /:userId.
 	it.each([
 		['public', [], true],
 		['friends_only', [], false],
@@ -616,7 +613,6 @@ describe('GET /api/profile/privacy', () => {
 		expect(callsOn('profile_privacy', 'eq')[0]?.args).toEqual(['user_id', ALICE]);
 	});
 
-	// Without a requesterId a missing row gets the defaults; only PUT inserts.
 	it('answers the default settings when the requester has no row', async () => {
 		setResult('profile_privacy', 'select', null, { code: 'PGRST116', message: 'No rows found' });
 
@@ -726,7 +722,6 @@ describe('music preferences', () => {
 const NO_ROW = { code: 'PGRST116', message: 'No rows found' };
 const DB_DOWN = { code: '08006', message: 'connection failure' };
 
-/** The next Supabase call throws, as an unexpected client error would. */
 function throwOnNextQuery() {
 	db.from.mockImplementationOnce(() => {
 		throw new Error('client exploded');

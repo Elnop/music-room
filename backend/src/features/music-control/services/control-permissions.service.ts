@@ -2,10 +2,8 @@ import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import { logger } from '@/shared/utils/logger.js';
 
-// Reads of the "all my devices" switch (`follows(friend → owner).can_control_music`);
-// control-switch.service.ts turns it on and off.
+// The "all my devices" switch is `follows(friend → owner).can_control_music`.
 
-/** The users ownerId has turned the switch on for. */
 export async function getGrantedPermissions(ownerId: string): Promise<string[]> {
 	try {
 		const { data, error } = await supabaseAdmin
@@ -27,7 +25,6 @@ export async function getGrantedPermissions(ownerId: string): Promise<string[]> 
 	}
 }
 
-/** Whether targetId has turned the switch on for controllerId. Fails closed. */
 export async function canControl(controllerId: string, targetId: string): Promise<boolean> {
 	try {
 		const { data, error } = await supabaseAdmin
@@ -38,7 +35,7 @@ export async function canControl(controllerId: string, targetId: string): Promis
 			.single();
 
 		if (error) {
-			// PGRST116: no row, controllerId does not follow targetId.
+			// PGRST116: no row, so controllerId does not follow targetId.
 			if (error.code !== 'PGRST116') {
 				logger.error('Failed to check control permission', { error, controllerId, targetId });
 			}

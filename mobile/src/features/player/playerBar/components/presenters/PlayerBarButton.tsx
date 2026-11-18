@@ -13,7 +13,6 @@ interface PlayerBarButtonProps {
 	style: StyleProp<ViewStyle>;
 	size?: number;
 	disabled?: boolean;
-	/** Shows a spinner in place of the icon. */
 	busy?: boolean;
 	/** For a toggle (the device picker while playing elsewhere): announced as selected. */
 	selected?: boolean;

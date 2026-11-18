@@ -38,7 +38,11 @@ const IOS_CLIENT_ID =
 
 /** Called once at app start; the web client ID gives an ID token on Android and iOS alike. */
 export function configureGoogleSignIn(): void {
-	GoogleSignin.configure({ webClientId: WEB_CLIENT_ID, iosClientId: IOS_CLIENT_ID, offlineAccess: false });
+	GoogleSignin.configure({
+		webClientId: WEB_CLIENT_ID,
+		iosClientId: IOS_CLIENT_ID,
+		offlineAccess: false,
+	});
 }
 
 /** Rejects with Error(SIGN_IN_CANCELLED) when the user cancels. */

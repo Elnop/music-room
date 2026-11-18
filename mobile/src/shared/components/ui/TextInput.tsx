@@ -9,7 +9,7 @@ const BASE_FONT = { fontFamily: FONT_FAMILIES.regular };
 export type TextInput = NativeTextInput;
 
 type TextInputProps = React.ComponentPropsWithRef<typeof NativeTextInput> & {
-	/** Web: the style of a field that draws its own frame, while it has the focus. */
+	/** Web: applied while focused, for a field that draws its own frame. */
 	focusedStyle?: StyleProp<TextStyle>;
 };
 

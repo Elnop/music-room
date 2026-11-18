@@ -1,10 +1,9 @@
-/** A button's rectangle in window coordinates, as `measureInWindow` reports it. */
 export interface MenuAnchor {
 	x: number;
 	y: number;
 	width: number;
 	height: number;
-	/** A context menu (a point or the focused element): it starts at the left edge, as the browser's own. */
+	/** A context menu starts at its point, like the browser's own. */
 	align?: 'start';
 }
 
@@ -20,7 +19,6 @@ const MARGIN = 8;
 /** Below the button while this much room is left, else on the side with the most room. */
 const ROOM_BELOW = 320;
 
-/** A drop-down menu right-aligned on its button, opening downwards unless the window ends too soon. */
 export function menuPlacement(
 	anchor: MenuAnchor,
 	window: { width: number; height: number },

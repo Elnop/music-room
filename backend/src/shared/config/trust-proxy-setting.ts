@@ -1,6 +1,6 @@
 import proxyaddr from 'proxy-addr';
 
-/** Express `trust proxy` format; default false (X-Forwarded-For ignored). No env import: env.ts validates with these. */
+// No env import: env.ts validates TRUST_PROXY with these functions.
 type TrustProxySetting = boolean | number | string;
 
 export function parseTrustProxy(value: string): TrustProxySetting {

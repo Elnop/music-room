@@ -16,9 +16,8 @@ interface EmptyStateAction {
 interface EmptyStateProps {
 	message: string;
 	icon?: PixelSpriteName;
-	/** A button under the message, leading out of the empty state. */
 	action?: EmptyStateAction;
-	/** A section's empty state among others (wide screens): it keeps to its content's height. */
+	/** Among other sections on wide screens: keeps to its content's height. */
 	compact?: boolean;
 	style?: StyleProp<ViewStyle>;
 }

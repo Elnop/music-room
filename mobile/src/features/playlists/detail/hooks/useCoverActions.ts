@@ -16,7 +16,6 @@ const PERMISSION_DENIED =
 	"Autorisez l'accès à vos photos dans les réglages pour choisir une cover.";
 
 interface CoverActions {
-	/** False on the free plan: changing the cover shows the Premium lock instead. */
 	isPremium: boolean;
 	isUploading: boolean;
 	change: () => void;
