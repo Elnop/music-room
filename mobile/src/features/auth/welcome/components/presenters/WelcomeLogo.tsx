@@ -6,7 +6,7 @@ import { displayText } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 
-const NOTE_SIZE = 216;
+const NOTE_SIZE = 400;
 
 export function WelcomeLogo() {
 	const { styles, theme } = useThemedStyles(createStyles);
@@ -39,7 +39,7 @@ const createStyles = (theme: Theme) =>
 		},
 		layer: { position: 'absolute', left: 0, top: 0 },
 		word: {
-			...displayText(theme, 54),
+			...displayText(theme, 66),
 			color: theme.colors.text,
 		},
 		wordShadow: { position: 'absolute', left: 0, color: theme.colors.shadow },
