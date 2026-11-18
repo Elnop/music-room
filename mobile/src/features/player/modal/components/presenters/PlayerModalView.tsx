@@ -7,7 +7,7 @@ import { Pressable } from '@/shared/components/ui/Pressable';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { PlayerHeader } from './PlayerHeader';
 import { isPlayerDialog } from './playerModalStyles';
-import { PlayerTrackInfo } from './PlayerTrackInfo';
+import { PlayerTrackError } from './PlayerTrackError';
 import { PlayerArtworkCarousel } from './PlayerArtworkCarousel';
 import { PlayerProgressSlider } from './PlayerProgressSlider';
 import { PlayerControls } from './PlayerControls';
@@ -73,17 +73,13 @@ export function PlayerModalView({ modal, gestures, seek, carousel }: PlayerModal
 									<PlayerArtworkCarousel
 										styles={modal.styles}
 										carousel={carousel}
-										hasTrack={modal.track !== null}
-										artworkUrl={modal.artworkUrl}
-										emptyIconColor={modal.colors.textSecondary}
+										colors={modal.colors}
 									/>
 								</View>
 							</GestureDetector>
 
-							<PlayerTrackInfo
+							<PlayerTrackError
 								styles={modal.styles}
-								track={modal.track}
-								infoStyle={carousel.infoStyle}
 								error={modal.error}
 								isRemote={modal.isRemote}
 								colors={modal.colors}

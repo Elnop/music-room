@@ -655,10 +655,11 @@ describe('PlayerModal artwork swipe', () => {
 		Object.assign(mockProgress, { currentTime: 0, duration: 0 });
 	});
 
-	it('shows the previous and next artworks on both sides', () => {
+	it('shows the current artwork between the previous and next ones', () => {
 		render(<PlayerModal />);
 		expect(artworks()).toEqual([
 			'https://i1.sndcdn.com/a-t500x500.jpg',
+			'https://i1.sndcdn.com/b-t500x500.jpg',
 			'https://i1.sndcdn.com/c-t500x500.jpg',
 		]);
 	});
@@ -696,7 +697,10 @@ describe('PlayerModal artwork swipe', () => {
 		render(<PlayerModal />);
 		swipe(-120);
 		expect(mockNext).not.toHaveBeenCalled();
-		expect(artworks()).toEqual(['https://i1.sndcdn.com/b-t500x500.jpg']);
+		expect(artworks()).toEqual([
+			'https://i1.sndcdn.com/b-t500x500.jpg',
+			'https://i1.sndcdn.com/c-t500x500.jpg',
+		]);
 	});
 
 	// fireGestureHandler skips activation rules: check them on the gesture itself.

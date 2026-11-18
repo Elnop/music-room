@@ -1,59 +1,36 @@
 import React from 'react';
 import { View } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import Animated from 'react-native-reanimated';
-import { Artwork } from '@/shared/components/media/Artwork';
+import { Text } from '@/shared/components/ui/Text';
 import type { ArtworkCarousel } from '@/features/player/modal/hooks/useArtworkCarousel';
-import type { createStyles } from './playerModalStyles';
+import { CAROUSEL_TEXT_HEIGHT, type createStyles } from './playerModalStyles';
+import { PlayerCarouselSlot } from './PlayerCarouselSlot';
 
 interface PlayerArtworkCarouselProps {
 	styles: ReturnType<typeof createStyles>;
 	carousel: ArtworkCarousel;
-	hasTrack: boolean;
-	artworkUrl: string | null;
-	emptyIconColor: string;
+	colors: { text: string; textSecondary: string };
 }
 
-interface Slot {
-	key: string;
-	uri: string | null;
-	offset: number;
-}
+export function PlayerArtworkCarousel({ styles, carousel, colors }: PlayerArtworkCarouselProps) {
+	const size = carousel.artworkSize;
+	const frameSize = size + styles.artworkShadow.borderWidth * 2;
 
-const slotsOf = (carousel: ArtworkCarousel, artworkUrl: string | null): Slot[] => {
-	const slots: Slot[] = [];
-	const used = new Set<string>();
-	const add = (name: string, uri: string | null, offset: number) => {
-		const key = uri && !used.has(uri) ? uri : `${name}-${uri ?? 'none'}`;
-		used.add(key);
-		slots.push({ key, uri, offset });
-	};
-	add('current', artworkUrl, 0);
-	if (carousel.hasPrevious) add('previous', carousel.previousArtworkUrl, -carousel.artworkStep);
-	if (carousel.hasNext) add('next', carousel.nextArtworkUrl, carousel.artworkStep);
-	return slots;
-};
-
-export function PlayerArtworkCarousel({
-	styles,
-	carousel,
-	hasTrack,
-	artworkUrl,
-	emptyIconColor,
-}: PlayerArtworkCarouselProps) {
-	if (!hasTrack) {
+	if (carousel.slots.length === 0) {
 		return (
 			<View style={styles.artworkWrapper}>
 				<View style={styles.artworkShadow}>
-					<View
-						style={[
-							styles.artwork,
-							styles.emptyArtwork,
-							{ width: carousel.artworkSize, height: carousel.artworkSize },
-						]}
-					>
-						<PixelIcon name="note" size={64} color={emptyIconColor} />
+					<View style={[styles.artwork, styles.emptyArtwork, { width: size, height: size }]}>
+						<PixelIcon name="note" size={64} color={colors.textSecondary} />
 					</View>
+				</View>
+				<View style={[styles.slotText, { width: size }]}>
+					<View style={styles.titleBox}>
+						<Text style={[styles.title, { color: colors.text }]}>Rien en lecture</Text>
+					</View>
+					<Text style={[styles.artist, { color: colors.textSecondary }]} numberOfLines={1}>
+						Choisissez un titre pour commencer
+					</Text>
 				</View>
 			</View>
 		);
@@ -61,19 +38,20 @@ export function PlayerArtworkCarousel({
 
 	return (
 		<View style={styles.artworkWrapper}>
-			<Animated.View style={[styles.artworkShadow, carousel.rowStyle]}>
-				<View style={{ width: carousel.artworkSize, height: carousel.artworkSize }} />
-				{slotsOf(carousel, artworkUrl).map(slot => (
-					<View key={slot.key} style={[styles.neighbourArtwork, { left: slot.offset }]}>
-						<Artwork
-							uri={slot.uri}
-							size={carousel.artworkSize}
-							style={styles.artwork}
-							iconSize={slot.offset === 0 ? 64 : undefined}
-						/>
-					</View>
+			<View style={{ width: frameSize, height: frameSize + CAROUSEL_TEXT_HEIGHT }}>
+				{carousel.slots.map(slot => (
+					<PlayerCarouselSlot
+						key={slot.key}
+						styles={styles}
+						slot={slot}
+						center={carousel.center}
+						drag={carousel.drag}
+						size={size}
+						step={carousel.artworkStep}
+						colors={colors}
+					/>
 				))}
-			</Animated.View>
+			</View>
 		</View>
 	);
 }
