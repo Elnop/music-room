@@ -86,6 +86,7 @@ export function LandingSections({
 
 const createStyles = (theme: Theme) =>
 	StyleSheet.create({
+		// Centred without a background of its own: Welcome's floating icons show through.
 		sections: {
 			width: '100%',
 			maxWidth: CONTENT_MAX_WIDTH.content,
@@ -120,7 +121,7 @@ const createStyles = (theme: Theme) =>
 			gap: theme.spacing.sm,
 			paddingVertical: theme.spacing.lg,
 			borderTopWidth: StyleSheet.hairlineWidth,
-			borderTopColor: theme.colors.landingShadow,
+			borderTopColor: theme.colors.borderSubtle,
 		},
 		footerLinks: {
 			flexDirection: 'row',
@@ -130,11 +131,11 @@ const createStyles = (theme: Theme) =>
 		},
 		footerLink: {
 			fontSize: theme.typography.sizes.md,
-			color: theme.colors.text,
+			color: theme.colors.textSecondary,
 			textDecorationLine: 'underline',
 		},
 		footerText: {
 			fontSize: 12,
-			color: theme.colors.text,
+			color: theme.colors.textSecondary,
 		},
 	});

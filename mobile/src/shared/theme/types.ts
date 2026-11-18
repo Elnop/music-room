@@ -26,8 +26,6 @@ export interface ThemeColors {
 	/** Friends and the other people of a playlist. */
 	people: string;
 	radar: string;
-	landing: string;
-	landingShadow: string;
 
 	// FIXED_COLORS: the same in every theme.
 	divider: string;
