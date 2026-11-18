@@ -16,15 +16,12 @@ import { CONTENT_MAX_WIDTH } from '@/shared/constants/layout';
 import { LANDING_SHOWN } from '@/shared/constants/platform';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
-import type { FloatingIconMotion } from '@/features/auth/welcome/hooks/useFloatingIcons';
-import { PixelWordmark } from '@/shared/components/media/PixelWordmark';
+import { WelcomeLogo } from './WelcomeLogo';
 import { LANDING_INTRO } from '@/features/auth/welcome/utils/landingContent';
-import { FloatingIcon } from './FloatingIcon';
 import { LandingSections } from './LandingSections';
 import { Text } from '@/shared/components/ui/Text';
 
 interface WelcomeViewProps {
-	icons: FloatingIconMotion[];
 	buildLabel: string;
 	showServer: boolean;
 	onToggleServer: () => void;
@@ -35,7 +32,6 @@ interface WelcomeViewProps {
 }
 
 export function WelcomeView({
-	icons,
 	buildLabel,
 	showServer,
 	onToggleServer,
@@ -52,10 +48,6 @@ export function WelcomeView({
 
 	return (
 		<SafeAreaView style={styles.container}>
-			{icons.map((icon, index) => (
-				<FloatingIcon key={index} {...icon} />
-			))}
-
 			<KeyboardAvoidingView
 				style={styles.flex}
 				behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -63,7 +55,7 @@ export function WelcomeView({
 				<ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
 					<View style={[styles.hero, heroHeight !== undefined && { minHeight: heroHeight }]}>
 						<View style={styles.header}>
-							<PixelWordmark size={48} />
+							<WelcomeLogo />
 							{LANDING_SHOWN && <Text style={styles.intro}>{LANDING_INTRO}</Text>}
 						</View>
 
@@ -81,7 +73,7 @@ export function WelcomeView({
 									<PixelIcon
 										name="gear"
 										size={20}
-										color={showServer ? theme.colors.primary : theme.colors.textSecondary}
+										color={showServer ? theme.colors.primary : theme.colors.text}
 									/>
 								</Pressable>
 								{showServer && (
@@ -124,7 +116,7 @@ const createStyles = (theme: Theme) =>
 	StyleSheet.create({
 		container: {
 			flex: 1,
-			backgroundColor: theme.colors.background,
+			backgroundColor: theme.colors.landing,
 		},
 		flex: {
 			flex: 1,
@@ -169,12 +161,12 @@ const createStyles = (theme: Theme) =>
 		},
 		privacyLinkText: {
 			fontSize: 12,
-			color: theme.colors.textSecondary,
+			color: theme.colors.text,
 			textDecorationLine: 'underline',
 		},
 		buildLabel: {
 			fontSize: 12,
-			color: theme.colors.textSecondary,
+			color: theme.colors.text,
 			textAlign: 'center',
 		},
 		serverPanel: {
