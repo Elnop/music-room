@@ -3,7 +3,6 @@ import { View, StyleSheet, Modal } from 'react-native';
 import { GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { getPlayerModal } from '@/shared/services/playerModalsBridge';
-import { EqualizerBars } from '@/shared/components/media/EqualizerBars';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { PlayerHeader } from './PlayerHeader';
@@ -64,6 +63,7 @@ export function PlayerModalView({ modal, gestures, seek, carousel }: PlayerModal
 							styles={modal.styles}
 							colors={modal.colors}
 							dialog={dialog}
+							isLoading={modal.isLoading}
 							onClose={modal.closeModal}
 						/>
 
@@ -79,16 +79,6 @@ export function PlayerModalView({ modal, gestures, seek, carousel }: PlayerModal
 									/>
 								</View>
 							</GestureDetector>
-
-							<View style={modal.styles.equalizer}>
-								<EqualizerBars
-									color={modal.colors.slider}
-									bars={18}
-									barWidth={12}
-									height={42}
-									playing={modal.isPlaying}
-								/>
-							</View>
 
 							<PlayerTrackInfo
 								styles={modal.styles}
@@ -115,7 +105,6 @@ export function PlayerModalView({ modal, gestures, seek, carousel }: PlayerModal
 
 							<PlayerControls
 								styles={modal.styles}
-								colors={modal.colors}
 								isPlaying={modal.isPlaying}
 								isLoading={modal.isLoading}
 								canGoPrevious={modal.canGoPrevious}

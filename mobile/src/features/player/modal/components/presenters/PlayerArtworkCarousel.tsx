@@ -14,6 +14,26 @@ interface PlayerArtworkCarouselProps {
 	emptyIconColor: string;
 }
 
+interface Slot {
+	key: string;
+	uri: string | null;
+	offset: number;
+}
+
+const slotsOf = (carousel: ArtworkCarousel, artworkUrl: string | null): Slot[] => {
+	const slots: Slot[] = [];
+	const used = new Set<string>();
+	const add = (name: string, uri: string | null, offset: number) => {
+		const key = uri && !used.has(uri) ? uri : `${name}-${uri ?? 'none'}`;
+		used.add(key);
+		slots.push({ key, uri, offset });
+	};
+	add('current', artworkUrl, 0);
+	if (carousel.hasPrevious) add('previous', carousel.previousArtworkUrl, -carousel.artworkStep);
+	if (carousel.hasNext) add('next', carousel.nextArtworkUrl, carousel.artworkStep);
+	return slots;
+};
+
 export function PlayerArtworkCarousel({
 	styles,
 	carousel,
@@ -21,26 +41,10 @@ export function PlayerArtworkCarousel({
 	artworkUrl,
 	emptyIconColor,
 }: PlayerArtworkCarouselProps) {
-	return (
-		<View style={styles.artworkWrapper}>
-			<Animated.View style={[styles.artworkShadow, carousel.rowStyle]}>
-				{carousel.hasPrevious && (
-					<View style={[styles.neighbourArtwork, { left: -carousel.artworkStep }]}>
-						<Artwork
-							uri={carousel.previousArtworkUrl}
-							size={carousel.artworkSize}
-							style={styles.artwork}
-						/>
-					</View>
-				)}
-				{hasTrack ? (
-					<Artwork
-						uri={artworkUrl}
-						size={carousel.artworkSize}
-						style={styles.artwork}
-						iconSize={64}
-					/>
-				) : (
+	if (!hasTrack) {
+		return (
+			<View style={styles.artworkWrapper}>
+				<View style={styles.artworkShadow}>
 					<View
 						style={[
 							styles.artwork,
@@ -50,16 +54,25 @@ export function PlayerArtworkCarousel({
 					>
 						<PixelIcon name="note" size={64} color={emptyIconColor} />
 					</View>
-				)}
-				{carousel.hasNext && (
-					<View style={[styles.neighbourArtwork, { left: carousel.artworkStep }]}>
+				</View>
+			</View>
+		);
+	}
+
+	return (
+		<View style={styles.artworkWrapper}>
+			<Animated.View style={[styles.artworkShadow, carousel.rowStyle]}>
+				<View style={{ width: carousel.artworkSize, height: carousel.artworkSize }} />
+				{slotsOf(carousel, artworkUrl).map(slot => (
+					<View key={slot.key} style={[styles.neighbourArtwork, { left: slot.offset }]}>
 						<Artwork
-							uri={carousel.nextArtworkUrl}
+							uri={slot.uri}
 							size={carousel.artworkSize}
 							style={styles.artwork}
+							iconSize={slot.offset === 0 ? 64 : undefined}
 						/>
 					</View>
-				)}
+				))}
 			</Animated.View>
 		</View>
 	);

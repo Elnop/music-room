@@ -22,6 +22,8 @@ export function artworkSize(windowWidth: number, windowHeight: number) {
 }
 export const HEADER_HIT_SLOP = { top: 4, bottom: 4, left: 4, right: 4 };
 
+const TITLE_LINE_HEIGHT = 38;
+
 export const createStyles = (theme: Theme, insets: { top: number; bottom: number }) =>
 	StyleSheet.create({
 		container: { flex: 1 },
@@ -77,9 +79,8 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 		},
 		artworkWrapper: {
 			alignItems: 'center',
-			marginBottom: 12,
+			marginBottom: 24,
 		},
-		equalizer: { alignItems: 'center', marginBottom: 24 },
 		artworkShadow: {
 			borderWidth: theme.borders.thick,
 			borderColor: theme.colors.border,
@@ -97,9 +98,14 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 			paddingHorizontal: 32,
 			marginBottom: 32,
 		},
+		titleBox: {
+			height: TITLE_LINE_HEIGHT * 2,
+			justifyContent: 'center',
+			marginBottom: 8,
+		},
 		title: {
 			...displayText(theme, 24),
-			marginBottom: 8,
+			lineHeight: TITLE_LINE_HEIGHT,
 			textAlign: 'center',
 			textShadowColor: theme.colors.shadow,
 			textShadowOffset: { width: theme.borders.thick, height: theme.borders.thick },
@@ -138,6 +144,14 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 			gap: 32,
 			paddingHorizontal: 32,
 		},
-		loadingContainer: { marginTop: 24, alignItems: 'center' },
+		loadingContainer: {
+			position: 'absolute',
+			top: insets.top + 16,
+			left: 72,
+			right: 72,
+			height: 42,
+			alignItems: 'center',
+			justifyContent: 'center',
+		},
 		loadingText: { fontSize: 14, fontFamily: FONT_FAMILIES.medium },
 	});

@@ -2,6 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
+import { Text } from '@/shared/components/ui/Text';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { HEADER_HIT_SLOP, type createStyles } from './playerModalStyles';
 
@@ -12,10 +13,17 @@ interface PlayerHeaderProps {
 	};
 	/** A dialog closes with ×, without the swipe handle of the phone's sheet. */
 	dialog?: boolean;
+	isLoading?: boolean;
 	onClose: () => void;
 }
 
-export function PlayerHeader({ styles, colors, dialog = false, onClose }: PlayerHeaderProps) {
+export function PlayerHeader({
+	styles,
+	colors,
+	dialog = false,
+	isLoading = false,
+	onClose,
+}: PlayerHeaderProps) {
 	const { theme } = useTheme();
 	return (
 		<View style={styles.header}>
@@ -43,6 +51,13 @@ export function PlayerHeader({ styles, colors, dialog = false, onClose }: Player
 					)}
 				</View>
 			</Pressable>
+			{isLoading && (
+				<View style={styles.loadingContainer} pointerEvents="none">
+					<Text style={[styles.loadingText, { color: colors.textSecondary }]}>
+						Chargement du flux audio…
+					</Text>
+				</View>
+			)}
 		</View>
 	);
 }

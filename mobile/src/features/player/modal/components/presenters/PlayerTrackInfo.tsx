@@ -31,9 +31,11 @@ export function PlayerTrackInfo({
 	return (
 		<>
 			<Animated.View style={[styles.trackInfo, infoStyle]}>
-				<Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
-					{track ? track.title : 'Rien en lecture'}
-				</Text>
+				<View style={styles.titleBox}>
+					<Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
+						{track ? track.title : 'Rien en lecture'}
+					</Text>
+				</View>
 				<Text style={[styles.artist, { color: colors.textSecondary }]} numberOfLines={1}>
 					{track ? track.artist : 'Choisissez un titre pour commencer'}
 				</Text>

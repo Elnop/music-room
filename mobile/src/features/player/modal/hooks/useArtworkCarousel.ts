@@ -28,6 +28,17 @@ const TRACK_CHANGE_MS = 260;
 const keyOf = (item: QueueItem | undefined) =>
 	item ? hashStringToNumber(item.track.trackUri) : undefined;
 
+const displayedIndex = (
+	items: QueueItem[],
+	currentItemId: string | null,
+	trackKey: string | number | null
+): number => {
+	if (trackKey === null) return -1;
+	const current = items.findIndex(item => item.id === currentItemId);
+	if (current >= 0 && keyOf(items[current]) === trackKey) return current;
+	return items.findIndex(item => keyOf(item) === trackKey);
+};
+
 export interface ArtworkCarousel {
 	previousArtworkUrl: string | null;
 	nextArtworkUrl: string | null;
@@ -44,8 +55,15 @@ export interface ArtworkCarousel {
 export function useArtworkCarousel(trackKey: string | number | null): ArtworkCarousel {
 	const queue = useActiveQueue();
 	const { size, step: artworkStep } = useArtworkSize();
-	const previous = trackKey === null ? undefined : previousItem(queue);
-	const next = trackKey === null ? undefined : nextItem(queue);
+	const shownIndex = displayedIndex(queue.items, queue.currentItemId, trackKey);
+	const previous =
+		trackKey === null
+			? undefined
+			: shownIndex >= 0
+				? queue.items[shownIndex - 1]
+				: previousItem(queue);
+	const next =
+		trackKey === null ? undefined : shownIndex >= 0 ? queue.items[shownIndex + 1] : nextItem(queue);
 	const hasPrevious = previous !== undefined;
 	const hasNext = next !== undefined;
 	const translateX = useSharedValue(0);
