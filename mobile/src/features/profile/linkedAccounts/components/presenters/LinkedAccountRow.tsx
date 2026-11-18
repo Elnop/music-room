@@ -5,6 +5,7 @@ import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
+import { displayText } from '@/shared/theme/pixelFrame';
 import type {
 	GoogleButtonSlot,
 	LinkedProvider,
@@ -148,8 +149,8 @@ const createStyles = (theme: Theme) =>
 			pointerEvents: 'none',
 		},
 		actionText: {
-			fontSize: 14,
-			fontFamily: theme.typography.families.semibold,
+			...displayText(theme, 14, 'button'),
+			textTransform: 'uppercase',
 		},
 		linkText: {
 			color: theme.colors.textInverse,

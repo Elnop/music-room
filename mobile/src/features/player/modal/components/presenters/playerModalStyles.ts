@@ -2,7 +2,7 @@ import { Dimensions, Platform, StyleSheet } from 'react-native';
 import { BREAKPOINTS, PLAYER_DIALOG_WIDTH } from '@/shared/constants/layout';
 import type { Theme } from '@/shared/theme/types';
 import { FONT_FAMILIES } from '@/shared/theme/fonts';
-import { pixelFrame } from '@/shared/theme/pixelFrame';
+import { displayText, pixelFrame } from '@/shared/theme/pixelFrame';
 
 export const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 export const DISMISS_THRESHOLD = SCREEN_HEIGHT * 0.2;
@@ -98,8 +98,7 @@ export const createStyles = (theme: Theme, insets: { top: number; bottom: number
 			marginBottom: 32,
 		},
 		title: {
-			fontSize: 24,
-			fontFamily: FONT_FAMILIES.bold,
+			...displayText(theme, 24),
 			marginBottom: 8,
 			textAlign: 'center',
 			textShadowColor: theme.colors.shadow,

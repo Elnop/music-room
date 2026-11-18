@@ -12,6 +12,7 @@ import { PrivacyPolicyOrchestrator } from '@/features/legal/privacyPolicy/compon
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { screenHeader, screenLayout } from '@/navigation/screenLayout';
+import { headerTitle } from '@/shared/theme/pixelFrame';
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 const layout = screenLayout(false);
@@ -31,9 +32,7 @@ export function AuthNavigator() {
 				headerBlurEffect: Platform.OS === 'ios' ? 'systemMaterialDark' : undefined,
 				headerTintColor: theme.colors.text,
 				headerShadowVisible: false,
-				headerTitleStyle: {
-					fontFamily: theme.typography.families.bold,
-				},
+				headerTitleStyle: headerTitle(theme),
 				headerTitleAlign: 'center',
 				// No title: the screens show the logo.
 				headerTitle: '',

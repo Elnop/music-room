@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { ShareLinkButton } from '@/shared/components/sharing/ShareLinkButton';
 import type { Theme } from '@/shared/theme/types';
+import { displayText } from '@/shared/theme/pixelFrame';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { playlistLink } from '@/shared/utils/shareLinks';
 import type { PlaylistWithTracks } from '@/features/playlists/types';
@@ -69,8 +70,7 @@ const createStyles = (theme: Theme) =>
 			color: theme.colors.text,
 		},
 		name: {
-			fontSize: 40,
-			fontFamily: theme.typography.families.extrabold,
+			...displayText(theme, 40),
 			color: theme.colors.text,
 			marginTop: theme.spacing.xs,
 		},

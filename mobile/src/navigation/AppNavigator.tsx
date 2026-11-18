@@ -37,6 +37,7 @@ import { NowPlayingPanel } from '@/features/player/nowPlayingPanel/components/or
 import { useNowPlayingPanelStore } from '@/shared/stores/nowPlayingPanelStore';
 import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import { KeyboardShortcuts } from './KeyboardShortcuts';
+import { headerTitle } from '@/shared/theme/pixelFrame';
 
 export type AppTabsParamList = {
 	HomeTab: NavigatorScreenParams<PlaylistStackParamList> | undefined;
@@ -134,9 +135,7 @@ export function AppNavigator() {
 								},
 								headerTintColor: theme.colors.text,
 								headerShadowVisible: false,
-								headerTitleStyle: {
-									fontFamily: theme.typography.families.bold,
-								},
+								headerTitleStyle: headerTitle(theme),
 								...sidebar,
 								tabBarIcon: ({ focused, color }) => (
 									<View style={styles.tabIcon}>

@@ -5,6 +5,7 @@ import { ProfileNavigationItem } from '@/features/profile/profileScreen/componen
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
+import { displayText } from '@/shared/theme/pixelFrame';
 import { Text } from '@/shared/components/ui/Text';
 
 interface ProfileMenuItemsProps {
@@ -94,8 +95,8 @@ const createStyles = (theme: Theme) =>
 			paddingHorizontal: theme.spacing.md,
 		},
 		logoutText: {
-			fontSize: 16,
-			fontFamily: theme.typography.families.semibold,
+			...displayText(theme, 16, 'button'),
+			textTransform: 'uppercase',
 			color: theme.colors.error,
 		},
 	});

@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 import { NOW_PLAYING_PANEL_WIDTH } from '@/shared/constants/layout';
 import type { Theme } from '@/shared/theme/types';
+import { displayText } from '@/shared/theme/pixelFrame';
 import { SPACING } from '@/shared/constants/app';
 
 const GUTTER = SPACING.md;
@@ -42,8 +43,7 @@ export const createStyles = (theme: Theme, separator: string) =>
 		content: { paddingHorizontal: GUTTER, paddingBottom: theme.spacing.lg, gap: theme.spacing.lg },
 		titleBlock: { gap: theme.spacing.xs },
 		title: {
-			fontSize: theme.typography.sizes.xxl,
-			fontFamily: theme.typography.families.bold,
+			...displayText(theme, theme.typography.sizes.xxl),
 			color: theme.colors.text,
 		},
 		artist: {

@@ -41,6 +41,7 @@
 		"postinstall": "patch-package"
 	},
 	"dependencies": {
+		"@expo-google-fonts/jersey-10": "^0.4.1",
 		"@expo-google-fonts/pixelify-sans": "^0.4.2",
 		"@expo-google-fonts/silkscreen": "^0.4.2",
 		"@expo/config-plugins": "^54.0.4",

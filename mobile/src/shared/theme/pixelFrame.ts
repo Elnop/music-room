@@ -27,3 +27,12 @@ export const pixelCaption = (theme: Theme): TextStyle => ({
 	fontFamily: theme.typography.families.mono,
 	color: theme.colors.textSecondary,
 });
+
+type DisplayRole = keyof Theme['typography']['displayScale'];
+
+export const displayText = (theme: Theme, size: number, role: DisplayRole = 'title') => ({
+	fontFamily: theme.typography.families.display,
+	fontSize: Math.round(size * theme.typography.displayScale[role]),
+});
+
+export const headerTitle = (theme: Theme) => displayText(theme, 18);

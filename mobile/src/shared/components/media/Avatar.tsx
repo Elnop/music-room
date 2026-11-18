@@ -5,6 +5,7 @@ import type { Theme } from '@/shared/theme/types';
 import { Text } from '@/shared/components/ui/Text';
 import { sizedAvatarUri } from '@/shared/utils/avatarUri';
 import { avatarColor, avatarInitials } from '@/shared/utils/avatarInitials';
+import { displayText } from '@/shared/theme/pixelFrame';
 import { AvatarPhoto } from './AvatarPhoto';
 
 interface AvatarProps {
@@ -32,7 +33,7 @@ export function Avatar({ uri, size = 'md', name, style }: AvatarProps) {
 	const photo = source && failed !== source ? source : undefined;
 	const initials = avatarInitials(name);
 	// Initials fill about 40% of the circle, the usual ratio for letter avatars.
-	const fontSize = Math.round(dimension * (initials.length > 1 ? 0.38 : 0.44));
+	const { fontSize } = displayText(theme, dimension * (initials.length > 1 ? 0.38 : 0.44), 'initials');
 	const background = name?.trim() ? { backgroundColor: avatarColor(name.trim()) } : undefined;
 
 	return (
@@ -73,6 +74,6 @@ const createStyles = (theme: Theme) =>
 		},
 		initials: {
 			color: theme.colors.onColor,
-			fontFamily: theme.typography.families.semibold,
+			fontFamily: theme.typography.families.display,
 		},
 	});

@@ -5,7 +5,7 @@ import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { ShareLinkButton } from '@/shared/components/sharing/ShareLinkButton';
 import { KeyButton } from '@/shared/components/ui/KeyButton';
 import { Text } from '@/shared/components/ui/Text';
-import { pixelFrame } from '@/shared/theme/pixelFrame';
+import { displayText, pixelFrame } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { playlistLink } from '@/shared/utils/shareLinks';
@@ -85,8 +85,7 @@ const createStyles = (theme: Theme) =>
 		top: { flexDirection: 'row', alignItems: 'flex-end', gap: theme.spacing.md },
 		side: { flex: 1, gap: theme.spacing.sm },
 		name: {
-			fontSize: theme.typography.sizes.xxl,
-			fontFamily: theme.typography.families.bold,
+			...displayText(theme, theme.typography.sizes.xxl),
 			color: theme.colors.text,
 			textShadowColor: theme.colors.shadow,
 			textShadowOffset: { width: theme.borders.thick, height: theme.borders.thick },
