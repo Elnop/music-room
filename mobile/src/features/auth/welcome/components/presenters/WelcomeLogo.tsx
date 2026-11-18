@@ -21,7 +21,10 @@ export function WelcomeLogo() {
 				style={[styles.layer, { left: shadowOffset, top: shadowOffset }]}
 			/>
 			<PixelIcon name="note" size={NOTE_SIZE} color={theme.colors.primary} style={styles.layer} />
-			<Text style={styles.word}>ZUMIK</Text>
+			<View>
+				<Text style={[styles.word, styles.wordShadow, { top: shadowOffset }]}>ZUMIK</Text>
+				<Text style={styles.word}>ZUMIK</Text>
+			</View>
 		</View>
 	);
 }
@@ -38,8 +41,6 @@ const createStyles = (theme: Theme) =>
 		word: {
 			...displayText(theme, 54),
 			color: theme.colors.text,
-			textShadowColor: theme.colors.shadow,
-			textShadowOffset: { width: 0, height: theme.borders.thick * 2 },
-			textShadowRadius: 0,
 		},
+		wordShadow: { position: 'absolute', left: 0, color: theme.colors.shadow },
 	});
