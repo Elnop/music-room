@@ -784,14 +784,15 @@ describe('PlayerProvider next track prefetch (#314)', () => {
 		testSessionStore.setState({ user: { id: 'me' } as UserProfile });
 	});
 
-	it('fetches the next stream once in the last 20 s and plays it with no request', async () => {
+	it('fetches the next stream once after 3 s of play and plays it with no request', async () => {
 		const { view, player } = await playQueueItem(A, [A, B, C]);
 
-		await reach(view, player, 150);
+		await reach(view, player, 2);
 		expect(mockApiRequest).toHaveBeenCalledTimes(1);
 
 		answerStreams({ streamUrl: 'u-qb', expiresAt: inMinutes(30), protocol: 'progressive' });
-		await reach(view, player, 181);
+		await reach(view, player, 3);
+		await reach(view, player, 150);
 		await reach(view, player, 190);
 		expect(mockApiRequest).toHaveBeenCalledTimes(2);
 		expect(streamCallFor(B)).toBe(1);

@@ -1,66 +1,109 @@
 import { useLayoutEffect } from 'react';
 import { Gesture } from 'react-native-gesture-handler';
 import {
-	interpolate,
 	runOnJS,
-	useAnimatedStyle,
 	useSharedValue,
 	withDelay,
 	withSequence,
 	withSpring,
 	withTiming,
+	type SharedValue,
 } from 'react-native-reanimated';
 import { getPlayback, useActiveQueue } from '@/shared/services/playbackBridge';
-import { nextItem, previousItem } from '@/shared/utils/queueNavigation';
 import { largeArtwork } from '@/shared/utils/artwork';
+import { hashStringToNumber } from '@/shared/utils/trackToSoundCloud';
+import type { QueueItem } from '@/shared/types/playback';
 import { hapticTap } from '@/shared/utils/haptics';
 import { trackSwipeDirection } from '@/features/player/utils/trackSwipe';
 import { useArtworkSize } from '@/features/player/modal/hooks/useArtworkSize';
+import type { NowPlayingTrack } from '@/features/player/types';
 
-/** A swipe toward a missing neighbour moves this fraction of the finger, then springs back. */
 const EDGE_RESISTANCE = 0.25;
-/** The artwork springs back if the queue has not moved to the new track by then. */
 const SETTLE_TIMEOUT_MS = 2500;
+const SWIPE_MS = 200;
+const TRACK_CHANGE_MS = 260;
+const WINDOW = 2;
+
+export interface CarouselSlot {
+	key: string;
+	index: number;
+	uri: string | null;
+	title: string;
+	artist: string;
+}
 
 export interface ArtworkCarousel {
-	previousArtworkUrl: string | null;
-	nextArtworkUrl: string | null;
+	slots: CarouselSlot[];
+	center: SharedValue<number>;
+	drag: SharedValue<number>;
 	hasPrevious: boolean;
 	hasNext: boolean;
 	panGesture: ReturnType<typeof Gesture.Pan>;
-	rowStyle: ReturnType<typeof useAnimatedStyle>;
-	infoStyle: ReturnType<typeof useAnimatedStyle>;
 	artworkSize: number;
 	artworkStep: number;
 }
 
-/** Swiping the artwork steps through the queue: right is always the previous item, never a restart. */
-export function useArtworkCarousel(trackKey: string | number | null): ArtworkCarousel {
+const keyOf = (item: QueueItem) => hashStringToNumber(item.track.trackUri);
+
+const displayedIndex = (
+	items: QueueItem[],
+	currentItemId: string | null,
+	track: NowPlayingTrack | null
+): number => {
+	if (!track) return -1;
+	const current = items.findIndex(item => item.id === currentItemId);
+	if (current >= 0 && keyOf(items[current]) === track.id) return current;
+	const byTrack = items.findIndex(item => keyOf(item) === track.id);
+	return byTrack >= 0 ? byTrack : current;
+};
+
+const queueSlots = (items: QueueItem[], shown: number): CarouselSlot[] => {
+	const first = Math.max(0, shown - WINDOW);
+	return items.slice(first, shown + WINDOW + 1).map((item, offset) => ({
+		key: item.id,
+		index: first + offset,
+		uri: largeArtwork(item.track.albumArt),
+		title: item.track.title,
+		artist: item.track.artist,
+	}));
+};
+
+export function useArtworkCarousel(
+	track: NowPlayingTrack | null,
+	artworkUrl: string | null
+): ArtworkCarousel {
 	const queue = useActiveQueue();
 	const { size, step: artworkStep } = useArtworkSize();
-	const previous = trackKey === null ? undefined : previousItem(queue);
-	const next = trackKey === null ? undefined : nextItem(queue);
-	const hasPrevious = previous !== undefined;
-	const hasNext = next !== undefined;
-	const translateX = useSharedValue(0);
+	const shown = displayedIndex(queue.items, queue.currentItemId, track);
+	const anchor = shown >= 0 ? shown : 0;
+	const slots: CarouselSlot[] =
+		shown >= 0
+			? queueSlots(queue.items, shown)
+			: track
+				? [{ key: 'current', index: 0, uri: artworkUrl, title: track.title, artist: track.artist }]
+				: [];
+	const hasPrevious = shown > 0;
+	const hasNext = shown >= 0 && shown < queue.items.length - 1;
 
-	// The new track's artwork now sits in the centre slot: recentre before paint, without animating.
+	const center = useSharedValue(anchor);
+	const drag = useSharedValue(0);
+
 	useLayoutEffect(() => {
-		translateX.value = 0;
-	}, [trackKey, translateX]);
+		center.value =
+			Math.abs(center.value - anchor) > 1.5
+				? anchor
+				: withTiming(anchor, { duration: TRACK_CHANGE_MS });
+	}, [anchor, track?.id, center]);
 
 	const step = (direction: 'next' | 'previous') => {
 		hapticTap();
 		void (direction === 'next' ? getPlayback().next() : getPlayback().previous());
 	};
 
-	/** Slides to the neighbour, then springs back unless the track change recentres it first. */
-	const slideTo = (offset: number) => {
+	const settleFromDrag = () => {
 		'worklet';
-		translateX.value = withSequence(
-			withTiming(offset, { duration: 200 }),
-			withDelay(SETTLE_TIMEOUT_MS, withSpring(0))
-		);
+		center.value = center.value - drag.value / artworkStep;
+		drag.value = 0;
 	};
 
 	const panGesture = Gesture.Pan()
@@ -70,34 +113,29 @@ export function useArtworkCarousel(trackKey: string | number | null): ArtworkCar
 		.onUpdate(event => {
 			const blocked =
 				(event.translationX < 0 && !hasNext) || (event.translationX > 0 && !hasPrevious);
-			translateX.value = blocked ? event.translationX * EDGE_RESISTANCE : event.translationX;
+			drag.value = blocked ? event.translationX * EDGE_RESISTANCE : event.translationX;
 		})
 		.onEnd(event => {
 			const direction = trackSwipeDirection(event);
-			if (direction === 'next' && hasNext) {
-				slideTo(-artworkStep);
-				runOnJS(step)('next');
-			} else if (direction === 'previous' && hasPrevious) {
-				slideTo(artworkStep);
-				runOnJS(step)('previous');
+			settleFromDrag();
+			if ((direction === 'next' && hasNext) || (direction === 'previous' && hasPrevious)) {
+				center.value = withSequence(
+					withTiming(anchor + (direction === 'next' ? 1 : -1), { duration: SWIPE_MS }),
+					withDelay(SETTLE_TIMEOUT_MS, withSpring(anchor))
+				);
+				runOnJS(step)(direction);
 			} else {
-				translateX.value = withSpring(0);
+				center.value = withSpring(anchor);
 			}
 		});
 
-	const rowStyle = useAnimatedStyle(() => ({ transform: [{ translateX: translateX.value }] }));
-	const infoStyle = useAnimatedStyle(() => ({
-		opacity: interpolate(Math.abs(translateX.value), [0, artworkStep], [1, 0.2]),
-	}));
-
 	return {
-		previousArtworkUrl: previous ? largeArtwork(previous.track.albumArt) : null,
-		nextArtworkUrl: next ? largeArtwork(next.track.albumArt) : null,
+		slots,
+		center,
+		drag,
 		hasPrevious,
 		hasNext,
 		panGesture,
-		rowStyle,
-		infoStyle,
 		artworkSize: size,
 		artworkStep,
 	};

@@ -3,12 +3,11 @@ import { View, StyleSheet, Modal } from 'react-native';
 import { GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { getPlayerModal } from '@/shared/services/playerModalsBridge';
-import { EqualizerBars } from '@/shared/components/media/EqualizerBars';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { PlayerHeader } from './PlayerHeader';
 import { isPlayerDialog } from './playerModalStyles';
-import { PlayerTrackInfo } from './PlayerTrackInfo';
+import { PlayerTrackError } from './PlayerTrackError';
 import { PlayerArtworkCarousel } from './PlayerArtworkCarousel';
 import { PlayerProgressSlider } from './PlayerProgressSlider';
 import { PlayerControls } from './PlayerControls';
@@ -58,12 +57,13 @@ export function PlayerModalView({ modal, gestures, seek, carousel }: PlayerModal
 							gestures.animatedStyle,
 						]}
 					>
-						<View style={[StyleSheet.absoluteFill, { backgroundColor: modal.gradientColors[0] }]} />
+						<Animated.View style={[StyleSheet.absoluteFill, modal.backgroundStyle]} />
 
 						<PlayerHeader
 							styles={modal.styles}
 							colors={modal.colors}
 							dialog={dialog}
+							isLoading={modal.isLoading}
 							onClose={modal.closeModal}
 						/>
 
@@ -73,27 +73,13 @@ export function PlayerModalView({ modal, gestures, seek, carousel }: PlayerModal
 									<PlayerArtworkCarousel
 										styles={modal.styles}
 										carousel={carousel}
-										hasTrack={modal.track !== null}
-										artworkUrl={modal.artworkUrl}
-										emptyIconColor={modal.colors.textSecondary}
+										colors={modal.colors}
 									/>
 								</View>
 							</GestureDetector>
 
-							<View style={modal.styles.equalizer}>
-								<EqualizerBars
-									color={modal.colors.slider}
-									bars={18}
-									barWidth={12}
-									height={42}
-									playing={modal.isPlaying}
-								/>
-							</View>
-
-							<PlayerTrackInfo
+							<PlayerTrackError
 								styles={modal.styles}
-								track={modal.track}
-								infoStyle={carousel.infoStyle}
 								error={modal.error}
 								isRemote={modal.isRemote}
 								colors={modal.colors}
@@ -115,7 +101,6 @@ export function PlayerModalView({ modal, gestures, seek, carousel }: PlayerModal
 
 							<PlayerControls
 								styles={modal.styles}
-								colors={modal.colors}
 								isPlaying={modal.isPlaying}
 								isLoading={modal.isLoading}
 								canGoPrevious={modal.canGoPrevious}
