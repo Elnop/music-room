@@ -2,12 +2,12 @@ import React from 'react';
 import { View } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
+import { useTheme } from '@/shared/theme/ThemeContext';
 import { HEADER_HIT_SLOP, type createStyles } from './playerModalStyles';
 
 interface PlayerHeaderProps {
 	styles: ReturnType<typeof createStyles>;
 	colors: {
-		text: string;
 		textSecondary: string;
 	};
 	/** A dialog closes with ×, without the swipe handle of the phone's sheet. */
@@ -16,6 +16,7 @@ interface PlayerHeaderProps {
 }
 
 export function PlayerHeader({ styles, colors, dialog = false, onClose }: PlayerHeaderProps) {
+	const { theme } = useTheme();
 	return (
 		<View style={styles.header}>
 			<View style={styles.swipeIndicator}>
@@ -36,9 +37,9 @@ export function PlayerHeader({ styles, colors, dialog = false, onClose }: Player
 			>
 				<View style={styles.headerButton}>
 					{dialog ? (
-						<PixelIcon name="close" size={24} color={colors.text} />
+						<PixelIcon name="close" size={24} color={theme.colors.text} />
 					) : (
-						<PixelIcon name="down" color={colors.text} />
+						<PixelIcon name="down" color={theme.colors.text} />
 					)}
 				</View>
 			</Pressable>

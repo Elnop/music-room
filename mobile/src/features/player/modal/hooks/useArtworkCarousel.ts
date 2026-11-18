@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { Gesture } from 'react-native-gesture-handler';
 import {
 	interpolate,
@@ -13,6 +13,8 @@ import {
 import { getPlayback, useActiveQueue } from '@/shared/services/playbackBridge';
 import { nextItem, previousItem } from '@/shared/utils/queueNavigation';
 import { largeArtwork } from '@/shared/utils/artwork';
+import { hashStringToNumber } from '@/shared/utils/trackToSoundCloud';
+import type { QueueItem } from '@/shared/types/playback';
 import { hapticTap } from '@/shared/utils/haptics';
 import { trackSwipeDirection } from '@/features/player/utils/trackSwipe';
 import { useArtworkSize } from '@/features/player/modal/hooks/useArtworkSize';
@@ -21,6 +23,10 @@ import { useArtworkSize } from '@/features/player/modal/hooks/useArtworkSize';
 const EDGE_RESISTANCE = 0.25;
 /** The artwork springs back if the queue has not moved to the new track by then. */
 const SETTLE_TIMEOUT_MS = 2500;
+const TRACK_CHANGE_MS = 260;
+
+const keyOf = (item: QueueItem | undefined) =>
+	item ? hashStringToNumber(item.track.trackUri) : undefined;
 
 export interface ArtworkCarousel {
 	previousArtworkUrl: string | null;
@@ -44,10 +50,19 @@ export function useArtworkCarousel(trackKey: string | number | null): ArtworkCar
 	const hasNext = next !== undefined;
 	const translateX = useSharedValue(0);
 
-	// The new track's artwork now sits in the centre slot: recentre before paint, without animating.
+	const neighbourKeys = useRef<{ previous?: number; next?: number }>({});
+
 	useLayoutEffect(() => {
-		translateX.value = 0;
-	}, [trackKey, translateX]);
+		const { previous: previousKey, next: nextKey } = neighbourKeys.current;
+		const shift = trackKey === nextKey ? artworkStep : trackKey === previousKey ? -artworkStep : 0;
+		const offset = shift === 0 ? 0 : translateX.value + shift;
+		translateX.value = offset;
+		if (offset !== 0) translateX.value = withTiming(0, { duration: TRACK_CHANGE_MS });
+	}, [trackKey, translateX, artworkStep]);
+
+	useLayoutEffect(() => {
+		neighbourKeys.current = { previous: keyOf(previous), next: keyOf(next) };
+	});
 
 	const step = (direction: 'next' | 'previous') => {
 		hapticTap();

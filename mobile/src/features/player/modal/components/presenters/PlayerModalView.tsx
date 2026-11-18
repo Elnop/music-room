@@ -58,7 +58,7 @@ export function PlayerModalView({ modal, gestures, seek, carousel }: PlayerModal
 							gestures.animatedStyle,
 						]}
 					>
-						<View style={[StyleSheet.absoluteFill, { backgroundColor: modal.gradientColors[0] }]} />
+						<Animated.View style={[StyleSheet.absoluteFill, modal.backgroundStyle]} />
 
 						<PlayerHeader
 							styles={modal.styles}

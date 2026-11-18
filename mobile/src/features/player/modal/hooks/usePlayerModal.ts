@@ -8,6 +8,7 @@ import { useImageColors } from '@/shared/hooks/useImageColors';
 import { getAdaptiveColors, hexToRgba } from '@/shared/theme/adaptivePalette';
 import { largeArtwork } from '@/shared/utils/artwork';
 import { createStyles } from '@/features/player/modal/components/presenters/playerModalStyles';
+import { useColorFade } from '@/features/player/modal/hooks/useColorFade';
 
 export function usePlayerModal() {
 	const { theme } = useTheme();
@@ -74,6 +75,8 @@ export function usePlayerModal() {
 				theme.colors.background,
 			];
 
+	const backgroundStyle = useColorFade(gradientColors[0]);
+
 	return {
 		isModalOpen,
 		closeModal: () => setModalOpen(false),
@@ -83,7 +86,7 @@ export function usePlayerModal() {
 		setDevicesOpen,
 		styles,
 		colors,
-		gradientColors,
+		backgroundStyle,
 		track: nowPlaying.track,
 		artworkUrl,
 		error,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, type StyleProp, type ViewStyle } from 'react-native';
+import { PixelRatio, View, type StyleProp, type ViewStyle } from 'react-native';
 import { PIXEL_SPRITES, type PixelSpriteName } from '@/shared/constants/pixelSprites';
 import { pixelRuns } from '@/shared/utils/pixelRuns';
 
@@ -28,7 +28,7 @@ export function PixelIcon({
 	accessibilityLabel,
 	testID,
 }: PixelIconProps) {
-	const cell = size / GRID;
+	const edge = (gridLine: number) => PixelRatio.roundToNearestPixel((gridLine * size) / GRID);
 
 	return (
 		<View
@@ -45,10 +45,10 @@ export function PixelIcon({
 					key={`${run.x}-${run.y}`}
 					style={{
 						position: 'absolute',
-						left: run.x * cell,
-						top: run.y * cell,
-						width: run.width * cell,
-						height: cell,
+						left: edge(run.x),
+						top: edge(run.y),
+						width: edge(run.x + run.width) - edge(run.x),
+						height: edge(run.y + 1) - edge(run.y),
 						backgroundColor: color,
 					}}
 				/>
