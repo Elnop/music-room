@@ -1,14 +1,14 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
+import type { PixelIconName } from '@/shared/constants/pixelIcons';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { Text } from '@/shared/components/ui/Text';
 
 interface SectionHeaderProps {
-	icon: PixelSpriteName;
+	icon: PixelIconName;
 	/** Read by screen readers; on screen the icon and the count stand for it. */
 	title: string;
 	count: number;

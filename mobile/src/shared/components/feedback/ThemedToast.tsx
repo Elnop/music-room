@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
+import type { PixelIconName } from '@/shared/constants/pixelIcons';
 import type { ToastConfigParams } from 'react-native-toast-message';
 import { pixelFrame } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
@@ -11,7 +11,7 @@ import { FONT_FAMILIES } from '@/shared/theme/fonts';
 
 export type ToastKind = 'success' | 'error' | 'info' | 'warning';
 
-const ICONS: Record<ToastKind, PixelSpriteName> = {
+const ICONS: Record<ToastKind, PixelIconName> = {
 	success: 'check',
 	error: 'alert',
 	info: 'info',

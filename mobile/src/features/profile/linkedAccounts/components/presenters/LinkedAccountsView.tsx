@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
+import type { PixelIconName } from '@/shared/constants/pixelIcons';
 import { ProfileScreenLayout } from '@/features/profile/common/components/presenters/ProfileScreenLayout';
 import { LinkedAccountRow } from '@/features/profile/linkedAccounts/components/presenters/LinkedAccountRow';
 import { useTheme } from '@/shared/theme/ThemeContext';
@@ -16,7 +16,7 @@ type MethodType = LinkedProvider['type'];
 interface MethodRow {
 	type: MethodType;
 	label: string;
-	icon: PixelSpriteName;
+	icon: PixelIconName;
 }
 
 const METHODS: MethodRow[] = [

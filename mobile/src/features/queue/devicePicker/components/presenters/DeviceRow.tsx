@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
+import type { PixelIconName } from '@/shared/constants/pixelIcons';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import type { DevicePickerOwner } from '@/types/device.types';
 import type { Theme } from '@/shared/theme/types';
@@ -10,7 +10,7 @@ import { Text } from '@/shared/components/ui/Text';
 
 export type PickerDevice = DevicePickerOwner['devices'][number];
 
-const deviceIcon = (platform: string): PixelSpriteName => (platform === 'web' ? 'laptop' : 'phone');
+const deviceIcon = (platform: string): PixelIconName => (platform === 'web' ? 'laptop' : 'phone');
 
 interface DeviceRowProps {
 	owner: DevicePickerOwner;

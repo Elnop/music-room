@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
+import type { PixelIconName } from '@/shared/constants/pixelIcons';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { displayText, keycap } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
@@ -15,7 +15,7 @@ interface EmptyStateAction {
 
 interface EmptyStateProps {
 	message: string;
-	icon?: PixelSpriteName;
+	icon?: PixelIconName;
 	action?: EmptyStateAction;
 	/** Among other sections on wide screens: keeps to its content's height. */
 	compact?: boolean;

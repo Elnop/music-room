@@ -1,7 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
+import type { PixelIconName } from '@/shared/constants/pixelIcons';
 import { keycap } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
@@ -11,7 +11,7 @@ import { Pressable } from './Pressable';
 type KeyTone = 'primary' | 'surface' | 'device';
 
 interface KeyButtonProps {
-	icon: PixelSpriteName;
+	icon: PixelIconName;
 	onPress: () => void;
 	accessibilityLabel: string;
 	tone?: KeyTone;

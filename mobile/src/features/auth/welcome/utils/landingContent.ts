@@ -1,9 +1,9 @@
-import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
+import type { PixelIconName } from '@/shared/constants/pixelIcons';
 
 export interface LandingFeature {
 	title: string;
 	description: string;
-	icon: PixelSpriteName;
+	icon: PixelIconName;
 }
 
 export const LANDING_INTRO =

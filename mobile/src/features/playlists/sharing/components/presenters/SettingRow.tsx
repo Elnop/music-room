@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
+import type { PixelIconName } from '@/shared/constants/pixelIcons';
 import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
 import { ThemedSwitch } from '@/shared/components/ui/ThemedSwitch';
 import type { Theme } from '@/shared/theme/types';
@@ -10,7 +10,7 @@ import { createSharingStyles } from './sharingStyles';
 import { Text } from '@/shared/components/ui/Text';
 
 interface SettingRowProps {
-	icon: PixelSpriteName;
+	icon: PixelIconName;
 	label: string;
 	description: string;
 	value: boolean;

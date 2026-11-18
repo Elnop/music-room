@@ -1,4 +1,4 @@
-import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
+import type { PixelIconName } from '@/shared/constants/pixelIcons';
 import { GENRE_COLORS } from '@/shared/theme/tokens';
 
 export type VisibilityLevel = 'public' | 'friends_only' | 'private';
@@ -118,7 +118,7 @@ export const VISIBILITY_LABELS: Record<VisibilityLevel, string> = {
 	private: 'Privé',
 };
 
-export const VISIBILITY_ICONS: Record<VisibilityLevel, PixelSpriteName> = {
+export const VISIBILITY_ICONS: Record<VisibilityLevel, PixelIconName> = {
 	public: 'globe',
 	friends_only: 'crew',
 	private: 'lock',

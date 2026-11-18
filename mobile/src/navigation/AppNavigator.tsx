@@ -7,7 +7,7 @@ import type { NavigatorScreenParams } from '@react-navigation/native';
 import { View, StyleSheet, Platform } from 'react-native';
 import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
+import type { PixelIconName } from '@/shared/constants/pixelIcons';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 
@@ -55,7 +55,7 @@ const Tab = createBottomTabNavigator<AppTabsParamList>();
 registerPlayback();
 registerMusicControl();
 
-const TAB_ICONS: Record<string, PixelSpriteName> = {
+const TAB_ICONS: Record<string, PixelIconName> = {
 	HomeTab: 'home',
 	PlaylistsTab: 'tape',
 	SearchTab: 'search',

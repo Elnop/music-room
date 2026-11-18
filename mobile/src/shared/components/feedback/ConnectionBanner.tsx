@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
+import type { PixelIconName } from '@/shared/constants/pixelIcons';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { useSocketStore } from '@/shared/stores/socketStore';
 import type { ConnectionStatus } from '@/shared/hooks/useConnectionStatus';
@@ -21,7 +21,7 @@ const COPY: Record<NonNullable<ConnectionStatus>, string> = {
 	failed: 'Connexion perdue',
 };
 
-const ICONS: Record<NonNullable<ConnectionStatus>, PixelSpriteName> = {
+const ICONS: Record<NonNullable<ConnectionStatus>, PixelIconName> = {
 	offline: 'alert',
 	reconnecting: 'sync',
 	failed: 'alert',

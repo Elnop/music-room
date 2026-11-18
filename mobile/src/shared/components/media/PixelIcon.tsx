@@ -1,16 +1,9 @@
 import React from 'react';
-import { PixelRatio, View, type StyleProp, type ViewStyle } from 'react-native';
-import { PIXEL_SPRITES, type PixelSpriteName } from '@/shared/constants/pixelSprites';
-import { pixelRuns } from '@/shared/utils/pixelRuns';
-
-const GRID = 24;
-
-const RUNS = Object.fromEntries(
-	Object.entries(PIXEL_SPRITES).map(([name, rows]) => [name, pixelRuns(rows)])
-) as Record<PixelSpriteName, ReturnType<typeof pixelRuns>>;
+import { View, type StyleProp, type ViewStyle } from 'react-native';
+import { PIXEL_ICONS, type PixelIconName } from '@/shared/constants/pixelIcons';
 
 interface PixelIconProps {
-	name: PixelSpriteName;
+	name: PixelIconName;
 	color: string;
 	size?: number;
 	style?: StyleProp<ViewStyle>;
@@ -27,7 +20,7 @@ export function PixelIcon({
 	accessibilityLabel,
 	testID,
 }: PixelIconProps) {
-	const edge = (gridLine: number) => PixelRatio.roundToNearestPixel((gridLine * size) / GRID);
+	const Icon = PIXEL_ICONS[name];
 
 	return (
 		<View
@@ -39,19 +32,7 @@ export function PixelIcon({
 			accessibilityLabel={accessibilityLabel}
 			importantForAccessibility={accessibilityLabel ? 'yes' : 'no'}
 		>
-			{RUNS[name].map(run => (
-				<View
-					key={`${run.x}-${run.y}`}
-					style={{
-						position: 'absolute',
-						left: edge(run.x),
-						top: edge(run.y),
-						width: edge(run.x + run.width) - edge(run.x),
-						height: edge(run.y + 1) - edge(run.y),
-						backgroundColor: color,
-					}}
-				/>
-			))}
+			<Icon width={size} height={size} fill={color} />
 		</View>
 	);
 }

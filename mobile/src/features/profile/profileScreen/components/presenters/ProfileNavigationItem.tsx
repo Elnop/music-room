@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
+import type { PixelIconName } from '@/shared/constants/pixelIcons';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { keycap, pixelFrame } from '@/shared/theme/pixelFrame';
@@ -11,7 +11,7 @@ import { Text } from '@/shared/components/ui/Text';
 interface ProfileNavigationItemProps {
 	title: string;
 	subtitle: string;
-	icon: PixelSpriteName;
+	icon: PixelIconName;
 	onPress: () => void;
 }
 
