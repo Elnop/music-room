@@ -14,6 +14,8 @@ const output = join(
 const FROM_LIBRARY = {
 	play: 'solid/play-solid',
 	pause: 'solid/pause-solid',
+	next: 'solid/arrow-right-solid',
+	prev: 'solid/arrow-left-solid',
 	plus: 'solid/plus-solid',
 	home: 'solid/home-solid',
 	tape: 'solid/cassette-tape-solid',
@@ -30,6 +32,7 @@ const FROM_LIBRARY = {
 	pencil: 'solid/pencil-solid',
 	grip: 'solid/bars-solid',
 	queue: 'solid/playlist-solid',
+	phone: 'solid/phone-ringing-low-solid',
 	beacon: 'solid/wifi-solid',
 	link: 'solid/link-solid',
 	note: 'solid/music-solid',
@@ -54,6 +57,7 @@ const FROM_LIBRARY = {
 	userRemove: 'solid/user-minus-solid',
 	volume: 'solid/sound-on-solid',
 	mute: 'solid/sound-mute-solid',
+	bluetooth: 'regular/wifi',
 	radioOn: 'solid/check-box-solid',
 	camera: 'solid/camera-solid',
 	pop: 'solid/sparkles-solid',
@@ -69,79 +73,6 @@ const FROM_LIBRARY = {
 };
 
 const EMPTY_FRAMES = { radioOff: 'regular/check-box' };
-
-const HAND_DRAWN = {
-	next: [
-		'............',
-		'............',
-		'..#.....##..',
-		'..##....##..',
-		'..###...##..',
-		'..####..##..',
-		'..####..##..',
-		'..###...##..',
-		'..##....##..',
-		'..#.....##..',
-		'............',
-		'............',
-	],
-	prev: [
-		'............',
-		'............',
-		'..##.....#..',
-		'..##....##..',
-		'..##...###..',
-		'..##..####..',
-		'..##..####..',
-		'..##...###..',
-		'..##....##..',
-		'..##.....#..',
-		'............',
-		'............',
-	],
-	phone: [
-		'...######...',
-		'..########..',
-		'..#......#..',
-		'..#......#..',
-		'..#......#..',
-		'..#......#..',
-		'..#......#..',
-		'..#......#..',
-		'..########..',
-		'..###..###..',
-		'..########..',
-		'...######...',
-	],
-	tablet: [
-		'............',
-		'.##########.',
-		'.#........#.',
-		'.#........#.',
-		'.#........#.',
-		'.#........#.',
-		'.#........#.',
-		'.#........#.',
-		'.##########.',
-		'.####..####.',
-		'.##########.',
-		'............',
-	],
-	bluetooth: [
-		'.....#......',
-		'.....##.....',
-		'.#...#.#....',
-		'..#..#..#...',
-		'...#.#.#....',
-		'....###.....',
-		'....###.....',
-		'...#.#.#....',
-		'..#..#..#...',
-		'.#...#.#....',
-		'.....##.....',
-		'.....#......',
-	],
-};
 
 const ORDER = [
 	'play',
@@ -182,7 +113,6 @@ const ORDER = [
 	'login',
 	'logout',
 	'laptop',
-	'tablet',
 	'google',
 	'facebook',
 	'share',
@@ -306,16 +236,10 @@ const emptyFrame = rows => {
 	);
 };
 
-const doubled = rows =>
-	rows.flatMap(row => {
-		const wide = [...row].map(pixel => pixel + pixel).join('');
-		return [wide, wide];
-	});
-
 const sprite = name => {
 	if (FROM_LIBRARY[name]) return rasterize(FROM_LIBRARY[name]);
 	if (EMPTY_FRAMES[name]) return emptyFrame(rasterize(EMPTY_FRAMES[name]));
-	return doubled(HAND_DRAWN[name]);
+	throw new Error(`No icon for ${name}`);
 };
 
 const body = ORDER.map(
