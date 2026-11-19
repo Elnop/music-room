@@ -16,6 +16,8 @@ import { useFieldFocus } from '@/shared/hooks/useFieldFocus';
 import { Pressable } from './Pressable';
 import { Text } from './Text';
 import { TextInput } from './TextInput';
+import EyeCrossSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/eye-cross-solid.svg';
+import EyeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/eye-solid.svg';
 
 interface InputProps extends Omit<TextInputProps, 'style'> {
 	label: string;
@@ -23,19 +25,14 @@ interface InputProps extends Omit<TextInputProps, 'style'> {
 	leftIcon?: React.ReactNode;
 	containerStyle?: ViewStyle;
 	style?: StyleProp<TextStyle>;
-	/** Web only: Enter submits the form. Native keyboards keep their return key as it was. */
+	/** Web only: Enter submits; native return keys keep their behaviour. */
 	submitOnEnter?: () => void;
 }
 
 export function Input({
 	label,
-	value,
-	onChangeText,
-	placeholder,
 	error,
 	secureTextEntry,
-	autoCapitalize,
-	keyboardType,
 	leftIcon,
 	containerStyle,
 	style,
@@ -69,13 +66,8 @@ export function Input({
 						multiline ? styles.multilineInput : undefined,
 						style,
 					]}
-					value={value}
-					onChangeText={onChangeText}
-					placeholder={placeholder}
 					placeholderTextColor={theme.colors.textSecondary}
-					secureTextEntry={secureTextEntry ? isHidden : secureTextEntry}
-					autoCapitalize={autoCapitalize}
-					keyboardType={keyboardType}
+					secureTextEntry={secureTextEntry && isHidden}
 					multiline={multiline}
 					{...rest}
 					{...focusProps}
@@ -91,7 +83,7 @@ export function Input({
 						style={[styles.toggle, Platform.OS === 'web' && styles.toggleWeb]}
 					>
 						<PixelIcon
-							name={isHidden ? 'eye' : 'eyeOff'}
+							icon={isHidden ? EyeSolid : EyeCrossSolid}
 							size={20}
 							color={theme.colors.textSecondary}
 						/>

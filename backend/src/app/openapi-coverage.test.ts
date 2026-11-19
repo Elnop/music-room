@@ -18,7 +18,6 @@ function isRouterLayer(layer: RouteLayer): boolean {
 	return !layer.route && Array.isArray(layer.handle?.stack);
 }
 
-/** Express `:param` becomes OpenAPI `{param}`; trailing slash dropped. */
 function toOpenApiPath(prefix: string, routePath: string): string {
 	const joined = `${prefix}${routePath === '/' ? '' : routePath}`;
 	return joined.replace(/:([A-Za-z0-9_]+)/g, '{$1}');

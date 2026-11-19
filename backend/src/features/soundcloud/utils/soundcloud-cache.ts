@@ -1,5 +1,3 @@
-/** Shared by search and track lookups; each prefixes its keys (`search:`, `track:`). Stream URLs are never cached. */
-
 export const CACHE_TTL = {
 	SEARCH: 3600,
 	TRACK: 3600,
@@ -12,7 +10,6 @@ interface CacheEntry {
 
 const entries = new Map<string, CacheEntry>();
 
-/** Null when absent or expired; an expired entry is dropped on read. */
 export function get<T>(key: string): T | null {
 	const cached = entries.get(key);
 	if (!cached) return null;

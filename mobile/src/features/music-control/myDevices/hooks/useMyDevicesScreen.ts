@@ -25,7 +25,7 @@ export function useMyDevicesScreen() {
 	const [loadFailed, setLoadFailed] = useState(false);
 	const [devices, setDevices] = useState<UserDeviceWithLicenses[]>([]);
 	const [friends, setFriends] = useState<FriendUserSummary[]>([]);
-	const [allDevicesIds, setAllDevicesIds] = useState<Set<string>>(new Set());
+	const [allDevicesFriendIds, setAllDevicesFriendIds] = useState<Set<string>>(new Set());
 	const [currentDeviceId, setCurrentDeviceId] = useState<string | null>(null);
 	const [licensed, setLicensed] = useState<Set<string>>(new Set());
 	const [pending, setPending] = useState<Set<string>>(new Set());
@@ -46,7 +46,7 @@ export function useMyDevicesScreen() {
 			]);
 			setDevices(myDevices);
 			setFriends(myFriends);
-			setAllDevicesIds(new Set(allowedIds));
+			setAllDevicesFriendIds(new Set(allowedIds));
 			setCurrentDeviceId(deviceInfo?.deviceId ?? null);
 			setLicensed(licensedPairs(myDevices));
 			setLoadFailed(false);
@@ -126,7 +126,7 @@ export function useMyDevicesScreen() {
 		bottomPadding,
 		devices,
 		friends,
-		allDevicesIds,
+		allDevicesFriendIds,
 		currentDeviceId,
 		licensed,
 		pending,

@@ -20,7 +20,6 @@ import { fail, shared } from '@/shared/config/swagger.errors.js';
 const SOUNDCLOUD_URL_RULE =
 	'an https URL on `soundcloud.com`, `www.soundcloud.com`, `m.soundcloud.com` or `on.soundcloud.com`';
 
-/** Every route is authenticated, then rate limited per user (default 120 per minute), Redis only. */
 const protectedResponses: RouteConfig['responses'] = {
 	401: shared('UnauthorizedError'),
 	429: fail(

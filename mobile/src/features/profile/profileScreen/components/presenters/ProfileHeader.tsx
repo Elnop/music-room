@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { Avatar } from '@/shared/components/media/Avatar';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
+import { displayText } from '@/shared/theme/pixelFrame';
 import type { UserProfile } from '@/types/user.types';
 import type { UserStats } from '@/features/profile/types';
 import { Text } from '@/shared/components/ui/Text';
@@ -55,8 +56,7 @@ const createStyles = (theme: Theme) =>
 			marginTop: theme.spacing.md,
 		},
 		displayName: {
-			fontSize: 26,
-			fontFamily: theme.typography.families.bold,
+			...displayText(theme, 26),
 			color: theme.colors.text,
 			marginTop: theme.spacing.xs,
 		},

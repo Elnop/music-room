@@ -15,14 +15,13 @@ import type { Theme } from '@/shared/theme/types';
 
 interface ContentContainerProps {
 	width: ContentWidth;
-	/** The left navigation, and the desktop's now playing panel, take their share of the window: the app's screens, not the auth ones. */
+	/** App screens, not auth ones: the side bar and the now playing panel take their share of the window. */
 	besideSidebar?: boolean;
-	/** The screen scrolls across the whole area and centres its own content with useContentColumn. */
+	/** The screen centres its own content with useContentColumn. */
 	scrollsAtEdge?: boolean;
 	children: React.ReactNode;
 }
 
-/** Centres a screen at a maximum width on wide screens; on the phone it renders nothing of its own. */
 export function ContentContainer({
 	width,
 	besideSidebar = false,

@@ -123,7 +123,10 @@ describe('UserProfileOrchestrator', () => {
 		fireEvent.press(await screen.findByRole('button', { name: 'Partager' }));
 
 		await waitFor(() =>
-			expect(share).toHaveBeenCalledWith({ message: `Alice\nhttps://elnop.github.io/music-room/user/${ID}`, title: 'Alice' })
+			expect(share).toHaveBeenCalledWith({
+				message: `Alice\nhttps://elnop.github.io/music-room/user/${ID}`,
+				title: 'Alice',
+			})
 		);
 	});
 
@@ -211,7 +214,10 @@ describe('UserProfileOrchestrator on wide screens', () => {
 		fireEvent.press(screen.getByRole('button', { name: 'Partager' }));
 
 		await waitFor(() => expect(friendsApi.followUser).toHaveBeenCalledWith(ID));
-		expect(share).toHaveBeenCalledWith({ message: `Alice\nhttps://elnop.github.io/music-room/user/${ID}`, title: 'Alice' });
+		expect(share).toHaveBeenCalledWith({
+			message: `Alice\nhttps://elnop.github.io/music-room/user/${ID}`,
+			title: 'Alice',
+		});
 	});
 
 	it('keeps what privacy hides hidden: initials, no bio, no tastes, no email', async () => {

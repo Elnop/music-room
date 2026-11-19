@@ -9,6 +9,10 @@ import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { Playlist, UserSummary } from '@/features/playlists/types';
 import { ownerName } from '@/features/playlists/home/utils/playlistLabels';
+import EyeCrossSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/eye-cross-solid.svg';
+import GlobeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/globe-solid.svg';
+import LockSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/lock-solid.svg';
+import PencilSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/pencil-solid.svg';
 
 interface PlaylistCassetteProps {
 	playlist: Playlist;
@@ -16,7 +20,6 @@ interface PlaylistCassetteProps {
 	width: number;
 }
 
-/** A playlist on the shelf: its cover, its name, then who sees it, who edits it and whose it is. */
 export function PlaylistCassette({ playlist, owner, width }: PlaylistCassetteProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
 	const ink = theme.colors.textSecondary;
@@ -24,14 +27,26 @@ export function PlaylistCassette({ playlist, owner, width }: PlaylistCassettePro
 	return (
 		<View style={{ width }}>
 			<View style={styles.cover}>
-				<Artwork uri={playlist.coverUrl || playlist.firstTrackCover} size={width - 6} iconSize={32} />
+				<Artwork
+					uri={playlist.coverUrl || playlist.firstTrackCover}
+					size={width - 6}
+					iconSize={32}
+				/>
 			</View>
 			<Text style={styles.name} numberOfLines={2}>
 				{playlist.name}
 			</Text>
 			<View style={styles.meta} importantForAccessibility="no-hide-descendants">
-				<PixelIcon name={playlist.visibility === 'public' ? 'globe' : 'eyeOff'} size={12} color={ink} />
-				<PixelIcon name={playlist.editMode === 'open' ? 'pencil' : 'lock'} size={12} color={ink} />
+				<PixelIcon
+					icon={playlist.visibility === 'public' ? GlobeSolid : EyeCrossSolid}
+					size={12}
+					color={ink}
+				/>
+				<PixelIcon
+					icon={playlist.editMode === 'open' ? PencilSolid : LockSolid}
+					size={12}
+					color={ink}
+				/>
 				{owner && <Avatar uri={owner.avatarUrl} name={ownerName(owner)} size="sm" />}
 			</View>
 		</View>

@@ -19,7 +19,6 @@ interface UserProfileWideSectionsProps {
 	isFriend: boolean;
 	playlists: FriendPlaylistSummary[];
 	onSelectPlaylist: (playlistId: string) => void;
-	/** The friend's listening, shown first when there is some. */
 	listening?: React.ReactNode;
 }
 
@@ -33,7 +32,6 @@ function infoRows(profile: FilteredProfile): ProfileInfoRow[] {
 	return rows;
 }
 
-/** The wide profile's column, under its header: the same sections and cards as my own profile. */
 export function UserProfileWideSections({
 	profile,
 	isFriend,

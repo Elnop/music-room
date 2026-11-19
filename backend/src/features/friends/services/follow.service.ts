@@ -7,7 +7,6 @@ import * as followStatusService from '@/features/friends/services/follow-status.
 import { revalidateListeningAccess } from '@/features/friends/utils/listening-access.js';
 import type { FollowActionResponse } from '@/features/friends/friends.types.js';
 
-/** 400 SELF_FOLLOW_ERROR on oneself, 404 USER_NOT_FOUND for an unknown user; following twice is a no-op. */
 export function followUser(
 	currentUserId: string,
 	targetUserId: string
@@ -47,7 +46,6 @@ export function followUser(
 	);
 }
 
-/** Not following is a no-op. */
 export function unfollowUser(
 	currentUserId: string,
 	targetUserId: string
@@ -62,8 +60,7 @@ export function unfollowUser(
 				'UNFOLLOW_ERROR'
 			);
 
-			// Control requires mutual friends: neither side may keep receiving
-			// the other's listening status.
+			// Listening and control need mutual friends, which this unfollow just ended.
 			await Promise.all([
 				revalidateListeningAccess(currentUserId, targetUserId),
 				revalidateListeningAccess(targetUserId, currentUserId),

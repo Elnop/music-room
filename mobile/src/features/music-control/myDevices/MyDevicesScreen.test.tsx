@@ -117,11 +117,11 @@ let sessionStore: StoreApi<SessionView>;
 async function renderLoaded(
 	devices: UserDeviceWithLicenses[],
 	friends: FriendUserSummary[],
-	allDevicesIds: string[] = []
+	allDevicesFriendIds: string[] = []
 ): Promise<void> {
 	fetchMock.mockResolvedValueOnce(ok({ devices }));
 	getFriends.mockResolvedValue(friends);
-	getPermissions.mockResolvedValue(allDevicesIds);
+	getPermissions.mockResolvedValue(allDevicesFriendIds);
 	render(<MyDevicesOrchestrator />);
 	await screen.findByText(
 		'Choisissez quels amis peuvent contrôler la musique de chaque appareil',

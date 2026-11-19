@@ -15,9 +15,6 @@ import {
 	toDevice,
 } from '@/features/music-control/utils/device.helpers.js';
 
-// Persists the devices a user connects from (`devices`, one row per
-// `(user_id, device_id)`).
-
 // `created_at` and `custom_name` stay out of the upsert so reconnections keep them.
 export async function recordConnection(userId: string, device: DeviceInfo): Promise<string> {
 	const { data, error } = await supabaseAdmin
@@ -48,7 +45,6 @@ export async function recordConnection(userId: string, device: DeviceInfo): Prom
 	return data.custom_name ?? device.deviceName;
 }
 
-/** `null` goes back to the system name; 404 when the device is not the owner's. */
 export async function renameDevice(
 	ownerId: string,
 	deviceId: string,

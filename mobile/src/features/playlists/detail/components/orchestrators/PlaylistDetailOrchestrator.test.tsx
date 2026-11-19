@@ -359,7 +359,6 @@ describe('PlaylistDetailOrchestrator owner actions (#342)', () => {
 		fireEvent.press(screen.getByLabelText(label));
 	};
 
-	/** The button of the last confirmation dialog. */
 	const alertButton = (text: string) => {
 		const buttons = (jest.mocked(Alert.alert).mock.calls.at(-1)?.[2] ?? []) as {
 			text: string;
@@ -403,7 +402,6 @@ describe('PlaylistDetailOrchestrator owner actions (#342)', () => {
 });
 
 describe('PlaylistDetailOrchestrator deleted while viewing (#342)', () => {
-	/** A connected socket whose handlers the test calls. */
 	function connectSocket() {
 		const handlers: Record<string, (data: unknown) => void> = {};
 		const socket = {

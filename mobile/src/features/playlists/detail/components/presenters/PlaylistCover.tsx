@@ -5,7 +5,7 @@ import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { PlaylistWithTracks } from '@/features/playlists/types';
 
-/** The cover of a playlist's header, or its first track's artwork. */
+/** Falls back to the first track's artwork. */
 export function PlaylistCover({
 	playlist,
 	size = 200,
@@ -19,11 +19,7 @@ export function PlaylistCover({
 
 	return (
 		<View style={[styles.cover, style]}>
-			<Artwork
-				uri={playlist.coverUrl || playlist.tracks[0]?.albumArt}
-				size={size}
-				iconSize={64}
-			/>
+			<Artwork uri={playlist.coverUrl || playlist.tracks[0]?.albumArt} size={size} iconSize={64} />
 		</View>
 	);
 }

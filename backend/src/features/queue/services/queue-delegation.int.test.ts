@@ -15,8 +15,7 @@ vi.mock('@/realtime/emitters/queue.emitters.js', async importOriginal => ({
 	sendDeviceCommand: vi.fn(),
 }));
 
-// No Socket.io server runs here: device presence and commands are stubbed on
-// the realtime emitter modules.
+// No Socket.io server runs here: device presence and commands are stubbed.
 
 const URI_PREFIX = `https://soundcloud.com/int-queue-delegation/${randomUUID()}`;
 const users: string[] = [];

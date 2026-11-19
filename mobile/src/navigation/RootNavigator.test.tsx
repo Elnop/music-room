@@ -203,7 +203,6 @@ describe('RootNavigator session restore', () => {
 
 	afterEach(() => {
 		globalThis.fetch = realFetch;
-		// Linking.getInitialURL and the logger spies
 		jest.restoreAllMocks();
 		useAuthStore.setState({
 			user: null,

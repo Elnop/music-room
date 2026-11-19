@@ -12,7 +12,6 @@ import { fail, shared } from '@/shared/config/swagger.errors.js';
 
 const invalidUserId = fail('userId is not a UUID', ['INVALID_USER_ID', 'Invalid user ID format']);
 
-/** Registers the /api/music-control routes. */
 export function registerMusicControlOpenapi(registry: OpenAPIRegistry): void {
 	const common = { tags: ['Music Control'], security: bearerAuth };
 	const unauthorized = shared('UnauthorizedError');

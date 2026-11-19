@@ -31,7 +31,6 @@ export async function sendCode(email: string, code: string): Promise<void> {
 	await mailService.sendVerificationEmail(email, code, verificationConfig.expiryMinutes);
 }
 
-/** Enforces the attempts limit and the expiry before marking the email verified. */
 export async function verifyCode(userId: string, code: string, ip: string): Promise<void> {
 	const attemptsKey = `email_verify_attempts:${userId}:${ip}`;
 
@@ -50,7 +49,7 @@ export async function verifyCode(userId: string, code: string, ip: string): Prom
 		throw new AppError(404, 'User not found', 'USER_NOT_FOUND');
 	}
 
-	// Already verified: refuse, so a session is never minted without a valid code
+	// Refused so that a session is never minted without a valid code.
 	if (profile.email_verified) {
 		logger.warn('Verification attempt on an already verified account', { userId, ip });
 		throw new AppError(400, 'Email already verified', 'ALREADY_VERIFIED');
@@ -72,7 +71,6 @@ export async function verifyCode(userId: string, code: string, ip: string): Prom
 		);
 	}
 
-	// Constant-time comparison against timing attacks
 	const isValid = crypto.timingSafeEqual(Buffer.from(profile.verification_code), Buffer.from(code));
 
 	if (!isValid) {
@@ -99,7 +97,6 @@ export async function verifyCode(userId: string, code: string, ip: string): Prom
 	logger.info('Email verified successfully', { userId });
 }
 
-/** Cooldown (429 RESEND_COOLDOWN), then an hourly cap (429 RESEND_LIMIT_EXCEEDED); records allowed attempts. */
 export async function consumeResend(userId: string, ip: string): Promise<void> {
 	const cooldown = { maxAttempts: 1, windowSeconds: verificationConfig.resendCooldownSeconds };
 	const cooldownKey = `email_resend:${userId}:${ip}`;

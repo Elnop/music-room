@@ -56,7 +56,7 @@ export const addViewerSchema = z.object({
 
 export const coverFileSchema = uploadedImageSchema('cover', 'cover');
 
-// Path segments read with `routeParam` (any non-empty value), documented as UUIDs.
+// Documents the path segment as a UUID; handlers read it with `routeParam`.
 export const playlistIdParamSchema = z.object({
 	id: z.uuid().meta({ param: { description: 'Playlist ID' } }),
 });
@@ -65,8 +65,7 @@ export const playlistMemberParamsSchema = playlistIdParamSchema.extend({
 	userId: z.uuid().meta({ param: { description: 'ID of the collaborator or viewer' } }),
 });
 
-// Request inputs. CreatePlaylistInput is the schema's input: visibility and
-// editMode may be omitted, the service applies the same defaults.
+// z.input: visibility and editMode may be omitted; the service applies the defaults.
 export type CreatePlaylistInput = z.input<typeof createPlaylistSchema>;
 export type UpdatePlaylistInput = z.infer<typeof updatePlaylistSchema>;
 export type MoveTrackInput = z.infer<typeof moveTrackSchema>;

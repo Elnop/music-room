@@ -8,6 +8,8 @@ import { focusedFieldStyle } from '@/shared/theme/fieldFocus';
 import { useFieldFocus } from '@/shared/hooks/useFieldFocus';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { TextInput } from '@/shared/components/ui/TextInput';
+import SearchSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/search-solid.svg';
+import TimesSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/times-solid.svg';
 
 interface SearchBarProps {
 	value: string;
@@ -15,7 +17,6 @@ interface SearchBarProps {
 	placeholder?: string;
 	style?: StyleProp<ViewStyle>;
 	autoFocus?: boolean;
-	/** Shows a spinner in the field while a search runs. */
 	loading?: boolean;
 	inputRef?: React.Ref<TextInput>;
 }
@@ -38,7 +39,7 @@ export function SearchBar({
 	return (
 		<View style={[styles.container, style, focused && focusedFieldStyle(theme.colors.primary)]}>
 			<PixelIcon
-				name="search"
+				icon={SearchSolid}
 				size={20}
 				color={theme.colors.textSecondary}
 				style={styles.icon}
@@ -72,7 +73,7 @@ export function SearchBar({
 					style={[styles.trailing, styles.clear]}
 					accessibilityLabel="Effacer la recherche"
 				>
-					<PixelIcon name="close" size={20} color={theme.colors.textSecondary} />
+					<PixelIcon icon={TimesSolid} size={20} color={theme.colors.textSecondary} />
 				</Pressable>
 			)}
 		</View>
@@ -102,6 +103,5 @@ const createStyles = (theme: Theme) =>
 		trailing: {
 			marginLeft: theme.spacing.sm,
 		},
-		clear: {
-		},
+		clear: {},
 	});

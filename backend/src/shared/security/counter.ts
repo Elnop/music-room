@@ -1,16 +1,14 @@
 import { redisClient, isRedisConnected } from '@/shared/config/redis.js';
 
-// Every limiter reaches Redis only through here; each one decides what Redis being down means
-// for it (503 or fail open). No in-memory fallback (doc/architecture/redis.md).
+// Each limiter decides what Redis being down means for it (503 or fail open); no in-memory fallback.
 
 export interface CounterState {
-	/** 0 when the key does not exist. */
 	count: number;
 	/** Redis PTTL: -2 missing, -1 no expiry. */
 	ttlMs: number;
 }
 
-/** A key without expiry starts a new window at 1; otherwise the window keeps its end. Atomic. */
+/** Atomic. A key without expiry restarts the window at 1; otherwise the window keeps its end. */
 const HIT_SCRIPT = `local ttl = redis.call('PTTL', KEYS[1])
 if ttl <= 0 then
 	redis.call('SET', KEYS[1], 1, 'PX', ARGV[1])
@@ -18,7 +16,6 @@ if ttl <= 0 then
 end
 return { redis.call('INCR', KEYS[1]), ttl }`;
 
-/** Read together. */
 const PEEK_SCRIPT = `return { redis.call('GET', KEYS[1]), redis.call('PTTL', KEYS[1]) }`;
 
 /** DECR only while the key exists: never recreate an expired key without expiry. */
@@ -30,12 +27,11 @@ function toState(reply: unknown): CounterState {
 	return { count: Number(count ?? 0) || 0, ttlMs: Number(ttlMs) };
 }
 
-/** The client has no offline queue. */
 export function isReady(): boolean {
 	return isRedisConnected();
 }
 
-/** Rounded as Redis' TTL gives them, 0 when none. */
+/** Rounded like Redis' TTL command; 0 when there is none. */
 export function toSeconds(ttlMs: number): number {
 	return ttlMs > 0 ? Math.floor((ttlMs + 500) / 1000) : 0;
 }
@@ -48,12 +44,10 @@ export async function peek(key: string): Promise<CounterState> {
 	return toState(await redisClient.eval(PEEK_SCRIPT, 1, key));
 }
 
-/** Only if the window still exists. */
 export async function release(key: string): Promise<void> {
 	await redisClient.eval(RELEASE_SCRIPT, 1, key);
 }
 
-/** Returns the number of keys deleted (0 or 1). */
 export async function clear(key: string): Promise<number> {
 	return redisClient.del(key);
 }

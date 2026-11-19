@@ -25,7 +25,6 @@ import {
 } from '@/shared/config/swagger.schemas.js';
 import { fail, shared } from '@/shared/config/swagger.errors.js';
 
-/** Registers the /api/playlists routes. */
 export function registerPlaylistOpenapi(registry: OpenAPIRegistry): void {
 	const common = { tags: ['Playlists'], security: bearerAuth };
 	nameSchemas({

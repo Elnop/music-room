@@ -12,10 +12,9 @@ import { toDetailsPayload } from '@/features/playlists/utils/playlist.helpers.js
 import * as realtime from '@/realtime/emitters/playlist.emitters.js';
 import type { CoverResponse } from '@/features/playlists/playlist.types.js';
 
-/** Public bucket, created by migration 031. */
 export const COVER_BUCKET = 'playlist-covers';
 
-/** Deletes the cover file when it was stored here for this playlist. Never throws. */
+/** Never throws; ignores a cover not stored in this bucket for this playlist. */
 export async function deleteCoverFile(
 	coverUrl: string | null | undefined,
 	playlistId: string
@@ -34,7 +33,6 @@ async function currentCoverUrl(playlistId: string): Promise<string | null> {
 	return data.cover_url;
 }
 
-/** Saves cover_url and tells the playlist's room through `playlist:details`. */
 async function setCoverUrl(playlistId: string, coverUrl: string | null): Promise<void> {
 	const { data, error } = await supabaseAdmin
 		.from('playlists')
@@ -49,7 +47,6 @@ async function setCoverUrl(playlistId: string, coverUrl: string | null): Promise
 	realtime.notifyPlaylistDetails(toDetailsPayload(data));
 }
 
-/** Owner and Premium only. The previous cover file is deleted when it was stored here. */
 export async function uploadCover(
 	playlistId: string,
 	userId: string,
@@ -67,7 +64,6 @@ export async function uploadCover(
 	try {
 		await setCoverUrl(playlistId, coverUrl);
 	} catch (error) {
-		// The new file is not referenced anywhere: remove it.
 		await removeStoredImage(COVER_BUCKET, path, { playlistId });
 		throw error;
 	}
@@ -78,7 +74,7 @@ export async function uploadCover(
 	return { coverUrl };
 }
 
-/** Owner only, on any plan: after a downgrade the cover stays until the owner removes it. */
+/** Any plan: after a downgrade the owner can still remove the cover. */
 export async function removeCover(playlistId: string, userId: string): Promise<CoverResponse> {
 	await checkOwnership(playlistId, userId);
 

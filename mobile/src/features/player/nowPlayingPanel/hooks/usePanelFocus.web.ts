@@ -24,10 +24,7 @@ interface BrowserDocument {
 
 const browser = globalThis as unknown as { document?: BrowserDocument };
 
-/**
- * While the panel is mounted: the focus moves to its close button, Escape inside it closes it,
- * and the focus goes back to what opened it (the player bar's toggle) once it closes.
- */
+/** Focuses the close button, closes on Escape, then gives the focus back to the opener. */
 export function usePanelFocus(onClose: () => void): void {
 	const onCloseRef = useRef(onClose);
 	useEffect(() => {

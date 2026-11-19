@@ -7,6 +7,8 @@ import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { PlaylistChoice } from '@/features/events/types';
 import { FieldLabel } from './FieldLabel';
 import { Text } from '@/shared/components/ui/Text';
+import BracketSquareOutline from '@hackernoon/pixel-icon-library/icons/SVG/regular/bracket-square.svg';
+import CheckBoxSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/check-box-solid.svg';
 
 interface PlaylistSelectorProps {
 	playlists: PlaylistChoice[];
@@ -38,7 +40,7 @@ export function PlaylistSelector({ playlists, selectedId, onSelect }: PlaylistSe
 							haptic="selection"
 						>
 							<PixelIcon
-								name={selected ? 'radioOn' : 'radioOff'}
+								icon={selected ? CheckBoxSolid : BracketSquareOutline}
 								size={18}
 								color={selected ? theme.colors.primary : theme.colors.textSecondary}
 							/>

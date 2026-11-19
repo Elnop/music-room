@@ -1,37 +1,27 @@
-import React from 'react';
+import React, { type ComponentType } from 'react';
 import { View, type StyleProp, type ViewStyle } from 'react-native';
-import { PIXEL_SPRITES, type PixelSpriteName } from '@/shared/constants/pixelSprites';
-import { pixelRuns } from '@/shared/utils/pixelRuns';
+import type { SvgProps } from 'react-native-svg';
 
-const GRID = 12;
-
-// Computed once: a sprite never changes at run time.
-const RUNS = Object.fromEntries(
-	Object.entries(PIXEL_SPRITES).map(([name, rows]) => [name, pixelRuns(rows)])
-) as Record<PixelSpriteName, ReturnType<typeof pixelRuns>>;
+export type PixelIconSource = ComponentType<SvgProps>;
 
 interface PixelIconProps {
-	name: PixelSpriteName;
+	icon: PixelIconSource;
 	color: string;
-	/** A multiple of 12 keeps every pixel square and sharp. */
 	size?: number;
 	style?: StyleProp<ViewStyle>;
-	/** An icon that alone tells a state (playing, unavailable) names it for screen readers. */
 	accessibilityLabel?: string;
 	testID?: string;
 }
 
 /** Decorative unless labelled: the control around it usually carries the label. */
 export function PixelIcon({
-	name,
+	icon: Icon,
 	color,
 	size = 24,
 	style,
 	accessibilityLabel,
 	testID,
 }: PixelIconProps) {
-	const cell = size / GRID;
-
 	return (
 		<View
 			style={[{ width: size, height: size }, style]}
@@ -42,19 +32,7 @@ export function PixelIcon({
 			accessibilityLabel={accessibilityLabel}
 			importantForAccessibility={accessibilityLabel ? 'yes' : 'no'}
 		>
-			{RUNS[name].map(run => (
-				<View
-					key={`${run.x}-${run.y}`}
-					style={{
-						position: 'absolute',
-						left: run.x * cell,
-						top: run.y * cell,
-						width: run.width * cell,
-						height: cell,
-						backgroundColor: color,
-					}}
-				/>
-			))}
+			<Icon width={size} height={size} fill={color} />
 		</View>
 	);
 }

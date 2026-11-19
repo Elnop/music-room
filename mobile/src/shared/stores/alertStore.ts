@@ -14,7 +14,7 @@ interface AlertState {
 	dismiss: () => void;
 }
 
-/** The browser's alerts, shown by AlertHost; native platforms use their own Alert and never fill it. */
+/** Browser only: native platforms use their own Alert. */
 export const useAlertStore = create<AlertState>(set => ({
 	queue: [],
 	push: alert => set(state => ({ queue: [...state.queue, alert] })),

@@ -1,66 +1,58 @@
 import React from 'react';
 import { View } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import Animated from 'react-native-reanimated';
-import { Artwork } from '@/shared/components/media/Artwork';
+import { Text } from '@/shared/components/ui/Text';
 import type { ArtworkCarousel } from '@/features/player/modal/hooks/useArtworkCarousel';
-import type { createStyles } from './playerModalStyles';
+import { CAROUSEL_TEXT_HEIGHT, type createStyles } from './playerModalStyles';
+import { PlayerCarouselSlot } from './PlayerCarouselSlot';
+import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
 interface PlayerArtworkCarouselProps {
 	styles: ReturnType<typeof createStyles>;
 	carousel: ArtworkCarousel;
-	hasTrack: boolean;
-	artworkUrl: string | null;
-	emptyIconColor: string;
+	colors: { text: string; textSecondary: string };
 }
 
-export function PlayerArtworkCarousel({
-	styles,
-	carousel,
-	hasTrack,
-	artworkUrl,
-	emptyIconColor,
-}: PlayerArtworkCarouselProps) {
+export function PlayerArtworkCarousel({ styles, carousel, colors }: PlayerArtworkCarouselProps) {
+	const size = carousel.artworkSize;
+	const frameSize = size + styles.artworkShadow.borderWidth * 2;
+
+	if (carousel.slots.length === 0) {
+		return (
+			<View style={styles.artworkWrapper}>
+				<View style={styles.artworkShadow}>
+					<View style={[styles.artwork, styles.emptyArtwork, { width: size, height: size }]}>
+						<PixelIcon icon={MusicSolid} size={64} color={colors.textSecondary} />
+					</View>
+				</View>
+				<View style={[styles.slotText, { width: size }]}>
+					<View style={styles.titleBox}>
+						<Text style={[styles.title, { color: colors.text }]}>Rien en lecture</Text>
+					</View>
+					<Text style={[styles.artist, { color: colors.textSecondary }]} numberOfLines={1}>
+						Choisissez un titre pour commencer
+					</Text>
+				</View>
+			</View>
+		);
+	}
+
 	return (
 		<View style={styles.artworkWrapper}>
-			<Animated.View style={[styles.artworkShadow, carousel.rowStyle]}>
-				{carousel.hasPrevious && (
-					<View style={[styles.neighbourArtwork, { left: -carousel.artworkStep }]}>
-						<Artwork
-							uri={carousel.previousArtworkUrl}
-							size={carousel.artworkSize}
-							style={styles.artwork}
-						/>
-					</View>
-				)}
-				{hasTrack ? (
-					<Artwork
-						uri={artworkUrl}
-						size={carousel.artworkSize}
-						style={styles.artwork}
-						iconSize={64}
+			<View style={{ width: frameSize, height: frameSize + CAROUSEL_TEXT_HEIGHT }}>
+				{carousel.slots.map(slot => (
+					<PlayerCarouselSlot
+						key={slot.key}
+						styles={styles}
+						slot={slot}
+						center={carousel.center}
+						drag={carousel.drag}
+						size={size}
+						step={carousel.artworkStep}
+						colors={colors}
 					/>
-				) : (
-					<View
-						style={[
-							styles.artwork,
-							styles.emptyArtwork,
-							{ width: carousel.artworkSize, height: carousel.artworkSize },
-						]}
-					>
-						<PixelIcon name="note" size={64} color={emptyIconColor} />
-					</View>
-				)}
-				{carousel.hasNext && (
-					<View style={[styles.neighbourArtwork, { left: carousel.artworkStep }]}>
-						<Artwork
-							uri={carousel.nextArtworkUrl}
-							size={carousel.artworkSize}
-							style={styles.artwork}
-						/>
-					</View>
-				)}
-			</Animated.View>
+				))}
+			</View>
 		</View>
 	);
 }

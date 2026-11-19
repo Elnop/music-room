@@ -6,7 +6,6 @@ import { formatAuthResponse, fetchUserProfile } from '@/features/auth/utils/auth
 import * as tokenRevocation from '@/features/auth/services/token-revocation.service.js';
 import { logger } from '@/shared/utils/logger.js';
 
-/** Tokens revoked by a logout are rejected before Supabase is called. */
 export async function verifyToken(token: string): Promise<SupabaseUser> {
 	try {
 		if (await tokenRevocation.isRevoked(token)) {
@@ -33,7 +32,7 @@ export async function verifyToken(token: string): Promise<SupabaseUser> {
 	}
 }
 
-/** 401 only when Supabase Auth refuses the token; an outage is 503 so the client keeps its session. */
+/** An outage is a 503, not a 401, so the client keeps its session. */
 export async function refreshToken(refreshToken: string): Promise<AuthResponse> {
 	try {
 		const { data, error } = await createSignInClient().auth.refreshSession({
@@ -69,7 +68,7 @@ export async function refreshToken(refreshToken: string): Promise<AuthResponse> 
 	}
 }
 
-/** Denylist first (even if Supabase then fails), then revoke with scope 'local': other devices stay signed in. */
+/** Scope 'local': the user's other devices stay signed in. */
 export async function logout(token: string, userId: string): Promise<void> {
 	await tokenRevocation.revoke(token);
 
@@ -91,7 +90,7 @@ export async function logout(token: string, userId: string): Promise<void> {
 	}
 }
 
-/** A 4xx other than 408 (timeout) and 429 (rate limit), which say nothing about the token. */
+/** 408 (timeout) and 429 (rate limit) say nothing about the token. */
 function isRefusal(error: unknown): boolean {
 	return (
 		isAuthApiError(error) &&
@@ -102,7 +101,6 @@ function isRefusal(error: unknown): boolean {
 	);
 }
 
-/** Supabase Auth unreachable or failing: not a refusal of the refresh token. */
 function authUnavailable(error: unknown): AppError {
 	logger.warn('Supabase Auth unavailable during token refresh', {
 		error: error instanceof Error ? error.message : String(error),

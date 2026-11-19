@@ -4,10 +4,9 @@ import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 
 export type OAuthProvider = 'google' | 'facebook';
 
-/** The browser shows Google's own button: a form-wide one, or a compact one in a row. */
 export type GoogleButtonVariant = 'form' | 'row';
 
-/** Set on the web only: the `View` the Google button renders into. */
+/** Set on the web only. */
 export type GoogleButtonSlot = RefCallback<View>;
 
 export interface LinkedProvider {

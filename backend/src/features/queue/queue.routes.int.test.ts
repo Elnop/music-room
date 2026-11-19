@@ -8,8 +8,6 @@ import { connectRedis, disconnectRedis, isRedisConnected } from '@/shared/config
 import { errorHandler } from '@/shared/middleware/error-handler.js';
 import type { QueueState } from '@/features/queue/queue.types.js';
 
-// Real user, token, playlist and queue rows; only the Socket.io emitter is mocked.
-
 vi.mock('@/realtime/emitters/queue.emitters.js', () => ({ notifyQueueUpdate: vi.fn() }));
 
 const { default: queueRoutes } = await import('@/features/queue/queue.routes.js');
@@ -43,7 +41,6 @@ async function createUser(): Promise<{ id: string; token: string }> {
 	return { id: data.user.id, token: session.session.access_token };
 }
 
-/** A public playlist of `ownerId` with `n` tracks, written as the playlists feature does; returns the track ids. */
 async function createPlaylist(
 	ownerId: string,
 	n: number

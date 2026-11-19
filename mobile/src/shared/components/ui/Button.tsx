@@ -4,14 +4,11 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { Pressable } from './Pressable';
 import { Text } from './Text';
-import { FONT_FAMILIES } from '@/shared/theme/fonts';
-import { keycap } from '@/shared/theme/pixelFrame';
+import { displayText, keycap } from '@/shared/theme/pixelFrame';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline';
-/** `compact` fits a header row, next to a title. */
 type ButtonSize = 'default' | 'compact';
 
-/** The label, given either as `title` or as the text children. */
 type ButtonLabel = { title: string; children?: never } | { title?: never; children: string };
 
 type ButtonProps = ButtonLabel & {
@@ -23,7 +20,6 @@ type ButtonProps = ButtonLabel & {
 	fullWidth?: boolean;
 	icon?: React.ReactNode;
 	style?: ViewStyle;
-	/** Defaults to the label. */
 	accessibilityLabel?: string;
 };
 
@@ -53,14 +49,14 @@ export function Button({
 		fullWidth && styles.fullWidth,
 		isDisabled && styles.disabled,
 		style,
-	].filter(Boolean);
+	];
 
 	const textStyle = [
 		styles.text,
 		styles[`${variant}Text` as keyof typeof styles],
 		size === 'compact' && styles.compactText,
 		isDisabled && styles.disabledText,
-	].filter(Boolean);
+	];
 
 	const spinnerColor = variant === 'primary' ? theme.colors.onColor : theme.colors.primary;
 
@@ -119,11 +115,11 @@ const createStyles = (theme: Theme) =>
 		},
 
 		text: {
-			fontSize: 16,
-			fontFamily: FONT_FAMILIES.semibold,
+			...displayText(theme, 16, 'button'),
+			textTransform: 'uppercase',
 		},
 		compactText: {
-			fontSize: 13,
+			fontSize: displayText(theme, 13, 'button').fontSize,
 		},
 		primaryText: {
 			color: theme.colors.onColor,

@@ -5,10 +5,8 @@ import { failUnexpected } from '@/shared/utils/fail-unexpected.js';
 import * as followStatusService from '@/features/friends/services/follow-status.service.js';
 import * as realtime from '@/realtime/emitters/control.emitters.js';
 
-// The "all my devices" switch (`follows(friend → owner).can_control_music`):
-// the owner lets a mutual friend control all of their devices.
+// The "all my devices" switch is `follows(friend → owner).can_control_music`.
 
-/** Sets the switch on `follows(allowedUserId → ownerId)`; `.select()` returns the rows updated. */
 function setControl(ownerId: string, allowedUserId: string, canControl: boolean) {
 	return supabaseAdmin
 		.from('follows')
@@ -18,10 +16,6 @@ function setControl(ownerId: string, allowedUserId: string, canControl: boolean)
 		.select();
 }
 
-/**
- * Turns the switch on for a friend. Only works if both users are mutual
- * friends (400 NOT_FRIENDS) and the friend follows the owner (400 FOLLOW_NOT_FOUND).
- */
 export function grantControl(ownerId: string, allowedUserId: string): Promise<void> {
 	return failUnexpected(
 		async () => {
@@ -49,7 +43,6 @@ export function grantControl(ownerId: string, allowedUserId: string): Promise<vo
 	);
 }
 
-/** Turns the switch off for a user. No row (friendship removed) is only logged. */
 export function revokeControl(ownerId: string, allowedUserId: string): Promise<void> {
 	return failUnexpected(
 		async () => {
@@ -62,7 +55,6 @@ export function revokeControl(ownerId: string, allowedUserId: string): Promise<v
 				logger.warn('No follow relationship found to revoke', { ownerId, allowedUserId });
 			}
 
-			// Evicts them from the listening room unless a license remains.
 			await realtime.notifyPermissionChange(allowedUserId, ownerId, false);
 			logger.info('Music control revoked', { ownerId, allowedUserId });
 		},

@@ -6,8 +6,8 @@ import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { Theme } from '@/shared/theme/types';
 import { trackTableColumns as columns } from './trackTableLayout';
 import { Text } from '@/shared/components/ui/Text';
+import ClockSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/clock-solid.svg';
 
-/** The column titles above the rows of a track table (wide screens). */
 export function TrackTableHeader() {
 	const { styles, theme } = useThemedStyles(createStyles);
 	const separator = useSeparatorColor();
@@ -25,7 +25,7 @@ export function TrackTableHeader() {
 			</View>
 			<View style={columns.duration}>
 				<PixelIcon
-					name="clock"
+					icon={ClockSolid}
 					size={16}
 					color={theme.colors.textSecondary}
 					accessibilityLabel="Durée"

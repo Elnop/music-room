@@ -2,9 +2,6 @@ import * as controlAccessService from '@/features/music-control/services/control
 import { AppError } from '@/shared/middleware/error-handler.js';
 import * as realtime from '@/realtime/emitters/control.emitters.js';
 
-// The owner and any friend who may control one of the owner's devices manage the whole queue; an action
-// that changes what plays needs control of the target device, online, checked before the queue changes.
-
 const accessDenied = () =>
 	new AppError(403, "Not authorized to manage this user's queue", 'QUEUE_ACCESS_DENIED');
 
@@ -13,7 +10,7 @@ export async function assertCanManageQueue(actorId: string, ownerId: string): Pr
 	if (!(await controlAccessService.canControlAnyDevice(actorId, ownerId))) throw accessDenied();
 }
 
-/** Null when the owner acts from the device that plays; a delegate must name an online device it controls. */
+/** Null: the owner plays on the device it acts from. */
 export async function resolvePlaybackDevice(
 	actorId: string,
 	ownerId: string,

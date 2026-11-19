@@ -12,6 +12,8 @@ import { createListStyles } from './listStyles';
 import { PlaylistGrid } from './PlaylistGrid';
 import { HomeSkeleton } from './HomeSkeleton';
 import { RefreshableScroll } from './RefreshableScroll';
+import GlobeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/globe-solid.svg';
+import UsersSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/users-solid.svg';
 
 const countAll = (screen: HomeScreen) =>
 	screen.friendsPlaylists.reduce((total, entry) => total + entry.playlists.length, 0);
@@ -28,7 +30,6 @@ export function HomeView({ screen, nearbyEvents, similarProfiles, actionsFor }: 
 	const { isWide } = useBreakpoint();
 
 	if (screen.isInitialLoading) return <HomeSkeleton />;
-	// Hidden while loading too, so the section never shows as a bare title.
 	const friendsCount = countAll(screen);
 
 	const content = (
@@ -42,11 +43,7 @@ export function HomeView({ screen, nearbyEvents, similarProfiles, actionsFor }: 
 			{friendsCount > 0 && (
 				<>
 					<View style={styles.section}>
-						<SectionHeader
-							icon="crew"
-							title="Playlists de vos amis"
-							count={friendsCount}
-						/>
+						<SectionHeader icon={UsersSolid} title="Playlists de vos amis" count={friendsCount} />
 						<FriendPlaylistCarousel
 							friendsPlaylists={screen.friendsPlaylists}
 							onPlaylistPress={screen.openPlaylist}
@@ -57,7 +54,7 @@ export function HomeView({ screen, nearbyEvents, similarProfiles, actionsFor }: 
 			)}
 			<View style={styles.section}>
 				<SectionHeader
-					icon="globe"
+					icon={GlobeSolid}
 					title="Playlists publiques"
 					count={screen.publicPlaylists.length}
 					open={screen.publicOpen}
@@ -74,7 +71,7 @@ export function HomeView({ screen, nearbyEvents, similarProfiles, actionsFor }: 
 						/>
 					) : (
 						<EmptyState
-							icon="globe"
+							icon={GlobeSolid}
 							message="Aucune playlist publique disponible"
 							compact={isWide}
 						/>

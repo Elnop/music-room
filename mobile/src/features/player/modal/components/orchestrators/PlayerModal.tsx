@@ -9,7 +9,7 @@ export function PlayerModal() {
 	const modal = usePlayerModal();
 	const gestures = usePlayerModalGestures(modal.isModalOpen, modal.closeModal);
 	const seek = useSeekPosition(modal.currentTime, modal.handleSeek);
-	const carousel = useArtworkCarousel(modal.track?.id ?? null);
+	const carousel = useArtworkCarousel(modal.track, modal.artworkUrl);
 
 	return <PlayerModalView modal={modal} gestures={gestures} seek={seek} carousel={carousel} />;
 }

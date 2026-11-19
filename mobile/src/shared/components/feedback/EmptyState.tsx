@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
+import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
-import { keycap } from '@/shared/theme/pixelFrame';
+import { displayText, keycap } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Text } from '@/shared/components/ui/Text';
@@ -15,10 +15,9 @@ interface EmptyStateAction {
 
 interface EmptyStateProps {
 	message: string;
-	icon?: PixelSpriteName;
-	/** A button under the message, leading out of the empty state. */
+	icon?: PixelIconSource;
 	action?: EmptyStateAction;
-	/** A section's empty state among others (wide screens): it keeps to its content's height. */
+	/** Among other sections on wide screens: keeps to its content's height. */
 	compact?: boolean;
 	style?: StyleProp<ViewStyle>;
 }
@@ -31,7 +30,7 @@ export function EmptyState({ message, icon, action, compact = false, style }: Em
 		<View style={[styles.container, compact && styles.compact, style]}>
 			{icon && (
 				<PixelIcon
-					name={icon}
+					icon={icon}
 					size={compact ? 36 : 60}
 					color={theme.colors.textSecondary}
 					style={[styles.icon, compact && styles.compactIcon]}
@@ -82,8 +81,8 @@ const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.primary,
 		},
 		actionText: {
-			fontSize: theme.typography.sizes.lg,
-			fontFamily: theme.typography.families.semibold,
+			...displayText(theme, theme.typography.sizes.lg, 'button'),
+			textTransform: 'uppercase',
 			color: theme.colors.onColor,
 		},
 	});

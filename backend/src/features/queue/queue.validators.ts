@@ -1,10 +1,9 @@
 import { z } from 'zod';
 import { addTrackSchema } from '@/shared/utils/track-upsert.js';
 
-/** Without `previewUrl`: a stream URL must never be persisted, so a sent one is stripped. */
+/** `previewUrl` is a stream URL: never persisted. */
 export const addQueueItemSchema = addTrackSchema.omit({ previewUrl: true });
 
-/** `next` places the track right after the current item (at the top when nothing is current). */
 export const addQueueItemBodySchema = addQueueItemSchema.extend({
 	next: z.boolean().optional(),
 });
@@ -15,10 +14,9 @@ export const queueOwnerParamsSchema = z.object({
 
 const playbackBodySchema = z.object({ deviceId: z.string().min(1).max(128).optional() });
 
-/** The owner's device that must play; a delegate must send it. */
 export const queuePlaybackSchema = playbackBodySchema.optional().transform(body => body ?? {});
 
-/** `startTrackId` is a track of the playlist (its `id` in the playlist's `tracks`); without it, the first plays. */
+/** `startTrackId` is the track's `id` in the playlist's `tracks`. */
 export const queuePlayPlaylistSchema = playbackBodySchema
 	.extend({
 		startTrackId: z.uuid('Invalid playlist track ID format').optional(),
@@ -38,14 +36,14 @@ export const queuePlaylistParamsSchema = z.object({
 		.meta({ param: { description: 'Id of a playlist you can view' } }),
 });
 
-/** `afterItemId` null = right after the current item. */
+/** `afterItemId` null: right after the current item. */
 export const moveQueueItemSchema = z.object({
 	afterItemId: z.uuid('Invalid queue item ID format').nullable(),
 });
 
 const deviceIdSchema = z.string().min(1).max(128);
 
-/** `playing` is an item of my queue or a track played outside it; `source` is the remote device to pause. */
+/** `source` is the remote device to pause. */
 export const transferSchema = z.object({
 	targetUserId: z.uuid('Invalid user ID format'),
 	targetDeviceId: deviceIdSchema,

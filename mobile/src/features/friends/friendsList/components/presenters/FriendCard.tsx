@@ -8,6 +8,8 @@ import type { FriendProfile } from '@/features/friends/types';
 import { ControlSwitch } from './ControlSwitch';
 import { createFriendsListStyles } from './friendsListStyles';
 import { Text } from '@/shared/components/ui/Text';
+import AngleRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/angle-right-solid.svg';
+import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
 interface FriendCardProps {
 	friend: FriendProfile;
@@ -18,7 +20,6 @@ interface FriendCardProps {
 	onToggleControl: (friendId: string, currentValue: boolean) => void;
 }
 
-/** A friend on wide screens: the card opens the profile, its footer says what the switch grants. */
 export function FriendCard({
 	friend,
 	canControl,
@@ -50,11 +51,11 @@ export function FriendCard({
 						</Text>
 					)}
 				</View>
-				<PixelIcon name="right" size={20} color={theme.colors.textSecondary} />
+				<PixelIcon icon={AngleRightSolid} size={20} color={theme.colors.textSecondary} />
 			</Pressable>
 			<View style={styles.cardFooter}>
 				<PixelIcon
-					name="note"
+					icon={MusicSolid}
 					size={14}
 					color={canControl ? theme.colors.primary : theme.colors.textSecondary}
 				/>

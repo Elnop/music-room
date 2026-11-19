@@ -16,14 +16,12 @@ export type DetailNavigation = NativeStackNavigationProp<PlaylistStackParamList,
 export interface PlaylistDetailScreen {
 	id: string;
 	playlist: PlaylistWithTracks | undefined;
-	/** Why the playlist could not be shown; null while it loads or once shown. */
 	failure: 'notFound' | 'error' | null;
 	retry: () => void;
 	isRefreshing: boolean;
 	refresh: () => void;
 	/** Set before this screen deletes the playlist: its own `playlist:deleted` is not news. */
 	markDeleting: (deleting: boolean) => void;
-	/** Leaves for the list after the playlist was deleted, and forgets it. */
 	leaveDeleted: () => void;
 	bottomPadding: number;
 }

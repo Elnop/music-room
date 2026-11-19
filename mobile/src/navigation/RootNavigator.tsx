@@ -26,11 +26,10 @@ export function RootNavigator() {
 	const loadFromStorage = useAuthStore(state => state.loadFromStorage);
 	const [isReady, setIsReady] = useState(false);
 	const navigationRef = useNavigationContainerRef<AppTabsParamList>();
-	// zumik:// links; read at each link so a link received signed out waits for sign-in
+	// A getter: each link reads the session it arrives in.
 	const linking = useMemo(() => createLinking(() => useAuthStore.getState().isAuthenticated), []);
 
-	// react-navigation's own light default would flash white behind the screens
-	// of the dark theme during transitions.
+	// react-navigation's light default would flash white behind dark screens during transitions.
 	const { theme } = useTheme();
 	const navigationTheme = useMemo(() => {
 		const base = isDarkBackground(theme.colors.background) ? DarkTheme : DefaultTheme;
@@ -55,7 +54,7 @@ export function RootNavigator() {
 	useMusicControlEmitter();
 
 	useEffect(() => {
-		// The backend address must be known before the first request (token refresh)
+		// The backend address must be known before the first request (token refresh).
 		loadBackendUrl()
 			.then(() => loadFromStorage())
 			.then(async () => {
@@ -82,7 +81,6 @@ export function RootNavigator() {
 		}
 	}, [isAuthenticated, connectSocket, disconnectSocket]);
 
-	// A link opened while signed out: the app navigator is mounted once signed in.
 	useEffect(() => {
 		if (isAuthenticated) openPendingLink(navigationRef);
 	}, [isAuthenticated, navigationRef]);

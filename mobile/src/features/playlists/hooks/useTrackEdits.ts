@@ -26,7 +26,6 @@ interface MoveVariables {
 	afterRank: string | null;
 }
 
-/** Moves a track, queued behind the previous move (utils/trackMoves.ts). */
 export function useMoveTrack() {
 	const client = useQueryClient();
 	return useMutation({

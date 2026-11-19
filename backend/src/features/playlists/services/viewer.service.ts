@@ -5,7 +5,6 @@ import { fetchSingle } from '@/shared/utils/database.helpers.js';
 import { checkOwnership } from '@/features/playlists/permissions/playlist.permissions.js';
 import * as realtime from '@/realtime/emitters/playlist.emitters.js';
 
-/** Adds a viewer; the owner and collaborators cannot be added. */
 export async function addViewer(
 	playlistId: string,
 	userId: string,

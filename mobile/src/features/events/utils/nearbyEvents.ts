@@ -27,7 +27,6 @@ export function nearbyByGps(
 
 export interface NearbyItem {
 	event: MusicEvent;
-	/** "Tout près" for a beacon heard, else the GPS distance. */
 	proximity: string;
 }
 

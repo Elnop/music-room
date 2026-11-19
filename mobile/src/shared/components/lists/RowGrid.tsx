@@ -5,7 +5,6 @@ import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { Theme } from '@/shared/theme/types';
 import { rowColumns } from '@/shared/utils/gridLayout';
 
-/** List rows as they are on the phone, side by side as cards on wider screens. */
 export function RowGrid({ children }: { children: React.ReactNode }) {
 	const { styles } = useThemedStyles(createStyles);
 	const columns = rowColumns(useBreakpoint().breakpoint);

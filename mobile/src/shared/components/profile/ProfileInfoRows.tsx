@@ -9,7 +9,6 @@ export interface ProfileInfoRow {
 	value: string;
 }
 
-/** A profile's facts, label on the left and value on the right, divided by a rule. */
 export function ProfileInfoRows({ rows }: { rows: ProfileInfoRow[] }) {
 	const { styles } = useThemedStyles(createStyles);
 

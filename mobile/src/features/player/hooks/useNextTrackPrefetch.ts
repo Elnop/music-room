@@ -8,13 +8,16 @@ import { nextItem } from '@/shared/utils/queueNavigation';
 import { streamPrefetch } from '@/features/player/services/streamPrefetch';
 import { fetchStreamUrl } from '@/features/player/services/streamApi';
 import { trackToSoundCloud } from '@/shared/utils/trackToSoundCloud';
-import { FETCH_TIMEOUT_MS, PREFETCH_WINDOW_S } from '@/features/player/constants';
+import {
+	FETCH_TIMEOUT_MS,
+	PREFETCH_AFTER_PLAYED_S,
+	PREFETCH_WINDOW_S,
+} from '@/features/player/constants';
 
 function playsLocally(): boolean {
 	return isLocalTarget();
 }
 
-/** Only for a track played locally, in its last PREFETCH_WINDOW_S seconds. */
 export function useNextTrackPrefetch(player: AudioPlayer): void {
 	const status = useAudioPlayerStatus(player);
 	const isPlaying = usePlayerStore(state => state.playbackState === 'playing');
@@ -41,7 +44,9 @@ export function useNextTrackPrefetch(player: AudioPlayer): void {
 	const ownStatus = status !== undefined && status.id === player?.id;
 	const duration = ownStatus ? (status.duration ?? 0) : 0;
 	const currentTime = ownStatus ? (status.currentTime ?? 0) : 0;
-	const inWindow = duration > 0 && duration - currentTime <= PREFETCH_WINDOW_S;
+	const inWindow =
+		duration > 0 &&
+		(currentTime >= PREFETCH_AFTER_PLAYED_S || duration - currentTime <= PREFETCH_WINDOW_S);
 
 	useEffect(() => {
 		const held = streamPrefetch.peek();

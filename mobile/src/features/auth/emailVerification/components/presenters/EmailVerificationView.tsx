@@ -3,6 +3,7 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
+import { displayText } from '@/shared/theme/pixelFrame';
 import { CodeInput } from '@/features/auth/code/components/presenters/CodeInput';
 import type { EmailVerification } from '@/features/auth/emailVerification/hooks/useEmailVerification';
 import { Text } from '@/shared/components/ui/Text';
@@ -131,11 +132,19 @@ const createStyles = (theme: Theme) =>
 			backgroundColor: theme.colors.primary,
 		},
 		buttonDisabled: { opacity: 0.5 },
-		buttonText: { fontSize: 16, fontFamily: FONT_FAMILIES.semibold, color: theme.colors.background },
+		buttonText: {
+			...displayText(theme, 16, 'button'),
+			textTransform: 'uppercase',
+			color: theme.colors.background,
+		},
 		resendContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
 		resendText: { fontSize: 14, color: theme.colors.textSecondary },
 		resendLink: { fontSize: 14, fontFamily: FONT_FAMILIES.semibold, color: theme.colors.primary },
 		resendLinkDisabled: { color: theme.colors.textSecondary },
 		backButton: { marginTop: 8 },
-		backText: { fontSize: 14, fontFamily: FONT_FAMILIES.semibold, color: theme.colors.textSecondary },
+		backText: {
+			fontSize: 14,
+			fontFamily: FONT_FAMILIES.semibold,
+			color: theme.colors.textSecondary,
+		},
 	});

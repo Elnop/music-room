@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { userSummarySchema } from '@/shared/users/user-summary.js';
 
-/** Accepts every input form of the Postgres `uuid` type (optional hyphens and braces), as the lookup used to. */
+/** Accepts every input form of the Postgres `uuid` type (optional hyphens, braces), as before validation existed. */
 export const friendUserParamsSchema = z.object({
 	userId: z
 		.string()

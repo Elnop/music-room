@@ -9,7 +9,6 @@ interface ScreenLayoutArgs {
 	children: React.ReactElement;
 }
 
-/** A navigator's `screenLayout`: centres each screen at its width on wide screens. */
 export const screenLayout =
 	(besideSidebar: boolean) =>
 	({ route, children }: ScreenLayoutArgs) => {
@@ -26,5 +25,5 @@ export const screenLayout =
 		);
 	};
 
-/** A navigator's `header` on wide screens: the phone keeps the native one. */
+/** Wide screens only: the phone keeps the native header. */
 export const screenHeader = (props: NativeStackHeaderProps) => <AlignedHeader {...props} />;

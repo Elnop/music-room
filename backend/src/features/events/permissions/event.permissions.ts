@@ -17,7 +17,6 @@ export async function loadOwnedEvent(eventId: string, userId: string): Promise<E
 	return event;
 }
 
-/** A linked playlist must be public and belong to the event's creator. */
 export async function assertLinkablePlaylist(playlistId: string, userId: string): Promise<void> {
 	const { data: playlist, error } = await supabaseAdmin
 		.from('playlists')

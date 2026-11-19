@@ -11,13 +11,11 @@ import {
 import { hapticSelection, hapticSuccess, hapticTap } from '@/shared/utils/haptics';
 import { useIconTooltip } from '@/shared/hooks/useIconTooltip';
 
-/** The opacity of every pressable element while it is held down. */
 export const PRESSED_OPACITY = 0.7;
 
-/** Under a mouse pointer (web); the browser already shows the hand cursor on an enabled pressable. */
+/** Opacity only: the browser already shows the hand cursor on an enabled pressable. */
 export const HOVERED_OPACITY = 0.85;
 
-/** react-native-web adds the pointer state; native platforms never set it. */
 type PressState = PressableStateCallbackType & { hovered?: boolean };
 
 export const pressableStyle = (
@@ -37,14 +35,12 @@ const HAPTICS = {
 } as const;
 
 interface PressableProps extends Omit<NativePressableProps, 'style' | 'accessibilityLabel'> {
-	/** What a screen reader announces; required so no control is silent. */
+	/** Required, so no control is silent for a screen reader. */
 	accessibilityLabel: string;
 	style?: StyleProp<ViewStyle>;
-	/** Haptic feedback fired on press; none by default. */
 	haptic?: keyof typeof HAPTICS;
 }
 
-/** The app's only touchable primitive; gestures (swipe, drag) stay on react-native-gesture-handler. */
 export function Pressable({
 	style,
 	haptic,

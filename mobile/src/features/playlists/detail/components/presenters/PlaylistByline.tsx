@@ -7,8 +7,8 @@ import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { headerFacts } from '@/features/playlists/detail/utils/headerFacts';
 import type { PlaylistWithTracks } from '@/features/playlists/types';
 import { Text } from '@/shared/components/ui/Text';
+import UsersSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/users-solid.svg';
 
-/** Who owns the playlist, how many tracks it has and who edits it, on one line (wide screens). */
 export function PlaylistByline({ playlist }: { playlist: PlaylistWithTracks }) {
 	const { styles, theme } = useThemedStyles(createStyles);
 	const { trackLabel, ownerName, collaboratorLabel } = headerFacts(playlist);
@@ -24,7 +24,7 @@ export function PlaylistByline({ playlist }: { playlist: PlaylistWithTracks }) {
 			{collaboratorLabel && (
 				<>
 					<Text style={styles.separator}>•</Text>
-					<PixelIcon name="crew" size={14} color={theme.colors.primary} />
+					<PixelIcon icon={UsersSolid} size={14} color={theme.colors.primary} />
 					<Text style={styles.collaborators}>{collaboratorLabel}</Text>
 				</>
 			)}

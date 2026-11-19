@@ -17,7 +17,6 @@ import {
 
 const router = Router();
 
-// IP blacklist first, then the global rate limiter as a safety net.
 router.use(checkIPBlacklist);
 router.use(globalAuthRateLimiter);
 

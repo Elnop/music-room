@@ -9,6 +9,7 @@ import { DeviceCard } from './DeviceCard';
 import { MyDevicesHeader } from './MyDevicesHeader';
 import { MyDevicesLoadingView } from './MyDevicesLoadingView';
 import { MyDevicesErrorView } from './MyDevicesErrorView';
+import PhoneRingingLowSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/phone-ringing-low-solid.svg';
 
 interface MyDevicesViewProps {
 	isLoading: boolean;
@@ -17,7 +18,7 @@ interface MyDevicesViewProps {
 	bottomPadding: number;
 	devices: UserDeviceWithLicenses[];
 	friends: FriendUserSummary[];
-	allDevicesIds: Set<string>;
+	allDevicesFriendIds: Set<string>;
 	currentDeviceId: string | null;
 	licensed: Set<string>;
 	pending: Set<string>;
@@ -35,7 +36,7 @@ export function MyDevicesView({
 	bottomPadding,
 	devices,
 	friends,
-	allDevicesIds,
+	allDevicesFriendIds,
 	currentDeviceId,
 	licensed,
 	pending,
@@ -76,7 +77,7 @@ export function MyDevicesView({
 
 				{devices.length === 0 ? (
 					<EmptyState
-						icon="phone"
+						icon={PhoneRingingLowSolid}
 						style={styles.emptyState}
 						message="Aucun appareil. Ouvrez Zumik sur un appareil pour le voir ici."
 					/>
@@ -87,7 +88,7 @@ export function MyDevicesView({
 							device={device}
 							isCurrent={device.deviceId === currentDeviceId}
 							friends={friends}
-							allDevicesIds={allDevicesIds}
+							allDevicesFriendIds={allDevicesFriendIds}
 							licensed={licensed}
 							pending={pending}
 							pairKey={pairKey}

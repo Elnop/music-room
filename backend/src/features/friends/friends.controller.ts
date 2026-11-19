@@ -9,7 +9,7 @@ import { friendUserParamsSchema } from '@/features/friends/friends.validators.js
 
 const userOf = (req: Request) => (req as AuthenticatedRequest).user.id;
 
-/** A malformed `:userId` is answered with `invalid`, as the database lookup did before validation existed. */
+/** A malformed id keeps the error each route answered before validation existed. */
 function targetOf(req: Request, invalid: () => AppError): string {
 	const parsed = friendUserParamsSchema.safeParse(req.params);
 	if (!parsed.success) throw invalid();

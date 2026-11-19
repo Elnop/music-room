@@ -4,9 +4,7 @@ interface KeyState {
 }
 
 export interface LatestThrottle {
-	/** Run `run` now if the key's window is closed, else keep it as the key's latest call. */
 	submit(key: string, run: () => void): void;
-	/** Drop the key's pending call, timer and window. */
 	cancel(key: string): void;
 }
 

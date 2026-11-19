@@ -6,6 +6,7 @@ import { LibraryView } from '@/features/playlists/library/components/presenters/
 import { HeaderIconButton } from '@/features/playlists/header/components/presenters/HeaderIconButton';
 import { usePlaylistCardMenu } from '@/features/playlists/cardMenu/hooks/usePlaylistCardMenu';
 import { PlaylistCardMenu } from '@/features/playlists/cardMenu/components/orchestrators/PlaylistCardMenu';
+import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
 
 type LibraryOrchestratorProps = NativeStackScreenProps<PlaylistStackParamList, 'Playlists'>;
 
@@ -18,7 +19,7 @@ export function LibraryOrchestrator({ navigation }: LibraryOrchestratorProps) {
 		navigation.setOptions({
 			headerRight: () => (
 				<HeaderIconButton
-					icon="plus"
+					icon={PlusSolid}
 					size={28}
 					onPress={createPlaylist}
 					accessibilityLabel="Créer une playlist"

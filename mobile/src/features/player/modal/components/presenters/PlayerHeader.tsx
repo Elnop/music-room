@@ -2,20 +2,31 @@ import React from 'react';
 import { View } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
+import { Text } from '@/shared/components/ui/Text';
+import { useTheme } from '@/shared/theme/ThemeContext';
 import { HEADER_HIT_SLOP, type createStyles } from './playerModalStyles';
+import ChevronDownSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/chevron-down-solid.svg';
+import TimesSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/times-solid.svg';
 
 interface PlayerHeaderProps {
 	styles: ReturnType<typeof createStyles>;
 	colors: {
-		text: string;
 		textSecondary: string;
 	};
 	/** A dialog closes with ×, without the swipe handle of the phone's sheet. */
 	dialog?: boolean;
+	isLoading?: boolean;
 	onClose: () => void;
 }
 
-export function PlayerHeader({ styles, colors, dialog = false, onClose }: PlayerHeaderProps) {
+export function PlayerHeader({
+	styles,
+	colors,
+	dialog = false,
+	isLoading = false,
+	onClose,
+}: PlayerHeaderProps) {
+	const { theme } = useTheme();
 	return (
 		<View style={styles.header}>
 			<View style={styles.swipeIndicator}>
@@ -36,13 +47,19 @@ export function PlayerHeader({ styles, colors, dialog = false, onClose }: Player
 			>
 				<View style={styles.headerButton}>
 					{dialog ? (
-						<PixelIcon name="close" size={24} color={colors.text} />
+						<PixelIcon icon={TimesSolid} size={24} color={theme.colors.text} />
 					) : (
-						<PixelIcon name="down" color={colors.text} />
+						<PixelIcon icon={ChevronDownSolid} color={theme.colors.text} />
 					)}
 				</View>
 			</Pressable>
-
+			{isLoading && (
+				<View style={styles.loadingContainer} pointerEvents="none">
+					<Text style={[styles.loadingText, { color: colors.textSecondary }]}>
+						Chargement du flux audio…
+					</Text>
+				</View>
+			)}
 		</View>
 	);
 }

@@ -12,9 +12,8 @@ interface PlaylistFormViewProps {
 	bottomPadding: number;
 }
 
-/** Name and description; visibility and edit rights on creation only. */
 export function PlaylistFormView({ form, bottomPadding }: PlaylistFormViewProps) {
-	const { styles, theme } = useThemedStyles(createStyles);
+	const { styles } = useThemedStyles(createStyles);
 
 	return (
 		<View style={styles.screen}>

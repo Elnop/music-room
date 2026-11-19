@@ -4,14 +4,12 @@ import type { AddressInfo } from 'node:net';
 import express from 'express';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-// Limiting on so the services' cooldowns are real; loopback whitelisted so the
-// route-level limiters (not under test here) skip these requests.
+// Loopback whitelisted so the route-level limiters skip these requests.
 vi.hoisted(() => {
 	process.env.RATE_LIMIT_ENABLED = 'true';
 	process.env.RATE_LIMIT_WHITELIST_IPS = '127.0.0.1,::1,::ffff:127.0.0.1';
 });
 
-// Never send real mail; read the codes from the mock instead.
 vi.mock('@/features/mail/services/mail.service.js', () => ({
 	sendVerificationEmail: vi.fn().mockResolvedValue(undefined),
 	sendPasswordResetEmail: vi.fn().mockResolvedValue(undefined),
@@ -24,9 +22,6 @@ const { sendVerificationEmail, sendPasswordResetEmail } =
 	await import('@/features/mail/services/mail.service.js');
 const { default: authRouter } = await import('@/features/auth/auth.routes.js');
 const { errorHandler } = await import('@/shared/middleware/error-handler.js');
-
-// The email/password journey end to end, through HTTP on the real auth router against the local
-// Supabase stack and test Redis.
 
 const PASSWORD = 'Flow-password-75';
 const NEW_PASSWORD = 'Flow-renewed-75';
@@ -64,7 +59,7 @@ describe('email/password auth flow (#75)', () => {
 					`failed_login:${e}:*`,
 					`account_locked:${e}:*`,
 				]);
-				// Failed logins also count per IP (shared/security/ip-reputation.ts).
+				// ip-reputation also counts failed logins per IP.
 				patterns.push('ip_failed_logins:*127.0.0.1', 'ip_failed_logins:::1');
 				patterns.push(...userIds.map(id => `email_*${id}*`));
 				for (const pattern of patterns) {
@@ -129,8 +124,7 @@ describe('email/password auth flow (#75)', () => {
 		expect(data.requiresVerification).toBe(true);
 		expect(accessToken(registered.body)).toBeUndefined();
 
-		// The auth user stays unconfirmed until the code is verified; the right password gets
-		// 403 EMAIL_NOT_VERIFIED with what the app needs to resend.
+		// Unconfirmed until the code is verified: only the right password gets 403 EMAIL_NOT_VERIFIED.
 		const wrongPassword = await post('login', { email, password: `${PASSWORD}-wrong` });
 		expect(wrongPassword.status).toBe(401);
 		expect(errorCode(wrongPassword.body)).toBe('INVALID_CREDENTIALS');

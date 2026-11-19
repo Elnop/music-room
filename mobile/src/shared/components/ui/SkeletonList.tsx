@@ -4,7 +4,6 @@ import { View, type StyleProp, type ViewStyle } from 'react-native';
 interface SkeletonListProps {
 	count?: number;
 	row: React.ComponentType;
-	/** Placeholder drawn above the rows, inside the same announcement. */
 	header?: React.ReactNode;
 	style?: StyleProp<ViewStyle>;
 }

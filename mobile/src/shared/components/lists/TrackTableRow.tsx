@@ -12,10 +12,13 @@ import type { Track } from '@/types/track.types';
 import { TrackActionsButton } from './TrackActionsButton';
 import { trackTableColumns as columns } from './trackTableLayout';
 import { Text } from '@/shared/components/ui/Text';
+import BarsSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/bars-solid.svg';
+import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
+import PlaySolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/play-solid.svg';
+import SoundOnSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/sound-on-solid.svg';
 
 interface TrackTableRowProps {
 	track: Track;
-	/** Its number in the list, from 1. */
 	position: number;
 	isCurrent: boolean;
 	isPending: boolean;
@@ -26,7 +29,6 @@ interface TrackTableRowProps {
 	onDragStart?: () => void;
 }
 
-/** A track as a table row on wide screens: the pointer over it shows play and the drag handle. */
 export function TrackTableRow({
 	track,
 	position,
@@ -71,10 +73,10 @@ export function TrackTableRow({
 							accessibilityLabel="Lancement"
 						/>
 					) : showPlay ? (
-						<PixelIcon name="play" size={16} color={theme.colors.text} />
+						<PixelIcon icon={PlaySolid} size={16} color={theme.colors.text} />
 					) : isCurrent ? (
 						<PixelIcon
-							name="volume"
+							icon={SoundOnSolid}
 							size={16}
 							color={theme.colors.primary}
 							accessibilityLabel="En cours de lecture"
@@ -88,7 +90,7 @@ export function TrackTableRow({
 						<Image source={{ uri: track.albumArt }} style={styles.albumArt} />
 					) : (
 						<View style={[styles.albumArt, styles.albumArtPlaceholder]}>
-							<PixelIcon name="note" size={18} color={theme.colors.textSecondary} />
+							<PixelIcon icon={MusicSolid} size={18} color={theme.colors.textSecondary} />
 						</View>
 					)}
 					<Text style={[styles.title, isCurrent && styles.titleCurrent]} numberOfLines={1}>
@@ -116,7 +118,7 @@ export function TrackTableRow({
 						style={[styles.dragHandle, !hovered && !isDragActive && styles.dragHandleIdle]}
 						accessibilityLabel="Réordonner"
 					>
-						<PixelIcon name="grip" size={22} color={theme.colors.textSecondary} />
+						<PixelIcon icon={BarsSolid} size={22} color={theme.colors.textSecondary} />
 					</Pressable>
 				)}
 			</View>

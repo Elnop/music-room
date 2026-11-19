@@ -13,7 +13,6 @@ interface ProfileSectionProps {
 		label: string;
 		onPress: () => void;
 	};
-	/** Wide screens: a larger title, read as the heading of the page's section. */
 	prominent?: boolean;
 }
 

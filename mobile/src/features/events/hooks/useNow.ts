@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 
-/** The current time, refreshed every `intervalMs`. */
 export function useNow(intervalMs: number): number {
 	const [now, setNow] = useState(Date.now);
 

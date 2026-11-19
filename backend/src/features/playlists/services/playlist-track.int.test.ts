@@ -4,9 +4,6 @@ import { supabaseAdmin } from '@/shared/config/supabase.js';
 import { AppError } from '@/shared/middleware/error-handler.js';
 import type { TrackUpsertInput } from '@/shared/utils/track-upsert.js';
 
-// Service layer on top of migration 016 (the RPCs are covered by track-operations.int.test.ts):
-// permissions, added_by, result shapes, error mapping and concurrent calls.
-
 const { notifyPlaylistUpdate } = vi.hoisted(() => ({ notifyPlaylistUpdate: vi.fn() }));
 vi.mock('@/realtime/emitters/playlist.emitters.js', () => ({
 	notifyPlaylistUpdate,
@@ -246,7 +243,6 @@ describe('playlist-track.service on atomic operations', () => {
 		]);
 
 		const refusals = results.flatMap(r => (r.status === 'rejected' ? [r.reason as AppError] : []));
-		// Only the second move of trackIds[3] may lose, and only with the documented code.
 		expect(refusals).toHaveLength(1);
 		expect(refusals[0]).toMatchObject({ statusCode: 409, code: 'TRACK_MOVED_CONCURRENTLY' });
 

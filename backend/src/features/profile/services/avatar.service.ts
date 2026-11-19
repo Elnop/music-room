@@ -8,15 +8,14 @@ import {
 } from '@/shared/storage/public-image.js';
 import type { AvatarResponse } from '@/features/profile/profile.types.js';
 
-/** Public bucket, created by migration 027. */
 export const AVATAR_BUCKET = 'avatars';
 
-/** Only paths this backend stored for userId (`<userId>/<uuid>.<ext>`) are ever deleted. */
+/** Only paths this backend stored for userId are ever deleted. */
 export function ownedAvatarPath(url: string | null | undefined, userId: string): string | null {
 	return storedImagePath(url, AVATAR_BUCKET, userId);
 }
 
-/** Deletes the photo at previousUrl when it is ours and no longer the avatar. Never throws. */
+/** Never throws. */
 export async function deleteReplacedAvatar(
 	previousUrl: string | null | undefined,
 	currentUrl: string | null | undefined,
@@ -50,7 +49,6 @@ async function setAvatarUrl(userId: string, avatarUrl: string | null): Promise<v
 	}
 }
 
-/** The previous photo is deleted when it was stored here; an external one is left alone. */
 export async function uploadAvatar(userId: string, file: Buffer): Promise<AvatarResponse> {
 	const previousUrl = await currentAvatarUrl(userId);
 	const { path, publicUrl: avatarUrl } = await storeImage(AVATAR_BUCKET, userId, file, {
@@ -61,7 +59,6 @@ export async function uploadAvatar(userId: string, file: Buffer): Promise<Avatar
 	try {
 		await setAvatarUrl(userId, avatarUrl);
 	} catch (error) {
-		// The new file is not referenced anywhere: remove it.
 		await removeStoredImage(AVATAR_BUCKET, path, { userId });
 		throw error;
 	}
@@ -72,7 +69,6 @@ export async function uploadAvatar(userId: string, file: Buffer): Promise<Avatar
 	return { avatarUrl };
 }
 
-/** Also deletes the photo when it was stored here. */
 export async function removeAvatar(userId: string): Promise<AvatarResponse> {
 	const previousUrl = await currentAvatarUrl(userId);
 	await setAvatarUrl(userId, null);

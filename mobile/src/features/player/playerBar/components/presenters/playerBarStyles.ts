@@ -34,8 +34,7 @@ export const createStyles = (theme: Theme) =>
 			minWidth: 0,
 			gap: theme.spacing.sm,
 		},
-		artwork: {
-		},
+		artwork: {},
 		info: {
 			flexShrink: 1,
 			minWidth: 0,

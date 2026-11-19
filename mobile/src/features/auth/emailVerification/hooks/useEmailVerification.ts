@@ -9,7 +9,6 @@ import {
 	useVerifyEmailMutation,
 } from '@/features/auth/hooks/useSignInMutations';
 
-/** Wait before another code may be sent, in seconds. */
 const RESEND_COOLDOWN_S = 60;
 
 export interface EmailVerification {
@@ -20,7 +19,6 @@ export interface EmailVerification {
 	isVerifying: boolean;
 	resend: () => void;
 	isResending: boolean;
-	/** Seconds before the code may be sent again. */
 	cooldown: number;
 	/** The last verify or resend failure, or a code that is too short. */
 	error: string | null;

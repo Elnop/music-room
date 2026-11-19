@@ -1,6 +1,7 @@
 import { logger } from '@/shared/utils/logger.js';
 
-/** Lazy import keeps Socket.io out of the friends feature and avoids a cycle; never throws, so eviction cannot fail the unfollow. */
+// Lazy imports avoid a cycle with realtime; errors are only logged so they never fail the unfollow.
+
 export async function revalidateListeningAccess(
 	controllerId: string,
 	ownerId: string
@@ -13,7 +14,6 @@ export async function revalidateListeningAccess(
 	}
 }
 
-/** Emits `permission:changed` to controllerId and evicts it once no owner device stays controllable; same lazy import, never throws. */
 export async function notifyListeningAccessChange(
 	controllerId: string,
 	ownerId: string,

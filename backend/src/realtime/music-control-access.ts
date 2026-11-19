@@ -8,9 +8,6 @@ import { socketLogger } from '@/shared/middleware/socket-logger.middleware.js';
 import { logger } from '@/shared/utils/logger.js';
 import type { AppSocketServer } from '@/realtime/socket-auth.js';
 
-// Access is per device: mutual friends, plus the owner's all-devices switch or a license on the device.
-// Identity always comes from the socket; unknown payload keys (such as `fromUserId`) are stripped.
-
 export const listeningTargetSchema = z.uuid();
 
 export const controlActionSchema = z.object({
@@ -19,7 +16,7 @@ export const controlActionSchema = z.object({
 	action: z.enum(['play', 'pause']),
 }) satisfies z.ZodType<ControlActionPayload>;
 
-/** Older clients may still send a `device` field: it is stripped, the device comes from the handshake. */
+/** A `device` field from older clients is stripped: the device comes from the handshake. */
 export const listeningUpdateSchema = z.object({
 	track: z
 		.object({
@@ -62,7 +59,6 @@ export function listeningRoom(ownerId: string): string {
 	return `listening:${ownerId}`;
 }
 
-/** After the controller lost access to every device of the owner. Never throws. */
 export function leaveListeningRoom(
 	io: AppSocketServer,
 	controllerId: string,

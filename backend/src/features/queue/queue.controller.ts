@@ -15,8 +15,6 @@ import {
 } from '@/features/queue/queue.validators.js';
 import type { QueueStepDirection } from '@/features/queue/queue.types.js';
 
-// Every route answers the full queue state of its owner: the caller, or `:userId`.
-
 const actorOf = (req: Request) => (req as AuthenticatedRequest).user.id;
 
 const ownerOf = (req: Request) => queueOwnerParamsSchema.parse(req.params).userId ?? actorOf(req);
@@ -68,7 +66,6 @@ export const stepNext = (req: Request, res: Response) => step(req, res, 'next');
 
 export const stepPrevious = (req: Request, res: Response) => step(req, res, 'previous');
 
-/** Always from the caller, never under /api/users/:userId/queue. */
 export async function transfer(req: Request, res: Response) {
 	const input = transferSchema.parse(req.body);
 	sendSuccess(res, await queueTransferService.transfer(actorOf(req), input));

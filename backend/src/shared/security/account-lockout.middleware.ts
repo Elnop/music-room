@@ -5,8 +5,6 @@ import * as accountLockout from '@/shared/security/account-lockout.js';
 import * as ipReputation from '@/shared/security/ip-reputation.js';
 import { requestIp } from '@/shared/security/request-ip.js';
 
-// Apply to the login endpoint after rate limiting.
-
 export async function checkAccountLockout(
 	req: Request,
 	res: Response,

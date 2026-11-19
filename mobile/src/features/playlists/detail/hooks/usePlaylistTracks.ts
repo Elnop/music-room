@@ -9,7 +9,7 @@ import { showError, showInfo, showSuccess } from '@/shared/utils/toast';
 import { toTrackInput } from '@/shared/utils/trackInput';
 import { useMoveTrack, useRemoveTrack } from '@/features/playlists/hooks/useTrackEdits';
 import { usePendingMovesStore } from '@/features/playlists/stores/pendingMovesStore';
-import { isOpen } from '@/features/playlists/utils/playlistCache';
+import { isOnScreen } from '@/features/playlists/utils/playlistCache';
 import { canEditPlaylist } from '@/features/playlists/utils/playlistPermissions';
 import { CONFLICT_MESSAGE, isMoveConflict } from '@/features/playlists/utils/trackMoves';
 import type { PlaylistWithTracks } from '@/features/playlists/types';
@@ -18,16 +18,13 @@ import type { TrackInPlaylist } from '@/types/track.types';
 
 export interface PlaylistTracks {
 	canEdit: boolean;
-	/** Drag is off while a move is on its way. */
 	isMoving: boolean;
-	/** Permalink of the track playing from this playlist's queue block, else null. */
+	/** Only the track playing from this playlist's queue block. */
 	currentUri: string | null;
-	/** The track whose quick actions are open. */
 	actionTrack: AddQueueItemBody | null;
 	showActions: (track: TrackInPlaylist) => void;
 	closeActions: () => void;
 	addToQueue: (track: TrackInPlaylist) => void;
-	/** A tap on an unavailable track, which cannot be played. */
 	explainUnavailable: () => void;
 	deleteTrack: (trackId: string) => Promise<void>;
 	/** Rejects on failure, so the list drops its local order and shows the cached one again. */
@@ -71,7 +68,7 @@ export function usePlaylistTracks(
 			if (!isMoveConflict(error)) {
 				logger.error('[PlaylistDetailScreen] Move track failed:', error);
 				showError(apiErrorMessage(error, 'Impossible de déplacer le titre'));
-			} else if (isOpen(client, id)) {
+			} else if (isOnScreen(client, id)) {
 				// The playlist was reloaded; tell the user only if it is still on screen.
 				showError(CONFLICT_MESSAGE);
 			}

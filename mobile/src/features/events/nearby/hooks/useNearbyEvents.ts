@@ -14,15 +14,12 @@ import type { EventStackParamList, MusicEvent } from '@/features/events/types';
 
 export interface NearbyEvents {
 	items: NearbyItem[];
-	/** Shown when `items` is empty. */
 	notice: NearbyNotice;
-	/** My ongoing and upcoming events, to open and manage them. */
 	mine: MusicEvent[];
 	openEvent: (id: string) => void;
 	createEvent: () => void;
 	requestPermission: () => void;
 	openSettings: () => void;
-	/** Whether Zumik beacons can be heard, besides the GPS. */
 	beaconStatus: BeaconScanStatus;
 	requestBeaconPermission: () => void;
 }

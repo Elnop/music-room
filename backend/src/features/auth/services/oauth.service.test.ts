@@ -20,7 +20,6 @@ const profile = {
 	picture: { data: { url: 'https://example.com/ada.jpg' } },
 };
 
-/** Routes Graph API calls by path: /app and /me. */
 function graph(app: Response, me: Response = graphReply(200, profile)) {
 	fetchMock.mockImplementation(url =>
 		Promise.resolve(new URL(url).pathname.endsWith('/app') ? app : me)

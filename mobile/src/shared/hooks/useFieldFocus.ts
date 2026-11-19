@@ -3,7 +3,7 @@ import { Platform, type TextInputProps } from 'react-native';
 
 type FocusHandlers = Pick<TextInputProps, 'onFocus' | 'onBlur'>;
 
-/** Whether a text field has the focus (web only: native fields keep their look), with the caller's handlers chained. */
+/** Web only: native fields keep their look. */
 export function useFieldFocus({ onFocus, onBlur }: FocusHandlers = {}) {
 	const [focused, setFocused] = useState(false);
 	const focusProps = useMemo<FocusHandlers>(

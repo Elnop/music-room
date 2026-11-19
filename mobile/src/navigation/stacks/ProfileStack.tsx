@@ -13,6 +13,7 @@ import { PrivacyPolicyOrchestrator } from '@/features/legal/privacyPolicy/compon
 import type { ProfileStackParamList } from '@/features/profile/types';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { screenHeader, screenLayout } from '@/navigation/screenLayout';
+import { headerTitle } from '@/shared/theme/pixelFrame';
 
 const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 const layout = screenLayout(true);
@@ -32,9 +33,7 @@ export function ProfileNavigator() {
 				headerBlurEffect: Platform.OS === 'ios' ? 'systemMaterialDark' : undefined,
 				headerTintColor: theme.colors.text,
 				headerShadowVisible: false,
-				headerTitleStyle: {
-					fontFamily: theme.typography.families.bold,
-				},
+				headerTitleStyle: headerTitle(theme),
 				headerTitleAlign: 'center',
 			}}
 		>

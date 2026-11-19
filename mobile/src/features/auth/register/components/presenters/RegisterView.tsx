@@ -14,7 +14,6 @@ interface RegisterViewProps {
 	email: FieldBinding;
 	username: FieldBinding;
 	password: FieldBinding;
-	/** Any sign-up or sign-in is running: the buttons wait. */
 	isLoading: boolean;
 	bottomInset: number;
 	onSubmit: () => void;

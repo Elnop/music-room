@@ -1,21 +1,19 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
+import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { INK, PIXEL } from '@/shared/theme/tokens';
 
 interface HeaderIconButtonProps {
-	icon: PixelSpriteName;
+	icon: PixelIconSource;
 	size: number;
 	onPress: () => void;
 	accessibilityLabel: string;
-	/** For a button that opens a menu: where the menu drops down from on wide screens. */
 	ref?: React.Ref<View>;
 }
 
-/** A 36-point pixel-framed icon button of the native header (`headerRight`). */
 export function HeaderIconButton({
 	icon,
 	size,
@@ -35,7 +33,7 @@ export function HeaderIconButton({
 					{ backgroundColor: theme.colors.background },
 				]}
 			>
-				<PixelIcon name={icon} size={size} color={theme.colors.text} />
+				<PixelIcon icon={icon} size={size} color={theme.colors.text} />
 			</Pressable>
 		</View>
 	);

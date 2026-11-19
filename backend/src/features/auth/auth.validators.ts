@@ -80,8 +80,6 @@ export const resetPasswordSchema = z.object({
 		.meta({ format: 'password' }),
 });
 
-// Response bodies, for the OpenAPI document; auth.types.ts infers its response types from them.
-
 export const userProfileSchema = z.object({
 	id: z.uuid(),
 	email: z.email(),
@@ -102,7 +100,6 @@ const sessionSchema = z.object({
 		.meta({ description: 'Unix timestamp when token expires', example: 1705318200 }),
 });
 
-/** Sign-in answer; register with email verification on gives no session. */
 export const authResultSchema = z.object({
 	user: userProfileSchema,
 	session: sessionSchema.optional(),

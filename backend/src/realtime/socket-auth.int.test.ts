@@ -39,7 +39,7 @@ async function createUser(): Promise<TestUser> {
 		.insert({ id, username: `int_${id.slice(0, 8)}` });
 	if (profileError) throw profileError;
 
-	// Sign in with the anon client, never the admin one.
+	// Never the admin client: signing in would replace its service-role session.
 	const { data: session, error: signInError } = await supabaseAnon.auth.signInWithPassword({
 		email,
 		password: PASSWORD,
@@ -58,7 +58,6 @@ function deviceFields(deviceId = `dev-${randomUUID()}`) {
 	};
 }
 
-/** A syntactically valid JWT whose `exp` is in the past (unsigned). */
 function expiredJwt(sub: string): string {
 	const b64 = (value: object) => Buffer.from(JSON.stringify(value)).toString('base64url');
 	const now = Math.floor(Date.now() / 1000);
@@ -129,16 +128,13 @@ describe('Socket.io handshake authentication', () => {
 		// verifyToken checks the logout denylist and fails closed without Redis.
 		await connectRedis();
 		if (!isRedisConnected()) throw new Error('Redis from scripts/test-db.sh is not reachable');
-		// Invalid-token handshakes below count against 127.0.0.1: start
-		// from a clean counter so repeated runs never reach the limit.
+		// Invalid-token handshakes count against 127.0.0.1: reset so repeated runs stay under the limit.
 		const tokenKeys = await redisClient.keys('rl:auth:token:*');
 		if (tokenKeys.length > 0) await redisClient.del(...tokenKeys);
 
 		alice = await createUser();
 		bob = await createUser();
 
-		// Mutual friends, and follows(bob -> alice, can_control_music): alice
-		// lets bob control her music.
 		const { error } = await supabaseAdmin.from('follows').insert([
 			{ follower_id: bob.id, following_id: alice.id, can_control_music: true },
 			{ follower_id: alice.id, following_id: bob.id },
@@ -329,7 +325,7 @@ describe('Socket.io handshake authentication', () => {
 		await expect(
 			refused(connect({ token: alice.token, ...deviceFields(), platform: 42 }))
 		).resolves.toBe('INVALID_HANDSHAKE');
-		// devices.device_id holds at most 128 characters (015_devices.sql).
+		// devices.device_id holds at most 128 characters.
 		await expect(
 			refused(connect({ token: alice.token, ...deviceFields(), deviceId: 'd'.repeat(129) }))
 		).resolves.toBe('INVALID_HANDSHAKE');

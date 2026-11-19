@@ -30,7 +30,6 @@ async function caught(promise: Promise<unknown>): Promise<unknown> {
 	);
 }
 
-/** supabase.from(table).select(cols).eq(col, value).single() resolves through selectSingle. */
 function builder(table: string) {
 	let columns = '';
 	const query = {

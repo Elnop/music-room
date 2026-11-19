@@ -14,7 +14,6 @@ import type { FriendPlaylists, Playlist, PlaylistStackParamList } from '@/featur
 type Navigation = NativeStackNavigationProp<PlaylistStackParamList, 'Home'>;
 
 export interface HomeScreen {
-	/** Nothing to show yet: the whole screen is a skeleton. */
 	isInitialLoading: boolean;
 	friendsPlaylists: FriendPlaylists[];
 	publicPlaylists: Playlist[];
@@ -24,7 +23,6 @@ export interface HomeScreen {
 	publicOpen: boolean;
 	togglePublic: () => void;
 	openPlaylist: (id: string) => void;
-	/** Space left under the list for the mini player. */
 	bottomPadding: number;
 }
 

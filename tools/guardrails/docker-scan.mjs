@@ -45,21 +45,30 @@ if (spawnSync('docker', ['info'], { stdio: 'ignore' }).status !== 0) {
 if (tool === 'semgrep') {
   // semgrep lists the files to scan with git. In a worktree, .git is a file pointing into the
   // main checkout's .git, so that directory is mounted at the same path too.
-  const gitDir = spawnSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], {
-    cwd: root,
-  });
+  const gitDir = spawnSync(
+    'git',
+    ['rev-parse', '--path-format=absolute', '--git-common-dir', '--absolute-git-dir'],
+    { cwd: root }
+  );
   if (gitDir.status !== 0) {
     console.error(`semgrep: ${gitDir.stderr.toString().trim()}`);
     process.exit(1);
   }
-  const commonGitDir = gitDir.stdout.toString().trim();
+  const [commonGitDir, ownGitDir] = gitDir.stdout.toString().trim().split('\n');
+  const outsideGitDir =
+    commonGitDir === join(root, '.git')
+      ? []
+      : [
+          '-v', `${commonGitDir}:${commonGitDir}:ro`,
+          '-e', `GIT_DIR=${ownGitDir}`, '-e', 'GIT_WORK_TREE=/src',
+        ];
   const outDir = mkdtempSync(join(tmpdir(), 'semgrep-'));
   let status = 1;
   try {
     status = run('docker', [
       'run', '--rm', '--network', 'none',
       '-v', `${root}:/src:ro`, '-w', '/src',
-      ...(commonGitDir === join(root, '.git') ? [] : ['-v', `${commonGitDir}:${commonGitDir}:ro`]),
+      ...outsideGitDir,
       '-v', `${outDir}:/out`,
       SEMGREP_IMAGE,
       'semgrep', 'scan',

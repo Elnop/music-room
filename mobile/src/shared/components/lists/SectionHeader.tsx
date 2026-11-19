@@ -1,22 +1,22 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
+import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { Text } from '@/shared/components/ui/Text';
+import AngleRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/angle-right-solid.svg';
+import ChevronDownSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/chevron-down-solid.svg';
 
 interface SectionHeaderProps {
-	icon: PixelSpriteName;
+	icon: PixelIconSource;
 	/** Read by screen readers; on screen the icon and the count stand for it. */
 	title: string;
-	/** Shown when above 0. */
 	count: number;
-	/** A section that folds: its header toggles it and shows a chevron. */
 	open?: boolean;
 	onToggle?: () => void;
-	/** A control at the end of a section that does not fold, such as a compact button. */
+	/** Only for a section that does not fold. */
 	action?: React.ReactNode;
 }
 
@@ -25,7 +25,7 @@ export function SectionHeader({ icon, title, count, open, onToggle, action }: Se
 
 	const label = (
 		<View style={styles.label}>
-			<PixelIcon name={icon} size={18} color={theme.colors.textSecondary} />
+			<PixelIcon icon={icon} size={18} color={theme.colors.textSecondary} />
 			{count > 0 && <Text style={styles.count}>{count}</Text>}
 		</View>
 	);
@@ -43,7 +43,7 @@ export function SectionHeader({ icon, title, count, open, onToggle, action }: Se
 		<Pressable style={styles.header} onPress={onToggle} accessibilityLabel={title}>
 			{label}
 			<PixelIcon
-				name={open ? 'down' : 'right'}
+				icon={open ? ChevronDownSolid : AngleRightSolid}
 				size={20}
 				color={theme.colors.textSecondary}
 			/>

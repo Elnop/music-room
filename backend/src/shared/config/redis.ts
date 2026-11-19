@@ -9,12 +9,12 @@ const redisConfig = {
 	password: env.REDIS_PASSWORD || undefined,
 	db: parseInt(env.REDIS_DB || '0'),
 	maxRetriesPerRequest: 3,
-	enableOfflineQueue: false, // Commands fail fast while disconnected (fail-closed)
+	// Commands fail at once while disconnected instead of waiting in a queue.
+	enableOfflineQueue: false,
 	lazyConnect: true,
 	autoResubscribe: false,
 	autoResendUnfulfilledCommands: false,
 	retryStrategy(times: number) {
-		// Linear backoff capped at 2s, forever.
 		return Math.min(times * 50, 2000);
 	},
 };
@@ -41,7 +41,6 @@ redisClient.on('ready', () => {
 });
 
 redisClient.on('error', error => {
-	// Log only the first error of an outage; 'ready' logs the recovery.
 	if (hasLoggedError) return;
 	hasLoggedError = true;
 	logger.error('Redis connection failed, retrying until it is back', {
@@ -53,11 +52,6 @@ redisClient.on('error', error => {
 
 redisClient.on('close', () => {
 	isConnected = false;
-	// No logging on close, to avoid spam.
-});
-
-redisClient.on('reconnecting', () => {
-	// No logging on reconnect, to avoid spam.
 });
 
 export async function connectRedis(): Promise<void> {
@@ -74,7 +68,7 @@ export async function connectRedis(): Promise<void> {
 			error: error instanceof Error ? error.message : 'Unknown error',
 			note: 'Authenticated requests answer 503 REVOCATION_UNAVAILABLE until Redis is ready',
 		});
-		// Don't throw: the backend starts even when Redis is down.
+		// No rethrow: the backend starts even when Redis is down.
 	}
 }
 

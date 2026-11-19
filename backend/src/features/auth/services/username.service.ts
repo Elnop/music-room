@@ -10,7 +10,6 @@ async function isTaken(username: string): Promise<boolean> {
 	return Boolean(data);
 }
 
-/** The base is cut so the result, suffix included, fits USERNAME_MAX_LENGTH. */
 export async function generateUniqueUsername(baseName: string): Promise<string> {
 	let username = usernameBase(baseName);
 

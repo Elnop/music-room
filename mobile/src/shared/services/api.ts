@@ -11,9 +11,7 @@ interface ApiResponse<T> {
 		message: string;
 		code: string;
 		details?: unknown;
-		/** Technical reason; sent by the backend in development and test only. */
 		why?: string;
-		/** Hint to fix it; sent by the backend in development and test only. */
 		fix?: string;
 	};
 	meta: {
@@ -21,7 +19,7 @@ interface ApiResponse<T> {
 	};
 }
 
-/** Developer context of an API error, sent by the backend in development and test only. */
+/** Sent by the backend in development and test only. */
 interface ApiErrorDebug {
 	why?: string;
 	fix?: string;
@@ -52,25 +50,19 @@ export class ApiError extends Error {
 	}
 }
 
-/** The backend logs these with every action. */
 function getClientHeaders(): Record<string, string> {
-	const appVersion = getAppVersion();
-
-	const headers = {
+	return {
 		'X-Platform': Platform.OS,
 		'X-Device-Model': getModelName() || getDeviceName() || 'Unknown Device',
-		'X-App-Version': appVersion,
+		'X-App-Version': getAppVersion(),
 	};
-
-	return headers;
 }
 
-/** Refreshes the token on a 401; reads the backend address at call time. */
 export async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
 	const url = `${getBackendUrl()}${endpoint}`;
 
 	const makeRequest = async (authToken?: string): Promise<Response> => {
-		// A FormData body gets its multipart Content-Type (with the boundary) from fetch.
+		// fetch sets a FormData body's multipart Content-Type, boundary included.
 		const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
 		const headers: Record<string, string> = {
 			...(isFormData ? {} : { 'Content-Type': 'application/json' }),
@@ -89,43 +81,28 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
 	};
 
 	try {
-		if (endpoint === '/api/auth/refresh') {
-			const response = await makeRequest();
-			return handleResponse<T>(response);
-		}
-
 		const authSession = getAuthSession();
-		if (!authSession) {
-			const response = await makeRequest();
-			return handleResponse<T>(response);
+		if (endpoint === '/api/auth/refresh' || !authSession) {
+			return handleResponse<T>(await makeRequest());
 		}
 
 		const { isTokenExpiringSoon, refreshAccessToken } = authSession;
-		const getAccessToken = () => getSession().accessToken;
+		const getAccessToken = () => getSession().accessToken || undefined;
 		const accessToken = getAccessToken();
 
 		if (accessToken && isTokenExpiringSoon()) {
 			await refreshAccessToken();
-
-			const response = await makeRequest(getAccessToken() || undefined);
-			return handleResponse<T>(response);
+			return handleResponse<T>(await makeRequest(getAccessToken()));
 		}
 
-		const response = await makeRequest(accessToken || undefined);
+		const response = await makeRequest(accessToken);
 
-		// Refresh only when a session exists: signed out (e.g. a wrong password
-		// at login), the 401 is the backend's answer, not an expired token.
+		// Signed out (a wrong password at login), a 401 is the backend's answer, not an expired token.
 		if (response.status === 401 && accessToken) {
-			const refreshSuccess = await refreshAccessToken();
-
-			if (!refreshSuccess) {
+			if (!(await refreshAccessToken())) {
 				throw new ApiError('Session expirée, reconnectez-vous.', 'SESSION_EXPIRED', undefined, 401);
 			}
-
-			const newAccessToken = getAccessToken();
-			const retryResponse = await makeRequest(newAccessToken || undefined);
-
-			return handleResponse<T>(retryResponse);
+			return handleResponse<T>(await makeRequest(getAccessToken()));
 		}
 
 		return handleResponse<T>(response);
@@ -175,7 +152,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
 				const errorText = await response.text();
 				errorMessage = errorText || errorMessage;
 			} catch {
-				// Ignore text parsing errors
+				// The status text stays the message.
 			}
 		}
 		throw new ApiError(errorMessage, errorCode, errorDetails, response.status, debug);
@@ -207,7 +184,6 @@ async function handleResponse<T>(response: Response): Promise<T> {
 
 const LOCAL_URI = /^(blob|data):/i;
 
-/** Reads a picked or manipulated image (blob: or data: URI) in the browser; refuses any network URL. */
 export async function readLocalBlob(uri: string): Promise<Blob> {
 	if (!LOCAL_URI.test(uri)) {
 		throw new Error(`readLocalBlob only reads blob: and data: URIs, got "${uri.split(':')[0]}:"`);

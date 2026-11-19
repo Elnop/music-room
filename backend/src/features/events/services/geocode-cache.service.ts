@@ -4,8 +4,7 @@ import { logger } from '@/shared/utils/logger.js';
 import { geocodedPlaceSchema } from '@/features/events/events-responses.validators.js';
 import type { GeocodedPlace } from '@/features/events/events.types.js';
 
-// Nominatim's usage policy asks for results to be cached. Fails open: without Redis, every
-// lookup is a miss and still goes through the upstream slot.
+// Nominatim's usage policy asks for a cache. Without Redis every lookup is a miss.
 
 const KEY_PREFIX = 'geocode:';
 const TTL_SECONDS = 7 * 24 * 3600;

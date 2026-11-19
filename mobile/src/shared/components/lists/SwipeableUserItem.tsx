@@ -9,6 +9,7 @@ import type { Theme } from '@/shared/theme/types';
 import { Avatar } from '@/shared/components/media/Avatar';
 import { Text } from '@/shared/components/ui/Text';
 import { FONT_FAMILIES } from '@/shared/theme/fonts';
+import UserMinusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/user-minus-solid.svg';
 
 interface SwipeableUserItemProps {
 	user: {
@@ -26,18 +27,16 @@ export function SwipeableUserItem({ user, role, onRemove }: SwipeableUserItemPro
 	const separator = useSeparatorColor();
 	const styles = React.useMemo(() => createStyles(theme, separator), [theme, separator]);
 
-	const renderRightActions = () => {
-		return (
-			<Pressable
-				style={styles.removeButton}
-				onPress={() => onRemove(user.id)}
-				accessibilityLabel="Retirer"
-			>
-				<PixelIcon name="userRemove" size={24} color={theme.colors.onColor} />
-				<Text style={styles.removeText}>Retirer</Text>
-			</Pressable>
-		);
-	};
+	const renderRightActions = () => (
+		<Pressable
+			style={styles.removeButton}
+			onPress={() => onRemove(user.id)}
+			accessibilityLabel="Retirer"
+		>
+			<PixelIcon icon={UserMinusSolid} size={24} color={theme.colors.onColor} />
+			<Text style={styles.removeText}>Retirer</Text>
+		</Pressable>
+	);
 
 	return (
 		<Swipeable renderRightActions={renderRightActions} overshootRight={false} friction={2}>

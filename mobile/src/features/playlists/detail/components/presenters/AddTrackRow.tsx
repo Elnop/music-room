@@ -5,15 +5,15 @@ import { Text } from '@/shared/components/ui/Text';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
 
-/** « Ajouter un titre », the first row under the header of a playlist an editor sees. */
 export function AddTrackRow({ onPress }: { onPress: () => void }) {
 	const { styles, theme } = useThemedStyles(createStyles);
 
 	return (
 		<Pressable style={styles.row} onPress={onPress} accessibilityLabel="Ajouter un titre">
 			<View style={styles.icon}>
-				<PixelIcon name="plus" size={24} color={theme.colors.textSecondary} />
+				<PixelIcon icon={PlusSolid} size={24} color={theme.colors.textSecondary} />
 			</View>
 			<Text style={styles.text}>Ajouter un titre</Text>
 		</Pressable>

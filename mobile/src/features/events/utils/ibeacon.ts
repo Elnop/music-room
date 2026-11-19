@@ -48,7 +48,6 @@ export function buildIBeaconPayload(frame: IBeaconFrame): number[] {
 	];
 }
 
-/** The frame that announces one event. */
 export function eventBeaconFrame(beaconMinor: number): IBeaconFrame {
 	return {
 		uuid: ZUMIK_BEACON_UUID,
@@ -82,7 +81,6 @@ export function parseIBeacon(data: number[]): IBeaconFrame | null {
 	};
 }
 
-/** The minor of a Zumik event beacon, or null for any other frame. */
 export function zumikBeaconMinor(frame: IBeaconFrame | null): number | null {
 	if (!frame || frame.uuid !== ZUMIK_BEACON_UUID || frame.major !== ZUMIK_BEACON_MAJOR) return null;
 	return frame.minor;

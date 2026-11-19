@@ -279,6 +279,8 @@ Every pressable element goes through `Pressable` or `Button` from `@/shared/comp
 
 The app has a single theme, `original` (`src/shared/theme/original.theme.ts`), read through `useTheme()`; the shared tokens are in `src/shared/theme/tokens.ts`. No hard-coded color outside `src/shared/theme/` (ESLint `guardrails/theme-tokens`): read `theme.colors.*`.
 
+Icons are `PixelIcon` (`src/shared/components/media/PixelIcon.tsx`), which draws an SVG of the [HackerNoon Pixel Icon Library](https://github.com/hackernoon/pixel-icon-library) with `react-native-svg`, filled with the requested colour. Each file imports the SVGs it uses straight from the npm package (`import PlaySolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/play-solid.svg'`) and passes the component: `<PixelIcon icon={PlaySolid} color={...} />`. `react-native-svg-transformer` (`metro.config.cjs`) turns each import into a component. There is no central list: only the icons a screen imports end up in the bundle.
+
 ### Component roles (in-house ESLint plugin)
 
 Component roles are checked automatically, without exception (#386, documentation: `.agents/rules/components.md`):
@@ -328,3 +330,5 @@ Tracked in the repository's GitHub Issues.
 ## License
 
 MIT
+
+The icons come from the HackerNoon Pixel Icon Library, MIT License, Copyright (c) 2023 HackerNoon.

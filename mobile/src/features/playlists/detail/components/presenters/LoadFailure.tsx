@@ -4,9 +4,11 @@ import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { Button } from '@/shared/components/ui/Button';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
+import LockSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/lock-solid.svg';
 
 interface LoadFailureProps {
-	/** Private or deleted (403, 404): no retry. */
+	/** 403 or 404: no retry. */
 	notFound: boolean;
 	onRetry: () => void;
 }
@@ -17,11 +19,11 @@ export function LoadFailure({ notFound, onRetry }: LoadFailureProps) {
 	return (
 		<View style={styles.failure}>
 			{notFound ? (
-				<EmptyState icon="lock" message="Playlist introuvable ou inaccessible" />
+				<EmptyState icon={LockSolid} message="Playlist introuvable ou inaccessible" />
 			) : (
 				<>
 					<EmptyState
-						icon="alert"
+						icon={ExclamationTriangleSolid}
 						message="Impossible de charger la playlist"
 						style={styles.failureMessage}
 					/>

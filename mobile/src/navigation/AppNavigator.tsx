@@ -7,7 +7,7 @@ import type { NavigatorScreenParams } from '@react-navigation/native';
 import { View, StyleSheet, Platform } from 'react-native';
 import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
+import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 
@@ -37,9 +37,13 @@ import { NowPlayingPanel } from '@/features/player/nowPlayingPanel/components/or
 import { useNowPlayingPanelStore } from '@/shared/stores/nowPlayingPanelStore';
 import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import { KeyboardShortcuts } from './KeyboardShortcuts';
+import { headerTitle } from '@/shared/theme/pixelFrame';
+import CassetteTapeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/cassette-tape-solid.svg';
+import HomeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/home-solid.svg';
+import SearchSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/search-solid.svg';
+import UserSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/user-solid.svg';
+import UsersSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/users-solid.svg';
 
-// Playlists and Friends take nested params: zumik:// share links open their screens;
-// Profile's let a playlist open Settings.
 export type AppTabsParamList = {
 	HomeTab: NavigatorScreenParams<PlaylistStackParamList> | undefined;
 	PlaylistsTab: NavigatorScreenParams<PlaylistStackParamList> | undefined;
@@ -52,19 +56,18 @@ export type { FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
 
 const Tab = createBottomTabNavigator<AppTabsParamList>();
 
-// Before any screen renders: the playlists feature plays through it.
+// Registered before any screen renders: the playlists feature plays through them.
 registerPlayback();
 registerMusicControl();
 
-const TAB_ICONS: Record<string, PixelSpriteName> = {
-	HomeTab: 'home',
-	PlaylistsTab: 'tape',
-	SearchTab: 'search',
-	FriendsTab: 'crew',
-	ProfileTab: 'me',
+const TAB_ICONS: Record<string, PixelIconSource> = {
+	HomeTab: HomeSolid,
+	PlaylistsTab: CassetteTapeSolid,
+	SearchTab: SearchSolid,
+	FriendsTab: UsersSolid,
+	ProfileTab: UserSolid,
 };
 
-/** Wide screens move the tabs to a side bar framed by AppTabBar: an icon rail on a tablet, icons and labels on desktop. */
 const sidebarOptions = (
 	breakpoint: Exclude<Breakpoint, 'phone'>,
 	theme: Theme
@@ -111,8 +114,7 @@ export function AppNavigator() {
 	useEventsSync();
 	useRemoteTarget();
 	const connectionStatus = useConnectionStatus();
-	// While the banner covers the status bar, the screens below it must not add
-	// the status bar inset again (react-navigation headers read this context).
+	// Under the banner, react-navigation headers must not add the status bar inset again.
 	const navigatorInsets = React.useMemo(
 		() => (connectionStatus ? { ...insets, top: 0 } : insets),
 		[connectionStatus, insets]
@@ -138,14 +140,11 @@ export function AppNavigator() {
 								},
 								headerTintColor: theme.colors.text,
 								headerShadowVisible: false,
-								headerTitleStyle: {
-									fontFamily: theme.typography.families.bold,
-								},
+								headerTitleStyle: headerTitle(theme),
 								...sidebar,
-								// A pixel square under the active tab, in its tint.
 								tabBarIcon: ({ focused, color }) => (
 									<View style={styles.tabIcon}>
-										<PixelIcon name={TAB_ICONS[route.name]} color={color} />
+										<PixelIcon icon={TAB_ICONS[route.name]} color={color} />
 										<View style={[styles.tabDot, focused && { backgroundColor: color }]} />
 									</View>
 								),
@@ -220,7 +219,6 @@ const createStyles = (theme: Theme, bottomInset: number) =>
 		container: {
 			flex: 1,
 		},
-		// The desktop's now playing panel docks to the right of the screens, above the player bar.
 		body: {
 			flex: 1,
 			flexDirection: 'row',

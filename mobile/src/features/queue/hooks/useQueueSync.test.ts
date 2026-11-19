@@ -52,7 +52,6 @@ function stateFor(ownerId: string): QueueState {
 	return { ownerId, currentItemId: null } as unknown as QueueState;
 }
 
-/** Render the hook and return the queue:updated handler it registered. */
 function setup() {
 	renderHook(() => useQueueSync());
 	const call = mockSocket.on.mock.calls.find(([event]) => event === 'queue:updated');

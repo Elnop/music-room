@@ -10,6 +10,7 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import type { PlaylistTracks } from '@/features/playlists/detail/hooks/usePlaylistTracks';
 import type { PlaylistWithTracks } from '@/features/playlists/types';
 import { createDetailStyles } from './detailStyles';
+import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
 interface PlaylistDetailViewProps {
 	playlist: PlaylistWithTracks;
@@ -77,17 +78,13 @@ export function PlaylistDetailView({
 						header
 					)
 				}
-				// The last track scrolls clear of the mini player.
 				contentContainerStyle={[
 					styles.list,
 					isWide && styles.column,
 					{ paddingBottom: bottomPadding },
 				]}
 				ListEmptyComponent={
-					<EmptyState
-						icon="note"
-						message="Aucun titre dans cette playlist pour l'instant"
-					/>
+					<EmptyState icon={MusicSolid} message="Aucun titre dans cette playlist pour l'instant" />
 				}
 				refreshControl={
 					<RefreshControl

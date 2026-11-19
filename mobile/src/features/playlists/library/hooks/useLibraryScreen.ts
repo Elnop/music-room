@@ -12,16 +12,14 @@ import type { Playlist, PlaylistStackParamList } from '@/features/playlists/type
 type Navigation = NativeStackNavigationProp<PlaylistStackParamList, 'Playlists'>;
 
 export interface LibraryScreen {
-	/** Nothing to show yet: the whole screen is a skeleton. */
 	isInitialLoading: boolean;
 	owned: Playlist[];
-	/** Playlists of other users where I am a collaborator or a viewer. */
+	/** Other users' playlists I collaborate on or view. */
 	shared: Playlist[];
 	isRefreshing: boolean;
 	refresh: () => void;
 	openPlaylist: (id: string) => void;
 	createPlaylist: () => void;
-	/** Space left under the list for the mini player. */
 	bottomPadding: number;
 }
 

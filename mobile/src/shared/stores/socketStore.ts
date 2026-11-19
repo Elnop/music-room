@@ -5,12 +5,10 @@ import { getBackendUrl, onBackendUrlChange } from '@/shared/services/backendUrl'
 import { getAuthSession, getSession, onSessionEnd } from '@/shared/services/authSession';
 import { logger } from '@/shared/utils/logger';
 
-// Handshake refusal codes, sent as the `connect_error` message (backend/src/realtime/socket-auth.ts).
 const NO_TOKEN = 'NO_TOKEN';
 const INVALID_HANDSHAKE = 'INVALID_HANDSHAKE';
 const INVALID_TOKEN = 'INVALID_TOKEN';
 const DEVICE_REGISTRATION_FAILED = 'DEVICE_REGISTRATION_FAILED';
-// Too many failed token verifications from this IP: refreshing would not help.
 const TOO_MANY_ATTEMPTS = 'TOO_MANY_ATTEMPTS';
 
 const HANDSHAKE_CODES = [
@@ -21,11 +19,10 @@ const HANDSHAKE_CODES = [
 	TOO_MANY_ATTEMPTS,
 ];
 
-// DEVICE_REGISTRATION_FAILED is transient, but Socket.io never retries a middleware refusal: retry it ourselves.
+// Socket.io never retries a middleware refusal, so a failed device registration is retried here.
 export const DEVICE_RETRY_DELAY_MS = 5000;
 export const DEVICE_RETRY_MAX = 3;
 
-/** Called on every connection attempt, so the token is always the current session's. */
 async function buildHandshake(): Promise<Record<string, string>> {
 	const token = getSession().accessToken ?? '';
 	const appVersion = getAppVersion();
@@ -38,7 +35,6 @@ async function buildHandshake(): Promise<Record<string, string>> {
 	}
 }
 
-/** idle: no socket (signed out, or stopped after a handshake refusal); failed: the Manager gave up. */
 export type SocketStatus = 'idle' | 'connecting' | 'connected' | 'reconnecting' | 'failed';
 
 interface SocketState {
@@ -48,7 +44,6 @@ interface SocketState {
 
 	connect: () => void;
 	disconnect: () => void;
-	/** Starts a new connection after the Manager gave up (or at any time). */
 	retry: () => void;
 }
 
@@ -64,9 +59,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 			return;
 		}
 
-		if (existingSocket) {
-			existingSocket.disconnect();
-		}
+		existingSocket?.disconnect();
 
 		const socketUrl = getBackendUrl();
 
@@ -79,13 +72,12 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 			reconnectionDelayMax: 5000,
 			timeout: 20000,
 			forceNew: true,
+			// A function, so every attempt sends the current session's token.
 			auth: cb => {
 				void buildHandshake().then(cb);
 			},
 		});
 
-		// One token refresh per handshake refusal and at most DEVICE_RETRY_MAX
-		// device registration retries; both reset once a connection succeeds.
 		let hasRefreshed = false;
 		let deviceRetries = 0;
 
@@ -128,11 +120,11 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 		socket.on('disconnect', reason => {
 			if (get().socket !== socket) return;
 			if (reason === 'io client disconnect') {
-				// Our own disconnect()/connect() set the status themselves.
+				// disconnect() and connect() set the status themselves.
 				set({ isConnected: false });
 				return;
 			}
-			// The Manager retries every other loss except a server kick.
+			// The Manager retries every loss but a server kick.
 			set({
 				isConnected: false,
 				status: reason === 'io server disconnect' ? 'failed' : 'reconnecting',
@@ -152,8 +144,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 			});
 		});
 
-		// reconnect* are Manager events (socket.io-client 4): they fire on
-		// socket.io, never on the socket itself.
+		// reconnect* events fire on the Manager, never on the socket.
 		const manager = socket.io;
 
 		manager.on('reconnect_attempt', () => {
@@ -175,27 +166,21 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 	disconnect: () => {
 		const { socket } = get();
 
-		if (socket) {
-			socket.disconnect();
-		}
+		socket?.disconnect();
 		set({ socket: null, isConnected: false, status: 'idle' });
 	},
 
-	/** connect() replaces a socket that is not connected; the status reads 'reconnecting' meanwhile. */
 	retry: () => {
 		get().connect();
-		// A retry follows a lost connection: keep the banner on « Reconnexion… »
-		// until the new socket connects (a first connect() stays 'connecting').
+		// A retry follows a lost connection: the banner stays on « Reconnexion… ».
 		if (get().status === 'connecting') set({ status: 'reconnecting' });
 	},
 }));
 
-// Every end of session closes the socket, so no connection authenticated with the old token outlives it.
 onSessionEnd(() => {
 	useSocketStore.getState().disconnect();
 });
 
-// A backend address change moves a live socket to the new server.
 onBackendUrlChange(() => {
 	const { socket, connect, disconnect } = useSocketStore.getState();
 	if (!socket) return;

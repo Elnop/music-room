@@ -47,7 +47,6 @@ export async function getFilteredProfile(
 			'PROFILE_NOT_FOUND'
 		);
 
-		// viewerId decides whether missing settings may be created
 		const privacy = await privacySettingsService.getPrivacySettings(
 			targetUserId,
 			viewerId ?? undefined
@@ -85,7 +84,6 @@ export async function getFilteredProfile(
 			isFriend,
 		};
 
-		// Privacy-filtered fields: only present when visible
 		if (visible.avatar) filteredProfile.avatarUrl = profileData.avatar_url ?? undefined;
 		if (visible.bio) filteredProfile.bio = profileData.bio || '';
 		if (visible.email) filteredProfile.email = email;

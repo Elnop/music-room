@@ -14,7 +14,6 @@ export async function verifyEmail(req: Request, res: Response) {
 	sendSuccess(res, await verifyEmailService.verifyEmail(userId, code, ip));
 }
 
-/** Same answer whether or not a code was sent: no account enumeration. */
 export async function resendVerification(req: Request, res: Response) {
 	const { userId, email } = resendVerificationSchema.parse(req.body);
 	const ip = requestIp(req);

@@ -1,8 +1,7 @@
 import { QueryClient } from '@tanstack/react-query';
 import { ApiError } from '@/shared/services/api';
 
-// Query hooks pick a profile (`staleTime: STALE.long`), never a number of their own. none: data
-// another user changes often; short: the default; long: rarely changes (genres, accounts, devices).
+// none: data other users change often; long: rarely changes (genres, accounts, devices).
 export const STALE = {
 	none: 0,
 	short: 30_000,
@@ -18,7 +17,6 @@ export function shouldRetry(failureCount: number, error: unknown): boolean {
 	return status === undefined || status >= 500;
 }
 
-/** Created once by AppProviders, and per test. */
 export function createQueryClient(): QueryClient {
 	return new QueryClient({
 		defaultOptions: {

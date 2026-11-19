@@ -47,7 +47,7 @@ async function requestAdvertisePermission(): Promise<boolean> {
 	return result === PermissionsAndroid.RESULTS.GRANTED;
 }
 
-/** Broadcasts the iBeacon frame of the event with this minor; throws an AdvertiseError. */
+/** Throws an AdvertiseError. */
 export async function startEventBeacon(beaconMinor: number): Promise<void> {
 	const native = nativeModule();
 	if (!native) throw new AdvertiseError('unsupported');

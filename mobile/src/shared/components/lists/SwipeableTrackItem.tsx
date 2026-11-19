@@ -14,29 +14,24 @@ import { Text } from '@/shared/components/ui/Text';
 import { FONT_FAMILIES } from '@/shared/theme/fonts';
 import { pixelRow } from '@/shared/theme/pixelFrame';
 import { formatDuration } from '@/shared/utils/formatters';
+import BarsSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/bars-solid.svg';
+import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
+import SoundOnSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/sound-on-solid.svg';
+import TrashSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/trash-solid.svg';
 
 interface SwipeableTrackItemProps {
 	track: Track;
 	onDelete: (trackId: string) => Promise<void>;
-	/** True for a viewer who cannot edit: no delete swipe, no drag handle. */
+	/** A viewer who cannot edit: no delete swipe, no drag handle. */
 	disabled?: boolean;
-	/** A right swipe adds the track to the play queue, for any viewer. */
 	onAddToQueue?: () => void;
-	/** Shows the drag handle; pressing it starts a reorder drag. */
 	onDragStart?: () => void;
-	/** Raises the row while it is being dragged. */
 	isDragActive?: boolean;
-	/** A long press or the ⋯ button opens the track's quick actions. */
 	onShowActions?: () => void;
-	/** The track playing now from this playlist: highlighted like the queue's current item. */
 	isCurrent?: boolean;
-	/** A tap on the row; without it, the row only reacts to a long press. */
 	onPress?: () => void;
-	/** Shows a spinner while the tap's request runs. */
 	isPending?: boolean;
-	/** Greyed out, with no queue swipe nor quick actions; delete and drag still work. */
 	unavailable?: boolean;
-	/** Its number in the list, from 1: wide screens then lay the row out as a table row. */
 	position?: number;
 }
 
@@ -67,7 +62,7 @@ export function SwipeableTrackItem({
 			onPress={() => onDelete(track.id)}
 			accessibilityLabel={`Supprimer ${track.title}`}
 		>
-			<PixelIcon name="trash" size={24} color={theme.colors.onColor} />
+			<PixelIcon icon={TrashSolid} size={24} color={theme.colors.onColor} />
 			<Text style={styles.deleteText}>Supprimer</Text>
 		</Pressable>
 	);
@@ -120,7 +115,7 @@ export function SwipeableTrackItem({
 									unavailable && styles.unavailable,
 								]}
 							>
-								<PixelIcon name="note" color={theme.colors.textSecondary} />
+								<PixelIcon icon={MusicSolid} color={theme.colors.textSecondary} />
 							</View>
 						)}
 
@@ -147,7 +142,7 @@ export function SwipeableTrackItem({
 
 						{isCurrent && !isPending && (
 							<PixelIcon
-								name="volume"
+								icon={SoundOnSolid}
 								size={18}
 								color={theme.colors.primary}
 								style={styles.playingIcon}
@@ -155,9 +150,9 @@ export function SwipeableTrackItem({
 							/>
 						)}
 
-						{track.durationMs && (
+						{track.durationMs ? (
 							<Text style={styles.duration}>{formatDuration(track.durationMs)}</Text>
-						)}
+						) : null}
 					</Pressable>
 
 					{actions && <TrackActionsButton onPress={actions} />}
@@ -169,7 +164,7 @@ export function SwipeableTrackItem({
 							style={styles.dragHandle}
 							accessibilityLabel="Réordonner"
 						>
-							<PixelIcon name="grip" color={theme.colors.textSecondary} />
+							<PixelIcon icon={BarsSolid} color={theme.colors.textSecondary} />
 						</Pressable>
 					)}
 				</View>

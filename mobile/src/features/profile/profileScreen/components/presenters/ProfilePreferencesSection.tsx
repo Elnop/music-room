@@ -8,6 +8,7 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import type { MusicGenre } from '@/types/user.types';
 import { Text } from '@/shared/components/ui/Text';
+import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
 interface ProfilePreferencesSectionProps {
 	genres: MusicGenre[];
@@ -45,7 +46,7 @@ export function ProfilePreferencesSection({
 					accessibilityLabel="Modifier les préférences musicales"
 				>
 					<PixelIcon
-						name="note"
+						icon={MusicSolid}
 						size={32}
 						color={theme.colors.textSecondary}
 						style={styles.emptyStateIcon}

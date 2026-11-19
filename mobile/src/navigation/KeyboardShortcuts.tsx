@@ -6,7 +6,7 @@ import { ShortcutsHelpDialog } from '@/shared/components/feedback/ShortcutsHelpD
 import { useKeyboardShortcuts } from '@/shared/hooks/useKeyboardShortcuts';
 import type { KeyboardShortcut } from '@/shared/utils/keyboardShortcuts';
 
-/** The browser's keyboard shortcuts and their help; a leaf, since the player's shortcuts re-render with the position. */
+/** A leaf component: the player's shortcuts re-render with the position. */
 export function KeyboardShortcuts() {
 	const navigation = useNavigation<NavigationProp<ParamListBase>>();
 	const requestSearchFocus = useSearchFocusStore(state => state.request);

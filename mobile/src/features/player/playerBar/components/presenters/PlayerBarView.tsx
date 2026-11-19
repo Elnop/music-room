@@ -10,12 +10,20 @@ import type { PlayerBarData } from '@/features/player/playerBar/hooks/usePlayerB
 import { PlayerBarButton } from './PlayerBarButton';
 import { createStyles } from './playerBarStyles';
 import { Text } from '@/shared/components/ui/Text';
+import ArrowLeftSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/arrow-left-solid.svg';
+import ArrowRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/arrow-right-solid.svg';
+import CassetteTapeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/cassette-tape-solid.svg';
+import PauseSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/pause-solid.svg';
+import PhoneRingingLowSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/phone-ringing-low-solid.svg';
+import PlaySolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/play-solid.svg';
+import PlaylistSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/playlist-solid.svg';
+import SoundMuteSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/sound-mute-solid.svg';
+import SoundOnSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/sound-on-solid.svg';
 
 interface PlayerBarViewProps {
 	data: PlayerBarData;
 }
 
-/** The desktop player: track, transport and seek, then the now playing panel, queue, devices and volume, on one row. */
 export function PlayerBarView({ data }: PlayerBarViewProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
@@ -57,7 +65,7 @@ export function PlayerBarView({ data }: PlayerBarViewProps) {
 			<View style={styles.center}>
 				<View style={styles.controls}>
 					<PlayerBarButton
-						icon="prev"
+						icon={ArrowLeftSolid}
 						label="Piste précédente"
 						onPress={data.handlePrevious}
 						disabled={!data.canGoPrevious}
@@ -65,7 +73,7 @@ export function PlayerBarView({ data }: PlayerBarViewProps) {
 						style={styles.iconButton}
 					/>
 					<PlayerBarButton
-						icon={data.isPlaying ? 'pause' : 'play'}
+						icon={data.isPlaying ? PauseSolid : PlaySolid}
 						label={data.isPlaying ? 'Pause' : 'Lecture'}
 						onPress={data.handlePlayPause}
 						disabled={data.playDisabled}
@@ -74,7 +82,7 @@ export function PlayerBarView({ data }: PlayerBarViewProps) {
 						style={[styles.playButton, !track && styles.playButtonEmpty]}
 					/>
 					<PlayerBarButton
-						icon="next"
+						icon={ArrowRightSolid}
 						label="Piste suivante"
 						onPress={data.handleNext}
 						disabled={!data.canGoNext}
@@ -97,7 +105,7 @@ export function PlayerBarView({ data }: PlayerBarViewProps) {
 
 			<View style={[styles.side, styles.sideEnd]}>
 				<PlayerBarButton
-					icon="tape"
+					icon={CassetteTapeSolid}
 					label={data.panelLabel}
 					onPress={data.onTogglePanel}
 					selected={data.isPanelOpen}
@@ -105,14 +113,14 @@ export function PlayerBarView({ data }: PlayerBarViewProps) {
 					style={styles.iconButton}
 				/>
 				<PlayerBarButton
-					icon="queue"
+					icon={PlaylistSolid}
 					label="File d'attente"
 					onPress={data.onOpenQueue}
 					color={theme.colors.text}
 					style={styles.iconButton}
 				/>
 				<PlayerBarButton
-					icon="phone"
+					icon={PhoneRingingLowSolid}
 					label="Choisir l'appareil"
 					onPress={data.onOpenDevices}
 					selected={data.isRemote}
@@ -120,7 +128,7 @@ export function PlayerBarView({ data }: PlayerBarViewProps) {
 					style={styles.iconButton}
 				/>
 				<PlayerBarButton
-					icon={data.volume === 0 ? 'mute' : 'volume'}
+					icon={data.volume === 0 ? SoundMuteSolid : SoundOnSolid}
 					label={data.volume === 0 ? 'Activer le son' : 'Couper le son'}
 					onPress={data.onToggleMute}
 					disabled={data.volumeDisabled}

@@ -1,6 +1,4 @@
-// Browser variant: expo-device leaves the model and the name empty on the web, so both
-// come from the user agent.
-
+// expo-device leaves the model and the name empty on the web: both come from the user agent.
 const BROWSERS: [RegExp, string][] = [
 	[/Edg(A|iOS)?\//, 'Edge'],
 	[/OPR\//, 'Opera'],
@@ -22,7 +20,6 @@ function match(userAgent: string, table: [RegExp, string][]): string | null {
 	return table.find(([pattern]) => pattern.test(userAgent))?.[1] ?? null;
 }
 
-/** `Chrome on Windows` with `on`; null when the user agent names neither. */
 function describe(joiner: string): string | null {
 	const { userAgent = '' } = (globalThis as { navigator?: { userAgent?: string } }).navigator ?? {};
 	const browser = match(userAgent, BROWSERS);
@@ -36,7 +33,6 @@ export function getModelName(): string | null {
 	return describe('on');
 }
 
-/** Shown in the device list. */
 export function getDeviceName(): string | null {
 	return describe('sur');
 }

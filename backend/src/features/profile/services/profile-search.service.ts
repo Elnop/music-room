@@ -5,7 +5,6 @@ import { ilikeContains } from '@/shared/utils/postgrest-filter.js';
 import { getSearchFieldVisibility } from '@/features/profile/permissions/search-visibility.js';
 import type { PublicProfile } from '@/features/profile/profile.types.js';
 
-/** Avatar and bio follow each profile's privacy settings for the viewer, as on GET /:userId. */
 export async function searchUsers(
 	query: string,
 	limit = 20,

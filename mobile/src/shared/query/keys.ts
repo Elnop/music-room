@@ -1,5 +1,3 @@
-// Every query key is built here so a hook and the socket bridge that invalidates it agree.
-// Keys nest: invalidating `queryKeys.playlists.all` refreshes every playlist key.
 export const queryKeys = {
 	auth: {
 		all: ['auth'] as const,
@@ -11,9 +9,7 @@ export const queryKeys = {
 		list: () => [...queryKeys.playlists.all, 'list'] as const,
 		detail: (playlistId: string) => [...queryKeys.playlists.all, 'detail', playlistId] as const,
 		public: () => [...queryKeys.playlists.all, 'public'] as const,
-		/** The public playlists of the user's friends. */
 		friends: () => [...queryKeys.playlists.all, 'friends'] as const,
-		/** Collaborators and viewers of a playlist. */
 		members: (playlistId: string) => [...queryKeys.playlists.all, 'members', playlistId] as const,
 	},
 	queue: {
@@ -31,7 +27,6 @@ export const queryKeys = {
 		status: (userId: string) => [...queryKeys.friends.all, 'status', userId] as const,
 		stats: () => [...queryKeys.friends.all, 'stats'] as const,
 		permissions: () => [...queryKeys.friends.all, 'permissions'] as const,
-		/** Profiles with similar music tastes, suggested on Home. */
 		recommendations: () => [...queryKeys.friends.all, 'recommendations'] as const,
 	},
 	profile: {
@@ -52,10 +47,8 @@ export const queryKeys = {
 	},
 	events: {
 		all: ['events'] as const,
-		/** Ongoing and upcoming events. */
 		list: () => [...queryKeys.events.all, 'list'] as const,
 		detail: (eventId: string) => [...queryKeys.events.all, 'detail', eventId] as const,
-		/** The public playlists of mine an event can link to. */
 		playlistChoices: (userId: string) =>
 			[...queryKeys.events.all, 'playlistChoices', userId] as const,
 	},

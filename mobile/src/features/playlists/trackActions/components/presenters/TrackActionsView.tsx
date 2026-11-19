@@ -8,6 +8,11 @@ import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 import type { TrackActions } from '@/features/playlists/trackActions/hooks/useTrackActions';
 import { Text } from '@/shared/components/ui/Text';
 import { NewPlaylistForm } from '@/features/playlists/trackActions/components/presenters/NewPlaylistForm';
+import ArrowRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/arrow-right-solid.svg';
+import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
+import PlaylistSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/playlist-solid.svg';
+import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
+import ShareSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/share-solid.svg';
 
 const TITLES = { playlists: 'Ajouter à une playlist', newPlaylist: 'Nouvelle playlist' } as const;
 
@@ -17,7 +22,6 @@ interface TrackActionsViewProps {
 	onClose: () => void;
 }
 
-/** The sheet of a track's quick actions, or the playlists to add it to. */
 export function TrackActionsView({ actions, anchor, onClose }: TrackActionsViewProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
 	const { step } = actions;
@@ -41,29 +45,29 @@ export function TrackActionsView({ actions, anchor, onClose }: TrackActionsViewP
 		>
 			{onActions ? (
 				<View>
+					<ActionSheetRow icon={ArrowRightSolid} label="Lire ensuite" onPress={actions.playNext} />
 					<ActionSheetRow
-						icon="next"
-						label="Lire ensuite"
-						onPress={actions.playNext}
-					/>
-					<ActionSheetRow
-						icon="queue"
+						icon={PlaylistSolid}
 						label="Ajouter à la file d'attente"
 						onPress={actions.addToQueue}
 					/>
 					<ActionSheetRow
-						icon="plus"
+						icon={PlusSolid}
 						label="Ajouter à une playlist"
 						onPress={actions.openPlaylists}
 						chevron
 					/>
-					<ActionSheetRow icon="share" label="Partager" onPress={actions.share} />
+					<ActionSheetRow icon={ShareSolid} label="Partager" onPress={actions.share} />
 				</View>
 			) : step === 'newPlaylist' ? (
 				<NewPlaylistForm draft={actions.newPlaylist} />
 			) : (
 				<View>
-					<ActionSheetRow icon="plus" label="Nouvelle playlist" onPress={actions.openNewPlaylist} />
+					<ActionSheetRow
+						icon={PlusSolid}
+						label="Nouvelle playlist"
+						onPress={actions.openNewPlaylist}
+					/>
 					{actions.loadingPlaylists ? (
 						<View style={styles.centered}>
 							<ActivityIndicator testID="track-actions-loading" color={theme.colors.primary} />
@@ -75,7 +79,7 @@ export function TrackActionsView({ actions, anchor, onClose }: TrackActionsViewP
 							{actions.editable.map(playlist => (
 								<ActionSheetRow
 									key={playlist.id}
-									icon="note"
+									icon={MusicSolid}
 									label={playlist.name}
 									detail={`${playlist.trackCount} ${playlist.trackCount === 1 ? 'titre' : 'titres'}`}
 									onPress={() => actions.addToPlaylist(playlist)}

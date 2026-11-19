@@ -5,6 +5,11 @@ import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { Text } from '@/shared/components/ui/Text';
+import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
+import PauseSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/pause-solid.svg';
+import PlaySolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/play-solid.svg';
+import SoundMuteSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/sound-mute-solid.svg';
+import SoundOnSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/sound-on-solid.svg';
 
 interface NowPlayingInlineProps {
 	track: {
@@ -15,11 +20,10 @@ interface NowPlayingInlineProps {
 	isPlaying: boolean;
 	onPlay: () => void;
 	onPause: () => void;
-	/** False hides the play/pause button (a device I may not control). */
+	/** False for a device I may not control: no play/pause button. */
 	controllable?: boolean;
 }
 
-/** Shows a friend's listening activity on their profile. */
 export function NowPlayingInline({
 	track,
 	isPlaying,
@@ -36,14 +40,14 @@ export function NowPlayingInline({
 				<Image source={{ uri: track.artworkUrl }} style={styles.artwork} />
 			) : (
 				<View style={[styles.artwork, styles.artworkPlaceholder]}>
-					<PixelIcon name="note" size={18} color={theme.colors.textSecondary} />
+					<PixelIcon icon={MusicSolid} size={18} color={theme.colors.textSecondary} />
 				</View>
 			)}
 
 			<View style={styles.trackInfo}>
 				<View style={styles.titleRow}>
 					<PixelIcon
-						name={isPlaying ? 'volume' : 'mute'}
+						icon={isPlaying ? SoundOnSolid : SoundMuteSolid}
 						size={12}
 						color={isPlaying ? theme.colors.primary : theme.colors.textSecondary}
 						style={styles.volumeIcon}
@@ -66,7 +70,7 @@ export function NowPlayingInline({
 					hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
 				>
 					<PixelIcon
-						name={isPlaying ? 'pause' : 'play'}
+						icon={isPlaying ? PauseSolid : PlaySolid}
 						size={16}
 						color={theme.colors.onColor}
 						style={!isPlaying ? { marginLeft: 1 } : undefined}

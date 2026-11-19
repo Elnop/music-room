@@ -9,6 +9,7 @@ import { SearchTracksOrchestrator } from '@/features/playlists/searchTracks/comp
 import type { FriendsStackParamList } from '@/features/friends/types';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { screenHeader, screenLayout } from '@/navigation/screenLayout';
+import { headerTitle } from '@/shared/theme/pixelFrame';
 
 export type { FriendsStackParamList };
 
@@ -30,9 +31,7 @@ export function FriendsNavigator() {
 				headerBlurEffect: Platform.OS === 'ios' ? 'systemMaterialDark' : undefined,
 				headerTintColor: theme.colors.text,
 				headerShadowVisible: false,
-				headerTitleStyle: {
-					fontFamily: theme.typography.families.bold,
-				},
+				headerTitleStyle: headerTitle(theme),
 				headerTitleAlign: 'center',
 			}}
 		>

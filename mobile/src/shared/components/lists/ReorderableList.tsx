@@ -13,7 +13,6 @@ import { hapticSelection } from '@/shared/utils/haptics';
 interface ReorderableRenderItemInfo<T> {
 	item: T;
 	index: number;
-	/** Starts dragging this row; call it from a handle's onPressIn. */
 	drag: () => void;
 	isActive: boolean;
 }
@@ -58,7 +57,6 @@ function Cell<T>({ item, index, renderItem, dragRequested }: CellProps<T>) {
 // Past this many points without a drag request, the touch is a scroll, a pull to refresh or a swipe.
 const DRAG_DECISION_SLOP = 10;
 
-/** A drag starts only when a row calls `drag`, so the list still scrolls and rows can still swipe. */
 export function ReorderableList<T>({
 	data,
 	keyExtractor,
@@ -67,14 +65,13 @@ export function ReorderableList<T>({
 	dragEnabled = true,
 	...listProps
 }: ReorderableListProps<T>) {
-	// The dropped order, valid only while `data` is still the array it was built from.
+	// The dropped order, valid while `data` is the array it was built from.
 	const [override, setOverride] = React.useState<{ base: T[]; items: T[] } | null>(null);
 	const items = override && override.base === data ? override.items : data;
 
 	const dragRequested = useSharedValue(false);
 	const touchStart = useSharedValue({ x: 0, y: 0 });
-	// An eagerly activating pan steals the touch from the native scroll and the RefreshControl on
-	// Android: it activates only once a row asked for a drag, and fails otherwise.
+	// Activates only once a row asks for a drag: an eager pan steals the touch from the scroll and RefreshControl on Android.
 	const panGesture = React.useMemo(
 		() =>
 			Gesture.Pan()
@@ -109,13 +106,12 @@ export function ReorderableList<T>({
 		setOverride({ base: data, items: reorderItems(items, from, to) });
 		const result = onReorder(from, to);
 		if (result) {
-			// Once the move settles, `data` is the truth again, even if it did not change.
 			const clear = () => setOverride(null);
 			result.then(clear, clear);
 		}
 	};
 
-	// The library calls these on the UI thread: they must be worklets. One tick at pick-up, one at drop.
+	// The library calls these on the UI thread, so they must be worklets.
 	const handleDragEdge = () => {
 		'worklet';
 		runOnJS(hapticSelection)();

@@ -8,7 +8,6 @@ export interface AvatarPhotoProps {
 	onError: () => void;
 }
 
-/** The photo laid over the avatar's initials. */
 export function AvatarPhoto({ uri, size, onLoad, onError }: AvatarPhotoProps) {
 	return (
 		<Image

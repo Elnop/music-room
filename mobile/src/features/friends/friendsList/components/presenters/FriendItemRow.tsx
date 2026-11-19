@@ -8,6 +8,8 @@ import type { FriendProfile } from '@/features/friends/types';
 import { ControlSwitch } from './ControlSwitch';
 import { createFriendsListStyles } from './friendsListStyles';
 import { Text } from '@/shared/components/ui/Text';
+import AngleRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/angle-right-solid.svg';
+import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
 interface FriendItemRowProps {
 	friend: FriendProfile;
@@ -42,7 +44,7 @@ export function FriendItemRow({
 				{friend.displayName && <Text style={styles.displayName}>{friend.displayName}</Text>}
 				<View style={styles.controlRow}>
 					<PixelIcon
-						name="note"
+						icon={MusicSolid}
 						size={12}
 						color={canControl ? theme.colors.primary : theme.colors.textSecondary}
 						style={styles.controlIcon}
@@ -61,7 +63,7 @@ export function FriendItemRow({
 					accessibilityLabel={`${friend.displayName || friend.username} peut contrôler ma musique`}
 				/>
 			</View>
-			<PixelIcon name="right" size={20} color={theme.colors.textSecondary} />
+			<PixelIcon icon={AngleRightSolid} size={20} color={theme.colors.textSecondary} />
 		</Pressable>
 	);
 }

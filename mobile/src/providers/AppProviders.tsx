@@ -11,11 +11,9 @@ import { onSessionEnd } from '@/shared/services/authSession';
 
 interface AppProvidersProps {
 	children: React.ReactNode;
-	/** Tests pass their own client; the app creates one for its lifetime. */
 	queryClient?: QueryClient;
 }
 
-/** Every app-wide provider, outermost first. App.tsx renders the app inside it. */
 export function AppProviders({ children, queryClient }: AppProvidersProps) {
 	const [client] = useState(() => queryClient ?? createQueryClient());
 

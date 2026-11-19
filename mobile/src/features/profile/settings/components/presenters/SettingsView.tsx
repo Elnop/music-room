@@ -9,6 +9,7 @@ import type { Theme } from '@/shared/theme/types';
 import { SubscriptionSection } from './SubscriptionSection';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Text } from '@/shared/components/ui/Text';
+import AngleRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/angle-right-solid.svg';
 
 interface SettingsViewProps {
 	theme: Theme;
@@ -59,7 +60,7 @@ export function SettingsView({
 					style={styles.row}
 				>
 					<Text style={styles.rowLabel}>Politique de confidentialité</Text>
-					<PixelIcon name="right" size={20} color={theme.colors.textSecondary} />
+					<PixelIcon icon={AngleRightSolid} size={20} color={theme.colors.textSecondary} />
 				</Pressable>
 			</View>
 		</ScrollView>

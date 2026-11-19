@@ -2,9 +2,7 @@ import { useRef } from 'react';
 import { Platform } from 'react-native';
 
 interface DeferredSheetAction {
-	/** Wraps an action: closes the sheet, then runs it. */
 	run: (action: () => void) => () => void;
-	/** The Modal's onDismiss. */
 	onDismiss: () => void;
 }
 

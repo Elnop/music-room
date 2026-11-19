@@ -8,7 +8,6 @@ import { createListStyles } from './listStyles';
 interface RefreshableScrollProps {
 	isRefreshing: boolean;
 	onRefresh: () => void;
-	/** Space left under the content for the mini player. */
 	bottomPadding: number;
 	children: React.ReactNode;
 }

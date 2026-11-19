@@ -4,8 +4,6 @@ import { rateLimitConfig } from '@/shared/config/rate-limit.config.js';
 import * as counter from '@/shared/security/counter.js';
 import type { RateLimitConfig, RateLimitResult } from '@/shared/security/security.types.js';
 
-// Fail closed: while Redis is not ready, counting or checking answers 503 REDIS_UNAVAILABLE.
-
 function requireRedis(key: string): void {
 	if (!counter.isReady()) {
 		logger.error('Rate limiting unavailable - Redis not connected', { key });
@@ -27,7 +25,6 @@ export async function checkLimit(key: string, config: RateLimitConfig): Promise<
 	return { canProceed: true, attempts };
 }
 
-/** Does not throw past the limit. */
 export async function increment(key: string, config: RateLimitConfig): Promise<RateLimitResult> {
 	if (!rateLimitConfig.enabled) {
 		logger.debug('Rate limiting disabled (development mode)', { key });
@@ -61,7 +58,6 @@ export async function incrementAndCheck(
 	return result;
 }
 
-/** Skipped while Redis is down. */
 export async function reset(key: string): Promise<void> {
 	if (!rateLimitConfig.enabled) {
 		logger.debug('Rate limiting disabled - skip reset', { key });
@@ -76,7 +72,6 @@ export async function reset(key: string): Promise<void> {
 	logger.info('Rate limit reset', { key });
 }
 
-/** 0 while Redis is down. */
 export async function getAttempts(key: string): Promise<number> {
 	if (!rateLimitConfig.enabled) return 0;
 	if (!counter.isReady()) {

@@ -16,7 +16,7 @@ import type { SoundCloudTrack } from '@/types/soundcloud.types';
 export interface SearchTracks {
 	search: DebouncedText;
 	results: SoundCloudTrack[];
-	/** A search runs, or a typed query waits for its delay. */
+	/** Also true while a typed query waits for its delay. */
 	isLoading: boolean;
 	isAdded: (track: SoundCloudTrack) => boolean;
 	add: (track: SoundCloudTrack) => void;
@@ -33,9 +33,7 @@ export function useSearchTracks(playlistId: string): SearchTracks {
 		queryKey: queryKeys.search.tracks(query),
 		queryFn: () => searchTracks(query),
 		enabled: query !== '',
-		// Every search asks the backend again, as the screen always did.
 		staleTime: STALE.none,
-		// A new query keeps the previous results on screen until it answers.
 		placeholderData: keepPreviousData,
 		retry: false,
 	});

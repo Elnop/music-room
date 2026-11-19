@@ -23,7 +23,6 @@ export interface TrackActions {
 	/** The last track, still rendered while the sheet slides out. */
 	shown: AddQueueItemBody | null;
 	step: Step;
-	/** The playlists the user can add the track to. */
 	editable: Playlist[];
 	loadingPlaylists: boolean;
 	playNext: () => void;

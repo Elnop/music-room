@@ -15,7 +15,6 @@ import { FONT_FAMILIES } from '@/shared/theme/fonts';
 interface LoginViewProps {
 	email: FieldBinding;
 	password: FieldBinding;
-	/** Any sign-in is running: the buttons wait. */
 	isLoading: boolean;
 	onSubmit: () => void;
 	onForgotPassword: () => void;

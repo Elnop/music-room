@@ -9,7 +9,6 @@ interface LoadingSpinnerProps {
 	size?: 'small' | 'large';
 	message?: string;
 	fullScreen?: boolean;
-	/** 'logo' (default) bounces the pixel equalizer; 'spinner' is the platform's activity indicator. */
 	variant?: 'logo' | 'spinner';
 }
 

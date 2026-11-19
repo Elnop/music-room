@@ -17,12 +17,13 @@ import { PanelDeviceCard } from './PanelDeviceCard';
 import { PanelTrackActions } from './PanelTrackActions';
 import { UpNextSection } from './UpNextSection';
 import { createStyles, PANEL_ARTWORK_SIZE } from './nowPlayingPanelStyles';
+import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
+import TimesSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/times-solid.svg';
 
 interface NowPlayingPanelViewProps {
 	data: NowPlayingPanelData;
 }
 
-/** Docked beside the content, above the player bar: what plays, its actions, the device and what comes next. */
 export function NowPlayingPanelView({ data }: NowPlayingPanelViewProps) {
 	const separator = useSeparatorColor();
 	const factory = React.useCallback((theme: Theme) => createStyles(theme, separator), [separator]);
@@ -45,7 +46,7 @@ export function NowPlayingPanelView({ data }: NowPlayingPanelViewProps) {
 					nativeID={PANEL_CLOSE_ID}
 					accessibilityLabel="Fermer le panneau"
 				>
-					<PixelIcon name="close" size={22} color={theme.colors.text} />
+					<PixelIcon icon={TimesSolid} size={22} color={theme.colors.text} />
 				</Pressable>
 			</View>
 
@@ -74,7 +75,7 @@ export function NowPlayingPanelView({ data }: NowPlayingPanelViewProps) {
 				) : (
 					<EmptyState
 						compact
-						icon="note"
+						icon={MusicSolid}
 						message="Rien en lecture : choisissez un titre pour commencer"
 					/>
 				)}

@@ -75,7 +75,7 @@ export const queueApi = {
 		});
 	},
 
-	/** `startTrackId`: the track of the playlist to start on; the first one without it. */
+	/** Without `startTrackId`, playback starts on the first track. */
 	playPlaylist(
 		playlistId: string,
 		target: QueueCallTarget = {},

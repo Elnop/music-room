@@ -13,23 +13,22 @@ import type { Theme } from '@/shared/theme/types';
 import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 import { Text } from '@/shared/components/ui/Text';
 import { FONT_FAMILIES } from '@/shared/theme/fonts';
+import AngleLeftSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/angle-left-solid.svg';
 
 interface ActionSheetProps {
 	visible: boolean;
 	title?: string;
 	subtitle?: string;
-	/** Shows a back chevron before the title. */
 	onBack?: () => void;
 	onClose: () => void;
 	/** iOS: the Modal finished sliding out. */
 	onDismiss?: () => void;
 	maxHeight?: DimensionValue;
-	/** Wide screens: the button that opened it, to drop down from; without one it is a centred dialog. */
+	/** Wide screens: drops down from it; without one, a centred dialog. */
 	anchor?: MenuAnchor | null;
 	children: React.ReactNode;
 }
 
-/** A bottom sheet over a dimmed backdrop that closes it: a title, then rows. */
 export function ActionSheet({
 	visible,
 	title,
@@ -59,7 +58,7 @@ export function ActionSheet({
 			<View style={[styles.header, { borderBottomColor: separator }]}>
 				{onBack && (
 					<Pressable onPress={onBack} style={styles.backButton} accessibilityLabel="Retour">
-						<PixelIcon name="back" size={22} color={theme.colors.text} />
+						<PixelIcon icon={AngleLeftSolid} size={22} color={theme.colors.text} />
 					</Pressable>
 				)}
 				<View style={styles.headerText}>

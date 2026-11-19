@@ -25,7 +25,6 @@ function graphUrl(path: string, accessToken: string, fields?: string): string {
 
 const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
-/** 400 when Google has not verified the email. */
 export async function verifyGoogleToken(idToken: string): Promise<GoogleTokenPayload> {
 	try {
 		const ticket = await googleClient.verifyIdToken({
@@ -71,7 +70,6 @@ export async function verifyGoogleToken(idToken: string): Promise<GoogleTokenPay
 	}
 }
 
-/** Checks the token was issued for this app; the profile email is optional. */
 export async function verifyFacebookToken(accessToken: string): Promise<FacebookTokenPayload> {
 	try {
 		// The user token alone tells which app it was issued for: no app secret needed.
@@ -112,7 +110,6 @@ export async function verifyFacebookToken(accessToken: string): Promise<Facebook
 			throw new AppError(401, 'Failed to fetch Facebook profile', 'PROFILE_FETCH_ERROR');
 		}
 
-		// Without the email permission, the account gets a synthetic email.
 		logger.info('Facebook token verified successfully', {
 			userId: profileData.id,
 			email: profileData.email || 'not_provided',

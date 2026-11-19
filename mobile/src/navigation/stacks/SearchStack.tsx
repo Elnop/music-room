@@ -5,6 +5,7 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import { SearchOrchestrator } from '@/features/search/searchScreen/components/orchestrators/SearchOrchestrator';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { screenHeader, screenLayout } from '@/navigation/screenLayout';
+import { headerTitle } from '@/shared/theme/pixelFrame';
 
 type SearchStackParamList = {
 	Search: undefined;
@@ -28,9 +29,7 @@ export function SearchNavigator() {
 				headerBlurEffect: Platform.OS === 'ios' ? 'systemMaterialDark' : undefined,
 				headerTintColor: theme.colors.text,
 				headerShadowVisible: false,
-				headerTitleStyle: {
-					fontFamily: theme.typography.families.bold,
-				},
+				headerTitleStyle: headerTitle(theme),
 				headerTitleAlign: 'center',
 			}}
 		>

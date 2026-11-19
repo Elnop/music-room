@@ -22,6 +22,7 @@ import { LANDING_INTRO } from '@/features/auth/welcome/utils/landingContent';
 import { FloatingIcon } from './FloatingIcon';
 import { LandingSections } from './LandingSections';
 import { Text } from '@/shared/components/ui/Text';
+import CogSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/cog-solid.svg';
 
 interface WelcomeViewProps {
 	icons: FloatingIconMotion[];
@@ -79,7 +80,7 @@ export function WelcomeView({
 									style={styles.serverToggle}
 								>
 									<PixelIcon
-										name="gear"
+										icon={CogSolid}
 										size={20}
 										color={showServer ? theme.colors.primary : theme.colors.textSecondary}
 									/>

@@ -45,7 +45,7 @@ export interface EventForm {
 	isSubmitting: boolean;
 }
 
-const orNull = (text: string) => (text.trim() ? text.trim() : null);
+const orNull = (text: string) => text.trim() || null;
 
 function useEditedEvent(eventId: string | undefined): MusicEvent | undefined {
 	const client = useQueryClient();
@@ -87,13 +87,10 @@ export function useEventForm(navigation: Navigation, eventId: string | undefined
 
 	const toggleGenre = (genre: MusicGenre) => {
 		setGenresError(undefined);
-		setGenres(current =>
-			current.includes(genre)
-				? current.filter(g => g !== genre)
-				: current.length < EVENT_LIMITS.GENRES_MAX
-					? [...current, genre]
-					: current
-		);
+		setGenres(current => {
+			if (current.includes(genre)) return current.filter(g => g !== genre);
+			return current.length < EVENT_LIMITS.GENRES_MAX ? [...current, genre] : current;
+		});
 	};
 
 	// Moving the start past the end keeps the event's length.

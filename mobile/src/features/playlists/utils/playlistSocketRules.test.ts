@@ -13,7 +13,6 @@ const client = createQueryClient();
 const detail = queryKeys.playlists.detail('p1');
 const list = queryKeys.playlists.list();
 
-/** Sends a payload through every rule of `event`. */
 const emit = (event: string, payload: unknown) =>
 	PLAYLIST_SOCKET_RULES.filter(rule => rule.event === event).map(rule =>
 		rule.apply(client, payload)

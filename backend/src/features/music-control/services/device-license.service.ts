@@ -16,13 +16,6 @@ import {
 	toDevice,
 } from '@/features/music-control/utils/device.helpers.js';
 
-// Per-device music control licenses (`device_control_licenses`): the owner of
-// a device lets a mutual friend control it.
-
-/**
- * Licenses granteeId on the owner's device. Idempotent: an existing license
- * keeps its first `created_at`.
- */
 export async function grant(
 	ownerId: string,
 	deviceId: string,
@@ -72,10 +65,6 @@ export async function grant(
 	return { deviceId, license: { user, grantedAt: license.created_at } };
 }
 
-/**
- * Removes granteeId's license on the owner's device. Idempotent: no error
- * when there is no such license (including self and non-friends).
- */
 export async function revoke(ownerId: string, deviceId: string, granteeId: string): Promise<void> {
 	await findOwnedDevice(ownerId, deviceId);
 
@@ -93,11 +82,9 @@ export async function revoke(ownerId: string, deviceId: string, granteeId: strin
 		});
 	}
 
-	// Idempotent: nothing to tell anyone when there was no such license.
 	if (!count) return;
 
 	logger.info('Device license revoked', { ownerId, deviceId, granteeId });
-	// Evicts the grantee from the owner's listening room once it has no controllable device left.
 	const stillAllowed = await controlAccessService.canControlAnyDevice(granteeId, ownerId);
 	await notifyListeningAccessChange(granteeId, ownerId, stillAllowed);
 }

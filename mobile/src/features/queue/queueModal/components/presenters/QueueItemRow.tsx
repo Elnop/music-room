@@ -4,7 +4,6 @@ import { Swipeable } from 'react-native-gesture-handler';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { useContextMenu } from '@/shared/hooks/useContextMenu';
-import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Artwork } from '@/shared/components/media/Artwork';
 import { TrackActionsButton } from '@/shared/components/lists/TrackActionsButton';
@@ -12,6 +11,9 @@ import { QueueTrackDetails } from './QueueTrackDetails';
 import { createRowStyles, formatDuration } from './queueModalStyles';
 import type { QueueItem } from '@/features/queue/types';
 import { Text } from '@/shared/components/ui/Text';
+import BarsSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/bars-solid.svg';
+import SoundOnSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/sound-on-solid.svg';
+import TrashSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/trash-solid.svg';
 
 interface QueueItemRowProps {
 	item: QueueItem;
@@ -33,8 +35,7 @@ export function QueueItemRow({
 	onShowActions,
 }: QueueItemRowProps) {
 	const { theme } = useTheme();
-	const separator = useSeparatorColor();
-	const styles = React.useMemo(() => createRowStyles(theme, separator), [theme, separator]);
+	const styles = React.useMemo(() => createRowStyles(theme), [theme]);
 	const swipeableRef = React.useRef<Swipeable>(null);
 	const { track } = item;
 	const contextMenu = useContextMenu(onShowActions ? () => onShowActions(item) : undefined);
@@ -51,7 +52,7 @@ export function QueueItemRow({
 			accessibilityRole="button"
 			accessibilityLabel={`Retirer ${track.title}`}
 		>
-			<PixelIcon name="trash" size={24} color={theme.colors.onColor} />
+			<PixelIcon icon={TrashSolid} size={24} color={theme.colors.onColor} />
 			<Text style={styles.deleteText}>Retirer</Text>
 		</Pressable>
 	);
@@ -88,7 +89,7 @@ export function QueueItemRow({
 
 					{isCurrent ? (
 						<PixelIcon
-							name="volume"
+							icon={SoundOnSolid}
 							size={18}
 							color={theme.colors.primary}
 							style={styles.playingIcon}
@@ -109,7 +110,7 @@ export function QueueItemRow({
 						accessibilityRole="button"
 						accessibilityLabel="Réordonner"
 					>
-						<PixelIcon name="grip" size={24} color={theme.colors.textSecondary} />
+						<PixelIcon icon={BarsSolid} size={24} color={theme.colors.textSecondary} />
 					</Pressable>
 				)}
 			</View>

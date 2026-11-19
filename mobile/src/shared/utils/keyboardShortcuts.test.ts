@@ -56,9 +56,9 @@ describe('matchShortcut', () => {
 		expect(
 			matchShortcut(press('ArrowRight', { target: element('DIV', 'slider') }), SHORTCUTS)
 		).toBeUndefined();
-		expect(matchShortcut(press('ArrowRight', { target: element('DIV', 'button') }), SHORTCUTS)).toBe(
-			SEEK
-		);
+		expect(
+			matchShortcut(press('ArrowRight', { target: element('DIV', 'button') }), SHORTCUTS)
+		).toBe(SEEK);
 	});
 
 	it.each(['ctrlKey', 'altKey', 'metaKey'] as const)('leaves a key with %s to the browser', key => {

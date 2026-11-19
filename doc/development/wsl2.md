@@ -15,7 +15,7 @@ mkdir -p ~/.jdks && tar -xzf OpenJDK17U-jdk_x64_linux_hotspot_*.tar.gz -C ~/.jdk
 ln -sfn ~/.jdks/jdk-17.* ~/.jdks/17
 ```
 
-In `~/.zshrc`:
+In `~/.bashrc` (or `~/.zshrc`):
 
 ```bash
 export JAVA_HOME=$HOME/.jdks/17
@@ -27,7 +27,7 @@ export PATH=$JAVA_HOME/bin:$PATH
 WSL2 does not see USB devices, and `usbipd-win` needs admin rights. The Windows platform-tools need no installation and run from WSL:
 
 1. Unzip [platform-tools-latest-windows.zip](https://dl.google.com/android/repository/platform-tools-latest-windows.zip) into a folder of your Windows profile, e.g. `C:\Users\<you>\platform-tools-win`.
-2. Point every make target at it, in `~/.zshrc`:
+2. Point every make target at it, in `~/.bashrc` (or `~/.zshrc`):
 
    ```bash
    export ADB="/mnt/c/Users/<you>/platform-tools-win/platform-tools/adb.exe"

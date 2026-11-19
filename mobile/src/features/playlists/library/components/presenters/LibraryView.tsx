@@ -10,6 +10,9 @@ import type { Playlist } from '@/features/playlists/types';
 import { createListStyles } from '@/features/playlists/home/components/presenters/listStyles';
 import { PlaylistGrid } from '@/features/playlists/home/components/presenters/PlaylistGrid';
 import { RefreshableScroll } from '@/features/playlists/home/components/presenters/RefreshableScroll';
+import CassetteTapeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/cassette-tape-solid.svg';
+import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
+import ShareSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/share-solid.svg';
 
 interface LibraryViewProps {
 	screen: LibraryScreen;
@@ -39,7 +42,7 @@ export function LibraryView({ screen, actionsFor }: LibraryViewProps) {
 			bottomPadding={screen.bottomPadding}
 		>
 			<View style={styles.section}>
-				<SectionHeader icon="tape" title="Vos playlists" count={screen.owned.length} />
+				<SectionHeader icon={CassetteTapeSolid} title="Vos playlists" count={screen.owned.length} />
 				{screen.owned.length > 0 ? (
 					<PlaylistGrid
 						playlists={screen.owned}
@@ -48,7 +51,7 @@ export function LibraryView({ screen, actionsFor }: LibraryViewProps) {
 					/>
 				) : (
 					<EmptyState
-						icon="note"
+						icon={MusicSolid}
 						message="Aucune playlist pour l'instant. Créez votre première playlist !"
 						action={{ label: 'Créer une playlist', onPress: screen.createPlaylist }}
 					/>
@@ -59,7 +62,7 @@ export function LibraryView({ screen, actionsFor }: LibraryViewProps) {
 					<View style={styles.sectionSpacer} />
 					<View style={styles.section}>
 						<SectionHeader
-							icon="share"
+							icon={ShareSolid}
 							title="Partagées avec vous"
 							count={screen.shared.length}
 						/>
