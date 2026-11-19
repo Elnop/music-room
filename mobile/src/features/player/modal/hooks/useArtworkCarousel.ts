@@ -11,10 +11,10 @@ import {
 } from 'react-native-reanimated';
 import { getPlayback, useActiveQueue } from '@/shared/services/playbackBridge';
 import { largeArtwork } from '@/shared/utils/artwork';
-import { hashStringToNumber } from '@/shared/utils/trackToSoundCloud';
 import type { QueueItem } from '@/shared/types/playback';
 import { hapticTap } from '@/shared/utils/haptics';
 import { trackSwipeDirection } from '@/features/player/utils/trackSwipe';
+import { displayedQueueIndex } from '@/features/player/utils/displayedQueueIndex';
 import { useArtworkSize } from '@/features/player/modal/hooks/useArtworkSize';
 import type { NowPlayingTrack } from '@/features/player/types';
 
@@ -43,20 +43,6 @@ export interface ArtworkCarousel {
 	artworkStep: number;
 }
 
-const keyOf = (item: QueueItem) => hashStringToNumber(item.track.trackUri);
-
-const displayedIndex = (
-	items: QueueItem[],
-	currentItemId: string | null,
-	track: NowPlayingTrack | null
-): number => {
-	if (!track) return -1;
-	const current = items.findIndex(item => item.id === currentItemId);
-	if (current >= 0 && keyOf(items[current]) === track.id) return current;
-	const byTrack = items.findIndex(item => keyOf(item) === track.id);
-	return byTrack >= 0 ? byTrack : current;
-};
-
 const queueSlots = (items: QueueItem[], shown: number): CarouselSlot[] => {
 	const first = Math.max(0, shown - WINDOW);
 	return items.slice(first, shown + WINDOW + 1).map((item, offset) => ({
@@ -74,7 +60,7 @@ export function useArtworkCarousel(
 ): ArtworkCarousel {
 	const queue = useActiveQueue();
 	const { size, step: artworkStep } = useArtworkSize();
-	const shown = displayedIndex(queue.items, queue.currentItemId, track);
+	const shown = displayedQueueIndex(queue.items, queue.currentItemId, track?.id ?? null);
 	const anchor = shown >= 0 ? shown : 0;
 	const slots: CarouselSlot[] =
 		shown >= 0
