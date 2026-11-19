@@ -3,7 +3,8 @@
     "guardrails/ui-primitives": 37,
     "guardrails/theme-tokens": 136,
     "guardrails/zustand-selector": 24,
-    "shared-not-to-legacy": 4
+    "shared-not-to-legacy": 4,
+    "check-tree": 178
   },
   "allowedPaths": {
     "no-asyncstorage-outside-storage": [

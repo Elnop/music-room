@@ -7,7 +7,7 @@ import { Artwork } from '@/shared/components/media/Artwork';
 import { EqualizerBars } from '@/shared/components/media/EqualizerBars';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { KeyButton } from '@/shared/components/ui/KeyButton';
-import type { MiniPlayerData } from '@/features/player/miniPlayer/hooks/useMiniPlayer';
+import type { MiniPlayerData } from '@/features/player/miniPlayer/useMiniPlayer';
 import { createStyles } from './miniPlayerStyles';
 import { Text } from '@/shared/components/ui/Text';
 import ArrowRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/arrow-right-solid.svg';

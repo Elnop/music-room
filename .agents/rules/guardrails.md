@@ -12,6 +12,7 @@ Read before changing a guardrail, an exception list, or when `npm run check` fai
 | lint | ESLint (`eslint . --quiet`) | `eslint.config.*`, `eslint-suppressions.json` | an ESLint error (warnings do not fail) |
 | dead-code | knip | `knip.json` | an unused file, export, type or dependency |
 | deps | dependency-cruiser | `.dependency-cruiser.cjs`, `.dependency-cruiser-known-violations.json` | a layer violation, a cross-feature import or a cycle ([architecture.md](architecture.md)) |
+| tree | check-tree (mobile) | `.check-tree-known-violations.json` | a folder outside the layout, an empty folder, a category folder with a single child ([structure.md](structure.md#check-tree)) |
 | duplication | jscpd | `.jscpd.json` | a clone of 5 lines and 50 tokens or more in `src/` (tests excluded) |
 | semgrep | semgrep (Docker) | `tools/semgrep/rules.yml` | a pattern rule below |
 | ast-grep | ast-grep | `sgconfig.yml`, `ast-grep/rules/` | a pattern rule below |
@@ -29,6 +30,7 @@ The rules block from day one; the violations that existed when a rule arrived ar
 | --- | --- | --- |
 | ESLint | `<project>/eslint-suppressions.json` (native bulk suppressions) | a (file, rule) pair, with its count |
 | dependency-cruiser | `<project>/.dependency-cruiser-known-violations.json` | a violation |
+| check-tree | `mobile/.check-tree-known-violations.json` | a message of check-tree, compared without its counts and file lists |
 | jscpd | the `ignore` globs of `<project>/.jscpd.json` | a glob (the first globs, tests and generated files, are permanent) |
 | semgrep | the `exclude` lists of `tools/semgrep/rules.yml` | a path (`backendUrl.ts`, `api.ts` and the test globs are permanent; a rule's `metadata.allowed-paths` globs are its definition, not exceptions) |
 | gitleaks | the `[[allowlists]]` of `.gitleaks.toml` | an allowed value or path, public by design |
@@ -37,6 +39,7 @@ An exception list only shrinks. `check:exceptions` counts the entries of each li
 
 - ESLint: `npx eslint . --prune-suppressions` (ESLint itself fails while a suppression is no longer needed).
 - dependency-cruiser: `npx depcruise <targets of check:deps> --config .dependency-cruiser.cjs --output-type baseline --output-to .dependency-cruiser-known-violations.json`.
+- check-tree: `npx check-tree src --write-known-violations` from `mobile/`.
 - jscpd, semgrep, gitleaks: delete the entries by hand.
 
 For jscpd `ignore`, semgrep `exclude` and every string of the `.gitleaks.toml` allowlist and `[extend]` sections, the comparison is by value: every entry must already exist on `develop`, so an entry can be neither added nor widened (such as `**/src/store/authStore.ts` turned into `**/src/**`).

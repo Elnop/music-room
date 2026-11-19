@@ -1,5 +1,5 @@
 import React from 'react';
-import { useDevicePicker } from '@/features/queue/devicePicker/hooks/useDevicePicker';
+import { useDevicePicker } from '@/features/queue/devicePicker/useDevicePicker';
 import { DevicePickerSheetView } from '@/features/queue/devicePicker/components/presenters/DevicePickerSheetView';
 
 interface DevicePickerSheetProps {

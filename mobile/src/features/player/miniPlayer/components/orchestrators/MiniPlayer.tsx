@@ -1,6 +1,6 @@
 import React from 'react';
 import { GestureDetector } from 'react-native-gesture-handler';
-import { useMiniPlayer } from '@/features/player/miniPlayer/hooks/useMiniPlayer';
+import { useMiniPlayer } from '@/features/player/miniPlayer/useMiniPlayer';
 import { MiniPlayerView } from '@/features/player/miniPlayer/components/presenters/MiniPlayerView';
 
 export function MiniPlayer() {

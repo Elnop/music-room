@@ -5,7 +5,7 @@ import { SectionHeader } from '@/shared/components/lists/SectionHeader';
 import { PlaylistCardSkeleton, SkeletonList } from '@/shared/components/ui/Skeleton';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
-import type { HomeScreen } from '@/features/playlists/home/hooks/useHomeScreen';
+import type { HomeScreen } from '@/features/playlists/home/useHomeScreen';
 import type { Playlist } from '@/features/playlists/types';
 import { FriendPlaylistCarousel } from './FriendPlaylistCarousel';
 import { createListStyles } from './listStyles';

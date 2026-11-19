@@ -1,5 +1,5 @@
 import React, { useLayoutEffect } from 'react';
-import { useProfileScreen } from '@/features/profile/profileScreen/hooks/useProfileScreen';
+import { useProfileScreen } from '@/features/profile/profileScreen/useProfileScreen';
 import { ProfileHeaderButtons } from '@/features/profile/profileScreen/components/presenters/ProfileHeaderButtons';
 import { ProfileView } from '@/features/profile/profileScreen/components/presenters/ProfileView';
 

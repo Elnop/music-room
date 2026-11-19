@@ -16,7 +16,7 @@ import { CONTENT_MAX_WIDTH } from '@/shared/constants/layout';
 import { LANDING_SHOWN } from '@/shared/constants/platform';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
-import type { FloatingIconMotion } from '@/features/auth/welcome/hooks/useFloatingIcons';
+import type { FloatingIconMotion } from '@/features/auth/welcome/useFloatingIcons';
 import { PixelWordmark } from '@/shared/components/media/PixelWordmark';
 import { LANDING_INTRO } from '@/features/auth/welcome/utils/landingContent';
 import { FloatingIcon } from './FloatingIcon';

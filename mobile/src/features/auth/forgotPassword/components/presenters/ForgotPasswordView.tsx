@@ -6,7 +6,7 @@ import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { PasswordScreenLayout } from '@/features/auth/form/components/presenters/PasswordScreenLayout';
 import { ErrorBox } from '@/features/auth/form/components/presenters/ErrorBox';
-import type { ForgotPassword } from '@/features/auth/forgotPassword/hooks/useForgotPassword';
+import type { ForgotPassword } from '@/features/auth/forgotPassword/useForgotPassword';
 import { Text } from '@/shared/components/ui/Text';
 import { FONT_FAMILIES } from '@/shared/theme/fonts';
 

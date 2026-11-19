@@ -1,10 +1,10 @@
 import React, { useLayoutEffect } from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { PlaylistStackParamList } from '@/features/playlists/types';
-import { useLibraryScreen } from '@/features/playlists/library/hooks/useLibraryScreen';
+import { useLibraryScreen } from '@/features/playlists/library/useLibraryScreen';
 import { LibraryView } from '@/features/playlists/library/components/presenters/LibraryView';
 import { HeaderIconButton } from '@/features/playlists/header/components/presenters/HeaderIconButton';
-import { usePlaylistCardMenu } from '@/features/playlists/cardMenu/hooks/usePlaylistCardMenu';
+import { usePlaylistCardMenu } from '@/features/playlists/cardMenu/usePlaylistCardMenu';
 import { PlaylistCardMenu } from '@/features/playlists/cardMenu/components/orchestrators/PlaylistCardMenu';
 import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
 

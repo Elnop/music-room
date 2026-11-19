@@ -8,7 +8,7 @@ import { logger } from '@/shared/utils/logger';
 import { showError, showInfo, showSuccess } from '@/shared/utils/toast';
 import { useEvent } from '@/features/events/hooks/useEventQueries';
 import { useDeleteEvent } from '@/features/events/hooks/useEventMutations';
-import { useBeaconStore } from '@/features/events/stores/beaconStore';
+import { useBeaconStore } from '@/features/events/beaconStore';
 import type { EventStackParamList, MusicEvent } from '@/features/events/types';
 
 type Navigation = NativeStackNavigationProp<EventStackParamList, 'EventDetail'>;

@@ -2,7 +2,7 @@ import React from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
 import type { PlaylistStackParamList } from '@/features/playlists/types';
-import { useSearchTracks } from '@/features/playlists/searchTracks/hooks/useSearchTracks';
+import { useSearchTracks } from '@/features/playlists/searchTracks/useSearchTracks';
 import { SearchTracksView } from '@/features/playlists/searchTracks/components/presenters/SearchTracksView';
 import { TrackActionsSheet } from '@/features/playlists/trackActions/components/orchestrators/TrackActionsSheet';
 

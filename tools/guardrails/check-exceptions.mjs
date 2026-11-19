@@ -23,6 +23,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { checkTreeEntry, followFolderRenames } from './check-tree-entries.mjs';
 import { followRenames, parseRenames } from './renames.mjs';
 
 const root = resolve(fileURLToPath(import.meta.url), '../../..');
@@ -62,6 +63,10 @@ function readDepcruise(text) {
 
 function readJscpd(text) {
   return { entries: new Set((JSON.parse(text).ignore ?? []).map((glob) => `ignore ${glob}`)) };
+}
+
+function readCheckTree(text) {
+  return { entries: new Set(JSON.parse(text).map(checkTreeEntry)) };
 }
 
 const unquote = (value) => value.trim().replace(/^(['"])(.*)\1$/, '$2');
@@ -162,6 +167,17 @@ const lists = [
     { project, path: `${project}/eslint-suppressions.json`, read: readEslint },
     { project, path: `${project}/.dependency-cruiser-known-violations.json`, read: readDepcruise },
     { project, path: `${project}/.jscpd.json`, read: readJscpd },
+    ...(project === 'mobile'
+      ? [
+          {
+            project,
+            path: `${project}/.check-tree-known-violations.json`,
+            read: readCheckTree,
+            follow: followFolderRenames,
+            newRule: 'check-tree',
+          },
+        ]
+      : []),
   ]),
   { path: 'tools/semgrep/rules.yml', read: readSemgrep },
   { path: '.gitleaks.toml', read: readGitleaks },
@@ -235,7 +251,20 @@ for (const list of lists) {
   }
   for (const reference of references) {
     const before = git('show', `${reference.rev}:${list.path}`);
-    if (before === null) continue;
+    if (before === null) {
+      if (list.newRule) {
+        const max = newRuleBaselines[list.project]?.[list.newRule] ?? 0;
+        const count = current.entries.size;
+        if (count > max) {
+          growths.push(
+            `${list.path}: ${count} entries for new rule ${list.newRule}, ${max} recorded in new-rule-baselines.json (vs ${reference.label})`
+          );
+        } else {
+          newRules.add(`${list.path}: ${list.newRule} (vs ${reference.label})`);
+        }
+      }
+      continue;
+    }
     let previous;
     try {
       previous = list.read(before);
@@ -244,7 +273,9 @@ for (const list of lists) {
     }
     const renames = renamesSince(reference.rev);
     const previousEntries = new Set(
-      [...(previous.entries ?? [])].map((entry) => followRenames(entry, renames, list.project))
+      [...(previous.entries ?? [])].map((entry) =>
+        (list.follow ?? followRenames)(entry, renames, list.project)
+      )
     );
     for (const [key, value] of Object.entries(current.counts ?? {})) {
       const was = previous.counts?.[key] ?? 0;

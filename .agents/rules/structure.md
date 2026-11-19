@@ -20,6 +20,8 @@ Where a file goes is set by the target layout in `doc/architecture/code-layout.m
       └── utils/                                                             (optional: the subject's own helpers, no JSX)
   ```
 
+  A category folder (`hooks/`, `stores/`, `services/`…) exists once it holds two files: a single hook, store or service sits at the root of its subject or feature ([check-tree](#check-tree)).
+
   `src/shared/` holds what several features use:
   - `components/ui/`: the primitives ([ui-primitives](#ui-primitives)): `Pressable`, `Button`, `Text`, `TextInput`, `Input`, `Card`, `Skeleton`, `ThemedSwitch`, `LoadingSpinner`;
   - `components/<subject>/`: shared blocks by subject (`feedback/`, `form/`, `layout/`, `lists/`, `media/`, `profile/`, `sharing/`, `theme/`);
@@ -67,3 +69,17 @@ Mobile: `Text` and `TextInput` come from `src/shared/components/ui/` (ESLint `gu
 ## font-families
 
 Mobile: no `fontWeight` and no font name (`fontFamily: 'Arial'`) outside `src/shared/theme/` (ESLint `guardrails/font-families`). Each weight of Pixelify Sans is its own family: Android picks a weight by family, not by `fontWeight`, and the browser fakes a bolder weight when a `fontWeight` is set on top of the family. Set `fontFamily: theme.typography.families.semibold` (or `FONT_FAMILIES.semibold` from `@/shared/theme/fonts` where no theme is at hand). A new weight is added to `FONT_FAMILIES` and `FONT_ASSETS` in `src/shared/theme/fonts.ts`, which `App.tsx` loads before the first render. Titles, button labels and avatar initials use the `display` family (Jersey 10, a single weight): spread `displayText(theme, size, role)` from `src/shared/theme/pixelFrame.ts`, which scales the size by `typography.displayScale`, since Jersey 10 looks smaller than Pixelify Sans at the same size.
+
+## check-tree
+
+Mobile: the folders of `src/` follow the layout of [brutalway](https://brutalway.elnop.dev/) (epic #616), checked by `@brutalway/check-tree` (`npm run check:tree`). It reports, one line per folder:
+
+- an empty folder (tests do not count: a folder holding only a test is empty);
+- a category folder (`components`, `orchestrators`, `presenters`, `hooks`, `stores`, `services`, `lib`…) holding a single child: move the child up one level and delete the folder;
+- two files of one kind outside their category folder (`holds 2 lib files`): move them into it;
+- a folder the layout does not name: `src/` holds `app/`, `features/` and `shared/`, `shared/` holds one folder per slice named after its concept, and a feature or a slice holds kind folders, `features/` and `shared/`;
+- a file of a `shared/` slice that a single feature uses (move it into that feature), and a slice whose files form groups that never import each other (split it).
+
+The violations that existed when the rule arrived are listed in `mobile/.check-tree-known-violations.json`, which check-tree skips. It fails on a violation that is not listed and on a listed one that no longer happens. After fixing folders, rewrite the list with `npx check-tree src --write-known-violations` (from `mobile/`) and check the diff: it may only lose lines, and `check:exceptions` fails if it gains one ([exception-lists](guardrails.md#exception-lists)).
+
+Until a later story of #616 changes `component-role-directory` and `presenter-pure`, which recognise a component's role by its folder, a single orchestrator or presenter stays in `components/orchestrators/` or `components/presenters/`: those folders are in the list, do not flatten them.

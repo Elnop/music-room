@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQueueModal } from '@/features/queue/queueModal/hooks/useQueueModal';
+import { useQueueModal } from '@/features/queue/queueModal/useQueueModal';
 import { QueueModalView } from '@/features/queue/queueModal/components/presenters/QueueModalView';
 
 interface QueueModalProps {

@@ -6,7 +6,7 @@ import { Pressable } from '@/shared/components/ui/Pressable';
 import { Artwork } from '@/shared/components/media/Artwork';
 import { getPlayerModal } from '@/shared/services/playerModalsBridge';
 import { PlayerProgressSlider } from '@/features/player/modal/components/presenters/PlayerProgressSlider';
-import type { PlayerBarData } from '@/features/player/playerBar/hooks/usePlayerBar';
+import type { PlayerBarData } from '@/features/player/playerBar/usePlayerBar';
 import { PlayerBarButton } from './PlayerBarButton';
 import { createStyles } from './playerBarStyles';
 import { Text } from '@/shared/components/ui/Text';

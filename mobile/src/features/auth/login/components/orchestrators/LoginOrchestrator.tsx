@@ -1,8 +1,8 @@
 import React from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '@/features/auth/types';
-import { useLoginForm } from '@/features/auth/login/hooks/useLoginForm';
-import { useProviderSignIn } from '@/features/auth/social/hooks/useProviderSignIn';
+import { useLoginForm } from '@/features/auth/login/useLoginForm';
+import { useProviderSignIn } from '@/features/auth/social/useProviderSignIn';
 import { useProviderButtons } from '@/features/auth/hooks/useProviderButtons';
 import { LoginView } from '@/features/auth/login/components/presenters/LoginView';
 

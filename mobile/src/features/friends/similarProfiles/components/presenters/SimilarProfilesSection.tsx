@@ -4,7 +4,7 @@ import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { SectionHeader } from '@/shared/components/lists/SectionHeader';
 import { Text } from '@/shared/components/ui/Text';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
-import type { SimilarProfilesSection as Section } from '@/features/friends/similarProfiles/hooks/useSimilarProfilesSection';
+import type { SimilarProfilesSection as Section } from '@/features/friends/similarProfiles/useSimilarProfilesSection';
 import { SimilarProfileCard } from './SimilarProfileCard';
 import { createSimilarProfilesStyles, SIMILAR_CARD_WIDTH } from './similarProfilesStyles';
 import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';

@@ -10,7 +10,7 @@ import { DeviceRow } from './DeviceRow';
 import type { DevicePickerOwner } from '@/types/device.types';
 import type { Theme } from '@/shared/theme/types';
 import type { createPickerStyles } from './devicePickerStyles';
-import type { LoadedDevices } from '@/features/queue/devicePicker/hooks/useDevicePicker';
+import type { LoadedDevices } from '@/features/queue/devicePicker/useDevicePicker';
 import type { PickerDevice } from './DeviceRow';
 import { Text } from '@/shared/components/ui/Text';
 import ChevronDownSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/chevron-down-solid.svg';

@@ -5,7 +5,7 @@ import { SearchBar } from '@/shared/components/form/SearchBar';
 import { SkeletonList, TrackRowSkeleton } from '@/shared/components/ui/Skeleton';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
-import type { SearchTracks } from '@/features/playlists/searchTracks/hooks/useSearchTracks';
+import type { SearchTracks } from '@/features/playlists/searchTracks/useSearchTracks';
 import { AddableTrackRow } from './AddableTrackRow';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 

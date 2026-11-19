@@ -25,7 +25,7 @@
 ## Running and verifying
 
 - The root `make` is the entry point: `make dev-docker` by default, `make dev-local` for the Android Studio emulator, `make dev-tunnel` when the phone is on another network.
-- `npm run check` in `backend/` or `mobile/` runs every guardrail in parallel (type-check, lint, knip, dependency-cruiser, jscpd, semgrep, ast-grep, gitleaks, tests, exception lists) and must pass before a commit: the husky pre-commit hook runs it on the touched projects, and the CI job `check` on every PR. semgrep and gitleaks run from Docker images, so Docker must be running. Details in `.agents/rules/guardrails.md`.
+- `npm run check` in `backend/` or `mobile/` runs every guardrail in parallel (type-check, lint, knip, dependency-cruiser, check-tree on mobile, jscpd, semgrep, ast-grep, gitleaks, tests, exception lists) and must pass before a commit: the husky pre-commit hook runs it on the touched projects, and the CI job `check` on every PR. semgrep and gitleaks run from Docker images, so Docker must be running. Details in `.agents/rules/guardrails.md`.
 - `make test` runs the backend (Vitest) and mobile (jest-expo) unit tests and exits non-zero on any failure; `npm test` runs one side. Strategy, mocks and single-test commands are in `doc/development/testing.md`. Also verify with `npm run type-check` and `npm run lint` in both `backend/` and `mobile/`, plus a call through Swagger UI for endpoints. The CI (`.github/workflows/ci.yml`) runs lint, type-check, `npm test` and the integration tests on every PR; keep it green.
 - Node 22 everywhere: `.nvmrc`, `backend/Dockerfile`, `mobile/Dockerfile`, `mobile/Dockerfile.android-build` and the CI. Change them together, with a ticket.
 - The app runs only as a native debug build (`cd mobile && npx expo run:android --app-id com.zumik.app.dev`), never in Expo Go: it crashes there for lack of its native modules (Google/Facebook sign-in, image colors).
@@ -44,7 +44,7 @@ Each rule `check` enforces has a section in `.agents/rules/`, and its error mess
 | Authoring or editing mobile components, orchestrators, presenters, or hooks | `.agents/rules/components.md` |
 | `npm run check` fails, or touching a guardrail or an exception list | `.agents/rules/guardrails.md` |
 
-Rules are append-only: never disable, weaken or switch a rule to `warn`, and never add an entry to an exception list (`eslint-suppressions.json`, `.dependency-cruiser-known-violations.json`, `.jscpd.json` `ignore`, semgrep `exclude`, `.gitleaks.toml` allowlists) to let code through; fix the code. Exception lists only shrink (`check:exceptions` compares them with `develop`). A new rule lands with its `.agents/rules` section.
+Rules are append-only: never disable, weaken or switch a rule to `warn`, and never add an entry to an exception list (`eslint-suppressions.json`, `.dependency-cruiser-known-violations.json`, `.check-tree-known-violations.json`, `.jscpd.json` `ignore`, semgrep `exclude`, `.gitleaks.toml` allowlists) to let code through; fix the code. Exception lists only shrink (`check:exceptions` compares them with `develop`). A new rule lands with its `.agents/rules` section.
 
 ## Conventions that differ from defaults
 
