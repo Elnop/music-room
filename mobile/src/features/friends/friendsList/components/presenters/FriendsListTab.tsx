@@ -11,6 +11,8 @@ import { FriendItemRow } from './FriendItemRow';
 import { ThemedRefreshControl } from '@/shared/components/lists/ThemedRefreshControl';
 import { createFriendsListStyles } from './friendsListStyles';
 import { useContentColumn } from '@/shared/hooks/useContentColumn';
+import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
+import UsersSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/users-solid.svg';
 
 interface FriendsListTabProps {
 	friends: FriendProfile[];
@@ -88,14 +90,14 @@ export function FriendsListTab({
 				loadFailed ? (
 					<EmptyState
 						style={styles.emptyState}
-						icon="alert"
+						icon={ExclamationTriangleSolid}
 						message="Impossible de charger vos amis"
 						action={{ label: 'Réessayer', onPress: onRetry }}
 					/>
 				) : (
 					<EmptyState
 						style={styles.emptyState}
-						icon="crew"
+						icon={UsersSolid}
 						message="Aucun ami pour l'instant. Suivez des utilisateurs qui vous suivent en retour pour devenir amis."
 						action={{
 							label: 'Rechercher des utilisateurs',

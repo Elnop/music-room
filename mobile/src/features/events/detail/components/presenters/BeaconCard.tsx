@@ -6,6 +6,7 @@ import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { createBeaconCardStyles } from './beaconCardStyles';
 import type { BeaconBroadcast } from '@/features/events/detail/hooks/useBeaconBroadcast';
 import { Text } from '@/shared/components/ui/Text';
+import WifiSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/wifi-solid.svg';
 
 function description(beacon: BeaconBroadcast): string {
 	if (!beacon.available) return "Disponible pendant l'événement";
@@ -20,7 +21,7 @@ export function BeaconCard({ beacon }: { beacon: BeaconBroadcast }) {
 	return (
 		<View style={styles.card}>
 			<PixelIcon
-				name={beacon.active ? 'beacon' : 'beacon'}
+				icon={beacon.active ? WifiSolid : WifiSolid}
 				size={24}
 				color={beacon.active ? theme.colors.primary : theme.colors.textSecondary}
 			/>

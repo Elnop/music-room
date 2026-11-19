@@ -11,7 +11,7 @@ export function FeatureCard({ title, description, icon }: LandingFeature) {
 
 	return (
 		<View style={styles.card}>
-			<PixelIcon name={icon} size={24} color={theme.colors.primary} />
+			<PixelIcon icon={icon} size={24} color={theme.colors.primary} />
 			<Text style={styles.title}>{title}</Text>
 			<Text style={styles.description}>{description}</Text>
 		</View>

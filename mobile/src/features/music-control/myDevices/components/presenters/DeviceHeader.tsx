@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
+import LaptopSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/laptop-solid.svg';
+import PhoneRingingLowSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/phone-ringing-low-solid.svg';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
@@ -10,6 +12,7 @@ import {
 	formatLastSeen,
 } from '@/features/music-control/myDevices/utils/deviceFormatters';
 import { Text } from '@/shared/components/ui/Text';
+import PencilSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/pencil-solid.svg';
 
 interface DeviceHeaderProps {
 	device: UserDeviceWithLicenses;
@@ -21,12 +24,12 @@ export function DeviceHeader({ device, isCurrent, onOpenRename }: DeviceHeaderPr
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 	const lastSeen = formatLastSeen(device.lastSeenAt);
-	const icon = device.platform === 'web' ? 'laptop' : 'phone';
+	const icon = device.platform === 'web' ? LaptopSolid : PhoneRingingLowSolid;
 
 	return (
 		<View style={styles.deviceHeader}>
 			<View style={styles.iconWrapper}>
-				<PixelIcon name={icon} size={20} color={theme.colors.primary} />
+				<PixelIcon icon={icon} size={20} color={theme.colors.primary} />
 			</View>
 			<View style={styles.textContainer}>
 				<View style={styles.titleRow}>
@@ -50,7 +53,7 @@ export function DeviceHeader({ device, isCurrent, onOpenRename }: DeviceHeaderPr
 				hitSlop={8}
 				style={styles.renameButton}
 			>
-				<PixelIcon name="pencil" size={20} color={theme.colors.textSecondary} />
+				<PixelIcon icon={PencilSolid} size={20} color={theme.colors.textSecondary} />
 			</Pressable>
 		</View>
 	);

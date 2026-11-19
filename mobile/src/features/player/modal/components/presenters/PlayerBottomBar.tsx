@@ -3,6 +3,8 @@ import { View } from 'react-native';
 import { KeyButton } from '@/shared/components/ui/KeyButton';
 import { Text } from '@/shared/components/ui/Text';
 import type { createStyles } from './playerModalStyles';
+import PhoneRingingLowSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/phone-ringing-low-solid.svg';
+import PlaylistSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/playlist-solid.svg';
 
 interface PlayerBottomBarProps {
 	styles: ReturnType<typeof createStyles>;
@@ -20,7 +22,7 @@ export function PlayerBottomBar({
 	return (
 		<View style={styles.bottomBar}>
 			<KeyButton
-				icon="phone"
+				icon={PhoneRingingLowSolid}
 				tone="device"
 				size={54}
 				onPress={onOpenDevices}
@@ -35,7 +37,12 @@ export function PlayerBottomBar({
 					{deviceLabel ? `Sur ${deviceLabel}` : 'Ce téléphone'}
 				</Text>
 			</KeyButton>
-			<KeyButton icon="queue" size={54} onPress={onOpenQueue} accessibilityLabel="File d'attente" />
+			<KeyButton
+				icon={PlaylistSolid}
+				size={54}
+				onPress={onOpenQueue}
+				accessibilityLabel="File d'attente"
+			/>
 		</View>
 	);
 }

@@ -1,14 +1,15 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelIconName } from '@/shared/constants/pixelIcons';
+import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Text } from '@/shared/components/ui/Text';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import AngleRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/angle-right-solid.svg';
 
 interface ActionSheetRowProps {
-	icon: PixelIconName;
+	icon: PixelIconSource;
 	label: string;
 	onPress: () => void;
 	detail?: string;
@@ -29,7 +30,7 @@ export function ActionSheetRow({
 
 	return (
 		<Pressable style={styles.row} onPress={onPress} accessibilityLabel={label}>
-			<PixelIcon name={icon} size={22} color={color} style={styles.icon} />
+			<PixelIcon icon={icon} size={22} color={color} style={styles.icon} />
 			{detail === undefined ? (
 				<Text style={[styles.label, { color }]}>{label}</Text>
 			) : (
@@ -40,7 +41,7 @@ export function ActionSheetRow({
 					<Text style={styles.detail}>{detail}</Text>
 				</View>
 			)}
-			{chevron && <PixelIcon name="right" size={20} color={theme.colors.textSecondary} />}
+			{chevron && <PixelIcon icon={AngleRightSolid} size={20} color={theme.colors.textSecondary} />}
 		</Pressable>
 	);
 }

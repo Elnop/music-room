@@ -7,6 +7,7 @@ import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { SearchTracks } from '@/features/playlists/searchTracks/hooks/useSearchTracks';
 import { AddableTrackRow } from './AddableTrackRow';
+import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
 interface SearchTracksViewProps {
 	screen: SearchTracks;
@@ -49,7 +50,7 @@ export function SearchTracksView({ screen, bottomPadding }: SearchTracksViewProp
 					ListEmptyComponent={
 						typed && screen.isLoading ? null : (
 							<EmptyState
-								icon="note"
+								icon={MusicSolid}
 								message={
 									typed
 										? 'Aucun titre trouvé'

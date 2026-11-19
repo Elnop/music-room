@@ -15,6 +15,9 @@ import type { Theme } from '@/shared/theme/types';
 import type { QueueItem } from '@/features/queue/types';
 import type { AddQueueItemBody } from '@/shared/types/playback';
 import { Text } from '@/shared/components/ui/Text';
+import ChevronDownSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/chevron-down-solid.svg';
+import PlaylistSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/playlist-solid.svg';
+import TimesSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/times-solid.svg';
 
 interface QueueModalViewProps {
 	visible: boolean;
@@ -67,7 +70,7 @@ export function QueueModalView({
 	const empty = current ? (
 		<Text style={styles.nothingNext}>Rien à suivre</Text>
 	) : (
-		<EmptyState message="La file d'attente est vide" icon="queue" />
+		<EmptyState message="La file d'attente est vide" icon={PlaylistSolid} />
 	);
 
 	const content = (
@@ -80,7 +83,11 @@ export function QueueModalView({
 					accessibilityRole="button"
 					accessibilityLabel="Fermer la file d'attente"
 				>
-					<PixelIcon name={isWide ? 'close' : 'down'} size={24} color={theme.colors.text} />
+					<PixelIcon
+						icon={isWide ? TimesSolid : ChevronDownSolid}
+						size={24}
+						color={theme.colors.text}
+					/>
 				</Pressable>
 				<Text style={styles.title}>File d&apos;attente</Text>
 			</View>

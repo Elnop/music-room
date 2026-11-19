@@ -6,6 +6,7 @@ import type { Theme } from '@/shared/theme/types';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useShareLink } from '@/shared/hooks/useShareLink';
 import { Text } from '@/shared/components/ui/Text';
+import ShareSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/share-solid.svg';
 
 interface ShareLinkButtonProps {
 	url: string;
@@ -21,7 +22,7 @@ export function ShareLinkButton({ url, title, style }: ShareLinkButtonProps) {
 
 	return (
 		<Pressable style={[styles.button, style]} onPress={handlePress} accessibilityLabel="Partager">
-			<PixelIcon name="share" size={16} color={theme.colors.text} />
+			<PixelIcon icon={ShareSolid} size={16} color={theme.colors.text} />
 			<Text style={styles.label}>Partager</Text>
 		</Pressable>
 	);

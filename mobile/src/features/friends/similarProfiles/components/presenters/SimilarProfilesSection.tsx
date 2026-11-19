@@ -7,6 +7,8 @@ import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { SimilarProfilesSection as Section } from '@/features/friends/similarProfiles/hooks/useSimilarProfilesSection';
 import { SimilarProfileCard } from './SimilarProfileCard';
 import { createSimilarProfilesStyles, SIMILAR_CARD_WIDTH } from './similarProfilesStyles';
+import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
+import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
 interface SimilarProfilesSectionProps {
 	section: Section;
@@ -22,7 +24,7 @@ export function SimilarProfilesSection({ section }: SimilarProfilesSectionProps)
 			case 'error':
 				return (
 					<EmptyState
-						icon="alert"
+						icon={ExclamationTriangleSolid}
 						message="Impossible de charger les suggestions"
 						action={{ label: 'Réessayer', onPress: section.retry }}
 						compact
@@ -31,7 +33,7 @@ export function SimilarProfilesSection({ section }: SimilarProfilesSectionProps)
 			case 'needsPreferences':
 				return (
 					<EmptyState
-						icon="note"
+						icon={MusicSolid}
 						message="Choisissez vos genres préférés pour découvrir des profils qui vous ressemblent"
 						action={{ label: 'Choisir mes genres', onPress: section.openPreferences }}
 						compact
@@ -59,7 +61,7 @@ export function SimilarProfilesSection({ section }: SimilarProfilesSectionProps)
 	return (
 		<View>
 			<SectionHeader
-				icon="note"
+				icon={MusicSolid}
 				title="Profils aux goûts proches"
 				count={section.profiles.length}
 			/>

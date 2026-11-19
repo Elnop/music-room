@@ -13,6 +13,7 @@ import type { Theme } from '@/shared/theme/types';
 import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 import { Text } from '@/shared/components/ui/Text';
 import { FONT_FAMILIES } from '@/shared/theme/fonts';
+import AngleLeftSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/angle-left-solid.svg';
 
 interface ActionSheetProps {
 	visible: boolean;
@@ -57,7 +58,7 @@ export function ActionSheet({
 			<View style={[styles.header, { borderBottomColor: separator }]}>
 				{onBack && (
 					<Pressable onPress={onBack} style={styles.backButton} accessibilityLabel="Retour">
-						<PixelIcon name="back" size={22} color={theme.colors.text} />
+						<PixelIcon icon={AngleLeftSolid} size={22} color={theme.colors.text} />
 					</Pressable>
 				)}
 				<View style={styles.headerText}>

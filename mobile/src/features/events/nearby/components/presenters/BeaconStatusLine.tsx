@@ -6,6 +6,8 @@ import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { BeaconScanStatus } from '@/features/events/nearby/hooks/useBeaconScan';
 import { Text } from '@/shared/components/ui/Text';
+import WifiOutline from '@hackernoon/pixel-icon-library/icons/SVG/regular/wifi.svg';
+import WifiSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/wifi-solid.svg';
 
 interface BeaconStatusLineProps {
 	status: BeaconScanStatus;
@@ -27,7 +29,7 @@ export function BeaconStatusLine({ status, onRequestPermission }: BeaconStatusLi
 				onPress={onRequestPermission}
 				accessibilityLabel="Détecter aussi les balises Bluetooth"
 			>
-				<PixelIcon name="bluetooth" size={16} color={theme.colors.primary} />
+				<PixelIcon icon={WifiOutline} size={16} color={theme.colors.primary} />
 				<Text style={styles.link}>Détecter aussi les balises Bluetooth</Text>
 			</Pressable>
 		);
@@ -38,7 +40,7 @@ export function BeaconStatusLine({ status, onRequestPermission }: BeaconStatusLi
 	return (
 		<View style={styles.row}>
 			<PixelIcon
-				name={status === 'scanning' ? 'beacon' : 'bluetooth'}
+				icon={status === 'scanning' ? WifiSolid : WifiOutline}
 				size={16}
 				color={theme.colors.textSecondary}
 			/>

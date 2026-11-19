@@ -26,7 +26,10 @@ describe('prepareSquareImage', () => {
 		expect(uri).toBe('file:///cache/avatar-512.jpg');
 		expect(mockManipulate).toHaveBeenCalledWith('file:///picked.png');
 		expect(mockContext.crop).not.toHaveBeenCalled();
-		expect(mockContext.resize).toHaveBeenCalledWith({ width: SQUARE_IMAGE_SIZE, height: SQUARE_IMAGE_SIZE });
+		expect(mockContext.resize).toHaveBeenCalledWith({
+			width: SQUARE_IMAGE_SIZE,
+			height: SQUARE_IMAGE_SIZE,
+		});
 		expect(mockSaveAsync).toHaveBeenCalledWith({ format: 'jpeg', compress: 0.8 });
 	});
 

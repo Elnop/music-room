@@ -16,6 +16,8 @@ import { useFieldFocus } from '@/shared/hooks/useFieldFocus';
 import { Pressable } from './Pressable';
 import { Text } from './Text';
 import { TextInput } from './TextInput';
+import EyeCrossSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/eye-cross-solid.svg';
+import EyeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/eye-solid.svg';
 
 interface InputProps extends Omit<TextInputProps, 'style'> {
 	label: string;
@@ -81,7 +83,7 @@ export function Input({
 						style={[styles.toggle, Platform.OS === 'web' && styles.toggleWeb]}
 					>
 						<PixelIcon
-							name={isHidden ? 'eye' : 'eyeOff'}
+							icon={isHidden ? EyeSolid : EyeCrossSolid}
 							size={20}
 							color={theme.colors.textSecondary}
 						/>

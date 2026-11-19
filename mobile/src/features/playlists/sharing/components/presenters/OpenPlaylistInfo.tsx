@@ -5,6 +5,7 @@ import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { createSharingStyles } from './sharingStyles';
 import { Text } from '@/shared/components/ui/Text';
+import InfoCircleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/info-circle-solid.svg';
 
 export function OpenPlaylistInfo() {
 	const { styles: shared } = useThemedStyles(createSharingStyles);
@@ -12,7 +13,7 @@ export function OpenPlaylistInfo() {
 
 	return (
 		<View style={[shared.card, styles.card]}>
-			<PixelIcon name="info" size={28} color={theme.colors.primary} />
+			<PixelIcon icon={InfoCircleSolid} size={28} color={theme.colors.primary} />
 			<View style={styles.content}>
 				<Text style={styles.title}>Playlist ouverte</Text>
 				<Text style={styles.text}>

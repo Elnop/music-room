@@ -7,7 +7,7 @@ import type { NavigatorScreenParams } from '@react-navigation/native';
 import { View, StyleSheet, Platform } from 'react-native';
 import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelIconName } from '@/shared/constants/pixelIcons';
+import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 
@@ -38,6 +38,11 @@ import { useNowPlayingPanelStore } from '@/shared/stores/nowPlayingPanelStore';
 import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import { KeyboardShortcuts } from './KeyboardShortcuts';
 import { headerTitle } from '@/shared/theme/pixelFrame';
+import CassetteTapeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/cassette-tape-solid.svg';
+import HomeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/home-solid.svg';
+import SearchSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/search-solid.svg';
+import UserSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/user-solid.svg';
+import UsersSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/users-solid.svg';
 
 export type AppTabsParamList = {
 	HomeTab: NavigatorScreenParams<PlaylistStackParamList> | undefined;
@@ -55,12 +60,12 @@ const Tab = createBottomTabNavigator<AppTabsParamList>();
 registerPlayback();
 registerMusicControl();
 
-const TAB_ICONS: Record<string, PixelIconName> = {
-	HomeTab: 'home',
-	PlaylistsTab: 'tape',
-	SearchTab: 'search',
-	FriendsTab: 'crew',
-	ProfileTab: 'me',
+const TAB_ICONS: Record<string, PixelIconSource> = {
+	HomeTab: HomeSolid,
+	PlaylistsTab: CassetteTapeSolid,
+	SearchTab: SearchSolid,
+	FriendsTab: UsersSolid,
+	ProfileTab: UserSolid,
 };
 
 const sidebarOptions = (
@@ -139,7 +144,7 @@ export function AppNavigator() {
 								...sidebar,
 								tabBarIcon: ({ focused, color }) => (
 									<View style={styles.tabIcon}>
-										<PixelIcon name={TAB_ICONS[route.name]} color={color} />
+										<PixelIcon icon={TAB_ICONS[route.name]} color={color} />
 										<View style={[styles.tabDot, focused && { backgroundColor: color }]} />
 									</View>
 								),

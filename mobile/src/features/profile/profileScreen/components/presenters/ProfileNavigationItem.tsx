@@ -1,17 +1,18 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelIconName } from '@/shared/constants/pixelIcons';
+import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { keycap, pixelFrame } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 import { Text } from '@/shared/components/ui/Text';
+import AngleRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/angle-right-solid.svg';
 
 interface ProfileNavigationItemProps {
 	title: string;
 	subtitle: string;
-	icon: PixelIconName;
+	icon: PixelIconSource;
 	onPress: () => void;
 }
 
@@ -28,13 +29,13 @@ export function ProfileNavigationItem({
 		<View style={styles.buttonContainer}>
 			<Pressable style={styles.menuButton} onPress={onPress} accessibilityLabel={title}>
 				<View style={styles.iconContainer}>
-					<PixelIcon name={icon} size={20} color={theme.colors.primary} />
+					<PixelIcon icon={icon} size={20} color={theme.colors.primary} />
 				</View>
 				<View style={styles.textContainer}>
 					<Text style={styles.title}>{title}</Text>
 					<Text style={styles.subtitle}>{subtitle}</Text>
 				</View>
-				<PixelIcon name="right" size={20} color={theme.colors.textSecondary} />
+				<PixelIcon icon={AngleRightSolid} size={20} color={theme.colors.textSecondary} />
 			</Pressable>
 		</View>
 	);

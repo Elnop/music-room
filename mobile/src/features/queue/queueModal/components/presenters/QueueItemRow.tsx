@@ -11,6 +11,9 @@ import { QueueTrackDetails } from './QueueTrackDetails';
 import { createRowStyles, formatDuration } from './queueModalStyles';
 import type { QueueItem } from '@/features/queue/types';
 import { Text } from '@/shared/components/ui/Text';
+import BarsSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/bars-solid.svg';
+import SoundOnSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/sound-on-solid.svg';
+import TrashSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/trash-solid.svg';
 
 interface QueueItemRowProps {
 	item: QueueItem;
@@ -49,7 +52,7 @@ export function QueueItemRow({
 			accessibilityRole="button"
 			accessibilityLabel={`Retirer ${track.title}`}
 		>
-			<PixelIcon name="trash" size={24} color={theme.colors.onColor} />
+			<PixelIcon icon={TrashSolid} size={24} color={theme.colors.onColor} />
 			<Text style={styles.deleteText}>Retirer</Text>
 		</Pressable>
 	);
@@ -86,7 +89,7 @@ export function QueueItemRow({
 
 					{isCurrent ? (
 						<PixelIcon
-							name="volume"
+							icon={SoundOnSolid}
 							size={18}
 							color={theme.colors.primary}
 							style={styles.playingIcon}
@@ -107,7 +110,7 @@ export function QueueItemRow({
 						accessibilityRole="button"
 						accessibilityLabel="Réordonner"
 					>
-						<PixelIcon name="grip" size={24} color={theme.colors.textSecondary} />
+						<PixelIcon icon={BarsSolid} size={24} color={theme.colors.textSecondary} />
 					</Pressable>
 				)}
 			</View>

@@ -9,6 +9,7 @@ import { DeviceCard } from './DeviceCard';
 import { MyDevicesHeader } from './MyDevicesHeader';
 import { MyDevicesLoadingView } from './MyDevicesLoadingView';
 import { MyDevicesErrorView } from './MyDevicesErrorView';
+import PhoneRingingLowSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/phone-ringing-low-solid.svg';
 
 interface MyDevicesViewProps {
 	isLoading: boolean;
@@ -76,7 +77,7 @@ export function MyDevicesView({
 
 				{devices.length === 0 ? (
 					<EmptyState
-						icon="phone"
+						icon={PhoneRingingLowSolid}
 						style={styles.emptyState}
 						message="Aucun appareil. Ouvrez Zumik sur un appareil pour le voir ici."
 					/>

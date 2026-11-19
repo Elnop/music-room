@@ -2,6 +2,7 @@ import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { EmptyState } from './EmptyState';
+import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
 jest.mock('@/shared/theme/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
@@ -16,10 +17,10 @@ describe('EmptyState', () => {
 	});
 
 	it('renders the given icon', () => {
-		render(<EmptyState message="Nothing here" icon="note" />);
+		render(<EmptyState message="Nothing here" icon={MusicSolid} />);
 		const icons = screen.UNSAFE_queryAllByType(PixelIcon);
 		expect(icons).toHaveLength(1);
-		expect(icons[0].props.name).toBe('note');
+		expect(icons[0].props.icon).toBe(MusicSolid);
 	});
 
 	it('has no button without an action', () => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import type { PixelIconName } from '@/shared/constants/pixelIcons';
+import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
 import { ProfileScreenLayout } from '@/features/profile/common/components/presenters/ProfileScreenLayout';
 import { LinkedAccountRow } from '@/features/profile/linkedAccounts/components/presenters/LinkedAccountRow';
 import { useTheme } from '@/shared/theme/ThemeContext';
@@ -10,19 +10,22 @@ import type {
 	LinkedProvider,
 	OAuthProvider,
 } from '@/shared/services/linkedAccountsBridge';
+import EnvelopeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/envelope-solid.svg';
+import FacebookRoundBrand from '@hackernoon/pixel-icon-library/icons/SVG/brands/facebook-round.svg';
+import GoogleBrand from '@hackernoon/pixel-icon-library/icons/SVG/brands/google.svg';
 
 type MethodType = LinkedProvider['type'];
 
 interface MethodRow {
 	type: MethodType;
 	label: string;
-	icon: PixelIconName;
+	icon: PixelIconSource;
 }
 
 const METHODS: MethodRow[] = [
-	{ type: 'password', label: 'Email et mot de passe', icon: 'mail' },
-	{ type: 'google', label: 'Google', icon: 'google' },
-	{ type: 'facebook', label: 'Facebook', icon: 'facebook' },
+	{ type: 'password', label: 'Email et mot de passe', icon: EnvelopeSolid },
+	{ type: 'google', label: 'Google', icon: GoogleBrand },
+	{ type: 'facebook', label: 'Facebook', icon: FacebookRoundBrand },
 ];
 
 interface LinkedAccountsViewProps {

@@ -39,7 +39,7 @@ export function VisibilityToggle({ label, description, value, onChange }: Visibi
 							accessibilityLabel={VISIBILITY_LABELS[option]}
 						>
 							<PixelIcon
-								name={VISIBILITY_ICONS[option]}
+								icon={VISIBILITY_ICONS[option]}
 								size={14}
 								color={isSelected ? theme.colors.textInverse : theme.colors.textSecondary}
 							/>

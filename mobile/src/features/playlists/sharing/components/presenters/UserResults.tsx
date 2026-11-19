@@ -10,6 +10,8 @@ import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { UserSummary } from '@/features/playlists/types';
 import { createSharingStyles } from './sharingStyles';
 import { Text } from '@/shared/components/ui/Text';
+import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
+import SearchSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/search-solid.svg';
 
 interface UserResultsProps {
 	results: UserSummary[];
@@ -46,13 +48,13 @@ export function UserResults({ results, isSearching, busy, onAdd }: UserResultsPr
 								{item.displayName && <Text style={styles.displayName}>{item.displayName}</Text>}
 							</View>
 							<View style={styles.addButton}>
-								<PixelIcon name="plus" size={24} color={theme.colors.onColor} />
+								<PixelIcon icon={PlusSolid} size={24} color={theme.colors.onColor} />
 							</View>
 						</Pressable>
 					)}
 				/>
 			) : (
-				<EmptyState icon="search" style={styles.empty} message="Aucun utilisateur trouvé" />
+				<EmptyState icon={SearchSolid} style={styles.empty} message="Aucun utilisateur trouvé" />
 			)}
 		</View>
 	);

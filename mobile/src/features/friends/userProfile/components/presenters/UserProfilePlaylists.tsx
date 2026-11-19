@@ -6,6 +6,7 @@ import type { FriendPlaylistSummary } from '@/features/friends/types';
 import { FriendPlaylistCard } from './FriendPlaylistCard';
 import { createUserProfileStyles } from './userProfileStyles';
 import { Text } from '@/shared/components/ui/Text';
+import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
 interface UserProfilePlaylistsProps {
 	playlists: FriendPlaylistSummary[];
@@ -26,7 +27,7 @@ export function UserProfilePlaylists({
 			<Text style={styles.sectionTitle}>Playlists</Text>
 			{playlists.length === 0 ? (
 				<EmptyState
-					icon="note"
+					icon={MusicSolid}
 					style={styles.emptyPlaylists}
 					message="Aucune playlist à afficher"
 				/>

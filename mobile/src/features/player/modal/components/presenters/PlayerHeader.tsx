@@ -5,6 +5,8 @@ import { Pressable } from '@/shared/components/ui/Pressable';
 import { Text } from '@/shared/components/ui/Text';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { HEADER_HIT_SLOP, type createStyles } from './playerModalStyles';
+import ChevronDownSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/chevron-down-solid.svg';
+import TimesSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/times-solid.svg';
 
 interface PlayerHeaderProps {
 	styles: ReturnType<typeof createStyles>;
@@ -45,9 +47,9 @@ export function PlayerHeader({
 			>
 				<View style={styles.headerButton}>
 					{dialog ? (
-						<PixelIcon name="close" size={24} color={theme.colors.text} />
+						<PixelIcon icon={TimesSolid} size={24} color={theme.colors.text} />
 					) : (
-						<PixelIcon name="down" color={theme.colors.text} />
+						<PixelIcon icon={ChevronDownSolid} color={theme.colors.text} />
 					)}
 				</View>
 			</Pressable>

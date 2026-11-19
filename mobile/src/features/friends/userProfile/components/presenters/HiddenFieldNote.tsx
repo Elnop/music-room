@@ -4,6 +4,7 @@ import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { createUserProfileHeaderStyles } from './userProfileHeaderStyles';
 import { Text } from '@/shared/components/ui/Text';
+import LockSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/lock-solid.svg';
 
 export function HiddenFieldNote({ label }: { label: string }) {
 	const { theme } = useTheme();
@@ -12,7 +13,7 @@ export function HiddenFieldNote({ label }: { label: string }) {
 	return (
 		<View style={styles.hiddenField}>
 			<PixelIcon
-				name="lock"
+				icon={LockSolid}
 				size={16}
 				color={theme.colors.textSecondary}
 				style={styles.hiddenIcon}

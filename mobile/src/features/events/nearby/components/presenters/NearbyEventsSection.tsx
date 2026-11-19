@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import { GENRE_INFO } from '@/types/user.types';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { RadarScope } from '@/shared/components/media/RadarScope';
 import { Button } from '@/shared/components/ui/Button';
@@ -14,6 +15,8 @@ import type { NearbyEvents } from '@/features/events/nearby/hooks/useNearbyEvent
 import { radarSpot } from '@/features/events/nearby/utils/radarBlips';
 import { BeaconStatusLine } from './BeaconStatusLine';
 import { EventRow } from './EventRow';
+import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
+import WifiSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/wifi-solid.svg';
 
 const NOTICE_ACTIONS = {
 	request: { label: 'Autoriser la localisation', handler: 'requestPermission' },
@@ -45,7 +48,11 @@ export function NearbyEventsSection({ nearby }: { nearby: NearbyEvents }) {
 							accessibilityLabel={`${event.name}, ${proximity}`}
 						>
 							<View style={[styles.dot, { backgroundColor: GENRE_COLORS[event.genres[0]] }]}>
-								<PixelIcon name={event.genres[0]} size={12} color={theme.colors.onColor} />
+								<PixelIcon
+									icon={GENRE_INFO[event.genres[0]].icon}
+									size={12}
+									color={theme.colors.onColor}
+								/>
 							</View>
 							{rank === 0 && (
 								<View style={styles.label}>
@@ -72,7 +79,7 @@ export function NearbyEventsSection({ nearby }: { nearby: NearbyEvents }) {
 					</View>
 				)}
 				<View style={styles.count}>
-					<PixelIcon name="beacon" size={12} color={theme.colors.primary} />
+					<PixelIcon icon={WifiSolid} size={12} color={theme.colors.primary} />
 					<Text style={styles.countText}>{nearby.items.length}</Text>
 				</View>
 			</RadarScope>
@@ -84,7 +91,7 @@ export function NearbyEventsSection({ nearby }: { nearby: NearbyEvents }) {
 					))}
 				</View>
 				<KeyButton
-					icon="plus"
+					icon={PlusSolid}
 					tone="primary"
 					size={45}
 					onPress={nearby.createEvent}

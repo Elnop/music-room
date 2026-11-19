@@ -12,6 +12,12 @@ import { playlistLink } from '@/shared/utils/shareLinks';
 import type { PlaylistWithTracks } from '@/features/playlists/types';
 import { headerFacts } from '@/features/playlists/detail/utils/headerFacts';
 import { PlaylistCover } from './PlaylistCover';
+import EyeCrossSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/eye-cross-solid.svg';
+import EyeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/eye-solid.svg';
+import LockSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/lock-solid.svg';
+import PencilSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/pencil-solid.svg';
+import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
+import UsersSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/users-solid.svg';
 
 interface PlaylistHeaderProps {
 	playlist: PlaylistWithTracks;
@@ -39,14 +45,14 @@ export function PlaylistHeader({ playlist, playButton, canEdit, onAddTrack }: Pl
 							accessible
 							accessibilityLabel={isPublic ? 'Publique' : 'Privée'}
 						>
-							<PixelIcon name={isPublic ? 'eye' : 'eyeOff'} color={theme.colors.onColor} />
+							<PixelIcon icon={isPublic ? EyeSolid : EyeCrossSolid} color={theme.colors.onColor} />
 						</View>
 						<View
 							style={[styles.badge, styles.editing]}
 							accessible
 							accessibilityLabel={isOpen ? 'Ouverte à tous en édition' : 'Édition sur invitation'}
 						>
-							<PixelIcon name={isOpen ? 'pencil' : 'lock'} color={theme.colors.onColor} />
+							<PixelIcon icon={isOpen ? PencilSolid : LockSolid} color={theme.colors.onColor} />
 						</View>
 					</View>
 					<View style={styles.row}>
@@ -55,7 +61,7 @@ export function PlaylistHeader({ playlist, playButton, canEdit, onAddTrack }: Pl
 						</View>
 						{collaboratorLabel && (
 							<View style={styles.collaborators} accessible accessibilityLabel={collaboratorLabel}>
-								<PixelIcon name="crew" size={12} color={theme.colors.people} />
+								<PixelIcon icon={UsersSolid} size={12} color={theme.colors.people} />
 								<Text style={styles.collaboratorCount}>{collaborators}</Text>
 							</View>
 						)}
@@ -68,7 +74,7 @@ export function PlaylistHeader({ playlist, playButton, canEdit, onAddTrack }: Pl
 			<View style={styles.actions}>
 				{trackCount > 0 && playButton}
 				{canEdit && (
-					<KeyButton icon="plus" onPress={onAddTrack} accessibilityLabel="Ajouter un titre" />
+					<KeyButton icon={PlusSolid} onPress={onAddTrack} accessibilityLabel="Ajouter un titre" />
 				)}
 				<ShareLinkButton url={playlistLink(playlist.id)} title={playlist.name} />
 				<Text style={styles.count} accessibilityLabel={trackLabel}>

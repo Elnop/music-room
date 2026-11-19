@@ -1,13 +1,13 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelIconName } from '@/shared/constants/pixelIcons';
+import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { INK, PIXEL } from '@/shared/theme/tokens';
 
 interface HeaderIconButtonProps {
-	icon: PixelIconName;
+	icon: PixelIconSource;
 	size: number;
 	onPress: () => void;
 	accessibilityLabel: string;
@@ -33,7 +33,7 @@ export function HeaderIconButton({
 					{ backgroundColor: theme.colors.background },
 				]}
 			>
-				<PixelIcon name={icon} size={size} color={theme.colors.text} />
+				<PixelIcon icon={icon} size={size} color={theme.colors.text} />
 			</Pressable>
 		</View>
 	);

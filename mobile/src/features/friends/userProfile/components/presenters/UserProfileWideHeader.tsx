@@ -15,6 +15,9 @@ import { HiddenFieldNote } from './HiddenFieldNote';
 import { UserProfileBadges } from './UserProfileBadges';
 import { createUserProfileHeaderStyles } from './userProfileHeaderStyles';
 import { Text } from '@/shared/components/ui/Text';
+import CheckSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/check-solid.svg';
+import ShareSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/share-solid.svg';
+import UserPlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/user-plus-solid.svg';
 
 type UserProfileWideHeaderProps = Pick<
 	UserProfileHeaderProps,
@@ -75,7 +78,7 @@ export function UserProfileWideHeader({
 							accessibilityLabel={followStatus.isFollowing ? 'Ne plus suivre' : 'Suivre'}
 							icon={
 								<PixelIcon
-									name={followStatus.isFollowing ? 'check' : 'userAdd'}
+									icon={followStatus.isFollowing ? CheckSolid : UserPlusSolid}
 									size={18}
 									color={followStatus.isFollowing ? theme.colors.text : theme.colors.onColor}
 								/>
@@ -88,7 +91,7 @@ export function UserProfileWideHeader({
 						variant="secondary"
 						onPress={share}
 						style={styles.action}
-						icon={<PixelIcon name="share" size={18} color={theme.colors.text} />}
+						icon={<PixelIcon icon={ShareSolid} size={18} color={theme.colors.text} />}
 					>
 						Partager
 					</Button>

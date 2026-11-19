@@ -1,21 +1,24 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelIconName } from '@/shared/constants/pixelIcons';
+import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
 import type { ToastConfigParams } from 'react-native-toast-message';
 import { pixelFrame } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Text } from '@/shared/components/ui/Text';
 import { FONT_FAMILIES } from '@/shared/theme/fonts';
+import CheckSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/check-solid.svg';
+import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
+import InfoCircleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/info-circle-solid.svg';
 
 export type ToastKind = 'success' | 'error' | 'info' | 'warning';
 
-const ICONS: Record<ToastKind, PixelIconName> = {
-	success: 'check',
-	error: 'alert',
-	info: 'info',
-	warning: 'alert',
+const ICONS: Record<ToastKind, PixelIconSource> = {
+	success: CheckSolid,
+	error: ExclamationTriangleSolid,
+	info: InfoCircleSolid,
+	warning: ExclamationTriangleSolid,
 };
 
 interface ThemedToastProps {
@@ -38,7 +41,7 @@ export function ThemedToast({ kind, params, theme }: ThemedToastProps) {
 			accessibilityLiveRegion="polite"
 			style={[styles.container, { borderColor: color }]}
 		>
-			<PixelIcon name={ICONS[kind]} size={22} color={color} style={styles.icon} />
+			<PixelIcon icon={ICONS[kind]} size={22} color={color} style={styles.icon} />
 			<View style={styles.texts}>
 				{params.text1 ? <Text style={styles.text1}>{params.text1}</Text> : null}
 				{params.text2 ? <Text style={styles.text2}>{params.text2}</Text> : null}

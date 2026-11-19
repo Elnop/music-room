@@ -1,14 +1,14 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelIconName } from '@/shared/constants/pixelIcons';
+import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
 import { pixelCaption } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { Text } from '@/shared/components/ui/Text';
 
 interface InfoRowProps {
-	icon: PixelIconName;
+	icon: PixelIconSource;
 	label: string;
 	text: string;
 }
@@ -18,7 +18,7 @@ export function InfoRow({ icon, label, text }: InfoRowProps) {
 
 	return (
 		<View style={styles.row} accessible accessibilityLabel={`${label} : ${text}`}>
-			<PixelIcon name={icon} size={20} color={theme.colors.primary} style={styles.icon} />
+			<PixelIcon icon={icon} size={20} color={theme.colors.primary} style={styles.icon} />
 			<View style={styles.body}>
 				<Text style={styles.label}>{label}</Text>
 				<Text style={styles.text}>{text}</Text>

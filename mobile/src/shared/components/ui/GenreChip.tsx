@@ -31,7 +31,7 @@ export function GenreChip({
 	size = 'md',
 }: GenreChipProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
-	const { label, color } = GENRE_INFO[genre];
+	const { label, color, icon: genreIcon } = GENRE_INFO[genre];
 	const ink = selected ? theme.colors.onColor : color;
 	const { padding, fontSize, icon } = SIZES[size];
 
@@ -44,7 +44,7 @@ export function GenreChip({
 				disabled && styles.disabled,
 			]}
 		>
-			<PixelIcon name={genre} size={icon} color={ink} />
+			<PixelIcon icon={genreIcon} size={icon} color={ink} />
 			<Text style={[styles.label, { fontSize }, selected && styles.labelSelected]}>{label}</Text>
 		</View>
 	);

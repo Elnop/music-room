@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { type ComponentType } from 'react';
 import { View, type StyleProp, type ViewStyle } from 'react-native';
-import { PIXEL_ICONS, type PixelIconName } from '@/shared/constants/pixelIcons';
+import type { SvgProps } from 'react-native-svg';
+
+export type PixelIconSource = ComponentType<SvgProps>;
 
 interface PixelIconProps {
-	name: PixelIconName;
+	icon: PixelIconSource;
 	color: string;
 	size?: number;
 	style?: StyleProp<ViewStyle>;
@@ -13,15 +15,13 @@ interface PixelIconProps {
 
 /** Decorative unless labelled: the control around it usually carries the label. */
 export function PixelIcon({
-	name,
+	icon: Icon,
 	color,
 	size = 24,
 	style,
 	accessibilityLabel,
 	testID,
 }: PixelIconProps) {
-	const Icon = PIXEL_ICONS[name];
-
 	return (
 		<View
 			style={[{ width: size, height: size }, style]}

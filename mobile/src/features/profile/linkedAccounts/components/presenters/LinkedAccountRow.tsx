@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelIconName } from '@/shared/constants/pixelIcons';
+import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
@@ -24,7 +24,7 @@ interface LinkedAccountRowProps {
 	method: {
 		type: MethodType;
 		label: string;
-		icon: PixelIconName;
+		icon: PixelIconSource;
 	};
 	linked?: LinkedProvider;
 	pending: OAuthProvider | null;
@@ -88,7 +88,7 @@ export function LinkedAccountRow({
 	return (
 		<View style={styles.accountItem} testID={`linked-account-${method.type}`}>
 			<View style={styles.methodBadge}>
-				<PixelIcon name={method.icon} size={20} color={theme.colors.primary} />
+				<PixelIcon icon={method.icon} size={20} color={theme.colors.primary} />
 			</View>
 			<View style={styles.methodInfo}>
 				<Text style={styles.rowTitle}>{method.label}</Text>

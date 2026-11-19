@@ -1,7 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelIconName } from '@/shared/constants/pixelIcons';
+import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
 import { keycap } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
@@ -11,7 +11,7 @@ import { Pressable } from './Pressable';
 type KeyTone = 'primary' | 'surface' | 'device';
 
 interface KeyButtonProps {
-	icon: PixelIconName;
+	icon: PixelIconSource;
 	onPress: () => void;
 	accessibilityLabel: string;
 	tone?: KeyTone;
@@ -37,7 +37,11 @@ export function KeyButton({
 	style,
 }: KeyButtonProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
-	const ink = { primary: theme.colors.onColor, surface: theme.colors.text, device: theme.colors.info }[tone];
+	const ink = {
+		primary: theme.colors.onColor,
+		surface: theme.colors.text,
+		device: theme.colors.info,
+	}[tone];
 
 	return (
 		<Pressable
@@ -53,7 +57,11 @@ export function KeyButton({
 			accessibilityLabel={accessibilityLabel}
 			accessibilityState={{ disabled: disabled || loading, busy: loading }}
 		>
-			{loading ? <ActivityIndicator color={ink} /> : <PixelIcon name={icon} size={iconSize} color={ink} />}
+			{loading ? (
+				<ActivityIndicator color={ink} />
+			) : (
+				<PixelIcon icon={icon} size={iconSize} color={ink} />
+			)}
 			{children}
 		</Pressable>
 	);

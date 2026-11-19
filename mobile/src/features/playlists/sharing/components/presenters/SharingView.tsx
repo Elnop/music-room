@@ -16,6 +16,9 @@ import { SettingRow } from './SettingRow';
 import { createSharingStyles } from './sharingStyles';
 import { UserResults } from './UserResults';
 import { Text } from '@/shared/components/ui/Text';
+import GlobeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/globe-solid.svg';
+import LockSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/lock-solid.svg';
+import PencilSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/pencil-solid.svg';
 
 export function SharingView({ sharing }: { sharing: PlaylistSharing }) {
 	const { styles: shared } = useThemedStyles(createSharingStyles);
@@ -42,7 +45,7 @@ export function SharingView({ sharing }: { sharing: PlaylistSharing }) {
 					<View style={styles.settings}>
 						<Text style={shared.sectionTitle}>Paramètres</Text>
 						<SettingRow
-							icon={mode.isPrivate ? 'lock' : 'globe'}
+							icon={mode.isPrivate ? LockSolid : GlobeSolid}
 							label="Visibilité"
 							description={
 								mode.isPrivate
@@ -54,7 +57,7 @@ export function SharingView({ sharing }: { sharing: PlaylistSharing }) {
 							busy={settings.isUpdating}
 						/>
 						<SettingRow
-							icon={mode.isEditRestricted ? 'pencil' : 'pencil'}
+							icon={mode.isEditRestricted ? PencilSolid : PencilSolid}
 							label="Mode de modification"
 							description={
 								mode.isEditRestricted

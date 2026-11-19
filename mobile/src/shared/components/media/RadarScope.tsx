@@ -26,12 +26,20 @@ export function RadarScope({ children }: { children?: React.ReactNode }) {
 					key={radius}
 					style={[
 						styles.ring,
-						{ width: radius * 2, height: radius * 2, borderRadius: radius, marginLeft: -radius, top: HEIGHT - radius },
+						{
+							width: radius * 2,
+							height: radius * 2,
+							borderRadius: radius,
+							marginLeft: -radius,
+							top: HEIGHT - radius,
+						},
 					]}
 				/>
 			))}
 			<Animated.View style={[styles.arm, { transform: [{ rotate }] }]} />
-			<Animated.View style={[styles.ping, { opacity: pingOpacity, transform: [{ scale: pingScale }] }]} />
+			<Animated.View
+				style={[styles.ping, { opacity: pingOpacity, transform: [{ scale: pingScale }] }]}
+			/>
 			<View style={styles.user} />
 			{children}
 		</View>
