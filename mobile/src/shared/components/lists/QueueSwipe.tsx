@@ -6,6 +6,7 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { Text } from '@/shared/components/ui/Text';
 import { FONT_FAMILIES } from '@/shared/theme/fonts';
+import PlaylistSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/playlist-solid.svg';
 
 const QUEUE_ACTION_WIDTH = 100;
 
@@ -21,7 +22,7 @@ export function QueueSwipe({ children, onAddToQueue, renderRightActions }: Queue
 
 	const renderLeftActions = () => (
 		<View style={styles.queueAction} accessible accessibilityLabel="Ajouter à la file d'attente">
-			<PixelIcon name="queue" size={24} color={theme.colors.onColor} />
+			<PixelIcon icon={PlaylistSolid} size={24} color={theme.colors.onColor} />
 			<Text style={styles.queueText}>À la file</Text>
 		</View>
 	);

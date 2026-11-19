@@ -8,6 +8,8 @@ import type { UserProfile } from '@/features/friends/types';
 import { SearchResultItemRow } from './SearchResultItemRow';
 import { ThemedRefreshControl } from '@/shared/components/lists/ThemedRefreshControl';
 import { createFriendsListStyles } from './friendsListStyles';
+import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
+import SearchSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/search-solid.svg';
 
 interface SearchUsersTabProps {
 	searchResults: UserProfile[];
@@ -57,14 +59,14 @@ export function SearchUsersTab({
 				searchFailed && searchQuery.trim() ? (
 					<EmptyState
 						style={styles.emptyState}
-						icon="alert"
+						icon={ExclamationTriangleSolid}
 						message="La recherche a échoué"
 						action={{ label: 'Réessayer', onPress: onRetry }}
 					/>
 				) : (
 					<EmptyState
 						style={styles.emptyState}
-						icon="search"
+						icon={SearchSolid}
 						message={
 							searchQuery
 								? 'Aucun utilisateur trouvé'

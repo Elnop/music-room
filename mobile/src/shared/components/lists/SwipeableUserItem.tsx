@@ -9,6 +9,7 @@ import type { Theme } from '@/shared/theme/types';
 import { Avatar } from '@/shared/components/media/Avatar';
 import { Text } from '@/shared/components/ui/Text';
 import { FONT_FAMILIES } from '@/shared/theme/fonts';
+import UserMinusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/user-minus-solid.svg';
 
 interface SwipeableUserItemProps {
 	user: {
@@ -32,7 +33,7 @@ export function SwipeableUserItem({ user, role, onRemove }: SwipeableUserItemPro
 			onPress={() => onRemove(user.id)}
 			accessibilityLabel="Retirer"
 		>
-			<PixelIcon name="userRemove" size={24} color={theme.colors.onColor} />
+			<PixelIcon icon={UserMinusSolid} size={24} color={theme.colors.onColor} />
 			<Text style={styles.removeText}>Retirer</Text>
 		</Pressable>
 	);

@@ -1,8 +1,10 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
+import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
+import RefreshSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/refresh-solid.svg';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
+import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { useSocketStore } from '@/shared/stores/socketStore';
 import type { ConnectionStatus } from '@/shared/hooks/useConnectionStatus';
@@ -21,10 +23,10 @@ const COPY: Record<NonNullable<ConnectionStatus>, string> = {
 	failed: 'Connexion perdue',
 };
 
-const ICONS: Record<NonNullable<ConnectionStatus>, PixelSpriteName> = {
-	offline: 'alert',
-	reconnecting: 'sync',
-	failed: 'alert',
+const ICONS: Record<NonNullable<ConnectionStatus>, PixelIconSource> = {
+	offline: ExclamationTriangleSolid,
+	reconnecting: RefreshSolid,
+	failed: ExclamationTriangleSolid,
 };
 
 const DARK_TEXT = FIXED_COLORS.inkDark;
@@ -72,7 +74,7 @@ export function ConnectionBanner({ status, topInset }: ConnectionBannerProps) {
 			testID="connection-banner"
 		>
 			<View style={styles.row}>
-				<PixelIcon name={ICONS[status]} size={16} color={color} />
+				<PixelIcon icon={ICONS[status]} size={16} color={color} />
 				<Text style={[styles.text, { color }]}>{COPY[status]}</Text>
 				{failed && (
 					<Pressable

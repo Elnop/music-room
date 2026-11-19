@@ -1,9 +1,13 @@
-import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
+import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
+import LoginSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/login-solid.svg';
+import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
+import PhoneRingingLowSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/phone-ringing-low-solid.svg';
+import UsersSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/users-solid.svg';
 
 export interface LandingFeature {
 	title: string;
 	description: string;
-	icon: PixelSpriteName;
+	icon: PixelIconSource;
 }
 
 export const LANDING_INTRO =
@@ -14,21 +18,21 @@ export const LANDING_FEATURES: LandingFeature[] = [
 		title: 'Playlist Editor',
 		description:
 			'Modifiez une playlist à plusieurs : chaque changement apparaît en direct pour tout le monde.',
-		icon: 'note',
+		icon: MusicSolid,
 	},
 	{
 		title: 'Music Control Delegation',
 		description: 'Laissez un ami contrôler la musique qui joue sur votre appareil.',
-		icon: 'phone',
+		icon: PhoneRingingLowSolid,
 	},
 	{
 		title: 'Amis et profils',
 		description: 'Suivez vos amis et choisissez ce que chacun peut voir de votre profil.',
-		icon: 'crew',
+		icon: UsersSolid,
 	},
 	{
 		title: 'Connexion',
 		description: 'Avec une adresse email, un compte Google ou un compte Facebook.',
-		icon: 'login',
+		icon: LoginSolid,
 	},
 ];

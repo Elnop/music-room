@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Image, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
 interface ArtworkProps {
 	uri?: string | null;
@@ -26,7 +27,7 @@ export function Artwork({ uri, size, style, iconSize }: ArtworkProps) {
 				<Image source={{ uri }} style={styles.image} testID="artwork-image" />
 			) : (
 				<PixelIcon
-					name="note"
+					icon={MusicSolid}
 					size={iconSize ?? Math.round(size * 0.4)}
 					color={theme.colors.textSecondary}
 					testID="artwork-placeholder"

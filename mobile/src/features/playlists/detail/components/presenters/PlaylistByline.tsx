@@ -7,6 +7,7 @@ import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { headerFacts } from '@/features/playlists/detail/utils/headerFacts';
 import type { PlaylistWithTracks } from '@/features/playlists/types';
 import { Text } from '@/shared/components/ui/Text';
+import UsersSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/users-solid.svg';
 
 export function PlaylistByline({ playlist }: { playlist: PlaylistWithTracks }) {
 	const { styles, theme } = useThemedStyles(createStyles);
@@ -23,7 +24,7 @@ export function PlaylistByline({ playlist }: { playlist: PlaylistWithTracks }) {
 			{collaboratorLabel && (
 				<>
 					<Text style={styles.separator}>•</Text>
-					<PixelIcon name="crew" size={14} color={theme.colors.primary} />
+					<PixelIcon icon={UsersSolid} size={14} color={theme.colors.primary} />
 					<Text style={styles.collaborators}>{collaboratorLabel}</Text>
 				</>
 			)}

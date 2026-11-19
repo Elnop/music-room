@@ -3,6 +3,8 @@ import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import CogSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/cog-solid.svg';
+import PencilSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/pencil-solid.svg';
 
 interface ProfileHeaderButtonsProps {
 	onEditProfile: () => void;
@@ -20,7 +22,7 @@ export function ProfileHeaderButtons({ onEditProfile, onSettings }: ProfileHeade
 				accessibilityLabel="Modifier le profil"
 				style={styles.button}
 			>
-				<PixelIcon name="pencil" size={24} color={theme.colors.text} />
+				<PixelIcon icon={PencilSolid} size={24} color={theme.colors.text} />
 			</Pressable>
 			<Pressable
 				onPress={onSettings}
@@ -28,7 +30,7 @@ export function ProfileHeaderButtons({ onEditProfile, onSettings }: ProfileHeade
 				accessibilityLabel="Réglages"
 				style={styles.button}
 			>
-				<PixelIcon name="gear" size={24} color={theme.colors.text} />
+				<PixelIcon icon={CogSolid} size={24} color={theme.colors.text} />
 			</Pressable>
 		</View>
 	);

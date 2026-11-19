@@ -23,6 +23,7 @@ import {
 } from '@/features/playlists/header/components/presenters/HeaderIconButton';
 import { TrackActionsSheet } from '@/features/playlists/trackActions/components/orchestrators/TrackActionsSheet';
 import { PlaylistActionsSheet } from './PlaylistActionsSheet';
+import EllipsesHorizontalSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/ellipses-horizontal-solid.svg';
 
 type PlaylistDetailOrchestratorProps = NativeStackScreenProps<
 	PlaylistStackParamList,
@@ -54,7 +55,7 @@ export function PlaylistDetailOrchestrator({ navigation, route }: PlaylistDetail
 					{isOwner ? (
 						<HeaderIconButton
 							ref={sheetButtonRef}
-							icon="more"
+							icon={EllipsesHorizontalSolid}
 							size={24}
 							onPress={openSheet}
 							accessibilityLabel="Options de la playlist"

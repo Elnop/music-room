@@ -16,6 +16,10 @@ import { BeaconCard } from './BeaconCard';
 import { BeaconUnavailableCard } from './BeaconUnavailableCard';
 import { InfoRow } from './InfoRow';
 import { Text } from '@/shared/components/ui/Text';
+import ClockSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/clock-solid.svg';
+import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
+import LoginSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/login-solid.svg';
+import WifiSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/wifi-solid.svg';
 
 interface EventDetailViewProps {
 	screen: EventDetailScreen;
@@ -31,7 +35,9 @@ export function EventDetailView({ screen, beacon, bottomPadding }: EventDetailVi
 	if (!event) {
 		// A deleted event shows the spinner while its screen closes.
 		if (!screen.failed) return <LoadingSpinner />;
-		return <EmptyState icon="alert" message="Impossible de charger l'événement" />;
+		return (
+			<EmptyState icon={ExclamationTriangleSolid} message="Impossible de charger l'événement" />
+		);
 	}
 
 	const organizer = event.organizer.displayName ?? event.organizer.username;
@@ -57,13 +63,13 @@ export function EventDetailView({ screen, beacon, bottomPadding }: EventDetailVi
 			</View>
 
 			<InfoRow
-				icon="clock"
+				icon={ClockSolid}
 				label="Quand"
 				text={`${formatEventDate(event.startsAt)} → ${formatEventDate(event.endsAt)}`}
 			/>
-			<InfoRow icon="beacon" label="Où" text={event.address} />
+			<InfoRow icon={WifiSolid} label="Où" text={event.address} />
 			{event.accessInfo && (
-				<InfoRow icon="login" label="Comment y accéder" text={event.accessInfo} />
+				<InfoRow icon={LoginSolid} label="Comment y accéder" text={event.accessInfo} />
 			)}
 			{event.description && <Text style={styles.description}>{event.description}</Text>}
 

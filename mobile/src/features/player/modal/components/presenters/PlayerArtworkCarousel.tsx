@@ -5,6 +5,7 @@ import { Text } from '@/shared/components/ui/Text';
 import type { ArtworkCarousel } from '@/features/player/modal/hooks/useArtworkCarousel';
 import { CAROUSEL_TEXT_HEIGHT, type createStyles } from './playerModalStyles';
 import { PlayerCarouselSlot } from './PlayerCarouselSlot';
+import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
 interface PlayerArtworkCarouselProps {
 	styles: ReturnType<typeof createStyles>;
@@ -21,7 +22,7 @@ export function PlayerArtworkCarousel({ styles, carousel, colors }: PlayerArtwor
 			<View style={styles.artworkWrapper}>
 				<View style={styles.artworkShadow}>
 					<View style={[styles.artwork, styles.emptyArtwork, { width: size, height: size }]}>
-						<PixelIcon name="note" size={64} color={colors.textSecondary} />
+						<PixelIcon icon={MusicSolid} size={64} color={colors.textSecondary} />
 					</View>
 				</View>
 				<View style={[styles.slotText, { width: size }]}>

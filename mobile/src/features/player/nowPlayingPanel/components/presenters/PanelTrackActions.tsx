@@ -8,6 +8,7 @@ import { Text } from '@/shared/components/ui/Text';
 import { ShareLinkButton } from '@/shared/components/sharing/ShareLinkButton';
 import { TrackActionsButton } from '@/shared/components/lists/TrackActionsButton';
 import type { NowPlayingPanelStyles } from './nowPlayingPanelStyles';
+import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
 
 interface PanelTrackActionsProps {
 	title: string;
@@ -36,7 +37,7 @@ export function PanelTrackActions({
 					onPress={pressAdd}
 					accessibilityLabel="Ajouter à une playlist"
 				>
-					<PixelIcon name="plus" size={16} color={theme.colors.text} />
+					<PixelIcon icon={PlusSolid} size={16} color={theme.colors.text} />
 					<Text style={styles.pillLabel}>Ajouter</Text>
 				</Pressable>
 			</View>

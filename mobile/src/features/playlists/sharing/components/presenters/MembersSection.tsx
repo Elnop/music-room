@@ -7,6 +7,7 @@ import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import type { PlaylistMember } from '@/features/playlists/types';
 import { createSharingStyles } from './sharingStyles';
 import { Text } from '@/shared/components/ui/Text';
+import UsersSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/users-solid.svg';
 
 interface MembersSectionProps {
 	title: string;
@@ -42,7 +43,7 @@ export function MembersSection({ title, members, emptyMessage, onRemove }: Membe
 					)}
 				/>
 			) : (
-				emptyMessage && <EmptyState icon="crew" style={styles.empty} message={emptyMessage} />
+				emptyMessage && <EmptyState icon={UsersSolid} style={styles.empty} message={emptyMessage} />
 			)}
 		</View>
 	);

@@ -14,6 +14,10 @@ import { Text } from '@/shared/components/ui/Text';
 import { FONT_FAMILIES } from '@/shared/theme/fonts';
 import { pixelRow } from '@/shared/theme/pixelFrame';
 import { formatDuration } from '@/shared/utils/formatters';
+import BarsSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/bars-solid.svg';
+import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
+import SoundOnSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/sound-on-solid.svg';
+import TrashSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/trash-solid.svg';
 
 interface SwipeableTrackItemProps {
 	track: Track;
@@ -58,7 +62,7 @@ export function SwipeableTrackItem({
 			onPress={() => onDelete(track.id)}
 			accessibilityLabel={`Supprimer ${track.title}`}
 		>
-			<PixelIcon name="trash" size={24} color={theme.colors.onColor} />
+			<PixelIcon icon={TrashSolid} size={24} color={theme.colors.onColor} />
 			<Text style={styles.deleteText}>Supprimer</Text>
 		</Pressable>
 	);
@@ -111,7 +115,7 @@ export function SwipeableTrackItem({
 									unavailable && styles.unavailable,
 								]}
 							>
-								<PixelIcon name="note" color={theme.colors.textSecondary} />
+								<PixelIcon icon={MusicSolid} color={theme.colors.textSecondary} />
 							</View>
 						)}
 
@@ -138,7 +142,7 @@ export function SwipeableTrackItem({
 
 						{isCurrent && !isPending && (
 							<PixelIcon
-								name="volume"
+								icon={SoundOnSolid}
 								size={18}
 								color={theme.colors.primary}
 								style={styles.playingIcon}
@@ -160,7 +164,7 @@ export function SwipeableTrackItem({
 							style={styles.dragHandle}
 							accessibilityLabel="Réordonner"
 						>
-							<PixelIcon name="grip" color={theme.colors.textSecondary} />
+							<PixelIcon icon={BarsSolid} color={theme.colors.textSecondary} />
 						</Pressable>
 					)}
 				</View>

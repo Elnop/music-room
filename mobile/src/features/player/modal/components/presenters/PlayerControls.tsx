@@ -2,6 +2,10 @@ import React from 'react';
 import { View } from 'react-native';
 import { KeyButton } from '@/shared/components/ui/KeyButton';
 import type { createStyles } from './playerModalStyles';
+import ArrowLeftSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/arrow-left-solid.svg';
+import ArrowRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/arrow-right-solid.svg';
+import PauseSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/pause-solid.svg';
+import PlaySolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/play-solid.svg';
 
 interface PlayerControlsProps {
 	styles: ReturnType<typeof createStyles>;
@@ -29,14 +33,14 @@ export function PlayerControls({
 	return (
 		<View style={styles.controls}>
 			<KeyButton
-				icon="prev"
+				icon={ArrowLeftSolid}
 				size={57}
 				onPress={onPrevious}
 				disabled={!canGoPrevious}
 				accessibilityLabel="Piste précédente"
 			/>
 			<KeyButton
-				icon={isPlaying ? 'pause' : 'play'}
+				icon={isPlaying ? PauseSolid : PlaySolid}
 				tone="primary"
 				size={90}
 				iconSize={48}
@@ -46,7 +50,7 @@ export function PlayerControls({
 				accessibilityLabel={isPlaying ? 'Pause' : 'Lecture'}
 			/>
 			<KeyButton
-				icon="next"
+				icon={ArrowRightSolid}
 				size={57}
 				onPress={onNext}
 				disabled={!canGoNext}

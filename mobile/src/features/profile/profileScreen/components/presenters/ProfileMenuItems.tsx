@@ -7,6 +7,10 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { displayText } from '@/shared/theme/pixelFrame';
 import { Text } from '@/shared/components/ui/Text';
+import LinkSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/link-solid.svg';
+import LockSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/lock-solid.svg';
+import LogoutSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/logout-solid.svg';
+import PhoneRingingLowSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/phone-ringing-low-solid.svg';
 
 interface ProfileMenuItemsProps {
 	wide?: boolean;
@@ -33,21 +37,21 @@ export function ProfileMenuItems({
 			<ProfileNavigationItem
 				title="Confidentialité"
 				subtitle="Gérez qui peut voir vos informations"
-				icon="lock"
+				icon={LockSolid}
 				onPress={onPrivacySettings}
 			/>
 
 			<ProfileNavigationItem
 				title="Comptes liés"
 				subtitle="Ajoutez ou retirez la connexion Google et Facebook"
-				icon="link"
+				icon={LinkSolid}
 				onPress={onLinkedAccounts}
 			/>
 
 			<ProfileNavigationItem
 				title="Mes appareils"
 				subtitle="Choisissez quels amis contrôlent chaque appareil"
-				icon="phone"
+				icon={PhoneRingingLowSolid}
 				onPress={onMyDevices}
 			/>
 
@@ -58,7 +62,7 @@ export function ProfileMenuItems({
 					disabled={isLoading}
 					accessibilityLabel="Se déconnecter"
 				>
-					<PixelIcon name="logout" size={20} color={theme.colors.error} />
+					<PixelIcon icon={LogoutSolid} size={20} color={theme.colors.error} />
 					<Text style={styles.logoutText}>Se déconnecter</Text>
 				</Pressable>
 			</View>

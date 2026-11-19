@@ -7,6 +7,7 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import type { UserProfile } from '@/features/friends/types';
 import { createFriendsListStyles } from './friendsListStyles';
 import { Text } from '@/shared/components/ui/Text';
+import AngleRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/angle-right-solid.svg';
 
 interface SearchResultItemRowProps {
 	user: UserProfile;
@@ -29,7 +30,7 @@ export function SearchResultItemRow({ user, onPress }: SearchResultItemRowProps)
 				<Text style={styles.username}>{user.username}</Text>
 				{user.displayName && <Text style={styles.displayName}>{user.displayName}</Text>}
 			</View>
-			<PixelIcon name="right" size={20} color={theme.colors.textSecondary} />
+			<PixelIcon icon={AngleRightSolid} size={20} color={theme.colors.textSecondary} />
 		</Pressable>
 	);
 }

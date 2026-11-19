@@ -6,6 +6,7 @@ import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { formatEventDate } from '@/features/events/utils/eventDates';
 import { Text } from '@/shared/components/ui/Text';
+import CalenderSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/calender-solid.svg';
 
 interface DateTimeRowProps {
 	label: string;
@@ -23,7 +24,7 @@ export function DateTimeRow({ label, value, onPress }: DateTimeRowProps) {
 				<Text style={styles.label}>{label}</Text>
 				<Text style={styles.value}>{text}</Text>
 			</View>
-			<PixelIcon name="calendar" size={20} color={theme.colors.textSecondary} />
+			<PixelIcon icon={CalenderSolid} size={20} color={theme.colors.textSecondary} />
 		</Pressable>
 	);
 }

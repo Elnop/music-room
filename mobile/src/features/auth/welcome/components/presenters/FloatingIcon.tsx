@@ -3,6 +3,7 @@ import { Animated } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { FloatingIconMotion } from '@/features/auth/welcome/hooks/useFloatingIcons';
+import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
 export function FloatingIcon({ spec, translateY, rotate, scale }: FloatingIconMotion) {
 	const { theme } = useTheme();
@@ -16,7 +17,7 @@ export function FloatingIcon({ spec, translateY, rotate, scale }: FloatingIconMo
 				transform: [{ translateY }, { rotate }, { scale }],
 			}}
 		>
-			<PixelIcon name="note" size={spec.size} color={theme.colors.primary} />
+			<PixelIcon icon={MusicSolid} size={spec.size} color={theme.colors.primary} />
 		</Animated.View>
 	);
 }

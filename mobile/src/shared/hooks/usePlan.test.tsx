@@ -66,9 +66,7 @@ describe('useChangePlan', () => {
 
 		act(() => result.current.mutate('premium'));
 		await waitFor(() =>
-			expect(client.getQueryData<Subscription>(queryKeys.subscription.plan())?.plan).toBe(
-				'premium'
-			)
+			expect(client.getQueryData<Subscription>(queryKeys.subscription.plan())?.plan).toBe('premium')
 		);
 
 		await act(async () => request.resolve(PREMIUM));

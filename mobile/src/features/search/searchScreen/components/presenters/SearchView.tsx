@@ -10,6 +10,8 @@ import type { Theme } from '@/shared/theme/types';
 import type { SoundCloudTrack } from '@/features/search/types';
 import type { AddQueueItemBody } from '@/shared/types/playback';
 import { useContentColumn } from '@/shared/hooks/useContentColumn';
+import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
+import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
 interface SearchViewProps {
 	inputRef: React.RefObject<TextInput | null>;
@@ -91,13 +93,13 @@ export function SearchView({
 					ListEmptyComponent={
 						isLoading ? null : isError && debouncedQuery.trim() ? (
 							<EmptyState
-								icon="alert"
+								icon={ExclamationTriangleSolid}
 								message="La recherche a échoué"
 								action={{ label: 'Réessayer', onPress: onRetry }}
 							/>
 						) : (
 							<EmptyState
-								icon="note"
+								icon={MusicSolid}
 								message={
 									searchQuery
 										? 'Aucun titre trouvé'

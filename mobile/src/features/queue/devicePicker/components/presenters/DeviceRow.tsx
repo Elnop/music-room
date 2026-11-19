@@ -1,16 +1,19 @@
 import React from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
+import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import type { DevicePickerOwner } from '@/types/device.types';
 import type { Theme } from '@/shared/theme/types';
 import type { createPickerStyles } from './devicePickerStyles';
 import { Text } from '@/shared/components/ui/Text';
+import LaptopSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/laptop-solid.svg';
+import PhoneRingingLowSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/phone-ringing-low-solid.svg';
 
 export type PickerDevice = DevicePickerOwner['devices'][number];
 
-const deviceIcon = (platform: string): PixelSpriteName => (platform === 'web' ? 'laptop' : 'phone');
+const deviceIcon = (platform: string): PixelIconSource =>
+	platform === 'web' ? LaptopSolid : PhoneRingingLowSolid;
 
 interface DeviceRowProps {
 	owner: DevicePickerOwner;
@@ -47,7 +50,7 @@ export function DeviceRow({
 		>
 			<View style={styles.iconContainer}>
 				<PixelIcon
-					name={deviceIcon(device.platform)}
+					icon={deviceIcon(device.platform)}
 					size={20}
 					color={active ? theme.colors.primary : theme.colors.text}
 				/>

@@ -9,6 +9,7 @@ import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { GENRE_INFO } from '@/types/user.types';
 import { formatEventDate, isOngoing } from '@/features/events/utils/eventDates';
 import type { MusicEvent } from '@/features/events/types';
+import WifiSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/wifi-solid.svg';
 
 interface EventRowProps {
 	event: MusicEvent;
@@ -26,7 +27,7 @@ export function EventRow({ event, onPress }: EventRowProps) {
 			onPress={onPress}
 			accessibilityLabel={[event.name, when, genres].join(', ')}
 		>
-			<PixelIcon name="beacon" color={theme.colors.primary} />
+			<PixelIcon icon={WifiSolid} color={theme.colors.primary} />
 			<Text style={styles.name} numberOfLines={1}>
 				{event.name}
 			</Text>

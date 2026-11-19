@@ -4,6 +4,7 @@ import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { useAnchoredPress } from '@/shared/hooks/useAnchoredPress';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import EllipsesHorizontalSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/ellipses-horizontal-solid.svg';
 
 interface TrackActionsButtonProps {
 	onPress: () => void;
@@ -16,7 +17,7 @@ export function TrackActionsButton({ onPress }: TrackActionsButtonProps) {
 	return (
 		<View ref={button} collapsable={false}>
 			<Pressable onPress={press} hitSlop={10} style={styles.button} accessibilityLabel="Actions">
-				<PixelIcon name="more" size={20} color={theme.colors.textSecondary} />
+				<PixelIcon icon={EllipsesHorizontalSolid} size={20} color={theme.colors.textSecondary} />
 			</Pressable>
 		</View>
 	);

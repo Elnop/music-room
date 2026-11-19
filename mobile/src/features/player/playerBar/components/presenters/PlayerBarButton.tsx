@@ -1,12 +1,12 @@
 import React from 'react';
 import { ActivityIndicator, type StyleProp, type ViewStyle } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
+import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { DISABLED_OPACITY } from './playerBarStyles';
 
 interface PlayerBarButtonProps {
-	icon: PixelSpriteName;
+	icon: PixelIconSource;
 	label: string;
 	onPress: () => void;
 	color: string;
@@ -41,7 +41,7 @@ export function PlayerBarButton({
 				<ActivityIndicator size="small" color={color} />
 			) : (
 				<PixelIcon
-					name={icon}
+					icon={icon}
 					size={size}
 					color={color}
 					style={disabled ? { opacity: DISABLED_OPACITY } : undefined}

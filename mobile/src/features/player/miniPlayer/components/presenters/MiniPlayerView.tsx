@@ -10,6 +10,11 @@ import { KeyButton } from '@/shared/components/ui/KeyButton';
 import type { MiniPlayerData } from '@/features/player/miniPlayer/hooks/useMiniPlayer';
 import { createStyles } from './miniPlayerStyles';
 import { Text } from '@/shared/components/ui/Text';
+import ArrowRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/arrow-right-solid.svg';
+import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
+import PauseSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/pause-solid.svg';
+import PhoneRingingLowSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/phone-ringing-low-solid.svg';
+import PlaySolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/play-solid.svg';
 
 interface MiniPlayerViewProps {
 	data: MiniPlayerData;
@@ -36,7 +41,7 @@ export function MiniPlayerView({ data }: MiniPlayerViewProps) {
 
 	const remoteLine = deviceLabel ? (
 		<View style={styles.deviceRow}>
-			<PixelIcon name="phone" size={12} color={theme.colors.info} />
+			<PixelIcon icon={PhoneRingingLowSolid} size={12} color={theme.colors.info} />
 			<Text style={styles.device} numberOfLines={1}>
 				Sur {deviceLabel}
 			</Text>
@@ -66,7 +71,7 @@ export function MiniPlayerView({ data }: MiniPlayerViewProps) {
 						{!track ? (
 							<>
 								<View style={[styles.artwork, styles.emptyArtwork]}>
-									<PixelIcon name="note" color={theme.colors.textSecondary} />
+									<PixelIcon icon={MusicSolid} color={theme.colors.textSecondary} />
 								</View>
 								<View style={styles.info}>
 									<Text style={styles.title} numberOfLines={1}>
@@ -96,7 +101,7 @@ export function MiniPlayerView({ data }: MiniPlayerViewProps) {
 				</Animated.View>
 
 				<KeyButton
-					icon={isPlaying ? 'pause' : 'play'}
+					icon={isPlaying ? PauseSolid : PlaySolid}
 					tone={track ? 'primary' : 'surface'}
 					size={42}
 					onPress={onTogglePlay}
@@ -114,7 +119,7 @@ export function MiniPlayerView({ data }: MiniPlayerViewProps) {
 					accessibilityLabel="Piste suivante"
 					accessibilityState={{ disabled: nextDisabled }}
 				>
-					<PixelIcon name="next" color={theme.colors.text} />
+					<PixelIcon icon={ArrowRightSolid} color={theme.colors.text} />
 				</Pressable>
 			</View>
 		</Pressable>

@@ -13,6 +13,8 @@ import { formatDuration } from '@/shared/utils/formatters';
 import { isPreviewOnly } from '@/shared/utils/soundcloudPreview';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import { Text } from '@/shared/components/ui/Text';
+import CheckSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/check-solid.svg';
+import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
 
 interface AddableTrackRowProps {
 	track: SoundCloudTrack;
@@ -63,7 +65,7 @@ export const AddableTrackRow = React.memo(function AddableTrackRow({
 					<TrackActionsButton onPress={() => onShowActions(track)} />
 					<View style={[styles.addButton, isAdded && styles.addedButton]}>
 						<PixelIcon
-							name={isAdded ? 'check' : 'plus'}
+							icon={isAdded ? CheckSolid : PlusSolid}
 							size={20}
 							color={theme.colors.onColor}
 							testID={`${isAdded ? 'added' : 'add'}-${track.id}`}

@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import type { createStyles } from './playerModalStyles';
 import { Text } from '@/shared/components/ui/Text';
+import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
 
 interface PlayerTrackErrorProps {
 	styles: ReturnType<typeof createStyles>;
@@ -18,7 +19,7 @@ export function PlayerTrackError({ styles, error, isRemote, colors }: PlayerTrac
 	if (!error || isRemote) return null;
 	return (
 		<View style={[styles.errorContainer, { backgroundColor: colors.errorBg }]}>
-			<PixelIcon name="alert" size={16} color={colors.error} />
+			<PixelIcon icon={ExclamationTriangleSolid} size={16} color={colors.error} />
 			<Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>
 		</View>
 	);

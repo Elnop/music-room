@@ -5,6 +5,8 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Text } from '@/shared/components/ui/Text';
 import type { NowPlayingPanelStyles } from './nowPlayingPanelStyles';
+import LaptopSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/laptop-solid.svg';
+import PhoneRingingLowSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/phone-ringing-low-solid.svg';
 
 interface PanelDeviceCardProps {
 	deviceLabel: string;
@@ -33,7 +35,7 @@ export function PanelDeviceCard({
 			<View style={styles.device}>
 				<View style={styles.deviceIcon}>
 					<PixelIcon
-						name={isRemote ? 'phone' : 'laptop'}
+						icon={isRemote ? PhoneRingingLowSolid : LaptopSolid}
 						size={20}
 						color={isRemote ? theme.colors.primary : theme.colors.text}
 					/>

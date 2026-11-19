@@ -13,6 +13,8 @@ import type { createPickerStyles } from './devicePickerStyles';
 import type { LoadedDevices } from '@/features/queue/devicePicker/hooks/useDevicePicker';
 import type { PickerDevice } from './DeviceRow';
 import { Text } from '@/shared/components/ui/Text';
+import ChevronDownSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/chevron-down-solid.svg';
+import TimesSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/times-solid.svg';
 
 interface DevicePickerSheetViewProps {
 	visible: boolean;
@@ -128,7 +130,11 @@ export function DevicePickerSheetView({
 					accessibilityRole="button"
 					accessibilityLabel="Fermer le choix d'appareil"
 				>
-					<PixelIcon name={isWide ? 'close' : 'down'} size={24} color={theme.colors.text} />
+					<PixelIcon
+						icon={isWide ? TimesSolid : ChevronDownSolid}
+						size={24}
+						color={theme.colors.text}
+					/>
 				</Pressable>
 				<Text style={styles.title}>Choisir un appareil</Text>
 			</View>

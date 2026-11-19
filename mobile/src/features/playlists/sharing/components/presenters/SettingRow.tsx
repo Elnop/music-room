@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelSpriteName } from '@/shared/constants/pixelSprites';
+import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
 import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
 import { ThemedSwitch } from '@/shared/components/ui/ThemedSwitch';
 import type { Theme } from '@/shared/theme/types';
@@ -10,7 +10,7 @@ import { createSharingStyles } from './sharingStyles';
 import { Text } from '@/shared/components/ui/Text';
 
 interface SettingRowProps {
-	icon: PixelSpriteName;
+	icon: PixelIconSource;
 	label: string;
 	description: string;
 	value: boolean;
@@ -26,7 +26,7 @@ export function SettingRow({ icon, label, description, value, onToggle, busy }: 
 		<View style={[shared.card, shared.row, styles.item]}>
 			<View style={styles.info}>
 				<View style={styles.iconContainer}>
-					<PixelIcon name={icon} size={20} color={theme.colors.primary} />
+					<PixelIcon icon={icon} size={20} color={theme.colors.primary} />
 				</View>
 				<View style={styles.text}>
 					<Text style={styles.label}>{label}</Text>
