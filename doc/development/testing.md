@@ -87,7 +87,7 @@ Mobile tests run with a 15 s timeout (`testTimeout` in `mobile/package.json`) in
 
 Jest uses half the cores (`maxWorkers: "50%"` in `mobile/package.json`) instead of all but one: each worker holds about 0.5 GB, and with every core busy `npm run check` went past 4 GB and froze a 16 GB WSL2 machine. With half the cores the check peaks at 2.9 GB and runs faster, as it no longer swaps.
 
-`npm run check` in `backend/` or `mobile/` runs the unit tests together with every other guardrail (type-check, lint, knip, dependency-cruiser, jscpd, semgrep, ast-grep, gitleaks, exception lists); the pre-commit hook runs it on the projects a commit touches. What each check does and how to fix a failure: `.agents/rules/guardrails.md`.
+`npm run check` in `backend/` or `mobile/` runs the unit tests together with every other guardrail (type-check, lint, knip, dependency-cruiser, check-tree on mobile, jscpd, semgrep, ast-grep, gitleaks, exception lists); the pre-commit hook runs it on the projects a commit touches. What each check does and how to fix a failure: `.agents/rules/guardrails.md`.
 
 ## Coverage
 
