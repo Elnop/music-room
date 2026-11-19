@@ -13,7 +13,7 @@ import { fail, ok } from '@/test/fetchResponses';
 import { signIn } from '@/test/session';
 import { musicEvent } from '@/test/eventFixtures';
 import { startEventBeacon, stopEventBeacon } from '@/features/events/services/beaconAdvertiser';
-import { useBeaconStore } from '@/features/events/stores/beaconStore';
+import { useBeaconStore } from '@/features/events/beaconStore';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')

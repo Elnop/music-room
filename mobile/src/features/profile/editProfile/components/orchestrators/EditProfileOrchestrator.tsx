@@ -1,5 +1,5 @@
 import React from 'react';
-import { useEditProfile } from '@/features/profile/editProfile/hooks/useEditProfile';
+import { useEditProfile } from '@/features/profile/editProfile/useEditProfile';
 import { EditProfileView } from '@/features/profile/editProfile/components/presenters/EditProfileView';
 
 export function EditProfileOrchestrator() {

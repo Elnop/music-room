@@ -4,7 +4,7 @@ import { queryKeys } from '@/shared/query/keys';
 import { ApiError } from '@/shared/services/api';
 import * as playlistApi from '@/features/playlists/services/playlistApi';
 import * as tracksApi from '@/features/playlists/services/tracksApi';
-import { usePendingMovesStore } from '@/features/playlists/stores/pendingMovesStore';
+import { usePendingMovesStore } from '@/features/playlists/pendingMovesStore';
 import type { MoveTrackResult, PlaylistWithTracks } from '@/features/playlists/types';
 import { deferred } from '@/test/deferred';
 import { playlistTrack } from '@/test/playlistFixtures';

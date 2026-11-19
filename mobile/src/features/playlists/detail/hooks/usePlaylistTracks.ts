@@ -8,7 +8,7 @@ import { afterRankForDrop } from '@/shared/utils/moveTarget';
 import { showError, showInfo, showSuccess } from '@/shared/utils/toast';
 import { toTrackInput } from '@/shared/utils/trackInput';
 import { useMoveTrack, useRemoveTrack } from '@/features/playlists/hooks/useTrackEdits';
-import { usePendingMovesStore } from '@/features/playlists/stores/pendingMovesStore';
+import { usePendingMovesStore } from '@/features/playlists/pendingMovesStore';
 import { isOnScreen } from '@/features/playlists/utils/playlistCache';
 import { canEditPlaylist } from '@/features/playlists/utils/playlistPermissions';
 import { CONFLICT_MESSAGE, isMoveConflict } from '@/features/playlists/utils/trackMoves';

@@ -3,8 +3,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { showError } from '@/shared/utils/toast';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '@/features/auth/types';
-import { useRegisterForm } from '@/features/auth/register/hooks/useRegisterForm';
-import { useProviderSignIn } from '@/features/auth/social/hooks/useProviderSignIn';
+import { useRegisterForm } from '@/features/auth/register/useRegisterForm';
+import { useProviderSignIn } from '@/features/auth/social/useProviderSignIn';
 import { useProviderButtons } from '@/features/auth/hooks/useProviderButtons';
 import { RegisterView } from '@/features/auth/register/components/presenters/RegisterView';
 

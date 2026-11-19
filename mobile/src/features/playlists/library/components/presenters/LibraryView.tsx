@@ -5,7 +5,7 @@ import { SectionHeader } from '@/shared/components/lists/SectionHeader';
 import { PlaylistCardSkeleton, SkeletonList } from '@/shared/components/ui/Skeleton';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { useContentColumn } from '@/shared/hooks/useContentColumn';
-import type { LibraryScreen } from '@/features/playlists/library/hooks/useLibraryScreen';
+import type { LibraryScreen } from '@/features/playlists/library/useLibraryScreen';
 import type { Playlist } from '@/features/playlists/types';
 import { createListStyles } from '@/features/playlists/home/components/presenters/listStyles';
 import { PlaylistGrid } from '@/features/playlists/home/components/presenters/PlaylistGrid';

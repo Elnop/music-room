@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMusicPreferences } from '@/features/profile/musicPreferences/hooks/useMusicPreferences';
+import { useMusicPreferences } from '@/features/profile/musicPreferences/useMusicPreferences';
 import { MusicPreferencesView } from '@/features/profile/musicPreferences/components/presenters/MusicPreferencesView';
 
 export function MusicPreferencesOrchestrator() {

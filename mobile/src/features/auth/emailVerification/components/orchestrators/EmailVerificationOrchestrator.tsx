@@ -1,7 +1,7 @@
 import React from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '@/features/auth/types';
-import { useEmailVerification } from '@/features/auth/emailVerification/hooks/useEmailVerification';
+import { useEmailVerification } from '@/features/auth/emailVerification/useEmailVerification';
 import { EmailVerificationView } from '@/features/auth/emailVerification/components/presenters/EmailVerificationView';
 
 type EmailVerificationOrchestratorProps = NativeStackScreenProps<

@@ -2,7 +2,7 @@ import type { QueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/shared/query/keys';
 import { ApiError } from '@/shared/services/api';
 import * as tracksApi from '@/features/playlists/services/tracksApi';
-import { usePendingMovesStore } from '@/features/playlists/stores/pendingMovesStore';
+import { usePendingMovesStore } from '@/features/playlists/pendingMovesStore';
 import type { PlaylistWithTracks } from '@/features/playlists/types';
 import { isOnScreen, reloadIfOnScreen, settleTrackEvent } from './playlistCache';
 

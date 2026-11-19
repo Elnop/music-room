@@ -5,7 +5,7 @@ import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
 import { displayText } from '@/shared/theme/pixelFrame';
 import { CodeInput } from '@/features/auth/code/components/presenters/CodeInput';
-import type { EmailVerification } from '@/features/auth/emailVerification/hooks/useEmailVerification';
+import type { EmailVerification } from '@/features/auth/emailVerification/useEmailVerification';
 import { Text } from '@/shared/components/ui/Text';
 import { FONT_FAMILIES } from '@/shared/theme/fonts';
 

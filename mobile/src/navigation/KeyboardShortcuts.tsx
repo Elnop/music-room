@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigation, type NavigationProp, type ParamListBase } from '@react-navigation/native';
 import { usePlayerShortcuts } from '@/features/player/hooks/usePlayerShortcuts';
-import { useSearchFocusStore } from '@/features/search/stores/searchFocusStore';
+import { useSearchFocusStore } from '@/features/search/searchFocusStore';
 import { ShortcutsHelpDialog } from '@/shared/components/feedback/ShortcutsHelpDialog';
 import { useKeyboardShortcuts } from '@/shared/hooks/useKeyboardShortcuts';
 import type { KeyboardShortcut } from '@/shared/utils/keyboardShortcuts';

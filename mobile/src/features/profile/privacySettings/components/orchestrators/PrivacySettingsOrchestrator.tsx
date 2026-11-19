@@ -1,5 +1,5 @@
 import React from 'react';
-import { usePrivacySettingsScreen } from '@/features/profile/privacySettings/hooks/usePrivacySettingsScreen';
+import { usePrivacySettingsScreen } from '@/features/profile/privacySettings/usePrivacySettingsScreen';
 import { PrivacySettingsView } from '@/features/profile/privacySettings/components/presenters/PrivacySettingsView';
 
 export function PrivacySettingsOrchestrator() {

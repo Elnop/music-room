@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLinkedAccountsScreen } from '@/features/profile/linkedAccounts/hooks/useLinkedAccountsScreen';
+import { useLinkedAccountsScreen } from '@/features/profile/linkedAccounts/useLinkedAccountsScreen';
 import { LinkedAccountsView } from '@/features/profile/linkedAccounts/components/presenters/LinkedAccountsView';
 
 export function LinkedAccountsOrchestrator() {
