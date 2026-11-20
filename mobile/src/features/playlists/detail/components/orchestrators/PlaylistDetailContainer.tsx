@@ -24,13 +24,20 @@ import {
 import { TrackActionsSheetContainer } from '@/features/playlists/trackActions/components/TrackActionsSheetContainer';
 import { PlaylistActionsSheetContainer } from './PlaylistActionsSheetContainer';
 import EllipsesHorizontalSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/ellipses-horizontal-solid.svg';
+import type { PlanState } from '@/features/subscription/lib/subscription';
 
 type PlaylistDetailOrchestratorProps = NativeStackScreenProps<
 	PlaylistStackParamList,
 	'PlaylistDetail'
->;
+> & {
+	premium: Pick<PlanState, 'isPremium' | 'refetch'>;
+};
 
-export function PlaylistDetailContainer({ navigation, route }: PlaylistDetailOrchestratorProps) {
+export function PlaylistDetailContainer({
+	navigation,
+	route,
+	premium,
+}: PlaylistDetailOrchestratorProps) {
 	const screen = usePlaylistDetailScreen(navigation, route.params.id);
 	const { id, playlist } = screen;
 	const userId = useSession(session => session.user?.id);
@@ -39,7 +46,7 @@ export function PlaylistDetailContainer({ navigation, route }: PlaylistDetailOrc
 	const play = usePlayPlaylist(id);
 	const gradient = useCoverGradient(playlist);
 	const isOwner = !!userId && playlist?.ownerId === userId;
-	const cover = useCoverActions(navigation, id, isOwner);
+	const cover = useCoverActions(navigation, id, premium);
 	const Header = useBreakpoint().isWide ? PlaylistWideHeader : PlaylistHeader;
 	const sheetButtonRef = React.useRef<View>(null);
 	const openSheet = useAnchoredPress(sheetButtonRef, owner.openSheet);

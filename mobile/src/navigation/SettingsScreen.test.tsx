@@ -3,10 +3,11 @@ import { ScrollView, StyleSheet } from 'react-native';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { originalTheme } from '@/shared/theme/original.theme';
-import { subscriptionApi } from '@/shared/services/subscriptionApi';
+import { subscriptionApi } from '@/features/subscription/lib/subscriptionApi';
 import { showError } from '@/shared/utils/toast';
-import type { Subscription } from '@/shared/types/subscription';
+import type { Subscription } from '@/features/subscription/lib/subscription';
 import { SettingsContainer } from '@/features/profile/settings/components/SettingsContainer';
+import { PlanContainer } from '@/features/subscription/PlanContainer';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -28,7 +29,7 @@ jest.mock('@/shared/services/authSession', () => ({
 		selector({ isAuthenticated: true }),
 }));
 
-jest.mock('@/shared/services/subscriptionApi', () => ({
+jest.mock('@/features/subscription/lib/subscriptionApi', () => ({
 	subscriptionApi: { getSubscription: jest.fn(), changePlan: jest.fn() },
 }));
 
@@ -48,7 +49,7 @@ let client: QueryClient;
 function renderSettings() {
 	render(
 		<QueryClientProvider client={client}>
-			<SettingsContainer />
+			<PlanContainer>{plan => <SettingsContainer subscription={plan} />}</PlanContainer>
 		</QueryClientProvider>
 	);
 }

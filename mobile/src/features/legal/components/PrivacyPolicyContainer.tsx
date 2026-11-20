@@ -2,7 +2,7 @@ import React from 'react';
 import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { openExternalUrl } from '@/shared/utils/openExternalUrl';
-import { PrivacyPolicyView } from '@/features/legal/privacyPolicy/components/presenters/PrivacyPolicyView';
+import { PrivacyPolicyView } from '@/features/legal/components/presenters/PrivacyPolicyView';
 
 export function PrivacyPolicyContainer() {
 	const { theme } = useTheme();

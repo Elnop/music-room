@@ -1,6 +1,6 @@
 import React from 'react';
-import { useSoundCloudSearchScreen } from '@/features/search/searchScreen/useSoundCloudSearchScreen';
-import { SearchView } from '@/features/search/searchScreen/components/presenters/SearchView';
+import { useSoundCloudSearchScreen } from '@/features/search/hooks/useSoundCloudSearchScreen';
+import { SearchView } from '@/features/search/components/presenters/SearchView';
 
 export function SearchContainer() {
 	const {

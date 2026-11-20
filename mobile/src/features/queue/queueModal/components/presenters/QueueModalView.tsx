@@ -13,7 +13,7 @@ import { QueueItemRow } from './QueueItemRow';
 import type { createModalStyles } from './queueModalStyles';
 import type { Theme } from '@/shared/theme/types';
 import type { QueueItem } from '@/features/queue/types';
-import type { AddQueueItemBody } from '@/shared/types/playback';
+import type { AddQueueItemBody } from '@/shared/playback/playback';
 import { Text } from '@/shared/components/ui/Text';
 import ChevronDownSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/chevron-down-solid.svg';
 import PlaylistSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/playlist-solid.svg';

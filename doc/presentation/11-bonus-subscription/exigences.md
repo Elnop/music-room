@@ -15,7 +15,7 @@
 ## Où regarder
 
 - [subscription.md](../../features/subscription.md)
-- `backend/src/shared/subscription/plan.ts`, `backend/src/features/subscription/`, `mobile/src/shared/hooks/usePlan.ts`
+- `backend/src/shared/subscription/plan.ts`, `backend/src/features/subscription/`, `mobile/src/features/subscription/`
 
 ## Scénario
 

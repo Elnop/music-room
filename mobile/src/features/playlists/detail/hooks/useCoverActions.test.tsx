@@ -15,7 +15,6 @@ jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.0.
 jest.mock('@tanstack/react-query', () => ({ useQueryClient: jest.fn(() => ({})) }));
 
 const mockPlan = { isPremium: true, refetch: jest.fn() };
-jest.mock('@/shared/hooks/usePlan', () => ({ usePlan: () => mockPlan }));
 
 const mockPickImage = jest.fn();
 jest.mock('@/shared/utils/imagePicker', () => ({
@@ -39,7 +38,7 @@ const navigation = {
 } as unknown as DetailNavigation;
 
 function setup() {
-	return renderHook(() => useCoverActions(navigation, ID, true)).result;
+	return renderHook(() => useCoverActions(navigation, ID, mockPlan)).result;
 }
 
 const alertButtons = () =>

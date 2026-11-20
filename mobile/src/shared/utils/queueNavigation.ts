@@ -1,4 +1,4 @@
-import type { QueueItem } from '@/shared/types/playback';
+import type { QueueItem } from '@/shared/playback/playback';
 
 /** Past this many seconds played, "previous" restarts the track instead. */
 export const RESTART_THRESHOLD_S = 3;

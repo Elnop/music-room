@@ -5,10 +5,10 @@ import { showError } from '@/shared/utils/toast';
 import { toTrackInput } from '@/shared/utils/trackInput';
 import { getPlayback } from '@/shared/services/playbackBridge';
 import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
-import { useSoundCloudSearch } from '@/features/search/useSoundCloudSearch';
+import { useSoundCloudSearch } from './useSoundCloudSearch';
 import { useSearchFocusStore } from '@/features/search/searchFocusStore';
-import type { SoundCloudTrack } from '@/features/search/types';
-import type { AddQueueItemBody } from '@/shared/types/playback';
+import type { SoundCloudTrack } from '@/features/search/lib/types';
+import type { AddQueueItemBody } from '@/shared/playback/playback';
 import { recordMenuAnchor } from '@/shared/stores/menuAnchorStore';
 import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 

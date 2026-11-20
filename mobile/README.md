@@ -244,9 +244,9 @@ mobile/src/
 - **AuthNavigator**: Welcome, Login, Register, EmailVerification, ForgotPassword, ResetPassword; each screen is the orchestrator of `features/auth/<subject>/`.
 - **AppNavigator** (tabs):
   - Home and Playlists mount the same stack (`stacks/PlaylistsStack.tsx`): Home, Playlists, PlaylistDetail, CreatePlaylist, SearchTracks, PlaylistSharing, EventDetail, EventForm (the orchestrators of `features/playlists/<subject>/`). Home opens on `Home` (`navigation/screens/HomeScreen.tsx`: friends' and public playlists from `playlists/home`, plus the nearby events section of `features/events/`, passed in since features never import each other); Playlists opens on `Playlists` (`playlists/library`: the playlists I own or that are shared with me, and the create button). A `zumik://playlist/<id>` link opens in the Playlists tab.
-  - Search → Search (the orchestrator of `features/search/searchScreen/components/orchestrators`)
+  - Search → Search (`features/search/components/SearchContainer.tsx`)
   - Friends → Friends, UserProfile, PlaylistDetail, SearchTracks
-  - Profile → Profile, EditProfile, PrivacySettings, MusicPreferences, LinkedAccounts, MyDevices, Settings (the orchestrators of `features/profile/<subject>/` and `features/music-control/myDevices/components/orchestrators`)
+  - Profile → Profile, EditProfile, PrivacySettings, MusicPreferences, LinkedAccounts, MyDevices, Settings (the containers of `features/profile/<subject>/` and `features/music-control/myDevices/`; Settings gets the plan from `features/subscription/PlanContainer.tsx`)
 
 ## State, real time and playback
 

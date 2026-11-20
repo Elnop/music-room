@@ -1,5 +1,5 @@
 import { apiRequest } from '@/shared/services/api';
-import type { Plan, Subscription } from '@/shared/types/subscription';
+import type { Plan, Subscription } from './subscription';
 
 export const subscriptionApi = {
 	getSubscription: () => apiRequest<Subscription>('/api/subscription'),

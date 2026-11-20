@@ -8,7 +8,7 @@ import { RegisterContainer } from '@/features/auth/register/components/RegisterC
 import { EmailVerificationContainer } from '@/features/auth/emailVerification/components/EmailVerificationContainer';
 import { ForgotPasswordContainer } from '@/features/auth/forgotPassword/components/ForgotPasswordContainer';
 import { ResetPasswordContainer } from '@/features/auth/resetPassword/components/ResetPasswordContainer';
-import { PrivacyPolicyContainer } from '@/features/legal/privacyPolicy/components/PrivacyPolicyContainer';
+import { PrivacyPolicyContainer } from '@/features/legal/components/PrivacyPolicyContainer';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { screenHeader, screenLayout } from '@/navigation/screenLayout';

@@ -7,7 +7,7 @@ import { registerPlayerModals } from '@/shared/services/playerModalsBridge';
 import { registerTrackActionsSheet } from '@/shared/services/trackActionsBridge';
 import { THIS_DEVICE_LABEL } from '@/shared/constants/platform';
 import type { NowPlaying } from '@/features/player/types';
-import type { QueueItem } from '@/shared/types/playback';
+import type { QueueItem } from '@/shared/playback/playback';
 import { Text } from '@/shared/components/ui/Text';
 
 let mockNowPlaying: NowPlaying;

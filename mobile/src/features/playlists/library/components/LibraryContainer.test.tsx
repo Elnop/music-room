@@ -56,6 +56,7 @@ let clear: () => void = () => undefined;
 function renderLibrary() {
 	const view = renderWithClient(
 		<LibraryContainer
+			premium={{ isPremium: true, refetch: jest.fn() }}
 			route={{ key: 'k', name: 'Playlists' } as Props['route']}
 			navigation={navigation as unknown as Props['navigation']}
 		/>

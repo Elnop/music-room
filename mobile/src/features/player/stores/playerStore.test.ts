@@ -1,6 +1,6 @@
 import { usePlayerStore, readPositionMs, setPositionReader } from './playerStore';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
-import type { PlaybackState } from '@/shared/types/playback';
+import type { PlaybackState } from '@/shared/playback/playback';
 
 const initialState = usePlayerStore.getState();
 

@@ -11,6 +11,7 @@ import { useDeletePlaylist } from '@/features/playlists/hooks/usePlaylistMutatio
 import { confirmPlaylistDelete } from '@/features/playlists/utils/confirmPlaylistDelete';
 import { forgetPlaylist } from '@/features/playlists/utils/playlistCache';
 import type { Playlist, PlaylistStackParamList } from '@/features/playlists/types';
+import type { PlanState } from '@/features/subscription/lib/subscription';
 
 export interface PlaylistCardMenu {
 	visible: boolean;
@@ -28,14 +29,15 @@ export interface PlaylistCardMenu {
 }
 
 export function usePlaylistCardMenu(
-	navigation: Pick<NativeStackNavigationProp<PlaylistStackParamList>, 'navigate' | 'getParent'>
+	navigation: Pick<NativeStackNavigationProp<PlaylistStackParamList>, 'navigate' | 'getParent'>,
+	premium: Pick<PlanState, 'isPremium' | 'refetch'>
 ): PlaylistCardMenu {
 	const client = useQueryClient();
 	const userId = useSession(session => session.user?.id);
 	const [playlist, setPlaylist] = useState<Playlist | null>(null);
 	const [visible, setVisible] = useState(false);
 	const id = playlist?.id ?? '';
-	const cover = useCoverActions(navigation, id, playlist !== null);
+	const cover = useCoverActions(navigation, id, premium);
 	const deletePlaylist = useDeletePlaylist();
 
 	const confirmDelete = async () => {

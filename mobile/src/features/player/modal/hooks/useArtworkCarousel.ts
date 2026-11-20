@@ -11,7 +11,7 @@ import {
 } from 'react-native-reanimated';
 import { getPlayback, useActiveQueue } from '@/shared/services/playbackBridge';
 import { largeArtwork } from '@/shared/utils/artwork';
-import type { QueueItem } from '@/shared/types/playback';
+import type { QueueItem } from '@/shared/playback/playback';
 import { hapticTap } from '@/shared/utils/haptics';
 import { trackSwipeDirection } from '@/features/player/utils/trackSwipe';
 import { displayedQueueIndex } from '@/features/player/utils/displayedQueueIndex';

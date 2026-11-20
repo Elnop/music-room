@@ -8,7 +8,7 @@ import { useCreatePlaylist } from '@/features/playlists/hooks/usePlaylistMutatio
 import { useAddTrack } from '@/features/playlists/hooks/useTrackEdits';
 import { playlistFormSchema } from '@/features/playlists/validators';
 import type { Playlist } from '@/features/playlists/types';
-import type { AddQueueItemBody } from '@/shared/types/playback';
+import type { AddQueueItemBody } from '@/shared/playback/playback';
 import { PLAYLIST_NAME_MAX } from '@/features/playlists/trackActions/utils/playlistName';
 
 

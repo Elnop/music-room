@@ -6,7 +6,7 @@ import {
 	POLICY_INTRO,
 	POLICY_SECTIONS,
 	POLICY_UPDATED_AT,
-} from '@/features/legal/privacyPolicy/utils/privacyPolicyContent';
+} from '@/features/legal/privacyPolicyContent';
 import { PolicyText } from './PolicyText';
 
 interface PrivacyPolicyViewProps {

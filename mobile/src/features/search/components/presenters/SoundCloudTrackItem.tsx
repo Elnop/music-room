@@ -11,7 +11,7 @@ import { TrackActionsButton } from '@/shared/components/lists/TrackActionsButton
 import { formatDuration } from '@/shared/utils/formatters';
 import { pixelRow } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
-import type { SoundCloudTrack } from '@/features/search/types';
+import type { SoundCloudTrack } from '@/features/search/lib/types';
 import { Text } from '@/shared/components/ui/Text';
 import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 

@@ -13,7 +13,7 @@ import {
 	type NewPlaylistDraft,
 } from '@/features/playlists/trackActions/hooks/useNewPlaylistFromTrack';
 import type { Playlist } from '@/features/playlists/types';
-import type { AddQueueItemBody } from '@/shared/types/playback';
+import type { AddQueueItemBody } from '@/shared/playback/playback';
 import type { TrackActionsStart } from '@/shared/services/trackActionsBridge';
 
 type Step = 'actions' | 'playlists' | 'newPlaylist';

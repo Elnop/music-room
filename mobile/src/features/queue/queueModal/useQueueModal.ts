@@ -6,7 +6,7 @@ import { afterItemIdForDrop } from '@/shared/utils/moveTarget';
 import { toTrackInput } from '@/shared/utils/trackInput';
 import { createModalStyles } from '@/features/queue/queueModal/components/presenters/queueModalStyles';
 import type { QueueItem } from '@/features/queue/types';
-import type { AddQueueItemBody } from '@/shared/types/playback';
+import type { AddQueueItemBody } from '@/shared/playback/playback';
 import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import { recordMenuAnchor } from '@/shared/stores/menuAnchorStore';
 import type { MenuAnchor } from '@/shared/utils/menuPlacement';

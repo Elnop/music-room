@@ -2,7 +2,7 @@
 
 Bonus V.3 (epic #478): each user is on a free or a premium plan and can switch from one to the other. The premium plan unlocks features the free plan lacks; the first one is a custom playlist cover (#483).
 
-Code: `backend/src/shared/subscription/plan.ts` (plan check, used by every feature that gates on Premium), `backend/src/features/subscription/` (the endpoints), migration `030_subscription_plan.sql`; mobile `src/shared/hooks/usePlan.ts`, `src/shared/services/subscriptionApi.ts` and the Settings screen (`features/profile/settings/`).
+Code: `backend/src/shared/subscription/plan.ts` (plan check, used by every feature that gates on Premium), `backend/src/features/subscription/` (the endpoints), migration `030_subscription_plan.sql`; mobile `src/features/subscription/` (`usePlan.ts`, `lib/subscriptionApi.ts`, `PlanContainer.tsx`) and the Settings screen (`features/profile/settings/`).
 
 ## The two plans
 
@@ -42,4 +42,4 @@ A downgrade deletes nothing: what was created on Premium (a playlist cover) stay
 
 ## In the app
 
-**Profile › Settings › Abonnement** shows the current plan and a Premium switch, with the note that no payment is asked (#484). `usePlan()` (`shared/hooks/usePlan.ts`) reads the plan; it lives in `shared/` because Settings and the playlist cover both read it. `useChangePlan()` switches it optimistically: the cached plan changes at once, so every screen reading `usePlan()` unlocks or locks the Premium feature without a restart; a failed request puts the previous plan back and Settings shows an error.
+**Profile › Settings › Abonnement** shows the current plan and a Premium switch, with the note that no payment is asked (#484). `usePlan()` (`features/subscription/usePlan.ts`) reads the plan. Since features never import each other, the navigation wraps the screens that need it in `PlanContainer` (`features/subscription/PlanContainer.tsx`), which passes the plan and the change to Settings and to the playlist screens (cover). `useChangePlan()` switches it optimistically: the cached plan changes at once, so every screen reading `usePlan()` unlocks or locks the Premium feature without a restart; a failed request puts the previous plan back and Settings shows an error.

@@ -9,11 +9,12 @@ import { LinkedAccountsContainer } from '@/features/profile/linkedAccounts/compo
 import { MusicPreferencesContainer } from '@/features/profile/musicPreferences/components/MusicPreferencesContainer';
 import { SettingsContainer } from '@/features/profile/settings/components/SettingsContainer';
 import { MyDevicesContainer } from '@/features/music-control/myDevices/components/orchestrators/MyDevicesContainer';
-import { PrivacyPolicyContainer } from '@/features/legal/privacyPolicy/components/PrivacyPolicyContainer';
+import { PrivacyPolicyContainer } from '@/features/legal/components/PrivacyPolicyContainer';
 import type { ProfileStackParamList } from '@/features/profile/types';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { screenHeader, screenLayout } from '@/navigation/screenLayout';
 import { headerTitle } from '@/shared/theme/pixelFrame';
+import { PlanContainer } from '@/features/subscription/PlanContainer';
 
 const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 const layout = screenLayout(true);
@@ -68,11 +69,9 @@ export function ProfileNavigator() {
 				component={MusicPreferencesContainer}
 				options={{ title: 'Préférences musicales' }}
 			/>
-			<ProfileStack.Screen
-				name="Settings"
-				component={SettingsContainer}
-				options={{ title: 'Réglages' }}
-			/>
+			<ProfileStack.Screen name="Settings" options={{ title: 'Réglages' }}>
+				{() => <PlanContainer>{plan => <SettingsContainer subscription={plan} />}</PlanContainer>}
+			</ProfileStack.Screen>
 			<ProfileStack.Screen
 				name="PrivacyPolicy"
 				component={PrivacyPolicyContainer}

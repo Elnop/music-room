@@ -1,8 +1,8 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { SearchContainer } from '@/features/search/searchScreen/components/SearchContainer';
-import { searchApi } from '@/features/search/services/searchApi';
+import { SearchContainer } from './SearchContainer';
+import { searchApi } from '@/features/search/lib/searchApi';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
 const mockPlayListTrack = jest.fn();
@@ -16,7 +16,7 @@ jest.mock('@/shared/services/playbackBridge', () => ({
 	usePlayerHeight: () => 0,
 }));
 
-jest.mock('@/features/search/services/searchApi', () => ({
+jest.mock('@/features/search/lib/searchApi', () => ({
 	searchApi: {
 		search: jest.fn(),
 		searchTracks: jest.fn(),

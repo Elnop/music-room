@@ -29,7 +29,7 @@ jest.mock('@/shared/utils/toast', () => ({ showError: jest.fn(), showSuccess: je
 const playlist = (id: string, ownerId: string) => ({ id, ownerId, name: `Mix ${id}` }) as Playlist;
 const navigation = { navigate: jest.fn(), getParent: jest.fn() };
 
-const setup = () => renderHook(() => usePlaylistCardMenu(navigation)).result;
+const setup = () => renderHook(() => usePlaylistCardMenu(navigation, { isPremium: true, refetch: jest.fn() })).result;
 
 beforeEach(() => {
 	jest.clearAllMocks();
