@@ -2,7 +2,7 @@
 
 Each user has one play queue, shared by all their devices. Friends who control one of their devices manage that queue too, and anyone can move what is playing to another device they control, Spotify Connect style. This extends Music Control Delegation (IV.2.2); Music Track Vote (IV.2.1) is not implemented, so the queue has no voting.
 
-Code: `backend/src/features/queue/`, `backend/src/realtime/emitters/queue.emitters.ts`, migrations `021` to `025`; mobile `src/features/queue/` (`queueModal/`, `devicePicker/`, `stores/queueStore.ts`, `stores/connectStore.ts`) and `src/features/player/`.
+Code: `backend/src/features/queue/`, `backend/src/realtime/emitters/queue.emitters.ts`, migrations `021` to `025`; mobile `src/features/playback/` (`features/queue-modal/`, `features/control-delegation/features/device-picker/`, `shared/player/stores/queueStore.ts`, `shared/player/stores/connectStore.ts`).
 
 ## The queue
 

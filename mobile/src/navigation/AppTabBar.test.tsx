@@ -7,7 +7,7 @@ import { Text } from '@/shared/theme/components/Text';
 
 const mockNavigate = jest.fn();
 
-jest.mock('@/features/player/miniPlayer/components/MiniPlayerContainer', () => {
+jest.mock('@/features/playback/features/mini-player/components/MiniPlayerContainer', () => {
 	const { Text: MockText } = jest.requireActual('@/shared/theme/components/Text');
 	return { MiniPlayerContainer: () => <MockText>mini-player</MockText> };
 });

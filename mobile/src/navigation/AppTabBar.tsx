@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { BottomTabBar, type BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { MiniPlayerContainer } from '@/features/player/miniPlayer/components/MiniPlayerContainer';
+import { MiniPlayerContainer } from '@/features/playback/features/mini-player/components/MiniPlayerContainer';
 import { PixelWordmark } from '@/shared/theme/components/PixelWordmark';
 import { PIXEL } from '@/shared/theme/lib/tokens';
 import { SIDEBAR_WIDTH } from '@/shared/theme/lib/layout';

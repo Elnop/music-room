@@ -1,0 +1,99 @@
+import { useMemo, useState } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { usePlayer } from '@/features/playback/shared/player/lib/PlayerContext';
+import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
+import { usePlaybackControls } from '@/features/playback/shared/player/hooks/usePlaybackControls';
+import { useImageColors } from '@/shared/image-colors/useImageColors';
+import { getAdaptiveColors, hexToRgba } from '@/shared/image-colors/adaptivePalette';
+import { largeArtwork } from '@/features/playback/shared/artwork/artwork';
+import { createStyles } from '@/features/playback/features/player-modal/components/presenters/playerModalStyles';
+import { useColorFade } from './useColorFade';
+
+export function usePlayerModal() {
+	const { theme } = useTheme();
+	const insets = useSafeAreaInsets();
+	const { error } = usePlayer();
+	const isModalOpen = usePlayerStore(state => state.isModalOpen);
+	const setModalOpen = usePlayerStore(state => state.setModalOpen);
+	const { nowPlaying, ...controls } = usePlaybackControls();
+
+	const [isQueueOpen, setQueueOpen] = useState(false);
+	const [isDevicesOpen, setDevicesOpen] = useState(false);
+	const [wasModalOpen, setWasModalOpen] = useState(isModalOpen);
+
+	if (wasModalOpen !== isModalOpen) {
+		setWasModalOpen(isModalOpen);
+		if (!isModalOpen) {
+			setQueueOpen(false);
+			setDevicesOpen(false);
+		}
+	}
+
+	const artworkUrl = largeArtwork(nowPlaying.track?.artworkUrl);
+	const { dominantColor } = useImageColors(artworkUrl, theme.colors.primary);
+	const styles = useMemo(() => createStyles(theme, insets), [theme, insets]);
+
+	const adaptive = useMemo(
+		() => (dominantColor ? getAdaptiveColors(dominantColor, theme.colors.background) : null),
+		[dominantColor, theme.colors.background]
+	);
+
+	const colors = useMemo(() => {
+		const base = adaptive
+			? {
+					text: adaptive.text,
+					textSecondary: adaptive.textSecondary,
+					buttonBg: adaptive.buttonBg,
+					slider: adaptive.accent,
+					sliderBg: adaptive.accentBg,
+					playBtnBg: adaptive.accent,
+					playBtnIcon: adaptive.onAccent,
+				}
+			: {
+					text: theme.colors.text,
+					textSecondary: theme.colors.textSecondary,
+					buttonBg: theme.colors.surface,
+					slider: theme.colors.primary,
+					sliderBg: theme.colors.border,
+					playBtnBg: theme.colors.primary,
+					playBtnIcon: theme.colors.onColor,
+				};
+		return {
+			...base,
+			error: theme.colors.error,
+			errorBg: hexToRgba(theme.colors.error, 0.15),
+		};
+	}, [adaptive, theme]);
+
+	const gradientColors: [string, string, string, string] = adaptive
+		? adaptive.gradient
+		: [
+				theme.colors.background,
+				theme.colors.background,
+				theme.colors.background,
+				theme.colors.background,
+			];
+
+	const backgroundStyle = useColorFade(gradientColors[0]);
+
+	return {
+		isModalOpen,
+		closeModal: () => setModalOpen(false),
+		isQueueOpen,
+		setQueueOpen,
+		isDevicesOpen,
+		setDevicesOpen,
+		styles,
+		colors,
+		backgroundStyle,
+		track: nowPlaying.track,
+		artworkUrl,
+		error,
+		isRemote: nowPlaying.isRemote,
+		isPlaying: nowPlaying.isPlaying,
+		isLoading: nowPlaying.isLoading,
+		deviceLabel: nowPlaying.deviceLabel,
+		...controls,
+	};
+}

@@ -1,12 +1,5 @@
-import type {
-	AddQueueItemBody,
-	OwnerQueue,
-	PlaybackState,
-	QueueStepOutcome,
-} from './playback';
+import type { AddQueueItemBody, PlaybackState, QueueStepOutcome } from './playback';
 import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
-
-export type { OwnerQueue } from './playback';
 
 export interface PlaylistPlayback {
 	playingUri: string | null;
@@ -20,22 +13,8 @@ interface PlayerSnapshot {
 	positionMs: number;
 }
 
-const EMPTY_QUEUE: OwnerQueue = Object.freeze({
-	currentItemId: null,
-	items: [],
-	version: 0,
-});
-
-interface PlaybackEmitterSnapshot {
-	currentTrack: SoundCloudTrack | null;
-	isPlaying: boolean;
-	seekCount: number;
-}
-
 interface PlaybackBridge {
 	usePlaylistPlayback: (playlistId: string) => PlaylistPlayback;
-	useActiveQueue: () => OwnerQueue;
-	usePlaybackEmitterState?: () => PlaybackEmitterSnapshot;
 	addToQueue: (track: AddQueueItemBody) => Promise<boolean>;
 	playNext: (track: AddQueueItemBody) => Promise<boolean>;
 	playPlaylist: (playlistId: string, startTrackId?: string) => Promise<string>;
@@ -48,7 +27,6 @@ interface PlaybackBridge {
 	resume: () => void;
 	stop: () => void;
 	getPlayerState: () => PlayerSnapshot;
-	readPositionMs?: () => number | null;
 	setCurrentQueueItem?: (userId: string, itemId: string, version: number) => void;
 }
 
@@ -57,8 +35,6 @@ const unavailable = () => Promise.reject(new Error(NOT_REGISTERED));
 
 const unregistered: PlaybackBridge = {
 	usePlaylistPlayback: () => ({ playingUri: null, state: null }),
-	useActiveQueue: () => EMPTY_QUEUE,
-	usePlaybackEmitterState: () => ({ currentTrack: null, isPlaying: false, seekCount: 0 }),
 	addToQueue: unavailable,
 	playNext: unavailable,
 	playPlaylist: unavailable,
@@ -71,7 +47,6 @@ const unregistered: PlaybackBridge = {
 	resume: () => undefined,
 	stop: () => undefined,
 	getPlayerState: () => ({ currentTrack: null, queueItemId: null, loadCounter: 0, positionMs: 0 }),
-	readPositionMs: () => null,
 	setCurrentQueueItem: () => undefined,
 };
 
@@ -90,16 +65,4 @@ export function getPlayback(): PlaybackBridge {
 
 export function usePlaylistPlayback(playlistId: string): PlaylistPlayback {
 	return getPlayback().usePlaylistPlayback(playlistId);
-}
-
-export function useActiveQueue(): OwnerQueue {
-	return getPlayback().useActiveQueue();
-}
-
-export function usePlaybackEmitterState(): PlaybackEmitterSnapshot {
-	return getPlayback().usePlaybackEmitterState?.() ?? unregistered.usePlaybackEmitterState!();
-}
-
-export function readPlaybackPositionMs(): number | null {
-	return getPlayback().readPositionMs?.() ?? null;
 }

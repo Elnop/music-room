@@ -2,11 +2,11 @@
 
 Subject IV.2.2 (Music Control Delegation): a user lets friends control their music, with a license specific to each device attached to their account.
 
-Code: `backend/src/features/music-control/`, `backend/src/realtime/handlers/control.handler.ts`, `listening.handler.ts`, `music-control-access.ts`; mobile `src/features/music-control/`.
+Code: `backend/src/features/music-control/`, `backend/src/realtime/handlers/control.handler.ts`, `listening.handler.ts`, `music-control-access.ts`; mobile `src/features/playback/features/control-delegation/` (`features/my-devices/`, `features/device-picker/`, `shared/delegation/`).
 
 ## Devices
 
-A device is registered every time the app opens its socket: the handshake carries a stable `deviceId`, a name, the platform, the model and the app version, and the backend upserts it in `devices` before accepting the connection. The user sees their devices, with the one in hand marked, in **Profile › My devices** (`features/music-control/myDevices/`) and can rename them (#352).
+A device is registered every time the app opens its socket: the handshake carries a stable `deviceId`, a name, the platform, the model and the app version, and the backend upserts it in `devices` before accepting the connection. The user sees their devices, with the one in hand marked, in **Profile › My devices** (`features/playback/features/control-delegation/features/my-devices/`) and can rename them (#352).
 
 ## Who may control what
 

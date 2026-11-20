@@ -11,6 +11,7 @@ import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { screenHeader, screenLayout } from '@/navigation/screenLayout';
 import { headerTitle } from '@/shared/theme/lib/pixelFrame';
 import { PlanContainer } from '@/features/subscription/PlanContainer';
+import { FriendListeningContainer } from '@/features/playback/features/control-delegation/FriendListeningContainer';
 
 export type { FriendsStackParamList };
 
@@ -41,14 +42,18 @@ export function FriendsNavigator() {
 				component={FriendsContainer}
 				options={{ title: 'Amis' }}
 			/>
-			<FriendsStack.Screen
-				name="UserProfile"
-				component={UserProfileContainer}
-				options={{ title: '', headerTitle: '' }}
-			/>
+			<FriendsStack.Screen name="UserProfile" options={{ title: '', headerTitle: '' }}>
+				{props => (
+					<FriendListeningContainer userId={props.route.params.userId}>
+						{listening => <UserProfileContainer {...props} listening={listening} />}
+					</FriendListeningContainer>
+				)}
+			</FriendsStack.Screen>
 			<FriendsStack.Screen name="PlaylistDetail" options={{ headerShown: false }}>
 				{props => (
-					<PlanContainer>{plan => <PlaylistDetailContainer {...props} premium={plan} />}</PlanContainer>
+					<PlanContainer>
+						{plan => <PlaylistDetailContainer {...props} premium={plan} />}
+					</PlanContainer>
 				)}
 			</FriendsStack.Screen>
 			<FriendsStack.Screen

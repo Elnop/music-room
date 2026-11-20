@@ -6,6 +6,7 @@ import { renderWithClient } from '@test-utils/renderWithClient';
 import { signIn } from '@test-utils/session';
 import '@test-utils/playback';
 import { UserProfileContainer } from './UserProfileContainer';
+import type { FriendListeningResult } from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
 
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
 
@@ -28,17 +29,6 @@ jest.mock('@/shared/theme/lib/toast', () => ({
 	showSuccess: jest.fn(),
 	showError: jest.fn(),
 	showInfo: jest.fn(),
-}));
-
-jest.mock('@/shared/backend/lib/musicControlBridge', () => ({
-	useFriendListening: () => ({
-		devices: [],
-		canControl: false,
-		remotePlay: jest.fn(),
-		remotePause: jest.fn(),
-		isLoading: false,
-		controlError: null,
-	}),
 }));
 
 jest.mock('@/shared/control-error/controlError', () => ({
@@ -94,10 +84,20 @@ jest.mock('@/features/user/features/friends/shared/follows/friendsApi', () => ({
 	},
 }));
 
+const listening: FriendListeningResult = {
+	devices: [],
+	canControl: false,
+	remotePlay: jest.fn(),
+	remotePause: jest.fn(),
+	isLoading: false,
+	error: null,
+	controlError: null,
+};
+
 const FOLLOW_BACK_HINT = 'Suivez cet utilisateur en retour pour devenir amis.';
 
 function renderScreen() {
-	return renderWithClient(<UserProfileContainer userId={ID} />);
+	return renderWithClient(<UserProfileContainer userId={ID} listening={listening} />);
 }
 
 function mockFollowStatus(isFollowing: boolean, isFollowedBy: boolean) {
@@ -180,7 +180,11 @@ describe('UserProfileContainer', () => {
 
 		const onNavigateToPlaylist = jest.fn();
 		renderWithClient(
-			<UserProfileContainer userId={ID} onNavigateToPlaylist={onNavigateToPlaylist} />
+			<UserProfileContainer
+				userId={ID}
+				listening={listening}
+				onNavigateToPlaylist={onNavigateToPlaylist}
+			/>
 		);
 
 		expect(await screen.findByText('Rock Classics')).toBeTruthy();

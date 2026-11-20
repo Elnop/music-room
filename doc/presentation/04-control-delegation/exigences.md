@@ -17,7 +17,7 @@
 ## Où regarder
 
 - Backend : `backend/src/features/music-control/`, `backend/src/features/queue/`, `backend/src/realtime/handlers/control.handler.ts`
-- Mobile : `mobile/src/features/music-control/myDevices/`, `mobile/src/features/queue/devicePicker/`
+- Mobile : `mobile/src/features/playback/features/control-delegation/` (`features/my-devices/`, `features/device-picker/`)
 - Détail : [control-delegation.md](../../features/control-delegation.md), [queue-and-connect.md](../../features/queue-and-connect.md), M11 de [threat-model.md](../../security/threat-model.md#m11-music-control-of-an-unauthorized-device)
 
 ## Scénarios

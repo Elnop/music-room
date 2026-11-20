@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react-native';
 import { getPlayback, usePlaylistPlayback } from '@/shared/playback/lib/playbackBridge';
-import { usePlayerStore } from '@/features/player/stores/playerStore';
-import { useQueueStore } from '@/features/queue/stores/queueStore';
+import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
+import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
 import { useAuthStore } from '@/features/user/features/auth/shared/sign-in/authStore';
 import type { QueueItem } from '@/shared/playback/lib/queue.types';
 import type { UserProfile } from '@/shared/users/user.types';
@@ -10,7 +10,9 @@ import { registerPlayback } from './playbackBridge';
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
-jest.mock('@/features/player/context/PlayerContext', () => ({ usePlayerHeight: () => 64 }));
+jest.mock('@/features/playback/shared/player/lib/PlayerContext', () => ({
+	usePlayerHeight: () => 64,
+}));
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 
 const item = { id: 'q1', sourcePlaylistId: 'p1' } as QueueItem;

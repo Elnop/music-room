@@ -1,22 +1,26 @@
 import { act, renderHook } from '@testing-library/react-native';
 import type { AlertButton } from 'react-native';
-import { usePlayerAudio } from '@/features/player/hooks/usePlayerAudio';
-import { useAutoplayPrompt } from '@/features/player/hooks/useAutoplayPrompt';
-import { usePlayerStore } from '@/features/player/stores/playerStore';
-import { useAutoplayStore } from '@/features/player/stores/autoplayStore';
-import { useMusicControlEmitter } from '@/features/music-control/hooks/useMusicControlEmitter';
+import { usePlayerAudio } from '@/features/playback/shared/player/hooks/usePlayerAudio';
+import { useAutoplayPrompt } from '@/features/playback/shared/player/hooks/useAutoplayPrompt';
+import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
+import { useAutoplayStore } from '@/features/playback/shared/player/stores/autoplayStore';
+import { useMusicControlEmitter } from '@/features/playback/features/control-delegation/hooks/useMusicControlEmitter';
 import { showAlert } from '@/shared/alerts/alert';
 import type { DeviceCommand } from '@/shared/playback/lib/queue.types';
-import { FakeMediaElement, autoplayRefusal, installFakeDocument } from '@test-utils/fakeMediaElement';
+import {
+	FakeMediaElement,
+	autoplayRefusal,
+	installFakeDocument,
+} from '@test-utils/fakeMediaElement';
 import { registerPlayback } from './playbackBridge';
 
 // The browser as a delegated device: a friend's commands drive the web player, and the status it sends back is true.
 
-jest.mock('@/features/player/services/audioPlayer', () =>
-	jest.requireActual('@/features/player/services/audioPlayer.web')
+jest.mock('@/features/playback/shared/player/lib/audioPlayer', () =>
+	jest.requireActual('@/features/playback/shared/player/lib/audioPlayer.web')
 );
 jest.mock('hls.js', () => ({ __esModule: true, default: { isSupported: () => false } }));
-jest.mock('@/features/player/services/streamApi', () => ({
+jest.mock('@/features/playback/shared/player/lib/streamApi', () => ({
 	fetchStreamUrl: () =>
 		Promise.resolve({ streamUrl: 'https://cdn/stream.m3u8', expiresAt: Date.now() + 1_800_000 }),
 }));

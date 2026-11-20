@@ -1,15 +1,11 @@
 import { registerPlaybackBridge } from '@/shared/playback/lib/playbackBridge';
-import { registerConnectBridge } from '@/shared/listening/lib/connectBridge';
-import { registerPlayerModals } from '@/shared/player-modals-bridge/playerModalsBridge';
 import { registerTrackActionsSheet } from '@/shared/playback/lib/trackActionsBridge';
-import { registerFriendsBridge } from '@/shared/backend/lib/friendsBridge';
-import { friendsApi } from '@/features/user/features/friends/shared/follows/friendsApi';
-import { readPositionMs, usePlayerStore } from '@/features/player/stores/playerStore';
-import { useConnectStore } from '@/features/queue/stores/connectStore';
-import { useActiveQueue, useQueueStore } from '@/features/queue/stores/queueStore';
-import { selectPlaysPlaylist } from '@/features/queue/utils/queueSelectors';
-import { QueueModalContainer } from '@/features/queue/queueModal/components/QueueModalContainer';
-import { DevicePickerSheetContainer } from '@/features/queue/devicePicker/components/DevicePickerSheetContainer';
+import {
+	readPositionMs,
+	usePlayerStore,
+} from '@/features/playback/shared/player/stores/playerStore';
+import { useActiveQueue, useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
+import { selectPlaysPlaylist } from '@/features/playback/shared/player/lib/queueSelectors';
 import { TrackActionsSheetContainer } from '@/features/playlists/trackActions/components/TrackActionsSheetContainer';
 
 /** Lets playlists reach the player and queue without importing them. */
@@ -24,13 +20,6 @@ export function registerPlayback(): void {
 				playingUri: fromPlaylist ? uri : null,
 				state: fromPlaylist ? playbackState : null,
 			};
-		},
-		useActiveQueue,
-		usePlaybackEmitterState: () => {
-			const currentTrack = usePlayerStore(state => state.currentTrack);
-			const isPlaying = usePlayerStore(state => state.isPlaying);
-			const seekCount = usePlayerStore(state => state.seekCount);
-			return { currentTrack, isPlaying, seekCount };
 		},
 		addToQueue: track => useQueueStore.getState().addItem(track),
 		playNext: track => useQueueStore.getState().playNext(track),
@@ -54,30 +43,10 @@ export function registerPlayback(): void {
 				positionMs: readPositionMs() ?? 0,
 			};
 		},
-		readPositionMs,
 		setCurrentQueueItem: (userId, itemId, version) => {
 			useQueueStore.getState().setCurrentItem(userId, itemId, version);
 		},
 	});
 
-	registerConnectBridge({
-		useConnect: selector => useConnectStore(selector),
-		useIsLocal: () => useConnectStore(s => s.target.kind === 'local'),
-		getConnectState: () => useConnectStore.getState(),
-		setRemoteStatus: status => useConnectStore.getState().setRemoteStatus(status),
-		setControlPending: pending => useConnectStore.getState().setControlPending(pending),
-		setLocal: message => useConnectStore.getState().setLocal(message),
-		setRemote: target => useConnectStore.getState().setRemote(target),
-	});
-
-	registerPlayerModals({
-		QueueModalContainer,
-		DevicePickerSheetContainer,
-	});
-
 	registerTrackActionsSheet(TrackActionsSheetContainer);
-
-	registerFriendsBridge({
-		getFriends: token => friendsApi.getFriends(token),
-	});
 }

@@ -1,6 +1,4 @@
-import type { MediaElement } from '@/features/player/services/mediaElement';
-
-export class FakeMediaElement implements MediaElement {
+export class FakeMediaElement {
 	src = '';
 	currentTime = 0;
 	volume = 1;

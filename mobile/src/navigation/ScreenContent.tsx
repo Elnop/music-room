@@ -1,6 +1,6 @@
 import React from 'react';
 import { ContentFrame } from '@/shared/theme/components/ContentFrame';
-import { useNowPlayingPanelStore } from '@/features/player/stores/nowPlayingPanelStore';
+import { useNowPlayingPanelStore } from '@/features/playback/shared/panel/nowPlayingPanelStore';
 import type { ContentWidth } from '@/shared/theme/lib/layout';
 
 interface ScreenContentProps {
@@ -10,7 +10,12 @@ interface ScreenContentProps {
 	children: React.ReactNode;
 }
 
-export function ScreenContent({ width, besideSidebar, scrollsAtEdge, children }: ScreenContentProps) {
+export function ScreenContent({
+	width,
+	besideSidebar,
+	scrollsAtEdge,
+	children,
+}: ScreenContentProps) {
 	const panelOpen = useNowPlayingPanelStore(state => state.isOpen);
 	return (
 		<ContentFrame

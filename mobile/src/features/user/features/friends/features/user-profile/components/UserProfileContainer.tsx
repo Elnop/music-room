@@ -8,11 +8,13 @@ import { useUserProfileScreen } from '@/features/user/features/friends/features/
 import { UserProfileView } from '@/features/user/features/friends/features/user-profile/components/presenters/UserProfileView';
 import { createUserProfileStyles } from '@/features/user/features/friends/features/user-profile/lib/userProfileStyles';
 import { Text } from '@/shared/theme/components/Text';
+import type { FriendListeningResult } from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
 
 type UserProfileOrchestratorProps = Partial<
 	NativeStackScreenProps<FriendsStackParamList, 'UserProfile'>
 > & {
 	userId?: string;
+	listening: FriendListeningResult;
 	onNavigateToPlaylist?: (playlistId: string) => void;
 };
 
@@ -20,12 +22,13 @@ export function UserProfileContainer({
 	route,
 	navigation,
 	userId: propUserId,
+	listening,
 	onNavigateToPlaylist,
 }: UserProfileOrchestratorProps) {
 	const userId = propUserId || route?.params?.userId || '';
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createUserProfileStyles(theme), [theme]);
-	const screen = useUserProfileScreen(userId);
+	const screen = useUserProfileScreen(userId, listening);
 
 	const handleSelectPlaylist = useCallback(
 		(playlistId: string) => {

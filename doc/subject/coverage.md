@@ -15,7 +15,7 @@ The subject asks for two of the three services of IV.2. Zumik delivers **Music P
 | III.1 Architecture, dependencies, justified choices | ✅ | `make install`, [decisions.md](../decisions.md) |
 | III.2 Mobile experience | ✅ | `mobile/` (Expo React Native, native Android build) |
 | IV.1 User | ✅ | `backend/src/features/auth/`, `profile/`; [accounts-auth.md](../features/accounts-auth.md) |
-| IV.2.2 Music Control Delegation | ✅ | `backend/src/features/music-control/`; [control-delegation.md](../features/control-delegation.md) |
+| IV.2.2 Music Control Delegation | ✅ | `backend/src/features/music-control/`, `mobile/src/features/playback/features/control-delegation/`; [control-delegation.md](../features/control-delegation.md) |
 | IV.2.3 Music Playlist Editor | ✅ | `backend/src/features/playlists/`; [playlist-editor.md](../features/playlist-editor.md) |
 | IV.3 Server | ✅ | Supabase behind the backend |
 | IV.4 API | ✅ | Swagger UI `/api-docs`; [mobile-api.md](../features/mobile-api.md) |
@@ -47,7 +47,7 @@ Details: [accounts-auth.md](../features/accounts-auth.md).
 ### IV.2.2 Music Control Delegation
 
 - A user delegates control of their music to friends, **per device**: a license on one device (`device_control_licenses`), or the "all my devices" switch (`follows.can_control_music`). Both users must be mutual friends.
-- Devices are registered at each socket connection (`devices`) and listed in the app (`features/music-control/myDevices/`).
+- Devices are registered at each socket connection (`devices`) and listed in the app (`features/playback/features/control-delegation/features/my-devices/`).
 - A delegate also manages the owner's play queue, and anyone can move playback to a device they control (Spotify Connect style).
 
 Details: [control-delegation.md](../features/control-delegation.md), [queue-and-connect.md](../features/queue-and-connect.md).
