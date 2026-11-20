@@ -2,38 +2,38 @@ import React from 'react';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { PlaylistSharingContainer } from './PlaylistSharingContainer';
-import { ThemedSwitch } from '@/shared/components/ui/ThemedSwitch';
-import { resetBackendUrl } from '@/shared/services/backendUrl';
-import { showError, showSuccess, showWarning } from '@/shared/utils/toast';
-import { logger } from '@/shared/utils/logger';
+import { ThemedSwitch } from '@/shared/theme/components/ThemedSwitch';
+import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
+import { showError, showSuccess, showWarning } from '@/shared/theme/lib/toast';
+import { logger } from '@/shared/logging/logger';
 import type { PlaylistStackParamList, PlaylistWithTracks } from '@/features/playlists/types';
-import { renderWithClient } from '@/test/renderWithClient';
-import { mockFetchRoutes } from '@/test/fetchRoutes';
-import { fail, ok } from '@/test/fetchResponses';
-import { signIn } from '@/test/session';
-import '@/test/playback';
-import { playlistWithTracks } from '@/test/playlistFixtures';
+import { renderWithClient } from '@test-utils/renderWithClient';
+import { mockFetchRoutes } from '@test-utils/fetchRoutes';
+import { fail, ok } from '@test-utils/fetchResponses';
+import { signIn } from '@test-utils/session';
+import '@test-utils/playback';
+import { playlistWithTracks } from '@test-utils/playlistFixtures';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
-jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
+jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 jest.mock('@react-navigation/native', () => {
 	const { useEffect } = jest.requireActual('react');
 	return { useFocusEffect: (effect: () => void) => useEffect(effect, [effect]) };
 });
-jest.mock('@/shared/utils/toast', () => ({
+jest.mock('@/shared/theme/lib/toast', () => ({
 	showError: jest.fn(),
 	showSuccess: jest.fn(),
 	showWarning: jest.fn(),
 }));
 // The swipe needs native gestures: « Retirer » is pressed directly.
-jest.mock('@/shared/components/lists/SwipeableUserItem', () => {
+jest.mock('@/features/playlists/sharing/components/presenters/SwipeableUserItem', () => {
 	const { Text } = jest.requireActual('react-native');
 	return {
 		SwipeableUserItem: (props: {

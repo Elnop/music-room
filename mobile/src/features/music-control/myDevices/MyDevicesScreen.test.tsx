@@ -3,39 +3,39 @@ import { ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { act, render, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import { createStore, type StoreApi } from 'zustand';
-import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
-import { resetBackendUrl } from '@/shared/services/backendUrl';
+import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
+import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { musicControlApi } from '@/features/music-control/services/musicControlApi';
-import * as friendsBridge from '@/shared/services/friendsBridge';
-import type { FriendUserSummary } from '@/shared/services/friendsBridge';
-import { showError, showSuccess } from '@/shared/utils/toast';
+import * as friendsBridge from '@/shared/backend/lib/friendsBridge';
+import type { FriendUserSummary } from '@/shared/backend/lib/friendsBridge';
+import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import type { UserDeviceWithLicenses } from '@/features/music-control/types';
 import { MyDevicesContainer } from './components/orchestrators/MyDevicesContainer';
-import { logger } from '@/shared/utils/logger';
+import { logger } from '@/shared/logging/logger';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/shared/services/playbackBridge', () => ({
+jest.mock('@/shared/playback/lib/playbackBridge', () => ({
 	usePlayerHeight: () => 0,
 }));
 
 const mockGetDeviceInfo = jest.fn();
-jest.mock('@/shared/services/deviceService', () => ({
+jest.mock('@/shared/backend/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 	deviceService: { getDeviceInfo: () => mockGetDeviceInfo() },
 }));
 
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
 
-jest.mock('@/shared/utils/toast', () => ({
+jest.mock('@/shared/theme/lib/toast', () => ({
 	showError: jest.fn(),
 	showSuccess: jest.fn(),
 }));
 
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

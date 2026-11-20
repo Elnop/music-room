@@ -1,5 +1,5 @@
 import type { AudioPlayer, AudioPlayerStatus } from '@/features/player/types';
-import type { StreamProtocol } from '@/types/soundcloud.types';
+import type { StreamProtocol } from '@/shared/tracks/lib/soundcloud.types';
 import { mediaElement, setMediaEventHandler, type MediaElement } from './mediaElement';
 import { attachStream } from './streamSource';
 

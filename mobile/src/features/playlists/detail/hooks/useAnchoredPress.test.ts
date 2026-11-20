@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react-native';
 import { useWindowDimensions, type View } from 'react-native';
-import { useMenuAnchorStore } from '@/shared/stores/menuAnchorStore';
+import { useMenuAnchorStore } from '@/shared/theme/menuAnchorStore';
 import { useAnchoredPress } from './useAnchoredPress';
 
 jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({

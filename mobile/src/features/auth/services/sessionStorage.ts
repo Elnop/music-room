@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { UserProfile } from '@/types/user.types';
-import { logger } from '@/shared/utils/logger';
+import type { UserProfile } from '@/shared/users/user.types';
+import { logger } from '@/shared/logging/logger';
 
 /** Storage module of the auth store (guardrails.md#no-asyncstorage-outside-storage). */
 interface StoredSession {

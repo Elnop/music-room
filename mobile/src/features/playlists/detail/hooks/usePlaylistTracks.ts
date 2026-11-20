@@ -1,22 +1,22 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useSession } from '@/shared/services/authSession';
-import { getPlayback, usePlaylistPlayback } from '@/shared/services/playbackBridge';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { logger } from '@/shared/utils/logger';
-import { afterRankForDrop } from '@/shared/utils/moveTarget';
-import { showError, showInfo, showSuccess } from '@/shared/utils/toast';
-import { toTrackInput } from '@/shared/utils/trackInput';
+import { useSession } from '@/shared/backend/lib/authSession';
+import { getPlayback, usePlaylistPlayback } from '@/shared/playback/lib/playbackBridge';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { logger } from '@/shared/logging/logger';
+import { afterRankForDrop } from '@/shared/tracks/lib/moveTarget';
+import { showError, showInfo, showSuccess } from '@/shared/theme/lib/toast';
+import { toTrackInput } from '@/shared/tracks/lib/trackInput';
 import { useMoveTrack, useRemoveTrack } from '@/features/playlists/hooks/useTrackEdits';
 import { usePendingMovesStore } from '@/features/playlists/pendingMovesStore';
 import { isOnScreen } from '@/features/playlists/utils/playlistCache';
 import { canEditPlaylist } from '@/features/playlists/utils/playlistPermissions';
 import { CONFLICT_MESSAGE, isMoveConflict } from '@/features/playlists/utils/trackMoves';
 import type { PlaylistWithTracks } from '@/features/playlists/types';
-import type { AddQueueItemBody } from '@/shared/playback/playback';
-import type { TrackInPlaylist } from '@/types/track.types';
-import { recordMenuAnchor } from '@/shared/stores/menuAnchorStore';
-import type { MenuAnchor } from '@/shared/utils/menuPlacement';
+import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
+import type { TrackInPlaylist } from '@/shared/tracks/lib/track.types';
+import { recordMenuAnchor } from '@/shared/theme/menuAnchorStore';
+import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
 
 export interface PlaylistTracks {
 	canEdit: boolean;

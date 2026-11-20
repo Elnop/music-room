@@ -1,9 +1,9 @@
 import React from 'react';
 import { ScrollView, View } from 'react-native';
-import { EmptyState } from '@/shared/components/feedback/EmptyState';
-import { SectionHeader } from '@/shared/components/lists/SectionHeader';
-import { Text } from '@/shared/components/ui/Text';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { EmptyState } from '@/shared/theme/components/EmptyState';
+import { SectionHeader } from '@/shared/theme/components/SectionHeader';
+import { Text } from '@/shared/theme/components/Text';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { SimilarProfilesSection as Section } from '@/features/friends/similarProfiles/useSimilarProfilesSection';
 import { SimilarProfileCard } from './SimilarProfileCard';
 import { createSimilarProfilesStyles, SIMILAR_CARD_WIDTH } from './similarProfilesStyles';

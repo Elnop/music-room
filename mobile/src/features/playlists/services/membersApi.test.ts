@@ -1,7 +1,7 @@
 import * as membersApi from './membersApi';
-import { apiRequest } from '@/shared/services/api';
+import { apiRequest } from '@/shared/backend/lib/api';
 
-jest.mock('@/shared/services/api', () => ({ apiRequest: jest.fn() }));
+jest.mock('@/shared/backend/lib/api', () => ({ apiRequest: jest.fn() }));
 
 const request = apiRequest as jest.MockedFunction<typeof apiRequest>;
 

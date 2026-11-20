@@ -1,11 +1,11 @@
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { ProfileStackParamList } from '@/features/profile/types';
-import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
+import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
 import type { PlanState } from '@/features/subscription/lib/subscription';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { showError } from '@/shared/utils/toast';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { showError } from '@/shared/theme/lib/toast';
 
 export function useSettingsScreen(subscription: PlanState) {
 	const { theme } = useTheme();

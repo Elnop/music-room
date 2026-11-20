@@ -7,12 +7,12 @@ const mockLogout = jest.fn();
 const mockNavigate = jest.fn();
 const mockSetOptions = jest.fn();
 
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-jest.mock('@/shared/services/playbackBridge', () => ({
+jest.mock('@/shared/playback/lib/playbackBridge', () => ({
 	usePlayerHeight: () => 0,
 }));
 
@@ -29,7 +29,7 @@ const mockUser = {
 	createdAt: '2026-10-01',
 };
 
-jest.mock('@/shared/services/authSession', () => ({
+jest.mock('@/shared/backend/lib/authSession', () => ({
 	useSession: (selector: (s: { user: typeof mockUser }) => unknown) => selector({ user: mockUser }),
 	logout: () => mockLogout(),
 }));
@@ -44,7 +44,7 @@ jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
 	default: jest.fn(() => ({ width: 390, height: 844, scale: 1, fontScale: 1 })),
 }));
 
-jest.mock('@/shared/services/deviceService', () => ({
+jest.mock('@/shared/backend/deviceService', () => ({
 	getBuildLabel: () => 'Zumik 1.0.0 (build 42 · a1b2c3d)',
 }));
 

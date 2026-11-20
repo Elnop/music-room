@@ -3,25 +3,25 @@ import { Alert, Platform } from 'react-native';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { PlaylistDetailContainer } from './PlaylistDetailContainer';
-import { testPlayback } from '@/test/playback';
-import { useSocketStore } from '@/shared/stores/socketStore';
-import { resetBackendUrl } from '@/shared/services/backendUrl';
-import { showError, showInfo, showSuccess } from '@/shared/utils/toast';
-import { logger } from '@/shared/utils/logger';
+import { testPlayback } from '@test-utils/playback';
+import { useSocketStore } from '@/shared/backend/socketStore';
+import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
+import { showError, showInfo, showSuccess } from '@/shared/theme/lib/toast';
+import { logger } from '@/shared/logging/logger';
 import type { PlaylistStackParamList, PlaylistWithTracks } from '@/features/playlists/types';
-import { renderWithClient } from '@/test/renderWithClient';
-import { mockFetchRoutes } from '@/test/fetchRoutes';
-import { fail, ok } from '@/test/fetchResponses';
-import { signIn } from '@/test/session';
-import { playlistTrack, playlistWithTracks } from '@/test/playlistFixtures';
+import { renderWithClient } from '@test-utils/renderWithClient';
+import { mockFetchRoutes } from '@test-utils/fetchRoutes';
+import { fail, ok } from '@test-utils/fetchResponses';
+import { signIn } from '@test-utils/session';
+import { playlistTrack, playlistWithTracks } from '@test-utils/playlistFixtures';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
-jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
+jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 jest.mock('react-native-safe-area-context', () => ({
@@ -31,11 +31,11 @@ jest.mock('@react-navigation/native', () => {
 	const { useEffect } = jest.requireActual('react');
 	return { useFocusEffect: (effect: () => void) => useEffect(effect, [effect]) };
 });
-jest.mock('@/shared/hooks/useImageColors', () => ({
+jest.mock('@/shared/image-colors/useImageColors', () => ({
 	useImageColors: () => ({ dominantColor: null }),
 	hexToRgba: () => '',
 }));
-jest.mock('@/shared/utils/toast', () => ({
+jest.mock('@/shared/theme/lib/toast', () => ({
 	showSuccess: jest.fn(),
 	showError: jest.fn(),
 	showInfo: jest.fn(),
@@ -56,7 +56,7 @@ interface MockListProps {
 }
 let mockList: MockListProps;
 // The list needs native drag: its rows render plainly, and the test reorders through its props.
-jest.mock('@/shared/components/lists/ReorderableList', () => {
+jest.mock('@/shared/theme/components/ReorderableList', () => {
 	const { View } = jest.requireActual('react-native');
 	return {
 		ReorderableList: (props: MockListProps) => {
@@ -76,7 +76,7 @@ jest.mock('@/shared/components/lists/ReorderableList', () => {
 		},
 	};
 });
-jest.mock('@/shared/components/lists/SwipeableTrackItem', () => {
+jest.mock('@/features/playlists/detail/components/presenters/SwipeableTrackItem', () => {
 	const { Text: MockText } = jest.requireActual('react-native');
 	return {
 		SwipeableTrackItem: (props: {

@@ -1,4 +1,4 @@
-import { apiRequest, authRequest } from '@/shared/services/api';
+import { apiRequest, authRequest } from '@/shared/backend/lib/api';
 import type {
 	FilteredProfile,
 	MusicGenre,
@@ -6,7 +6,7 @@ import type {
 	ProfilePrivacy,
 	UpdateMusicPreferencesData,
 	UpdatePrivacyData,
-} from '@/types/user.types';
+} from '@/shared/users/user.types';
 
 export const privacyApi = {
 	async getPrivacySettings(accessToken?: string): Promise<ProfilePrivacy> {

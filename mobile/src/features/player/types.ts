@@ -1,4 +1,4 @@
-import type { StreamProtocol } from '@/types/soundcloud.types';
+import type { StreamProtocol } from '@/shared/tracks/lib/soundcloud.types';
 
 /** What the player hooks use of an expo-audio player, which the browser player also implements. */
 export interface AudioPlayer {

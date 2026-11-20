@@ -3,21 +3,21 @@ import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { Platform } from 'react-native';
 import * as Location from 'expo-location';
 import { NearbyEventsContainer } from './NearbyEventsContainer';
-import { resetBackendUrl } from '@/shared/services/backendUrl';
-import { logger } from '@/shared/utils/logger';
-import { renderWithClient } from '@/test/renderWithClient';
-import { mockFetchRoutes } from '@/test/fetchRoutes';
-import { ok } from '@/test/fetchResponses';
-import { signIn } from '@/test/session';
-import { musicEvent } from '@/test/eventFixtures';
+import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
+import { logger } from '@/shared/logging/logger';
+import { renderWithClient } from '@test-utils/renderWithClient';
+import { mockFetchRoutes } from '@test-utils/fetchRoutes';
+import { ok } from '@test-utils/fetchResponses';
+import { signIn } from '@test-utils/session';
+import { musicEvent } from '@test-utils/eventFixtures';
 import * as beaconScanner from '@/features/events/features/nearby/lib/beaconScanner';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
-jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 const mockNavigate = jest.fn();

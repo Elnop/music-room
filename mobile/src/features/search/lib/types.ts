@@ -1,3 +1,3 @@
-import type { SoundCloudTrack, SoundCloudSearchResult } from '@/types/soundcloud.types';
+import type { SoundCloudTrack, SoundCloudSearchResult } from '@/shared/tracks/lib/soundcloud.types';
 
 export type { SoundCloudTrack, SoundCloudSearchResult };

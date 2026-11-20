@@ -1,18 +1,18 @@
 import React from 'react';
 import { View, ScrollView, ActivityIndicator } from 'react-native';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import { FullScreenSheet } from '@/shared/components/layout/FullScreenSheet';
-import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
-import { AppToast } from '@/shared/components/feedback/AppToast';
-import { THIS_DEVICE_LABEL } from '@/shared/constants/platform';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { FullScreenSheet } from '@/features/queue/queueModal/components/presenters/FullScreenSheet';
+import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
+import { AppToast } from '@/shared/theme/components/AppToast';
+import { THIS_DEVICE_LABEL } from '@/shared/platform/platform';
 import { DeviceRow } from './DeviceRow';
-import type { DevicePickerOwner } from '@/types/device.types';
-import type { Theme } from '@/shared/theme/types';
+import type { DevicePickerOwner } from '@/shared/devices/device.types';
+import type { Theme } from '@/shared/theme/lib/types';
 import type { createPickerStyles } from './devicePickerStyles';
 import type { LoadedDevices } from '@/features/queue/devicePicker/useDevicePicker';
 import type { PickerDevice } from './DeviceRow';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 import ChevronDownSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/chevron-down-solid.svg';
 import TimesSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/times-solid.svg';
 

@@ -1,17 +1,17 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import type { Theme } from '@/shared/theme/types';
-import { displayText } from '@/shared/theme/pixelFrame';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import type { PixelIconSource } from '@/shared/theme/components/PixelIcon';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { Theme } from '@/shared/theme/lib/types';
+import { displayText } from '@/shared/theme/lib/pixelFrame';
 import type {
 	GoogleButtonSlot,
 	LinkedProvider,
 	OAuthProvider,
-} from '@/shared/services/linkedAccountsBridge';
-import { Text } from '@/shared/components/ui/Text';
+} from '@/shared/linked-accounts-bridge/linkedAccountsBridge';
+import { Text } from '@/shared/theme/components/Text';
 
 type MethodType = LinkedProvider['type'];
 

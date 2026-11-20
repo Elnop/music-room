@@ -5,11 +5,11 @@ import {
 	useUnlinkProvider,
 	useGoogleButton,
 	type OAuthProvider,
-} from '@/shared/services/linkedAccountsBridge';
-import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { showError, showSuccess } from '@/shared/utils/toast';
+} from '@/shared/linked-accounts-bridge/linkedAccountsBridge';
+import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { showError, showSuccess } from '@/shared/theme/lib/toast';
 
 const PROVIDER_LABELS: Record<OAuthProvider, string> = {
 	google: 'Google',

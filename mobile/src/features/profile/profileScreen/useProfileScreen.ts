@@ -1,14 +1,14 @@
 import { useCallback, useState } from 'react';
-import { showAlert } from '@/shared/utils/alert';
+import { showAlert } from '@/shared/alerts/alert';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useUserMusicPreferences, useUserStats } from '@/features/profile/hooks/useProfileQueries';
 import type { ProfileStackParamList } from '@/features/profile/types';
-import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
-import { logout, useSession } from '@/shared/services/authSession';
-import { getBuildLabel } from '@/shared/services/deviceService';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import { logger } from '@/shared/utils/logger';
+import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
+import { logout, useSession } from '@/shared/backend/lib/authSession';
+import { getBuildLabel } from '@/shared/backend/deviceService';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { logger } from '@/shared/logging/logger';
 
 export function useProfileScreen() {
 	const { theme } = useTheme();

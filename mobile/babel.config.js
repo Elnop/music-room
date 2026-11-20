@@ -11,6 +11,7 @@ module.exports = function (api) {
           extensions: ['.ios.js', '.android.js', '.js', '.ts', '.tsx', '.json'],
           alias: {
             '@': path.resolve(__dirname, 'src'),
+            '@test-utils': path.resolve(__dirname, 'test-utils'),
           },
         },
       ],

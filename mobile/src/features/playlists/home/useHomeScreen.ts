@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { logger } from '@/shared/utils/logger';
-import { showError } from '@/shared/utils/toast';
+import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { logger } from '@/shared/logging/logger';
+import { showError } from '@/shared/theme/lib/toast';
 import {
 	useFriendsPlaylists,
 	usePublicPlaylists,

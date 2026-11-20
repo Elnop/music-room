@@ -3,10 +3,10 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { PlayerBarContainer } from './PlayerBarContainer';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { useVolumeStore } from '@/features/player/stores/volumeStore';
-import { useNowPlayingPanelStore } from '@/shared/stores/nowPlayingPanelStore';
-import { registerPlayerModals } from '@/shared/services/playerModalsBridge';
+import { useNowPlayingPanelStore } from '@/features/player/stores/nowPlayingPanelStore';
+import { registerPlayerModals } from '@/shared/player-modals-bridge/playerModalsBridge';
 import type { NowPlaying } from '@/features/player/types';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 
 const mockSeekTo = jest.fn();
 const mockPrevious = jest.fn();
@@ -15,14 +15,14 @@ const mockToggle = jest.fn();
 
 let mockNowPlaying: NowPlaying;
 
-jest.mock('@/shared/utils/haptics', () => ({
+jest.mock('@/shared/theme/lib/haptics', () => ({
 	hapticTap: jest.fn(),
 	hapticSelection: jest.fn(),
 	hapticSuccess: jest.fn(),
 }));
 
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

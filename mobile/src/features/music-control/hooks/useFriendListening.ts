@@ -1,8 +1,8 @@
 import { useEffect, useCallback, useMemo, useState } from 'react';
-import { useSocketStore } from '@/shared/stores/socketStore';
-import { acquireListening, releaseListening } from '@/shared/services/listeningRooms';
-import type { ListeningStatus, UserListeningStatus } from '@/types/listening.types';
-import { logger } from '@/shared/utils/logger';
+import { useSocketStore } from '@/shared/backend/socketStore';
+import { acquireListening, releaseListening } from '@/shared/listening-rooms/listeningRooms';
+import type { ListeningStatus, UserListeningStatus } from '@/shared/listening/lib/listening.types';
+import { logger } from '@/shared/logging/logger';
 import type { FriendDeviceStatus, FriendListeningResult } from '@/features/music-control/types';
 import { useControllableDevices } from './useControllableDevices';
 

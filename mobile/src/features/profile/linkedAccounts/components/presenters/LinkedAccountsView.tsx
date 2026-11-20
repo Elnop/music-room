@@ -1,15 +1,15 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
+import type { PixelIconSource } from '@/shared/theme/components/PixelIcon';
 import { ProfileScreenFrame } from '@/features/profile/common/presenters/ProfileScreenFrame';
 import { LinkedAccountRow } from '@/features/profile/linkedAccounts/components/presenters/LinkedAccountRow';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import type { Theme } from '@/shared/theme/types';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { Theme } from '@/shared/theme/lib/types';
 import type {
 	GoogleButtonSlot,
 	LinkedProvider,
 	OAuthProvider,
-} from '@/shared/services/linkedAccountsBridge';
+} from '@/shared/linked-accounts-bridge/linkedAccountsBridge';
 import EnvelopeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/envelope-solid.svg';
 import FacebookRoundBrand from '@hackernoon/pixel-icon-library/icons/SVG/brands/facebook-round.svg';
 import GoogleBrand from '@hackernoon/pixel-icon-library/icons/SVG/brands/google.svg';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { PlaylistCardSkeleton } from '@/shared/components/ui/Skeleton';
+import { PlaylistCardSkeleton } from '@/shared/theme/components/Skeleton';
 import { FRIEND_CARD_WIDTH } from './FriendPlaylistCarousel';
 
 export function FriendCardSkeleton() {

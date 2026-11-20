@@ -3,12 +3,12 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SearchContainer } from './SearchContainer';
 import { searchApi } from '@/features/search/lib/searchApi';
-import type { SoundCloudTrack } from '@/types/soundcloud.types';
+import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
 
 const mockPlayListTrack = jest.fn();
 const mockAddToQueue = jest.fn();
 
-jest.mock('@/shared/services/playbackBridge', () => ({
+jest.mock('@/shared/playback/lib/playbackBridge', () => ({
 	getPlayback: () => ({
 		playListTrack: mockPlayListTrack,
 		addToQueue: mockAddToQueue,
@@ -27,16 +27,16 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/shared/services/deviceService', () => ({
+jest.mock('@/shared/backend/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-jest.mock('@/shared/utils/toast', () => ({
+jest.mock('@/shared/theme/lib/toast', () => ({
 	showError: jest.fn(),
 }));
 

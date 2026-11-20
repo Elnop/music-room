@@ -1,9 +1,9 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
-import { showError } from '@/shared/utils/toast';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { logger } from '@/shared/utils/logger';
+import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
+import { showError } from '@/shared/theme/lib/toast';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { logger } from '@/shared/logging/logger';
 import { useFriendsList, useControlPermissions } from '@/features/friends/hooks/useFriendsQueries';
 import { useToggleControlMutation } from '@/features/friends/hooks/useFriendsMutations';
 import { useDebouncedUserSearch } from './useDebouncedUserSearch';

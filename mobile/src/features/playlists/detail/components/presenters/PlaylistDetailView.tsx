@@ -1,12 +1,12 @@
 import React from 'react';
 import { RefreshControl, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { EmptyState } from '@/shared/components/feedback/EmptyState';
-import { ReorderableList } from '@/shared/components/lists/ReorderableList';
-import { SwipeableTrackItem } from '@/shared/components/lists/SwipeableTrackItem';
-import { TrackTableHeader } from '@/shared/components/lists/TrackTableHeader';
-import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
-import { useTheme } from '@/shared/theme/ThemeContext';
+import { EmptyState } from '@/shared/theme/components/EmptyState';
+import { ReorderableList } from '@/shared/theme/components/ReorderableList';
+import { SwipeableTrackItem } from './SwipeableTrackItem';
+import { TrackTableHeader } from './TrackTableHeader';
+import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { PlaylistTracks } from '@/features/playlists/detail/hooks/usePlaylistTracks';
 import type { PlaylistWithTracks } from '@/features/playlists/types';
 import { createDetailStyles } from './detailStyles';

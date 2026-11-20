@@ -1,7 +1,7 @@
 import React from 'react';
-import { ProfileSection } from '@/shared/components/profile/ProfileSection';
-import { ProfileInfoRows, memberSinceLabel } from '@/shared/components/profile/ProfileInfoRows';
-import type { UserProfile } from '@/types/user.types';
+import { ProfileSection } from '@/shared/theme/components/ProfileSection';
+import { ProfileInfoRows, memberSinceLabel } from '@/shared/theme/components/ProfileInfoRows';
+import type { UserProfile } from '@/shared/users/user.types';
 
 interface ProfileInfoSectionProps {
 	user: UserProfile;

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { logger } from '@/shared/utils/logger';
-import { showError, showWarning } from '@/shared/utils/toast';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { logger } from '@/shared/logging/logger';
+import { showError, showWarning } from '@/shared/theme/lib/toast';
 import { useUpdatePlaylist } from '@/features/playlists/hooks/usePlaylistMutations';
 import { refreshPlaylist } from '@/features/playlists/utils/playlistCache';
 import type { PlaylistInput } from '@/features/playlists/validators';

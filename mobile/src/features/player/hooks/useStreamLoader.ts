@@ -2,9 +2,9 @@ import { useEffect, useRef } from 'react';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { streamPrefetch } from '@/features/player/services/streamPrefetch';
 import { fetchStreamUrl } from '@/features/player/services/streamApi';
-import { ApiError } from '@/shared/services/api';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { logger } from '@/shared/utils/logger';
+import { ApiError } from '@/shared/backend/lib/api';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { logger } from '@/shared/logging/logger';
 import { FETCH_TIMEOUT_MS } from '@/features/player/constants';
 
 export function useStreamLoader(): void {

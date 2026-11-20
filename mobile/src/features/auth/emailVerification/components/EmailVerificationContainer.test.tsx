@@ -4,11 +4,11 @@ import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useAuthStore } from '@/features/auth/stores/authStore';
 import type { AuthStackParamList } from '@/features/auth/types';
-import { resetBackendUrl } from '@/shared/services/backendUrl';
-import { showError, showSuccess } from '@/shared/utils/toast';
-import { logger } from '@/shared/utils/logger';
-import { renderWithQuery } from '@/test/renderWithQuery';
-import { fail, ok } from '@/test/fetchResponses';
+import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
+import { showError, showSuccess } from '@/shared/theme/lib/toast';
+import { logger } from '@/shared/logging/logger';
+import { renderWithQuery } from '@test-utils/renderWithQuery';
+import { fail, ok } from '@test-utils/fetchResponses';
 import { EmailVerificationContainer } from './EmailVerificationContainer';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -16,11 +16,11 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 );
 jest.mock('@/features/auth/services/googleSignIn', () => ({ signInWithGoogle: jest.fn() }));
 jest.mock('@/features/auth/services/facebookSignIn', () => ({ signInWithFacebook: jest.fn() }));
-jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
+jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
-jest.mock('@/shared/utils/toast', () => ({ showError: jest.fn(), showSuccess: jest.fn() }));
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/lib/toast', () => ({ showError: jest.fn(), showSuccess: jest.fn() }));
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

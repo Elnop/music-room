@@ -1,15 +1,15 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { ShareLinkButton } from '@/shared/components/sharing/ShareLinkButton';
-import type { Theme } from '@/shared/theme/types';
-import { displayText } from '@/shared/theme/pixelFrame';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
-import { playlistLink } from '@/shared/utils/shareLinks';
+import { ShareLinkButton } from '@/shared/theme/components/ShareLinkButton';
+import type { Theme } from '@/shared/theme/lib/types';
+import { displayText } from '@/shared/theme/lib/pixelFrame';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import { playlistLink } from '@/shared/share-links/shareLinks';
 import type { PlaylistWithTracks } from '@/features/playlists/types';
 import { AddTrackRow } from './AddTrackRow';
 import { PlaylistByline } from './PlaylistByline';
 import { PlaylistCover } from './PlaylistCover';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 
 interface PlaylistWideHeaderProps {
 	playlist: PlaylistWithTracks;

@@ -1,9 +1,9 @@
 import React from 'react';
 import { View } from 'react-native';
-import { useTheme } from '@/shared/theme/ThemeContext';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { FollowStatus } from '@/features/friends/types';
 import { createUserProfileHeaderStyles } from './userProfileHeaderStyles';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 
 interface UserProfileBadgesProps {
 	followStatus: FollowStatus | null;

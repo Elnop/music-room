@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
 import type { AudioPlayer } from '@/features/player/types';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
-import { isLocalTarget } from '@/shared/services/connectBridge';
+import { isLocalTarget } from '@/shared/listening/lib/connectBridge';
 import { isStreamStale } from '@/features/player/services/streamPrefetch';
-import { logger } from '@/shared/utils/logger';
+import { logger } from '@/shared/logging/logger';
 import { PLAYER_LOAD_TIMEOUT_MS } from '@/features/player/constants';
 
 const playsLocally = () => isLocalTarget();

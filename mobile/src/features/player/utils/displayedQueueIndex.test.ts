@@ -1,5 +1,5 @@
-import type { QueueItem } from '@/shared/playback/playback';
-import { hashStringToNumber } from '@/shared/utils/trackToSoundCloud';
+import type { QueueItem } from '@/shared/playback/lib/playback';
+import { hashStringToNumber } from '@/shared/tracks/lib/trackToSoundCloud';
 import { displayedQueueIndex } from './displayedQueueIndex';
 
 const item = (id: string, uri: string): QueueItem => ({

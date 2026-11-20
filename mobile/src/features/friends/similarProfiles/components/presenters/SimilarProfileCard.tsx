@@ -1,8 +1,8 @@
 import React from 'react';
-import { Avatar } from '@/shared/components/media/Avatar';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import { Text } from '@/shared/components/ui/Text';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { Avatar } from '@/shared/theme/components/Avatar';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { Text } from '@/shared/theme/components/Text';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { RecommendedProfile } from '@/features/friends/types';
 import {
 	profileName,

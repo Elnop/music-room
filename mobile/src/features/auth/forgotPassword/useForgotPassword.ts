@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import type { AuthStackParamList } from '@/features/auth/types';
 import { useForgotPasswordMutation } from '@/features/auth/hooks/usePasswordResetMutations';
 

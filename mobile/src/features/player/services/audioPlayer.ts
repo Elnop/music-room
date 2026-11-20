@@ -4,7 +4,7 @@ import {
 	type AudioPlayer as ExpoAudioPlayer,
 } from 'expo-audio';
 import type { AudioPlayer, AudioPlayerStatus } from '@/features/player/types';
-import type { StreamProtocol } from '@/types/soundcloud.types';
+import type { StreamProtocol } from '@/shared/tracks/lib/soundcloud.types';
 
 // The browser variant (audioPlayer.web.ts) plays HLS through an audio element, which expo-audio cannot outside Safari.
 

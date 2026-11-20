@@ -25,7 +25,7 @@ An import that leaves the current folder goes through the `@/` alias (`@/feature
 
 ## no-legacy-aliases
 
-Mobile only: `@/` is the only alias, in `tsconfig.json`, `babel.config.js` (`module-resolver`, which jest uses too) and ESLint. The older aliases (`@api`, `@components`, `@contexts`, `@screens`, `@services`, `@store`, `@hooks`, `@utils`, `@themes`, `@constants`) were removed by #377 and stay banned (ESLint `no-restricted-imports`): write `@/shared/...`, not `@utils/...`.
+Mobile only: `@/` (to `src/`) and `@test-utils/` (to `test-utils/`, the helpers tests share) are the only aliases, in `tsconfig.json` and `babel.config.js` (`module-resolver`, which jest uses too). Production code never imports `test-utils/` (dependency-cruiser `no-prod-to-tests`). The older aliases (`@api`, `@components`, `@contexts`, `@screens`, `@services`, `@store`, `@hooks`, `@utils`, `@themes`, `@constants`) were removed by #377 and stay banned (ESLint `no-restricted-imports`): write `@/shared/...`, not `@utils/...`.
 
 ## mobile-layers
 

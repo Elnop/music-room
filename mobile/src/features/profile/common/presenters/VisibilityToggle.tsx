@@ -1,12 +1,13 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import type { Theme } from '@/shared/theme/types';
-import type { VisibilityLevel } from '@/types/user.types';
-import { VISIBILITY_ICONS, VISIBILITY_LABELS } from '@/types/user.types';
-import { Text } from '@/shared/components/ui/Text';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { Theme } from '@/shared/theme/lib/types';
+import type { VisibilityLevel } from '@/shared/users/user.types';
+import { VISIBILITY_LABELS } from '@/shared/users/user.types';
+import { VISIBILITY_ICONS } from '@/shared/theme/lib/genres';
+import { Text } from '@/shared/theme/components/Text';
 
 interface VisibilityToggleProps {
 	label: string;

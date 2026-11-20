@@ -4,25 +4,25 @@ import { LinkedAccountsContainer } from '@/features/profile/linkedAccounts/compo
 import {
 	registerLinkedAccountsBridge,
 	type LinkedProvider,
-} from '@/shared/services/linkedAccountsBridge';
-import { showError, showSuccess } from '@/shared/utils/toast';
+} from '@/shared/linked-accounts-bridge/linkedAccountsBridge';
+import { showError, showSuccess } from '@/shared/theme/lib/toast';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
+jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
 
-jest.mock('@/shared/services/playbackBridge', () => ({
+jest.mock('@/shared/playback/lib/playbackBridge', () => ({
 	usePlayerHeight: () => 0,
 }));
 
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-jest.mock('@/shared/utils/toast', () => ({
+jest.mock('@/shared/theme/lib/toast', () => ({
 	showError: jest.fn(),
 	showSuccess: jest.fn(),
 }));

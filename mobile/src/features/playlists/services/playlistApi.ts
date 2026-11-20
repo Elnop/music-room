@@ -1,5 +1,5 @@
-import { apiRequest } from '@/shared/services/api';
-import { jpegFormData } from '@/shared/utils/jpegFormData';
+import { apiRequest } from '@/shared/backend/lib/api';
+import { jpegFormData } from '@/shared/backend/lib/jpegFormData';
 import type { CoverResponse, Playlist, PlaylistWithTracks } from '@/features/playlists/types';
 import type { PlaylistInput } from '@/features/playlists/validators';
 

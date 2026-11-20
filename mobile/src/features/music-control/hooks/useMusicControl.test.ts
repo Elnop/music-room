@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react-native';
 import { controlErrorMessage, useFriendListening, useMusicControlEmitter } from './useMusicControl';
 import { musicControlApi } from '@/features/music-control/services/musicControlApi';
-import { logger } from '@/shared/utils/logger';
+import { logger } from '@/shared/logging/logger';
 
 const mockSocket = {
 	connected: true,
@@ -28,17 +28,17 @@ const setPositionReader = (r: (() => number) | null) => {
 	mockReader = r;
 };
 
-jest.mock('@/shared/stores/socketStore', () => ({
+jest.mock('@/shared/backend/socketStore', () => ({
 	useSocketStore: (selector: (state: typeof mockSocketState) => unknown) =>
 		selector(mockSocketState),
 }));
 
-jest.mock('@/shared/services/authSession', () => ({
+jest.mock('@/shared/backend/lib/authSession', () => ({
 	useSession: (selector: (state: typeof mockAuthState) => unknown) => selector(mockAuthState),
 	getSession: () => mockAuthState,
 }));
 
-jest.mock('@/shared/services/playbackBridge', () => ({
+jest.mock('@/shared/playback/lib/playbackBridge', () => ({
 	usePlaybackEmitterState: () => mockPlayerState,
 	readPlaybackPositionMs: () => (mockReader ? mockReader() : null),
 	getPlayback: () => ({
@@ -49,13 +49,13 @@ jest.mock('@/shared/services/playbackBridge', () => ({
 	}),
 }));
 
-jest.mock('@/shared/services/connectBridge', () => ({
+jest.mock('@/shared/listening/lib/connectBridge', () => ({
 	getConnectBridge: () => ({
 		setLocal: mockSetLocal,
 	}),
 }));
 
-jest.mock('@/shared/services/deviceService', () => ({
+jest.mock('@/shared/backend/deviceService', () => ({
 	deviceService: {
 		getDeviceInfo: jest.fn(() =>
 			Promise.resolve({

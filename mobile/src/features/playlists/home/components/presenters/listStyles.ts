@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import type { Theme } from '@/shared/theme/types';
+import type { Theme } from '@/shared/theme/lib/types';
 
 export const createListStyles = (theme: Theme) =>
 	StyleSheet.create({

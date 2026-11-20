@@ -1,10 +1,10 @@
-import type { UserProfile } from '@/types/user.types';
+import type { UserProfile } from '@/shared/users/user.types';
 import type {
 	GoogleButtonSlot,
 	GoogleButtonVariant,
 	LinkedProvider,
 	OAuthProvider,
-} from '@/shared/services/linkedAccountsBridge';
+} from '@/shared/linked-accounts-bridge/linkedAccountsBridge';
 
 // Mirrors the backend response types (backend/src/features/auth/auth.types.ts).
 export type { LinkedProvider, OAuthProvider };

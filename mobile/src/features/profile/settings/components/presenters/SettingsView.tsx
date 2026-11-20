@@ -1,14 +1,13 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { useContentColumn } from '@/shared/hooks/useContentColumn';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import { BackendUrlField } from '@/shared/components/form/BackendUrlField';
+import { useContentColumn } from '@/shared/theme/hooks/useContentColumn';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import type { Plan } from '@/features/subscription/lib/subscription';
-import { pixelFrame } from '@/shared/theme/pixelFrame';
-import type { Theme } from '@/shared/theme/types';
+import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
+import type { Theme } from '@/shared/theme/lib/types';
 import { SubscriptionSection } from './SubscriptionSection';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import { Text } from '@/shared/components/ui/Text';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { Text } from '@/shared/theme/components/Text';
 import AngleRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/angle-right-solid.svg';
 
 interface SettingsViewProps {
@@ -18,6 +17,7 @@ interface SettingsViewProps {
 	isChangingPlan: boolean;
 	onTogglePremium: (premium: boolean) => void;
 	onOpenPrivacyPolicy: () => void;
+	backendUrlField: React.ReactNode;
 }
 
 export function SettingsView({
@@ -27,6 +27,7 @@ export function SettingsView({
 	isChangingPlan,
 	onTogglePremium,
 	onOpenPrivacyPolicy,
+	backendUrlField,
 }: SettingsViewProps) {
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 	const column = useContentColumn();
@@ -49,7 +50,7 @@ export function SettingsView({
 
 			<View style={styles.section}>
 				<Text style={styles.sectionTitle}>Serveur</Text>
-				<BackendUrlField />
+				{backendUrlField}
 			</View>
 
 			<View style={styles.section}>

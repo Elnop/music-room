@@ -44,7 +44,7 @@ rules:
     languages: [typescript]
     severity: ERROR
     message: >-
-      HTTP calls go through mobile/src/shared/services/api.ts, which sends the
+      HTTP calls go through mobile/src/shared/backend/lib/api.ts, which sends the
       X-Platform, X-Device-Model and X-App-Version headers. See
       .agents/rules/guardrails.md#no-fetch-outside-api-client
     pattern-either:
@@ -56,7 +56,7 @@ rules:
         - /mobile/src/
         - /mobile/App.tsx
       exclude:
-        - /mobile/src/shared/services/api.ts
+        - /mobile/src/shared/backend/lib/api.ts
         - "*.test.ts"
         - "*.test.tsx"
 
@@ -88,9 +88,9 @@ rules:
       exclude:
         - "*Storage.ts"
         # A storage module named before the convention.
-        - /mobile/src/shared/services/backendUrl.ts
+        - /mobile/src/shared/backend/lib/backendUrl.ts
         - "*.test.ts"
         - "*.test.tsx"
         # Known exceptions: remove each line once the file goes through a
         # storage module. This list only shrinks.
-        - /mobile/src/shared/theme/ThemeContext.tsx
+        - /mobile/src/shared/theme/components/ThemeContext.tsx

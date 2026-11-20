@@ -1,0 +1,158 @@
+import React, { useState } from 'react';
+import {
+	View,
+	StyleSheet,
+	TextInputProps,
+	ViewStyle,
+	StyleProp,
+	TextStyle,
+	Platform,
+} from 'react-native';
+import { PixelIcon } from './PixelIcon';
+import { useTheme } from './ThemeContext';
+import type { Theme } from '@/shared/theme/lib/types';
+import { focusedFieldStyle } from '@/shared/theme/lib/fieldFocus';
+import { useFieldFocus } from '@/shared/theme/hooks/useFieldFocus';
+import { Pressable } from './Pressable';
+import { Text } from './Text';
+import { TextInput } from './TextInput';
+import EyeCrossSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/eye-cross-solid.svg';
+import EyeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/eye-solid.svg';
+
+interface InputProps extends Omit<TextInputProps, 'style'> {
+	label: string;
+	error?: string;
+	leftIcon?: React.ReactNode;
+	containerStyle?: ViewStyle;
+	style?: StyleProp<TextStyle>;
+	/** Web only: Enter submits; native return keys keep their behaviour. */
+	submitOnEnter?: () => void;
+}
+
+export function Input({
+	label,
+	error,
+	secureTextEntry,
+	leftIcon,
+	containerStyle,
+	style,
+	multiline,
+	submitOnEnter,
+	onFocus,
+	onBlur,
+	...rest
+}: InputProps) {
+	const { theme } = useTheme();
+	const styles = React.useMemo(() => createStyles(theme), [theme]);
+	const [isHidden, setIsHidden] = useState(true);
+	const { focused, focusProps } = useFieldFocus({ onFocus, onBlur });
+
+	return (
+		<View style={[styles.container, containerStyle]}>
+			<Text style={styles.label}>{label}</Text>
+			<View
+				style={[
+					styles.inputContainer,
+					error && styles.inputContainerError,
+					focused && focusedFieldStyle(error ? theme.colors.error : theme.colors.primary),
+				]}
+			>
+				{leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
+				<TextInput
+					style={[
+						styles.input,
+						leftIcon ? styles.inputWithIcon : undefined,
+						secureTextEntry ? styles.inputWithToggle : undefined,
+						multiline ? styles.multilineInput : undefined,
+						style,
+					]}
+					placeholderTextColor={theme.colors.textSecondary}
+					secureTextEntry={secureTextEntry && isHidden}
+					multiline={multiline}
+					{...rest}
+					{...focusProps}
+					{...(Platform.OS === 'web' && submitOnEnter && !multiline
+						? { onSubmitEditing: submitOnEnter }
+						: undefined)}
+				/>
+				{secureTextEntry && (
+					<Pressable
+						onPress={() => setIsHidden(hidden => !hidden)}
+						accessibilityLabel={isHidden ? 'Afficher le mot de passe' : 'Masquer le mot de passe'}
+						hitSlop={8}
+						style={[styles.toggle, Platform.OS === 'web' && styles.toggleWeb]}
+					>
+						<PixelIcon
+							icon={isHidden ? EyeSolid : EyeCrossSolid}
+							size={20}
+							color={theme.colors.textSecondary}
+						/>
+					</Pressable>
+				)}
+			</View>
+			{error && <Text style={styles.error}>{error}</Text>}
+		</View>
+	);
+}
+
+const createStyles = (theme: Theme) =>
+	StyleSheet.create({
+		container: {
+			marginBottom: theme.spacing.md,
+		},
+		label: {
+			fontSize: theme.typography.sizes.sm,
+			fontFamily: theme.typography.families.semibold,
+			color: theme.colors.text,
+			marginBottom: theme.spacing.xs,
+		},
+		inputContainer: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			backgroundColor: theme.colors.surface,
+			borderWidth: theme.borders.thick,
+			borderColor: theme.colors.border,
+		},
+		inputContainerError: {
+			borderColor: theme.colors.error,
+			backgroundColor: theme.colors.surface,
+		},
+		leftIcon: {
+			paddingLeft: theme.spacing.sm + 2,
+		},
+		input: {
+			flex: 1,
+			paddingVertical: theme.spacing.sm + 2,
+			paddingHorizontal: theme.spacing.sm + 4,
+			fontSize: theme.typography.sizes.md,
+			color: theme.colors.text,
+			fontFamily: theme.typography.families.regular,
+		},
+		inputWithIcon: {
+			paddingLeft: theme.spacing.xs,
+		},
+		inputWithToggle: {
+			paddingRight: theme.spacing.xs,
+		},
+		toggle: {
+			paddingHorizontal: theme.spacing.sm + 2,
+			paddingVertical: theme.spacing.sm,
+		},
+		// The keyboard ring sits 4 px outside the button: kept inside the field's frame.
+		toggleWeb: {
+			paddingHorizontal: theme.spacing.xs,
+			paddingVertical: theme.spacing.xs,
+			marginHorizontal: theme.spacing.xs + 2,
+		},
+		multilineInput: {
+			textAlignVertical: 'top',
+			paddingTop: theme.spacing.sm + 2,
+		},
+		error: {
+			fontSize: theme.typography.sizes.xs,
+			color: theme.colors.error,
+			fontFamily: theme.typography.families.semibold,
+			marginTop: theme.spacing.xs,
+			marginLeft: theme.spacing.xs,
+		},
+	});

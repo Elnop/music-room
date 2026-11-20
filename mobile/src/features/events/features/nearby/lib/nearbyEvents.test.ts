@@ -1,4 +1,4 @@
-import { musicEvent } from '@/test/eventFixtures';
+import { musicEvent } from '@test-utils/eventFixtures';
 import { mergeNearby, nearbyByGps } from './nearbyEvents';
 
 const HOUR = 3_600_000;

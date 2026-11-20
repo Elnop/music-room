@@ -1,14 +1,14 @@
 import { useEffect } from 'react';
-import { useSocketStore } from '@/shared/stores/socketStore';
-import { useSession } from '@/shared/services/authSession';
+import { useSocketStore } from '@/shared/backend/socketStore';
+import { useSession } from '@/shared/backend/lib/authSession';
 import { useConnectStore } from '@/features/queue/stores/connectStore';
 import { useQueueStore } from '@/features/queue/stores/queueStore';
-import { controlErrorMessage, type ControlError } from '@/shared/utils/controlError';
-import { acquireListening, releaseListening } from '@/shared/services/listeningRooms';
-import { showError } from '@/shared/utils/toast';
-import type { UserListeningStatus } from '@/types/listening.types';
-import type { ControlRevokedPayload } from '@/types/device.types';
-import { logger } from '@/shared/utils/logger';
+import { controlErrorMessage, type ControlError } from '@/shared/control-error/controlError';
+import { acquireListening, releaseListening } from '@/shared/listening-rooms/listeningRooms';
+import { showError } from '@/shared/theme/lib/toast';
+import type { UserListeningStatus } from '@/shared/listening/lib/listening.types';
+import type { ControlRevokedPayload } from '@/shared/devices/device.types';
+import { logger } from '@/shared/logging/logger';
 
 export function useRemoteTarget(): void {
 	const socket = useSocketStore(state => state.socket);

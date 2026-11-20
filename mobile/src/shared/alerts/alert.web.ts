@@ -1,0 +1,7 @@
+import type { AlertButton } from 'react-native';
+import { useAlertStore } from './alertStore';
+
+// react-native-web's Alert.alert does nothing, so AlertHostContainer shows the alert as a dialog.
+export function showAlert(title: string, message: string, buttons: AlertButton[]): void {
+	useAlertStore.getState().push({ title, message, buttons });
+}

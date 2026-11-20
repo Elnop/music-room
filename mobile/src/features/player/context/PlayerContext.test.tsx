@@ -3,16 +3,16 @@ import { act, render } from '@testing-library/react-native';
 import { PlayerProvider } from './PlayerProvider';
 import { usePlayer } from './PlayerContext';
 import { readPositionMs, usePlayerStore } from '@/features/player/stores/playerStore';
-import { registerConnectBridge, type ConnectSnapshot } from '@/shared/services/connectBridge';
-import { registerPlaybackBridge, type OwnerQueue } from '@/shared/services/playbackBridge';
-import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
+import { registerConnectBridge, type ConnectSnapshot } from '@/shared/listening/lib/connectBridge';
+import { registerPlaybackBridge, type OwnerQueue } from '@/shared/playback/lib/playbackBridge';
+import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
 import { createStore } from 'zustand';
 import { streamPrefetch } from '@/features/player/services/streamPrefetch';
-import { apiRequest } from '@/shared/services/api';
-import { trackToSoundCloud } from '@/shared/utils/trackToSoundCloud';
-import type { SoundCloudTrack, StreamUrlResponse } from '@/types/soundcloud.types';
-import type { QueueItem } from '@/types/queue.types';
-import type { UserProfile } from '@/types/user.types';
+import { apiRequest } from '@/shared/backend/lib/api';
+import { trackToSoundCloud } from '@/shared/tracks/lib/trackToSoundCloud';
+import type { SoundCloudTrack, StreamUrlResponse } from '@/shared/tracks/lib/soundcloud.types';
+import type { QueueItem } from '@/shared/playback/lib/queue.types';
+import type { UserProfile } from '@/shared/users/user.types';
 
 interface MockPlayer {
 	id: number;
@@ -87,7 +87,7 @@ jest.mock('expo-audio', () => ({
 	setAudioModeAsync: jest.fn(() => Promise.resolve()),
 }));
 
-jest.mock('@/shared/services/api', () => {
+jest.mock('@/shared/backend/lib/api', () => {
 	class ApiError extends Error {
 		code: string;
 		details?: unknown;
@@ -107,12 +107,12 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/shared/services/deviceService', () => ({
+jest.mock('@/shared/backend/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 
 const mockApiRequest = apiRequest as jest.Mock;
-const { ApiError: MockApiError } = jest.requireMock('@/shared/services/api') as {
+const { ApiError: MockApiError } = jest.requireMock('@/shared/backend/lib/api') as {
 	ApiError: new (message: string, code: string, details?: unknown, status?: number) => Error;
 };
 

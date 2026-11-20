@@ -2,10 +2,10 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { ProfileScreenFrame } from '@/features/profile/common/presenters/ProfileScreenFrame';
 import { VisibilityToggle } from '@/features/profile/common/presenters/VisibilityToggle';
-import { Button } from '@/shared/components/ui/Button';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import type { Theme } from '@/shared/theme/types';
-import type { ProfilePrivacy, VisibilityLevel } from '@/types/user.types';
+import { Button } from '@/shared/theme/components/Button';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { Theme } from '@/shared/theme/lib/types';
+import type { ProfilePrivacy, VisibilityLevel } from '@/shared/users/user.types';
 
 interface PrivacySettingsViewProps {
 	theme: Theme;

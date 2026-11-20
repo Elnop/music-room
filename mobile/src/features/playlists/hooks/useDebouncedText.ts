@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { debounce } from '@/shared/utils/debounce';
+import { debounce } from '@/shared/debounce/debounce';
 
 const SEARCH_DELAY_MS = 500;
 

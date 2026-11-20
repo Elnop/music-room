@@ -12,4 +12,4 @@
 | 4 | Même action depuis le navigateur | `platform: web` | ☐ |
 | 5 | **Profil** : la version affichée en bas (`Zumik <version> (build …)`) | C'est la même que `appVersion` dans les logs | ☐ |
 
-**À dire** : un seul client HTTP (`mobile/src/shared/services/api.ts`) ajoute les en-têtes. Une règle semgrep interdit d'appeler `fetch` en dehors de ce client, donc aucune action ne peut échapper aux logs.
+**À dire** : un seul client HTTP (`mobile/src/shared/backend/lib/api.ts`) ajoute les en-têtes. Une règle semgrep interdit d'appeler `fetch` en dehors de ce client, donc aucune action ne peut échapper aux logs.

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/shared/query/keys';
-import { STALE } from '@/shared/query/queryClient';
-import { useSession } from '@/shared/services/authSession';
+import { queryKeys } from '@/shared/query-keys/keys';
+import { STALE } from '@/shared/backend/queryClient';
+import { useSession } from '@/shared/backend/lib/authSession';
 import { subscriptionApi } from '@/features/subscription/lib/subscriptionApi';
 import type { Plan, Subscription } from '@/features/subscription/lib/subscription';
 

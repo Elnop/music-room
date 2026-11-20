@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/shared/query/keys';
+import { queryKeys } from '@/shared/query-keys/keys';
 import { friendsApi } from '@/features/friends/services/friendsApi';
 
 export function useToggleControlMutation() {

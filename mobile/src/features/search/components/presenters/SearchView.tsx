@@ -1,18 +1,18 @@
 import React from 'react';
 import { View, FlatList, StyleSheet, RefreshControl, type TextInput } from 'react-native';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import { SearchBar } from '@/shared/components/form/SearchBar';
-import { SkeletonList, TrackRowSkeleton } from '@/shared/components/ui/Skeleton';
-import { EmptyState } from '@/shared/components/feedback/EmptyState';
-import { getTrackActionsSheet } from '@/shared/services/trackActionsBridge';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { SearchBar } from '@/shared/theme/components/SearchBar';
+import { SkeletonList, TrackRowSkeleton } from '@/shared/theme/components/Skeleton';
+import { EmptyState } from '@/shared/theme/components/EmptyState';
+import { getTrackActionsSheet } from '@/shared/playback/lib/trackActionsBridge';
 import { SoundCloudTrackItem } from './SoundCloudTrackItem';
-import type { Theme } from '@/shared/theme/types';
+import type { Theme } from '@/shared/theme/lib/types';
 import type { SoundCloudTrack } from '@/features/search/lib/types';
-import type { AddQueueItemBody } from '@/shared/playback/playback';
-import { useContentColumn } from '@/shared/hooks/useContentColumn';
+import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
+import { useContentColumn } from '@/shared/theme/hooks/useContentColumn';
 import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
-import type { MenuAnchor } from '@/shared/utils/menuPlacement';
+import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
 
 interface SearchViewProps {
 	inputRef: React.RefObject<TextInput | null>;

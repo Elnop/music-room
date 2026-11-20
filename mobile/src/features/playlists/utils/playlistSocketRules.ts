@@ -1,5 +1,5 @@
-import { queryKeys } from '@/shared/query/keys';
-import { socketCacheRule } from '@/shared/query/socketCache';
+import { queryKeys } from '@/shared/query-keys/keys';
+import { socketCacheRule } from '@/shared/backend/lib/socketCache';
 import type {
 	Playlist,
 	PlaylistDeletedEvent,

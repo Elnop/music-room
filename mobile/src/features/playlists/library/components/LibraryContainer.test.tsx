@@ -2,23 +2,23 @@ import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { LibraryContainer } from './LibraryContainer';
-import { resetBackendUrl } from '@/shared/services/backendUrl';
-import { showError } from '@/shared/utils/toast';
-import { logger } from '@/shared/utils/logger';
+import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
+import { showError } from '@/shared/theme/lib/toast';
+import { logger } from '@/shared/logging/logger';
 import type { Playlist, PlaylistStackParamList } from '@/features/playlists/types';
-import { renderWithClient } from '@/test/renderWithClient';
-import { mockFetchRoutes } from '@/test/fetchRoutes';
-import { fail, ok } from '@/test/fetchResponses';
-import { signIn } from '@/test/session';
-import '@/test/playback';
+import { renderWithClient } from '@test-utils/renderWithClient';
+import { mockFetchRoutes } from '@test-utils/fetchRoutes';
+import { fail, ok } from '@test-utils/fetchResponses';
+import { signIn } from '@test-utils/session';
+import '@test-utils/playback';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
-jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
+jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 let mockFocus: () => void = () => undefined;
@@ -31,7 +31,7 @@ jest.mock('@react-navigation/native', () => {
 		},
 	};
 });
-jest.mock('@/shared/utils/toast', () => ({ showError: jest.fn() }));
+jest.mock('@/shared/theme/lib/toast', () => ({ showError: jest.fn() }));
 
 type Props = NativeStackScreenProps<PlaylistStackParamList, 'Playlists'>;
 

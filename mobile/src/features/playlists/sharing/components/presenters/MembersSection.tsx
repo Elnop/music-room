@@ -1,12 +1,12 @@
 import React from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
-import { EmptyState } from '@/shared/components/feedback/EmptyState';
-import { SwipeableUserItem } from '@/shared/components/lists/SwipeableUserItem';
-import type { Theme } from '@/shared/theme/types';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { EmptyState } from '@/shared/theme/components/EmptyState';
+import { SwipeableUserItem } from './SwipeableUserItem';
+import type { Theme } from '@/shared/theme/lib/types';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { PlaylistMember } from '@/features/playlists/types';
 import { createSharingStyles } from './sharingStyles';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 import UsersSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/users-solid.svg';
 
 interface MembersSectionProps {

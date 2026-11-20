@@ -1,15 +1,15 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { testPlayback } from '@/test/playback';
-import { showInfo } from '@/shared/utils/toast';
+import { testPlayback } from '@test-utils/playback';
+import { showInfo } from '@/shared/theme/lib/toast';
 import { PlayPlaylistButton } from '@/features/playlists/detail/components/presenters/PlayPlaylistButton';
 import { usePlayPlaylist } from './usePlayPlaylist';
 
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
-jest.mock('@/shared/utils/toast', () => ({ showInfo: jest.fn() }));
+jest.mock('@/shared/theme/lib/toast', () => ({ showInfo: jest.fn() }));
 
 const { playPlaylist, pause, resume } = testPlayback;
 const setState = (state: 'playing' | 'paused' | 'loading' | null) => {

@@ -1,8 +1,8 @@
 import { act, renderHook } from '@testing-library/react-native';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { useAutoplayStore } from '@/features/player/stores/autoplayStore';
-import type { SoundCloudTrack, StreamProtocol } from '@/types/soundcloud.types';
-import { FakeMediaElement, autoplayRefusal, installFakeDocument } from '@/test/fakeMediaElement';
+import type { SoundCloudTrack, StreamProtocol } from '@/shared/tracks/lib/soundcloud.types';
+import { FakeMediaElement, autoplayRefusal, installFakeDocument } from '@test-utils/fakeMediaElement';
 import { useAudioPlayer, useAudioPlayerStatus } from './audioPlayer.web';
 
 const mockHls = {

@@ -2,32 +2,32 @@ import React from 'react';
 import { act, fireEvent, screen } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SearchTracksContainer } from './SearchTracksContainer';
-import { createQueryClient } from '@/shared/query/queryClient';
-import { queryKeys } from '@/shared/query/keys';
-import { resetBackendUrl } from '@/shared/services/backendUrl';
-import '@/test/playback';
-import { showError } from '@/shared/utils/toast';
+import { createQueryClient } from '@/shared/backend/queryClient';
+import { queryKeys } from '@/shared/query-keys/keys';
+import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
+import '@test-utils/playback';
+import { showError } from '@/shared/theme/lib/toast';
 import type { PlaylistStackParamList } from '@/features/playlists/types';
-import { deferred } from '@/test/deferred';
-import { renderWithClient } from '@/test/renderWithClient';
-import { mockFetchRoutes } from '@/test/fetchRoutes';
-import { fail, ok } from '@/test/fetchResponses';
-import { signIn } from '@/test/session';
-import { playlistTrack, playlistWithTracks } from '@/test/playlistFixtures';
+import { deferred } from '@test-utils/deferred';
+import { renderWithClient } from '@test-utils/renderWithClient';
+import { mockFetchRoutes } from '@test-utils/fetchRoutes';
+import { fail, ok } from '@test-utils/fetchResponses';
+import { signIn } from '@test-utils/session';
+import { playlistTrack, playlistWithTracks } from '@test-utils/playlistFixtures';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
-jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
+jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 jest.mock('react-native-safe-area-context', () => ({
 	useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
-jest.mock('@/shared/utils/toast', () => ({
+jest.mock('@/shared/theme/lib/toast', () => ({
 	showSuccess: jest.fn(),
 	showError: jest.fn(),
 	showInfo: jest.fn(),

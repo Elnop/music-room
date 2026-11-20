@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
-import { useSocketStore } from '@/shared/stores/socketStore';
+import { useSocketStore } from '@/shared/backend/socketStore';
 import {
 	usePlaybackEmitterState,
 	readPlaybackPositionMs,
 	getPlayback,
-} from '@/shared/services/playbackBridge';
-import { getConnectBridge } from '@/shared/services/connectBridge';
-import { useSession, getSession } from '@/shared/services/authSession';
-import { deviceService, type DeviceInfo } from '@/shared/services/deviceService';
-import { queueTrackToSoundCloud, trackToSoundCloud } from '@/shared/utils/trackToSoundCloud';
-import type { DeviceCommand } from '@/types/queue.types';
+} from '@/shared/playback/lib/playbackBridge';
+import { getConnectBridge } from '@/shared/listening/lib/connectBridge';
+import { useSession, getSession } from '@/shared/backend/lib/authSession';
+import { deviceService, type DeviceInfo } from '@/shared/backend/deviceService';
+import { queueTrackToSoundCloud, trackToSoundCloud } from '@/shared/tracks/lib/trackToSoundCloud';
+import type { DeviceCommand } from '@/shared/playback/lib/queue.types';
 
 type ControlCommand = DeviceCommand | { action: 'play'; fromUserId: string };
 

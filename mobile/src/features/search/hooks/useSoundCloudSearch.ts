@@ -1,6 +1,6 @@
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { queryKeys } from '@/shared/query/keys';
-import { STALE } from '@/shared/query/queryClient';
+import { queryKeys } from '@/shared/query-keys/keys';
+import { STALE } from '@/shared/backend/queryClient';
 import { searchApi } from '@/features/search/lib/searchApi';
 import type { SoundCloudTrack } from '@/features/search/lib/types';
 

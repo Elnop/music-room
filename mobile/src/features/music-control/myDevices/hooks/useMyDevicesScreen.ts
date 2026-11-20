@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigation, type NavigationProp } from '@react-navigation/native';
-import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
-import { getSession } from '@/shared/services/authSession';
+import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
+import { getSession } from '@/shared/backend/lib/authSession';
 import { musicControlApi } from '@/features/music-control/services/musicControlApi';
-import { getFriends, type FriendUserSummary } from '@/shared/services/friendsBridge';
-import { deviceService } from '@/shared/services/deviceService';
-import { showError, showSuccess } from '@/shared/utils/toast';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
+import { getFriends, type FriendUserSummary } from '@/shared/backend/lib/friendsBridge';
+import { deviceService } from '@/shared/backend/deviceService';
+import { showError, showSuccess } from '@/shared/theme/lib/toast';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import type { UserDeviceWithLicenses } from '@/features/music-control/types';
 import {
 	pairKey,

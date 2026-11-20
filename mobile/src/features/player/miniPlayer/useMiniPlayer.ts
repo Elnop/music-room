@@ -2,8 +2,8 @@ import { Gesture } from 'react-native-gesture-handler';
 import { runOnJS, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { useNowPlaying, type NowPlayingTrack } from '@/features/player/hooks/useNowPlaying';
-import { RESTART_THRESHOLD_S } from '@/shared/utils/queueNavigation';
-import { hapticTap } from '@/shared/utils/haptics';
+import { RESTART_THRESHOLD_S } from '@/shared/playback/lib/queueNavigation';
+import { hapticTap } from '@/shared/theme/lib/haptics';
 import { SWIPE_FLICK_VELOCITY, trackSwipeDirection } from '@/features/player/utils/trackSwipe';
 import { openPlayerLabel } from '@/features/player/utils/openPlayerLabel';
 

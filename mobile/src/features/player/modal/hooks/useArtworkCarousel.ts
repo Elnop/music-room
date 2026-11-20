@@ -9,10 +9,10 @@ import {
 	withTiming,
 	type SharedValue,
 } from 'react-native-reanimated';
-import { getPlayback, useActiveQueue } from '@/shared/services/playbackBridge';
-import { largeArtwork } from '@/shared/utils/artwork';
-import type { QueueItem } from '@/shared/playback/playback';
-import { hapticTap } from '@/shared/utils/haptics';
+import { getPlayback, useActiveQueue } from '@/shared/playback/lib/playbackBridge';
+import { largeArtwork } from '@/features/player/utils/artwork';
+import type { QueueItem } from '@/shared/playback/lib/playback';
+import { hapticTap } from '@/shared/theme/lib/haptics';
 import { trackSwipeDirection } from '@/features/player/utils/trackSwipe';
 import { displayedQueueIndex } from '@/features/player/utils/displayedQueueIndex';
 import { useArtworkSize } from '@/features/player/modal/hooks/useArtworkSize';

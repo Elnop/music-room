@@ -1,10 +1,10 @@
 import React from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
-import { EmptyState } from '@/shared/components/feedback/EmptyState';
-import { SearchBar } from '@/shared/components/form/SearchBar';
-import { SkeletonList, TrackRowSkeleton } from '@/shared/components/ui/Skeleton';
-import type { Theme } from '@/shared/theme/types';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { EmptyState } from '@/shared/theme/components/EmptyState';
+import { SearchBar } from '@/shared/theme/components/SearchBar';
+import { SkeletonList, TrackRowSkeleton } from '@/shared/theme/components/Skeleton';
+import type { Theme } from '@/shared/theme/lib/types';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { SearchTracks } from '@/features/playlists/searchTracks/useSearchTracks';
 import { AddableTrackRow } from './AddableTrackRow';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';

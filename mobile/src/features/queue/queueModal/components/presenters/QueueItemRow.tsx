@@ -1,20 +1,20 @@
 import React from 'react';
 import { View } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import { useContextMenu } from '@/shared/hooks/useContextMenu';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import { Artwork } from '@/shared/components/media/Artwork';
-import { TrackActionsButton } from '@/shared/components/lists/TrackActionsButton';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useContextMenu } from '@/shared/theme/hooks/useContextMenu';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { Artwork } from '@/shared/theme/components/Artwork';
+import { TrackActionsButton } from '@/shared/theme/components/TrackActionsButton';
 import { QueueTrackDetails } from './QueueTrackDetails';
 import { createRowStyles, formatDuration } from './queueModalStyles';
 import type { QueueItem } from '@/features/queue/types';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 import BarsSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/bars-solid.svg';
 import SoundOnSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/sound-on-solid.svg';
 import TrashSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/trash-solid.svg';
-import type { MenuAnchor } from '@/shared/utils/menuPlacement';
+import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
 
 interface QueueItemRowProps {
 	item: QueueItem;

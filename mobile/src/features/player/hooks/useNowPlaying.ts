@@ -2,8 +2,8 @@ import { useCallback, useMemo } from 'react';
 import { usePlayer } from '@/features/player/context/PlayerContext';
 import { usePlayerProgress } from './usePlayerProgress';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
-import { useActiveQueue, getPlayback } from '@/shared/services/playbackBridge';
-import { previousAction, selectHasNext, selectHasPrevious } from '@/shared/utils/queueNavigation';
+import { useActiveQueue, getPlayback } from '@/shared/playback/lib/playbackBridge';
+import { previousAction, selectHasNext, selectHasPrevious } from '@/shared/playback/lib/queueNavigation';
 import { useRemoteNowPlaying } from './useRemoteNowPlaying';
 
 import type { NowPlaying, NowPlayingTrack } from '@/features/player/types';

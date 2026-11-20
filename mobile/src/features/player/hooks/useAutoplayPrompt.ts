@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useAutoplayStore } from '@/features/player/stores/autoplayStore';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import type { AudioPlayer } from '@/features/player/types';
-import { showAlert } from '@/shared/utils/alert';
+import { showAlert } from '@/shared/alerts/alert';
 
 /** Browser only: a playback started before any click on the page waits for one. Native never blocks. */
 export function useAutoplayPrompt(player: AudioPlayer): void {

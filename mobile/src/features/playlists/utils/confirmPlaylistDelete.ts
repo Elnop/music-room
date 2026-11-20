@@ -1,4 +1,4 @@
-import { showAlert } from '@/shared/utils/alert';
+import { showAlert } from '@/shared/alerts/alert';
 
 /** Deleting a playlist removes it for all its members, so it always asks first. */
 export function confirmPlaylistDelete(name: string, onConfirm: () => void): void {

@@ -1,8 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
 import Animated, { interpolate, useAnimatedStyle, type SharedValue } from 'react-native-reanimated';
-import { Artwork } from '@/shared/components/media/Artwork';
-import { Text } from '@/shared/components/ui/Text';
+import { Artwork } from '@/shared/theme/components/Artwork';
+import { Text } from '@/shared/theme/components/Text';
 import type { CarouselSlot } from '@/features/player/modal/hooks/useArtworkCarousel';
 import type { createStyles } from './playerModalStyles';
 

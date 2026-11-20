@@ -1,8 +1,8 @@
 import { Dimensions, Platform, StyleSheet } from 'react-native';
-import { BREAKPOINTS, PLAYER_DIALOG_WIDTH } from '@/shared/constants/layout';
-import type { Theme } from '@/shared/theme/types';
-import { FONT_FAMILIES } from '@/shared/theme/fonts';
-import { displayText, pixelFrame } from '@/shared/theme/pixelFrame';
+import { BREAKPOINTS, PLAYER_DIALOG_WIDTH } from '@/shared/theme/lib/layout';
+import type { Theme } from '@/shared/theme/lib/types';
+import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
+import { displayText, pixelFrame } from '@/shared/theme/lib/pixelFrame';
 
 export const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 export const DISMISS_THRESHOLD = SCREEN_HEIGHT * 0.2;

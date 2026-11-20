@@ -1,5 +1,5 @@
 import type { PlaylistUpdatedEvent, PlaylistWithTracks } from '@/features/playlists/types';
-import type { TrackInPlaylist } from '@/types/track.types';
+import type { TrackInPlaylist } from '@/shared/tracks/lib/track.types';
 
 // Applies the server's track events in version order (doc/features/playlist-concurrency.md,
 // "Broadcast and convergence"). Ranks compare byte by byte, like the server.

@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useAudioPlayerStatus } from '@/features/player/services/audioPlayer';
 import type { AudioPlayer } from '@/features/player/types';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
-import { isLocalTarget } from '@/shared/services/connectBridge';
+import { isLocalTarget } from '@/shared/listening/lib/connectBridge';
 
 /** Mirrors into the store the pauses and resumes the system makes behind the app's back (calls, unplugged headsets). */
 export function useAudioInterruption(player: AudioPlayer): void {

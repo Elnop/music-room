@@ -1,16 +1,16 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useTheme } from '@/shared/theme/ThemeContext';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import { CodeInput } from '@/features/auth/code/CodeInput';
 import { PasswordScreenFrame } from '@/features/auth/form/presenters/PasswordScreenFrame';
 import { ErrorBox } from '@/features/auth/form/presenters/ErrorBox';
-import { Button } from '@/shared/components/ui/Button';
-import { Input } from '@/shared/components/ui/Input';
-import { Pressable } from '@/shared/components/ui/Pressable';
+import { Button } from '@/shared/theme/components/Button';
+import { Input } from '@/shared/theme/components/Input';
+import { Pressable } from '@/shared/theme/components/Pressable';
 import type { ResetPassword } from '@/features/auth/resetPassword/hooks/useResetPassword';
 import { PasswordRequirements } from './PasswordRequirements';
-import { Text } from '@/shared/components/ui/Text';
-import { FONT_FAMILIES } from '@/shared/theme/fonts';
+import { Text } from '@/shared/theme/components/Text';
+import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
 
 interface ResetPasswordViewProps {
 	email: string;

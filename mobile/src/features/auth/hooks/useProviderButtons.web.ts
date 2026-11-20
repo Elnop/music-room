@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { View } from 'react-native';
-import { logger } from '@/shared/utils/logger';
+import { logger } from '@/shared/logging/logger';
 import {
 	renderGoogleButton,
 	type GoogleButtonTarget,

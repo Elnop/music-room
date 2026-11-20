@@ -1,14 +1,14 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Button } from '@/shared/components/ui/Button';
-import { Input } from '@/shared/components/ui/Input';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import type { Theme } from '@/shared/theme/types';
+import { Button } from '@/shared/theme/components/Button';
+import { Input } from '@/shared/theme/components/Input';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { Theme } from '@/shared/theme/lib/types';
 import { AuthFormFrame } from '@/features/auth/form/presenters/AuthFormFrame';
 import { SocialSignInButtons } from '@/features/auth/social/SocialSignInButtons';
 import type { FieldBinding } from '@/features/auth/form/hooks/useFieldBinding';
 import type { GoogleButtonSlot } from '@/features/auth/types';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 
 interface RegisterViewProps {
 	email: FieldBinding;

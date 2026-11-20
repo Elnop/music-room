@@ -2,7 +2,7 @@ import { useEffect, useMemo, useSyncExternalStore } from 'react';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { useAutoplayStore } from '@/features/player/stores/autoplayStore';
 import type { AudioPlayer, AudioPlayerStatus } from '@/features/player/types';
-import type { StreamProtocol } from '@/types/soundcloud.types';
+import type { StreamProtocol } from '@/shared/tracks/lib/soundcloud.types';
 import { HtmlAudioPlayer, type PlaybackEvents } from './htmlAudioPlayer';
 
 // Browser variant of audioPlayer.ts: expo-audio's web player cannot read HLS outside Safari.

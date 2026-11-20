@@ -1,7 +1,7 @@
-import { resetBackendUrl } from '@/shared/services/backendUrl';
-import { mockFetchRoutes } from '@/test/fetchRoutes';
-import { fail, ok } from '@/test/fetchResponses';
-import { signIn } from '@/test/session';
+import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
+import { mockFetchRoutes } from '@test-utils/fetchRoutes';
+import { fail, ok } from '@test-utils/fetchResponses';
+import { signIn } from '@test-utils/session';
 import {
 	geocodeAddress,
 	geocoderNeedsLocationPermission,
@@ -11,7 +11,7 @@ import {
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
-jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
+jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 
 const ADDRESS = '96 bd Bessières, 75017 Paris';
 const ROUTE = `GET /api/events/geocode?q=${encodeURIComponent(ADDRESS)}`;

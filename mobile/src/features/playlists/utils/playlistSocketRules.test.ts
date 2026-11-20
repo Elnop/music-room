@@ -1,13 +1,13 @@
-import { createQueryClient } from '@/shared/query/queryClient';
-import { queryKeys } from '@/shared/query/keys';
+import { createQueryClient } from '@/shared/backend/queryClient';
+import { queryKeys } from '@/shared/query-keys/keys';
 import type { Playlist, PlaylistWithTracks } from '@/features/playlists/types';
-import { playlistTrack, playlistWithTracks } from '@/test/playlistFixtures';
+import { playlistTrack, playlistWithTracks } from '@test-utils/playlistFixtures';
 import { PLAYLIST_SOCKET_RULES } from './playlistSocketRules';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
-jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
+jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 
 const client = createQueryClient();
 const detail = queryKeys.playlists.detail('p1');

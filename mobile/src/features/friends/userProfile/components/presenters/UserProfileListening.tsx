@@ -1,5 +1,5 @@
 import React from 'react';
-import { NowPlayingInline } from '@/shared/components/media/NowPlayingInline';
+import { NowPlayingInline } from './NowPlayingInline';
 import type { FriendListeningDevice } from '@/features/friends/types';
 
 interface UserProfileListeningProps {

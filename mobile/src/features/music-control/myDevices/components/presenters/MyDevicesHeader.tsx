@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import type { Theme } from '@/shared/theme/types';
-import { Text } from '@/shared/components/ui/Text';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { Theme } from '@/shared/theme/lib/types';
+import { Text } from '@/shared/theme/components/Text';
 
 export function MyDevicesHeader() {
 	const { theme } = useTheme();

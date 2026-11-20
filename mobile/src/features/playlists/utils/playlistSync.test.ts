@@ -1,6 +1,6 @@
 import { applyPlaylistEvent, sortByRank } from './playlistSync';
 import type { PlaylistWithTracks } from '@/features/playlists/types';
-import type { TrackInPlaylist } from '@/types/track.types';
+import type { TrackInPlaylist } from '@/shared/tracks/lib/track.types';
 
 const track = (id: string, rank: string): TrackInPlaylist =>
 	({

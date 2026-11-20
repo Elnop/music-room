@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
-import { getPlayback, usePlaylistPlayback } from '@/shared/services/playbackBridge';
-import { showInfo } from '@/shared/utils/toast';
+import { getPlayback, usePlaylistPlayback } from '@/shared/playback/lib/playbackBridge';
+import { showInfo } from '@/shared/theme/lib/toast';
 
 export interface PlayPlaylist {
 	loading: boolean;

@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { pixelFrame, pixelRow } from '@/shared/theme/pixelFrame';
-import type { Theme } from '@/shared/theme/types';
+import { pixelFrame, pixelRow } from '@/shared/theme/lib/pixelFrame';
+import type { Theme } from '@/shared/theme/lib/types';
 
 export const createFriendsListStyles = (theme: Theme) =>
 	StyleSheet.create({

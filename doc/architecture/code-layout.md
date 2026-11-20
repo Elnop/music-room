@@ -68,8 +68,8 @@ mobile/src/
 - Features: auth, playlists, player, queue (with Connect and playback transfer), friends, profile, music-control, search. A subject folder always exists, even for a single-subject feature.
 - **Component roles** are read from the name (`XContainer` is an orchestrator, any other component a presenter) and checked by dependency-cruiser (presenters reach no store or query, render no orchestrator) and by an in-house ESLint plugin (screens import only orchestrators, hooks contain no JSX, one component per file) ([components.md](../../.agents/rules/components.md)).
 - **Server data lives in TanStack Query**; Zustand only keeps client state (session, player, preferences, UI). A Socket.io event updates the cache (`setQueryData`) or invalidates it through the key factory ([state.md](../../.agents/rules/state.md)).
-- A feature's stores stay in the feature (a deliberate difference from VibeAppTemplate, which puts every store in `shared/stores/`), because `queueStore` or `connectStore` hold business logic.
-- **Primitives and theme**: every touchable is a `Pressable` or `Button` from `shared/components/ui/` (required `accessibilityLabel`), and every colour comes from the theme tokens ([ui-primitives, theme-tokens](../../.agents/rules/structure.md#ui-primitives)).
+- A feature's stores stay in the feature (a deliberate difference from VibeAppTemplate, which puts every store in a `shared/stores/` folder), because `queueStore` or `connectStore` hold business logic.
+- **Primitives and theme**: every touchable is a `Pressable` or `Button` from `shared/theme/components/` (required `accessibilityLabel`), and every colour comes from the theme tokens ([ui-primitives, theme-tokens](../../.agents/rules/structure.md#ui-primitives)).
 - Full placement rule: [placement](../../.agents/rules/structure.md#placement).
 
 ## Why

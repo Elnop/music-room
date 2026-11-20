@@ -11,7 +11,8 @@
 		"lib": ["esnext"],
 		"types": ["react-native", "jest"],
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": ["./src/*"],
+			"@test-utils/*": ["./test-utils/*"]
 		}
 	},
 	"include": ["**/*.ts", "**/*.tsx"],

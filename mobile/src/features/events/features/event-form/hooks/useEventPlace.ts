@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { logger } from '@/shared/utils/logger';
-import { showError } from '@/shared/utils/toast';
+import { logger } from '@/shared/logging/logger';
+import { showError } from '@/shared/theme/lib/toast';
 import {
 	currentPlace,
 	requestLocationPermission,

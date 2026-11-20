@@ -1,9 +1,9 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import type { Theme } from '@/shared/theme/types';
-import { Text } from '@/shared/components/ui/Text';
+import { LoadingSpinner } from '@/shared/theme/components/LoadingSpinner';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { Theme } from '@/shared/theme/lib/types';
+import { Text } from '@/shared/theme/components/Text';
 
 interface ProfileScreenLayoutProps {
 	subtitle?: string;

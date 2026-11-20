@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import type { Theme } from '@/shared/theme/types';
-import { EmptyState } from '@/shared/components/feedback/EmptyState';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { Theme } from '@/shared/theme/lib/types';
+import { EmptyState } from '@/shared/theme/components/EmptyState';
 import type { UserDeviceWithLicenses } from '@/features/music-control/types';
-import type { FriendUserSummary } from '@/shared/services/friendsBridge';
+import type { FriendUserSummary } from '@/shared/backend/lib/friendsBridge';
 import { DeviceCard } from './DeviceCard';
 import { MyDevicesHeader } from './MyDevicesHeader';
 import { MyDevicesLoadingView } from './MyDevicesLoadingView';

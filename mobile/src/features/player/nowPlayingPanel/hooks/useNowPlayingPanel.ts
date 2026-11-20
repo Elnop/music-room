@@ -1,20 +1,20 @@
 import { useCallback, useMemo, useState } from 'react';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import { hexToRgba, useImageColors } from '@/shared/hooks/useImageColors';
-import { useNowPlayingPanelStore } from '@/shared/stores/nowPlayingPanelStore';
-import { getPlayback, useActiveQueue } from '@/shared/services/playbackBridge';
-import type { TrackActionsStart } from '@/shared/services/trackActionsBridge';
-import { THIS_DEVICE_LABEL } from '@/shared/constants/platform';
-import { largeArtwork } from '@/shared/utils/artwork';
-import { toTrackInput } from '@/shared/utils/trackInput';
-import type { AddQueueItemBody } from '@/shared/playback/playback';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { hexToRgba, useImageColors } from '@/shared/image-colors/useImageColors';
+import { useNowPlayingPanelStore } from '@/features/player/stores/nowPlayingPanelStore';
+import { getPlayback, useActiveQueue } from '@/shared/playback/lib/playbackBridge';
+import type { TrackActionsStart } from '@/shared/playback/lib/trackActionsBridge';
+import { THIS_DEVICE_LABEL } from '@/shared/platform/platform';
+import { largeArtwork } from '@/features/player/utils/artwork';
+import { toTrackInput } from '@/shared/tracks/lib/trackInput';
+import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
 import { useNowPlaying } from '@/features/player/hooks/useNowPlaying';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { UP_NEXT_COUNT } from '@/features/player/constants';
 import { upNext } from '@/features/player/nowPlayingPanel/utils/upNext';
 import { usePanelFocus } from './usePanelFocus';
-import { recordMenuAnchor } from '@/shared/stores/menuAnchorStore';
-import type { MenuAnchor } from '@/shared/utils/menuPlacement';
+import { recordMenuAnchor } from '@/shared/theme/menuAnchorStore';
+import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
 
 type Sheet = 'queue' | 'devices';
 

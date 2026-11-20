@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/shared/query/keys';
-import { STALE } from '@/shared/query/queryClient';
-import { useSession } from '@/shared/services/authSession';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { logger } from '@/shared/utils/logger';
-import { showError, showSuccess } from '@/shared/utils/toast';
+import { queryKeys } from '@/shared/query-keys/keys';
+import { STALE } from '@/shared/backend/queryClient';
+import { useSession } from '@/shared/backend/lib/authSession';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { logger } from '@/shared/logging/logger';
+import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import * as membersApi from '@/features/playlists/services/membersApi';
 import * as usersApi from '@/features/playlists/services/usersApi';
 import { refreshPlaylist } from '@/features/playlists/utils/playlistCache';

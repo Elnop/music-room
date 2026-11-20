@@ -2,23 +2,23 @@ import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { createStore } from 'zustand';
 import { View } from 'react-native';
-import { registerPlayerModals } from '@/shared/services/playerModalsBridge';
+import { registerPlayerModals } from '@/shared/player-modals-bridge/playerModalsBridge';
 import { PlayerModalContainer } from './PlayerModalContainer';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
-import { registerPlaybackBridge, type OwnerQueue } from '@/shared/services/playbackBridge';
-import { registerConnectBridge, type ConnectSnapshot } from '@/shared/services/connectBridge';
-import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
-import { hashStringToNumber } from '@/shared/utils/trackToSoundCloud';
-import type { UserProfile } from '@/types/user.types';
-import { useImageColors } from '@/shared/hooks/useImageColors';
+import { registerPlaybackBridge, type OwnerQueue } from '@/shared/playback/lib/playbackBridge';
+import { registerConnectBridge, type ConnectSnapshot } from '@/shared/listening/lib/connectBridge';
+import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
+import { hashStringToNumber } from '@/shared/tracks/lib/trackToSoundCloud';
+import type { UserProfile } from '@/shared/users/user.types';
+import { useImageColors } from '@/shared/image-colors/useImageColors';
 import { fireGestureHandler, getByGestureTestId } from 'react-native-gesture-handler/jest-utils';
 import { State } from 'react-native-gesture-handler';
 import type { PanGesture } from 'react-native-gesture-handler';
-import type { SoundCloudTrack } from '@/types/soundcloud.types';
-import { hapticTap } from '@/shared/utils/haptics';
-import { Text } from '@/shared/components/ui/Text';
+import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
+import { hapticTap } from '@/shared/theme/lib/haptics';
+import { Text } from '@/shared/theme/components/Text';
 
-jest.mock('@/shared/utils/haptics', () => ({
+jest.mock('@/shared/theme/lib/haptics', () => ({
 	hapticTap: jest.fn(),
 	hapticSelection: jest.fn(),
 	hapticSuccess: jest.fn(),
@@ -27,8 +27,8 @@ jest.mock('@/shared/utils/haptics', () => ({
 const mockSeekTo = jest.fn();
 const mockProgress = { progress: 0, currentTime: 0, duration: 0 };
 
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
@@ -45,12 +45,12 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/shared/services/deviceService', () => ({
+jest.mock('@/shared/backend/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 	deviceService: { getDeviceInfo: jest.fn(async () => ({ deviceId: 'phone' })) },
 }));
 
-jest.mock('@/shared/services/musicControlBridge', () => ({
+jest.mock('@/shared/backend/lib/musicControlBridge', () => ({
 	getDevicePicker: jest.fn(async () => ({
 		owners: [
 			{
@@ -81,7 +81,7 @@ jest.mock('@/features/player/hooks/usePlayerProgress', () => ({
 	usePlayerProgress: () => mockProgress,
 }));
 
-jest.mock('@/shared/hooks/useImageColors', () => ({
+jest.mock('@/shared/image-colors/useImageColors', () => ({
 	useImageColors: jest.fn(() => ({ dominantColor: null })),
 	hexToRgba: (color: string) => color,
 	getAdaptiveColors: () => null,

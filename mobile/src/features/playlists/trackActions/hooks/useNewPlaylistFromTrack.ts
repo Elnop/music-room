@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/shared/query/keys';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { logger } from '@/shared/utils/logger';
-import { showError, showSuccess } from '@/shared/utils/toast';
+import { queryKeys } from '@/shared/query-keys/keys';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { logger } from '@/shared/logging/logger';
+import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import { useCreatePlaylist } from '@/features/playlists/hooks/usePlaylistMutations';
 import { useAddTrack } from '@/features/playlists/hooks/useTrackEdits';
 import { playlistFormSchema } from '@/features/playlists/validators';
 import type { Playlist } from '@/features/playlists/types';
-import type { AddQueueItemBody } from '@/shared/playback/playback';
+import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
 import { PLAYLIST_NAME_MAX } from '@/features/playlists/trackActions/utils/playlistName';
 
 

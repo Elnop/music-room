@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMenuAnchor } from '@/shared/hooks/useMenuAnchor';
+import { useMenuAnchor } from '@/features/playlists/hooks/useMenuAnchor';
 import { useDeferredSheetAction } from '@/features/playlists/detail/hooks/useDeferredSheetAction';
 import {
 	PlaylistActionsView,

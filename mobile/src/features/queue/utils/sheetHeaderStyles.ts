@@ -1,5 +1,5 @@
-import type { Theme } from '@/shared/theme/types';
-import { FONT_FAMILIES } from '@/shared/theme/fonts';
+import type { Theme } from '@/shared/theme/lib/types';
+import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
 
 export const sheetHeaderStyles = (theme: Theme, insets: { top: number }, separator: string) => ({
 	container: {

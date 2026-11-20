@@ -1,4 +1,4 @@
-import { apiRequest } from '@/shared/services/api';
+import { apiRequest } from '@/shared/backend/lib/api';
 import type { LoginInput, RegisterInput } from '@/features/auth/validators';
 import type { AuthResponse, MessageResponse } from '@/features/auth/types';
 

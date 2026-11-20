@@ -191,9 +191,9 @@ export default [
   // See .agents/rules/logging.md#no-console
   {
     files: [
-      'src/shared/utils/logger.ts',
-      'src/shared/utils/logger.test.ts',
-      'src/shared/components/feedback/ErrorBoundary.test.tsx',
+      'src/shared/logging/logger.ts',
+      'src/shared/logging/logger.test.ts',
+      'src/providers/ErrorBoundary.test.tsx',
     ],
     rules: {
       'no-restricted-globals': 'off',
@@ -233,7 +233,7 @@ export default [
             'MemberExpression[property.name=/^(TouchableOpacity|Pressable)$/]',
           ].join(', '),
           message:
-            'Use Pressable or Button from @/shared/components/ui/, not TouchableOpacity or Pressable from react-native. See .agents/rules/structure.md#ui-primitives',
+            'Use Pressable or Button from @/shared/theme/components/, not TouchableOpacity or Pressable from react-native. See .agents/rules/structure.md#ui-primitives',
         },
       ],
       'guardrails/theme-tokens': [
@@ -247,7 +247,7 @@ export default [
             'TemplateElement[value.raw=/^(rgb|rgba|hsl|hsla)\\(/i]',
           ].join(', '),
           message:
-            'No colour literal outside src/shared/theme/; read the colour from the theme (theme.colors.*). See .agents/rules/structure.md#theme-tokens',
+            'No colour literal outside the theme modules; read the colour from the theme (theme.colors.*). See .agents/rules/structure.md#theme-tokens',
         },
         {
           // Named colours are common words ('snow' is also an icon), so only
@@ -260,7 +260,7 @@ export default [
             .map(node => `${node}[value=/^(${NAMED_COLORS.join('|')})$/i]`)
             .join(', '),
           message:
-            'No named colour outside src/shared/theme/; read the colour from the theme (theme.colors.*). See .agents/rules/structure.md#theme-tokens',
+            'No named colour outside the theme modules; read the colour from the theme (theme.colors.*). See .agents/rules/structure.md#theme-tokens',
         },
       ],
       'guardrails/zustand-selector': [
@@ -277,7 +277,7 @@ export default [
           selector:
             "ImportDeclaration[source.value='react-native'][importKind='value'] > ImportSpecifier[importKind='value'][imported.name=/^(Text|TextInput)$/]",
           message:
-            'Use Text or TextInput from @/shared/components/ui/, not from react-native: they set the brand font. See .agents/rules/structure.md#text-primitives',
+            'Use Text or TextInput from @/shared/theme/components/, not from react-native: they set the brand font. See .agents/rules/structure.md#text-primitives',
         },
       ],
       'guardrails/font-families': [
@@ -289,7 +289,7 @@ export default [
             "JSXAttribute[name.name='fontFamily']",
           ].join(', '),
           message:
-            'No fontWeight and no font name outside src/shared/theme/; read the family from theme.typography.families (FONT_FAMILIES). See .agents/rules/structure.md#font-families',
+            'No fontWeight and no font name outside the theme modules; read the family from theme.typography.families (FONT_FAMILIES). See .agents/rules/structure.md#font-families',
         },
       ],
       'components/screen-orchestrator-only': 'error',
@@ -299,15 +299,53 @@ export default [
     },
   },
   {
-    files: ['src/shared/components/ui/**'],
+    files: [
+      'src/shared/theme/components/Button.test.tsx',
+      'src/shared/theme/components/Button.tsx',
+      'src/shared/theme/components/Card.test.tsx',
+      'src/shared/theme/components/Card.tsx',
+      'src/shared/theme/components/GenreChip.tsx',
+      'src/shared/theme/components/Input.test.tsx',
+      'src/shared/theme/components/Input.tsx',
+      'src/shared/theme/components/KeyButton.tsx',
+      'src/shared/theme/components/LoadingSpinner.test.tsx',
+      'src/shared/theme/components/LoadingSpinner.tsx',
+      'src/shared/theme/components/PlaylistCardSkeleton.tsx',
+      'src/shared/theme/components/Pressable.test.tsx',
+      'src/shared/theme/components/Pressable.tsx',
+      'src/shared/theme/components/Skeleton.test.tsx',
+      'src/shared/theme/components/Skeleton.tsx',
+      'src/shared/theme/components/SkeletonBlock.tsx',
+      'src/shared/theme/components/SkeletonList.tsx',
+      'src/shared/theme/components/SkeletonRow.tsx',
+      'src/shared/theme/components/Text.test.tsx',
+      'src/shared/theme/components/Text.tsx',
+      'src/shared/theme/components/TextInput.tsx',
+      'src/shared/theme/components/ThemedSwitch.tsx',
+      'src/shared/theme/components/TrackRowSkeleton.tsx',
+      'src/shared/theme/components/UserRowSkeleton.tsx',
+      'src/shared/theme/lib/skeletonStyles.ts',
+    ],
     rules: { 'guardrails/ui-primitives': 'off' },
   },
   {
-    files: ['src/shared/theme/**'],
+    files: [
+      'src/shared/theme/components/ThemeContext.tsx',
+      'src/shared/theme/hooks/useThemedStyles.ts',
+      'src/shared/image-colors/adaptivePalette.test.ts',
+      'src/shared/image-colors/adaptivePalette.ts',
+      'src/shared/theme/lib/fieldFocus.ts',
+      'src/shared/theme/lib/fonts.ts',
+      'src/shared/theme/lib/navigationFonts.ts',
+      'src/shared/theme/lib/original.theme.ts',
+      'src/shared/theme/lib/pixelFrame.ts',
+      'src/shared/theme/lib/tokens.ts',
+      'src/shared/theme/lib/types.ts',
+    ],
     rules: { 'guardrails/theme-tokens': 'off', 'guardrails/font-families': 'off' },
   },
   {
-    files: ['src/shared/components/ui/Text.tsx', 'src/shared/components/ui/TextInput.tsx'],
+    files: ['src/shared/theme/components/Text.tsx', 'src/shared/theme/components/TextInput.tsx'],
     rules: { 'guardrails/text-primitives': 'off' },
   },
 

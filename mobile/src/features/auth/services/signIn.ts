@@ -1,5 +1,5 @@
-import { ApiError } from '@/shared/services/api';
-import { logger } from '@/shared/utils/logger';
+import { ApiError } from '@/shared/backend/lib/api';
+import { logger } from '@/shared/logging/logger';
 import { useAuthStore } from '@/features/auth/stores/authStore';
 import type { LoginInput, RegisterInput } from '@/features/auth/validators';
 import type { AuthResponse, OAuthProvider, RegisterResult } from '@/features/auth/types';

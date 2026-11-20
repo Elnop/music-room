@@ -1,8 +1,8 @@
-import type { UserProfile } from '@/types/user.types';
+import type { UserProfile } from '@/shared/users/user.types';
 import type { AuthSessionTokens } from '@/features/auth/types';
 import * as authApi from '@/features/auth/services/authApi';
-import { ApiError } from '@/shared/services/api';
-import { logger } from '@/shared/utils/logger';
+import { ApiError } from '@/shared/backend/lib/api';
+import { logger } from '@/shared/logging/logger';
 import type { GetAuthState, SetAuthState } from './authState';
 
 interface TokenRefreshDeps {

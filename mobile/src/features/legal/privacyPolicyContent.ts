@@ -1,4 +1,4 @@
-import { CONTACT_EMAIL, CONTACT_MAILTO } from '@/shared/constants/links';
+import { CONTACT_EMAIL, CONTACT_MAILTO } from '@/shared/project-links/links';
 
 export type PolicySpan =
 	string | { bold: string } | { code: string } | { link: string; url: string };

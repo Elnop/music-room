@@ -1,8 +1,8 @@
 import type { QueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/shared/query/keys';
+import { queryKeys } from '@/shared/query-keys/keys';
 import * as tracksApi from '@/features/playlists/services/tracksApi';
 import type { PlaylistWithTracks } from '@/features/playlists/types';
-import type { AddQueueItemBody } from '@/shared/playback/playback';
+import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
 import { reloadIfOnScreen, settleTrackEvent } from './playlistCache';
 
 /** Adds a track; the answer is applied like its own `playlist:updated` event. */

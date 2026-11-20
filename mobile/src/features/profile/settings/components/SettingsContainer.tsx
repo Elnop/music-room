@@ -5,9 +5,10 @@ import type { PlanState } from '@/features/subscription/lib/subscription';
 
 interface SettingsContainerProps {
 	subscription: PlanState;
+	backendUrlField: React.ReactNode;
 }
 
-export function SettingsContainer({ subscription }: SettingsContainerProps) {
+export function SettingsContainer({ subscription, backendUrlField }: SettingsContainerProps) {
 	const { theme, bottomPadding, plan, isChangingPlan, handleTogglePremium, openPrivacyPolicy } =
 		useSettingsScreen(subscription);
 
@@ -19,6 +20,7 @@ export function SettingsContainer({ subscription }: SettingsContainerProps) {
 			isChangingPlan={isChangingPlan}
 			onTogglePremium={handleTogglePremium}
 			onOpenPrivacyPolicy={openPrivacyPolicy}
+			backendUrlField={backendUrlField}
 		/>
 	);
 }

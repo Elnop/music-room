@@ -1,9 +1,9 @@
 import React from 'react';
 import { View } from 'react-native';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { createBeaconCardStyles } from './beaconCardStyles';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 import WifiSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/wifi-solid.svg';
 
 /** Shown instead of the card in a browser, which cannot broadcast over Bluetooth. */

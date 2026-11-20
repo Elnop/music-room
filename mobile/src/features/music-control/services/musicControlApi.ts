@@ -1,4 +1,4 @@
-import { apiRequest, authRequest } from '@/shared/services/api';
+import { apiRequest, authRequest } from '@/shared/backend/lib/api';
 import type {
 	CanControlResponse,
 	ControlActionResponse,

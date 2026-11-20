@@ -1,9 +1,9 @@
 import React from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
-import { useLoop } from '@/shared/hooks/useLoop';
-import { pixelFrame } from '@/shared/theme/pixelFrame';
-import type { Theme } from '@/shared/theme/types';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { useLoop } from '@/shared/theme/hooks/useLoop';
+import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
+import type { Theme } from '@/shared/theme/lib/types';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 
 const HEIGHT = 216;
 const RINGS = [60, 130, 200];

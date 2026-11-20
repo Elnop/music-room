@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNowPlayingPanelStore } from '@/shared/stores/nowPlayingPanelStore';
+import { useNowPlayingPanelStore } from '@/features/player/stores/nowPlayingPanelStore';
 import { useVolumeStore } from '@/features/player/stores/volumeStore';
 import { usePlaybackControls } from '@/features/player/hooks/usePlaybackControls';
 import { useSeekPosition } from '@/features/player/modal/hooks/useSeekPosition';

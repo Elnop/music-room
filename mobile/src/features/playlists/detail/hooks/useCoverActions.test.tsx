@@ -2,8 +2,8 @@ import { Alert } from 'react-native';
 import { act, renderHook } from '@testing-library/react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCoverActions } from './useCoverActions';
-import { ApiError } from '@/shared/services/api';
-import { showError, showSuccess } from '@/shared/utils/toast';
+import { ApiError } from '@/shared/backend/lib/api';
+import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import * as playlistApi from '@/features/playlists/services/playlistApi';
 import { patchPlaylist } from '@/features/playlists/utils/playlistCache';
 import type { DetailNavigation } from './usePlaylistDetailScreen';
@@ -11,16 +11,16 @@ import type { DetailNavigation } from './usePlaylistDetailScreen';
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
-jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
+jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
 jest.mock('@tanstack/react-query', () => ({ useQueryClient: jest.fn(() => ({})) }));
 
 const mockPlan = { isPremium: true, refetch: jest.fn() };
 
 const mockPickImage = jest.fn();
-jest.mock('@/shared/utils/imagePicker', () => ({
+jest.mock('@/shared/image-picker/imagePicker', () => ({
 	pickImage: (...args: unknown[]) => mockPickImage(...args),
 }));
-jest.mock('@/shared/utils/squareImage', () => ({
+jest.mock('@/shared/square-image/squareImage', () => ({
 	prepareSquareImage: () => Promise.resolve('file:///cover-512.jpg'),
 }));
 jest.mock('@/features/playlists/services/playlistApi', () => ({
@@ -28,7 +28,7 @@ jest.mock('@/features/playlists/services/playlistApi', () => ({
 	removeCover: jest.fn(),
 }));
 jest.mock('@/features/playlists/utils/playlistCache', () => ({ patchPlaylist: jest.fn() }));
-jest.mock('@/shared/utils/toast', () => ({ showError: jest.fn(), showSuccess: jest.fn() }));
+jest.mock('@/shared/theme/lib/toast', () => ({ showError: jest.fn(), showSuccess: jest.fn() }));
 
 const ID = 'p1';
 const COVER = 'https://x/storage/v1/object/public/playlist-covers/p1/c.jpg';

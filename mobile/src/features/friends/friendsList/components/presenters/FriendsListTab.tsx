@@ -1,16 +1,16 @@
 import React from 'react';
 import { FlatList, View } from 'react-native';
-import { EmptyState } from '@/shared/components/feedback/EmptyState';
-import { SkeletonList, UserRowSkeleton } from '@/shared/components/ui/Skeleton';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
-import { rowColumns } from '@/shared/utils/gridLayout';
+import { EmptyState } from '@/shared/theme/components/EmptyState';
+import { SkeletonList, UserRowSkeleton } from '@/shared/theme/components/Skeleton';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
+import { rowColumns } from '@/shared/theme/lib/gridLayout';
 import type { FriendProfile } from '@/features/friends/types';
 import { FriendCard } from './FriendCard';
 import { FriendItemRow } from './FriendItemRow';
-import { ThemedRefreshControl } from '@/shared/components/lists/ThemedRefreshControl';
+import { ThemedRefreshControl } from '@/shared/refresh-control/ThemedRefreshControl';
 import { createFriendsListStyles } from './friendsListStyles';
-import { useContentColumn } from '@/shared/hooks/useContentColumn';
+import { useContentColumn } from '@/shared/theme/hooks/useContentColumn';
 import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
 import UsersSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/users-solid.svg';
 

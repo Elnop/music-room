@@ -1,6 +1,6 @@
 // Browser variant: the Facebook JavaScript SDK, loaded when a screen offers Facebook.
 import Constants from 'expo-constants';
-import { logger } from '@/shared/utils/logger';
+import { logger } from '@/shared/logging/logger';
 import { loadScript } from '@/features/auth/utils/loadScript';
 import { SIGN_IN_CANCELLED } from './signInCancelled';
 

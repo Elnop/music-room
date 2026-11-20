@@ -1,4 +1,4 @@
-import { ApiError, apiRequest } from '@/shared/services/api';
+import { ApiError, apiRequest } from '@/shared/backend/lib/api';
 import type {
 	QueueCallTarget,
 	QueueState,
@@ -7,7 +7,7 @@ import type {
 	TransferRequest,
 	TransferResult,
 } from '@/features/queue/types';
-import type { AddQueueItemBody } from '@/shared/playback/playback';
+import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
 
 const base = ({ ownerId }: QueueCallTarget = {}): string =>
 	ownerId ? `/api/users/${encodeURIComponent(ownerId)}/queue` : '/api/queue';

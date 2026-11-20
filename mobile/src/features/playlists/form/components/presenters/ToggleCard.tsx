@@ -1,9 +1,9 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { ThemedSwitch } from '@/shared/components/ui/ThemedSwitch';
-import type { Theme } from '@/shared/theme/types';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
-import { Text } from '@/shared/components/ui/Text';
+import { ThemedSwitch } from '@/shared/theme/components/ThemedSwitch';
+import type { Theme } from '@/shared/theme/lib/types';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import { Text } from '@/shared/theme/components/Text';
 
 interface ToggleCardProps {
 	label: string;

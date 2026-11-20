@@ -2,10 +2,10 @@ import { act, renderHook } from '@testing-library/react-native';
 import type { useAudioPlayer } from 'expo-audio';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { PLAYER_LOAD_TIMEOUT_MS } from '@/features/player/constants';
-import type { SoundCloudTrack } from '@/types/soundcloud.types';
+import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
 import { useAudioPlaybackSync } from './useAudioPlaybackSync';
 
-jest.mock('@/shared/services/connectBridge', () => ({ isLocalTarget: () => true }));
+jest.mock('@/shared/listening/lib/connectBridge', () => ({ isLocalTarget: () => true }));
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')

@@ -1,8 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
-import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
-import { ThemedSwitch } from '@/shared/components/ui/ThemedSwitch';
-import { useTheme } from '@/shared/theme/ThemeContext';
+import { LoadingSpinner } from '@/shared/theme/components/LoadingSpinner';
+import { ThemedSwitch } from '@/shared/theme/components/ThemedSwitch';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import { createFriendsListStyles } from './friendsListStyles';
 
 interface ControlSwitchProps {

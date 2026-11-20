@@ -2,8 +2,8 @@ import { useEffect, useRef } from 'react';
 import { useAudioPlayerStatus } from '@/features/player/services/audioPlayer';
 import type { AudioPlayer } from '@/features/player/types';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
-import { isLocalTarget } from '@/shared/services/connectBridge';
-import { getPlayback } from '@/shared/services/playbackBridge';
+import { isLocalTarget } from '@/shared/listening/lib/connectBridge';
+import { getPlayback } from '@/shared/playback/lib/playbackBridge';
 
 /** Once per loaded track, local mode only: in remote mode the playing device advances itself. */
 export function useQueueAutoAdvance(player: AudioPlayer): void {

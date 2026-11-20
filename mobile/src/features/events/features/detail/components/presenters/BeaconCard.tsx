@@ -1,11 +1,11 @@
 import React from 'react';
 import { View } from 'react-native';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import { ThemedSwitch } from '@/shared/components/ui/ThemedSwitch';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import { ThemedSwitch } from '@/shared/theme/components/ThemedSwitch';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { createBeaconCardStyles } from './beaconCardStyles';
 import type { BeaconBroadcast } from '@/features/events/features/detail/hooks/useBeaconBroadcast';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 import WifiSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/wifi-solid.svg';
 
 function description(beacon: BeaconBroadcast): string {

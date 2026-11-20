@@ -1,4 +1,4 @@
-import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
+import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
 import { useCachedPlaylist } from '@/features/playlists/hooks/usePlaylistQueries';
 import { useRefetchOnFocus } from '@/features/playlists/hooks/useRefetchOnFocus';
 import type { UserSummary } from '@/features/playlists/types';

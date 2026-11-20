@@ -2,10 +2,10 @@ import React from 'react';
 import { StyleSheet, View, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
 import Slider from '@react-native-community/slider';
 import type { SeekPosition } from '@/features/player/modal/hooks/useSeekPosition';
-import { Text } from '@/shared/components/ui/Text';
-import { pixelFrame } from '@/shared/theme/pixelFrame';
-import type { Theme } from '@/shared/theme/types';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { Text } from '@/shared/theme/components/Text';
+import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
+import type { Theme } from '@/shared/theme/lib/types';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 
 /** The track drawn as pixel blocks; the slider stays on top, invisible, to seek. */
 const SEGMENTS = 24;

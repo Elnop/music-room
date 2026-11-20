@@ -2,20 +2,20 @@
 
 Bonus V.1 (Multi-platform support): the service is also available in a browser, as a responsive web app that adapts to phone, tablet and desktop. Epic #474, stories #518 to #524.
 
-Code: the same `mobile/` app, built for the web by Expo (`react-native-web`). Every `*.web.ts` file in `mobile/src/`, `shared/hooks/useBreakpoint.ts`, `shared/constants/layout.ts` and `platform.ts`, `shared/components/layout/`, `navigation/screenLayout.tsx`; backend `GET /api/events/geocode` ([events.md](events.md)). The choice of Expo web over a separate client is in [decisions.md](../decisions.md#3-bonus-v1-web-client-epic-474).
+Code: the same `mobile/` app, built for the web by Expo (`react-native-web`). Every `*.web.ts` file in `mobile/src/`, `shared/theme/hooks/useBreakpoint.ts`, `shared/theme/lib/layout.ts`, `shared/platform/platform.ts`, `shared/theme/components/` (layout and dialogs), `navigation/screenLayout.tsx`; backend `GET /api/events/geocode` ([events.md](events.md)). The choice of Expo web over a separate client is in [decisions.md](../decisions.md#3-bonus-v1-web-client-epic-474).
 
 ## Approach
 
-The browser runs the Android app's code: the same screens, Zustand stores, TanStack Query cache, Socket.io client and API client (`shared/services/api.ts`, so the IV.6 headers are sent: `X-Platform: web`, and `X-Device-Model` read from the user agent, e.g. `Chrome on Linux`). It stays a remote control of the backend (IV.5), and the guardrails of `npm run check` cover it with no second project.
+The browser runs the Android app's code: the same screens, Zustand stores, TanStack Query cache, Socket.io client and API client (`shared/backend/lib/api.ts`, so the IV.6 headers are sent: `X-Platform: web`, and `X-Device-Model` read from the user agent, e.g. `Chrome on Linux`). It stays a remote control of the backend (IV.5), and the guardrails of `npm run check` cover it with no second project.
 
 Each native module was already isolated in one service or hook. That file gets a `.web.ts` variant next to it, which Metro picks for the web bundle; nothing imports a variant by name (knip treats `src/**/*.web.{ts,tsx}` as entry points). No native library reaches the web bundle, and hls.js reaches only the web one; the Google and Facebook SDKs are scripts loaded at run time.
 
 | Variant (`mobile/src/…`) | Replaces on the web |
 | --- | --- |
-| `shared/services/deviceIdentity.web.ts` | `expo-device` (empty on the web): model and name from the user agent (`Chrome on Linux`, `Chrome sur Linux` in the device list) |
-| `shared/hooks/useImageColors.web.ts` | `react-native-image-colors`: no extraction, the theme's fallback colour |
-| `shared/utils/alert.web.ts` | `Alert.alert` (a no-op in react-native-web): the alert is queued in `shared/stores/alertStore.ts` and `AlertHost` shows it as a centred dialog with every button |
-| `shared/utils/jpegFormData.web.ts` | The React Native `{ uri }` upload object: the picked image is read into a `Blob` (avatar, playlist cover) |
+| `shared/backend/lib/deviceIdentity.web.ts` | `expo-device` (empty on the web): model and name from the user agent (`Chrome on Linux`, `Chrome sur Linux` in the device list) |
+| `shared/image-colors/useImageColors.web.ts` | `react-native-image-colors`: no extraction, the theme's fallback colour |
+| `shared/alerts/alert.web.ts` | `Alert.alert` (a no-op in react-native-web): the alert is queued in `shared/alerts/alertStore.ts` and `AlertHost` shows it as a centred dialog with every button |
+| `shared/backend/lib/jpegFormData.web.ts` | The React Native `{ uri }` upload object: the picked image is read into a `Blob` (avatar, playlist cover) |
 | `features/auth/services/googleSignIn.web.ts` | Native Google Sign-In: Google Identity Services, Google's rendered button in popup mode |
 | `features/auth/services/facebookSignIn.web.ts` | Facebook Android SDK: Facebook JavaScript SDK, `FB.login` |
 | `features/auth/hooks/useProviderButtons.web.ts` | Loads the two SDK scripts on the sign-in, sign-up and linked-accounts screens only, and mounts Google's button |
@@ -27,11 +27,11 @@ Each native module was already isolated in one service or hook. That file gets a
 | `features/events/features/event-form/lib/pickDateTime.web.ts` | The Android date and time pickers: a modal `<dialog>` with a `datetime-local` field |
 | `features/events/features/nearby/lib/beaconScanner.web.ts` | The BLE scan: always reports « unsupported » |
 
-`shared/constants/platform.ts` hides what the browser cannot do: the beacon broadcast (`BEACON_BROADCAST_AVAILABLE`). The backend address field (`BackendUrlField`) works in the browser too, on Welcome and in Settings: the address is kept in the browser's storage, and the chosen backend must list the page's origin in its `ALLOWED_ORIGINS`.
+`shared/platform/platform.ts` hides what the browser cannot do: the beacon broadcast (`BEACON_BROADCAST_AVAILABLE`). The backend address field (`BackendUrlField`) works in the browser too, on Welcome and in Settings: the address is kept in the browser's storage, and the chosen backend must list the page's origin in its `ALLOWED_ORIGINS`.
 
 ## Responsive layout
 
-`useBreakpoint()` (`shared/hooks/useBreakpoint.ts`, from `useWindowDimensions`, so it follows a window resize live) gives three levels, set in `shared/constants/layout.ts`:
+`useBreakpoint()` (`shared/theme/hooks/useBreakpoint.ts`, from `useWindowDimensions`, so it follows a window resize live) gives three levels, set in `shared/theme/lib/layout.ts`:
 
 | Level | Window width | Layout |
 | --- | --- | --- |
@@ -43,11 +43,11 @@ Every adaptation keys on `isWide` (tablet or desktop), so a phone, and Android, 
 
 - **Navigation**: the tabs move to the left (`tabBarPosition: 'left'`, `AppTabBar`); the mini-player leaves the tab bar and is docked in a fixed bar at the bottom of the window (`AppNavigator`).
 - **Width**: each screen is centred at a maximum width chosen per route in `navigation/screenLayout.tsx` (`ContentContainer`: form 600 px, content 960 px, wide 1280 px).
-- **Grids**: playlist tiles get their column count from the content width (`shared/utils/gridLayout.ts`); friends and events go to 2 columns on tablet and 3 on desktop (`RowGrid`).
+- **Grids**: playlist tiles get their column count from the content width (`shared/theme/lib/gridLayout.ts`); friends and events go to 2 columns on tablet and 3 on desktop (`RowGrid`).
 - **Dialogs**: the action sheet, the queue and the device picker become centred dialogs (`CenteredDialog`, `FullScreenSheet`), capped at 560 px.
 - **Player**: on desktop the full player is a 440 px panel docked on the right over a backdrop.
 - **Mouse and keyboard**: a `Pressable` lightens under the pointer and shows the hand cursor; Escape closes every modal; Enter submits the sign-in, sign-up, playlist, event, profile and password forms (`Input submitOnEnter`, browser only).
-- **URL**: on the web every screen has its own path (`navigation/screenPaths.ts`: `/playlists`, `/playlist/<id>/add-tracks`, `/event/<id>`, `/profile/devices`, `/login`…), and only identifiers go in it. The root `/` is the home in both sessions (the landing signed out, `/welcome` being an alias), and `/privacy` the privacy policy in both (not `/profile/privacy`, the profile visibility settings): such a path has one entry per session. Reloading reopens the screen in its canonical tab above its parent screens, after sign-in for an app screen; a signed-out path opened signed in, or an unknown path, opens the home. `/verify-email` and `/reset-password` keep the email out of the address and reload on the screen before them. Android still opens only `zumik://playlist/<id>` and `zumik://user/<id>`. Sharing a playlist or a profile sends its https path here (`shared/utils/shareLinks.ts`), since a messaging app makes only http(s) links clickable; in an Android browser, `site/404.html` offers to open it in the app (an `intent://` link to `zumik://`, falling back to the web app when the app is missing).
+- **URL**: on the web every screen has its own path (`navigation/screenPaths.ts`: `/playlists`, `/playlist/<id>/add-tracks`, `/event/<id>`, `/profile/devices`, `/login`…), and only identifiers go in it. The root `/` is the home in both sessions (the landing signed out, `/welcome` being an alias), and `/privacy` the privacy policy in both (not `/profile/privacy`, the profile visibility settings): such a path has one entry per session. Reloading reopens the screen in its canonical tab above its parent screens, after sign-in for an app screen; a signed-out path opened signed in, or an unknown path, opens the home. `/verify-email` and `/reset-password` keep the email out of the address and reload on the screen before them. Android still opens only `zumik://playlist/<id>` and `zumik://user/<id>`. Sharing a playlist or a profile sends its https path here (`shared/share-links/shareLinks.ts`), since a messaging app makes only http(s) links clickable; in an Android browser, `site/404.html` offers to open it in the app (an `intent://` link to `zumik://`, falling back to the web app when the app is missing).
 
 ## Audio
 

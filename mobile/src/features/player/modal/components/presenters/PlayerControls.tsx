@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { KeyButton } from '@/shared/components/ui/KeyButton';
+import { KeyButton } from '@/shared/theme/components/KeyButton';
 import type { createStyles } from './playerModalStyles';
 import ArrowLeftSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/arrow-left-solid.svg';
 import ArrowRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/arrow-right-solid.svg';

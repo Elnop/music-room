@@ -23,7 +23,7 @@ Zumik is a mobile app backed by one API server. The app is a remote control: it 
 
 | Piece | Role | More |
 |---|---|---|
-| **Mobile app** (`mobile/`) | Expo React Native, native build. TanStack Query holds server data, Zustand the client state (session, player, UI). Every HTTP call goes through `shared/services/api.ts`, which adds the token and the `X-Platform` / `X-Device-Model` / `X-App-Version` headers. | [mobile/README.md](../../mobile/README.md) |
+| **Mobile app** (`mobile/`) | Expo React Native, native build. TanStack Query holds server data, Zustand the client state (session, player, UI). Every HTTP call goes through `shared/backend/lib/api.ts`, which adds the token and the `X-Platform` / `X-Device-Model` / `X-App-Version` headers. | [mobile/README.md](../../mobile/README.md) |
 | **Backend** (`backend/`) | Express 5 API, one folder per feature (auth, profile, friends, playlists, queue, music-control, soundcloud, mail). Validates every input with Zod, checks rights, and talks to Supabase with the service key. | [backend/README.md](../../backend/README.md) |
 | **Real time** (`backend/src/realtime/`) | Socket.io server on the same process. Authenticates each connection with the token at the handshake, registers the device, and keeps rooms: `playlist:<id>` for editors of a playlist, `user:<id>` for a user's devices, `listening:<id>` for the friends allowed to see and control a user's playback. | [backend/README.md](../../backend/README.md#real-time-socketio) |
 | **Supabase** | PostgreSQL (all data), Auth (passwords, sessions, tokens) and Storage (avatars). Reached only by the backend: the anon key has no privilege on the tables (#201). Local stack in development, hosted project in production. | [backend/README.md](../../backend/README.md#2-supabase-local-stack-default-or-hosted-project) |
@@ -35,7 +35,7 @@ Zumik is a mobile app backed by one API server. The app is a remote control: it 
 1. The app calls the API with its access token. `authMiddleware` checks the token against the Redis revocation list, then with Supabase Auth (failures are rate-limited per IP).
 2. The controller parses the input with its Zod schema, the service checks rights (`permissions/`) and reads or writes Supabase. Operations that must be atomic (playlist tracks, the play queue) are Postgres functions that lock the row they change.
 3. After a change, the feature calls an emitter of `realtime/emitters/`, which pushes the new state to the right room. Each event carries a version where order matters, so clients drop stale states.
-4. On the app, the socket event updates the TanStack Query cache directly (`shared/query/socketCache.ts`), so every screen shows the server's state.
+4. On the app, the socket event updates the TanStack Query cache directly (`shared/backend/lib/socketCache.ts`), so every screen shows the server's state.
 
 ## Main flows
 

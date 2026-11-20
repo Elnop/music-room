@@ -1,9 +1,9 @@
 import { renderHook } from '@testing-library/react-native';
 import { createStore } from 'zustand';
 import { useQueueSync } from './useQueueSync';
-import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
+import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
 import type { QueueState } from '@/features/queue/types';
-import type { UserProfile } from '@/types/user.types';
+import type { UserProfile } from '@/shared/users/user.types';
 
 const mockSocket = {
 	connected: true,
@@ -23,7 +23,7 @@ let mockTarget: { kind: 'local' } | { kind: 'remote'; ownerId: string; deviceId:
 	kind: 'local',
 };
 
-jest.mock('@/shared/stores/socketStore', () => ({
+jest.mock('@/shared/backend/socketStore', () => ({
 	useSocketStore: (selector: (state: typeof mockSocketState) => unknown) =>
 		selector(mockSocketState),
 }));

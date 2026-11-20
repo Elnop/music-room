@@ -5,19 +5,19 @@ import {
 	NavigationContainer,
 	useNavigationContainerRef,
 } from '@react-navigation/native';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import { NAVIGATION_FONTS } from '@/shared/theme/navigationFonts';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { NAVIGATION_FONTS } from '@/shared/theme/lib/navigationFonts';
 import { AuthNavigator } from './AuthNavigator';
 import { AppNavigator, type AppTabsParamList } from './AppNavigator';
 import { createLinking, openPendingLink } from './linking';
 import { formatDocumentTitle } from './documentTitle';
 import { useAuthStore } from '@/features/auth/stores/authStore';
-import { useSocketStore } from '@/shared/stores/socketStore';
-import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
-import { isDarkBackground } from '@/shared/components/feedback/textContrast';
+import { useSocketStore } from '@/shared/backend/socketStore';
+import { LoadingSpinner } from '@/shared/theme/components/LoadingSpinner';
+import { isDarkBackground } from '@/shared/theme/lib/textContrast';
 import { useMusicControlEmitter } from '@/features/music-control/hooks/useMusicControlEmitter';
-import { loadBackendUrl } from '@/shared/services/backendUrl';
-import { logger } from '@/shared/utils/logger';
+import { loadBackendUrl } from '@/shared/backend/lib/backendUrl';
+import { logger } from '@/shared/logging/logger';
 
 const DOCUMENT_TITLE = { formatter: formatDocumentTitle };
 

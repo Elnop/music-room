@@ -1,10 +1,10 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { Avatar } from '@/shared/components/media/Avatar';
-import { Button } from '@/shared/components/ui/Button';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import type { Theme } from '@/shared/theme/types';
-import type { UserProfile } from '@/types/user.types';
+import { Avatar } from '@/shared/theme/components/Avatar';
+import { Button } from '@/shared/theme/components/Button';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { Theme } from '@/shared/theme/lib/types';
+import type { UserProfile } from '@/shared/users/user.types';
 
 interface EditProfilePhotoProps {
 	user: UserProfile | null;

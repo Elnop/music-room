@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { onSessionEnd } from '@/shared/services/authSession';
+import { onSessionEnd } from '@/shared/backend/lib/authSession';
 import { initialPlayerState, type PlayerState } from './playerState';
 
 export { readPositionMs, setPositionReader } from './positionReader';

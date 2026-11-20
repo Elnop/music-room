@@ -1,13 +1,13 @@
-import { createQueryClient } from '@/shared/query/queryClient';
-import { queryKeys } from '@/shared/query/keys';
+import { createQueryClient } from '@/shared/backend/queryClient';
+import { queryKeys } from '@/shared/query-keys/keys';
 import type { MusicEvent } from './types';
-import { musicEvent } from '@/test/eventFixtures';
+import { musicEvent } from '@test-utils/eventFixtures';
 import { EVENT_SOCKET_RULES } from './eventSocketRules';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
-jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
+jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 
 const client = createQueryClient();
 const list = queryKeys.events.list();

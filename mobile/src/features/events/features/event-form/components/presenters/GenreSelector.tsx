@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { FormError } from '@/shared/components/feedback/FormError';
-import { GenreChip } from '@/shared/components/ui/GenreChip';
-import type { Theme } from '@/shared/theme/types';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
-import { MUSIC_GENRES, type MusicGenre } from '@/types/user.types';
+import { FormError } from '@/shared/theme/components/FormError';
+import { GenreChip } from '@/shared/theme/components/GenreChip';
+import type { Theme } from '@/shared/theme/lib/types';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import { MUSIC_GENRES, type MusicGenre } from '@/shared/users/user.types';
 import { EVENT_LIMITS } from '@/features/events/features/event-form/lib/validators';
 import { FieldLabel } from './FieldLabel';
 

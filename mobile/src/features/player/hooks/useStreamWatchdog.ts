@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useAudioPlayerStatus } from '@/features/player/services/audioPlayer';
 import type { AudioPlayer } from '@/features/player/types';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
-import { isLocalTarget } from '@/shared/services/connectBridge';
+import { isLocalTarget } from '@/shared/listening/lib/connectBridge';
 import { RENEWAL_HEALTHY_MS } from '@/features/player/constants';
 
 function playsLocally(): boolean {

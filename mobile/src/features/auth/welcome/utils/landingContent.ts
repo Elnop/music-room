@@ -1,4 +1,4 @@
-import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
+import type { PixelIconSource } from '@/shared/theme/components/PixelIcon';
 import LoginSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/login-solid.svg';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 import PhoneRingingLowSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/phone-ringing-low-solid.svg';

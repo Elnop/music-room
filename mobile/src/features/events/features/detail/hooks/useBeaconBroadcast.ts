@@ -1,5 +1,5 @@
 import { useShallow } from 'zustand/shallow';
-import { showError, showSuccess } from '@/shared/utils/toast';
+import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import { useBeaconStore } from '@/features/events/features/detail/beaconStore';
 import { isOngoing } from '@/features/events/shared/event-dates/eventDates';
 import type { AdvertiseFailure } from '@/features/events/features/detail/beaconAdvertiser';

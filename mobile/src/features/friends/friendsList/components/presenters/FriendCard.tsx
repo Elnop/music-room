@@ -1,13 +1,13 @@
 import React from 'react';
 import { View } from 'react-native';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import { Avatar } from '@/shared/components/media/Avatar';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import { useTheme } from '@/shared/theme/ThemeContext';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import { Avatar } from '@/shared/theme/components/Avatar';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { FriendProfile } from '@/features/friends/types';
 import { ControlSwitch } from './ControlSwitch';
 import { createFriendsListStyles } from './friendsListStyles';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 import AngleRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/angle-right-solid.svg';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 

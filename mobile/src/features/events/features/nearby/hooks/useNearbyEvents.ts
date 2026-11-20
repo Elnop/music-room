@@ -1,8 +1,8 @@
 import { useEffect, useMemo } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useSession } from '@/shared/services/authSession';
-import { logger } from '@/shared/utils/logger';
+import { useSession } from '@/shared/backend/lib/authSession';
+import { logger } from '@/shared/logging/logger';
 import { NEARBY_CLOCK_MS } from '@/features/events/features/nearby/lib/constants';
 import { useEvents } from '@/features/events/shared/events/hooks/useEventQueries';
 import { useNow } from './useNow';

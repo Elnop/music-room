@@ -1,11 +1,11 @@
-import { apiRequest, authRequest } from '@/shared/services/api';
-import { jpegFormData } from '@/shared/utils/jpegFormData';
+import { apiRequest, authRequest } from '@/shared/backend/lib/api';
+import { jpegFormData } from '@/shared/backend/lib/jpegFormData';
 import type {
 	AvatarResponse,
 	FilteredProfile,
 	UpdateProfileData,
 	UserProfile,
-} from '@/types/user.types';
+} from '@/shared/users/user.types';
 
 export const profileApi = {
 	async updateProfile(data: UpdateProfileData, accessToken?: string): Promise<UserProfile> {

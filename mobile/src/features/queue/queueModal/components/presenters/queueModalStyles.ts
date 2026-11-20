@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native';
 import { sheetHeaderStyles } from '@/features/queue/utils/sheetHeaderStyles';
-import { pixelCaption, pixelRow } from '@/shared/theme/pixelFrame';
-import type { Theme } from '@/shared/theme/types';
-import { FONT_FAMILIES } from '@/shared/theme/fonts';
+import { pixelCaption, pixelRow } from '@/shared/theme/lib/pixelFrame';
+import type { Theme } from '@/shared/theme/lib/types';
+import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
 
 export const formatDuration = (ms: number): string => {
 	const minutes = Math.floor(ms / 60000);

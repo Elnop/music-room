@@ -1,6 +1,6 @@
 import { PermissionsAndroid, Platform } from 'react-native';
 import { BleManager, ScanMode, State } from 'react-native-ble-plx';
-import { logger } from '@/shared/utils/logger';
+import { logger } from '@/shared/logging/logger';
 import { base64ToBytes } from './base64';
 import { parseIBeacon, zumikBeaconMinor } from '@/features/events/shared/beacon/ibeacon';
 

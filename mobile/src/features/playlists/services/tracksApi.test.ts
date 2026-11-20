@@ -2,9 +2,9 @@ import * as tracksApi from './tracksApi';
 import * as playlistApi from './playlistApi';
 import * as usersApi from './usersApi';
 import * as trackSearchApi from './trackSearchApi';
-import { apiRequest } from '@/shared/services/api';
+import { apiRequest } from '@/shared/backend/lib/api';
 
-jest.mock('@/shared/services/api', () => ({ apiRequest: jest.fn() }));
+jest.mock('@/shared/backend/lib/api', () => ({ apiRequest: jest.fn() }));
 
 const request = apiRequest as jest.MockedFunction<typeof apiRequest>;
 

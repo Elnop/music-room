@@ -1,12 +1,12 @@
 import React from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
-import type { Theme } from '@/shared/theme/types';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import type { Theme } from '@/shared/theme/lib/types';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { ActionSheet } from '@/features/playlists/actionSheet/presenters/ActionSheet';
 import { ActionSheetRow } from '@/features/playlists/actionSheet/presenters/ActionSheetRow';
-import type { MenuAnchor } from '@/shared/utils/menuPlacement';
+import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
 import type { TrackActions } from '@/features/playlists/trackActions/hooks/useTrackActions';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 import { NewPlaylistForm } from '@/features/playlists/trackActions/components/presenters/NewPlaylistForm';
 import ArrowRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/arrow-right-solid.svg';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';

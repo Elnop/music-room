@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, ActivityIndicator } from 'react-native';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import type { DevicePickerOwner } from '@/types/device.types';
-import type { Theme } from '@/shared/theme/types';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import type { PixelIconSource } from '@/shared/theme/components/PixelIcon';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import type { DevicePickerOwner } from '@/shared/devices/device.types';
+import type { Theme } from '@/shared/theme/lib/types';
 import type { createPickerStyles } from './devicePickerStyles';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 import LaptopSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/laptop-solid.svg';
 import PhoneRingingLowSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/phone-ringing-low-solid.svg';
 

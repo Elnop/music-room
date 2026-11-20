@@ -3,11 +3,11 @@ import { StyleSheet, View } from 'react-native';
 import { BottomTabBar, type BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MiniPlayerContainer } from '@/features/player/miniPlayer/components/MiniPlayerContainer';
-import { PixelWordmark } from '@/shared/components/media/PixelWordmark';
-import { PIXEL } from '@/shared/theme/tokens';
-import { SIDEBAR_WIDTH } from '@/shared/constants/layout';
-import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
-import { useTheme } from '@/shared/theme/ThemeContext';
+import { PixelWordmark } from '@/shared/theme/components/PixelWordmark';
+import { PIXEL } from '@/shared/theme/lib/tokens';
+import { SIDEBAR_WIDTH } from '@/shared/theme/lib/layout';
+import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import { SidebarAccount } from './SidebarAccount';
 
 /** The phone's mini-player sits on the tab bar; wide screens leave the player to AppNavigator. */

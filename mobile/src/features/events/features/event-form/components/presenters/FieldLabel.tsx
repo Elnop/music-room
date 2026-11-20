@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import type { Theme } from '@/shared/theme/types';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
-import { Text } from '@/shared/components/ui/Text';
+import type { Theme } from '@/shared/theme/lib/types';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import { Text } from '@/shared/theme/components/Text';
 
 export function FieldLabel({ children }: { children: string }) {
 	const { styles } = useThemedStyles(createStyles);

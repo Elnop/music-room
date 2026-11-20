@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { logger } from '@/shared/utils/logger';
-import { showError, showSuccess } from '@/shared/utils/toast';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { logger } from '@/shared/logging/logger';
+import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import { useDeletePlaylist } from '@/features/playlists/hooks/usePlaylistMutations';
 import { confirmPlaylistDelete } from '@/features/playlists/utils/confirmPlaylistDelete';
 import type { DetailNavigation, PlaylistDetailScreen } from './usePlaylistDetailScreen';

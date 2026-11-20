@@ -1,24 +1,24 @@
 import React from 'react';
 import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import { FullScreenSheet } from '@/shared/components/layout/FullScreenSheet';
-import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
-import { AppToast } from '@/shared/components/feedback/AppToast';
-import { ReorderableList } from '@/shared/components/lists/ReorderableList';
-import { EmptyState } from '@/shared/components/feedback/EmptyState';
-import { getTrackActionsSheet } from '@/shared/services/trackActionsBridge';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { FullScreenSheet } from './FullScreenSheet';
+import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
+import { AppToast } from '@/shared/theme/components/AppToast';
+import { ReorderableList } from '@/shared/theme/components/ReorderableList';
+import { EmptyState } from '@/shared/theme/components/EmptyState';
+import { getTrackActionsSheet } from '@/shared/playback/lib/trackActionsBridge';
 import { QueueItemRow } from './QueueItemRow';
 import type { createModalStyles } from './queueModalStyles';
-import type { Theme } from '@/shared/theme/types';
+import type { Theme } from '@/shared/theme/lib/types';
 import type { QueueItem } from '@/features/queue/types';
-import type { AddQueueItemBody } from '@/shared/playback/playback';
-import { Text } from '@/shared/components/ui/Text';
+import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
+import { Text } from '@/shared/theme/components/Text';
 import ChevronDownSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/chevron-down-solid.svg';
 import PlaylistSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/playlist-solid.svg';
 import TimesSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/times-solid.svg';
-import type { MenuAnchor } from '@/shared/utils/menuPlacement';
+import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
 
 interface QueueModalViewProps {
 	visible: boolean;
