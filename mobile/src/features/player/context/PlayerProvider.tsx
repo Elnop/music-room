@@ -12,7 +12,7 @@ import { usePlayerVolume } from '@/features/player/hooks/usePlayerVolume';
 import { configureAudioMode } from '@/features/player/services/audioMode';
 import { registerJsKeepAliveTask } from '@/features/player/services/jsKeepAlive';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
-import { MediaSessionBridge } from '@/features/player/mediaSession/components/orchestrators/MediaSessionBridge';
+import { MediaSessionBridgeContainer } from '@/features/player/mediaSession/MediaSessionBridgeContainer';
 
 configureAudioMode();
 registerJsKeepAliveTask();
@@ -38,7 +38,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
 	return (
 		<PlayerContext.Provider value={value}>
-			<MediaSessionBridge />
+			<MediaSessionBridgeContainer />
 			{children}
 		</PlayerContext.Provider>
 	);

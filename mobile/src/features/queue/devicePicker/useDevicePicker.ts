@@ -51,7 +51,7 @@ export function useDevicePicker(visible: boolean, onClose: () => void) {
 				if (!cancelled) setLoaded({ owners: picker.owners, phoneId: info.deviceId });
 			})
 			.catch(error => {
-				logger.error('[DevicePickerSheet] Loading devices failed:', error);
+				logger.error('[DevicePickerSheetContainer] Loading devices failed:', error);
 				if (!cancelled) setLoadError(true);
 			})
 			.finally(() => {

@@ -10,7 +10,7 @@ import * as friendsBridge from '@/shared/services/friendsBridge';
 import type { FriendUserSummary } from '@/shared/services/friendsBridge';
 import { showError, showSuccess } from '@/shared/utils/toast';
 import type { UserDeviceWithLicenses } from '@/features/music-control/types';
-import { MyDevicesOrchestrator } from './components/orchestrators/MyDevicesOrchestrator';
+import { MyDevicesContainer } from './components/orchestrators/MyDevicesContainer';
 import { logger } from '@/shared/utils/logger';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -122,7 +122,7 @@ async function renderLoaded(
 	fetchMock.mockResolvedValueOnce(ok({ devices }));
 	getFriends.mockResolvedValue(friends);
 	getPermissions.mockResolvedValue(allDevicesFriendIds);
-	render(<MyDevicesOrchestrator />);
+	render(<MyDevicesContainer />);
 	await screen.findByText(
 		'Choisissez quels amis peuvent contrôler la musique de chaque appareil',
 		{},
@@ -192,7 +192,7 @@ describe('MyDevicesScreen', () => {
 		getFriends.mockResolvedValue([alice]);
 		getPermissions.mockResolvedValue([]);
 
-		render(<MyDevicesOrchestrator />);
+		render(<MyDevicesContainer />);
 
 		await screen.findByText('Impossible de charger vos appareils', {}, FIRST_RENDER);
 		expect(showError).toHaveBeenCalledWith(
@@ -335,7 +335,7 @@ describe('MyDevicesScreen', () => {
 		getFriends.mockResolvedValue([alice]);
 		getPermissions.mockResolvedValue([]);
 
-		render(<MyDevicesOrchestrator />);
+		render(<MyDevicesContainer />);
 
 		expect(await screen.findByLabelText('Chargement', {}, FIRST_RENDER)).toBeTruthy();
 		expect(screen.queryByTestId('device-device-1')).toBeNull();

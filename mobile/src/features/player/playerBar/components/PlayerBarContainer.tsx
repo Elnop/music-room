@@ -1,0 +1,8 @@
+import React from 'react';
+import { usePlayerBar } from '@/features/player/playerBar/usePlayerBar';
+import { PlayerBarView } from '@/features/player/playerBar/components/presenters/PlayerBarView';
+
+export function PlayerBarContainer() {
+	const data = usePlayerBar();
+	return <PlayerBarView data={data} />;
+}

@@ -27,8 +27,8 @@ interface PlayerBarViewProps {
 export function PlayerBarView({ data }: PlayerBarViewProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
-	const QueueModal = getPlayerModal('QueueModal');
-	const DevicePickerSheet = getPlayerModal('DevicePickerSheet');
+	const QueueModalContainer = getPlayerModal('QueueModalContainer');
+	const DevicePickerSheetContainer = getPlayerModal('DevicePickerSheetContainer');
 	const { track } = data;
 	const sliderColors = {
 		slider: theme.colors.primary,
@@ -149,10 +149,10 @@ export function PlayerBarView({ data }: PlayerBarViewProps) {
 				/>
 			</View>
 
-			{QueueModal &&
-				React.createElement(QueueModal, { visible: data.isQueueOpen, onClose: data.onCloseQueue })}
-			{DevicePickerSheet &&
-				React.createElement(DevicePickerSheet, {
+			{QueueModalContainer &&
+				React.createElement(QueueModalContainer, { visible: data.isQueueOpen, onClose: data.onCloseQueue })}
+			{DevicePickerSheetContainer &&
+				React.createElement(DevicePickerSheetContainer, {
 					visible: data.isDevicesOpen,
 					onClose: data.onCloseDevices,
 				})}

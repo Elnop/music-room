@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { BottomTabBar, type BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { MiniPlayer } from '@/features/player/miniPlayer/components/orchestrators/MiniPlayer';
+import { MiniPlayerContainer } from '@/features/player/miniPlayer/components/MiniPlayerContainer';
 import { PixelWordmark } from '@/shared/components/media/PixelWordmark';
 import { PIXEL } from '@/shared/theme/tokens';
 import { SIDEBAR_WIDTH } from '@/shared/constants/layout';
@@ -19,7 +19,7 @@ export function AppTabBar(props: BottomTabBarProps) {
 	if (breakpoint === 'phone') {
 		return (
 			<View>
-				<MiniPlayer />
+				<MiniPlayerContainer />
 				<BottomTabBar {...props} />
 			</View>
 		);

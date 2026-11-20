@@ -7,9 +7,9 @@ import { Text } from '@/shared/components/ui/Text';
 
 const mockNavigate = jest.fn();
 
-jest.mock('@/features/player/miniPlayer/components/orchestrators/MiniPlayer', () => {
+jest.mock('@/features/player/miniPlayer/components/MiniPlayerContainer', () => {
 	const { Text: MockText } = jest.requireActual('@/shared/components/ui/Text');
-	return { MiniPlayer: () => <MockText>mini-player</MockText> };
+	return { MiniPlayerContainer: () => <MockText>mini-player</MockText> };
 });
 
 jest.mock('@react-navigation/bottom-tabs', () => {

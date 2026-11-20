@@ -55,7 +55,7 @@ export default {
 					if (hasNonTypeSpecifier) {
 						const isOrchestrator =
 							source.includes('/orchestrators/') ||
-							node.specifiers.some(s => s.imported?.name?.endsWith('Orchestrator'));
+							node.specifiers.some(s => /(Container|Layout|Page)$/.test(s.imported?.name ?? ''));
 						const isAllowed = isOrchestrator || source.endsWith('/types') || source.includes('/types/');
 						if (!isAllowed) {
 							context.report({

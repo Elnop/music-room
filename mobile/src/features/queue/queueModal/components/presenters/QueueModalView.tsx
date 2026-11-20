@@ -18,6 +18,7 @@ import { Text } from '@/shared/components/ui/Text';
 import ChevronDownSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/chevron-down-solid.svg';
 import PlaylistSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/playlist-solid.svg';
 import TimesSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/times-solid.svg';
+import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 
 interface QueueModalViewProps {
 	visible: boolean;
@@ -31,7 +32,7 @@ interface QueueModalViewProps {
 	onPlay: (itemId: string) => void;
 	onRemove: (itemId: string) => Promise<boolean>;
 	onReorder: (from: number, to: number) => Promise<void>;
-	onShowActions: (item: QueueItem) => void;
+	onShowActions: (item: QueueItem, anchor?: MenuAnchor) => void;
 	onCloseActions: () => void;
 }
 

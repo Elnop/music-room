@@ -28,9 +28,9 @@ export function NowPlayingPanelView({ data }: NowPlayingPanelViewProps) {
 	const separator = useSeparatorColor();
 	const factory = React.useCallback((theme: Theme) => createStyles(theme, separator), [separator]);
 	const { styles, theme } = useThemedStyles(factory);
-	const QueueModal = getPlayerModal('QueueModal');
-	const DevicePickerSheet = getPlayerModal('DevicePickerSheet');
-	const TrackActionsSheet = getTrackActionsSheet();
+	const QueueModalContainer = getPlayerModal('QueueModalContainer');
+	const DevicePickerSheetContainer = getPlayerModal('DevicePickerSheetContainer');
+	const TrackActionsSheetContainer = getTrackActionsSheet();
 	const { track } = data;
 
 	return (
@@ -97,15 +97,15 @@ export function NowPlayingPanelView({ data }: NowPlayingPanelViewProps) {
 				)}
 			</ScrollView>
 
-			{QueueModal &&
-				React.createElement(QueueModal, { visible: data.isQueueOpen, onClose: data.onCloseSheet })}
-			{DevicePickerSheet &&
-				React.createElement(DevicePickerSheet, {
+			{QueueModalContainer &&
+				React.createElement(QueueModalContainer, { visible: data.isQueueOpen, onClose: data.onCloseSheet })}
+			{DevicePickerSheetContainer &&
+				React.createElement(DevicePickerSheetContainer, {
 					visible: data.isDevicesOpen,
 					onClose: data.onCloseSheet,
 				})}
-			{TrackActionsSheet &&
-				React.createElement(TrackActionsSheet, {
+			{TrackActionsSheetContainer &&
+				React.createElement(TrackActionsSheetContainer, {
 					track: data.actions?.track ?? null,
 					start: data.actions?.start,
 					onClose: data.onCloseActions,

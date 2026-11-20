@@ -6,15 +6,15 @@ import RefreshSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/refresh
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
-import { useSocketStore } from '@/shared/stores/socketStore';
 import type { ConnectionStatus } from '@/shared/hooks/useConnectionStatus';
 import type { Theme } from '@/shared/theme/types';
-import { FIXED_COLORS } from '@/shared/theme/tokens';
+import { textColorOn } from '@/shared/components/feedback/textContrast';
 import { Text } from '@/shared/components/ui/Text';
 
 interface ConnectionBannerProps {
 	status: ConnectionStatus;
 	topInset: number;
+	onRetry: () => void;
 }
 
 const COPY: Record<NonNullable<ConnectionStatus>, string> = {
@@ -29,35 +29,8 @@ const ICONS: Record<NonNullable<ConnectionStatus>, PixelIconSource> = {
 	failed: ExclamationTriangleSolid,
 };
 
-const DARK_TEXT = FIXED_COLORS.inkDark;
-const LIGHT_TEXT = FIXED_COLORS.inkLight;
-
-function luminance(hex: string): number {
-	const [r, g, b] = [1, 3, 5].map(i => {
-		const c = parseInt(hex.slice(i, i + 2), 16) / 255;
-		return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
-	});
-	return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-}
-
-const contrast = (a: string, b: string) => {
-	const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
-	return (hi + 0.05) / (lo + 0.05);
-};
-
-export function textColorOn(background: string): string {
-	return contrast(background, DARK_TEXT) >= contrast(background, LIGHT_TEXT)
-		? DARK_TEXT
-		: LIGHT_TEXT;
-}
-
-export function isDarkBackground(background: string): boolean {
-	return textColorOn(background) === LIGHT_TEXT;
-}
-
-export function ConnectionBanner({ status, topInset }: ConnectionBannerProps) {
+export function ConnectionBanner({ status, topInset, onRetry }: ConnectionBannerProps) {
 	const { theme } = useTheme();
-	const retry = useSocketStore(state => state.retry);
 	const styles = React.useMemo(() => createStyles(theme, topInset), [theme, topInset]);
 
 	if (!status) return null;
@@ -78,7 +51,7 @@ export function ConnectionBanner({ status, topInset }: ConnectionBannerProps) {
 				<Text style={[styles.text, { color }]}>{COPY[status]}</Text>
 				{failed && (
 					<Pressable
-						onPress={retry}
+						onPress={onRetry}
 						accessibilityLabel="Réessayer"
 						hitSlop={8}
 						style={[styles.button, { backgroundColor: color }]}

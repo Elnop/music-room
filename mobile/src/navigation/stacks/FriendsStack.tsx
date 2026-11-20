@@ -2,10 +2,10 @@ import React from 'react';
 import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '@/shared/theme/ThemeContext';
-import { FriendsOrchestrator } from '@/features/friends/friendsList/components/orchestrators/FriendsOrchestrator';
-import { UserProfileOrchestrator } from '@/features/friends/userProfile/components/orchestrators/UserProfileOrchestrator';
-import { PlaylistDetailOrchestrator } from '@/features/playlists/detail/components/orchestrators/PlaylistDetailOrchestrator';
-import { SearchTracksOrchestrator } from '@/features/playlists/searchTracks/components/orchestrators/SearchTracksOrchestrator';
+import { FriendsContainer } from '@/features/friends/friendsList/components/FriendsContainer';
+import { UserProfileContainer } from '@/features/friends/userProfile/components/UserProfileContainer';
+import { PlaylistDetailContainer } from '@/features/playlists/detail/components/orchestrators/PlaylistDetailContainer';
+import { SearchTracksContainer } from '@/features/playlists/searchTracks/components/SearchTracksContainer';
 import type { FriendsStackParamList } from '@/features/friends/types';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { screenHeader, screenLayout } from '@/navigation/screenLayout';
@@ -37,22 +37,22 @@ export function FriendsNavigator() {
 		>
 			<FriendsStack.Screen
 				name="Friends"
-				component={FriendsOrchestrator}
+				component={FriendsContainer}
 				options={{ title: 'Amis' }}
 			/>
 			<FriendsStack.Screen
 				name="UserProfile"
-				component={UserProfileOrchestrator}
+				component={UserProfileContainer}
 				options={{ title: '', headerTitle: '' }}
 			/>
 			<FriendsStack.Screen
 				name="PlaylistDetail"
-				component={PlaylistDetailOrchestrator}
+				component={PlaylistDetailContainer}
 				options={{ headerShown: false }}
 			/>
 			<FriendsStack.Screen
 				name="SearchTracks"
-				component={SearchTracksOrchestrator}
+				component={SearchTracksContainer}
 				options={{ title: 'Ajouter des musiques' }}
 			/>
 		</FriendsStack.Navigator>

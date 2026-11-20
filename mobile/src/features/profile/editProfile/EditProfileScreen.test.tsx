@@ -1,7 +1,7 @@
 import React from 'react';
 import { Alert } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { EditProfileOrchestrator } from './components/orchestrators/EditProfileOrchestrator';
+import { EditProfileContainer } from '@/features/profile/editProfile/components/EditProfileContainer';
 
 const mockPickAndUpload = jest.fn();
 const mockRemove = jest.fn();
@@ -50,7 +50,7 @@ jest.mock('@/features/profile/hooks/useProfileMutations', () => ({
 type AlertButtons = NonNullable<Parameters<typeof Alert.alert>[2]>;
 
 function openMenu(): AlertButtons {
-	render(<EditProfileOrchestrator />);
+	render(<EditProfileContainer />);
 	fireEvent.press(screen.getByText('Changer la photo'));
 	expect(Alert.alert).toHaveBeenCalledWith(
 		'Photo de profil',
@@ -100,7 +100,7 @@ describe('EditProfileScreen profile photo (#351)', () => {
 
 	it('shows a spinner over the avatar while uploading', () => {
 		mockPicker.isUploading = true;
-		render(<EditProfileOrchestrator />);
+		render(<EditProfileContainer />);
 		expect(screen.getByTestId('avatar-uploading')).toBeTruthy();
 	});
 });

@@ -281,15 +281,14 @@ The app has a single theme, `original` (`src/shared/theme/original.theme.ts`), r
 
 Icons are `PixelIcon` (`src/shared/components/media/PixelIcon.tsx`), which draws an SVG of the [HackerNoon Pixel Icon Library](https://github.com/hackernoon/pixel-icon-library) with `react-native-svg`, filled with the requested colour. Each file imports the SVGs it uses straight from the npm package (`import PlaySolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/play-solid.svg'`) and passes the component: `<PixelIcon icon={PlaySolid} color={...} />`. `react-native-svg-transformer` (`metro.config.cjs`) turns each import into a component. There is no central list: only the icons a screen imports end up in the bundle.
 
-### Component roles (in-house ESLint plugin)
+### Component roles
 
 Component roles are checked automatically, without exception (#386, documentation: `.agents/rules/components.md`):
 
 - **`components/screen-orchestrator-only`**: a navigation screen only imports orchestrators from `features/`, never presenters.
-- **`components/presenter-pure`**: a presenter is a pure view (props in, JSX out): no state (`useState`), no effect (`useEffect`), no Zustand store, no TanStack query, no direct network call.
+- **Roles by name** (dependency-cruiser, `@brutalway/dependency-cruiser-config`): an orchestrator is named `XContainer`; any other component is a presenter, which reaches no Zustand store and no TanStack query through any chain of imports, and renders no orchestrator.
 - **`components/hook-no-jsx`**: a hook contains no JSX element or fragment (logic only).
 - **`components/one-component-per-file`**: at most one React component per source file.
-- **`components/component-role-directory`**: every component of a feature lives in `features/<feature>/<subject>/components/orchestrators/` or `.../components/presenters/`, a React provider in `features/<feature>/context/`.
 - **`components/orchestrator-no-fetch`**: an orchestrator leaves network calls to TanStack Query or service hooks, with no direct `fetch`.
 
 ### Hot reload

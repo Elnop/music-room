@@ -1,0 +1,26 @@
+import React from 'react';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { AuthStackParamList } from '@/features/auth/types';
+import { useEmailVerification } from '@/features/auth/emailVerification/useEmailVerification';
+import { EmailVerificationView } from './EmailVerificationView';
+
+type EmailVerificationOrchestratorProps = NativeStackScreenProps<
+	AuthStackParamList,
+	'EmailVerification'
+>;
+
+export function EmailVerificationContainer({
+	route,
+	navigation,
+}: EmailVerificationOrchestratorProps) {
+	const { userId, email } = route.params;
+	const verification = useEmailVerification(userId, email);
+
+	return (
+		<EmailVerificationView
+			email={email}
+			verification={verification}
+			onBackToLogin={() => navigation.navigate('Login')}
+		/>
+	);
+}

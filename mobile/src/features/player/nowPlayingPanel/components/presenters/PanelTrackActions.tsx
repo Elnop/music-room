@@ -2,7 +2,8 @@ import React, { useRef } from 'react';
 import { View } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { useTheme } from '@/shared/theme/ThemeContext';
-import { useAnchoredPress } from '@/shared/hooks/useAnchoredPress';
+import { useMeasuredPress } from '@/shared/hooks/useMeasuredPress';
+import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Text } from '@/shared/components/ui/Text';
 import { ShareLinkButton } from '@/shared/components/sharing/ShareLinkButton';
@@ -14,8 +15,8 @@ interface PanelTrackActionsProps {
 	title: string;
 	shareUrl: string;
 	styles: NowPlayingPanelStyles;
-	onAddToPlaylist: () => void;
-	onMoreActions: () => void;
+	onAddToPlaylist: (anchor?: MenuAnchor) => void;
+	onMoreActions: (anchor?: MenuAnchor) => void;
 }
 
 export function PanelTrackActions({
@@ -27,7 +28,7 @@ export function PanelTrackActions({
 }: PanelTrackActionsProps) {
 	const { theme } = useTheme();
 	const addButton = useRef<View>(null);
-	const pressAdd = useAnchoredPress(addButton, onAddToPlaylist);
+	const pressAdd = useMeasuredPress(addButton, onAddToPlaylist);
 
 	return (
 		<View style={styles.actions}>

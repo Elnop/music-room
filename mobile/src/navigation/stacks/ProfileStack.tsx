@@ -2,14 +2,14 @@ import React from 'react';
 import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '@/shared/theme/ThemeContext';
-import { ProfileOrchestrator } from '@/features/profile/profileScreen/components/orchestrators/ProfileOrchestrator';
-import { EditProfileOrchestrator } from '@/features/profile/editProfile/components/orchestrators/EditProfileOrchestrator';
-import { PrivacySettingsOrchestrator } from '@/features/profile/privacySettings/components/orchestrators/PrivacySettingsOrchestrator';
-import { LinkedAccountsOrchestrator } from '@/features/profile/linkedAccounts/components/orchestrators/LinkedAccountsOrchestrator';
-import { MusicPreferencesOrchestrator } from '@/features/profile/musicPreferences/components/orchestrators/MusicPreferencesOrchestrator';
-import { SettingsOrchestrator } from '@/features/profile/settings/components/orchestrators/SettingsOrchestrator';
-import { MyDevicesOrchestrator } from '@/features/music-control/myDevices/components/orchestrators/MyDevicesOrchestrator';
-import { PrivacyPolicyOrchestrator } from '@/features/legal/privacyPolicy/components/orchestrators/PrivacyPolicyOrchestrator';
+import { ProfileContainer } from '@/features/profile/profileScreen/components/ProfileContainer';
+import { EditProfileContainer } from '@/features/profile/editProfile/components/EditProfileContainer';
+import { PrivacySettingsContainer } from '@/features/profile/privacySettings/components/PrivacySettingsContainer';
+import { LinkedAccountsContainer } from '@/features/profile/linkedAccounts/components/LinkedAccountsContainer';
+import { MusicPreferencesContainer } from '@/features/profile/musicPreferences/components/MusicPreferencesContainer';
+import { SettingsContainer } from '@/features/profile/settings/components/SettingsContainer';
+import { MyDevicesContainer } from '@/features/music-control/myDevices/components/orchestrators/MyDevicesContainer';
+import { PrivacyPolicyContainer } from '@/features/legal/privacyPolicy/components/PrivacyPolicyContainer';
 import type { ProfileStackParamList } from '@/features/profile/types';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { screenHeader, screenLayout } from '@/navigation/screenLayout';
@@ -39,43 +39,43 @@ export function ProfileNavigator() {
 		>
 			<ProfileStack.Screen
 				name="Profile"
-				component={ProfileOrchestrator}
+				component={ProfileContainer}
 				// Wide screens show the title and the header's actions in the profile's own header.
 				options={{ title: 'Mon Profil', headerShown: !isWide }}
 			/>
 			<ProfileStack.Screen
 				name="EditProfile"
-				component={EditProfileOrchestrator}
+				component={EditProfileContainer}
 				options={{ title: 'Éditer le profil' }}
 			/>
 			<ProfileStack.Screen
 				name="PrivacySettings"
-				component={PrivacySettingsOrchestrator}
+				component={PrivacySettingsContainer}
 				options={{ title: 'Confidentialité' }}
 			/>
 			<ProfileStack.Screen
 				name="LinkedAccounts"
-				component={LinkedAccountsOrchestrator}
+				component={LinkedAccountsContainer}
 				options={{ title: 'Comptes liés' }}
 			/>
 			<ProfileStack.Screen
 				name="MyDevices"
-				component={MyDevicesOrchestrator}
+				component={MyDevicesContainer}
 				options={{ title: 'Mes appareils' }}
 			/>
 			<ProfileStack.Screen
 				name="MusicPreferences"
-				component={MusicPreferencesOrchestrator}
+				component={MusicPreferencesContainer}
 				options={{ title: 'Préférences musicales' }}
 			/>
 			<ProfileStack.Screen
 				name="Settings"
-				component={SettingsOrchestrator}
+				component={SettingsContainer}
 				options={{ title: 'Réglages' }}
 			/>
 			<ProfileStack.Screen
 				name="PrivacyPolicy"
-				component={PrivacyPolicyOrchestrator}
+				component={PrivacyPolicyContainer}
 				options={{ title: 'Politique de confidentialité' }}
 			/>
 		</ProfileStack.Navigator>

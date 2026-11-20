@@ -8,6 +8,8 @@ import { createModalStyles } from '@/features/queue/queueModal/components/presen
 import type { QueueItem } from '@/features/queue/types';
 import type { AddQueueItemBody } from '@/shared/types/playback';
 import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
+import { recordMenuAnchor } from '@/shared/stores/menuAnchorStore';
+import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 
 export function useQueueModal() {
 	const { theme } = useTheme();
@@ -25,7 +27,8 @@ export function useQueueModal() {
 	const [isMoving, setIsMoving] = React.useState(false);
 	const [actionTrack, setActionTrack] = React.useState<AddQueueItemBody | null>(null);
 
-	const showActions = React.useCallback((item: QueueItem) => {
+	const showActions = React.useCallback((item: QueueItem, anchor?: MenuAnchor) => {
+		recordMenuAnchor(anchor);
 		setActionTrack(toTrackInput(item.track));
 	}, []);
 

@@ -1,6 +1,6 @@
 import React from 'react';
-import { RowSkeletonLayout } from './RowSkeletonLayout';
+import { SkeletonRow } from './SkeletonRow';
 
 export function UserRowSkeleton() {
-	return <RowSkeletonLayout radius={24} firstWidth="55%" secondWidth="35%" />;
+	return <SkeletonRow radius={24} firstWidth="55%" secondWidth="35%" />;
 }

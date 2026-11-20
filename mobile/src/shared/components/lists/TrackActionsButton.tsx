@@ -2,18 +2,19 @@ import React, { useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { Pressable } from '@/shared/components/ui/Pressable';
-import { useAnchoredPress } from '@/shared/hooks/useAnchoredPress';
+import { useMeasuredPress } from '@/shared/hooks/useMeasuredPress';
+import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import EllipsesHorizontalSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/ellipses-horizontal-solid.svg';
 
 interface TrackActionsButtonProps {
-	onPress: () => void;
+	onPress: (anchor?: MenuAnchor) => void;
 }
 
 export function TrackActionsButton({ onPress }: TrackActionsButtonProps) {
 	const { theme } = useTheme();
 	const button = useRef<View>(null);
-	const press = useAnchoredPress(button, onPress);
+	const press = useMeasuredPress(button, onPress);
 	return (
 		<View ref={button} collapsable={false}>
 			<Pressable onPress={press} hitSlop={10} style={styles.button} accessibilityLabel="Actions">

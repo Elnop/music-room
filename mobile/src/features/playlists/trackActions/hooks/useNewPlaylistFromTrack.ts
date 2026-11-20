@@ -9,8 +9,8 @@ import { useAddTrack } from '@/features/playlists/hooks/useTrackEdits';
 import { playlistFormSchema } from '@/features/playlists/validators';
 import type { Playlist } from '@/features/playlists/types';
 import type { AddQueueItemBody } from '@/shared/types/playback';
+import { PLAYLIST_NAME_MAX } from '@/features/playlists/trackActions/utils/playlistName';
 
-export const PLAYLIST_NAME_MAX = 50;
 
 export interface NewPlaylistDraft {
 	name: string;
@@ -45,7 +45,7 @@ export function useNewPlaylistFromTrack(
 		try {
 			created = await create.mutateAsync({ name: parsed.data });
 		} catch (failure) {
-			logger.error('[TrackActionsSheet] Create playlist failed:', failure);
+			logger.error('[TrackActionsSheetContainer] Create playlist failed:', failure);
 			setError(apiErrorMessage(failure, 'Impossible de créer la playlist'));
 			setCreating(false);
 			return;
@@ -56,7 +56,7 @@ export function useNewPlaylistFromTrack(
 			await addTrack.mutateAsync({ playlistId: created.id, track });
 			showSuccess(`Ajouté à « ${created.name} »`);
 		} catch (failure) {
-			logger.error('[TrackActionsSheet] Add to new playlist failed:', failure);
+			logger.error('[TrackActionsSheetContainer] Add to new playlist failed:', failure);
 			showError(`Playlist « ${created.name} » créée, mais le titre n'a pas pu y être ajouté`);
 		}
 		// The list holds the playlist since its creation, with no track yet.

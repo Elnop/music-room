@@ -2,7 +2,7 @@ import React from 'react';
 import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '@/shared/theme/ThemeContext';
-import { SearchOrchestrator } from '@/features/search/searchScreen/components/orchestrators/SearchOrchestrator';
+import { SearchContainer } from '@/features/search/searchScreen/components/SearchContainer';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { screenHeader, screenLayout } from '@/navigation/screenLayout';
 import { headerTitle } from '@/shared/theme/pixelFrame';
@@ -35,7 +35,7 @@ export function SearchNavigator() {
 		>
 			<SearchStack.Screen
 				name="Search"
-				component={SearchOrchestrator}
+				component={SearchContainer}
 				options={{ title: 'Recherche' }}
 			/>
 		</SearchStack.Navigator>

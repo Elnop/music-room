@@ -16,6 +16,7 @@ import BarsSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/bars-solid
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 import PlaySolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/play-solid.svg';
 import SoundOnSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/sound-on-solid.svg';
+import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 
 interface TrackTableRowProps {
 	track: Track;
@@ -25,7 +26,7 @@ interface TrackTableRowProps {
 	unavailable: boolean;
 	isDragActive: boolean;
 	onPress?: () => void;
-	onShowActions?: () => void;
+	onShowActions?: (anchor?: MenuAnchor) => void;
 	onDragStart?: () => void;
 }
 
@@ -60,7 +61,7 @@ export function TrackTableRow({
 			{/* The row's buttons sit beside its pressable area, never in it: the web nests no <button>. */}
 			<Pressable
 				onPress={onPress}
-				onLongPress={onShowActions}
+				onLongPress={onShowActions ? () => onShowActions() : undefined}
 				accessibilityLabel={`${position}. ${track.title}, ${track.artist}${unavailable ? ', indisponible' : ''}`}
 				accessibilityState={{ selected: isCurrent, busy: isPending, disabled: unavailable }}
 				style={styles.pressable}

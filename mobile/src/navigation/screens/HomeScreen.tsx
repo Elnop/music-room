@@ -1,19 +1,19 @@
 import React from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { PlaylistStackParamList } from '@/features/playlists/types';
-import { HomeOrchestrator } from '@/features/playlists/home/components/orchestrators/HomeOrchestrator';
-import { NearbyEventsOrchestrator } from '@/features/events/nearby/components/orchestrators/NearbyEventsOrchestrator';
-import { SimilarProfilesOrchestrator } from '@/features/friends/similarProfiles/components/orchestrators/SimilarProfilesOrchestrator';
+import { HomeContainer } from '@/features/playlists/home/components/HomeContainer';
+import { NearbyEventsContainer } from '@/features/events/nearby/components/NearbyEventsContainer';
+import { SimilarProfilesContainer } from '@/features/friends/similarProfiles/components/SimilarProfilesContainer';
 
 type HomeScreenProps = NativeStackScreenProps<PlaylistStackParamList, 'Home'>;
 
 /** Features never import each other, so the events and profiles sections are passed in here. */
 export function HomeScreen(props: HomeScreenProps) {
 	return (
-		<HomeOrchestrator
+		<HomeContainer
 			{...props}
-			nearbyEvents={<NearbyEventsOrchestrator />}
-			similarProfiles={<SimilarProfilesOrchestrator />}
+			nearbyEvents={<NearbyEventsContainer />}
+			similarProfiles={<SimilarProfilesContainer />}
 		/>
 	);
 }

@@ -14,7 +14,7 @@ import { formatDocumentTitle } from './documentTitle';
 import { useAuthStore } from '@/features/auth/stores/authStore';
 import { useSocketStore } from '@/shared/stores/socketStore';
 import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
-import { isDarkBackground } from '@/shared/components/feedback/ConnectionBanner';
+import { isDarkBackground } from '@/shared/components/feedback/textContrast';
 import { useMusicControlEmitter } from '@/features/music-control/hooks/useMusicControlEmitter';
 import { loadBackendUrl } from '@/shared/services/backendUrl';
 import { logger } from '@/shared/utils/logger';

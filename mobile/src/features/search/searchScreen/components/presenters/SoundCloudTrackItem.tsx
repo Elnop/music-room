@@ -13,12 +13,13 @@ import { pixelRow } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 import type { SoundCloudTrack } from '@/features/search/types';
 import { Text } from '@/shared/components/ui/Text';
+import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 
 interface SoundCloudTrackItemProps {
 	track: SoundCloudTrack;
 	onPlay: (track: SoundCloudTrack) => void;
 	onAddToQueue: (track: SoundCloudTrack) => void;
-	onShowActions: (track: SoundCloudTrack) => void;
+	onShowActions: (track: SoundCloudTrack, anchor?: MenuAnchor) => void;
 }
 
 export function SoundCloudTrackItem({
@@ -58,7 +59,7 @@ export function SoundCloudTrackItem({
 					</View>
 					<Text style={styles.duration}>{formatDuration(track.duration)}</Text>
 				</Pressable>
-				<TrackActionsButton onPress={() => onShowActions(track)} />
+				<TrackActionsButton onPress={anchor => onShowActions(track, anchor)} />
 			</View>
 		</QueueSwipe>
 	);

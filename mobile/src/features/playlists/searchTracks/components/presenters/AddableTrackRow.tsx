@@ -15,13 +15,14 @@ import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import { Text } from '@/shared/components/ui/Text';
 import CheckSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/check-solid.svg';
 import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
+import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 
 interface AddableTrackRowProps {
 	track: SoundCloudTrack;
 	isAdded: boolean;
 	onAdd: (track: SoundCloudTrack) => void;
 	onAddToQueue: (track: SoundCloudTrack) => void;
-	onShowActions: (track: SoundCloudTrack) => void;
+	onShowActions: (track: SoundCloudTrack, anchor?: MenuAnchor) => void;
 }
 
 /** Memoized: adding one track redraws that row only, so its check shows at once. */
@@ -62,7 +63,7 @@ export const AddableTrackRow = React.memo(function AddableTrackRow({
 							<Text style={styles.trackDuration}>{formatDuration(track.duration)}</Text>
 						</View>
 					</View>
-					<TrackActionsButton onPress={() => onShowActions(track)} />
+					<TrackActionsButton onPress={anchor => onShowActions(track, anchor)} />
 					<View style={[styles.addButton, isAdded && styles.addedButton]}>
 						<PixelIcon
 							icon={isAdded ? CheckSolid : PlusSolid}

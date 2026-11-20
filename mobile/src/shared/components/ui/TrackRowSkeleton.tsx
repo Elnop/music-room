@@ -1,6 +1,6 @@
 import React from 'react';
-import { RowSkeletonLayout } from './RowSkeletonLayout';
+import { SkeletonRow } from './SkeletonRow';
 
 export function TrackRowSkeleton() {
-	return <RowSkeletonLayout radius={4} firstWidth="70%" secondWidth="45%" />;
+	return <SkeletonRow radius={4} firstWidth="70%" secondWidth="45%" />;
 }

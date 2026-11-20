@@ -25,8 +25,8 @@ interface PlayerModalViewProps {
 }
 
 export function PlayerModalView({ modal, gestures, seek, carousel }: PlayerModalViewProps) {
-	const QueueModal = getPlayerModal('QueueModal');
-	const DevicePickerSheet = getPlayerModal('DevicePickerSheet');
+	const QueueModalContainer = getPlayerModal('QueueModalContainer');
+	const DevicePickerSheetContainer = getPlayerModal('DevicePickerSheetContainer');
 	// Desktop has the now playing panel instead; a tablet browser centres the player over the app.
 	const { isDesktop, width } = useBreakpoint();
 	const dialog = isPlayerDialog(width);
@@ -123,13 +123,13 @@ export function PlayerModalView({ modal, gestures, seek, carousel }: PlayerModal
 					</Animated.View>
 				</GestureDetector>
 
-				{QueueModal &&
-					React.createElement(QueueModal, {
+				{QueueModalContainer &&
+					React.createElement(QueueModalContainer, {
 						visible: modal.isModalOpen && !isDesktop && modal.isQueueOpen,
 						onClose: () => modal.setQueueOpen(false),
 					})}
-				{DevicePickerSheet &&
-					React.createElement(DevicePickerSheet, {
+				{DevicePickerSheetContainer &&
+					React.createElement(DevicePickerSheetContainer, {
 						visible: modal.isModalOpen && !isDesktop && modal.isDevicesOpen,
 						onClose: () => modal.setDevicesOpen(false),
 					})}

@@ -69,9 +69,9 @@ function mockPlayerFor(url: string): MockPlayer {
 	return player;
 }
 
-// The system media controls are covered by MediaSessionBridge.test.tsx.
-jest.mock('@/features/player/mediaSession/components/orchestrators/MediaSessionBridge', () => ({
-	MediaSessionBridge: () => null,
+// The system media controls are covered by MediaSessionBridgeContainer.test.tsx.
+jest.mock('@/features/player/mediaSession/MediaSessionBridgeContainer', () => ({
+	MediaSessionBridgeContainer: () => null,
 }));
 
 jest.mock('expo-audio', () => ({

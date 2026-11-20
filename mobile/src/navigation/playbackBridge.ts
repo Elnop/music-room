@@ -8,9 +8,9 @@ import { readPositionMs, usePlayerStore } from '@/features/player/stores/playerS
 import { useConnectStore } from '@/features/queue/stores/connectStore';
 import { useActiveQueue, useQueueStore } from '@/features/queue/stores/queueStore';
 import { selectPlaysPlaylist } from '@/features/queue/utils/queueSelectors';
-import { QueueModal } from '@/features/queue/queueModal/components/orchestrators/QueueModal';
-import { DevicePickerSheet } from '@/features/queue/devicePicker/components/orchestrators/DevicePickerSheet';
-import { TrackActionsSheet } from '@/features/playlists/trackActions/components/orchestrators/TrackActionsSheet';
+import { QueueModalContainer } from '@/features/queue/queueModal/components/QueueModalContainer';
+import { DevicePickerSheetContainer } from '@/features/queue/devicePicker/components/DevicePickerSheetContainer';
+import { TrackActionsSheetContainer } from '@/features/playlists/trackActions/components/TrackActionsSheetContainer';
 
 /** Lets playlists reach the player and queue without importing them. */
 export function registerPlayback(): void {
@@ -71,11 +71,11 @@ export function registerPlayback(): void {
 	});
 
 	registerPlayerModals({
-		QueueModal,
-		DevicePickerSheet,
+		QueueModalContainer,
+		DevicePickerSheetContainer,
 	});
 
-	registerTrackActionsSheet(TrackActionsSheet);
+	registerTrackActionsSheet(TrackActionsSheetContainer);
 
 	registerFriendsBridge({
 		getFriends: token => friendsApi.getFriends(token),

@@ -1,7 +1,7 @@
 import React, { type ReactElement } from 'react';
 import { Alert, useWindowDimensions } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { ProfileOrchestrator } from './components/orchestrators/ProfileOrchestrator';
+import { ProfileContainer } from '@/features/profile/profileScreen/components/ProfileContainer';
 
 const mockLogout = jest.fn();
 const mockNavigate = jest.fn();
@@ -57,7 +57,7 @@ describe('ProfileScreen logout', () => {
 	});
 
 	const pressLogout = (): AlertButtons => {
-		render(<ProfileOrchestrator />);
+		render(<ProfileContainer />);
 		fireEvent.press(screen.getByText('Se déconnecter'));
 		expect(Alert.alert).toHaveBeenCalledWith('Se déconnecter ?', expect.any(String), [
 			expect.objectContaining({ text: 'Annuler', style: 'cancel' }),
@@ -90,7 +90,7 @@ describe('ProfileScreen header', () => {
 	});
 
 	const renderHeader = () => {
-		render(<ProfileOrchestrator />);
+		render(<ProfileContainer />);
 		const { headerRight } = mockSetOptions.mock.calls.at(-1)[0] as {
 			headerRight: () => ReactElement;
 		};
@@ -112,7 +112,7 @@ describe('ProfileScreen header', () => {
 
 describe('ProfileScreen build label', () => {
 	it('shows the installed build at the bottom of the profile, as its only version', () => {
-		render(<ProfileOrchestrator />);
+		render(<ProfileContainer />);
 		expect(screen.getByText('Zumik 1.0.0 (build 42 · a1b2c3d)')).toBeTruthy();
 		expect(screen.queryByText('Zumik v1.0.0')).toBeNull();
 	});
@@ -133,14 +133,14 @@ describe('ProfileScreen on wide screens', () => {
 	});
 
 	it('offers editing and settings as buttons of its own header', () => {
-		render(<ProfileOrchestrator />);
+		render(<ProfileContainer />);
 		fireEvent.press(screen.getByRole('button', { name: 'Modifier le profil' }));
 		fireEvent.press(screen.getByRole('button', { name: 'Réglages' }));
 		expect(mockNavigate.mock.calls).toEqual([['EditProfile'], ['Settings']]);
 	});
 
 	it('shows a single version label, the build one', () => {
-		render(<ProfileOrchestrator />);
+		render(<ProfileContainer />);
 		expect(screen.getByText('Zumik 1.0.0 (build 42 · a1b2c3d)')).toBeTruthy();
 		expect(screen.queryByText('Zumik v1.0.0')).toBeNull();
 	});

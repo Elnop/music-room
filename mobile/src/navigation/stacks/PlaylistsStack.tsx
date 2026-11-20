@@ -4,13 +4,13 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { PlaylistStackParamList } from '@/features/playlists/types';
 import type { EventStackParamList } from '@/features/events/types';
-import { LibraryOrchestrator } from '@/features/playlists/library/components/orchestrators/LibraryOrchestrator';
-import { PlaylistDetailOrchestrator } from '@/features/playlists/detail/components/orchestrators/PlaylistDetailOrchestrator';
-import { PlaylistFormOrchestrator } from '@/features/playlists/form/components/orchestrators/PlaylistFormOrchestrator';
-import { SearchTracksOrchestrator } from '@/features/playlists/searchTracks/components/orchestrators/SearchTracksOrchestrator';
-import { PlaylistSharingOrchestrator } from '@/features/playlists/sharing/components/orchestrators/PlaylistSharingOrchestrator';
-import { EventDetailOrchestrator } from '@/features/events/detail/components/orchestrators/EventDetailOrchestrator';
-import { EventFormOrchestrator } from '@/features/events/form/components/orchestrators/EventFormOrchestrator';
+import { LibraryContainer } from '@/features/playlists/library/components/LibraryContainer';
+import { PlaylistDetailContainer } from '@/features/playlists/detail/components/orchestrators/PlaylistDetailContainer';
+import { PlaylistFormContainer } from '@/features/playlists/form/components/PlaylistFormContainer';
+import { SearchTracksContainer } from '@/features/playlists/searchTracks/components/SearchTracksContainer';
+import { PlaylistSharingContainer } from '@/features/playlists/sharing/components/PlaylistSharingContainer';
+import { EventDetailContainer } from '@/features/events/detail/components/EventDetailContainer';
+import { EventFormContainer } from '@/features/events/form/components/EventFormContainer';
 import { HomeScreen } from '@/navigation/screens/HomeScreen';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { screenHeader, screenLayout } from '@/navigation/screenLayout';
@@ -48,12 +48,12 @@ export function PlaylistsNavigator({ initialRouteName }: PlaylistsNavigatorProps
 			<PlaylistStack.Screen name="Home" component={HomeScreen} options={{ title: 'Accueil' }} />
 			<PlaylistStack.Screen
 				name="Playlists"
-				component={LibraryOrchestrator}
+				component={LibraryContainer}
 				options={{ title: 'Playlists' }}
 			/>
 			<PlaylistStack.Screen
 				name="PlaylistDetail"
-				component={PlaylistDetailOrchestrator}
+				component={PlaylistDetailContainer}
 				options={{
 					headerTransparent: true,
 					headerBlurEffect: undefined,
@@ -63,29 +63,29 @@ export function PlaylistsNavigator({ initialRouteName }: PlaylistsNavigatorProps
 			/>
 			<PlaylistStack.Screen
 				name="CreatePlaylist"
-				component={PlaylistFormOrchestrator}
+				component={PlaylistFormContainer}
 				options={({ route }) => ({
 					title: route.params?.playlistId ? 'Modifier la playlist' : 'Nouvelle Playlist',
 				})}
 			/>
 			<PlaylistStack.Screen
 				name="SearchTracks"
-				component={SearchTracksOrchestrator}
+				component={SearchTracksContainer}
 				options={{ title: 'Ajouter des titres' }}
 			/>
 			<PlaylistStack.Screen
 				name="PlaylistSharing"
-				component={PlaylistSharingOrchestrator}
+				component={PlaylistSharingContainer}
 				options={{ title: 'Visibilité et droits' }}
 			/>
 			<PlaylistStack.Screen
 				name="EventDetail"
-				component={EventDetailOrchestrator}
+				component={EventDetailContainer}
 				options={{ title: 'Événement' }}
 			/>
 			<PlaylistStack.Screen
 				name="EventForm"
-				component={EventFormOrchestrator}
+				component={EventFormContainer}
 				options={({ route }) => ({
 					title: route.params?.eventId ? "Modifier l'événement" : 'Nouvel événement',
 				})}

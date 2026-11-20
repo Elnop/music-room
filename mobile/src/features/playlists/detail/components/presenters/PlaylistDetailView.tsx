@@ -59,7 +59,7 @@ export function PlaylistDetailView({
 						onDelete={() => tracks.deleteTrack(item.id)}
 						disabled={!canEdit}
 						onAddToQueue={() => tracks.addToQueue(item)}
-						onShowActions={() => tracks.showActions(item)}
+						onShowActions={anchor => tracks.showActions(item, anchor)}
 						onDragStart={canEdit ? drag : undefined}
 						isDragActive={isActive}
 						isCurrent={currentUri !== null && item.trackUri === currentUri}

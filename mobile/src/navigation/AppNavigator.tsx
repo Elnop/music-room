@@ -21,19 +21,20 @@ import { SearchNavigator } from '@/navigation/stacks/SearchStack';
 import { FriendsNavigator, type FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
 
 import { AppTabBar } from './AppTabBar';
-import { PlayerModal } from '@/features/player/modal/components/orchestrators/PlayerModal';
-import { PlayerErrorToast } from '@/features/player/modal/components/orchestrators/PlayerErrorToast';
+import { PlayerModalContainer } from '@/features/player/modal/components/orchestrators/PlayerModalContainer';
+import { PlayerErrorToastContainer } from '@/features/player/modal/components/orchestrators/PlayerErrorToastContainer';
 import { PlayerProvider } from '@/features/player/context/PlayerProvider';
 import { useQueueSync } from '@/features/queue/hooks/useQueueSync';
 import { useEventsSync } from '@/features/events/hooks/useEventsSync';
 import { useRemoteTarget } from '@/features/queue/hooks/useRemoteTarget';
 import { useConnectionStatus } from '@/shared/hooks/useConnectionStatus';
 import { ConnectionBanner } from '@/shared/components/feedback/ConnectionBanner';
+import { useSocketStore } from '@/shared/stores/socketStore';
 import { TAB_BAR_HEIGHT } from '@/shared/constants/layout';
 import { useBreakpoint, type Breakpoint } from '@/shared/hooks/useBreakpoint';
-import { MiniPlayer } from '@/features/player/miniPlayer/components/orchestrators/MiniPlayer';
-import { PlayerBar } from '@/features/player/playerBar/components/orchestrators/PlayerBar';
-import { NowPlayingPanel } from '@/features/player/nowPlayingPanel/components/orchestrators/NowPlayingPanel';
+import { MiniPlayerContainer } from '@/features/player/miniPlayer/components/MiniPlayerContainer';
+import { PlayerBarContainer } from '@/features/player/playerBar/components/PlayerBarContainer';
+import { NowPlayingPanelContainer } from '@/features/player/nowPlayingPanel/components/NowPlayingPanelContainer';
 import { useNowPlayingPanelStore } from '@/shared/stores/nowPlayingPanelStore';
 import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
 import { KeyboardShortcuts } from './KeyboardShortcuts';
@@ -114,6 +115,7 @@ export function AppNavigator() {
 	useEventsSync();
 	useRemoteTarget();
 	const connectionStatus = useConnectionStatus();
+	const retryConnection = useSocketStore(state => state.retry);
 	// Under the banner, react-navigation headers must not add the status bar inset again.
 	const navigatorInsets = React.useMemo(
 		() => (connectionStatus ? { ...insets, top: 0 } : insets),
@@ -123,7 +125,7 @@ export function AppNavigator() {
 	return (
 		<PlayerProvider>
 			<View style={styles.container}>
-				<ConnectionBanner status={connectionStatus} topInset={insets.top} />
+				<ConnectionBanner status={connectionStatus} topInset={insets.top} onRetry={retryConnection} />
 
 				{/* The same tree on every width: a resized window keeps its navigation state. */}
 				<View style={styles.body}>
@@ -197,17 +199,17 @@ export function AppNavigator() {
 							/>
 						</Tab.Navigator>
 					</SafeAreaInsetsContext.Provider>
-					{breakpoint === 'desktop' && panelOpen && <NowPlayingPanel />}
+					{breakpoint === 'desktop' && panelOpen && <NowPlayingPanelContainer />}
 				</View>
 
 				{sidebar && (
 					<View style={[styles.playerBar, { borderTopColor: separator }]}>
-						{breakpoint === 'desktop' ? <PlayerBar /> : <MiniPlayer />}
+						{breakpoint === 'desktop' ? <PlayerBarContainer /> : <MiniPlayerContainer />}
 					</View>
 				)}
 
-				<PlayerModal />
-				<PlayerErrorToast />
+				<PlayerModalContainer />
+				<PlayerErrorToastContainer />
 				{Platform.OS === 'web' && <KeyboardShortcuts />}
 			</View>
 		</PlayerProvider>

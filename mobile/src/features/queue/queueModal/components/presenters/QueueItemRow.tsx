@@ -14,6 +14,7 @@ import { Text } from '@/shared/components/ui/Text';
 import BarsSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/bars-solid.svg';
 import SoundOnSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/sound-on-solid.svg';
 import TrashSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/trash-solid.svg';
+import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 
 interface QueueItemRowProps {
 	item: QueueItem;
@@ -22,7 +23,7 @@ interface QueueItemRowProps {
 	onRemove: (itemId: string) => Promise<boolean>;
 	onDragStart?: () => void;
 	isDragActive?: boolean;
-	onShowActions?: (item: QueueItem) => void;
+	onShowActions?: (item: QueueItem, anchor?: MenuAnchor) => void;
 }
 
 export function QueueItemRow({
@@ -100,7 +101,7 @@ export function QueueItemRow({
 					<Text style={styles.duration}>{formatDuration(track.durationMs)}</Text>
 				</Pressable>
 
-				{onShowActions && <TrackActionsButton onPress={() => onShowActions(item)} />}
+				{onShowActions && <TrackActionsButton onPress={anchor => onShowActions(item, anchor)} />}
 
 				{onDragStart && (
 					<Pressable

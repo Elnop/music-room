@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
 import { useTheme } from '@/shared/theme/ThemeContext';
-import { isDarkBackground } from '@/shared/components/feedback/ConnectionBanner';
+import { isDarkBackground } from '@/shared/components/feedback/textContrast';
 import { useFocusRing } from '@/shared/hooks/useFocusRing';
 
 /** So no white window shows between screens or before the first render. */

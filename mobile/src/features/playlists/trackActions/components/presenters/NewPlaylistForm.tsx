@@ -4,10 +4,8 @@ import type { Theme } from '@/shared/theme/types';
 import { useThemedStyles } from '@/shared/theme/useThemedStyles';
 import { Input } from '@/shared/components/ui/Input';
 import { Button } from '@/shared/components/ui/Button';
-import {
-	PLAYLIST_NAME_MAX,
-	type NewPlaylistDraft,
-} from '@/features/playlists/trackActions/hooks/useNewPlaylistFromTrack';
+import type { NewPlaylistDraft } from '@/features/playlists/trackActions/hooks/useNewPlaylistFromTrack';
+import { PLAYLIST_NAME_MAX } from '@/features/playlists/trackActions/utils/playlistName';
 
 interface NewPlaylistFormProps {
 	draft: NewPlaylistDraft;

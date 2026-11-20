@@ -8,13 +8,13 @@ interface ModalProps {
 type ModalComponent = React.ComponentType<ModalProps>;
 
 interface PlayerModalsRegistry {
-	QueueModal: ModalComponent | null;
-	DevicePickerSheet: ModalComponent | null;
+	QueueModalContainer: ModalComponent | null;
+	DevicePickerSheetContainer: ModalComponent | null;
 }
 
 const registry: PlayerModalsRegistry = {
-	QueueModal: null,
-	DevicePickerSheet: null,
+	QueueModalContainer: null,
+	DevicePickerSheetContainer: null,
 };
 
 export function registerPlayerModals(modals: Partial<PlayerModalsRegistry>): void {
