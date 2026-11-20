@@ -11,7 +11,7 @@ Read before changing a guardrail, an exception list, or when `npm run check` fai
 | type-check | tsc | `tsconfig.json` | a type error |
 | lint | ESLint (`eslint . --quiet`) | `eslint.config.*`, `eslint-suppressions.json` | an ESLint error (warnings do not fail) |
 | dead-code | knip | `knip.json` | an unused file, export, type or dependency |
-| deps | dependency-cruiser | `.dependency-cruiser.cjs`, `.dependency-cruiser-known-violations.json` | a layer violation, a cross-feature import or a cycle ([architecture.md](architecture.md)) |
+| deps | dependency-cruiser | `.dependency-cruiser.cjs` (mobile: preset `@brutalway/dependency-cruiser-config/layers`), `.dependency-cruiser-known-violations.json` | a layer violation, a cross-feature import or a cycle ([architecture.md](architecture.md), mobile: [mobile-layers](architecture.md#mobile-layers)) |
 | tree | check-tree (mobile) | `.check-tree-known-violations.json` | a folder outside the layout, an empty folder, a category folder with a single child ([structure.md](structure.md#check-tree)) |
 | duplication | jscpd | `.jscpd.json` | a clone of 5 lines and 50 tokens or more in `src/` (tests excluded) |
 | semgrep | semgrep (Docker) | `tools/semgrep/rules.yml` | a pattern rule below |
