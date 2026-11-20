@@ -1,0 +1,79 @@
+import { useCallback, useEffect, useState } from 'react';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { logger } from '@/shared/logging/logger';
+import { showError } from '@/shared/theme/lib/toast';
+import {
+	useFriendsPlaylists,
+	usePublicPlaylists,
+} from '@/features/playlists/shared/playlist/usePlaylistQueries';
+import { useRefetchOnFocus } from '@/features/playlists/shared/refetch-on-focus/useRefetchOnFocus';
+import type {
+	FriendPlaylists,
+	Playlist,
+	PlaylistStackParamList,
+} from '@/features/playlists/shared/playlist/lib/types';
+
+type Navigation = NativeStackNavigationProp<PlaylistStackParamList, 'Home'>;
+
+export interface HomeScreen {
+	isInitialLoading: boolean;
+	friendsPlaylists: FriendPlaylists[];
+	publicPlaylists: Playlist[];
+	publicLoading: boolean;
+	isRefreshing: boolean;
+	refresh: () => void;
+	publicOpen: boolean;
+	togglePublic: () => void;
+	openPlaylist: (id: string) => void;
+	bottomPadding: number;
+}
+
+export function useHomeScreen(navigation: Navigation): HomeScreen {
+	const bottomPadding = useBottomPadding();
+	const friends = useFriendsPlaylists();
+	const publics = usePublicPlaylists();
+	const [isRefreshing, setIsRefreshing] = useState(false);
+	const [publicOpen, setPublicOpen] = useState(true);
+
+	const { refetch: refetchFriends } = friends;
+	const { refetch: refetchPublic } = publics;
+	useRefetchOnFocus(
+		useCallback(() => {
+			void refetchFriends();
+			void refetchPublic();
+		}, [refetchFriends, refetchPublic])
+	);
+
+	useEffect(() => {
+		if (friends.error)
+			logger.error('[HomeScreen] Failed to load friends playlists:', friends.error);
+	}, [friends.error]);
+	useEffect(() => {
+		if (publics.error) logger.error('[HomeScreen] Failed to load public playlists:', publics.error);
+	}, [publics.error]);
+
+	const refresh = async () => {
+		setIsRefreshing(true);
+		const [result] = await Promise.all([refetchPublic(), refetchFriends()]);
+		setIsRefreshing(false);
+		if (result.isError) {
+			logger.error('[HomeScreen] Refresh failed:', result.error);
+			showError(apiErrorMessage(result.error, 'Impossible de rafraîchir les playlists'));
+		}
+	};
+
+	return {
+		isInitialLoading: friends.isLoading && publics.isLoading,
+		friendsPlaylists: friends.data ?? [],
+		publicPlaylists: publics.data ?? [],
+		publicLoading: publics.isLoading,
+		isRefreshing,
+		refresh: () => void refresh(),
+		publicOpen,
+		togglePublic: () => setPublicOpen(open => !open),
+		openPlaylist: id => navigation.navigate('PlaylistDetail', { id }),
+		bottomPadding,
+	};
+}

@@ -1,11 +1,12 @@
 import React from 'react';
+import { TrackActionsSheetContainer } from '@/features/playlists/features/editor/features/track-actions/components/TrackActionsSheetContainer';
 import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import { FriendsContainer } from '@/features/user/features/friends/features/friends-list/components/FriendsContainer';
 import { UserProfileContainer } from '@/features/user/features/friends/features/user-profile/components/UserProfileContainer';
-import { PlaylistDetailContainer } from '@/features/playlists/detail/components/orchestrators/PlaylistDetailContainer';
-import { SearchTracksContainer } from '@/features/playlists/searchTracks/components/SearchTracksContainer';
+import { PlaylistDetailContainer } from '@/features/playlists/features/editor/features/detail/components/PlaylistDetailContainer';
+import { SearchTracksContainer } from '@/features/playlists/features/editor/features/search-tracks/components/SearchTracksContainer';
 import type { FriendsStackParamList } from '@/features/user/features/friends/types';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { screenHeader, screenLayout } from '@/navigation/screenLayout';
@@ -52,15 +53,21 @@ export function FriendsNavigator() {
 			<FriendsStack.Screen name="PlaylistDetail" options={{ headerShown: false }}>
 				{props => (
 					<PlanContainer>
-						{plan => <PlaylistDetailContainer {...props} premium={plan} />}
+						{plan => (
+							<PlaylistDetailContainer
+								{...props}
+								premium={plan}
+								TrackActionsSheet={TrackActionsSheetContainer}
+							/>
+						)}
 					</PlanContainer>
 				)}
 			</FriendsStack.Screen>
-			<FriendsStack.Screen
-				name="SearchTracks"
-				component={SearchTracksContainer}
-				options={{ title: 'Ajouter des musiques' }}
-			/>
+			<FriendsStack.Screen name="SearchTracks" options={{ title: 'Ajouter des musiques' }}>
+				{props => (
+					<SearchTracksContainer {...props} TrackActionsSheet={TrackActionsSheetContainer} />
+				)}
+			</FriendsStack.Screen>
 		</FriendsStack.Navigator>
 	);
 }

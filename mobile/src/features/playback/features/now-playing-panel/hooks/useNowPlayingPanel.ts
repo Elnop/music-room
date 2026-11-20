@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import { hexToRgba, useImageColors } from '@/shared/image-colors/useImageColors';
 import { useNowPlayingPanelStore } from '@/features/playback/shared/panel/nowPlayingPanelStore';
-import type { TrackActionsStart } from '@/shared/playback/lib/trackActionsBridge';
+import type { TrackActionsStart } from '@/shared/playback/lib/trackActionsSheet';
 import { THIS_DEVICE_LABEL } from '@/shared/platform/platform';
 import { largeArtwork } from '@/features/playback/shared/artwork/artwork';
 import { toTrackInput } from '@/shared/tracks/lib/trackInput';

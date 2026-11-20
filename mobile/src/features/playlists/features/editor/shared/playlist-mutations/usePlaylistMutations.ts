@@ -1,0 +1,47 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import * as playlistApi from '@/features/playlists/shared/playlist/lib/playlistApi';
+import type { PlaylistInput } from '@/features/playlists/shared/playlist/lib/validators';
+import {
+	dropFromList,
+	patchPlaylist,
+	prependPlaylist,
+} from '@/features/playlists/shared/playlist/lib/playlistCache';
+
+export function useCreatePlaylist() {
+	const client = useQueryClient();
+	return useMutation({
+		mutationFn: (input: PlaylistInput) => playlistApi.createPlaylist(input),
+		onSuccess: playlist => prependPlaylist(client, playlist),
+	});
+}
+
+interface UpdateVariables {
+	id: string;
+	changes: Partial<PlaylistInput>;
+}
+
+export function useUpdatePlaylist() {
+	const client = useQueryClient();
+	return useMutation({
+		mutationFn: ({ id, changes }: UpdateVariables) => playlistApi.updatePlaylist(id, changes),
+		onSuccess: updated =>
+			patchPlaylist(client, updated.id, {
+				name: updated.name,
+				description: updated.description,
+				coverUrl: updated.coverUrl,
+				visibility: updated.visibility,
+				editMode: updated.editMode,
+				collaboratorIds: updated.collaboratorIds,
+				viewerIds: updated.viewerIds,
+				updatedAt: updated.updatedAt,
+			}),
+	});
+}
+
+export function useDeletePlaylist() {
+	const client = useQueryClient();
+	return useMutation({
+		mutationFn: (id: string) => playlistApi.deletePlaylist(id),
+		onSuccess: (_result, id) => dropFromList(client, id),
+	});
+}

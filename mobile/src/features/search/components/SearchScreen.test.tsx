@@ -67,7 +67,7 @@ let queryClient: QueryClient;
 const renderScreen = async () => {
 	render(
 		<QueryClientProvider client={queryClient}>
-			<SearchContainer />
+			<SearchContainer TrackActionsSheet={() => null} />
 		</QueryClientProvider>
 	);
 	await act(async () => {});

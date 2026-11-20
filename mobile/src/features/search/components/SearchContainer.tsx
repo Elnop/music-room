@@ -1,8 +1,13 @@
 import React from 'react';
+import type { TrackActionsSheetComponent } from '@/shared/playback/lib/trackActionsSheet';
 import { useSoundCloudSearchScreen } from '@/features/search/hooks/useSoundCloudSearchScreen';
 import { SearchView } from '@/features/search/components/presenters/SearchView';
 
-export function SearchContainer() {
+export function SearchContainer({
+	TrackActionsSheet,
+}: {
+	TrackActionsSheet: TrackActionsSheetComponent;
+}) {
 	const {
 		inputRef,
 		searchQuery,
@@ -24,6 +29,7 @@ export function SearchContainer() {
 
 	return (
 		<SearchView
+			TrackActionsSheet={TrackActionsSheet}
 			inputRef={inputRef}
 			searchQuery={searchQuery}
 			debouncedQuery={debouncedQuery}

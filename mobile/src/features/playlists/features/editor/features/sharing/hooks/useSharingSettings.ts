@@ -1,0 +1,65 @@
+import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { logger } from '@/shared/logging/logger';
+import { showError, showWarning } from '@/shared/theme/lib/toast';
+import { useUpdatePlaylist } from '@/features/playlists/features/editor/shared/playlist-mutations/usePlaylistMutations';
+import { refreshPlaylist } from '@/features/playlists/shared/playlist/lib/playlistCache';
+import type { PlaylistInput } from '@/features/playlists/shared/playlist/lib/validators';
+import type { SharingMode } from '@/features/playlists/features/editor/features/sharing/lib/sharingTexts';
+
+export interface SharingSettings {
+	isUpdating: boolean;
+	toggleVisibility: () => void;
+	toggleEditMode: () => void;
+}
+
+export function useSharingSettings(
+	id: string,
+	mode: SharingMode,
+	loaded: boolean
+): SharingSettings {
+	const client = useQueryClient();
+	const update = useUpdatePlaylist();
+	const [isUpdating, setIsUpdating] = useState(false);
+	const { isPrivate, isEditRestricted } = mode;
+
+	const apply = async (changes: Partial<PlaylistInput>, failure: string) => {
+		setIsUpdating(true);
+		try {
+			await update.mutateAsync({ id, changes });
+			await refreshPlaylist(client, id);
+		} catch (error) {
+			logger.error(`[PlaylistSharing] ${failure}:`, error);
+			showError(
+				apiErrorMessage(
+					error,
+					changes.visibility
+						? 'Impossible de changer la visibilité'
+						: 'Impossible de changer le mode édition'
+				)
+			);
+		} finally {
+			setIsUpdating(false);
+		}
+	};
+
+	return {
+		isUpdating,
+		toggleVisibility: () => {
+			if (isUpdating || !loaded) return;
+			if (isPrivate) showWarning('Playlist publique : visible par tous');
+			void apply({ visibility: isPrivate ? 'public' : 'private' }, 'Failed to update visibility');
+		},
+		toggleEditMode: () => {
+			if (isUpdating || !loaded) return;
+			if (isEditRestricted) {
+				showWarning(isPrivate ? 'Tous les membres pourront éditer' : 'Tout le monde pourra éditer');
+			}
+			void apply(
+				{ editMode: isEditRestricted ? 'open' : 'restricted' },
+				'Failed to update edit mode'
+			);
+		},
+	};
+}
