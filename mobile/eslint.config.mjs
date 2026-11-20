@@ -193,7 +193,7 @@ export default [
     files: [
       'src/shared/logging/logger.ts',
       'src/shared/logging/logger.test.ts',
-      'src/providers/ErrorBoundary.test.tsx',
+      'src/features/shell/components/presenters/ErrorBoundary.test.tsx',
     ],
     rules: {
       'no-restricted-globals': 'off',
@@ -336,7 +336,7 @@ export default [
       'src/shared/image-colors/adaptivePalette.ts',
       'src/shared/theme/lib/fieldFocus.ts',
       'src/shared/theme/lib/fonts.ts',
-      'src/shared/theme/lib/navigationFonts.ts',
+      'src/features/shell/lib/navigationFonts.ts',
       'src/shared/theme/lib/original.theme.ts',
       'src/shared/theme/lib/pixelFrame.ts',
       'src/shared/theme/lib/tokens.ts',

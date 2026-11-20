@@ -22,7 +22,7 @@ export default {
 		const isHook = filename.includes('/hooks/') || /use[A-Z]/.test(filename);
 		if (isHook) return {};
 
-		const isNavigation = filename.includes('/src/navigation/') || filename.startsWith('src/navigation/');
+		const isNavigation = filename.includes('/src/app/') || filename.startsWith('src/app/');
 		const isScreenComponent = /[A-Z]\w*Screen\.[jt]sx?$/.test(filename) && !filename.includes('.test.');
 
 		if (!isNavigation && !isScreenComponent) {

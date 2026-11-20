@@ -7,7 +7,7 @@ import { ProfilePreferencesSection } from './ProfilePreferencesSection';
 import { ProfileWideHeader } from './ProfileWideHeader';
 import type { UserStats } from '@/features/user/features/profile/types';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
-import { useContentColumn } from '@/shared/theme/hooks/useContentColumn';
+import { useContentColumn } from '@/shared/content-column/useContentColumn';
 import type { Theme } from '@/shared/theme/lib/types';
 import type { MusicGenre, UserProfile } from '@/shared/users/user.types';
 import { Text } from '@/shared/theme/components/Text';

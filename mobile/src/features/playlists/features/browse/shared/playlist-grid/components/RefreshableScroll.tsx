@@ -1,6 +1,6 @@
 import React from 'react';
 import { ScrollView } from 'react-native';
-import { useContentColumn } from '@/shared/theme/hooks/useContentColumn';
+import { useContentColumn } from '@/shared/content-column/useContentColumn';
 import { ThemedRefreshControl } from '@/shared/refresh-control/ThemedRefreshControl';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { createListStyles } from '@/features/playlists/features/browse/shared/playlist-grid/lib/listStyles';

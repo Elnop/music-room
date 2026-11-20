@@ -1,6 +1,6 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { useContentColumn } from '@/shared/theme/hooks/useContentColumn';
+import { useContentColumn } from '@/shared/content-column/useContentColumn';
 import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import type { Plan } from '@/features/subscription/lib/subscription';
 import { pixelFrame } from '@/shared/theme/lib/pixelFrame';

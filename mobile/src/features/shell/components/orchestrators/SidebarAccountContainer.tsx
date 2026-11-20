@@ -1,0 +1,80 @@
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Avatar } from '@/shared/theme/components/Avatar';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { useSession } from '@/shared/backend/lib/authSession';
+import { useSeparatorColor } from '@/shared/theme/hooks/useSeparatorColor';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { Theme } from '@/shared/theme/lib/types';
+import { Text } from '@/shared/theme/components/Text';
+
+interface SidebarAccountProps {
+	/** The account replaces the profile tab, so it takes the active tab's fill. */
+	active: boolean;
+	onPress: () => void;
+}
+
+export function SidebarAccountContainer({ active, onPress }: SidebarAccountProps) {
+	const { theme } = useTheme();
+	const separator = useSeparatorColor();
+	const styles = React.useMemo(() => createStyles(theme, separator), [theme, separator]);
+	const user = useSession(s => s.user);
+	if (!user) return null;
+	const name = user.displayName || user.username;
+
+	return (
+		<View style={styles.container}>
+			<Pressable
+				style={[styles.account, active && styles.active]}
+				onPress={onPress}
+				// On the web a link without an address ignores Enter; a button answers Enter and Space.
+				accessibilityRole="button"
+				accessibilityLabel={`Profil, ${name}`}
+				accessibilityState={{ selected: active }}
+			>
+				<Avatar size="sm" name={name} uri={user.avatarUrl} />
+				<View style={styles.info}>
+					<Text style={styles.name} numberOfLines={1}>
+						{name}
+					</Text>
+					<Text style={styles.username} numberOfLines={1}>
+						@{user.username}
+					</Text>
+				</View>
+			</Pressable>
+		</View>
+	);
+}
+
+const createStyles = (theme: Theme, separator: string) =>
+	StyleSheet.create({
+		container: {
+			marginHorizontal: theme.spacing.sm,
+			paddingVertical: theme.spacing.sm,
+			borderTopWidth: 1,
+			borderTopColor: separator,
+		},
+		account: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			gap: theme.spacing.sm,
+			paddingHorizontal: theme.spacing.sm,
+			paddingVertical: theme.spacing.sm,
+		},
+		active: {
+			backgroundColor: theme.colors.surfaceAlt,
+		},
+		info: {
+			flex: 1,
+			minWidth: 0,
+		},
+		name: {
+			fontSize: theme.typography.sizes.md,
+			fontFamily: theme.typography.families.semibold,
+			color: theme.colors.text,
+		},
+		username: {
+			fontSize: theme.typography.sizes.sm,
+			color: theme.colors.textSecondary,
+		},
+	});

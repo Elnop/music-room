@@ -97,7 +97,7 @@
 	},
 	"devDependencies": {
 		"@ast-grep/cli": "^0.51.0",
-		"@brutalway/check-tree": "0.10.0",
+		"@brutalway/check-tree": "0.10.1",
 		"@brutalway/dependency-cruiser-config": "0.12.0",
 		"@eslint/js": "^9.39.2",
 		"@expo/ngrok": "^4.1.3",

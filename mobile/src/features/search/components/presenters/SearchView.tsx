@@ -9,7 +9,7 @@ import { SoundCloudTrackItem } from './SoundCloudTrackItem';
 import type { Theme } from '@/shared/theme/lib/types';
 import type { SoundCloudTrack } from '@/features/search/lib/types';
 import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
-import { useContentColumn } from '@/shared/theme/hooks/useContentColumn';
+import { useContentColumn } from '@/shared/content-column/useContentColumn';
 import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';

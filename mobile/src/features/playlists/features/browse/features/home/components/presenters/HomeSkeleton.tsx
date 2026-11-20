@@ -7,7 +7,7 @@ import {
 } from '@/shared/theme/components/Skeleton';
 import type { Theme } from '@/shared/theme/lib/types';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
-import { useContentColumn } from '@/shared/theme/hooks/useContentColumn';
+import { useContentColumn } from '@/shared/content-column/useContentColumn';
 import { FriendCardSkeleton } from './FriendCardSkeleton';
 import { createListStyles } from '@/features/playlists/features/browse/shared/playlist-grid/lib/listStyles';
 
