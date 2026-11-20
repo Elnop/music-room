@@ -8,7 +8,7 @@
 // (merge-base of HEAD and $GUARDRAILS_BASE, default origin/develop) and with
 // HEAD, so both a branch and uncommitted changes are caught. A file that does
 // not exist in a reference yet is not compared with it. Inline escapes
-// (eslint-disable, nosemgrep, ast-grep-ignore, jscpd:ignore-start) may not
+// (eslint-disable, oxlint-disable, nosemgrep, ast-grep-ignore, jscpd:ignore-start) may not
 // grow in any file under <project>/src/; a new file starts at 0.
 //
 // Two changes are not growth:
@@ -177,6 +177,7 @@ const lists = [
             newRule: 'check-tree',
             fromMovedCode: movedIntoFolder,
           },
+          { project, path: `${project}/.oxlint-suppressions.json`, read: readEslint, newRule: 'oxlint' },
         ]
       : []),
   ]),
@@ -185,7 +186,7 @@ const lists = [
 ];
 
 // Inline escapes that bypass the lists, counted per file under <project>/src/.
-const DIRECTIVES = 'eslint-disable|nosemgrep|ast-grep-ignore|jscpd:ignore-start';
+const DIRECTIVES = 'eslint-disable|oxlint-disable|nosemgrep|ast-grep-ignore|jscpd:ignore-start';
 
 // --- references --------------------------------------------------------------
 
@@ -256,7 +257,11 @@ for (const list of lists) {
     if (before === null) {
       if (list.newRule) {
         const max = newRuleBaselines[list.project]?.[list.newRule] ?? 0;
-        const count = current.entries.size;
+        const count = current.entries
+          ? current.entries.size
+          : Object.entries(current.counts ?? {})
+              .filter(([key]) => key.endsWith('(occurrences)'))
+              .reduce((sum, [, value]) => sum + value, 0);
         if (count > max) {
           growths.push(
             `${list.path}: ${count} entries for new rule ${list.newRule}, ${max} recorded in new-rule-baselines.json (vs ${reference.label})`
