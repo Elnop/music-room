@@ -42,7 +42,7 @@ beforeEach(() => {
 
 describe('PlaylistPlaybackContainer', () => {
 	it('reports what plays from a playlist, and nothing for another one', () => {
-		expect(playbackOf('p1')).toEqual({ playingUri: URI, state: 'playing' });
-		expect(playbackOf('p2')).toEqual({ playingUri: null, state: null });
+		expect(playbackOf('p1')).toMatchObject({ playingUri: URI, state: 'playing' });
+		expect(playbackOf('p2')).toMatchObject({ playingUri: null, state: null });
 	});
 });

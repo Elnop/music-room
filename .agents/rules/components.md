@@ -3,7 +3,7 @@
 Read before authoring or editing React components, orchestrators, presenters, hooks, or screens in `mobile/`. Every rule here is checked by `npm run check`: the ESLint plugin `components`, whose messages link to their section, and dependency-cruiser for the roles ([roles-by-name](#roles-by-name)). Rules are append-only: see [guardrails.md](guardrails.md#append-only-rules).
 
 The component architecture:
-- **Screens / Navigation** (`src/navigation/`): define navigation stacks and routes; screens only mount orchestrators.
+- **Screens / Navigation** (`src/app/`): define navigation stacks and routes; screens only mount orchestrators.
 - **Orchestrators**, named `XContainer` (or `XLayout`, `XPage`): connect hooks and stores, manage high-level presentation decisions, and select presenters.
 - **Presenters**, every other component: props in, JSX out; they reach no store and no query, through no chain of imports.
 - **Hooks** (`features/<feature>/<subject>/hooks/`): contain component logic, state, and mutations; zero JSX.
@@ -12,7 +12,7 @@ The component architecture:
 
 ## screen-orchestrator-only
 
-Screens and navigation stacks/navigators in `src/navigation/**` or screen component files (`*Screen.tsx`) must only import orchestrators from `src/features/**`.
+Screens and navigation stacks/navigators in `src/app/**` or screen component files (`*Screen.tsx`) must only import orchestrators from `src/features/**`.
 
 - **Forbidden**: Importing presenters directly into a navigation stack or screen file (`import { FooView } from '@/features/.../presenters/FooView'`).
 - **Allowed**: Importing orchestrators (`import { FooContainer } from '@/features/.../FooContainer'`, or any file of an `orchestrators/` folder), type definitions (`import type { ... }`), or shared navigation primitives.

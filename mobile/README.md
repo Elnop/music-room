@@ -156,7 +156,7 @@ The web client is published at `https://elnop.github.io/music-room/` by `.github
 
 ## Architecture
 
-From epic #362: `src/shared/`, `src/providers/`, `src/navigation/` and `src/features/<feature>/`. Every feature was fully migrated (#378–#385) to the orchestrators / presenters / hooks pattern, and every component rule is enforced by the ESLint plugin without any exception. Each feature has one layout: what its subjects share (`hooks/`, `services/`, `stores/`, `utils/`, `types.ts`…) at its root, its React providers in `context/`, and one folder per subject, even when there is only one, holding `components/orchestrators/`, `components/presenters/`, `hooks/` and, when needed, `utils/`. More in [code-layout.md](../doc/architecture/code-layout.md).
+From epic #362, then the brutalway layers (epic #616): `src/app/`, `src/features/<feature>/` and `src/shared/`. Every feature was fully migrated (#378–#385) to the orchestrators / presenters / hooks pattern, and every component rule is enforced by the ESLint plugin without any exception. Each feature has one layout: what its subjects share (`hooks/`, `services/`, `stores/`, `utils/`, `types.ts`…) at its root, its React providers in `context/`, and one folder per subject, even when there is only one, holding `components/orchestrators/`, `components/presenters/`, `hooks/` and, when needed, `utils/`. More in [code-layout.md](../doc/architecture/code-layout.md).
 
 ```
 mobile/src/
@@ -177,8 +177,7 @@ mobile/src/
 │   ├── theme/              # ThemeContext, original theme, tokens
 │   ├── constants/app.ts    # API config, spacing
 │   └── utils/              # logger, toast, haptics, apiErrorMessage, debounce, moveTarget, shareLinks...
-├── providers/              # AppProviders: gestures, ErrorBoundary, QueryClient, theme, safe area
-├── navigation/             # RootNavigator, AuthNavigator, AppNavigator (tabs) + stacks/ + screens/ (screens composing several features)
+├── app/                    # RootNavigator, AuthNavigator, AppNavigator (tabs) + stacks/ + screens/; imports only features/
 ├── features/               # One feature per folder (#378–#385)
 │   ├── auth/               # Sign-in, sign-up, email code, forgotten password, linked accounts
 │   │   ├── <subject>/      # welcome, login, register, emailVerification, forgotPassword, resetPassword,
@@ -251,7 +250,7 @@ mobile/src/
 ## State, real time and playback
 
 - **HTTP calls**: always through `shared/backend/lib/api.ts`, which adds the token and the `X-Platform`, `X-Device-Model`, `X-App-Version` headers the backend logs.
-- **Server data**: TanStack Query (`AppProviders` provides the client). A query key is built with `queryKeys` (`shared/query-keys/keys.ts`), freshness is chosen among the `STALE` profiles (`shared/backend/queryClient.ts`), and a Socket.io event updates the cache (`setQueryData`) or invalidates it through `useSocketCache` (`shared/backend/lib/socketCache.ts`). Zustand only keeps client state. Rules: `.agents/rules/state.md`.
+- **Server data**: TanStack Query (`AppProvidersContainer` provides the client). A query key is built with `queryKeys` (`shared/query-keys/keys.ts`), freshness is chosen among the `STALE` profiles (`shared/backend/queryClient.ts`), and a Socket.io event updates the cache (`setQueryData`) or invalidates it through `useSocketCache` (`shared/backend/lib/socketCache.ts`). Zustand only keeps client state. Rules: `.agents/rules/state.md`.
 - **Session and shared layer**: `shared/` does not import auth; the session store registers itself in `shared/backend/lib/authSession.ts` (token, refresh) and announces each session end there (`onSessionEnd`), on which the socket closes and the player empties.
 - **Real time**: `shared/backend/socketStore.ts` manages the Socket.io connection; `features/playlists/features/editor/features/detail/hooks/usePlaylistRoom.ts` joins a playlist's room, whose events update the cache (`lib/playlistSocketRules.ts` next to it); `features/playback/features/control-delegation/hooks/` handles friends' listening and delegated control commands.
 - **Playback contract**: playlists and search start playback through the `PlaybackActions` they receive as a prop (`features/playback/lib/playbackActions.ts`), and the playlist screen gets what it plays from `features/playback/PlaylistPlaybackContainer.tsx`; the navigation passes both, so no feature imports the player or the queue.

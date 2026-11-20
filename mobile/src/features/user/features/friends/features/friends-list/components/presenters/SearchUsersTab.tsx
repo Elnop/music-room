@@ -2,7 +2,7 @@ import React from 'react';
 import { FlatList } from 'react-native';
 import { EmptyState } from '@/shared/theme/components/EmptyState';
 import { SkeletonList, UserRowSkeleton } from '@/shared/theme/components/Skeleton';
-import { useContentColumn } from '@/shared/theme/hooks/useContentColumn';
+import { useContentColumn } from '@/shared/content-column/useContentColumn';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { UserProfile } from '@/features/user/features/friends/types';
 import { SearchResultItemRow } from './SearchResultItemRow';

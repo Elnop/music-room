@@ -8,7 +8,7 @@ import { FriendsListTab } from './FriendsListTab';
 import { SearchUsersTab } from './SearchUsersTab';
 import { createFriendsListStyles } from './friendsListStyles';
 import { Text } from '@/shared/theme/components/Text';
-import { useContentColumn } from '@/shared/theme/hooks/useContentColumn';
+import { useContentColumn } from '@/shared/content-column/useContentColumn';
 
 interface FriendsListViewProps {
 	activeTab: 'friends' | 'search';

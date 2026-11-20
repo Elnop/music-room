@@ -2,7 +2,7 @@ import React from 'react';
 import { View, ScrollView } from 'react-native';
 import { memberSinceLabel } from '@/features/user/shared/profile-info-rows/ProfileInfoRows';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
-import { useContentColumn } from '@/shared/theme/hooks/useContentColumn';
+import { useContentColumn } from '@/shared/content-column/useContentColumn';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type {
 	FilteredProfile,

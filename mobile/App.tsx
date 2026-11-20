@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { useFonts } from 'expo-font';
-import { AppProviders } from '@/providers/AppProviders';
-import { RootNavigator } from '@/navigation/RootNavigator';
-import { ThemedSystemUI } from '@/shared/theme/components/ThemedSystemUI';
+import { AppProvidersContainer } from '@/features/shell/components/orchestrators/AppProvidersContainer';
+import { RootNavigator } from '@/app/RootNavigator';
+import { ThemedSystemUI } from '@/features/shell/components/presenters/ThemedSystemUI';
 import { configureGoogleSignIn } from '@/features/user/features/auth/shared/sign-in/lib/googleSignIn';
 import { initializeFacebookSDK } from '@/features/user/features/auth/shared/sign-in/lib/facebookSignIn';
-import { restoreRedirectedPath } from '@/navigation/webBasePath';
+import { restoreRedirectedPath } from '@/features/shell/lib/webBasePath';
 import { onBackendError } from '@/shared/backend/lib/backendErrors';
 import { logger } from '@/shared/logging/logger';
 import { FONT_ASSETS } from '@/shared/theme/lib/fonts';
@@ -26,9 +26,9 @@ export default function App() {
 	if (!fontsLoaded && !fontError) return null;
 
 	return (
-		<AppProviders>
+		<AppProvidersContainer>
 			<RootNavigator />
 			<ThemedSystemUI />
-		</AppProviders>
+		</AppProvidersContainer>
 	);
 }

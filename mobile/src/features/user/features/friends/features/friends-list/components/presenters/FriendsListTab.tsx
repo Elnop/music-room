@@ -10,7 +10,7 @@ import { FriendCard } from './FriendCard';
 import { FriendItemRow } from './FriendItemRow';
 import { ThemedRefreshControl } from '@/shared/refresh-control/ThemedRefreshControl';
 import { createFriendsListStyles } from './friendsListStyles';
-import { useContentColumn } from '@/shared/theme/hooks/useContentColumn';
+import { useContentColumn } from '@/shared/content-column/useContentColumn';
 import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
 import UsersSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/users-solid.svg';
 

@@ -11,7 +11,7 @@ Two kinds of state, two tools (epic #362):
 
 A Zustand store that copies server data and refreshes it by hand moves to TanStack Query when its feature migrates (#378–#385); no new one is written.
 
-The `QueryClient` comes from `createQueryClient()` (`src/shared/backend/queryClient.ts`), provided once by `AppProviders` (`src/providers/AppProviders.tsx`). A test renders with its own client (`<AppProviders queryClient={client}>` or a `QueryClientProvider`) and calls `client.clear()` at the end, so cache timers stop.
+The `QueryClient` comes from `createQueryClient()` (`src/shared/backend/queryClient.ts`), provided once by `AppProvidersContainer` (`src/providers/AppProvidersContainer.tsx`). A test renders with its own client (`<AppProvidersContainer queryClient={client}>` or a `QueryClientProvider`) and calls `client.clear()` at the end, so cache timers stop.
 
 ## query-keys
 

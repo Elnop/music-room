@@ -2,20 +2,12 @@ module.exports = {
   extends: require.resolve('@brutalway/dependency-cruiser-config/layers'),
   forbidden: [
     {
-      name: 'shared-not-to-navigation',
+      name: 'shared-not-to-app',
       severity: 'error',
       comment:
-        'src/shared/ must not import src/navigation/, which composes the features until it becomes src/app/ (#623). See .agents/rules/architecture.md#layers',
+        'src/shared/ must not import src/app/, which composes the features. See .agents/rules/architecture.md#layers',
       from: { path: '^src/shared/' },
-      to: { path: '^src/navigation/' },
-    },
-    {
-      name: 'features-not-to-navigation',
-      severity: 'error',
-      comment:
-        'src/features/ must not import src/navigation/, which composes the features until it becomes src/app/ (#623). See .agents/rules/architecture.md#layers',
-      from: { path: '^src/features/' },
-      to: { path: '^src/navigation/' },
+      to: { path: '^src/app/' },
     },
   ],
   options: {

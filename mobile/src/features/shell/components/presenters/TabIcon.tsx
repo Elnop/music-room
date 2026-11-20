@@ -1,0 +1,44 @@
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
+import { PixelIcon, type PixelIconSource } from '@/shared/theme/components/PixelIcon';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import CassetteTapeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/cassette-tape-solid.svg';
+import HomeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/home-solid.svg';
+import SearchSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/search-solid.svg';
+import UserSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/user-solid.svg';
+import UsersSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/users-solid.svg';
+
+const TAB_ICONS: Record<string, PixelIconSource> = {
+	HomeTab: HomeSolid,
+	PlaylistsTab: CassetteTapeSolid,
+	SearchTab: SearchSolid,
+	FriendsTab: UsersSolid,
+	ProfileTab: UserSolid,
+};
+
+interface TabIconProps {
+	routeName: string;
+	focused: boolean;
+	color: string;
+}
+
+function TabIcon({ routeName, focused, color }: TabIconProps) {
+	const { theme } = useTheme();
+	return (
+		<View style={[styles.icon, { gap: theme.spacing.xs }]}>
+			<PixelIcon icon={TAB_ICONS[routeName]} color={color} />
+			<View style={[styles.dot, focused && { backgroundColor: color }]} />
+		</View>
+	);
+}
+
+export const tabIconFor =
+	(routeName: string) =>
+	({ focused, color }: { focused: boolean; color: string }) => (
+		<TabIcon routeName={routeName} focused={focused} color={color} />
+	);
+
+const styles = StyleSheet.create({
+	icon: { alignItems: 'center' },
+	dot: { width: 6, height: 6 },
+});

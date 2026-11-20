@@ -46,8 +46,7 @@ backend/src/
 
 ```
 mobile/src/
-├── navigation/               React Navigation; a screen only imports an orchestrator
-├── providers/                AppProviders: QueryClient, theme, gestures, safe area…
+├── app/                      React Navigation: navigators, stacks, screens joining several features; imports only features/
 ├── features/<feature>/
 │   ├── hooks/ services/ stores/ utils/ types.ts validators.ts …   shared by the feature's subjects
 │   ├── context/                                                   React providers

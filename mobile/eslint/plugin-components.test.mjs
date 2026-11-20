@@ -24,19 +24,19 @@ ruleTester.run('screen-orchestrator-only', screenOrchestratorOnly, {
 	valid: [
 		{
 			code: "import { LoginContainer } from '@/features/auth/login/components/orchestrators/LoginContainer';",
-			filename: '/app/mobile/src/navigation/AuthNavigator.tsx',
+			filename: '/app/mobile/src/app/AuthNavigator.tsx',
 		},
 		{
 			code: "import type { Playlist } from '@/features/playlists/types';",
-			filename: '/app/mobile/src/navigation/stacks/PlaylistsStack.tsx',
+			filename: '/app/mobile/src/app/stacks/PlaylistsStack.tsx',
 		},
 		{
 			code: "import { SomeComponent } from '@/shared/components/ui/Button';",
-			filename: '/app/mobile/src/navigation/AppNavigator.tsx',
+			filename: '/app/mobile/src/app/AppNavigator.tsx',
 		},
 		{
 			code: "import { LoginContainer } from '@/features/auth/login/LoginContainer';",
-			filename: '/app/mobile/src/navigation/AuthNavigator.tsx',
+			filename: '/app/mobile/src/app/AuthNavigator.tsx',
 		},
 		{
 			code: "import { FooView } from './presenters/FooView';",
@@ -46,12 +46,12 @@ ruleTester.run('screen-orchestrator-only', screenOrchestratorOnly, {
 	invalid: [
 		{
 			code: "import { LoginView } from '@/features/auth/login/components/presenters/LoginView';",
-			filename: '/app/mobile/src/navigation/AuthNavigator.tsx',
+			filename: '/app/mobile/src/app/AuthNavigator.tsx',
 			errors: [{ messageId: 'noPresenterInScreen' }],
 		},
 		{
 			code: "import { PlaylistDetailView } from '@/features/playlists/detail/components/presenters/PlaylistDetailView';",
-			filename: '/app/mobile/src/navigation/stacks/PlaylistsStack.tsx',
+			filename: '/app/mobile/src/app/stacks/PlaylistsStack.tsx',
 			errors: [{ messageId: 'noPresenterInScreen' }],
 		},
 	],
