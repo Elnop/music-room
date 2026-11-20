@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import { NowPlayingPanelContainer } from './NowPlayingPanelContainer';
 import { useNowPlayingPanelStore } from '@/features/playback/shared/panel/nowPlayingPanelStore';
 import type { PlayerSheets } from '@/features/playback/shared/full-screen-sheet/FullScreenSheet';
-import { registerTrackActionsSheet } from '@/shared/playback/lib/trackActionsBridge';
+import type { TrackActionsSheetComponent } from '@/shared/playback/lib/trackActionsSheet';
 import { THIS_DEVICE_LABEL } from '@/shared/platform/platform';
 import type { NowPlaying } from '@/features/playback/shared/player/lib/types';
 import type { OwnerQueue, QueueItem } from '@/shared/playback/lib/playback';
@@ -54,9 +54,8 @@ const sheets: PlayerSheets = {
 	DevicePicker: ({ visible }) => (visible ? <Text>devices-sheet</Text> : null),
 };
 
-registerTrackActionsSheet(({ track, start }) =>
-	track ? <Text>{`actions-sheet ${start} ${track.title}`}</Text> : null
-);
+const TrackActionsSheet: TrackActionsSheetComponent = ({ track, start }) =>
+	track ? <Text>{`actions-sheet ${start} ${track.title}`}</Text> : null;
 
 const playing = (overrides: Partial<NowPlaying> = {}): NowPlaying => ({
 	isRemote: false,
@@ -92,7 +91,7 @@ describe('NowPlayingPanelContainer', () => {
 	});
 
 	it('shows the track, the device and what comes next, without the transport of the bar', () => {
-		render(<NowPlayingPanelContainer {...sheets} />);
+		render(<NowPlayingPanelContainer {...sheets} TrackActionsSheet={TrackActionsSheet} />);
 		expect(screen.getAllByText('Goofy Goober Rock')).toHaveLength(1);
 		expect(screen.getByText(THIS_DEVICE_LABEL)).toBeTruthy();
 		expect(screen.getByText('Ripped Pants')).toBeTruthy();
@@ -103,12 +102,12 @@ describe('NowPlayingPanelContainer', () => {
 
 	it('names the remote device that plays', () => {
 		mockNowPlaying = playing({ isRemote: true, deviceLabel: 'Pixel de Patrick' });
-		render(<NowPlayingPanelContainer {...sheets} />);
+		render(<NowPlayingPanelContainer {...sheets} TrackActionsSheet={TrackActionsSheet} />);
 		expect(screen.getByText('Pixel de Patrick')).toBeTruthy();
 	});
 
 	it('plays an item of the queue, and opens the whole queue and the device picker', () => {
-		render(<NowPlayingPanelContainer {...sheets} />);
+		render(<NowPlayingPanelContainer {...sheets} TrackActionsSheet={TrackActionsSheet} />);
 		fireEvent.press(screen.getByLabelText('Lire Sweet Victory, Matthew'));
 		expect(mockPlayItem).toHaveBeenCalledWith('c');
 		fireEvent.press(screen.getByLabelText("Afficher toute la file d'attente"));
@@ -118,7 +117,7 @@ describe('NowPlayingPanelContainer', () => {
 	});
 
 	it('opens the track actions on the playlists or on the whole menu', () => {
-		render(<NowPlayingPanelContainer {...sheets} />);
+		render(<NowPlayingPanelContainer {...sheets} TrackActionsSheet={TrackActionsSheet} />);
 		fireEvent.press(screen.getByLabelText('Ajouter à une playlist'));
 		expect(screen.getByText('actions-sheet playlists Goofy Goober Rock')).toBeTruthy();
 		fireEvent.press(screen.getByLabelText('Actions'));
@@ -127,12 +126,12 @@ describe('NowPlayingPanelContainer', () => {
 
 	it('says when the queue has nothing after the track', () => {
 		mockQueue = { currentItemId: 'a', items: [item('a', 'Goofy Goober Rock')], version: 1 };
-		render(<NowPlayingPanelContainer {...sheets} />);
+		render(<NowPlayingPanelContainer {...sheets} TrackActionsSheet={TrackActionsSheet} />);
 		expect(screen.getByText("Rien d'autre dans la file après ce titre.")).toBeTruthy();
 	});
 
 	it('closes with its button', () => {
-		render(<NowPlayingPanelContainer {...sheets} />);
+		render(<NowPlayingPanelContainer {...sheets} TrackActionsSheet={TrackActionsSheet} />);
 		fireEvent.press(screen.getByLabelText('Fermer le panneau'));
 		expect(useNowPlayingPanelStore.getState().isOpen).toBe(false);
 	});
@@ -140,7 +139,7 @@ describe('NowPlayingPanelContainer', () => {
 	it('invites to pick a track when nothing plays', () => {
 		mockNowPlaying = playing({ track: null, isPlaying: false });
 		mockQueue = { currentItemId: null, items: [], version: 0 };
-		render(<NowPlayingPanelContainer {...sheets} />);
+		render(<NowPlayingPanelContainer {...sheets} TrackActionsSheet={TrackActionsSheet} />);
 		expect(screen.getByText('Rien en lecture : choisissez un titre pour commencer')).toBeTruthy();
 		expect(screen.queryByLabelText('Ajouter à une playlist')).toBeNull();
 	});

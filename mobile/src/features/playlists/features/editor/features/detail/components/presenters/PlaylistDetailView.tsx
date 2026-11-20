@@ -1,0 +1,106 @@
+import React from 'react';
+import { RefreshControl, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { EmptyState } from '@/shared/theme/components/EmptyState';
+import { ReorderableList } from '@/shared/theme/components/ReorderableList';
+import { SwipeableTrackItem } from './SwipeableTrackItem';
+import { TrackTableHeader } from './TrackTableHeader';
+import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { PlaylistTracks } from '@/features/playlists/features/editor/features/detail/hooks/usePlaylistTracks';
+import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';
+import { createDetailStyles } from './detailStyles';
+import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
+
+interface PlaylistDetailViewProps {
+	playlist: PlaylistWithTracks;
+	tracks: PlaylistTracks;
+	header: React.ReactElement;
+	gradient: readonly [string, string, ...string[]];
+	isRefreshing: boolean;
+	onRefresh: () => void;
+	bottomPadding: number;
+	onPlayTrack: (track: { id: string; trackUri: string }) => void;
+	pendingTrackId: string | null;
+}
+
+export function PlaylistDetailView({
+	playlist,
+	tracks,
+	header,
+	gradient,
+	isRefreshing,
+	onRefresh,
+	bottomPadding,
+	onPlayTrack,
+	pendingTrackId,
+}: PlaylistDetailViewProps) {
+	const { theme } = useTheme();
+	const insets = useSafeAreaInsets();
+	const styles = React.useMemo(() => createDetailStyles(theme, insets.top), [theme, insets.top]);
+	const { canEdit, currentUri } = tracks;
+	const { isWide } = useBreakpoint();
+	const tableHeader = isWide && playlist.tracks.length > 0;
+
+	return (
+		<View style={styles.container}>
+			<View style={[bandStyles.band, { backgroundColor: gradient[0] }]} />
+			<ReorderableList
+				data={playlist.tracks}
+				keyExtractor={item => item.id}
+				onReorder={tracks.reorder}
+				dragEnabled={canEdit && !tracks.isMoving}
+				// Rows re-render when the playing track changes, to move the highlight.
+				extraData={currentUri}
+				renderItem={({ item, index, drag, isActive }) => (
+					<SwipeableTrackItem
+						track={item}
+						position={index + 1}
+						onDelete={() => tracks.deleteTrack(item.id)}
+						disabled={!canEdit}
+						onAddToQueue={() => tracks.addToQueue(item)}
+						onShowActions={anchor => tracks.showActions(item, anchor)}
+						onDragStart={canEdit ? drag : undefined}
+						isDragActive={isActive}
+						isCurrent={currentUri !== null && item.trackUri === currentUri}
+						onPress={item.unavailable ? tracks.explainUnavailable : () => onPlayTrack(item)}
+						isPending={pendingTrackId === item.id}
+						unavailable={item.unavailable}
+					/>
+				)}
+				ListHeaderComponent={
+					tableHeader ? (
+						<>
+							{header}
+							<TrackTableHeader />
+						</>
+					) : (
+						header
+					)
+				}
+				contentContainerStyle={[
+					styles.list,
+					isWide && styles.column,
+					{ paddingBottom: bottomPadding },
+				]}
+				ListEmptyComponent={
+					<EmptyState icon={MusicSolid} message="Aucun titre dans cette playlist pour l'instant" />
+				}
+				refreshControl={
+					<RefreshControl
+						refreshing={isRefreshing}
+						onRefresh={onRefresh}
+						tintColor={theme.colors.primary}
+						colors={[theme.colors.primary]}
+					/>
+				}
+				showsVerticalScrollIndicator={false}
+			/>
+		</View>
+	);
+}
+
+// A flat band in the cover's colour behind the header: pixel art has no gradients.
+const bandStyles = StyleSheet.create({
+	band: { position: 'absolute', top: 0, left: 0, right: 0, height: 260 },
+});

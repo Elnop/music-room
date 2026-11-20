@@ -5,7 +5,6 @@ import { QueueModalContainer } from './QueueModalContainer';
 import { useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
-import { registerTrackActionsSheet } from '@/shared/playback/lib/trackActionsBridge';
 import type { UserProfile } from '@/shared/users/user.types';
 import type { QueueItem, QueueState } from '@/features/playback/shared/player/lib/queue.types';
 
@@ -96,7 +95,7 @@ const setQueue = (state: Pick<QueueState, 'currentItemId' | 'items'>, ownerId = 
 const titles = () => screen.queryAllByText(/^Title /).map(node => node.props.children);
 
 const renderModal = async () => {
-	render(<QueueModalContainer visible onClose={jest.fn()} />);
+	render(<QueueModalContainer visible onClose={jest.fn()} TrackActionsSheet={() => null} />);
 	await act(async () => {});
 };
 
@@ -113,8 +112,6 @@ registerAuthSession({
 	isTokenExpiringSoon: () => false,
 	refreshAccessToken: async () => true,
 });
-
-registerTrackActionsSheet(() => null);
 
 beforeEach(() => {
 	useQueueStore.setState(initialQueue, true);

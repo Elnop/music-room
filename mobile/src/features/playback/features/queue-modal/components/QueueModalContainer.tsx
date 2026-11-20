@@ -1,13 +1,15 @@
 import React from 'react';
+import type { TrackActionsSheetComponent } from '@/shared/playback/lib/trackActionsSheet';
 import { useQueueModal } from '@/features/playback/features/queue-modal/useQueueModal';
 import { QueueModalView } from '@/features/playback/features/queue-modal/components/presenters/QueueModalView';
 
 interface QueueModalProps {
 	visible: boolean;
 	onClose: () => void;
+	TrackActionsSheet: TrackActionsSheetComponent;
 }
 
-export function QueueModalContainer({ visible, onClose }: QueueModalProps) {
+export function QueueModalContainer({ visible, onClose, TrackActionsSheet }: QueueModalProps) {
 	const {
 		theme,
 		styles,
@@ -24,6 +26,7 @@ export function QueueModalContainer({ visible, onClose }: QueueModalProps) {
 
 	return (
 		<QueueModalView
+			TrackActionsSheet={TrackActionsSheet}
 			visible={visible}
 			onClose={onClose}
 			theme={theme}

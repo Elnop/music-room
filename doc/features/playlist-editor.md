@@ -2,7 +2,7 @@
 
 Subject IV.2.3 (Music Playlist Editor): several users edit the same playlist in real time, with visibility and editing rights, and concurrent edits never corrupt it.
 
-Code: `backend/src/features/playlists/`, `backend/src/realtime/handlers/playlist.handler.ts`, `playlist-room.ts`; mobile `src/features/playlists/`.
+Code: `backend/src/features/playlists/`, `backend/src/realtime/handlers/playlist.handler.ts`, `playlist-room.ts`; mobile `src/features/playlists/` (the editor in `features/editor/`).
 
 ## Rights
 

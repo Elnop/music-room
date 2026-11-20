@@ -4,7 +4,7 @@ import { useTheme } from '@/shared/theme/components/ThemeContext';
 import { SearchBar } from '@/shared/theme/components/SearchBar';
 import { SkeletonList, TrackRowSkeleton } from '@/shared/theme/components/Skeleton';
 import { EmptyState } from '@/shared/theme/components/EmptyState';
-import { getTrackActionsSheet } from '@/shared/playback/lib/trackActionsBridge';
+import type { TrackActionsSheetComponent } from '@/shared/playback/lib/trackActionsSheet';
 import { SoundCloudTrackItem } from './SoundCloudTrackItem';
 import type { Theme } from '@/shared/theme/lib/types';
 import type { SoundCloudTrack } from '@/features/search/lib/types';
@@ -15,6 +15,7 @@ import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-sol
 import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
 
 interface SearchViewProps {
+	TrackActionsSheet: TrackActionsSheetComponent;
 	inputRef: React.RefObject<TextInput | null>;
 	searchQuery: string;
 	debouncedQuery: string;
@@ -34,6 +35,7 @@ interface SearchViewProps {
 }
 
 export function SearchView({
+	TrackActionsSheet,
 	inputRef,
 	searchQuery,
 	debouncedQuery,
@@ -53,7 +55,6 @@ export function SearchView({
 }: SearchViewProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
-	const TrackActionsSheetContainer = getTrackActionsSheet();
 	const column = useContentColumn();
 
 	return (
@@ -112,11 +113,7 @@ export function SearchView({
 				/>
 			)}
 
-			{TrackActionsSheetContainer &&
-				React.createElement(TrackActionsSheetContainer, {
-					track: actionTrack,
-					onClose: onCloseActions,
-				})}
+			<TrackActionsSheet track={actionTrack} onClose={onCloseActions} />
 		</View>
 	);
 }

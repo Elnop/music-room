@@ -1,4 +1,5 @@
 import React from 'react';
+import { TrackActionsSheetContainer } from '@/features/playlists/features/editor/features/track-actions/components/TrackActionsSheetContainer';
 import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
@@ -33,11 +34,9 @@ export function SearchNavigator() {
 				headerTitleAlign: 'center',
 			}}
 		>
-			<SearchStack.Screen
-				name="Search"
-				component={SearchContainer}
-				options={{ title: 'Recherche' }}
-			/>
+			<SearchStack.Screen name="Search" options={{ title: 'Recherche' }}>
+				{() => <SearchContainer TrackActionsSheet={TrackActionsSheetContainer} />}
+			</SearchStack.Screen>
 		</SearchStack.Navigator>
 	);
 }

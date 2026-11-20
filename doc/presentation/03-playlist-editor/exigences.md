@@ -30,7 +30,7 @@
 
 - `backend/src/features/playlists/` (`permissions/playlist.permissions.ts`), `backend/src/realtime/handlers/playlist.handler.ts`
 - Goûts proches : `GET /api/profile/recommendations`, fonction SQL `recommend_similar_profiles` (migration 033), `mobile/src/features/user/features/friends/features/similar-profiles/`
-- Mobile : `mobile/src/features/playlists/` (`sharing/`, `utils/playlistSocketRules.ts`)
+- Mobile : `mobile/src/features/playlists/features/editor/` (`features/sharing/`, `features/detail/lib/playlistSocketRules.ts`)
 - Détail : [playlist-editor.md](../../features/playlist-editor.md), [playlist-concurrency.md](../../features/playlist-concurrency.md)
 
 ## Scénarios

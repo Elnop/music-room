@@ -12,10 +12,11 @@ import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { Theme } from '@/shared/theme/lib/types';
 
 import { PlaylistsNavigator } from '@/navigation/stacks/PlaylistsStack';
-import type { PlaylistStackParamList } from '@/features/playlists/types';
+import type { PlaylistStackParamList } from '@/features/playlists/shared/playlist/lib/types';
 import type { ProfileStackParamList } from '@/features/user/features/profile/types';
 import { registerPlayback } from '@/navigation/playbackBridge';
-import { QueueModalContainer } from '@/features/playback/features/queue-modal/components/QueueModalContainer';
+import { TrackActionsSheetContainer } from '@/features/playlists/features/editor/features/track-actions/components/TrackActionsSheetContainer';
+import { QueueSheet } from '@/navigation/QueueSheet';
 import { DevicePickerSheetContainer } from '@/features/playback/features/control-delegation/features/device-picker/components/DevicePickerSheetContainer';
 import type { PlayerSheets } from '@/features/playback/shared/full-screen-sheet/FullScreenSheet';
 import { ProfileNavigator } from '@/navigation/stacks/ProfileStack';
@@ -63,7 +64,7 @@ const Tab = createBottomTabNavigator<AppTabsParamList>();
 registerPlayback();
 
 const PLAYER_SHEETS: PlayerSheets = {
-	QueueModal: QueueModalContainer,
+	QueueModal: QueueSheet,
 	DevicePicker: DevicePickerSheetContainer,
 };
 
@@ -209,7 +210,12 @@ export function AppNavigator() {
 							/>
 						</Tab.Navigator>
 					</SafeAreaInsetsContext.Provider>
-					{breakpoint === 'desktop' && panelOpen && <NowPlayingPanelContainer {...PLAYER_SHEETS} />}
+					{breakpoint === 'desktop' && panelOpen && (
+						<NowPlayingPanelContainer
+							{...PLAYER_SHEETS}
+							TrackActionsSheet={TrackActionsSheetContainer}
+						/>
+					)}
 				</View>
 
 				{sidebar && (

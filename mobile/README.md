@@ -253,7 +253,7 @@ mobile/src/
 - **HTTP calls**: always through `shared/backend/lib/api.ts`, which adds the token and the `X-Platform`, `X-Device-Model`, `X-App-Version` headers the backend logs.
 - **Server data**: TanStack Query (`AppProviders` provides the client). A query key is built with `queryKeys` (`shared/query-keys/keys.ts`), freshness is chosen among the `STALE` profiles (`shared/backend/queryClient.ts`), and a Socket.io event updates the cache (`setQueryData`) or invalidates it through `useSocketCache` (`shared/backend/lib/socketCache.ts`). Zustand only keeps client state. Rules: `.agents/rules/state.md`.
 - **Session and shared layer**: `shared/` does not import auth; the session store registers itself in `shared/backend/lib/authSession.ts` (token, refresh) and announces each session end there (`onSessionEnd`), on which the socket closes and the player empties.
-- **Real time**: `shared/backend/socketStore.ts` manages the Socket.io connection; `features/playlists/hooks/usePlaylistRoom.ts` joins a playlist's room, whose events update the cache (`utils/playlistSocketRules.ts`); `useMusicControl` handles friends' listening and delegated control commands.
+- **Real time**: `shared/backend/socketStore.ts` manages the Socket.io connection; `features/playlists/features/editor/features/detail/hooks/usePlaylistRoom.ts` joins a playlist's room, whose events update the cache (`lib/playlistSocketRules.ts` next to it); `features/playback/features/control-delegation/hooks/` handles friends' listening and delegated control commands.
 - **Playback contract**: playlists start and display playback through `shared/playback/lib/playbackBridge.ts`, which `navigation/playbackBridge.ts` wires to `playerStore` and `queueStore` when `AppNavigator` loads; no feature imports the player or the queue.
 - **Audio playback**: expo-audio plays the SoundCloud HLS stream; `PlayerContext` manages the player's lifecycle, `playerStore` its state (current track, play/pause, modal), `MiniPlayer` and `PlayerModal` the display.
 - **Background playback (Android)**: React Native pauses JS timers once the app is in the background, and `fetch` resolves through `setTimeout`, so the next track's requests would wait for the app to come back. The local Expo module `modules/js-keep-alive/` runs a headless JS task while this device plays or loads a track (`features/playback/hooks/useBackgroundKeepAlive.ts`), which keeps the timers firing. Native code: reinstall the debug build (`npx expo prebuild --clean -p android`, then `npx expo run:android --app-id com.zumik.app.dev --no-bundler`) after pulling it.
@@ -300,7 +300,7 @@ Expo supports hot reload: change any file and the app updates within 1-2 seconds
 Types, validators and versions match the backend:
 
 - **TypeScript types** (`src/features/<feature>/types.ts`, and the shared ones in their slice, such as `src/shared/tracks/lib/track.types.ts`) match the backend's schemas.
-- **Zod validators** (`src/features/playlists/validators.ts`, `src/features/user/features/auth/shared/sign-in/lib/validators.ts`) use the same rules.
+- **Zod validators** (`src/features/playlists/shared/playlist/lib/validators.ts`, `src/features/user/features/auth/shared/sign-in/lib/validators.ts`) use the same rules.
 - **Versions**: Socket.io and Zod are the same as the backend's.
 
 ## Tests

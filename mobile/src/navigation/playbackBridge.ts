@@ -1,12 +1,10 @@
 import { registerPlaybackBridge } from '@/shared/playback/lib/playbackBridge';
-import { registerTrackActionsSheet } from '@/shared/playback/lib/trackActionsBridge';
 import {
 	readPositionMs,
 	usePlayerStore,
 } from '@/features/playback/shared/player/stores/playerStore';
 import { useActiveQueue, useQueueStore } from '@/features/playback/shared/player/stores/queueStore';
 import { selectPlaysPlaylist } from '@/features/playback/shared/player/lib/queueSelectors';
-import { TrackActionsSheetContainer } from '@/features/playlists/trackActions/components/TrackActionsSheetContainer';
 
 /** Lets playlists reach the player and queue without importing them. */
 export function registerPlayback(): void {
@@ -47,6 +45,4 @@ export function registerPlayback(): void {
 			useQueueStore.getState().setCurrentItem(userId, itemId, version);
 		},
 	});
-
-	registerTrackActionsSheet(TrackActionsSheetContainer);
 }

@@ -16,7 +16,7 @@ The subject asks for two of the three services of IV.2. Zumik delivers **Music P
 | III.2 Mobile experience | ✅ | `mobile/` (Expo React Native, native Android build) |
 | IV.1 User | ✅ | `backend/src/features/auth/`, `profile/`; [accounts-auth.md](../features/accounts-auth.md) |
 | IV.2.2 Music Control Delegation | ✅ | `backend/src/features/music-control/`, `mobile/src/features/playback/features/control-delegation/`; [control-delegation.md](../features/control-delegation.md) |
-| IV.2.3 Music Playlist Editor | ✅ | `backend/src/features/playlists/`; [playlist-editor.md](../features/playlist-editor.md) |
+| IV.2.3 Music Playlist Editor | ✅ | `backend/src/features/playlists/`, `mobile/src/features/playlists/features/editor/`; [playlist-editor.md](../features/playlist-editor.md) |
 | IV.3 Server | ✅ | Supabase behind the backend |
 | IV.4 API | ✅ | Swagger UI `/api-docs`; [mobile-api.md](../features/mobile-api.md) |
 | IV.5 Mobile application | ✅ | `mobile/src/shared/backend/lib/api.ts`, `backendUrl.ts` |

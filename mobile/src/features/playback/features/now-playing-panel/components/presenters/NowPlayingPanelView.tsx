@@ -9,7 +9,7 @@ import { Text } from '@/shared/theme/components/Text';
 import { Artwork } from '@/shared/theme/components/Artwork';
 import { EmptyState } from '@/shared/theme/components/EmptyState';
 import type { PlayerSheets } from '@/features/playback/shared/full-screen-sheet/FullScreenSheet';
-import { getTrackActionsSheet } from '@/shared/playback/lib/trackActionsBridge';
+import type { TrackActionsSheetComponent } from '@/shared/playback/lib/trackActionsSheet';
 import type { Theme } from '@/shared/theme/lib/types';
 import { PANEL_CLOSE_ID, PANEL_ID } from '@/features/playback/shared/player/lib/constants';
 import type { NowPlayingPanelData } from '@/features/playback/features/now-playing-panel/hooks/useNowPlayingPanel';
@@ -21,14 +21,19 @@ import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-sol
 import TimesSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/times-solid.svg';
 
 interface NowPlayingPanelViewProps extends PlayerSheets {
+	TrackActionsSheet: TrackActionsSheetComponent;
 	data: NowPlayingPanelData;
 }
 
-export function NowPlayingPanelView({ data, QueueModal, DevicePicker }: NowPlayingPanelViewProps) {
+export function NowPlayingPanelView({
+	data,
+	QueueModal,
+	DevicePicker,
+	TrackActionsSheet,
+}: NowPlayingPanelViewProps) {
 	const separator = useSeparatorColor();
 	const factory = React.useCallback((theme: Theme) => createStyles(theme, separator), [separator]);
 	const { styles, theme } = useThemedStyles(factory);
-	const TrackActionsSheetContainer = getTrackActionsSheet();
 	const { track } = data;
 
 	return (
@@ -97,12 +102,11 @@ export function NowPlayingPanelView({ data, QueueModal, DevicePicker }: NowPlayi
 
 			<QueueModal visible={data.isQueueOpen} onClose={data.onCloseSheet} />
 			<DevicePicker visible={data.isDevicesOpen} onClose={data.onCloseSheet} />
-			{TrackActionsSheetContainer &&
-				React.createElement(TrackActionsSheetContainer, {
-					track: data.actions?.track ?? null,
-					start: data.actions?.start,
-					onClose: data.onCloseActions,
-				})}
+			<TrackActionsSheet
+				track={data.actions?.track ?? null}
+				start={data.actions?.start}
+				onClose={data.onCloseActions}
+			/>
 		</View>
 	);
 }

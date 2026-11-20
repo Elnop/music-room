@@ -1,4 +1,4 @@
-import type { PlaylistWithTracks } from '@/features/playlists/types';
+import type { PlaylistWithTracks } from '@/features/playlists/shared/playlist/lib/types';
 import type { TrackInPlaylist } from '@/shared/tracks/lib/track.types';
 
 export const playlistTrack = (id: string, rank: string, trackUri = id): TrackInPlaylist => ({

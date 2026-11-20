@@ -8,7 +8,7 @@ import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { AppToast } from '@/shared/theme/components/AppToast';
 import { ReorderableList } from '@/shared/theme/components/ReorderableList';
 import { EmptyState } from '@/shared/theme/components/EmptyState';
-import { getTrackActionsSheet } from '@/shared/playback/lib/trackActionsBridge';
+import type { TrackActionsSheetComponent } from '@/shared/playback/lib/trackActionsSheet';
 import { QueueItemRow } from './QueueItemRow';
 import type { createModalStyles } from './queueModalStyles';
 import type { Theme } from '@/shared/theme/lib/types';
@@ -21,6 +21,7 @@ import TimesSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/times-sol
 import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
 
 interface QueueModalViewProps {
+	TrackActionsSheet: TrackActionsSheetComponent;
 	visible: boolean;
 	onClose: () => void;
 	theme: Theme;
@@ -37,6 +38,7 @@ interface QueueModalViewProps {
 }
 
 export function QueueModalView({
+	TrackActionsSheet,
 	visible,
 	onClose,
 	theme,
@@ -51,7 +53,6 @@ export function QueueModalView({
 	onShowActions,
 	onCloseActions,
 }: QueueModalViewProps) {
-	const TrackActionsSheetComponent = getTrackActionsSheet();
 	const { isWide } = useBreakpoint();
 
 	const header = current ? (
@@ -113,11 +114,7 @@ export function QueueModalView({
 				)}
 			/>
 
-			{TrackActionsSheetComponent &&
-				React.createElement(TrackActionsSheetComponent, {
-					track: actionTrack,
-					onClose: onCloseActions,
-				})}
+			<TrackActionsSheet track={actionTrack} onClose={onCloseActions} />
 
 			<AppToast />
 		</GestureHandlerRootView>
