@@ -14,12 +14,6 @@
 		"**/__tests__/**",
 		"**/__mocks__/**",
 		"**/src/assets.d.ts",
-		"**/src/shared/theme/components/Skeleton.tsx",
-		"**/src/navigation/AuthNavigator.tsx",
-		"**/src/navigation/stacks/FriendsStack.tsx",
-		"**/src/navigation/stacks/PlaylistsStack.tsx",
-		"**/src/navigation/stacks/ProfileStack.tsx",
-		"**/src/navigation/stacks/SearchStack.tsx",
-		"**/src/types/assets.d.ts"
+		"**/src/shared/theme/components/Skeleton.tsx"
 	]
 }
