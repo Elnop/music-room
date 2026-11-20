@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { checkTreeEntry, followFolderRenames } from './check-tree-entries.mjs';
+import { checkTreeEntry, followFolderRenames, movedIntoFolder } from './check-tree-entries.mjs';
 
 test('keeps the folder and the verdict of a message', () => {
   assert.equal(
@@ -47,4 +47,21 @@ test('a move from another folder leaves the entry alone', () => {
     ),
     'src/types holds lib files'
   );
+});
+
+test('an entry comes from moved code when a renamed file lands in its folder', () => {
+  const renames = [['mobile/src/shared/hooks/useLoop.ts', 'mobile/src/shared/theme/hooks/useLoop.ts']];
+  assert.equal(movedIntoFolder('src/shared/theme holds groups of files that never import each other', renames, 'mobile'), true);
+  assert.equal(movedIntoFolder('src/shared/theme/hooks holds a single child', renames, 'mobile'), true);
+});
+
+test('an entry in a folder that received no renamed file is new code', () => {
+  const renames = [['mobile/src/shared/hooks/useLoop.ts', 'mobile/src/shared/theme/useLoop.ts']];
+  assert.equal(movedIntoFolder('src/shared/forms holds lib files', renames, 'mobile'), false);
+  assert.equal(movedIntoFolder('src/shared/theme/hooks holds a single child', renames, 'mobile'), false);
+});
+
+test('a rename in another project is not moved code', () => {
+  const renames = [['backend/src/shared/a.ts', 'backend/src/shared/theme/a.ts']];
+  assert.equal(movedIntoFolder('src/shared/theme holds lib files', renames, 'mobile'), false);
 });

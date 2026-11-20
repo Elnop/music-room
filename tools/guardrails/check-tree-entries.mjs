@@ -18,3 +18,8 @@ export function followFolderRenames(entry, renames, project) {
   }
   return entry;
 }
+
+export function movedIntoFolder(entry, renames, project) {
+  const [folder] = entry.split(' ');
+  return renames.some(([, to]) => to.startsWith(`${project}/${folder}/`));
+}
