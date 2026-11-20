@@ -11,13 +11,13 @@ module.exports = {
 		owner: '@anonymous',
 		version: '1.0.0',
 		orientation: 'portrait',
-		icon: './src/assets/logo/app-icon.png',
+		icon: './assets/logo/app-icon.png',
 		userInterfaceStyle: 'dark',
 		// Window background before the first render (expo-system-ui), else Android shows white.
 		backgroundColor: '#0D0D0D',
 		newArchEnabled: true,
 		splash: {
-			image: './src/assets/logo/logo.png',
+			image: './assets/logo/logo.png',
 			resizeMode: 'contain',
 			backgroundColor: '#121212',
 		},
@@ -66,7 +66,7 @@ module.exports = {
 			],
 		},
 		web: {
-			favicon: './src/assets/logo/app-icon.png',
+			favicon: './assets/logo/app-icon.png',
 		},
 		// The GitHub Pages build serves the app under a sub-path; dev stays at the root.
 		...(process.env.WEB_BASE_URL && { experiments: { baseUrl: process.env.WEB_BASE_URL } }),
