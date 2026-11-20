@@ -1,14 +1,14 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Button } from '@/shared/components/ui/Button';
-import { Input } from '@/shared/components/ui/Input';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import { useTheme } from '@/shared/theme/ThemeContext';
+import { Button } from '@/shared/theme/components/Button';
+import { Input } from '@/shared/theme/components/Input';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import { PasswordScreenFrame } from '@/features/auth/form/presenters/PasswordScreenFrame';
 import { ErrorBox } from '@/features/auth/form/presenters/ErrorBox';
 import type { ForgotPassword } from '@/features/auth/forgotPassword/useForgotPassword';
-import { Text } from '@/shared/components/ui/Text';
-import { FONT_FAMILIES } from '@/shared/theme/fonts';
+import { Text } from '@/shared/theme/components/Text';
+import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
 
 export function ForgotPasswordView({ form }: { form: ForgotPassword }) {
 	const { theme } = useTheme();

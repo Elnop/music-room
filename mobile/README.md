@@ -10,7 +10,7 @@ How it fits with the rest of the system: [doc/architecture/overview.md](../doc/a
 - **Language**: TypeScript (strict mode)
 - **Navigation**: React Navigation v7
 - **State**: TanStack Query v5 (server data, cache, invalidation) and Zustand v5 (local client state: session, preferences, UI, player)
-- **HTTP client**: shared API client (`src/shared/services/api.ts`) on top of `fetch`, which adds the telemetry headers (`X-Platform`, `X-Device-Model`, `X-App-Version`) and refreshes the token transparently
+- **HTTP client**: shared API client (`src/shared/backend/lib/api.ts`) on top of `fetch`, which adds the telemetry headers (`X-Platform`, `X-Device-Model`, `X-App-Version`) and refreshes the token transparently
 - **Auth**: the backend API (`/api/auth/*`); the app ships no Supabase client
 - **Real time**: socket.io-client v4.8
 - **Validation**: Zod v4
@@ -40,9 +40,9 @@ From the repository root, `make install` installs both projects.
 
 ### Environment variables
 
-`make dev-docker` and `make dev-local` force `EXPO_PUBLIC_API_URL=http://<local IP>:3000` and `EXPO_PUBLIC_WS_URL=ws://<local IP>:3000` (variables `DEV_API_URL` and `DEV_WS_URL` in `make/config.mk`), whatever the value in `.env`. `make dev-tunnel` uses the ngrok tunnel URL. The values in `.env` are only used by an `npx expo start` run by hand. A tester can also change the backend address inside the app, without rebuilding (`BackendUrlField`, `shared/services/backendUrl.ts`).
+`make dev-docker` and `make dev-local` force `EXPO_PUBLIC_API_URL=http://<local IP>:3000` and `EXPO_PUBLIC_WS_URL=ws://<local IP>:3000` (variables `DEV_API_URL` and `DEV_WS_URL` in `make/config.mk`), whatever the value in `.env`. `make dev-tunnel` uses the ngrok tunnel URL. The values in `.env` are only used by an `npx expo start` run by hand. A tester can also change the backend address inside the app, without rebuilding (`BackendUrlField`, `shared/backend/lib/backendUrl.ts`).
 
-The app never talks to Supabase: sign-in, sign-up, email verification, password reset, refresh and logout all go through the backend API (calls in `src/features/auth/services/`, through the `src/shared/services/api.ts` client), which logs them. The session (backend tokens) lives in `src/features/auth/stores/authStore.ts`, persisted in AsyncStorage by `features/auth/services/sessionStorage.ts`; it is refreshed through `/api/auth/refresh` (before a request when the token expires soon, at startup, and after a 401), and a refused refresh (401) clears the storage and goes back to the sign-in screen.
+The app never talks to Supabase: sign-in, sign-up, email verification, password reset, refresh and logout all go through the backend API (calls in `src/features/auth/services/`, through the `src/shared/backend/lib/api.ts` client), which logs them. The session (backend tokens) lives in `src/features/auth/stores/authStore.ts`, persisted in AsyncStorage by `features/auth/services/sessionStorage.ts`; it is refreshed through `/api/auth/refresh` (before a request when the token expires soon, at startup, and after a 401), and a refused refresh (401) clears the storage and goes back to the sign-in screen.
 
 ```env
 # Backend API (ignored by make dev-docker, dev-local and dev-tunnel)
@@ -95,11 +95,11 @@ From the root: `make dev-phone` (USB phone, any network), `make dev-docker` (Doc
 
 ### Web app
 
-`make dev-web` (backend in Docker) or `make dev-web-local` (no Docker) serves the app in a browser on `http://localhost:8081`, the web origin in the backend's `ALLOWED_ORIGINS`; it calls the backend on `http://localhost:3000` and has no backend address to pick. A service that wraps a native module has a `.web.ts` variant next to it, which Metro picks for the web bundle (`googleSignIn.web.ts`, `beaconScanner.web.ts`, `useImageColors.web.ts`, …); what the browser cannot do is hidden (`shared/constants/platform.ts`).
+`make dev-web` (backend in Docker) or `make dev-web-local` (no Docker) serves the app in a browser on `http://localhost:8081`, the web origin in the backend's `ALLOWED_ORIGINS`; it calls the backend on `http://localhost:3000` and has no backend address to pick. A service that wraps a native module has a `.web.ts` variant next to it, which Metro picks for the web bundle (`googleSignIn.web.ts`, `beaconScanner.web.ts`, `useImageColors.web.ts`, …); what the browser cannot do is hidden (`shared/platform/platform.ts`).
 
 The player hooks reach the audio through `features/player/services/audioPlayer.ts` (expo-audio). Its browser variant `audioPlayer.web.ts` plays the SoundCloud HLS stream in one `<audio>` element for the page: natively when the browser reads HLS (Safari), through `hls.js` otherwise, which only feeds the element; the queue, auto-advance, prefetch and the expired-URL watchdog stay the shared hooks. `useMediaSession.web.ts` drives the media keys and the browser's media notification through the Media Session API. A playback the browser refuses before any click on the page (a friend's remote command, typically) leaves the player paused, so the controller never sees it playing, and asks "Cliquer pour activer le son" (`hooks/useAutoplayPrompt.ts`).
 
-To test the responsive layout, resize the browser window (or use the browser's device toolbar) across the breakpoints of `shared/constants/layout.ts`: under 768 px the phone layout, which is Android's; from 768 px a left icon rail; from 1024 px the desktop side bar. The layout follows the window live, no reload. `npx expo export -p web --clear` builds the static site into `dist/` (`--clear`: the Metro cache can hold another checkout's paths); the backend address is the `EXPO_PUBLIC_API_URL` and `EXPO_PUBLIC_WS_URL` of the build. Everything the web client changes or lacks, and the demo scenario: [web-client.md](../doc/features/web-client.md).
+To test the responsive layout, resize the browser window (or use the browser's device toolbar) across the breakpoints of `shared/theme/lib/layout.ts`: under 768 px the phone layout, which is Android's; from 768 px a left icon rail; from 1024 px the desktop side bar. The layout follows the window live, no reload. `npx expo export -p web --clear` builds the static site into `dist/` (`--clear`: the Metro cache can hold another checkout's paths); the backend address is the `EXPO_PUBLIC_API_URL` and `EXPO_PUBLIC_WS_URL` of the build. Everything the web client changes or lacks, and the demo scenario: [web-client.md](../doc/features/web-client.md).
 
 ## Scripts
 
@@ -250,11 +250,11 @@ mobile/src/
 
 ## State, real time and playback
 
-- **HTTP calls**: always through `shared/services/api.ts`, which adds the token and the `X-Platform`, `X-Device-Model`, `X-App-Version` headers the backend logs.
-- **Server data**: TanStack Query (`AppProviders` provides the client). A query key is built with `queryKeys` (`shared/query/keys.ts`), freshness is chosen among the `STALE` profiles (`shared/query/queryClient.ts`), and a Socket.io event updates the cache (`setQueryData`) or invalidates it through `useSocketCache` (`shared/query/socketCache.ts`). Zustand only keeps client state. Rules: `.agents/rules/state.md`.
-- **Session and shared layer**: `shared/` does not import auth; the session store registers itself in `shared/services/authSession.ts` (token, refresh) and announces each session end there (`onSessionEnd`), on which the socket closes and the player empties.
-- **Real time**: `shared/stores/socketStore.ts` manages the Socket.io connection; `features/playlists/hooks/usePlaylistRoom.ts` joins a playlist's room, whose events update the cache (`utils/playlistSocketRules.ts`); `useMusicControl` handles friends' listening and delegated control commands.
-- **Playback contract**: playlists start and display playback through `shared/services/playbackBridge.ts`, which `navigation/playbackBridge.ts` wires to `playerStore` and `queueStore` when `AppNavigator` loads; no feature imports the player or the queue.
+- **HTTP calls**: always through `shared/backend/lib/api.ts`, which adds the token and the `X-Platform`, `X-Device-Model`, `X-App-Version` headers the backend logs.
+- **Server data**: TanStack Query (`AppProviders` provides the client). A query key is built with `queryKeys` (`shared/query-keys/keys.ts`), freshness is chosen among the `STALE` profiles (`shared/backend/queryClient.ts`), and a Socket.io event updates the cache (`setQueryData`) or invalidates it through `useSocketCache` (`shared/backend/lib/socketCache.ts`). Zustand only keeps client state. Rules: `.agents/rules/state.md`.
+- **Session and shared layer**: `shared/` does not import auth; the session store registers itself in `shared/backend/lib/authSession.ts` (token, refresh) and announces each session end there (`onSessionEnd`), on which the socket closes and the player empties.
+- **Real time**: `shared/backend/socketStore.ts` manages the Socket.io connection; `features/playlists/hooks/usePlaylistRoom.ts` joins a playlist's room, whose events update the cache (`utils/playlistSocketRules.ts`); `useMusicControl` handles friends' listening and delegated control commands.
+- **Playback contract**: playlists start and display playback through `shared/playback/lib/playbackBridge.ts`, which `navigation/playbackBridge.ts` wires to `playerStore` and `queueStore` when `AppNavigator` loads; no feature imports the player or the queue.
 - **Audio playback**: expo-audio plays the SoundCloud HLS stream; `PlayerContext` manages the player's lifecycle, `playerStore` its state (current track, play/pause, modal), `MiniPlayer` and `PlayerModal` the display.
 - **Background playback (Android)**: React Native pauses JS timers once the app is in the background, and `fetch` resolves through `setTimeout`, so the next track's requests would wait for the app to come back. The local Expo module `modules/js-keep-alive/` runs a headless JS task while this device plays or loads a track (`features/player/hooks/useBackgroundKeepAlive.ts`), which keeps the timers firing. Native code: reinstall the debug build (`npx expo prebuild --clean -p android`, then `npx expo run:android --app-id com.zumik.app.dev --no-bundler`) after pulling it.
 - **Events and location**: `expo-location` (address to coordinates, current position) and `@react-native-community/datetimepicker` (Android date and time dialogs) are native modules: after pulling them, rebuild the debug build (`npx expo prebuild --clean -p android`, then `npx expo run:android --app-id com.zumik.app.dev --no-bundler`). The location permission is foreground only and asked when a position is needed; Android's geocoder needs it even to place a typed address. The position never leaves the phone: the backend gets the event's coordinates, never the user's.
@@ -267,19 +267,19 @@ mobile/src/
 
 ### Imports
 
-A single alias, `@/` (to `src/`), for every import that leaves the current folder; never `../` (ESLint):
+A single alias, `@/` (to `src/`), for every import that leaves the current folder; never `../` (ESLint). Tests also import the helpers of `test-utils/` through `@test-utils/`:
 
 ```typescript
-import { Button } from '@/shared/components/ui/Button';
+import { Button } from '@/shared/theme/components/Button';
 ```
 
 ### Primitives and theme
 
-Every pressable element goes through `Pressable` or `Button` from `@/shared/components/ui/`: one press opacity, optional haptic feedback (`haptic`), `button` role by default and a required `accessibilityLabel`. `TouchableOpacity` and `Pressable` from `react-native` are forbidden elsewhere (ESLint `guardrails/ui-primitives`). Gestures (swipe, drag and drop) stay on `react-native-gesture-handler`.
+Every pressable element goes through `Pressable` or `Button` from `@/shared/theme/components/`: one press opacity, optional haptic feedback (`haptic`), `button` role by default and a required `accessibilityLabel`. `TouchableOpacity` and `Pressable` from `react-native` are forbidden elsewhere (ESLint `guardrails/ui-primitives`). Gestures (swipe, drag and drop) stay on `react-native-gesture-handler`.
 
-The app has a single theme, `original` (`src/shared/theme/original.theme.ts`), read through `useTheme()`; the shared tokens are in `src/shared/theme/tokens.ts`. No hard-coded color outside `src/shared/theme/` (ESLint `guardrails/theme-tokens`): read `theme.colors.*`.
+The app has a single theme, `original` (`src/shared/theme/lib/original.theme.ts`), read through `useTheme()`; the shared tokens are in `src/shared/theme/lib/tokens.ts`. No hard-coded color outside `src/shared/theme/` (ESLint `guardrails/theme-tokens`): read `theme.colors.*`.
 
-Icons are `PixelIcon` (`src/shared/components/media/PixelIcon.tsx`), which draws an SVG of the [HackerNoon Pixel Icon Library](https://github.com/hackernoon/pixel-icon-library) with `react-native-svg`, filled with the requested colour. Each file imports the SVGs it uses straight from the npm package (`import PlaySolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/play-solid.svg'`) and passes the component: `<PixelIcon icon={PlaySolid} color={...} />`. `react-native-svg-transformer` (`metro.config.cjs`) turns each import into a component. There is no central list: only the icons a screen imports end up in the bundle.
+Icons are `PixelIcon` (`src/shared/theme/components/PixelIcon.tsx`), which draws an SVG of the [HackerNoon Pixel Icon Library](https://github.com/hackernoon/pixel-icon-library) with `react-native-svg`, filled with the requested colour. Each file imports the SVGs it uses straight from the npm package (`import PlaySolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/play-solid.svg'`) and passes the component: `<PixelIcon icon={PlaySolid} color={...} />`. `react-native-svg-transformer` (`metro.config.cjs`) turns each import into a component. There is no central list: only the icons a screen imports end up in the bundle.
 
 ### Component roles
 
@@ -299,7 +299,7 @@ Expo supports hot reload: change any file and the app updates within 1-2 seconds
 
 Types, validators and versions match the backend:
 
-- **TypeScript types** (`src/types/`, `src/features/<feature>/types.ts`) match the backend's schemas.
+- **TypeScript types** (`src/features/<feature>/types.ts`, and the shared ones in their slice, such as `src/shared/tracks/lib/track.types.ts`) match the backend's schemas.
 - **Zod validators** (`src/features/playlists/validators.ts`, `src/features/auth/validators.ts`) use the same rules.
 - **Versions**: Socket.io and Zod are the same as the backend's.
 

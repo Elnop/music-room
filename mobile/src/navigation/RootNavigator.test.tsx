@@ -5,7 +5,7 @@ import { act, render, screen } from '@testing-library/react-native';
 import { RootNavigator } from './RootNavigator';
 import { useAuthStore } from '@/features/auth/stores/authStore';
 import { clearPendingLink } from './linking';
-import { logger } from '@/shared/utils/logger';
+import { logger } from '@/shared/logging/logger';
 
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
 
@@ -13,21 +13,21 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/shared/services/deviceService', () => ({
+jest.mock('@/shared/backend/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-jest.mock('@/shared/services/backendUrl', () => ({
+jest.mock('@/shared/backend/lib/backendUrl', () => ({
 	loadBackendUrl: () => Promise.resolve(),
 	getBackendUrl: () => 'http://backend.test',
 }));
 
-jest.mock('@/shared/stores/socketStore', () => {
+jest.mock('@/shared/backend/socketStore', () => {
 	const state = { connect: jest.fn(), disconnect: jest.fn() };
 	return { useSocketStore: (select: (s: typeof state) => unknown) => select(state) };
 });
@@ -36,7 +36,7 @@ jest.mock('@/features/music-control/hooks/useMusicControlEmitter', () => ({
 	useMusicControlEmitter: jest.fn(),
 }));
 
-jest.mock('@/shared/components/ui/LoadingSpinner', () => ({
+jest.mock('@/shared/theme/components/LoadingSpinner', () => ({
 	LoadingSpinner: () => null,
 }));
 

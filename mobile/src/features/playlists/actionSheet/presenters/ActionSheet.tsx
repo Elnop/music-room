@@ -1,18 +1,18 @@
 import React from 'react';
 import { Modal, StyleSheet, View, type DimensionValue } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import { AnchoredMenu } from '@/shared/components/layout/AnchoredMenu';
-import { CenteredDialog } from '@/shared/components/layout/CenteredDialog';
-import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
-import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import { pixelFrame } from '@/shared/theme/pixelFrame';
-import type { Theme } from '@/shared/theme/types';
-import type { MenuAnchor } from '@/shared/utils/menuPlacement';
-import { Text } from '@/shared/components/ui/Text';
-import { FONT_FAMILIES } from '@/shared/theme/fonts';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { AnchoredMenu } from './AnchoredMenu';
+import { CenteredDialog } from '@/shared/theme/components/CenteredDialog';
+import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
+import { useSeparatorColor } from '@/shared/theme/hooks/useSeparatorColor';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
+import type { Theme } from '@/shared/theme/lib/types';
+import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
+import { Text } from '@/shared/theme/components/Text';
+import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
 import AngleLeftSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/angle-left-solid.svg';
 
 interface ActionSheetProps {

@@ -1,13 +1,13 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import { ProfileSection } from '@/shared/components/profile/ProfileSection';
-import { GenreChip } from '@/shared/components/ui/GenreChip';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import type { Theme } from '@/shared/theme/types';
-import type { MusicGenre } from '@/types/user.types';
-import { Text } from '@/shared/components/ui/Text';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import { ProfileSection } from '@/shared/theme/components/ProfileSection';
+import { GenreChip } from '@/shared/theme/components/GenreChip';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { Theme } from '@/shared/theme/lib/types';
+import type { MusicGenre } from '@/shared/users/user.types';
+import { Text } from '@/shared/theme/components/Text';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
 interface ProfilePreferencesSectionProps {

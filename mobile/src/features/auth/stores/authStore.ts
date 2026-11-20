@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { notifySessionEnd, registerAuthSession } from '@/shared/services/authSession';
+import { notifySessionEnd, registerAuthSession } from '@/shared/backend/lib/authSession';
 import { createSessionActions } from './sessionActions';
 import { SIGNED_OUT, type AuthState } from './authState';
 

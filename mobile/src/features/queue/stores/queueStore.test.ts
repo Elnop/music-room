@@ -8,24 +8,24 @@ import {
 	selectPlaysPlaylist,
 } from '@/features/queue/utils/queueSelectors';
 import { createStore } from 'zustand';
-import { registerPlaybackBridge } from '@/shared/services/playbackBridge';
-import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
-import { deferred } from '@/test/deferred';
+import { registerPlaybackBridge } from '@/shared/playback/lib/playbackBridge';
+import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
+import { deferred } from '@test-utils/deferred';
 import { useConnectStore } from './connectStore';
-import type { UserProfile } from '@/types/user.types';
+import type { UserProfile } from '@/shared/users/user.types';
 import { queueApi } from '@/features/queue/services/queueApi';
-import { ApiError } from '@/shared/services/api';
-import { showError, showInfo, showSuccess } from '@/shared/utils/toast';
-import { hapticSuccess } from '@/shared/utils/haptics';
-import type { QueueItem, QueueState, QueueStepResult } from '@/types/queue.types';
-import type { SoundCloudTrack } from '@/types/soundcloud.types';
-import { logger } from '@/shared/utils/logger';
+import { ApiError } from '@/shared/backend/lib/api';
+import { showError, showInfo, showSuccess } from '@/shared/theme/lib/toast';
+import { hapticSuccess } from '@/shared/theme/lib/haptics';
+import type { QueueItem, QueueState, QueueStepResult } from '@/shared/playback/lib/queue.types';
+import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
+import { logger } from '@/shared/logging/logger';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/shared/services/deviceService', () => ({
+jest.mock('@/shared/backend/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 
@@ -43,9 +43,9 @@ jest.mock('@/features/queue/services/queueApi', () => ({
 	},
 }));
 
-jest.mock('@/shared/utils/haptics', () => ({ hapticSuccess: jest.fn() }));
+jest.mock('@/shared/theme/lib/haptics', () => ({ hapticSuccess: jest.fn() }));
 
-jest.mock('@/shared/utils/toast', () => ({
+jest.mock('@/shared/theme/lib/toast', () => ({
 	showSuccess: jest.fn(),
 	showError: jest.fn(),
 	showInfo: jest.fn(),

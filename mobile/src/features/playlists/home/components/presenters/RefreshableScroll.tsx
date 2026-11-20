@@ -1,8 +1,8 @@
 import React from 'react';
 import { ScrollView } from 'react-native';
-import { useContentColumn } from '@/shared/hooks/useContentColumn';
-import { ThemedRefreshControl } from '@/shared/components/lists/ThemedRefreshControl';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { useContentColumn } from '@/shared/theme/hooks/useContentColumn';
+import { ThemedRefreshControl } from '@/shared/refresh-control/ThemedRefreshControl';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { createListStyles } from './listStyles';
 
 interface RefreshableScrollProps {

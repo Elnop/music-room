@@ -23,7 +23,7 @@ function answerLogin(response: LoginResponse): void {
 	login.mockImplementation((callback: (response: LoginResponse) => void) => callback(response));
 }
 
-type Logger = typeof import('@/shared/utils/logger');
+type Logger = typeof import('@/shared/logging/logger');
 
 /** A fresh module, with the logger instance it writes to. */
 function load(): FacebookWeb & Logger {
@@ -31,7 +31,7 @@ function load(): FacebookWeb & Logger {
 	jest.isolateModules(() => {
 		module = {
 			...jest.requireActual<FacebookWeb>('./facebookSignIn.web'),
-			...jest.requireActual<Logger>('@/shared/utils/logger'),
+			...jest.requireActual<Logger>('@/shared/logging/logger'),
 		};
 	});
 	return module as FacebookWeb & Logger;

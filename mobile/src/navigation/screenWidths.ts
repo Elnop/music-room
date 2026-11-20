@@ -1,4 +1,4 @@
-import type { ContentWidth } from '@/shared/constants/layout';
+import type { ContentWidth } from '@/shared/theme/lib/layout';
 
 /** A screen not listed (Welcome) stays full width. */
 export const SCREEN_WIDTHS: Record<string, ContentWidth> = {

@@ -5,9 +5,9 @@ import { useAutoplayPrompt } from '@/features/player/hooks/useAutoplayPrompt';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { useAutoplayStore } from '@/features/player/stores/autoplayStore';
 import { useMusicControlEmitter } from '@/features/music-control/hooks/useMusicControlEmitter';
-import { showAlert } from '@/shared/utils/alert';
-import type { DeviceCommand } from '@/types/queue.types';
-import { FakeMediaElement, autoplayRefusal, installFakeDocument } from '@/test/fakeMediaElement';
+import { showAlert } from '@/shared/alerts/alert';
+import type { DeviceCommand } from '@/shared/playback/lib/queue.types';
+import { FakeMediaElement, autoplayRefusal, installFakeDocument } from '@test-utils/fakeMediaElement';
 import { registerPlayback } from './playbackBridge';
 
 // The browser as a delegated device: a friend's commands drive the web player, and the status it sends back is true.
@@ -20,7 +20,7 @@ jest.mock('@/features/player/services/streamApi', () => ({
 	fetchStreamUrl: () =>
 		Promise.resolve({ streamUrl: 'https://cdn/stream.m3u8', expiresAt: Date.now() + 1_800_000 }),
 }));
-jest.mock('@/shared/utils/alert', () => ({ showAlert: jest.fn() }));
+jest.mock('@/shared/alerts/alert', () => ({ showAlert: jest.fn() }));
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
@@ -28,16 +28,16 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 const mockSocket = { connected: true, on: jest.fn(), off: jest.fn(), emit: jest.fn() };
 const mockSession = { user: { id: 'owner' }, accessToken: 'token', isAuthenticated: true };
 
-jest.mock('@/shared/stores/socketStore', () => ({
+jest.mock('@/shared/backend/socketStore', () => ({
 	useSocketStore: (selector: (state: object) => unknown) =>
 		selector({ socket: mockSocket, isConnected: true }),
 }));
-jest.mock('@/shared/services/authSession', () => ({
+jest.mock('@/shared/backend/lib/authSession', () => ({
 	useSession: (selector: (state: object) => unknown) => selector(mockSession),
 	getSession: () => mockSession,
 	onSessionEnd: () => () => undefined,
 }));
-jest.mock('@/shared/services/deviceService', () => ({
+jest.mock('@/shared/backend/deviceService', () => ({
 	deviceService: {
 		getDeviceInfo: () =>
 			Promise.resolve({

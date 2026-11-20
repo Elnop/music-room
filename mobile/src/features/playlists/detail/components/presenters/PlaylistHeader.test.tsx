@@ -3,14 +3,14 @@ import { Share } from 'react-native';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { PlaylistHeader } from './PlaylistHeader';
 import type { PlaylistWithTracks } from '@/features/playlists/types';
-import type { UserProfile } from '@/types/user.types';
+import type { UserProfile } from '@/shared/users/user.types';
 
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-jest.mock('@/shared/utils/toast', () => ({
+jest.mock('@/shared/theme/lib/toast', () => ({
 	showSuccess: jest.fn(),
 	showError: jest.fn(),
 	showInfo: jest.fn(),

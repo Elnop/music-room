@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Linking, Platform } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import * as Location from 'expo-location';
-import { logger } from '@/shared/utils/logger';
+import { logger } from '@/shared/logging/logger';
 import { useAppActive } from './useAppActive';
 import { requestLocationPermission, type Coordinates } from '@/features/events/shared/events/lib/eventLocation';
 

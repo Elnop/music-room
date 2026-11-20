@@ -1,9 +1,9 @@
 import React from 'react';
 import { View } from 'react-native';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import { Text } from '@/shared/components/ui/Text';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { Text } from '@/shared/theme/components/Text';
 import type { NowPlayingPanelStyles } from './nowPlayingPanelStyles';
 import LaptopSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/laptop-solid.svg';
 import PhoneRingingLowSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/phone-ringing-low-solid.svg';

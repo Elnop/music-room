@@ -1,11 +1,11 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { GenreChip } from '@/shared/components/ui/GenreChip';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import type { Theme } from '@/shared/theme/types';
-import type { MusicGenre } from '@/types/user.types';
-import { MAX_GENRES, MUSIC_GENRES } from '@/types/user.types';
-import { Text } from '@/shared/components/ui/Text';
+import { GenreChip } from '@/shared/theme/components/GenreChip';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { Theme } from '@/shared/theme/lib/types';
+import type { MusicGenre } from '@/shared/users/user.types';
+import { MAX_GENRES, MUSIC_GENRES } from '@/shared/users/user.types';
+import { Text } from '@/shared/theme/components/Text';
 
 interface GenreSelectorProps {
 	selectedGenres: MusicGenre[];

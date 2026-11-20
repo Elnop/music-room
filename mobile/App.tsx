@@ -2,16 +2,18 @@ import React, { useEffect } from 'react';
 import { useFonts } from 'expo-font';
 import { AppProviders } from '@/providers/AppProviders';
 import { RootNavigator } from '@/navigation/RootNavigator';
-import { AppToast } from '@/shared/components/feedback/AppToast';
-import { ThemedSystemUI } from '@/shared/components/theme/ThemedSystemUI';
+import { ThemedSystemUI } from '@/shared/theme/components/ThemedSystemUI';
 import { configureGoogleSignIn } from '@/features/auth/services/googleSignIn';
 import { initializeFacebookSDK } from '@/features/auth/services/facebookSignIn';
 // Registers the linked accounts bridge.
 import '@/features/auth/hooks/useLinkedProviders';
 import { restoreRedirectedPath } from '@/navigation/webBasePath';
-import { FONT_ASSETS } from '@/shared/theme/fonts';
+import { onBackendError } from '@/shared/backend/lib/backendErrors';
+import { logger } from '@/shared/logging/logger';
+import { FONT_ASSETS } from '@/shared/theme/lib/fonts';
 
 // Before the first render: navigation reads its initial state from the address bar.
+onBackendError((level, message, context) => logger[level](message, context));
 restoreRedirectedPath();
 
 export default function App() {
@@ -29,7 +31,6 @@ export default function App() {
 		<AppProviders>
 			<RootNavigator />
 			<ThemedSystemUI />
-			<AppToast />
 		</AppProviders>
 	);
 }

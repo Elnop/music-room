@@ -14,7 +14,7 @@
 		"**/__tests__/**",
 		"**/__mocks__/**",
 		"**/src/assets.d.ts",
-		"**/src/shared/components/ui/Skeleton.tsx",
+		"**/src/shared/theme/components/Skeleton.tsx",
 		"**/src/navigation/AuthNavigator.tsx",
 		"**/src/navigation/stacks/FriendsStack.tsx",
 		"**/src/navigation/stacks/PlaylistsStack.tsx",

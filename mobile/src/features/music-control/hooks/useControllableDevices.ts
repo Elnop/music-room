@@ -1,8 +1,8 @@
 import { useEffect, useCallback, useState } from 'react';
-import { useSocketStore } from '@/shared/stores/socketStore';
+import { useSocketStore } from '@/shared/backend/socketStore';
 import { musicControlApi } from '@/features/music-control/services/musicControlApi';
-import type { ControlError } from '@/shared/utils/controlError';
-import { logger } from '@/shared/utils/logger';
+import type { ControlError } from '@/shared/control-error/controlError';
+import { logger } from '@/shared/logging/logger';
 
 interface PermissionChangedEvent {
 	ownerId: string;

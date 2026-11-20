@@ -1,9 +1,9 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { PlaylistCardSkeleton, SkeletonBlock, SkeletonList } from '@/shared/components/ui/Skeleton';
-import type { Theme } from '@/shared/theme/types';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
-import { useContentColumn } from '@/shared/hooks/useContentColumn';
+import { PlaylistCardSkeleton, SkeletonBlock, SkeletonList } from '@/shared/theme/components/Skeleton';
+import type { Theme } from '@/shared/theme/lib/types';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import { useContentColumn } from '@/shared/theme/hooks/useContentColumn';
 import { FriendCardSkeleton } from './FriendCardSkeleton';
 import { createListStyles } from './listStyles';
 

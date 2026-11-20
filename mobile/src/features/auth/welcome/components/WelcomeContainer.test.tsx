@@ -1,27 +1,23 @@
+import { Text } from '@/shared/theme/components/Text';
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '@/features/auth/types';
-import { openExternalUrl } from '@/shared/utils/openExternalUrl';
+import { openExternalUrl } from '@/shared/external-links/openExternalUrl';
 import { WelcomeContainer } from './WelcomeContainer';
 
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
-jest.mock('@/shared/components/form/BackendUrlField', () => {
-	const { Text } = jest.requireActual('react-native');
-	return { BackendUrlField: () => <Text>backend-url-field</Text> };
-});
-
-jest.mock('@/shared/services/deviceService', () => ({
+jest.mock('@/shared/backend/deviceService', () => ({
 	getBuildLabel: () => 'Zumik 1.0.0 (build 42 · a1b2c3d)',
 }));
 
-jest.mock('@/shared/utils/openExternalUrl', () => ({ openExternalUrl: jest.fn() }));
+jest.mock('@/shared/external-links/openExternalUrl', () => ({ openExternalUrl: jest.fn() }));
 
 let mockLandingShown = false;
-jest.mock('@/shared/constants/platform', () => ({
+jest.mock('@/shared/platform/platform', () => ({
 	get LANDING_SHOWN() {
 		return mockLandingShown;
 	},
@@ -33,7 +29,10 @@ const navigate = jest.fn();
 
 function renderWelcome() {
 	render(
-		<WelcomeContainer {...({ navigation: { navigate }, route: {} } as unknown as Props)} />
+		<WelcomeContainer
+			{...({ navigation: { navigate }, route: {} } as unknown as Props)}
+			backendUrlField={<Text>backend-url-field</Text>}
+		/>
 	);
 }
 
@@ -90,8 +89,8 @@ describe('WelcomeContainer', () => {
 		fireEvent.press(screen.getByLabelText('Télécharger pour Android'));
 		fireEvent.press(screen.getByLabelText('Code source'));
 		expect(jest.mocked(openExternalUrl).mock.calls).toEqual([
-			['https://github.com/Elnop/music-room/releases/latest'],
-			['https://github.com/Elnop/music-room'],
+			['https://github.com/Elnop/music-room/releases/latest', expect.any(Function)],
+			['https://github.com/Elnop/music-room', expect.any(Function)],
 		]);
 
 		fireEvent.press(screen.getByLabelText('Politique de confidentialité'));

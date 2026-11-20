@@ -1,4 +1,4 @@
-import { controlErrorMessage } from '@/shared/utils/controlError';
+import { controlErrorMessage } from '@/shared/control-error/controlError';
 import { useMusicControlEmitter } from './useMusicControlEmitter';
 import { useFriendListening } from './useFriendListening';
 

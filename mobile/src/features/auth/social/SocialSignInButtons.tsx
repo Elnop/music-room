@@ -1,12 +1,12 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import type { Theme } from '@/shared/theme/types';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { Theme } from '@/shared/theme/lib/types';
 import { GOOGLE_FORM_BUTTON } from '@/features/auth/constants';
 import type { GoogleButtonSlot } from '@/features/auth/types';
-import { Text } from '@/shared/components/ui/Text';
-import { FONT_FAMILIES } from '@/shared/theme/fonts';
+import { Text } from '@/shared/theme/components/Text';
+import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
 
 interface SocialSignInButtonsProps {
 	onGoogle: () => void;

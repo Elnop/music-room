@@ -1,11 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Socket } from 'socket.io-client';
 import { useAuthStore } from './authStore';
-import { useSocketStore } from '@/shared/stores/socketStore';
-import { resetBackendUrl } from '@/shared/services/backendUrl';
+import { useSocketStore } from '@/shared/backend/socketStore';
+import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { storedSession } from '@/features/auth/services/sessionStorage';
 import { login } from '@/features/auth/services/signIn';
-import { logger } from '@/shared/utils/logger';
+import { logger } from '@/shared/logging/logger';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -23,7 +23,7 @@ jest.mock(
 jest.mock('@/features/auth/services/googleSignIn', () => ({ signInWithGoogle: jest.fn() }));
 jest.mock('@/features/auth/services/facebookSignIn', () => ({ signInWithFacebook: jest.fn() }));
 
-jest.mock('@/shared/services/deviceService', () => ({
+jest.mock('@/shared/backend/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 

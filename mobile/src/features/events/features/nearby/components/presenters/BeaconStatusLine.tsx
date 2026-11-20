@@ -1,11 +1,11 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import type { Theme } from '@/shared/theme/types';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import type { Theme } from '@/shared/theme/lib/types';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { BeaconScanStatus } from '@/features/events/features/nearby/hooks/useBeaconScan';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 import WifiOutline from '@hackernoon/pixel-icon-library/icons/SVG/regular/wifi.svg';
 import WifiSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/wifi-solid.svg';
 

@@ -1,12 +1,12 @@
 import React from 'react';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import {
 	WideProfileHeader,
 	wideProfileActionStyle,
-} from '@/shared/components/profile/WideProfileHeader';
-import { Button } from '@/shared/components/ui/Button';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import type { UserProfile } from '@/types/user.types';
+} from '@/shared/theme/components/WideProfileHeader';
+import { Button } from '@/shared/theme/components/Button';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { UserProfile } from '@/shared/users/user.types';
 import type { UserStats } from '@/features/profile/types';
 import CogSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/cog-solid.svg';
 import PencilSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/pencil-solid.svg';

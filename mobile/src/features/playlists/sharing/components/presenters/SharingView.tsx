@@ -1,9 +1,9 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { SearchBar } from '@/shared/components/form/SearchBar';
-import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
-import type { Theme } from '@/shared/theme/types';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { SearchBar } from '@/shared/theme/components/SearchBar';
+import { LoadingSpinner } from '@/shared/theme/components/LoadingSpinner';
+import type { Theme } from '@/shared/theme/lib/types';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { PlaylistSharing } from '@/features/playlists/sharing/hooks/usePlaylistSharing';
 import {
 	membersTitle,
@@ -15,7 +15,7 @@ import { OpenPlaylistInfo } from './OpenPlaylistInfo';
 import { SettingRow } from './SettingRow';
 import { createSharingStyles } from './sharingStyles';
 import { UserResults } from './UserResults';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 import GlobeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/globe-solid.svg';
 import LockSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/lock-solid.svg';
 import PencilSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/pencil-solid.svg';

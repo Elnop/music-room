@@ -1,8 +1,8 @@
 import React from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import { Text } from '@/shared/components/ui/Text';
-import { FONT_FAMILIES } from '@/shared/theme/fonts';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { Text } from '@/shared/theme/components/Text';
+import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
 
 interface PasswordScreenLayoutProps {
 	title: string;

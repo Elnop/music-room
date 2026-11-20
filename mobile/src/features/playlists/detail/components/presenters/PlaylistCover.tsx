@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
-import { Artwork } from '@/shared/components/media/Artwork';
-import type { Theme } from '@/shared/theme/types';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { Artwork } from '@/shared/theme/components/Artwork';
+import type { Theme } from '@/shared/theme/lib/types';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { PlaylistWithTracks } from '@/features/playlists/types';
 
 /** Falls back to the first track's artwork. */

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useTheme } from '@/shared/theme/ThemeContext';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import { ProfileContainer } from '@/features/profile/profileScreen/components/ProfileContainer';
 import { EditProfileContainer } from '@/features/profile/editProfile/components/EditProfileContainer';
 import { PrivacySettingsContainer } from '@/features/profile/privacySettings/components/PrivacySettingsContainer';
@@ -11,10 +11,11 @@ import { SettingsContainer } from '@/features/profile/settings/components/Settin
 import { MyDevicesContainer } from '@/features/music-control/myDevices/components/orchestrators/MyDevicesContainer';
 import { PrivacyPolicyContainer } from '@/features/legal/components/PrivacyPolicyContainer';
 import type { ProfileStackParamList } from '@/features/profile/types';
-import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
+import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { screenHeader, screenLayout } from '@/navigation/screenLayout';
-import { headerTitle } from '@/shared/theme/pixelFrame';
+import { headerTitle } from '@/shared/theme/lib/pixelFrame';
 import { PlanContainer } from '@/features/subscription/PlanContainer';
+import { BackendUrlField } from '@/navigation/BackendUrlField';
 
 const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 const layout = screenLayout(true);
@@ -70,7 +71,7 @@ export function ProfileNavigator() {
 				options={{ title: 'Préférences musicales' }}
 			/>
 			<ProfileStack.Screen name="Settings" options={{ title: 'Réglages' }}>
-				{() => <PlanContainer>{plan => <SettingsContainer subscription={plan} />}</PlanContainer>}
+				{() => <PlanContainer>{plan => <SettingsContainer subscription={plan} backendUrlField={<BackendUrlField />} />}</PlanContainer>}
 			</ProfileStack.Screen>
 			<ProfileStack.Screen
 				name="PrivacyPolicy"

@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ApiError } from '@/shared/services/api';
-import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
-import { useScreenTitle } from '@/shared/hooks/useScreenTitle';
-import { showError, showInfo } from '@/shared/utils/toast';
+import { ApiError } from '@/shared/backend/lib/api';
+import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
+import { useScreenTitle } from '@/shared/screen-title/useScreenTitle';
+import { showError, showInfo } from '@/shared/theme/lib/toast';
 import { usePlaylistDetail } from '@/features/playlists/hooks/usePlaylistQueries';
 import { usePlaylistRoom } from '@/features/playlists/hooks/usePlaylistRoom';
 import { useRefetchOnFocus } from '@/features/playlists/hooks/useRefetchOnFocus';

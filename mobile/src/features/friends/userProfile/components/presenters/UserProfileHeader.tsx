@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { useTheme } from '@/shared/theme/ThemeContext';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { UserProfileHeaderProps } from '@/features/friends/types';
 import { UserProfileInfo } from './UserProfileInfo';
 import { UserProfileActions } from './UserProfileActions';

@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { showAlert } from '@/shared/utils/alert';
+import { showAlert } from '@/shared/alerts/alert';
 import { useQueryClient } from '@tanstack/react-query';
-import { ApiError } from '@/shared/services/api';
+import { ApiError } from '@/shared/backend/lib/api';
 import type { PlanState } from '@/features/subscription/lib/subscription';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { pickImage } from '@/shared/utils/imagePicker';
-import { prepareSquareImage } from '@/shared/utils/squareImage';
-import { showError, showSuccess } from '@/shared/utils/toast';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { pickImage } from '@/shared/image-picker/imagePicker';
+import { prepareSquareImage } from '@/shared/square-image/squareImage';
+import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import * as playlistApi from '@/features/playlists/services/playlistApi';
 import { patchPlaylist } from '@/features/playlists/utils/playlistCache';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -71,7 +71,7 @@ export function useCoverActions(
 			showLocked();
 			return;
 		}
-		const asset = await pickImage('library', PERMISSION_DENIED);
+		const asset = await pickImage('library', () => showError(PERMISSION_DENIED));
 		if (!asset) return;
 		await run(
 			async () => {

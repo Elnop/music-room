@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
-import type { Theme } from '@/shared/theme/types';
-import { displayText } from '@/shared/theme/pixelFrame';
+import type { Theme } from '@/shared/theme/lib/types';
+import { displayText } from '@/shared/theme/lib/pixelFrame';
 
 export const createUserProfileHeaderStyles = (theme: Theme) =>
 	StyleSheet.create({

@@ -1,20 +1,20 @@
 import { act, renderHook } from '@testing-library/react-native';
 import { createStore } from 'zustand';
 import { useNowPlaying } from './useNowPlaying';
-import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
+import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
-import { registerConnectBridge, type ConnectSnapshot } from '@/shared/services/connectBridge';
-import { registerPlaybackBridge, type OwnerQueue } from '@/shared/services/playbackBridge';
-import type { ListeningStatus } from '@/types/listening.types';
-import type { QueueItem } from '@/types/queue.types';
-import type { SoundCloudTrack } from '@/types/soundcloud.types';
-import type { UserProfile } from '@/types/user.types';
+import { registerConnectBridge, type ConnectSnapshot } from '@/shared/listening/lib/connectBridge';
+import { registerPlaybackBridge, type OwnerQueue } from '@/shared/playback/lib/playbackBridge';
+import type { ListeningStatus } from '@/shared/listening/lib/listening.types';
+import type { QueueItem } from '@/shared/playback/lib/queue.types';
+import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
+import type { UserProfile } from '@/shared/users/user.types';
 
 const mockSocket = { connected: true, on: jest.fn(), off: jest.fn(), emit: jest.fn() };
 const mockSeekTo = jest.fn();
 let mockProgress = { currentTime: 0, duration: 0, progress: 0 };
 
-jest.mock('@/shared/stores/socketStore', () => ({
+jest.mock('@/shared/backend/socketStore', () => ({
 	useSocketStore: { getState: () => ({ socket: mockSocket }) },
 }));
 
@@ -30,7 +30,7 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/shared/services/deviceService', () => ({
+jest.mock('@/shared/backend/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 
@@ -239,7 +239,7 @@ describe('useNowPlaying remote', () => {
 	};
 
 	it("shows the device's track, estimated progress and the queue item's duration", () => {
-		const { hashStringToNumber } = jest.requireActual('@/shared/utils/trackToSoundCloud');
+		const { hashStringToNumber } = jest.requireActual('@/shared/tracks/lib/trackToSoundCloud');
 		goRemote('friend', 'Léa');
 		testQueue = {
 			version: 1,

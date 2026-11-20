@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { showSuccess } from '@/shared/utils/toast';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { showSuccess } from '@/shared/theme/lib/toast';
 import type { AuthStackParamList } from '@/features/auth/types';
 import { newPasswordError } from '@/features/auth/utils/passwordRules';
 import { useCodeInput, type CodeInput } from '@/features/auth/code/hooks/useCodeInput';

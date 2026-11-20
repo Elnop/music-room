@@ -1,13 +1,13 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
-import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
-import { ThemedSwitch } from '@/shared/components/ui/ThemedSwitch';
-import type { Theme } from '@/shared/theme/types';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import type { PixelIconSource } from '@/shared/theme/components/PixelIcon';
+import { LoadingSpinner } from '@/shared/theme/components/LoadingSpinner';
+import { ThemedSwitch } from '@/shared/theme/components/ThemedSwitch';
+import type { Theme } from '@/shared/theme/lib/types';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { createSharingStyles } from './sharingStyles';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 
 interface SettingRowProps {
 	icon: PixelIconSource;

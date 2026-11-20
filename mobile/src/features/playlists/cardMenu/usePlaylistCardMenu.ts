@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { queryKeys } from '@/shared/query/keys';
-import { useSession } from '@/shared/services/authSession';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { logger } from '@/shared/utils/logger';
-import { showError, showSuccess } from '@/shared/utils/toast';
+import { queryKeys } from '@/shared/query-keys/keys';
+import { useSession } from '@/shared/backend/lib/authSession';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { logger } from '@/shared/logging/logger';
+import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import { useCoverActions } from '@/features/playlists/detail/hooks/useCoverActions';
 import { useDeletePlaylist } from '@/features/playlists/hooks/usePlaylistMutations';
 import { confirmPlaylistDelete } from '@/features/playlists/utils/confirmPlaylistDelete';

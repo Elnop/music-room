@@ -2,11 +2,11 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { GenreSelector } from '@/features/profile/common/presenters/GenreSelector';
 import { ProfileScreenFrame } from '@/features/profile/common/presenters/ProfileScreenFrame';
-import { Button } from '@/shared/components/ui/Button';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import type { Theme } from '@/shared/theme/types';
-import type { MusicGenre } from '@/types/user.types';
-import { MAX_GENRES } from '@/types/user.types';
+import { Button } from '@/shared/theme/components/Button';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { Theme } from '@/shared/theme/lib/types';
+import type { MusicGenre } from '@/shared/users/user.types';
+import { MAX_GENRES } from '@/shared/users/user.types';
 
 interface MusicPreferencesViewProps {
 	theme: Theme;

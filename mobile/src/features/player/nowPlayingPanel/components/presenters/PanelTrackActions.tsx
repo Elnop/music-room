@@ -1,13 +1,13 @@
 import React, { useRef } from 'react';
 import { View } from 'react-native';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import { useMeasuredPress } from '@/shared/hooks/useMeasuredPress';
-import type { MenuAnchor } from '@/shared/utils/menuPlacement';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import { Text } from '@/shared/components/ui/Text';
-import { ShareLinkButton } from '@/shared/components/sharing/ShareLinkButton';
-import { TrackActionsButton } from '@/shared/components/lists/TrackActionsButton';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { useMeasuredPress } from '@/shared/theme/hooks/useMeasuredPress';
+import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { Text } from '@/shared/theme/components/Text';
+import { ShareLinkButton } from '@/shared/theme/components/ShareLinkButton';
+import { TrackActionsButton } from '@/shared/theme/components/TrackActionsButton';
 import type { NowPlayingPanelStyles } from './nowPlayingPanelStyles';
 import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
 

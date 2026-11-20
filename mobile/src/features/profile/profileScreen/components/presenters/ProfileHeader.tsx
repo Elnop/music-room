@@ -1,12 +1,12 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Avatar } from '@/shared/components/media/Avatar';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import type { Theme } from '@/shared/theme/types';
-import { displayText } from '@/shared/theme/pixelFrame';
-import type { UserProfile } from '@/types/user.types';
+import { Avatar } from '@/shared/theme/components/Avatar';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { Theme } from '@/shared/theme/lib/types';
+import { displayText } from '@/shared/theme/lib/pixelFrame';
+import type { UserProfile } from '@/shared/users/user.types';
 import type { UserStats } from '@/features/profile/types';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 
 interface ProfileHeaderProps {
 	user: UserProfile;

@@ -1,20 +1,20 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import {
 	WideProfileHeader,
 	wideProfileActionStyle,
-} from '@/shared/components/profile/WideProfileHeader';
-import { Button } from '@/shared/components/ui/Button';
-import { useShareLink } from '@/shared/hooks/useShareLink';
-import { userLink } from '@/shared/utils/shareLinks';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
-import type { Theme } from '@/shared/theme/types';
+} from '@/shared/theme/components/WideProfileHeader';
+import { Button } from '@/shared/theme/components/Button';
+import { useShareLink } from '@/shared/theme/hooks/useShareLink';
+import { userLink } from '@/shared/share-links/shareLinks';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import type { Theme } from '@/shared/theme/lib/types';
 import type { UserProfileHeaderProps } from '@/features/friends/types';
 import { HiddenFieldNote } from './HiddenFieldNote';
 import { UserProfileBadges } from './UserProfileBadges';
 import { createUserProfileHeaderStyles } from './userProfileHeaderStyles';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 import CheckSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/check-solid.svg';
 import ShareSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/share-solid.svg';
 import UserPlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/user-plus-solid.svg';

@@ -2,8 +2,8 @@ import { getActionFromState } from '@react-navigation/native';
 import type { LinkingOptions, NavigationContainerRef } from '@react-navigation/native';
 import { Platform } from 'react-native';
 import type { AppTabsParamList } from './AppNavigator';
-import { logger } from '@/shared/utils/logger';
-import { LINK_PREFIX } from '@/shared/utils/shareLinks';
+import { logger } from '@/shared/logging/logger';
+import { LINK_PREFIX } from '@/shared/share-links/shareLinks';
 import { stripBasePath, webBasePath } from './webBasePath';
 import {
 	matchScreenPath,

@@ -2,9 +2,9 @@ import React from 'react';
 import { Share, useWindowDimensions } from 'react-native';
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { friendsApi } from '@/features/friends/services/friendsApi';
-import { renderWithClient } from '@/test/renderWithClient';
-import { signIn } from '@/test/session';
-import '@/test/playback';
+import { renderWithClient } from '@test-utils/renderWithClient';
+import { signIn } from '@test-utils/session';
+import '@test-utils/playback';
 import { UserProfileContainer } from './UserProfileContainer';
 
 const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
@@ -12,25 +12,25 @@ const ID = '3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c';
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
-jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
+jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
 jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
 	__esModule: true,
 	default: jest.fn(() => ({ width: 390, height: 844, scale: 1, fontScale: 1 })),
 }));
 
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-jest.mock('@/shared/utils/toast', () => ({
+jest.mock('@/shared/theme/lib/toast', () => ({
 	showSuccess: jest.fn(),
 	showError: jest.fn(),
 	showInfo: jest.fn(),
 }));
 
-jest.mock('@/shared/services/musicControlBridge', () => ({
+jest.mock('@/shared/backend/lib/musicControlBridge', () => ({
 	useFriendListening: () => ({
 		devices: [],
 		canControl: false,
@@ -41,7 +41,7 @@ jest.mock('@/shared/services/musicControlBridge', () => ({
 	}),
 }));
 
-jest.mock('@/shared/utils/controlError', () => ({
+jest.mock('@/shared/control-error/controlError', () => ({
 	controlErrorMessage: jest.fn(),
 }));
 

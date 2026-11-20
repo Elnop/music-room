@@ -2,7 +2,7 @@ import { act, renderHook } from '@testing-library/react-native';
 import type { View } from 'react-native';
 import { renderGoogleButton } from '@/features/auth/services/googleSignIn.web';
 import { preloadFacebookSdk } from '@/features/auth/services/facebookSignIn.web';
-import { logger } from '@/shared/utils/logger';
+import { logger } from '@/shared/logging/logger';
 import { useProviderButtons } from './useProviderButtons.web';
 
 jest.mock('@/features/auth/services/googleSignIn.web', () => ({ renderGoogleButton: jest.fn() }));

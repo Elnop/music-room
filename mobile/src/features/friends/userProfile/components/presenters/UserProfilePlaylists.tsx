@@ -1,11 +1,11 @@
 import React from 'react';
 import { View } from 'react-native';
-import { EmptyState } from '@/shared/components/feedback/EmptyState';
-import { useTheme } from '@/shared/theme/ThemeContext';
+import { EmptyState } from '@/shared/theme/components/EmptyState';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { FriendPlaylistSummary } from '@/features/friends/types';
 import { FriendPlaylistCard } from './FriendPlaylistCard';
 import { createUserProfileStyles } from './userProfileStyles';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
 interface UserProfilePlaylistsProps {

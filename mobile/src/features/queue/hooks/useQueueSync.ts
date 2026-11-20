@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { useSocketStore } from '@/shared/stores/socketStore';
+import { useSocketStore } from '@/shared/backend/socketStore';
 import { useQueueStore } from '@/features/queue/stores/queueStore';
-import { useSession } from '@/shared/services/authSession';
+import { useSession } from '@/shared/backend/lib/authSession';
 import { useConnectStore } from '@/features/queue/stores/connectStore';
 import type { QueueState } from '@/features/queue/types';
 

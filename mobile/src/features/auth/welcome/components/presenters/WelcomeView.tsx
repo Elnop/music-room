@@ -8,20 +8,19 @@ import {
 	View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import { Button } from '@/shared/components/ui/Button';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import { BackendUrlField } from '@/shared/components/form/BackendUrlField';
-import { CONTENT_MAX_WIDTH } from '@/shared/constants/layout';
-import { LANDING_SHOWN } from '@/shared/constants/platform';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import type { Theme } from '@/shared/theme/types';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import { Button } from '@/shared/theme/components/Button';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { CONTENT_MAX_WIDTH } from '@/shared/theme/lib/layout';
+import { LANDING_SHOWN } from '@/shared/platform/platform';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { Theme } from '@/shared/theme/lib/types';
 import type { FloatingIconMotion } from '@/features/auth/welcome/useFloatingIcons';
-import { PixelWordmark } from '@/shared/components/media/PixelWordmark';
+import { PixelWordmark } from '@/shared/theme/components/PixelWordmark';
 import { LANDING_INTRO } from '@/features/auth/welcome/utils/landingContent';
 import { FloatingIcon } from './FloatingIcon';
 import { LandingSections } from './LandingSections';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 import CogSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/cog-solid.svg';
 
 interface WelcomeViewProps {
@@ -33,6 +32,7 @@ interface WelcomeViewProps {
 	onLogin: () => void;
 	onOpenPrivacyPolicy: () => void;
 	onOpenLink: (url: string) => void;
+	backendUrlField: React.ReactNode;
 }
 
 export function WelcomeView({
@@ -44,6 +44,7 @@ export function WelcomeView({
 	onLogin,
 	onOpenPrivacyPolicy,
 	onOpenLink,
+	backendUrlField,
 }: WelcomeViewProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
@@ -87,7 +88,7 @@ export function WelcomeView({
 								</Pressable>
 								{showServer && (
 									<View style={styles.serverPanel}>
-										<BackendUrlField />
+										{backendUrlField}
 									</View>
 								)}
 							</>

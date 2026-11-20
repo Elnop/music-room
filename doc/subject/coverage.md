@@ -19,7 +19,7 @@ The subject asks for two of the three services of IV.2. Zumik delivers **Music P
 | IV.2.3 Music Playlist Editor | ✅ | `backend/src/features/playlists/`; [playlist-editor.md](../features/playlist-editor.md) |
 | IV.3 Server | ✅ | Supabase behind the backend |
 | IV.4 API | ✅ | Swagger UI `/api-docs`; [mobile-api.md](../features/mobile-api.md) |
-| IV.5 Mobile application | ✅ | `mobile/src/shared/services/api.ts`, `backendUrl.ts` |
+| IV.5 Mobile application | ✅ | `mobile/src/shared/backend/lib/api.ts`, `backendUrl.ts` |
 | IV.6 Security | ✅ | [threat-model.md](../security/threat-model.md) |
 | IV.7 Scaling | ⏳ | `make perf-test`, [tests/performance/README.md](../../tests/performance/README.md); reference machine and report: #103, #106 |
 | IV.8 Agility, quality, CI | ✅ | [quality-and-ci.md](../development/quality-and-ci.md), [testing.md](../development/testing.md) |
@@ -74,7 +74,7 @@ Details: [playlist-editor.md](../features/playlist-editor.md), [playlist-concurr
 
 - The app is a remote control of the backend: all data goes through the API.
 - Google and Facebook sign-in in the app.
-- The backend address can be changed inside the app for testing, without a rebuild (`shared/services/backendUrl.ts`, `BackendUrlField`): the next API and socket traffic goes to the new address.
+- The backend address can be changed inside the app for testing, without a rebuild (`shared/backend/lib/backendUrl.ts`, `BackendUrlField`): the next API and socket traffic goes to the new address.
 
 ### IV.6 Security
 
@@ -102,7 +102,7 @@ Details: [web-client.md](../features/web-client.md); the choice of Expo web over
 | Subject | Where |
 | --- | --- |
 | Service available on another platform | The same `mobile/` app built for the browser with Expo web (`react-native-web`); each native module has a `.web.ts` variant (`mobile/src/**/*.web.ts`). Static build `npx expo export -p web`, published on GitHub Pages (`https://elnop.github.io/music-room/`, `.github/workflows/pages.yml`) |
-| Responsive web client (phone, tablet, desktop) | `shared/hooks/useBreakpoint.ts`: phone < 768 px (the Android layout), tablet, desktop ≥ 1024 px; side navigation, centred content, grids, docked player, centred dialogs, mouse and keyboard (`shared/components/layout/`, `navigation/screenLayout.tsx`) |
+| Responsive web client (phone, tablet, desktop) | `shared/theme/hooks/useBreakpoint.ts`: phone < 768 px (the Android layout), tablet, desktop ≥ 1024 px; side navigation, centred content, grids, docked player, centred dialogs, mouse and keyboard (`shared/components/layout/`, `navigation/screenLayout.tsx`) |
 | Same service in the browser | Playlist Editor in real time, Music Control Delegation with the browser as a device (HLS player with hls.js, Media Session), Google and Facebook sign-in (GIS, Facebook JavaScript SDK), events by browser geolocation; the backend is unchanged except `GET /api/events/geocode`, and the browser sends the IV.6 headers (`X-Platform: web`) |
 
 Assumed gaps:

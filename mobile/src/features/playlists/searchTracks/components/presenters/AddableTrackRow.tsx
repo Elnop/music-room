@@ -1,21 +1,21 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import type { Theme } from '@/shared/theme/types';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
-import { useContextMenu } from '@/shared/hooks/useContextMenu';
-import { QueueSwipe } from '@/shared/components/lists/QueueSwipe';
-import { Artwork } from '@/shared/components/media/Artwork';
-import { PreviewBadge } from '@/shared/components/media/PreviewBadge';
-import { TrackActionsButton } from '@/shared/components/lists/TrackActionsButton';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import { formatDuration } from '@/shared/utils/formatters';
-import { isPreviewOnly } from '@/shared/utils/soundcloudPreview';
-import type { SoundCloudTrack } from '@/types/soundcloud.types';
-import { Text } from '@/shared/components/ui/Text';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import type { Theme } from '@/shared/theme/lib/types';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import { useContextMenu } from '@/shared/theme/hooks/useContextMenu';
+import { QueueSwipe } from '@/shared/theme/components/QueueSwipe';
+import { Artwork } from '@/shared/theme/components/Artwork';
+import { PreviewBadge } from '@/shared/theme/components/PreviewBadge';
+import { TrackActionsButton } from '@/shared/theme/components/TrackActionsButton';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { formatDuration } from '@/shared/formatting/formatters';
+import { isPreviewOnly } from '@/shared/tracks/lib/soundcloudPreview';
+import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
+import { Text } from '@/shared/theme/components/Text';
 import CheckSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/check-solid.svg';
 import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
-import type { MenuAnchor } from '@/shared/utils/menuPlacement';
+import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
 
 interface AddableTrackRowProps {
 	track: SoundCloudTrack;

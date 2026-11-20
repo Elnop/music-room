@@ -1,4 +1,4 @@
-import type { MusicGenre } from '@/types/user.types';
+import type { MusicGenre } from '@/shared/users/user.types';
 
 /** displayName and avatarUrl are absent when unset. */
 export interface EventOrganizer {

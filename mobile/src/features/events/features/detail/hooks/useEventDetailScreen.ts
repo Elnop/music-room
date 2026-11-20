@@ -1,11 +1,11 @@
 import { useEffect, useRef } from 'react';
-import { showAlert } from '@/shared/utils/alert';
+import { showAlert } from '@/shared/alerts/alert';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useSession } from '@/shared/services/authSession';
-import { ApiError } from '@/shared/services/api';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { logger } from '@/shared/utils/logger';
-import { showError, showInfo, showSuccess } from '@/shared/utils/toast';
+import { useSession } from '@/shared/backend/lib/authSession';
+import { ApiError } from '@/shared/backend/lib/api';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { logger } from '@/shared/logging/logger';
+import { showError, showInfo, showSuccess } from '@/shared/theme/lib/toast';
 import { useEvent } from '@/features/events/shared/events/hooks/useEventQueries';
 import { useDeleteEvent } from '@/features/events/shared/events/hooks/useEventMutations';
 import { useBeaconStore } from '@/features/events/features/detail/beaconStore';

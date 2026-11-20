@@ -3,11 +3,12 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StyleSheet } from 'react-native';
 import { QueryClientProvider, type QueryClient } from '@tanstack/react-query';
-import { AlertHostContainer } from '@/shared/components/feedback/AlertHostContainer';
-import { ErrorBoundary } from '@/shared/components/feedback/ErrorBoundary';
-import { ThemeProvider } from '@/shared/theme/ThemeContext';
-import { createQueryClient } from '@/shared/query/queryClient';
-import { onSessionEnd } from '@/shared/services/authSession';
+import { AlertHostContainer } from './AlertHostContainer';
+import { AppToast } from '@/shared/theme/components/AppToast';
+import { ErrorBoundary } from './ErrorBoundary';
+import { ThemeProvider } from '@/shared/theme/components/ThemeContext';
+import { createQueryClient } from '@/shared/backend/queryClient';
+import { onSessionEnd } from '@/shared/backend/lib/authSession';
 
 interface AppProvidersProps {
 	children: React.ReactNode;
@@ -32,6 +33,7 @@ export function AppProviders({ children, queryClient }: AppProvidersProps) {
 					<ThemeProvider>
 						<SafeAreaProvider>
 							{children}
+							<AppToast />
 							<AlertHostContainer />
 						</SafeAreaProvider>
 					</ThemeProvider>

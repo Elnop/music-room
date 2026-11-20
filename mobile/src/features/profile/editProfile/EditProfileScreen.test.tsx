@@ -14,20 +14,20 @@ const mockSession: { user: Record<string, unknown> | null; accessToken: string }
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
-jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
+jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
 
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-jest.mock('@/shared/services/playbackBridge', () => ({ usePlayerHeight: () => 0 }));
+jest.mock('@/shared/playback/lib/playbackBridge', () => ({ usePlayerHeight: () => 0 }));
 
 jest.mock('@react-navigation/native', () => ({
 	useNavigation: () => ({ goBack: jest.fn() }),
 }));
 
-jest.mock('@/shared/services/authSession', () => ({
+jest.mock('@/shared/backend/lib/authSession', () => ({
 	useSession: (selector: (s: typeof mockSession) => unknown) => selector(mockSession),
 	setUser: jest.fn(),
 }));

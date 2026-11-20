@@ -1,13 +1,13 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Avatar } from '@/shared/components/media/Avatar';
-import { GenreChip } from '@/shared/components/ui/GenreChip';
-import { useTheme } from '@/shared/theme/ThemeContext';
+import { Avatar } from '@/shared/theme/components/Avatar';
+import { GenreChip } from '@/shared/theme/components/GenreChip';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { FilteredProfile, FollowStatus, MusicGenre } from '@/features/friends/types';
 import { createUserProfileHeaderStyles } from './userProfileHeaderStyles';
 import { HiddenFieldNote } from './HiddenFieldNote';
 import { UserProfileBadges } from './UserProfileBadges';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 
 interface UserProfileInfoProps {
 	profile: FilteredProfile;

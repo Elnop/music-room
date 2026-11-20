@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { keycap, pixelFrame } from '@/shared/theme/pixelFrame';
-import type { Theme } from '@/shared/theme/types';
+import { keycap, pixelFrame } from '@/shared/theme/lib/pixelFrame';
+import type { Theme } from '@/shared/theme/lib/types';
 
 export const createStyles = (theme: Theme) =>
 	StyleSheet.create({

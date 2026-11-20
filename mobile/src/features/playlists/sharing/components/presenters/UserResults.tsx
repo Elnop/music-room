@@ -1,15 +1,15 @@
 import React from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import { EmptyState } from '@/shared/components/feedback/EmptyState';
-import { Avatar } from '@/shared/components/media/Avatar';
-import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import type { Theme } from '@/shared/theme/types';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import { EmptyState } from '@/shared/theme/components/EmptyState';
+import { Avatar } from '@/shared/theme/components/Avatar';
+import { LoadingSpinner } from '@/shared/theme/components/LoadingSpinner';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import type { Theme } from '@/shared/theme/lib/types';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { UserSummary } from '@/features/playlists/types';
 import { createSharingStyles } from './sharingStyles';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 import PlusSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/plus-solid.svg';
 import SearchSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/search-solid.svg';
 

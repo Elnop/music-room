@@ -1,8 +1,8 @@
-import { getPlayback } from '@/shared/services/playbackBridge';
-import { trackToSoundCloud } from '@/shared/utils/trackToSoundCloud';
+import { getPlayback } from '@/shared/playback/lib/playbackBridge';
+import { trackToSoundCloud } from '@/shared/tracks/lib/trackToSoundCloud';
 import { currentItem } from '@/features/queue/utils/queueSelectors';
-import { showError } from '@/shared/utils/toast';
-import { logger } from '@/shared/utils/logger';
+import { showError } from '@/shared/theme/lib/toast';
+import { logger } from '@/shared/logging/logger';
 import {
 	actionScope,
 	handleRemoteRefusal,

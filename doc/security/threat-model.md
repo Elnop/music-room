@@ -128,7 +128,7 @@ The thresholds come from `backend/src/shared/config/rate-limit.config.ts` (envir
 
 **Protection.**
 - At the handshake, a revoked token is refused (`authenticateSocket` goes through `verifyToken` in `session.service.ts`): #71.
-- The app closes its socket at every session end: `useAuthStore.subscribe` subscription in `mobile/src/shared/stores/socketStore.ts` (#70).
+- The app closes its socket at every session end: `useAuthStore.subscribe` subscription in `mobile/src/shared/backend/socketStore.ts` (#70).
 
 **Tests.**
 - `backend/src/realtime/socket-auth.int.test.ts`: "refuses a token revoked by logout with INVALID_TOKEN (#71)".

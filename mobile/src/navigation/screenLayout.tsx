@@ -1,5 +1,5 @@
 import React from 'react';
-import { ContentContainer } from '@/shared/components/layout/ContentContainer';
+import { ScreenContent } from '@/navigation/ScreenContent';
 import type { NativeStackHeaderProps } from '@react-navigation/native-stack';
 import { AlignedHeader } from '@/navigation/AlignedHeader';
 import { EDGE_SCROLL_SCREENS, FULL_BLEED_SCREENS, SCREEN_WIDTHS } from '@/navigation/screenWidths';
@@ -15,13 +15,13 @@ export const screenLayout =
 		const width = SCREEN_WIDTHS[route.name];
 		if (!width || FULL_BLEED_SCREENS.has(route.name)) return children;
 		return (
-			<ContentContainer
+			<ScreenContent
 				width={width}
 				besideSidebar={besideSidebar}
 				scrollsAtEdge={EDGE_SCROLL_SCREENS.has(route.name)}
 			>
 				{children}
-			</ContentContainer>
+			</ScreenContent>
 		);
 	};
 

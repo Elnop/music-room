@@ -1,9 +1,9 @@
-import type { UserProfile } from '@/types/user.types';
+import type { UserProfile } from '@/shared/users/user.types';
 import type { AuthSessionTokens } from '@/features/auth/types';
 import * as authApi from '@/features/auth/services/authApi';
 import { storedSession } from '@/features/auth/services/sessionStorage';
-import { lastTrackStorage } from '@/shared/services/lastTrackStorage';
-import { logger } from '@/shared/utils/logger';
+import { lastTrackStorage } from '@/shared/playback/lib/lastTrackStorage';
+import { logger } from '@/shared/logging/logger';
 import { createTokenRefresh } from './tokenRefresh';
 import { SIGNED_OUT, type GetAuthState, type SessionActions, type SetAuthState } from './authState';
 
@@ -51,7 +51,11 @@ export function createSessionActions(set: SetAuthState, get: GetAuthState): Sess
 			}
 			await endSessionLocally();
 			// After the session ends, so the player no longer saves it for this user.
-			if (user) await lastTrackStorage.clear(user.id);
+			if (user) {
+				await lastTrackStorage
+					.clear(user.id)
+					.catch(error => logger.warn('[lastTrackStorage] Clear failed', error));
+			}
 		},
 
 		refreshAccessToken: createTokenRefresh({ set, get, applySession, persist, endSessionLocally }),

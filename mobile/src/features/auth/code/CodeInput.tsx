@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
 import { CODE_INPUT_MAX_LENGTH } from '@/features/auth/utils/codeDigits';
-import { TextInput } from '@/shared/components/ui/TextInput';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import { focusedFieldStyle } from '@/shared/theme/fieldFocus';
+import { TextInput } from '@/shared/theme/components/TextInput';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { focusedFieldStyle } from '@/shared/theme/lib/fieldFocus';
 
 interface CodeInputProps {
 	digits: string[];

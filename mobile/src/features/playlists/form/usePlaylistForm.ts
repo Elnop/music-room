@@ -3,12 +3,12 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { queryKeys } from '@/shared/query/keys';
-import { useCappedField, type CappedField } from '@/shared/hooks/useCappedField';
-import { useSession } from '@/shared/services/authSession';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { logger } from '@/shared/utils/logger';
-import { showError, showSuccess } from '@/shared/utils/toast';
+import { queryKeys } from '@/shared/query-keys/keys';
+import { useCappedField, type CappedField } from '@/shared/theme/hooks/useCappedField';
+import { useSession } from '@/shared/backend/lib/authSession';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { logger } from '@/shared/logging/logger';
+import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import {
 	useCreatePlaylist,
 	useUpdatePlaylist,

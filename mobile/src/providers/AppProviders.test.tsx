@@ -2,10 +2,10 @@ import React from 'react';
 import { render, screen } from '@testing-library/react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { AppProviders } from './AppProviders';
-import { createQueryClient } from '@/shared/query/queryClient';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import { notifySessionEnd } from '@/shared/services/authSession';
-import { Text } from '@/shared/components/ui/Text';
+import { createQueryClient } from '@/shared/backend/queryClient';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { notifySessionEnd } from '@/shared/backend/lib/authSession';
+import { Text } from '@/shared/theme/components/Text';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -17,7 +17,7 @@ jest.mock('react-native-gesture-handler', () => ({
 jest.mock('react-native-safe-area-context', () => ({
 	SafeAreaProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
-jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
+jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
 
 function Probe({ onClient }: { onClient: (client: unknown) => void }) {
 	onClient(useQueryClient());

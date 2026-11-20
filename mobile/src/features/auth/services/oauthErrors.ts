@@ -1,5 +1,5 @@
-import { ApiError } from '@/shared/services/api';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
+import { ApiError } from '@/shared/backend/lib/api';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import type { OAuthProvider } from '@/features/auth/types';
 import { isScriptLoadError } from '@/features/auth/utils/loadScript';
 

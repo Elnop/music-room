@@ -1,8 +1,8 @@
-import { registerPlaybackBridge } from '@/shared/services/playbackBridge';
-import { registerConnectBridge } from '@/shared/services/connectBridge';
-import { registerPlayerModals } from '@/shared/services/playerModalsBridge';
-import { registerTrackActionsSheet } from '@/shared/services/trackActionsBridge';
-import { registerFriendsBridge } from '@/shared/services/friendsBridge';
+import { registerPlaybackBridge } from '@/shared/playback/lib/playbackBridge';
+import { registerConnectBridge } from '@/shared/listening/lib/connectBridge';
+import { registerPlayerModals } from '@/shared/player-modals-bridge/playerModalsBridge';
+import { registerTrackActionsSheet } from '@/shared/playback/lib/trackActionsBridge';
+import { registerFriendsBridge } from '@/shared/backend/lib/friendsBridge';
 import { friendsApi } from '@/features/friends/services/friendsApi';
 import { readPositionMs, usePlayerStore } from '@/features/player/stores/playerStore';
 import { useConnectStore } from '@/features/queue/stores/connectStore';

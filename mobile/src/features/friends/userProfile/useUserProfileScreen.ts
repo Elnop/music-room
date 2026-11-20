@@ -1,10 +1,10 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
-import { useScreenTitle } from '@/shared/hooks/useScreenTitle';
-import { useFriendListening } from '@/shared/services/musicControlBridge';
-import { controlErrorMessage } from '@/shared/utils/controlError';
-import { showError } from '@/shared/utils/toast';
-import { logger } from '@/shared/utils/logger';
+import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
+import { useScreenTitle } from '@/shared/screen-title/useScreenTitle';
+import { useFriendListening } from '@/shared/backend/lib/musicControlBridge';
+import { controlErrorMessage } from '@/shared/control-error/controlError';
+import { showError } from '@/shared/theme/lib/toast';
+import { logger } from '@/shared/logging/logger';
 import {
 	useUserProfile,
 	useFollowStatus,

@@ -1,9 +1,9 @@
 import React from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
-import { CappedInput } from '@/shared/components/form/CappedInput';
-import { Button } from '@/shared/components/ui/Button';
-import type { Theme } from '@/shared/theme/types';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { CappedInput } from '@/shared/theme/components/CappedInput';
+import { Button } from '@/shared/theme/components/Button';
+import type { Theme } from '@/shared/theme/lib/types';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { PlaylistForm } from '@/features/playlists/form/usePlaylistForm';
 import { ToggleCard } from './ToggleCard';
 

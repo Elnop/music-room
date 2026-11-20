@@ -1,9 +1,9 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { showError } from '@/shared/utils/toast';
-import { logger } from '@/shared/utils/logger';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { showError } from '@/shared/theme/lib/toast';
+import { logger } from '@/shared/logging/logger';
 import { registerSchema, type RegisterInput } from '@/features/auth/validators';
 import type { AuthStackParamList } from '@/features/auth/types';
 import { useRegisterMutation } from '@/features/auth/hooks/useSignInMutations';

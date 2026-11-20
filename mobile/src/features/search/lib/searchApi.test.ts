@@ -1,8 +1,8 @@
 import { searchApi } from './searchApi';
-import { apiRequest } from '@/shared/services/api';
-import type { SoundCloudSearchResult, SoundCloudTrack } from '@/types/soundcloud.types';
+import { apiRequest } from '@/shared/backend/lib/api';
+import type { SoundCloudSearchResult, SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
 
-jest.mock('@/shared/services/api', () => ({
+jest.mock('@/shared/backend/lib/api', () => ({
 	apiRequest: jest.fn(),
 }));
 

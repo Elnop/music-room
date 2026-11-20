@@ -11,7 +11,7 @@ Subjects IV.4 (API) and IV.5 (mobile application): a documented REST/JSON API, a
   { "success": false, "error": { "message": "…", "code": "PLAYLIST_NOT_FOUND", "details": {}, "why": "…", "fix": "…" }, "meta": {} }
   ```
 
-  The app reads it into `ApiError`, keeping the HTTP status, and turns the code into a French message (`shared/utils/apiErrorMessage.ts`).
+  The app reads it into `ApiError`, keeping the HTTP status, and turns the code into a French message (`shared/backend/lib/apiErrorMessage.ts`).
 - **Every input is validated by Zod** before the controller uses it; a failure is a `400 VALIDATION_ERROR`.
 
 ## Documentation generated from the code
@@ -20,8 +20,8 @@ Swagger UI at `/api-docs` documents every endpoint with its method, parameters, 
 
 ## The mobile client
 
-- **Every HTTP call goes through `shared/services/api.ts`** (#174). It adds the access token, refreshes it when it is about to expire or after a 401 (except for a wrong-password login, whose 401 is shown as is, #235), and sends the `X-Platform`, `X-Device-Model` and `X-App-Version` headers that the backend logs with every action (subject IV.6). No module calls `fetch` around it (semgrep rule).
+- **Every HTTP call goes through `shared/backend/lib/api.ts`** (#174). It adds the access token, refreshes it when it is about to expire or after a 401 (except for a wrong-password login, whose 401 is shown as is, #235), and sends the `X-Platform`, `X-Device-Model` and `X-App-Version` headers that the backend logs with every action (subject IV.6). No module calls `fetch` around it (semgrep rule).
 - **Server data is cached by TanStack Query**, and socket events update that cache, so screens show the server's state without polling.
-- **Changing the backend address in the app**: a field in Settings and on the Welcome screen (reachable before login) edits the address (`shared/services/backendUrl.ts`, `BackendUrlField`). It is persisted, validated, read by every module at call time, and the socket reconnects to the new address: no rebuild is needed. The default is the build-time `EXPO_PUBLIC_API_URL`.
+- **Changing the backend address in the app**: a field in Settings and on the Welcome screen (reachable before login) edits the address (`shared/backend/lib/backendUrl.ts`, `BackendUrlField`). It is persisted, validated, read by every module at call time, and the socket reconnects to the new address: no rebuild is needed. The default is the build-time `EXPO_PUBLIC_API_URL`.
 - **Socket.io** carries the same token at the handshake, plus the device identity; the event list is in [backend/README.md](../../backend/README.md#real-time-socketio).
 - **Build information**: the Profile screen and the Welcome screen (before login, #492) show `Zumik <version> (build <N> · <sha>)` for a release build, `(dev)` for a local debug build (#361).

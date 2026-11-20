@@ -5,7 +5,7 @@ import {
 } from '@react-native-google-signin/google-signin';
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
-import { logger } from '@/shared/utils/logger';
+import { logger } from '@/shared/logging/logger';
 import { googleIosClientId } from '@/features/auth/utils/googleIosClientId';
 import { SIGN_IN_CANCELLED } from './signInCancelled';
 

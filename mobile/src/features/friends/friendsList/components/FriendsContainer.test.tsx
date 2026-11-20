@@ -1,29 +1,29 @@
 import React from 'react';
 import { act, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import { createStore } from 'zustand';
-import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
+import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
 import { friendsApi } from '@/features/friends/services/friendsApi';
-import { renderWithClient } from '@/test/renderWithClient';
-import { signIn } from '@/test/session';
-import '@/test/playback';
+import { renderWithClient } from '@test-utils/renderWithClient';
+import { signIn } from '@test-utils/session';
+import '@test-utils/playback';
 import { FriendsContainer } from './FriendsContainer';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
-jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
+jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 jest.mock('socket.io-client', () => ({ io: jest.fn() }));
 
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-jest.mock('@/shared/utils/apiErrorMessage', () => ({
+jest.mock('@/shared/backend/lib/apiErrorMessage', () => ({
 	apiErrorMessage: (_error: unknown, fallback: string) => fallback,
 }));
 
-jest.mock('@/shared/utils/toast', () => ({
+jest.mock('@/shared/theme/lib/toast', () => ({
 	showError: jest.fn(),
 	showSuccess: jest.fn(),
 }));

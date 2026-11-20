@@ -7,22 +7,22 @@ import {
 	LAST_TRACK_SAVE_INTERVAL_MS,
 	useLastTrackPersistence,
 } from './useLastTrackPersistence';
-import { lastTrackStorage, type LastTrackEntry } from '@/shared/services/lastTrackStorage';
+import { lastTrackStorage, type LastTrackEntry } from '@/shared/playback/lib/lastTrackStorage';
 import { usePlayerStore, setPositionReader } from '@/features/player/stores/playerStore';
 import {
 	registerAuthSession,
 	notifySessionEnd,
 	type SessionView,
-} from '@/shared/services/authSession';
-import { registerConnectBridge, type ConnectSnapshot } from '@/shared/services/connectBridge';
-import { queueTrackToSoundCloud } from '@/shared/utils/trackToSoundCloud';
-import type { UserProfile } from '@/types/user.types';
+} from '@/shared/backend/lib/authSession';
+import { registerConnectBridge, type ConnectSnapshot } from '@/shared/listening/lib/connectBridge';
+import { queueTrackToSoundCloud } from '@/shared/tracks/lib/trackToSoundCloud';
+import type { UserProfile } from '@/shared/users/user.types';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/shared/services/deviceService', () => ({
+jest.mock('@/shared/backend/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 

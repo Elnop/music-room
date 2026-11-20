@@ -7,7 +7,7 @@ import type {
 	RevokeDeviceLicenseResponse,
 	UserDevice,
 	UserDeviceWithLicenses,
-} from '@/types/device.types';
+} from '@/shared/devices/device.types';
 
 export type {
 	ControllableDevicesResponse,
@@ -37,4 +37,4 @@ export interface ControlActionResponse {
 export type {
 	FriendDeviceStatus,
 	FriendListeningResult,
-} from '@/shared/services/musicControlBridge';
+} from '@/shared/backend/lib/musicControlBridge';

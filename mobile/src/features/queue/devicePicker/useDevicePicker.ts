@@ -1,15 +1,15 @@
 import React from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import { getDevicePicker } from '@/shared/services/musicControlBridge';
-import { deviceService } from '@/shared/services/deviceService';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { getDevicePicker } from '@/shared/backend/lib/musicControlBridge';
+import { deviceService } from '@/shared/backend/deviceService';
 import { useConnectStore } from '@/features/queue/stores/connectStore';
 import { transferTo } from '@/features/queue/services/transferPlayback';
-import { logger } from '@/shared/utils/logger';
+import { logger } from '@/shared/logging/logger';
 import { createPickerStyles } from '@/features/queue/devicePicker/components/presenters/devicePickerStyles';
-import type { DevicePickerOwner } from '@/types/device.types';
+import type { DevicePickerOwner } from '@/shared/devices/device.types';
 import type { PickerDevice } from '@/features/queue/devicePicker/components/presenters/DeviceRow';
-import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
+import { useSeparatorColor } from '@/shared/theme/hooks/useSeparatorColor';
 
 export interface LoadedDevices {
 	owners: DevicePickerOwner[];

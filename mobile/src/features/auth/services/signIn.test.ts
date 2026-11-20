@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuthStore } from '@/features/auth/stores/authStore';
-import { getBackendUrl, resetBackendUrl } from '@/shared/services/backendUrl';
-import { logger } from '@/shared/utils/logger';
+import { getBackendUrl, resetBackendUrl } from '@/shared/backend/lib/backendUrl';
+import { logger } from '@/shared/logging/logger';
 import { login, register, signInWithProvider, verifyEmail } from './signIn';
 import { forgotPassword, resetPassword } from './passwordApi';
 import { oauthErrorMessage } from './oauthErrors';
@@ -15,7 +15,7 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 jest.mock('./googleSignIn', () => ({ signInWithGoogle: jest.fn() }));
 jest.mock('./facebookSignIn', () => ({ signInWithFacebook: jest.fn() }));
 
-jest.mock('@/shared/services/deviceService', () => ({
+jest.mock('@/shared/backend/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 

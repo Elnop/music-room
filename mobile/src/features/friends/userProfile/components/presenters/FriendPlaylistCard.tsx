@@ -1,11 +1,11 @@
 import React from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
-import { Artwork } from '@/shared/components/media/Artwork';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import type { Theme } from '@/shared/theme/types';
+import { Artwork } from '@/shared/theme/components/Artwork';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { Theme } from '@/shared/theme/lib/types';
 import type { FriendPlaylistSummary } from '@/features/friends/types';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 
 interface FriendPlaylistCardProps {
 	playlist: FriendPlaylistSummary;

@@ -3,17 +3,17 @@ import { useWindowDimensions } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { AppTabBar } from './AppTabBar';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 
 const mockNavigate = jest.fn();
 
 jest.mock('@/features/player/miniPlayer/components/MiniPlayerContainer', () => {
-	const { Text: MockText } = jest.requireActual('@/shared/components/ui/Text');
+	const { Text: MockText } = jest.requireActual('@/shared/theme/components/Text');
 	return { MiniPlayerContainer: () => <MockText>mini-player</MockText> };
 });
 
 jest.mock('@react-navigation/bottom-tabs', () => {
-	const { Text: MockText } = jest.requireActual('@/shared/components/ui/Text');
+	const { Text: MockText } = jest.requireActual('@/shared/theme/components/Text');
 	return { BottomTabBar: () => <MockText>tab-bar</MockText> };
 });
 
@@ -21,12 +21,12 @@ jest.mock('react-native-safe-area-context', () => ({
 	useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
 
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-jest.mock('@/shared/services/authSession', () => ({
+jest.mock('@/shared/backend/lib/authSession', () => ({
 	useSession: (selector: (s: { user: object }) => unknown) =>
 		selector({ user: { id: 'me', username: 'bob', displayName: 'Bob' } }),
 }));

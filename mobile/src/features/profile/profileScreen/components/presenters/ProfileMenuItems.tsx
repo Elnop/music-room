@@ -1,12 +1,12 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
 import { ProfileNavigationItem } from '@/features/profile/profileScreen/components/presenters/ProfileNavigationItem';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import type { Theme } from '@/shared/theme/types';
-import { displayText } from '@/shared/theme/pixelFrame';
-import { Text } from '@/shared/components/ui/Text';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { Theme } from '@/shared/theme/lib/types';
+import { displayText } from '@/shared/theme/lib/pixelFrame';
+import { Text } from '@/shared/theme/components/Text';
 import LinkSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/link-solid.svg';
 import LockSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/lock-solid.svg';
 import LogoutSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/logout-solid.svg';

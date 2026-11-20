@@ -1,19 +1,19 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { queryKeys } from '@/shared/query/keys';
-import { STALE } from '@/shared/query/queryClient';
-import { getPlayback } from '@/shared/services/playbackBridge';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { showError } from '@/shared/utils/toast';
-import { toTrackInput } from '@/shared/utils/trackInput';
+import { queryKeys } from '@/shared/query-keys/keys';
+import { STALE } from '@/shared/backend/queryClient';
+import { getPlayback } from '@/shared/playback/lib/playbackBridge';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { showError } from '@/shared/theme/lib/toast';
+import { toTrackInput } from '@/shared/tracks/lib/trackInput';
 import { useCachedPlaylist } from '@/features/playlists/hooks/usePlaylistQueries';
 import { useDebouncedText, type DebouncedText } from '@/features/playlists/hooks/useDebouncedText';
 import { useAddTrack } from '@/features/playlists/hooks/useTrackEdits';
 import { searchTracks } from '@/features/playlists/services/trackSearchApi';
-import type { AddQueueItemBody } from '@/shared/playback/playback';
-import type { SoundCloudTrack } from '@/types/soundcloud.types';
-import { recordMenuAnchor } from '@/shared/stores/menuAnchorStore';
-import type { MenuAnchor } from '@/shared/utils/menuPlacement';
+import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
+import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
+import { recordMenuAnchor } from '@/shared/theme/menuAnchorStore';
+import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
 
 export interface SearchTracks {
 	search: DebouncedText;

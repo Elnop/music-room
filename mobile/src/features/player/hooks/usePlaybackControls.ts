@@ -1,8 +1,8 @@
 import { usePlayer } from '@/features/player/context/PlayerContext';
 import { useNowPlaying } from '@/features/player/hooks/useNowPlaying';
 import { SEEK_STEP_S } from '@/features/player/constants';
-import { hapticTap } from '@/shared/utils/haptics';
-import { RESTART_THRESHOLD_S } from '@/shared/utils/queueNavigation';
+import { hapticTap } from '@/shared/theme/lib/haptics';
+import { RESTART_THRESHOLD_S } from '@/shared/playback/lib/queueNavigation';
 
 /** A remote device is never seeked. */
 export function usePlaybackControls() {

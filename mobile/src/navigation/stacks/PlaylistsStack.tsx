@@ -1,7 +1,7 @@
 import React from 'react';
 import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useTheme } from '@/shared/theme/ThemeContext';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { PlaylistStackParamList } from '@/features/playlists/types';
 import type { EventStackParamList } from '@/features/events/lib/types';
 import { LibraryContainer } from '@/features/playlists/library/components/LibraryContainer';
@@ -12,9 +12,9 @@ import { PlaylistSharingContainer } from '@/features/playlists/sharing/component
 import { EventDetailContainer } from '@/features/events/features/detail/components/EventDetailContainer';
 import { EventFormContainer } from '@/features/events/features/event-form/components/EventFormContainer';
 import { HomeScreen } from '@/navigation/screens/HomeScreen';
-import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
+import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
 import { screenHeader, screenLayout } from '@/navigation/screenLayout';
-import { headerTitle } from '@/shared/theme/pixelFrame';
+import { headerTitle } from '@/shared/theme/lib/pixelFrame';
 import { PlanContainer } from '@/features/subscription/PlanContainer';
 
 const PlaylistStack = createNativeStackNavigator<PlaylistStackParamList & EventStackParamList>();

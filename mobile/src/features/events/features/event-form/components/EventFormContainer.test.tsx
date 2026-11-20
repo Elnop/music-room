@@ -4,28 +4,28 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as Location from 'expo-location';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { EventFormContainer } from './EventFormContainer';
-import { createQueryClient } from '@/shared/query/queryClient';
-import { queryKeys } from '@/shared/query/keys';
-import { resetBackendUrl } from '@/shared/services/backendUrl';
-import { showError } from '@/shared/utils/toast';
-import { logger } from '@/shared/utils/logger';
+import { createQueryClient } from '@/shared/backend/queryClient';
+import { queryKeys } from '@/shared/query-keys/keys';
+import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
+import { showError } from '@/shared/theme/lib/toast';
+import { logger } from '@/shared/logging/logger';
 import type { EventStackParamList } from '@/features/events/lib/types';
-import { renderWithClient } from '@/test/renderWithClient';
-import { mockFetchRoutes } from '@/test/fetchRoutes';
-import { ok } from '@/test/fetchResponses';
-import { signIn } from '@/test/session';
-import { musicEvent } from '@/test/eventFixtures';
+import { renderWithClient } from '@test-utils/renderWithClient';
+import { mockFetchRoutes } from '@test-utils/fetchRoutes';
+import { ok } from '@test-utils/fetchResponses';
+import { signIn } from '@test-utils/session';
+import { musicEvent } from '@test-utils/eventFixtures';
 import { formatEventDate } from '@/features/events/shared/event-dates/eventDates';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
-jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
-jest.mock('@/shared/utils/toast', () => ({
+jest.mock('@/shared/theme/lib/toast', () => ({
 	showSuccess: jest.fn(),
 	showError: jest.fn(),
 	showInfo: jest.fn(),

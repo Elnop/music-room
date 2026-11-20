@@ -1,16 +1,16 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import { Button } from '@/shared/components/ui/Button';
-import { Input } from '@/shared/components/ui/Input';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import { Text } from '@/shared/components/ui/Text';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import type { Theme } from '@/shared/theme/types';
+import { Button } from '@/shared/theme/components/Button';
+import { Input } from '@/shared/theme/components/Input';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { Text } from '@/shared/theme/components/Text';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { Theme } from '@/shared/theme/lib/types';
 import { AuthFormFrame } from '@/features/auth/form/presenters/AuthFormFrame';
 import { SocialSignInButtons } from '@/features/auth/social/SocialSignInButtons';
 import type { FieldBinding } from '@/features/auth/form/hooks/useFieldBinding';
 import type { GoogleButtonSlot } from '@/features/auth/types';
-import { FONT_FAMILIES } from '@/shared/theme/fonts';
+import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
 
 interface LoginViewProps {
 	email: FieldBinding;

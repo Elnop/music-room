@@ -1,7 +1,7 @@
 import { create } from 'zustand';
-import { getSession, useSession, onSessionEnd } from '@/shared/services/authSession';
-import { getPlayback } from '@/shared/services/playbackBridge';
-import { showInfo } from '@/shared/utils/toast';
+import { getSession, useSession, onSessionEnd } from '@/shared/backend/lib/authSession';
+import { getPlayback } from '@/shared/playback/lib/playbackBridge';
+import { showInfo } from '@/shared/theme/lib/toast';
 import type { ConnectTarget, ListeningStatus, RemoteTarget } from '@/features/queue/types';
 
 interface ConnectState {

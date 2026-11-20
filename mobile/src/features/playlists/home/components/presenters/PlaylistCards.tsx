@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import { useContextMenu } from '@/shared/hooks/useContextMenu';
-import { useGridTileWidth } from '@/shared/hooks/useGridTileWidth';
-import type { Theme } from '@/shared/theme/types';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { useContextMenu } from '@/shared/theme/hooks/useContextMenu';
+import { useGridTileWidth } from '@/shared/theme/hooks/useGridTileWidth';
+import type { Theme } from '@/shared/theme/lib/types';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Playlist } from '@/features/playlists/types';
 import { playlistCardLabel } from '@/features/playlists/home/utils/playlistLabels';
 import { PlaylistCassette } from './PlaylistCassette';

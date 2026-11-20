@@ -1,6 +1,6 @@
 import React from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
+import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
 import type { EventStackParamList } from '@/features/events/lib/types';
 import { useEventDetailScreen } from '@/features/events/features/detail/hooks/useEventDetailScreen';
 import { useBeaconBroadcast } from '@/features/events/features/detail/hooks/useBeaconBroadcast';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Playlist } from '@/features/playlists/types';
 import { createListStyles } from './listStyles';
 import { PlaylistGridCard } from './PlaylistCards';

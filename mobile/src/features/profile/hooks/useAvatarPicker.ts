@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useSession, setAvatarUrl } from '@/shared/services/authSession';
+import { useSession, setAvatarUrl } from '@/shared/backend/lib/authSession';
 import { profileApi } from '@/features/profile/services/profileApi';
-import { pickImage, type ImageSource } from '@/shared/utils/imagePicker';
-import { prepareSquareImage } from '@/shared/utils/squareImage';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { showError, showSuccess } from '@/shared/utils/toast';
+import { pickImage, type ImageSource } from '@/shared/image-picker/imagePicker';
+import { prepareSquareImage } from '@/shared/square-image/squareImage';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { showError, showSuccess } from '@/shared/theme/lib/toast';
 
 const PERMISSION_DENIED: Record<ImageSource, string> = {
 	library: "Autorisez l'accès à vos photos dans les réglages pour choisir une photo de profil.",
@@ -18,7 +18,7 @@ export function useAvatarPicker() {
 
 	const pickAndUpload = async (source: ImageSource): Promise<void> => {
 		if (!accessToken || isUploading) return;
-		const asset = await pickImage(source, PERMISSION_DENIED[source]);
+		const asset = await pickImage(source, () => showError(PERMISSION_DENIED[source]));
 		if (!asset) return;
 
 		setIsUploading(true);

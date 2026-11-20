@@ -17,7 +17,7 @@
 ## Où regarder
 
 - [web-client.md](../../features/web-client.md), [decisions.md §3](../../decisions.md#3-bonus-v1-web-client-epic-474)
-- `mobile/src/shared/hooks/useBreakpoint.ts`, `mobile/src/**/*.web.ts`
+- `mobile/src/shared/theme/hooks/useBreakpoint.ts`, `mobile/src/**/*.web.ts`
 
 ## Scénario
 

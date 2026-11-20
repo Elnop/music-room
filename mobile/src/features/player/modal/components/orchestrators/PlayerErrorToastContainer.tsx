@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
-import { showError } from '@/shared/utils/toast';
+import { showError } from '@/shared/theme/lib/toast';
 
 export function PlayerErrorToastContainer(): null {
 	const error = usePlayerStore(state => state.error);

@@ -1,10 +1,10 @@
-import { apiRequest } from '@/shared/services/api';
+import { apiRequest } from '@/shared/backend/lib/api';
 import type {
 	AddTrackResult,
 	MoveTrackResult,
 	RemoveTrackResult,
 } from '@/features/playlists/types';
-import type { AddQueueItemBody } from '@/shared/playback/playback';
+import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
 
 export function addTrack(playlistId: string, track: AddQueueItemBody): Promise<AddTrackResult> {
 	return apiRequest<AddTrackResult>(`/api/playlists/${playlistId}/tracks`, {

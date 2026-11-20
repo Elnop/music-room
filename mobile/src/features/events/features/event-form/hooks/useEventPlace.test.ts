@@ -1,11 +1,11 @@
 import { act, renderHook } from '@testing-library/react-native';
 import * as Location from 'expo-location';
-import { showError } from '@/shared/utils/toast';
-import { logger } from '@/shared/utils/logger';
+import { showError } from '@/shared/theme/lib/toast';
+import { logger } from '@/shared/logging/logger';
 import { geocode } from '@/features/events/shared/events/lib/eventsApi';
 import { useEventPlace } from './useEventPlace';
 
-jest.mock('@/shared/utils/toast', () => ({ showError: jest.fn() }));
+jest.mock('@/shared/theme/lib/toast', () => ({ showError: jest.fn() }));
 jest.mock('expo-location', () => ({
 	Accuracy: { Balanced: 3 },
 	requestForegroundPermissionsAsync: jest.fn(),

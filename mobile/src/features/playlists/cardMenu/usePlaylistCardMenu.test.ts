@@ -1,19 +1,19 @@
 import { Alert } from 'react-native';
 import { act, renderHook } from '@testing-library/react-native';
-import { showSuccess } from '@/shared/utils/toast';
+import { showSuccess } from '@/shared/theme/lib/toast';
 import type { Playlist } from '@/features/playlists/types';
 import { usePlaylistCardMenu } from './usePlaylistCardMenu';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
-jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
+jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
 
 const mockInvalidate = jest.fn();
 jest.mock('@tanstack/react-query', () => ({
 	useQueryClient: () => ({ invalidateQueries: mockInvalidate }),
 }));
-jest.mock('@/shared/services/authSession', () => ({
+jest.mock('@/shared/backend/lib/authSession', () => ({
 	useSession: (select: (session: object) => unknown) => select({ user: { id: 'me' } }),
 }));
 jest.mock('@/features/playlists/detail/hooks/useCoverActions', () => ({
@@ -24,7 +24,7 @@ jest.mock('@/features/playlists/hooks/usePlaylistMutations', () => ({
 	useDeletePlaylist: () => ({ mutateAsync: mockDelete }),
 }));
 jest.mock('@/features/playlists/utils/playlistCache', () => ({ forgetPlaylist: jest.fn() }));
-jest.mock('@/shared/utils/toast', () => ({ showError: jest.fn(), showSuccess: jest.fn() }));
+jest.mock('@/shared/theme/lib/toast', () => ({ showError: jest.fn(), showSuccess: jest.fn() }));
 
 const playlist = (id: string, ownerId: string) => ({ id, ownerId, name: `Mix ${id}` }) as Playlist;
 const navigation = { navigate: jest.fn(), getParent: jest.fn() };

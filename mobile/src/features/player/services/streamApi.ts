@@ -1,5 +1,5 @@
-import { apiRequest } from '@/shared/services/api';
-import type { StreamUrlResponse } from '@/types/soundcloud.types';
+import { apiRequest } from '@/shared/backend/lib/api';
+import type { StreamUrlResponse } from '@/shared/tracks/lib/soundcloud.types';
 import type { StreamFetchResult } from '@/features/player/types';
 
 /** Expiry is epoch ms, null when unknown; no protocol (an older server) means HLS. Throws when the server sends no URL. */

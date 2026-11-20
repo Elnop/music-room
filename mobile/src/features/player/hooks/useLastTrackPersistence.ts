@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { AppState } from 'react-native';
 import { usePlayerStore, readPositionMs } from '@/features/player/stores/playerStore';
-import { useSession } from '@/shared/services/authSession';
-import { isLocalTarget, useIsLocalTarget } from '@/shared/services/connectBridge';
-import { lastTrackStorage, type LastTrackEntry } from '@/shared/services/lastTrackStorage';
-import { queueTrackToSoundCloud } from '@/shared/utils/trackToSoundCloud';
-import { toTrackInput } from '@/shared/utils/trackInput';
+import { useSession } from '@/shared/backend/lib/authSession';
+import { isLocalTarget, useIsLocalTarget } from '@/shared/listening/lib/connectBridge';
+import { lastTrackStorage, type LastTrackEntry } from '@/shared/playback/lib/lastTrackStorage';
+import { queueTrackToSoundCloud } from '@/shared/tracks/lib/trackToSoundCloud';
+import { toTrackInput } from '@/shared/tracks/lib/trackInput';
+import { logger } from '@/shared/logging/logger';
 
 export const LAST_TRACK_SAVE_INTERVAL_MS = 10_000;
 export const LAST_TRACK_PLAY_SAVE_DELAY_MS = 2000;
@@ -39,8 +40,8 @@ function snapshot(): LastTrackEntry | null {
 function persist(userId: string): void {
 	if (!isLocal()) return;
 	const entry = snapshot();
-	if (entry) void lastTrackStorage.save(userId, entry);
-	else void lastTrackStorage.clear(userId);
+	const write = entry ? lastTrackStorage.save(userId, entry) : lastTrackStorage.clear(userId);
+	void write.catch(error => logger.warn('[lastTrackStorage] Save failed', error));
 }
 
 /** Keeps the last track across restarts, per device and user; it comes back paused, without a stream. */
@@ -70,6 +71,9 @@ export function useLastTrackPersistence(): void {
 				);
 			}
 			setRestoredFor(userId);
+		}).catch(error => {
+			logger.warn('[lastTrackStorage] Load failed', error);
+			if (!cancelled) setRestoredFor(userId);
 		});
 		return () => {
 			cancelled = true;

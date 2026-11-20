@@ -1,5 +1,5 @@
-import { hexToRgba, useImageColors } from '@/shared/hooks/useImageColors';
-import { useTheme } from '@/shared/theme/ThemeContext';
+import { hexToRgba, useImageColors } from '@/shared/image-colors/useImageColors';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { PlaylistWithTracks } from '@/features/playlists/types';
 
 type GradientColors = readonly [string, string, ...string[]];

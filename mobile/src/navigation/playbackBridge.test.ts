@@ -1,17 +1,17 @@
 import { renderHook } from '@testing-library/react-native';
-import { getPlayback, usePlaylistPlayback } from '@/shared/services/playbackBridge';
+import { getPlayback, usePlaylistPlayback } from '@/shared/playback/lib/playbackBridge';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { useQueueStore } from '@/features/queue/stores/queueStore';
 import { useAuthStore } from '@/features/auth/stores/authStore';
-import type { QueueItem } from '@/types/queue.types';
-import type { UserProfile } from '@/types/user.types';
+import type { QueueItem } from '@/shared/playback/lib/queue.types';
+import type { UserProfile } from '@/shared/users/user.types';
 import { registerPlayback } from './playbackBridge';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 jest.mock('@/features/player/context/PlayerContext', () => ({ usePlayerHeight: () => 64 }));
-jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
+jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 
 const item = { id: 'q1', sourcePlaylistId: 'p1' } as QueueItem;
 const URI = 'https://soundcloud.com/a/song';

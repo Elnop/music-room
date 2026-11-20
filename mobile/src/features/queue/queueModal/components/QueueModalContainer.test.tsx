@@ -4,13 +4,13 @@ import { createStore } from 'zustand';
 import { QueueModalContainer } from './QueueModalContainer';
 import { useQueueStore } from '@/features/queue/stores/queueStore';
 import { useConnectStore } from '@/features/queue/stores/connectStore';
-import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
-import { registerTrackActionsSheet } from '@/shared/services/trackActionsBridge';
-import type { UserProfile } from '@/types/user.types';
+import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
+import { registerTrackActionsSheet } from '@/shared/playback/lib/trackActionsBridge';
+import type { UserProfile } from '@/shared/users/user.types';
 import type { QueueItem, QueueState } from '@/features/queue/types';
 
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
@@ -27,7 +27,7 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/shared/services/deviceService', () => ({
+jest.mock('@/shared/backend/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 

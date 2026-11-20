@@ -1,0 +1,136 @@
+import React from 'react';
+import type { FlatListProps } from 'react-native';
+import { Gesture } from 'react-native-gesture-handler';
+import { runOnJS, useSharedValue, type SharedValue } from 'react-native-reanimated';
+import LibReorderableList, {
+	reorderItems,
+	useIsActive,
+	useReorderableDrag,
+	type ReorderableListReorderEvent,
+} from 'react-native-reorderable-list';
+import { hapticSelection } from '@/shared/theme/lib/haptics';
+
+interface ReorderableRenderItemInfo<T> {
+	item: T;
+	index: number;
+	drag: () => void;
+	isActive: boolean;
+}
+
+type PassThroughProps<T> = Pick<
+	FlatListProps<T>,
+	| 'ListHeaderComponent'
+	| 'ListEmptyComponent'
+	| 'contentContainerStyle'
+	| 'showsVerticalScrollIndicator'
+	| 'refreshControl'
+	| 'extraData'
+>;
+
+interface ReorderableListProps<T> extends PassThroughProps<T> {
+	data: T[];
+	keyExtractor: (item: T, index: number) => string;
+	renderItem: (info: ReorderableRenderItemInfo<T>) => React.ReactElement | null;
+	/** Once a returned promise settles, the rows show the order of `data` again. */
+	onReorder: (from: number, to: number) => void | Promise<unknown>;
+	dragEnabled?: boolean;
+}
+
+interface CellProps<T> {
+	item: T;
+	index: number;
+	renderItem: ReorderableListProps<T>['renderItem'];
+	dragRequested: SharedValue<boolean>;
+}
+
+// The library's hooks only work inside a cell, so each row renders through this.
+function Cell<T>({ item, index, renderItem, dragRequested }: CellProps<T>) {
+	const startDrag = useReorderableDrag();
+	const isActive = useIsActive();
+	const drag = () => {
+		dragRequested.set(true);
+		startDrag();
+	};
+	return renderItem({ item, index, drag, isActive });
+}
+
+// Past this many points without a drag request, the touch is a scroll, a pull to refresh or a swipe.
+const DRAG_DECISION_SLOP = 10;
+
+export function ReorderableList<T>({
+	data,
+	keyExtractor,
+	renderItem,
+	onReorder,
+	dragEnabled = true,
+	...listProps
+}: ReorderableListProps<T>) {
+	// The dropped order, valid while `data` is the array it was built from.
+	const [override, setOverride] = React.useState<{ base: T[]; items: T[] } | null>(null);
+	const items = override && override.base === data ? override.items : data;
+
+	const dragRequested = useSharedValue(false);
+	const touchStart = useSharedValue({ x: 0, y: 0 });
+	// Activates only once a row asks for a drag: an eager pan steals the touch from the scroll and RefreshControl on Android.
+	const panGesture = React.useMemo(
+		() =>
+			Gesture.Pan()
+				.manualActivation(true)
+				.onTouchesDown(event => {
+					touchStart.set({ x: event.allTouches[0].absoluteX, y: event.allTouches[0].absoluteY });
+				})
+				.onTouchesMove((event, manager) => {
+					if (dragRequested.get()) {
+						manager.activate();
+						return;
+					}
+					const touch = event.allTouches[0];
+					const start = touchStart.get();
+					const moved = Math.max(
+						Math.abs(touch.absoluteX - start.x),
+						Math.abs(touch.absoluteY - start.y)
+					);
+					if (moved > DRAG_DECISION_SLOP) manager.fail();
+				})
+				.onTouchesUp(() => {
+					dragRequested.set(false);
+				})
+				.onTouchesCancelled(() => {
+					dragRequested.set(false);
+				}),
+		[dragRequested, touchStart]
+	);
+
+	const handleReorder = ({ from, to }: ReorderableListReorderEvent) => {
+		if (from === to) return;
+		setOverride({ base: data, items: reorderItems(items, from, to) });
+		const result = onReorder(from, to);
+		if (result) {
+			const clear = () => setOverride(null);
+			result.then(clear, clear);
+		}
+	};
+
+	// The library calls these on the UI thread, so they must be worklets.
+	const handleDragEdge = () => {
+		'worklet';
+		runOnJS(hapticSelection)();
+	};
+
+	return (
+		<LibReorderableList
+			{...listProps}
+			data={items}
+			keyExtractor={keyExtractor}
+			renderItem={({ item, index }) => (
+				<Cell item={item} index={index} renderItem={renderItem} dragRequested={dragRequested} />
+			)}
+			onReorder={handleReorder}
+			onDragStart={handleDragEdge}
+			onDragEnd={handleDragEdge}
+			dragEnabled={dragEnabled}
+			panGesture={panGesture}
+			shouldUpdateActiveItem
+		/>
+	);
+}

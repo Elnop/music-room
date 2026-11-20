@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, ScrollView } from 'react-native';
-import { memberSinceLabel } from '@/shared/components/profile/ProfileInfoRows';
-import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
-import { useContentColumn } from '@/shared/hooks/useContentColumn';
-import { useTheme } from '@/shared/theme/ThemeContext';
+import { memberSinceLabel } from '@/shared/theme/components/ProfileInfoRows';
+import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
+import { useContentColumn } from '@/shared/theme/hooks/useContentColumn';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type {
 	FilteredProfile,
 	FollowStatus,
@@ -16,7 +16,7 @@ import { UserProfileWideHeader } from './UserProfileWideHeader';
 import { UserProfileWideSections } from './UserProfileWideSections';
 import { UserProfilePlaylists } from './UserProfilePlaylists';
 import { createUserProfileStyles } from './userProfileStyles';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 
 interface UserProfileViewProps {
 	userId: string;

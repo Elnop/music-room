@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { SkeletonBlock, SkeletonList, TrackRowSkeleton } from '@/shared/components/ui/Skeleton';
-import type { Theme } from '@/shared/theme/types';
-import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { SkeletonBlock, SkeletonList, TrackRowSkeleton } from '@/shared/theme/components/Skeleton';
+import type { Theme } from '@/shared/theme/lib/types';
+import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { createDetailStyles } from './detailStyles';
 
 export function DetailSkeleton() {

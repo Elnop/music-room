@@ -1,12 +1,12 @@
 import React from 'react';
 import { FlatList } from 'react-native';
-import { EmptyState } from '@/shared/components/feedback/EmptyState';
-import { SkeletonList, UserRowSkeleton } from '@/shared/components/ui/Skeleton';
-import { useContentColumn } from '@/shared/hooks/useContentColumn';
-import { useTheme } from '@/shared/theme/ThemeContext';
+import { EmptyState } from '@/shared/theme/components/EmptyState';
+import { SkeletonList, UserRowSkeleton } from '@/shared/theme/components/Skeleton';
+import { useContentColumn } from '@/shared/theme/hooks/useContentColumn';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { UserProfile } from '@/features/friends/types';
 import { SearchResultItemRow } from './SearchResultItemRow';
-import { ThemedRefreshControl } from '@/shared/components/lists/ThemedRefreshControl';
+import { ThemedRefreshControl } from '@/shared/refresh-control/ThemedRefreshControl';
 import { createFriendsListStyles } from './friendsListStyles';
 import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
 import SearchSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/search-solid.svg';

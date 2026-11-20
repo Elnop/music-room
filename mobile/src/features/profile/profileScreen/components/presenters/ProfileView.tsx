@@ -6,11 +6,11 @@ import { ProfileMenuItems } from '@/features/profile/profileScreen/components/pr
 import { ProfilePreferencesSection } from '@/features/profile/profileScreen/components/presenters/ProfilePreferencesSection';
 import { ProfileWideHeader } from '@/features/profile/profileScreen/components/presenters/ProfileWideHeader';
 import type { UserStats } from '@/features/profile/types';
-import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
-import { useContentColumn } from '@/shared/hooks/useContentColumn';
-import type { Theme } from '@/shared/theme/types';
-import type { MusicGenre, UserProfile } from '@/types/user.types';
-import { Text } from '@/shared/components/ui/Text';
+import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
+import { useContentColumn } from '@/shared/theme/hooks/useContentColumn';
+import type { Theme } from '@/shared/theme/lib/types';
+import type { MusicGenre, UserProfile } from '@/shared/users/user.types';
+import { Text } from '@/shared/theme/components/Text';
 
 interface ProfileViewProps {
 	theme: Theme;

@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import type { Theme } from '@/shared/theme/types';
-import { SkeletonBlock } from '@/shared/components/ui/Skeleton';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { Theme } from '@/shared/theme/lib/types';
+import { SkeletonBlock } from '@/shared/theme/components/Skeleton';
 
 export function DeviceCardSkeleton() {
 	const { theme } = useTheme();

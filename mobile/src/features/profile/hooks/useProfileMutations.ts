@@ -1,13 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/shared/query/keys';
-import { setUser } from '@/shared/services/authSession';
+import { queryKeys } from '@/shared/query-keys/keys';
+import { setUser } from '@/shared/backend/lib/authSession';
 import { privacyApi } from '@/features/profile/services/privacyApi';
 import { profileApi } from '@/features/profile/services/profileApi';
 import type {
 	UpdateMusicPreferencesData,
 	UpdatePrivacyData,
 	UpdateProfileData,
-} from '@/types/user.types';
+} from '@/shared/users/user.types';
 
 export function useUpdateProfileMutation() {
 	const queryClient = useQueryClient();

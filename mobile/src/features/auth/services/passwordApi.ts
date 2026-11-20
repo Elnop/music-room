@@ -1,4 +1,4 @@
-import { apiRequest } from '@/shared/services/api';
+import { apiRequest } from '@/shared/backend/lib/api';
 import type { MessageResponse, ResendStatus } from '@/features/auth/types';
 
 export function forgotPassword(email: string): Promise<MessageResponse> {

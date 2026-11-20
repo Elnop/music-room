@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import { Text } from '@/shared/components/ui/Text';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { Text } from '@/shared/theme/components/Text';
 
 const LINES = [
 	'Le mot de passe doit contenir :',

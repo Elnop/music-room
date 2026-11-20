@@ -1,8 +1,8 @@
 import React from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import type { Theme } from '@/shared/theme/types';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import type { Theme } from '@/shared/theme/lib/types';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { FriendPlaylists } from '@/features/playlists/types';
 import { playlistCardLabel } from '@/features/playlists/home/utils/playlistLabels';
 import { PlaylistCassette } from './PlaylistCassette';

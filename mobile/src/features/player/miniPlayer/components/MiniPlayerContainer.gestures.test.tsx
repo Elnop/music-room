@@ -6,9 +6,9 @@ import { fireGestureHandler, getByGestureTestId } from 'react-native-gesture-han
 import { MiniPlayerContainer } from './MiniPlayerContainer';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import type { NowPlaying } from '@/features/player/types';
-import { hapticTap } from '@/shared/utils/haptics';
+import { hapticTap } from '@/shared/theme/lib/haptics';
 
-jest.mock('@/shared/utils/haptics', () => ({
+jest.mock('@/shared/theme/lib/haptics', () => ({
 	hapticTap: jest.fn(),
 	hapticSelection: jest.fn(),
 	hapticSuccess: jest.fn(),
@@ -18,12 +18,12 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/shared/services/deviceService', () => ({
+jest.mock('@/shared/backend/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

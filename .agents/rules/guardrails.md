@@ -75,11 +75,11 @@ semgrep, mobile: a `useEffect` callback is never `async`. React expects it to re
 
 ## no-fetch-outside-api-client
 
-semgrep, mobile: `fetch(` appears only in `src/shared/services/api.ts`. The API client adds the `X-Platform`, `X-Device-Model` and `X-App-Version` headers the backend logs (subject IV.6). Call the backend through it.
+semgrep, mobile: `fetch(` appears only in `src/shared/backend/lib/api.ts`. The API client adds the `X-Platform`, `X-Device-Model` and `X-App-Version` headers the backend logs (subject IV.6). Call the backend through it.
 
 ## no-asyncstorage-outside-storage
 
-semgrep, mobile: `@react-native-async-storage/async-storage` is imported only by storage modules and tests. A storage module is named `<thing>Storage.ts` (`src/shared/services/lastTrackStorage.ts`, `src/features/auth/services/sessionStorage.ts`): the rule allows that name through `metadata.allowed-paths` (see [exception-lists](#exception-lists)). `src/shared/services/backendUrl.ts`, a storage module named before the convention, keeps its own exclude. Other code calls a storage module, so keys and formats live in one place. The other files importing it today are listed in the rule's `exclude` and leave it as they migrate.
+semgrep, mobile: `@react-native-async-storage/async-storage` is imported only by storage modules and tests. A storage module is named `<thing>Storage.ts` (`src/shared/playback/lib/lastTrackStorage.ts`, `src/features/auth/services/sessionStorage.ts`): the rule allows that name through `metadata.allowed-paths` (see [exception-lists](#exception-lists)). `src/shared/backend/lib/backendUrl.ts`, a storage module named before the convention, keeps its own exclude. Other code calls a storage module, so keys and formats live in one place. The other files importing it today are listed in the rule's `exclude` and leave it as they migrate.
 
 ## no-non-null-assertion-on-env
 

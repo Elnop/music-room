@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, fireEvent, screen, act } from '@testing-library/react-native';
 import { SoundCloudTrackItem } from './SoundCloudTrackItem';
-import type { SoundCloudTrack } from '@/types/soundcloud.types';
+import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
 
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 

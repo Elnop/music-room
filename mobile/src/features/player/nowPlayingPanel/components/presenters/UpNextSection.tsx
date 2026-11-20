@@ -1,8 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import { Text } from '@/shared/components/ui/Text';
-import type { QueueItem } from '@/shared/playback/playback';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { Text } from '@/shared/theme/components/Text';
+import type { QueueItem } from '@/shared/playback/lib/playback';
 import { UpNextRow } from './UpNextRow';
 import type { NowPlayingPanelStyles } from './nowPlayingPanelStyles';
 

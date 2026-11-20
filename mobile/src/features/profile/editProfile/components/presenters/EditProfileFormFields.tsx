@@ -3,10 +3,10 @@ import { StyleSheet, View } from 'react-native';
 import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 import { PROFILE_LIMITS, type UpdateProfileInput } from '@/features/profile/types';
-import { Input } from '@/shared/components/ui/Input';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import type { Theme } from '@/shared/theme/types';
-import { Text } from '@/shared/components/ui/Text';
+import { Input } from '@/shared/theme/components/Input';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { Theme } from '@/shared/theme/lib/types';
+import { Text } from '@/shared/theme/components/Text';
 
 interface EditProfileFormFieldsProps {
 	control: Control<UpdateProfileInput>;

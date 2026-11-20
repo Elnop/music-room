@@ -2,12 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { useUserMusicPreferences } from '@/features/profile/hooks/useProfileQueries';
 import { useUpdateMusicPreferencesMutation } from '@/features/profile/hooks/useProfileMutations';
-import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { showError } from '@/shared/utils/toast';
-import type { MusicGenre } from '@/types/user.types';
-import { MAX_GENRES } from '@/types/user.types';
+import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { showError } from '@/shared/theme/lib/toast';
+import type { MusicGenre } from '@/shared/users/user.types';
+import { MAX_GENRES } from '@/shared/users/user.types';
 
 export function useMusicPreferences() {
 	const { theme } = useTheme();

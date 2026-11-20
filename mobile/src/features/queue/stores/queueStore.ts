@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { getSession } from '@/shared/services/authSession';
-import { getPlayback } from '@/shared/services/playbackBridge';
+import { getSession } from '@/shared/backend/lib/authSession';
+import { getPlayback } from '@/shared/playback/lib/playbackBridge';
 import { queueApi } from '@/features/queue/services/queueApi';
 import { useConnectStore, useActiveOwnerId } from '@/features/queue/stores/connectStore';
 import { asStep, mutate, runStep } from '@/features/queue/stores/queueStepRunner';
@@ -11,11 +11,11 @@ import {
 	removeItemAction,
 } from '@/features/queue/stores/queueItemActions';
 import { playPlaylistError, selectQueue } from '@/features/queue/utils/queueSelectors';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { logger } from '@/shared/utils/logger';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { logger } from '@/shared/logging/logger';
 import type { OwnerQueue, QueueState, QueueStepOutcome } from '@/features/queue/types';
-import type { AddQueueItemBody } from '@/shared/playback/playback';
-import type { SoundCloudTrack } from '@/types/soundcloud.types';
+import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
+import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
 
 interface QueueStoreState {
 	queues: Record<string, OwnerQueue>;

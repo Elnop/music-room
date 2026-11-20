@@ -1,13 +1,13 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { openExternalUrl } from '@/shared/utils/openExternalUrl';
+import { openExternalUrl } from '@/shared/external-links/openExternalUrl';
 import { PrivacyPolicyContainer } from './PrivacyPolicyContainer';
 
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
-jest.mock('@/shared/utils/openExternalUrl', () => ({ openExternalUrl: jest.fn() }));
+jest.mock('@/shared/external-links/openExternalUrl', () => ({ openExternalUrl: jest.fn() }));
 
 describe('PrivacyPolicyContainer', () => {
 	it('shows every section of the policy', () => {
@@ -36,7 +36,7 @@ describe('PrivacyPolicyContainer', () => {
 		fireEvent.press(screen.getByText('CNIL'));
 		fireEvent.press(screen.getAllByText('leon.perrotin@gmail.com')[0]);
 
-		expect(openExternalUrl).toHaveBeenNthCalledWith(1, 'https://www.cnil.fr');
-		expect(openExternalUrl).toHaveBeenNthCalledWith(2, 'mailto:leon.perrotin@gmail.com');
+		expect(openExternalUrl).toHaveBeenNthCalledWith(1, 'https://www.cnil.fr', expect.any(Function));
+		expect(openExternalUrl).toHaveBeenNthCalledWith(2, 'mailto:leon.perrotin@gmail.com', expect.any(Function));
 	});
 });

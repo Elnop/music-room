@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { getHeaderTitle, Header, HeaderBackButton } from '@react-navigation/elements';
 import type { NativeStackHeaderProps } from '@react-navigation/native-stack';
-import { CONTENT_MAX_WIDTH } from '@/shared/constants/layout';
+import { CONTENT_MAX_WIDTH } from '@/shared/theme/lib/layout';
 import { SCREEN_WIDTHS } from '@/navigation/screenWidths';
 
 /** Laid out in the screen's column so its buttons line up with the content. */

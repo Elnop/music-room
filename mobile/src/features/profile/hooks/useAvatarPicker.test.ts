@@ -1,12 +1,12 @@
 import { act, renderHook } from '@testing-library/react-native';
 import { useAvatarPicker } from './useAvatarPicker';
-import { ApiError } from '@/shared/services/api';
+import { ApiError } from '@/shared/backend/lib/api';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
+jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
 
 const mockPicker = {
 	requestMediaLibraryPermissionsAsync: jest.fn(),
@@ -22,7 +22,7 @@ jest.mock('expo-image-picker', () => ({
 }));
 
 const mockPrepareAvatar = jest.fn();
-jest.mock('@/shared/utils/squareImage', () => ({
+jest.mock('@/shared/square-image/squareImage', () => ({
 	prepareSquareImage: (asset: unknown) => mockPrepareAvatar(asset),
 }));
 
@@ -36,7 +36,7 @@ jest.mock('@/features/profile/services/profileApi', () => ({
 }));
 
 const mockSetAvatarUrl = jest.fn();
-jest.mock('@/shared/services/authSession', () => ({
+jest.mock('@/shared/backend/lib/authSession', () => ({
 	useSession: (selector: (s: { accessToken: string }) => unknown) =>
 		selector({ accessToken: 'token' }),
 	setAvatarUrl: (url: string | null) => mockSetAvatarUrl(url),
@@ -44,7 +44,7 @@ jest.mock('@/shared/services/authSession', () => ({
 
 const mockShowError = jest.fn();
 const mockShowSuccess = jest.fn();
-jest.mock('@/shared/utils/toast', () => ({
+jest.mock('@/shared/theme/lib/toast', () => ({
 	showError: (message: string) => mockShowError(message),
 	showSuccess: (message: string) => mockShowSuccess(message),
 }));

@@ -1,15 +1,15 @@
 import React from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTheme } from '@/shared/theme/ThemeContext';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import { useActiveQueue, useQueueStore } from '@/features/queue/stores/queueStore';
-import { afterItemIdForDrop } from '@/shared/utils/moveTarget';
-import { toTrackInput } from '@/shared/utils/trackInput';
+import { afterItemIdForDrop } from '@/shared/tracks/lib/moveTarget';
+import { toTrackInput } from '@/shared/tracks/lib/trackInput';
 import { createModalStyles } from '@/features/queue/queueModal/components/presenters/queueModalStyles';
 import type { QueueItem } from '@/features/queue/types';
-import type { AddQueueItemBody } from '@/shared/playback/playback';
-import { useSeparatorColor } from '@/shared/hooks/useSeparatorColor';
-import { recordMenuAnchor } from '@/shared/stores/menuAnchorStore';
-import type { MenuAnchor } from '@/shared/utils/menuPlacement';
+import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
+import { useSeparatorColor } from '@/shared/theme/hooks/useSeparatorColor';
+import { recordMenuAnchor } from '@/shared/theme/menuAnchorStore';
+import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
 
 export function useQueueModal() {
 	const { theme } = useTheme();

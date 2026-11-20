@@ -4,21 +4,21 @@ import {
 	registerAuthSession,
 	notifySessionEnd,
 	type SessionView,
-} from '@/shared/services/authSession';
-import { registerPlaybackBridge } from '@/shared/services/playbackBridge';
-import { showInfo } from '@/shared/utils/toast';
-import type { ListeningStatus } from '@/types/listening.types';
-import type { UserProfile } from '@/types/user.types';
+} from '@/shared/backend/lib/authSession';
+import { registerPlaybackBridge } from '@/shared/playback/lib/playbackBridge';
+import { showInfo } from '@/shared/theme/lib/toast';
+import type { ListeningStatus } from '@/shared/listening/lib/listening.types';
+import type { UserProfile } from '@/shared/users/user.types';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/shared/services/deviceService', () => ({
+jest.mock('@/shared/backend/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 }));
 
-jest.mock('@/shared/utils/toast', () => ({
+jest.mock('@/shared/theme/lib/toast', () => ({
 	showInfo: jest.fn(),
 	showError: jest.fn(),
 	showSuccess: jest.fn(),

@@ -2,12 +2,12 @@ import { act, renderHook } from '@testing-library/react-native';
 import { createStore } from 'zustand';
 import { useRemoteTarget } from './useRemoteTarget';
 import { useConnectStore } from '@/features/queue/stores/connectStore';
-import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
-import '@/test/playback';
-import { showError, showInfo } from '@/shared/utils/toast';
-import type { ListeningStatus, UserListeningStatus } from '@/types/listening.types';
-import type { UserProfile } from '@/types/user.types';
-import { logger } from '@/shared/utils/logger';
+import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
+import '@test-utils/playback';
+import { showError, showInfo } from '@/shared/theme/lib/toast';
+import type { ListeningStatus, UserListeningStatus } from '@/shared/listening/lib/listening.types';
+import type { UserProfile } from '@/shared/users/user.types';
+import { logger } from '@/shared/logging/logger';
 
 const mockSocket = {
 	connected: true,
@@ -19,7 +19,7 @@ const mockSocketState = { socket: mockSocket, isConnected: true };
 const mockLoad = jest.fn();
 const mockForget = jest.fn();
 
-jest.mock('@/shared/stores/socketStore', () => ({
+jest.mock('@/shared/backend/socketStore', () => ({
 	useSocketStore: (selector: (state: typeof mockSocketState) => unknown) =>
 		selector(mockSocketState),
 }));
@@ -32,12 +32,12 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/shared/services/deviceService', () => ({
+jest.mock('@/shared/backend/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 	deviceService: { getDeviceInfo: jest.fn() },
 }));
 
-jest.mock('@/shared/utils/toast', () => ({
+jest.mock('@/shared/theme/lib/toast', () => ({
 	showInfo: jest.fn(),
 	showError: jest.fn(),
 	showSuccess: jest.fn(),
@@ -198,7 +198,7 @@ describe('useRemoteTarget', () => {
 
 	it('shares the listening room with another holder', () => {
 		const { acquireListening, releaseListening } = jest.requireActual(
-			'@/shared/services/listeningRooms'
+			'@/shared/listening-rooms/listeningRooms'
 		);
 		acquireListening(mockSocket, 'friend'); // the friend profile
 		mockSocket.emit.mockClear();

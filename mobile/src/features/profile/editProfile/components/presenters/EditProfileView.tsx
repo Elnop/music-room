@@ -4,11 +4,11 @@ import type { Control, FieldErrors } from 'react-hook-form';
 import { EditProfileFormFields } from '@/features/profile/editProfile/components/presenters/EditProfileFormFields';
 import { EditProfilePhoto } from '@/features/profile/editProfile/components/presenters/EditProfilePhoto';
 import type { UpdateProfileInput } from '@/features/profile/types';
-import { FormError } from '@/shared/components/feedback/FormError';
-import { Button } from '@/shared/components/ui/Button';
-import type { Theme } from '@/shared/theme/types';
-import type { UserProfile } from '@/types/user.types';
-import { Text } from '@/shared/components/ui/Text';
+import { FormError } from '@/shared/theme/components/FormError';
+import { Button } from '@/shared/theme/components/Button';
+import type { Theme } from '@/shared/theme/lib/types';
+import type { UserProfile } from '@/shared/users/user.types';
+import { Text } from '@/shared/theme/components/Text';
 
 interface EditProfileViewProps {
 	theme: Theme;

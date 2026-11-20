@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Share } from 'react-native';
-import { getPlayback } from '@/shared/services/playbackBridge';
-import { useSession } from '@/shared/services/authSession';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { logger } from '@/shared/utils/logger';
-import { showError, showSuccess } from '@/shared/utils/toast';
+import { getPlayback } from '@/shared/playback/lib/playbackBridge';
+import { useSession } from '@/shared/backend/lib/authSession';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { logger } from '@/shared/logging/logger';
+import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import { usePlaylists } from '@/features/playlists/hooks/usePlaylistQueries';
 import { useAddTrack } from '@/features/playlists/hooks/useTrackEdits';
 import { canEditPlaylist } from '@/features/playlists/utils/playlistPermissions';
@@ -13,8 +13,8 @@ import {
 	type NewPlaylistDraft,
 } from '@/features/playlists/trackActions/hooks/useNewPlaylistFromTrack';
 import type { Playlist } from '@/features/playlists/types';
-import type { AddQueueItemBody } from '@/shared/playback/playback';
-import type { TrackActionsStart } from '@/shared/services/trackActionsBridge';
+import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
+import type { TrackActionsStart } from '@/shared/playback/lib/trackActionsBridge';
 
 type Step = 'actions' | 'playlists' | 'newPlaylist';
 

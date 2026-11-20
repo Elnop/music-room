@@ -1,14 +1,14 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Button } from '@/shared/components/ui/Button';
-import { ShareLinkButton } from '@/shared/components/sharing/ShareLinkButton';
-import { userLink } from '@/shared/utils/shareLinks';
-import { useTheme } from '@/shared/theme/ThemeContext';
+import { Button } from '@/shared/theme/components/Button';
+import { ShareLinkButton } from '@/shared/theme/components/ShareLinkButton';
+import { userLink } from '@/shared/share-links/shareLinks';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { UserProfileHeaderProps } from '@/features/friends/types';
 import { createUserProfileHeaderStyles } from './userProfileHeaderStyles';
 import { createUserProfileStyles } from './userProfileStyles';
 import { UserProfileListening } from './UserProfileListening';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 
 type UserProfileActionsProps = UserProfileHeaderProps;
 

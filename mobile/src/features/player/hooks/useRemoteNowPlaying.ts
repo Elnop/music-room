@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useConnectStoreSelector, setControlPending } from '@/shared/services/connectBridge';
-import { useSession } from '@/shared/services/authSession';
-import { useSocketStore } from '@/shared/stores/socketStore';
-import { useActiveQueue, getPlayback, type OwnerQueue } from '@/shared/services/playbackBridge';
-import { selectHasNext, selectHasPrevious } from '@/shared/utils/queueNavigation';
-import { hashStringToNumber } from '@/shared/utils/trackToSoundCloud';
-import { estimatePositionMs } from '@/shared/utils/remotePosition';
+import { useConnectStoreSelector, setControlPending } from '@/shared/listening/lib/connectBridge';
+import { useSession } from '@/shared/backend/lib/authSession';
+import { useSocketStore } from '@/shared/backend/socketStore';
+import { useActiveQueue, getPlayback, type OwnerQueue } from '@/shared/playback/lib/playbackBridge';
+import { selectHasNext, selectHasPrevious } from '@/shared/playback/lib/queueNavigation';
+import { hashStringToNumber } from '@/shared/tracks/lib/trackToSoundCloud';
+import { estimatePositionMs } from '@/shared/listening/lib/remotePosition';
 import type { NowPlaying } from '@/features/player/types';
 
 const REMOTE_TICK_MS = 1000;

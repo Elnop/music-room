@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import type { Theme } from '@/shared/theme/types';
-import { Avatar } from '@/shared/components/media/Avatar';
-import { ThemedSwitch } from '@/shared/components/ui/ThemedSwitch';
-import type { FriendUserSummary } from '@/shared/services/friendsBridge';
-import { Text } from '@/shared/components/ui/Text';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { Theme } from '@/shared/theme/lib/types';
+import { Avatar } from '@/shared/theme/components/Avatar';
+import { ThemedSwitch } from '@/shared/theme/components/ThemedSwitch';
+import type { FriendUserSummary } from '@/shared/backend/lib/friendsBridge';
+import { Text } from '@/shared/theme/components/Text';
 
 interface DeviceFriendRowProps {
 	friend: FriendUserSummary;

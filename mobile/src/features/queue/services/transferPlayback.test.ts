@@ -3,24 +3,24 @@ import { transferTo } from './transferPlayback';
 import { useConnectStore } from '@/features/queue/stores/connectStore';
 import { useQueueStore } from '@/features/queue/stores/queueStore';
 import { queueApi } from '@/features/queue/services/queueApi';
-import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
-import { registerPlaybackBridge } from '@/shared/services/playbackBridge';
-import { ApiError } from '@/shared/services/api';
-import { showError } from '@/shared/utils/toast';
-import { hapticSuccess } from '@/shared/utils/haptics';
-import type { DevicePickerOwner } from '@/types/device.types';
-import type { QueueItem, QueueState } from '@/types/queue.types';
-import type { ListeningStatus } from '@/types/listening.types';
-import type { SoundCloudTrack } from '@/types/soundcloud.types';
-import type { UserProfile } from '@/types/user.types';
-import { hashStringToNumber } from '@/shared/utils/trackToSoundCloud';
-import { logger } from '@/shared/utils/logger';
+import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
+import { registerPlaybackBridge } from '@/shared/playback/lib/playbackBridge';
+import { ApiError } from '@/shared/backend/lib/api';
+import { showError } from '@/shared/theme/lib/toast';
+import { hapticSuccess } from '@/shared/theme/lib/haptics';
+import type { DevicePickerOwner } from '@/shared/devices/device.types';
+import type { QueueItem, QueueState } from '@/shared/playback/lib/queue.types';
+import type { ListeningStatus } from '@/shared/listening/lib/listening.types';
+import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
+import type { UserProfile } from '@/shared/users/user.types';
+import { hashStringToNumber } from '@/shared/tracks/lib/trackToSoundCloud';
+import { logger } from '@/shared/logging/logger';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/shared/services/deviceService', () => ({
+jest.mock('@/shared/backend/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 	deviceService: { getDeviceInfo: jest.fn(async () => ({ deviceId: 'phone' })) },
 }));
@@ -29,9 +29,9 @@ jest.mock('@/features/queue/services/queueApi', () => ({
 	queueApi: { getQueue: jest.fn(), transfer: jest.fn() },
 }));
 
-jest.mock('@/shared/utils/haptics', () => ({ hapticSuccess: jest.fn() }));
+jest.mock('@/shared/theme/lib/haptics', () => ({ hapticSuccess: jest.fn() }));
 
-jest.mock('@/shared/utils/toast', () => ({
+jest.mock('@/shared/theme/lib/toast', () => ({
 	showSuccess: jest.fn(),
 	showError: jest.fn(),
 	showInfo: jest.fn(),

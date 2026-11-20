@@ -1,8 +1,8 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { showError } from '@/shared/utils/toast';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { debounce } from '@/shared/utils/debounce';
-import { logger } from '@/shared/utils/logger';
+import { showError } from '@/shared/theme/lib/toast';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { debounce } from '@/shared/debounce/debounce';
+import { logger } from '@/shared/logging/logger';
 import { friendsApi } from '@/features/friends/services/friendsApi';
 import type { UserProfile } from '@/features/friends/types';
 

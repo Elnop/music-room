@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { showError } from '@/shared/utils/toast';
+import { showError } from '@/shared/theme/lib/toast';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '@/features/auth/types';
 import { useRegisterForm } from '@/features/auth/register/useRegisterForm';

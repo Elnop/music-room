@@ -1,20 +1,20 @@
 import { queueApi } from '@/features/queue/services/queueApi';
-import { deviceService } from '@/shared/services/deviceService';
-import { getSession } from '@/shared/services/authSession';
+import { deviceService } from '@/shared/backend/deviceService';
+import { getSession } from '@/shared/backend/lib/authSession';
 import { useConnectStore } from '@/features/queue/stores/connectStore';
-import { getPlayback } from '@/shared/services/playbackBridge';
+import { getPlayback } from '@/shared/playback/lib/playbackBridge';
 import { useQueueStore } from '@/features/queue/stores/queueStore';
 import { selectQueue } from '@/features/queue/utils/queueSelectors';
-import { estimatePositionMs } from '@/shared/utils/remotePosition';
-import { toTrackInput } from '@/shared/utils/trackInput';
-import { hashStringToNumber } from '@/shared/utils/trackToSoundCloud';
-import { showError } from '@/shared/utils/toast';
-import { hapticSuccess } from '@/shared/utils/haptics';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import type { DevicePickerOwner } from '@/types/device.types';
-import type { QueueTrack, TransferRequest } from '@/types/queue.types';
-import type { AddQueueItemBody } from '@/shared/playback/playback';
-import { logger } from '@/shared/utils/logger';
+import { estimatePositionMs } from '@/shared/listening/lib/remotePosition';
+import { toTrackInput } from '@/shared/tracks/lib/trackInput';
+import { hashStringToNumber } from '@/shared/tracks/lib/trackToSoundCloud';
+import { showError } from '@/shared/theme/lib/toast';
+import { hapticSuccess } from '@/shared/theme/lib/haptics';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import type { DevicePickerOwner } from '@/shared/devices/device.types';
+import type { QueueTrack, TransferRequest } from '@/shared/playback/lib/queue.types';
+import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
+import { logger } from '@/shared/logging/logger';
 
 interface Playback {
 	playing: TransferRequest['playing'];

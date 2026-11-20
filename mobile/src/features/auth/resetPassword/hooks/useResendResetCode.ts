@@ -1,5 +1,5 @@
 import { canResendResetCode } from '@/features/auth/services/passwordApi';
-import { showError, showSuccess } from '@/shared/utils/toast';
+import { showError, showSuccess } from '@/shared/theme/lib/toast';
 import { useCountdown } from '@/features/auth/code/hooks/useCountdown';
 import type { useForgotPasswordMutation } from '@/features/auth/hooks/usePasswordResetMutations';
 

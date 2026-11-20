@@ -1,9 +1,9 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { PixelIcon } from '@/shared/components/media/PixelIcon';
-import { Text } from '@/shared/components/ui/Text';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
-import type { Theme } from '@/shared/theme/types';
+import { PixelIcon } from '@/shared/theme/components/PixelIcon';
+import { Text } from '@/shared/theme/components/Text';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import type { Theme } from '@/shared/theme/lib/types';
 import type { LandingFeature } from '@/features/auth/welcome/utils/landingContent';
 
 export function FeatureCard({ title, description, icon }: LandingFeature) {

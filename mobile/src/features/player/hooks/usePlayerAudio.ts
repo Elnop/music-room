@@ -2,7 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { useAudioPlayer } from '@/features/player/services/audioPlayer';
 import type { AudioPlayer } from '@/features/player/types';
 import { usePlayerStore, setPositionReader } from '@/features/player/stores/playerStore';
-import { isLocalTarget } from '@/shared/services/connectBridge';
+import { isLocalTarget } from '@/shared/listening/lib/connectBridge';
 import { isStreamStale } from '@/features/player/services/streamPrefetch';
 import { useStreamLoader } from './useStreamLoader';
 import { useAudioPlaybackSync } from './useAudioPlaybackSync';

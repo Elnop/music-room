@@ -1,7 +1,7 @@
-import { apiRequest, authRequest } from '@/shared/services/api';
+import { apiRequest, authRequest } from '@/shared/backend/lib/api';
 import { profileApi } from './profileApi';
 
-jest.mock('@/shared/services/api', () => ({
+jest.mock('@/shared/backend/lib/api', () => ({
 	apiRequest: jest.fn(),
 	authRequest: jest.fn(),
 }));

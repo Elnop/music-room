@@ -1,14 +1,14 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import { SearchBar } from '@/shared/components/form/SearchBar';
-import { useTheme } from '@/shared/theme/ThemeContext';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { SearchBar } from '@/shared/theme/components/SearchBar';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { FriendProfile, UserProfile } from '@/features/friends/types';
 import { FriendsListTab } from './FriendsListTab';
 import { SearchUsersTab } from './SearchUsersTab';
 import { createFriendsListStyles } from './friendsListStyles';
-import { Text } from '@/shared/components/ui/Text';
-import { useContentColumn } from '@/shared/hooks/useContentColumn';
+import { Text } from '@/shared/theme/components/Text';
+import { useContentColumn } from '@/shared/theme/hooks/useContentColumn';
 
 interface FriendsListViewProps {
 	activeTab: 'friends' | 'search';

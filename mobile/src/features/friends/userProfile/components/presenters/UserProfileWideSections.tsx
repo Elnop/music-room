@@ -1,18 +1,18 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { ProfileSection } from '@/shared/components/profile/ProfileSection';
+import { ProfileSection } from '@/shared/theme/components/ProfileSection';
 import {
 	ProfileInfoRows,
 	memberSinceLabel,
 	type ProfileInfoRow,
-} from '@/shared/components/profile/ProfileInfoRows';
-import { GenreChip } from '@/shared/components/ui/GenreChip';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
-import type { Theme } from '@/shared/theme/types';
+} from '@/shared/theme/components/ProfileInfoRows';
+import { GenreChip } from '@/shared/theme/components/GenreChip';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import type { Theme } from '@/shared/theme/lib/types';
 import type { FilteredProfile, FriendPlaylistSummary } from '@/features/friends/types';
 import { FriendPlaylistCard } from './FriendPlaylistCard';
 import { HiddenFieldNote } from './HiddenFieldNote';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 
 interface UserProfileWideSectionsProps {
 	profile: FilteredProfile;

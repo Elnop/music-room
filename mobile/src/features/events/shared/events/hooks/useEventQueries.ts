@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/shared/query/keys';
-import { STALE } from '@/shared/query/queryClient';
-import { useSession } from '@/shared/services/authSession';
+import { queryKeys } from '@/shared/query-keys/keys';
+import { STALE } from '@/shared/backend/queryClient';
+import { useSession } from '@/shared/backend/lib/authSession';
 import * as eventsApi from '@/features/events/shared/events/lib/eventsApi';
 import type { MusicEvent } from '@/features/events/lib/types';
 

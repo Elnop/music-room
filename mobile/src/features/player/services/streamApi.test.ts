@@ -1,7 +1,7 @@
-import { apiRequest } from '@/shared/services/api';
+import { apiRequest } from '@/shared/backend/lib/api';
 import { fetchStreamUrl } from './streamApi';
 
-jest.mock('@/shared/services/api', () => ({ apiRequest: jest.fn() }));
+jest.mock('@/shared/backend/lib/api', () => ({ apiRequest: jest.fn() }));
 
 const mockApiRequest = apiRequest as jest.Mock;
 const EXPIRES_AT = '2026-01-01T00:30:00.000Z';

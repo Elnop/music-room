@@ -1,24 +1,24 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { NowPlayingPanelContainer } from './NowPlayingPanelContainer';
-import { useNowPlayingPanelStore } from '@/shared/stores/nowPlayingPanelStore';
-import { registerPlaybackBridge, type OwnerQueue } from '@/shared/services/playbackBridge';
-import { registerPlayerModals } from '@/shared/services/playerModalsBridge';
-import { registerTrackActionsSheet } from '@/shared/services/trackActionsBridge';
-import { THIS_DEVICE_LABEL } from '@/shared/constants/platform';
+import { useNowPlayingPanelStore } from '@/features/player/stores/nowPlayingPanelStore';
+import { registerPlaybackBridge, type OwnerQueue } from '@/shared/playback/lib/playbackBridge';
+import { registerPlayerModals } from '@/shared/player-modals-bridge/playerModalsBridge';
+import { registerTrackActionsSheet } from '@/shared/playback/lib/trackActionsBridge';
+import { THIS_DEVICE_LABEL } from '@/shared/platform/platform';
 import type { NowPlaying } from '@/features/player/types';
-import type { QueueItem } from '@/shared/playback/playback';
-import { Text } from '@/shared/components/ui/Text';
+import type { QueueItem } from '@/shared/playback/lib/playback';
+import { Text } from '@/shared/theme/components/Text';
 
 let mockNowPlaying: NowPlaying;
 
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-jest.mock('@/shared/hooks/useImageColors', () => ({
-	...jest.requireActual('@/shared/theme/adaptivePalette'),
+jest.mock('@/shared/image-colors/useImageColors', () => ({
+	...jest.requireActual('@/shared/image-colors/adaptivePalette'),
 	useImageColors: () => ({ dominantColor: null, isLoading: false }),
 }));
 

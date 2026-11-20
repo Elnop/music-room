@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { useNavigation, type NavigationProp, type ParamListBase } from '@react-navigation/native';
 import { usePlayerShortcuts } from '@/features/player/hooks/usePlayerShortcuts';
 import { useSearchFocusStore } from '@/features/search/searchFocusStore';
-import { ShortcutsHelpDialog } from '@/shared/components/feedback/ShortcutsHelpDialog';
-import { useKeyboardShortcuts } from '@/shared/hooks/useKeyboardShortcuts';
-import type { KeyboardShortcut } from '@/shared/utils/keyboardShortcuts';
+import { ShortcutsHelpDialog } from './ShortcutsHelpDialog';
+import { useKeyboardShortcuts } from '@/shared/keyboard-shortcuts/useKeyboardShortcuts';
+import type { KeyboardShortcut } from '@/shared/keyboard-shortcuts/keyboardShortcuts';
 
 /** A leaf component: the player's shortcuts re-render with the position. */
 export function KeyboardShortcuts() {

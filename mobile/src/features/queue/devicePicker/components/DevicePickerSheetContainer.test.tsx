@@ -5,18 +5,18 @@ import { DevicePickerSheetContainer } from './DevicePickerSheetContainer';
 import { useConnectStore } from '@/features/queue/stores/connectStore';
 import { useQueueStore } from '@/features/queue/stores/queueStore';
 import { queueApi } from '@/features/queue/services/queueApi';
-import { registerAuthSession, type SessionView } from '@/shared/services/authSession';
-import { registerPlaybackBridge } from '@/shared/services/playbackBridge';
-import { getDevicePicker } from '@/shared/services/musicControlBridge';
-import { ApiError } from '@/shared/services/api';
-import { showError } from '@/shared/utils/toast';
-import type { DevicePickerResponse } from '@/types/device.types';
-import type { UserProfile } from '@/types/user.types';
-import type { SoundCloudTrack } from '@/types/soundcloud.types';
-import { logger } from '@/shared/utils/logger';
+import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
+import { registerPlaybackBridge } from '@/shared/playback/lib/playbackBridge';
+import { getDevicePicker } from '@/shared/backend/lib/musicControlBridge';
+import { ApiError } from '@/shared/backend/lib/api';
+import { showError } from '@/shared/theme/lib/toast';
+import type { DevicePickerResponse } from '@/shared/devices/device.types';
+import type { UserProfile } from '@/shared/users/user.types';
+import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
+import { logger } from '@/shared/logging/logger';
 
-jest.mock('@/shared/theme/ThemeContext', () => {
-	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
+jest.mock('@/shared/theme/components/ThemeContext', () => {
+	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
@@ -28,12 +28,12 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('@/shared/services/deviceService', () => ({
+jest.mock('@/shared/backend/deviceService', () => ({
 	getAppVersion: () => '1.2.3',
 	deviceService: { getDeviceInfo: jest.fn(async () => ({ deviceId: 'phone' })) },
 }));
 
-jest.mock('@/shared/services/musicControlBridge', () => ({
+jest.mock('@/shared/backend/lib/musicControlBridge', () => ({
 	getDevicePicker: jest.fn(),
 }));
 
@@ -41,7 +41,7 @@ jest.mock('@/features/queue/services/queueApi', () => ({
 	queueApi: { getQueue: jest.fn(), transfer: jest.fn() },
 }));
 
-jest.mock('@/shared/utils/toast', () => ({
+jest.mock('@/shared/theme/lib/toast', () => ({
 	showSuccess: jest.fn(),
 	showError: jest.fn(),
 	showInfo: jest.fn(),

@@ -1,13 +1,13 @@
 import { QueryObserver, type QueryClient } from '@tanstack/react-query';
-import { createQueryClient } from '@/shared/query/queryClient';
-import { queryKeys } from '@/shared/query/keys';
-import { ApiError } from '@/shared/services/api';
+import { createQueryClient } from '@/shared/backend/queryClient';
+import { queryKeys } from '@/shared/query-keys/keys';
+import { ApiError } from '@/shared/backend/lib/api';
 import * as playlistApi from '@/features/playlists/services/playlistApi';
 import * as tracksApi from '@/features/playlists/services/tracksApi';
 import { usePendingMovesStore } from '@/features/playlists/pendingMovesStore';
 import type { MoveTrackResult, PlaylistWithTracks } from '@/features/playlists/types';
-import { deferred } from '@/test/deferred';
-import { playlistTrack } from '@/test/playlistFixtures';
+import { deferred } from '@test-utils/deferred';
+import { playlistTrack } from '@test-utils/playlistFixtures';
 import { loadPlaylist } from './playlistCache';
 import { addTrack, removeTrack } from './trackEdits';
 import { moveTrack } from './trackMoves';
@@ -15,7 +15,7 @@ import { moveTrack } from './trackMoves';
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
-jest.mock('@/shared/services/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
+jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.2.3' }));
 
 jest.mock('@/features/playlists/services/tracksApi', () => ({
 	addTrack: jest.fn(),

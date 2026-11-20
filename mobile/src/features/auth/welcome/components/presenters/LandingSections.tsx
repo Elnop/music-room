@@ -1,13 +1,13 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Button } from '@/shared/components/ui/Button';
-import { Pressable } from '@/shared/components/ui/Pressable';
-import { Text } from '@/shared/components/ui/Text';
-import { LATEST_RELEASE_URL, SOURCE_CODE_URL } from '@/shared/constants/links';
-import { CONTENT_MAX_WIDTH } from '@/shared/constants/layout';
-import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
-import type { Theme } from '@/shared/theme/types';
+import { Button } from '@/shared/theme/components/Button';
+import { Pressable } from '@/shared/theme/components/Pressable';
+import { Text } from '@/shared/theme/components/Text';
+import { LATEST_RELEASE_URL, SOURCE_CODE_URL } from '@/shared/project-links/links';
+import { CONTENT_MAX_WIDTH } from '@/shared/theme/lib/layout';
+import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import type { Theme } from '@/shared/theme/lib/types';
 import { LANDING_FEATURES } from '@/features/auth/welcome/utils/landingContent';
 import { FeatureCard } from './FeatureCard';
 

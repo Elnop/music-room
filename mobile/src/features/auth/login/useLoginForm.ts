@@ -1,10 +1,10 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ApiError } from '@/shared/services/api';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { showWarning } from '@/shared/utils/toast';
-import { logger } from '@/shared/utils/logger';
+import { ApiError } from '@/shared/backend/lib/api';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { showWarning } from '@/shared/theme/lib/toast';
+import { logger } from '@/shared/logging/logger';
 import { loginSchema, type LoginInput } from '@/features/auth/validators';
 import type { AuthStackParamList } from '@/features/auth/types';
 import { useLoginMutation } from '@/features/auth/hooks/useSignInMutations';

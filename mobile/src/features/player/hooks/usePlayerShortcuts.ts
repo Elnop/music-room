@@ -1,6 +1,6 @@
 import { usePlaybackControls } from '@/features/player/hooks/usePlaybackControls';
 import { SEEK_STEP_S } from '@/features/player/constants';
-import type { KeyboardShortcut } from '@/shared/utils/keyboardShortcuts';
+import type { KeyboardShortcut } from '@/shared/keyboard-shortcuts/keyboardShortcuts';
 
 /** As with the player's buttons, a remote device is never seeked. */
 export function usePlayerShortcuts(): KeyboardShortcut[] {

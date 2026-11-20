@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/shared/query/keys';
-import { useSocketCache } from '@/shared/query/socketCache';
-import { useSocketStore } from '@/shared/stores/socketStore';
+import { queryKeys } from '@/shared/query-keys/keys';
+import { useSocketCache } from '@/shared/backend/lib/socketCache';
+import { useSocketStore } from '@/shared/backend/socketStore';
 import type { PlaylistDeletedEvent } from '@/features/playlists/types';
 import { PLAYLIST_SOCKET_RULES } from '@/features/playlists/utils/playlistSocketRules';
 

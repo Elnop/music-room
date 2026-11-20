@@ -1,16 +1,16 @@
-import { getPlayback } from '@/shared/services/playbackBridge';
+import { getPlayback } from '@/shared/playback/lib/playbackBridge';
 import { queueApi } from '@/features/queue/services/queueApi';
 import { useConnectStore } from '@/features/queue/stores/connectStore';
 import { actionScope, handleRemoteRefusal } from '@/features/queue/stores/queueScope';
 import { asStep, mutate, runStep } from '@/features/queue/stores/queueStepRunner';
-import { toTrackInput } from '@/shared/utils/trackInput';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { showError, showInfo, showSuccess } from '@/shared/utils/toast';
-import { hapticSuccess } from '@/shared/utils/haptics';
-import { logger } from '@/shared/utils/logger';
+import { toTrackInput } from '@/shared/tracks/lib/trackInput';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { showError, showInfo, showSuccess } from '@/shared/theme/lib/toast';
+import { hapticSuccess } from '@/shared/theme/lib/haptics';
+import { logger } from '@/shared/logging/logger';
 import type { QueueState } from '@/features/queue/types';
-import type { AddQueueItemBody } from '@/shared/playback/playback';
-import type { SoundCloudTrack } from '@/types/soundcloud.types';
+import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
+import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
 
 export async function addItemAction(
 	track: AddQueueItemBody,

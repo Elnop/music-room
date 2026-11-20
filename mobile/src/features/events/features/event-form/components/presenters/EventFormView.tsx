@@ -1,8 +1,8 @@
 import React from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
-import { Button } from '@/shared/components/ui/Button';
-import { CappedInput } from '@/shared/components/form/CappedInput';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import { Button } from '@/shared/theme/components/Button';
+import { CappedInput } from '@/shared/theme/components/CappedInput';
 import type { EventForm } from '@/features/events/features/event-form/hooks/useEventForm';
 import { createEventScreenStyles } from '@/features/events/shared/event-screen/eventScreenStyles';
 import { DateTimeRow } from './DateTimeRow';

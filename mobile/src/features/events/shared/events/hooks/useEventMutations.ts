@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/shared/query/keys';
+import { queryKeys } from '@/shared/query-keys/keys';
 import * as eventsApi from '@/features/events/shared/events/lib/eventsApi';
 import { removeEvent, upsertEvent } from '@/features/events/shared/events/lib/eventCache';
 import type { EventInput, MusicEvent } from '@/features/events/lib/types';

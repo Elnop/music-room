@@ -1,6 +1,6 @@
 import React from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useBottomPadding } from '@/shared/hooks/useBottomPadding';
+import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
 import type { PlaylistStackParamList } from '@/features/playlists/types';
 import { useSearchTracks } from '@/features/playlists/searchTracks/useSearchTracks';
 import { SearchTracksView } from '@/features/playlists/searchTracks/components/presenters/SearchTracksView';

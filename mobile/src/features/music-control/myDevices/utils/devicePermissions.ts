@@ -1,5 +1,5 @@
 import type { UserDeviceWithLicenses } from '@/features/music-control/types';
-import type { FriendUserSummary } from '@/shared/services/friendsBridge';
+import type { FriendUserSummary } from '@/shared/backend/lib/friendsBridge';
 
 export const pairKey = (deviceId: string, userId: string): string => `${deviceId}|${userId}`;
 

@@ -1,9 +1,9 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import type { Theme } from '@/shared/theme/types';
-import { useThemedStyles } from '@/shared/theme/useThemedStyles';
-import { Input } from '@/shared/components/ui/Input';
-import { Button } from '@/shared/components/ui/Button';
+import type { Theme } from '@/shared/theme/lib/types';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
+import { Input } from '@/shared/theme/components/Input';
+import { Button } from '@/shared/theme/components/Button';
 import type { NewPlaylistDraft } from '@/features/playlists/trackActions/hooks/useNewPlaylistFromTrack';
 import { PLAYLIST_NAME_MAX } from '@/features/playlists/trackActions/utils/playlistName';
 

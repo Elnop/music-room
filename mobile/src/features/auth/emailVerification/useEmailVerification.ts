@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Keyboard } from 'react-native';
-import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
-import { showSuccess } from '@/shared/utils/toast';
+import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
+import { showSuccess } from '@/shared/theme/lib/toast';
 import { useCodeInput, type CodeInput } from '@/features/auth/code/hooks/useCodeInput';
 import { useCountdown } from '@/features/auth/code/hooks/useCountdown';
 import {

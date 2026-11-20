@@ -1,13 +1,13 @@
 import React, { useCallback } from 'react';
 import { View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { LoadingSpinner } from '@/shared/components/ui/LoadingSpinner';
-import { useTheme } from '@/shared/theme/ThemeContext';
+import { LoadingSpinner } from '@/shared/theme/components/LoadingSpinner';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { FriendsStackParamList } from '@/features/friends/types';
 import { useUserProfileScreen } from '@/features/friends/userProfile/useUserProfileScreen';
 import { UserProfileView } from '@/features/friends/userProfile/components/presenters/UserProfileView';
 import { createUserProfileStyles } from '@/features/friends/userProfile/components/presenters/userProfileStyles';
-import { Text } from '@/shared/components/ui/Text';
+import { Text } from '@/shared/theme/components/Text';
 
 type UserProfileOrchestratorProps = Partial<
 	NativeStackScreenProps<FriendsStackParamList, 'UserProfile'>

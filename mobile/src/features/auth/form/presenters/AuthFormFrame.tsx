@@ -1,9 +1,9 @@
 import React from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
-import { useTheme } from '@/shared/theme/ThemeContext';
-import type { Theme } from '@/shared/theme/types';
-import { PixelWordmark } from '@/shared/components/media/PixelWordmark';
-import { Text } from '@/shared/components/ui/Text';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import type { Theme } from '@/shared/theme/lib/types';
+import { PixelWordmark } from '@/shared/theme/components/PixelWordmark';
+import { Text } from '@/shared/theme/components/Text';
 
 interface AuthFormLayoutProps {
 	logoSize: number;

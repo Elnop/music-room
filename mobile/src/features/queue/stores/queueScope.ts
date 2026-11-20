@@ -1,7 +1,7 @@
-import { ApiError } from '@/shared/services/api';
-import { getSession } from '@/shared/services/authSession';
+import { ApiError } from '@/shared/backend/lib/api';
+import { getSession } from '@/shared/backend/lib/authSession';
 import { useConnectStore } from '@/features/queue/stores/connectStore';
-import { showError } from '@/shared/utils/toast';
+import { showError } from '@/shared/theme/lib/toast';
 import type { ActionScope } from '@/features/queue/types';
 
 export interface StepOptions {

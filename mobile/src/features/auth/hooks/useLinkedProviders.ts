@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/shared/query/keys';
-import { STALE } from '@/shared/query/queryClient';
+import { queryKeys } from '@/shared/query-keys/keys';
+import { STALE } from '@/shared/backend/queryClient';
 import { useAuthStore } from '@/features/auth/stores/authStore';
 import * as providersApi from '@/features/auth/services/providersApi';
 import { signInWithGoogle } from '@/features/auth/services/googleSignIn';
 import { signInWithFacebook } from '@/features/auth/services/facebookSignIn';
 import type { LinkedProvidersResponse, OAuthProvider } from '@/features/auth/types';
-import { registerLinkedAccountsBridge } from '@/shared/services/linkedAccountsBridge';
+import { registerLinkedAccountsBridge } from '@/shared/linked-accounts-bridge/linkedAccountsBridge';
 import { useProviderButtons } from './useProviderButtons';
 
 /** The screens using these hooks are signed in. */

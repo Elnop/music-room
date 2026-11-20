@@ -2,12 +2,12 @@ import { useEffect, useRef } from 'react';
 import { useAudioPlayerStatus } from '@/features/player/services/audioPlayer';
 import type { AudioPlayer } from '@/features/player/types';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
-import { isLocalTarget, useIsLocalTarget } from '@/shared/services/connectBridge';
-import { useActiveQueue } from '@/shared/services/playbackBridge';
-import { nextItem } from '@/shared/utils/queueNavigation';
+import { isLocalTarget, useIsLocalTarget } from '@/shared/listening/lib/connectBridge';
+import { useActiveQueue } from '@/shared/playback/lib/playbackBridge';
+import { nextItem } from '@/shared/playback/lib/queueNavigation';
 import { streamPrefetch } from '@/features/player/services/streamPrefetch';
 import { fetchStreamUrl } from '@/features/player/services/streamApi';
-import { trackToSoundCloud } from '@/shared/utils/trackToSoundCloud';
+import { trackToSoundCloud } from '@/shared/tracks/lib/trackToSoundCloud';
 import {
 	FETCH_TIMEOUT_MS,
 	PREFETCH_AFTER_PLAYED_S,
