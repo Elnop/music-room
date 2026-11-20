@@ -10,6 +10,7 @@ import type { FriendsStackParamList } from '@/features/friends/types';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { screenHeader, screenLayout } from '@/navigation/screenLayout';
 import { headerTitle } from '@/shared/theme/pixelFrame';
+import { PlanContainer } from '@/features/subscription/PlanContainer';
 
 export type { FriendsStackParamList };
 
@@ -45,11 +46,11 @@ export function FriendsNavigator() {
 				component={UserProfileContainer}
 				options={{ title: '', headerTitle: '' }}
 			/>
-			<FriendsStack.Screen
-				name="PlaylistDetail"
-				component={PlaylistDetailContainer}
-				options={{ headerShown: false }}
-			/>
+			<FriendsStack.Screen name="PlaylistDetail" options={{ headerShown: false }}>
+				{props => (
+					<PlanContainer>{plan => <PlaylistDetailContainer {...props} premium={plan} />}</PlanContainer>
+				)}
+			</FriendsStack.Screen>
 			<FriendsStack.Screen
 				name="SearchTracks"
 				component={SearchTracksContainer}

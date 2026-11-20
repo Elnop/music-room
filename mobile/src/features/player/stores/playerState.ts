@@ -1,5 +1,5 @@
 import type { SoundCloudTrack, StreamProtocol } from '@/types/soundcloud.types';
-import type { PlaybackState } from '@/shared/types/playback';
+import type { PlaybackState } from '@/shared/playback/playback';
 
 export interface PlayerState {
 	currentTrack: SoundCloudTrack | null;

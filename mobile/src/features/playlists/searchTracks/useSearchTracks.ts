@@ -10,7 +10,7 @@ import { useCachedPlaylist } from '@/features/playlists/hooks/usePlaylistQueries
 import { useDebouncedText, type DebouncedText } from '@/features/playlists/hooks/useDebouncedText';
 import { useAddTrack } from '@/features/playlists/hooks/useTrackEdits';
 import { searchTracks } from '@/features/playlists/services/trackSearchApi';
-import type { AddQueueItemBody } from '@/shared/types/playback';
+import type { AddQueueItemBody } from '@/shared/playback/playback';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 import { recordMenuAnchor } from '@/shared/stores/menuAnchorStore';
 import type { MenuAnchor } from '@/shared/utils/menuPlacement';

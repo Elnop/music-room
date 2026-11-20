@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { Pressable } from '@/shared/components/ui/Pressable';
 import { Text } from '@/shared/components/ui/Text';
 import { Artwork } from '@/shared/components/media/Artwork';
-import type { QueueItem } from '@/shared/types/playback';
+import type { QueueItem } from '@/shared/playback/playback';
 import { UP_NEXT_ARTWORK_SIZE, type NowPlayingPanelStyles } from './nowPlayingPanelStyles';
 
 interface UpNextRowProps {

@@ -1,5 +1,5 @@
 import { registerPlaybackBridge, type PlaylistPlayback } from '@/shared/services/playbackBridge';
-import type { AddQueueItemBody } from '@/shared/types/playback';
+import type { AddQueueItemBody } from '@/shared/playback/playback';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
 /** Registered once per test file, at load; each test sets `testPlayback.playing` and the mocks it needs. */

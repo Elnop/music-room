@@ -5,20 +5,23 @@ import { useHomeScreen } from '@/features/playlists/home/useHomeScreen';
 import { HomeView } from '@/features/playlists/home/components/presenters/HomeView';
 import { usePlaylistCardMenu } from '@/features/playlists/cardMenu/usePlaylistCardMenu';
 import { PlaylistCardMenuContainer } from '@/features/playlists/cardMenu/PlaylistCardMenuContainer';
+import type { PlanState } from '@/features/subscription/lib/subscription';
 
 type HomeOrchestratorProps = NativeStackScreenProps<PlaylistStackParamList, 'Home'> & {
 	/** Sections of other features: the navigation layer passes them in. */
 	nearbyEvents?: React.ReactNode;
 	similarProfiles?: React.ReactNode;
+	premium: Pick<PlanState, 'isPremium' | 'refetch'>;
 };
 
 export function HomeContainer({
 	navigation,
 	nearbyEvents,
 	similarProfiles,
+	premium,
 }: HomeOrchestratorProps) {
 	const screen = useHomeScreen(navigation);
-	const menu = usePlaylistCardMenu(navigation);
+	const menu = usePlaylistCardMenu(navigation, premium);
 	return (
 		<>
 			<HomeView

@@ -15,6 +15,7 @@ import { HomeScreen } from '@/navigation/screens/HomeScreen';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { screenHeader, screenLayout } from '@/navigation/screenLayout';
 import { headerTitle } from '@/shared/theme/pixelFrame';
+import { PlanContainer } from '@/features/subscription/PlanContainer';
 
 const PlaylistStack = createNativeStackNavigator<PlaylistStackParamList & EventStackParamList>();
 const layout = screenLayout(true);
@@ -46,21 +47,24 @@ export function PlaylistsNavigator({ initialRouteName }: PlaylistsNavigatorProps
 			}}
 		>
 			<PlaylistStack.Screen name="Home" component={HomeScreen} options={{ title: 'Accueil' }} />
-			<PlaylistStack.Screen
-				name="Playlists"
-				component={LibraryContainer}
-				options={{ title: 'Playlists' }}
-			/>
+			<PlaylistStack.Screen name="Playlists" options={{ title: 'Playlists' }}>
+				{props => (
+					<PlanContainer>{plan => <LibraryContainer {...props} premium={plan} />}</PlanContainer>
+				)}
+			</PlaylistStack.Screen>
 			<PlaylistStack.Screen
 				name="PlaylistDetail"
-				component={PlaylistDetailContainer}
 				options={{
 					headerTransparent: true,
 					headerBlurEffect: undefined,
 					headerStyle: { backgroundColor: 'transparent' },
 					title: '',
 				}}
-			/>
+			>
+				{props => (
+					<PlanContainer>{plan => <PlaylistDetailContainer {...props} premium={plan} />}</PlanContainer>
+				)}
+			</PlaylistStack.Screen>
 			<PlaylistStack.Screen
 				name="CreatePlaylist"
 				component={PlaylistFormContainer}

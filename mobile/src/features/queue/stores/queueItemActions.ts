@@ -9,7 +9,7 @@ import { showError, showInfo, showSuccess } from '@/shared/utils/toast';
 import { hapticSuccess } from '@/shared/utils/haptics';
 import { logger } from '@/shared/utils/logger';
 import type { QueueState } from '@/features/queue/types';
-import type { AddQueueItemBody } from '@/shared/types/playback';
+import type { AddQueueItemBody } from '@/shared/playback/playback';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
 export async function addItemAction(

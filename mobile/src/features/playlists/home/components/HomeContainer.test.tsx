@@ -64,6 +64,7 @@ let clear: () => void = () => undefined;
 function renderHome(nearbyEvents?: React.ReactNode) {
 	const view = renderWithClient(
 		<HomeContainer
+			premium={{ isPremium: true, refetch: jest.fn() }}
 			route={{ key: 'k', name: 'Home' } as Props['route']}
 			navigation={navigation as unknown as Props['navigation']}
 			nearbyEvents={nearbyEvents}

@@ -13,7 +13,7 @@ import { isOnScreen } from '@/features/playlists/utils/playlistCache';
 import { canEditPlaylist } from '@/features/playlists/utils/playlistPermissions';
 import { CONFLICT_MESSAGE, isMoveConflict } from '@/features/playlists/utils/trackMoves';
 import type { PlaylistWithTracks } from '@/features/playlists/types';
-import type { AddQueueItemBody } from '@/shared/types/playback';
+import type { AddQueueItemBody } from '@/shared/playback/playback';
 import type { TrackInPlaylist } from '@/types/track.types';
 import { recordMenuAnchor } from '@/shared/stores/menuAnchorStore';
 import type { MenuAnchor } from '@/shared/utils/menuPlacement';

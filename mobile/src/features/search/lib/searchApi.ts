@@ -1,5 +1,5 @@
 import { apiRequest } from '@/shared/services/api';
-import type { SoundCloudSearchResult, SoundCloudTrack } from '@/features/search/types';
+import type { SoundCloudSearchResult, SoundCloudTrack } from './types';
 
 export const searchApi = {
 	search: async (query: string, limit = 20): Promise<SoundCloudSearchResult> => {

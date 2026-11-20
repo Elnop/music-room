@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { showAlert } from '@/shared/utils/alert';
 import { useQueryClient } from '@tanstack/react-query';
 import { ApiError } from '@/shared/services/api';
-import { usePlan } from '@/shared/hooks/usePlan';
+import type { PlanState } from '@/features/subscription/lib/subscription';
 import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 import { pickImage } from '@/shared/utils/imagePicker';
 import { prepareSquareImage } from '@/shared/utils/squareImage';
@@ -26,10 +26,10 @@ interface CoverActions {
 export function useCoverActions(
 	navigation: Pick<NativeStackNavigationProp<PlaylistStackParamList>, 'getParent'>,
 	playlistId: string,
-	isOwner: boolean
+	premium: Pick<PlanState, 'isPremium' | 'refetch'>
 ): CoverActions {
 	const client = useQueryClient();
-	const { isPremium, refetch: refetchPlan } = usePlan({ enabled: isOwner });
+	const { isPremium, refetch: refetchPlan } = premium;
 	const [isUploading, setIsUploading] = useState(false);
 
 	const showLocked = () =>
@@ -55,7 +55,7 @@ export function useCoverActions(
 		} catch (error) {
 			if (error instanceof ApiError && error.code === 'PREMIUM_REQUIRED') {
 				// Downgraded from another device: the cached plan is stale.
-				void refetchPlan();
+				refetchPlan();
 				showLocked();
 				return;
 			}

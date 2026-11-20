@@ -2,7 +2,7 @@ import React from 'react';
 import { useTrackActions } from '@/features/playlists/trackActions/hooks/useTrackActions';
 import { TrackActionsView } from '@/features/playlists/trackActions/components/presenters/TrackActionsView';
 import { useMenuAnchor } from '@/shared/hooks/useMenuAnchor';
-import type { AddQueueItemBody } from '@/shared/types/playback';
+import type { AddQueueItemBody } from '@/shared/playback/playback';
 import type { TrackActionsStart } from '@/shared/services/trackActionsBridge';
 
 interface TrackActionsSheetProps {

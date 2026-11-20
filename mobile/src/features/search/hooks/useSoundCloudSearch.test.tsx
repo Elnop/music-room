@@ -2,7 +2,7 @@ import { renderHook, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { useSoundCloudSearch } from './useSoundCloudSearch';
-import { searchApi } from '@/features/search/services/searchApi';
+import { searchApi } from '@/features/search/lib/searchApi';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -13,7 +13,7 @@ jest.mock('@/shared/services/deviceService', () => ({
 	getAppVersion: () => '1.0.0',
 }));
 
-jest.mock('@/features/search/services/searchApi', () => ({
+jest.mock('@/features/search/lib/searchApi', () => ({
 	searchApi: {
 		searchTracks: jest.fn(),
 	},

@@ -1,4 +1,4 @@
-import type { OwnerQueue, QueueItem } from '@/shared/types/playback';
+import type { OwnerQueue, QueueItem } from '@/shared/playback/playback';
 import { upNext } from './upNext';
 
 const item = (id: string): QueueItem => ({

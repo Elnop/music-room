@@ -4,10 +4,10 @@ import type {
 	OwnerQueue,
 	PlaybackState,
 	QueueStepOutcome,
-} from '@/shared/types/playback';
+} from '@/shared/playback/playback';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
-export type { OwnerQueue } from '@/shared/types/playback';
+export type { OwnerQueue } from '@/shared/playback/playback';
 
 export interface PlaylistPlayback {
 	playingUri: string | null;

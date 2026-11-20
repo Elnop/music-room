@@ -3,7 +3,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { useContentColumn } from '@/shared/hooks/useContentColumn';
 import { PixelIcon } from '@/shared/components/media/PixelIcon';
 import { BackendUrlField } from '@/shared/components/form/BackendUrlField';
-import type { Plan } from '@/shared/types/subscription';
+import type { Plan } from '@/features/subscription/lib/subscription';
 import { pixelFrame } from '@/shared/theme/pixelFrame';
 import type { Theme } from '@/shared/theme/types';
 import { SubscriptionSection } from './SubscriptionSection';

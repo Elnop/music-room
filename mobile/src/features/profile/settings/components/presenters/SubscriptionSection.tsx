@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { ThemedSwitch } from '@/shared/components/ui/ThemedSwitch';
-import type { Plan } from '@/shared/types/subscription';
+import type { Plan } from '@/features/subscription/lib/subscription';
 import type { Theme } from '@/shared/theme/types';
 import { Text } from '@/shared/components/ui/Text';
 

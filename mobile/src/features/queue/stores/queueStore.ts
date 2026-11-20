@@ -14,7 +14,7 @@ import { playPlaylistError, selectQueue } from '@/features/queue/utils/queueSele
 import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 import { logger } from '@/shared/utils/logger';
 import type { OwnerQueue, QueueState, QueueStepOutcome } from '@/features/queue/types';
-import type { AddQueueItemBody } from '@/shared/types/playback';
+import type { AddQueueItemBody } from '@/shared/playback/playback';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
 interface QueueStoreState {

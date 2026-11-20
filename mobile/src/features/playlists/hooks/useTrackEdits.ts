@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import * as trackEdits from '@/features/playlists/utils/trackEdits';
 import { moveTrack } from '@/features/playlists/utils/trackMoves';
-import type { AddQueueItemBody } from '@/shared/types/playback';
+import type { AddQueueItemBody } from '@/shared/playback/playback';
 
 export function useAddTrack() {
 	const client = useQueryClient();

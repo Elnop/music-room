@@ -13,7 +13,7 @@ import { hapticSuccess } from '@/shared/utils/haptics';
 import { apiErrorMessage } from '@/shared/utils/apiErrorMessage';
 import type { DevicePickerOwner } from '@/types/device.types';
 import type { QueueTrack, TransferRequest } from '@/types/queue.types';
-import type { AddQueueItemBody } from '@/shared/types/playback';
+import type { AddQueueItemBody } from '@/shared/playback/playback';
 import { logger } from '@/shared/utils/logger';
 
 interface Playback {

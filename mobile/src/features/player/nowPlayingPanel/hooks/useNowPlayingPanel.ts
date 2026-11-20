@@ -7,7 +7,7 @@ import type { TrackActionsStart } from '@/shared/services/trackActionsBridge';
 import { THIS_DEVICE_LABEL } from '@/shared/constants/platform';
 import { largeArtwork } from '@/shared/utils/artwork';
 import { toTrackInput } from '@/shared/utils/trackInput';
-import type { AddQueueItemBody } from '@/shared/types/playback';
+import type { AddQueueItemBody } from '@/shared/playback/playback';
 import { useNowPlaying } from '@/features/player/hooks/useNowPlaying';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { UP_NEXT_COUNT } from '@/features/player/constants';

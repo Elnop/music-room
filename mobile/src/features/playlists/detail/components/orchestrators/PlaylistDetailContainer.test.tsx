@@ -120,6 +120,7 @@ const element = () => (
 	<PlaylistDetailContainer
 		route={{ key: 'k', name: 'PlaylistDetail', params: { id: ID } } as Props['route']}
 		navigation={navigation as unknown as Props['navigation']}
+		premium={{ isPremium: false, refetch: jest.fn() }}
 	/>
 );
 
@@ -181,7 +182,6 @@ describe('PlaylistDetailContainer header button', () => {
 		};
 		expect(view.getByTestId('skeleton-list')).toBeTruthy();
 		expect(renderHeaderRight().queryByLabelText('Options de la playlist')).toBeNull();
-		expect(routes.calls()).not.toContain('GET /api/subscription');
 	});
 
 	it("opens the actions sheet from the owner's ⋯", async () => {
@@ -194,7 +194,6 @@ describe('PlaylistDetailContainer header button', () => {
 
 	it('locks « Changer la cover » on the free plan and offers removal only with a cover (#485)', async () => {
 		await renderScreen();
-		await waitFor(() => expect(routes.calls()).toContain('GET /api/subscription'));
 		openOwnerSheet();
 		expect(await screen.findByText('Réservé au Premium')).toBeTruthy();
 		expect(screen.queryByLabelText('Retirer la cover')).toBeNull();
