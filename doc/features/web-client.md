@@ -16,9 +16,9 @@ Each native module was already isolated in one service or hook. That file gets a
 | `shared/image-colors/useImageColors.web.ts` | `react-native-image-colors`: no extraction, the theme's fallback colour |
 | `shared/alerts/alert.web.ts` | `Alert.alert` (a no-op in react-native-web): the alert is queued in `shared/alerts/alertStore.ts` and `AlertHost` shows it as a centred dialog with every button |
 | `shared/backend/lib/jpegFormData.web.ts` | The React Native `{ uri }` upload object: the picked image is read into a `Blob` (avatar, playlist cover) |
-| `features/auth/services/googleSignIn.web.ts` | Native Google Sign-In: Google Identity Services, Google's rendered button in popup mode |
-| `features/auth/services/facebookSignIn.web.ts` | Facebook Android SDK: Facebook JavaScript SDK, `FB.login` |
-| `features/auth/hooks/useProviderButtons.web.ts` | Loads the two SDK scripts on the sign-in, sign-up and linked-accounts screens only, and mounts Google's button |
+| `features/user/features/auth/shared/sign-in/lib/googleSignIn.web.ts` | Native Google Sign-In: Google Identity Services, Google's rendered button in popup mode |
+| `features/user/features/auth/shared/sign-in/lib/facebookSignIn.web.ts` | Facebook Android SDK: Facebook JavaScript SDK, `FB.login` |
+| `features/user/features/auth/shared/sign-in/hooks/useProviderButtons.web.ts` | Loads the two SDK scripts on the sign-in, sign-up and linked-accounts screens only, and mounts Google's button |
 | `features/player/services/audioPlayer.web.ts` | `expo-audio`: one `<audio>` element for the page, fed natively or by hls.js |
 | `features/player/services/audioMode.web.ts` | The audio session setup: a tab has none (no-op) |
 | `features/player/services/jsKeepAlive.web.ts` | The Android headless task that keeps JavaScript running in the background: a tab keeps its timers (no-op) |

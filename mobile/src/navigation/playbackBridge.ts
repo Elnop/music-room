@@ -3,7 +3,7 @@ import { registerConnectBridge } from '@/shared/listening/lib/connectBridge';
 import { registerPlayerModals } from '@/shared/player-modals-bridge/playerModalsBridge';
 import { registerTrackActionsSheet } from '@/shared/playback/lib/trackActionsBridge';
 import { registerFriendsBridge } from '@/shared/backend/lib/friendsBridge';
-import { friendsApi } from '@/features/friends/services/friendsApi';
+import { friendsApi } from '@/features/user/features/friends/shared/follows/friendsApi';
 import { readPositionMs, usePlayerStore } from '@/features/player/stores/playerStore';
 import { useConnectStore } from '@/features/queue/stores/connectStore';
 import { useActiveQueue, useQueueStore } from '@/features/queue/stores/queueStore';

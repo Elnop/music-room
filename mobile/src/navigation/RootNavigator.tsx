@@ -11,7 +11,7 @@ import { AuthNavigator } from './AuthNavigator';
 import { AppNavigator, type AppTabsParamList } from './AppNavigator';
 import { createLinking, openPendingLink } from './linking';
 import { formatDocumentTitle } from './documentTitle';
-import { useAuthStore } from '@/features/auth/stores/authStore';
+import { useAuthStore } from '@/features/user/features/auth/shared/sign-in/authStore';
 import { useSocketStore } from '@/shared/backend/socketStore';
 import { LoadingSpinner } from '@/shared/theme/components/LoadingSpinner';
 import { isDarkBackground } from '@/shared/theme/lib/textContrast';

@@ -13,7 +13,7 @@ import type { Theme } from '@/shared/theme/lib/types';
 
 import { PlaylistsNavigator } from '@/navigation/stacks/PlaylistsStack';
 import type { PlaylistStackParamList } from '@/features/playlists/types';
-import type { ProfileStackParamList } from '@/features/profile/types';
+import type { ProfileStackParamList } from '@/features/user/features/profile/types';
 import { registerPlayback } from '@/navigation/playbackBridge';
 import { registerMusicControl } from '@/navigation/musicControlBridge';
 import { ProfileNavigator } from '@/navigation/stacks/ProfileStack';

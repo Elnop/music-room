@@ -39,7 +39,7 @@ The subject asks for two of the three services of IV.2. Zumik delivers **Music P
 
 - Sign-up with email and password, or with Google or Facebook (`/api/auth/register`, `/google`, `/facebook`).
 - Email verification required before the first login, forgotten password by code (`/verify-email`, `/forgot-password`, `/reset-password`).
-- A signed-in user links a Google or Facebook account to their account from the app, even when its email differs, and can unlink it; unlinking the last sign-in method is refused (`POST /api/auth/providers/:provider/link`, `DELETE /api/auth/providers/:provider`, screen `features/profile/linkedAccounts/`).
+- A signed-in user links a Google or Facebook account to their account from the app, even when its email differs, and can unlink it; unlinking the last sign-in method is refused (`POST /api/auth/providers/:provider/link`, `DELETE /api/auth/providers/:provider`, screen `features/user/features/auth/features/linked-accounts/`).
 - Profile with public, friends-only and private fields (`profile_privacy`, applied when another user reads the profile), and music preferences.
 
 Details: [accounts-auth.md](../features/accounts-auth.md).

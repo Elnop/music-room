@@ -21,7 +21,7 @@
 ## Où regarder
 
 - Backend : `backend/src/features/auth/`, `backend/src/features/profile/` (`getFilteredProfile`)
-- Mobile : `mobile/src/features/auth/`, `mobile/src/features/profile/`
+- Mobile : `mobile/src/features/user/` (`features/auth/`, `features/profile/`, `features/friends/`, `features/settings/`)
 - Détail : [accounts-auth.md](../../features/accounts-auth.md), menaces M1 à M6 de [threat-model.md](../../security/threat-model.md)
 
 ## Scénarios
