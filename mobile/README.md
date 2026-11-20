@@ -140,7 +140,7 @@ To test the responsive layout, resize the browser window (or use the browser's d
 
 The production APK (backend `https://zumik.cluzhub.com`) is built by `.github/workflows/release-apk.yml` on every push to `main` and published in the [GitHub Releases](https://github.com/Elnop/music-room/releases/latest). It reads `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`, `EXPO_PUBLIC_FACEBOOK_APP_ID` and `EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN` from the repository's Actions secrets. Run by hand (`gh workflow run release-apk.yml --ref <branch>`) outside `main`, it uploads the APK as a run artifact without creating a release.
 
-The web client is published at `https://elnop.github.io/music-room/` by `.github/workflows/pages.yml` on every push to `main` touching `site/` or `mobile/`, next to the static privacy policy and 404 page of `site/`. Its `index.html` comes from the template `public/index.html`, whose `<noscript>` describes the app and links to `privacy.html` for robots that do not run JavaScript. It is built with `WEB_BASE_URL=/music-room` (`experiments.baseUrl` in `app.config.js`, unset by `make dev-web`), against the hosted backend, and reads `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` and `EXPO_PUBLIC_FACEBOOK_APP_ID` from the Actions secrets; the Facebook client token stays out of the web bundle. GitHub Pages knows none of the app's routes: `site/404.html` sends `/music-room/<path>` back to the app with the path in `?redirect=`, which `navigation/webBasePath.ts` puts back in the address bar before the navigation reads it, so a shared `…/playlist/<id>` opens; an old `/music-room/app/<path>` link loses its `/app` on the way, and `site/privacy.html` relays the same way to `/privacy`. The hosted backend must list `https://elnop.github.io` in `ALLOWED_ORIGINS` (set by hand in Coolify), or the browser blocks its API and Socket.io calls.
+The web client is published at `https://elnop.github.io/music-room/` by `.github/workflows/pages.yml` on every push to `main` touching `site/` or `mobile/`, next to the static privacy policy and 404 page of `site/`. Its `index.html` comes from the template `public/index.html`, whose `<noscript>` describes the app and links to `privacy.html` for robots that do not run JavaScript. It is built with `WEB_BASE_URL=/music-room` (`experiments.baseUrl` in `app.config.js`, unset by `make dev-web`), against the hosted backend, and reads `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` and `EXPO_PUBLIC_FACEBOOK_APP_ID` from the Actions secrets; the Facebook client token stays out of the web bundle. GitHub Pages knows none of the app's routes: `site/404.html` sends `/music-room/<path>` back to the app with the path in `?redirect=`, which `features/shell/lib/webBasePath.ts` puts back in the address bar before the navigation reads it, so a shared `…/playlist/<id>` opens; an old `/music-room/app/<path>` link loses its `/app` on the way, and `site/privacy.html` relays the same way to `/privacy`. The hosted backend must list `https://elnop.github.io` in `ALLOWED_ORIGINS` (set by hand in Coolify), or the browser blocks its API and Socket.io calls.
 
 ### Backend
 
@@ -156,85 +156,37 @@ The web client is published at `https://elnop.github.io/music-room/` by `.github
 
 ## Architecture
 
-From epic #362, then the brutalway layers (epic #616): `src/app/`, `src/features/<feature>/` and `src/shared/`. Every feature was fully migrated (#378–#385) to the orchestrators / presenters / hooks pattern, and every component rule is enforced by the ESLint plugin without any exception. Each feature has one layout: what its subjects share (`hooks/`, `services/`, `stores/`, `utils/`, `types.ts`…) at its root, its React providers in `context/`, and one folder per subject, even when there is only one, holding `components/orchestrators/`, `components/presenters/`, `hooks/` and, when needed, `utils/`. More in [code-layout.md](../doc/architecture/code-layout.md).
+The code follows the layers of [brutalway](https://brutalway.elnop.dev/) (epic #616): `src/app/` composes the features, `src/features/` holds one folder per domain of the subject, and `src/shared/` holds leaf slices. A feature has kind folders for its own files, its sub-features in `features/` and the slices they share in `shared/`; two features never import each other, and what one passes to another goes through `app/` as props. dependency-cruiser, check-tree, oxlint and ESLint check these rules. More in [code-layout.md](../doc/architecture/code-layout.md).
 
 ```
 mobile/src/
-├── shared/                 # Code common to every feature; imports neither features/ nor navigation/
-│   ├── components/
-│   │   ├── ui/             # Primitives: Pressable, Button, Input, Card, Skeleton, ThemedSwitch, LoadingSpinner
-│   │   ├── feedback/       # AppToast, ConnectionBanner, EmptyState, ErrorBoundary, FormError
-│   │   ├── form/           # SearchBar, BackendUrlField
-│   │   ├── lists/          # ReorderableList, SwipeableTrackItem, SwipeableUserItem, QueueSwipe
-│   │   ├── media/          # Artwork, Avatar
-│   │   ├── sharing/        # ShareLinkButton
-│   │   └── theme/          # ThemedSystemUI
-│   ├── services/           # api.ts (HTTP client), authSession (session contract), backendUrl,
-│   │                       # lastTrackStorage
-│   ├── query/              # TanStack Query: queryClient (STALE profiles), keys (key factory), socketCache
-│   ├── stores/             # socketStore (Socket.io connection)
-│   ├── hooks/              # useConnectionStatus, useImageColors, usePlan (subscription plan)
-│   ├── theme/              # ThemeContext, original theme, tokens
-│   ├── constants/app.ts    # API config, spacing
-│   └── utils/              # logger, toast, haptics, apiErrorMessage, debounce, moveTarget, shareLinks...
-├── app/                    # RootNavigator, AuthNavigator, AppNavigator (tabs) + stacks/ + screens/; imports only features/
-├── features/               # One feature per folder (#378–#385)
-│   ├── auth/               # Sign-in, sign-up, email code, forgotten password, linked accounts
-│   │   ├── <subject>/      # welcome, login, register, emailVerification, forgotPassword, resetPassword,
-│   │   │                   # code, form, social: components/{orchestrators,presenters} + hooks/
-│   │   ├── hooks/          # TanStack queries and mutations (linked accounts, sign-in, password)
-│   │   ├── services/       # authApi, passwordApi, providersApi, signIn, googleSignIn, facebookSignIn, sessionStorage
-│   │   ├── stores/         # authStore (session) and its actions
-│   │   ├── utils/          # codeDigits, passwordRules
-│   │   └── types.ts · validators.ts
-│   ├── playlists/          # Home, my playlists, detail, create/edit, adding tracks, visibility and rights
-│   │   ├── <subject>/      # home, library, detail, form, searchTracks, sharing, trackActions, actionSheet, header
-│   │   ├── hooks/          # TanStack queries and mutations, Socket.io room (usePlaylistRoom)
-│   │   ├── services/       # playlistApi, tracksApi, membersApi, usersApi, trackSearchApi
-│   │   ├── stores/         # pendingMovesStore (moves in flight)
-│   │   ├── utils/          # Cache (playlistCache, trackEdits, trackMoves), playlistSync, socket rules, rights
-│   │   └── types.ts · validators.ts
-│   ├── player/             # Audio playback, mini player, player modal, system media controls (#380)
-│   │   ├── miniPlayer/ · modal/ · mediaSession/   # components/{orchestrators,presenters} + hooks/
-│   │   ├── context/        # PlayerContext (player lifecycle)
-│   │   ├── hooks/ · services/ · stores/           # playerStore
-│   │   └── constants.ts · types.ts
-│   ├── queue/              # Play queue, synchronization and Connect (#381)
-│   │   ├── queueModal/     # components/{orchestrators,presenters} + hooks/
-│   │   ├── devicePicker/   # components/{orchestrators,presenters} + hooks/
-│   │   ├── hooks/          # useQueueSync, useRemoteTarget
-│   │   ├── services/       # transferPlayback
-│   │   ├── stores/         # queueStore, connectStore
-│   │   └── types.ts
-│   ├── friends/            # Friends list, user search, friend profile and permissions (#382)
-│   │   ├── friendsList/    # components/{orchestrators,presenters} + hooks/
-│   │   ├── userProfile/    # components/{orchestrators,presenters} + hooks/
-│   │   ├── hooks/          # useFriendsQueries, useFriendsMutations
-│   │   ├── services/       # friendsApi
-│   │   └── types.ts
-│   ├── profile/            # Profile, edit, privacy, music preferences, linked accounts, settings (#383)
-│   │   ├── profileScreen/ · editProfile/ · privacySettings/ · musicPreferences/ · linkedAccounts/ · settings/ · common/
-│   │   ├── hooks/ · services/ · utils/
-│   │   └── types.ts
-│   ├── music-control/      # Delegated control, device management, listening permissions (#384)
-│   │   ├── myDevices/      # components/{orchestrators,presenters} + hooks/ + utils/
-│   │   ├── hooks/          # useMusicControl, useFriendListening, useControllableDevices...
-│   │   ├── services/       # musicControlApi
-│   │   └── types.ts
-│   ├── events/             # Physical events near the user (bonus V.2)
-│   │   ├── nearby/         # The home's "Événements à proximité" section, my events, create button
-│   │   ├── detail/ · form/ # Event page (how to get in, genres, linked playlist), create/edit form
-│   │   ├── hooks/          # TanStack queries and mutations, useEventsSync (event:* socket events)
-│   │   ├── services/       # eventsApi, beaconAdvertiser (native module wrapper), beaconScanner (react-native-ble-plx)
-│   │   ├── stores/         # beaconStore (the beacon this phone broadcasts)
-│   │   └── utils/          # eventCache, eventSocketRules, eventDates, eventLocation (expo-location), pickDateTime, geo, nearbyEvents, ibeacon, beaconDistance, base64
-│   └── search/             # SoundCloud track search (#385)
-│       ├── searchScreen/   # components/{orchestrators,presenters} + hooks/
-│       ├── hooks/          # useSoundCloudSearch (TanStack Query)
-│       ├── services/       # searchApi
-│       └── types.ts
-├── services/               # api-clients.test.ts (tests of the API clients)
-└── types/                  # Types matching the backend's responses
+├── app/                        # RootNavigator, AuthNavigator, AppNavigator (tabs), stacks/, screens/ (HomeScreen, PlaylistDetailScreen),
+│                               # QueueSheet, TrackActionsSheet, KeyboardShortcuts; imports only features/
+├── features/
+│   ├── user/                   # IV.1
+│   │   ├── features/auth/      # welcome, login, register, email-verification, forgot-password, reset-password, linked-accounts;
+│   │   │                       # shared/sign-in (session, authStore, Google and Facebook sign-in), password-reset, code-input…
+│   │   ├── features/profile/   # profile-screen, edit-profile, music-preferences, privacy-settings; shared/profile
+│   │   ├── features/friends/   # friends-list, user-profile, similar-profiles; shared/follows
+│   │   ├── features/settings/
+│   │   └── shared/             # profile-layout, profile-section, profile-info-rows, wide-profile-header
+│   ├── playlists/
+│   │   ├── features/browse/    # home, library; shared/playlist-grid
+│   │   ├── features/editor/    # IV.2.3: detail, playlist-form, search-tracks, sharing, track-actions, card-menu;
+│   │   │                       # shared/track-edits, action-sheet, cover-actions, permissions…
+│   │   └── shared/             # playlist (API, cache, real-time sync, types), header-button, refetch-on-focus
+│   ├── playback/
+│   │   ├── components/ hooks/ lib/   # PlayerProvider, PlaylistPlaybackContainer, playbackActions, what the provider mounts
+│   │   ├── features/           # mini-player, player-bar, player-modal, now-playing-panel, media-session, queue-modal,
+│   │   │                       # control-delegation (IV.2.2: my-devices, device-picker; shared/delegation)
+│   │   └── shared/             # player (audio engine, playerStore, queueStore, connectStore), seek-bar, panel, volume…
+│   ├── events/                 # bonus V.2: features/ nearby, detail, event-form; shared/ events, beacon, event-dates
+│   ├── subscription/           # bonus V.3: usePlan, PlanContainer
+│   ├── search/ · legal/
+│   └── shell/                  # AppProvidersContainer, AppFrameLayout, TabBarLayout, NavigationRootLayout, startup, linking,
+│                               # alert host, keyboard shortcuts help
+└── shared/                     # theme (design system), backend (api.ts, session, socketStore, queryClient), query-keys,
+                                # playback, tracks, users, alerts, logging, formatting, platform, share-links…
 ```
 
 ## Navigation
@@ -242,7 +194,7 @@ mobile/src/
 - **RootNavigator** switches between `AuthNavigator` and `AppNavigator` depending on the auth state (persisted by `features/user/features/auth/shared/sign-in/authStore.ts`).
 - **AuthNavigator**: Welcome, Login, Register, EmailVerification, ForgotPassword, ResetPassword; each screen is the orchestrator of `features/user/features/auth/features/<screen>/`.
 - **AppNavigator** (tabs):
-  - Home and Playlists mount the same stack (`stacks/PlaylistsStack.tsx`): Home, Playlists, PlaylistDetail, CreatePlaylist, SearchTracks, PlaylistSharing, EventDetail, EventForm (the orchestrators of `features/playlists/<subject>/`). Home opens on `Home` (`navigation/screens/HomeScreen.tsx`: friends' and public playlists from `playlists/home`, plus the nearby events section of `features/events/`, passed in since features never import each other); Playlists opens on `Playlists` (`playlists/library`: the playlists I own or that are shared with me, and the create button). A `zumik://playlist/<id>` link opens in the Playlists tab.
+  - Home and Playlists mount the same stack (`stacks/PlaylistsStack.tsx`): Home, Playlists, PlaylistDetail, CreatePlaylist, SearchTracks, PlaylistSharing, EventDetail, EventForm (the orchestrators of `features/playlists/<subject>/`). Home opens on `Home` (`app/screens/HomeScreen.tsx`: friends' and public playlists from `playlists/home`, plus the nearby events section of `features/events/`, passed in since features never import each other); Playlists opens on `Playlists` (`playlists/library`: the playlists I own or that are shared with me, and the create button). A `zumik://playlist/<id>` link opens in the Playlists tab.
   - Search → Search (`features/search/components/SearchContainer.tsx`)
   - Friends → Friends, UserProfile, PlaylistDetail, SearchTracks
   - Profile → Profile, EditProfile, PrivacySettings, MusicPreferences, LinkedAccounts, MyDevices, Settings (the containers of `features/user/features/profile/features/<screen>/` and `features/playback/features/control-delegation/features/my-devices/`; Settings gets the plan from `features/subscription/PlanContainer.tsx`)
@@ -253,7 +205,7 @@ mobile/src/
 - **Server data**: TanStack Query (`AppProvidersContainer` provides the client). A query key is built with `queryKeys` (`shared/query-keys/keys.ts`), freshness is chosen among the `STALE` profiles (`shared/backend/queryClient.ts`), and a Socket.io event updates the cache (`setQueryData`) or invalidates it through `useSocketCache` (`shared/backend/lib/socketCache.ts`). Zustand only keeps client state. Rules: `.agents/rules/state.md`.
 - **Session and shared layer**: `shared/` does not import auth; the session store registers itself in `shared/backend/lib/authSession.ts` (token, refresh) and announces each session end there (`onSessionEnd`), on which the socket closes and the player empties.
 - **Real time**: `shared/backend/socketStore.ts` manages the Socket.io connection; `features/playlists/features/editor/features/detail/hooks/usePlaylistRoom.ts` joins a playlist's room, whose events update the cache (`lib/playlistSocketRules.ts` next to it); `features/playback/features/control-delegation/hooks/` handles friends' listening and delegated control commands.
-- **Playback contract**: playlists and search start playback through the `PlaybackActions` they receive as a prop (`features/playback/lib/playbackActions.ts`), and the playlist screen gets what it plays from `features/playback/PlaylistPlaybackContainer.tsx`; the navigation passes both, so no feature imports the player or the queue.
+- **Playback contract**: playlists and search start playback through the `PlaybackActions` they receive as a prop (`features/playback/lib/playbackActions.ts`), and the playlist screen gets what it plays from `features/playback/components/PlaylistPlaybackContainer.tsx`; the navigation passes both, so no feature imports the player or the queue.
 - **Audio playback**: expo-audio plays the SoundCloud HLS stream; `PlayerContext` manages the player's lifecycle, `playerStore` its state (current track, play/pause, modal), `MiniPlayer` and `PlayerModal` the display.
 - **Background playback (Android)**: React Native pauses JS timers once the app is in the background, and `fetch` resolves through `setTimeout`, so the next track's requests would wait for the app to come back. The local Expo module `modules/js-keep-alive/` runs a headless JS task while this device plays or loads a track (`features/playback/hooks/useBackgroundKeepAlive.ts`), which keeps the timers firing. Native code: reinstall the debug build (`npx expo prebuild --clean -p android`, then `npx expo run:android --app-id com.zumik.app.dev --no-bundler`) after pulling it.
 - **Events and location**: `expo-location` (address to coordinates, current position) and `@react-native-community/datetimepicker` (Android date and time dialogs) are native modules: after pulling them, rebuild the debug build (`npx expo prebuild --clean -p android`, then `npx expo run:android --app-id com.zumik.app.dev --no-bundler`). The location permission is foreground only and asked when a position is needed; Android's geocoder needs it even to place a typed address. The position never leaves the phone: the backend gets the event's coordinates, never the user's.

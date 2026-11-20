@@ -7,25 +7,24 @@ Read before creating a file or a folder. Every rule here is checked by `npm run 
 Where a file goes is set by the target layout in `doc/architecture/code-layout.md` and summarized in `AGENTS.md`:
 
 - Backend: `src/features/<name>/` holds `<name>.routes.ts`, `<name>.controller.ts`, `<name>.validators.ts`, `<name>.types.ts`, `<name>.openapi.ts`, logic in `services/`, authorization in `permissions/`, helpers in `utils/`. Cross-cutting code (config, middleware, security, types) goes in `src/shared/`; the Socket.io server in `src/realtime/` (`socket-server.ts`, `handlers/`, `emitters/`); the composition root (routes registry, OpenAPI document) in `src/app/`.
-- Mobile: `src/features/<feature>/` (components, hooks, services, stores of one feature), `src/shared/`, and `src/app/`, which composes the features into the navigation (`App.tsx` mounts `AppProvidersContainer` from `features/shell` and `RootNavigator` from `app/`). The legacy folders (`components/<feature>/`, `screens/`, `store/`, `hooks/`, `contexts/`, `services/`, `api/`, `utils/`) move into `features/` story by story (#378–#385); add nothing new to them. Every feature has the same layout, and a component's role is read from its name ([components.md](components.md#roles-by-name)); a subject folder always exists, even for a single-subject feature, `*Styles.ts` files sit with their presenters, and tests sit next to their file:
+- Mobile: three layers, `src/app/`, `src/features/` and `src/shared/` ([mobile-layers](architecture.md#mobile-layers)). `src/app/` composes the features into the navigation and imports only features; `App.tsx` mounts `AppProvidersContainer` from `features/shell` and `RootNavigator` from `app/`. A feature is a domain of the subject (`user` for IV.1, `playlists` with its `editor` for IV.2.3, `playback` with its `control-delegation` for IV.2.2, `events`, `subscription`, `search`, `legal`, `shell`). It holds kind folders for its own files, its sub-features in `features/` and the slices they share in `shared/`, and the same shape repeats one level down. A component's role is read from its name ([components.md](components.md#roles-by-name)), and tests sit next to their file:
 
   ```
   features/<feature>/
-  ├── hooks/ services/ stores/ utils/ constants.ts types.ts validators.ts …   (shared by subjects)
-  ├── context/                                                                 (React providers)
-  └── <subject>/
-      ├── components/        (orchestrators/ and presenters/ inside, once there are two of a role)
-      ├── hooks/
-      └── utils/                                                             (optional: the subject's own helpers, no JSX)
+  ├── components/ hooks/ lib/ …   (the feature's own files; orchestrators/ and presenters/ inside components/ once there are two of a role)
+  ├── features/<sub-feature>/      (a screen or a part of the domain, same shape)
+  └── shared/<slice>/              (what several sub-features use; a slice imports no other slice and its files import each other)
   ```
 
-  A category folder (`hooks/`, `stores/`, `services/`…) exists once it holds two files: a single hook, store or service sits at the root of its subject or feature ([check-tree](#check-tree)).
+  A sub-feature never imports a sibling, nor the root files of its feature: what two sub-features share goes in the feature's `shared/`, and what they pass each other goes through `app/` as props (render-prop containers such as `PlanContainer`, `FriendListeningContainer`, `PlaylistCardMenuContainer`, `PlaylistPlaybackContainer`, and components such as `TrackActionsSheet`).
+
+  A kind folder (`hooks/`, `stores/`, `lib/`…) exists once it holds two files: a single hook, store or lib file sits at the root of its feature or slice ([check-tree](#check-tree)).
 
   `src/shared/` holds what several features use, one folder per slice named after its concept, with its own kind folders (`components/`, `hooks/`, `lib/`) once it holds two files of a kind. A slice is a leaf: it imports no other slice (dependency-cruiser `no-cross-shared`, [mobile-layers](architecture.md#mobile-layers); type-only imports do not count), and its files import each other (check-tree). A slice file that a single feature uses lives in that feature. The slices:
-  - `theme/`: the design system: tokens, fonts, `pixelFrame`, the primitives ([ui-primitives](#ui-primitives)) `Pressable`, `Button`, `Text`, `TextInput`, `Input`, `SearchBar`, `Card`, `ThemedSwitch`, the skeletons, `PixelIcon`, `Avatar`, `Artwork`, `LoadingSpinner`, dialogs, menus, breakpoints and `ContentFrame`, the genres;
+  - `theme/`: the design system: tokens, fonts, `pixelFrame`, the primitives ([ui-primitives](#ui-primitives)) `Pressable`, `Button`, `Text`, `TextInput`, `Input`, `SearchBar`, `Card`, `ThemedSwitch`, the skeletons, `PixelIcon`, `Avatar`, `Artwork`, `LoadingSpinner`, dialogs, menus, breakpoints, the genres;
   - `backend/`: the connection to the server: `api.ts`, `backendUrl.ts`, the session (`authSession.ts`), the device identity, `queryClient.ts`, `socketStore.ts`, `socketCache.ts`, and `onBackendError`, through which `App.tsx` logs what goes wrong in there; `query-keys/`: the key factory ([state.md](state.md));
   - `playback/`, `tracks/`, `users/`: shared domain types and pure functions, such as the props one feature receives from another (`PlaybackActions`, `TrackActionsSheetComponent`);
-  - `logging/`, `formatting/`, `debounce/`, `platform/`, `alerts/`, `image-colors/`, `image-picker/`, `square-image/`, `external-links/`, `project-links/`, `share-links/`, `keyboard-shortcuts/`, `screen-title/`…
+  - `logging/`, `formatting/`, `debounce/`, `platform/`, `alerts/`, `content-column/`, `image-colors/`, `image-picker/`, `square-image/`, `external-links/`, `project-links/`, `share-links/`, `keyboard-shortcuts/`, `screen-title/`…
 
   Test helpers live in `mobile/test-utils/`, outside `src/`, imported through `@test-utils/`; production code never imports them (dependency-cruiser `no-prod-to-tests`).
 - Tests sit next to the file they test.

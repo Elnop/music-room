@@ -47,25 +47,22 @@ backend/src/
 ```
 mobile/src/
 ├── app/                      React Navigation: navigators, stacks, screens joining several features; imports only features/
-├── features/<feature>/
-│   ├── hooks/ services/ stores/ utils/ types.ts validators.ts …   shared by the feature's subjects
-│   ├── context/                                                   React providers
-│   └── <subject>/
-│       ├── components/             XContainer orchestrators wire hooks and stores, presenters take props;
-│       │                           orchestrators/ and presenters/ once there are two of a role
-│       ├── hooks/                      logic and state; never JSX
-│       └── utils/                      optional: the subject's own helpers, no JSX
-└── shared/
-    ├── components/ui/          primitives: Pressable, Button, Input, Card, Skeleton…
-    ├── components/<subject>/   blocks shared by features (feedback, form, lists, media…)
-    ├── services/               API client (api.ts), backend URL, storage
-    ├── query/                  QueryClient, key factory, cache profiles, socket cache
-    ├── stores/                 cross-cutting Zustand stores (socketStore)
-    └── hooks/ · utils/ · constants/ · theme/
+├── features/
+│   ├── user/                 IV.1: features/ auth, profile, friends, settings
+│   ├── playlists/            features/ browse (home, library), editor (IV.2.3: detail, playlist-form, search-tracks, sharing, track-actions, card-menu)
+│   ├── playback/             player and queue; features/ mini-player, player-bar, player-modal, now-playing-panel, media-session, queue-modal,
+│   │                         control-delegation (IV.2.2: my-devices, device-picker)
+│   ├── events/               bonus iBeacon: features/ nearby, detail, event-form
+│   ├── subscription/         bonus: the plan, PlanContainer
+│   ├── search/ · legal/
+│   └── shell/                the app's frame: providers, layout, tab bar, startup, linking; what app/ needs from shared/
+└── shared/                   leaf slices: theme (design system), backend (API client, session, socket), playback, tracks, users,
+                              alerts, logging, formatting, query-keys…
 ```
 
-- Features: auth, playlists, player, queue (with Connect and playback transfer), friends, profile, music-control, search. A subject folder always exists, even for a single-subject feature.
-- **Component roles** are read from the name (`XContainer` is an orchestrator, any other component a presenter) and checked by dependency-cruiser (presenters reach no store or query, render no orchestrator) and by an in-house ESLint plugin (screens import only orchestrators, hooks contain no JSX, one component per file) ([components.md](../../.agents/rules/components.md)).
+Inside a feature, the same shape repeats: kind folders (`components/`, `hooks/`, `lib/`, `stores/`) for its own files, its sub-features in `features/`, and the slices they share in `shared/`. A sub-feature never imports a sibling or its feature's root files; two features never import each other. What crosses features goes through `app/` as props: the plan from `PlanContainer`, a friend's listening state from `FriendListeningContainer`, the playback actions, the track actions sheet. These rules are the `layers` preset of [brutalway](https://brutalway.elnop.dev/), checked by dependency-cruiser and check-tree ([architecture.md](../../.agents/rules/architecture.md#mobile-layers), [structure.md](../../.agents/rules/structure.md#check-tree)).
+
+- **Component roles** are read from the name (`XContainer` is an orchestrator, any other component a presenter) and checked by dependency-cruiser (presenters reach no store or query, render no orchestrator), oxlint and an in-house ESLint plugin (screens import only orchestrators, hooks contain no JSX, one component per file) ([components.md](../../.agents/rules/components.md)).
 - **Server data lives in TanStack Query**; Zustand only keeps client state (session, player, preferences, UI). A Socket.io event updates the cache (`setQueryData`) or invalidates it through the key factory ([state.md](../../.agents/rules/state.md)).
 - A feature's stores stay in the feature (a deliberate difference from VibeAppTemplate, which puts every store in a `shared/stores/` folder), because `queueStore` or `connectStore` hold business logic.
 - **Primitives and theme**: every touchable is a `Pressable` or `Button` from `shared/theme/components/` (required `accessibilityLabel`), and every colour comes from the theme tokens ([ui-primitives, theme-tokens](../../.agents/rules/structure.md#ui-primitives)).

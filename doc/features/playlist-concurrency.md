@@ -73,7 +73,7 @@ The playlist is at version 10. Alice and Bob both display version 10; track E ha
 
 ## Broadcast and convergence
 
-After each operation the backend emits `playlist:updated` to the `playlist:<id>` room. The payload is a per-operation delta carrying the new `tracksVersion` (types `PlaylistUpdatedPayload` in `backend/src/features/playlists/playlist.types.ts` and `PlaylistUpdatedEvent` in `mobile/src/features/playlists/types.ts`):
+After each operation the backend emits `playlist:updated` to the `playlist:<id>` room. The payload is a per-operation delta carrying the new `tracksVersion` (types `PlaylistUpdatedPayload` in `backend/src/features/playlists/playlist.types.ts` and `PlaylistUpdatedEvent` in `mobile/src/features/playlists/shared/playlist/lib/types.ts`):
 
 ```ts
 { playlistId, tracksVersion, rebalanced, event: 'track_added', track }    // track carries rank, addedBy, addedAt

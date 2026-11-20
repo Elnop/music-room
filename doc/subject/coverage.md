@@ -14,7 +14,7 @@ The subject asks for two of the three services of IV.2. Zumik delivers **Music P
 |---|---|---|
 | III.1 Architecture, dependencies, justified choices | ✅ | `make install`, [decisions.md](../decisions.md) |
 | III.2 Mobile experience | ✅ | `mobile/` (Expo React Native, native Android build) |
-| IV.1 User | ✅ | `backend/src/features/auth/`, `profile/`; [accounts-auth.md](../features/accounts-auth.md) |
+| IV.1 User | ✅ | `backend/src/features/auth/`, `profile/`, `mobile/src/features/user/`; [accounts-auth.md](../features/accounts-auth.md) |
 | IV.2.2 Music Control Delegation | ✅ | `backend/src/features/music-control/`, `mobile/src/features/playback/features/control-delegation/`; [control-delegation.md](../features/control-delegation.md) |
 | IV.2.3 Music Playlist Editor | ✅ | `backend/src/features/playlists/`, `mobile/src/features/playlists/features/editor/`; [playlist-editor.md](../features/playlist-editor.md) |
 | IV.3 Server | ✅ | Supabase behind the backend |
@@ -102,7 +102,7 @@ Details: [web-client.md](../features/web-client.md); the choice of Expo web over
 | Subject | Where |
 | --- | --- |
 | Service available on another platform | The same `mobile/` app built for the browser with Expo web (`react-native-web`); each native module has a `.web.ts` variant (`mobile/src/**/*.web.ts`). Static build `npx expo export -p web`, published on GitHub Pages (`https://elnop.github.io/music-room/`, `.github/workflows/pages.yml`) |
-| Responsive web client (phone, tablet, desktop) | `shared/theme/hooks/useBreakpoint.ts`: phone < 768 px (the Android layout), tablet, desktop ≥ 1024 px; side navigation, centred content, grids, docked player, centred dialogs, mouse and keyboard (`shared/components/layout/`, `navigation/screenLayout.tsx`) |
+| Responsive web client (phone, tablet, desktop) | `shared/theme/hooks/useBreakpoint.ts`: phone < 768 px (the Android layout), tablet, desktop ≥ 1024 px; side navigation, centred content, grids, docked player, centred dialogs, mouse and keyboard (`mobile/src/features/shell/`: `AppFrameLayout`, `TabBarLayout`, `screenLayout.tsx`) |
 | Same service in the browser | Playlist Editor in real time, Music Control Delegation with the browser as a device (HLS player with hls.js, Media Session), Google and Facebook sign-in (GIS, Facebook JavaScript SDK), events by browser geolocation; the backend is unchanged except `GET /api/events/geocode`, and the browser sends the IV.6 headers (`X-Platform: web`) |
 
 Assumed gaps:
@@ -120,7 +120,7 @@ Details: [events.md](../features/events.md). Music Track Vote's "event" is not r
 
 | Subject | Where |
 | --- | --- |
-| *a mechanism such as IBeacon* | The organiser's phone broadcasts an iBeacon frame (Zumik UUID, the event's minor): `mobile/src/features/events/shared/beacon/ibeacon.ts`, `mobile/modules/beacon-advertiser/`. Other phones scan and decode it in project code (`services/beaconScanner.ts`, `utils/ibeacon.ts`, `utils/beaconDistance.ts`); GPS distance as a fallback (`utils/geo.ts`) |
+| *a mechanism such as IBeacon* | The organiser's phone broadcasts an iBeacon frame (Zumik UUID, the event's minor): `mobile/src/features/events/shared/beacon/ibeacon.ts`, `mobile/modules/beacon-advertiser/`. Other phones scan and decode it in project code (`mobile/src/features/events/features/nearby/lib/beaconScanner.ts`, `ibeacon.ts` above, `mobile/src/features/events/features/nearby/lib/beaconDistance.ts`); GPS distance as a fallback (`mobile/src/features/events/features/nearby/lib/geo.ts`) |
 | *a public event registered on your service* | `events` table (migration `032_events.sql`), `backend/src/features/events/`, `GET/POST/PATCH/DELETE /api/events`; every event is public |
 | *how to access it, the kind of music* | `accessInfo` and `genres` of the event, on its page (`features/events/features/detail/`), with its address, dates and linked playlist |
 | *automatically receive* | The event appears in « Événements à proximité » on **Accueil** with no action, and leaves on its own (`features/events/features/nearby/`, `lib/nearbyEvents.ts`); `event:*` Socket.io events keep the list current |
@@ -131,7 +131,7 @@ Demo scenario: [presentation/10-bonus-iot/scenario.md](../presentation/10-bonus-
 
 ## Bonus V.3 Free and paid subscription
 
-- Each user is on the free or the premium plan (`user_profiles.plan`); Premium unlocks a custom playlist cover. The switch is simulated, without payment: **Profile › Settings › Abonnement**. Details: [subscription.md](../features/subscription.md).
+- Each user is on the free or the premium plan (`user_profiles.plan`); Premium unlocks a custom playlist cover (`mobile/src/features/subscription/`). The switch is simulated, without payment: **Profile › Settings › Abonnement**. Details: [subscription.md](../features/subscription.md).
 - The access check is server-side (`assertPremium`, 403 `PREMIUM_REQUIRED`); the app only hides or locks the action.
 
 Demo scenario: [presentation/11-bonus-subscription/scenario.md](../presentation/11-bonus-subscription/scenario.md).
