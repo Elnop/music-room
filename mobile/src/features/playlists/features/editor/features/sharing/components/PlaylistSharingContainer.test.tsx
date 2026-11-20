@@ -14,7 +14,6 @@ import { renderWithClient } from '@test-utils/renderWithClient';
 import { mockFetchRoutes } from '@test-utils/fetchRoutes';
 import { fail, ok } from '@test-utils/fetchResponses';
 import { signIn } from '@test-utils/session';
-import '@test-utils/playback';
 import { playlistWithTracks } from '@test-utils/playlistFixtures';
 
 jest.mock('@react-native-async-storage/async-storage', () =>

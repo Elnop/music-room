@@ -2,7 +2,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { queryKeys } from '@/shared/query-keys/keys';
 import { STALE } from '@/shared/backend/queryClient';
-import { getPlayback } from '@/shared/playback/lib/playbackBridge';
+import type { PlaybackActions } from '@/shared/playback/lib/playbackActions';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { showError } from '@/shared/theme/lib/toast';
 import { toTrackInput } from '@/shared/tracks/lib/trackInput';
@@ -31,7 +31,7 @@ export interface SearchTracks {
 	closeActions: () => void;
 }
 
-export function useSearchTracks(playlistId: string): SearchTracks {
+export function useSearchTracks(playlistId: string, playback: PlaybackActions): SearchTracks {
 	const search = useDebouncedText();
 	const query = search.settled.trim();
 	const found = useQuery({
@@ -85,7 +85,7 @@ export function useSearchTracks(playlistId: string): SearchTracks {
 		isAdded: track => addedHere.has(track.permalink_url) || playlistUris.has(track.permalink_url),
 		add: useCallback((track: SoundCloudTrack) => void add(track), [add]),
 		addToQueue: useCallback((track: SoundCloudTrack) => {
-			void getPlayback().addToQueue(toTrackInput(track));
+			void playback.addToQueue(toTrackInput(track));
 		}, []),
 		actionTrack,
 		showActions: useCallback((track: SoundCloudTrack, anchor?: MenuAnchor) => {

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { act, render } from '@testing-library/react-native';
-import { PlayerProvider } from '@/features/playback/PlayerProvider';
+import { PlayerProvider } from './PlayerProvider';
 import { usePlayer } from '@/features/playback/shared/player/lib/PlayerContext';
 import {
 	readPositionMs,

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { getPlayback, usePlaylistPlayback } from '@/shared/playback/lib/playbackBridge';
+import type { PlaybackActions, PlaylistPlayback } from '@/shared/playback/lib/playbackActions';
 import { showInfo } from '@/shared/theme/lib/toast';
 
 export interface PlayPlaylist {
@@ -11,8 +11,11 @@ export interface PlayPlaylist {
 }
 
 /** While this device plays the playlist, the button pauses and resumes without a request. */
-export function usePlayPlaylist(playlistId: string): PlayPlaylist {
-	const { playingUri, state } = usePlaylistPlayback(playlistId);
+export function usePlayPlaylist(
+	playlistId: string,
+	playback: PlaybackActions & PlaylistPlayback
+): PlayPlaylist {
+	const { playingUri, state } = playback;
 	const [pending, setPending] = useState(false);
 	const [pendingTrackId, setPendingTrackId] = useState<string | null>(null);
 	// Guards a second tap before the re-render that disables the button.
@@ -24,7 +27,7 @@ export function usePlayPlaylist(playlistId: string): PlayPlaylist {
 		setPending(true);
 		setPendingTrackId(startTrackId ?? null);
 		try {
-			const outcome = await getPlayback().playPlaylist(playlistId, startTrackId);
+			const outcome = await playback.playPlaylist(playlistId, startTrackId);
 			if (outcome === 'ignored') showInfo('Une action est déjà en cours');
 		} finally {
 			pendingRef.current = false;
@@ -35,8 +38,8 @@ export function usePlayPlaylist(playlistId: string): PlayPlaylist {
 
 	const press = async () => {
 		if (pendingRef.current) return;
-		if (playing) return getPlayback().pause();
-		if (state === 'paused') return getPlayback().resume();
+		if (playing) return playback.pause();
+		if (state === 'paused') return playback.resume();
 		await start();
 	};
 

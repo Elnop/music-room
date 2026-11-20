@@ -14,8 +14,7 @@ import type { Theme } from '@/shared/theme/lib/types';
 import { PlaylistsNavigator } from '@/navigation/stacks/PlaylistsStack';
 import type { PlaylistStackParamList } from '@/features/playlists/shared/playlist/lib/types';
 import type { ProfileStackParamList } from '@/features/user/features/profile/types';
-import { registerPlayback } from '@/navigation/playbackBridge';
-import { TrackActionsSheetContainer } from '@/features/playlists/features/editor/features/track-actions/components/TrackActionsSheetContainer';
+import { TrackActionsSheet } from '@/navigation/TrackActionsSheet';
 import { QueueSheet } from '@/navigation/QueueSheet';
 import { DevicePickerSheetContainer } from '@/features/playback/features/control-delegation/features/device-picker/components/DevicePickerSheetContainer';
 import type { PlayerSheets } from '@/features/playback/shared/full-screen-sheet/FullScreenSheet';
@@ -26,7 +25,7 @@ import { FriendsNavigator, type FriendsStackParamList } from '@/navigation/stack
 import { AppTabBar } from './AppTabBar';
 import { PlayerModalContainer } from '@/features/playback/features/player-modal/components/orchestrators/PlayerModalContainer';
 import { PlayerErrorToastContainer } from '@/features/playback/features/player-modal/components/orchestrators/PlayerErrorToastContainer';
-import { PlayerProvider } from '@/features/playback/PlayerProvider';
+import { PlayerProvider } from '@/features/playback/components/PlayerProvider';
 import { useQueueSync } from '@/features/playback/hooks/useQueueSync';
 import { useEventsSync } from '@/features/events/useEventsSync';
 import { useRemoteTarget } from '@/features/playback/hooks/useRemoteTarget';
@@ -61,7 +60,6 @@ export type { FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
 const Tab = createBottomTabNavigator<AppTabsParamList>();
 
 // Registered before any screen renders: the playlists feature plays through them.
-registerPlayback();
 
 const PLAYER_SHEETS: PlayerSheets = {
 	QueueModal: QueueSheet,
@@ -211,10 +209,7 @@ export function AppNavigator() {
 						</Tab.Navigator>
 					</SafeAreaInsetsContext.Provider>
 					{breakpoint === 'desktop' && panelOpen && (
-						<NowPlayingPanelContainer
-							{...PLAYER_SHEETS}
-							TrackActionsSheet={TrackActionsSheetContainer}
-						/>
+						<NowPlayingPanelContainer {...PLAYER_SHEETS} TrackActionsSheet={TrackActionsSheet} />
 					)}
 				</View>
 

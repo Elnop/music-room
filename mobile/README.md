@@ -169,8 +169,8 @@ mobile/src/
 │   │   ├── media/          # Artwork, Avatar
 │   │   ├── sharing/        # ShareLinkButton
 │   │   └── theme/          # ThemedSystemUI
-│   ├── services/           # api.ts (HTTP client), authSession (session contract), playbackBridge
-│   │                       # (playback contract), backendUrl, lastTrackStorage
+│   ├── services/           # api.ts (HTTP client), authSession (session contract), backendUrl,
+│   │                       # lastTrackStorage
 │   ├── query/              # TanStack Query: queryClient (STALE profiles), keys (key factory), socketCache
 │   ├── stores/             # socketStore (Socket.io connection)
 │   ├── hooks/              # useConnectionStatus, useImageColors, usePlan (subscription plan)
@@ -254,7 +254,7 @@ mobile/src/
 - **Server data**: TanStack Query (`AppProviders` provides the client). A query key is built with `queryKeys` (`shared/query-keys/keys.ts`), freshness is chosen among the `STALE` profiles (`shared/backend/queryClient.ts`), and a Socket.io event updates the cache (`setQueryData`) or invalidates it through `useSocketCache` (`shared/backend/lib/socketCache.ts`). Zustand only keeps client state. Rules: `.agents/rules/state.md`.
 - **Session and shared layer**: `shared/` does not import auth; the session store registers itself in `shared/backend/lib/authSession.ts` (token, refresh) and announces each session end there (`onSessionEnd`), on which the socket closes and the player empties.
 - **Real time**: `shared/backend/socketStore.ts` manages the Socket.io connection; `features/playlists/features/editor/features/detail/hooks/usePlaylistRoom.ts` joins a playlist's room, whose events update the cache (`lib/playlistSocketRules.ts` next to it); `features/playback/features/control-delegation/hooks/` handles friends' listening and delegated control commands.
-- **Playback contract**: playlists start and display playback through `shared/playback/lib/playbackBridge.ts`, which `navigation/playbackBridge.ts` wires to `playerStore` and `queueStore` when `AppNavigator` loads; no feature imports the player or the queue.
+- **Playback contract**: playlists and search start playback through the `PlaybackActions` they receive as a prop (`features/playback/lib/playbackActions.ts`), and the playlist screen gets what it plays from `features/playback/PlaylistPlaybackContainer.tsx`; the navigation passes both, so no feature imports the player or the queue.
 - **Audio playback**: expo-audio plays the SoundCloud HLS stream; `PlayerContext` manages the player's lifecycle, `playerStore` its state (current track, play/pause, modal), `MiniPlayer` and `PlayerModal` the display.
 - **Background playback (Android)**: React Native pauses JS timers once the app is in the background, and `fetch` resolves through `setTimeout`, so the next track's requests would wait for the app to come back. The local Expo module `modules/js-keep-alive/` runs a headless JS task while this device plays or loads a track (`features/playback/hooks/useBackgroundKeepAlive.ts`), which keeps the timers firing. Native code: reinstall the debug build (`npx expo prebuild --clean -p android`, then `npx expo run:android --app-id com.zumik.app.dev --no-bundler`) after pulling it.
 - **Events and location**: `expo-location` (address to coordinates, current position) and `@react-native-community/datetimepicker` (Android date and time dialogs) are native modules: after pulling them, rebuild the debug build (`npx expo prebuild --clean -p android`, then `npx expo run:android --app-id com.zumik.app.dev --no-bundler`). The location permission is foreground only and asked when a position is needed; Android's geocoder needs it even to place a typed address. The position never leaves the phone: the backend gets the event's coordinates, never the user's.

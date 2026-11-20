@@ -4,7 +4,6 @@ import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { friendsApi } from '@/features/user/features/friends/shared/follows/friendsApi';
 import { renderWithClient } from '@test-utils/renderWithClient';
 import { signIn } from '@test-utils/session';
-import '@test-utils/playback';
 import { UserProfileContainer } from './UserProfileContainer';
 import type { FriendListeningResult } from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
 

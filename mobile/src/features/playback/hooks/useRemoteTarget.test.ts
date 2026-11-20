@@ -3,7 +3,6 @@ import { createStore } from 'zustand';
 import { useRemoteTarget } from './useRemoteTarget';
 import { useConnectStore } from '@/features/playback/shared/player/stores/connectStore';
 import { registerAuthSession, type SessionView } from '@/shared/backend/lib/authSession';
-import '@test-utils/playback';
 import { showError, showInfo } from '@/shared/theme/lib/toast';
 import type {
 	ListeningStatus,

@@ -1,12 +1,15 @@
 import React from 'react';
 import type { TrackActionsSheetComponent } from '@/shared/playback/lib/trackActionsSheet';
+import type { PlaybackActions } from '@/shared/playback/lib/playbackActions';
 import { useSoundCloudSearchScreen } from '@/features/search/hooks/useSoundCloudSearchScreen';
 import { SearchView } from '@/features/search/components/presenters/SearchView';
 
 export function SearchContainer({
 	TrackActionsSheet,
+	playback,
 }: {
 	TrackActionsSheet: TrackActionsSheetComponent;
+	playback: PlaybackActions;
 }) {
 	const {
 		inputRef,
@@ -25,7 +28,7 @@ export function SearchContainer({
 		handleAddToQueue,
 		handleShowActions,
 		handleCloseActions,
-	} = useSoundCloudSearchScreen();
+	} = useSoundCloudSearchScreen(playback);
 
 	return (
 		<SearchView

@@ -22,6 +22,7 @@ import {
 	headerButtonStyles,
 } from '@/features/playlists/shared/header-button/HeaderIconButton';
 import type { TrackActionsSheetComponent } from '@/shared/playback/lib/trackActionsSheet';
+import type { PlaybackActions, PlaylistPlayback } from '@/shared/playback/lib/playbackActions';
 import { PlaylistActionsSheetContainer } from '@/features/playlists/features/editor/shared/action-sheet/components/PlaylistActionsSheetContainer';
 import EllipsesHorizontalSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/ellipses-horizontal-solid.svg';
 import type { PlanState } from '@/features/subscription/lib/subscription';
@@ -32,6 +33,7 @@ type PlaylistDetailOrchestratorProps = NativeStackScreenProps<
 > & {
 	premium: Pick<PlanState, 'isPremium' | 'refetch'>;
 	TrackActionsSheet: TrackActionsSheetComponent;
+	playback: PlaybackActions & PlaylistPlayback;
 };
 
 export function PlaylistDetailContainer({
@@ -39,13 +41,14 @@ export function PlaylistDetailContainer({
 	route,
 	premium,
 	TrackActionsSheet,
+	playback,
 }: PlaylistDetailOrchestratorProps) {
 	const screen = usePlaylistDetailScreen(navigation, route.params.id);
 	const { id, playlist } = screen;
 	const userId = useSession(session => session.user?.id);
-	const tracks = usePlaylistTracks(id, playlist);
+	const tracks = usePlaylistTracks(id, playlist, playback);
 	const owner = useOwnerActions(navigation, screen);
-	const play = usePlayPlaylist(id);
+	const play = usePlayPlaylist(id, playback);
 	const gradient = useCoverGradient(playlist);
 	const isOwner = !!userId && playlist?.ownerId === userId;
 	const cover = useCoverActions(navigation, id, premium);

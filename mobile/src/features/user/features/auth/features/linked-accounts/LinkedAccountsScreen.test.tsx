@@ -10,10 +10,6 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 
 jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.0.0' }));
 
-jest.mock('@/shared/playback/lib/playbackBridge', () => ({
-	usePlayerHeight: () => 0,
-}));
-
 jest.mock('@/shared/theme/components/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/lib/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
@@ -43,17 +39,20 @@ const mockUnlinkProvider = jest.fn();
 let mockGoogleButton: jest.Mock | undefined;
 let mockGoogleCredential: () => void = () => undefined;
 
-jest.mock('@/features/user/features/auth/features/linked-accounts/hooks/useLinkedProviders', () => ({
-	useLinkedProviders: () => ({
-		data: mockProvidersData,
-		isLoading: mockIsLoading,
-		error: mockError,
-		errorUpdatedAt: mockError ? Date.now() : 0,
-		isFetchedAfterMount: Boolean(mockError),
-	}),
-	useLinkProvider: () => ({ mutateAsync: mockLinkProvider }),
-	useUnlinkProvider: () => ({ mutateAsync: mockUnlinkProvider }),
-}));
+jest.mock(
+	'@/features/user/features/auth/features/linked-accounts/hooks/useLinkedProviders',
+	() => ({
+		useLinkedProviders: () => ({
+			data: mockProvidersData,
+			isLoading: mockIsLoading,
+			error: mockError,
+			errorUpdatedAt: mockError ? Date.now() : 0,
+			isFetchedAfterMount: Boolean(mockError),
+		}),
+		useLinkProvider: () => ({ mutateAsync: mockLinkProvider }),
+		useUnlinkProvider: () => ({ mutateAsync: mockUnlinkProvider }),
+	})
+);
 
 jest.mock('@/features/user/features/auth/shared/sign-in/hooks/useProviderButtons', () => ({
 	useProviderButtons: (onCredential: () => void) => {

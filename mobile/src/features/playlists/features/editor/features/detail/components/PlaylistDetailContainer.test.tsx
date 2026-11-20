@@ -128,6 +128,7 @@ const element = () => (
 		navigation={navigation as unknown as Props['navigation']}
 		premium={{ isPremium: false, refetch: jest.fn() }}
 		TrackActionsSheet={() => null}
+		playback={{ ...testPlayback }}
 	/>
 );
 
@@ -165,7 +166,8 @@ beforeEach(async () => {
 	jest.spyOn(logger, 'error').mockImplementation(() => undefined);
 	await resetBackendUrl();
 	signIn('me');
-	testPlayback.playing = { playingUri: null, state: null };
+	testPlayback.playingUri = null;
+	testPlayback.state = null;
 	useSocketStore.setState({ socket: null, isConnected: false });
 	routes = mockFetchRoutes({
 		'GET /api/subscription': () => ok({ plan: 'free', premiumFeatures: ['playlist_cover'] }),
@@ -247,7 +249,8 @@ describe('PlaylistDetailContainer tracks (#307)', () => {
 	];
 
 	it('highlights every row of the track playing from this playlist', async () => {
-		testPlayback.playing = { playingUri: URI, state: 'playing' };
+		testPlayback.playingUri = URI;
+		testPlayback.state = 'playing';
 		await renderScreen({ tracks });
 		expect(screen.getByText('Song (current)')).toBeTruthy();
 		expect(screen.getByText('Again (current)')).toBeTruthy();
@@ -293,7 +296,8 @@ describe('PlaylistDetailContainer tracks (#307)', () => {
 	});
 
 	it('does not restart the track already playing when it is tapped', async () => {
-		testPlayback.playing = { playingUri: URI, state: 'playing' };
+		testPlayback.playingUri = URI;
+		testPlayback.state = 'playing';
 		await renderScreen({ tracks });
 		fireEvent.press(screen.getByText('Song (current)'));
 		expect(testPlayback.playPlaylist).not.toHaveBeenCalled();

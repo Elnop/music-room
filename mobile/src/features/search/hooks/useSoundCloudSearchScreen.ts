@@ -3,7 +3,7 @@ import type { TextInput } from 'react-native';
 import { debounce } from '@/shared/debounce/debounce';
 import { showError } from '@/shared/theme/lib/toast';
 import { toTrackInput } from '@/shared/tracks/lib/trackInput';
-import { getPlayback } from '@/shared/playback/lib/playbackBridge';
+import type { PlaybackActions } from '@/shared/playback/lib/playbackActions';
 import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
 import { useSoundCloudSearch } from './useSoundCloudSearch';
 import { useSearchFocusStore } from '@/features/search/searchFocusStore';
@@ -12,7 +12,7 @@ import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
 import { recordMenuAnchor } from '@/shared/theme/menuAnchorStore';
 import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
 
-export function useSoundCloudSearchScreen() {
+export function useSoundCloudSearchScreen(playback: PlaybackActions) {
 	const bottomPadding = useBottomPadding();
 	const inputRef = useRef<TextInput>(null);
 	const focusPending = useSearchFocusStore(state => state.pending);
@@ -78,11 +78,11 @@ export function useSoundCloudSearchScreen() {
 	}, [debouncedQuery, debouncedSetQuery, refetch]);
 
 	const handlePlay = useCallback((track: SoundCloudTrack) => {
-		void getPlayback().playListTrack(track);
+		void playback.playListTrack(track);
 	}, []);
 
 	const handleAddToQueue = useCallback((track: SoundCloudTrack) => {
-		void getPlayback().addToQueue(toTrackInput(track));
+		void playback.addToQueue(toTrackInput(track));
 	}, []);
 
 	const handleShowActions = useCallback((track: SoundCloudTrack, anchor?: MenuAnchor) => {

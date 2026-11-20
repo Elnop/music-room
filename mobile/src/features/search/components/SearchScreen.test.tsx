@@ -4,17 +4,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SearchContainer } from './SearchContainer';
 import { searchApi } from '@/features/search/lib/searchApi';
 import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
+import { testPlayback } from '@test-utils/playback';
 
-const mockPlayListTrack = jest.fn();
-const mockAddToQueue = jest.fn();
-
-jest.mock('@/shared/playback/lib/playbackBridge', () => ({
-	getPlayback: () => ({
-		playListTrack: mockPlayListTrack,
-		addToQueue: mockAddToQueue,
-	}),
-	usePlayerHeight: () => 0,
-}));
+const mockPlayListTrack = testPlayback.playListTrack;
 
 jest.mock('@/features/search/lib/searchApi', () => ({
 	searchApi: {
@@ -67,7 +59,7 @@ let queryClient: QueryClient;
 const renderScreen = async () => {
 	render(
 		<QueryClientProvider client={queryClient}>
-			<SearchContainer TrackActionsSheet={() => null} />
+			<SearchContainer TrackActionsSheet={() => null} playback={testPlayback} />
 		</QueryClientProvider>
 	);
 	await act(async () => {});

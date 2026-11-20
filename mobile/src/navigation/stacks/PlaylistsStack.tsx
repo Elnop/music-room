@@ -1,5 +1,7 @@
 import React from 'react';
-import { TrackActionsSheetContainer } from '@/features/playlists/features/editor/features/track-actions/components/TrackActionsSheetContainer';
+import { TrackActionsSheet } from '@/navigation/TrackActionsSheet';
+import { playbackActions } from '@/features/playback/lib/playbackActions';
+import { PlaylistPlaybackContainer } from '@/features/playback/components/PlaylistPlaybackContainer';
 import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
@@ -72,11 +74,16 @@ export function PlaylistsNavigator({ initialRouteName }: PlaylistsNavigatorProps
 				{props => (
 					<PlanContainer>
 						{plan => (
-							<PlaylistDetailContainer
-								{...props}
-								premium={plan}
-								TrackActionsSheet={TrackActionsSheetContainer}
-							/>
+							<PlaylistPlaybackContainer playlistId={props.route.params.id}>
+								{playlistPlayback => (
+									<PlaylistDetailContainer
+										{...props}
+										premium={plan}
+										TrackActionsSheet={TrackActionsSheet}
+										playback={{ ...playbackActions, ...playlistPlayback }}
+									/>
+								)}
+							</PlaylistPlaybackContainer>
 						)}
 					</PlanContainer>
 				)}
@@ -90,7 +97,11 @@ export function PlaylistsNavigator({ initialRouteName }: PlaylistsNavigatorProps
 			/>
 			<PlaylistStack.Screen name="SearchTracks" options={{ title: 'Ajouter des titres' }}>
 				{props => (
-					<SearchTracksContainer {...props} TrackActionsSheet={TrackActionsSheetContainer} />
+					<SearchTracksContainer
+						{...props}
+						TrackActionsSheet={TrackActionsSheet}
+						playback={playbackActions}
+					/>
 				)}
 			</PlaylistStack.Screen>
 			<PlaylistStack.Screen
