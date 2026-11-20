@@ -15,27 +15,29 @@ import { PlaylistsNavigator } from '@/navigation/stacks/PlaylistsStack';
 import type { PlaylistStackParamList } from '@/features/playlists/types';
 import type { ProfileStackParamList } from '@/features/user/features/profile/types';
 import { registerPlayback } from '@/navigation/playbackBridge';
-import { registerMusicControl } from '@/navigation/musicControlBridge';
+import { QueueModalContainer } from '@/features/playback/features/queue-modal/components/QueueModalContainer';
+import { DevicePickerSheetContainer } from '@/features/playback/features/control-delegation/features/device-picker/components/DevicePickerSheetContainer';
+import type { PlayerSheets } from '@/features/playback/shared/full-screen-sheet/FullScreenSheet';
 import { ProfileNavigator } from '@/navigation/stacks/ProfileStack';
 import { SearchNavigator } from '@/navigation/stacks/SearchStack';
 import { FriendsNavigator, type FriendsStackParamList } from '@/navigation/stacks/FriendsStack';
 
 import { AppTabBar } from './AppTabBar';
-import { PlayerModalContainer } from '@/features/player/modal/components/orchestrators/PlayerModalContainer';
-import { PlayerErrorToastContainer } from '@/features/player/modal/components/orchestrators/PlayerErrorToastContainer';
-import { PlayerProvider } from '@/features/player/context/PlayerProvider';
-import { useQueueSync } from '@/features/queue/hooks/useQueueSync';
+import { PlayerModalContainer } from '@/features/playback/features/player-modal/components/orchestrators/PlayerModalContainer';
+import { PlayerErrorToastContainer } from '@/features/playback/features/player-modal/components/orchestrators/PlayerErrorToastContainer';
+import { PlayerProvider } from '@/features/playback/PlayerProvider';
+import { useQueueSync } from '@/features/playback/hooks/useQueueSync';
 import { useEventsSync } from '@/features/events/useEventsSync';
-import { useRemoteTarget } from '@/features/queue/hooks/useRemoteTarget';
+import { useRemoteTarget } from '@/features/playback/hooks/useRemoteTarget';
 import { useConnectionStatus } from '@/shared/backend/useConnectionStatus';
 import { ConnectionBanner } from './ConnectionBanner';
 import { useSocketStore } from '@/shared/backend/socketStore';
 import { TAB_BAR_HEIGHT } from '@/shared/theme/lib/layout';
 import { useBreakpoint, type Breakpoint } from '@/shared/theme/hooks/useBreakpoint';
-import { MiniPlayerContainer } from '@/features/player/miniPlayer/components/MiniPlayerContainer';
-import { PlayerBarContainer } from '@/features/player/playerBar/components/PlayerBarContainer';
-import { NowPlayingPanelContainer } from '@/features/player/nowPlayingPanel/components/NowPlayingPanelContainer';
-import { useNowPlayingPanelStore } from '@/features/player/stores/nowPlayingPanelStore';
+import { MiniPlayerContainer } from '@/features/playback/features/mini-player/components/MiniPlayerContainer';
+import { PlayerBarContainer } from '@/features/playback/features/player-bar/components/PlayerBarContainer';
+import { NowPlayingPanelContainer } from '@/features/playback/features/now-playing-panel/components/NowPlayingPanelContainer';
+import { useNowPlayingPanelStore } from '@/features/playback/shared/panel/nowPlayingPanelStore';
 import { useSeparatorColor } from '@/shared/theme/hooks/useSeparatorColor';
 import { KeyboardShortcuts } from './KeyboardShortcuts';
 import { headerTitle } from '@/shared/theme/lib/pixelFrame';
@@ -59,7 +61,11 @@ const Tab = createBottomTabNavigator<AppTabsParamList>();
 
 // Registered before any screen renders: the playlists feature plays through them.
 registerPlayback();
-registerMusicControl();
+
+const PLAYER_SHEETS: PlayerSheets = {
+	QueueModal: QueueModalContainer,
+	DevicePicker: DevicePickerSheetContainer,
+};
 
 const TAB_ICONS: Record<string, PixelIconSource> = {
 	HomeTab: HomeSolid,
@@ -125,7 +131,11 @@ export function AppNavigator() {
 	return (
 		<PlayerProvider>
 			<View style={styles.container}>
-				<ConnectionBanner status={connectionStatus} topInset={insets.top} onRetry={retryConnection} />
+				<ConnectionBanner
+					status={connectionStatus}
+					topInset={insets.top}
+					onRetry={retryConnection}
+				/>
 
 				{/* The same tree on every width: a resized window keeps its navigation state. */}
 				<View style={styles.body}>
@@ -199,16 +209,20 @@ export function AppNavigator() {
 							/>
 						</Tab.Navigator>
 					</SafeAreaInsetsContext.Provider>
-					{breakpoint === 'desktop' && panelOpen && <NowPlayingPanelContainer />}
+					{breakpoint === 'desktop' && panelOpen && <NowPlayingPanelContainer {...PLAYER_SHEETS} />}
 				</View>
 
 				{sidebar && (
 					<View style={[styles.playerBar, { borderTopColor: separator }]}>
-						{breakpoint === 'desktop' ? <PlayerBarContainer /> : <MiniPlayerContainer />}
+						{breakpoint === 'desktop' ? (
+							<PlayerBarContainer {...PLAYER_SHEETS} />
+						) : (
+							<MiniPlayerContainer />
+						)}
 					</View>
 				)}
 
-				<PlayerModalContainer />
+				<PlayerModalContainer {...PLAYER_SHEETS} />
 				<PlayerErrorToastContainer />
 				{Platform.OS === 'web' && <KeyboardShortcuts />}
 			</View>

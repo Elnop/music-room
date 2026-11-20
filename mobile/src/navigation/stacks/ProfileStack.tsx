@@ -8,7 +8,7 @@ import { PrivacySettingsContainer } from '@/features/user/features/profile/featu
 import { LinkedAccountsContainer } from '@/features/user/features/auth/features/linked-accounts/components/LinkedAccountsContainer';
 import { MusicPreferencesContainer } from '@/features/user/features/profile/features/music-preferences/components/MusicPreferencesContainer';
 import { SettingsContainer } from '@/features/user/features/settings/components/SettingsContainer';
-import { MyDevicesContainer } from '@/features/music-control/myDevices/components/orchestrators/MyDevicesContainer';
+import { MyDevicesContainer } from '@/features/playback/features/control-delegation/features/my-devices/components/orchestrators/MyDevicesContainer';
 import { PrivacyPolicyContainer } from '@/features/legal/components/PrivacyPolicyContainer';
 import type { ProfileStackParamList } from '@/features/user/features/profile/types';
 import { useBreakpoint } from '@/shared/theme/hooks/useBreakpoint';
@@ -71,7 +71,13 @@ export function ProfileNavigator() {
 				options={{ title: 'Préférences musicales' }}
 			/>
 			<ProfileStack.Screen name="Settings" options={{ title: 'Réglages' }}>
-				{() => <PlanContainer>{plan => <SettingsContainer subscription={plan} backendUrlField={<BackendUrlField />} />}</PlanContainer>}
+				{() => (
+					<PlanContainer>
+						{plan => (
+							<SettingsContainer subscription={plan} backendUrlField={<BackendUrlField />} />
+						)}
+					</PlanContainer>
+				)}
 			</ProfileStack.Screen>
 			<ProfileStack.Screen
 				name="PrivacyPolicy"

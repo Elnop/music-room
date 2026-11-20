@@ -32,7 +32,7 @@ jest.mock('@/shared/backend/socketStore', () => {
 	return { useSocketStore: (select: (s: typeof state) => unknown) => select(state) };
 });
 
-jest.mock('@/features/music-control/hooks/useMusicControlEmitter', () => ({
+jest.mock('@/features/playback/features/control-delegation/hooks/useMusicControlEmitter', () => ({
 	useMusicControlEmitter: jest.fn(),
 }));
 

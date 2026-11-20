@@ -15,7 +15,7 @@ import { useAuthStore } from '@/features/user/features/auth/shared/sign-in/authS
 import { useSocketStore } from '@/shared/backend/socketStore';
 import { LoadingSpinner } from '@/shared/theme/components/LoadingSpinner';
 import { isDarkBackground } from '@/shared/theme/lib/textContrast';
-import { useMusicControlEmitter } from '@/features/music-control/hooks/useMusicControlEmitter';
+import { useMusicControlEmitter } from '@/features/playback/features/control-delegation/hooks/useMusicControlEmitter';
 import { loadBackendUrl } from '@/shared/backend/lib/backendUrl';
 import { logger } from '@/shared/logging/logger';
 

@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useBottomPadding } from '@/shared/theme/hooks/useBottomPadding';
 import { useScreenTitle } from '@/shared/screen-title/useScreenTitle';
-import { useFriendListening } from '@/shared/backend/lib/musicControlBridge';
+import type { FriendListeningResult } from '@/features/playback/features/control-delegation/shared/delegation/lib/types';
 import { controlErrorMessage } from '@/shared/control-error/controlError';
 import { showError } from '@/shared/theme/lib/toast';
 import { logger } from '@/shared/logging/logger';
@@ -12,7 +12,7 @@ import {
 } from '@/features/user/features/friends/shared/follows/hooks/useFriendsQueries';
 import { useFollowMutation } from '@/features/user/features/friends/shared/follows/hooks/useFriendsMutations';
 
-export function useUserProfileScreen(userId: string) {
+export function useUserProfileScreen(userId: string, listening: FriendListeningResult) {
 	const bottomPadding = useBottomPadding();
 	const {
 		data: profile,
@@ -33,7 +33,7 @@ export function useUserProfileScreen(userId: string) {
 		remotePause,
 		isLoading: isListeningLoading,
 		controlError,
-	} = useFriendListening(userId);
+	} = listening;
 
 	useEffect(() => {
 		if (controlError) {
