@@ -1,0 +1,27 @@
+import React, { useState } from 'react';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { AuthStackParamList } from '@/features/auth/types';
+import { getBuildLabel } from '@/shared/services/deviceService';
+import { openExternalUrl } from '@/shared/utils/openExternalUrl';
+import { useFloatingIcons } from '@/features/auth/welcome/useFloatingIcons';
+import { WelcomeView } from '@/features/auth/welcome/components/presenters/WelcomeView';
+
+type WelcomeOrchestratorProps = NativeStackScreenProps<AuthStackParamList, 'Welcome'>;
+
+export function WelcomeContainer({ navigation }: WelcomeOrchestratorProps) {
+	const icons = useFloatingIcons();
+	const [showServer, setShowServer] = useState(false);
+
+	return (
+		<WelcomeView
+			icons={icons}
+			buildLabel={getBuildLabel()}
+			showServer={showServer}
+			onToggleServer={() => setShowServer(value => !value)}
+			onStart={() => navigation.navigate('Register')}
+			onLogin={() => navigation.navigate('Login')}
+			onOpenPrivacyPolicy={() => navigation.navigate('PrivacyPolicy')}
+			onOpenLink={openExternalUrl}
+		/>
+	);
+}

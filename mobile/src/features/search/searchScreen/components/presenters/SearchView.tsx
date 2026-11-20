@@ -12,6 +12,7 @@ import type { AddQueueItemBody } from '@/shared/types/playback';
 import { useContentColumn } from '@/shared/hooks/useContentColumn';
 import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
+import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 
 interface SearchViewProps {
 	inputRef: React.RefObject<TextInput | null>;
@@ -28,7 +29,7 @@ interface SearchViewProps {
 	onRetry: () => void;
 	onPlay: (track: SoundCloudTrack) => void;
 	onAddToQueue: (track: SoundCloudTrack) => void;
-	onShowActions: (track: SoundCloudTrack) => void;
+	onShowActions: (track: SoundCloudTrack, anchor?: MenuAnchor) => void;
 	onCloseActions: () => void;
 }
 
@@ -52,7 +53,7 @@ export function SearchView({
 }: SearchViewProps) {
 	const { theme } = useTheme();
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
-	const TrackActionsSheet = getTrackActionsSheet();
+	const TrackActionsSheetContainer = getTrackActionsSheet();
 	const column = useContentColumn();
 
 	return (
@@ -111,8 +112,8 @@ export function SearchView({
 				/>
 			)}
 
-			{TrackActionsSheet &&
-				React.createElement(TrackActionsSheet, {
+			{TrackActionsSheetContainer &&
+				React.createElement(TrackActionsSheetContainer, {
 					track: actionTrack,
 					onClose: onCloseActions,
 				})}

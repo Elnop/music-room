@@ -110,7 +110,7 @@ Concurrency is tested on the integration Postgres (story 1.10, see [testing.md](
 | `mobile/src/shared/utils/moveTarget.test.ts` | `afterRank` for up / down and the list edges |
 | `mobile/src/features/playlists/utils/trackMoves.test.ts` | move queue, `409` reload, loading, add and remove |
 | `mobile/src/features/playlists/utils/playlistSocketRules.test.ts` | events applied to the cache, reload |
-| `mobile/src/features/playlists/detail/components/orchestrators/PlaylistDetailOrchestrator.test.tsx` | the screen: room, deletion, `409` message, moves |
+| `mobile/src/features/playlists/detail/components/orchestrators/PlaylistDetailContainer.test.tsx` | the screen: room, deletion, `409` message, moves |
 | `mobile/src/features/playlists/services/*.test.ts` | move request, collaborators and viewers |
 
 ## Alternatives not chosen

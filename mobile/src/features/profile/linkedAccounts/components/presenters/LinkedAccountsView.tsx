@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import type { PixelIconSource } from '@/shared/components/media/PixelIcon';
-import { ProfileScreenLayout } from '@/features/profile/common/components/presenters/ProfileScreenLayout';
+import { ProfileScreenFrame } from '@/features/profile/common/presenters/ProfileScreenFrame';
 import { LinkedAccountRow } from '@/features/profile/linkedAccounts/components/presenters/LinkedAccountRow';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import type { Theme } from '@/shared/theme/types';
@@ -52,7 +52,7 @@ export function LinkedAccountsView({
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
 
 	return (
-		<ProfileScreenLayout
+		<ProfileScreenFrame
 			subtitle="Choisissez comment vous connecter à Zumik"
 			bottomPadding={bottomPadding}
 			isLoading={isLoading}
@@ -78,7 +78,7 @@ export function LinkedAccountsView({
 					})}
 				</View>
 			)}
-		</ProfileScreenLayout>
+		</ProfileScreenFrame>
 	);
 }
 

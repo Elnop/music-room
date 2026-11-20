@@ -55,7 +55,7 @@ export function useTrackActions(
 	const newPlaylist = useNewPlaylistFromTrack(shown, onClose);
 
 	useEffect(() => {
-		if (list.error) logger.error('[TrackActionsSheet] Loading playlists failed:', list.error);
+		if (list.error) logger.error('[TrackActionsSheetContainer] Loading playlists failed:', list.error);
 	}, [list.error]);
 
 	const editable = useMemo(
@@ -91,7 +91,7 @@ export function useTrackActions(
 					await addTrack.mutateAsync({ playlistId: playlist.id, track: body });
 					showSuccess(`Ajouté à « ${playlist.name} »`);
 				} catch (error) {
-					logger.error('[TrackActionsSheet] Add to playlist failed:', error);
+					logger.error('[TrackActionsSheetContainer] Add to playlist failed:', error);
 					showError(apiErrorMessage(error, "Impossible d'ajouter le titre à la playlist"));
 				}
 			}),
@@ -102,7 +102,7 @@ export function useTrackActions(
 				try {
 					await Share.share({ message: body.trackUri, url: body.trackUri, title: body.title });
 				} catch (error) {
-					logger.error('[TrackActionsSheet] Share failed:', error);
+					logger.error('[TrackActionsSheetContainer] Share failed:', error);
 					showError('Impossible de partager ce titre');
 				}
 			}),

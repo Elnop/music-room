@@ -9,6 +9,8 @@ import { useSoundCloudSearch } from '@/features/search/useSoundCloudSearch';
 import { useSearchFocusStore } from '@/features/search/searchFocusStore';
 import type { SoundCloudTrack } from '@/features/search/types';
 import type { AddQueueItemBody } from '@/shared/types/playback';
+import { recordMenuAnchor } from '@/shared/stores/menuAnchorStore';
+import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 
 export function useSoundCloudSearchScreen() {
 	const bottomPadding = useBottomPadding();
@@ -83,7 +85,8 @@ export function useSoundCloudSearchScreen() {
 		void getPlayback().addToQueue(toTrackInput(track));
 	}, []);
 
-	const handleShowActions = useCallback((track: SoundCloudTrack) => {
+	const handleShowActions = useCallback((track: SoundCloudTrack, anchor?: MenuAnchor) => {
+		recordMenuAnchor(anchor);
 		setActionTrack(toTrackInput(track));
 	}, []);
 

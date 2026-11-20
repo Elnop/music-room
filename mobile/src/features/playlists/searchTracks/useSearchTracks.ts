@@ -12,6 +12,8 @@ import { useAddTrack } from '@/features/playlists/hooks/useTrackEdits';
 import { searchTracks } from '@/features/playlists/services/trackSearchApi';
 import type { AddQueueItemBody } from '@/shared/types/playback';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
+import { recordMenuAnchor } from '@/shared/stores/menuAnchorStore';
+import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 
 export interface SearchTracks {
 	search: DebouncedText;
@@ -22,7 +24,7 @@ export interface SearchTracks {
 	add: (track: SoundCloudTrack) => void;
 	addToQueue: (track: SoundCloudTrack) => void;
 	actionTrack: AddQueueItemBody | null;
-	showActions: (track: SoundCloudTrack) => void;
+	showActions: (track: SoundCloudTrack, anchor?: MenuAnchor) => void;
 	closeActions: () => void;
 }
 
@@ -83,7 +85,10 @@ export function useSearchTracks(playlistId: string): SearchTracks {
 			void getPlayback().addToQueue(toTrackInput(track));
 		}, []),
 		actionTrack,
-		showActions: useCallback((track: SoundCloudTrack) => setActionTrack(toTrackInput(track)), []),
+		showActions: useCallback((track: SoundCloudTrack, anchor?: MenuAnchor) => {
+			recordMenuAnchor(anchor);
+			setActionTrack(toTrackInput(track));
+		}, []),
 		closeActions: () => setActionTrack(null),
 	};
 }

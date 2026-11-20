@@ -15,6 +15,8 @@ import { CONFLICT_MESSAGE, isMoveConflict } from '@/features/playlists/utils/tra
 import type { PlaylistWithTracks } from '@/features/playlists/types';
 import type { AddQueueItemBody } from '@/shared/types/playback';
 import type { TrackInPlaylist } from '@/types/track.types';
+import { recordMenuAnchor } from '@/shared/stores/menuAnchorStore';
+import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 
 export interface PlaylistTracks {
 	canEdit: boolean;
@@ -22,7 +24,7 @@ export interface PlaylistTracks {
 	/** Only the track playing from this playlist's queue block. */
 	currentUri: string | null;
 	actionTrack: AddQueueItemBody | null;
-	showActions: (track: TrackInPlaylist) => void;
+	showActions: (track: TrackInPlaylist, anchor?: MenuAnchor) => void;
 	closeActions: () => void;
 	addToQueue: (track: TrackInPlaylist) => void;
 	explainUnavailable: () => void;
@@ -81,7 +83,10 @@ export function usePlaylistTracks(
 		isMoving,
 		currentUri: playingUri,
 		actionTrack,
-		showActions: track => setActionTrack(toTrackInput(track)),
+		showActions: (track, anchor) => {
+			recordMenuAnchor(anchor);
+			setActionTrack(toTrackInput(track));
+		},
 		closeActions: () => setActionTrack(null),
 		addToQueue: track => void getPlayback().addToQueue(toTrackInput(track)),
 		explainUnavailable: () => showInfo("Ce titre n'est plus disponible sur SoundCloud"),

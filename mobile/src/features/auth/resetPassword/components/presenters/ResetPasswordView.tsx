@@ -1,9 +1,9 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useTheme } from '@/shared/theme/ThemeContext';
-import { CodeInput } from '@/features/auth/code/components/presenters/CodeInput';
-import { PasswordScreenLayout } from '@/features/auth/form/components/presenters/PasswordScreenLayout';
-import { ErrorBox } from '@/features/auth/form/components/presenters/ErrorBox';
+import { CodeInput } from '@/features/auth/code/CodeInput';
+import { PasswordScreenFrame } from '@/features/auth/form/presenters/PasswordScreenFrame';
+import { ErrorBox } from '@/features/auth/form/presenters/ErrorBox';
 import { Button } from '@/shared/components/ui/Button';
 import { Input } from '@/shared/components/ui/Input';
 import { Pressable } from '@/shared/components/ui/Pressable';
@@ -24,7 +24,7 @@ export function ResetPasswordView({ email, form }: ResetPasswordViewProps) {
 		!form.isLoading && form.code.isComplete && !!form.newPassword && !!form.confirmation;
 
 	return (
-		<PasswordScreenLayout
+		<PasswordScreenFrame
 			title="Nouveau mot de passe"
 			subtitle={
 				<>
@@ -101,7 +101,7 @@ export function ResetPasswordView({ email, form }: ResetPasswordViewProps) {
 					<Text style={[styles.resendCooldown, secondary]}>Renvoyer dans {form.cooldown} s</Text>
 				)}
 			</View>
-		</PasswordScreenLayout>
+		</PasswordScreenFrame>
 	);
 }
 

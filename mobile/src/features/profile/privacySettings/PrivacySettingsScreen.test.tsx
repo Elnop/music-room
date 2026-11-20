@@ -2,7 +2,7 @@ import React from 'react';
 import { Alert } from 'react-native';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { PrivacySettingsOrchestrator } from './components/orchestrators/PrivacySettingsOrchestrator';
+import { PrivacySettingsContainer } from '@/features/profile/privacySettings/components/PrivacySettingsContainer';
 import { privacyApi } from '@/features/profile/services/privacyApi';
 import { showError } from '@/shared/utils/toast';
 
@@ -71,7 +71,7 @@ function renderLoaded(): Promise<void> {
 	});
 	render(
 		<QueryClientProvider client={client}>
-			<PrivacySettingsOrchestrator />
+			<PrivacySettingsContainer />
 		</QueryClientProvider>
 	);
 	return screen.findByText('Choisissez qui peut voir vos informations').then(() => undefined);

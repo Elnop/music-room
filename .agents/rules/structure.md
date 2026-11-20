@@ -7,15 +7,14 @@ Read before creating a file or a folder. Every rule here is checked by `npm run 
 Where a file goes is set by the target layout in `doc/architecture/code-layout.md` and summarized in `AGENTS.md`:
 
 - Backend: `src/features/<name>/` holds `<name>.routes.ts`, `<name>.controller.ts`, `<name>.validators.ts`, `<name>.types.ts`, `<name>.openapi.ts`, logic in `services/`, authorization in `permissions/`, helpers in `utils/`. Cross-cutting code (config, middleware, security, types) goes in `src/shared/`; the Socket.io server in `src/realtime/` (`socket-server.ts`, `handlers/`, `emitters/`); the composition root (routes registry, OpenAPI document) in `src/app/`.
-- Mobile: `src/features/<feature>/` (components, hooks, services, stores of one feature), `src/shared/`, `src/navigation/`, `src/providers/` (`AppProviders.tsx`, the providers `App.tsx` wraps the app in). The legacy folders (`components/<feature>/`, `screens/`, `store/`, `hooks/`, `contexts/`, `services/`, `api/`, `utils/`) move into `features/` story by story (#378–#385); add nothing new to them. Every feature has the same layout (ESLint `components/component-role-directory`, see [components.md](components.md#component-role-directory)); a subject folder always exists, even for a single-subject feature, `*Styles.ts` files sit with their presenters, and tests sit next to their file:
+- Mobile: `src/features/<feature>/` (components, hooks, services, stores of one feature), `src/shared/`, `src/navigation/`, `src/providers/` (`AppProviders.tsx`, the providers `App.tsx` wraps the app in). The legacy folders (`components/<feature>/`, `screens/`, `store/`, `hooks/`, `contexts/`, `services/`, `api/`, `utils/`) move into `features/` story by story (#378–#385); add nothing new to them. Every feature has the same layout, and a component's role is read from its name ([components.md](components.md#roles-by-name)); a subject folder always exists, even for a single-subject feature, `*Styles.ts` files sit with their presenters, and tests sit next to their file:
 
   ```
   features/<feature>/
   ├── hooks/ services/ stores/ utils/ constants.ts types.ts validators.ts …   (shared by subjects)
   ├── context/                                                                 (React providers)
   └── <subject>/
-      ├── components/orchestrators/
-      ├── components/presenters/
+      ├── components/        (orchestrators/ and presenters/ inside, once there are two of a role)
       ├── hooks/
       └── utils/                                                             (optional: the subject's own helpers, no JSX)
   ```
@@ -82,4 +81,4 @@ Mobile: the folders of `src/` follow the layout of [brutalway](https://brutalway
 
 The violations that existed when the rule arrived are listed in `mobile/.check-tree-known-violations.json`, which check-tree skips. It fails on a violation that is not listed and on a listed one that no longer happens. After fixing folders, rewrite the list with `npx check-tree src --write-known-violations` (from `mobile/`) and check the diff: it may only lose lines, and `check:exceptions` fails if it gains one. When you move files, the entries of the folders they leave may come back under the folder they reach: that is accepted as long as the list does not grow ([exception-lists](guardrails.md#exception-lists)).
 
-Until a later story of #616 changes `component-role-directory` and `presenter-pure`, which recognise a component's role by its folder, a single orchestrator or presenter stays in `components/orchestrators/` or `components/presenters/`: those folders are in the list, do not flatten them.
+Since #622 the role of a component comes from its name, so `components/orchestrators/` and `components/presenters/` follow the grouping rule like any category folder: a single orchestrator or presenter sits in `components/`, and a role folder exists once it holds two of them.

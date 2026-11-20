@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
-import { LinkedAccountsOrchestrator } from './components/orchestrators/LinkedAccountsOrchestrator';
+import { LinkedAccountsContainer } from '@/features/profile/linkedAccounts/components/LinkedAccountsContainer';
 import {
 	registerLinkedAccountsBridge,
 	type LinkedProvider,
@@ -73,7 +73,7 @@ beforeEach(() => {
 
 describe('LinkedAccountsScreen', () => {
 	it('lists each sign-in method with its state', () => {
-		render(<LinkedAccountsOrchestrator />);
+		render(<LinkedAccountsContainer />);
 
 		expect(screen.getByTestId('linked-account-password')).toHaveTextContent(/Lié · Principal/);
 		expect(screen.getByLabelText('Délier Google')).toBeTruthy();
@@ -85,7 +85,7 @@ describe('LinkedAccountsScreen', () => {
 		mockProvidersData = undefined;
 		mockError = new Error('Server exploded');
 
-		render(<LinkedAccountsOrchestrator />);
+		render(<LinkedAccountsContainer />);
 
 		expect(screen.getByText('Impossible de charger les comptes liés')).toBeTruthy();
 		expect(showError).toHaveBeenCalled();
@@ -95,7 +95,7 @@ describe('LinkedAccountsScreen', () => {
 		mockProvidersData = [password];
 		mockLinkProvider.mockResolvedValueOnce(undefined);
 
-		render(<LinkedAccountsOrchestrator />);
+		render(<LinkedAccountsContainer />);
 		fireEvent.press(screen.getByLabelText('Lier Google'));
 
 		await waitFor(() => {
@@ -107,7 +107,7 @@ describe('LinkedAccountsScreen', () => {
 	it('unlinks Google when pressing Délier Google', async () => {
 		mockUnlinkProvider.mockResolvedValueOnce(undefined);
 
-		render(<LinkedAccountsOrchestrator />);
+		render(<LinkedAccountsContainer />);
 		fireEvent.press(screen.getByLabelText('Délier Google'));
 
 		await waitFor(() => {
@@ -120,7 +120,7 @@ describe('LinkedAccountsScreen', () => {
 		mockProvidersData = [password];
 		mockLinkProvider.mockRejectedValueOnce(new Error('Link failed'));
 
-		render(<LinkedAccountsOrchestrator />);
+		render(<LinkedAccountsContainer />);
 		fireEvent.press(screen.getByLabelText('Lier Google'));
 
 		await waitFor(() => {
@@ -131,7 +131,7 @@ describe('LinkedAccountsScreen', () => {
 	it('shows error toast when unlinking fails', async () => {
 		mockUnlinkProvider.mockRejectedValueOnce(new Error('Unlink failed'));
 
-		render(<LinkedAccountsOrchestrator />);
+		render(<LinkedAccountsContainer />);
 		fireEvent.press(screen.getByLabelText('Délier Google'));
 
 		await waitFor(() => {
@@ -143,7 +143,7 @@ describe('LinkedAccountsScreen', () => {
 		mockProvidersData = [password];
 		mockLinkProvider.mockRejectedValueOnce(new Error('SIGN_IN_CANCELLED'));
 
-		render(<LinkedAccountsOrchestrator />);
+		render(<LinkedAccountsContainer />);
 		fireEvent.press(screen.getByLabelText('Lier Google'));
 
 		await waitFor(() => {
@@ -157,7 +157,7 @@ describe('LinkedAccountsScreen', () => {
 		mockGoogleButton = jest.fn();
 		mockLinkProvider.mockResolvedValueOnce(undefined);
 
-		render(<LinkedAccountsOrchestrator />);
+		render(<LinkedAccountsContainer />);
 
 		expect(screen.getByTestId('google-button-slot')).toBeTruthy();
 		expect(screen.queryByLabelText('Lier Google')).toBeNull();
@@ -172,7 +172,7 @@ describe('LinkedAccountsScreen', () => {
 	it('unlinks Google with the usual button on the web', () => {
 		mockGoogleButton = jest.fn();
 
-		render(<LinkedAccountsOrchestrator />);
+		render(<LinkedAccountsContainer />);
 
 		expect(screen.getByLabelText('Délier Google')).toBeTruthy();
 		expect(screen.queryByTestId('google-button-slot')).toBeNull();

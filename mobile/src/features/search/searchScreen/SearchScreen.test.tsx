@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { SearchOrchestrator } from './components/orchestrators/SearchOrchestrator';
+import { SearchContainer } from '@/features/search/searchScreen/components/SearchContainer';
 import { searchApi } from '@/features/search/services/searchApi';
 import type { SoundCloudTrack } from '@/types/soundcloud.types';
 
@@ -67,7 +67,7 @@ let queryClient: QueryClient;
 const renderScreen = async () => {
 	render(
 		<QueryClientProvider client={queryClient}>
-			<SearchOrchestrator />
+			<SearchContainer />
 		</QueryClientProvider>
 	);
 	await act(async () => {});

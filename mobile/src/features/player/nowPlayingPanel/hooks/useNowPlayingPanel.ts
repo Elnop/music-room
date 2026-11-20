@@ -13,6 +13,8 @@ import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { UP_NEXT_COUNT } from '@/features/player/constants';
 import { upNext } from '@/features/player/nowPlayingPanel/utils/upNext';
 import { usePanelFocus } from './usePanelFocus';
+import { recordMenuAnchor } from '@/shared/stores/menuAnchorStore';
+import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 
 type Sheet = 'queue' | 'devices';
 
@@ -71,8 +73,14 @@ export function useNowPlayingPanel() {
 		onOpenDevices: () => setSheet('devices'),
 		onCloseSheet: () => setSheet(null),
 		actions,
-		onAddToPlaylist: () => openActions('playlists'),
-		onMoreActions: () => openActions('actions'),
+		onAddToPlaylist: (anchor?: MenuAnchor) => {
+			recordMenuAnchor(anchor);
+			openActions('playlists');
+		},
+		onMoreActions: (anchor?: MenuAnchor) => {
+			recordMenuAnchor(anchor);
+			openActions('actions');
+		},
 		onCloseActions: () => setActions(null),
 	};
 }

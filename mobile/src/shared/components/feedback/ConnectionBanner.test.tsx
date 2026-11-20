@@ -1,20 +1,16 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { ConnectionBanner, textColorOn } from './ConnectionBanner';
+import { ConnectionBanner } from './ConnectionBanner';
+import { textColorOn } from '@/shared/components/feedback/textContrast';
 import { FIXED_COLORS } from '@/shared/theme/tokens';
 import { originalTheme } from '@/shared/theme/original.theme';
 
-const mockSocketState = { retry: jest.fn() };
+const retry = jest.fn();
 
 jest.mock('@/shared/theme/ThemeContext', () => {
 	const { originalTheme } = jest.requireActual('@/shared/theme/original.theme');
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
-
-jest.mock('@/shared/stores/socketStore', () => ({
-	useSocketStore: (selector: (state: typeof mockSocketState) => unknown) =>
-		selector(mockSocketState),
-}));
 
 beforeEach(() => {
 	jest.clearAllMocks();
@@ -22,39 +18,39 @@ beforeEach(() => {
 
 describe('ConnectionBanner', () => {
 	it('renders nothing without a status', () => {
-		render(<ConnectionBanner status={null} topInset={24} />);
+		render(<ConnectionBanner status={null} topInset={24} onRetry={retry} />);
 		expect(screen.toJSON()).toBeNull();
 	});
 
 	it('shows « Hors ligne » when offline, without a retry button', () => {
-		render(<ConnectionBanner status="offline" topInset={24} />);
+		render(<ConnectionBanner status="offline" topInset={24} onRetry={retry} />);
 		expect(screen.getByText('Hors ligne')).toBeTruthy();
 		expect(screen.queryByText('Réessayer')).toBeNull();
 		expect(screen.getByTestId('connection-banner').props.accessibilityRole).toBe('alert');
 	});
 
 	it('shows « Reconnexion… » while reconnecting, without a retry button', () => {
-		render(<ConnectionBanner status="reconnecting" topInset={24} />);
+		render(<ConnectionBanner status="reconnecting" topInset={24} onRetry={retry} />);
 		expect(screen.getByText('Reconnexion…')).toBeTruthy();
 		expect(screen.queryByText('Réessayer')).toBeNull();
 	});
 
 	it('shows « Connexion perdue » and retries on « Réessayer »', () => {
-		render(<ConnectionBanner status="failed" topInset={24} />);
+		render(<ConnectionBanner status="failed" topInset={24} onRetry={retry} />);
 		expect(screen.getByText('Connexion perdue')).toBeTruthy();
 
 		fireEvent.press(screen.getByRole('button', { name: 'Réessayer' }));
 
-		expect(mockSocketState.retry).toHaveBeenCalledTimes(1);
+		expect(retry).toHaveBeenCalledTimes(1);
 	});
 
 	it('sits under the status bar', () => {
-		render(<ConnectionBanner status="offline" topInset={24} />);
+		render(<ConnectionBanner status="offline" topInset={24} onRetry={retry} />);
 		expect(screen.getByTestId('connection-banner')).toHaveStyle({ paddingTop: 24 });
 	});
 
 	it('picks a readable text color on the background', () => {
-		render(<ConnectionBanner status="failed" topInset={0} />);
+		render(<ConnectionBanner status="failed" topInset={0} onRetry={retry} />);
 		// Default theme error: white would be 3.8:1, dark text is 5:1.
 		expect(screen.getByText('Connexion perdue')).toHaveStyle({ color: FIXED_COLORS.inkDark });
 	});

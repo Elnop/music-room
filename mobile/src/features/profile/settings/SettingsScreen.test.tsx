@@ -6,7 +6,7 @@ import { originalTheme } from '@/shared/theme/original.theme';
 import { subscriptionApi } from '@/shared/services/subscriptionApi';
 import { showError } from '@/shared/utils/toast';
 import type { Subscription } from '@/shared/types/subscription';
-import { SettingsOrchestrator } from './components/orchestrators/SettingsOrchestrator';
+import { SettingsContainer } from '@/features/profile/settings/components/SettingsContainer';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -48,7 +48,7 @@ let client: QueryClient;
 function renderSettings() {
 	render(
 		<QueryClientProvider client={client}>
-			<SettingsOrchestrator />
+			<SettingsContainer />
 		</QueryClientProvider>
 	);
 }
@@ -61,7 +61,7 @@ beforeEach(() => {
 
 afterEach(() => client.clear());
 
-describe('SettingsOrchestrator', () => {
+describe('SettingsContainer', () => {
 	it('renders the subscription and server sections without a theme picker', async () => {
 		renderSettings();
 		expect(screen.getByText('Abonnement')).toBeTruthy();

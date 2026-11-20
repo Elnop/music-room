@@ -2,13 +2,13 @@ import React from 'react';
 import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '@/features/auth/types';
-import { WelcomeOrchestrator } from '@/features/auth/welcome/components/orchestrators/WelcomeOrchestrator';
-import { LoginOrchestrator } from '@/features/auth/login/components/orchestrators/LoginOrchestrator';
-import { RegisterOrchestrator } from '@/features/auth/register/components/orchestrators/RegisterOrchestrator';
-import { EmailVerificationOrchestrator } from '@/features/auth/emailVerification/components/orchestrators/EmailVerificationOrchestrator';
-import { ForgotPasswordOrchestrator } from '@/features/auth/forgotPassword/components/orchestrators/ForgotPasswordOrchestrator';
-import { ResetPasswordOrchestrator } from '@/features/auth/resetPassword/components/orchestrators/ResetPasswordOrchestrator';
-import { PrivacyPolicyOrchestrator } from '@/features/legal/privacyPolicy/components/orchestrators/PrivacyPolicyOrchestrator';
+import { WelcomeContainer } from '@/features/auth/welcome/components/WelcomeContainer';
+import { LoginContainer } from '@/features/auth/login/components/LoginContainer';
+import { RegisterContainer } from '@/features/auth/register/components/RegisterContainer';
+import { EmailVerificationContainer } from '@/features/auth/emailVerification/components/EmailVerificationContainer';
+import { ForgotPasswordContainer } from '@/features/auth/forgotPassword/components/ForgotPasswordContainer';
+import { ResetPasswordContainer } from '@/features/auth/resetPassword/components/ResetPasswordContainer';
+import { PrivacyPolicyContainer } from '@/features/legal/privacyPolicy/components/PrivacyPolicyContainer';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { useBreakpoint } from '@/shared/hooks/useBreakpoint';
 import { screenHeader, screenLayout } from '@/navigation/screenLayout';
@@ -40,33 +40,33 @@ export function AuthNavigator() {
 		>
 			<Stack.Screen
 				name="Welcome"
-				component={WelcomeOrchestrator}
+				component={WelcomeContainer}
 				options={{ title: 'Bienvenue', headerShown: false }}
 			/>
-			<Stack.Screen name="Login" component={LoginOrchestrator} options={{ title: 'Connexion' }} />
+			<Stack.Screen name="Login" component={LoginContainer} options={{ title: 'Connexion' }} />
 			<Stack.Screen
 				name="Register"
-				component={RegisterOrchestrator}
+				component={RegisterContainer}
 				options={{ title: 'Inscription' }}
 			/>
 			<Stack.Screen
 				name="EmailVerification"
-				component={EmailVerificationOrchestrator}
+				component={EmailVerificationContainer}
 				options={{ title: "Vérification de l'email" }}
 			/>
 			<Stack.Screen
 				name="ForgotPassword"
-				component={ForgotPasswordOrchestrator}
+				component={ForgotPasswordContainer}
 				options={{ title: 'Mot de passe oublié' }}
 			/>
 			<Stack.Screen
 				name="ResetPassword"
-				component={ResetPasswordOrchestrator}
+				component={ResetPasswordContainer}
 				options={{ title: 'Nouveau mot de passe' }}
 			/>
 			<Stack.Screen
 				name="PrivacyPolicy"
-				component={PrivacyPolicyOrchestrator}
+				component={PrivacyPolicyContainer}
 				options={{
 					title: 'Politique de confidentialité',
 					headerTitle: 'Politique de confidentialité',

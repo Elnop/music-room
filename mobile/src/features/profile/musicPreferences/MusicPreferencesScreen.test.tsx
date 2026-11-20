@@ -1,7 +1,7 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MusicPreferencesOrchestrator } from './components/orchestrators/MusicPreferencesOrchestrator';
+import { MusicPreferencesContainer } from '@/features/profile/musicPreferences/components/MusicPreferencesContainer';
 import { privacyApi } from '@/features/profile/services/privacyApi';
 import type { MusicGenre } from '@/types/user.types';
 
@@ -42,7 +42,7 @@ function renderLoaded(): Promise<void> {
 	});
 	render(
 		<QueryClientProvider client={client}>
-			<MusicPreferencesOrchestrator />
+			<MusicPreferencesContainer />
 		</QueryClientProvider>
 	);
 	return screen.findByText(/Quels genres aimez-vous/).then(() => undefined);

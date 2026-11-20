@@ -18,6 +18,7 @@ import BarsSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/bars-solid
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 import SoundOnSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/sound-on-solid.svg';
 import TrashSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/trash-solid.svg';
+import type { MenuAnchor } from '@/shared/utils/menuPlacement';
 
 interface SwipeableTrackItemProps {
 	track: Track;
@@ -27,7 +28,7 @@ interface SwipeableTrackItemProps {
 	onAddToQueue?: () => void;
 	onDragStart?: () => void;
 	isDragActive?: boolean;
-	onShowActions?: () => void;
+	onShowActions?: (anchor?: MenuAnchor) => void;
 	isCurrent?: boolean;
 	onPress?: () => void;
 	isPending?: boolean;
@@ -96,7 +97,7 @@ export function SwipeableTrackItem({
 					{/* The row's buttons sit beside its pressable area, never in it: the web nests no <button>. */}
 					<Pressable
 						onPress={onPress}
-						onLongPress={actions}
+						onLongPress={actions ? () => actions() : undefined}
 						accessibilityLabel={`${track.title}, ${track.artist}${unavailable ? ', indisponible' : ''}`}
 						accessibilityHint={actions ? 'Appui long pour les actions du titre' : undefined}
 						accessibilityState={{ selected: isCurrent, busy: isPending, disabled: unavailable }}

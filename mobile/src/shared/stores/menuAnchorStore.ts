@@ -11,3 +11,7 @@ export const useMenuAnchorStore = create<MenuAnchorState>(set => ({
 	anchor: null,
 	setAnchor: anchor => set({ anchor }),
 }));
+
+export function recordMenuAnchor(anchor?: MenuAnchor): void {
+	if (anchor) useMenuAnchorStore.getState().setAnchor(anchor);
+}
