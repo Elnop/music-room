@@ -12,10 +12,6 @@ jest.mock('@/shared/theme/components/ThemeContext', () => {
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-jest.mock('@/shared/playback/lib/playbackBridge', () => ({
-	usePlayerHeight: () => 0,
-}));
-
 jest.mock('@react-navigation/native', () => ({
 	useNavigation: () => ({ navigate: mockNavigate, setOptions: mockSetOptions }),
 	useFocusEffect: jest.fn(),

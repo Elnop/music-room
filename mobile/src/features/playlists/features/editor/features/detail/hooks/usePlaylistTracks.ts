@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSession } from '@/shared/backend/lib/authSession';
-import { getPlayback, usePlaylistPlayback } from '@/shared/playback/lib/playbackBridge';
+import type { PlaybackActions, PlaylistPlayback } from '@/shared/playback/lib/playbackActions';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { logger } from '@/shared/logging/logger';
 import { afterRankForDrop } from '@/shared/tracks/lib/moveTarget';
@@ -41,11 +41,12 @@ export interface PlaylistTracks {
 
 export function usePlaylistTracks(
 	id: string,
-	playlist: PlaylistWithTracks | undefined
+	playlist: PlaylistWithTracks | undefined,
+	playback: PlaybackActions & PlaylistPlayback
 ): PlaylistTracks {
 	const client = useQueryClient();
 	const userId = useSession(session => session.user?.id);
-	const { playingUri } = usePlaylistPlayback(id);
+	const { playingUri } = playback;
 	const isMoving = usePendingMovesStore(state => state.count > 0);
 	const removeTrack = useRemoveTrack();
 	const moveTrack = useMoveTrack();
@@ -94,7 +95,7 @@ export function usePlaylistTracks(
 			setActionTrack(toTrackInput(track));
 		},
 		closeActions: () => setActionTrack(null),
-		addToQueue: track => void getPlayback().addToQueue(toTrackInput(track)),
+		addToQueue: track => void playback.addToQueue(toTrackInput(track)),
 		explainUnavailable: () => showInfo("Ce titre n'est plus disponible sur SoundCloud"),
 		deleteTrack,
 		reorder,

@@ -5,16 +5,22 @@ import type { PlaylistStackParamList } from '@/features/playlists/shared/playlis
 import { useSearchTracks } from '@/features/playlists/features/editor/features/search-tracks/useSearchTracks';
 import { SearchTracksView } from '@/features/playlists/features/editor/features/search-tracks/components/presenters/SearchTracksView';
 import type { TrackActionsSheetComponent } from '@/shared/playback/lib/trackActionsSheet';
+import type { PlaybackActions } from '@/shared/playback/lib/playbackActions';
 
 type SearchTracksOrchestratorProps = NativeStackScreenProps<
 	PlaylistStackParamList,
 	'SearchTracks'
 > & {
 	TrackActionsSheet: TrackActionsSheetComponent;
+	playback: PlaybackActions;
 };
 
-export function SearchTracksContainer({ route, TrackActionsSheet }: SearchTracksOrchestratorProps) {
-	const screen = useSearchTracks(route.params.playlistId);
+export function SearchTracksContainer({
+	route,
+	TrackActionsSheet,
+	playback,
+}: SearchTracksOrchestratorProps) {
+	const screen = useSearchTracks(route.params.playlistId, playback);
 	const bottomPadding = useBottomPadding();
 
 	return (

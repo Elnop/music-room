@@ -16,10 +16,6 @@ jest.mock('@/shared/theme/components/ThemeContext', () => {
 	return { useTheme: () => ({ theme: originalTheme }) };
 });
 
-jest.mock('@/shared/playback/lib/playbackBridge', () => ({
-	usePlayerHeight: () => 0,
-}));
-
 jest.mock('@/shared/backend/lib/authSession', () => ({
 	useSession: () => true,
 }));

@@ -6,7 +6,6 @@ import { Text } from '@/shared/theme/components/Text';
 import { createQueryClient } from '@/shared/backend/queryClient';
 import { queryKeys } from '@/shared/query-keys/keys';
 import { resetBackendUrl } from '@/shared/backend/lib/backendUrl';
-import '@test-utils/playback';
 import { showError } from '@/shared/theme/lib/toast';
 import type { PlaylistStackParamList } from '@/features/playlists/shared/playlist/lib/types';
 import { deferred } from '@test-utils/deferred';
@@ -15,6 +14,7 @@ import { mockFetchRoutes } from '@test-utils/fetchRoutes';
 import { fail, ok } from '@test-utils/fetchResponses';
 import { signIn } from '@test-utils/session';
 import { playlistTrack, playlistWithTracks } from '@test-utils/playlistFixtures';
+import { testPlayback } from '@test-utils/playback';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
 	jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -62,6 +62,7 @@ async function renderScreen() {
 			route={{ key: 'k', name: 'SearchTracks', params: { playlistId: 'p1' } } as Props['route']}
 			navigation={{} as Props['navigation']}
 			TrackActionsSheet={({ track }) => (track ? <Text>{`actions ${track.title}`}</Text> : null)}
+			playback={testPlayback}
 		/>,
 		client
 	);

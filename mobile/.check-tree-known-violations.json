@@ -1,7 +1,7 @@
 [
   "src/assets is not a layer: src/ holds app/, features/ and shared/ next to its entry files, move it into one of them",
-  "src/navigation holds 11 components files (AlignedHeader.tsx, AppNavigator.tsx, AppTabBar.tsx, AuthNavigator.tsx, BackendUrlField.tsx, ConnectionBanner.tsx, KeyboardShortcuts.tsx, QueueSheet.tsx, RootNavigator.tsx, ShortcutsHelpDialog.tsx, SidebarAccount.tsx): move them into components/",
-  "src/navigation holds 6 lib files (documentTitle.ts, linking.ts, playbackBridge.ts, screenPaths.ts, screenWidths.ts, webBasePath.ts): move them into lib/",
+  "src/navigation holds 12 components files (AlignedHeader.tsx, AppNavigator.tsx, AppTabBar.tsx, AuthNavigator.tsx, BackendUrlField.tsx, ConnectionBanner.tsx, KeyboardShortcuts.tsx, QueueSheet.tsx, RootNavigator.tsx, ShortcutsHelpDialog.tsx, SidebarAccount.tsx, TrackActionsSheet.tsx): move them into components/",
+  "src/navigation holds 5 lib files (documentTitle.ts, linking.ts, screenPaths.ts, screenWidths.ts, webBasePath.ts): move them into lib/",
   "src/navigation is not a layer: src/ holds app/, features/ and shared/ next to its entry files, move it into one of them",
   "src/navigation/stacks holds 4 components files (FriendsStack.tsx, PlaylistsStack.tsx, ProfileStack.tsx, SearchStack.tsx): move them into components/",
   "src/providers holds 3 components files (AlertHostContainer.tsx, AppProviders.tsx, ErrorBoundary.tsx): move them into components/",

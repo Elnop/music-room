@@ -5,7 +5,6 @@ import { registerAuthSession, type SessionView } from '@/shared/backend/lib/auth
 import { friendsApi } from '@/features/user/features/friends/shared/follows/friendsApi';
 import { renderWithClient } from '@test-utils/renderWithClient';
 import { signIn } from '@test-utils/session';
-import '@test-utils/playback';
 import { FriendsContainer } from './FriendsContainer';
 
 jest.mock('@react-native-async-storage/async-storage', () =>

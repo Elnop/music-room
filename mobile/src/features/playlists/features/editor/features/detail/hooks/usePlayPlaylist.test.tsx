@@ -13,11 +13,11 @@ jest.mock('@/shared/theme/lib/toast', () => ({ showInfo: jest.fn() }));
 
 const { playPlaylist, pause, resume } = testPlayback;
 const setState = (state: 'playing' | 'paused' | 'loading' | null) => {
-	testPlayback.playing = { playingUri: null, state };
+	testPlayback.state = state;
 };
 
 function Harness({ playlistId }: { playlistId: string }) {
-	return <PlayPlaylistButton play={usePlayPlaylist(playlistId)} />;
+	return <PlayPlaylistButton play={usePlayPlaylist(playlistId, { ...testPlayback })} />;
 }
 
 const renderButton = async (playlistId = 'p1') => {

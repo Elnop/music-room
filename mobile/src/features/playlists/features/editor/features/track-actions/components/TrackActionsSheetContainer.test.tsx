@@ -91,7 +91,9 @@ afterEach(() => {
 });
 
 const renderSheet = () => {
-	const view = renderWithClient(<TrackActionsSheetContainer track={track} onClose={onClose} />);
+	const view = renderWithClient(
+		<TrackActionsSheetContainer track={track} onClose={onClose} playback={testPlayback} />
+	);
 	clear = () => view.client.clear();
 	return view;
 };

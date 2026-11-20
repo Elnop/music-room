@@ -4,7 +4,7 @@ import { usePlayerAudio } from '@/features/playback/shared/player/hooks/usePlaye
 import { useAutoplayPrompt } from '@/features/playback/shared/player/hooks/useAutoplayPrompt';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 import { useAutoplayStore } from '@/features/playback/shared/player/stores/autoplayStore';
-import { useMusicControlEmitter } from '@/features/playback/features/control-delegation/hooks/useMusicControlEmitter';
+import { useMusicControlEmitter } from './useMusicControlEmitter';
 import { showAlert } from '@/shared/alerts/alert';
 import type { DeviceCommand } from '@/shared/playback/lib/queue.types';
 import {
@@ -12,9 +12,6 @@ import {
 	autoplayRefusal,
 	installFakeDocument,
 } from '@test-utils/fakeMediaElement';
-import { registerPlayback } from './playbackBridge';
-
-// The browser as a delegated device: a friend's commands drive the web player, and the status it sends back is true.
 
 jest.mock('@/features/playback/shared/player/lib/audioPlayer', () =>
 	jest.requireActual('@/features/playback/shared/player/lib/audioPlayer.web')
@@ -103,8 +100,6 @@ async function receiveTrack() {
 	act(() => media.loadStream(180));
 	await settle();
 }
-
-beforeAll(() => registerPlayback());
 
 beforeEach(() => {
 	jest.useFakeTimers();

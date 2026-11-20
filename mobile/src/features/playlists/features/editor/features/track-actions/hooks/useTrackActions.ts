@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Share } from 'react-native';
-import { getPlayback } from '@/shared/playback/lib/playbackBridge';
+import type { PlaybackActions } from '@/shared/playback/lib/playbackActions';
 import { useSession } from '@/shared/backend/lib/authSession';
 import { apiErrorMessage } from '@/shared/backend/lib/apiErrorMessage';
 import { logger } from '@/shared/logging/logger';
@@ -37,7 +37,8 @@ export interface TrackActions {
 export function useTrackActions(
 	track: AddQueueItemBody | null,
 	onClose: () => void,
-	start: TrackActionsStart = 'actions'
+	start: TrackActionsStart = 'actions',
+	playback: PlaybackActions
 ): TrackActions {
 	const userId = useSession(session => session.user?.id);
 	const [shown, setShown] = useState(track);
@@ -73,8 +74,8 @@ export function useTrackActions(
 		step,
 		editable,
 		loadingPlaylists: list.isFetching && editable.length === 0,
-		playNext: () => run(body => getPlayback().playNext(body)),
-		addToQueue: () => run(body => getPlayback().addToQueue(body)),
+		playNext: () => run(body => playback.playNext(body)),
+		addToQueue: () => run(body => playback.addToQueue(body)),
 		openPlaylists: () => setStep('playlists'),
 		backToActions: () => setStep('actions'),
 		openNewPlaylist: () => {
