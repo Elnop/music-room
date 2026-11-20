@@ -23,7 +23,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkTreeEntry, followFolderRenames } from './check-tree-entries.mjs';
+import { checkTreeEntry, followFolderRenames, movedIntoFolder } from './check-tree-entries.mjs';
 import { followRenames, parseRenames } from './renames.mjs';
 
 const root = resolve(fileURLToPath(import.meta.url), '../../..');
@@ -175,6 +175,7 @@ const lists = [
             read: readCheckTree,
             follow: followFolderRenames,
             newRule: 'check-tree',
+            fromMovedCode: movedIntoFolder,
           },
         ]
       : []),
@@ -234,6 +235,7 @@ const newRuleBaselines = JSON.parse(
 // --- comparison --------------------------------------------------------------
 
 const newRules = new Set();
+const movedEntries = new Set();
 
 const growths = [];
 for (const list of lists) {
@@ -273,9 +275,10 @@ for (const list of lists) {
     }
     const renames = renamesSince(reference.rev);
     const previousEntries = new Set(
-      [...(previous.entries ?? [])].map((entry) =>
-        (list.follow ?? followRenames)(entry, renames, list.project)
-      )
+      [...(previous.entries ?? [])].flatMap((entry) => [
+        entry,
+        (list.follow ?? followRenames)(entry, renames, list.project),
+      ])
     );
     for (const [key, value] of Object.entries(current.counts ?? {})) {
       const was = previous.counts?.[key] ?? 0;
@@ -289,10 +292,14 @@ for (const list of lists) {
         growths.push(`${list.path}: ${key} grew from ${was} to ${value} (vs ${reference.label})`);
       }
     }
+    const listGrew = (current.entries?.size ?? 0) > (previous.entries?.size ?? 0);
     for (const entry of current.entries ?? []) {
-      if (!previousEntries.has(entry)) {
-        growths.push(`${list.path}: new or changed entry ${entry} (vs ${reference.label})`);
+      if (previousEntries.has(entry)) continue;
+      if (!listGrew && list.fromMovedCode?.(entry, renames, list.project)) {
+        movedEntries.add(`${list.path}: ${entry} (vs ${reference.label})`);
+        continue;
       }
+      growths.push(`${list.path}: new or changed entry ${entry} (vs ${reference.label})`);
     }
     // A rule's allowed-paths may grow only through new-rule-baselines.json.
     for (const entry of current.allowed ?? []) {
@@ -348,6 +355,7 @@ if (growths.length > 0) {
   process.exit(1);
 }
 for (const rule of newRules) console.log(`new rule, baseline accepted: ${rule}`);
+for (const entry of movedEntries) console.log(`moved code, entry accepted: ${entry}`);
 console.log(
   `exception lists did not grow (${lists.length} files and inline escapes, vs ${references.map((r) => r.label).join(' and ') || 'nothing'})`
 );
