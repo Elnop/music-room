@@ -2,7 +2,7 @@ import { renderHook } from '@testing-library/react-native';
 import { getPlayback, usePlaylistPlayback } from '@/shared/playback/lib/playbackBridge';
 import { usePlayerStore } from '@/features/player/stores/playerStore';
 import { useQueueStore } from '@/features/queue/stores/queueStore';
-import { useAuthStore } from '@/features/auth/stores/authStore';
+import { useAuthStore } from '@/features/user/features/auth/shared/sign-in/authStore';
 import type { QueueItem } from '@/shared/playback/lib/queue.types';
 import type { UserProfile } from '@/shared/users/user.types';
 import { registerPlayback } from './playbackBridge';

@@ -3,7 +3,7 @@ import { Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { act, render, screen } from '@testing-library/react-native';
 import { RootNavigator } from './RootNavigator';
-import { useAuthStore } from '@/features/auth/stores/authStore';
+import { useAuthStore } from '@/features/user/features/auth/shared/sign-in/authStore';
 import { clearPendingLink } from './linking';
 import { logger } from '@/shared/logging/logger';
 

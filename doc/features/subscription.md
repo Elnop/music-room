@@ -2,7 +2,7 @@
 
 Bonus V.3 (epic #478): each user is on a free or a premium plan and can switch from one to the other. The premium plan unlocks features the free plan lacks; the first one is a custom playlist cover (#483).
 
-Code: `backend/src/shared/subscription/plan.ts` (plan check, used by every feature that gates on Premium), `backend/src/features/subscription/` (the endpoints), migration `030_subscription_plan.sql`; mobile `src/features/subscription/` (`usePlan.ts`, `lib/subscriptionApi.ts`, `PlanContainer.tsx`) and the Settings screen (`features/profile/settings/`).
+Code: `backend/src/shared/subscription/plan.ts` (plan check, used by every feature that gates on Premium), `backend/src/features/subscription/` (the endpoints), migration `030_subscription_plan.sql`; mobile `src/features/subscription/` (`usePlan.ts`, `lib/subscriptionApi.ts`, `PlanContainer.tsx`) and the Settings screen (`features/user/features/settings/`).
 
 ## The two plans
 

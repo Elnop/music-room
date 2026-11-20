@@ -1,0 +1,54 @@
+import React from 'react';
+import { View, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
+import { CODE_INPUT_MAX_LENGTH } from './codeDigits';
+import { TextInput } from '@/shared/theme/components/TextInput';
+import { useTheme } from '@/shared/theme/components/ThemeContext';
+import { focusedFieldStyle } from '@/shared/theme/lib/fieldFocus';
+
+interface CodeInputProps {
+	digits: string[];
+	setBoxRef: (index: number) => (input: TextInput | null) => void;
+	onChangeDigit: (index: number, text: string) => void;
+	onKeyPress: (index: number, key: string) => void;
+	containerStyle: StyleProp<ViewStyle>;
+	boxStyle: (filled: boolean) => StyleProp<TextStyle>;
+	autoFocus?: boolean;
+	editable?: boolean;
+}
+
+/** The first box accepts a pasted or autofilled code. */
+export function CodeInput({
+	digits,
+	setBoxRef,
+	onChangeDigit,
+	onKeyPress,
+	containerStyle,
+	boxStyle,
+	autoFocus,
+	editable,
+}: CodeInputProps) {
+	const { theme } = useTheme();
+	const focusedStyle = focusedFieldStyle(theme.colors.primary);
+	return (
+		<View style={containerStyle}>
+			{digits.map((digit, index) => (
+				<TextInput
+					key={index}
+					ref={setBoxRef(index)}
+					style={boxStyle(digit !== '')}
+					focusedStyle={focusedStyle}
+					value={digit}
+					onChangeText={text => onChangeDigit(index, text)}
+					onKeyPress={({ nativeEvent: { key } }) => onKeyPress(index, key)}
+					keyboardType="number-pad"
+					maxLength={CODE_INPUT_MAX_LENGTH}
+					autoComplete={index === 0 ? 'sms-otp' : 'off'}
+					textContentType={index === 0 ? 'oneTimeCode' : 'none'}
+					selectTextOnFocus
+					autoFocus={autoFocus && index === 0}
+					editable={editable}
+				/>
+			))}
+		</View>
+	);
+}

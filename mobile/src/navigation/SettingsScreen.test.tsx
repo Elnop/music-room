@@ -6,7 +6,7 @@ import { originalTheme } from '@/shared/theme/lib/original.theme';
 import { subscriptionApi } from '@/features/subscription/lib/subscriptionApi';
 import { showError } from '@/shared/theme/lib/toast';
 import type { Subscription } from '@/features/subscription/lib/subscription';
-import { SettingsContainer } from '@/features/profile/settings/components/SettingsContainer';
+import { SettingsContainer } from '@/features/user/features/settings/components/SettingsContainer';
 import { PlanContainer } from '@/features/subscription/PlanContainer';
 
 jest.mock('@react-native-async-storage/async-storage', () =>

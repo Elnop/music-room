@@ -108,18 +108,18 @@ The thresholds come from `backend/src/shared/config/rate-limit.config.ts` (envir
 - `POST /api/auth/logout` puts the SHA-256 hash of the access token in a Redis revocation list until its `exp` (`revoke`, `backend/src/features/auth/services/token-revocation.service.ts`), then ends the Supabase session with `signOut(token, 'local')`, which invalidates the refresh token (`logout`, `backend/src/features/auth/services/session.service.ts`). The user's other devices stay signed in.
 - Every request checks the revocation list before Supabase (`verifyToken`, `session.service.ts`); without Redis, `503 REVOCATION_UNAVAILABLE`, never an acceptance.
 - `POST /api/auth/refresh` answers 401 to a refused refresh token and 503 if Supabase is unavailable (#126): the app does not sign the user out because of an outage.
-- Mobile: `endSessionLocally` (`mobile/src/features/auth/stores/sessionActions.ts`) clears the session even if the backend call fails.
+- Mobile: `endSessionLocally` (`mobile/src/features/user/features/auth/shared/sign-in/lib/sessionActions.ts`) clears the session even if the backend call fails.
 
 **Tests.**
 - `backend/src/features/auth/services/logout.int.test.ts`: "rejects the old access token and the old refresh token", "keeps the same user's other session signed in".
 - `backend/src/features/auth/services/session.service.test.ts`: "rejects a revoked token with 401 TOKEN_REVOKED without calling Supabase", "keeps the 503 REVOCATION_UNAVAILABLE from the denylist check", 401 / 503 cases of `refreshToken`.
 - `backend/src/features/auth/services/token-revocation.service.test.ts`: "stores a SHA-256 hash of the token, never the token".
 - `backend/src/features/auth/auth.middleware.test.ts`: "answers 401 TOKEN_REVOKED for a token revoked by a logout".
-- `mobile/src/features/auth/stores/authStore.test.ts`: "still ends the session when the backend logout fails".
+- `mobile/src/features/user/features/auth/shared/sign-in/authStore.test.ts`: "still ends the session when the backend logout fails".
 
 **Accepted risks.**
 - A stolen token stays valid until it is revoked or expires (lifetime set by Supabase Auth). The token is not bound to the device.
-- Tokens are stored in AsyncStorage (`mobile/src/features/auth/services/sessionStorage.ts`), unencrypted. Reason: it needs a rooted phone or physical access; `expo-secure-store` would be the improvement. On the web, the same module writes to `localStorage`: see M14.
+- Tokens are stored in AsyncStorage (`mobile/src/features/user/features/auth/shared/sign-in/lib/sessionStorage.ts`), unencrypted. Reason: it needs a rooted phone or physical access; `expo-secure-store` would be the improvement. On the web, the same module writes to `localStorage`: see M14.
 - In `make dev-docker` and `make dev-local`, the app talks to the backend over `http://` and `ws://` on the local network (`DEV_API_URL` in `make/config.mk`): tokens in clear text on the Wi-Fi. `make dev-tunnel` goes through HTTPS (ngrok). Reason: development environment, no production deployment.
 
 ## M6. Token revoked while a socket is already open
@@ -132,7 +132,7 @@ The thresholds come from `backend/src/shared/config/rate-limit.config.ts` (envir
 
 **Tests.**
 - `backend/src/realtime/socket-auth.int.test.ts`: "refuses a token revoked by logout with INVALID_TOKEN (#71)".
-- `mobile/src/features/auth/stores/authStore.test.ts`: "revokes the session on the backend, disconnects the socket and clears the session".
+- `mobile/src/features/user/features/auth/shared/sign-in/authStore.test.ts`: "revokes the session on the backend, disconnects the socket and clears the session".
 
 **Accepted risk.** The token is checked at the handshake only (documented in `backend/README.md`). A malicious client that keeps its socket open after logout, or past its token's expiry, stays connected until it disconnects or the server restarts. #70 covers the app, not a modified client. Reason: only the official app disconnects by itself; re-checking the token on every event, or disconnecting the user's sockets at logout, would be the fix (L6). Room rights are still re-checked on every change (M10), so such a socket gains no access.
 
@@ -265,12 +265,12 @@ Bonus V.1, the web client ([web-client.md](../features/web-client.md)).
 - No HTML injection: the app renders user data (playlist and track names, profiles, event texts) through React Native components, which react-native-web writes as escaped text. The code has no `dangerouslySetInnerHTML`, `innerHTML`, `eval` or `new Function`; the few DOM nodes it builds itself (`pickDateTime.web.ts`, `loadScript.ts`) set `textContent` or a fixed `src`.
 - Short access token: `jwt_expiry = 3600` (`backend/supabase/config.toml`), with refresh token rotation (`enable_refresh_token_rotation`), so each refresh replaces the refresh token.
 - Logout revokes both tokens on the backend, as on Android (M5): the access token through the Redis revocation list, the refresh token through `signOut`. A user who suspects theft signs out.
-- Third-party scripts: only Google Identity Services (`https://accounts.google.com/gsi/client`) and the Facebook SDK (`https://connect.facebook.net/en_US/sdk.js`), injected by `features/auth/utils/loadScript.ts` on the sign-in, sign-up and linked-accounts screens only (`useProviderButtons.web.ts`), never at page load. No analytics or advertising script.
+- Third-party scripts: only Google Identity Services (`https://accounts.google.com/gsi/client`) and the Facebook SDK (`https://connect.facebook.net/en_US/sdk.js`), injected by `features/user/features/auth/shared/sign-in/lib/loadScript.ts` on the sign-in, sign-up and linked-accounts screens only (`useProviderButtons.web.ts`), never at page load. No analytics or advertising script.
 - CORS: the backend answers browsers only from `ALLOWED_ORIGINS` (M9), so another site cannot call the API with the user's tokens unless it holds them.
 
 **Tests.**
-- `mobile/src/features/auth/utils/loadScript.test.ts`: one load per URL, a failed load retried.
-- `mobile/src/features/auth/hooks/useProviderButtons.web.test.ts`: Google's button rendered by the screen, the app's button back when the script fails.
+- `mobile/src/features/user/features/auth/shared/sign-in/lib/loadScript.test.ts`: one load per URL, a failed load retried.
+- `mobile/src/features/user/features/auth/shared/sign-in/hooks/useProviderButtons.web.test.ts`: Google's button rendered by the screen, the app's button back when the script fails.
 - M5's logout tests apply unchanged (same endpoints).
 
 **Accepted risks.**

@@ -3,10 +3,8 @@ import { useFonts } from 'expo-font';
 import { AppProviders } from '@/providers/AppProviders';
 import { RootNavigator } from '@/navigation/RootNavigator';
 import { ThemedSystemUI } from '@/shared/theme/components/ThemedSystemUI';
-import { configureGoogleSignIn } from '@/features/auth/services/googleSignIn';
-import { initializeFacebookSDK } from '@/features/auth/services/facebookSignIn';
-// Registers the linked accounts bridge.
-import '@/features/auth/hooks/useLinkedProviders';
+import { configureGoogleSignIn } from '@/features/user/features/auth/shared/sign-in/lib/googleSignIn';
+import { initializeFacebookSDK } from '@/features/user/features/auth/shared/sign-in/lib/facebookSignIn';
 import { restoreRedirectedPath } from '@/navigation/webBasePath';
 import { onBackendError } from '@/shared/backend/lib/backendErrors';
 import { logger } from '@/shared/logging/logger';
