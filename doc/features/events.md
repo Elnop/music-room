@@ -27,7 +27,7 @@ Every event is public. Any signed-in user creates one; only its creator (the org
 | `DELETE /api/events/:id` | Organiser only |
 | `GET /api/events/geocode?q=` | Coordinates of a typed address, for the web app, which has no geocoder: the backend asks OpenStreetMap's Nominatim and answers `{ location: { latitude, longitude, displayName } \| null }`. Per user `RATE_LIMIT_GEOCODE_*` (60 per hour), and one Nominatim request per second for the whole backend (`shared/security/upstream-slot.ts`, a Redis key): a request waits up to 3 s for its turn, then gets 429. Answers, « not found » included, are cached 7 days in Redis by trimmed, lowercased address (`services/geocode-cache.service.ts`), and a cached answer takes no slot |
 
-Writes are rate-limited per user (`RATE_LIMIT_EVENTS_*`, 60 per hour). Each write is broadcast to every connected socket: `event:created` and `event:updated` with the whole event, `event:deleted` with `{ eventId }`. The app applies them to its TanStack Query cache (`features/events/utils/eventSocketRules.ts`, mounted once by `useEventsSync`), so lists and pages change without a reload.
+Writes are rate-limited per user (`RATE_LIMIT_EVENTS_*`, 60 per hour). Each write is broadcast to every connected socket: `event:created` and `event:updated` with the whole event, `event:deleted` with `{ eventId }`. The app applies them to its TanStack Query cache (`features/events/lib/eventSocketRules.ts`, mounted once by `useEventsSync`), so lists and pages change without a reload.
 
 ## In the app
 
@@ -41,7 +41,7 @@ Two sources feed the section, both only while the home is shown and the app in t
 
 ### GPS
 
-`expo-location` follows the position (`watchPositionAsync`, balanced accuracy, every 20 m or 10 s). The phone computes the distance to each event of `GET /api/events` with the haversine formula (`features/events/utils/geo.ts`) and keeps the ongoing ones within 300 m (`NEARBY_RADIUS_M`), nearest first, with their distance (« 120 m »). A clock re-checks every 30 s, so an event leaves when it ends.
+`expo-location` follows the position (`watchPositionAsync`, balanced accuracy, every 20 m or 10 s). The phone computes the distance to each event of `GET /api/events` with the haversine formula (`features/events/features/nearby/lib/geo.ts`) and keeps the ongoing ones within 300 m (`NEARBY_RADIUS_M`), nearest first, with their distance (« 120 m »). A clock re-checks every 30 s, so an event leaves when it ends.
 
 ### iBeacon
 
@@ -56,7 +56,7 @@ The organiser's phone is the beacon. On the page of an ongoing event, « Diffuse
 | Minor | the event's `beaconMinor` |
 | Measured power | `-59` dBm, the expected RSSI at one metre |
 
-The frame is built in `features/events/utils/ibeacon.ts`. The local Expo module `modules/beacon-advertiser/` (Kotlin, `BluetoothLeAdvertiser`, non-connectable, low latency, high power) only broadcasts the bytes it receives; see [decisions.md](../decisions.md) for why no advertising library was used.
+The frame is built in `features/events/shared/beacon/ibeacon.ts`. The local Expo module `modules/beacon-advertiser/` (Kotlin, `BluetoothLeAdvertiser`, non-connectable, low latency, high power) only broadcasts the bytes it receives; see [decisions.md](../decisions.md) for why no advertising library was used.
 
 The other phones scan with `react-native-ble-plx`, which only reports advertisements. The project decodes the manufacturer data, keeps frames with Zumik's UUID and major, and matches the minor with `beaconMinor`. The distance comes from the RSSI with the log-distance model, `d = 10^((measuredPower − rssi) / (10 × 2.5))`, on an RSSI smoothed per beacon (exponential average, 0.3); a beacon unheard for 8 s is dropped (`utils/beaconDistance.ts`).
 

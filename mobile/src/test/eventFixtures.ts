@@ -1,4 +1,4 @@
-import type { MusicEvent } from '@/features/events/types';
+import type { MusicEvent } from '@/features/events/lib/types';
 
 const HOUR = 3_600_000;
 

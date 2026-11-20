@@ -25,7 +25,7 @@ import { PlayerModalContainer } from '@/features/player/modal/components/orchest
 import { PlayerErrorToastContainer } from '@/features/player/modal/components/orchestrators/PlayerErrorToastContainer';
 import { PlayerProvider } from '@/features/player/context/PlayerProvider';
 import { useQueueSync } from '@/features/queue/hooks/useQueueSync';
-import { useEventsSync } from '@/features/events/hooks/useEventsSync';
+import { useEventsSync } from '@/features/events/useEventsSync';
 import { useRemoteTarget } from '@/features/queue/hooks/useRemoteTarget';
 import { useConnectionStatus } from '@/shared/hooks/useConnectionStatus';
 import { ConnectionBanner } from '@/shared/components/feedback/ConnectionBanner';

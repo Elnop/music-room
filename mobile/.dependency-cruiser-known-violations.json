@@ -1412,57 +1412,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/shared/components/media/RadarScope.tsx",
-    "to": "src/shared/hooks/useLoop.ts",
-    "unresolvedTo": "@/shared/hooks/useLoop",
-    "dependencyTypes": [
-      "aliased",
-      "aliased-tsconfig",
-      "aliased-tsconfig-paths",
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "no-cross-shared"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/shared/components/media/RadarScope.tsx",
-    "to": "src/shared/theme/pixelFrame.ts",
-    "unresolvedTo": "@/shared/theme/pixelFrame",
-    "dependencyTypes": [
-      "aliased",
-      "aliased-tsconfig",
-      "aliased-tsconfig-paths",
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "no-cross-shared"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/shared/components/media/RadarScope.tsx",
-    "to": "src/shared/theme/useThemedStyles.ts",
-    "unresolvedTo": "@/shared/theme/useThemedStyles",
-    "dependencyTypes": [
-      "aliased",
-      "aliased-tsconfig",
-      "aliased-tsconfig-paths",
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "no-cross-shared"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/shared/components/profile/ProfileInfoRows.tsx",
     "to": "src/shared/theme/useThemedStyles.ts",
     "unresolvedTo": "@/shared/theme/useThemedStyles",

@@ -23,9 +23,9 @@ Each native module was already isolated in one service or hook. That file gets a
 | `features/player/services/audioMode.web.ts` | The audio session setup: a tab has none (no-op) |
 | `features/player/services/jsKeepAlive.web.ts` | The Android headless task that keeps JavaScript running in the background: a tab keeps its timers (no-op) |
 | `features/player/mediaSession/hooks/useMediaSession.web.ts` | `expo-media-control`: the browser's Media Session API |
-| `features/events/utils/geocoder.web.ts` | `expo-location` `geocodeAsync`, missing on the web: the backend route `GET /api/events/geocode` |
-| `features/events/utils/pickDateTime.web.ts` | The Android date and time pickers: a modal `<dialog>` with a `datetime-local` field |
-| `features/events/services/beaconScanner.web.ts` | The BLE scan: always reports « unsupported » |
+| `features/events/shared/events/lib/geocoder.web.ts` | `expo-location` `geocodeAsync`, missing on the web: the backend route `GET /api/events/geocode` |
+| `features/events/features/event-form/lib/pickDateTime.web.ts` | The Android date and time pickers: a modal `<dialog>` with a `datetime-local` field |
+| `features/events/features/nearby/lib/beaconScanner.web.ts` | The BLE scan: always reports « unsupported » |
 
 `shared/constants/platform.ts` hides what the browser cannot do: the beacon broadcast (`BEACON_BROADCAST_AVAILABLE`). The backend address field (`BackendUrlField`) works in the browser too, on Welcome and in Settings: the address is kept in the browser's storage, and the chosen backend must list the page's origin in its `ALLOWED_ORIGINS`.
 
