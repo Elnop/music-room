@@ -1,14 +1,5 @@
 {
   "mobile": {
-    "guardrails/ui-primitives": 37,
-    "guardrails/theme-tokens": 136,
-    "guardrails/zustand-selector": 24,
-    "shared-not-to-legacy": 4,
-    "check-tree": 178,
-    "no-cross-shared": 177,
-    "presenters-are-pure": 151,
-    "presenters-render-presenters": 9,
-    "not-to-dev-dep": 2,
     "oxlint": 4564
   },
   "allowedPaths": {
