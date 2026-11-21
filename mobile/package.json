@@ -26,7 +26,7 @@
 		"check:exceptions": "node ../tools/guardrails/check-exceptions.mjs mobile",
 		"format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
 		"type-check": "tsc --noEmit",
-		"test": "node --test eslint/plugin-components.test.mjs ../tools/guardrails/check-tree-entries.test.mjs ../tools/guardrails/check-oxlint.test.mjs && jest",
+		"test": "node --test eslint/plugin-components.test.mjs ../tools/guardrails/*.test.mjs && jest",
 		"test:watch": "jest --watch",
 		"test:coverage": "jest --coverage",
 		"fix": "npm run format && npm run lint:fix",

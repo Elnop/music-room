@@ -215,6 +215,12 @@ if (forkPoint) {
       'Run `git fetch origin develop` for the full check.'
   );
 }
+const landedBaselines = JSON.parse(
+  (forkPoint && git('show', `${forkPoint}:tools/guardrails/new-rule-baselines.json`)) || '{}'
+);
+const isLanded = (project, rule) => landedBaselines[project]?.[rule] !== undefined;
+const baselineFor = (project, rule) =>
+  isLanded(project, rule) ? undefined : newRuleBaselines[project]?.[rule];
 const head = git('rev-parse', 'HEAD')?.trim();
 if (head && head !== forkPoint) references.push({ label: 'HEAD', rev: head });
 
@@ -239,6 +245,14 @@ const newRules = new Set();
 const movedEntries = new Set();
 
 const growths = [];
+for (const [project, rules] of Object.entries(newRuleBaselines)) {
+  if (project === 'allowedPaths') continue;
+  for (const rule of Object.keys(rules).filter((r) => isLanded(project, r))) {
+    growths.push(
+      `tools/guardrails/new-rule-baselines.json: ${project} ${rule} is already on ${base}; remove it, a baseline only serves the ticket that adds its rule`
+    );
+  }
+}
 for (const list of lists) {
   const file = join(root, list.path);
   if (!existsSync(file)) {
@@ -256,7 +270,7 @@ for (const list of lists) {
     const before = git('show', `${reference.rev}:${list.path}`);
     if (before === null) {
       if (list.newRule) {
-        const max = newRuleBaselines[list.project]?.[list.newRule] ?? 0;
+        const max = baselineFor(list.project, list.newRule) ?? 0;
         const count = current.entries
           ? current.entries.size
           : Object.entries(current.counts ?? {})
@@ -288,7 +302,7 @@ for (const list of lists) {
     for (const [key, value] of Object.entries(current.counts ?? {})) {
       const was = previous.counts?.[key] ?? 0;
       const rule = ruleOf(key);
-      const max = newRuleBaselines[list.project]?.[rule];
+      const max = baselineFor(list.project, rule);
       if (!(key in (previous.counts ?? {})) && max !== undefined && value <= max) {
         newRules.add(`${list.path}: ${rule} (vs ${reference.label})`);
         continue;
