@@ -7,11 +7,11 @@ import type { Theme } from '@/shared/theme/lib/types';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { Text } from '@/shared/theme/components/Text';
 
-interface InfoRowProps {
+type InfoRowProps = {
 	icon: PixelIconSource;
 	label: string;
 	text: string;
-}
+};
 
 export function InfoRow({ icon, label, text }: InfoRowProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
@@ -28,11 +28,12 @@ export function InfoRow({ icon, label, text }: InfoRowProps) {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		row: { flexDirection: 'row', alignItems: 'flex-start', gap: theme.spacing.md },
 		icon: { marginTop: 2 },
 		body: { flex: 1 },
 		label: pixelCaption(theme),
 		text: { fontSize: theme.typography.sizes.lg, color: theme.colors.text, marginTop: 2 },
 	});
+	return styles;
 }

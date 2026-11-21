@@ -108,7 +108,7 @@ describe('LibraryContainer', () => {
 		expect(screen.getByText('Mine')).toBeTruthy();
 		expect(screen.getByLabelText('Partagées avec vous')).toBeTruthy();
 		expect(screen.getByText('Shared')).toBeTruthy();
-		expect(routes.calls()).toEqual(['GET /api/playlists']);
+		expect(routes.calls()).toStrictEqual(['GET /api/playlists']);
 	});
 
 	it('opens a playlist and creates one from the header', async () => {

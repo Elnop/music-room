@@ -94,7 +94,7 @@ describe('RegisterContainer', () => {
 			})
 		);
 		expect(request().url).toMatch(/\/api\/auth\/register$/u);
-		expect(request().body).toEqual({
+		expect(request().body).toStrictEqual({
 			email: 'new@example.com',
 			password: 'Secret1!',
 			username: 'newbie',

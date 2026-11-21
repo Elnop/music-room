@@ -51,15 +51,15 @@ afterAll(() => client.clear());
 
 describe('PLAYLIST_SOCKET_RULES', () => {
 	it('applies the next track version and ignores it a second time', () => {
-		expect(emit('playlist:updated', removeA(11))).toEqual(['updated']);
-		expect(emit('playlist:updated', removeA(11))).toEqual(['updated']);
-		expect(shown().tracks.map(t => t.id)).toEqual(['B']);
+		expect(emit('playlist:updated', removeA(11))).toStrictEqual(['updated']);
+		expect(emit('playlist:updated', removeA(11))).toStrictEqual(['updated']);
+		expect(shown().tracks.map(t => t.id)).toStrictEqual(['B']);
 		expect(shown().tracksVersion).toBe(11);
 	});
 
 	it('reloads the playlist when a version is missing or after a rebalance', () => {
-		expect(emit('playlist:updated', removeA(15))).toEqual(['invalidated']);
-		expect(emit('playlist:updated', removeA(11, true))).toEqual(['invalidated']);
+		expect(emit('playlist:updated', removeA(15))).toStrictEqual(['invalidated']);
+		expect(emit('playlist:updated', removeA(11, true))).toStrictEqual(['invalidated']);
 		expect(shown().tracks).toHaveLength(2);
 	});
 
@@ -74,7 +74,7 @@ describe('PLAYLIST_SOCKET_RULES', () => {
 		expect(shown().description).toBeUndefined();
 		expect(shown().coverUrl).toBeUndefined();
 		expect(shown().tracks).toHaveLength(2);
-		expect(client.getQueryData<Playlist[]>(list)!.map(p => p.name)).toEqual([
+		expect(client.getQueryData<Playlist[]>(list)!.map(p => p.name)).toStrictEqual([
 			'Les tubes du Crabe Croustillant',
 			'Other',
 		]);
@@ -95,7 +95,7 @@ describe('PLAYLIST_SOCKET_RULES', () => {
 
 	it('drops a deleted playlist from the list', () => {
 		emit('playlist:deleted', { playlistId: 'p1' });
-		expect(client.getQueryData<Playlist[]>(list)!.map(p => p.id)).toEqual(['p2']);
+		expect(client.getQueryData<Playlist[]>(list)!.map(p => p.id)).toStrictEqual(['p2']);
 	});
 
 	it('marks the tracks whose availability changed, without touching the version', () => {
@@ -103,7 +103,7 @@ describe('PLAYLIST_SOCKET_RULES', () => {
 			playlistId: 'p1',
 			tracks: [{ trackId: 'B', unavailable: true }],
 		});
-		expect(shown().tracks.map(t => [t.id, t.unavailable])).toEqual([
+		expect(shown().tracks.map(t => [t.id, t.unavailable])).toStrictEqual([
 			['A', false],
 			['B', true],
 		]);

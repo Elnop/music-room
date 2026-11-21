@@ -3,13 +3,13 @@ import {
 	loadScript,
 } from '@/features/user/features/auth/shared/sign-in/lib/loadScript';
 
-interface FakeScript {
+type FakeScript = {
 	src: string;
 	async: boolean;
 	onload: (() => void) | null;
 	onerror: (() => void) | null;
 	remove: jest.Mock;
-}
+};
 
 let appended: FakeScript[];
 const realDocument = (globalThis as { document?: unknown }).document;

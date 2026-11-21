@@ -6,14 +6,14 @@ import type { SvgProps } from 'react-native-svg';
 
 export type PixelIconSource = ComponentType<SvgProps>;
 
-interface PixelIconProps {
+type PixelIconProps = {
 	icon: PixelIconSource;
 	color: string;
 	size?: number;
 	style?: StyleProp<ViewStyle>;
 	accessibilityLabel?: string;
 	testID?: string;
-}
+};
 
 export function PixelIcon({
 	icon: Icon,

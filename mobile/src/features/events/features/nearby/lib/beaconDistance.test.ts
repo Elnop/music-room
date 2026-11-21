@@ -24,7 +24,7 @@ describe('sightings', () => {
 	it('smooths the RSSI per beacon and drops a silent one', () => {
 		let sightings = recordSighting(new Map(), 42, { rssi: -70, measuredPower: -59 }, 0);
 		sightings = recordSighting(sightings, 42, { rssi: -60, measuredPower: -59 }, 1_000);
-		expect(sightings.get(42)).toEqual({ rssi: -67, measuredPower: -59, lastSeen: 1_000 });
+		expect(sightings.get(42)).toStrictEqual({ rssi: -67, measuredPower: -59, lastSeen: 1_000 });
 
 		expect(pruneSightings(sightings, 8_000, 8_000).has(42)).toBe(true);
 		expect(pruneSightings(sightings, 9_001, 8_000).has(42)).toBe(false);

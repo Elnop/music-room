@@ -1,12 +1,12 @@
 import { useController } from 'react-hook-form';
 import type { Control, FieldValues, Path } from 'react-hook-form';
 
-export interface CappedField {
+export type CappedField = {
 	value: string;
 	onChangeText: (text: string) => void;
 	error?: string;
 	max: number;
-}
+};
 
 export function useCappedField<Form extends FieldValues>(
 	control: Control<Form>,

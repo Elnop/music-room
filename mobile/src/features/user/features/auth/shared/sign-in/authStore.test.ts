@@ -297,7 +297,7 @@ function expectAuthenticated(): void {
 }
 
 async function expectPersisted(): Promise<void> {
-	expect(JSON.parse((await AsyncStorage.getItem(KEYS.user)) as string)).toEqual(user);
+	expect(JSON.parse((await AsyncStorage.getItem(KEYS.user)) as string)).toStrictEqual(user);
 	expect(await AsyncStorage.getItem(KEYS.access)).toBe('new-access');
 	expect(await AsyncStorage.getItem(KEYS.refresh)).toBe('new-refresh');
 	expect(await AsyncStorage.getItem(KEYS.isAuth)).toBe('true');
@@ -313,7 +313,7 @@ async function expectSignedOutAndNothingStored(): Promise<void> {
 		isAuthenticated: false,
 		isLoading: false,
 	});
-	expect(await AsyncStorage.multiGet(Object.values(KEYS))).toEqual(
+	expect(await AsyncStorage.multiGet(Object.values(KEYS))).toStrictEqual(
 		Object.values(KEYS).map(key => [key, null])
 	);
 }
@@ -327,7 +327,7 @@ describe('refresh during use', () => {
 			useAuthStore.getState().refreshAccessToken(),
 		]);
 
-		expect(results).toEqual([true, true]);
+		expect(results).toStrictEqual([true, true]);
 		expect(calledUrls()).toHaveLength(1);
 		expect(calledUrls()[0]).toMatch(/\/api\/auth\/refresh$/u);
 		expectAuthenticated();
@@ -347,7 +347,7 @@ describe('refresh during use', () => {
 			useAuthStore.getState().refreshAccessToken(),
 		]);
 
-		expect(results).toEqual([false, false]);
+		expect(results).toStrictEqual([false, false]);
 		expect(calledUrls()).toHaveLength(1);
 		await expectSignedOutAndNothingStored();
 	});

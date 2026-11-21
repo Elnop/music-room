@@ -40,7 +40,7 @@ describe('queryKeys', () => {
 	});
 
 	it('builds distinct keys for distinct ids', () => {
-		expect(queryKeys.playlists.detail('a')).toEqual(['playlists', 'detail', 'a']);
-		expect(queryKeys.playlists.detail('a')).not.toEqual(queryKeys.playlists.detail('b'));
+		expect(queryKeys.playlists.detail('a')).toStrictEqual(['playlists', 'detail', 'a']);
+		expect(queryKeys.playlists.detail('a')).not.toStrictEqual(queryKeys.playlists.detail('b'));
 	});
 });

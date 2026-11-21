@@ -12,10 +12,10 @@ import { PasswordRequirements } from '@/features/user/features/auth/features/res
 import { Text } from '@/shared/theme/components/Text';
 import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
 
-interface ResetPasswordViewProps {
+type ResetPasswordViewProps = {
 	email: string;
 	form: ResetPassword;
-}
+};
 
 export function ResetPasswordView({ email, form }: ResetPasswordViewProps) {
 	const { theme } = useTheme();

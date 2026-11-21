@@ -14,7 +14,7 @@ import { useResendResetCode } from '@/features/user/features/auth/features/reset
 
 const BACK_TO_LOGIN_DELAY_MS = 1500;
 
-export interface ResetPassword {
+export type ResetPassword = {
 	code: CodeInput;
 	newPassword: string;
 	changeNewPassword: (text: string) => void;
@@ -26,7 +26,7 @@ export interface ResetPassword {
 	error: string | null;
 	resend: () => void;
 	cooldown: number;
-}
+};
 
 export function useResetPassword(
 	email: string,

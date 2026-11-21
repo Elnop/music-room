@@ -95,7 +95,7 @@ export function BackendUrlFieldContainer() {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		current: {
 			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.textSecondary,
@@ -109,4 +109,5 @@ function createStyles(theme: Theme) {
 			flex: 1,
 		},
 	});
+	return styles;
 }

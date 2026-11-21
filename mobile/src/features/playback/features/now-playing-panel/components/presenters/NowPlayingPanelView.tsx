@@ -23,10 +23,10 @@ import {
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 import TimesSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/times-solid.svg';
 
-interface NowPlayingPanelViewProps extends PlayerSheets {
+type NowPlayingPanelViewProps = PlayerSheets & {
 	TrackActionsSheet: TrackActionsSheetComponent;
 	data: NowPlayingPanelData;
-}
+};
 
 export function NowPlayingPanelView({
 	data,

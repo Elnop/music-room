@@ -3,12 +3,12 @@ import { ContentFrame } from '@/features/shell/components/presenters/ContentFram
 import { usePanelOpen } from '@/features/shell/components/orchestrators/PanelOpenContainer';
 import type { ContentWidth } from '@/shared/theme/lib/layout';
 
-interface ScreenContentProps {
+type ScreenContentProps = {
 	width: ContentWidth;
 	besideSidebar: boolean;
 	scrollsAtEdge: boolean;
 	children: React.ReactNode;
-}
+};
 
 export function ScreenContent({
 	width,

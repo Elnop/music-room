@@ -27,7 +27,7 @@ import type { AddQueueItemBody } from '@/shared/playback/lib/playback';
 import type { SoundCloudTrack } from '@/shared/tracks/lib/soundcloud.types';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 
-interface QueueStoreState {
+type QueueStoreState = {
 	queues: Record<string, OwnerQueue>;
 	loaded: boolean;
 	load: (ownerId?: string) => Promise<void>;
@@ -44,7 +44,7 @@ interface QueueStoreState {
 	moveItem: (itemId: string, afterItemId: string | null) => Promise<boolean>;
 	playPlaylist: (playlistId: string, startTrackId?: string) => Promise<QueueStepOutcome>;
 	playListTrack: (track: SoundCloudTrack) => Promise<void>;
-}
+};
 
 export function useActiveQueue(): OwnerQueue {
 	const ownerId = useActiveOwnerId();

@@ -29,12 +29,12 @@ export function getBuildLabel(): string {
 	);
 }
 
-export interface DeviceInfo {
+export type DeviceInfo = {
 	deviceId: string;
 	deviceName: string;
 	platform: string;
 	model: string;
-}
+};
 
 export const deviceService = {
 	async getDeviceInfo(): Promise<DeviceInfo> {

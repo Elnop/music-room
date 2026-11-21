@@ -26,7 +26,7 @@ describe('startEventBeacon', () => {
 		const [companyId, data] = mockNative.start.mock.calls[0];
 		expect(companyId).toBe(0x004c);
 		expect(data).toHaveLength(23);
-		expect(data.slice(20, 22)).toEqual([0, 42]);
+		expect(data.slice(20, 22)).toStrictEqual([0, 42]);
 	});
 
 	it.each([

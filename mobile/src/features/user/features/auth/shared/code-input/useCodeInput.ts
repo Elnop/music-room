@@ -4,7 +4,7 @@ import { fillCodeDigits } from '@/features/user/features/auth/shared/code-input/
 
 const EMPTY_CODE = ['', '', '', '', '', ''];
 
-export interface CodeInput {
+export type CodeInput = {
 	digits: string[];
 	isComplete: boolean;
 	setBoxRef: (index: number) => (input: TextInput | null) => void;
@@ -12,7 +12,7 @@ export interface CodeInput {
 	pressKey: (index: number, key: string) => void;
 	focusFirst: () => void;
 	reset: () => void;
-}
+};
 
 export function useCodeInput(): CodeInput {
 	const [digits, setDigits] = useState<string[]>(EMPTY_CODE);

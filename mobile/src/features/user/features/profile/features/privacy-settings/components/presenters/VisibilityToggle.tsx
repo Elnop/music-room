@@ -9,12 +9,12 @@ import { VISIBILITY_LABELS } from '@/shared/users/user.types';
 import { VISIBILITY_ICONS } from '@/shared/theme/lib/genres';
 import { Text } from '@/shared/theme/components/Text';
 
-interface VisibilityToggleProps {
+type VisibilityToggleProps = {
 	label: string;
 	description?: string;
 	value: VisibilityLevel;
 	onChange: (value: VisibilityLevel) => void;
-}
+};
 
 const VISIBILITY_OPTIONS: VisibilityLevel[] = ['public', 'friends_only', 'private'];
 
@@ -56,7 +56,7 @@ export function VisibilityToggle({ label, description, value, onChange }: Visibi
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		toggleGroup: {
 			marginBottom: theme.spacing.lg,
 		},
@@ -100,4 +100,5 @@ function createStyles(theme: Theme) {
 			color: theme.colors.textInverse,
 		},
 	});
+	return styles;
 }

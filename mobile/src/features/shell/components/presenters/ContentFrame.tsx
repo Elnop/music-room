@@ -12,13 +12,13 @@ import { ContentWidthContext } from '@/shared/theme/hooks/useContentWidth';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Theme } from '@/shared/theme/lib/types';
 
-interface ContentContainerProps {
+type ContentContainerProps = {
 	width: ContentWidth;
 	besideSidebar?: boolean;
 	scrollsAtEdge?: boolean;
 	panelOpen?: boolean;
 	children: React.ReactNode;
-}
+};
 
 export function ContentFrame({
 	width,
@@ -50,8 +50,9 @@ export function ContentFrame({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		outer: { flex: 1, alignItems: 'center', backgroundColor: theme.colors.background },
 		inner: { flex: 1, width: '100%' },
 	});
+	return styles;
 }

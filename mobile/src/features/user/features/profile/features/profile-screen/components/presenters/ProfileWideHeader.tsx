@@ -11,12 +11,12 @@ import type { UserStats } from '@/features/user/features/profile/types';
 import CogSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/cog-solid.svg';
 import PencilSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/pencil-solid.svg';
 
-interface ProfileWideHeaderProps {
+type ProfileWideHeaderProps = {
 	user: UserProfile;
 	stats?: UserStats | null;
 	onEditProfile: () => void;
 	onSettings: () => void;
-}
+};
 
 export function ProfileWideHeader({
 	user,

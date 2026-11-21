@@ -48,7 +48,7 @@ describe('RowGrid', () => {
 	it('puts two rows side by side on a tablet', () => {
 		mockWidth(800);
 		renderRows();
-		expect(cellWidths()).toEqual(['50%', '50%', '50%']);
+		expect(cellWidths()).toStrictEqual(['50%', '50%', '50%']);
 	});
 
 	it('puts three rows side by side on desktop', () => {

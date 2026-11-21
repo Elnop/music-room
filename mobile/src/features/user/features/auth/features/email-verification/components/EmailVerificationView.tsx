@@ -9,11 +9,11 @@ import type { EmailVerification } from '@/features/user/features/auth/features/e
 import { Text } from '@/shared/theme/components/Text';
 import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
 
-interface EmailVerificationViewProps {
+type EmailVerificationViewProps = {
 	email: string;
 	verification: EmailVerification;
 	onBackToLogin: () => void;
-}
+};
 
 function resendLabel(cooldown: number, isResending: boolean): string {
 	if (cooldown > 0) return `Renvoyer dans ${cooldown} s`;
@@ -91,7 +91,7 @@ export function EmailVerificationView({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: { flex: 1, backgroundColor: theme.colors.background },
 		content: { flex: 1, paddingHorizontal: 24, paddingTop: 60, alignItems: 'center' },
 		title: {
@@ -148,4 +148,5 @@ function createStyles(theme: Theme) {
 			color: theme.colors.textSecondary,
 		},
 	});
+	return styles;
 }

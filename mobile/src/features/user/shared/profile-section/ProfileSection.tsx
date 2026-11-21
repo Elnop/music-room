@@ -6,7 +6,7 @@ import { pixelCaption, pixelFrame } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/lib/types';
 import { Text } from '@/shared/theme/components/Text';
 
-interface ProfileSectionProps {
+type ProfileSectionProps = {
 	title: string;
 	children: React.ReactNode;
 	rightAction?: {
@@ -14,7 +14,7 @@ interface ProfileSectionProps {
 		onPress: () => void;
 	};
 	prominent?: boolean;
-}
+};
 
 export function ProfileSection({
 	title,
@@ -41,7 +41,7 @@ export function ProfileSection({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: {
 			...pixelFrame(theme),
 			backgroundColor: theme.colors.surface,
@@ -75,4 +75,5 @@ function createStyles(theme: Theme) {
 			paddingBottom: theme.spacing.md,
 		},
 	});
+	return styles;
 }

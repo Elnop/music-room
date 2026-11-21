@@ -249,7 +249,7 @@ describe('RootNavigator session restore', () => {
 		expect(fetchMock).toHaveBeenCalledTimes(1);
 		const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
 		expect(url).toBe('http://backend.test/api/auth/refresh');
-		expect(JSON.parse(init.body as string)).toEqual({ refreshToken: 'stored-refresh' });
+		expect(JSON.parse(init.body as string)).toStrictEqual({ refreshToken: 'stored-refresh' });
 		expect(useAuthStore.getState()).toMatchObject({
 			accessToken: 'new-access',
 			refreshToken: 'new-refresh',

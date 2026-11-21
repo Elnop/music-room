@@ -114,7 +114,7 @@ describe('deviceService', () => {
 
 			const info = await deviceService.getDeviceInfo();
 
-			expect(info).toEqual({
+			expect(info).toStrictEqual({
 				deviceId: 'existing-id',
 				deviceName: 'My Device',
 				platform: Platform.OS,

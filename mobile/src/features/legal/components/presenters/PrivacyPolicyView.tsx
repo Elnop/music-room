@@ -9,11 +9,11 @@ import {
 } from '@/features/legal/privacyPolicyContent';
 import { PolicyText } from '@/features/legal/components/presenters/PolicyText';
 
-interface PrivacyPolicyViewProps {
+type PrivacyPolicyViewProps = {
 	theme: Theme;
 	bottomPadding: number;
 	onOpenLink: (url: string) => void;
-}
+};
 
 export function PrivacyPolicyView({ theme, bottomPadding, onOpenLink }: PrivacyPolicyViewProps) {
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
@@ -68,7 +68,7 @@ export function PrivacyPolicyView({ theme, bottomPadding, onOpenLink }: PrivacyP
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -111,4 +111,5 @@ function createStyles(theme: Theme) {
 			flex: 1,
 		},
 	});
+	return styles;
 }

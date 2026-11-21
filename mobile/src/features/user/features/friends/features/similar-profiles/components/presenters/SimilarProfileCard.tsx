@@ -10,10 +10,10 @@ import {
 } from '@/features/user/features/friends/features/similar-profiles/similarProfileLabels';
 import { createSimilarProfilesStyles } from '@/features/user/features/friends/features/similar-profiles/components/presenters/similarProfilesStyles';
 
-interface SimilarProfileCardProps {
+type SimilarProfileCardProps = {
 	profile: RecommendedProfile;
 	onOpen: (userId: string) => void;
-}
+};
 
 export function SimilarProfileCard({ profile, onOpen }: SimilarProfileCardProps) {
 	const { styles } = useThemedStyles(createSimilarProfilesStyles);

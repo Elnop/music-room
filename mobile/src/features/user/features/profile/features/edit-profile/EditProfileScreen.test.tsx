@@ -68,14 +68,14 @@ describe('EditProfileScreen profile photo (#351)', () => {
 
 	it('offers gallery, camera and cancel when there is no photo', () => {
 		const buttons = openMenu();
-		expect(buttons.map(b => b.text)).toEqual(['Galerie', 'Appareil photo', 'Annuler']);
+		expect(buttons.map(b => b.text)).toStrictEqual(['Galerie', 'Appareil photo', 'Annuler']);
 	});
 
 	it('also offers to remove the current photo', () => {
 		mockSession.user = { ...mockSession.user, avatarUrl: 'https://cdn.test/me.jpg' };
 
 		const buttons = openMenu();
-		expect(buttons.map(b => b.text)).toEqual([
+		expect(buttons.map(b => b.text)).toStrictEqual([
 			'Galerie',
 			'Appareil photo',
 			'Retirer la photo',

@@ -24,16 +24,16 @@ jest.mock('@/shared/backend/deviceService', () => ({ getAppVersion: () => '1.0.0
 
 jest.mock('@/shared/backend/socketStore', () => ({ useSocketStore: jest.fn() }));
 
-interface Playlist {
+type Playlist = {
 	id: string;
 	name: string;
 	version: number;
-}
-interface RenamedEvent {
+};
+type RenamedEvent = {
 	playlistId: string;
 	name: string;
 	version: number;
-}
+};
 
 const renameRule: SocketCacheRule<RenamedEvent, Playlist> = {
 	event: 'playlist:renamed',

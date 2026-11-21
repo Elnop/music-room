@@ -54,14 +54,14 @@ describe('TabBarLayout', () => {
 	it('stacks the mini-player right above the tab bar, in the tab bar slot', () => {
 		setWidth(375);
 		render(<TabBarLayout {...props} miniPlayer={<Text>mini-player</Text>} />);
-		expect(texts()).toEqual(['mini-player', 'tab-bar']);
+		expect(texts()).toStrictEqual(['mini-player', 'tab-bar']);
 		expect(screen.queryByLabelText('Zumik')).toBeNull();
 	});
 
 	it('frames the tablet rail with the wordmark, without the mini-player nor the account', () => {
 		setWidth(820);
 		render(<TabBarLayout {...props} miniPlayer={<Text>mini-player</Text>} />);
-		expect(texts()).toEqual(['ZUMIK', 'tab-bar']);
+		expect(texts()).toStrictEqual(['ZUMIK', 'tab-bar']);
 		expect(screen.getByLabelText('Zumik')).toBeTruthy();
 	});
 

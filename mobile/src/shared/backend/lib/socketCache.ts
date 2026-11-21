@@ -4,11 +4,11 @@ import type { QueryClient, QueryKey } from '@tanstack/react-query';
 import type { Socket } from 'socket.io-client';
 import { useSocketStore } from '@/shared/backend/socketStore';
 
-export interface SocketCacheRule<Payload, Data> {
+export type SocketCacheRule<Payload, Data> = {
 	event: string;
 	queryKey: (payload: Payload) => QueryKey | null;
 	update?: (current: Data, payload: Payload) => Data | undefined;
-}
+};
 
 type SocketCacheResult = 'updated' | 'invalidated' | 'ignored';
 
@@ -30,10 +30,10 @@ export function applySocketEvent<Payload, Data>(
 	return 'invalidated';
 }
 
-interface SocketCacheBinding {
+type SocketCacheBinding = {
 	event: string;
 	apply: (client: QueryClient, payload: unknown) => SocketCacheResult;
-}
+};
 
 export function socketCacheRule<Payload, Data>(
 	rule: SocketCacheRule<Payload, Data>

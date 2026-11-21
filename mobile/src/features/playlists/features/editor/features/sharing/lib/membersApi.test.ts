@@ -34,7 +34,7 @@ describe('membersApi viewers', () => {
 	it('lists the viewers', async () => {
 		const viewers = [{ id: 'u', username: 'bob' }];
 		request.mockResolvedValue({ viewers });
-		await expect(membersApi.getViewers('p')).resolves.toEqual(viewers);
+		await expect(membersApi.getViewers('p')).resolves.toStrictEqual(viewers);
 		expect(request).toHaveBeenCalledWith('/api/playlists/p/viewers');
 	});
 

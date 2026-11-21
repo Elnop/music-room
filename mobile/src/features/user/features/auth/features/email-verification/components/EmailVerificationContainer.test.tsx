@@ -81,7 +81,7 @@ describe('EmailVerificationContainer', () => {
 
 		await waitFor(() => expect(useAuthStore.getState().isAuthenticated).toBe(true));
 		expect(request().url).toMatch(/\/api\/auth\/verify-email$/u);
-		expect(request().body).toEqual({ userId: 'user-a', code: '123456' });
+		expect(request().body).toStrictEqual({ userId: 'user-a', code: '123456' });
 	});
 
 	it('shows the error and empties the boxes after a wrong code', async () => {
@@ -104,7 +104,7 @@ describe('EmailVerificationContainer', () => {
 		expect(await screen.findByText('Renvoyer dans 60 s')).toBeTruthy();
 		expect(showSuccess).toHaveBeenCalledWith('Code renvoyé. Vérifiez votre email.');
 		expect(request().url).toMatch(/\/api\/auth\/resend-verification$/u);
-		expect(request().body).toEqual(PARAMS);
+		expect(request().body).toStrictEqual(PARAMS);
 	});
 
 	it('shows why a new code could not be sent', async () => {

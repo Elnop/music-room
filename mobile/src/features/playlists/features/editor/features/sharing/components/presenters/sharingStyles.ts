@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 import type { Theme } from '@/shared/theme/lib/types';
 
 export function createSharingStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		sectionTitle: {
 			fontSize: theme.typography.sizes.sm,
 			fontFamily: theme.typography.families.semibold,
@@ -23,4 +23,5 @@ export function createSharingStyles(theme: Theme) {
 			marginBottom: theme.spacing.sm,
 		},
 	});
+	return styles;
 }

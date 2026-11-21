@@ -1,7 +1,7 @@
-interface Debounced<A extends unknown[]> {
+type Debounced<A extends unknown[]> = {
 	(...args: A): void;
 	cancel: () => void;
-}
+};
 
 export function debounce<A extends unknown[]>(
 	fn: (...args: A) => void,

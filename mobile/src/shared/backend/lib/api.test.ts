@@ -36,7 +36,7 @@ describe('apiRequest backend address', () => {
 	it('sends the next request to the new address with the client headers', async () => {
 		await setBackendUrl('http://192.168.1.20:3000/');
 
-		await expect(apiRequest('/api/playlists')).resolves.toEqual({ ok: true });
+		await expect(apiRequest('/api/playlists')).resolves.toStrictEqual({ ok: true });
 
 		const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
 		expect(url).toBe('http://192.168.1.20:3000/api/playlists');

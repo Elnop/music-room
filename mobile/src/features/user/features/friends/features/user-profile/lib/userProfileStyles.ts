@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native';
 import type { Theme } from '@/shared/theme/lib/types';
 
-export const createUserProfileStyles = (theme: Theme) =>
-	StyleSheet.create({
+export const createUserProfileStyles = (theme: Theme) => {
+	const styles = StyleSheet.create({
 		shareButton: {
 			alignSelf: 'flex-start',
 			marginTop: theme.spacing.md,
@@ -57,3 +57,5 @@ export const createUserProfileStyles = (theme: Theme) =>
 			textAlign: 'center',
 		},
 	});
+	return styles;
+};

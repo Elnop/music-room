@@ -1,15 +1,15 @@
-interface DomScript {
+type DomScript = {
 	src: string;
 	async: boolean;
 	onload: (() => void) | null;
 	onerror: (() => void) | null;
 	remove: () => void;
-}
+};
 
-interface DomDocument {
+type DomDocument = {
 	head: { appendChild: (node: DomScript) => void };
 	createElement: (tag: 'script') => DomScript;
-}
+};
 
 const loads = new Map<string, Promise<void>>();
 

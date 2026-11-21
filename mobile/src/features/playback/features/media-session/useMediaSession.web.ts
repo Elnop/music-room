@@ -7,23 +7,23 @@ import { logger } from '@/shared/logging/logger';
 type MediaAction = 'play' | 'pause' | 'previoustrack' | 'nexttrack' | 'seekto';
 type ActionHandler = ((details: { seekTime?: number }) => void) | null;
 
-interface MetadataInit {
+type MetadataInit = {
 	title: string;
 	artist: string;
 	artwork: { src: string }[];
-}
+};
 
-interface BrowserMediaSession {
+type BrowserMediaSession = {
 	metadata: unknown;
 	playbackState: 'none' | 'paused' | 'playing';
 	setActionHandler(action: MediaAction, handler: ActionHandler): void;
 	setPositionState?(state: { duration: number; position: number; playbackRate: number }): void;
-}
+};
 
-interface BrowserGlobals {
+type BrowserGlobals = {
 	navigator?: { mediaSession?: BrowserMediaSession };
 	MediaMetadata?: new (init: MetadataInit) => unknown;
-}
+};
 
 const browser = globalThis as unknown as BrowserGlobals;
 const MEDIA_ACTIONS: MediaAction[] = ['play', 'pause', 'previoustrack', 'nexttrack', 'seekto'];

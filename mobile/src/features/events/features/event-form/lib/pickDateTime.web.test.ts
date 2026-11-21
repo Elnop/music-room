@@ -4,7 +4,7 @@ import {
 	toLocalInputValue,
 } from '@/features/events/features/event-form/lib/pickDateTime.web';
 
-interface FakeNode {
+type FakeNode = {
 	tag: string;
 	attributes: Record<string, string>;
 	children: FakeNode[];
@@ -19,7 +19,7 @@ interface FakeNode {
 	remove: () => void;
 	showModal: () => void;
 	addEventListener: (type: string, listener: () => void) => void;
-}
+};
 
 function fakeNode(tag: string): FakeNode {
 	const node: FakeNode = {
@@ -80,7 +80,7 @@ describe('pickDateTime (web)', () => {
 	it('round-trips a local date through the datetime-local value', () => {
 		const date = new Date(2026, 10, 6, 20, 5);
 		expect(toLocalInputValue(date)).toBe('2026-11-06T20:05');
-		expect(fromLocalInputValue('2026-11-06T20:05')).toEqual(date);
+		expect(fromLocalInputValue('2026-11-06T20:05')).toStrictEqual(date);
 		expect(fromLocalInputValue('')).toBeNull();
 		expect(fromLocalInputValue('not a date')).toBeNull();
 	});
@@ -91,14 +91,17 @@ describe('pickDateTime (web)', () => {
 		expect(dialog.showModal).toHaveBeenCalled();
 		expect(input.attributes.type).toBe('datetime-local');
 		expect(input.value).toBe('2026-11-06T20:00');
-		expect(find(dialog, 'button').map(button => button.textContent)).toEqual(['Annuler', 'OK']);
+		expect(find(dialog, 'button').map(button => button.textContent)).toStrictEqual([
+			'Annuler',
+			'OK',
+		]);
 	});
 
 	it('resolves the picked date on OK and removes the dialog', async () => {
 		const { dialog, input, close } = open(new Date(2026, 10, 6, 20, 0));
 		input.value = '2026-11-07T01:30';
 
-		await expect(close('confirm')).resolves.toEqual(new Date(2026, 10, 7, 1, 30));
+		await expect(close('confirm')).resolves.toStrictEqual(new Date(2026, 10, 7, 1, 30));
 		expect(dialog.removed).toBe(true);
 	});
 

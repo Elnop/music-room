@@ -17,13 +17,13 @@ import { FriendPlaylistCard } from '@/features/user/features/friends/features/us
 import { HiddenFieldNote } from '@/features/user/features/friends/features/user-profile/components/presenters/HiddenFieldNote';
 import { Text } from '@/shared/theme/components/Text';
 
-interface UserProfileWideSectionsProps {
+type UserProfileWideSectionsProps = {
 	profile: FilteredProfile;
 	isFriend: boolean;
 	playlists: FriendPlaylistSummary[];
 	onSelectPlaylist: (playlistId: string) => void;
 	listening?: React.ReactNode;
-}
+};
 
 function infoRows(profile: FilteredProfile): ProfileInfoRow[] {
 	const rows: ProfileInfoRow[] = [{ label: "Nom d'utilisateur", value: `@${profile.username}` }];
@@ -94,10 +94,11 @@ export function UserProfileWideSections({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		section: { marginTop: theme.spacing.md },
 		genres: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.xs },
 		empty: { fontSize: theme.typography.sizes.md, color: theme.colors.textSecondary },
 		playlist: { paddingHorizontal: 0 },
 	});
+	return styles;
 }

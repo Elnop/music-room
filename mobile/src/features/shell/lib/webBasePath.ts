@@ -9,15 +9,15 @@ export function stripBasePath(path: string, base = webBasePath()): string {
 	return /^[/?#]/u.test(rest) ? rest : path;
 }
 
-interface BrowserLocation {
+type BrowserLocation = {
 	pathname: string;
 	search: string;
 	hash: string;
-}
+};
 
-interface BrowserHistory {
+type BrowserHistory = {
 	replaceState(data: unknown, unused: string, url: string): void;
-}
+};
 
 const REDIRECT_PARAM = /[?&]redirect=([^&]*)/u;
 

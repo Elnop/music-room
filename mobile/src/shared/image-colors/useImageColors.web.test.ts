@@ -10,7 +10,7 @@ const FALLBACK = 'fallback-colour';
 describe('useImageColors (web)', () => {
 	it('gives a cover the fallback colour', () => {
 		const { result } = renderHook(() => useImageColors('https://example.com/art.jpg', FALLBACK));
-		expect(result.current).toEqual({ dominantColor: FALLBACK, isLoading: false });
+		expect(result.current).toStrictEqual({ dominantColor: FALLBACK, isLoading: false });
 	});
 
 	it('gives no colour without a cover', () => {

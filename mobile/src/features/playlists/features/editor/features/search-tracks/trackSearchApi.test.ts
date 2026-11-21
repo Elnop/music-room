@@ -12,8 +12,8 @@ describe('trackSearchApi', () => {
 
 	it('returns the SoundCloud collection, or nothing', async () => {
 		request.mockResolvedValueOnce({ collection: [{ id: 1 }] }).mockResolvedValueOnce({});
-		await expect(trackSearchApi.searchTracks('daft')).resolves.toEqual([{ id: 1 }]);
-		await expect(trackSearchApi.searchTracks('daft')).resolves.toEqual([]);
+		await expect(trackSearchApi.searchTracks('daft')).resolves.toStrictEqual([{ id: 1 }]);
+		await expect(trackSearchApi.searchTracks('daft')).resolves.toStrictEqual([]);
 		expect(request).toHaveBeenCalledWith('/api/soundcloud/search?q=daft&limit=20');
 	});
 });

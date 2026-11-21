@@ -14,11 +14,11 @@ import {
 import { Text } from '@/shared/theme/components/Text';
 import PencilSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/pencil-solid.svg';
 
-interface DeviceHeaderProps {
+type DeviceHeaderProps = {
 	device: UserDeviceWithLicenses;
 	isCurrent: boolean;
 	onOpenRename: (device: UserDeviceWithLicenses) => void;
-}
+};
 
 export function DeviceHeader({ device, isCurrent, onOpenRename }: DeviceHeaderProps) {
 	const { theme } = useTheme();
@@ -60,7 +60,7 @@ export function DeviceHeader({ device, isCurrent, onOpenRename }: DeviceHeaderPr
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		deviceHeader: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -108,4 +108,5 @@ function createStyles(theme: Theme) {
 			marginTop: 2,
 		},
 	});
+	return styles;
 }

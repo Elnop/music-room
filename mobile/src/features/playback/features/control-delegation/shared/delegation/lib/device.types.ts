@@ -1,12 +1,12 @@
-export interface UserDevice {
+export type UserDevice = {
 	deviceId: string;
 	deviceName: string;
 	platform: string;
 	model: string;
 	lastSeenAt: string;
-}
+};
 
-export interface DeviceLicense {
+export type DeviceLicense = {
 	user: {
 		id: string;
 		username: string;
@@ -14,51 +14,51 @@ export interface DeviceLicense {
 		avatarUrl: string | null;
 	};
 	grantedAt: string;
-}
+};
 
-export interface UserDeviceWithLicenses extends UserDevice {
+export type UserDeviceWithLicenses = UserDevice & {
 	licenses: DeviceLicense[];
-}
+};
 
 type DeviceAccess = 'all-devices' | 'license';
 
-export interface ControllableDevice extends UserDevice {
+export type ControllableDevice = UserDevice & {
 	access: DeviceAccess;
-}
+};
 
-export interface MyDevicesResponse {
+export type MyDevicesResponse = {
 	devices: UserDeviceWithLicenses[];
-}
+};
 
-export interface GrantDeviceLicenseResponse {
+export type GrantDeviceLicenseResponse = {
 	deviceId: string;
 	license: DeviceLicense;
-}
+};
 
-export interface RevokeDeviceLicenseResponse {
+export type RevokeDeviceLicenseResponse = {
 	message: string;
-}
+};
 
-export interface RenameDeviceResponse {
+export type RenameDeviceResponse = {
 	device: UserDevice;
-}
+};
 
-export interface ControllableDevicesResponse {
+export type ControllableDevicesResponse = {
 	allDevices: boolean;
 	devices: ControllableDevice[];
-}
+};
 
-export interface DevicePickerOwner {
+export type DevicePickerOwner = {
 	ownerId: string;
 	username: string;
 	isSelf: boolean;
 	devices: Array<ControllableDevice & { online: boolean }>;
-}
+};
 
-export interface DevicePickerResponse {
+export type DevicePickerResponse = {
 	owners: DevicePickerOwner[];
-}
+};
 
-export interface ControlRevokedPayload {
+export type ControlRevokedPayload = {
 	ownerId: string;
-}
+};

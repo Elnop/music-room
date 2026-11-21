@@ -4,12 +4,12 @@ import { Text } from '@/shared/theme/components/Text';
 import type { Theme } from '@/shared/theme/lib/types';
 import type { PolicySpan } from '@/features/legal/privacyPolicyContent';
 
-interface PolicyTextProps {
+type PolicyTextProps = {
 	spans: PolicySpan[];
 	theme: Theme;
 	style: StyleProp<TextStyle>;
 	onOpenLink: (url: string) => void;
-}
+};
 
 export function PolicyText({ spans, theme, style, onOpenLink }: PolicyTextProps) {
 	return (

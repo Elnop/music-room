@@ -9,10 +9,10 @@ import { DateTimeRow } from '@/features/events/features/event-form/components/pr
 import { GenreSelector } from '@/features/events/features/event-form/components/presenters/GenreSelector';
 import { PlaylistSelector } from '@/features/events/features/event-form/components/presenters/PlaylistSelector';
 
-interface EventFormViewProps {
+type EventFormViewProps = {
 	form: EventForm;
 	bottomPadding: number;
-}
+};
 
 export function EventFormView({ form, bottomPadding }: EventFormViewProps) {
 	const { styles } = useThemedStyles(createEventScreenStyles);

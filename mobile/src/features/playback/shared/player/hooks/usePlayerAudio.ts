@@ -14,10 +14,10 @@ function playsLocally() {
 	return isLocalTarget();
 }
 
-interface PlayerAudio {
+type PlayerAudio = {
 	player: AudioPlayer;
 	seekTo: (seconds: number) => void;
-}
+};
 
 export function usePlayerAudio(): PlayerAudio {
 	const streamUrl = usePlayerStore(state => state.streamUrl);

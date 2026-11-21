@@ -2,13 +2,13 @@ import { useRef, useState } from 'react';
 import type { PlaybackActions, PlaylistPlayback } from '@/shared/playback/lib/playbackActions';
 import { showInfo } from '@/shared/theme/lib/toast';
 
-export interface PlayPlaylist {
+export type PlayPlaylist = {
 	loading: boolean;
 	playing: boolean;
 	press: () => void;
 	pendingTrackId: string | null;
 	playFrom: (track: { id: string; trackUri: string }) => void;
-}
+};
 
 export function usePlayPlaylist(
 	playlistId: string,

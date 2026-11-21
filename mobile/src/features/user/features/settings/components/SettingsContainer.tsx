@@ -3,10 +3,10 @@ import { useSettingsScreen } from '@/features/user/features/settings/useSettings
 import { SettingsView } from '@/features/user/features/settings/components/presenters/SettingsView';
 import type { PlanState } from '@/features/subscription/lib/subscription';
 
-interface SettingsContainerProps {
+type SettingsContainerProps = {
 	subscription: PlanState;
 	backendUrlField: React.ReactNode;
-}
+};
 
 export function SettingsContainer({ subscription, backendUrlField }: SettingsContainerProps) {
 	const { theme, bottomPadding, plan, isChangingPlan, handleTogglePremium, openPrivacyPolicy } =

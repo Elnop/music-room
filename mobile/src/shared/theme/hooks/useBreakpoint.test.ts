@@ -32,7 +32,7 @@ describe('useBreakpoint', () => {
 	it('keeps the phone layout below the tablet width', () => {
 		mockWidth(375);
 		const { result } = renderHook(() => useBreakpoint());
-		expect(result.current).toEqual({
+		expect(result.current).toStrictEqual({
 			breakpoint: 'phone',
 			isWide: false,
 			isDesktop: false,

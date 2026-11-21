@@ -12,14 +12,14 @@ import LockSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/lock-solid
 import LogoutSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/logout-solid.svg';
 import PhoneRingingLowSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/phone-ringing-low-solid.svg';
 
-interface ProfileMenuItemsProps {
+type ProfileMenuItemsProps = {
 	wide?: boolean;
 	isLoading: boolean;
 	onPrivacySettings: () => void;
 	onLinkedAccounts: () => void;
 	onMyDevices: () => void;
 	onConfirmLogout: () => void;
-}
+};
 
 export function ProfileMenuItems({
 	wide = false,
@@ -71,7 +71,7 @@ export function ProfileMenuItems({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		logoutSection: {
 			paddingHorizontal: theme.spacing.lg,
 			marginTop: theme.spacing.lg,
@@ -104,4 +104,5 @@ function createStyles(theme: Theme) {
 			color: theme.colors.error,
 		},
 	});
+	return styles;
 }

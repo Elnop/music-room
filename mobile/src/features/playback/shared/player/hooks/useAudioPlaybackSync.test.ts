@@ -54,7 +54,7 @@ describe('useAudioPlaybackSync', () => {
 		expect(state.error).toBeNull();
 		expect(state.streamRenewed).toBe(true);
 		expect(state.loadCounter).toBe(loadCounter + 1);
-		expect(state.currentTrack).toEqual(track);
+		expect(state.currentTrack).toStrictEqual(track);
 	});
 
 	it('shows the error when the renewed stream does not load either', () => {

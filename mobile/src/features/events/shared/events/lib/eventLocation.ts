@@ -1,10 +1,10 @@
 import * as Location from 'expo-location';
 import { placeName } from '@/features/events/shared/events/lib/geocoder';
 
-export interface Coordinates {
+export type Coordinates = {
 	latitude: number;
 	longitude: number;
-}
+};
 
 export async function requestLocationPermission(): Promise<boolean> {
 	const { status } = await Location.requestForegroundPermissionsAsync();

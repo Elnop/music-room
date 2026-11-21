@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 
-interface VolumeState {
+type VolumeState = {
 	volume: number;
 	muted: boolean;
 	setVolume: (volume: number) => void;
 	toggleMute: () => void;
-}
+};
 
 export const useVolumeStore = create<VolumeState>(set => ({
 	volume: 1,

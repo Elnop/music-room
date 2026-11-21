@@ -6,11 +6,11 @@ import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/lib/types';
 
-interface CenteredDialogProps {
+type CenteredDialogProps = {
 	onClose: () => void;
 	fill?: boolean;
 	children: React.ReactNode;
-}
+};
 
 export function CenteredDialog({ onClose, fill = false, children }: CenteredDialogProps) {
 	const { styles } = useThemedStyles(createStyles);
@@ -29,7 +29,7 @@ export function CenteredDialog({ onClose, fill = false, children }: CenteredDial
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		backdrop: {
 			flex: 1,
 			alignItems: 'center',
@@ -48,4 +48,5 @@ function createStyles(theme: Theme) {
 		fill: { height: '80%' },
 		fit: { maxHeight: '85%' },
 	});
+	return styles;
 }

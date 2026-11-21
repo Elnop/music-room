@@ -13,7 +13,7 @@ function loadFor(os: string): Constants {
 
 describe('platform features', () => {
 	it('keeps every native feature on Android', () => {
-		expect(loadFor('android')).toEqual({
+		expect({ ...loadFor('android') }).toStrictEqual({
 			BEACON_BROADCAST_AVAILABLE: true,
 			THIS_DEVICE_LABEL: 'Ce téléphone',
 			LANDING_SHOWN: false,
@@ -21,7 +21,7 @@ describe('platform features', () => {
 	});
 
 	it('hides what the browser cannot do', () => {
-		expect(loadFor('web')).toEqual({
+		expect({ ...loadFor('web') }).toStrictEqual({
 			BEACON_BROADCAST_AVAILABLE: false,
 			THIS_DEVICE_LABEL: 'Ce navigateur',
 			LANDING_SHOWN: true,

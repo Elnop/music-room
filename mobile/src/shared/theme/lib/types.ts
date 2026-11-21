@@ -3,7 +3,7 @@ import type { PIXEL_BORDERS, PIXEL_SHADOWS, PIXEL_TYPOGRAPHY } from '@/shared/th
 
 export type ThemeName = 'original';
 
-export interface ThemeColors {
+export type ThemeColors = {
 	primary: string;
 
 	background: string;
@@ -35,17 +35,17 @@ export interface ThemeColors {
 	onColor: string;
 	backdrop: string;
 	shadow: string;
-}
+};
 
-export interface Theme {
+export type Theme = {
 	name: ThemeName;
 	colors: ThemeColors;
 	borders: typeof PIXEL_BORDERS;
 	shadows: typeof PIXEL_SHADOWS;
 	typography: typeof PIXEL_TYPOGRAPHY;
 	spacing: typeof SPACING;
-}
+};
 
-export interface ThemeContextValue {
+export type ThemeContextValue = {
 	theme: Theme;
-}
+};

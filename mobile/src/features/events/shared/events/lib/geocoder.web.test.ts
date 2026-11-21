@@ -31,8 +31,11 @@ describe('geocoder (web)', () => {
 			[ROUTE]: ok({ location: { latitude: 48.9, longitude: 2.3, displayName: 'Paris' } }),
 		});
 
-		await expect(geocodeAddress(ADDRESS)).resolves.toEqual({ latitude: 48.9, longitude: 2.3 });
-		expect(calls()).toEqual([ROUTE]);
+		await expect(geocodeAddress(ADDRESS)).resolves.toStrictEqual({
+			latitude: 48.9,
+			longitude: 2.3,
+		});
+		expect(calls()).toStrictEqual([ROUTE]);
 	});
 
 	it('answers null when the backend finds nothing', async () => {

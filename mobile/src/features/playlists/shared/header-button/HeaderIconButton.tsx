@@ -6,13 +6,13 @@ import { Pressable } from '@/shared/theme/components/Pressable';
 import { useTheme } from '@/shared/theme/components/ThemeContext';
 import { INK, PIXEL } from '@/shared/theme/lib/tokens';
 
-interface HeaderIconButtonProps {
+type HeaderIconButtonProps = {
 	icon: PixelIconSource;
 	size: number;
 	onPress: () => void;
 	accessibilityLabel: string;
 	ref?: React.Ref<View>;
-}
+};
 
 export function HeaderIconButton({
 	icon,

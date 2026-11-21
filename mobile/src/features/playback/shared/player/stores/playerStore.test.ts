@@ -52,7 +52,7 @@ describe('playerStore playTrack', () => {
 		usePlayerStore.getState().playTrack(track);
 
 		const state = usePlayerStore.getState();
-		expect(state.currentTrack).toEqual(track);
+		expect(state.currentTrack).toStrictEqual(track);
 		expect(state.pendingTrackId).toBe(42);
 		expect(state.playbackState).toBe('loading');
 		expect(state.loading).toBe(true);
@@ -70,7 +70,7 @@ describe('playerStore playTrack', () => {
 		usePlayerStore.getState().playTrack(track);
 
 		expect(usePlayerStore.getState().loadCounter).toBe(2);
-		expect(usePlayerStore.getState().currentTrack).toEqual(track);
+		expect(usePlayerStore.getState().currentTrack).toStrictEqual(track);
 	});
 
 	it('replaces the current track with the new one', () => {
@@ -280,7 +280,7 @@ describe('playerStore stream renewal (#313)', () => {
 		usePlayerStore.getState().renewStream(90000, true, true);
 
 		const state = usePlayerStore.getState();
-		expect(state.currentTrack).toEqual(track);
+		expect(state.currentTrack).toStrictEqual(track);
 		expect(state.queueItemId).toBe('q9');
 		expect(state.isModalOpen).toBe(true);
 		expect(state.startPositionMs).toBe(90000);

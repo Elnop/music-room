@@ -5,16 +5,16 @@ import type {
 	ShortcutKeyEvent,
 } from '@/shared/keyboard-shortcuts/keyboardShortcuts';
 
-interface BrowserKeyEvent extends ShortcutKeyEvent {
+type BrowserKeyEvent = ShortcutKeyEvent & {
 	defaultPrevented: boolean;
 	preventDefault(): void;
-}
+};
 
-interface BrowserDocument {
+type BrowserDocument = {
 	addEventListener(type: 'keydown', listener: (event: BrowserKeyEvent) => void): void;
 	removeEventListener(type: 'keydown', listener: (event: BrowserKeyEvent) => void): void;
 	querySelector(selector: string): unknown;
-}
+};
 
 const browser = globalThis as unknown as { document?: BrowserDocument };
 

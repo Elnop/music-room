@@ -1,25 +1,25 @@
 import { useEffect, useRef } from 'react';
 import { PANEL_CLOSE_ID, PANEL_ID } from '@/features/playback/shared/player/lib/constants';
 
-interface BrowserKeyEvent {
+type BrowserKeyEvent = {
 	key: string;
 	defaultPrevented: boolean;
 	preventDefault(): void;
-}
+};
 
-interface BrowserElement {
+type BrowserElement = {
 	isConnected: boolean;
 	focus(): void;
 	contains(other: BrowserElement | null): boolean;
 	addEventListener(type: 'keydown', listener: (event: BrowserKeyEvent) => void): void;
 	removeEventListener(type: 'keydown', listener: (event: BrowserKeyEvent) => void): void;
-}
+};
 
-interface BrowserDocument {
+type BrowserDocument = {
 	activeElement: BrowserElement | null;
 	body: BrowserElement;
 	getElementById(id: string): BrowserElement | null;
-}
+};
 
 const browser = globalThis as unknown as { document?: BrowserDocument };
 

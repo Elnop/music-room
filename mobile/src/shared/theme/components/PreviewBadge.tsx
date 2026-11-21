@@ -16,7 +16,7 @@ export function PreviewBadge() {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		badge: {
 			alignSelf: 'flex-start',
 			fontSize: theme.typography.sizes.xs,
@@ -28,4 +28,5 @@ function createStyles(theme: Theme) {
 			overflow: 'hidden',
 		},
 	});
+	return styles;
 }

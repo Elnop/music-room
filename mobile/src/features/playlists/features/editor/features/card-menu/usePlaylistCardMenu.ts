@@ -16,7 +16,7 @@ import type {
 } from '@/features/playlists/shared/playlist/lib/types';
 import type { PlanState } from '@/features/subscription/lib/subscription';
 
-export interface PlaylistCardMenu {
+export type PlaylistCardMenu = {
 	visible: boolean;
 	playlist: Playlist | null;
 	actionsFor: (playlist: Playlist) => (() => void) | undefined;
@@ -27,7 +27,7 @@ export interface PlaylistCardMenu {
 	coverLocked: boolean;
 	changeCover: () => void;
 	removeCover: () => void;
-}
+};
 
 export function usePlaylistCardMenu(
 	navigation: Pick<NativeStackNavigationProp<PlaylistStackParamList>, 'navigate' | 'getParent'>,

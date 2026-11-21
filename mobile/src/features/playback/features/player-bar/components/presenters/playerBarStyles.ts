@@ -6,7 +6,7 @@ export const DISABLED_OPACITY = 0.35;
 const TIME_WIDTH = 44;
 
 export function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: {
 			height: 80,
 			flexDirection: 'row',
@@ -109,4 +109,5 @@ export function createStyles(theme: Theme) {
 			height: 20,
 		},
 	});
+	return styles;
 }

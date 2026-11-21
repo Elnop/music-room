@@ -3,7 +3,7 @@ import type { UserProfile } from '@/shared/users/user.types';
 
 export type EditMode = 'open' | 'restricted';
 
-export interface Playlist {
+export type Playlist = {
 	id: string;
 	name: string;
 	description?: string;
@@ -18,36 +18,36 @@ export interface Playlist {
 	editMode: EditMode;
 	createdAt: string;
 	updatedAt: string;
-}
+};
 
-export interface PlaylistWithTracks extends Omit<Playlist, 'trackCount'> {
+export type PlaylistWithTracks = Omit<Playlist, 'trackCount'> & {
 	tracks: TrackInPlaylist[];
 	owner: UserProfile;
 	tracksVersion: number;
-}
+};
 
-export interface AddTrackResult {
+export type AddTrackResult = {
 	track: TrackInPlaylist;
 	tracksVersion: number;
 	rebalanced: boolean;
-}
+};
 
-export interface RemoveTrackResult {
+export type RemoveTrackResult = {
 	tracksVersion: number;
-}
+};
 
-export interface MoveTrackResult {
+export type MoveTrackResult = {
 	trackId: string;
 	rank: string;
 	tracksVersion: number;
 	rebalanced: boolean;
-}
+};
 
-interface PlaylistUpdateBase {
+type PlaylistUpdateBase = {
 	playlistId: string;
 	tracksVersion: number;
 	rebalanced: boolean;
-}
+};
 
 export type PlaylistUpdatedEvent = PlaylistUpdateBase &
 	(
@@ -56,43 +56,43 @@ export type PlaylistUpdatedEvent = PlaylistUpdateBase &
 		| { event: 'track_moved'; trackId: string; rank: string }
 	);
 
-export interface PlaylistDetailsEvent {
+export type PlaylistDetailsEvent = {
 	playlistId: string;
 	name: string;
 	description?: string;
 	visibility: 'public' | 'private';
 	editMode: EditMode;
 	coverUrl?: string;
-}
+};
 
-export interface CoverResponse {
+export type CoverResponse = {
 	coverUrl: string | null;
-}
+};
 
-export interface TracksAvailabilityEvent {
+export type TracksAvailabilityEvent = {
 	playlistId: string;
 	tracks: { trackId: string; unavailable: boolean }[];
-}
+};
 
-export interface PlaylistDeletedEvent {
+export type PlaylistDeletedEvent = {
 	playlistId: string;
-}
+};
 
-export interface UserSummary {
+export type UserSummary = {
 	id: string;
 	username: string;
 	displayName?: string;
 	avatarUrl?: string;
-}
+};
 
-export interface PlaylistMember extends UserSummary {
+export type PlaylistMember = UserSummary & {
 	canEdit: boolean;
-}
+};
 
-export interface FriendPlaylists {
+export type FriendPlaylists = {
 	friend: UserSummary;
 	playlists: Playlist[];
-}
+};
 
 export type PlaylistStackParamList = {
 	Home: undefined;

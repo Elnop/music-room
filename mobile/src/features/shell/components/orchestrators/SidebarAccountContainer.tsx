@@ -8,10 +8,10 @@ import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { Theme } from '@/shared/theme/lib/types';
 import { Text } from '@/shared/theme/components/Text';
 
-interface SidebarAccountProps {
+type SidebarAccountProps = {
 	active: boolean;
 	onPress: () => void;
-}
+};
 
 export function SidebarAccountContainer({ active, onPress }: SidebarAccountProps) {
 	const { theme } = useTheme();
@@ -45,7 +45,7 @@ export function SidebarAccountContainer({ active, onPress }: SidebarAccountProps
 }
 
 function createStyles(theme: Theme, separator: string) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: {
 			marginHorizontal: theme.spacing.sm,
 			paddingVertical: theme.spacing.sm,
@@ -76,4 +76,5 @@ function createStyles(theme: Theme, separator: string) {
 			color: theme.colors.textSecondary,
 		},
 	});
+	return styles;
 }

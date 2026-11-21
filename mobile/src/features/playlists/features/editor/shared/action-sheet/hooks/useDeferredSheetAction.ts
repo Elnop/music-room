@@ -1,10 +1,10 @@
 import { useRef } from 'react';
 import { Platform } from 'react-native';
 
-interface DeferredSheetAction {
+type DeferredSheetAction = {
 	run: (action: () => void) => () => void;
 	onDismiss: () => void;
-}
+};
 
 export function useDeferredSheetAction(onClose: () => void): DeferredSheetAction {
 	const pendingRef = useRef<(() => void) | null>(null);

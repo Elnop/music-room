@@ -45,7 +45,7 @@ jest.mock('@/shared/theme/lib/toast', () => ({
 	showInfo: jest.fn(),
 }));
 
-interface MockListProps {
+type MockListProps = {
 	data: { id: string }[];
 	renderItem: (info: {
 		item: { id: string };
@@ -57,7 +57,7 @@ interface MockListProps {
 	onReorder: (from: number, to: number) => Promise<void>;
 	dragEnabled: boolean;
 	refreshControl: React.ReactElement<{ onRefresh: () => void }>;
-}
+};
 let mockList: MockListProps;
 jest.mock('@/shared/theme/components/ReorderableList', () => {
 	const { View } = jest.requireActual('react-native');
@@ -232,7 +232,7 @@ describe('PlaylistDetailContainer load failure', () => {
 		routes.routes[`GET /api/playlists/${ID}`] = fail(500, 'INTERNAL');
 		await renderScreen(null);
 		expect(await screen.findByText('Impossible de charger la playlist')).toBeTruthy();
-		expect(routes.calls()).toEqual([`GET /api/playlists/${ID}`]);
+		expect(routes.calls()).toStrictEqual([`GET /api/playlists/${ID}`]);
 
 		routes.routes[`GET /api/playlists/${ID}`] = answer({ name: 'Back' });
 		fireEvent.press(screen.getByText('Réessayer'));
@@ -328,7 +328,7 @@ describe('PlaylistDetailContainer tracks (#307)', () => {
 		expect(routes.fetchMock.mock.calls.at(-1)?.[1]?.body).toBe(
 			JSON.stringify({ afterRank: null, expectedVersion: 1 })
 		);
-		expect(mockList.data.map(t => t.id)).toEqual(['Again', 'Song', 'Other']);
+		expect(mockList.data.map(t => t.id)).toStrictEqual(['Again', 'Song', 'Other']);
 	});
 
 	it('reloads and tells the user when someone else moved the track', async () => {

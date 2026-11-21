@@ -21,11 +21,11 @@ const ICONS: Record<ToastKind, PixelIconSource> = {
 	warning: ExclamationTriangleSolid,
 };
 
-interface ThemedToastProps {
+type ThemedToastProps = {
 	kind: ToastKind;
 	params: ToastConfigParams<unknown>;
 	theme: Theme;
-}
+};
 
 export function ThemedToast({ kind, params, theme }: ThemedToastProps) {
 	const styles = React.useMemo(() => createStyles(theme), [theme]);
@@ -50,7 +50,7 @@ export function ThemedToast({ kind, params, theme }: ThemedToastProps) {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -79,4 +79,5 @@ function createStyles(theme: Theme) {
 			marginTop: 2,
 		},
 	});
+	return styles;
 }

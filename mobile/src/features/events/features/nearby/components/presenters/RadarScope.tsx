@@ -47,7 +47,7 @@ export function RadarScope({ children }: { children?: React.ReactNode }) {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		scope: {
 			...pixelFrame(theme),
 			height: HEIGHT,
@@ -95,4 +95,5 @@ function createStyles(theme: Theme) {
 			backgroundColor: theme.colors.primary,
 		},
 	});
+	return styles;
 }

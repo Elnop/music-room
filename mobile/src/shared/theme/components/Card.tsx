@@ -39,7 +39,7 @@ export function Card({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		card: {
 			...pixelFrame(theme),
 			backgroundColor: theme.colors.surface,
@@ -49,4 +49,5 @@ function createStyles(theme: Theme) {
 			...theme.shadows.medium,
 		},
 	});
+	return styles;
 }

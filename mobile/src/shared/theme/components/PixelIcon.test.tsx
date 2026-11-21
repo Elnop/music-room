@@ -9,7 +9,7 @@ describe('PixelIcon', () => {
 		render(<PixelIcon icon={PlaySolid} color={INK} size={18} />);
 		const svg = screen.getByTestId('svg-icon');
 
-		expect(svg.props.style).toEqual({ width: 18, height: 18 });
+		expect(svg.props.style).toStrictEqual({ width: 18, height: 18 });
 		expect(svg.props.accessibilityHint).toBe(INK);
 	});
 

@@ -130,7 +130,7 @@ describe('QueueModalContainer', () => {
 		setQueue({ currentItemId: 'b', items: ['a', 'b', 'c', 'd'].map(item) });
 		await renderModal();
 
-		expect(titles()).toEqual(['Title b', 'Title c', 'Title d']);
+		expect(titles()).toStrictEqual(['Title b', 'Title c', 'Title d']);
 		expect(screen.getByLabelText('Lire Title b').props.accessibilityState).toMatchObject({
 			selected: true,
 		});
@@ -148,7 +148,7 @@ describe('QueueModalContainer', () => {
 		setQueue({ currentItemId: null, items: ['a', 'b'].map(item) });
 		await renderModal();
 
-		expect(titles()).toEqual(['Title a', 'Title b']);
+		expect(titles()).toStrictEqual(['Title a', 'Title b']);
 		expect(screen.queryByText('En cours de lecture')).toBeNull();
 	});
 
@@ -163,7 +163,7 @@ describe('QueueModalContainer', () => {
 		setQueue({ currentItemId: 'a', items: ['a'].map(item) });
 		await renderModal();
 
-		expect(titles()).toEqual(['Title a']);
+		expect(titles()).toStrictEqual(['Title a']);
 		expect(screen.getByText('Rien à suivre')).toBeTruthy();
 	});
 
@@ -182,7 +182,7 @@ describe('QueueModalContainer', () => {
 		await renderModal();
 
 		act(() => setQueue({ currentItemId: 'a', items: ['a', 'c', 'b'].map(item) }));
-		expect(titles()).toEqual(['Title a', 'Title c', 'Title b']);
+		expect(titles()).toStrictEqual(['Title a', 'Title c', 'Title b']);
 	});
 
 	it("shows the friend's queue in remote mode on their device, mine again after", async () => {
@@ -190,9 +190,9 @@ describe('QueueModalContainer', () => {
 		useConnectStore.setState({ target: { kind: 'remote', ownerId: 'friend', deviceId: 'tablet' } });
 		setQueue({ currentItemId: 'c', items: ['c', 'd'].map(item) }, 'friend');
 		await renderModal();
-		expect(titles()).toEqual(['Title c', 'Title d']);
+		expect(titles()).toStrictEqual(['Title c', 'Title d']);
 
 		act(() => useConnectStore.setState({ target: { kind: 'local' } }));
-		expect(titles()).toEqual(['Title a', 'Title b']);
+		expect(titles()).toStrictEqual(['Title a', 'Title b']);
 	});
 });

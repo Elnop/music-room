@@ -11,11 +11,11 @@ import type { Theme } from '@/shared/theme/lib/types';
 import { textColorOn } from '@/features/shell/lib/textContrast';
 import { Text } from '@/shared/theme/components/Text';
 
-interface ConnectionBannerProps {
+type ConnectionBannerProps = {
 	status: ConnectionStatus;
 	topInset: number;
 	onRetry: () => void;
-}
+};
 
 const COPY: Record<NonNullable<ConnectionStatus>, string> = {
 	offline: 'Hors ligne',
@@ -65,7 +65,7 @@ export function ConnectionBanner({ status, topInset, onRetry }: ConnectionBanner
 }
 
 function createStyles(theme: Theme, topInset: number) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: {
 			paddingTop: topInset,
 		},
@@ -92,4 +92,5 @@ function createStyles(theme: Theme, topInset: number) {
 			fontFamily: theme.typography.families.bold,
 		},
 	});
+	return styles;
 }

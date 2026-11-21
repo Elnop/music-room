@@ -32,7 +32,7 @@ describe('searchApi', () => {
 
 	it('returns empty result for blank query without calling API', async () => {
 		const result = await searchApi.search('   ');
-		expect(result).toEqual({ collection: [], total_results: 0 });
+		expect(result).toStrictEqual({ collection: [], total_results: 0 });
 		expect(mockApiRequest).not.toHaveBeenCalled();
 	});
 
@@ -46,7 +46,7 @@ describe('searchApi', () => {
 		const result = await searchApi.search('daft punk', 15);
 
 		expect(mockApiRequest).toHaveBeenCalledWith('/api/soundcloud/search?q=daft+punk&limit=15');
-		expect(result).toEqual(mockResponse);
+		expect(result).toStrictEqual(mockResponse);
 	});
 
 	it('searchTracks returns track collection or empty array', async () => {
@@ -56,10 +56,10 @@ describe('searchApi', () => {
 		});
 
 		const tracks = await searchApi.searchTracks('daft');
-		expect(tracks).toEqual([sampleTrack]);
+		expect(tracks).toStrictEqual([sampleTrack]);
 
 		mockApiRequest.mockResolvedValueOnce({} as SoundCloudSearchResult);
 		const emptyTracks = await searchApi.searchTracks('none');
-		expect(emptyTracks).toEqual([]);
+		expect(emptyTracks).toStrictEqual([]);
 	});
 });

@@ -11,15 +11,15 @@ import {
 	geocoderNeedsLocationPermission,
 } from '@/features/events/shared/events/lib/geocoder';
 
-interface Located extends Coordinates {
+type Located = Coordinates & {
 	address: string;
-}
+};
 
-export interface EventPlace {
+export type EventPlace = {
 	isLocating: boolean;
 	locateHere: () => void;
 	resolve: (address: string) => Promise<Coordinates | null>;
-}
+};
 
 const POSITION_PERMISSION_NEEDED =
 	"Autorisez la localisation pour utiliser votre position : Zumik ne l'envoie jamais au serveur";

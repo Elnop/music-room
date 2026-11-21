@@ -17,7 +17,7 @@ import type {
 
 type Navigation = NativeStackNavigationProp<PlaylistStackParamList, 'Home'>;
 
-export interface HomeScreen {
+export type HomeScreen = {
 	isInitialLoading: boolean;
 	friendsPlaylists: FriendPlaylists[];
 	publicPlaylists: Playlist[];
@@ -28,7 +28,7 @@ export interface HomeScreen {
 	togglePublic: () => void;
 	openPlaylist: (id: string) => void;
 	bottomPadding: number;
-}
+};
 
 export function useHomeScreen(navigation: Navigation): HomeScreen {
 	const bottomPadding = useBottomPadding();

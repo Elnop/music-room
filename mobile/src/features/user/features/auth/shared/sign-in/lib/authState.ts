@@ -2,7 +2,7 @@ import type { StoreApi } from 'zustand';
 import type { UserProfile } from '@/shared/users/user.types';
 import type { AuthSessionTokens } from '@/features/user/features/auth/types';
 
-export interface SessionState {
+export type SessionState = {
 	user: UserProfile | null;
 	accessToken: string | null;
 	refreshToken: string | null;
@@ -10,9 +10,9 @@ export interface SessionState {
 	isAuthenticated: boolean;
 	isLoading: boolean;
 	isRefreshing: boolean;
-}
+};
 
-export interface SessionActions {
+export type SessionActions = {
 	startSession: (user: UserProfile, session: AuthSessionTokens) => Promise<void>;
 	logout: () => Promise<void>;
 	refreshAccessToken: () => Promise<boolean>;
@@ -20,7 +20,7 @@ export interface SessionActions {
 	loadFromStorage: () => Promise<void>;
 	setAvatarUrl: (avatarUrl: string | null) => Promise<void>;
 	setUser: (user: UserProfile) => Promise<void>;
-}
+};
 
 export type AuthState = SessionState & SessionActions;
 

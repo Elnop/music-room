@@ -4,7 +4,7 @@ const window = { width: 1440, height: 900 };
 
 describe('menuPlacement', () => {
 	it('opens under the button, its right edge on the button', () => {
-		expect(menuPlacement({ x: 1340, y: 20, width: 36, height: 36 }, window, 260)).toEqual({
+		expect(menuPlacement({ x: 1340, y: 20, width: 36, height: 36 }, window, 260)).toStrictEqual({
 			left: 1116,
 			top: 60,
 			maxHeight: 832,
@@ -16,7 +16,7 @@ describe('menuPlacement', () => {
 	});
 
 	it('opens upwards from a button near the bottom of the window', () => {
-		expect(menuPlacement({ x: 900, y: 800, width: 32, height: 32 }, window, 260)).toEqual({
+		expect(menuPlacement({ x: 900, y: 800, width: 32, height: 32 }, window, 260)).toStrictEqual({
 			left: 672,
 			bottom: 104,
 			maxHeight: 788,
@@ -30,7 +30,11 @@ describe('menuPlacement', () => {
 
 	it('opens a context menu at its point, to the right', () => {
 		const point = { x: 600, y: 300, width: 0, height: 0, align: 'start' as const };
-		expect(menuPlacement(point, window, 320)).toEqual({ left: 600, top: 304, maxHeight: 588 });
+		expect(menuPlacement(point, window, 320)).toStrictEqual({
+			left: 600,
+			top: 304,
+			maxHeight: 588,
+		});
 	});
 
 	it('flips a context menu to the left of a point near the right edge', () => {

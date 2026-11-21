@@ -22,6 +22,6 @@ describe('ThemedRefreshControl', () => {
 		const control = screen.UNSAFE_getByType(RefreshControl);
 		expect(control.props.children).toBe(list);
 		expect(control.props.style).toBe(style);
-		expect(control.props.colors).toEqual(['transparent']);
+		expect(control.props.colors).toStrictEqual(['transparent']);
 	});
 });

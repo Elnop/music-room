@@ -9,12 +9,12 @@ import { createSharingStyles } from '@/features/playlists/features/editor/featur
 import { Text } from '@/shared/theme/components/Text';
 import UsersSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/users-solid.svg';
 
-interface MembersSectionProps {
+type MembersSectionProps = {
 	title: string;
 	members: PlaylistMember[];
 	emptyMessage: string | null;
 	onRemove: (userId: string) => Promise<void>;
-}
+};
 
 export function MembersSection({ title, members, emptyMessage, onRemove }: MembersSectionProps) {
 	const { styles: shared } = useThemedStyles(createSharingStyles);
@@ -50,7 +50,7 @@ export function MembersSection({ title, members, emptyMessage, onRemove }: Membe
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		section: {
 			flex: 1,
 		},
@@ -59,4 +59,5 @@ function createStyles(theme: Theme) {
 			padding: theme.spacing.lg,
 		},
 	});
+	return styles;
 }

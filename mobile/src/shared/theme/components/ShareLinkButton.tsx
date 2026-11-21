@@ -9,11 +9,11 @@ import { useShareLink } from '@/shared/theme/hooks/useShareLink';
 import { Text } from '@/shared/theme/components/Text';
 import ShareSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/share-solid.svg';
 
-interface ShareLinkButtonProps {
+type ShareLinkButtonProps = {
 	url: string;
 	title?: string;
 	style?: StyleProp<ViewStyle>;
-}
+};
 
 export function ShareLinkButton({ url, title, style }: ShareLinkButtonProps) {
 	const { theme } = useTheme();
@@ -30,7 +30,7 @@ export function ShareLinkButton({ url, title, style }: ShareLinkButtonProps) {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		button: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -47,4 +47,5 @@ function createStyles(theme: Theme) {
 			color: theme.colors.text,
 		},
 	});
+	return styles;
 }

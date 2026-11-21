@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 
-interface AutoplayState {
+type AutoplayState = {
 	blocked: boolean;
 	setBlocked: (blocked: boolean) => void;
-}
+};
 
 export const useAutoplayStore = create<AutoplayState>(set => ({
 	blocked: false,

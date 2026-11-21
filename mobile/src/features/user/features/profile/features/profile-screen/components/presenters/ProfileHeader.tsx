@@ -8,10 +8,10 @@ import type { UserProfile } from '@/shared/users/user.types';
 import type { UserStats } from '@/features/user/features/profile/types';
 import { Text } from '@/shared/theme/components/Text';
 
-interface ProfileHeaderProps {
+type ProfileHeaderProps = {
 	user: UserProfile;
 	stats?: UserStats | null;
-}
+};
 
 export function ProfileHeader({ user, stats }: ProfileHeaderProps) {
 	const { theme } = useTheme();
@@ -43,7 +43,7 @@ export function ProfileHeader({ user, stats }: ProfileHeaderProps) {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		heroContent: {
 			alignItems: 'center',
 			paddingHorizontal: theme.spacing.lg,
@@ -96,4 +96,5 @@ function createStyles(theme: Theme) {
 			backgroundColor: theme.colors.border,
 		},
 	});
+	return styles;
 }

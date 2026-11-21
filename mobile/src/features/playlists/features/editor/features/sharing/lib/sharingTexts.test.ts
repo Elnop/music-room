@@ -13,7 +13,7 @@ const modes = [
 
 describe('sharingTexts', () => {
 	it('titles each mode', () => {
-		expect(modes.map(mode => sharingHeader(mode).title)).toEqual([
+		expect(modes.map(mode => sharingHeader(mode).title)).toStrictEqual([
 			'Accès et modification',
 			'Accès',
 			'Éditeurs',
@@ -22,7 +22,7 @@ describe('sharingTexts', () => {
 	});
 
 	it('counts the members by what they are', () => {
-		expect(modes.map(mode => membersTitle(mode, 2))).toEqual([
+		expect(modes.map(mode => membersTitle(mode, 2))).toStrictEqual([
 			'Personnes ayant accès (2)',
 			'Invités (2)',
 			'Éditeurs (2)',

@@ -17,7 +17,7 @@ describe('tracksApi', () => {
 		const result = { trackId: 't', rank: 'c', tracksVersion: 11, rebalanced: false };
 		request.mockResolvedValue(result);
 
-		await expect(tracksApi.moveTrack('p', 't', null, 10)).resolves.toEqual(result);
+		await expect(tracksApi.moveTrack('p', 't', null, 10)).resolves.toStrictEqual(result);
 
 		expect(request).toHaveBeenCalledWith('/api/playlists/p/tracks/t/move', {
 			method: 'POST',
@@ -27,7 +27,7 @@ describe('tracksApi', () => {
 
 	it('returns the remove result', async () => {
 		request.mockResolvedValue({ tracksVersion: 4 });
-		await expect(tracksApi.removeTrack('p', 't')).resolves.toEqual({ tracksVersion: 4 });
+		await expect(tracksApi.removeTrack('p', 't')).resolves.toStrictEqual({ tracksVersion: 4 });
 		expect(request).toHaveBeenCalledWith('/api/playlists/p/tracks/t', { method: 'DELETE' });
 	});
 });
@@ -37,7 +37,7 @@ describe('tracksApi.addTrack', () => {
 		const result = { track: { id: 't' }, tracksVersion: 2, rebalanced: false };
 		request.mockResolvedValue(result);
 		const track = { trackUri: 'u', title: 'T', artist: 'A', durationMs: 1 };
-		await expect(tracksApi.addTrack('p', track)).resolves.toEqual(result);
+		await expect(tracksApi.addTrack('p', track)).resolves.toStrictEqual(result);
 		expect(request).toHaveBeenCalledWith('/api/playlists/p/tracks', {
 			method: 'POST',
 			body: JSON.stringify(track),
@@ -48,10 +48,10 @@ describe('tracksApi.addTrack', () => {
 describe('playlistApi', () => {
 	it('unwraps the lists and the playlist', async () => {
 		request.mockResolvedValue({ playlists: [{ id: 'p' }], playlist: { id: 'p' } });
-		await expect(playlistApi.fetchPlaylists()).resolves.toEqual([{ id: 'p' }]);
-		await expect(playlistApi.fetchPublicPlaylists()).resolves.toEqual([{ id: 'p' }]);
-		await expect(playlistApi.fetchUserPublicPlaylists('u')).resolves.toEqual([{ id: 'p' }]);
-		await expect(playlistApi.fetchPlaylistById('p')).resolves.toEqual({ id: 'p' });
+		await expect(playlistApi.fetchPlaylists()).resolves.toStrictEqual([{ id: 'p' }]);
+		await expect(playlistApi.fetchPublicPlaylists()).resolves.toStrictEqual([{ id: 'p' }]);
+		await expect(playlistApi.fetchUserPublicPlaylists('u')).resolves.toStrictEqual([{ id: 'p' }]);
+		await expect(playlistApi.fetchPlaylistById('p')).resolves.toStrictEqual({ id: 'p' });
 		expect(request).toHaveBeenCalledWith('/api/playlists/user/u');
 	});
 

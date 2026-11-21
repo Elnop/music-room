@@ -35,12 +35,12 @@ describe('friendsApi', () => {
 		jest.mocked(apiRequest).mockResolvedValueOnce(stats);
 		const res1 = await friendsApi.getMyStats();
 		expect(apiRequest).toHaveBeenCalledWith('/api/friends/stats/me');
-		expect(res1).toEqual(stats);
+		expect(res1).toStrictEqual(stats);
 
 		jest.mocked(authRequest).mockResolvedValueOnce(stats);
 		const res2 = await friendsApi.getMyStats('tok');
 		expect(authRequest).toHaveBeenCalledWith('/api/friends/stats/me', 'tok');
-		expect(res2).toEqual(stats);
+		expect(res2).toStrictEqual(stats);
 	});
 
 	it('getFollowStatus calls /api/friends/status/:userId', async () => {
@@ -54,7 +54,7 @@ describe('friendsApi', () => {
 		jest.mocked(apiRequest).mockResolvedValueOnce(status);
 		const res = await friendsApi.getFollowStatus('u1');
 		expect(apiRequest).toHaveBeenCalledWith('/api/friends/status/u1');
-		expect(res).toEqual(status);
+		expect(res).toStrictEqual(status);
 	});
 
 	it('followUser posts to /api/friends/follow/:userId', async () => {
@@ -64,7 +64,7 @@ describe('friendsApi', () => {
 		expect(apiRequest).toHaveBeenCalledWith('/api/friends/follow/u2', {
 			method: 'POST',
 		});
-		expect(res).toEqual(ret);
+		expect(res).toStrictEqual(ret);
 	});
 
 	it('unfollowUser sends DELETE to /api/friends/follow/:userId', async () => {
@@ -74,7 +74,7 @@ describe('friendsApi', () => {
 		expect(apiRequest).toHaveBeenCalledWith('/api/friends/follow/u2', {
 			method: 'DELETE',
 		});
-		expect(res).toEqual(ret);
+		expect(res).toStrictEqual(ret);
 	});
 
 	it('searchUsers queries /api/profile/search', async () => {
@@ -87,7 +87,7 @@ describe('friendsApi', () => {
 		jest.mocked(apiRequest).mockResolvedValueOnce({ id: 'u3' });
 		const res = await friendsApi.getProfile('u3');
 		expect(apiRequest).toHaveBeenCalledWith('/api/profile/u3');
-		expect(res).toEqual({ id: 'u3' });
+		expect(res).toStrictEqual({ id: 'u3' });
 	});
 
 	it('getUserPublicPlaylists returns the playlists array', async () => {
@@ -95,14 +95,14 @@ describe('friendsApi', () => {
 		jest.mocked(apiRequest).mockResolvedValueOnce({ playlists });
 		const res = await friendsApi.getUserPublicPlaylists('u4');
 		expect(apiRequest).toHaveBeenCalledWith('/api/playlists/user/u4');
-		expect(res).toEqual(playlists);
+		expect(res).toStrictEqual(playlists);
 	});
 
 	it('getMyPermissions, grantControl and revokeControl interact with permissions API', async () => {
 		jest.mocked(apiRequest).mockResolvedValueOnce({ allowedUserIds: ['u5'] });
 		const perms = await friendsApi.getMyPermissions();
 		expect(apiRequest).toHaveBeenCalledWith('/api/music-control/permissions');
-		expect(perms).toEqual(['u5']);
+		expect(perms).toStrictEqual(['u5']);
 
 		jest.mocked(apiRequest).mockResolvedValueOnce(undefined);
 		await friendsApi.grantControl('u5');

@@ -25,7 +25,7 @@ const PLAYLIST_LIMITS = { NAME_MAX: 50, DESCRIPTION_MAX: 500 } as const;
 
 type Navigation = NativeStackNavigationProp<PlaylistStackParamList, 'CreatePlaylist'>;
 
-export interface PlaylistForm {
+export type PlaylistForm = {
 	isEditing: boolean;
 	name: CappedField;
 	description: CappedField;
@@ -35,7 +35,7 @@ export interface PlaylistForm {
 	setIsEditRestricted: (value: boolean) => void;
 	submit: () => void;
 	isSubmitting: boolean;
-}
+};
 
 export function usePlaylistForm(
 	navigation: Navigation,

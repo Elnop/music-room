@@ -43,12 +43,12 @@ export async function geocode(address: string): Promise<GeocodedPlace | null> {
 	return data.location;
 }
 
-interface OwnPlaylist {
+type OwnPlaylist = {
 	id: string;
 	name: string;
 	ownerId: string;
 	visibility: 'public' | 'private';
-}
+};
 
 export async function fetchPlaylistChoices(userId: string): Promise<PlaylistChoice[]> {
 	const data = await apiRequest<{ playlists: OwnPlaylist[] }>('/api/playlists');

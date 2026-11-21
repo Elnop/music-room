@@ -2,12 +2,12 @@ import { useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
 import type { View } from 'react-native';
 
-interface TooltipElement {
+type TooltipElement = {
 	textContent: string | null;
 	getAttribute(name: string): string | null;
 	setAttribute(name: string, value: string): void;
 	removeAttribute(name: string): void;
-}
+};
 
 const ICON_GLYPHS = /[-]/gu;
 

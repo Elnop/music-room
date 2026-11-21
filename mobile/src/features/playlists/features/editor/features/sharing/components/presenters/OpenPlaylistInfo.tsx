@@ -25,7 +25,7 @@ export function OpenPlaylistInfo() {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		card: {
 			flexDirection: 'row',
 			padding: theme.spacing.lg,
@@ -45,4 +45,5 @@ function createStyles(theme: Theme) {
 			lineHeight: 20,
 		},
 	});
+	return styles;
 }

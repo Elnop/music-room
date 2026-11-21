@@ -8,7 +8,7 @@ import type {
 } from '@/features/playback/shared/player/lib/queue.types';
 import { usePlayerStore } from '@/features/playback/shared/player/stores/playerStore';
 
-interface ConnectState {
+type ConnectState = {
 	target: ConnectTarget;
 	remoteStatus: ListeningStatus | null;
 	controlPending: boolean;
@@ -16,7 +16,7 @@ interface ConnectState {
 	setLocal: (message?: string) => void;
 	setRemoteStatus: (status: ListeningStatus | null) => void;
 	setControlPending: (pending: boolean) => void;
-}
+};
 
 const LOCAL: ConnectTarget = { kind: 'local' };
 

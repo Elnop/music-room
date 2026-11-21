@@ -13,7 +13,7 @@ import type { EventStackParamList, MusicEvent } from '@/features/events/lib/type
 
 type Navigation = NativeStackNavigationProp<EventStackParamList, 'EventDetail'>;
 
-export interface EventDetailScreen {
+export type EventDetailScreen = {
 	event: MusicEvent | undefined;
 	isLoading: boolean;
 	failed: boolean;
@@ -22,7 +22,7 @@ export interface EventDetailScreen {
 	openPlaylist: () => void;
 	edit: () => void;
 	remove: () => void;
-}
+};
 
 export function useEventDetailScreen(navigation: Navigation, id: string): EventDetailScreen {
 	const userId = useSession(session => session.user?.id);

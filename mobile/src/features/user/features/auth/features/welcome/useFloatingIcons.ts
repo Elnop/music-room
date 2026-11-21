@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { Animated, Dimensions, Easing } from 'react-native';
 
-export interface FloatingIconSpec {
+export type FloatingIconSpec = {
 	size: number;
 	top: number;
 	left: number;
@@ -9,14 +9,14 @@ export interface FloatingIconSpec {
 	duration: number;
 	rotateDirection: 1 | -1;
 	floatRange: number;
-}
+};
 
-export interface FloatingIconMotion {
+export type FloatingIconMotion = {
 	spec: FloatingIconSpec;
 	translateY: Animated.AnimatedInterpolation<number>;
 	rotate: Animated.AnimatedInterpolation<string>;
 	scale: Animated.Value;
-}
+};
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 

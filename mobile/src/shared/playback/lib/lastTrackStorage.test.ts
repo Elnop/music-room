@@ -33,7 +33,7 @@ describe('lastTrackStorage', () => {
 	it('saves and loads an entry per user', async () => {
 		await lastTrackStorage.save('me', entry);
 
-		expect(await lastTrackStorage.load('me')).toEqual(entry);
+		expect(await lastTrackStorage.load('me')).toStrictEqual(entry);
 		expect(await lastTrackStorage.load('other')).toBeNull();
 	});
 

@@ -4,13 +4,13 @@ import { usePanelFocus } from '@/features/playback/features/now-playing-panel/ho
 
 type Listener = (event: object) => void;
 
-interface FakeElement {
+type FakeElement = {
 	isConnected: boolean;
 	focus: jest.Mock;
 	contains: (other: unknown) => boolean;
 	addEventListener: (type: string, listener: Listener) => void;
 	removeEventListener: (type: string, listener: Listener) => void;
-}
+};
 
 const listeners = new Set<Listener>();
 function element(): FakeElement {

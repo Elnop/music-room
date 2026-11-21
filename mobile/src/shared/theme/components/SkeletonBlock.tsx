@@ -25,12 +25,12 @@ function useReduceMotion(): boolean | null {
 	return reduceMotion;
 }
 
-interface SkeletonBlockProps {
+type SkeletonBlockProps = {
 	width?: DimensionValue;
 	height?: DimensionValue;
 	radius?: number;
 	style?: StyleProp<ViewStyle>;
-}
+};
 
 export function SkeletonBlock({
 	width = '100%',

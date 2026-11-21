@@ -33,7 +33,10 @@ describe('usePlayerShortcuts', () => {
 		run('ArrowLeft', true);
 		run('ArrowRight', true);
 
-		expect(mockControls.handleSliderAction.mock.calls).toEqual([['decrement'], ['increment']]);
+		expect(mockControls.handleSliderAction.mock.calls).toStrictEqual([
+			['decrement'],
+			['increment'],
+		]);
 		expect(mockControls.handlePrevious).toHaveBeenCalledTimes(1);
 		expect(mockControls.handleNext).toHaveBeenCalledTimes(1);
 	});

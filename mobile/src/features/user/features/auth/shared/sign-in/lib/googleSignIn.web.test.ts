@@ -2,11 +2,11 @@ import type * as GoogleWebModule from '@/features/user/features/auth/shared/sign
 
 type GoogleWeb = typeof GoogleWebModule;
 
-interface ButtonConfig {
+type ButtonConfig = {
 	size: string;
 	width?: number;
 	click_listener: () => void;
-}
+};
 
 const mockLoadScript = jest.fn();
 let mockClientId: string | undefined;

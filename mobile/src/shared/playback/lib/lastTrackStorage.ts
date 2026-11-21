@@ -2,11 +2,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { z } from 'zod';
 import type { QueueTrack } from '@/shared/playback/lib/queue.types';
 
-export interface LastTrackEntry {
+export type LastTrackEntry = {
 	track: QueueTrack;
 	queueItemId: string | null;
 	positionMs: number;
-}
+};
 
 const entrySchema = z.object({
 	track: z.object({

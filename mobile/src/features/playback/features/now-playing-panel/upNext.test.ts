@@ -31,19 +31,19 @@ describe('upNext', () => {
 	it('takes the first items after the current one and counts the rest', () => {
 		const result = upNext(queue('b', ['a', 'b', 'c', 'd', 'e']), 2);
 		expect(result.current?.id).toBe('b');
-		expect(result.items.map(next => next.id)).toEqual(['c', 'd']);
+		expect(result.items.map(next => next.id)).toStrictEqual(['c', 'd']);
 		expect(result.total).toBe(3);
 	});
 
 	it('has nothing after the last item', () => {
 		const result = upNext(queue('b', ['a', 'b']), 5);
-		expect(result.items).toEqual([]);
+		expect(result.items).toStrictEqual([]);
 		expect(result.total).toBe(0);
 	});
 
 	it('shows the whole queue when nothing is current', () => {
 		const result = upNext(queue(null, ['a', 'b']), 5);
 		expect(result.current).toBeNull();
-		expect(result.items.map(next => next.id)).toEqual(['a', 'b']);
+		expect(result.items.map(next => next.id)).toStrictEqual(['a', 'b']);
 	});
 });

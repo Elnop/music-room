@@ -20,7 +20,7 @@ const PROVIDER_LABELS: Record<OAuthProvider, string> = {
 	facebook: 'Facebook',
 };
 
-interface LinkedAccountRowProps {
+type LinkedAccountRowProps = {
 	method: {
 		type: MethodType;
 		label: string;
@@ -31,7 +31,7 @@ interface LinkedAccountRowProps {
 	onLink: (provider: OAuthProvider) => void;
 	onUnlink: (provider: OAuthProvider) => void;
 	googleButton?: GoogleButtonSlot;
-}
+};
 
 export function LinkedAccountRow({
 	method,
@@ -104,7 +104,7 @@ export function LinkedAccountRow({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		accountItem: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -161,4 +161,5 @@ function createStyles(theme: Theme) {
 			color: theme.colors.error,
 		},
 	});
+	return styles;
 }

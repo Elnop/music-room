@@ -52,12 +52,12 @@ describe('getAdaptiveColors', () => {
 	it('keeps the translucent gradient when the text reaches AA on it', () => {
 		const palette = getAdaptiveColors('#0A0A0A', '#0D0D0D');
 		expect(palette?.text).toBe('#FFFFFF');
-		expect(palette?.gradient.map(stop => rgba(stop).alpha)).toEqual([...GRADIENT_ALPHAS]);
+		expect(palette?.gradient.map(stop => rgba(stop).alpha)).toStrictEqual([...GRADIENT_ALPHAS]);
 	});
 
 	it('turns the gradient opaque when no text colour reaches AA on both ends', () => {
 		const palette = getAdaptiveColors('#F5F5F5', '#0D0D0D');
-		expect(palette?.gradient.map(stop => rgba(stop).alpha)).toEqual([1, 1, 1, 1]);
+		expect(palette?.gradient.map(stop => rgba(stop).alpha)).toStrictEqual([1, 1, 1, 1]);
 		expect(palette?.text).toBe('#000000');
 	});
 

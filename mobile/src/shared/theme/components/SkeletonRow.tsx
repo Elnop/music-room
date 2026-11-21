@@ -5,11 +5,11 @@ import { useTheme } from '@/shared/theme/components/ThemeContext';
 import { SkeletonBlock } from '@/shared/theme/components/SkeletonBlock';
 import { createRowSkeletonStyles } from '@/shared/theme/lib/skeletonStyles';
 
-interface RowSkeletonLayoutProps {
+type RowSkeletonLayoutProps = {
 	radius: number;
 	firstWidth: DimensionValue;
 	secondWidth: DimensionValue;
-}
+};
 
 export function SkeletonRow({ radius, firstWidth, secondWidth }: RowSkeletonLayoutProps) {
 	const { theme } = useTheme();

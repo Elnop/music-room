@@ -84,7 +84,7 @@ describe('useMediaSession (web)', () => {
 	it('shows the track, its artwork, its state, and its position to the browser', () => {
 		renderHook(() => useMediaSession());
 
-		expect(session.metadata).toEqual(
+		expect(session.metadata).toStrictEqual(
 			new FakeMetadata({
 				title: 'Song',
 				artist: 'Artist',
@@ -126,7 +126,7 @@ describe('useMediaSession (web)', () => {
 	it('clears the session without a track, and survives an unsupported action', () => {
 		unsupportedSeek = true;
 		const { rerender, unmount } = renderHook(() => useMediaSession());
-		expect(session.handlers.get('play')).toEqual(expect.any(Function));
+		expect(session.handlers.get('play')).toStrictEqual(expect.any(Function));
 
 		mockNowPlaying = nowPlaying({ track: null, durationMs: null });
 		rerender({});

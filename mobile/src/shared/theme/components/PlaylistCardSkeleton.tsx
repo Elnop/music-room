@@ -5,9 +5,9 @@ import type { Theme } from '@/shared/theme/lib/types';
 import { useGridTileWidth } from '@/shared/theme/hooks/useGridTileWidth';
 import { SkeletonBlock } from '@/shared/theme/components/SkeletonBlock';
 
-interface PlaylistCardSkeletonProps {
+type PlaylistCardSkeletonProps = {
 	width?: number;
-}
+};
 
 export function PlaylistCardSkeleton({ width: fixedWidth }: PlaylistCardSkeletonProps) {
 	const { theme } = useTheme();
@@ -24,7 +24,7 @@ export function PlaylistCardSkeleton({ width: fixedWidth }: PlaylistCardSkeleton
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		cardTitle: {
 			marginTop: theme.spacing.sm,
 		},
@@ -32,4 +32,5 @@ function createStyles(theme: Theme) {
 			marginTop: 6,
 		},
 	});
+	return styles;
 }

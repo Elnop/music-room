@@ -109,7 +109,7 @@ describe('SettingsContainer', () => {
 		renderSettings();
 		expect(
 			StyleSheet.flatten(screen.UNSAFE_getByType(ScrollView).props.contentContainerStyle)
-		).toEqual({ paddingBottom: testTheme.spacing.xl });
+		).toStrictEqual({ paddingBottom: testTheme.spacing.xl });
 	});
 
 	it('opens the privacy policy', () => {

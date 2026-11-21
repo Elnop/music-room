@@ -32,7 +32,7 @@ export function DetailSkeleton() {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		header: {
 			alignItems: 'center',
 			marginBottom: theme.spacing.lg,
@@ -44,4 +44,5 @@ function createStyles(theme: Theme) {
 			marginTop: theme.spacing.xs,
 		},
 	});
+	return styles;
 }

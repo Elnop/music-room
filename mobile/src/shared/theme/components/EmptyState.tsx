@@ -9,18 +9,18 @@ import type { Theme } from '@/shared/theme/lib/types';
 import { Pressable } from '@/shared/theme/components/Pressable';
 import { Text } from '@/shared/theme/components/Text';
 
-interface EmptyStateAction {
+type EmptyStateAction = {
 	label: string;
 	onPress: () => void;
-}
+};
 
-interface EmptyStateProps {
+type EmptyStateProps = {
 	message: string;
 	icon?: PixelIconSource;
 	action?: EmptyStateAction;
 	compact?: boolean;
 	style?: StyleProp<ViewStyle>;
-}
+};
 
 export function EmptyState({ message, icon, action, compact = false, style }: EmptyStateProps) {
 	const { theme } = useTheme();
@@ -47,7 +47,7 @@ export function EmptyState({ message, icon, action, compact = false, style }: Em
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: {
 			flex: 1,
 			justifyContent: 'center',
@@ -85,4 +85,5 @@ function createStyles(theme: Theme) {
 			color: theme.colors.onColor,
 		},
 	});
+	return styles;
 }

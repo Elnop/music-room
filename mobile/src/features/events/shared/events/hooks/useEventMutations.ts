@@ -20,10 +20,10 @@ export function useCreateEvent() {
 	});
 }
 
-interface UpdateVariables {
+type UpdateVariables = {
 	id: string;
 	changes: Partial<EventInput>;
-}
+};
 
 export function useUpdateEvent() {
 	const client = useQueryClient();

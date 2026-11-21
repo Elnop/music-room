@@ -8,10 +8,10 @@ import {
 	SCREEN_WIDTHS,
 } from '@/features/shell/lib/screenWidths';
 
-interface ScreenLayoutArgs {
+type ScreenLayoutArgs = {
 	route: { name: string };
 	children: React.ReactElement;
-}
+};
 
 export function screenLayout(besideSidebar: boolean) {
 	return ({ route, children }: ScreenLayoutArgs) => {

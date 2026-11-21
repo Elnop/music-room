@@ -6,12 +6,12 @@ import type { createStyles } from '@/features/playback/features/player-modal/com
 import PhoneRingingLowSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/phone-ringing-low-solid.svg';
 import PlaylistSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/playlist-solid.svg';
 
-interface PlayerBottomBarProps {
+type PlayerBottomBarProps = {
 	styles: ReturnType<typeof createStyles>;
 	deviceLabel: string | null;
 	onOpenDevices: () => void;
 	onOpenQueue: () => void;
-}
+};
 
 export function PlayerBottomBar({
 	styles,

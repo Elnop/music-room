@@ -12,7 +12,7 @@ import {
 
 const RESEND_COOLDOWN_S = 60;
 
-export interface EmailVerification {
+export type EmailVerification = {
 	code: CodeInput;
 	changeDigit: (index: number, text: string) => void;
 	verify: () => void;
@@ -22,7 +22,7 @@ export interface EmailVerification {
 	cooldown: number;
 	error: string | null;
 	codeError: string | null;
-}
+};
 
 export function useEmailVerification(userId: string, email: string): EmailVerification {
 	const code = useCodeInput();

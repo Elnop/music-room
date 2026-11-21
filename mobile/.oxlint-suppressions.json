@@ -17,21 +17,11 @@
       "count": 1
     }
   },
-  "src/app/RootNavigator.test.tsx": {
-    "jest(prefer-strict-equal)": {
-      "count": 1
-    }
-  },
   "src/app/RootNavigator.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
     },
     "function-size(max-variables)": {
-      "count": 1
-    }
-  },
-  "src/app/SettingsScreen.test.tsx": {
-    "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
@@ -43,9 +33,6 @@
   "src/app/stacks/PlaylistsStack.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/app/stacks/ProfileStack.tsx": {
@@ -54,9 +41,6 @@
     }
   },
   "src/features/events/features/detail/beaconAdvertiser.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 1
-    },
     "react-native(split-platform-components)": {
       "count": 1
     }
@@ -66,9 +50,6 @@
       "count": 1
     },
     "react-native(split-platform-components)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     },
     "typescript(method-signature-style)": {
@@ -86,9 +67,6 @@
     },
     "store-layout(store-layout)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/events/features/detail/components/EventDetailContainer.test.tsx": {
@@ -119,14 +97,8 @@
     }
   },
   "src/features/events/features/detail/components/presenters/InfoRow.tsx": {
-    "react-native(no-unused-styles)": {
-      "count": 5
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/events/features/detail/components/presenters/beaconCardStyles.ts": {
@@ -143,9 +115,6 @@
     },
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/events/features/detail/hooks/useEventDetailScreen.ts": {
@@ -157,9 +126,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/events/features/event-form/components/EventFormContainer.test.tsx": {
@@ -168,14 +134,8 @@
     }
   },
   "src/features/events/features/event-form/components/presenters/DateTimeRow.tsx": {
-    "react-native(no-unused-styles)": {
-      "count": 3
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/events/features/event-form/components/presenters/EventFormView.tsx": {
@@ -184,27 +144,15 @@
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/events/features/event-form/components/presenters/FieldLabel.tsx": {
     "component-props(no-restricted-syntax)": {
       "count": 1
-    },
-    "react-native(no-unused-styles)": {
-      "count": 1
     }
   },
   "src/features/events/features/event-form/components/presenters/GenreSelector.tsx": {
     "react-native(no-raw-text)": {
-      "count": 1
-    },
-    "react-native(no-unused-styles)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -213,12 +161,6 @@
       "count": 1
     },
     "react-native(no-raw-text)": {
-      "count": 1
-    },
-    "react-native(no-unused-styles)": {
-      "count": 5
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -231,14 +173,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/events/features/event-form/hooks/useEventPlace.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 2
     }
   },
   "src/features/events/features/event-form/hooks/useEventPlace.ts": {
@@ -247,19 +181,10 @@
     },
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 2
     }
   },
   "src/features/events/features/event-form/lib/pickDateTime.web.test.ts": {
     "jest(prefer-called-with)": {
-      "count": 1
-    },
-    "jest(prefer-strict-equal)": {
-      "count": 3
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -269,9 +194,6 @@
     },
     "function-size(max-functions)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 4
     }
   },
   "src/features/events/features/event-form/lib/validators.ts": {
@@ -287,22 +209,10 @@
   "src/features/events/features/nearby/components/presenters/BeaconStatusLine.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "react-native(no-unused-styles)": {
-      "count": 3
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/events/features/nearby/components/presenters/EventRow.tsx": {
-    "react-native(no-unused-styles)": {
-      "count": 3
-    },
     "theme-styles(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -312,9 +222,6 @@
     },
     "eslint(max-lines-per-function)": {
       "count": 3
-    },
-    "react-native(no-unused-styles)": {
-      "count": 12
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 7
@@ -329,9 +236,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "react-native(no-unused-styles)": {
-      "count": 5
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 13
@@ -349,9 +253,6 @@
     },
     "react(set-state-in-effect)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/events/features/nearby/hooks/useForegroundPosition.ts": {
@@ -366,9 +267,6 @@
     },
     "react(exhaustive-effect-dependencies)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/events/features/nearby/hooks/useNearbyEvents.ts": {
@@ -380,14 +278,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/events/features/nearby/lib/base64.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 3
     }
   },
   "src/features/events/features/nearby/lib/base64.ts": {
@@ -395,16 +285,8 @@
       "count": 1
     }
   },
-  "src/features/events/features/nearby/lib/beaconDistance.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 1
-    }
-  },
   "src/features/events/features/nearby/lib/beaconDistance.ts": {
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -414,16 +296,10 @@
     },
     "react-native(split-platform-components)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/events/features/nearby/lib/beaconScanner.web.ts": {
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -432,17 +308,9 @@
       "count": 4
     }
   },
-  "src/features/events/features/nearby/lib/nearbyEvents.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 6
-    }
-  },
   "src/features/events/features/nearby/lib/nearbyEvents.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 2
     },
     "unicorn(no-array-sort)": {
       "count": 2
@@ -451,15 +319,9 @@
   "src/features/events/features/nearby/lib/nearbyNotice.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/events/features/nearby/lib/radarBlips.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 1
-    },
     "unicorn(no-array-for-each)": {
       "count": 1
     }
@@ -467,15 +329,9 @@
   "src/features/events/features/nearby/lib/radarBlips.ts": {
     "file-named-after-export(file-named-after-export)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/events/lib/eventSocketRules.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 3
-    },
     "query-conventions(query-key-factory)": {
       "count": 2
     },
@@ -500,14 +356,6 @@
     },
     "export-placement(no-restricted-syntax)": {
       "count": 8
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 7
-    }
-  },
-  "src/features/events/shared/beacon/ibeacon.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 3
     }
   },
   "src/features/events/shared/beacon/ibeacon.ts": {
@@ -516,29 +364,11 @@
     },
     "function-size(max-functions)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/events/shared/event-dates/eventDates.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 1
     }
   },
   "src/features/events/shared/event-screen/eventScreenStyles.ts": {
     "file-named-after-export(file-named-after-export)": {
       "count": 1
-    }
-  },
-  "src/features/events/shared/events/hooks/useEventMutations.ts": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/events/shared/events/lib/eventCache.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 3
     }
   },
   "src/features/events/shared/events/lib/eventCache.ts": {
@@ -549,27 +379,16 @@
   "src/features/events/shared/events/lib/eventLocation.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/events/shared/events/lib/eventsApi.ts": {
     "function-size(max-functions)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/events/shared/events/lib/geocoder.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    }
-  },
-  "src/features/events/shared/events/lib/geocoder.web.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 2
     }
   },
   "src/features/events/shared/events/lib/geocoder.web.ts": {
@@ -586,9 +405,6 @@
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 3
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/legal/components/presenters/PrivacyPolicyView.tsx": {
@@ -598,21 +414,12 @@
     "react(no-array-index-key)": {
       "count": 3
     },
-    "react-native(no-unused-styles)": {
-      "count": 10
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 3
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/legal/privacyPolicyContent.ts": {
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -622,12 +429,6 @@
     },
     "jest(prefer-called-with)": {
       "count": 5
-    },
-    "jest(prefer-strict-equal)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 2
     }
   },
   "src/features/playback/components/PlayerProvider.tsx": {
@@ -648,16 +449,10 @@
   "src/features/playback/features/control-delegation/features/device-picker/components/DevicePickerSheetContainer.test.tsx": {
     "jest(prefer-called-with)": {
       "count": 1
-    },
-    "jest(prefer-strict-equal)": {
-      "count": 1
     }
   },
   "src/features/playback/features/control-delegation/features/device-picker/components/DevicePickerSheetContainer.tsx": {
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -697,9 +492,6 @@
   "src/features/playback/features/control-delegation/features/device-picker/transferPlayback.test.ts": {
     "jest(prefer-called-with)": {
       "count": 1
-    },
-    "jest(prefer-strict-equal)": {
-      "count": 8
     }
   },
   "src/features/playback/features/control-delegation/features/device-picker/transferPlayback.ts": {
@@ -710,9 +502,6 @@
       "count": 1
     },
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -727,9 +516,6 @@
       "count": 1
     },
     "react(exhaustive-effect-dependencies)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -746,11 +532,6 @@
   },
   "src/features/playback/features/control-delegation/features/my-devices/components/orchestrators/RenameDeviceModalContainer.test.tsx": {
     "jest(prefer-called-with)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/features/control-delegation/features/my-devices/components/orchestrators/RenameDeviceModalContainer.tsx": {
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -771,9 +552,6 @@
   "src/features/playback/features/control-delegation/features/my-devices/components/presenters/DeviceCardSkeleton.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "react-native(no-unused-styles)": {
-      "count": 7
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 2
@@ -800,38 +578,21 @@
     "eslint(max-lines-per-function)": {
       "count": 2
     },
-    "react-native(no-unused-styles)": {
-      "count": 9
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 8
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playback/features/control-delegation/features/my-devices/components/presenters/MyDevicesErrorView.tsx": {
     "component-props(no-restricted-syntax)": {
       "count": 1
     },
-    "react-native(no-unused-styles)": {
-      "count": 3
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playback/features/control-delegation/features/my-devices/components/presenters/MyDevicesHeader.tsx": {
-    "react-native(no-unused-styles)": {
-      "count": 2
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 2
-    }
-  },
-  "src/features/playback/features/control-delegation/features/my-devices/components/presenters/MyDevicesLoadingView.tsx": {
-    "react-native(no-unused-styles)": {
-      "count": 1
     }
   },
   "src/features/playback/features/control-delegation/features/my-devices/components/presenters/MyDevicesView.tsx": {
@@ -879,9 +640,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playback/features/control-delegation/hooks/useControllableDevices.ts": {
@@ -893,9 +651,6 @@
     },
     "react(exhaustive-effect-dependencies)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 2
     }
   },
   "src/features/playback/features/control-delegation/hooks/useFriendListening.test.ts": {
@@ -904,9 +659,6 @@
     },
     "jest(prefer-called-with)": {
       "count": 4
-    },
-    "jest(prefer-strict-equal)": {
-      "count": 3
     }
   },
   "src/features/playback/features/control-delegation/hooks/useFriendListening.ts": {
@@ -939,14 +691,6 @@
   "src/features/playback/features/control-delegation/shared/delegation/lib/device.types.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 12
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 12
-    }
-  },
-  "src/features/playback/features/control-delegation/shared/delegation/lib/musicControlApi.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 6
     }
   },
   "src/features/playback/features/control-delegation/shared/delegation/lib/types.ts": {
@@ -954,9 +698,6 @@
       "count": 1
     },
     "export-placement(no-restricted-syntax)": {
-      "count": 6
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 6
     }
   },
@@ -977,16 +718,10 @@
     },
     "react(exhaustive-effect-dependencies)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playback/features/media-session/useMediaSession.web.test.ts": {
     "jest(prefer-called-with)": {
-      "count": 2
-    },
-    "jest(prefer-strict-equal)": {
       "count": 2
     }
   },
@@ -1003,9 +738,6 @@
     "sonarjs(cognitive-complexity)": {
       "count": 1
     },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 3
-    },
     "typescript(method-signature-style)": {
       "count": 2
     }
@@ -1018,9 +750,6 @@
       "count": 1
     },
     "theme-styles(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -1047,42 +776,20 @@
     },
     "react(capitalized-calls)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playback/features/now-playing-panel/components/presenters/NowPlayingPanelView.tsx": {
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playback/features/now-playing-panel/components/presenters/PanelDeviceCard.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playback/features/now-playing-panel/components/presenters/PanelTrackActions.tsx": {
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/features/now-playing-panel/components/presenters/UpNextRow.tsx": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/features/now-playing-panel/components/presenters/UpNextSection.tsx": {
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -1106,9 +813,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playback/features/now-playing-panel/hooks/usePanelFocus.web.test.ts": {
@@ -1118,9 +822,6 @@
     "jest(prefer-called-with)": {
       "count": 4
     },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    },
     "unicorn(no-array-for-each)": {
       "count": 1
     }
@@ -1129,21 +830,8 @@
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 3
-    },
     "typescript(method-signature-style)": {
       "count": 6
-    }
-  },
-  "src/features/playback/features/now-playing-panel/upNext.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 3
-    }
-  },
-  "src/features/playback/features/now-playing-panel/upNext.ts": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playback/features/player-bar/components/PlayerBarContainer.test.tsx": {
@@ -1170,9 +858,6 @@
   "src/features/playback/features/player-bar/components/presenters/PlayerBarView.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playback/features/player-bar/components/presenters/playerBarStyles.ts": {
@@ -1197,11 +882,6 @@
       "count": 1
     }
   },
-  "src/features/playback/features/player-modal/components/orchestrators/PlayerModalContainer.test.tsx": {
-    "jest(prefer-strict-equal)": {
-      "count": 3
-    }
-  },
   "src/features/playback/features/player-modal/components/orchestrators/PlayerModalContainer.tsx": {
     "component-props(no-restricted-syntax)": {
       "count": 1
@@ -1213,16 +893,10 @@
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 5
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playback/features/player-modal/components/presenters/PlayerBottomBar.tsx": {
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -1251,25 +925,16 @@
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playback/features/player-modal/components/presenters/PlayerModalView.tsx": {
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playback/features/player-modal/components/presenters/PlayerTrackError.tsx": {
     "theme-styles(no-restricted-syntax)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playback/features/player-modal/components/presenters/playerModalStyles.ts": {
@@ -1301,9 +966,6 @@
     },
     "react(exhaustive-effect-dependencies)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 2
     }
   },
   "src/features/playback/features/player-modal/hooks/usePlayerModal.ts": {
@@ -1322,19 +984,11 @@
       "count": 2
     }
   },
-  "src/features/playback/features/queue-modal/components/QueueModalContainer.test.tsx": {
-    "jest(prefer-strict-equal)": {
-      "count": 6
-    }
-  },
   "src/features/playback/features/queue-modal/components/QueueModalContainer.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
     },
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -1350,11 +1004,6 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/features/queue-modal/components/presenters/QueueTrackDetails.tsx": {
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -1383,11 +1032,6 @@
       "count": 2
     }
   },
-  "src/features/playback/hooks/useLastTrackPersistence.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 1
-    }
-  },
   "src/features/playback/hooks/useLastTrackPersistence.ts": {
     "eslint(max-lines-per-function)": {
       "count": 1
@@ -1413,11 +1057,6 @@
       "count": 1
     }
   },
-  "src/features/playback/hooks/usePlayerShortcuts.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 1
-    }
-  },
   "src/features/playback/hooks/usePlayerShortcuts.ts": {
     "eslint(max-lines-per-function)": {
       "count": 1
@@ -1429,11 +1068,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    }
-  },
-  "src/features/playback/hooks/useRemoteTarget.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 3
     }
   },
   "src/features/playback/hooks/useRemoteTarget.ts": {
@@ -1460,9 +1094,6 @@
     }
   },
   "src/features/playback/lib/jsKeepAlive.ts": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    },
     "typescript(method-signature-style)": {
       "count": 2
     }
@@ -1480,27 +1111,11 @@
   "src/features/playback/shared/full-screen-sheet/FullScreenSheet.tsx": {
     "export-placement(no-restricted-syntax)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 2
-    }
-  },
-  "src/features/playback/shared/listening-rooms/listeningRooms.ts": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playback/shared/panel/nowPlayingPanelStore.ts": {
     "store-layout(store-layout)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/shared/player/hooks/useAudioPlaybackSync.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 1
     }
   },
   "src/features/playback/shared/player/hooks/useAudioPlaybackSync.ts": {
@@ -1546,16 +1161,10 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playback/shared/player/hooks/usePlayerProgress.ts": {
     "react(exhaustive-effect-dependencies)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -1610,9 +1219,6 @@
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    },
     "unicorn(no-array-for-each)": {
       "count": 1
     }
@@ -1620,17 +1226,11 @@
   "src/features/playback/shared/player/lib/listening.types.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 2
     }
   },
   "src/features/playback/shared/player/lib/mediaElement.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 2
     },
     "typescript(method-signature-style)": {
       "count": 7
@@ -1639,17 +1239,11 @@
   "src/features/playback/shared/player/lib/playerState.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playback/shared/player/lib/queue.types.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 4
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 3
     }
   },
   "src/features/playback/shared/player/lib/queueNavigation.ts": {
@@ -1658,16 +1252,10 @@
     },
     "function-size(max-functions)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playback/shared/player/lib/queueScope.ts": {
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -1692,19 +1280,9 @@
       "count": 1
     }
   },
-  "src/features/playback/shared/player/lib/streamApi.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 1
-    }
-  },
   "src/features/playback/shared/player/lib/streamApi.ts": {
     "file-named-after-export(file-named-after-export)": {
       "count": 1
-    }
-  },
-  "src/features/playback/shared/player/lib/streamPrefetch.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 2
     }
   },
   "src/features/playback/shared/player/lib/streamPrefetch.ts": {
@@ -1723,19 +1301,11 @@
       "count": 2
     }
   },
-  "src/features/playback/shared/player/lib/trackToSoundCloud.ts": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
   "src/features/playback/shared/player/lib/types.ts": {
     "check-file(filename-blocklist)": {
       "count": 1
     },
     "export-placement(no-restricted-syntax)": {
-      "count": 7
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 7
     },
     "typescript(method-signature-style)": {
@@ -1745,14 +1315,6 @@
   "src/features/playback/shared/player/stores/autoplayStore.ts": {
     "store-layout(store-layout)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/shared/player/stores/connectStore.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 4
     }
   },
   "src/features/playback/shared/player/stores/connectStore.ts": {
@@ -1764,14 +1326,6 @@
     },
     "store-layout(store-layout)": {
       "count": 6
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/playback/shared/player/stores/playerStore.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 3
     }
   },
   "src/features/playback/shared/player/stores/playerStore.ts": {
@@ -1788,12 +1342,6 @@
     },
     "jest(prefer-called-with)": {
       "count": 3
-    },
-    "jest(prefer-strict-equal)": {
-      "count": 17
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playback/shared/player/stores/queueStore.ts": {
@@ -1805,9 +1353,6 @@
     },
     "store-layout(store-layout)": {
       "count": 3
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playback/shared/seek-bar/PlayerProgressSlider.tsx": {
@@ -1830,9 +1375,6 @@
     },
     "react(set-state-in-effect)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playback/shared/sheet-header/sheetHeaderStyles.ts": {
@@ -1843,17 +1385,11 @@
   "src/features/playback/shared/track-swipe/trackSwipe.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playback/shared/volume/volumeStore.ts": {
     "store-layout(store-layout)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/browse/features/home/components/HomeContainer.tsx": {
@@ -1870,17 +1406,6 @@
     },
     "react(only-export-components)": {
       "count": 1
-    },
-    "react-native(no-unused-styles)": {
-      "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/playlists/features/browse/features/home/components/presenters/HomeSkeleton.tsx": {
-    "react-native(no-unused-styles)": {
-      "count": 3
     }
   },
   "src/features/playlists/features/browse/features/home/components/presenters/HomeView.tsx": {
@@ -1905,14 +1430,6 @@
       "count": 1
     },
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/playlists/features/browse/features/library/components/LibraryContainer.test.tsx": {
-    "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
@@ -1941,22 +1458,13 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/browse/shared/playlist-grid/components/PlaylistCards.tsx": {
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     },
-    "react-native(no-unused-styles)": {
-      "count": 1
-    },
     "theme-styles(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -1964,14 +1472,8 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "react-native(no-unused-styles)": {
-      "count": 3
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 3
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/browse/shared/playlist-grid/components/PlaylistGrid.tsx": {
@@ -1981,9 +1483,6 @@
   },
   "src/features/playlists/features/browse/shared/playlist-grid/components/RefreshableScroll.tsx": {
     "theme-styles(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -2023,23 +1522,14 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/features/detail/components/PlaylistDetailContainer.test.tsx": {
     "jest(prefer-called-with)": {
       "count": 1
     },
-    "jest(prefer-strict-equal)": {
-      "count": 2
-    },
     "react-native(no-raw-text)": {
       "count": 3
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/features/detail/components/PlaylistDetailContainer.tsx": {
@@ -2064,19 +1554,6 @@
       "count": 4
     }
   },
-  "src/features/playlists/features/editor/features/detail/components/presenters/DetailSkeleton.tsx": {
-    "react-native(no-unused-styles)": {
-      "count": 3
-    }
-  },
-  "src/features/playlists/features/editor/features/detail/components/presenters/LoadFailure.tsx": {
-    "react-native(no-unused-styles)": {
-      "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
   "src/features/playlists/features/editor/features/detail/components/presenters/PlayPlaylistButton.tsx": {
     "component-props(no-restricted-syntax)": {
       "count": 1
@@ -2088,16 +1565,10 @@
     },
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "react-native(no-unused-styles)": {
-      "count": 5
     }
   },
   "src/features/playlists/features/editor/features/detail/components/presenters/PlaylistCover.tsx": {
     "component-props(no-restricted-syntax)": {
-      "count": 1
-    },
-    "react-native(no-unused-styles)": {
       "count": 1
     }
   },
@@ -2127,25 +1598,13 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "react-native(no-unused-styles)": {
-      "count": 13
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/features/detail/components/presenters/PlaylistWideHeader.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 2
-    },
-    "react-native(no-unused-styles)": {
-      "count": 7
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/features/detail/components/presenters/SwipeableTrackItem.tsx": {
@@ -2171,9 +1630,6 @@
   "src/features/playlists/features/editor/features/detail/components/presenters/TrackTableHeader.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "react-native(no-unused-styles)": {
-      "count": 2
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 3
@@ -2207,19 +1663,11 @@
       "count": 1
     }
   },
-  "src/features/playlists/features/editor/features/detail/hooks/useAnchoredPress.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 1
-    }
-  },
   "src/features/playlists/features/editor/features/detail/hooks/useOwnerActions.ts": {
     "eslint(max-lines-per-function)": {
       "count": 1
     },
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -2237,9 +1685,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/features/detail/hooks/usePlaylistDetailScreen.ts": {
@@ -2254,9 +1699,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/features/detail/hooks/usePlaylistRoom.ts": {
@@ -2264,9 +1706,6 @@
       "count": 1
     },
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -2279,15 +1718,9 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/features/detail/lib/playlistSocketRules.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 8
-    },
     "query-conventions(query-key-factory)": {
       "count": 6
     }
@@ -2317,33 +1750,18 @@
   "src/features/playlists/features/editor/features/playlist-form/components/PlaylistFormContainer.test.tsx": {
     "jest(prefer-called-with)": {
       "count": 3
-    },
-    "jest(prefer-strict-equal)": {
-      "count": 5
     }
   },
   "src/features/playlists/features/editor/features/playlist-form/components/presenters/PlaylistFormView.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "react-native(no-unused-styles)": {
-      "count": 5
-    },
     "theme-styles(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/playlists/features/editor/features/playlist-form/components/presenters/ToggleCard.tsx": {
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "react-native(no-unused-styles)": {
-      "count": 5
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -2356,17 +1774,11 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/features/search-tracks/components/SearchTracksContainer.test.tsx": {
     "jest(prefer-called-with)": {
       "count": 1
-    },
-    "jest(prefer-strict-equal)": {
-      "count": 2
     }
   },
   "src/features/playlists/features/editor/features/search-tracks/components/presenters/AddableTrackRow.tsx": {
@@ -2378,28 +1790,14 @@
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 7
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/features/search-tracks/components/presenters/SearchTracksView.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "react-native(no-unused-styles)": {
-      "count": 3
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/playlists/features/editor/features/search-tracks/trackSearchApi.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 2
     }
   },
   "src/features/playlists/features/editor/features/search-tracks/trackSearchApi.ts": {
@@ -2422,9 +1820,6 @@
     },
     "react-hooks(exhaustive-deps)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/features/sharing/components/PlaylistSharingContainer.test.tsx": {
@@ -2435,18 +1830,9 @@
   "src/features/playlists/features/editor/features/sharing/components/presenters/MembersSection.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "react-native(no-unused-styles)": {
-      "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/features/sharing/components/presenters/OpenPlaylistInfo.tsx": {
-    "react-native(no-unused-styles)": {
-      "count": 4
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 1
     }
@@ -2455,14 +1841,8 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "react-native(no-unused-styles)": {
-      "count": 6
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 3
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/features/sharing/components/presenters/SharingView.tsx": {
@@ -2475,9 +1855,6 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "react-native(no-unused-styles)": {
-      "count": 8
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 1
     }
@@ -2486,14 +1863,8 @@
     "eslint(max-lines-per-function)": {
       "count": 2
     },
-    "react-native(no-unused-styles)": {
-      "count": 11
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 13
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/features/sharing/components/presenters/UserResults.tsx": {
@@ -2503,14 +1874,8 @@
     "eslint(no-nested-ternary)": {
       "count": 1
     },
-    "react-native(no-unused-styles)": {
-      "count": 7
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 4
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/features/sharing/components/presenters/sharingStyles.ts": {
@@ -2526,9 +1891,6 @@
       "count": 1
     },
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -2550,9 +1912,6 @@
     },
     "tanstack-query(exhaustive-deps)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/features/sharing/hooks/useSharingSettings.ts": {
@@ -2564,34 +1923,15 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/features/sharing/hooks/useUserSearch.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/playlists/features/editor/features/sharing/lib/membersApi.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 1
-    }
-  },
-  "src/features/playlists/features/editor/features/sharing/lib/sharingTexts.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 2
     }
   },
   "src/features/playlists/features/editor/features/sharing/lib/sharingTexts.ts": {
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -2601,22 +1941,6 @@
     },
     "jest(prefer-called-with)": {
       "count": 7
-    },
-    "jest(prefer-strict-equal)": {
-      "count": 1
-    }
-  },
-  "src/features/playlists/features/editor/features/track-actions/components/TrackActionsSheetContainer.tsx": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/playlists/features/editor/features/track-actions/components/presenters/NewPlaylistForm.tsx": {
-    "react-native(no-unused-styles)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/features/track-actions/components/presenters/TrackActionsView.tsx": {
@@ -2626,14 +1950,8 @@
     "eslint(no-nested-ternary)": {
       "count": 3
     },
-    "react-native(no-unused-styles)": {
-      "count": 3
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/features/track-actions/hooks/useNewPlaylistFromTrack.ts": {
@@ -2645,9 +1963,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/features/track-actions/hooks/useTrackActions.ts": {
@@ -2658,9 +1973,6 @@
       "count": 1
     },
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -2706,22 +2018,8 @@
     "eslint(max-lines-per-function)": {
       "count": 2
     },
-    "react-native(no-unused-styles)": {
-      "count": 6
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 7
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/playlists/features/editor/shared/action-sheet/components/presenters/AnchoredMenu.tsx": {
-    "react-native(no-unused-styles)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/shared/action-sheet/components/presenters/PlaylistActionsView.tsx": {
@@ -2735,16 +2033,6 @@
       "count": 1
     }
   },
-  "src/features/playlists/features/editor/shared/action-sheet/hooks/useDeferredSheetAction.ts": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/playlists/features/editor/shared/action-sheet/hooks/useMenuAnchor.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 3
-    }
-  },
   "src/features/playlists/features/editor/shared/cover-actions/useCoverActions.test.tsx": {
     "hook-files(no-restricted-syntax)": {
       "count": 1
@@ -2756,16 +2044,10 @@
   "src/features/playlists/features/editor/shared/cover-actions/useCoverActions.ts": {
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/features/editor/shared/debounced-text/useDebouncedText.ts": {
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -2774,17 +2056,9 @@
       "count": 1
     }
   },
-  "src/features/playlists/features/editor/shared/playlist-mutations/usePlaylistMutations.ts": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
   "src/features/playlists/features/editor/shared/track-edits/lib/trackMoves.test.ts": {
     "function-size(max-functions)": {
       "count": 1
-    },
-    "jest(prefer-strict-equal)": {
-      "count": 10
     },
     "query-conventions(named-cache-windows)": {
       "count": 2
@@ -2801,22 +2075,9 @@
       "count": 1
     }
   },
-  "src/features/playlists/features/editor/shared/track-edits/lib/tracksApi.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 7
-    }
-  },
   "src/features/playlists/features/editor/shared/track-edits/pendingMovesStore.ts": {
     "store-layout(store-layout)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/playlists/features/editor/shared/track-edits/useTrackEdits.ts": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/shared/header-button/HeaderIconButton.tsx": {
@@ -2828,9 +2089,6 @@
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 3
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/shared/playlist/lib/playlistApi.ts": {
@@ -2852,11 +2110,6 @@
       "count": 1
     }
   },
-  "src/features/playlists/shared/playlist/lib/playlistSync.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 8
-    }
-  },
   "src/features/playlists/shared/playlist/lib/playlistSync.ts": {
     "eslint(no-nested-ternary)": {
       "count": 1
@@ -2871,9 +2124,6 @@
     },
     "export-placement(no-restricted-syntax)": {
       "count": 15
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 13
     }
   },
   "src/features/playlists/shared/playlist/lib/usersApi.ts": {
@@ -2884,9 +2134,6 @@
   "src/features/playlists/shared/playlist/lib/validators.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 3
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/playlists/shared/playlist/usePlaylistQueries.ts": {
@@ -2929,21 +2176,12 @@
     "eslint(max-lines-per-function)": {
       "count": 2
     },
-    "react-native(no-unused-styles)": {
-      "count": 8
-    },
     "theme-styles(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/search/hooks/useSoundCloudSearch.test.tsx": {
     "hook-files(no-restricted-syntax)": {
-      "count": 1
-    },
-    "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
@@ -2961,11 +2199,6 @@
       "count": 2
     }
   },
-  "src/features/search/lib/searchApi.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 4
-    }
-  },
   "src/features/search/lib/types.ts": {
     "check-file(filename-blocklist)": {
       "count": 1
@@ -2974,16 +2207,10 @@
   "src/features/search/searchFocusStore.ts": {
     "store-layout(store-layout)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/shell/ScreenContent.tsx": {
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -2993,9 +2220,6 @@
     },
     "react(no-array-index-key)": {
       "count": 1
-    },
-    "react-native(no-unused-styles)": {
-      "count": 3
     }
   },
   "src/features/shell/components/orchestrators/AppFrameLayout.tsx": {
@@ -3005,27 +2229,13 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "react-native(no-unused-styles)": {
-      "count": 3
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/shell/components/orchestrators/AppProvidersContainer.test.tsx": {
-    "jest(prefer-strict-equal)": {
-      "count": 1
-    },
     "query-conventions(query-key-factory)": {
       "count": 4
-    }
-  },
-  "src/features/shell/components/orchestrators/AppProvidersContainer.tsx": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/shell/components/orchestrators/BackendUrlFieldContainer.tsx": {
@@ -3034,16 +2244,10 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "react-native(no-unused-styles)": {
-      "count": 3
     }
   },
   "src/features/shell/components/orchestrators/NavigationRootLayout.tsx": {
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -3070,20 +2274,11 @@
     "eslint(max-lines-per-function)": {
       "count": 2
     },
-    "react-native(no-unused-styles)": {
-      "count": 6
-    },
     "theme-styles(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/features/shell/components/orchestrators/TabBarLayout.test.tsx": {
-    "jest(prefer-strict-equal)": {
-      "count": 2
-    },
     "react-native(no-raw-text)": {
       "count": 1
     }
@@ -3117,27 +2312,15 @@
     "eslint(max-lines-per-function)": {
       "count": 2
     },
-    "react-native(no-unused-styles)": {
-      "count": 5
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 5
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/shell/components/presenters/ContentFrame.tsx": {
     "function-size(max-variables)": {
       "count": 1
     },
-    "react-native(no-unused-styles)": {
-      "count": 2
-    },
     "theme-styles(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -3147,23 +2330,14 @@
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 17
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 2
     }
   },
   "src/features/shell/components/presenters/ShortcutsHelpDialog.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 2
     },
-    "react-native(no-unused-styles)": {
-      "count": 6
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/shell/components/presenters/TabIcon.tsx": {
@@ -3175,9 +2349,6 @@
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 4
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/shell/components/presenters/ThemedSystemUI.tsx": {
@@ -3194,9 +2365,6 @@
     "file-named-after-export(file-named-after-export)": {
       "count": 1
     },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 2
-    },
     "typescript(method-signature-style)": {
       "count": 3
     }
@@ -3212,9 +2380,6 @@
   "src/features/shell/hooks/useKeyboardShortcuts.web.ts": {
     "file-named-after-export(file-named-after-export)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 2
     },
     "typescript(method-signature-style)": {
       "count": 4
@@ -3242,9 +2407,6 @@
   "src/features/shell/lib/linking.test.ts": {
     "eslint(max-nested-callbacks)": {
       "count": 4
-    },
-    "jest(prefer-strict-equal)": {
-      "count": 6
     }
   },
   "src/features/shell/lib/linking.ts": {
@@ -3260,14 +2422,6 @@
       "count": 1
     }
   },
-  "src/features/shell/lib/screenPaths.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 4
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
   "src/features/shell/lib/screenPaths.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
@@ -3277,9 +2431,6 @@
     },
     "function-size(max-variables)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 6
     }
   },
   "src/features/shell/lib/screenWidths.ts": {
@@ -3293,15 +2444,7 @@
     }
   },
   "src/features/shell/lib/webBasePath.ts": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 2
-    },
     "typescript(method-signature-style)": {
-      "count": 1
-    }
-  },
-  "src/features/shell/screenLayout.tsx": {
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -3313,17 +2456,11 @@
   "src/features/subscription/lib/subscription.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 4
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 2
     }
   },
   "src/features/subscription/usePlan.test.tsx": {
     "hook-files(no-restricted-syntax)": {
       "count": 1
-    },
-    "jest(prefer-strict-equal)": {
-      "count": 2
     }
   },
   "src/features/subscription/usePlan.ts": {
@@ -3331,23 +2468,12 @@
       "count": 5
     }
   },
-  "src/features/user/features/auth/features/email-verification/components/EmailVerificationContainer.test.tsx": {
-    "jest(prefer-strict-equal)": {
-      "count": 2
-    }
-  },
   "src/features/user/features/auth/features/email-verification/components/EmailVerificationView.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 2
     },
-    "react-native(no-unused-styles)": {
-      "count": 19
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 22
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/features/email-verification/useEmailVerification.ts": {
@@ -3358,14 +2484,6 @@
       "count": 1
     },
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/user/features/auth/features/forgot-password/components/ForgotPasswordContainer.test.tsx": {
-    "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
@@ -3386,9 +2504,6 @@
     },
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/features/linked-accounts/LinkedAccountsScreen.test.tsx": {
@@ -3408,14 +2523,8 @@
     "eslint(no-nested-ternary)": {
       "count": 1
     },
-    "react-native(no-unused-styles)": {
-      "count": 12
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 7
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/features/linked-accounts/components/presenters/LinkedAccountsView.tsx": {
@@ -3478,14 +2587,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/user/features/auth/features/register/components/RegisterContainer.test.tsx": {
-    "jest(prefer-strict-equal)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/features/register/components/RegisterView.tsx": {
@@ -3508,14 +2609,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/user/features/auth/features/reset-password/components/ResetPasswordContainer.test.tsx": {
-    "jest(prefer-strict-equal)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/features/reset-password/components/presenters/PasswordRequirements.tsx": {
@@ -3532,14 +2625,6 @@
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 13
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/user/features/auth/features/reset-password/hooks/useResendResetCode.ts": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/features/reset-password/hooks/useResetPassword.ts": {
@@ -3554,9 +2639,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/features/reset-password/passwordRules.ts": {
@@ -3564,17 +2646,9 @@
       "count": 1
     }
   },
-  "src/features/user/features/auth/features/welcome/components/WelcomeContainer.test.tsx": {
-    "jest(prefer-strict-equal)": {
-      "count": 2
-    }
-  },
   "src/features/user/features/auth/features/welcome/components/presenters/FeatureCard.tsx": {
     "component-props(no-restricted-syntax)": {
       "count": 1
-    },
-    "react-native(no-unused-styles)": {
-      "count": 3
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 1
@@ -3595,14 +2669,8 @@
     "eslint(no-nested-ternary)": {
       "count": 1
     },
-    "react-native(no-unused-styles)": {
-      "count": 10
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/features/welcome/components/presenters/WelcomeView.tsx": {
@@ -3625,9 +2693,6 @@
   "src/features/user/features/auth/features/welcome/landingContent.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/features/welcome/useFloatingIcons.ts": {
@@ -3635,9 +2700,6 @@
       "count": 1
     },
     "export-placement(no-restricted-syntax)": {
-      "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 2
     },
     "unicorn(no-array-for-each)": {
@@ -3648,13 +2710,7 @@
     "eslint(max-lines-per-function)": {
       "count": 2
     },
-    "react-native(no-unused-styles)": {
-      "count": 9
-    },
     "theme-styles(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -3669,11 +2725,6 @@
       "count": 1
     }
   },
-  "src/features/user/features/auth/shared/code-input/codeDigits.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 12
-    }
-  },
   "src/features/user/features/auth/shared/code-input/codeDigits.ts": {
     "eslint(max-lines-per-function)": {
       "count": 1
@@ -3683,9 +2734,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/shared/code-input/useCodeInput.ts": {
@@ -3693,14 +2741,6 @@
       "count": 1
     },
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/user/features/auth/shared/countdown/useCountdown.ts": {
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -3715,36 +2755,19 @@
   "src/features/user/features/auth/shared/field-binding/useFieldBinding.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/user/features/auth/shared/password-reset/passwordApi.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 2
     }
   },
   "src/features/user/features/auth/shared/password-screen/PasswordScreenFrame.tsx": {
     "theme-styles(no-restricted-syntax)": {
       "count": 11
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/shared/sign-in/SocialSignInButtons.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 2
     },
-    "react-native(no-unused-styles)": {
-      "count": 12
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 12
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/shared/sign-in/authStore.test.ts": {
@@ -3753,9 +2776,6 @@
     },
     "jest(expect-expect)": {
       "count": 3
-    },
-    "jest(prefer-strict-equal)": {
-      "count": 4
     }
   },
   "src/features/user/features/auth/shared/sign-in/authStore.ts": {
@@ -3776,11 +2796,6 @@
       "count": 1
     }
   },
-  "src/features/user/features/auth/shared/sign-in/hooks/useProviderSignIn.ts": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
   "src/features/user/features/auth/shared/sign-in/lib/authApi.ts": {
     "function-size(max-functions)": {
       "count": 1
@@ -3789,9 +2804,6 @@
   "src/features/user/features/auth/shared/sign-in/lib/authState.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 6
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 2
     }
   },
   "src/features/user/features/auth/shared/sign-in/lib/constants.ts": {
@@ -3802,18 +2814,8 @@
       "count": 1
     }
   },
-  "src/features/user/features/auth/shared/sign-in/lib/facebookSignIn.web.ts": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 2
-    }
-  },
   "src/features/user/features/auth/shared/sign-in/lib/googleSignIn.ts": {
     "eslint(max-lines-per-function)": {
-      "count": 1
-    }
-  },
-  "src/features/user/features/auth/shared/sign-in/lib/googleSignIn.web.test.ts": {
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -3826,23 +2828,14 @@
     },
     "function-size(max-functions)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 3
     }
   },
   "src/features/user/features/auth/shared/sign-in/lib/loadScript.test.ts": {
     "jest(prefer-called-with)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/shared/sign-in/lib/loadScript.ts": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 2
-    },
     "unicorn(prefer-add-event-listener)": {
       "count": 2
     }
@@ -3866,17 +2859,11 @@
     },
     "file-named-after-export(file-named-after-export)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/auth/shared/sign-in/lib/signIn.test.ts": {
     "function-size(max-functions)": {
       "count": 1
-    },
-    "jest(prefer-strict-equal)": {
-      "count": 9
     }
   },
   "src/features/user/features/auth/shared/sign-in/lib/signInCancelled.ts": {
@@ -3889,9 +2876,6 @@
       "count": 1
     },
     "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -3906,29 +2890,15 @@
     },
     "export-placement(no-restricted-syntax)": {
       "count": 11
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 6
-    }
-  },
-  "src/features/user/features/friends/features/friends-list/components/presenters/ControlSwitch.tsx": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/friends/features/friends-list/components/presenters/FriendCard.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/friends/features/friends-list/components/presenters/FriendItemRow.tsx": {
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -3947,11 +2917,6 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/user/features/friends/features/friends-list/components/presenters/SearchResultItemRow.tsx": {
     "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
@@ -3994,17 +2959,9 @@
       "count": 1
     }
   },
-  "src/features/user/features/friends/features/similar-profiles/components/presenters/SimilarProfileCard.tsx": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
   "src/features/user/features/friends/features/similar-profiles/components/presenters/SimilarProfilesSection.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/friends/features/similar-profiles/components/presenters/similarProfilesStyles.ts": {
@@ -4021,9 +2978,6 @@
   "src/features/user/features/friends/features/similar-profiles/useSimilarProfilesSection.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/friends/features/user-profile/components/UserProfileContainer.tsx": {
@@ -4051,14 +3005,8 @@
     "eslint(max-lines-per-function)": {
       "count": 2
     },
-    "react-native(no-unused-styles)": {
-      "count": 9
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 9
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/friends/features/user-profile/components/presenters/UserProfileActions.tsx": {
@@ -4072,11 +3020,6 @@
       "count": 3
     }
   },
-  "src/features/user/features/friends/features/user-profile/components/presenters/UserProfileBadges.tsx": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
   "src/features/user/features/friends/features/user-profile/components/presenters/UserProfileInfo.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
@@ -4086,21 +3029,10 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/user/features/friends/features/user-profile/components/presenters/UserProfileListening.tsx": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/friends/features/user-profile/components/presenters/UserProfilePlaylists.tsx": {
     "eslint(max-lines-per-function)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -4127,9 +3059,6 @@
     },
     "react-native(no-raw-text)": {
       "count": 1
-    },
-    "react-native(no-unused-styles)": {
-      "count": 1
     }
   },
   "src/features/user/features/friends/features/user-profile/components/presenters/UserProfileWideSections.tsx": {
@@ -4137,12 +3066,6 @@
       "count": 1
     },
     "eslint(no-nested-ternary)": {
-      "count": 1
-    },
-    "react-native(no-unused-styles)": {
-      "count": 4
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -4182,11 +3105,6 @@
       "count": 1
     }
   },
-  "src/features/user/features/friends/shared/follows/friendsApi.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 8
-    }
-  },
   "src/features/user/features/friends/shared/follows/hooks/useFriendsQueries.ts": {
     "function-size(max-functions)": {
       "count": 1
@@ -4201,14 +3119,6 @@
     },
     "export-placement(no-restricted-syntax)": {
       "count": 9
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 8
-    }
-  },
-  "src/features/user/features/profile/features/edit-profile/EditProfileScreen.test.tsx": {
-    "jest(prefer-strict-equal)": {
-      "count": 2
     }
   },
   "src/features/user/features/profile/features/edit-profile/components/EditProfileContainer.tsx": {
@@ -4223,14 +3133,8 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "react-native(no-unused-styles)": {
-      "count": 3
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 4
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/profile/features/edit-profile/components/presenters/EditProfilePhoto.tsx": {
@@ -4238,12 +3142,6 @@
       "count": 1
     },
     "react-native(no-raw-text)": {
-      "count": 1
-    },
-    "react-native(no-unused-styles)": {
-      "count": 3
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -4304,14 +3202,8 @@
     "eslint(max-lines-per-function)": {
       "count": 2
     },
-    "react-native(no-unused-styles)": {
-      "count": 6
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 3
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/profile/features/music-preferences/components/presenters/MusicPreferencesView.tsx": {
@@ -4367,14 +3259,8 @@
     "eslint(max-lines-per-function)": {
       "count": 2
     },
-    "react-native(no-unused-styles)": {
-      "count": 9
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 9
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/profile/features/privacy-settings/usePrivacySettingsScreen.ts": {
@@ -4382,11 +3268,6 @@
       "count": 1
     },
     "function-size(max-variables)": {
-      "count": 1
-    }
-  },
-  "src/features/user/features/profile/features/profile-screen/ProfileScreen.test.tsx": {
-    "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
@@ -4405,40 +3286,20 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "react-native(no-unused-styles)": {
-      "count": 9
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 8
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/profile/features/profile-screen/components/presenters/ProfileHeaderButtons.tsx": {
     "theme-styles(no-restricted-syntax)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/features/user/features/profile/features/profile-screen/components/presenters/ProfileInfoSection.tsx": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/profile/features/profile-screen/components/presenters/ProfileMenuItems.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 2
     },
-    "react-native(no-unused-styles)": {
-      "count": 5
-    },
     "theme-styles(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -4446,28 +3307,16 @@
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "react-native(no-unused-styles)": {
-      "count": 6
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 5
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/profile/features/profile-screen/components/presenters/ProfilePreferencesSection.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 2
     },
-    "react-native(no-unused-styles)": {
-      "count": 5
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 3
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/profile/features/profile-screen/components/presenters/ProfileView.tsx": {
@@ -4493,9 +3342,6 @@
     },
     "react-native(no-raw-text)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/profile/features/profile-screen/useProfileScreen.ts": {
@@ -4506,27 +3352,16 @@
       "count": 1
     }
   },
-  "src/features/user/features/profile/shared/profile/lib/profileApi.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 2
-    }
-  },
   "src/features/user/features/profile/types.ts": {
     "check-file(filename-blocklist)": {
       "count": 1
     },
     "export-placement(no-restricted-syntax)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/features/settings/components/SettingsContainer.tsx": {
     "function-size(max-variables)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -4550,12 +3385,6 @@
     },
     "eslint(no-nested-ternary)": {
       "count": 1
-    },
-    "react-native(no-unused-styles)": {
-      "count": 5
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/shared/profile-info-rows/ProfileInfoRows.tsx": {
@@ -4571,41 +3400,23 @@
     "react(only-export-components)": {
       "count": 1
     },
-    "react-native(no-unused-styles)": {
-      "count": 4
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 3
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/shared/profile-layout/ProfileScreenFrame.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 2
     },
-    "react-native(no-unused-styles)": {
-      "count": 7
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 3
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/features/user/shared/profile-section/ProfileSection.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
     },
-    "react-native(no-unused-styles)": {
-      "count": 6
-    },
     "theme-styles(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -4631,11 +3442,6 @@
       "count": 1
     }
   },
-  "src/shared/alerts/alert.web.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 1
-    }
-  },
   "src/shared/alerts/alert.web.ts": {
     "file-named-after-export(file-named-after-export)": {
       "count": 1
@@ -4643,9 +3449,6 @@
   },
   "src/shared/alerts/alertStore.ts": {
     "store-layout(store-layout)": {
-      "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 2
     }
   },
@@ -4655,9 +3458,6 @@
     },
     "jest(prefer-called-with)": {
       "count": 1
-    },
-    "jest(prefer-strict-equal)": {
-      "count": 1
     }
   },
   "src/shared/backend/deviceService.ts": {
@@ -4665,14 +3465,6 @@
       "count": 1
     },
     "import(no-unassigned-import)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/shared/backend/lib/api.test.ts": {
-    "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
@@ -4688,16 +3480,10 @@
     },
     "function-size(max-variables)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 2
     }
   },
   "src/shared/backend/lib/authSession.test.ts": {
     "eslint(max-nested-callbacks)": {
-      "count": 1
-    },
-    "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
@@ -4711,16 +3497,8 @@
     "hook-naming(no-restricted-syntax)": {
       "count": 1
     },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 2
-    },
     "unicorn(no-array-for-each)": {
       "count": 1
-    }
-  },
-  "src/shared/backend/lib/backendUrl.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 3
     }
   },
   "src/shared/backend/lib/backendUrl.ts": {
@@ -4746,9 +3524,6 @@
     "query-conventions(query-key-factory)": {
       "count": 15
     },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 2
-    },
     "unicorn(no-array-for-each)": {
       "count": 2
     }
@@ -4762,9 +3537,6 @@
     },
     "query-conventions(query-key-factory)": {
       "count": 3
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 2
     }
   },
   "src/shared/backend/queryClient.ts": {
@@ -4775,12 +3547,6 @@
   "src/shared/backend/socketStore.test.ts": {
     "jest(prefer-called-with)": {
       "count": 7
-    },
-    "jest(prefer-strict-equal)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 2
     },
     "unicorn(no-array-for-each)": {
       "count": 2
@@ -4798,9 +3564,6 @@
     },
     "store-layout(store-layout)": {
       "count": 5
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/shared/content-column/useContentColumn.ts": {
@@ -4810,14 +3573,6 @@
   },
   "src/shared/control-error/controlError.ts": {
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/shared/debounce/debounce.ts": {
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -4834,9 +3589,6 @@
   "src/shared/image-colors/adaptivePalette.test.ts": {
     "eslint(max-nested-callbacks)": {
       "count": 1
-    },
-    "jest(prefer-strict-equal)": {
-      "count": 2
     }
   },
   "src/shared/image-colors/adaptivePalette.ts": {
@@ -4851,9 +3603,6 @@
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/shared/image-colors/useImageColors.ts": {
@@ -4861,25 +3610,14 @@
       "count": 3
     }
   },
-  "src/shared/image-colors/useImageColors.web.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 1
-    }
-  },
   "src/shared/image-picker/imagePicker.ts": {
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/shared/keyboard-shortcuts/keyboardShortcuts.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 3
     }
   },
   "src/shared/logging/logger.test.ts": {
@@ -4892,59 +3630,34 @@
       "count": 3
     }
   },
-  "src/shared/platform/platform.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 2
-    }
-  },
   "src/shared/platform/platform.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 3
     }
   },
-  "src/shared/playback/lib/lastTrackStorage.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 1
-    }
-  },
   "src/shared/playback/lib/lastTrackStorage.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/shared/playback/lib/playback.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 6
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 4
     }
   },
   "src/shared/playback/lib/playbackActions.ts": {
     "export-placement(no-restricted-syntax)": {
-      "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 2
     }
   },
   "src/shared/playback/lib/queue.types.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 9
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 6
     }
   },
   "src/shared/playback/lib/trackActionsSheet.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 3
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/shared/project-links/links.ts": {
@@ -4952,21 +3665,11 @@
       "count": 4
     }
   },
-  "src/shared/query-keys/keys.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 2
-    }
-  },
   "src/shared/query-keys/keys.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
     "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    }
-  },
-  "src/shared/refresh-control/ThemedRefreshControl.test.tsx": {
-    "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
@@ -4983,29 +3686,15 @@
   "src/shared/square-image/squareImage.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/shared/theme/components/Artwork.test.tsx": {
     "eslint(no-unused-vars)": {
       "count": 1
-    },
-    "jest(prefer-strict-equal)": {
-      "count": 1
     }
   },
   "src/shared/theme/components/Artwork.tsx": {
     "theme-styles(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/shared/theme/components/Avatar.test.tsx": {
-    "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
@@ -5016,14 +3705,8 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "react-native(no-unused-styles)": {
-      "count": 2
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/shared/theme/components/AvatarPhoto.tsx": {
@@ -5031,9 +3714,6 @@
       "count": 1
     },
     "theme-styles(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -5057,9 +3737,6 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "react-native(no-unused-styles)": {
-      "count": 13
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 6
     }
@@ -5078,28 +3755,9 @@
       "count": 1
     }
   },
-  "src/shared/theme/components/Card.tsx": {
-    "react-native(no-unused-styles)": {
-      "count": 2
-    }
-  },
-  "src/shared/theme/components/CenteredDialog.tsx": {
-    "react-native(no-unused-styles)": {
-      "count": 4
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
   "src/shared/theme/components/EmptyState.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "react-native(no-unused-styles)": {
-      "count": 7
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 2
     }
   },
   "src/shared/theme/components/EqualizerBars.tsx": {
@@ -5108,17 +3766,6 @@
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 3
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/shared/theme/components/FormError.tsx": {
-    "react-native(no-unused-styles)": {
-      "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/shared/theme/components/GenreChip.tsx": {
@@ -5128,14 +3775,8 @@
     "function-size(max-variables)": {
       "count": 1
     },
-    "react-native(no-unused-styles)": {
-      "count": 4
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 3
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/shared/theme/components/Input.tsx": {
@@ -5169,17 +3810,6 @@
   "src/shared/theme/components/LoadingSpinner.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "react-native(no-unused-styles)": {
-      "count": 3
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/shared/theme/components/PixelIcon.test.tsx": {
-    "jest(prefer-strict-equal)": {
-      "count": 1
     }
   },
   "src/shared/theme/components/PixelIcon.tsx": {
@@ -5188,16 +3818,10 @@
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/shared/theme/components/PixelWordmark.tsx": {
     "component-props(no-restricted-syntax)": {
-      "count": 1
-    },
-    "react-native(no-unused-styles)": {
       "count": 1
     },
     "theme-styles(no-restricted-syntax)": {
@@ -5205,20 +3829,11 @@
     }
   },
   "src/shared/theme/components/PlaylistCardSkeleton.tsx": {
-    "react-native(no-unused-styles)": {
-      "count": 2
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/shared/theme/components/Pressable.test.tsx": {
-    "jest(prefer-strict-equal)": {
-      "count": 1
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 2
     }
@@ -5232,15 +3847,9 @@
     },
     "react(only-export-components)": {
       "count": 3
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/shared/theme/components/PreviewBadge.tsx": {
-    "react-native(no-unused-styles)": {
-      "count": 1
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 2
     }
@@ -5259,11 +3868,6 @@
       "count": 1
     }
   },
-  "src/shared/theme/components/ReorderableList.test.tsx": {
-    "jest(prefer-strict-equal)": {
-      "count": 4
-    }
-  },
   "src/shared/theme/components/ReorderableList.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
@@ -5278,17 +3882,9 @@
       "count": 3
     }
   },
-  "src/shared/theme/components/RowGrid.test.tsx": {
-    "jest(prefer-strict-equal)": {
-      "count": 1
-    }
-  },
   "src/shared/theme/components/RowGrid.tsx": {
     "component-props(no-restricted-syntax)": {
       "count": 1
-    },
-    "react-native(no-unused-styles)": {
-      "count": 3
     },
     "theme-styles(no-restricted-syntax)": {
       "count": 1
@@ -5314,30 +3910,15 @@
   "src/shared/theme/components/SectionHeader.tsx": {
     "eslint(max-lines-per-function)": {
       "count": 1
-    },
-    "react-native(no-unused-styles)": {
-      "count": 3
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/shared/theme/components/ShareLinkButton.tsx": {
-    "react-native(no-unused-styles)": {
-      "count": 2
-    },
     "theme-styles(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
   "src/shared/theme/components/Skeleton.test.tsx": {
     "jest(prefer-called-with)": {
-      "count": 1
-    },
-    "jest(prefer-strict-equal)": {
       "count": 1
     }
   },
@@ -5346,19 +3927,6 @@
       "count": 1
     },
     "theme-styles(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/shared/theme/components/SkeletonList.tsx": {
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/shared/theme/components/SkeletonRow.tsx": {
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -5378,9 +3946,6 @@
     },
     "react(only-export-components)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/shared/theme/components/ThemedToast.tsx": {
@@ -5393,27 +3958,13 @@
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
-    "react-native(no-unused-styles)": {
-      "count": 5
-    },
     "theme-styles(no-restricted-syntax)": {
       "count": 5
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/shared/theme/components/TrackActionsButton.tsx": {
     "theme-styles(no-restricted-syntax)": {
       "count": 3
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
-    }
-  },
-  "src/shared/theme/hooks/useBreakpoint.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 1
     }
   },
   "src/shared/theme/hooks/useBreakpoint.ts": {
@@ -5422,16 +3973,10 @@
     },
     "hook-naming(no-restricted-syntax)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/shared/theme/hooks/useCappedField.ts": {
     "export-placement(no-restricted-syntax)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     }
   },
@@ -5443,25 +3988,16 @@
   "src/shared/theme/hooks/useContextMenu.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/shared/theme/hooks/useContextMenu.web.test.ts": {
     "jest(prefer-called-with)": {
       "count": 4
-    },
-    "jest(prefer-strict-equal)": {
-      "count": 3
     }
   },
   "src/shared/theme/hooks/useContextMenu.web.ts": {
     "eslint(max-params)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 4
     },
     "typescript(method-signature-style)": {
       "count": 3
@@ -5474,9 +4010,6 @@
   },
   "src/shared/theme/hooks/useIconTooltip.web.ts": {
     "file-named-after-export(file-named-after-export)": {
-      "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
       "count": 1
     },
     "typescript(method-signature-style)": {
@@ -5508,20 +4041,12 @@
       "count": 8
     }
   },
-  "src/shared/theme/lib/menuPlacement.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 3
-    }
-  },
   "src/shared/theme/lib/menuPlacement.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 1
     },
     "function-size(max-variables)": {
       "count": 1
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 2
     }
   },
   "src/shared/theme/lib/original.theme.ts": {
@@ -5564,25 +4089,16 @@
     },
     "export-placement(no-restricted-syntax)": {
       "count": 4
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 3
     }
   },
   "src/shared/theme/menuAnchorStore.ts": {
     "store-layout(store-layout)": {
       "count": 3
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 1
     }
   },
   "src/shared/tracks/lib/soundcloud.types.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 4
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 3
     }
   },
   "src/shared/tracks/lib/soundcloudPreview.ts": {
@@ -5592,14 +4108,6 @@
   },
   "src/shared/tracks/lib/track.types.ts": {
     "export-placement(no-restricted-syntax)": {
-      "count": 2
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 2
-    }
-  },
-  "src/shared/tracks/lib/trackInput.test.ts": {
-    "jest(prefer-strict-equal)": {
       "count": 2
     }
   },
@@ -5611,15 +4119,9 @@
   "src/shared/users/user.types.ts": {
     "export-placement(no-restricted-syntax)": {
       "count": 13
-    },
-    "type-definitions(no-restricted-syntax)": {
-      "count": 9
     }
   },
   "test-utils/api-clients.test.ts": {
-    "jest(prefer-strict-equal)": {
-      "count": 1
-    },
     "unicorn(filename-case)": {
       "count": 1
     }

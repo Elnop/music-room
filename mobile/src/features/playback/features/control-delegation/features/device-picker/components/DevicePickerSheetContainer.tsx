@@ -2,10 +2,10 @@ import React from 'react';
 import { useDevicePicker } from '@/features/playback/features/control-delegation/features/device-picker/useDevicePicker';
 import { DevicePickerSheetView } from '@/features/playback/features/control-delegation/features/device-picker/components/presenters/DevicePickerSheetView';
 
-interface DevicePickerSheetProps {
+type DevicePickerSheetProps = {
 	visible: boolean;
 	onClose: () => void;
-}
+};
 
 export function DevicePickerSheetContainer({ visible, onClose }: DevicePickerSheetProps) {
 	const { theme, styles, loaded, loading, loadError, pendingKey, retry, isActive, handlePick } =

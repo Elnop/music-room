@@ -5,9 +5,9 @@ import { pixelFrame } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/lib/types';
 import { Text } from '@/shared/theme/components/Text';
 
-interface FormErrorProps {
+type FormErrorProps = {
 	message: string;
-}
+};
 
 export function FormError({ message }: FormErrorProps) {
 	const { theme } = useTheme();
@@ -23,7 +23,7 @@ export function FormError({ message }: FormErrorProps) {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: {
 			...pixelFrame(theme),
 			borderColor: theme.colors.error,
@@ -37,4 +37,5 @@ function createStyles(theme: Theme) {
 			fontFamily: theme.typography.families.semibold,
 		},
 	});
+	return styles;
 }

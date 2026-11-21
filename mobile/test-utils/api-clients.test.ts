@@ -101,7 +101,7 @@ describe('with a signed-in session', () => {
 			)
 			.mockResolvedValueOnce(jsonResponse({ success: true, data: [] }));
 
-		await expect(friendsApi.getFriends('stale-caller-token')).resolves.toEqual([]);
+		await expect(friendsApi.getFriends('stale-caller-token')).resolves.toStrictEqual([]);
 
 		expect(refreshAccessToken).toHaveBeenCalledTimes(1);
 		const [[, first], [, retry]] = fetchMock.mock.calls as [string, RequestInit][];

@@ -27,7 +27,7 @@ describe('Avatar', () => {
 	it('shows the initials until the image has loaded', () => {
 		render(<Avatar uri="https://example.com/a.png" name="John Doe" />);
 		const image = screen.UNSAFE_getByType(Image);
-		expect(image.props.source).toEqual({ uri: 'https://example.com/a.png' });
+		expect(image.props.source).toStrictEqual({ uri: 'https://example.com/a.png' });
 		expect(screen.getByText('JD')).toBeTruthy();
 
 		fireEvent(image, 'load');

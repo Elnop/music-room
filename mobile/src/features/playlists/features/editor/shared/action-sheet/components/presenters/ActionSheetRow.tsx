@@ -8,14 +8,14 @@ import type { Theme } from '@/shared/theme/lib/types';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import AngleRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/angle-right-solid.svg';
 
-interface ActionSheetRowProps {
+type ActionSheetRowProps = {
 	icon: PixelIconSource;
 	label: string;
 	onPress: () => void;
 	detail?: string;
 	destructive?: boolean;
 	chevron?: boolean;
-}
+};
 
 export function ActionSheetRow({
 	icon,
@@ -47,7 +47,7 @@ export function ActionSheetRow({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		row: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -73,4 +73,5 @@ function createStyles(theme: Theme) {
 			marginTop: 2,
 		},
 	});
+	return styles;
 }

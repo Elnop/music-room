@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { usePlayer } from '@/features/playback/shared/player/lib/PlayerContext';
 
-interface PlayerProgress {
+type PlayerProgress = {
 	currentTime: number;
 	duration: number;
 	progress: number;
-}
+};
 
 export function usePlayerProgress(): PlayerProgress {
 	const { player } = usePlayer();

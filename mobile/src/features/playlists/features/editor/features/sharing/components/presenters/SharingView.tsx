@@ -105,7 +105,7 @@ export function SharingView({ sharing }: { sharing: PlaylistSharing }) {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: { flex: 1, backgroundColor: theme.colors.background },
 		scroll: { flexGrow: 1 },
 		header: {
@@ -125,4 +125,5 @@ function createStyles(theme: Theme) {
 		settings: { marginBottom: theme.spacing.lg },
 		searchBar: { marginBottom: theme.spacing.md },
 	});
+	return styles;
 }

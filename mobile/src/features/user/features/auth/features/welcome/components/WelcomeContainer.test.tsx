@@ -63,7 +63,7 @@ describe('WelcomeContainer', () => {
 
 		fireEvent.press(screen.getByLabelText('Serveur'));
 		expect(screen.getByText('backend-url-field')).toBeTruthy();
-		expect(screen.getByLabelText('Serveur').props.accessibilityState).toEqual({ expanded: true });
+		expect(screen.getByLabelText('Serveur').props.accessibilityState.expanded).toBe(true);
 
 		fireEvent.press(screen.getByLabelText('Serveur'));
 		expect(screen.queryByText('backend-url-field')).toBeNull();
@@ -88,7 +88,7 @@ describe('WelcomeContainer', () => {
 
 		fireEvent.press(screen.getByLabelText('Télécharger pour Android'));
 		fireEvent.press(screen.getByLabelText('Code source'));
-		expect(jest.mocked(openExternalUrl).mock.calls).toEqual([
+		expect(jest.mocked(openExternalUrl).mock.calls).toStrictEqual([
 			['https://github.com/Elnop/music-room/releases/latest', expect.any(Function)],
 			['https://github.com/Elnop/music-room', expect.any(Function)],
 		]);

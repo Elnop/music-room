@@ -14,12 +14,12 @@ import { formatDocumentTitle } from '@/features/shell/lib/documentTitle';
 
 const DOCUMENT_TITLE = { formatter: formatDocumentTitle };
 
-interface NavigationRootLayoutProps<T extends ParamListBase> {
+type NavigationRootLayoutProps<T extends ParamListBase> = {
 	ready: boolean;
 	linking: LinkingOptions<T>;
 	navigationRef: NavigationContainerRefWithCurrent<T>;
 	children: ReactNode;
-}
+};
 
 export function NavigationRootLayout<T extends ParamListBase>({
 	ready,

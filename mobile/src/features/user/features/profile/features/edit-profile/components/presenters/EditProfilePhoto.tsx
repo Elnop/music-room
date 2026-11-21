@@ -6,12 +6,12 @@ import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { Theme } from '@/shared/theme/lib/types';
 import type { UserProfile } from '@/shared/users/user.types';
 
-interface EditProfilePhotoProps {
+type EditProfilePhotoProps = {
 	user: UserProfile | null;
 	isUploading: boolean;
 	isLoading: boolean;
 	onOpenMenu: () => void;
-}
+};
 
 export function EditProfilePhoto({
 	user,
@@ -45,7 +45,7 @@ export function EditProfilePhoto({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		photoBlock: {
 			alignItems: 'center',
 			gap: theme.spacing.md,
@@ -61,4 +61,5 @@ function createStyles(theme: Theme) {
 			alignSelf: 'center',
 		},
 	});
+	return styles;
 }

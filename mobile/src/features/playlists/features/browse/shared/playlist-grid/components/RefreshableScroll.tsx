@@ -5,12 +5,12 @@ import { ThemedRefreshControl } from '@/shared/refresh-control/ThemedRefreshCont
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { createListStyles } from '@/features/playlists/features/browse/shared/playlist-grid/lib/listStyles';
 
-interface RefreshableScrollProps {
+type RefreshableScrollProps = {
 	isRefreshing: boolean;
 	onRefresh: () => void;
 	bottomPadding: number;
 	children: React.ReactNode;
-}
+};
 
 export function RefreshableScroll({
 	isRefreshing,

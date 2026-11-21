@@ -26,7 +26,7 @@ export function MyDevicesErrorView({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		errorScreen: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -43,4 +43,5 @@ function createStyles(theme: Theme) {
 			textAlign: 'center',
 		},
 	});
+	return styles;
 }

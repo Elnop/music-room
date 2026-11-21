@@ -9,14 +9,14 @@ import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import { createSharingStyles } from '@/features/playlists/features/editor/features/sharing/components/presenters/sharingStyles';
 import { Text } from '@/shared/theme/components/Text';
 
-interface SettingRowProps {
+type SettingRowProps = {
 	icon: PixelIconSource;
 	label: string;
 	description: string;
 	value: boolean;
 	onToggle: () => void;
 	busy: boolean;
-}
+};
 
 export function SettingRow({ icon, label, description, value, onToggle, busy }: SettingRowProps) {
 	const { styles: shared } = useThemedStyles(createSharingStyles);
@@ -43,7 +43,7 @@ export function SettingRow({ icon, label, description, value, onToggle, busy }: 
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		item: {
 			justifyContent: 'space-between',
 		},
@@ -75,4 +75,5 @@ function createStyles(theme: Theme) {
 			marginTop: 2,
 		},
 	});
+	return styles;
 }

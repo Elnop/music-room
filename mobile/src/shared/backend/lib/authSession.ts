@@ -2,20 +2,20 @@ import { createStore, useStore } from 'zustand';
 import type { StoreApi } from 'zustand';
 import type { UserProfile } from '@/shared/users/user.types';
 
-export interface SessionView {
+export type SessionView = {
 	user: UserProfile | null;
 	accessToken: string | null;
 	isAuthenticated: boolean;
-}
+};
 
-interface AuthSession {
+type AuthSession = {
 	store: StoreApi<SessionView>;
 	isTokenExpiringSoon: () => boolean;
 	refreshAccessToken: () => Promise<boolean>;
 	logout?: () => Promise<void>;
 	setAvatarUrl?: (url: string | null) => Promise<void>;
 	setUser?: (user: UserProfile) => void | Promise<void>;
-}
+};
 
 const signedOut = createStore<SessionView>(() => ({
 	user: null,

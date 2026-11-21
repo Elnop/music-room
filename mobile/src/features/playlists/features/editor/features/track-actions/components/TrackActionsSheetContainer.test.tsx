@@ -137,7 +137,7 @@ describe('TrackActionsSheetContainer', () => {
 
 		expect(screen.getByTestId('track-actions-loading')).toBeTruthy();
 		expect(await screen.findByText('Mine')).toBeTruthy();
-		expect(routes.calls()).toEqual(['GET /api/playlists']);
+		expect(routes.calls()).toStrictEqual(['GET /api/playlists']);
 		expect(screen.getByText('Collab')).toBeTruthy();
 		expect(screen.getByText('Open public')).toBeTruthy();
 		expect(screen.queryByText('Read only')).toBeNull();

@@ -2,50 +2,50 @@ import type { FilteredProfile, MusicGenre, UserProfile } from '@/shared/users/us
 
 export type { FilteredProfile, MusicGenre, UserProfile };
 
-export interface FollowStatus {
+export type FollowStatus = {
 	isFollowing: boolean;
 	isFollowedBy: boolean;
 	isFriend: boolean;
 	followersCount: number;
 	followingCount: number;
-}
+};
 
-export interface FriendProfile {
+export type FriendProfile = {
 	id: string;
 	username: string;
 	displayName?: string;
 	avatarUrl?: string;
-}
+};
 
-export interface RecommendedProfile {
+export type RecommendedProfile = {
 	id: string;
 	username: string;
 	displayName?: string;
 	avatarUrl?: string;
 	commonGenres: MusicGenre[];
 	score: number;
-}
+};
 
-export interface ProfileRecommendations {
+export type ProfileRecommendations = {
 	hasPreferences: boolean;
 	profiles: RecommendedProfile[];
-}
+};
 
-export interface MyStats {
+export type MyStats = {
 	followersCount: number;
 	followingCount: number;
-}
+};
 
-export interface FriendPlaylistSummary {
+export type FriendPlaylistSummary = {
 	id: string;
 	name: string;
 	coverUrl?: string | null;
 	firstTrackCover?: string | null;
 	trackCount: number;
 	visibility: 'public' | 'private';
-}
+};
 
-export interface FriendListeningDevice {
+export type FriendListeningDevice = {
 	device: { deviceId: string };
 	track?: {
 		id: number;
@@ -55,9 +55,9 @@ export interface FriendListeningDevice {
 	} | null;
 	isPlaying: boolean;
 	controllable: boolean;
-}
+};
 
-export interface UserProfileHeaderProps {
+export type UserProfileHeaderProps = {
 	userId: string;
 	profile: FilteredProfile;
 	followStatus: FollowStatus | null;
@@ -68,7 +68,7 @@ export interface UserProfileHeaderProps {
 	isListeningLoading: boolean;
 	onRemotePlay: (deviceId: string) => void;
 	onRemotePause: (deviceId: string) => void;
-}
+};
 
 export type FriendsStackParamList = {
 	Friends: undefined;

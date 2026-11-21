@@ -13,20 +13,20 @@ describe('nearbyByGps', () => {
 		const nearest = musicEvent({ id: 'nearest' });
 		const far = musicEvent({ id: 'far', latitude: 48.91 });
 		const result = nearbyByGps([near, far, nearest], here);
-		expect(result.map(item => item.event.id)).toEqual(['nearest', 'near']);
+		expect(result.map(item => item.event.id)).toStrictEqual(['nearest', 'near']);
 		expect(result[1].distance).toBeCloseTo(111, -1);
 	});
 
 	it('leaves out upcoming and ended events', () => {
 		const upcoming = musicEvent({ id: 'upcoming', startsAt: at(HOUR), endsAt: at(2 * HOUR) });
 		const ended = musicEvent({ id: 'ended', startsAt: at(-2 * HOUR), endsAt: at(-HOUR) });
-		expect(nearbyByGps([upcoming, ended], here)).toEqual([]);
+		expect(nearbyByGps([upcoming, ended], here)).toStrictEqual([]);
 	});
 
 	it('drops an event once it ends', () => {
 		const event = musicEvent();
 		const afterEnd = Date.parse(event.endsAt) + 1;
-		expect(nearbyByGps([event], here, afterEnd)).toEqual([]);
+		expect(nearbyByGps([event], here, afterEnd)).toStrictEqual([]);
 	});
 });
 
@@ -39,7 +39,7 @@ describe('mergeNearby', () => {
 		const heard = musicEvent({ id: 'heard', beaconMinor: 7 });
 		const located = musicEvent({ id: 'located', beaconMinor: 8, latitude: 48.8976 });
 		const items = mergeNearby([located, heard], new Map([[7, sighting(-60)]]), here);
-		expect(items).toEqual([
+		expect(items).toStrictEqual([
 			{ event: heard, proximity: 'Tout près' },
 			{ event: located, proximity: '110 m' },
 		]);
@@ -47,7 +47,7 @@ describe('mergeNearby', () => {
 
 	it('works without any position, from the beacon alone', () => {
 		const far = musicEvent({ beaconMinor: 7, latitude: 45, longitude: 4 });
-		expect(mergeNearby([far], new Map([[7, sighting(-70)]]), null)).toEqual([
+		expect(mergeNearby([far], new Map([[7, sighting(-70)]]), null)).toStrictEqual([
 			{ event: far, proximity: 'Tout près' },
 		]);
 	});
@@ -66,9 +66,8 @@ describe('mergeNearby', () => {
 			[2, sighting(-80)],
 			[3, sighting(-50)],
 		]);
-		expect(mergeNearby([farther, ended, near], heard, null).map(item => item.event.id)).toEqual([
-			'near',
-			'farther',
-		]);
+		expect(
+			mergeNearby([farther, ended, near], heard, null).map(item => item.event.id)
+		).toStrictEqual(['near', 'farther']);
 	});
 });

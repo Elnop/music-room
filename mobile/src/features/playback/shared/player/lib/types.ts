@@ -1,6 +1,6 @@
 import type { StreamProtocol } from '@/shared/tracks/lib/soundcloud.types';
 
-export interface AudioPlayer {
+export type AudioPlayer = {
 	readonly id: number;
 	readonly playing: boolean;
 	readonly isLoaded: boolean;
@@ -10,9 +10,9 @@ export interface AudioPlayer {
 	play(): void;
 	pause(): void;
 	seekTo(seconds: number): Promise<void>;
-}
+};
 
-export interface AudioPlayerStatus {
+export type AudioPlayerStatus = {
 	id: number;
 	playing: boolean;
 	isLoaded: boolean;
@@ -21,34 +21,34 @@ export interface AudioPlayerStatus {
 	currentTime: number;
 	didJustFinish: boolean;
 	playbackState: string;
-}
+};
 
-export interface PlayerContextValue {
+export type PlayerContextValue = {
 	player: AudioPlayer;
 	loading: boolean;
 	error: string | null;
 	seekTo: (seconds: number) => void;
-}
+};
 
-export interface StreamFetchResult {
+export type StreamFetchResult = {
 	streamUrl: string;
 	protocol: StreamProtocol;
 	expiresAt: number | null;
-}
+};
 
-export interface PrefetchedStream extends StreamFetchResult {
+export type PrefetchedStream = StreamFetchResult & {
 	queueItemId: string;
 	permalink: string;
-}
+};
 
-export interface NowPlayingTrack {
+export type NowPlayingTrack = {
 	id: number;
 	title: string;
 	artist: string;
 	artworkUrl: string | null;
-}
+};
 
-export interface NowPlaying {
+export type NowPlaying = {
 	isRemote: boolean;
 	track: NowPlayingTrack | null;
 	isPlaying: boolean;
@@ -62,4 +62,4 @@ export interface NowPlaying {
 	previous: () => void;
 	hasNext: boolean;
 	hasPrevious: boolean;
-}
+};

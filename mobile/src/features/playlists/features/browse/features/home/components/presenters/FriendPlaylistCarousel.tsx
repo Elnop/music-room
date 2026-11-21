@@ -9,10 +9,10 @@ import { PlaylistCassette } from '@/features/playlists/features/browse/shared/pl
 
 export const FRIEND_CARD_WIDTH = 120;
 
-interface FriendPlaylistCarouselProps {
+type FriendPlaylistCarouselProps = {
 	friendsPlaylists: FriendPlaylists[];
 	onPlaylistPress: (playlistId: string) => void;
-}
+};
 
 export function FriendPlaylistCarousel({
 	friendsPlaylists,
@@ -46,11 +46,12 @@ export function FriendPlaylistCarousel({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		scrollContent: {
 			paddingHorizontal: theme.spacing.md,
 			paddingBottom: theme.spacing.sm,
 		},
 		card: { marginRight: theme.spacing.md },
 	});
+	return styles;
 }

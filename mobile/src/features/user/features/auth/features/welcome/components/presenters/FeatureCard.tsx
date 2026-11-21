@@ -19,7 +19,7 @@ export function FeatureCard({ title, description, icon }: LandingFeature) {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		card: {
 			flex: 1,
 			gap: theme.spacing.sm,
@@ -37,4 +37,5 @@ function createStyles(theme: Theme) {
 			color: theme.colors.textSecondary,
 		},
 	});
+	return styles;
 }

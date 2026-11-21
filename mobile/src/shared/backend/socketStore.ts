@@ -37,7 +37,7 @@ async function buildHandshake(): Promise<Record<string, string>> {
 
 export type SocketStatus = 'idle' | 'connecting' | 'connected' | 'reconnecting' | 'failed';
 
-interface SocketState {
+type SocketState = {
 	socket: Socket | null;
 	isConnected: boolean;
 	status: SocketStatus;
@@ -45,7 +45,7 @@ interface SocketState {
 	connect: () => void;
 	disconnect: () => void;
 	retry: () => void;
-}
+};
 
 export const useSocketStore = create<SocketState>((set, get) => ({
 	socket: null,

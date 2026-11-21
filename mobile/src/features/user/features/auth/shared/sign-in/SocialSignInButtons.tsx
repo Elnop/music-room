@@ -8,12 +8,12 @@ import type { GoogleButtonSlot } from '@/features/user/features/auth/types';
 import { Text } from '@/shared/theme/components/Text';
 import { FONT_FAMILIES } from '@/shared/theme/lib/fonts';
 
-interface SocialSignInButtonsProps {
+type SocialSignInButtonsProps = {
 	onGoogle: () => void;
 	onFacebook: () => void;
 	disabled: boolean;
 	googleButton?: GoogleButtonSlot;
-}
+};
 
 export function SocialSignInButtons({
 	onGoogle,
@@ -64,7 +64,7 @@ export function SocialSignInButtons({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		divider: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -137,4 +137,5 @@ function createStyles(theme: Theme) {
 			color: theme.colors.onFacebook,
 		},
 	});
+	return styles;
 }

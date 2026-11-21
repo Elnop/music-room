@@ -2,7 +2,7 @@ import { radarSpot } from '@/features/events/features/nearby/lib/radarBlips';
 
 describe('radarSpot', () => {
 	it('keeps an event at the same spot from one render to the next', () => {
-		expect(radarSpot('event-a', 0, 3)).toEqual(radarSpot('event-a', 0, 3));
+		expect(radarSpot('event-a', 0, 3)).toStrictEqual(radarSpot('event-a', 0, 3));
 	});
 
 	it('puts a nearer event closer to the user at the bottom centre', () => {

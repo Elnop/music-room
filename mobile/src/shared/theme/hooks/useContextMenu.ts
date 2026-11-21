@@ -1,7 +1,7 @@
-export interface ContextMenuProps {
+export type ContextMenuProps = {
 	onContextMenu?: unknown;
 	onKeyDown?: unknown;
-}
+};
 
 const NONE: ContextMenuProps = {};
 

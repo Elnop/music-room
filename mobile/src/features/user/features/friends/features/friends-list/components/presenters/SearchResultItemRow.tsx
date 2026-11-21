@@ -9,10 +9,10 @@ import { createFriendsListStyles } from '@/features/user/features/friends/featur
 import { Text } from '@/shared/theme/components/Text';
 import AngleRightSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/angle-right-solid.svg';
 
-interface SearchResultItemRowProps {
+type SearchResultItemRowProps = {
 	user: UserProfile;
 	onPress: (userId: string) => void;
-}
+};
 
 export function SearchResultItemRow({ user, onPress }: SearchResultItemRowProps) {
 	const { theme } = useTheme();

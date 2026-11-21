@@ -64,14 +64,14 @@ afterEach(() => {
 
 describe('connectStore', () => {
 	it('starts local', () => {
-		expect(connect().target).toEqual({ kind: 'local' });
+		expect(connect().target).toStrictEqual({ kind: 'local' });
 		expect(activeOwnerId()).toBe('me');
 	});
 
 	it('setRemote targets the device and stops the phone audio', () => {
 		connect().setRemote({ ownerId: 'friend', deviceId: 'tablet', ownerUsername: 'Léa' });
 
-		expect(connect().target).toEqual({
+		expect(connect().target).toStrictEqual({
 			kind: 'remote',
 			ownerId: 'friend',
 			deviceId: 'tablet',
@@ -85,7 +85,7 @@ describe('connectStore', () => {
 		connect().setRemote({ ownerId: 'friend', deviceId: 'tablet' });
 		connect().setRemoteStatus(status);
 		connect().setLocal();
-		expect(connect().target).toEqual({ kind: 'local' });
+		expect(connect().target).toStrictEqual({ kind: 'local' });
 		expect(connect().remoteStatus).toBeNull();
 		expect(showInfo).not.toHaveBeenCalled();
 
@@ -108,7 +108,7 @@ describe('connectStore', () => {
 		connect().setRemote({ ownerId: 'friend', deviceId: 'tablet' });
 		connect().setRemoteStatus(status);
 		notifySessionEnd();
-		expect(connect().target).toEqual({ kind: 'local' });
+		expect(connect().target).toStrictEqual({ kind: 'local' });
 		expect(connect().remoteStatus).toBeNull();
 	});
 });

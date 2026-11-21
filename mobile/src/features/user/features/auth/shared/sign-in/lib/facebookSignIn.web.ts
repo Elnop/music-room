@@ -6,15 +6,15 @@ import { SIGN_IN_CANCELLED } from '@/features/user/features/auth/shared/sign-in/
 const SDK_SCRIPT = 'https://connect.facebook.net/en_US/sdk.js';
 const GRAPH_VERSION = 'v21.0';
 
-interface LoginResponse {
+type LoginResponse = {
 	status?: string;
 	authResponse?: { accessToken?: string } | null;
-}
+};
 
-interface FacebookSdk {
+type FacebookSdk = {
 	init: (config: { appId: string; version: string; cookie: boolean; xfbml: boolean }) => void;
 	login: (callback: (response: LoginResponse) => void, options: { scope: string }) => void;
-}
+};
 
 const FACEBOOK_APP_ID: string | undefined =
 	Constants.expoConfig?.extra?.EXPO_PUBLIC_FACEBOOK_APP_ID ||

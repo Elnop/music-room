@@ -31,7 +31,7 @@ describe('streamPrefetch', () => {
 	it('returns a matching fresh entry once, then nothing', () => {
 		streamPrefetch.set(entry());
 
-		expect(streamPrefetch.take('b', 'https://soundcloud.com/artist/b', NOW)).toEqual(entry());
+		expect(streamPrefetch.take('b', 'https://soundcloud.com/artist/b', NOW)).toStrictEqual(entry());
 		expect(streamPrefetch.peek()).toBeNull();
 		expect(streamPrefetch.take('b', 'https://soundcloud.com/artist/b', NOW)).toBeNull();
 	});
@@ -42,7 +42,7 @@ describe('streamPrefetch', () => {
 		expect(streamPrefetch.take('c', 'https://soundcloud.com/artist/b', NOW)).toBeNull();
 		expect(streamPrefetch.take('b', 'https://soundcloud.com/artist/c', NOW)).toBeNull();
 		expect(streamPrefetch.take(null, 'https://soundcloud.com/artist/b', NOW)).toBeNull();
-		expect(streamPrefetch.peek()).toEqual(entry());
+		expect(streamPrefetch.peek()).toStrictEqual(entry());
 	});
 
 	it('drops a matching entry about to expire', () => {

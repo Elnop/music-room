@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 
-interface Countdown {
+type Countdown = {
 	seconds: number;
 	start: (seconds: number) => void;
-}
+};
 
 export function useCountdown(): Countdown {
 	const [seconds, setSeconds] = useState(0);

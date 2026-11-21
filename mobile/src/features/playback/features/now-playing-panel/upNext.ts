@@ -1,10 +1,10 @@
 import type { OwnerQueue, QueueItem } from '@/shared/playback/lib/playback';
 
-interface UpNext {
+type UpNext = {
 	current: QueueItem | null;
 	items: QueueItem[];
 	total: number;
-}
+};
 
 export function upNext(queue: OwnerQueue, count: number): UpNext {
 	const index =

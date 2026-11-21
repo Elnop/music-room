@@ -15,12 +15,12 @@ import type { SoundCloudTrack } from '@/features/search/lib/types';
 import { Text } from '@/shared/theme/components/Text';
 import type { MenuAnchor } from '@/shared/theme/lib/menuPlacement';
 
-interface SoundCloudTrackItemProps {
+type SoundCloudTrackItemProps = {
 	track: SoundCloudTrack;
 	onPlay: (track: SoundCloudTrack) => void;
 	onAddToQueue: (track: SoundCloudTrack) => void;
 	onShowActions: (track: SoundCloudTrack, anchor?: MenuAnchor) => void;
-}
+};
 
 export function SoundCloudTrackItem({
 	track,
@@ -65,7 +65,7 @@ export function SoundCloudTrackItem({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: pixelRow(theme),
 		pressable: {
 			flex: 1,
@@ -100,4 +100,5 @@ function createStyles(theme: Theme) {
 			marginRight: theme.spacing.sm,
 		},
 	});
+	return styles;
 }

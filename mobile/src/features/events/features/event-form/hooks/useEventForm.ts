@@ -33,7 +33,7 @@ import type {
 
 type Navigation = NativeStackNavigationProp<EventStackParamList, 'EventForm'>;
 
-export interface EventForm {
+export type EventForm = {
 	isEditing: boolean;
 	name: CappedField;
 	description: CappedField;
@@ -52,7 +52,7 @@ export interface EventForm {
 	selectPlaylist: (id: string | null) => void;
 	submit: () => void;
 	isSubmitting: boolean;
-}
+};
 
 function orNull(text: string) {
 	return text.trim() || null;

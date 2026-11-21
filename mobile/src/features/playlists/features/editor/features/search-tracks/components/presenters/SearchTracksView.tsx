@@ -9,10 +9,10 @@ import type { SearchTracks } from '@/features/playlists/features/editor/features
 import { AddableTrackRow } from '@/features/playlists/features/editor/features/search-tracks/components/presenters/AddableTrackRow';
 import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
 
-interface SearchTracksViewProps {
+type SearchTracksViewProps = {
 	screen: SearchTracks;
 	bottomPadding: number;
-}
+};
 
 export function SearchTracksView({ screen, bottomPadding }: SearchTracksViewProps) {
 	const { styles } = useThemedStyles(createStyles);
@@ -66,7 +66,7 @@ export function SearchTracksView({ screen, bottomPadding }: SearchTracksViewProp
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -80,4 +80,5 @@ function createStyles(theme: Theme) {
 			paddingTop: theme.spacing.sm,
 		},
 	});
+	return styles;
 }

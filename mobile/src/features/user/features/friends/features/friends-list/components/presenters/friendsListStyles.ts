@@ -3,7 +3,7 @@ import { pixelFrame, pixelRow } from '@/shared/theme/lib/pixelFrame';
 import type { Theme } from '@/shared/theme/lib/types';
 
 export function createFriendsListStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -120,4 +120,5 @@ export function createFriendsListStyles(theme: Theme) {
 			paddingTop: theme.spacing.xxl,
 		},
 	});
+	return styles;
 }

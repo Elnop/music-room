@@ -7,9 +7,9 @@ import { Button } from '@/shared/theme/components/Button';
 import type { NewPlaylistDraft } from '@/features/playlists/features/editor/features/track-actions/hooks/useNewPlaylistFromTrack';
 import { PLAYLIST_NAME_MAX } from '@/features/playlists/features/editor/features/track-actions/playlistName';
 
-interface NewPlaylistFormProps {
+type NewPlaylistFormProps = {
 	draft: NewPlaylistDraft;
-}
+};
 
 export function NewPlaylistForm({ draft }: NewPlaylistFormProps) {
 	const { styles } = useThemedStyles(createStyles);
@@ -36,10 +36,11 @@ export function NewPlaylistForm({ draft }: NewPlaylistFormProps) {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		form: {
 			paddingHorizontal: theme.spacing.lg,
 			paddingTop: theme.spacing.md,
 		},
 	});
+	return styles;
 }

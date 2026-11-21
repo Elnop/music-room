@@ -1,8 +1,8 @@
-interface BeaconFrame {
+type BeaconFrame = {
 	minor: number;
 	rssi: number;
 	measuredPower: number;
-}
+};
 
 export type ScannerState = 'on' | 'off' | 'unsupported';
 

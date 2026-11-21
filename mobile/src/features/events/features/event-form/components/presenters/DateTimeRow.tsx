@@ -8,11 +8,11 @@ import { formatEventDate } from '@/features/events/shared/event-dates/eventDates
 import { Text } from '@/shared/theme/components/Text';
 import CalenderSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/calender-solid.svg';
 
-interface DateTimeRowProps {
+type DateTimeRowProps = {
 	label: string;
 	value: Date;
 	onPress: () => void;
-}
+};
 
 export function DateTimeRow({ label, value, onPress }: DateTimeRowProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
@@ -30,7 +30,7 @@ export function DateTimeRow({ label, value, onPress }: DateTimeRowProps) {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		row: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -48,4 +48,5 @@ function createStyles(theme: Theme) {
 			marginTop: 2,
 		},
 	});
+	return styles;
 }

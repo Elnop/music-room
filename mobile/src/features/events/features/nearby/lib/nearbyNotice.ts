@@ -1,10 +1,10 @@
 import { Platform } from 'react-native';
 import type { PositionState } from '@/features/events/features/nearby/hooks/useForegroundPosition';
 
-export interface NearbyNotice {
+export type NearbyNotice = {
 	message: string;
 	action?: 'request' | 'settings' | 'retry';
-}
+};
 
 function privacy(): string {
 	return Platform.OS === 'web'

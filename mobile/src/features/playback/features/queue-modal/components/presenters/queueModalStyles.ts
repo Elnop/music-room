@@ -15,7 +15,7 @@ export function createModalStyles(
 	insets: { top: number; bottom: number },
 	separator: string
 ) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		...sheetHeaderStyles(theme, insets, separator),
 		listContent: {
 			flexGrow: 1,
@@ -33,10 +33,11 @@ export function createModalStyles(
 			color: theme.colors.textSecondary,
 		},
 	});
+	return styles;
 }
 
 export function createRowStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		row: pixelRow(theme),
 		rowMain: {
 			flex: 1,
@@ -91,4 +92,5 @@ export function createRowStyles(theme: Theme) {
 			marginTop: 4,
 		},
 	});
+	return styles;
 }

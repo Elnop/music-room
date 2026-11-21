@@ -2,12 +2,12 @@ import React from 'react';
 import { View } from 'react-native';
 import type { StyleProp, ViewStyle } from 'react-native';
 
-interface SkeletonListProps {
+type SkeletonListProps = {
 	count?: number;
 	row: React.ComponentType;
 	header?: React.ReactNode;
 	style?: StyleProp<ViewStyle>;
-}
+};
 
 export function SkeletonList({ count = 6, row: Row, header, style }: SkeletonListProps) {
 	return (

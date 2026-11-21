@@ -68,7 +68,7 @@ describe('AppProvidersContainer', () => {
 		client.setQueryData(['playlists', 'friends'], [{ id: 'p2' }]);
 		unmount();
 		notifySessionEnd();
-		expect(client.getQueryData(['playlists', 'friends'])).toEqual([{ id: 'p2' }]);
+		expect(client.getQueryData(['playlists', 'friends'])).toStrictEqual([{ id: 'p2' }]);
 		client.clear();
 	});
 });

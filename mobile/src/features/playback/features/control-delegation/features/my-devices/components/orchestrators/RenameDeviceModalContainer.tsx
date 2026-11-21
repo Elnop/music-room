@@ -2,12 +2,12 @@ import React from 'react';
 import { useRenameDeviceForm } from '@/features/playback/features/control-delegation/features/my-devices/hooks/useRenameDeviceForm';
 import { RenameDeviceModalView } from '@/features/playback/features/control-delegation/features/my-devices/components/presenters/RenameDeviceModalView';
 
-interface RenameDeviceModalProps {
+type RenameDeviceModalProps = {
 	deviceName: string | null;
 	saving: boolean;
 	onClose: () => void;
 	onSubmit: (name: string | null) => void;
-}
+};
 
 export function RenameDeviceModalContainer({
 	deviceName,

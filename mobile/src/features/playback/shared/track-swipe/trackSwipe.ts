@@ -1,11 +1,11 @@
 const SWIPE_TRACK_THRESHOLD = 80;
 export const SWIPE_FLICK_VELOCITY = 800;
 
-interface SwipeEnd {
+type SwipeEnd = {
 	translationX: number;
 	translationY: number;
 	velocityX: number;
-}
+};
 
 export function trackSwipeDirection(event: SwipeEnd): 'next' | 'previous' | null {
 	'worklet';

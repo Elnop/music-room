@@ -48,7 +48,7 @@ const BLACK: Rgb = [0, 0, 0];
 const SECONDARY_MIN_ALPHA = 0.7;
 const SECONDARY_ALPHA_STEP = 0.05;
 
-interface AdaptivePalette {
+type AdaptivePalette = {
 	text: string;
 	textSecondary: string;
 	buttonBg: string;
@@ -56,7 +56,7 @@ interface AdaptivePalette {
 	accentBg: string;
 	onAccent: string;
 	gradient: [string, string, string, string];
-}
+};
 
 function gradientSamples(): number[] {
 	const low = Math.min(...GRADIENT_ALPHAS);

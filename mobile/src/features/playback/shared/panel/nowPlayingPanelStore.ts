@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 import { onSessionEnd } from '@/shared/backend/lib/authSession';
 
-interface NowPlayingPanelState {
+type NowPlayingPanelState = {
 	isOpen: boolean;
 	setOpen: (isOpen: boolean) => void;
 	toggle: () => void;
-}
+};
 
 export const useNowPlayingPanelStore = create<NowPlayingPanelState>(set => ({
 	isOpen: false,

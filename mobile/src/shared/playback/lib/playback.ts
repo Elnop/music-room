@@ -1,22 +1,22 @@
-export interface QueueTrack {
+export type QueueTrack = {
 	trackUri: string;
 	title: string;
 	artist: string;
 	album: string | null;
 	albumArt: string | null;
 	durationMs: number;
-}
+};
 
-export interface QueueItem {
+export type QueueItem = {
 	id: string;
 	rank: string;
 	track: QueueTrack;
 	sourcePlaylistId: string | null;
 	blockId: string | null;
 	blockDetached: boolean;
-}
+};
 
-export interface AddQueueItemBody {
+export type AddQueueItemBody = {
 	trackUri: string;
 	title: string;
 	artist: string;
@@ -24,14 +24,14 @@ export interface AddQueueItemBody {
 	albumArt?: string;
 	durationMs: number;
 	next?: boolean;
-}
+};
 
 export type PlaybackState = 'idle' | 'loading' | 'ready' | 'playing' | 'paused';
 
-export interface OwnerQueue {
+export type OwnerQueue = {
 	currentItemId: string | null;
 	items: QueueItem[];
 	version: number;
-}
+};
 
 export type QueueStepOutcome = 'played' | 'stopped' | 'boundary' | 'error' | 'ignored';

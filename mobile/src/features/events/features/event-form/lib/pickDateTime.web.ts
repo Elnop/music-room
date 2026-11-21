@@ -1,25 +1,25 @@
-interface DomElement {
+type DomElement = {
 	textContent: string | null;
 	style: Record<string, string>;
 	setAttribute: (name: string, value: string) => void;
 	append: (...children: DomElement[]) => void;
 	remove: () => void;
-}
+};
 
-interface DomInput extends DomElement {
+type DomInput = DomElement & {
 	value: string;
-}
+};
 
-interface DomDialog extends DomElement {
+type DomDialog = DomElement & {
 	returnValue: string;
 	showModal: () => void;
 	addEventListener: (type: 'close', listener: () => void, options: { once: boolean }) => void;
-}
+};
 
-interface DomDocument {
+type DomDocument = {
 	body: DomElement;
 	createElement: (tag: string) => DomElement;
-}
+};
 
 const CONFIRM = 'confirm';
 

@@ -14,11 +14,11 @@ import GlobeSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/globe-sol
 import LockSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/lock-solid.svg';
 import PencilSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/pencil-solid.svg';
 
-interface PlaylistCassetteProps {
+type PlaylistCassetteProps = {
 	playlist: Playlist;
 	owner?: UserSummary;
 	width: number;
-}
+};
 
 export function PlaylistCassette({ playlist, owner, width }: PlaylistCassetteProps) {
 	const { styles, theme } = useThemedStyles(createStyles);
@@ -54,7 +54,7 @@ export function PlaylistCassette({ playlist, owner, width }: PlaylistCassettePro
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		cover: { ...pixelFrame(theme), backgroundColor: theme.colors.surfaceAlt },
 		name: {
 			fontSize: theme.typography.sizes.md,
@@ -71,4 +71,5 @@ function createStyles(theme: Theme) {
 			marginTop: theme.spacing.xs,
 		},
 	});
+	return styles;
 }

@@ -2,12 +2,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { UserProfile } from '@/shared/users/user.types';
 import { logger } from '@/shared/logging/logger';
 
-interface StoredSession {
+type StoredSession = {
 	user: UserProfile;
 	accessToken: string;
 	refreshToken: string | null;
 	tokenExpiresAt: number | null;
-}
+};
 
 const KEYS = {
 	user: '@zumik/auth_user',

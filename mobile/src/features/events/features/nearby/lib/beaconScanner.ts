@@ -4,11 +4,11 @@ import { logger } from '@/shared/logging/logger';
 import { base64ToBytes } from '@/features/events/features/nearby/lib/base64';
 import { parseIBeacon, zumikBeaconMinor } from '@/features/events/shared/beacon/ibeacon';
 
-interface BeaconFrame {
+type BeaconFrame = {
 	minor: number;
 	rssi: number;
 	measuredPower: number;
-}
+};
 
 export type ScannerState = 'on' | 'off' | 'unsupported';
 

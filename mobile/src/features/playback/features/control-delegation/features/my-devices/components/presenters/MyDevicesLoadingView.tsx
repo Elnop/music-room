@@ -18,7 +18,7 @@ export function MyDevicesLoadingView() {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		loadingScreen: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
@@ -26,4 +26,5 @@ function createStyles(theme: Theme) {
 			paddingTop: theme.spacing.lg,
 		},
 	});
+	return styles;
 }

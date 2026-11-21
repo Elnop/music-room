@@ -5,12 +5,12 @@ import { useTheme } from '@/shared/theme/components/ThemeContext';
 import type { Theme } from '@/shared/theme/lib/types';
 import { Text } from '@/shared/theme/components/Text';
 
-interface LoadingSpinnerProps {
+type LoadingSpinnerProps = {
 	size?: 'small' | 'large';
 	message?: string;
 	fullScreen?: boolean;
 	variant?: 'logo' | 'spinner';
-}
+};
 
 export function LoadingSpinner({
 	size = 'large',
@@ -47,7 +47,7 @@ export function LoadingSpinner({
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: {
 			justifyContent: 'center',
 			alignItems: 'center',
@@ -64,4 +64,5 @@ function createStyles(theme: Theme) {
 			fontFamily: theme.typography.families.medium,
 		},
 	});
+	return styles;
 }

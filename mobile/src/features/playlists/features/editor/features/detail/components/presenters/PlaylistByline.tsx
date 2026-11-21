@@ -33,7 +33,7 @@ export function PlaylistByline({ playlist }: { playlist: PlaylistWithTracks }) {
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		meta: {
 			flexDirection: 'row',
 			alignItems: 'center',
@@ -60,4 +60,5 @@ function createStyles(theme: Theme) {
 			fontFamily: theme.typography.families.semibold,
 		},
 	});
+	return styles;
 }
