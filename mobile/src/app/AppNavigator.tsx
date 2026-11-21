@@ -13,7 +13,6 @@ import { NowPlayingPanelContainer } from '@/features/playback/features/now-playi
 import { useNowPlayingPanelStore } from '@/features/playback/shared/panel/nowPlayingPanelStore';
 import { useEventsSync } from '@/features/events/useEventsSync';
 import { AppFrameLayout } from '@/features/shell/components/orchestrators/AppFrameLayout';
-import { PanelOpenContainer } from '@/features/shell/components/orchestrators/PanelOpenContainer';
 import type { PlayerSheets } from '@/features/playback/shared/full-screen-sheet/FullScreenSheet';
 
 export type { AppTabsParamList } from '@/app/AppTabs';
@@ -33,18 +32,17 @@ export function AppNavigator() {
 	return (
 		<PlayerProvider>
 			<AppFrameLayout
-				panel={
-					panelOpen && (
+				panelOpen={panelOpen}
+				slots={{
+					panel: panelOpen && (
 						<NowPlayingPanelContainer {...PLAYER_SHEETS} TrackActionsSheet={TrackActionsSheet} />
-					)
-				}
-				playerBar={<PlayerBarContainer {...PLAYER_SHEETS} />}
-				miniPlayer={<MiniPlayerContainer />}
-				overlays={<AppOverlays sheets={PLAYER_SHEETS} />}
+					),
+					playerBar: <PlayerBarContainer {...PLAYER_SHEETS} />,
+					miniPlayer: <MiniPlayerContainer />,
+					overlays: <AppOverlays sheets={PLAYER_SHEETS} />,
+				}}
 			>
-				<PanelOpenContainer open={panelOpen}>
-					<AppTabs />
-				</PanelOpenContainer>
+				<AppTabs />
 			</AppFrameLayout>
 		</PlayerProvider>
 	);

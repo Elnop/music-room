@@ -1,5 +1,7 @@
 export const TAB_BAR_HEIGHT = 70;
 
+export const TAB_BAR_PADDING = 10;
+
 export const BREAKPOINTS = { tablet: 768, desktop: 1024 } as const;
 
 export const SIDEBAR_WIDTH = { tablet: 104, desktop: 240 } as const;
@@ -11,3 +13,5 @@ export const DIALOG_MAX_WIDTH = 560;
 export const PLAYER_DIALOG_WIDTH = 440;
 
 export const NOW_PLAYING_PANEL_WIDTH = 360;
+
+export const ERROR_STACK_MAX_HEIGHT = 300;

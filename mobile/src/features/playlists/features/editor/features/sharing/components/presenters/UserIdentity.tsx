@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Text } from '@/shared/theme/components/Text';
+import { NameWithHandle } from '@/shared/theme/components/NameWithHandle';
 import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { Theme } from '@/shared/theme/types/themeTypes';
 
@@ -14,12 +14,7 @@ export function UserIdentity({ username, displayName }: UserIdentityProps) {
 
 	return (
 		<View style={styles.userInfo}>
-			<Text style={styles.displayName} numberOfLines={1}>
-				{displayName || username}
-			</Text>
-			<Text style={styles.username} numberOfLines={1}>
-				@{username}
-			</Text>
+			<NameWithHandle name={displayName || username} username={username} size="large" />
 		</View>
 	);
 }
@@ -29,16 +24,6 @@ function createStyles(theme: Theme) {
 		userInfo: {
 			flex: 1,
 			marginRight: theme.spacing.sm,
-		},
-		displayName: {
-			fontSize: theme.typography.sizes.mlg,
-			fontFamily: theme.typography.families.semibold,
-			color: theme.colors.text,
-			marginBottom: theme.spacing.xxs,
-		},
-		username: {
-			fontSize: theme.typography.sizes.smd,
-			color: theme.colors.textSecondary,
 		},
 	});
 	return styles;

@@ -7,13 +7,13 @@ import type {
 
 type BrowserKeyEvent = ShortcutKeyEvent & {
 	defaultPrevented: boolean;
-	preventDefault(): void;
+	preventDefault: () => void;
 };
 
 type BrowserDocument = {
-	addEventListener(type: 'keydown', listener: (event: BrowserKeyEvent) => void): void;
-	removeEventListener(type: 'keydown', listener: (event: BrowserKeyEvent) => void): void;
-	querySelector(selector: string): unknown;
+	addEventListener: (type: 'keydown', listener: (event: BrowserKeyEvent) => void) => void;
+	removeEventListener: (type: 'keydown', listener: (event: BrowserKeyEvent) => void) => void;
+	querySelector: (selector: string) => unknown;
 };
 
 const browser = globalThis as unknown as { document?: BrowserDocument };

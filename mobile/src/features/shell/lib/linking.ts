@@ -6,19 +6,8 @@ import { logger } from '@/shared/logging/logger';
 import { LINK_PREFIX } from '@/shared/share-links/shareLinksConfig';
 import { stripBasePath, webBasePath } from '@/features/shell/lib/webBasePath';
 import { matchScreenPath, pathFromState, stateFromMatch } from '@/features/shell/lib/screenPaths';
-import type { ScreenPathMatch } from '@/features/shell/lib/screenPaths';
-
-let pendingPath: string | null = null;
-
-export function takePendingLink(): string | null {
-	const path = pendingPath;
-	pendingPath = null;
-	return path;
-}
-
-export function clearPendingLink(): void {
-	pendingPath = null;
-}
+import type { ScreenPathMatch } from '@/features/shell/types/screenPathTypes';
+import { keepPendingLink, takePendingLink } from '@/features/shell/lib/pendingLink';
 
 function matchLink(path: string, signedIn?: boolean): ScreenPathMatch | undefined {
 	const match = matchScreenPath(path, signedIn);
@@ -51,7 +40,7 @@ export function createLinking(isSignedIn: () => boolean): LinkingOptions<AppTabs
 			if (!match) return undefined;
 			const isAppScreen = Boolean(match.entry.tab);
 			if (isAppScreen !== signedIn) {
-				if (isAppScreen && match.entry.path !== '') pendingPath = path;
+				if (isAppScreen && match.entry.path !== '') keepPendingLink(path);
 				return undefined;
 			}
 			return stateFromMatch(match);

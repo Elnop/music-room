@@ -1,7 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { PlaylistStackParamList } from '@/features/playlists/shared/playlist/playlistTypes';
-import type { EventStackParamList } from '@/features/events/lib/types';
+import type { EventStackParamList } from '@/features/events/eventTypes';
 import { HomeScreen } from '@/app/screens/HomeScreen';
 import { LibraryScreen } from '@/app/screens/LibraryScreen';
 import { PlaylistDetailScreen } from '@/app/screens/PlaylistDetailScreen';

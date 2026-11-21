@@ -1,25 +1,9 @@
-type DomElement = {
-	textContent: string | null;
-	style: Record<string, string>;
-	setAttribute: (name: string, value: string) => void;
-	append: (...children: DomElement[]) => void;
-	remove: () => void;
-};
-
-type DomInput = DomElement & {
-	value: string;
-};
-
-type DomDialog = DomElement & {
-	returnValue: string;
-	showModal: () => void;
-	addEventListener: (type: 'close', listener: () => void, options: { once: boolean }) => void;
-};
-
-type DomDocument = {
-	body: DomElement;
-	createElement: (tag: string) => DomElement;
-};
+import { button, element } from '@/features/events/features/event-form/lib/domElements';
+import type {
+	DomDialog,
+	DomDocument,
+	DomInput,
+} from '@/features/events/features/event-form/types/domTypes';
 
 const CONFIRM = 'confirm';
 
@@ -38,24 +22,7 @@ export function fromLocalInputValue(value: string): Date | null {
 	return Number.isNaN(date.getTime()) ? null : date;
 }
 
-function element<T extends DomElement>(
-	doc: DomDocument,
-	tag: string,
-	attributes: Record<string, string> = {}
-): T {
-	const node = doc.createElement(tag);
-	for (const [name, value] of Object.entries(attributes)) node.setAttribute(name, value);
-	return node as T;
-}
-
-function button(doc: DomDocument, label: string, attributes: Record<string, string>): DomElement {
-	const node = element(doc, 'button', attributes);
-	node.textContent = label;
-	return node;
-}
-
-export function pickDateTime(current: Date): Promise<Date | null> {
-	const doc = (globalThis as unknown as { document: DomDocument }).document;
+function buildDialog(doc: DomDocument, current: Date) {
 	const dialog = element<DomDialog>(doc, 'dialog', { 'aria-label': 'Date et heure' });
 	const form = element(doc, 'form', { method: 'dialog' });
 	const input = element<DomInput>(doc, 'input', {
@@ -73,6 +40,12 @@ export function pickDateTime(current: Date): Promise<Date | null> {
 	Object.assign(actions.style, { display: 'flex', justifyContent: 'flex-end', gap: '8px' });
 	form.append(input, actions);
 	dialog.append(form);
+	return { dialog, input };
+}
+
+export function pickDateTime(current: Date): Promise<Date | null> {
+	const doc = (globalThis as unknown as { document: DomDocument }).document;
+	const { dialog, input } = buildDialog(doc, current);
 
 	return new Promise(resolve => {
 		dialog.addEventListener(

@@ -6,9 +6,9 @@ type StyleElement = {
 };
 
 type BrowserDocument = {
-	getElementById(id: string): StyleElement | null;
-	createElement(tag: 'style'): StyleElement;
-	head: { appendChild(element: StyleElement): void };
+	getElementById: (id: string) => StyleElement | null;
+	createElement: (tag: 'style') => StyleElement;
+	head: { appendChild: (element: StyleElement) => void };
 };
 
 const browser = globalThis as unknown as { document?: BrowserDocument };

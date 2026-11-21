@@ -30,10 +30,14 @@ export function InfoRow({ icon, label, text }: InfoRowProps) {
 function createStyles(theme: Theme) {
 	const styles = StyleSheet.create({
 		row: { flexDirection: 'row', alignItems: 'flex-start', gap: theme.spacing.md },
-		icon: { marginTop: 2 },
+		icon: { marginTop: theme.spacing.xxs },
 		body: { flex: 1 },
 		label: pixelCaption(theme),
-		text: { fontSize: theme.typography.sizes.lg, color: theme.colors.text, marginTop: 2 },
+		text: {
+			fontSize: theme.typography.sizes.lg,
+			color: theme.colors.text,
+			marginTop: theme.spacing.xxs,
+		},
 	});
 	return styles;
 }

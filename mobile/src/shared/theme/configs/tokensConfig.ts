@@ -35,8 +35,9 @@ export const PIXEL_TYPOGRAPHY = {
 		xxxl: 32,
 	},
 	lineHeights: {
-		sm: 18,
-		md: 20,
+		xs: 18,
+		sm: 20,
+		md: 21,
 	},
 	letterSpacings: {
 		wide: 1,
@@ -111,6 +112,7 @@ export const CONTROL_SIZES = {
 	headerButton: 36,
 	buttonCompact: 28,
 	searchBar: 44,
+	keyRow: 45,
 	button: 52,
 	toast: 56,
 	rowIcon: 36,

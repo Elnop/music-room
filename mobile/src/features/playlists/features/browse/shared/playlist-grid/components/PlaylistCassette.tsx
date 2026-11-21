@@ -42,8 +42,8 @@ function createStyles(theme: Theme) {
 			fontSize: theme.typography.sizes.md,
 			fontFamily: theme.typography.families.medium,
 			color: theme.colors.text,
-			lineHeight: theme.typography.lineHeights.sm,
-			height: theme.typography.lineHeights.sm * 2,
+			lineHeight: theme.typography.lineHeights.xs,
+			height: theme.typography.lineHeights.xs * 2,
 			marginTop: theme.spacing.sm,
 		},
 	});

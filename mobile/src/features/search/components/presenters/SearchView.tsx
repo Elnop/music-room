@@ -1,134 +1,47 @@
 import React from 'react';
-import { View, FlatList, StyleSheet, RefreshControl } from 'react-native';
-import type { TextInput } from 'react-native';
-import { useTheme } from '@/shared/theme/hooks/useTheme';
-import { SearchBar } from '@/shared/theme/components/SearchBar';
+import { View, StyleSheet } from 'react-native';
 import { SkeletonList, TrackRowSkeleton } from '@/shared/theme/components/Skeleton';
-import { EmptyState } from '@/shared/theme/components/EmptyState';
+import { useThemedStyles } from '@/shared/theme/hooks/useThemedStyles';
 import type { TrackActionsSheetComponent } from '@/shared/playback/types/trackActionsSheetTypes';
-import { SoundCloudTrackItem } from '@/features/search/components/presenters/SoundCloudTrackItem';
 import type { Theme } from '@/shared/theme/types/themeTypes';
-import type { SoundCloudTrack } from '@/features/search/lib/types';
-import type { AddQueueItemBody } from '@/shared/playback/types/playbackTypes';
 import { useContentColumn } from '@/shared/content-column/useContentColumn';
-import ExclamationTriangleSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/exclamation-triangle-solid.svg';
-import MusicSolid from '@hackernoon/pixel-icon-library/icons/SVG/solid/music-solid.svg';
-import type { MenuAnchor } from '@/shared/theme/types/menuTypes';
+import { SearchHeader } from '@/features/search/components/presenters/SearchHeader';
+import { SearchResultsList } from '@/features/search/components/presenters/SearchResultsList';
+import type { SearchScreen } from '@/features/search/searchTypes';
 
-interface SearchViewProps {
+type SearchViewProps = SearchScreen & {
 	TrackActionsSheet: TrackActionsSheetComponent;
-	inputRef: React.RefObject<TextInput | null>;
-	searchQuery: string;
-	debouncedQuery: string;
-	isLoading: boolean;
-	isRefreshing: boolean;
-	isError: boolean;
-	searchResults: SoundCloudTrack[];
-	actionTrack: AddQueueItemBody | null;
-	bottomPadding: number;
-	onSearchChange: (text: string) => void;
-	onRefresh: () => void;
-	onRetry: () => void;
-	onPlay: (track: SoundCloudTrack) => void;
-	onAddToQueue: (track: SoundCloudTrack) => void;
-	onShowActions: (track: SoundCloudTrack, anchor?: MenuAnchor) => void;
-	onCloseActions: () => void;
-}
+};
 
-export function SearchView({
-	TrackActionsSheet,
-	inputRef,
-	searchQuery,
-	debouncedQuery,
-	isLoading,
-	isRefreshing,
-	isError,
-	searchResults,
-	actionTrack,
-	bottomPadding,
-	onSearchChange,
-	onRefresh,
-	onRetry,
-	onPlay,
-	onAddToQueue,
-	onShowActions,
-	onCloseActions,
-}: SearchViewProps) {
-	const { theme } = useTheme();
-	const styles = React.useMemo(() => createStyles(theme), [theme]);
+export function SearchView({ TrackActionsSheet, field, results, ...screen }: SearchViewProps) {
+	const { styles } = useThemedStyles(createStyles);
 	const column = useContentColumn();
+	const loading = results.isLoading && !results.isRefreshing;
 
 	return (
 		<View style={styles.container}>
-			<View style={[styles.header, column]}>
-				<SearchBar
-					input={{ inputRef }}
-					value={searchQuery}
-					onChangeText={onSearchChange}
-					placeholder="Rechercher sur SoundCloud..."
-					loading={isLoading && !isRefreshing}
-				/>
-			</View>
-
-			{isLoading && !isRefreshing && searchResults.length === 0 ? (
+			<SearchHeader field={field} loading={loading} />
+			{loading && results.tracks.length === 0 ? (
 				<SkeletonList count={8} row={TrackRowSkeleton} style={column} />
 			) : (
-				<FlatList
-					data={searchResults}
-					refreshControl={
-						<RefreshControl
-							refreshing={isRefreshing}
-							onRefresh={onRefresh}
-							tintColor={theme.colors.primary}
-							colors={[theme.colors.primary]}
-						/>
-					}
-					keyExtractor={item => item.id.toString()}
-					renderItem={({ item }) => (
-						<SoundCloudTrackItem
-							track={item}
-							onPlay={onPlay}
-							onAddToQueue={onAddToQueue}
-							onShowActions={onShowActions}
-						/>
-					)}
-					contentContainerStyle={[{ paddingBottom: bottomPadding, flexGrow: 1 }, column]}
-					ListEmptyComponent={
-						isLoading ? null : isError && debouncedQuery.trim() ? (
-							<EmptyState
-								icon={ExclamationTriangleSolid}
-								message="La recherche a échoué"
-								action={{ label: 'Réessayer', onPress: onRetry }}
-							/>
-						) : (
-							<EmptyState
-								icon={MusicSolid}
-								message={
-									searchQuery
-										? 'Aucun titre trouvé'
-										: 'Recherchez sur SoundCloud des titres à écouter ou à ajouter à vos playlists'
-								}
-							/>
-						)
-					}
+				<SearchResultsList
+					results={results}
+					searchQuery={field.searchQuery}
+					trackHandlers={screen.trackHandlers}
+					bottomPadding={screen.bottomPadding}
 				/>
 			)}
-
-			<TrackActionsSheet track={actionTrack} onClose={onCloseActions} />
+			<TrackActionsSheet track={screen.actionSheet.track} onClose={screen.actionSheet.onClose} />
 		</View>
 	);
 }
 
 function createStyles(theme: Theme) {
-	return StyleSheet.create({
+	const styles = StyleSheet.create({
 		container: {
 			flex: 1,
 			backgroundColor: theme.colors.background,
 		},
-		header: {
-			paddingHorizontal: theme.spacing.lg,
-			paddingTop: theme.spacing.xs,
-			paddingBottom: theme.spacing.md,
-		},
 	});
+	return styles;
 }

@@ -42,7 +42,7 @@ function createStyles(theme: Theme) {
 		text: {
 			fontSize: theme.typography.sizes.sm,
 			color: theme.colors.textSecondary,
-			lineHeight: theme.typography.lineHeights.md,
+			lineHeight: theme.typography.lineHeights.sm,
 		},
 	});
 	return styles;

@@ -1,20 +1,11 @@
-export const APPLE_COMPANY_ID = 0x004c;
-
-export const ZUMIK_BEACON_UUID = '5a554d49-4b00-4e00-8000-6576656e7473';
-
-const ZUMIK_BEACON_MAJOR = 1;
-
-export const MEASURED_POWER = -59;
-
-const IBEACON_TYPE = 0x02;
-const IBEACON_LENGTH = 0x15;
-
-type IBeaconFrame = {
-	uuid: string;
-	major: number;
-	minor: number;
-	measuredPower: number;
-};
+import {
+	IBEACON_LENGTH,
+	IBEACON_TYPE,
+	MEASURED_POWER,
+	ZUMIK_BEACON_MAJOR,
+	ZUMIK_BEACON_UUID,
+} from '@/features/events/shared/beacon/ibeaconConfig';
+import type { IBeaconFrame } from '@/features/events/shared/beacon/ibeaconTypes';
 
 function uuidBytes(uuid: string): number[] {
 	const hex = uuid.replaceAll('-', '');
@@ -51,33 +42,6 @@ export function eventBeaconFrame(beaconMinor: number): IBeaconFrame {
 		major: ZUMIK_BEACON_MAJOR,
 		minor: beaconMinor,
 		measuredPower: MEASURED_POWER,
-	};
-}
-
-function hex(bytes: number[]) {
-	return bytes.map(byte => byte.toString(16).padStart(2, '0')).join('');
-}
-
-function formatUuid(bytes: number[]): string {
-	const h = hex(bytes);
-	return [h.slice(0, 8), h.slice(8, 12), h.slice(12, 16), h.slice(16, 20), h.slice(20)].join('-');
-}
-
-function toSigned(byte: number) {
-	return byte > 127 ? byte - 256 : byte;
-}
-
-export function parseIBeacon(data: number[]): IBeaconFrame | null {
-	if (data.length < 25) return null;
-	const companyId = data[0] | (data[1] << 8);
-	if (companyId !== APPLE_COMPANY_ID || data[2] !== IBEACON_TYPE || data[3] !== IBEACON_LENGTH) {
-		return null;
-	}
-	return {
-		uuid: formatUuid(data.slice(4, 20)),
-		major: (data[20] << 8) | data[21],
-		minor: (data[22] << 8) | data[23],
-		measuredPower: toSigned(data[24]),
 	};
 }
 

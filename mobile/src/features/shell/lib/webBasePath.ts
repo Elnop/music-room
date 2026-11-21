@@ -16,7 +16,7 @@ type BrowserLocation = {
 };
 
 type BrowserHistory = {
-	replaceState(data: unknown, unused: string, url: string): void;
+	replaceState: (data: unknown, unused: string, url: string) => void;
 };
 
 const REDIRECT_PARAM = /[?&]redirect=([^&]*)/u;
