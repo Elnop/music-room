@@ -32,7 +32,7 @@ The rules block from day one; the violations that existed when a rule arrived ar
 | dependency-cruiser | `backend/.dependency-cruiser-known-violations.json` | a violation |
 | oxlint | `mobile/.oxlint-suppressions.json` (same format as ESLint's) | a (file, rule) pair, with its count |
 | jscpd | the `ignore` globs of `<project>/.jscpd.json` | a glob (the first globs, tests and generated files, are permanent) |
-| semgrep | the `exclude` lists of `tools/semgrep/rules.yml` | a path (`backendUrl.ts`, `api.ts` and the test globs are permanent; a rule's `metadata.allowed-paths` globs are its definition, not exceptions) |
+| semgrep | the `exclude` lists of `tools/semgrep/rules.yml` | a path (`api.ts` and the test globs are permanent; a rule's `metadata.allowed-paths` globs are its definition, not exceptions) |
 | gitleaks | the `[[allowlists]]` of `.gitleaks.toml` | an allowed value or path, public by design |
 
 An exception list only shrinks. `check:exceptions` counts the entries of each list per rule and fails when a count is higher than at the fork point from `origin/develop` or than at `HEAD`. A story that cleans files then shrinks the list:
@@ -88,7 +88,7 @@ semgrep, mobile: `fetch(` appears only in `src/shared/backend/lib/api.ts`. The A
 
 ## no-asyncstorage-outside-storage
 
-semgrep, mobile: `@react-native-async-storage/async-storage` is imported only by storage modules and tests. A storage module is named `<thing>Storage.ts` (`src/shared/playback/lastTrackStorage.ts`, `src/features/user/features/auth/shared/sign-in/lib/sessionStorage.ts`): the rule allows that name through `metadata.allowed-paths` (see [exception-lists](#exception-lists)). `src/shared/backend/lib/backendUrl.ts`, a storage module named before the convention, keeps its own exclude. Other code calls a storage module, so keys and formats live in one place. The other files importing it today are listed in the rule's `exclude` and leave it as they migrate.
+semgrep, mobile: `@react-native-async-storage/async-storage` is imported only by storage modules and tests. A storage module is named `<thing>Storage.ts` (`src/shared/playback/lastTrackStorage.ts`, `src/features/user/features/auth/shared/sign-in/lib/sessionStorage.ts`): the rule allows that name through `metadata.allowed-paths` (see [exception-lists](#exception-lists)). Other code calls a storage module, so keys and formats live in one place. The other files importing it today are listed in the rule's `exclude` and leave it as they migrate.
 
 ## no-non-null-assertion-on-env
 
